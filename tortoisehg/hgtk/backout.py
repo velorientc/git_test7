@@ -60,7 +60,8 @@ class BackoutDialog(gdialog.GDialog):
         ## message text area
         self.logview = gtk.TextView(buffer=None)
         self.logview.set_editable(True)
-        self.logview.modify_font(pango.FontDescription('Monospace'))
+        fontcomment = hglib.getfontconfig()['fontcomment']
+        self.logview.modify_font(pango.FontDescription(fontcomment))
         self.buf = self.logview.get_buffer()
         self.buf.set_text(self.msgset['str'])
         scrolledwindow = gtk.ScrolledWindow()
