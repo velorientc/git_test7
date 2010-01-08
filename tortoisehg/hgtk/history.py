@@ -382,6 +382,7 @@ class GLog(gdialog.GWindow):
     def toggle_show_toolbar(self, button):
         self.show_toolbar = button.get_active()
         self.syncbox.set_visible('reload', not self.show_toolbar)
+        self.sttool.set_visible('load', not self.show_toolbar)
         self._show_toolbar(self.show_toolbar)
 
     def p4pending_test(self, button):
@@ -1362,12 +1363,15 @@ class GLog(gdialog.GWindow):
     def get_extras(self):
         hbox = gtk.HBox()
         hbox.pack_start(self.stbar)
-        tbar = gtklib.SlimToolbar(self.tooltips)
-        hbox.pack_end(tbar, False, False)
-        more = tbar.append_button(gtk.STOCK_GO_DOWN, _('Load more Revisions'))
+        self.sttool = gtklib.SlimToolbar(self.tooltips)
+        hbox.pack_end(self.sttool, False, False)
+        more = self.sttool.append_button(gtk.STOCK_GO_DOWN,
+                           _('Load more Revisions'), group='load')
         more.connect('clicked', self.more_clicked)
-        all = tbar.append_button(gtk.STOCK_GOTO_BOTTOM, _('Load all Revisions'))
+        all = self.sttool.append_button(gtk.STOCK_GOTO_BOTTOM,
+                          _('Load all Revisions'), group='load')
         all.connect('clicked', self.load_all_clicked)
+        self.sttool.set_visible('load', not self.show_toolbar)
         return hbox
 
     def refresh_on_marker_change(self, oldlen, oldmarkers, newmarkers):
