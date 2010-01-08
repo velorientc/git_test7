@@ -99,7 +99,8 @@ class ServeDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription('Monospace'))
+        fontlog = hglib.getfontconfig()['fontlog']
+        self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
         vbox.pack_start(scrolledwindow, True, True)
