@@ -7,7 +7,6 @@
 
 import os
 import gtk
-import pango
 
 from mercurial import extensions
 from tortoisehg.util.i18n import _
@@ -32,7 +31,7 @@ class BugReport(gdialog.GWindow):
         textview = gtk.TextView()
         textview.set_wrap_mode(gtk.WRAP_NONE)
         textview.set_editable(False)
-        textview.modify_font(pango.FontDescription(self.fontdiff))
+        textview.modify_font(self.fonts['diff'])
         scroller = gtk.ScrolledWindow()
         scroller.set_shadow_type(gtk.SHADOW_IN)
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)

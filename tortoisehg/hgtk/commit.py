@@ -11,7 +11,6 @@ import os
 import errno
 import gtk
 import gobject
-import pango
 import tempfile
 import cStringIO
 import time
@@ -384,7 +383,7 @@ class GCommit(GStatus):
         self.text = gtk.TextView()
         self.text.connect('populate-popup', self.msg_add_to_popup)
         self.connect('thg-reflow', self.thgreflow, self.text)
-        self.text.modify_font(pango.FontDescription(self.fontcomment))
+        self.text.modify_font(self.fonts['comment'])
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 

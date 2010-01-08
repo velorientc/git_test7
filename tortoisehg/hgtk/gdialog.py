@@ -14,8 +14,9 @@ import shutil
 import tempfile
 import gtk
 import atexit
+import pango
 
-from mercurial import cmdutil, util, ui, hg, commands
+from mercurial import cmdutil, util, ui, hg, commands, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import settings, hglib, paths, shlib
@@ -257,21 +258,14 @@ class GWindow(gtk.Window):
         return self.opts.get(opt, False)
 
     def _parse_config(self):
-        # defaults
-        self.fontcomment = 'monospace 10'
-        self.fontdiff = 'monospace 10'
-        self.fontlist = 'Sans 9'
-        self.diffbottom = ''
-
-        for attr, setting in self.ui.configitems('gtools'):
-            if setting : setattr(self, attr, setting)
-
-        if not self.diffbottom:
+        self.rawfonts = hglib.getfontconfig(self.ui)
+        self.fonts = {}
+        for name, val in self.rawfonts.items():
+            self.fonts[name[4:]] = pango.FontDescription(val)
+        try:
+            self.diffbottom = self.ui.configbool('gtools', 'diffbottom', False)
+        except error.ConfigError:
             self.diffbottom = False
-        elif self.diffbottom.lower() == 'false' or self.diffbottom == '0':
-            self.diffbottom = False
-        else:
-            self.diffbottom = True
 
 
     def _parse_opts(self):

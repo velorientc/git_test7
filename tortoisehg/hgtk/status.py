@@ -283,7 +283,7 @@ class GStatus(gdialog.GWindow):
         self.filetree.set_search_equal_func(self.search_filelist)
         if hasattr(self.filetree, 'set_rubber_banding'):
             self.filetree.set_rubber_banding(True)
-        self.filetree.modify_font(pango.FontDescription(self.fontlist))
+        self.filetree.modify_font(self.fonts['list'])
         self.filetree.set_headers_clickable(True)
 
         toggle_cell = gtk.CellRendererToggle()
@@ -367,7 +367,7 @@ class GStatus(gdialog.GWindow):
         self.diff_notebook.set_tab_pos(gtk.POS_BOTTOM)
         self.diff_notebook_pages = {}
 
-        self.difffont = pango.FontDescription(self.fontdiff)
+        self.difffont = self.fonts['diff']
 
         self.clipboard = None
 

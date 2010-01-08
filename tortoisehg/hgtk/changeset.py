@@ -660,7 +660,7 @@ class ChangeSet(gdialog.GWindow):
         details_text.set_wrap_mode(gtk.WRAP_NONE)
         details_text.connect('populate-popup', self.add_to_popup)
         details_text.set_editable(False)
-        details_text.modify_font(pango.FontDescription(self.fontcomment))
+        details_text.modify_font(self.fonts['comment'])
         details_box.pack_start(details_text)
 
         self._buffer = gtk.TextBuffer()
@@ -679,7 +679,7 @@ class ChangeSet(gdialog.GWindow):
         filelist_tree.connect('popup-menu', self.file_popup_menu)
         filelist_tree.connect('row-activated', self.file_row_act)
         filelist_tree.set_search_equal_func(self.search_filelist)
-        filelist_tree.modify_font(pango.FontDescription(self.fontlist))
+        filelist_tree.modify_font(self.fonts['list'])
         self._filelist_tree = filelist_tree
 
         accelgroup = gtk.AccelGroup()
@@ -817,7 +817,7 @@ class ChangeSet(gdialog.GWindow):
 
         tag_table = self._buffer.get_tag_table()
 
-        tag_table.add(make_texttag('diff', font=self.fontdiff))
+        tag_table.add(make_texttag('diff', font=self.rawfonts['fontdiff']))
         tag_table.add(make_texttag('blue', foreground='blue'))
         tag_table.add(make_texttag('red', foreground='red'))
         tag_table.add(make_texttag('green', foreground='darkgreen'))
