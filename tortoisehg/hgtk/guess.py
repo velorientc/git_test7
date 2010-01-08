@@ -200,7 +200,8 @@ class DetectRenameDialog(gtk.Window):
         self.buf.create_tag('header', foreground=gtklib.DBLUE)
         diffview = gtk.TextView(self.buf)
         scroller.add(diffview)
-        diffview.modify_font(pango.FontDescription('monospace'))
+        fontdiff = hglib.getfontconfig()['fontdiff']
+        diffview.modify_font(pango.FontDescription(fontdiff))
         diffview.set_wrap_mode(gtk.WRAP_NONE)
         diffview.set_editable(False)
 
