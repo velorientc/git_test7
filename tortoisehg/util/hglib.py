@@ -134,7 +134,8 @@ def getfontconfig(ui):
         # defaults
         _fontconfig = {'fontcomment': 'monospace 10',
                        'fontdiff': 'monospace 10',
-                       'fontlist': 'sans 9'}
+                       'fontlist': 'sans 9',
+                       'fontlog': 'monospace 10'}
         # overwrite defaults with configured values
         for name, val in ui.configitems('gtools'):
             if val and name.startswith('font'):
