@@ -1360,7 +1360,15 @@ class GLog(gdialog.GWindow):
         return vbox
 
     def get_extras(self):
-        return self.stbar
+        hbox = gtk.HBox()
+        hbox.pack_start(self.stbar)
+        tbar = gtklib.SlimToolbar(self.tooltips)
+        hbox.pack_end(tbar, False, False)
+        more = tbar.append_button(gtk.STOCK_GO_DOWN, _('Load more Revisions'))
+        more.connect('clicked', self.more_clicked)
+        all = tbar.append_button(gtk.STOCK_GOTO_BOTTOM, _('Load all Revisions'))
+        all.connect('clicked', self.load_all_clicked)
+        return hbox
 
     def refresh_on_marker_change(self, oldlen, oldmarkers, newmarkers):
         # Note that oldmarkers/newmarkers may be either dicts
