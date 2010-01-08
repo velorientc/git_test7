@@ -127,6 +127,20 @@ def diffexpand(line):
         return line
     return line[0] + line[1:].expandtabs(_tabwidth)
 
+_fontconfig = None
+def getfontconfig(ui):
+    global _fontconfig
+    if _fontconfig is None:
+        # defaults
+        _fontconfig = {'fontcomment': 'monospace 10',
+                       'fontdiff': 'monospace 10',
+                       'fontlist': 'sans 9'}
+        # overwrite defaults with configured values
+        for name, val in ui.configitems('gtools'):
+            if val and name.startswith('font'):
+                _fontconfig[name] = val
+    return _fontconfig
+
 def uiwrite(u, args):
     '''
     write args if there are buffers
