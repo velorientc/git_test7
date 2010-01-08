@@ -33,6 +33,7 @@ class ChangeSet(gdialog.GWindow):
         if issue:
             match = r'%s|(%s)' % (match, issue)
         self.bodyre = re.compile(match)
+        self.httpre = re.compile(r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))')
         self.issuedict = dict()
 
     def get_title(self):
@@ -303,6 +304,14 @@ class ChangeSet(gdialog.GWindow):
                 if len(groups) > 2:
                     self.issuedict[link] = groups[1:]
                 buf.insert_with_tags_by_name(eob, link, 'issuelink')
+        for m in self.httpre.finditer(desc):
+            a, b = m.span()
+            if a > pos:
+                buf.insert(eob, desc[pos:a])
+                pos = b
+            groups = m.groups()
+            link = groups[0]
+            buf.insert_with_tags_by_name(eob, link, 'urllink')
         if pos < len(desc):
             buf.insert(eob, desc[pos:])
         buf.insert(eob, '\n\n')
@@ -822,10 +831,20 @@ class ChangeSet(gdialog.GWindow):
                                      underline=pango.UNDERLINE_SINGLE)
         issuelink_tag.connect('event', self.issuelink_event)
         tag_table.add(issuelink_tag)
+        urllink_tag = make_texttag('urllink', foreground='blue',
+                                     underline=pango.UNDERLINE_SINGLE)
+        urllink_tag.connect('event', self.urllink_event)
+        tag_table.add(urllink_tag)
         csetlink_tag = make_texttag('csetlink', foreground='blue',
                                     underline=pango.UNDERLINE_SINGLE)
         csetlink_tag.connect('event', self.csetlink_event)
         tag_table.add(csetlink_tag)
+
+    def urllink_event(self, tag, widget, event, liter):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text = self.get_link_text(tag, widget, liter)
+        shlib.browse_url(text)
 
     def issuelink_event(self, tag, widget, event, liter):
         if event.type != gtk.gdk.BUTTON_RELEASE:
