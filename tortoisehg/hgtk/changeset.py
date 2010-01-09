@@ -28,12 +28,12 @@ class ChangeSet(gdialog.GWindow):
         self.bfile = None
 
         # initialize changeset/issue tracker link regex and dict
-        match = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
+        csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
+        httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
         issue = repo.ui.config('tortoisehg', 'issue.regex')
         if issue:
-            match = r'%s|(%s)' % (match, issue)
-        self.bodyre = re.compile(match)
-        self.httpre = re.compile(r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))')
+            regexp = r'%s|%s|(%s)' % (csmatch, httpmatch, issue)
+        self.bodyre = re.compile(regexp)
         self.issuedict = dict()
 
     def get_title(self):
@@ -296,22 +296,17 @@ class ChangeSet(gdialog.GWindow):
                 buf.insert(eob, desc[pos:a])
                 pos = b
             groups = m.groups()
-            link = groups[0]
-            if link:
+            if groups[0]:
+                link = groups[0]
                 buf.insert_with_tags_by_name(eob, link, 'csetlink')
-            else:
+            elif groups[1]:
                 link = groups[1]
-                if len(groups) > 2:
-                    self.issuedict[link] = groups[1:]
+                buf.insert_with_tags_by_name(eob, link, 'urllink')
+            else:
+                link = groups[4]
+                if len(groups) > 4:
+                    self.issuedict[link] = groups[4:]
                 buf.insert_with_tags_by_name(eob, link, 'issuelink')
-        for m in self.httpre.finditer(desc):
-            a, b = m.span()
-            if a > pos:
-                buf.insert(eob, desc[pos:a])
-                pos = b
-            groups = m.groups()
-            link = groups[0]
-            buf.insert_with_tags_by_name(eob, link, 'urllink')
         if pos < len(desc):
             buf.insert(eob, desc[pos:])
         buf.insert(eob, '\n\n')
