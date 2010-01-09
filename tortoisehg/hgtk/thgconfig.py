@@ -104,10 +104,6 @@ _log_info = (
         _('The number of revisions to read and display in the'
         ' changelog viewer in a single batch.'
         ' Default: 500')),
-    (_('Copy Hash'), 'tortoisehg.copyhash', ['False', 'True'],
-        _('Allow the changelog viewer to copy the changeset hash'
-        ' of the currently selected changeset into the clipboard.'
-        ' DEPRECATED. Default: False')),
     (_('Dead Branches'), 'tortoisehg.deadbranch', [],
         _('Comma separated list of branch names that should be ignored'
         ' when building a list of branch names for a repository.'
