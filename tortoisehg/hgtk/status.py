@@ -275,6 +275,7 @@ class GStatus(gdialog.GWindow):
 
         self.filetree = gtk.TreeView(self.filemodel)
         self.filetree.connect('popup-menu', self.tree_popup_menu)
+        self.filetree.connect('button-press-event', self.tree_button_press)
         self.filetree.connect('button-release-event', self.tree_button_release)
         self.filetree.connect('row-activated', self.tree_row_act)
         self.filetree.connect('key-press-event', self.tree_key_press)
@@ -1463,6 +1464,31 @@ class GStatus(gdialog.GWindow):
                 entry[FM_CHECKED] = state
                 self.update_chunk_state(entry)
         self.update_check_count()
+
+    def tree_button_press(self, treeview, event):
+        '''Selection management for filetree right-click
+
+        If the user right-clicks on a currently-selected item in the
+        filetree, preserve their entire existing selection for the popup menu.
+
+        http://www.daa.com.au/pipermail/pygtk/2005-June/010465.html
+        '''
+        if event.button != 3:
+            return False
+        
+        clicked_row = treeview.get_path_at_pos(int(event.x),
+                                               int(event.y))
+        
+        selection = treeview.get_selection()
+        selected_rows = selection.get_selected_rows()[1]
+
+        # If they didn't right-click on a currently selected row,
+        # change the selection
+        if clicked_row[0] not in selected_rows:
+            selection.unselect_all()
+            selection.select_path(clicked_row[0])
+
+        return True
 
     def tree_button_release(self, treeview, event):
         if event.button != 3:
