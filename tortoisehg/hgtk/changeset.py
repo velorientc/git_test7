@@ -152,9 +152,6 @@ class ChangeSet(gdialog.GWindow):
         # update dialog title
         self.set_title(title)
 
-        if self.clipboard:
-            self.clipboard.set_text(str(ctx))
-
         pats = self.pats
         if self.graphview:
             (path, focus) = self.graphview.treeview.get_cursor()
@@ -469,11 +466,6 @@ class ChangeSet(gdialog.GWindow):
             'tortoisehg', 'changeset-expander')
 
         self.curfile = ''
-        if self.repo.ui.configbool('tortoisehg', 'copyhash'):
-            sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
-            self.clipboard = gtk.Clipboard(selection=sel)
-        else:
-            self.clipboard = None
         self.filemenu = self.file_context_menu()
 
         details_frame_parent = gtk.VBox()
