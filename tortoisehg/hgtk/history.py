@@ -431,7 +431,7 @@ class GLog(gdialog.GWindow):
             self.stbar.set_idle_text(text)
             if pending:
                 from tortoisehg.hgtk.p4pending import PerforcePending
-                dialog = PerforcePending(self.repo, pending, self.goto_rev)
+                dialog = PerforcePending(self.repo, pending, self.graphview)
                 dialog.show_all()
                 dialog.present()
         if self.runner.execute(cmd, callback):

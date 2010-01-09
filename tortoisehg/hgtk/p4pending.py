@@ -17,10 +17,10 @@ from tortoisehg.hgtk import gtklib, gdialog, cslist
 
 class PerforcePending(gdialog.GDialog):
     'Dialog for selecting a revision'
-    def __init__(self, repo, pending, gotofunc):
+    def __init__(self, repo, pending, graphview):
         gdialog.GDialog.__init__(self, resizable=True)
         self.repo = repo
-        self.gotofunc = gotofunc
+        self.graphview = graphview
         self.pending = pending
 
     def get_icon(self):
@@ -44,6 +44,8 @@ class PerforcePending(gdialog.GDialog):
 
         ## changeset list
         self.cslist = cslist.ChangesetList()
+        self.cslist.set_activatable_enable(True)
+        self.cslist.connect('item-activated', self.item_activated)
         table.add_row(None, self.cslist, padding=False,
                       yopt=gtk.FILL|gtk.EXPAND)
 
@@ -52,6 +54,13 @@ class PerforcePending(gdialog.GDialog):
             clcombo.append_text(changelist)
         clcombo.set_active(0)
 
+    def item_activated(self, cslist, hash, *args):
+        try:
+            rev = self.repo[hash].rev()
+        except error.LookupError:
+            return
+        if self.graphview:
+            self.graphview.set_revision_id(rev)
 
     def get_buttons(self):
         return [('submit', _('Submit'), gtk.RESPONSE_OK),
