@@ -6,7 +6,7 @@
 #endif
 
 [Setup]
-AppCopyright=Copyright 2005-2009 Matt Mackall and others
+AppCopyright=Copyright 2008-2010 Steve Borho and others
 AppName=TortoiseHg
 AppVerName=TortoiseHg {#VERSION}
 InfoAfterFile=contrib/win32/postinstall.txt
@@ -21,9 +21,9 @@ AppContact=Steve Borho <steve@borho.org>
 OutputBaseFilename=TortoiseHg-{#VERSION}
 DefaultDirName={pf}\TortoiseHg
 SourceDir=..\..
-VersionInfoDescription=Mercurial distributed SCM
-VersionInfoCopyright=Copyright 2005-2009 Matt Mackall and others
-VersionInfoCompany=Matt Mackall and others
+VersionInfoDescription=TortoiseHg (with Mercurial)
+VersionInfoCopyright=Copyright 2008-2010 Steve Borho and others
+VersionInfoCompany=Steve Borho and others
 InternalCompressLevel=max
 SolidCompression=true
 SetupIconFile=icons\thg_logo.ico
