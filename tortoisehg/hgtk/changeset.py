@@ -33,6 +33,8 @@ class ChangeSet(gdialog.GWindow):
         issue = repo.ui.config('tortoisehg', 'issue.regex')
         if issue:
             regexp = r'%s|%s|(%s)' % (csmatch, httpmatch, issue)
+        else:
+            regexp = r'%s|%s' % (csmatch, httpmatch)
         self.bodyre = re.compile(regexp)
         self.issuedict = dict()
 
