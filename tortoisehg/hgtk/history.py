@@ -385,20 +385,6 @@ class GLog(gdialog.GWindow):
         self.sttool.set_visible('load', not self.show_toolbar)
         self._show_toolbar(self.show_toolbar)
 
-    def p4pending_test(self, button):
-        'used for testing p4pending without a p4 server or client'
-        # TODO: DELETE ME
-        from tortoisehg.hgtk.p4pending import PerforcePending
-        pending = {
-                '5270342' : ['c4d780fd4abc', '46b33a7c177b'],
-                'Submitted0' : ['46b33a7c177b', 'c4d780fd4abc']
-                }
-        text = _('%d pending changelists found') % len(pending)
-        self.stbar.set_idle_text(text)
-        dialog = PerforcePending(self.repo, pending, self.goto_rev)
-        dialog.show_all()
-        dialog.present()
-
     def p4pending(self, button):
         'revert or submit these pending changelists'
         cmd = ['hg', 'p4pending', '--verbose']
