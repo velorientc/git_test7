@@ -379,7 +379,7 @@ class GWindow(gtk.Window):
         if not url:
             return
         if not url.startswith('http'):
-            url = 'http://tortoisehg.org/manual/0.9/' + url
+            url = 'http://tortoisehg.org/manual/0.10/' + url
         shlib.browse_url(url)
 
     def launch(self, item, app):
