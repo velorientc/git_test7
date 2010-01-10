@@ -336,24 +336,29 @@ Message Parsing
 ---------------
 
 New in TortoiseHg 0.10, the repository browser will detect and underline
-changeset hashes and bug report identifiers inside changeset messages.  These
-underlined phrases are clickable links.
+changeset hashes, HTTP(s) URLs, and bug report identifiers inside
+changeset messages.  These underlined phrases are clickable links.
 
 Every word-boundary delimited string of 12 or 40 characters from the
 range [0-9a-f] is considered a changeset link. Clicking on it in the
 repository explorer will jump to the given changeset if possible.
 
-Issue tracker links are enabled when configured in the tortoisehg
-section of the configuration files. There are two keys: issue.regex
-and issue.link. The first defines the regex to match when picking up
-issue numbers, while the second defines the command to run when an
-issue number is recognized.
+HTTP and HTTPS URLs are similarly turned into clickable links which are
+opened in your default web browser.
 
-You may include groups in issue.regex, and corresponding {n} tokens
-in issue.link (where n is a non-negative integer). {0} refers to the
-entire string matched by issue.regex, while {1} refers to the first
-group and so on. If no {n} tokens are found in issue.link, the entire
-matched string is appended instead.
+Issue tracker links are enabled when configured in the tortoisehg
+section of your configuration files.  Since only a single issue tracker
+can be configured at a time, it is typically configured in the
+repository's :file:`.hg/hgrc` file.  There are two keys: issue.regex and
+issue.link. The first defines the regex to match when picking up issue
+numbers, while the second defines the command to run when an issue
+number is recognized.
+
+You may include groups in issue.regex, and corresponding {n} tokens in
+issue.link (where n is a non-negative integer). {0} refers to the entire
+string matched by issue.regex, while {1} refers to the first group and
+so on. If no {n} tokens are found in issue.link, the entire matched
+string is appended instead.
 
 Examples::
 
