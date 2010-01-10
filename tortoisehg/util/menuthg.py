@@ -7,29 +7,10 @@
 
 import os
 
-from mercurial import hg, ui, node
+from mercurial import hg, ui, node, error
 
 from tortoisehg.util.i18n import _ as gettext
 from tortoisehg.util import cachethg, paths, hglib
-
-promoted = []
-try:
-    from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
-    try:
-        hkey = OpenKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
-        pl = QueryValueEx(hkey, 'PromotedItems')[0]
-        for item in pl.split(','):
-            item = item.strip()
-            if item: promoted.append(str(item))
-    except EnvironmentError:
-        promoted = ['commit', 'log']
-except ImportError:
-    # fallback method for non-win32 platforms
-    u = ui.ui()
-    pl = u.config('tortoisehg', 'promoteditems', 'commit')
-    for item in pl.split(','):
-        item = item.strip()
-        if item: promoted.append(str(item))
 
 def _(msgid):
     return {'id': msgid, 'str': gettext(msgid)}
@@ -68,6 +49,9 @@ thgcmenu = {
     'log':        { 'label': _('Repository Explorer'),
                     'help':  _('View change history in repository'),
                     'icon':  'menulog.ico'},
+    'history':    { 'label': _('File History'),
+                    'help':  _('View change history of selected files'),
+                    'icon':  'menulog.ico'},
     'synch':      { 'label': _('Synchronize'),
                     'help':  _('Synchronize with remote repository'),
                     'icon':  'menusynch.ico'},
@@ -89,6 +73,9 @@ thgcmenu = {
     'repoconf':   { 'label': _('Repository Settings'),
                     'help':  _('Configure repository settings'),
                     'icon':  'settings_repo.ico'},
+    'shellconf':  { 'label': _('Explorer extension settings'),
+                    'help':  _('Configure Explorer shell extension'),
+                    'icon':  'settings_user.ico'},
     'about':      { 'label': _('About TortoiseHg'),
                     'help':  _('Show About Dialog'),
                     'icon':  'menuabout.ico'},
@@ -110,6 +97,8 @@ thgcmenu = {
     'dndsynch':   { 'label': _('DnD Synchronize'),
                     'help':  _('Synchronize with dragged repository'),
                     'icon':  'menusynch.ico'}}
+
+_ALWAYS_DEMOTE_ = ('about', 'userconf', 'repoconf')
 
 class TortoiseMenu(object):
 
@@ -163,15 +152,15 @@ class TortoiseMenuSep(object):
 
 class thg_menu(object):
 
-    def __init__(self, ui, name = "TortoiseHG"):
+    def __init__(self, ui, promoted, name = "TortoiseHg"):
         self.menus = [[]]
         self.ui = ui
         self.name = name
         self.sep = [False]
+        self.promoted = promoted
 
     def add_menu(self, hgcmd, icon=None, state=True):
-        global promoted, thgcmenu
-        if hgcmd in promoted:
+        if hgcmd in self.promoted:
             pos = 0
         else:
             pos = 1
@@ -181,8 +170,10 @@ class thg_menu(object):
         if self.sep[pos]:
             self.sep[pos] = False
             self.menus[pos].append(TortoiseMenuSep())
-        self.menus[pos].append(TortoiseMenu(thgcmenu[hgcmd]['label']['str'],
-                thgcmenu[hgcmd]['help']['str'], hgcmd, thgcmenu[hgcmd]['icon'], state))
+        self.menus[pos].append(TortoiseMenu(
+                thgcmenu[hgcmd]['label']['str'],
+                thgcmenu[hgcmd]['help']['str'], hgcmd,
+                thgcmenu[hgcmd]['icon'], state))
 
     def add_sep(self):
         self.sep = [True for _s in self.sep]
@@ -204,7 +195,7 @@ def open_repo(path):
         try:
             repo = hg.repository(ui.ui(), path=root)
             return repo
-        except hglib.RepoError:
+        except error.RepoError:
             pass
         except StandardError, e:
             print "error while opening repo %s:" % path
@@ -216,8 +207,22 @@ def open_repo(path):
 class menuThg:
     """shell extension that adds context menu items"""
 
-    def __init__(self):
-        self.name = "TortoiseHG"
+    def __init__(self, internal=False):
+        self.name = "TortoiseHg"
+        promoted = []
+        pl = ui.ui().config('tortoisehg', 'promoteditems', 'commit,log')
+        for item in pl.split(','):
+            item = item.strip()
+            if item:
+                promoted.append(item)
+        if internal:
+            for item in thgcmenu.keys():
+                promoted.append(item)
+        for item in _ALWAYS_DEMOTE_:
+            if item in promoted:
+                promoted.remove(item)
+        self.promoted = promoted
+
 
     def get_commands_dragdrop(self, srcfiles, destfolder):
         """
@@ -243,7 +248,7 @@ class menuThg:
 
         drop_repo = open_repo(destfolder)
 
-        menu = thg_menu(drag_repo.ui, self.name)
+        menu = thg_menu(drag_repo.ui, self.promoted, self.name)
         menu.add_menu('clone')
 
         if drop_repo:
@@ -251,7 +256,7 @@ class menuThg:
         return menu
 
     def get_norepo_commands(self, cwd, files):
-        menu = thg_menu(ui.ui(), self.name)
+        menu = thg_menu(ui.ui(), self.promoted, self.name)
         menu.add_menu('clone')
         menu.add_menu('init')
         menu.add_menu('userconf')
@@ -286,7 +291,7 @@ class menuThg:
         tracked = changed or modified or clean
         new = bool(states & set([cachethg.UNKNOWN, cachethg.IGNORED]))
 
-        menu = thg_menu(repo.ui, self.name)
+        menu = thg_menu(repo.ui, self.promoted, self.name)
         if changed or cachethg.UNKNOWN in states or 'qtip' in repo['.'].tags():
             menu.add_menu('commit')
         if hashgignore or new and len(states) == 1:
@@ -320,7 +325,7 @@ class menuThg:
         menu.add_sep()
 
         if tracked:
-            menu.add_menu('log')
+            menu.add_menu(files and 'history' or 'log')
 
         if len(files) == 0:
             menu.add_sep()
@@ -333,12 +338,12 @@ class menuThg:
             menu.add_menu('clone')
             if repo.root != cwd:
                 menu.add_menu('init')
-            menu.add_sep()
-            menu.add_menu('userconf')
-            menu.add_menu('repoconf')
 
         # add common menu items
         menu.add_sep()
+        menu.add_menu('userconf')
+        if tracked:
+            menu.add_menu('repoconf')
         menu.add_menu('about')
 
         menu.add_sep()

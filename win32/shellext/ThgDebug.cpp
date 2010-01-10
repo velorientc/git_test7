@@ -7,9 +7,7 @@
 // (at your option) any later version.
 
 #include "ThgDebug.h"
-#include "TortoiseUtils.h"
-
-#include <string>
+#include "RegistryConfig.h"
 
 bool ThgDebug::regDebugShellExt()
 {

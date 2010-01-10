@@ -13,7 +13,7 @@ import Queue
 import os
 import time
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, paths
@@ -32,7 +32,7 @@ class RecoveryDialog(gtk.Window):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -82,11 +82,12 @@ class RecoveryDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription('Monospace'))
+        fontlog = hglib.getfontconfig()['fontlog']
+        self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground='#900000')
+                                   foreground=gtklib.DRED)
         vbox.pack_start(scrolledwindow, True, True)
 
         self.stbar = statusbar.StatusBar()

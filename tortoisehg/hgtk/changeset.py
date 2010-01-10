@@ -6,25 +6,37 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import gtk
 import gobject
 import pango
 import Queue
 
-from mercurial import cmdutil, util, patch, mdiff
+from mercurial import cmdutil, util, patch, mdiff, error
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import shlib, hglib
+from tortoisehg.util import shlib, hglib, paths
 
 from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
 
-class ChangeSet(gdialog.GDialog):
+class ChangeSet(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
     def __init__(self, ui, repo, cwd, pats, opts, stbar=None):
-        gdialog.GDialog.__init__(self, ui, repo, cwd, pats, opts)
+        gdialog.GWindow.__init__(self, ui, repo, cwd, pats, opts)
         self.stbar = stbar
         self.glog_parent = None
         self.bfile = None
+
+        # initialize changeset/issue tracker link regex and dict
+        csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
+        httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
+        issue = repo.ui.config('tortoisehg', 'issue.regex')
+        if issue:
+            regexp = r'%s|%s|(%s)' % (csmatch, httpmatch, issue)
+        else:
+            regexp = r'%s|%s' % (csmatch, httpmatch)
+        self.bodyre = re.compile(regexp)
+        self.issuedict = dict()
 
     def get_title(self):
         title = _('%s changeset ') % self.get_reponame()
@@ -52,12 +64,12 @@ class ChangeSet(gdialog.GDialog):
         self.load_details(self.repo.changelog.rev(node0))
 
     def save_settings(self):
-        settings = gdialog.GDialog.save_settings(self)
+        settings = gdialog.GWindow.save_settings(self)
         settings['changeset'] = self._hpaned.get_position()
         return settings
 
     def load_settings(self, settings):
-        gdialog.GDialog.load_settings(self, settings)
+        gdialog.GWindow.load_settings(self, settings)
         if settings and 'changeset' in settings:
             self._setting_hpos = settings['changeset']
         else:
@@ -92,8 +104,8 @@ class ChangeSet(gdialog.GDialog):
             if len(parents) == 2:
                 # deferred adding of parent check button
                 if not self.parent_button.parent:
-                    self.parent_box.pack_start(gtk.HSeparator(), False, False)
                     self.parent_box.pack_start(self.parent_button, False, False)
+                    self.parent_box.pack_start(gtk.HSeparator(), False, False)
                     self.parent_box.show_all()
 
                 # show parent box
@@ -124,11 +136,21 @@ class ChangeSet(gdialog.GDialog):
         else:
             parent = self.repo[-1]
 
+        oldother = hasattr(self, 'otherparent') and self.otherparent or None
+        self.otherparent = len(parents) == 2 and self.diff_other_parent()
+
+        # refresh merge row without graph redrawing
+        if self.graphview:
+            gview = self.graphview
+            if oldother:
+                gview.model.clear_parents()
+            elif self.otherparent:
+                gview.model.set_parent(ctx.rev(), parent)
+            gview.hide()
+            gview.show()
+
         # update dialog title
         self.set_title(title)
-
-        if self.clipboard:
-            self.clipboard.set_text(str(ctx))
 
         pats = self.pats
         if self.graphview:
@@ -157,8 +179,10 @@ class ChangeSet(gdialog.GDialog):
         self.curnodes = (parent, ctx.node())
         if selrow is not None:
             self._filesel.select_path((selrow,))
+            self._filelist_tree.set_cursor((selrow,))
         elif len(self._filelist) > 1:
             self._filesel.select_path((1,))
+            self._filelist_tree.set_cursor((1,))
         else:
             self._filesel.select_path((0,))
 
@@ -261,7 +285,30 @@ class ChangeSet(gdialog.GDialog):
         buf = self._buffer
         buf.set_text('')
         eob = buf.get_end_iter()
-        buf.insert(eob, desc.rstrip('\n\r') + '\n\n')
+        desc = desc.rstrip('\n\r')
+
+        pos = 0
+        self.issuedict.clear()
+        for m in self.bodyre.finditer(desc):
+            a, b = m.span()
+            if a > pos:
+                buf.insert(eob, desc[pos:a])
+                pos = b
+            groups = m.groups()
+            if groups[0]:
+                link = groups[0]
+                buf.insert_with_tags_by_name(eob, link, 'csetlink')
+            elif groups[1]:
+                link = groups[1]
+                buf.insert_with_tags_by_name(eob, link, 'urllink')
+            else:
+                link = groups[4]
+                if len(groups) > 4:
+                    self.issuedict[link] = groups[4:]
+                buf.insert_with_tags_by_name(eob, link, 'issuelink')
+        if pos < len(desc):
+            buf.insert(eob, desc[pos:])
+        buf.insert(eob, '\n\n')
 
     def append_diff(self, wfile):
         if not wfile:
@@ -274,7 +321,7 @@ class ChangeSet(gdialog.GDialog):
 
         try:
             fctx = self.repo[rev].filectx(wfile)
-        except hglib.LookupError:
+        except error.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             lines = ['diff',
@@ -286,7 +333,7 @@ class ChangeSet(gdialog.GDialog):
             try:
                 for s in patch.diff(self.repo, n1, n2, match=m, opts=opts):
                     lines.extend(s.splitlines())
-            except (hglib.RepoLookupError, hglib.RepoError, hglib.LookupError), e:
+            except (error.RepoLookupError, error.RepoError, error.LookupError), e:
                 err = _('Repository Error:  %s, refresh suggested') % str(e)
                 lines = ['diff', '', err]
         tags, lines = self.prepare_diff(lines, offset, wfile)
@@ -358,9 +405,9 @@ class ChangeSet(gdialog.GDialog):
         offset += len(txt.decode('utf-8'))
         for l1 in difflines[1:]:
             l = hglib.toutf(l1)
-            if l.startswith('+++'):
+            if l.startswith('--- '):
                 continue
-            if l.startswith('---'):
+            if l.startswith('+++ '):
                 continue
             if l.startswith('@@'):
                 tag = 'blue'
@@ -419,11 +466,6 @@ class ChangeSet(gdialog.GDialog):
             'tortoisehg', 'changeset-expander')
 
         self.curfile = ''
-        if self.repo.ui.configbool('tortoisehg', 'copyhash'):
-            sel = (os.name == 'nt') and 'CLIPBOARD' or 'PRIMARY'
-            self.clipboard = gtk.Clipboard(selection=sel)
-        else:
-            self.clipboard = None
         self.filemenu = self.file_context_menu()
 
         details_frame_parent = gtk.VBox()
@@ -485,7 +527,16 @@ class ChangeSet(gdialog.GDialog):
                 try:
                     tctx = self.repo[ts]
                     return revline_data(tctx)
-                except (hglib.LookupError, hglib.RepoLookupError, hglib.RepoError):
+                except (error.LookupError, error.RepoLookupError, error.RepoError):
+                    return ts
+            elif item == 'p4':
+                ts = widget.get_data('p4', usepreset=True)
+                if not ts:
+                    return None
+                try:
+                    tctx = self.repo[ts]
+                    return revline_data(tctx)
+                except (error.LookupError, error.RepoLookupError, error.RepoError):
                     return ts
             elif item == 'patch':
                 if hasattr(ctx, '_patchname'):
@@ -516,7 +567,7 @@ class ChangeSet(gdialog.GDialog):
                     if branch:
                         return '%s - %s %s' % (revnum, branch, summary)
                     return '%s - %s' % (revnum, summary)
-            if item in ('cset', 'transplant', 'patch'):
+            if item in ('cset', 'transplant', 'patch', 'p4'):
                 if isinstance(value, basestring):
                     return revid_markup(value)
                 return revline_markup(*value)
@@ -532,7 +583,7 @@ class ChangeSet(gdialog.GDialog):
         def widget_func(widget, item, markups):
             def linkwidget(revnum, revid, summary, highlight=None, branch=None):
                 # revision label
-                opts = dict(underline='single', foreground='#0000FF')
+                opts = dict(underline='single', color='blue')
                 if highlight:
                     opts['weight'] = 'bold'
                 rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
@@ -545,7 +596,7 @@ class ChangeSet(gdialog.GDialog):
                 sum = gtklib.markup(summary)
                 if branch:
                     sum = gtklib.markup(branch, color='black',
-                        background='#aaffaa') + ' ' + sum
+                        background=gtklib.PGREEN) + ' ' + sum
                 sumlabel = gtk.Label()
                 sumlabel.set_markup(sum)
                 sumlabel.set_selectable(True)
@@ -572,7 +623,7 @@ class ChangeSet(gdialog.GDialog):
                                markup=markup_func, widget=widget_func)
         self.csetstyle = csinfo.panelstyle(contents=('cset', 'branch',
                                 'user', 'dateage', 'parents', 'children',
-                                'tags', 'transplant'), selectable=True)
+                                'tags', 'transplant', 'p4'), selectable=True)
         self.patchstyle = csinfo.panelstyle(contents=('patch', 'branch',
                                  'user', 'dateage', 'parents'),
                                  selectable=True)
@@ -598,7 +649,7 @@ class ChangeSet(gdialog.GDialog):
         details_text.set_wrap_mode(gtk.WRAP_NONE)
         details_text.connect('populate-popup', self.add_to_popup)
         details_text.set_editable(False)
-        details_text.modify_font(pango.FontDescription(self.fontcomment))
+        details_text.modify_font(self.fonts['comment'])
         details_box.pack_start(details_text)
 
         self._buffer = gtk.TextBuffer()
@@ -608,6 +659,7 @@ class ChangeSet(gdialog.GDialog):
 
         ## file list
         filelist_tree = gtk.TreeView()
+        filelist_tree.set_headers_visible(False)
         filesel = filelist_tree.get_selection()
         filesel.connect('changed', self.filelist_rowchanged)
         self._filesel = filesel
@@ -616,7 +668,8 @@ class ChangeSet(gdialog.GDialog):
         filelist_tree.connect('popup-menu', self.file_popup_menu)
         filelist_tree.connect('row-activated', self.file_row_act)
         filelist_tree.set_search_equal_func(self.search_filelist)
-        filelist_tree.modify_font(pango.FontDescription(self.fontlist))
+        filelist_tree.modify_font(self.fonts['list'])
+        self._filelist_tree = filelist_tree
 
         accelgroup = gtk.AccelGroup()
         if self.glog_parent:
@@ -629,16 +682,70 @@ class ChangeSet(gdialog.GDialog):
                         modifier, gtk.ACCEL_VISIBLE)
         filelist_tree.connect('thg-diff', self.thgdiff)
 
+        def scroll_details(widget, direction=gtk.SCROLL_PAGE_DOWN):
+            self.diffscroller.emit("scroll-child", direction, False)
+
+        # signal, accelerator key, handler, (parameters,)
+        status_accelerators = [
+            ('status-scroll-down', 'bracketright', scroll_details,
+             (gtk.SCROLL_PAGE_DOWN,)),
+            ('status-scroll-up', 'bracketleft', scroll_details,
+             (gtk.SCROLL_PAGE_UP,)),
+            ('status-next-file', 'period', gtklib.move_treeview_selection,
+             (filelist_tree, 1)),
+            ('status-previous-file', 'comma', gtklib.move_treeview_selection,
+             (filelist_tree, -1)),
+        ]
+        
+        for signal, accelerator, handler, param in status_accelerators:
+            root = self.glog_parent or self
+            gtklib.add_accelerator(root, signal, accelgroup,
+                                   mod + accelerator)
+            root.connect(signal, handler, *param)
+
         self._filelist = gtk.ListStore(
                 gobject.TYPE_STRING,   # MAR status
                 gobject.TYPE_STRING,   # filename (utf-8 encoded)
                 gobject.TYPE_STRING,   # filename
                 )
         filelist_tree.set_model(self._filelist)
-        column = gtk.TreeViewColumn(_('Stat'), gtk.CellRendererText(), text=0)
+
+        column = gtk.TreeViewColumn()
         filelist_tree.append_column(column)
-        column = gtk.TreeViewColumn(_('Files'), gtk.CellRendererText(), text=1)
-        filelist_tree.append_column(column)
+
+        iconcell = gtk.CellRendererPixbuf()
+        filecell = gtk.CellRendererText()
+
+        column.pack_start(iconcell, expand=False)
+        column.pack_start(filecell, expand=False)
+        column.add_attribute(filecell, 'text', 1)
+
+        iconw, iconh = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
+
+        def get_pixbuf(iconfilename):
+            iconpath = paths.get_tortoise_icon(iconfilename)
+            if iconpath == None:
+                raise (_("could not open icon file '%s' (check install)") 
+                            % iconfilename)
+            return gtk.gdk.pixbuf_new_from_file_at_size(
+                iconpath, iconw, iconh)
+
+        addedpixbuf = get_pixbuf('fileadd.ico')
+        removedpixbuf = get_pixbuf('filedelete.ico')
+        modifiedpixbuf = get_pixbuf('filemodify.ico')
+
+        def cell_seticon(column, cell, model, iter):
+            state = model.get_value(iter, 0)
+            pixbuf = None
+            if state == 'A':
+                pixbuf = addedpixbuf
+            elif state == 'R':
+                pixbuf = removedpixbuf
+            elif state == 'M':
+                pixbuf = modifiedpixbuf
+            cell.set_property('pixbuf', pixbuf)
+
+        column.set_cell_data_func(iconcell, cell_seticon)
 
         list_frame = gtk.Frame()
         list_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
@@ -646,11 +753,10 @@ class ChangeSet(gdialog.GDialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(filelist_tree)
         flbox = gtk.VBox()
-        flbox.pack_start(scroller)
         list_frame.add(flbox)
-
         self.parent_box = gtk.VBox()
         flbox.pack_start(self.parent_box, False, False)
+        flbox.pack_start(scroller)
 
         btn = gtk.CheckButton(_('Diff to second Parent'))
         btn.connect('toggled', self.parent_toggled)
@@ -700,7 +806,7 @@ class ChangeSet(gdialog.GDialog):
 
         tag_table = self._buffer.get_tag_table()
 
-        tag_table.add(make_texttag('diff', font=self.fontdiff))
+        tag_table.add(make_texttag('diff', font=self.rawfonts['fontdiff']))
         tag_table.add(make_texttag('blue', foreground='blue'))
         tag_table.add(make_texttag('red', foreground='red'))
         tag_table.add(make_texttag('green', foreground='darkgreen'))
@@ -709,6 +815,66 @@ class ChangeSet(gdialog.GDialog):
                                    paragraph_background='grey',
                                    weight=pango.WEIGHT_BOLD))
         tag_table.add(make_texttag('yellowbg', background='yellow'))
+
+        issuelink_tag = make_texttag('issuelink', foreground='blue',
+                                     underline=pango.UNDERLINE_SINGLE)
+        issuelink_tag.connect('event', self.issuelink_event)
+        tag_table.add(issuelink_tag)
+        urllink_tag = make_texttag('urllink', foreground='blue',
+                                     underline=pango.UNDERLINE_SINGLE)
+        urllink_tag.connect('event', self.urllink_event)
+        tag_table.add(urllink_tag)
+        csetlink_tag = make_texttag('csetlink', foreground='blue',
+                                    underline=pango.UNDERLINE_SINGLE)
+        csetlink_tag.connect('event', self.csetlink_event)
+        tag_table.add(csetlink_tag)
+
+    def urllink_event(self, tag, widget, event, liter):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text = self.get_link_text(tag, widget, liter)
+        shlib.browse_url(text)
+
+    def issuelink_event(self, tag, widget, event, liter):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text = self.get_link_text(tag, widget, liter)
+        if not text:
+            return
+        link = self.repo.ui.config('tortoisehg', 'issue.link')
+        if link:
+            groups = self.issuedict.get(text, [text])
+            link, num = re.subn(r'\{(\d+)\}', lambda m:
+                groups[int(m.group(1))], link)
+            if not num:
+                link += text
+            shlib.browse_url(link)
+
+    def csetlink_event(self, tag, widget, event, liter):
+        if event.type != gtk.gdk.BUTTON_RELEASE:
+            return
+        text = self.get_link_text(tag, widget, liter)
+        if not text:
+            return
+        try:
+            rev = self.repo[text].rev()
+            if self.graphview:
+                self.graphview.set_revision_id(rev, load=True)
+            else:
+                self.load_details(rev)
+        except error.RepoError:
+            pass
+
+    def get_link_text(self, tag, widget, liter):
+        text_buffer = widget.get_buffer()
+        beg = liter.copy()
+        while not beg.begins_tag(tag):
+            beg.backward_char()
+        end = liter.copy()
+        while not end.ends_tag(tag):
+            end.forward_char()
+        text = text_buffer.get_text(beg, end)
+        return text
 
     def file_button_release(self, widget, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |
@@ -730,7 +896,7 @@ class ChangeSet(gdialog.GDialog):
         try:
             fctx = ctx.filectx(self.curfile)
             has_filelog = fctx.filelog().linkrev(fctx.filerev()) == ctx.rev()
-        except hglib.LookupError:
+        except error.LookupError:
             has_filelog = False
         self.ann_menu.set_sensitive(has_filelog)
         self.save_menu.set_sensitive(has_filelog)

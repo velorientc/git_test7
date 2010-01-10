@@ -7,14 +7,13 @@
 
 import os
 import gtk
-import pango
 
 from mercurial import extensions
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, version
 from tortoisehg.hgtk import gdialog, gtklib
 
-class BugReport(gdialog.GDialog):
+class BugReport(gdialog.GWindow):
     """GTK+ based dialog for displaying traceback info to the user in a
     cut-paste friendly manner.  And include a number of useful bit of
     information like version numbers, etc.
@@ -32,7 +31,7 @@ class BugReport(gdialog.GDialog):
         textview = gtk.TextView()
         textview.set_wrap_mode(gtk.WRAP_NONE)
         textview.set_editable(False)
-        textview.modify_font(pango.FontDescription(self.fontdiff))
+        textview.modify_font(self.fonts['diff'])
         scroller = gtk.ScrolledWindow()
         scroller.set_shadow_type(gtk.SHADOW_IN)
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)

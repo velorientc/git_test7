@@ -190,12 +190,6 @@ Changelog
 	changelog viewer in a single batch.
 	Default: 500.
 
-:guilabel:`Copy Hash:`
-	Allow the changelog viewer to copy the changeset hash
-	of the currently selected changeset into the clipboard.
-	DEPRECATED, will be removed in a later release.
-	Default: False.
-
 :guilabel:`Dead Branches:`
 	Comma separated list of branch names that should be ignored when
 	building a list of branch names for a repository.  Default: None
@@ -410,6 +404,16 @@ Diff
 	Ignore changes whose lines are all blank.
 	Default: False.
 
+Removed this release
+====================
+
+:guilabel:`Copy Hash:`
+	Allow the changelog viewer to copy the changeset hash
+	of the currently selected changeset into the clipboard.
+	Default: False.
+
+To copy the hash of a changeset to the clipboard, use the 'Copy Hash'
+context menu option.
 
 Keyboard navigation
 ===================

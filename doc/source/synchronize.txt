@@ -141,7 +141,7 @@ where you can configure your SMTP settings and set default
 in mailing lists.
 
 Please consult the Mercurial documentation for the differences between
-plain patches, HG patches, Git patches, and bundles.
+plain patches, Hg patches, Git patches, and bundles.
 
 From command line
 -----------------
