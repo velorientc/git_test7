@@ -150,7 +150,10 @@ class RecoveryDialog(gtk.Window):
 
     def _stop_clicked(self, toolbutton, data=None):
         if self.hgthread and self.hgthread.isAlive():
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
             self._stop_button.set_sensitive(False)
 
     def _exec_cmd(self, cmd, postfunc=None):

@@ -529,7 +529,10 @@ class SynchDialog(gtk.Window):
 
     def stop_clicked(self, toolbutton, data=None):
         if self.cmd_running():
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
             self.stop_button.set_sensitive(False)
 
     def exec_cmd(self, cmd):

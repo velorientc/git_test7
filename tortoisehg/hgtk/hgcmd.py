@@ -102,7 +102,10 @@ class CmdDialog(gtk.Dialog):
 
     def _on_stop_clicked(self, button):
         if self.hgthread:
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
 
     def _delete(self, widget, event):
         return True
@@ -371,7 +374,10 @@ class CmdWidget(gtk.VBox):
         """
         if self.hgthread:
             self.useraborted = True
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
             self.set_pbar(True)
             self.set_buttons(stop=False, close=True)
 
@@ -719,7 +725,10 @@ class CmdRunner(object):
         Terminate the thread forcibly.
         """
         if self.hgthread:
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
 
     def get_buffer(self):
         """
