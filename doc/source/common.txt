@@ -24,6 +24,12 @@ We define a few keyboard accelerators that all of the TortoiseHg tools support.
 :kbd:`Ctrl-Enter`
 	activation
 
+:kdb:`Ctrl-.` and :kbd:`Ctrl-,`
+	select next or previous file in a file list
+
+:kdb:`Ctrl-[` and :kbd:`Ctrl-]`
+	page up or down a text pane
+
 :kbd:`F5`, :kbd:`Ctrl-R`
 	refresh
 
