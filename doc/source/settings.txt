@@ -86,8 +86,11 @@ TortoiseHg
 	or other, or :guilabel:`internal:dump` to leave files in the working
 	directory for manual merging.
 
-:guilabel:`Visual Diff Command:`
-	Specify visual diff tool; must be an extdiff command.
+:guilabel:`Visual Diff Tool:`
+	Specify visual diff tool as described in the [merge-tools] section
+	of your Mercurial configuration files.  If left unspecified,
+	TortoiseHg will use the selected merge tool. Failing that it uses
+	the first applicable tool it finds.
 
 :guilabel:`Skip Diff Window:`
 	Bypass the builtin visual diff dialog and directly use your
