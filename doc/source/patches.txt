@@ -8,11 +8,12 @@ Patches
 Defining a patch
 ================
 
-`The patch management problem <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+These links are recommended reading for understanding the history and nature
+of patches and how they can be used with Mercurial.
 
-`Understanding patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
-
-`More about patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+* `The patch management problem <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `Understanding patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `More about patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
 
 Pitfalls
 ========
@@ -27,6 +28,7 @@ things, you will need to enable **git** patches via::
 Mercurial 1.5 improves it's behavior in this regard.  It will warn you
 when git diffs are required, or sometimes upgrade to the git format
 automatically.
+`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_.
 
 Mercurial's patch routines do not deal well with mixed EOLN between
 source files and patches.  The **patch.eol** setting was introduced in
@@ -36,9 +38,10 @@ source files and patches.  The **patch.eol** setting was introduced in
 	eol = auto #strict, lf, or crlf
 
 The work on the hgeol extension is also improving this area.  Perhaps it
-will be resolved by hg-1.5
+will be resolved by hg-1.5.
+`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_.
 
-Apply a patch is not a foolproof operation.  If the source file has
+Applying a patch is not a foolproof operation.  If the source file has
 diverged from the file that was used to create the patch, there may be
 conflicts during the patch application.  These are written to a file
 with an .rej extension.  Currently, these rejected changes must be
@@ -52,9 +55,8 @@ Changeset
 ---------
 
 To export a changeset as a patch file, use the changeset context menu of
-the Repository Explorer. :menuselection:`Export --> Export Patch`  You
-will be asked to provide a filename.
-
+the Repository Explorer to select :menuselection:`Export --> Export Patch`.
+You will be asked to provide a filename.
 
 Changeset Ranges
 ----------------
@@ -79,8 +81,14 @@ To send a changeset range, use the changeset range selection feature of
 the Repository Explorer and select
 :menuselection:`Email from here to selected...`
 
-..note::
-	You must configure SMTP to send patches via email
+Lastly, you can use the :guilabel:`Email` button on the syncbar of the
+Repository Explorer to email all outgoing changes to the selected remote
+repository.
+
+.. note::
+	You must configure
+	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
+	to send patches via email
 
 Cherry Picking
 --------------
@@ -99,7 +107,7 @@ For even finer cherry-picking, you can highlight a number of diff-hunks
 in the hunk selection pane and hit CTRL-C.  This will copy the
 highlighted (mouse selected, not toggled) hunks to the clipboard.
 
-..note::
+.. note::
 	Reversing the order of your selection reverses the effect of the
 	patch.
 
