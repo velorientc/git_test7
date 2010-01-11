@@ -32,9 +32,11 @@ _tortoise_info = (
         ' markers in place.  Chose internal:merge to force conflict markers,'
         ' internal:prompt to always select local or other, or internal:dump'
         ' to leave files in the working directory for manual merging')),
-    (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
+    (_('Visual Diff Tool'), 'tortoisehg.vdiff', [],
         _('Specify visual diff tool, as described in the [merge-tools]'
-          ' section of your Mercurial configuration file.')),
+          ' section of your Mercurial configuration files.  If left'
+          ' unspecified, TortoiseHg will use the selected merge tool.'
+          ' Failing that it uses the first applicable tool it finds.')),
     (_('Visual Editor'), 'tortoisehg.editor', [],
         _('Specify the visual editor used to view files, etc')),
     (_('CLI Editor'), 'ui.editor', [],
