@@ -17,7 +17,32 @@ Defining a patch
 Pitfalls
 ========
 
-diff.git, patch.eol, rejections, strip
+The standard patch format cannot describe binary files, renames, copies,
+or permission changes.  If your patch needs to record any of those
+things, you will need to enable **git** patches via::
+
+	[diff]
+	git=True
+
+Mercurial 1.5 improves it's behavior in this regard.  It will warn you
+when git diffs are required, or sometimes upgrade to the git format
+automatically.
+
+Mercurial's patch routines do not deal well with mixed EOLN between
+source files and patches.  The **patch.eol** setting was introduced in
+1.3 to improve this situation::
+
+	[patch]
+	eol = auto #strict, lf, or crlf
+
+The work on the hgeol extension is also improving this area.  Perhaps it
+will be resolved by hg-1.5
+
+Apply a patch is not a foolproof operation.  If the source file has
+diverged from the file that was used to create the patch, there may be
+conflicts during the patch application.  These are written to a file
+with an .rej extension.  Currently, these rejected changes must be
+manually resolved by the user.
 
 
 Export Patches
@@ -26,25 +51,57 @@ Export Patches
 Changeset
 ---------
 
-Repository Explorer, context menu
+To export a changeset as a patch file, use the changeset context menu of
+the Repository Explorer. :menuselection:`Export --> Export Patch`  You
+will be asked to provide a filename.
 
 
 Changeset Ranges
 ----------------
 
-Changeset range context menu.  Patch/bundle/email
+Select a range of changesets in the Repository Explorer.  Left click on
+the first (base) changeset, then right click on the last (target)
+changeset.  This opens a special revision range context menu.  From this
+menu you can generate patches, generate a bundle, send emails, or view
+the accumulated changes.
 
+This is a very powerful feature and there is no restriction on the base
+and target changesets you can select.
 
 Email
 -----
 
-email dialog, tags, 1 of N, bundles, inline, etc
-SMTP settings
+To send a changeset as an email, use the changeset context menu of the
+Repository Explorer. :menuselection:`Export --> Email Patch`.  This
+opens the e-mail dialog for this single changeset.
+
+To send a changeset range, use the changeset range selection feature of
+the Repository Explorer and select
+:menuselection:`Email from here to selected...`
+
+..note::
+	You must configure SMTP to send patches via email
 
 Cherry Picking
 --------------
 
-To a file, to the clipboard
+Use the changeset range selection feature of the Repository Explorer and
+select :menuselection:`Diff with selected`.  This opens up a status
+viewer showing you the accumulated changes between your base and target
+changesets.
+
+From the status viewer, you can select files and diff hunks just as you
+can in the commit tool, and preview the final result in the
+:guilabel:`Save Preview` tab.  Pressing :guilabel:`Save As` will save
+the selected changes to a patch file.
+
+For even finer cherry-picking, you can highlight a number of diff-hunks
+in the hunk selection pane and hit CTRL-C.  This will copy the
+highlighted (mouse selected, not toggled) hunks to the clipboard.
+
+..note::
+	Reversing the order of your selection reverses the effect of the
+	patch.
 
 
 Import Patches
