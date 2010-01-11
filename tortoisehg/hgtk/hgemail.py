@@ -7,8 +7,6 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import sys
-import gobject
 import gtk
 import pango
 import tempfile
