@@ -288,7 +288,7 @@ class GLog(gdialog.GWindow):
             dict(text=_('Toolbar'), ascheck=True, check=self.show_toolbar,
                 func=self.toggle_show_toolbar),
             ] + sync_bar_item + [
-            dict(text=_('Filter Bar'), ascheck=True, 
+            dict(text=_('Filter Bar'), ascheck=True,
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
             ] + mq_item + [
             dict(text='----'),
@@ -305,8 +305,11 @@ class GLog(gdialog.GWindow):
             dict(name='color-by-branch', text=_('Color by Branch'),
                 ascheck=True, func=self.toggle_branchcolor,
                 check=self.branch_color),
-            dict(text=_('Ignore Max Diff Size'), ascheck=True, 
+            dict(text=_('Ignore Max Diff Size'), ascheck=True,
                 func=disable_maxdiff),
+            dict(name='always-show-output', text=(_('Always Show Output')),
+                ascheck=True, func=self.toggle_showoutput,
+                check=self.showoutput),
                 ]),
 
             (_('_Navigate'), [
@@ -369,6 +372,11 @@ class GLog(gdialog.GWindow):
             self.compactgraph = active
             self.reload_log()         
 
+    def toggle_showoutput(self, button):
+        active = button.get_active()
+        if self.showoutput != active:
+            self.showoutput = active
+
     def toggle_show_filterbar(self, button):
         self.show_filterbar = button.get_active()
         if self.filterbox is not None:
@@ -385,13 +393,31 @@ class GLog(gdialog.GWindow):
         self.sttool.set_visible('load', not self.show_toolbar)
         self._show_toolbar(self.show_toolbar)
 
+    def execute_command(self, cmd, callback=None, status=None,
+                        title=None, force=False):
+        if self.showoutput or force:
+            dlg = hgcmd.CmdDialog(cmd)
+            dlg.show_all()
+            dlg.run()
+            dlg.hide()
+            callback and callback(dlg.return_code(), dlg.get_buffer())
+            return dlg
+        def wrapper(*args):
+            self.stbar.end()
+            self.syncbox.set_enable('stop', False)
+            self.cmd_set_sensitive('stop', False)
+            callback and callback(*args)
+        self.stbar.begin(*(status and (status,) or ()))
+        if title:
+            self.runner.set_title(title)
+        self.syncbox.set_enable('stop', True)
+        self.cmd_set_sensitive('stop', True)
+        return self.runner.execute(cmd, wrapper)
+
     def p4pending(self, button):
         'revert or submit these pending changelists'
         cmd = ['hg', 'p4pending', '--verbose']
         def callback(return_code, buffer, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             pending = {}
             if return_code == 0:
                 submitted = 0
@@ -420,12 +446,9 @@ class GLog(gdialog.GWindow):
                 dialog = PerforcePending(self.repo, pending, self.graphview)
                 dialog.show_all()
                 dialog.present()
-        if self.runner.execute(cmd, callback):
-            self.runner.set_title(_('Pending Perforce changelists'))
-            self.stbar.begin(_('Finding pending Perforce changelists...'))
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmd, callback,
+                    status=_('Finding pending Perforce changelists...'),
+                    title=_('Pending Perforce changelists')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -433,9 +456,6 @@ class GLog(gdialog.GWindow):
     def p4identify(self, button):
         cmd = ['hg', 'p4identify']
         def callback(return_code, buffer, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 lines = buffer.splitlines()[:-1]
                 if len(lines) == 1:
@@ -451,12 +471,9 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Unable to identify Perforce tip')
             self.stbar.set_idle_text(text)
-        if self.runner.execute(cmd, callback):
-            self.runner.set_title(_('Identifying Perforce tip'))
-            self.stbar.begin(_('Finding tip Perforce changelist...'))
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmd, callback,
+                    status=_('Finding tip Perforce changelist...'),
+                    title=_('Identifying Perforce tip')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -747,6 +764,7 @@ class GLog(gdialog.GWindow):
             settings['glog-mqpane'] = self.setting_mqhpos
             settings['glog-mqvis'] = self.setting_mqvis
         settings['branch-color'] = self.graphview.get_property('branch-color')
+        settings['show-output'] = self.showoutput
         settings['show-toolbar'] = self.show_toolbar
         settings['show-filterbar'] = self.show_filterbar
         settings['show-syncbar'] = self.show_syncbar
@@ -767,6 +785,7 @@ class GLog(gdialog.GWindow):
         self.setting_mqhpos = settings.get('glog-mqpane', 140) or 140
         self.setting_mqvis = settings.get('glog-mqvis', False)
         self.branch_color = settings.get('branch-color', False)
+        self.showoutput = settings.get('show-output', False)
         self.show_toolbar = settings.get('show-toolbar', True)
         self.show_filterbar = settings.get('show-filterbar', True)
         self.show_syncbar = settings.get('show-syncbar', True)
@@ -1404,13 +1423,11 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg'] + cmd + [self.bfile]
 
         def callback(return_code, *args):
-            self.stbar.end()
             self.remove_overlay('--rebase' in cmd)
 
-        if self.runner.execute(cmdline, callback):
-            self.runner.set_title(_('Applying bundle'))
-            self.stbar.begin(_('Applying bundle...'))
-        else:
+        if not self.execute_command(cmdline, callback,
+                    status=_('Applying bundle...'),
+                    title=_('Applying bundle')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -1446,7 +1463,6 @@ class GLog(gdialog.GWindow):
         self.remove_overlay(False)
 
     def incoming_clicked(self, toolbutton):
-
         def cleanup():
             try:
                 shutil.rmtree(self.bundledir)
@@ -1462,10 +1478,7 @@ class GLog(gdialog.GWindow):
             return
         if path.startswith('p4://'):
             cmdline = ['hg', 'incoming', '--verbose', path]
-            dlg = hgcmd.CmdDialog(cmdline)
-            dlg.show_all()
-            dlg.run()
-            dlg.hide()
+            self.execute_command(cmdline, force=True)
             return
         if not self.bundledir:
             self.bundledir = tempfile.mkdtemp(prefix='thg-incoming-')
@@ -1481,9 +1494,6 @@ class GLog(gdialog.GWindow):
         cmdline += [hglib.validate_synch_path(path, self.repo)]
 
         def callback(return_code, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             if return_code == 0 and os.path.isfile(bfile):
                 self.set_bundlefile(bfile)
                 text = _('%d incoming changesets') % self.npreviews
@@ -1493,12 +1503,9 @@ class GLog(gdialog.GWindow):
                 text = _('No incoming changesets')
             self.stbar.set_idle_text(text)
 
-        if self.runner.execute(cmdline, callback):
-            self.runner.set_title(_('Incoming'))
-            self.stbar.begin(_('Checking incoming changesets...'))
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmdline, callback,
+                    status=_('Checking incoming changesets...'),
+                    title=_('Incoming')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -1597,9 +1604,6 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg'] + cmd + self.get_proxy_args() + [remote_path]
 
         def callback(return_code, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 self.repo.invalidate()
                 self.changeview.clear_cache()
@@ -1615,12 +1619,9 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Aborted pull')
             self.stbar.set_idle_text(text)
-        if self.runner.execute(cmdline, callback):
-            self.runner.set_title(_('Pull'))
-            self.stbar.begin(_('Pulling changesets...'))
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmdline, callback,
+                    status=_('Pulling changesets...'),
+                    title=_('Pull')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -1635,19 +1636,13 @@ class GLog(gdialog.GWindow):
             return
         if path.startswith('p4://'):
             cmdline = ['hg', 'outgoing', '--verbose', path]
-            dlg = hgcmd.CmdDialog(cmdline)
-            dlg.show_all()
-            dlg.run()
-            dlg.hide()
+            self.execute_command(cmdline, force=True)
             return
         cmd = ['hg', 'outgoing', '--quiet', '--template', '{node}\n']
         cmd += self.get_proxy_args()
         cmd += [hglib.validate_synch_path(path, self.repo)] 
 
         def callback(return_code, buffer, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 outgoing = []
                 for line in buffer.splitlines()[:-1]:
@@ -1664,12 +1659,9 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('No outgoing changesets')
             self.stbar.set_idle_text(text)
-        if self.runner.execute(cmd, callback):
-            self.runner.set_title(_('Outgoing'))
-            self.stbar.begin(_('Checking outgoing changesets...'))
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmd, callback,
+                    status=_('Checking outgoing changesets...'),
+                    title=_('Outgoing')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -1726,9 +1718,6 @@ class GLog(gdialog.GWindow):
         cmdline += [remote_path]
 
         def callback(return_code, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 if self.outgoing:
                     self.outgoing = []
@@ -1737,12 +1726,9 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Aborted push')
             self.stbar.set_idle_text(text)
-        if self.runner.execute(cmdline, callback):
-            self.runner.set_title(_('Push'))
-            self.stbar.begin(_('Pushing changesets...'))
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmdline, callback,
+                    status=_('Pushing changesets...'),
+                    title=_('Push')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -1914,10 +1900,7 @@ class GLog(gdialog.GWindow):
         if res != gtk.RESPONSE_YES:
             return
         cmdline = ['hg', 'revert', '--verbose', '--all', '--rev', str(rev)]
-        dlg = hgcmd.CmdDialog(cmdline)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        self.execute_command(cmdline, force=True)
 
     def vdiff_change(self, menuitem, pats=[]):
         if self.currevid is None:
@@ -1988,13 +1971,26 @@ class GLog(gdialog.GWindow):
         result = gtklib.NativeSaveFileDialogWrapper(title=_('Write bundle to'),
                                                     initial=self.repo.root,
                                                     filename=filename).run()
-        if result:
-            cmdline = ['hg', 'bundle', '--base', str(parent),
-                      '--rev', str(revrange[1]), result]
-            dlg = hgcmd.CmdDialog(cmdline)
-            dlg.show_all()
-            dlg.run()
-            dlg.hide()
+        if not result:
+            return
+
+        parent = str(parent)
+        rev = str(revrange[1])
+        cmdline = ['hg', 'bundle', '--base', parent, '--rev', rev, result]
+        def callback(return_code, *args):
+            if return_code == 0:
+                text = _('Finish bundling')
+            elif return_code is None:
+                text = _('Aborted bundling')
+            else:
+                text = _('Failed to bundle')
+            self.stbar.set_idle_text(text)
+        data = dict(base=parent, rev=rev)
+        if not self.execute_command(cmdline, callback, title=_('Bundling'),
+                    status=_('Bundling from %(base)s to %(rev)s...') % data):
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def qimport_rev(self, menuitem):
         """QImport selected revision."""
@@ -2008,14 +2004,23 @@ class GLog(gdialog.GWindow):
             revs.sort()
             rev = '%s:%s' % (str(revs[0]), str(revs[1]))
         cmdline = ['hg', 'qimport', '--rev', rev]
-        dialog = hgcmd.CmdDialog(cmdline)
-        dialog.show_all()
-        dialog.run()
-        dialog.hide()
-        self.repo.invalidate()
-        self.reload_log()
-        self.changeview.clear()
-        self.enable_mqpanel()
+        def callback(return_code, *args):
+            if return_code == 0:
+                hglib.invalidaterepo(self.repo)
+                self.reload_log()
+                self.changeview.clear()
+                self.enable_mqpanel()
+                text = _('Finish importing')
+            elif return_code is None:
+                text = _('Aborted importing')
+            else:
+                text = _('Failed to import')
+            self.stbar.set_idle_text(text)
+        if not self.execute_command(cmdline, callback, title=_('QImporting'),
+                                    status=_('Importing to Patch Queue...')):
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def rebase_selected(self, menuitem):
         """Rebase revision on top of selection (1st on top of 2nd).""" 
@@ -2026,10 +2031,7 @@ class GLog(gdialog.GWindow):
             return
         cmdline = ['hg', 'rebase', '--source', str(revs[0]),
                    '--dest', str(revs[1])]
-        dialog = hgcmd.CmdDialog(cmdline)
-        dialog.show_all()
-        dialog.run()
-        dialog.hide()
+        self.execute_command(cmdline, force=True)
         self.repo.invalidate()
         self.reload_log()
         self.changeview.clear()
@@ -2039,10 +2041,7 @@ class GLog(gdialog.GWindow):
         revs = list(self.revrange)
         revs.sort()
         cmdline = ['hg', 'transplant', '%d:%d' % (revs[0], revs[1])]
-        dialog = hgcmd.CmdDialog(cmdline)
-        dialog.show_all()
-        dialog.run()
-        dialog.hide()
+        self.execute_command(cmdline, force=True)
         self.repo.invalidate()
         self.reload_log()
         self.changeview.clear()
@@ -2137,26 +2136,17 @@ class GLog(gdialog.GWindow):
 
     def bisect_good(self, menuitem):
         cmd = ['hg', 'bisect', '--good', str(self.currevid)]
-        dlg = hgcmd.CmdDialog(cmd)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        self.execute_command(cmd, force=True)
         self.refresh_model()
 
     def bisect_bad(self, menuitem):
         cmd = ['hg', 'bisect', '--bad', str(self.currevid)]
-        dlg = hgcmd.CmdDialog(cmd)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        self.execute_command(cmd, force=True)
         self.refresh_model()
 
     def bisect_skip(self, menuitem):
         cmd = ['hg', 'bisect', '--skip', str(self.currevid)]
-        dlg = hgcmd.CmdDialog(cmd)
-        dlg.show_all()
-        dlg.run()
-        dlg.hide()
+        self.execute_command(cmd, force=True)
         self.refresh_model()
 
     def show_status(self, menuitem):
@@ -2193,9 +2183,6 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'push', '--rev', rev, remote_path]
 
         def callback(return_code, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 if self.outgoing:
                     d = self.outgoing.index(node)
@@ -2205,12 +2192,9 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Aborted push')
             self.stbar.set_idle_text(text)
-        if self.runner.execute(cmdline, callback):
-            self.runner.set_title(_('Push to %s') % rev)
-            self.stbar.begin(_('Pushing changesets to revision %s...') % rev)
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmdline, callback,
+                    status=_('Pushing changesets to revision %s...') % rev,
+                    title=_('Push to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -2220,9 +2204,6 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'pull', '--rev', rev, self.bfile]
 
         def callback(return_code, *args):
-            self.stbar.end()
-            self.syncbox.set_enable('stop', False)
-            self.cmd_set_sensitive('stop', False)
             if return_code == 0:
                 curtip = len(hg.repository(self.ui, self.repo.root))
                 self.repo = hg.repository(self.ui, path=self.bfile)
@@ -2239,12 +2220,9 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Aborted pull')
             self.stbar.set_idle_text(text)
-        if self.runner.execute(cmdline, callback):
-            self.runner.set_title(_('Pull to %s') % rev)
-            self.stbar.begin(_('Pulling changesets to revision %s...') % rev)
-            self.syncbox.set_enable('stop', True)
-            self.cmd_set_sensitive('stop', True)
-        else:
+        if not self.execute_command(cmdline, callback,
+                    status=_('Pulling changesets to revision %s...') % rev,
+                    title=_('Pull to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -2281,12 +2259,25 @@ class GLog(gdialog.GWindow):
         result = gtklib.NativeSaveFileDialogWrapper(title=_('Write bundle to'),
                                                     initial=self.repo.root,
                                                     filename=filename).run()
-        if result:
-            cmdline = ['hg', 'bundle', '--base', str(parent), result]
-            dlg = hgcmd.CmdDialog(cmdline)
-            dlg.show_all()
-            dlg.run()
-            dlg.hide()
+        if not result:
+            return
+
+        parent = str(parent)
+        cmdline = ['hg', 'bundle', '--base', parent, result]
+        def callback(return_code, *args):
+            if return_code == 0:
+                text = _('Finish bundling')
+            elif return_code is None:
+                text = _('Aborted bundling')
+            else:
+                text = _('Failed to bundle')
+            self.stbar.set_idle_text(text)
+        data = dict(base=parent)
+        if not self.execute_command(cmdline, callback, title=_('Bundling'),
+                    status=_('Bundling from %(base)s to tip...') % data):
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def email_patch(self, menuitem):
         rev = self.currevid
@@ -2339,10 +2330,7 @@ class GLog(gdialog.GWindow):
         """Transplant selection on top of current revision."""
         rev = self.currevid
         cmdline = ['hg', 'transplant', str(rev)]
-        dialog = hgcmd.CmdDialog(cmdline)
-        dialog.show_all()
-        dialog.run()
-        dialog.hide()
+        self.execute_command(cmdline, force=True)
         self.repo.invalidate()
         self.reload_log()
         self.changeview.clear()
