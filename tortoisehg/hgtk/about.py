@@ -10,11 +10,14 @@ import os
 import sys
 import gtk
 import threading
+import urllib2
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import version, paths, hglib
 
 from tortoisehg.hgtk import gtklib, hgtk
+
+_verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
 
 def browse_url(url):
     def start_browser():
@@ -61,7 +64,27 @@ class AboutDialog(gtk.AboutDialog):
 
         comment = _("Several icons are courtesy of the TortoiseSVN project")
 
-        self.set_website("http://tortoisehg.org")
+        newver = (0,0,0)
+        upgradeurl = ''
+        if os.name == 'nt':
+            try:
+                f = urllib2.urlopen(_verurl).read().splitlines()
+                newver = tuple([int(p) for p in f[0].split('.')])
+                upgradeurl = f[1]
+            except:
+                pass
+        ver = version.version()
+        if '+' in ver:
+            ver = ver[:ver.index('+')]
+        try:
+            curver = tuple([int(p) for p in ver.split('.')])
+        except:
+            curver = (0,0,0)
+        if newver > curver:
+            comment = _('A new version of TortoiseHg is ready for download!')
+            self.set_website(upgradeurl)
+        else:
+            self.set_website("http://tortoisehg.org")
         self.set_name("TortoiseHg")
         self.set_version(_("(version %s)") % version.version())
         if hasattr(self, 'set_wrap_license'):
