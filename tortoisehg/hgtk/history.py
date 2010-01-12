@@ -2036,11 +2036,18 @@ class GLog(gdialog.GWindow):
         self.reload_log()
         self.changeview.clear()
 
-    def transplant_revs(self, menuitem):
+    def transplant_rev(self, menuitem):
+        """Transplant selection on top of current revision."""
+        rev = str(self.currevid)
+        self.transplant_revs(menuitem, rev)
+
+    def transplant_revs(self, menuitem, rev=None):
         """Transplant revision range on top of current revision."""
-        revs = list(self.revrange)
-        revs.sort()
-        cmdline = ['hg', 'transplant', '%d:%d' % (revs[0], revs[1])]
+        if rev is None:
+            revs = list(self.revrange)
+            revs.sort()
+            rev = '%d:%d' % (revs[0], revs[1])
+        cmdline = ['hg', 'transplant', rev]
         self.execute_command(cmdline, force=True)
         self.repo.invalidate()
         self.reload_log()
@@ -2325,15 +2332,6 @@ class GLog(gdialog.GWindow):
         parents = [x.node() for x in self.repo.parents()]
         dlg = archive.ArchiveDialog(rev)
         self.show_dialog(dlg)
-
-    def transplant_rev(self, menuitem):
-        """Transplant selection on top of current revision."""
-        rev = self.currevid
-        cmdline = ['hg', 'transplant', str(rev)]
-        self.execute_command(cmdline, force=True)
-        self.repo.invalidate()
-        self.reload_log()
-        self.changeview.clear()
 
     def select_common_ancestor(self, menuitem):
         rev1, rev2 = self.revrange
