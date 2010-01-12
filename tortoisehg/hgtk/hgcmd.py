@@ -218,6 +218,11 @@ class CmdDialog(gtk.Dialog):
         else:
             return False
 
+    def get_buffer(self):
+        start = self.textbuffer.get_start_iter()
+        end = self.textbuffer.get_end_iter()
+        return self.textbuffer.get_text(start, end)
+
 # CmdWidget style constants
 STYLE_NORMAL  = 'normal'    # pbar + embedded log viewer
 STYLE_COMPACT = 'compact'   # pbar + popup log viewer
