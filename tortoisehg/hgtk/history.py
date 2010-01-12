@@ -1959,15 +1959,28 @@ class GLog(gdialog.GWindow):
                 commands.export(self.ui,self.repo, rev, **opts)
             s, o = self._hg_call_wrapper('Export', dohgexport, False)
 
-    def bundle_revs(self, menuitem):
-        revrange = list(self.revrange)
-        revrange.sort()
-        parent = self.repo[revrange[0]].parents()[0].rev()
+    def bundle_rev_to_tip(self, menuitem):
+        try:
+            parent = self.repo[self.currevid].parents()[0].rev()
+        except (ValueError, error.LookupError):
+            return
+        self.bundle_revs(menuitem, parent)
+
+    def bundle_revs(self, menuitem, base=None):
+        data = dict(name=os.path.basename(self.repo.root))
+        if base is None:
+            revrange = list(self.revrange)
+            revrange.sort()
+            parent = self.repo[revrange[0]].parents()[0].rev()
+            data.update(base=revrange[0], rev=revrange[1])
+            filename = '%(name)s_rev%(base)s_to_rev%(rev)s.hg' % data
+        else:
+            parent = base
+            data.update(base=self.currevid)
+            filename = '%(name)s_rev%(base)s_to_tip.hg' % data
         # Special case for revision 0's parent.
         if parent == -1: parent = 'null'
 
-        filename = "%s_rev%d_to_rev%s.hg" % (os.path.basename(self.repo.root),
-                   revrange[0], revrange[1])
         result = gtklib.NativeSaveFileDialogWrapper(title=_('Write bundle to'),
                                                     initial=self.repo.root,
                                                     filename=filename).run()
@@ -1975,8 +1988,17 @@ class GLog(gdialog.GWindow):
             return
 
         parent = str(parent)
-        rev = str(revrange[1])
-        cmdline = ['hg', 'bundle', '--base', parent, '--rev', rev, result]
+        cmdline = ['hg', 'bundle', '--base', parent]
+        data = dict(base=parent)
+        if base is None:
+            rev = str(revrange[1])
+            cmdline += ['--rev', rev]
+            data.update(rev=rev)
+            status = _('Bundling from %(base)s to %(rev)s...') % data
+        else:
+            status = _('Bundling from %(base)s to tip...') % data
+        cmdline.append(result)
+
         def callback(return_code, *args):
             if return_code == 0:
                 text = _('Finish bundling')
@@ -1985,9 +2007,7 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Failed to bundle')
             self.stbar.set_idle_text(text)
-        data = dict(base=parent, rev=rev)
-        if not self.execute_command(cmdline, callback, title=_('Bundling'),
-                    status=_('Bundling from %(base)s to %(rev)s...') % data):
+        if not self.execute_command(cmdline, callback, status, _('Bundling')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
                              'operation is completed'), self).run()
@@ -2253,38 +2273,6 @@ class GLog(gdialog.GWindow):
             def dohgexport():
                 commands.export(self.ui,self.repo,str(rev),**exportOpts)
             success, outtext = self._hg_call_wrapper("Export",dohgexport,False)
-
-    def bundle_rev_to_tip(self, menuitem):
-        try:
-            rev = self.currevid
-            parent = self.repo[rev].parents()[0].rev()
-            # Special case for revision 0's parent.
-            if parent == -1: parent = 'null'
-        except (ValueError, error.LookupError):
-            return
-        filename = "%s_rev%d_to_tip.hg" % (os.path.basename(self.repo.root), rev)
-        result = gtklib.NativeSaveFileDialogWrapper(title=_('Write bundle to'),
-                                                    initial=self.repo.root,
-                                                    filename=filename).run()
-        if not result:
-            return
-
-        parent = str(parent)
-        cmdline = ['hg', 'bundle', '--base', parent, result]
-        def callback(return_code, *args):
-            if return_code == 0:
-                text = _('Finish bundling')
-            elif return_code is None:
-                text = _('Aborted bundling')
-            else:
-                text = _('Failed to bundle')
-            self.stbar.set_idle_text(text)
-        data = dict(base=parent)
-        if not self.execute_command(cmdline, callback, title=_('Bundling'),
-                    status=_('Bundling from %(base)s to tip...') % data):
-            gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
 
     def email_patch(self, menuitem):
         rev = self.currevid
