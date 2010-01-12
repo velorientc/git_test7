@@ -66,53 +66,32 @@ class EmailDialog(gtk.Window):
         hbox.pack_start(flagframe, False, False, 4)
         mainvbox.pack_start(hbox, False, True, 4)
 
-        vbox = gtk.VBox()
-        envframe.add(vbox)
+        # Envelope settings
+        table = gtklib.LayoutTable()
+        envframe.add(table)
 
-        # To: combo box
-        hbox = gtk.HBox()
+        ## To: combo box
         self._tolist = gtk.ListStore(str)
         self._tobox = gtk.ComboBoxEntry(self._tolist, 0)
-        lbl = gtk.Label(_('To:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(1.0, 0.5)
-        hbox.pack_start(lbl, False, False, 4)
-        hbox.pack_start(self._tobox, True, True, 4)
-        vbox.pack_start(hbox, False, False, 4)
+        table.add_row(_('To:'), self._tobox, padding=False)
 
-        # Cc: combo box
-        hbox = gtk.HBox()
+        ## Cc: combo box
         self._cclist = gtk.ListStore(str)
         self._ccbox = gtk.ComboBoxEntry(self._cclist, 0)
-        lbl = gtk.Label(_('Cc:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(1.0, 0.5)
-        hbox.pack_start(lbl, False, False, 4)
-        hbox.pack_start(self._ccbox, True, True, 4)
-        vbox.pack_start(hbox, False, False, 4)
+        table.add_row(_('Cc:'), self._ccbox, padding=False)
 
-        # From: combo box
-        hbox = gtk.HBox()
+        ## From: combo box
         self._fromlist = gtk.ListStore(str)
         self._frombox = gtk.ComboBoxEntry(self._fromlist, 0)
-        lbl = gtk.Label(_('From:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(1.0, 0.5)
-        hbox.pack_start(lbl, False, False, 4)
-        hbox.pack_start(self._frombox, True, True, 4)
-        vbox.pack_start(hbox, False, False, 4)
+        table.add_row(_('From:'), self._frombox, padding=False)
 
-        hbox = gtk.HBox()
+        ## In-Reply-To: entry
         self._replyto = gtk.Entry()
-        lbl = gtk.Label(_('In-Reply-To:'))
-        lbl.set_property('width-chars', 10)
-        lbl.set_alignment(1.0, 0.5)
-        hbox.pack_start(lbl, False, False, 4)
-        hbox.pack_start(self._replyto, True, True, 4)
-        vbox.pack_start(hbox, False, False, 4)
+        table.add_row(_('In-Reply-To:'), self._replyto, padding=False)
         self.tips.set_tip(self._replyto,
             _('Message identifier to reply to, for threading'))
 
+        # Options
         vbox = gtk.VBox()
         flagframe.add(vbox)
 
