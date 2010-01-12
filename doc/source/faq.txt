@@ -14,7 +14,8 @@ Frequently Asked Questions
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
-	and two bonus extensions: hgfold, hgcr-gui.
+	and five bonus extensions: hgfold, hgcr-gui, perfarce, hgeol,
+	mercurial-keyring.
 
 *How can I get translations for the Explorer context menu?*
 
