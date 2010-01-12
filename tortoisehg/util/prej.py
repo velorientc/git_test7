@@ -1067,7 +1067,7 @@ class rejhunk:
                 fcur = fnext
         return (retstart, score, conflicts, match)
 
-def rejmerge(patchfile):
+def rejmerge(pfile):
     def backup(orig):
         fname = orig + ".mergebackup"
         try: os.unlink(fname)
@@ -1078,30 +1078,30 @@ def rejmerge(patchfile):
             new.write(x)
         return fname
 
-    rej = patchfile.rej
+    rej = pfile.rej
     if not rej:
         return
     backupf = None
     badrej = []
     for h in rej:
-        r = rejhunk(h, patchfile)
+        r = rejhunk(h, pfile)
         r.search()
         if r.score >= 0:
             if not backupf:
-                backupf = backup(patchfile.fname)
+                backupf = backup(pfile.fname)
             global global_conflicts
             global global_rejects
             if r.direction:
                 s = "warning file %s hunk %d: merging " % (
-                     patchfile.fname, h.number)
-                patchfile.ui.warn(s + "with changes already applied\n")
+                     pfile.fname, h.number)
+                pfile.ui.warn(s + "with changes already applied\n")
             r.apply()
             if r.conflicts > 0:
                 global_conflicts += 1
             global_rejects += 1
-    patchfile.rej = badrej
-    patchfile.write()
-    merge_func(patchfile.fname, backupf)
+    pfile.rej = badrej
+    pfile.write()
+    merge_func(pfile.ui, pfile.fname, backupf)
     try:
         os.unlink(backupf)
     except:
