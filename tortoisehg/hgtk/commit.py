@@ -602,7 +602,7 @@ class GCommit(GStatus):
     def get_custom_menus(self):
         def commit(menuitem, files):
             if self.ready_message() and self.isuptodate():
-                self.hg_commit(files)
+                self.commit_selected(files)
                 self.reload_status()
                 abs = [self.repo.wjoin(file) for file in files]
                 shlib.shell_notify(abs)
