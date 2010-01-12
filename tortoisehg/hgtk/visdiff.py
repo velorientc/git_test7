@@ -59,6 +59,39 @@ def snapshot(repo, files, ctx, tmproot):
             os.chmod(dest, stat.S_IREAD)
     return base, fns_and_mtime
 
+def filemerge(ui, fname, patchedfname):
+    'Launch the preferred visual diff tool for two text files'
+    detectedtools = hglib.difftools(ui)
+    if not detectedtools:
+        gdialog.Prompt(_('No diff tool found'),
+                       _('No visual diff tools were detected'), None).run()
+        return None
+    preferred = besttool(ui, detectedtools)
+    diffcmd, diffopts, mergeopts = detectedtools[preferred]
+
+    plabel = fname + _('[working copy]')
+    clabel = _('[rejected changes]')
+    replace = dict(parent=fname, parent1=fname, plabel1=plabel,
+                   clabel=clabel, child=patchedfname)
+    def quote(match):
+        key = match.group()[1:]
+        return util.shellquote(replace[key])
+
+    args = ' '.join(diffopts)
+    args = re.sub(_regex, quote, args)
+    cmdline = util.shellquote(diffcmd) + ' ' + args
+    cmdline = util.quotecommand(cmdline)
+    try:
+        subprocess.Popen(cmdline, shell=True,
+                         creationflags=openflags,
+                         stderr=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
+                         stdin=subprocess.PIPE).communicate()
+    except (OSError, EnvironmentError), e:
+        gdialog.Prompt(_('Tool launch failure'),
+                       _('%s : %s') % (diffcmd, str(e)), None).run()
+        return None
+
 
 def besttool(ui, tools):
     'Select preferred or highest priority tool from dictionary'
