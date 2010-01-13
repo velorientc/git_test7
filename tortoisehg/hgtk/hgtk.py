@@ -456,7 +456,7 @@ def mpatch(ui, rejfile, *pats, **opts):
         raise util.Abort(_('%s does not exist\n') % rejfile)
     # Assume patch was made from repo root, and arrange ourselves thusly
     repo = hg.repository(ui, path=paths.find_root())
-    rejfile = util.canonpath(repo.root, repo.root, rejfile)
+    rejfile = util.canonpath(repo.root, repo.getcwd(), rejfile)
     os.chdir(repo.root)
     source = rejfile[:-4]
     if not os.path.exists(source):
