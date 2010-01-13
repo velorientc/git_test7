@@ -243,17 +243,11 @@ class GCommit(GStatus):
 
     def load_settings(self, settings):
         GStatus.load_settings(self, settings)
-        self.setting_vpos = -1
+        self.setting_vpos = settings.get('commit-vpane', -1)
         self.showtoolbar = settings.get('show-toolbar', True)
-        self.showparents = True
-        self.showadvanced = False
+        self.showparents = settings.get('showparents', True)
+        self.showadvanced = settings.get('showadvanced', False)
         self.showoutput = settings.get('show-output', False)
-        try:
-            self.setting_vpos = settings['commit-vpane']
-            self.showparents = settings['showparents']
-            self.showadvanced = settings['showadvanced']
-        except KeyError:
-            pass
 
     def show_toolbar_on_start(self):
         return self.showtoolbar
