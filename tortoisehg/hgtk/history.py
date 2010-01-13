@@ -1636,12 +1636,12 @@ class GLog(gdialog.GWindow):
             self.pathentry.grab_focus()
             return
         if path.startswith('p4://'):
-            cmdline = ['hg', 'outgoing', '--verbose', path]
-            self.execute_command(cmdline, force=True)
-            return
-        cmd = ['hg', 'outgoing', '--quiet', '--template', '{node}\n']
-        cmd += self.get_proxy_args()
-        cmd += [hglib.validate_synch_path(path, self.repo)] 
+            # hg out -q p4://server/client output hashes (thanks Frank)
+            cmd = ['hg', 'outgoing', '--quiet', path]
+        else:
+            cmd = ['hg', 'outgoing', '--quiet', '--template', '{node}\n']
+            cmd += self.get_proxy_args()
+            cmd += [hglib.validate_synch_path(path, self.repo)] 
 
         def callback(return_code, buffer, *args):
             if return_code == 0:
