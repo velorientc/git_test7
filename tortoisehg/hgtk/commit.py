@@ -310,7 +310,7 @@ class GCommit(GStatus):
         self.connect('delete-event', self.delete)
         status_body = GStatus.get_body(self)
 
-        vbox = gtk.VBox()
+        midpane = gtk.VBox()
 
         # Advanced bar
         self.advanced_frame = gtk.VBox()
@@ -338,7 +338,7 @@ class GCommit(GStatus):
         self.autopush.set_active(pushafterci)
         adv_hbox.pack_start(self.autopush, False, False, 2)
 
-        vbox.pack_start(self.advanced_frame, False, False, 2)
+        midpane.pack_start(self.advanced_frame, False, False, 2)
 
         mbox = gtk.HBox()
         self.connect('thg-accept', self.thgaccept)
@@ -373,7 +373,7 @@ class GCommit(GStatus):
                                               self.first_msg_popdown)
         self.msg_cbbox.connect('changed', self.changed_cb)
         mbox.pack_start(self.msg_cbbox)
-        vbox.pack_start(mbox, False, False)
+        midpane.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
 
         # change message field
@@ -382,7 +382,7 @@ class GCommit(GStatus):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         frame.add(scroller)
-        vbox.pack_start(frame)
+        midpane.pack_start(frame)
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
@@ -398,8 +398,8 @@ class GCommit(GStatus):
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 
-        vbox2 = gtk.VBox()
-        vbox2.pack_start(status_body)
+        botbox = gtk.VBox()
+        botbox.pack_start(status_body)
 
         # parent changeset info
         parents_vbox = gtk.VBox(spacing=1)
@@ -426,12 +426,12 @@ class GCommit(GStatus):
         self.parent2_label = add_parent()
         parents_hbox = gtk.HBox()
         parents_hbox.pack_start(parents_vbox, False, False, 5)
-        vbox2.pack_start(parents_hbox, False, False, 2)
-        vbox2.pack_start(gtk.HSeparator(), False, False)
+        botbox.pack_start(parents_hbox, False, False, 2)
+        botbox.pack_start(gtk.HSeparator(), False, False)
 
         self.vpaned = gtk.VPaned()
-        self.vpaned.pack1(vbox, shrink=False)
-        self.vpaned.pack2(vbox2, shrink=False)
+        self.vpaned.pack1(midpane, shrink=False)
+        self.vpaned.pack2(botbox, shrink=False)
         gtklib.idle_add_single_call(self.realize_settings)
         return self.vpaned
 
