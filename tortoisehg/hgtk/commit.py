@@ -138,6 +138,7 @@ class GCommit(GStatus):
         self.qnew = False
         self.notify_func = None
         self.patch_text = None
+        self.runner = hgcmd.CmdRunner()
 
     def get_help_url(self):
         return 'commit.html'
@@ -193,13 +194,20 @@ class GCommit(GStatus):
                 else:
                     frame.hide()
                 setattr(self, statename, show)
+        def toggle_showoutput(button):
+            active = button.get_active()
+            if self.showoutput != active:
+                self.showoutput = active
         return [(_('_View'),
            [dict(text=_('Advanced'), ascheck=True, func=toggle,
                 args=['advanced'], check=self.showadvanced),
             dict(text=_('Parents'), ascheck=True, func=toggle,
                 args=['parents'], check=self.showparents),
             dict(text='----'),
-            dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH)]),
+            dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH),
+            dict(text='----'),
+            dict(name='always-show-output', text=_('Always Show Output'),
+                ascheck=True, func=toggle_showoutput, check=self.showoutput)]),
            (_('_Operations'), [
             dict(text=_('_Commit'), func=self.commit_clicked,
                 icon=gtk.STOCK_OK),
@@ -225,6 +233,7 @@ class GCommit(GStatus):
         settings['commit-vpane'] = self.vpaned.get_position()
         settings['showparents'] = self.showparents
         settings['showadvanced'] = self.showadvanced
+        settings['show-output'] = self.showoutput
         return settings
 
 
@@ -233,6 +242,7 @@ class GCommit(GStatus):
         self.setting_vpos = -1
         self.showparents = True
         self.showadvanced = False
+        self.showoutput = settings.get('show-output', False)
         try:
             self.setting_vpos = settings['commit-vpane']
             self.showparents = settings['showparents']
@@ -433,6 +443,22 @@ class GCommit(GStatus):
 
     ### End of overridable methods ###
 
+    def execute_command(self, cmd, callback=None, status=None,
+                        title=None, force=False):
+        if self.showoutput or force:
+            dlg = hgcmd.CmdDialog(cmd)
+            dlg.set_transient_for(self)
+            dlg.run()
+            dlg.hide()
+            callback and callback(dlg.return_code(), dlg.get_buffer())
+            return dlg
+        def wrapper(*args):
+            self.stbar.end()
+            callback and callback(*args)
+        self.stbar.begin(*(status and (status,) or ()))
+        if title:
+            self.runner.set_title(title)
+        return self.runner.execute(cmd, wrapper)
 
     def update_recent_committers(self, name=None):
         """ 'name' argument must be in UTF-8. """
@@ -602,10 +628,11 @@ class GCommit(GStatus):
     def get_custom_menus(self):
         def commit(menuitem, files):
             if self.ready_message() and self.isuptodate():
-                self.commit_selected(files)
-                self.reload_status()
-                abs = [self.repo.wjoin(file) for file in files]
-                shlib.shell_notify(abs)
+                def callback():
+                    self.reload_status()
+                    abs = [self.repo.wjoin(file) for file in files]
+                    shlib.shell_notify(abs)
+                self.commit_selected(files, callback)
         if self.is_merge():
             return ()
         else:
@@ -716,9 +743,14 @@ class GCommit(GStatus):
                     commitable += '?!'
             return self.relevant_checked_files(commitable)
 
+        def callback():
+            self.reload_status()
+            files = [self.repo.wjoin(x) for x in commit_list]
+            shlib.shell_notify(files)
+
         if self.qnew:
             commit_list = get_list()
-            self.commit_selected(commit_list)
+            self.commit_selected(commit_list, callback)
         else:
             if not self.ready_message():
                 return
@@ -726,24 +758,21 @@ class GCommit(GStatus):
             if self.is_merge():
                 commit_list = get_list(addremove=False)
                 # merges must be committed without specifying file list.
-                self.hg_commit([])
+                self.hg_commit([], callback)
             else:
                 commit_list = get_list()
                 if len(commit_list) > 0:
-                    self.commit_selected(commit_list)
+                    self.commit_selected(commit_list, callback)
                 elif self.qheader is not None:
-                    self.commit_selected([])
+                    self.commit_selected([], callback)
                 elif self.closebranch or self.nextbranch:
-                    self.commit_selected([])
+                    self.commit_selected([], callback)
                 else:
                     gdialog.Prompt(_('Nothing Commited'),
                            _('No committable files selected'), self).run()
                     return
-        self.reload_status()
-        files = [self.repo.wjoin(x) for x in commit_list]
-        shlib.shell_notify(files)
 
-    def commit_selected(self, files):
+    def commit_selected(self, files, callback):
         # 1a. get list of chunks not rejected
         repo, ui = self.repo, self.repo.ui
 
@@ -817,7 +846,7 @@ class GCommit(GStatus):
             cwd = os.getcwd()
             os.chdir(repo.root)
             try:
-                self.hg_commit(files)
+                self.hg_commit(files, callback)
             finally:
                 os.chdir(cwd)
 
@@ -873,10 +902,7 @@ class GCommit(GStatus):
         if self.qnew or self.qheader is not None:
             cmdline = ['hg', 'addremove', '--verbose']
             cmdline += [self.repo.wjoin(x) for x in files]
-            dialog = hgcmd.CmdDialog(cmdline, True)
-            dialog.set_transient_for(self)
-            dialog.run()
-            dialog.hide()
+            self.execute_command(cmdline, force=True)
         return True
 
     def ready_message(self):
@@ -930,7 +956,7 @@ class GCommit(GStatus):
                     return False
         return True
         
-    def hg_commit(self, files):
+    def hg_commit(self, files, callback):
         # get advanced options
         user = hglib.fromutf(self.committer_cbbox.get_active_text())
         if not user:
@@ -983,9 +1009,8 @@ class GCommit(GStatus):
         elif self.closebranch:
             cmdline.append('--close-branch')
 
-        # call the threaded CmdDialog to do the commit, so the the large commit
-        # won't get locked up by potential large commit. CmdDialog will also
-        # display the progress of the commit operation.
+        # Use threaded executers (CmdDialog or CmdRunner) so that the Commit
+        # dialog can continue UI handling if it's large commit.
         if self.qnew:
             cmdline[1] = 'qnew'
             cmdline.append('--force')
@@ -1006,31 +1031,40 @@ class GCommit(GStatus):
         cmdline += files
         if autopush:
             cmdline = (cmdline, ['hg', 'push'])
-        dialog = hgcmd.CmdDialog(cmdline, True)
-        dialog.set_transient_for(self)
-        dialog.run()
-        dialog.hide()
-
-        # refresh overlay icons and commit dialog
-        if dialog.return_code() == 0:
-            self.closebranch = False
-            self.nextbranch = None
-            self.filechunks = {}       # force re-read of chunks
-            buf = self.text.get_buffer()
-            if buf.get_modified():
-                self.update_recent_messages(self.opts['message'])
-                buf.set_modified(False)
-            if self.qnew:
-                self.qnew_name.set_text('')
-                hglib.invalidaterepo(self.repo)
-                self.mode = 'commit'
-                self.qnew = False
-            elif self.qheader is None:
-                self.text.set_buffer(gtk.TextBuffer())
-                self.msg_cbbox.set_active(-1)
-                self.last_commit_id = self.get_tip_rev(True)
-            if self.notify_func:
-                self.notify_func(*self.notify_args)
+        def done(return_code, *args):
+            if return_code == 0:
+                # refresh overlay icons and commit dialog
+                self.closebranch = False
+                self.nextbranch = None
+                self.filechunks = {} # force re-read of chunks
+                buf = self.text.get_buffer()
+                if buf.get_modified():
+                    self.update_recent_messages(self.opts['message'])
+                    buf.set_modified(False)
+                if self.qnew:
+                    self.qnew_name.set_text('')
+                    hglib.invalidaterepo(self.repo)
+                    self.mode = 'commit'
+                    self.qnew = False
+                elif self.qheader is None:
+                    self.text.set_buffer(gtk.TextBuffer())
+                    self.msg_cbbox.set_active(-1)
+                    self.last_commit_id = self.get_tip_rev(True)
+                if self.notify_func:
+                    self.notify_func(*self.notify_args)
+                text = _('Finish committing')
+            elif return_code is None:
+                text = _('Aborted committing')
+            else:
+                text = _('Failed to commit')
+            self.stbar.set_idle_text(text)
+            callback()
+        if not self.execute_command(cmdline, done,
+                    status=_('Committing changes...'),
+                    title=_('Commit')):
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def get_tip_rev(self, refresh=False):
         if refresh:
