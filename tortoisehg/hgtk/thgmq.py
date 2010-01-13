@@ -547,12 +547,16 @@ class MQWidget(gtk.VBox):
     def get_path_by_patchname(self, name):
         """ return path has specified patch name """
         iter = self.get_iter_by_patchname(name)
-        return self.model.get_path(iter)
+        if iter:
+            return self.model.get_path(iter)
+        return None
 
     def get_row_by_patchname(self, name):
         """ return row has specified patch name """
         path = self.get_path_by_patchname(name)
-        return self.model[path]
+        if path:
+            return self.model[path]
+        return None
 
     def get_qtip_patchname(self):
         if self.mqloaded and 'qtip' in self.repo.tags():
