@@ -701,7 +701,6 @@ class GLog(gdialog.GWindow):
         elif 'bundle' in opts:
             self.set_bundlefile(opts['bundle'])
             self.bundle_autoreject = True
-            refreshed = True
         else:
             self.reload_log(**opts)
 
