@@ -691,16 +691,17 @@ class GLog(gdialog.GWindow):
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             self.filterentry.set_text(opts['filehist'])
-            opts['pats'] = [opts['filehist']]
+            self.filter_entry_activated(self.filterentry, self.filtercombo)
         elif self.pats:
             self.custombutton.set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             self.filterentry.set_text(', '.join(self.pats))
-            opts['pats'] = self.pats
-        if 'bundle' in opts:
+            self.filter_entry_activated(self.filterentry, self.filtercombo)
+        elif 'bundle' in opts:
             self.set_bundlefile(opts['bundle'])
             self.bundle_autoreject = True
+            refreshed = True
         else:
             self.reload_log(**opts)
 
