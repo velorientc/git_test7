@@ -856,6 +856,7 @@ class GLog(gdialog.GWindow):
         self.ancestrybutton.set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
+        self.pats = pats
         self.lastrevid = None
 
         def ftitle(filtername):
@@ -1798,7 +1799,7 @@ class GLog(gdialog.GWindow):
 
     def thgdiff(self, treeview):
         'ctrl-d handler'
-        self.vdiff_change(None)
+        self.vdiff_change(None, self.pats)
 
     def thgparent(self, treeview):
         'ctrl-p handler'
@@ -1916,9 +1917,9 @@ class GLog(gdialog.GWindow):
             opts['rev'] = [str(parent), str(rev)]
         self._do_diff(pats, opts)
 
-    def vdiff_local(self, menuitem, pats=[]):
+    def vdiff_local(self, menuitem):
         opts = {'rev':[str(self.currevid)], 'bundle':self.bfile}
-        self._do_diff(pats, {'rev' : [str(self.currevid)]})
+        self._do_diff(self.pats, {'rev' : [str(self.currevid)]})
 
     def diff_revs(self, menuitem):
         rev0, rev1 = self.revrange
@@ -2382,7 +2383,7 @@ class GLog(gdialog.GWindow):
             return True
         return False
 
-    def tree_popup_menu(self, treeview, button=0, time=0) :
+    def tree_popup_menu(self, treeview, button=0, time=0):
         menu = self.tree_context_menu()
         menu.popup(None, None, None, button, time)
         return True
@@ -2392,8 +2393,8 @@ class GLog(gdialog.GWindow):
         menu.popup(None, None, None, button, time)
         return True
 
-    def tree_row_act(self, tree, path, column) :
-        self.vdiff_change(None)
+    def tree_row_act(self, tree, path, column):
+        self.vdiff_change(None, self.pats)
         return True
 
 def run(ui, *pats, **opts):
