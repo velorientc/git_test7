@@ -180,7 +180,6 @@ class GCommit(GStatus):
         self.update_check_count()
         self.opts['check'] = False
 
-
     def get_menu_list(self):
         def refresh(menu):
             self.reload_status()
@@ -198,8 +197,13 @@ class GCommit(GStatus):
             active = button.get_active()
             if self.showoutput != active:
                 self.showoutput = active
+        def toggle_showtoolbar(button):
+            self.showtoolbar = button.get_active()
+            self._show_toolbar(self.showtoolbar)
         return [(_('_View'),
-           [dict(text=_('Advanced'), ascheck=True, func=toggle,
+           [dict(text=_('Toolbar'), ascheck=True, check=self.showtoolbar,
+                func=toggle_showtoolbar),
+            dict(text=_('Advanced'), ascheck=True, func=toggle,
                 args=['advanced'], check=self.showadvanced),
             dict(text=_('Parents'), ascheck=True, func=toggle,
                 args=['parents'], check=self.showparents),
@@ -231,15 +235,16 @@ class GCommit(GStatus):
     def save_settings(self):
         settings = GStatus.save_settings(self)
         settings['commit-vpane'] = self.vpaned.get_position()
+        settings['show-toolbar'] = self.showtoolbar
         settings['showparents'] = self.showparents
         settings['showadvanced'] = self.showadvanced
         settings['show-output'] = self.showoutput
         return settings
 
-
     def load_settings(self, settings):
         GStatus.load_settings(self, settings)
         self.setting_vpos = -1
+        self.showtoolbar = settings.get('show-toolbar', True)
         self.showparents = True
         self.showadvanced = False
         self.showoutput = settings.get('show-output', False)
@@ -250,6 +255,8 @@ class GCommit(GStatus):
         except KeyError:
             pass
 
+    def show_toolbar_on_start(self):
+        return self.showtoolbar
 
     def get_tbbuttons(self):
         # insert to head of toolbar
