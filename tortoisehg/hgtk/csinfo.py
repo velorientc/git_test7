@@ -20,7 +20,7 @@ from tortoisehg.util import hglib, paths
 
 from tortoisehg.hgtk import gtklib
 
-PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags', 'transplant', 'p4')
+PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags', 'transplant', 'p4', 'svn')
 
 def create(repo, target=None, style=None, custom=None, **kargs):
     return Factory(repo, custom, style, target, **kargs)()
@@ -201,7 +201,7 @@ class SummaryInfo(object):
               'dateage': _('Date:'), 'branch': _('Branch:'),
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
               'rawtags': _('Tags:'), 'transplant': _('Transplant:'),
-              'p4': _('Perforce:')}
+              'p4': _('Perforce:'), 'svn': _('Subversion:')}
 
     def __init__(self):
         pass
@@ -288,6 +288,13 @@ class SummaryInfo(object):
             elif item == 'p4':
                 extra = ctx.extra()
                 return extra.get('p4', None)
+            elif item == 'svn':
+                extra = ctx.extra()
+                cvt = extra.get('convert_revision', '')
+                if cvt.startswith('svn:'):
+                    return cvt.split('/', 1)[-1]
+                else:
+                    return None
             elif item == 'ishead':
                 return len(ctx.children()) == 0
             raise UnknownItem(item)
@@ -335,7 +342,7 @@ class SummaryInfo(object):
                 return '%s' % revid
             elif item in ('revid', 'transplant'):
                 return gtklib.markup(value, **mono)
-            elif item in ('revnum', 'p4'):
+            elif item in ('revnum', 'p4', 'svn'):
                 return str(value)
             elif item in ('rawbranch', 'branch'):
                 return gtklib.markup(' %s ' % value, color='black',
