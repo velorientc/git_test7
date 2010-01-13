@@ -448,6 +448,23 @@ def thgimport(ui, *pats, **opts):
     from tortoisehg.hgtk.thgimport import run
     gtkrun(run, ui, *pats, **opts)
 
+def mpatch(ui, rejfile, *pats, **opts):
+    """Attempt to resolve conflicts in a .rej file"""
+    if not rejfile or pats or not rejfile.endswith('.rej'):
+        raise util.Abort(_('mpatch expects *.rej file argument\n'))
+    if not os.path.exists(rejfile):
+        raise util.Abort(_('%s does not exist\n') % rejfile)
+    # Assume patch was made from repo root, and arrange ourselves thusly
+    repo = hg.repository(ui, path=paths.find_root())
+    rejfile = util.canonpath(repo.root, repo.root, rejfile)
+    os.chdir(repo.root)
+    source = rejfile[:-4]
+    if not os.path.exists(source):
+        raise util.Abort(_('%s does not exist\n') % source)
+    from tortoisehg.util import prej
+    from tortoisehg.hgtk import visdiff
+    prej.run(ui, rejfile, source, visdiff.filemerge)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, alias=None):
     """show help for a command, extension, or list of commands
@@ -725,6 +742,7 @@ table = {
         ('hgtk archive')),
     "^strip": (strip, [], ('hgtk strip [REV]')),
     "^browse": (browse, [], ('hgtk browse [REV]')),
+    "^mpatch": (mpatch, [], ('hgtk mpatch file.rej')),
     "^import": (thgimport,
         [('', 'repo', False, _('import to the repository')),
          ('', 'mq', False, _('import to the patch queue (MQ)'))],

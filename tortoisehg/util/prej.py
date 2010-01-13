@@ -1099,13 +1099,15 @@ def rejmerge(pfile):
             if r.conflicts > 0:
                 global_conflicts += 1
             global_rejects += 1
-    pfile.rej = badrej
-    pfile.write()
-    merge_func(pfile.ui, pfile.fname, backupf)
-    try:
-        os.unlink(backupf)
-    except:
-        pass
+    if backupf:
+        global merge_func
+        pfile.rej = badrej
+        pfile.write()
+        merge_func(pfile.ui, pfile.fname, backupf)
+        try:
+            os.unlink(backupf)
+        except:
+            pass
 
 def updatedir(patches):
     l = patches.keys()
@@ -1115,13 +1117,16 @@ def updatedir(patches):
         if gp.mode != None:
             x = gp.mode & 0100 != 0
             util.set_exec(gp.path, x)
-            
-def run(ui, rejfile, sourcefile, merge_func):
+
+global merge_func
+def run(ui, rejfile, sourcefile, mergefunc):
     '''
     Attempt to apply the patch hunks in rejfile,  When patch fails,
     run merge_func to launch user's preferred visual diff tool to
     resolve conflicts.
     '''
+    global merge_func
+    merge_func = mergefunc
     diffp = file(rejfile)
     changed = {}
     try:
