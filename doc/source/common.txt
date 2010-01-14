@@ -49,8 +49,8 @@ Visual Diffs
 In TortoiseHg 0.10, the visual (external) diff infrastructure was
 refactored.  The new system uses tool descriptions in
 :file:`mergetools.ini` to detect most common diff tools on your computer
-(including TortoiseMerge, which ships in our installer) and select the
-best available tool.
+(including KDiff3, which ships in our installer) and select the best
+available tool.
 
 If the user has selected a merge tool
 (:menuselection:`TortoiseHg --> Three-way Merge Tool`), that tool will
