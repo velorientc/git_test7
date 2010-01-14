@@ -423,14 +423,13 @@ class GLog(gdialog.GWindow):
                 submitted = 0
                 for line in buffer.splitlines()[:-1]:
                     try:
-                        changelist, hashes = line.split(' ')
-                        if type(hashes) is str:
-                            hashes = [hashes]
+                        hashes = line.split(' ')
+                        changelist = hashes.pop(0)
                         if changelist == 'submitted':
                             changelist = _('Submitted') + str(submitted)
                             submitted += 1
                         pending[changelist] = hashes
-                    except ValueError:
+                    except (ValueError, IndexError):
                         text = _('Unable to parse p4pending output')
                 if pending:
                     text = _('%d pending changelists found') % len(pending)
