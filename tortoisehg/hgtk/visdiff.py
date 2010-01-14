@@ -92,7 +92,7 @@ def filemerge(ui, fname, patchedfname):
     diffcmd, diffopts, mergeopts = detectedtools[preferred]
     replace = dict(parent=fname, parent1=fname,
                    plabel1=fname + _('[working copy]'),
-                   child=patchedfname, clabel=_('[rejected changes]'))
+                   child=patchedfname, clabel=_('[original]'))
     launchtool(diffcmd, diffopts, replace, True)
 
 
