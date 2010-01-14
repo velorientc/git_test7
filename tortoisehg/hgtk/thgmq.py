@@ -525,9 +525,14 @@ class MQWidget(gtk.VBox):
             return len(repo.mq.series) > 0
         return False
 
-    def is_qtip(self, patchname):
-        if patchname:
-            return patchname == self.get_qtip_patchname()
+    def is_applied(self, name):
+        if self.mqloaded:
+            return name in self.repo.mq.applied
+        return False
+
+    def is_qtip(self, name):
+        if name:
+            return name == self.get_qtip_patchname()
         return False
 
     ### internal functions ###
@@ -542,7 +547,13 @@ class MQWidget(gtk.VBox):
 
     def get_path_by_patchname(self, name):
         """ return path has specified patch name """
-        return self.model.get_path(self.get_iter_by_patchname(name))
+        iter = self.get_iter_by_patchname(name)
+        return self.model.get_path(iter)
+
+    def get_row_by_patchname(self, name):
+        """ return row has specified patch name """
+        path = self.get_path_by_patchname(name)
+        return self.model[path]
 
     def get_qtip_patchname(self):
         if self.mqloaded and 'qtip' in self.repo.tags():
