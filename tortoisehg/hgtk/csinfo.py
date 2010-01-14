@@ -287,7 +287,8 @@ class SummaryInfo(object):
                 return None
             elif item == 'p4':
                 extra = ctx.extra()
-                return extra.get('p4', None)
+                p4cl = extra.get('p4', None)
+                return p4cl and ('changelist %s' % p4cl)
             elif item == 'svn':
                 extra = ctx.extra()
                 cvt = extra.get('convert_revision', '')
