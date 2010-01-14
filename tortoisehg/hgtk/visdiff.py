@@ -31,6 +31,8 @@ except ImportError:
 # Match parent2 first, so 'parent1?' will match both parent1 and parent
 _regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
 
+_nonexistant = _('[non-existant]')
+
 def snapshot(repo, files, ctx, tmproot):
     '''snapshot files as of some revision'''
     dirname = os.path.basename(repo.root) or 'root'
@@ -236,25 +238,24 @@ def visualdiff(ui, repo, pats, opts):
             dir2, fns_and_mtime = snapshot(repo, MA, ctx2, tmproot)
             label2 = 'working files'
 
+        def getfile(fname, dir, label):
+            file = os.path.join(tmproot, dir, fname)
+            if os.path.isfile(file):
+                return fname+label, file
+            nullfile = os.path.join(tmproot, 'empty')
+            fp = open(nullfile, 'w')
+            fp.close()
+            return _nonexistant+label, nullfile
+
         # If only one change, diff the files instead of the directories
         # Handle bogus modifies correctly by checking if the files exist
         if len(MAR) == 1:
             lfile = util.localpath(MAR.pop())
-            dir1a = os.path.join(dir1a, lfile)
-            if not os.path.isfile(os.path.join(tmproot, dir1a)):
-                dir1a = os.devnull
+            label1a, dir1a = getfile(lfile, dir1a, label1a)
             if do3way:
-                dir1b = os.path.join(dir1b, lfile)
-                if not os.path.isfile(os.path.join(tmproot, dir1b)):
-                    dir1b = os.devnull
-                if not os.path.isfile(os.path.join(tmproot, dira)):
-                    dira = os.devnull
-            dir2 = os.path.join(dir2, lfile)
-            label1a = lfile + label1a
-            label1b = lfile + label1b
-            labela = lfile + labela
-            label2 = lfile + label2
-
+                label1b, dir1b = getfile(lfile, dir1b, label1b)
+                labela, dira = getfile(lfile, dira, labela)
+            label2, dir2 = getfile(lfile, dir2, label2)
         if do3way:
             label1a += '[local]'
             label1b += '[other]'
@@ -569,7 +570,10 @@ class FileSelectionDialog(gtk.Dialog):
                 path = os.path.join(dir, util.localpath(source))
                 return source, path
             else:
-                return fname, os.devnull
+                nullfile = os.path.join(self.tmproot, 'empty')
+                fp = open(nullfile, 'w')
+                fp.close()
+                return _nonexistant, nullfile
 
         local, file1a = getfile(ctx1a, dir1a, fname, source)
         if ctx1b:
