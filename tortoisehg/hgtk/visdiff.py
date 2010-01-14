@@ -61,6 +61,26 @@ def snapshot(repo, files, ctx, tmproot):
             os.chmod(dest, stat.S_IREAD)
     return base, fns_and_mtime
 
+def launchtool(cmd, opts, replace, block):
+    def quote(match):
+        key = match.group()[1:]
+        return util.shellquote(replace[key])
+    args = ' '.join(opts)
+    args = re.sub(_regex, quote, args)
+    cmdline = util.shellquote(cmd) + ' ' + args
+    cmdline = util.quotecommand(cmdline)
+    try:
+        proc = subprocess.Popen(cmdline, shell=True,
+                                creationflags=openflags,
+                                stderr=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                stdin=subprocess.PIPE)
+        if block:
+            proc.communicate()
+    except (OSError, EnvironmentError), e:
+        gdialog.Prompt(_('Tool launch failure'),
+                       _('%s : %s') % (cmd, str(e)), None).run()
+
 def filemerge(ui, fname, patchedfname):
     'Launch the preferred visual diff tool for two text files'
     detectedtools = hglib.difftools(ui)
@@ -70,29 +90,10 @@ def filemerge(ui, fname, patchedfname):
         return None
     preferred = besttool(ui, detectedtools)
     diffcmd, diffopts, mergeopts = detectedtools[preferred]
-
-    plabel = fname + _('[working copy]')
-    clabel = _('[rejected changes]')
-    replace = dict(parent=fname, parent1=fname, plabel1=plabel,
-                   clabel=clabel, child=patchedfname)
-    def quote(match):
-        key = match.group()[1:]
-        return util.shellquote(replace[key])
-
-    args = ' '.join(diffopts)
-    args = re.sub(_regex, quote, args)
-    cmdline = util.shellquote(diffcmd) + ' ' + args
-    cmdline = util.quotecommand(cmdline)
-    try:
-        subprocess.Popen(cmdline, shell=True,
-                         creationflags=openflags,
-                         stderr=subprocess.PIPE,
-                         stdout=subprocess.PIPE,
-                         stdin=subprocess.PIPE).communicate()
-    except (OSError, EnvironmentError), e:
-        gdialog.Prompt(_('Tool launch failure'),
-                       _('%s : %s') % (diffcmd, str(e)), None).run()
-        return None
+    replace = dict(parent=fname, parent1=fname,
+                   plabel1=fname + _('[working copy]'),
+                   child=patchedfname, clabel=_('[rejected changes]'))
+    launchtool(diffcmd, diffopts, replace, True)
 
 
 def besttool(ui, tools):
@@ -267,25 +268,7 @@ def visualdiff(ui, repo, pats, opts):
                        plabel1=label1a, plabel2=label1b,
                        ancestor=dira, alabel=labela,
                        clabel=label2, child=dir2)
-        def quote(match):
-            key = match.group()[1:]
-            return util.shellquote(replace[key])
-
-        args = re.sub(_regex, quote, args)
-        cmdline = util.shellquote(diffcmd) + ' ' + args
-        cmdline = util.quotecommand(cmdline)
-
-        ui.debug('running %r\n' % (cmdline))
-        try:
-            subprocess.Popen(cmdline, shell=True,
-                             creationflags=openflags,
-                             stderr=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             stdin=subprocess.PIPE).communicate()
-        except (OSError, EnvironmentError), e:
-            gdialog.Prompt(_('Tool launch failure'),
-                           _('%s : %s') % (diffcmd, str(e)), None).run()
-            return None
+        launchtool(diffcmd, diffopts, replace, True)
 
         # detect if changes were made to mirrored working files
         for copy_fn, working_fn, mtime in fns_and_mtime:
@@ -594,109 +577,41 @@ class FileSelectionDialog(gtk.Dialog):
             labela += '[ancestor]'
             label2 += '[merged]'
 
-        args = ctx1b and self.mergeopts or self.diffopts
-        args = ' '.join(args)
-
         # Function to quote file/dir names in the argument string
         replace = dict(parent=file1a, parent1=file1a, plabel1=label1a,
                        parent2=file1b, plabel2=label1b,
                        ancestor=filea, alabel=labela,
                        clabel=label2, child=file2)
-        def quote(match):
-            key = match.group()[1:]
-            return util.shellquote(replace[key])
-
-        args = re.sub(_regex, quote, args)
-        cmdline = util.shellquote(self.diffpath) + ' ' + args
-        cmdline = util.quotecommand(cmdline)
-        try:
-            subprocess.Popen(cmdline, shell=True,
-                       creationflags=openflags,
-                       stderr=subprocess.PIPE,
-                       stdout=subprocess.PIPE,
-                       stdin=subprocess.PIPE)
-        except (OSError, EnvironmentError), e:
-            gdialog.Prompt(_('Tool launch failure'),
-                    _('%s : %s') % (self.diffpath, str(e)), None).run()
+        args = ctx1b and self.mergeopts or self.diffopts
+        launchtool(self.diffpath, args, replace, False)
 
     def p1dirdiff(self, button):
         dir1a, dir1b, dira, dir2 = self.dirs
         rev1a, rev1b, reva, rev2 = self.revs
 
-        # Function to quote file/dir names in the argument string
         replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
                        parent2='', plabel2='', ancestor='', alabel='',
                        clabel=rev2, child=dir2)
-        def quote(match):
-            key = match.group()[1:]
-            return util.shellquote(replace[key])
-
-        args = ' '.join(self.diffopts)
-        args = re.sub(_regex, quote, args)
-        cmdline = util.shellquote(self.diffpath) + ' ' + args
-        cmdline = util.quotecommand(cmdline)
-        try:
-            subprocess.Popen(cmdline, shell=True,
-                       creationflags=openflags,
-                       stderr=subprocess.PIPE,
-                       stdout=subprocess.PIPE,
-                       stdin=subprocess.PIPE)
-        except (OSError, EnvironmentError), e:
-            gdialog.Prompt(_('Tool launch failure'),
-                    _('%s : %s') % (self.diffpath, str(e)), None).run()
+        launchtool(self.diffpath, self.diffopts, replace, False)
 
     def p2dirdiff(self, button):
         dir1a, dir1b, dira, dir2 = self.dirs
         rev1a, rev1b, reva, rev2 = self.revs
 
-        # Function to quote file/dir names in the argument string
         replace = dict(parent=dir1b, parent1=dir1b, plabel1=rev1b,
                        parent2='', plabel2='', ancestor='', alabel='',
                        clabel=rev2, child=dir2)
-        def quote(match):
-            key = match.group()[1:]
-            return util.shellquote(replace[key])
-
-        args = ' '.join(self.diffopts)
-        args = re.sub(_regex, quote, args)
-        cmdline = util.shellquote(self.diffpath) + ' ' + args
-        cmdline = util.quotecommand(cmdline)
-        try:
-            subprocess.Popen(cmdline, shell=True,
-                       creationflags=openflags,
-                       stderr=subprocess.PIPE,
-                       stdout=subprocess.PIPE,
-                       stdin=subprocess.PIPE)
-        except (OSError, EnvironmentError), e:
-            gdialog.Prompt(_('Tool launch failure'),
-                    _('%s : %s') % (self.diffpath, str(e)), None).run()
+        launchtool(self.diffpath, self.diffopts, replace, False)
 
     def threewaydirdiff(self, button):
         dir1a, dir1b, dira, dir2 = self.dirs
         rev1a, rev1b, reva, rev2 = self.revs
 
-        # Function to quote file/dir names in the argument string
         replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
                        parent2=dir1b, plabel2=rev1b,
                        ancestor=dira, alabel=reva,
                        clabel=dir2, child=rev2)
-        def quote(match):
-            key = match.group()[1:]
-            return util.shellquote(replace[key])
-
-        args = ' '.join(self.mergeopts)
-        args = re.sub(_regex, quote, args)
-        cmdline = util.shellquote(self.diffpath) + ' ' + args
-        cmdline = util.quotecommand(cmdline)
-        try:
-            subprocess.Popen(cmdline, shell=True,
-                       creationflags=openflags,
-                       stderr=subprocess.PIPE,
-                       stdout=subprocess.PIPE,
-                       stdin=subprocess.PIPE)
-        except (OSError, EnvironmentError), e:
-            gdialog.Prompt(_('Tool launch failure'),
-                    _('%s : %s') % (self.diffpath, str(e)), None).run()
+        launchtool(self.diffpath, self.mergeopts, replace, False)
 
 
 def run(ui, *pats, **opts):
