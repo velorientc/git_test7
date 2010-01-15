@@ -776,6 +776,7 @@ class GCommit(GStatus):
     def commit_selected(self, files, callback):
         # 1a. get list of chunks not rejected
         repo, ui = self.repo, self.repo.ui
+        cwd = os.getcwd()
 
         # 2. backup changed files, so we can restore them in the end
         backups = {}
@@ -837,30 +838,30 @@ class GCommit(GStatus):
                         gdialog.Prompt(_('Commit'),
                                 _('Unable to apply patch'), self).run()
                         return
-            del fp
+
+            def finish():
+                os.chdir(cwd)
+                # restore backup files
+                try:
+                    for realname, tmpname in backups.iteritems():
+                        util.copyfile(tmpname, repo.wjoin(realname))
+                        os.unlink(tmpname)
+                    os.rmdir(backupdir)
+                except OSError:
+                    pass
+                callback()
 
             # 4. We prepared working directory according to filtered patch.
             #    Now is the time to delegate the job to commit/qrefresh
             #    or the like!
             # it is important to first chdir to repo root -- we'll call a
             # highlevel command with list of pathnames relative to repo root
+            del fp
             cwd = os.getcwd()
             os.chdir(repo.root)
-            try:
-                self.hg_commit(files, callback)
-            finally:
-                os.chdir(cwd)
-
-            return
-        finally:
-            # 5. finally restore backed-up files
-            try:
-                for realname, tmpname in backups.iteritems():
-                    util.copyfile(tmpname, repo.wjoin(realname))
-                    os.unlink(tmpname)
-                os.rmdir(backupdir)
-            except OSError:
-                pass
+            self.hg_commit(files, finish)
+        except:
+            finish()
 
 
     def undo_clicked(self, toolbutton, data=None):
