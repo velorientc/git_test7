@@ -450,17 +450,21 @@ def thgimport(ui, *pats, **opts):
 
 def mpatch(ui, rejfile, *pats, **opts):
     """Attempt to resolve conflicts in a .rej file"""
+    def abort(err):
+        from tortoisehg.hgtk import gdialog
+        gdialog.Prompt(_('mpatch error'), err, None).run()        
+        return None
     if not rejfile or pats or not rejfile.endswith('.rej'):
-        raise util.Abort(_('mpatch expects *.rej file argument\n'))
+        return abort(_('mpatch expects *.rej file argument\n'))
     if not os.path.exists(rejfile):
-        raise util.Abort(_('%s does not exist\n') % rejfile)
+        return abort(_('%s does not exist\n') % rejfile)
     # Assume patch was made from repo root, and arrange ourselves thusly
     repo = hg.repository(ui, path=paths.find_root())
     rejfile = util.canonpath(repo.root, repo.getcwd(), rejfile)
     os.chdir(repo.root)
     source = rejfile[:-4]
     if not os.path.exists(source):
-        raise util.Abort(_('%s does not exist\n') % source)
+        return abort(_('%s does not exist\n') % source)
     from tortoisehg.util import prej
     from tortoisehg.hgtk import visdiff
     prej.run(ui, rejfile, source, visdiff.filemerge)
