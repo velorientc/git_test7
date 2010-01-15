@@ -11,7 +11,7 @@ import gtk.keysyms
 import gobject
 import pango
 
-from mercurial import extensions, error
+from mercurial import error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -86,12 +86,6 @@ class MQWidget(gtk.VBox):
         self.repo = repo
         self.mqloaded = hasattr(repo, 'mq')
         self.statusbar = statusbar
-
-        try:
-            extensions.find('qup')
-            self.hasqup = True
-        except KeyError:
-            self.hasqup = False
 
         # top toolbar
         tbar = gtklib.SlimToolbar(tooltips)
@@ -434,17 +428,6 @@ class MQWidget(gtk.VBox):
         cmdline = ['hg', 'qfold', patch]
         self.cmd.execute(cmdline, self.cmd_done)
 
-    def mknext(self, patch):
-        """
-        [MQ] Execute 'qup patch'
-
-        patch: the patch name or an index to specify the patch.
-        """
-        if not (self.hasqup and patch and self.is_operable()):
-            return
-        cmdline = ['hg', 'qup', patch]
-        self.cmd.execute(cmdline, self.cmd_done)
-
     def qmove(self, patch, op):
         """
         [MQ] Move patch. This is NOT standard API of MQ.
@@ -683,7 +666,6 @@ class MQWidget(gtk.VBox):
         is_qtip = self.is_qtip(row[MQ_NAME])
         is_qparent = row[MQ_INDEX] == INDEX_QPARENT
         is_applied = row[MQ_STATUS] == 'A'
-        is_next = row[MQ_INDEX] == self.get_num_applied()
 
         if is_operable and not is_qtip and (not is_qparent or has_applied):
             append(_('_Goto'), self.goto_activated, gtk.STOCK_JUMP_TO)
@@ -695,8 +677,6 @@ class MQWidget(gtk.VBox):
             append(_('_Delete'), self.delete_activated, gtk.STOCK_DELETE)
             if has_applied and not is_qparent:
                 append(_('F_old'), self.fold_activated, gtk.STOCK_DIRECTORY)
-            if self.hasqup and not is_next:
-                append(_('Make It _Next'), self.mknext_activated)
             if self.get_num_unapplied() > 1:
                 sub = gtk.Menu()
                 append(_('Move'), icon=gtk.STOCK_INDEX).set_submenu(sub)
@@ -870,6 +850,3 @@ class MQWidget(gtk.VBox):
 
     def fold_activated(self, menuitem, row):
         self.qfold(row[MQ_NAME])
-
-    def mknext_activated(self, menuitem, row):
-        self.mknext(row[MQ_NAME])
