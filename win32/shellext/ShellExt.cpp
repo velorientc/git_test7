@@ -58,9 +58,6 @@ int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
         _UnloadResources();
     }
 
-    if (g_cRefThisDll > 0)
-        InitStatus::check();
-
     return 1;
 }
 
