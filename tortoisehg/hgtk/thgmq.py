@@ -656,12 +656,16 @@ class MQWidget(gtk.VBox):
             return
 
         menu = gtk.Menu()
-        def append(label, handler=None):
+        def append(label, handler=None, target=None):
             item = gtk.MenuItem(label, True)
             item.set_border_width(1)
             if handler:
                 item.connect('activate', handler, row)
-            menu.append(item)
+            if target:
+                target.append(item)
+            else:
+                menu.append(item)
+            return item
 
         is_operable = self.is_operable()
         has_patch = self.has_patch()
@@ -683,6 +687,12 @@ class MQWidget(gtk.VBox):
                 append(_('F_old'), self.fold_activated)
             if self.hasqup and not is_next:
                 append(_('Make It _Next'), self.mknext_activated)
+            sub = gtk.Menu()
+            append(_('Move')).set_submenu(sub)
+            append(_('Top'), lambda *a: self.qmove_ui(MOVE_TOP), sub)
+            append(_('Up'), lambda *a: self.qmove_ui(MOVE_UP), sub)
+            append(_('Down'), lambda *a: self.qmove_ui(MOVE_DOWN), sub)
+            append(_('Bottom'), lambda *a: self.qmove_ui(MOVE_BOTTOM), sub)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
