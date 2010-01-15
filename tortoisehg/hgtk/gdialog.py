@@ -373,11 +373,15 @@ class GWindow(gtk.Window):
     def get_reponame(self):
         return hglib.get_reponame(self.repo)
 
-    def helpcontents(self, item):
+    def helpindex(self, item):
+        self.helpcontents(item, 'index.html')
+
+    def helpcontents(self, item, url=None):
         'User selected Help->Contents from menu bar'
-        url = self.get_help_url()
         if not url:
-            return
+            url = self.get_help_url()
+            if not url:
+                return
         if not url.startswith('http'):
             fullurl = 'http://tortoisehg.org/manual/0.10/' + url
             # Use local CHM file if it can be found
@@ -501,9 +505,11 @@ class GWindow(gtk.Window):
           (_('_Help'),
            [dict(text=_('Contents'), func=self.helpcontents,
                 icon=gtk.STOCK_INFO),
+            dict(text=_('Index'), func=self.helpindex,
+                icon=gtk.STOCK_HELP),
             dict(text=_('About'), func=self.launch, args=['about'],
                 icon=gtk.STOCK_ABOUT)])
-          ]
+           ]
             menubar = gtk.MenuBar()
             for title, items in allmenus:
                 m_items = gtklib.MenuItems()
