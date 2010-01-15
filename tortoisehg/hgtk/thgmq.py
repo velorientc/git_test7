@@ -29,6 +29,12 @@ MQ_ESCAPED = 4
 INDEX_SEPARATOR = -1
 INDEX_QPARENT   = -2
 
+# Move patch operations
+MOVE_TOP    = 1
+MOVE_UP     = 2
+MOVE_DOWN   = 3
+MOVE_BOTTOM = 4
+
 class MQWidget(gtk.VBox):
 
     __gproperties__ = {
@@ -196,7 +202,6 @@ class MQWidget(gtk.VBox):
 
         # accelerators
         if accelgroup:
-
             key, mod = gtk.accelerator_parse('F2')
             self.list.add_accelerator('thg-rename', accelgroup,
                     key, mod, gtk.ACCEL_VISIBLE)
@@ -208,68 +213,16 @@ class MQWidget(gtk.VBox):
             self.list.connect('thg-rename', thgrename)
 
             mod = gtk.gdk.CONTROL_MASK
-
-            def mq_move(tree, key):
-                oldrow = tree.get_cursor()[0][0]
-                minval = self.separator_pos + 1
-                if oldrow < minval:
-                    return True
-                maxval = len(self.model) - 1
-                if key == gtk.keysyms.Up:
-                    newrow = oldrow - 1
-                elif key == gtk.keysyms.Down:
-                    newrow = oldrow + 1
-                elif key == gtk.keysyms.Page_Up:
-                    newrow = minval
-                elif key == gtk.keysyms.Page_Down:
-                    newrow = maxval
-                else:
-                    return True
-                if newrow != oldrow and newrow >= minval and newrow <= maxval:
-                    self.move_patch(oldrow, newrow)
-                return True
-
-            def add(name, key, hook=None):
+            def add(name, key, func, *args):
                 self.list.add_accelerator(name, accelgroup, key, mod, 0)
-                if hook:
-                    self.list.connect(name, hook)
-                else:
-                    self.list.connect(name, mq_move, key)
-
-            add('mq-move-up', gtk.keysyms.Up)
-            add('mq-move-down', gtk.keysyms.Down)
-            add('mq-move-top', gtk.keysyms.Page_Up)
-            add('mq-move-bottom', gtk.keysyms.Page_Down)
-            add('mq-pop', gtk.keysyms.Left, lambda _: self.qpop())
-            add('mq-push', gtk.keysyms.Right, lambda _: self.qpush())
-
-    def move_patch(self, oldidx, newidx):
-
-        def list_move_item(list, oldpos, newpos):
-            olditem = list[oldpos]
-            del list[oldpos]
-            list.insert(newpos, olditem)
-
-        # Update series
-        p = self.repo.mq
-        model = self.model
-        oldrow = model[oldidx]
-        newrow = model[newidx]
-        list_move_item(p.full_series, p.find_series(oldrow[MQ_NAME]),
-                                      p.find_series(newrow[MQ_NAME]))
-        p.series_dirty = True
-        p.save_dirty()
-
-        # Update TreeView
-        if newidx < oldidx:
-            model.move_before(oldrow.iter, newrow.iter)
-        else:
-            model.move_after(oldrow.iter, newrow.iter)
-        begin = min(oldidx, newidx)
-        offset = min(oldrow[MQ_INDEX], newrow[MQ_INDEX]) - begin
-        for i in xrange(begin, max(oldidx, newidx) + 1):
-            model[i][MQ_INDEX] = i + offset
-
+                self.list.connect(name, lambda *a: func(*args))
+            add('mq-move-top', gtk.keysyms.Page_Up, self.qmove_ui, MOVE_TOP)
+            add('mq-move-up', gtk.keysyms.Up, self.qmove_ui, MOVE_UP)
+            add('mq-move-down', gtk.keysyms.Down, self.qmove_ui, MOVE_DOWN)
+            add('mq-move-bottom', gtk.keysyms.Page_Down, self.qmove_ui,
+                MOVE_BOTTOM)
+            add('mq-pop', gtk.keysyms.Left, self.qpop)
+            add('mq-push', gtk.keysyms.Right, self.qpush)
 
     ### public functions ###
 
@@ -492,6 +445,80 @@ class MQWidget(gtk.VBox):
             return
         cmdline = ['hg', 'qup', patch]
         self.cmd.execute(cmdline, self.cmd_done)
+
+    def qmove(self, patch, op):
+        """
+        [MQ] Move patch. This is NOT standard API of MQ.
+
+        patch: the patch name or an index to specify the patch.
+        op: the operator for moving the patch: MOVE_TOP, MOVE_UP,
+            MOVE_DOWN or MOVE_BOTTOM.
+        """
+        if not self.is_operable() or self.is_applied(patch):
+            return False
+
+        # get current index in the list
+        oldrow = self.get_row_by_patchname(patch)
+        for i in range(len(self.model)):
+            if self.model[i][MQ_NAME] == oldrow[MQ_NAME]:
+                oldidx = i
+                break
+        else:
+            return False
+
+        # get new index in the list
+        minval = self.separator_pos + 1
+        maxval = len(self.model) - 1
+        if op == MOVE_TOP:
+            newidx = minval
+        elif op == MOVE_UP:
+            newidx = oldidx - 1
+        elif op == MOVE_DOWN:
+            newidx = oldidx + 1
+        elif op == MOVE_BOTTOM:
+            newidx = maxval
+
+        if newidx == oldidx or newidx < minval or maxval < newidx:
+            return False
+
+        # Update series
+        q = self.repo.mq
+        oldrow = self.model[oldidx]
+        newrow = self.model[newidx]
+        oldpos = q.find_series(oldrow[MQ_NAME])
+        newpos = q.find_series(newrow[MQ_NAME])
+        olditem = q.full_series[oldpos]
+        del q.full_series[oldpos]
+        q.full_series.insert(newpos, olditem)
+        q.series_dirty = True
+        q.save_dirty()
+
+        # Update TreeView
+        if newidx < oldidx:
+            self.model.move_before(oldrow.iter, newrow.iter)
+        else:
+            self.model.move_after(oldrow.iter, newrow.iter)
+        begin = min(oldidx, newidx)
+        offset = min(oldrow[MQ_INDEX], newrow[MQ_INDEX]) - begin
+        for i in xrange(begin, max(oldidx, newidx) + 1):
+            self.model[i][MQ_INDEX] = i + offset
+
+    def qmove_ui(self, op):
+        """
+        [MQ] Move selected patch in the list.
+
+        Return True if succeed to move; otherwise False.
+
+        op: the operator for moving the patch: MOVE_TOP, MOVE_UP,
+            MOVE_DOWN or MOVE_BOTTOM.
+        """
+        sel = self.list.get_selection()
+        if sel.count_selected_rows() == 1:
+            model, paths = sel.get_selected_rows()
+            patch = model[paths[0]][MQ_NAME]
+            if patch:
+                return self.qmove(patch, op)
+        return False
 
     def has_mq(self):
         return self.mqloaded and os.path.isdir(self.repo.mq.path)
