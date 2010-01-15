@@ -98,23 +98,22 @@ class MQWidget(gtk.VBox):
 
         ## buttons
         self.btn = {}
-        popallbtn = tbar.append_button(gtk.STOCK_GOTO_FIRST,
+        popallbtn = tbar.append_button(gtk.STOCK_GOTO_TOP,
                                       _('Unapply all patches'))
         popallbtn.connect('clicked', self.popall_clicked)
         self.btn['popall'] = popallbtn
 
-        popbtn = tbar.append_button(gtk.STOCK_GO_BACK,
+        popbtn = tbar.append_button(gtk.STOCK_GO_UP,
                                    _('Unapply last patch'))
         popbtn.connect('clicked', self.pop_clicked)
         self.btn['pop'] = popbtn
 
-        pushbtn = gtk.ToolButton(gtk.STOCK_GO_FORWARD)
-        pushbtn = tbar.append_button(gtk.STOCK_GO_FORWARD,
+        pushbtn = tbar.append_button(gtk.STOCK_GO_DOWN,
                                     _('Apply next patch'))
         pushbtn.connect('clicked', self.push_clicked)
         self.btn['push'] = pushbtn
 
-        pushallbtn = tbar.append_button(gtk.STOCK_GOTO_LAST,
+        pushallbtn = tbar.append_button(gtk.STOCK_GOTO_BOTTOM,
                                        _('Apply all patches'))
         pushallbtn.connect('clicked', self.pushall_clicked)
         self.btn['pushall'] = pushallbtn
