@@ -941,6 +941,19 @@ class GLog(gdialog.GWindow):
         # refresh MQ widget if exists
         if hasattr(self, 'mqwidget'):
             self.mqwidget.refresh()
+            # update status messages
+            status_text = ''
+            idle_text = None
+            ntotal = self.mqwidget.get_num_patches()
+            if ntotal > 0:
+                ncount = self.mqwidget.get_num_applied()
+                status_text = _('%(count)d of %(total)d Patches applied') % {
+                                'count': ncount, 'total': ntotal}
+                if ncount > 0:
+                    idle_text = _("Patch '%s' applied") % \
+                                  self.mqwidget.get_qtip_patchname()
+            self.stbar.set_right3_text(status_text)
+            self.stbar.set_idle_text(idle_text)
 
         # Remember options to next time reload_log is called
         self.filteropts = opts
@@ -1323,7 +1336,7 @@ class GLog(gdialog.GWindow):
         if 'mq' in self.exs:
             # create MQWidget
             self.mqwidget = thgmq.MQWidget(
-                self.repo, self.stbar, accelgroup, self.tooltips)
+                self.repo, accelgroup, self.tooltips)
             self.mqwidget.connect('patch-selected', self.patch_selected)
             self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
 

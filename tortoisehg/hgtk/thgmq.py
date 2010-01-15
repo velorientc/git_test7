@@ -80,12 +80,11 @@ class MQWidget(gtk.VBox):
                             str)) # patch name
     }
 
-    def __init__(self, repo, statusbar, accelgroup=None, tooltips=None):
+    def __init__(self, repo, accelgroup=None, tooltips=None):
         gtk.VBox.__init__(self)
 
         self.repo = repo
         self.mqloaded = hasattr(repo, 'mq')
-        self.statusbar = statusbar
 
         # top toolbar
         tbar = gtklib.SlimToolbar(tooltips)
@@ -270,21 +269,6 @@ class MQWidget(gtk.VBox):
 
         # update UI sensitives
         self.update_sensitives()
-
-        # report status
-        status_text = ''
-        idle_text = None
-        if self.has_mq():
-            nser = len(self.repo.mq.series)
-            if nser:
-                napp = len(self.repo.mq.applied)
-                status_text = _('%(count)d of %(total)d Patches applied') % {
-                        'count': napp, 'total': nser}
-                if napp:
-                    pn = self.get_qtip_patchname()
-                    idle_text = _("Patch '%s' applied") % pn
-        self.statusbar.set_right3_text(status_text)
-        self.statusbar.set_idle_text(idle_text)
 
     def set_repo(self, repo):
         self.repo = repo
