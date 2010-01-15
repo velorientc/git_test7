@@ -379,8 +379,13 @@ class GWindow(gtk.Window):
         if not url:
             return
         if not url.startswith('http'):
-            url = 'http://tortoisehg.org/manual/0.10/' + url
-        shlib.browse_url(url)
+            fullurl = 'http://tortoisehg.org/manual/0.10/' + url
+            # Use local CHM file if it can be found
+            if os.name == 'nt' and paths.bin_path:
+                chm = os.path.join(paths.bin_path, 'docs', 'TortoiseHg.chm')
+                if os.path.exists(chm):
+                    fullurl = (r'mk:@MSITStore:%s::/' % chm) + url
+        shlib.browse_url(fullurl)
 
     def launch(self, item, app):
         import sys
