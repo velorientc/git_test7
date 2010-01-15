@@ -543,6 +543,12 @@ class MQWidget(gtk.VBox):
             return len(self.repo.mq.applied)
         return 0
 
+    def get_num_unapplied(self):
+        """ return the number of unapplied patches """
+        if self.mqloaded:
+            return self.get_num_patches() - self.get_num_applied()
+        return 0
+
     def is_operable(self):
         """ return True if MQ is operable """
         if self.mqloaded:
@@ -692,16 +698,17 @@ class MQWidget(gtk.VBox):
                 append(_('F_old'), self.fold_activated, gtk.STOCK_DIRECTORY)
             if self.hasqup and not is_next:
                 append(_('Make It _Next'), self.mknext_activated)
-            sub = gtk.Menu()
-            append(_('Move'), icon=gtk.STOCK_INDEX).set_submenu(sub)
-            append(_('Top'), lambda *a: self.qmove_ui(MOVE_TOP),
-                   gtk.STOCK_GOTO_TOP, sub)
-            append(_('Up'), lambda *a: self.qmove_ui(MOVE_UP),
-                   gtk.STOCK_GO_UP, sub)
-            append(_('Down'), lambda *a: self.qmove_ui(MOVE_DOWN),
-                   gtk.STOCK_GO_DOWN, sub)
-            append(_('Bottom'), lambda *a: self.qmove_ui(MOVE_BOTTOM),
-                   gtk.STOCK_GOTO_BOTTOM, sub)
+            if self.get_num_unapplied() > 1:
+                sub = gtk.Menu()
+                append(_('Move'), icon=gtk.STOCK_INDEX).set_submenu(sub)
+                append(_('Top'), lambda *a: self.qmove_ui(MOVE_TOP),
+                       gtk.STOCK_GOTO_TOP, sub)
+                append(_('Up'), lambda *a: self.qmove_ui(MOVE_UP),
+                       gtk.STOCK_GO_UP, sub)
+                append(_('Down'), lambda *a: self.qmove_ui(MOVE_DOWN),
+                       gtk.STOCK_GO_DOWN, sub)
+                append(_('Bottom'), lambda *a: self.qmove_ui(MOVE_BOTTOM),
+                       gtk.STOCK_GOTO_BOTTOM, sub)
 
         if len(menu.get_children()) > 0:
             menu.show_all()
