@@ -637,7 +637,7 @@ class GCommit(GStatus):
         if self.is_merge():
             return ()
         else:
-            return [(_('_Commit'), commit, 'MAR'),]
+            return [(_('_Commit'), commit, 'MARS'),]
 
     def delete(self, window, event):
         if not self.should_live():
@@ -737,7 +737,7 @@ class GCommit(GStatus):
             return
 
         def get_list(addremove=True):
-            commitable = 'MAR'
+            commitable = 'MARS'
             if addremove:
                 ar_list = self.relevant_checked_files('?!')
                 if len(ar_list) > 0 and self.should_addremove(ar_list):
@@ -793,6 +793,7 @@ class GCommit(GStatus):
             allchunks = []
             for f in files:
                 cf = util.pconvert(f)
+                if cf in self.subrepos: continue
                 if cf not in self.status[0]: continue
                 if f not in self.filechunks: continue
                 chunks = self.filechunks[f]
