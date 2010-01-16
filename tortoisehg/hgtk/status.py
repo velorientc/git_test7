@@ -15,7 +15,7 @@ import gobject
 import pango
 import threading
 
-from mercurial import cmdutil, util, commands, patch, mdiff, error
+from mercurial import cmdutil, util, commands, patch, mdiff, error, hg
 from mercurial import merge as merge_
 
 from tortoisehg.util.i18n import _
@@ -721,6 +721,10 @@ class GStatus(gdialog.GWindow):
         if not self.ready: return False
 
         def get_repo_status():
+            # Create a new repo object
+            repo = hg.repository(self.ui, path=self.repo.root)
+            self.newrepo = repo
+
             if self.mqmode and self.mode != 'status':
                 # when a patch is applied, show diffs to parent of top patch
                 qtip = repo['.']
@@ -755,6 +759,8 @@ class GStatus(gdialog.GWindow):
                     self.stbar.end()
                     self.stbar.set_status_text(self.status_error)
                     return False
+                self.repo = self.newrepo
+                self.ui = self.repo.ui
                 self.refresh_file_tree()
                 self.update_check_count()
                 self.refresh_complete()
