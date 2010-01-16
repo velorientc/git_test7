@@ -17,6 +17,12 @@ Frequently Asked Questions
 	and five bonus extensions: hgfold, hgcr-gui, perfarce, hgeol,
 	mercurial-keyring.
 
+*Is Mercurial on Windows compatible with the index service and virus scanners?*
+
+	No. Like TortoiseSVN, `we recommend <http://www.selenic.com/pipermail/mercurial/2010-January/029680.html>`_
+	to turn off the indexing service on the working copies and repositories,
+	and exclude them from virus scans.
+
 *How can I get translations for the Explorer context menu?*
 
 	The available translations were stored by the installer under
