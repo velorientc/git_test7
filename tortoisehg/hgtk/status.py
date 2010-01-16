@@ -89,6 +89,7 @@ class GStatus(gdialog.GWindow):
         self.filechunks = {}
         self.status_error = None
         self.preview_tab_name_label = None
+        self.subrepos = []
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -688,6 +689,10 @@ class GStatus(gdialog.GWindow):
                 ck, p = waschecked.get(wfile, (defcheck, False))
                 model.append([ck, stat, hglib.toutf(wfile), wfile, mst, p])
 
+        for sdir in self.subrepos:
+            wfile = util.localpath(sdir)
+            model.append([True, 'S', hglib.toutf(wfile), wfile, '', False])
+
         self.auto_check() # may check more files
 
         # recover selections
@@ -747,6 +752,14 @@ class GStatus(gdialog.GWindow):
                                      unknown=unknown)
                 self.status = status
             except IOError, e:
+                self.status_error = str(e)
+            self.subrepos = []
+            wctx = repo[None]
+            try:
+                for s in wctx.substate:
+                    if matcher(s) and wctx.sub(s).dirty():
+                        self.subrepos.append(s)
+            except (IOError, error.ConfigError), e:
                 self.status_error = str(e)
 
         def status_wait(thread):
@@ -1503,7 +1516,7 @@ class GStatus(gdialog.GWindow):
     def tree_popup_menu(self, treeview):
         model, tpaths = treeview.get_selection().get_selected_rows()
         types = {'M':[], 'A':[], 'R':[], '!':[], 'I':[], '?':[], 'C':[],
-                 'r':[], 'u':[]}
+                 'r':[], 'u':[], 'S':[]}
         all = []
         pathmap = {}
         for p in tpaths:
