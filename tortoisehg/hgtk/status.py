@@ -691,7 +691,8 @@ class GStatus(gdialog.GWindow):
 
         for sdir in self.subrepos:
             wfile = util.localpath(sdir)
-            model.append([True, 'S', hglib.toutf(wfile), wfile, '', False])
+            ck, p = waschecked(wfile, (True, False))
+            model.append([ck, 'S', hglib.toutf(wfile), wfile, '', p])
 
         self.auto_check() # may check more files
 
@@ -884,7 +885,7 @@ class GStatus(gdialog.GWindow):
         return True
 
     def sort_by_stat(self, model, iter1, iter2):
-        order = 'MAR!?IC'
+        order = 'MAR!?SIC'
         lhs, rhs = (model.get_value(iter1, FM_STATUS),
                     model.get_value(iter2, FM_STATUS))
         # GTK+ bug that calls sort before a full row is inserted causing
