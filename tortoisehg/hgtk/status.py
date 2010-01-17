@@ -567,7 +567,7 @@ class GStatus(gdialog.GWindow):
                      (False, 'clean',    _('C: clean')),
                      (True,  'removed',  _('R: removed')),
                      (False, 'deleted',  _('!: deleted')),
-                     (False, 'subrepo',  _('S: subrepo'))]
+                     (True, 'subrepo',  _('S: subrepo'))]
 
         checks = []
         nomerge = (self.count_revs() <= 1)
@@ -697,10 +697,12 @@ class GStatus(gdialog.GWindow):
                 ck, p = waschecked.get(wfile, (defcheck, False))
                 model.append([ck, stat, hglib.toutf(wfile), wfile, mst, p])
 
-        for sdir in self.subrepos:
-            wfile = util.localpath(sdir)
-            ck, p = waschecked(wfile, (True, False))
-            model.append([ck, 'S', hglib.toutf(wfile), wfile, '', p])
+        if self.test_opt('subrepo') or self.is_merge():
+            for sdir in self.subrepos:
+                wfile = util.localpath(sdir)
+                defcheck = wfile not in self.excludes
+                ck, p = waschecked.get(wfile, (defcheck, False))
+                model.append([ck, 'S', hglib.toutf(wfile), wfile, '', p])
 
         self.auto_check() # may check more files
 
@@ -1724,6 +1726,6 @@ def run(ui, *pats, **opts):
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
         'added':True, 'removed':True, 'deleted':True, 'unknown':True,
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
-        'rev':rev, 'check':True
+        'rev':rev, 'check':True, 'subrepo':True
     }
     return GStatus(ui, None, None, pats, cmdoptions)
