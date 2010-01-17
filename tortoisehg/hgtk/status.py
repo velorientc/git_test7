@@ -117,16 +117,9 @@ class GStatus(gdialog.GWindow):
             for check in self._show_checks.values():
                 check.set_active(True)
         else:
-            wasset = False
             for opt in self.opts:
                 if opt in self._show_checks and self.opts[opt]:
-                    wasset = True
                     self._show_checks[opt].set_active(True)
-            if not wasset:
-                for check in [item[1] for item in self._show_checks.iteritems()
-                              if item[0] in ('modified', 'added', 'removed',
-                                             'deleted', 'unknown', 'subrepo')]:
-                    check.set_active(True)
             if self.pats:
                 for name, check in self._show_checks.iteritems():
                     check.set_sensitive(False)
