@@ -149,9 +149,13 @@ Refer to `keyring docs <http://pypi.python.org/pypi/keyring>`_
 for more details.
 
 .. note::
-	On Windows, it will default to storing your encrypted passwords in
-	the system registry under HKCU\\Software\\Mercurial\\Keyring.  No
-	configuration is required.
+	On Windows XP and above, your encrypted passwords are stored in the
+	credentials subsystem using
+	`CredRead <http://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ and `CredWrite <http://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
+
+.. note::
+	On Windows 2K, the encrypted passwords are stored in the system
+	registry under HKCU\\Software\\Mercurial\\Keyring.
 
 **Repository configuration (HTTP)**
 
