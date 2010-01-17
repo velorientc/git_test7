@@ -108,7 +108,7 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
         // we require a higher speed for showing overlays on repo roots,
         // since we will do considerably more file accesses compared
         // to showing icons just *inside* repos
-        if (ticks > 50 /* ms */)
+        if (ticks > 150 /* ms */)
         {
             file_access_is_unacceptably_slow = true;
             goto exit;
