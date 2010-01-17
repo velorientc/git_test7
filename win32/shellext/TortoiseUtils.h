@@ -29,4 +29,15 @@ bool StartsWith(const std::string& a, const std::string& b);
 void Tokenize(const std::string& str, std::vector<std::string>& tokens,
   const std::string& delimiters = " ");
 
+template <typename C, typename T>
+bool contains(const C& c, const T& t)
+{
+    for (C::const_iterator i = c.begin(); i != c.end(); ++i)
+    {
+        if (*i == t)
+            return true;
+    }
+    return false;
+}
+
 #endif
