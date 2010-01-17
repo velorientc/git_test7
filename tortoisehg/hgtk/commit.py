@@ -1170,7 +1170,7 @@ def run(_ui, *pats, **opts):
         'user':opts.get('user', ''), 'date':opts.get('date', ''),
         'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
-        'unknown':True, 'ignored':False,
+        'unknown':True, 'ignored':False, 'subrepo':True,
         'exclude':[], 'include':[], 'rev':[],
         'check': True, 'git':False, 'addremove':False,
     }
