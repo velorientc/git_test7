@@ -1,0 +1,25 @@
+** Please do not run setup.py **
+
+On Linux, the suggested methods for using TortoiseHg are to either
+install a package built for your distribution, or run directly out of a
+cloned repository.  For details, see:
+
+http://bitbucket.org/tortoisehg/stable/wiki/download
+
+http://bitbucket.org/tortoisehg/stable/wiki/hgtk
+
+http://bitbucket.org/tortoisehg/stable/wiki/nautilus
+
+
+On Windows, we prefer you use the more recent stable release, which
+can always be found at http://tortoisehg.org
+
+
+If you ran setup.py and are now having troubles with icons, you have two
+choices:
+
+1) Find the tortoisehg/util/config.py file that was installed and
+manually edit it to fixup the paths.
+
+2) Delete the installation and use one of the preferred install methods.
+
