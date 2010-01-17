@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <windows.h>
 #include <string>
+#include <vector>
 
 #define _MBSTR(wstr) hf_wctomb((LPSTR)alloca(wcslen(wstr) + 1), (wstr),wcslen(wstr) + 1)
 #define _WCSTR(str) hf_mbtowc((LPWSTR)alloca((strlen(str) + 1) * sizeof(WCHAR)),(str),strlen(str) + 1)
@@ -25,5 +26,7 @@ FILE* fopenReadRenameAllowed(const char* path);
 int GetRegSZValue(HKEY hkey, const char* name, std::string& res);
 int GetRegSZValueW(HKEY hkey, const wchar_t* name, std::wstring& res);
 bool StartsWith(const std::string& a, const std::string& b);
+void Tokenize(const std::string& str, std::vector<std::string>& tokens,
+  const std::string& delimiters = " ");
 
 #endif

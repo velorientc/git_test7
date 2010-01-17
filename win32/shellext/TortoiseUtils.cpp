@@ -339,3 +339,19 @@ bool StartsWith(const std::string& a, const std::string& b)
     return true;
 }
 
+
+void Tokenize(const std::string& str, std::vector<std::string>& tokens,
+    const std::string& delimiters)
+{
+    typedef std::string S;
+    S::size_type lastpos = str.find_first_not_of(delimiters, 0);
+    S::size_type pos = str.find_first_of(delimiters, lastpos);
+
+    while (S::npos != pos || S::npos != lastpos)
+    {
+        tokens.push_back(str.substr(lastpos, pos - lastpos));
+        lastpos = str.find_first_not_of(delimiters, pos);
+        pos = str.find_first_of(delimiters, lastpos);
+    }
+}
+
