@@ -1039,14 +1039,17 @@ class GStatus(gdialog.GWindow):
 
     def update_commit_preview(self):
         if self.is_merge():
-            difftext = [_('===== Diff to first parent =====\n')]
-            for s in patch.diff(self.repo, self._node1, self._node2,
-                    opts=patch.diffopts(self.ui, self.opts)):
+            opts = patch.diffopts(self.ui, self.opts)
+            opts.git = True
+            wctx = self.repo[None]
+            pctx1, pctx2 = wctx.parents()
+            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
+                        pctx1.rev(), str(pctx1))]
+            for s in patch.diff(self.repo, pctx1.node(), None, opts=opts):
                 difftext.extend(s.splitlines(True))
-            pctxs = self.repo[None].parents()
-            difftext.append(_('\n===== Diff to second parent =====\n'))
-            for s in patch.diff(self.repo, pctxs[1].node(), None,
-                    opts=patch.diffopts(self.ui, self.opts)):
+            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                            pctx2.rev(), str(pctx2)))
+            for s in patch.diff(self.repo, pctx2.node(), None, opts=opts):
                 difftext.extend(s.splitlines(True))
         else:
             buf = cStringIO.StringIO()
@@ -1097,19 +1100,26 @@ class GStatus(gdialog.GWindow):
     def generate_text_diffs(self, row):
         wfile = self.filemodel[row][FM_PATH]
         pfile = util.pconvert(wfile)
-        difftext = []
-        is_merge = self.is_merge()
-        if is_merge:
-            difftext = [_('===== Diff to first parent =====\n')]
         matcher = cmdutil.matchfiles(self.repo, [pfile])
-        for s in patch.diff(self.repo, self._node1, self._node2,
-                match=matcher, opts=patch.diffopts(self.ui, self.opts)):
-            difftext.extend(s.splitlines(True))
-        if is_merge:
-            pctxs = self.repo[None].parents()
-            difftext.append(_('\n===== Diff to second parent =====\n'))
-            for s in patch.diff(self.repo, pctxs[1].node(), None,
-                    match=matcher, opts=patch.diffopts(self.ui, self.opts)):
+        opts = patch.diffopts(self.ui, self.opts)
+        opts.git = True
+        difftext = []
+        if self.is_merge():
+            wctx = self.repo[None]
+            pctx1, pctx2 = wctx.parents()
+            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
+                        pctx1.rev(), str(pctx1))]
+            for s in patch.diff(self.repo, pctx1.node(), None,
+                                match=matcher, opts=opts):
+                difftext.extend(s.splitlines(True))
+            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                            pctx2.rev(), str(pctx2)))
+            for s in patch.diff(self.repo, pctx2.node(), None,
+                                match=matcher, opts=opts):
+                difftext.extend(s.splitlines(True))
+        else:
+            for s in patch.diff(self.repo, self._node1, self._node2,
+                    match=matcher, opts=opts):
                 difftext.extend(s.splitlines(True))
         return self.diff_highlight_buffer(difftext)
 
