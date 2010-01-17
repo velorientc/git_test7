@@ -125,7 +125,7 @@ class GStatus(gdialog.GWindow):
             if not wasset:
                 for check in [item[1] for item in self._show_checks.iteritems()
                               if item[0] in ('modified', 'added', 'removed',
-                                             'deleted', 'unknown')]:
+                                             'deleted', 'unknown', 'subrepo')]:
                     check.set_active(True)
             if self.pats:
                 for name, check in self._show_checks.iteritems():
@@ -559,7 +559,8 @@ class GStatus(gdialog.GWindow):
                      (True,  'added',    _('A: added')),
                      (False, 'clean',    _('C: clean')),
                      (True,  'removed',  _('R: removed')),
-                     (False, 'deleted',  _('!: deleted')) ]
+                     (False, 'deleted',  _('!: deleted')),
+                     (False, 'subrepo',  _('S: subrepo'))]
 
         checks = []
         nomerge = (self.count_revs() <= 1)
