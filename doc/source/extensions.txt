@@ -106,4 +106,104 @@ You may want to add it to your Mercurial.ini or a repository's hgrc like this::
 	[extensions]
 	hgcr-gui=
  
+Mercurial-Keyring
+=================
+
+* `Mercurial Keyring <http://pypi.python.org/pypi/mercurial_keyring>`_ home page
+* `Wiki page <http://mercurial.selenic.com/wiki/KeyringExtension>`_
+
+Keyring extension uses services of the keyring library to securely save
+authentication passwords (HTTP/HTTPS and SMTP) using system specific
+password database (Gnome Keyring, KDE KWallet, OSXKeyChain, dedicated
+solutions for Win32 and command line).
+
+**What it does**
+
+The extension prompts for the HTTP password on the first pull/push
+to/from given remote repository (just like it is done by default), but
+saves the password (keyed by the combination of username and remote
+repository url) in the password database. On the next run it checks for
+the username in .hg/hgrc, then for suitable password in the password
+database, and uses those credentials if found.
+
+Similarly, while sending emails via SMTP server which requires
+authorization, it prompts for the password on first use of given server,
+then saves it in the password database and reuses on successive runs.
+
+In case password turns out incorrect (either because it was invalid, or
+because it was changed on the server) it just prompts the user again.
+
+**Installation**
+
+First, the extension must be enabled in your Mercurial.ini file as::
+
+	[extensions]
+	mercurial_keyring=
+
+**Password backend configuration**
+
+The most appropriate password backend should usually be picked automatically,
+without configuration. Still, if necessary, it can be configured using
+~/keyringrc.cfg file (keyringrc.cfg in the home directory of the current user).
+Refer to `keyring docs <http://pypi.python.org/pypi/keyring>`_
+for more details.
+
+.. note::
+	On Windows, it will default to storing your encrypted passwords in
+	the system registry under HKCU\\Software\\Mercurial\\Keyring.  No
+	configuration is required.
+
+**Repository configuration (HTTP)**
+
+Edit repository-local .hg/hgrc and save there the remote repository path and
+the username, but do not save the password. For example::
+
+	[paths]
+	myremote = https://my.server.com/hgrepo/someproject
+
+	[auth]
+	myremote.schemes = http https
+	myremote.prefix = my.server.com/hgrepo
+	myremote.username = mekk
+
+Simpler form with url-embedded name can also be used::
+
+	[paths]
+	bitbucket = https://User@bitbucket.org/User/project_name/
+
+.. note::
+	If both username and password are given in .hg/hgrc, extension will
+	use them without using the password database. If username is not
+	given, extension will prompt for credentials every time, also
+	without saving the password. So, in both cases, it is effectively
+	reverting to the default behaviour.
+
+Consult `[auth] <http://www.selenic.com/mercurial/hgrc.5.html#auth>`_
+section documentation for more details.
+
+**Repository configuration (SMTP)**
+
+Edit either repository-local .hg/hgrc, or ~/.hgrc (the latter is usually
+preferable) and set there all standard email and smtp properties, including
+smtp username, but without smtp password. For example::
+
+	[email]
+	method = smtp
+	from = Joe Doe <Joe.Doe@remote.com>
+
+	[smtp]
+	host = smtp.gmail.com
+	port = 587
+	username = JoeDoe@gmail.com
+	tls = true
+
+Just as in case of HTTP, you must set username, but must not set password here
+to use the extension, in other cases it will revert to the default behaviour.
+
+**Usage**
+
+Configure the repository as above, then just pull and push (or email) You
+should be asked for the password only once (per every username +
+remote_repository_url combination). 
+
 .. vim: noet ts=4
