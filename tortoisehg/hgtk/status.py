@@ -186,6 +186,7 @@ class GStatus(gdialog.GWindow):
         settings = gdialog.GWindow.save_settings(self)
         settings['gstatus-hpane'] = self.diffpane.get_position()
         settings['gstatus-lastpos'] = self.setting_lastpos
+        settings['gstatus-type-expander'] = self.types_expander.get_expanded()
         return settings
 
 
@@ -193,9 +194,11 @@ class GStatus(gdialog.GWindow):
         gdialog.GWindow.load_settings(self, settings)
         self.setting_pos = 270
         self.setting_lastpos = 64000
+        self.setting_types_expanded = False
         try:
             self.setting_pos = settings['gstatus-hpane']
             self.setting_lastpos = settings['gstatus-lastpos']
+            self.setting_types_expanded = settings['gstatus-type-expander']
         except KeyError:
             pass
         self.mqmode, repo = None, self.repo
@@ -344,7 +347,11 @@ class GStatus(gdialog.GWindow):
         self.counter = gtk.Label('')
         exp_labelbox.pack_end(self.counter, False, False, 2)
         self.status_types = self.get_status_types()
-        self.status_types.hide()
+        if self.setting_types_expanded:
+            expander.set_expanded(True)
+            self.status_types.show()
+        else:
+            self.status_types.hide()
         expander_box = gtk.VBox()
         expander_box.pack_start(exp_labelbox)
         expander_box.pack_start(self.status_types)
