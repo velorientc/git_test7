@@ -371,7 +371,7 @@ def hginit(ui, *pats, **opts):
     gtkrun(run, ui, *pats, **opts)
 
 def log(ui, *pats, **opts):
-    """changelog viewer"""
+    """Repository Explorer (changelog viewer)"""
     from tortoisehg.hgtk.history import run
     gtkrun(run, ui, *pats, **opts)
 
