@@ -657,11 +657,7 @@ class GLog(gdialog.GWindow):
             self.currevid = self.lastrevid = None
             self.changeview.load_patch_details(patchfile)
         else:
-            self.currevid = revid
-            if self.currevid != self.lastrevid:
-                self.lastrevid = self.currevid
-                self.changeview.opts['rev'] = [str(self.currevid)]
-                self.changeview.load_details(self.currevid)
+            self.goto_rev(revid)
 
     def repo_invalidated(self, mqwidget):
         self.reload_log()
