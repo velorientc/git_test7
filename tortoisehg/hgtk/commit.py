@@ -201,13 +201,19 @@ class GCommit(GStatus):
         def toggle_showtoolbar(button):
             self.showtoolbar = button.get_active()
             self._show_toolbar(self.showtoolbar)
-        return [(_('_View'),
-           [dict(text=_('Toolbar'), ascheck=True, check=self.showtoolbar,
+        if self.mqloaded:
+            mq_item = [dict(text=_('Patch Queue'), name='mq', ascheck=True,
+                func=self.mq_clicked, check=self.setting_mqvis) ]
+        else:
+            mq_item = []
+        return [(_('_View'), [
+            dict(text=_('Toolbar'), ascheck=True, check=self.showtoolbar,
                 func=toggle_showtoolbar),
             dict(text=_('Advanced'), ascheck=True, func=toggle,
                 args=['advanced'], check=self.showadvanced),
             dict(text=_('Parents'), ascheck=True, func=toggle,
                 args=['parents'], check=self.showparents),
+            ] + mq_item + [
             dict(text='----'),
             dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH),
             dict(text='----'),
@@ -240,6 +246,13 @@ class GCommit(GStatus):
         settings['showparents'] = self.showparents
         settings['showadvanced'] = self.showadvanced
         settings['show-output'] = self.showoutput
+        if hasattr(self, 'mqpaned') and self.mqwidget.has_patch():
+            curpos = self.mqpaned.get_position()
+            settings['mqpane'] = curpos or self.setting_mqhpos
+            settings['mqvis'] = bool(curpos)
+        else:
+            settings['mqpane'] = self.setting_mqhpos
+            settings['mqvis'] = self.setting_mqvis
         return settings
 
     def load_settings(self, settings):
@@ -249,6 +262,8 @@ class GCommit(GStatus):
         self.showparents = settings.get('showparents', True)
         self.showadvanced = settings.get('showadvanced', False)
         self.showoutput = settings.get('show-output', False)
+        self.setting_mqhpos = settings.get('mqpane', 140) or 140
+        self.setting_mqvis = settings.get('mqvis', False)
 
     def show_toolbar_on_start(self):
         return self.showtoolbar
@@ -263,6 +278,13 @@ class GCommit(GStatus):
             self.commit_clicked, name='commit', tip=_('commit'))
         tbbuttons.insert(0, undo_btn)
         tbbuttons.insert(0, commit_btn)
+        if self.mqloaded:
+            mq_btn = self.make_toolbutton(gtk.STOCK_DIRECTORY,
+                        _('Patch Queue'), self.mq_clicked,
+                        name='mq', tip=_('Show/Hide Patch Queue'),
+                        toggle=True, icon='menupatch.ico')
+            tbbuttons.append(mq_btn)
+            self.mqtb = mq_btn
         return tbbuttons
 
     def should_live(self, widget=None, event=None):
@@ -554,6 +576,27 @@ class GCommit(GStatus):
     def repo_invalidated(self, mqwidget):
         self.reload_status()
 
+    def enable_mqpanel(self, enable=None):
+        if not hasattr(self, 'mqpaned'):
+            return
+        if enable is None:
+            enable = self.setting_mqvis and self.mqwidget.has_patch()
+
+        # set the state of MQ toolbutton
+        self.cmd_handler_block_by_func('mq', self.mq_clicked)
+        self.cmd_set_active('mq', enable)
+        self.cmd_handler_unblock_by_func('mq', self.mq_clicked)
+        self.cmd_set_sensitive('mq', self.mqwidget.has_mq())
+
+        # show/hide MQ pane
+        oldpos = self.mqpaned.get_position()
+        self.mqpaned.set_position(enable and self.setting_mqhpos or 0)
+        if not enable and oldpos:
+            self.setting_mqhpos = oldpos
+
+    def mq_clicked(self, widget, *args):
+        self.enable_mqpanel(widget.get_active())
+
     def update_commit_button(self):
         label = _('Commit')
         tooltip = _('commit')
@@ -658,6 +701,8 @@ class GCommit(GStatus):
             self.parents_frame.hide()
         if not self.showadvanced:
             self.advanced_frame.hide()
+        if hasattr(self, 'mqpaned') and self.mqtb.get_active():
+            self.mqpaned.set_position(self.setting_mqhpos)
 
     def thgaccept(self, window):
         self.commit_clicked(None)
