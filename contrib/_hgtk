@@ -82,7 +82,7 @@ _hgtk() {
     fi
   fi
 
-  curcontext="${curcontext%:*:*}:hg-${cmd}:"
+  curcontext="${curcontext%:*:*}:hgtk-${cmd}:"
 
   zstyle -s ":completion:$curcontext:" cache-policy update_policy
 
