@@ -317,9 +317,11 @@ class GLog(gdialog.GWindow):
                     icon=gtk.STOCK_ABOUT),
                 dict(text=_('Working Parent'), func=navigate, args=['.'],
                     icon=gtk.STOCK_HOME),
+                dict(text=_('Previous Selected'), icon=gtk.STOCK_GO_BACK,
+                    func=lambda *a: self.goto_prev_sel()),
                 dict(text='----'),
-                dict(text=_('Revision...'), func=navigate, args=[None],
-                    icon=gtk.STOCK_JUMP_TO),
+                dict(text=_('Revision...'), icon=gtk.STOCK_JUMP_TO,
+                    func=lambda *a: self.show_goto_dialog()),
                 ] + bmenus),
 
             (_('_Synchronize'), [
@@ -492,6 +494,7 @@ class GLog(gdialog.GWindow):
         if not path:
             self.currevid = None
             return False
+        self.prevrevid = self.currevid
         self.currevid = graphview.get_revid_at_path(path)
         self.ancestrybutton.set_sensitive(True)
         if self.currevid != self.lastrevid:
@@ -1857,6 +1860,10 @@ class GLog(gdialog.GWindow):
     def goto_rev(self, revision):
         rid = self.repo[revision].rev()
         self.graphview.set_revision_id(rid, load=True)
+
+    def goto_prev_sel(self):
+        if hasattr(self, 'prevrevid') and self.prevrevid:
+            self.goto_rev(self.prevrevid)
 
     def strip_rev(self, menuitem):
         def strip_completed():
