@@ -470,7 +470,7 @@ def mpatch(ui, rejfile, *pats, **opts):
     prej.run(ui, rejfile, source, visdiff.filemerge)
 
 ### help management, adapted from mercurial.commands.help_()
-def help_(ui, name=None, with_version=False, alias=None):
+def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
 
     With no arguments, print a list of commands and short help.
