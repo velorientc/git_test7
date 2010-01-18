@@ -7,7 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
-Copyright (C) 2009 Steve Borho <steve@borho.org>.
+Copyright (C) 2008-2010 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
@@ -20,7 +20,7 @@ import gtk
 import gobject
 
 import mercurial.ui as _ui
-from mercurial import hg, util, fancyopts, cmdutil, extensions
+from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib
@@ -30,15 +30,20 @@ try:
 except ImportError:
     config_nofork = None
 
-nonrepo_commands = '''userconfig clone debugcomplete init about help
-version thgstatus serve'''
+nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
+about help version thgstatus serve'''
 
 # Add TortoiseHg signals, hooked to key accelerators in gtklib
 for sig in ('copy-clipboard', 'thg-diff', 'thg-parent', 'thg-rename',
-        'thg-revision'):
+            'thg-revision', 'mq-move-up', 'mq-move-down', 'mq-move-top',
+            'mq-move-bottom', 'mq-pop', 'mq-push'):
     gobject.signal_new(sig, gtk.TreeView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
-for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept', 'thg-reflow'):
+for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept',
+            'thg-reflow', 'status-scroll-down', 'status-scroll-up', 
+            'status-next-file', 'status-previous-file', 
+            'status-select-all', 'status-next-page', 
+            'status-previous-page'):
     gobject.signal_new(sig, gtk.Window,
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-close', 'thg-new'):
@@ -140,7 +145,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except fancyopts.getopt.GetoptError, inst:
-        raise hglib.ParseError(None, inst)
+        raise error.ParseError(None, inst)
 
     if args:
         alias, args = args[0], args[1:]
@@ -163,7 +168,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions)
     except fancyopts.getopt.GetoptError, inst:
-        raise hglib.ParseError(cmd, inst)
+        raise error.ParseError(cmd, inst)
 
     # separate global options back out
     for o in globalopts:
@@ -184,20 +189,20 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except hglib.ParseError, inst:
+    except error.ParseError, inst:
         if inst.args[0]:
             ui.status(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
             ui.status(_("hgtk: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
-    except hglib.AmbiguousCommand, inst:
+    except error.AmbiguousCommand, inst:
         ui.status(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except hglib.UnknownCommand, inst:
+    except error.UnknownCommand, inst:
         ui.status(_("hgtk: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
-    except hglib.RepoError, inst:
+    except error.RepoError, inst:
         ui.status(_("abort: %s!\n") % inst)
 
     return -1
@@ -245,9 +250,10 @@ def runcommand(ui, args):
         ui.quiet = True
 
     if cmd not in nonrepo_commands.split() and not path:
-        raise hglib.RepoError(_("There is no Mercurial repository here"
+        raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
+    cmdoptions['mainapp'] = True
     try:
         return func(ui, *args, **cmdoptions)
     except TypeError, inst:
@@ -255,7 +261,7 @@ def runcommand(ui, args):
         tb = traceback.extract_tb(sys.exc_info()[2])
         if len(tb) != 1: # no
             raise
-        raise hglib.ParseError(cmd, _("invalid arguments"))
+        raise error.ParseError(cmd, _("invalid arguments"))
 
 mainwindow = None
 def thgexit(win):
@@ -329,6 +335,11 @@ def repoconfig(ui, *pats, **opts):
     from tortoisehg.hgtk.thgconfig import run
     gtkrun(run, ui, *pats, **opts)
 
+def shellconfig(ui, *pats, **opts):
+    """Explorer extension configuration editor"""
+    from tortoisehg.hgtk.shellconf import run
+    gtkrun(run, ui, *pats, **opts)
+
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
     if not pats or len(pats) > 2:
@@ -360,7 +371,7 @@ def hginit(ui, *pats, **opts):
     gtkrun(run, ui, *pats, **opts)
 
 def log(ui, *pats, **opts):
-    """changelog viewer"""
+    """Repository Explorer (changelog viewer)"""
     from tortoisehg.hgtk.history import run
     gtkrun(run, ui, *pats, **opts)
 
@@ -393,7 +404,7 @@ def serve(ui, *pats, **opts):
     """web server"""
     from tortoisehg.hgtk.serve import run
     if paths.find_root() == None and not opts['webdir_conf']:
-        raise hglib.RepoError(_("There is no Mercurial repository here"
+        raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
     gtkrun(run, ui, *pats, **opts)
 
@@ -422,16 +433,44 @@ def update(ui, *pats, **opts):
     from tortoisehg.hgtk.update import run
     gtkrun(run, ui, *pats, **opts)
 
-def vdiff(ui, *pats, **opts):
-    """launch configured visual diff tool"""
-    from tortoisehg.hgtk.visdiff import run, rawextdiff
-    if opts.get('raw'):
-        rawextdiff(ui, *pats, **opts)
-        return
+def browse(ui, *pats, **opts):
+    """browse repository state"""
+    from tortoisehg.hgtk.browse import run
     gtkrun(run, ui, *pats, **opts)
 
+def vdiff(ui, *pats, **opts):
+    """launch configured visual diff tool"""
+    from tortoisehg.hgtk.visdiff import run
+    gtkrun(run, ui, *pats, **opts)
+
+def thgimport(ui, *pats, **opts):
+    """import patches to repository/patch queue"""
+    from tortoisehg.hgtk.thgimport import run
+    gtkrun(run, ui, *pats, **opts)
+
+def mpatch(ui, rejfile, *pats, **opts):
+    """Attempt to resolve conflicts in a .rej file"""
+    def abort(err):
+        from tortoisehg.hgtk import gdialog
+        gdialog.Prompt(_('mpatch error'), err, None).run()        
+        return None
+    if not rejfile or pats or not rejfile.endswith('.rej'):
+        return abort(_('mpatch expects *.rej file argument\n'))
+    if not os.path.exists(rejfile):
+        return abort(_('%s does not exist\n') % rejfile)
+    # Assume patch was made from repo root, and arrange ourselves thusly
+    repo = hg.repository(ui, path=paths.find_root())
+    rejfile = util.canonpath(repo.root, repo.getcwd(), rejfile)
+    os.chdir(repo.root)
+    source = rejfile[:-4]
+    if not os.path.exists(source):
+        return abort(_('%s does not exist\n') % source)
+    from tortoisehg.util import prej
+    from tortoisehg.hgtk import visdiff
+    prej.run(ui, rejfile, source, visdiff.filemerge)
+
 ### help management, adapted from mercurial.commands.help_()
-def help_(ui, name=None, with_version=False, alias=None):
+def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
 
     With no arguments, print a list of commands and short help.
@@ -466,7 +505,7 @@ def help_(ui, name=None, with_version=False, alias=None):
 
         try:
             aliases, i = cmdutil.findcmd(name, table, False)
-        except hglib.AmbiguousCommand, inst:
+        except error.AmbiguousCommand, inst:
             select = lambda c: c.lstrip('^').startswith(inst.args[0])
             helplist(_('list of commands:\n\n'), select)
             return
@@ -496,9 +535,12 @@ def help_(ui, name=None, with_version=False, alias=None):
     def helplist(header, select=None):
         h = {}
         cmds = {}
-        for c, e in table.items():
+        for c, e in table.iteritems():
             f = c.split("|", 1)[0]
             if select and not select(f):
+                continue
+            if (not select and name != 'shortlist' and
+                e[0].__module__ != __name__):
                 continue
             if name == "shortlist" and not f.startswith("^"):
                 continue
@@ -506,9 +548,12 @@ def help_(ui, name=None, with_version=False, alias=None):
             if not ui.debugflag and f.startswith("debug"):
                 continue
             doc = e[0].__doc__
+            if doc and 'DEPRECATED' in doc and not ui.verbose:
+                continue
+            #doc = gettext(doc)
             if not doc:
-                doc = _("(No help text available)")
-            h[f] = doc.splitlines(0)[0].rstrip()
+                doc = _("(no help text available)")
+            h[f] = doc.splitlines()[0].rstrip()
             cmds[f] = c.lstrip("^")
 
         if not h:
@@ -516,15 +561,14 @@ def help_(ui, name=None, with_version=False, alias=None):
             return
 
         ui.status(header)
-        fns = h.keys()
-        fns.sort()
+        fns = sorted(h)
         m = max(map(len, fns))
         for f in fns:
             if ui.verbose:
                 commands = cmds[f].replace("|",", ")
                 ui.write(" %s:\n      %s\n"%(commands, h[f]))
             else:
-                ui.write(' %-*s   %s\n' % (m, f, h[f]))
+                ui.write(' %-*s   %s\n' % (m, f, util.wrap(h[f], m + 4)))
 
         if not ui.quiet:
             addglobalopts(True)
@@ -535,7 +579,7 @@ def help_(ui, name=None, with_version=False, alias=None):
             if name in names:
                 break
         else:
-            raise hglib.UnknownCommand(name)
+            raise error.UnknownCommand(name)
 
         # description
         if not doc:
@@ -553,7 +597,7 @@ def help_(ui, name=None, with_version=False, alias=None):
                 f(name)
                 i = None
                 break
-            except hglib.UnknownCommand, inst:
+            except error.UnknownCommand, inst:
                 i = inst
         if i:
             raise i
@@ -642,8 +686,8 @@ globalopts = [
 ]
 
 table = {
-    "^about": (about, [], _('hgtk about')),
-    "^add": (add, [], _('hgtk add [FILE]...')),
+    "about": (about, [], _('hgtk about')),
+    "add": (add, [], _('hgtk add [FILE]...')),
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
     "^commit|ci": (commit,
         [('u', 'user', '', _('record user as committer')),
@@ -655,12 +699,12 @@ table = {
     "^log|history|explorer": (log,
         [('l', 'limit', '', _('limit number of changes displayed'))],
         _('hgtk log [OPTIONS] [FILE]')),
-    "^merge": (merge, 
+    "merge": (merge, 
         [('r', 'rev', '', _('revision to merge with'))],
         _('hgtk merge')),
     "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
     "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
-    "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
+    "synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
     "^status|st|diff": (status,
         [('r', 'rev', [], _('revisions to compare'))],
         _('hgtk status [FILE]...')),
@@ -671,10 +715,10 @@ table = {
         [('', 'focus', '', _('field to give initial focus'))],
         _('hgtk repoconfig')),
     "^guess": (guess, [], _('hgtk guess')),
-    "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
-    "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
-    "^revert": (revert, [], _('hgtk revert [FILE]...')),
-    "^forget": (forget, [], _('hgtk forget [FILE]...')),
+    "remove|rm": (revert, [], _('hgtk remove [FILE]...')),
+    "rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
+    "revert": (revert, [], _('hgtk revert [FILE]...')),
+    "forget": (forget, [], _('hgtk forget [FILE]...')),
     "^serve":
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
@@ -693,8 +737,7 @@ table = {
     "^vdiff": (vdiff,
         [('c', 'change', '', _('changeset to view in diff tool')),
          ('r', 'rev', [], _('revisions to view in diff tool')),
-         ('b', 'bundle', '', _('bundle file to preview')),
-         ('', 'raw', None, _('directly use raw extdiff command'))],
+         ('b', 'bundle', '', _('bundle file to preview'))],
             _('launch visual diff tool')),
     "^version": (version,
         [('v', 'verbose', None, _('print license'))],
@@ -703,8 +746,18 @@ table = {
          [('o', 'options', None, _('show the command options'))],
          _('[-o] CMD')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
-    "^archive": (archive,
+    "archive": (archive,
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk archive')),
-    "^strip": (strip, [], ('hgtk strip [REV]')),
+    "strip": (strip, [], ('hgtk strip [REV]')),
+    "browse": (browse, [], ('hgtk browse [REV]')),
+    "^mpatch": (mpatch, [], ('hgtk mpatch file.rej')),
+    "import": (thgimport,
+        [('', 'repo', False, _('import to the repository')),
+         ('', 'mq', False, _('import to the patch queue (MQ)'))],
+        _('hgtk import [OPTION] [SOURCE]...')),
 }
+
+if os.name == 'nt':
+    # TODO: extra detection to determine if shell extension is installed
+    table['shellconfig'] = (shellconfig, [], _('hgtk shellconfig'))

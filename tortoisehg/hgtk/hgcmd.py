@@ -84,11 +84,12 @@ class CmdDialog(gtk.Dialog):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription('Monospace'))
+        fontlog = hglib.getfontconfig()['fontlog']
+        self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground='#900000')
+                                   foreground=gtklib.DRED)
 
         self.vbox.pack_start(scrolledwindow, True, True)
         self.connect('map_event', self._on_window_map_event)
@@ -101,7 +102,10 @@ class CmdDialog(gtk.Dialog):
 
     def _on_stop_clicked(self, button):
         if self.hgthread:
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
 
     def _delete(self, widget, event):
         return True
@@ -214,6 +218,11 @@ class CmdDialog(gtk.Dialog):
         else:
             return False
 
+    def get_buffer(self):
+        start = self.textbuffer.get_start_iter()
+        end = self.textbuffer.get_end_iter()
+        return self.textbuffer.get_text(start, end)
+
 # CmdWidget style constants
 STYLE_NORMAL  = 'normal'    # pbar + embedded log viewer
 STYLE_COMPACT = 'compact'   # pbar + popup log viewer
@@ -222,17 +231,17 @@ class CmdWidget(gtk.VBox):
 
     def __init__(self, style=STYLE_NORMAL, tooltips=None, logsize=None):
         """
-        style: String. Predefined constans of CmdWidget style.  Two styles;
-               STYLE_NORMAL (progress bar + popup log viewer) and
-               STYLE_COMPACT (progress bar + embedded log viewer) are
-               availabled. Default: STYLE_NORMAL.
+        style:    String. Predefined constans of CmdWidget style. Two styles,
+                  STYLE_NORMAL (progress bar + popup log viewer) and
+                  STYLE_COMPACT (progress bar + embedded log viewer) are
+                  available. Default: STYLE_NORMAL.
         tooltips: Reference. gtk.Tooltips instance to show tooltips of several
-                  buttons.  If you omit, it will create a new instance of
-                  gtk.Tooltips.  Default: None.
-        logsize: Tuple or list contains 2 numbers.  Specify the size of
-                 embedded log viewer.  size[0] = width, size[1] = height.  
-                 If you pass -1 as width or height size, it will be change to
-                 *natual* size of the widget.  Default: tuple(-1, 180).
+                  buttons. If omitted, a new instance of gtk.Tooltips will be
+                  created. Default: None.
+        logsize:  Tuple or list containing two numbers. Specify the size of the
+                  embedded log viewer. size[0] = width, size[1] = height.  
+                  If you pass -1 as width or height size, it will be set to
+                  the natural size of the widget. Default: tuple(-1, 180).
         """
         gtk.VBox.__init__(self)
 
@@ -269,7 +278,7 @@ class CmdWidget(gtk.VBox):
         self.pack_start(progbox)
 
         def add_button(stock_id, tooltip, handler, toggle=False):
-            btn = progbox.append_stock(stock_id, tooltip, toggle)
+            btn = progbox.append_button(stock_id, tooltip, toggle)
             btn.connect('clicked', handler)
             return btn
 
@@ -324,16 +333,16 @@ class CmdWidget(gtk.VBox):
     def execute(self, cmdline, callback, *args, **kargs):
         """
         Execute passed command line using 'hgthread'.
-        When the command terminated, callback function is called
-        with return code. 
+        When the command terminates, the callback function is invoked
+        with its return code. 
 
         cmdline: command line string.
-        callback: function called after terminated the thread.
+        callback: function invoked after the command terminates.
 
         def callback(returncode, useraborted, ...)
 
         returncode: See the description of 'hgthread'.
-        useraborted: Indicates whether the thread is aborted by user.
+        useraborted: Whether the command was aborted by the user.
         """
         if self.hgthread:
             return
@@ -370,28 +379,30 @@ class CmdWidget(gtk.VBox):
         """
         if self.hgthread:
             self.useraborted = True
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
             self.set_pbar(True)
             self.set_buttons(stop=False, close=True)
 
     def set_result(self, text, style=None):
         """
-        Put text message and icon to the progress bar.
+        Put text message and icon in the progress bar.
 
         style: String. If passed 'succeed', 'green' or 'ok', green
                text and succeed icon will be shown.  If passed 'error',
-               'failed', 'fail' or 'red' are passed, red text and error
-               icon will be shown.
+               'failed', 'fail' or 'red', red text and error icon will be shown.
         """
         markup = '<span foreground="%s" weight="%s">%%s</span>'
         if style in ('succeed', 'green', 'ok'):
-            markup = markup % ('#007700', 'bold')
+            markup = markup % (gtklib.DGREEN, 'bold')
             icons = {'succeed': True}
         elif style in ('error', 'failed', 'fail', 'red'):
-            markup = markup % ('#880000', 'bold')
+            markup = markup % (gtklib.DRED, 'bold')
             icons = {'error': True}
         else:
-            markup = markup % ('#000000', 'normal')
+            markup = markup % ('black', 'normal')
             icons = {}
         text = gtklib.markup_escape_text(text)
         self.rlabel.set_markup(markup % text)
@@ -409,7 +420,7 @@ class CmdWidget(gtk.VBox):
     def get_pbar(self):
         """
         Return 'visible' property of the progress bar box.
-        If not exists progress bar, it always returns False.
+        If there is no progress bar, it returns False.
         """
         if hasattr(self, 'progbox'):
             return self.progbox.get_property('visible')
@@ -418,7 +429,7 @@ class CmdWidget(gtk.VBox):
     def set_buttons(self, log=None, stop=None, close=None):
         """
         Set visible properties of buttons on the progress bar box.
-        If omitted all argments, it does nothing.
+        If all arguments are omitted, it does nothing.
 
         log: if True, log button is shown. (default: None)
         stop: if True, stop button is shown. (default: None)
@@ -561,19 +572,20 @@ class CmdLogWidget(gtk.VBox):
         # log textview
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription('Monospace'))
+        fontlog = hglib.getfontconfig()['fontlog']
+        self.textview.modify_font(pango.FontDescription(fontlog))
         pane.add(self.textview)
 
         # text buffer
         self.buffer = self.textview.get_buffer()
         self.buffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                               foreground='#900000')
+                               foreground=gtklib.DRED)
 
     ### public functions ###
 
     def append(self, text, error=False):
         """
-        Insert the text to the end of TextView.
+        Insert text at the end of the TextView.
 
         text: string you want to append.
         error: if True, append text with 'error' tag. (default: False)
@@ -587,7 +599,7 @@ class CmdLogWidget(gtk.VBox):
 
     def clear(self):
         """
-        Clear all text in TextView.
+        Clear all text in the TextView.
         """
         self.buffer.delete(self.buffer.get_start_iter(),
                            self.buffer.get_end_iter())
@@ -597,20 +609,17 @@ class CmdLogDialog(gtk.Window):
     def __init__(self, title=_('Command Log')):
         gtk.Window.__init__(self, type=gtk.WINDOW_TOPLEVEL)
         gtklib.set_tortoise_icon(self, 'hg.ico')
+        accelgroup, mod = gtklib.set_tortoise_keys(self)
         self.set_title(title)
         self.set_default_size(320, 240)
-        self.connect('delete-event', self.delete_event)
+        self.connect('delete-event', self.should_live)
 
         # accelerators
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        mod = gtklib.get_thg_modifier()
-        for key, modifier in (gtk.accelerator_parse(mod+'w'),
-                              gtk.accelerator_parse(mod+'q'),
-                              gtk.accelerator_parse('Escape')):
-            self.add_accelerator('thg-close', accelgroup, key,
-                                 modifier, gtk.ACCEL_VISIBLE)
-        self.connect('thg-close', self.delete_event)
+        key, modifier = gtk.accelerator_parse('Escape')
+        self.add_accelerator('thg-close', accelgroup, key, modifier,
+                             gtk.ACCEL_VISIBLE)
+        self.connect('thg-close', self.should_live)
+        self.connect('thg-exit', self.should_live)
 
         # log viewer
         self.log = CmdLogWidget()
@@ -637,20 +646,186 @@ class CmdLogDialog(gtk.Window):
         """
         Set hook function.
 
-        hook: the function called on closing this dialog.
+        hook: the function called when this dialog is closed.
 
         def close_hook(dialog)
 
-        where 'dialog' is the instance of CmdLogDialog class.
+        where 'dialog' is an instance of the CmdLogDialog class.
         The hook function should return True or False.
-        By returning True, you can prevent closing/hiding the dialog.
+        If True is returned, closing the dialog is prevented.
         """
         self.close_hook = hook
 
     ### signal handlers ###
 
-    def delete_event(self, *args):
+    def should_live(self, *args):
         if hasattr(self, 'close_hook'):
             if self.close_hook(self):
                 self.hide()
         return True
+
+# Structured log types for CmdRunner
+LOG_NORMAL = 0
+LOG_ERROR = 1
+
+class CmdRunner(object):
+    """
+    Interactive command runner without GUI.
+
+    By default, there is no GUI (as opposed to CmdDialog).
+    If user interaction is needed (e.g. HTTPS auth), a simple
+    input dialog will be shown.
+    """
+    def __init__(self):
+        self.hgthread = None
+
+        self.dlg = CmdLogDialog()
+        def close_hook(dialog):
+            self.show_log(False)
+            return False
+        self.dlg.set_close_hook(close_hook)
+
+        self.clear_buffers()
+
+    ### public functions ###
+
+    def execute(self, cmdline, callback, *args, **kargs):
+        """
+        Execute passed command line using 'hgthread'.
+        When the command terminates, the callback function is invoked
+        with its return code. 
+
+        cmdline: command line string.
+        callback: function invoked after the command terminates.
+
+        def callback(returncode, useraborted, ...)
+
+        returncode: See the description of 'hgthread'.
+        useraborted: Whether the command was aborted by the user.
+
+        return: True if the command was started,
+                False if a command is already running.
+        """
+        if self.hgthread:
+            return False
+
+        # clear previous logs
+        self.clear_buffers()
+
+        # thread start
+        self.hgthread = hgthread.HgThread(cmdline[1:])
+        self.hgthread.start()
+        gobject.timeout_add(10, self.process_queue, callback, args, kargs)
+
+        return True
+
+    def is_alive(self):
+        """
+        Return whether the thread is alive.
+        """
+        return self.hgthread and self.hgthread.isAlive()
+
+    def stop(self):
+        """
+        Terminate the thread forcibly.
+        """
+        if self.hgthread:
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
+
+    def get_buffer(self):
+        """
+        Return buffer containing all messages.
+
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
+        """
+        return ''.join([chunk[0] for chunk in self.buffer])
+
+    def get_raw_buffer(self):
+        """
+        Return structured buffer.
+
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
+        """
+        return self.buffer
+
+    def get_msg_buffer(self):
+        """
+        Return buffer with regular messages.
+
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
+        """
+        return ''.join([chunk[0] for chunk in self.buffer \
+                                           if chunk[1] == LOG_NORMAL])
+
+    def get_err_buffer(self):
+        """
+        Return buffer with error messages.
+
+        Note that the buffer will be cleared when the 'execute' method
+        is called, so you need to store this before next execution.
+        """
+        return ''.join([chunk[0] for chunk in self.buffer \
+                                           if chunk[1] == LOG_ERROR])
+
+    def set_title(self, title):
+        """
+        Set the title of the command log window.
+        """
+        self.dlg.set_title(title)
+
+    ### internal use functions ###
+
+    def clear_buffers(self):
+        """
+        Clear both message and error buffers.
+        """
+        self.buffer = []
+        self.dlg.log.clear()
+
+    def show_log(self, visible=True):
+        if visible:
+            if self.dlg.get_property('visible'):
+                self.dlg.present()
+            else:
+                self.dlg.show_all()
+        else:
+            self.dlg.hide()
+
+    def process_queue(self, callback, args, kargs):
+        # process queue
+        self.hgthread.process_dialogs()
+
+        # receive messages from queue
+        while self.hgthread.getqueue().qsize():
+            try:
+                msg = hglib.toutf(self.hgthread.getqueue().get(0))
+                self.buffer.append((msg, LOG_NORMAL))
+                self.dlg.log.append(msg)
+            except Queue.Empty:
+                pass
+        while self.hgthread.geterrqueue().qsize():
+            try:
+                msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
+                self.buffer.append((msg, LOG_ERROR))
+                self.dlg.log.append(msg, error=True)
+            except Queue.Empty:
+                pass
+
+        # check thread state
+        if not self.hgthread.isAlive():
+            returncode = self.hgthread.return_code()
+            self.hgthread = None
+            if len(self.get_err_buffer()) > 0:
+                self.show_log(True)
+            def call_callback():
+                callback(returncode, self.get_buffer(), *args, **kargs)
+            gtklib.idle_add_single_call(call_callback)
+            return False # Stop polling this function
+        else:
+            return True # Continue polling
