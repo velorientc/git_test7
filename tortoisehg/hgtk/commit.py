@@ -15,14 +15,14 @@ import tempfile
 import cStringIO
 import time
 
-from mercurial import hg, util, patch, cmdutil
+from mercurial import hg, util, patch, cmdutil, extensions
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
 from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
-from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
+from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd, thgmq
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, repo):
@@ -139,6 +139,7 @@ class GCommit(GStatus):
         self.notify_func = None
         self.patch_text = None
         self.runner = hgcmd.CmdRunner()
+        self.mqloaded = bool(extensions.find('mq'))
 
     def get_help_url(self):
         return 'commit.html'
@@ -305,6 +306,8 @@ class GCommit(GStatus):
         if self.qnew:
             self.qnew_name.grab_focus() # set focus back
             self.qnew_name.set_position(-1)
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.refresh()
 
     def get_body(self):
         self.connect('delete-event', self.delete)
@@ -397,6 +400,36 @@ class GCommit(GStatus):
         self.text.modify_font(self.fonts['comment'])
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
+
+        # MQ panel
+        if self.mqloaded:
+            self.mqwidget = thgmq.MQWidget(self.repo, accelgroup,
+                                           self.tooltips)
+            self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
+
+            def wrapframe(widget):
+                frame = gtk.Frame()
+                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+                frame.add(widget)
+                return frame
+            self.mqpaned = gtk.HPaned()
+            self.mqpaned.add1(wrapframe(self.mqwidget))
+            self.mqpaned.add2(wrapframe(midpane))
+
+            # register signal handler
+            def notify(paned, gparam):
+                if not hasattr(self, 'mqtb'):
+                    return
+                pos = paned.get_position()
+                if self.cmd_get_active('mq'):
+                    if pos < 140:
+                        paned.set_position(140)
+                else:
+                    if pos != 0:
+                        paned.set_position(0)
+            self.mqpaned.connect('notify::position', notify)
+
+            midpane = self.mqpaned
 
         botbox = gtk.VBox()
         botbox.pack_start(status_body)
@@ -517,6 +550,9 @@ class GCommit(GStatus):
         elif dialog.closebranch:
             self.closebranch = True
         self.refresh_branchop()
+
+    def repo_invalidated(self, mqwidget):
+        self.reload_status()
 
     def update_commit_button(self):
         label = _('Commit')
