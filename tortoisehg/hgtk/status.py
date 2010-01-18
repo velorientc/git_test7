@@ -655,14 +655,14 @@ class GStatus(gdialog.GWindow):
         if selection is None:
             return
 
-        (modified, added, removed, deleted, unknown, ignored, clean) = self.status
-        changetypes = (('M', 'modified', modified),
-                       ('A', 'added', added),
-                       ('R', 'removed', removed),
-                       ('!', 'deleted', deleted),
-                       ('?', 'unknown', unknown),
-                       ('I', 'ignored', ignored),
-                       ('C', 'clean', clean))
+        (M, A, R, D, U, I, C) = self.status
+        changetypes = (('M', 'modified', M),
+                       ('A', 'added', A),
+                       ('R', 'removed', R),
+                       ('!', 'deleted', D),
+                       ('?', 'unknown', U),
+                       ('I', 'ignored', I),
+                       ('C', 'clean', C))
 
         # List of the currently checked and selected files to pass on to
         # the new data
@@ -685,17 +685,17 @@ class GStatus(gdialog.GWindow):
         for stat, _, wfiles in types:
             for wfile in wfiles:
                 mst = wfile in ms and ms[wfile].upper() or ""
-                wfile = util.localpath(wfile)
-                defcheck = stat in 'MAR' and wfile not in self.excludes
-                ck, p = waschecked.get(wfile, (defcheck, False))
-                model.append([ck, stat, hglib.toutf(wfile), wfile, mst, p])
+                lfile = util.localpath(wfile)
+                defcheck = stat in 'MAR' and lfile not in self.excludes
+                ck, p = waschecked.get(lfile, (defcheck, False))
+                model.append([ck, stat, hglib.toutf(lfile), lfile, mst, p])
 
         if self.test_opt('subrepo') or self.is_merge():
             for sdir in self.subrepos:
-                wfile = util.localpath(sdir)
-                defcheck = wfile not in self.excludes
-                ck, p = waschecked.get(wfile, (defcheck, False))
-                model.append([ck, 'S', hglib.toutf(wfile), wfile, '', p])
+                lfile = util.localpath(sdir)
+                defcheck = lfile not in self.excludes
+                ck, p = waschecked.get(lfile, (defcheck, False))
+                model.append([ck, 'S', hglib.toutf(lfile), lfile, '', p])
 
         self.auto_check() # may check more files
 
@@ -1131,9 +1131,9 @@ class GStatus(gdialog.GWindow):
         return self.diff_highlight_buffer(difftext)
 
 
-    def update_hunk_model(self, row, tree):
+    def update_hunk_model(self, path, tree):
         # Read this file's diffs into hunk selection model
-        wfile = self.filemodel[row][FM_PATH]
+        wfile = self.filemodel[path][FM_PATH]
         self.filerowstart = {}
         self.diffmodel.clear()
         if not self.is_merge():
