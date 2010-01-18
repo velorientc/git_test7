@@ -535,9 +535,12 @@ def help_(ui, name=None, with_version=False, **opts):
     def helplist(header, select=None):
         h = {}
         cmds = {}
-        for c, e in table.items():
+        for c, e in table.iteritems():
             f = c.split("|", 1)[0]
             if select and not select(f):
+                continue
+            if (not select and name != 'shortlist' and
+                e[0].__module__ != __name__):
                 continue
             if name == "shortlist" and not f.startswith("^"):
                 continue
@@ -545,9 +548,12 @@ def help_(ui, name=None, with_version=False, **opts):
             if not ui.debugflag and f.startswith("debug"):
                 continue
             doc = e[0].__doc__
+            if doc and 'DEPRECATED' in doc and not ui.verbose:
+                continue
+            #doc = gettext(doc)
             if not doc:
-                doc = _("(No help text available)")
-            h[f] = doc.splitlines(0)[0].rstrip()
+                doc = _("(no help text available)")
+            h[f] = doc.splitlines()[0].rstrip()
             cmds[f] = c.lstrip("^")
 
         if not h:
@@ -555,15 +561,14 @@ def help_(ui, name=None, with_version=False, **opts):
             return
 
         ui.status(header)
-        fns = h.keys()
-        fns.sort()
+        fns = sorted(h)
         m = max(map(len, fns))
         for f in fns:
             if ui.verbose:
                 commands = cmds[f].replace("|",", ")
                 ui.write(" %s:\n      %s\n"%(commands, h[f]))
             else:
-                ui.write(' %-*s   %s\n' % (m, f, h[f]))
+                ui.write(' %-*s   %s\n' % (m, f, util.wrap(h[f], m + 4)))
 
         if not ui.quiet:
             addglobalopts(True)
@@ -681,8 +686,8 @@ globalopts = [
 ]
 
 table = {
-    "^about": (about, [], _('hgtk about')),
-    "^add": (add, [], _('hgtk add [FILE]...')),
+    "about": (about, [], _('hgtk about')),
+    "add": (add, [], _('hgtk add [FILE]...')),
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
     "^commit|ci": (commit,
         [('u', 'user', '', _('record user as committer')),
@@ -694,12 +699,12 @@ table = {
     "^log|history|explorer": (log,
         [('l', 'limit', '', _('limit number of changes displayed'))],
         _('hgtk log [OPTIONS] [FILE]')),
-    "^merge": (merge, 
+    "merge": (merge, 
         [('r', 'rev', '', _('revision to merge with'))],
         _('hgtk merge')),
     "^recovery|rollback|verify": (recovery, [], _('hgtk recovery')),
     "^shelve|unshelve": (shelve, [], _('hgtk shelve')),
-    "^synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
+    "synch|pull|push|incoming|outgoing|email": (synch, [], _('hgtk synch')),
     "^status|st|diff": (status,
         [('r', 'rev', [], _('revisions to compare'))],
         _('hgtk status [FILE]...')),
@@ -710,10 +715,10 @@ table = {
         [('', 'focus', '', _('field to give initial focus'))],
         _('hgtk repoconfig')),
     "^guess": (guess, [], _('hgtk guess')),
-    "^remove|rm": (revert, [], _('hgtk remove [FILE]...')),
-    "^rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
-    "^revert": (revert, [], _('hgtk revert [FILE]...')),
-    "^forget": (forget, [], _('hgtk forget [FILE]...')),
+    "remove|rm": (revert, [], _('hgtk remove [FILE]...')),
+    "rename|mv": (rename, [], _('hgtk rename SOURCE [DEST]')),
+    "revert": (revert, [], _('hgtk revert [FILE]...')),
+    "forget": (forget, [], _('hgtk forget [FILE]...')),
     "^serve":
         (serve,
          [('', 'webdir-conf', '', _('name of the webdir config file'))],
@@ -741,13 +746,13 @@ table = {
          [('o', 'options', None, _('show the command options'))],
          _('[-o] CMD')),
     "help": (help_, [], _('hgtk help [COMMAND]')),
-    "^archive": (archive,
+    "archive": (archive,
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk archive')),
-    "^strip": (strip, [], ('hgtk strip [REV]')),
-    "^browse": (browse, [], ('hgtk browse [REV]')),
+    "strip": (strip, [], ('hgtk strip [REV]')),
+    "browse": (browse, [], ('hgtk browse [REV]')),
     "^mpatch": (mpatch, [], ('hgtk mpatch file.rej')),
-    "^import": (thgimport,
+    "import": (thgimport,
         [('', 'repo', False, _('import to the repository')),
          ('', 'mq', False, _('import to the patch queue (MQ)'))],
         _('hgtk import [OPTION] [SOURCE]...')),
