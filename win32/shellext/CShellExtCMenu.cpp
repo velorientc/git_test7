@@ -111,7 +111,7 @@ MenuDescription menuDescList[] =
     {"", L"", L"", ".ico", 0},
 };
 
-const char* RepoNoFilesMenu =
+const char* const RepoNoFilesMenu =
     "commit status shelve vidff sep"
     " add revert rename forget remove sep"
     " log update grep sep"
@@ -121,14 +121,14 @@ const char* RepoNoFilesMenu =
     " about"
 ;
 
-const char* RepoFilesMenu =
+const char* const RepoFilesMenu =
     "commit status vidff sep"
     " add revert rename forget remove sep"
     " log datamine sep"
     " about"
 ;
 
-const char* NoRepoMenu =
+const char* const NoRepoMenu =
     "clone init shellconf userconf thgstatus sep"
     " about"
 ;
