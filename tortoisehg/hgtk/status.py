@@ -699,6 +699,11 @@ class GStatus(gdialog.GWindow):
 
         self.auto_check() # may check more files
 
+        # manually refresh partially selected files
+        for i, row in enumerate(model):
+            if row[FM_PARTIAL_SELECTED]:
+                self.update_hunk_model(i, self.filetree)
+
         # recover selections
         firstrow = None
         for i, row in enumerate(model):
@@ -1020,7 +1025,6 @@ class GStatus(gdialog.GWindow):
         elif pname == 'hunk-selection':
             self.update_hunk_model(row, tree)
         elif pname == 'commit-preview':
-            self.update_hunk_model(row, tree)
             self.update_commit_preview()
 
     def get_page_name(self, num):
