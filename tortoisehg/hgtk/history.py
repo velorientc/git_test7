@@ -1045,7 +1045,7 @@ class GLog(gdialog.GWindow):
 
     def mq_context_menu(self):
         m = gtklib.MenuItems() 
-        cmenu_qimport = create_menu(_('QImport Revision'), self.qimport_rev)
+        cmenu_qimport = create_menu(_('Import Revision to MQ'), self.qimport_rev)
         cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
 
         try:
@@ -1127,7 +1127,7 @@ class GLog(gdialog.GWindow):
         
         # need MQ extension for qimport command
         if 'mq' in self.exs:
-            m.append(create_menu(_('qimport from here to selected'),
+            m.append(create_menu(_('Import from here to selected to MQ'),
                      self.qimport_revs))
 
         m.append_sep()
@@ -2049,7 +2049,7 @@ class GLog(gdialog.GWindow):
             else:
                 text = _('Failed to import')
             self.stbar.set_idle_text(text)
-        if not self.execute_command(cmdline, callback, title=_('QImporting'),
+        if not self.execute_command(cmdline, callback, title=_('Importing'),
                                     status=_('Importing to Patch Queue...')):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after running '
