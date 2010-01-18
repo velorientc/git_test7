@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
-#include "Dirstatecache.h"
 #include "Thgstatus.h"
 #include "Winstat.h"
 #include "InitStatus.h"
