@@ -744,7 +744,7 @@ class MQWidget(gtk.VBox):
             self.cmd.set_result(_('Canceled'), style='error')
         else:
             self.cmd.set_result(_('Failed'), style='error')
-        self.repo.mq.invalidate()
+        hglib.invalidaterepo(self.repo)
         self.refresh()
         if not noemit:
             self.emit('repo-invalidated')
