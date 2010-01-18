@@ -703,6 +703,7 @@ class GStatus(gdialog.GWindow):
         for i, row in enumerate(model):
             if row[FM_PARTIAL_SELECTED]:
                 self.update_hunk_model(i, self.filetree)
+                self.diffmodel.clear()
 
         # recover selections
         firstrow = None
