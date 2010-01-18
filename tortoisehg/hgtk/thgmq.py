@@ -559,7 +559,8 @@ class MQWidget(gtk.VBox):
         return None
 
     def get_qtip_patchname(self):
-        if self.mqloaded and 'qtip' in self.repo.tags():
+        if self.mqloaded and self.get_num_applied() > 0 \
+                         and 'qtip' in self.repo.tags():
             return self.repo.mq.applied[-1].name
         return None
 
