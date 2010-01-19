@@ -105,10 +105,7 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
 
         const bool has_hg = hasHgDir(cls, cur.path, ticks);
 
-        // we require a higher speed for showing overlays on repo roots,
-        // since we will do considerably more file accesses compared
-        // to showing icons just *inside* repos
-        if (ticks > 150 /* ms */)
+        if (ticks > 5000 /* ms */)
         {
             file_access_is_unacceptably_slow = true;
             goto exit;
@@ -133,7 +130,7 @@ int findHgRoot(char cls, QueryState& cur, QueryState& last, bool outdated)
     for (std::string p = cur.basedir;;)
     {
         bool has_hg = hasHgDir(cls, p, ticks);
-        if (ticks > 300 /* ms */)
+        if (ticks > 5000 /* ms */)
         {
             const std::string reason = "ignoring slow \"" + p + "\"";
             Thgstatus::error(reason);
