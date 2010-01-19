@@ -809,8 +809,8 @@ class ChangeSet(gdialog.GWindow):
             tag_table.add(make_texttag('red'))
             tag_table.add(make_texttag('green'))
         else:
-            tag_table.add(make_texttag('red', foreground='red'))
-            tag_table.add(make_texttag('green', foreground='darkgreen'))
+            tag_table.add(make_texttag('red', foreground=gtklib.DRED))
+            tag_table.add(make_texttag('green', foreground=gtklib.DGREEN))
         tag_table.add(make_texttag('black', foreground='black'))
         tag_table.add(make_texttag('greybg',
                                    paragraph_background='grey',
