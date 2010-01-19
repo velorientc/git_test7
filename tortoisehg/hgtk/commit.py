@@ -640,11 +640,13 @@ class GCommit(GStatus):
 
     def update_parent_labels(self):
         ctxs, isheads, ismerge = self.get_head_info()
-        self.parent1_label.update(ctxs[0])
+        self.parent1_label.info.clear_cache()
+        self.parent1_label.update(ctxs[0], repo=self.repo)
         if not ismerge:
             self.parent2_label.hide()
         else:
-            self.parent2_label.update(ctxs[1])
+            self.parent2_label.info.clear_cache()
+            self.parent2_label.update(ctxs[1], repo=self.repo)
             self.parent2_label.show()
 
     def thgreflow(self, window, textview):
