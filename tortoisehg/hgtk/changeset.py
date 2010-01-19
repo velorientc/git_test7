@@ -26,6 +26,7 @@ class ChangeSet(gdialog.GWindow):
         self.stbar = stbar
         self.glog_parent = None
         self.bfile = None
+        self.colorstyle = repo.ui.config('tortoisehg', 'diffcolorstyle')
 
         # initialize changeset/issue tracker link regex and dict
         csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
@@ -799,8 +800,17 @@ class ChangeSet(gdialog.GWindow):
 
         tag_table.add(make_texttag('diff', font=self.rawfonts['fontdiff']))
         tag_table.add(make_texttag('blue', foreground='blue'))
-        tag_table.add(make_texttag('red', foreground='red'))
-        tag_table.add(make_texttag('green', foreground='darkgreen'))
+        if self.colorstyle == 'background':
+            tag_table.add(make_texttag('red',
+                                       paragraph_background=gtklib.PRED))
+            tag_table.add(make_texttag('green',
+                                       paragraph_background=gtklib.PGREEN))
+        elif self.colorstyle == 'none':
+            tag_table.add(make_texttag('red'))
+            tag_table.add(make_texttag('green'))
+        else:
+            tag_table.add(make_texttag('red', foreground='red'))
+            tag_table.add(make_texttag('green', foreground='darkgreen'))
         tag_table.add(make_texttag('black', foreground='black'))
         tag_table.add(make_texttag('greybg',
                                    paragraph_background='grey',

@@ -249,7 +249,11 @@ _diff_info = (
         ' Default: False')),
     (_('Ignore Blank Lines'), 'diff.ignoreblanklines', ['False', 'True'],
         _('Ignore changes whose lines are all blank.'
-        ' Default: False')))
+        ' Default: False')),
+    (_('Coloring Style'), 'tortoisehg.diffcolorstyle',
+        ['none', 'foreground', 'background'],
+        _('Adjust the coloring style of diff lines in the changeset viewer.'
+          'Default: foreground')))
 
 class PathEditDialog(gtk.Dialog):
     _protocols = (('ssh', _('ssh')), ('http', _('http')),
