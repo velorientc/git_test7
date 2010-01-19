@@ -1,4 +1,4 @@
-# gdialog.py - base dialog for gtools
+# gdialog.py - base window & dialogs for gtools
 #
 # Copyright 2007 Brad Schick, brad at gmail . com
 # Copyright 2008 Steve Borho <steve@borho.org>
@@ -14,20 +14,20 @@ import shutil
 import tempfile
 import gtk
 import atexit
+import pango
 
-from mercurial import cmdutil, util, ui, hg, commands
+from mercurial import cmdutil, util, ui, hg, commands, error
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import settings, hglib, paths
+from tortoisehg.util import settings, hglib, paths, shlib
 
-from tortoisehg.hgtk import gtklib
+from tortoisehg.hgtk import gtklib, hgcmd
 
 class SimpleMessage(gtklib.MessageDialog):
     def run(self):
         response = gtklib.MessageDialog.run(self)
         self.destroy()
         return response
-
 
 class Prompt(SimpleMessage):
     def __init__(self, title, message, parent, type=gtk.MESSAGE_INFO):
@@ -40,9 +40,12 @@ class Prompt(SimpleMessage):
         key, modifier = gtk.accelerator_parse(mod+'Return')
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
-        buttons = self.get_children()[0].get_children()[1].get_children()
-        buttons[0].add_accelerator('clicked', accel_group, key,
-                modifier, gtk.ACCEL_VISIBLE)
+        try:
+            buttons = self.get_children()[0].get_children()[1].get_children()
+            buttons[0].add_accelerator('clicked', accel_group, key,
+                                       modifier, gtk.ACCEL_VISIBLE)
+        except IndexError:
+            pass
 
 class CustomPrompt(gtk.MessageDialog):
     ''' Custom prompt dialog.  Provide a list of choices with ampersands
@@ -96,14 +99,14 @@ class Confirm(SimpleMessage):
         accel_group = gtk.AccelGroup()
         self.add_accel_group(accel_group)
         buttons = self.get_children()[0].get_children()[1].get_children()
-        buttons[1].add_accelerator("clicked", accel_group, ord("y"),
+        buttons[1].add_accelerator('clicked', accel_group, ord('y'),
                               0, gtk.ACCEL_VISIBLE)
-        buttons[0].add_accelerator("clicked", accel_group, ord("n"),
+        buttons[0].add_accelerator('clicked', accel_group, ord('n'),
                               0, gtk.ACCEL_VISIBLE)
 
-
-class GDialog(gtk.Window):
-    """GTK+ based dialog for displaying mercurial information
+class GWindow(gtk.Window):
+    """
+    gtk.Window based window for displaying mercurial information
 
     The following methods are meant to be overridden by subclasses. At this
     point GCommit is really the only intended subclass.
@@ -255,21 +258,14 @@ class GDialog(gtk.Window):
         return self.opts.get(opt, False)
 
     def _parse_config(self):
-        # defaults
-        self.fontcomment = 'monospace 10'
-        self.fontdiff = 'monospace 10'
-        self.fontlist = 'Sans 9'
-        self.diffbottom = ''
-
-        for attr, setting in self.ui.configitems('gtools'):
-            if setting : setattr(self, attr, setting)
-
-        if not self.diffbottom:
+        self.rawfonts = hglib.getfontconfig(self.ui)
+        self.fonts = {}
+        for name, val in self.rawfonts.items():
+            self.fonts[name[4:]] = pango.FontDescription(val)
+        try:
+            self.diffbottom = self.ui.configbool('gtools', 'diffbottom', False)
+        except error.ConfigError:
             self.diffbottom = False
-        elif self.diffbottom.lower() == 'false' or self.diffbottom == '0':
-            self.diffbottom = False
-        else:
-            self.diffbottom = True
 
 
     def _parse_opts(self):
@@ -323,11 +319,8 @@ class GDialog(gtk.Window):
         if tip:
             tbutton.set_tooltip(self.tooltips, tip)
         if icon:
-            path = paths.get_tortoise_icon(icon)
-            if path:
-                image = gtk.Image()
-                image.set_from_file(path)
-                tbutton.set_icon_widget(image)
+            image = self.icon_from_name(icon)
+            tbutton.set_icon_widget(image)
         tbutton.set_use_underline(True)
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)
@@ -380,20 +373,28 @@ class GDialog(gtk.Window):
     def get_reponame(self):
         return hglib.get_reponame(self.repo)
 
-    def helpcontents(self, item):
+    def helpindex(self, item):
+        self.helpcontents(item, 'index.html')
+
+    def helpcontents(self, item, url=None):
         'User selected Help->Contents from menu bar'
-        url = self.get_help_url()
         if not url:
-            return
+            url = self.get_help_url()
+            if not url:
+                return
         if not url.startswith('http'):
-            url = 'http://tortoisehg.org/manual/0.9/' + url
-        from tortoisehg.hgtk import about
-        about.browse_url(url)
+            fullurl = 'http://tortoisehg.org/manual/0.10/' + url
+            # Use local CHM file if it can be found
+            if os.name == 'nt' and paths.bin_path:
+                chm = os.path.join(paths.bin_path, 'docs', 'TortoiseHg.chm')
+                if os.path.exists(chm):
+                    fullurl = (r'mk:@MSITStore:%s::/' % chm) + url
+        shlib.browse_url(fullurl)
 
     def launch(self, item, app):
         import sys
         # Spawn background process and exit
-        if hasattr(sys, "frozen"):
+        if hasattr(sys, 'frozen'):
             args = [sys.argv[0], app]
         else:
             args = [sys.executable] + [sys.argv[0], app]
@@ -423,6 +424,22 @@ class GDialog(gtk.Window):
 
     def setfocus(self, window, event):
         self.lastpos = self.get_position()
+
+    def icon_from_name(self, icon):
+        if icon.startswith('gtk'):
+            img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
+        else:
+            img = gtk.Image()
+            ico = paths.get_tortoise_icon(icon)
+            if not ico:
+                return img
+            try:
+                width, height = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)
+                buf = gtk.gdk.pixbuf_new_from_file_at_size(ico, width, height)
+                img.set_from_pixbuf(buf)
+            except: # don't let broken gtk+ to break dialogs
+                pass
+        return img
 
     def _setup_gtk(self):
         self.set_title(self.get_title())
@@ -488,9 +505,11 @@ class GDialog(gtk.Window):
           (_('_Help'),
            [dict(text=_('Contents'), func=self.helpcontents,
                 icon=gtk.STOCK_INFO),
+            dict(text=_('Index'), func=self.helpindex,
+                icon=gtk.STOCK_HELP),
             dict(text=_('About'), func=self.launch, args=['about'],
                 icon=gtk.STOCK_ABOUT)])
-          ]
+           ]
             menubar = gtk.MenuBar()
             for title, items in allmenus:
                 m_items = gtklib.MenuItems()
@@ -511,22 +530,7 @@ class GDialog(gtk.Window):
                             item.set_active(check)
                         elif icon:
                             item = gtk.ImageMenuItem(text)
-                            if icon.startswith('gtk'):
-                                img = gtk.image_new_from_stock(
-                                    icon, gtk.ICON_SIZE_MENU)
-                            else:
-                                img = gtk.Image()
-                                ico = paths.get_tortoise_icon(icon)
-                                if ico:
-                                    try:
-                                        width, height = gtk.icon_size_lookup(
-                                            gtk.ICON_SIZE_MENU)
-                                        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-                                            ico, width, height)
-                                        img.set_from_pixbuf(pixbuf)
-                                    except:
-                                        # don't let broken gtk+ to break dialogs
-                                        pass
+                            img = self.icon_from_name(icon)
                             item.set_image(img)
                         else:
                             item = gtk.MenuItem(text)
@@ -635,8 +639,8 @@ class GDialog(gtk.Window):
             ctx = repo[node]
             mf = ctx.manifest()
             dirname = os.path.basename(repo.root)
-            if dirname == "":
-                dirname = "root"
+            if dirname == '':
+                dirname = 'root'
             dirname = '%s.%s' % (dirname, str(ctx))
             base = os.path.join(tmproot, dirname)
             try:
@@ -674,8 +678,8 @@ class GDialog(gtk.Window):
                         copynode, self.tmproot)
                 pathroot = os.path.join(self.tmproot, copydir)
 
-            paths = ['"'+os.path.join(pathroot, f)+'"' for f in files]
-            command = editor + ' ' + ' '.join(paths)
+            paths = ['"%s"' % os.path.join(pathroot, f) for f in files]
+            command = '%s %s' % (editor, ' '.join(paths))
             util.system(command,
                         environ={'HGUSER': self.ui.username()},
                         onerr=self.ui, errprefix=_('edit failed'))
@@ -702,3 +706,204 @@ class GDialog(gtk.Window):
         thread.setDaemon(True)
         thread.start()
 
+MODE_NORMAL  = 'normal'
+MODE_WORKING = 'working'
+
+RESPONSE_FORCE_CLOSE = 1024
+
+class GDialog(gtk.Dialog):
+    """ gtk.Dialog based window for executing mercurial operations """
+    def __init__(self, resizable=False, norepo=False):
+        gtk.Dialog.__init__(self)
+        gtklib.set_tortoise_icon(self, self.get_icon())
+        gtklib.set_tortoise_keys(self)
+        self.set_resizable(resizable)
+        self.set_has_separator(False)
+
+        self.ui = ui.ui()
+        if norepo:
+            repo = None
+        else:
+            try:
+                repo = hg.repository(self.ui, path=paths.find_root())
+            except error.RepoError:
+                gtklib.idle_add_single_call(self.destroy)
+                return
+        self.repo = repo
+        self.after_done = True
+
+        # persistent settings
+        name = self.get_setting_name()
+        if name:
+            self.settings = settings.Settings(name)
+
+        # dialog size
+        defsize = self.get_defsize()
+        if defsize != (-1, -1):
+            self.set_default_size(*defsize)
+
+        # signal handler
+        self.connect('realize', self.realized)
+
+    ### Overridable Functions ###
+
+    def get_title(self, reponame):
+        return 'TortoiseHg - %s' % reponame
+
+    def get_icon(self):
+        return 'thg_logo.ico'
+
+    def get_defsize(self):
+        return (-1, -1)
+
+    def get_setting_name(self):
+        return None
+
+    def get_body(self, vbox):
+        pass
+
+    def get_extras(self, vbox):
+        pass
+
+    def get_buttons(self):
+        return []
+
+    def get_default_button(self):
+        return None
+
+    def get_action_map(self):
+        return {}
+
+    def switch_to(self, normal, working, cmd):
+        pass
+
+    def command_done(self, returncode, useraborted, *args):
+        pass
+
+    def before_close(self):
+        return True
+
+    def load_settings(self):
+        pass
+
+    def store_settings(self):
+        pass
+
+    ### Public Functions ###
+
+    def set_notify_func(self, func, *args):
+        self.notify_func = func
+        self.notify_args = args
+
+    def set_after_done(self, close):
+        self.after_done = close
+
+    ### Internal Functions ###
+
+    def after_init(self):
+        self.get_extras(self.vbox)
+
+        # CmdWidget
+        self.cmd = hgcmd.CmdWidget()
+        self.cmd.show_all()
+        self.cmd.hide()
+        self.vbox.pack_start(self.cmd, False, False, 6)
+
+        # abort button
+        btn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
+        self.buttons['abort'] = btn
+        btn.hide()
+
+    def do_switch_to(self, mode, cmd=True):
+        if mode == MODE_NORMAL:
+            normal = True
+        elif mode == MODE_WORKING:
+            normal = False
+            self.buttons['abort'].grab_focus()
+        else:
+            raise _('unknown mode name: %s') % mode
+        working = not normal
+
+        if cmd:
+            self.cmd.set_property('visible', working)
+        self.buttons['abort'].set_property('visible', working)
+
+        self.switch_to(normal, working, cmd)
+
+    def abort(self):
+        self.cmd.stop()
+        self.cmd.show_log()
+        self.do_switch_to(MODE_NORMAL, cmd=False)
+
+    def execute_command(self, cmdline, *args):
+        def cmd_done(returncode, useraborted):
+            self.do_switch_to(MODE_NORMAL, cmd=False)
+            self.command_done(returncode, useraborted, *args)
+            if hasattr(self, 'notify_func') and self.notify_func:
+                self.notify_func(*self.notify_args)
+            if self.after_done and returncode == 0:
+                if not self.cmd.is_show_log():
+                    self.response(gtk.RESPONSE_CLOSE)
+        self.do_switch_to(MODE_WORKING)
+        self.cmd.execute(cmdline, cmd_done)
+
+    ### Signal Handler ###
+
+    def realized(self, *args):
+        # set title
+        reponame = self.repo and hglib.get_reponame(self.repo) or ''
+        self.set_title(self.get_title(reponame))
+
+        # construct ui widgets
+        self.buttons = {}
+        for name, label, res in self.get_buttons():
+            btn = self.add_button(label, res)
+            self.buttons[name] = btn
+        self.get_body(self.vbox)
+
+        name = self.get_default_button()
+        if name:
+            btn = self.buttons.get(name)
+            if btn:
+                btn.grab_focus()
+
+        # signal handler
+        self.connect('response', self.dialog_response)
+
+        # prepare to show
+        self.load_settings()
+        self.vbox.show_all()
+        gtklib.idle_add_single_call(self.after_init)
+
+    def dialog_response(self, dialog, response_id):
+        # User-defined buttons
+        actmap = self.get_action_map()
+        if actmap.has_key(response_id):
+            actmap[response_id]()
+        # Forced close
+        elif response_id == RESPONSE_FORCE_CLOSE:
+            if self.cmd.is_alive():
+                self.abort()
+            self.store_settings()
+            self.destroy()
+            return # close dialog
+        # Cancel button or dialog closing by the user
+        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
+            if self.cmd.is_alive():
+                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
+                                      _('Do you want to abort?')).run()
+                if ret == gtk.RESPONSE_YES:
+                    self.abort()
+            else:
+                close = self.before_close()
+                if close:
+                    self.store_settings()
+                    self.destroy()
+                    return # close dialog
+        # Abort button
+        elif response_id == gtk.RESPONSE_CANCEL:
+            self.abort()
+        else:
+            raise _('unexpected response id: %s') % response_id
+
+        self.run() # don't close dialog
