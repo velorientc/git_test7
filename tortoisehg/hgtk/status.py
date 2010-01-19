@@ -90,6 +90,7 @@ class GStatus(gdialog.GWindow):
         self.status_error = None
         self.preview_tab_name_label = None
         self.subrepos = []
+        self.colorstyle = self.repo.ui.config('tortoisehg', 'diffcolorstyle')
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -1082,8 +1083,15 @@ class GStatus(gdialog.GWindow):
 
     def diff_highlight_buffer(self, difftext):
         buf = gtk.TextBuffer()
-        buf.create_tag('removed', foreground=gtklib.DRED)
-        buf.create_tag('added', foreground=gtklib.DGREEN)
+        if self.colorstyle == 'background':
+            buf.create_tag('removed', paragraph_background=gtklib.PRED)
+            buf.create_tag('added', paragraph_background=gtklib.PGREEN)
+        elif self.colorstyle == 'none':
+            buf.create_tag('removed')
+            buf.create_tag('added')
+        else:
+            buf.create_tag('removed', foreground=gtklib.DRED)
+            buf.create_tag('added', foreground=gtklib.DGREEN)
         buf.create_tag('position', foreground='#FF8000')
         buf.create_tag('header', foreground=gtklib.DBLUE)
 
