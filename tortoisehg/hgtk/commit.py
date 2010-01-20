@@ -497,6 +497,10 @@ class GCommit(GStatus):
             res = _('Commit Preview')
         return res
 
+    def prepare_display(self):
+        GStatus.prepare_display(self)
+        self.enable_mqpanel()
+
     ### End of overridable methods ###
 
     def execute_command(self, cmd, callback=None, status=None,
