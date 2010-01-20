@@ -427,6 +427,10 @@ class GCommit(GStatus):
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 
+        buf = self.text.get_buffer()
+        buf.connect('changed', self.msg_changed)
+        buf.create_tag('over', paragraph_background=gtklib.PRED)
+
         # MQ panel
         if self.mqloaded:
             self.mqwidget = thgmq.MQWidget(self.repo, accelgroup,
@@ -1193,7 +1197,37 @@ class GCommit(GStatus):
                 menuitem.connect('activate', handler)
             menu.append(menuitem)
         menu.show_all()
-        
+
+    def get_lengths(self):
+        try:
+            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
+            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
+        except (TypeError, ValueError):
+            sumlen = 0
+            maxlen = 0
+        return sumlen, maxlen
+
+    def msg_changed(self, buf):
+        if buf.get_char_count() == 0:
+            return # no text
+        sumlen, maxlen = self.get_lengths()
+        if not (sumlen or maxlen):
+            return # not configured
+
+        # clear all highlights
+        start, end = buf.get_start_iter(), buf.get_end_iter()
+        buf.remove_all_tags(start, end)
+
+        # highlight overed lines
+        for line_num in range(buf.get_line_count()):
+            start = buf.get_iter_at_line(line_num)
+            end = start.copy()
+            end.forward_line()
+            line = buf.get_text(start, end).rstrip('\n\r')
+            if (line_num == 0 and len(line) > sumlen) \
+                              or  len(line) > maxlen:
+                buf.apply_tag_by_name('over', start, end)
+
     def msg_paste_fnames(self, sender):
         buf = self.text.get_buffer()
         fnames = [ file[FM_PATH_UTF8] for file in self.filemodel
