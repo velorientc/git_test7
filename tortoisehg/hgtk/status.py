@@ -1265,7 +1265,7 @@ class GStatus(gdialog.GDialog):
             text = '\n'.join(files[:5])
             if len(files) > 5:
                 text += '  ...\n'
-            return text
+            return hglib.toutf(text)
 
         if self.is_merge():
             res = gdialog.CustomPrompt(
