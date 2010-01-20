@@ -383,6 +383,7 @@ class GCommit(GStatus):
             self.qnew_name.set_sensitive(not self.is_merge())
             self.qnew_name.set_width_chars(20)
             self.qnew_name.connect('changed', self.qnew_changed)
+            self.qnew_name.connect('activate', self.qnew_activated)
             mbox.pack_start(self.qnew_name, False, False, 2)
         else:
             self.qnew_name = None
@@ -1166,13 +1167,16 @@ class GCommit(GStatus):
     def get_qnew_name(self):
         return self.qnew_name and self.qnew_name.get_text().strip() or ''
 
-    def qnew_changed(self, element):
+    def qnew_changed(self, entry):
         qnew = bool(self.get_qnew_name())
         if self.qnew != qnew:
             self.qnew = qnew
             self.mode = qnew and 'status' or 'commit'
             self.reload_status()
-            
+
+    def qnew_activated(self, entry):
+        self.commit_clicked(None)
+
     def msg_add_to_popup(self, textview, menu):
         menu_items = (('----', None),
                       (_('Paste _Filenames'), self.msg_paste_fnames),
