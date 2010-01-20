@@ -71,9 +71,9 @@ class BranchOperationDialog(gtk.Dialog):
         lbl.set_markup(gtklib.markup(_('Changes take effect on next commit'),
                                      weight='bold'))
         table.add_row(lbl, padding=False, ypad=6)
+        table.add_row(nochanges)
         table.add_row(self.newbranchradio, branchcombo)
         table.add_row(self.closebranchradio)
-        table.add_row(nochanges)
 
         # signal handlers
         self.connect('response', self.response)
