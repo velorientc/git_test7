@@ -329,6 +329,7 @@ class GCommit(GStatus):
             self.qnew_name.grab_focus() # set focus back
             self.qnew_name.set_position(-1)
         if hasattr(self, 'mqwidget'):
+            self.mqwidget.set_repo(self.repo)
             self.mqwidget.refresh()
 
     def get_body(self):
