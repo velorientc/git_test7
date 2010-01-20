@@ -1013,18 +1013,17 @@ class GCommit(GStatus):
             return False
 
         try:
-            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
-            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
-        except (TypeError, ValueError):
+            sumlen, maxlen = self.get_lengths(noexcept=False)
+        except ValueError:
             gdialog.Prompt(_('Error'),
                    _('Message format configuration error'),
                    self).run()
             self.msg_config(None)
             return False
-        
+
         lines = hglib.tounicode(buf.get_text(buf.get_start_iter(),
                                              buf.get_end_iter())).splitlines()
-        
+
         if sumlen and len(lines[0].rstrip()) > sumlen:
             resp = gdialog.Confirm(_('Confirm Commit'), [], self,
                            _('The summary line length of %i is greater than'
@@ -1054,7 +1053,7 @@ class GCommit(GStatus):
                 if resp != gtk.RESPONSE_YES:
                     return False
         return True
-        
+
     def hg_commit(self, files, callback):
         # get advanced options
         user = hglib.fromutf(self.committer_cbbox.get_active_text())
@@ -1198,11 +1197,13 @@ class GCommit(GStatus):
             menu.append(menuitem)
         menu.show_all()
 
-    def get_lengths(self):
+    def get_lengths(self, noexcept=True):
         try:
             sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
             maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
         except (TypeError, ValueError):
+            if not noexcept:
+                raise ValueError
             sumlen = 0
             maxlen = 0
         return sumlen, maxlen
@@ -1236,12 +1237,7 @@ class GCommit(GStatus):
         buf.insert_at_cursor('\n'.join(fnames))    
 
     def msg_word_wrap(self, sender):
-        try:
-            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
-            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
-        except (TypeError, ValueError):
-            sumlen = 0
-            maxlen = 0
+        sumlen, maxlen = self.get_lengths()
         if not (sumlen or maxlen):
             gdialog.Prompt(_('Info Required'),
                    _('Message format needs to be configured'),
