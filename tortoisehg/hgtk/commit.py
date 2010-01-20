@@ -840,6 +840,7 @@ class GCommit(GStatus):
         if self.qnew:
             commit_list = get_list()
             self.commit_selected(commit_list, callback)
+            self.enable_mqpanel(True)
         else:
             if not self.ready_message():
                 return
