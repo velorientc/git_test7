@@ -77,7 +77,7 @@ class BranchOperationDialog(gtk.Dialog):
 
         # signal handlers
         self.connect('response', self.response)
-        self.newbranchradio.connect('toggled', self.nbtoggle)
+        self.newbranchradio.connect('toggled', self.nbtoggle, branchcombo)
         self.branchentry.connect('activate', self.activated)
 
         # prepare to show
@@ -95,8 +95,8 @@ class BranchOperationDialog(gtk.Dialog):
 
         self.show_all()
 
-    def nbtoggle(self, radio):
-        self.branchentry.set_sensitive(radio.get_active())
+    def nbtoggle(self, radio, combo):
+        combo.set_sensitive(radio.get_active())
         if radio.get_active():
             self.branchentry.grab_focus()
 
