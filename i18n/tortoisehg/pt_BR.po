@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2009-12-29 02:36+0000\n"
-"PO-Revision-Date: 2009-12-29 13:24+0000\n"
+"POT-Creation-Date: 2010-01-02 01:46+0000\n"
+"PO-Revision-Date: 2010-01-04 15:16+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-12-30 04:50+0000\n"
+"X-Launchpad-Export-Date: 2010-01-05 04:42+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: tortoisehg\hgtk\history.py:212 tortoisehg\hgtk\synch.py:79
@@ -5208,14 +5208,584 @@ msgstr "Sincronização Arrastar-E-Soltar"
 msgid "Synchronize with dragged repository"
 msgstr "Sincronizar com o repositório arrastado"
 
+#~ msgid "Backout changeset - "
+#~ msgstr "Backout changeset - "
+
+#~ msgid "changeset:"
+#~ msgstr "changeset:"
+
+#~ msgid "Source Path:"
+#~ msgstr "Caminho original:"
+
+#~ msgid "Destination Path:"
+#~ msgstr "Caminho de destino:"
+
+#~ msgid "Clone To Revision:"
+#~ msgstr "Clonar até a revisão:"
+
+#~ msgid "do not update the new working directory"
+#~ msgstr "não atualizar o novo diretório de trabalho"
+
+#~ msgid "use pull protocol to copy metadata"
+#~ msgstr "usar o protocolo pull para copiar metadados"
+
+#~ msgid "use uncompressed transfer"
+#~ msgstr "usar transferência sem compressão"
+
+#~ msgid "use proxy server"
+#~ msgstr "usar servidor proxy"
+
+#~ msgid "Remote Cmd:"
+#~ msgstr "Cmd Remoto:"
+
+#~ msgid "Source and dest are the same"
+#~ msgstr "Origem e destino são os mesmos"
+
+#~ msgid "Please specify a different destination"
+#~ msgstr "Especifique um destino diferente"
+
+#~ msgid "Clone aborted"
+#~ msgstr "Clonagem abortada"
+
+#~ msgid "Clone error"
+#~ msgstr "Erro ao clonar"
+
+#~ msgid "Recent Commit Messages..."
+#~ msgstr "Mensagens de Consolidação recentes..."
+
+#~ msgid "Undo commit"
+#~ msgstr "Desfazer consolidação"
+
+#~ msgid "DataMining"
+#~ msgstr "DataMining"
+
+#~ msgid "Follow"
+#~ msgstr "Seguir"
+
+#~ msgid "Follow Rename:"
+#~ msgstr "Seguir renomeação:"
+
+#~ msgid "Done"
+#~ msgstr "Feito"
+
+#~ msgid "Detect Copies/Renames in "
+#~ msgstr "Detectar Cópias/Renomeações em "
+
+#~ msgid "send"
+#~ msgstr "enviar"
+
+#~ msgid "Send email(s)"
+#~ msgstr "Enviar email(s)"
+
+#~ msgid "test"
+#~ msgstr "testar"
+
+#~ msgid "Show email(s) which would be sent"
+#~ msgstr "Mostrar email que seria enviado"
+
+#~ msgid "configure"
+#~ msgstr "configurar"
+
+#~ msgid "Email revision(s) "
+#~ msgstr "Enviar email com as revisão(ões) "
+
+#~ msgid "The description field is unused when sending a single patch."
+#~ msgstr "O campo da descrição não é usado ao enviar um único patch"
+
+#~ msgid "Ignore filter for "
+#~ msgstr "Ignorar filtro para "
+
+#~ msgid "unrecognized response\n"
+#~ msgstr "resposta não reconhecida\n"
+
+#~ msgid "[command returned code %d]\n"
+#~ msgstr "[o comando retornou o código %d]\n"
+
+#~ msgid "[command completed successfully]\n"
+#~ msgstr "[comando completado com sucesso]\n"
+
+#~ msgid "_Filter"
+#~ msgstr "_Filtrar"
+
+#~ msgid "Filter revisions for display"
+#~ msgstr "Filtra revisões para exibição"
+
+#~ msgid "_DataMine"
+#~ msgstr "_DataMine"
+
+#~ msgid "Search Repository History"
+#~ msgstr "Pesquisa o Histórico do Repositório"
+
+#~ msgid "Show Rev"
+#~ msgstr "Mostrar Rev"
+
+#~ msgid "Show ID"
+#~ msgstr "Mostrar ID"
+
+#~ msgid "Show All Revisions"
+#~ msgstr "Mostrar Todas as Revisões"
+
+#~ msgid "Show Tagged Revisions"
+#~ msgstr "Mostrar Revisões Etiquetadas"
+
+#~ msgid "Show Head Revisions"
+#~ msgstr "Mostrar Revisões de Cabeça"
+
+#~ msgid "Show Only Merge Revisions"
+#~ msgstr "Mostrar Apenas Revisões de Mesclagem"
+
+#~ msgid "Show Non-Merge Revisions"
+#~ msgstr "Não Mostrar Revisões de Mesclagem"
+
+#~ msgid "_update"
+#~ msgstr "at_ualizar"
+
+#~ msgid "_merge with"
+#~ msgstr "_mesclar com"
+
+#~ msgid "_copy hash"
+#~ msgstr "_copiar hash"
+
+#~ msgid "_export patch"
+#~ msgstr "_exportar patch"
+
+#~ msgid "e_mail patch"
+#~ msgstr "enviar patch por e_mail"
+
+#~ msgid "_bundle rev:tip"
+#~ msgstr "criar _bundle rev:tip"
+
+#~ msgid "add/remove _tag"
+#~ msgstr "adicionar/remover e_tiqueta"
+
+#~ msgid "_revert"
+#~ msgstr "_reverter"
+
+#~ msgid "strip revision"
+#~ msgstr "remover a revi_são"
+
+#~ msgid "_diff with selected"
+#~ msgstr "_diff com o selecionado"
+
+#~ msgid "visual diff with selected"
+#~ msgstr "diff visual com o selecionado"
+
+#~ msgid "show next %d revisions"
+#~ msgstr "mostrar as próximas %d revisões"
+
+#~ msgid "show all remaining revisions"
+#~ msgstr "mostrar todas as revisões restantes"
+
+#~ msgid "Remove revision %d and all descendants?"
+#~ msgstr "Remover a revisão %d e todos os seus descendentes?"
+
+#~ msgid "View revision graph of named branch"
+#~ msgstr "Ver grafo de revisões do ramo nomeado"
+
+#~ msgid "View range of revisions"
+#~ msgstr "Ver revisões dentro de uma faixa"
+
+#~ msgid "Search Filter"
+#~ msgstr "Filtro de Pesquisa"
+
+#~ msgid "Search repository changelog with criteria"
+#~ msgstr "Mostrar o changelog do repositório com o critério"
+
+#~ msgid "File(s):"
+#~ msgstr "Arquivo(s):"
+
+#~ msgid "Display only changesets affecting these comma separated file paths"
+#~ msgstr ""
+#~ "Mostrar apenas os changesets que afetam estes caminhos de arquivo separados "
+#~ "por vírgulas"
+
+#~ msgid "Keyword(s):"
+#~ msgstr "Palavra(s)-chave"
+
+#~ msgid "Help on date formats"
+#~ msgstr "Ajuda sobre o formato das datas"
+
+#~ msgid "TortoiseHg Recovery - "
+#~ msgstr "Recuperação do TortoiseHg - "
+
+#~ msgid "_difference"
+#~ msgstr "_diferença"
+
+#~ msgid "l_og"
+#~ msgstr "l_og"
+
+#~ msgid "_view"
+#~ msgstr "_ver"
+
+#~ msgid "_add"
+#~ msgstr "_adicionar"
+
+#~ msgid "_ignore"
+#~ msgstr "_ignorar"
+
+#~ msgid "re_move"
+#~ msgstr "re_mover"
+
+#~ msgid "re_name"
+#~ msgstr "re_nomear"
+
+#~ msgid "_copy"
+#~ msgstr "_copiar"
+
+#~ msgid "add"
+#~ msgstr "adicionar"
+
+#~ msgid "revision(s) "
+#~ msgstr "revisão(ões) "
+
+#~ msgid "extension '%s' overrides commands: %s\n"
+#~ msgstr "a extensão '%s' sobrepõe os comandos:\n"
+
+#~ msgid "repository '%s' is not local"
+#~ msgstr "o repositório '%s' não é local"
+
+#~ msgid "Create Clone"
+#~ msgstr "Criar Clone"
+
+#~ msgid "Clone a Repository"
+#~ msgstr "Clonar um repositório"
+
+#~ msgid "clone a repository"
+#~ msgstr "clonar um repositório"
+
+#~ msgid "create a new repository in this directory"
+#~ msgstr "cria um novo repositório neste diretório"
+
+#~ msgid "HG Commit..."
+#~ msgstr "HG Commit..."
+
+#~ msgid "View File Status"
+#~ msgstr "Ver estado dos arquivos"
+
+#~ msgid "Repository status"
+#~ msgstr "Estado do repositório"
+
+#~ msgid "Add Files"
+#~ msgstr "Adicionar Arquivos"
+
+#~ msgid "Add files to Hg repository"
+#~ msgstr "Adiciona arquivos ao repositório Hg"
+
+#~ msgid "Remove Files"
+#~ msgstr "Remover Arquivos"
+
+#~ msgid "Remove selected files on the next commit"
+#~ msgstr "Remove os arquivos selecionados na próxima consolidação"
+
+#~ msgid "Revert Changes"
+#~ msgstr "Reverter Mudanças"
+
+#~ msgid "Revert selected files"
+#~ msgstr "Reverte os arquivos selecionados"
+
+#~ msgid "show changeset information per file line"
+#~ msgstr "mostra informação de changeset linha a linha"
+
+#~ msgid "View Changelog"
+#~ msgstr "Ver Changelog"
+
+#~ msgid "View revision history"
+#~ msgstr "Exibe histórico de revisões"
+
+#~ msgid "Search revisions of files for a text pattern"
+#~ msgstr "Pesquisa um padrão de texto nas revisões de arquivos"
+
+#~ msgid "Synchronize..."
+#~ msgstr "Sincronizar..."
+
+#~ msgid "General repair and recovery of repository"
+#~ msgstr "Reparação geral e recuperação do repositório"
+
+#~ msgid "start web server for this repository"
+#~ msgstr "iniciar servidor web para este repositório"
+
+#~ msgid "Clone a repository here"
+#~ msgstr "Clonar um repositório aqui"
+
+#~ msgid "Configure settings local to this repository"
+#~ msgstr "Configura definições locais para este repositório"
+
+#~ msgid ""
+#~ "** Please report this bug to tortoisehg-discuss@lists.sourceforge.net or "
+#~ "http://bitbucket.org/tortoisehg/stable/issues\n"
+#~ msgstr ""
+#~ "** Por favor informe sobre este bug em tortoisehg-"
+#~ "discuss@lists.sourceforge.net ou "
+#~ "http://bitbucket.org/tortoisehg/stable/issues\n"
+
+#~ msgid "_Other parent"
+#~ msgstr "_Outro pai"
+
+#~ msgid "diff other parent"
+#~ msgstr "diff com outro pai"
+
 #~ msgid "branch:"
 #~ msgstr "ramo:"
+
+#~ msgid "user/date:"
+#~ msgstr "usuário/data:"
+
+#~ msgid "parent:"
+#~ msgstr "pai:"
+
+#~ msgid "child:"
+#~ msgstr "filho:"
 
 #~ msgid "tags:"
 #~ msgstr "etiquetas:"
 
+#~ msgid "_visual diff"
+#~ msgstr "diff _visual"
+
+#~ msgid "diff to _local"
+#~ msgstr "diff com _local"
+
+#~ msgid "_view at revision"
+#~ msgstr "_ver na revisão"
+
+#~ msgid "_save at revision"
+#~ msgstr "salvar _na revisão"
+
+#~ msgid "_revert file contents"
+#~ msgstr "_reverter conteúdo dos arquivos"
+
+#~ msgid "_commit"
+#~ msgstr "_consolidar"
+
+#~ msgid "Confirm Undo commit"
+#~ msgstr "Confirmar Desfazimento da Consolidação"
+
+#~ msgid "notify the shell for path(s) given"
+#~ msgstr "notificar o shell para o(s) caminho(s) dado(s)"
+
 #~ msgid "Launch synchronize tool"
 #~ msgstr "Executa a ferramenta de sincronização"
+
+#~ msgid "Show Local Date"
+#~ msgstr "Mostrar Data Local"
+
+#~ msgid "Show UTC Date"
+#~ msgstr "Mostrar Data UTC"
+
+#~ msgid "Show Branch"
+#~ msgstr "Mostrar Ramo"
+
+#~ msgid "Show New Revisions"
+#~ msgstr "Mostrar Novas Revisões"
+
+#~ msgid "Show Revision Ancestry"
+#~ msgstr "Mostrar Ancestrais de Revisão"
+
+#~ msgid "visualize change"
+#~ msgstr "visualizar alteração"
+
+#~ msgid "diff to local"
+#~ msgstr "diff com local"
+
+#~ msgid "backout revision"
+#~ msgstr "anular revisão"
+
+#~ msgid "email from here to selected"
+#~ msgstr "enviar por email daqui até o selecionado"
+
+#~ msgid "bundle from here to selected"
+#~ msgstr "bundle daqui até o selecionado"
+
+#~ msgid "Confirm Strip Revision(s)"
+#~ msgstr "Confirmar Strip da Revisão"
+
+#~ msgid "Confirm Revert Revision(s)"
+#~ msgstr "Confirmar Reversão da Revisão"
+
+#~ msgid "Log Filter - %s"
+#~ msgstr "Filtro de Log - %s"
+
+#~ msgid ""
+#~ "Display only changesets matching these comma separated case insensitive "
+#~ "keywords"
+#~ msgstr ""
+#~ "Mostra apenas changesets que correspondam a estas palavras chave separadas "
+#~ "por vírgulas"
+
+#~ msgid "Display only changesets matching this date specification"
+#~ msgstr "Mostrar apenas changesets que correspondam à data especificada"
+
+#~ msgid "Merging in "
+#~ msgstr "Mesclando em "
+
+#~ msgid "rev"
+#~ msgstr "rev"
+
+#~ msgid "summary"
+#~ msgstr "sumário"
+
+#~ msgid "user"
+#~ msgstr "usuário"
+
+#~ msgid "date"
+#~ msgstr "data"
+
+#~ msgid "branch"
+#~ msgstr "ramo"
+
+#~ msgid "tags"
+#~ msgstr "etiquetas"
+
+#~ msgid "Unable to find repo at %s\n"
+#~ msgstr "Não é possível encontrar o repo em %s\n"
+
+#~ msgid "Serve %s - %s"
+#~ msgstr "Serve %s - %s"
+
+#~ msgid "Serve - "
+#~ msgstr "Serve - "
+
+#~ msgid "edit"
+#~ msgstr "editar"
+
+#~ msgid "view other"
+#~ msgstr "ver outro"
+
+#~ msgid "_guess rename"
+#~ msgstr "in_ferir renomeações"
+
+#~ msgid "resolve"
+#~ msgstr "resolver"
+
+#~ msgid "mark resolved"
+#~ msgstr "marcar como resolvido"
+
+#~ msgid "mark unresolved"
+#~ msgstr "marcar como não resolvido"
+
+#~ msgid "revert"
+#~ msgstr "reverter"
+
+#~ msgid "move selected files to other directory"
+#~ msgstr "mover arquivos selecionados para outro diretório"
+
+#~ msgid "remove"
+#~ msgstr "remover"
+
+#~ msgid "Revert files to revision %s?"
+#~ msgstr "Reverter arquivos para a revisão %s?"
+
+#~ msgid "Revert file(s) to local or other parent?"
+#~ msgstr "Reverter arquivo(s) para local ou outro pai?"
+
+#~ msgid "&local"
+#~ msgstr "&local"
+
+#~ msgid "&other"
+#~ msgstr "&outro"
+
+#~ msgid "l"
+#~ msgstr "l"
+
+#~ msgid "o"
+#~ msgstr "o"
+
+#~ msgid "Revert the following files?"
+#~ msgstr "reverter os seguintes arquivos?"
+
+#~ msgid "TortoiseHg Synchronize - "
+#~ msgstr "Sincronizar do TortoiseHg - "
+
+#~ msgid "Post pull operation"
+#~ msgstr "Operação posterior ao pull"
+
+#~ msgid "Target Revision:"
+#~ msgstr "Revisão de destino:"
+
+#~ msgid "Remote Command:"
+#~ msgstr "Comando Remoto:"
+
+#~ msgid "Show Patches"
+#~ msgstr "Mostrar Patches"
+
+#~ msgid "Show Newest First"
+#~ msgstr "Mostrar Mais Recentes Primeiro"
+
+#~ msgid "Show No Merges"
+#~ msgstr "Não Mostrar Mesclagens"
+
+#~ msgid "View pulled revisions"
+#~ msgstr "Ver revisões trazidas"
+
+#~ msgid "TortoiseHg Tag - %s"
+#~ msgstr "Etiquetas TortoiseHg - %s"
+
+#~ msgid "Add tag to selected version"
+#~ msgstr "Adiciona etiqueta à versão selecionada"
+
+#~ msgid "Remove tag from repository"
+#~ msgstr "Remover etiqueta do repositório"
+
+#~ msgid "Use custom commit message"
+#~ msgstr "Usar mensagem de consolidação personalizada"
+
+#~ msgid "Commit message:"
+#~ msgstr "Mensagem de consolidação:"
+
+#~ msgid "Promote menu items to the top menu"
+#~ msgstr "Promover itens do menu para o menu do topo"
+
+#~ msgid "Promote menu item \"%s\" to top menu"
+#~ msgstr "promover o item do menu \"%s\" para o menu do topo"
+
+#~ msgid "3-way Merge Tool"
+#~ msgstr "Mesclagem de 3 vias"
+
+#~ msgid "External Commit Tool"
+#~ msgstr "Ferramenta externa de consolidação"
+
+#~ msgid ""
+#~ "Select commit tool launched by TortoiseHg. (Qct is no longer distributed as "
+#~ "part of TortoiseHG.) Default: None (use the builtin tool)"
+#~ msgstr ""
+#~ "selecione a ferramenta de consolidação iniciada pelo TortoiseHg. (Qct já não "
+#~ "é distribuído como parte do TortoiseHG). O valor padrão é Nenhum (use a "
+#~ "ferramenta incluída)"
+
+#~ msgid ""
+#~ "Allow the changelog viewer to copy the changeset hash of the currently "
+#~ "selected changeset into the clipboard. Default: False"
+#~ msgstr ""
+#~ "Faz com que o visualizador de changelog copie a hash do changeset atualmente "
+#~ "selecionado para a área de transferência. Valor padrão: Falso"
+
+#~ msgid "Confirm quit without saving?"
+#~ msgstr "Confirmar sair sem salvar?"
+
+#~ msgid "Yes to abandon changes, No to continue"
+#~ msgstr "Sim para abandonar alterações, Não para continuar"
+
+#~ msgid "= Current Branch Tip ="
+#~ msgstr "= Tip do Ramo Atual ="
+
+#~ msgid "Overwrite local changes (--clean)"
+#~ msgstr "Sobrescrever alterações locais (--clean)"
+
+#~ msgid ""
+#~ "Patch series description is sent in initial summary email with [PATCH 0 of "
+#~ "N] subject.  It should describe the effects of the entire patch series.  "
+#~ "When emailing a bundle, these fields make up the message subject and body."
+#~ msgstr ""
+#~ "A descrição da série de patches é enviada no email de sumário inicial com "
+#~ "[PATCH 0 of N] prefixado ao assunto. Deve descrever os efeitos da série "
+#~ "completa de patches. Ao enviar um bundle por email, estes campos são usados "
+#~ "como assunto e corpo da mensagem."
+
+#~ msgid "Shelve or unshelve repository changes"
+#~ msgstr "Adia ou retira do adiamento mudanças no repositório"
+
+#~ msgid "Show Working Parents"
+#~ msgstr "Mostra Pais de Trabalho"
 
 #~ msgid "Copyright 2009 TK Soh and others"
 #~ msgstr "Copyright 2009 TK Soh e outros"
@@ -5223,5 +5793,11 @@ msgstr "Sincronizar com o repositório arrastado"
 #~ msgid "user:"
 #~ msgstr "usuário:"
 
+#~ msgid "transplant:"
+#~ msgstr "transplante:"
+
 #~ msgid "date:"
 #~ msgstr "data:"
+
+#~ msgid "patch:"
+#~ msgstr "patch:"

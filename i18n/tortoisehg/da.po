@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
-"POT-Creation-Date: 2009-12-29 02:36+0000\n"
-"PO-Revision-Date: 2009-12-29 07:54+0000\n"
+"POT-Creation-Date: 2010-01-02 01:46+0000\n"
+"PO-Revision-Date: 2010-01-02 11:24+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-12-30 04:49+0000\n"
+"X-Launchpad-Export-Date: 2010-01-03 04:47+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:38
@@ -232,7 +232,7 @@ msgstr "Brug engelsk omgørelsesbesked"
 
 #: tortoisehg\hgtk\backout.py:97
 msgid "Merge with old dirstate parent after backout"
-msgstr "Foren med gammel mappetilstand forælder efter omgørelse"
+msgstr ""
 
 #: tortoisehg\hgtk\backout.py:163 tortoisehg\hgtk\commit.py:451
 msgid "Confirm Discard Message"
@@ -1495,7 +1495,7 @@ msgstr "Du skal konfigurere SMTP"
 
 #: tortoisehg\hgtk\hgignore.py:35
 msgid "Ignore filter - %s"
-msgstr "Ignoreringsmønster - %s"
+msgstr ""
 
 #: tortoisehg\hgtk\hgignore.py:51 tortoisehg\hgtk\hgignore.py:59
 #: tortoisehg\hgtk\quickop.py:50 tortoisehg\hgtk\tagadd.py:39
@@ -1873,7 +1873,7 @@ msgstr "vent indtil næste sekund"
 
 #: tortoisehg\hgtk\hgtk.py:684
 msgid "notify the shell for paths given"
-msgstr "notificer shell for angivne stier"
+msgstr ""
 
 #: tortoisehg\hgtk\hgtk.py:685
 msgid "remove the status cache"
@@ -1905,7 +1905,7 @@ msgstr "revisioner at vise i diff-værktøj"
 
 #: tortoisehg\hgtk\hgtk.py:696
 msgid "bundle file to preview"
-msgstr "bundt-fil som skal forhåndsvises"
+msgstr ""
 
 #: tortoisehg\hgtk\hgtk.py:697
 msgid "directly use raw extdiff command"
@@ -1995,7 +1995,7 @@ msgstr "vis/skjul lap-kø"
 
 #: tortoisehg\hgtk\history.py:156
 msgid "Sync Bar"
-msgstr "Synk. bjælke"
+msgstr ""
 
 #: tortoisehg\hgtk\history.py:166
 msgid "Load more Revisions"
@@ -2035,7 +2035,7 @@ msgstr "Ignorer maks diff størrelse"
 
 #: tortoisehg\hgtk\history.py:195
 msgid "_Navigate"
-msgstr "_Navigér"
+msgstr ""
 
 #: tortoisehg\hgtk\history.py:196
 msgid "Tip"
