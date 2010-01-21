@@ -1652,7 +1652,7 @@ class GStatus(gdialog.GWindow):
         menu.append_sep()
         make(_('_Forget'), forget, 'MARC!ru', paths=True)
         make(_('_Add'), add, 'I?', paths=True)
-        make(_('_Guess Rename...'), guess_rename, '?')
+        make(_('_Guess Rename...'), guess_rename, '?!')
         make(_('_Ignore'), ignore, '?')
         make(_('Remove versioned'), remove, 'C')
         make(_('_Delete unversioned'), delete, '?I')
