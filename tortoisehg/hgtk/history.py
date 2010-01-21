@@ -191,6 +191,10 @@ class GLog(gdialog.GWindow):
                     _('Re_fresh'),
                     self.refresh_clicked, name='refresh',
                     tip=_('Reload revision history')),
+                self.make_toolbutton(gtk.STOCK_CLEAR,
+                    _('Reset _Marks'),
+                    self.refresh_clicked, userdata=True, name='reset',
+                    tip=_('Reset revision marks')),
                ]
         if 'mq' in self.exs:
             self.mqtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
@@ -2350,6 +2354,10 @@ class GLog(gdialog.GWindow):
         self.reload_log()
 
     def refresh_clicked(self, toolbutton, data=None):
+        if data:
+            self.stbar.set_idle_text(None)
+            self.outgoing = []
+            self.origtip = len(self.repo)
         self.reload_log()
         return True
 
