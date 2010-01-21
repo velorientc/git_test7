@@ -15,8 +15,11 @@
 # sources.
 
 from mercurial.i18n import _
+from mercurial import demandimport
+demandimport.disable()
 from mercurial import base85, util, diffhelpers
 from mercurial.patch import PatchError, copyfile
+demandimport.enable()
 
 import cStringIO, os, re, zlib
 import bisect
