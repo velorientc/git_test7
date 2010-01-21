@@ -45,6 +45,8 @@ public:
 
 bool hasHgDir(char cls, const std::string& path, unsigned& ticks)
 {
+    ticks = 0;
+
     bool res = false;
 
     if (path.empty() || path == "\\" || ::PathIsRoot(path.c_str()))
