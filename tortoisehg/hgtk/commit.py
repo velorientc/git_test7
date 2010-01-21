@@ -11,22 +11,21 @@ import os
 import errno
 import gtk
 import gobject
-import pango
 import tempfile
 import cStringIO
 import time
 
-from mercurial import hg, util, patch, cmdutil
+from mercurial import hg, util, patch, cmdutil, extensions
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
 from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
-from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
+from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd, thgmq
 
 class BranchOperationDialog(gtk.Dialog):
-    def __init__(self, branch, close, mergebranches):
+    def __init__(self, branch, close, repo):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
                             buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
                                      gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL),
@@ -39,11 +38,11 @@ class BranchOperationDialog(gtk.Dialog):
         self.newbranch = None
         self.closebranch = False
 
-        if mergebranches:
+        if len(repo.parents()) == 2:
             lbl = gtk.Label(_('Select branch of merge commit'))
             branchcombo = gtk.combo_box_new_text()
-            for name in mergebranches:
-                branchcombo.append_text(name)
+            for p in repo.parents():
+                branchcombo.append_text(p.branch())
             branchcombo.set_active(0)
             self.vbox.pack_start(lbl, True, True, 2)
             self.vbox.pack_start(branchcombo, True, True, 2)
@@ -56,7 +55,11 @@ class BranchOperationDialog(gtk.Dialog):
         self.newbranchradio = gtk.RadioButton(nochanges,
                 _('Open a new named branch'))
         self.newbranchradio.set_active(True)
-        self.branchentry = gtk.Entry()
+        branchcombo = gtk.combo_box_entry_new_text()
+        for name in hglib.getlivebranch(repo):
+            branchcombo.append_text(name)
+        self.branchentry = branchcombo.child
+
         self.closebranchradio = gtk.RadioButton(nochanges,
                 _('Close current named branch'))
 
@@ -68,13 +71,13 @@ class BranchOperationDialog(gtk.Dialog):
         lbl.set_markup(gtklib.markup(_('Changes take effect on next commit'),
                                      weight='bold'))
         table.add_row(lbl, padding=False, ypad=6)
-        table.add_row(self.newbranchradio, self.branchentry)
-        table.add_row(self.closebranchradio)
         table.add_row(nochanges)
+        table.add_row(self.newbranchradio, branchcombo)
+        table.add_row(self.closebranchradio)
 
         # signal handlers
         self.connect('response', self.response)
-        self.newbranchradio.connect('toggled', self.nbtoggle)
+        self.newbranchradio.connect('toggled', self.nbtoggle, branchcombo)
         self.branchentry.connect('activate', self.activated)
 
         # prepare to show
@@ -87,11 +90,13 @@ class BranchOperationDialog(gtk.Dialog):
             self.closebranchradio.set_active(True)
         else:
             nochanges.set_active(True)
+        if repo[None].branch() == 'default':
+            self.closebranchradio.set_sensitive(False)
 
         self.show_all()
 
-    def nbtoggle(self, radio):
-        self.branchentry.set_sensitive(radio.get_active())
+    def nbtoggle(self, radio, combo):
+        combo.set_sensitive(radio.get_active())
         if radio.get_active():
             self.branchentry.grab_focus()
 
@@ -135,11 +140,13 @@ class GCommit(GStatus):
         self.qnew = False
         self.notify_func = None
         self.patch_text = None
+        self.runner = hgcmd.CmdRunner()
+        self.mqloaded = bool(extensions.find('mq'))
 
     def get_help_url(self):
         return 'commit.html'
 
-    def set_notify_func(self, func, args):
+    def set_notify_func(self, func, *args):
         self.notify_func = func
         self.notify_args = args
 
@@ -176,7 +183,6 @@ class GCommit(GStatus):
         self.update_check_count()
         self.opts['check'] = False
 
-
     def get_menu_list(self):
         def refresh(menu):
             self.reload_status()
@@ -190,13 +196,31 @@ class GCommit(GStatus):
                 else:
                     frame.hide()
                 setattr(self, statename, show)
-        return [(_('_View'),
-           [dict(text=_('Advanced'), ascheck=True, func=toggle,
+        def toggle_showoutput(button):
+            active = button.get_active()
+            if self.showoutput != active:
+                self.showoutput = active
+        def toggle_showtoolbar(button):
+            self.showtoolbar = button.get_active()
+            self._show_toolbar(self.showtoolbar)
+        if self.mqloaded:
+            mq_item = [dict(text=_('Patch Queue'), name='mq', ascheck=True,
+                func=self.mq_clicked, check=self.setting_mqvis) ]
+        else:
+            mq_item = []
+        return [(_('_View'), [
+            dict(text=_('Toolbar'), ascheck=True, check=self.showtoolbar,
+                func=toggle_showtoolbar),
+            dict(text=_('Advanced'), ascheck=True, func=toggle,
                 args=['advanced'], check=self.showadvanced),
             dict(text=_('Parents'), ascheck=True, func=toggle,
                 args=['parents'], check=self.showparents),
+            ] + mq_item + [
             dict(text='----'),
-            dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH)]),
+            dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH),
+            dict(text='----'),
+            dict(name='always-show-output', text=_('Always Show Output'),
+                ascheck=True, func=toggle_showoutput, check=self.showoutput)]),
            (_('_Operations'), [
             dict(text=_('_Commit'), func=self.commit_clicked,
                 icon=gtk.STOCK_OK),
@@ -220,23 +244,31 @@ class GCommit(GStatus):
     def save_settings(self):
         settings = GStatus.save_settings(self)
         settings['commit-vpane'] = self.vpaned.get_position()
+        settings['show-toolbar'] = self.showtoolbar
         settings['showparents'] = self.showparents
         settings['showadvanced'] = self.showadvanced
+        settings['show-output'] = self.showoutput
+        if hasattr(self, 'mqpaned') and self.mqwidget.has_patch():
+            curpos = self.mqpaned.get_position()
+            settings['mqpane'] = curpos or self.setting_mqhpos
+            settings['mqvis'] = bool(curpos)
+        else:
+            settings['mqpane'] = self.setting_mqhpos
+            settings['mqvis'] = self.setting_mqvis
         return settings
-
 
     def load_settings(self, settings):
         GStatus.load_settings(self, settings)
-        self.setting_vpos = -1
-        self.showparents = True
-        self.showadvanced = False
-        try:
-            self.setting_vpos = settings['commit-vpane']
-            self.showparents = settings['showparents']
-            self.showadvanced = settings['showadvanced']
-        except KeyError:
-            pass
+        self.setting_vpos = settings.get('commit-vpane', -1)
+        self.showtoolbar = settings.get('show-toolbar', True)
+        self.showparents = settings.get('showparents', True)
+        self.showadvanced = settings.get('showadvanced', False)
+        self.showoutput = settings.get('show-output', False)
+        self.setting_mqhpos = settings.get('mqpane', 140) or 140
+        self.setting_mqvis = settings.get('mqvis', False)
 
+    def show_toolbar_on_start(self):
+        return self.showtoolbar
 
     def get_tbbuttons(self):
         # insert to head of toolbar
@@ -248,6 +280,13 @@ class GCommit(GStatus):
             self.commit_clicked, name='commit', tip=_('commit'))
         tbbuttons.insert(0, undo_btn)
         tbbuttons.insert(0, commit_btn)
+        if self.mqloaded:
+            mq_btn = self.make_toolbutton(gtk.STOCK_DIRECTORY,
+                        _('Patch Queue'), self.mq_clicked,
+                        name='mq', tip=_('Show/Hide Patch Queue'),
+                        toggle=True, icon='menupatch.ico')
+            tbbuttons.append(mq_btn)
+            self.mqtb = mq_btn
         return tbbuttons
 
     def should_live(self, widget=None, event=None):
@@ -291,12 +330,15 @@ class GCommit(GStatus):
         if self.qnew:
             self.qnew_name.grab_focus() # set focus back
             self.qnew_name.set_position(-1)
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.set_repo(self.repo)
+            self.mqwidget.refresh()
 
     def get_body(self):
         self.connect('delete-event', self.delete)
         status_body = GStatus.get_body(self)
 
-        vbox = gtk.VBox()
+        midpane = gtk.VBox()
 
         # Advanced bar
         self.advanced_frame = gtk.VBox()
@@ -324,7 +366,7 @@ class GCommit(GStatus):
         self.autopush.set_active(pushafterci)
         adv_hbox.pack_start(self.autopush, False, False, 2)
 
-        vbox.pack_start(self.advanced_frame, False, False, 2)
+        midpane.pack_start(self.advanced_frame, False, False, 2)
 
         mbox = gtk.HBox()
         self.connect('thg-accept', self.thgaccept)
@@ -343,6 +385,7 @@ class GCommit(GStatus):
             self.qnew_name.set_sensitive(not self.is_merge())
             self.qnew_name.set_width_chars(20)
             self.qnew_name.connect('changed', self.qnew_changed)
+            self.qnew_name.connect('activate', self.qnew_activated)
             mbox.pack_start(self.qnew_name, False, False, 2)
         else:
             self.qnew_name = None
@@ -359,7 +402,7 @@ class GCommit(GStatus):
                                               self.first_msg_popdown)
         self.msg_cbbox.connect('changed', self.changed_cb)
         mbox.pack_start(self.msg_cbbox)
-        vbox.pack_start(mbox, False, False)
+        midpane.pack_start(mbox, False, False)
         self._mru_messages = self.settings.mrul('recent_messages')
 
         # change message field
@@ -368,7 +411,7 @@ class GCommit(GStatus):
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         frame.add(scroller)
-        vbox.pack_start(frame)
+        midpane.pack_start(frame)
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
@@ -380,27 +423,61 @@ class GCommit(GStatus):
         self.text = gtk.TextView()
         self.text.connect('populate-popup', self.msg_add_to_popup)
         self.connect('thg-reflow', self.thgreflow, self.text)
-        self.text.modify_font(pango.FontDescription(self.fontcomment))
+        self.text.modify_font(self.fonts['comment'])
         scroller.add(self.text)
         gtklib.addspellcheck(self.text, self.repo.ui)
 
-        vbox2 = gtk.VBox()
-        vbox2.pack_start(status_body)
+        buf = self.text.get_buffer()
+        buf.connect('changed', self.msg_changed)
+        buf.create_tag('over', paragraph_background=gtklib.PRED)
+
+        # MQ panel
+        if self.mqloaded:
+            self.mqwidget = thgmq.MQWidget(self.repo, accelgroup,
+                                           self.tooltips)
+            self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
+
+            def wrapframe(widget):
+                frame = gtk.Frame()
+                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+                frame.add(widget)
+                return frame
+            self.mqpaned = gtk.HPaned()
+            self.mqpaned.add1(wrapframe(self.mqwidget))
+            self.mqpaned.add2(wrapframe(midpane))
+
+            # register signal handler
+            def notify(paned, gparam):
+                if not hasattr(self, 'mqtb'):
+                    return
+                pos = paned.get_position()
+                if self.cmd_get_active('mq'):
+                    if pos < 140:
+                        paned.set_position(140)
+                else:
+                    if pos != 0:
+                        paned.set_position(0)
+            self.mqpaned.connect('notify::position', notify)
+
+            midpane = self.mqpaned
+
+        botbox = gtk.VBox()
+        botbox.pack_start(status_body)
 
         # parent changeset info
         parents_vbox = gtk.VBox(spacing=1)
         self.parents_frame = parents_vbox
-        style = csinfo.labelstyle(contents=(_('Parent: %(rev)s'),
-                       ' %(athead)s', ' %(branch)s', ' %(tags)s',
+        style = csinfo.labelstyle(contents=('%(athead)s ',
+                       _('Parent: %(rev)s'), ' %(branch)s', ' %(tags)s',
                        ' %(summary)s'), selectable=True)
         def data_func(widget, item, ctx):
             if item == 'athead':
-                return widget.get_data('ishead') or self.mqmode
+                return widget.get_data('ishead') or bool(self.mqmode)
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
             if item == 'athead' and value is False:
-                text = '[%s]' % _('not at head revision')
-                return gtklib.markup(text, weight='bold')
+                text = '[%s]' % _('Not at head')
+                return gtklib.markup(text, weight='bold', color=gtklib.DRED)
             raise csinfo.UnknownItem(item)
         custom = csinfo.custom(data=data_func, markup=markup_func)
         factory = csinfo.factory(self.repo, custom, style)
@@ -412,12 +489,12 @@ class GCommit(GStatus):
         self.parent2_label = add_parent()
         parents_hbox = gtk.HBox()
         parents_hbox.pack_start(parents_vbox, False, False, 5)
-        vbox2.pack_start(parents_hbox, False, False, 2)
-        vbox2.pack_start(gtk.HSeparator(), False, False)
+        botbox.pack_start(parents_hbox, False, False, 2)
+        botbox.pack_start(gtk.HSeparator(), False, False)
 
         self.vpaned = gtk.VPaned()
-        self.vpaned.pack1(vbox, shrink=False)
-        self.vpaned.pack2(vbox2, shrink=False)
+        self.vpaned.pack1(midpane, shrink=False)
+        self.vpaned.pack2(botbox, shrink=False)
         gtklib.idle_add_single_call(self.realize_settings)
         return self.vpaned
 
@@ -428,8 +505,28 @@ class GCommit(GStatus):
             res = _('Commit Preview')
         return res
 
+    def prepare_display(self):
+        GStatus.prepare_display(self)
+        self.enable_mqpanel()
+
     ### End of overridable methods ###
 
+    def execute_command(self, cmd, callback=None, status=None,
+                        title=None, force=False):
+        if self.showoutput or force:
+            dlg = hgcmd.CmdDialog(cmd)
+            dlg.set_transient_for(self)
+            dlg.run()
+            dlg.hide()
+            callback and callback(dlg.return_code(), dlg.get_buffer())
+            return dlg
+        def wrapper(*args):
+            self.stbar.end()
+            callback and callback(*args)
+        self.stbar.begin(*(status and (status,) or ()))
+        if title:
+            self.runner.set_title(title)
+        return self.runner.execute(cmd, wrapper)
 
     def update_recent_committers(self, name=None):
         """ 'name' argument must be in UTF-8. """
@@ -477,11 +574,8 @@ class GCommit(GStatus):
             liststore.append([sumline, msg])
 
     def branch_clicked(self, button):
-        if self.is_merge():
-            mb = [p.branch() for p in self.repo.parents()]
-        else:
-            mb = None
-        dialog = BranchOperationDialog(self.nextbranch, self.closebranch, mb)
+        dialog = BranchOperationDialog(self.nextbranch,
+                                       self.closebranch, self.repo)
         dialog.run()
         self.nextbranch = None
         self.closebranch = False
@@ -490,6 +584,30 @@ class GCommit(GStatus):
         elif dialog.closebranch:
             self.closebranch = True
         self.refresh_branchop()
+
+    def repo_invalidated(self, mqwidget):
+        self.reload_status()
+
+    def enable_mqpanel(self, enable=None):
+        if not hasattr(self, 'mqpaned'):
+            return
+        if enable is None:
+            enable = self.setting_mqvis and self.mqwidget.has_patch()
+
+        # set the state of MQ toolbutton
+        self.cmd_handler_block_by_func('mq', self.mq_clicked)
+        self.cmd_set_active('mq', enable)
+        self.cmd_handler_unblock_by_func('mq', self.mq_clicked)
+        self.cmd_set_sensitive('mq', self.mqwidget.has_mq())
+
+        # show/hide MQ pane
+        oldpos = self.mqpaned.get_position()
+        self.mqpaned.set_position(enable and self.setting_mqhpos or 0)
+        if not enable and oldpos:
+            self.setting_mqhpos = oldpos
+
+    def mq_clicked(self, widget, *args):
+        self.enable_mqpanel(widget.get_active())
 
     def update_commit_button(self):
         label = _('Commit')
@@ -534,11 +652,13 @@ class GCommit(GStatus):
 
     def update_parent_labels(self):
         ctxs, isheads, ismerge = self.get_head_info()
-        self.parent1_label.update(ctxs[0])
+        self.parent1_label.info.clear_cache()
+        self.parent1_label.update(ctxs[0], repo=self.repo)
         if not ismerge:
             self.parent2_label.hide()
         else:
-            self.parent2_label.update(ctxs[1])
+            self.parent2_label.info.clear_cache()
+            self.parent2_label.update(ctxs[1], repo=self.repo)
             self.parent2_label.show()
 
     def thgreflow(self, window, textview):
@@ -595,6 +715,8 @@ class GCommit(GStatus):
             self.parents_frame.hide()
         if not self.showadvanced:
             self.advanced_frame.hide()
+        if hasattr(self, 'mqpaned') and self.mqtb.get_active():
+            self.mqpaned.set_position(self.setting_mqhpos)
 
     def thgaccept(self, window):
         self.commit_clicked(None)
@@ -602,14 +724,15 @@ class GCommit(GStatus):
     def get_custom_menus(self):
         def commit(menuitem, files):
             if self.ready_message() and self.isuptodate():
-                self.hg_commit(files)
-                self.reload_status()
-                abs = [self.repo.wjoin(file) for file in files]
-                shlib.shell_notify(abs)
+                def callback():
+                    self.reload_status()
+                    abs = [self.repo.wjoin(file) for file in files]
+                    shlib.shell_notify(abs)
+                self.commit_selected(files, callback)
         if self.is_merge():
             return ()
         else:
-            return [(_('_Commit'), commit, 'MAR'),]
+            return [(_('_Commit'), commit, 'MARS'),]
 
     def delete(self, window, event):
         if not self.should_live():
@@ -709,16 +832,22 @@ class GCommit(GStatus):
             return
 
         def get_list(addremove=True):
-            commitable = 'MAR'
+            commitable = 'MARS'
             if addremove:
                 ar_list = self.relevant_checked_files('?!')
                 if len(ar_list) > 0 and self.should_addremove(ar_list):
                     commitable += '?!'
             return self.relevant_checked_files(commitable)
 
+        def callback():
+            self.reload_status()
+            files = [self.repo.wjoin(x) for x in commit_list]
+            shlib.shell_notify(files)
+
         if self.qnew:
             commit_list = get_list()
-            self.commit_selected(commit_list)
+            self.commit_selected(commit_list, callback)
+            self.enable_mqpanel(True)
         else:
             if not self.ready_message():
                 return
@@ -726,26 +855,24 @@ class GCommit(GStatus):
             if self.is_merge():
                 commit_list = get_list(addremove=False)
                 # merges must be committed without specifying file list.
-                self.hg_commit([])
+                self.hg_commit([], callback)
             else:
                 commit_list = get_list()
                 if len(commit_list) > 0:
-                    self.commit_selected(commit_list)
+                    self.commit_selected(commit_list, callback)
                 elif self.qheader is not None:
-                    self.commit_selected([])
-                elif self.closebranch:
-                    self.commit_selected([])
+                    self.commit_selected([], callback)
+                elif self.closebranch or self.nextbranch:
+                    self.commit_selected([], callback)
                 else:
                     gdialog.Prompt(_('Nothing Commited'),
                            _('No committable files selected'), self).run()
                     return
-        self.reload_status()
-        files = [self.repo.wjoin(x) for x in commit_list]
-        shlib.shell_notify(files)
 
-    def commit_selected(self, files):
+    def commit_selected(self, files, callback):
         # 1a. get list of chunks not rejected
         repo, ui = self.repo, self.repo.ui
+        cwd = os.getcwd()
 
         # 2. backup changed files, so we can restore them in the end
         backups = {}
@@ -762,6 +889,7 @@ class GCommit(GStatus):
             allchunks = []
             for f in files:
                 cf = util.pconvert(f)
+                if cf in self.subrepos: continue
                 if cf not in self.status[0]: continue
                 if f not in self.filechunks: continue
                 chunks = self.filechunks[f]
@@ -807,30 +935,30 @@ class GCommit(GStatus):
                         gdialog.Prompt(_('Commit'),
                                 _('Unable to apply patch'), self).run()
                         return
-            del fp
+
+            def finish():
+                os.chdir(cwd)
+                # restore backup files
+                try:
+                    for realname, tmpname in backups.iteritems():
+                        util.copyfile(tmpname, repo.wjoin(realname))
+                        os.unlink(tmpname)
+                    os.rmdir(backupdir)
+                except OSError:
+                    pass
+                callback()
 
             # 4. We prepared working directory according to filtered patch.
             #    Now is the time to delegate the job to commit/qrefresh
             #    or the like!
             # it is important to first chdir to repo root -- we'll call a
             # highlevel command with list of pathnames relative to repo root
+            del fp
             cwd = os.getcwd()
             os.chdir(repo.root)
-            try:
-                self.hg_commit(files)
-            finally:
-                os.chdir(cwd)
-
-            return
-        finally:
-            # 5. finally restore backed-up files
-            try:
-                for realname, tmpname in backups.iteritems():
-                    util.copyfile(tmpname, repo.wjoin(realname))
-                    os.unlink(tmpname)
-                os.rmdir(backupdir)
-            except OSError:
-                pass
+            self.hg_commit(files, finish)
+        except:
+            finish()
 
 
     def undo_clicked(self, toolbutton, data=None):
@@ -860,13 +988,6 @@ class GCommit(GStatus):
                     _('Errors during rollback!'), self).run()
 
 
-    def changelog_clicked(self, toolbutton, data=None):
-        from tortoisehg.hgtk import history
-        dlg = history.run(self.ui)
-        dlg.display()
-        return True
-
-
     def should_addremove(self, files):
         if self.test_opt('addremove'):
             return True
@@ -880,10 +1001,7 @@ class GCommit(GStatus):
         if self.qnew or self.qheader is not None:
             cmdline = ['hg', 'addremove', '--verbose']
             cmdline += [self.repo.wjoin(x) for x in files]
-            dialog = hgcmd.CmdDialog(cmdline, True)
-            dialog.set_transient_for(self)
-            dialog.run()
-            dialog.hide()
+            self.execute_command(cmdline, force=True)
         return True
 
     def ready_message(self):
@@ -895,18 +1013,17 @@ class GCommit(GStatus):
             return False
 
         try:
-            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
-            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
-        except (TypeError, ValueError):
+            sumlen, maxlen = self.get_lengths(noexcept=False)
+        except ValueError:
             gdialog.Prompt(_('Error'),
                    _('Message format configuration error'),
                    self).run()
             self.msg_config(None)
             return False
-        
+
         lines = hglib.tounicode(buf.get_text(buf.get_start_iter(),
                                              buf.get_end_iter())).splitlines()
-        
+
         if sumlen and len(lines[0].rstrip()) > sumlen:
             resp = gdialog.Confirm(_('Confirm Commit'), [], self,
                            _('The summary line length of %i is greater than'
@@ -936,8 +1053,8 @@ class GCommit(GStatus):
                 if resp != gtk.RESPONSE_YES:
                     return False
         return True
-        
-    def hg_commit(self, files):
+
+    def hg_commit(self, files, callback):
         # get advanced options
         user = hglib.fromutf(self.committer_cbbox.get_active_text())
         if not user:
@@ -990,9 +1107,8 @@ class GCommit(GStatus):
         elif self.closebranch:
             cmdline.append('--close-branch')
 
-        # call the threaded CmdDialog to do the commit, so the the large commit
-        # won't get locked up by potential large commit. CmdDialog will also
-        # display the progress of the commit operation.
+        # Use threaded executers (CmdDialog or CmdRunner) so that the Commit
+        # dialog can continue UI handling if it's large commit.
         if self.qnew:
             cmdline[1] = 'qnew'
             cmdline.append('--force')
@@ -1013,31 +1129,40 @@ class GCommit(GStatus):
         cmdline += files
         if autopush:
             cmdline = (cmdline, ['hg', 'push'])
-        dialog = hgcmd.CmdDialog(cmdline, True)
-        dialog.set_transient_for(self)
-        dialog.run()
-        dialog.hide()
-
-        # refresh overlay icons and commit dialog
-        if dialog.return_code() == 0:
-            self.closebranch = False
-            self.nextbranch = None
-            self.filechunks = {}       # force re-read of chunks
-            buf = self.text.get_buffer()
-            if buf.get_modified():
-                self.update_recent_messages(self.opts['message'])
-                buf.set_modified(False)
-            if self.qnew:
-                self.qnew_name.set_text('')
-                hglib.invalidaterepo(self.repo)
-                self.mode = 'commit'
-                self.qnew = False
-            elif self.qheader is None:
-                self.text.set_buffer(gtk.TextBuffer())
-                self.msg_cbbox.set_active(-1)
-                self.last_commit_id = self.get_tip_rev(True)
-            if self.notify_func:
-                self.notify_func(self.notify_args)
+        def done(return_code, *args):
+            if return_code == 0:
+                # refresh overlay icons and commit dialog
+                self.closebranch = False
+                self.nextbranch = None
+                self.filechunks = {} # force re-read of chunks
+                buf = self.text.get_buffer()
+                if buf.get_modified():
+                    self.update_recent_messages(self.opts['message'])
+                    buf.set_modified(False)
+                if self.qnew:
+                    self.qnew_name.set_text('')
+                    hglib.invalidaterepo(self.repo)
+                    self.mode = 'commit'
+                    self.qnew = False
+                elif self.qheader is None:
+                    self.text.set_buffer(gtk.TextBuffer())
+                    self.msg_cbbox.set_active(-1)
+                    self.last_commit_id = self.get_tip_rev(True)
+                if self.notify_func:
+                    self.notify_func(*self.notify_args)
+                text = _('Finish committing')
+            elif return_code is None:
+                text = _('Aborted committing')
+            else:
+                text = _('Failed to commit')
+            self.stbar.set_idle_text(text)
+            callback()
+        if not self.execute_command(cmdline, done,
+                    status=_('Committing changes...'),
+                    title=_('Commit')):
+            gdialog.Prompt(_('Cannot run now'),
+                           _('Please try again after running '
+                             'operation is completed'), self).run()
 
     def get_tip_rev(self, refresh=False):
         if refresh:
@@ -1047,13 +1172,16 @@ class GCommit(GStatus):
     def get_qnew_name(self):
         return self.qnew_name and self.qnew_name.get_text().strip() or ''
 
-    def qnew_changed(self, element):
+    def qnew_changed(self, entry):
         qnew = bool(self.get_qnew_name())
         if self.qnew != qnew:
             self.qnew = qnew
             self.mode = qnew and 'status' or 'commit'
             self.reload_status()
-            
+
+    def qnew_activated(self, entry):
+        self.commit_clicked(None)
+
     def msg_add_to_popup(self, textview, menu):
         menu_items = (('----', None),
                       (_('Paste _Filenames'), self.msg_paste_fnames),
@@ -1068,7 +1196,39 @@ class GCommit(GStatus):
                 menuitem.connect('activate', handler)
             menu.append(menuitem)
         menu.show_all()
-        
+
+    def get_lengths(self, noexcept=True):
+        try:
+            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
+            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
+        except (TypeError, ValueError):
+            if not noexcept:
+                raise ValueError
+            sumlen = 0
+            maxlen = 0
+        return sumlen, maxlen
+
+    def msg_changed(self, buf):
+        if buf.get_char_count() == 0:
+            return # no text
+        sumlen, maxlen = self.get_lengths()
+        if not (sumlen or maxlen):
+            return # not configured
+
+        # clear all highlights
+        start, end = buf.get_start_iter(), buf.get_end_iter()
+        buf.remove_all_tags(start, end)
+
+        # highlight overed lines
+        for line_num in range(buf.get_line_count()):
+            start = buf.get_iter_at_line(line_num)
+            end = start.copy()
+            end.forward_line()
+            line = buf.get_text(start, end).rstrip('\n\r')
+            if (line_num == 0 and len(line) > sumlen) \
+                              or  len(line) > maxlen:
+                buf.apply_tag_by_name('over', start, end)
+
     def msg_paste_fnames(self, sender):
         buf = self.text.get_buffer()
         fnames = [ file[FM_PATH_UTF8] for file in self.filemodel
@@ -1077,12 +1237,7 @@ class GCommit(GStatus):
         buf.insert_at_cursor('\n'.join(fnames))    
 
     def msg_word_wrap(self, sender):
-        try:
-            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
-            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
-        except (TypeError, ValueError):
-            sumlen = 0
-            maxlen = 0
+        sumlen, maxlen = self.get_lengths()
         if not (sumlen or maxlen):
             gdialog.Prompt(_('Info Required'),
                    _('Message format needs to be configured'),
@@ -1140,7 +1295,7 @@ def run(_ui, *pats, **opts):
         'user':opts.get('user', ''), 'date':opts.get('date', ''),
         'logfile':'', 'message':'',
         'modified':True, 'added':True, 'removed':True, 'deleted':True,
-        'unknown':True, 'ignored':False,
+        'unknown':True, 'ignored':False, 'subrepo':True,
         'exclude':[], 'include':[], 'rev':[],
         'check': True, 'git':False, 'addremove':False,
     }

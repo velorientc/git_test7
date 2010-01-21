@@ -140,7 +140,7 @@ Commit
 ======
    
 Commit your local repository by right-clicking anywhere in the folder,
-or on the folder itself, and then selecting :guilabel:`HG Commit ...`,
+or on the folder itself, and then selecting :guilabel:`Hg Commit ...`,
 or from command line type :command:`hgtk commit`.  Write a commit
 message, select the files you wish to commit, then press
 :guilabel:`Commit`. If, after the commit, you realize that something was

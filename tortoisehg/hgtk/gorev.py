@@ -9,7 +9,8 @@
 import os
 import gtk
 import gobject
-import mercurial
+
+from mercurial import error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.hgtk import gtklib, gdialog
@@ -54,11 +55,11 @@ class GotoRevDialog(gtk.Dialog):
                 self.gotofunc(revision)
             self.revEntry.set_text('')
             self.hide()
-        except mercurial.error.LookupError, e:
+        except error.LookupError, e:
             gdialog.Prompt(_('Ambiguous Revision'), str(e), self).run()
             self.revEntry.grab_focus()
             return
-        except mercurial.error.RepoError, e:
+        except error.RepoError, e:
             gdialog.Prompt(_('Invalid Revision'), str(e), self).run()
             self.revEntry.grab_focus()
             return

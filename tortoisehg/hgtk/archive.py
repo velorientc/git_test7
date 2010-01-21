@@ -7,62 +7,50 @@
 
 import os
 import gtk
-import gobject
-import pango
 
-from mercurial import hg, ui
+from mercurial import error
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 
-from tortoisehg.hgtk import hgcmd, gtklib, gdialog
+from tortoisehg.hgtk import gtklib, gdialog
 
 WD_PARENT = _('= Working Directory Parent =')
-MODE_NORMAL  = 'normal'
-MODE_WORKING = 'working'
 
-class ArchiveDialog(gtk.Dialog):
+class ArchiveDialog(gdialog.GDialog):
     """ Dialog to archive a Mercurial repo """
-
     def __init__(self, rev=None):
-        """ Initialize the Dialog """
-        gtk.Dialog.__init__(self)
-        gtklib.set_tortoise_icon(self, 'menucheckout.ico')
-        gtklib.set_tortoise_keys(self)
-        self.set_resizable(False)
-        self.set_has_separator(False)
-        self.connect('response', self.dialog_response)
+        gdialog.GDialog.__init__(self)
+        self.initrev = rev
 
-        # buttons
-        self.archivebtn = self.add_button(_('Archive'), gtk.RESPONSE_OK)
-        self.closebtn = self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+    ### Start of Overriding Section ###
 
-        try:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
-            gtklib.idle_add_single_call(self.destroy)
-            return
-        self.repo = repo
-        self.set_title(_('Archive - %s') % hglib.get_reponame(repo))
+    def get_title(self, reponame):
+        return _('Archive - %s') % reponame
+
+    def get_icon(self):
+        return 'menucheckout.ico'
+
+    def get_body(self, vbox):
         self.prevtarget = None
 
         # layout table
         self.table = table = gtklib.LayoutTable()
-        self.vbox.pack_start(table, True, True, 2)
+        vbox.pack_start(table, True, True, 2)
 
         ## revision combo
         self.combo = gtk.combo_box_entry_new_text()
         self.combo.child.set_width_chars(28)
         self.combo.child.connect('activate',
                                  lambda b: self.response(gtk.RESPONSE_OK))
-        if rev:
-            self.combo.append_text(str(rev))
+        if self.initrev:
+            self.combo.append_text(str(self.initrev))
         else:
             self.combo.append_text(WD_PARENT)
         self.combo.set_active(0)
-        for b in repo.branchtags():
+        for b in self.repo.branchtags():
             self.combo.append_text(b)
-        tags = list(repo.tags())
+        tags = list(self.repo.tags())
         tags.sort()
         tags.reverse()
         for t in tags:
@@ -94,50 +82,35 @@ class ArchiveDialog(gtk.Dialog):
         self.uzipradio = add_type(_('Uncompressed zip archive'))
         self.zipradio = add_type(_('Zip archive compressed using deflate'))
 
-        # register signal handlers
+        # signal handler
         self.combo.connect('changed', lambda c: self.update_path())
 
         # prepare to show
-        self.update_path(hglib.toutf(repo.root))
-        self.archivebtn.grab_focus()
-        gtklib.idle_add_single_call(self.after_init)
+        self.update_path(hglib.toutf(self.repo.root))
 
-    def after_init(self):
-        # CmdWidget
-        self.cmd = hgcmd.CmdWidget()
-        self.cmd.show_all()
-        self.cmd.hide()
-        self.vbox.pack_start(self.cmd, True, True, 6)
+    def get_buttons(self):
+        return [('archive', _('Archive'), gtk.RESPONSE_OK),
+                ('close', gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)]
 
-        # abort button
-        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.abortbtn.hide()
+    def get_action_map(self):
+        return {gtk.RESPONSE_OK: self.archive}
 
-    def dialog_response(self, dialog, response_id):
-        def abort():
-            self.cmd.stop()
-            self.cmd.show_log()
-            self.switch_to(MODE_NORMAL, cmd=False)
-        # Archive button
-        if response_id == gtk.RESPONSE_OK:
-            self.archive()
-        # Close button or dialog closing by the user
-        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if self.cmd.is_alive():
-                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
-                                      _('Do you want to abort?')).run()
-                if ret == gtk.RESPONSE_YES:
-                    abort()
-            else:
-                self.destroy()
-                return # close dialog
-        # Abort button
-        elif response_id == gtk.RESPONSE_CANCEL:
-            abort()
+    def switch_to(self, normal, working, cmd):
+        self.table.set_sensitive(normal)
+        self.buttons['archive'].set_property('visible', normal)
+        self.buttons['close'].set_property('visible', normal)
+        if normal:
+            self.buttons['close'].grab_focus()
+
+    def command_done(self, returncode, useraborted, *args):
+        if returncode == 0:
+            self.cmd.set_result(_('Archived successfully'), style='ok')
+        elif useraborted:
+            self.cmd.set_result(_('Canceled archiving'), style='error')
         else:
-            raise _('unexpected response id: %s') % response_id
+            self.cmd.set_result(_('Failed to archive'), style='error')
 
-        self.run() # don't close dialog
+    ### End of Overriding Section ###
 
     def type_changed(self, radio):
         if not radio.get_active():
@@ -176,7 +149,7 @@ class ArchiveDialog(gtk.Dialog):
         else:
             try:
                 self.repo[text]
-            except (hglib.RepoError, hglib.LookupError):
+            except (error.RepoError, error.LookupError):
                 return
         if path is None:
             path = self.destentry.get_text()
@@ -227,24 +200,6 @@ class ArchiveDialog(gtk.Dialog):
         if response:
             self.destentry.set_text(response)
 
-    def switch_to(self, mode, cmd=True):
-        if mode == MODE_NORMAL:
-            normal = True
-            self.closebtn.grab_focus()
-        elif mode == MODE_WORKING:
-            normal = False
-            self.abortbtn.grab_focus()
-        else:
-            raise _('unknown mode name: %s') % mode
-        working = not normal
-
-        self.table.set_sensitive(normal)
-        self.archivebtn.set_property('visible', normal)
-        self.closebtn.set_property('visible', normal)
-        if cmd:
-            self.cmd.set_property('visible', working)
-        self.abortbtn.set_property('visible', working)
-
     def archive(self):
         # verify input
         type = self.get_selected_archive_type()['type']
@@ -263,6 +218,7 @@ class ArchiveDialog(gtk.Dialog):
                 if ret != gtk.RESPONSE_YES:
                     return False
 
+        # prepare command line
         cmdline = ['hg', 'archive', '--verbose']
         rev = self.combo.get_active_text()
         if rev != WD_PARENT:
@@ -272,18 +228,8 @@ class ArchiveDialog(gtk.Dialog):
         cmdline.append(type)
         cmdline.append(hglib.fromutf(dest))
 
-        def cmd_done(returncode, useraborted):
-            self.switch_to(MODE_NORMAL, cmd=False)
-            if returncode == 0:
-                if not self.cmd.is_show_log():
-                    self.response(gtk.RESPONSE_CLOSE)
-                self.cmd.set_result(_('Archived successfully'), style='ok')
-            elif useraborted:
-                self.cmd.set_result(_('Canceled archiving'), style='error')
-            else:
-                self.cmd.set_result(_('Failed to archive'), style='error')
-        self.switch_to(MODE_WORKING)
-        self.cmd.execute(cmdline, cmd_done)
+        # start archiving
+        self.execute_command(cmdline)
 
 def run(ui, *pats, **opts):
     return ArchiveDialog(opts.get('rev'))

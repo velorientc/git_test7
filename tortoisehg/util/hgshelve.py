@@ -24,6 +24,8 @@ from mercurial import util, fancyopts
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 
+from tortoisehg.hgtk import gtklib
+
 lines_re = re.compile(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@\s*(.*)')
 
 def internalpatch(patchobj, ui, strip, cwd, files={}):
@@ -41,11 +43,17 @@ def internalpatch(patchobj, ui, strip, cwd, files={}):
         os.chdir(cwd)
     eolmode = ui.config('patch', 'eol', 'strict')
     try:
-        eol = {'strict': None, 'crlf': '\r\n', 'lf': '\n'}[eolmode.lower()]
+        eol = {'strict': None,
+               'auto': None,
+               'crlf': '\r\n',
+               'lf': '\n'}[eolmode.lower()]
     except KeyError:
         raise util.Abort(_('Unsupported line endings type: %s') % eolmode)
     try:
-        ret = patch.applydiff(ui, fp, files, strip=strip, eol=eol)
+        if hasattr(patch, 'eolmodes'): # hg-1.5 hack
+            ret = patch.applydiff(ui, fp, files, strip=strip, eolmode=eolmode)
+        else:
+            ret = patch.applydiff(ui, fp, files, strip=strip, eol=eol)
     finally:
         if cwd:
             os.chdir(curdir)
@@ -130,11 +138,11 @@ class header(object):
                     if selected(i):
                         shunks += 1
                         slines += h.added + h.removed
-                str += "<span foreground='#000088'>"
+                str += '<span foreground="%s">' % gtklib.DBLUE
                 str += _('total: %d hunks (%d changed lines); '
                         'selected: %d hunks (%d changed lines)') % (hunks,
                                 lines, shunks, slines)
-                str += "</span>"
+                str += '</span>'
                 break
             str += hglib.toutf(h)
         return str
