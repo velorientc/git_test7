@@ -45,14 +45,17 @@ public:
 
 bool hasHgDir(char cls, const std::string& path, unsigned& ticks)
 {
+    ticks = 0;
+
     bool res = false;
 
-    if (path.empty() || path == "\\" || ::PathIsRoot(path.c_str()))
-    {
+    if (path.empty() || path == "\\")
         return res;
-    }
 
     const std::string p = path + "\\.hg";
+
+    if (::PathIsUNCServerShare(p.c_str()))
+        return res;
 
     unsigned tc0 = ::GetTickCount();
     res = ::PathIsDirectory(p.c_str()) != 0;
