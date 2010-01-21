@@ -199,13 +199,9 @@ std::string GetHgRepoRoot(const std::string& path)
 {
     TDEBUG_TRACE("GetHgRepoRoot('" << path << "')");
 
-    if (::PathIsUNCServerShare(path.c_str()))
-    {
-        TDEBUG_TRACE("GetHgRepoRoot: path is UNC share '" << path << "'");
-        return "";
-    }
-
-    std::string p = IsDirectory(path)? path : DirName(path);
+    std::string p = 
+        (::PathIsUNCServerShare(path.c_str()) || IsDirectory(path))
+            ? path : DirName(path);
     for (;;)
     {
         std::string tdir = p + "\\.hg";
