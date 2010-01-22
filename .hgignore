@@ -21,6 +21,7 @@ win32/shellext/hgtk.cmd
 *.idb
 *.pdb
 *.manifest
+*.res
 glob:win32/shellext/shellext.ncb
 glob:win32/shellext/shellext.suo
 glob:win32/shellext/Debug/

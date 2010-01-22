@@ -35,10 +35,11 @@ LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
 all: THgShell.dll
 
 clean:
-    del *.obj *.dll *.exe *.lib *.exp *.manifest
+    del *.obj *.dll *.exe *.lib *.exp *.manifest *.res
 
 THgShell.dll: $(OBJECTS_THGSGELL)
-    link /OUT:$@ $(LDFLAGS_THGSHELL) $**
+    rc shellext.rc
+    link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
     mt -nologo -manifest $@.manifest -outputresource:"$@;#2"
 
 dirstate.exe: dirstate.obj $(OBJECTS_DIRSTATE)
