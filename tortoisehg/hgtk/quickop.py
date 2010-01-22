@@ -7,59 +7,59 @@
 
 import os
 import gtk
-import gobject
 import pango
 
-from mercurial import hg, ui, cmdutil
+from mercurial import cmdutil
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, paths, shlib
-from tortoisehg.util.hglib import RepoError
+from tortoisehg.util import hglib, shlib
 
-from tortoisehg.hgtk import hgcmd, gtklib, gdialog
+from tortoisehg.hgtk import gtklib, gdialog
 
-MODE_NORMAL  = 'normal'
-MODE_WORKING = 'working'
+LABELS = { 'add': (_('Select files to add'), _('Add')),
+           'forget': (_('Select files to forget'), _('Forget')),
+           'revert': (_('Select files to revert'), _('Revert')),
+           'remove': (_('Select files to remove'), _('Remove')),}
 
-class QuickOpDialog(gtk.Dialog):
-    'Dialog for performing quick dirstate operations'
+class QuickOpDialog(gdialog.GDialog):
+    """ Dialog for performing quick dirstate operations """
     def __init__(self, command, pats):
-        gtk.Dialog.__init__(self)
-        gtklib.set_tortoise_icon(self, 'hg.ico')
-        gtklib.set_tortoise_keys(self)
-        self.set_resizable(False)
-        self.set_size_request(450, 300)
-        self.set_has_separator(False)
-        self.connect('response', self.dialog_response)
-
-        try:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
-            gtklib.idle_add_single_call(self.destroy)
-            return
+        gdialog.GDialog.__init__(self, resizable=True)
+        self.pats = pats
 
         # Handle rm alias
         if command == 'rm':
             command = 'remove'
-
-        os.chdir(repo.root)
-        self.repo = repo
-        self.set_title(hglib.get_reponame(repo) + ' - hg ' + command)
         self.command = command
 
-        labels = { 'add': (_('Select files to add'), _('Add')),
-                   'forget': (_('Select files to forget'), _('Forget')),
-                   'revert': (_('Select files to revert'), _('Revert')),
-                   'remove': (_('Select files to remove'), _('Remove')),
-                }
+        # show minimize/maximize buttons
+        self.realize()
+        if self.window:
+            self.window.set_decorations(gtk.gdk.DECOR_ALL)
 
-        # add dialog buttons
-        self.gobutton = self.add_button(labels[command][1], gtk.RESPONSE_OK)
-        self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
+    ### Start of Overriding Section ###
 
-        lbl = gtk.Label(labels[command][0])
+    def get_title(self, reponame):
+        return reponame + ' - hg ' + self.command
+
+    def get_icon(self):
+        return 'hg.ico'
+
+    def get_defsize(self):
+        return (450, 300)
+
+    def get_body(self, vbox):
+        os.chdir(self.repo.root)
+
+        # wrap box
+        wrapbox = gtk.VBox()
+        wrapbox.set_border_width(5)
+        vbox.pack_start(wrapbox, True, True)
+        self.wrapbox = wrapbox
+
+        lbl = gtk.Label(LABELS[self.command][0])
         lbl.set_alignment(0, 0)
-        self.vbox.pack_start(lbl, False, False, 8)
+        wrapbox.pack_start(lbl, False, False)
 
         def keypressed(tree, event):
             'Make spacebar toggle selected rows'
@@ -82,7 +82,7 @@ class QuickOpDialog(gtk.Dialog):
         self.filetree.set_reorderable(False)
         if hasattr(self.filetree, 'set_rubber_banding'):
             self.filetree.set_rubber_banding(True)
-        fontlist = repo.ui.config('gtools', 'fontlist', 'MS UI Gothic 9')
+        fontlist = hglib.getfontconfig()['fontlist']
         self.filetree.modify_font(pango.FontDescription(fontlist))
 
         def select_toggle(cell, path):
@@ -105,30 +105,42 @@ class QuickOpDialog(gtk.Dialog):
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         scroller.add(self.filetree)
-        self.vbox.pack_start(scroller, True, True, 8)
+        wrapbox.pack_start(scroller, True, True, 6)
 
         def toggleall(button):
             for row in self.filetree.get_model():
                 row[0] = not row[0]
 
-        hbox = gtk.HBox()
+        # extra box
+        self.extrabox = hbox = gtk.HBox()
+        wrapbox.pack_start(hbox, False, False)
+
+        ## toggle button
         tb = gtk.Button(_('Toggle all selections'))
         tb.connect('pressed', toggleall)
-        self.toggleall = tb
-        hbox.pack_start(tb, False, False, 0)
-        self.vbox.pack_start(hbox, False, False, 2)
+        hbox.pack_start(tb, False, False)
+
+        if self.command == 'revert':
+            ## no backup checkbox
+            chk = gtk.CheckButton(_('Do not save backup files (*.orig)'))
+            hbox.pack_start(chk, False, False, 6)
+            self.nobackup = chk
+
+            ## padding
+            hbox.pack_start(gtk.Label())
 
         types = { 'add' : 'I?',
                   'forget' : 'MAR!C',
                   'revert' : 'MAR!',
                   'remove' : 'MAR!CI?',
                 }
-        filetypes = types[command]
+        filetypes = types[self.command]
 
         try:
-            matcher = cmdutil.match(repo, pats)
-            status = repo.status(match=matcher,
+            matcher = cmdutil.match(self.repo, self.pats)
+            status = self.repo.status(match=matcher,
                                  clean='C' in filetypes,
                                  ignored='I' in filetypes,
                                  unknown='?' in filetypes)
@@ -153,11 +165,11 @@ class QuickOpDialog(gtk.Dialog):
                 fm.append([True, f, hglib.toutf(f), _('unknown')])
         if 'I' in filetypes:
             for f in ignored:
-                if command == 'remove' or f in pats:
+                if self.command == 'remove' or f in self.pats:
                     fm.append([True, f, hglib.toutf(f), _('ignored')])
         if 'C' in filetypes:
             for f in clean:
-                if command == 'remove' or f in pats:
+                if self.command == 'remove' or f in self.pats:
                     fm.append([True, f, hglib.toutf(f), _('clean')])
 
         if not len(fm):
@@ -167,67 +179,35 @@ class QuickOpDialog(gtk.Dialog):
             self.hide()
             return
 
-        # prepare to show
-        self.gobutton.grab_focus()
-        gtklib.idle_add_single_call(self.after_init)
+    def get_buttons(self):
+        return [('go', LABELS[self.command][1], gtk.RESPONSE_OK),
+                ('cancel', gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)]
 
-    def after_init(self):
-        # CmdWidget
-        self.cmd = hgcmd.CmdWidget()
-        self.cmd.show_all()
-        self.cmd.hide()
-        self.vbox.pack_start(self.cmd, False, False, 6)
+    def get_default_button(self):
+        return 'go'
 
-        # abort button
-        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.abortbtn.hide()
+    def get_action_map(self):
+        return {gtk.RESPONSE_OK: self.operation}
 
-    def abort(self):
-        self.cmd.stop()
-        self.cmd.show_log()
-        self.switch_to(MODE_NORMAL, cmd=False)
+    def switch_to(self, normal, working, cmd):
+        self.wrapbox.set_sensitive(normal)
+        self.buttons['go'].set_property('visible', normal)
+        self.buttons['cancel'].set_property('visible', normal)
+        if normal:
+            self.buttons['cancel'].grab_focus()
 
-    def dialog_response(self, dialog, response_id):
-        # go button
-        if response_id == gtk.RESPONSE_OK:
-            self.operation(self.repo)
-        # Close button or dialog closing by the user
-        elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if hasattr(self, 'cmd') and self.cmd.is_alive():
-                ret = gdialog.Confirm(_('Confirm Abort'), [], self,
-                                      _('Do you want to abort?')).run()
-                if ret == gtk.RESPONSE_YES:
-                    self.abort()
-            else:
-                return # close dialog
-        # Abort button
-        elif response_id == gtk.RESPONSE_CANCEL:
-            self.abort()
+    def command_done(self, returncode, useraborted, list):
+        if returncode == 0:
+            shlib.shell_notify(list)
+            self.cmd.set_result(_('Successfully'), style='ok')
+        elif useraborted:
+            self.cmd.set_result(_('Canceled'), style='error')
         else:
-            raise _('unexpected response id: %s') % response_id
+            self.cmd.set_result(_('Failed'), style='error')
 
-        self.run() # don't close dialog
+    ### End of Overriding Section ###
 
-    def switch_to(self, mode, cmd=True):
-        if mode == MODE_NORMAL:
-            normal = True
-            self.closebtn.grab_focus()
-        elif mode == MODE_WORKING:
-            normal = False
-            self.abortbtn.grab_focus()
-        else:
-            raise _('unknown mode name: %s') % mode
-        working = not normal
-
-        self.filetree.set_sensitive(normal)
-        self.toggleall.set_sensitive(normal)
-        self.gobutton.set_property('visible', normal)
-        self.closebtn.set_property('visible', normal)
-        if cmd:
-            self.cmd.set_property('visible', working)
-        self.abortbtn.set_property('visible', working)
-
-    def operation(self, repo):
+    def operation(self):
         fm = self.filetree.get_model()
         deleting = self.command == 'remove'
         list, dellist = [], []
@@ -253,21 +233,13 @@ class QuickOpDialog(gtk.Dialog):
             gtklib.idle_add_single_call(self.response, gtk.RESPONSE_CLOSE)
             return
 
+        # prepare command line
         cmdline = ['hg', self.command, '--verbose'] + list
+        if hasattr(self, 'nobackup') and self.nobackup.get_active():
+            cmdline.append('--no-backup')
 
-        def cmd_done(returncode, useraborted):
-            self.switch_to(MODE_NORMAL, cmd=False)
-            if returncode == 0:
-                shlib.shell_notify(list)
-                if not self.cmd.is_show_log():
-                    self.response(gtk.RESPONSE_CLOSE)
-                self.cmd.set_result(_('Successfully'), style='ok')
-            elif useraborted:
-                self.cmd.set_result(_('Canceled'), style='error')
-            else:
-                self.cmd.set_result(_('Failed'), style='error')
-        self.switch_to(MODE_WORKING)
-        self.cmd.execute(cmdline, cmd_done)
+        # execute command
+        self.execute_command(cmdline, list)
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)

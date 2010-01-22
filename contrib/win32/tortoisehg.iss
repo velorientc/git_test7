@@ -6,7 +6,7 @@
 #endif
 
 [Setup]
-AppCopyright=Copyright 2005-2009 Matt Mackall and others
+AppCopyright=Copyright 2008-2010 Steve Borho and others
 AppName=TortoiseHg
 AppVerName=TortoiseHg {#VERSION}
 InfoAfterFile=contrib/win32/postinstall.txt
@@ -21,9 +21,9 @@ AppContact=Steve Borho <steve@borho.org>
 OutputBaseFilename=TortoiseHg-{#VERSION}
 DefaultDirName={pf}\TortoiseHg
 SourceDir=..\..
-VersionInfoDescription=Mercurial distributed SCM
-VersionInfoCopyright=Copyright 2005-2009 Matt Mackall and others
-VersionInfoCompany=Matt Mackall and others
+VersionInfoDescription=TortoiseHg (with Mercurial)
+VersionInfoCopyright=Copyright 2008-2010 Steve Borho and others
+VersionInfoCompany=Steve Borho and others
 InternalCompressLevel=max
 SolidCompression=true
 SetupIconFile=icons\thg_logo.ico
@@ -50,19 +50,17 @@ Name: hgbook; Description: The book 'Mercurial: The Definitive Guide' (PDF); Typ
 Name: shell; Description: Shell integration (overlay icons, context menu) [admin required]; Types: full; Flags: restart; Check: ShellInstallPossible
 
 [Files]
-Source: ..\build-hg\contrib\mercurial.el; DestDir: {app}/contrib
-Source: ..\build-hg\contrib\vim\*.*; DestDir: {app}/contrib/vim
-Source: ..\build-hg\contrib\zsh_completion; DestDir: {app}/contrib
-Source: ..\build-hg\contrib\hgk; DestDir: {app}/contrib
-Source: ..\build-hg\contrib\win32\ReadMe.html; DestDir: {app}; Flags: isreadme
-Source: ..\build-hg\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
-Source: ..\build-hg\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
-Source: ..\build-hg\help\*.*; DestDir: {app}\help
+Source: ..\build-hg\mercurial\help\*.txt; DestDir: {app}\help
+Source: ..\build-hg\mercurial\templates\*.*; DestDir: {app}\templates; Flags: recursesubdirs createallsubdirs
+Source: ..\build-hg\mercurial\locale\*.*; DestDir: {app}\locale; Flags: recursesubdirs createallsubdirs
+Source: ..\build-hg\contrib\xml.rnc; DestDir: {app}/contrib
 Source: ..\build-hg\i18n\*.*; DestDir: {app}\i18n
 Source: ..\build-hg\doc\*.html; DestDir: {app}\docs; Flags: ignoreversion; Components: help
 Source: ..\build-hg\doc\style.css; DestDir: {app}\docs; Flags: ignoreversion; Components: help
 Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsourcedoesntexist uninsneveruninstall
-Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
+Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini
+Source: contrib\win32\mergepatterns.ini; DestDir: {app}
+Source: contrib\mergetools.ini; DestDir: {app}
 Source: contrib\win32\mercurialuser.ini; DestDir: {%USERPROFILE}; DestName: Mercurial.ini; AfterInstall: FileExpandStringEx('{%USERPROFILE}\Mercurial.ini'); Flags: onlyifdoesntexist 
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
 Source: ..\contrib\*.exe; DestDir: {app}
@@ -82,6 +80,7 @@ Source: i18n\*.*; DestDir: {app}\i18n; Flags: recursesubdirs createallsubdirs
 Source: win32\*.reg; DestDir: {app}\cmenu_i18n
 Source: COPYING.txt; DestDir: {app}; DestName: Copying.txt
 Source: icons\thg_logo.ico; DestDir: {app}
+Source: ..\contrib\diff-scripts\*.*; DestDir: {app}\diff-scripts
 Source: ..\misc\hgbook.pdf; DestDir: {app}/docs; Flags: ignoreversion; Components: hgbook
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShell.dll; Check: not Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
 Source: ..\misc\ThgShellx86.dll; DestDir: {app}; DestName: ThgShellx86.dll; Check: Is64BitInstallMode; Flags: ignoreversion restartreplace uninsrestartdelete; Components: shell
@@ -229,6 +228,9 @@ begin
   TaskbarMutex := 'thgtaskbar,Global\thgtaskbar';
   tries := 0;
   while (tries < 4) and CheckForMutexes(TaskbarMutex) do begin
+    TaskbarWindow := FindWindowByWindowName('TortoiseHg Overlay Icon Server');
+    if TaskbarWindow <> 0 then
+      SendMessage(TaskbarWindow, wm_Close, 0, 0);
     TaskbarWindow := FindWindowByWindowName('TortoiseHg RPC server');
     if TaskbarWindow <> 0 then
       SendMessage(TaskbarWindow, wm_Close, 0, 0);
