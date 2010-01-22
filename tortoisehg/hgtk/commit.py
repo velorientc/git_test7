@@ -1225,8 +1225,8 @@ class GCommit(GStatus):
             end = start.copy()
             end.forward_line()
             line = buf.get_text(start, end).rstrip('\n\r')
-            if (line_num == 0 and len(line) > sumlen) \
-                              or  len(line) > maxlen:
+            limit = (line_num == 0) and sumlen or maxlen
+            if limit and len(line) > limit:
                 buf.apply_tag_by_name('over', start, end)
 
     def msg_paste_fnames(self, sender):
