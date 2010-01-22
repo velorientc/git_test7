@@ -86,8 +86,11 @@ TortoiseHg
 	or other, or :guilabel:`internal:dump` to leave files in the working
 	directory for manual merging.
 
-:guilabel:`Visual Diff Command:`
-	Specify visual diff tool; must be an extdiff command.
+:guilabel:`Visual Diff Tool:`
+	Specify visual diff tool as described in the [merge-tools] section
+	of your Mercurial configuration files.  If left unspecified,
+	TortoiseHg will use the selected merge tool. Failing that it uses
+	the first applicable tool it finds.
 
 :guilabel:`Skip Diff Window:`
 	Bypass the builtin visual diff dialog and directly use your
@@ -189,12 +192,6 @@ Changelog
 	The number of revisions to read and display in the
 	changelog viewer in a single batch.
 	Default: 500.
-
-:guilabel:`Copy Hash:`
-	Allow the changelog viewer to copy the changeset hash
-	of the currently selected changeset into the clipboard.
-	DEPRECATED, will be removed in a later release.
-	Default: False.
 
 :guilabel:`Dead Branches:`
 	Comma separated list of branch names that should be ignored when
@@ -410,6 +407,16 @@ Diff
 	Ignore changes whose lines are all blank.
 	Default: False.
 
+Removed this release
+====================
+
+:guilabel:`Copy Hash:`
+	Allow the changelog viewer to copy the changeset hash
+	of the currently selected changeset into the clipboard.
+	Default: False.
+
+To copy the hash of a changeset to the clipboard, use the 'Copy Hash'
+context menu option.
 
 Keyboard navigation
 ===================
