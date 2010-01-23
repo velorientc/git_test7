@@ -73,14 +73,19 @@ class ImportDialog(gdialog.GDialog):
         menubtn.add(gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE))
 
         self.menu = gtk.Menu()
-        def append(label, handler=None):
-            item = gtk.MenuItem(label, True)
+        def append(label, handler=None, icon=None):
+            if icon:
+                item = gtk.ImageMenuItem(label)
+                img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
+                item.set_image(img)
+            else:
+                item = gtk.MenuItem(label, True)
             item.set_border_width(1)
             if handler:
                 item.connect('activate', handler)
             self.menu.append(item)
-        append(_('Browse Directory...'), self.dir_clicked)
-        append(_('Import from Clipboard'), self.clip_clicked)
+        append(_('Browse Directory...'), self.dir_clicked, gtk.STOCK_DIRECTORY)
+        append(_('Import from Clipboard'), self.clip_clicked, gtk.STOCK_PASTE)
 
         table.add_row(_('Source:'), self.src_combo, 1,
                       self.files_btn, menubtn, expand=0)
