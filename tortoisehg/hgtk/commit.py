@@ -135,6 +135,7 @@ class GCommit(GStatus):
         self.qnew = False
         self.notify_func = None
         self.patch_text = None
+        self.qheader = None
 
     def get_help_url(self):
         return 'commit.html'
