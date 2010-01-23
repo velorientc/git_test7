@@ -542,11 +542,6 @@ class TreeView(gtk.ScrolledWindow):
 
         self.columns = COLS.split()
 
-        # append columns
-        for cn in self.columns:
-            c = self.tvcolumns[cn]
-            self.treeview.append_column(c)
-
     def set_columns(self, columns):
         if ' '.join(columns) != ' '.join(self.columns):
             for cn in self.columns:
