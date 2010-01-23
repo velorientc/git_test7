@@ -720,12 +720,7 @@ class GLog(gdialog.GWindow):
                 self.graphview.set_property(col + '-column-visible', vis)
             if vis:
                 columns.append(col)
-        try:
-            self.graphview.set_columns(columns)
-        except KeyError:
-            # ignore unknown column names, these could originate from garbeled
-            # persisted data
-            pass
+        self.graphview.set_columns(columns)
 
         self.cmd_set_sensitive('compact-graph', self.graphcol)
         self.cmd_set_sensitive('color-by-branch', self.graphcol)
