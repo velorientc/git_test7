@@ -1906,6 +1906,8 @@ class GLog(gdialog.GDialog):
         self.reload_log()
 
     def refresh_clicked(self, toolbutton, data=None):
+        self.refreshui()
+        self.update_urllist()
         self.reload_log()
         return True
 
