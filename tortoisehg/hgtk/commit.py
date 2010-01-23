@@ -140,6 +140,7 @@ class GCommit(GStatus):
         self.qnew = False
         self.notify_func = None
         self.patch_text = None
+        self.qheader = None
         self.runner = hgcmd.CmdRunner()
         self.mqloaded = bool(extensions.find('mq'))
 
