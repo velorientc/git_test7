@@ -547,9 +547,12 @@ class TreeView(gtk.ScrolledWindow):
                 c = self.tvcolumns[cn]
                 self.treeview.remove_column(c)
             for cn in columns:
-                c = self.tvcolumns[cn]
-                self.treeview.append_column(c)
-                self.columns = columns
+                try:
+                    c = self.tvcolumns[cn]
+                    self.treeview.append_column(c)
+                except KeyError:
+                    continue
+            self.columns = columns
 
     def get_columns(self):
         return self.columns
