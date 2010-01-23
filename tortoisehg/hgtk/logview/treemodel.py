@@ -66,6 +66,7 @@ class TreeModel(gtk.GenericTreeModel):
 
         hglib.invalidaterepo(repo)
 
+        self.longsummary = repo.ui.configbool('tortoisehg', 'longsummary', False)
         self.set_author_color()
         self.hidetags = hglib.gethidetags(repo.ui)
 
@@ -156,7 +157,7 @@ class TreeModel(gtk.GenericTreeModel):
 
             # convert to Unicode for valid string operations
             summary = hglib.tounicode(ctx.description()).replace(u'\0', '')
-            if self.repo.ui.configbool('tortoisehg', 'longsummary'):
+            if self.longsummary:
                 limit = 80
                 lines = summary.splitlines()
                 if lines:
@@ -277,10 +278,7 @@ class TreeModel(gtk.GenericTreeModel):
                 if not k.startswith('authorcolor.'): continue
                 pat = k[12:]
                 self.author_pats.append((re.compile(pat, re.I), v))
-            try:
-                enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor')
-            except error.ConfigError:
-                enabled = False
+            enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor', False)
             if self.author_pats or enabled:
                 self.color_func = self.text_color_author
 
