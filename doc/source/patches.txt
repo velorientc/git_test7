@@ -1,0 +1,128 @@
+*******
+Patches
+*******
+
+.. module:: patches
+	:synopsis: Describe patch operations
+
+Defining a patch
+================
+
+These links are recommended reading for understanding the history and nature
+of patches and how they can be used with Mercurial.
+
+* `The patch management problem <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `Understanding patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `More about patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+
+Pitfalls
+========
+
+The standard patch format cannot describe binary files, renames, copies,
+or permission changes.  If your patch needs to record any of those
+things, you will need to enable **git** patches via::
+
+	[diff]
+	git=True
+
+Mercurial 1.5 improves it's behavior in this regard.  It will warn you
+when git diffs are required, or sometimes upgrade to the git format
+automatically.
+`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_.
+
+Mercurial's patch routines do not deal well with mixed EOLN between
+source files and patches.  The **patch.eol** setting was introduced in
+1.3 to improve this situation::
+
+	[patch]
+	eol = auto #strict, lf, or crlf
+
+The work on the hgeol extension is also improving this area.  Perhaps it
+will be resolved by hg-1.5.
+`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_.
+
+Applying a patch is not a foolproof operation.  If the source file has
+diverged from the file that was used to create the patch, there may be
+conflicts during the patch application.  These are written to a file
+with an .rej extension.  Currently, these rejected changes must be
+manually resolved by the user.
+
+
+Export Patches
+==============
+
+Changeset
+---------
+
+To export a changeset as a patch file, use the changeset context menu of
+the Repository Explorer to select :menuselection:`Export --> Export Patch`.
+You will be asked to provide a filename.
+
+Changeset Ranges
+----------------
+
+Select a range of changesets in the Repository Explorer.  Left click on
+the first (base) changeset, then right click on the last (target)
+changeset.  This opens a special revision range context menu.  From this
+menu you can generate patches, generate a bundle, send emails, or view
+the accumulated changes.
+
+This is a very powerful feature and there is no restriction on the base
+and target changesets you can select.
+
+Email
+-----
+
+To send a changeset as an email, use the changeset context menu of the
+Repository Explorer. :menuselection:`Export --> Email Patch`.  This
+opens the e-mail dialog for this single changeset.
+
+To send a changeset range, use the changeset range selection feature of
+the Repository Explorer and select
+:menuselection:`Email from here to selected...`
+
+Lastly, you can use the :guilabel:`Email` button on the syncbar of the
+Repository Explorer to email all outgoing changes to the selected remote
+repository.
+
+.. note::
+	You must configure
+	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
+	to send patches via email
+
+Cherry Picking
+--------------
+
+Use the changeset range selection feature of the Repository Explorer and
+select :menuselection:`Diff with selected`.  This opens up a status
+viewer showing you the accumulated changes between your base and target
+changesets.
+
+From the status viewer, you can select files and diff hunks just as you
+can in the commit tool, and preview the final result in the
+:guilabel:`Save Preview` tab.  Pressing :guilabel:`Save As` will save
+the selected changes to a patch file.
+
+For even finer cherry-picking, you can highlight a number of diff-hunks
+in the hunk selection pane and hit CTRL-C.  This will copy the
+highlighted (mouse selected, not toggled) hunks to the clipboard.
+
+.. note::
+	Reversing the order of your selection reverses the effect of the
+	patch.
+
+
+Import Patches
+==============
+
+Import dialog
+Pitfall: requires clean working directory state
+Pitfall: hg import can spawn an editor if patch has no header
+
+
+Patch Queues
+============
+
+MQ pane in Repository Explorer, Commit tool.
+
+.. vim: noet ts=4
