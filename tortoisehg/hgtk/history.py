@@ -355,6 +355,9 @@ class GLog(gdialog.GWindow):
                     sensitive=not bool(self.bfile),
                     func=self.add_bundle_clicked, icon=gtk.STOCK_ADD),
                 dict(text='----'),
+                dict(text=_('Configure Paths...'), name='path',
+                    func=self.conf_clicked, icon=gtk.STOCK_PREFERENCES),
+                dict(text='----'),
                 dict(text=_('Use proxy server'), name='use-proxy-server',
                     ascheck=True, func=toggle_proxy),
                 dict(text=_('Force push'), ascheck=True, func=toggle_force),
@@ -1295,7 +1298,7 @@ class GLog(gdialog.GWindow):
         push.connect('clicked', self.push_clicked)
         apply.connect('clicked', self.apply_clicked)
         reject.connect('clicked', self.reject_clicked)
-        conf.connect('clicked', self.conf_clicked, urlcombo)
+        conf.connect('clicked', self.conf_clicked)
         email.connect('clicked', self.email_clicked)
         stop.connect('clicked', self.stop_clicked)
 
@@ -1749,7 +1752,7 @@ class GLog(gdialog.GWindow):
                            _('Please try again after running '
                              'operation is completed'), self).run()
 
-    def conf_clicked(self, toolbutton, combo):
+    def conf_clicked(self, *args):
         newpath = hglib.fromutf(self.pathentry.get_text()).strip()
         for alias, path in self.repo.ui.configitems('paths'):
             if newpath in (path, url.hidepassword(path)):
