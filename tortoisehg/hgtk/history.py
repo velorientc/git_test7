@@ -545,7 +545,7 @@ class GLog(gdialog.GWindow):
             gobject.TYPE_STRING,
             gobject.TYPE_STRING)
 
-        for c in self.graphview.get_columns():
+        for c in self.column_order.split():
             vis, text, prop, col = columns[c]
             model.append([vis, text, prop, col])
 
@@ -711,12 +711,17 @@ class GLog(gdialog.GWindow):
         self.syncbox.set_property('visible', self.show_syncbar)
         self.syncbox.set_no_show_all(True)
 
-        for col in [col for col in DEFAULT_COLS.split() if col != 'graph']:
-            if col in self.showcol:
-                self.graphview.set_property(col+'-column-visible',
-                        self.showcol[col])
+        columns = []
+        for col in [c for c in self.column_order.split()]:
+            if col == 'graph':
+                vis = self.graphcol
+            elif col in self.showcol:
+                vis = self.showcol[col]
+                self.graphview.set_property(col + '-column-visible', vis)
+            if vis:
+                columns.append(col)
         try:
-            self.graphview.set_columns(self.column_order.split())
+            self.graphview.set_columns(columns)
         except KeyError:
             # ignore unknown column names, these could originate from garbeled
             # persisted data
@@ -776,7 +781,7 @@ class GLog(gdialog.GWindow):
             vis = self.graphview.get_property(col+'-column-visible')
             settings['glog-vis-'+col] = vis
         settings['filter-mode'] = self.filtercombo.get_active()
-        settings['column-order'] = ' '.join(self.graphview.get_columns())
+        settings['column-order'] = self.column_order
         return settings
 
     def load_settings(self, settings):
