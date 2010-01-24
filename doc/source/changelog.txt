@@ -16,8 +16,8 @@ the contents of those changes.
 
 	Changelog viewer dialog with main toolbar hidden
 
-New in 0.9, the changelog tool has a menu bar for accessing tool
-functions and for launching other tools.
+The changelog tool has a menu bar for accessing tool functions and for
+launching other tools.
 
 	:guilabel:`Tools`
 		Launch other TortoiseHg tools as separate processes
@@ -35,15 +35,25 @@ The toolbar buttons from left to right:
 
 	:guilabel:`Refresh`
 		Reload the revision history (if you commit in another window, etc)
-	:guilabel:`Synchronize`
-		Opens synchronize tool to communicate changes with other repositories
+	:guilabel:`Reset Marks`
+		Remove 'new', 'incoming', and 'outgoing' revision marks and refresh
 	:guilabel:`Patch Queue`
 		Toggles the display of the MQ pane.  This button is only visible
 		when the MQ extension has been enabled by the user.
+	:guilabel:`Commit`
+		Launch the commit tool in a separate process
+	:guilabel:`Datamine`
+		Launch the data mining tool in a separate process
+	:guilabel:`Recovery`
+		Launch the recovery dialog in a separate process
+	:guilabel:`Web Server`
+		Launch the web server dialog in a separate process
+	:guilabel:`Shelve`
+		Launch the shelve tool in a separate process
 	:guilabel:`Load more`
-		load the next N revisions into the graph
+		Load the next N revisions into the graph
 	:guilabel:`Load all`
-		load all remaining revisions into the graph
+		Load all remaining revisions into the graph
 
 Sync Bar
 ---------
@@ -71,6 +81,8 @@ From left to right...
 	:guilabel:`Pull`
 		Pull incoming changesets from the remote repository, then apply
 		after-pull effect (update, fetch, or rebase).
+	:guilabel:`Import`
+		Open the import dialog to import one or more patches
 	:guilabel:`Outgoing`
 		Determine outgoing changesets that would be pushed to the
 		remote repository.  Outgoing changesets are marked with an 'up'
@@ -170,9 +182,9 @@ the search text of that type, and then hits return in the text entry.
 	:guilabel:`User`
 		Parse the user text as a user / comitter name.
 
-In 0.9.1, the filter entry was given a combo box which stores the
-history of searches made while the dialog was open.  Selecting an item
-from the drop down list will trigger re-enable that filter.
+The filter entry has a combo box which stores the history of searches
+made while the dialog was open.  Selecting an item from the drop down
+list will apply that filter.
 
 Revision Graph Details
 ----------------------
@@ -182,6 +194,28 @@ in your repository history.  This column auto-sizes for as many lines of
 ancestry that are required to visualize the revisions you have loaded.
 The column has an initial hard-limit width to prevent some degenerative
 cases from breaking the viewer, but can be resized after refreshes.
+
+Performance Implications
+------------------------
+
+There are some Repository Explorer features that should probably be
+avoided in large repositories.
+
+* :menuselection:`View -> Color By Branch` 
+	This option requires the log viewer to query the branch name of
+	every revision in order to draw the graph.  It can cause refreshes
+	to be slow.
+
+* :menuselection:`View -> Compact Graph` 
+	This option can cause refresh to be slower than the default setting.
+	Also be aware that enabling this feature makes the graph lines less
+	accurate.  The feature trades merge parent accuracy for horizontal
+	screen space.
+
+* Column :guilabel:`Changes` 
+	This column can be expensive to calculate on large repositories,
+	causing both refreshes and scrolling to be slow.
+
 
 Revision Context Menus
 ----------------------
@@ -271,7 +305,7 @@ operation on revision ranges.
 .. [#rcm4] The strip command will store the stripped revisions in a bundle file
 		that can later be reapplied.
 		See `also <http://mercurial.selenic.com/wiki/EditingHistory>`_.
-.. [#rcm5] :menuselection:`Global Settings --> TortoiseHg --> Visual Diff Command`
+.. [#rcm5] :menuselection:`Global Settings --> TortoiseHg --> Visual Diff Tool`
 .. [#rcm6] Only sensitive if the selected revision is your current working
 		directory parent
 
