@@ -73,9 +73,32 @@ Frequently Asked Questions
 
 	See `ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
 
-*How can I use Qct with TortoiseHg?*
 
-	In 0.9, we have dropped support for external commit tools.  Sorry.
+*How can I use the hg-git extension with TortoiseHg*
+
+	TortoiseHg installers include the dulwich package, so all that is
+	necessary is to clone 
+	`hg-git <http://bitbucket.org/durin42/hg-git/>`_ and enable both
+	the hg-git and bookmarks extensions::
+
+		[extensions]
+		hggit = C:\extensions\hg-git\hggit
+		bookmarks =
+
+	Beware the 'incoming' command appears broken when speaking with git
+	repositories, and 'outgoing' does not show much useful info. So you are
+	restricted to simple push and pull commands (not uncommon for extensions
+	that speak with external revision control tools).
+
+*How can I use the hgsubversion extension with TortoiseHg*
+
+	TortoiseHg installers include the svn Python bindings required by
+	hgsubversion, so all one has to do is clone
+	`hgsubversion <http://bitbucket.org/durin42/hgsubversion/>`_ and then
+	enable it::
+
+		[extensions]
+		hgsubversion = C:\extensions\hgsubversion\hgsubversion
 
 *How can I use tool X as my visual diff tool?*
 
