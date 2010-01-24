@@ -1438,6 +1438,8 @@ class GLog(gdialog.GDialog):
         self.update_postpull()
 
     def update_urllist(self):
+        if self.bfile:
+            return
         urllist = self.urlcombo.get_model()
         urllist.clear()
         for alias, path in self.repo.ui.configitems('paths'):
