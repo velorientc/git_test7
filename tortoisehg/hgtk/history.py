@@ -21,7 +21,8 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
-from tortoisehg.hgtk.logview.treeview import COLS as DEFAULT_COLS
+from tortoisehg.hgtk.logview.treeview import COLS
+DEFAULT_COLS = 'graph msg user age'.split()
 
 from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
@@ -718,7 +719,7 @@ class GLog(gdialog.GWindow):
         for col in [c for c in self.column_order.split()]:
             if col == 'graph':
                 vis = self.graphcol
-            elif col in self.showcol:
+            else:
                 vis = self.showcol[col]
                 self.graphview.set_property(col + '-column-visible', vis)
             if vis:
@@ -775,8 +776,8 @@ class GLog(gdialog.GWindow):
         settings['show-syncbar'] = self.show_syncbar
         settings['graphcol'] = self.graphcol
         settings['compactgraph'] = self.compactgraph
-        for col in [col for col in DEFAULT_COLS.split() if col != 'graph']:
-            vis = self.graphview.get_property(col+'-column-visible')
+        for col in [col for col in COLS.split() if col != 'graph']:
+            vis = self.graphview.get_property(col + '-column-visible')
             settings['glog-vis-'+col] = vis
         settings['filter-mode'] = self.filtercombo.get_active()
         settings['column-order'] = self.column_order
@@ -799,13 +800,12 @@ class GLog(gdialog.GWindow):
         self.graphcol = settings.get('graphcol', True)
         self.compactgraph = settings.get('compactgraph', False)
         self.showcol = {}
-        for col in [col for col in DEFAULT_COLS.split() if col != 'graph']:
-            key = 'glog-vis-'+col
-            if key in settings:
-                self.showcol[col] = settings[key]
+        for col in [col for col in COLS.split() if col != 'graph']:
+            key = 'glog-vis-' + col
+            self.showcol[col] = settings.get(key, col in DEFAULT_COLS)
         self.filter_mode = settings.get('filter-mode', 1)
-        order = settings.get('column-order', DEFAULT_COLS)
-        order_list, def_list = order.split(), DEFAULT_COLS.split()
+        order = settings.get('column-order', COLS)
+        order_list, def_list = order.split(), COLS.split()
         order_len, def_len = len(order_list), len(def_list)
         if order_len != def_len:
             # add newly added columns if exists
