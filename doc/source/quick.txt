@@ -58,10 +58,9 @@ You must then select the :guilabel:`Commit` tab and enter a name in the
 
 If you are not using one of our Windows installers, you will also have
 to configure a visual diff tool.  Type :command:`hgtk userconfig` and on
-the TortoiseHg tab you will find :guilabel:`Visual Diff Command`.  If
-there are no options in the drop-down list, you must enable and
-configure Mercurial's ExtDiff extension and then restart the userconfig
-application.
+the TortoiseHg tab you will find :guilabel:`Visual Diff Tool`.  If
+there are no options in the drop-down list, you must install a diff tool
+that is supported by our mergetools.ini or configure your own tool.
 
 
 Initialize the repository

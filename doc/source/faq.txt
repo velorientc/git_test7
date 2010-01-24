@@ -81,7 +81,7 @@ Frequently Asked Questions
 
 	Since version 0.10, TortoiseHg should autodetect most popular visual
 	diff tools and make them available for selection from the
-	:guilabel:`Visual Diff Command` item in the settings tool.
+	:guilabel:`Visual Diff Tool` item in the settings tool.
 
 *I'm a CLI user, how do I disable the shell extensions (overlay icons and context menus)?*
 
