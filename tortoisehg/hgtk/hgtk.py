@@ -232,7 +232,7 @@ def runcommand(ui, args):
         os.chdir(path)
     if options['fork']:
         cmdoptions['fork'] = True
-    if options['nofork']:
+    if options['nofork'] or options['profile']:
         cmdoptions['nofork'] = True
     path = paths.find_root(os.getcwd())
     if path:
@@ -254,14 +254,59 @@ def runcommand(ui, args):
                     " (.hg not found)"))
 
     cmdoptions['mainapp'] = True
-    try:
-        return func(ui, *args, **cmdoptions)
-    except TypeError, inst:
-        # was this an argument error?
-        tb = traceback.extract_tb(sys.exc_info()[2])
-        if len(tb) != 1: # no
-            raise
-        raise error.ParseError(cmd, _("invalid arguments"))
+    d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
+    return _runcommand(lui, options, cmd, d)
+
+def _runcommand(ui, options, cmd, cmdfunc):
+    def checkargs():
+        try:
+            return cmdfunc()
+        except error.SignatureError:
+            raise error.ParseError(cmd, _("invalid arguments"))
+
+    if options['profile']:
+        format = ui.config('profiling', 'format', default='text')
+
+        if not format in ['text', 'kcachegrind']:
+            ui.warn(_("unrecognized profiling format '%s'"
+                        " - Ignored\n") % format)
+            format = 'text'
+
+        output = ui.config('profiling', 'output')
+
+        if output:
+            path = ui.expandpath(output)
+            ostream = open(path, 'wb')
+        else:
+            ostream = sys.stderr
+
+        try:
+            from mercurial import lsprof
+        except ImportError:
+            raise util.Abort(_(
+                'lsprof not available - install from '
+                'http://codespeak.net/svn/user/arigo/hack/misc/lsprof/'))
+        p = lsprof.Profiler()
+        p.enable(subcalls=True)
+        try:
+            return checkargs()
+        finally:
+            p.disable()
+
+            if format == 'kcachegrind':
+                import lsprofcalltree
+                calltree = lsprofcalltree.KCacheGrind(p)
+                calltree.output(ostream)
+            else:
+                # format == 'text'
+                stats = lsprof.Stats(p.getstats())
+                stats.sort()
+                stats.pprint(top=10, file=ostream, climit=5)
+
+            if output:
+                ostream.close()
+    else:
+        return checkargs()
 
 mainwindow = None
 def thgexit(win):
@@ -680,6 +725,7 @@ globalopts = [
     ('q', 'quiet', None, _('suppress output')),
     ('h', 'help', None, _('display help and exit')),
     ('', 'debugger', None, _('start debugger')),
+    ('', 'profile', None, _('print command execution profile')),
     ('', 'nofork', None, _('do not fork GUI process')),
     ('', 'fork', None, _('always fork GUI process')),
     ('', 'listfile', '', _('read file list from file')),
