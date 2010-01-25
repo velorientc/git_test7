@@ -116,6 +116,7 @@ int DirectoryStatus::read(const std::string& hgroot, const std::string& cwd)
         if (line.size() > 1)
         {
             path = line.c_str() + 1;
+            ::CharLower(const_cast<char*>(path.c_str()));
         }
         path.push_back('/');
 
