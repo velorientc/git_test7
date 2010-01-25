@@ -41,6 +41,9 @@ class ServeDialog(gtk.Window):
         sys.stdout = self
         sys.stderr = self
 
+        # Set a closed attribute to better mimic stderr (issue #891)
+        self.closed = True
+
         # Override mercurial.commands.serve() with our own version
         # that supports being stopped
         commands.table.update(thg_serve_cmd)
