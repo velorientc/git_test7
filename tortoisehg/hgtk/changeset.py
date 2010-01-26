@@ -441,9 +441,9 @@ class ChangeSet(gdialog.GWindow):
                  gtk.STOCK_JUSTIFY_FILL)
         m.append(_('Diff to _local'), self.diff_to_local)
         m.append_sep()
-        m.append(_('_View at Revision'), self.view_file_rev)
-        self.save_menu = m.append(_('_Save at Revision...'),
-                                  self.save_file_rev, gtk.STOCK_SAVE)
+        m.append(_('_View at Revision'), self.view_file_rev, gtk.STOCK_EDIT)
+        self.msave = m.append(_('_Save at Revision...'),
+                              self.save_file_rev, gtk.STOCK_SAVE)
         m.append_sep()
         m.append(_('_File History'), self.file_history, 'menulog.ico')
         self.ann_menu = m.append(_('_Annotate File'), self.ann_file,
@@ -886,7 +886,7 @@ class ChangeSet(gdialog.GWindow):
         except error.LookupError:
             has_filelog = False
         self.ann_menu.set_sensitive(has_filelog)
-        self.save_menu.set_sensitive(has_filelog)
+        self.msave.set_sensitive(has_filelog)
         return True
 
     def thgdiff(self, treeview):
