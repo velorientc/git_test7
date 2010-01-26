@@ -721,17 +721,54 @@ class SlimToolbar(gtk.HBox):
             self.groups[group] = []
         self.groups[group].append(widget)
 
-class MenuItems(object):
+class MenuBuilder(object):
     '''controls creation of menus by ignoring separators at odd places'''
-
     def __init__(self):
         self.reset()
+
+    ### public methods ###
 
     def reset(self):
         self.childs = []
         self.sep = None
 
-    def append(self, child):
+    def append(self, *args, **kargs):
+        """
+        Create a new menu item and append it the end of menu.
+
+        label: a string to be shown as menu label.
+        handler: a function to be connected with 'activate' signal.
+                 Default: None.
+        icon: GKT+ stock item name or TortoiseHg's bundle icon name.
+              Default: None.
+        ascheck: whether enable toggle feature. Default: False.
+        check: toggle state on init. Default: False.
+        sensitive: sensitive state on init. Default: True.
+        args: an argument list for 'handler' parameter.
+              Default: [] (an empty list).
+        """
+        menu = self.create_menuitem(*args, **kargs)
+        self.append_child(menu)
+        return menu
+
+    def append_sep(self):
+        self.append_child(gtk.SeparatorMenuItem())
+
+    def append_submenu(self, label, submenu, icon=None):
+        menu = self.create_menuitem(label, None, icon)
+        menu.set_submenu(submenu)
+        self.append_child(menu)
+
+    def build(self):
+        menu = gtk.Menu()
+        for c in self.childs:
+            menu.append(c)
+        self.reset()
+        return menu
+
+    ### internal method ###
+
+    def append_child(self, child):
         '''appends the child menu item, but ignores odd separators'''
         if isinstance(child, gtk.SeparatorMenuItem):
             if len(self.childs) > 0:
@@ -742,16 +779,21 @@ class MenuItems(object):
                 self.sep = None
             self.childs.append(child)
 
-    def append_sep(self):
-        self.append(gtk.SeparatorMenuItem())
-
-    def create_menu(self):
-        '''creates the menu by ignoring any extra separator'''
-        res = gtk.Menu()
-        for c in self.childs:
-            res.append(c)
-        self.reset()
-        return res
+    def create_menuitem(self, label, handler=None, icon=None, *a, **kargs):
+        if kargs.get('ascheck', False):
+            menu = gtk.CheckMenuItem(label)
+            menu.set_active(kargs.get('check', False))
+        elif icon:
+            menu = gtk.ImageMenuItem(label)
+            menu.set_image(get_icon_image(icon))
+        else:
+            menu = gtk.MenuItem(label, True)
+        if handler:
+            args = kargs.get('args', [])
+            menu.connect('activate', handler, *args)
+        menu.set_sensitive(kargs.get('sensitive', True))
+        menu.set_border_width(1)
+        return menu
 
 def addspellcheck(textview, ui=None):
     lang = None
