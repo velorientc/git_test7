@@ -35,9 +35,10 @@ LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
 all: THgShell.dll
 
 clean:
-    del *.obj *.dll *.exe *.lib *.exp *.manifest *.res
+    del *.obj *.dll *.exe *.lib *.exp *.manifest *.res parentid.h
 
 THgShell.dll: $(OBJECTS_THGSGELL)
+    create-parentid-h.cmd
     rc shellext.rc
     link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
     mt -nologo -manifest $@.manifest -outputresource:"$@;#2"

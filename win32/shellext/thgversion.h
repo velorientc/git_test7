@@ -1,0 +1,3 @@
+#define THG_VERSION_FIRST   0
+#define THG_VERSION_SECOND  9
+#define THG_VERSION_THIRD   3

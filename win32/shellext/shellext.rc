@@ -1,9 +1,24 @@
 #include "windows.h"
+#include "thgversion.h"
+#include "parentid.h"
+
+
+#define TOSTR(x)  #x
+#define TOSTR2(x) TOSTR(x)
+
+#define THG_VERSION_BINARY \
+  THG_VERSION_FIRST, THG_VERSION_SECOND, THG_VERSION_THIRD, 0
+
+#define THG_VERSION_STRING \
+  TOSTR2(THG_VERSION_FIRST) "." \
+  TOSTR2(THG_VERSION_SECOND) "." \
+  TOSTR2(THG_VERSION_THIRD) "-" \
+  TOSTR2(THG_PARENT_ID)
 
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,3,0
- PRODUCTVERSION 0,9,3,0
+ FILEVERSION THG_VERSION_BINARY
+ PRODUCTVERSION THG_VERSION_BINARY
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -21,12 +36,12 @@ BEGIN
             VALUE "Comments", "TortoiseHg Shell Extension"
             VALUE "CompanyName", "TortoiseHg Project"
             VALUE "FileDescription", "TortoiseHg Shell Extension Dynamic Link Library"
-            VALUE "FileVersion", "0, 9, 3, 0"
+            VALUE "FileVersion", THG_VERSION_STRING
             VALUE "InternalName", "shellext"
             VALUE "LegalCopyright", "Copyright (C) 2010"
             VALUE "OriginalFilename", "ThgShell.dll"
             VALUE "ProductName", "TortoiseHg Shell Extension Dynamic Link Library"
-            VALUE "ProductVersion", "0, 9, 3, 0"
+            VALUE "ProductVersion", THG_VERSION_STRING
         END
     END
     BLOCK "VarFileInfo"
