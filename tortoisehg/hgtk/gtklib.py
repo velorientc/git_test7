@@ -124,20 +124,24 @@ def move_treeview_selection(window, treeview, distance=1):
     selection.select_iter(selected)
     treeview.set_cursor(model.get_path(selected))
 
+def get_icon_pixbuf(name, size=gtk.ICON_SIZE_MENU):
+    path = paths.get_tortoise_icon(name)
+    if path:
+        try:
+            w, h = gtk.icon_size_lookup(size)
+            return gtk.gdk.pixbuf_new_from_file_at_size(path, w, h)
+        except:
+            pass
+    return None
+
 def get_icon_image(name):
     if name.startswith('gtk'):
         img = gtk.image_new_from_stock(name, gtk.ICON_SIZE_MENU)
     else:
         img = gtk.Image()
-        path = paths.get_tortoise_icon(name)
-        if not path:
-            return img
-        try:
-            width, height = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)
-            buf = gtk.gdk.pixbuf_new_from_file_at_size(path, width, height)
-            img.set_from_pixbuf(buf)
-        except:
-            pass
+        pixbuf = get_icon_pixbuf(name)
+        if pixbuf:
+            img.set_from_pixbuf(pixbuf)
     return img
 
 class MessageDialog(gtk.Dialog):
