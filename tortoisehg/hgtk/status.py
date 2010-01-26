@@ -1559,21 +1559,17 @@ class GStatus(gdialog.GWindow):
             all.append(file)
             pathmap[file] = p
 
-        def make(label, handler, stats, enabled=True, paths=False):
+        def make(label, func, stats, icon=None, sens=True, paths=False):
             files = []
             for t in stats:
                 files.extend(types[t])
             if not files:
                 return
-            item = gtk.MenuItem(label, True)
+            args = [files]
             if paths:
                 p = [pathmap[f] for f in files]
-                item.connect('activate', handler, files, p)
-            else:
-                item.connect('activate', handler, files)
-            item.set_border_width(1)
-            item.set_sensitive(enabled)
-            menu.append(item)
+                args.append(p)
+            item = menu.append(label, func, icon, args=args, sensitive=sens)
             return files
 
         def vdiff(menuitem, files):
@@ -1640,30 +1636,30 @@ class GStatus(gdialog.GWindow):
             dlg.show_all()
             dlg.set_notify_func(self.ignoremask_updated)
 
-        menu = gtklib.MenuItems()
-        make(_('_Visual Diff'), vdiff, 'MAR!ru')
-        make(_('Edit'), edit, 'MACI?ru')
+        menu = gtklib.MenuBuilder()
+        make(_('_Visual Diff'), vdiff, 'MAR!ru', gtk.STOCK_JUSTIFY_FILL)
+        make(_('Edit'), edit, 'MACI?ru', gtk.STOCK_EDIT)
         make(_('View missing'), viewmissing, 'R!')
-        make(_('View other'), other, 'MAru', self.is_merge())
+        make(_('View other'), other, 'MAru', None, self.is_merge())
         menu.append_sep()
-        make(_('_Revert'), revert, 'MAR!ru')
+        make(_('_Revert'), revert, 'MAR!ru', gtk.STOCK_MEDIA_REWIND)
         menu.append_sep()
-        make(_('L_og'), log, 'MARC!ru')
+        make(_('L_og'), log, 'MARC!ru', 'menulog.ico')
         menu.append_sep()
-        make(_('_Forget'), forget, 'MARC!ru', paths=True)
-        make(_('_Add'), add, 'I?', paths=True)
-        make(_('_Guess Rename...'), guess_rename, '?!')
-        make(_('_Ignore'), ignore, '?')
-        make(_('Remove versioned'), remove, 'C')
-        make(_('_Delete unversioned'), delete, '?I')
+        make(_('_Forget'), forget, 'MARC!ru', gtk.STOCK_CLEAR, paths=True)
+        make(_('_Add'), add, 'I?', gtk.STOCK_ADD, paths=True)
+        make(_('_Guess Rename...'), guess_rename, '?!', 'detect_rename.ico')
+        make(_('_Ignore'), ignore, '?', 'ignore.ico')
+        make(_('Remove versioned'), remove, 'C', 'menudelete.ico')
+        make(_('_Delete unversioned'), delete, '?I', gtk.STOCK_DELETE)
         if len(all) == 1:
             menu.append_sep()
-            make(_('_Copy...'), copy, 'MC')
-            make(_('Rename...'), rename, 'MC')
+            make(_('_Copy...'), copy, 'MC', gtk.STOCK_COPY)
+            make(_('Rename...'), rename, 'MC', 'general.ico')
         menu.append_sep()
-        f = make(_('Restart Merge...'), resolve, 'u')
-        make(_('Mark unresolved'), unmark, 'r')
-        make(_('Mark resolved'), mark, 'u')
+        f = make(_('Restart Merge...'), resolve, 'u', 'menumerge.ico')
+        make(_('Mark unresolved'), unmark, 'r', gtk.STOCK_NO)
+        make(_('Mark resolved'), mark, 'u', gtk.STOCK_YES)
         if f:
             rmenu = gtk.Menu()
             for tool in hglib.mergetools(self.repo.ui):
@@ -1671,14 +1667,13 @@ class GStatus(gdialog.GWindow):
                 item.connect('activate', resolve_with, tool, f)
                 item.set_border_width(1)
                 rmenu.append(item)
-            item = gtk.MenuItem(_('Restart merge with'), True)
-            item.set_submenu(rmenu)
-            menu.append(item)
+            menu.append_submenu(_('Restart merge with'), rmenu,
+                                'menumerge.ico')
 
         for label, func, stats in self.get_custom_menus():
             make(label, func, stats)
 
-        menu = menu.create_menu()
+        menu = menu.build()
         if len(menu.get_children()) > 0:
             menu.show_all()
             menu.popup(None, None, None, 0, 0)
