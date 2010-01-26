@@ -135,22 +135,27 @@ class DataMineDialog(gdialog.GWindow):
         return menu
 
     def grep_context_menu(self):
-        menu = gtk.Menu()
-        menu.append(create_menu(_('di_splay change'), self.cmenu_display))
-        menu.append(create_menu(_('_annotate file'), self.cmenu_annotate))
-        menu.append(create_menu(_('_file history'), self.cmenu_file_log))
-        menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
+        m = gtklib.MenuBuilder()
+        m.append(_('di_splay change'), self.cmenu_display,
+                 'menushowchanged.ico')
+        m.append(_('_annotate file'), self.cmenu_annotate, 'menublame.ico')
+        m.append(_('_file history'), self.cmenu_file_log, 'menulog.ico')
+        m.append(_('_view file at revision'), self.cmenu_view, gtk.STOCK_EDIT)
+        menu = m.build()
         menu.show_all()
         return menu
 
     def annotate_context_menu(self, objs):
-        menu = gtk.Menu()
-        menu.append(create_menu(_('_zoom to change'), self.cmenu_zoom, objs))
-        menu.append(create_menu(_('di_splay change'), self.cmenu_display))
-        menu.append(create_menu(_('_annotate parent'),
-                                self.cmenu_annotate_parent, objs))
-        menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
-        menu.append(create_menu(_('_file history'), self.cmenu_file_log))
+        m = gtklib.MenuBuilder()
+        m.append(_('_zoom to change'), self.cmenu_zoom, gtk.STOCK_ZOOM_IN,
+                 args=[objs])
+        m.append(_('di_splay change'), self.cmenu_display,
+                 'menushowchanged.ico')
+        m.append(_('_annotate parent'), self.cmenu_annotate_parent,
+                 'menublame.ico', args=[objs])
+        m.append(_('_view file at revision'), self.cmenu_view, gtk.STOCK_EDIT)
+        m.append(_('_file history'), self.cmenu_file_log, 'menulog.ico')
+        menu = m.build()
         menu.show_all()
         return menu
 
@@ -852,13 +857,6 @@ class DataMineDialog(gdialog.GWindow):
     def ann_row_act(self, tree, path, column, objs):
         ann_cmenu = self.annotate_context_menu(objs)
         ann_cmenu.get_children()[0].activate()
-
-
-def create_menu(label, callback, *args):
-    menuitem = gtk.MenuItem(label, True)
-    menuitem.connect('activate', callback, *args)
-    menuitem.set_border_width(1)
-    return menuitem
 
 def run(ui, *pats, **opts):
     cmdoptions = {
