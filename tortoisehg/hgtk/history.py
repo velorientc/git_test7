@@ -29,18 +29,6 @@ from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 from tortoisehg.hgtk import statusbar, bookmark, thgimport
 
-def create_menu(label, callback=None):
-    menuitem = gtk.MenuItem(label, True)
-    if callback:
-        menuitem.connect('activate', callback)
-    menuitem.set_border_width(1)
-    return menuitem
-
-def create_submenu(label, menu):
-    m = create_menu(label)
-    m.set_submenu(menu)
-    return m
-
 class FilterBox(gtklib.SlimToolbar):
     'Filter Toolbar for repository log'
 
@@ -965,36 +953,34 @@ class GLog(gdialog.GWindow):
         self.filteropts = opts
 
     def tree_context_menu(self):
-        m = gtklib.MenuItems()
-        m.append(create_menu(_('Visualize Change'), self.vdiff_change))
-        m.append(create_menu(_('Di_splay Change'), self.show_status))
-        m.append(create_menu(_('Diff to local'), self.vdiff_local))
+        m = gtklib.MenuBuilder()
+        m.append(_('Visualize Change'), self.vdiff_change,
+                 gtk.STOCK_JUSTIFY_FILL)
+        m.append(_('Di_splay Change'), self.show_status)
+        m.append(_('Diff to local'), self.vdiff_local)
         m.append_sep()
-        m.append(create_menu(_('_Copy hash'), self.copy_hash))
+        m.append(_('_Copy hash'), self.copy_hash, gtk.STOCK_COPY)
         if self.bfile:
             if self.currevid >= len(self.repo) - self.npreviews:
                 m.append_sep()
-                m.append(create_menu(_('Pull to here'), self.pull_to))
-            menu = m.create_menu()
+                m.append(_('Pull to here'), self.pull_to,
+                         gtk.STOCK_GOTO_BOTTOM)
+            menu = m.build()
             menu.show_all()
             return menu
 
         if self.repo[self.currevid].node() in self.outgoing:
             m.append_sep()
-            m.append(create_menu(_('Push to here'), self.push_to))
+            m.append(_('Push to here'), self.push_to, gtk.STOCK_GOTO_TOP)
         m.append_sep()
-        m.append(create_menu(_('_Update...'), self.checkout))
-        cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
-        m.append(cmenu_merge)
-        cmenu_backout = create_menu(_('Backout...'), self.backout_rev)
-        m.append(cmenu_backout)
-        m.append(create_menu(_('_Revert'), self.revert))
+        m.append(_('_Update...'), self.checkout, 'menucheckout.ico')
+        mmerge = m.append(_('_Merge with...'), self.domerge, 'menumerge.ico')
+        mbackout = m.append(_('Backout...'), self.backout_rev, gtk.STOCK_UNDO)
+        m.append(_('_Revert'), self.revert, gtk.STOCK_MEDIA_REWIND)
         m.append_sep()
-        m.append(create_submenu(_('Export'), 
-                                self.export_context_menu()))
+        m.append_submenu(_('Export'), self.export_context_menu(), gtk.STOCK_GO_FORWARD)
         m.append_sep()
-        m.append(create_submenu(_('Tag'),
-                                self.tags_context_menu()))
+        m.append_submenu(_('Tag'), self.tags_context_menu())
         m.append_sep()
 
         # disable/enable menus as required
@@ -1008,79 +994,77 @@ class GLog(gdialog.GWindow):
             actx = cctx.ancestor(pctx)
             can_merge = actx != pctx or pctx.branch() != cctx.branch()
             can_backout = actx == cctx
-        cmenu_merge.set_sensitive(can_merge)
-        cmenu_backout.set_sensitive(can_backout)
+        mmerge.set_sensitive(can_merge)
+        mbackout.set_sensitive(can_backout)
 
         # need mq extension for strip command
         if 'mq' in self.exs:
-            m.append(create_submenu(_('Mercurial Queues'),
-                                self.mq_context_menu()))
+            m.append_submenu(_('Mercurial Queues'), self.mq_context_menu(),
+                             'menupatch.ico')
 
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
-            m.append(create_menu(_('Transp_lant to local'),
-                     self.transplant_rev))
+            m.append(_('Transp_lant to local'), self.transplant_rev,
+                     gtk.STOCK_CONVERT)
 
         m.append_sep()
-        m.append(create_submenu(_('Bisect'),
-                                self.bisect_context_menu()))
-        menu = m.create_menu()
+        m.append_submenu(_('Bisect'), self.bisect_context_menu(),
+                         gtk.STOCK_FIND)
+        menu = m.build()
         menu.show_all()
         return menu
 
     def export_context_menu(self):
-        m = gtklib.MenuItems() 
-        m.append(create_menu(_('_Export Patch...'), self.export_patch))
-        m.append(create_menu(_('E_mail Patch...'), self.email_patch))
-        m.append(create_menu(_('_Bundle rev:tip...'), self.bundle_rev_to_tip))
-        m.append(create_menu(_('_Archive...'), self.archive))
-        return m.create_menu()
+        m = gtklib.MenuBuilder() 
+        m.append(_('_Export Patch...'), self.export_patch, 'menupatch.ico')
+        m.append(_('E_mail Patch...'), self.email_patch, gtk.STOCK_GOTO_LAST)
+        m.append(_('_Bundle rev:tip...'), self.bundle_rev_to_tip,
+                 'menurelocate.ico')
+        m.append(_('_Archive...'), self.archive, gtk.STOCK_SAVE)
+        return m.build()
 
     def tags_context_menu(self):
-        m = gtklib.MenuItems() 
-        m.append(create_menu(_('Add/Remove _Tag...'), self.add_tag))
+        m = gtklib.MenuBuilder() 
+        m.append(_('Add/Remove _Tag...'), self.add_tag)
         if 'bookmarks' in self.exs:
-            m.append(create_menu(_('Add/Move/Remove B_ookmark...'), 
-                                 self.add_bookmark))
-            m.append(create_menu(_('Rename Bookmark...'), 
-                                 self.rename_bookmark))
+            m.append(_('Add/Move/Remove B_ookmark...'), self.add_bookmark)
+            m.append(_('Rename Bookmark...'), self.rename_bookmark)
             if self.repo.ui.configbool('bookmarks', 'track.current'):
-                m.append(create_menu(_('Set Current Bookmark...'), 
-                                 self.current_bookmark))
-        return m.create_menu()
+                m.append(_('Set Current Bookmark...'), self.current_bookmark)
+        return m.build()
 
     def mq_context_menu(self):
-        m = gtklib.MenuItems() 
-        cmenu_qimport = create_menu(_('Import Revision to MQ'), self.qimport_rev)
-        cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
+        m = gtklib.MenuBuilder() 
+        mqimport = m.append(_('Import Revision to MQ'), self.qimport_rev,
+                            'menuimport.ico')
+        mstrip = m.append(_('Strip Revision...'), self.strip_rev,
+                          'menudelete.ico')
+        m.append_sep()
 
         try:
             ctx = self.repo[self.currevid]
             qbase = self.repo['qbase']
             actx = ctx.ancestor(qbase)
             if self.repo['qparent'] == ctx:
-                cmenu_qimport.set_sensitive(True)
-                cmenu_strip.set_sensitive(False)
+                mqimport.set_sensitive(True)
+                mstrip.set_sensitive(False)
             elif actx == qbase or actx == ctx:
                 # we're in the mq revision range or the mq
                 # is a descendant of us
-                cmenu_qimport.set_sensitive(False)
-                cmenu_strip.set_sensitive(False)
+                mqimport.set_sensitive(False)
+                mstrip.set_sensitive(False)
         except:
             pass
 
-        m.append_sep()
-        m.append(cmenu_qimport)
-        m.append(cmenu_strip)
-        return m.create_menu()
+        return m.build()
 
     def bisect_context_menu(self):
-        m = gtklib.MenuItems() 
-        m.append(create_menu(_('Reset'), self.bisect_reset))
-        m.append(create_menu(_('Mark as good'), self.bisect_good))
-        m.append(create_menu(_('Mark as bad'), self.bisect_bad))
-        m.append(create_menu(_('Skip testing'), self.bisect_skip))
-        return m.create_menu()
+        m = gtklib.MenuBuilder() 
+        m.append(_('Reset'), self.bisect_reset, gtk.STOCK_CLEAR)
+        m.append(_('Mark as good'), self.bisect_good, gtk.STOCK_YES)
+        m.append(_('Mark as bad'), self.bisect_bad, gtk.STOCK_NO)
+        m.append(_('Skip testing'), self.bisect_skip, gtk.STOCK_MEDIA_FORWARD)
+        return m.build()
 
     def restore_single_sel(self, widget, *args):
         self.tree.get_selection().set_mode(gtk.SELECTION_SINGLE)
@@ -1089,26 +1073,25 @@ class GLog(gdialog.GWindow):
         self.revrange = None
 
     def tree_diff_context_menu(self):
-        m = gtklib.MenuItems()
-        m.append(create_menu(_('_Diff with selected'), self.diff_revs))
-        m.append(create_menu(_('Visual Diff with selected'),
-                 self.vdiff_selected))
+        m = gtklib.MenuBuilder()
+        m.append(_('_Diff with selected'), self.diff_revs)
+        m.append(_('Visual Diff with selected'), self.vdiff_selected,
+                 gtk.STOCK_JUSTIFY_FILL)
         if self.bfile:
-            menu = m.create_menu()
+            menu = m.build()
             menu.connect_after('selection-done', self.restore_single_sel)
             menu.show_all()
             return menu
 
         m.append_sep()
-        m.append(create_menu(_('Email from here to selected...'),
-                 self.email_revs))
-        m.append(create_menu(_('Bundle from here to selected...'),
-                 self.bundle_revs))
-        m.append(create_menu(_('Export Patches from here to selected...'),
-                 self.export_revs))
+        m.append(_('Email from here to selected...'), self.email_revs,
+                 gtk.STOCK_GOTO_LAST)
+        m.append(_('Bundle from here to selected...'), self.bundle_revs,
+                 'menurelocate.ico')
+        m.append(_('Export Patches from here to selected...'),
+                 self.export_revs, gtk.STOCK_GO_FORWARD)
         m.append_sep()
-        cmenu_merge = create_menu(_('_Merge with...'), self.domerge)
-        m.append(cmenu_merge)
+        mmerge = m.append(_('_Merge with...'), self.domerge, 'menumerge.ico')
         m.append_sep()
         
         # disable/enable menus as required
@@ -1119,28 +1102,28 @@ class GLog(gdialog.GWindow):
             rev0, rev1 = self.revrange
             c0, c1 = self.repo[rev0], self.repo[rev1]
             can_merge = c0.branch() != c1.branch() or c0.ancestor(c1) != c1
-        cmenu_merge.set_sensitive(can_merge)
+        mmerge.set_sensitive(can_merge)
 
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
-            m.append(create_menu(_('Transplant Revision range to local'),
-                     self.transplant_revs))
+            m.append(_('Transplant Revision range to local'),
+                     self.transplant_revs, gtk.STOCK_CONVERT)
 
         # need rebase extension for rebase command
         if 'rebase' in self.exs:
-            m.append(create_menu(_('Rebase on top of selected'),
-                     self.rebase_selected))
+            m.append(_('Rebase on top of selected'), self.rebase_selected,
+                     gtk.STOCK_CUT)
         
         # need MQ extension for qimport command
         if 'mq' in self.exs:
-            m.append(create_menu(_('Import from here to selected to MQ'),
-                     self.qimport_revs))
+            m.append(_('Import from here to selected to MQ'),
+                     self.qimport_revs, 'menuimport.ico')
 
         m.append_sep()
-        m.append(create_menu(_('Select common ancestor revision'),
-            self.select_common_ancestor))
+        m.append(_('Select common ancestor revision'),
+                 self.select_common_ancestor, gtk.STOCK_JUMP_TO)
 
-        menu = m.create_menu()
+        menu = m.build()
         menu.connect_after('selection-done', self.restore_single_sel)
         menu.show_all()
         return menu
