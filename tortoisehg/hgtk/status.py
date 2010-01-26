@@ -1519,10 +1519,12 @@ class GStatus(gdialog.GWindow):
         '''
         if event.button != 3:
             return False
-        
+
         clicked_row = treeview.get_path_at_pos(int(event.x),
                                                int(event.y))
-        
+        if not clicked_row:
+            return False
+
         selection = treeview.get_selection()
         selected_rows = selection.get_selected_rows()[1]
 
