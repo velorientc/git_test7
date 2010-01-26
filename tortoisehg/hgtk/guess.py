@@ -214,7 +214,7 @@ class DetectRenameDialog(gtk.Window):
         self.acceptbtn.connect('pressed', lambda b: self.accept_match())
 
         self.unktree.get_selection().connect('changed', self.unknown_sel_change)
-        self.cantree.connect('row-activated', lambda b: self.accept_match())
+        self.cantree.connect('row-activated', lambda t,p,c: self.accept_match())
         self.cantree.get_selection().connect('changed', self.show_diff)
         self.connect('delete-event', lambda *a: self.save_settings())
         gtklib.idle_add_single_call(self.refresh)
