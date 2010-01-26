@@ -733,7 +733,7 @@ class GCommit(GStatus):
         if self.is_merge():
             return ()
         else:
-            return [(_('_Commit'), commit, 'MARS'),]
+            return [(_('_Commit'), commit, 'MARS', gtk.STOCK_OK),]
 
     def delete(self, window, event):
         if not self.should_live():
