@@ -1184,18 +1184,13 @@ class GCommit(GStatus):
         self.commit_clicked(None)
 
     def msg_add_to_popup(self, textview, menu):
-        menu_items = (('----', None),
-                      (_('Paste _Filenames'), self.msg_paste_fnames),
-                      (_('App_ly Format'), self.msg_word_wrap),
-                      (_('C_onfigure Format'), self.msg_config))
-        for label, handler in menu_items:
-            if label == '----':
-                menuitem = gtk.SeparatorMenuItem()
-            else:
-                menuitem = gtk.MenuItem(label)
-            if handler:
-                menuitem.connect('activate', handler)
-            menu.append(menuitem)
+        def add(label, handler, icon):
+            item = gtklib.create_menuitem(label, handler, icon)
+            menu.append(item)
+        menu.append(gtk.SeparatorMenuItem())
+        add(_('Paste _Filenames'), self.msg_paste_fnames, gtk.STOCK_PASTE)
+        add(_('App_ly Format'), self.msg_word_wrap, gtk.STOCK_APPLY)
+        add(_('C_onfigure Format...'), self.msg_config, gtk.STOCK_PREFERENCES)
         menu.show_all()
 
     def get_lengths(self, noexcept=True):
