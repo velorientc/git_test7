@@ -712,6 +712,36 @@ class SlimToolbar(gtk.HBox):
             self.groups[group] = []
         self.groups[group].append(widget)
 
+def create_menuitem(label, handler=None, icon=None, *args, **kargs):
+    """
+    Create a new menu item and append it the end of menu.
+
+    label: a string to be shown as menu label.
+    handler: a function to be connected with 'activate' signal.
+             Default: None.
+    icon: GKT+ stock item name or TortoiseHg's bundle icon name.
+          Default: None.
+    ascheck: whether enable toggle feature. Default: False.
+    check: toggle state on init. Default: False.
+    sensitive: sensitive state on init. Default: True.
+    args: an argument list for 'handler' parameter.
+          Default: [] (an empty list).
+    """
+    if kargs.get('ascheck', False):
+        menu = gtk.CheckMenuItem(label)
+        menu.set_active(kargs.get('check', False))
+    elif icon:
+        menu = gtk.ImageMenuItem(label)
+        menu.set_image(get_icon_image(icon))
+    else:
+        menu = gtk.MenuItem(label, True)
+    if handler:
+        args = kargs.get('args', [])
+        menu.connect('activate', handler, *args)
+    menu.set_sensitive(kargs.get('sensitive', True))
+    menu.set_border_width(1)
+    return menu
+
 class MenuBuilder(object):
     '''controls creation of menus by ignoring separators at odd places'''
     def __init__(self):
@@ -724,21 +754,7 @@ class MenuBuilder(object):
         self.sep = None
 
     def append(self, *args, **kargs):
-        """
-        Create a new menu item and append it the end of menu.
-
-        label: a string to be shown as menu label.
-        handler: a function to be connected with 'activate' signal.
-                 Default: None.
-        icon: GKT+ stock item name or TortoiseHg's bundle icon name.
-              Default: None.
-        ascheck: whether enable toggle feature. Default: False.
-        check: toggle state on init. Default: False.
-        sensitive: sensitive state on init. Default: True.
-        args: an argument list for 'handler' parameter.
-              Default: [] (an empty list).
-        """
-        menu = self.create_menuitem(*args, **kargs)
+        menu = create_menuitem(*args, **kargs)
         self.append_child(menu)
         return menu
 
@@ -746,7 +762,7 @@ class MenuBuilder(object):
         self.append_child(gtk.SeparatorMenuItem())
 
     def append_submenu(self, label, submenu, icon=None):
-        menu = self.create_menuitem(label, None, icon)
+        menu = create_menuitem(label, None, icon)
         menu.set_submenu(submenu)
         self.append_child(menu)
 
@@ -769,22 +785,6 @@ class MenuBuilder(object):
                 self.childs.append(self.sep)
                 self.sep = None
             self.childs.append(child)
-
-    def create_menuitem(self, label, handler=None, icon=None, *a, **kargs):
-        if kargs.get('ascheck', False):
-            menu = gtk.CheckMenuItem(label)
-            menu.set_active(kargs.get('check', False))
-        elif icon:
-            menu = gtk.ImageMenuItem(label)
-            menu.set_image(get_icon_image(icon))
-        else:
-            menu = gtk.MenuItem(label, True)
-        if handler:
-            args = kargs.get('args', [])
-            menu.connect('activate', handler, *args)
-        menu.set_sensitive(kargs.get('sensitive', True))
-        menu.set_border_width(1)
-        return menu
 
 def addspellcheck(textview, ui=None):
     lang = None
