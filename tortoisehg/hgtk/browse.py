@@ -112,14 +112,10 @@ class BrowsePane(gtk.TreeView):
         col = gtk.TreeViewColumn(_('status'))
         self.append_column(col)
 
-        iconw, iconh = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
-        def packpixmap(ico, id):
-            iconpath = paths.get_tortoise_icon(ico)
-            if iconpath == None:
-                raise (_("could not open icon file '%s' (check install)") % ico)
-            pm = gtk.gdk.pixbuf_new_from_file_at_size(iconpath, iconw, iconh)
+        def packpixmap(name, id):
+            pixbuf = gtklib.get_icon_pixbuf(name)
             cell = gtk.CellRendererPixbuf()
-            cell.set_property('pixbuf', pm)
+            cell.set_property('pixbuf', pixbuf)
             col.pack_start(cell, expand=False)
             col.add_attribute(cell, 'visible', id)
 
