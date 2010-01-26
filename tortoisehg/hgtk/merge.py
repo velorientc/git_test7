@@ -86,6 +86,11 @@ class MergeDialog(gdialog.GDialog):
         self.localframe = info
         self.localrev = str(info.get_data('revnum'))
 
+        discard = gtk.CheckButton(_('Discard all changes from merge target '
+                                    '(other) revision'))
+        self.discard = discard
+        self.vbox.pack_start(discard, False, False)
+
         vlist = gtk.ListStore(str,  # tool name
                               bool) # separator
         combo = gtk.ComboBoxEntry(vlist, 0)
@@ -112,6 +117,7 @@ class MergeDialog(gdialog.GDialog):
         if len(self.repo.parents()) == 2:
             self.mergetool.set_sensitive(False)
             self.mergelabel.set_sensitive(False)
+            self.discard.set_sensitive(False)
             self.buttons['merge'].set_sensitive(False)
             self.buttons['commit'].set_sensitive(True)
             self.buttons['undo'].set_sensitive(True)
@@ -137,6 +143,7 @@ class MergeDialog(gdialog.GDialog):
         self.otherframe.set_sensitive(normal)
         self.localframe.set_sensitive(normal)
         self.mergetool.set_property('visible', normal)
+        self.discard.set_property('visible', normal)
         self.mergelabel.set_property('visible', normal)
 
         self.buttons['merge'].set_property('visible', normal)
@@ -170,6 +177,7 @@ class MergeDialog(gdialog.GDialog):
         else:
             raise _('unexpected type: %s') % type
 
+        self.discard.set_sensitive(merged)
         self.mergetool.set_sensitive(merged)
         self.mergelabel.set_sensitive(merged)
         self.buttons['merge'].set_sensitive(merged)
@@ -190,12 +198,22 @@ class MergeDialog(gdialog.GDialog):
     ### End of Overriding Section ###
 
     def domerge(self):
-        tool = hglib.fromutf(self.mergetool.child.get_text())
-        if tool:
-            cmdline = ['hg', '--config', 'ui.merge=%s' % tool]
+        if self.discard.get_active():
+            c = self.repo[None]
+            if c.modified() or c.added() or c.removed():
+                gdialog.Prompt(_('Cannot merge'),
+                               _('Uncommitted local changes'), self).run()
+                return
+            # '.' is safer than self.localrev, in case the user has
+            # pulled a fast one on us and updated from the CLI
+            cmdline = ['hg', 'debugsetparents', '.', self.otherrev]
         else:
-            cmdline = ['hg']
-        cmdline.extend(['merge', '--rev', self.otherrev])
+            tool = hglib.fromutf(self.mergetool.child.get_text())
+            if tool:
+                cmdline = ['hg', '--config', 'ui.merge=%s' % tool]
+            else:
+                cmdline = ['hg']
+            cmdline.extend(['merge', '--rev', self.otherrev])
         self.execute_command(cmdline, 'merge')
 
     def docommit(self):
