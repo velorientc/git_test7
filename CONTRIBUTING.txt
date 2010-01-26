@@ -15,3 +15,8 @@ application is still reasonably usable with the base library versions listed
 below.
 
 PyGtk: 2.10
+
+=== Python version ===
+
+TortoiseHg needs to run on Python 2.4, to stay consistent with Mercurial
+itself.

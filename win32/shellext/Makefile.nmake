@@ -3,12 +3,14 @@ OBJECTS_DIRSTATE = TortoiseUtils.obj \
         Direntry.obj \
         Directory.obj \
         Winstat.obj \
+        RegistryConfig.obj \
         ThgDebug.obj
 
 OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         InitStatus.obj \
         CShellExtCMenu.obj \
         CShellExtOverlay.obj \
+        TortoiseIconBitmap.obj \
         IconBitmapUtils.obj \
         Registry.obj \
         ShellExt.obj \
@@ -21,6 +23,10 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Thgstatus.obj \
         QueryDirstate.obj
 
+OBJECTS_TERMINATE = Thgstatus.obj \
+        RegistryConfig.obj \
+        ThgDebug.obj
+
 LIBS    = shlwapi.lib gdiplus.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
 DEFFILE = ShellExt.def
 
@@ -30,9 +36,10 @@ CPPFLAGS         = /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG
 BASE_LDFLAGS     = /nologo /INCREMENTAL:NO /MANIFEST $(LIBS)
 LDFLAGS_THGSHELL = $(BASE_LDFLAGS) /DLL /DEF:$(DEFFILE)
 LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
+LDFLAGS_TERMINATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
 
 
-all: THgShell.dll
+all: THgShell.dll terminate.exe
 
 clean:
     del *.obj *.dll *.exe *.lib *.exp *.manifest *.res parentid.h
@@ -45,4 +52,8 @@ THgShell.dll: $(OBJECTS_THGSGELL)
 
 dirstate.exe: dirstate.obj $(OBJECTS_DIRSTATE)
     link /OUT:$@ $(LDFLAGS_DIRSTATE) $**
+    mt -nologo -manifest $@.manifest -outputresource:"$@;#1"
+
+terminate.exe: terminate.obj $(OBJECTS_TERMINATE)
+    link /OUT:$@ $(LDFLAGS_TERMINATE) $**
     mt -nologo -manifest $@.manifest -outputresource:"$@;#1"
