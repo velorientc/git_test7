@@ -65,6 +65,7 @@ Source: {app}\Mercurial.ini; DestDir: {app}\backup; Flags: external skipifsource
 Source: contrib\win32\mercurial.ini; DestDir: {app}; DestName: Mercurial.ini; AfterInstall: FileExpandString('{app}\Mercurial.ini')
 Source: contrib\win32\mercurialuser.ini; DestDir: {%USERPROFILE}; DestName: Mercurial.ini; AfterInstall: FileExpandStringEx('{%USERPROFILE}\Mercurial.ini'); Flags: onlyifdoesntexist 
 Source: ReleaseNotes.txt; DestDir: {app}; DestName: ReleaseNotes.txt
+Source: ..\extension-versions.txt; DestDir: {app}/contrib
 Source: ..\contrib\*.exe; DestDir: {app}
 Source: ..\contrib\*.dll; DestDir: {app}
 Source: ..\contrib\TortoiseOverlays\*.*; DestDir: {app}/TortoiseOverlays
