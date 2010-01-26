@@ -998,17 +998,10 @@ class ChangeSet(gdialog.GWindow):
         shlib.shell_notify([self.repo.wjoin(self.curfile)])
 
     def add_to_popup(self, textview, menu):
-        menu_items = (('----', None),
-                      (_('Toggle _Wordwrap'), self.toggle_wordwrap),
-                     )
-        for label, handler in menu_items:
-            if label == '----':
-                menuitem = gtk.SeparatorMenuItem()
-            else:
-                menuitem = gtk.MenuItem(label)
-            if handler:
-                menuitem.connect('activate', handler)
-            menu.append(menuitem)
+        menu.append(gtk.SeparatorMenuItem())
+        menu.append(gtklib.create_menuitem(_('Toggle _Wordwrap'),
+                                           self.toggle_wordwrap,
+                                           gtk.STOCK_JUSTIFY_LEFT))
         menu.show_all()
 
     def toggle_wordwrap(self, sender):
