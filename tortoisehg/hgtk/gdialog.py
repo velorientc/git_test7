@@ -512,36 +512,18 @@ class GWindow(gtk.Window):
            ]
             menubar = gtk.MenuBar()
             for title, items in allmenus:
-                m_items = gtklib.MenuItems()
+                m_items = gtklib.MenuBuilder()
                 for d in items:
                     text = d['text']
-                    name = d.get('name')
-                    func = d.get('func')
-                    ascheck = d.get('ascheck', False)
-                    args = d.get('args', [])
-                    icon = d.get('icon')
-                    check = d.get('check', False)
-                    sensitive = d.get('sensitive', None)
                     if text == '----':
-                        item = gtk.SeparatorMenuItem()
-                    else:
-                        if ascheck:
-                            item = gtk.CheckMenuItem(text)
-                            item.set_active(check)
-                        elif icon:
-                            item = gtk.ImageMenuItem(text)
-                            img = self.icon_from_name(icon)
-                            item.set_image(img)
-                        else:
-                            item = gtk.MenuItem(text)
-                        if sensitive is not None:
-                            item.set_sensitive(sensitive)
-                        item.connect('activate', func, *args)
-                        if name:
-                            self.menuitems[name] = item
-                    m_items.append(item)
+                        m_items.append_sep()
+                        continue
+                    item = m_items.append(text, d.get('func'), **d)
+                    name = d.get('name')
+                    if name:
+                        self.menuitems[name] = item
                 item = gtk.MenuItem(title)
-                item.set_submenu(m_items.create_menu())
+                item.set_submenu(m_items.build())
                 menubar.append(item)
 
         vbox = gtk.VBox(False, 0)
