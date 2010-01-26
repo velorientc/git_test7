@@ -436,28 +436,23 @@ class ChangeSet(gdialog.GWindow):
             self.load_details(revnum)
 
     def file_context_menu(self):
-        def create_menu(label, callback):
-            menuitem = gtk.MenuItem(label, True)
-            menuitem.connect('activate', callback)
-            menuitem.set_border_width(1)
-            return menuitem
+        m = gtklib.MenuBuilder()
+        m.append(_('_Visual Diff'), self.diff_file_rev,
+                 gtk.STOCK_JUSTIFY_FILL)
+        m.append(_('Diff to _local'), self.diff_to_local)
+        m.append_sep()
+        m.append(_('_View at Revision'), self.view_file_rev)
+        self.save_menu = m.append(_('_Save at Revision...'),
+                                  self.save_file_rev, gtk.STOCK_SAVE)
+        m.append_sep()
+        m.append(_('_File History'), self.file_history, 'menulog.ico')
+        self.ann_menu = m.append(_('_Annotate File'), self.ann_file,
+                                 'menublame.ico')
+        m.append_sep()
+        m.append(_('_Revert File Contents'), self.revert_file,
+                 gtk.STOCK_MEDIA_REWIND)
 
-        menu = gtklib.MenuItems()
-        menu.append(create_menu(_('_Visual Diff'), self.diff_file_rev))
-        menu.append(create_menu(_('Diff to _local'), self.diff_to_local))
-        menu.append_sep()
-        menu.append(create_menu(_('_View at Revision'), self.view_file_rev))
-        self.save_menu = create_menu(_('_Save at Revision...'),
-            self.save_file_rev)
-        menu.append(self.save_menu)
-        menu.append_sep()
-        menu.append(create_menu(_('_File History'), self.file_history))
-        self.ann_menu = create_menu(_('_Annotate File'), self.ann_file)
-        menu.append(self.ann_menu)
-        menu.append_sep()
-        menu.append(create_menu(_('_Revert File Contents'), self.revert_file))
-
-        menu = menu.create_menu()
+        menu = m.build()
         menu.show_all()
         return menu
 
