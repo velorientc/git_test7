@@ -42,6 +42,8 @@ int Direntry::read(FILE* f, std::vector<char>& relpath)
     fread(&relpath[0], sizeof(char), length, f);
     relpath[length] = 0;
 
+    ::CharLowerBuff(&relpath[0], length);
+
     return 1;
 }
 

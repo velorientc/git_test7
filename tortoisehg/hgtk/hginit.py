@@ -8,7 +8,7 @@
 import os
 import gtk
 
-from mercurial import hg, ui, util
+from mercurial import hg, ui, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib
@@ -33,7 +33,10 @@ class InitDialog(gtk.Dialog):
         self.cwd = os.getcwd()
 
         # preconditioning info
-        self.dest_path = os.path.abspath(repos and repos[0] or self.cwd)
+        path = os.path.abspath(repos and repos[0] or self.cwd)
+        if not os.path.isdir(path):
+            path = os.path.dirname(path)
+        self.dest_path = path
 
         # layout table
         table = gtklib.LayoutTable()
@@ -110,7 +113,7 @@ class InitDialog(gtk.Dialog):
 
         try:
             hg.repository(u, dest, create=1)
-        except hglib.RepoError, inst:
+        except error.RepoError, inst:
             dialog.error_dialog(self, _('Unable to create new repository'),
                     hglib.toutf(str(inst)))
             return False

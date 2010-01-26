@@ -3,6 +3,7 @@
 #include "TortoiseUtils.h"
 #include "StringUtils.h"
 #include "QueryDirstate.h"
+#include "RegistryConfig.h"
 #include "CShellExtOverlay.h"
 
 #include <shlwapi.h>
@@ -35,7 +36,14 @@ STDMETHODIMP CShellExtOverlay::IsMemberOf(LPCWSTR pwszPath, DWORD /* dwAttrib */
     if (GetRegistryConfig("EnableOverlays", cval) != 0 && cval == "0")
         return S_FALSE;
 
-    std::string path = WideToMultibyte(pwszPath);
+    // This overlay handler processes all filenames in lowercase, so that a path
+    // "C:\FOO\BAR\Baz.TXT" will be considered equal to "C:\foo\bar\baz.txt"
+    // (note that mercurial preserves the case of filenames in .hg/dirstate)
+
+    std::wstring lowerpath(pwszPath);
+    ::CharLowerW(const_cast<wchar_t*>(lowerpath.c_str()));
+
+    std::string path = WideToMultibyte(lowerpath.c_str());
 
     if (GetRegistryConfig("LocalDisksOnly", cval) != 0 && cval != "0"
             && PathIsNetworkPath(path.c_str()))
