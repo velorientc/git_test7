@@ -3,7 +3,7 @@
 # Zsh completion script for hgtk.
 # copy it into your zsh function path (/usr/share/zsh/site-functions)
 #
-# Copyright (C) 2009 Steve Borho
+# Copyright (C) 2009-2010 Steve Borho
 #
 # This is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free
@@ -59,49 +59,49 @@ _hgtk() {
 
   if [[ -z "$cmd" ]]
   then
-    _arguments -s -w : $_hg_global_opts \
-    ':hgtk command:_hg_commands'
+    _arguments -s -w : $_hgtk_global_opts \
+    ':hgtk command:_hgtk_commands'
     return
   fi
 
   # resolve abbreviations and aliases
-  if ! (( $+functions[_hg_cmd_${cmd}] ))
+  if ! (( $+functions[_hgtk_cmd_${cmd}] ))
   then
     local cmdexp
-    (( $#_hg_cmd_list )) || _hg_get_commands
+    (( $#_hgtk_cmd_list )) || _hgtk_get_commands
 
-    cmdexp=$_hg_cmd_list[(r)${cmd}*]
-    if [[ $cmdexp == $_hg_cmd_list[(R)${cmd}*] ]]
+    cmdexp=$_hgtk_cmd_list[(r)${cmd}*]
+    if [[ $cmdexp == $_hgtk_cmd_list[(R)${cmd}*] ]]
     then
       # might be nice to rewrite the command line with the expansion
       cmd="$cmdexp"
     fi
-    if [[ -n $_hg_alias_list[$cmd] ]]
+    if [[ -n $_hgtk_alias_list[$cmd] ]]
     then
-      cmd=$_hg_alias_list[$cmd]
+      cmd=$_hgtk_alias_list[$cmd]
     fi
   fi
 
-  curcontext="${curcontext%:*:*}:hg-${cmd}:"
+  curcontext="${curcontext%:*:*}:hgtk-${cmd}:"
 
   zstyle -s ":completion:$curcontext:" cache-policy update_policy
 
   if [[ -z "$update_policy" ]]
   then
-    zstyle ":completion:$curcontext:" cache-policy _hg_cache_policy
+    zstyle ":completion:$curcontext:" cache-policy _hgtk_cache_policy
   fi
 
-  if (( $+functions[_hg_cmd_${cmd}] ))
+  if (( $+functions[_hgtk_cmd_${cmd}] ))
   then
-    _hg_cmd_${cmd}
+    _hgtk_cmd_${cmd}
   else
     # complete unknown commands normally
-    _arguments -s -w : $_hg_global_opts \
+    _arguments -s -w : $_hgtk_global_opts \
       '*:files:_hg_files'
   fi
 }
 
-_hg_cache_policy() {
+_hgtk_cache_policy() {
   typeset -a old
 
   # cache for a minute
@@ -111,27 +111,27 @@ _hg_cache_policy() {
   return 1
 }
 
-_hg_get_commands() {
-  typeset -ga _hg_cmd_list
-  typeset -gA _hg_alias_list
+_hgtk_get_commands() {
+  typeset -ga _hgtk_cmd_list
+  typeset -gA _hgtk_alias_list
   local hline cmd cmdalias
 
   _call_program hgtk hgtk debugcomplete -v 2>/dev/null | while read -A hline
   do
     cmd=$hline[1]
-    _hg_cmd_list+=($cmd)
+    _hgtk_cmd_list+=($cmd)
 
     for cmdalias in $hline[2,-1]
     do
-      _hg_cmd_list+=($cmdalias)
-      _hg_alias_list+=($cmdalias $cmd)
+      _hgtk_cmd_list+=($cmdalias)
+      _hgtk_alias_list+=($cmdalias $cmd)
     done
   done
 }
 
-_hg_commands() {
-  (( $#_hg_cmd_list )) || _hg_get_commands
-  _describe -t commands 'hgtk command' _hg_cmd_list
+_hgtk_commands() {
+  (( $#_hgtk_cmd_list )) || _hgtk_get_commands
+  _describe -t commands 'hgtk command' _hgtk_cmd_list
 }
 
 _hg_revrange() {
@@ -296,7 +296,7 @@ _hg_clone_dest() {
 }
 
 # Common options
-_hg_global_opts=(
+_hgtk_global_opts=(
     '(--repository -R)'{-R+,--repository}'[repository root directory]:repository:_files -/'
     '(--verbose -v)'{-v,--verbose}'[enable additional output]'
     '(--quiet -q)'{-q,--quiet}'[suppress output]'
@@ -304,76 +304,37 @@ _hg_global_opts=(
     '--debugger[start debugger]'
 )
 
-_hg_pat_opts=(
-  '*'{-I+,--include}'[include names matching the given patterns]:dir:_files -W $(_hg_cmd root) -/'
-  '*'{-X+,--exclude}'[exclude names matching the given patterns]:dir:_files -W $(_hg_cmd root) -/')
-
-_hg_diff_opts=(
-  '(--text -a)'{-a,--text}'[treat all files as text]'
-  '(--git -g)'{-g,--git}'[use git extended diff format]'
-  "--nodates[don't include dates in diff headers]")
-
-_hg_style_opts=(
-  '--style[display using template map file]:'
-  '--template[display with template]:')
-
-_hg_commit_opts=(
-  '(-m --message -l --logfile --edit -e)'{-e,--edit}'[edit commit message]'
-  '(-e --edit -l --logfile --message -m)'{-m+,--message}'[use <text> as commit message]:message:'
-  '(-e --edit -m --message --logfile -l)'{-l+,--logfile}'[read the commit message from <file>]:log file:_files')
-
-_hg_remote_opts=(
-  '(--ssh -e)'{-e+,--ssh}'[specify ssh command to use]:'
-  '--remotecmd[specify hg command to run on the remote side]:')
-
 _hg_cmd() {
   _call_program hg hg "$_hg_cmd_globals[@]" "$@"
 }
 
-_hg_cmd_add() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
+_hgtk_cmd_add() {
+  _arguments -s -w : $_hgtk_global_opts \
   '*:unknown files:_hg_unknown'
 }
 
-_hg_cmd_annotate() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
-  '(--rev -r)'{-r+,--rev}'[annotate the specified revision]:revision:_hg_tags' \
-  '(--follow -f)'{-f,--follow}'[follow file copies and renames]' \
-  '(--text -a)'{-a,--text}'[treat all files as text]' \
-  '(--user -u)'{-u,--user}'[list the author]' \
-  '(--date -d)'{-d,--date}'[list the date]' \
-  '(--number -n)'{-n,--number}'[list the revision number (default)]' \
-  '(--changeset -c)'{-c,--changeset}'[list the changeset]' \
+_hgtk_cmd_annotate() {
+  _arguments -s -w : $_hgtk_global_opts \
   '*:files:_hg_files'
 }
 
-_hg_cmd_clone() {
-  _arguments -s -w : $_hg_global_opts $_hg_remote_opts \
-  '(--noupdate -U)'{-U,--noupdate}'[do not update the new working directory]' \
-  '(--rev -r)'{-r+,--rev}'[a changeset you would like to have after cloning]:' \
-  '--uncompressed[use uncompressed transfer (fast over LAN)]' \
+_hgtk_cmd_clone() {
+  _arguments -s -w : $_hgtk_global_opts \
   ':source repository:_hg_remote' \
   ':destination:_hg_clone_dest'
 }
 
-_hg_cmd_commit() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
-  '(--addremove -A)'{-A,--addremove}'[mark new/missing files as added/removed before committing]' \
-  '(--message -m)'{-m+,--message}'[use <text> as commit message]:text:' \
-  '(--logfile -l)'{-l+,--logfile}'[read commit message from <file>]:log file:_files -g \*.txt' \
+_hgtk_cmd_commit() {
+  _arguments -s -w : $_hgtk_global_opts \
   '(--date -d)'{-d+,--date}'[record datecode as commit date]:date code:' \
   '(--user -u)'{-u+,--user}'[record user as commiter]:user:' \
   '*:file:_hg_files'
 }
 
-_hg_cmd_vdiff() {
+_hgtk_cmd_vdiff() {
   typeset -A opt_args
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts $_hg_diff_opts \
+  _arguments -s -w : $_hgtk_global_opts \
   '*'{-r,--rev}'+[revision]:revision:_hg_revrange' \
-  '(--show-function -p)'{-p,--show-function}'[show which function each change is in]' \
-  '(--ignore-all-space -w)'{-w,--ignore-all-space}'[ignore white space when comparing lines]' \
-  '(--ignore-space-change -b)'{-b,--ignore-space-change}'[ignore changes in the amount of white space]' \
-  '(--ignore-blank-lines -B)'{-B,--ignore-blank-lines}'[ignore changes whose lines are all blank]' \
   '*:file:->diff_files'
 
   if [[ $state == 'diff_files' ]]
@@ -387,164 +348,53 @@ _hg_cmd_vdiff() {
   fi
 }
 
-_hg_cmd_export() {
-  _arguments -s -w : $_hg_global_opts $_hg_diff_opts \
-  '(--outout -o)'{-o+,--output}'[print output to file with formatted name]:filespec:' \
-  '--switch-parent[diff against the second parent]' \
-  '*:revision:_hg_tags'
-}
-
-_hg_cmd_grep() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
-  '(--print0 -0)'{-0,--print0}'[end filenames with NUL]' \
-  '--all[print all revisions with matches]' \
-  '(--follow -f)'{-f,--follow}'[follow changeset or file history]' \
-  '(--ignore-case -i)'{-i,--ignore-case}'[ignore case when matching]' \
-  '(--files-with-matches -l)'{-l,--files-with-matches}'[print only filenames and revs that match]' \
-  '(--line-number -n)'{-n,--line-number}'[print matching line numbers]' \
-  '*'{-r+,--rev}'[search in given revision range]:revision:_hg_revrange' \
-  '(--user -u)'{-u,--user}'[print user who committed change]' \
-  '1:search pattern:' \
+_hgtk_cmd_grep() {
+  _arguments -s -w : $_hgtk_global_opts \
   '*:files:_hg_files'
 }
 
-_hg_cmd_heads() {
-  _arguments -s -w : $_hg_global_opts $_hg_style_opts \
-  '(--rev -r)'{-r+,--rev}'[show only heads which are descendants of rev]:revision:_hg_tags'
+_hgtk_cmd_help() {
+  _arguments -s -w : $_hgtk_global_opts \
+  '*:hgtk command:_hgtk_commands'
 }
 
-_hg_cmd_help() {
-  _arguments -s -w : $_hg_global_opts \
-  '*:hgtk command:_hg_commands'
-}
-
-_hg_cmd_incoming() {
-  _arguments -s -w : $_hg_global_opts $_hg_remote_opts $_hg_style_opts \
-  '(--no-merges -M)'{-M,--no-merges}'[do not show merge revisions]' \
-  '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
-  '(--patch -p)'{-p,--patch}'[show patch]' \
-  '(--rev -r)'{-r+,--rev}'[a specific revision up to which you would like to pull]:revision:_hg_tags' \
-  '(--newest-first -n)'{-n,--newest-first}'[show newest record first]' \
-  '--bundle[file to store the bundles into]:bundle file:_files' \
-  ':source:_hg_remote'
-}
-
-_hg_cmd_init() {
-  _arguments -s -w : $_hg_global_opts $_hg_remote_opts \
+_hgtk_cmd_init() {
+  _arguments -s -w : $_hgtk_global_opts \
   ':dir:_files -/'
 }
 
-_hg_cmd_log() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts $_hg_style_opts \
-  '(--follow --follow-first -f)'{-f,--follow}'[follow changeset or history]' \
-  '(-f --follow)--follow-first[only follow the first parent of merge changesets]' \
-  '(--copies -C)'{-C,--copies}'[show copied files]' \
-  '(--keyword -k)'{-k+,--keyword}'[search for a keyword]:' \
+_hgtk_cmd_log() {
+  _arguments -s -w : $_hgtk_global_opts \
   '(--limit -l)'{-l+,--limit}'[limit number of changes displayed]:' \
   '*'{-r,--rev}'[show the specified revision or range]:revision:_hg_revrange' \
-  '(--no-merges -M)'{-M,--no-merges}'[do not show merges]' \
-  '(--only-merges -m)'{-m,--only-merges}'[show only merges]' \
-  '(--patch -p)'{-p,--patch}'[show patch]' \
-  '(--prune -P)'{-P+,--prune}'[do not display revision or any of its ancestors]:revision:_hg_tags' \
   '*:files:_hg_files'
 }
 
-_hg_cmd_outgoing() {
-  _arguments -s -w : $_hg_global_opts $_hg_remote_opts $_hg_style_opts \
-  '(--no-merges -M)'{-M,--no-merges}'[do not show merge revisions]' \
-  '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
-  '(--patch -p)'{-p,--patch}'[show patch]' \
-  '(--rev -r)'{-r+,--rev}'[a specific revision you would like to push]' \
-  '(--newest-first -n)'{-n,--newest-first}'[show newest record first]' \
-  ':destination:_hg_remote'
+_hgtk_cmd_pull() {
+  _arguments -s -w : $_hgtk_global_opts 
 }
 
-_hg_cmd_pull() {
-  _arguments -s -w : $_hg_global_opts $_hg_remote_opts \
-  '(--force -f)'{-f,--force}'[run even when the remote repository is unrelated]' \
-  '(--update -u)'{-u,--update}'[update to new tip if changesets were pulled]' \
-  '(--rev -r)'{-r+,--rev}'[a specific revision up to which you would like to pull]:revision:' \
-  ':source:_hg_remote'
+_hgtk_cmd_push() {
+  _arguments -s -w : $_hgtk_global_opts 
 }
 
-_hg_cmd_push() {
-  _arguments -s -w : $_hg_global_opts $_hg_remote_opts \
-  '(--force -f)'{-f,--force}'[force push]' \
-  '(--rev -r)'{-r+,--rev}'[a specific revision you would like to push]:revision:_hg_tags' \
-  ':destination:_hg_remote'
-}
-
-_hg_cmd_remove() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
-  '(--after -A)'{-A,--after}'[record remove that has already occurred]' \
-  '(--force -f)'{-f,--force}'[remove file even if modified]' \
+_hgtk_cmd_rename() {
+  _arguments -s -w : $_hgtk_global_opts \
   '*:file:_hg_files'
 }
 
-_hg_cmd_rename() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
-  '(--after -A)'{-A,--after}'[record a rename that has already occurred]' \
-  '(--force -f)'{-f,--force}'[forcibly copy over an existing managed file]' \
-  '*:file:_hg_files'
+_hgtk_cmd_serve() {
+  _arguments -s -w : $_hgtk_global_opts 
 }
 
-_hg_cmd_revert() {
-  local context state line
-  typeset -A opt_args
-
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
-  '(--all -a :)'{-a,--all}'[revert all changes when no arguments given]' \
-  '(--rev -r)'{-r+,--rev}'[revision to revert to]:revision:_hg_tags' \
-  '--no-backup[do not save backup copies of files]' \
-  '*:file:->diff_files'
-
-  if [[ $state == 'diff_files' ]]
-  then
-    if [[ -n $opt_args[-r] ]]
-    then
-      _hg_files
-    else
-      typeset -a status_files
-      _hg_status mard
-      _wanted files expl 'modified, added, removed or deleted file' _multi_parts / status_files
-    fi
-  fi
-}
-
-_hg_cmd_serve() {
-  _arguments -s -w : $_hg_global_opts \
-  '(--accesslog -A)'{-A+,--accesslog}'[name of access log file]:log file:_files' \
-  '(--errorlog -E)'{-E+,--errorlog}'[name of error log file]:log file:_files' \
-  '(--daemon -d)'{-d,--daemon}'[run server in background]' \
-  '(--port -p)'{-p+,--port}'[listen port]:listen port:' \
-  '(--address -a)'{-a+,--address}'[interface address]:interface address:' \
-  '(--name -n)'{-n+,--name}'[name to show in web pages]:repository name:' \
-  '(--templates -t)'{-t,--templates}'[web template directory]:template dir:_files -/' \
-  '--style[web template style]:style' \
-  '--stdio[for remote clients]' \
-  '(--ipv6 -6)'{-6,--ipv6}'[use IPv6 in addition to IPv4]'
-}
-
-_hg_cmd_status() {
-  _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
-  '(--all -A)'{-A,--all}'[show status of all files]' \
-  '(--modified -m)'{-m,--modified}'[show only modified files]' \
-  '(--added -a)'{-a,--added}'[show only added files]' \
-  '(--removed -r)'{-r,--removed}'[show only removed files]' \
-  '(--deleted -d)'{-d,--deleted}'[show only deleted (but tracked) files]' \
-  '(--clean -c)'{-c,--clean}'[show only files without changes]' \
-  '(--unknown -u)'{-u,--unknown}'[show only unknown files]' \
-  '(--ignored -i)'{-i,--ignored}'[show ignored files]' \
-  '(--no-status -n)'{-n,--no-status}'[hide status prefix]' \
-  '(--copies -C)'{-C,--copies}'[show source of copied files]' \
-  '(--print0 -0)'{-0,--print0}'[end filenames with NUL, for use with xargs]' \
+_hgtk_cmd_status() {
+  _arguments -s -w : $_hgtk_global_opts \
   '--rev[show difference from revision]:revision:_hg_tags' \
   '*:files:_files'
 }
 
-_hg_cmd_update() {
-  _arguments -s -w : $_hg_global_opts \
-  '(--clean -C)'{-C,--clean}'[overwrite locally modified files]' \
+_hgtk_cmd_update() {
+  _arguments -s -w : $_hgtk_global_opts \
   '(--rev -r)'{-r+,--rev}'[revision]:revision:_hg_tags' \
   ':revision:_hg_tags'
 }

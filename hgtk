@@ -51,7 +51,7 @@ if err:
     _ui.warn('abort: %s\n' % err)
     sys.exit(1)
 
-if not capt or 'THGDEBUG' in os.environ:
+if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
     sys.exit(tortoisehg.hgtk.hgtk.dispatch(sys.argv[1:]))
 else:
     mystderr = cStringIO.StringIO()

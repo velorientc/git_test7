@@ -17,7 +17,7 @@ import sys
 import threading
 import time
 
-from mercurial import hg, ui, commands, cmdutil, util
+from mercurial import hg, ui, commands, cmdutil, util, error
 from mercurial.hgweb import server
 
 from tortoisehg.util.i18n import _
@@ -102,7 +102,8 @@ class ServeDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription('Monospace'))
+        fontlog = hglib.getfontconfig()['fontlog']
+        self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
         vbox.pack_start(scrolledwindow, True, True)
@@ -116,7 +117,7 @@ class ServeDialog(gtk.Window):
         if self._root:
             try:
                 repo = hg.repository(ui.ui(), path=self._root)
-            except hglib.RepoError:
+            except error.RepoError:
                 self.destroy()
             self.defport = repo.ui.config('web', 'port') or '8000'
             self.webname = repo.ui.config('web', 'name') or \

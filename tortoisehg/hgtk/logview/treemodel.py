@@ -31,14 +31,16 @@ WFILE = 4
 
 BRANCH = 5          # calculated on demand, not cached
 HEXID = 6
-LOCALTIME = 7
-UTC = 8
+REVHEX = 7
+LOCALTIME = 8
+UTC = 9
 
-MESSAGE = 9         # calculated on demand, cached
-COMMITER = 10
-TAGS = 11
-FGCOLOR = 12
-AGE = 13
+MESSAGE = 10        # calculated on demand, cached
+COMMITER = 11
+TAGS = 12
+FGCOLOR = 13
+AGE = 14
+CHANGES = 15
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -49,18 +51,10 @@ class TreeModel(gtk.GenericTreeModel):
         self.origtip = opts['orig-tip']
         self.npreviews = opts['npreviews']
         self.showgraph = opts['show-graph']
-        self.revisions = {}
         self.graphdata = graphdata
-        self.set_author_color()
-        self.hidetags = self.repo.ui.config(
-            'tortoisehg', 'hidetags', '').split()
+        self.revisions, self.parents = {}, {}
         self.wcparents, self.tagrevs, self.branchtags = [], [], {}
-        try:
-            self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-            self.branchtags = repo.branchtags()
-            self.wcparents = [x.rev() for x in repo.parents()]
-        except util.Abort:
-            pass
+        self.refresh()
 
     def refresh(self):
         repo = self.repo
@@ -70,18 +64,30 @@ class TreeModel(gtk.GenericTreeModel):
         except error.RepoLookupError:
             oldbranches = []
 
-        repo.invalidate()
-        repo.dirstate.invalidate()
+        hglib.invalidaterepo(repo)
 
-        self.wcparents = [x.rev() for x in repo.parents()]
-        self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
-        self.branchtags = repo.branchtags()
+        self.longsummary = repo.ui.configbool('tortoisehg', 'longsummary', False)
+        self.set_author_color()
+        self.hidetags = hglib.gethidetags(repo.ui)
+
+        self.curbookmark = hglib.get_repo_bookmarkcurrent(repo)
+        try:
+            self.wcparents = [x.rev() for x in repo.parents()]
+            self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
+            self.branchtags = repo.branchtags()
+        except util.Abort:
+            pass
         brevs = [repo[n].rev() for n in self.branchtags.values()]
         allrevs = set(oldtags + oldparents + oldbranches +
                       brevs + self.wcparents + self.tagrevs)
         for rev in allrevs:
             if rev in self.revisions:
                 del self.revisions[rev]
+
+        self.mqpatches = []
+        if hasattr(self.repo, 'mq'):
+            self.repo.mq.parse_series()
+            self.mqpatches = [p.name for p in self.repo.mq.applied]
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
@@ -98,6 +104,7 @@ class TreeModel(gtk.GenericTreeModel):
 
         if index == BRANCH: return str
         if index == HEXID: return str
+        if index == REVHEX: return str
         if index == LOCALTIME: return str
         if index == UTC: return str
 
@@ -106,6 +113,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == TAGS: return str
         if index == FGCOLOR: return str
         if index == AGE: return str
+        if index == CHANGES: return str
 
     def on_get_iter(self, path):
         return path[0]
@@ -124,13 +132,19 @@ class TreeModel(gtk.GenericTreeModel):
             return []
         if column == WFILE: return path or ''
 
-        if column in (HEXID, BRANCH, LOCALTIME, UTC):
-            try:
-                ctx = self.repo[revid]
-            except IndexError:
-                return None
+        try:
+            ctx = self.repo[revid]
+        except IndexError:
+            return None
+
+        # non-cached columns
+
+        if column in (HEXID, REVHEX, BRANCH, LOCALTIME, UTC):
             if column == HEXID:
                 return str(ctx)
+            if column == REVHEX:
+                hexid = gtklib.markup(str(ctx), face='monospace')
+                return '%s: %s' % (revid, hexid)
             if column == BRANCH:
                 return ctx.branch()
             if column == LOCALTIME:
@@ -138,15 +152,46 @@ class TreeModel(gtk.GenericTreeModel):
             if column == UTC:
                 return hglib.utctime(ctx.date())
 
-        if revid not in self.revisions:
-            try:
-                ctx = self.repo[revid]
-            except IndexError:
-                return None
+        # cached columns
 
+        if revid not in self.revisions:
+            self.revisions[revid] = {}
+        cache = self.revisions[revid]
+
+        if cache.has_key(column):
+            return cache[column]
+
+        if column in (COMMITER, FGCOLOR):
+            cache[COMMITER] = hglib.toutf(hglib.username(ctx.user()))
+
+        if column == TAGS:
+            tags = self.repo.nodetags(ctx.node())
+            cache[TAGS] = hglib.toutf(', '.join(tags))
+
+        elif column == AGE:
+            cache[AGE] = hglib.age(ctx.date())
+
+        elif column == FGCOLOR:
+            cache[FGCOLOR] = self.color_func(revid, cache[COMMITER])
+
+        elif column == CHANGES:
+            parent = self.parents.get(revid, None)
+            if parent is None:
+                parent = ctx.parents()[0].node()
+            M, A, R = self.repo.status(parent, ctx.node())[:3]
+            common = dict(color='black')
+            M = M and gtklib.markup(' %s ' % len(M),
+                             background=gtklib.PORANGE, **common) or ''
+            A = A and gtklib.markup(' %s ' % len(A),
+                             background=gtklib.PGREEN, **common) or ''
+            R = R and gtklib.markup(' %s ' % len(R),
+                             background=gtklib.PRED, **common) or ''
+            cache[CHANGES] = ''.join((M, A, R))
+
+        elif column in (MESSAGE, GRAPHNODE):
             # convert to Unicode for valid string operations
             summary = hglib.tounicode(ctx.description()).replace(u'\0', '')
-            if self.repo.ui.configbool('tortoisehg', 'longsummary'):
+            if self.longsummary:
                 limit = 80
                 lines = summary.splitlines()
                 if lines:
@@ -161,25 +206,26 @@ class TreeModel(gtk.GenericTreeModel):
                 summary = lines and lines[0] or ''
             escape = gtklib.markup_escape_text
             summary = escape(hglib.toutf(summary))
+
             node = ctx.node()
             tags = self.repo.nodetags(node)
-            taglist = hglib.toutf(', '.join(tags))
             tstr = ''
             for tag in tags:
                 if tag not in self.hidetags:
-                    tstr += gtklib.markup(' %s ' % tag, color='black',
-                                          background='#ffffaa') + ' '
+                    bg = gtklib.PYELLOW
+                    if tag == self.curbookmark:
+                        bg = gtklib.PORANGE
+                    elif tag in self.mqpatches:
+                        bg = gtklib.PBLUE
+                    style = {'color': 'black', 'background': bg}
+                    tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
             branch = ctx.branch()
             bstr = ''
             if self.branchtags.get(branch) == node:
                 bstr += gtklib.markup(' %s ' % branch, color='black',
-                                      background='#aaffaa') + ' '
+                                      background=gtklib.PGREEN) + ' '
 
-            author = hglib.toutf(hglib.username(ctx.user()))
-            age = hglib.age(ctx.date())
-
-            color = self.color_func(revid, author)
             if revid in self.wcparents:
                 sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
                 status = 4
@@ -204,15 +250,11 @@ class TreeModel(gtk.GenericTreeModel):
                     # new
                     status += 2
 
-            revision = (sumstr, author, taglist, color, age, status)
-            self.revisions[revid] = revision
-        else:
-            revision = self.revisions[revid]
-        if column == GRAPHNODE:
-            column, color = graphnode
-            return (column, color, revision[5])
-        else:
-            return revision[column-MESSAGE]
+            cache[MESSAGE] = sumstr
+            gcolumn, gcolor = graphnode
+            cache[GRAPHNODE] = (gcolumn, gcolor, status)
+
+        return cache[column]
 
     def on_iter_next(self, rowref):
         if rowref < len(self.graphdata) - 1:
@@ -248,10 +290,7 @@ class TreeModel(gtk.GenericTreeModel):
                 if not k.startswith('authorcolor.'): continue
                 pat = k[12:]
                 self.author_pats.append((re.compile(pat, re.I), v))
-            try:
-                enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor')
-            except hglib.ConfigError:
-                enabled = False
+            enabled = self.repo.ui.configbool('tortoisehg', 'authorcolor', False)
             if self.author_pats or enabled:
                 self.color_func = self.text_color_author
 
@@ -273,3 +312,13 @@ class TreeModel(gtk.GenericTreeModel):
             self.color_cache[author] = color
         return self.color_cache[author]
 
+    def set_parent(self, rev, parent):
+        self.parents[rev] = parent
+        if rev in self.revisions:
+            del self.revisions[rev]
+
+    def clear_parents(self):
+        for rev in self.parents.keys():
+            if rev in self.revisions:
+                del self.revisions[rev]
+        self.parents = {}
