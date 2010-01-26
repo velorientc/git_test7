@@ -1670,8 +1670,8 @@ class GStatus(gdialog.GWindow):
             menu.append_submenu(_('Restart merge with'), rmenu,
                                 'menumerge.ico')
 
-        for label, func, stats in self.get_custom_menus():
-            make(label, func, stats)
+        for label, func, stats, icon in self.get_custom_menus():
+            make(label, func, stats, icon)
 
         menu = menu.build()
         if len(menu.get_children()) > 0:
