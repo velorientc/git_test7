@@ -45,7 +45,7 @@ def toutf(s):
 
     Return 'str' type string.
     """
-    return tounicode(s).encode('utf-8')
+    return tounicode(s).encode('utf-8').replace('\0','')
 
 def fromutf(s):
     """
