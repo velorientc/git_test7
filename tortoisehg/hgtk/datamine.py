@@ -601,10 +601,13 @@ class DataMineDialog(gdialog.GWindow):
 
         # File log revision graph
         graphview = LogTreeView(self.repo, 5000)
+        graphview.set_property('rev-column-visible', True)
+        graphview.set_property('msg-column-visible', True)
+        graphview.set_property('user-column-visible', True)
+        graphview.set_property('age-column-visible', True)
+        graphview.set_columns(['graph', 'rev', 'msg', 'user', 'age'])
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
         graphview.refresh(True, [path], graphopts)
-        graphview.set_property('rev-column-visible', True)
-        graphview.set_property('age-column-visible', True)
 
         # Annotation text tree view
         treeview = gtk.TreeView()
