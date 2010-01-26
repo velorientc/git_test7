@@ -124,13 +124,12 @@ class DataMineDialog(gdialog.GWindow):
         gdialog.GWindow._destroying(self, gtkobj)
 
     def ann_header_context_menu(self, treeview):
-        menu = gtk.Menu()
-        button = gtk.CheckMenuItem(_('Filename'))
-        button.connect('toggled', self.toggle_annatate_columns, treeview, 2)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('User'))
-        button.connect('toggled', self.toggle_annatate_columns, treeview, 3)
-        menu.append(button)
+        m = gtklib.MenuBuilder()
+        m.append(_('Filename'), self.toggle_annatate_columns,
+                 ascheck=True, args=[treeview, 2])
+        m.append(_('User'), self.toggle_annatate_columns,
+                 ascheck=True, args=[treeview, 3])
+        menu = m.build()
         menu.show_all()
         return menu
 
