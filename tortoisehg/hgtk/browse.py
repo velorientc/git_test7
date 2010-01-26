@@ -291,34 +291,21 @@ class BrowsePane(gtk.TreeView):
             finally:
                 os.chdir(oldcwd)
 
-        def create_menu(label, hgcmd=None):
-            menuitem = gtk.MenuItem(label, True)
-            if hgcmd:
-                menuitem.connect('activate', rundialog, hgcmd)
-            menuitem.set_border_width(1)
-            return menuitem
-
-        def create_submenu(label, menu):
-            m = create_menu(label)
-            m.set_submenu(menu)
-            return m
-
-        def buildmenus(menus):
-            m = gtklib.MenuItems()
-            for menu_info in menus:
-                if menu_info.isSep():
+        def build(menus):
+            m = gtklib.MenuBuilder()
+            for info in menus:
+                if info.isSep():
                     m.append_sep()
-                elif menu_info.isSubmenu():
-                    item = create_submenu(menu_info.menutext,
-                                          buildmenus(menu_info.get_menus()))
-                    m.append(item)
-                elif menu_info.state:
-                    # TODO: do something with menu_info.helptext, .icon
-                    item = create_menu(menu_info.menutext, menu_info.hgcmd)
-                    m.append(item)
-            return m.create_menu()
+                elif info.isSubmenu():
+                    m.append_submenu(info.menutext, icon=info.icon,
+                                     submenu=build(info.get_menus()))
+                elif info.state:
+                    # TODO: do something with info.helptext
+                    m.append(info.menutext, rundialog, info.icon,
+                             args=[info.hgcmd])
+            return m.build()
 
-        menu = buildmenus(menus)
+        menu = build(menus)
         menu.show_all()
         menu.popup(None, None, None, 0, 0)
 
