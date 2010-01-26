@@ -707,19 +707,10 @@ class ChangeSet(gdialog.GWindow):
         column.pack_start(filecell, expand=False)
         column.add_attribute(filecell, 'text', 1)
 
-        iconw, iconh = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
-
-        def get_pixbuf(iconfilename):
-            iconpath = paths.get_tortoise_icon(iconfilename)
-            if iconpath == None:
-                raise (_("could not open icon file '%s' (check install)") 
-                            % iconfilename)
-            return gtk.gdk.pixbuf_new_from_file_at_size(
-                iconpath, iconw, iconh)
-
-        addedpixbuf = get_pixbuf('fileadd.ico')
-        removedpixbuf = get_pixbuf('filedelete.ico')
-        modifiedpixbuf = get_pixbuf('filemodify.ico')
+        size = gtk.ICON_SIZE_SMALL_TOOLBAR
+        addedpixbuf = gtklib.get_icon_pixbuf('fileadd.ico', size)
+        removedpixbuf = gtklib.get_icon_pixbuf('filedelete.ico', size)
+        modifiedpixbuf = gtklib.get_icon_pixbuf('filemodify.ico', size)
 
         def cell_seticon(column, cell, model, iter):
             state = model.get_value(iter, 0)
