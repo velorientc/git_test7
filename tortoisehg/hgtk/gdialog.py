@@ -775,10 +775,8 @@ class GDialog(gtk.Dialog):
         self.cmd.hide()
         self.vbox.pack_start(self.cmd, False, False, 6)
 
-        # abort button
-        btn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.buttons['abort'] = btn
-        btn.hide()
+        # add Abort button
+        self.action_area.add(self.buttons['abort'])
 
     def do_switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
@@ -820,13 +818,21 @@ class GDialog(gtk.Dialog):
         reponame = self.repo and hglib.get_reponame(self.repo) or ''
         self.set_title(self.get_title(reponame))
 
-        # construct ui widgets
+        # add user-defined buttons
         self.buttons = {}
         for name, label, res in self.get_buttons():
             btn = self.add_button(label, res)
             self.buttons[name] = btn
+
+        # create Abort button (add later)
+        btn = gtk.Button(_('Abort'))
+        btn.connect('clicked', lambda *a: self.response(gtk.RESPONSE_CANCEL))
+        self.buttons['abort'] = btn
+
+        # construct dialog body
         self.get_body(self.vbox)
 
+        # focus on default button if needs
         name = self.get_default_button()
         if name:
             btn = self.buttons.get(name)
