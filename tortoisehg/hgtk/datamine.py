@@ -135,25 +135,25 @@ class DataMineDialog(gdialog.GWindow):
 
     def grep_context_menu(self):
         m = gtklib.MenuBuilder()
-        m.append(_('di_splay change'), self.cmenu_display,
+        m.append(_('Di_splay Change'), self.cmenu_display,
                  'menushowchanged.ico')
-        m.append(_('_annotate file'), self.cmenu_annotate, 'menublame.ico')
-        m.append(_('_file history'), self.cmenu_file_log, 'menulog.ico')
-        m.append(_('_view file at revision'), self.cmenu_view, gtk.STOCK_EDIT)
+        m.append(_('_Annotate File'), self.cmenu_annotate, 'menublame.ico')
+        m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
+        m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
         menu = m.build()
         menu.show_all()
         return menu
 
     def annotate_context_menu(self, objs):
         m = gtklib.MenuBuilder()
-        m.append(_('_zoom to change'), self.cmenu_zoom, gtk.STOCK_ZOOM_IN,
+        m.append(_('_Zoom to Change'), self.cmenu_zoom, gtk.STOCK_ZOOM_IN,
                  args=[objs])
-        m.append(_('di_splay change'), self.cmenu_display,
+        m.append(_('Di_splay Change'), self.cmenu_display,
                  'menushowchanged.ico')
-        m.append(_('_annotate parent'), self.cmenu_annotate_parent,
+        m.append(_('_Annotate Parent'), self.cmenu_annotate_parent,
                  'menublame.ico', args=[objs])
-        m.append(_('_view file at revision'), self.cmenu_view, gtk.STOCK_EDIT)
-        m.append(_('_file history'), self.cmenu_file_log, 'menulog.ico')
+        m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
+        m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
         menu = m.build()
         menu.show_all()
         return menu
