@@ -673,48 +673,33 @@ class MQWidget(gtk.VBox):
             menu.popup(None, None, None, 0, 0)
 
     def create_view_menu(self):
-        menu = gtk.Menu()
-        def append(item=None, handler=None, check=False,
-                   active=False, sep=False):
-            if sep:
-                item = gtk.SeparatorMenuItem()
-            else:
-                if isinstance(item, str):
-                    if check:
-                        item = gtk.CheckMenuItem(item)
-                        item.set_active(active)
-                    else:
-                        item = gtk.MenuItem(item)
-                item.set_border_width(1)
-            if handler:
-                item.connect('activate', handler)
-            menu.append(item)
-            return item
+        self.vmenu = {}
+        m = gtklib.MenuBuilder()
+
         def colappend(label, col_idx, active=True):
             def handler(menuitem):
                 col = self.cols[col_idx]
                 col.set_visible(menuitem.get_active())
             propname = self.col_to_prop(col_idx)
-            item = append(label, handler, check=True, active=active)
+            item = m.append(label, handler, ascheck=True, check=active)
             self.vmenu[propname] = item
-
-        self.vmenu = {}
 
         colappend(_('Show Index'), MQ_INDEX)
         colappend(_('Show Status'), MQ_STATUS, active=False)
         colappend(_('Show Summary'), MQ_SUMMARY, active=False)
 
-        append(sep=True)
+        m.append_sep()
 
         def enable_editable(item):
             self.cells[MQ_NAME].set_property('editable', item.get_active())
-        item = append(_('Enable editable cells'), enable_editable,
-                check=True, active=False)
+        item = m.append(_('Enable editable cells'), enable_editable,
+                        ascheck=True, check=False)
         self.vmenu['editable-cell'] = item
-        item = append(_("Show 'qparent'"), lambda item: self.refresh(),
-                check=True, active=True)
+        item = m.append(_("Show 'qparent'"), lambda item: self.refresh(),
+                        ascheck=True, check=True)
         self.vmenu['show-qparent'] = item
 
+        menu = m.build()
         menu.show_all()
         return menu
 
