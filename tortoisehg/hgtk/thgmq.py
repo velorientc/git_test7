@@ -632,22 +632,9 @@ class MQWidget(gtk.VBox):
         if row[MQ_INDEX] == INDEX_SEPARATOR:
             return
 
-        menu = gtk.Menu()
-        def append(label, handler=None, icon=None, target=None):
-            if icon:
-                item = gtk.ImageMenuItem(label)
-                img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
-                item.set_image(img)
-            else:
-                item = gtk.MenuItem(label, True)
-            item.set_border_width(1)
-            if handler:
-                item.connect('activate', handler, row)
-            if target:
-                target.append(item)
-            else:
-                menu.append(item)
-            return item
+        m = gtklib.MenuBuilder()
+        def append(*args):
+            m.append(*args, **dict(args=[row]))
 
         is_operable = self.is_operable()
         has_patch = self.has_patch()
@@ -661,23 +648,26 @@ class MQWidget(gtk.VBox):
         if has_patch and not is_qparent:
             append(_('_Rename'), self.rename_activated, gtk.STOCK_EDIT)
         if has_applied and not is_qparent:
-            append(_('_Finish Applied'), self.finish_activated, gtk.STOCK_APPLY)
+            append(_('_Finish Applied'), self.finish_activated,
+                   gtk.STOCK_APPLY)
         if not is_applied and not is_qparent:
             append(_('_Delete'), self.delete_activated, gtk.STOCK_DELETE)
             if has_applied and not is_qparent:
                 append(_('F_old'), self.fold_activated, gtk.STOCK_DIRECTORY)
             if self.get_num_unapplied() > 1:
-                sub = gtk.Menu()
-                append(_('Move'), icon=gtk.STOCK_INDEX).set_submenu(sub)
-                append(_('Top'), lambda *a: self.qmove_ui(MOVE_TOP),
-                       gtk.STOCK_GOTO_TOP, sub)
-                append(_('Up'), lambda *a: self.qmove_ui(MOVE_UP),
-                       gtk.STOCK_GO_UP, sub)
-                append(_('Down'), lambda *a: self.qmove_ui(MOVE_DOWN),
-                       gtk.STOCK_GO_DOWN, sub)
-                append(_('Bottom'), lambda *a: self.qmove_ui(MOVE_BOTTOM),
-                       gtk.STOCK_GOTO_BOTTOM, sub)
+                sub = gtklib.MenuBuilder()
+                sub.append(_('Top'), lambda *a: self.qmove_ui(MOVE_TOP),
+                           gtk.STOCK_GOTO_TOP, args=[row])
+                sub.append(_('Up'), lambda *a: self.qmove_ui(MOVE_UP),
+                           gtk.STOCK_GO_UP, args=[row])
+                sub.append(_('Down'), lambda *a: self.qmove_ui(MOVE_DOWN),
+                           gtk.STOCK_GO_DOWN, args=[row])
+                sub.append(_('Bottom'),
+                           lambda *a: self.qmove_ui(MOVE_BOTTOM),
+                           gtk.STOCK_GOTO_BOTTOM, args=[row])
+                m.append_submenu(_('Move'), sub.build(), gtk.STOCK_INDEX)
 
+        menu = m.build()
         if len(menu.get_children()) > 0:
             menu.show_all()
             menu.popup(None, None, None, 0, 0)
