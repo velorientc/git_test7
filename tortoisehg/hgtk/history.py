@@ -310,7 +310,7 @@ class GLog(gdialog.GWindow):
                     icon=gtk.STOCK_ABOUT),
                 dict(text=_('Working Parent'), func=navigate, args=['.'],
                     icon=gtk.STOCK_HOME),
-                dict(text=_('Previous Selected'), icon=gtk.STOCK_GO_BACK,
+                dict(text=_('Previously Selected'), icon=gtk.STOCK_GO_BACK,
                     func=lambda *a: self.goto_prev_sel()),
                 dict(text='----'),
                 dict(text=_('Revision...'), icon=gtk.STOCK_JUMP_TO,
