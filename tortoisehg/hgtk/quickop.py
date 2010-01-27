@@ -56,6 +56,9 @@ class QuickOpDialog(gtk.Dialog):
         # add dialog buttons
         self.gobutton = self.add_button(labels[command][1], gtk.RESPONSE_OK)
         self.closebtn = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
+        self.abortbtn = gtk.Button(_('Abort'))
+        self.abortbtn.connect('clicked',
+                      lambda *a: self.response(gtk.RESPONSE_CANCEL))
 
         lbl = gtk.Label(labels[command][0])
         lbl.set_alignment(0, 0)
@@ -178,9 +181,8 @@ class QuickOpDialog(gtk.Dialog):
         self.cmd.hide()
         self.vbox.pack_start(self.cmd, False, False, 6)
 
-        # abort button
-        self.abortbtn = self.add_button(_('Abort'), gtk.RESPONSE_CANCEL)
-        self.abortbtn.hide()
+        # add Abort button
+        self.action_area.add(self.abortbtn)
 
     def abort(self):
         self.cmd.stop()
