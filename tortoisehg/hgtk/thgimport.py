@@ -72,20 +72,12 @@ class ImportDialog(gdialog.GDialog):
         menubtn.set_focus_on_click(False)
         menubtn.add(gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_NONE))
 
-        self.menu = gtk.Menu()
-        def append(label, handler=None, icon=None):
-            if icon:
-                item = gtk.ImageMenuItem(label)
-                img = gtk.image_new_from_stock(icon, gtk.ICON_SIZE_MENU)
-                item.set_image(img)
-            else:
-                item = gtk.MenuItem(label, True)
-            item.set_border_width(1)
-            if handler:
-                item.connect('activate', handler)
-            self.menu.append(item)
-        append(_('Browse Directory...'), self.dir_clicked, gtk.STOCK_DIRECTORY)
-        append(_('Import from Clipboard'), self.clip_clicked, gtk.STOCK_PASTE)
+        m = gtklib.MenuBuilder()
+        m.append(_('Browse Directory...'), self.dir_clicked,
+                 gtk.STOCK_DIRECTORY)
+        m.append(_('Import from Clipboard'), self.clip_clicked,
+                 gtk.STOCK_PASTE)
+        self.menu = m.build()
 
         table.add_row(_('Source:'), self.src_combo, 1,
                       self.files_btn, menubtn, expand=0)
