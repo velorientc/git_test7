@@ -999,13 +999,13 @@ class ChangeSet(gdialog.GWindow):
 
     def add_to_popup(self, textview, menu):
         menu.append(gtk.SeparatorMenuItem())
-        menu.append(gtklib.create_menuitem(_('Toggle _Wordwrap'),
-                                           self.toggle_wordwrap,
-                                           gtk.STOCK_JUSTIFY_LEFT))
+        check = self.textview.get_wrap_mode() == gtk.WRAP_WORD
+        menu.append(gtklib.create_menuitem(_('Enable _Wordwrap'),
+                                           self.wordwrap_activated,
+                                           ascheck=True, check=check))
         menu.show_all()
 
-    def toggle_wordwrap(self, sender):
-        if self.textview.get_wrap_mode() != gtk.WRAP_NONE:
-            self.textview.set_wrap_mode(gtk.WRAP_NONE)
-        else:
-            self.textview.set_wrap_mode(gtk.WRAP_WORD)
+    def wordwrap_activated(self, menuitem):
+        mode = self.textview.get_wrap_mode() != gtk.WRAP_WORD \
+                    and gtk.WRAP_WORD or gtk.WRAP_NONE
+        self.textview.set_wrap_mode(mode)
