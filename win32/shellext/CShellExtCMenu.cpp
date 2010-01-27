@@ -6,8 +6,12 @@
 #include "InitStatus.h"
 #include "SysInfo.h"
 #include "ShellExt.h"
-#include "CShellExtCMenu.h"
+#include "RegistryConfig.h"
+#include "TortoiseIconBitmap.h"
+
 #include <map>
+
+#include "CShellExtCMenu.h"
 
 
 struct MenuDescription
@@ -96,6 +100,9 @@ MenuDescription menuDescList[] =
     {"forget",      L"Forget Files...",
                     L"Remove files from version control",
                     "menudelete.ico", 0},
+    {"shellconf",   L"Explorer Extension Settings",
+                    L"Configure Explorer extension",
+                    "settings_repo.ico", 0},
 
     /* Add new items here */
 
@@ -103,40 +110,28 @@ MenuDescription menuDescList[] =
     {"", L"", L"", ".ico", 0},
 };
 
-/* These enumerations must match the order of menuDescList */
-enum menuDescListEntries
-{
-    Commit, Init, Clone, Status, Shelve, Add, Revert, Remove, Rename,
-    Log, Synch, Serve, Update, Recover, Thgstatus, Userconf, Repoconf,
-    About, Datamine, VDiff, Ignore, Guess, Grep, Forget,
-    /* Add new items here */
-    Separator, EndOfList
-};
+const char* const RepoNoFilesMenu =
+    "commit status shelve vidff sep"
+    " add revert rename forget remove sep"
+    " log update grep sep"
+    " synch serve clone init thgstatus sep"
+    " ignore guess recover sep"
+    " shellconf repoconf userconf sep"
+    " about"
+;
 
-menuDescListEntries RepoNoFilesMenu[] =
-{
-    Commit, Status, Shelve, VDiff, Separator,
-    Add, Revert, Rename, Forget, Remove, Separator,
-    Log, Update, Grep, Separator,
-    Synch, Serve, Clone, Init, Thgstatus, Separator,
-    Ignore, Guess, Recover, Separator,
-    Repoconf, Userconf, Separator,
-    About, EndOfList
-};
+const char* const RepoFilesMenu =
+    "commit status vidff sep"
+    " add revert rename forget remove sep"
+    " log datamine sep"
+    " about"
+;
 
-menuDescListEntries RepoFilesMenu[] =
-{
-    Commit, Status, VDiff, Separator,
-    Add, Revert, Rename, Forget, Remove, Separator,
-    Log, Datamine, Separator,
-    About, EndOfList
-};
+const char* const NoRepoMenu =
+    "clone init shellconf userconf thgstatus sep"
+    " about"
+;
 
-menuDescListEntries NoRepoMenu[] =
-{
-    Clone, Init, Userconf, Thgstatus, Separator,
-    About, EndOfList
-};
 
 typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
 typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
@@ -433,40 +428,14 @@ CShellExtCMenu::QueryContextMenu(
 
     InitMenuMaps();
 
-    const std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
-    bool promoted[sz];
-    memset(&promoted, 0, sizeof(promoted));
+    typedef std::vector<std::string> entriesT;
+    typedef entriesT::const_iterator entriesIter;
 
-    std::string cval = "commit,log"; // default value if key not found
-    GetRegistryConfig("PromotedItems", cval);
+    std::string promoted_string = "commit,log"; // default value if key not found
+    GetRegistryConfig("PromotedItems", promoted_string);
 
-    size_t found;
-    do
-    {
-        if (cval.empty())
-            break;
-
-        found = cval.find_first_of(',');
-
-        std::string key;
-        if( found == std::string::npos )
-            key = cval;
-        else
-        {
-            key = cval.substr(0, found);
-            cval = cval.substr(found+1);
-        }
-
-        for (UINT i = 0; i < sz; i++)
-        {
-            if (!key.compare(menuDescList[i].name))
-            {
-                promoted[i] = true;
-                break;
-            }
-        }
-    }
-    while (found != std::string::npos);
+    entriesT promoted;
+    Tokenize(promoted_string, promoted, ",");
 
     // Select menu to show
     bool fileMenu = myFiles.size() > 0;
@@ -500,26 +469,28 @@ CShellExtCMenu::QueryContextMenu(
     );
 
     /* We have three menu types: files-selected, no-files-selected, no-repo */
-    menuDescListEntries *entries;
+    const char* entries_string = 0;
     if (isHgrepo)
         if (fileMenu)
-            entries = RepoFilesMenu;
+            entries_string = RepoFilesMenu;
         else
-            entries = RepoNoFilesMenu;
+            entries_string = RepoNoFilesMenu;
     else
-        entries = NoRepoMenu;
+        entries_string = NoRepoMenu;
 
     // start building TortoiseHg menus and submenus
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR | MF_BYPOSITION, 0, NULL);
 
-    menuDescListEntries *walk;
-    for (walk = entries; *walk != EndOfList; walk++)
+    entriesT entries;
+    Tokenize(entries_string, entries, " ");
+
+    for (entriesIter i = entries.begin(); i != entries.end(); i++)
     {
-        UINT idx = (UINT) *walk;
-        if (promoted[idx])
+        std::string name = *i;
+        if (contains(promoted, name))
         {
             InsertMenuItemByName(
-                hMenu, menuDescList[idx].name, indexMenu++,
+                hMenu, name, indexMenu++,
                 idCmd++, idCmdFirst, L"Hg "
             );
         }
@@ -530,9 +501,10 @@ CShellExtCMenu::QueryContextMenu(
     {
         UINT indexSubMenu = 0;
         bool isSeparator = true;
-        for (walk = entries; *walk != EndOfList; walk++)
+        for (entriesIter i = entries.begin(); i != entries.end(); i++)
         {
-            if (*walk == Separator)
+            std::string name = *i;
+            if (name == "sep")
             {
                 if (!isSeparator)
                 {
@@ -545,11 +517,10 @@ CShellExtCMenu::QueryContextMenu(
             }
             else
             {
-                UINT idx = (UINT) *walk;
-                if (!promoted[idx])
+                if (!contains(promoted, name))
                 {
                     InsertMenuItemByName(
-                        hSubMenu, menuDescList[idx].name,
+                        hSubMenu, name,
                         indexSubMenu++, idCmd++, idCmdFirst, L""
                     );
                     isSeparator = false;

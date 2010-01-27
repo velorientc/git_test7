@@ -33,6 +33,9 @@ public:
     static int error(const std::string& text) {
         return SendRequest("error|" + text);
     }
+    static int terminate() {
+        return SendRequest("terminate|");
+    }
 };
 
 #endif
