@@ -1648,7 +1648,7 @@ class GStatus(gdialog.GWindow):
         menu.append_sep()
         make(_('L_og'), log, 'MARC!ru', 'menulog.ico')
         menu.append_sep()
-        make(_('_Forget'), forget, 'MARC!ru', gtk.STOCK_CLEAR, paths=True)
+        make(_('_Forget'), forget, 'MAC!ru', gtk.STOCK_CLEAR, paths=True)
         make(_('_Add'), add, 'I?', gtk.STOCK_ADD, paths=True)
         make(_('_Guess Rename...'), guess_rename, '?!', 'detect_rename.ico')
         make(_('_Ignore'), ignore, '?', 'ignore.ico')
