@@ -254,12 +254,16 @@ class GLog(gdialog.GWindow):
                 hglib._maxdiff = None
             self.reload_log()
         lb = hglib.getlivebranch(self.repo)
-        bmenus = []
+        navi_b = []
+        filter_b = []
         if len(lb) > 1 or (lb and lb[0] != 'default'):
-            bmenus.append(dict(text='----'))
+            navi_b.append(dict(text='----'))
             for name in lb[:10]:
-                bmenus.append(dict(text=hglib.toutf(name), func=navigate, 
-                    args=[name]))
+                bname = hglib.toutf(name)
+                navi_b.append(dict(text=bname, func=navigate, args=[name]))
+                filter_b.append(dict(text=bname, name='@' + bname,
+                         func=self.filter_handler, args=['branch', bname],
+                         asradio=True, rg='all'))
 
         fnc = self.toggle_view_column
         if self.repo.ui.configbool('tortoisehg', 'disable-syncbar'):
@@ -329,7 +333,7 @@ class GLog(gdialog.GWindow):
             dict(text='----'),
             dict(text=_('Revision...'), icon=gtk.STOCK_JUMP_TO,
                 func=lambda *a: self.show_goto_dialog()),
-            ] + bmenus),
+            ] + navi_b),
 
         dict(text=_('_Synchronize'), subitems=[
             dict(text=_('Incoming'), name='incoming',
@@ -365,7 +369,37 @@ class GLog(gdialog.GWindow):
                 ascheck=True, func=toggle_proxy),
             dict(text=_('Force push'), ascheck=True, func=toggle_force),
             ]),
-            ] + p4menu
+
+        dict(text=_('_Filter'), subitems=[
+            dict(text=_('All'), name='all', asradio=True,
+                func=self.filter_handler, args=['all'], check=True),
+            dict(text=_('Tagged'), name='tagged', asradio=True,
+                func=self.filter_handler, args=['tagged'], rg='all'),
+            dict(text=_('Ancestry'), name='ancestry', asradio=True,
+                func=self.filter_handler, args=['ancestry'], rg='all'),
+            dict(text=_('Parents'), name='parents', asradio=True,
+                func=self.filter_handler, args=['parents'], rg='all'),
+            dict(text=_('Heads'), name='heads', asradio=True,
+                func=self.filter_handler, args=['heads'], rg='all'),
+            dict(text=_('Merges'), name='only_merges', asradio=True,
+                func=self.filter_handler, args=['only_merges'], rg='all'),
+            dict(text=_('Branch'), name='branch', subitems=filter_b),
+            dict(text=_('Custom'), name='custom', subitems=[
+                dict(text=_('Revision Range'), name='revrange', asradio=True,
+                    rg='all', func=self.filter_handler, args=['custom', 0]),
+                dict(text=_('File Patterns'), name='filepats', asradio=True,
+                    rg='all', func=self.filter_handler, args=['custom', 1]),
+                dict(text=_('Keywords'), name='keywords', asradio=True,
+                    rg='all', func=self.filter_handler, args=['custom', 2]),
+                dict(text=_('Date'), name='date', asradio=True,
+                    rg='all', func=self.filter_handler, args=['custom', 3]),
+                dict(text=_('User'), name='user', asradio=True,
+                    rg='all', func=self.filter_handler, args=['custom', 4]),
+                ]),
+            dict(text='----'),
+            dict(text=_('Hide Merges'), name='no_merges', ascheck=True,
+                func=self.filter_handler, args=['no_merges']),
+            ])] + p4menu
 
     def toggle_view_column(self, button, property):
         active = button.get_active()
@@ -507,6 +541,7 @@ class GLog(gdialog.GWindow):
         self.prevrevid = self.currevid
         self.currevid = graphview.get_revid_at_path(path)
         self.filterbar.get_button('ancestry').set_sensitive(True)
+        self.menuitems['ancestry'].set_sensitive(True)
         if self.currevid != self.lastrevid:
             self.lastrevid = self.currevid
             self.changeview.opts['rev'] = [str(self.currevid)]
@@ -605,42 +640,98 @@ class GLog(gdialog.GWindow):
             self.entrycombo.get_model().append( row )
         self.activate_filter(text, mode)
 
-    def activate_filter(self, text, mode):
-        opts = {}
-        if mode == 0: # Rev Range
+    def check_filter_text(self, text, mode):
+        if not text:
+            return False
+        elif mode == 0:
             try:
-                opts['revlist'] = cmdutil.revrange(self.repo, [text])
+                cmdutil.revrange(self.repo, [text])
             except Exception, e:
-                gdialog.Prompt(_('Invalid revision range'), str(e), self).run()
-                return
-        elif mode == 1: # File Patterns
-            opts['pats'] = [w.strip() for w in text.split(',')]
-        elif mode == 2: # Keywords
-            opts['keyword'] = [w.strip() for w in text.split(',')]
-        elif mode == 3: # Date
+                gdialog.Prompt(_('Invalid revision range'),
+                               str(e), self).run()
+                return False
+        elif mode == 3:
             try:
-                # return of matchdate not used, just sanity checking
                 util.matchdate(text)
-                opts['date'] = text
             except (ValueError, util.Abort), e:
                 gdialog.Prompt(_('Invalid date specification'),
                                str(e), self).run()
-                return
+                return False
+        return True
+
+    def activate_filter(self, text, mode):
+        if not self.check_filter_text(text, mode):
+            return
+        opts = {}
+        if mode == 0: # Rev Range
+            opts['revlist'] = cmdutil.revrange(self.repo, [text])
+            name = 'revrange'
+        elif mode == 1: # File Patterns
+            opts['pats'] = [w.strip() for w in text.split(',')]
+            name = 'filepats'
+        elif mode == 2: # Keywords
+            opts['keyword'] = [w.strip() for w in text.split(',')]
+            name = 'keywords'
+        elif mode == 3: # Date
+            opts['date'] = ret
+            name = 'date'
         elif mode == 4: # User
             opts['user'] = [w.strip() for w in text.split(',')]
+            name = 'user'
         else:
             return
         self.filterbar.get_button('custom').set_active(True)
         self.filter = 'custom'
         self.reload_log(**opts)
 
-    def filter_selected(self, widget, type):
-        if type == 'no_merges':
-            self.no_merges = widget.get_active()
-            self.reload_log()
-            return
+        # update menu item
+        menu = self.menuitems[name]
+        menu.handler_block_by_func(self.filter_handler)
+        menu.set_active(True)
+        menu.handler_unblock_by_func(self.filter_handler)
 
-        if not widget.get_active():
+    def filter_handler(self, menu, type, *args):
+        if not type == 'no_merges' and not menu.get_active():
+            self.lastfilterinfo = (menu, type)
+            return
+        if type == 'branch':
+            branch = args[0]
+            combo = self.branchcombo
+            model = combo.get_model()
+            for row in model:
+                if row[0] == branch:
+                    if combo.get_active_text() == branch:
+                        # need to activate 'branch' radio button if specified
+                        # branch was already selected at drop-down list
+                        self.filterbar.get_button('branch').set_active(True)
+                    else:
+                        combo.set_active_iter(row.iter)
+                    break
+        elif type == 'custom':
+            from tortoisehg.hgtk import dialog
+            desc = _("'%s' filter:") % menu.child.get_text()
+            mode = args[0]
+            text = dialog.entry_dialog(self, desc)
+            if self.check_filter_text(text, mode):
+                self.filterentry.set_text(text)
+                self.filtercombo.set_active(mode)
+                self.filter_entry_activated(self.filterentry,
+                                            self.filtercombo)
+            elif self.lastfilterinfo:
+                # restore previously selected filter
+                pmenu, ptype = self.lastfilterinfo
+                if ptype == 'custom':
+                    pmenu.handler_block_by_func(self.filter_handler)
+                pmenu.set_active(True)
+                if ptype == 'custom':
+                    pmenu.handler_unblock_by_func(self.filter_handler)
+        else:
+            button = self.filterbar.get_button(type)
+            if button:
+                button.set_active(menu.get_active())
+
+    def filter_selected(self, widget, type):
+        if not type == 'no_merges' and not widget.get_active():
             return
 
         if type == 'branch':
@@ -648,17 +739,32 @@ class GLog(gdialog.GWindow):
             self.select_branch(self.branchcombo)
             return
 
+        menu = self.menuitems[type]
+        menu.handler_block_by_func(self.filter_handler)
+        menu.set_active(widget.get_active())
+        menu.handler_unblock_by_func(self.filter_handler)
+
+        if type == 'no_merges':
+            self.no_merges = widget.get_active()
+            self.reload_log()
+            return
+
         self.filter = type
         self.filteropts = None
         self.reload_log()
 
     def update_hide_merges_button(self):
+        button = self.filterbar.get_button('no_merges')
+        menu = self.menuitems['no_merges']
         compatible = self.filter in ['all', 'branch', 'custom']
         if compatible:
-            self.filterbar.get_button('no_merges').set_sensitive(True)
+            button.set_sensitive(True)
+            menu.set_sensitive(True)
         else:
-            self.filterbar.get_button('no_merges').set_active(False)
-            self.filterbar.get_button('no_merges').set_sensitive(False)
+            button.set_active(False)
+            button.set_sensitive(False)
+            menu.set_active(False)
+            menu.set_sensitive(False)
             self.no_merges = False
 
     def patch_selected(self, mqwidget, revid, patchname):
@@ -861,6 +967,7 @@ class GLog(gdialog.GWindow):
         self.cmd_set_sensitive('load-more', len(self.repo)>0)
         self.cmd_set_sensitive('load-all', len(self.repo)>0)
         self.filterbar.get_button('ancestry').set_sensitive(False)
+        self.menuitems['ancestry'].set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
         self.pats = pats
@@ -1305,6 +1412,7 @@ class GLog(gdialog.GWindow):
                                    hglib.getlivebranch(self.repo))
         filterbar = self.filterbar
         self.lastbranchrow = None
+        self.lastfilterinfo = None
         self.filter_mode = filterbar.filter_mode
         self.filtercombo = filterbar.filtercombo
         self.filterentry = filterbar.entry
@@ -1834,6 +1942,13 @@ class GLog(gdialog.GWindow):
             self.filterbar.get_button('branch').set_active(True)
             self.filterbar.get_button('branch').set_sensitive(True)
             self.reload_log(branch=combo.get_model()[row][0])
+
+            bname = combo.get_active_text() # utf8 encoded
+            menu = self.menuitems.get('@' + bname)
+            if menu:
+                menu.handler_block_by_func(self.filter_handler)
+                menu.set_active(True)
+                menu.handler_unblock_by_func(self.filter_handler)
 
     def show_goto_dialog(self):
         'Launch a modeless goto revision dialog'
