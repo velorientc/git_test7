@@ -35,33 +35,42 @@ class FilterBar(gtklib.SlimToolbar):
     def __init__(self, tooltips, filter_mode, branch_names):
         gtklib.SlimToolbar.__init__(self, tooltips)
         self.filter_mode = filter_mode
+        self.buttons = {}
 
         self.all = gtk.RadioButton(None, _('All'))
         self.all.set_active(True)
         self.append_widget(self.all, padding=0)
+        self.buttons['all'] = self.all
 
         self.tagged = gtk.RadioButton(self.all, _('Tagged'))
         self.append_widget(self.tagged, padding=0)
+        self.buttons['tagged'] = self.tagged
 
         self.ancestry = gtk.RadioButton(self.all, _('Ancestry'))
         self.append_widget(self.ancestry, padding=0)
+        self.buttons['ancestry'] = self.ancestry
 
         self.parents = gtk.RadioButton(self.all, _('Parents'))
         self.append_widget(self.parents, padding=0)
+        self.buttons['parents'] = self.parents
 
         self.heads = gtk.RadioButton(self.all, _('Heads'))
         self.append_widget(self.heads, padding=0)
+        self.buttons['heads'] = self.heads
 
         self.merges = gtk.RadioButton(self.all, _('Merges'))
         self.append_widget(self.merges, padding=0)
+        self.buttons['only_merges'] = self.merges
 
         self.hidemerges = gtk.CheckButton(_('Hide Merges'))
         self.append_widget(self.hidemerges, padding=0)
+        self.buttons['no_merges'] = self.hidemerges
 
         self.branches = gtk.RadioButton(self.all)
         tooltips.set_tip(self.branches, _('Branch Filter'))
         self.branches.set_sensitive(False)
         self.append_widget(self.branches, padding=0)
+        self.buttons['branch'] = self.branches
 
         self.branchcombo = gtk.combo_box_new_text()
         self.branchcombo.append_text(_('Branches...'))
@@ -74,6 +83,7 @@ class FilterBar(gtklib.SlimToolbar):
         tooltips.set_tip(self.custombutton, _('Custom Filter'))
         self.custombutton.set_sensitive(False)
         self.append_widget(self.custombutton, padding=0)
+        self.buttons['custom'] = self.custombutton
 
         self.filtercombo = gtk.combo_box_new_text()
         self.filtercombo_entries = (_('Rev Range'), _('File Patterns'),
@@ -98,13 +108,15 @@ class FilterBar(gtklib.SlimToolbar):
         self.entry = entry
         self.append_widget(entrycombo, expand=True, padding=0)
 
-
     def connect(self, detailed_signal, handler, *opts):
         '''Connect an external signal handler to an internal widget
            Signal format is '[widget_name]_[signal]'.'''
         widget_name, signal = detailed_signal.split('_')
         widget = self.__dict__[widget_name]
         widget.connect(signal, handler, *opts)
+
+    def get_button(self, type):
+        return self.buttons.get(type)
 
 class GLog(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
@@ -492,7 +504,7 @@ class GLog(gdialog.GWindow):
             return False
         self.prevrevid = self.currevid
         self.currevid = graphview.get_revid_at_path(path)
-        self.ancestrybutton.set_sensitive(True)
+        self.filterbar.get_button('ancestry').set_sensitive(True)
         if self.currevid != self.lastrevid:
             self.lastrevid = self.currevid
             self.changeview.opts['rev'] = [str(self.currevid)]
@@ -616,7 +628,7 @@ class GLog(gdialog.GWindow):
             opts['user'] = [w.strip() for w in text.split(',')]
         else:
             return
-        self.custombutton.set_active(True)
+        self.filterbar.get_button('custom').set_active(True)
         self.filter = 'custom'
         self.reload_log(**opts)
 
@@ -641,10 +653,10 @@ class GLog(gdialog.GWindow):
     def update_hide_merges_button(self):
         compatible = self.filter in ['all', 'branch', 'custom']
         if compatible:
-            self.hidemerges.set_sensitive(True)
+            self.filterbar.get_button('no_merges').set_sensitive(True)
         else:
-            self.hidemerges.set_active(False)
-            self.hidemerges.set_sensitive(False)
+            self.filterbar.get_button('no_merges').set_active(False)
+            self.filterbar.get_button('no_merges').set_sensitive(False)
             self.no_merges = False
 
     def patch_selected(self, mqwidget, revid, patchname):
@@ -681,13 +693,13 @@ class GLog(gdialog.GWindow):
 
         opts = self.opts
         if opts['filehist']:
-            self.custombutton.set_active(True)
+            self.filterbar.get_button('custom').set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             self.filterentry.set_text(opts['filehist'])
             self.filter_entry_activated(self.filterentry, self.filtercombo)
         elif self.pats:
-            self.custombutton.set_active(True)
+            self.filterbar.get_button('custom').set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             self.filterentry.set_text(', '.join(self.pats))
@@ -846,7 +858,7 @@ class GLog(gdialog.GWindow):
 
         self.cmd_set_sensitive('load-more', len(self.repo)>0)
         self.cmd_set_sensitive('load-all', len(self.repo)>0)
-        self.ancestrybutton.set_sensitive(False)
+        self.filterbar.get_button('ancestry').set_sensitive(False)
         pats = opts.get('pats', [])
         self.changeview.pats = pats
         self.pats = pats
@@ -1290,15 +1302,11 @@ class GLog(gdialog.GWindow):
                                    self.filter_mode, 
                                    hglib.getlivebranch(self.repo))
         filterbar = self.filterbar
-        self.ancestrybutton = filterbar.ancestry
-        self.hidemerges = filterbar.hidemerges
-        self.branchbutton = filterbar.branches
         self.lastbranchrow = None
-        self.branchcombo = filterbar.branchcombo
-        self.custombutton = filterbar.custombutton 
         self.filter_mode = filterbar.filter_mode
         self.filtercombo = filterbar.filtercombo
         self.filterentry = filterbar.entry
+        self.branchcombo = filterbar.branchcombo
         self.entrycombo = filterbar.entrycombo
 
         fcon = self.filterbar.connect
@@ -1821,8 +1829,8 @@ class GLog(gdialog.GWindow):
         elif row != self.lastbranchrow:
             self.filter = 'branch'
             self.lastbranchrow = row
-            self.branchbutton.set_active(True)
-            self.branchbutton.set_sensitive(True)
+            self.filterbar.get_button('branch').set_active(True)
+            self.filterbar.get_button('branch').set_sensitive(True)
             self.reload_log(branch=combo.get_model()[row][0])
 
     def show_goto_dialog(self):
