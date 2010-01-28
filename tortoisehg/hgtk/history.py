@@ -29,6 +29,12 @@ from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 from tortoisehg.hgtk import statusbar, bookmark, thgimport
 
+MODE_REVRANGE = 0
+MODE_FILEPATS = 1
+MODE_KEYWORDS = 2
+MODE_DATE     = 3
+MODE_USER     = 4
+
 class FilterBar(gtklib.SlimToolbar):
     'Filter Toolbar for repository log'
 
@@ -386,15 +392,20 @@ class GLog(gdialog.GWindow):
             dict(text=_('Branch'), name='branch', subitems=filter_b),
             dict(text=_('Custom'), name='custom', subitems=[
                 dict(text=_('Revision Range'), name='revrange', asradio=True,
-                    rg='all', func=self.filter_handler, args=['custom', 0]),
+                    rg='all', func=self.filter_handler,
+                    args=['custom', MODE_REVRANGE]),
                 dict(text=_('File Patterns'), name='filepats', asradio=True,
-                    rg='all', func=self.filter_handler, args=['custom', 1]),
+                    rg='all', func=self.filter_handler,
+                    args=['custom', MODE_FILEPATS]),
                 dict(text=_('Keywords'), name='keywords', asradio=True,
-                    rg='all', func=self.filter_handler, args=['custom', 2]),
+                    rg='all', func=self.filter_handler,
+                    args=['custom', MODE_KEYWORDS]),
                 dict(text=_('Date'), name='date', asradio=True,
-                    rg='all', func=self.filter_handler, args=['custom', 3]),
+                    rg='all', func=self.filter_handler,
+                    args=['custom', MODE_DATE]),
                 dict(text=_('User'), name='user', asradio=True,
-                    rg='all', func=self.filter_handler, args=['custom', 4]),
+                    rg='all', func=self.filter_handler,
+                    args=['custom', MODE_USER]),
                 ]),
             dict(text='----'),
             dict(text=_('Hide Merges'), name='no_merges', ascheck=True,
@@ -663,19 +674,19 @@ class GLog(gdialog.GWindow):
         if not self.check_filter_text(text, mode):
             return
         opts = {}
-        if mode == 0: # Rev Range
+        if mode == MODE_REVRANGE:
             opts['revlist'] = cmdutil.revrange(self.repo, [text])
             name = 'revrange'
-        elif mode == 1: # File Patterns
+        elif mode == MODE_FILEPATS:
             opts['pats'] = [w.strip() for w in text.split(',')]
             name = 'filepats'
-        elif mode == 2: # Keywords
+        elif mode == MODE_KEYWORDS:
             opts['keyword'] = [w.strip() for w in text.split(',')]
             name = 'keywords'
-        elif mode == 3: # Date
+        elif mode == MODE_DATE:
             opts['date'] = ret
             name = 'date'
-        elif mode == 4: # User
+        elif mode == MODE_USER:
             opts['user'] = [w.strip() for w in text.split(',')]
             name = 'user'
         else:
