@@ -468,47 +468,56 @@ class GWindow(gtk.Window):
         menus = self.get_menu_list()
         if menus:
             allmenus = [
-          (_('_Tools'),
-           [dict(text=_('Repository Explorer'), func=self.launch, args=['log'],
-                icon='menulog.ico'),
-            dict(text=_('Commit'), func=self.launch, args=['commit'],
-                icon='menucommit.ico'),
-            dict(text=_('Datamine'), func=self.launch, args=['datamine'],
-                icon='menurepobrowse.ico'),
-            dict(text=_('Recovery'), func=self.launch, args=['recover'],
-                icon='general.ico'),
-            dict(text=_('Serve'), func=self.launch, args=['serve'],
-                icon='proxy.ico'),
-            dict(text=_('Shelve'), func=self.launch, args=['shelve'],
-                icon='shelve.ico'),
-            dict(text=_('Synchronize'), func=self.launch, args=['synch'],
-                icon='menusynch.ico'),
-            dict(text=_('Settings'), func=self.launch, args=['repoconfig'],
-                icon='settings_repo.ico')])
-           ] + menus + [
-          (_('_Help'),
-           [dict(text=_('Contents'), func=self.helpcontents,
-                icon=gtk.STOCK_INFO),
-            dict(text=_('Index'), func=self.helpindex,
-                icon=gtk.STOCK_HELP),
-            dict(text=_('About'), func=self.launch, args=['about'],
-                icon=gtk.STOCK_ABOUT)])
-           ]
-            menubar = gtk.MenuBar()
-            for title, items in allmenus:
-                m_items = gtklib.MenuBuilder()
-                for d in items:
+            dict(text=_('_Tools'), subitems=[
+                dict(text=_('Repository Explorer'), func=self.launch,
+                    args=['log'], icon='menulog.ico'),
+                dict(text=_('Commit'), func=self.launch,
+                    args=['commit'], icon='menucommit.ico'),
+                dict(text=_('Datamine'), func=self.launch,
+                    args=['datamine'], icon='menurepobrowse.ico'),
+                dict(text=_('Recovery'), func=self.launch,
+                    args=['recover'], icon='general.ico'),
+                dict(text=_('Serve'), func=self.launch,
+                    args=['serve'], icon='proxy.ico'),
+                dict(text=_('Shelve'), func=self.launch,
+                    args=['shelve'], icon='shelve.ico'),
+                dict(text=_('Synchronize'), func=self.launch,
+                    args=['synch'], icon='menusynch.ico'),
+                dict(text=_('Settings'), func=self.launch,
+                    args=['repoconfig'], icon='settings_repo.ico')])
+                ] + menus + [
+            dict(text=_('_Help'), subitems=[
+                dict(text=_('Contents'), func=self.helpcontents,
+                    icon=gtk.STOCK_INFO),
+                dict(text=_('Index'), func=self.helpindex,
+                    icon=gtk.STOCK_HELP),
+                dict(text=_('About'), func=self.launch,
+                    args=['about'], icon=gtk.STOCK_ABOUT)])
+                ]
+            def build(menus, nobuild=False):
+                mb = gtklib.MenuBuilder()
+                for d in menus:
                     text = d['text']
                     if text == '----':
-                        m_items.append_sep()
+                        mb.append_sep()
                         continue
-                    item = m_items.append(text, d.get('func'), **d)
+                    subitems = d.get('subitems')
+                    if subitems:
+                        sub = build(subitems)
+                        item = mb.append_submenu(text, sub, **d)
+                    else:
+                        if 'rg' in d:
+                            d.update(group=self.menuitems.get(d['rg']))
+                        item = mb.append(text, d.get('func'), **d)
                     name = d.get('name')
                     if name:
                         self.menuitems[name] = item
-                item = gtk.MenuItem(title)
-                item.set_submenu(m_items.build())
-                menubar.append(item)
+                if nobuild:
+                    return mb.get_menus()
+                return mb.build()
+            menubar = gtk.MenuBar()
+            for menu in build(allmenus, nobuild=True):
+                menubar.append(menu)
 
         vbox = gtk.VBox(False, 0)
         self.add(vbox)
