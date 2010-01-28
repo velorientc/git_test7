@@ -209,7 +209,8 @@ class GCommit(GStatus):
                 func=self.mq_clicked, check=self.setting_mqvis) ]
         else:
             mq_item = []
-        return [(_('_View'), [
+        return [
+        dict(text=_('_View'), subitems=[
             dict(text=_('Toolbar'), ascheck=True, check=self.showtoolbar,
                 func=toggle_showtoolbar),
             dict(text=_('Advanced'), ascheck=True, func=toggle,
@@ -221,8 +222,9 @@ class GCommit(GStatus):
             dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH),
             dict(text='----'),
             dict(name='always-show-output', text=_('Always Show Output'),
-                ascheck=True, func=toggle_showoutput, check=self.showoutput)]),
-           (_('_Operations'), [
+                ascheck=True, func=toggle_showoutput, check=self.showoutput)
+            ]),
+        dict(text=_('_Operations'), subitems=[
             dict(text=_('_Commit'), func=self.commit_clicked,
                 icon=gtk.STOCK_OK),
             dict(name='undo', text=_('_Undo'), func=self.undo_clicked,
@@ -239,8 +241,8 @@ class GCommit(GStatus):
             dict(name='move', text=_('Move'), func=self.move_clicked,
                 icon=gtk.STOCK_JUMP_TO),
             dict(name='forget', text=_('_Forget'), func=self.forget_clicked,
-                icon=gtk.STOCK_CLEAR)]),
-           ]
+                icon=gtk.STOCK_CLEAR)
+            ])]
 
     def save_settings(self):
         settings = GStatus.save_settings(self)
