@@ -722,13 +722,20 @@ def create_menuitem(label, handler=None, icon=None, *args, **kargs):
     icon: GKT+ stock item name or TortoiseHg's bundle icon name.
           Default: None.
     ascheck: whether enable toggle feature. Default: False.
-    check: toggle state on init. Default: False.
+    asradio: whether use radio menu item. Default: False.
+    group: menu item instance to be used for group of radio menu item.
+           Default: None.
+    check: toggle or selection state for check/radio menu item.
+           Default: False.
     sensitive: sensitive state on init. Default: True.
     args: an argument list for 'handler' parameter.
           Default: [] (an empty list).
     """
-    if kargs.get('ascheck', False):
-        menu = gtk.CheckMenuItem(label)
+    if kargs.get('asradio') or kargs.get('ascheck'):
+        if kargs.get('asradio'):
+            menu = gtk.RadioMenuItem(kargs.get('group'), label)
+        else:
+            menu = gtk.CheckMenuItem(label)
         menu.set_active(kargs.get('check', False))
     elif icon:
         menu = gtk.ImageMenuItem(label)
