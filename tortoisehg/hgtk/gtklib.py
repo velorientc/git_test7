@@ -753,16 +753,16 @@ class MenuBuilder(object):
         self.childs = []
         self.sep = None
 
-    def append(self, *args, **kargs):
-        menu = create_menuitem(*args, **kargs)
+    def append(self, *a, **k):
+        menu = create_menuitem(*a, **k)
         self.append_child(menu)
         return menu
 
     def append_sep(self):
         self.append_child(gtk.SeparatorMenuItem())
 
-    def append_submenu(self, label, submenu, icon=None):
-        menu = create_menuitem(label, None, icon)
+    def append_submenu(self, label, submenu, icon=None, *a, **k):
+        menu = create_menuitem(label, None, icon, *a, **k)
         menu.set_submenu(submenu)
         self.append_child(menu)
 
