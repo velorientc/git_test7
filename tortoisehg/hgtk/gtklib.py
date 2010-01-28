@@ -773,6 +773,9 @@ class MenuBuilder(object):
         self.reset()
         return menu
 
+    def get_menus(self):
+        return self.childs[:]
+
     ### internal method ###
 
     def append_child(self, child):
