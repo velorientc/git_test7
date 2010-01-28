@@ -285,7 +285,7 @@ class GLog(gdialog.GWindow):
             mq_item = []
 
         if 'perfarce' in self.exs:
-            p4menu = [(_('_Perforce'), [
+            p4menu = [dict(text=_('_Perforce'), subitems=[
                 dict(text=_('Identify'), func=self.p4identify,
                     icon=gtk.STOCK_PROPERTIES),
                 dict(text=_('Pending'), func=self.p4pending,
