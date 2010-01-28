@@ -29,7 +29,7 @@ from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 from tortoisehg.hgtk import statusbar, bookmark, thgimport
 
-class FilterBox(gtklib.SlimToolbar):
+class FilterBar(gtklib.SlimToolbar):
     'Filter Toolbar for repository log'
 
     def __init__(self, tooltips, filter_mode, branch_names):
@@ -115,7 +115,7 @@ class GLog(gdialog.GWindow):
         self.currevid = None
         self.origtip = len(self.repo)
         self.ready = False
-        self.filterbox = None
+        self.filterbar = None
         self.details_model = None
         self.syncbox = None
         self.filteropts = None
@@ -377,8 +377,8 @@ class GLog(gdialog.GWindow):
 
     def toggle_show_filterbar(self, button):
         self.show_filterbar = button.get_active()
-        if self.filterbox is not None:
-            self.filterbox.set_property('visible', self.show_filterbar)
+        if self.filterbar is not None:
+            self.filterbar.set_property('visible', self.show_filterbar)
 
     def toggle_show_syncbar(self, button):
         self.show_syncbar = button.get_active()
@@ -698,8 +698,8 @@ class GLog(gdialog.GWindow):
         else:
             self.reload_log(**opts)
 
-        self.filterbox.set_property('visible', self.show_filterbar)
-        self.filterbox.set_no_show_all(True)
+        self.filterbar.set_property('visible', self.show_filterbar)
+        self.filterbar.set_no_show_all(True)
         self.syncbox.set_property('visible', self.show_syncbar)
         self.syncbox.set_no_show_all(True)
 
@@ -1286,22 +1286,22 @@ class GLog(gdialog.GWindow):
         stop.connect('clicked', self.stop_clicked)
 
         # filter bar
-        self.filterbox = FilterBox(self.tooltips,
+        self.filterbar = FilterBar(self.tooltips,
                                    self.filter_mode, 
                                    hglib.getlivebranch(self.repo))
-        filterbox = self.filterbox
-        self.ancestrybutton = filterbox.ancestry
-        self.hidemerges = filterbox.hidemerges
-        self.branchbutton = filterbox.branches
+        filterbar = self.filterbar
+        self.ancestrybutton = filterbar.ancestry
+        self.hidemerges = filterbar.hidemerges
+        self.branchbutton = filterbar.branches
         self.lastbranchrow = None
-        self.branchcombo = filterbox.branchcombo
-        self.custombutton = filterbox.custombutton 
-        self.filter_mode = filterbox.filter_mode
-        self.filtercombo = filterbox.filtercombo
-        self.filterentry = filterbox.entry
-        self.entrycombo = filterbox.entrycombo
+        self.branchcombo = filterbar.branchcombo
+        self.custombutton = filterbar.custombutton 
+        self.filter_mode = filterbar.filter_mode
+        self.filtercombo = filterbar.filtercombo
+        self.filterentry = filterbar.entry
+        self.entrycombo = filterbar.entrycombo
 
-        fcon = self.filterbox.connect
+        fcon = self.filterbar.connect
         fsel = self.filter_selected
         fcon('all_toggled', fsel, 'all')
         fcon('tagged_toggled', fsel, 'tagged')
@@ -1317,7 +1317,7 @@ class GLog(gdialog.GWindow):
 
         midpane = gtk.VBox()
         midpane.pack_start(syncbox, False)
-        midpane.pack_start(filterbox, False)
+        midpane.pack_start(filterbar, False)
         midpane.pack_start(self.graphview)
         midpane.show_all()
 
