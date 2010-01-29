@@ -119,6 +119,14 @@ def gethidetags(ui):
         _hidetags = taglist
     return _hidetags
 
+def getfilteredtags(repo):
+    filtered = []
+    hides = gethidetags(repo.ui)
+    for tag in list(repo.tags()):
+        if tag not in hides:
+            filtered.append(tag)
+    return filtered
+
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'
     if _tabwidth is None:
