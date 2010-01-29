@@ -259,18 +259,39 @@ class GLog(gdialog.GWindow):
             else:
                 hglib._maxdiff = None
             self.reload_log()
+
+        # navigation menu (branches, tags)
+        navi_menu = []
+
         lb = hglib.getlivebranch(self.repo)
-        navi_b = []
         filter_b = []
         if len(lb) > 1 or (lb and lb[0] != 'default'):
-            navi_b.append(dict(text='----'))
+            navi_b = []
             for name in lb[:10]:
                 bname = hglib.toutf(name)
                 navi_b.append(dict(text=bname, func=navigate, args=[name]))
                 filter_b.append(dict(text=bname, name='@' + bname,
                          func=self.filter_handler, args=['branch', bname],
                          asradio=True, rg='all'))
+            if len(navi_b) > 0:
+                navi_menu.append(dict(text='----'))
+                navi_menu.append(dict(text=_('Branches'), subitems=navi_b,
+                                      icon='branch.ico'))
 
+        ft = hglib.getfilteredtags(self.repo)
+        ft.sort()
+        ft.reverse()
+        navi_t = []
+        for tag in ft:
+            tname = hglib.toutf(tag)
+            navi_t.append(dict(text=tname, func=navigate, args=[tag]))
+        if len(navi_t) > 0:
+            if len(navi_menu) == 0:
+                navi_menu.append(dict(text='----'))
+            navi_menu.append(dict(text=_('Tags'), subitems=navi_t,
+                                  icon=gtk.STOCK_ITALIC))
+
+        # sync menu
         fnc = self.toggle_view_column
         if self.repo.ui.configbool('tortoisehg', 'disable-syncbar'):
             sync_bar_item = []
@@ -278,12 +299,14 @@ class GLog(gdialog.GWindow):
             sync_bar_item = [dict(text=_('Sync Bar'), ascheck=True, 
                     func=self.toggle_show_syncbar, check=self.show_syncbar)]
 
+        # MQ extension menu
         if 'mq' in self.exs:
             mq_item = [dict(text=_('Patch Queue'), name='mq', ascheck=True,
                 func=self.mq_clicked, check=self.setting_mqvis) ]
         else:
             mq_item = []
 
+        # Perforce extension menu
         if 'perfarce' in self.exs:
             p4menu = [dict(text=_('_Perforce'), subitems=[
                 dict(text=_('Identify'), func=self.p4identify,
@@ -339,7 +362,7 @@ class GLog(gdialog.GWindow):
             dict(text='----'),
             dict(text=_('Revision...'), icon=gtk.STOCK_JUMP_TO,
                 func=lambda *a: self.show_goto_dialog()),
-            ] + navi_b),
+            ] + navi_menu),
 
         dict(text=_('_Synchronize'), subitems=[
             dict(text=_('Incoming'), name='incoming',
