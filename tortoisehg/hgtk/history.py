@@ -1113,13 +1113,13 @@ class GLog(gdialog.GWindow):
         m.append(_('Visualize Change'), self.vdiff_change,
                  gtk.STOCK_JUSTIFY_FILL)
         m.append(_('Di_splay Change'), self.show_status)
-        m.append(_('Diff to local'), self.vdiff_local)
+        m.append(_('Diff to Local'), self.vdiff_local)
         m.append_sep()
-        m.append(_('_Copy hash'), self.copy_hash, gtk.STOCK_COPY)
+        m.append(_('_Copy Hash'), self.copy_hash, gtk.STOCK_COPY)
         if self.bfile:
             if self.currevid >= len(self.repo) - self.npreviews:
                 m.append_sep()
-                m.append(_('Pull to here'), self.pull_to,
+                m.append(_('Pull to Here'), self.pull_to,
                          gtk.STOCK_GOTO_BOTTOM)
             menu = m.build()
             menu.show_all()
@@ -1127,7 +1127,7 @@ class GLog(gdialog.GWindow):
 
         if self.repo[self.currevid].node() in self.outgoing:
             m.append_sep()
-            m.append(_('Push to here'), self.push_to, gtk.STOCK_GOTO_TOP)
+            m.append(_('Push to Here'), self.push_to, gtk.STOCK_GOTO_TOP)
         m.append_sep()
         m.append(_('_Update...'), self.checkout, 'menucheckout.ico')
         mmerge = m.append(_('_Merge with...'), self.domerge, 'menumerge.ico')
@@ -1160,7 +1160,7 @@ class GLog(gdialog.GWindow):
 
         # need transplant extension for transplant command
         if 'transplant' in self.exs:
-            m.append(_('Transp_lant to local'), self.transplant_rev,
+            m.append(_('Transp_lant to Local'), self.transplant_rev,
                      gtk.STOCK_CONVERT)
 
         m.append_sep()
@@ -1219,9 +1219,9 @@ class GLog(gdialog.GWindow):
     def bisect_context_menu(self):
         m = gtklib.MenuBuilder() 
         m.append(_('Reset'), self.bisect_reset, gtk.STOCK_CLEAR)
-        m.append(_('Mark as good'), self.bisect_good, gtk.STOCK_YES)
-        m.append(_('Mark as bad'), self.bisect_bad, gtk.STOCK_NO)
-        m.append(_('Skip testing'), self.bisect_skip, gtk.STOCK_MEDIA_FORWARD)
+        m.append(_('Mark as Good'), self.bisect_good, gtk.STOCK_YES)
+        m.append(_('Mark as Bad'), self.bisect_bad, gtk.STOCK_NO)
+        m.append(_('Skip Testing'), self.bisect_skip, gtk.STOCK_MEDIA_FORWARD)
         return m.build()
 
     def restore_single_sel(self, widget, *args):
