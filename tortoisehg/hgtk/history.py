@@ -1136,7 +1136,7 @@ class GLog(gdialog.GWindow):
         m.append_sep()
         m.append_submenu(_('Export'), self.export_context_menu(), gtk.STOCK_GO_FORWARD)
         m.append_sep()
-        m.append_submenu(_('Tag'), self.tags_context_menu())
+        m.append_submenu(_('Tag'), self.tags_context_menu(), gtk.STOCK_ITALIC)
         m.append_sep()
 
         # disable/enable menus as required
@@ -1184,9 +1184,11 @@ class GLog(gdialog.GWindow):
         m.append(_('Add/Remove _Tag...'), self.add_tag)
         if 'bookmarks' in self.exs:
             m.append(_('Add/Move/Remove B_ookmark...'), self.add_bookmark)
-            m.append(_('Rename Bookmark...'), self.rename_bookmark)
+            m.append(_('Rename Bookmark...'), self.rename_bookmark,
+                     gtk.STOCK_EDIT)
             if self.repo.ui.configbool('bookmarks', 'track.current'):
-                m.append(_('Set Current Bookmark...'), self.current_bookmark)
+                m.append(_('Set Current Bookmark...'), self.current_bookmark,
+                         gtk.STOCK_YES)
         return m.build()
 
     def mq_context_menu(self):
