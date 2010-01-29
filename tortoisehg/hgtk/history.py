@@ -389,7 +389,8 @@ class GLog(gdialog.GWindow):
                 func=self.filter_handler, args=['heads'], rg='all'),
             dict(text=_('Merges'), name='only_merges', asradio=True,
                 func=self.filter_handler, args=['only_merges'], rg='all'),
-            dict(text=_('Branch'), name='branch', subitems=filter_b),
+            dict(text=_('Branch'), name='branch', icon='branch.ico',
+                subitems=filter_b),
             dict(text=_('Custom'), name='custom', subitems=[
                 dict(text=_('Revision Range'), name='revrange', asradio=True,
                     rg='all', func=self.filter_handler,
@@ -406,7 +407,7 @@ class GLog(gdialog.GWindow):
                 dict(text=_('User'), name='user', asradio=True,
                     rg='all', func=self.filter_handler,
                     args=['custom', MODE_USER]),
-                ]),
+                ], icon='general.ico'),
             dict(text='----'),
             dict(text=_('Hide Merges'), name='no_merges', ascheck=True,
                 func=self.filter_handler, args=['no_merges']),
