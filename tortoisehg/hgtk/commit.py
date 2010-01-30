@@ -142,7 +142,10 @@ class GCommit(GStatus):
         self.patch_text = None
         self.qheader = None
         self.runner = hgcmd.CmdRunner()
-        self.mqloaded = bool(extensions.find('mq'))
+        try:
+            self.mqloaded = bool(extensions.find('mq'))
+        except KeyError:
+            self.mqloaded = False
 
     def get_help_url(self):
         return 'commit.html'
