@@ -1,0 +1,18 @@
+Steps for making a release:
+* update ReleaseNotes.txt                           (major release only)
+* set revision number in doc/source*/conf.py
+* set revision number in win32/shellext/thgversion.h
+* tag stable branch of repository, push
+* build release installer
+* commit and tag thg-winbuild
+* create and upload a tarball
+* upload installer to bitbucket, sourceforge, codeplex
+* update thg-web curversion.txt, commit, push
+* update URLs and front page of thg-web
+* update NEWS on wiki front page
+* update and build hgbook, check into thg-winbuild  (major release only)
+* upload PDF and CHM, update wiki links             (major release only)
+* wiki: Move ReleaseNotes to old-release-notes      (major release only)
+* wiki: Move FixedBugs to ReleaseNotes, empty FixedBugs
+* update FAQ entries
+* [ANN] email to tortoisehg-discuss and mercurial@selenic.com
