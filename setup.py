@@ -178,20 +178,8 @@ def runcmd(cmd, env):
 version = ''
 
 if os.path.isdir('.hg'):
-    env = os.environ
-    env.update({'HGRCPATH': '', 'LANGUAGE': 'C'})
-    cmd = ['hg', 'id', '-i', '-t']
-    l = runcmd(cmd, env).split()
-    while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
-        l.pop()
-    if len(l) > 1: # tag found
-        version = l[-1]
-        if l[0].endswith('+'): # propagate the dirty status to the tag
-            version += '+'
-    elif len(l) == 1: # no tag found
-        cmd = ['hg', 'parents', '--template',
-               '{latesttag}+{latesttagdistance}-']
-        version = runcmd(cmd, env) + l[0]
+    from tortoisehg.util import version as _version
+    version = _version.liveversion()
     if version.endswith('+'):
         version += time.strftime('%Y%m%d')
 elif os.path.exists('.hg_archival.txt'):
