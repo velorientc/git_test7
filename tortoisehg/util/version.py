@@ -6,7 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-from mercurial import ui, hg, commands
+from mercurial import ui, hg, commands, error
 from tortoisehg.util.i18n import _
 
 def liveversion():
@@ -14,7 +14,7 @@ def liveversion():
     utilpath = os.path.dirname(os.path.realpath(__file__))
     thgpath = os.path.dirname(os.path.dirname(utilpath))
     if not os.path.isdir(os.path.join(thgpath, '.hg')):
-        return _('unknown')
+        raise error.RepoError(_('repository %s not found') % thgpath)
 
     u = ui.ui()
     repo = hg.repository(u, path=thgpath)
@@ -36,12 +36,13 @@ def liveversion():
 
 def version():
     try:
+        return liveversion()
+    except:
+        pass
+    try:
         import __version__
         return __version__.version
     except ImportError:
-        try:
-            return liveversion()
-        except:
-            return _('unknown')
+        return _('unknown')
 
 
