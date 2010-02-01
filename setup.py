@@ -15,6 +15,8 @@ from distutils.core import setup
 from distutils.command.build import build
 from distutils.spawn import spawn, find_executable
 
+thgcopyright = 'Copyright (C) 2010 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2010 Matt Mackall and others'
 
 class build_mo(build):
 
@@ -112,12 +114,17 @@ def setup_windows():
        }
     }
     extra['console'] = [
-            {'script':'contrib/hg', 'icon_resources':[(0,'icons/hg.ico')]},
-            {'script':'hgtk', 'icon_resources':[(0,'icons/thg_logo.ico')]}
+            {'script':'contrib/hg', 
+             'icon_resources':[(0,'icons/hg.ico')],
+             'copyright':hgcopyright},
+            {'script':'hgtk',
+             'icon_resources':[(0,'icons/thg_logo.ico')],
+             'copyright':thgcopyright}
             ]
     extra['windows'] = [
             {'script':'thgtaskbar.py',
-             'icon_resources':[(0,'icons/thg_logo.ico')]}
+             'icon_resources':[(0,'icons/thg_logo.ico')],
+             'copyright':thgcopyright}
             ]
 
     return _scripts, _packages, _data_files, extra
