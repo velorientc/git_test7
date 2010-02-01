@@ -1040,7 +1040,7 @@ class GLog(gdialog.GWindow):
                     opts['filehist'] = name
                     self.graphview.refresh(graphcol, [name], opts)
             if not opts.get('filehist'):
-                ftitle(_('custom filter'))
+                ftitle(self.filtercombo.get_active_text())
                 self.graphview.refresh(False, npats, opts)
             filtertext += self.filtercombo.get_active_text()
         elif self.filter == 'all':
