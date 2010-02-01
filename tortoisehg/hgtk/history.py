@@ -1296,6 +1296,17 @@ class GLog(gdialog.GWindow):
         self.stbar.append_field('filter')
         self.stbar.append_field('rev')
 
+        ## add load buttons to statusbar
+        self.sttool = gtklib.SlimToolbar(self.tooltips)
+        self.stbar.append_widget(self.sttool)
+        more = self.sttool.append_button(gtk.STOCK_GO_DOWN,
+                           _('Load more Revisions'), group='load')
+        more.connect('clicked', self.more_clicked)
+        all = self.sttool.append_button(gtk.STOCK_GOTO_BOTTOM,
+                          _('Load all Revisions'), group='load')
+        all.connect('clicked', self.load_all_clicked)
+        self.sttool.set_visible('load', not self.show_toolbar)
+
         # Allocate TreeView instance to use internally
         limit = self.limit
         if self.opts['limit']:
@@ -1527,18 +1538,7 @@ class GLog(gdialog.GWindow):
         return vbox
 
     def get_extras(self):
-        hbox = gtk.HBox()
-        hbox.pack_start(self.stbar)
-        self.sttool = gtklib.SlimToolbar(self.tooltips)
-        hbox.pack_end(self.sttool, False, False)
-        more = self.sttool.append_button(gtk.STOCK_GO_DOWN,
-                           _('Load more Revisions'), group='load')
-        more.connect('clicked', self.more_clicked)
-        all = self.sttool.append_button(gtk.STOCK_GOTO_BOTTOM,
-                          _('Load all Revisions'), group='load')
-        all.connect('clicked', self.load_all_clicked)
-        self.sttool.set_visible('load', not self.show_toolbar)
-        return hbox
+        return self.stbar
 
     def refresh_on_marker_change(self, oldlen, oldmarkers, newmarkers):
         # Note that oldmarkers/newmarkers may be either dicts
