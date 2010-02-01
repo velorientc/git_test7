@@ -121,7 +121,7 @@ class TreeView(gtk.ScrolledWindow):
                               ())
     }
 
-    def __init__(self, repo, limit=500, pbar=None):
+    def __init__(self, repo, limit=500, stbar=None):
         """Create a new TreeView.
 
         :param repo:  Repository object to show
@@ -134,7 +134,7 @@ class TreeView(gtk.ScrolledWindow):
         self.batchsize = limit
         self.repo = repo
         self.currevid = None
-        self.pbar = pbar
+        self.stbar = stbar
         self.grapher = None
         self.graphdata = []
         self.index = {}
@@ -142,9 +142,9 @@ class TreeView(gtk.ScrolledWindow):
                       'branch-color':False, 'show-graph':True }
         self.construct_treeview()
 
-    def set_repo(self, repo, pbar=None):
+    def set_repo(self, repo, stbar=None):
         self.repo = repo
-        self.pbar = pbar
+        self.stbar = stbar
 
     def search_in_tree(self, model, column, key, iter, data):
         """Searches all fields shown in the tree when the user hits crtr+f,
@@ -241,8 +241,8 @@ class TreeView(gtk.ScrolledWindow):
 
         if not len(self.graphdata):
             self.treeview.set_model(None)
-            if self.pbar is not None:
-                self.pbar.end()
+            if self.stbar is not None:
+                self.stbar.end()
             self.emit('revisions-loaded')
             return False
 
@@ -264,12 +264,12 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
         if revid is not None:
             self.set_revision_id(revid)
-        if self.pbar is not None:
-            self.pbar.end()
+        if self.stbar is not None:
+            self.stbar.end()
             revision_text = _('%(count)d of %(total)d Revisions') % {
                     'count': len(self.model),
                     'total': len(self.repo) }
-            self.pbar.set_text(revision_text, name='rev')
+            self.stbar.set_text(revision_text, name='rev')
         return False
 
     def do_get_property(self, property):
@@ -326,8 +326,8 @@ class TreeView(gtk.ScrolledWindow):
             return
         self.batchsize = size
         self.limit += self.batchsize
-        if self.pbar is not None:
-            self.pbar.begin()
+        if self.stbar is not None:
+            self.stbar.begin()
         gobject.idle_add(self.populate)
 
     def load_all_revisions(self):
@@ -335,8 +335,8 @@ class TreeView(gtk.ScrolledWindow):
             self.emit('revisions-loaded')
             return
         self.limit = None
-        if self.pbar is not None:
-            self.pbar.begin()
+        if self.stbar is not None:
+            self.stbar.begin()
         gobject.idle_add(self.populate)
 
     def scroll_to_revision(self, revid):
@@ -374,12 +374,12 @@ class TreeView(gtk.ScrolledWindow):
             hglib.invalidaterepo(self.repo)
             if len(self.repo) > 0:
                 self.create_log_generator(graphcol, pats, opts)
-                if self.pbar is not None:
-                    self.pbar.begin()
+                if self.stbar is not None:
+                    self.stbar.begin()
                 gobject.idle_add(self.populate, self.currevid)
             else:
                 self.treeview.set_model(None)
-                self.pbar.set_text(_('Repository is empty'))
+                self.stbar.set_text(_('Repository is empty'))
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
