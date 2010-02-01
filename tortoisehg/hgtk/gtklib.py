@@ -29,6 +29,18 @@ if gobject.pygobject_version <= (2,12,1):
     # http://www.mail-archive.com/tortoisehg-develop@lists.sourceforge.net/msg06900.html
     raise Exception('incompatible version of gobject')
 
+# common colors
+
+DRED = '#900000'
+DGREEN = '#006400'
+DBLUE = '#000090'
+
+PRED = '#ffcccc'
+PGREEN = '#aaffaa'
+PBLUE = '#aaddff'
+PYELLOW = '#ffffaa'
+PORANGE = '#ffddaa'
+
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)
@@ -39,7 +51,16 @@ def get_thg_modifier():
     else:
         return '<Control>'
 
-def set_tortoise_keys(window):
+def add_accelerator(widget, signal, accelgroup, accelerator,
+                    accel_flags=gtk.ACCEL_VISIBLE):
+    """Add an accelerator for signal to widget.
+
+    accelerator is the key string parsed by gtk.accelerator_parse; the
+    other parameters are passed to gtk.Widget.add_accelerator"""
+    key, modifier = gtk.accelerator_parse(accelerator)
+    widget.add_accelerator(signal, accelgroup, key, modifier, accel_flags)
+
+def set_tortoise_keys(window, connect=True):
     'Set default TortoiseHg keyboard accelerators'
     if sys.platform == 'darwin':
         mask = gtk.accelerator_get_default_mod_mask()
@@ -48,25 +69,24 @@ def set_tortoise_keys(window):
     mod = get_thg_modifier()
     accelgroup = gtk.AccelGroup()
     window.add_accel_group(accelgroup)
-    key, modifier = gtk.accelerator_parse(mod+'w')
-    window.add_accelerator('thg-close', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'q')
-    window.add_accelerator('thg-exit', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse('F5')
-    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'r')
-    window.add_accelerator('thg-refresh', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
-    key, modifier = gtk.accelerator_parse(mod+'Return')
-    window.add_accelerator('thg-accept', accelgroup, key, modifier,
-            gtk.ACCEL_VISIBLE)
+
+    default_accelerators = [
+        (mod+'w', 'thg-close'),
+        (mod+'q', 'thg-exit'),
+        ('F5', 'thg-refresh'),
+        (mod+'r', 'thg-refresh'),
+        (mod+'Return', 'thg-accept'),
+    ]
+
+    for accelerator, signal in default_accelerators:
+        add_accelerator(window, signal, accelgroup, accelerator)
 
     # connect ctrl-w and ctrl-q to every window
-    window.connect('thg-close', thgclose)
-    window.connect('thg-exit', thgexit)
+    if connect:
+        window.connect('thg-close', thgclose)
+        window.connect('thg-exit', thgexit)
+
+    return accelgroup, mod
 
 def thgexit(window):
     if thgclose(window):
@@ -78,6 +98,51 @@ def thgclose(window):
             return False
     window.destroy()
     return True
+
+def move_treeview_selection(window, treeview, distance=1):
+    """Accelerator handler to move a treeview's cursor and selection
+
+    Moves the treeview's cursor by distance and selects the row on which
+    the cursor lands.
+
+    distance: an integer number of rows to move the cursor, positive to
+              move the selection down, negative for up.  A distance of
+              0 will reset the selection to the current row."""
+    row = 0
+    path = treeview.get_cursor()[0]
+    if path:
+        row = path[0]
+    model = treeview.get_model()
+
+    # make sure new row is within bounds
+    new_row = min((row + distance), len(model) - 1)
+    new_row = max(0, new_row)
+
+    selected = model.get_iter_from_string(str(new_row))
+    selection = treeview.get_selection()
+    selection.unselect_all()
+    selection.select_iter(selected)
+    treeview.set_cursor(model.get_path(selected))
+
+def get_icon_pixbuf(name, size=gtk.ICON_SIZE_MENU):
+    path = paths.get_tortoise_icon(name)
+    if path:
+        try:
+            w, h = gtk.icon_size_lookup(size)
+            return gtk.gdk.pixbuf_new_from_file_at_size(path, w, h)
+        except:
+            pass
+    return None
+
+def get_icon_image(name):
+    if name.startswith('gtk'):
+        img = gtk.image_new_from_stock(name, gtk.ICON_SIZE_MENU)
+    else:
+        img = gtk.Image()
+        pixbuf = get_icon_pixbuf(name)
+        if pixbuf:
+            img.set_from_pixbuf(pixbuf)
+    return img
 
 class MessageDialog(gtk.Dialog):
     button_map = {
@@ -148,7 +213,7 @@ class NativeSaveFileDialogWrapper:
     that isn't available"""
     def __init__(self, initial = None, title = _('Save File'),
                  filter = ((_('All files'), '*.*'),), filterindex = 1,
-                 filename = '', open=False):
+                 filename = '', open=False, multi=False):
         if initial is None:
             initial = os.path.expanduser("~")
         self.initial = initial
@@ -157,6 +222,7 @@ class NativeSaveFileDialogWrapper:
         self.filter = filter
         self.filterindex = filterindex
         self.open = open
+        self.multi = multi
 
     def run(self):
         """run the file dialog, either return a file name, or False if
@@ -183,8 +249,11 @@ class NativeSaveFileDialogWrapper:
                 f = ''
                 for name, mask in self.filter:
                     f += '\0'.join([name, mask,''])
+                flags = win32con.OFN_EXPLORER
+                if self.multi:
+                    flags |= win32con.OFN_ALLOWMULTISELECT
                 opts = dict(InitialDir=self.initial,
-                        Flags=win32con.OFN_EXPLORER,
+                        Flags=flags,
                         File=self.filename,
                         DefExt=None,
                         Title=hglib.fromutf(self.title),
@@ -192,11 +261,10 @@ class NativeSaveFileDialogWrapper:
                         CustomFilter=None,
                         FilterIndex=self.filterindex)
                 if self.open:
-                    fname, _, _ = win32gui.GetOpenFileNameW(**opts)
+                    ret = win32gui.GetOpenFileNameW(**opts)
                 else:
-                    fname, _, _ = win32gui.GetSaveFileNameW(**opts)
-                if fname:
-                    fname = os.path.abspath(fname)
+                    ret = win32gui.GetSaveFileNameW(**opts)
+                fname = ret[0]
             except pywintypes.error:
                 pass
             os.chdir(cwd)
@@ -211,6 +279,14 @@ class NativeSaveFileDialogWrapper:
         fname = False 
         if q.qsize():
             fname = q.get(0)
+        if fname and self.multi and fname.find('\x00') != -1:
+            splitted = fname.split('\x00')
+            dir, fnames = splitted[0], splitted[1:]
+            fname = []
+            for fn in fnames:
+                path = os.path.abspath(os.path.join(dir, fn))
+                if os.path.exists(path):
+                    fname.append(hglib.toutf(path))
         return fname
 
     def runCompatible(self):
@@ -225,6 +301,8 @@ class NativeSaveFileDialogWrapper:
         dlg = gtk.FileChooserDialog(self.title, None, action, buttons)
         dlg.set_default_response(gtk.RESPONSE_OK)
         dlg.set_current_folder(self.initial)
+        if self.multi:
+            dlg.set_select_multiple(True)
         if not self.open:
             dlg.set_current_name(self.filename)
         for name, pattern in self.filter:
@@ -233,7 +311,10 @@ class NativeSaveFileDialogWrapper:
             fi.add_pattern(pattern)
             dlg.add_filter(fi)
         if dlg.run() == gtk.RESPONSE_OK:
-            result = dlg.get_filename();
+            if self.multi:
+                result = dlg.get_filenames()
+            else:
+                result = dlg.get_filename()
         else:
             result = False
         dlg.destroy()
@@ -318,7 +399,7 @@ class NativeFolderSelectDialog:
         return fname
 
     def runCompatible(self):
-        dialog = gtk.FileChooserDialog(title=None,
+        dialog = gtk.FileChooserDialog(title=self.title,
                 action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                 buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,
                          gtk.STOCK_OPEN,gtk.RESPONSE_OK))
@@ -350,8 +431,8 @@ class NativeFileManager:
         subprocess.Popen('explorer "%s"' % self.path)
 
     def runNautilus(self):
-        # TODO implement me!
-        pass
+        import subprocess
+        subprocess.Popen('nautilus --browser "%s"' % self.path)
 
 def markup(text, **kargs):
     """
@@ -502,18 +583,23 @@ class LayoutTable(gtk.VBox):
                     specify this option, 'padding' option will be changed
                     to False automatically.  Default: -1 (last element).
             xpad: Number. Override default 'xpad' value.
-            ypad: [same as 'xpad']
+            ypad: Same as 'xpad'.
+            xopt: Number. Combination of gtk.EXPAND, gtk.SHRINK or gtk.FILL.
+                  Note that This option is applied only body elements, not
+                  header. Default: gtk.FILL|gtk.EXPAND.
+            yopt: Same as 'xopt' except Default: 0.
             headopts: Dictionary. Override default 'headopts' value.
-            bodyopts: [same as 'headopts']
+            bodyopts: Same as 'headopts'.
         """
         if len(widgets) == 0:
             return
         t = self.table
-        FLAG = gtk.FILL|gtk.EXPAND
         rows = t.get_property('n-rows')
         t.set_property('n-rows', rows + 1)
         xpad = kargs.get('xpad', self.xpad)
         ypad = kargs.get('ypad', self.ypad)
+        xopt = kargs.get('xopt', gtk.FILL|gtk.EXPAND)
+        yopt = kargs.get('yopt', 0)
         hopts = kargs.get('headopts', self.headopts)
         bopts = kargs.get('bodyopts', self.bodyopts)
         def getwidget(obj, opts=None):
@@ -554,7 +640,7 @@ class LayoutTable(gtk.VBox):
         if len(widgets) == 1:
             cols = t.get_property('n-columns')
             widget = pack(*widgets, **kargs)
-            t.attach(widget, 0, cols, rows, rows + 1, FLAG, 0, xpad, ypad)
+            t.attach(widget, 0, cols, rows, rows + 1, xopt, yopt, xpad, ypad)
         else:
             first = getwidget(widgets[0], hopts)
             if isinstance(first, gtk.Label):
@@ -562,48 +648,144 @@ class LayoutTable(gtk.VBox):
             t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, xpad, ypad)
             self.headers.append(first)
             rest = pack(*(widgets[1:]), **kargs)
-            t.attach(rest, 1, 2, rows, rows + 1, FLAG, 0, xpad, ypad)
+            t.attach(rest, 1, 2, rows, rows + 1, xopt, yopt, xpad, ypad)
 
 class SlimToolbar(gtk.HBox):
     """
-    Slim Toolbar, allows to add the buttons of menu size.
+    Slim Toolbar, allows to add the buttons with small icon.
     """
-
     def __init__(self, tooltips=None):
         gtk.HBox.__init__(self)
         self.tooltips = tooltips
+        self.groups = {}
 
-    def append_stock(self, stock_id, tooltip=None, toggle=False):
-        icon = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_MENU)
+    ### public methods ###
+
+    def append_button(self, icon, tooltip=None, toggle=False, group=None):
+        """
+        icon: stock id or file name bundled in TortoiseHg.
+        """
         if toggle:
             button = gtk.ToggleButton()
         else:
             button = gtk.Button()
-        button.set_image(icon)
+        button.set_image(get_icon_image(icon))
         button.set_relief(gtk.RELIEF_NONE)
         button.set_focus_on_click(False)
         if self.tooltips and tooltip:
             self.tooltips.set_tip(button, tooltip)
-        self.append_widget(button, padding=0)
+        self.append_widget(button, padding=0, group=group)
         return button
 
-    def append_widget(self, widget, expand=False, padding=2):
+    def append_widget(self, widget, expand=False, padding=2, group=None):
         self.pack_start(widget, expand, expand, padding)
+        self.add_group(group, widget)
 
     def append_space(self):
         self.append_widget(gtk.Label(), expand=True, padding=0)
 
-class MenuItems(object):
-    '''controls creation of menus by ignoring separators at odd places'''
+    def append_separator(self, group=None):
+        self.append_widget(gtk.VSeparator(), group=group)
 
+    def set_enable(self, group, enable=True):
+        if not group or not self.groups.has_key(group):
+            return
+        for widget in self.groups[group]:
+            widget.set_sensitive(enable)
+
+    def set_visible(self, group, visible=True):
+        if not group or not self.groups.has_key(group):
+            return
+        for widget in self.groups[group]:
+            if visible is True:
+                widget.set_no_show_all(False)
+            widget.set_property('visible', visible)
+            if visible is False:
+                widget.set_no_show_all(True)
+
+    ### internal method ###
+
+    def add_group(self, group, widget):
+        if not group or not widget:
+            return
+        if not self.groups.has_key(group):
+            self.groups[group] = []
+        self.groups[group].append(widget)
+
+def create_menuitem(label, handler=None, icon=None, *args, **kargs):
+    """
+    Create a new menu item and append it the end of menu.
+
+    label: a string to be shown as menu label.
+    handler: a function to be connected with 'activate' signal.
+             Default: None.
+    icon: GKT+ stock item name or TortoiseHg's bundle icon name.
+          Default: None.
+    ascheck: whether enable toggle feature. Default: False.
+    asradio: whether use radio menu item. Default: False.
+    group: menu item instance to be used for group of radio menu item.
+           Default: None.
+    check: toggle or selection state for check/radio menu item.
+           Default: False.
+    sensitive: sensitive state on init. Default: True.
+    args: an argument list for 'handler' parameter.
+          Default: [] (an empty list).
+    """
+    if kargs.get('asradio') or kargs.get('ascheck'):
+        if kargs.get('asradio'):
+            menu = gtk.RadioMenuItem(kargs.get('group'), label)
+        else:
+            menu = gtk.CheckMenuItem(label)
+        menu.set_active(kargs.get('check', False))
+    elif icon:
+        menu = gtk.ImageMenuItem(label)
+        menu.set_image(get_icon_image(icon))
+    else:
+        menu = gtk.MenuItem(label, True)
+    if handler:
+        args = kargs.get('args', [])
+        menu.connect('activate', handler, *args)
+    menu.set_sensitive(kargs.get('sensitive', True))
+    menu.set_border_width(1)
+    return menu
+
+class MenuBuilder(object):
+    '''controls creation of menus by ignoring separators at odd places'''
     def __init__(self):
         self.reset()
+
+    ### public methods ###
 
     def reset(self):
         self.childs = []
         self.sep = None
 
-    def append(self, child):
+    def append(self, *a, **k):
+        menu = create_menuitem(*a, **k)
+        self.append_child(menu)
+        return menu
+
+    def append_sep(self):
+        self.append_child(gtk.SeparatorMenuItem())
+
+    def append_submenu(self, label, submenu, icon=None, *a, **k):
+        menu = create_menuitem(label, None, icon, *a, **k)
+        menu.set_submenu(submenu)
+        self.append_child(menu)
+
+    def build(self):
+        menu = gtk.Menu()
+        for c in self.childs:
+            menu.append(c)
+        self.reset()
+        return menu
+
+    def get_menus(self):
+        return self.childs[:]
+
+    ### internal method ###
+
+    def append_child(self, child):
         '''appends the child menu item, but ignores odd separators'''
         if isinstance(child, gtk.SeparatorMenuItem):
             if len(self.childs) > 0:
@@ -613,17 +795,6 @@ class MenuItems(object):
                 self.childs.append(self.sep)
                 self.sep = None
             self.childs.append(child)
-
-    def append_sep(self):
-        self.append(gtk.SeparatorMenuItem())
-
-    def create_menu(self):
-        '''creates the menu by ignoring any extra separator'''
-        res = gtk.Menu()
-        for c in self.childs:
-            res.append(c)
-        self.reset()
-        return res
 
 def addspellcheck(textview, ui=None):
     lang = None

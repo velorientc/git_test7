@@ -9,7 +9,6 @@
 #include "FCNTL.H"
 
 #include "shlwapi.h"
-#include "IconBitmapUtils.h"
 
 
 LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars)
@@ -59,35 +58,6 @@ std::string GetTHgProgRoot()
         return "";
 
     return lpszValue;
-}
-
-
-int GetRegistryConfig(const std::string& name, std::string& res)
-{
-    const char* const subkey = "Software\\TortoiseHg";
-
-    HKEY hkey = 0;
-    LONG rv = RegOpenKeyExA(
-        HKEY_CURRENT_USER, subkey, 0, KEY_READ, &hkey);
-
-    if (rv != ERROR_SUCCESS || hkey == 0)
-        return 0;
-
-    BYTE Data[MAX_PATH] = "";
-    DWORD cbData = MAX_PATH * sizeof(BYTE);
-
-    rv = RegQueryValueExA(
-        hkey, name.c_str(), 0, 0, Data, &cbData);
-
-    int ret = 0;
-    if (rv == ERROR_SUCCESS)
-    {
-        res = reinterpret_cast<const char*>(&Data);
-        ret = 1;
-    }
-
-    RegCloseKey(hkey);
-    return ret;
 }
 
 
@@ -222,43 +192,6 @@ HICON GetTortoiseIcon(const std::string& iconname)
     );
 
     return h;
-}
-
-HBITMAP GetTortoiseIconBitmap(const std::string& iconname)
-{
-    IconBitmapUtils bmpUtils;
-    typedef std::map<std::string, HBITMAP> BitmapCacheT;
-    static BitmapCacheT bmpcache_;
-
-   BitmapCacheT::const_iterator i = bmpcache_.find(iconname);
-    if (i != bmpcache_.end())
-        return i->second;
-
-    if (bmpcache_.size() > 200)
-    {
-        TDEBUG_TRACE("**** GetTortoiseIconBitmap: error: too many bitmaps in cache");
-        return 0;
-    }
-
-    HICON hIcon = GetTortoiseIcon(iconname);
-    if (!hIcon)
-        return 0;
-
-    HBITMAP hBmp = bmpUtils.IconToBitmapPARGB32(hIcon);
-    if (!hBmp)
-    {
-        TDEBUG_TRACE("**** GetTortoiseIconBitmap: error: something wrong in bmpUtils.ConvertToPARGB32(hIcon)");
-        return 0;
-    }
-
-    bmpcache_[iconname] = hBmp;
-
-    TDEBUG_TRACE(
-        "GetTortoiseIconBitmap: added '" << iconname << "' to bmpcache_"
-        " (" << bmpcache_.size() << " bitmaps in cache)"
-    );
-
-    return hBmp;
 }
 
 
@@ -400,5 +333,21 @@ bool StartsWith(const std::string& a, const std::string& b)
     }
 
     return true;
+}
+
+
+void Tokenize(const std::string& str, std::vector<std::string>& tokens,
+    const std::string& delimiters)
+{
+    typedef std::string S;
+    S::size_type lastpos = str.find_first_not_of(delimiters, 0);
+    S::size_type pos = str.find_first_of(delimiters, lastpos);
+
+    while (S::npos != pos || S::npos != lastpos)
+    {
+        tokens.push_back(str.substr(lastpos, pos - lastpos));
+        lastpos = str.find_first_not_of(delimiters, pos);
+        pos = str.find_first_of(delimiters, lastpos);
+    }
 }
 

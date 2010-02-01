@@ -1,0 +1,28 @@
+Steps for making a release:
+
+* Pull latest translations from Launchpad
+* update ReleaseNotes.txt                           (major release only)
+* set revision number in tortoisehg/hgtk/gdialog.py (major release only)
+* set revision number in doc/source/conf.py
+* set revision number in win32/shellext/thgversion.h
+* tag stable branch of repository, push
+* build pdf hgbook, check into thg-winbuild         (major release only)
+* build release installer
+* commit and tag thg-winbuild
+* create and upload a tarball (python setup.py sdist)
+* upload installer to bitbucket, sourceforge, codeplex
+* update thg-web curversion.txt, commit, push
+* update URLs and front page of thg-web
+* update NEWS on wiki front page
+* build html hgbook, check into thg-web             (major release only)
+* upload hgbook pdf to bitbucket                    (major release only)
+* upload PDF and CHM, update wiki links             (major release only)
+* wiki: Move ReleaseNotes to old-release-notes      (major release only)
+* wiki: Move FixedBugs or upcoming-release-notes to ReleaseNotes, empty FixedBugs
+* update FAQ entries
+* [ANN] email to tortoisehg-discuss and mercurial@selenic.com
+
+Post Major Release:
+* Increment minimum Mercurial version in tortoisehg/util/hgversion.py
+* Sweep through code and remove hacks for older Mercurial releases
+* Update http://bitbucket.org/tortoisehg/stable/wiki/ReleaseNotes#matching-versions

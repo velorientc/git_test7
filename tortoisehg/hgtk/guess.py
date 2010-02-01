@@ -13,7 +13,7 @@ import pango
 import cStringIO
 import Queue
 
-from mercurial import hg, ui, mdiff, cmdutil, match, util
+from mercurial import hg, ui, mdiff, cmdutil, match, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, paths, thread2, settings
@@ -44,7 +44,7 @@ class DetectRenameDialog(gtk.Window):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -194,13 +194,14 @@ class DetectRenameDialog(gtk.Window):
 
         #$$ text view for diff
         self.buf = gtk.TextBuffer()
-        self.buf.create_tag('removed', foreground='#900000')
-        self.buf.create_tag('added', foreground='#006400')
+        self.buf.create_tag('removed', foreground=gtklib.DRED)
+        self.buf.create_tag('added', foreground=gtklib.DGREEN)
         self.buf.create_tag('position', foreground='#FF8000')
-        self.buf.create_tag('header', foreground='#000090')
+        self.buf.create_tag('header', foreground=gtklib.DBLUE)
         diffview = gtk.TextView(self.buf)
         scroller.add(diffview)
-        diffview.modify_font(pango.FontDescription('monospace'))
+        fontdiff = hglib.getfontconfig()['fontdiff']
+        diffview.modify_font(pango.FontDescription(fontdiff))
         diffview.set_wrap_mode(gtk.WRAP_NONE)
         diffview.set_editable(False)
 
@@ -270,7 +271,7 @@ class DetectRenameDialog(gtk.Window):
         thread = thread2.Thread(target=self.search_thread, args=(q, tgts))
         thread.start()
         self.stbar.begin()
-        self.stbar.set_status_text(_('finding source of ') + ', '.join(tgts))
+        self.stbar.set_text(_('finding source of ') + ', '.join(tgts))
         gobject.timeout_add(50, self.search_wait, thread, q)
 
     def search_thread(self, q, tgts):

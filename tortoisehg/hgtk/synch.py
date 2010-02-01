@@ -15,7 +15,7 @@ import sys
 import threading
 import urllib
 
-from mercurial import hg, ui, extensions, url
+from mercurial import hg, ui, extensions, url, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -240,12 +240,13 @@ class SynchDialog(gtk.Window):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.textview = gtk.TextView(buffer=None)
         self.textview.set_editable(False)
-        self.textview.modify_font(pango.FontDescription('Monospace'))
+        fontlog = hglib.getfontconfig()['fontlog']
+        self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textview.connect('populate-popup', self.add_to_popup)
         self.textbuffer = self.textview.get_buffer()
         self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground='#900000')
+                                   foreground=gtklib.DRED)
         basevbox.pack_start(scrolledwindow, True, True)
 
         # statusbar
@@ -328,7 +329,7 @@ class SynchDialog(gtk.Window):
         try:
             # open a new repo, rebase can confuse cached repo
             repo = hg.repository(ui.ui(), path=self.root)
-        except hglib.RepoError:
+        except error.RepoError:
             return
 
         wc = repo[None]
@@ -366,7 +367,7 @@ class SynchDialog(gtk.Window):
                     raise _("unknown sort key '%s'") % sort
                 uipaths.sort(sortfunc)
             return uipaths
-        except hglib.RepoError:
+        except error.RepoError:
             return None
 
     def btn_remotepath_clicked(self, button):
@@ -528,7 +529,10 @@ class SynchDialog(gtk.Window):
 
     def stop_clicked(self, toolbutton, data=None):
         if self.cmd_running():
-            self.hgthread.terminate()
+            try:
+                self.hgthread.terminate()
+            except ValueError:
+                pass # race, thread was already terminated
             self.stop_button.set_sensitive(False)
 
     def exec_cmd(self, cmd):
@@ -560,7 +564,7 @@ class SynchDialog(gtk.Window):
         self.hgthread = hgthread.HgThread(cmdline, parent=self)
         self.hgthread.start()
         self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(cmd))
+        self.stbar.set_text('hg ' + ' '.join(cmd))
 
         self.add_src_to_recent(remote_path)
 

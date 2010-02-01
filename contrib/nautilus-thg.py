@@ -25,7 +25,7 @@ demandimport.enable()
 import subprocess
 import urllib
 
-from mercurial import hg, ui, match, util
+from mercurial import hg, ui, match, util, error
 from mercurial.node import short
 
 def _thg_path():
@@ -40,7 +40,7 @@ def _thg_path():
         sys.path.insert(0, thgpath)
 _thg_path()
 
-from tortoisehg.util import paths, debugthg, hglib, cachethg
+from tortoisehg.util import paths, debugthg, cachethg
 from tortoisehg.hgtk import gtklib
 
 if debugthg.debug('N'):
@@ -107,7 +107,7 @@ class HgExtension(nautilus.MenuProvider,
             return None
         try:
             return hg.repository(ui.ui(), path=p)
-        except hglib.RepoError:
+        except error.RepoError:
             return None
         except StandardError, e:
             debugf(e)
@@ -212,19 +212,19 @@ class HgExtension(nautilus.MenuProvider,
     def get_columns(self):
         return nautilus.Column("HgNautilus::80hg_status",
                                "hg_status",
-                               "HG Status",
+                               "Hg Status",
                                "Version control status"),
 
     def _get_file_status(self, localpath, repo=None):
         cachestate = cachethg.get_state(localpath, repo)
-        cache2state = {cachethg.UNCHANGED: ('default', 'clean'),
-                       cachethg.ADDED: ('cvs-added', 'added'),
-                       cachethg.MODIFIED: ('cvs-modified', 'modified'),
-                       cachethg.UNKNOWN: ('new', 'unrevisioned'),
-                       cachethg.IGNORED: (None, 'ignored'),
-                       cachethg.NOT_IN_REPO: (None, ''),
-                       cachethg.ROOT: ('generic', 'root'),
-                       cachethg.UNRESOLVED: ('cvs-confilict', 'unresolved')}
+        cache2state = {cachethg.UNCHANGED:   ('default',   'clean'),
+                       cachethg.ADDED:       ('new',       'added'),
+                       cachethg.MODIFIED:    ('important', 'modified'),
+                       cachethg.UNKNOWN:     (None,        'unrevisioned'),
+                       cachethg.IGNORED:     ('noread',    'ignored'),
+                       cachethg.NOT_IN_REPO: (None,        'unrevisioned'),
+                       cachethg.ROOT:        ('generic',   'root'),
+                       cachethg.UNRESOLVED:  ('danger',    'unresolved')}
         emblem, status = cache2state.get(cachestate, (None, '?'))
         return emblem, status
 

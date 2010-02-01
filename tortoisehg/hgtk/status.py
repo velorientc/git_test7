@@ -15,7 +15,7 @@ import gobject
 import pango
 import threading
 
-from mercurial import cmdutil, util, commands, patch, mdiff
+from mercurial import cmdutil, util, commands, patch, mdiff, error, hg
 from mercurial import merge as merge_
 
 from tortoisehg.util.i18n import _
@@ -41,33 +41,33 @@ DM_FONT      = 5
 
 def hunk_markup(text):
     'Format a diff hunk for display in a TreeView row with markup'
-    hunk = ""
+    hunk = ''
     # don't use splitlines, should split with only LF for the patch
     lines = hglib.tounicode(text).split(u'\n')
     for line in lines:
-        line = gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        line = hglib.toutf(line[:512]) + '\n'
         if line.startswith('---') or line.startswith('+++'):
-            hunk += '<span foreground="#000090">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DBLUE)
         elif line.startswith('-'):
-            hunk += '<span foreground="#900000">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DRED)
         elif line.startswith('+'):
-            hunk += '<span foreground="#006400">%s</span>' % line
+            hunk += gtklib.markup(line, color=gtklib.DGREEN)
         elif line.startswith('@@'):
-            hunk = '<span foreground="#FF8000">%s</span>' % line
+            hunk = gtklib.markup(line, color='#FF8000')
         else:
-            hunk += line
+            hunk += gtklib.markup(line)
     return hunk
 
 def hunk_unmarkup(text):
     'Format a diff hunk for display in a TreeView row without markup'
-    hunk = ""
+    hunk = ''
     # don't use splitlines, should split with only LF for the patch
     lines = hglib.tounicode(text).split(u'\n')
     for line in lines:
-        hunk += gtklib.markup_escape_text(hglib.toutf(line[:512])) + '\n'
+        hunk += gtklib.markup(hglib.toutf(line[:512])) + '\n'
     return hunk
 
-class GStatus(gdialog.GDialog):
+class GStatus(gdialog.GWindow):
     """GTK+ based dialog for displaying repository status
 
     Also provides related operations like add, delete, remove, revert, refresh,
@@ -82,13 +82,15 @@ class GStatus(gdialog.GDialog):
     ### Following methods are meant to be overridden by subclasses ###
 
     def init(self):
-        gdialog.GDialog.init(self)
+        gdialog.GWindow.init(self)
         self.mode = 'status'
         self.ready = False
         self.filerowstart = {}
         self.filechunks = {}
         self.status_error = None
         self.preview_tab_name_label = None
+        self.subrepos = []
+        self.colorstyle = self.repo.ui.config('tortoisehg', 'diffcolorstyle')
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -116,16 +118,9 @@ class GStatus(gdialog.GDialog):
             for check in self._show_checks.values():
                 check.set_active(True)
         else:
-            wasset = False
             for opt in self.opts:
                 if opt in self._show_checks and self.opts[opt]:
-                    wasset = True
                     self._show_checks[opt].set_active(True)
-            if not wasset:
-                for check in [item[1] for item in self._show_checks.iteritems()
-                              if item[0] in ('modified', 'added', 'removed',
-                                             'deleted', 'unknown')]:
-                    check.set_active(True)
             if self.pats:
                 for name, check in self._show_checks.iteritems():
                     check.set_sensitive(False)
@@ -182,19 +177,22 @@ class GStatus(gdialog.GDialog):
 
 
     def save_settings(self):
-        settings = gdialog.GDialog.save_settings(self)
+        settings = gdialog.GWindow.save_settings(self)
         settings['gstatus-hpane'] = self.diffpane.get_position()
         settings['gstatus-lastpos'] = self.setting_lastpos
+        settings['gstatus-type-expander'] = self.types_expander.get_expanded()
         return settings
 
 
     def load_settings(self, settings):
-        gdialog.GDialog.load_settings(self, settings)
+        gdialog.GWindow.load_settings(self, settings)
         self.setting_pos = 270
         self.setting_lastpos = 64000
+        self.setting_types_expanded = False
         try:
             self.setting_pos = settings['gstatus-hpane']
             self.setting_lastpos = settings['gstatus-lastpos']
+            self.setting_types_expanded = settings['gstatus-type-expander']
         except KeyError:
             pass
         self.mqmode, repo = None, self.repo
@@ -203,6 +201,66 @@ class GStatus(gdialog.GDialog):
 
     def is_merge(self):
         return self.count_revs() < 2 and len(self.repo.parents()) == 2
+
+
+    def get_accelgroup(self):
+        accelgroup = gtk.AccelGroup()
+        mod = gtklib.get_thg_modifier()
+        
+        gtklib.add_accelerator(self.filetree, 'thg-diff', accelgroup, mod+'d')
+        self.filetree.connect('thg-diff', self.thgdiff)
+        self.connect('thg-refresh', self.thgrefresh)
+
+        # set CTRL-c accelerator for copy-clipboard
+        gtklib.add_accelerator(self.difftree, 'copy-clipboard', accelgroup, mod+'c')
+        self.difftree.connect('copy-clipboard', self.copy_to_clipboard)
+
+        def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
+            page_num = self.diff_notebook.get_current_page()
+            page = self.diff_notebook.get_nth_page(page_num)
+
+            page.emit("scroll-child", direction, False)
+
+        def toggle_filetree_selection(*arguments):
+            self.sel_clicked(not self.selcb.get_active())
+
+        def next_diff_notebook_page(*arguments):
+            notebook = self.diff_notebook
+            if notebook.get_current_page() >= len(notebook) - 1:
+                notebook.set_current_page(0)
+            else:
+                notebook.next_page()
+                
+        def previous_diff_notebook_page(*arguments):
+            notebook = self.diff_notebook
+            if notebook.get_current_page() <= 0:
+                notebook.set_current_page(len(notebook) - 1)
+            else:
+                notebook.prev_page()
+                
+        # signal, accelerator key, handler, (parameters)
+        status_accelerators = [
+            ('status-scroll-down', 'bracketright', scroll_diff_notebook,
+             (gtk.SCROLL_PAGE_DOWN,)),
+            ('status-scroll-up', 'bracketleft', scroll_diff_notebook,
+             (gtk.SCROLL_PAGE_UP,)),
+            ('status-next-file', 'period', gtklib.move_treeview_selection,
+             (self.filetree, 1)),
+            ('status-previous-file', 'comma', gtklib.move_treeview_selection,
+             (self.filetree, -1)),
+            ('status-select-all', 'u', toggle_filetree_selection, ()),
+            ('status-next-page', 'p', next_diff_notebook_page, ()),
+            ('status-previous-page', '<Shift>p',
+             previous_diff_notebook_page, ()),
+        ]
+        
+        for signal, accelerator, handler, parameters in status_accelerators:
+            gtklib.add_accelerator(self, signal, accelgroup,
+                                   mod + accelerator)
+            self.connect(signal, handler, *parameters)
+
+        return accelgroup
+                
 
     def get_body(self):
         is_merge = self.is_merge()
@@ -215,6 +273,7 @@ class GStatus(gdialog.GDialog):
 
         self.filetree = gtk.TreeView(self.filemodel)
         self.filetree.connect('popup-menu', self.tree_popup_menu)
+        self.filetree.connect('button-press-event', self.tree_button_press)
         self.filetree.connect('button-release-event', self.tree_button_release)
         self.filetree.connect('row-activated', self.tree_row_act)
         self.filetree.connect('key-press-event', self.tree_key_press)
@@ -223,17 +282,8 @@ class GStatus(gdialog.GDialog):
         self.filetree.set_search_equal_func(self.search_filelist)
         if hasattr(self.filetree, 'set_rubber_banding'):
             self.filetree.set_rubber_banding(True)
-        self.filetree.modify_font(pango.FontDescription(self.fontlist))
+        self.filetree.modify_font(self.fonts['list'])
         self.filetree.set_headers_clickable(True)
-
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'d')
-        self.filetree.add_accelerator('thg-diff', accelgroup, key,
-                        modifier, gtk.ACCEL_VISIBLE)
-        self.filetree.connect('thg-diff', self.thgdiff)
-        self.connect('thg-refresh', self.thgrefresh)
 
         toggle_cell = gtk.CellRendererToggle()
         toggle_cell.connect('toggled', self.select_toggle)
@@ -291,7 +341,11 @@ class GStatus(gdialog.GDialog):
         self.counter = gtk.Label('')
         exp_labelbox.pack_end(self.counter, False, False, 2)
         self.status_types = self.get_status_types()
-        self.status_types.hide()
+        if self.setting_types_expanded:
+            expander.set_expanded(True)
+            self.status_types.show()
+        else:
+            self.status_types.hide()
         expander_box = gtk.VBox()
         expander_box.pack_start(exp_labelbox)
         expander_box.pack_start(self.status_types)
@@ -316,7 +370,7 @@ class GStatus(gdialog.GDialog):
         self.diff_notebook.set_tab_pos(gtk.POS_BOTTOM)
         self.diff_notebook_pages = {}
 
-        self.difffont = pango.FontDescription(self.fontdiff)
+        self.difffont = self.fonts['diff']
 
         self.clipboard = None
 
@@ -341,21 +395,15 @@ class GStatus(gdialog.GDialog):
                 pango.FontDescription)
 
         difftree = gtk.TreeView(self.diffmodel)
-
-        # set CTRL-c accelerator for copy-clipboard
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'c')
-        difftree.add_accelerator('copy-clipboard', accelgroup, key,
-                        modifier, gtk.ACCEL_VISIBLE)
-        difftree.connect('copy-clipboard', self.copy_to_clipboard)
-
+        
         difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         difftree.set_headers_visible(False)
         difftree.set_enable_search(False)
         if getattr(difftree, 'enable-grid-lines', None) is not None:
             difftree.set_property('enable-grid-lines', True)
         difftree.connect('row-activated', self.diff_tree_row_act)
-
+        self.difftree = difftree
+        
         cell = gtk.CellRendererText()
         diffcol = gtk.TreeViewColumn('diff', cell)
         diffcol.set_resizable(True)
@@ -412,6 +460,11 @@ class GStatus(gdialog.GDialog):
 
         self.diff_notebook.connect('switch-page', self.page_switched,
                                    sel, difftree)
+
+        # add keyboard accelerators
+        accelgroup = self.get_accelgroup()     
+        self.add_accel_group(accelgroup)
+        
         return self.diffpane
 
     def append_page(self, name, child, label):
@@ -501,19 +554,20 @@ class GStatus(gdialog.GDialog):
 
     def get_status_types(self):
         # Tuple: (onmerge, ctype, translated label)
-        allchecks = [(False, False, 'unknown',  _('?: unknown')),
-                     (True,  False, 'modified', _('M: modified')),
-                     (False, False, 'ignored',  _('I: ignored')),
-                     (True,  False, 'added',    _('A: added')),
-                     (False, False, 'clean',    _('C: clean')),
-                     (True,  False, 'removed',  _('R: removed')),
-                     (False, True,  'deleted',  _('!: deleted')) ]
+        allchecks = [(False, 'unknown',  _('?: unknown')),
+                     (True,  'modified', _('M: modified')),
+                     (False, 'ignored',  _('I: ignored')),
+                     (True,  'added',    _('A: added')),
+                     (False, 'clean',    _('C: clean')),
+                     (True,  'removed',  _('R: removed')),
+                     (False, 'deleted',  _('!: deleted')),
+                     (True, 'subrepo',  _('S: subrepo'))]
 
         checks = []
         nomerge = (self.count_revs() <= 1)
-        for onmerge, fixed, button, text in allchecks:
+        for onmerge, button, text in allchecks:
             if onmerge or nomerge:
-                checks.append((fixed, button, text))
+                checks.append((button, text))
 
         table = gtk.Table(rows=2, columns=3)
         table.set_col_spacings(8)
@@ -521,11 +575,9 @@ class GStatus(gdialog.GDialog):
         self._show_checks = {}
         row, col = 0, 0
 
-        for fixed, name, labeltext in checks:
+        for name, labeltext in checks:
             button = gtk.CheckButton(labeltext)
             widget = button
-            if fixed:
-                widget = gtk.Label(labeltext)
             button.connect('toggled', self.show_toggle, name)
             self._show_checks[name] = button
             table.attach(widget, col, col+1, row, row+1)
@@ -604,14 +656,14 @@ class GStatus(gdialog.GDialog):
         if selection is None:
             return
 
-        (modified, added, removed, deleted, unknown, ignored, clean) = self.status
-        changetypes = (('M', 'modified', modified),
-                       ('A', 'added', added),
-                       ('R', 'removed', removed),
-                       ('!', 'deleted', deleted),
-                       ('?', 'unknown', unknown),
-                       ('I', 'ignored', ignored),
-                       ('C', 'clean', clean))
+        (M, A, R, D, U, I, C) = self.status
+        changetypes = (('M', 'modified', M),
+                       ('A', 'added', A),
+                       ('R', 'removed', R),
+                       ('!', 'deleted', D),
+                       ('?', 'unknown', U),
+                       ('I', 'ignored', I),
+                       ('C', 'clean', C))
 
         # List of the currently checked and selected files to pass on to
         # the new data
@@ -634,12 +686,25 @@ class GStatus(gdialog.GDialog):
         for stat, _, wfiles in types:
             for wfile in wfiles:
                 mst = wfile in ms and ms[wfile].upper() or ""
-                wfile = util.localpath(wfile)
-                defcheck = stat in 'MAR' and wfile not in self.excludes
-                ck, p = waschecked.get(wfile, (defcheck, False))
-                model.append([ck, stat, hglib.toutf(wfile), wfile, mst, p])
+                lfile = util.localpath(wfile)
+                defcheck = stat in 'MAR' and lfile not in self.excludes
+                ck, p = waschecked.get(lfile, (defcheck, False))
+                model.append([ck, stat, hglib.toutf(lfile), lfile, mst, p])
+
+        if self.test_opt('subrepo') or self.is_merge():
+            for sdir in self.subrepos:
+                lfile = util.localpath(sdir)
+                defcheck = lfile not in self.excludes
+                ck, p = waschecked.get(lfile, (defcheck, False))
+                model.append([ck, 'S', hglib.toutf(lfile), lfile, '', p])
 
         self.auto_check() # may check more files
+
+        # manually refresh partially selected files
+        for i, row in enumerate(model):
+            if row[FM_PARTIAL_SELECTED]:
+                self.update_hunk_model(i, self.filetree)
+                self.diffmodel.clear()
 
         # recover selections
         firstrow = None
@@ -672,6 +737,10 @@ class GStatus(gdialog.GDialog):
         if not self.ready: return False
 
         def get_repo_status():
+            # Create a new repo object
+            repo = hg.repository(self.ui, path=self.repo.root)
+            self.newrepo = repo
+
             if self.mqmode and self.mode != 'status':
                 # when a patch is applied, show diffs to parent of top patch
                 qtip = repo['.']
@@ -695,6 +764,14 @@ class GStatus(gdialog.GDialog):
                 self.status = status
             except IOError, e:
                 self.status_error = str(e)
+            self.subrepos = []
+            wctx = repo[None]
+            try:
+                for s in wctx.substate:
+                    if matcher(s) and wctx.sub(s).dirty():
+                        self.subrepos.append(s)
+            except (IOError, error.ConfigError), e:
+                self.status_error = str(e)
 
         def status_wait(thread):
             if thread.isAlive():
@@ -704,8 +781,10 @@ class GStatus(gdialog.GDialog):
                     self.ready = True
                     self.update_check_count()
                     self.stbar.end()
-                    self.stbar.set_status_text(self.status_error)
+                    self.stbar.set_text(self.status_error)
                     return False
+                self.repo = self.newrepo
+                self.ui = self.repo.ui
                 self.refresh_file_tree()
                 self.update_check_count()
                 self.refresh_complete()
@@ -727,6 +806,12 @@ class GStatus(gdialog.GDialog):
         thread.start()
         gobject.timeout_add(50, status_wait, thread)
         return True
+
+    def set_file_states(self, paths, state=True):
+        for p in paths:
+            self.filemodel[p][FM_CHECKED] = state
+            self.update_chunk_state(self.filemodel[p])
+        self.update_check_count()
 
     def select_toggle(self, cellrenderer, path):
         'User manually toggled file status via checkbox'
@@ -810,7 +895,7 @@ class GStatus(gdialog.GDialog):
         return True
 
     def sort_by_stat(self, model, iter1, iter2):
-        order = 'MAR!?IC'
+        order = 'MAR!?SIC'
         lhs, rhs = (model.get_value(iter1, FM_STATUS),
                     model.get_value(iter2, FM_STATUS))
         # GTK+ bug that calls sort before a full row is inserted causing
@@ -827,11 +912,11 @@ class GStatus(gdialog.GDialog):
     def text_color(self, column, text_renderer, model, row_iter):
         stat = model[row_iter][FM_STATUS]
         if stat == 'M':
-            text_renderer.set_property('foreground', '#000090')
+            text_renderer.set_property('foreground', gtklib.DBLUE)
         elif stat == 'A':
-            text_renderer.set_property('foreground', '#006400')
+            text_renderer.set_property('foreground', gtklib.DGREEN)
         elif stat == 'R':
-            text_renderer.set_property('foreground', '#900000')
+            text_renderer.set_property('foreground', gtklib.DRED)
         elif stat == 'C':
             text_renderer.set_property('foreground', 'black')
         elif stat == '!':
@@ -846,9 +931,11 @@ class GStatus(gdialog.GDialog):
 
     def rename_file(self, wfile):
         fdir, fname = os.path.split(wfile)
-        newfile = dialog.entry_dialog(self, _('Rename file to:'), True, fname)
-        if newfile and newfile != fname:
-            self.hg_move([wfile, os.path.join(fdir, newfile)])
+        utf_fname = hglib.toutf(fname)
+        newfile = dialog.entry_dialog(self, _('Rename file to:'),
+                         True, utf_fname)
+        if newfile and newfile != utf_fname:
+            self.hg_move([wfile, os.path.join(fdir, hglib.fromutf(newfile))])
         return True
 
 
@@ -942,7 +1029,6 @@ class GStatus(gdialog.GDialog):
         elif pname == 'hunk-selection':
             self.update_hunk_model(row, tree)
         elif pname == 'commit-preview':
-            self.update_hunk_model(row, tree)
             self.update_commit_preview()
 
     def get_page_name(self, num):
@@ -964,14 +1050,17 @@ class GStatus(gdialog.GDialog):
 
     def update_commit_preview(self):
         if self.is_merge():
-            difftext = [_('===== Diff to first parent =====\n')]
-            for s in patch.diff(self.repo, self._node1, self._node2,
-                    opts=patch.diffopts(self.ui, self.opts)):
+            opts = patch.diffopts(self.ui, self.opts)
+            opts.git = True
+            wctx = self.repo[None]
+            pctx1, pctx2 = wctx.parents()
+            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
+                        pctx1.rev(), str(pctx1))]
+            for s in patch.diff(self.repo, pctx1.node(), None, opts=opts):
                 difftext.extend(s.splitlines(True))
-            pctxs = self.repo[None].parents()
-            difftext.append(_('\n===== Diff to second parent =====\n'))
-            for s in patch.diff(self.repo, pctxs[1].node(), None,
-                    opts=patch.diffopts(self.ui, self.opts)):
+            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                            pctx2.rev(), str(pctx2)))
+            for s in patch.diff(self.repo, pctx2.node(), None, opts=opts):
                 difftext.extend(s.splitlines(True))
         else:
             buf = cStringIO.StringIO()
@@ -996,10 +1085,17 @@ class GStatus(gdialog.GDialog):
 
     def diff_highlight_buffer(self, difftext):
         buf = gtk.TextBuffer()
-        buf.create_tag('removed', foreground='#900000')
-        buf.create_tag('added', foreground='#006400')
+        if self.colorstyle == 'background':
+            buf.create_tag('removed', paragraph_background=gtklib.PRED)
+            buf.create_tag('added', paragraph_background=gtklib.PGREEN)
+        elif self.colorstyle == 'none':
+            buf.create_tag('removed')
+            buf.create_tag('added')
+        else:
+            buf.create_tag('removed', foreground=gtklib.DRED)
+            buf.create_tag('added', foreground=gtklib.DGREEN)
         buf.create_tag('position', foreground='#FF8000')
-        buf.create_tag('header', foreground='#000090')
+        buf.create_tag('header', foreground=gtklib.DBLUE)
 
         bufiter = buf.get_start_iter()
         for line in difftext:
@@ -1022,26 +1118,33 @@ class GStatus(gdialog.GDialog):
     def generate_text_diffs(self, row):
         wfile = self.filemodel[row][FM_PATH]
         pfile = util.pconvert(wfile)
-        difftext = []
-        is_merge = self.is_merge()
-        if is_merge:
-            difftext = [_('===== Diff to first parent =====\n')]
         matcher = cmdutil.matchfiles(self.repo, [pfile])
-        for s in patch.diff(self.repo, self._node1, self._node2,
-                match=matcher, opts=patch.diffopts(self.ui, self.opts)):
-            difftext.extend(s.splitlines(True))
-        if is_merge:
-            pctxs = self.repo[None].parents()
-            difftext.append(_('\n===== Diff to second parent =====\n'))
-            for s in patch.diff(self.repo, pctxs[1].node(), None,
-                    match=matcher, opts=patch.diffopts(self.ui, self.opts)):
+        opts = patch.diffopts(self.ui, self.opts)
+        opts.git = True
+        difftext = []
+        if self.is_merge():
+            wctx = self.repo[None]
+            pctx1, pctx2 = wctx.parents()
+            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
+                        pctx1.rev(), str(pctx1))]
+            for s in patch.diff(self.repo, pctx1.node(), None,
+                                match=matcher, opts=opts):
+                difftext.extend(s.splitlines(True))
+            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                            pctx2.rev(), str(pctx2)))
+            for s in patch.diff(self.repo, pctx2.node(), None,
+                                match=matcher, opts=opts):
+                difftext.extend(s.splitlines(True))
+        else:
+            for s in patch.diff(self.repo, self._node1, self._node2,
+                    match=matcher, opts=opts):
                 difftext.extend(s.splitlines(True))
         return self.diff_highlight_buffer(difftext)
 
 
-    def update_hunk_model(self, row, tree):
+    def update_hunk_model(self, path, tree):
         # Read this file's diffs into hunk selection model
-        wfile = self.filemodel[row][FM_PATH]
+        wfile = self.filemodel[path][FM_PATH]
         self.filerowstart = {}
         self.diffmodel.clear()
         if not self.is_merge():
@@ -1056,7 +1159,7 @@ class GStatus(gdialog.GDialog):
         try:
             pfile = util.pconvert(wfile)
             fctx = ctx.filectx(pfile)
-        except hglib.LookupError:
+        except error.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             # Fake patch that displays size warning
@@ -1393,6 +1496,7 @@ class GStatus(gdialog.GDialog):
 
     def ignoremask_updated(self):
         '''User has changed the ignore mask in hgignore dialog'''
+        self.opts['check'] = True
         self.reload_status()
 
     def relevant_checked_files(self, stats):
@@ -1407,6 +1511,33 @@ class GStatus(gdialog.GDialog):
                 self.update_chunk_state(entry)
         self.update_check_count()
 
+    def tree_button_press(self, treeview, event):
+        '''Selection management for filetree right-click
+
+        If the user right-clicks on a currently-selected item in the
+        filetree, preserve their entire existing selection for the popup menu.
+
+        http://www.daa.com.au/pipermail/pygtk/2005-June/010465.html
+        '''
+        if event.button != 3:
+            return False
+
+        clicked_row = treeview.get_path_at_pos(int(event.x),
+                                               int(event.y))
+        if not clicked_row:
+            return False
+
+        selection = treeview.get_selection()
+        selected_rows = selection.get_selected_rows()[1]
+
+        # If they didn't right-click on a currently selected row,
+        # change the selection
+        if clicked_row[0] not in selected_rows:
+            selection.unselect_all()
+            selection.select_path(clicked_row[0])
+
+        return True
+
     def tree_button_release(self, treeview, event):
         if event.button != 3:
             return False
@@ -1416,8 +1547,9 @@ class GStatus(gdialog.GDialog):
     def tree_popup_menu(self, treeview):
         model, tpaths = treeview.get_selection().get_selected_rows()
         types = {'M':[], 'A':[], 'R':[], '!':[], 'I':[], '?':[], 'C':[],
-                 'r':[], 'u':[]}
+                 'r':[], 'u':[], 'S':[]}
         all = []
+        pathmap = {}
         for p in tpaths:
             row = model[p]
             file = util.pconvert(row[FM_PATH])
@@ -1429,18 +1561,19 @@ class GStatus(gdialog.GDialog):
             else:
                 types[row[FM_STATUS]].append(file)
             all.append(file)
+            pathmap[file] = p
 
-        def make(label, handler, stats, enabled=True):
+        def make(label, func, stats, icon=None, sens=True, paths=False):
             files = []
             for t in stats:
                 files.extend(types[t])
             if not files:
                 return
-            item = gtk.MenuItem(label, True)
-            item.connect('activate', handler, files)
-            item.set_border_width(1)
-            item.set_sensitive(enabled)
-            menu.append(item)
+            args = [files]
+            if paths:
+                p = [pathmap[f] for f in files]
+                args.append(p)
+            item = menu.append(label, func, icon, args=args, sensitive=sens)
             return files
 
         def vdiff(menuitem, files):
@@ -1459,10 +1592,12 @@ class GStatus(gdialog.GDialog):
             from tortoisehg.hgtk import history
             dlg = history.run(self.ui, canonpats=files)
             dlg.display()
-        def forget(menuitem, files):
+        def forget(menuitem, files, paths):
             self.hg_forget(files)
-        def add(menuitem, files):
+            self.set_file_states(paths, state=False)
+        def add(menuitem, files, paths):
             self.hg_add(files)
+            self.set_file_states(paths, state=True)
         def delete(menuitem, files):
             self.delete_files(files)
         def unmark(menuitem, files):
@@ -1505,30 +1640,30 @@ class GStatus(gdialog.GDialog):
             dlg.show_all()
             dlg.set_notify_func(self.ignoremask_updated)
 
-        menu = gtklib.MenuItems()
-        make(_('_Visual Diff'), vdiff, 'MAR!ru')
-        make(_('Edit'), edit, 'MACI?ru')
+        menu = gtklib.MenuBuilder()
+        make(_('_Visual Diff'), vdiff, 'MAR!ru', gtk.STOCK_JUSTIFY_FILL)
+        make(_('Edit'), edit, 'MACI?ru', gtk.STOCK_EDIT)
         make(_('View missing'), viewmissing, 'R!')
-        make(_('View other'), other, 'MAru', self.is_merge())
+        make(_('View other'), other, 'MAru', None, self.is_merge())
         menu.append_sep()
-        make(_('_Revert'), revert, 'MAR!ru')
+        make(_('_Revert'), revert, 'MAR!ru', gtk.STOCK_MEDIA_REWIND)
         menu.append_sep()
-        make(_('L_og'), log, 'MARC!ru')
+        make(_('L_og'), log, 'MARC!ru', 'menulog.ico')
         menu.append_sep()
-        make(_('_Forget'), forget, 'MARC!ru')
-        make(_('_Add'), add, 'I?')
-        make(_('_Guess Rename...'), guess_rename, '?')
-        make(_('_Ignore'), ignore, '?')
-        make(_('Remove versioned'), remove, 'C')
-        make(_('_Delete unversioned'), delete, '?I')
+        make(_('_Forget'), forget, 'MAC!ru', gtk.STOCK_CLEAR, paths=True)
+        make(_('_Add'), add, 'I?', gtk.STOCK_ADD, paths=True)
+        make(_('_Guess Rename...'), guess_rename, '?!', 'detect_rename.ico')
+        make(_('_Ignore'), ignore, '?', 'ignore.ico')
+        make(_('Remove versioned'), remove, 'C', 'menudelete.ico')
+        make(_('_Delete unversioned'), delete, '?I', gtk.STOCK_DELETE)
         if len(all) == 1:
             menu.append_sep()
-            make(_('_Copy...'), copy, 'MC')
-            make(_('Rename...'), rename, 'MC')
+            make(_('_Copy...'), copy, 'MC', gtk.STOCK_COPY)
+            make(_('Rename...'), rename, 'MC', 'general.ico')
         menu.append_sep()
-        f = make(_('Restart Merge...'), resolve, 'u')
-        make(_('Mark unresolved'), unmark, 'r')
-        make(_('Mark resolved'), mark, 'u')
+        f = make(_('Restart Merge...'), resolve, 'u', 'menumerge.ico')
+        make(_('Mark unresolved'), unmark, 'r', gtk.STOCK_NO)
+        make(_('Mark resolved'), mark, 'u', gtk.STOCK_YES)
         if f:
             rmenu = gtk.Menu()
             for tool in hglib.mergetools(self.repo.ui):
@@ -1536,14 +1671,13 @@ class GStatus(gdialog.GDialog):
                 item.connect('activate', resolve_with, tool, f)
                 item.set_border_width(1)
                 rmenu.append(item)
-            item = gtk.MenuItem(_('Restart merge with'), True)
-            item.set_submenu(rmenu)
-            menu.append(item)
+            menu.append_submenu(_('Restart merge with'), rmenu,
+                                'menumerge.ico')
 
-        for label, func, stats in self.get_custom_menus():
-            make(label, func, stats)
+        for label, func, stats, icon in self.get_custom_menus():
+            make(label, func, stats, icon)
 
-        menu = menu.create_menu()
+        menu = menu.build()
         if len(menu.get_children()) > 0:
             menu.show_all()
             menu.popup(None, None, None, 0, 0)
@@ -1597,6 +1731,6 @@ def run(ui, *pats, **opts):
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
         'added':True, 'removed':True, 'deleted':True, 'unknown':True,
         'exclude':[], 'include':[], 'debug':True, 'verbose':True, 'git':False,
-        'rev':rev, 'check':True
+        'rev':rev, 'check':True, 'subrepo':True
     }
     return GStatus(ui, None, None, pats, cmdoptions)

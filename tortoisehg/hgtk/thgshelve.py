@@ -104,7 +104,7 @@ class GShelve(GStatus):
         if self.is_merge():
             return ()
         else:
-            return ((_('_shelve'), shelve, 'MAR'),)
+            return ((_('_Shelve'), shelve, 'MAR', 'shelve.ico'),)
 
 
     def should_live(self, widget=None, event=None):
