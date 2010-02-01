@@ -971,10 +971,11 @@ class ChangeSet(gdialog.GWindow):
         if self.glog_parent:
             # If this changeset browser is embedded in glog, send
             # send this event to the main app
-            opts = {'pats' : [self.curfile]}
+            fname = hglib.toutf(self.curfile)
+            opts = {'pats': [fname]}
             self.glog_parent.filtercombo.set_active(1)
-            self.glog_parent.filterentry.set_text(self.curfile)
-            self.glog_parent.custombutton.set_active(True)
+            self.glog_parent.filterentry.set_text(fname)
+            self.glog_parent.filterbar.get_button('custom').set_active(True)
             self.glog_parent.filter = 'custom'
             self.glog_parent.reload_log(**opts)
         else:
