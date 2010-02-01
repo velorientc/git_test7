@@ -565,6 +565,7 @@ class GLog(gdialog.GWindow):
         self.graphview.load_all_revisions()
         self.cmd_set_sensitive('load-more', False)
         self.cmd_set_sensitive('load-all', False)
+        self.sttool.set_enable('load', False)
 
     def selection_changed(self, graphview):
         'Graphview reports a new row selected'
@@ -589,6 +590,7 @@ class GLog(gdialog.GWindow):
             self.changeview.clear()
         self.cmd_set_sensitive('load-more', False)
         self.cmd_set_sensitive('load-all', False)
+        self.sttool.set_enable('load', False)
 
     def details_clicked(self, toolbutton, data=None):
         self.show_details_dialog()
@@ -1001,6 +1003,7 @@ class GLog(gdialog.GWindow):
 
         self.cmd_set_sensitive('load-more', len(self.repo)>0)
         self.cmd_set_sensitive('load-all', len(self.repo)>0)
+        self.sttool.set_enable('load', len(self.repo)>0)
         self.filterbar.get_button('ancestry').set_sensitive(False)
         self.menuitems['ancestry'].set_sensitive(False)
         pats = opts.get('pats', [])
