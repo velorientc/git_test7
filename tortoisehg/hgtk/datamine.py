@@ -114,7 +114,6 @@ class DataMineDialog(gdialog.GWindow):
         notebook.connect('thg-new', self.new_notebook)
 
         self.stbar = statusbar.StatusBar()
-        self.stbar.sttext.set_property('use-markup', True)
         vbox.pack_start(self.stbar, False, False, 2)
         self.stop_button.set_sensitive(False)
         return vbox
