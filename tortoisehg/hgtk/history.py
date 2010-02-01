@@ -1092,18 +1092,17 @@ class GLog(gdialog.GWindow):
         if hasattr(self, 'mqwidget'):
             self.mqwidget.refresh()
             # update status messages
-            status_text = ''
-            idle_text = None
+            mq_text = None
             ntotal = self.mqwidget.get_num_patches()
             if ntotal > 0:
                 ncount = self.mqwidget.get_num_applied()
-                status_text = _('%(count)d of %(total)d Patches applied') % {
-                                'count': ncount, 'total': ntotal}
+                mq_text = ''
                 if ncount > 0:
-                    idle_text = _("Patch '%s' applied") % \
-                                  self.mqwidget.get_qtip_patchname()
-            self.stbar.set_text(status_text, name='mq')
-            self.stbar.set_idle_text(idle_text)
+                    mq_text += _('Current patch: %s,  ') % \
+                                 self.mqwidget.get_qtip_patchname()
+                mq_text += _('%(count)d of %(total)d applied patches') % {
+                             'count': ncount, 'total': ntotal}
+            self.stbar.set_text(mq_text, name='mq')
 
         # Remember options to next time reload_log is called
         self.filteropts = opts
