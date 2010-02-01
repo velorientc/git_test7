@@ -710,7 +710,7 @@ class GLog(gdialog.GWindow):
             opts['keyword'] = [w.strip() for w in text.split(',')]
             name = 'keywords'
         elif mode == MODE_DATE:
-            opts['date'] = ret
+            opts['date'] = text
             name = 'date'
         elif mode == MODE_USER:
             opts['user'] = [w.strip() for w in text.split(',')]
