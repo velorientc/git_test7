@@ -471,8 +471,9 @@ class GCommit(GStatus):
         botbox.pack_start(status_body)
 
         # parent changeset info
-        parents_vbox = gtk.VBox(spacing=1)
-        self.parents_frame = parents_vbox
+        pframe = gtk.VBox()
+        self.parents_frame = pframe
+        pvbox = gtk.VBox(spacing=1)
         style = csinfo.labelstyle(contents=('%(athead)s ',
                        _('Parent: %(rev)s'), ' %(branch)s', ' %(tags)s',
                        ' %(summary)s'), selectable=True)
@@ -489,14 +490,15 @@ class GCommit(GStatus):
         factory = csinfo.factory(self.repo, custom, style)
         def add_parent():
             label = factory()
-            parents_vbox.pack_start(label, False, False)
+            pvbox.pack_start(label, False, False)
             return label
         self.parent1_label = add_parent()
         self.parent2_label = add_parent()
-        parents_hbox = gtk.HBox()
-        parents_hbox.pack_start(parents_vbox, False, False, 5)
-        botbox.pack_start(parents_hbox, False, False, 2)
-        botbox.pack_start(gtk.HSeparator(), False, False)
+        phbox = gtk.HBox()
+        phbox.pack_start(pvbox, False, False, 5)
+        pframe.pack_start(phbox, False, False)
+        pframe.pack_start(gtk.HSeparator(), False, False)
+        botbox.pack_start(pframe, False, False, 2)
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(midpane, shrink=False)
