@@ -564,7 +564,7 @@ class SynchDialog(gtk.Window):
         self.hgthread = hgthread.HgThread(cmdline, parent=self)
         self.hgthread.start()
         self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(cmd))
+        self.stbar.set_text('hg ' + ' '.join(cmd))
 
         self.add_src_to_recent(remote_path)
 

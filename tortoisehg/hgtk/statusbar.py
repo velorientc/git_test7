@@ -10,77 +10,113 @@ import gtk
 import gobject
 
 from tortoisehg.util.i18n import _
+from tortoisehg.hgtk import gtklib
+
+ALIGN_MAP = {   gtk.JUSTIFY_LEFT: 0,
+                gtk.JUSTIFY_CENTER: 0.5,
+                gtk.JUSTIFY_RIGHT: 1}
 
 class StatusBar(gtk.HBox):
     def __init__(self, extra=None):
         gtk.HBox.__init__(self)
+
+        self.fields = {}
+        self.boxes = {}
+
         self.idle_text = None
-        self.started = False
+        self.timeout_id = None
+
+        self.append_field('status', expand=True, sep=False)
 
         self.pbar = gtk.ProgressBar()
-        self.sttext = gtk.Label("")
-        self.sttext.set_alignment(0, 0.5)
+        self.pbar.set_no_show_all(True)
+        self.append_widget(self.pbar, pack=gtk.PACK_START)
 
-        self.pbox = gtk.HBox()
-        self.pbox.pack_start(gtk.VSeparator(), False, False)
-        self.pbox.pack_start(self.pbar, False, False)
+        gtklib.idle_add_single_call(self.after_init)
 
-        self.pack_start(self.sttext, padding=4)
-        if extra:
-            self.pack_end(extra, False, False)
-        self.right1_label = gtk.Label()
-        self.pack_end(self.right1_label, False, False, padding=20)
-        self.pack_end(self.pbox, False, False, padding=1)
-        self.pbox.set_child_visible(False)
-        self.right2_label = gtk.Label()
-        self.pack_end(self.right2_label, False, False, padding=5)
-        self.right3_label = gtk.Label()
-        self.pack_end(self.right3_label, False, False, padding=20)
-        self.show_all()
-
-    def _pulse_timer(self, now=False):
-        self.pbar.pulse()
-        return True
+    ### public methods ###
 
     def begin(self, msg=_('Running...'), timeout=100):
-        self.pbox.set_child_visible(True)
-        self.pbox.map()
-        self.set_status_text(msg)
-        self.started = True 
-        self._timeout_event = gobject.timeout_add(timeout, self._pulse_timer)
+        self.set_text(msg)
+        self.pbar.map()
+        self.pbar.show_all()
+        self.timeout_id = gobject.timeout_add(timeout, self.pulse_timer)
 
     def end(self, msg=None, unmap=True):
-        self.started = False 
-        gobject.source_remove(self._timeout_event)
+        gobject.source_remove(self.timeout_id)
+        self.timeout_id = None
 
-        t = ''
+        text = ''
         if msg:
-            t = msg
+            text = msg
         elif self.idle_text:
-            t = self.idle_text
-        self.set_status_text(t)
+            text = self.idle_text
+        self.set_text(text)
 
         if unmap:
-            self.pbox.unmap()
+            self.pbar.unmap()
         else:
             self.pbar.set_fraction(1.0)
 
-    def set_status_text(self, msg):
-        self.sttext.set_text(str(msg))
+    def set_text(self, msg, name='status'):
+        try:
+            label, box = self.fields[name], self.boxes[name]
+        except KeyError:
+            raise _('unknown field name: %s') % name
+
+        if not msg and not name == 'status':
+            label.set_text('')
+            box.hide_all()
+            box.unmap()
+            box.set_no_show_all(True)
+            return
+
+        label.set_text(msg)
+        if box.get_no_show_all():
+            box.set_no_show_all(False)
+            box.map()
+            box.show_all()
 
     def set_idle_text(self, msg):
         self.idle_text = msg
-        if msg and not self.started:
-            self.set_status_text(msg)
+        if msg and self.timeout_id is None:
+            self.set_text(msg, name='status')
 
-    def set_right1_text(self, msg):
-        self.right1_label.set_text(str(msg))
+    def append_widget(self, widget, expand=False, pack=gtk.PACK_START):
+        if pack == gtk.PACK_START:
+            packfunc = self.pack_start
+        elif pack == gtk.PACK_END:
+            packfunc = self.pack_end
+        else:
+            raise _('invalid pack direction: %s') % pack
+        packfunc(widget, expand, expand, 2)
 
-    def set_right2_text(self, msg):
-        self.right2_label.set_text(str(msg))
+    def append_field(self, name, expand=False, pack=gtk.PACK_START,
+                     align=gtk.JUSTIFY_LEFT, sep=True):
+        label = gtk.Label()
+        try:
+            label.set_alignment(ALIGN_MAP[align], 0.5)
+        except KeyError:
+            raise _('invalid alignment value: %s') % align
 
-    def set_right3_text(self, msg):
-        self.right3_label.set_text(str(msg))
+        box = gtk.HBox()
+        if sep:
+            box.pack_start(gtk.VSeparator(), False, False, 2)
+        box.pack_start(label, expand, expand, 2)
+        self.append_widget(box, expand, pack)
+        box.set_no_show_all(True)
+
+        self.fields[name] = label
+        self.boxes[name] = box
 
     def set_pulse_step(self, val):
         self.pbar.set_pulse_step(val)
+
+    ### signal handlers ###
+
+    def after_init(self, *args):
+        self.pbar.set_no_show_all(False)
+
+    def pulse_timer(self, now=False):
+        self.pbar.pulse()
+        return True

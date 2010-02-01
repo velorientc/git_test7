@@ -176,7 +176,7 @@ class RecoveryDialog(gtk.Window):
         self.hgthread = hgthread.HgThread(cmdline, postfunc)
         self.hgthread.start()
         self.stbar.begin()
-        self.stbar.set_status_text('hg ' + ' '.join(cmdline))
+        self.stbar.set_text('hg ' + ' '.join(cmdline))
 
     def _cmd_running(self):
         if self.hgthread and self.hgthread.isAlive():

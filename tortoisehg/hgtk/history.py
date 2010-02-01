@@ -1086,7 +1086,7 @@ class GLog(gdialog.GWindow):
             else:
                 filtertext = '%s: %s' % (filterprefix, nomergestext)
 
-        self.stbar.set_right2_text(filtertext)
+        self.stbar.set_text(filtertext, name='filter')
 
         # refresh MQ widget if exists
         if hasattr(self, 'mqwidget'):
@@ -1102,7 +1102,7 @@ class GLog(gdialog.GWindow):
                 if ncount > 0:
                     idle_text = _("Patch '%s' applied") % \
                                   self.mqwidget.get_qtip_patchname()
-            self.stbar.set_right3_text(status_text)
+            self.stbar.set_text(status_text, name='mq')
             self.stbar.set_idle_text(idle_text)
 
         # Remember options to next time reload_log is called
@@ -1289,8 +1289,13 @@ class GLog(gdialog.GWindow):
     def get_body(self):
         self.connect('delete-event', self.delete)
         self.gorev_dialog = None
-        self.stbar = statusbar.StatusBar()
         self.limit = self.get_graphlimit(None)
+
+        # prepare statusbar
+        self.stbar = statusbar.StatusBar()
+        self.stbar.append_field('mq')
+        self.stbar.append_field('filter')
+        self.stbar.append_field('rev')
 
         # Allocate TreeView instance to use internally
         limit = self.limit

@@ -457,7 +457,7 @@ class DataMineDialog(gdialog.GWindow):
             try:
                 hglib.hgcmd_toq(q, *args)
             except (util.Abort, error.LookupError), e:
-                self.stbar.set_status_text(_('Abort: %s') % str(e))
+                self.stbar.set_text(_('Abort: %s') % str(e))
 
         thread = thread2.Thread(target=threadfunc, args=args)
         thread.start()
@@ -516,7 +516,7 @@ class DataMineDialog(gdialog.GWindow):
             iter = model.get_iter(path)
             self.currev = model[iter][GCOL_REVID]
             self.curpath = hglib.fromutf(model[iter][GCOL_PATH])
-            self.stbar.set_status_text(hglib.toutf(model[iter][GCOL_DESC]))
+            self.stbar.set_text(model[iter][GCOL_DESC])
 
     def close_current_page(self):
         num = self.notebook.get_current_page()
@@ -759,7 +759,7 @@ class DataMineDialog(gdialog.GWindow):
             try:
                 hglib.hgcmd_toq(q, *args)
             except (util.Abort, error.LookupError), e:
-                self.stbar.set_status_text(_('Abort: %s') % str(e))
+                self.stbar.set_text(_('Abort: %s') % str(e))
 
         (frame, treeview, origpath, graphview) = objs
         q = Queue.Queue()
@@ -839,7 +839,7 @@ class DataMineDialog(gdialog.GWindow):
             anniter = model.get_iter(path)
             self.currev = model[anniter][ACOL_REVID]
             self.path = model.path
-            self.stbar.set_status_text(model[anniter][ACOL_DESC])
+            self.stbar.set_text(model[anniter][ACOL_DESC])
 
     def ann_button_release(self, widget, event, objs):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |

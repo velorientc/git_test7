@@ -781,7 +781,7 @@ class GStatus(gdialog.GWindow):
                     self.ready = True
                     self.update_check_count()
                     self.stbar.end()
-                    self.stbar.set_status_text(self.status_error)
+                    self.stbar.set_text(self.status_error)
                     return False
                 self.repo = self.newrepo
                 self.ui = self.repo.ui

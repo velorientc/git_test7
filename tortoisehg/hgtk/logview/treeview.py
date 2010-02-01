@@ -269,7 +269,7 @@ class TreeView(gtk.ScrolledWindow):
             revision_text = _('%(count)d of %(total)d Revisions') % {
                     'count': len(self.model),
                     'total': len(self.repo) }
-            self.pbar.set_right1_text(revision_text)
+            self.pbar.set_text(revision_text, name='rev')
         return False
 
     def do_get_property(self, property):
@@ -379,7 +379,7 @@ class TreeView(gtk.ScrolledWindow):
                 gobject.idle_add(self.populate, self.currevid)
             else:
                 self.treeview.set_model(None)
-                self.pbar.set_status_text(_('Repository is empty'))
+                self.pbar.set_text(_('Repository is empty'))
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
