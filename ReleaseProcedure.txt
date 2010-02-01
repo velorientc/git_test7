@@ -1,8 +1,9 @@
 Steps for making a release:
 
+* Pull latest translations from Launchpad
 * update ReleaseNotes.txt                           (major release only)
-* set revision number in doc/source*/conf.py
-* set revision number in tortoisehg/hgtk/gdialog.py
+* set revision number in tortoisehg/hgtk/gdialog.py (major release only)
+* set revision number in doc/source/conf.py
 * set revision number in win32/shellext/thgversion.h
 * tag stable branch of repository, push
 * build pdf hgbook, check into thg-winbuild         (major release only)
