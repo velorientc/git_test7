@@ -8,7 +8,7 @@
 import os
 import sys
 
-from mercurial import hg, cmdutil, util, ui, node, merge
+from mercurial import hg, cmdutil, util, ui, node, merge, error
 import paths
 import debugthg
 import hglib
@@ -188,7 +188,7 @@ def get_states(upath, repo=None):
         if not repo or (repo.root != root and repo.root != real(root)):
             repo = hg.repository(ui.ui(), path=root)
             debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
-    except hglib.RepoError:
+    except error.RepoError:
         # We aren't in a working tree
         debugf("%s: not in repo", pdir)
         add(pdir + '*', IGNORED)

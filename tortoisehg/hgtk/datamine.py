@@ -13,7 +13,7 @@ import Queue
 import threading
 import re
 
-from mercurial import util
+from mercurial import util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, thread2
@@ -41,7 +41,7 @@ ACOL_COLOR = 5
 ACOL_USER  = 6
 ACOL_LNUM  = 7 # line number
 
-class DataMineDialog(gdialog.GDialog):
+class DataMineDialog(gdialog.GWindow):
 
     def get_title(self):
         return _('%s - datamine') % self.get_reponame()
@@ -79,11 +79,11 @@ class DataMineDialog(gdialog.GDialog):
         os.chdir(root)
 
     def save_settings(self):
-        settings = gdialog.GDialog.save_settings(self)
+        settings = gdialog.GWindow.save_settings(self)
         return settings
 
     def load_settings(self, settings):
-        gdialog.GDialog.load_settings(self, settings)
+        gdialog.GWindow.load_settings(self, settings)
         self.tabwidth = hglib.gettabwidth(self.repo.ui)
 
     def get_body(self):
@@ -121,36 +121,40 @@ class DataMineDialog(gdialog.GDialog):
 
     def _destroying(self, gtkobj):
         self.stop_all_searches()
-        gdialog.GDialog._destroying(self, gtkobj)
+        gdialog.GWindow._destroying(self, gtkobj)
 
     def ann_header_context_menu(self, treeview):
-        menu = gtk.Menu()
-        button = gtk.CheckMenuItem(_('Filename'))
-        button.connect('toggled', self.toggle_annatate_columns, treeview, 2)
-        menu.append(button)
-        button = gtk.CheckMenuItem(_('User'))
-        button.connect('toggled', self.toggle_annatate_columns, treeview, 3)
-        menu.append(button)
+        m = gtklib.MenuBuilder()
+        m.append(_('Filename'), self.toggle_annatate_columns,
+                 ascheck=True, args=[treeview, 2])
+        m.append(_('User'), self.toggle_annatate_columns,
+                 ascheck=True, args=[treeview, 3])
+        menu = m.build()
         menu.show_all()
         return menu
 
     def grep_context_menu(self):
-        menu = gtk.Menu()
-        menu.append(create_menu(_('di_splay change'), self.cmenu_display))
-        menu.append(create_menu(_('_annotate file'), self.cmenu_annotate))
-        menu.append(create_menu(_('_file history'), self.cmenu_file_log))
-        menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
+        m = gtklib.MenuBuilder()
+        m.append(_('Di_splay Change'), self.cmenu_display,
+                 'menushowchanged.ico')
+        m.append(_('_Annotate File'), self.cmenu_annotate, 'menublame.ico')
+        m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
+        m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
+        menu = m.build()
         menu.show_all()
         return menu
 
     def annotate_context_menu(self, objs):
-        menu = gtk.Menu()
-        menu.append(create_menu(_('_zoom to change'), self.cmenu_zoom, objs))
-        menu.append(create_menu(_('di_splay change'), self.cmenu_display))
-        menu.append(create_menu(_('_annotate parent'),
-                                self.cmenu_annotate_parent, objs))
-        menu.append(create_menu(_('_view file at revision'), self.cmenu_view))
-        menu.append(create_menu(_('_file history'), self.cmenu_file_log))
+        m = gtklib.MenuBuilder()
+        m.append(_('_Zoom to Change'), self.cmenu_zoom, gtk.STOCK_ZOOM_IN,
+                 args=[objs])
+        m.append(_('Di_splay Change'), self.cmenu_display,
+                 'menushowchanged.ico')
+        m.append(_('_Annotate Parent'), self.cmenu_annotate_parent,
+                 'menublame.ico', args=[objs])
+        m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
+        m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
+        menu = m.build()
         menu.show_all()
         return menu
 
@@ -191,7 +195,7 @@ class DataMineDialog(gdialog.GDialog):
         parent_ctx = self.repo[parent_revid]
         try:
             parent_ctx.filectx(filepath)
-        except LookupError:
+        except error.LookupError:
             # file was renamed/moved, try to find previous file path
             end_iter = iter
             path = graphview.get_path_at_revid(int(anotrev))
@@ -208,7 +212,7 @@ class DataMineDialog(gdialog.GDialog):
                     if renamed:
                         filepath = renamed[0]
                         break
-                except LookupError:
+                except error.LookupError:
                     # break iteration, but don't use 'break' statement
                     # so that execute 'else' block for showing prompt.
                     iter = end_iter
@@ -453,7 +457,7 @@ class DataMineDialog(gdialog.GDialog):
         def threadfunc(q, *args):
             try:
                 hglib.hgcmd_toq(q, *args)
-            except (util.Abort, hglib.LookupError), e:
+            except (util.Abort, error.LookupError), e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 
         thread = thread2.Thread(target=threadfunc, args=args)
@@ -580,7 +584,7 @@ class DataMineDialog(gdialog.GDialog):
             ctx = self.repo.parents()[0]
             try:
                 fctx = ctx.filectx(path)
-            except LookupError:
+            except error.LookupError:
                 gdialog.Prompt(_('File is unrevisioned'),
                        _('Unable to annotate ') + path, self).run()
                 return
@@ -601,10 +605,13 @@ class DataMineDialog(gdialog.GDialog):
 
         # File log revision graph
         graphview = LogTreeView(self.repo, 5000)
+        graphview.set_property('rev-column-visible', True)
+        graphview.set_property('msg-column-visible', True)
+        graphview.set_property('user-column-visible', True)
+        graphview.set_property('age-column-visible', True)
+        graphview.set_columns(['graph', 'rev', 'msg', 'user', 'age'])
         graphview.connect('revisions-loaded', self.revisions_loaded, rev)
         graphview.refresh(True, [path], graphopts)
-        graphview.set_property('rev-column-visible', True)
-        graphview.set_property('age-column-visible', True)
 
         # Annotation text tree view
         treeview = gtk.TreeView()
@@ -752,7 +759,7 @@ class DataMineDialog(gdialog.GDialog):
         def threadfunc(q, *args):
             try:
                 hglib.hgcmd_toq(q, *args)
-            except (util.Abort, hglib.LookupError), e:
+            except (util.Abort, error.LookupError), e:
                 self.stbar.set_status_text(_('Abort: %s') % str(e))
 
         (frame, treeview, origpath, graphview) = objs
@@ -849,13 +856,6 @@ class DataMineDialog(gdialog.GDialog):
     def ann_row_act(self, tree, path, column, objs):
         ann_cmenu = self.annotate_context_menu(objs)
         ann_cmenu.get_children()[0].activate()
-
-
-def create_menu(label, callback, *args):
-    menuitem = gtk.MenuItem(label, True)
-    menuitem.connect('activate', callback, *args)
-    menuitem.set_border_width(1)
-    return menuitem
 
 def run(ui, *pats, **opts):
     cmdoptions = {
