@@ -931,9 +931,11 @@ class GStatus(gdialog.GWindow):
 
     def rename_file(self, wfile):
         fdir, fname = os.path.split(wfile)
-        newfile = dialog.entry_dialog(self, _('Rename file to:'), True, fname)
-        if newfile and newfile != fname:
-            self.hg_move([wfile, os.path.join(fdir, newfile)])
+        utf_fname = hglib.toutf(fname)
+        newfile = dialog.entry_dialog(self, _('Rename file to:'),
+                         True, utf_fname)
+        if newfile and newfile != utf_fname:
+            self.hg_move([wfile, os.path.join(fdir, hglib.fromutf(newfile))])
         return True
 
 
