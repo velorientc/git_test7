@@ -201,7 +201,8 @@ class SummaryInfo(object):
               'dateage': _('Date:'), 'branch': _('Branch:'),
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
               'rawtags': _('Tags:'), 'transplant': _('Transplant:'),
-              'p4': _('Perforce:'), 'svn': _('Subversion:')}
+              'p4': _('Perforce:'), 'svn': _('Subversion:'),
+              'shortuser': _('User:')}
 
     def __init__(self):
         pass
@@ -230,6 +231,8 @@ class SummaryInfo(object):
                 return hglib.toutf(hglib.tounicode(value)[:80])
             elif item == 'user':
                 return hglib.toutf(ctx.user())
+            elif item == 'shortuser':
+                return hglib.toutf(hglib.username(ctx.user()))
             elif item == 'dateage':
                 date = self.get_data('date', *args)
                 age = self.get_data('age', *args)
@@ -352,7 +355,8 @@ class SummaryInfo(object):
                 opts = dict(color='black', background=gtklib.PYELLOW)
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
-            elif item in ('desc', 'summary', 'user', 'date', 'age'):
+            elif item in ('desc', 'summary', 'user', 'shortuser',
+                          'date', 'age'):
                 return gtklib.markup(value)
             elif item == 'dateage':
                 return gtklib.markup('%s (%s)' % value)
