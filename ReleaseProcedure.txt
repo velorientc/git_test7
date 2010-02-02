@@ -23,6 +23,7 @@ Steps for making a release:
 * update FAQ entries
 * [ANN] email to tortoisehg-discuss and mercurial@selenic.com
 * Update Mercurial wiki NEWS and Downloads and TortoiseHg pages
+* Add the new version number and new features to the issue tracker
 
 Post Major Release:
 * Increment minimum Mercurial version in tortoisehg/util/hgversion.py
