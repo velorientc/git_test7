@@ -1940,13 +1940,36 @@ class GLog(gdialog.GWindow):
     def update_urllist(self):
         if self.bfile:
             return
+
+        # save current selection & default path
+        oldurl = self.pathentry.get_text()
         urllist = self.urlcombo.get_model()
+        for path, alias in urllist:
+            if alias == 'default':
+                defurl = path
+                break
+        else:
+            defurl = None
+
+        # update URL list
         urllist.clear()
+        new_defurl = None
         for alias, path in self.repo.ui.configitems('paths'):
             path = url.hidepassword(path)
             urllist.append((hglib.toutf(path), hglib.toutf(alias)))
             if alias == 'default':
                 self.urlcombo.set_active(len(urllist) - 1)
+                new_defurl = path
+
+        # restore previous selection
+        if oldurl and defurl == new_defurl:
+            for row in urllist:
+                path, alias = row
+                if oldurl == path:
+                    self.urlcombo.set_active_iter(row.iter)
+                    break
+            else:
+                self.pathentry.set_text(oldurl)
 
     def update_postpull(self, ppull=None):
         if ppull is None:
