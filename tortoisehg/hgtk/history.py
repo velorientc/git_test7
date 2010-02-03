@@ -821,6 +821,9 @@ class GLog(gdialog.GWindow):
     def repo_invalidated(self, mqwidget):
         self.reload_log()
 
+    def files_dropped(self, mqwidget, files, *args):
+        self.import_clicked(None, thgimport.DEST_MQ, files)
+
     def prepare_display(self):
         'Called at end of display() method'
         self.ready = True
@@ -1517,10 +1520,11 @@ class GLog(gdialog.GWindow):
         # MQ widget
         if 'mq' in self.exs:
             # create MQWidget
-            self.mqwidget = thgmq.MQWidget(
-                self.repo, accelgroup, self.tooltips)
+            self.mqwidget = thgmq.MQWidget(self.repo,
+                                           accelgroup, self.tooltips)
             self.mqwidget.connect('patch-selected', self.patch_selected)
             self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
+            self.mqwidget.connect('files-dropped', self.files_dropped)
 
             def wrapframe(widget):
                 frame = gtk.Frame()
@@ -1939,7 +1943,7 @@ class GLog(gdialog.GWindow):
     def stop_clicked(self, toolbutton):
         self.runner.stop()
 
-    def import_clicked(self, widget, paths=None):
+    def import_clicked(self, widget, dest=thgimport.DEST_REPO, paths=None):
         oldlen = len(self.repo)
         enabled = hasattr(self, 'mqpaned')
         if enabled:
@@ -1952,7 +1956,7 @@ class GLog(gdialog.GWindow):
             if enabled and oldnum < self.mqwidget.get_num_patches():
                 self.mqwidget.refresh()
                 self.enable_mqpanel(enable=True)
-        dialog = thgimport.ImportDialog(self.repo, sources=paths)
+        dialog = thgimport.ImportDialog(self.repo, dest, paths)
         dialog.set_notify_func(import_completed)
         self.show_dialog(dialog)
 
@@ -2016,7 +2020,7 @@ class GLog(gdialog.GWindow):
                 else:
                     self.pathentry.set_text(path)
             elif dest == DND_DEST_GRAPHVIEW:
-                self.import_clicked(None, paths)
+                self.import_clicked(None, thgimport.DEST_REPO, paths)
             else:
                 raise _('unknown dnd dest: %s') % dest
 
