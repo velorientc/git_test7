@@ -43,8 +43,9 @@ class StatusBar(gtk.HBox):
         self.timeout_id = gobject.timeout_add(timeout, self.pulse_timer)
 
     def end(self, msg=None, unmap=True):
-        gobject.source_remove(self.timeout_id)
-        self.timeout_id = None
+        if self.timeout_id:
+            gobject.source_remove(self.timeout_id)
+            self.timeout_id = None
 
         text = ''
         if msg:
