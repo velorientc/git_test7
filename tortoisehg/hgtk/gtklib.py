@@ -10,8 +10,8 @@ import os
 import sys
 import gtk
 import gobject
-import pango
 import Queue
+import urllib
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import paths, hglib, thread2
@@ -143,6 +143,14 @@ def get_icon_image(name):
         if pixbuf:
             img.set_from_pixbuf(pixbuf)
     return img
+
+def normalize_dnd_paths(rawstr):
+    paths = []
+    for line in rawstr.rstrip('\x00').splitlines():
+        if line.startswith('file:'):
+            path = os.path.normpath(urllib.url2pathname(line[5:]))
+            paths.append(path)
+    return paths
 
 class MessageDialog(gtk.Dialog):
     button_map = {

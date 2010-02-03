@@ -10,7 +10,6 @@ import gtk
 import gtk.keysyms
 import gobject
 import pango
-import urllib
 
 from mercurial import error
 
@@ -814,12 +813,7 @@ class MQWidget(gtk.VBox):
 
     def dnd_received(self, widget, context, x, y, sel, target, *args):
         if target == MQ_DND_URI_LIST:
-            # borrow from cslist.py
-            paths = []
-            for line in sel.data.rstrip('\x00').splitlines():
-                if line.startswith('file:'):
-                    path = os.path.normpath(urllib.url2pathname(line[5:]))
-                    paths.append(path)
+            paths = gtklib.normalize_dnd_paths(sel.data)
             if paths:
                 self.emit('files-dropped', paths, sel.data)
 

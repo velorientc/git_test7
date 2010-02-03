@@ -13,7 +13,6 @@ import gobject
 import shutil
 import tempfile
 import atexit
-import urllib
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 from mercurial import hbisect, error
@@ -2005,12 +2004,7 @@ class GLog(gdialog.GWindow):
 
     def dnd_received(self, widget, context, x, y, sel, target, tm, dest):
         if target == HIST_DND_URI_LIST:
-            # borrow from cslist.py
-            paths = []
-            for line in sel.data.rstrip('\x00').splitlines():
-                if line.startswith('file:'):
-                    path = os.path.normpath(urllib.url2pathname(line[5:]))
-                    paths.append(path)
+            paths = gtklib.normalize_dnd_paths(sel.data)
             if not paths:
                 return
             if dest == DND_DEST_PATHENTRY:

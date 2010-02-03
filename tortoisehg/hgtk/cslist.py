@@ -8,7 +8,6 @@
 import os
 import gtk
 import gobject
-import urllib
 
 from mercurial import hg, ui
 
@@ -768,13 +767,9 @@ class ChangesetList(gtk.Frame):
             pos, start, end = self.get_item_pos(y, detail=True)
             self.reorder_item(self.item_drag, end)
         elif target_type == CSL_DND_URI_LIST:
-            files = []
-            for line in sel.data.rstrip('\x00').splitlines():
-                if line.startswith('file:'):
-                    path = os.path.normpath(urllib.url2pathname(line[5:]))
-                    files.append(path)
-            if files:
-                self.emit('files-dropped', files, sel.data)
+            paths = gtklib.normalize_dnd_paths(sel.data)
+            if paths:
+                self.emit('files-dropped', paths, sel.data)
 
     def dnd_get(self, widget, context, sel, target_type, event_time):
         pos = self.item_drag
