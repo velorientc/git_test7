@@ -210,16 +210,16 @@ except ImportError:
 
 if os.name == "nt":
     (scripts, packages, data_files, extra) = setup_windows(version)
-    desc='Windows shell extension for Mercurial VCS'
+    desc = 'Windows shell extension for Mercurial VCS'
     # Windows binary file versions for exe/dll files must have the
     # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
-    setupversion=version.split('+', 1)[0]
-    productname='TortoiseHg'
+    setupversion = version.split('+', 1)[0]
+    productname = 'TortoiseHg'
 else:
     (scripts, packages, data_files, extra) = setup_posix()
-    desc='TortoiseHg dialogs for Mercurial VCS'
-    setupversion=version
-    productname='tortoisehg'
+    desc = 'TortoiseHg dialogs for Mercurial VCS'
+    setupversion = version
+    productname = 'tortoisehg'
 
 setup(name=productname,
         version=setupversion,
