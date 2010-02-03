@@ -13,6 +13,7 @@ import gobject
 import shutil
 import tempfile
 import atexit
+import urllib
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 from mercurial import hbisect, error
@@ -34,6 +35,8 @@ MODE_FILEPATS = 1
 MODE_KEYWORDS = 2
 MODE_DATE     = 3
 MODE_USER     = 4
+
+HIST_DND_URI_LIST = 1024
 
 class FilterBar(gtklib.SlimToolbar):
     'Filter Toolbar for repository log'
@@ -1417,6 +1420,12 @@ class GLog(gdialog.GWindow):
         self.pathentry = urlcombo.get_child()
         syncbox.append_widget(urlcombo, expand=True)
 
+        ## dnd setup for path entry
+        self.dnd_targets = [('text/uri-list', 0, HIST_DND_URI_LIST)]
+        self.pathentry.drag_dest_set(gtk.DEST_DEFAULT_MOTION | \
+             gtk.DEST_DEFAULT_DROP, self.dnd_targets, gtk.gdk.ACTION_MOVE)
+        self.pathentry.connect('drag-data-received', self.dnd_received)
+
         self.update_urllist()
 
         ## post pull drop-down list
@@ -1979,6 +1988,20 @@ class GLog(gdialog.GWindow):
             if name == ppull:
                 self.ppullcombo.set_active_iter(row.iter)
                 break
+
+    def dnd_received(self, widget, context, x, y, sel, target_type, *args):
+        if target_type == HIST_DND_URI_LIST:
+            # borrow from cslist.py
+            for line in sel.data.rstrip('\x00').splitlines():
+                if line.startswith('file:'):
+                    path = os.path.normpath(urllib.url2pathname(line[5:]))
+                    break
+            else:
+                return
+            if os.path.isfile(path):
+                self.set_bundlefile(path)
+            else:
+                self.pathentry.set_text(path)
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
