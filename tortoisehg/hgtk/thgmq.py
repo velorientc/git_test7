@@ -10,6 +10,7 @@ import gtk
 import gtk.keysyms
 import gobject
 import pango
+import urllib
 
 from mercurial import error
 
@@ -34,6 +35,9 @@ MOVE_TOP    = 1
 MOVE_UP     = 2
 MOVE_DOWN   = 3
 MOVE_BOTTOM = 4
+
+# DnD target constans
+MQ_DND_URI_LIST = 1024
 
 class MQWidget(gtk.VBox):
 
@@ -77,7 +81,11 @@ class MQWidget(gtk.VBox):
         'patch-selected': (gobject.SIGNAL_RUN_FIRST,
                            gobject.TYPE_NONE,
                            (int,  # revision number
-                            str)) # patch name
+                            str)), # patch name
+        'files-dropped': (gobject.SIGNAL_RUN_FIRST,
+                          gobject.TYPE_NONE,
+                          (object, # list of dropped files/dirs
+                           str))   # raw string data
     }
 
     def __init__(self, repo, accelgroup=None, tooltips=None):
@@ -149,6 +157,12 @@ class MQWidget(gtk.VBox):
         self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('row-activated', self.list_row_activated)
         self.list.connect('size-allocate', self.list_size_allocated)
+
+        ### dnd setup for patch list
+        targets = [('text/uri-list', 0, MQ_DND_URI_LIST)]
+        self.list.drag_dest_set(gtk.DEST_DEFAULT_MOTION | \
+             gtk.DEST_DEFAULT_DROP, targets, gtk.gdk.ACTION_MOVE)
+        self.list.connect('drag-data-received', self.dnd_received)
 
         self.cols = {}
         self.cells = {}
@@ -797,6 +811,17 @@ class MQWidget(gtk.VBox):
 
     def pushall_clicked(self, toolbutton):
         self.qpush(all=True)
+
+    def dnd_received(self, widget, context, x, y, sel, target, *args):
+        if target == MQ_DND_URI_LIST:
+            # borrow from cslist.py
+            paths = []
+            for line in sel.data.rstrip('\x00').splitlines():
+                if line.startswith('file:'):
+                    path = os.path.normpath(urllib.url2pathname(line[5:]))
+                    paths.append(path)
+            if paths:
+                self.emit('files-dropped', paths, sel.data)
 
     ### context menu signal handlers ###
 
