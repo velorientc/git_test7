@@ -214,12 +214,14 @@ if os.name == "nt":
     # Windows binary file versions for exe/dll files must have the
     # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
     setupversion=version.split('+', 1)[0]
+    productname='TortoiseHg'
 else:
     (scripts, packages, data_files, extra) = setup_posix()
     desc='TortoiseHg dialogs for Mercurial VCS'
     setupversion=version
+    productname='tortoisehg'
 
-setup(name="tortoisehg",
+setup(name=productname,
         version=setupversion,
         author='Steve Borho',
         author_email='steve@borho.org',
