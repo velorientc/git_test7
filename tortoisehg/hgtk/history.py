@@ -2013,6 +2013,16 @@ class GLog(gdialog.GWindow):
                     self.set_bundlefile(path)
                 else:
                     self.pathentry.set_text(path)
+
+                # HACK: I don't know why, but 'drag-data-received' signal
+                # is emitted twice: the former has correct dropped path,
+                # the latter has previously dropped (old) path.  To avoid
+                # overwriting with old one, I had to block dnd signal
+                # right after this signal handler is called.
+                widget.handler_block_by_func(self.dnd_received)
+                def after():
+                    widget.handler_unblock_by_func(self.dnd_received)
+                gtklib.idle_add_single_call(after)
             elif dest == DND_DEST_GRAPHVIEW:
                 self.import_clicked(None, thgimport.DEST_REPO, paths)
             else:
