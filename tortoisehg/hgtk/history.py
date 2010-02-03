@@ -38,6 +38,9 @@ MODE_USER     = 4
 
 HIST_DND_URI_LIST = 1024
 
+DND_DEST_GRAPHVIEW = 0
+DND_DEST_PATHENTRY = 1
+
 class FilterBar(gtklib.SlimToolbar):
     'Filter Toolbar for repository log'
 
@@ -1320,6 +1323,13 @@ class GLog(gdialog.GWindow):
             limit = self.get_graphlimit(self.opts['limit'])
         self.graphview = LogTreeView(self.repo, limit, self.stbar)
 
+        # dnd setup for TreeView
+        targets = [('text/uri-list', 0, HIST_DND_URI_LIST)]
+        self.graphview.drag_dest_set(gtk.DEST_DEFAULT_MOTION | \
+             gtk.DEST_DEFAULT_DROP, targets, gtk.gdk.ACTION_MOVE)
+        self.graphview.connect('drag-data-received', self.dnd_received,
+                               DND_DEST_GRAPHVIEW)
+
         # Allocate ChangeSet instance to use internally
         self.changeview = changeset.ChangeSet(self.ui, self.repo, self.cwd, [],
                 self.opts, self.stbar)
@@ -1421,10 +1431,10 @@ class GLog(gdialog.GWindow):
         syncbox.append_widget(urlcombo, expand=True)
 
         ## dnd setup for path entry
-        self.dnd_targets = [('text/uri-list', 0, HIST_DND_URI_LIST)]
         self.pathentry.drag_dest_set(gtk.DEST_DEFAULT_MOTION | \
-             gtk.DEST_DEFAULT_DROP, self.dnd_targets, gtk.gdk.ACTION_MOVE)
-        self.pathentry.connect('drag-data-received', self.dnd_received)
+             gtk.DEST_DEFAULT_DROP, targets, gtk.gdk.ACTION_MOVE)
+        self.pathentry.connect('drag-data-received', self.dnd_received,
+                               DND_DEST_PATHENTRY)
 
         self.update_urllist()
 
@@ -1929,7 +1939,7 @@ class GLog(gdialog.GWindow):
     def stop_clicked(self, toolbutton):
         self.runner.stop()
 
-    def import_clicked(self, toolbutton):
+    def import_clicked(self, widget, paths=None):
         oldlen = len(self.repo)
         enabled = hasattr(self, 'mqpaned')
         if enabled:
@@ -1942,7 +1952,7 @@ class GLog(gdialog.GWindow):
             if enabled and oldnum < self.mqwidget.get_num_patches():
                 self.mqwidget.refresh()
                 self.enable_mqpanel(enable=True)
-        dialog = thgimport.ImportDialog(self.repo)
+        dialog = thgimport.ImportDialog(self.repo, sources=paths)
         dialog.set_notify_func(import_completed)
         self.show_dialog(dialog)
 
@@ -1989,19 +1999,26 @@ class GLog(gdialog.GWindow):
                 self.ppullcombo.set_active_iter(row.iter)
                 break
 
-    def dnd_received(self, widget, context, x, y, sel, target_type, *args):
-        if target_type == HIST_DND_URI_LIST:
+    def dnd_received(self, widget, context, x, y, sel, target, tm, dest):
+        if target == HIST_DND_URI_LIST:
             # borrow from cslist.py
+            paths = []
             for line in sel.data.rstrip('\x00').splitlines():
                 if line.startswith('file:'):
                     path = os.path.normpath(urllib.url2pathname(line[5:]))
-                    break
-            else:
+                    paths.append(path)
+            if not paths:
                 return
-            if os.path.isfile(path):
-                self.set_bundlefile(path)
+            if dest == DND_DEST_PATHENTRY:
+                path = paths[0] # use only first path
+                if os.path.isfile(path):
+                    self.set_bundlefile(path)
+                else:
+                    self.pathentry.set_text(path)
+            elif dest == DND_DEST_GRAPHVIEW:
+                self.import_clicked(None, paths)
             else:
-                self.pathentry.set_text(path)
+                raise _('unknown dnd dest: %s') % dest
 
     def realize_settings(self):
         self.vpaned.set_position(self.setting_vpos)
