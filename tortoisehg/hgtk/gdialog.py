@@ -658,7 +658,6 @@ class GWindow(gtk.Window):
             paths = ['"%s"' % os.path.join(pathroot, f) for f in files]
             command = '%s %s' % (editor, ' '.join(paths))
             util.system(command,
-                        environ={'HGUSER': self.ui.username()},
                         onerr=self.ui, errprefix=_('edit failed'))
 
         editor = (self.ui.config('tortoisehg', 'editor') or
