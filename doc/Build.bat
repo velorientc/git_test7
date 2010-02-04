@@ -1,6 +1,6 @@
 @echo off
 
-if "%hhc_compiler" equ "" (
+if "%hhc_compiler%" equ "" (
     set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
 )
 set PDFLATEX=PdfLatex
