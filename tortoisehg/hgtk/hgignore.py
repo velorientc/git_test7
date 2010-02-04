@@ -7,8 +7,8 @@
 
 import os
 import gtk
-import gobject
 import re
+import threading
 
 from mercurial import hg, ui, match, util, error
 
@@ -68,12 +68,17 @@ class HgIgnoreDialog(gtk.Window):
 
         ### ignore file combo if needs
         if len(ignorefiles) > 1:
+            # file selector
             combo = gtk.combo_box_new_text()
             for f in ignorefiles:
                 combo.append_text(hglib.toutf(f))
             combo.set_active(0)
             combo.connect('changed', self.file_selected)
-            table.add_row(_('Apply to:'), combo, padding=False)
+            # edit button
+            edit = gtk.Button(_('Edit File'))
+            edit.connect('clicked', self.edit_clicked)
+            table.add_row(_('Apply to:'), combo, 0, edit,
+                          padding=False, expand=0)
         self.ignorefile = ignorefiles[0]
 
         ## hbox for filter & unknown list
@@ -152,6 +157,22 @@ class HgIgnoreDialog(gtk.Window):
         'select another ignore file'
         self.ignorefile = hglib.fromutf(combo.get_active_text())
         self.refresh()
+
+    def edit_clicked(self, button):
+        def doedit():
+            util.system('%s "%s"' % (editor, self.ignorefile))
+        editor = (self.repo.ui.config('tortoisehg', 'editor') or
+                self.repo.ui.config('gtools', 'editor') or
+                os.environ.get('HGEDITOR') or
+                self.repo.ui.config('ui', 'editor') or
+                os.environ.get('EDITOR', 'vi'))
+        if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+            gdialog.Prompt(_('No visual editor configured'),
+                   _('Please configure a visual editor.'), self).run()
+            return
+        thread = threading.Thread(target=doedit, name='edit ignore')
+        thread.setDaemon(True)
+        thread.start()
 
     def unknown_search(self, model, column, key, iter):
         'case insensitive filename search'
