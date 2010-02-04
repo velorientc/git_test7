@@ -10,7 +10,6 @@ import os
 import sys
 import re
 import urlparse
-import threading
 
 from mercurial import hg, ui, util, url, filemerge, error
 
@@ -681,28 +680,15 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
 
     def edit_clicked(self, button):
-        def doedit():
-            util.system("%s \"%s\"" % (editor, self.fn))
         # reload configs, in case they have been written since opened
         if self.configrepo:
             repo = hg.repository(ui.ui(), self.root)
             u = repo.ui
         else:
             u = ui.ui()
-        editor = (u.config('tortoisehg', 'editor') or
-                u.config('gtools', 'editor') or
-                os.environ.get('HGEDITOR') or
-                u.config('ui', 'editor') or
-                os.environ.get('EDITOR', 'vi'))
-        if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-            gdialog.Prompt(_('No visual editor configured'),
-                   _('Please configure a visual editor.'), self).run()
+        # open config file with visual editor
+        if not gtklib.open_with_editor(u, self.fn, self):
             self.focus_field('tortoisehg.editor')
-            return True
-        thread = threading.Thread(target=doedit, name='edit config')
-        thread.setDaemon(True)
-        thread.start()
-        return True
 
     def delete_event(self, dlg, event):
         return True

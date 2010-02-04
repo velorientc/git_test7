@@ -12,6 +12,9 @@ import gtk
 import gobject
 import Queue
 import urllib
+import threading
+
+from mercurial import util
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import paths, hglib, thread2
@@ -151,6 +154,23 @@ def normalize_dnd_paths(rawstr):
             path = os.path.normpath(urllib.url2pathname(line[5:]))
             paths.append(path)
     return paths
+
+def open_with_editor(ui, file, parent=None):
+    def doedit():
+        util.system('%s "%s"' % (editor, file))
+    editor = (ui.config('tortoisehg', 'editor') or
+            ui.config('gtools', 'editor') or
+            os.environ.get('HGEDITOR') or
+            ui.config('ui', 'editor') or
+            os.environ.get('EDITOR', 'vi'))
+    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+        gdialog.Prompt(_('No visual editor configured'),
+               _('Please configure a visual editor.'), parent).run()
+        return False
+    thread = threading.Thread(target=doedit, name='edit')
+    thread.setDaemon(True)
+    thread.start()
+    return True
 
 class MessageDialog(gtk.Dialog):
     button_map = {

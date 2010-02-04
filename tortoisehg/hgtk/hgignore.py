@@ -8,7 +8,6 @@
 import os
 import gtk
 import re
-import threading
 
 from mercurial import hg, ui, match, util, error
 
@@ -159,20 +158,7 @@ class HgIgnoreDialog(gtk.Window):
         self.refresh()
 
     def edit_clicked(self, button):
-        def doedit():
-            util.system('%s "%s"' % (editor, self.ignorefile))
-        editor = (self.repo.ui.config('tortoisehg', 'editor') or
-                self.repo.ui.config('gtools', 'editor') or
-                os.environ.get('HGEDITOR') or
-                self.repo.ui.config('ui', 'editor') or
-                os.environ.get('EDITOR', 'vi'))
-        if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-            gdialog.Prompt(_('No visual editor configured'),
-                   _('Please configure a visual editor.'), self).run()
-            return
-        thread = threading.Thread(target=doedit, name='edit ignore')
-        thread.setDaemon(True)
-        thread.start()
+        gtklib.open_with_editor(self.repo.ui, self.ignorefile, self)
 
     def unknown_search(self, model, column, key, iter):
         'case insensitive filename search'
