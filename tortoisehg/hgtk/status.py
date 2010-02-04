@@ -762,7 +762,7 @@ class GStatus(gdialog.GWindow):
                                      clean=clean,
                                      unknown=unknown)
                 self.status = status
-            except IOError, e:
+            except (IOError, util.Abort), e:
                 self.status_error = str(e)
             self.subrepos = []
             wctx = repo[None]
