@@ -457,6 +457,8 @@ class GWindow(gtk.Window):
         tbuttons =  self.get_tbbuttons()
         for tbutton in tbuttons:
             toolbar.insert(tbutton, -1)
+        for x in toolbar.get_children():
+            x.set_homogeneous(True)
         self.toolbar = toolbar
 
         # Subclass returns the main body
