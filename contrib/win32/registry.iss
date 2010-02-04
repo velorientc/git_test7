@@ -106,6 +106,16 @@ Root: HKCR; Subkey: Folder\shellex\ContextMenuHandlers\TortoiseHgCMenu; ValueTyp
 Root: HKCR32; Subkey: Folder\shellex\ContextMenuHandlers\TortoiseHgCMenu; Check: Is64BitInstallMode; Flags: uninsdeletekey; Components: shell
 Root: HKCR32; Subkey: Folder\shellex\ContextMenuHandlers\TortoiseHgCMenu; Check: Is64BitInstallMode; ValueType: string; ValueName: ; ValueData: {{B456DB9F-7BF4-478c-937A-05130C2C212E}; Components: shell
 
+Root: HKCR; Subkey: LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu; Flags: uninsdeletekey; Components: shell
+Root: HKCR; Subkey: LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu; ValueType: string; ValueName: ; ValueData: {{B456DB9F-7BF4-478c-937A-05130C2C212E}; Components: shell
+Root: HKCR32; Subkey: LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu; Check: Is64BitInstallMode; Flags: uninsdeletekey; Components: shell
+Root: HKCR32; Subkey: LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu; Check: Is64BitInstallMode; ValueType: string; ValueName: ; ValueData: {{B456DB9F-7BF4-478c-937A-05130C2C212E}; Components: shell
+
+Root: HKCR; Subkey: LibraryFolder\background\shellex\ContextMenuHandlers\TortoiseHgCMenu; Flags: uninsdeletekey; Components: shell
+Root: HKCR; Subkey: LibraryFolder\background\shellex\ContextMenuHandlers\TortoiseHgCMenu; ValueType: string; ValueName: ; ValueData: {{B456DB9F-7BF4-478c-937A-05130C2C212E}; Components: shell
+Root: HKCR32; Subkey: LibraryFolder\background\shellex\ContextMenuHandlers\TortoiseHgCMenu; Check: Is64BitInstallMode; Flags: uninsdeletekey; Components: shell
+Root: HKCR32; Subkey: LibraryFolder\background\shellex\ContextMenuHandlers\TortoiseHgCMenu; Check: Is64BitInstallMode; ValueType: string; ValueName: ; ValueData: {{B456DB9F-7BF4-478c-937A-05130C2C212E}; Components: shell
+
 Root: HKCR; Subkey: *\shellex\ContextMenuHandlers\TortoiseHgCMenu; Flags: uninsdeletekey; Components: shell
 Root: HKCR; Subkey: *\shellex\ContextMenuHandlers\TortoiseHgCMenu; ValueType: string; ValueName: ; ValueData: {{B456DB9F-7BF4-478c-937A-05130C2C212E}; Components: shell
 Root: HKCR32; Subkey: *\shellex\ContextMenuHandlers\TortoiseHgCMenu; Check: Is64BitInstallMode; Flags: uninsdeletekey; Components: shell
