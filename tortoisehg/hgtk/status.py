@@ -87,6 +87,7 @@ class GStatus(gdialog.GWindow):
         self.ready = False
         self.filerowstart = {}
         self.filechunks = {}
+        self.status = (None,) * 7
         self.status_error = None
         self.preview_tab_name_label = None
         self.subrepos = []
