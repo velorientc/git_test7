@@ -229,7 +229,7 @@ _('Optional. Method to use to send email messages. If value is "smtp" (default),
 _diff_info = (
     (_('Patch EOL'), 'patch.eol', ['strict', 'crlf', 'lf'],
         _('Normalize file line endings during and after patch to lf or'
-          ' crlf.  Strict does no normalization.'
+        ' crlf.  Strict does no normalization.'
         ' Default: strict')),
     (_('Git Format'), 'diff.git', ['False', 'True'],
         _('Use git extended diff header format.'
@@ -252,7 +252,7 @@ _diff_info = (
     (_('Coloring Style'), 'tortoisehg.diffcolorstyle',
         ['none', 'foreground', 'background'],
         _('Adjust the coloring style of diff lines in the changeset viewer.'
-          'Default: foreground')))
+        ' Default: foreground')))
 
 class PathEditDialog(gtk.Dialog):
     _protocols = (('ssh', _('ssh')), ('http', _('http')),
