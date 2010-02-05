@@ -765,7 +765,8 @@ class ConfigDialog(gtk.Dialog):
         for page_num, info, vbox, widgets in self.pages.values():
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
-                    self.notebook.set_current_page(page_num)
+                    path = self.confmodel[page_num].path
+                    self.confview.set_cursor(path)
                     widgets[n].grab_focus()
                     return
 
