@@ -605,29 +605,29 @@ class ConfigDialog(gtk.Dialog):
                   'Examples: en, en_GB, en_US')),)
 
         # create pages for each section of configuration file
-        self.tortoise_frame = self.add_page(notebook, 'TortoiseHg')
+        self.tortoise_frame = self.add_page('TortoiseHg')
         self.fill_frame(self.tortoise_frame, tortoise_info)
 
-        self.commit_frame = self.add_page(notebook, _('Commit'))
+        self.commit_frame = self.add_page(_('Commit'))
         self.fill_frame(self.commit_frame, _commit_info)
 
-        self.log_frame = self.add_page(notebook, _('Changelog'))
+        self.log_frame = self.add_page(_('Changelog'))
         self.fill_frame(self.log_frame, _log_info)
 
-        self.paths_frame = self.add_page(notebook, _('Sync'))
+        self.paths_frame = self.add_page(_('Sync'))
         vbox = self.fill_frame(self.paths_frame, _paths_info)
         self.fill_path_frame(vbox)
 
-        self.web_frame = self.add_page(notebook, _('Web'))
+        self.web_frame = self.add_page(_('Web'))
         self.fill_frame(self.web_frame, _web_info)
 
-        self.proxy_frame = self.add_page(notebook, _('Proxy'))
+        self.proxy_frame = self.add_page(_('Proxy'))
         self.fill_frame(self.proxy_frame, _proxy_info)
 
-        self.email_frame = self.add_page(notebook, _('Email'))
+        self.email_frame = self.add_page(_('Email'))
         self.fill_frame(self.email_frame, _email_info)
 
-        self.diff_frame = self.add_page(notebook, _('Diff'))
+        self.diff_frame = self.add_page(_('Diff'))
         self.fill_frame(self.diff_frame, _diff_info)
 
         self.configrepo = configrepo
@@ -1017,13 +1017,13 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, notebook, tab):
+    def add_page(self, tab):
         frame = gtk.VBox()
         frame.set_border_width(4)
         frame.show()
 
         label = gtk.Label(tab)
-        notebook.append_page(frame, label)
+        self.notebook.append_page(frame, label)
         return frame
 
     def get_ini_config(self, cpath):
