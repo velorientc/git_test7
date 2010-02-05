@@ -127,14 +127,18 @@ def move_treeview_selection(window, treeview, distance=1):
     selection.select_iter(selected)
     treeview.set_cursor(model.get_path(selected))
 
+_renderer = gtk.HBox()
 def get_icon_pixbuf(name, size=gtk.ICON_SIZE_MENU):
-    path = paths.get_tortoise_icon(name)
-    if path:
-        try:
-            w, h = gtk.icon_size_lookup(size)
-            return gtk.gdk.pixbuf_new_from_file_at_size(path, w, h)
-        except:
-            pass
+    if name.startswith('gtk'):
+        return _renderer.render_icon(name, size)
+    else:
+        path = paths.get_tortoise_icon(name)
+        if path:
+            try:
+                w, h = gtk.icon_size_lookup(size)
+                return gtk.gdk.pixbuf_new_from_file_at_size(path, w, h)
+            except:
+                pass
     return None
 
 def get_icon_image(name):
