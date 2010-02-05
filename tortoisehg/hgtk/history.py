@@ -2461,8 +2461,16 @@ class GLog(gdialog.GWindow):
         def callback(return_code, *args):
             if return_code == 0:
                 if self.outgoing:
-                    d = self.outgoing.index(node)
-                    self.outgoing = self.outgoing[d + 1:]
+                    ancestors = set([self.repo[node].rev()])
+                    while ancestors:
+                        n = self.repo[ancestors.pop()]
+                        try:
+                            d = self.outgoing.index(n.node())
+                        except ValueError:
+                            continue
+                        del self.outgoing[d]
+                        for p in n.parents():
+                            ancestors.add(p.rev())
                     self.reload_log()
                 text = _('Finished push to revision %s') % rev
             else:
