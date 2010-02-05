@@ -142,7 +142,7 @@ _web_info = (
         ' Default is the working directory.')),
     (_('Description'), 'web.description', ['unknown'],
         _("Textual description of the repository's purpose or"
-        " contents.")),
+        ' contents.')),
     (_('Contact'), 'web.contact', ['unknown'],
         _('Name or email address of the person in charge of the'
         ' repository.')),
@@ -381,7 +381,7 @@ class PathEditDialog(gtk.Dialog):
             user = m.group(2)
             host = m.group(3)
             port = m.group(5)
-            folder = m.group(7) or "."
+            folder = m.group(7) or '.'
             passwd = ''
             scheme = 'ssh'
         elif path.startswith('http://') or path.startswith('https://'):
@@ -551,7 +551,7 @@ class ConfigDialog(gtk.Dialog):
         except ImportError:
             dialog.error_dialog(self, _('Iniparse package not found'),
                          _("Can't change settings without iniparse package - "
-                           "view is readonly."))
+                           'view is readonly.'))
             print 'Please install http://code.google.com/p/iniparse/'
             self.readonly = True
 
@@ -700,7 +700,7 @@ class ConfigDialog(gtk.Dialog):
                 ret = 0
             else:
                 ret = gdialog.CustomPrompt(_('Confirm Exit'),
-                        _("Exit after saving changes?"), self,
+                        _('Exit after saving changes?'), self,
                         (_('&Yes'), _('&No (discard changes)'),
                          _('&Cancel')), default=2, esc=2).run()
             if ret == 2:
@@ -875,8 +875,8 @@ class ConfigDialog(gtk.Dialog):
         self.pathtree = gtk.TreeView(self.pathdata)
         self.pathtree.set_enable_search(False)
         self.pathtree.add_events(gtk.gdk.BUTTON_PRESS_MASK)
-        self.pathtree.connect("cursor-changed", self._pathtree_changed)
-        self.pathtree.connect("button-press-event", self._pathtree_pressed)
+        self.pathtree.connect('cursor-changed', self._pathtree_changed)
+        self.pathtree.connect('button-press-event', self._pathtree_pressed)
 
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
@@ -1141,7 +1141,7 @@ class ConfigDialog(gtk.Dialog):
         self.refresh_vlist()
 
         try:
-            f = open(self.fn, "w")
+            f = open(self.fn, 'w')
             f.write(str(self.ini))
             f.close()
             self._btn_apply.set_sensitive(False)
