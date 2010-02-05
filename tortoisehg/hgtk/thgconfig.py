@@ -788,7 +788,9 @@ class ConfigDialog(gtk.Dialog):
                 self.pathtree.get_column(0))
         self.refresh_path_list()
         # This method may be called from hgtk.sync, so ensure page is visible
-        self.notebook.set_current_page(3)
+        page_num = self.pages['sync'][0]
+        path = self.confmodel[page_num].path
+        self.confview.set_cursor(path)
         self.dirty_event()
 
     def dirty_event(self, *args):
