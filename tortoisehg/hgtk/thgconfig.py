@@ -760,13 +760,18 @@ class ConfigDialog(gtk.Dialog):
         page_num, info, vbox, widgets = self.pages[name]
         self.notebook.set_current_page(page_num)
 
+    def show_page(self, name):
+        '''Show page by activating treeview item'''
+        page_num = self.pages[name][0]
+        path = self.confmodel[page_num].path
+        self.confview.set_cursor(path)
+
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''
-        for page_num, info, vbox, widgets in self.pages.values():
+        for name, (page_num, info, vbox, widgets) in self.pages.items():
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
-                    path = self.confmodel[page_num].path
-                    self.confview.set_cursor(path)
+                    self.show_page(name)
                     widgets[n].grab_focus()
                     return
 
@@ -788,9 +793,7 @@ class ConfigDialog(gtk.Dialog):
                 self.pathtree.get_column(0))
         self.refresh_path_list()
         # This method may be called from hgtk.sync, so ensure page is visible
-        page_num = self.pages['sync'][0]
-        path = self.confmodel[page_num].path
-        self.confview.set_cursor(path)
+        self.show_page('sync')
         self.dirty_event()
 
     def dirty_event(self, *args):
