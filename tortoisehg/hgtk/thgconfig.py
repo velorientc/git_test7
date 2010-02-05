@@ -641,9 +641,11 @@ class ConfigDialog(gtk.Dialog):
         # create pages for each section of configuration file
         self.add_page('TortoiseHg', 'general', tortoise_info, 'thg_logo.ico')
         self.add_page(_('Commit'), 'commit', _commit_info, 'menucommit.ico')
-        self.add_page(_('Changelog'), 'log', _log_info, 'menulog.ico')
-        self.add_page(_('Sync'), 'sync', _paths_info, 'menusynch.ico', True)
-        self.add_page(_('Web'), 'web', _web_info, 'proxy.ico')
+        self.add_page(_('Repository Explorer'), 'log', _log_info,
+                      'menulog.ico')
+        self.add_page(_('Synchronize'), 'sync', _paths_info, 'menusynch.ico',
+                      path=True)
+        self.add_page(_('Web Server'), 'web', _web_info, 'proxy.ico')
         self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
         self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
         self.add_page(_('Diff'), 'diff', _diff_info, gtk.STOCK_JUSTIFY_FILL)
