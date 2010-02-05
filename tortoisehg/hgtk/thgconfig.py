@@ -605,30 +605,14 @@ class ConfigDialog(gtk.Dialog):
                   'Examples: en, en_GB, en_US')),)
 
         # create pages for each section of configuration file
-        self.tortoise_frame = self.add_page('TortoiseHg')
-        self.fill_frame(self.tortoise_frame, tortoise_info)
-
-        self.commit_frame = self.add_page(_('Commit'))
-        self.fill_frame(self.commit_frame, _commit_info)
-
-        self.log_frame = self.add_page(_('Changelog'))
-        self.fill_frame(self.log_frame, _log_info)
-
-        self.paths_frame = self.add_page(_('Sync'))
-        vbox = self.fill_frame(self.paths_frame, _paths_info)
-        self.fill_path_frame(vbox)
-
-        self.web_frame = self.add_page(_('Web'))
-        self.fill_frame(self.web_frame, _web_info)
-
-        self.proxy_frame = self.add_page(_('Proxy'))
-        self.fill_frame(self.proxy_frame, _proxy_info)
-
-        self.email_frame = self.add_page(_('Email'))
-        self.fill_frame(self.email_frame, _email_info)
-
-        self.diff_frame = self.add_page(_('Diff'))
-        self.fill_frame(self.diff_frame, _diff_info)
+        self.add_page('TortoiseHg', tortoise_info)
+        self.add_page(_('Commit'), _commit_info)
+        self.add_page(_('Changelog'), _log_info)
+        self.add_page(_('Sync'), _paths_info, path=True)
+        self.add_page(_('Web'), _web_info)
+        self.add_page(_('Proxy'), _proxy_info)
+        self.add_page(_('Email'), _email_info)
+        self.add_page(_('Diff'), _diff_info)
 
         self.configrepo = configrepo
 
@@ -1017,10 +1001,14 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, tab):
+    def add_page(self, tab, info, path=False):
         frame = gtk.VBox()
         frame.set_border_width(4)
         frame.show()
+
+        vbox = self.fill_frame(frame, info)
+        if path:
+            self.fill_path_frame(vbox)
 
         label = gtk.Label(tab)
         self.notebook.append_page(frame, label)
