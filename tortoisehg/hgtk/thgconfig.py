@@ -525,6 +525,7 @@ class ConfigDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self._btn_apply = self.action_area.get_children()[0]
         self.set_has_separator(False)
+        self.set_default_size(-1, 500)
 
         self.ui = ui.ui()
         try:
@@ -563,7 +564,7 @@ class ConfigDialog(gtk.Dialog):
         # wrapper box for padding
         wrapbox = gtk.VBox()
         wrapbox.set_border_width(5)
-        self.vbox.pack_start(wrapbox, False, False)
+        self.vbox.pack_start(wrapbox)
 
         # create combo to select the target
         combo = gtk.combo_box_new_text()
@@ -573,25 +574,58 @@ class ConfigDialog(gtk.Dialog):
         combo.connect('changed', self.fileselect)
 
         hbox = gtk.HBox()
-        hbox.pack_start(combo, False, False, 2)
+        hbox.pack_start(combo, False, False)
         edit = gtk.Button(_('Edit File'))
-        hbox.pack_start(edit, False, False, 2)
+        hbox.pack_start(edit, False, False, 6)
         edit.connect('clicked', self.edit_clicked)
         wrapbox.pack_start(hbox, False, False, 1)
 
-        # insert padding of between combo and notebook
-        wrapbox.pack_start(gtk.VBox(), False, False, 3)
+        # insert padding of between combo and middle pane
+        wrapbox.pack_start(gtk.VBox(), False, False, 4)
 
-        # Create a new notebook, place the position of the tabs
+        # hbox for splitting treeview and main pane (notebook + desc)
+        sidebox = gtk.HBox()
+        wrapbox.pack_start(sidebox)
+
+        # create treeview for selecting configuration page
+        self.confmodel = gtk.ListStore(gtk.gdk.Pixbuf, # icon
+                                       str, # label text
+                                       str) # page id
+        self.confview = gtk.TreeView(self.confmodel)
+        self.confview.set_headers_visible(False)
+        self.confview.set_size_request(140, -1)
+        self.confview.connect('cursor-changed', self.cursor_changed)
+
+        tvframe = gtk.Frame()
+        sidebox.pack_start(tvframe, False, False)
+        tvframe.set_shadow_type(gtk.SHADOW_IN)
+        tvframe.add(self.confview)
+
+        col = gtk.TreeViewColumn()
+        self.confview.append_column(col)
+        cell = gtk.CellRendererPixbuf()
+        col.pack_start(cell, True)
+        col.add_attribute(cell, 'pixbuf', 0)
+
+        col = gtk.TreeViewColumn(None, gtk.CellRendererText(), text=1)
+        self.confview.append_column(col)
+
+        # insert padding of between treeview and main pane
+        sidebox.pack_start(gtk.HBox(), False, False, 4)
+
+        # vbox for splitting notebook and desc frame
+        mainbox = gtk.VBox()
+        sidebox.pack_start(mainbox)
+
+        # create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
-        notebook.set_tab_pos(gtk.POS_TOP)
-        wrapbox.pack_start(notebook, True, True)
+        notebook.set_show_tabs(False)
+        notebook.set_show_border(False)
         notebook.show()
-        self.show_tabs = True
-        self.show_border = True
+        mainbox.pack_start(notebook)
 
         self.dirty = False
-        self.pages = []
+        self.pages = {}
         self.tooltips = gtk.Tooltips()
         self.history = settings.Settings('thgconfig')
 
@@ -605,14 +639,31 @@ class ConfigDialog(gtk.Dialog):
                   'Examples: en, en_GB, en_US')),)
 
         # create pages for each section of configuration file
-        self.add_page('TortoiseHg', tortoise_info)
-        self.add_page(_('Commit'), _commit_info)
-        self.add_page(_('Changelog'), _log_info)
-        self.add_page(_('Sync'), _paths_info, path=True)
-        self.add_page(_('Web'), _web_info)
-        self.add_page(_('Proxy'), _proxy_info)
-        self.add_page(_('Email'), _email_info)
-        self.add_page(_('Diff'), _diff_info)
+        self.add_page('TortoiseHg', 'general', tortoise_info, 'thg_logo.ico')
+        self.add_page(_('Commit'), 'commit', _commit_info, 'menucommit.ico')
+        self.add_page(_('Changelog'), 'log', _log_info, 'menulog.ico')
+        self.add_page(_('Sync'), 'sync', _paths_info, 'menusynch.ico', True)
+        self.add_page(_('Web'), 'web', _web_info, 'proxy.ico')
+        self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
+        self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
+        self.add_page(_('Diff'), 'diff', _diff_info, gtk.STOCK_JUSTIFY_FILL)
+
+        # insert padding of between notebook and common desc frame
+        mainbox.pack_start(gtk.VBox(), False, False, 2)
+
+        # common description frame
+        descframe = gtk.Frame(_('Description'))
+        mainbox.pack_start(descframe, False, False)
+        desctext = gtk.TextView()
+        desctext.set_wrap_mode(gtk.WRAP_WORD)
+        desctext.set_editable(False)
+        desctext.set_sensitive(False)
+        scrolled = gtk.ScrolledWindow()
+        scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolled.set_border_width(4)
+        scrolled.add(desctext)
+        descframe.add(scrolled)
+        self.descbuffer = desctext.get_buffer()
 
         self.configrepo = configrepo
 
@@ -620,6 +671,10 @@ class ConfigDialog(gtk.Dialog):
         self._btn_apply.set_sensitive(False)
         self.dirty = False
         combo.set_active(configrepo and 1 or 0)
+
+        # activate first config page
+        self.confview.set_cursor(self.confmodel[0].path)
+        self.confview.grab_focus()
 
     def fileselect(self, combo):
         'select another hgrc file'
@@ -695,13 +750,21 @@ class ConfigDialog(gtk.Dialog):
                 self._apply_clicked()
         return False
 
+    def cursor_changed(self, treeview):
+        path, focus = self.confview.get_cursor()
+        if not path:
+            return
+        name = self.confmodel[path][2]
+        page_num, info, vbox, widgets = self.pages[name]
+        self.notebook.set_current_page(page_num)
+
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''
-        for page_num, (vbox, info, widgets) in enumerate(self.pages):
-            for w, (label, cpath, values, tip) in enumerate(info):
+        for page_num, info, vbox, widgets in self.pages.values():
+            for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
                     self.notebook.set_current_page(page_num)
-                    widgets[w].grab_focus()
+                    widgets[n].grab_focus()
                     return
 
     def new_path(self, newpath, alias='new'):
@@ -845,8 +908,11 @@ class ConfigDialog(gtk.Dialog):
         self._defaultpathbutton.set_sensitive(not default_path and path_selected)
 
     def fill_path_frame(self, frvbox):
+        # insert padding
+        frvbox.pack_start(gtk.VBox(), False, False, 2)
+
+        # paths frame
         frame = gtk.Frame(_('Remote repository paths'))
-        frame.set_border_width(4)
         frvbox.pack_start(frame, True, True, 2)
         vbox = gtk.VBox()
         vbox.set_border_width(4)
@@ -870,92 +936,81 @@ class ConfigDialog(gtk.Dialog):
         column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
         self.pathtree.append_column(column)
 
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(self.pathtree)
-        vbox.add(scrolledwindow)
+        scrolled = gtk.ScrolledWindow()
+        scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolled.add(self.pathtree)
 
-        buttonbox = gtk.HBox()
+        treeframe = gtk.Frame()
+        treeframe.set_border_width(2)
+        treeframe.set_shadow_type(gtk.SHADOW_IN)
+        treeframe.add(scrolled)
+        vbox.add(treeframe)
+
+        # bottom command buttons
+        bottombox = gtk.HBox()
+        vbox.pack_start(bottombox, False, False, 4)
+
         self.addButton = gtk.Button(_('_Add'))
         self.addButton.set_use_underline(True)
         self.addButton.connect('clicked', self._add_path)
-        buttonbox.pack_start(self.addButton, True, True, 2)
+        bottombox.pack_start(self.addButton, True, True, 2)
 
         self._editpathbutton = gtk.Button(_('_Edit'))
         self._editpathbutton.set_use_underline(True)
         self._editpathbutton.connect('clicked', self._edit_path)
-        buttonbox.pack_start(self._editpathbutton, True, True, 2)
+        bottombox.pack_start(self._editpathbutton, True, True, 2)
 
         self._delpathbutton = gtk.Button(_('_Remove'))
         self._delpathbutton.set_use_underline(True)
         self._delpathbutton.connect('clicked', self._remove_path)
-        buttonbox.pack_start(self._delpathbutton, True, True, 2)
+        bottombox.pack_start(self._delpathbutton, True, True, 2)
 
         self._testpathbutton = gtk.Button(_('_Test'))
         self._testpathbutton.set_use_underline(True)
         self._testpathbutton.connect('clicked', self._test_path)
-        buttonbox.pack_start(self._testpathbutton, True, True, 2)
+        bottombox.pack_start(self._testpathbutton, True, True, 2)
 
         self._defaultpathbutton = gtk.Button(_('Set as _default'))
         self._defaultpathbutton.set_use_underline(True)
         self._defaultpathbutton.connect('clicked', self._default_path)
-        buttonbox.pack_start(self._defaultpathbutton, True, True, 2)
+        bottombox.pack_start(self._defaultpathbutton, True, True, 2)
 
-        vbox.pack_start(buttonbox, False, False, 4)
-
-    def set_help(self, widget, event, buffer, tooltip):
+    def set_help(self, widget, event, tooltip):
         text = ' '.join(tooltip.splitlines())
-        buffer.set_text(text)
+        self.descbuffer.set_text(text)
 
     def fill_frame(self, frame, info):
         widgets = []
 
-        descframe = gtk.Frame(_('Description'))
-        descframe.set_border_width(4)
-        desctext = gtk.TextView()
-        desctext.set_wrap_mode(gtk.WRAP_WORD)
-        desctext.set_editable(False)
-        desctext.set_sensitive(False)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(desctext)
-        scrolledwindow.set_border_width(4)
-        descframe.add(scrolledwindow)
+        table = gtklib.LayoutTable()
 
         vbox = gtk.VBox()
-        table = gtk.Table(len(info), 2, False)
-        vbox.pack_start(table, False, False, 2)
-        if info != _paths_info:
-            vbox.pack_start(gtk.Label(), True, True, 0)
-        vbox.pack_start(descframe, False, False, 2)
-        frame.add(vbox)
+        vbox.pack_start(table, False, False)
+
+        scrolled = gtk.ScrolledWindow()
+        scrolled.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrolled.add_with_viewport(vbox)
+        scrolled.child.set_shadow_type(gtk.SHADOW_NONE)
+        frame.pack_start(scrolled)
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect('changed', self.dirty_event)
-            combo.child.connect('focus-in-event', self.set_help,
-                    desctext.get_buffer(), tooltip)
+            combo.child.connect('focus-in-event', self.set_help, tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
-            combo.child.set_width_chars(40)
+            combo.child.set_width_chars(32)
             if cpath in _pwfields:
                 combo.child.set_visibility(False)
             widgets.append(combo)
 
-            lbl = gtk.Label(label + ':')
-            lbl.set_alignment(1.0, 0.0)
-            eventbox = gtk.EventBox()
-            eventbox.set_visible_window(False)
-            eventbox.add(lbl)
-            table.attach(eventbox, 0, 1, row, row+1, gtk.FILL, 0, 4, 2)
-            table.attach(combo, 1, 2, row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
-            self.tooltips.set_tip(eventbox, tooltip)
+            table.add_row(label + ':', combo, padding=False)
+            self.tooltips.set_tip(combo, tooltip)
 
-        self.pages.append((vbox, info, widgets))
-        return vbox
+        return vbox, widgets
 
     def refresh_vlist(self):
-        for vbox, info, widgets in self.pages:
+        for page_num, info, vbox, widgets in self.pages.values():
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 ispw = cpath in _pwfields
                 combo = widgets[row]
@@ -1001,17 +1056,23 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, tab, info, path=False):
+    def add_page(self, label, name, info, icon=None, path=False):
+        # setup page
         frame = gtk.VBox()
-        frame.set_border_width(4)
         frame.show()
 
-        vbox = self.fill_frame(frame, info)
+        vbox, widgets = self.fill_frame(frame, info)
         if path:
             self.fill_path_frame(vbox)
 
-        label = gtk.Label(tab)
-        self.notebook.append_page(frame, label)
+        # add to notebook
+        pagenum = self.notebook.append_page(frame)
+        self.pages[name] = (pagenum, info, vbox, widgets)
+
+        # add treeview item
+        pixbuf = gtklib.get_icon_pixbuf(icon, gtk.ICON_SIZE_LARGE_TOOLBAR)
+        self.confmodel.append((pixbuf, label, name))
+
         return frame
 
     def get_ini_config(self, cpath):
@@ -1120,9 +1181,9 @@ class ConfigDialog(gtk.Dialog):
                 del self.ini['paths'][name]
 
         # Flush changes on all pages
-        for vbox, info, widgets in self.pages:
-            for w, (label, cpath, values, tip) in enumerate(info):
-                newvalue = hglib.fromutf(widgets[w].child.get_text())
+        for page_num, info, vbox, widgets in self.pages.values():
+            for n, (label, cpath, values, tip) in enumerate(info):
+                newvalue = hglib.fromutf(widgets[n].child.get_text())
                 self.record_new_value(cpath, newvalue)
 
         self.history.write()
@@ -1142,6 +1203,6 @@ class ConfigDialog(gtk.Dialog):
 
 def run(ui, *pats, **opts):
     dlg = ConfigDialog(opts.get('alias') == 'repoconfig')
-    if opts.get('focus', ''):
+    if opts.get('focus'):
         dlg.focus_field(opts['focus'])
     return dlg
