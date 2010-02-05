@@ -54,13 +54,13 @@ _tortoise_info = (
         _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
         ' Default: False (show diffs to right of file list)')),
-    (_('Capture Stderr'), 'tortoisehg.stderrcapt', ['True', 'False'],
+    (_('Capture stderr'), 'tortoisehg.stderrcapt', ['True', 'False'],
         _('Redirect stderr to a buffer which is parsed at the end of'
         ' the process for runtime errors. Default: True')),
     (_('Fork hgtk'), 'tortoisehg.hgtkfork', ['True', 'False'],
         _('When running hgtk from the command line, fork a background'
         ' process to run graphical dialogs.  Default: True')),
-    (_('Full path title'), 'tortoisehg.fullpath', ['False', 'True'],
+    (_('Full Path Title'), 'tortoisehg.fullpath', ['False', 'True'],
         _('Show a full directory path of the repository in the dialog title'
         ' instead of just the root directory name.  Default: False')))
 
@@ -130,7 +130,7 @@ _log_info = (
         )
 
 _paths_info = (
-    (_('After pull operation'), 'tortoisehg.postpull',
+    (_('After Pull Operation'), 'tortoisehg.postpull',
         ['none', 'update', 'fetch', 'rebase'],
         _('Operation which is performed directly after a successful pull.'
           ' update equates to pull --update, fetch equates to the fetch'
