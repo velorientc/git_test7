@@ -328,10 +328,15 @@ class MQWidget(gtk.VBox):
         """
         [MQ] Execute 'qdelete' command.
 
-        patch: the patch name or an index to specify the patch.
+        patch: a patch name or an index number, or its list.
         keep: if True, use '--keep' option. (default: False)
         """
-        if not self.has_patch():
+        if not patch or not self.has_patch():
+            return
+        if isinstance(patch, (basestring, int, long)):
+            patch = [patch]
+        unapplied = [p for p in patch if not self.is_applied(p)]
+        if not unapplied:
             return
         if not keep:
             ret = gdialog.CustomPrompt(_('Confirm Delete'),
@@ -344,7 +349,7 @@ class MQWidget(gtk.VBox):
                 keep = True
             else:
                 return
-        cmdline = ['hg', 'qdelete', patch]
+        cmdline = ['hg', 'qdelete'] + unapplied
         if keep:
             cmdline.append('--keep')
         self.cmd.execute(cmdline, self.cmd_done, noemit=True)
