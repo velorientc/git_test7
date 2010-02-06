@@ -641,7 +641,7 @@ class MQWidget(gtk.VBox):
     def row_sep_func(self, model, iter, data=None):
         return model[iter][MQ_INDEX] == INDEX_SEPARATOR
 
-    def show_patch_cmenu(self, list, path):
+    def show_patch_cmenu(self, path):
         row = self.model[path]
         if row[MQ_INDEX] == INDEX_SEPARATOR:
             return
@@ -784,7 +784,7 @@ class MQWidget(gtk.VBox):
         x, y = int(event.x), int(event.y)
         pathinfo = list.get_path_at_pos(x, y)
         if pathinfo:
-            self.show_patch_cmenu(list, pathinfo[0])
+            self.show_patch_cmenu(pathinfo[0])
 
     def list_sel_changed(self, list):
         path, focus = list.get_cursor()
