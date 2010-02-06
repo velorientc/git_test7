@@ -154,6 +154,7 @@ class MQWidget(gtk.VBox):
             self.list.set_tooltip_column(MQ_ESCAPED)
         self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
+        self.list.connect('button-release-event', self.list_released)
         self.list.connect('row-activated', self.list_row_activated)
         self.list.connect('size-allocate', self.list_size_allocated)
 
@@ -775,9 +776,15 @@ class MQWidget(gtk.VBox):
                     selection = list.get_selection()
                     selection.unselect_all()
                 gtklib.idle_add_single_call(unselect)
-        elif event.button == 3:
-            if pathinfo:
-                self.show_patch_cmenu(self.list, pathinfo[0])
+
+    def list_released(self, list, event):
+        if event.button != 3:
+            return
+
+        x, y = int(event.x), int(event.y)
+        pathinfo = list.get_path_at_pos(x, y)
+        if pathinfo:
+            self.show_patch_cmenu(list, pathinfo[0])
 
     def list_sel_changed(self, list):
         path, focus = list.get_cursor()
