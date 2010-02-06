@@ -540,7 +540,7 @@ class MQWidget(gtk.VBox):
 
     def is_applied(self, name):
         if self.mqloaded:
-            return name in self.repo.mq.applied
+            return self.repo.mq.isapplied(name)
         return False
 
     def is_qtip(self, name):
