@@ -418,17 +418,28 @@ class MQWidget(gtk.VBox):
         """
         [MQ] Execute 'qfold' command.
 
-        patch: the patch name or an index to specify the patch.
+        patch: a patch name or an index number, or its list.
         """
         if not patch or not self.has_applied():
             return
-        data = dict(target=patch, qtip=self.get_qtip_patchname())
-        ret = gdialog.Confirm(_('Confirm Fold'), [], None,
+        if isinstance(patch, (basestring, int, long)):
+            patch = [patch]
+        unapplied = [p for p in patch if not self.is_applied(p)]
+        if not unapplied:
+            return
+        data = dict(qtip=self.get_qtip_patchname())
+        if len(unapplied) == 1:
+            data.update(target=unapplied[0])
+            ret = gdialog.Confirm(_('Confirm Fold'), [], None,
                     _("Do you want to fold un-applied patch '%(target)s'"
                       " into current patch '%(qtip)s'?") % data).run()
+        else:
+            ret = gdialog.Confirm(_('Confirm Fold'), unapplied, None,
+                    _("Do you want to fold following un-applied patches"
+                      " into the current patch '%(qtip)s'?") % data).run()
         if ret != gtk.RESPONSE_YES:
             return
-        cmdline = ['hg', 'qfold', patch]
+        cmdline = ['hg', 'qfold'] + unapplied
         self.cmd.execute(cmdline, self.cmd_done)
 
     def qmove(self, patch, op):
