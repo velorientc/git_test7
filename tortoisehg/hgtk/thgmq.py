@@ -152,6 +152,9 @@ class MQWidget(gtk.VBox):
         # To support old PyGTK (<2.12)
         if hasattr(self.list, 'set_tooltip_column'):
             self.list.set_tooltip_column(MQ_ESCAPED)
+        self.list.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        if hasattr(self.list, 'set_rubber_banding'):
+            self.list.set_rubber_banding(True)
         self.list.connect('cursor-changed', self.list_sel_changed)
         self.list.connect('button-press-event', self.list_pressed)
         self.list.connect('button-release-event', self.list_released)
@@ -702,6 +705,35 @@ class MQWidget(gtk.VBox):
             menu.show_all()
             menu.popup(None, None, None, 0, 0)
 
+    def show_patches_cmenu(self):
+        sel = self.list.get_selection()
+        patches = []
+        for path in sel.get_selected_rows()[1]:
+            row = self.model[path]
+            if row[MQ_INDEX] in (INDEX_SEPARATOR, INDEX_QPARENT):
+                continue
+            patches.append(row[MQ_NAME])
+
+        incl_applied, incl_unapplied = False, False
+        for patch in patches:
+            if self.is_applied(patch):
+                incl_applied = True
+            else:
+                incl_unapplied = True
+
+        m = gtklib.MenuBuilder()
+        if incl_unapplied:
+            m.append(_('_Delete'), lambda *a: self.qdelete(patches),
+                     gtk.STOCK_DELETE)
+        if self.has_applied() and incl_unapplied:
+            m.append(_('F_old'), lambda *a: self.qfold(patches),
+                     gtk.STOCK_DIRECTORY)
+
+        menu = m.build()
+        if len(menu.get_children()) > 0:
+            menu.show_all()
+            menu.popup(None, None, None, 0, 0)
+
     def create_view_menu(self):
         self.vmenu = {}
         m = gtklib.MenuBuilder()
@@ -784,6 +816,7 @@ class MQWidget(gtk.VBox):
     def list_pressed(self, list, event):
         x, y = int(event.x), int(event.y)
         pathinfo = list.get_path_at_pos(x, y)
+
         if event.button == 1:
             if not pathinfo:
                 # HACK: clear selection after this function calling,
@@ -793,14 +826,29 @@ class MQWidget(gtk.VBox):
                     selection.unselect_all()
                 gtklib.idle_add_single_call(unselect)
 
+        elif event.button == 3 and pathinfo:
+            sel = list.get_selection()
+            sel_rows = sel.get_selected_rows()[1] # list of paths
+            if pathinfo[0] not in sel_rows:
+                sel.unselect_all()
+                sel.select_path(pathinfo[0])
+            return True
+
     def list_released(self, list, event):
         if event.button != 3:
             return
 
-        x, y = int(event.x), int(event.y)
-        pathinfo = list.get_path_at_pos(x, y)
-        if pathinfo:
+        sel = list.get_selection()
+        count = sel.count_selected_rows()
+        if count == 1:
+            x, y = int(event.x), int(event.y)
+            pathinfo = list.get_path_at_pos(x, y)
+            if not pathinfo:
+                return
             self.show_patch_cmenu(pathinfo[0])
+
+        elif 1 < count:
+            self.show_patches_cmenu()
 
     def list_sel_changed(self, list):
         path, focus = list.get_cursor()
