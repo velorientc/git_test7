@@ -54,10 +54,19 @@ class CustomPrompt(gtk.MessageDialog):
     '''
     # ret = CustomPrompt('Title', 'Message', self, ('&Yes', 'N&o'), 1).run()
     # ret will be (gtk.RESPONSE_DELETE_EVENT, 0 (for yes), or 1 (for no)
-    def __init__(self, title, message, parent, choices, default=None, esc=None):
+    def __init__(self, title, message, parent, choices, default=None,
+                 esc=None, files=None):
         gtk.MessageDialog.__init__(self, parent, gtk.DIALOG_MODAL,
                 gtk.MESSAGE_QUESTION)
         self.set_title(hglib.toutf(title))
+        if files:
+            msg = ''
+            for i, file in enumerate(files):
+                msg += '   %s\n' % file
+                if i == 9:
+                    msg += '   ...\n'
+                    break
+            message += '\n\n' + msg
         self.format_secondary_markup(gtklib.markup(hglib.toutf(message),
                                      weight='bold'))
         accel_group = gtk.AccelGroup()
