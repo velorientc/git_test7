@@ -776,17 +776,8 @@ class MQWidget(gtk.VBox):
             if has_applied and not is_qparent:
                 append(_('F_old'), self.fold_activated, gtk.STOCK_DIRECTORY)
             if self.get_num_unapplied() > 1:
-                sub = gtklib.MenuBuilder()
-                sub.append(_('Top'), lambda *a: self.qreorder_ui(MOVE_TOP),
-                           gtk.STOCK_GOTO_TOP, args=[row])
-                sub.append(_('Up'), lambda *a: self.qreorder_ui(MOVE_UP),
-                           gtk.STOCK_GO_UP, args=[row])
-                sub.append(_('Down'), lambda *a: self.qreorder_ui(MOVE_DOWN),
-                           gtk.STOCK_GO_DOWN, args=[row])
-                sub.append(_('Bottom'),
-                           lambda *a: self.qreorder_ui(MOVE_BOTTOM),
-                           gtk.STOCK_GOTO_BOTTOM, args=[row])
-                m.append_submenu(_('Reorder'), sub.build(), gtk.STOCK_INDEX)
+                sub = self.create_reorder_menu()
+                m.append_submenu(_('Reorder'), sub, gtk.STOCK_INDEX)
 
         menu = m.build()
         if len(menu.get_children()) > 0:
