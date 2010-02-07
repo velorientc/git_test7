@@ -746,9 +746,9 @@ class MQWidget(gtk.VBox):
             item = m.append(label, handler, ascheck=True, check=active)
             self.vmenu[propname] = item
 
-        colappend(_('Show Index'), MQ_INDEX)
-        colappend(_('Show Status'), MQ_STATUS, active=False)
-        colappend(_('Show Summary'), MQ_SUMMARY, active=False)
+        colappend(_('Index'), MQ_INDEX)
+        colappend(_('Status'), MQ_STATUS, active=False)
+        colappend(_('Summary'), MQ_SUMMARY, active=False)
 
         m.append_sep()
 
