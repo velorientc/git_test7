@@ -342,10 +342,16 @@ class MQWidget(gtk.VBox):
         if not unapplied:
             return
         if not keep:
-            ret = gdialog.CustomPrompt(_('Confirm Delete'),
-                          _('Do you want to delete?'), None,
-                          (_('&Yes'), _('Yes (&keep)'),
-                          _('&Cancel')), default=2, esc=2).run()
+            buttons = (_('&Yes'), _('Yes (&keep)'), _('&Cancel'))
+            if len(unapplied) == 1:
+                data = dict(name=unapplied[0])
+                ret = gdialog.CustomPrompt(_('Confirm Delete'),
+                        _("Do you want to delete '%(name)s'?") % data,
+                        None, buttons, default=2, esc=2).run()
+            else:
+                ret = gdialog.CustomPrompt(_('Confirm Delete'),
+                        _('Do you want to delete these patches?'), None,
+                        buttons, default=2, esc=2, files=unapplied).run()
             if ret == 0:
                 pass
             elif ret == 1:
