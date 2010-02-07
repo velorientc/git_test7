@@ -597,6 +597,14 @@ class MQWidget(gtk.VBox):
             return self.model[path]
         return None
 
+    def get_pos_by_patchname(self, name):
+        """ return position of specified patch name """
+        if name:
+            for i, row in enumerate(self.model):
+                if row[MQ_NAME] == name:
+                    return i
+        return None
+
     def get_qtip_patchname(self):
         if self.mqloaded and self.get_num_applied() > 0 \
                          and 'qtip' in self.repo.tags():
