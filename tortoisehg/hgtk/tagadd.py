@@ -50,7 +50,7 @@ class TagAddDialog(gtk.Dialog):
         ## tag name input
         self.tagcombo = gtk.combo_box_entry_new_text()
         self.tagentry = self.tagcombo.get_child()
-        self.tagentry.set_text(tag)
+        self.tagentry.set_text(hglib.toutf(tag))
         self.tagentry.connect('activate',
                               lambda *a: self.response(RESPONSE_ADD))
         table.add_row(_('Tag:'), self.tagcombo, padding=False)
@@ -102,7 +102,7 @@ class TagAddDialog(gtk.Dialog):
         for tagname in tags:
             if tagname == 'tip':
                 continue
-            self.tagcombo.append_text(tagname)
+            self.tagcombo.append_text(hglib.toutf(tagname))
 
         # clear tag input
         if clear:
@@ -226,7 +226,7 @@ class TagAddDialog(gtk.Dialog):
 
     def _add_hg_tag(self, name, revision, message, local, user=None,
                     date=None, force=False, english=False):
-        if name in self.repo.tags() and not force:
+        if hglib.fromutf(name) in self.repo.tags() and not force:
             raise util.Abort(_('a tag named "%s" already exists') % name)
 
         ctx = self.repo[revision]
@@ -239,15 +239,17 @@ class TagAddDialog(gtk.Dialog):
         if name in self.repo.tags() and not force:
             raise util.Abort(_("Tag '%s' already exist") % name)
 
-        self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
+        lname = hglib.fromutf(name)
+        self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)
 
     def _remove_hg_tag(self, name, message, local, user=None, date=None,
                     english=False):
-        if not name in self.repo.tags():
+        if hglib.fromutf(name) not in self.repo.tags():
             raise util.Abort(_("Tag '%s' does not exist") % name)
 
         if not message:
             msgset = keep._('Removed tag %s')
             message = (english and msgset['id'] or msgset['str']) % name
         r = self.repo[-1].node()
-        self.repo.tag(name, r, message, local, user, date)
+        lname = hglib.fromutf(name)
+        self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)
