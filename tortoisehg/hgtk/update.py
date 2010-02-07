@@ -57,8 +57,8 @@ class UpdateDialog(gdialog.GDialog):
         tags = list(self.repo.tags())
         tags.sort()
         tags.reverse()
-        for t in tags:
-            combo.append_text(t)
+        for tag in tags:
+            combo.append_text(hglib.toutf(tag))
 
         ## changeset summaries
         style = csinfo.labelstyle(contents=('%(rev)s', ' %(branch)s',
@@ -171,7 +171,7 @@ class UpdateDialog(gdialog.GDialog):
         merge = len(ctxs) == 2
         if merge:
             self.parent2_label.update(ctxs[1])
-        newrev = self.revcombo.get_active_text()
+        newrev = hglib.fromutf(self.revcombo.get_active_text())
         try:
             new_ctx = self.repo[newrev]
             if not merge and new_ctx.rev() == ctxs[0].rev():
@@ -187,7 +187,7 @@ class UpdateDialog(gdialog.GDialog):
 
     def update(self):
         cmdline = ['hg', 'update', '--verbose']
-        rev = self.revcombo.get_active_text()
+        rev = hglib.fromutf(self.revcombo.get_active_text())
         cmdline.append('--rev')
         cmdline.append(rev)
 
