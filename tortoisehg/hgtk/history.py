@@ -1632,6 +1632,7 @@ class GLog(gdialog.GWindow):
         self.changeview.bfile = None
         if hasattr(self, 'mqwidget'):
             self.mqwidget.set_repo(self.repo)
+            self.mqwidget.set_sensitive(True)
         if resettip:
             self.origtip = len(self.repo)
         self.reload_log()
@@ -1702,6 +1703,10 @@ class GLog(gdialog.GWindow):
         if self.origurl == -1:
             self.origurl = self.pathentry.get_text()
         self.pathentry.set_text(bfile)
+
+        # disable MQ panel
+        if hasattr(self, 'mqwidget'):
+            self.mqwidget.set_sensitive(False)
 
         # create apply/reject toolbar buttons
         apply = gtk.ToolButton(gtk.STOCK_APPLY)
