@@ -62,7 +62,7 @@ class StripDialog(gdialog.GDialog):
         tags.sort()
         tags.reverse()
         for tag in tags:
-            self.revcombo.append_text(tag)
+            self.revcombo.append_text(hglib.toutf(tag))
 
         def createlabel():
             label = gtk.Label()
@@ -190,6 +190,8 @@ class StripDialog(gdialog.GDialog):
         revstr = self.revcombo.get_active_text()
         if revstr is None or len(revstr) == 0:
             return None
+        if isinstance(revstr, basestring):
+            revstr = hglib.fromutf(revstr)
         try:
             revnum = self.repo[revstr].rev()
         except (error.RepoError, error.LookupError):
