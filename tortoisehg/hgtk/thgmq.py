@@ -565,7 +565,13 @@ class MQWidget(gtk.VBox):
 
     def is_applied(self, name):
         if self.mqloaded:
-            return self.repo.mq.isapplied(name)
+            return self.repo.mq.isapplied(name) is not None
+        return False
+
+    def is_unapplied(self, name):
+        if self.mqloaded:
+            return self.repo.mq.find_series(name) is not None and \
+                   not self.repo.mq.isapplied(name)
         return False
 
     def is_qtip(self, name):
