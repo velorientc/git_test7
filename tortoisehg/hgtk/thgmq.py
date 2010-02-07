@@ -459,7 +459,7 @@ class MQWidget(gtk.VBox):
         op: the operator for moving the patch: MOVE_TOP, MOVE_UP,
             MOVE_DOWN or MOVE_BOTTOM.
         """
-        if isinstance(patch, (basestring, int, long)):
+        if isinstance(patch, (basestring)):
             patch = [patch]
         applied = [p for p in patch if self.is_applied(p)]
         if not patch or not self.is_operable() or len(applied) > 0:
