@@ -183,7 +183,7 @@ version = ''
 
 if os.path.isdir('.hg'):
     from tortoisehg.util import version as _version
-    version = _version.liveversion()
+    branch, version = _version.liveversion()
     if version.endswith('+'):
         version += time.strftime('%Y%m%d')
 elif os.path.exists('.hg_archival.txt'):
@@ -213,7 +213,8 @@ if os.name == "nt":
     desc = 'Windows shell extension for Mercurial VCS'
     # Windows binary file versions for exe/dll files must have the
     # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
-    setupversion = version.split('+', 1)[0]
+    from tortoisehg.util.version import package_version
+    setupversion = package_version()
     productname = 'TortoiseHg'
 else:
     (scripts, packages, data_files, extra) = setup_posix()

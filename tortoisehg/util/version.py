@@ -32,11 +32,12 @@ def liveversion():
         u.pushbuffer()
         commands.parents(u, repo, template='{latesttag}+{latesttagdistance}-')
         version = u.popbuffer() + l[0]
-    return version
+    return repo[None].branch(), version
 
 def version():
     try:
-        return liveversion()
+        branch, version = liveversion()
+        return version
     except:
         pass
     try:
@@ -45,4 +46,20 @@ def version():
     except ImportError:
         return _('unknown')
 
-
+def package_version():
+    try:
+        branch, version = liveversion()
+        if '+' in  version:
+            version, extra = version.split('+', 1)
+            major, minor, periodic = version.split('.')
+            tagdistance = int(extra.split('-', 1)[0])
+            periodic = int(periodic) * 10000
+            if branch == 'default':
+                periodic += tagdistance + 5000
+            else:
+                periodic += tagdistance + 1000
+            version = '.'.join([major, minor, str(periodic)])
+        return version
+    except:
+        pass
+    return _('unknown')
