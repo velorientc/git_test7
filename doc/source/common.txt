@@ -177,9 +177,10 @@ Most of the TortoiseHg treeviews are configured for live searches.
 Ensure that the treeview has focus (by clicking on a row), and begin
 typing a search phrase. A small entry window will appear containing the
 text you have typed, and the treeview will immediately jump to the first
-row that matches the text you have entered thus far.  As you enter more
-characters, the search is refined.
-
+row that matches the text you have entered thus far. As you enter more
+characters, the search is refined. (Do not hit return to 'complete' the
+search, before using the keys mentioned below, or the entry window will
+disappear, ending the search instead.)
 * :kbd:`Ctrl-F` opens the search window explicitly
 * :kbd:`Ctrl-G` advances the search to the next match
 * :kbd:`Shift-Ctrl-G` searches backwards
