@@ -100,22 +100,22 @@ class MQWidget(gtk.VBox):
         self.btn = {}
         popallbtn = tbar.append_button(gtk.STOCK_GOTO_TOP,
                                       _('Unapply all patches'))
-        popallbtn.connect('clicked', self.popall_clicked)
+        popallbtn.connect('clicked', lambda *a: self.qpop(all=True))
         self.btn['popall'] = popallbtn
 
         popbtn = tbar.append_button(gtk.STOCK_GO_UP,
                                    _('Unapply last patch'))
-        popbtn.connect('clicked', self.pop_clicked)
+        popbtn.connect('clicked', lambda *a: self.qpop())
         self.btn['pop'] = popbtn
 
         pushbtn = tbar.append_button(gtk.STOCK_GO_DOWN,
                                     _('Apply next patch'))
-        pushbtn.connect('clicked', self.push_clicked)
+        pushbtn.connect('clicked', lambda *a: self.qpush())
         self.btn['push'] = pushbtn
 
         pushallbtn = tbar.append_button(gtk.STOCK_GOTO_BOTTOM,
                                        _('Apply all patches'))
-        pushallbtn.connect('clicked', self.pushall_clicked)
+        pushallbtn.connect('clicked', lambda *a: self.qpush(all=True))
         self.btn['pushall'] = pushallbtn
 
         ## separator
@@ -951,18 +951,6 @@ class MQWidget(gtk.VBox):
     def list_size_allocated(self, list, req):
         if self.mqloaded and self.has_applied():
             self.scroll_to_current()
-
-    def popall_clicked(self, toolbutton):
-        self.qpop(all=True)
-
-    def pop_clicked(self, toolbutton):
-        self.qpop()
-
-    def push_clicked(self, toolbutton):
-        self.qpush()
-
-    def pushall_clicked(self, toolbutton):
-        self.qpush(all=True)
 
     def dnd_received(self, widget, context, x, y, sel, target, *args):
         if target == MQ_DND_URI_LIST:
