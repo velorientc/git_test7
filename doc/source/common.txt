@@ -181,6 +181,7 @@ row that matches the text you have entered thus far. As you enter more
 characters, the search is refined. (Do not hit return to 'complete' the
 search, before using the keys mentioned below, or the entry window will
 disappear, ending the search instead.)
+
 * :kbd:`Ctrl-F` opens the search window explicitly
 * :kbd:`Ctrl-G` advances the search to the next match
 * :kbd:`Shift-Ctrl-G` searches backwards
