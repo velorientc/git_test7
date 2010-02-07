@@ -29,7 +29,7 @@ MQ_ESCAPED = 4
 INDEX_SEPARATOR = -1
 INDEX_QPARENT   = -2
 
-# Move patch operations
+# Available operations for patch reordering
 MOVE_TOP    = 1
 MOVE_UP     = 2
 MOVE_DOWN   = 3
@@ -225,10 +225,10 @@ class MQWidget(gtk.VBox):
             def add(name, key, func, *args):
                 self.list.add_accelerator(name, accelgroup, key, mod, 0)
                 self.list.connect(name, lambda *a: func(*args))
-            add('mq-move-top', gtk.keysyms.Page_Up, self.qmove_ui, MOVE_TOP)
-            add('mq-move-up', gtk.keysyms.Up, self.qmove_ui, MOVE_UP)
-            add('mq-move-down', gtk.keysyms.Down, self.qmove_ui, MOVE_DOWN)
-            add('mq-move-bottom', gtk.keysyms.Page_Down, self.qmove_ui,
+            add('mq-move-top', gtk.keysyms.Page_Up, self.qreorder_ui, MOVE_TOP)
+            add('mq-move-up', gtk.keysyms.Up, self.qreorder_ui, MOVE_UP)
+            add('mq-move-down', gtk.keysyms.Down, self.qreorder_ui, MOVE_DOWN)
+            add('mq-move-bottom', gtk.keysyms.Page_Down, self.qreorder_ui,
                 MOVE_BOTTOM)
             add('mq-pop', gtk.keysyms.Left, self.qpop)
             add('mq-push', gtk.keysyms.Right, self.qpush)
@@ -445,9 +445,9 @@ class MQWidget(gtk.VBox):
         cmdline = ['hg', 'qfold'] + unapplied
         self.cmd.execute(cmdline, self.cmd_done)
 
-    def qmove(self, patch, op):
+    def qreorder(self, patch, op):
         """
-        [MQ] Move patch. This is NOT standard API of MQ.
+        [MQ] Reorder a patch. This is NOT standard API of MQ.
 
         patch: the patch name or an index to specify the patch.
         op: the operator for moving the patch: MOVE_TOP, MOVE_UP,
@@ -502,11 +502,11 @@ class MQWidget(gtk.VBox):
         for i in xrange(begin, max(oldidx, newidx) + 1):
             self.model[i][MQ_INDEX] = i + offset
 
-    def qmove_ui(self, op):
+    def qreorder_ui(self, op):
         """
-        [MQ] Move selected patch in the list.
+        [MQ] Reorder selected patch in the list.
 
-        Return True if succeed to move; otherwise False.
+        Return True if succeed to reorder; otherwise False.
 
         op: the operator for moving the patch: MOVE_TOP, MOVE_UP,
             MOVE_DOWN or MOVE_BOTTOM.
@@ -516,7 +516,7 @@ class MQWidget(gtk.VBox):
             model, paths = sel.get_selected_rows()
             patch = model[paths[0]][MQ_NAME]
             if patch:
-                return self.qmove(patch, op)
+                return self.qreorder(patch, op)
         return False
 
     def has_mq(self):
@@ -689,16 +689,16 @@ class MQWidget(gtk.VBox):
                 append(_('F_old'), self.fold_activated, gtk.STOCK_DIRECTORY)
             if self.get_num_unapplied() > 1:
                 sub = gtklib.MenuBuilder()
-                sub.append(_('Top'), lambda *a: self.qmove_ui(MOVE_TOP),
+                sub.append(_('Top'), lambda *a: self.qreorder_ui(MOVE_TOP),
                            gtk.STOCK_GOTO_TOP, args=[row])
-                sub.append(_('Up'), lambda *a: self.qmove_ui(MOVE_UP),
+                sub.append(_('Up'), lambda *a: self.qreorder_ui(MOVE_UP),
                            gtk.STOCK_GO_UP, args=[row])
-                sub.append(_('Down'), lambda *a: self.qmove_ui(MOVE_DOWN),
+                sub.append(_('Down'), lambda *a: self.qreorder_ui(MOVE_DOWN),
                            gtk.STOCK_GO_DOWN, args=[row])
                 sub.append(_('Bottom'),
-                           lambda *a: self.qmove_ui(MOVE_BOTTOM),
+                           lambda *a: self.qreorder_ui(MOVE_BOTTOM),
                            gtk.STOCK_GOTO_BOTTOM, args=[row])
-                m.append_submenu(_('Move'), sub.build(), gtk.STOCK_INDEX)
+                m.append_submenu(_('Reorder'), sub.build(), gtk.STOCK_INDEX)
 
         menu = m.build()
         if len(menu.get_children()) > 0:
