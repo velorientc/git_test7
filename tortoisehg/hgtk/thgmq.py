@@ -469,12 +469,12 @@ class MQWidget(gtk.VBox):
         model = self.model
         lastidx = len(model) - 1
         minidx, maxidx = lastidx, 0
-        for name in patch:
-            pos = self.get_pos_by_patchname(name)
-            if pos < minidx:
-                minidx = pos
-            if maxidx < pos:
-                maxidx = pos
+        for idx, row in enumerate(model):
+            if row[MQ_NAME] in patch:
+                if idx < minidx:
+                    minidx = idx
+                if maxidx < idx:
+                    maxidx = idx
 
         # find index of first unapplied patch in TreeView
         for i, row in enumerate(model):
