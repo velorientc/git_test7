@@ -453,77 +453,133 @@ class MQWidget(gtk.VBox):
 
     def qreorder(self, patch, op):
         """
-        [MQ] Reorder a patch. This is NOT standard API of MQ.
+        [MQ] Reorder patches. This is NOT standard API of MQ.
 
-        patch: the patch name or an index to specify the patch.
+        patch: a patch name, or its list.
         op: the operator for moving the patch: MOVE_TOP, MOVE_UP,
             MOVE_DOWN or MOVE_BOTTOM.
         """
-        if not self.is_operable() or self.is_applied(patch):
+        if isinstance(patch, (basestring, int, long)):
+            patch = [patch]
+        applied = [p for p in patch if self.is_applied(p)]
+        if not patch or not self.is_operable() or len(applied) > 0:
             return False
 
-        # get current index in the list
-        oldrow = self.get_row_by_patchname(patch)
-        for i in range(len(self.model)):
-            if self.model[i][MQ_NAME] == oldrow[MQ_NAME]:
-                oldidx = i
+        # get min/max indices of selected patches in TreeView
+        model = self.model
+        lastidx = len(model) - 1
+        minidx, maxidx = lastidx, 0
+        for name in patch:
+            pos = self.get_pos_by_patchname(name)
+            if pos < minidx:
+                minidx = pos
+            if maxidx < pos:
+                maxidx = pos
+
+        # find index of first unapplied patch in TreeView
+        for i, row in enumerate(model):
+            if self.is_unapplied(row[MQ_NAME]):
+                uminidx = i
                 break
         else:
             return False
 
-        # get new index in the list
-        minval = self.separator_pos + 1
-        maxval = len(self.model) - 1
-        if op == MOVE_TOP:
-            newidx = minval
-        elif op == MOVE_UP:
-            newidx = oldidx - 1
-        elif op == MOVE_DOWN:
-            newidx = oldidx + 1
-        elif op == MOVE_BOTTOM:
-            newidx = maxval
-
-        if newidx == oldidx or newidx < minval or maxval < newidx:
+        # check whether operation is possible
+        if (minidx == uminidx and op in (MOVE_TOP, MOVE_UP)) or \
+           (maxidx == lastidx and op in (MOVE_DOWN, MOVE_BOTTOM)):
             return False
 
-        # Update series
+        # determine dirty range
+        if op == MOVE_TOP:
+            dirty = range(uminidx, maxidx + 1)
+        elif op == MOVE_UP:
+            dirty = range(minidx - 1, maxidx + 1)
+        elif op == MOVE_DOWN:
+            dirty = range(minidx, maxidx + 2)
+        elif op == MOVE_BOTTOM:
+            dirty = range(minidx, lastidx + 1)
+        else:
+            raise _('invalid reorder operation: %s') % op
+
+        # prepare qdirty (dirty range in MQ series)
+        qdirty = range(model[dirty[0]][MQ_INDEX],
+                       model[dirty[-1]][MQ_INDEX] + 1)
+
+        # fill with safe indices (first-half)
+        nums = range(len(model))
+        neworder = nums[:dirty[0]]
+
+        # fill with new indices
+        def get_target_positions():
+            plist = []
+            for name in patch:
+                pos = self.get_pos_by_patchname(name)
+                plist.append(pos)
+            plist.sort()
+            return plist
+        if op in (MOVE_TOP, MOVE_UP):
+            # append target patch positions
+            positions = get_target_positions()
+            neworder += positions
+            # append remains
+            for pos in dirty:
+                if pos not in positions:
+                    neworder.append(pos)
+        else:
+            # prepare target patch positions
+            positions = get_target_positions()
+            # append non-target patch positions
+            for pos in dirty:
+                if pos not in positions:
+                    neworder.append(pos)
+            # append target patch positions
+            neworder += positions
+
+        # fill with safe indices (last-half)
+        neworder += nums[dirty[-1] + 1:]
+
+        # update TreeView
+        model.reorder(neworder)
+
+        # update series
         q = self.repo.mq
-        oldrow = self.model[oldidx]
-        newrow = self.model[newidx]
-        oldpos = q.find_series(oldrow[MQ_NAME])
-        newpos = q.find_series(newrow[MQ_NAME])
-        olditem = q.full_series[oldpos]
-        del q.full_series[oldpos]
-        q.full_series.insert(newpos, olditem)
+        series = q.full_series[:]
+        for pos, qpos in zip(dirty, qdirty):
+            q.full_series[qpos] = series[model[pos][MQ_INDEX]]
         q.series_dirty = True
         q.save_dirty()
 
-        # Update TreeView
-        if newidx < oldidx:
-            self.model.move_before(oldrow.iter, newrow.iter)
-        else:
-            self.model.move_after(oldrow.iter, newrow.iter)
-        begin = min(oldidx, newidx)
-        offset = min(oldrow[MQ_INDEX], newrow[MQ_INDEX]) - begin
-        for i in xrange(begin, max(oldidx, newidx) + 1):
-            self.model[i][MQ_INDEX] = i + offset
+        # need to refresh
+        self.refresh()
+
+        # restore selection
+        sel = self.list.get_selection()
+        sel.unselect_all()
+        for row in model:
+            if row[MQ_NAME] in patch:
+                sel.select_path(row.path)
+
+        return True
 
     def qreorder_ui(self, op):
         """
-        [MQ] Reorder selected patch in the list.
+        [MQ] Reorder selected patches in the list.
 
-        Return True if succeed to reorder; otherwise False.
+        Return True if succeed reordering; otherwise False.
 
         op: the operator for moving the patch: MOVE_TOP, MOVE_UP,
             MOVE_DOWN or MOVE_BOTTOM.
         """
         sel = self.list.get_selection()
-        if sel.count_selected_rows() == 1:
-            model, paths = sel.get_selected_rows()
-            patch = model[paths[0]][MQ_NAME]
-            if patch:
-                return self.qreorder(patch, op)
-        return False
+        if sel.count_selected_rows() == 0:
+            return False
+        patches = []
+        for path in sel.get_selected_rows()[1]:
+            row = self.model[path]
+            if row[MQ_INDEX] in (INDEX_SEPARATOR, INDEX_QPARENT):
+                continue
+            patches.append(row[MQ_NAME])
+        return self.qreorder(patches, op)
 
     def has_mq(self):
         return self.mqloaded and os.path.isdir(self.repo.mq.path)
@@ -680,6 +736,18 @@ class MQWidget(gtk.VBox):
     def row_sep_func(self, model, iter, data=None):
         return model[iter][MQ_INDEX] == INDEX_SEPARATOR
 
+    def create_reorder_menu(self):
+        sub = gtklib.MenuBuilder()
+        sub.append(_('Top'), lambda *a: self.qreorder_ui(MOVE_TOP),
+                   gtk.STOCK_GOTO_TOP)
+        sub.append(_('Up'), lambda *a: self.qreorder_ui(MOVE_UP),
+                   gtk.STOCK_GO_UP)
+        sub.append(_('Down'), lambda *a: self.qreorder_ui(MOVE_DOWN),
+                   gtk.STOCK_GO_DOWN)
+        sub.append(_('Bottom'), lambda *a: self.qreorder_ui(MOVE_BOTTOM),
+                   gtk.STOCK_GOTO_BOTTOM)
+        return sub.build()
+
     def show_patch_cmenu(self, path):
         row = self.model[path]
         if row[MQ_INDEX] == INDEX_SEPARATOR:
@@ -748,6 +816,9 @@ class MQWidget(gtk.VBox):
         if self.has_applied() and incl_unapplied:
             m.append(_('F_old'), lambda *a: self.qfold(patches),
                      gtk.STOCK_DIRECTORY)
+        if not incl_applied and incl_unapplied:
+            sub = self.create_reorder_menu()
+            m.append_submenu(_('Reorder'), sub, gtk.STOCK_INDEX)
 
         menu = m.build()
         if len(menu.get_children()) > 0:
