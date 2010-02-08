@@ -407,6 +407,10 @@ Diff
 	Ignore changes whose lines are all blank.
 	Default: False.
 
+:guilabel:`Coloring Style:`
+	Adjust the coloring style of diff lines in the changeset viewer.
+	Default: foreground.
+
 Removed this release
 ====================
 
