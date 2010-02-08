@@ -119,7 +119,7 @@ TortoiseHg
 	Show the diff panel below the file list in status, shelve, and
 	commit dialogs.  Default: False (show diffs to right of file list).
 
-:guilabel:`Capture Stderr:`
+:guilabel:`Capture stderr:`
 	Redirect stderr to a buffer which is parsed at the end of the process
 	for runtime errors. Default: True.
 
@@ -127,7 +127,7 @@ TortoiseHg
 	When running hgtk from the command line, fork a background process
 	to run graphical dialogs. Default: True.
 
-:guilabel:`Full path title:`
+:guilabel:`Full Path Title:`
 	Show a full directory path of the repository in the dialog title
 	instead of just the root directory name.  Default: False
 
@@ -225,7 +225,7 @@ can be used as default targets for some operations.
 * *default*	- the default URL to pull from, usually clone source
 * *default-push* - the default push target when using the command line
 
-:guilabel:`After pull operation:`
+:guilabel:`After Pull Operation:`
 	Operation which is performed directly after a successful pull.
 	:guilabel:`update` equates to :command:`pull --update`, :guilabel:`fetch`
 	equates to the fetch extension, :guilabel:`rebase` equates to
