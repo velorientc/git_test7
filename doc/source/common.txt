@@ -153,7 +153,7 @@ so it may be incorporated in a future release.
 Word Diffs
 ~~~~~~~~~~
 
-The TortoiseHG Windows installers now include TortoiseSVN's scripts for
+The TortoiseHg Windows installers now include TortoiseSVN's scripts for
 comparing (and sometimes merging) many binary document formats.  These
 are configured in the site-wide :file:`mergepatterns.ini` as handlers for
 each binary format's common file extensions, so no user intervention is
