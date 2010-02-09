@@ -35,6 +35,7 @@ Mercurial 1.5 ではこの振る舞いが改善され、GIT 形式の差分が�
 Mercurial のパッチ処理は改行文字に一貫性のないソースファイルとパッチを
 うまく取り扱うことができないため、その解決方法として **patch.eol**
 設定がバージョン 1.3 で導入されました： ::
+
 	[patch]
 	eol = auto #strict, lf, or crlf
 
