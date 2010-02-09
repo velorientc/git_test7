@@ -79,6 +79,7 @@ Hgcr-gui
 
 **詳細説明**
 
+.. NEEDFORTRANSLATION
 * I've implemented the review around files and not changesets, because at the end,
   I want to be able to tell for the specific project if all the files went through
   code review process or not - the project status.
@@ -101,7 +102,8 @@ Mercurial.ini またはリポジトリの hgrc に次のように記述してく
 
 	[extensions]
 	hgcr-gui=
- 
+
+.. NEEDFORTRANSLATION
 Perfarce
 ========
 
