@@ -1,8 +1,8 @@
 @echo off
 setlocal
 
-if "%hhc_compiler%" equ "" (
-    set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
+if not exist %hhc_compiler%. (
+	set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
 )
 set PDFLATEX=PdfLatex
 set SPHINXBUILD=sphinx-build
