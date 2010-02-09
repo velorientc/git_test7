@@ -97,12 +97,13 @@ class TagAddDialog(gtk.Dialog):
         self.tagcombo.get_model().clear()
 
         # add tags to drop-down list
-        tags = [x[0] for x in self.repo.tagslist()]
+        tags = list(self.repo.tags())
         tags.sort()
-        for tagname in tags:
-            if tagname == 'tip':
+        tags.reverse()
+        for tag in tags:
+            if tag == 'tip':
                 continue
-            self.tagcombo.append_text(hglib.toutf(tagname))
+            self.tagcombo.append_text(hglib.toutf(tag))
 
         # clear tag input
         if clear:
