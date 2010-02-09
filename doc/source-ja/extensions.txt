@@ -7,7 +7,7 @@
 
 この章では Windows 向けの TortoiseHg バイナリパッケージに標準添付されている
 Mercurial の拡張機能について述べます。これらの拡張機能は TortoiseHg
-をより便利に使ってもらうためで、必要になったらすぐに簡単に有効化できます。
+をより便利に使ってもらうためで、必要になったらすぐに簡単に有効にできます。
 
 Hgfold
 ======
@@ -104,90 +104,90 @@ Mercurial.ini またはリポジトリの hgrc に次のように記述してく
 	[extensions]
 	hgcr-gui=
 
-.. NEEDFORTRANSLATION
-
 Perfarce
 ========
 
-`Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ home
-page.
-
-This extension modifies the remote repository handling so that repository
-paths that resemble::
+`Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_
+拡張機能は Perforce サーバ上の名前付き Perforce
+クライアント仕様に基いて ::
 
 	p4://p4server[:port]/clientname
 
-cause operations on the named p4 client specification on the p4 server.
-The client specification must already exist on the server before using
-this extension. Making changes to the client specification Views causes
-problems when synchronizing the repositories, and should be avoided.
+のようなリモートリポジトリパスを持つリポジトリにおける同期処理を変更します。
 
-Five built-in Mercurial commands are overridden.
+この拡張機能を使用する前にサーバ上にクライアント仕様を用意しておく必要があります。
+
+.. NEEDFORTRANSLATION
+
+Making changes to the client specification Views causes problems when
+synchronizing the repositories, and should be avoided.
+
+5つの Mercurial 標準コマンドが上書きされます。
 
 outgoing::
 
-	If the destination repository name starts with p4:// then this
-	reports files affected by the revision(s) that are in the local
-	repository but not in the p4 depot.
+	送信先リポジトリのパスが p4:// で始まっている場合、
+	ローカルリポジトリにあって Perforce リポジトリにないリビジョンの
+	ファイルを表示します。
 
 push::
 
-	If the destination repository name starts with p4:// then this
-	exports changes from the local repository to the p4 depot. If no
-	revision is specified then all changes since the last p4 changelist
-	are pushed. In either case, all revisions to be pushed are foled
-	into a single p4 changelist.  Optionally the resulting changelist is
-	submitted to the p4 server, controlled by the --submit option to
-	push, or by setting **perfarce.submit** to True.  If the option
-	**perfarce.keep** is False then after a successful submit the files
-	in the p4 workarea will be deleted.
+	プッシュ先リポジトリのパスが p4:// で始まっている場合、
+	変更点をローカルリポジトリから Perforce リポジトリにエクスポートします。
+	リビジョンを指定せずに実行したときは、最後のプッシュした時点からの
+	全てのリビジョンが送信されます。どちらの場合も単一の Perforce
+	変更リストにまとめられた状態ででプッシュされます。
+	結果の変更リストを Perforce サーバにサブミットするかどうかは --submit
+	オプションを使用するか、 **perfarce.submit** 設定を True にしてください。
+	**perfarce.keep** が False のとき、ファイルのサブミットに成功すると、
+	Perforce 作業エリアが削除されます。
 
 pull::
 
-	If the source repository name starts with p4:// then this imports
-	changes from the p4 depot, automatically creating merges of
-	changelists submitted by hg push.  If the config option
-	**perfarce.keep** is False then the import does not leave files in
-	the p4 workarea, otherwise the p4 workarea will be updated with the
-	new files.
+	プル元リポジトリのパスが p4:// で始まっている場合、
+	Perforce リポジトリから変更点をインポートし、hg push で
+	自動的にサブミット済みの変更リストとマージされます。 **perfarce.keep**
+	設定が False の場合は Perforce 作業エリアからファイルが削除され、
+	True のときは Perforce 作業エリアは新しいファイルで更新されます。
 
 incoming::
 
-	If the source repository name starts with p4:// then this
-	reports changes in the p4 depot that are not yet in the local
-	repository.
+	受信元リポジトリのパスが p4:// で始まっている場合、
+	Perforce リポジトリにあって、まだローカルにない変更点を表示します。
 
 clone::
 
-	If the source repository name starts with p4:// then this
-	creates the destination repository and pulls all changes from
-	the p4 depot into it.
+	クローン元リポジトリのパスが p4:// で始まっている場合、
+	クローン先のリポジトリを作成し、全ての変更点を Perforce
+	リポジトリからプルします。
 
-**TortoiseHg Integration**
+**TortoiseHg との統合**
 
-When the perfarce extension is enabled, it adds a :guilabel:`start revision`
-configurable option to the clone tool, and a :guilabel:`Perforce` menu
-to the Repository Explorer.  The menu has two items:
+perfarce 拡張機能が有効化されると、クローンダイアログに
+:guilabel:`開始リビジョン` オプション設定が追加され、
+チェンジログビューアのメニューバーには
+:guilabel:`Perforce` メニューが追加されます：
 
 identity::
 
-	Finds the tip Perforce changelist in your local repository and
-	selects it in the changelog window.
+	Perforce 変更リストの tip リビジョンがローカルリポジトリにおける
+	どのリビジョンなのかを探して、そのリビジョンを選択します。
 
 pending::
 
-	Detects pending Perforce changelists that have been "push"ed to your
-	Perforce client but have not been submitted, or have not been pulled
-	back.  This opens the pending changelist dialog so that you can view
-	these pending changelists and either submit or revert them.
+	Perforce クライアントにプッシュしているが、まだサブミットしていない、
+	または取り止めた保留中の Perforce 変更リストを検出します。
+	実行すると保留中の変更リストが表示され、それらをサブミットするか
+	取り止めるか決めることができます。
 
 **インストール**
 
-You may want to add it to your Mercurial.ini or a repository's hgrc like this::
+拡張機能を Mercurial.ini ファイルまたはリポジトリの hgrc
+ファイルで有効にしてください： ::
 
 	[extensions]
 	perfarce=
- 
+
 HGEOL
 =====
 
@@ -224,7 +224,7 @@ HTTP パスワードの入力を促し、それをパスワードデータベー
 
 **インストール**
 
-まずは拡張機能を Mercurial.ini ファイルで有効化してください： ::
+まずは拡張機能を Mercurial.ini ファイルで有効にしてください： ::
 
 	[extensions]
 	mercurial_keyring=
