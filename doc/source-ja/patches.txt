@@ -8,9 +8,6 @@
 パッチとは
 ==========
 
-These links are recommended reading for understanding the history and nature
-of patches and how they can be used with Mercurial.
-
 以下のリンクはパッチの本質と歴史を理解し、Mercurial
 ではどのように使われているのかを理解するのによい資料です。
 
