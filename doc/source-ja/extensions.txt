@@ -227,25 +227,27 @@ HTTP パスワードの入力を促し、それをパスワードデータベー
 
 **バックエンドの設定**
 
-The most appropriate password backend should usually be picked automatically,
-without configuration. Still, if necessary, it can be configured using
-~/keyringrc.cfg file (keyringrc.cfg in the home directory of the current user).
-Refer to `keyring docs <http://pypi.python.org/pypi/keyring>`_
-for more details.
+使用しているシステムに最適なバックエンドは自動的に選択されますが、
+必要に応じて ~/keyringrc.cfg ファイル (ユーザのホームディレクトリの
+keyringrc.cfg ファイル) を設定することで指定可能です。
+設定に関する詳細は `keyring ドキュメント <http://pypi.python.org/pypi/keyring>`_
+を参照してください。
 
 .. note::
-	On Windows XP and above, your encrypted passwords are stored in the
-	credentials subsystem using
-	`CredRead <http://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ and `CredWrite <http://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
+	Windows XP 以降の Windows では、暗号化されたパスワードは
+	`CredRead <http://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ と
+	`CredWrite <http://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
+	を用いて、Credentials Subsystem に保管されます。
 
 .. note::
-	On Windows 2K, the encrypted passwords are stored in the system
-	registry under HKCU\\Software\\Mercurial\\Keyring.
+	Windows 2000 では、暗号化されたパスワードはシステムレジストリ
+	HKCU\\Software\\Mercurial\\Keyring
+	以下に保管されます。
 
 **リポジトリの設定 (HTTP)**
 
-Edit repository-local .hg/hgrc and save there the remote repository path and
-the username, but do not save the password. For example::
+リポジトリローカルの .hg/hgrc ファイルにリモートリポジトリの URL とユーザ名を記述して保存します。
+パスワードは keyring から提供されるためここでは記述しないでください： ::
 
 	[paths]
 	myremote = https://my.server.com/hgrepo/someproject
@@ -255,26 +257,30 @@ the username, but do not save the password. For example::
 	myremote.prefix = my.server.com/hgrepo
 	myremote.username = mekk
 
-Simpler form with url-embedded name can also be used::
+次のようにリポジトリ URL にユーザ名を含める形式を使用すれば、より簡潔に記述できます： ::
 
 	[paths]
 	bitbucket = https://User@bitbucket.org/User/project_name/
 
 .. note::
-	If both username and password are given in .hg/hgrc, extension will
-	use them without using the password database. If username is not
-	given, extension will prompt for credentials every time, also
-	without saving the password. So, in both cases, it is effectively
-	reverting to the default behaviour.
+	.hg/hgrc ファイル内にユーザ名とパスワードの両方を記述した場合、
+	keyring 拡張機能はパスワードデータベースを使用せず、
+	記述してあるパスワードを使用します。
+	また、ユーザ名が記述されていない場合は認証が必要になるたびに
+	ユーザ名とパスワードの入力を要求しますが、
+	それらはパスワードデータベースに保管されません。
+	つまりこれら両方の状況は keyring 拡張機能を使用していない、
+	Mercurial 標準の動作になるということです。
 
-Consult `[auth] <http://www.selenic.com/mercurial/hgrc.5.html#auth>`_
-section documentation for more details.
+Mercurial の認証に関するより詳しい説明はマニュアルの
+`[auth] <http://www.selenic.com/mercurial/hgrc.5.html#auth>`_
+セクションにあります。
 
 **リポジトリの設定 (SMTP)**
 
-Edit either repository-local .hg/hgrc, or ~/.hgrc (the latter is usually
-preferable) and set there all standard email and smtp properties, including
-smtp username, but without smtp password. For example::
+リポジトリローカルの .hg/hgrc ファイル、またはホームディレクトリの hgrc
+ファイル (メール送信の認証情報はリポジトリ共通で使えるので通常は後者)
+に SMTP パスワード以外の SMTP メール設定を記述してください。例えば： ::
 
 	[email]
 	method = smtp
@@ -286,13 +292,13 @@ smtp username, but without smtp password. For example::
 	username = JoeDoe@gmail.com
 	tls = true
 
-Just as in case of HTTP, you must set username, but must not set password here
-to use the extension, in other cases it will revert to the default behaviour.
+前述の HTTP の設定と同様に、ユーザ名だけを設定してパスワードは設定しません。
+パスワードを記述した場合の動作は Mercurial 標準の振る舞いになります。
 
 **使い方**
 
-Configure the repository as above, then just pull and push (or email) You
-should be asked for the password only once (per every username +
-remote_repository_url combination). 
+上記設定を終えたら、あとは普通にプルやプッシュ (またはメール送信)
+をするだけです。(ユーザ名とリポジトリ URL の組み合せで)
+初回のみパスワードを要求されます。
 
 .. vim: noet ts=4
