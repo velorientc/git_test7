@@ -1,4 +1,5 @@
 @echo off
+setlocal
 
 if "%hhc_compiler%" equ "" (
     set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
