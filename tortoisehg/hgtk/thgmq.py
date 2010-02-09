@@ -941,7 +941,7 @@ class MQWidget(gtk.VBox):
         try:
             ctx = self.repo[patchname]
             revid = ctx.rev()
-        except (error.RepoError, error.RepoLookupError):
+        except (error.RepoError, error.RepoLookupError, error.LookupError):
             revid = -1
         self.emit('patch-selected', revid, patchname)
 
