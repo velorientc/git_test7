@@ -328,7 +328,7 @@ class PBranchWidget(gtk.VBox):
             status_text = self.pending_merges() \
                 and _('pending pmerges') \
                 or _('no pending pmerges')
-        self.statusbar.set_right3_text(status_text)
+        self.statusbar.set_text(status_text, 'pbranch')
         self.statusbar.set_idle_text(idle_text)
 
     def pgraph(self):

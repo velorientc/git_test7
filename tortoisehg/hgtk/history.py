@@ -1357,6 +1357,7 @@ class GLog(gdialog.GWindow):
         # prepare statusbar
         self.stbar = statusbar.StatusBar()
         self.stbar.append_field('mq')
+        self.stbar.append_field('pbranch')
         self.stbar.append_field('filter')
         self.stbar.append_field('rev')
 
