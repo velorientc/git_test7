@@ -57,12 +57,12 @@ class TagAddDialog(gtk.Dialog):
         table.add_row(_('Tag:'), self.tagcombo, padding=False)
 
         ## revision input
-        self._rev_input = gtk.Entry()
-        self._rev_input.set_width_chars(12)
-        self._rev_input.set_text(rev)
-        self._rev_input.connect('notify::text',
+        self.reventry = gtk.Entry()
+        self.reventry.set_width_chars(12)
+        self.reventry.set_text(rev)
+        self.reventry.connect('notify::text',
                                 lambda *a: self.update_sensitives())
-        table.add_row(_('Revision:'), self._rev_input)
+        table.add_row(_('Revision:'), self.reventry)
         
         # advanced options expander
         self.expander = gtk.Expander(_('Advanced options'))
@@ -73,23 +73,23 @@ class TagAddDialog(gtk.Dialog):
         self.expander.add(table)
 
         ## tagging options
-        self._local_tag = gtk.CheckButton(_('Tag is local'))
-        self._local_tag.connect('toggled', self.local_tag_toggled)
-        self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
-        self._replace_tag.connect('toggled',
+        self.localchk = gtk.CheckButton(_('Tag is local'))
+        self.localchk.connect('toggled', self.local_tag_toggled)
+        self.replacechk = gtk.CheckButton(_('Replace existing tag'))
+        self.replacechk.connect('toggled',
                                   lambda *a: self.update_sensitives())
-        self._eng_msg = gtk.CheckButton(_('Use English commit message'))
-        table.add_row(self._local_tag)
-        table.add_row(self._replace_tag)
-        table.add_row(self._eng_msg)
+        self.engchk = gtk.CheckButton(_('Use English commit message'))
+        table.add_row(self.localchk)
+        table.add_row(self.replacechk)
+        table.add_row(self.engchk)
 
         ## custom commit message
-        self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
-        self._use_msg.connect('toggled', self.msg_toggled)
-        self._commit_message = gtk.Entry()
-        self._commit_message.set_sensitive(False)
-        table.add_row(self._use_msg)
-        table.add_row(self._commit_message, padding=False)
+        self.customchk = gtk.CheckButton(_('Use custom commit message:'))
+        self.customchk.connect('toggled', self.msg_toggled)
+        self.msgentry = gtk.Entry()
+        self.msgentry.set_sensitive(False)
+        table.add_row(self.customchk)
+        table.add_row(self.msgentry, padding=False)
 
         # prepare to show
         self.load_settings()
@@ -124,11 +124,11 @@ class TagAddDialog(gtk.Dialog):
 
         node = tagmap[hglib.fromutf(tag)]
         ctx = self.repo[node]
-        self._rev_input.set_text(str(ctx.rev()))
+        self.reventry.set_text(str(ctx.rev()))
 
     def update_sensitives(self, affectlocal=False):
         """ update bottom button sensitives based on rev and tag """
-        rev = self._rev_input.get_text()
+        rev = self.reventry.get_text()
         tag = self.tagentry.get_text()
         if not rev or not tag:
             self.addbtn.set_sensitive(False)
@@ -143,7 +143,7 @@ class TagAddDialog(gtk.Dialog):
             self.removebtn.set_sensitive(False)
             return
         # check tag existence
-        force = self._replace_tag.get_active()
+        force = self.replacechk.get_active()
         is_exist = hglib.fromutf(tag) in self.repo.tags()
         self.addbtn.set_sensitive(not is_exist or force)
         self.removebtn.set_sensitive(is_exist)
@@ -151,36 +151,36 @@ class TagAddDialog(gtk.Dialog):
         # check if local
         is_local = self.repo.tagtype(hglib.fromutf(tag))
         if affectlocal and is_local is not None:
-            self._local_tag.set_active(is_local == 'local')
+            self.localchk.set_active(is_local == 'local')
 
     def load_settings(self):
         expanded = self.settings.get_value('expanded', False, True)
         self.expander.set_property('expanded', expanded)
 
         checked = self.settings.get_value('english', False, True)
-        self._eng_msg.set_active(checked)
+        self.engchk.set_active(checked)
 
     def store_settings(self):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
 
-        checked = self._eng_msg.get_active()
+        checked = self.engchk.get_active()
         self.settings.set_value('english', checked)
 
         self.settings.write()
 
     def local_tag_toggled(self, checkbutton):
         local_tag_st = checkbutton.get_active()
-        self._eng_msg.set_sensitive(not local_tag_st)
-        self._use_msg.set_sensitive(not local_tag_st)
-        use_msg_st = self._use_msg.get_active()
-        self._commit_message.set_sensitive(not local_tag_st and use_msg_st)
+        self.engchk.set_sensitive(not local_tag_st)
+        self.customchk.set_sensitive(not local_tag_st)
+        use_msg_st = self.customchk.get_active()
+        self.msgentry.set_sensitive(not local_tag_st and use_msg_st)
 
     def msg_toggled(self, checkbutton):
         state = checkbutton.get_active()
-        self._commit_message.set_sensitive(state)
+        self.msgentry.set_sensitive(state)
         if state:
-            self._commit_message.grab_focus()
+            self.msgentry.grab_focus()
 
     def combo_changed(self, combo):
         self.update_revision()
@@ -205,13 +205,13 @@ class TagAddDialog(gtk.Dialog):
 
     def _do_add_tag(self):
         # gather input data
-        is_local = self._local_tag.get_active()
+        is_local = self.localchk.get_active()
         name = self.tagentry.get_text()
-        rev = self._rev_input.get_text()
-        force = self._replace_tag.get_active()
-        eng_msg = self._eng_msg.get_active()
-        use_msg = self._use_msg.get_active()
-        message = self._commit_message.get_text()
+        rev = self.reventry.get_text()
+        force = self.replacechk.get_active()
+        eng_msg = self.engchk.get_active()
+        use_msg = self.customchk.get_active()
+        message = self.msgentry.get_text()
 
         # verify input
         if name == '':
@@ -222,7 +222,7 @@ class TagAddDialog(gtk.Dialog):
         if use_msg and not message:
             dialog.error_dialog(self, _('Custom commit message is empty'),
                          _('Please enter commit message'))
-            self._commit_message.grab_focus()
+            self.msgentry.grab_focus()
             return False
 
         # add tag to repo
@@ -242,10 +242,10 @@ class TagAddDialog(gtk.Dialog):
 
     def _do_remove_tag(self):
         # gather input data
-        is_local = self._local_tag.get_active()
+        is_local = self.localchk.get_active()
         name = self.tagentry.get_text()
-        eng_msg = self._eng_msg.get_active()
-        use_msg = self._use_msg.get_active()
+        eng_msg = self.engchk.get_active()
+        use_msg = self.customchk.get_active()
 
         # verify input
         if name == '':
@@ -255,7 +255,7 @@ class TagAddDialog(gtk.Dialog):
             return False
 
         if use_msg:
-            message = self._commit_message.get_text()
+            message = self.msgentry.get_text()
         else:
             message = ''
 
