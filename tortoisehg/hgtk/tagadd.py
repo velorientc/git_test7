@@ -71,6 +71,7 @@ class TagAddDialog(gtk.Dialog):
 
         ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
+        self._local_tag.set_active(self.repo.tagtype(tag) == 'local')
         self._local_tag.connect('toggled', self.local_tag_toggled)
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
         self._eng_msg = gtk.CheckButton(_('Use English commit message'))
