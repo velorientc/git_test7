@@ -10,7 +10,7 @@ import os
 import gtk
 import traceback
 
-from mercurial import hg, ui, util
+from mercurial import hg, ui, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, i18n
@@ -36,8 +36,8 @@ class TagAddDialog(gtk.Dialog):
         self.repo = repo
 
         # add buttons
-        self.add_button(_('Add'), RESPONSE_ADD)
-        self.add_button(_('Remove'), RESPONSE_REMOVE)
+        self.addbtn = self.add_button(_('Add'), RESPONSE_ADD)
+        self.removebtn = self.add_button(_('Remove'), RESPONSE_REMOVE)
         self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # persistent settings
@@ -51,6 +51,7 @@ class TagAddDialog(gtk.Dialog):
         self.tagcombo = gtk.combo_box_entry_new_text()
         self.tagentry = self.tagcombo.get_child()
         self.tagentry.set_text(hglib.toutf(tag))
+        self.tagcombo.connect('changed', self.combo_changed)
         self.tagentry.connect('activate',
                               lambda *a: self.response(RESPONSE_ADD))
         table.add_row(_('Tag:'), self.tagcombo, padding=False)
@@ -59,6 +60,8 @@ class TagAddDialog(gtk.Dialog):
         self._rev_input = gtk.Entry()
         self._rev_input.set_width_chars(12)
         self._rev_input.set_text(rev)
+        self._rev_input.connect('notify::text',
+                                lambda *a: self.update_sensitives())
         table.add_row(_('Revision:'), self._rev_input)
         
         # advanced options expander
@@ -71,9 +74,10 @@ class TagAddDialog(gtk.Dialog):
 
         ## tagging options
         self._local_tag = gtk.CheckButton(_('Tag is local'))
-        self._local_tag.set_active(self.repo.tagtype(tag) == 'local')
         self._local_tag.connect('toggled', self.local_tag_toggled)
         self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
+        self._replace_tag.connect('toggled',
+                                  lambda *a: self.update_sensitives())
         self._eng_msg = gtk.CheckButton(_('Use English commit message'))
         table.add_row(self._local_tag)
         table.add_row(self._replace_tag)
@@ -90,6 +94,7 @@ class TagAddDialog(gtk.Dialog):
         # prepare to show
         self.load_settings()
         self._refresh(clear=False)
+        self.update_sensitives(True)
         self.tagentry.grab_focus()
 
     def _refresh(self, clear=True):
@@ -109,6 +114,44 @@ class TagAddDialog(gtk.Dialog):
         # clear tag input
         if clear:
             self.tagentry.set_text('')
+
+    def update_revision(self):
+        """ update revision entry based on tag """
+        tagmap = self.repo.tags()
+        tag = self.tagentry.get_text()
+        if not tag or hglib.fromutf(tag) not in tagmap:
+            return
+
+        node = tagmap[hglib.fromutf(tag)]
+        ctx = self.repo[node]
+        self._rev_input.set_text(str(ctx.rev()))
+
+    def update_sensitives(self, affectlocal=False):
+        """ update bottom button sensitives based on rev and tag """
+        rev = self._rev_input.get_text()
+        tag = self.tagentry.get_text()
+        if not rev or not tag:
+            self.addbtn.set_sensitive(False)
+            self.removebtn.set_sensitive(False)
+            return
+
+        # check if valid revision
+        try:
+            self.repo[hglib.fromutf(rev)]
+        except (error.LookupError, error.RepoLookupError, error.RepoError):
+            self.addbtn.set_sensitive(False)
+            self.removebtn.set_sensitive(False)
+            return
+        # check tag existence
+        force = self._replace_tag.get_active()
+        is_exist = hglib.fromutf(tag) in self.repo.tags()
+        self.addbtn.set_sensitive(not is_exist or force)
+        self.removebtn.set_sensitive(is_exist)
+
+        # check if local
+        is_local = self.repo.tagtype(hglib.fromutf(tag))
+        if affectlocal and is_local is not None:
+            self._local_tag.set_active(is_local == 'local')
 
     def load_settings(self):
         expanded = self.settings.get_value('expanded', False, True)
@@ -138,6 +181,10 @@ class TagAddDialog(gtk.Dialog):
         self._commit_message.set_sensitive(state)
         if state:
             self._commit_message.grab_focus()
+
+    def combo_changed(self, combo):
+        self.update_revision()
+        self.update_sensitives(True)
 
     def dialog_response(self, dialog, response_id):
         # Add button
