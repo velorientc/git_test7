@@ -841,7 +841,7 @@ class GLog(gdialog.GWindow):
         try:
             try:
                 pf.writelines(pbranchwidget.pdiff(patchname))
-            except (util.Abort, hglib.RepoError), e:
+            except (util.Abort, error.RepoError), e:
                 self.stbar.set_text(str(e))
                 return
             self.currevid = self.lastrevid = None
