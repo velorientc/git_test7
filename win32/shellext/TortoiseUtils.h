@@ -13,7 +13,6 @@ LPWSTR hf_mbtowc(LPWSTR lpw, LPCSTR lpa, int nChars);
 LPSTR hf_wctomb(LPSTR lpa, LPCWSTR lpw, int nChars);
 
 std::string GetTHgProgRoot();
-std::string GetTHgShellRoot();
 std::string GetTemporaryFile(LPCSTR prefix="THG");
 bool IsDirectory(const std::string&);
 std::string DirName(const std::string&);

@@ -33,20 +33,6 @@ LPSTR hf_wctomb(LPSTR lpa, LPCWSTR lpw, int nChars)
 }
 
 
-std::string GetTHgShellRoot()
-{
-    LPCSTR regname = "Software\\TortoiseHgShell";
-    HKEY key = HKEY_LOCAL_MACHINE;
-    TCHAR lpszValue[MAX_PATH] = "";
-    LONG lpcbLonger = MAX_PATH * sizeof(TCHAR);
-
-    if (RegQueryValue(key, regname, lpszValue, &lpcbLonger) != ERROR_SUCCESS)
-        return "";
-
-    return lpszValue;
-}
-
-
 std::string GetTHgProgRoot()
 {
     LPCSTR regname = "Software\\TortoiseHg";
