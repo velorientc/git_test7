@@ -96,28 +96,28 @@ class PBranchWidget(gtk.VBox):
 
         ## buttons
         self.btn = {}
-        pmergebtn = tbar.append_stock(gtk.STOCK_CONVERT,
+        pmergebtn = tbar.append_button(gtk.STOCK_CONVERT,
                                       _('Merge all pending dependencies'))
         pmergebtn.connect('clicked', self.pmerge_clicked)
         self.btn['pmerge'] = pmergebtn
 
-        pbackoutbtn = tbar.append_stock(gtk.STOCK_GO_BACK,
+        pbackoutbtn = tbar.append_button(gtk.STOCK_GO_BACK,
                                    _('Backout current patch branch'))
         pbackoutbtn.connect('clicked', self.pbackout_clicked)
         self.btn['pbackout'] = pbackoutbtn
 
         reapplybtn = gtk.ToolButton(gtk.STOCK_GO_FORWARD)
-        reapplybtn = tbar.append_stock(gtk.STOCK_GO_FORWARD,
+        reapplybtn = tbar.append_button(gtk.STOCK_GO_FORWARD,
                                     _('Backport part of a changeset to a dependency'))
         reapplybtn.connect('clicked', self.reapply_clicked)
         self.btn['reapply'] = reapplybtn
 
-        pnewbtn = tbar.append_stock(gtk.STOCK_NEW,
+        pnewbtn = tbar.append_button(gtk.STOCK_NEW,
                                        _('Start a new patch branch'))
         pnewbtn.connect('clicked', self.pnew_clicked)
         self.btn['pnew'] = pnewbtn
 
-        pgraphbtn = tbar.append_stock(gtk.STOCK_EDIT,
+        pgraphbtn = tbar.append_button(gtk.STOCK_EDIT,
                                        _('Edit patch dependency graph'))
         pgraphbtn.connect('clicked', self.edit_pgraph_clicked)
         self.btn['pnew'] = pnewbtn
