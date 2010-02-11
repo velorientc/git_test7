@@ -189,10 +189,10 @@ class TagAddDialog(gtk.Dialog):
     def dialog_response(self, dialog, response_id):
         # Add button
         if response_id == RESPONSE_ADD:
-            self._do_add_tag()
+            self.add_tag()
         # Remove button
         elif response_id == RESPONSE_REMOVE:
-            self._do_remove_tag()
+            self.remove_tag()
         # Close button or closed by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             self.store_settings()
@@ -203,7 +203,7 @@ class TagAddDialog(gtk.Dialog):
 
         self.run() # don't close dialog
 
-    def _do_add_tag(self):
+    def add_tag(self):
         # gather input data
         is_local = self.localchk.get_active()
         name = self.tagentry.get_text()
@@ -227,7 +227,7 @@ class TagAddDialog(gtk.Dialog):
 
         # add tag to repo
         try:
-            self._add_hg_tag(name, rev, message, is_local, force=force,
+            self.add_hg_tag(name, rev, message, is_local, force=force,
                             english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been added') % name)
@@ -240,7 +240,7 @@ class TagAddDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
-    def _do_remove_tag(self):
+    def remove_tag(self):
         # gather input data
         is_local = self.localchk.get_active()
         name = self.tagentry.get_text()
@@ -260,7 +260,7 @@ class TagAddDialog(gtk.Dialog):
             message = ''
 
         try:
-            self._remove_hg_tag(name, message, is_local, english=eng_msg)
+            self.remove_hg_tag(name, message, is_local, english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
             self.update_tagcombo()
@@ -272,8 +272,7 @@ class TagAddDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
-
-    def _add_hg_tag(self, name, revision, message, local, user=None,
+    def add_hg_tag(self, name, revision, message, local, user=None,
                     date=None, force=False, english=False):
         if hglib.fromutf(name) in self.repo.tags() and not force:
             raise util.Abort(_('a tag named "%s" already exists') % name)
@@ -291,7 +290,7 @@ class TagAddDialog(gtk.Dialog):
         lname = hglib.fromutf(name)
         self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)
 
-    def _remove_hg_tag(self, name, message, local, user=None, date=None,
+    def remove_hg_tag(self, name, message, local, user=None, date=None,
                     english=False):
         if hglib.fromutf(name) not in self.repo.tags():
             raise util.Abort(_("Tag '%s' does not exist") % name)
