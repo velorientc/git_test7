@@ -836,13 +836,13 @@ class GLog(gdialog.GWindow):
 
     def pbranch_selected(self, pbranchwidget, revid, patchname):
         'if revid < 0 then the patch is listed in .hg/pgraph but not in repo'
-        self.stbar.set_status_text('')
+        self.stbar.set_text('')
         pf = tempfile.TemporaryFile()
         try:
             try:
                 pf.writelines(pbranchwidget.pdiff(patchname))
             except (util.Abort, hglib.RepoError), e:
-                self.stbar.set_status_text(str(e))
+                self.stbar.set_text(str(e))
                 return
             self.currevid = self.lastrevid = None
             pf.seek(0)
