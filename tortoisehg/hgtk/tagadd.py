@@ -93,11 +93,11 @@ class TagAddDialog(gtk.Dialog):
 
         # prepare to show
         self.load_settings()
-        self._refresh(clear=False)
+        self.update_tagcombo(clear=False)
         self.update_sensitives(True)
         self.tagentry.grab_focus()
 
-    def _refresh(self, clear=True):
+    def update_tagcombo(self, clear=True):
         """ update display on dialog with recent repo data """
         self.repo.invalidate()
         self.tagcombo.get_model().clear()
@@ -231,7 +231,7 @@ class TagAddDialog(gtk.Dialog):
                             english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been added') % name)
-            self._refresh()
+            self.update_tagcombo()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in tagging'), str(inst))
             return False
@@ -263,7 +263,7 @@ class TagAddDialog(gtk.Dialog):
             self._remove_hg_tag(name, message, is_local, english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
-            self._refresh()
+            self.update_tagcombo()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in tagging'), str(inst))
             return False
