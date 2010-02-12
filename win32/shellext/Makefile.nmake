@@ -32,7 +32,8 @@ DEFFILE = ShellExt.def
 
 
 # /MT = statically linked runtime libraries /MD = dynamically linked
-CPPFLAGS         = /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG
+# THG_EXTRA_CPPFLAGS is taken from environment (may be undefined)
+CPPFLAGS         = /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG $(THG_EXTRA_CPPFLAGS)
 BASE_LDFLAGS     = /nologo /INCREMENTAL:NO /MANIFEST $(LIBS)
 LDFLAGS_THGSHELL = $(BASE_LDFLAGS) /DLL /DEF:$(DEFFILE)
 LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
