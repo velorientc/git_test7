@@ -1,0 +1,93 @@
+*******
+Oprávky
+*******
+
+.. module:: patches
+	:synopsis: Describe patch operations
+
+Definice oprávky
+================
+
+Četba těchto odkazů je užitečná pro pochopení historie a povahy oprávek (patches) a jejich použití v Mercurialu.
+
+
+* `Problém správy oprávek <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `Pochopení oprávek <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `Více o oprávkách <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+
+Zádrhel
+=======
+
+Standardní formát oprávky neumí popsat binární soubory, změnu jmen souborů nebo změnu povolení. Potřebujeme-li zachytit cokoliv z uvedeného, musíme povolit oprávky **git**  zadáním:: 
+
+	[diff]
+	git=True
+
+Mercurial 1.5 své chování v tomto směru vylepšuje. Vydá varování, když jsou potřebné git diffy nebo se někdy do formágu git nastaví automaticky - `diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_.
+
+Oprávkové rutiny Mercurialu nezacházejí dobře s různými EOLN mezi zdrojovými kódy a oprávkami. Pro zlepšení situace bylo v 1.3 zavedeno nastavení **patch.eol**::
+
+	[patch]
+	eol = auto #strict, lf, or crlf
+
+Práce na extenzi hgeol se v této oblasti také zlepšuje. Bude zřejmě vyřešeno v hg-1.5. `patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_.
+
+Použití oprávky není blbuvzdorná operace. Pokud je zdrojový soubor odvozen ze souboru, použitého pro vytvoření oprávky, mohou při jejím použití vzniknout konflikty. Tyto se zapisují do souboru s příponou .rej. Tyto odmítnuté změny musejí v současné době být řešeny ručně uživatelem.
+
+Export oprávek
+==============
+
+Changeset
+---------
+
+Pro export changesetu jako oprávkového souboru použijeme kontextovou nabídku pro vybranou revizi v Průzkumníku repozitáře :menuselection:`Export oprávky...`. Budeme požádání o potvrzení jména souboru 'repo_rev.patch'
+
+
+Rozsah changesetů
+-----------------
+
+V Průzkumníku repozitáře určíme rozsah changesetů tak, že levým poklepem vybereme první (bázový) changeset a potom pravým poklepem poslední (cílový) changeset. Tím se také otevře kontextová nabídka, jejíž pomocí můžeme generovat oprávky či svazek oprávek a poslat jej případně mailem nebo si prohlédnout nahromaděné změny.
+
+Tento nástroj je velmi účinný a pro volbu báze a cíle nejsou žádná omezení.
+
+
+Email
+-----
+
+Pro odeslání changesetu prostřednictvím emailu použijeme kontextové menu v Průzkumníku repozitáře.
+:menuselection:`Email oprávky`.  Volba otevře dialog pro odeslání vybraného changesetu.
+
+Pro odeslání rozsahu changesetů použijeme výše popsaný způsob výběru a zvolíme :menuselection:`Emailem odsud k vybranému...`
+
+Konečně lze použít tlačítko :guilabel:`Email` v synchronizační liště Průzkumníka repozitáře pro odeslání všech odchozích změn do vybraného vzdáleného repozitáře.
+
+.. note::
+	Pro posílání oprávek emailem nutno nastavit
+	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
+
+Vybírání třešniček
+------------------
+
+V Průzkumníku repozitáře použijeme již popsaný způsob určení rozsahu a z kontextové nabídky vybereme :menuselection:`Diff odsud k vybranému`. Otevře se prohlížeč 'status' se zobrazenými změnami mezi bázovým a cílovým changesetem.
+
+V tomto prohlížeči můžeme vybírat soubory a porce diffů stejně jako v nástroji 'commit'. Svůj výběr si můžeme prohlédnout volbou :guilabel:`Náhled před uložením` a vybrané změny uložit do oprávkového souboru tlačítkem :guilabel:`Uložit jako`. 
+
+Označené porce na záložce 'Výběr porce' můžeme také  příkazem
+CTRL-C uložit do schránky.
+
+.. note::
+	Změna pořadí výběru změní účinek oprávky.
+
+
+Import oprávek
+==============
+
+Zádrhel: Import vyžaduje čistý pracovní adresář. Příkaz hg import může vygenerovat editor, jestliže oprávka nemá záhlaví.
+
+
+Fronty oprávek
+==============
+
+Záložka MQ (při povolené extenzi) v Průzkumníku repozitáře, nástroj Commit.
+
+.. vim: noet ts=4

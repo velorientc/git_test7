@@ -1,0 +1,54 @@
+Serve
+=====
+
+.. module:: serve.dialog
+	:synopsis: Dialog used to start/stop the web server
+
+.. figure:: figures/serve.png
+	:alt: Web server dialog
+
+Procedura Serve je obálkou pro vestavěný webový server Mercurialu. Jakmile je spuštěn, může se kterýkoli počítač připojit k http portu a brouzdat repozitářem/ři nebo provádět úkony clone, pull, či dokonce push, pokud to konfigurace našeho serveru dovoluje.
+
+Tlačítka dialogového okna:
+
+	:guilabel:`Spustit`
+		spustit webový server
+	:guilabel:`Stop`
+		zavřít webový server
+	:guilabel:`Procházet`
+		spustit vlastní nastavený webový prohlížeč
+	:guilabel:`Nastavit`
+		nastavit webové zobrazení repozitáře, popis a přístupová pravidla
+
+Tlačítko :guilabel:`Nastavit` otevírá dialog pro nastavení aktuálního repozitáře.
+Různé webové konfigurace lze nalézt na wiki stránkách Mercurialu.
+
+Více repozitářů
+----------------
+
+Pokud bychom chtěli jednou instancí webového serveru obsáhnout více repozitářů, vytvoříme textový soubor :file:`hgwebdir.conf` s následujícím obsahem: ::
+
+	[paths]
+	/ = /path/to/repositories/*
+
+Vlevo od rovnítka se zadá cesta tam, kde se objeví repozitáře v kontextu webového serveru. Vpravo od rovnítka se zadají cesty k repozitářům na našem počítači
+
+Abychom tento soubor mohli použít, musíme spustit dialog Server z příkazového řádku následujícím způsobem: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.
+
+
+Spuštění z příkazového řádku
+----------------------------
+
+::
+
+	hgtk serve [OPTION]...
+
+	web server
+
+	volby:
+
+		--webdir-conf  jméno konfiguračního souboru
+
+	globální volby viz "hgtk -v help serve" 
+
+.. vim: noet ts=4
