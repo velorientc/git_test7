@@ -127,12 +127,15 @@ class CmdDialog(gtk.Dialog):
                     self.stdoutq.put(o)
                 else:
                     break
-        self.oldstdout = os.dup(sys.__stdout__.fileno())
         self.stdoutq = Queue.Queue()
-        self.readfd, writefd = os.pipe()
-        os.dup2(writefd, sys.__stdout__.fileno())
-        thread = threading.Thread(target=pollstdout, args=[])
-        thread.start()
+        if os.name == 'nt':
+            # Only capture stdout on Windows.  This causes hard crashes
+            # on some other platforms. See issue #783
+            self.readfd, writefd = os.pipe()
+            self.oldstdout = os.dup(sys.__stdout__.fileno())
+            os.dup2(writefd, sys.__stdout__.fileno())
+            thread = threading.Thread(target=pollstdout, args=[])
+            thread.start()
 
         self.hgthread = hgthread.HgThread(self.cmdline[1:])
         self.hgthread.start()
@@ -192,8 +195,9 @@ class CmdDialog(gtk.Dialog):
             self._button_stop.set_sensitive(False)
             self._button_ok.set_sensitive(True)
             self._button_ok.grab_focus()
-            os.dup2(self.oldstdout, sys.__stdout__.fileno())
-            os.close(self.oldstdout)
+            if os.name == 'nt':
+                os.dup2(self.oldstdout, sys.__stdout__.fileno())
+                os.close(self.oldstdout)
             return False # Stop polling this function
         else:
             return True
