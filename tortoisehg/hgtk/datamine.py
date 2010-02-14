@@ -768,7 +768,7 @@ class DataMineDialog(gdialog.GWindow):
 
         (frame, treeview, origpath, graphview) = objs
         q = Queue.Queue()
-        args = [q, 'annotate', '--follow', '--number',
+        args = [q, 'annotate', '--follow', '--number', '--file',
                 '--rev', str(rev), 'path:'+path]
         thread = thread2.Thread(target=threadfunc, args=args)
         thread.start()
