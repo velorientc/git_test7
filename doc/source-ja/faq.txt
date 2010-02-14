@@ -14,14 +14,45 @@
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_,
-	に加えて拡張機能の hgfold と hgcr-gui を同梱しています。
+	に加えて5つの拡張機能: hgfold、hgcr-gui、perfarce、hgeol、mercurial-keyring
+	を同梱しています。
 
-*エクスプローラの右クリックメニューは英語のままなの？*
+*Windows 上の Mercurial はインデックスサービスやアンチウイルスソフトウェアと競合しませんか？*
+
+	競合する可能性があります。
+	`TortoiseSVN <http://www.selenic.com/pipermail/mercurial/2010-January/029680.html>`_
+	と同様、リポジトリとその作業コピーのディレクトリではインデックスサービスを無効にし、
+	アンチウイルスソフトウェアのスキャン対象外に指定してください。
+
+*エクスプローラの右クリックメニューは翻訳されませんか？*
 
 	右クリックメニューの翻訳ファイルは TortoiseHg のインストールディレクトリ
 	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n` にあります。
 	使用したい言語の Windows レジストリファイルをダブルクリックして、
 	表示される確認ダイアログの指示に従ってインストールしてください。
+
+*TortoiseHg ダイアログのツールバー表示を設定できますか？*
+
+	TortoiseHg のダイアログは PyGTK のアプリケーションなので、
+	:file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
+	にある :file:`gtkrc` ファイルを変更することで設定可能です： ::
+
+		gtk-toolbar-icon-size = GTK_ICON_SIZE_LARGE_TOOLBAR
+		# Pick an icon size from:
+		# GTK_ICON_SIZE_MENU
+		# GTK_ICON_SIZE_SMALL_TOOLBAR
+		# GTK_ICON_SIZE_LARGE_TOOLBAR   (default)
+		# GTK_ICON_SIZE_BUTTON
+		# GTK_ICON_SIZE_DND
+		# GTK_ICON_SIZE_DIALOG
+		gtk-toolbar-style = GTK_TOOLBAR_BOTH
+		# Pick a toolbar style from:
+		# GTK_TOOLBAR_ICONS
+		# GTK_TOOLBAR_TEXT
+		# GTK_TOOLBAR_BOTH              (default)
+		# GTK_TOOLBAR_BOTH_HORIZ
+
+	これらの設定は TortoiseHg 全体に適用されます。
 
 *マージや任意のリビジョンへの更新はどうやるの？*
 
@@ -31,76 +62,49 @@
 
 *'failed to import extension hgext.hgconfig...' という警告メッセージはどうすれば消えるの？*
 
-	バージョン 0.7.2 以降にアップグレードしてください。ただし Windows Vista
-	では若干問題があります。詳しくは
 	`issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_
 	を参照してください。
 
-*SSH サーバに接続できない (TortoisePlink.exe - "...cannot execute specified..." というエラーメッセージ)*
+*TortoiseHg の shelve 拡張機能をコマンドラインから使うにはどうすればいいですか？*
 
-	バージョン 0.7.2 以降にはライブラリ依存のない TortoisePlink を同梱しているため、
-	最新版にアップグレードすることで解決するはずです。公式 Wiki の
-	`SSH 接続 <http://bitbucket.org/kuy/thg-ja/wiki/ssh>`_ ページも参考に
-	してみてください。
-
-*TortoiseHg で Qct を使うことはできますか？*
-
-	申し訳ありませんが、外部コミットツールのオプションはバージョン 0.9 で廃止されました。
-
-*TortoiseHg で hgk (hg view) を使うことはできますか？*
-
-	`tclkit <http://www.equi4.com/tclkit>`_ をダウンロードして
-	TortoiseHg のインストールディレクトリに置きます。
-	`hgk <http://www.selenic.com/repo/hg/raw-file/tip/contrib/hgk>`_
-	スクリプトは Mercurial のリポジトリからダウンロードして
-	:file:`TortoiseHg\\contrib` ディレクトリに置きます。
-	次に :file:`hgk.cmd` ファイルを作成して :file:`TortoiseHg\\scripts`
-	ディレクトリに置きます。このファイルには： ::
-
-		@set HG=C:\Program Files\TortoiseHg\hg.exe
-		@"C:\Program Files\TortoiseHg\tclkit-win32.exe" "C:\Program Files\TortoiseHg\contrib\hgk" %*
-
-	を記述します。そして hgk を有効化するため :file:`Mercurial.ini` ファイルに： ::
+	:file:`Mercurial.ini` ファイルで以下のように拡張機能を有効化してください： ::
 
 		[extensions]
-		hgk =
+		tortoisehg.util.hgshelve=
 
-		[hgk]
-		path=C:\Program Files\TortoiseHg\scripts\hgk.cmd
-		vdiff=vdiff
+*SSH サーバに接続できない (TortoisePlink.exe - "...cannot execute specified..." というエラーメッセージ)*
 
-	を設定すればコマンドラインから :command:`hg view` で起動できます。
+	`SSH 接続 <http://bitbucket.org/kuy/thg-ja/wiki/ssh>`_ ページを参照してください。
 
-*GUI の Diff ツールとして WinMerge を使うにはどうすればいいの？*
+*hg-git 拡張機能を TortoiseHg で使うにはどうすればいいですか？*
 
-	ホームディレクトリの :file:`Mercurial.ini` ファイルに以下を追加してください。
+	TortoiseHg インストーラには dulwich パッケージ含まれているため、あとは
+	`hg-git <http://bitbucket.org/durin42/hg-git/>`_ をクローンして
+	hg-git と bookmarks 拡張機能を有効化するだけで使えるようになります： ::
 
-		[extdiff]
-		cmd.winmerge = C:\Program Files\WinMerge\WinMerge.exe
-		opts.winmerge = /e /x /ub /wl
+		[extensions]
+		hggit = C:\extensions\hg-git\hggit
+		bookmarks =
 
-	:guilabel:`グローバル設定` ダイアログを開いて、 :guilabel:`TortoiseHg`
-	タブにある :guilabel:`GUI 差分表示コマンド` のドロップダウンリストを見ると
-	:guilabel:`winmerge` という項目が追加されているので、それを選択して
-	:guilabel:`適用` ボタンを押してダイアログを閉じてください。
+	ただし 'incoming' (受信チェンジセットの表示) コマンドは git リポジトリとの
+	やりとりがうまくいかず、'outgoing' (送信チェンジセットの表示) コマンドも
+	あまり有用な情報を表示しません。
+	そのため実質的には単純にプッシュまたはプルを使用することになります。
 
-	他の WinMerge のような GUI の差分表示ツールでもこの方法で対応可能ですが、
-	TortoiseHg はディレクトリ差分の機能を使うため、それをサポートしている
-	ツールに限られます。バージョン 0.8 以降ではディレクトリ差分の無いツールでも
-	利用可能になりました。
+*hgsubversion 拡張機能を TortoiseHg で使うにはどうすればいいですか？*
 
-*GUI の Diff ツールとして Araxis Merge を使うにはどうすればいいの？*
+	TortoiseHg インストーラには hgsubversion が必要とする Subversion の Python
+	バインディングを同梱しているため、
+	`hgsubversion <http://bitbucket.org/durin42/hgsubversion/>`_
+	をクローンして、それを有効化するだけで使用できます： ::
 
-	ホームディレクトリの :file:`Mercurial.ini` ファイルに以下を追加してください。
+		[extensions]
+		hgsubversion = C:\extensions\hgsubversion\hgsubversion
 
-		[extdiff]
-		cmd.adiff=C:\Program Files\Araxis\Araxis Merge v6.5\compare.exe
-		opts.adiff=/wait
+*～差分表示ツールを使うにはどうすればいいの？*
 
-	:guilabel:`グローバル設定` ダイアログを開いて、 :guilabel:`TortoiseHg`
-	タブにある :guilabel:`GUI 差分表示コマンド` のドロップダウンリストを見ると
-	:guilabel:`adiff` という項目が追加されているので、それを選択して :guilabel:`適用`
-	ボタンを押してダイアログを閉じてください。
+	バージョン 0.10 から TortoiseHg はよく使われている GUI 差分表示ツールを自動的に検出し、
+	それらを設定画面で選択可能な状態にしてくれます。
 
 *シェル拡張を無効にする方法は？ (アイコンオーバーレイと右クリックメニュー)*
 
@@ -148,22 +152,8 @@
 
 *GTK のテーマを変更するにはどうすればいいの？*
 
-	バージョン 0.7 ではインストール時に選択可能です。それ以降のバージョン
-	(またはバージョン 0.7 がインストール済み) の場合は手動で変更できます：
-
-	* :file:`C:\\Program Files\\TortoiseHg\\gtk\\share\\themes` を開きます
-	* :file:`themes` ディレクトリにあるテーマ名を覚えるか開いたままにします
-	* :file:`C:\\Program Files\\TortoiseHg\\etc\\gtk-2.0` を開きます
-	  (バージョン 0.8 以降は
-	  :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0`)
-	* :file:`gtkrc` ファイルを開いてテーマ名を変更します
-	* Windows Vista の場合、ファイルを編集できないため、一度ファイルをデスクトップ
-	  などにコピーしてそれを編集して保存し、元の場所に上書きコピーします
-	  (表示されるセキュリティ警告のダイアログは全て「はい」を選択)
-	* 変更は次に TortoiseHg を起動したときから反映されます
-
-	同梱されていないテーマでもそれをダウンロードして :file:`gtk\\share\\themes`
-	ディレクトリにコピーすれば、 :file:`gtkrc` ファイルでそのテーマを設定可能です。
+	テーマをダウンロードしてそれを :file:`gtk\\share\\themes` にコピーし、
+	:file:`gtk\\etc\\gtk-2.0\\gtkrc` ファイルで変更してください。
 
 *アンインストールしても大量の DLL や PYD の拡張子のファイルが残ってしまう*
 

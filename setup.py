@@ -52,7 +52,7 @@ build.sub_commands.append(('build_mo', None))
 cmdclass = {
         'build_mo': build_mo}
 
-def setup_windows():
+def setup_windows(version):
     # Specific definitios for Windows NT-alike installations
     _scripts = []
     _data_files = []
@@ -116,15 +116,22 @@ def setup_windows():
     extra['console'] = [
             {'script':'contrib/hg', 
              'icon_resources':[(0,'icons/hg.ico')],
-             'copyright':hgcopyright},
+             'copyright':hgcopyright,
+             'product_version':version},
             {'script':'hgtk',
              'icon_resources':[(0,'icons/thg_logo.ico')],
-             'copyright':thgcopyright}
+             'copyright':thgcopyright,
+             'product_version':version},
+            {'script':'contrib/docdiff.py',
+             'icon_resources':[(0,'icons/TortoiseMerge.ico')],
+             'copyright':thgcopyright,
+             'product_version':version}
             ]
     extra['windows'] = [
             {'script':'thgtaskbar.py',
              'icon_resources':[(0,'icons/thg_logo.ico')],
-             'copyright':thgcopyright}
+             'copyright':thgcopyright,
+             'product_version':version}
             ]
 
     return _scripts, _packages, _data_files, extra
@@ -158,14 +165,6 @@ def setup_posix():
 
     return _scripts, _packages, _data_files, _extra
 
-
-if os.name == "nt":
-    (scripts, packages, data_files, extra) = setup_windows()
-    desc='Windows shell extension for Mercurial VCS'
-else:
-    (scripts, packages, data_files, extra) = setup_posix()
-    desc='TortoiseHg dialogs for Mercurial VCS'
-
 def runcmd(cmd, env):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, env=env)
@@ -183,20 +182,8 @@ def runcmd(cmd, env):
 version = ''
 
 if os.path.isdir('.hg'):
-    env = os.environ
-    env.update({'HGRCPATH': '', 'LANGUAGE': 'C'})
-    cmd = ['hg', 'id', '-i', '-t']
-    l = runcmd(cmd, env).split()
-    while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
-        l.pop()
-    if len(l) > 1: # tag found
-        version = l[-1]
-        if l[0].endswith('+'): # propagate the dirty status to the tag
-            version += '+'
-    elif len(l) == 1: # no tag found
-        cmd = ['hg', 'parents', '--template',
-               '{latesttag}+{latesttagdistance}-']
-        version = runcmd(cmd, env) + l[0]
+    from tortoisehg.util import version as _version
+    branch, version = _version.liveversion()
     if version.endswith('+'):
         version += time.strftime('%Y%m%d')
 elif os.path.exists('.hg_archival.txt'):
@@ -221,8 +208,22 @@ try:
 except ImportError:
     version = 'unknown'
 
-setup(name="tortoisehg",
-        version=version,
+if os.name == "nt":
+    (scripts, packages, data_files, extra) = setup_windows(version)
+    desc = 'Windows shell extension for Mercurial VCS'
+    # Windows binary file versions for exe/dll files must have the
+    # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
+    from tortoisehg.util.version import package_version
+    setupversion = package_version()
+    productname = 'TortoiseHg'
+else:
+    (scripts, packages, data_files, extra) = setup_posix()
+    desc = 'TortoiseHg dialogs for Mercurial VCS'
+    setupversion = version
+    productname = 'tortoisehg'
+
+setup(name=productname,
+        version=setupversion,
         author='Steve Borho',
         author_email='steve@borho.org',
         url='http://tortoisehg.org',

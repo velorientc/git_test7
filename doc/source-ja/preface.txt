@@ -14,7 +14,7 @@
 TortoiseHg は Windows のシェル拡張として提供されるため、
 ユーザは普段使っている Windows エクスプローラから利用することができます。
 
-本書の最新版は `公式サイト <http://bitbucket.org/tortoisehg/stable>`_
+本書の最新版は `公式サイト <http://tortoisehg.org>`_
 からダウンロード可能です。
 
 本書の読み方

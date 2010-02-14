@@ -1,0 +1,33 @@
+﻿.. TortoiseHg documentation master file, created by
+   sphinx-quickstart on Tue Jul 21 13:14:26 2009.
+   You can adapt this file completely to your liking,     but it should at least contain the root 
+   `toctree` directive.
+
+Vítejte v dokumentaci pro TortoiseHg!
+======================================
+
+Obsah:
+
+.. toctree::
+		:maxdepth: 3
+		:numbered:
+
+		preface
+		intro
+		quick
+		daily
+		settings
+		recovery
+		patches
+		extensions
+		faq
+		debugging
+   
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+.. vim: noet ts=4

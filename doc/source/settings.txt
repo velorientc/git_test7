@@ -86,8 +86,11 @@ TortoiseHg
 	or other, or :guilabel:`internal:dump` to leave files in the working
 	directory for manual merging.
 
-:guilabel:`Visual Diff Command:`
-	Specify visual diff tool; must be an extdiff command.
+:guilabel:`Visual Diff Tool:`
+	Specify visual diff tool as described in the [merge-tools] section
+	of your Mercurial configuration files.  If left unspecified,
+	TortoiseHg will use the selected merge tool. Failing that it uses
+	the first applicable tool it finds.
 
 :guilabel:`Skip Diff Window:`
 	Bypass the builtin visual diff dialog and directly use your
@@ -116,7 +119,7 @@ TortoiseHg
 	Show the diff panel below the file list in status, shelve, and
 	commit dialogs.  Default: False (show diffs to right of file list).
 
-:guilabel:`Capture Stderr:`
+:guilabel:`Capture stderr:`
 	Redirect stderr to a buffer which is parsed at the end of the process
 	for runtime errors. Default: True.
 
@@ -124,7 +127,7 @@ TortoiseHg
 	When running hgtk from the command line, fork a background process
 	to run graphical dialogs. Default: True.
 
-:guilabel:`Full path title:`
+:guilabel:`Full Path Title:`
 	Show a full directory path of the repository in the dialog title
 	instead of just the root directory name.  Default: False
 
@@ -190,12 +193,6 @@ Changelog
 	changelog viewer in a single batch.
 	Default: 500.
 
-:guilabel:`Copy Hash:`
-	Allow the changelog viewer to copy the changeset hash
-	of the currently selected changeset into the clipboard.
-	DEPRECATED, will be removed in a later release.
-	Default: False.
-
 :guilabel:`Dead Branches:`
 	Comma separated list of branch names that should be ignored when
 	building a list of branch names for a repository.  Default: None
@@ -228,7 +225,7 @@ can be used as default targets for some operations.
 * *default*	- the default URL to pull from, usually clone source
 * *default-push* - the default push target when using the command line
 
-:guilabel:`After pull operation:`
+:guilabel:`After Pull Operation:`
 	Operation which is performed directly after a successful pull.
 	:guilabel:`update` equates to :command:`pull --update`, :guilabel:`fetch`
 	equates to the fetch extension, :guilabel:`rebase` equates to
@@ -410,6 +407,20 @@ Diff
 	Ignore changes whose lines are all blank.
 	Default: False.
 
+:guilabel:`Coloring Style:`
+	Adjust the coloring style of diff lines in the changeset viewer.
+	Default: foreground.
+
+Removed this release
+====================
+
+:guilabel:`Copy Hash:`
+	Allow the changelog viewer to copy the changeset hash
+	of the currently selected changeset into the clipboard.
+	Default: False.
+
+To copy the hash of a changeset to the clipboard, use the 'Copy Hash'
+context menu option.
 
 Keyboard navigation
 ===================

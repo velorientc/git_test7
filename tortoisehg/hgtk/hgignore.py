@@ -7,10 +7,9 @@
 
 import os
 import gtk
-import gobject
 import re
 
-from mercurial import hg, ui, match, util
+from mercurial import hg, ui, match, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib, paths
@@ -28,7 +27,7 @@ class HgIgnoreDialog(gtk.Window):
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-        except hglib.RepoError:
+        except error.RepoError:
             gtklib.idle_add_single_call(self.destroy)
             return
         self.repo = repo
@@ -68,12 +67,17 @@ class HgIgnoreDialog(gtk.Window):
 
         ### ignore file combo if needs
         if len(ignorefiles) > 1:
+            # file selector
             combo = gtk.combo_box_new_text()
             for f in ignorefiles:
                 combo.append_text(hglib.toutf(f))
             combo.set_active(0)
             combo.connect('changed', self.file_selected)
-            table.add_row(_('Apply to:'), combo, padding=False)
+            # edit button
+            edit = gtk.Button(_('Edit File'))
+            edit.connect('clicked', self.edit_clicked)
+            table.add_row(_('Apply to:'), combo, 0, edit,
+                          padding=False, expand=0)
         self.ignorefile = ignorefiles[0]
 
         ## hbox for filter & unknown list
@@ -153,6 +157,9 @@ class HgIgnoreDialog(gtk.Window):
         self.ignorefile = hglib.fromutf(combo.get_active_text())
         self.refresh()
 
+    def edit_clicked(self, button):
+        gtklib.open_with_editor(self.repo.ui, self.ignorefile, self)
+
     def unknown_search(self, model, column, key, iter):
         'case insensitive filename search'
         key = key.lower()
@@ -217,10 +224,7 @@ class HgIgnoreDialog(gtk.Window):
     def refresh(self):
         hglib.invalidaterepo(self.repo)
         matcher = match.always(self.repo.root, self.repo.root)
-        changes = self.repo.dirstate.status(matcher, ignored=False,
-                                            clean=False, unknown=True)
-        (lookup, modified, added, removed,
-         deleted, unknown, ignored, clean) = changes
+        unknown = self.repo.status(match=matcher, unknown=True)[4]
         self.unkmodel.clear()
         for u in unknown:
             self.unkmodel.append([hglib.toutf(u), u])

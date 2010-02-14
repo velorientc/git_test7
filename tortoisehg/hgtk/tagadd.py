@@ -48,13 +48,12 @@ class TagAddDialog(gtk.Dialog):
         self.vbox.pack_start(table, True, True, 2)
 
         ## tag name input
-        self._tagslist = gtk.ListStore(str)
-        self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
-        self._tag_input = self._taglistbox.get_child()
-        self._tag_input.connect('activate',
-                                lambda *a: self.response(RESPONSE_ADD))
-        self._tag_input.set_text(tag)
-        table.add_row(_('Tag:'), self._taglistbox, padding=False)
+        self.tagcombo = gtk.combo_box_entry_new_text()
+        self.tagentry = self.tagcombo.get_child()
+        self.tagentry.set_text(hglib.toutf(tag))
+        self.tagentry.connect('activate',
+                              lambda *a: self.response(RESPONSE_ADD))
+        table.add_row(_('Tag:'), self.tagcombo, padding=False)
 
         ## revision input
         self._rev_input = gtk.Entry()
@@ -90,12 +89,12 @@ class TagAddDialog(gtk.Dialog):
         # prepare to show
         self.load_settings()
         self._refresh(clear=False)
-        self._taglistbox.grab_focus()
+        self.tagentry.grab_focus()
 
     def _refresh(self, clear=True):
         """ update display on dialog with recent repo data """
         self.repo.invalidate()
-        self._tagslist.clear()
+        self.tagcombo.get_model().clear()
 
         # add tags to drop-down list
         tags = [x[0] for x in self.repo.tagslist()]
@@ -103,11 +102,11 @@ class TagAddDialog(gtk.Dialog):
         for tagname in tags:
             if tagname == 'tip':
                 continue
-            self._tagslist.append([tagname])
+            self.tagcombo.append_text(hglib.toutf(tagname))
 
         # clear tag input
         if clear:
-            self._tag_input.set_text('')
+            self.tagentry.set_text('')
 
     def load_settings(self):
         expanded = self.settings.get_value('expanded', False, True)
@@ -158,7 +157,7 @@ class TagAddDialog(gtk.Dialog):
     def _do_add_tag(self):
         # gather input data
         is_local = self._local_tag.get_active()
-        name = self._tag_input.get_text()
+        name = self.tagentry.get_text()
         rev = self._rev_input.get_text()
         force = self._replace_tag.get_active()
         eng_msg = self._eng_msg.get_active()
@@ -169,7 +168,7 @@ class TagAddDialog(gtk.Dialog):
         if name == '':
             dialog.error_dialog(self, _('Tag input is empty'),
                          _('Please enter tag name'))
-            self._tag_input.grab_focus()
+            self.tagentry.grab_focus()
             return False
         if use_msg and not message:
             dialog.error_dialog(self, _('Custom commit message is empty'),
@@ -195,7 +194,7 @@ class TagAddDialog(gtk.Dialog):
     def _do_remove_tag(self):
         # gather input data
         is_local = self._local_tag.get_active()
-        name = self._tag_input.get_text()
+        name = self.tagentry.get_text()
         eng_msg = self._eng_msg.get_active()
         use_msg = self._use_msg.get_active()
 
@@ -203,7 +202,7 @@ class TagAddDialog(gtk.Dialog):
         if name == '':
             dialog.error_dialog(self, _('Tag name is empty'),
                          _('Please select tag name to remove'))
-            self._tag_input.grab_focus()
+            self.tagentry.grab_focus()
             return False
 
         if use_msg:
@@ -227,7 +226,7 @@ class TagAddDialog(gtk.Dialog):
 
     def _add_hg_tag(self, name, revision, message, local, user=None,
                     date=None, force=False, english=False):
-        if name in self.repo.tags() and not force:
+        if hglib.fromutf(name) in self.repo.tags() and not force:
             raise util.Abort(_('a tag named "%s" already exists') % name)
 
         ctx = self.repo[revision]
@@ -240,15 +239,17 @@ class TagAddDialog(gtk.Dialog):
         if name in self.repo.tags() and not force:
             raise util.Abort(_("Tag '%s' already exist") % name)
 
-        self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
+        lname = hglib.fromutf(name)
+        self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)
 
     def _remove_hg_tag(self, name, message, local, user=None, date=None,
                     english=False):
-        if not name in self.repo.tags():
+        if hglib.fromutf(name) not in self.repo.tags():
             raise util.Abort(_("Tag '%s' does not exist") % name)
 
         if not message:
             msgset = keep._('Removed tag %s')
             message = (english and msgset['id'] or msgset['str']) % name
         r = self.repo[-1].node()
-        self.repo.tag(name, r, message, local, user, date)
+        lname = hglib.fromutf(name)
+        self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)

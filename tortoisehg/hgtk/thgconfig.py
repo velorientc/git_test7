@@ -10,9 +10,8 @@ import os
 import sys
 import re
 import urlparse
-import threading
 
-from mercurial import hg, ui, util, url, filemerge
+from mercurial import hg, ui, util, url, filemerge, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -32,22 +31,20 @@ _tortoise_info = (
         ' markers in place.  Chose internal:merge to force conflict markers,'
         ' internal:prompt to always select local or other, or internal:dump'
         ' to leave files in the working directory for manual merging')),
-    (_('Visual Diff Command'), 'tortoisehg.vdiff', [],
-        _('Specify visual diff tool; must be an extdiff command')),
-    (_('Skip Diff Window'), 'tortoisehg.vdiffnowin', ['False', 'True'],
-        _("Bypass the builtin visual diff dialog and directly use your"
-          " visual diff tool's directory diff feature.  Only enable this"
-          " feature if you know your diff tool has a valid extdiff"
-          " configuration.  Default: False")),
+    (_('Visual Diff Tool'), 'tortoisehg.vdiff', [],
+        _('Specify visual diff tool, as described in the [merge-tools]'
+          ' section of your Mercurial configuration files.  If left'
+          ' unspecified, TortoiseHg will use the selected merge tool.'
+          ' Failing that it uses the first applicable tool it finds.')),
     (_('Visual Editor'), 'tortoisehg.editor', [],
         _('Specify the visual editor used to view files, etc')),
     (_('CLI Editor'), 'ui.editor', [],
-        _('The editor to use during a commit and other'
-        ' instances where Mercurial needs multiline input from'
-        ' the user.  Only used by command line interface commands.')),
+        _('The editor to use during a commit and other instances where'
+        ' Mercurial needs multiline input from the user.  Used by'
+        ' command line commands, including patch import.')),
     (_('Tab Width'), 'tortoisehg.tabwidth', [],
         _('Specify the number of spaces that tabs expand to in various'
-        ' TortoiseHG windows.'
+        ' TortoiseHg windows.'
         ' Default: Not expanded')),
     (_('Max Diff Size'), 'tortoisehg.maxdiff', ['1024', '0'],
         _('The maximum size file (in KB) that TortoiseHg will '
@@ -57,13 +54,13 @@ _tortoise_info = (
         _('Show the diff panel below the file list in status, shelve, and'
         ' commit dialogs.'
         ' Default: False (show diffs to right of file list)')),
-    (_('Capture Stderr'), 'tortoisehg.stderrcapt', ['True', 'False'],
+    (_('Capture stderr'), 'tortoisehg.stderrcapt', ['True', 'False'],
         _('Redirect stderr to a buffer which is parsed at the end of'
         ' the process for runtime errors. Default: True')),
     (_('Fork hgtk'), 'tortoisehg.hgtkfork', ['True', 'False'],
         _('When running hgtk from the command line, fork a background'
         ' process to run graphical dialogs.  Default: True')),
-    (_('Full path title'), 'tortoisehg.fullpath', ['False', 'True'],
+    (_('Full Path Title'), 'tortoisehg.fullpath', ['False', 'True'],
         _('Show a full directory path of the repository in the dialog title'
         ' instead of just the root directory name.  Default: False')))
 
@@ -72,7 +69,7 @@ _commit_info = (
         _('Name associated with commits')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
        _('Maximum length of the commit message summary line.'
-         ' If set, TortoiseHG will issue a warning if the'
+         ' If set, TortoiseHg will issue a warning if the'
          ' summary line is too long or not separated by a'
          ' blank line. Default: 0 (unenforced)')),
     (_('Message Line Length'), 'tortoisehg.messagewrap', ['0', '80'],
@@ -108,10 +105,6 @@ _log_info = (
         _('The number of revisions to read and display in the'
         ' changelog viewer in a single batch.'
         ' Default: 500')),
-    (_('Copy Hash'), 'tortoisehg.copyhash', ['False', 'True'],
-        _('Allow the changelog viewer to copy the changeset hash'
-        ' of the currently selected changeset into the clipboard.'
-        ' DEPRECATED. Default: False')),
     (_('Dead Branches'), 'tortoisehg.deadbranch', [],
         _('Comma separated list of branch names that should be ignored'
         ' when building a list of branch names for a repository.'
@@ -130,10 +123,14 @@ _log_info = (
         ' Default: None')),
     (_('Use Expander'), 'tortoisehg.changeset-expander', ['False', 'True'],
         _('Show changeset details with an expander')),
+    (_('Toolbar Style'), 'tortoisehg.logtbarstyle',
+        ['small', 'large', 'theme'],
+        _('Adjust the display of the main toolbar in the Repository'
+          ' Explorer.  Values: small, large, or theme.  Default: theme')),
         )
 
 _paths_info = (
-    (_('After pull operation'), 'tortoisehg.postpull',
+    (_('After Pull Operation'), 'tortoisehg.postpull',
         ['none', 'update', 'fetch', 'rebase'],
         _('Operation which is performed directly after a successful pull.'
           ' update equates to pull --update, fetch equates to the fetch'
@@ -145,7 +142,7 @@ _web_info = (
         ' Default is the working directory.')),
     (_('Description'), 'web.description', ['unknown'],
         _("Textual description of the repository's purpose or"
-        " contents.")),
+        ' contents.')),
     (_('Contact'), 'web.contact', ['unknown'],
         _('Name or email address of the person in charge of the'
         ' repository.')),
@@ -232,7 +229,7 @@ _('Optional. Method to use to send email messages. If value is "smtp" (default),
 _diff_info = (
     (_('Patch EOL'), 'patch.eol', ['strict', 'crlf', 'lf'],
         _('Normalize file line endings during and after patch to lf or'
-          ' crlf.  Strict does no normalization.'
+        ' crlf.  Strict does no normalization.'
         ' Default: strict')),
     (_('Git Format'), 'diff.git', ['False', 'True'],
         _('Use git extended diff header format.'
@@ -251,7 +248,11 @@ _diff_info = (
         ' Default: False')),
     (_('Ignore Blank Lines'), 'diff.ignoreblanklines', ['False', 'True'],
         _('Ignore changes whose lines are all blank.'
-        ' Default: False')))
+        ' Default: False')),
+    (_('Coloring Style'), 'tortoisehg.diffcolorstyle',
+        ['none', 'foreground', 'background'],
+        _('Adjust the coloring style of diff lines in the changeset viewer.'
+        ' Default: foreground')))
 
 class PathEditDialog(gtk.Dialog):
     _protocols = (('ssh', _('ssh')), ('http', _('http')),
@@ -380,7 +381,7 @@ class PathEditDialog(gtk.Dialog):
             user = m.group(2)
             host = m.group(3)
             port = m.group(5)
-            folder = m.group(7) or "."
+            folder = m.group(7) or '.'
             passwd = ''
             scheme = 'ssh'
         elif path.startswith('http://') or path.startswith('https://'):
@@ -524,18 +525,19 @@ class ConfigDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self._btn_apply = self.action_area.get_children()[0]
         self.set_has_separator(False)
+        self.set_default_size(-1, 500)
 
         self.ui = ui.ui()
         try:
             root = paths.find_root()
             if root:
                 repo = hg.repository(self.ui, root)
-                name = self.get_reponame(repo)
+                name = hglib.get_reponame(repo)
                 self.ui = repo.ui
             else:
                 repo = None
             self.root = root
-        except hglib.RepoError:
+        except error.RepoError:
             repo = None
             if configrepo:
                 dialog.error_dialog(self, _('No repository found'),
@@ -549,8 +551,8 @@ class ConfigDialog(gtk.Dialog):
             self.readonly = False
         except ImportError:
             dialog.error_dialog(self, _('Iniparse package not found'),
-                         _('Please install iniparse package\n'
-                           'Settings are only shown, no changing is possible'))
+                         _("Can't change settings without iniparse package - "
+                           'view is readonly.'))
             print 'Please install http://code.google.com/p/iniparse/'
             self.readonly = True
 
@@ -559,6 +561,12 @@ class ConfigDialog(gtk.Dialog):
         self.connect('thg-accept', self.thgaccept)
         self.connect('delete-event', self.delete_event)
 
+        # wrapper box for padding
+        wrapbox = gtk.VBox()
+        wrapbox.set_border_width(5)
+        self.vbox.pack_start(wrapbox)
+
+        # create combo to select the target
         combo = gtk.combo_box_new_text()
         combo.append_text(_('User global settings'))
         if repo:
@@ -566,22 +574,58 @@ class ConfigDialog(gtk.Dialog):
         combo.connect('changed', self.fileselect)
 
         hbox = gtk.HBox()
-        hbox.pack_start(combo, False, False, 2)
+        hbox.pack_start(combo, False, False)
         edit = gtk.Button(_('Edit File'))
-        hbox.pack_start(edit, False, False, 2)
+        hbox.pack_start(edit, False, False, 6)
         edit.connect('clicked', self.edit_clicked)
-        self.vbox.pack_start(hbox, False, False, 4)
+        wrapbox.pack_start(hbox, False, False, 1)
 
-        # Create a new notebook, place the position of the tabs
+        # insert padding of between combo and middle pane
+        wrapbox.pack_start(gtk.VBox(), False, False, 4)
+
+        # hbox for splitting treeview and main pane (notebook + desc)
+        sidebox = gtk.HBox()
+        wrapbox.pack_start(sidebox)
+
+        # create treeview for selecting configuration page
+        self.confmodel = gtk.ListStore(gtk.gdk.Pixbuf, # icon
+                                       str, # label text
+                                       str) # page id
+        self.confview = gtk.TreeView(self.confmodel)
+        self.confview.set_headers_visible(False)
+        self.confview.set_size_request(140, -1)
+        self.confview.connect('cursor-changed', self.cursor_changed)
+
+        tvframe = gtk.Frame()
+        sidebox.pack_start(tvframe, False, False)
+        tvframe.set_shadow_type(gtk.SHADOW_IN)
+        tvframe.add(self.confview)
+
+        col = gtk.TreeViewColumn()
+        self.confview.append_column(col)
+        cell = gtk.CellRendererPixbuf()
+        col.pack_start(cell, True)
+        col.add_attribute(cell, 'pixbuf', 0)
+
+        col = gtk.TreeViewColumn(None, gtk.CellRendererText(), text=1)
+        self.confview.append_column(col)
+
+        # insert padding of between treeview and main pane
+        sidebox.pack_start(gtk.HBox(), False, False, 4)
+
+        # vbox for splitting notebook and desc frame
+        mainbox = gtk.VBox()
+        sidebox.pack_start(mainbox)
+
+        # create a new notebook, place the position of the tabs
         self.notebook = notebook = gtk.Notebook()
-        notebook.set_tab_pos(gtk.POS_TOP)
-        self.vbox.pack_start(notebook, True, True)
+        notebook.set_show_tabs(False)
+        notebook.set_show_border(False)
         notebook.show()
-        self.show_tabs = True
-        self.show_border = True
+        mainbox.pack_start(notebook)
 
         self.dirty = False
-        self.pages = []
+        self.pages = {}
         self.tooltips = gtk.Tooltips()
         self.history = settings.Settings('thgconfig')
 
@@ -595,30 +639,33 @@ class ConfigDialog(gtk.Dialog):
                   'Examples: en, en_GB, en_US')),)
 
         # create pages for each section of configuration file
-        self.tortoise_frame = self.add_page(notebook, 'TortoiseHG')
-        self.fill_frame(self.tortoise_frame, tortoise_info)
+        self.add_page('TortoiseHg', 'general', tortoise_info, 'thg_logo.ico')
+        self.add_page(_('Commit'), 'commit', _commit_info, 'menucommit.ico')
+        self.add_page(_('Repository Explorer'), 'log', _log_info,
+                      'menulog.ico')
+        self.add_page(_('Synchronize'), 'sync', _paths_info, 'menusynch.ico',
+                      path=True)
+        self.add_page(_('Web Server'), 'web', _web_info, 'proxy.ico')
+        self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
+        self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
+        self.add_page(_('Diff'), 'diff', _diff_info, gtk.STOCK_JUSTIFY_FILL)
 
-        self.commit_frame = self.add_page(notebook, _('Commit'))
-        self.fill_frame(self.commit_frame, _commit_info)
+        # insert padding of between notebook and common desc frame
+        mainbox.pack_start(gtk.VBox(), False, False, 2)
 
-        self.log_frame = self.add_page(notebook, _('Changelog'))
-        self.fill_frame(self.log_frame, _log_info)
-
-        self.paths_frame = self.add_page(notebook, _('Sync'))
-        vbox = self.fill_frame(self.paths_frame, _paths_info)
-        self.fill_path_frame(vbox)
-
-        self.web_frame = self.add_page(notebook, _('Web'))
-        self.fill_frame(self.web_frame, _web_info)
-
-        self.proxy_frame = self.add_page(notebook, _('Proxy'))
-        self.fill_frame(self.proxy_frame, _proxy_info)
-
-        self.email_frame = self.add_page(notebook, _('Email'))
-        self.fill_frame(self.email_frame, _email_info)
-
-        self.diff_frame = self.add_page(notebook, _('Diff'))
-        self.fill_frame(self.diff_frame, _diff_info)
+        # common description frame
+        descframe = gtk.Frame(_('Description'))
+        mainbox.pack_start(descframe, False, False)
+        desctext = gtk.TextView()
+        desctext.set_wrap_mode(gtk.WRAP_WORD)
+        desctext.set_editable(False)
+        desctext.set_sensitive(False)
+        scrolled = gtk.ScrolledWindow()
+        scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolled.set_border_width(4)
+        scrolled.add(desctext)
+        descframe.add(scrolled)
+        self.descbuffer = desctext.get_buffer()
 
         self.configrepo = configrepo
 
@@ -626,6 +673,10 @@ class ConfigDialog(gtk.Dialog):
         self._btn_apply.set_sensitive(False)
         self.dirty = False
         combo.set_active(configrepo and 1 or 0)
+
+        # activate first config page
+        self.confview.set_cursor(self.confmodel[0].path)
+        self.confview.grab_focus()
 
     def fileselect(self, combo):
         'select another hgrc file'
@@ -637,18 +688,10 @@ class ConfigDialog(gtk.Dialog):
         self.configrepo = combo.get_active() and True or False
         self.refresh()
 
-    def get_reponame(self, repo):
-        if repo.ui.config('tortoisehg', 'fullpath', False):
-            name = repo.root
-        else:
-            name = repo.ui.config('web', 'name') \
-                        or os.path.basename(repo.root)
-        return hglib.toutf(name)
-
     def refresh(self):
         if self.configrepo:
             repo = hg.repository(ui.ui(), self.root)
-            name = self.get_reponame(repo)
+            name = hglib.get_reponame(repo)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
             self.set_title(_('TortoiseHg Configure Repository - ') + hglib.toutf(name))
             gtklib.set_tortoise_icon(self, 'settings_repo.ico')
@@ -670,28 +713,15 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
 
     def edit_clicked(self, button):
-        def doedit():
-            util.system("%s \"%s\"" % (editor, self.fn))
         # reload configs, in case they have been written since opened
         if self.configrepo:
             repo = hg.repository(ui.ui(), self.root)
             u = repo.ui
         else:
             u = ui.ui()
-        editor = (u.config('tortoisehg', 'editor') or
-                u.config('gtools', 'editor') or
-                os.environ.get('HGEDITOR') or
-                u.config('ui', 'editor') or
-                os.environ.get('EDITOR', 'vi'))
-        if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-            gdialog.Prompt(_('No visual editor configured'),
-                   _('Please configure a visual editor.'), self).run()
+        # open config file with visual editor
+        if not gtklib.open_with_editor(u, self.fn, self):
             self.focus_field('tortoisehg.editor')
-            return True
-        thread = threading.Thread(target=doedit, name='edit config')
-        thread.setDaemon(True)
-        thread.start()
-        return True
 
     def delete_event(self, dlg, event):
         return True
@@ -711,7 +741,7 @@ class ConfigDialog(gtk.Dialog):
                 ret = 0
             else:
                 ret = gdialog.CustomPrompt(_('Confirm Exit'),
-                        _("Exit after saving changes?"), self,
+                        _('Exit after saving changes?'), self,
                         (_('&Yes'), _('&No (discard changes)'),
                          _('&Cancel')), default=2, esc=2).run()
             if ret == 2:
@@ -722,13 +752,27 @@ class ConfigDialog(gtk.Dialog):
                 self._apply_clicked()
         return False
 
+    def cursor_changed(self, treeview):
+        path, focus = self.confview.get_cursor()
+        if not path:
+            return
+        name = self.confmodel[path][2]
+        page_num, info, vbox, widgets = self.pages[name]
+        self.notebook.set_current_page(page_num)
+
+    def show_page(self, name):
+        '''Show page by activating treeview item'''
+        page_num = self.pages[name][0]
+        path = self.confmodel[page_num].path
+        self.confview.set_cursor(path)
+
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''
-        for page_num, (vbox, info, widgets) in enumerate(self.pages):
-            for w, (label, cpath, values, tip) in enumerate(info):
+        for name, (page_num, info, vbox, widgets) in self.pages.items():
+            for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
-                    self.notebook.set_current_page(page_num)
-                    widgets[w].grab_focus()
+                    self.show_page(name)
+                    widgets[n].grab_focus()
                     return
 
     def new_path(self, newpath, alias='new'):
@@ -749,7 +793,7 @@ class ConfigDialog(gtk.Dialog):
                 self.pathtree.get_column(0))
         self.refresh_path_list()
         # This method may be called from hgtk.sync, so ensure page is visible
-        self.notebook.set_current_page(3)
+        self.show_page('sync')
         self.dirty_event()
 
     def dirty_event(self, *args):
@@ -872,8 +916,11 @@ class ConfigDialog(gtk.Dialog):
         self._defaultpathbutton.set_sensitive(not default_path and path_selected)
 
     def fill_path_frame(self, frvbox):
+        # insert padding
+        frvbox.pack_start(gtk.VBox(), False, False, 2)
+
+        # paths frame
         frame = gtk.Frame(_('Remote repository paths'))
-        frame.set_border_width(4)
         frvbox.pack_start(frame, True, True, 2)
         vbox = gtk.VBox()
         vbox.set_border_width(4)
@@ -886,8 +933,8 @@ class ConfigDialog(gtk.Dialog):
         self.pathtree = gtk.TreeView(self.pathdata)
         self.pathtree.set_enable_search(False)
         self.pathtree.add_events(gtk.gdk.BUTTON_PRESS_MASK)
-        self.pathtree.connect("cursor-changed", self._pathtree_changed)
-        self.pathtree.connect("button-press-event", self._pathtree_pressed)
+        self.pathtree.connect('cursor-changed', self._pathtree_changed)
+        self.pathtree.connect('button-press-event', self._pathtree_pressed)
 
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
@@ -897,92 +944,81 @@ class ConfigDialog(gtk.Dialog):
         column = gtk.TreeViewColumn(_('Repository Path'), renderer, text=1)
         self.pathtree.append_column(column)
 
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(self.pathtree)
-        vbox.add(scrolledwindow)
+        scrolled = gtk.ScrolledWindow()
+        scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolled.add(self.pathtree)
 
-        buttonbox = gtk.HBox()
+        treeframe = gtk.Frame()
+        treeframe.set_border_width(2)
+        treeframe.set_shadow_type(gtk.SHADOW_IN)
+        treeframe.add(scrolled)
+        vbox.add(treeframe)
+
+        # bottom command buttons
+        bottombox = gtk.HBox()
+        vbox.pack_start(bottombox, False, False, 4)
+
         self.addButton = gtk.Button(_('_Add'))
         self.addButton.set_use_underline(True)
         self.addButton.connect('clicked', self._add_path)
-        buttonbox.pack_start(self.addButton, True, True, 2)
+        bottombox.pack_start(self.addButton, True, True, 2)
 
         self._editpathbutton = gtk.Button(_('_Edit'))
         self._editpathbutton.set_use_underline(True)
         self._editpathbutton.connect('clicked', self._edit_path)
-        buttonbox.pack_start(self._editpathbutton, True, True, 2)
+        bottombox.pack_start(self._editpathbutton, True, True, 2)
 
         self._delpathbutton = gtk.Button(_('_Remove'))
         self._delpathbutton.set_use_underline(True)
         self._delpathbutton.connect('clicked', self._remove_path)
-        buttonbox.pack_start(self._delpathbutton, True, True, 2)
+        bottombox.pack_start(self._delpathbutton, True, True, 2)
 
         self._testpathbutton = gtk.Button(_('_Test'))
         self._testpathbutton.set_use_underline(True)
         self._testpathbutton.connect('clicked', self._test_path)
-        buttonbox.pack_start(self._testpathbutton, True, True, 2)
+        bottombox.pack_start(self._testpathbutton, True, True, 2)
 
         self._defaultpathbutton = gtk.Button(_('Set as _default'))
         self._defaultpathbutton.set_use_underline(True)
         self._defaultpathbutton.connect('clicked', self._default_path)
-        buttonbox.pack_start(self._defaultpathbutton, True, True, 2)
+        bottombox.pack_start(self._defaultpathbutton, True, True, 2)
 
-        vbox.pack_start(buttonbox, False, False, 4)
-
-    def set_help(self, widget, event, buffer, tooltip):
+    def set_help(self, widget, event, tooltip):
         text = ' '.join(tooltip.splitlines())
-        buffer.set_text(text)
+        self.descbuffer.set_text(text)
 
     def fill_frame(self, frame, info):
         widgets = []
 
-        descframe = gtk.Frame(_('Description'))
-        descframe.set_border_width(4)
-        desctext = gtk.TextView()
-        desctext.set_wrap_mode(gtk.WRAP_WORD)
-        desctext.set_editable(False)
-        desctext.set_sensitive(False)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add(desctext)
-        scrolledwindow.set_border_width(4)
-        descframe.add(scrolledwindow)
+        table = gtklib.LayoutTable()
 
         vbox = gtk.VBox()
-        table = gtk.Table(len(info), 2, False)
-        vbox.pack_start(table, False, False, 2)
-        if info != _paths_info:
-            vbox.pack_start(gtk.Label(), True, True, 0)
-        vbox.pack_start(descframe, False, False, 2)
-        frame.add(vbox)
+        vbox.pack_start(table, False, False)
+
+        scrolled = gtk.ScrolledWindow()
+        scrolled.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrolled.add_with_viewport(vbox)
+        scrolled.child.set_shadow_type(gtk.SHADOW_NONE)
+        frame.pack_start(scrolled)
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
             vlist = gtk.ListStore(str, bool)
             combo = gtk.ComboBoxEntry(vlist, 0)
             combo.connect('changed', self.dirty_event)
-            combo.child.connect('focus-in-event', self.set_help,
-                    desctext.get_buffer(), tooltip)
+            combo.child.connect('focus-in-event', self.set_help, tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
-            combo.child.set_width_chars(40)
+            combo.child.set_width_chars(32)
             if cpath in _pwfields:
                 combo.child.set_visibility(False)
             widgets.append(combo)
 
-            lbl = gtk.Label(label + ':')
-            lbl.set_alignment(1.0, 0.0)
-            eventbox = gtk.EventBox()
-            eventbox.set_visible_window(False)
-            eventbox.add(lbl)
-            table.attach(eventbox, 0, 1, row, row+1, gtk.FILL, 0, 4, 2)
-            table.attach(combo, 1, 2, row, row+1, gtk.FILL|gtk.EXPAND, 0, 4, 2)
-            self.tooltips.set_tip(eventbox, tooltip)
+            table.add_row(label + ':', combo, padding=False)
+            self.tooltips.set_tip(combo, tooltip)
 
-        self.pages.append((vbox, info, widgets))
-        return vbox
+        return vbox, widgets
 
     def refresh_vlist(self):
-        for vbox, info, widgets in self.pages:
+        for page_num, info, vbox, widgets in self.pages.values():
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 ispw = cpath in _pwfields
                 combo = widgets[row]
@@ -993,14 +1029,10 @@ class ConfigDialog(gtk.Dialog):
                 curvalue = self.get_ini_config(cpath)
 
                 if cpath == 'tortoisehg.vdiff':
-                    # Special case, add extdiff.cmd.* to possible values
-                    for name, value in self.ui.configitems('extdiff'):
-                        if name.startswith('cmd.'):
-                            if name[4:] not in values:
-                                values.append(name[4:])
-                        elif not name.startswith('opts.'):
-                            if name not in values:
-                                values.append(name)
+                    tools = hglib.difftools(self.ui)
+                    for name in tools.keys():
+                        if name not in values:
+                            values.append(name)
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     hglib.mergetools(self.ui, values)
@@ -1032,13 +1064,23 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, notebook, tab):
+    def add_page(self, label, name, info, icon=None, path=False):
+        # setup page
         frame = gtk.VBox()
-        frame.set_border_width(4)
         frame.show()
 
-        label = gtk.Label(tab)
-        notebook.append_page(frame, label)
+        vbox, widgets = self.fill_frame(frame, info)
+        if path:
+            self.fill_path_frame(vbox)
+
+        # add to notebook
+        pagenum = self.notebook.append_page(frame)
+        self.pages[name] = (pagenum, info, vbox, widgets)
+
+        # add treeview item
+        pixbuf = gtklib.get_icon_pixbuf(icon, gtk.ICON_SIZE_LARGE_TOOLBAR)
+        self.confmodel.append((pixbuf, label, name))
+
         return frame
 
     def get_ini_config(self, cpath):
@@ -1064,18 +1106,36 @@ class ConfigDialog(gtk.Dialog):
                     break
                 except (IOError, OSError):
                     pass
+            else:
+                gdialog.Prompt(_('Unable to create a Mercurial.ini file'),
+                       _('Insufficient access rights, reverting to read-only'
+                         'mode.'), self).run()
+                from mercurial import config
+                self.fn = rcpath[0]
+                cfg = config.config()
+                self.readonly = True
+                return cfg
         self.fn = fn
         try:
             import iniparse
             # Monkypatch this regex to prevent iniparse from considering
             # 'rem' as a comment
             iniparse.ini.CommentLine.regex = \
-                       re.compile(r'^(?P<csep>[;#])(?P<comment>.*)$')
+                       re.compile(r'^(?P<csep>[%;#])(?P<comment>.*)$')
             return iniparse.INIConfig(file(fn), optionxformvalue=None)
         except ImportError:
             from mercurial import config
             cfg = config.config()
             cfg.read(fn)
+            self.readonly = True
+            return cfg
+        except Exception, e:
+            gdialog.Prompt(_('Unable to parse a config file'),
+                    _('%s\nReverting to read-only mode.') % str(e), self).run()
+            from mercurial import config
+            cfg = config.config()
+            cfg.read(fn)
+            self.readonly = True
             return cfg
 
     def record_new_value(self, cpath, newvalue, keephistory=True):
@@ -1129,16 +1189,16 @@ class ConfigDialog(gtk.Dialog):
                 del self.ini['paths'][name]
 
         # Flush changes on all pages
-        for vbox, info, widgets in self.pages:
-            for w, (label, cpath, values, tip) in enumerate(info):
-                newvalue = hglib.fromutf(widgets[w].child.get_text())
+        for page_num, info, vbox, widgets in self.pages.values():
+            for n, (label, cpath, values, tip) in enumerate(info):
+                newvalue = hglib.fromutf(widgets[n].child.get_text())
                 self.record_new_value(cpath, newvalue)
 
         self.history.write()
         self.refresh_vlist()
 
         try:
-            f = open(self.fn, "w")
+            f = open(self.fn, 'w')
             f.write(str(self.ini))
             f.close()
             self._btn_apply.set_sensitive(False)
@@ -1151,6 +1211,6 @@ class ConfigDialog(gtk.Dialog):
 
 def run(ui, *pats, **opts):
     dlg = ConfigDialog(opts.get('alias') == 'repoconfig')
-    if opts.get('focus', ''):
+    if opts.get('focus'):
         dlg.focus_field(opts['focus'])
     return dlg

@@ -129,6 +129,9 @@ MQ とはどう違うのか？
 	6)	シェルフツールを開いて :guilabel:`シェルフから戻す` ボタンを押す
 	7)	最上位のパッチを更新する (手順4に戻る)
 
+追加、削除、名前変更されたファイルをシェルフすることはできませんが、
+MQ ならそれが可能です。
+
 attic 拡張機能とはどう違うのか？
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -168,5 +171,14 @@ attic 拡張機能はシェルフ機能の上位版です。具体的には atti
 	shelve/unshelve tool
 
 	use "hgtk -v help shelve" to show global options
+
+TortoiseHg のシェルフ機能を Mercurial のコマンドラインから使うには、
+Mercurial.ini ファイルで以下のように拡張機能を有効化してください： ::
+
+	[extensions]
+	tortoisehg.util.hgshelve=
+
+これにより Mercurial に :command:`shelve` および :command:`unshelve`
+コマンドが追加されます。
 
 .. vim: noet ts=4

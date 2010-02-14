@@ -1,7 +1,8 @@
 @echo off
+setlocal
 
-if "%hhc_compiler" equ "" (
-    set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
+if not exist %hhc_compiler%. (
+	set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
 )
 set PDFLATEX=PdfLatex
 set SPHINXBUILD=sphinx-build
@@ -58,7 +59,7 @@ if "%1" == "htmlhelp" (
 
 if "%1" == "chm" (
 	%SPHINXBUILD% -b htmlhelp %ALLSPHINXOPTS% %OUTPUTDIR%/chm
-	%hhc_compiler% %OUTPUTDIR%/chm/TortoiseHG.hhp
+	%hhc_compiler% %OUTPUTDIR%/chm/TortoiseHg.hhp
 	echo.
 	echo.Build finished. The CHM file is in %OUTPUTDIR%/chm.
 	goto end
@@ -75,13 +76,13 @@ if "%1" == "pdf" (
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %OUTPUTDIR%/pdf
 	pushd .
 	cd %OUTPUTDIR%\pdf
-	%PDFLATEX% TortoiseHG.tex
-	%PDFLATEX% TortoiseHG.tex
-	%PDFLATEX% TortoiseHG.tex
-	makeindex -s python.ist TortoiseHG.idx
-	makeindex -s python.ist modTortoiseHG.idx
-	%PDFLATEX% TortoiseHG.tex
-	%PDFLATEX% TortoiseHG.tex
+	%PDFLATEX% TortoiseHg.tex
+	%PDFLATEX% TortoiseHg.tex
+	%PDFLATEX% TortoiseHg.tex
+	makeindex -s python.ist TortoiseHg.idx
+	makeindex -s python.ist modTortoiseHg.idx
+	%PDFLATEX% TortoiseHg.tex
+	%PDFLATEX% TortoiseHg.tex
 	popd
 	echo.
 	echo.Build finished; the PDF file is in %OUTPUTDIR%/pdf.
