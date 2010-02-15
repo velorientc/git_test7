@@ -768,8 +768,11 @@ class DataMineDialog(gdialog.GWindow):
 
         (frame, treeview, origpath, graphview) = objs
         q = Queue.Queue()
-        args = [q, 'annotate', '--follow', '--number', '--file',
-                '--rev', str(rev), 'path:'+path]
+        # Use short -f here because it's meaning has changed, it used
+        # to be --follow but now it means --file.  We want either.
+        # Replace -f with --file when support for hg-1.4 is dropped
+        args = [q, 'annotate', '-f', '--number', '--rev', str(rev),
+                'path:'+path]
         thread = thread2.Thread(target=threadfunc, args=args)
         thread.start()
         frame._mythread = thread
