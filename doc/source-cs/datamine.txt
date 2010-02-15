@@ -1,4 +1,4 @@
-﻿Zkoumání dat
+Zkoumání dat
 ============
 
 .. module:: datamine.dialog

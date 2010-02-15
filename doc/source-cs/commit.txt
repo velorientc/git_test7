@@ -1,4 +1,4 @@
-﻿Commit
+Commit
 ======
 
 .. module:: commit.dialog

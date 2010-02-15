@@ -1,4 +1,4 @@
-﻿Klonování repozitáře
+Klonování repozitáře
 ====================
 
 .. module:: clone.dialog

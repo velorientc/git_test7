@@ -1,4 +1,4 @@
-﻿Almárka
+Almárka
 =======
 
 .. module:: shelve.dialog
