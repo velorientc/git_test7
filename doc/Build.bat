@@ -33,6 +33,7 @@ if "%1" == "help" (
 	echo.and where ^<lang^> is one of
 	echo.  en  to make target in English ^(default^)
 	echo.  ja  to make target in Japanese
+	echo.  cs  to make target in Czech
 	goto end
 )
 
