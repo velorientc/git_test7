@@ -1,4 +1,4 @@
-***************************
+﻿***************************
 Rychlá cesta pro netrpělivé
 ***************************
 
@@ -207,7 +207,7 @@ V otevřené složce **bim** vytvoří Petr nový textový soubor "bob.txt" s te
 	Do textového pole Petr zapíše průvodní text revize, neboli changesetu: "bim mess 0"
 	Commit
 	
-.. figure:: images/repos.png
+.. figure:: figures/repos.png
 	:alt: Coordination scheme
 	
 Koloběh příkazů mezi repozitáři
