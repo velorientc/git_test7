@@ -5,6 +5,7 @@ syntax: glob
 *.pyc
 build/
 build-ja/
+build-cs/
 dist/
 Output/
 .*.swp
