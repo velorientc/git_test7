@@ -53,7 +53,7 @@ def hunk_markup(text):
         elif line.startswith('+'):
             hunk += gtklib.markup(line, color=gtklib.DGREEN)
         elif line.startswith('@@'):
-            hunk = gtklib.markup(line, color='#FF8000')
+            hunk = gtklib.markup(line, color=gtklib.DORANGE)
         else:
             hunk += gtklib.markup(line)
     return hunk
@@ -411,7 +411,7 @@ class GStatus(gdialog.GWindow):
         diffcol.add_attribute(cell, 'markup', DM_DISP_TEXT)
 
         # differentiate header chunks
-        cell.set_property('cell-background', '#DDDDDD')
+        cell.set_property('cell-background', gtklib.STATUS_HEADER)
         diffcol.add_attribute(cell, 'cell_background_set', DM_IS_HEADER)
         self.headerfont = self.difffont.copy()
         self.headerfont.set_weight(pango.WEIGHT_HEAVY)
@@ -420,8 +420,8 @@ class GStatus(gdialog.GWindow):
         self.rejfont = self.difffont.copy()
         self.rejfont.set_weight(pango.WEIGHT_LIGHT)
         diffcol.add_attribute(cell, 'font-desc', DM_FONT)
-        cell.set_property('background', '#EEEEEE')
-        cell.set_property('foreground', '#888888')
+        cell.set_property('background', gtklib.STATUS_REJECT_BACKGROUND)
+        cell.set_property('foreground', gtklib.STATUS_REJECT_FOREGROUND)
         diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
         diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
         difftree.append_column(diffcol)
@@ -869,7 +869,8 @@ class GStatus(gdialog.GWindow):
         sel = lambda x: x >= lasthunk or not dmodel[hc+x+1][DM_REJECTED]
         newtext = chunks[0].selpretty(sel)
         if not selected:
-            newtext = "<span foreground='#888888'>" + newtext + "</span>"
+            newtext = "<span foreground='" + gtklib.STATUS_REJECT_FOREGROUND + \
+                "'>" + newtext + "</span>"
         dmodel[hc][DM_DISP_TEXT] = newtext
 
     def updated_codes(self):
@@ -919,15 +920,15 @@ class GStatus(gdialog.GWindow):
         elif stat == 'R':
             text_renderer.set_property('foreground', gtklib.DRED)
         elif stat == 'C':
-            text_renderer.set_property('foreground', 'black')
+            text_renderer.set_property('foreground', gtklib.NORMAL)
         elif stat == '!':
-            text_renderer.set_property('foreground', 'red')
+            text_renderer.set_property('foreground', gtklib.RED)
         elif stat == '?':
-            text_renderer.set_property('foreground', '#AA5000')
+            text_renderer.set_property('foreground', gtklib.DORANGE)
         elif stat == 'I':
-            text_renderer.set_property('foreground', 'black')
+            text_renderer.set_property('foreground', gtklib.NORMAL)
         else:
-            text_renderer.set_property('foreground', 'black')
+            text_renderer.set_property('foreground', gtklib.NORMAL)
 
 
     def rename_file(self, wfile):
@@ -1095,7 +1096,7 @@ class GStatus(gdialog.GWindow):
         else:
             buf.create_tag('removed', foreground=gtklib.DRED)
             buf.create_tag('added', foreground=gtklib.DGREEN)
-        buf.create_tag('position', foreground='#FF8000')
+        buf.create_tag('position', foreground=gtklib.DORANGE)
         buf.create_tag('header', foreground=gtklib.DBLUE)
 
         bufiter = buf.get_start_iter()
