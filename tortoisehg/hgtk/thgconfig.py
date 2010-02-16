@@ -658,7 +658,7 @@ class ConfigDialog(gtk.Dialog):
         self.add_page(_('Repository Explorer'), 'log', _log_info,
                       'menulog.ico')
         self.add_page(_('Synchronize'), 'sync', _paths_info, 'menusynch.ico',
-                      path=True)
+                      extra=True)
         self.add_page(_('Web Server'), 'web', _web_info, 'proxy.ico')
         self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
         self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
@@ -930,7 +930,7 @@ class ConfigDialog(gtk.Dialog):
         self._testpathbutton.set_sensitive(repo_available and path_selected)
         self._defaultpathbutton.set_sensitive(not default_path and path_selected)
 
-    def fill_path_frame(self, frvbox):
+    def fill_sync_frame(self, frvbox):
         # insert padding
         frvbox.pack_start(gtk.VBox(), False, False, 2)
 
@@ -1079,14 +1079,16 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, label, name, info, icon=None, path=False):
+    def add_page(self, label, name, info, icon=None, extra=False):
         # setup page
         frame = gtk.VBox()
         frame.show()
 
         vbox, widgets = self.fill_frame(frame, info)
-        if path:
-            self.fill_path_frame(vbox)
+        if extra:
+            func = getattr(self, 'fill_%s_frame' % name, None)
+            if func:
+                func(vbox)
 
         # add to notebook
         pagenum = self.notebook.append_page(frame)
