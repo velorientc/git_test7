@@ -37,12 +37,111 @@ if gobject.pygobject_version <= (2,12,1):
 DRED = '#900000'
 DGREEN = '#006400'
 DBLUE = '#000090'
+DYELLOW = '#6A6A00'
+DORANGE = '#AA5000'
+# DORANGE = '#FF8000'
 
 PRED = '#ffcccc'
 PGREEN = '#aaffaa'
 PBLUE = '#aaddff'
 PYELLOW = '#ffffaa'
 PORANGE = '#ffddaa'
+
+RED = 'red'
+GREEN = 'green'
+BLUE = 'blue'
+YELLOW = 'yellow'
+BLACK = 'black'
+WHITE = 'white'
+GREY = 'grey'
+
+NORMAL = BLACK
+NEW_REV_COLOR = DGREEN
+CHANGE_HEADER = GREY
+
+UP_ARROW_COLOR = '#feaf3e'
+DOWN_ARROW_COLOR = '#8ae234'
+STAR_COLOR = '#fce94f'
+CELL_GREY = '#2e3436'
+STATUS_HEADER = '#DDDDDD'
+STATUS_REJECT_BACKGROUND = '#EEEEEE'
+STATUS_REJECT_FOREGROUND = '#888888'
+
+# line colors
+MAINLINE_COLOR = ( 0.0, 0.0, 0.0 )
+LINE_COLORS = [
+    ( 1.0, 0.0, 0.0 ),
+    ( 1.0, 1.0, 0.0 ),
+    ( 0.0, 1.0, 0.0 ),
+    ( 0.0, 1.0, 1.0 ),
+    ( 0.0, 0.0, 1.0 ),
+    ( 1.0, 0.0, 1.0 ),
+    ]
+
+def get_gtk_colors():
+    color_scheme = gtk.settings_get_default().get_property('gtk-color-scheme')
+    colors = {}
+    for color in color_scheme.split('\n'):
+        color = color.strip()
+        if color:
+            name, color = color.split(':')
+            colors[name.strip()] = gtk.gdk.color_parse(color.strip())
+    return colors
+
+def _init_colors():
+    global NORMAL, MAINLINE_COLOR
+
+    gtk_colors = get_gtk_colors()
+
+    try:
+        normal = gtk_colors['fg_color']
+    except KeyError:
+        # TODO: find out how to log such errors
+        pass
+    else:
+        NORMAL = str(normal)
+        MAINLINE_COLOR = (
+                normal.red_float,
+                normal.green_float,
+                normal.blue_float
+            )
+        
+        # adjust colors for a dark color scheme:
+        if normal.value > 0.5:
+            global RED, GREEN, BLUE, BLACK, WHITE, \
+                DRED, DGREEN, DBLUE, DYELLOW, DORANGE, \
+                PRED, PGREEN, PBLUE, PYELLOW, PORANGE, \
+                NEW_REV_COLOR, LINE_COLORS, CHANGE_HEADER
+            
+            RED = PRED
+            GREEN = NEW_REV_COLOR = PGREEN
+            BLUE = PBLUE
+            PRED = DRED
+            DRED = '#FF6161'
+#            DRED, PRED = PRED, DRED
+            DGREEN, PGREEN = PGREEN, DGREEN
+            DBLUE, PBLUE = PBLUE, DBLUE
+            DYELLOW, PYELLOW = PYELLOW, DYELLOW
+            DORANGE, PORANGE = PORANGE, DORANGE
+            BLACK, WHITE = WHITE, BLACK
+
+            CHANGE_HEADER = '#404040'
+
+            LINE_COLORS = [
+                ( 1.0, 0.3804, 0.3804 ),
+                ( 1.0, 1.0, 0.0 ),
+                ( 0.0, 1.0, 0.0 ),
+                ( 0.0, 1.0, 1.0 ),
+                ( 0.2902, 0.4863, 0.851 ),
+                ( 1.0, 0.3882, 1.0 ),
+                ]
+
+            # TODO: dark color scheme for:
+            # UP_ARROW_COLOR, DOWN_ARROW_COLOR, STAR_COLOR,
+            # CELL_GREY, STATUS_HEADER, STATUS_REJECT_BACKGROUND,
+            # STATUS_REJECT_FOREGROUND
+
+_init_colors()
 
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
