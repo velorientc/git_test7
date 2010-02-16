@@ -254,6 +254,20 @@ _diff_info = (
         _('Adjust the coloring style of diff lines in the changeset viewer.'
         ' Default: foreground')))
 
+_font_info = (
+    (_('Commit Message'), 'gtools.fontcomment', [],
+        _('Font used in changeset viewer and commit log text.'
+        ' Default: monospace 10')),
+    (_('Diff Text'), 'gtools.fontdiff', [],
+        _('Font used for diffs in status and commit tools.'
+        ' Default: monospace 10')),
+    (_('File List'), 'gtools.fontlist', [],
+        _('Font used in file lists in status and commit tools.'
+        ' Default: sans 9')),
+    (_('Command Output'), 'gtools.fontlog', [],
+        _('Font used in command output window.'
+        ' Default: monospace 10')))
+
 class PathEditDialog(gtk.Dialog):
     _protocols = (('ssh', _('ssh')), ('http', _('http')),
                   ('https', _('https')), ('local', _('local')))
@@ -649,6 +663,7 @@ class ConfigDialog(gtk.Dialog):
         self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
         self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
         self.add_page(_('Diff'), 'diff', _diff_info, gtk.STOCK_JUSTIFY_FILL)
+        self.add_page(_('Font'), 'font', _font_info, gtk.STOCK_SELECT_FONT)
 
         # insert padding of between notebook and common desc frame
         mainbox.pack_start(gtk.VBox(), False, False, 2)
