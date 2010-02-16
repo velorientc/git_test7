@@ -116,6 +116,7 @@ def setup_windows(version):
     extra['console'] = [
             {'script':'contrib/hg', 
              'icon_resources':[(0,'icons/hg.ico')],
+             'description':'Mercurial Distributed SCM',
              'copyright':hgcopyright,
              'product_version':version},
             {'script':'hgtk',
