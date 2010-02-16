@@ -120,6 +120,7 @@ def setup_windows(version):
              'product_version':version},
             {'script':'hgtk',
              'icon_resources':[(0,'icons/thg_logo.ico')],
+             'description':'TortoiseHg GUI tools for Mercurial SCM',
              'copyright':thgcopyright,
              'product_version':version},
             {'script':'contrib/docdiff.py',
