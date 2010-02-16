@@ -392,7 +392,7 @@ class GWindow(gtk.Window):
             if not url:
                 return
         if not url.startswith('http'):
-            fullurl = 'http://tortoisehg.org/manual/0.10/' + url
+            fullurl = 'http://tortoisehg.org/manual/1.0/' + url
             # Use local CHM file if it can be found
             if os.name == 'nt' and paths.bin_path:
                 chm = os.path.join(paths.bin_path, 'docs', 'TortoiseHg.chm')
