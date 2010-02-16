@@ -340,7 +340,6 @@ class ChangeSet(gdialog.GWindow):
         tags, lines = self.prepare_diff(lines, offset, wfile)
         for l in lines:
             buf.insert(eob, l)
-
         # inserts the tags
         for name, p0, p1 in tags:
             i0 = buf.get_iter_at_offset(p0)
@@ -419,7 +418,7 @@ class ChangeSet(gdialog.GWindow):
                 tag = 'red'
                 l = hglib.diffexpand(l)
             else:
-                tag = 'black'
+                tag = 'normal'
                 l = hglib.diffexpand(l)
             l = l+"\n"
             length = len(l.decode('utf-8'))
@@ -570,7 +569,7 @@ class ChangeSet(gdialog.GWindow):
         def widget_func(widget, item, markups):
             def linkwidget(revnum, revid, summary, highlight=None, branch=None):
                 # revision label
-                opts = dict(underline='single', color='blue')
+                opts = dict(underline='single', color=gtklib.BLUE)
                 if highlight:
                     opts['weight'] = 'bold'
                 rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
@@ -582,7 +581,7 @@ class ChangeSet(gdialog.GWindow):
                 # summary & branch label
                 sum = gtklib.markup(summary)
                 if branch:
-                    sum = gtklib.markup(branch, color='black',
+                    sum = gtklib.markup(branch, color=gtklib.NORMAL,
                         background=gtklib.PGREEN) + ' ' + sum
                 sumlabel = gtk.Label()
                 sumlabel.set_markup(sum)
@@ -785,7 +784,7 @@ class ChangeSet(gdialog.GWindow):
         tag_table = self._buffer.get_tag_table()
 
         tag_table.add(make_texttag('diff', font=self.rawfonts['fontdiff']))
-        tag_table.add(make_texttag('blue', foreground='blue'))
+        tag_table.add(make_texttag('blue', foreground=gtklib.BLUE))
         if self.colorstyle == 'background':
             tag_table.add(make_texttag('red',
                                        paragraph_background=gtklib.PRED))
@@ -797,21 +796,21 @@ class ChangeSet(gdialog.GWindow):
         else:
             tag_table.add(make_texttag('red', foreground=gtklib.DRED))
             tag_table.add(make_texttag('green', foreground=gtklib.DGREEN))
-        tag_table.add(make_texttag('black', foreground='black'))
+        tag_table.add(make_texttag('normal', foreground=gtklib.NORMAL))
         tag_table.add(make_texttag('greybg',
-                                   paragraph_background='grey',
+                                   paragraph_background=gtklib.CHANGE_HEADER,
                                    weight=pango.WEIGHT_BOLD))
-        tag_table.add(make_texttag('yellowbg', background='yellow'))
+        tag_table.add(make_texttag('yellowbg', background=gtklib.YELLOW))
 
-        issuelink_tag = make_texttag('issuelink', foreground='blue',
+        issuelink_tag = make_texttag('issuelink', foreground=gtklib.BLUE,
                                      underline=pango.UNDERLINE_SINGLE)
         issuelink_tag.connect('event', self.issuelink_event)
         tag_table.add(issuelink_tag)
-        urllink_tag = make_texttag('urllink', foreground='blue',
+        urllink_tag = make_texttag('urllink', foreground=gtklib.BLUE,
                                      underline=pango.UNDERLINE_SINGLE)
         urllink_tag.connect('event', self.urllink_event)
         tag_table.add(urllink_tag)
-        csetlink_tag = make_texttag('csetlink', foreground='blue',
+        csetlink_tag = make_texttag('csetlink', foreground=gtklib.BLUE,
                                     underline=pango.UNDERLINE_SINGLE)
         csetlink_tag.connect('event', self.csetlink_event)
         tag_table.add(csetlink_tag)

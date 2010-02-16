@@ -349,10 +349,10 @@ class SummaryInfo(object):
             elif item in ('revnum', 'p4', 'svn'):
                 return str(value)
             elif item in ('rawbranch', 'branch'):
-                return gtklib.markup(' %s ' % value, color='black',
+                return gtklib.markup(' %s ' % value, color=gtklib.BLACK,
                                      background=gtklib.PGREEN)
             elif item in ('rawtags', 'tags'):
-                opts = dict(color='black', background=gtklib.PYELLOW)
+                opts = dict(color=gtklib.BLACK, background=gtklib.PYELLOW)
                 tags = [gtklib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)
             elif item in ('desc', 'summary', 'user', 'shortuser',
