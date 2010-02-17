@@ -930,13 +930,16 @@ class ConfigDialog(gtk.Dialog):
         self._testpathbutton.set_sensitive(repo_available and path_selected)
         self._defaultpathbutton.set_sensitive(not default_path and path_selected)
 
-    def fill_sync_frame(self, frvbox):
+    def fill_sync_frame(self, parent, table):
+        # add table
+        parent.pack_start(table, False, False)
+
         # insert padding
-        frvbox.pack_start(gtk.VBox(), False, False, 2)
+        parent.pack_start(gtk.VBox(), False, False, 2)
 
         # paths frame
         frame = gtk.Frame(_('Remote repository paths'))
-        frvbox.pack_start(frame, True, True, 2)
+        parent.pack_start(frame, True, True, 2)
         vbox = gtk.VBox()
         vbox.set_border_width(4)
         frame.add(vbox)
@@ -1002,13 +1005,14 @@ class ConfigDialog(gtk.Dialog):
         text = ' '.join(tooltip.splitlines())
         self.descbuffer.set_text(text)
 
-    def fill_frame(self, frame, info):
+    def fill_frame(self, frame, info, build=True):
         widgets = []
 
         table = gtklib.LayoutTable()
 
         vbox = gtk.VBox()
-        vbox.pack_start(table, False, False)
+        if build:
+            vbox.pack_start(table, False, False)
 
         scrolled = gtk.ScrolledWindow()
         scrolled.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -1030,7 +1034,7 @@ class ConfigDialog(gtk.Dialog):
             table.add_row(label + ':', combo, padding=False)
             self.tooltips.set_tip(combo, tooltip)
 
-        return vbox, widgets
+        return vbox, table, widgets
 
     def refresh_vlist(self):
         for page_num, info, vbox, widgets in self.pages.values():
@@ -1084,11 +1088,11 @@ class ConfigDialog(gtk.Dialog):
         frame = gtk.VBox()
         frame.show()
 
-        vbox, widgets = self.fill_frame(frame, info)
+        vbox, table, widgets = self.fill_frame(frame, info, not extra)
         if extra:
             func = getattr(self, 'fill_%s_frame' % name, None)
             if func:
-                func(vbox)
+                func(vbox, table)
 
         # add to notebook
         pagenum = self.notebook.append_page(frame)
