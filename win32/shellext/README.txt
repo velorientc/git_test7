@@ -96,10 +96,6 @@ Winstat64.obj Dirstatecache.obj DirectoryStatus.obj Thgstatus.obj QueryDirstate.
 This should produce the file THgShell.dll, which contains the 32 bit variant of the
 shell extension.
 
-To install it for testing on a 32 bit Windows, rename the THgShell.dll in "C:\Program Files\TortoiseHg"
-to something else (e.g. THgShell-01.dll), then copy the newly built THgShell.dll to
-"C:\Program Files\TortoiseHg" and restart explorer.exe (logout/login or restart will do as well).
-
 
 === Building the 64 bit target ===
 
@@ -174,6 +170,20 @@ shell extension.
 
 
 === Testing ===
+To install the new THgShell.dll for testing, rename the THgShellx86.dll in
+"C:\Program Files\TortoiseHg" to something else (e.g. THgShell-01.dll), then copy the newly built
+THgShell.dll to "C:\Program Files\TortoiseHg\THgShellx86.dll" and restart explorer.exe
+(logout/login will do as well).
+
+For x64 systems, the dll is instead located in
+"C:\Program Files\Common Files\TortoiseHg\ThgShellx64.dll".
+
+See
+http://www.addictivetips.com/windows-tips/how-to-restart-explorer-exe-process-properly-in-windows-xp-and-vista/
+for properly restarting explorer (in case you don't want to do a logout/login).
+Of course, simply killing explorer.exe with the task manager and restarting it will work too
+(you might loose some settings changes you might have done in explorer though).
+
 The shell extension emits trace output (TDEBUG_TRACE macro calls in the sources). This output
 can be captured by using for example the tool **DebugView** from Microsoft sysinternals (see 
 http://technet.microsoft.com/en-us/sysinternals/bb896647.aspx).
