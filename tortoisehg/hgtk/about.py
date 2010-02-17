@@ -69,6 +69,9 @@ class AboutDialog(gtk.AboutDialog):
             curver = (0,0,0)
         if newver > curver:
             comment = _('A new version of TortoiseHg is ready for download!')
+            self.set_website(upgradeurl)
+        else:
+            self.set_website('http://tortoisehg.org')
 
         self.set_website(upgradeurl)
         self.set_name("TortoiseHg")
