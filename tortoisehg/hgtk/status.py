@@ -1120,6 +1120,9 @@ class GStatus(gdialog.GWindow):
     def generate_text_diffs(self, row):
         wfile = self.filemodel[row][FM_PATH]
         pfile = util.pconvert(wfile)
+        lines = self.check_max_diff(pfile)
+        if lines:
+            return self.diff_highlight_buffer(lines)
         matcher = cmdutil.matchfiles(self.repo, [pfile])
         opts = patch.diffopts(self.ui, self.opts)
         opts.git = True
