@@ -5,7 +5,7 @@ Integrace s průzkumníkem Windows
 	:synopsis: Windows explorer integration
 
 Překryvné ikonky
----------------
+----------------
 
 TortoiseHg poskytuje vizuální vyjádření stavu souborů pomocí překryvných ikonek v okně Průzkumníka Windows. Stejné řešení lze nalézt i u jiných programů Tortoise, jako je TortoiseCVS a TortoiseSVN.
 
