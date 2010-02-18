@@ -268,6 +268,13 @@ _font_info = (
         _('Font used in command output window.'
         ' Default: monospace 10')))
 
+_font_presets = {
+    'win-ja': (_('Japanese on Windows'), {
+        'gtools.fontcomment': 'MS Gothic 11',
+        'gtools.fontdiff': 'MS Gothic 10',
+        'gtools.fontlist': 'MS UI Gothic 9',
+        'gtools.fontlog': 'MS Gothic 10'})}
+
 class PathEditDialog(gtk.Dialog):
     _protocols = (('ssh', _('ssh')), ('http', _('http')),
                   ('https', _('https')), ('local', _('local')))
@@ -663,7 +670,8 @@ class ConfigDialog(gtk.Dialog):
         self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
         self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
         self.add_page(_('Diff'), 'diff', _diff_info, gtk.STOCK_JUSTIFY_FILL)
-        self.add_page(_('Font'), 'font', _font_info, gtk.STOCK_SELECT_FONT)
+        self.add_page(_('Font'), 'font', _font_info, gtk.STOCK_SELECT_FONT,
+                      extra=True, width=20)
 
         # insert padding of between notebook and common desc frame
         mainbox.pack_start(gtk.VBox(), False, False, 2)
@@ -716,6 +724,8 @@ class ConfigDialog(gtk.Dialog):
             gtklib.set_tortoise_icon(self, 'settings_user.ico')
         self.ini = self.load_config(self.rcpath)
         self.refresh_vlist()
+
+        # refresh sync frame
         self.pathdata.clear()
         if 'paths' in self.ini:
             for name in self.ini['paths']:
@@ -724,6 +734,36 @@ class ConfigDialog(gtk.Dialog):
                 self.pathdata.append([hglib.toutf(name), safepath,
                     hglib.toutf(path)])
         self.refresh_path_list()
+
+        # refresh preset fonts combo
+        model = self.presetcombo.get_model()
+        cpaths = [info[1] for info in _font_info]
+        defaulfonts = True
+        for cpath in cpaths:
+            value = self.get_ini_config(cpath)
+            if value is not None:
+                defaulfonts = False
+        if defaulfonts:
+            # theme default fonts
+            self.defaultradio.set_active(True)
+            self.presetcombo.set_active(0)
+        else:
+            for name, (label, preset) in _font_presets.items():
+                for cpath in cpaths:
+                    if self.get_ini_config(cpath) != preset[cpath]:
+                        break
+                else:
+                    # preset fonts
+                    rows = [row for row in model if row[0] == name]
+                    if rows:
+                        self.presetcombo.set_active_iter(rows[0].iter)
+                    self.presetradio.set_active(True)
+                    break
+            else:
+                # custom fonts
+                self.customradio.set_active(True)
+                self.presetcombo.set_active(0)
+
         self._btn_apply.set_sensitive(False)
         self.dirty = False
 
@@ -1001,11 +1041,79 @@ class ConfigDialog(gtk.Dialog):
         self._defaultpathbutton.connect('clicked', self._default_path)
         bottombox.pack_start(self._defaultpathbutton, True, True, 2)
 
+    def fill_font_frame(self, parent, table):
+        # layout table
+        layout = gtklib.LayoutTable()
+        parent.pack_start(layout, False, False, 2)
+        parent.reorder_child(layout, 0)
+
+        # radio buttons
+        defaultradio = gtk.RadioButton(None, _('Theme default fonts'))
+        presetradio = gtk.RadioButton(defaultradio, _('Preset fonts:'))
+        customradio = gtk.RadioButton(defaultradio, _('Custom fonts:'))
+        self.defaultradio = defaultradio
+        self.presetradio = presetradio
+        self.customradio = customradio
+
+        # preset list
+        presetmodel = gtk.ListStore(str, # internal name
+                                    str) # GUI label
+        presetmodel.append((None, _(' - Select Preset -')))
+        for name, (label, preset) in _font_presets.items():
+            presetmodel.append((name, label))
+        presetcombo = gtk.ComboBox(presetmodel)
+        cell = gtk.CellRendererText()
+        presetcombo.pack_start(cell)
+        presetcombo.add_attribute(cell, 'text', 1)
+        self.presetcombo = presetcombo
+
+        # layouting
+        layout.add_row(defaultradio)
+        layout.add_row(presetradio, presetcombo)
+        vbox = gtk.VBox()
+        vbox.pack_start(customradio, False, False)
+        vbox.pack_start(gtk.VBox())
+        layout.add_row(vbox, table, yhopt=gtk.FILL|gtk.EXPAND)
+
+        # signal handlers
+        def combo_changed(combo):
+            # configure for each item
+            model = combo.get_model()
+            name = model[combo.get_active()][0] # internal name
+            if name is None:
+                return
+            preset = _font_presets[name][1] # preset data
+            pagenum, info, vbox, widgets = self.pages['font']
+            for row, (label, cpath, vals, tip) in enumerate(info):
+                itemcombo = widgets[row]
+                itemcombo.child.set_text(preset[cpath])
+        presetcombo.connect('changed', combo_changed)
+        def radio_activated(radio, init=False):
+            if not radio.get_active():
+                return
+            presetcombo.set_sensitive(presetradio.get_active())
+            table.set_sensitive(customradio.get_active())
+            if init:
+                return
+            if radio == defaultradio:
+                pagenum, info, vbox, widgets = self.pages['font']
+                for row, (label, cpath, vals, tip) in enumerate(info):
+                    itemcombo = widgets[row]
+                    itemcombo.set_active(0) # unspecified
+            if radio != presetradio:
+                presetcombo.set_active(0)
+        defaultradio.connect('toggled', radio_activated)
+        presetradio.connect('toggled', radio_activated)
+        customradio.connect('toggled', radio_activated)
+
+        # prepare to show
+        radio_activated(defaultradio, init=True)
+
     def set_help(self, widget, event, tooltip):
         text = ' '.join(tooltip.splitlines())
         self.descbuffer.set_text(text)
 
-    def fill_frame(self, frame, info, build=True):
+    def fill_frame(self, frame, info, build=True, width=32):
         widgets = []
 
         table = gtklib.LayoutTable()
@@ -1026,7 +1134,7 @@ class ConfigDialog(gtk.Dialog):
             combo.connect('changed', self.dirty_event)
             combo.child.connect('focus-in-event', self.set_help, tooltip)
             combo.set_row_separator_func(lambda model, path: model[path][1])
-            combo.child.set_width_chars(32)
+            combo.child.set_width_chars(width)
             if cpath in _pwfields:
                 combo.child.set_visibility(False)
             widgets.append(combo)
@@ -1083,12 +1191,12 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, label, name, info, icon=None, extra=False):
+    def add_page(self, label, name, info, icon=None, extra=False, width=32):
         # setup page
         frame = gtk.VBox()
         frame.show()
 
-        vbox, table, widgets = self.fill_frame(frame, info, not extra)
+        vbox, table, widgets = self.fill_frame(frame, info, not extra, width)
         if extra:
             func = getattr(self, 'fill_%s_frame' % name, None)
             if func:
