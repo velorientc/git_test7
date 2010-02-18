@@ -163,7 +163,9 @@ class ChangesetList(gtk.Frame):
                              contents=('%(item_l)s:', ' %(branch)s',
                                        ' %(tags)s', ' %(summary)s'))
         self.pstyle = csinfo.panelstyle(
-                             contents=('item',) + csinfo.PANEL_DEFAULT[1:])
+                             contents=('item', 'summary', 'user','dateage',
+                                       'rawbranch', 'tags', 'transplant',
+                                       'p4', 'svn'))
 
         # prepare to show
         gtklib.idle_add_single_call(self.after_init)
