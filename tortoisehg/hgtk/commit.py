@@ -230,10 +230,10 @@ class GCommit(GStatus):
             dict(text='----'),
             dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH),
             dict(text='----'),
-            dict(name='always-show-output', text=_('Always Show Output'),
-                ascheck=True, func=toggle_showoutput, check=self.showoutput),
             dict(name='ignore-max-diff', text=_('Ignore Max Diff Size'),
-                ascheck=True, func=disable_maxdiff, check=self.showoutput)
+                ascheck=True, func=disable_maxdiff),
+            dict(name='always-show-output', text=_('Always Show Output'),
+                ascheck=True, func=toggle_showoutput, check=self.showoutput)
             ]),
         dict(text=_('_Operations'), subitems=[
             dict(text=_('_Commit'), func=self.commit_clicked,
