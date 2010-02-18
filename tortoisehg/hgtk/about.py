@@ -42,14 +42,23 @@ class AboutDialog(gtk.AboutDialog):
         comment = _("Several icons are courtesy of the TortoiseSVN project")
 
         newver = (0,0,0)
-        upgradeurl = ''
-        if os.name == 'nt':
-            try:
-                f = urllib2.urlopen(_verurl).read().splitlines()
-                newver = tuple([int(p) for p in f[0].split('.')])
-                upgradeurl = f[1]
-            except:
-                pass
+        upgradeurl = 'http://tortoisehg.org'
+        try:
+            f = urllib2.urlopen(_verurl).read().splitlines()
+            newver = tuple([int(p) for p in f[0].split('.')])
+            upgradeurl = f[1] # generic download URL
+            platform = sys.platform
+            if platform == 'win32':
+                from win32process import IsWow64Process as IsX64
+                platform = IsX64() and 'x64' or 'x86'
+            # linux2 for Linux, darwin for OSX
+            for line in f[2:]:
+                p, url = line.split(':')
+                if platform == p:
+                    upgradeurl = url.strip()
+                    break
+        except:
+            pass
         ver = version.version()
         if '+' in ver:
             ver = ver[:ver.index('+')]
@@ -61,7 +70,8 @@ class AboutDialog(gtk.AboutDialog):
             comment = _('A new version of TortoiseHg is ready for download!')
             self.set_website(upgradeurl)
         else:
-            self.set_website("http://tortoisehg.org")
+            self.set_website('http://tortoisehg.org')
+
         self.set_name("TortoiseHg")
         self.set_version(_("(version %s)") % version.version())
         if hasattr(self, 'set_wrap_license'):

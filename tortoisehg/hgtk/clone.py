@@ -203,12 +203,12 @@ class CloneDialog(gdialog.GDialog):
 
     def browse_clicked(self, button, title, entry):
         res = gtklib.NativeFolderSelectDialog(
-                     initial=entry.get_text(), title=title).run()
+                     initial=entry.get_text().strip(), title=title).run()
         if res:
             entry.set_text(res)
 
     def bundle_clicked(self, button, title, entry):
-        path = entry.get_text()
+        path = entry.get_text().strip()
         if os.path.isdir(path):
             initial = path
         else:
@@ -264,16 +264,16 @@ class CloneDialog(gdialog.GDialog):
     def clone(self):
         # gather input data
         src = self.srcentry.get_text().strip()
-        dest = self.destentry.get_text() or os.path.basename(src)
-        remotecmd = self.remotecmdentry.get_text()
+        dest = self.destentry.get_text().strip() or os.path.basename(src)
+        remotecmd = self.remotecmdentry.get_text().strip()
         if self.reventry.get_property('sensitive'):
-            rev = self.reventry.get_text()
+            rev = self.reventry.get_text().strip()
         else:
             rev = None
 
         if hasattr(self, 'startreventry') and \
                    self.startreventry.get_property('sensitive'):
-            startrev = self.startreventry.get_text()
+            startrev = self.startreventry.get_text().strip()
         else:
             startrev = None
 

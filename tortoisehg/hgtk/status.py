@@ -601,6 +601,7 @@ class GStatus(gdialog.GWindow):
         self.pats = []
         for name, check in self._show_checks.iteritems():
             check.set_sensitive(True)
+        self.set_title(self.get_title())
         self.reload_status()
 
     def search_filelist(self, model, column, key, iter):
@@ -1120,6 +1121,9 @@ class GStatus(gdialog.GWindow):
     def generate_text_diffs(self, row):
         wfile = self.filemodel[row][FM_PATH]
         pfile = util.pconvert(wfile)
+        lines = self.check_max_diff(pfile)
+        if lines:
+            return self.diff_highlight_buffer(lines)
         matcher = cmdutil.matchfiles(self.repo, [pfile])
         opts = patch.diffopts(self.ui, self.opts)
         opts.git = True
@@ -1154,22 +1158,28 @@ class GStatus(gdialog.GWindow):
             if len(self.diffmodel):
                 tree.scroll_to_cell(0, use_align=True, row_align=0.0)
 
-    def read_file_chunks(self, wfile):
-        'Get diffs of working file, parse into (c)hunks'
-        difftext = cStringIO.StringIO()
+    def check_max_diff(self, pfile):
+        lines = []
         ctx = self.repo[self._node1]
         try:
-            pfile = util.pconvert(wfile)
             fctx = ctx.filectx(pfile)
         except error.LookupError:
             fctx = None
         if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             # Fake patch that displays size warning
-            lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
+            lines = ['diff --git a/%s b/%s\n' % (pfile, pfile)]
             lines.append(_('File is larger than the specified max size.\n'))
             lines.append(_('Hunk selection is disabled for this file.\n'))
-            lines.append('--- a/%s\n' % wfile)
-            lines.append('+++ b/%s\n' % wfile)
+            lines.append('--- a/%s\n' % pfile)
+            lines.append('+++ b/%s\n' % pfile)
+        return lines
+
+    def read_file_chunks(self, wfile):
+        'Get diffs of working file, parse into (c)hunks'
+        difftext = cStringIO.StringIO()
+        pfile = util.pconvert(wfile)
+        lines = self.check_max_diff(pfile)
+        if lines:
             difftext.writelines(lines)
             difftext.seek(0)
         else:
