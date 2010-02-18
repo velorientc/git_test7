@@ -411,6 +411,42 @@ Diff
 	Adjust the coloring style of diff lines in the changeset viewer.
 	Default: foreground.
 
+
+.. module:: font.settings
+	:synopsis: Dialog used to set font specific preferences
+
+Font
+----
+
+:guilabel:`Theme default fonts`
+	Use default fonts based on current GTK theme.
+
+:guilabel:`Preset fonts:`
+	Select preset fonts from drop-down combo.  These font sets are tuned
+	specifically for each language and/or environment.
+
+:guilabel:`Custom fonts:`
+	Set font names and sizes individually for each usage place.
+
+The group which contains drop-down combo entries under
+:guilabel:`Custom fonts:` radio button is enabled when you activate it.
+
+:guilabel:`Commit Message:`
+	Font used in changeset viewer and commit log text.
+	Default: monospace 10.
+
+:guilabel:`Diff Text:`
+	Font used for diffs in status and commit tools.
+        Default: monospace 10.
+
+:guilabel:`File List:`
+	Font used in file lists in status and commit tools.
+        Default: sans 9.
+
+:guilabel:`Command Output:`
+	Font used in command output window.
+        Default: monospace 10.
+
 Removed this release
 ====================
 
