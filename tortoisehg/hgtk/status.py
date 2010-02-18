@@ -601,6 +601,7 @@ class GStatus(gdialog.GWindow):
         self.pats = []
         for name, check in self._show_checks.iteritems():
             check.set_sensitive(True)
+        self.set_title(self.get_title())
         self.reload_status()
 
     def search_filelist(self, model, column, key, iter):
