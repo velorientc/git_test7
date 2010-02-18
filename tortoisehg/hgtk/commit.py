@@ -8,6 +8,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import sys
 import errno
 import gtk
 import gobject
@@ -207,6 +208,11 @@ class GCommit(GStatus):
         def toggle_showtoolbar(button):
             self.showtoolbar = button.get_active()
             self._show_toolbar(self.showtoolbar)
+        def disable_maxdiff(menuitem):
+            if menuitem.get_active():
+                hglib._maxdiff = sys.maxint
+            else:
+                hglib._maxdiff = None
         if self.mqloaded:
             mq_item = [dict(text=_('Patch Queue'), name='mq', ascheck=True,
                 func=self.mq_clicked, check=self.setting_mqvis) ]
@@ -225,7 +231,9 @@ class GCommit(GStatus):
             dict(text=_('Refresh'), func=refresh, icon=gtk.STOCK_REFRESH),
             dict(text='----'),
             dict(name='always-show-output', text=_('Always Show Output'),
-                ascheck=True, func=toggle_showoutput, check=self.showoutput)
+                ascheck=True, func=toggle_showoutput, check=self.showoutput),
+            dict(name='ignore-max-diff', text=_('Ignore Max Diff Size'),
+                ascheck=True, func=disable_maxdiff, check=self.showoutput)
             ]),
         dict(text=_('_Operations'), subitems=[
             dict(text=_('_Commit'), func=self.commit_clicked,

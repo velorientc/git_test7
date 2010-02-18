@@ -92,7 +92,6 @@ class GStatus(gdialog.GWindow):
         self.preview_tab_name_label = None
         self.subrepos = []
         self.colorstyle = self.repo.ui.config('tortoisehg', 'diffcolorstyle')
-        self.ignoremaxdiff = False
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -1159,8 +1158,6 @@ class GStatus(gdialog.GWindow):
 
     def check_max_diff(self, pfile):
         lines = []
-        if self.ignoremaxdiff:
-            return lines
         ctx = self.repo[self._node1]
         try:
             fctx = ctx.filectx(pfile)
