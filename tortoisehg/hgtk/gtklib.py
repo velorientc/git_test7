@@ -616,10 +616,14 @@ class LayoutTable(gtk.VBox):
                     to False automatically.  Default: -1 (last element).
             xpad: Number. Override default 'xpad' value.
             ypad: Same as 'xpad'.
+            xhopt: Number. Combination of gtk.EXPAND, gtk.SHRINK or gtk.FILL.
+                   Note that this option is applied with only head element.
+                   Default: gtk.FILL.
+            yhopt: Same as 'xhopt' except default value. Default: 0.
             xopt: Number. Combination of gtk.EXPAND, gtk.SHRINK or gtk.FILL.
-                  Note that This option is applied only body elements, not
-                  header. Default: gtk.FILL|gtk.EXPAND.
-            yopt: Same as 'xopt' except Default: 0.
+                  Note that this option is applied with only body elements.
+                  Default: gtk.FILL|gtk.EXPAND.
+            yopt: Same as 'xopt' except default value. Default: 0.
             headopts: Dictionary. Override default 'headopts' value.
             bodyopts: Same as 'headopts'.
         """
@@ -630,6 +634,8 @@ class LayoutTable(gtk.VBox):
         t.set_property('n-rows', rows + 1)
         xpad = kargs.get('xpad', self.xpad)
         ypad = kargs.get('ypad', self.ypad)
+        xhopt = kargs.get('xhopt', gtk.FILL)
+        yhopt = kargs.get('yhopt', 0)
         xopt = kargs.get('xopt', gtk.FILL|gtk.EXPAND)
         yopt = kargs.get('yopt', 0)
         hopts = kargs.get('headopts', self.headopts)
@@ -677,7 +683,7 @@ class LayoutTable(gtk.VBox):
             first = getwidget(widgets[0], hopts)
             if isinstance(first, gtk.Label):
                 first.set_alignment(1, 0.5)
-            t.attach(first, 0, 1, rows, rows + 1, gtk.FILL, 0, xpad, ypad)
+            t.attach(first, 0, 1, rows, rows + 1, xhopt, yhopt, xpad, ypad)
             self.headers.append(first)
             rest = pack(*(widgets[1:]), **kargs)
             t.attach(rest, 1, 2, rows, rows + 1, xopt, yopt, xpad, ypad)
