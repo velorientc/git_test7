@@ -120,7 +120,7 @@ Frequently Asked Questions
 	1. The Mercurial configuration system, which is three-tiered
 		1. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
 		2. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
-		3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\.hg\hgrc`
+		3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\\.hg\\hgrc`
 	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
 	   (window positions, etc)
 
