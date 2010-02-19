@@ -1128,6 +1128,8 @@ class GCommit(GStatus):
         if self.qnew:
             cmdline[1] = 'qnew'
             cmdline.append('--force')
+            if not files:
+                cmdline += ['-X', self.repo.root]
         elif self.qheader is not None:
             cmdline[1] = 'qrefresh'
             if not files:
