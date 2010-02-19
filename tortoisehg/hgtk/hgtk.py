@@ -97,9 +97,12 @@ def portable_fork(ui, opts):
         args = [sys.executable] + sys.argv
     if os.name == 'nt':
         args = ['"%s"' % arg for arg in args]
+        mode = os.P_DETACH
+    else:
+        mode = os.P_NOWAIT
     env = os.environ.copy()
     env['THG_HGTK_SPAWN'] = '1'
-    os.spawnve(os.P_DETACH, sys.executable, args, env)
+    os.spawnve(mode, sys.executable, args, env)
     sys.exit(0)
 
 def get_list_from_file(filename):
