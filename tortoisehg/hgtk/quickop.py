@@ -175,9 +175,8 @@ class QuickOpDialog(gdialog.GDialog):
         if not len(fm):
             gdialog.Prompt(_('No appropriate files'),
                            _('No files found for this operation'), self).run()
-            gtklib.idle_add_single_call(self.destroy)
+            self.earlyout=True
             self.hide()
-            return
 
     def get_buttons(self):
         return [('go', LABELS[self.command][1], gtk.RESPONSE_OK),

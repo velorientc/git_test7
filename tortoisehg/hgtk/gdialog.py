@@ -704,6 +704,7 @@ class GDialog(gtk.Dialog):
         gtklib.set_tortoise_keys(self)
         self.set_resizable(resizable)
         self.set_has_separator(False)
+        self.earlyout = False
 
         self.ui = ui.ui()
         if norepo:
@@ -850,6 +851,9 @@ class GDialog(gtk.Dialog):
 
         # construct dialog body
         self.get_body(self.vbox)
+        if self.earlyout:
+            gtklib.idle_add_single_call(self.destroy)
+            return
 
         # focus on default button if needs
         name = self.get_default_button()
