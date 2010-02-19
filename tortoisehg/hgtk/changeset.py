@@ -915,10 +915,14 @@ class ChangeSet(gdialog.GWindow):
         result = gtklib.NativeSaveFileDialogWrapper(title=_("Save file to"),
                                                     initial=self.cwd,
                                                     filename=filename).run()
-        if result:
+        if not result:
+            return
+        try:
             q = Queue.Queue()
             hglib.hgcmd_toq(q, 'cat', '--rev',
                 str(self.currev), '--output', hglib.fromutf(result), self.curfile)
+        except (util.Abort, IOError), e:
+            gdialog.Prompt(_('Unable to save file'), str(e), self).run()
 
     def diff_to_local(self, menuitem):
         if not self.curfile:
