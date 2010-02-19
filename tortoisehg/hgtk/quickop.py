@@ -145,7 +145,7 @@ class QuickOpDialog(gdialog.GDialog):
                                  ignored='I' in filetypes,
                                  unknown='?' in filetypes)
         except IOError:
-            pass
+            status = [None] * 7
 
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         if 'M' in filetypes:
