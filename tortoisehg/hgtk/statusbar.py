@@ -38,8 +38,9 @@ class StatusBar(gtk.HBox):
 
     def begin(self, msg=_('Running...'), timeout=100):
         self.set_text(msg)
-        self.pbar.map()
         self.pbar.show_all()
+        if self.pbar.get_property('visible'):
+            self.pbar.map()
         self.timeout_id = gobject.timeout_add(timeout, self.pulse_timer)
 
     def end(self, msg=None, unmap=True):
@@ -75,8 +76,9 @@ class StatusBar(gtk.HBox):
         label.set_text(msg)
         if box.get_no_show_all():
             box.set_no_show_all(False)
-            box.map()
             box.show_all()
+            if box.get_property('visible'):
+                box.map()
 
     def set_idle_text(self, msg):
         self.idle_text = msg
