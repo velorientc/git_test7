@@ -1335,7 +1335,7 @@ class GStatus(gdialog.GWindow):
         buf.seek(0)
         try:
             try:
-                fp = open(result, "w")
+                fp = open(result, 'wb')
                 fp.write(buf.read())
             except OSError:
                 pass
