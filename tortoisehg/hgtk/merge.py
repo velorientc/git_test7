@@ -43,12 +43,12 @@ class MergeDialog(gdialog.GDialog):
         prevs = [ctx.rev() for ctx in self.repo.parents()]
         if len(prevs) > 1:
             rev0, rev1 = prevs
-        elif not rev1:
+        elif (not rev1 and rev1 != 0):
             gdialog.Prompt(_('Unable to merge'),
                            _('Must supply a target revision'), self).run()
             gtklib.idle_add_single_call(self.destroy)
             return
-        elif not rev0:
+        elif (not rev0 and rev0 != 0):
             rev0 = prevs[0]
         elif rev1 == prevs[0]:
             # selected pair was backwards
