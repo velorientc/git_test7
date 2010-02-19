@@ -292,12 +292,20 @@ class TagAddDialog(gtk.Dialog):
 
     def remove_hg_tag(self, name, message, local, user=None, date=None,
                     english=False):
-        if hglib.fromutf(name) not in self.repo.tags():
-            raise util.Abort(_("Tag '%s' does not exist") % name)
+        lname = hglib.fromutf(name)
+
+        tagtype = self.repo.tagtype(lname)
+        if not tagtype:
+            raise util.Abort(_('tag \'%s\' does not exist') % lname)
+        if local:
+            if tagtype != 'local':
+                raise util.Abort(_('tag \'%s\' is not a local tag') % lname)
+        else:
+            if tagtype != 'global':
+                raise util.Abort(_('tag \'%s\' is not a global tag') % lname)
 
         if not message:
             msgset = keep._('Removed tag %s')
             message = (english and msgset['id'] or msgset['str']) % name
         r = self.repo[-1].node()
-        lname = hglib.fromutf(name)
         self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)
