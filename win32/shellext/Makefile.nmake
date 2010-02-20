@@ -47,7 +47,7 @@ clean:
 
 THgShell.dll: $(OBJECTS_THGSGELL)
     create-parentid-h.cmd
-    rc shellext.rc
+    rc $(THG_EXTRA_RCFLAGS) shellext.rc
     link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
     mt -nologo -manifest $@.manifest -outputresource:"$@;#2"
 

@@ -1,7 +1,9 @@
 #include "windows.h"
-#include "thgversion.h"
 #include "parentid.h"
 
+#ifndef THG_VERSION_FIRST
+#include "thgversion.h"
+#endif
 
 #define TOSTR(x)  #x
 #define TOSTR2(x) TOSTR(x)
