@@ -86,7 +86,7 @@ class FilterBar(gtklib.SlimToolbar):
         self.branchcombo = gtk.combo_box_new_text()
         self.branchcombo.append_text(_('Branches...'))
         for name in branch_names:
-            self.branchcombo.append_text(hglib.toutf(name))
+            self.branchcombo.append_text(name)
         self.branchcombo.set_active(0)
         self.append_widget(self.branchcombo, padding=0)
 
@@ -273,10 +273,10 @@ class GLog(gdialog.GWindow):
         if len(lb) > 1 or (lb and lb[0] != 'default'):
             navi_b = []
             for name in lb[:10]:
-                bname = hglib.toutf(name)
-                navi_b.append(dict(text=bname, func=navigate, args=[name]))
-                filter_b.append(dict(text=bname, name='@' + bname,
-                         func=self.filter_handler, args=['branch', bname],
+                lname = hglib.fromutf(name)
+                navi_b.append(dict(text=name, func=navigate, args=[lname]))
+                filter_b.append(dict(text=name, name='@' + name,
+                         func=self.filter_handler, args=['branch', name],
                          asradio=True, rg='all'))
             if len(navi_b) > 0:
                 navi_menu.append(dict(text='----'))

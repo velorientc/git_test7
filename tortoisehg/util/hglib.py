@@ -95,6 +95,7 @@ def getmaxdiffsize(ui):
 
 _deadbranch = None
 def getdeadbranch(ui):
+    '''return a list of dead branch names in UTF-8'''
     global _deadbranch
     if _deadbranch is None:
         db = toutf(ui.config('tortoisehg', 'deadbranch', ''))
@@ -103,9 +104,10 @@ def getdeadbranch(ui):
     return _deadbranch
 
 def getlivebranch(repo):
+    '''return a list of live branch names in UTF-8'''
     lives = []
     deads = getdeadbranch(repo.ui)
-    for branch in repo.branchtags().keys():
+    for branch in repo.branchtags().keys(): # encoded in UTF-8
         if branch not in deads:
             lives.append(branch)
     return lives
