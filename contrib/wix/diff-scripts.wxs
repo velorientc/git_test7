@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Fragment>
+    <ComponentGroup Id='DiffScripts' >
+      <Component Id='diff_doc.js' Guid='CA3E8CB7-F19B-46F2-B289-5FB313CF05E9' Directory='DiffScriptsDir'>
+        <File Id='diff_doc.js' Name='diff-doc.js' DiskId='1' Source='..\contrib\diff-scripts\diff-doc.js'/>
+      </Component>
+      <Component Id='diff_nb.vbs' Guid='8A92B9C6-5C40-4954-83E8-9CDA7E1740F9' Directory='DiffScriptsDir' >
+        <File Id='diff_nb.vbs' Name='diff-nb.vbs' DiskId='1' Source='..\contrib\diff-scripts\diff-nb.vbs'/>
+      </Component>
+      <Component Id='diff_odt.vbs' Guid='CC666469-5892-413C-B167-4C94FA2F77C7' Directory='DiffScriptsDir' >
+        <File Id='diff_odt.vbs' Name='diff-odt.vbs' DiskId='1' Source='..\contrib\diff-scripts\diff-odt.vbs'/>
+      </Component>
+      <Component Id='diff_ppt.js' Guid='1E5BFDD0-4DCB-45A8-ACAA-64B7F5A7E564' Directory='DiffScriptsDir' >
+        <File Id='diff_ppt.js' Name='diff-ppt.js' DiskId='1' Source='..\contrib\diff-scripts\diff-ppt.js'/>
+      </Component>
+      <Component Id='diff_sxw.vbs' Guid='81745FB6-D498-40A9-AF4F-395696BB4433' Directory='DiffScriptsDir' >
+        <File Id='diff_sxw.vbs' Name='diff-sxw.vbs' DiskId='1' Source='..\contrib\diff-scripts\diff-sxw.vbs'/>
+      </Component>
+      <Component Id='diff_xls.vbs' Guid='62CB5EAB-ACB6-4513-8A45-028B906A0E57' Directory='DiffScriptsDir' >
+        <File Id='diff_xls.vbs' Name='diff-xls.vbs' DiskId='1' Source='..\contrib\diff-scripts\diff-xls.vbs'/>
+      </Component>
+      <Component Id='mergedoc.js' Guid='A6AAB6EB-6E58-454D-BB74-36F0A0017285' Directory='DiffScriptsDir' >
+        <File Id='mergedoc.js' Name='merge-doc.js' DiskId='1' Source='..\contrib\diff-scripts\merge-doc.js'/>
+      </Component>
+      <Component Id='mergeods.vbs' Guid='0822A38C-F713-4DC3-A748-EB5B04D91FE3' Directory='DiffScriptsDir' >
+        <File Id='mergeods.vbs' Name='merge-ods.vbs' DiskId='1' Source='..\contrib\diff-scripts\merge-ods.vbs'/>
+      </Component>
+      <Component Id='diffscriptREADME' Guid='C4B5E35C-415A-41A8-8E55-ACE1444DE747' Directory='DiffScriptsDir' >
+        <File Id='diffscriptREADME' Name='Readme.txt' DiskId='1' Source='..\contrib\diff-scripts\Readme.txt'/>
+      </Component>
+      <Component Id='diffscriptSOURCE' Guid='F99F210A-A930-4262-B5AE-B5922C264876' Directory='DiffScriptsDir' >
+        <File Id='diffscriptSOURCE' Name='SOURCE.txt' DiskId='1' Source='..\contrib\diff-scripts\SOURCE.txt'/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+      <Directory Id='DiffScriptsDir' Name='diff-scripts'/>
+    </DirectoryRef>
+  </Fragment>
+
+</Wix>
