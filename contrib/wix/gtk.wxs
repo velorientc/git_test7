@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup Id="gtkFolder">
+            <Component Id="cmp95D2A52C6791B08D1539C664A879F9EB" Directory="dirAF0908AE581708941042190E29921322" Guid="{F3E67856-93FE-4699-A19D-8A1517B8B546}">
+                <File Id="fil2C3257EA584CCADF09EEE3CDCB268553" KeyPath="yes" Source="$(var.SourceDir)\freetype6.dll" />
+            </Component>
+            <Component Id="cmp8E5F2B5577229A0DE4438C1222BD0B0E" Directory="dirAF0908AE581708941042190E29921322" Guid="{7B9A6516-3704-41C3-A8A6-5065EAF2131E}">
+                <File Id="filBDE460ADC33ABF39E06F60802FFBE208" KeyPath="yes" Source="$(var.SourceDir)\intl.dll" />
+            </Component>
+            <Component Id="cmpED451BE90BE7F606BFF3DD670ABBAF7A" Directory="dirAF0908AE581708941042190E29921322" Guid="{78F23B8A-7625-4504-98E8-314DCB35FC42}">
+                <File Id="filB288F37C7D2585322B125C35877C9D43" KeyPath="yes" Source="$(var.SourceDir)\libatk-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp57B404C5FE8059742C5B3D4CFFA4FF40" Directory="dirAF0908AE581708941042190E29921322" Guid="{BF561B25-81A2-4A58-B64C-354B61D42F1D}">
+                <File Id="filB4F5B4CD714EEF5AE70051355678EC92" KeyPath="yes" Source="$(var.SourceDir)\libcairo-2.dll" />
+            </Component>
+            <Component Id="cmpD1DB39699A6DCC41C2CCB5830717A525" Directory="dirAF0908AE581708941042190E29921322" Guid="{EE78B073-8603-415A-ADA6-664189A82DFA}">
+                <File Id="fil87B31DB73706553D526724958EF689AC" KeyPath="yes" Source="$(var.SourceDir)\libexpat-1.dll" />
+            </Component>
+            <Component Id="cmp92432AFB7030A35836C5EDE066002E44" Directory="dirAF0908AE581708941042190E29921322" Guid="{258C4A7F-1DB2-46FE-A049-B4D16841AA01}">
+                <File Id="fil861BE7DD998CC4355CACD4B678C678C9" KeyPath="yes" Source="$(var.SourceDir)\libfontconfig-1.dll" />
+            </Component>
+            <Component Id="cmp7AFA5D812FD2B8B2E0EA0BEDCE4127EE" Directory="dirAF0908AE581708941042190E29921322" Guid="{B4C87314-FFD7-4E97-862A-4D808B41BA06}">
+                <File Id="fil5B4F64835A747D31CEC168F362A55A9B" KeyPath="yes" Source="$(var.SourceDir)\libgailutil-18.dll" />
+            </Component>
+            <Component Id="cmpFF0B0F4F3D2BBBFC195D6D54F3B8F388" Directory="dirAF0908AE581708941042190E29921322" Guid="{E7A5BD3D-0D1A-41DE-8DED-8FC71EA3514D}">
+                <File Id="fil55C96943954E1991FDD7768614C375E9" KeyPath="yes" Source="$(var.SourceDir)\libgdk-win32-2.0-0.dll" />
+            </Component>
+            <Component Id="cmpC975AF38766770C71D4D151F2F17B0D6" Directory="dirAF0908AE581708941042190E29921322" Guid="{F8867FEA-FF7D-43F2-9064-A54EEC7302F0}">
+                <File Id="fil6F7F32D5AE4CADA898C2330EDD96ACE2" KeyPath="yes" Source="$(var.SourceDir)\libgdk_pixbuf-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp5174D79FB8C798D0C1583E24A036E691" Directory="dirAF0908AE581708941042190E29921322" Guid="{87B31404-E7C9-422E-8B35-3953C038B1D0}">
+                <File Id="fil5E72B2E2AEB8B19A34920F517B9C96D8" KeyPath="yes" Source="$(var.SourceDir)\libgio-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp4206D9F040247E2CAB5FC7C570D004D5" Directory="dirAF0908AE581708941042190E29921322" Guid="{26869A92-2B8B-4A13-9840-15E0DF060E75}">
+                <File Id="fil603DC3BF96D901B664196B032F423903" KeyPath="yes" Source="$(var.SourceDir)\libglib-2.0-0.dll" />
+            </Component>
+            <Component Id="cmpD9987611F2826D4DA187854FB40AD5A8" Directory="dirAF0908AE581708941042190E29921322" Guid="{D1940073-22F8-40A8-BF88-5AB27BAEEF48}">
+                <File Id="fil2D83D1EB033D716241C598053CD4F00B" KeyPath="yes" Source="$(var.SourceDir)\libgmodule-2.0-0.dll" />
+            </Component>
+            <Component Id="cmpA36BBFB174F7251BA1B6D12AE9CA21B0" Directory="dirAF0908AE581708941042190E29921322" Guid="{0BB578E1-6297-4780-9428-0FECB5DF8C16}">
+                <File Id="fil6EB169A499FF169C144A14C10235F313" KeyPath="yes" Source="$(var.SourceDir)\libgobject-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp6F52842EBF4AD1D9CE01ABD378F23D29" Directory="dirAF0908AE581708941042190E29921322" Guid="{3C6A9BFE-217C-4955-8C6B-055A49136D74}">
+                <File Id="filA7FA427475E2629188329DFB1E673127" KeyPath="yes" Source="$(var.SourceDir)\libgthread-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp5AECD7E312E8F8C021BE8B7EF267408A" Directory="dirAF0908AE581708941042190E29921322" Guid="{6D4A9889-EE4F-49B6-865B-66EDA4457EA7}">
+                <File Id="fil9567661A6C917C23A2BB230351658780" KeyPath="yes" Source="$(var.SourceDir)\libgtk-win32-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp61B800C461C37BA228F7DE63811D90E4" Directory="dirAF0908AE581708941042190E29921322" Guid="{99449E63-0E08-4ED9-8CDE-642DC85B00B2}">
+                <File Id="filAFA22EA98282599AFD290EF89AED0286" KeyPath="yes" Source="$(var.SourceDir)\libjpeg-7.dll" />
+            </Component>
+            <Component Id="cmpF0F28DD5B420336AA5CA175C130BB453" Directory="dirAF0908AE581708941042190E29921322" Guid="{91C8FA8F-3866-46AC-8465-88B0BDD6D118}">
+                <File Id="fil88D416CE6D4CD6BCC226031C98986309" KeyPath="yes" Source="$(var.SourceDir)\libpango-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp51AB483CC2908062DEA26A0E2E02AC87" Directory="dirAF0908AE581708941042190E29921322" Guid="{3D140B9F-2C7A-4477-8217-362A2BD39018}">
+                <File Id="filD66455811E27F1B7DD25D260D1316779" KeyPath="yes" Source="$(var.SourceDir)\libpangocairo-1.0-0.dll" />
+            </Component>
+            <Component Id="cmpE25C85DD53F3AD4458862E531D5B5709" Directory="dirAF0908AE581708941042190E29921322" Guid="{4D804C28-FB64-4718-8E35-726770E04A27}">
+                <File Id="filE9A19C5888B5A1BFB84D414890D2E7B3" KeyPath="yes" Source="$(var.SourceDir)\libpangoft2-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp70DDF310B49ACCD624A05B001E53D3C3" Directory="dirAF0908AE581708941042190E29921322" Guid="{735D4F40-3C28-4559-BC71-AEA41918B6C1}">
+                <File Id="fil6E26FABA972276B49D76554BB6D2DAE1" KeyPath="yes" Source="$(var.SourceDir)\libpangowin32-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp4DDEB3F35350CF90DB593C2C29173D75" Directory="dirAF0908AE581708941042190E29921322" Guid="{0D031781-28BC-40C7-97BA-7C5599956613}">
+                <File Id="filF28EB623C2C6E90D97AAD3A4E468E4C6" KeyPath="yes" Source="$(var.SourceDir)\libpng12-0.dll" />
+            </Component>
+            <Component Id="cmp475FEB3EBE19A79BE11A07FAE4C5F5BF" Directory="dirAF0908AE581708941042190E29921322" Guid="{3AE15C99-ACDF-448E-9B59-8303776E05B4}">
+                <File Id="filB0921A12FBDB9974A3FEE43D37A43EB1" KeyPath="yes" Source="$(var.SourceDir)\libtiff-3.dll" />
+            </Component>
+            <Component Id="cmpEF066ECC4C8893A4F12DEF3ADB8A708C" Directory="dirAF0908AE581708941042190E29921322" Guid="{194ECE64-5A0B-4C66-AF0B-8D1430EEBAE5}">
+                <File Id="fil5F27577BD8EB9A17F77C83CFB4E8224E" KeyPath="yes" Source="$(var.SourceDir)\libtiffxx-3.dll" />
+            </Component>
+            <Component Id="cmpF7A7D91D54A4E9FEA4B80B280BBD9C03" Directory="dirAF0908AE581708941042190E29921322" Guid="{C8CF3A77-26C5-47BA-926B-30C9FCBAA981}">
+                <File Id="filAE0AB5291D6D014AFC8AA53192D5EB28" KeyPath="yes" Source="$(var.SourceDir)\zlib1.dll" />
+            </Component>
+            <Component Id="cmp4D26698F50A2FA47840AD22C4F3429B2" Directory="dir08B568FC4A956995C805A5774295D769" Guid="{C12345B3-FE07-4F38-913A-4C83C3F8316F}">
+                <File Id="filF30CD986C9F4C8F88CF769E3A241E5D9" KeyPath="yes" Source="$(var.SourceDir)\etc\fonts\fonts.conf" />
+            </Component>
+            <Component Id="cmpE87D5B8E27D192F9696DF6274679CB41" Directory="dir08B568FC4A956995C805A5774295D769" Guid="{C8C700DF-26AC-48C6-8488-D1C0EB659B14}">
+                <File Id="fil9C0ADDFDC5A5DBE533969737B81A9DC3" KeyPath="yes" Source="$(var.SourceDir)\etc\fonts\fonts.dtd" />
+            </Component>
+            <Component Id="cmpEB152F5C7B54573A193AB11BF500C911" Directory="dirC3DDBC05EDA2E71549EB5115342F0DCB" Guid="{BF75EB61-A166-4532-BFA8-B056A0D7F34B}">
+                <File Id="fil55E4C0069ED163BDCC2981810D5212D0" KeyPath="yes" Source="$(var.SourceDir)\etc\gtk-2.0\gdk-pixbuf.loaders" />
+            </Component>
+            <Component Id="cmpC1D8BDB42DBA777667E9CFC575963321" Directory="dirC3DDBC05EDA2E71549EB5115342F0DCB" Guid="{FA8FBFF0-3FF1-4599-9C30-7C8F1339B5F2}">
+                <File Id="fil499963169B61EC8C0736125C4E1E08B5" KeyPath="yes" Source="$(var.SourceDir)\etc\gtk-2.0\gtk.immodules" />
+            </Component>
+            <Component Id="cmp172E301D72DBA7572EBD3569A887F611" Directory="dirC3DDBC05EDA2E71549EB5115342F0DCB" Guid="{2091E609-B6B9-4D44-A8E7-6E1A93E462E2}">
+                <File Id="filB94336556780A448CA3BF6818F910E8C" KeyPath="yes" Source="$(var.SourceDir)\etc\gtk-2.0\gtkrc" />
+            </Component>
+            <Component Id="cmp4BB13CEB08FA9BEF187E183A515678AA" Directory="dirC3DDBC05EDA2E71549EB5115342F0DCB" Guid="{188AE8BB-BDBC-47B4-8138-5E60BCE39ABC}">
+                <File Id="fil518B23C7967D34826E35078D8025FC95" KeyPath="yes" Source="$(var.SourceDir)\etc\gtk-2.0\im-multipress.conf" />
+            </Component>
+            <Component Id="cmpD0EE7B0DFAABA042FE13D664146D4C04" Directory="dir4D5A5E547BF08DCC7CB393AA77725DC6" Guid="{2BFCBF7E-ED8D-4F43-85A9-5C9D02A67B60}">
+                <File Id="filC1D4F420287200FF769A86B960451D51" KeyPath="yes" Source="$(var.SourceDir)\etc\pango\pango.modules" />
+            </Component>
+            <Component Id="cmp66383B67E5F363F4581639231AF9C9EE" Directory="dir42517383A8BD4EB3C74D968C82E9CE9D" Guid="{8777D983-6288-49B4-8CD7-E37C0FAA3370}">
+                <File Id="fil1024E98EB36BDF99876D892EA99A201D" KeyPath="yes" Source="$(var.SourceDir)\lib\gtk-2.0\2.10.0\engines\libpixmap.dll" />
+            </Component>
+            <Component Id="cmp80649D72F2D2D21267FE88B901C9B668" Directory="dir42517383A8BD4EB3C74D968C82E9CE9D" Guid="{A7AD3547-E096-441C-97EB-721AF31946A9}">
+                <File Id="filEA267BAEC64C7CE99C374B7539DF2943" KeyPath="yes" Source="$(var.SourceDir)\lib\gtk-2.0\2.10.0\engines\libwimp.dll" />
+            </Component>
+            <Component Id="cmpD603B38C5ED8B9D5DB01688853E16712" Directory="dir729871E6EC35A9DECE6FF7B32138252A" Guid="{D9D6F693-2FF6-4D96-B9A6-C9FF9F9924F4}">
+                <File Id="filF341CDBC5EC6E3666630CF8E47D37176" KeyPath="yes" Source="$(var.SourceDir)\lib\gtk-2.0\modules\libgail.dll" />
+            </Component>
+            <Component Id="cmp1B4CBEAA261389976111A0BCBE78B199" Directory="dirCB9CA3ADC39C1A3799455CA285716FDF" Guid="{A5E8DD52-4584-4113-AC0C-4176364E6517}">
+                <File Id="fil03784D6F2AA22A9072BA2E754A2674C0" KeyPath="yes" Source="$(var.SourceDir)\share\locale\cs\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmpC7FE6F414B8ACE484A14A37F9931D543" Directory="dirCB9CA3ADC39C1A3799455CA285716FDF" Guid="{F492ACEB-8C28-429B-A26E-613BF7050768}">
+                <File Id="fil03A4F1D63810BE0F0048137F51711329" KeyPath="yes" Source="$(var.SourceDir)\share\locale\cs\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp0CB4B52A6CDF6781CB86C3D309B8DA43" Directory="dir743A80CC8087F7E4581DFA3CF21EBFC7" Guid="{5149E901-DF2E-4B39-B6D2-E4834025DE5F}">
+                <File Id="filEB883805123097DC2266724A8BF7B0A7" KeyPath="yes" Source="$(var.SourceDir)\share\locale\da\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmpA817E1A3A732FF72AC7CCE3C841F0E7C" Directory="dir743A80CC8087F7E4581DFA3CF21EBFC7" Guid="{576D54E4-A5E1-4C69-BCB1-CF44030DD585}">
+                <File Id="filB9099FB5A239632706011C0CA01DAEEE" KeyPath="yes" Source="$(var.SourceDir)\share\locale\da\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp9362DCA2C332300CB6CFDF0B0214F65F" Directory="dirB63A63591CEE726E252D3F1EDF91810A" Guid="{2AA531E9-F338-4FAA-9119-F3DAFE578115}">
+                <File Id="fil130782B289E0071646A31E53B8B2C7F3" KeyPath="yes" Source="$(var.SourceDir)\share\locale\de\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmp32D793AD25980335BA4752C897EC0F29" Directory="dirB63A63591CEE726E252D3F1EDF91810A" Guid="{D8A6B3C7-6C9D-4C89-8547-4550B29F2ECE}">
+                <File Id="filF399CED2F45197DCCEDB6A9BF5F9408D" KeyPath="yes" Source="$(var.SourceDir)\share\locale\de\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp47129AF325A2A729C1B5BEA0E72675C4" Directory="dir60F321B03BAA25EB1AC97DFC28473C04" Guid="{1F2AE5FD-44F8-4899-94A5-BE7FB47B0313}">
+                <File Id="filDE8D24063D4E7D51A432873179A947F2" KeyPath="yes" Source="$(var.SourceDir)\share\locale\es\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmp63C0E5D0960DDC3922CE8AD6E305DF39" Directory="dir60F321B03BAA25EB1AC97DFC28473C04" Guid="{D35627A5-F06A-4FF4-9E19-5CE94237B911}">
+                <File Id="fil4E068BD8054DBBCBA0635ABB3074843F" KeyPath="yes" Source="$(var.SourceDir)\share\locale\es\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp76F2D9D636A27EDF00AAB91DC67EFFE5" Directory="dirBDB748E09E02E7AC798E147F33F0E7BE" Guid="{ABBD26B0-7AED-46D5-8ADC-F27DA0646EDF}">
+                <File Id="fil72A42EACB3A30D5D0B3C2EDEEB57076E" KeyPath="yes" Source="$(var.SourceDir)\share\locale\fr\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmpD7B722222FF8D26546A150C790C5CE6B" Directory="dirBDB748E09E02E7AC798E147F33F0E7BE" Guid="{D3298CF8-DEC1-4DFD-AA4D-9CB1C0073573}">
+                <File Id="filB1F5A5F8029AA9D2B24D16360C31A028" KeyPath="yes" Source="$(var.SourceDir)\share\locale\fr\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp58547333A6A40CC76B5C51CE40588639" Directory="dir04401B6AB98C9F13123FD08D7F30F36E" Guid="{C49B012C-6495-4D83-904B-86A4ED19D9CC}">
+                <File Id="fil9DA92600C28978257AAA1405C3622CC1" KeyPath="yes" Source="$(var.SourceDir)\share\locale\it\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmp10C04A09F467F156A1A557552ABCD408" Directory="dir04401B6AB98C9F13123FD08D7F30F36E" Guid="{4D544F0A-9692-496F-B99B-B8E30BE2F976}">
+                <File Id="fil3D705BA84B049EAF6BD021142992805C" KeyPath="yes" Source="$(var.SourceDir)\share\locale\it\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmpAC9E7D22BCA00B4A54C8D07C77D802C2" Directory="dirE39E9481DE545341F934ADEAEA8236C2" Guid="{583E721D-7830-4DD1-B1CC-10D809AFF3D4}">
+                <File Id="fil6046813C8E89FF39B446DF07264EB849" KeyPath="yes" Source="$(var.SourceDir)\share\locale\ja\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmp728A51089E50C91C23EACB2C3D3E6D50" Directory="dirE39E9481DE545341F934ADEAEA8236C2" Guid="{F5C13397-9B2C-4490-A743-C14A62E48AFE}">
+                <File Id="filA6C899BE7C3EA58A8C5E45C26C5EED17" KeyPath="yes" Source="$(var.SourceDir)\share\locale\ja\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp6DDCB2E4F510E3BE0031BAF8B268C38E" Directory="dir6D8A9C773A27D798E3E1FD11A23BF7F0" Guid="{84B064A8-BFE3-40B9-8E7D-8B9EA601ED96}">
+                <File Id="fil9FA6254DEAA23CCA57FC264C1BC27125" KeyPath="yes" Source="$(var.SourceDir)\share\locale\pt\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmpAB9CAEF6520E5667566F11003DCFBF58" Directory="dir6D8A9C773A27D798E3E1FD11A23BF7F0" Guid="{21A6A7F7-5634-4B1B-B8A5-32CFE891C359}">
+                <File Id="filD7777FCE14C3E36F22B00B9D6CE4993B" KeyPath="yes" Source="$(var.SourceDir)\share\locale\pt\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmpFF55AB480D5BF97AC3C131B437090B9A" Directory="dir1C32F7A1DD32A5237E1A27F82CBB6894" Guid="{2BF9BBAB-3158-49BD-BCE0-2945F508E309}">
+                <File Id="fil5BBC7739AF13AA57A5F4FB4AA770835C" KeyPath="yes" Source="$(var.SourceDir)\share\locale\pt_BR\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmpE0C082C9DFB74BCD872E2763C33E7C31" Directory="dir1C32F7A1DD32A5237E1A27F82CBB6894" Guid="{F9EE9787-965E-49EE-BB11-091AC13205FF}">
+                <File Id="fil14DB8DAE664F61640871108FC4A43815" KeyPath="yes" Source="$(var.SourceDir)\share\locale\pt_BR\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp7D1A433C302DB45833690B51EF7C624D" Directory="dir388E247500EF27E30C7B617BD6EE0ADB" Guid="{285F4BAA-BA10-49A5-B8A7-01100BBC7993}">
+                <File Id="filE1F48B3F2EDD81686B6B554D9F6E8735" KeyPath="yes" Source="$(var.SourceDir)\share\locale\ru\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmp6CACC6FB6669CBA383FA21AB4B99E20A" Directory="dir388E247500EF27E30C7B617BD6EE0ADB" Guid="{B8439611-DA5C-4128-8BBD-EA5D13DD0071}">
+                <File Id="fil2BFA3228A0D5BF1EAA7AD18EB7911398" KeyPath="yes" Source="$(var.SourceDir)\share\locale\ru\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmpB98EB5100A62F90D5F02FDF677002ABA" Directory="dir8FFD59F850DABB1B7159002FB38BE69F" Guid="{C7D335C7-58E1-4441-9EBF-A9CC3CC5A548}">
+                <File Id="fil6B6DFC935D682DBA1437791E0D71EAB2" KeyPath="yes" Source="$(var.SourceDir)\share\locale\uk\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmp49F9F2F739F3FE2FEF3C0B402E9A302C" Directory="dir8FFD59F850DABB1B7159002FB38BE69F" Guid="{3FF63D81-8248-449C-A40F-89B5983449C5}">
+                <File Id="filBAEEA0AAE98B16B61AAF30353E3DABED" KeyPath="yes" Source="$(var.SourceDir)\share\locale\uk\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmpC15676E20135396E2532AFF4F62FF7BB" Directory="dir4119D9FADAC6B5272C69CF40EB9D01F6" Guid="{02184105-276B-43F1-9755-F6840EB7AF15}">
+                <File Id="fil9E4192DB33D7FC6E4EA95F12B38BF0B8" KeyPath="yes" Source="$(var.SourceDir)\share\locale\zh_CN\LC_MESSAGES\glib20.mo" />
+            </Component>
+            <Component Id="cmpF0AFDF77586A3AE3F3116D82C1C205E9" Directory="dir4119D9FADAC6B5272C69CF40EB9D01F6" Guid="{C860A0D8-79BE-4817-BDB0-96019D7F3CD1}">
+                <File Id="fil3AB7015AAA66322D13A4354B35366AA1" KeyPath="yes" Source="$(var.SourceDir)\share\locale\zh_CN\LC_MESSAGES\gtk20.mo" />
+            </Component>
+            <Component Id="cmp7157158F2A1BA68F820FA7C165142D7B" Directory="dir57E4A149B0C3367D6851B00D16299B5E" Guid="{05F4EFA3-0A59-4487-A53C-FC121DABA898}">
+                <File Id="fil6B3E2F652C7025EC63B490B5A50BCE1F" KeyPath="yes" Source="$(var.SourceDir)\share\themes\MS-Windows\gtk-2.0\gtkrc" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="INSTALLDIR">
+            <Directory Id="dirAF0908AE581708941042190E29921322" Name="gtk" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir743A80CC8087F7E4581DFA3CF21EBFC7" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir04401B6AB98C9F13123FD08D7F30F36E" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC3DDBC05EDA2E71549EB5115342F0DCB" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirCB9CA3ADC39C1A3799455CA285716FDF" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirB63A63591CEE726E252D3F1EDF91810A" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir60F321B03BAA25EB1AC97DFC28473C04" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir8FFD59F850DABB1B7159002FB38BE69F" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC3DDBC05EDA2E71549EB5115342F0DCB" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir08B568FC4A956995C805A5774295D769" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir04401B6AB98C9F13123FD08D7F30F36E" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir60F321B03BAA25EB1AC97DFC28473C04" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir42517383A8BD4EB3C74D968C82E9CE9D" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir388E247500EF27E30C7B617BD6EE0ADB" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir6D8A9C773A27D798E3E1FD11A23BF7F0" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir57E4A149B0C3367D6851B00D16299B5E" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirE39E9481DE545341F934ADEAEA8236C2" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBDB748E09E02E7AC798E147F33F0E7BE" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir388E247500EF27E30C7B617BD6EE0ADB" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir42517383A8BD4EB3C74D968C82E9CE9D" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirB63A63591CEE726E252D3F1EDF91810A" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir743A80CC8087F7E4581DFA3CF21EBFC7" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir6D8A9C773A27D798E3E1FD11A23BF7F0" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirE39E9481DE545341F934ADEAEA8236C2" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir8FFD59F850DABB1B7159002FB38BE69F" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir4119D9FADAC6B5272C69CF40EB9D01F6" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC3DDBC05EDA2E71549EB5115342F0DCB" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirCB9CA3ADC39C1A3799455CA285716FDF" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir4D5A5E547BF08DCC7CB393AA77725DC6" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir729871E6EC35A9DECE6FF7B32138252A" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBDB748E09E02E7AC798E147F33F0E7BE" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir1C32F7A1DD32A5237E1A27F82CBB6894" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir08B568FC4A956995C805A5774295D769" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC3DDBC05EDA2E71549EB5115342F0DCB" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir4119D9FADAC6B5272C69CF40EB9D01F6" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir1C32F7A1DD32A5237E1A27F82CBB6894" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC6B92A7004E478344FDFEDB97CB4AC38">
+            <Directory Id="dir04401B6AB98C9F13123FD08D7F30F36E" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3F37261C6145CCE3B0140036938A9BEF">
+            <Directory Id="dir08B568FC4A956995C805A5774295D769" Name="fonts" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dir11D44FC7020DDB8C6DDA0C0D5B6D0B50" Name="pt_BR" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir896CCA973CFFED5DB6BECEEC2F6245F5">
+            <Directory Id="dir16BC26468C9A6C4037ECF72F245C63FD" Name="locale" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir11D44FC7020DDB8C6DDA0C0D5B6D0B50">
+            <Directory Id="dir1C32F7A1DD32A5237E1A27F82CBB6894" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC7A73CA20977699C59CE6B304FF9A464">
+            <Directory Id="dir388E247500EF27E30C7B617BD6EE0ADB" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322">
+            <Directory Id="dir3F37261C6145CCE3B0140036938A9BEF" Name="etc" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirE1F37683FCF2DF5276BC10DFDA02E5A3">
+            <Directory Id="dir4119D9FADAC6B5272C69CF40EB9D01F6" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir4C21EC80AE51F4F29585D27E49EA4389">
+            <Directory Id="dir42517383A8BD4EB3C74D968C82E9CE9D" Name="engines" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dir46A46D30DDE1C62A860CBF6B6E7AB34E" Name="da" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir6909C65FBEFC22521E1D952B78E0F8C9">
+            <Directory Id="dir4C21EC80AE51F4F29585D27E49EA4389" Name="2.10.0" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3F37261C6145CCE3B0140036938A9BEF">
+            <Directory Id="dir4D5A5E547BF08DCC7CB393AA77725DC6" Name="pango" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dir57A39B0E0D98B392C924E8F23B7D4435" Name="uk" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir84F6A2A60E465DFCEAB2EB06E7B1319A">
+            <Directory Id="dir57E4A149B0C3367D6851B00D16299B5E" Name="gtk-2.0" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dir5A5D9ABAF6EA7022AF1090424C07EEB7" Name="fr" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirEC315B8296EEA8588D564DE67AC28CC5">
+            <Directory Id="dir60F321B03BAA25EB1AC97DFC28473C04" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dir62A1329E174B43FAAAF2AF3ED45E2284" Name="de" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir71718B77881F9C33B4C9717D08FECF16">
+            <Directory Id="dir6909C65FBEFC22521E1D952B78E0F8C9" Name="gtk-2.0" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirB2B249F6162E091F80E90B752832C994">
+            <Directory Id="dir6D8A9C773A27D798E3E1FD11A23BF7F0" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322">
+            <Directory Id="dir71718B77881F9C33B4C9717D08FECF16" Name="lib" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir6909C65FBEFC22521E1D952B78E0F8C9">
+            <Directory Id="dir729871E6EC35A9DECE6FF7B32138252A" Name="modules" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir46A46D30DDE1C62A860CBF6B6E7AB34E">
+            <Directory Id="dir743A80CC8087F7E4581DFA3CF21EBFC7" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir9F9DF81E59286FE92745A6E506EA03C3">
+            <Directory Id="dir84F6A2A60E465DFCEAB2EB06E7B1319A" Name="MS-Windows" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirAF0908AE581708941042190E29921322">
+            <Directory Id="dir896CCA973CFFED5DB6BECEEC2F6245F5" Name="share" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir57A39B0E0D98B392C924E8F23B7D4435">
+            <Directory Id="dir8FFD59F850DABB1B7159002FB38BE69F" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir896CCA973CFFED5DB6BECEEC2F6245F5">
+            <Directory Id="dir9F9DF81E59286FE92745A6E506EA03C3" Name="themes" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dirB2B249F6162E091F80E90B752832C994" Name="pt" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir62A1329E174B43FAAAF2AF3ED45E2284">
+            <Directory Id="dirB63A63591CEE726E252D3F1EDF91810A" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dirB65242C383E220F4BA9D81D10C4AC44E" Name="ja" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dirB72C0BC24190C41EEDDF6E68D8BB2A62" Name="cs" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir5A5D9ABAF6EA7022AF1090424C07EEB7">
+            <Directory Id="dirBDB748E09E02E7AC798E147F33F0E7BE" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3F37261C6145CCE3B0140036938A9BEF">
+            <Directory Id="dirC3DDBC05EDA2E71549EB5115342F0DCB" Name="gtk-2.0" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dirC6B92A7004E478344FDFEDB97CB4AC38" Name="it" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dirC7A73CA20977699C59CE6B304FF9A464" Name="ru" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirB72C0BC24190C41EEDDF6E68D8BB2A62">
+            <Directory Id="dirCB9CA3ADC39C1A3799455CA285716FDF" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dirE1F37683FCF2DF5276BC10DFDA02E5A3" Name="zh_CN" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirB65242C383E220F4BA9D81D10C4AC44E">
+            <Directory Id="dirE39E9481DE545341F934ADEAEA8236C2" Name="LC_MESSAGES" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir16BC26468C9A6C4037ECF72F245C63FD">
+            <Directory Id="dirEC315B8296EEA8588D564DE67AC28CC5" Name="es" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

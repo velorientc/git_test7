@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup Id="thgI18nFolder">
+            <Component Id="cmpC14597F5868E1660A6411D5D0B5D3A1A" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{8704556B-370C-4466-AC66-C9B8E9ABBA8A}">
+                <File Id="fil92F97F9EFFCAF3BA3E5B7F284F455521" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\ca.po" />
+            </Component>
+            <Component Id="cmp8EC0FF10BB1E4833D8AF8BDCA155BDC9" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{6F937488-F2D4-454B-A74B-AEB46093C7D5}">
+                <File Id="fil6813A3DE23622E4245D0112CE3502ED4" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\cs.po" />
+            </Component>
+            <Component Id="cmp5BA96AD7B452B2B85396FF772EC53F57" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{0D8BD609-ACE8-4F80-9C3F-F4786134321E}">
+                <File Id="filB3AA4D33C9A746660AA4045F3FD1B57E" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\da.po" />
+            </Component>
+            <Component Id="cmp00740C2E49473A43CDC64235B3B4F68B" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{6C8DC8C6-BE21-4E7F-B04A-4B3A3B5DE717}">
+                <File Id="filD398F353E7537C7CFFEBF8A4091E0029" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\de.po" />
+            </Component>
+            <Component Id="cmpF0C36E1823D5E27E0CA6891431DB01B5" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{00B2474C-EDFE-42D9-B615-01F9A2763BA6}">
+                <File Id="fil49097354ABD9F13A109E6660BF3FC604" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\en_GB.po" />
+            </Component>
+            <Component Id="cmp032B96BCECDDDA2CFEF42C84B968B3B0" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{3836C2F2-2F49-4E7C-9BD8-DC4E2C0A25F7}">
+                <File Id="fil425D6A523C3FDAD39C70638608C1C5E9" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\es.po" />
+            </Component>
+            <Component Id="cmp024AFC118F4726F59D860DD1931484DD" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{5F6FD344-EB67-4D14-B2F2-1BA4622157BE}">
+                <File Id="fil854CB0D538D1B7DCFF4E7B3CC9F1A6B9" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\fa.po" />
+            </Component>
+            <Component Id="cmp5490D3651BB839BFAE35465217D4F9B9" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{F92E2353-8A87-4AAD-8598-4DF0B78FCCAE}">
+                <File Id="filB9248C202F08C07ED22676FC7AE1EAB1" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\fr.po" />
+            </Component>
+            <Component Id="cmp72E864088CE347F1DBBB6186600674DA" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{B624AE73-C570-4067-9FF2-7E1310C628D7}">
+                <File Id="filA51B70FEAD944966CB77AC597E61F8DA" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\he.po" />
+            </Component>
+            <Component Id="cmp2A7BDB33745A5605A68F04B36B8D8BD0" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{FB326D4A-2DF8-4D57-8BA6-46814ADBAC38}">
+                <File Id="fil4583BC3FA99AF8A805321D2060D01BDF" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\hr.po" />
+            </Component>
+            <Component Id="cmpC21EA0E4E9BB49DFF157C0189BB7BD1F" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{414549F6-DF14-4DC2-9535-5E46404EC9FD}">
+                <File Id="fil4BB829836719EACBEDB1DE8B1850D869" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\it.po" />
+            </Component>
+            <Component Id="cmp2D566433B3069781EEA3F4A6B54B3D86" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{A8325BD4-510B-4517-AEA5-FACD3E9298B3}">
+                <File Id="fil5D932D9118CA65FFDDED5E538388DE50" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\ja.po" />
+            </Component>
+            <Component Id="cmpE3FDDD0395C855FD0B702D2FE7E10DC2" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{18FFED53-D4DD-49CD-9B47-D7002C562BF2}">
+                <File Id="fil4C7054E14A770F42FF188A6173EC16C0" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\ko.po" />
+            </Component>
+            <Component Id="cmp5A68824415488775CFE11D0196000F09" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{B9FF32D5-BECD-4696-9A82-BB8CBC445129}">
+                <File Id="fil4EC53B9AD7572E3F158836D8424F371B" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\nl.po" />
+            </Component>
+            <Component Id="cmp4DAA607720E6610E1E288A077F7B4497" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{69F93EA2-6784-4970-9A50-665640450BFF}">
+                <File Id="fil90235BA8EAC32E8580B76EAA3E7D8B4A" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\nn.po" />
+            </Component>
+            <Component Id="cmpC2BBFFD765E9456F4785DAE6F3B17E1F" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{4562B8BF-DE2D-4A5F-A6B4-750EFC34A7DC}">
+                <File Id="filD75A3BD8FE993434B1D53C0773AB09D5" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\pl.po" />
+            </Component>
+            <Component Id="cmp79C9421C7670222BCAF218AE2113697D" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{FF6C5A4D-9EA6-4EFF-8C7B-2056A5D9009F}">
+                <File Id="filE05B5A44676495E7B402179F1F739C97" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\pt.po" />
+            </Component>
+            <Component Id="cmp4BBD89111B5366FF4B4A8073A7BD3CB9" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{2F0993D2-5506-4740-902E-86E3F7301178}">
+                <File Id="filB9D6DC3C0612779A153CF3EAEE76A280" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\pt_BR.po" />
+            </Component>
+            <Component Id="cmp8D372AF02B5959DAD7B9AE5B80414C87" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{11D6A70C-5B58-4159-87AF-F6495872BAD5}">
+                <File Id="filEFC3947F7FAC622673CA4377613F0A30" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\ru.po" />
+            </Component>
+            <Component Id="cmp2F04FCA0C22FFA8267E1702EB2EB2C3D" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{F53CBE07-6948-4689-B10A-7FEDD4D8B358}">
+                <File Id="filF228EF54437EB53A9104F74A214B0212" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\tr.po" />
+            </Component>
+            <Component Id="cmp201536D0CCCCC771E5C48507D55507F6" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{2EDE0BE4-770C-4B3B-9042-2ABA012B9D1E}">
+                <File Id="fil16BAA9657D1D89C400479761D97E5C96" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\uk.po" />
+            </Component>
+            <Component Id="cmp31D2A99DB09B111C4E996BA034426ADA" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{902C9302-FC3C-41B6-88DB-3D26E1ABB5F3}">
+                <File Id="fil69F761B5FFA731635DECB45DCC7D99AA" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\zh_CN.po" />
+            </Component>
+            <Component Id="cmp40E012307AACB56E75E97510E12A7AA2" Directory="dir65AF64928515EA6B7BB2B3F096AAEC7A" Guid="{F0F2E096-DAD1-4F13-B448-D32042FEF2BB}">
+                <File Id="fil5930D7160200A9B32BFBE8DB53D28618" KeyPath="yes" Source="$(var.SourceDir)\tortoisehg\zh_TW.po" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirE238460D44340499CA44F8E5739FEA52">
+            <Directory Id="dir65AF64928515EA6B7BB2B3F096AAEC7A" Name="tortoisehg" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

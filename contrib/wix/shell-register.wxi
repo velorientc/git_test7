@@ -1,0 +1,45 @@
+<Include>
+  <!-- cmenu COM component -->
+  <RegistryValue Root='HKCR' Key='CLSID\{46605027-5B8C-4DCE-BFE0-051B7972D64C}' Type='string' Value='TortoiseHg' />
+  <RegistryValue Root='HKCR' Key='CLSID\{46605027-5B8C-4DCE-BFE0-051B7972D64C}\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <!-- Normal overlay COM component -->
+  <RegistryValue Root='HKCR' Key='CLSID\{869C8877-2C3C-438D-844B-31B86BFE5E8A}' Type='string' Value='TortoiseHg' />
+  <RegistryValue Root='HKCR' Key='CLSID\{869C8877-2C3C-438D-844B-31B86BFE5E8A}\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <!-- Added overlay COM component -->
+  <RegistryValue Root='HKCR' Key='CLSID\{AF42ADAB-8C2E-4285-B746-99B31094708E}' Type='string' Value='TortoiseHg' />
+  <RegistryValue Root='HKCR' Key='CLSID\{AF42ADAB-8C2E-4285-B746-99B31094708E}\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <!-- Modified overlay COM component -->
+  <RegistryValue Root='HKCR' Key='CLSID\{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}' Type='string' Value='TortoiseHg' />
+  <RegistryValue Root='HKCR' Key='CLSID\{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <!-- Unversioned overlay COM component -->
+  <RegistryValue Root='HKCR' Key='CLSID\{9E3D4EC9-0624-4393-8B48-204C217ED1FF}' Type='string' Value='TortoiseHg' />
+  <RegistryValue Root='HKCR' Key='CLSID\{9E3D4EC9-0624-4393-8B48-204C217ED1FF}\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+
+  <!-- cmenu registration -->
+  <RegistryValue Root='HKCR' Key='Directory\shellex\ContextMenuHandlers\TortoiseHgCMenu'            Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+  <RegistryValue Root='HKCR' Key='Directory\Background\shellex\ContextMenuHandlers\TortoiseHgCMenu' Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+  <RegistryValue Root='HKCR' Key='Drive\shellex\ContextMenuHandlers\TortoiseHgCMenu'                Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+  <RegistryValue Root='HKCR' Key='Folder\shellex\ContextMenuHandlers\TortoiseHgCMenu'               Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+  <RegistryValue Root='HKCR' Key='InternetShortcut\shellex\ContextMenuHandlers\TortoiseHgCMenu'     Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+  <RegistryValue Root='HKCR' Key='LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu'      Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+  <RegistryValue Root='HKCR' Key='LibraryFolder\shellex\ContextMenuHandlers\TortoiseHgCMenu'        Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+  <RegistryValue Root='HKCR' Key='*\shellex\ContextMenuHandlers\TortoiseHgCMenu'                    Type='string' Value='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' />
+
+  <!-- register overlay components with TortoiseOverlays -->
+  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Normal'      Type='string' Name='TortoiseHgMsi' Value='{869C8877-2C3C-438D-844B-31B86BFE5E8A}' />
+  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Added'       Type='string' Name='TortoiseHgMsi' Value='{AF42ADAB-8C2E-4285-B746-99B31094708E}' />
+  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Modified'    Type='string' Name='TortoiseHgMsi' Value='{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}' />
+  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Unversioned' Type='string' Name='TortoiseHgMsi' Value='{9E3D4EC9-0624-4393-8B48-204C217ED1FF}' />
+
+  <!-- Mark all as approved -->
+  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
+                 Name='{46605027-5B8C-4DCE-BFE0-051B7972D64C}' Value='TortoiseHg' />
+  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
+                 Name='{869C8877-2C3C-438D-844B-31B86BFE5E8A}' Value='TortoiseHg' />
+  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
+                 Name='{AF42ADAB-8C2E-4285-B746-99B31094708E}' Value='TortoiseHg' />
+  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
+                 Name='{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}' Value='TortoiseHg' />
+  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
+                 Name='{9E3D4EC9-0624-4393-8B48-204C217ED1FF}' Value='TortoiseHg' />
+</Include>
