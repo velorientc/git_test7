@@ -2,8 +2,20 @@
 #include "parentid.h"
 
 #ifndef THG_VERSION_FIRST
-#include "thgversion.h"
+/* dummy version for shellext development */
+#define THG_VERSION_FIRST   0
+#define THG_VERSION_SECOND  0
+#define THG_VERSION_THIRD   55555
 #endif
+
+#ifndef THG_VERSION_SECOND
+#define THG_VERSION_SECOND  0
+#endif
+
+#ifndef THG_VERSION_THIRD
+#define THG_VERSION_THIRD   0
+#endif
+
 
 #define TOSTR(x)  #x
 #define TOSTR2(x) TOSTR(x)
