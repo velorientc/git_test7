@@ -369,7 +369,7 @@ the :command:`hg import` command.
 Message Parsing
 ---------------
 
-New in TortoiseHg 0.10, the repository browser will detect and underline
+New in TortoiseHg 1.0, the repository browser will detect and underline
 changeset hashes, HTTP(s) URLs, and bug report identifiers inside
 changeset messages.  These underlined phrases are clickable links.
 
