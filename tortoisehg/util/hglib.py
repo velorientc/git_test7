@@ -109,7 +109,7 @@ def getlivebranch(repo):
     deads = getdeadbranch(repo.ui)
     for branch in repo.branchtags().keys(): # encoded in UTF-8
         if branch not in deads:
-            lives.append(branch)
+            lives.append(branch.replace('\0', ''))
     return lives
 
 _hidetags = None
