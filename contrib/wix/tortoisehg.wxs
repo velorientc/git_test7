@@ -14,11 +14,6 @@
     <?define IsX64 = no ?>
   <?endif?>
 
-  <?ifndef ProductId ?>
-    <?define ProductId=* ?>
-    <?warning ProductId was not defined. Using $(var.ProductId) ?>
-  <?endif?>
-
   <Product Name='TortoiseHg $(var.Version)' Id='$(var.ProductId)' UpgradeCode='$(var.ProductUpgradeCode)'
            Language='1033' Codepage='1252' Version='$(var.Version)' Manufacturer='Steve Borho and others.'>
 
