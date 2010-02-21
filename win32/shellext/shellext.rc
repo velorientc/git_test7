@@ -49,12 +49,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "TortoiseHg Shell Extension"
             VALUE "CompanyName", "TortoiseHg Project"
-            VALUE "FileDescription", "TortoiseHg Shell Extension Dynamic Link Library"
+            VALUE "FileDescription", "TortoiseHg Shell Extension"
             VALUE "FileVersion", THG_VERSION_STRING
             VALUE "InternalName", "shellext"
-            VALUE "LegalCopyright", "Copyright (C) 2010"
+            VALUE "LegalCopyright", "Copyright (C) 2010 Steve Borho and others"
             VALUE "OriginalFilename", "ThgShell.dll"
-            VALUE "ProductName", "TortoiseHg Shell Extension Dynamic Link Library"
+            VALUE "ProductName", "TortoiseHg"
             VALUE "ProductVersion", THG_VERSION_STRING
         END
     END
