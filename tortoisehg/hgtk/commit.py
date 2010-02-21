@@ -638,18 +638,19 @@ class GCommit(GStatus):
         else:
             plus, minus = _('_Commit (+1 head)'), _('_Commit (-1 head)')
             ctxs, isheads, ismerge = self.get_head_info()
-            if not ismerge:
-                if not isheads[0]:
-                    label = plus
-                    tooltip = _('parent is not a head, '
-                                'commit to add a new head')
-            else:
-                if isheads[0] and isheads[1]:
+            if ismerge:
+                b1, b2 = [c.branch() for c in ctxs]
+                if isheads[0] and isheads[1] and b1 == b2:
                     label = minus
                     tooltip = _('commit to merge one head')
                 elif not isheads[0] and not isheads[1]:
                     label = plus
-                    tooltip = _('no parent is a head, '
+                    tooltip = _('neither parent is a head, '
+                                'commit to add a new head')
+            else:
+                if not isheads[0]:
+                    label = plus
+                    tooltip = _('parent is not a head, '
                                 'commit to add a new head')
 
         btn = self.get_toolbutton('commit')
