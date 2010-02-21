@@ -721,11 +721,11 @@ class MQWidget(gtk.VBox):
 
         stat = row[MQ_STATUS]
         if stat == 'A':
-            cell.set_property('foreground', 'blue')
+            cell.set_property('foreground', gtklib.BLUE)
         elif stat == 'U':
-            cell.set_property('foreground', '#909090')
+            cell.set_property('foreground', gtklib.GREY)
         else:
-            cell.set_property('foreground', 'black')
+            cell.set_property('foreground', gtklib.NORMAL)
 
         patchname = row[MQ_NAME]
         if self.is_qtip(patchname):

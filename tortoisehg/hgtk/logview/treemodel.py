@@ -179,7 +179,7 @@ class TreeModel(gtk.GenericTreeModel):
             if parent is None:
                 parent = ctx.parents()[0].node()
             M, A, R = self.repo.status(parent, ctx.node())[:3]
-            common = dict(color='black')
+            common = dict(color=gtklib.BLACK)
             M = M and gtklib.markup(' %s ' % len(M),
                              background=gtklib.PORANGE, **common) or ''
             A = A and gtklib.markup(' %s ' % len(A),
@@ -217,13 +217,13 @@ class TreeModel(gtk.GenericTreeModel):
                         bg = gtklib.PORANGE
                     elif tag in self.mqpatches:
                         bg = gtklib.PBLUE
-                    style = {'color': 'black', 'background': bg}
+                    style = {'color': gtklib.BLACK, 'background': bg}
                     tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
             branch = ctx.branch()
             bstr = ''
             if self.branchtags.get(branch) == node:
-                bstr += gtklib.markup(' %s ' % branch, color='black',
+                bstr += gtklib.markup(' %s ' % branch, color=gtklib.BLACK,
                                       background=gtklib.PGREEN) + ' '
 
             if revid in self.wcparents:
@@ -295,7 +295,7 @@ class TreeModel(gtk.GenericTreeModel):
                 self.color_func = self.text_color_author
 
     def text_color_default(self, rev, author):
-        return int(rev) >= self.origtip and 'darkgreen' or 'black'
+        return int(rev) >= self.origtip and gtklib.NEW_REV_COLOR or gtklib.NORMAL
 
     colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
      slateblue red2 navy dimgrey'''.split()
@@ -303,7 +303,7 @@ class TreeModel(gtk.GenericTreeModel):
 
     def text_color_author(self, rev, author):
         if int(rev) >= self.origtip:
-            return 'darkgreen'
+            return gtklib.NEW_REV_COLOR
         for re, v in self.author_pats:
             if (re.search(author)):
                 return v
