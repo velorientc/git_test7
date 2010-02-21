@@ -46,7 +46,7 @@ Visual Diffs
 
 	Visual Diff Window
 
-In TortoiseHg 0.10, the visual (external) diff infrastructure was
+In TortoiseHg 1.0, the visual (external) diff infrastructure was
 refactored.  The new system uses tool descriptions in
 :file:`mergetools.ini` to detect most common diff tools on your computer
 (including KDiff3, which ships in our installer) and select the best

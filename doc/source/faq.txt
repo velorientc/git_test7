@@ -102,7 +102,7 @@ Frequently Asked Questions
 
 *How can I use tool X as my visual diff tool?*
 
-	Since version 0.10, TortoiseHg should autodetect most popular visual
+	Since version 1.0, TortoiseHg should autodetect most popular visual
 	diff tools and make them available for selection from the
 	:guilabel:`Visual Diff Tool` item in the settings tool.
 
