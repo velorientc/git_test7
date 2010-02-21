@@ -1750,17 +1750,22 @@ class GLog(gdialog.GWindow):
 
         self.bfile = bfile
         oldtip = len(self.repo)
-        self.repo = hg.repository(self.ui, path=bfile)
-        self.graphview.set_repo(self.repo, self.stbar)
-        self.changeview.set_repo(self.repo)
-        self.changeview.bfile = bfile
-        if hasattr(self, 'mqwidget'):
-            self.mqwidget.set_repo(self.repo)
-        self.npreviews = len(self.repo) - oldtip
-        self.reload_log(**kwopts)
+        try:
+            self.repo = hg.repository(self.ui, path=bfile)
+            self.graphview.set_repo(self.repo, self.stbar)
+            self.changeview.set_repo(self.repo)
+            self.changeview.bfile = bfile
+            if hasattr(self, 'mqwidget'):
+                self.mqwidget.set_repo(self.repo)
+            self.npreviews = len(self.repo) - oldtip
+            self.reload_log(**kwopts)
 
-        self.stbar.set_idle_text(_('Bundle Preview'))
-        self.bundle_autoreject = False
+            self.stbar.set_idle_text(_('Bundle Preview'))
+            self.bundle_autoreject = False
+        except error.Abort:
+            self.remove_overlay(False)
+            gtklib.idle_add_single_call(self.stbar.set_idle_text,
+                   _('Failed to preview, not a Mercurial bundle file'))
 
     def add_bundle_clicked(self, button):
         result = gtklib.NativeSaveFileDialogWrapper(
