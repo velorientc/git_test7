@@ -300,7 +300,8 @@ class SummaryInfo(object):
                 else:
                     return None
             elif item == 'ishead':
-                return len(ctx.children()) == 0
+                childbranches = [cctx.branch() for cctx in ctx.children()]
+                return ctx.branch() not in childbranches
             raise UnknownItem(item)
         if custom.has_key('data') and not kargs.get('usepreset', False):
             try:

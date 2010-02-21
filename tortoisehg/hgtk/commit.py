@@ -658,11 +658,8 @@ class GCommit(GStatus):
 
     def get_head_info(self):
         def ishead(ctx):
-            for cctx in ctx.children():
-                if cctx.branch() == ctx.branch():
-                    return False
-            else:
-                return True
+            childbranches = [cctx.branch() for cctx in ctx.children()]
+            return ctx.branch() not in childbranches
         if self.mqmode:
             ctxs = self.repo['.'].parents()
         else:
