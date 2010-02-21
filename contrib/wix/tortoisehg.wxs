@@ -14,7 +14,12 @@
     <?define IsX64 = no ?>
   <?endif?>
 
-  <Product Name='TortoiseHg $(var.Version)' Id='*' UpgradeCode='$(var.ProductUpgradeCode)'
+  <?ifndef ProductId ?>
+    <?define ProductId=* ?>
+    <?warning ProductId was not defined. Using $(var.ProductId) ?>
+  <?endif?>
+
+  <Product Name='TortoiseHg $(var.Version)' Id='$(var.ProductId)' UpgradeCode='$(var.ProductUpgradeCode)'
            Language='1033' Codepage='1252' Version='$(var.Version)' Manufacturer='Steve Borho and others.'>
 
     <Package Id='*' Keywords='Installer' Description="Windows shell extension for Mercurial DVCS (version $(var.Version))"
