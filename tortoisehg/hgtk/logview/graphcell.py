@@ -162,6 +162,8 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                          start, end, colour, style)
 
         # Draw the revision node in the right column
+        if not self.node:
+            return
         (column, colour, status) = self.node
         arc_start_position_x = cell_area.x + box_size * column + box_size / 2; 
         arc_start_position_y = cell_area.y + cell_area.height / 2;

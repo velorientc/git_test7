@@ -65,9 +65,17 @@ class UpdateDialog(gdialog.GDialog):
                        ' %(tags)s', '\n%(summary)s'), selectable=True, width=350)
         factory = csinfo.factory(self.repo, style=style)
 
+        def add_with_pad(title, cslabel):
+            label = gtk.Label(title)
+            label.set_alignment(1, 0)
+            headbox = gtk.VBox()
+            headbox.pack_start(label, False, False, 2)
+            headbox.pack_start(gtk.VBox())
+            table.add_row(headbox, cslabel, yhopt=gtk.FILL|gtk.EXPAND)
+
         ## summary of target revision
         self.target_label = factory()
-        table.add_row(_('Target:'), self.target_label)
+        add_with_pad(_('Target:'), self.target_label)
 
         ## summary of parent 1 revision
         self.parent1_label = factory()
@@ -75,11 +83,11 @@ class UpdateDialog(gdialog.GDialog):
         ## summary of parent 2 revision if needs
         self.ctxs = self.repo[None].parents()
         if len(self.ctxs) == 2:
-            table.add_row(_('Parent 1:'), self.parent1_label)
+            add_with_pad(_('Parent 1:'), self.parent1_label)
             self.parent2_label = factory()
-            table.add_row(_('Parent 2:'), self.parent2_label)
+            add_with_pad(_('Parent 2:'), self.parent2_label)
         else:
-            table.add_row(_('Parent:'), self.parent1_label)
+            add_with_pad(_('Parent:'), self.parent1_label)
             self.parent2_label = None
 
         ## option expander
