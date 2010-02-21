@@ -1762,6 +1762,11 @@ class GLog(gdialog.GWindow):
 
             self.stbar.set_idle_text(_('Bundle Preview'))
             self.bundle_autoreject = False
+        except error.LookupError:
+            self.remove_overlay(False)
+            gtklib.idle_add_single_call(self.stbar.set_idle_text,
+                   _('Failed to preview, a bundle file unrelated '
+                     'to this repository'))
         except error.Abort:
             self.remove_overlay(False)
             gtklib.idle_add_single_call(self.stbar.set_idle_text,
