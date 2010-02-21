@@ -1071,7 +1071,7 @@ class ConfigDialog(gtk.Dialog):
         layout.add_row(defaultradio)
         layout.add_row(presetradio, presetcombo)
         vbox = gtk.VBox()
-        vbox.pack_start(customradio, False, False)
+        vbox.pack_start(customradio, False, False, 4)
         vbox.pack_start(gtk.VBox())
         layout.add_row(vbox, table, yhopt=gtk.FILL|gtk.EXPAND)
 
