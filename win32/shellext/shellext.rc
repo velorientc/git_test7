@@ -30,8 +30,7 @@
   TOSTR2(THG_VERSION_FIRST) "." \
   TOSTR2(THG_VERSION_SECOND) "." \
   TOSTR2(THG_VERSION_THIRD) "-" \
-  TOSTR2(THG_PARENT_ID) " / " \
-  TOSTR2(THG_PRODUCT_ID)
+  TOSTR2(THG_PARENT_ID)
 
 
 VS_VERSION_INFO VERSIONINFO
@@ -58,7 +57,7 @@ BEGIN
             VALUE "InternalName", "shellext"
             VALUE "LegalCopyright", "Copyright (C) 2010 Steve Borho and others"
             VALUE "OriginalFilename", "ThgShell.dll"
-            VALUE "ProductName", "TortoiseHg"
+            VALUE "ProductName", "TortoiseHg " TOSTR2(THG_PRODUCT_ID)
             VALUE "ProductVersion", THG_VERSION_STRING
         END
     END
