@@ -849,13 +849,15 @@ class GLog(gdialog.GWindow):
             self.filterbar.get_button('custom').set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
-            self.filterentry.set_text(hglib.toutf(opts['filehist']))
+            path = hglib.escapepath(opts['filehist'])
+            self.filterentry.set_text(hglib.toutf(path))
             self.filter_entry_activated(self.filterentry, self.filtercombo)
         elif self.pats:
             self.filterbar.get_button('custom').set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
-            self.filterentry.set_text(hglib.toutf(', '.join(self.pats)))
+            paths = [hglib.escapepath(p) for p in self.pats]
+            self.filterentry.set_text(hglib.toutf(', '.join(paths)))
             self.filter_entry_activated(self.filterentry, self.filtercombo)
         elif 'bundle' in opts:
             self.set_bundlefile(opts['bundle'])
