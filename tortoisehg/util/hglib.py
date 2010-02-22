@@ -219,6 +219,14 @@ def canonpaths(list):
                 canonpats.append(f)
     return canonpats
 
+def escapepath(path):
+    'Before passing a file path to hg API, it may need escaping'
+    p = path
+    if '[' in p or '{' in p or '*' in p or '?' in p:
+        return 'path:' + p
+    else:
+        return p
+
 def normpats(pats):
     'Normalize file patterns'
     normpats = []
