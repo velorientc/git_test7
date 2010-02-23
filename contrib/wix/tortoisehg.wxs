@@ -180,6 +180,9 @@
       <?elseif $(var.Platform) = "x64" ?>
         <Merge Id='TortoiseOverlaysMergeX64' Language='0' DiskId='1' 
                SourceFile='..\contrib\TortoiseOverlays\TortoiseOverlays-1.0.11.18359-x64.msm' />
+        <!-- TortoiseOverlaysMergeX64 is merge-incompatible with TortoiseOverlaysMergeX86 due to conflicting
+             component id's. So we cannot merge both, but ideally, we would
+             (see http://tortoisesvn.tigris.org/ds/viewMessage.do?dsForumId=757&dsMessageId=2446062) -->
         <Directory Id="CommonFiles64Folder" Name="Programs64" >
           <Directory Id="Common64" Name="TortoiseHg" >
             <Component Id='thgshellx64dll' Guid='59FD2A49-BA62-40CC-B155-D11DB11EE611' Win64='yes'>
