@@ -224,18 +224,29 @@
         <MergeRef Id='VCRedist'/>
         <MergeRef Id='VCRedistPolicy' />
       </Feature>
-      <Feature Id='ShellExtension' Title='Shell Extension' Description='Windows Explorer Integration' Level='1'>
-        <ComponentGroupRef Id='cmenuI18n' />
-        <ComponentRef Id='thgtaskbarEXE' />
-        <?if $(var.Platform) = "x86" ?>
-          <MergeRef Id='TortoiseOverlaysMergeX86' />
-        <?endif?>
-        <ComponentRef Id='thgshellx86dll' />
-        <?if $(var.Platform) = "x64" ?>
-          <MergeRef Id='TortoiseOverlaysMergeX64' />
-          <ComponentRef Id='thgshellx64dll' />
-        <?endif?>
-      </Feature>
+      <?if $(var.Platform) = "x86" ?>
+          <Feature Id='ShellExtension' Title='Shell Extension' Level='1' AllowAdvertise='no'
+                   Description='Overlay icons and context menu'>
+            <ComponentGroupRef Id='cmenuI18n' />
+            <ComponentRef Id='thgtaskbarEXE' />
+            <MergeRef Id='TortoiseOverlaysMergeX86' />
+            <ComponentRef Id='thgshellx86dll' />
+          </Feature>
+      <?elseif $(var.Platform) = "x64" ?>
+          <Feature Id='ShellExtension' Title='Shell Extension x64' Level='1' AllowAdvertise='no'
+                   Description='Overlay icons and context menu for 64 bit processes'>
+            <ComponentGroupRef Id='cmenuI18n' />
+            <ComponentRef Id='thgtaskbarEXE' />
+            <MergeRef Id='TortoiseOverlaysMergeX64' />
+            <ComponentRef Id='thgshellx64dll' />
+            <Feature Id='ShellExtensionx86' Title='Shell Extension x86' Display='expand' Level='1'
+                     AllowAdvertise='no'
+                     Description='Overlay icons and context menu for 32 bit processes'>
+              <!-- <MergeRef Id='TortoiseOverlaysMergeX86' /> -->
+              <ComponentRef Id='thgshellx86dll' />
+            </Feature>
+          </Feature>
+      <?endif?>
       <Feature Id='Locales' Title='Translations' Description='Mercurial and TortoiseHg Translations' Level='1'>
         <ComponentGroupRef Id='localeFolder' />
         <ComponentGroupRef Id='i18nFolder' />
