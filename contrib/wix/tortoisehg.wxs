@@ -233,14 +233,13 @@
             <ComponentRef Id='thgshellx86dll' />
           </Feature>
       <?elseif $(var.Platform) = "x64" ?>
-          <Feature Id='ShellExtension' Title='Shell Extension x64' Level='1' AllowAdvertise='no'
+          <Feature Id='ShellExtension' Title='Shell Extension x64' Level='1' Display='expand' AllowAdvertise='no'
                    Description='Overlay icons and context menu for 64 bit processes'>
             <ComponentGroupRef Id='cmenuI18n' />
             <ComponentRef Id='thgtaskbarEXE' />
             <MergeRef Id='TortoiseOverlaysMergeX64' />
             <ComponentRef Id='thgshellx64dll' />
-            <Feature Id='ShellExtensionx86' Title='Shell Extension x86' Display='expand' Level='1'
-                     AllowAdvertise='no'
+            <Feature Id='ShellExtensionx86' Title='Shell Extension x86' Level='1' AllowAdvertise='no'
                      Description='Overlay icons and context menu for 32 bit processes'>
               <!-- <MergeRef Id='TortoiseOverlaysMergeX86' /> -->
               <ComponentRef Id='thgshellx86dll' />
