@@ -38,7 +38,7 @@ class GtkUi(ui.ui):
             self.dialogq = dialogq
             self.responseq = responseq
         self.setconfig('ui', 'interactive', 'on')
-        self.setconfig('ui', 'progress', 'False')
+        self.setconfig('progress', 'disable', 'True')
 
     def write(self, *args):
         if hglib.uiwrite(self, args):
