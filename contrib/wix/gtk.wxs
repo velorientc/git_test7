@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <ComponentGroup Id="gtkFolder">
@@ -47,9 +47,6 @@
             <Component Id="cmp5AECD7E312E8F8C021BE8B7EF267408A" Directory="dirAF0908AE581708941042190E29921322" Guid="{6D4A9889-EE4F-49B6-865B-66EDA4457EA7}">
                 <File Id="fil9567661A6C917C23A2BB230351658780" KeyPath="yes" Source="$(var.SourceDir)\libgtk-win32-2.0-0.dll" />
             </Component>
-            <Component Id="cmp61B800C461C37BA228F7DE63811D90E4" Directory="dirAF0908AE581708941042190E29921322" Guid="{99449E63-0E08-4ED9-8CDE-642DC85B00B2}">
-                <File Id="filAFA22EA98282599AFD290EF89AED0286" KeyPath="yes" Source="$(var.SourceDir)\libjpeg-7.dll" />
-            </Component>
             <Component Id="cmpF0F28DD5B420336AA5CA175C130BB453" Directory="dirAF0908AE581708941042190E29921322" Guid="{91C8FA8F-3866-46AC-8465-88B0BDD6D118}">
                 <File Id="fil88D416CE6D4CD6BCC226031C98986309" KeyPath="yes" Source="$(var.SourceDir)\libpango-1.0-0.dll" />
             </Component>
@@ -63,13 +60,7 @@
                 <File Id="fil6E26FABA972276B49D76554BB6D2DAE1" KeyPath="yes" Source="$(var.SourceDir)\libpangowin32-1.0-0.dll" />
             </Component>
             <Component Id="cmp4DDEB3F35350CF90DB593C2C29173D75" Directory="dirAF0908AE581708941042190E29921322" Guid="{0D031781-28BC-40C7-97BA-7C5599956613}">
-                <File Id="filF28EB623C2C6E90D97AAD3A4E468E4C6" KeyPath="yes" Source="$(var.SourceDir)\libpng12-0.dll" />
-            </Component>
-            <Component Id="cmp475FEB3EBE19A79BE11A07FAE4C5F5BF" Directory="dirAF0908AE581708941042190E29921322" Guid="{3AE15C99-ACDF-448E-9B59-8303776E05B4}">
-                <File Id="filB0921A12FBDB9974A3FEE43D37A43EB1" KeyPath="yes" Source="$(var.SourceDir)\libtiff-3.dll" />
-            </Component>
-            <Component Id="cmpEF066ECC4C8893A4F12DEF3ADB8A708C" Directory="dirAF0908AE581708941042190E29921322" Guid="{194ECE64-5A0B-4C66-AF0B-8D1430EEBAE5}">
-                <File Id="fil5F27577BD8EB9A17F77C83CFB4E8224E" KeyPath="yes" Source="$(var.SourceDir)\libtiffxx-3.dll" />
+                <File Id="filF28EB623C2C6E90D97AAD3A4E468E4C6" KeyPath="yes" Source="$(var.SourceDir)\libpng14-14.dll" />
             </Component>
             <Component Id="cmpF7A7D91D54A4E9FEA4B80B280BBD9C03" Directory="dirAF0908AE581708941042190E29921322" Guid="{C8CF3A77-26C5-47BA-926B-30C9FCBAA981}">
                 <File Id="filAE0AB5291D6D014AFC8AA53192D5EB28" KeyPath="yes" Source="$(var.SourceDir)\zlib1.dll" />
