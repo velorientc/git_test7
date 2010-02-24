@@ -15,6 +15,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 import os
 import pdb
 import sys
+import subprocess
 import traceback
 import gtk
 import gobject
@@ -29,6 +30,12 @@ try:
     from tortoisehg.util.config import nofork as config_nofork
 except ImportError:
     config_nofork = None
+
+try:
+    import win32con
+    openflags = win32con.CREATE_NO_WINDOW
+except ImportError:
+    openflags = 0
 
 nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
 about help version thgstatus serve'''
@@ -95,14 +102,12 @@ def portable_fork(ui, opts):
         args = sys.argv
     else:
         args = [sys.executable] + sys.argv
-    if os.name == 'nt':
-        args = ['"%s"' % arg for arg in args]
-        mode = os.P_DETACH
-    else:
-        mode = os.P_NOWAIT
-    env = os.environ.copy()
-    env['THG_HGTK_SPAWN'] = '1'
-    os.spawnve(mode, sys.executable, args, env)
+    os.environ['THG_HGTK_SPAWN'] = '1'
+    cmdline = subprocess.list2cmdline(args)
+    subprocess.Popen(cmdline,
+                     close_fds=True,
+                     creationflags=openflags,
+                     shell=True)
     sys.exit(0)
 
 def get_list_from_file(filename):

@@ -282,20 +282,18 @@ class patchfile:
                         self.lines[l : l + len(old)] = newlines
                         self.offset += len(newlines) - len(old)
                         self.dirty = 1
-                        if fuzzlen:
-                            fuzzstr = "with fuzz %d " % fuzzlen
-                            f = self.ui.warn
-                            self.printfile(True)
-                        else:
-                            fuzzstr = ""
-                            f = self.ui.note
                         offset = l - orig_start - fuzzlen
-                        if offset == 1:
-                            linestr = "line"
+                        if fuzzlen:
+                            msg = _("Hunk #%d succeeded at %d "
+                                    "with fuzz %d "
+                                    "(offset %d lines).\n")
+                            self.printfile(True)
+                            self.ui.warn(msg %
+                                (h.number, l + 1, fuzzlen, offset))
                         else:
-                            linestr = "lines"
-                        f(_("Hunk #%d succeeded at %d %s(offset %d %s).\n") %
-                          (h.number, l+1, fuzzstr, offset, linestr))
+                            msg = _("Hunk #%d succeeded at %d "
+                                    "(offset %d lines).\n")
+                            self.ui.note(msg % (h.number, l + 1, offset))
                         return fuzzlen
         self.printfile(True)
         self.ui.warn(_("Hunk #%d FAILED at %d\n") % (h.number, orig_start))

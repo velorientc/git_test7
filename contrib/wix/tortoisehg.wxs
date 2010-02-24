@@ -180,6 +180,9 @@
       <?elseif $(var.Platform) = "x64" ?>
         <Merge Id='TortoiseOverlaysMergeX64' Language='0' DiskId='1' 
                SourceFile='..\contrib\TortoiseOverlays\TortoiseOverlays-1.0.11.18359-x64.msm' />
+        <!-- TortoiseOverlaysMergeX64 is merge-incompatible with TortoiseOverlaysMergeX86 due to conflicting
+             component id's. So we cannot merge both, but ideally, we would
+             (see http://tortoisesvn.tigris.org/ds/viewMessage.do?dsForumId=757&dsMessageId=2446062) -->
         <Directory Id="CommonFiles64Folder" Name="Programs64" >
           <Directory Id="Common64" Name="TortoiseHg" >
             <Component Id='thgshellx64dll' Guid='59FD2A49-BA62-40CC-B155-D11DB11EE611' Win64='yes'>
@@ -221,18 +224,28 @@
         <MergeRef Id='VCRedist'/>
         <MergeRef Id='VCRedistPolicy' />
       </Feature>
-      <Feature Id='ShellExtension' Title='Shell Extension' Description='Windows Explorer Integration' Level='1'>
-        <ComponentGroupRef Id='cmenuI18n' />
-        <ComponentRef Id='thgtaskbarEXE' />
-        <?if $(var.Platform) = "x86" ?>
-          <MergeRef Id='TortoiseOverlaysMergeX86' />
-        <?endif?>
-        <ComponentRef Id='thgshellx86dll' />
-        <?if $(var.Platform) = "x64" ?>
-          <MergeRef Id='TortoiseOverlaysMergeX64' />
-          <ComponentRef Id='thgshellx64dll' />
-        <?endif?>
-      </Feature>
+      <?if $(var.Platform) = "x86" ?>
+          <Feature Id='ShellExtension' Title='Shell Extension' Level='1' AllowAdvertise='no'
+                   Description='Overlay icons and context menu'>
+            <ComponentGroupRef Id='cmenuI18n' />
+            <ComponentRef Id='thgtaskbarEXE' />
+            <MergeRef Id='TortoiseOverlaysMergeX86' />
+            <ComponentRef Id='thgshellx86dll' />
+          </Feature>
+      <?elseif $(var.Platform) = "x64" ?>
+          <Feature Id='ShellExtension' Title='Shell Extension x64' Level='1' Display='expand' AllowAdvertise='no'
+                   Description='Overlay icons and context menu for 64 bit processes'>
+            <ComponentGroupRef Id='cmenuI18n' />
+            <ComponentRef Id='thgtaskbarEXE' />
+            <MergeRef Id='TortoiseOverlaysMergeX64' />
+            <ComponentRef Id='thgshellx64dll' />
+            <Feature Id='ShellExtensionx86' Title='Shell Extension x86' Level='1' AllowAdvertise='no'
+                     Description='Overlay icons and context menu for 32 bit processes'>
+              <!-- <MergeRef Id='TortoiseOverlaysMergeX86' /> -->
+              <ComponentRef Id='thgshellx86dll' />
+            </Feature>
+          </Feature>
+      <?endif?>
       <Feature Id='Locales' Title='Translations' Description='Mercurial and TortoiseHg Translations' Level='1'>
         <ComponentGroupRef Id='localeFolder' />
         <ComponentGroupRef Id='i18nFolder' />
