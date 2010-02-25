@@ -34,3 +34,4 @@ glob:win32/*.reg
 glob:*~
 glob:tortoisehg/util/__version__.py
 glob:win32/shellext/parentid.h
+glob:*.wixobj
