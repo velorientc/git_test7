@@ -1,9 +1,92 @@
-******************************
-A quick tour for the impatient
-******************************
+*********************************
+A Quick Start Guide to TortoiseHg
+*********************************
 
 .. module:: tour
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
+
+Welcome to TortoiseHg and the Mercurial!  TortoiseHg is a Windows
+Explorer shell extension and a set of graphical applications that serve
+as a friendly front-end to the Mercurial distributed version control
+system (DVCS).   All TortoiseHg functionality is reachable from Explorer
+context menus as well as from a command line application named
+:command:`hgtk`.  Mercurial commands are also available from the
+standard :command:`hg` command line application.
+
+
+Configuring TortoiseHg
+======================
+
+Your first step should be to make sure that you are correctly identified
+to TortoiseHg.  You do this by opening the global settings dialog.
+Right click on the desktop background and select
+:menuselection:`TortoiseHg --> Global Settings`.
+
+.. figure:: figures/cmenu-global-settings.jpg
+	:alt: Desktop Context Menu
+
+	Open "Global Settings" from the desktop
+
+This opens the TortoiseHg settings dialog, editing your global (user)
+configuration.  If you are using the command line, the global settings
+dialog can be opened by :command:`hgtk userconfig`.
+
+.. figure:: figures/settings.png
+	:alt: Settings Dialog
+
+	TortoiseHg Settings Dialog
+
+First select the :guilabel:`Commit` page and enter a name in the
+:guilabel:`Username` field.
+
+.. note::
+	If you neglect to configure a username TortoiseHg will ask you to
+	enter one when you try to *commit*, which is the first time a
+	username is actually required.
+
+.. note::
+	There are no hard fast rules on how to format your username, the
+	field is free form, but the following convention is commonly used::
+	
+		FullName <email>
+		
+	for example ::
+	
+		Donald Duck <donaldduck@example.net>
+	
+	The email address is stripped when viewing history in the changelog
+	viewer, and the built-in web server obfuscates email addresses to
+	prevent SPAM.
+
+
+Next, select the :guilabel:`TortoiseHg` page and select the
+:guilabel:`Three-way Merge Tool` entry.  In the drop down list you will
+find all of the merge tools detected on your computer (kdiff3 is
+provided by the Windows installer) and a number of internal merge
+behaviors.  Select your preferred merge tool.
+
+If you prefer for TortoiseHg to also use your selected merge tool for
+visual diffs, you can leave the :guilabel:`Visual Diff Tool`
+unspecified.  Otherwise, select your favorite visual diff tool from the
+drop down list of detected visual diff tools.
+
+If there are no options in either drop-down list, you must install a
+diff/merge tool that is supported by our mergetools.rc or configure your
+own tool.
+
+Feel free to configure other global settings while you have the dialog
+open.  You will have the chance later to override these global settings
+with repository local settings, if required.
+
+Click the :guilabel:`Ok` button to save the changes you have made and
+close the settings dialog.
+
+.. note::
+	Most TortoiseHg tools require a restart to pick up changes made in the
+	settings dialog.
+
+Getting Acquainted
+==================
 
 Mercurial supports many different
 `collaboration models <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
@@ -16,52 +99,6 @@ To get started, suppose you volunteer to create the central repository.
 There are ways to `convert <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
 non-Mercurial repositories into Mercurial repositories, but this example
 assumes you are starting from scratch.
-
-This tutorial assumes you already have TortoiseHg properly installed,
-and you have your project folder open in your file browser.
-
-
-Configuring TortoiseHg
-======================
-
-First you need to make sure that you are correctly identified in
-TortoiseHg.  You do this by adjusting the global settings of TortoiseHg.
-Right click in your source folder and select
-:menuselection:`TortoiseHg --> Global Settings`
-
-.. figure:: figures/cmenu-global-settings.jpg
-	:alt: Context Menu
-
-	Open "Global Settings" from the desktop
-
-You must then select the :guilabel:`Commit` tab and enter a name in the
-:guilabel:`Username` field.
-
-.. note::
-	If you forget to configure your username TortoiseHg will ask you to
-	enter one when you *commit*, the only time the name is actually
-	required.
-
-.. note::
-	There are no hard rules on how to format your user name, the field
-	is free form, but the following convention is commonly used::
-	
-		FullName <email>
-		
-	for example ::
-	
-		Donald Duck <donaldduck@example.net>
-	
-	The email address is stripped when viewing history in the changelog
-	viewer, and the built-in web server obfuscates email addresses to
-	prevent SPAM.
-
-If you are not using one of our Windows installers, you will also have
-to configure a visual diff tool.  Type :command:`hgtk userconfig` and on
-the TortoiseHg tab you will find :guilabel:`Visual Diff Tool`.  If
-there are no options in the drop-down list, you must install a diff tool
-that is supported by our mergetools.ini or configure your own tool.
-
 
 Initialize the repository
 =========================
@@ -215,7 +252,6 @@ a couple of directories with changes pending.  You can traverse the
 directories to find specific changes and commit them from Explorer. A
 quicker way is to use the commit tool:
 
-.. {{images/image001.png}}
 .. figure:: figures/overlayicons.png
 	:alt: Overlay Icons 
 
