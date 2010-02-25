@@ -29,10 +29,10 @@ TortoiseHg.  You do this by adjusting the global settings of TortoiseHg.
 Right click in your source folder and select
 :menuselection:`TortoiseHg --> Global Settings`
 
-.. figure:: figures/cmenu-nofiles.jpg
+.. figure:: figures/cmenu-global-settings.jpg
 	:alt: Context Menu
 
-	Context menu with no files selected
+	Open "Global Settings" from the desktop
 
 You must then select the :guilabel:`Commit` tab and enter a name in the
 :guilabel:`Username` field.
