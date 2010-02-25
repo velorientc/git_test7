@@ -316,8 +316,8 @@
       Value="NOTE: Logoff/logon or restarting explorer may be needed to start the overlay icons" />
 
     <WixVariable Id="WixUILicenseRtf" Value="contrib\wix\COPYING.rtf" />
-    <WixVariable Id="WixUIBannerBmp" Value="..\misc\WixUIBannerBmp.bmp" />
-    <WixVariable Id="WixUIDialogBmp" Value="..\misc\WixUIDialogBmp.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="contrib\wix\WixUIBannerBmp.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="contrib\wix\WixUIDialogBmp.bmp" />
 
     <Icon Id="thgIcon.ico" SourceFile="icons\thg_logo.ico" />
     <Icon Id="hgIcon.ico" SourceFile="icons\hg.ico" />
