@@ -315,7 +315,7 @@
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT"
       Value="NOTE: Logoff/logon or restarting explorer may be needed to start the overlay icons" />
 
-    <WixVariable Id="WixUILicenseRtf" Value="..\misc\COPYING.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="contrib\wix\COPYING.rtf" />
     <WixVariable Id="WixUIBannerBmp" Value="..\misc\WixUIBannerBmp.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="..\misc\WixUIDialogBmp.bmp" />
 
