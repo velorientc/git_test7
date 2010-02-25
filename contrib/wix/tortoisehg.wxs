@@ -77,7 +77,7 @@
                       Name='TortoiseHgRpcServer' Value='[INSTALLDIR]thgtaskbar.exe' />
           </Component>
           <Component Id='thgshellx86dll' Guid='1126CF42-3994-428B-A746-464E1BC680F3'>
-            <File Id='thgshellx86dll' Name='ThgShellx86.dll' DiskId='1' Source='..\misc\ThgShellx86.dll' KeyPath='yes'/>
+            <File Id='thgshellx86dll' Name='ThgShellx86.dll' DiskId='1' Source='win32\ThgShellx86.dll' KeyPath='yes'/>
             <RegistryValue Root='HKMU' Key='Software\TortoiseHg' Type='string' Value='[INSTALLDIR]' />
             <RegistryValue Root='HKCR' Key='CLSID\{46605027-5B8C-4DCE-BFE0-051B7972D64C}\InProcServer32'
                            Type='string' Value='[INSTALLDIR]ThgShellx86.dll' />
@@ -186,7 +186,7 @@
         <Directory Id="CommonFiles64Folder" Name="Programs64" >
           <Directory Id="Common64" Name="TortoiseHg" >
             <Component Id='thgshellx64dll' Guid='59FD2A49-BA62-40CC-B155-D11DB11EE611' Win64='yes'>
-              <File Id='thgshellx64dll' Name='ThgShellx64.dll' DiskId='1' Source='..\misc\ThgShellx64.dll' KeyPath='yes' />
+              <File Id='thgshellx64dll' Name='ThgShellx64.dll' DiskId='1' Source='win32\ThgShellx64.dll' KeyPath='yes' />
               <RegistryValue Root='HKMU' Key='Software\TortoiseHg' Type='string' Value='[INSTALLDIR]' />
               <RegistryValue Root='HKCR' Key='CLSID\{46605027-5B8C-4DCE-BFE0-051B7972D64C}\InProcServer32'
                              Type='string' Value='[Common64]ThgShellx64.dll' />
@@ -290,9 +290,9 @@
          the command pipe. Windows installer sometimes fails to shutdown thgtaskbar.exe, which
          occasionally leads to a crash of thgtaskbar.exe during install, which in turn pops up
          an ugly crash report dialog pointing to faulting module PYTHON26.DLL. -->
-    <Binary Id='TerminateEXE' SourceFile='..\misc\terminate.exe' />
+    <Binary Id='TerminateEXE' SourceFile='win32\terminate-x86.exe' />
     <CustomAction Id='CallTerminate' BinaryKey='TerminateEXE' ExeCommand='' Return='ignore' />
-    
+
     <CustomAction Id='StartThgtaskbarEXE' FileKey='thgtaskbarEXE' ExeCommand='' Return='asyncNoWait' />
 
     <InstallExecuteSequence>
