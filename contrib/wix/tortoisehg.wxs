@@ -53,6 +53,9 @@
     <Property Id='INSTALLEDTORTOISEHGPRODUCTS' Secure='yes'></Property>
     <Property Id='REINSTALLMODE'>amus</Property>
 
+    <!--Auto-accept the license page-->
+    <Property Id='LicenseAccepted'>1</Property>
+
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='TortoiseHg'>
