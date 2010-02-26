@@ -56,7 +56,7 @@ BEGIN
             VALUE "FileVersion", THG_VERSION_STRING
             VALUE "InternalName", "shellext"
             VALUE "LegalCopyright", "Copyright (C) 2010 Steve Borho and others"
-            VALUE "OriginalFilename", "ThgShell.dll"
+            VALUE "OriginalFilename", TOSTR2(THG_SHELL_FNAME)
             VALUE "ProductName", "TortoiseHg " TOSTR2(THG_PRODUCT_ID)
             VALUE "ProductVersion", THG_VERSION_STRING
         END

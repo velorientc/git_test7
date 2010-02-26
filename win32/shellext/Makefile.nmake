@@ -40,14 +40,17 @@ LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
 LDFLAGS_TERMINATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
 
 
-all: THgShell.dll terminate.exe
+THGSHELL_TARGET = THgShell$(THG_PLATFORM).dll
+TERMINATE_TARGET = terminate-$(THG_PLATFORM).exe
+
+all: $(THGSHELL_TARGET) $(TERMINATE_TARGET)
 
 clean:
     del *.obj *.dll *.exe *.lib *.exp *.manifest *.res parentid.h
 
-THgShell.dll: $(OBJECTS_THGSGELL)
+$(THGSHELL_TARGET): $(OBJECTS_THGSGELL)
     create-parentid-h.cmd
-    rc $(THG_EXTRA_RCFLAGS) shellext.rc
+    rc /dTHG_SHELL_FNAME="$@" $(THG_EXTRA_RCFLAGS) shellext.rc
     link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
     mt -nologo -manifest $@.manifest -outputresource:"$@;#2"
 
@@ -55,6 +58,6 @@ dirstate.exe: dirstate.obj $(OBJECTS_DIRSTATE)
     link /OUT:$@ $(LDFLAGS_DIRSTATE) $**
     mt -nologo -manifest $@.manifest -outputresource:"$@;#1"
 
-terminate.exe: terminate.obj $(OBJECTS_TERMINATE)
+$(TERMINATE_TARGET): terminate.obj $(OBJECTS_TERMINATE)
     link /OUT:$@ $(LDFLAGS_TERMINATE) $**
     mt -nologo -manifest $@.manifest -outputresource:"$@;#1"
