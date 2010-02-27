@@ -65,7 +65,7 @@ TortoiseHg には簡単にセットアップできるようにインストーラ
 ^^^^^^^^
 
 TortoiseHg のユーザインターフェイスは様々な言語に翻訳されています。
-全ての利用可能な言語はインストール済みなので、
+すべての利用可能な言語はインストール済みなので、
 別途言語パックをダウンロードする必要はありません。
 :file:`C:\\Program Files\\TortoiseHg\\locale` に利用可能な言語が用意されています。
 環境変数 ``LANGUAGE`` に言語コードを設定するだけでその言語が利用可能になります。
@@ -95,7 +95,7 @@ Ubuntu 向けの Deb パッケージは
 `ここ <https://launchpad.net/~tortoisehg-ppa>`_ から入手できます。
 
 Max OS X 向けのパッケージは用意されていませんが、ソースコードから
-インストールすることで hgtk スクリプトを含む全ての TortoiseHg ダイアログが
+インストールすることで hgtk スクリプトを含むすべての TortoiseHg ダイアログが
 利用可能になります。詳しくは
 `MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_
 をご覧ください。

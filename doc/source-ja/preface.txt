@@ -66,7 +66,7 @@ Bitbucket には `公式 Wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>
 謝辞
 ====
 
-TortoiseHg プロジェクトに貢献し、本当に便利なツールを作り上げた全ての開発者、
+TortoiseHg プロジェクトに貢献し、本当に便利なツールを作り上げたすべての開発者、
 翻訳者、利用者コミュニティ、特に貴重なバグレポートおよび機能要望をしていただいた
 ユーザの方々に感謝の意を表します。
 
