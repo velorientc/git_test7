@@ -182,7 +182,7 @@
 *Windows の TortoiseHg はどこの Python モジュールを参照しているの？*
 
 	TortoiseHg は Python の実行に必要な環境を DLL の形で同梱しています。
-	標準ライブラリは全て :file:`C:\\Program Files\\TortoiseHg` の
+	標準ライブラリはすべて :file:`C:\\Program Files\\TortoiseHg` の
 	:file:`library.zip` ファイルに格納されています。
 
 	そのため、非標準の Python モジュールに依存した Mercurial 拡張機能
