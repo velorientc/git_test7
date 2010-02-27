@@ -173,19 +173,20 @@
         </Directory>
       </Directory -->
 
+      <?define TOverlaysVersion = 1.0.13.18745 ?>
+      <?define TOverlaysSrcDir = ..\contrib\TortoiseOverlays ?>
+      <?define TOverlaysSrcFilenameX86 = TortoiseOverlays-$(var.TOverlaysVersion)-win32.msm ?>
+      <?define TOverlaysSrcFilenameX64 = TortoiseOverlays-$(var.TOverlaysVersion)-x64.msm ?>
+
       <Merge Id='VCRedist' DiskId='1' Language='1033'
              SourceFile='C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC\microsoft.vcxx.crt.x86_msm.msm' />
       <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
              SourceFile='C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC\policy.x.xx.microsoft.vcxx.crt.x86_msm.msm' />
-      <?if $(var.Platform) = "x86" ?>
-        <Merge Id='TortoiseOverlaysMergeX86' Language='0' DiskId='1' 
-               SourceFile='..\contrib\TortoiseOverlays\TortoiseOverlays-1.0.11.18359-win32.msm' />
-      <?elseif $(var.Platform) = "x64" ?>
+      <Merge Id='TortoiseOverlaysMergeX86' Language='0' DiskId='1' 
+             SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX86)' />
+      <?if $(var.Platform) = "x64" ?>
         <Merge Id='TortoiseOverlaysMergeX64' Language='0' DiskId='1' 
-               SourceFile='..\contrib\TortoiseOverlays\TortoiseOverlays-1.0.11.18359-x64.msm' />
-        <!-- TortoiseOverlaysMergeX64 is merge-incompatible with TortoiseOverlaysMergeX86 due to conflicting
-             component id's. So we cannot merge both, but ideally, we would
-             (see http://tortoisesvn.tigris.org/ds/viewMessage.do?dsForumId=757&dsMessageId=2446062) -->
+               SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX64)' />
         <Directory Id="CommonFiles64Folder" Name="Programs64" >
           <Directory Id="Common64" Name="TortoiseHg" >
             <Component Id='thgshellx64dll' Guid='59FD2A49-BA62-40CC-B155-D11DB11EE611' Win64='yes'>
@@ -244,7 +245,7 @@
             <ComponentRef Id='thgshellx64dll' />
             <Feature Id='ShellExtensionx86' Title='Shell Extension x86' Level='1' AllowAdvertise='no'
                      Description='Overlay icons and context menu for 32 bit processes'>
-              <!-- <MergeRef Id='TortoiseOverlaysMergeX86' /> -->
+              <MergeRef Id='TortoiseOverlaysMergeX86' />
               <ComponentRef Id='thgshellx86dll' />
             </Feature>
           </Feature>
