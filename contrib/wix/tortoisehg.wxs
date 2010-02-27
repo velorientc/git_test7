@@ -182,8 +182,8 @@
              SourceFile='C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC\microsoft.vcxx.crt.x86_msm.msm' />
       <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
              SourceFile='C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC\policy.x.xx.microsoft.vcxx.crt.x86_msm.msm' />
-        <Merge Id='TortoiseOverlaysMergeX86' Language='0' DiskId='1' 
-               SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX86)' />
+      <Merge Id='TortoiseOverlaysMergeX86' Language='0' DiskId='1' 
+             SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX86)' />
       <?if $(var.Platform) = "x64" ?>
         <Merge Id='TortoiseOverlaysMergeX64' Language='0' DiskId='1' 
                SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX64)' />
