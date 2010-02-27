@@ -86,8 +86,8 @@ TortoiseHg の Windows 向けインストーラには `TortoiseSVN <http://torto
 
 :menuselection:`TortoiseHg... --> About`
 	メニュー選択およびその組み合せ、またタブ選択、GUI のラベルを示します。例えば
-	:menuselection:`TortoiseHg... --> グローバル設定 --> コミット --> ユーザ名`
-	は メニューから :menuselection:`TortoiseHg... --> グローバル設定` とたどり、
+	:menuselection:`TortoiseHg... --> ユーザ設定 --> コミット --> ユーザ名`
+	は メニューから :menuselection:`TortoiseHg... --> ユーザ設定` とたどり、
 	開いたダイアログの :guilabel:`コミット` というタブに切り替えて、その中にある
 	:guilabel:`ユーザ名` というラベルの付いた場所で何かをする、という意味になります。
 

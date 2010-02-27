@@ -295,7 +295,7 @@ avoided in large repositories.
 .. [#rcm4]	strip コマンドは削除したリビジョンを後で再適用できるようにバンドルファイルとして
 			保存します。詳細は `こちら <http://mercurial.selenic.com/wiki/EditingHistory>`_
 			を参照してください。
-.. [#rcm5]	:menuselection:`グローバル設定 --> TortoiseHg --> GUI 差分表示コマンド`
+.. [#rcm5]	:menuselection:`ユーザ設定 --> TortoiseHg --> GUI 差分表示コマンド`
 .. [#rcm6]	選択中のリビジョンが現在の作業ディレクトリの親リビジョンであるときのみ有効になります。
 
 
@@ -320,7 +320,7 @@ avoided in large repositories.
 	:guilabel:`元に戻す`
 		このファイルを作業ディレクトリに取り出します。 [#flcm3]_
 
-.. [#flcm1]	:menuselection:`グローバル設定 --> TortoiseHg --> GUI エディタ`
+.. [#flcm1]	:menuselection:`ユーザ設定 --> TortoiseHg --> GUI エディタ`
 .. [#flcm2]	ファイルの履歴を変更しない単純な変更のみ表示し、削除されたファイルなどは
 				表示されません。
 .. [#flcm3]	新しいファイル内容は作業ディレクトリへの変更として反映されるので、
@@ -334,7 +334,7 @@ avoided in large repositories.
 一度に全てのファイルの差分を表示したい場合は :guilabel:`[全てのファイル]` を
 クリックしてください。またチェンジセットブラウザは最大差分サイズを超えるファイル
 は表示せず飛ばします。詳しくは
-:menuselection:`グローバル設定 --> TortoiseHg --> 最大差分サイズ`
+:menuselection:`ユーザ設定 --> TortoiseHg --> 最大差分サイズ`
 を参照してください。 :menuselection:`表示
 -> 最大差分サイズ制限を無視` を使用すると一時的にこのオプションを無効化できます。
 
