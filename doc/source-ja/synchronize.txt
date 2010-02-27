@@ -123,8 +123,9 @@ TortoiseHg は *ssh:* 接続とその認証のために TortoisePlink ツール 
 	なるのかを確認するのはよい習慣です)。
 
 :guilabel:`送信` ボタンはそのままで、 :guilabel:`設定` ボタンを押すと TortoiseHg
-の設定ダイアログにあるメール送信タブを開きます。そこでは SMTP 設定や :guilabel:`To:`
-アドレスと :guilabel:`From:` アドレスのデフォルトを指定することができます。
+の設定ダイアログにある :guilabel:`メール送信` ページを開きます。そこでは
+SMTP 設定や :guilabel:`To:` アドレスと :guilabel:`From:`
+アドレスのデフォルトを指定することができます。
 
 :guilabel:`In-Reply-To:` は送信するパッチがメーリングリストで確実にスレッド
 として認識されるために使われます。
