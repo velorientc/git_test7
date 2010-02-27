@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-22 23:55+0000\n"
-"PO-Revision-Date: 2010-02-25 21:49+0000\n"
+"PO-Revision-Date: 2010-02-26 12:32+0000\n"
 "Last-Translator: paolof <gp.fadel@gmail.com>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-02-26 04:53+0000\n"
+"X-Launchpad-Export-Date: 2010-02-27 04:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:36
@@ -370,7 +370,7 @@ msgstr "percorso"
 
 #: tortoisehg\hgtk\browse.py:344 tortoisehg\hgtk\browse.py:346
 msgid "browser"
-msgstr ""
+msgstr "browser"
 
 #: tortoisehg\hgtk\bugreport.py:25
 msgid "TortoiseHg Bug Report"
@@ -521,7 +521,7 @@ msgstr "Clona fino alla revisione:"
 
 #: tortoisehg\hgtk\clone.py:135
 msgid "Starting P4 Changelist:"
-msgstr ""
+msgstr "Inizia lista modifiche P4:"
 
 #: tortoisehg\hgtk\clone.py:141
 msgid "Do not update the new working directory"
@@ -2378,11 +2378,11 @@ msgstr "_Perforce"
 
 #: tortoisehg\hgtk\history.py:317
 msgid "Identify"
-msgstr ""
+msgstr "Identifica"
 
 #: tortoisehg\hgtk\history.py:319
 msgid "Pending"
-msgstr ""
+msgstr "In sospeso"
 
 #: tortoisehg\hgtk\history.py:327 tortoisehg\hgtk\history.py:1317
 msgid "Load more Revisions"
@@ -2502,39 +2502,39 @@ msgstr "Intervallo revisioni"
 #: tortoisehg\hgtk\history.py:515 tortoisehg\hgtk\p4pending.py:83
 #: tortoisehg\hgtk\p4pending.py:105 tortoisehg\hgtk\p4pending.py:110
 msgid "Submitted"
-msgstr ""
+msgstr "Inviato"
 
 #: tortoisehg\hgtk\history.py:519
 msgid "Unable to parse p4pending output"
-msgstr ""
+msgstr "Impossibile analizzare il risultato di p4pending"
 
 #: tortoisehg\hgtk\history.py:521
 msgid "%d pending changelists found"
-msgstr ""
+msgstr "trovate %d liste modifiche in sospeso"
 
 #: tortoisehg\hgtk\history.py:523
 msgid "No pending Perforce changelists"
-msgstr ""
+msgstr "Nessuna lista modifiche in sospeso di Perforce"
 
 #: tortoisehg\hgtk\history.py:525
 msgid "Aborted p4pending"
-msgstr ""
+msgstr "p4pending interrotto"
 
 #: tortoisehg\hgtk\history.py:527
 msgid "Unable to determine pending changesets"
-msgstr ""
+msgstr "Impossibile determinale le liste modifiche in sospeso"
 
 #: tortoisehg\hgtk\history.py:535
 msgid "Finding pending Perforce changelists..."
-msgstr ""
+msgstr "Ricerca liste modifiche in sospeso di Perforce..."
 
 #: tortoisehg\hgtk\history.py:536
 msgid "Pending Perforce changelists"
-msgstr ""
+msgstr "Liste modifiche in sospeso di Perforce"
 
 #: tortoisehg\hgtk\history.py:548
 msgid "Perforce changelist %s"
-msgstr ""
+msgstr "Lista modifiche Perforce %s"
 
 #: tortoisehg\hgtk\history.py:553
 msgid "Unable to find rev %s"
@@ -2542,19 +2542,19 @@ msgstr "Impossibile trovare la revisione %s"
 
 #: tortoisehg\hgtk\history.py:555
 msgid "Aborted p4identify"
-msgstr ""
+msgstr "p4identify interrotto"
 
 #: tortoisehg\hgtk\history.py:557
 msgid "Unable to identify Perforce tip"
-msgstr ""
+msgstr "Impossibile indentificare il tip Perforce"
 
 #: tortoisehg\hgtk\history.py:560
 msgid "Finding tip Perforce changelist..."
-msgstr ""
+msgstr "Ricerca tip della lista modifiche Perforce..."
 
 #: tortoisehg\hgtk\history.py:561
 msgid "Identifying Perforce tip"
-msgstr ""
+msgstr "Identificazione tip Perforce in corso"
 
 #: tortoisehg\hgtk\history.py:606 tortoisehg\hgtk\logview\treeview.py:400
 msgid "Graph"
@@ -3228,6 +3228,7 @@ msgstr "Revisione attuale (locale)"
 #: tortoisehg\hgtk\merge.py:89
 msgid "Discard all changes from merge target (other) revision"
 msgstr ""
+"Ignora le modifiche della revisione con la quale eseguire il merge (altra)"
 
 #: tortoisehg\hgtk\merge.py:100
 msgid "Merge tools:"
@@ -3282,7 +3283,7 @@ msgstr "Impossibile eseguire il merge"
 
 #: tortoisehg\hgtk\merge.py:205
 msgid "Uncommitted local changes"
-msgstr ""
+msgstr "Ci sono modifiche locali di cui non si è eseguito il commit"
 
 #: tortoisehg\hgtk\merge.py:240
 msgid "Confirm undo merge"
@@ -3294,15 +3295,15 @@ msgstr "Eseguire il checkout pulito della revisione originale?"
 
 #: tortoisehg\hgtk\p4pending.py:30
 msgid "Pending Perforce Changelists - %s"
-msgstr ""
+msgstr "Liste modifiche in sospeso di Perforce - %s"
 
 #: tortoisehg\hgtk\p4pending.py:43
 msgid "Changelist:"
-msgstr ""
+msgstr "Lista modifiche:"
 
 #: tortoisehg\hgtk\p4pending.py:66
 msgid "Submit"
-msgstr ""
+msgstr "Invia"
 
 #: tortoisehg\hgtk\p4pending.py:67 tortoisehg\hgtk\quickop.py:21
 msgid "Revert"
@@ -3310,7 +3311,7 @@ msgstr "Ripristina"
 
 #: tortoisehg\hgtk\p4pending.py:98
 msgid "Finished"
-msgstr ""
+msgstr "Completato"
 
 #: tortoisehg\hgtk\p4pending.py:100 tortoisehg\hgtk\quickop.py:203
 #: tortoisehg\hgtk\thgmq.py:863
@@ -4986,7 +4987,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:267
 msgid "Command Output"
-msgstr ""
+msgstr "Output comandi"
 
 #: tortoisehg\hgtk\thgconfig.py:268
 msgid "Font used in command output window. Default: monospace 10"
@@ -4994,7 +4995,7 @@ msgstr "Font usato nella finestra di output comandi. Default: monospace 10"
 
 #: tortoisehg\hgtk\thgconfig.py:272
 msgid "Japanese on Windows"
-msgstr ""
+msgstr "Giapponese in Windows"
 
 #: tortoisehg\hgtk\thgconfig.py:279
 msgid "http"
@@ -5160,7 +5161,7 @@ msgstr "Font di default del tema"
 
 #: tortoisehg\hgtk\thgconfig.py:1052
 msgid "Preset fonts:"
-msgstr ""
+msgstr "Font preimpostati:"
 
 #: tortoisehg\hgtk\thgconfig.py:1053
 msgid "Custom fonts:"
@@ -5168,7 +5169,7 @@ msgstr "Font personalizzato:"
 
 #: tortoisehg\hgtk\thgconfig.py:1061
 msgid " - Select Preset -"
-msgstr ""
+msgstr " - Selezionare la preimpostazione -"
 
 #: tortoisehg\hgtk\thgconfig.py:1171
 msgid "Suggested"
@@ -5340,6 +5341,8 @@ msgid ""
 "Do you want to fold following un-applied patches into the current patch "
 "'%(qtip)s'?"
 msgstr ""
+"Vuoi collassare le seguenti patch non applicate nella patch corrente "
+"'%(qtip)s'?"
 
 #: tortoisehg\hgtk\thgmq.py:502
 msgid "invalid reorder operation: %s"
@@ -5371,7 +5374,7 @@ msgstr "_Rinomina"
 
 #: tortoisehg\hgtk\thgmq.py:772
 msgid "_Finish Applied"
-msgstr ""
+msgstr "_Completa applicazione"
 
 #: tortoisehg\hgtk\thgmq.py:775 tortoisehg\hgtk\thgmq.py:805
 msgid "_Delete"
@@ -5379,7 +5382,7 @@ msgstr "_Elimina"
 
 #: tortoisehg\hgtk\thgmq.py:777 tortoisehg\hgtk\thgmq.py:808
 msgid "F_old"
-msgstr ""
+msgstr "C_ollassa"
 
 #: tortoisehg\hgtk\thgmq.py:780 tortoisehg\hgtk\thgmq.py:812
 msgid "Reorder"
@@ -5419,7 +5422,7 @@ msgstr "Modifiche accantonate"
 
 #: tortoisehg\hgtk\thgshelve.py:107
 msgid "_Shelve"
-msgstr ""
+msgstr "_Shelve"
 
 #: tortoisehg\hgtk\thgshelve.py:140
 msgid "No changes to shelve"
@@ -5655,7 +5658,7 @@ msgstr "Impossibile trovare il changeset"
 
 #: tortoisehg\hgtk\visdiff.py:133
 msgid "You likely need to refresh this application"
-msgstr ""
+msgstr "Probabilmente devi aggiornare questa applicazione"
 
 #: tortoisehg\hgtk\visdiff.py:150
 msgid "No file changes"
@@ -5699,11 +5702,11 @@ msgstr "I file temporanei verranno rimossi alla chiusura di questa finestra"
 
 #: tortoisehg\hgtk\visdiff.py:381
 msgid "Dir diff to p1"
-msgstr ""
+msgstr "Comparazione directory con p1"
 
 #: tortoisehg\hgtk\visdiff.py:383
 msgid "Dir diff to p2"
-msgstr ""
+msgstr "Comparazione directory con p2"
 
 #: tortoisehg\hgtk\visdiff.py:385
 msgid "3-way dir diff"
@@ -6076,15 +6079,17 @@ msgstr "Sincronizza con il repository trascinato"
 
 #: tortoisehg\util\prej.py:143
 msgid "patching file %s\n"
-msgstr ""
+msgstr "applicazione patch sul file %s\n"
 
 #: tortoisehg\util\prej.py:190
 msgid "%d out of %d hunk%s FAILED -- saving rejects to file %s\n"
 msgstr ""
+"Applicazione di %d su %d blocchi %s FALLITA -- salvataggio blocchi rifiutati "
+"nel file %s\n"
 
 #: tortoisehg\util\prej.py:226
 msgid "bad hunk #%d %s (%d %d %d %d)"
-msgstr ""
+msgstr "blocco errato #%d %s (%d %d %d %d)"
 
 #: tortoisehg\util\prej.py:235
 msgid "file %s already exists\n"
@@ -6093,47 +6098,49 @@ msgstr "file %s già esistente\n"
 #: tortoisehg\util\prej.py:287
 msgid "Hunk #%d succeeded at %d with fuzz %d (offset %d lines).\n"
 msgstr ""
+"Blocco #%d applicato con successo a %d con fattore di incertezza %d (offset "
+"%d linee).\n"
 
 #: tortoisehg\util\prej.py:294
 msgid "Hunk #%d succeeded at %d (offset %d lines).\n"
-msgstr ""
+msgstr "Blocco #%d applicato con successo a %d (offset %d linee).\n"
 
 #: tortoisehg\util\prej.py:299
 msgid "Hunk #%d FAILED at %d\n"
-msgstr ""
+msgstr "Blocco #%d FALLITO a %d\n"
 
 #: tortoisehg\util\prej.py:318 tortoisehg\util\prej.py:344
 #: tortoisehg\util\prej.py:376
 msgid "bad hunk #%d"
-msgstr ""
+msgstr "blocco errato #%d"
 
 #: tortoisehg\util\prej.py:363 tortoisehg\util\prej.py:405
 msgid "bad hunk #%d old text line %d"
-msgstr ""
+msgstr "blocco #%d errato linea vecchio testo %d"
 
 #: tortoisehg\util\prej.py:550
 msgid "could not extract binary patch"
-msgstr ""
+msgstr "impossibile estrarre la patch binaria"
 
 #: tortoisehg\util\prej.py:566
 msgid "binary patch is %d bytes, not %d"
-msgstr ""
+msgstr "la pathc binaria è lunga %d byte, non %d"
 
 #: tortoisehg\util\prej.py:591
 msgid "unable to strip away %d dirs from %s"
-msgstr ""
+msgstr "impossibile eliminare %d directory da %s"
 
 #: tortoisehg\util\prej.py:613
 msgid "unable to find %s or %s for patching"
-msgstr ""
+msgstr "impossibile trovare %s o %s per applicare la patch"
 
 #: tortoisehg\util\prej.py:792
 msgid "malformed patch %s %s"
-msgstr ""
+msgstr "patch non conforme %s %s"
 
 #: tortoisehg\util\prej.py:803
 msgid "No valid hunks found"
-msgstr ""
+msgstr "Nessun blocco valido trovato"
 
 #: tortoisehg\util\version.py:17
 msgid "repository %s not found"
