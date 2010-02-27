@@ -149,6 +149,8 @@
 		fontdiff = courier 10
 		# font used in file lists in status and commit tools
 		fontlist = courier 9
+		# font used in command output window
+		fontlog = courier 10
 
 *GTK のテーマを変更するにはどうすればいいの？*
 
