@@ -128,6 +128,11 @@ For Mac OS X, no packages are available but you can run hgtk and all the
 dialogs via the source install method. For details, see
 `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
 
+.. note::
+	If you install TortoiseHg from source, you need to add our
+	contrib/mergetools.ini file to your HGRC path in some way.  One
+	approach is to %include it from your ~/.hgrc file.
+
 Language settings
 ^^^^^^^^^^^^^^^^^
 
