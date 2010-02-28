@@ -129,7 +129,7 @@ Mercurial-Keyring
 =================
 
 * `Mercurial Keyring <http://pypi.python.org/pypi/mercurial_keyring>`_ home page
-* `Wiki page <http://mercurial.selenic.com/wiki/KeyringExtension>`_
+* `Keyring Extension <http://mercurial.selenic.com/wiki/KeyringExtension>`_ wiki page
 
 Keyring extension uses services of the keyring library to securely save
 authentication passwords (HTTP/HTTPS and SMTP) using system specific

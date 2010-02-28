@@ -6,13 +6,14 @@ Use with other VCS systems
 	:synopsis: Describe using TortoiseHg as a front-end to other VCS
 
 This chapter describes the three most popular Mercurial extensions for
-interoperating with *foreign* VCS systems.
+interoperating with *foreign* VCS systems.  See also `Repository
+Conversion <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
 
 Perfarce (Perforce)
 ===================
 
-`Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ home
-page.
+* `Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ home page.
+* `Mercurial for Perforce users <http://mercurial.selenic.com/wiki/PerforceConcepts>`_
 
 This extension modifies the remote repository handling so that repository
 paths that resemble::
@@ -95,7 +96,9 @@ repository's hgrc like this::
 hgsubversion (SVN)
 ==================
 
-`hgsubversion <http://bitbucket.org/durin42/hgsubversion/wiki/Home>`_ home page
+* `hgsubversion <http://bitbucket.org/durin42/hgsubversion/wiki/Home>`_ home page
+* `hgsubversion Extension <http://mercurial.selenic.com/wiki/HgSubversion>`_ wiki page
+* `Working with Subversion Repositories <http://mercurial.selenic.com/wiki/WorkingWithSubversion>`_
 
 hgsubversion, as it's name implies, allows you to use Mercurial as a
 client to a Subversion server.  It can also be used to do straight
@@ -133,7 +136,9 @@ checkin number in the Repository Explorer browser.
 hg-git (git)
 ============ 
 
-`hg-git <http://hg-git.github.com/>`_ home page
+* `hg-git <http://hg-git.github.com/>`_ home page
+* `hg-git Extension <http://mercurial.selenic.com/wiki/HgGit>`_ wiki page
+* `Mercurial for Git users <http://mercurial.selenic.com/wiki/GitConcepts>`_
 
 hg-git, as it's name implies, allows you to use Mercurial as a
 client to a git server.  It can also be used to do straight conversions
