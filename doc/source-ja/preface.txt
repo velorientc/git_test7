@@ -66,7 +66,7 @@ Bitbucket には `公式 Wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>
 謝辞
 ====
 
-TortoiseHg プロジェクトに貢献し、本当に便利なツールを作り上げた全ての開発者、
+TortoiseHg プロジェクトに貢献し、本当に便利なツールを作り上げたすべての開発者、
 翻訳者、利用者コミュニティ、特に貴重なバグレポートおよび機能要望をしていただいた
 ユーザの方々に感謝の意を表します。
 
@@ -88,7 +88,7 @@ TortoiseHg の Windows 向けインストーラには `TortoiseSVN <http://torto
 	メニュー選択およびその組み合せ、またタブ選択、GUI のラベルを示します。例えば
 	:menuselection:`TortoiseHg... --> ユーザ設定 --> コミット --> ユーザ名`
 	は メニューから :menuselection:`TortoiseHg... --> ユーザ設定` とたどり、
-	開いたダイアログの :guilabel:`コミット` というタブに切り替えて、その中にある
+	開いたダイアログの :guilabel:`コミット` というページに切り替えて、その中にある
 	:guilabel:`ユーザ名` というラベルの付いた場所で何かをする、という意味になります。
 
 :file:`.hg/hgrc`

@@ -134,15 +134,15 @@
 
           <Directory Id='HGRCD' Name='hgrc.d'>
             <Component Id='mercurial.rc' Guid='28ACE5D7-FFCE-488E-A94A-8F13A21DD25D'>
-              <File Id='mercurial.rc' Name='Mercurial.rc' DiskId='1' Source='contrib\win32\mercurial.ini'
+              <File Id='mercurial.rc' Name='Mercurial.rc' DiskId='1' Source='contrib\win32\mercurial.rc'
                     ReadOnly='yes'/>
             </Component>
             <Component Id='mergetools.rc' Guid='30CC047C-48B4-4D91-B8EC-79975327A9C7'>
-              <File Id='mergetools.rc' Name='MergeTools.rc' DiskId='1' Source='contrib\mergetools.ini'
+              <File Id='mergetools.rc' Name='MergeTools.rc' DiskId='1' Source='contrib\mergetools.rc'
                     ReadOnly='yes'/>
             </Component>
             <Component Id="mergepatterns.rc" Guid="05860DA7-8391-43A4-A4E7-6E9E084D11C6">
-              <File Id='mergepatterns.rc' Name='MergePatterns.rc' DiskId='1' Source='contrib\win32\mergepatterns.ini'
+              <File Id='mergepatterns.rc' Name='MergePatterns.rc' DiskId='1' Source='contrib\win32\mergepatterns.rc'
                     ReadOnly='yes' KeyPath='yes'/>
             </Component>
           </Directory>
@@ -156,10 +156,10 @@
             <RegistryValue Root='HKCU' Key='Software\TortoiseHg' Type='string' Value='[INSTALLDIR]' KeyPath='yes' />
             <Shortcut Id='UrlShortcut' Directory='ProgramMenuDir' Name='TortoiseHg Web Site' Target='[ARPHELPLINK]'
                       Icon="thgIcon.ico" IconIndex='0' />
-            <Shortcut Id="UninstallProduct" Name="Uninstall TortoiseHg"
+            <!-- Shortcut Id="UninstallProduct" Name="Uninstall TortoiseHg"
                       Target="[System64Folder]msiexec.exe"
                       Arguments="/x [ProductCode]"
-                      Description="Uninstalls TortoiseHg" />
+                      Description="Uninstalls TortoiseHg" /-->
           </Component>
         </Directory>
       </Directory>

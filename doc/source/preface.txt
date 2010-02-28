@@ -37,6 +37,9 @@ components of TortoiseHg.
 :doc:`recovery` describes the recovery operations one can perform on a
 project.
 
+:doc:`nonhg` describes how to use TortoiseHg as a client to
+non-Mercurial servers.
+
 :doc:`faq` has a list of common questions and their answers.
 
 :doc:`debugging` describes how to debug any problems that you find.

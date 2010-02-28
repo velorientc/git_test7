@@ -27,8 +27,9 @@ things, you will need to enable **git** patches via::
 
 Mercurial 1.5 improves it's behavior in this regard.  It will warn you
 when git diffs are required, or sometimes upgrade to the git format
-automatically.
-`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_.
+automatically.  See also the
+`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_ of
+the hgrc documentation.
 
 Mercurial's patch routines do not deal well with mixed EOLN between
 source files and patches.  The **patch.eol** setting was introduced in
@@ -38,14 +39,19 @@ source files and patches.  The **patch.eol** setting was introduced in
 	eol = auto #strict, lf, or crlf
 
 The work on the hgeol extension is also improving this area.  Perhaps it
-will be resolved by hg-1.5.
-`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_.
+will be resolved by hg-1.5.  See also the
+`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
+of the hgrc documentation.
 
 Applying a patch is not a foolproof operation.  If the source file has
 diverged from the file that was used to create the patch, there may be
 conflicts during the patch application.  These are written to a file
-with an .rej extension.  Currently, these rejected changes must be
-manually resolved by the user.
+with an .rej extension.  TortoiseHg 1.0 includes an experimental
+:command:`hgtk mpatch` command that can try *harder* to apply the
+rejected patch hunks.  This command is based on Chris Mason's `mpatch
+<http://oss.oracle.com/~mason/mpatch/>`_ utility.  If mpatch cannot
+apply the rejected hunks, your only remaining choice is to apply them by
+hand.
 
 
 Export Patches
@@ -72,6 +78,11 @@ and target changesets you can select.
 
 Email
 -----
+
+.. figure:: figures/email.png
+	:alt: Email dialog
+
+	Email dialog of Repository Explorer
 
 To send a changeset as an email, use the changeset context menu of the
 Repository Explorer. :menuselection:`Export --> Email Patch`.  This
@@ -108,21 +119,47 @@ in the hunk selection pane and hit CTRL-C.  This will copy the
 highlighted (mouse selected, not toggled) hunks to the clipboard.
 
 .. note::
-	Reversing the order of your selection reverses the effect of the
-	patch.
+	Reversing the order of your changeset selection reverses the effect
+	of the patch.
 
 
 Import Patches
 ==============
 
-Import dialog
-Pitfall: requires clean working directory state
-Pitfall: hg import can spawn an editor if patch has no header
+.. figure:: figures/import.png
+	:alt: Import tool
+
+	Import dialog of Repository Explorer
+
+The import dialog can be opened from the sync bar or menu of the
+Repository Explorer, or via :command:`hgtk import`.  The dialog supports
+file and directory drag and drop.  The drop down menu in the upper right
+corner next to the :guilabel:`Browse` button has the options:
+:guilabel:`Browse Directory..` and :guilabel:`Import from Clipboard`.
+
+.. note::
+	Importing a patch requires a clean working directory state.  You
+	must commit, revert, or shelve changes before importing a patch.
+
+.. warning::
+	If the patch you are importing does not have a commit
+	message, Mercurial will try to launch your editor, just as if you
+	had tried to import the patch from the command line.  Your ui.editor
+	needs to be a GUI app to make this work correctly.
 
 
 Patch Queues
 ============
 
-MQ pane in Repository Explorer, Commit tool.
+.. figure:: figures/patchqueue.png
+	:alt: Patch Queue
+
+	Patch Queue panel in the Repository Explorer
+
+Both the Repository Explorer and Commit Tool have optional Patch Queue
+panels that are available when the user has enabled the MQ extension.
+It allows the user to perform most patch operations including push, pop,
+rename, and finish.  It's recommended that to learn the MQ extension
+before using the Patch Queue panel.
 
 .. vim: noet ts=4

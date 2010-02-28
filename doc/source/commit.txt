@@ -10,14 +10,15 @@ Commit
 	proper configuration. See
 	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
    
-The commit tool is one of the main two applications of TortoiseHg.
+The commit tool is one of the two main applications of TortoiseHg.
 Together with the Repository Explorer (aka, the changelog tool) these
 two tools can perform or access nearly every function that TortoiseHg
 supports.
 
-Not only can the commit tool commit your changes, but it can examine the
-state of your working directory and perform most routine maintenance
-tasks (add new files, record renames, manage the ignore filter, etc).
+Not only can the commit tool commit your changes, but it can also
+examine the state of your working directory and perform most routine
+maintenance tasks (add new files, record renames, manage the ignore
+filter, etc).
 
 .. figure:: figures/commit.png
 	:alt: Commit dialog
@@ -66,6 +67,9 @@ Enumerating the toolbar buttons:
 	:guilabel:`Refresh`
 		Reload the state of the working directory. It tries to retain
 		check and selection state across refresh.
+	:guilabel:`Patch Queue`
+		If the MQ extension is enabled, this toggle button for the patch
+		queue pane will be visible.
 
 Below the toolbar are useful widgets:
 
@@ -92,11 +96,12 @@ The file list has four columns:
 	   column header is checkable, it will toggle the file selection
 	   states.
 	2) The :guilabel:`st` column holds the status of the file, defined
-	   by Mercurial's status command, one of 'MARD?IC'.
+	   by Mercurial's status command, one of 'MARD?IC'.  A status of 'S'
+	   indicates a dirty subrepository that needs to be committed.
 	3) The :guilabel:`ms` column holds the merge state of the file,
 	   defined by Mercurial's resolve command, one of ' RU'.  See the
 	   merge section below.
-	4) The canonical path of the file (relative to the repository root)
+	4) The canonical path of the file relative to the repository root
 
 .. note::
 	If the commit tool was started with a file pattern or selection, a

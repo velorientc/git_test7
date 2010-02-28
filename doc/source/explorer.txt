@@ -26,32 +26,28 @@ directory of repositories. The taskbar icon will turn green and the
 directory icons will turn into question marks while this refresh is in
 progress.
 
-The new C++ shell extension is an order of magnitude faster than the
-Python extension used in previous releases, but we still make the
-overlays configurable via the taskbar menu.  Simply click on the
-Mercurial (droplet) icon in the system tray and select
-:guilabel:`Options`.  In the options dialog you can disable overlays
-globally, or enable them for local disks only.
+The overlay handler and context menus are configurable.  From any folder
+background (even the desktop), right click and select
+:menuselection:`TortoiseHg --> Explorer Extension Settings`. In the settings
+dialog you can promote individual menu options to the top menu.
 
 .. figure:: figures/taskbarui.png
-	:alt: Taskbar options dialog
+	:alt: Shell Configuration dialog
 
-	Taskbar Options Dialog
+	Shell Configuration Dialog
 
-Release 0.8.1 introduced the ability to selectively disable overlay
-icons in specific repositories.  This can be done by editing the
-:file:`.hg\\thgstatus` file inside the repository and replacing it's
-contents with a single line containing::
+One can selectively disable overlay icons in a specific repository by
+editing the :file:`.hg\\thgstatus` file inside the repository and
+replacing it's contents with a single line containing::
 
 	@@noicons
 
 Context Menus
 -------------
 
-The TortoiseHg commands (GUI window & dialogs) may be accessed via the
-context menu of Explorer windows. The TortoiseHg context menu is 
-context sensitive and which varies according to the current folder and
-file selection.  Here is the context menu for a revisioned folder:
+TortoiseHg commands may be accessed via the context menu of Explorer
+windows and other applications which use the standard File/Open dialogs.
+Here is the context menu for a revisioned folder:
 
 .. figure:: figures/cmenu-nofiles.jpg
 	:alt: Context menu
@@ -67,13 +63,8 @@ And here is the context menu for selected files or folders:
 
 TortoiseHg provides dialogs for the most regularly used Mercurial
 commands.  Less frequently used and newly added Mercurial commands
-must need be accessed on the CLI (command line interface) through 
-:file:`cmd.exe` windows.
-
-The context menus are configurable via the taskbar menu. Simply click on
-the Mercurial (droplet) icon in the system tray and select
-:guilabel:`Options`.  In the options dialog you can promote individual
-menu options to the top menu.
+may be accessed from the CLI (command line interface) through
+:file:`cmd.exe` on Windows.
 
 Nautilus
 --------
