@@ -182,9 +182,8 @@ the search text of that type, and then hits return in the text entry.
 	:guilabel:`User`
 		Parse the user text as a user / comitter name.
 
-The filter entry has a combo box which stores the history of searches
-made while the dialog was open.  Selecting an item from the drop down
-list will apply that filter.
+The filter entry has a combo box which stores the history of searches.
+Selecting an item from the drop down list will apply that filter.
 
 Revision Graph Details
 ----------------------
@@ -213,8 +212,8 @@ avoided in large repositories.
 	screen space.
 
 * Column :guilabel:`Changes` 
-	This column can be expensive to calculate on large repositories,
-	causing both refreshes and scrolling to be slow.
+	This column can be expensive to calculate on repositories with large
+	working copies, causing both refreshes and scrolling to be slow.
 
 
 Revision Context Menus
@@ -232,37 +231,54 @@ revision context menu.
 		current working directory
 	:guilabel:`Copy Hash`
 		copy current revision's full hash to the clipboard
-	:guilabel:`Update`
+	:guilabel:`Update...`
 		update your working directory to this revision [#rcm1]_
-	:guilabel:`Merge With`
+	:guilabel:`Merge With...`
 		merge with this revision [#rcm2]_
-	:guilabel:`Export Patch`
-		generate a patch file containing this revision's changes
-	:guilabel:`Email Patch`
-		send this revision's changes to email recipient [#rcm3]_
-	:guilabel:`Bundle rev:tip`
-		create a bundle with all revs from selected to tip
-	:guilabel:`Add/Remove Tag`
-		opens the TortoiseHg tag dialog with this revision selected
-	:guilabel:`Backout revision`
+	:guilabel:`Backout...`
 		create a backout changeset for selected revision
 	:guilabel:`Revert`
 		revert working copy to this revision's contents, without
 		updating working directory parent revision. Use with care.
-	:guilabel:`Archive...`
-		open the archive dialog for this revision, allowing user to
-		generate a backup copy of the repository at that revision.
+	:guilabel:`Export`
+		:guilabel:`Export Patch`
+			generate a patch file containing this revision's changes
+		:guilabel:`Email Patch`
+			send this revision's changes to email recipient [#rcm3]_
+		:guilabel:`Bundle rev:tip`
+			create a bundle with all revs from selected to tip
+		:guilabel:`Archive...`
+			open the archive dialog for this revision, allowing user to
+			generate a backup copy of the repository at that revision.
+	:guilabel:`Tag`
+		:guilabel:`Add/Remove Tag`
+			opens the TortoiseHg tag dialog with this revision selected
+		:guilabel:`Add/Move/Remove Bookmark`
+			opens the TortoiseHg bookmark dialog with this revision selected
+			*This option requires the boomarks extension to be enabled*
+		:guilabel:`Rename Bookmark`
+			opens the TortoiseHg bookmark rename dialog
+			*This option requires the boomarks extension to be enabled*
+	:guilabel:`Mercurial Queues`
+		:guilabel:`Import revision to MQ`
+			Import selected revision into the current patch queue.  Only
+			valid for qbase or checked out head revision.  *Only visible
+			when MQ is enabled*
+		:guilabel:`Strip Revision...`
+			Remove the selected revision and all of it's descendants from the
+			repository [#rcm4]_ *Only visible when MQ is enabled*
 	:guilabel:`Transplant to local`
 		Transplant selected revision onto the current working parent.
 		*Only visible when the transplant extension is enabled*
-	:guilabel:`qimport`
-		Import selected revision into the current patch queue.  Only
-		valid for qbase or checked out head revision.  *Only visible
-		when MQ is enabled*
-	:guilabel:`Strip Revision...`
-		Remove the selected revision and all of it's descendants from the
-		repository [#rcm4]_ *Only visible when MQ is enabled*
-
+	:guilabel:`Bisect`
+		:guilabel:`Reset`
+			Reset bisect state. See `bisect <#id10>`_ section below.
+		:guilabel:`Mark as Good`
+			Mark changeset as good
+		:guilabel:`Mark as Bad`
+			Mark changeset as bad
+		:guilabel:`Skip Testing`
+			Skip testing this changeset
 
 If you right-click on a row other than the one that was currently
 selected, you get a secondary context menu which defines commands that
@@ -403,6 +419,25 @@ Examples::
 	Mercurial:
 	issue.regex = \bissue\d+\b
 	issue.link = http://mercurial.selenic.com/bts/
+
+Bisect
+------
+
+TortoiseHg 1.0 introduced support for bisect bug searching to help find
+changesets which introduce problems. To use, mark the earliest changeset
+you know exhibits the problem as bad, then mark the latest changeset
+which is free from the problem as good.  Once you have performed tests,
+mark the working directory parent as good or bad, and bisect will either
+update to another candidate changeset or announce that it has found the
+bad revision.
+
+As a shortcut, you can also mark a revision as good or bad without
+checking it out first.
+
+For more automated bisecting, you must use the Mercurial command line
+and provide an automated test that can build and run a changeset and
+return 0-good, 125-skip, or 127-abort, or anythin else to mean bad.  See
+the :command:`hg bisect` command help for more information.
 
 
 Keyboard navigation
