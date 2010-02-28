@@ -73,6 +73,11 @@ and target changesets you can select.
 Email
 -----
 
+.. figure:: figures/email.png
+	:alt: Email dialog
+
+	Email dialog of Repository Explorer
+
 To send a changeset as an email, use the changeset context menu of the
 Repository Explorer. :menuselection:`Export --> Email Patch`.  This
 opens the e-mail dialog for this single changeset.
@@ -126,9 +131,12 @@ file and directory drag and drop.  The drop down menu in the upper right
 corner next to the :guilabel:`Browse` button has the options:
 :guilabel:`Browse Directory..` and :guilabel:`Import from Clipboard`.
 
+.. note::
+	Importing a patch requires a clean working directory state.  You
+	must commit, revert, or shelve changes before importing a patch.
+
 .. warning::
-	Pitfall: importing a patch requires a clean working directory state
-	Pitfall: if the patch you are importing does not have a commit
+	If the patch you are importing does not have a commit
 	message, Mercurial will try to launch your editor, just as if you
 	had tried to import the patch from the command line.  Your ui.editor
 	needs to be a GUI app to make this work correctly.
@@ -144,8 +152,8 @@ Patch Queues
 
 Both the Repository Explorer and Commit Tool have optional Patch Queue
 panels that are available when the user has enabled the MQ extension.
-It allows the user to perform most possible patch operations including
-push, pop, rename, and finish.  It's recommended that you learn the MQ
-extension before using the Patch Queue panel.
+It allows the user to perform most patch operations including push, pop,
+rename, and finish.  It's recommended that to learn the MQ extension
+before using the Patch Queue panel.
 
 .. vim: noet ts=4
