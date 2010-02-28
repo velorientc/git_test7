@@ -14,8 +14,10 @@ Frequently Asked Questions
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
-	and five bonus extensions: hgfold, hgcr-gui, perfarce, hgeol,
-	mercurial-keyring.
+	five bonus extensions: hgfold, hgcr-gui, perfarce, hgeol, mercurial-keyring.
+	python-svn for hgsubversion and convert extensions
+	dulwich for hg-git use.
+	See :file:`extension-versions.txt` in installer root for more details
 
 *Is Mercurial on Windows compatible with the index service and virus scanners?*
 
@@ -26,7 +28,7 @@ Frequently Asked Questions
 *How can I get translations for the Explorer context menu?*
 
 	The available translations were stored by the installer under
-	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  Select the
+	:file:`C:\\Program Files\\TortoiseHg\\i18n\\cmenu`.  Select the
 	locale you would like to use, double-click on it, and confirm all
 	requests.
 
@@ -58,10 +60,6 @@ Frequently Asked Questions
 	Merges and updates are intended to be done from within the Changelog
 	tool (:guilabel:`Repository Explorer` menu option)
 
-*How do I fix* ``failed to import extension hgext.hgconfig...`` *warnings?*
-
-	See `issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_.
-
 *How do I use TortoiseHg's shelve extension from the hg command line?*
 	
 	Enable the extension in your Mercurial.ini file::
@@ -74,44 +72,15 @@ Frequently Asked Questions
 	See `ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
 
 
-*How can I use the hg-git extension with TortoiseHg*
-
-	TortoiseHg installers include the dulwich package, so all that is
-	necessary is to clone 
-	`hg-git <http://bitbucket.org/durin42/hg-git/>`_ and enable both
-	the hg-git and bookmarks extensions::
-
-		[extensions]
-		hggit = C:\extensions\hg-git\hggit
-		bookmarks =
-
-	Beware the 'incoming' command appears broken when speaking with git
-	repositories, and 'outgoing' does not show much useful info. So you are
-	restricted to simple push and pull commands (not uncommon for extensions
-	that speak with external revision control tools).
-
-*How can I use the hgsubversion extension with TortoiseHg*
-
-	TortoiseHg installers include the svn Python bindings required by
-	hgsubversion, so all one has to do is clone
-	`hgsubversion <http://bitbucket.org/durin42/hgsubversion/>`_ and then
-	enable it::
-
-		[extensions]
-		hgsubversion = C:\extensions\hgsubversion\hgsubversion
-
 *How can I use tool X as my visual diff tool?*
 
 	Since version 1.0, TortoiseHg should autodetect most popular visual
 	diff tools and make them available for selection from the
 	:guilabel:`Visual Diff Tool` item in the settings tool.
 
-*I'm a CLI user, how do I disable the shell extensions (overlay icons and context menus)?*
+*I'm a CLI user, how do I disable the shell extension (overlay icons and context menus)?*
 
-	You can disable overlays via the taskbar options menu.  The only way
-	to disable the context menu is to rename :file:`ThgShell.dll` in
-	your install directory and then restart explorer (this completely
-	disables the shell extension).
+	Simply ask the installer to remove the shell extension entirely.
 
 *How is TortoiseHg configured?*
 
@@ -156,28 +125,6 @@ Frequently Asked Questions
 	You also should be able to download new themes and copy them into
 	the :file:`gtk\\share\\themes` directory and then enable them in
 	:file:`gtk\\etc\\gtk-2.0\\gtkrc`.
-
-*After uninstalling, it left a bunch of DLL and PYD files behind.*
-
-	Reboot, like the uninstaller told you to :-) The uninstaller marked
-	those files for removal at the next boot since most of them could
-	not be removed while your system was running.
-
-*How can I convert a subversion repository to Mercurial?*
-
-	You must install svn-win32-1.6 command line tools, then add them to
-	your path. Then you must enable the
-	`convert <http://mercurial.selenic.com/wiki/ConvertExtension>`_
-	extension. At this point, you should be able to use the
-	:command:`hg convert` command to do the conversion. Please direct
-	problems/questions about the convert extension to the Mercurial
-	mailing list or #mercurial on irc.freenode.net.
-
-	Alternatively, you can use the hgsubversion extension.
-
-	Refer to
-	`Converting Repositories <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
-	page for more details.
 
 *Where do TortoiseHg extensions look for external Python modules on Windows?*
 
