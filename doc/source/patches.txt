@@ -27,8 +27,9 @@ things, you will need to enable **git** patches via::
 
 Mercurial 1.5 improves it's behavior in this regard.  It will warn you
 when git diffs are required, or sometimes upgrade to the git format
-automatically.
-`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_.
+automatically.  See also the
+`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_ of
+the hgrc documentation.
 
 Mercurial's patch routines do not deal well with mixed EOLN between
 source files and patches.  The **patch.eol** setting was introduced in
@@ -38,14 +39,19 @@ source files and patches.  The **patch.eol** setting was introduced in
 	eol = auto #strict, lf, or crlf
 
 The work on the hgeol extension is also improving this area.  Perhaps it
-will be resolved by hg-1.5.
-`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_.
+will be resolved by hg-1.5.  See also the
+`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
+of the hgrc documentation.
 
 Applying a patch is not a foolproof operation.  If the source file has
 diverged from the file that was used to create the patch, there may be
 conflicts during the patch application.  These are written to a file
-with an .rej extension.  Currently, these rejected changes must be
-manually resolved by the user.
+with an .rej extension.  TortoiseHg 1.0 includes an experimental
+:command:`hgtk mpatch` command that can try *harder* to apply the
+rejected patch hunks.  This command is based on Chris Mason's `mpatch
+<http://oss.oracle.com/~mason/mpatch/>`_ utility.  If mpatch cannot
+apply the rejected hunks, your only remaining choice is to apply them by
+hand.
 
 
 Export Patches
