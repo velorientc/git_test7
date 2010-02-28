@@ -38,19 +38,57 @@ Installing TortoiseHg
 On Windows
 ----------
 
-TortoiseHg comes with an easy to use installer. Double click on the installer
-file and follow the instructions. The installer will take care of the rest.
+TortoiseHg comes with an easy to use MSI installer. Double click on the
+installer file and follow the instructions.
 
-After installation a reboot is necessary.
+After a clean install, a re-login is usually required to start the icon
+overlays.
+
+During upgrades, the installer will ask to close or restart any
+applications that have loaded the TortoiseHg shell extension.  If you
+allow those applications to be closed, the upgrade will not require a
+reboot or logout.
 
 .. note::
-	If you have an older (<0.8) version already installed, the installer
-	will ask that you to remove the previous version of TortoiseHg.  The
-	uninstall can be initiated from the control panel or the start menu.
+	If you have a legacy version of TortoiseHg installed, the 1.0
+	installer will ask that you to remove it.  The uninstall can be
+	initiated from the control panel or the start menu.
+
+.. warning::
+	The legacy uninstallers have a tendency to delete your user
+	Mercurial.ini file, so backup your file before uninstalling the
+	older TortoiseHg versions.  This is not a problem with the newer MSI
+	packages.
+
+All legacy TortoiseHg installers (before version 1.0) were built with
+InnoSetup.  They installed a TortoiseOverlay package as a separate
+application, so you always saw both TortoiseHg and TortoiseOverlay as
+two applications in the *Add/Remove Programs* control panel program.
+(On X64 platforms, there were two TortoiseOverlays, one for x86
+processes and one of x64 processes).
+
+The new MSI installers for TortoiseHg 1.0 include the TortoiseOverlay
+packages as "merge modules" so they do not appear as separate
+applications anymore.  It should be safe to uninstall the older
+TortoiseOverlay applications from *Add/Remove Programs* after you
+uninstall the legacy (<=0.9.3) TortoiseHg installer, unless you have
+other Tortoise products that also used the separate TortoiseOverlay MSI
+approach (TortoiseCVS or TortoiseBZR).
 
 .. note::
-	If you have 0.8 or later already installed, the installer will close
-	the ThgTaskbar application when it begins copying files.
+	TortoiseOverlay is a shim package that allows multiple Tortoise
+	style shell extension clients to share overlay slots.  This is
+	necessary because even modern Windows platforms only support a
+	limited number of overlay slots (11-14).  TortoiseOverlay
+	packages are created by the TortoiseSVN developers.
+
+To be completely safe, there are two approaches you can take:
+
+1) Just leave the old TortoiseOverlay packages installed.  They do not
+   harm anything.
+2) Uninstall all the old TortoiseOverlay packages, then re-install all
+   of your Tortoise products until they are all functional.
+
 
 
 Language settings
@@ -72,7 +110,7 @@ variable ``LANGUAGE`` to the desidered language, e.g. for italian
 
 The Windows shell extension context menus get their translations from
 the Windows registry.  Translations for many locales were installed
-under :file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  Select the
+under :file:`C:\\Program Files\\TortoiseHg\\i18n\\cmenu`.  Select the
 locale you would like to use, double-click on it, and confirm all
 requests.
 
