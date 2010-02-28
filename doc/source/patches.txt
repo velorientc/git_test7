@@ -108,21 +108,44 @@ in the hunk selection pane and hit CTRL-C.  This will copy the
 highlighted (mouse selected, not toggled) hunks to the clipboard.
 
 .. note::
-	Reversing the order of your selection reverses the effect of the
-	patch.
+	Reversing the order of your changeset selection reverses the effect
+	of the patch.
 
 
 Import Patches
 ==============
 
-Import dialog
-Pitfall: requires clean working directory state
-Pitfall: hg import can spawn an editor if patch has no header
+.. figure:: figures/import.png
+	:alt: Import tool
+
+	Import dialog of Repository Explorer
+
+The import dialog can be opened from the sync bar or menu of the
+Repository Explorer, or via :command:`hgtk import`.  The dialog supports
+file and directory drag and drop.  The drop down menu in the upper right
+corner next to the :guilabel:`Browse` button has the options:
+:guilabel:`Browse Directory..` and :guilabel:`Import from Clipboard`.
+
+.. warning::
+	Pitfall: importing a patch requires a clean working directory state
+	Pitfall: if the patch you are importing does not have a commit
+	message, Mercurial will try to launch your editor, just as if you
+	had tried to import the patch from the command line.  Your ui.editor
+	needs to be a GUI app to make this work correctly.
 
 
 Patch Queues
 ============
 
-MQ pane in Repository Explorer, Commit tool.
+.. figure:: figures/patchqueue.png
+	:alt: Patch Queue
+
+	Patch Queue panel in the Repository Explorer
+
+Both the Repository Explorer and Commit Tool have optional Patch Queue
+panels that are available when the user has enabled the MQ extension.
+It allows the user to perform most possible patch operations including
+push, pop, rename, and finish.  It's recommended that you learn the MQ
+extension before using the Patch Queue panel.
 
 .. vim: noet ts=4
