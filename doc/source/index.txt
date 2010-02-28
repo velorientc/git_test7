@@ -20,6 +20,7 @@ Contents:
 	recovery
 	patches
 	extensions
+	nonhg
 	faq
 	debugging
    
