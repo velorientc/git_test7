@@ -130,7 +130,7 @@ dialogs via the source install method. For details, see
 
 .. note::
 	If you install TortoiseHg from source, you need to add our
-	contrib/mergetools.ini file to your HGRC path in some way.  One
+	contrib/mergetools.rc file to your HGRC path in some way.  One
 	approach is to %include it from your ~/.hgrc file.
 
 Language settings

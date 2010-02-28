@@ -48,7 +48,7 @@ Visual Diffs
 
 In TortoiseHg 1.0, the visual (external) diff infrastructure was
 refactored.  The new system uses tool descriptions in
-:file:`mergetools.ini` to detect most common diff tools on your computer
+:file:`mergetools.rc` to detect most common diff tools on your computer
 (including KDiff3, which ships in our installer) and select the best
 available tool.
 
@@ -155,7 +155,7 @@ Word Diffs
 
 The TortoiseHg Windows installers now include TortoiseSVN's scripts for
 comparing (and sometimes merging) many binary document formats.  These
-are configured in the site-wide :file:`mergepatterns.ini` as handlers for
+are configured in the site-wide :file:`mergepatterns.rc` as handlers for
 each binary format's common file extensions, so no user intervention is
 required.
 
