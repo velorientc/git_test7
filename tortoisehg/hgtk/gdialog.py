@@ -21,7 +21,7 @@ from mercurial import cmdutil, util, ui, hg, commands, error
 from tortoisehg.util.i18n import _
 from tortoisehg.util import settings, hglib, paths, shlib
 
-from tortoisehg.hgtk import gtklib, hgcmd
+from tortoisehg.hgtk import gtklib
 
 class SimpleMessage(gtklib.MessageDialog):
     def run(self):
@@ -787,6 +787,7 @@ class GDialog(gtk.Dialog):
     ### Internal Functions ###
 
     def after_init(self):
+        from tortoisehg.hgtk import hgcmd
         self.get_extras(self.vbox)
 
         # CmdWidget
