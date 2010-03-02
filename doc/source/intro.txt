@@ -38,16 +38,20 @@ Installing TortoiseHg
 On Windows
 ----------
 
-TortoiseHg comes with an easy to use MSI installer. Double click on the
-installer file and follow the instructions.
+TortoiseHg comes with an easy to use MSI installer.  You can always find
+the most up to date release on our `website
+<http://tortoisehg.bitbucket.org/download/windows.html>`_.
+Double click on the installer file and follow the instructions.
 
-After a clean install, a re-login is usually required to start the icon
-overlays.
+After a first time install, a re-login is usually required to start the
+icon overlays.
 
 During upgrades, the installer will ask to close or restart any
 applications that have loaded the TortoiseHg shell extension.  If you
 allow those applications to be closed, the upgrade will not require a
-reboot or logout.
+reboot or logout.  If other users are logged in, or if there are
+applications which cannot be shutdown, a reboot will be required to
+complete the install.
 
 .. note::
 	If you have a legacy version of TortoiseHg installed, the 1.0
@@ -117,12 +121,8 @@ requests.
 On Linux and Mac
 ----------------
 
-Debian DEB and RPM packages for Fedora are available on the
-`download <http://bitbucket.org/tortoisehg/stable/wiki/download/>`_
-page of the wiki.
-
-Packages for Ubuntu can be found at the TortoiseHg 
-`PPA <https://launchpad.net/~tortoisehg-ppa>`_ web site.
+The most recent Linux packages can be found on our `download
+<http://tortoisehg.bitbucket.org/download/linux.html>`_ page.
 
 For Mac OS X, no packages are available but you can run hgtk and all the
 dialogs via the source install method. For details, see
