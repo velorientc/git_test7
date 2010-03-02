@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-22 23:55+0000\n"
-"PO-Revision-Date: 2010-02-26 12:32+0000\n"
+"PO-Revision-Date: 2010-03-01 12:34+0000\n"
 "Last-Translator: paolof <gp.fadel@gmail.com>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-02-27 04:52+0000\n"
+"X-Launchpad-Export-Date: 2010-03-02 04:44+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:36
@@ -4585,7 +4585,7 @@ msgid ""
 "small, large, or theme.  Default: theme"
 msgstr ""
 "Imposta la visualizzazione della barra strumenti principale nella finestra "
-"di esplorazione reporitory. Possibili valori: small, large, o theme. "
+"di esplorazione repository. Possibili valori: small, large, o theme. "
 "Default: theme"
 
 #: tortoisehg\hgtk\thgconfig.py:133
@@ -4982,8 +4982,8 @@ msgstr "Lista File"
 #: tortoisehg\hgtk\thgconfig.py:265
 msgid "Font used in file lists in status and commit tools. Default: sans 9"
 msgstr ""
-"Font usato nella lista file negli strumenti di stato file e commit.. "
-"Default: sans 9"
+"Font usato nella lista file negli strumenti di stato file e commit. Default: "
+"sans 9"
 
 #: tortoisehg\hgtk\thgconfig.py:267
 msgid "Command Output"
