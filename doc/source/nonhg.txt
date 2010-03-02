@@ -150,13 +150,13 @@ TortoiseHg Windows installers come with the python-git bindings (named
 dulwich) that hg-git requires, so one only needs to clone the
 hg-git repository to your local computer::
 
-	hg clone http://bitbucket.org/durin42/hg-git/ C:\hggit
+	hg clone http://bitbucket.org/durin42/hg-git/ C:\hg-git
 
 Then enable hggit and bookmarks in your Mercurial.ini file::
 
 	[extensions]
 	bookmarks =
-	hggit = C:\hggit
+	hggit = C:\hg-git\hggit
 
 You can verify that worked by typing :command:`hg help hggit`
 
