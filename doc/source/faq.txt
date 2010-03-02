@@ -148,6 +148,14 @@ Frequently Asked Questions
 	Note that this will not work for modules distributed as .egg files;
 	the supplied path must contain the module's .py or .pyc files.
 
+	If you have many extensions and/or hooks that all share the same
+	Python package, you can create an extension which explicitly
+	modifies sys.path for all the others.  Simply name the extension
+	such that it is loaded first (alphabetically).  Something like::
+
+		[extensions]
+		00setSysPath = C:\path\to\setsyspath.py
+
 *How do I fix odd characters in dialog?*
 
 	Since 0.8, we no longer distribute multiple themes and switched

@@ -159,7 +159,7 @@ Patch Queues
 Both the Repository Explorer and Commit Tool have optional Patch Queue
 panels that are available when the user has enabled the MQ extension.
 It allows the user to perform most patch operations including push, pop,
-rename, and finish.  It's recommended that to learn the MQ extension
-before using the Patch Queue panel.
+rename, and finish.  It's recommended to learn the MQ extension before
+using the Patch Queue panel.
 
 .. vim: noet ts=4
