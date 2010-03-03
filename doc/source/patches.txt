@@ -137,6 +137,9 @@ file and directory drag and drop.  The drop down menu in the upper right
 corner next to the :guilabel:`Browse` button has the options:
 :guilabel:`Browse Directory..` and :guilabel:`Import from Clipboard`.
 
+You have the choice of importing directly into the repository, or
+importing into your patch queue.
+
 .. note::
 	Importing a patch requires a clean working directory state.  You
 	must commit, revert, or shelve changes before importing a patch.
@@ -156,10 +159,10 @@ Patch Queues
 
 	Patch Queue panel in the Repository Explorer
 
-Both the Repository Explorer and Commit Tool have optional Patch Queue
-panels that are available when the user has enabled the MQ extension.
-It allows the user to perform most patch operations including push, pop,
-rename, and finish.  It's recommended to learn the MQ extension before
-using the Patch Queue panel.
+Both the Repository Explorer and Commit Tool have an optional Patch
+Queue panel that is only available when the user has enabled the MQ
+extension.  It allows the user to perform most patch queue operations
+including push, pop, rename, and finish.  It's recommended to learn the
+MQ extension before using the Patch Queue panel.
 
 .. vim: noet ts=4
