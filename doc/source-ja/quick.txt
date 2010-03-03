@@ -21,7 +21,7 @@ TortoiseHg のユーザ設定ダイアログから設定できます。
 プロジェクトディレクトリを右クリックして
 :menuselection:`TortoiseHg --> ユーザ設定` を選択します。
 
-.. figure:: figures/cmenu-global-settings.jpg
+.. figure:: figures/cmenu-global-settings.png
 	:alt: デスクトップの右クリックメニュー
 
 	デスクトップからユーザ設定ダイアログを開く
