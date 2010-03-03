@@ -126,7 +126,7 @@ Mercurial-Keyring
 =================
 
 * `Mercurial Keyring <http://pypi.python.org/pypi/mercurial_keyring>`_ ウェブサイト
-* `Wiki ページ <http://mercurial.selenic.com/wiki/KeyringExtension>`_
+* `Keyring 拡張機能 <http://mercurial.selenic.com/wiki/KeyringExtension>`_ Wiki
 
 keyring 拡張機能は安全に認証パスワード (HTTP/HTTPS and SMTP) をシステム固有の
 パスワードデータベース (Gnome Keyring, KDE KWallet, OSXKeyChain, Win32,
