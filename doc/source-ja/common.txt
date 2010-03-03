@@ -52,7 +52,7 @@
 
 TortoiseHg 1.0 では GUI 差分表示 (外部ツール) のベースが見直されました。
 新しいシステムはよく使われている差分ツール (インストーラ同梱の KDiff3 も含む)
-の検出とその選択に :file:`mergetools.ini` を使用します。
+の検出とその選択に :file:`mergetools.rc` を使用します。
 
 ユーザがマージツール (:menuselection:`TortoiseHg --> 3-way マージツール`)
 を設定すると、ツール選択の処理を飛ばして、マージツールが GUI 差分表示にも使用されます。
@@ -146,7 +146,7 @@ Office ファイルの差分
 TortoiseHg の Windows インストーラには様々なバイナリファイルを比較・マージするために
 TortoiseSVN のスクリプトを同梱しています。
 それらは TortoiseHg のインストールディレクトリにある
-:file:`mergepatterns.ini` ファイルで設定されているため、
+:file:`mergepatterns.rc` ファイルで設定されているため、
 使用にあたって特別な追加設定などは不要です。
 
 ファイルの拡張子によって使用する差分表示ツールを変更するために、
