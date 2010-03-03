@@ -55,12 +55,16 @@ See also http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
 for some info bits about Running and Testing Shell Extensions on Windows
 
 The :command:`DbgView` tool from the SysInternals suite will capture
-debug messages from the shell extension.
+debug messages from the shell extension.  However, the shell
+extension does not emit debugging info by default.  It must be enabled
+by setting the registry key defined in
+:file:`win32/shellext/DebugShellExt.reg` in the TortoiseHg source
+repository.  You can double-click on this file to load the key into your
+registry.
 
-The :command:`ThgTaskbar` application's options dialog has an error
-logging tab.  If you have this dialog open while you are browsing
-folders, you will get info and error level messages from the icon
-overlay refresh process.
+Another option is to exit the :command:`ThgTaskbar` system tray
+application and start it from the command line.  It will emit some debug
+information to the console.
 
 Nautilus
 ~~~~~~~~
