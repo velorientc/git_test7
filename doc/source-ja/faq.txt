@@ -15,7 +15,9 @@
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_,
 	に加えて5つの拡張機能: hgfold、hgcr-gui、perfarce、hgeol、mercurial-keyring
-	を同梱しています。
+	を同梱しています。また hgsubversion 拡張機能およびリポジトリ変換拡張機能のために
+	python-svn、hg-git 拡張機能のために dulwich も含めています。
+	詳細は :file:`extension-versions.txt` をご覧ください。
 
 *Windows 上の Mercurial はインデックスサービスやアンチウイルスソフトウェアと競合しませんか？*
 
@@ -24,10 +26,10 @@
 	と同様、リポジトリとその作業コピーのディレクトリではインデックスサービスを無効にし、
 	アンチウイルスソフトウェアのスキャン対象外に指定してください。
 
-*エクスプローラの右クリックメニューは翻訳されませんか？*
+*エクスプローラの右クリックメニューは翻訳されないのですか？*
 
 	右クリックメニューの翻訳ファイルは TortoiseHg のインストールディレクトリ
-	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n` にあります。
+	:file:`C:\\Program Files\\TortoiseHg\\i18n\\cmenu` にあります。
 	使用したい言語の Windows レジストリファイルをダブルクリックして、
 	表示される確認ダイアログの指示に従ってインストールしてください。
 
@@ -60,11 +62,6 @@
 	エクスプローラの右クリックメニューの :guilabel:`ログの表示`
 	から起動してください。
 
-*'failed to import extension hgext.hgconfig...' という警告メッセージはどうすれば消えるの？*
-
-	`issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_
-	を参照してください。
-
 *TortoiseHg の shelve 拡張機能をコマンドラインから使うにはどうすればいいですか？*
 
 	:file:`Mercurial.ini` ファイルで以下のように拡張機能を有効化してください： ::
@@ -76,31 +73,6 @@
 
 	`SSH 接続 <http://bitbucket.org/kuy/thg-ja/wiki/ssh>`_ ページを参照してください。
 
-*hg-git 拡張機能を TortoiseHg で使うにはどうすればいいですか？*
-
-	TortoiseHg インストーラには dulwich パッケージ含まれているため、あとは
-	`hg-git <http://bitbucket.org/durin42/hg-git/>`_ をクローンして
-	hg-git と bookmarks 拡張機能を有効化するだけで使えるようになります： ::
-
-		[extensions]
-		hggit = C:\extensions\hg-git\hggit
-		bookmarks =
-
-	ただし 'incoming' (受信チェンジセットの表示) コマンドは git リポジトリとの
-	やりとりがうまくいかず、'outgoing' (送信チェンジセットの表示) コマンドも
-	あまり有用な情報を表示しません。
-	そのため実質的には単純にプッシュまたはプルを使用することになります。
-
-*hgsubversion 拡張機能を TortoiseHg で使うにはどうすればいいですか？*
-
-	TortoiseHg インストーラには hgsubversion が必要とする Subversion の Python
-	バインディングを同梱しているため、
-	`hgsubversion <http://bitbucket.org/durin42/hgsubversion/>`_
-	をクローンして、それを有効化するだけで使用できます： ::
-
-		[extensions]
-		hgsubversion = C:\extensions\hgsubversion\hgsubversion
-
 *～差分表示ツールを使うにはどうすればいいの？*
 
 	バージョン 1.0 から TortoiseHg はよく使われている GUI 差分表示ツールを自動的に検出し、
@@ -108,13 +80,7 @@
 
 *シェル拡張を無効にする方法は？ (アイコンオーバーレイと右クリックメニュー)*
 
-	アイコンオーバーレイを無効化するにはトレイアイコンをクリックして表示される
-	メニューにある :guilabel:`オプション` から起動できるタスクバーダイアログで
-	無効にできます。右クリックメニューを非表示にするには TortoiseHg
-	インストールディレクトリにある :file:`ThgShell.dll` ファイルの名前を変更して
-	エクスプローラを再起動します。しかしこの方法は右クリックメニューだけでなく、
-	アイコンオーバーレイも同時に無効化されます。現在、右クリックメニューのみを
-	無効化する簡単な方法はありません。
+	TortoiseHg インストーラを使って、シェル拡張機能を削除してください。
 
 *TortoiseHg はどこに設定を保存しているの？*
 
@@ -157,28 +123,6 @@
 	テーマをダウンロードしてそれを :file:`gtk\\share\\themes` にコピーし、
 	:file:`gtk\\etc\\gtk-2.0\\gtkrc` ファイルで変更してください。
 
-*アンインストールしても大量の DLL や PYD の拡張子のファイルが残ってしまう*
-
-	再起動してください、とアンインストーラが指示しているはずです :-)
-	Windows が起動している状態では削除できないファイルもあるため、それらは再起動後
-	に削除されるように設定されています。
-
-*Subversion のリポジトリを Mercurial に変換する方法は？*
-
-	まずコマンドラインツールの svn-win32-1.6 をインストールし、そのプログラムを
-	環境変数の PATH に追加してください。次に
-	`convert <http://mercurial.selenic.com/wiki/ConvertExtension>`_
-	拡張機能を有効化し、 :command:`hg convert` コマンドを実行することで
-	変換できます。変換について何か問題が起きたときや、質問がある場合は直接
-	Mercurial のメーリングリストや IRC (irc.freenode.net の #mercurial)
-	に尋ねてみてください。
-
-	もしくは hgsubversion 拡張機能を使うという方法もあります。
-
-	詳しくは
-	`リポジトリの変換 <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
-	を参照してください。
-
 *Windows の TortoiseHg はどこの Python モジュールを参照しているの？*
 
 	TortoiseHg は Python の実行に必要な環境を DLL の形で同梱しています。
@@ -199,6 +143,14 @@
 
 	この方法はモジュールが .egg ファイルとして配布されている場合はうまくいきません。
 	指定するパスは .py または .pyc ファイルを含んでいる必要があります。
+
+	もしいくつもの拡張機能またはフックスクリプトを使用していて、同じ Python
+	パッケージを共有したい場合は明示的に sys.path を変更する拡張機能を作ることができます。
+	最初に読み込まれるような単純な名前 (つまりアルファベット順で) にしてください。
+	例えば： ::
+
+		[extensions]
+		00setSysPath = C:\path\to\setsyspath.py
 
 *ダイアログのぎこちないフォント描画を直すにはどうすればいいの？*
 
