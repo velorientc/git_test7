@@ -406,7 +406,7 @@ class CmdWidget(gtk.VBox):
             markup = markup % (gtklib.DRED, 'bold')
             icons = {'error': True}
         else:
-            markup = markup % ('black', 'normal')
+            markup = markup % (gtklib.NORMAL, 'normal')
             icons = {}
         text = gtklib.markup_escape_text(text)
         self.rlabel.set_markup(markup % text)
