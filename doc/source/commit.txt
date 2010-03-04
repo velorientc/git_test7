@@ -352,6 +352,27 @@ has these two configurables for commit message policy:
 		can be used to format the message and a warning will be issued
 		if any lines are too long at commit.  Default: 0 (unenforced)
 
+
+Subrepositories
+---------------
+
+A `subrepository <http://mercurial.selenic.com/wiki/subrepos>`_
+is a feature introduced in Mercurial 1.3.  It allows one Mercurial
+repository to store references to external Mercurial (or potentially
+other VCS) repositories, and to include the state of those external
+repositories in the main repository's history.
+
+TortoiseHg 1.0 introduced rudimentary support for subrepositories, and
+only in the commit / status tool.  When Mercurial considers a subrepo as
+dirty, it will appear in the commit tool as a special entry in the file
+list with a status of *S*.  If a subrepo is included in the file list of
+a commit, the subrepo is committed along with the other changes,
+updating the .hgsubstate file in the main repository root.
+
+Prior to TortoiseHg 1.0, dirty subrepos were not shown in the commit
+tool and .hgsubstate was not updated during commits.
+
+
 MQ patches
 ----------
 
