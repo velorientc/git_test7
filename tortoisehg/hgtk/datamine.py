@@ -116,7 +116,7 @@ class DataMineDialog(gdialog.GWindow):
         # status bar
         hbox = gtk.HBox()
         style = csinfo.labelstyle(contents=('%(shortuser)s@%(revnum)s '
-                       '%(dateage)s "%(summary)s"',), selectable=True)
+                       '%(dateage)s', ' "%(summary)s"',), selectable=True)
         self.cslabel = csinfo.create(self.repo, style=style)
         hbox.pack_start(self.cslabel, False, False, 4)
         self.stbar = statusbar.StatusBar()
