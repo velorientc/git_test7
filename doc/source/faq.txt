@@ -72,6 +72,15 @@ Frequently Asked Questions
 	See `ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
 
 
+*Why can't I connect to an ssh server (remote: bash: <server name>: command not found)?*
+
+	TortoisePlink (and basic Plink) will try to use the :guilabel:`Host
+	Name` configured in Putty under the :guilabel:`Default Settings`.
+	It adds this host name to its command line parameters, causing the
+	hostname to be specified twice, causing this particular error.
+	Clearing the host name from the :guilabel:`Default Settings` is a
+	possible workaround.
+
 *How can I use tool X as my visual diff tool?*
 
 	Since version 1.0, TortoiseHg should autodetect most popular visual
