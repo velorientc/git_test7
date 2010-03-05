@@ -11,6 +11,268 @@ been added in the current version.
 The ReleaseNotes page on the TortosieHg Wiki is usually kept up to date.
 http://bitbucket.org/tortoisehg/stable/wiki/ReleaseNotes
 
+= TortoiseHg 1.0 =
+
+Released on March 5, 2010
+
+Codenamed **Varnish**
+
+== Packaged Versions ==
+
+The following products are included in our TortoiseHg Windows installers.
+
+* Mercurial 1.5
+* Python 2.6.4 [1]
+* GTK 2.18.7
+* PyGtk 2.16.0
+* python-svn 1.6.6 (for use by hgsubversion and hg convert)
+* dulwich (for use by hg-git and others)
+* Perfarce extension
+* hgeol extension
+* mercurial keychain extension
+* TortoiseSVN's doc diff scripts 
+* See extension-versions.txt in the install directory for the complete
+* list of bundled extensions and modules and their versions
+
+[1] If you used any hooks or extensions with previous versions of
+TortoiseHg, and those hooks or extensions added local Python
+site-packages to sys.path, you will have to upgrade your Python to 2.6
+to stay current with TortoiseHg 1.0.  Failure to do so will cause hgtk
+to not function correctly.  You will see errors on the console about
+failing to import gdialog.
+
+== Behavior Changes ==
+
+=== Entirely new installer ===
+
+The new MSI installers can perform installs and upgrades/downgrades (of
+previous MSI installs) without reboot and perform silent installs. The
+MSI installer packages are now digitally signed. 
+
+There are two important details to be aware of:
+
+1) **You must uninstall pre-1.0 (InnoSetup based) installers before
+installing 1.0.  Before uninstalling the old version, backup your user
+Mercurial.ini file.**  The old installers have a tendency to delete your
+user Mercurial.ini file when they are uninstalled.
+
+2) **There are now separate x86 and x64 installer packages.**  Download
+the appropriate package for your platform.
+
+After the first install of an msi installer (not an upgrade or downgrade
+from a previously installed msi installer), a logout/login of all users
+is required to have the overlay icon handler initialized. The context
+menu works without logout/login. Later upgrade (or downgrade) installs
+won't need a logout/login on Vista and Windows 7, as all affected
+programs are shut down by the installer and explorer is restarted
+automatically by the installer.
+
+On Windows XP, a logout/login of all users after every msi upgrade or
+downgrade install is required. If in doubt, doing a reboot will make
+sure all users will get the updated files loaded.
+
+If you don't install any shell extension at all (overlay icons and shell
+context menu), then no logout/login is needed at all.
+
+If you don't install the 32 bit ("x86") shell extension on 64 bit
+versions of Windows, there will be no need to shutdown any 32 bit
+programs on later upgrades/downgrades (which may be handy, because,
+typically, lots of programs -- e.g. email clients, browsers -- are still
+32 bit only). On 64 bit Windows Vista and Windows 7, explorer is a 64
+bit process, so there is no need to install the 32 bit shell extension
+on these systems in order to have the overlay icons and context menu
+working in explorer. 
+
+There are more installer details near the end of the release notes.
+
+=== Branch Head Detection ===
+
+In Mercurial 1.5, the 'hg heads' command was changed to make it more
+branch centric.  In particular, a revision with children on other
+branches but no child on it's own branch is still considered a branch
+head.  For example, if you merge the head of branch A into branch B,
+branch A's head is still considered a repository head even though it has
+a child in branch B.
+
+TortoiseHg tries to follow along with this semantic change, primarily in
+the commit tool.  We no longer warn of creating new heads when
+committing on a branch head that has children in other branches.  And
+similarly merging heads of two branches no longer indicates the reducing
+of the number of heads.  Refs #953
+
+=== Shell extension configuration removed from taskbar app ===
+
+The Shell extension configuration tool is now launched from its own
+shell context menu option named "Explorer extension settings".  The
+dialog no longer has a logging feature, so debugging overlay refresh
+issues must be done by manually starting the thgtaskbar.exe application
+from a command line window.
+
+=== CopyHash configurable removed ===
+
+The tortoisehg.copyhash configurable, marked deprecated in 0.9, was
+removed in this release.  Use the 'Copy Hash' context menu option in the
+Repository Explorer instead.
+
+=== Skip Diff Window removed ===
+
+The tortoisehg.nodiffwin configurable has been made obsolete by an
+overhaul of the visual diff system.  The system automatically detects
+when the visual diff window is required.
+
+== Enhancements ==
+
+=== Visual Diff Overhaul ===
+
+The visual diff infrastructure was largely overhauled in this release to
+detect diff tools on your computer and use them optimally.  Among other
+improvements, it now supports visual diffs of renames and copies, as
+well as many common binary formats.  For details, see
+
+http://tortoisehg.bitbucket.org/manual/1.0/common.html#visual-diffs
+
+Refs #567, #166
+
+=== Import Dialog ===
+
+TortoiseHg can now import (or qimport) patches from a dialog which
+supports file and folder drag-n-drop.
+
+See http://tortoisehg.bitbucket.org/manual/1.0/patches.html#import-patches for details
+
+=== Perforce Integration via perfarce extension ===
+
+TortoiseHg can now operate as a front end to a Perforce client via the
+use of the perfarce extension.
+
+See http://tortoisehg.bitbucket.org/manual/1.0/extensions.html#perfarce for details
+
+=== HTTP(s)/SMTP keychain integration ===
+
+The mercurial-keyring extension is now bundled.  It caches passwords for
+HTTP(S) and SMTP requests.  It must be enabled and configured to
+activate the cache behavior.
+
+See http://tortoisehg.bitbucket.org/manual/1.0/extensions.html#mercurial-keyring
+for details.
+
+Refs #103, #854
+
+=== Changeset Message Links ===
+
+The Repository Explorer now parses your commit messages for changeset
+hashes, HTTP(S) URLs, and bug tracker links.  For more information, see 
+
+http://tortoisehg.bitbucket.org/manual/1.0/changelog.html#message-parsing
+
+Refs #315, #369
+
+=== Miscellaneous ===
+
+* CmdRunner widget for running interactive commands in the background (much fewer popup windows)
+* Improved support for bookmark extension
+* bash completion support added for hgtk
+* Repository Explorer menu cleanup
+* Icons for file status in Repository Explorer
+* Icons in menus of Repository Explorer and other applications, #704
+* Improved row selection logic in Repository Explorer
+* Improved support for converted subversion changesets
+* MQ pane added to commit tool (only visible when MQ extension is enabled)
+* MQ pane supports file and directory drag/drop events
+* MQ pane supports multi-selections, #874
+* Add 'no-backup' option to revert mode of quickop dialog
+* Taskbar icon display is now configurable from shell configuration dialog
+* Support for subrepos in the status/commit tool, #338, #507.
+* Improve selection and context menu behavior of status/commit/shelve tools, including #633,#875
+* Allow a new named branch to be created without file changes
+* Merge option to discard changes from other branch (dummy/null merge) #873
+* New layout for settings tool, new fonts page #924
+* Layout improvements to several tools, including #712,#713, #724, #763,#768, #773,#805,#874,#878,#883
+* Ctrl-., next/prev file accelerators for several tools
+* Ctrl-[] page up/down accelerators for several tools
+* The About dialog will look for upgrades and offer a download link
+* Tag dialog improvements, #915, #916
+* Explorer overlays are now case insensitive #867
+* Show context menus from  "Library" folders and background in Windows 7, #923
+
+== Bug fixes ==
+
+* #507 - commit: update .hgsubstate when checking in dirty subrepos
+* #561 - status: improve display of merge diffs
+* #586 - status: check files after running rename guess tool
+* #709 - status: partially selected files refreshed properly
+* #764 - prevent traceback in Repository Explorer
+* #784 - detect and help prevent install problems on Linux
+* #788 - prevent a traceback in quickop dialog
+* #792 - prevent a traceback from non-standard dialog layouts
+* #827 - catch up with patch API changes in Mercurial
+* #834 - catch errors from launching URLs on Windows
+* #844 - fix hunk selection feature, after regression
+* #846 - use newer status() API after older function was removed
+* #847 - re-enable toggle display of deleted files in status/commit/shelve
+* #850 - patch iniparse to consider %include lines to be comments
+* #860 - fix commits from context menu of commit tool
+* #867 - handle case folding conflicts in icon overlays (use lower case file names everywhere)
+* #870 - commit: fix parent bar refresh
+* #888 - fix tracebacks in quickop dialog
+* #894 - prevent crashes in quickop on early exits
+* #897 - diff text pane of status/commit tool now supports max diff size
+* #907 - Catch IO and other errors when saving files from other revisions
+* #912 - CTRL-C in cmd.exe should not kill forked hgtk processes
+* #919 - Consistent treatment of branch names and UTF-8
+* #920 - disable MQ operations when a bundle is applied
+* #922 - Catch errors during status refresh
+* #927 - Strip leading/trailing whitespace in clone tool
+* #929 - QNew will no longer include all diffs when no files were selected
+* #934 - Correctly reset commit tool title after clearing a filter
+* #947 - Save cherry picked patch files with raw EOLN
+* #942, #959 - Improve bundle error handling
+* #951 - Escape file paths on Windows if they are not safe globs
+* #977 - Close init dialog on success
+
+== Installer Changes ==
+
+TortoiseOverlays are now included as "merge modules" so they no longer
+appear in **Add/Remove Programs** as separate applications.  It should
+be safe to uninstall old versions of TortoiseOverlays you find on your
+computer at the same time you uninstall your older TortoiseHg installs,
+so long as you do not have other Tortoise utilities that use them
+(TortoiseCVS or TortoiseBzr, for instance).  Future upgrades and
+uninstalls should handle TortoiseOverlays seamlessly.
+
+Similarly, we include the MSVC CRT redistributables using MS's approved
+merge modules.
+
+Because of these first two changes, the MSI installers require elevated
+install privileges.  We do not intend to make any ZIP style installers
+for download, though users are free to make them for their own use.
+Refs #677
+
+The new MSI packages will refuse to upgrade an old InnoSetup install.
+The old install must be removed and rebooted before installing the MSI
+package. The good news is this should be the last reboot required by
+THG. MSI packages will upgrade or downgrade other MSI packages without
+reboot.
+
+If the old InnoSetup installer created your user Mercurial.ini file (if
+it asked for your username and email address) the old installer will try
+to delete that file when you uninstall it. We *highly* recommend you
+backup your user Mercurial.ini file before uninstalling your existing
+TortoiseHg package. The new MSI installers do not have this problem. 
+
+MSI's use the Windows Installer framework, so you get safer upgrades,
+repair facilities, and safe rollbacks after errors.
+
+There are now separate packages for x86 and x64 targets. They will
+refuse to install on inappropriate architectures so just be aware of the
+split.
+
+The x64 package correctly installs the x86 portions under
+${ProgramFiles(x86)} and the x64 portion under ${CommonProgramFiles}.
+This is a change from the pre-1.0 installers.
+
+
+
 == TortoiseHg 0.9 ==
 
 Released November 16, 2009
