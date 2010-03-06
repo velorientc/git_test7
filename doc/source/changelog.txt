@@ -429,18 +429,18 @@ Bisect
 TortoiseHg 1.0 introduced support for bisect bug searching to help find
 changesets which introduce problems. To use, mark the earliest changeset
 you know exhibits the problem as bad, then mark the latest changeset
-which is free from the problem as good.  Once you have performed tests,
-mark the working directory parent as good or bad, and bisect will either
-update to another candidate changeset or announce that it has found the
-bad revision.
+which is free from the problem as good.  The changelog tool will select
+a changeset for you to test.  Once you have performed tests, mark the
+changeset as good or bad, and bisect will either update to another
+candidate changeset or announce that it has found the bad revision.
 
 As a shortcut, you can also mark a revision as good or bad without
 checking it out first.
 
 For more automated bisecting, you must use the Mercurial command line
 and provide an automated test that can build and run a changeset and
-return 0-good, 125-skip, or 127-abort, or anythin else to mean bad.  See
-the :command:`hg bisect` command help for more information.
+return 0-good, 125-skip, or 127-abort, or anything else to mean bad.
+See the :command:`hg bisect` command help for more information.
 
 
 Keyboard navigation

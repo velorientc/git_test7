@@ -57,8 +57,8 @@ Frequently Asked Questions
 
 *How do I do merges and arbitrary version checkouts?*
 
-	Merges and updates are intended to be done from within the Changelog
-	tool (:guilabel:`Repository Explorer` menu option)
+	Merges and updates are intended to be done within the
+	:guilabel:`Repository Explorer`, using changeset context menus
 
 *How do I use TortoiseHg's shelve extension from the hg command line?*
 	
@@ -131,9 +131,9 @@ Frequently Asked Questions
 
 *How do I switch GTK themes?*
 
-	You also should be able to download new themes and copy them into
-	the :file:`gtk\\share\\themes` directory and then enable them in
-	:file:`gtk\\etc\\gtk-2.0\\gtkrc`.
+	You can download new themes and copy them into the
+	:file:`gtk\\share\\themes` directory of your install and then enable
+	them in :file:`gtk\\etc\\gtk-2.0\\gtkrc`.
 
 *Where do TortoiseHg extensions look for external Python modules on Windows?*
 
@@ -165,13 +165,11 @@ Frequently Asked Questions
 		[extensions]
 		00setSysPath = C:\path\to\setsyspath.py
 
-*How do I fix odd characters in dialog?*
+*How do I fix odd characters in dialogs?*
 
-	Since 0.8, we no longer distribute multiple themes and switched
-	default theme to MS-Windows.  As a result, it might causes an issue
-	related default font of MS-Windows theme in some environments.  In
-	order to fix this issue, add following setting to TortoiseHg's
-	:file:`gtkrc` file::
+	The default font of the MS-Windows theme may cause problems in some
+	environments.  In order to fix this issue, add following setting to
+	TortoiseHg's :file:`gtkrc` file::
 
 		style "msw-default"
 		{
@@ -180,5 +178,7 @@ Frequently Asked Questions
 
 	You can find :file:`gtkrc` file in your TortoiseHg install directory:
 	i.e. :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
+
+	Also see the :guilabel:`Fonts` page of the settings tool
 
 .. vim: noet ts=4
