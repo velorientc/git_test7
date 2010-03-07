@@ -118,8 +118,8 @@ _log_info = (
         ' Default: None')),
     (_('Hide Tags'), 'tortoisehg.hidetags', [],
         _('Space separated list of tags that will not be shown.'
-          ' Useful example: Specify "qbase qparent qtip" to hide the'
-          ' standard tags inserted by the Mercurial Queues Extension.' 
+        ' Useful example: Specify "qbase qparent qtip" to hide the'
+        ' standard tags inserted by the Mercurial Queues Extension.' 
         ' Default: None')),
     (_('Use Expander'), 'tortoisehg.changeset-expander', ['False', 'True'],
         _('Show changeset details with an expander')),
@@ -189,29 +189,29 @@ _proxy_info = (
         _('Optional. Comma-separated list of host names that'
         ' should bypass the proxy')),
     (_('User'), 'http_proxy.user', [],
-        _('Optional. User name to authenticate with at the'
-        ' proxy server')),
+        _('Optional. User name to authenticate with at the proxy server')),
     (_('Password'), 'http_proxy.passwd', [],
         _('Optional. Password to authenticate with at the'
         ' proxy server')))
 
 _email_info = (
     (_('From'), 'email.from', [],
-        _('Email address to use in the "From" header and for the SMTP envelope')),
+        _('Email address to use in the "From" header and for'
+        ' the SMTP envelope')),
     (_('To'), 'email.to', [],
         _('Comma-separated list of recipient email addresses')),
     (_('Cc'), 'email.cc', [],
-        _('Comma-separated list of carbon copy recipient email'
-        ' addresses')),
+        _('Comma-separated list of carbon copy recipient email addresses')),
     (_('Bcc'), 'email.bcc', [],
         _('Comma-separated list of blind carbon copy recipient'
         ' email addresses')),
     (_('method'), 'email.method', ['smtp'],
-_('Optional. Method to use to send email messages. If value is "smtp" (default),'
-' use SMTP (configured below).  Otherwise, use as name of program to run that'
-' acts like sendmail (takes "-f" option for sender, list of recipients on'
-' command line, message on stdin). Normally, setting this to "sendmail" or'
-' "/usr/sbin/sendmail" is enough to use sendmail to send messages.')),
+        _('Optional. Method to use to send email messages. If value is'
+        ' "smtp" (default), use SMTP (configured below).  Otherwise, use as'
+        ' name of program to run that acts like sendmail (takes "-f" option'
+        ' for sender, list of recipients on command line, message on stdin).'
+        ' Normally, setting this to "sendmail" or "/usr/sbin/sendmail"'
+        ' is enough to use sendmail to send messages.')),
     (_('SMTP Host'), 'smtp.host', [], _('Host name of mail server')),
     (_('SMTP Port'), 'smtp.port', ['25'],
         _('Port to connect to on mail server.'
