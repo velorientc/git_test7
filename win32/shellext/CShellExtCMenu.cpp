@@ -111,7 +111,7 @@ MenuDescription menuDescList[] =
 };
 
 const char* const RepoNoFilesMenu =
-    "commit status shelve vidff sep"
+    "commit status shelve vdiff sep"
     " add revert rename forget remove sep"
     " log update grep sep"
     " synch serve clone init thgstatus sep"
@@ -121,7 +121,7 @@ const char* const RepoNoFilesMenu =
 ;
 
 const char* const RepoFilesMenu =
-    "commit status vidff sep"
+    "commit status vdiff sep"
     " add revert rename forget remove sep"
     " log datamine sep"
     " about"
