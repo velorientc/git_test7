@@ -140,7 +140,7 @@ hg-git (git)
 * `hg-git Extension <http://mercurial.selenic.com/wiki/HgGit>`_ wiki page
 * `Mercurial for Git users <http://mercurial.selenic.com/wiki/GitConcepts>`_
 
-hg-git, as it's name implies, allows you to use Mercurial as a
+hg-git, as its name implies, allows you to use Mercurial as a
 client to a git server.  It can also be used to do straight conversions
 of Git repositories into Mercurial.
 
