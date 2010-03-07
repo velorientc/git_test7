@@ -23,7 +23,8 @@ _unspeclocalstr = hglib.fromutf(_unspecstr)
 
 _pwfields = ('http_proxy.passwd', 'smtp.password')
 
-_tortoise_info = (
+INFO = (
+({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo.ico'}, (
     (_('Three-way Merge Tool'), 'ui.merge', [],
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
@@ -62,9 +63,13 @@ _tortoise_info = (
         ' process to run graphical dialogs.  Default: True')),
     (_('Full Path Title'), 'tortoisehg.fullpath', ['False', 'True'],
         _('Show a full directory path of the repository in the dialog title'
-        ' instead of just the root directory name.  Default: False')))
+        ' instead of just the root directory name.  Default: False')),
+    ) + (gtklib.hasspellcheck() and
+    (_('Spell Check Language'), 'tortoisehg.spellcheck', [],
+        _('Default language for spell check. System language is'
+        ' used if not specified. Examples: en, en_GB, en_US'),) or ())),
 
-_commit_info = (
+({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit.ico'}, (
     (_('Username'), 'ui.username', [],
         _('Name associated with commits')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
@@ -88,10 +93,11 @@ _commit_info = (
     (_('Auto Exclude List'), 'tortoisehg.ciexclude', [],
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, commit, and shelve dialogs are opened.'
-         '  Default: None'))
-       )
+         '  Default: None')),
+    )),
 
-_log_info = (
+({'name': 'log', 'label': _('Repository Explorer'),
+  'icon': 'menulog.ico'}, (
     (_('Author Coloring'), 'tortoisehg.authorcolor', ['False', 'True'],
         _('Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
@@ -126,17 +132,19 @@ _log_info = (
     (_('Toolbar Style'), 'tortoisehg.logtbarstyle',
         ['small', 'large', 'theme'],
         _('Adjust the display of the main toolbar in the Repository'
-          ' Explorer.  Values: small, large, or theme.  Default: theme')),
-        )
+        ' Explorer.  Values: small, large, or theme.  Default: theme')),
+    )),
 
-_paths_info = (
+({'name': 'sync', 'label': _('Synchronize'), 'icon': 'menusynch.ico',
+  'extra': True}, (
     (_('After Pull Operation'), 'tortoisehg.postpull',
         ['none', 'update', 'fetch', 'rebase'],
         _('Operation which is performed directly after a successful pull.'
-          ' update equates to pull --update, fetch equates to the fetch'
-          ' extension, rebase equates to pull --rebase.  Default: none')),)
+        ' update equates to pull --update, fetch equates to the fetch'
+        ' extension, rebase equates to pull --rebase.  Default: none')),
+    )),
 
-_web_info = (
+({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy.ico'}, (
     (_('Name'), 'web.name', ['unknown'],
         _('Repository name to use in the web interface.'
         ' Default is the working directory.')),
@@ -179,9 +187,10 @@ _web_info = (
         ' (separated by whitespace or ",") is also denied. The contents'
         ' of the deny_push list are examined before the allow_push list.')),
     (_('Encoding'), 'web.encoding', ['UTF-8'],
-        _('Character encoding name')))
+        _('Character encoding name')),
+    )),
 
-_proxy_info = (
+({'name': 'proxy', 'label': _('Proxy'), 'icon': 'general.ico'}, (
     (_('Host'), 'http_proxy.host', [],
         _('Host name and (optional) port of proxy server, for'
         ' example "myproxy:8000"')),
@@ -191,10 +200,10 @@ _proxy_info = (
     (_('User'), 'http_proxy.user', [],
         _('Optional. User name to authenticate with at the proxy server')),
     (_('Password'), 'http_proxy.passwd', [],
-        _('Optional. Password to authenticate with at the'
-        ' proxy server')))
+        _('Optional. Password to authenticate with at the proxy server')),
+    )),
 
-_email_info = (
+({'name': 'email', 'label': _('Email'), 'icon': gtk.STOCK_GOTO_LAST}, (
     (_('From'), 'email.from', [],
         _('Email address to use in the "From" header and for'
         ' the SMTP envelope')),
@@ -224,9 +233,11 @@ _email_info = (
     (_('SMTP Password'), 'smtp.password', [],
         _('Password to authenticate to mail server with')),
     (_('Local Hostname'), 'smtp.local_hostname', [],
-        _('Hostname the sender can use to identify itself to the mail server.')))
+        _('Hostname the sender can use to identify itself to the'
+        ' mail server.')),
+    )),
 
-_diff_info = (
+({'name': 'diff', 'label': _('Diff'), 'icon': gtk.STOCK_JUSTIFY_FILL}, (
     (_('Patch EOL'), 'patch.eol', ['strict', 'crlf', 'lf'],
         _('Normalize file line endings during and after patch to lf or'
         ' crlf.  Strict does no normalization.'
@@ -251,10 +262,12 @@ _diff_info = (
         ' Default: False')),
     (_('Coloring Style'), 'tortoisehg.diffcolorstyle',
         ['none', 'foreground', 'background'],
-        _('Adjust the coloring style of diff lines in the changeset viewer.'
-        ' Default: foreground')))
+        _('Adjust the coloring style of diff lines in the changeset'
+        ' viewer. Default: foreground')),
+    )),
 
-_font_info = (
+({'name': 'font', 'label': _('Font'), 'icon': gtk.STOCK_SELECT_FONT,
+  'extra': True, 'width': 16}, (
     (_('Commit Message'), 'gtools.fontcomment', [],
         _('Font used in changeset viewer and commit log text.'
         ' Default: monospace 10')),
@@ -266,7 +279,8 @@ _font_info = (
         ' Default: sans 9')),
     (_('Command Output'), 'gtools.fontlog', [],
         _('Font used in command output window.'
-        ' Default: monospace 10')))
+        ' Default: monospace 10')),
+    )),)
 
 _font_presets = {
     'win-ja': (_('Japanese on Windows'), {
@@ -650,28 +664,16 @@ class ConfigDialog(gtk.Dialog):
         self.tooltips = gtk.Tooltips()
         self.history = settings.Settings('thgconfig')
 
-        # add spell ckeck entry if spell check is supported
-        tortoise_info = _tortoise_info
-        if gtklib.hasspellcheck():
-            tortoise_info += ((
-                _('Spell Check Language'), 'tortoisehg.spellcheck', [],
-                _('Default language for spell check. '
-                  'System language is used if not specified. '
-                  'Examples: en, en_GB, en_US')),)
-
         # create pages for each section of configuration file
-        self.add_page('TortoiseHg', 'general', tortoise_info, 'thg_logo.ico')
-        self.add_page(_('Commit'), 'commit', _commit_info, 'menucommit.ico')
-        self.add_page(_('Repository Explorer'), 'log', _log_info,
-                      'menulog.ico')
-        self.add_page(_('Synchronize'), 'sync', _paths_info, 'menusynch.ico',
-                      extra=True)
-        self.add_page(_('Web Server'), 'web', _web_info, 'proxy.ico')
-        self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
-        self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
-        self.add_page(_('Diff'), 'diff', _diff_info, gtk.STOCK_JUSTIFY_FILL)
-        self.add_page(_('Font'), 'font', _font_info, gtk.STOCK_SELECT_FONT,
-                      extra=True, width=20)
+        self.add_page('general')
+        self.add_page('commit')
+        self.add_page('log')
+        self.add_page('sync')
+        self.add_page('web')
+        self.add_page('proxy')
+        self.add_page('email')
+        self.add_page('diff')
+        self.add_page('font')
 
         # insert padding of between notebook and common desc frame
         mainbox.pack_start(gtk.VBox(), False, False, 2)
@@ -728,45 +730,7 @@ class ConfigDialog(gtk.Dialog):
         self.ini = self.load_config(self.rcpath)
         self.refresh_vlist()
 
-        # refresh sync frame
-        self.pathdata.clear()
-        if 'paths' in self.ini:
-            for name in self.ini['paths']:
-                path = self.ini['paths'][name]
-                safepath = hglib.toutf(url.hidepassword(path))
-                self.pathdata.append([hglib.toutf(name), safepath,
-                    hglib.toutf(path)])
-        self.refresh_path_list()
-
-        # refresh preset fonts combo
-        model = self.presetcombo.get_model()
-        cpaths = [info[1] for info in _font_info]
-        defaulfonts = True
-        for cpath in cpaths:
-            value = self.get_ini_config(cpath)
-            if value is not None:
-                defaulfonts = False
-        if defaulfonts:
-            # theme default fonts
-            self.defaultradio.set_active(True)
-            self.presetcombo.set_active(0)
-        else:
-            for name, (label, preset) in _font_presets.items():
-                for cpath in cpaths:
-                    if self.get_ini_config(cpath) != preset[cpath]:
-                        break
-                else:
-                    # preset fonts
-                    rows = [row for row in model if row[0] == name]
-                    if rows:
-                        self.presetcombo.set_active_iter(rows[0].iter)
-                    self.presetradio.set_active(True)
-                    break
-            else:
-                # custom fonts
-                self.customradio.set_active(True)
-                self.presetcombo.set_active(0)
-
+        # clear modification status
         self._btn_apply.set_sensitive(False)
         self.dirty = False
 
@@ -1042,6 +1006,16 @@ class ConfigDialog(gtk.Dialog):
         self.testpathbtn.connect('clicked', test_path)
         self.defaultpathbtn.connect('clicked', make_default)
 
+    def refresh_sync_frame(self):
+        self.pathdata.clear()
+        if 'paths' in self.ini:
+            for name in self.ini['paths']:
+                path = self.ini['paths'][name]
+                safepath = hglib.toutf(url.hidepassword(path))
+                self.pathdata.append([hglib.toutf(name), safepath,
+                                      hglib.toutf(path)])
+        self.refresh_path_list()
+
     def fill_font_frame(self, parent, table):
         # layout table
         layout = gtklib.LayoutTable()
@@ -1110,6 +1084,35 @@ class ConfigDialog(gtk.Dialog):
         # prepare to show
         radio_activated(defaultradio, init=True)
 
+    def refresh_font_frame(self):
+        model = self.presetcombo.get_model()
+        cpaths = [info[1] for info in self.pages['font'][1]]
+        defaulfonts = True
+        for cpath in cpaths:
+            value = self.get_ini_config(cpath)
+            if value is not None:
+                defaulfonts = False
+        if defaulfonts:
+            # theme default fonts
+            self.defaultradio.set_active(True)
+            self.presetcombo.set_active(0)
+        else:
+            for name, (label, preset) in _font_presets.items():
+                for cpath in cpaths:
+                    if self.get_ini_config(cpath) != preset[cpath]:
+                        break
+                else:
+                    # preset fonts
+                    rows = [row for row in model if row[0] == name]
+                    if rows:
+                        self.presetcombo.set_active_iter(rows[0].iter)
+                    self.presetradio.set_active(True)
+                    break
+            else:
+                # custom fonts
+                self.customradio.set_active(True)
+                self.presetcombo.set_active(0)
+
     def set_help(self, widget, event, tooltip):
         text = ' '.join(tooltip.splitlines())
         self.descbuffer.set_text(text)
@@ -1146,7 +1149,7 @@ class ConfigDialog(gtk.Dialog):
         return vbox, table, widgets
 
     def refresh_vlist(self):
-        for page_num, info, vbox, widgets in self.pages.values():
+        for name, (page_num, info, vbox, widgets) in self.pages.items():
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 ispw = cpath in _pwfields
                 combo = widgets[row]
@@ -1158,9 +1161,9 @@ class ConfigDialog(gtk.Dialog):
 
                 if cpath == 'tortoisehg.vdiff':
                     tools = hglib.difftools(self.ui)
-                    for name in tools.keys():
-                        if name not in values:
-                            values.append(name)
+                    for key in tools.keys():
+                        if key not in values:
+                            values.append(key)
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     hglib.mergetools(self.ui, values)
@@ -1192,8 +1195,21 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, label, name, info, icon=None, extra=False, width=32):
-        # setup page
+            func_name = 'refresh_%s_frame' % name
+            if hasattr(self, func_name):
+                getattr(self, func_name)()
+
+    def add_page(self, name):
+        for data in INFO:
+            if name == data[0]['name']:
+                meta, info = data
+                break
+        else:
+            return
+        label, icon = meta['label'], meta['icon']
+        extra, width = meta.get('extra', False), meta.get('width', 32)
+
+        # setup frame and content
         frame = gtk.VBox()
         frame.show()
 
