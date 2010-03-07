@@ -867,10 +867,10 @@ class ConfigDialog(gtk.Dialog):
             default_path = model[path][0] == 'default'
         else:
             default_path = False
-        self._editpathbutton.set_sensitive(path_selected)
-        self._delpathbutton.set_sensitive(path_selected)
-        self._testpathbutton.set_sensitive(repo_available and path_selected)
-        self._defaultpathbutton.set_sensitive(not default_path and path_selected)
+        self.editpathbtn.set_sensitive(path_selected)
+        self.delpathbtn.set_sensitive(path_selected)
+        self.testpathbtn.set_sensitive(repo_available and path_selected)
+        self.defaultpathbtn.set_sensitive(not default_path and path_selected)
 
     def fill_sync_frame(self, parent, table):
         # add table
@@ -916,25 +916,25 @@ class ConfigDialog(gtk.Dialog):
         bottombox = gtk.HBox()
         vbox.pack_start(bottombox, False, False, 4)
 
-        self.addButton = gtk.Button(_('_Add'))
-        self.addButton.set_use_underline(True)
-        bottombox.pack_start(self.addButton, True, True, 2)
+        addpathbtn = gtk.Button(_('_Add'))
+        addpathbtn.set_use_underline(True)
+        bottombox.pack_start(addpathbtn, True, True, 2)
 
-        self._editpathbutton = gtk.Button(_('_Edit'))
-        self._editpathbutton.set_use_underline(True)
-        bottombox.pack_start(self._editpathbutton, True, True, 2)
+        self.editpathbtn = gtk.Button(_('_Edit'))
+        self.editpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.editpathbtn, True, True, 2)
 
-        self._delpathbutton = gtk.Button(_('_Remove'))
-        self._delpathbutton.set_use_underline(True)
-        bottombox.pack_start(self._delpathbutton, True, True, 2)
+        self.delpathbtn = gtk.Button(_('_Remove'))
+        self.delpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.delpathbtn, True, True, 2)
 
-        self._testpathbutton = gtk.Button(_('_Test'))
-        self._testpathbutton.set_use_underline(True)
-        bottombox.pack_start(self._testpathbutton, True, True, 2)
+        self.testpathbtn = gtk.Button(_('_Test'))
+        self.testpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.testpathbtn, True, True, 2)
 
-        self._defaultpathbutton = gtk.Button(_('Set as _default'))
-        self._defaultpathbutton.set_use_underline(True)
-        bottombox.pack_start(self._defaultpathbutton, True, True, 2)
+        self.defaultpathbtn = gtk.Button(_('Set as _default'))
+        self.defaultpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.defaultpathbtn, True, True, 2)
 
         # signal handlers
         def pathtree_changed(sel):
@@ -1033,11 +1033,11 @@ class ConfigDialog(gtk.Dialog):
         # connect handlers
         self.pathtree.connect('cursor-changed', pathtree_changed)
         self.pathtree.connect('button-press-event', pathtree_pressed)
-        self.addButton.connect('clicked', add_path)
-        self._editpathbutton.connect('clicked', edit_path)
-        self._delpathbutton.connect('clicked', remove_path)
-        self._testpathbutton.connect('clicked', test_path)
-        self._defaultpathbutton.connect('clicked', make_default)
+        addpathbtn.connect('clicked', add_path)
+        self.editpathbtn.connect('clicked', edit_path)
+        self.delpathbtn.connect('clicked', remove_path)
+        self.testpathbtn.connect('clicked', test_path)
+        self.defaultpathbtn.connect('clicked', make_default)
 
     def fill_font_frame(self, parent, table):
         # layout table
