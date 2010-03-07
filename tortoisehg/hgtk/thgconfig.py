@@ -856,104 +856,6 @@ class ConfigDialog(gtk.Dialog):
             self._btn_apply.set_sensitive(not self.readonly)
             self.dirty = True
 
-    def _add_path(self, *args):
-        self.new_path('http://')
-        self._edit_path(new=True)
-
-    def _edit_path(self, *args, **opts):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        model, path = selection.get_selected()
-        dialog = PathEditDialog(model[path][2], model[path][0],
-                [p[0] for p in self.pathdata if p[0] != model[path][0]])
-        dialog.set_transient_for(self)
-        dialog.run()
-        if dialog.newpath:
-            if model[path][0] != dialog.newalias:
-                # remove existing path
-                rows = [row for row in model if row[0] == dialog.newalias]
-                if len(rows) > 0:
-                    del model[rows[0].iter]
-            # update path info
-            model[path][0] = dialog.newalias
-            model[path][1] = url.hidepassword(dialog.newpath)
-            model[path][2] = dialog.newpath
-            self.dirty_event()
-        elif opts.has_key('new') and opts['new'] == True:
-            del self.pathdata[path]
-            self.refresh_path_list()
-            self.dirty_event()
-
-    def _remove_path(self, *args):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        model, path = selection.get_selected()
-        next_iter = self.pathdata.iter_next(path)
-        del self.pathdata[path]
-        if next_iter:
-            selection.select_iter(next_iter)
-        elif len(self.pathdata):
-            selection.select_path(len(self.pathdata) - 1)
-        self.refresh_path_list()
-        self.dirty_event()
-
-    def _test_path(self, *args):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        if not self.root:
-            dialog.error_dialog(self, _('No Repository Found'),
-                    _('Path testing cannot work without a repository'))
-            return
-        model, path = selection.get_selected()
-        testpath = hglib.fromutf(model[path][2])
-        if not testpath:
-            return
-        if testpath[0] == '~':
-            testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--verbose', testpath]
-        dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
-        dlg.run()
-        dlg.hide()
-
-    def _default_path(self, *args):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        model, path = selection.get_selected()
-        if model[path][0] == 'default':
-            return
-        # collect rows has 'default' alias
-        rows = [row for row in model if row[0] == 'default']
-        if len(rows) > 0:
-            ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _("Overwrite existing '%s' path?") % 'default').run()
-            if ret != gtk.RESPONSE_YES:
-                return
-            # remove old default path
-            default_iter = rows[0].iter
-            del model[default_iter]
-        # set 'default' alias to selected path
-        model[path][0] = 'default'
-        self.refresh_path_list()
-        self.dirty_event()
-
-    def _pathtree_changed(self, sel):
-        self.refresh_path_list()
-
-    def _pathtree_pressed(self, widget, event):
-        if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
-            x, y = int(event.x), int(event.y)
-            pathinfo = self.pathtree.get_path_at_pos(x, y)
-            if pathinfo is not None:
-                self._edit_path()
-        elif event.button == 1:
-            selection = self.pathtree.get_selection()
-            selection.unselect_all()
-            self.refresh_path_list()
-
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
         selection = self.pathtree.get_selection()
@@ -991,8 +893,6 @@ class ConfigDialog(gtk.Dialog):
         self.pathtree = gtk.TreeView(self.pathdata)
         self.pathtree.set_enable_search(False)
         self.pathtree.add_events(gtk.gdk.BUTTON_PRESS_MASK)
-        self.pathtree.connect('cursor-changed', self._pathtree_changed)
-        self.pathtree.connect('button-press-event', self._pathtree_pressed)
 
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
@@ -1018,28 +918,126 @@ class ConfigDialog(gtk.Dialog):
 
         self.addButton = gtk.Button(_('_Add'))
         self.addButton.set_use_underline(True)
-        self.addButton.connect('clicked', self._add_path)
         bottombox.pack_start(self.addButton, True, True, 2)
 
         self._editpathbutton = gtk.Button(_('_Edit'))
         self._editpathbutton.set_use_underline(True)
-        self._editpathbutton.connect('clicked', self._edit_path)
         bottombox.pack_start(self._editpathbutton, True, True, 2)
 
         self._delpathbutton = gtk.Button(_('_Remove'))
         self._delpathbutton.set_use_underline(True)
-        self._delpathbutton.connect('clicked', self._remove_path)
         bottombox.pack_start(self._delpathbutton, True, True, 2)
 
         self._testpathbutton = gtk.Button(_('_Test'))
         self._testpathbutton.set_use_underline(True)
-        self._testpathbutton.connect('clicked', self._test_path)
         bottombox.pack_start(self._testpathbutton, True, True, 2)
 
         self._defaultpathbutton = gtk.Button(_('Set as _default'))
         self._defaultpathbutton.set_use_underline(True)
-        self._defaultpathbutton.connect('clicked', self._default_path)
         bottombox.pack_start(self._defaultpathbutton, True, True, 2)
+
+        # signal handlers
+        def pathtree_changed(sel):
+            self.refresh_path_list()
+        def pathtree_pressed(widget, event):
+            if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
+                x, y = int(event.x), int(event.y)
+                pathinfo = self.pathtree.get_path_at_pos(x, y)
+                if pathinfo is not None:
+                    edit_path()
+            elif event.button == 1:
+                selection = self.pathtree.get_selection()
+                selection.unselect_all()
+                self.refresh_path_list()
+        def edit_path(*args, **opts):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            model, path = selection.get_selected()
+            dialog = PathEditDialog(model[path][2], model[path][0],
+                    [p[0] for p in self.pathdata if p[0] != model[path][0]])
+            dialog.set_transient_for(self)
+            dialog.run()
+            if dialog.newpath:
+                if model[path][0] != dialog.newalias:
+                    # remove existing path
+                    rows = [row for row in model if row[0] == dialog.newalias]
+                    if len(rows) > 0:
+                        del model[rows[0].iter]
+                # update path info
+                model[path][0] = dialog.newalias
+                model[path][1] = url.hidepassword(dialog.newpath)
+                model[path][2] = dialog.newpath
+                self.dirty_event()
+            elif opts.has_key('new') and opts['new'] == True:
+                del self.pathdata[path]
+                self.refresh_path_list()
+                self.dirty_event()
+
+        def add_path(*args):
+            self.new_path('http://')
+            edit_path(new=True)
+        def remove_path(*args):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            model, path = selection.get_selected()
+            next_iter = self.pathdata.iter_next(path)
+            del self.pathdata[path]
+            if next_iter:
+                selection.select_iter(next_iter)
+            elif len(self.pathdata):
+                selection.select_path(len(self.pathdata) - 1)
+            self.refresh_path_list()
+            self.dirty_event()
+        def test_path(*args):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            if not self.root:
+                dialog.error_dialog(self, _('No Repository Found'),
+                        _('Path testing cannot work without a repository'))
+                return
+            model, path = selection.get_selected()
+            testpath = hglib.fromutf(model[path][2])
+            if not testpath:
+                return
+            if testpath[0] == '~':
+                testpath = os.path.expanduser(testpath)
+            cmdline = ['hg', 'incoming', '--verbose', testpath]
+            dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
+            dlg.run()
+            dlg.hide()
+        def make_default(*args):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            model, path = selection.get_selected()
+            if model[path][0] == 'default':
+                return
+            # collect rows has 'default' alias
+            rows = [row for row in model if row[0] == 'default']
+            if len(rows) > 0:
+                ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                       _("Overwrite existing '%s' path?") % 'default').run()
+                if ret != gtk.RESPONSE_YES:
+                    return
+                # remove old default path
+                default_iter = rows[0].iter
+                del model[default_iter]
+            # set 'default' alias to selected path
+            model[path][0] = 'default'
+            self.refresh_path_list()
+            self.dirty_event()
+
+        # connect handlers
+        self.pathtree.connect('cursor-changed', pathtree_changed)
+        self.pathtree.connect('button-press-event', pathtree_pressed)
+        self.addButton.connect('clicked', add_path)
+        self._editpathbutton.connect('clicked', edit_path)
+        self._delpathbutton.connect('clicked', remove_path)
+        self._testpathbutton.connect('clicked', test_path)
+        self._defaultpathbutton.connect('clicked', make_default)
 
     def fill_font_frame(self, parent, table):
         # layout table
