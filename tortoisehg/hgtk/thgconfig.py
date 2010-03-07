@@ -537,7 +537,7 @@ class PathEditDialog(gtk.Dialog):
         return ret
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, configrepo=False):
+    def __init__(self, configrepo=False, focus=None):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
                             buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
@@ -697,9 +697,12 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
         combo.set_active(configrepo and 1 or 0)
 
-        # activate first config page
-        self.confview.set_cursor(self.confmodel[0].path)
-        self.confview.grab_focus()
+        # focus 'general' page or specified field
+        if focus:
+            self.focus_field(focus)
+        else:
+            self.show_page('general')
+            self.confview.grab_focus()
 
     def fileselect(self, combo):
         'select another hgrc file'
@@ -1337,7 +1340,6 @@ class ConfigDialog(gtk.Dialog):
         return 0
 
 def run(ui, *pats, **opts):
-    dlg = ConfigDialog(opts.get('alias') == 'repoconfig')
-    if opts.get('focus'):
-        dlg.focus_field(opts['focus'])
+    dlg = ConfigDialog(opts.get('alias') == 'repoconfig',
+                       focus=opts.get('focus'))
     return dlg
