@@ -30,7 +30,7 @@ To debug the changelog viewer, for instance, enter these commands
 into a :command:`cmd.exe` window, while inside the repository::
 
     set THGDEBUG=1
-    hgtk log
+    hgtk --nofork log
 
 Linux/MacOSX
 ~~~~~~~~~~~~
@@ -39,7 +39,7 @@ To debug the changelog viewer, for instance, enter these commands
 into your shell window, while inside the repository::
     
     export THGDEBUG=1
-    hgtk log
+    hgtk --nofork log
 
 
 
