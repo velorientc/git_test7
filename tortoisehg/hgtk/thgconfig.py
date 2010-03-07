@@ -664,16 +664,11 @@ class ConfigDialog(gtk.Dialog):
         self.tooltips = gtk.Tooltips()
         self.history = settings.Settings('thgconfig')
 
-        # create pages for each section of configuration file
-        self.add_page('general')
-        self.add_page('commit')
-        self.add_page('log')
-        self.add_page('sync')
-        self.add_page('web')
-        self.add_page('proxy')
-        self.add_page('email')
-        self.add_page('diff')
-        self.add_page('font')
+        # add page items to treeview
+        for meta, info in INFO:
+            pixbuf = gtklib.get_icon_pixbuf(meta['icon'],
+                            gtk.ICON_SIZE_LARGE_TOOLBAR)
+            self.confmodel.append((pixbuf, meta['label'], meta['name']))
 
         # insert padding of between notebook and common desc frame
         mainbox.pack_start(gtk.VBox(), False, False, 2)
@@ -717,16 +712,20 @@ class ConfigDialog(gtk.Dialog):
         self.refresh()
 
     def refresh(self):
+        # determine target config file
         if self.configrepo:
             repo = hg.repository(ui.ui(), self.root)
             name = hglib.get_reponame(repo)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title(_('TortoiseHg Configure Repository - ') + hglib.toutf(name))
+            self.set_title(_('TortoiseHg Configure Repository - ') + \
+                           hglib.toutf(name))
             gtklib.set_tortoise_icon(self, 'settings_repo.ico')
         else:
             self.rcpath = util.user_rcpath()
             self.set_title(_('TortoiseHg Configure User-Global Settings'))
             gtklib.set_tortoise_icon(self, 'settings_user.ico')
+
+        # refresh config values
         self.ini = self.load_config(self.rcpath)
         self.refresh_vlist()
 
@@ -779,21 +778,29 @@ class ConfigDialog(gtk.Dialog):
         if not path:
             return
         name = self.confmodel[path][2]
+        if not self.pages.has_key(name):
+            self.add_page(name)
         page_num, info, vbox, widgets = self.pages[name]
         self.notebook.set_current_page(page_num)
 
     def show_page(self, name):
         '''Show page by activating treeview item'''
-        page_num = self.pages[name][0]
-        path = self.confmodel[page_num].path
+        for row in self.confmodel:
+            if name == row[2]:
+                path = row.path
+                break
+        else:
+            return
         self.confview.set_cursor(path)
 
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''
-        for name, (page_num, info, vbox, widgets) in self.pages.items():
+        for meta, info in INFO:
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
+                    name = meta['name']
                     self.show_page(name)
+                    widgets = self.pages[name][3]
                     widgets[n].grab_focus()
                     return
 
@@ -1148,8 +1155,19 @@ class ConfigDialog(gtk.Dialog):
 
         return vbox, table, widgets
 
-    def refresh_vlist(self):
-        for name, (page_num, info, vbox, widgets) in self.pages.items():
+    def refresh_vlist(self, pagename=None):
+        # sotre modification status
+        prev_dirty = self.dirty
+
+        # update configured values
+        if pagename is None:
+            pages = self.pages.values()
+            pages = [(key,) + data for key, data in self.pages.items()]
+        else:
+            pages = ((pagename,) + self.pages[pagename],)
+        for name, page_num, info, vbox, widgets in pages:
+
+            # standard configs
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 ispw = cpath in _pwfields
                 combo = widgets[row]
@@ -1195,9 +1213,15 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
+            # extra configs
             func_name = 'refresh_%s_frame' % name
             if hasattr(self, func_name):
                 getattr(self, func_name)()
+
+        # clear modification status forcibly if need
+        if self.dirty != prev_dirty:
+            self._btn_apply.set_sensitive(False)
+            self.dirty = False
 
     def add_page(self, name):
         for data in INFO:
@@ -1206,7 +1230,6 @@ class ConfigDialog(gtk.Dialog):
                 break
         else:
             return
-        label, icon = meta['label'], meta['icon']
         extra, width = meta.get('extra', False), meta.get('width', 32)
 
         # setup frame and content
@@ -1223,11 +1246,9 @@ class ConfigDialog(gtk.Dialog):
         pagenum = self.notebook.append_page(frame)
         self.pages[name] = (pagenum, info, vbox, widgets)
 
-        # add treeview item
-        pixbuf = gtklib.get_icon_pixbuf(icon, gtk.ICON_SIZE_LARGE_TOOLBAR)
-        self.confmodel.append((pixbuf, label, name))
-
-        return frame
+        # prepare to show
+        self.refresh_vlist(name)
+        frame.show_all()
 
     def get_ini_config(self, cpath):
         '''Retrieve a value from the parsed config file'''
@@ -1315,24 +1336,26 @@ class ConfigDialog(gtk.Dialog):
         self.history.read()
 
         # flush changes on paths page
-        if len(self.pathdata):
-            refreshlist = []
-            for row in self.pathdata:
-                name = hglib.fromutf(row[0])
-                path = hglib.fromutf(row[2])
-                if not name:
-                    gdialog.Prompt(_('Invalid path'),
-                           _('Skipped saving path with no alias'), self).run()
-                    continue
-                cpath = '.'.join(['paths', name])
-                self.record_new_value(cpath, path, False)
-                refreshlist.append(name)
-            for name in self.ini.paths:
-                if name not in refreshlist:
+        if self.pages.has_key('sync'):
+            if len(self.pathdata):
+                refreshlist = []
+                for row in self.pathdata:
+                    name = hglib.fromutf(row[0])
+                    path = hglib.fromutf(row[2])
+                    if not name:
+                        gdialog.Prompt(_('Invalid path'),
+                                _('Skipped saving path with no alias'),
+                                self).run()
+                        continue
+                    cpath = '.'.join(['paths', name])
+                    self.record_new_value(cpath, path, False)
+                    refreshlist.append(name)
+                for name in self.ini.paths:
+                    if name not in refreshlist:
+                        del self.ini['paths'][name]
+            elif 'paths' in list(self.ini):
+                for name in list(self.ini.paths):
                     del self.ini['paths'][name]
-        elif 'paths' in list(self.ini):
-            for name in list(self.ini.paths):
-                del self.ini['paths'][name]
 
         # Flush changes on all pages
         for page_num, info, vbox, widgets in self.pages.values():
