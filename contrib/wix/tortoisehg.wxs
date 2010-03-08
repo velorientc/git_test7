@@ -22,7 +22,8 @@
 
   <?define VCRedistSrcDir = C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC ?>
 
-  <Product Name='TortoiseHg $(var.Version)' Id='$(var.ProductId)' UpgradeCode='$(var.ProductUpgradeCode)'
+  <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
+           Id='$(var.ProductId)' UpgradeCode='$(var.ProductUpgradeCode)'
            Language='1033' Codepage='1252' Version='$(var.Version)' Manufacturer='Steve Borho and others.'>
 
     <Package Id='*' Keywords='Installer' Description="Windows shell extension for Mercurial DVCS (version $(var.Version))"
