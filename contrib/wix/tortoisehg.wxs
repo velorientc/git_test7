@@ -22,6 +22,13 @@
 
   <?define VCRedistSrcDir = C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC ?>
 
+  <!-- shell extension CLSID's -->
+  <?define CLSID_TortoiseHgCmenu = 46605027-5B8C-4DCE-BFE0-051B7972D64C ?>
+  <?define CLSID_TortoiseHg0 = 869C8877-2C3C-438D-844B-31B86BFE5E8A ?>
+  <?define CLSID_TortoiseHg1 = AF42ADAB-8C2E-4285-B746-99B31094708E ?>
+  <?define CLSID_TortoiseHg2 = CDA1C89D-E9B5-4981-A857-82DD932EA2FD ?>
+  <?define CLSID_TortoiseHg6 = 9E3D4EC9-0624-4393-8B48-204C217ED1FF ?>
+
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
            Version='$(var.Version)'
@@ -134,23 +141,23 @@
               Type='string' Value='[INSTALLDIR]'
             />
             <RegistryValue
-              Root='HKCR' Key='CLSID\{46605027-5B8C-4DCE-BFE0-051B7972D64C}\InProcServer32'
+              Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHgCmenu)}\InProcServer32'
               Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
             />
             <RegistryValue
-              Root='HKCR' Key='CLSID\{869C8877-2C3C-438D-844B-31B86BFE5E8A}\InProcServer32'
+              Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg0)}\InProcServer32'
               Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
             />
             <RegistryValue
-              Root='HKCR' Key='CLSID\{AF42ADAB-8C2E-4285-B746-99B31094708E}\InProcServer32'
+              Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg1)}\InProcServer32'
               Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
             />
             <RegistryValue
-              Root='HKCR' Key='CLSID\{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}\InProcServer32'
+              Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg2)}\InProcServer32'
               Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
             />
             <RegistryValue
-              Root='HKCR' Key='CLSID\{9E3D4EC9-0624-4393-8B48-204C217ED1FF}\InProcServer32'
+              Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg6)}\InProcServer32'
               Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
             />
             <?include shell-register.wxi ?>
@@ -282,23 +289,23 @@
                   Type='string' Value='[INSTALLDIR]'
               />
               <RegistryValue
-                  Root='HKCR' Key='CLSID\{46605027-5B8C-4DCE-BFE0-051B7972D64C}\InProcServer32'
+                  Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHgCmenu)}\InProcServer32'
                   Type='string' Value='[Common64]ThgShellx64.dll'
               />
               <RegistryValue
-                  Root='HKCR' Key='CLSID\{869C8877-2C3C-438D-844B-31B86BFE5E8A}\InProcServer32'
+                  Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg0)}\InProcServer32'
                   Type='string' Value='[Common64]ThgShellx64.dll'
               />
               <RegistryValue
-                  Root='HKCR' Key='CLSID\{AF42ADAB-8C2E-4285-B746-99B31094708E}\InProcServer32'
+                  Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg1)}\InProcServer32'
                   Type='string' Value='[Common64]ThgShellx64.dll'
               />
               <RegistryValue
-                  Root='HKCR' Key='CLSID\{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}\InProcServer32'
+                  Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg2)}\InProcServer32'
                   Type='string' Value='[Common64]ThgShellx64.dll'
               />
               <RegistryValue
-                  Root='HKCR' Key='CLSID\{9E3D4EC9-0624-4393-8B48-204C217ED1FF}\InProcServer32'
+                  Root='HKCR' Key='CLSID\{$(var.CLSID_TortoiseHg6)}\InProcServer32'
                   Type='string' Value='[Common64]ThgShellx64.dll'
               />
               <?include shell-register.wxi ?>
