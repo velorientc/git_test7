@@ -365,6 +365,14 @@ class TreeView(gtk.ScrolledWindow):
                 else:
                     self.next_revision_batch(self.batchsize)
 
+            try:
+                ctx = self.repo[revid]
+                if ctx.rev() == -1:
+                    self.stbar.set_text('Null changeset is not viewable')
+                    return
+            except Exception, e:
+                self.stbar.set_text(str(e))
+                return
             handler = self.connect('batch-loaded', loaded)
             self.next_revision_batch(self.batchsize)
 
