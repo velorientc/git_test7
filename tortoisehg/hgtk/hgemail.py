@@ -235,9 +235,8 @@ class EmailDialog(gtk.Window):
             self._flaglist.append(['STABLE'])
 
     def _on_conf_clicked(self, button):
-        dlg = thgconfig.ConfigDialog(False)
+        dlg = thgconfig.ConfigDialog(False, focus='email.from')
         dlg.show_all()
-        dlg.focus_field('email.from')
         dlg.run()
         dlg.hide()
         self._refresh(False)
@@ -281,9 +280,8 @@ class EmailDialog(gtk.Window):
             if not self.repo.ui.config('smtp', 'host'):
                 dialog.info_dialog(self, _('Info required'),
                             _('You must configure SMTP'))
-                dlg = thgconfig.ConfigDialog(False)
+                dlg = thgconfig.ConfigDialog(False, focus='smtp.host')
                 dlg.show_all()
-                dlg.focus_field('smtp.host')
                 dlg.run()
                 dlg.hide()
                 self._refresh(False)

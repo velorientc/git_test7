@@ -50,6 +50,9 @@ The toolbar buttons from left to right:
 		Launch the web server dialog in a separate process
 	:guilabel:`Shelve`
 		Launch the shelve tool in a separate process
+	:guilabel:`Patch Branch`
+		Toggles the display of the Patch Branch pane.  This button is only
+		visible when the pbranch extension has been enabled by the user.
 	:guilabel:`Load more`
 		Load the next N revisions into the graph
 	:guilabel:`Load all`
