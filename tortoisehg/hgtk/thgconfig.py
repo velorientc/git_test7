@@ -706,10 +706,18 @@ class ConfigDialog(gtk.Dialog):
     def fileselect(self, combo):
         'select another hgrc file'
         if self.dirty:
-            ret = gdialog.Confirm(_('Unapplied changes'), [], self,
-                   _('Lose changes and switch files?.')).run()
-            if ret != gtk.RESPONSE_YES:
-               return
+            ret = gdialog.CustomPrompt(_('Confirm Switch'),
+                    _('Switch after saving changes?'), self,
+                    (_('&Save'), _('&Discard'), _('&Cancel')),
+                    default=2, esc=2).run()
+            if ret == 2:
+                combo.handler_block_by_func(self.fileselect)
+                repo = combo.get_active() == CONF_GLOBAL
+                combo.set_active(repo and CONF_REPO or CONF_GLOBAL)
+                combo.handler_unblock_by_func(self.fileselect)
+                return
+            elif ret == 0:
+                self._apply_clicked()
         self.refresh()
 
     def refresh(self):
