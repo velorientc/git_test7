@@ -1170,7 +1170,10 @@ class GCommit(GStatus):
                     self.last_commit_id = self.get_tip_rev(True)
                 if self.notify_func:
                     self.notify_func(*self.notify_args)
-                text = _('Finish committing')
+                if autopush:
+                    text = _('Finish committing and pushing')
+                else:
+                    text = _('Finish committing')
             elif return_code is None:
                 text = _('Aborted committing')
             else:
