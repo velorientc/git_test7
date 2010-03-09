@@ -541,8 +541,12 @@ class DataMineDialog(gdialog.GWindow):
 
     def stop_search(self, frame):
         if getattr(frame, '_mythread', None):
-            frame._mythread.terminate()
-            frame._mythread.join()
+            if frame._mythread.isAlive():
+                try:
+                    frame._mythread.terminate()
+                    frame._mythread.join()
+                except (threading.ThreadError, ValueError):
+                    pass
             frame._mythread = None
 
     def close_page(self, button, widget):
