@@ -295,7 +295,7 @@ class ChangeSet(gdialog.GWindow):
         self.issuedict.clear()
         for m in self.bodyre.finditer(desc):
             a, b = m.span()
-            if a > pos:
+            if a >= pos:
                 buf.insert(eob, desc[pos:a])
                 pos = b
             groups = m.groups()
