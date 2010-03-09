@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Alil Adamov <diagiman@gmail.com>\n"
 "POT-Creation-Date: 2010-02-22 23:55+0000\n"
-"PO-Revision-Date: 2010-02-27 08:13+0000\n"
+"PO-Revision-Date: 2010-03-05 14:05+0000\n"
 "Last-Translator: Alil Adamov <diagiman@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-02-28 04:58+0000\n"
+"X-Launchpad-Export-Date: 2010-03-06 05:13+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:36
 msgid "TortoiseHg Overlay Icon Server"
-msgstr "TortoiseHg Сервер Наложений Иконок"
+msgstr "TortoiseHg Сервер Наложений Значков"
 
 #: thgtaskbar.py:117
 msgid "Exit"

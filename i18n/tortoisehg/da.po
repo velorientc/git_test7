@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2010-02-22 23:55+0000\n"
-"PO-Revision-Date: 2010-03-04 14:52+0000\n"
+"PO-Revision-Date: 2010-03-07 06:05+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-03-05 05:03+0000\n"
+"X-Launchpad-Export-Date: 2010-03-08 05:40+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:36
@@ -5998,7 +5998,7 @@ msgstr "Synkroniser med indtrukket depot"
 
 #: tortoisehg\util\prej.py:143
 msgid "patching file %s\n"
-msgstr ""
+msgstr "lapper filen %s\n"
 
 #: tortoisehg\util\prej.py:190
 msgid "%d out of %d hunk%s FAILED -- saving rejects to file %s\n"
@@ -6010,7 +6010,7 @@ msgstr ""
 
 #: tortoisehg\util\prej.py:235
 msgid "file %s already exists\n"
-msgstr ""
+msgstr "fil %s findes allerede\n"
 
 #: tortoisehg\util\prej.py:287
 msgid "Hunk #%d succeeded at %d with fuzz %d (offset %d lines).\n"
@@ -6035,31 +6035,31 @@ msgstr ""
 
 #: tortoisehg\util\prej.py:550
 msgid "could not extract binary patch"
-msgstr ""
+msgstr "kunne ikke udtrække binær lap"
 
 #: tortoisehg\util\prej.py:566
 msgid "binary patch is %d bytes, not %d"
-msgstr ""
+msgstr "binær lap er %d byte, ikke %d"
 
 #: tortoisehg\util\prej.py:591
 msgid "unable to strip away %d dirs from %s"
-msgstr ""
+msgstr "kan ikke fjerne %d kataloger fra %s"
 
 #: tortoisehg\util\prej.py:613
 msgid "unable to find %s or %s for patching"
-msgstr ""
+msgstr "kan ikke finde %s eller %s til lapning"
 
 #: tortoisehg\util\prej.py:792
 msgid "malformed patch %s %s"
-msgstr ""
+msgstr "misformet lap %s %s"
 
 #: tortoisehg\util\prej.py:803
 msgid "No valid hunks found"
-msgstr ""
+msgstr "Ingen gyldige stumper fundet"
 
 #: tortoisehg\util\version.py:17
 msgid "repository %s not found"
-msgstr ""
+msgstr "depot %s ikke fundet"
 
 #~ msgid "Ignore filter for "
 #~ msgstr "Ignorer filter for "
