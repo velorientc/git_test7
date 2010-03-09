@@ -536,6 +536,9 @@ class PathEditDialog(gtk.Dialog):
             ret += netloc + '/' + folder
         return ret
 
+CONF_GLOBAL = 0
+CONF_REPO   = 1
+
 class ConfigDialog(gtk.Dialog):
     def __init__(self, configrepo=False):
         """ Initialize the Dialog. """
@@ -593,6 +596,7 @@ class ConfigDialog(gtk.Dialog):
         if repo:
             combo.append_text(_('%s repository settings') % hglib.toutf(name))
         combo.connect('changed', self.fileselect)
+        self.confcombo = combo
 
         hbox = gtk.HBox()
         hbox.pack_start(combo, False, False)
@@ -690,12 +694,10 @@ class ConfigDialog(gtk.Dialog):
         descframe.add(scrolled)
         self.descbuffer = desctext.get_buffer()
 
-        self.configrepo = configrepo
-
         # Force dialog into clean state in the beginning
         self._btn_apply.set_sensitive(False)
         self.dirty = False
-        combo.set_active(configrepo and 1 or 0)
+        combo.set_active(configrepo and CONF_REPO or CONF_GLOBAL)
 
         # activate first config page
         self.confview.set_cursor(self.confmodel[0].path)
@@ -708,11 +710,10 @@ class ConfigDialog(gtk.Dialog):
                    _('Lose changes and switch files?.')).run()
             if ret != gtk.RESPONSE_YES:
                return
-        self.configrepo = combo.get_active() and True or False
         self.refresh()
 
     def refresh(self):
-        if self.configrepo:
+        if self.confcombo.get_active() == CONF_REPO:
             repo = hg.repository(ui.ui(), self.root)
             name = hglib.get_reponame(repo)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
@@ -769,7 +770,7 @@ class ConfigDialog(gtk.Dialog):
 
     def edit_clicked(self, button):
         # reload configs, in case they have been written since opened
-        if self.configrepo:
+        if self.confcombo.get_active() == CONF_REPO:
             repo = hg.repository(ui.ui(), self.root)
             u = repo.ui
         else:
