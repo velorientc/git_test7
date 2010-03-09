@@ -981,7 +981,7 @@ class GCommit(GStatus):
 
     def undo_clicked(self, toolbutton, data=None):
         response = gdialog.Confirm(_('Confirm Undo Commit'),
-                [], self, _('Undo last commit')).run()
+                [], self, _('Undo last commit?')).run()
         if response != gtk.RESPONSE_YES:
             return
 
