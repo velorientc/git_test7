@@ -6,13 +6,17 @@
 #include "ThgClassFactory.h"
 #include "CShellExtCMenu.h"
 #include "CShellExtOverlay.h"
+#include "ThgCLSIDs.h"
 
 
-#define CLSID_TortoiseHgCmenu L"{46605027-5B8C-4DCE-BFE0-051B7972D64C}"
-#define CLSID_TortoiseHg0     L"{869C8877-2C3C-438D-844B-31B86BFE5E8A}"
-#define CLSID_TortoiseHg1     L"{AF42ADAB-8C2E-4285-B746-99B31094708E}"
-#define CLSID_TortoiseHg2     L"{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}"
-#define CLSID_TortoiseHg6     L"{9E3D4EC9-0624-4393-8B48-204C217ED1FF}"
+#define TOLSTR(x)   L ## #x
+#define TOLSTR2(x)  TOLSTR(x)
+
+#define CLSID_TortoiseHgCmenu  TOLSTR2(THG_CLSID_TortoiseHgCmenu)
+#define CLSID_TortoiseHg0      TOLSTR2(THG_CLSID_TortoiseHg0)
+#define CLSID_TortoiseHg1      TOLSTR2(THG_CLSID_TortoiseHg1)
+#define CLSID_TortoiseHg2      TOLSTR2(THG_CLSID_TortoiseHg2)
+#define CLSID_TortoiseHg6      TOLSTR2(THG_CLSID_TortoiseHg6)
 
 
 UINT g_cRefThisDll = 0;

@@ -1,0 +1,8 @@
+#include "ThgCLSIDs.h"
+<Include>
+  <?define CLSID_TortoiseHgCmenu = THG_CLSID_TortoiseHgCmenu ?>
+  <?define CLSID_TortoiseHg0 = THG_CLSID_TortoiseHg0 ?>
+  <?define CLSID_TortoiseHg1 = THG_CLSID_TortoiseHg1 ?>
+  <?define CLSID_TortoiseHg2 = THG_CLSID_TortoiseHg2 ?>
+  <?define CLSID_TortoiseHg6 = THG_CLSID_TortoiseHg6 ?>
+</Include>

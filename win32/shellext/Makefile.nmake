@@ -46,9 +46,10 @@ TERMINATE_TARGET = terminate-$(THG_PLATFORM).exe
 all: $(THGSHELL_TARGET) $(TERMINATE_TARGET)
 
 clean:
-    del *.obj *.dll *.exe *.lib *.exp *.manifest *.res parentid.h
+    del *.obj *.dll *.exe *.lib *.exp *.manifest *.res parentid.h ThgCLSIDs.wxi
 
 $(THGSHELL_TARGET): $(OBJECTS_THGSGELL)
+    cl /EP ThgCLSIDs-template.wxi > ThgCLSIDs.wxi
     create-parentid-h.cmd
     rc /dTHG_SHELL_FNAME="$@" $(THG_EXTRA_RCFLAGS) shellext.rc
     link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
