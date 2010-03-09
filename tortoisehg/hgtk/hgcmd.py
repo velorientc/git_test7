@@ -699,7 +699,8 @@ class CmdRunner(object):
         When the command terminates, the callback function is invoked
         with its return code. 
 
-        cmdline: command line string.
+        cmdline: a list of command line arguments or its tuple/list.
+                 All command line arguments must be string, not int or long.
         callback: function invoked after the command terminates.
 
         def callback(returncode, useraborted, ...)
@@ -716,10 +717,13 @@ class CmdRunner(object):
         # clear previous logs
         self.clear_buffers()
 
-        # thread start
-        self.hgthread = hgthread.HgThread(cmdline[1:])
-        self.hgthread.start()
-        gobject.timeout_add(10, self.process_queue, callback, args, kargs)
+        # normalize 'cmdline' arguments
+        if isinstance(cmdline[0], basestring):
+            cmdline = (cmdline,)
+        self.cmdlist = list(cmdline)
+
+        # execute cmdline
+        self.execute_next(callback, args, kargs)
 
         return True
 
@@ -801,6 +805,14 @@ class CmdRunner(object):
         else:
             self.dlg.hide()
 
+    def execute_next(self, callback, args, kargs):
+        if not self.cmdlist:
+            return
+        cmdline = self.cmdlist.pop(0)
+        self.hgthread = hgthread.HgThread(cmdline[1:])
+        self.hgthread.start()
+        gobject.timeout_add(10, self.process_queue, callback, args, kargs)
+
     def process_queue(self, callback, args, kargs):
         # process queue
         self.hgthread.process_dialogs()
@@ -827,9 +839,14 @@ class CmdRunner(object):
             self.hgthread = None
             if len(self.get_err_buffer()) > 0:
                 self.show_log(True)
-            def call_callback():
-                callback(returncode, self.get_buffer(), *args, **kargs)
-            gtklib.idle_add_single_call(call_callback)
+            if returncode == 0 and self.cmdlist:
+                def call_next():
+                    self.execute_next(callback, args, kargs)
+                gtklib.idle_add_single_call(call_next)
+            else:
+                def call_callback():
+                    callback(returncode, self.get_buffer(), *args, **kargs)
+                gtklib.idle_add_single_call(call_callback)
             return False # Stop polling this function
         else:
             return True # Continue polling
