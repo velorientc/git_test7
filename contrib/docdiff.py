@@ -25,18 +25,18 @@ scripts = {
     'doc'  : ('diff-doc.js', 'merge-doc.js'),    # MS Word
     'docx' : ('diff-doc.js', 'merge-doc.js'),
     'docm' : ('diff-doc.js', 'merge-doc.js'),
-    'ppt'  : ('diff-ppt.js'),                    # MS PowerPoint
-    'pptx' : ('diff-ppt.js'),
-    'pptm' : ('diff-ppt.js'),
-    'xls'  : ('diff-xls.vbs'),                   # MS Excel
-    'xlsx' : ('diff-xls.vbs'),
-    'xlsm' : ('diff-xls.vbs'),
-    'xlsb' : ('diff-xls.vbs'),
-    'xlam' : ('diff-xls.vbs'),
+    'ppt'  : ('diff-ppt.js',),                   # MS PowerPoint
+    'pptx' : ('diff-ppt.js',),
+    'pptm' : ('diff-ppt.js',),
+    'xls'  : ('diff-xls.vbs',),                  # MS Excel
+    'xlsx' : ('diff-xls.vbs',),
+    'xlsm' : ('diff-xls.vbs',),
+    'xlsb' : ('diff-xls.vbs',),
+    'xlam' : ('diff-xls.vbs',),
     'ods'  : ('diff-odt.vbs', 'merge-ods.vbs'),  # OpenOffice Text
     'odt'  : ('diff-odt.vbs', 'merge-ods.vbs'),
     'sxw'  : ('diff-sxw.vbs', 'merge-ods.vbs'),  # OpenOffice Calc
-    'nb'   : ('diff-nb.vbs'),                    # Mathematica Notebook
+    'nb'   : ('diff-nb.vbs',),                   # Mathematica Notebook
 }
 
 def main():
