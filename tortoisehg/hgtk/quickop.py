@@ -9,7 +9,7 @@ import os
 import gtk
 import pango
 
-from mercurial import cmdutil
+from mercurial import cmdutil, util
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib
@@ -144,8 +144,12 @@ class QuickOpDialog(gdialog.GDialog):
                                  clean='C' in filetypes,
                                  ignored='I' in filetypes,
                                  unknown='?' in filetypes)
-        except IOError:
-            status = [None] * 7
+        except (IOError, util.Abort), e:
+            gdialog.Prompt(_('Unable to determine repository status'),
+                           str(e), self).run()
+            self.earlyout=True
+            self.hide()
+            return
 
         (modified, added, removed, deleted, unknown, ignored, clean) = status
         if 'M' in filetypes:
