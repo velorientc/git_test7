@@ -717,7 +717,7 @@ class ConfigDialog(gtk.Dialog):
                 combo.handler_unblock_by_func(self.fileselect)
                 return
             elif ret == 0:
-                self._apply_clicked()
+                self.apply_changes()
         self.refresh()
 
     def refresh(self):
@@ -795,7 +795,7 @@ class ConfigDialog(gtk.Dialog):
 
     def should_live(self, dialog=None, resp=None):
         if resp == gtk.RESPONSE_APPLY:
-            self._apply_clicked()
+            self.apply_changes()
             self.emit_stop_by_name('response')
             return True
         elif resp == gtk.RESPONSE_CANCEL:
@@ -813,7 +813,7 @@ class ConfigDialog(gtk.Dialog):
                     self.emit_stop_by_name('response')
                 return True
             elif ret == 0:
-                self._apply_clicked()
+                self.apply_changes()
         return False
 
     def cursor_changed(self, treeview):
@@ -1299,7 +1299,7 @@ class ConfigDialog(gtk.Dialog):
             self.history.get_value(cpath).remove(newvalue)
         self.history.mrul(cpath).add(newvalue)
 
-    def _apply_clicked(self, *args):
+    def apply_changes(self):
         if self.readonly:
             #dialog? Read only access, please install ...
             return
