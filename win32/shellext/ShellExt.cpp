@@ -7,17 +7,13 @@
 #include "CShellExtCMenu.h"
 #include "CShellExtOverlay.h"
 
-#include <olectl.h>
 
-#define INITGUID
-#include <initguid.h>
+#define CLSID_TortoiseHgCmenu L"{46605027-5B8C-4DCE-BFE0-051B7972D64C}"
+#define CLSID_TortoiseHg0     L"{869C8877-2C3C-438D-844B-31B86BFE5E8A}"
+#define CLSID_TortoiseHg1     L"{AF42ADAB-8C2E-4285-B746-99B31094708E}"
+#define CLSID_TortoiseHg2     L"{CDA1C89D-E9B5-4981-A857-82DD932EA2FD}"
+#define CLSID_TortoiseHg6     L"{9E3D4EC9-0624-4393-8B48-204C217ED1FF}"
 
-DEFINE_GUID(CLSID_TortoiseHgCmenu, 0x46605027L, 0x5B8C, 0x4DCE, 0xBF, 0xE0, 0x05, 0x1B, 0x79, 0x72, 0xD6, 0x4C);
-
-DEFINE_GUID(CLSID_TortoiseHg0, 0x869C8877L, 0x2C3C, 0x438D, 0x84, 0x4B, 0x31, 0xB8, 0x6B, 0xFE, 0x5E, 0x8A);
-DEFINE_GUID(CLSID_TortoiseHg1, 0xAF42ADABL, 0x8C2E, 0x4285, 0xB7, 0x46, 0x99, 0xB3, 0x10, 0x94, 0x70, 0x8E);
-DEFINE_GUID(CLSID_TortoiseHg2, 0xCDA1C89DL, 0xE9B5, 0x4981, 0xA8, 0x57, 0x82, 0xDD, 0x93, 0x2E, 0xA2, 0xFD);
-DEFINE_GUID(CLSID_TortoiseHg6, 0x9E3D4EC9L, 0x0624, 0x4393, 0x8B, 0x48, 0x20, 0x4C, 0x21, 0x7E, 0xD1, 0xFF);
 
 UINT g_cRefThisDll = 0;
 HINSTANCE g_hmodThisDll = NULL;
@@ -68,9 +64,15 @@ STDAPI DllCanUnloadNow(void)
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 {
-    LPWSTR   pwszShellExt;
-    StringFromIID(rclsid, &pwszShellExt);
-    TDEBUG_TRACEW("DllGetClassObject clsid = " << pwszShellExt);
+    std::wstring clsid;
+    {
+        LPWSTR ptr = 0;
+        ::StringFromIID(rclsid, &ptr);
+        clsid = ptr;
+        ::CoTaskMemFree(ptr);
+    }
+
+    TDEBUG_TRACEW("DllGetClassObject clsid = " << clsid);
 
     if (ppvOut == 0)
     {
@@ -83,34 +85,34 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     typedef ThgClassFactory<CShellExtOverlay> FactOvl;
     typedef ThgClassFactory<CShellExtCMenu>   FactCmenu;
 
-    if (IsEqualIID(rclsid, CLSID_TortoiseHgCmenu))
+    if (clsid == CLSID_TortoiseHgCmenu)
     {
         FactCmenu *pcf = new FactCmenu(0);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgCmenu");
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (IsEqualIID(rclsid, CLSID_TortoiseHg0))
+    else if (clsid == CLSID_TortoiseHg0)
     {
         FactOvl *pcf = new FactOvl('C');  // clean
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
         ++InitStatus::inst().unchanged_;
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (IsEqualIID(rclsid, CLSID_TortoiseHg1))
+    else if (clsid == CLSID_TortoiseHg1)
     {
         FactOvl *pcf = new FactOvl('A');  // added
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
         ++InitStatus::inst().added_;
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (IsEqualIID(rclsid, CLSID_TortoiseHg2))
+    else if (clsid == CLSID_TortoiseHg2)
     {
         FactOvl *pcf = new FactOvl('M');   // modified
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
         ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (IsEqualIID(rclsid, CLSID_TortoiseHg6))
+    else if (clsid == CLSID_TortoiseHg6)
     {
         FactOvl *pcf = new FactOvl('?');   // not in repo
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
