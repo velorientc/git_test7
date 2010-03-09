@@ -70,7 +70,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 {
     LPWSTR   pwszShellExt;
     StringFromIID(rclsid, &pwszShellExt);
-    TDEBUG_TRACE("DllGetClassObject clsid = " << WideToMultibyte(pwszShellExt));
+    TDEBUG_TRACEW("DllGetClassObject clsid = " << pwszShellExt);
 
     if (ppvOut == 0)
     {
