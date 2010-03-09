@@ -1084,9 +1084,8 @@ class GCommit(GStatus):
             # bring up the config dialog for user to enter their username.
             # But since we can't be sure they will do it right, we will
             # have them to retry, to re-trigger the checking mechanism.
-            dlg = thgconfig.ConfigDialog(False)
+            dlg = thgconfig.ConfigDialog(False, focus='ui.username')
             dlg.show_all()
-            dlg.focus_field('ui.username')
             dlg.run()
             dlg.hide()
             self.refreshui()
@@ -1299,9 +1298,8 @@ class GCommit(GStatus):
         buf.set_text('\n'.join(lines))                       
 
     def msg_config(self, sender):
-        dlg = thgconfig.ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True, focus='tortoisehg.summarylen')
         dlg.show_all()
-        dlg.focus_field('tortoisehg.summarylen')
         dlg.run()
         dlg.hide()
         self.refreshui()
