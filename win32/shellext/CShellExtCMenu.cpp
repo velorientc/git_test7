@@ -115,7 +115,7 @@ const char* const RepoNoFilesMenu =
     " add revert rename forget remove sep"
     " log update grep sep"
     " synch serve clone init thgstatus sep"
-    " ignore guess recover sep"
+    " hgignore guess recover sep"
     " shellconf repoconf userconf sep"
     " about"
 ;
