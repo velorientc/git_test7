@@ -8,6 +8,7 @@
 #include "ShellExt.h"
 #include "RegistryConfig.h"
 #include "TortoiseIconBitmap.h"
+#include "ThgVersion.h"
 
 #include <map>
 
@@ -871,6 +872,12 @@ STDMETHODIMP CShellExtCMenu::Initialize(
     TCHAR name[MAX_PATH+1];
 
     TDEBUG_TRACE("CShellExtCMenu::Initialize");
+
+    TDEBUG_TRACEW(
+        L"---- TortoiseHg shell extension version " 
+        << ThgVersion::get() << L"----"
+    );
+
     TDEBUG_TRACE("  pIDFolder: " << pIDFolder);
     TDEBUG_TRACE("  pDataObj: " << pDataObj);
 
