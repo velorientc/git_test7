@@ -230,3 +230,44 @@ should be asked for the password only once (per every username +
 remote_repository_url combination). 
 
 .. vim: noet ts=4
+
+pbranch
+=======
+
+Patch Branches (`pbranch <http://mercurial.selenic.com/wiki/PatchBranchExtension>`_) 
+is a way to develop a series of patches for submission into a main 
+repo. It is based on topic branches, one per patch, and is thus highly 
+suitable for collaborative and/or long-term patch development and 
+maintenance.
+
+'A detailed manual <http://arrenbrecht.ch/mercurial/pbranch/>'_ can be found online.
+
+It adds a number of commands which can be listed with 
+:command:`hg help pbranch`::
+
+ pbackout       - backs out the current patch branch (undoes all its changes)
+ pdiff          - prints the final diff for the current or given patch branch
+ peditmessage   - edit the patch message
+ pemail         - send patches by email
+ pexport        - exports patches
+ pextdiff       - combines pdiff and extdiff
+ pgraph         - print an ASCII art rendering of the patch dependency graph
+ pmerge         - merge pending heads from dependencies into patch branches
+ pmessage       - print the patch message(s)
+ pnew           - start a new patch branch
+ pstatus        - print status of current (or given) patch branch
+ reapply        - reverts the working copy of all files touched by REV to REV
+
+**Installation**
+
+To test the use of this plugin, you can specify it on the Mercurial
+command line like this::
+
+	hg --config "extensions.pbranch=" pstatus
+
+You may want to add it to your Mercurial.ini or a repository's hgrc like this::
+
+	[extensions]
+	pbranch=
+ 
+If you do this, you can omit the --config command-line option.

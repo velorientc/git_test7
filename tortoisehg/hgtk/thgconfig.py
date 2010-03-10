@@ -23,7 +23,8 @@ _unspeclocalstr = hglib.fromutf(_unspecstr)
 
 _pwfields = ('http_proxy.passwd', 'smtp.password')
 
-_tortoise_info = (
+INFO = (
+({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo.ico'}, (
     (_('Three-way Merge Tool'), 'ui.merge', [],
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
@@ -62,9 +63,13 @@ _tortoise_info = (
         ' process to run graphical dialogs.  Default: True')),
     (_('Full Path Title'), 'tortoisehg.fullpath', ['False', 'True'],
         _('Show a full directory path of the repository in the dialog title'
-        ' instead of just the root directory name.  Default: False')))
+        ' instead of just the root directory name.  Default: False')),
+    ) + (gtklib.hasspellcheck() and
+    (_('Spell Check Language'), 'tortoisehg.spellcheck', [],
+        _('Default language for spell check. System language is'
+        ' used if not specified. Examples: en, en_GB, en_US'),) or ())),
 
-_commit_info = (
+({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit.ico'}, (
     (_('Username'), 'ui.username', [],
         _('Name associated with commits')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
@@ -88,10 +93,11 @@ _commit_info = (
     (_('Auto Exclude List'), 'tortoisehg.ciexclude', [],
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, commit, and shelve dialogs are opened.'
-         '  Default: None'))
-       )
+         '  Default: None')),
+    )),
 
-_log_info = (
+({'name': 'log', 'label': _('Repository Explorer'),
+  'icon': 'menulog.ico'}, (
     (_('Author Coloring'), 'tortoisehg.authorcolor', ['False', 'True'],
         _('Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
@@ -118,25 +124,27 @@ _log_info = (
         ' Default: None')),
     (_('Hide Tags'), 'tortoisehg.hidetags', [],
         _('Space separated list of tags that will not be shown.'
-          ' Useful example: Specify "qbase qparent qtip" to hide the'
-          ' standard tags inserted by the Mercurial Queues Extension.' 
+        ' Useful example: Specify "qbase qparent qtip" to hide the'
+        ' standard tags inserted by the Mercurial Queues Extension.' 
         ' Default: None')),
     (_('Use Expander'), 'tortoisehg.changeset-expander', ['False', 'True'],
         _('Show changeset details with an expander')),
     (_('Toolbar Style'), 'tortoisehg.logtbarstyle',
         ['small', 'large', 'theme'],
         _('Adjust the display of the main toolbar in the Repository'
-          ' Explorer.  Values: small, large, or theme.  Default: theme')),
-        )
+        ' Explorer.  Values: small, large, or theme.  Default: theme')),
+    )),
 
-_paths_info = (
+({'name': 'sync', 'label': _('Synchronize'), 'icon': 'menusynch.ico',
+  'extra': True}, (
     (_('After Pull Operation'), 'tortoisehg.postpull',
         ['none', 'update', 'fetch', 'rebase'],
         _('Operation which is performed directly after a successful pull.'
-          ' update equates to pull --update, fetch equates to the fetch'
-          ' extension, rebase equates to pull --rebase.  Default: none')),)
+        ' update equates to pull --update, fetch equates to the fetch'
+        ' extension, rebase equates to pull --rebase.  Default: none')),
+    )),
 
-_web_info = (
+({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy.ico'}, (
     (_('Name'), 'web.name', ['unknown'],
         _('Repository name to use in the web interface.'
         ' Default is the working directory.')),
@@ -179,9 +187,10 @@ _web_info = (
         ' (separated by whitespace or ",") is also denied. The contents'
         ' of the deny_push list are examined before the allow_push list.')),
     (_('Encoding'), 'web.encoding', ['UTF-8'],
-        _('Character encoding name')))
+        _('Character encoding name')),
+    )),
 
-_proxy_info = (
+({'name': 'proxy', 'label': _('Proxy'), 'icon': 'general.ico'}, (
     (_('Host'), 'http_proxy.host', [],
         _('Host name and (optional) port of proxy server, for'
         ' example "myproxy:8000"')),
@@ -189,29 +198,29 @@ _proxy_info = (
         _('Optional. Comma-separated list of host names that'
         ' should bypass the proxy')),
     (_('User'), 'http_proxy.user', [],
-        _('Optional. User name to authenticate with at the'
-        ' proxy server')),
+        _('Optional. User name to authenticate with at the proxy server')),
     (_('Password'), 'http_proxy.passwd', [],
-        _('Optional. Password to authenticate with at the'
-        ' proxy server')))
+        _('Optional. Password to authenticate with at the proxy server')),
+    )),
 
-_email_info = (
+({'name': 'email', 'label': _('Email'), 'icon': gtk.STOCK_GOTO_LAST}, (
     (_('From'), 'email.from', [],
-        _('Email address to use in the "From" header and for the SMTP envelope')),
+        _('Email address to use in the "From" header and for'
+        ' the SMTP envelope')),
     (_('To'), 'email.to', [],
         _('Comma-separated list of recipient email addresses')),
     (_('Cc'), 'email.cc', [],
-        _('Comma-separated list of carbon copy recipient email'
-        ' addresses')),
+        _('Comma-separated list of carbon copy recipient email addresses')),
     (_('Bcc'), 'email.bcc', [],
         _('Comma-separated list of blind carbon copy recipient'
         ' email addresses')),
     (_('method'), 'email.method', ['smtp'],
-_('Optional. Method to use to send email messages. If value is "smtp" (default),'
-' use SMTP (configured below).  Otherwise, use as name of program to run that'
-' acts like sendmail (takes "-f" option for sender, list of recipients on'
-' command line, message on stdin). Normally, setting this to "sendmail" or'
-' "/usr/sbin/sendmail" is enough to use sendmail to send messages.')),
+        _('Optional. Method to use to send email messages. If value is'
+        ' "smtp" (default), use SMTP (configured below).  Otherwise, use as'
+        ' name of program to run that acts like sendmail (takes "-f" option'
+        ' for sender, list of recipients on command line, message on stdin).'
+        ' Normally, setting this to "sendmail" or "/usr/sbin/sendmail"'
+        ' is enough to use sendmail to send messages.')),
     (_('SMTP Host'), 'smtp.host', [], _('Host name of mail server')),
     (_('SMTP Port'), 'smtp.port', ['25'],
         _('Port to connect to on mail server.'
@@ -224,9 +233,11 @@ _('Optional. Method to use to send email messages. If value is "smtp" (default),
     (_('SMTP Password'), 'smtp.password', [],
         _('Password to authenticate to mail server with')),
     (_('Local Hostname'), 'smtp.local_hostname', [],
-        _('Hostname the sender can use to identify itself to the mail server.')))
+        _('Hostname the sender can use to identify itself to the'
+        ' mail server.')),
+    )),
 
-_diff_info = (
+({'name': 'diff', 'label': _('Diff'), 'icon': gtk.STOCK_JUSTIFY_FILL}, (
     (_('Patch EOL'), 'patch.eol', ['strict', 'crlf', 'lf'],
         _('Normalize file line endings during and after patch to lf or'
         ' crlf.  Strict does no normalization.'
@@ -251,10 +262,12 @@ _diff_info = (
         ' Default: False')),
     (_('Coloring Style'), 'tortoisehg.diffcolorstyle',
         ['none', 'foreground', 'background'],
-        _('Adjust the coloring style of diff lines in the changeset viewer.'
-        ' Default: foreground')))
+        _('Adjust the coloring style of diff lines in the changeset'
+        ' viewer. Default: foreground')),
+    )),
 
-_font_info = (
+({'name': 'font', 'label': _('Font'), 'icon': gtk.STOCK_SELECT_FONT,
+  'extra': True, 'width': 16}, (
     (_('Commit Message'), 'gtools.fontcomment', [],
         _('Font used in changeset viewer and commit log text.'
         ' Default: monospace 10')),
@@ -266,7 +279,8 @@ _font_info = (
         ' Default: sans 9')),
     (_('Command Output'), 'gtools.fontlog', [],
         _('Font used in command output window.'
-        ' Default: monospace 10')))
+        ' Default: monospace 10')),
+    )),)
 
 _font_presets = {
     'win-ja': (_('Japanese on Windows'), {
@@ -540,7 +554,7 @@ CONF_GLOBAL = 0
 CONF_REPO   = 1
 
 class ConfigDialog(gtk.Dialog):
-    def __init__(self, configrepo=False):
+    def __init__(self, configrepo=False, focus=None):
         """ Initialize the Dialog. """
         gtk.Dialog.__init__(self, parent=None, flags=0,
                             buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
@@ -654,28 +668,11 @@ class ConfigDialog(gtk.Dialog):
         self.tooltips = gtk.Tooltips()
         self.history = settings.Settings('thgconfig')
 
-        # add spell ckeck entry if spell check is supported
-        tortoise_info = _tortoise_info
-        if gtklib.hasspellcheck():
-            tortoise_info += ((
-                _('Spell Check Language'), 'tortoisehg.spellcheck', [],
-                _('Default language for spell check. '
-                  'System language is used if not specified. '
-                  'Examples: en, en_GB, en_US')),)
-
-        # create pages for each section of configuration file
-        self.add_page('TortoiseHg', 'general', tortoise_info, 'thg_logo.ico')
-        self.add_page(_('Commit'), 'commit', _commit_info, 'menucommit.ico')
-        self.add_page(_('Repository Explorer'), 'log', _log_info,
-                      'menulog.ico')
-        self.add_page(_('Synchronize'), 'sync', _paths_info, 'menusynch.ico',
-                      extra=True)
-        self.add_page(_('Web Server'), 'web', _web_info, 'proxy.ico')
-        self.add_page(_('Proxy'), 'proxy', _proxy_info, 'general.ico')
-        self.add_page(_('Email'), 'email', _email_info, gtk.STOCK_GOTO_LAST)
-        self.add_page(_('Diff'), 'diff', _diff_info, gtk.STOCK_JUSTIFY_FILL)
-        self.add_page(_('Font'), 'font', _font_info, gtk.STOCK_SELECT_FONT,
-                      extra=True, width=20)
+        # add page items to treeview
+        for meta, info in INFO:
+            pixbuf = gtklib.get_icon_pixbuf(meta['icon'],
+                            gtk.ICON_SIZE_LARGE_TOOLBAR)
+            self.confmodel.append((pixbuf, meta['label'], meta['name']))
 
         # insert padding of between notebook and common desc frame
         mainbox.pack_start(gtk.VBox(), False, False, 2)
@@ -699,9 +696,12 @@ class ConfigDialog(gtk.Dialog):
         self.dirty = False
         combo.set_active(configrepo and CONF_REPO or CONF_GLOBAL)
 
-        # activate first config page
-        self.confview.set_cursor(self.confmodel[0].path)
-        self.confview.grab_focus()
+        # focus 'general' page or specified field
+        if focus:
+            self.focus_field(focus)
+        else:
+            self.show_page('general')
+            self.confview.grab_focus()
 
     def fileselect(self, combo):
         'select another hgrc file'
@@ -721,58 +721,24 @@ class ConfigDialog(gtk.Dialog):
         self.refresh()
 
     def refresh(self):
+        # determine target config file
         if self.confcombo.get_active() == CONF_REPO:
             repo = hg.repository(ui.ui(), self.root)
             name = hglib.get_reponame(repo)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title(_('TortoiseHg Configure Repository - ') + hglib.toutf(name))
+            self.set_title(_('TortoiseHg Configure Repository - ') + \
+                           hglib.toutf(name))
             gtklib.set_tortoise_icon(self, 'settings_repo.ico')
         else:
             self.rcpath = util.user_rcpath()
             self.set_title(_('TortoiseHg Configure User-Global Settings'))
             gtklib.set_tortoise_icon(self, 'settings_user.ico')
+
+        # refresh config values
         self.ini = self.load_config(self.rcpath)
         self.refresh_vlist()
 
-        # refresh sync frame
-        self.pathdata.clear()
-        if 'paths' in self.ini:
-            for name in self.ini['paths']:
-                path = self.ini['paths'][name]
-                safepath = hglib.toutf(url.hidepassword(path))
-                self.pathdata.append([hglib.toutf(name), safepath,
-                    hglib.toutf(path)])
-        self.refresh_path_list()
-
-        # refresh preset fonts combo
-        model = self.presetcombo.get_model()
-        cpaths = [info[1] for info in _font_info]
-        defaulfonts = True
-        for cpath in cpaths:
-            value = self.get_ini_config(cpath)
-            if value is not None:
-                defaulfonts = False
-        if defaulfonts:
-            # theme default fonts
-            self.defaultradio.set_active(True)
-            self.presetcombo.set_active(0)
-        else:
-            for name, (label, preset) in _font_presets.items():
-                for cpath in cpaths:
-                    if self.get_ini_config(cpath) != preset[cpath]:
-                        break
-                else:
-                    # preset fonts
-                    rows = [row for row in model if row[0] == name]
-                    if rows:
-                        self.presetcombo.set_active_iter(rows[0].iter)
-                    self.presetradio.set_active(True)
-                    break
-            else:
-                # custom fonts
-                self.customradio.set_active(True)
-                self.presetcombo.set_active(0)
-
+        # clear modification status
         self._btn_apply.set_sensitive(False)
         self.dirty = False
 
@@ -821,21 +787,29 @@ class ConfigDialog(gtk.Dialog):
         if not path:
             return
         name = self.confmodel[path][2]
+        if not self.pages.has_key(name):
+            self.add_page(name)
         page_num, info, vbox, widgets = self.pages[name]
         self.notebook.set_current_page(page_num)
 
     def show_page(self, name):
         '''Show page by activating treeview item'''
-        page_num = self.pages[name][0]
-        path = self.confmodel[page_num].path
+        for row in self.confmodel:
+            if name == row[2]:
+                path = row.path
+                break
+        else:
+            return
         self.confview.set_cursor(path)
 
     def focus_field(self, focusfield):
         '''Set page and focus to requested datum'''
-        for name, (page_num, info, vbox, widgets) in self.pages.items():
+        for meta, info in INFO:
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
+                    name = meta['name']
                     self.show_page(name)
+                    widgets = self.pages[name][3]
                     widgets[n].grab_focus()
                     return
 
@@ -865,104 +839,6 @@ class ConfigDialog(gtk.Dialog):
             self._btn_apply.set_sensitive(not self.readonly)
             self.dirty = True
 
-    def _add_path(self, *args):
-        self.new_path('http://')
-        self._edit_path(new=True)
-
-    def _edit_path(self, *args, **opts):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        model, path = selection.get_selected()
-        dialog = PathEditDialog(model[path][2], model[path][0],
-                [p[0] for p in self.pathdata if p[0] != model[path][0]])
-        dialog.set_transient_for(self)
-        dialog.run()
-        if dialog.newpath:
-            if model[path][0] != dialog.newalias:
-                # remove existing path
-                rows = [row for row in model if row[0] == dialog.newalias]
-                if len(rows) > 0:
-                    del model[rows[0].iter]
-            # update path info
-            model[path][0] = dialog.newalias
-            model[path][1] = url.hidepassword(dialog.newpath)
-            model[path][2] = dialog.newpath
-            self.dirty_event()
-        elif opts.has_key('new') and opts['new'] == True:
-            del self.pathdata[path]
-            self.refresh_path_list()
-            self.dirty_event()
-
-    def _remove_path(self, *args):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        model, path = selection.get_selected()
-        next_iter = self.pathdata.iter_next(path)
-        del self.pathdata[path]
-        if next_iter:
-            selection.select_iter(next_iter)
-        elif len(self.pathdata):
-            selection.select_path(len(self.pathdata) - 1)
-        self.refresh_path_list()
-        self.dirty_event()
-
-    def _test_path(self, *args):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        if not self.root:
-            dialog.error_dialog(self, _('No Repository Found'),
-                    _('Path testing cannot work without a repository'))
-            return
-        model, path = selection.get_selected()
-        testpath = hglib.fromutf(model[path][2])
-        if not testpath:
-            return
-        if testpath[0] == '~':
-            testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--verbose', testpath]
-        dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
-        dlg.run()
-        dlg.hide()
-
-    def _default_path(self, *args):
-        selection = self.pathtree.get_selection()
-        if not selection.count_selected_rows():
-            return
-        model, path = selection.get_selected()
-        if model[path][0] == 'default':
-            return
-        # collect rows has 'default' alias
-        rows = [row for row in model if row[0] == 'default']
-        if len(rows) > 0:
-            ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
-                   _("Overwrite existing '%s' path?") % 'default').run()
-            if ret != gtk.RESPONSE_YES:
-                return
-            # remove old default path
-            default_iter = rows[0].iter
-            del model[default_iter]
-        # set 'default' alias to selected path
-        model[path][0] = 'default'
-        self.refresh_path_list()
-        self.dirty_event()
-
-    def _pathtree_changed(self, sel):
-        self.refresh_path_list()
-
-    def _pathtree_pressed(self, widget, event):
-        if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
-            x, y = int(event.x), int(event.y)
-            pathinfo = self.pathtree.get_path_at_pos(x, y)
-            if pathinfo is not None:
-                self._edit_path()
-        elif event.button == 1:
-            selection = self.pathtree.get_selection()
-            selection.unselect_all()
-            self.refresh_path_list()
-
     def refresh_path_list(self):
         """Update sensitivity of buttons"""
         selection = self.pathtree.get_selection()
@@ -974,10 +850,10 @@ class ConfigDialog(gtk.Dialog):
             default_path = model[path][0] == 'default'
         else:
             default_path = False
-        self._editpathbutton.set_sensitive(path_selected)
-        self._delpathbutton.set_sensitive(path_selected)
-        self._testpathbutton.set_sensitive(repo_available and path_selected)
-        self._defaultpathbutton.set_sensitive(not default_path and path_selected)
+        self.editpathbtn.set_sensitive(path_selected)
+        self.delpathbtn.set_sensitive(path_selected)
+        self.testpathbtn.set_sensitive(repo_available and path_selected)
+        self.defaultpathbtn.set_sensitive(not default_path and path_selected)
 
     def fill_sync_frame(self, parent, table):
         # add table
@@ -1000,8 +876,6 @@ class ConfigDialog(gtk.Dialog):
         self.pathtree = gtk.TreeView(self.pathdata)
         self.pathtree.set_enable_search(False)
         self.pathtree.add_events(gtk.gdk.BUTTON_PRESS_MASK)
-        self.pathtree.connect('cursor-changed', self._pathtree_changed)
-        self.pathtree.connect('button-press-event', self._pathtree_pressed)
 
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn(_('Alias'), renderer, text=0)
@@ -1025,30 +899,138 @@ class ConfigDialog(gtk.Dialog):
         bottombox = gtk.HBox()
         vbox.pack_start(bottombox, False, False, 4)
 
-        self.addButton = gtk.Button(_('_Add'))
-        self.addButton.set_use_underline(True)
-        self.addButton.connect('clicked', self._add_path)
-        bottombox.pack_start(self.addButton, True, True, 2)
+        addpathbtn = gtk.Button(_('_Add'))
+        addpathbtn.set_use_underline(True)
+        bottombox.pack_start(addpathbtn, True, True, 2)
 
-        self._editpathbutton = gtk.Button(_('_Edit'))
-        self._editpathbutton.set_use_underline(True)
-        self._editpathbutton.connect('clicked', self._edit_path)
-        bottombox.pack_start(self._editpathbutton, True, True, 2)
+        self.editpathbtn = gtk.Button(_('_Edit'))
+        self.editpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.editpathbtn, True, True, 2)
 
-        self._delpathbutton = gtk.Button(_('_Remove'))
-        self._delpathbutton.set_use_underline(True)
-        self._delpathbutton.connect('clicked', self._remove_path)
-        bottombox.pack_start(self._delpathbutton, True, True, 2)
+        self.delpathbtn = gtk.Button(_('_Remove'))
+        self.delpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.delpathbtn, True, True, 2)
 
-        self._testpathbutton = gtk.Button(_('_Test'))
-        self._testpathbutton.set_use_underline(True)
-        self._testpathbutton.connect('clicked', self._test_path)
-        bottombox.pack_start(self._testpathbutton, True, True, 2)
+        self.testpathbtn = gtk.Button(_('_Test'))
+        self.testpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.testpathbtn, True, True, 2)
 
-        self._defaultpathbutton = gtk.Button(_('Set as _default'))
-        self._defaultpathbutton.set_use_underline(True)
-        self._defaultpathbutton.connect('clicked', self._default_path)
-        bottombox.pack_start(self._defaultpathbutton, True, True, 2)
+        self.defaultpathbtn = gtk.Button(_('Set as _default'))
+        self.defaultpathbtn.set_use_underline(True)
+        bottombox.pack_start(self.defaultpathbtn, True, True, 2)
+
+        # signal handlers
+        def pathtree_changed(sel):
+            self.refresh_path_list()
+        def pathtree_pressed(widget, event):
+            if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
+                x, y = int(event.x), int(event.y)
+                pathinfo = self.pathtree.get_path_at_pos(x, y)
+                if pathinfo is not None:
+                    edit_path()
+            elif event.button == 1:
+                selection = self.pathtree.get_selection()
+                selection.unselect_all()
+                self.refresh_path_list()
+        def edit_path(*args, **opts):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            model, path = selection.get_selected()
+            dialog = PathEditDialog(model[path][2], model[path][0],
+                    [p[0] for p in self.pathdata if p[0] != model[path][0]])
+            dialog.set_transient_for(self)
+            dialog.run()
+            if dialog.newpath:
+                if model[path][0] != dialog.newalias:
+                    # remove existing path
+                    rows = [row for row in model if row[0] == dialog.newalias]
+                    if len(rows) > 0:
+                        del model[rows[0].iter]
+                # update path info
+                model[path][0] = dialog.newalias
+                model[path][1] = url.hidepassword(dialog.newpath)
+                model[path][2] = dialog.newpath
+                self.dirty_event()
+            elif opts.has_key('new') and opts['new'] == True:
+                del self.pathdata[path]
+                self.refresh_path_list()
+                self.dirty_event()
+
+        def add_path(*args):
+            self.new_path('http://')
+            edit_path(new=True)
+        def remove_path(*args):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            model, path = selection.get_selected()
+            next_iter = self.pathdata.iter_next(path)
+            del self.pathdata[path]
+            if next_iter:
+                selection.select_iter(next_iter)
+            elif len(self.pathdata):
+                selection.select_path(len(self.pathdata) - 1)
+            self.refresh_path_list()
+            self.dirty_event()
+        def test_path(*args):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            if not self.root:
+                dialog.error_dialog(self, _('No Repository Found'),
+                        _('Path testing cannot work without a repository'))
+                return
+            model, path = selection.get_selected()
+            testpath = hglib.fromutf(model[path][2])
+            if not testpath:
+                return
+            if testpath[0] == '~':
+                testpath = os.path.expanduser(testpath)
+            cmdline = ['hg', 'incoming', '--verbose', testpath]
+            dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
+            dlg.run()
+            dlg.hide()
+        def make_default(*args):
+            selection = self.pathtree.get_selection()
+            if not selection.count_selected_rows():
+                return
+            model, path = selection.get_selected()
+            if model[path][0] == 'default':
+                return
+            # collect rows has 'default' alias
+            rows = [row for row in model if row[0] == 'default']
+            if len(rows) > 0:
+                ret = gdialog.Confirm(_('Confirm Overwrite'), [], self,
+                       _("Overwrite existing '%s' path?") % 'default').run()
+                if ret != gtk.RESPONSE_YES:
+                    return
+                # remove old default path
+                default_iter = rows[0].iter
+                del model[default_iter]
+            # set 'default' alias to selected path
+            model[path][0] = 'default'
+            self.refresh_path_list()
+            self.dirty_event()
+
+        # connect handlers
+        self.pathtree.connect('cursor-changed', pathtree_changed)
+        self.pathtree.connect('button-press-event', pathtree_pressed)
+        addpathbtn.connect('clicked', add_path)
+        self.editpathbtn.connect('clicked', edit_path)
+        self.delpathbtn.connect('clicked', remove_path)
+        self.testpathbtn.connect('clicked', test_path)
+        self.defaultpathbtn.connect('clicked', make_default)
+
+    def refresh_sync_frame(self):
+        self.pathdata.clear()
+        if 'paths' in self.ini:
+            for name in self.ini['paths']:
+                path = self.ini['paths'][name]
+                safepath = hglib.toutf(url.hidepassword(path))
+                self.pathdata.append([hglib.toutf(name), safepath,
+                                      hglib.toutf(path)])
+        self.refresh_path_list()
 
     def fill_font_frame(self, parent, table):
         # layout table
@@ -1118,6 +1100,35 @@ class ConfigDialog(gtk.Dialog):
         # prepare to show
         radio_activated(defaultradio, init=True)
 
+    def refresh_font_frame(self):
+        model = self.presetcombo.get_model()
+        cpaths = [info[1] for info in self.pages['font'][1]]
+        defaulfonts = True
+        for cpath in cpaths:
+            value = self.get_ini_config(cpath)
+            if value is not None:
+                defaulfonts = False
+        if defaulfonts:
+            # theme default fonts
+            self.defaultradio.set_active(True)
+            self.presetcombo.set_active(0)
+        else:
+            for name, (label, preset) in _font_presets.items():
+                for cpath in cpaths:
+                    if self.get_ini_config(cpath) != preset[cpath]:
+                        break
+                else:
+                    # preset fonts
+                    rows = [row for row in model if row[0] == name]
+                    if rows:
+                        self.presetcombo.set_active_iter(rows[0].iter)
+                    self.presetradio.set_active(True)
+                    break
+            else:
+                # custom fonts
+                self.customradio.set_active(True)
+                self.presetcombo.set_active(0)
+
     def set_help(self, widget, event, tooltip):
         text = ' '.join(tooltip.splitlines())
         self.descbuffer.set_text(text)
@@ -1153,8 +1164,19 @@ class ConfigDialog(gtk.Dialog):
 
         return vbox, table, widgets
 
-    def refresh_vlist(self):
-        for page_num, info, vbox, widgets in self.pages.values():
+    def refresh_vlist(self, pagename=None):
+        # sotre modification status
+        prev_dirty = self.dirty
+
+        # update configured values
+        if pagename is None:
+            pages = self.pages.values()
+            pages = [(key,) + data for key, data in self.pages.items()]
+        else:
+            pages = ((pagename,) + self.pages[pagename],)
+        for name, page_num, info, vbox, widgets in pages:
+
+            # standard configs
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 ispw = cpath in _pwfields
                 combo = widgets[row]
@@ -1166,9 +1188,9 @@ class ConfigDialog(gtk.Dialog):
 
                 if cpath == 'tortoisehg.vdiff':
                     tools = hglib.difftools(self.ui)
-                    for name in tools.keys():
-                        if name not in values:
-                            values.append(name)
+                    for key in tools.keys():
+                        if key not in values:
+                            values.append(key)
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     hglib.mergetools(self.ui, values)
@@ -1200,8 +1222,26 @@ class ConfigDialog(gtk.Dialog):
                 elif currow:
                     combo.set_active(currow)
 
-    def add_page(self, label, name, info, icon=None, extra=False, width=32):
-        # setup page
+            # extra configs
+            func_name = 'refresh_%s_frame' % name
+            if hasattr(self, func_name):
+                getattr(self, func_name)()
+
+        # clear modification status forcibly if need
+        if self.dirty != prev_dirty:
+            self._btn_apply.set_sensitive(False)
+            self.dirty = False
+
+    def add_page(self, name):
+        for data in INFO:
+            if name == data[0]['name']:
+                meta, info = data
+                break
+        else:
+            return
+        extra, width = meta.get('extra', False), meta.get('width', 32)
+
+        # setup frame and content
         frame = gtk.VBox()
         frame.show()
 
@@ -1215,11 +1255,9 @@ class ConfigDialog(gtk.Dialog):
         pagenum = self.notebook.append_page(frame)
         self.pages[name] = (pagenum, info, vbox, widgets)
 
-        # add treeview item
-        pixbuf = gtklib.get_icon_pixbuf(icon, gtk.ICON_SIZE_LARGE_TOOLBAR)
-        self.confmodel.append((pixbuf, label, name))
-
-        return frame
+        # prepare to show
+        self.refresh_vlist(name)
+        frame.show_all()
 
     def get_ini_config(self, cpath):
         '''Retrieve a value from the parsed config file'''
@@ -1307,24 +1345,26 @@ class ConfigDialog(gtk.Dialog):
         self.history.read()
 
         # flush changes on paths page
-        if len(self.pathdata):
-            refreshlist = []
-            for row in self.pathdata:
-                name = hglib.fromutf(row[0])
-                path = hglib.fromutf(row[2])
-                if not name:
-                    gdialog.Prompt(_('Invalid path'),
-                           _('Skipped saving path with no alias'), self).run()
-                    continue
-                cpath = '.'.join(['paths', name])
-                self.record_new_value(cpath, path, False)
-                refreshlist.append(name)
-            for name in self.ini.paths:
-                if name not in refreshlist:
+        if self.pages.has_key('sync'):
+            if len(self.pathdata):
+                refreshlist = []
+                for row in self.pathdata:
+                    name = hglib.fromutf(row[0])
+                    path = hglib.fromutf(row[2])
+                    if not name:
+                        gdialog.Prompt(_('Invalid path'),
+                                _('Skipped saving path with no alias'),
+                                self).run()
+                        continue
+                    cpath = '.'.join(['paths', name])
+                    self.record_new_value(cpath, path, False)
+                    refreshlist.append(name)
+                for name in self.ini.paths:
+                    if name not in refreshlist:
+                        del self.ini['paths'][name]
+            elif 'paths' in list(self.ini):
+                for name in list(self.ini.paths):
                     del self.ini['paths'][name]
-        elif 'paths' in list(self.ini):
-            for name in list(self.ini.paths):
-                del self.ini['paths'][name]
 
         # Flush changes on all pages
         for page_num, info, vbox, widgets in self.pages.values():
@@ -1348,7 +1388,6 @@ class ConfigDialog(gtk.Dialog):
         return 0
 
 def run(ui, *pats, **opts):
-    dlg = ConfigDialog(opts.get('alias') == 'repoconfig')
-    if opts.get('focus'):
-        dlg.focus_field(opts['focus'])
+    dlg = ConfigDialog(opts.get('alias') == 'repoconfig',
+                       focus=opts.get('focus'))
     return dlg
