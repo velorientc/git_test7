@@ -21,7 +21,8 @@ OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
         Dirstatecache.obj \
         DirectoryStatus.obj \
         Thgstatus.obj \
-        QueryDirstate.obj
+        QueryDirstate.obj \
+        ThgVersion.obj
 
 OBJECTS_TERMINATE = Thgstatus.obj \
         RegistryConfig.obj \
@@ -48,9 +49,11 @@ all: $(THGSHELL_TARGET) $(TERMINATE_TARGET)
 clean:
     del *.obj *.dll *.exe *.lib *.exp *.manifest *.res parentid.h ThgCLSIDs.wxi
 
-$(THGSHELL_TARGET): $(OBJECTS_THGSGELL)
-    cl /EP ThgCLSIDs-template.wxi > ThgCLSIDs.wxi
+ThgVersion:
     create-parentid-h.cmd
+
+$(THGSHELL_TARGET): ThgVersion $(OBJECTS_THGSGELL)
+    cl /EP ThgCLSIDs-template.wxi > ThgCLSIDs.wxi
     rc /dTHG_SHELL_FNAME="$@" $(THG_EXTRA_RCFLAGS) shellext.rc
     link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
     mt -nologo -manifest $@.manifest -outputresource:"$@;#2"

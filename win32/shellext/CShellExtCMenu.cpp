@@ -8,6 +8,7 @@
 #include "ShellExt.h"
 #include "RegistryConfig.h"
 #include "TortoiseIconBitmap.h"
+#include "ThgVersion.h"
 
 #include <map>
 
@@ -107,7 +108,7 @@ MenuDescription menuDescList[] =
     /* Add new items here */
 
     // template
-    {"", L"", L"", ".ico", 0},
+    //{"", L"", L"", ".ico", 0},
 };
 
 const char* const RepoNoFilesMenu =
@@ -196,7 +197,10 @@ void InitMenuMaps()
             MenuDescription md = menuDescList[i];
 
             if (md.name.size() == 0)
+            {
+                TDEBUG_TRACE("**** InitMenuMaps: ignoring entry with empty name");
                 break;
+            }
 
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
 
@@ -226,7 +230,6 @@ void InsertMenuItemWithIcon1(
 
     if (SysInfo::Instance().IsVistaOrLater())
     {
-        TDEBUG_TRACE("    InsertMenuItemWithIcon1: Vista or later detected, using modern context menu style");
         HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
         if (hBmp)
         {
@@ -276,7 +279,6 @@ void InsertSubMenuItemWithIcon2(
 
     if (SysInfo::Instance().IsVistaOrLater())
     {
-        TDEBUG_TRACE("    InsertMenuItemWithIcon1: Vista or later detected, using modern context menu style");
         HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
         if (hBmp)
         {
@@ -870,6 +872,12 @@ STDMETHODIMP CShellExtCMenu::Initialize(
     TCHAR name[MAX_PATH+1];
 
     TDEBUG_TRACE("CShellExtCMenu::Initialize");
+
+    TDEBUG_TRACEW(
+        L"---- TortoiseHg shell extension version " 
+        << ThgVersion::get() << L"----"
+    );
+
     TDEBUG_TRACE("  pIDFolder: " << pIDFolder);
     TDEBUG_TRACE("  pDataObj: " << pDataObj);
 
