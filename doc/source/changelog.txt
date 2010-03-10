@@ -234,6 +234,9 @@ revision context menu.
 		current working directory
 	:guilabel:`Copy Hash`
 		copy current revision's full hash to the clipboard
+	:guilabel:`Push to Here`
+		performs the equivalent of 'push -r <rev>'.  This option is only
+		available on changesets marked as outgoing.
 	:guilabel:`Update...`
 		update your working directory to this revision [#rcm1]_
 	:guilabel:`Merge With...`

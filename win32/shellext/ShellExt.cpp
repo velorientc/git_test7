@@ -13,10 +13,10 @@
 #define TOLSTR2(x)  TOLSTR(x)
 
 #define CLSID_TortoiseHgCmenu  TOLSTR2(THG_CLSID_TortoiseHgCmenu)
-#define CLSID_TortoiseHg0      TOLSTR2(THG_CLSID_TortoiseHg0)
-#define CLSID_TortoiseHg1      TOLSTR2(THG_CLSID_TortoiseHg1)
-#define CLSID_TortoiseHg2      TOLSTR2(THG_CLSID_TortoiseHg2)
-#define CLSID_TortoiseHg6      TOLSTR2(THG_CLSID_TortoiseHg6)
+#define CLSID_TortoiseHgNormal       TOLSTR2(THG_CLSID_TortoiseHgNormal)
+#define CLSID_TortoiseHgAdded        TOLSTR2(THG_CLSID_TortoiseHgAdded)
+#define CLSID_TortoiseHgModified     TOLSTR2(THG_CLSID_TortoiseHgModified)
+#define CLSID_TortoiseHgUnversioned  TOLSTR2(THG_CLSID_TortoiseHgUnversioned)
 
 
 UINT g_cRefThisDll = 0;
@@ -95,31 +95,31 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgCmenu");
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (clsid == CLSID_TortoiseHg0)
+    else if (clsid == CLSID_TortoiseHgNormal)
     {
         FactOvl *pcf = new FactOvl('C');  // clean
-        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg0");
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgNormal");
         ++InitStatus::inst().unchanged_;
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (clsid == CLSID_TortoiseHg1)
+    else if (clsid == CLSID_TortoiseHgAdded)
     {
         FactOvl *pcf = new FactOvl('A');  // added
-        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg1");
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgAdded");
         ++InitStatus::inst().added_;
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (clsid == CLSID_TortoiseHg2)
+    else if (clsid == CLSID_TortoiseHgModified)
     {
         FactOvl *pcf = new FactOvl('M');   // modified
-        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg2");
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgModified");
         ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (clsid == CLSID_TortoiseHg6)
+    else if (clsid == CLSID_TortoiseHgUnversioned)
     {
         FactOvl *pcf = new FactOvl('?');   // not in repo
-        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHg6");
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgUnversioned");
         ++InitStatus::inst().notinrepo_;
         return pcf->QueryInterface(riid, ppvOut);
     }
