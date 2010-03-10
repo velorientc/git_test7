@@ -11,7 +11,7 @@ import sys
 import re
 import urlparse
 
-from mercurial import hg, ui, util, url, filemerge, error
+from mercurial import hg, ui, util, url, filemerge, error, extensions
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
@@ -280,7 +280,10 @@ INFO = (
     (_('Command Output'), 'gtools.fontlog', [],
         _('Font used in command output window.'
         ' Default: monospace 10')),
-    )),)
+    )),
+
+({'name': 'extensions', 'label': _('Extensions'), 'icon': gtk.STOCK_EXECUTE,
+  'extra': True}, ()),)
 
 _font_presets = {
     'win-ja': (_('Japanese on Windows'), {
@@ -1129,6 +1132,71 @@ class ConfigDialog(gtk.Dialog):
                 self.customradio.set_active(True)
                 self.presetcombo.set_active(0)
 
+    def fill_extensions_frame(self, parent, table):
+        def allexts():
+            enabledexts, maxnamelen = extensions.enabled()
+            disabledexts, maxnamelen = extensions.disabled()
+            exts = disabledexts.copy()
+            exts.update(enabledexts)
+            return iter((name, exts[name])
+                        for name in sorted(exts.iterkeys()))
+
+        vbox = gtk.VBox()
+        parent.pack_start(table, False, False)
+
+        self.extensionschecks = {}
+        for name, shortdesc in allexts():
+            ck = gtk.CheckButton(name)
+            ck.connect('toggled', self.dirty_event)
+            ck.connect('focus-in-event', self.set_help, shortdesc)
+            table.add_row(ck, padding=False)
+            self.tooltips.set_tip(ck, shortdesc)
+            self.extensionschecks[name] = ck
+
+    def refresh_extensions_frame(self):
+        enabledexts, namemaxlen = extensions.enabled()
+        def getinival(name):
+            for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
+                try:
+                    return self.ini['extensions'][cand]
+                except KeyError:
+                    pass
+
+        def changable(name):
+            curval = getinival(name)
+            if curval not in ('', None):
+                # enabled or unspecified, official extensions only
+                return False
+            elif name in enabledexts and curval is None:
+                # re-disabling ext is not supported
+                return False
+            else:
+                return True
+
+        for name, ck in self.extensionschecks.iteritems():
+            ck.set_active(name in enabledexts)
+            ck.set_sensitive(changable(name))
+
+    def apply_extensions_changes(self):
+        enabledexts, namemaxlen = extensions.enabled()
+        for name, ck in self.extensionschecks.iteritems():
+            if ck.get_active() == (name in enabledexts):
+                continue  # unchanged
+
+            if 'extensions' not in self.ini:
+                new_namespace = getattr(self.ini, '_new_namespace',
+                                        self.ini.new_namespace)
+                new_namespace('extensions')
+
+            if ck.get_active():
+                self.ini['extensions'][name] = ''
+            else:
+                for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
+                    try:
+                        del self.ini['extensions'][cand]
+                    except KeyError:
+                        pass
+
     def set_help(self, widget, event, tooltip):
         text = ' '.join(tooltip.splitlines())
         self.descbuffer.set_text(text)
@@ -1365,6 +1433,9 @@ class ConfigDialog(gtk.Dialog):
             elif 'paths' in list(self.ini):
                 for name in list(self.ini.paths):
                     del self.ini['paths'][name]
+
+        if 'extensions' in self.pages:
+            self.apply_extensions_changes()
 
         # Flush changes on all pages
         for page_num, info, vbox, widgets in self.pages.values():
