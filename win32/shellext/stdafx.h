@@ -23,18 +23,26 @@
 #ifdef THG_DEBUG
     #include <sstream>
 
+    #ifdef _M_X64
+    #define THG_PREFIX    "[THGx64] "
+    #define THG_PREFIXL  L"[THGx64] "
+    #else
+    #define THG_PREFIX    "[THGx86] "
+    #define THG_PREFIXL  L"[THGx86] "
+    #endif
+
     // TDEBUG_TRACE() prints debugging messages to Windows' debugger display.
     // The messages can be viewed with Sysinternals DebugView, which may be
     // downloaded from Microsoft TechNet.
     #define TDEBUG_TRACE(s) if (ThgDebug::enabled()) {                      \
                                std::stringstream _the_msg;                  \
-                               _the_msg << "[THG] " << s;                   \
+                               _the_msg << THG_PREFIX << s;                 \
                                std::string _the_str = _the_msg.str();       \
                                OutputDebugStringA(_the_str.c_str());         \
                             }
     #define TDEBUG_TRACEW(s) if (ThgDebug::enabled()) {                      \
                                std::basic_stringstream<wchar_t> _the_msg;    \
-                               _the_msg << L"[THG] " << s;                   \
+                               _the_msg << THG_PREFIXL << s;                 \
                                std::wstring _the_str = _the_msg.str();       \
                                OutputDebugStringW(_the_str.c_str());         \
                             }
