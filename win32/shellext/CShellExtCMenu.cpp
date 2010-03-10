@@ -235,7 +235,7 @@ void InsertMenuItemWithIcon1(
         }
         else
         {
-            TDEBUG_TRACE("    InsertMenuItemWithIcon1: can't find " + iconName);
+            TDEBUG_TRACE("    ***** InsertMenuItemWithIcon1: can't find " + iconName);
             mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
@@ -250,7 +250,7 @@ void InsertMenuItemWithIcon1(
         }
         else
         {
-            TDEBUG_TRACE("    InsertMenuItemWithIcon1: can't find " + iconName);
+            TDEBUG_TRACE("    ***** InsertMenuItemWithIcon1: can't find " + iconName);
             mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
@@ -285,7 +285,7 @@ void InsertSubMenuItemWithIcon2(
         }
         else
         {
-            TDEBUG_TRACE("    InsertSubMenuItemWithIcon2: can't find " + iconName);
+            TDEBUG_TRACE("    ***** InsertSubMenuItemWithIcon2: can't find " + iconName);
             mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
@@ -300,7 +300,7 @@ void InsertSubMenuItemWithIcon2(
         }
         else
         {
-            TDEBUG_TRACE("    InsertSubMenuItemWithIcon2: can't find " + iconName);
+            TDEBUG_TRACE("    ***** InsertSubMenuItemWithIcon2: can't find " + iconName);
             mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
@@ -319,7 +319,7 @@ void InsertMenuItemByName(
     MenuDescriptionMap::iterator iter = MenuDescMap.find(name);
     if (iter == MenuDescMap.end())
     {
-        TDEBUG_TRACE("InsertMenuItemByName: can't find menu info for " << name);
+        TDEBUG_TRACE("***** InsertMenuItemByName: can't find menu info for " << name);
         return;
     }
 
@@ -340,7 +340,7 @@ int HasTortoiseMenu(HMENU hMenu, bool& hasmenu)
     const int count = ::GetMenuItemCount(hMenu);
     if (count == -1)
     {
-        TDEBUG_TRACE("HasTortoiseMenu: GetMenuItemCount returned -1");
+        TDEBUG_TRACE("***** HasTortoiseMenu: GetMenuItemCount returned -1");
         return -1;
     }
 
@@ -588,7 +588,7 @@ CShellExtCMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         else
         {
             TDEBUG_TRACE(
-                "CShellExtCMenu::InvokeCommand: action not found for idCmd "
+                "***** CShellExtCMenu::InvokeCommand: action not found for idCmd "
                 << idCmd
             );
         }
@@ -635,7 +635,7 @@ CShellExtCMenu::GetCommandString(
     MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
     if (iter == MenuIdMap.end())
     {
-        TDEBUG_TRACE("CShellExtCMenu::GetCommandString: idCmd not found");
+        TDEBUG_TRACE("***** CShellExtCMenu::GetCommandString: idCmd not found");
     }
     else
     {
@@ -651,7 +651,7 @@ CShellExtCMenu::GetCommandString(
             if (size >= 40)
             {
                 TDEBUG_TRACE(
-                    "CShellExtCMenu::GetCommandString: warning:" 
+                    "***** CShellExtCMenu::GetCommandString: warning:" 
                     << " length of help text is " << size
                     << ", which is not reasonably short (<40)");
             }
@@ -714,7 +714,7 @@ CShellExtCMenu::GetCommandString(
     if (size > cchMax-1)
     {
         TDEBUG_TRACE(
-            "CShellExtCMenu::GetCommandString: string was truncated: size = "
+            "***** CShellExtCMenu::GetCommandString: string was truncated: size = "
                 << size << ", cchMax = " << cchMax);
     }
 
@@ -811,7 +811,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
     }
     else
     {
-        TDEBUG_TRACE("DoHgtk: can't get cwd");
+        TDEBUG_TRACE("***** DoHgtk: can't get cwd");
         return;
     }
 
@@ -821,7 +821,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
         const std::string tempfile = GetTemporaryFile();
         if (tempfile.empty())
         {
-            TDEBUG_TRACE("DoHgtk: error: GetTemporaryFile returned empty string");
+            TDEBUG_TRACE("***** DoHgtk: error: GetTemporaryFile returned empty string");
             return;
         }
 
@@ -833,7 +833,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
 
         if (tempfileHandle == INVALID_HANDLE_VALUE)
         {
-            TDEBUG_TRACE("DoHgtk: error: failed to create file " << tempfile);
+            TDEBUG_TRACE("***** DoHgtk: error: failed to create file " << tempfile);
             return;
         }
 
