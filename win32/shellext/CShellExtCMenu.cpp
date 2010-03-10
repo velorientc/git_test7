@@ -226,7 +226,6 @@ void InsertMenuItemWithIcon1(
 
     if (SysInfo::Instance().IsVistaOrLater())
     {
-        TDEBUG_TRACE("    InsertMenuItemWithIcon1: Vista or later detected, using modern context menu style");
         HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
         if (hBmp)
         {
@@ -276,7 +275,6 @@ void InsertSubMenuItemWithIcon2(
 
     if (SysInfo::Instance().IsVistaOrLater())
     {
-        TDEBUG_TRACE("    InsertMenuItemWithIcon1: Vista or later detected, using modern context menu style");
         HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
         if (hBmp)
         {
