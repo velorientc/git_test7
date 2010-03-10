@@ -107,7 +107,7 @@ MenuDescription menuDescList[] =
     /* Add new items here */
 
     // template
-    {"", L"", L"", ".ico", 0},
+    //{"", L"", L"", ".ico", 0},
 };
 
 const char* const RepoNoFilesMenu =
@@ -196,7 +196,10 @@ void InitMenuMaps()
             MenuDescription md = menuDescList[i];
 
             if (md.name.size() == 0)
+            {
+                TDEBUG_TRACE("**** InitMenuMaps: ignoring entry with empty name");
                 break;
+            }
 
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
 
