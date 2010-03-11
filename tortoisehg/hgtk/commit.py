@@ -384,7 +384,7 @@ class GCommit(GStatus):
 
         mbox = gtk.HBox()
         self.connect('thg-accept', self.thgaccept)
-        self.branchbutton = gtk.Button()
+        self.branchbutton = gtk.Button(use_underline=False)
         self.branchbutton.connect('clicked', self.branch_clicked)
         mbox.pack_start(self.branchbutton, False, False, 2)
         if self.is_merge():

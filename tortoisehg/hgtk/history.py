@@ -274,10 +274,11 @@ class GLog(gdialog.GWindow):
             navi_b = []
             for name in lb[:10]:
                 lname = hglib.fromutf(name)
-                navi_b.append(dict(text=name, func=navigate, args=[lname]))
+                navi_b.append(dict(text=name, func=navigate, args=[lname],
+                                   use_underline=False))
                 filter_b.append(dict(text=name, name='@' + name,
                          func=self.filter_handler, args=['branch', name],
-                         asradio=True, rg='all'))
+                         asradio=True, rg='all', use_underline=False))
             if len(navi_b) > 0:
                 navi_menu.append(dict(text='----'))
                 navi_menu.append(dict(text=_('Branches'), subitems=navi_b,
@@ -289,7 +290,8 @@ class GLog(gdialog.GWindow):
         navi_t = []
         for tag in ft:
             tname = hglib.toutf(tag)
-            navi_t.append(dict(text=tname, func=navigate, args=[tag]))
+            navi_t.append(dict(text=tname, func=navigate, args=[tag],
+                               use_underline=False))
         if len(navi_t) > 0:
             if len(navi_menu) == 0:
                 navi_menu.append(dict(text='----'))

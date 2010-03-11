@@ -766,6 +766,8 @@ def create_menuitem(label, handler=None, icon=None, *args, **kargs):
     check: toggle or selection state for check/radio menu item.
            Default: False.
     sensitive: sensitive state on init. Default: True.
+    use_underline: handle underline as accelerator key prefix.
+                   Default: True.
     args: an argument list for 'handler' parameter.
           Default: [] (an empty list).
     """
@@ -779,11 +781,12 @@ def create_menuitem(label, handler=None, icon=None, *args, **kargs):
         menu = gtk.ImageMenuItem(label)
         menu.set_image(get_icon_image(icon))
     else:
-        menu = gtk.MenuItem(label, True)
+        menu = gtk.MenuItem(label)
     if handler:
         args = kargs.get('args', [])
         menu.connect('activate', handler, *args)
     menu.set_sensitive(kargs.get('sensitive', True))
+    menu.set_use_underline(kargs.get('use_underline', True))
     menu.set_border_width(1)
     return menu
 
