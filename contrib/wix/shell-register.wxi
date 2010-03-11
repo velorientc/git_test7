@@ -81,41 +81,41 @@
 
   <!-- register overlay components with TortoiseOverlays -->
   <RegistryValue
-    Root='HKMU' Key='Software\TortoiseOverlays\Normal'
+    Root='HKLM' Key='Software\TortoiseOverlays\Normal'
     Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgNormal)'
   />
   <RegistryValue
-    Root='HKMU' Key='Software\TortoiseOverlays\Added'
+    Root='HKLM' Key='Software\TortoiseOverlays\Added'
     Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgAdded)'
   />
-  <RegistryValue Root='HKMU'
-    Key='Software\TortoiseOverlays\Modified'
+  <RegistryValue
+    Root='HKLM' Key='Software\TortoiseOverlays\Modified'
     Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgModified)'
   />
   <RegistryValue
-    Root='HKMU' Key='Software\TortoiseOverlays\Unversioned'
+    Root='HKLM' Key='Software\TortoiseOverlays\Unversioned'
     Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgUnversioned)'
   />
 
   <!-- Mark all as approved -->
   <RegistryValue
-    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
     Type='string' Name='$(var.CLSID_TortoiseHgCmenu)' Value='TortoiseHg'
   />
   <RegistryValue
-    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
     Type='string' Name='$(var.CLSID_TortoiseHgNormal)' Value='TortoiseHg'
   />
   <RegistryValue
-    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
     Type='string' Name='$(var.CLSID_TortoiseHgAdded)' Value='TortoiseHg'
   />
   <RegistryValue
-    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
     Type='string' Name='$(var.CLSID_TortoiseHgModified)' Value='TortoiseHg'
   />
   <RegistryValue
-    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
     Type='string' Name='$(var.CLSID_TortoiseHgUnversioned)' Value='TortoiseHg'
   />
 </Include>
