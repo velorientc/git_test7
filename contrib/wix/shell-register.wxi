@@ -1,45 +1,121 @@
 <Include>
   <!-- cmenu COM component -->
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)' Type='string' Value='TortoiseHg' />
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)'
+    Type='string' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+    Type='string' Name='ThreadingModel' Value='Apartment'
+  />
   <!-- Normal overlay COM component -->
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgNormal)' Type='string' Value='TortoiseHg' />
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgNormal)\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgNormal)'
+    Type='string' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgNormal)\InProcServer32'
+    Type='string' Name='ThreadingModel' Value='Apartment'
+  />
   <!-- Added overlay COM component -->
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgAdded)' Type='string' Value='TortoiseHg' />
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgAdded)\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgAdded)'
+    Type='string' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgAdded)\InProcServer32'
+    Type='string' Name='ThreadingModel' Value='Apartment'
+  />
   <!-- Modified overlay COM component -->
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgModified)' Type='string' Value='TortoiseHg' />
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgModified)\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgModified)'
+    Type='string' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgModified)\InProcServer32'
+    Type='string' Name='ThreadingModel' Value='Apartment'
+  />
   <!-- Unversioned overlay COM component -->
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgUnversioned)' Type='string' Value='TortoiseHg' />
-  <RegistryValue Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgUnversioned)\InProcServer32' Type='string' Name='ThreadingModel' Value='Apartment' />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgUnversioned)'
+    Type='string' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgUnversioned)\InProcServer32'
+    Type='string' Name='ThreadingModel' Value='Apartment'
+  />
 
   <!-- cmenu registration -->
-  <RegistryValue Root='HKCR' Key='Directory\shellex\ContextMenuHandlers\TortoiseHgCMenu'            Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
-  <RegistryValue Root='HKCR' Key='Directory\Background\shellex\ContextMenuHandlers\TortoiseHgCMenu' Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
-  <RegistryValue Root='HKCR' Key='Drive\shellex\ContextMenuHandlers\TortoiseHgCMenu'                Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
-  <RegistryValue Root='HKCR' Key='Folder\shellex\ContextMenuHandlers\TortoiseHgCMenu'               Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
-  <RegistryValue Root='HKCR' Key='InternetShortcut\shellex\ContextMenuHandlers\TortoiseHgCMenu'     Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
-  <RegistryValue Root='HKCR' Key='LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu'      Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
-  <RegistryValue Root='HKCR' Key='LibraryFolder\shellex\ContextMenuHandlers\TortoiseHgCMenu'        Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
-  <RegistryValue Root='HKCR' Key='*\shellex\ContextMenuHandlers\TortoiseHgCMenu'                    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)' />
+  <RegistryValue
+    Root='HKCR' Key='Directory\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='Directory\Background\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='Drive\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='Folder\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='InternetShortcut\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='LibraryFolder\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='*\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
 
   <!-- register overlay components with TortoiseOverlays -->
-  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Normal'      Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgNormal)' />
-  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Added'       Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgAdded)' />
-  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Modified'    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgModified)' />
-  <RegistryValue Root='HKMU' Key='Software\TortoiseOverlays\Unversioned' Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgUnversioned)' />
+  <RegistryValue
+    Root='HKMU' Key='Software\TortoiseOverlays\Normal'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgNormal)'
+  />
+  <RegistryValue
+    Root='HKMU' Key='Software\TortoiseOverlays\Added'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgAdded)'
+  />
+  <RegistryValue Root='HKMU'
+    Key='Software\TortoiseOverlays\Modified'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgModified)'
+  />
+  <RegistryValue
+    Root='HKMU' Key='Software\TortoiseOverlays\Unversioned'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgUnversioned)'
+  />
 
   <!-- Mark all as approved -->
-  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
-                 Name='$(var.CLSID_TortoiseHgCmenu)' Value='TortoiseHg' />
-  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
-                 Name='$(var.CLSID_TortoiseHgNormal)' Value='TortoiseHg' />
-  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
-                 Name='$(var.CLSID_TortoiseHgAdded)' Value='TortoiseHg' />
-  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
-                 Name='$(var.CLSID_TortoiseHgModified)' Value='TortoiseHg' />
-  <RegistryValue Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved' Type='string'
-                 Name='$(var.CLSID_TortoiseHgUnversioned)' Value='TortoiseHg' />
+  <RegistryValue
+    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Type='string' Name='$(var.CLSID_TortoiseHgCmenu)' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Type='string' Name='$(var.CLSID_TortoiseHgNormal)' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Type='string' Name='$(var.CLSID_TortoiseHgAdded)' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Type='string' Name='$(var.CLSID_TortoiseHgModified)' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Type='string' Name='$(var.CLSID_TortoiseHgUnversioned)' Value='TortoiseHg'
+  />
 </Include>
