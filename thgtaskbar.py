@@ -233,7 +233,7 @@ def update_batch(batch):
                     logger.msg('Failed updating %s (check permissions)' % r)
                     failedroots.add(r)
                 except (error.Abort, error.ConfigError, error.RepoError, 
-                        error.RevlogError), e:
+                        error.RevlogError, ImportError), e:
                     logger.msg('Failed updating %s (%s)' % (r, str(e)))
                     failedroots.add(r)
             notifypaths -= failedroots
