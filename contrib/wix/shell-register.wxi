@@ -88,8 +88,8 @@
     Root='HKMU' Key='Software\TortoiseOverlays\Added'
     Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgAdded)'
   />
-  <RegistryValue Root='HKMU'
-    Key='Software\TortoiseOverlays\Modified'
+  <RegistryValue
+    Root='HKMU' Key='Software\TortoiseOverlays\Modified'
     Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgModified)'
   />
   <RegistryValue
