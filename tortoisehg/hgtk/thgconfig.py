@@ -591,19 +591,24 @@ class ConfigDialog(gtk.Dialog):
         self.vbox.pack_start(wrapbox)
 
         # create combo to select the target
+        hbox = gtk.HBox()
+        wrapbox.pack_start(hbox, False, False, 1)
         combo = gtk.combo_box_new_text()
+        hbox.pack_start(combo, False, False)
         combo.append_text(_('User global settings'))
         if repo:
             combo.append_text(_('%s repository settings') % hglib.toutf(name))
         combo.connect('changed', self.fileselect)
         self.confcombo = combo
 
-        hbox = gtk.HBox()
-        hbox.pack_start(combo, False, False)
+        # command buttons
         edit = gtk.Button(_('Edit File'))
         hbox.pack_start(edit, False, False, 6)
         edit.connect('clicked', self.edit_clicked)
-        wrapbox.pack_start(hbox, False, False, 1)
+
+        reload = gtk.Button(_('Reload'))
+        hbox.pack_start(reload, False, False)
+        reload.connect('clicked', lambda *a: self.refresh())
 
         # insert padding of between combo and middle pane
         wrapbox.pack_start(gtk.VBox(), False, False, 4)
