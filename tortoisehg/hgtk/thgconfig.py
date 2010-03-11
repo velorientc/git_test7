@@ -1160,7 +1160,7 @@ class ConfigDialog(gtk.Dialog):
 
         self.extensionschecks = {}
         for name, shortdesc in allexts():
-            ck = gtk.CheckButton(name)
+            ck = gtk.CheckButton(name, use_underline=False)
             ck.connect('toggled', self.dirty_event)
             ck.connect('focus-in-event', self.set_help, shortdesc)
             table.add_row(ck, padding=False)
