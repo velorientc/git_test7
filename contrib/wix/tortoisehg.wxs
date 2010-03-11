@@ -20,11 +20,16 @@
   <?define TOverlaysSrcFilenameX86 = TortoiseOverlays-$(var.TOverlaysVersion)-win32.msm ?>
   <?define TOverlaysSrcFilenameX64 = TortoiseOverlays-$(var.TOverlaysVersion)-x64.msm ?>
 
+  <?define TOverlaysRegistryKey = Software\TortoiseOverlays ?>
+
   <?define VCRedistSrcDir = C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC ?>
 
   <!-- shell extension CLSID's -->
   <?include ../../win32/shellext/ThgCLSIDs.wxi ?>
-  
+  <?define OverlayCLSIDList = 
+    $(var.CLSID_TortoiseHgNormal);$(var.CLSID_TortoiseHgAdded);$(var.CLSID_TortoiseHgModified);$(var.CLSID_TortoiseHgUnversioned)
+  ?>
+
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
            Version='$(var.Version)'
