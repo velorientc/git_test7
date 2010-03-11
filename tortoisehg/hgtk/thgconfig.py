@@ -625,7 +625,7 @@ class ConfigDialog(gtk.Dialog):
 
         reload = gtk.Button(_('Reload'))
         hbox.pack_start(reload, False, False)
-        reload.connect('clicked', lambda *a: self.refresh())
+        reload.connect('clicked', self.reload_clicked)
 
         # insert padding of between combo and middle pane
         wrapbox.pack_start(gtk.VBox(), False, False, 4)
@@ -760,6 +760,15 @@ class ConfigDialog(gtk.Dialog):
         # open config file with visual editor
         if not gtklib.open_with_editor(u, self.fn, self):
             self.focus_field('tortoisehg.editor')
+
+    def reload_clicked(self, button):
+        if self.dirty:
+            ret = gdialog.Confirm(_('Confirm Reload'), [], self,
+                                  _('Unsaved changes will be lost.\n'
+                                    'Do you want to reload?')).run()
+            if ret != gtk.RESPONSE_YES:
+                return
+        self.refresh()
 
     def delete_event(self, dlg, event):
         return True
