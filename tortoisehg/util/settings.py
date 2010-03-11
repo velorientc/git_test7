@@ -96,7 +96,7 @@ class Settings(object):
         f.write(s)
         try:
             f.rename()
-        except WindowsError:
+        except OSError:
             pass # silently ignore these errors
 
     def _get_path(self, appname):
@@ -115,4 +115,7 @@ class Settings(object):
     def _audit(self):
         if os.path.exists(os.path.dirname(self._path)):
             return
-        os.makedirs(os.path.dirname(self._path))
+        try:
+            os.makedirs(os.path.dirname(self._path))
+        except OSError:
+            pass # silently ignore these errors
