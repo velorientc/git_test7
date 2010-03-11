@@ -145,22 +145,12 @@
               Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
               Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
             />
-            <RegistryValue
-              Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgNormal)\InProcServer32'
-              Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
-            />
-            <RegistryValue
-              Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgAdded)\InProcServer32'
-              Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
-            />
-            <RegistryValue
-              Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgModified)\InProcServer32'
-              Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
-            />
-            <RegistryValue
-              Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgUnversioned)\InProcServer32'
-              Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
-            />
+            <?foreach CLSID in $(var.OverlayCLSIDList) ?>
+              <RegistryValue
+                Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
+                Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
+              />
+            <?endforeach?>
             <?include shell-register.wxi ?>
           </Component>
           <Component Id='COPYING' Guid='382A8405-CB7B-42E8-8B9D-88B5C5283E73'>
@@ -293,22 +283,12 @@
                   Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
                   Type='string' Value='[Common64]ThgShellx64.dll'
               />
-              <RegistryValue
-                  Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgNormal)\InProcServer32'
+              <?foreach CLSID in $(var.OverlayCLSIDList) ?>
+                <RegistryValue
+                  Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
                   Type='string' Value='[Common64]ThgShellx64.dll'
-              />
-              <RegistryValue
-                  Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgAdded)\InProcServer32'
-                  Type='string' Value='[Common64]ThgShellx64.dll'
-              />
-              <RegistryValue
-                  Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgModified)\InProcServer32'
-                  Type='string' Value='[Common64]ThgShellx64.dll'
-              />
-              <RegistryValue
-                  Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgUnversioned)\InProcServer32'
-                  Type='string' Value='[Common64]ThgShellx64.dll'
-              />
+                />
+              <?endforeach?>
               <?include shell-register.wxi ?>
             </Component>
           </Directory>
