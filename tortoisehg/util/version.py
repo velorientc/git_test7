@@ -49,17 +49,25 @@ def version():
 def package_version():
     try:
         branch, version = liveversion()
-        if '+' in  version:
+
+        extra = None
+        if '+' in version:
             version, extra = version.split('+', 1)
-            major, minor, periodic = version.split('.')
+
+        v = [int(x) for x in version.split('.')]
+        while len(v) < 3:
+            v.append(0)
+        major, minor, periodic = v
+
+        if extra != None:
             tagdistance = int(extra.split('-', 1)[0])
-            periodic = int(periodic) * 10000
+            periodic *= 10000
             if branch == 'default':
                 periodic += tagdistance + 5000
             else:
                 periodic += tagdistance + 1000
-            version = '.'.join([major, minor, str(periodic)])
-        return version
+
+        return '.'.join([str(x) for x in (major, minor, periodic)])
     except:
         pass
     return _('unknown')
