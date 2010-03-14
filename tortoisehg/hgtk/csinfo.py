@@ -140,7 +140,7 @@ class patchctx(object):
         """ Read patch context from file
         :param patchHandle: If set, then the patch is a temporary.
             The provided handle is used to read the patch and
-			the patchpath contains the name of the patch. 
+            the patchpath contains the name of the patch. 
             The handle is NOT closed.
         """
         self._path = patchpath
@@ -486,7 +486,7 @@ class SummaryBase(object):
         self.ctx = None
         if type(target) == patchctx:
             # If a patchctx is specified as target, use it instead
-			# of creating a context from revision or patch file
+            # of creating a context from revision or patch file
             self.ctx = target
             target = None
             self.target = None
