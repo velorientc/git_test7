@@ -26,9 +26,6 @@
 
   <!-- shell extension CLSID's -->
   <?include ../../win32/shellext/ThgCLSIDs.wxi ?>
-  <?define OverlayCLSIDList = 
-    $(var.CLSID_TortoiseHgNormal);$(var.CLSID_TortoiseHgAdded);$(var.CLSID_TortoiseHgModified);$(var.CLSID_TortoiseHgUnversioned)
-  ?>
 
   <Product Name='TortoiseHg $(var.Version) ($(var.Platform))'
            Id='$(var.ProductId)'
