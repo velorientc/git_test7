@@ -16,7 +16,7 @@
 #define CLSID_TortoiseHgNormal       TOLSTR2(THG_CLSID_TortoiseHgNormal)
 #define CLSID_TortoiseHgAdded        TOLSTR2(THG_CLSID_TortoiseHgAdded)
 #define CLSID_TortoiseHgModified     TOLSTR2(THG_CLSID_TortoiseHgModified)
-#define CLSID_TortoiseHgUnversioned  TOLSTR2(THG_CLSID_TortoiseHgUnversioned)
+#define CLSID_TortoiseHgDeleted      TOLSTR2(THG_CLSID_TortoiseHgDeleted)
 
 
 UINT g_cRefThisDll = 0;
@@ -116,10 +116,10 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
         ++InitStatus::inst().modified_;
         return pcf->QueryInterface(riid, ppvOut);
     }
-    else if (clsid == CLSID_TortoiseHgUnversioned)
+    else if (clsid == CLSID_TortoiseHgDeleted)
     {
         FactOvl *pcf = new FactOvl('?');   // not in repo
-        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgUnversioned");
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgDeleted");
         ++InitStatus::inst().notinrepo_;
         return pcf->QueryInterface(riid, ppvOut);
     }

@@ -68,8 +68,8 @@
     Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgModified)'
   />
   <RegistryValue
-    Root='HKLM' Key='$(var.TOverlaysRegistryKey)\Unversioned'
-    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgUnversioned)'
+    Root='HKLM' Key='$(var.TOverlaysRegistryKey)\Deleted'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgDeleted)'
   />
 
   <!-- Mark all as approved -->
