@@ -126,7 +126,7 @@
             </File>
             <RegistryValue
               Name='TortoiseHgRpcServer' 
-              Root='HKMU' Key='Software\Microsoft\Windows\CurrentVersion\Run'
+              Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Run'
               Type='string' Value='[INSTALLDIR]thgtaskbar.exe'
             />
           </Component>
@@ -135,7 +135,7 @@
                   Source='win32\ThgShellx86.dll'
             />
             <RegistryValue
-              Root='HKMU' Key='Software\TortoiseHg'
+              Root='HKLM' Key='Software\TortoiseHg'
               Type='string' Value='[INSTALLDIR]'
             />
             <RegistryValue
@@ -273,7 +273,7 @@
                     Source='win32\ThgShellx64.dll'
               />
               <RegistryValue
-                  Root='HKMU' Key='Software\TortoiseHg'
+                  Root='HKLM' Key='Software\TortoiseHg'
                   Type='string' Value='[INSTALLDIR]'
               />
               <RegistryValue
