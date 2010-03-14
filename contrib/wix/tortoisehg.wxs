@@ -15,6 +15,8 @@
     <?define IsX64 = no ?>
   <?endif?>
 
+  <?define ProgramRegKey = Software\TortoiseHg ?>
+
   <?define TOverlaysVersion = 1.0.15.18898 ?>
   <?define TOverlaysSrcDir = ..\contrib\TortoiseOverlays ?>
   <?define TOverlaysSrcFilenameX86 = TortoiseOverlays-$(var.TOverlaysVersion)-win32.msm ?>
@@ -135,7 +137,7 @@
                   Source='win32\ThgShellx86.dll'
             />
             <RegistryValue
-              Root='HKLM' Key='Software\TortoiseHg'
+              Root='HKLM' Key='$(var.ProgramRegKey)'
               Type='string' Value='[INSTALLDIR]'
             />
             <RegistryValue
@@ -231,7 +233,7 @@
           <Component Id="ProgramMenuDir" Guid="D5A63320-1238-489B-B68B-CF053E9577CA">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryValue
-              Root='HKCU' Key='Software\TortoiseHg'
+              Root='HKCU' Key='$(var.ProgramRegKey)'
               Type='string' Value='[INSTALLDIR]' KeyPath='yes'
             />
             <Shortcut Id='UrlShortcut' Directory='ProgramMenuDir' Name='TortoiseHg Web Site'
@@ -273,7 +275,7 @@
                     Source='win32\ThgShellx64.dll'
               />
               <RegistryValue
-                  Root='HKLM' Key='Software\TortoiseHg'
+                  Root='HKLM' Key='$(var.ProgramRegKey)'
                   Type='string' Value='[INSTALLDIR]'
               />
               <RegistryValue
