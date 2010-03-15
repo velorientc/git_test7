@@ -428,7 +428,7 @@
             INSTALLEDTORTOISEHGPRODUCTS
         </RemoveExistingProducts>
         <Custom Action='StartThgtaskbarEXE' After='InstallFinalize'>
-            NOT Installed
+            <![CDATA[&ShellExtension=3]]>
         </Custom>
     </InstallExecuteSequence>
 
