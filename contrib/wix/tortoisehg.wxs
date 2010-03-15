@@ -121,13 +121,13 @@
           <Component Id='thgtaskbarEXE' Guid='BEF92F4D-4442-4806-8C59-DC8BDCCCADD3'>
             <File Id='thgtaskbarEXE' Name='thgtaskbar.exe' DiskId='1' KeyPath='yes'
                   Source='dist\thgtaskbar.exe' >
-              <Shortcut Id="taskBarShortcut" Directory="ProgramMenuDir"
-                        Name="Taskbar Application"
+              <Shortcut Id="thgtaskbarEXEshortcut" Directory="ProgramMenuDir"
+                        Name="Overlay Icon Server"
                         Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
               />
             </File>
             <RegistryValue
-              Name='TortoiseHgRpcServer' 
+              Name='TortoiseHgOverlayIconServer' 
               Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Run'
               Type='string' Value='[INSTALLDIR]thgtaskbar.exe'
             />
@@ -428,7 +428,7 @@
             INSTALLEDTORTOISEHGPRODUCTS
         </RemoveExistingProducts>
         <Custom Action='StartThgtaskbarEXE' After='InstallFinalize'>
-            NOT Installed
+            <![CDATA[&ShellExtension=3]]>
         </Custom>
     </InstallExecuteSequence>
 
