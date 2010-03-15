@@ -1150,7 +1150,7 @@ class ConfigDialog(gtk.Dialog):
         def allexts():
             enabledexts, maxnamelen = extensions.enabled()
             disabledexts, maxnamelen = extensions.disabled()
-            exts = disabledexts.copy()
+            exts = (disabledexts or {}).copy()
             exts.update(enabledexts)
             return iter((name, exts[name])
                         for name in sorted(exts.iterkeys()))
