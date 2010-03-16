@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-22 23:55+0000\n"
-"PO-Revision-Date: 2010-03-08 14:06+0000\n"
+"PO-Revision-Date: 2010-03-10 12:54+0000\n"
 "Last-Translator: kosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-03-09 04:37+0000\n"
+"X-Launchpad-Export-Date: 2010-03-11 05:09+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:36
@@ -2749,7 +2749,7 @@ msgstr "Встановити поточну закладку..."
 
 #: tortoisehg\hgtk\history.py:1209
 msgid "Import Revision to MQ"
-msgstr "Import Revision to MQ"
+msgstr "Імпорт редакцій до MQ"
 
 #: tortoisehg\hgtk\history.py:1211
 msgid "Strip Revision..."
@@ -2761,11 +2761,11 @@ msgstr "Відновити початкові"
 
 #: tortoisehg\hgtk\history.py:1235
 msgid "Mark as Good"
-msgstr "Mark as Good"
+msgstr "Відмітити як добрі"
 
 #: tortoisehg\hgtk\history.py:1236
 msgid "Mark as Bad"
-msgstr "Mark as Bad"
+msgstr "Відмітити як сумнівні"
 
 #: tortoisehg\hgtk\history.py:1237
 msgid "Skip Testing"
@@ -2801,11 +2801,11 @@ msgstr "Зміна бази на крок вище вибраної"
 
 #: tortoisehg\hgtk\history.py:1290
 msgid "Import from here to selected to MQ"
-msgstr "Import from here to selected to MQ"
+msgstr "імпортувати звідси, до MQ"
 
 #: tortoisehg\hgtk\history.py:1294
 msgid "Select common ancestor revision"
-msgstr "Select common ancestor revision"
+msgstr "Виберіть перегляді спільних попередників"
 
 #: tortoisehg\hgtk\history.py:1348
 msgid "Load more"
@@ -2841,7 +2841,7 @@ msgstr "Отримати вхідні набори змін"
 
 #: tortoisehg\hgtk\history.py:1406
 msgid "Import patches"
-msgstr "Імпорт патчів"
+msgstr "Імпорт латок"
 
 #: tortoisehg\hgtk\history.py:1409
 msgid "Determine and mark outgoing changesets"
@@ -2857,7 +2857,7 @@ msgstr "Відправити поштою вихідний набір змін"
 
 #: tortoisehg\hgtk\history.py:1416
 msgid "Stop current transaction"
-msgstr "Зупинити поточну справу"
+msgstr "Зупинити поточну дію"
 
 #: tortoisehg\hgtk\history.py:1448
 msgid "After Pull:"
@@ -2906,7 +2906,7 @@ msgstr "Будь-ласка, введіть або оберіть віддале
 
 #: tortoisehg\hgtk\history.py:1689
 msgid "%d incoming changesets"
-msgstr "%d incoming changesets"
+msgstr "%d вхідних змін"
 
 #: tortoisehg\hgtk\history.py:1691
 msgid "Aborted incoming"
@@ -2914,11 +2914,11 @@ msgstr "Перервано вхідні"
 
 #: tortoisehg\hgtk\history.py:1693
 msgid "No incoming changesets"
-msgstr "No incoming changesets"
+msgstr "Немає вхідних змін"
 
 #: tortoisehg\hgtk\history.py:1697
 msgid "Checking incoming changesets..."
-msgstr "Checking incoming changesets..."
+msgstr "Перевірка наявності вхідних змін..."
 
 #: tortoisehg\hgtk\history.py:1716
 msgid "Accept incoming previewed changesets"
@@ -2942,7 +2942,7 @@ msgstr "Попередній перегляд пакету"
 
 #: tortoisehg\hgtk\history.py:1770
 msgid "Failed to preview, a bundle file unrelated to this repository"
-msgstr "Failed to preview, a bundle file unrelated to this repository"
+msgstr "Не вдається переглянути, файли не пов'язані з цим сховищем"
 
 #: tortoisehg\hgtk\history.py:1775
 msgid "Failed to preview, not a Mercurial bundle file"
