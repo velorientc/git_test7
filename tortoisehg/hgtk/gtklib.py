@@ -771,6 +771,10 @@ def create_menuitem(label, handler=None, icon=None, *args, **kargs):
     args: an argument list for 'handler' parameter.
           Default: [] (an empty list).
     """
+    use_underline = kargs.get('use_underline', True)
+    if gtk.gtk_version < (2, 14, 0) and not use_underline:
+       # workaround (set_use_underline not available on gtk < 2.14)
+       label = label.replace('_', '__')
     if kargs.get('asradio') or kargs.get('ascheck'):
         if kargs.get('asradio'):
             menu = gtk.RadioMenuItem(kargs.get('group'), label)
@@ -786,7 +790,8 @@ def create_menuitem(label, handler=None, icon=None, *args, **kargs):
         args = kargs.get('args', [])
         menu.connect('activate', handler, *args)
     menu.set_sensitive(kargs.get('sensitive', True))
-    menu.set_use_underline(kargs.get('use_underline', True))
+    if gtk.gtk_version >= (2, 14, 0):
+       menu.set_use_underline(use_underline)
     menu.set_border_width(1)
     return menu
 
