@@ -24,8 +24,6 @@
 
   <?define TOverlaysRegistryKey = Software\TortoiseOverlays ?>
 
-  <?define VCRedistSrcDir = C:\Program Files\Microsoft SDKs\Windows\v7.0\Redist\VC ?>
-
   <!-- shell extension CLSID's -->
   <?include ../../win32/shellext/ThgCLSIDs.wxi ?>
 
