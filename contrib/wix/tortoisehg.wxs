@@ -351,8 +351,14 @@
             </Feature>
           </Feature>
       <?endif?>
+      <?if $(var.Platform) = "x64" ?>
+          <?define ShellExtensionX86level = 1000 ?>
+      <?else?>
+          <?define ShellExtensionX86level = 1 ?>
+      <?endif?>
       <Feature Id='ShellExtensionX86' Title='Shell Extension x86'
-               Level='1' AllowAdvertise='no'
+               Level='$(var.ShellExtensionX86level)'
+               Absent='allow' AllowAdvertise='no'
                Description='Context menu for 32-bit processes'>
         <ComponentGroupRef Id='cmenuI18n' />
         <ComponentRef Id='thgshellx86dll' />
