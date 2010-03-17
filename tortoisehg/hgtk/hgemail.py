@@ -211,11 +211,21 @@ class EmailDialog(gtk.Window):
             self.repo = None
             return
 
+        def getfromaddr(ui):
+            """Get sender address in the same manner as patchbomb"""
+            addr = ui.config('email', 'from') or ui.config('patchbomb', 'from')
+            if addr:
+                return addr
+            try:
+                return repo.ui.username()
+            except error.Abort:
+                return ''
+
         if initial:
             # Only zap these fields at startup
             self._tobox.child.set_text(hglib.fromutf(repo.ui.config('email', 'to', '')))
             self._ccbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'cc', '')))
-            self._frombox.child.set_text(hglib.fromutf(repo.ui.config('email', 'from', '')))
+            self._frombox.child.set_text(hglib.fromutf(getfromaddr(repo.ui)))
             self._subjbox.child.set_text(hglib.fromutf(repo.ui.config('email', 'subject', '')))
             self.tooltips.set_tip(self._eventbox,
                     _('Patch series description is sent in initial summary'
