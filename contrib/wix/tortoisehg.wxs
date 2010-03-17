@@ -148,7 +148,15 @@
                 Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
               />
             <?endforeach?>
+          </Component>         
+          <Component Id='CmenuShellRegistrationX86' 
+                     Guid='{287A355F-3DF6-4f55-9DD5-FABD09498B0C}'
+          >
             <?include shell-register-cmenu.wxi ?>
+          </Component>
+          <Component Id='OverlaysShellRegistrationX86' 
+                     Guid='{5592F837-8C78-43f0-AD8D-2E2EA4B17E45}'
+          >
             <?include shell-register-overlays.wxi ?>
           </Component>
           <Component Id='COPYING' Guid='382A8405-CB7B-42E8-8B9D-88B5C5283E73'>
@@ -287,9 +295,18 @@
                   Type='string' Value='[Common64]ThgShellx64.dll'
                 />
               <?endforeach?>
+            </Component>
+            <Component Id='CmenuShellRegistrationX64' Win64='yes'
+                       Guid='{46DF4532-7BFF-427a-BC59-F3B4D1022F56}'
+            >
               <?include shell-register-cmenu.wxi ?>
+            </Component>
+            <Component Id='OverlaysShellRegistrationX64' Win64='yes'
+                       Guid='{9B1300FC-3D05-4c82-991D-96277404C4BA}'
+            >
               <?include shell-register-overlays.wxi ?>
             </Component>
+
           </Directory>
         </Directory>
       <?endif?>
@@ -325,6 +342,8 @@
             <ComponentRef Id='thgtaskbarEXE' />
             <MergeRef Id='TortoiseOverlaysMergeX86' />
             <ComponentRef Id='thgshellx86dll' />
+            <ComponentRef Id='CmenuShellRegistrationX86' />
+            <ComponentRef Id='OverlaysShellRegistrationX86' />
           </Feature>
       <?elseif $(var.Platform) = "x64" ?>
           <Feature Id='ShellExtension' Level='1' Display='expand' AllowAdvertise='no'
@@ -334,11 +353,15 @@
             <ComponentRef Id='thgtaskbarEXE' />
             <MergeRef Id='TortoiseOverlaysMergeX64' />
             <ComponentRef Id='thgshellx64dll' />
+            <ComponentRef Id='CmenuShellRegistrationX64' />
+            <ComponentRef Id='OverlaysShellRegistrationX64' />
             <Feature Id='ShellExtensionx86' Level='1' AllowAdvertise='no'
                      Title='Shell Extension x86'
                      Description='Overlay icons and context menu for 32 bit processes'>
               <MergeRef Id='TortoiseOverlaysMergeX86' />
               <ComponentRef Id='thgshellx86dll' />
+              <ComponentRef Id='CmenuShellRegistrationX86' />
+              <ComponentRef Id='OverlaysShellRegistrationX86' />
             </Feature>
           </Feature>
       <?endif?>
