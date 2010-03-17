@@ -148,7 +148,16 @@
                 Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
               />
             <?endforeach?>
-            <?include shell-register.wxi ?>
+          </Component>         
+          <Component Id='CmenuShellRegistrationX86' 
+                     Guid='{287A355F-3DF6-4f55-9DD5-FABD09498B0C}'
+          >
+            <?include shell-register-cmenu.wxi ?>
+          </Component>
+          <Component Id='OverlaysShellRegistrationX86' 
+                     Guid='{5592F837-8C78-43f0-AD8D-2E2EA4B17E45}'
+          >
+            <?include shell-register-overlays.wxi ?>
           </Component>
           <Component Id='COPYING' Guid='382A8405-CB7B-42E8-8B9D-88B5C5283E73'>
             <File Id='COPYING' Name='COPYING.txt' DiskId='1'
@@ -286,8 +295,18 @@
                   Type='string' Value='[Common64]ThgShellx64.dll'
                 />
               <?endforeach?>
-              <?include shell-register.wxi ?>
             </Component>
+            <Component Id='CmenuShellRegistrationX64' Win64='yes'
+                       Guid='{46DF4532-7BFF-427a-BC59-F3B4D1022F56}'
+            >
+              <?include shell-register-cmenu.wxi ?>
+            </Component>
+            <Component Id='OverlaysShellRegistrationX64' Win64='yes'
+                       Guid='{9B1300FC-3D05-4c82-991D-96277404C4BA}'
+            >
+              <?include shell-register-overlays.wxi ?>
+            </Component>
+
           </Directory>
         </Directory>
       <?endif?>
@@ -315,31 +334,38 @@
         <MergeRef Id='VCRedist'/>
         <MergeRef Id='VCRedistPolicy' />
       </Feature>
-      <?if $(var.Platform) = "x86" ?>
-          <Feature Id='ShellExtension' Title='Shell Extension'
+      <?if $(var.Platform) = "x64" ?>
+          <Feature Id='ShellExtensionX64' Title='Shell Extension x64'
                    Level='1' AllowAdvertise='no'
-                   Description='Overlay icons and context menu'>
+                   Description='Context menu for 64-bit processes'>
             <ComponentGroupRef Id='cmenuI18n' />
-            <ComponentRef Id='thgtaskbarEXE' />
-            <MergeRef Id='TortoiseOverlaysMergeX86' />
-            <ComponentRef Id='thgshellx86dll' />
-          </Feature>
-      <?elseif $(var.Platform) = "x64" ?>
-          <Feature Id='ShellExtension' Level='1' Display='expand' AllowAdvertise='no'
-                   Title='Shell Extension x64'
-                   Description='Overlay icons and context menu for 64 bit processes'>
-            <ComponentGroupRef Id='cmenuI18n' />
-            <ComponentRef Id='thgtaskbarEXE' />
-            <MergeRef Id='TortoiseOverlaysMergeX64' />
             <ComponentRef Id='thgshellx64dll' />
-            <Feature Id='ShellExtensionx86' Level='1' AllowAdvertise='no'
-                     Title='Shell Extension x86'
-                     Description='Overlay icons and context menu for 32 bit processes'>
-              <MergeRef Id='TortoiseOverlaysMergeX86' />
-              <ComponentRef Id='thgshellx86dll' />
+            <ComponentRef Id='CmenuShellRegistrationX64' />
+            <Feature Id='OverlaysX64' Title='Overlay Icons'
+                     Level='1' AllowAdvertise='no'
+                     Description='Overlay icons for 64-bit processes'
+            >
+              <ComponentRef Id='thgtaskbarEXE' />
+              <MergeRef Id='TortoiseOverlaysMergeX64' />
+              <ComponentRef Id='OverlaysShellRegistrationX64' />
             </Feature>
           </Feature>
       <?endif?>
+      <Feature Id='ShellExtensionX86' Title='Shell Extension x86'
+               Level='1' AllowAdvertise='no'
+               Description='Context menu for 32-bit processes'>
+        <ComponentGroupRef Id='cmenuI18n' />
+        <ComponentRef Id='thgshellx86dll' />
+        <ComponentRef Id='CmenuShellRegistrationX86' />
+        <Feature Id='OverlaysX86' Title='Overlay Icons'
+                 Level='1' AllowAdvertise='no'
+                 Description='Overlay icons for 32-bit processes'
+        >
+          <ComponentRef Id='thgtaskbarEXE' />
+          <MergeRef Id='TortoiseOverlaysMergeX86' />
+          <ComponentRef Id='OverlaysShellRegistrationX86' />
+        </Feature>
+      </Feature>
       <Feature Id='Locales' Level='1'
                Title='Translations'
                Description='Mercurial and TortoiseHg Translations'>
@@ -425,9 +451,15 @@
         <RemoveExistingProducts After="InstallValidate">
             INSTALLEDTORTOISEHGPRODUCTS
         </RemoveExistingProducts>
-        <Custom Action='StartThgtaskbarEXE' After='InstallFinalize'>
-            <![CDATA[&ShellExtension=3]]>
-        </Custom>
+        <?if $(var.Platform) = "x64" ?>
+          <Custom Action='StartThgtaskbarEXE' After='InstallFinalize'>
+            <![CDATA[&OverlaysX86=3 OR &OverlaysX64=3]]>
+          </Custom>
+        <?else?>
+          <Custom Action='StartThgtaskbarEXE' After='InstallFinalize'>
+            <![CDATA[&OverlaysX86=3]]>
+          </Custom>
+        <?endif?>
     </InstallExecuteSequence>
 
     <Upgrade Id='$(var.ProductUpgradeCode)'>

@@ -1,0 +1,40 @@
+<Include>
+  <!-- overlay components -->
+  <?foreach CLSID in $(var.OverlayCLSIDList) ?>
+    <RegistryValue
+      Root='HKCR' Key='CLSID\$(var.CLSID)'
+      Type='string' Value='TortoiseHg'
+    />
+    <RegistryValue
+      Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
+      Type='string' Name='ThreadingModel' Value='Apartment'
+    />
+  <?endforeach?>
+
+  <!-- register overlay components with TortoiseOverlays -->
+  <RegistryValue
+    Root='HKLM' Key='$(var.TOverlaysRegistryKey)\Normal'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgNormal)'
+  />
+  <RegistryValue
+    Root='HKLM' Key='$(var.TOverlaysRegistryKey)\Added'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgAdded)'
+  />
+  <RegistryValue
+    Root='HKLM' Key='$(var.TOverlaysRegistryKey)\Modified'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgModified)'
+  />
+  <RegistryValue
+    Root='HKLM' Key='$(var.TOverlaysRegistryKey)\Deleted'
+    Type='string' Name='TortoiseHgMsi' Value='$(var.CLSID_TortoiseHgDeleted)'
+  />
+
+  <!-- Mark all as approved -->
+  <?foreach CLSID in $(var.OverlayCLSIDList) ?>
+    <RegistryValue
+      Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+      Type='string' Name='$(var.CLSID)' Value='TortoiseHg'
+    />
+  <?endforeach?>
+
+</Include>
