@@ -148,7 +148,8 @@
                 Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
               />
             <?endforeach?>
-            <?include shell-register.wxi ?>
+            <?include shell-register-cmenu.wxi ?>
+            <?include shell-register-overlays.wxi ?>
           </Component>
           <Component Id='COPYING' Guid='382A8405-CB7B-42E8-8B9D-88B5C5283E73'>
             <File Id='COPYING' Name='COPYING.txt' DiskId='1'
@@ -286,7 +287,8 @@
                   Type='string' Value='[Common64]ThgShellx64.dll'
                 />
               <?endforeach?>
-              <?include shell-register.wxi ?>
+              <?include shell-register-cmenu.wxi ?>
+              <?include shell-register-overlays.wxi ?>
             </Component>
           </Directory>
         </Directory>
