@@ -94,6 +94,11 @@ INFO = (
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, commit, and shelve dialogs are opened.'
          '  Default: None')),
+    (_('English Message'), 'tortoisehg.engmsg', ['False', 'True'],
+       _('Use English commit message even if LANGUAGE or LANG environment'
+         ' variables are set to any language other than English.'
+         ' This setting is used in Merge/Tag/Backout dialog.'
+         '  Default: False')),
     )),
 
 ({'name': 'log', 'label': _('Repository Explorer'),
