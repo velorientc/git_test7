@@ -312,7 +312,7 @@
       <?endif?>
     </Directory>
 
-    <Feature Id='Complete' Title='TortoiseHg $(var.Version)'
+    <Feature Id='Complete' Title='TortoiseHg'
              Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'
              Description='The complete package' >
       <Feature Id='MainProgram' Title='Program'
