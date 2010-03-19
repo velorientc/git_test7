@@ -120,7 +120,7 @@
             <File Id='thgtaskbarEXE' Name='thgtaskbar.exe' DiskId='1' KeyPath='yes'
                   Source='dist\thgtaskbar.exe' >
               <Shortcut Id="thgtaskbarEXEshortcut" Directory="ProgramMenuDir"
-                        Name="Overlay Icon Server"
+                        Name="TortoiseHg Overlay Icon Server"
                         Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
               />
             </File>
