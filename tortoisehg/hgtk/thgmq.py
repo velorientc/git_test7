@@ -11,7 +11,7 @@ import gtk.keysyms
 import gobject
 import pango
 
-from mercurial import error
+from mercurial import error, util
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -546,6 +546,8 @@ class MQWidget(gtk.VBox):
         series = q.full_series[:]
         for pos, qpos in zip(dirty, qdirty):
             q.full_series[qpos] = series[model[pos][MQ_INDEX]]
+        if len(set(q.full_series)) != len(q.full_series):  # found duplicates
+            raise util.Abort(_('series become inconsistent during reorder'))
         q.series_dirty = True
         q.save_dirty()
 
