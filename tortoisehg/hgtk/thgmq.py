@@ -476,12 +476,14 @@ class MQWidget(gtk.VBox):
                 if maxidx < idx:
                     maxidx = idx
 
-        # find index of first unapplied patch in TreeView
+        # find index of first unapplied patch after last applied one in TreeView
+        uminidx = None
         for i, row in enumerate(model):
-            if self.is_unapplied(row[MQ_NAME]):
+            if uminidx is None and self.is_unapplied(row[MQ_NAME]):
                 uminidx = i
-                break
-        else:
+            elif self.is_applied(row[MQ_NAME]):
+                uminidx = None
+        if uminidx is None:
             return False
 
         # check whether operation is possible
