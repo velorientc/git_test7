@@ -126,6 +126,32 @@ class ShellConfigWindow(gtk.Window):
         self.lclonly = gtk.CheckButton(_('Local disks only'))
         hbox.pack_start(self.lclonly, False, False, 2)
 
+        ## Overlay icons group
+        frame = gtk.Frame(_('Enabled Overlay Handlers'))
+        frame.set_border_width(2)
+        iconsvbox.pack_start(frame, False, False, 2)
+        tvbox = gtk.VBox()
+        frame.add(tvbox)
+        
+        hbox = gtk.HBox()
+        tvbox.pack_start(hbox, False, False, 2)
+        hbox.pack_start(gtk.Label(
+            _('(Warning: affects all Tortoises, logoff required after change)')), 
+            False, False, 2)
+
+        hbox = gtk.HBox()
+        tvbox.pack_start(hbox, False, False, 2)
+        self.enableUnversionedHandler = gtk.CheckButton(_('Unversioned'))
+        hbox.pack_start(self.enableUnversionedHandler, False, False, 2)
+        self.enableReadonlyHandler = gtk.CheckButton(_('Readonly (*)'))
+        hbox.pack_start(self.enableReadonlyHandler, False, False, 2)
+
+        hbox = gtk.HBox()
+        tvbox.pack_start(hbox, False, False, 2)
+        hbox.pack_start(gtk.Label(
+            _('*: not used by TortoiseHg')), 
+            False, False, 2)
+
         ## Taskbar group
         taskbarframe = gtk.Frame(_('Taskbar'))
         taskbarframe.set_border_width(2)
