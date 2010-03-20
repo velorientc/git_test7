@@ -828,7 +828,7 @@ class GCommit(GStatus):
                 revs = cmdutil.revrange(self.repo, ['tip'])
                 fp = cStringIO.StringIO()
                 opts = patch.diffopts(self.ui, self.opts)
-                patch.export(self.repo, revs, fp=fp, opts=opts)
+                cmdutil.export(self.repo, revs, fp=fp, opts=opts)
                 text = fp.getvalue().splitlines(True)
                 buf = self.diff_highlight_buffer(text)
                 self.patch_text.set_buffer(buf)
