@@ -2198,7 +2198,7 @@ class GLog(gdialog.GWindow):
 
     def strip_rev(self, menuitem):
         def strip_completed():
-            self.repo.invalidate()
+            hglib.invalidaterepo(self.repo)
             self.reload_log()
             self.changeview.clear()
         rev = self.currevid

@@ -130,7 +130,7 @@ def setup_windows(version):
              'product_version':version}
             ]
     extra['windows'] = [
-            {'script':'thgtaskbar.py',
+            {'script':'TortoiseHgOverlayServer.py',
              'icon_resources':[(0,'icons/thg_logo.ico')],
              'description':'TortoiseHg Overlay Icon Server',
              'copyright':thgcopyright,
