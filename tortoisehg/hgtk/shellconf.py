@@ -32,25 +32,21 @@ class ShellConfigWindow(gtk.Window):
         vbox.set_border_width(5)
         self.add(vbox)
 
-        # Options page
+        # Create a new notebook, place the position of the tabs
+        self.notebook = notebook = gtk.Notebook()
+        notebook.set_tab_pos(gtk.POS_TOP)
+        vbox.pack_start(notebook, True, True)
+        notebook.show()
 
-        ## Overlays group
-        ovframe = gtk.Frame(_('Overlays'))
-        ovframe.set_border_width(2)
-        vbox.pack_start(ovframe, False, False, 2)
-        ovcvbox = gtk.VBox()
-        ovframe.add(ovcvbox)
-        hbox = gtk.HBox()
-        ovcvbox.pack_start(hbox, False, False, 2)
-        self.ovenable = gtk.CheckButton(_('Enable overlays'))
-        hbox.pack_start(self.ovenable, False, False, 2)
-        self.lclonly = gtk.CheckButton(_('Local disks only'))
-        hbox.pack_start(self.lclonly, False, False, 2)
+        # Context Menu page
+        cmenuframe = self.add_page(notebook, _('Context Menu'))
+        cmenuvbox = gtk.VBox()
+        cmenuframe.add(cmenuvbox)
 
-        ## Context Menu group
-        cmframe = gtk.Frame(_('Context Menu'))
+        ## Top/Sub Menu items group
+        cmframe = gtk.Frame(_('Menu Items'))
         cmframe.set_border_width(2)
-        vbox.pack_start(cmframe, True, True, 2)
+        cmenuvbox.pack_start(cmframe, True, True, 2)
 
         table = gtk.Table(2, 3)
         cmframe.add(table)
@@ -112,10 +108,28 @@ class ShellConfigWindow(gtk.Window):
         subbutton.connect('clicked', self.sub_clicked)
         mbbox.add(subbutton)
 
+        # Icons page
+        iconsframe = self.add_page(notebook, _('Icons'))
+        iconsvbox = gtk.VBox()
+        iconsframe.add(iconsvbox)
+
+        ## Overlays group
+        ovframe = gtk.Frame(_('Overlays'))
+        ovframe.set_border_width(2)
+        iconsvbox.pack_start(ovframe, False, False, 2)
+        ovcvbox = gtk.VBox()
+        ovframe.add(ovcvbox)
+        hbox = gtk.HBox()
+        ovcvbox.pack_start(hbox, False, False, 2)
+        self.ovenable = gtk.CheckButton(_('Enable overlays'))
+        hbox.pack_start(self.ovenable, False, False, 2)
+        self.lclonly = gtk.CheckButton(_('Local disks only'))
+        hbox.pack_start(self.lclonly, False, False, 2)
+
         ## Taskbar group
         taskbarframe = gtk.Frame(_('Taskbar'))
         taskbarframe.set_border_width(2)
-        vbox.pack_start(taskbarframe, False, False, 2)
+        iconsvbox.pack_start(taskbarframe, False, False, 2)
         taskbarbox = gtk.VBox()
         taskbarframe.add(taskbarbox)
         hbox = gtk.HBox()
@@ -146,6 +160,9 @@ class ShellConfigWindow(gtk.Window):
 
         accelgroup = gtk.AccelGroup()
         self.add_accel_group(accelgroup)
+
+        # Padding
+        vbox.pack_start(gtk.HBox(), False, False, 3)
 
         # Bottom buttons
         bbox = gtk.HBox()
@@ -178,6 +195,15 @@ class ShellConfigWindow(gtk.Window):
         self.apply.connect('clicked', self.apply_clicked)
         self.apply.set_sensitive(False)
         righthbbox.pack_start(self.apply, False, False)
+
+    def add_page(self, notebook, tab):
+        frame = gtk.Frame()
+        frame.set_border_width(5)
+        frame.set_shadow_type(gtk.SHADOW_NONE)
+        frame.show()
+        label = gtk.Label(tab)
+        notebook.append_page(frame, label)
+        return frame
 
     def load_shell_configs(self):
         overlayenable = True
