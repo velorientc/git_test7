@@ -143,8 +143,10 @@ class ShellConfigWindow(gtk.Window):
         tvbox.pack_start(hbox, False, False, 2)
         self.enableUnversionedHandler = gtk.CheckButton(_('Unversioned'))
         hbox.pack_start(self.enableUnversionedHandler, False, False, 2)
-        self.enableReadonlyHandler = gtk.CheckButton(_('Readonly (*)'))
-        hbox.pack_start(self.enableReadonlyHandler, False, False, 2)
+        self.enableIgnoredHandler = gtk.CheckButton(_('Ignored (*)'))
+        hbox.pack_start(self.enableIgnoredHandler, False, False, 2)
+        self.enableUnversionedHandler.connect('toggled', lambda x: self.apply.set_sensitive(True))
+        self.enableIgnoredHandler.connect('toggled', lambda x: self.apply.set_sensitive(True))
 
         hbox = gtk.HBox()
         tvbox.pack_start(hbox, False, False, 2)
@@ -237,6 +239,8 @@ class ShellConfigWindow(gtk.Window):
         promoteditems = 'commit'
         show_taskbaricon = True
         hgighlight_taskbaricon = True
+        enableUnversionedHandler = True
+        enableIgnoredHandler = True
         try:
             from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
             hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
@@ -251,6 +255,11 @@ class ShellConfigWindow(gtk.Window):
             except EnvironmentError: pass
             try: promoteditems = QueryValueEx(hkey, 'PromotedItems')[0]
             except EnvironmentError: pass
+            hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseOverlays')
+            try: enableUnversionedHandler = QueryValueEx(hkey, 'ShowUnversionedOverlay')[0] != 0
+            except EnvironmentError: pass
+            try: enableIgnoredHandler = QueryValueEx(hkey, 'ShowIgnoredOverlay')[0] != 0
+            except EnvironmentError: pass
         except (ImportError, WindowsError):
             pass
 
@@ -259,6 +268,8 @@ class ShellConfigWindow(gtk.Window):
         self.lclonly.set_sensitive(overlayenable)
         self.show_taskbaricon.set_active(show_taskbaricon)
         self.hgighlight_taskbaricon.set_active(hgighlight_taskbaricon)
+        self.enableUnversionedHandler.set_active(enableUnversionedHandler)
+        self.enableIgnoredHandler.set_active(enableIgnoredHandler)
 
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         self.submmodel.clear()
@@ -277,17 +288,22 @@ class ShellConfigWindow(gtk.Window):
         localdisks = self.lclonly.get_active() and '1' or '0'
         show_taskbaricon = self.show_taskbaricon.get_active() and '1' or '0'
         hgighlight_taskbaricon = self.hgighlight_taskbaricon.get_active() and '1' or '0'
+        enableUnversionedHandler = self.enableUnversionedHandler.get_active() and 1 or 0
+        enableIgnoredHandler = self.enableIgnoredHandler.get_active() and 1 or 0
         promoted = []
         for row in self.topmmodel:
             promoted.append(row[0])
         try:
-            from _winreg import HKEY_CURRENT_USER, CreateKey, SetValueEx, REG_SZ
+            from _winreg import HKEY_CURRENT_USER, CreateKey, SetValueEx, REG_SZ, REG_DWORD
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
             SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
             SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
             SetValueEx(hkey, 'ShowTaskbarIcon', 0, REG_SZ, show_taskbaricon)
             SetValueEx(hkey, 'HighlightTaskbarIcon', 0, REG_SZ, hgighlight_taskbaricon)
             SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
+            hkey = CreateKey(HKEY_CURRENT_USER, r'Software\TortoiseOverlays')
+            SetValueEx(hkey, 'ShowUnversionedOverlay', 0, REG_DWORD, enableUnversionedHandler)
+            SetValueEx(hkey, 'ShowIgnoredOverlay', 0, REG_DWORD, enableIgnoredHandler)
         except ImportError:
             pass
 
