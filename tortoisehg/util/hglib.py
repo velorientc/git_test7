@@ -11,7 +11,7 @@ import shlex
 import time
 import inspect
 
-from mercurial import ui, util, extensions, match, bundlerepo, url
+from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge
 
 _encoding = encoding.encoding
@@ -452,3 +452,17 @@ def is_descriptor(obj, attr):
             return hasattr(cls.__dict__[attr], '__get__')
     return None
     
+def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
+           opts=None):
+    '''
+    export changesets as hg patches.
+    
+    Mercurial moved patch.export to cmdutil.export after version 1.5
+    (change e764f24a45ee in mercurial).
+    '''   
+
+    try:
+        return cmdutil.export(repo, revs, template, fp, switch_parent, opts)
+    except AttributeError:
+        from mercurial import patch
+        return patch.export(repo, revs, template, fp, switch_parent, opts)
