@@ -296,7 +296,10 @@ class SummaryInfo(object):
                 extra = ctx.extra()
                 cvt = extra.get('convert_revision', '')
                 if cvt.startswith('svn:'):
-                    return cvt.split('/', 1)[-1]
+                    result = cvt.split('/', 1)[-1]
+                    if cvt != result:
+                        return result
+                    return cvt.split('@')[-1]
                 else:
                     return None
             elif item == 'ishead':
