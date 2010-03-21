@@ -126,7 +126,7 @@ class ShellConfigWindow(gtk.Window):
         self.lclonly = gtk.CheckButton(_('Local disks only'))
         hbox.pack_start(self.lclonly, False, False, 2)
 
-        ## Overlay icons group
+        ## Overlay icon handlers group
         frame = gtk.Frame(_('Enabled Overlay Handlers'))
         frame.set_border_width(2)
         iconsvbox.pack_start(frame, False, False, 2)
@@ -136,17 +136,41 @@ class ShellConfigWindow(gtk.Window):
         hbox = gtk.HBox()
         tvbox.pack_start(hbox, False, False, 2)
         hbox.pack_start(gtk.Label(
-            _('(Warning: affects all Tortoises, logoff required after change)')), 
+            _('Warning: affects all Tortoises, logoff required after change')), 
             False, False, 2)
 
         hbox = gtk.HBox()
         tvbox.pack_start(hbox, False, False, 2)
+
+        colvbox = gtk.VBox()
+        hbox.pack_start(colvbox, False, False, 2)
+        self.enableAddedHandler = gtk.CheckButton(_('Added'))
+        colvbox.pack_start(self.enableAddedHandler, False, False, 2)
         self.enableUnversionedHandler = gtk.CheckButton(_('Unversioned'))
-        hbox.pack_start(self.enableUnversionedHandler, False, False, 2)
-        self.enableIgnoredHandler = gtk.CheckButton(_('Ignored (*)'))
-        hbox.pack_start(self.enableIgnoredHandler, False, False, 2)
-        self.enableUnversionedHandler.connect('toggled', lambda x: self.apply.set_sensitive(True))
-        self.enableIgnoredHandler.connect('toggled', lambda x: self.apply.set_sensitive(True))
+        colvbox.pack_start(self.enableUnversionedHandler, False, False, 2)
+
+        colvbox = gtk.VBox()
+        hbox.pack_start(colvbox, False, False, 2)
+        self.enableLockedHandler = gtk.CheckButton(_('Locked*'))
+        colvbox.pack_start(self.enableLockedHandler, False, False, 2)
+        self.enableReadonlyHandler = gtk.CheckButton(_('Readonly*'))
+        colvbox.pack_start(self.enableReadonlyHandler, False, False, 2)
+
+        colvbox = gtk.VBox()
+        hbox.pack_start(colvbox, False, False, 2)
+        self.enableIgnoredHandler = gtk.CheckButton(_('Ignored*'))
+        colvbox.pack_start(self.enableIgnoredHandler, False, False, 2)
+        self.enableDeletedHandler = gtk.CheckButton(_('Deleted*'))
+        colvbox.pack_start(self.enableDeletedHandler, False, False, 2)
+
+        def connect_apply(checkbutton):
+            checkbutton.connect('toggled', lambda x: self.apply.set_sensitive(True))
+        connect_apply(self.enableAddedHandler)
+        connect_apply(self.enableUnversionedHandler)
+        connect_apply(self.enableIgnoredHandler)
+        connect_apply(self.enableLockedHandler)
+        connect_apply(self.enableReadonlyHandler)
+        connect_apply(self.enableDeletedHandler)
 
         hbox = gtk.HBox()
         tvbox.pack_start(hbox, False, False, 2)
@@ -163,17 +187,17 @@ class ShellConfigWindow(gtk.Window):
         hbox = gtk.HBox()
         taskbarbox.pack_start(hbox, False, False, 2)
         self.show_taskbaricon = gtk.CheckButton(_('Show Icon'))
-        hbox.pack_start(self.show_taskbaricon, False, False, 2)        
+        hbox.pack_start(self.show_taskbaricon, False, False, 2)
         self.hgighlight_taskbaricon = gtk.CheckButton(_('Highlight Icon'))
-        hbox.pack_start(self.hgighlight_taskbaricon, False, False, 2)        
+        hbox.pack_start(self.hgighlight_taskbaricon, False, False, 2)
 
         # Tooltips
         tips = gtk.Tooltips()
 
-        tooltip = _('Enable/Disable the overlay icons globally')
+        tooltip = _('Show overlay icons in Mercurial repositories')
         tips.set_tip(self.ovenable, tooltip)
         self.ovenable.connect('toggled', self.ovenable_toggled)
-        tooltip = _('Only enable overlays on local disks')
+        tooltip = _('Show overlays on local disks only')
         tips.set_tip(self.lclonly, tooltip)
         self.lclonly.connect('toggled', lambda x: self.apply.set_sensitive(True))
 
