@@ -265,6 +265,10 @@ class ShellConfigWindow(gtk.Window):
         hgighlight_taskbaricon = True
         enableUnversionedHandler = True
         enableIgnoredHandler = True
+        enableLockedHandler = True
+        enableReadonlyHandler = True
+        enableDeletedHandler = True
+        enableAddedHandler = True
         try:
             from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
             hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
@@ -279,10 +283,19 @@ class ShellConfigWindow(gtk.Window):
             except EnvironmentError: pass
             try: promoteditems = QueryValueEx(hkey, 'PromotedItems')[0]
             except EnvironmentError: pass
+
             hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseOverlays')
             try: enableUnversionedHandler = QueryValueEx(hkey, 'ShowUnversionedOverlay')[0] != 0
             except EnvironmentError: pass
             try: enableIgnoredHandler = QueryValueEx(hkey, 'ShowIgnoredOverlay')[0] != 0
+            except EnvironmentError: pass
+            try: enableLockedHandler = QueryValueEx(hkey, 'ShowLockedOverlay')[0] != 0
+            except EnvironmentError: pass
+            try: enableReadonlyHandler = QueryValueEx(hkey, 'ShowReadonlyOverlay')[0] != 0
+            except EnvironmentError: pass
+            try: enableDeletedHandler = QueryValueEx(hkey, 'ShowDeletedOverlay')[0] != 0
+            except EnvironmentError: pass
+            try: enableAddedHandler = QueryValueEx(hkey, 'ShowAddedOverlay')[0] != 0
             except EnvironmentError: pass
         except (ImportError, WindowsError):
             pass
@@ -294,6 +307,10 @@ class ShellConfigWindow(gtk.Window):
         self.hgighlight_taskbaricon.set_active(hgighlight_taskbaricon)
         self.enableUnversionedHandler.set_active(enableUnversionedHandler)
         self.enableIgnoredHandler.set_active(enableIgnoredHandler)
+        self.enableLockedHandler.set_active(enableLockedHandler)
+        self.enableReadonlyHandler.set_active(enableReadonlyHandler)
+        self.enableDeletedHandler.set_active(enableDeletedHandler)
+        self.enableAddedHandler.set_active(enableAddedHandler)
 
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         self.submmodel.clear()
@@ -314,6 +331,10 @@ class ShellConfigWindow(gtk.Window):
         hgighlight_taskbaricon = self.hgighlight_taskbaricon.get_active() and '1' or '0'
         enableUnversionedHandler = self.enableUnversionedHandler.get_active() and 1 or 0
         enableIgnoredHandler = self.enableIgnoredHandler.get_active() and 1 or 0
+        enableLockedHandler = self.enableLockedHandler.get_active() and 1 or 0
+        enableReadonlyHandler = self.enableReadonlyHandler.get_active() and 1 or 0
+        enableDeletedHandler = self.enableDeletedHandler.get_active() and 1 or 0
+        enableAddedHandler = self.enableAddedHandler.get_active() and 1 or 0
         promoted = []
         for row in self.topmmodel:
             promoted.append(row[0])
@@ -328,6 +349,10 @@ class ShellConfigWindow(gtk.Window):
             hkey = CreateKey(HKEY_CURRENT_USER, r'Software\TortoiseOverlays')
             SetValueEx(hkey, 'ShowUnversionedOverlay', 0, REG_DWORD, enableUnversionedHandler)
             SetValueEx(hkey, 'ShowIgnoredOverlay', 0, REG_DWORD, enableIgnoredHandler)
+            SetValueEx(hkey, 'ShowLockedOverlay', 0, REG_DWORD, enableLockedHandler)
+            SetValueEx(hkey, 'ShowReadonlyOverlay', 0, REG_DWORD, enableReadonlyHandler)
+            SetValueEx(hkey, 'ShowDeletedOverlay', 0, REG_DWORD, enableDeletedHandler)
+            SetValueEx(hkey, 'ShowAddedOverlay', 0, REG_DWORD, enableAddedHandler)
         except ImportError:
             pass
 
