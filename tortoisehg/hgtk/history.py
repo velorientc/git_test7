@@ -47,6 +47,7 @@ class FilterBar(gtklib.SlimToolbar):
         gtklib.SlimToolbar.__init__(self, tooltips)
         self.filter_mode = filter_mode
         self.buttons = {}
+        self.handlers = {}
 
         self.all = gtk.RadioButton(None, _('All'))
         self.all.set_active(True)
@@ -84,9 +85,7 @@ class FilterBar(gtklib.SlimToolbar):
         self.buttons['branch'] = self.branches
 
         self.branchcombo = gtk.combo_box_new_text()
-        self.branchcombo.append_text(_('Branches...'))
-        for name in branch_names:
-            self.branchcombo.append_text(name)
+        self.refresh(branch_names)
         self.branchcombo.set_active(0)
         self.append_widget(self.branchcombo, padding=0)
 
@@ -126,8 +125,45 @@ class FilterBar(gtklib.SlimToolbar):
         widget = self.__dict__[widget_name]
         widget.connect(signal, handler, *opts)
 
+        if not self.handlers.has_key(widget_name):
+            self.handlers[widget_name] = []
+        self.handlers[widget_name].append(handler)
+
     def get_button(self, type):
         return self.buttons.get(type)
+
+    def refresh(self, branch_names):
+        ''' refresh branch names in drop-down list '''
+        # block all handlers
+        if self.handlers.has_key('branchcombo'):
+            handlers = self.handlers['branchcombo']
+            for handler in handlers:
+                self.branchcombo.handler_block_by_func(handler)
+        else:
+            handlers = ()
+
+        # save selected item
+        text = self.branchcombo.get_active_text()
+
+        # refresh branch names
+        self.branchcombo.get_model().clear()
+        self.branchcombo.append_text(_('Branches...'))
+        for name in branch_names:
+            self.branchcombo.append_text(name)
+
+        # try to restore previously selected item
+        for row in self.branchcombo.get_model():
+            if row[0] == text:
+                self.branchcombo.set_active_iter(row.iter)
+                break
+        else:
+            # fallback to 'All' filter if no matches
+            self.branchcombo.set_active(0)
+            self.all.set_active(True)
+
+        # unblock all handlers
+        for handler in handlers:
+            self.branchcombo.handler_unblock_by_func(handler)
 
 class GLog(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
@@ -1128,6 +1164,9 @@ class GLog(gdialog.GWindow):
                 mq_text += _('%(count)d of %(total)d applied patches') % {
                              'count': ncount, 'total': ntotal}
             self.stbar.set_text(mq_text, name='mq')
+
+        # refresh filterbar
+        self.filterbar.refresh(hglib.getlivebranch(self.repo))
 
         # Remember options to next time reload_log is called
         self.filteropts = opts
