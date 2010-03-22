@@ -168,6 +168,7 @@ def open_with_editor(ui, file, parent=None):
             ui.config('ui', 'editor') or
             os.environ.get('EDITOR', 'vi'))
     if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+        from tortoisehg.hgtk import gdialog
         gdialog.Prompt(_('No visual editor configured'),
                _('Please configure a visual editor.'), parent).run()
         return False
