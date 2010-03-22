@@ -89,21 +89,31 @@ Windows).
 	(Default: not checked)
 
 :guilabel:`Enabled Overlay Handlers:`
-	These settings allow to enable/disable of overlay handlers in the
-	shared TortoiseOverlays component. The TortoiseOverlays component is shared
-	by all Tortoises (TortoiseHg, TortoiseSVN, etc), so that Windows overlay
-	icon slots can be shared. The total number of overlay slots available on
-	Windows is fairly limited and depends on the exact Windows version used
-	and on what other programs are installed. For example, on a pristine install
+	These (per user) settings provide the possibility to disable overlay
+	icon handlers in the shared TortoiseOverlays component.
+	The TortoiseOverlays component is shared by all Tortoises (TortoiseHg,
+	TortoiseSVN, etc), with the goal to avoid registering too many icon slots,
+	by using a common set of icons slots for all Tortoises (thus using the
+	same set of icons for all Tortoises).
+	The total number of overlay slots available on Windows is fairly limited and
+	depends on the exact Windows version. For example, on a pristine install
 	of Windows 7, there are only 8 free overlay handler slots available.
-	This section allows to individually disable certain non-essential overlay
-	handlers, so that they do not use up an overlay handler slot.
-	Note that these settings affect ALL Tortoises per user (login).
+	This section allows to disable certain non-essential overlay
+	handlers, to reduce icon handler slot consumption by the TortoiseOverlays
+	component. Unchecking handlers in this section increases the chances that
+	important handlers like "Normal" (green checkmark) or "Modifed" (red
+	exclamation mark) will still get an icon slot, even if there are too many
+	handlers registered on a computer.
 	Unchecking handlers that are not used by TortoiseHg (that is: Locked,
 	Readonly, Ignored, Deleted) is highly recommended, if you know that no
-	other Tortoises (e.g. TortoiseSVN) are installed. Make sure the "Added"
-	and "Unversioned" handlers are enabled (these are used by TortoiseHg).
+	other Tortoises (e.g. TortoiseSVN) uses them. 
+	Make sure the "Added" and "Unversioned" handlers are enabled, as these
+	are used by TortoiseHg.
 	(Default: all checked)
+
+.. warning::
+	The "Enabled Overlay Handlers" settings affect all Tortoises for a user.
+	A logoff/login is required to make changes in that section effective.
 
 :guilabel:`Taskbar:`
 	Checkmark "Show Icon" to show the icon of the Overlay Icon Server in the
