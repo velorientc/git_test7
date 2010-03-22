@@ -94,10 +94,10 @@ INFO = (
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, commit, and shelve dialogs are opened.'
          '  Default: None')),
-    (_('English Message'), 'tortoisehg.engmsg', ['False', 'True'],
-       _('Use English commit message even if LANGUAGE or LANG environment'
-         ' variables are set to any language other than English.'
-         ' This setting is used in Merge/Tag/Backout dialog.'
+    (_('English Messages'), 'tortoisehg.engmsg', ['False', 'True'],
+       _('Generate English commit messages even if LANGUAGE or LANG'
+         ' environment variables are set to a non-English language.'
+         ' This setting is used by the Merge, Tag and Backout dialogs.'
          '  Default: False')),
     )),
 
