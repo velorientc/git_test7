@@ -1933,38 +1933,9 @@ class GLog(gdialog.GWindow):
         self.show_dialog(dlg)
 
     def push_clicked(self, toolbutton):
-        original_path = hglib.fromutf(self.pathentry.get_text()).strip()
-        remote_path = hglib.validate_synch_path(original_path, self.repo)
+        remote_path = self.validate_path()
         if not remote_path:
-            gdialog.Prompt(_('No remote path specified'),
-                           _('Please enter or select a remote path'),
-                           self).run()
-            self.pathentry.grab_focus()
             return
-
-        confirm_push = False
-        if not hg.islocal(remote_path):
-            if self.forcepush:
-                title = _('Confirm Forced Push to Remote Repository')
-                text = _('Forced push to remote repository\n%s\n'
-                    '(creating new heads in remote if needed)?') % original_path
-                buttontext = _('Forced &Push')
-            else:
-                title = _('Confirm Push to remote Repository')
-                text = _('Push to remote repository\n%s\n?') % original_path
-                buttontext = _('&Push')
-            confirm_push = True
-        elif self.forcepush:
-            title = _('Confirm Forced Push')
-            text = _('Forced push to repository\n%s\n'
-                '(creating new heads if needed)?') % original_path
-            buttontext = _('Forced &Push')
-            confirm_push = True
-        if confirm_push:
-            dlg = gdialog.CustomPrompt(title, text,
-                    None, (buttontext, _('&Cancel')), default=1, esc=1)
-            if dlg.run() != 0:
-                return
 
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
@@ -2508,22 +2479,55 @@ class GLog(gdialog.GWindow):
                          statopts)
         dialog.display()
 
-    def push_to(self, menuitem):
-        remote_path = hglib.fromutf(self.pathentry.get_text()).strip()
-        for alias, path in self.repo.ui.configitems('paths'):
-            if remote_path == alias:
-                remote_path = path
-            elif remote_path == url.hidepassword(path):
-                remote_path = path
+    def validate_path(self):
+        original_path = hglib.fromutf(self.pathentry.get_text()).strip()
+        remote_path = hglib.validate_synch_path(original_path, self.repo)
         if not remote_path:
             gdialog.Prompt(_('No remote path specified'),
                            _('Please enter or select a remote path'),
                            self).run()
             self.pathentry.grab_focus()
+            return None
+        else:
+            confirm_push = False
+            if not hg.islocal(remote_path):
+                if self.forcepush:
+                    title = _('Confirm Forced Push to Remote Repository')
+                    text = _('Forced push to remote repository\n%s\n'
+                             '(creating new heads in remote if needed)?') % original_path
+                    buttontext = _('Forced &Push')
+                else:
+                    title = _('Confirm Push to remote Repository')
+                    text = _('Push to remote repository\n%s\n?') % original_path
+                    buttontext = _('&Push')
+                    confirm_push = True
+            elif self.forcepush:
+                title = _('Confirm Forced Push')
+                text = _('Forced push to repository\n%s\n'
+                         '(creating new heads if needed)?') % original_path
+                buttontext = _('Forced &Push')
+                confirm_push = True
+            
+            if confirm_push:
+                dlg = gdialog.CustomPrompt(title, text,
+                    None, (buttontext, _('&Cancel')), default=1, esc=1)
+                if dlg.run() != 0:
+                    return None
+                else:
+                    return remote_path
+            else:
+                return remote_path    
+
+    def push_to(self, menuitem):
+        remote_path = self.validate_path()
+        if not remote_path:
             return
+        
         node = self.repo[self.currevid].node()
         rev = str(self.currevid)
         cmdline = ['hg', 'push', '--rev', rev, remote_path]
+        if self.forcepush:
+            cmdline += ['--force']
 
         def callback(return_code, *args):
             if return_code == 0:
