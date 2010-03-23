@@ -381,7 +381,8 @@ Diff
 
 :guilabel:`Patch EOL:`
 	Normalize file line endings during and after patch to lf or crlf.
-	Strict does no normalization.  Default: strict
+	Strict does no normalization.  Auto (introduced in hg 1.5) does
+	per-file detection and is the recommended setting.  Default: strict
 
 :guilabel:`Git Format:`
 	Use git extended diff header format.
