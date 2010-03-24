@@ -87,10 +87,10 @@ def dispatch(args):
         else:
             gtkrun(run, u, **opts)
 
+origwdir = os.getcwd()
 def portable_fork(ui, opts):
     if 'THG_HGTK_SPAWN' in os.environ or (
-            not opts.get('fork') and (
-                opts.get('nofork') or opts.get('repository'))):
+        not opts.get('fork') and opts.get('nofork')):
         return
     elif ui.configbool('tortoisehg', 'hgtkfork', None) is not None:
         if not ui.configbool('tortoisehg', 'hgtkfork'):
@@ -104,6 +104,7 @@ def portable_fork(ui, opts):
         args = [sys.executable] + sys.argv
     os.environ['THG_HGTK_SPAWN'] = '1'
     cmdline = subprocess.list2cmdline(args)
+    os.chdir(origwdir)
     subprocess.Popen(cmdline,
                      close_fds=True,
                      creationflags=openflags,

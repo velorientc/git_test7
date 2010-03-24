@@ -214,9 +214,8 @@ class ServeDialog(gtk.Window):
             threading.Thread(target=start_browser).start()
 
     def _on_conf_clicked(self, *args):
-        dlg = thgconfig.ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True, focus='web.name')
         dlg.show_all()
-        dlg.focus_field('web.name')
         dlg.run()
         dlg.hide()
         self._get_config()
