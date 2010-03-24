@@ -405,7 +405,7 @@
                Description='Diff/Merge Tool'>
         <ComponentRef Id='KDiff3EXE' />
       </Feature>
-      <Feature Id='SHHUtils' Level='1'
+      <Feature Id='SSHUtils' Level='1'
                Title='SSH Utils'
                Description='TortoisePlink and Pageant key agent'>
         <ComponentRef Id='TortoisePlinkEXE' />
