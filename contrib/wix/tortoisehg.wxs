@@ -27,11 +27,11 @@
            Version='$(var.Version)'
            UpgradeCode='$(var.ProductUpgradeCode)'
            Language='1033' Codepage='1252'
-           Manufacturer='Steve Borho and others.'>
+           Manufacturer='Steve Borho and others'>
 
     <Package Id='*' Keywords='Installer'
              Description="Windows shell extension for Mercurial DVCS (version $(var.Version))"
-             Manufacturer='Steve Borho and others.'
+             Manufacturer='Steve Borho and others'
              InstallerVersion='300' Languages='1033' Compressed='yes'
              SummaryCodepage='1252' Platform='$(var.Platform)'
              Comments='$(var.Comments)'
