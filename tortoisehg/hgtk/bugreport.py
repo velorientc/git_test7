@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
+import os, sys
 import gtk
 
 from mercurial import extensions
@@ -63,6 +63,20 @@ class BugReport(gdialog.GWindow):
             text += '** CWD: %s\n' % os.getcwd()
             extlist = [x[0] for x in extensions.extensions()]
             text += '** Extensions loaded: %s\n' % ', '.join(extlist)
+            if os.name == 'nt':
+                text += '** sys.getwindowsversion(): %s\n' % str(sys.getwindowsversion())
+                arch = 'unknown (failed to import win32api)'
+                try:
+                    import win32api
+                    arch = 'unknown'
+                    archval = win32api.GetNativeSystemInfo()[0]
+                    if archval == 9:
+                        arch = 'x64'
+                    elif archval == 0:
+                        arch = 'x86'
+                except ImportError:
+                    pass
+                text += '** Processor architecture: %s\n' % arch
             text += self.opts['error']
             text += '\n}}}'
             self.__error_text__ = text
