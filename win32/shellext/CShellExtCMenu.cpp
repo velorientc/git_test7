@@ -856,10 +856,11 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
 
     if (cmd == "thgstatus")
     {
-        std::string p = dir + "\\TortoiseHgOverlayServer.exe";
-        LaunchCommand(Quote(p), cwd);
-
-        Thgstatus::remove(cwd);
+        if (Thgstatus::remove(cwd) != 0)
+        {
+            std::string p = dir + "\\TortoiseHgOverlayServer.exe";
+            LaunchCommand(Quote(p), cwd);
+        }
         InitStatus::check();
         return;
     }
