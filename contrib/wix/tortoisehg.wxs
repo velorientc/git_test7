@@ -375,7 +375,7 @@
         <ComponentGroupRef Id='localeFolder' />
         <ComponentGroupRef Id='i18nFolder' />
         <ComponentGroupRef Id='thgLocaleFolder' />
-        <ComponentGroupRef Id='thgI18nFolder' />
+        <ComponentRef Id='thgI18nFolder' />
       </Feature>
       <Feature Id='ThgDocumentation' Level='1'
                Title='Documentation'
