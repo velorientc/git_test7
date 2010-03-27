@@ -1,33 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <?define thgcmenulangs = cs;da;de;en_GB;en_US;es;fa;fr;he;hr;it;ja;ko;nl;nn;pl;pt;pt_BR;ru;tr;uk;zh_CN;zh_TW ?>
+    <!-- lang 'ca' is used for key path -->
+
     <Fragment>
         <DirectoryRef Id="dirE238460D44340499CA44F8E5739FEA52">
             <Directory Id="cmenuI18n" Name="cmenu">
                 <Component Id="cmenuI18n" Guid="{B0AB4947-248C-4c6b-841C-49284EF99022}">
                     <File Source="$(var.SourceDir)\thg-cmenu-ca.reg" KeyPath="yes"/>
-                    <File Source="$(var.SourceDir)\thg-cmenu-cs.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-da.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-de.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-en_GB.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-en_US.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-es.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-fa.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-fr.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-he.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-hr.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-it.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-ja.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-ko.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-nl.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-nn.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-pl.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-pt.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-pt_BR.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-ru.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-tr.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-uk.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-zh_CN.reg" />
-                    <File Source="$(var.SourceDir)\thg-cmenu-zh_TW.reg" />
+                    <?foreach LANG in $(var.thgcmenulangs) ?>
+                        <File Source="$(var.SourceDir)\thg-cmenu-$(var.LANG).reg" />
+                    <?endforeach?>
                 </Component>
             </Directory>
         </DirectoryRef>
