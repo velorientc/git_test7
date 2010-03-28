@@ -6,6 +6,11 @@
 
 int main(int argc, char *argv[])
 {
-    Thgstatus::terminate();
+    if (Thgstatus::terminate() == 0)
+    {
+        // pipe ok, so icon server is running
+        // -> wait a bit for icon server to shut down
+        ::Sleep(5000 /* ms */);
+    }
     return 0;
 }
