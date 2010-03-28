@@ -145,10 +145,10 @@ class ChangeSet(gdialog.GWindow):
             gview = self.graphview
             if oldother:
                 gview.model.clear_parents()
+                gview.queue_draw()
             elif self.otherparent:
                 gview.model.set_parent(ctx.rev(), parent)
-            gview.hide()
-            gview.show()
+                gview.queue_draw()
 
         # update dialog title
         self.set_title(title)
