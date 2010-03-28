@@ -279,7 +279,7 @@ class CmdWidget(gtk.VBox):
 
         # progress bar box
         self.progbox = progbox = gtklib.SlimToolbar(tooltips)
-        self.pack_start(progbox)
+        self.pack_start(progbox, False, False)
 
         def add_button(stock_id, tooltip, handler, toggle=False):
             btn = progbox.append_button(stock_id, tooltip, toggle)
