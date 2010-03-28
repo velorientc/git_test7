@@ -149,7 +149,7 @@ class FilterBar(gtklib.SlimToolbar):
         # refresh branch names
         self.branchcombo.get_model().clear()
         self.branchcombo.append_text(_('Branches...'))
-        for name in branch_names:
+        for name in sorted(branch_names):
             self.branchcombo.append_text(name)
 
         # try to restore previously selected item
