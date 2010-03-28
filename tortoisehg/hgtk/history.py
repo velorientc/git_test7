@@ -15,7 +15,7 @@ import tempfile
 import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
-from mercurial import hbisect, error
+from mercurial import error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
