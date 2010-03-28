@@ -83,7 +83,7 @@ class CloneDialog(gdialog.GDialog):
 
         # layout table for fixed options
         self.table = table = gtklib.LayoutTable()
-        vbox.pack_start(table, True, True, 2)
+        vbox.pack_start(table, False, False, 2)
 
         ## comboentry for source paths
         self.srclist, srccombo = createcombo(self.srcpath,
@@ -115,7 +115,7 @@ class CloneDialog(gdialog.GDialog):
 
         # expander for advanced options
         self.expander = expander = gtk.Expander(_('Advanced options'))
-        vbox.pack_start(expander, True, True, 2)
+        vbox.pack_start(expander, False, False, 2)
 
         # layout table for advanced options
         table = gtklib.LayoutTable()
@@ -171,13 +171,16 @@ class CloneDialog(gdialog.GDialog):
     def get_action_map(self):
         return {gtk.RESPONSE_OK: self.clone}
 
-    def switch_to(self, normal, *args):
+    def switch_to(self, normal, working, *args):
         self.table.set_sensitive(normal)
         self.expander.set_sensitive(normal)
         self.buttons['clone'].set_property('visible', normal)
         self.buttons['cancel'].set_property('visible', normal)
         if normal:
             self.buttons['cancel'].grab_focus()
+        if working:
+            self.set_resizable(True)
+            self.vbox.set_child_packing(self.cmd, True, True, 6, gtk.PACK_START)
 
     def command_done(self, returncode, useraborted, src, dest):
         self.add_src_to_recent(src)

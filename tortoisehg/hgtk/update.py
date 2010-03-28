@@ -35,7 +35,7 @@ class UpdateDialog(gdialog.GDialog):
     def get_body(self, vbox):
         # layout table
         table = gtklib.LayoutTable()
-        vbox.pack_start(table, True, True, 2)
+        vbox.pack_start(table, False, False, 2)
         self.table = table
 
         ## revision label & combobox
@@ -141,6 +141,9 @@ class UpdateDialog(gdialog.GDialog):
         self.buttons['close'].set_property('visible', normal)
         if normal:
             self.buttons['close'].grab_focus()
+        if working:
+            self.set_resizable(True)
+            self.vbox.set_child_packing(self.cmd, True, True, 6, gtk.PACK_START)
         if cmd and self.opt_showlog.get_active():
             self.cmd.show_log()
 
