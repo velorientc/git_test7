@@ -101,13 +101,13 @@ def _init_colors():
     else:
         NORMAL = str(normal)
         MAINLINE_COLOR = (
-                normal.red_float,
-                normal.green_float,
-                normal.blue_float
+                normal.red / 65535.0,
+                normal.green / 65535.0,
+                normal.blue / 65535.0
             )
         
         # adjust colors for a dark color scheme:
-        if normal.value > 0.5:
+        if hasattr(normal, 'value') and normal.value > 0.5 or max(MAINLINE_COLOR) > 0.5:
             global RED, GREEN, BLUE, BLACK, WHITE, \
                 DRED, DGREEN, DBLUE, DYELLOW, DORANGE, \
                 PRED, PGREEN, PBLUE, PYELLOW, PORANGE, \
@@ -877,21 +877,19 @@ def create_menuitem(label, handler=None, icon=None, *args, **kargs):
        label = label.replace('_', '__')
     if kargs.get('asradio') or kargs.get('ascheck'):
         if kargs.get('asradio'):
-            menu = gtk.RadioMenuItem(kargs.get('group'), label)
+            menu = gtk.RadioMenuItem(kargs.get('group'), label, use_underline=use_underline)
         else:
-            menu = gtk.CheckMenuItem(label)
+            menu = gtk.CheckMenuItem(label, use_underline=use_underline)
         menu.set_active(kargs.get('check', False))
     elif icon:
         menu = gtk.ImageMenuItem(label)
         menu.set_image(get_icon_image(icon))
     else:
-        menu = gtk.MenuItem(label)
+        menu = gtk.MenuItem(label, use_underline=use_underline)
     if handler:
         args = kargs.get('args', [])
         menu.connect('activate', handler, *args)
     menu.set_sensitive(kargs.get('sensitive', True))
-    if gtk.gtk_version >= (2, 14, 0):
-       menu.set_use_underline(use_underline)
     menu.set_border_width(1)
     return menu
 
