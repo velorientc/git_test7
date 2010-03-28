@@ -4,7 +4,7 @@
 
 #include "Thgstatus.h"
 
-int main(int argc, char *argv[])
+extern "C" UINT __stdcall TerminateIconServer()
 {
     if (Thgstatus::terminate() == 0)
     {
@@ -12,5 +12,5 @@ int main(int argc, char *argv[])
         // -> wait a bit for icon server to shut down
         ::Sleep(5000 /* ms */);
     }
-    return 0;
+    return ERROR_SUCCESS;
 }

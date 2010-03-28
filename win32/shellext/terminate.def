@@ -1,0 +1,5 @@
+LIBRARY      TERMINATE
+
+EXPORTS
+    TerminateIconServer 
+
