@@ -1141,13 +1141,13 @@ class GLog(gdialog.GWindow):
             if len(npats) == 1:
                 kind, name = match._patsplit(npats[0], None)
                 if kind == 'path' and not os.path.isdir(name):
-                    ftitle(_('file history: ') + hglib.toutf(name))
+                    ftitle(_('file patterns "%s"') % hglib.toutf(name))
                     lname = hglib.fromutf(name)
                     opts['filehist'] = lname
                     self.graphview.refresh(graphcol, [lname], opts)
             if not opts.get('filehist'):
-                ftitle('%s: %s' % (self.filtercombo.get_active_text(),
-                                   self.filterentry.get_text()))
+                ftitle('%s "%s"' % (self.filtercombo.get_active_text(),
+                                    self.filterentry.get_text()))
                 self.graphview.refresh(False, npats, opts)
             filtertext += self.filtercombo.get_active_text()
         elif self.filter == 'all':
