@@ -923,7 +923,7 @@ class GStatus(gdialog.GWindow):
         elif stat == '?':
             text_renderer.set_property('foreground', '#AA5000')
         elif stat == 'I':
-            text_renderer.set_property('foreground', 'black')
+            text_renderer.set_property('foreground', '#404040')
         else:
             text_renderer.set_property('foreground', 'black')
 
