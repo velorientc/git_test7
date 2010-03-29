@@ -33,23 +33,32 @@ lze použít na jakékoliv platformě, která podporuje PyGtk, včetně Mac OS X
 Instalace TortoiseHg
 ====================
 
-V OS Windows
+Ve Windows
 ----------
 
 TortoiseHg je poskytován se snadno použitelným instalačním programem - `viz THg <http://tortoisehg.org>`_.
-Dvojklikem na souboru spustíme instalaci a sledujeme pokyny. O zbytek
-se program postará sám.
+Dvojím klepnutím na staženém souboru spustíme instalaci a sledujeme pokyny. 
 
-Po instalaci je zapotřebí restartovat počítač.
+Během aktualizace nás instalátor požádá, abychon zavřeli všechny aplikace, které si načetly extenze rozhranní TorotiseHg. Pokud tak učiníme, aktualizace nebude požadovat restart počítače. Jsou-li připojeni jiní uživatelé, nebo nelze-li některé aplikace zavřít, bude pro ukončení instalace požadován restart.
 
 .. note::
-	Máme-li již nainstalovánu starší verzi (<0.8>), budeme požádáni, 
-	abychom před instalací nového programu starší verzi odinstalovali.
+	Máme-li nainstalovánu starší verzi, budeme při instalaci TortoiseHe 1.0 požádáni abychom ji odinstalovali. 
     
+Všechny starší instalační programy (před verzí 1.0) byly vystaveny s InnoSetup. Balíček TortoiseOverlay instalovaly jako separátní aplikaci, takže v ovládacím panelu *Přidat/Odebrat programy* jsme mohli vidět jak TortoiseHg, tak TortoiseOverlay.
+
+Nové instalační programy pro THg 1.0 obsahují balíčky TortoiseOverlay jako "sloučené moduly", takže se již neobjevují jako separátní aplikace. Mohlo by být vhodné odinstalovat starší aplikaci TortoiseOverlay nástrojem *Přidat/Odebrat programy* poté, co odinstalujeme starší TortoiseHg (<= 0.9.3) - pokud nemáme jiné produkty Tortoise (TortoiseCVS nebo TortoiseBZR), které TortoiseOverlay používají.
+
 .. note::
-	Máme-li nainstalovánu verzi 0.8 nebo novější, instalační program
-	uzavře obslužnou aplikaci na počátku kopírování souborů.
- 
+	TortoiseOverlay is a shim package that allows multiple Tortoise
+	style shell extension clients to share overlay slots.  This is
+	necessary because even modern Windows platforms only support a
+	limited number of overlay slots (11-14).  TortoiseOverlay
+	packages are created by the TortoiseSVN developers.
+
+Bezpečné jsou tyto dvě možnosti:
+
+	1. Ponecháme staré balíčky TortoiseOverlay nainstalovány, neboť ničemu neškodí.
+	2. Staré balíčky TortoiseOverlay odinstalujeme a přeinstalujeme všechny své produkty Tortoise. 
   
 Jazykové nastavení ve Windows
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -70,23 +79,23 @@ přiřadíme odpovídající hodnotu, např. pro češtinu to bude ``set LANGUAG
     
 Překlad extenze kontextového menu Průzkumníka Windows je řízen z regisrů
 Windows. Překlady pro mnohé lokalizace byly instalovány do 
-:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  
-Na souboru vybrané lokalizace provedeme dvojklik a potvrdíme všechny 
-požadavky.
+:file:`C:\\Program Files\\TortoiseHg\\cmenu\\thg-cmenu-cs.reg`.  
+Na souboru vybrané lokalizace provedeme dvojí klepnutí a potvrdíme všechny požadavky.
 
 
 V OS Linux a Mac
 ----------------
 
-Debian DEB a RPM balíčky pro systém Fedora lze získat na stránce 
-`wiki <http://bitbucket.org/tortoisehg/stable/wiki/download/>`_.
-
-Instalační DEB balíčky pro Ubuntu lze nalézt 
-`zde <https://launchpad.net/~tortoisehg-ppa>`_.
+Nejposlednější balíčky ke stažení pro Linux lze nalézt na našich `stránkách
+<http://tortoisehg.bitbucket.org/download/linux.html>`_.
 
 Pro MacOSX nejsou žádné balíčky k disposici, ale je možné používat
 hgtk a všechny dialogy pomocí instalační metody. Podrobnosti viz
 `MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
+
+.. note::
+	Při instalaci TortoiseHg ze zdroje, je nutné nějakým způsobem přidat soubor contrib/mergetools.rc do cesty HGRC. Možný způsob je připojit jej ze souboru ~/.hgrc.
+
 
 Jazykové nastavení v Linuxu
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -4,42 +4,38 @@ Rychlá cesta pro netrpělivé
 
 .. module:: tour
 	:synopsis: A Gentle Introduction to Using TortoiseHg on Windows
-
-Mercurial podporuje mnoho různých
-`modelů spolupráce <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
-Tato kapitola popisuje jeden z mnohých - model s centrálním repozitářem.
-
-Začneme tím, že si centrální repozitář sami vytvoříme. Existují způsoby
-jak `přeměnit <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
-repozitáře z jiných systémů na repozitář Mercurialu, ale jednodušší bude 
-začít úplně od začátku.
-
-Máme tedy program TortoiseHg řádně naistalován a připravili jsme si adresář projektu, který si otevřeme. 
+	
+	
+Jak už bylo řečeno, TortoiseHg je extenze rozhranní Průzkumníka Windows a řada dalších grafických aplikací, které slouží jako uživatelsky příznivé prostředí pro rozptýlený systém kontroly verzí (DVCS) Mercurialu. Všechny nástroje TortoiseHg jsou přístupné přes kontextové menu Průzkumníka nebo pomocí aplikace příkazového řádku, nazvané :command:`hgtk`. Příkazy Mercurialu jsou také dostupné ze standardní aplikace příkazového řádku :command:`hg`.
 
 
 Konfigurace programu
 ======================
 
 Nejprve se musíme do programu TortoiseHg řádně zapsat. Uděláme to tak,
-že upravíme jeho globální (uživatelské) nastavení. Ve svém otevřeném adresáři klikneme pravým tlačítkem myši a vybereme
-:menuselection:`TortoiseHg -> Globální nastavení`
+že upravíme jeho globální (uživatelské) nastavení. Pravým klepnutím kdekoli na volné ploše obrazovky otevřeme kontextové menu a vybereme :menuselection:`TortoiseHg -> Globální nastavení`
 
-.. figure:: figures/cmenu-nofiles.jpg
-	:alt: Context Menu
+.. figure:: figures/cmenu-global-settings.jpg
+	:alt: Desktop Context Menu
 
-	Rozvinuté kontextové menu
+	Přístup ke globálnímu nastavení z plochy monitoru
 
-Vybereme záložku :guilabel:`Commit` a zadáme jméno do textového pole
-:guilabel:`Jméno uživatele`.
+Otevře se okno pro Globální nastavení uživatele. Používáme-li příkazový řádek, otevřeme toto okno příkazem :command:`hgtk userconfig`.
+
+.. figure:: figures/settings.png
+	:alt: Settings Dialog
+	
+	Konfigurace uživatele
+	
+Nejprve vybereme záložku :guilabel:`Commit` a zadáme jméno do textového pole :guilabel:`Jméno uživatele`.
 
 .. note::
-	Zapomeneme-li zadat své jméno, zeptá se nás na něj program při 
-	nejbližším použití příkazu *commit*; je to jediná chvíle, kdy je
+	Opomeneme-li zadat své jméno, zeptá se nás na něj program při 
+	nejbližším použití příkazu *commit*; bude to poprvé, kdy je
 	jméno požadováno.
 
 .. note::
-	Pro formátování uživatelského jména není pevné pravidlo ale obvykle se
-	používá následující formát::
+	Pro formátování uživatelského jména není pevné pravidlo ale obvykle se používá následující formát::
 	
 		Celé Jméno <email>
 		
@@ -49,9 +45,30 @@ Vybereme záložku :guilabel:`Commit` a zadáme jméno do textového pole
 	
 	Emailová adresa je odtržena při prohlížení historie změn a vestavěný webový server zakryje emailovou adresu
 	v rámci prevence proti spamu.
+	
+Dále vybereme záložku :guilabel:`TortoiseHg` a v ní :guilabel:`Nástroj pro sloučení`. V rozvinovacím seznamu nalezneme všechny slučovací nástroje nalezené v programovém vybavení počítače (kdiff3 je poskytnut instalátorem pro Windows) a řadu interních způsobů sloučení. Vybereme si oblíbený nástroj pro slučování.
 
-Pokud jsme nepoužili některý z instalačních programů pro Windows,
-musíme si také nakonfigurovat nástroj pro vizuální porovnávání diffů *KDiff3*. Nastavení provedeme v dialogovém okně *Globální nastavení uživatele*, které můžeme také otevřít příkazem :command:`hgtk userconfig` z příkazového řádku. Na záložce TortoiseHg prohlédneme textové pole :guilabel:`Nástroj Visual Diff`. Pokud v rozbalovacím seznamu nenajdeme konkretní nabídku, musíme si nakonfigurovat přístup k extenzi Mercurialu :guilabel:`Extdiff` (viz 4.1.2). 
+Pokud chceme, aby TortoiseHg používal náš vybraný slučovací nástroj také pro vizuální zobrazení diffů, necháme položku :guilabel:`Nástroj Visual Diff` neurčenu. Jinak si v rozvinovacím seznamu vybereme z nabízených nástrojů. 
+
+Pokud nám v rozvinovacích seznamech není nabídnuta žádná volba, musíme nainstalovat slučovací nástroj, který je podporován v mergetools.rc nebo si nakonfigurovat nástroj vlastní.
+
+.. note::
+	Při instalaci TortoiseHg ze zdroje, je nutné nějakým způsobem přidat soubor contrib/mergetools.ini do cesty HGRC. Možný způsob je připojit jej ze souboru ~/.hgrc.
+	
+Neostýchejme se v otevřeném okně konfigurovat i další položky globálního nastavení. Tato nastavení budeme moci později přepsat v konfiguraci repozitáře.
+
+Nastavené změny potvrdíme a okno zavřeme tlačítkem :guilabel:`OK`.
+
+.. note::
+	Většina nástrojů TortoiseHg vyžadují nové spuštění aplikace aby se projevily změny provedené v konfiguračním okně.
+
+První seznámení
+===============
+
+Mercurial podporuje mnoho různých `modelů spolupráce <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_. Tato kapitola popisuje pouze jeden z nich: model s centrálním repozitářem. Model s centrálním repozitářem je nejvíce známý těm, kteří přecházejí z jiných revizních systémů a je tedy nejvhodnější začít právě s ním.
+
+Potřebujeme tedy vytvořit centrální repozitář. Bylo by možné přeměnit `nemercuriálový repozitář <http://mercurial.selenic.com/wiki/RepositoryConversion>`_ v repozitář Mercurialu ale v našem příkladu začneme úplně od začátku. 
+
 
 Založení nového repozitáře
 ==========================
@@ -72,9 +89,9 @@ Se složkou :file:`.hg` nikdy přímo nepracujeme. Při zadávání příkazů s
 
 Mezi pracovním adresářem a repozitářem existuje tajemná symbióza. Jak později poznáme, mění se obsah pracovního adresáře podle aktuálně nastavené revize.
 
-Pojem "pracovní adresář" je poněkud nejednoznačný. Je to jednak adresář, do něhož jsme se "nacédovali", jednak adresář, který souvisí s aktuálně nastavenou revizí.
+Pojem pracovní adresář je tedy poněkud nejednoznačný. Je to jednak lokální adresář, do něhož jsme se přesunuli, jednak adresář, který souvisí s aktuálně nastavenou revizí.
 
-Pokud to bude možné, bude v dalším textu první souvislost označována jako "adresář projektu" a "pracovní adresář" bude důsledně chápán jako odraz aktuální revize.
+Pokud to bude možné, bude v dalším textu první souvislost označována jako *adresář projektu* a *pracovní adresář* bude důsledně chápán jako odraz aktuální revize.
 
 
 .. warning::
@@ -84,7 +101,10 @@ Pokud to bude možné, bude v dalším textu první souvislost označována jako
 Přidávání souborů
 =================
 
-Nyní je třeba říci aplikaci Mercurial, které soubory v pracovním adresáři mají být sledovány a které ignorovány. Lze to provést více způsoby:
+Mezi pracovním adresářem a repozitářem si představme přechodný prostor, do něhož se ukládají změny v pracovním adresáři před tím, než jsou předány k zápisu do repozitáře příkazem *commit*. Říkejme tomuto prostoru třeba *brašna*. Obdobný prostor v systému Git se nazývá *výstav*. 
+
+Nyní je třeba říci aplikaci Mercurial, které soubory v pracovním adresáři (předpokládejme, že tam nějaké máme) mají být sledovány a které ignorovány. 
+Lze to provést více způsoby - přidáme soubory do brašny dále uvedeným postupem ad 1 a 2:
 
 1. V otevřeném adresáři otevřeme pravým klikem kontextovou nabídku
    a vybereme :menuselection:`TortoiseHg -> Přidat soubory...` (případně z 
@@ -92,7 +112,7 @@ Nyní je třeba říci aplikaci Mercurial, které soubory v pracovním adresář
    dialogové okno, kde označíme soubory, které chceme do sledování přidat
    a potvrdíme volbu tlačítkem :guilabel:`Přidat`.
     
-2. Nebo tamtéž volbou :menuselection:`TortoiseHg -> Stav repo`  
+2. Nebo tamtéž volbou :menuselection:`TortoiseHg -> Status souboru`  
    (případně příkazem :command:`hgtk status` z příkazového řádku) 
    otevřeme dialogové okno, kde vybereme přidávané 
    soubory a potvrdíme křížkem :guilabel:`Přidat`. 
@@ -101,10 +121,7 @@ Nyní je třeba říci aplikaci Mercurial, které soubory v pracovním adresář
    vybereme volbu :guilabel:`Ignorovat`, která
    otevře dialogové okno *Ignorované soubory - ...*
    
-3. Nebo přeskočíme přidávání nových souborů v samostatném kroku a necháme
-   je přidat nástrojem :menuselection:`Hg Commit...`. V tomto
-   prostředí lze přidat soubory ke sledování a zároveň je potvrdit pouhým
-   jejich výběrem a stisknutím tlačítka :guilabel:`Commit`.
+3. Nebo naplníme brašnu přímo v nástroji :menuselection:`THg --> Commit...`. 
    
 4. Okno *Ignorované soubory - ...*, otevřeme také volbou :menuselection:`TortoiseHg -> 
    Ignorované soubory...` 
@@ -117,23 +134,17 @@ Nyní je třeba říci aplikaci Mercurial, které soubory v pracovním adresář
 	Soubor :file:`.hgignore` se vytvoří automaticky při první volbě ignorovaného souboru a je v běžných případech zahrnován do sledování repozitářem.
 
 .. note::
-	Je dobrým zvykem nemít mnoho *neznámých* souborů ve svém pracovním
-	adresáři, neboť se tak snadno přehlédnou důležité soubory při jejich 
-	přidávání.
-	Doporučuje se udržovat soubor :file:`.hgignore` v aktuálním stavu.
-
-.. note::
-	Pokud je okno "status" nebo "commit" prázdné, znamená to, že v aktuálním pracovním adresáři nejsou žádné nepřidané soubory.
+	Je dobrým zvykem nemít mnoho *neznámých* souborů ve svém pracovním adresáři.
 
 
 Commit
 ======
 
-Změny provedené v pracovních souborech předáme do svého repozitáře příkazem :guilabel:`commit` (předat či potvrdit). V otevřeném pracovním adresáři otevřeme nabídku :guilabel:`HG Commit...` ,
+Změny provedené v pracovních souborech předáme z brašny do svého repozitáře příkazem :guilabel:`commit` (předat či potvrdit). V otevřeném pracovním adresáři otevřeme nabídku :guilabel:`TortoiseHg --> Commit...` ,
 nebo zadáme příkaz :command:`hgtk commit`.  
-Napíšeme průvodní text, vybereme soubory, které chceme předat  a stiskneme 
-:guilabel:`Commit`. Pokud si posléze uvědomíme, že jsme chtěli něco jinak,
-můžeme předání ještě zrušit tlačítkem :guilabel:`Zpět`.  
+Napíšeme průvodní komentář, vybereme soubory, které chceme předat  a stiskneme 
+:guilabel:`Commit`. Pokud si před uzavřením okna *Commit* uvědomíme, že jsme commit vlastně nechtěli,
+můžeme jej ještě zrušit tlačítkem :guilabel:`Zpět`.  
 
 
 .. figure:: figures/commit.png
@@ -144,7 +155,7 @@ můžeme předání ještě zrušit tlačítkem :guilabel:`Zpět`.
 Klonování repozitáře
 ====================
 
-Nyní svou práci již můžeme sdílet s ostatními. Zkopírujeme svůj repozitář
+Nyní své výtvory již můžeme sdílet s ostatními. Zkopírujeme svůj repozitář
 někam, kam mají přístup všichni členové naší skupiny. Tomuto úkonu se říká
 *klonování repozitáře*. Provedeme jej nástrojem :menuselection:`TortoiseHg -> Klonovat...`, nebo příkazem
 :command:`hgtk clone` z příkazového řádku.  Potom zadáme cestu k místu určení.
@@ -162,18 +173,7 @@ Dalším klonováním tohoto klonu lze získat opět kompletní pracovní adres�
 Doplňující poznámky
 ===================
 
-Soubory i adresáře jsou pro lepší orientaci v průzkumníku Windows  označeny
-překryvnými ikonami.
-
-.. {{images/image001.png}}
-.. figure:: figures/overlayicons.png
-	:alt: Overlay Icons 
-
-	Překryvné ikony ve Windows XP
-
-Změny v souborech si můžeme prohlédnout v okně extenze :menuselection:`KDiff`, kterou otevřeme výběrem :menuselection:`Vizuální Diff` a to automaticky, pokud máme zatrženou volbu *Osamělý soubor hned otevřít*. K tomuto nástroji se dostaneme buď z kontextového menu, nebo přes příkaz :command:`hgtk vdiff`.
-
-V dalším textu této kapitoly se jestě setkáme s příkazy :menuselection:`Aktualizovat`, :menuselection:`Pull` (stáhnout) a :menuselection:`Push` (vyslat). Poslední dva příkazy nalezneme v okně :menuselection:`ToroiseHg -> Synchronizovat`, případně je lze
+V dalším textu této kapitoly se jestě setkáme s příkazy :menuselection:`Aktualizovat`, :menuselection:`Pull` (stáhnout) a :menuselection:`Push` (vystrčit). Poslední dva příkazy nalezneme v okně :menuselection:`ToroiseHg -> Synchronizovat`, případně je lze
 zadat příkazem :command:`hgtk pull` respektive :command:`hgtk push`. Změny si lze před :menuselection:`Pull` a :menuselection:`Push` prohlédnout příkazem :guilabel:`Příchozí` a :guilabel:`Odchozí`.
 
 Příkaz :menuselection:`Pull` přetáhne změny z repozitáře do repozitáře,
@@ -198,13 +198,13 @@ Konkretní použití jednotlivých příkazů si názorně ukážeme na následu
 	  Učinit repo ...
 	Vytvořit
 
-V otevřené složce **bim** vytvoří Petr nový textový soubor "bob.txt" s textem "Nazdar". Svoji práci potom potvrdí pro repozitář::
+V otevřené složce **bim** vytvoří Petr nový textový soubor "bob.txt" s textem "Nazdar". Svoji práci potom předá do repozitáře::
 
 	c:\bim> echo Nazdar > bob.txt
 	
 	c:\bim> hgtk commit  --> Otevře se okno "bim - commit"
 	
-	Do textového pole Petr zapíše průvodní text revize, neboli changesetu: "bim mess 0"
+	Do textového pole Petr zapíše průvodní text první revize (neboli changesetu): "bim mess 0"
 	Commit
 	
 .. figure:: figures/repos.png
@@ -225,7 +225,7 @@ obsahovat pracovní soubory::
 	Klonovat
 2. Máme pracovní adresář "bam" s repozitářem, který budeme považovat za
 centrální. Obsahuje pouze složku :guilabel:`.hg`. Pavel si založí adresář
-:guilabel:`bum` a z něho si pořídí kopii centrálního repozitáře včetně pracovních
+:guilabel:`bum` a do něho si pořídí kopii centrálního repozitáře včetně pracovních
 souborů::
 	c:\bum> hgtk clone  --> Otevře se okno "Klonovat repozitář"
 	
@@ -234,7 +234,7 @@ souborů::
 	# "Neaktualizovat novou pracovní složku" se tentokrát nezatrhne
 	Klonovat
 3. Máme tři pracovní adresáře, Petr i Pavel mají totožné pracovní soubory.
-Petr do svého připíše "bim bim", Pavel "bum bum". Své nyní již rozdílné
+Petr do svého souboru připíše "bim bim", Pavel "bum bum". Své nyní již rozdílné
 změny potvrdí do svých repozitářů::
 	c:\b~m> hgtk commit  --> Otevře se okno "b~m - commit"
 	
@@ -260,18 +260,18 @@ bez dalšího "vystrčit" naše změny zpět do centrálního repozitáře::
 :: 
 	c:\bum> hgtk pull  --> Otevře se okno "bum - synchronizovat"
 	
-	Zkontrolujeme adresu centrálního repozitáře
+	Zkontroluje adresu centrálního repozitáře
 	Pull
 7. Pavlova situace je teď odlišná od Petrovy. V jeho pracovním adresáři se nacházejí dvě různé verze téhož souboru. Již při provádění příkazu "pull" byl upozorněn, že má provést příkaz "merge"
 ::
 	c:\bum>hgtk merge  --> Otevře se okno "KDiff3"
 	
-	Postupným výběrem dvou písmen z A, B, C vytvoříme sloučení a uložíme.
-8. Provedené změny musíme předat repozitáři
+	Postupným výběrem dvou písmen z A, B, C vytvoří sloučení a uloží.
+8. Provedené změny musí předat repozitáři
 :: 
 	c:\bum>hgtk commit --> Otevře se okno "bum - commit"
 	
-	Zapíšeme průvodní text "Merge one"
+	Zapíše průvodní text, například "Merge one"
 	Commit
 9. Sloučenou verzi odešle Pavel zpět do centrálního repozitáře
 ::

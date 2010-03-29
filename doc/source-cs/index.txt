@@ -1,3 +1,5 @@
+.. TortoiseHg documentation master file
+
 
 Vítejte v dokumentaci pro TortoiseHg!
 ======================================
@@ -16,6 +18,7 @@ Obsah:
 	recovery
 	patches
 	extensions
+	nonhg
 	faq
 	debugging
    

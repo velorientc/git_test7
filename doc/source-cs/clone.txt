@@ -5,7 +5,7 @@ Klonování repozitáře
 	:synopsis: Dialog used to clone a repository
 
 Pro vytvoření věrné kopie repozitáře použijeme proceduru "clone".
-V kontextové nabídce průzkumníka Windows vybereme :menuselection:`TortoiseHg -> Klonovat repo`.
+V kontextové nabídce průzkumníka Windows vybereme :menuselection:`TortoiseHg -> Klonovat repo` nebo zadáme **hgtk clone**.
 
 .. figure:: figures/clone.png
 	:alt: Clone dialog
@@ -17,11 +17,11 @@ V kontextové nabídce průzkumníka Windows vybereme :menuselection:`TortoiseHg
 :guilabel:`Destinace`
 	Cesta k pracovnímu adresáři, do něhož má být klon uložen.
 
-Pod rozšířenou nabídkou :guilabel:`Pokročilé možnosti` nalezneme:
+Pod rozšířenou nabídkou expandéru :guilabel:`Pokročilé možnosti` nalezneme:
 
 :guilabel:`Klonovat až k revizi`
 	Můžeme omezit rozsah klonování až po zadanou revizi. Nebudou importovány ani tagy, vytvořené po této revizi.
-:guilabel:`Neaktualizovat novou pracovní složku`
+:guilabel:`Neaktualizovat nový pracovní adresář`
 	Je-li zatrženo, bude do nového pracovního adresáře zkopírována pouze složka **.hg**. Tato volba je užitečná při vytváření centrálního nebo záložního repozitáře klonováním. Komunikaci s takovým repozitářem tvoří nástroje  *push* a *pull*.
 :guilabel:`Použít protokol pull ke kopírování metadat`
 	Nachází-li se zdroj i destinace ve stejném souborovém systému, snaží se Mercurial použít pevné odkazy. Některé souborové systémy, jako např. ASF, používají pevné odkazy nesprávně ale nehlásí chybu. Tuto volbu použijeme, chceme-li se vyhnout pevným odkazům .

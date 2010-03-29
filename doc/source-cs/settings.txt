@@ -63,7 +63,7 @@ TortoiseHg
 :guilabel:`Přeskočit úvodní okno VDiff:`
 	Vypustit úvodní okno se seznamem souborů a přímo použít prvky našeho 'VDiff' programu. Tuto volbu povolíme jen tehdy, pokud víme, že náš nástroj má platnou konfiguraci příkazu extdiff. Implicitní nastavení je False.
 
-:guilabel:`Grafický (textový) editor:`
+:guilabel:`Vizuální editor:`
 	Editor pro zobrazování souborů, atp.
 
 :guilabel:`Editor CLI:`
@@ -81,7 +81,7 @@ TortoiseHg
 :guilabel:`Zachytit stderr:`
 	Přesměrovat stderr do bufferu, který je na konci procesu analyzován pro chyby za běhu. Implicitně je True.
 
-:guilabel:`Rozvětvit hgtk:`
+:guilabel:`Dělit hgtk:`
 	Při zadání hgtk z přikazového řádku rozdělit proces na pozadí tak, aby spouštěl grafické dialogy. Implicitně je True.
 
 :guilabel:`Úplný název cesty:`
@@ -101,21 +101,21 @@ Commit
 :guilabel:`Délka souhrnného řádku:`
 	Maximální délka souhrnného řádku průvodní zprávy komitu.
 	Aplikace vydá varování při překročení zadané délky, nebo není-li souhrnný řádek oddělen od případného dalšího textu prázdným řádkem. Implicitní nastavení je 0 (nevynuceno). 
-:guilabel:`Délka řádku komentáře:`
+:guilabel:`Délka řádku zprávy:`
 	Délka zalomení řádku průvodní zprávy komitu. Je-li délka zadána, lze použít vyskakovací menu pro formátování zprávy a objeví se varování při překročení zadané délky. Implicitní nastavení je 0 (nevynuceno).
-:guilabel:`Provést push po komitu:`
-	Aplikace se pokusí vyslat (push) revizi k nastavenému repozitáři po každém úspěšném komitu. Implicitně je False.
-:guilabel:`Seznam Auto Include:`
+:guilabel:`Push po komitu:`
+	Aplikace se pokusí poslat (push) revizi k nastavenému repozitáři po každém úspěšném komitu. Implicitně je False.
+:guilabel:`Seznam auto-include:`
 	Čárkami rozdělený seznam souborů, které jsou automaticky vloženy do každého komitu. Zamýšleno pouze jako nastavení repozitáře. Implicitní nastavení je None.
-:guilabel:`Seznam Auto Exclude:`
+:guilabel:`Seznam auto-exclude:`
 	Čárkami rozdělený seznam souborů, které jsou automaticky vypuštěny z výběru při otevření dialogů status, commit a shelve. Implicitní nastavení je None.
 
 
 .. module:: changelog.settings
 	:synopsis: Dialog used to set changelog specific preferences
 
-Changelog
----------
+Průzkumník repozitáře
+---------------------
 
 :guilabel:`Zabarvení podle autora:`
 	Zabarvení changesetů podle jména autora. Není-li umožněno, jsou změny zabarveny zeleně pro sloučení, červeně pro netriviální rodiče a černě pro běžné případy. Implicitně je False.
@@ -126,13 +126,10 @@ Changelog
 :guilabel:`Velikost dávky logu:`
 	Počet revizí načtených a zobrazených v jedné dávce. Implicitně je 500.
 
-:guilabel:`Kopírovat hash:`
-	V okně Repozitory Explorer lze kopírovat ID (hash) changesetů do schránky. Zastaralé, v dalších verzích programu bude vypuštěno. Implicitní nastavení je False.
-
 :guilabel:`Mrtvé větve:`
 	Seznam čárkami oddělených jmen větví, které mají být ignorovány při sestavování seznamu jmen větví pro repozitář. Implicitní nastavení je None.
 
-:guilabel:`Zabarvení větví:`
+:guilabel:`Barvy větví:`
 	Seznam mezerami oddělených jmen větví a barev ve formě 'branch:#XXXXXX'. Mezery a dvojtečky ve jménu větve musí být předznamenány zpětnými lomítky (\\). Podobně mohou být předznamenány i některé další znaky, např. \\u0040 bude dekódováno na znak @ a \\n na 'linefeed'. Implicitní nastavení je None.
 
 :guilabel:`Skrýt tagy:`
@@ -140,6 +137,9 @@ Changelog
 	
 :guilabel:`Použít expandér:`
 	Zobrazit detaily changesetu pomocí rozbalovací ikony
+
+:guilabel:`Styl nástrojové lišty`
+	Jsou nabízeny čtyři možnosti: neurčeno (implicitní), small, large a theme.
 
 .. module:: synchronize.settings
 	:synopsis: Dialog used to set synchronize specific preferences
@@ -167,8 +167,8 @@ Na záložce :guilabel:`Sync` můžeme ukládat adresy URL (cesty) přidružený
 Web
 ---
 
-:guilabel:`Jméno:`
-	Jméno repozitáře pro použití ve webovém rozhraní. Implicitní hodnota je název pracovního adresáře.
+:guilabel:`Název:`
+	Název repozitáře pro použití ve webovém rozhraní. Implicitní hodnota je název pracovního adresáře.
 
 :guilabel:`Popis:`
 	Popis účelu nebo obsahu repozitáře.
@@ -183,7 +183,7 @@ Web
 	Seznam (CSV) archivovacích formátů pro načítání
 
 :guilabel:`Port:`
-	Port, který má být naslouchán.
+	Port, kterému má být nasloucháno.
 
 :guilabel:`Push vyžaduje SSL:`
 	Zda požadovat přenos příchozího 'push' přes SSL, aby se zabránilo 'čmuchání po heslu'. 
@@ -254,7 +254,7 @@ Jinak se zadaná hodnota použije jako jméno programu, který působí jako 'se
 :guilabel:`Port SMTP:`
 	Port pro připojení na mailovém serveru. Implicitní nastavení je 25.
 
-:guilabel:`TLS SMTP:`
+:guilabel:`SMTP TLS:`
 	Připojení k mailovému serveru s použitím TLS. Implicitní nastavení je False.
 
 :guilabel:`Uživatel SMTP:`
@@ -263,7 +263,7 @@ Jinak se zadaná hodnota použije jako jméno programu, který působí jako 'se
 	:guilabel:`Heslo pro SMTP:`
 	Heslo pro ověření u mailového serveru.
 
-:guilabel:`Místní jméno hostitele:`
+:guilabel:`Lokální jméno hostitele:`
 	Hostitelské jméno, které může odesílatel použít pro ověření u mailového serveru.
 
 
@@ -274,7 +274,7 @@ Diff
 ----
 
 :guilabel:`Oprávka EOL:`
-	Normalizovat ukončení řádků v souboru na lf nebo crlf během aa po akci patch. Implicitní nastavení 'strict' normalizaci neprovádí. 
+	Normalizovat ukončení řádků v souboru na lf nebo crlf během a po akci patch. Implicitní nastavení 'strict' normalizaci neprovádí. 
 
 :guilabel:`Formát Git:`
 	Použít rozšířený git formát záhlaví diffu. Implicitně je False.
@@ -283,18 +283,42 @@ Diff
 	Do záhlaví diffů nezahrnovat data modifikací. Implicitně je False.
 
 :guilabel:`Zobrazit funkci:`
-	Ukázat funkci ve které se jednotlivá změna nachází. Implicitně je False.
+	Ukázat funkci ve které je jednotlivá změna obsažena. Implicitně je False.
 
 :guilabel:`Ignorovat prázdné znaky:`
-	Ignorovat prázdné znaky při porovnávání řádků. Implicitně je False.
+	Ignorovat prázdné znaky (WS) při porovnávání řádků. Implicitně je False.
 
 :guilabel:`Ignorovat množství WS:`
 	Ignorovat změny v počtu prázdných znaků. Implicitně je False.
 
 :guilabel:`Ignorovat prázdné řádky:`
 	Ignorovat změny, jejichž řádky jsou všechny prázdné. Implicitně je False.
+	
+:guilabel:`Styl zabarvení:`
+	Úprava stylu zabarvení diffových řádků v prohlížeči changesetů. Implicitně: foreground.
 
 
+Font
+====
+
+:guilabel:`Implicitní fonty motivu`
+	Použít výchozí fonty založené na aktuálním motivu GTK
+	
+:guilabel:`Nastavené fonty:`
+	Vybrat nastavené fonty z rozbalovací nabídky. Tyto sady fontů vyjadřuji odlišnosti různých jazyků či prostředí.
+	
+:guilabel:`Uživatelské fonty:`
+	Určit jména fontů a velikostí individuálně pro jednotlivá místa použití.
+	:guilabel:`Komentář komitu:`
+		Font je používán v prohlížeči changesetů a při zápisu komitu. Implicitně: monospace 10.
+	:guilabel:`Text diffu:`
+		Font je používán pro zápis diffů v nástrojích status a commit. Implicitně: monospace 10.
+	:guilabel:`Seznam souborů:`
+		Font je používán v seznamu souborů v nástrojích status a commit. Implicitně: sans 9.
+	:guilabel:`Výstup příkazu:`
+		Font je používán v oknech s výstupem příkazů. Implicitně: monospace 10.
+
+	
 Klávesová navigace
 ===================
 

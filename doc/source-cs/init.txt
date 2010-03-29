@@ -4,7 +4,7 @@ Vytvoření nového repozitáře
 .. module:: init.dialog
 	:synopsis: Dialog used to create a repository
 
-Při vytváření nového repozitáře v existujícím pracovním adresáři použijeme nástroj "init". V kontextové nabídce průzkumníka Windows vybereme
+Při vytváření nového repozitáře v existujícím adresáři projektu použijeme nástroj "init". V kontextové nabídce průzkumníka Windows vybereme
 :menuselection:`TortoiseHg... -> Vytvořit repozitář`. 
 
 .. figure:: figures/init.png
@@ -27,7 +27,7 @@ Při vytváření nového repozitáře v existujícím pracovním adresáři pou
 	činíme), pak tuto volbu ignorujeme.
 
 
-Vytvoření repozitáře znamená vytvoření složky :file:`.hg` v adresáři projektu. Instalací této složky se ale z adresáře projektu stává pracovní adresář. Ve složce :file:`.hg` uchovává Mercurial všechny informace o verzích pracovních souborů.
+Vytvoření nového repozitáře znamená vytvoření podadresáře :file:`.hg` v adresáři projektu. V tomto podadresáři uchovává Mercurial všechny informace o verzích pracovních souborů.
 
 .. warning::
 	Je nebezpečné editovat soubory ve složce :file:`.hg`, neboť může dojít k poškození repozitáře (s výjimkou konfiguračního souboru :file:`.hg/hgrc`).

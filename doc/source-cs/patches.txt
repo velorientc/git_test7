@@ -15,8 +15,8 @@ Definice oprávky
 * `Pochopení oprávek <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
 * `Více o oprávkách <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
 
-Zádrhel
-=======
+Úskalí
+======
 
 Standardní formát oprávky neumí popsat binární soubory, změnu jmen souborů nebo změnu povolení. Potřebujeme-li zachytit cokoliv z uvedeného, musíme povolit oprávky **git**  zadáním:: 
 
@@ -32,7 +32,7 @@ Oprávkové rutiny Mercurialu nezacházejí dobře s různými EOLN mezi zdrojov
 
 Práce na extenzi hgeol se v této oblasti také zlepšuje. Bude zřejmě vyřešeno v hg-1.5. `patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_.
 
-Použití oprávky není blbuvzdorná operace. Pokud je zdrojový soubor odvozen ze souboru, použitého pro vytvoření oprávky, mohou při jejím použití vzniknout konflikty. Tyto se zapisují do souboru s příponou .rej. Tyto odmítnuté změny musejí v současné době být řešeny ručně uživatelem.
+Použití oprávky není nepokazitelná operace. Pokud se zdrojový soubor odchýlil od souboru, použitého pro vytvoření oprávky, mohou při jejím použití vzniknout konflikty. Tyto se zapisují do souboru s příponou .rej. TortoiseHg 1.0 přichází s experimentálním příkazem :command:`hgtk mpatch` který se *usilovněji* pokouší použít odmítnuté porce oprávek. Tento příkaz vychází z utility Chrise Masona `mpatch <http://oss.oracle.com/~mason/mpatch/>`_. Pokud mpatch odmítnuté porce nepřijme, nezbývá nám než se pokusit o jejich uplatnění ručně.
 
 Export oprávek
 ==============
@@ -54,8 +54,12 @@ Tento nástroj je velmi účinný a pro volbu báze a cíle nejsou žádná omez
 Email
 -----
 
-Pro odeslání changesetu prostřednictvím emailu použijeme kontextové menu v Průzkumníku repozitáře.
-:menuselection:`Email oprávky`.  Volba otevře dialog pro odeslání vybraného changesetu.
+.. figure:: figures/email.png
+	:alt: Email dialog
+	
+	E-mailová pošta v Průzkumníku repozitáře
+
+Pro odeslání changesetu prostřednictvím emailu použijeme kontextové menu v Průzkumníku repozitáře :menuselection:`Exportovat --> Email oprávky...`.  Volba otevře dialog pro odeslání vybraného changesetu.
 
 Pro odeslání rozsahu changesetů použijeme výše popsaný způsob výběru a zvolíme :menuselection:`Emailem odsud k vybranému...`
 
@@ -82,12 +86,30 @@ CTRL-C uložit do schránky.
 Import oprávek
 ==============
 
-Zádrhel: Import vyžaduje čistý pracovní adresář. Příkaz hg import může vygenerovat editor, jestliže oprávka nemá záhlaví.
+.. figure:: figures/import.png
+	:alt: Import tool
+	
+	Dialog pro import v Průzkumníku repozitáře
+
+Dialog pro import oprávky lze otevřít v synchronizační liště Průzkumíka repozitáře nebo porostřednictvím příkazu :command:`hgtk import`. Dialog podporuje přemisťování souborů a adresářů metodou drag and drop. Rozbalovací nabídka vpravo nahoře vedle tlačítka :guilabel:`Vyhledat...` obsahuje položky :guilabel:`Adresář pro hledání...` a :guilabel:`Importovat ze schránky`.
+
+Můžeme importovat přímo do repozitáře nebo do fronty oprávek.
+
+.. note::
+	Import oprávky vyžaduje čistý stav pracovního adresáře. Před importem oprávky musíme provést commit, revert, nebo odložení (shelve) změn.
+
+.. warning::
+	Pokud importovaná oprávka nemá komentář komitu, pokusí se Mercurial spustit náš editor, stejně jako kdybychom se pokoušeli importovat oprávku z příkazového řádku. Pro zdárný průběh akce je zapotřebí, aby náš UI editor byla GUI aplikace.
 
 
 Fronty oprávek
 ==============
 
-Záložka MQ (při povolené extenzi) v Průzkumníku repozitáře, nástroj Commit.
-
+.. figure:: figures/patchqueue.png
+	:alt: Patch Queue
+	
+	Panel fronty oprávek v Průzkumníku repozitáře
+	
+Jak Průzkumník repozitáře, tak nástroj Commit obsahují panel Fronta oprávek, který je viditelný pouze při umožněné extenzi MQ. Dovoluje uživateli provádět většinu operací pro frontu oprávek včetně push, pop, rename a finish. Před použitím tohoto panelu je dobré si něco přečíst o extenzi MQ.
+	
 .. vim: noet ts=4

@@ -4,9 +4,9 @@ Obecné vlastnosti
 .. module:: common.dialog
 	:synopsis: Common features to all the dialog
 
-Jedním z nepřeložených termínů v této dokumentaci je slovo "diff", což není pouze zkratka slova difference, ale označuje se jím standardizovaný způsob evidence změn - "unified diff".
+Jedním z běžně používaných termínů v této dokumentaci je slovo "diff", což není zkratka slova difference, ale označuje se jím standardizovaný způsob určení a zápisu změn - "unified diff".
 
-Slovo "Visual Diff" označuje nástroj pro porovnávání změn v souborech.
+Slovo "Visual Diff" (také VDiff) označuje nástroj pro porovnávání změn ve dvou nebo ve třech souborech. Ve druhém případě se hovoří o "třídílném porovnávání".
 
 Klávesnicové zkratky
 ---------------------
@@ -29,55 +29,86 @@ Je nadefinováno několik klávesnicových zkratek, které jsou podporovány vš
 	obnovit
 
 V `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_ se místo :kbd:`Ctrl` používá jako modifikátor klávesnice "apple".
-the
-apple (command) key is used as the modifier instead of :kbd:`Ctrl`.
+
 
 Porovnání změn
 --------------
-
 .. figure:: figures/visual-diff.jpg
 	:alt: Visual Diff Window 
 
-	Okno Přehled změn
+	Okno Vizuální diffy
 	
-TortoiseHg 0.8 zavedl okno "Přehled změn", které je užitečné z následujících důvodů:
+V TortoiseHg 1.0 byla struktura Vizuálních diffů přepracována. Nový systém používá popisy v souboru :file:`mergetools.rc` k nalezení nejobvyklejších diffových nástrojů v počítači (včetně KDiff3, který je obsažen v instalačním programu) a k výběru nejvhodnějšího z nich.
 
-1. Umožňuje individuální výběr vizuálního diffového nástroje pro každý jednotlivý soubor
-2. Umožňuje použití diffových nástrojů, které větví procesy na pozadí
-3. Umožňuje použití i takových vizuálních diffových nástrojů, které nepodporují diffy celých adresářů
-4. Poskytuje zpětnou vazbu, nebyly-li žádné soubory modifikovány. 
+Jestliže má uživatel zadaný nástroj pro slučování (:menuslelection: `TortoiseHg --> Nástroj pro sloučení`), je tento nástroj používán pro provádění vizuálních diffů bez výběrového procesu. Uživatel si ovšem může pro vizualizaci diffů vybrat odlišný nástroj (:menuselection: `TortoiseHg --> Nástroj Visual Diff`).
+
+Konfigurační soubor :file:`mergetools.rc` obsahuje příkazové řádky pro každý nástroj, takže další konfigurace uživatelem není potřebná. Ten si buď vybere určitý nástroj, nebo přijme implicitní nastavení.
+
+Vizuální diffový systém použije libovolnou existující konfiguraci, kterou nalezne. Protože až donedávna extdiff nepodporoval třídílné diffové argumenty, bude patrně nejlepší znemožnit nebo smazat všechny extdiffové konfigurace.
+
+Systém pro vizuální diff použije přímo vybrané diffové nástroje, pokud prováděná akce nevyžaduje otevření okna VDiff. Může k tomu dojít za těchto podmínek:
+
+	1. Výběr porovnávaných souborů vyžaduje více nástrojů
+	2. Vybraný nástroj dělí odpojené procesy na pozadí
+	3. Vybraný nástroj nepodporuje požadovaný diff adresáře
+	4. Vybraný nástroj nepodporuje třídílné porovnávání
+	5. Změny obsahují přejmenování a kopie souborů
 	
-Pro potřebu vizualizace změn si TortoiseHg vygeneruje dočasné soubory, které obsahují starší verze dat. Tyto dočasné soubory jsou smazány při zavření aplikace "Vizuální Diff".
+Při použití okna pro vizuální diff se po uzavření dialogu smažou dočasné soubory. Mělo by tedy toto okno zůstat otevřené dokud neuzavřeme všechny otevřené diffové nástroje. Je-li diffový nástroj spuštěn přímo, potom se dočasné soubory smažou při uzavření nástroje.
 
-Chceme-li vypustit otevření okna "Přehled změn" a přímo spouštět nastavený nástroj Vizuální Diff, otevřeme
-:menuselection:`TortoiseHg -> Globální nastavení` a na kartě TorotiseHg nastavíme :menuselection:`Přeskočit úvodní okno VDiff` na hodnotu "true".
+Je-li diffový nástroj spuštěn přimo k porovnání souboru pracovní kopie, můžeme jej editovat přímo v tomto nástroji. Porovnáváme-li více souborů, vytvoří si vizuálně diffový systém snímek souborů pracovní kopie a zaznamená jejich původní velikosti a časová razítka. Při uzavření diffového nástroje porovná systém velikosti a časové údaje a překopíruje upravené soubory zpět do původní pracovní kopie. Tímto způsobem můžeme upravovat soubory pracovní kopie uvnitř diffového nástroje i když provádíme porovnávání adresářů.
+
+Je-li okno vizuálního diffu použito k porovnávání souborů pracovní kopie, toto porovnání se provádí soubor po souboru.
 
 .. note::
-	Nastavení položky `Přeskočit úvodní okno VDiff` nemění chování nástroje VDiff, které se při spuštění z kontextového menu vždy otevře. 
+	Nastavitelná položka :menuselection:`TortoiseHg --> Skip Diff Windov` byla odstraněna kvůli nadbytečnosti.
 
-.. warning::
-	Vypustíme-li okno "Přehled změn", musí si náš VDiff nástroj umět poradit s adresáři a nesmí 
-	větvit procesy v pozadí.
-	Caveat emptor.
+Přidání nástrojů
+~~~~~~~~~~~~~~~~
 
-Nastavení vizuálního diffového nástroje se v TortoiseHg provádí ve dvou krocích. Nejprve musíme nastavit příkaz
-`extdiff <http://mercurial.selenic.com/wiki/ExtdiffExtension>`_
-v konfiguračním souboru :file:`TortoiseHg/Mercurial.ini`::
+Máme-li nainstalovaný diffový nástroj, který není podporován aplikací TortoiseHg, můžeme vytvořit jeho konfiguraci v souboru :file:`Merurial.ini`. Viz `dokumentace Hg <http://www.selenic.com/mercurial/hgrc.5.html#merge-tools>`_. Poté přidáme extra klíče, které pro vizuální diff používá TortoiseHg::
 
-	[extdiff]
-	myapp = C:\Path\to\tool.exe
+	diffargs:  the arguments to use for two-way file comparisons
+	diff3args: the arguments to use for three-way file comparisons
+	dirdiff:   this tool supports two-way directory comparisons
+	dir3diff:  this tool supports three-way directory comparisons
+	
+Při sestavování argumentů pro příkazovový řádek můžeme použít následující proměnné::
 
-Potom je možné vybrat `myapp` ze seznamu dostupných nástrojů "extdiff" v :menuselection:`Globální nastavení -> TortoiseHg -> Nástroj Visual Diff`.
-Nějaké konfigurační příklady lze nalézt v :doc:`faq`.
+	$parent1:  the file or directory from the first parent revision
+	$parent2:  the file or directory from the second parent revision
+	$child:    the file or directory from the revision being compared
+	$ancestor: the file or directory from the ancestor of a merge
+	$parent:   a synonym for $parent1
 
-Je-li nastaveno více nástrojů `extdiff`, umožní nám okno "Přehled změn" vybrat individuální nástroj pro každý soubor jednotlivě.
+	$plabel1:  a symbolic name for the first parent revision
+	$plabel2:  a symbolic name for the second parent revision
+	$clabel:   a symbolic name for the revision being compared
+	$alabel:   a symbolic name for the ancestor revision
+	
+$parent2 a $ancestor mají ovšem smysl pouze tehdy, jsou-li použity jako argumenty třídílného diffu pro zobrazení changesetů sloučení. Nemůže-li náš diffový nástroj použít rozumným způsobem revizi předka, je bezpečnější vypustit jej z příkazového řádku pro diff3args.
 
-Prohledávání stromových struktur
---------------------------------
+.. note::
+	Ve Windows může parametr `executable` použít proměnné prostředí s použitím syntaxe ${ProgramFiles}
+	
+Pokud tuto konfiguraci neprovedeme, implicitní hodnota **diffargs** je '$parent $child'. Implicitní hodnota **diffargs3** je "", což naznačuje, že vizuální diffový nástroj nemůže provádět třídílná srovnání.
+
+Vytvoříte-li novou konfiguraci nástroje pro vizuální diff nebo vylepšíte-li stávající, pošlete prosím mail našemu vývojovému oddělení pro možné zahrnutí do přístího vydání programu.
+
+Diffy slov
+~~~~~~~~~~
+
+Instalační program TortoiseHg pro Windows nyní obsahuje skripty aplikace TortoiseSVN pro porovnávání (a někdy sloučení) dokumentů v mnoha binárních formátech. Tyto jsou nastaveny v souboru :file:`mergepatterns.rc` jako ovladače pro obvyklé extenze souborů každého binárního formátu, takže není zapotřebí zásahu uživatele.
+
+Pro podporu výběru nástrojů, vycházejícího z přípony souboru, přidal TortoiseHg podporu pro sekci **[diff-patterns]**, která je ekvivalentní k sekci Mercurialu `merge-patterns <http://www.selenic.com/mercurial/hgrc.5.html#merge-patterns>`_.
+
+Prohledávání stromových  struktur
+---------------------------------
 
 Mnohé dialogy programu TortoiseHg používají stromových struktur k prezentaci seznamů dat uživateli. Seznamy souborů v oknech status, commit, shelve mají tvar stromových struktur.
+
 Většina stromových struktur je uzpůsobena pro živé vyhledávání.
-Ujistíme se, že má struktura zaměření (klikem na řádku) a začneme zapisovat vyhledávací frázi. Objeví se malé vstupní pole, které obsahuje náš zadávaný text. Zaměření (focus) se okamžitě přenese k prvnímu řádku, které odpovídá dosud zadanému textu. Dalším textem se výběr upřesňuje.
+Ujistíme se, že má struktura zaměření (klepnutím na řádku) a začneme zapisovat vyhledávací frázi. Objeví se malé vstupní pole, které obsahuje náš zadávaný text. Zaměření (focus) se okamžitě přenese k prvnímu řádku, které odpovídá dosud zadanému textu. Dalším textem se výběr upřesňuje.
 
 V poli stromové struktury je možné také použít tyto klávesové zkratky:
 

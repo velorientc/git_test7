@@ -14,25 +14,20 @@ TortoiseHg poskytuje vizuální vyjádření stavu souborů pomocí překryvnýc
 
 	Překryvné ikony na ikonách složek a souborů (XP)
 
-Kontextové menu obsahuje volbu :guilabel:`Aktualizovat ikony` která přinutí aplikaci TortoiseHg oživit ikony v právě rozbaleném repozitáři nebo ve složce s repozitáři. 
+Kontextové menu obsahuje volbu :guilabel:`Aktualizovat ikony` která přinutí aplikaci TortoiseHg oživit ikony v právě rozbaleném repozitáři nebo ve složce s repozitáři. Ikona hlavního panelu zezelená a ikony v adresáři se změní v otazníky ve chvíli, kdy probíhá tato aktualizace.
 
-Ikona hlavního panelu zezelená a ikony v adresáři se změní v otazníky ve chvíli, kdy probíhá tato aktualizace.
-
-Nové rozšíření konzoly C++ je řádově rychlejší než extenze Pythonu
-používaná v dřívějších verzích a stále je možné překryvy konfigurovat pomocí nabídky hlavního panelu (taskbar menu). 
-Jednoduše klikneme na ikonku *TortoiseHg RPC Server* v rozvinuté liště hlavního panelu vpravo dole a vybereme :guilabel:`Options`.  
-V okně **TortoiseHg Taskbar** lze povolit překryvy globálně nebo je povolit jen pro lokální disky.
+Ovladač překryvů a kontextové nabídky jsou nastavitelné. V ploše otevřeného adresáře nebo dokonce v ploše obrazovky provedeme pravé klepnutí a vybereme :menuselection:`TortoiseHg --> Nastavení kontextových nabídek`. V otevřeném okně můžeme jednotlivé volby přesouvat ze submenu do hlavního menu a obráceně.
 
 .. figure:: figures/taskbarui.png
-	:alt: Taskbar options dialog
+	:alt: Shell Configuration dialog
 
-	Dialogové okno Hlavního panelu TortoiseHg 
-
-Verze 0.8.1 uvedla možnost selektivně umožnit překryvné ikonky jen v určitých repozitářích. To lze provést editací souboru
-:file:`.hg\\thgstatus` uvnitř repozitáře a nahradit jeho obsah
+	Nastavení kontextových nabídek
+	
+Překryvné ikony lze selektivně znemožnit pro určitý repozitář editací souboru :file:`.hg\\thgstatus` uvnitř repozitáře a nahradit jeho obsah
 řádkem obsahujícím::
 
 	@@noicons
+
 
 Kontextové nabídky
 ------------------
@@ -52,15 +47,14 @@ A zde je kontextové menu pro vybrané soubory nebo složky:
 
 	Kontextové menu pro soubor nebo složku
 
-TortoiseHg poskytuje dialogy pro většinu běžně používaných příkazů aplikace Mercurial. Méně používané a nově přidané příkazy jsou přístupné z příkazového řádku konzoly
+TortoiseHg poskytuje dialogy pro většinu běžně používaných příkazů aplikace Mercurial. Méně používané a nově přidané příkazy jsou ve Windows přístupné z příkazového řádku konzoly
 :file:`cmd.exe`.
 
-Kontextová menu lze konfigurovat prostřednictvím ikonky *TortoiseHg RPC Server* v liště hlavního panelu, stejně jako překryvné ikony.
 
 Nautilus
 --------
 
-TortoiseHg také poskytuje integraci rozhraní s pracovním prostředím GNOME pomocí pluginu nautilus-python. Pokud jsme TortoiseHg instalovali z distribučního balíku, je možné, že tuto extenzi máme již nastavenu. Pokud ne, vyhledejte si prosím potřebné informace na našich stránkách Wiki. 
+TortoiseHg také poskytuje integraci rozhraní s pracovním prostředím GNOME pomocí pluginu nautilus-python. Pokud jste TortoiseHg instalovali z distribučního balíku, je možné, že tuto extenzi máte již nastavenu. Pokud ne, vyhledejte si prosím potřebné informace na našich stránkách Wiki. 
 
 Grafické rozhraní extenze pro Nautilus nepodporuje překryvné ikonky a kontextové menu. Umožňuje však výběr příkazů z rozbalovacích nabídek, pokud upravíme soubor :file:`~/.hgrc` následujícím způsobem::
 

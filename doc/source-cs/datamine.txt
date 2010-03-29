@@ -4,7 +4,7 @@ Zkoumání dat
 .. module:: datamine.dialog
 	:synopsis: Dialog used to search repository history
 
-Aplikace datamine (zkoumání dat) se používá k inspekci revizí v repozitáři. Okno má implicitně otevřenou záložku *Hledat* a vyvolatelnou záložku *Anotace*.
+Aplikace datamine (zkoumání dat) se používá k inspekci historie revizí v repozitáři. Okno má implicitně otevřenou záložku *Hledat* a vyvolatelnou záložku *Anotace*.
 
 Záložka Hledat
 --------------
@@ -38,11 +38,11 @@ Zatržítka pod textovými poli:
 
 Záložky 'hledat' jsou pojmenovány podle posledně použitého vyhledávacího řetězce. Tlačítko :guilabel:`Nové hledání` samozřejmě otevře novou záložku 'hledat' a tlačítko :guilabel:`Stop` ukončí právě probíhající hledání (toto tlačítko je aktivní jenom při probíhajícím hledání).
 
-V okně záložky hledat se vypíše seznam souborů s nalezenou shodou. Popisný tooltip poskytne u každého řádku další informaci (autor, datum/čas, shrnutí).
+Shody
+^^^^^
 
-Dvojklik na označeném řádku otevře podrobné zobrazení vybraného changesetu.
-
-Pravý klik na řádku otevře kontextovou nabídku s těmito položkami:
+Každá shoda se stává pojítkem k changesetu a má popisný tooltip (autor, datum/čas, shrnutí). Dvojí klepnutí na označeném řádku otevře podrobné zobrazení vybraného changesetu.
+Pravé klepnutí na řádku otevře kontextovou nabídku s těmito položkami:
 
 	:guilabel:`zobrazit changeset`
 		otevřít okno s podrobným zobrazením changesetu

@@ -4,7 +4,7 @@ Almárka
 .. module:: shelve.dialog
 	:synopsis: Dialog used to perform shelve/unshelve operations
 
-Účelem tohoto nástroje je umožnit uživateli **odložit** (shelve) vybrané změny z pracovního adresáře, uložit je uvnitř repozitáře ve speciálním oprávkovém souboru (patch file) a později je opět **vyjmout** (unshelve).
+Účelem tohoto nástroje je umožnit uživateli **odložit** (shelve) vybrané změny z pracovního adresáře, uložit je uvnitř repozitáře ve speciálním oprávkovém souboru (patch file) a později je opět **vyjmout** (unshelve). Úložný prostor uvnitř repozitáře je označován jako shelf, neboli almárka.
 
 .. figure:: figures/shelve.png
 	:alt: Shelve dialog
@@ -18,37 +18,30 @@ Stručný popis jednotlivých tlačítek:
 	:guilabel:`Unshelve`
 		Vrátit odložené změny zpět do pracovního adresáře.
 	:guilabel:`VDiff`
-		Optické porovnání vybraného souboru
+		Vizuální porovnání vybraných souborů
 	:guilabel:`Vrátit`
 		Vrátit vybrané soubory k poslednímu verzovanému stavu. Při slučování je možné určit návrat k vybranému rodiči. 
 	:guilabel:`Přidat`
-		Zahrnout vybrané soubory (které měly status neznámého (?) nebo ignorovaného (I) souboru) do procesu *shelve*.
+		Přidat vybrané soubory, které měly status neznámého (?) nebo ignorovaného (I) souboru).
 	:guilabel:`Přesunout`
 		Přemístit vybrané soubory do určeného cílového adresáře verzovaným způsobem.
-	:guilabel:`Odstranit`
-		Smazat vybrané verzované i neverzované soubory (verzované označit jako smazané). 
+	:guilabel:`Odebrat`
+		Smazat vybrané neverzované soubory a/nebo odebrat (označit jako smazané) všechny verzované soubory.
 	:guilabel:`Zapomenout`
 		Zapomenout vybrané verzované soubory.
 	:guilabel:`Obnovit`
 		Znovu načíst stav pracovního adresáře. Procedura se snaží zachovat výběr souborů i jejich výběrový status.
 
-Pole pro seznam souborů má čtyři sloupce:
-
-	1) Zatržítko, které ukazuje zda je soubor pro operaci vybrán. Tlačítka nástrojové lišty pracují jenom s vybranými soubory. "Částečně" vybrané soubory mají zvlášní výběrový status. 
-	2) Sloupec :guilabel:`st` označuje status souboru.
-	3) Sloupec :guilabel:`ms` označuje stav sloučení (merge) souboru. Viz odstavec 4.5.5 Slučování.
-	4) Kanonická cesta souboru (relativně ke kořenu repozitáře).
-
-Pod seznamem souborů jsou (po rozbalení přepínače) zatržítka, která přepínají zobrazení různých tříd souborů (neznámý, upravený, ignorovaný, přidaný, čistý, odstraněný, smazaný). Tato zatržítka nejsou přístupná, pokud byl commit spuštěn se zadaným výběrem souborů.
+Pole pro seznam souborů má čtyři sloupce stejně jako v nástroji Commit. Význam jednotlivých záhlaví - viz 4.5.1 nad poznámkou.
 
 Záložky
 -------
 
-Diffový panel nástroje Shelve má čtyži záložky:
+Diffový panel nástroje Shelve má čtyři záložky:
 	1) Text diffu - ukazuje diff aktuálně vybraného souboru
-	2) Výběr porce - umožňuje přeskakovat porce diffů  vybraného souboru
-	3) Náhled regálu - zobrazuje všechny vybrané změny. Tento náhled ukazuje změny, které budou odstraněny z pracovního adresáře a odloženy v almárce.
-	4) Obsah regálu - aktuální obsah regálu.
+	2) Výběr porce - umožňuje vybírat z porcí diffů  vybraného souboru
+	3) Náhled almárky - zobrazuje všechny vybrané změny. Tento náhled ukazuje změny, které budou odebrány z pracovního adresáře a odloženy v almárce.
+	4) Obsah almárky - aktuální obsah almárky.
 
 
 Odkládání změn

@@ -10,9 +10,9 @@ Synchronizace
 	Dialogové okno Synchronizace 
 
 .. note::
-	Tento nástroj je v 0.9 zpochybňován a může být v další 
+	Tento nástroj byl v 0.9 zpochybněn a může být v další 
 	verzi vypuštěn. Pro synchronizační úkoly doporučujeme 
-	používat HG Průzkumník repozitáře.
+	používat Průzkumník repozitáře.
 
 Synchronizační nástroj se používá pro přemisťování changesetů mezi repozitáři nebo pro odeslání změny emailem.
 
@@ -73,7 +73,7 @@ Rozbalovací ikona :guilabel:`Pokročilé možnosti` skrývá řadu dalších na
 	:guilabel:`Nejnovější ukázat první`
 		změnit pořadí uváděných changesetů
 	:guilabel:`Sloučení nezobrazovat`
-		odfiltrovat z výstupu changesety se sloučením (neovlivní akci push/pull)
+		odfiltrovat z výstupu sloučené changesety (neovlivní akci push/pull)
 
 
 Po akci Pull
@@ -103,6 +103,8 @@ Dialog pro odeslání emailu lze otevřít ve dvou nástrojích.
 Význam tlačítka :guilabel:`Poslat` je zřejmý a dle očekávání tlačítko :guilabel:`Nastavit` otevírá dialog pro nastavení SMTP, adresy příjemce a jména odesílatele.
 
 Textové pole :guilabel:`In-Reply-To:` se používá pro správné třídění oprávek (patches). 
+
+Vysvětlení rozdílů mezi 'prostými oprávkami, oprávkami Hg, oprávkami Git a svazky' nalezneme v dokumentaci Mercurialu. 
 
 
 Spuštění z příkazového řádku

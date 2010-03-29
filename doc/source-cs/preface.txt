@@ -10,32 +10,31 @@ Cílový čtenář
 
 Tato kniha je napsána pro gramotného uživatele počítače, který chce používat
 Mercurial pro správu svých dat a vyhovuje mu, není-li pro komunikaci s 
-programem omezen pouze na příkazový řádek. Protože TortoiseHg je extenze
-uživatelského rozhraní Windowsu, předpokládá se, že čtenář zná Průzkumník Windows a umí jej používat.
+programem omezen pouze na příkazový řádek. TortoiseHg je extenze
+uživatelského rozhraní Windows a nadstavba programu Mercurial.
 
-Nejaktuálnější verzi této dokumentace lze nalézt na těchto
-`webových <http://tortoisehg.org>`_ stránkách.
+Nejaktuálnější verzi této dokumentace lze nalézt na 
+`webových <http://tortoisehg.org>`_ stránkách TortoiseHg.
 
 Seznámení s obsahem
 ===================
 
-:doc:`preface` stručně seznamuje s programem TortoiseHg, s kolektivem lidí,
-kteří se na jeho tvorbě podílejí a s licenčními podmínkami pro jeho používání a 
-šíření.
+Předmluva stručně seznamuje s programem, s kolektivem lidí kteří se na jeho tvorbě podílejí a s licenčními podmínkami pro jeho používání a šíření.
 
 V kapitole :doc:`intro` se seznámíme s instalací programu a s nastavením jeho jazykové verze. 
 
-Kapitola :doc:`quick` je stručným průvodcem programem THg.
+Kapitola :doc:`quick` je stručným průvodcem programem.
 
 Kapitola :doc:`daily` obsahuje popis často používaných 
 nástrojů programu.
 
 Kapitola :doc:`settings` popisuje konfiguraci TortoiseHg.
 
-Kapitola :doc:`recovery` popisuje záchranné operace, které lze v projektu
-provádět.
+Kapitola :doc:`recovery` popisuje záchranné operace, které lze v projektu provádět.
 
-Kapitola :doc:`faq` obsahuje seznam otázek a odpovědí.
+Kapitola :doc:`nonhg` popisuje použití TortoiseHg jako klientskou aplikaci pro nemercurialové servery.
+
+Kapitola :doc:`faq` obsahuje seznam otázek a odpovědí - nepřeloženo.
 
 Kapitola :doc:`debugging` popisuje řešení možných problémů.
 
@@ -44,7 +43,7 @@ TortoiseHg je volně šířený program!
 
 TortoiseHg je šířen ve shodě s licenčními podmínkami 
 `GPLv2 <http://www.gnu.org/licenses/gpl-2.0.html>`_.  Lze jej instalovat 
-na neomezené množství počítačů a používat v shodě s výše uvedenými podmínkami.
+na neomezené množství počítačů a šířit ve shodě s licencí GPLv2.
 
 Kolektiv
 ========
@@ -53,19 +52,19 @@ Adresy:
 
 * `Uživatelé <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - Oznámení, otázky-odpovědi a diskuze o vlastnostech
 * `Vývojáři <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Oprávky (patches), zprávy o chybách a diskuze o vývoji programu.
-* `Témata <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Archiv probíraných témat.
+* `Publikované verze <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Oznámení o vydaných verzích programu.
 
-Wiki adresa pro Bitbucket je `zde <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ .
+Naše Wiki na stránkách Bitbucket je `zde <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ .
 
 Poděkování
 ==========
 
-Dík všem, kteří přispívají do projektu TortoiseHg. Pro vybudování skutečně 
+Dík všem, kteřído projektu TortoiseHg přispívají. Pro vybudování skutečně 
 použitelné aplikace je potřebný kolektiv vývojářů, překladatelů a uživatelů.
 Dík patří zejména těm uživatelům, kteří nelenují oznámit chybu nebo se podělit o svůj názor.
 
-Při instalaci TortoiseHg ve Windows jsou instalovány překryvné ikonky stejně jako v aplikaci  
-`TortoiseSVN <http://tortoisesvn.net>`_ .
+Při instalaci TortoiseHg ve Windows jsou instalovány překryvné ikonky převzaté z projektu  
+`TortoiseSVN <http://tortoisesvn.net>`_.
 
 Konvence použité v textu
 ========================
@@ -107,7 +106,7 @@ Program TortoiseHg lze aktivovat buď jako kontextové menu v Průzkumníku Wind
 
 Z toho vyplývá, že bez znalosti omezeného množství anglických slov se při používání TortoiseHg neobejdeme. Proto jsem si dovolil některá slova v manuálu i v lokalizaci nepřekládat.
 
-Bez překladu ponechávám slova COMMIT, PULL, PUSH, CHANGESET, HASH, SHELVE, DATAMINE, DIFF A VISUAL DIFF. Slova PATCH a HUNK jsem si dovolil přeložit jako oprávka a porce.
+Bez překladu ponechávám slova COMMIT, PULL, PUSH, CHANGESET, HASH, SHELVE, DATAMINE, DIFF A VISUAL DIFF. Slova PATCH a HUNK jsem si dovolil přeložit jako oprávka a porce a SHELF jako almárka.
 
     
 .. vim: noet ts=4
