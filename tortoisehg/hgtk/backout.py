@@ -81,6 +81,8 @@ class BackoutDialog(gdialog.GDialog):
         ## use English backout message option
         self.eng_msg = gtk.CheckButton(_('Use English backout message'))
         self.eng_msg.connect('toggled', self.eng_msg_toggled)
+        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+        self.eng_msg.set_active(engmsg)
         hbox.pack_start(self.eng_msg, False, False)
 
         ## merge after backout
@@ -116,14 +118,10 @@ class BackoutDialog(gdialog.GDialog):
             self.cmd.set_result(_('Failed to backout'), style='error')
 
     def load_settings(self):
-        checked = self.settings.get_value('english', False, True)
-        self.eng_msg.set_active(checked)
         checked = self.settings.get_value('merge', True, True)
         self.merge_button.set_active(checked)
 
     def store_settings(self):
-        checked = self.eng_msg.get_active()
-        self.settings.set_value('english', checked)
         checked = self.merge_button.get_active()
         self.settings.set_value('merge', checked)
         self.settings.write()
