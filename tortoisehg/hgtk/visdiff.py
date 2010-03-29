@@ -205,11 +205,11 @@ def visualdiff(ui, repo, pats, opts):
     # Disable 3-way merge if there is only one parent or no tool support
     do3way = bool(mergeopts) and ctx1b is not None
     if do3way:
-        args = ' '.join(mergeopts)
+        args = mergeopts
     else:
-        args = ' '.join(diffopts)
+        args = diffopts
 
-    def dodiff(tmproot, diffcmd, args):
+    def dodiff(tmproot):
         fns_and_mtime = []
 
         # Always make a copy of ctx1a (and ctx1b, if applicable)
@@ -276,7 +276,7 @@ def visualdiff(ui, repo, pats, opts):
                        plabel1=label1a, plabel2=label1b,
                        ancestor=dira, alabel=labela,
                        clabel=label2, child=dir2)
-        launchtool(diffcmd, diffopts, replace, True)
+        launchtool(diffcmd, args, replace, True)
 
         # detect if changes were made to mirrored working files
         for copy_fn, working_fn, mtime in fns_and_mtime:
@@ -287,7 +287,7 @@ def visualdiff(ui, repo, pats, opts):
 
     def dodiffwrapper():
         try:
-            dodiff(tmproot, diffcmd, args)
+            dodiff(tmproot)
         finally:
             ui.note(_('cleaning up temp directory\n'))
             shutil.rmtree(tmproot)
