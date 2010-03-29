@@ -1736,7 +1736,7 @@ class GStatus(gdialog.GWindow):
         return False
 
 def run(ui, *pats, **opts):
-    showclean = pats and True or False
+    showclean = util.any(os.path.isfile(e) for e in pats)
     rev = opts.get('rev', [])
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
