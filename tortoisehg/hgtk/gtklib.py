@@ -40,6 +40,7 @@ DBLUE = '#000090'
 DYELLOW = '#6A6A00'
 DORANGE = '#AA5000'
 # DORANGE = '#FF8000'
+DGRAY = '#404040'
 
 PRED = '#ffcccc'
 PGREEN = '#aaffaa'

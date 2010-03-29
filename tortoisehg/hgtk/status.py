@@ -924,7 +924,7 @@ class GStatus(gdialog.GWindow):
         elif stat == '?':
             text_renderer.set_property('foreground', gtklib.DORANGE)
         elif stat == 'I':
-            text_renderer.set_property('foreground', '#404040')
+            text_renderer.set_property('foreground', gtklib.DGRAY)
         else:
             text_renderer.set_property('foreground', gtklib.NORMAL)
 
