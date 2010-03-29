@@ -1110,20 +1110,27 @@ class GCommit(GStatus):
         if self.nextbranch:
             # response: 0=Yes, 1=No, 2=Cancel
             if self.nextbranch in self.repo.branchtags():
-                if self.nextbranch in [p.branch() for p in self.repo.parents()]:
-                    response = 0
+                pb = [p.branch() for p in self.repo.parents()]
+                if self.nextbranch in pb:
+                    resp = 0
                 else:
-                    response = gdialog.CustomPrompt(_('Confirm Override Branch'),
-                        _('A branch named "%s" already exists,\n'
-                        'override?') % self.nextbranch, self,
+                    rev = self.repo[self.nextbranch].rev()
+                    resp = gdialog.CustomPrompt(_('Confirm Branch Change'),
+                        _('Named branch "%s" already exists, '
+                          'last used in revision %d\n'
+                          'Yes\t- Make commit restarting this named branch\n'
+                          'No\t- Make commit without changing branch\n'
+                          'Cancel - Cancel this commit') % (self.nextbranch,
+                              rev), self,
                         (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
             else:
-                response = gdialog.CustomPrompt(_('Confirm New Branch'),
-                    _('Create new named branch "%s"?') % self.nextbranch,
+                resp = gdialog.CustomPrompt(_('Confirm New Branch'),
+                    _('Create new named branch "%s" with this commit?') %
+                    self.nextbranch,
                     self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
-            if response == 0:
+            if resp == 0:
                 self.repo.dirstate.setbranch(self.nextbranch)
-            elif response == 2:
+            elif resp == 2:
                 return
         elif self.closebranch:
             cmdline.append('--close-branch')
