@@ -53,16 +53,16 @@ class GShelve(GStatus):
 
     def save_settings(self):
         settings = GStatus.save_settings(self)
-        settings['gshelve'] = self.vpaned.get_position()
+        #settings['gshelve'] = self.vpaned.get_position()
         return settings
 
 
     def load_settings(self, settings):
         GStatus.load_settings(self, settings)
-        if settings:
-            self._setting_vpos = settings['gshelve']
-        else:
-            self._setting_vpos = -1
+        #if settings:
+        #    self._setting_vpos = settings['gshelve']
+        #else:
+        #    self._setting_vpos = -1
 
 
     def get_tbbuttons(self):
@@ -78,11 +78,11 @@ class GShelve(GStatus):
 
     def get_body(self):
         status_body = GStatus.get_body(self)
-        vbox = gtk.VBox()  # For named shelf collection
-        self.vpaned = gtk.VPaned()
-        self.vpaned.add1(vbox)
-        self.vpaned.add2(status_body)
-        self.vpaned.set_position(self._setting_vpos)
+        #vbox = gtk.VBox()  # For named shelf collection
+        #self.vpaned = gtk.VPaned()
+        #self.vpaned.add1(vbox)
+        #self.vpaned.add2(status_body)
+        #self.vpaned.set_position(self._setting_vpos)
         self.activate_shelve_buttons(True)
 
         self.patch_text = gtk.TextView()
@@ -95,7 +95,7 @@ class GShelve(GStatus):
         scroller.add(self.patch_text)
         self.diff_notebook.append_page(scroller, gtk.Label(_('Shelf Contents')))
         self.diff_notebook.show_all()
-        return self.vpaned
+        return status_body
 
     def get_custom_menus(self):
         def shelve(menuitem, files):
