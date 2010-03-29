@@ -271,7 +271,10 @@ class DetectRenameDialog(gtk.Window):
         thread = thread2.Thread(target=self.search_thread, args=(q, tgts))
         thread.start()
         self.stbar.begin()
-        self.stbar.set_text(_('finding source of ') + ', '.join(tgts))
+        text = _('finding source of ') + ', '.join(tgts)
+        if len(text) > 60:
+            text = text[:60]+'...'
+        self.stbar.set_text(text)
         gobject.timeout_add(50, self.search_wait, thread, q)
 
     def search_thread(self, q, tgts):
