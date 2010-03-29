@@ -122,9 +122,6 @@ class GStatus(gdialog.GWindow):
             for opt in self.opts:
                 if opt in self._show_checks and self.opts[opt]:
                     self._show_checks[opt].set_active(True)
-            if self.pats:
-                for name, check in self._show_checks.iteritems():
-                    check.set_sensitive(False)
         self.ready = True
 
 
