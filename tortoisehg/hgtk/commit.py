@@ -1125,8 +1125,10 @@ class GCommit(GStatus):
                         (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
             else:
                 resp = gdialog.CustomPrompt(_('Confirm New Branch'),
-                    _('Create new named branch "%s" with this commit?') %
-                    self.nextbranch,
+                    _('Create new named branch "%s" with this commit?\n'
+                      'Yes\t- Start new branch with this commit\n'
+                      'No\t- Make commit without branch change\n'
+                      'Cancel - Cancel this commit') % self.nextbranch,
                     self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
             if resp == 0:
                 self.repo.dirstate.setbranch(self.nextbranch)
