@@ -885,7 +885,7 @@ class GDialog(gtk.Dialog):
             return # close dialog
         # Cancel button or dialog closing by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if self.cmd.is_alive():
+            if hasattr(self, 'cmd') and self.cmd.is_alive():
                 ret = Confirm(_('Confirm Abort'), [], self,
                               _('Do you want to abort?')).run()
                 if ret == gtk.RESPONSE_YES:
