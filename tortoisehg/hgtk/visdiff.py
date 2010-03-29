@@ -172,7 +172,15 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    if len(toollist) > 1 or cpy:
+    cto = cpy.keys()
+    cfrom = cpy.values()
+    for path in MAR:
+        if path in cto or path in cfrom:
+            hascopies = True
+            break
+    else:
+        hascopies = False
+    if len(toollist) > 1 or hascopies:
         usewin = True
     else:
         preferred = toollist.pop()

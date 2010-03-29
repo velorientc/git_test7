@@ -122,9 +122,6 @@ class GStatus(gdialog.GWindow):
             for opt in self.opts:
                 if opt in self._show_checks and self.opts[opt]:
                     self._show_checks[opt].set_active(True)
-            if self.pats:
-                for name, check in self._show_checks.iteritems():
-                    check.set_sensitive(False)
         self.ready = True
 
 
@@ -927,7 +924,7 @@ class GStatus(gdialog.GWindow):
         elif stat == '?':
             text_renderer.set_property('foreground', gtklib.DORANGE)
         elif stat == 'I':
-            text_renderer.set_property('foreground', gtklib.NORMAL)
+            text_renderer.set_property('foreground', '#404040')
         else:
             text_renderer.set_property('foreground', gtklib.NORMAL)
 
@@ -1737,7 +1734,7 @@ class GStatus(gdialog.GWindow):
         return False
 
 def run(ui, *pats, **opts):
-    showclean = pats and True or False
+    showclean = util.any(os.path.isfile(e) for e in pats)
     rev = opts.get('rev', [])
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
