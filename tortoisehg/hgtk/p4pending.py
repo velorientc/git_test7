@@ -80,7 +80,7 @@ class PerforcePending(gdialog.GDialog):
         revs = [self.repo[hash] for hash in self.pending[curcl]]
         self.cslist.clear()
         self.cslist.update(revs, self.repo)
-        sensitive = not curcl.startswith(_('Submitted'))
+        sensitive = not curcl.endswith('(submitted)')
         self.buttons['submit'].set_property('sensitive', sensitive)
         self.buttons['revert'].set_property('sensitive', sensitive)
         self.curcl = curcl
@@ -102,11 +102,11 @@ class PerforcePending(gdialog.GDialog):
             self.cmd.set_result(_('Failed'), style='error')
 
     def submit(self):
-        assert(not self.curcl.startswith(_('Submitted')))
-        cmdline = ['hg', 'p4submit', '--verbose', self.curcl]
+        assert(self.curcl.endswith('(pending)'))
+        cmdline = ['hg', 'p4submit', '--verbose', self.curcl[:-10]]
         self.execute_command(cmdline)
 
     def revert(self):
-        assert(not self.curcl.startswith(_('Submitted')))
-        cmdline = ['hg', 'p4revert', '--verbose', self.curcl]
+        assert(self.curcl.endswith('(pending)'))
+        cmdline = ['hg', 'p4revert', '--verbose', self.curcl[:-10]]
         self.execute_command(cmdline)
