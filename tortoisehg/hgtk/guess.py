@@ -307,9 +307,10 @@ class DetectRenameDialog(gtk.Window):
 
     def search_wait(self, thread, q):
         canmodel = self.cantree.get_model()
-        while q.qsize():
+        while canmodel and q.qsize():
             source, dest, sim = q.get(0)
-            canmodel.append( [source, hglib.toutf(source), dest, hglib.toutf(dest), sim, True] )
+            canmodel.append( [source, hglib.toutf(source), dest,
+                              hglib.toutf(dest), sim, True] )
         if thread.isAlive():
             return True
         else:
