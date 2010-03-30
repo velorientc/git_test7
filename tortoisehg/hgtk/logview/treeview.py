@@ -354,24 +354,26 @@ class TreeView(gtk.ScrolledWindow):
             self.treeview.set_cursor(row)
             self.treeview.grab_focus()
         elif load:
-            handler, stophandler = None, None
+            handlers = [None, None]
 
             def loaded(dummy):
                 if revid in self.index:
-                    if handler is not None:
-                        self.disconnect(handler)
-                        handler = None
+                    hload = handlers[0]
+                    if hload is not None:
+                        self.disconnect(hload)
+                        handlers[0] = None
                     self.set_revision_id(revid)
                     self.scroll_to_revision(revid)
                 else:
                     self.next_revision_batch(self.batchsize)
             def stopped(dummy):
-                if handler is not None:
-                    self.disconnect(handler)
-                    handler = None
-                if stophandler is not None:
-                    self.disconnect(stophandler)
-                    stophandler = None
+                hload, hstop = handlers
+                if hload is not None:
+                    self.disconnect(hload)
+                    handlers[0] = None
+                if hstop is not None:
+                    self.disconnect(hstop)
+                    handlers[1] = None
                 self.stbar.set_text(_('Changeset not found in current view'))
 
             try:
@@ -382,8 +384,8 @@ class TreeView(gtk.ScrolledWindow):
             except Exception, e:
                 self.stbar.set_text(str(e))
                 return
-            handler = self.connect('batch-loaded', loaded)
-            stophandler = self.connect('revisions-loaded', stopped)
+            handlers[0] = self.connect('batch-loaded', loaded)
+            handlers[1] = self.connect('revisions-loaded', stopped)
             self.next_revision_batch(self.batchsize)
 
     def refresh(self, graphcol, pats, opts):
