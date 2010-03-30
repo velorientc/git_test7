@@ -1,0 +1,41 @@
+********
+Recovery
+********
+
+.. module:: recovery.dialog
+	:synopsis: Dialog used to perform recovery operations
+
+.. figure:: figures/recover.png
+	:alt: Recovery dialog
+
+	Recovery Dialog
+
+The toolbar buttons equate to a Mercurial command
+
+:guilabel:`clean`
+	:command:`hg update --clean` - performs a clean checkout of the
+	current (first) working directory parent revision.  Undoes an
+	aborted or partially completed merge.  This will destroy all
+	changes, please use carefully.  You should shelve any changes you
+	wish to keep before using this command.
+
+
+:guilabel:`rollback`
+	:command:`hg rollback` - undo operation for the most recent
+	repository transaction, which is usually a commit or a pull.  There
+	is no way to know for certain what operation will be rolled back, so
+	only use this in situations where you know what the last transaction
+	was.
+
+
+:guilabel:`recover`
+	:command:`hg recover` - recover from a badly aborted transaction.
+	This is rarely necessary, and Mercurial will inform you if it ever
+	needs to be performed.
+
+
+:guilabel:`verify`
+	:command:`hg verify` - perform a consistency check of the contents of your
+	repository.  Completely safe.
+
+.. vim: noet ts=4

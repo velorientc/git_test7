@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?define thglocales = ca;cs;da;de;en_GB;es;fa;fr;he;hr;it;ja;nl;nn;pl;pt;pt_BR;ru;sv;tr;uk;zh_CN;zh_TW ?>
+    <Fragment>
+        <ComponentGroup Id="thgLocaleFolder">
+            <?foreach LOC in $(var.thglocales) ?>
+                <ComponentRef Id="thg.locale.$(var.LOC)"/>
+            <?endforeach?>
+        </ComponentGroup>
+    </Fragment>
+    <?foreach LOC in $(var.thglocales) ?>
+        <Fragment>
+            <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
+                <Directory Id="thg.locale.$(var.LOC)" Name="$(var.LOC)">
+                    <Directory Id="thg.locale.$(var.LOC).LC_MESSAGES" Name="LC_MESSAGES">
+                        <Component Id="thg.locale.$(var.LOC)" Guid="*">
+                            <File Id="tortoisehg.mo.$(var.LOC)" KeyPath="yes" 
+                                  Source="$(var.SourceDir)\$(var.LOC)\LC_MESSAGES\tortoisehg.mo"
+                            />
+                        </Component>
+                    </Directory>
+                </Directory>
+            </DirectoryRef>
+        </Fragment>
+    <?endforeach?>
+</Wix>

@@ -1,0 +1,52 @@
+Klonování repozitáře
+====================
+
+.. module:: clone.dialog
+	:synopsis: Dialog used to clone a repository
+
+Pro vytvoření věrné kopie repozitáře použijeme proceduru "clone".
+V kontextové nabídce průzkumníka Windows vybereme :menuselection:`TortoiseHg -> Klonovat repo`.
+
+.. figure:: figures/clone.png
+	:alt: Clone dialog
+
+	Dialogové okno Klonovat repozitář
+	
+:guilabel:`Cesta ke zdroji`
+	Cesta k repozitáři (nebo URL), který má být klonován. Pro výběr lokálního adresáře můžeme použít nástroj :guilabel:`Vyhledat...`. 
+:guilabel:`Destinace`
+	Cesta k pracovnímu adresáři, do něhož má být klon uložen.
+
+Pod rozšířenou nabídkou :guilabel:`Pokročilé možnosti` nalezneme:
+
+:guilabel:`Klonovat až k revizi`
+	Můžeme omezit rozsah klonování až po zadanou revizi. Nebudou importovány ani tagy, vytvořené po této revizi.
+:guilabel:`Neaktualizovat novou pracovní složku`
+	Je-li zatrženo, bude do nového pracovního adresáře zkopírována pouze složka **.hg**. Tato volba je užitečná při vytváření centrálního nebo záložního repozitáře klonováním. Komunikaci s takovým repozitářem tvoří nástroje  *push* a *pull*.
+:guilabel:`Použít protokol pull ke kopírování metadat`
+	Nachází-li se zdroj i destinace ve stejném souborovém systému, snaží se Mercurial použít pevné odkazy. Některé souborové systémy, jako např. ASF, používají pevné odkazy nesprávně ale nehlásí chybu. Tuto volbu použijeme, chceme-li se vyhnout pevným odkazům .
+:guilabel:`Použít nekomprimovaný přenos`
+	Pro použití nekomprimovaného transferu (rychlé v LAN).
+:guilabel:`Použít proxy server`
+	Pro použití proxy serveru, nastaveného v :menuselection:`TortoiseHg... -> Globální nastavení -> Proxy`.
+	Volba je použitelná jen je-li proxy server nastaven.
+:guilabel:`Vzdálený příkaz`
+	Nutno určit příkaz Mercurialu, který má být spuštěn na vzdálené straně.
+
+
+Spuštění z příkazového řádku
+----------------------------
+
+::
+
+	hgtk clone
+	
+	alias: cl
+
+Skladba příkazu je ::
+
+	hgtk clone [SOURCE] [DEST]
+
+kde [SOURCE] a [DEST] jsou cesty ke zdrojovému repozitáři a k pracovní složce nového repozitáře.
+
+.. vim: noet ts=4

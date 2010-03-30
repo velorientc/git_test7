@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLDIR">
+            <Directory Id="IconsDirectory" Name="icons">
+                <Component Id='Icons' Guid='{30E997E7-FB02-4d34-AF61-A6FD6C93E268}'>
+                    <File Source="$(var.SourceDir)\branch.ico" KeyPath="yes" />
+                    <File Source="$(var.SourceDir)\detect_rename.ico" />
+                    <File Source="$(var.SourceDir)\fileadd.ico" />
+                    <File Source="$(var.SourceDir)\filedelete.ico" />
+                    <File Source="$(var.SourceDir)\filemodify.ico" />
+                    <File Source="$(var.SourceDir)\general.ico" />
+                    <File Source="$(var.SourceDir)\hg.ico" />
+                    <File Source="$(var.SourceDir)\hg_60.ico" />
+                    <File Source="$(var.SourceDir)\hgB.ico" />
+                    <File Source="$(var.SourceDir)\ignore.ico" />
+                    <File Source="$(var.SourceDir)\menuabout.ico" />
+                    <File Source="$(var.SourceDir)\menuadd.ico" />
+                    <File Source="$(var.SourceDir)\menublame.ico" />
+                    <File Source="$(var.SourceDir)\menucheckout.ico" />
+                    <File Source="$(var.SourceDir)\menuclone.ico" />
+                    <File Source="$(var.SourceDir)\menucommit.ico" />
+                    <File Source="$(var.SourceDir)\menucreaterepos.ico" />
+                    <File Source="$(var.SourceDir)\menudelete.ico" />
+                    <File Source="$(var.SourceDir)\menudiff.ico" />
+                    <File Source="$(var.SourceDir)\menuhelp.ico" />
+                    <File Source="$(var.SourceDir)\menuimport.ico" />
+                    <File Source="$(var.SourceDir)\menulog.ico" />
+                    <File Source="$(var.SourceDir)\menumerge.ico" />
+                    <File Source="$(var.SourceDir)\menupatch.ico" />
+                    <File Source="$(var.SourceDir)\menurelocate.ico" />
+                    <File Source="$(var.SourceDir)\menurepobrowse.ico" />
+                    <File Source="$(var.SourceDir)\menurevert.ico" />
+                    <File Source="$(var.SourceDir)\menurevisiongraph.ico" />
+                    <File Source="$(var.SourceDir)\menusettings.ico" />
+                    <File Source="$(var.SourceDir)\menushowchanged.ico" />
+                    <File Source="$(var.SourceDir)\menusynch.ico" />
+                    <File Source="$(var.SourceDir)\menuunmerge.ico" />
+                    <File Source="$(var.SourceDir)\proxy.ico" />
+                    <File Source="$(var.SourceDir)\python.ico" />
+                    <File Source="$(var.SourceDir)\README.txt" />
+                    <File Source="$(var.SourceDir)\refresh_overlays.ico" />
+                    <File Source="$(var.SourceDir)\settings_repo.ico" />
+                    <File Source="$(var.SourceDir)\settings_user.ico" />
+                    <File Source="$(var.SourceDir)\shelve.ico" />
+                    <File Source="$(var.SourceDir)\thg_logo.ico" />
+                    <File Source="$(var.SourceDir)\thg_logo_92x50.png" />
+                    <File Source="$(var.SourceDir)\TortoiseMerge.ico" />
+                </Component>
+                <Directory Id="SvgDirectory" Name="svg">
+                    <Component Id='SvgIcons' Guid='{7C87CCC7-8377-49c8-ACFD-1F246ED14747}'>
+                        <File Source="$(var.SourceDir)\svg\add.svg" KeyPath="yes" />
+                        <File Source="$(var.SourceDir)\svg\checkout.svg" />
+                        <File Source="$(var.SourceDir)\svg\clone.svg" />
+                        <File Source="$(var.SourceDir)\svg\commit.svg" />
+                        <File Source="$(var.SourceDir)\svg\detect_rename.svg" />
+                        <File Source="$(var.SourceDir)\svg\ignore.svg" />
+                        <File Source="$(var.SourceDir)\svg\init.svg" />
+                        <File Source="$(var.SourceDir)\svg\log.svg" />
+                        <File Source="$(var.SourceDir)\svg\merge.svg" />
+                        <File Source="$(var.SourceDir)\svg\proxy.svg" />
+                        <File Source="$(var.SourceDir)\svg\recovery.svg" />
+                        <File Source="$(var.SourceDir)\svg\refresh_overlays.svg" />
+                        <File Source="$(var.SourceDir)\svg\remove.svg" />
+                        <File Source="$(var.SourceDir)\svg\repobrowse.svg" />
+                        <File Source="$(var.SourceDir)\svg\revert.svg" />
+                        <File Source="$(var.SourceDir)\svg\shelve.svg" />
+                        <File Source="$(var.SourceDir)\svg\status.svg" />
+                        <File Source="$(var.SourceDir)\svg\sync.svg" />
+                        <File Source="$(var.SourceDir)\svg\thg_logo.svg" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+</Wix>

@@ -1,0 +1,68 @@
+#include "windows.h"
+#include "parentid.h"
+
+#ifndef THG_VERSION_FIRST
+/* dummy version for shellext development */
+#define THG_VERSION_FIRST   0
+#define THG_VERSION_SECOND  0
+#define THG_VERSION_THIRD   55555
+#endif
+
+#ifndef THG_VERSION_SECOND
+#define THG_VERSION_SECOND  0
+#endif
+
+#ifndef THG_VERSION_THIRD
+#define THG_VERSION_THIRD   0
+#endif
+
+#ifndef THG_PRODUCT_ID
+#define THG_PRODUCT_ID ?
+#endif
+
+#define TOSTR(x)  #x
+#define TOSTR2(x) TOSTR(x)
+
+#define THG_VERSION_BINARY \
+  THG_VERSION_FIRST, THG_VERSION_SECOND, THG_VERSION_THIRD, 0
+
+#define THG_VERSION_STRING \
+  TOSTR2(THG_VERSION_FIRST) "." \
+  TOSTR2(THG_VERSION_SECOND) "." \
+  TOSTR2(THG_VERSION_THIRD) "-" \
+  TOSTR2(THG_PARENT_ID)
+
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION THG_VERSION_BINARY
+ PRODUCTVERSION THG_VERSION_BINARY
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "TortoiseHg Shell Extension"
+            VALUE "CompanyName", "TortoiseHg Project"
+            VALUE "FileDescription", "TortoiseHg Shell Extension"
+            VALUE "FileVersion", THG_VERSION_STRING
+            VALUE "InternalName", "shellext"
+            VALUE "LegalCopyright", "Copyright (C) 2010 Steve Borho and others"
+            VALUE "OriginalFilename", TOSTR2(THG_SHELL_FNAME)
+            VALUE "ProductName", "TortoiseHg " TOSTR2(THG_PRODUCT_ID)
+            VALUE "ProductVersion", THG_VERSION_STRING
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

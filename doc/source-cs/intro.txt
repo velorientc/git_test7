@@ -1,0 +1,99 @@
+****
+Úvod
+****
+
+.. module:: introduction
+	:synopsis: Introduce TortoiseHg and its various parts
+
+Co je TortoiseHg?
+=================
+
+TortoiseHg je sada grafických nástrojů a extenzí uživatelského rozhraní 
+programu `Mercurial <http://mercurial.selenic.com/wiki/>`_ pro rozptýlenou správu revizí.
+
+Ve Windows
+	se TortoiseHg skládá z extenze uživatelského rozhranní s překryvnými
+	ikonami a kontextovým menu v Průzkumníku a z programu pro příkazový
+	řádek :file:`hgtk.exe` který spouští nástroje TortoiseHg. Protože 
+	jádrem TortoiseHg je Mercurial, lze rovněž používat program pro 
+	příkazový řádek :file:`hg.exe`.  
+
+V Linuxu
+	se TortoiseHg skládá ze skriptu hgtk pro příkazový řádek a z extenze
+	Nautilusu, která poskytuje překryvné ikony a kontextové menu v 
+	průzkumíku souborů.
+	Pro činnost TortoiseHg v Linuxu je potřebná oddělená instalace 
+	programu Mercurial. Binární balíčky TortoiseHg znají Mercurial jako
+	závislou aplikaci, která je obvykle instalována automaticky.
+    
+TortoiseHg je napsán převážně v Pythonu s využitím PyGtk (extenze
+rozhraní Windowsu je významná výjimka). Skript hgtk a dialogy TortoiseHg
+lze použít na jakékoliv platformě, která podporuje PyGtk, včetně Mac OS X.
+
+Instalace TortoiseHg
+====================
+
+V OS Windows
+----------
+
+TortoiseHg je poskytován se snadno použitelným instalačním programem - `viz THg <http://tortoisehg.org>`_.
+Dvojklikem na souboru spustíme instalaci a sledujeme pokyny. O zbytek
+se program postará sám.
+
+Po instalaci je zapotřebí restartovat počítač.
+
+.. note::
+	Máme-li již nainstalovánu starší verzi (<0.8>), budeme požádáni, 
+	abychom před instalací nového programu starší verzi odinstalovali.
+    
+.. note::
+	Máme-li nainstalovánu verzi 0.8 nebo novější, instalační program
+	uzavře obslužnou aplikaci na počátku kopírování souborů.
+ 
+  
+Jazykové nastavení ve Windows
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Uživatelské rozhraní TorotiseHg bylo přeloženo do mnoha jazyků. Jazykové balíčky nejsou potřebné, neboť všechny přeložené jazyky jsou nainstalované. Které to jsou,
+zjistíme nahlédnutím do složky
+:file:`C:\\Program Files\\TortoiseHg\\locale` 
+Potřebný jazyk aktivujeme tak, že k proměnné prostředí ``LANGUAGE`` 
+přiřadíme odpovídající hodnotu, např. pro češtinu to bude ``set LANGUAGE=cs``.
+
+.. note::
+	Jestliže po nastavení proměnné LANGUAGE se standardní prvky GUI 
+	jako je :guilabel:`OK` nebo :guilabel:`Apply` stále ukazují 
+	v angličtině,
+	znamená to, že instalační program neobsahuje pro náš jazyk překlad
+	GTK+. Což je obvykle důsledkem toho, že v době vydání
+	programu nebyla lokalizace do našeho jazyka kompletní.
+    
+Překlad extenze kontextového menu Průzkumníka Windows je řízen z regisrů
+Windows. Překlady pro mnohé lokalizace byly instalovány do 
+:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  
+Na souboru vybrané lokalizace provedeme dvojklik a potvrdíme všechny 
+požadavky.
+
+
+V OS Linux a Mac
+----------------
+
+Debian DEB a RPM balíčky pro systém Fedora lze získat na stránce 
+`wiki <http://bitbucket.org/tortoisehg/stable/wiki/download/>`_.
+
+Instalační DEB balíčky pro Ubuntu lze nalézt 
+`zde <https://launchpad.net/~tortoisehg-ppa>`_.
+
+Pro MacOSX nejsou žádné balíčky k disposici, ale je možné používat
+hgtk a všechny dialogy pomocí instalační metody. Podrobnosti viz
+`MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
+
+Jazykové nastavení v Linuxu
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Nástroje TortoiseHg používají pro lokalizaci svých textů knihovnu
+`gettext <http://docs.python.org/library/gettext.html>`_ Pythonu.
+Pro lokalizaci dialogů se doporučuje nastavení proměnné prostředí
+LANGUAGE na příslušnou hodnotu.
+ 
+.. vim: noet ts=4

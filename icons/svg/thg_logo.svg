@@ -1,0 +1,830 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="100"
+   height="100"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docbase="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG"
+   sodipodi:docname="thg_logo.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3366">
+      <stop
+         style="stop-color:#1f252d;stop-opacity:1;"
+         offset="0"
+         id="stop3368" />
+      <stop
+         style="stop-color:#8c9bb0;stop-opacity:1;"
+         offset="1"
+         id="stop3370" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3893">
+      <stop
+         style="stop-color:#729fcf;stop-opacity:1;"
+         offset="0"
+         id="stop3895" />
+      <stop
+         style="stop-color:#b9cfe7;stop-opacity:1;"
+         offset="1"
+         id="stop3897" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3873">
+      <stop
+         style="stop-color:#4f9a05;stop-opacity:1;"
+         offset="0"
+         id="stop3875" />
+      <stop
+         style="stop-color:#b5ea81;stop-opacity:1;"
+         offset="1"
+         id="stop3877" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3801"
+       inkscape:collect="always">
+      <stop
+         id="stop3803"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1" />
+      <stop
+         id="stop3805"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3563">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3565" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0"
+         offset="1"
+         id="stop3567" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3263">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3265" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3267" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3207">
+      <stop
+         style="stop-color:#1c2f52;stop-opacity:1;"
+         offset="0"
+         id="stop3209" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0"
+         offset="1"
+         id="stop3211" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3207"
+       id="radialGradient3215"
+       cx="135.25655"
+       cy="237.94363"
+       fx="135.25655"
+       fy="237.94363"
+       r="17.294315"
+       gradientTransform="matrix(1.9206889,-0.5952514,0.4482225,1.4462734,-222.50779,-3.4197639)"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       x="-0.073921852"
+       width="1.1478437"
+       y="-0.13688254"
+       height="1.2737651"
+       id="filter3245">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.0345558"
+         id="feGaussianBlur3247" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3263"
+       id="linearGradient3269"
+       x1="138.77478"
+       y1="240.89607"
+       x2="120.65009"
+       y2="239.44398"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <filter
+       inkscape:collect="always"
+       x="-0.090638652"
+       width="1.1812773"
+       y="-0.29311559"
+       height="1.5862312"
+       id="filter3551">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.70848038"
+         id="feGaussianBlur3553" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3563"
+       id="linearGradient3569"
+       x1="145.21049"
+       y1="239.79642"
+       x2="147.4772"
+       y2="230.32625"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <filter
+       inkscape:collect="always"
+       x="-0.17634664"
+       width="1.3526933"
+       y="-0.090942018"
+       height="1.1818841"
+       id="filter3675">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.56643104"
+         id="feGaussianBlur3677" />
+    </filter>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3801"
+       id="radialGradient3799"
+       cx="116.58452"
+       cy="238.6376"
+       fx="116.58452"
+       fy="238.6376"
+       r="6.2167935"
+       gradientTransform="matrix(0.7474576,0.4827389,-0.3525983,0.545952,118.17347,76.264608)"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       x="-0.12314623"
+       width="1.2462925"
+       y="-0.17335643"
+       height="1.3467129"
+       id="filter3861">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.58690859"
+         id="feGaussianBlur3863" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3873"
+       id="linearGradient3871"
+       x1="110.73299"
+       y1="246.05139"
+       x2="103.46745"
+       y2="241.88451"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3873"
+       id="linearGradient3887"
+       x1="150.33246"
+       y1="245.59206"
+       x2="153.4617"
+       y2="244.32936"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3899"
+       x1="150.52632"
+       y1="252.26941"
+       x2="150.24753"
+       y2="251.15334"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3915"
+       x1="152.88489"
+       y1="252.0074"
+       x2="152.50584"
+       y2="250.62347"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3923"
+       x1="154.80414"
+       y1="250.36142"
+       x2="154.42509"
+       y2="249.24535"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3931"
+       x1="140.32919"
+       y1="254.67867"
+       x2="140.03812"
+       y2="253.11617"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3939"
+       x1="137.93027"
+       y1="255.21292"
+       x2="137.58832"
+       y2="253.78435"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3947"
+       x1="134.15059"
+       y1="256.17233"
+       x2="134.27011"
+       y2="254.96698"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3955"
+       x1="109.05109"
+       y1="254.29736"
+       x2="109.05109"
+       y2="252.8688"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3963"
+       x1="112.18076"
+       y1="254.03375"
+       x2="111.75079"
+       y2="252.42661"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3893"
+       id="linearGradient3971"
+       x1="114.79793"
+       y1="253.71906"
+       x2="114.23315"
+       y2="252.2905"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <filter
+       inkscape:collect="always"
+       x="-0.14466302"
+       width="1.289326"
+       y="-0.5060032"
+       height="2.0120063"
+       id="filter4911">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.93716196"
+         id="feGaussianBlur4913" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.13995127"
+       width="1.2799026"
+       y="-0.1497658"
+       height="1.2995316"
+       id="filter5023">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.52462254"
+         id="feGaussianBlur5025" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.091351531"
+       width="1.1827031"
+       y="-0.17482693"
+       height="1.349654"
+       id="filter5063">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.40405715"
+         id="feGaussianBlur5065" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3873"
+       id="linearGradient5079"
+       x1="103.49712"
+       y1="235.01828"
+       x2="103.91125"
+       y2="233.75017"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <filter
+       inkscape:collect="always"
+       x="-0.14084633"
+       width="1.2816926"
+       y="-0.17480762"
+       height="1.3496153"
+       id="filter3308">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.3380205"
+         id="feGaussianBlur3310" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3328">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.34360318"
+         id="feGaussianBlur3330" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3873"
+       id="linearGradient3346"
+       x1="133.64865"
+       y1="250.63817"
+       x2="126.16358"
+       y2="248.6237"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(5.4119643,24.145687)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3366"
+       id="linearGradient3372"
+       x1="164.19093"
+       y1="209.0542"
+       x2="153.48773"
+       y2="197.25838"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(8.4191692,22.343075)" />
+    <filter
+       inkscape:collect="always"
+       x="-0.081502736"
+       width="1.1630055"
+       y="-0.19747992"
+       height="1.3949598"
+       id="filter3443">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.5398498"
+         id="feGaussianBlur3445" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="48.914471"
+     inkscape:cy="72.178133"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="740"
+     inkscape:window-height="658"
+     inkscape:window-x="101"
+     inkscape:window-y="37"
+     showguides="false"
+     height="200px"
+     width="100px"
+     showgrid="false" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>TortoiseHg</dc:title>
+        <dc:date>2007-dec-11</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Peer Sommerlund</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title />
+          </cc:Agent>
+        </dc:rights>
+        <dc:source />
+        <dc:description>Closely resembles TortoiseSVN logo</dc:description>
+        <cc:license
+           rdf:resource="http://artlibre.org/licence.php/lalgb.html" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://artlibre.org/licence.php/lalgb.html">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#ShareAlike" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Bitmaps"
+     style="opacity:1;display:none"
+     transform="translate(-89.535713,-215.00437)">
+    <image
+       style="display:inline"
+       y="203.93361"
+       x="93.178574"
+       id="image2225"
+       height="64"
+       width="84"
+       sodipodi:absref="C:\Documents and Settings\Peer\Skrivebord\tortoise.png"
+       xlink:href="tortoise.png" />
+    <image
+       style="display:inline"
+       xlink:href="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\TortoiseCVS.png"
+       sodipodi:absref="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\TortoiseCVS.png"
+       width="88.785721"
+       height="51.071426"
+       id="image3489"
+       x="90.996773"
+       y="209.09836" />
+  </g>
+  <g
+     inkscape:label="Vector tortoise"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="opacity:1;display:inline"
+     transform="translate(-89.535713,-215.00437)">
+    <path
+       style="opacity:1;fill:url(#linearGradient3887);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 150.08638,269.50119 C 149.32743,270.48226 147.05102,275.02458 150.04399,276.70176 C 151.17233,277.33406 153.83074,277.29966 156.60425,276.98493 C 160.68823,276.5215 160.13355,274.61775 159.75632,271.96513 C 159.43742,269.72266 156.66716,266.38262 156.28409,265.37517 L 150.94767,264.54359 L 150.08638,269.50119 z"
+       id="path3178"
+       sodipodi:nodetypes="csssccc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:#376274;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 157.6441,263.65073 C 155.87067,266.71103 153.30606,271.74608 148.80837,270.87932 L 150.32267,264.27573 L 157.6441,263.65073 z"
+       id="path3180"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:#dfecdf;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 156.75124,253.74002 C 156.75124,253.74002 162.47151,254.58364 163.92026,248.4053 C 164.69742,245.09097 165.59553,242.99893 168.34307,241.4664 C 171.95822,241.192 173.56703,247.13431 177.47002,250.1118 C 178.6409,251.00503 179.60817,252.33839 179.57115,253.16629 C 179.53138,254.05575 178.57306,254.66074 178.00573,255.1316 C 177.1731,255.44792 170.71302,257.06588 169.19184,254.9261 C 169.37233,253.96398 169.65391,253.20423 169.69953,253.2385 C 169.14349,254.0996 168.80028,254.76497 167.64628,255.08708 C 168.6003,255.01137 167.07878,255.0945 168.71085,254.77742 C 170.24933,256.70052 173.28197,256.41042 174.17603,256.48596 C 173.84475,258.41007 171.77471,259.53872 166.84053,258.47216 C 163.47785,263.78196 155.14984,263.97265 151.66196,265.43644 C 151.56751,260.42644 151.06554,255.95913 156.75124,253.74002 z"
+       id="path2233"
+       sodipodi:nodetypes="cscssccccccccc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:#447444;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;filter:url(#filter3328)"
+       d="M 175.19321,247.30194 C 168.27011,248.32597 167.6907,251.49384 165.52612,253.88882 C 162.5763,257.15264 159.84547,259.14675 153.3603,259.94374 C 153.34839,260.991 151.85958,264.08753 151.88071,265.20819 C 155.36859,263.7444 163.70552,263.54924 167.06821,258.23944 C 172.00239,259.306 174.08068,258.19481 174.41196,256.27069 C 173.5179,256.19515 170.48169,256.47503 168.94321,254.55194 C 168.57274,254.62391 168.39828,254.67092 168.28696,254.70819 C 169.10449,254.35121 169.43295,253.7625 169.91196,253.02069 C 169.86634,252.98642 169.59245,253.74608 169.41196,254.70819 C 170.93314,256.84797 177.39183,255.24326 178.22446,254.92694 C 178.79179,254.45608 179.7472,253.84764 179.78696,252.95819 C 179.82398,252.13029 178.86409,250.78893 177.69321,249.89569 C 176.74081,249.16913 175.93488,248.24818 175.19321,247.30194 z M 168.13071,254.80194 C 168.18783,254.83026 168.35772,254.82659 167.88071,254.86444 C 167.97447,254.83827 168.0471,254.83256 168.13071,254.80194 z"
+       id="path3312"
+       sodipodi:nodetypes="cscccccscccssccsc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#a7d2d0;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       id="path2237"
+       sodipodi:cx="170.71428"
+       sodipodi:cy="219.86218"
+       sodipodi:rx="3.2142856"
+       sodipodi:ry="5.3571429"
+       d="M 173.92856,219.86218 A 3.2142856,5.3571429 0 1 1 167.49999,219.86218 A 3.2142856,5.3571429 0 1 1 173.92856,219.86218 z"
+       transform="matrix(1.0318461,0,0,0.9191076,-0.8390154,42.629827)"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:#76b676;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.97681499px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;filter:url(#filter3308)"
+       d="M 169.13071,243.92694 C 165.5767,247.00748 166.76666,254.00493 161.13071,255.33319 C 159.43357,255.37242 154.96601,256.10083 154.75571,259.58319 C 153.009,264.61054 159.2735,261.2153 161.84946,260.39569 C 163.78657,259.82518 168.17842,255.93274 163.72446,256.73944 C 163.34613,255.03626 168.28279,253.54094 169.97303,250.98242 C 175.49403,244.70244 168.71863,256.48131 174.69321,253.86444 C 177.33277,254.12693 178.3412,252.41253 175.72446,251.14569 C 172.02883,249.35931 175.89205,246.9038 173.07269,245.95063 C 172.97136,250.53644 171.221,243.49014 169.13071,243.92694 z"
+       id="neck-reflection"
+       inkscape:label="#path2286"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#000606;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       id="path3168"
+       sodipodi:cx="170.71428"
+       sodipodi:cy="220.66576"
+       sodipodi:rx="0.53571427"
+       sodipodi:ry="1.875"
+       d="M 171.24999,220.66576 A 0.53571427,1.875 0 1 1 170.17856,220.66576 A 0.53571427,1.875 0 1 1 171.24999,220.66576 z"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252"
+       transform="translate(5.4119643,24.145687)" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#a7d2d0;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       id="path2235"
+       sodipodi:cx="166.69643"
+       sodipodi:cy="220.13004"
+       sodipodi:rx="3.6607144"
+       sodipodi:ry="5.5921354"
+       d="M 170.35714,220.13004 A 3.6607144,5.5921354 0 1 1 163.03571,220.13004 A 3.6607144,5.5921354 0 1 1 170.35714,220.13004 z"
+       transform="matrix(0.9694601,0,0,0.9726581,10.060918,30.963562)"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:url(#linearGradient5079);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 112.19767,264.36502 C 111.69607,263.86219 110.76757,262.86831 110.05482,262.31144 C 108.31319,260.95072 107.08688,260.05027 105.41196,259.00787 C 103.6306,257.89923 102.31967,256.68124 102.19768,254.54359 C 105.44196,256.19548 108.78401,256.45767 112.37625,258.11502 C 113.29883,258.54067 114.87625,258.64897 114.87625,259.54359 C 114.87625,260.59904 114.9529,261.53314 114.5191,262.40073 C 114.26781,262.90331 112.73707,263.9335 112.19767,264.36502 z"
+       id="path3170"
+       sodipodi:nodetypes="csscsssc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 114.34053,259.72216 C 118.86942,243.61541 142.20059,235.4138 154.16196,251.50787 C 155.32674,254.73528 148.82695,264.04608 150.23339,267.40073 C 145.16153,268.87616 137.25422,266.87184 131.12625,269.18645 C 131.12625,269.18645 123.44063,266.43768 121.48339,265.0793 C 119.68498,263.83116 113.97256,261.20489 114.34053,259.72216 z"
+       id="path2229"
+       sodipodi:nodetypes="ccccsc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:0;fill:#2a3a2a;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 126.92982,267.66859 C 126.37052,269.77607 124.23761,273.38003 125.41196,274.27573 C 126.42096,275.04531 128.10239,275.37551 129.96553,275.7043 C 131.48338,275.97216 132.56309,273.274 132.91196,271.32931 C 133.2334,269.53754 132.63569,268.96516 132.37624,268.02573 L 126.92982,267.66859 z"
+       id="path3174"
+       sodipodi:nodetypes="cssscc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 125.81375,270.43644 C 125.81375,270.43644 124.8638,273.06961 125.23339,273.42752 C 125.97654,274.14717 127.88964,274.94537 130.05482,275.57037 C 132.22,276.19537 132.32044,276.19537 133.44767,275.83823 C 134.49408,275.5067 134.2066,270.3918 134.2066,270.3918 L 125.81375,270.43644 z"
+       id="path2232"
+       sodipodi:nodetypes="cszzcc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3346);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.94999015px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 133.19177,268.68885 C 131.54101,271.49344 129.58443,273.82047 129.72202,275.63828 C 129.87375,277.64302 131.51933,279.02765 132.20436,279.36849 C 133.16291,279.84542 136.32383,280.61097 140.62559,280.8639 C 144.20048,281.07409 145.73583,279.1024 145.70485,272.7901 C 145.6875,269.25524 144.77365,269.05066 144.77365,269.05066 L 133.19177,268.68885 z"
+       id="path3176"
+       sodipodi:nodetypes="csssscc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:url(#radialGradient3215);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3245)"
+       d="M 116.52874,260.30461 C 116.52874,260.30461 122.08458,249.19294 128.90311,247.04637 C 135.72164,244.89979 140.83376,244.51049 147.96974,248.43532 C 150.49511,249.82429 151.78938,251.3395 151.75781,252.6022 C 151.68489,255.51934 148.60108,256.51654 147.7172,259.42073 C 146.83331,262.32492 145.94943,264.34523 145.94943,264.34523 C 140.23556,265.64852 133.78239,266.57406 129.40817,266.4918 C 125.50224,266.42041 123.09474,261.69358 116.52874,260.30461 z"
+       id="path3205"
+       sodipodi:nodetypes="csssscsc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3871);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 113.49233,263.69537 C 111.5443,265.03613 109.52858,267.23931 108.87341,269.02167 C 108.13675,271.0257 107.68106,275.12857 109.16196,276.46323 C 113.2157,280.11666 116.5106,278.73296 118.51158,278.63007 C 119.90411,278.55847 120.13616,274.83128 120.18874,273.38288 L 120.50124,266.15073 L 113.49233,263.69537 z"
+       id="path3172"
+       sodipodi:nodetypes="csssccc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:0.78000004;fill:url(#radialGradient3799);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3861)"
+       d="M 115.13978,259.92581 C 115.13978,259.92581 115.60021,259.97045 120.39844,262.36956 C 125.19666,264.76867 125.87264,266.11299 126.37772,265.2291 C 126.88279,264.34522 126.5987,261.15693 123.56824,259.13662 C 120.04436,256.78736 118.42278,257.14789 117.03382,258.15804 C 115.64486,259.1682 115.13978,259.79954 115.13978,259.92581 z"
+       id="path3249"
+       sodipodi:nodetypes="cssssc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:#add5d5;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 112.6523,260.52386 C 119.08131,259.06712 123.98031,264.85925 127.48085,266.21386 C 128.95037,266.81747 131.3154,267.19067 133.61727,266.05509 C 137.38537,264.1962 142.67525,265.47618 145.70411,266.49704 C 147.51549,267.10755 149.82343,264.24535 150.45164,260.36263 C 150.97384,257.13509 152.47697,253.88681 153.24362,252.80568 C 154.22099,251.42738 155.1285,250.54606 156.53569,250.74128 C 157.86245,250.92534 158.32054,252.56921 158.53696,252.95876 C 158.04377,253.18304 156.92074,252.66845 156.21104,254.19727 C 155.34623,256.06021 153.26842,261.54837 152.72441,264.56865 C 152.43518,266.17447 150.40049,270.27728 149.23593,270.82422 C 147.23559,271.7637 145.28832,271.59506 143.62625,270.97216 C 137.51915,268.68337 133.476,270.86005 131.56819,271.66478 C 129.71218,272.44766 121.86352,269.13565 120.74743,267.89312 C 118.16912,265.0227 113.17799,263.89559 111.3941,263.56145 C 110.27887,263.35256 110.42486,261.02858 112.6523,260.52386 z"
+       id="path2231"
+       sodipodi:nodetypes="ccssssscssssssss"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#000606;fill-opacity:1;stroke:#000000;stroke-width:0.99995869;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path3166"
+       sodipodi:cx="166.60715"
+       sodipodi:cy="220.57646"
+       sodipodi:rx="0.71428573"
+       sodipodi:ry="2.5"
+       d="M 167.32143,220.57646 A 0.71428573,2.5 0 1 1 165.89286,220.57646 A 0.71428573,2.5 0 1 1 167.32143,220.57646 z"
+       transform="matrix(0.9422741,0,0,0.7309687,15.365001,83.740191)"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:url(#linearGradient3923);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 159.09316,270.26591 C 159.66788,270.2653 160.00125,271.34617 160.29297,271.97178 C 160.8949,273.26265 161.0072,274.82314 160.65898,275.23409 C 160.30999,275.64593 158.80399,275.52525 157.98068,275.49078 C 157.24997,275.46018 157.0925,274.30699 157.05538,273.67112 C 157.09076,272.00092 158.26925,270.26674 159.09316,270.26591 z"
+       id="path5556"
+       sodipodi:nodetypes="cssscs"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:url(#linearGradient3915);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 157.7989,271.46547 C 158.37362,271.46486 158.70699,272.54573 158.99871,273.17134 C 159.60064,274.46221 159.71294,276.0227 159.36472,276.43365 C 159.01573,276.84549 157.50973,276.72481 156.68642,276.69034 C 155.95571,276.65974 155.79824,275.50655 155.76112,274.87068 C 155.7965,273.20048 156.97499,271.4663 157.7989,271.46547 z"
+       id="path5552"
+       sodipodi:nodetypes="cssscs"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:url(#linearGradient3899);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 155.26178,272.1739 C 155.8365,272.17329 156.16987,273.25416 156.46159,273.87977 C 157.06352,275.17064 157.17582,276.73113 156.8276,277.14208 C 156.47861,277.55392 154.97261,277.43324 154.1493,277.39877 C 153.41859,277.36817 153.26112,276.21498 153.224,275.57911 C 153.25938,273.90891 154.43787,272.17473 155.26178,272.1739 z"
+       id="path4466"
+       sodipodi:nodetypes="cssscs"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3931);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:none;stroke-opacity:1"
+       d="M 145.21024,273.5549 C 145.93296,273.69977 147.03886,275.21404 146.97801,278.82665 C 146.96377,279.69425 144.38135,280.24681 144.13694,279.39485 C 143.71234,277.91478 143.83112,273.27847 145.21024,273.5549 z"
+       id="path3525"
+       sodipodi:nodetypes="csss"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3939);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:none;stroke-opacity:1"
+       d="M 142.93741,274.24939 C 143.54054,274.19214 144.73339,277.41475 145.14711,280.02621 C 145.22942,280.54577 143.07313,281.02825 141.04336,280.1209 C 140.38589,279.827 141.51339,274.38455 142.93741,274.24939 z"
+       id="path3523"
+       sodipodi:nodetypes="csss"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3947);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:none;stroke-opacity:1"
+       d="M 140.14106,276.02511 C 140.71271,275.97565 142.89506,278.21485 142.88741,280.63394 C 142.88467,281.50165 137.6147,281.35753 137.36313,280.50766 C 136.92501,279.02759 138.67744,276.15173 140.14106,276.02511 z"
+       id="path3201"
+       sodipodi:nodetypes="csss"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3971);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       d="M 119.59064,272.78383 C 120.16536,272.78322 120.84254,274.25754 120.96902,274.93613 C 121.2138,276.24955 121.50468,277.29642 121.15646,277.70737 C 120.80748,278.11922 119.27952,278.33461 118.47816,278.14263 C 117.74745,277.96757 118.03641,277.09105 117.99929,276.54619 C 118.03467,274.87599 118.76673,272.78466 119.59064,272.78383 z"
+       id="path2230"
+       sodipodi:nodetypes="cssscs"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3963);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       d="M 117.65659,272.73918 C 118.23131,272.73857 118.69113,274.20539 118.76712,274.89147 C 118.87797,275.89239 119.06236,278.08027 118.68669,278.46629 C 118.02521,279.14599 116.72047,278.60246 115.91911,278.41048 C 115.1884,278.23542 115.47736,276.91247 115.44024,276.36761 C 115.47562,274.69741 116.83268,272.74001 117.65659,272.73918 z"
+       id="path2224"
+       sodipodi:nodetypes="cssscs"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:url(#linearGradient3955);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 115.69052,272.66594 C 116.25842,272.5777 116.48848,278.47317 116.14026,278.88412 C 115.79128,279.29597 114.04011,278.79708 113.23875,278.6051 C 112.50804,278.43004 112.59412,277.50727 112.67059,275.98187 C 112.74931,274.41195 114.12803,272.90873 115.69052,272.66594 z"
+       id="path3527"
+       sodipodi:nodetypes="csszs"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:0.87920006;fill:url(#linearGradient3569);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3675)"
+       d="M 153.52558,251.71832 C 153.52558,251.71832 151.12646,251.08698 150.11631,252.2234 C 149.10616,253.35982 145.94943,259.04193 145.82316,261.44104 C 145.69689,263.84015 147.46466,266.4918 147.46466,266.4918 C 150.21483,263.67538 150.96045,259.53707 151.379,256.76908 C 151.68106,254.77149 153.52558,251.46578 153.52558,251.71832 z"
+       id="path3253"
+       sodipodi:nodetypes="csscsc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:0.59999994;fill:url(#linearGradient3269);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3551)"
+       d="M 146.83332,264.21896 C 145.57062,262.95626 141.53002,260.05208 136.22671,261.94612 C 130.92341,263.84015 126.06205,264.8503 126.06205,264.8503 L 132.43864,267.12315 C 132.43864,267.12315 138.62583,263.96642 143.42405,265.86046 C 148.22228,267.75449 147.21212,266.23926 147.96974,265.48165 C 148.72735,264.72403 147.08585,264.34523 146.83332,264.21896 z"
+       id="path3251"
+       sodipodi:nodetypes="csccssc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 151.63154,267.62822 C 153.4019,267.29323 155.10961,266.91647 156.17723,266.11299"
+       id="path3889"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 150.4798,269.47762 C 152.0308,269.47727 153.2035,268.97251 154.40946,268.51211"
+       id="path3891"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:0.50961537;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter4911)"
+       d="M 144.87625,270.97216 C 144.13196,270.96363 142.82659,270.50439 141.84053,270.25787 C 140.59913,269.94752 139.55906,269.36502 138.2691,269.36502 C 136.7422,269.36502 135.43425,269.26459 134.16196,269.90073 C 133.1052,270.42911 132.18815,270.88763 131.30482,271.3293 C 130.66582,271.6488 130.30406,272.54459 129.87625,273.11502 C 129.07443,274.1841 131.62508,273.70459 131.84053,273.65073 C 132.86503,273.39461 133.7788,273.16616 134.69767,272.93644 C 135.73666,272.6767 136.24314,272.40073 137.55482,272.40073 C 138.86434,272.40073 140.17386,272.40073 141.48339,272.40073 C 142.38836,272.40073 143.31425,272.54594 144.16196,272.75787 C 145.56149,273.10776 145.43051,272.08069 144.87625,270.97216 z"
+       id="path3973"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:0.53365383;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter5063)"
+       d="M 120.7691,267.22216 C 121.81014,267.48242 119.05032,265.91634 118.09053,265.43644 C 116.95689,264.86962 116.07735,264.30815 114.87625,264.00787 C 113.55726,263.67813 111.88178,264.19741 111.30482,264.54359 C 109.91647,265.3766 110.10245,265.79359 111.84053,265.79359 C 113.26527,265.79359 114.28555,266.24688 115.59053,266.50787 C 117.21226,266.83222 117.10686,266.7742 118.09053,267.75787 C 118.54601,268.21336 120.10521,269.23684 120.23339,269.36502 C 120.75401,269.88564 120.3903,267.8535 120.7691,267.22216 z"
+       id="path3975"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:0.4375;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter5023)"
+       d="M 156.66196,266.3293 C 157.26308,266.93042 158.7541,268.30627 156.66196,268.8293 C 155.9979,268.99532 154.90549,269.68316 154.34053,270.43644 C 153.71058,271.27638 152.7459,272.34465 151.94564,272.88946 C 150.17031,274.09812 148.42518,274.694 149.5191,274.72216 C 150.30764,274.74246 148.6451,273.19931 148.80482,272.40073 C 149.08217,271.01397 148.65589,270.28952 150.26842,270.28952 C 152.24655,269.698 153.86616,268.02515 155.70758,266.95559 C 156.08723,266.51444 156.36434,266.62692 156.66196,266.3293 z"
+       id="path3977"
+       sodipodi:nodetypes="csssssccc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       d="M 115.54384,267.57771 C 115.97776,268.03222 116.55692,268.78645 117.4,268.85935 C 118.01688,268.91269 118.39094,268.92906 118.81421,268.54999"
+       id="path5067"
+       sodipodi:nodetypes="csc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <path
+       style="opacity:1;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       d="M 115.05771,269.03612 C 115.08354,269.01028 115.89997,269.78871 116.51611,270.09678 C 116.9927,270.33508 117.59844,270.31863 118.23969,270.00839"
+       id="path5069"
+       sodipodi:nodetypes="csc"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+    <text
+       xml:space="preserve"
+       style="font-size:13.41817474px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3372);fill-opacity:1;stroke:#babdb6;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.50555558;font-family:Eras Demi ITC"
+       x="163.03711"
+       y="234.28128"
+       id="text3348"
+       sodipodi:linespacing="125%"
+       transform="matrix(0.9420879,7.4701878e-2,-0.1127702,1.0525301,0,0)"
+       inkscape:transform-center-y="40.093068"
+       inkscape:transform-center-x="56.089936"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252"><tspan
+         sodipodi:role="line"
+         id="tspan3350"
+         x="163.03711"
+         y="234.28128"
+         style="fill:url(#linearGradient3372);fill-opacity:1;stroke:#babdb6;stroke-width:0.30000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.50555558">Hg</tspan></text>
+    <path
+       style="opacity:0.87019228;fill:#2e3436;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;filter:url(#filter3443)"
+       d="M 156.77615,252.92898 C 155.64638,252.98573 154.8501,253.81672 153.9949,255.02273 C 153.22825,256.10386 151.73584,259.32643 151.21365,262.55398 C 150.58544,266.4367 148.27504,269.32074 146.46365,268.71023 C 143.43479,267.68937 138.13801,266.41385 134.3699,268.27273 C 132.06803,269.40831 129.71442,269.03259 128.2449,268.42898 C 124.74436,267.07437 119.83016,261.28474 113.40115,262.74148 C 112.75148,262.88869 112.31079,263.19486 111.9949,263.55398 C 114.07422,263.98336 118.4033,265.0998 120.77615,267.74148 C 121.89224,268.98401 129.73264,272.3056 131.58865,271.52273 C 133.49646,270.718 137.54405,268.54644 143.65115,270.83523 C 145.31322,271.45813 147.24456,271.61846 149.2449,270.67898 C 150.40946,270.13204 152.45567,266.03479 152.7449,264.42898 C 153.28891,261.4087 155.34884,255.91691 156.21365,254.05398 C 156.53179,253.36865 156.94836,253.10619 157.33865,252.99148 C 157.31579,252.98734 157.29955,252.96348 157.27615,252.96023 C 157.10025,252.93583 156.93755,252.92087 156.77615,252.92898 z"
+       id="path3374"
+       inkscape:export-filename="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\thg_logo1.png"
+       inkscape:export-xdpi="211.42252"
+       inkscape:export-ydpi="211.42252" />
+  </g>
+</svg>

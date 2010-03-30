@@ -1,0 +1,67 @@
+
+OBJECTS_DIRSTATE = TortoiseUtils.obj \
+        Direntry.obj \
+        Directory.obj \
+        Winstat.obj \
+        RegistryConfig.obj \
+        ThgDebug.obj
+
+OBJECTS_THGSGELL = $(OBJECTS_DIRSTATE) \
+        InitStatus.obj \
+        CShellExtCMenu.obj \
+        CShellExtOverlay.obj \
+        TortoiseIconBitmap.obj \
+        IconBitmapUtils.obj \
+        Registry.obj \
+        ShellExt.obj \
+        StringUtils.obj \
+        SysInfo.obj \
+        dirstate.obj \
+        Winstat64.obj \
+        Dirstatecache.obj \
+        DirectoryStatus.obj \
+        Thgstatus.obj \
+        QueryDirstate.obj \
+        ThgVersion.obj
+
+OBJECTS_TERMINATE = Thgstatus.obj \
+        RegistryConfig.obj \
+        ThgDebug.obj
+
+LIBS    = shlwapi.lib gdiplus.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Msi.lib
+DEFFILE = ShellExt.def
+
+
+# /MT = statically linked runtime libraries /MD = dynamically linked
+# THG_EXTRA_CPPFLAGS is taken from environment (may be undefined)
+CPPFLAGS         = /nologo /Ox /W2 /EHsc /MT /DAPPMAIN /DTHG_DEBUG $(THG_EXTRA_CPPFLAGS)
+BASE_LDFLAGS     = /nologo /INCREMENTAL:NO /MANIFEST $(LIBS)
+LDFLAGS_THGSHELL = $(BASE_LDFLAGS) /DLL /DEF:$(DEFFILE)
+LDFLAGS_DIRSTATE = $(BASE_LDFLAGS) /SUBSYSTEM:CONSOLE
+LDFLAGS_TERMINATE = $(BASE_LDFLAGS) /DLL /DEF:terminate.def
+
+
+THGSHELL_TARGET = THgShell$(THG_PLATFORM).dll
+TERMINATE_TARGET = terminate-$(THG_PLATFORM).dll
+
+all: $(THGSHELL_TARGET) $(TERMINATE_TARGET)
+
+clean:
+    del *.obj *.dll *.exe *.lib *.exp *.manifest *.res parentid.h ThgCLSIDs.wxi
+
+ThgVersion:
+    create-parentid-h.cmd
+
+$(THGSHELL_TARGET): ThgVersion $(OBJECTS_THGSGELL)
+    cl /EP ThgCLSIDs-template.wxi > ThgCLSIDs.wxi
+    rc /dTHG_SHELL_FNAME="$@" $(THG_EXTRA_RCFLAGS) shellext.rc
+    link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
+    mt -nologo -manifest $@.manifest -outputresource:"$@;#2"
+
+dirstate.exe: dirstate.obj $(OBJECTS_DIRSTATE)
+    link /OUT:$@ $(LDFLAGS_DIRSTATE) $**
+    mt -nologo -manifest $@.manifest -outputresource:"$@;#1"
+
+$(TERMINATE_TARGET): terminate.obj $(OBJECTS_TERMINATE)
+    link /OUT:$@ $(LDFLAGS_TERMINATE) $**
+    mt -nologo -manifest $@.manifest -outputresource:"$@;#1"

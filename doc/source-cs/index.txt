@@ -1,0 +1,29 @@
+
+Vítejte v dokumentaci pro TortoiseHg!
+======================================
+
+Obsah:
+
+.. toctree::
+	:maxdepth: 3
+	:numbered:
+   
+	preface
+	intro
+	quick
+	daily
+	settings
+	recovery
+	patches
+	extensions
+	faq
+	debugging
+   
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+.. vim: noet ts=4

@@ -1,0 +1,11 @@
+#include "ThgCLSIDs.h"
+<Include>
+  <?define CLSID_TortoiseHgCmenu = THG_CLSID_TortoiseHgCmenu ?>
+  <?define CLSID_TortoiseHgNormal = THG_CLSID_TortoiseHgNormal ?>
+  <?define CLSID_TortoiseHgAdded = THG_CLSID_TortoiseHgAdded ?>
+  <?define CLSID_TortoiseHgModified = THG_CLSID_TortoiseHgModified ?>
+  <?define CLSID_TortoiseHgUnversioned = THG_CLSID_TortoiseHgUnversioned ?>
+  <?define OverlayCLSIDList = 
+    THG_CLSID_TortoiseHgNormal;THG_CLSID_TortoiseHgAdded;THG_CLSID_TortoiseHgModified;THG_CLSID_TortoiseHgUnversioned
+  ?>
+</Include>

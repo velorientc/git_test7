@@ -1,0 +1,136 @@
+Datamine
+========
+
+.. module:: datamine.dialog
+	:synopsis: Dialog used to search repository history
+
+The datamine application is used to inspect the revision history of your
+repository.  It is a tabbed application that supports two tab types,
+*Search* and *Annotate*.
+
+
+Search Tabs
+-----------
+
+.. figure:: figures/search.png
+	:alt: Search dialog
+
+	Search tabs
+
+The search tab is used to search (*grep*) through your entire revision
+history for keywords, variable names, functions, etc... 
+
+The text entry fields have these purposes:
+
+	:guilabel:`regexp`
+		Regular expression search criteria.
+	:guilabel:`includes`
+		Comma separated list of paths to include in your search. If no
+		paths are given, the search is assumed to be repository wide. In
+		other words, specifying an include path actually narrows the
+		search criteria.
+	:guilabel:`excludes`
+		Comma separated list of paths to exclude from your search.
+		Exclusion patterns are applied after inclusion patterns.
+
+The toggle buttons below the entry fields are for:
+
+	:guilabel:`Follow copies and renames`
+		follow searches through copies and renames out of inclusion filters
+	:guilabel:`Ignore case`
+		Perform the search without case considerations
+	:guilabel:`Show line numbers`
+		Show line numbers at the front of the matching lines
+	:guilabel:`Show all matching revisions`
+		Show every instance where the search criteria matches in a file,
+		not just the most recent revision.  It shows +/- to indicate
+		whether the change adds or removes your search text.
+
+Search tabs are named after the search string most recently used to
+start a search.  The :guilabel:`New Search` toolbar button will
+obviously open a new search tab while the :guilabel:`Stop` button will
+terminate an ongoing search (the :guilabel:`Stop` button is only
+sensitive when a search is in progress).
+
+Matches
+^^^^^^^
+
+Each match will be a link to a changeset and will have a descriptive
+tooltip (author, date/time, summary).  Right clicking on a matched line
+will bring up a context menu with these features:
+
+	:guilabel:`display change`
+		open a changeset window with this changeset, to see the full context
+	:guilabel:`annotate file`
+		open an annotation tab for this file at this revision
+	:guilabel:`file history`
+		open a changelog window with this file's revision history
+	:guilabel:`view file at revision`
+		open the current file at the specified revision in your favorite
+		text editor.
+
+
+Annotate Tabs
+-------------
+
+.. figure:: figures/annotate.png
+	:alt: Annotate tabs
+
+	Annotate tabs
+
+
+The revision graph has a simple context menu for opening the entire
+changeset in the changeset browser. Activating a row in the revision
+graph updates the file annotation to that revision.
+
+In the bottom pane is the actual annotation. Each line in the annotation
+is also a link to the changeset which provided that line. Activating a
+row will zoom the changelog (top pane) to the changeset that introduced
+that line and change focus to the top pane.
+
+The color scheme in the annotation pane is two dimensional. Authors
+determine hue, and age determines saturation. The older a change, the
+lighter the color.
+
+By right-clicking on the annotate pane's column headers (Line, Rev,
+Source) you can bring up a menu for showing two optional columns:
+:guilabel:`filename` and :guilabel:`user`.
+
+Following Renames
+^^^^^^^^^^^^^^^^^
+
+The annotation data will automatically follow lines of code back through
+copies and renames to find the initial changeset that introduced the
+line.  The graph log pane will also attempt to follow renames and
+copies, so some lines in the graph may correlate to different filenames
+than the original annotated file path.  Renames are indicated in the
+graph by color changes within a column.
+
+Configurables
+^^^^^^^^^^^^^
+
+The annotate tabs support the following configurations defined primarily
+for other tools:
+
+:menuselection:`Changelog --> Author Coloring`
+	Give each author a separate color in the changelog graph
+:menuselection:`Changelog --> Long Summary`
+	Concatenates lines of commit message together to reach an 80
+	character summary.
+:menuselection:`TortoiseHg --> Tab width`
+	Number of spaces to expand tabs in diffs and annotate output
+
+From command line
+-----------------
+
+The datamine tool can be started from command line ::
+
+	hgtk datamine
+
+	aliases: annotate, blame
+
+	repository search and annotate tool
+
+	use "hgtk -v help datamine" to show global options
+
+.. vim: noet ts=4

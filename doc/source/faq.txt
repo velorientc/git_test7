@@ -1,0 +1,184 @@
+**************************
+Frequently Asked Questions
+**************************
+
+
+*What is TortoiseHg?*
+
+	A Windows shell extension for the Mercurial revision control system,
+	similar to the Tortoise clients for Subversion and CVS. It also
+	includes an hgtk application for command line use on many platforms.
+
+*What comes included in the TortoiseHg binary installer for Windows?*
+
+	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
+	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
+	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
+	five bonus extensions: hgfold, hgcr-gui, perfarce, hgeol, mercurial-keyring.
+	python-svn for hgsubversion and convert extensions
+	dulwich for hg-git use.
+	See :file:`extension-versions.txt` in installer root for more details
+
+*Is Mercurial on Windows compatible with the index service and virus scanners?*
+
+	No. Like TortoiseSVN, `we recommend <http://www.selenic.com/pipermail/mercurial/2010-January/029680.html>`_
+	to turn off the indexing service on the working copies and repositories,
+	and exclude them from virus scans.
+
+*How can I get translations for the Explorer context menu?*
+
+	The available translations were stored by the installer under
+	:file:`C:\\Program Files\\TortoiseHg\\i18n\\cmenu`.  Select the
+	locale you would like to use, double-click on it, and confirm all
+	requests.
+
+*Can I configure the toolbars in TortoiseHg applications?*
+
+	TortoiseHg dialogs are PyGtk applications, so they can be configured by
+	modifying the gtkrc file that is installed as
+	:file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`::
+
+		gtk-toolbar-icon-size = GTK_ICON_SIZE_LARGE_TOOLBAR
+		# Pick an icon size from:
+		# GTK_ICON_SIZE_MENU
+		# GTK_ICON_SIZE_SMALL_TOOLBAR
+		# GTK_ICON_SIZE_LARGE_TOOLBAR   (default)
+		# GTK_ICON_SIZE_BUTTON
+		# GTK_ICON_SIZE_DND
+		# GTK_ICON_SIZE_DIALOG
+		gtk-toolbar-style = GTK_TOOLBAR_BOTH
+		# Pick a toolbar style from:
+		# GTK_TOOLBAR_ICONS
+		# GTK_TOOLBAR_TEXT
+		# GTK_TOOLBAR_BOTH              (default)
+		# GTK_TOOLBAR_BOTH_HORIZ
+
+	These settings are applied globally to all TortoiseHg applications.
+
+*How do I do merges and arbitrary version checkouts?*
+
+	Merges and updates are intended to be done within the
+	:guilabel:`Repository Explorer`, using changeset context menus
+
+*How do I use TortoiseHg's shelve extension from the hg command line?*
+	
+	Enable the extension in your Mercurial.ini file::
+
+		[extensions]
+		tortoisehg.util.hgshelve=
+
+*Why can't I connect to an ssh server (TortoisePlink.exe* ``...cannot execute specified...`` *error message)?*
+
+	See `ssh <http://bitbucket.org/tortoisehg/stable/wiki/ssh>`_.
+
+
+*Why can't I connect to an ssh server (remote: bash: <server name>: command not found)?*
+
+	TortoisePlink (and basic Plink) will try to use the :guilabel:`Host
+	Name` configured in Putty under the :guilabel:`Default Settings`.
+	It adds this host name to its command line parameters, causing the
+	hostname to be specified twice, causing this particular error.
+	Clearing the host name from the :guilabel:`Default Settings` is a
+	possible workaround.
+
+*How can I use tool X as my visual diff tool?*
+
+	Since version 1.0, TortoiseHg should autodetect most popular visual
+	diff tools and make them available for selection from the
+	:guilabel:`Visual Diff Tool` item in the settings tool.
+
+*I'm a CLI user, how do I disable the shell extension (overlay icons and context menus)?*
+
+	Simply ask the installer to remove the shell extension entirely.
+
+*How is TortoiseHg configured?*
+
+	TortoiseHg gets configuration settings from two systems.
+
+	1. The Mercurial configuration system, which is three-tiered
+		1. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
+		2. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
+		3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\\.hg\\hgrc`
+	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
+	   (window positions, etc)
+
+	These are some of the configurables that are stored the Mercurial
+	configuration system. ::
+	
+		[tortoisehg]
+		vdiff = vdiff
+		editor = gvim
+		tabwidth = 4
+		longsummary = True
+		graphlimit = 500
+		authorcolor = True
+		authorcolor.steve = blue
+
+*Is it possible to change fonts?*
+
+	In some cases, yes. The gtools based dialogs (commit, status,
+	shelve) allow some font configuration. ::
+
+		[gtools]
+		# font used in changeset viewer and commit log text
+		fontcomment = courier 10
+		# font used for diffs in status and commit tools
+		fontdiff = courier 10
+		# font used in file lists in status and commit tools
+		fontlist = courier 9
+		# font used in command output window
+		fontlog = courier 10
+
+*How do I switch GTK themes?*
+
+	You can download new themes and copy them into the
+	:file:`gtk\\share\\themes` directory of your install and then enable
+	them in :file:`gtk\\etc\\gtk-2.0\\gtkrc`.
+
+*Where do TortoiseHg extensions look for external Python modules on Windows?*
+
+	TortoiseHg includes an entire Python distribution bundled up as
+	DLLs. The standard library modules are all in the
+	:file:`library.zip` file in :file:`C:\\Program Files\\TortoiseHg`.
+
+	If you try to use an extension that imports a non-standard Python
+	module, you will find that the extension will fail to load because
+	it can't find the module. For example the ReviewBoard extension
+	imports the simplejson module, which is not part of the standard
+	Python distribution.
+
+	In order to make it work you need to add a couple of lines to the
+	top of the extension's .py file, before the line that imports the
+	foreign module::
+
+		import sys
+		sys.path.append(r'C:\path\to\module')
+
+	Note that this will not work for modules distributed as .egg files;
+	the supplied path must contain the module's .py or .pyc files.
+
+	If you have many extensions and/or hooks that all share the same
+	Python package, you can create an extension which explicitly
+	modifies sys.path for all the others.  Simply name the extension
+	such that it is loaded first (alphabetically).  Something like::
+
+		[extensions]
+		00setSysPath = C:\path\to\setsyspath.py
+
+*How do I fix odd characters in dialogs?*
+
+	The default font of the MS-Windows theme may cause problems in some
+	environments.  In order to fix this issue, add following setting to
+	TortoiseHg's :file:`gtkrc` file::
+
+		style "msw-default"
+		{
+		font_name = "MS UI Gothic 9"
+		}
+
+	You can find :file:`gtkrc` file in your TortoiseHg install directory:
+	i.e. :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
+
+	Also see the :guilabel:`Fonts` page of the settings tool
+
+.. vim: noet ts=4

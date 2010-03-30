@@ -1,0 +1,59 @@
+Rename Guessing
+===============
+
+.. module:: guess.dialog
+	:synopsis: Dialog used to detect copies and/or renames
+
+.. figure:: figures/guess.jpg
+	:alt: Rename guessing dialog
+
+	Rename Guessing Dialog
+
+This dialog is used to find renames, moves, and/or copies that were done
+without Mercurial's knowledge.  The dialog can be launched from the
+shell context menu, or from the status or commit tools via the context
+menu of an unknown file.
+
+Follow these steps:
+
+1) select one or more of the :guilabel:`Unrevisioned Files`
+2) slide the simularity bar to the percentage match you desire
+3) press either :guilabel:`Find Renames` or :guilabel:`Find Copies`.
+4) select candidate matches and accept good matches
+5) repeat until all unrevisioned files are matched
+
+Find Renames
+------------
+
+This feature will search the repository for missing files (files which
+were revisioned but are now gone).  For each missing file, it compares
+the last revisioned data against the unrevisioned file and if the
+percentage of matching lines is above the
+:guilabel:`Minimum Simularity Percentage`, it adds the pair to the
+:guilabel:`Candidate Matches`.
+
+Find Copies
+-----------
+
+This feature will check every revisioned file in the repository to see
+if it exactly matches the unrevisioned file.
+
+Candidate Matches
+-----------------
+
+When you select a match in this list, the differences between the two
+files are shown in the bottom pane.  Pressing :guilabel:`Accept Match`
+will record the rename or copy event with Mercurial.
+
+From command line
+-----------------
+
+The guess tool can be started from command line::
+
+	hgtk guess
+
+	guess previous renames or copies
+
+	use "hgtk -v help guess" to show global options
+
+.. vim: noet ts=4

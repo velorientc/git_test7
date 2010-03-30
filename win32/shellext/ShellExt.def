@@ -1,0 +1,8 @@
+; shellext: Declares the module parameters for the DLL.
+
+LIBRARY      THGSHELL
+
+EXPORTS
+    DllCanUnloadNow		PRIVATE 
+    DllGetClassObject	PRIVATE 
+

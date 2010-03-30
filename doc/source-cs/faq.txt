@@ -1,0 +1,234 @@
+**************************
+Frequently Asked Questions
+**************************
+
+
+*Co je TortoiseHg?*
+
+	A Windows shell extension for the Mercurial revision control system,
+	similar to the Tortoise clients for Subversion and CVS. It also
+	includes an hgtk application for command line use on many platforms.
+
+*Co je součástí binární instalace TortioseHg pro Windows?*
+
+	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
+	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
+	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
+	and two bonus extensions: hgfold, hgcr-gui.
+
+*Jak lze získat překlady kontextového menu Exploreru?*
+
+	Dostupné překlady jsou při instalaci uloženy ve složce
+	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  Poklepem na zvýrazněném souboru :file:`thg-cmenu-cs.reg` aktivujte dva dotazy, které potvrďte.
+
+*Jak provádět sloučení a výběr libovolných verzí?*
+
+	Merges and updates are intended to be done from within the Changelog
+	tool (:guilabel:`Repository Explorer` menu option)
+
+*Jak se vyrovnat s varováním* ``failed to import extension hgext.hgconfig...`` **
+
+	Upgrading to release 0.7.2 or later should fix these warnings, but
+	there are further complications on Vista.  See
+	`issue #135 <http://bitbucket.org/tortoisehg/stable/issue/135/>`_.
+
+*Jak použít extenzi TortoiseHg pro akci 'hg shelve' z příkazového řádku?*
+	
+	Enable the extension in your Mercurial.ini file::
+
+		[extensions]
+		tortoisehg.util.hgshelve=
+
+
+*Jak lze použít Qct v TortoiseHg?*
+
+	In 0.9, we have dropped support for external commit tools.  Sorry.
+
+*Jak lze použít hgk (hg view) v TortoiseHg?*
+
+	Download `tclkit <http://www.equi4.com/tclkit>`_ and place it in
+	your TortoiseHg directory.  Download the
+	`hgk <http://www.selenic.com/repo/hg/raw-file/tip/contrib/hgk>`_ script
+	from the Mercurial repository and place it in your
+	:file:`TortoiseHg\\contrib` directory. Create an :file:`hgk.cmd` file
+	and place it in :file:`TortoiseHg\\scripts`. This file should
+	contain ::
+
+		@set HG=C:\Program Files\TortoiseHg\hg.exe
+		@"C:\Program Files\TortoiseHg\tclkit-win32.exe" "C:\Program Files\TortoiseHg\contrib\hgk" %*
+ 
+	Then enable hgk in your :file:`Mercurial.ini`
+	file::
+
+		[extensions]
+		hgk =
+
+		[hgk]
+		path=C:\Program Files\TortoiseHg\scripts\hgk.cmd
+		vdiff=vdiff
+
+	This allows you launch :command:`hg view` from the command line.
+
+*Jak mohu použít WinMerge jako svůj vizuální diffový nástroj?*
+
+	Add these lines to your personal :file:`Mercurial.ini` file ::
+
+		[extdiff]
+		cmd.winmerge = C:\Program Files\WinMerge\WinMerge.exe
+		opts.winmerge = /e /x /ub /wl
+
+	Now run the :guilabel:`Global Settings` tool. On the
+	:guilabel:`TortoiseHg` tab, you should see :guilabel:`winmerge`
+	available in the drop-down list for :guilabel:`Visual Diff Command`.
+	Select :guilabel:`winmerge`, apply, then close.
+
+	This same approach can be used to add nearly any visual diff tool,
+	but be aware that your diff tool must be able to support directory
+	diffs if it is to be used by TortoiseHg, unless you are using
+	release 0.8 or later.
+
+*Jak mohu použít Araxis Merge jako svůj vizuální diffový a slučovací nástroj?*
+
+	Add these lines to your personal :file:`Mercurial.ini` file ::
+
+		[extdiff]
+		cmd.araxis=C:\Program Files\Araxis\Araxis Merge\compare.exe
+		opts.araxis=/wait
+
+		[merge-tools]
+		araxis.executable=C:\Program Files\Araxis\Araxis Merge\AraxisP4WinMrg.exe
+		araxis.priority=1
+		araxis.args=$base $other $local $output
+		araxis.gui=True
+
+	If you're on a 64 bit OS, append (x86) to Program Files.
+
+	Now run the :guilabel:`Global Settings` tool. On the
+	:guilabel:`TortoiseHg` tab, you should see :guilabel:`araxis`
+	available in the drop-down list for :guilabel:`Three-way Merge Tool`
+	and :guilabel:`Visual Diff Command`.  Select :guilabel:`araxis` for
+	both, then close.
+
+*Užívám-li CLI, jak mohu vypnout extenze shellu (překryvné ikony a kontextová menu)?*
+
+	You can disable overlays via the taskbar options menu.  The only way
+	to disable the context menu is to rename :file:`ThgShell.dll` in
+	your install directory and then restart explorer (this completely
+	disables the shell extension).
+
+*Jak je TortoiseHg konfigurován?*
+
+	TortoiseHg gets configuration settings from two systems.
+
+	1. The Mercurial configuration system, which is three-tiered
+		1. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
+		2. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
+		3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\.hg\hgrc`
+	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
+	   (window positions, etc)
+
+	These are some of the configurables that are stored the Mercurial
+	configuration system. ::
+	
+		[tortoisehg]
+		vdiff = vdiff
+		editor = gvim
+		tabwidth = 4
+		longsummary = True
+		graphlimit = 500
+		authorcolor = True
+		authorcolor.steve = blue
+
+*Je možné změnit fonty?*
+
+	In some cases, yes. The gtools based dialogs (commit, status,
+	shelve) allow some font configuration. ::
+
+		[gtools]
+		# font used in changeset viewer and commit log text
+		fontcomment = courier 10
+		# font used for diffs in status and commit tools
+		fontdiff = courier 10
+		# font used in file lists in status and commit tools
+		fontlist = courier 9
+
+*Jak přepnu GTK témata?*
+
+	In 0.7, the theme was selectable at install time.  For later
+	releases, you can still do this manually.
+
+		* cd :file:`C:\\Program Files\\TortoiseHg\\gtk\\share\\themes`
+		* look at the themes in this directory, remember their names or
+		  keep this folder open.
+		* :command:`cd ..\\..\\etc\\gtk-2.0`
+		* edit :file:`gtkrc` and change the name of the theme you wish to use
+		* Vista may try to prevent you from editing the file directly. I work
+		  around this by copying to your desktop, editing it there, then
+		  copying it back (and answering all the security dialogs)
+		* Changes immediately take affect on all newly launched applications
+
+	You also should be able to download new themes and copy them into
+	the :file:`gtk\\share\\themes` directory and then enable them in your
+	:file:`gtkrc`.
+
+*After uninstalling, it left a bunch of DLL and PYD files behind.*
+
+	Reboot, like the uninstaller told you to :-) The uninstaller marked
+	those files for removal at the next boot since most of them could
+	not be removed while your system was running.
+
+*Jak lze konvertovat repozitář SVN na Mercurial?*
+
+	You must install svn-win32-1.6 command line tools, then add them to
+	your path. Then you must enable the
+	`convert <http://mercurial.selenic.com/wiki/ConvertExtension>`_
+	extension. At this point, you should be able to use the
+	:command:`hg convert` command to do the conversion. Please direct
+	problems/questions about the convert extension to the Mercurial
+	mailing list or #mercurial on irc.freenode.net.
+
+	Alternatively, you can use the hgsubversion extension.
+
+	Refer to
+	`Converting Repositories <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
+	page for more details.
+
+*Kde vyhledávají extenze TortoiseHg externí moduly Pythonu ve Windows?*
+
+	TortoiseHg includes an entire Python distribution bundled up as
+	DLLs. The standard library modules are all in the
+	:file:`library.zip` file in :file:`C:\\Program Files\\TortoiseHg`.
+
+	If you try to use an extension that imports a non-standard Python
+	module, you will find that the extension will fail to load because
+	it can't find the module. For example the ReviewBoard extension
+	imports the simplejson module, which is not part of the standard
+	Python distribution.
+
+	In order to make it work you need to add a couple of lines to the
+	top of the extension's .py file, before the line that imports the
+	foreign module::
+
+		import sys
+		sys.path.append(r'C:\path\to\module')
+
+	Note that this will not work for modules distributed as .egg files;
+	the supplied path must contain the module's .py or .pyc files.
+
+*Jak se vypořádat se zvláštními znaky v dialogu?*
+
+	Since 0.8, we no longer distribute multiple themes and switched
+	default theme to MS-Windows.  As a result, it might causes an issue
+	related default font of MS-Windows theme in some environments.  In
+	order to fix this issue, add following setting to TortoiseHg's
+	:file:`gtkrc` file::
+
+		style "msw-default"
+		{
+		font_name = "MS UI Gothic 9"
+		}
+
+	You can find :file:`gtkrc` file in your TortoiseHg install directory:
+	i.e. :file:`C:\\Program Files\\TortoiseHg\\gtk\\etc\\gtk-2.0\\gtkrc`
+
+.. vim: noet ts=4

@@ -1,29 +1,56 @@
-# Trivial Mercurial plugin for Nautilus
+# TortoiseHg plugin for Nautilus
 #
-# Copyright (C) 2007 Steve Borho
+# Copyright 2007 Steve Borho
 #
-# Stolen mercilessly from nautilus-bzr, thanks guys
-# Copyright (C) 2006 Jeff Bailey
-# Copyright (C) 2006 Wouter van Heyst
-# Copyright (C) 2006 Jelmer Vernooij
-#
-# Published under the GNU GPL
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
-import gconf
 import gtk
 import gobject
-from mercurial import hg, ui, util, repo
-from mercurial.node import short
 import nautilus
+import gnomevfs
 import os
-import subprocess
 import sys
-import tempfile
-import time
+
+try:
+    from mercurial import demandimport
+except ImportError:
+    # workaround to use user's local python libs
+    userlib = os.path.expanduser('~/lib/python')
+    if os.path.exists(userlib) and userlib not in sys.path:
+        sys.path.append(userlib)
+    from mercurial import demandimport
+demandimport.enable()
+
+import subprocess
 import urllib
 
-TORTOISEHG_PATH = '~/tools/tortoisehg-dev'
-TERMINAL_KEY = '/desktop/gnome/applications/terminal/exec'
+from mercurial import hg, ui, match, util, error
+from mercurial.node import short
+
+def _thg_path():
+    # check if nautilus-thg.py is a symlink first
+    pfile = __file__
+    if pfile.endswith('.pyc'):
+        pfile = pfile[:-1]
+    path = os.path.dirname(os.path.dirname(os.path.realpath(pfile)))
+    thgpath = os.path.normpath(path)
+    testpath = os.path.join(thgpath, 'tortoisehg')
+    if os.path.isdir(testpath) and thgpath not in sys.path:
+        sys.path.insert(0, thgpath)
+_thg_path()
+
+from tortoisehg.util import paths, debugthg, cachethg
+from tortoisehg.hgtk import gtklib
+
+if debugthg.debug('N'):
+    debugf = debugthg.debugf
+else:
+    debugf = debugthg.debugf_No
+
+
+nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
+
 
 class HgExtension(nautilus.MenuProvider,
                   nautilus.ColumnProvider,
@@ -31,458 +58,261 @@ class HgExtension(nautilus.MenuProvider,
                   nautilus.PropertyPageProvider):
 
     def __init__(self):
-        self.cacherepo = None
-        self.cacheroot = None
-        self.client = gconf.client_get_default()
-        thgpath = os.environ.get('TORTOISEHG_PATH',
-                os.path.expanduser(TORTOISEHG_PATH))
-        os.environ['TORTOISEHG_PATH'] = thgpath
-        os.environ['THG_ICON_PATH'] = os.path.join(thgpath, 'icons')
-        self.hgproc = os.path.join(thgpath, 'hgproc.py')
-        self.ipath = os.path.join(thgpath, 'icons', 'tortoise')
+        self.scanStack = []
+        self.allvfs = {}
+        self.inv_dirs = set()
+
+        from tortoisehg.util import menuthg
+        self.hgtk = paths.find_in_path('hgtk')
+        self.menu = menuthg.menuThg()
+        self.notify = os.path.expanduser('~/.tortoisehg/notify')
+        try:
+            f = open(self.notify, 'w')
+            f.close()
+            ds_uri = gnomevfs.get_uri_from_local_path(self.notify)
+            self.gmon = gnomevfs.monitor_add(ds_uri,
+                      gnomevfs.MONITOR_FILE, self.notified)
+        except (gnomevfs.NotSupportedError, IOError), e:
+            debugf('no notification because of %s', e)
+            self.notify = ''
 
     def icon(self, iname):
-        return os.path.join(self.ipath, iname)
+        return paths.get_tortoise_icon(iname)
 
-    def get_path_for_vfs_file(self, vfs_file):
+    def get_path_for_vfs_file(self, vfs_file, store=True):
         if vfs_file.get_uri_scheme() != 'file':
             return None
-        return urllib.unquote(vfs_file.get_uri()[7:])
+        path = urllib.unquote(vfs_file.get_uri()[7:])
+        if vfs_file.is_gone():
+            self.allvfs.pop(path, '')
+            return None
+        if store:
+            self.allvfs[path] = vfs_file
+        return path
 
-    def clear_cached_repo(self):
-        self.cacheroot = None
-        self.cacherepo = None
+    def get_vfs(self, path):
+        vfs = self.allvfs.get(path, None)
+        if vfs and vfs.is_gone():
+            del self.allvfs[path]
+            return None
+        return vfs
 
     def get_repo_for_path(self, path):
         '''
         Find mercurial repository for vfs_file
         Returns hg.repo
         '''
-        p = os.path.isdir(path) and path or os.path.dirname(path)
-        while not os.path.isdir(os.path.join(p, ".hg")):
-            oldp = p
-            p = os.path.dirname(p)
-            if p == oldp:
-                return None
-
-        if p == self.cacheroot:
-            return self.cacherepo
-        # Keep one repo cached
+        p = paths.find_root(path)
+        if not p:
+            return None
         try:
-            self.cacheroot = p
-            self.cacherepo = hg.repository(ui.ui(), path=p)
-            return self.cacherepo
-        except repo.RepoError:
-            self.cacheroot = None
-            self.cacherepo = None
+            return hg.repository(ui.ui(), path=p)
+        except error.RepoError:
+            return None
+        except StandardError, e:
+            debugf(e)
             return None
 
-    def _open_terminal_cb(self, window, vfs_file):
-        path = self.get_path_for_vfs_file(vfs_file)
-        if path is None:
-            return
-        os.chdir(path)
-        terminal = self.client.get_string(TERMINAL_KEY)
-        os.system('%s &' % terminal)
-
-    def _about_cb(self, window, vfs_file):
-        self._run_dialog('about', [vfs_file])
-
-    def _add_cb(self, window, vfs_files):
-        self._run_dialog('add', vfs_files)
-        self.clear_cached_repo()
-
-    def _clone_cb(self, window, vfs_file):
-        self._run_dialog('clone', [vfs_file])
-
-    def _commit_cb(self, window, vfs_files):
-        self._run_dialog('commit', vfs_files)
-        self.clear_cached_repo()
-
-    def _datamine_cb(self, window, vfs_files):
-        self._run_dialog('datamine', vfs_files)
-
-    def _diff_cb(self, window, vfs_files):
-        path = self.get_path_for_vfs_file(vfs_files[0])
-        if path is None:
-            return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            return
-        diffcmd = repo.ui.config('tortoisehg', 'vdiff', None)
-        if diffcmd is None:
-            self._run_dialog('diff', vfs_files)
-        else:
-            cmdline = ['hg', diffcmd]
-            cwd = os.path.isdir(path) and path or os.path.dirname(path)
-            paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
-            subprocess.Popen(cmdline + paths, shell=False, cwd=cwd)
-
-    def _history_cb(self, window, vfs_files):
-        self._run_dialog('history', vfs_files)
-        self.clear_cached_repo()
-
-    def _init_cb(self, window, vfs_file):
-        self._run_dialog('init', [vfs_file])
-
-    def _recovery_cb(self, window, vfs_file):
-        self._run_dialog('recovery', [vfs_file])
-        self.clear_cached_repo()
-
-    def _revert_cb(self, window, vfs_files):
-        self._run_dialog('revert', vfs_files)
-        self.clear_cached_repo()
-
-    def _serve_cb(self, window, vfs_file):
-        self._run_dialog('serve', [vfs_file], filelist=False)
-
-    def _status_cb(self, window, vfs_file):
-        self._run_dialog('status', [vfs_file])
-
-    def _sync_cb(self, window, vfs_file):
-        self._run_dialog('synch', [vfs_file], filelist=False)
-        self.clear_cached_repo()
-
-    def _thgconfig_repo_cb(self, window, vfs_file):
-        self._run_dialog('config', [vfs_file])
-
-    def _thgconfig_user_cb(self, window, vfs_file):
-        self._run_dialog('config', [vfs_file], filelist=False)
-
-    def _unmerge_cb(self, window, vfs_file):
-        self._run_dialog('checkout', [vfs_file], filelist=False,
-                extras=['--', '--clean', str(self.rev0)])
-        self.clear_cached_repo()
-
-    def _run_dialog(self, hgcmd, vfs_files, filelist=True, extras=[]):
+    def run_dialog(self, menuitem, hgtkcmd, cwd = None):
         '''
-        hgcmd - hgproc subcommand
-        vfs_files - directory, or list of selected files
-        filelist  - bool for whether to generate file list for hgproc
+        hgtkcmd - hgtk subcommand
         '''
-        paths = [self.get_path_for_vfs_file(f) for f in vfs_files]
-        if paths[0] is None:
-            return
-
-        path = paths[0]
-        repo = self.get_repo_for_path(path)
-        cwd = os.path.isdir(path) and path or os.path.dirname(path)
-
-        if repo is not None:
-            root = repo.root
+        if cwd: #bg
+            self.files = []
         else:
-            root = cwd
+            cwd = self.cwd
+        repo = self.get_repo_for_path(cwd)
 
-        cmdopts  = [sys.executable, self.hgproc]
-        cmdopts += ['--root', root]
-        cmdopts += ['--cwd', cwd]
-        cmdopts += ['--command', hgcmd]
+        cmdopts = [sys.executable, self.hgtk, hgtkcmd]
 
-        if filelist:
-            # Use temporary file to store file list (avoid shell command
-            # line limitations)
-            fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
-            os.write(fd, "\n".join(paths))
-            os.close(fd)
-            cmdopts += ['--listfile', tmpfile, '--deletelistfile']
-        cmdopts.extend(extras)
+        if hgtkcmd not in nofilecmds and self.files:
+            pipe = subprocess.PIPE
+            cmdopts += ['--listfile', '-']
+        else:
+            pipe = None
 
-        subprocess.Popen(cmdopts, cwd=cwd, shell=False)
+        proc = subprocess.Popen(cmdopts, cwd=cwd, stdin=pipe, shell=False)
+        if pipe:
+            proc.stdin.write('\n'.join(self.files))
+            proc.stdin.close()
 
-        # Remove cached repo object, dirstate may change
-        self.cacherepo = None
-        self.cacheroot = None
+    def buildMenu(self, vfs_files, bg):
+        '''Build menu'''
+        self.pos = 0
+        self.files = []
+        files = []
+        for vfs_file in vfs_files:
+            f = self.get_path_for_vfs_file(vfs_file)
+            if f:
+                files.append(f)
+        if not files:
+            return
+        if bg or len(files) == 1 and vfs_files[0].is_directory():
+            cwd = files[0]
+            files = []
+        else:
+            cwd = os.path.dirname(files[0])
+        repo = self.get_repo_for_path(cwd)
+        if repo:
+            menus = self.menu.get_commands(repo, cwd, files)
+            self.files = files
+        else:
+            menus = self.menu.get_norepo_commands(cwd, files)
+        self.cwd = cwd
+        return self._buildMenu(menus)
+
+    def _buildMenu(self, menus):
+        '''Build one level of a menu'''
+        items = []
+        if self.files:
+            passcwd = None
+        else: #bg
+            passcwd = self.cwd
+        for menu_info in menus:
+            idstr = 'HgNautilus::%02d%s' % (self.pos, menu_info.hgcmd)
+            self.pos += 1
+            if menu_info.isSep():
+                # can not insert a separator till now
+                pass
+            elif menu_info.isSubmenu():
+                if hasattr(nautilus, 'Menu'):
+                    item = nautilus.MenuItem(idstr, menu_info.menutext,
+                            menu_info.helptext)
+                    submenu = nautilus.Menu()
+                    item.set_submenu(submenu)
+                    for subitem in self._buildMenu(menu_info.get_menus()):
+                        submenu.append_item(subitem)
+                    items.append(item)
+                else: #submenu not suported
+                    for subitem in self._buildMenu(menu_info.get_menus()):
+                        items.append(subitem)
+            else:
+                if menu_info.state:
+                    item = nautilus.MenuItem(idstr,
+                                 menu_info.menutext,
+                                 menu_info.helptext,
+                                 self.icon(menu_info.icon))
+                    item.connect('activate', self.run_dialog, menu_info.hgcmd,
+                            passcwd)
+                    items.append(item)
+        return items
 
     def get_background_items(self, window, vfs_file):
         '''Build context menu for current directory'''
-        items = []
-        path = self.get_path_for_vfs_file(vfs_file)
-        if path is None:
-            return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            item = nautilus.MenuItem('HgNautilus::newtree',
-                                 'Create New Repository',
-                                 'Make directory versioned',
-                                 self.icon('menucreaterepos.ico'))
-            item.connect('activate', self._init_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::clone',
-                                 'Create Clone',
-                                 'Create clone here from source',
-                                 self.icon('menuclone.ico'))
-            item.connect('activate', self._clone_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::about',
-                                 'About TortoiseHg',
-                                 'Information about TortoiseHg installation',
-                                 self.icon('menuabout.ico'))
-            item.connect('activate', self._about_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::terminal',
-                                 'Open Terminal Here',
-                                 'Open terminal in current directory')
-            item.connect('activate', self._open_terminal_cb, vfs_file)
-            items.append(item)
-            return items
-
-        if len(repo.changectx(None).parents()) > 1:
-            self.rev0 = repo.changectx(None).parents()[0].rev()
-            item = nautilus.MenuItem('HgNautilus::undomerge',
-                                 'Undo Merge',
-                                 'Clean checkout of original parent revision',
-                                 self.icon('menuunmerge.ico'))
-            item.connect('activate', self._unmerge_cb, vfs_file)
-            items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::commit',
-                             'Commit',
-                             'Commit changes',
-                             self.icon('menucommit.ico'))
-        item.connect('activate', self._commit_cb, [vfs_file])
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::status',
-                             'Show Status',
-                             'Show Repository Status',
-                             self.icon('menushowchanged.ico'))
-        item.connect('activate', self._status_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::diff',
-                             'Visual Diff',
-                             'Show Changes to Repository',
-                             self.icon('menudiff.ico'))
-        item.connect('activate', self._diff_cb, [vfs_file])
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::dag',
-                             'Revision History',
-                             'Show revision DAG',
-                             self.icon('menurevisiongraph.ico'))
-        item.connect('activate', self._history_cb, [vfs_file])
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::datamine',
-                             'Data Mining',
-                             'Search revision history',
-                             self.icon('menulog.ico'))
-        item.connect('activate', self._datamine_cb, [vfs_file])
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::sync',
-                             'Synchronize',
-                             'Sync with another repository',
-                             self.icon('menusynch.ico'))
-        item.connect('activate', self._sync_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::serve',
-                             'Web Server',
-                             'Start internal web server',
-                             self.icon('proxy.ico'))
-        item.connect('activate', self._serve_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::recover',
-                             'Recovery',
-                             'General repair and recovery of repository',
-                             self.icon('general.ico'))
-        item.connect('activate', self._recovery_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::repoconfig',
-                             'Repository Settings',
-                             'Configure Mercurial settings for this repo',
-                             self.icon('menusettings.ico'))
-        item.connect('activate', self._thgconfig_repo_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::userconfig',
-                             'User-Global Settings',
-                             'Configure global Mercurial settings',
-                             self.icon('menusettings.ico'))
-        item.connect('activate', self._thgconfig_user_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::about',
-                             'About TortoiseHg',
-                             'Information about TortoiseHg installation',
-                             self.icon('menuabout.ico'))
-        item.connect('activate', self._about_cb, vfs_file)
-        items.append(item)
-
-        item = nautilus.MenuItem('HgNautilus::terminal',
-                             'Open Terminal Here',
-                             'Open terminal in current directory')
-        item.connect('activate', self._open_terminal_cb, vfs_file)
-        items.append(item)
-        return items
+        if vfs_file and self.menu:
+            return self.buildMenu([vfs_file], True)
+        else:
+            self.files = []
 
     def get_file_items(self, window, vfs_files):
-        '''Build context menu for selected files'''
-        items = []
-        if not vfs_files:
-            return items
-
-        vfs_file = vfs_files[0]
-        path = self.get_path_for_vfs_file(vfs_file)
-        repo = self.get_repo_for_path(path)
-        if repo is None:
-            if not vfs_file.is_directory():
-                return items
-
-            # Menu for unrevisioned subdirectory
-            name = vfs_files[0].get_name()
-            item = nautilus.MenuItem('HgNautilus::newtree',
-                                 'Make directory versioned',
-                                 'Create Repository in %s' % name,
-                                 self.icon('menucreaterepos.ico'))
-            item.connect('activate', self._init_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::clone',
-                                 'Create clone from source',
-                                 'Create Clone in %s' % name,
-                                 self.icon('menuclone.ico'))
-            item.connect('activate', self._clone_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::about',
-                                 'About TortoiseHg',
-                                 'Information about TortoiseHg installation',
-                                 self.icon('menuabout.ico'))
-            item.connect('activate', self._about_cb, vfs_file)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::terminal',
-                                 'Open Terminal Here',
-                                 'Open Terminal in %s' % name)
-            item.connect('activate', self._open_terminal_cb, vfs_file)
-            items.append(item)
-            return items
-
-        localpaths = []
-        for vfs_file in vfs_files:
-            path = self.get_path_for_vfs_file(vfs_file)
-            if path is None:
-                continue
-            localpath = path[len(repo.root)+1:]
-            localpaths.append(localpath)
-
-        changes = repo.dirstate.status(localpaths, util.always, True, True)
-        (lookup, modified, added, removed, deleted, unknown,
-                ignored, clean) = changes
-
-        # Add menu items based on states list
-        if unknown:
-            item = nautilus.MenuItem('HgNautilus::add',
-                                 'Add Files',
-                                 'Add unversioned files',
-                                 self.icon('menuadd.ico'))
-            item.connect('activate', self._add_cb, vfs_files)
-            items.append(item)
-
-        if modified or added or removed or deleted or unknown:
-            item = nautilus.MenuItem('HgNautilus::commit',
-                                 'Commit Files',
-                                 'Commit changes',
-                                 self.icon('menucommit.ico'))
-            item.connect('activate', self._commit_cb, vfs_files)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::revert',
-                                 'Undo Changes',
-                                 'Revert changes to files',
-                                 self.icon('menurevert.ico'))
-            item.connect('activate', self._revert_cb, vfs_files)
-            items.append(item)
-
-        if modified or clean:
-            item = nautilus.MenuItem('HgNautilus::log',
-                                 'File Changelog',
-                                 'Show file revision history',
-                                 self.icon('menulog.ico'))
-            item.connect('activate', self._history_cb, vfs_files)
-            items.append(item)
-            item = nautilus.MenuItem('HgNautilus::annotate',
-                                 'Annotate File',
-                                 'Annotate file at current revision',
-                                 self.icon('menulog.ico'))
-            item.connect('activate', self._datamine_cb, vfs_files)
-            items.append(item)
-
-
-        if modified:
-            item = nautilus.MenuItem('HgNautilus::diff',
-                                 'File Diffs',
-                                 'Show file changes',
-                                 self.icon('menudiff.ico'))
-            item.connect('activate', self._diff_cb, vfs_files)
-            items.append(item)
-
-        return items
+        '''Build context menu for selected files/directories'''
+        if vfs_files and self.menu:
+            return self.buildMenu(vfs_files, False)
 
     def get_columns(self):
-        return nautilus.Column("HgNautilus::hg_status",
+        return nautilus.Column("HgNautilus::80hg_status",
                                "hg_status",
-                               "HG Status",
+                               "Hg Status",
                                "Version control status"),
 
-    def _get_file_status(self, repo, localpath):
-        emblem = None
-        status = '?'
-
-        # This is not what the API is optimized for, but this appears
-        # to work efficiently enough
-        changes = repo.dirstate.status([localpath], util.always, True, True)
-        (lookup, modified, added, removed, deleted, unknown,
-                ignored, clean) = changes
-
-        if localpath in clean:
-            emblem = 'default'
-            status = 'clean'
-        elif localpath in modified:
-            emblem = 'cvs-modified'
-            status = 'modified'
-        elif localpath in added:
-            emblem = 'cvs-aded'
-            status = 'added'
-        elif localpath in unknown:
-            emblem = 'new'
-            status = 'unrevisioned'
-        elif localpath in ignored:
-            status = 'ignored'
-        elif localpath in deleted:
-            # Should be hard to reach this state
-            emblem = 'stockmail-priority-high'
-            status = 'deleted'
+    def _get_file_status(self, localpath, repo=None):
+        cachestate = cachethg.get_state(localpath, repo)
+        cache2state = {cachethg.UNCHANGED:   ('default',   'clean'),
+                       cachethg.ADDED:       ('new',       'added'),
+                       cachethg.MODIFIED:    ('important', 'modified'),
+                       cachethg.UNKNOWN:     (None,        'unrevisioned'),
+                       cachethg.IGNORED:     ('noread',    'ignored'),
+                       cachethg.NOT_IN_REPO: (None,        'unrevisioned'),
+                       cachethg.ROOT:        ('generic',   'root'),
+                       cachethg.UNRESOLVED:  ('danger',    'unresolved')}
+        emblem, status = cache2state.get(cachestate, (None, '?'))
         return emblem, status
 
-
     def update_file_info(self, file):
-        '''Return emblem and hg status for this file'''
-        path = self.get_path_for_vfs_file(file)
-        if path is None or file.is_directory():
+        '''Queue file for emblem and hg status update'''
+        self.scanStack.append(file)
+        if len(self.scanStack) == 1:
+            gobject.idle_add(self.fileinfo_on_idle)
+
+    def fileinfo_on_idle(self):
+        '''Update emblem and hg status for files when there is time'''
+        if not self.scanStack:
+            return False
+        try:
+            vfs_file = self.scanStack.pop()
+            path = self.get_path_for_vfs_file(vfs_file, False)
+            if not path:
+                return True
+            oldvfs = self.get_vfs(path)
+            if oldvfs and oldvfs != vfs_file:
+                #file has changed on disc (not invalidated)
+                self.get_path_for_vfs_file(vfs_file) #save new vfs
+                self.invalidate([os.path.dirname(path)])
+            emblem, status = self._get_file_status(path)
+            if emblem is not None:
+                vfs_file.add_emblem(emblem)
+            vfs_file.add_string_attribute('hg_status', status)
+        except StandardError, e:
+            debugf(e)
+        return True
+
+    def notified(self, mon_uri=None, event_uri=None, event=None):
+        debugf('notified from hgtk, %s', event, level='n')
+        f = open(self.notify, 'a+')
+        files = None
+        try:
+            files = [line[:-1] for line in f if line]
+            if files:
+                f.truncate(0)
+        finally:
+            f.close()
+        if not files:
             return
-        repo = self.get_repo_for_path(path)
-        if repo is None:
+        root = os.path.commonprefix(files)
+        root = paths.find_root(root)
+        if root:
+            self.invalidate(files, root)
+
+    def invalidate(self, paths, root = ''):
+        started = bool(self.inv_dirs)
+        if cachethg.cache_pdir == root and root not in self.inv_dirs:
+            cachethg.overlay_cache.clear()
+        self.inv_dirs.update([os.path.dirname(root), '/', ''])
+        for path in paths:
+            path = os.path.join(root, path)
+            while path not in self.inv_dirs:
+                self.inv_dirs.add(path)
+                path = os.path.dirname(path)
+                if cachethg.cache_pdir == path:
+                    cachethg.overlay_cache.clear()
+        if started:
             return
-        localpath = path[len(repo.root)+1:]
-        emblem, status = self._get_file_status(repo, localpath)
-        if emblem is not None:
-            file.add_emblem(emblem)
-        file.add_string_attribute('hg_status', status)
+        if len(paths) > 1:
+            self._invalidate_dirs()
+        else:
+            #group invalidation of directories
+            gobject.timeout_add(200, self._invalidate_dirs)
+
+    def _invalidate_dirs(self):
+        for path in self.inv_dirs:
+            vfs = self.get_vfs(path)
+            if vfs:
+                vfs.invalidate_extension_info()
+        self.inv_dirs.clear()
 
     # property page borrowed from http://www.gnome.org/~gpoo/hg/nautilus-hg/
-    def __add_row(self, table, row, label_item, label_value):
+    def __add_row(self, row, label_item, label_value):
         label = gtk.Label(label_item)
         label.set_use_markup(True)
         label.set_alignment(1, 0)
-        table.attach(label, 0, 1, row, row + 1, gtk.FILL, gtk.FILL, 0, 0)
+        self.table.attach(label, 0, 1, row, row + 1, gtk.FILL, gtk.FILL, 0, 0)
         label.show()
 
         label = gtk.Label(label_value)
         label.set_use_markup(True)
         label.set_alignment(0, 1)
         label.show()
-        table.attach(label, 1, 2, row, row + 1, gtk.FILL, 0, 0, 0)
+        self.table.attach(label, 1, 2, row, row + 1, gtk.FILL, 0, 0, 0)
 
     def get_property_pages(self, vfs_files):
         if len(vfs_files) != 1:
@@ -494,45 +324,43 @@ class HgExtension(nautilus.MenuProvider,
         repo = self.get_repo_for_path(path)
         if repo is None:
             return
-
         localpath = path[len(repo.root)+1:]
-        emblem, status = self._get_file_status(repo, localpath)
+        emblem, status = self._get_file_status(path, repo)
 
         # Get the information from Mercurial
-        ctx = repo.changectx(None).parents()[0]
+        ctx = repo['.']
         try:
             fctx = ctx.filectx(localpath)
-            rev = fctx.filelog().linkrev(fctx.filenode())
+            rev = fctx.filelog().linkrev(fctx.filerev())
         except:
             rev = ctx.rev()
         ctx = repo.changectx(rev)
         node = short(ctx.node())
-        date = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(ctx.date()[0]))
+        date = util.datestr(ctx.date(), '%Y-%m-%d %H:%M:%S %1%2')
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()
-        user = gobject.markup_escape_text(user)
+        user = gtklib.markup_escape_text(user)
         tags = ', '.join(ctx.tags())
         branch = ctx.branch()
 
         self.property_label = gtk.Label('Mercurial')
 
-        table = gtk.Table(7, 2, False)
-        table.set_border_width(5)
-        table.set_row_spacings(5)
-        table.set_col_spacings(5)
+        self.table = gtk.Table(7, 2, False)
+        self.table.set_border_width(5)
+        self.table.set_row_spacings(5)
+        self.table.set_col_spacings(5)
 
-        self.__add_row(table, 0, '<b>Status</b>:', status)
-        self.__add_row(table, 1, '<b>Last-Commit-Revision</b>:', str(rev))
-        self.__add_row(table, 2, '<b>Last-Commit-Description</b>:', description)
-        self.__add_row(table, 3, '<b>Last-Commit-Date</b>:', date)
-        self.__add_row(table, 4, '<b>Last-Commit-User</b>:', user)
+        self.__add_row(0, '<b>Status</b>:', status)
+        self.__add_row(1, '<b>Last-Commit-Revision</b>:', str(rev))
+        self.__add_row(2, '<b>Last-Commit-Description</b>:', description)
+        self.__add_row(3, '<b>Last-Commit-Date</b>:', date)
+        self.__add_row(4, '<b>Last-Commit-User</b>:', user)
         if tags:
-            self.__add_row(table, 5, '<b>Tags</b>:', tags)
+            self.__add_row(5, '<b>Tags</b>:', tags)
         if branch != 'default':
-            self.__add_row(table, 6, '<b>Branch</b>:', branch)
+            self.__add_row(6, '<b>Branch</b>:', branch)
 
-        table.show()
-
+        self.table.show()
         return nautilus.PropertyPage("MercurialPropertyPage::status",
-                                     self.property_label, table),
+                                     self.property_label, self.table),

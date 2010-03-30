@@ -1,0 +1,94 @@
+*******
+Extenze
+*******
+
+.. module:: extensions
+		:synopsis: Describe extensions bundled with TortoiseHg binary packages
+
+Tato kapitola popisuje extenze Mercurialu, která jsou pro Windows dodávána s binárními balíčky TortoiseHg. Tato rozšíření jsou připojena pro pohodlí uživatelů, kteří si je mohou zpřístupnit, jakmile je potřebuji.
+
+Hgfold
+======
+
+`hgfold <http://mercurial.selenic.com/wiki/CaseFoldExtension>`_  je rozšíření Mercurialu, které pomůže uživatelům Windows s kolizemi jmen souborů v VFAT a NTFS.
+
+Přidá možnosti k následujícím příkazům Mercurialu. Více info viz :command:`hg help <command>`::
+
+	up    - dovolí aktualizovat k revizi s kolizemi jmen souborů
+	merge - dovolí sloučení s changesetem, který by vytvořil kolizi jmen souborů
+
+Extenze v současné době neumí kolizi zabránit. Viz wiki Mercurialu.     
+
+**Instalace**
+
+Plugin zpřístupníme doplněním textu ve svém konfiguračním souboru mercurial.ini nebo souboru .hgrc repozitáře::
+
+	[extensions]
+	fold=
+ 
+
+**Varování**
+
+Jako u všech slučovacích operací musí soubor fold.py změnit rodiče pracovního adresáře. To se stále ještě zkouší a proto používat opatrně.
+
+Dostaneme-li po běhu příkazu :command:`hg recover` chybové hlášení, vyzkoušíme příkaz :command:`hg debugsetparents <číslo revize 'tip'>`. Toto číslo zjistíme příkazem :command:`hg log`.
+
+Hgcr-gui
+========
+
+Nástroj správy kontrol `CodeReview <http://bitbucket.org/glimchb/hgcr-gui/wiki/Home>`_ 
+
+* Tato extenze umožňuje správu kontrol našeho kódu v libovolném projektu.
+* Pomáhá udržet správu kontrol uvnitř Mercurialu
+* Do kontrolovaného přehledu lze přidávat i odebírat soubory
+* Kontrolor může označit kód jako kompletně zkontrolvaný a vrátit zprávu vývojáři.
+* Projektový manažer může zkontrolat stav kontroly - které soubory jsou zkontrolované a které nikoliv.
+* Extenze okamžitě zjistí soubory změněné po kontrole a podá o tom zprávu.
+* Tato extenze používá GUI z TortoiseHg ale také využívá rozhranní příkazového řádku.
+* Databáze kontroly kódu je po kontrole uložena v souboru .code-review v kořenovém adresáři repozitáře.
+
+
+**Použití**::
+
+	hg cr [OPTIONS] [FILES]
+
+	Code Review Plugin (requires Mercurial 1.3.x and TortoiseHg 0.9)
+
+	options:
+
+	 -c --complete  Mark CR as complete
+	 -a --add       Add files to CR list
+	 -r --remove    Remove files from CR list
+	 -l --list      Print files in CR list
+
+	use "hg -v help cr" to show global options
+
+.. note::
+	Pro spuštění GUI nezadáváme žádné možnosti.
+
+**Další podrobnosti**
+
+* I've implemented the review around files and not changesets, because at the end,
+  I want to be able to tell for the specific project if all the files went through
+  code review process or not - the project status.
+* Suppose you have some project that you are in charge and many developers do 
+  write code for it. And there is a group of reviewrs that review the developers code.
+* Is is very difficult to keep track of changes developers do, but simple to find
+  out what files have already been reviewd (by reviewers) and what were not.
+* Using this extension, Developer can mark his files (when finished development 
+  process) as "Ready for review" and send notice to reviewer.
+* Reviewer will pick up the changeset (because changesets are stored in the code
+  review database) and perform code review (put notes inside the developer's code).
+* Afterwards Reviewr will mark the files as "Review Completed" and return the 
+  notice to the developer.
+* The project manager can follow every time what is going on with his/her project. 
+
+**Instalace**
+
+Chceme-li tuto extenzi použít, doplníme konfigurační soubory
+/mercurial.ini meb /hgrc like takto::
+
+	[extensions]
+	hgcr-gui=
+ 
+.. vim: noet ts=4

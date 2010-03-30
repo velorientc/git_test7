@@ -1,0 +1,52 @@
+<Include>
+  <!-- cmenu COM component -->
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)'
+    Type='string' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+    Type='string' Name='ThreadingModel' Value='Apartment'
+  />
+
+  <!-- cmenu registration -->
+  <RegistryValue
+    Root='HKCR' Key='Directory\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='Directory\Background\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='Drive\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='Folder\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='InternetShortcut\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='LibraryLocation\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='LibraryFolder\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
+    Root='HKCR' Key='*\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+
+  <!-- Mark all as approved -->
+  <RegistryValue
+    Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Type='string' Name='$(var.CLSID_TortoiseHgCmenu)' Value='TortoiseHg'
+  />
+
+</Include>

@@ -1,0 +1,281 @@
+Commit
+======
+
+.. module:: commit.dialog
+	:synopsis: Dialog used to perform commit
+
+   
+Commit je jedním ze dvou hlavních nástrojů programu 
+TortoiseHg, druhým je Průzkumník repozitáře. Oba tyto nástroje dovedou zpřístupnit nebo provést téměř každou funkci, kterou TortoiseHg podporuje.
+
+Nástroj Commit umí nejen předat repozitáři naše změny, ale umí také přezkoušet stav našeho pracovního adresáře a provádět rutinní udržovací úkony (přidat nové soubory, zaznamenat změnu jmen, spravovat filtr "ignore", atp).
+
+.. figure:: figures/commit.png
+	:alt: Commit dialog
+
+	Dialogové okno Commit
+
+Popis prvků
+------------
+
+Na horním okraji okna Commit je výběrová lišta, nově zavedená ve verzi 0.9:
+
+	:guilabel:`Nástroje`
+		Lze samostatně spustit osm procesů TortoiseHg
+	:guilabel:`Zobrazení`
+		Přepínač dvou režimů zobrazení a přístup k nástroji pro obnovení obsahu pracovního adresáře.
+	:guilabel:`Operace`
+		Položky této nabídky jsou shodné s tlačítky v nástrojové liště.
+	:guilabel:`Nápověda`
+		Přístup k otevření webového prohlížeče a informaci "O programu".
+
+Výčet tlačítek v nástrojové liště:
+
+	:guilabel:`Commit`
+		Předat vybrané diffy v označených souborech do repozitáře.
+	:guilabel:`Zpět`
+		Zrušit právě zadaný komit. Zpráva o zadaném komitu je uložena, takže jej lze snadno v případě potřeby zopakovat.
+	:guilabel:`VDiff`
+		Zobrazení rozdílů u vybraných souborů.
+	:guilabel:`Vrátit`
+		Navrátit vybrané soubory ke stavu poslední revize. Při slučování (merge) lze provést návrat k vybranému rodiči.
+	:guilabel:`Přidat`
+		Přidat označené soubory, které měly status neznámého (?) nebo ignorovaného (I) souboru.
+	:guilabel:`Přesunout`
+		Přemístit označené soubory do určeného adresáře verzovaným (versioned) způsobem.
+	:guilabel:`Odstranit`
+		Smazat označené soubory (verzované soubory také zaznamenat jako smazané).
+	:guilabel:`Zapomenout`
+		Zapomenout označené verzované soubory.
+	:guilabel:`Obnovit`
+		Znovu načíst stav pracovního adresáře. Procedura se snaží zachovat výběr souborů i jejich výběrový status.
+
+Pod nástrojovou lištou jsou další užitečné prvky:
+
+	:guilabel:`Větev`
+		Ukazuje jméno aktuální větve pracovního adresáře. Normálně je toto tlačítko pouze informativní, ale jeho stisknutí otevře dialog pro správu větvení. Dokud se neseznámíme s `pojmenovanými větvemi <http://mercurial.selenic.com/wiki/NamedBranches>`_,   nebudeme toto tlačítko používat.
+	:guilabel:`QNew`
+		Máme-li zpřístupněnou extenzi MQ, máme přístupné textové pole pro zápis jména oprávky (patch). Zadání jména oprávnky přepne nástroj Commit do režimu 'QNew'.
+	:guilabel:`Komentář posledního komitu`
+		Rolovací seznam posledních deseti průvodních textů k evidovaným revizím.
+
+Seznam souborů má čtyři sloupce:
+
+	1) Zatržítko, které ukazuje zda je soubor pro operaci vybrán. Tlačítka nástrojové lišty pracují jenom s vybranými soubory. 
+	2) Sloupec :guilabel:`st` označuje výběrový stav souboru.
+	3) Sloupec :guilabel:`ms` označuje stav sloučení (merge) souboru. Viz odstavec 4.5.5 Slučování.
+	4) Kanonická cesta souboru (relativně ke kořenu repozitáře).
+
+.. note::
+	Byl-li nástroj Commit spuštěn pro skupinu souborů, objeví se na spodním okraji seznamu lišta, jíž lze zrušit filtr a zobrazit soubory aktuálního adresáře.
+
+Pod seznamem souborů jsou (po rozbalení přepínače) zatržítka, která přepínají zobrazení různých tříd souborů (neznámý,upravený, ignorovaný, přidaný, čistý, odstraněný, smazaný). Tato zatržítka nejsou přístupná, pokud byl commit spuštěn pro zadaný výběr souborů.
+
+*Neznámý* soubor není Mercurialem sledován a také nevyhovuje žádnému nastavenému filtru. Neznáme soubory jsou implicitně zobrazovány, protože to jsou obvykle soubory, které mají teprve být přidány do revize. 
+Editor seznamu ignorovaných souborů je přístupný přes kontextovou nabídku "Ignorované soubory...".
+Doporučuje se udržovat seznam ignorovaných souborů v aktuálním stavu.
+
+*Modifikovaný* ...
+
+*Ignorovaný* soubor je nesledovaný soubor, uvedený v seznamu ignorovaných souborů. Žádný z těchto typů souborů není implicitně zobrazován, pokud jej uživatel nezahrne do výběru v průzkumníku nebo nezadá jeho jméno na příkazovém řádku.
+
+*Přidaný* ...
+
+*Čistý* soubor je sledovaný soubor, který nebyl modifikován.
+
+*Odstraněný* znamená, že verzovaný soubor byl označen jako odstraněný. 
+
+*Smazaný* znamená, že verzovaný soubor chybí, ale
+aplikaci Mercurial nebylo přikázáno, aby přestala tento soubor sledovat. Když například přejmenujeme verzovaný soubor v průzkumníku, objeví se nám v okně nástroje Commit soubor s původním jménem jako smazaný a soubor s novým jménem jako neznámý. Pravým klikem na novém jméně souboru otevřeme nabídku a vybereme dialog *Vypátrat změnu jména* který může objevit původní jméno souboru porovnáním obsahů a označit starý soubor jako odstraněný a nový soubor jako přidaný a zaznamenat celou operaci jako přejmenování.
+
+.. figure:: figures/parentbar.png
+	:alt: Parent bar
+
+	Lišta s informací o rodiči
+
+Pod seznamem souborů a sousedním panelem se záložkami je úzká lišta, která nám ukazuje rodiče aktuální verze pracovního adresáře a obsahuje varování, pokud by úkon commit vytvořil nové čelo (head). V menu :guilabel:`Zobrazení` lze zvolit nezobrazování této lišty.
+
+Napravo od seznamu souborů je panel :guilabel:`diff`, který je nově ve verzi 0.9 rozdělen do tří (čtyř) záložek.
+
+	:guilabel:`Text diffu`
+		Ukazuje textové diffy u aktuálně vybraného souboru.
+	:guilabel:`Výběr porce`
+		Diffy v této záložce lze vybírat po porcích (hunks), což má umožnit detailní výběr změn, které mají být zahrnuty do komitu. Rozdíly se zobrazují pro aktuálně vybraný soubor. V této záložce se nezobrazují binární diffy nebo přejmenování. Tato data lze vidět v záložce Text diffu.
+	:guilabel:`Náhled komitu`
+		Tato záložka zobrazuje náhled na vybrané porce všech zatržených souborů, které budou předány po stisknutí tlačítka Commit.
+	:guilabel:`Obsah oprávky`
+		Tato možnost je viditelná, je-li procedura Commit v režimu QRefresh. Zobrazuje aktuální obsah obnovované oprávky (patch).
+
+.. figure:: figures/advancedbar.png
+	:alt: Advanced bar
+
+	Lišta zobrazení "Pokročilé"
+
+Je-li v menu :guilabel:`Zobrazení` zatržena volba :guilabel:`Pokročilé` vloží se mezi nástrojovou lištu a rolovací lištu s historií průvodních zpráv nová lišta, která obsahuje:
+
+	:guilabel:`Komitent`
+		Uživatelské jméno pro aktuální komit. Tato hodnota je obvykle čtena ze souboru *Mercurial.init* ale může být i určena příkazem hgtk nebo čtena z oprávkového souboru. Jméno lze v textovém poli změnit.
+	:guilabel:`Automaticky připojeno`
+		Textové pole pro úpravu čárkami rozděleného (CSV) seznamu  souborů, které se v seznamu nacházejí bez ohledu na to, byly-li zatrženy. Toto použití je zamýšleno u těch repozitářů, které mají předkomitové spouštěče (pre-commit hooks), jež upravují určité soubory.
+	:guilabel:`Push po komitu`
+		Přepínač, který určuje, zda se má TortoiseHg pokusit poslat (push) výsledné změny po každém úspěšném komitu do přednastavené destinace.
+
+Výběr změn
+-----------
+
+Podívejme se podrobněji na to, co znamená fráze 'předat (commit) vybrané diffy v označených souborech'. 
+
+Nástroj Commit v TortoiseHg podporuje výběr změn uvnitř diffového panelu se záložkami. To znamená, že všechny změny které provedeme ve verzovaných souborech mohou být individuelně vybrány pro zařazení do komitu anebo z komitu vypuštěny (ale ponechány v pracovním adresáři). Fandové procedury "darc" nebo záznamové extenze Mercurialu tuto vlastnost okamžitě poznají.
+
+Kdy je použití selektivního výběru nezbytné?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Máme-li více než jednu ucelenou změnu ve svém zdrojovém kódu a chtěli bychom své změny předávat po částech. To lze často zajistit filtrovaním seznamu souborů v každém komitu ale může se stát, že se naše změny vyskytují v téže sadě souborů a potom se tato výběrová možnost stává nepostradatelnou.
+
+Jak se to provádí?
+^^^^^^^^^^^^^^^^^
+
+Dvojklikem na jednotlivých porcích změn v záložce
+:guilabel:`Výběr porce`. Alternativně lze použít mezerníku k přepínání aktivity výběru. Není-li porce vybrána, je vypnuté kontextové zvýraznění změny a její pozadí zešedne.
+Zároveň je aktualizováno záhlaví záložky s informací o stavu výběru, počtu vybraných porcí a změněných řádků.
+Je-li soubor vybrán pro commit jenom částečně, jeho ikona se změní ze zatržítka na označení předvolby (radio button). Zběžným pohledem na seznam souborů lze tedy poznat, které soubory jsou do komitu zahrnuty zcela, které částečně a které vůbec ne.
+
+Co se děje při akci commit?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Krátká odpověď je taková, že vybrané porce v označených souborech jsou předány do repozitáře a nevybrané změny jsou ponechány v pracovním adresáři pro případný příští commit.
+
+Delší odpověď je poněkud složitější. Za kulisami jsou částečně vybrané soubory celé zálohovány na bezpečném místě, jsou navráceny k jejich poslednímu revizovanému stavu, k nim jsou připojeny vybrané porce změn a takto upravené soubory jsou komitovány. Následně jsou soubory obnoveny ze zálohy, čímž se do pracovní kopie vrátí nevybrané porce změn.
+Soubory vybrané jako celek se vyhnou této *"backup-revert-patch-commit-recover"* oklice a jsou komitovány rovnou.
+ 
+Tato delší odpověď je zajímavá jenom v případě, že se něco nepovede, což je ve Windows možné s pravděpodobností větší než nula.
+Jestliže nějaká závada (způsobená třeba kontrolou virů nebo kompilátorem) uzavře soubor uvnitř popsaného procesu, uvidíme chybové hlášení o selhání oprávky. Tyto chyby jsou opravitelné. Smažeme v repozitáři všechny soubory s příponou  :file:`.rej` a zkusíme komit znovu.
+ 
+Klávesová navigace
+-------------------
+
+:kbd:`Ctrl-Enter`
+	Spustí komit
+:kbd:`Ctrl-C`
+	Při použití v diffovém panelu zkopíruje aktuálně zvýrazněné (nikoliv vybrané, jen zvýrazněné) porce diffů do schránky. Tyto mohou být vlepeny do textového zásobníku za účelem vytvoření libovolné oprávky založené na  změnách v pracovním adresáři.
+:kbd:`Alt-Q`
+	Reflow the paragraph currently under the cursor.  You must configure
+	a message format policy for this key combination to work.
+
+Kód, který kopíruje porce do schránky rozezná záhlaví diffů. Obsah schránky může vždy tvořit platnou oprávku (patch).
+
+
+Kontextová menu
+------------------
+
+Pravý klik na zvýrazněném souboru v seznamu souborů otevře nabídku dalších příkazů.
+
+U neznámých souborů s otazníkem umožní toto kontextové menu zjistit přejmenování (domníváme-li se, že neznámý soubor je kopie nebo přejmenování revizovaného souboru) nebo nastavit filtr repozitáře pro ignorování souborů. 
+
+Slučování
+---------
+
+Nástroj commit má speciální mód, je-li otevřen v repozitáři, který je ve sloučeném stavu (technicky to znamená, že aktuální pracovní adresář má dvě rodičovské revize). Seznam souborů nemá zatržítka a záložky diffového panelu jsou skryté. 'Deklarace komitu' je v podstatě neměnná, protože po sloučení je nutné komitovat celý pracovní adresář.
+
+V tomto režimu je obzvláště užitečný sloupec *ms*. Soubory označené *R* jsou ty, u kterých Mercurial nebo uživatel úspěšně sloučil (vyřešil) změny od obou rodičů. Soubory označené *U* mají nevyřešené změny. U nich je možné použít kontextovou nabídku *Restartovat slučování* ke spuštění procesu slučování, nebo lze použít kontextovou nabídku *edit* pro vyřešení konfliktu ručně.
+Volba *Restartovat slučování* nám umožní vybrat slučovací nástroj nebo dokonce vybrat jednu či druhou verzi nepodmíněně (internal:local, internal:other). Po ručním vyřešení konfliktu je nutné použít kontextovou nabídku *mark resolved*,
+aby se změnilo označení souboru na *R*. 
+
+Mercurial nám nedovolí komitovat sloučení pokud některý ze souborů má statut *U*.
+
+Označení *local* je pro revizi, kterou jsme vybrali na počátku slučování a *other* je pro revizi se kterou se sloučení provádí.
+
+Pro zrušení nezdařeného pokusu o sloučení musíme říci aplikaci Mercurial aby odstranila druhého rodiče z našeho pracovního adresáře. To obvykle obnáší provedení čisté aktualizace (clean update) prvního rodiče. Nástroj pro sloučení má tlačítko :guilabel:`Undo`, které přesně toto dělá. Nástroj pro obnovení (recovery) má také tlačítko :guilabel:`Clean`, které provádí totéž. 
+
+Poté, co jsme vrátili náš pracovní adresář do stavu rodičovké revize, můžeme restartovat proces sloučení.
+
+Textové pole průvodní zprávy
+-----------------------------
+
+V tomto poli jsou přístupné tyto kontextové nabídky:
+
+	:guilabel:`Vložit jména souborů`:
+		Vlepí vybrané jméno souboru v místě kurzoru.
+	:guilabel:`Použít formát`:
+		Použije nastavenou konfiguraci záložky Commit v okně "Konfigurace repozitáře".
+	:guilabel:`Nastavit formát`:
+		Otevře okno "Konfigurace repozitáře" pro konfiguraci.
+
+Oprávky MQ
+----------
+
+Mnozí pokročilí uživatelé Mercurialu používají extenzi MQ pro správu fronty oprávek (patch queue). Procedura commit pozná použití oprávky a zavede režim *patch refresh*. V tomto režimu se změní titulek okna na "refreshing patch *patchname*" a v textovém poli pro průvodní zprávu se objeví komentář oprávky.
+
+Ke stávajícím záložkám *Diff-Hunk-Náhled* přibude nová záložka 'Obsah oprávky' s úplným obsahem oprávky. Záložky Text diffu a Výběr porce potom zobrazují celkový rozdíl změn z oprávky i z pracovního adresáře, takže můžeme při akci *qrefresh* přemisťovat změny do oprávky i z oprávky.
+
+Vpodstatě totéž by nám ukázal příkaz "qdiff". Získat diff pouze pracovního adresáře lze příkazem :command:`hg diff` z příkazového řádku nebo zápisem jména do vstupního pole QNew, což přepne dialog do režimu QNew.
+ 
+Aktivace tlačítka :guilabel:`Commit`, které se v tomto kontextu změnilo na :guilabel:`QRefresh` doplní poslední oprávku o zadané změny včetně popisu oprávky. To může být zpočátku poněkud matoucí, protože změny, které jsme z oprávky vypustili, budou po provedení "refresh" stále v pracovním adresáři, takže pokud se nepodíváme přímo na obsah oprávky, můžeme si myslet, že se nic nezměnilo.
+
+
+Režim QNew
+-----------
+
+Proceduru commit lze použít pro vytvoření nové oprávky do naší fronty oprávek.
+Máme-li přístupnou extenzi MQ, objeví se mezi tlačítkem "branch: ..."  a roletovým menu s historií průvodních zpráv další textové pole. Zadáme-li do tohoto pole jméno souboru, změní se režim z *commit* nebo *qrefresh* na režim *qnew*. V tomto režimu se zobrazují jenom úpravy pracovního adresáře (změny, které by se typicky přidávaly do nové oprávky příkazem  :command:`hg qnew -f`). Aby byla změna režimu patrná, změní se také tlačítko :guilabel:`Commit` na tlačítko :guilabel:`QNew`.
+
+Aktivace tlačítka :guilabel:`QNew` způsobí zápis vybraných porcí změn do nové oprávky (se jménem souboru, které jsme zadali) s následným obnovením (refresh). Po této obnově se procedura commit přepne do režimu *qrefresh*, protože nyní bude existovat alespoň jedna použitá oprávka.
+
+Novou oprávku můžeme doplnit průvodní zprávou při počáteční události *qnew* anebo dodatečně v režimu *qrefresh*.
+
+Nastavitelné parametry
+----------------------
+
+Editační okno "Konfigurace repozitáře" umožňuje nastavení řady veličin:
+
+:menuselection:`Commit -> Jméno uživatele`
+	Nastavení uživatelského jména spojeného s našimi komity. (viz :doc:`quick`)
+:menuselection:`Commit -> Délka souhrnného řádku`
+	Maximální délka řádku se souhrnným textem komitu. Pokud je zadaná, vydá TotroiseHg varování při překročení této hodnoty. Implicitní nastavení je <neurčeno>; hodnota '0' má stejný význam. 
+:menuselection:`Commit -> Délka řádku komentáře`
+	Maximální délka řádku průvodní zprávy pod prázdným řádkem (mezi souhrnným řádkem a vlastní průvodní zprávou musí být jeden řádek prázdný). Varování a implicitní nastavení je stejné jako v předchozím případě.
+:menuselection:`Commit -> Provést push po komitu`:
+	Při hodnotě True se procedura Commit pokusí o provedení 
+	akce 'push' po ukončení akce 'commit'.
+:menuselection:`Commit -> Seznam Auto Include`:
+	Čárkami rozdělený seznam souborů, které jsou automaticky
+	obsaženy v každém komitu. Zamýšleno pouze pro nastavení
+	repozitáře.
+:menuselection:`Commit -> Seznam Auto Exclude`:
+	Čárkami rozdělený seznam souborů, které jsou automaticky
+	vypuštěny z výběru při otevření nástrojů *status*, 
+	*commit* a *shelve*.
+:menuselection:`TortoiseHg -> Diffový panel dole`
+	Přesunutí diffového panelu pod seznam souborů
+:menuselection:`TortoiseHg -> Max velikost diffu`
+	Nastavení limitu pro velikost diffu.
+
+Externí nástroj pro konfiguraci není v 0.9 zařazen.
+
+Spuštění příkazu z příkazového řádku
+-------------------------------------
+
+::
+
+	hgtk commit [OPTIONS] [FILE]...
+
+	alias: hgtk ci
+
+	options:
+
+	 -u --user <jméno>  otevřít commit pro zadané jméno
+	 -d --date <date> použít zadané datum
+
+	Globální možnosti viz "hgtk -v help commit" 
+
+
+	
+.. warning::   
+	Extenze win32text může působit potíže při výběru 
+	porcí (hunks). 
+	Toto je již vyřešeno ve verzích Mercurial 1.3 a 
+	TortoiseHg 0.8, ale vyžaduje to řádné nastavení. Viz 
+	`issue #82 
+	<http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
+
+.. vim: noet ts=4

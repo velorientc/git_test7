@@ -1,0 +1,168 @@
+*******
+Patches
+*******
+
+.. module:: patches
+	:synopsis: Describe patch operations
+
+Defining a patch
+================
+
+These links are recommended reading for understanding the history and nature
+of patches and how they can be used with Mercurial.
+
+* `The patch management problem <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `Understanding patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `More about patches <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+
+Pitfalls
+========
+
+The standard patch format cannot describe binary files, renames, copies,
+or permission changes.  If your patch needs to record any of those
+things, you will need to enable **git** patches via::
+
+	[diff]
+	git=True
+
+Mercurial 1.5 improves it's behavior in this regard.  It will warn you
+when git diffs are required, or sometimes upgrade to the git format
+automatically.  See also the
+`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_ of
+the hgrc documentation.
+
+Mercurial's patch routines do not deal well with mixed EOLN between
+source files and patches.  The **patch.eol** setting was introduced in
+1.3 to improve this situation::
+
+	[patch]
+	eol = auto #strict, lf, or crlf
+
+The work on the hgeol extension is also improving this area.  Perhaps it
+will be resolved by hg-1.5.  See also the
+`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
+of the hgrc documentation.
+
+Applying a patch is not a foolproof operation.  If the source file has
+diverged from the file that was used to create the patch, there may be
+conflicts during the patch application.  These are written to a file
+with an .rej extension.  TortoiseHg 1.0 includes an experimental
+:command:`hgtk mpatch` command that can try *harder* to apply the
+rejected patch hunks.  This command is based on Chris Mason's `mpatch
+<http://oss.oracle.com/~mason/mpatch/>`_ utility.  If mpatch cannot
+apply the rejected hunks, your only remaining choice is to apply them by
+hand.
+
+
+Export Patches
+==============
+
+Changeset
+---------
+
+To export a changeset as a patch file, use the changeset context menu of
+the Repository Explorer to select :menuselection:`Export --> Export Patch`.
+You will be asked to provide a filename.
+
+Changeset Ranges
+----------------
+
+Select a range of changesets in the Repository Explorer.  Left click on
+the first (base) changeset, then right click on the last (target)
+changeset.  This opens a special revision range context menu.  From this
+menu you can generate patches, generate a bundle, send emails, or view
+the accumulated changes.
+
+This is a very powerful feature and there is no restriction on the base
+and target changesets you can select.
+
+Email
+-----
+
+.. figure:: figures/email.png
+	:alt: Email dialog
+
+	Email dialog of Repository Explorer
+
+To send a changeset as an email, use the changeset context menu of the
+Repository Explorer. :menuselection:`Export --> Email Patch`.  This
+opens the e-mail dialog for this single changeset.
+
+To send a changeset range, use the changeset range selection feature of
+the Repository Explorer and select
+:menuselection:`Email from here to selected...`
+
+Lastly, you can use the :guilabel:`Email` button on the syncbar of the
+Repository Explorer to email all outgoing changes to the selected remote
+repository.
+
+.. note::
+	You must configure
+	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
+	to send patches via email
+
+Cherry Picking
+--------------
+
+Use the changeset range selection feature of the Repository Explorer and
+select :menuselection:`Diff with selected`.  This opens up a status
+viewer showing you the accumulated changes between your base and target
+changesets.
+
+From the status viewer, you can select files and diff hunks just as you
+can in the commit tool, and preview the final result in the
+:guilabel:`Save Preview` tab.  Pressing :guilabel:`Save As` will save
+the selected changes to a patch file.
+
+For even finer cherry-picking, you can highlight a number of diff-hunks
+in the hunk selection pane and hit CTRL-C.  This will copy the
+highlighted (mouse selected, not toggled) hunks to the clipboard.
+
+.. note::
+	Reversing the order of your changeset selection reverses the effect
+	of the patch.
+
+
+Import Patches
+==============
+
+.. figure:: figures/import.png
+	:alt: Import tool
+
+	Import dialog of Repository Explorer
+
+The import dialog can be opened from the sync bar or menu of the
+Repository Explorer, or via :command:`hgtk import`.  The dialog supports
+file and directory drag and drop.  The drop down menu in the upper right
+corner next to the :guilabel:`Browse` button has the options:
+:guilabel:`Browse Directory..` and :guilabel:`Import from Clipboard`.
+
+You have the choice of importing directly into the repository, or
+importing into your patch queue.
+
+.. note::
+	Importing a patch requires a clean working directory state.  You
+	must commit, revert, or shelve changes before importing a patch.
+
+.. warning::
+	If the patch you are importing does not have a commit
+	message, Mercurial will try to launch your editor, just as if you
+	had tried to import the patch from the command line.  Your ui.editor
+	needs to be a GUI app to make this work correctly.
+
+
+Patch Queues
+============
+
+.. figure:: figures/patchqueue.png
+	:alt: Patch Queue
+
+	Patch Queue panel in the Repository Explorer
+
+Both the Repository Explorer and Commit Tool have an optional Patch
+Queue panel that is only available when the user has enabled the MQ
+extension.  It allows the user to perform most patch queue operations
+including push, pop, rename, and finish.  It's recommended to learn the
+MQ extension before using the Patch Queue panel.
+
+.. vim: noet ts=4

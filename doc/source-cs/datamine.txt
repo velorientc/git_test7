@@ -1,0 +1,108 @@
+Zkoumání dat
+============
+
+.. module:: datamine.dialog
+	:synopsis: Dialog used to search repository history
+
+Aplikace datamine (zkoumání dat) se používá k inspekci revizí v repozitáři. Okno má implicitně otevřenou záložku *Hledat* a vyvolatelnou záložku *Anotace*.
+
+Záložka Hledat
+--------------
+
+.. figure:: figures/search.png
+	:alt: Search dialog
+
+	Okno se záložkou Hledat
+
+Záložka Hledat se používá pro vyhledávání (*grep*) souborů podle klíčových slov, proměnných, funkcí, atp v histori repozitáře.
+
+Pole pro zadávání textu mají tyto významy:
+
+	:guilabel:`Regexp`
+		Regulární výraz vyhledávacího kritéria.
+	:guilabel:`Zahrnuje`
+		CSV seznam cest, které mají do vyhledávání být zahrnuty. Není-li žádná cesta zadána, předpokládá se hledání v celém repozitáři. Zadání cesty tedy zužuje vyhledávací kriteria.
+	:guilabel:`Vylučuje`
+		CSV seznam cest, které mají být vyloučeny z vyhledávání. Tento vyčleňovací filtr je použit po předchozím začleňovacím filtru.
+
+Zatržítka pod textovými poli:
+
+	:guilabel:`Kopie a změny jmen`
+		Prohledávat kopie a přejmenované soubory neuvedené v inkluzivním výběru
+	:guilabel:`Ignorovat velikost pímen`
+		Nezohledňovat velikost písmen při hledání
+	:guilabel:`Zobrazit čísla řádků`
+		Zobrazit číslo řádku na počátku vyhledaného řádku
+	:guilabel:`Zobrazit všechny shodné revize`
+		Zobrazit každý případ shody vyhledávacího kriteria s jeho výskytem v řádku, nikoliv jenom u poslední revize. Znaménka +/- říkají, zda vyhledávaný text byl v této změně přidán či odejmut.
+
+Záložky 'hledat' jsou pojmenovány podle posledně použitého vyhledávacího řetězce. Tlačítko :guilabel:`Nové hledání` samozřejmě otevře novou záložku 'hledat' a tlačítko :guilabel:`Stop` ukončí právě probíhající hledání (toto tlačítko je aktivní jenom při probíhajícím hledání).
+
+V okně záložky hledat se vypíše seznam souborů s nalezenou shodou. Popisný tooltip poskytne u každého řádku další informaci (autor, datum/čas, shrnutí).
+
+Dvojklik na označeném řádku otevře podrobné zobrazení vybraného changesetu.
+
+Pravý klik na řádku otevře kontextovou nabídku s těmito položkami:
+
+	:guilabel:`zobrazit changeset`
+		otevřít okno s podrobným zobrazením changesetu
+	:guilabel:`annotace souboru`
+		otevřít anotační záložku pro daný soubor a revizi
+	:guilabel:`historie souboru`
+		otevřít průzkumník repozitáře s revizemi souboru 
+	:guilabel:`otevřít revizi souboru`
+		otevřít aktuální stav souboru dané revize v nastaveném textovém editoru
+
+Anotační záložky
+----------------
+
+.. figure:: figures/annotate.png
+	:alt: Annotate tabs
+
+	Anotační záložka
+
+Anotační záložka se aktivuje z kontextového menu nad vybraným souborem v záložce "hledat".
+Těchto záložek je možné otevřít celou řadu, účelné je otevřít pro každý soubor záložky 'hledat' jednu záložku anotační. 
+
+Anotační záložka má dva panely. V horním panelu je graf a seznam revizí vybraného souboru. Pro každou revizi lze dvojklikem aktualizovat anotaci ve spodním panelu a obráceně - pro každý řádek anotace lze dvojklikem zvýraznit odpovídající revizi v horním panelu.
+
+U obou panelů lze pravým klikem otevřít kontextovou nabídku s položkami: zoom ke změně, zobrazit changeset, anotace rodiče, otevřít revizi souboru a historie souboru. Je to podobná nabídka jako v záložce 'hledat'.
+
+Barevné schema anotačního panelu je dvojrozměrné. Barva řádku se mění podle autora, sytost podle stáří změny. Čím je změna starší, tím je zabarvení světlejší.
+
+Pravým klikem na záhlaví sloupců v anotačním panelu lze přidat další sloupce :guilabel:`Jméno souboru` a :guilabel:`Uživatel`.
+
+Sledování změny jmen
+^^^^^^^^^^^^^^^^^^^^
+
+Anotační data sledují automaticky řádky kódu zpět zkrz kopie a změny jmen až k původnímu changesetu, který změnu zavedl.
+Panel se zobrazením grafu se rovněž pokouší sledovat změny jmen a kopie takže některé řádky v tomto panelu mohou korelovat s jinými jmény souborů než původní anotovaná cesta k souboru.
+Změny jmen jsou v grafu vyznačeny barevně.
+
+
+Nastavitelné parametry
+^^^^^^^^^^^^^^^^^^^^^^
+
+Anotační záložky lze konfigurovat v okně Nastavení ..., který byl primárně definován pro jiné nástroje:
+
+:menuselection:`Changelog -> Zabarvení podle autora`
+	Měnit zabarvení větve grafu podle autora
+:menuselection:`Changelog -> Dlouhý souhrn`
+	Spojuje řádky zprávy komitu do délky 80 znaků.
+:menuselection:`TortoiseHg -> Šířka záložky`
+	Počet míst pro šířku záložek 
+
+Spuštění z příkazového řádku
+----------------------------
+
+::
+
+	hgtk datamine
+
+	aliasy: annotate, blame
+
+	repository search and annotate tool
+
+	globální možnosti viz "hgtk -v help datamine" 
+
+.. vim: noet ts=4

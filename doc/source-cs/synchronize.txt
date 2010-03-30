@@ -1,0 +1,124 @@
+Synchronizace
+=============
+
+.. module:: synchronize.dialog
+	:synopsis: Dialog used to perform synchronization operations
+
+.. figure:: figures/synchronize.png
+	:alt: Synchronize dialog
+
+	Dialogové okno Synchronizace 
+
+.. note::
+	Tento nástroj je v 0.9 zpochybňován a může být v další 
+	verzi vypuštěn. Pro synchronizační úkoly doporučujeme 
+	používat HG Průzkumník repozitáře.
+
+Synchronizační nástroj se používá pro přemisťování changesetů mezi repozitáři nebo pro odeslání změny emailem.
+
+	:guilabel:`Příchozí`
+		zobrazit changesety, které mají být staženy z cílového repozitáře neboli změny v cílovém repozitáři, které nejsou v lokálním repozitáři 
+	:guilabel:`Pull`
+		převzít příchozí changesety z cílového repozitáře
+	:guilabel:`Odchozí`
+		zobrazit changesety, které mají být vyslány do  cílového repozitáře, neboli změny v lokálním adresáři, které nejsou v cílovém repozitáři
+	:guilabel:`Push`
+		vyslat odchozí changesety do cílového repozitáře, neboli vytvořit nový *tip* v cílovém repozitáři z *tipu* v lokálním repozitáři 
+	:guilabel:`Email`
+		poslat odchozí changesety (do cílového repozitáře) jako email
+	:guilabel:`Shelve`
+		spustit nástroj 'shelve', aby bylo možné odložit pracovní změny dočasně do 'regálu', protože některé operace vyžadují čistý pracovní adresář
+	:guilabel:`Stop`
+		zastavit probíhající operaci
+	:guilabel:`Nastavit`
+		nastavit cesty k repozitářům
+
+Pod nástrojovou lištou jsou dvě tlačítka s jedním textovým polem:
+
+	:guilabel:`Repo:`
+		vyhledat lokální repozitář pro synchronizaci
+	:guilabel:`Svazek:`
+		vyhledat lokální soubor svazku pro akci pull
+
+V rozbalovacím textovém poli zadáme nebo vyhledáme cesty k cílovým repozitářům. Synchronizační nástroj zaplní tento seznam cestami, nastavenými pro aktuální repozitář.
+
+Vyběrový seznam :guilabel:`Po akci Pull` obsahuje názvy operací, které se mají provést po akci 'pull'. Tyto operace jsou nastavitelné prostřednictvím tlačítka :guilabel:`Nastavit`.  
+Je možné zadat globální nastavení (pro uživatele) a toto  nastavení změnit v konfiguraci repozitáře.
+
+	:guilabel:`Nic`
+		Po akci 'pull' se neprovede žádná operace. Bude možné vidět stažené changesety v zobrazení logů a provést aktualizaci k novému tipu.
+	:guilabel:`Aktualizovat`
+		Automaticky aktualizovat k novému tipu větve jenom v tom případě, že nové revize byly staženy do lokálního repozitáře. To může spustit slučování, pokud by stažené změny kolidovaly s lokálními nekomitovanými změnami.
+	:guilabel:`Fetch`
+		Ekvivalentní k hg fetch.  Viz příslušná dokumentace k  extenzi. Tento prvek lze použít při zpřístupněné extenzi 'fetch'.
+	:guilabel:`Rebase`
+		Ekvivalentní k pull --rebase. Viz příslušná dokumentace k extenzi. Tento prvek lze použít při zpřístupněné extenzi 'rebase'.
+
+Tlačítko :guilabel:`use proxy` je rychlá cesta k odpojení proxy konfigurace pro individuální operace. Toto tlačítko je aktivní, je-li nastaveno http proxy.
+
+Všechny operace, které vyžadují ověření, vysunují dialogová políčka pro získání požadované informace od uživatele. TorotiseHg používá nástroj TorotoisePlink (vypůjčený z TortoiseSVN) pro ošetření autentizace a spojení *ssh*. Při potížích s připojením k serveru ssh je možné nahlédnout do otázek a odpovědí FAQ_.
+
+.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+
+Rozbalovací ikona :guilabel:`Pokročilé možnosti` skrývá řadu dalších nastavitelných parametrů platných pro většinu operací push/pull.
+
+	:guilabel:`Vynutit pull nebo push`
+		potlačit varování o více čelech (heads) nebo nepříbuzných repozitářích
+	:guilabel:`Cílová revize`
+		zamezí poslání všech revizí
+	:guilabel:`Vzdálený příkaz`
+		poskytuje argument -e
+	:guilabel:`Zobrazit oprávky`
+		zobrazit diffy ve vstupních a výstupních změnách
+	:guilabel:`Nejnovější ukázat první`
+		změnit pořadí uváděných changesetů
+	:guilabel:`Sloučení nezobrazovat`
+		odfiltrovat z výstupu changesety se sloučením (neovlivní akci push/pull)
+
+
+Po akci Pull
+------------
+
+Po stažení changesetů do našeho repozitáře se na dolním okraji okna může objevit tlačítko:
+
+	:guilabel:`Aktualizovat k tipu větve`
+		Aktualizovat pracovní adresář k novému tipu aktuální větve.
+
+Tlačítko je skryté, není-li použitelné.
+
+Email
+-----
+
+.. figure:: figures//email.png
+	:alt: Email dialog
+
+	Dialogové okno pro odeslání emailu
+ 
+Dialog pro odeslání emailu lze otevřít ve dvou nástrojích.
+
+1) V kontextové nabídce průzkumníku repozitáře, v kterémžto případě uživatel zamýšlí odeslat jedinou revizi nebo rozsah revizí.
+
+2) V nástroji Synchronizace, v kterémžto případě uživatel může odeslat všechny výstupní změny do aktuálního cílového repozitáře. Je dobrým zvykem změny zkontrolovat před spuštěním okna emailu.
+
+Význam tlačítka :guilabel:`Poslat` je zřejmý a dle očekávání tlačítko :guilabel:`Nastavit` otevírá dialog pro nastavení SMTP, adresy příjemce a jména odesílatele.
+
+Textové pole :guilabel:`In-Reply-To:` se používá pro správné třídění oprávek (patches). 
+
+
+Spuštění z příkazového řádku
+----------------------------
+
+::
+
+	hgtk synch
+
+	aliasy: pull, push, incoming, outgoing, email
+
+	repository synchronization tool
+
+	globální volby viz "hgtk -v help synch" 
+
+Příkaz se zadává bez voleb a parametrů s výjimkou globálních voleb. Je-li synchronizační nástroj spuštěn pomocí zástupných názvů push, outgoing nebo email, vybere automaticky *default-push* URL. Pro všechny ostatní aliasy vybere nástroj *default* URL. Není-li vybrané URL nalezeno, použije se první nalezená cesta.
+
+
+.. vim: noet ts=4
