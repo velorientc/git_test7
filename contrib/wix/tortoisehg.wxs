@@ -323,7 +323,8 @@
         <ComponentGroupRef Id='helpFolder' />
         <ComponentGroupRef Id='templatesFolder' />
         <ComponentGroupRef Id='gtkFolder' />
-        <ComponentGroupRef Id='iconsFolder' />
+        <ComponentRef Id='Icons' />
+        <ComponentRef Id='SvgIcons' />
       </Feature>
       <Feature Id='VCRedist' Title='Visual C++ 9.0 Runtime'
                AllowAdvertise='no' Display='hidden' Level='1'>
@@ -334,7 +335,7 @@
           <Feature Id='ShellExtensionX64' Title='Shell Extension x64'
                    Level='1' AllowAdvertise='no'
                    Description='Context menu for 64-bit processes'>
-            <ComponentGroupRef Id='cmenuI18n' />
+            <ComponentRef Id='cmenuI18n' />
             <ComponentRef Id='thgshellx64dll' />
             <ComponentRef Id='CmenuShellRegistrationX64' />
             <Feature Id='OverlaysX64' Title='Overlay Icons'
@@ -356,7 +357,7 @@
                Level='$(var.ShellExtensionX86level)'
                Absent='allow' AllowAdvertise='no'
                Description='Context menu for 32-bit processes'>
-        <ComponentGroupRef Id='cmenuI18n' />
+        <ComponentRef Id='cmenuI18n' />
         <ComponentRef Id='thgshellx86dll' />
         <ComponentRef Id='CmenuShellRegistrationX86' />
         <Feature Id='OverlaysX86' Title='Overlay Icons'
