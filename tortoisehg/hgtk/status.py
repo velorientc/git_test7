@@ -85,7 +85,6 @@ class GStatus(gdialog.GWindow):
         gdialog.GWindow.init(self)
         self.mode = 'status'
         self.ready = False
-        self.filerowstart = {}
         self.filechunks = {}
         self.status = (None,) * 7
         self.status_error = None
@@ -829,15 +828,11 @@ class GStatus(gdialog.GWindow):
         chunks = self.filechunks[wfile]
         for chunk in chunks:
             chunk.active = selected
-        # this file's chunks may not be in diffmodel
-        if wfile not in self.filerowstart:
-            return
-        rowstart = self.filerowstart[wfile]
         for n, chunk in enumerate(chunks):
             if n == 0:
                 continue
-            self.diffmodel[rowstart+n][DM_REJECTED] = not selected
-            self.update_diff_hunk(self.diffmodel[rowstart+n])
+            self.diffmodel[n][DM_REJECTED] = not selected
+            self.update_diff_hunk(self.diffmodel[n])
         self.update_diff_header(self.diffmodel, wfile, selected)
 
     def update_diff_hunk(self, row):
@@ -859,16 +854,15 @@ class GStatus(gdialog.GWindow):
 
     def update_diff_header(self, dmodel, wfile, selected):
         try:
-            hc = self.filerowstart[wfile]
             chunks = self.filechunks[wfile]
         except IndexError:
             return
         lasthunk = len(chunks)-1
-        sel = lambda x: x >= lasthunk or not dmodel[hc+x+1][DM_REJECTED]
+        sel = lambda x: x >= lasthunk or not dmodel[x+1][DM_REJECTED]
         newtext = chunks[0].selpretty(sel)
         if not selected:
             newtext = "<span foreground='#888888'>" + newtext + "</span>"
-        dmodel[hc][DM_DISP_TEXT] = newtext
+        dmodel[0][DM_DISP_TEXT] = newtext
 
     def updated_codes(self):
         types = [('modified', 'M'),
@@ -1147,7 +1141,6 @@ class GStatus(gdialog.GWindow):
     def update_hunk_model(self, path, tree):
         # Read this file's diffs into hunk selection model
         wfile = self.filemodel[path][FM_PATH]
-        self.filerowstart = {}
         self.diffmodel.clear()
         if not self.is_merge():
             self.append_diff_hunks(wfile)
@@ -1231,7 +1224,6 @@ class GStatus(gdialog.GWindow):
                     elif nc.fromline > oc.fromline:
                         break
 
-        self.filerowstart[wfile] = len(self.diffmodel)
         self.filechunks[wfile] = chunks
 
         # Set row status based on chunk state
@@ -1265,18 +1257,17 @@ class GStatus(gdialog.GWindow):
         row = dmodel[path]
         wfile = row[DM_PATH]
         try:
-            startrow = self.filerowstart[wfile]
             chunks = self.filechunks[wfile]
         except IndexError:
             pass
-        chunkrows = xrange(startrow+1, startrow+len(chunks))
+        chunkrows = xrange(1, len(chunks))
         for fr in self.filemodel:
             if fr[FM_PATH] == wfile:
                 break
         if row[DM_IS_HEADER]:
             for n, chunk in enumerate(chunks[1:]):
                 chunk.active = not fr[FM_CHECKED]
-                self.update_diff_hunk(dmodel[startrow+n+1])
+                self.update_diff_hunk(dmodel[n+1])
             newvalue = not fr[FM_CHECKED]
             partial = False
         else:
