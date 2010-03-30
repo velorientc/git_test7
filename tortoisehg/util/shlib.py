@@ -40,6 +40,8 @@ if os.name == 'nt':
             return
         dirs = set()
         for path in paths:
+            if path is None:
+                continue
             abspath = os.path.abspath(path)
             if not os.path.isdir(abspath):
                 abspath = os.path.dirname(abspath)
@@ -143,7 +145,8 @@ else:
             return
         f_notify = open(notify, 'w')
         try:
-            f_notify.write('\n'.join([os.path.abspath(path) for path in paths]))
+            abspaths = [os.path.abspath(path) for path in paths if path]
+            f_notify.write('\n'.join(abspaths))
         finally:
             f_notify.close()
 

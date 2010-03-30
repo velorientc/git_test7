@@ -186,7 +186,8 @@ class CloneDialog(gdialog.GDialog):
         self.add_src_to_recent(src)
         self.add_dest_to_recent(dest)
         if returncode == 0:
-            shlib.shell_notify([dest])
+            if dest:
+                shlib.shell_notify([dest])
             self.cmd.set_result(_('Cloned successfully'), style='ok')
         elif useraborted:
             self.cmd.set_result(_('Canceled updating'), style='error')
