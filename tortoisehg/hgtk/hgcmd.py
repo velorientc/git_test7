@@ -277,6 +277,12 @@ class CmdWidget(gtk.VBox):
         else:
             raise _('unknown CmdWidget style: %s') % style
 
+        # progress status frame
+        statframe = gtk.Frame()
+        statframe.set_border_width(4)
+        statframe.set_shadow_type(gtk.SHADOW_NONE)
+        self.pack_start(statframe, False, False)
+
         # progress bar box
         self.progbox = progbox = gtklib.SlimToolbar(tooltips)
         self.pack_start(progbox, False, False)
@@ -312,6 +318,13 @@ class CmdWidget(gtk.VBox):
                 self.icons[name] = img
             add_icon('succeed', gtk.STOCK_APPLY)
             add_icon('error', gtk.STOCK_DIALOG_ERROR)
+
+            # progres status label
+            self.progstat = gtk.Label()
+            statframe.add(self.progstat)
+            self.progstat.set_alignment(0, 0.5)
+            self.progstat.set_ellipsize(pango.ELLIPSIZE_END)
+            self.progstat.hide()
 
             # progress bar
             self.pbar = gtk.ProgressBar()
@@ -355,6 +368,7 @@ class CmdWidget(gtk.VBox):
         self.log.clear()
 
         # prepare UI
+        self.inprogress = False
         self.switch_to(working=True)
         self.set_buttons(stop=True, close=False)
         self.already_opened = self.get_pbar()
@@ -406,7 +420,7 @@ class CmdWidget(gtk.VBox):
             markup = markup % (gtklib.DRED, 'bold')
             icons = {'error': True}
         else:
-            markup = markup % ('black', 'normal')
+            markup = markup % (gtklib.NORMAL, 'normal')
             icons = {}
         text = gtklib.markup_escape_text(text)
         self.rlabel.set_markup(markup % text)
@@ -482,12 +496,50 @@ class CmdWidget(gtk.VBox):
 
     ### internal use functions ###
 
+    def clear_progress(self):
+        self.pbar.set_fraction(0)
+        self.pbar.set_text('')
+        self.progstat.set_text('')
+        self.inprogress = False
+
     def update_progress(self):
         if not self.pbar:
             return
         if not self.hgthread.isAlive():
-            self.pbar.set_fraction(0)
-        else:
+            self.clear_progress()
+            return
+
+        data = None
+        while self.hgthread.getprogqueue().qsize():
+            try:
+                data = self.hgthread.getprogqueue().get_nowait()
+            except Queue.Empty:
+                pass
+        counting = False
+        if data:
+            topic, item, pos, total, unit = data
+            if pos is None:
+                self.clear_progress()
+                return
+            if total is None:
+                count = '%d' % pos
+                counting = True
+            else:
+                self.pbar.set_fraction(float(pos) / float(total))
+                count = '%d / %d' % (pos, total)
+            if unit:
+                count += ' ' + unit
+            self.pbar.set_text(count)
+            if item:
+                status = '%s: %s' % (topic, item)
+            else:
+                status = _('Status: %s') % topic
+            self.progstat.set_text(status)
+            if self.progstat.get_property('visible') is False:
+                self.progstat.show()
+            self.inprogress = True
+
+        if not self.inprogress or counting:
             # pulse the progress bar every ~100ms
             tm = shlib.get_system_times()[4]
             if tm - self.last_pbar_update < 0.100:
