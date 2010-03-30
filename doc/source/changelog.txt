@@ -223,47 +223,47 @@ Right-clicking on a revision in the (top) graph pane will bring up the
 revision context menu.
 
 	:guilabel:`Visualize Change`
-		open this change in your visual diff tool
+		Open this change in your visual diff tool
 	:guilabel:`Display Change`
-		open this changeset in the changeset browser (more below)
+		Open this changeset in the changeset browser (more below)
 	:guilabel:`Diff to Local`
-		display changes (visual diff) between this revision and your
+		Display changes (visual diff) between this revision and your
 		current working directory
 	:guilabel:`Copy Hash`
-		copy current revision's full hash to the clipboard
+		Copy current revision's full hash to the clipboard
 	:guilabel:`Push to Here`
-		performs the equivalent of 'push -r <rev>'.  This option is only
+		Performs the equivalent of 'push -r <rev>'.  This option is only
 		available on changesets marked as outgoing.
 	:guilabel:`Update...`
-		update your working directory to this revision. Opens the
+		Update your working directory to this revision. Opens the
 		TortoiseHg update dialog with this revision selected.
 	:guilabel:`Merge With...`
-		merge with this revision. Opens the TortoiseHg merge dialog with
+		Merge with this revision. Opens the TortoiseHg merge dialog with
 		this revision selected.
 	:guilabel:`Backout...`
-		create a backout changeset for selected revision
+		Create a backout changeset for selected revision
 	:guilabel:`Revert`
-		revert working copy to this revision's contents, without
+		Revert working copy to this revision's contents, without
 		updating working directory parent revision. Use with care.
 	:guilabel:`Export`
 		:guilabel:`Export Patch`
-			generate a patch file containing this revision's changes
+			Generate a patch file containing this revision's changes
 		:guilabel:`Email Patch`
-			send this revision's changes to email recipient.  Opens the
+			Send this revision's changes to email recipient.  Opens the
 			TortoiseHg email dialog with this revision selected.
 		:guilabel:`Bundle rev:tip`
-			create a bundle with all revs from selected to tip
+			Create a bundle with all revs from selected to tip
 		:guilabel:`Archive...`
-			open the archive dialog for this revision, allowing user to
+			Open the archive dialog for this revision, allowing user to
 			generate a backup copy of the repository at that revision.
 	:guilabel:`Tag`
 		:guilabel:`Add/Remove Tag`
-			opens the TortoiseHg tag dialog with this revision selected
+			Open the TortoiseHg tag dialog with this revision selected
 		:guilabel:`Add/Move/Remove Bookmark`
-			opens the TortoiseHg bookmark dialog with this revision selected
+			Open the TortoiseHg bookmark dialog with this revision selected
 			*This option requires the boomarks extension to be enabled*
 		:guilabel:`Rename Bookmark`
-			opens the TortoiseHg bookmark rename dialog
+			Open the TortoiseHg bookmark rename dialog
 			*This option requires the boomarks extension to be enabled*
 	:guilabel:`Mercurial Queues`
 		:guilabel:`Import revision to MQ`
