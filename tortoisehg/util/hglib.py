@@ -107,9 +107,17 @@ def getlivebranch(repo):
     '''return a list of live branch names in UTF-8'''
     lives = []
     deads = getdeadbranch(repo.ui)
-    for branch in repo.branchtags().keys(): # encoded in UTF-8
-        if branch not in deads:
-            lives.append(branch.replace('\0', ''))
+    cl = repo.changelog
+    for branch, heads in repo.branchmap().iteritems():
+        # branch encoded in UTF-8
+        if branch in deads:
+            # ignore branch names in tortoisehg.deadbranch
+            continue
+        bheads = [h for h in heads if ('close' not in cl.read(h)[5])]
+        if not bheads:
+            # ignore branches with all heads closed
+            continue
+        lives.append(branch.replace('\0', ''))
     return lives
 
 _hidetags = None
