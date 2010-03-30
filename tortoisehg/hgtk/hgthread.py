@@ -25,18 +25,20 @@ class GtkUi(ui.ui):
     main thread to pickup.
     '''
     def __init__(self, src=None, outputq=None, errorq=None, dialogq=None,
-            responseq=None):
+            responseq=None, progressq=None):
         super(GtkUi, self).__init__(src)
         if src:
             self.outputq = src.outputq
             self.errorq = src.errorq
             self.dialogq = src.dialogq
             self.responseq = src.responseq
+            self.progressq = src.progressq
         else:
             self.outputq = outputq
             self.errorq = errorq
             self.dialogq = dialogq
             self.responseq = responseq
+            self.progressq = progressq
         self.setconfig('ui', 'interactive', 'on')
         self.setconfig('progress', 'disable', 'True')
 
@@ -90,6 +92,9 @@ class GtkUi(ui.ui):
             raise util.Abort(_('response expected'))
         return r
 
+    def progress(self, topic, pos, item='', unit='', total=None):
+        self.progressq.put( (topic, item, pos, total, unit) )
+
 
 class HgThread(thread2.Thread):
     '''
@@ -103,8 +108,9 @@ class HgThread(thread2.Thread):
         self.errorq = Queue.Queue()
         self.dialogq = Queue.Queue()
         self.responseq = Queue.Queue()
+        self.progressq = Queue.Queue()
         self.ui = GtkUi(None, self.outputq, self.errorq, self.dialogq,
-                        self.responseq)
+                        self.responseq, self.progressq)
         self.args = args
         self.ret = None
         self.postfunc = postfunc
@@ -116,6 +122,9 @@ class HgThread(thread2.Thread):
 
     def geterrqueue(self):
         return self.errorq
+
+    def getprogqueue(self):
+        return self.progressq
 
     def return_code(self):
         '''
