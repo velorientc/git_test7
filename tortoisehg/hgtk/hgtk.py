@@ -31,6 +31,8 @@ try:
 except ImportError:
     config_nofork = None
 
+from tortoisehg.hgtk import textview
+
 try:
     import win32con
     openflags = win32con.CREATE_NO_WINDOW
@@ -55,6 +57,9 @@ for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept',
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-close', 'thg-new'):
     gobject.signal_new(sig, gtk.Notebook,
+        gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+for sig in ('thg-undo', 'thg-redo'):
+    gobject.signal_new(sig, textview.UndoableTextView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
 gtkmainalive = False
