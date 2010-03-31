@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <?define thglocales = ca;cs;da;de;en_GB;es;fa;fr;he;hr;it;ja;nl;nn;pl;pt;pt_BR;ru;sv;tr;uk;zh_CN;zh_TW ?>
+    <?define thglocales = ca;cs;da;de;en_GB;es;fa;fr;he;hr;hu;it;ja;nl;nn;pl;pt;pt_BR;ru;sv;tr;uk;zh_CN;zh_TW ?>
     <Fragment>
         <ComponentGroup Id="thgLocaleFolder">
             <?foreach LOC in $(var.thglocales) ?>
