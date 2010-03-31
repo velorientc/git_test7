@@ -373,7 +373,7 @@
                Title='Translations'
                Description='Mercurial and TortoiseHg Translations'>
         <ComponentGroupRef Id='localeFolder' />
-        <ComponentGroupRef Id='i18nFolder' />
+        <ComponentRef Id='i18nFolder' />
         <ComponentGroupRef Id='thgLocaleFolder' />
         <ComponentRef Id='thgI18nFolder' />
       </Feature>
