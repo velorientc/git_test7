@@ -5,7 +5,7 @@
     <!-- lang 'ca' is used for key path -->
 
     <Fragment>
-        <DirectoryRef Id="dirE238460D44340499CA44F8E5739FEA52">
+        <DirectoryRef Id="i18ndir">
             <Directory Id="cmenuI18n" Name="cmenu">
                 <Component Id="cmenuI18n" Guid="{B0AB4947-248C-4c6b-841C-49284EF99022}">
                     <File Source="$(var.SourceDir)\thg-cmenu-ca.reg" KeyPath="yes"/>
