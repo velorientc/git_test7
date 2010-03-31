@@ -161,7 +161,7 @@ def visualdiff(ui, repo, pats, opts):
 
     # Build tool list based on diff-patterns matches
     toollist = set()
-    patterns = ui.configitems('diff-patterns')
+    patterns = repo.ui.configitems('diff-patterns')
     patterns = [(p, t) for p,t in patterns if t in detectedtools]
     for path in MAR:
         for pat, tool in patterns:
@@ -180,7 +180,8 @@ def visualdiff(ui, repo, pats, opts):
             break
     else:
         hascopies = False
-    if len(toollist) > 1 or hascopies:
+    force = repo.ui.configbool('tortoisehg', 'forcevdiffwin')
+    if len(toollist) > 1 or hascopies or force:
         usewin = True
     else:
         preferred = toollist.pop()

@@ -30,6 +30,7 @@ kdiff3.args=--auto --L1 base --L2 parent1 --L3 parent2 $base $local $other -o $o
 kdiff3.regkey=Software\KDiff3
 kdiff3.regappend=\kdiff3.exe
 kdiff3.fixeol=True
+kdiff3.premerge=False
 kdiff3.gui=True
 kdiff3.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
 kdiff3.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
