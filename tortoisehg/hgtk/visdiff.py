@@ -473,7 +473,7 @@ class FileSelectionDialog(gtk.Dialog):
                 return 'R'
             return ' '
 
-        for f in mod_a | add_a | rem_a:
+        for f in sorted(mod_a | add_a | rem_a):
             model.append([get_status(f, mod_a, add_a, rem_a), hglib.toutf(f)])
 
         self.connect('response', self.response)
