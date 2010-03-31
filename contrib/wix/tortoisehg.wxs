@@ -320,7 +320,7 @@
         <ComponentRef Id='mercurial.rc' />
         <ComponentRef Id='mergetools.rc' />
         <ComponentRef Id='ExtensionVersions' />
-        <ComponentGroupRef Id='helpFolder' />
+        <ComponentRef Id='helpFolder' />
         <ComponentGroupRef Id='templatesFolder' />
         <ComponentGroupRef Id='gtkFolder' />
         <ComponentRef Id='Icons' />
