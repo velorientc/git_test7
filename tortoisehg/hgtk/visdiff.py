@@ -180,7 +180,8 @@ def visualdiff(ui, repo, pats, opts):
             break
     else:
         hascopies = False
-    if len(toollist) > 1 or hascopies:
+    force = repo.ui.configbool('tortoisehg', 'forcevdiffwin')
+    if len(toollist) > 1 or hascopies or force:
         usewin = True
     else:
         preferred = toollist.pop()
