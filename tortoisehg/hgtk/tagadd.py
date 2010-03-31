@@ -60,6 +60,7 @@ class TagAddDialog(gtk.Dialog):
         self.reventry = gtk.Entry()
         self.reventry.set_width_chars(12)
         self.reventry.set_text(rev)
+        self.initial_rev = rev
         self.reventry.connect('notify::text',
                                 lambda *a: self.update_sensitives())
         table.add_row(_('Revision:'), self.reventry)
@@ -120,6 +121,8 @@ class TagAddDialog(gtk.Dialog):
         tagmap = self.repo.tags()
         tag = self.tagentry.get_text()
         if not tag or hglib.fromutf(tag) not in tagmap:
+            if self.initial_rev:
+                self.reventry.set_text(self.initial_rev)
             return
 
         node = tagmap[hglib.fromutf(tag)]
