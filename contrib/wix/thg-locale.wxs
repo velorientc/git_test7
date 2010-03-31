@@ -10,7 +10,7 @@
     </Fragment>
     <?foreach LOC in $(var.thglocales) ?>
         <Fragment>
-            <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
+            <DirectoryRef Id="localedir">
                 <Directory Id="thg.locale.$(var.LOC)" Name="$(var.LOC)">
                     <Directory Id="thg.locale.$(var.LOC).LC_MESSAGES" Name="LC_MESSAGES">
                         <Component Id="thg.locale.$(var.LOC)" Guid="*">

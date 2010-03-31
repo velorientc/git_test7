@@ -13,13 +13,13 @@
 
     <Fragment>
         <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="dirA42EA32F4A238F2C40AD5ACF4C831152" Name="locale" />
+            <Directory Id="localedir" Name="locale" />
         </DirectoryRef>
     </Fragment>
 
     <?foreach LOC in $(var.hglocales) ?>
         <Fragment>
-            <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
+            <DirectoryRef Id="localedir">
                 <Directory Id="hg.locale.$(var.LOC)" Name="$(var.LOC)">
                     <Directory Id="hg.locale.$(var.LOC).LC_MESSAGES" Name="LC_MESSAGES">
                         <Component Id="hg.locale.$(var.LOC)" Guid="*">
