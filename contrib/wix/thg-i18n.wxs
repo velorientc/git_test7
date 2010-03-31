@@ -8,9 +8,9 @@
         <DirectoryRef Id="i18ndir">
             <Directory Id="thgI18nFolder" Name="tortoisehg">
                 <Component Id="thgI18nFolder" Guid="{69E6E182-BCD2-4b03-A941-7B9A054DF7AF}">
-                    <File Source="$(var.SourceDir)\tortoisehg\ca.po" KeyPath="yes" />
+                    <File Id="thg.ca.po" Source="$(var.SourceDir)\tortoisehg\ca.po" KeyPath="yes" />
                     <?foreach LANG in $(var.thg_po_langs) ?>
-                        <File Source="$(var.SourceDir)\tortoisehg\$(var.LANG).po" />
+                        <File Id="thg.$(var.LANG).po" Source="$(var.SourceDir)\tortoisehg\$(var.LANG).po" />
                     <?endforeach?>
                 </Component>
             </Directory>
