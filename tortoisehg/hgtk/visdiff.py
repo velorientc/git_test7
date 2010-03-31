@@ -161,7 +161,7 @@ def visualdiff(ui, repo, pats, opts):
 
     # Build tool list based on diff-patterns matches
     toollist = set()
-    patterns = ui.configitems('diff-patterns')
+    patterns = repo.ui.configitems('diff-patterns')
     patterns = [(p, t) for p,t in patterns if t in detectedtools]
     for path in MAR:
         for pat, tool in patterns:
