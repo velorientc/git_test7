@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <?include guids.wxi ?>
+
     <Fragment>
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="docdir" Name="doc" />
@@ -8,7 +11,7 @@
     <Fragment>
         <ComponentGroup Id="docFolder">
             <Component Id="doc.hg.1.html" Directory="docdir"
-                       Guid="{6289D803-14D9-4AF8-AE67-4DB12D1EA5A6}"
+                       Guid="$(var.doc.hg.1.html.guid)"
             >
                 <File Source="$(var.SourceDir)\hg.1.html" KeyPath="yes">
                     <Shortcut Id="hg1StartMenu" Directory="ProgramMenuDir"
@@ -17,7 +20,7 @@
                 </File>
             </Component>
             <Component Id="doc.hgignore.5.html" Directory="docdir"
-                       Guid="{4E80FFF0-C28A-460F-ABC4-85BC25422B80}"
+                       Guid="$(var.doc.hgignore.5.html.guid)"
             >
                 <File Source="$(var.SourceDir)\hgignore.5.html" KeyPath="yes">
                     <Shortcut Id="hgignore5StartMenu" Directory="ProgramMenuDir"
@@ -26,7 +29,7 @@
                 </File>
             </Component>
             <Component Id="doc.hgrc.5.html" Directory="docdir" 
-                       Guid="{F392839B-CEB6-462E-8F23-A85D48F99BD3}"
+                       Guid="$(var.doc.hgrc.5.html)"
             >
                 <File Source="$(var.SourceDir)\hgrc.5.html" KeyPath="yes">
                     <Shortcut Id="hgrc5StartMenu" Directory="ProgramMenuDir"
@@ -35,7 +38,7 @@
                 </File>
             </Component>
             <Component Id="doc.style.css" Directory="docdir"
-                       Guid="{5C276050-DDDD-49FB-86ED-C636FD629242}"
+                       Guid="$(var.doc.style.css)"
             >
                 <File Source="$(var.SourceDir)\style.css" KeyPath="yes" />
             </Component>

@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+    <?include guids.wxi ?>
+
     <Fragment>
         <ComponentGroup Id="templatesFolder">
 
@@ -24,7 +26,7 @@
 
         <Directory Id="templatesdir" Name="templates">
 
-          <Component Id="templates.root" Guid="{C609F85B-91CD-463f-8C07-57931D53B99F}">
+          <Component Id="templates.root" Guid="$(var.templates.root.guid)">
             <File Source="$(var.SourceDir)\map-cmdline.changelog" KeyPath="yes" />
             <File Source="$(var.SourceDir)\map-cmdline.compact" />
             <File Source="$(var.SourceDir)\map-cmdline.default" />
@@ -33,7 +35,7 @@
           </Component>
 
           <Directory Id="templates.atomdir" Name="atom">
-            <Component Id="templates.atom" Guid="{0155E267-F0D5-4115-A7D4-F217599B06C7}">
+            <Component Id="templates.atom" Guid="$(var.templates.atom.guid)">
               <File Id="atom.changelog.tmpl"      Source="$(var.SourceDir)\atom\changelog.tmpl" KeyPath="yes" />
               <File Id="atom.changelogentry.tmpl" Source="$(var.SourceDir)\atom\changelogentry.tmpl" />
               <File Id="atom.error.tmpl"          Source="$(var.SourceDir)\atom\error.tmpl" />
@@ -46,14 +48,14 @@
           </Directory>
 
           <Directory Id="templates.coaldir" Name="coal">
-            <Component Id="templates.coal" Guid="{310F768C-0817-4a07-907C-89AB8FDAE9DE}">
+            <Component Id="templates.coal" Guid="$(var.templates.coal.guid)">
               <File Id="coal.header.tmpl" Source="$(var.SourceDir)\coal\header.tmpl" KeyPath="yes" />
               <File Id="coal.map"         Source="$(var.SourceDir)\coal\map" />
             </Component>
           </Directory>
 
           <Directory Id="templates.gitwebdir" Name="gitweb">
-            <Component Id="templates.gitweb" Guid="{6A6B3DFF-EC52-479a-842C-A650FCF2D39C}">
+            <Component Id="templates.gitweb" Guid="$(var.templates.gitweb.guid)">
               <File Id="gitweb.branches.tmpl"       Source="$(var.SourceDir)\gitweb\branches.tmpl" KeyPath="yes" />
               <File Id="gitweb.changelog.tmpl"      Source="$(var.SourceDir)\gitweb\changelog.tmpl" />
               <File Id="gitweb.changelogentry.tmpl" Source="$(var.SourceDir)\gitweb\changelogentry.tmpl" />
@@ -78,7 +80,7 @@
           </Directory>
 
           <Directory Id="templates.monobluedir" Name="monoblue">
-            <Component Id="templates.monoblue" Guid="{3AA37057-AFB1-4150-8062-2372257A91D2}">
+            <Component Id="templates.monoblue" Guid="$(var.templates.monoblue.guid)">
               <File Id="monoblue.branches.tmpl"       Source="$(var.SourceDir)\monoblue\branches.tmpl" KeyPath="yes" />
               <File Id="monoblue.changelog.tmpl"      Source="$(var.SourceDir)\monoblue\changelog.tmpl" />
               <File Id="monoblue.changelogentry.tmpl" Source="$(var.SourceDir)\monoblue\changelogentry.tmpl" />
@@ -103,7 +105,7 @@
           </Directory>
 
           <Directory Id="templates.paperdir" Name="paper">
-            <Component Id="templates.paper" Guid="{071CFCD8-2F96-4df8-8539-EF3D8176A0FB}">
+            <Component Id="templates.paper" Guid="$(var.templates.paper.guid)">
               <File Id="paper.branches.tmpl"      Source="$(var.SourceDir)\paper\branches.tmpl" KeyPath="yes" />
               <File Id="paper.changeset.tmpl"     Source="$(var.SourceDir)\paper\changeset.tmpl" />
               <File Id="paper.error.tmpl"         Source="$(var.SourceDir)\paper\error.tmpl" />
@@ -127,7 +129,7 @@
           </Directory>
 
           <Directory Id="templates.rawdir" Name="raw">
-            <Component Id="templates.raw" Guid="{F71E0FEB-32F9-4b18-91A5-A59722C682DC}">
+            <Component Id="templates.raw" Guid="$(var.templates.raw.guid)">
               <File Id="raw.changeset.tmpl"    Source="$(var.SourceDir)\raw\changeset.tmpl" KeyPath="yes" />
               <File Id="raw.error.tmpl"        Source="$(var.SourceDir)\raw\error.tmpl" />
               <File Id="raw.fileannotate.tmpl" Source="$(var.SourceDir)\raw\fileannotate.tmpl" />
@@ -140,7 +142,7 @@
           </Directory>
 
           <Directory Id="templates.rssdir" Name="rss">
-            <Component Id="templates.rss" Guid="{23DA0B15-6463-400b-95E0-CD5FAD6B75B5}">
+            <Component Id="templates.rss" Guid="$(var.templates.rss.guid)">
               <File Id="rss.changelog.tmpl"      Source="$(var.SourceDir)\rss\changelog.tmpl" KeyPath="yes" />
               <File Id="rss.changelogentry.tmpl" Source="$(var.SourceDir)\rss\changelogentry.tmpl" />
               <File Id="rss.error.tmpl"          Source="$(var.SourceDir)\rss\error.tmpl" />
@@ -154,7 +156,7 @@
           </Directory>
 
           <Directory Id="templates.spartandir" Name="spartan">
-            <Component Id="templates.spartan" Guid="{0686468F-D950-422f-A904-1B09FFD3C852}">
+            <Component Id="templates.spartan" Guid="$(var.templates.spartan.guid)">
                 <File Id="spartan.branches.tmpl"       Source="$(var.SourceDir)\spartan\branches.tmpl" KeyPath="yes" />
                 <File Id="spartan.changelog.tmpl"      Source="$(var.SourceDir)\spartan\changelog.tmpl" />
                 <File Id="spartan.changelogentry.tmpl" Source="$(var.SourceDir)\spartan\changelogentry.tmpl" />
@@ -180,7 +182,7 @@
           </Directory>
 
           <Directory Id="templates.staticdir" Name="static">
-            <Component Id="templates.static" Guid="{9AC0E261-7563-4147-9974-12022C1CBD4E}">
+            <Component Id="templates.static" Guid="$(var.templates.static.guid)">
                 <File Id="static.background.png"     Source="$(var.SourceDir)\static\background.png" KeyPath="yes" />
                 <File Id="static.coal.file.png"      Source="$(var.SourceDir)\static\coal-file.png" />
                 <File Id="static.coal.folder.png"    Source="$(var.SourceDir)\static\coal-folder.png" />
