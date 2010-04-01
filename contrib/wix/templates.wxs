@@ -1,206 +1,206 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-    <?include guids.wxi ?>
+  <?include guids.wxi ?>
 
-    <Fragment>
-        <ComponentGroup Id="templatesFolder">
+  <Fragment>
+    <ComponentGroup Id="templatesFolder">
 
-            <ComponentRef Id="templates.root" />
+      <ComponentRef Id="templates.root" />
 
-            <ComponentRef Id="templates.atom" />
-            <ComponentRef Id="templates.coal" />
-            <ComponentRef Id="templates.gitweb" />
-            <ComponentRef Id="templates.monoblue" />
-            <ComponentRef Id="templates.paper" />
-            <ComponentRef Id="templates.raw" />
-            <ComponentRef Id="templates.rss" />
-            <ComponentRef Id="templates.spartan" />
-            <ComponentRef Id="templates.static" />
+      <ComponentRef Id="templates.atom" />
+      <ComponentRef Id="templates.coal" />
+      <ComponentRef Id="templates.gitweb" />
+      <ComponentRef Id="templates.monoblue" />
+      <ComponentRef Id="templates.paper" />
+      <ComponentRef Id="templates.raw" />
+      <ComponentRef Id="templates.rss" />
+      <ComponentRef Id="templates.spartan" />
+      <ComponentRef Id="templates.static" />
 
-        </ComponentGroup>
-    </Fragment>
+    </ComponentGroup>
+  </Fragment>
 
-    <Fragment>
-      <DirectoryRef Id="INSTALLDIR">
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
 
-        <Directory Id="templatesdir" Name="templates">
+      <Directory Id="templatesdir" Name="templates">
 
-          <Component Id="templates.root" Guid="$(var.templates.root.guid)">
-            <File Source="$(var.SourceDir)\map-cmdline.changelog" KeyPath="yes" />
-            <File Source="$(var.SourceDir)\map-cmdline.compact" />
-            <File Source="$(var.SourceDir)\map-cmdline.default" />
-            <File Source="$(var.SourceDir)\map-cmdline.xml" />
-            <File Source="$(var.SourceDir)\template-vars.txt" />
+        <Component Id="templates.root" Guid="$(var.templates.root.guid)">
+          <File Source="$(var.SourceDir)\map-cmdline.changelog" KeyPath="yes" />
+          <File Source="$(var.SourceDir)\map-cmdline.compact" />
+          <File Source="$(var.SourceDir)\map-cmdline.default" />
+          <File Source="$(var.SourceDir)\map-cmdline.xml" />
+          <File Source="$(var.SourceDir)\template-vars.txt" />
+        </Component>
+
+        <Directory Id="templates.atomdir" Name="atom">
+          <Component Id="templates.atom" Guid="$(var.templates.atom.guid)">
+            <File Id="atom.changelog.tmpl"      Source="$(var.SourceDir)\atom\changelog.tmpl" KeyPath="yes" />
+            <File Id="atom.changelogentry.tmpl" Source="$(var.SourceDir)\atom\changelogentry.tmpl" />
+            <File Id="atom.error.tmpl"          Source="$(var.SourceDir)\atom\error.tmpl" />
+            <File Id="atom.filelog.tmpl"        Source="$(var.SourceDir)\atom\filelog.tmpl" />
+            <File Id="atom.header.tmpl"         Source="$(var.SourceDir)\atom\header.tmpl" />
+            <File Id="atom.map"                 Source="$(var.SourceDir)\atom\map" />
+            <File Id="atom.tagentry.tmpl"       Source="$(var.SourceDir)\atom\tagentry.tmpl" />
+            <File Id="atom.tags.tmpl"           Source="$(var.SourceDir)\atom\tags.tmpl" />
           </Component>
-
-          <Directory Id="templates.atomdir" Name="atom">
-            <Component Id="templates.atom" Guid="$(var.templates.atom.guid)">
-              <File Id="atom.changelog.tmpl"      Source="$(var.SourceDir)\atom\changelog.tmpl" KeyPath="yes" />
-              <File Id="atom.changelogentry.tmpl" Source="$(var.SourceDir)\atom\changelogentry.tmpl" />
-              <File Id="atom.error.tmpl"          Source="$(var.SourceDir)\atom\error.tmpl" />
-              <File Id="atom.filelog.tmpl"        Source="$(var.SourceDir)\atom\filelog.tmpl" />
-              <File Id="atom.header.tmpl"         Source="$(var.SourceDir)\atom\header.tmpl" />
-              <File Id="atom.map"                 Source="$(var.SourceDir)\atom\map" />
-              <File Id="atom.tagentry.tmpl"       Source="$(var.SourceDir)\atom\tagentry.tmpl" />
-              <File Id="atom.tags.tmpl"           Source="$(var.SourceDir)\atom\tags.tmpl" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.coaldir" Name="coal">
-            <Component Id="templates.coal" Guid="$(var.templates.coal.guid)">
-              <File Id="coal.header.tmpl" Source="$(var.SourceDir)\coal\header.tmpl" KeyPath="yes" />
-              <File Id="coal.map"         Source="$(var.SourceDir)\coal\map" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.gitwebdir" Name="gitweb">
-            <Component Id="templates.gitweb" Guid="$(var.templates.gitweb.guid)">
-              <File Id="gitweb.branches.tmpl"       Source="$(var.SourceDir)\gitweb\branches.tmpl" KeyPath="yes" />
-              <File Id="gitweb.changelog.tmpl"      Source="$(var.SourceDir)\gitweb\changelog.tmpl" />
-              <File Id="gitweb.changelogentry.tmpl" Source="$(var.SourceDir)\gitweb\changelogentry.tmpl" />
-              <File Id="gitweb.changeset.tmpl"      Source="$(var.SourceDir)\gitweb\changeset.tmpl" />
-              <File Id="gitweb.error.tmpl"          Source="$(var.SourceDir)\gitweb\error.tmpl" />
-              <File Id="gitweb.fileannotate.tmpl"   Source="$(var.SourceDir)\gitweb\fileannotate.tmpl" />
-              <File Id="gitweb.filediff.tmpl"       Source="$(var.SourceDir)\gitweb\filediff.tmpl" />
-              <File Id="gitweb.filelog.tmpl"        Source="$(var.SourceDir)\gitweb\filelog.tmpl" />
-              <File Id="gitweb.filerevision.tmpl"   Source="$(var.SourceDir)\gitweb\filerevision.tmpl" />
-              <File Id="gitweb.footer.tmpl"         Source="$(var.SourceDir)\gitweb\footer.tmpl" />
-              <File Id="gitweb.graph.tmpl"          Source="$(var.SourceDir)\gitweb\graph.tmpl" />
-              <File Id="gitweb.header.tmpl"         Source="$(var.SourceDir)\gitweb\header.tmpl" />
-              <File Id="gitweb.index.tmpl"          Source="$(var.SourceDir)\gitweb\index.tmpl" />
-              <File Id="gitweb.manifest.tmpl"       Source="$(var.SourceDir)\gitweb\manifest.tmpl" />
-              <File Id="gitweb.map"                 Source="$(var.SourceDir)\gitweb\map" />
-              <File Id="gitweb.notfound.tmpl"       Source="$(var.SourceDir)\gitweb\notfound.tmpl" />
-              <File Id="gitweb.search.tmpl"         Source="$(var.SourceDir)\gitweb\search.tmpl" />
-              <File Id="gitweb.shortlog.tmpl"       Source="$(var.SourceDir)\gitweb\shortlog.tmpl" />
-              <File Id="gitweb.summary.tmpl"        Source="$(var.SourceDir)\gitweb\summary.tmpl" />
-              <File Id="gitweb.tags.tmpl"           Source="$(var.SourceDir)\gitweb\tags.tmpl" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.monobluedir" Name="monoblue">
-            <Component Id="templates.monoblue" Guid="$(var.templates.monoblue.guid)">
-              <File Id="monoblue.branches.tmpl"       Source="$(var.SourceDir)\monoblue\branches.tmpl" KeyPath="yes" />
-              <File Id="monoblue.changelog.tmpl"      Source="$(var.SourceDir)\monoblue\changelog.tmpl" />
-              <File Id="monoblue.changelogentry.tmpl" Source="$(var.SourceDir)\monoblue\changelogentry.tmpl" />
-              <File Id="monoblue.changeset.tmpl"      Source="$(var.SourceDir)\monoblue\changeset.tmpl" />
-              <File Id="monoblue.error.tmpl"          Source="$(var.SourceDir)\monoblue\error.tmpl" />
-              <File Id="monoblue.fileannotate.tmpl"   Source="$(var.SourceDir)\monoblue\fileannotate.tmpl" />
-              <File Id="monoblue.filediff.tmpl"       Source="$(var.SourceDir)\monoblue\filediff.tmpl" />
-              <File Id="monoblue.filelog.tmpl"        Source="$(var.SourceDir)\monoblue\filelog.tmpl" />
-              <File Id="monoblue.filerevision.tmpl"   Source="$(var.SourceDir)\monoblue\filerevision.tmpl" />
-              <File Id="monoblue.footer.tmpl"         Source="$(var.SourceDir)\monoblue\footer.tmpl" />
-              <File Id="monoblue.graph.tmpl"          Source="$(var.SourceDir)\monoblue\graph.tmpl" />
-              <File Id="monoblue.header.tmpl"         Source="$(var.SourceDir)\monoblue\header.tmpl" />
-              <File Id="monoblue.index.tmpl"          Source="$(var.SourceDir)\monoblue\index.tmpl" />
-              <File Id="monoblue.manifest.tmpl"       Source="$(var.SourceDir)\monoblue\manifest.tmpl" />
-              <File Id="monoblue.map"                 Source="$(var.SourceDir)\monoblue\map" />
-              <File Id="monoblue.notfound.tmpl"       Source="$(var.SourceDir)\monoblue\notfound.tmpl" />
-              <File Id="monoblue.search.tmpl"         Source="$(var.SourceDir)\monoblue\search.tmpl" />
-              <File Id="monoblue.shortlog.tmpl"       Source="$(var.SourceDir)\monoblue\shortlog.tmpl" />
-              <File Id="monoblue.summary.tmpl"        Source="$(var.SourceDir)\monoblue\summary.tmpl" />
-              <File Id="monoblue.tags.tmpl"           Source="$(var.SourceDir)\monoblue\tags.tmpl" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.paperdir" Name="paper">
-            <Component Id="templates.paper" Guid="$(var.templates.paper.guid)">
-              <File Id="paper.branches.tmpl"      Source="$(var.SourceDir)\paper\branches.tmpl" KeyPath="yes" />
-              <File Id="paper.changeset.tmpl"     Source="$(var.SourceDir)\paper\changeset.tmpl" />
-              <File Id="paper.error.tmpl"         Source="$(var.SourceDir)\paper\error.tmpl" />
-              <File Id="paper.fileannotate.tmpl"  Source="$(var.SourceDir)\paper\fileannotate.tmpl" />
-              <File Id="paper.filediff.tmpl"      Source="$(var.SourceDir)\paper\filediff.tmpl" />
-              <File Id="paper.filelog.tmpl"       Source="$(var.SourceDir)\paper\filelog.tmpl" />
-              <File Id="paper.filelogentry.tmpl"  Source="$(var.SourceDir)\paper\filelogentry.tmpl" />
-              <File Id="paper.filerevision.tmpl"  Source="$(var.SourceDir)\paper\filerevision.tmpl" />
-              <File Id="paper.footer.tmpl"        Source="$(var.SourceDir)\paper\footer.tmpl" />
-              <File Id="paper.graph.tmpl"         Source="$(var.SourceDir)\paper\graph.tmpl" />
-              <File Id="paper.header.tmpl"        Source="$(var.SourceDir)\paper\header.tmpl" />
-              <File Id="paper.index.tmpl"         Source="$(var.SourceDir)\paper\index.tmpl" />
-              <File Id="paper.manifest.tmpl"      Source="$(var.SourceDir)\paper\manifest.tmpl" />
-              <File Id="paper.map"                Source="$(var.SourceDir)\paper\map" />
-              <File Id="paper.notfound.tmpl"      Source="$(var.SourceDir)\paper\notfound.tmpl" />
-              <File Id="paper.search.tmpl"        Source="$(var.SourceDir)\paper\search.tmpl" />
-              <File Id="paper.shortlog.tmpl"      Source="$(var.SourceDir)\paper\shortlog.tmpl" />
-              <File Id="paper.shortlogentry.tmpl" Source="$(var.SourceDir)\paper\shortlogentry.tmpl" />
-              <File Id="paper.tags.tmpl"          Source="$(var.SourceDir)\paper\tags.tmpl" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.rawdir" Name="raw">
-            <Component Id="templates.raw" Guid="$(var.templates.raw.guid)">
-              <File Id="raw.changeset.tmpl"    Source="$(var.SourceDir)\raw\changeset.tmpl" KeyPath="yes" />
-              <File Id="raw.error.tmpl"        Source="$(var.SourceDir)\raw\error.tmpl" />
-              <File Id="raw.fileannotate.tmpl" Source="$(var.SourceDir)\raw\fileannotate.tmpl" />
-              <File Id="raw.filediff.tmpl"     Source="$(var.SourceDir)\raw\filediff.tmpl" />
-              <File Id="raw.index.tmpl"        Source="$(var.SourceDir)\raw\index.tmpl" />
-              <File Id="raw.manifest.tmpl"     Source="$(var.SourceDir)\raw\manifest.tmpl" />
-              <File Id="raw.map"               Source="$(var.SourceDir)\raw\map" />
-              <File Id="raw.notfound.tmpl"     Source="$(var.SourceDir)\raw\notfound.tmpl" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.rssdir" Name="rss">
-            <Component Id="templates.rss" Guid="$(var.templates.rss.guid)">
-              <File Id="rss.changelog.tmpl"      Source="$(var.SourceDir)\rss\changelog.tmpl" KeyPath="yes" />
-              <File Id="rss.changelogentry.tmpl" Source="$(var.SourceDir)\rss\changelogentry.tmpl" />
-              <File Id="rss.error.tmpl"          Source="$(var.SourceDir)\rss\error.tmpl" />
-              <File Id="rss.filelog.tmpl"        Source="$(var.SourceDir)\rss\filelog.tmpl" />
-              <File Id="rss.filelogentry.tmpl"   Source="$(var.SourceDir)\rss\filelogentry.tmpl" />
-              <File Id="rss.header.tmpl"         Source="$(var.SourceDir)\rss\header.tmpl" />
-              <File Id="rss.map"                 Source="$(var.SourceDir)\rss\map" />
-              <File Id="rss.tagentry.tmpl"       Source="$(var.SourceDir)\rss\tagentry.tmpl" />
-              <File Id="rss.tags.tmpl"           Source="$(var.SourceDir)\rss\tags.tmpl" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.spartandir" Name="spartan">
-            <Component Id="templates.spartan" Guid="$(var.templates.spartan.guid)">
-                <File Id="spartan.branches.tmpl"       Source="$(var.SourceDir)\spartan\branches.tmpl" KeyPath="yes" />
-                <File Id="spartan.changelog.tmpl"      Source="$(var.SourceDir)\spartan\changelog.tmpl" />
-                <File Id="spartan.changelogentry.tmpl" Source="$(var.SourceDir)\spartan\changelogentry.tmpl" />
-                <File Id="spartan.changeset.tmpl"      Source="$(var.SourceDir)\spartan\changeset.tmpl" />
-                <File Id="spartan.error.tmpl"          Source="$(var.SourceDir)\spartan\error.tmpl" />
-                <File Id="spartan.fileannotate.tmpl"   Source="$(var.SourceDir)\spartan\fileannotate.tmpl" />
-                <File Id="spartan.filediff.tmpl"       Source="$(var.SourceDir)\spartan\filediff.tmpl" />
-                <File Id="spartan.filelog.tmpl"        Source="$(var.SourceDir)\spartan\filelog.tmpl" />
-                <File Id="spartan.filelogentry.tmpl"   Source="$(var.SourceDir)\spartan\filelogentry.tmpl" />
-                <File Id="spartan.filerevision.tmpl"   Source="$(var.SourceDir)\spartan\filerevision.tmpl" />
-                <File Id="spartan.footer.tmpl"         Source="$(var.SourceDir)\spartan\footer.tmpl" />
-                <File Id="spartan.graph.tmpl"          Source="$(var.SourceDir)\spartan\graph.tmpl" />
-                <File Id="spartan.header.tmpl"         Source="$(var.SourceDir)\spartan\header.tmpl" />
-                <File Id="spartan.index.tmpl"          Source="$(var.SourceDir)\spartan\index.tmpl" />
-                <File Id="spartan.manifest.tmpl"       Source="$(var.SourceDir)\spartan\manifest.tmpl" />
-                <File Id="spartan.map"                 Source="$(var.SourceDir)\spartan\map" />
-                <File Id="spartan.notfound.tmpl"       Source="$(var.SourceDir)\spartan\notfound.tmpl" />
-                <File Id="spartan.search.tmpl"         Source="$(var.SourceDir)\spartan\search.tmpl" />
-                <File Id="spartan.shortlog.tmpl"       Source="$(var.SourceDir)\spartan\shortlog.tmpl" />
-                <File Id="spartan.shortlogentry.tmpl"  Source="$(var.SourceDir)\spartan\shortlogentry.tmpl" />
-                <File Id="spartan.tags.tmpl"           Source="$(var.SourceDir)\spartan\tags.tmpl" />
-            </Component>
-          </Directory>
-
-          <Directory Id="templates.staticdir" Name="static">
-            <Component Id="templates.static" Guid="$(var.templates.static.guid)">
-                <File Id="static.background.png"     Source="$(var.SourceDir)\static\background.png" KeyPath="yes" />
-                <File Id="static.coal.file.png"      Source="$(var.SourceDir)\static\coal-file.png" />
-                <File Id="static.coal.folder.png"    Source="$(var.SourceDir)\static\coal-folder.png" />
-                <File Id="static.excanvas.js"        Source="$(var.SourceDir)\static\excanvas.js" />
-                <File Id="static.graph.js"           Source="$(var.SourceDir)\static\graph.js" />
-                <File Id="static.hgicon.png"         Source="$(var.SourceDir)\static\hgicon.png" />
-                <File Id="static.hglogo.png"         Source="$(var.SourceDir)\static\hglogo.png" />
-                <File Id="static.style.coal.css"     Source="$(var.SourceDir)\static\style-coal.css" />
-                <File Id="static.style.gitweb.css"   Source="$(var.SourceDir)\static\style-gitweb.css" />
-                <File Id="static.style.monoblue.css" Source="$(var.SourceDir)\static\style-monoblue.css" />
-                <File Id="static.style.paper.css"    Source="$(var.SourceDir)\static\style-paper.css" />
-                <File Id="static.style.css"          Source="$(var.SourceDir)\static\style.css" />
-            </Component>
-          </Directory>
-
         </Directory>
 
-      </DirectoryRef>
-    </Fragment>
+        <Directory Id="templates.coaldir" Name="coal">
+          <Component Id="templates.coal" Guid="$(var.templates.coal.guid)">
+            <File Id="coal.header.tmpl" Source="$(var.SourceDir)\coal\header.tmpl" KeyPath="yes" />
+            <File Id="coal.map"         Source="$(var.SourceDir)\coal\map" />
+          </Component>
+        </Directory>
+
+        <Directory Id="templates.gitwebdir" Name="gitweb">
+          <Component Id="templates.gitweb" Guid="$(var.templates.gitweb.guid)">
+            <File Id="gitweb.branches.tmpl"       Source="$(var.SourceDir)\gitweb\branches.tmpl" KeyPath="yes" />
+            <File Id="gitweb.changelog.tmpl"      Source="$(var.SourceDir)\gitweb\changelog.tmpl" />
+            <File Id="gitweb.changelogentry.tmpl" Source="$(var.SourceDir)\gitweb\changelogentry.tmpl" />
+            <File Id="gitweb.changeset.tmpl"      Source="$(var.SourceDir)\gitweb\changeset.tmpl" />
+            <File Id="gitweb.error.tmpl"          Source="$(var.SourceDir)\gitweb\error.tmpl" />
+            <File Id="gitweb.fileannotate.tmpl"   Source="$(var.SourceDir)\gitweb\fileannotate.tmpl" />
+            <File Id="gitweb.filediff.tmpl"       Source="$(var.SourceDir)\gitweb\filediff.tmpl" />
+            <File Id="gitweb.filelog.tmpl"        Source="$(var.SourceDir)\gitweb\filelog.tmpl" />
+            <File Id="gitweb.filerevision.tmpl"   Source="$(var.SourceDir)\gitweb\filerevision.tmpl" />
+            <File Id="gitweb.footer.tmpl"         Source="$(var.SourceDir)\gitweb\footer.tmpl" />
+            <File Id="gitweb.graph.tmpl"          Source="$(var.SourceDir)\gitweb\graph.tmpl" />
+            <File Id="gitweb.header.tmpl"         Source="$(var.SourceDir)\gitweb\header.tmpl" />
+            <File Id="gitweb.index.tmpl"          Source="$(var.SourceDir)\gitweb\index.tmpl" />
+            <File Id="gitweb.manifest.tmpl"       Source="$(var.SourceDir)\gitweb\manifest.tmpl" />
+            <File Id="gitweb.map"                 Source="$(var.SourceDir)\gitweb\map" />
+            <File Id="gitweb.notfound.tmpl"       Source="$(var.SourceDir)\gitweb\notfound.tmpl" />
+            <File Id="gitweb.search.tmpl"         Source="$(var.SourceDir)\gitweb\search.tmpl" />
+            <File Id="gitweb.shortlog.tmpl"       Source="$(var.SourceDir)\gitweb\shortlog.tmpl" />
+            <File Id="gitweb.summary.tmpl"        Source="$(var.SourceDir)\gitweb\summary.tmpl" />
+            <File Id="gitweb.tags.tmpl"           Source="$(var.SourceDir)\gitweb\tags.tmpl" />
+          </Component>
+        </Directory>
+
+        <Directory Id="templates.monobluedir" Name="monoblue">
+          <Component Id="templates.monoblue" Guid="$(var.templates.monoblue.guid)">
+            <File Id="monoblue.branches.tmpl"       Source="$(var.SourceDir)\monoblue\branches.tmpl" KeyPath="yes" />
+            <File Id="monoblue.changelog.tmpl"      Source="$(var.SourceDir)\monoblue\changelog.tmpl" />
+            <File Id="monoblue.changelogentry.tmpl" Source="$(var.SourceDir)\monoblue\changelogentry.tmpl" />
+            <File Id="monoblue.changeset.tmpl"      Source="$(var.SourceDir)\monoblue\changeset.tmpl" />
+            <File Id="monoblue.error.tmpl"          Source="$(var.SourceDir)\monoblue\error.tmpl" />
+            <File Id="monoblue.fileannotate.tmpl"   Source="$(var.SourceDir)\monoblue\fileannotate.tmpl" />
+            <File Id="monoblue.filediff.tmpl"       Source="$(var.SourceDir)\monoblue\filediff.tmpl" />
+            <File Id="monoblue.filelog.tmpl"        Source="$(var.SourceDir)\monoblue\filelog.tmpl" />
+            <File Id="monoblue.filerevision.tmpl"   Source="$(var.SourceDir)\monoblue\filerevision.tmpl" />
+            <File Id="monoblue.footer.tmpl"         Source="$(var.SourceDir)\monoblue\footer.tmpl" />
+            <File Id="monoblue.graph.tmpl"          Source="$(var.SourceDir)\monoblue\graph.tmpl" />
+            <File Id="monoblue.header.tmpl"         Source="$(var.SourceDir)\monoblue\header.tmpl" />
+            <File Id="monoblue.index.tmpl"          Source="$(var.SourceDir)\monoblue\index.tmpl" />
+            <File Id="monoblue.manifest.tmpl"       Source="$(var.SourceDir)\monoblue\manifest.tmpl" />
+            <File Id="monoblue.map"                 Source="$(var.SourceDir)\monoblue\map" />
+            <File Id="monoblue.notfound.tmpl"       Source="$(var.SourceDir)\monoblue\notfound.tmpl" />
+            <File Id="monoblue.search.tmpl"         Source="$(var.SourceDir)\monoblue\search.tmpl" />
+            <File Id="monoblue.shortlog.tmpl"       Source="$(var.SourceDir)\monoblue\shortlog.tmpl" />
+            <File Id="monoblue.summary.tmpl"        Source="$(var.SourceDir)\monoblue\summary.tmpl" />
+            <File Id="monoblue.tags.tmpl"           Source="$(var.SourceDir)\monoblue\tags.tmpl" />
+          </Component>
+        </Directory>
+
+        <Directory Id="templates.paperdir" Name="paper">
+          <Component Id="templates.paper" Guid="$(var.templates.paper.guid)">
+            <File Id="paper.branches.tmpl"      Source="$(var.SourceDir)\paper\branches.tmpl" KeyPath="yes" />
+            <File Id="paper.changeset.tmpl"     Source="$(var.SourceDir)\paper\changeset.tmpl" />
+            <File Id="paper.error.tmpl"         Source="$(var.SourceDir)\paper\error.tmpl" />
+            <File Id="paper.fileannotate.tmpl"  Source="$(var.SourceDir)\paper\fileannotate.tmpl" />
+            <File Id="paper.filediff.tmpl"      Source="$(var.SourceDir)\paper\filediff.tmpl" />
+            <File Id="paper.filelog.tmpl"       Source="$(var.SourceDir)\paper\filelog.tmpl" />
+            <File Id="paper.filelogentry.tmpl"  Source="$(var.SourceDir)\paper\filelogentry.tmpl" />
+            <File Id="paper.filerevision.tmpl"  Source="$(var.SourceDir)\paper\filerevision.tmpl" />
+            <File Id="paper.footer.tmpl"        Source="$(var.SourceDir)\paper\footer.tmpl" />
+            <File Id="paper.graph.tmpl"         Source="$(var.SourceDir)\paper\graph.tmpl" />
+            <File Id="paper.header.tmpl"        Source="$(var.SourceDir)\paper\header.tmpl" />
+            <File Id="paper.index.tmpl"         Source="$(var.SourceDir)\paper\index.tmpl" />
+            <File Id="paper.manifest.tmpl"      Source="$(var.SourceDir)\paper\manifest.tmpl" />
+            <File Id="paper.map"                Source="$(var.SourceDir)\paper\map" />
+            <File Id="paper.notfound.tmpl"      Source="$(var.SourceDir)\paper\notfound.tmpl" />
+            <File Id="paper.search.tmpl"        Source="$(var.SourceDir)\paper\search.tmpl" />
+            <File Id="paper.shortlog.tmpl"      Source="$(var.SourceDir)\paper\shortlog.tmpl" />
+            <File Id="paper.shortlogentry.tmpl" Source="$(var.SourceDir)\paper\shortlogentry.tmpl" />
+            <File Id="paper.tags.tmpl"          Source="$(var.SourceDir)\paper\tags.tmpl" />
+          </Component>
+        </Directory>
+
+        <Directory Id="templates.rawdir" Name="raw">
+          <Component Id="templates.raw" Guid="$(var.templates.raw.guid)">
+            <File Id="raw.changeset.tmpl"    Source="$(var.SourceDir)\raw\changeset.tmpl" KeyPath="yes" />
+            <File Id="raw.error.tmpl"        Source="$(var.SourceDir)\raw\error.tmpl" />
+            <File Id="raw.fileannotate.tmpl" Source="$(var.SourceDir)\raw\fileannotate.tmpl" />
+            <File Id="raw.filediff.tmpl"     Source="$(var.SourceDir)\raw\filediff.tmpl" />
+            <File Id="raw.index.tmpl"        Source="$(var.SourceDir)\raw\index.tmpl" />
+            <File Id="raw.manifest.tmpl"     Source="$(var.SourceDir)\raw\manifest.tmpl" />
+            <File Id="raw.map"               Source="$(var.SourceDir)\raw\map" />
+            <File Id="raw.notfound.tmpl"     Source="$(var.SourceDir)\raw\notfound.tmpl" />
+          </Component>
+        </Directory>
+
+        <Directory Id="templates.rssdir" Name="rss">
+          <Component Id="templates.rss" Guid="$(var.templates.rss.guid)">
+            <File Id="rss.changelog.tmpl"      Source="$(var.SourceDir)\rss\changelog.tmpl" KeyPath="yes" />
+            <File Id="rss.changelogentry.tmpl" Source="$(var.SourceDir)\rss\changelogentry.tmpl" />
+            <File Id="rss.error.tmpl"          Source="$(var.SourceDir)\rss\error.tmpl" />
+            <File Id="rss.filelog.tmpl"        Source="$(var.SourceDir)\rss\filelog.tmpl" />
+            <File Id="rss.filelogentry.tmpl"   Source="$(var.SourceDir)\rss\filelogentry.tmpl" />
+            <File Id="rss.header.tmpl"         Source="$(var.SourceDir)\rss\header.tmpl" />
+            <File Id="rss.map"                 Source="$(var.SourceDir)\rss\map" />
+            <File Id="rss.tagentry.tmpl"       Source="$(var.SourceDir)\rss\tagentry.tmpl" />
+            <File Id="rss.tags.tmpl"           Source="$(var.SourceDir)\rss\tags.tmpl" />
+          </Component>
+        </Directory>
+
+        <Directory Id="templates.spartandir" Name="spartan">
+          <Component Id="templates.spartan" Guid="$(var.templates.spartan.guid)">
+            <File Id="spartan.branches.tmpl"       Source="$(var.SourceDir)\spartan\branches.tmpl" KeyPath="yes" />
+            <File Id="spartan.changelog.tmpl"      Source="$(var.SourceDir)\spartan\changelog.tmpl" />
+            <File Id="spartan.changelogentry.tmpl" Source="$(var.SourceDir)\spartan\changelogentry.tmpl" />
+            <File Id="spartan.changeset.tmpl"      Source="$(var.SourceDir)\spartan\changeset.tmpl" />
+            <File Id="spartan.error.tmpl"          Source="$(var.SourceDir)\spartan\error.tmpl" />
+            <File Id="spartan.fileannotate.tmpl"   Source="$(var.SourceDir)\spartan\fileannotate.tmpl" />
+            <File Id="spartan.filediff.tmpl"       Source="$(var.SourceDir)\spartan\filediff.tmpl" />
+            <File Id="spartan.filelog.tmpl"        Source="$(var.SourceDir)\spartan\filelog.tmpl" />
+            <File Id="spartan.filelogentry.tmpl"   Source="$(var.SourceDir)\spartan\filelogentry.tmpl" />
+            <File Id="spartan.filerevision.tmpl"   Source="$(var.SourceDir)\spartan\filerevision.tmpl" />
+            <File Id="spartan.footer.tmpl"         Source="$(var.SourceDir)\spartan\footer.tmpl" />
+            <File Id="spartan.graph.tmpl"          Source="$(var.SourceDir)\spartan\graph.tmpl" />
+            <File Id="spartan.header.tmpl"         Source="$(var.SourceDir)\spartan\header.tmpl" />
+            <File Id="spartan.index.tmpl"          Source="$(var.SourceDir)\spartan\index.tmpl" />
+            <File Id="spartan.manifest.tmpl"       Source="$(var.SourceDir)\spartan\manifest.tmpl" />
+            <File Id="spartan.map"                 Source="$(var.SourceDir)\spartan\map" />
+            <File Id="spartan.notfound.tmpl"       Source="$(var.SourceDir)\spartan\notfound.tmpl" />
+            <File Id="spartan.search.tmpl"         Source="$(var.SourceDir)\spartan\search.tmpl" />
+            <File Id="spartan.shortlog.tmpl"       Source="$(var.SourceDir)\spartan\shortlog.tmpl" />
+            <File Id="spartan.shortlogentry.tmpl"  Source="$(var.SourceDir)\spartan\shortlogentry.tmpl" />
+            <File Id="spartan.tags.tmpl"           Source="$(var.SourceDir)\spartan\tags.tmpl" />
+          </Component>
+        </Directory>
+
+        <Directory Id="templates.staticdir" Name="static">
+          <Component Id="templates.static" Guid="$(var.templates.static.guid)">
+            <File Id="static.background.png"     Source="$(var.SourceDir)\static\background.png" KeyPath="yes" />
+            <File Id="static.coal.file.png"      Source="$(var.SourceDir)\static\coal-file.png" />
+            <File Id="static.coal.folder.png"    Source="$(var.SourceDir)\static\coal-folder.png" />
+            <File Id="static.excanvas.js"        Source="$(var.SourceDir)\static\excanvas.js" />
+            <File Id="static.graph.js"           Source="$(var.SourceDir)\static\graph.js" />
+            <File Id="static.hgicon.png"         Source="$(var.SourceDir)\static\hgicon.png" />
+            <File Id="static.hglogo.png"         Source="$(var.SourceDir)\static\hglogo.png" />
+            <File Id="static.style.coal.css"     Source="$(var.SourceDir)\static\style-coal.css" />
+            <File Id="static.style.gitweb.css"   Source="$(var.SourceDir)\static\style-gitweb.css" />
+            <File Id="static.style.monoblue.css" Source="$(var.SourceDir)\static\style-monoblue.css" />
+            <File Id="static.style.paper.css"    Source="$(var.SourceDir)\static\style-paper.css" />
+            <File Id="static.style.css"          Source="$(var.SourceDir)\static\style.css" />
+          </Component>
+        </Directory>
+
+      </Directory>
+
+    </DirectoryRef>
+  </Fragment>
 
  </Wix>
