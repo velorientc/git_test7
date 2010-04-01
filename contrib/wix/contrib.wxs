@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-    <?include guids.wxi ?>
+  <?include guids.wxi ?>
 
-    <Fragment>
-        <ComponentGroup Id="contribFolder">
-            <ComponentRef Id="contrib" />
-            <ComponentRef Id="contrib.vim" />
-        </ComponentGroup>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="contribdir" Name="contrib">
-                <Component Id="contrib" Guid="$(var.contrib.guid)">
-                    <File Source="$(var.SourceDir)\bash_completion" KeyPath="yes" />
-                    <File Source="$(var.SourceDir)\hgk" />
-                    <File Source="$(var.SourceDir)\hgwebdir.fcgi" />
-                    <File Source="$(var.SourceDir)\hgwebdir.wsgi" />
-                    <File Source="$(var.SourceDir)\logo-droplets.svg" />
-                    <File Source="$(var.SourceDir)\mercurial.el" />
-                    <File Source="$(var.SourceDir)\sample.hgrc" />
-                    <File Source="$(var.SourceDir)\tcsh_completion" />
-                    <File Source="$(var.SourceDir)\tcsh_completion_build.sh" />
-                    <File Source="$(var.SourceDir)\xml.rnc" />
-                    <File Source="$(var.SourceDir)\zsh_completion" />
-                </Component>
-                <Directory Id="vimdir" Name="vim">
-                    <Component Id="contrib.vim" Guid="$(var.contrib.vim.guid)">
-                        <File Source="$(var.SourceDir)\vim\hg-menu.vim" KeyPath="yes" />
-                        <File Source="$(var.SourceDir)\vim\HGAnnotate.vim" />
-                        <File Source="$(var.SourceDir)\vim\hgcommand.vim" />
-                        <File Source="$(var.SourceDir)\vim\patchreview.txt" />
-                        <File Source="$(var.SourceDir)\vim\patchreview.vim" />
-                    </Component>
-                </Directory>
-            </Directory>
-        </DirectoryRef>
-    </Fragment>
+  <Fragment>
+    <ComponentGroup Id="contribFolder">
+      <ComponentRef Id="contrib" />
+      <ComponentRef Id="contrib.vim" />
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+      <Directory Id="contribdir" Name="contrib">
+        <Component Id="contrib" Guid="$(var.contrib.guid)">
+          <File Source="$(var.SourceDir)\bash_completion" KeyPath="yes" />
+          <File Source="$(var.SourceDir)\hgk" />
+          <File Source="$(var.SourceDir)\hgwebdir.fcgi" />
+          <File Source="$(var.SourceDir)\hgwebdir.wsgi" />
+          <File Source="$(var.SourceDir)\logo-droplets.svg" />
+          <File Source="$(var.SourceDir)\mercurial.el" />
+          <File Source="$(var.SourceDir)\sample.hgrc" />
+          <File Source="$(var.SourceDir)\tcsh_completion" />
+          <File Source="$(var.SourceDir)\tcsh_completion_build.sh" />
+          <File Source="$(var.SourceDir)\xml.rnc" />
+          <File Source="$(var.SourceDir)\zsh_completion" />
+        </Component>
+        <Directory Id="vimdir" Name="vim">
+          <Component Id="contrib.vim" Guid="$(var.contrib.vim.guid)">
+            <File Source="$(var.SourceDir)\vim\hg-menu.vim" KeyPath="yes" />
+            <File Source="$(var.SourceDir)\vim\HGAnnotate.vim" />
+            <File Source="$(var.SourceDir)\vim\hgcommand.vim" />
+            <File Source="$(var.SourceDir)\vim\patchreview.txt" />
+            <File Source="$(var.SourceDir)\vim\patchreview.vim" />
+          </Component>
+        </Directory>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
 </Wix>
