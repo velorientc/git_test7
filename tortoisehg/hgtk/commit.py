@@ -19,7 +19,9 @@ import time
 from mercurial import hg, util, patch, cmdutil, extensions
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import shlib, hglib
+from tortoisehg.util import shlib, hglib, i18n
+
+keep = i18n.keepgettext()
 
 from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
 from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
@@ -782,10 +784,12 @@ class GCommit(GStatus):
 
             # pre-fill commit message, if not modified
             buf = self.text.get_buffer()
-            if not buf.get_modified():
-                buf.set_text(_('Merge '))
-                buf.set_modified(False)
-
+            if buf.get_modified():
+                return
+            engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+            msgset = keep._('Merge ')
+            buf.set_text(engmsg and msgset['id'] or msgset['str'])
+            buf.set_modified(False)
 
     def check_patch_queue(self):
         'See if an MQ patch is applied, switch to qrefresh mode'
@@ -1084,9 +1088,8 @@ class GCommit(GStatus):
             # bring up the config dialog for user to enter their username.
             # But since we can't be sure they will do it right, we will
             # have them to retry, to re-trigger the checking mechanism.
-            dlg = thgconfig.ConfigDialog(False)
+            dlg = thgconfig.ConfigDialog(False, focus='ui.username')
             dlg.show_all()
-            dlg.focus_field('ui.username')
             dlg.run()
             dlg.hide()
             self.refreshui()
@@ -1107,20 +1110,29 @@ class GCommit(GStatus):
         if self.nextbranch:
             # response: 0=Yes, 1=No, 2=Cancel
             if self.nextbranch in self.repo.branchtags():
-                if self.nextbranch in [p.branch() for p in self.repo.parents()]:
-                    response = 0
+                pb = [p.branch() for p in self.repo.parents()]
+                if self.nextbranch in pb:
+                    resp = 0
                 else:
-                    response = gdialog.CustomPrompt(_('Confirm Override Branch'),
-                        _('A branch named "%s" already exists,\n'
-                        'override?') % self.nextbranch, self,
+                    rev = self.repo[self.nextbranch].rev()
+                    resp = gdialog.CustomPrompt(_('Confirm Branch Change'),
+                        _('Named branch "%s" already exists, '
+                          'last used in revision %d\n'
+                          'Yes\t- Make commit restarting this named branch\n'
+                          'No\t- Make commit without changing branch\n'
+                          'Cancel - Cancel this commit') % (self.nextbranch,
+                              rev), self,
                         (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
             else:
-                response = gdialog.CustomPrompt(_('Confirm New Branch'),
-                    _('Create new named branch "%s"?') % self.nextbranch,
+                resp = gdialog.CustomPrompt(_('Confirm New Branch'),
+                    _('Create new named branch "%s" with this commit?\n'
+                      'Yes\t- Start new branch with this commit\n'
+                      'No\t- Make commit without branch change\n'
+                      'Cancel - Cancel this commit') % self.nextbranch,
                     self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
-            if response == 0:
+            if resp == 0:
                 self.repo.dirstate.setbranch(self.nextbranch)
-            elif response == 2:
+            elif resp == 2:
                 return
         elif self.closebranch:
             cmdline.append('--close-branch')
@@ -1300,9 +1312,8 @@ class GCommit(GStatus):
         buf.set_text('\n'.join(lines))                       
 
     def msg_config(self, sender):
-        dlg = thgconfig.ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True, focus='tortoisehg.summarylen')
         dlg.show_all()
-        dlg.focus_field('tortoisehg.summarylen')
         dlg.run()
         dlg.hide()
         self.refreshui()

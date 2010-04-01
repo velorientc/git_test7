@@ -2,217 +2,36 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <ComponentGroup Id="contribFolder">
-            <Component Id="cmp807F426F34EC5B808607BA4007244E84" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{FBF5CB2C-8932-46F4-8FC4-EF4C0F726276}">
-                <File Id="fil0BF2562805D37A6C57219F945DC7C3B4" KeyPath="yes" Source="$(var.SourceDir)\bash_completion" />
-            </Component>
-            <Component Id="cmpB28139F1930563D83220AD2C1128B030" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{0E83D552-3153-4E55-8353-A4E5E3A18764}">
-                <File Id="fil8A6DCD57765E3E3FEF179102A0906054" KeyPath="yes" Source="$(var.SourceDir)\hgk" />
-            </Component>
-            <Component Id="cmpB7DA2E5DE9E5C7DDB7696E436D98B142" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{6EF9A4E6-4C95-496D-8FAB-8B0BD0688874}">
-                <File Id="fil18816C74E6F00D731B7DBE0870BDE2D9" KeyPath="yes" Source="$(var.SourceDir)\hgwebdir.fcgi" />
-            </Component>
-            <Component Id="cmpB1DF769846D452FC44EBA6763F12D29F" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{F0FFFFCE-56A8-437A-8D7E-45C30505DB09}">
-                <File Id="fil5896BB6DFC36A92D41E0AB8C7DB80A97" KeyPath="yes" Source="$(var.SourceDir)\hgwebdir.wsgi" />
-            </Component>
-            <Component Id="cmp7C407D087BF1947C9EC8AFE24B42CD9B" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{F7120A93-1E95-4837-A53A-E77DC187B537}">
-                <File Id="fil81E357676284E64EDFEBE9FE5CEB872F" KeyPath="yes" Source="$(var.SourceDir)\logo-droplets.svg" />
-            </Component>
-            <Component Id="cmp6946EABE287930CA55C76B0961DE17E7" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{5D1410F4-53AD-4229-B8C2-7191FDBDFB65}">
-                <File Id="filA77C0B15558EB3894B9E728D2FE3AF9F" KeyPath="yes" Source="$(var.SourceDir)\mercurial.el" />
-            </Component>
-            <Component Id="cmpBEDE8604BDE5144025036F4BB04679B2" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{D054A71E-2583-41FD-B9DA-BBCEB032AC81}">
-                <File Id="fil3F209A8D711EA35E5B38E05678D0D5E2" KeyPath="yes" Source="$(var.SourceDir)\sample.hgrc" />
-            </Component>
-            <Component Id="cmpED03CB84DEE74E99BB62BE0F8AC356F1" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{48D86148-9FF6-48BA-BC62-F860314F7728}">
-                <File Id="filCD2BF173510DF04EA722FE4924B3DAE7" KeyPath="yes" Source="$(var.SourceDir)\tcsh_completion" />
-            </Component>
-            <Component Id="cmp7395336B1B93AB450D822FA0DE0C5FCB" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{135985F7-12C9-4420-BD49-BB53C07CF5B2}">
-                <File Id="fil2C004105E9F354CA4156678C4FB76823" KeyPath="yes" Source="$(var.SourceDir)\tcsh_completion_build.sh" />
-            </Component>
-            <Component Id="cmpA914A0A1896C5E91A8381B2B5491564C" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{E3B7F734-23AE-4422-9801-3FD0C8DEFBD7}">
-                <File Id="filBF6BED4F17C843169CEBE289E39FC8FB" KeyPath="yes" Source="$(var.SourceDir)\xml.rnc" />
-            </Component>
-            <Component Id="cmp512D2C19167594DBED53CF4A5896DAC1" Directory="dirCA1E322A30AE0A461BB6A083C7A87627" Guid="{D0B6E660-F316-421E-84FC-87C895F02888}">
-                <File Id="filA8F4DBB6CE376C77AA79D9E9D715A519" KeyPath="yes" Source="$(var.SourceDir)\zsh_completion" />
-            </Component>
-            <Component Id="cmp82B1C0B5D90172AD872BBE93AD1A4746" Directory="dirBED34C623F6A770B7C7A5C815434688D" Guid="{269220E0-2D46-499A-B843-0B7AA9D1AAAE}">
-                <File Id="filBB7FA67E9542AD28BADC33AE9FE32A34" KeyPath="yes" Source="$(var.SourceDir)\vim\hg-menu.vim" />
-            </Component>
-            <Component Id="cmp86D915E62A0C3FF73A370E0D48DDE5F1" Directory="dirBED34C623F6A770B7C7A5C815434688D" Guid="{9B8F4EFE-A098-4f96-A05D-A49861587405}">
-                <File Id="filC508D5BC3A9EAE1F33C95F8EF07EF431" KeyPath="yes" Source="$(var.SourceDir)\vim\HGAnnotate.vim" />
-            </Component>
-            <Component Id="cmp6F11D903E1DB0DFC0C3EB42F63394E60" Directory="dirBED34C623F6A770B7C7A5C815434688D" Guid="{240CE26A-A9F4-48E7-942E-D543DC75FA62}">
-                <File Id="filDAC324AFC5566758101A7423165FE7FA" KeyPath="yes" Source="$(var.SourceDir)\vim\hgcommand.vim" />
-            </Component>
-            <Component Id="cmpA55369F11281B52F404E0724200C115F" Directory="dirBED34C623F6A770B7C7A5C815434688D" Guid="{9B3361BE-5A8D-4364-A7CE-E78495EAA508}">
-                <File Id="fil982E8F72370A711566A7F7645AC8204D" KeyPath="yes" Source="$(var.SourceDir)\vim\patchreview.txt" />
-            </Component>
-            <Component Id="cmp56F529456B47B91250785C4D0A205ED2" Directory="dirBED34C623F6A770B7C7A5C815434688D" Guid="{18DE2CB6-F85C-4792-BEC6-CE60227C7D72}">
-                <File Id="filC59985C7F91EC21A42FEF97AD3CDD65D" KeyPath="yes" Source="$(var.SourceDir)\vim\patchreview.vim" />
-            </Component>
+            <ComponentRef Id="contrib" />
+            <ComponentRef Id="contrib.vim" />
         </ComponentGroup>
     </Fragment>
     <Fragment>
         <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="dirCA1E322A30AE0A461BB6A083C7A87627" Name="contrib" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirBED34C623F6A770B7C7A5C815434688D" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirD2A98CA486D03F46DB07EE76569468D8" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirBED34C623F6A770B7C7A5C815434688D" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir51C59DA466E26BFDB5855AE6BE2E4BDD" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirBED34C623F6A770B7C7A5C815434688D" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirBED34C623F6A770B7C7A5C815434688D" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir3F9A2BE78E3069AB8A904DF734C62404" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir3F9A2BE78E3069AB8A904DF734C62404" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirD2A98CA486D03F46DB07EE76569468D8" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir3F9A2BE78E3069AB8A904DF734C62404" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirBED34C623F6A770B7C7A5C815434688D" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir3F9A2BE78E3069AB8A904DF734C62404" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir51C59DA466E26BFDB5855AE6BE2E4BDD" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir3F9A2BE78E3069AB8A904DF734C62404" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0AAB909DA146B054F15679730FA6EDC4" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir51C59DA466E26BFDB5855AE6BE2E4BDD" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirCA1E322A30AE0A461BB6A083C7A87627">
-            <Directory Id="dirBED34C623F6A770B7C7A5C815434688D" Name="vim" />
+            <Directory Id="contribdir" Name="contrib">
+                <Component Id="contrib" Guid="{509AE2EF-3AC6-4661-A9C3-51F663BE83B2}">
+                    <File Source="$(var.SourceDir)\bash_completion" KeyPath="yes" />
+                    <File Source="$(var.SourceDir)\hgk" />
+                    <File Source="$(var.SourceDir)\hgwebdir.fcgi" />
+                    <File Source="$(var.SourceDir)\hgwebdir.wsgi" />
+                    <File Source="$(var.SourceDir)\logo-droplets.svg" />
+                    <File Source="$(var.SourceDir)\mercurial.el" />
+                    <File Source="$(var.SourceDir)\sample.hgrc" />
+                    <File Source="$(var.SourceDir)\tcsh_completion" />
+                    <File Source="$(var.SourceDir)\tcsh_completion_build.sh" />
+                    <File Source="$(var.SourceDir)\xml.rnc" />
+                    <File Source="$(var.SourceDir)\zsh_completion" />
+                </Component>
+                <Directory Id="vimdir" Name="vim">
+                    <Component Id="contrib.vim" Guid="{BEA4DF96-9CEF-4273-B637-8DE7B10A6FAE}">
+                        <File Source="$(var.SourceDir)\vim\hg-menu.vim" KeyPath="yes" />
+                        <File Source="$(var.SourceDir)\vim\HGAnnotate.vim" />
+                        <File Source="$(var.SourceDir)\vim\hgcommand.vim" />
+                        <File Source="$(var.SourceDir)\vim\patchreview.txt" />
+                        <File Source="$(var.SourceDir)\vim\patchreview.vim" />
+                    </Component>
+                </Directory>
+            </Directory>
         </DirectoryRef>
     </Fragment>
 </Wix>
