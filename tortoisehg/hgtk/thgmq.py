@@ -362,7 +362,7 @@ class MQWidget(gtk.VBox):
         if keep:
             cmdline.append('--keep')
         cmdline.append('--')
-        cmdline.extned(unapplied)
+        cmdline.extend(unapplied)
         self.cmd.execute(cmdline, self.cmd_done, noemit=True)
 
     def qrename(self, name, patch='qtip'):
