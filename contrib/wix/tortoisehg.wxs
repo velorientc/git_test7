@@ -89,16 +89,16 @@
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='TortoiseHg'>
           <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)'>
-            <File Id='hgtkEXE' Name='hgtk.exe' DiskId='1' KeyPath='yes'
+            <File Id='hgtkEXE' Name='hgtk.exe' KeyPath='yes'
                   Source='dist\hgtk.exe'
             />
-            <File Id='hgEXE' Name='hg.exe' DiskId='1'
+            <File Id='hgEXE' Name='hg.exe'
                   Source='dist\hg.exe'
             />
-            <File Id='libraryZIP' Name='library.zip' DiskId='1'
+            <File Id='libraryZIP' Name='library.zip'
                   Source='dist\library.zip'
             />
-            <File Id='pythonDLL' Name='python26.dll' DiskId='1'
+            <File Id='pythonDLL' Name='python26.dll'
                   Source='dist\python26.dll'
             />
             <Environment Id="Environment" Name="PATH" Part="last" System="yes"
@@ -107,13 +107,13 @@
           </Component>
           <Component Id='ExtensionVersions' Guid='1996AB0D-634D-4DC8-9581-326151F38B11'>
             <File Id='ExtensionVersions' Name='extension-versions.txt'
-                  DiskId='1' KeyPath='yes'
+                  KeyPath='yes'
                   Source='..\extension-versions.txt'
             />
           </Component>
           <Component Id='OverlayServerEXE' Guid='DC5D9CC4-8330-4146-99EC-30D3AA255DD4'>
             <File Id='OverlayServerEXE' Name='TortoiseHgOverlayServer.exe'
-                  DiskId='1' KeyPath='yes'
+                  KeyPath='yes'
                   Source='dist\TortoiseHgOverlayServer.exe' >
               <Shortcut Id="OverlayServerEXEshortcut" Directory="ProgramMenuDir"
                         Name="TortoiseHg Overlay Icon Server"
@@ -127,7 +127,7 @@
             />
           </Component>
           <Component Id='thgshellx86dll' Guid='1126CF42-3994-428B-A746-464E1BC680F3'>
-            <File Id='thgshellx86dll' Name='ThgShellx86.dll' DiskId='1' KeyPath='yes'
+            <File Id='thgshellx86dll' Name='ThgShellx86.dll' KeyPath='yes'
                   Source='win32\ThgShellx86.dll'
             />
             <RegistryValue
@@ -156,33 +156,33 @@
             <?include shell-register-overlays.wxi ?>
           </Component>
           <Component Id='COPYING' Guid='382A8405-CB7B-42E8-8B9D-88B5C5283E73'>
-            <File Id='COPYING' Name='COPYING.txt' DiskId='1'
+            <File Id='COPYING' Name='COPYING.txt'
                   Source='COPYING.txt'
             />
           </Component>
           <Component Id='docdiffEXE' Guid='4BA6389A-6A0B-483B-A3FE-86EE436FDD31'>
-            <File Id='docdiffEXE' Name='docdiff.exe' DiskId='1' KeyPath='yes'
+            <File Id='docdiffEXE' Name='docdiff.exe' KeyPath='yes'
                   Source='dist\docdiff.exe'
             />
           </Component>
           <Component Id='KDiff3EXE' Guid='B2A5EFD4-A385-45E0-8467-46B955979672'>
-            <File Id='KDiff3EXE' Name='kdiff3.exe' DiskId='1' KeyPath='yes'
+            <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
                   Source='..\contrib\kdiff3.exe'
             />
           </Component>
           <Component Id='TortoisePlinkEXE' Guid='A18BFE4D-BED0-4EF9-97CC-5B4326E3CD2F'>
-            <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' DiskId='1' KeyPath='yes'
+            <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
                   Source='..\contrib\TortoisePlink.exe'
             />
           </Component>
           <Component Id='PageantEXE' Guid='EA7EF381-076C-47CE-8F51-355DB7F86D1A'>
-            <File Id='PageantEXE' Name='Pageant.exe' DiskId='1' KeyPath='yes'
+            <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
                   Source='..\contrib\Pageant.exe'
             />
           </Component>
           <Directory Id='docFolder' Name='doc'>
             <Component Id='chmFile' Guid='A26038DC-C686-4296-9335-FA4B9ABC769C'>
-              <File Id='chmFile' Name='TortoiseHg.chm' DiskId='1' KeyPath='yes'
+              <File Id='chmFile' Name='TortoiseHg.chm' KeyPath='yes'
                     Source='doc\build\chm\TortoiseHg.chm' >
                   <Shortcut Id="chmStartMenu" Directory="ProgramMenuDir"
                             Name="TortoiseHg Manual (CHM)"
@@ -191,7 +191,7 @@
               </File>
             </Component>
             <Component Id='pdfFile' Guid='1C5792DA-C48F-4F7F-9CD8-FC467995B8E4'>
-              <File Id='pdfFile' Name='TortoiseHg.pdf' DiskId='1' KeyPath='yes'
+              <File Id='pdfFile' Name='TortoiseHg.pdf' KeyPath='yes'
                     Source='doc\build\pdf\TortoiseHg.pdf'>
                   <Shortcut Id="pdfStartMenu" Directory="ProgramMenuDir"
                             Name="TortoiseHg Manual (PDF)"
@@ -200,7 +200,7 @@
               </File>
             </Component>
             <Component Id='hgbook' Guid='A5F6D094-BCFD-4AC0-8675-7DF8CC94FEE5'>
-              <File Id='hgbook' Name='hgbook.pdf' DiskId='1' KeyPath='yes'
+              <File Id='hgbook' Name='hgbook.pdf' KeyPath='yes'
                     Source='..\misc\hgbook.pdf'>
                   <Shortcut Id="hgbookStartMenu" Directory="ProgramMenuDir"
                             Name="Mercurial - The Definitive Guide (PDF)"
@@ -212,18 +212,18 @@
 
           <Directory Id='HGRCD' Name='hgrc.d'>
             <Component Id='mercurial.rc' Guid='28ACE5D7-FFCE-488E-A94A-8F13A21DD25D'>
-              <File Id='mercurial.rc' Name='Mercurial.rc' DiskId='1' ReadOnly='yes'
+              <File Id='mercurial.rc' Name='Mercurial.rc' ReadOnly='yes'
                     Source='contrib\win32\mercurial.rc'
               />
             </Component>
             <Component Id='mergetools.rc' Guid='30CC047C-48B4-4D91-B8EC-79975327A9C7'>
-              <File Id='mergetools.rc' Name='MergeTools.rc' DiskId='1' ReadOnly='yes'
+              <File Id='mergetools.rc' Name='MergeTools.rc' ReadOnly='yes'
                     Source='contrib\mergetools.rc'
               />
             </Component>
             <Component Id="mergepatterns.rc" Guid="05860DA7-8391-43A4-A4E7-6E9E084D11C6">
               <File Id='mergepatterns.rc' Name='MergePatterns.rc'
-                    DiskId='1' ReadOnly='yes' KeyPath='yes'
+                    ReadOnly='yes' KeyPath='yes'
                     Source='contrib\win32\mergepatterns.rc'
               />
             </Component>
@@ -274,7 +274,7 @@
         <Directory Id="CommonFiles64Folder" Name="Programs64" >
           <Directory Id="Common64" Name="TortoiseHg" >
             <Component Id='thgshellx64dll' Guid='59FD2A49-BA62-40CC-B155-D11DB11EE611' Win64='yes'>
-              <File Id='thgshellx64dll' Name='ThgShellx64.dll' DiskId='1' KeyPath='yes'
+              <File Id='thgshellx64dll' Name='ThgShellx64.dll' KeyPath='yes'
                     Source='win32\ThgShellx64.dll'
               />
               <RegistryValue
@@ -320,10 +320,11 @@
         <ComponentRef Id='mercurial.rc' />
         <ComponentRef Id='mergetools.rc' />
         <ComponentRef Id='ExtensionVersions' />
-        <ComponentGroupRef Id='helpFolder' />
+        <ComponentRef Id='helpFolder' />
         <ComponentGroupRef Id='templatesFolder' />
         <ComponentGroupRef Id='gtkFolder' />
-        <ComponentGroupRef Id='iconsFolder' />
+        <ComponentRef Id='Icons' />
+        <ComponentRef Id='SvgIcons' />
       </Feature>
       <Feature Id='VCRedist' Title='Visual C++ 9.0 Runtime'
                AllowAdvertise='no' Display='hidden' Level='1'>
@@ -334,7 +335,7 @@
           <Feature Id='ShellExtensionX64' Title='Shell Extension x64'
                    Level='1' AllowAdvertise='no'
                    Description='Context menu for 64-bit processes'>
-            <ComponentGroupRef Id='cmenuI18n' />
+            <ComponentRef Id='cmenuI18n' />
             <ComponentRef Id='thgshellx64dll' />
             <ComponentRef Id='CmenuShellRegistrationX64' />
             <Feature Id='OverlaysX64' Title='Overlay Icons'
@@ -356,7 +357,7 @@
                Level='$(var.ShellExtensionX86level)'
                Absent='allow' AllowAdvertise='no'
                Description='Context menu for 32-bit processes'>
-        <ComponentGroupRef Id='cmenuI18n' />
+        <ComponentRef Id='cmenuI18n' />
         <ComponentRef Id='thgshellx86dll' />
         <ComponentRef Id='CmenuShellRegistrationX86' />
         <Feature Id='OverlaysX86' Title='Overlay Icons'
@@ -372,7 +373,7 @@
                Title='Translations'
                Description='Mercurial and TortoiseHg Translations'>
         <ComponentGroupRef Id='localeFolder' />
-        <ComponentGroupRef Id='i18nFolder' />
+        <ComponentRef Id='i18nFolder' />
         <ComponentGroupRef Id='thgLocaleFolder' />
         <ComponentRef Id='thgI18nFolder' />
       </Feature>
