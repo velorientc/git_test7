@@ -7,15 +7,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2010-03-31 16:33+0000\n"
+"POT-Creation-Date: 2010-04-01 05:09+0000\n"
 "PO-Revision-Date: 2010-03-31 20:43+0000\n"
 "Last-Translator: paolof <gp.fadel@gmail.com>\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-01 03:44+0000\n"
+"X-Launchpad-Export-Date: 2010-04-01 06:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
+
+#: TortoiseHgOverlayServer.py:36
+msgid "TortoiseHg Overlay Icon Server"
+msgstr "Server icone di overlay di TortoiseHg"
+
+#: TortoiseHgOverlayServer.py:117
+msgid "Exit"
+msgstr "Esci"
 
 #: tortoisehg\hgtk\about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
@@ -2491,8 +2499,7 @@ msgstr "Intervallo revisioni"
 msgid "%s (submitted)"
 msgstr "%s (inviato)"
 
-#: tortoisehg\hgtk\history.py:557
-#: tortoisehg\hgtk\history.py:563
+#: tortoisehg\hgtk\history.py:557 tortoisehg\hgtk\history.py:563
 msgid "%s (pending)"
 msgstr "%s (in attesa)"
 
@@ -3224,13 +3231,13 @@ msgid "Merge target (other)"
 msgstr "Revisione con la quale eseguire il merge"
 
 #: tortoisehg\hgtk\merge.py:84
-msgid "Current revision (local)"
-msgstr "Revisione attuale (locale)"
-
-#: tortoisehg\hgtk\merge.py:89
 msgid "Discard all changes from merge target (other) revision"
 msgstr ""
 "Ignora le modifiche della revisione con la quale eseguire il merge (altra)"
+
+#: tortoisehg\hgtk\merge.py:89
+msgid "Current revision (local)"
+msgstr "Revisione attuale (locale)"
 
 #: tortoisehg\hgtk\merge.py:100
 msgid "Merge tools:"
@@ -5416,8 +5423,7 @@ msgstr "_Elimina"
 msgid "F_old"
 msgstr "C_ollassa"
 
-#: tortoisehg\hgtk\thgmq.py:784
-#: tortoisehg\hgtk\thgmq.py:816
+#: tortoisehg\hgtk\thgmq.py:784 tortoisehg\hgtk\thgmq.py:816
 msgid "Reorder"
 msgstr "Riordina"
 
@@ -5697,72 +5703,72 @@ msgstr "Nessun file modificato"
 msgid "There are no file changes to view"
 msgstr "Non ci sono file modificati da vedere"
 
-#: tortoisehg\hgtk\visdiff.py:292
+#: tortoisehg\hgtk\visdiff.py:293
 msgid "cleaning up temp directory\n"
 msgstr "pulizia directory temporanea\n"
 
-#: tortoisehg\hgtk\visdiff.py:309
+#: tortoisehg\hgtk\visdiff.py:310
 msgid "Visual Diffs"
 msgstr "Comparazione visuale"
 
-#: tortoisehg\hgtk\visdiff.py:314
+#: tortoisehg\hgtk\visdiff.py:315
 msgid "working changes"
 msgstr "modifiche in corso"
 
-#: tortoisehg\hgtk\visdiff.py:316
+#: tortoisehg\hgtk\visdiff.py:317
 msgid "changeset "
 msgstr "changeset "
 
-#: tortoisehg\hgtk\visdiff.py:318
+#: tortoisehg\hgtk\visdiff.py:319
 msgid "revisions %d to %d"
 msgstr "revisioni da %d a %d"
 
-#: tortoisehg\hgtk\visdiff.py:319
+#: tortoisehg\hgtk\visdiff.py:320
 msgid "Visual Diffs - "
 msgstr "Confronto visuale - "
 
-#: tortoisehg\hgtk\visdiff.py:321
+#: tortoisehg\hgtk\visdiff.py:322
 msgid " filtered"
 msgstr " filtrato"
 
-#: tortoisehg\hgtk\visdiff.py:335
+#: tortoisehg\hgtk\visdiff.py:336
 msgid "Temporary files are removed when this dialog is closed"
 msgstr "I file temporanei verranno rimossi alla chiusura di questa finestra"
 
-#: tortoisehg\hgtk\visdiff.py:389
+#: tortoisehg\hgtk\visdiff.py:390
 msgid "Dir diff to p1"
 msgstr "Comparazione directory con p1"
 
-#: tortoisehg\hgtk\visdiff.py:391
+#: tortoisehg\hgtk\visdiff.py:392
 msgid "Dir diff to p2"
 msgstr "Comparazione directory con p2"
 
-#: tortoisehg\hgtk\visdiff.py:393
+#: tortoisehg\hgtk\visdiff.py:394
 msgid "3-way dir diff"
 msgstr "Comparazione directory a 3 vie"
 
-#: tortoisehg\hgtk\visdiff.py:399
+#: tortoisehg\hgtk\visdiff.py:400
 msgid "Directory diff"
 msgstr "Comparazione directory"
 
-#: tortoisehg\hgtk\visdiff.py:532
+#: tortoisehg\hgtk\visdiff.py:533
 msgid "Unable to delete temp files"
 msgstr "Impossible cancellare i file temporanei"
 
-#: tortoisehg\hgtk\visdiff.py:533
+#: tortoisehg\hgtk\visdiff.py:534
 msgid "Close diff tools and try again, or quit to leak files?"
 msgstr ""
 "Chiudi lo strumento di comparazione e riprova, oppure esci per perdere i file"
 
-#: tortoisehg\hgtk\visdiff.py:534
+#: tortoisehg\hgtk\visdiff.py:535
 msgid "&Quit"
 msgstr "&Esci"
 
-#: tortoisehg\hgtk\visdiff.py:534
+#: tortoisehg\hgtk\visdiff.py:535
 msgid "Try &Again"
 msgstr "&Riprova"
 
-#: tortoisehg\hgtk\visdiff.py:630
+#: tortoisehg\hgtk\visdiff.py:631
 msgid "No repository found here"
 msgstr "Nessun repository trovato qui"
 
@@ -6174,9 +6180,6 @@ msgstr "Nessun blocco valido trovato"
 #: tortoisehg\util\version.py:17
 msgid "repository %s not found"
 msgstr "repository %s non trovato"
-
-#~ msgid "Exit"
-#~ msgstr "Esci"
 
 #~ msgid "Running"
 #~ msgstr "In esecuzione"

@@ -9,13 +9,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-22 23:55+0000\n"
-"PO-Revision-Date: 2010-02-27 11:01+0000\n"
-"Last-Translator: Tovim <Unknown>\n"
+"PO-Revision-Date: 2010-03-29 19:11+0100\n"
+"Last-Translator: Tovim <tovim@seznam.cs>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-02-28 04:58+0000\n"
+"X-Launchpad-Export-Date: 2010-03-17 13:20+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:36
@@ -58,13 +58,16 @@ msgstr "Archivace - %s"
 msgid "Archive revision:"
 msgstr "Archivovaná revize:"
 
-#: tortoisehg\hgtk\archive.py:65 tortoisehg\hgtk\clone.py:70
-#: tortoisehg\hgtk\hginit.py:54 tortoisehg\hgtk\thgconfig.py:323
+#: tortoisehg\hgtk\archive.py:65
+#: tortoisehg\hgtk\clone.py:70
+#: tortoisehg\hgtk\hginit.py:54
+#: tortoisehg\hgtk\thgconfig.py:323
 #: tortoisehg\hgtk\thgimport.py:63
 msgid "Browse..."
 msgstr "Vyhledat..."
 
-#: tortoisehg\hgtk\archive.py:68 tortoisehg\hgtk\clone.py:106
+#: tortoisehg\hgtk\archive.py:68
+#: tortoisehg\hgtk\clone.py:106
 msgid "Destination path:"
 msgstr "Cesta k destinaci:"
 
@@ -126,9 +129,10 @@ msgstr "Archivy gzip tar"
 
 #: tortoisehg\hgtk\archive.py:179
 msgid "Compressed zip archives"
-msgstr "Komprimované archivy tar"
+msgstr "Komprimované archivy zip"
 
-#: tortoisehg\hgtk\archive.py:191 tortoisehg\hgtk\clone.py:107
+#: tortoisehg\hgtk\archive.py:191
+#: tortoisehg\hgtk\clone.py:107
 #: tortoisehg\hgtk\hginit.py:91
 msgid "Select Destination Folder"
 msgstr "Vyberte cílovou složku"
@@ -141,8 +145,10 @@ msgstr "Vyberte cílový soubor"
 msgid "All Files (*.*)"
 msgstr "Všechny soubory (*.*)"
 
-#: tortoisehg\hgtk\archive.py:209 tortoisehg\hgtk\archive.py:215
-#: tortoisehg\hgtk\gtklib.py:359 tortoisehg\hgtk\thgconfig.py:503
+#: tortoisehg\hgtk\archive.py:209
+#: tortoisehg\hgtk\archive.py:215
+#: tortoisehg\hgtk\gtklib.py:359
+#: tortoisehg\hgtk\thgconfig.py:503
 #: tortoisehg\hgtk\thgconfig.py:931
 msgid "Confirm Overwrite"
 msgstr "Potvďte přepsání"
@@ -184,9 +190,7 @@ msgid "Backout commit message"
 msgstr "Komentář komitu anulované revize"
 
 #: tortoisehg\hgtk\backout.py:76
-msgid ""
-"Commit message text for new changeset that reverses the  effect of the "
-"change being backed out."
+msgid "Commit message text for new changeset that reverses the  effect of the change being backed out."
 msgstr "Komentář komitu revize, která ruší účinek anulované změny."
 
 #: tortoisehg\hgtk\backout.py:82
@@ -213,7 +217,8 @@ msgstr "Zrušené anulování"
 msgid "Failed to backout"
 msgstr "Anulování se nezdařilo"
 
-#: tortoisehg\hgtk\backout.py:139 tortoisehg\hgtk\commit.py:564
+#: tortoisehg\hgtk\backout.py:139
+#: tortoisehg\hgtk\commit.py:564
 msgid "Confirm Discard Message"
 msgstr "Potvrdit komentář k odvržení"
 
@@ -225,18 +230,22 @@ msgstr "Zavrhnout komentář ke stávajícímu anulování?"
 msgid "Bookmark - %s"
 msgstr "Záložka - %s"
 
-#: tortoisehg\hgtk\bookmark.py:48 tortoisehg\hgtk\hgignore.py:50
-#: tortoisehg\hgtk\hgignore.py:58 tortoisehg\hgtk\quickop.py:19
+#: tortoisehg\hgtk\bookmark.py:48
+#: tortoisehg\hgtk\hgignore.py:50
+#: tortoisehg\hgtk\hgignore.py:58
+#: tortoisehg\hgtk\quickop.py:19
 #: tortoisehg\hgtk\tagadd.py:39
 msgid "Add"
 msgstr "Přidat"
 
-#: tortoisehg\hgtk\bookmark.py:49 tortoisehg\hgtk\commit.py:252
+#: tortoisehg\hgtk\bookmark.py:49
+#: tortoisehg\hgtk\commit.py:252
 #: tortoisehg\hgtk\status.py:163
 msgid "Move"
 msgstr "Přesunout"
 
-#: tortoisehg\hgtk\bookmark.py:50 tortoisehg\hgtk\quickop.py:22
+#: tortoisehg\hgtk\bookmark.py:50
+#: tortoisehg\hgtk\quickop.py:22
 #: tortoisehg\hgtk\tagadd.py:40
 msgid "Remove"
 msgstr "Odebrat"
@@ -249,7 +258,8 @@ msgstr "Přejmenovat"
 msgid "Set Current"
 msgstr "Nastavit stávající"
 
-#: tortoisehg\hgtk\bookmark.py:56 tortoisehg\hgtk\bookmark.py:182
+#: tortoisehg\hgtk\bookmark.py:56
+#: tortoisehg\hgtk\bookmark.py:182
 #: tortoisehg\hgtk\merge.py:178
 msgid "unexpected type: %s"
 msgstr "neočekávaný typ: %s"
@@ -262,8 +272,10 @@ msgstr "Starý název"
 msgid "Bookmark:"
 msgstr "Záložka"
 
-#: tortoisehg\hgtk\bookmark.py:83 tortoisehg\hgtk\csinfo.py:198
-#: tortoisehg\hgtk\csinfo.py:199 tortoisehg\hgtk\cslist.py:142
+#: tortoisehg\hgtk\bookmark.py:83
+#: tortoisehg\hgtk\csinfo.py:198
+#: tortoisehg\hgtk\csinfo.py:199
+#: tortoisehg\hgtk\cslist.py:142
 #: tortoisehg\hgtk\tagadd.py:65
 msgid "Revision:"
 msgstr "Revize:"
@@ -276,23 +288,31 @@ msgstr "Nový název"
 msgid "Make new/moved bookmark current"
 msgstr "Zadat novou/přemístěnou záložku jako stávající"
 
-#: tortoisehg\hgtk\bookmark.py:167 tortoisehg\hgtk\gdialog.py:902
-#: tortoisehg\hgtk\hginit.py:83 tortoisehg\hgtk\tagadd.py:202
+#: tortoisehg\hgtk\bookmark.py:167
+#: tortoisehg\hgtk\gdialog.py:902
+#: tortoisehg\hgtk\hginit.py:83
+#: tortoisehg\hgtk\tagadd.py:202
 msgid "unexpected response id: %s"
 msgstr "neočekávaná odezva id: %s"
 
-#: tortoisehg\hgtk\bookmark.py:208 tortoisehg\hgtk\bookmark.py:238
-#: tortoisehg\hgtk\bookmark.py:292 tortoisehg\hgtk\bookmark.py:324
+#: tortoisehg\hgtk\bookmark.py:208
+#: tortoisehg\hgtk\bookmark.py:238
+#: tortoisehg\hgtk\bookmark.py:292
+#: tortoisehg\hgtk\bookmark.py:324
 msgid "Bookmark input is empty"
 msgstr "Zadání záložky je prázdné"
 
-#: tortoisehg\hgtk\bookmark.py:209 tortoisehg\hgtk\bookmark.py:239
-#: tortoisehg\hgtk\bookmark.py:293 tortoisehg\hgtk\bookmark.py:325
+#: tortoisehg\hgtk\bookmark.py:209
+#: tortoisehg\hgtk\bookmark.py:239
+#: tortoisehg\hgtk\bookmark.py:293
+#: tortoisehg\hgtk\bookmark.py:325
 msgid "Please enter bookmark name"
 msgstr "Zadejte prosím název záložky"
 
-#: tortoisehg\hgtk\bookmark.py:216 tortoisehg\hgtk\bookmark.py:246
-#: tortoisehg\hgtk\bookmark.py:274 tortoisehg\hgtk\bookmark.py:306
+#: tortoisehg\hgtk\bookmark.py:216
+#: tortoisehg\hgtk\bookmark.py:246
+#: tortoisehg\hgtk\bookmark.py:274
+#: tortoisehg\hgtk\bookmark.py:306
 #: tortoisehg\hgtk\bookmark.py:332
 msgid "Bookmarking completed"
 msgstr "Tvorba záložky je ukončena"
@@ -301,11 +321,16 @@ msgstr "Tvorba záložky je ukončena"
 msgid "Bookmark \"%s\" has been added"
 msgstr "Byla přidána záložka \"%s\""
 
-#: tortoisehg\hgtk\bookmark.py:224 tortoisehg\hgtk\bookmark.py:227
-#: tortoisehg\hgtk\bookmark.py:254 tortoisehg\hgtk\bookmark.py:257
-#: tortoisehg\hgtk\bookmark.py:278 tortoisehg\hgtk\bookmark.py:281
-#: tortoisehg\hgtk\bookmark.py:311 tortoisehg\hgtk\bookmark.py:314
-#: tortoisehg\hgtk\bookmark.py:337 tortoisehg\hgtk\bookmark.py:340
+#: tortoisehg\hgtk\bookmark.py:224
+#: tortoisehg\hgtk\bookmark.py:227
+#: tortoisehg\hgtk\bookmark.py:254
+#: tortoisehg\hgtk\bookmark.py:257
+#: tortoisehg\hgtk\bookmark.py:278
+#: tortoisehg\hgtk\bookmark.py:281
+#: tortoisehg\hgtk\bookmark.py:311
+#: tortoisehg\hgtk\bookmark.py:314
+#: tortoisehg\hgtk\bookmark.py:337
+#: tortoisehg\hgtk\bookmark.py:340
 msgid "Error in bookmarking"
 msgstr "Chyba při tvorbě záložky"
 
@@ -341,11 +366,13 @@ msgstr "Záložka \"%s\" byla přejmenována na \"%s\""
 msgid "Bookmark \"%s\" has been made current"
 msgstr "Aktuální se stává záložka \"%s\""
 
-#: tortoisehg\hgtk\bookmark.py:346 tortoisehg\hgtk\bookmark.py:373
+#: tortoisehg\hgtk\bookmark.py:346
+#: tortoisehg\hgtk\bookmark.py:373
 msgid "a bookmark named \"%s\" already exists"
 msgstr "název záložky \"%s\" již existuje"
 
-#: tortoisehg\hgtk\bookmark.py:355 tortoisehg\hgtk\bookmark.py:382
+#: tortoisehg\hgtk\bookmark.py:355
+#: tortoisehg\hgtk\bookmark.py:382
 msgid "No bookmark named \"%s\" exists"
 msgstr "Neexistuje záložka s názvem \"%s\""
 
@@ -353,7 +380,8 @@ msgstr "Neexistuje záložka s názvem \"%s\""
 msgid "Bookmark '%s' does not exist"
 msgstr "Záložka \"%s\" neexistuje"
 
-#: tortoisehg\hgtk\browse.py:112 tortoisehg\hgtk\quickop.py:100
+#: tortoisehg\hgtk\browse.py:112
+#: tortoisehg\hgtk\quickop.py:100
 #: tortoisehg\hgtk\status.py:134
 msgid "status"
 msgstr "status"
@@ -362,12 +390,14 @@ msgstr "status"
 msgid "type"
 msgstr "typ"
 
-#: tortoisehg\hgtk\browse.py:142 tortoisehg\hgtk\quickop.py:103
+#: tortoisehg\hgtk\browse.py:142
+#: tortoisehg\hgtk\quickop.py:103
 #: tortoisehg\hgtk\status.py:322
 msgid "path"
 msgstr "cesta"
 
-#: tortoisehg\hgtk\browse.py:344 tortoisehg\hgtk\browse.py:346
+#: tortoisehg\hgtk\browse.py:344
+#: tortoisehg\hgtk\browse.py:346
 msgid "browser"
 msgstr "prohlížeč"
 
@@ -379,18 +409,14 @@ msgstr "Zpráva o chybě v TortoiseHg"
 msgid "Save as.."
 msgstr "Uložit jako.."
 
-#: tortoisehg\hgtk\bugreport.py:48 tortoisehg\hgtk\hgcmd.py:48
+#: tortoisehg\hgtk\bugreport.py:48
+#: tortoisehg\hgtk\hgcmd.py:48
 msgid "Close"
 msgstr "Zavřít"
 
 #: tortoisehg\hgtk\bugreport.py:57
-msgid ""
-"** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues "
-"or tortoisehg-discuss@lists.sourceforge.net\n"
-msgstr ""
-"** Oznamte prosím tuto chybu na  "
-"http://bitbucket.org/tortoisehg/stable/issues or tortoisehg-"
-"discuss@lists.sourceforge.net\n"
+msgid "** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues or tortoisehg-discuss@lists.sourceforge.net\n"
+msgstr "** Oznamte prosím tuto chybu na  http://bitbucket.org/tortoisehg/stable/issues or tortoisehg-discuss@lists.sourceforge.net\n"
 
 #: tortoisehg\hgtk\bugreport.py:73
 msgid "Save error report to"
@@ -400,7 +426,8 @@ msgstr "Uložit zprávu o chybě do"
 msgid "%s changeset "
 msgstr "%s changeset "
 
-#: tortoisehg\hgtk\changeset.py:165 tortoisehg\hgtk\changeset.py:195
+#: tortoisehg\hgtk\changeset.py:165
+#: tortoisehg\hgtk\changeset.py:195
 msgid "[All Files]"
 msgstr "[Všechny soubory]"
 
@@ -420,9 +447,10 @@ msgstr "Chyba repositáře:  %s, navrženo obnovení"
 msgid "[no hunks to display]"
 msgstr "[žádné porce k zobrazení]"
 
-#: tortoisehg\hgtk\changeset.py:440 tortoisehg\hgtk\status.py:1655
+#: tortoisehg\hgtk\changeset.py:440
+#: tortoisehg\hgtk\status.py:1655
 msgid "_Visual Diff"
-msgstr "_Vizuální Diff"
+msgstr "Vizuální Diff"
 
 #: tortoisehg\hgtk\changeset.py:442
 msgid "Diff to _local"
@@ -430,30 +458,33 @@ msgstr "VDiff k aktuální"
 
 #: tortoisehg\hgtk\changeset.py:444
 msgid "_View at Revision"
-msgstr "_Zobrazit  v revizi"
+msgstr "Otevřít v revizi"
 
 #: tortoisehg\hgtk\changeset.py:445
 msgid "_Save at Revision..."
-msgstr "_Uložit v revizi ..."
+msgstr "Uložit v revizi..."
 
-#: tortoisehg\hgtk\changeset.py:448 tortoisehg\hgtk\datamine.py:147
+#: tortoisehg\hgtk\changeset.py:448
+#: tortoisehg\hgtk\datamine.py:147
 #: tortoisehg\hgtk\datamine.py:162
 msgid "_File History"
-msgstr "_Historie souboru"
+msgstr "Historie souboru"
 
-#: tortoisehg\hgtk\changeset.py:449 tortoisehg\hgtk\datamine.py:146
+#: tortoisehg\hgtk\changeset.py:449
+#: tortoisehg\hgtk\datamine.py:146
 msgid "_Annotate File"
 msgstr "Anotace souboru"
 
 #: tortoisehg\hgtk\changeset.py:452
 msgid "_Revert File Contents"
-msgstr "_Vrátit obsah souboru..."
+msgstr "Vrátit obsah souboru..."
 
 #: tortoisehg\hgtk\changeset.py:536
 msgid "Changeset:"
 msgstr "Changeset:"
 
-#: tortoisehg\hgtk\changeset.py:538 tortoisehg\hgtk\update.py:90
+#: tortoisehg\hgtk\changeset.py:538
+#: tortoisehg\hgtk\update.py:90
 msgid "Parent:"
 msgstr "Rodič:"
 
@@ -461,7 +492,8 @@ msgstr "Rodič:"
 msgid "Child:"
 msgstr "Dítě:"
 
-#: tortoisehg\hgtk\changeset.py:542 tortoisehg\hgtk\cslist.py:143
+#: tortoisehg\hgtk\changeset.py:542
+#: tortoisehg\hgtk\cslist.py:143
 msgid "Patch:"
 msgstr "Oprávka:"
 
@@ -509,13 +541,14 @@ msgstr "Cesta ke zdroji:"
 msgid "Select Source Folder"
 msgstr "Vyberte zdrojovou složku"
 
-#: tortoisehg\hgtk\clone.py:117 tortoisehg\hgtk\tagadd.py:68
+#: tortoisehg\hgtk\clone.py:117
+#: tortoisehg\hgtk\tagadd.py:68
 msgid "Advanced options"
 msgstr "Pokročilé možnosti"
 
 #: tortoisehg\hgtk\clone.py:127
 msgid "Clone to revision:"
-msgstr "Klonovat do revize:"
+msgstr "Klonovat až k revizi:"
 
 #: tortoisehg\hgtk\clone.py:135
 msgid "Starting P4 Changelist:"
@@ -533,12 +566,14 @@ msgstr "Použít protokol pull ke kopírování metadat"
 msgid "Use uncompressed transfer"
 msgstr "Použít nekomprimovaný přenos"
 
-#: tortoisehg\hgtk\clone.py:149 tortoisehg\hgtk\history.py:402
+#: tortoisehg\hgtk\clone.py:149
+#: tortoisehg\hgtk\history.py:402
 #: tortoisehg\hgtk\synch.py:183
 msgid "Use proxy server"
 msgstr "Použít proxy server"
 
-#: tortoisehg\hgtk\clone.py:159 tortoisehg\hgtk\synch.py:204
+#: tortoisehg\hgtk\clone.py:159
+#: tortoisehg\hgtk\synch.py:204
 msgid "Remote command:"
 msgstr "Vzdálený příkaz:"
 
@@ -550,7 +585,8 @@ msgstr "Klonovat"
 msgid "Cloned successfully"
 msgstr "Klonování se zdařilo"
 
-#: tortoisehg\hgtk\clone.py:189 tortoisehg\hgtk\update.py:151
+#: tortoisehg\hgtk\clone.py:189
+#: tortoisehg\hgtk\update.py:151
 msgid "Canceled updating"
 msgstr "Aktualizace zrušena"
 
@@ -618,17 +654,21 @@ msgstr " - qrefresh "
 msgid " - commit"
 msgstr " - commit"
 
-#: tortoisehg\hgtk\commit.py:217 tortoisehg\hgtk\commit.py:299
-#: tortoisehg\hgtk\history.py:213 tortoisehg\hgtk\history.py:309
+#: tortoisehg\hgtk\commit.py:217
+#: tortoisehg\hgtk\commit.py:299
+#: tortoisehg\hgtk\history.py:213
+#: tortoisehg\hgtk\history.py:309
 #: tortoisehg\hgtk\thgimport.py:107
 msgid "Patch Queue"
 msgstr "Fronta oprávek"
 
-#: tortoisehg\hgtk\commit.py:222 tortoisehg\hgtk\history.py:326
+#: tortoisehg\hgtk\commit.py:222
+#: tortoisehg\hgtk\history.py:326
 msgid "_View"
-msgstr "_Zobrazení"
+msgstr "Zobrazení"
 
-#: tortoisehg\hgtk\commit.py:223 tortoisehg\hgtk\history.py:332
+#: tortoisehg\hgtk\commit.py:223
+#: tortoisehg\hgtk\history.py:332
 msgid "Toolbar"
 msgstr "Nástrojová lišta"
 
@@ -636,73 +676,89 @@ msgstr "Nástrojová lišta"
 msgid "Advanced"
 msgstr "Pokročilé"
 
-#: tortoisehg\hgtk\commit.py:227 tortoisehg\hgtk\history.py:64
-#: tortoisehg\hgtk\history.py:414 tortoisehg\hgtk\history.py:1088
+#: tortoisehg\hgtk\commit.py:227
+#: tortoisehg\hgtk\history.py:64
+#: tortoisehg\hgtk\history.py:414
+#: tortoisehg\hgtk\history.py:1088
 msgid "Parents"
 msgstr "Rodiče"
 
-#: tortoisehg\hgtk\commit.py:231 tortoisehg\hgtk\hgignore.py:142
+#: tortoisehg\hgtk\commit.py:231
+#: tortoisehg\hgtk\hgignore.py:142
 #: tortoisehg\hgtk\history.py:339
 msgid "Refresh"
 msgstr "Obnovit"
 
-#: tortoisehg\hgtk\commit.py:233 tortoisehg\hgtk\history.py:353
+#: tortoisehg\hgtk\commit.py:233
+#: tortoisehg\hgtk\history.py:353
 msgid "Ignore Max Diff Size"
 msgstr "Ignorovat max. velikost diffu"
 
-#: tortoisehg\hgtk\commit.py:235 tortoisehg\hgtk\history.py:355
+#: tortoisehg\hgtk\commit.py:235
+#: tortoisehg\hgtk\history.py:355
 msgid "Always Show Output"
 msgstr "Vždy zobrazit výstup"
 
 #: tortoisehg\hgtk\commit.py:238
 msgid "_Operations"
-msgstr "_Operace"
+msgstr "Operace"
 
-#: tortoisehg\hgtk\commit.py:239 tortoisehg\hgtk\commit.py:293
+#: tortoisehg\hgtk\commit.py:239
+#: tortoisehg\hgtk\commit.py:293
 #: tortoisehg\hgtk\commit.py:753
 msgid "_Commit"
-msgstr "_Commit"
+msgstr "Commit"
 
-#: tortoisehg\hgtk\commit.py:241 tortoisehg\hgtk\commit.py:291
+#: tortoisehg\hgtk\commit.py:241
+#: tortoisehg\hgtk\commit.py:291
 msgid "_Undo"
 msgstr "_Zpět"
 
-#: tortoisehg\hgtk\commit.py:244 tortoisehg\hgtk\status.py:154
+#: tortoisehg\hgtk\commit.py:244
+#: tortoisehg\hgtk\status.py:154
 msgid "_Diff"
 msgstr "VDiff"
 
-#: tortoisehg\hgtk\commit.py:246 tortoisehg\hgtk\status.py:157
+#: tortoisehg\hgtk\commit.py:246
+#: tortoisehg\hgtk\status.py:157
 msgid "Re_vert"
 msgstr "Vrátit"
 
-#: tortoisehg\hgtk\commit.py:248 tortoisehg\hgtk\status.py:160
-#: tortoisehg\hgtk\status.py:1665 tortoisehg\hgtk\thgconfig.py:1019
+#: tortoisehg\hgtk\commit.py:248
+#: tortoisehg\hgtk\status.py:160
+#: tortoisehg\hgtk\status.py:1665
+#: tortoisehg\hgtk\thgconfig.py:1019
 msgid "_Add"
-msgstr "_Přidat"
+msgstr "Přidat"
 
-#: tortoisehg\hgtk\commit.py:250 tortoisehg\hgtk\status.py:166
+#: tortoisehg\hgtk\commit.py:250
+#: tortoisehg\hgtk\status.py:166
 #: tortoisehg\hgtk\thgconfig.py:1029
 msgid "_Remove"
-msgstr "_Odebrat"
+msgstr "Odebrat"
 
-#: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\status.py:169
+#: tortoisehg\hgtk\commit.py:254
+#: tortoisehg\hgtk\status.py:169
 #: tortoisehg\hgtk\status.py:1664
 msgid "_Forget"
-msgstr "_Zapomenout"
+msgstr "Zapomenout"
 
 #: tortoisehg\hgtk\commit.py:292
 msgid "undo recent commit"
 msgstr "zrušit poslední komit"
 
-#: tortoisehg\hgtk\commit.py:294 tortoisehg\hgtk\commit.py:630
+#: tortoisehg\hgtk\commit.py:294
+#: tortoisehg\hgtk\commit.py:630
 msgid "commit"
 msgstr "commit"
 
-#: tortoisehg\hgtk\commit.py:300 tortoisehg\hgtk\history.py:215
+#: tortoisehg\hgtk\commit.py:300
+#: tortoisehg\hgtk\history.py:215
 msgid "Show/Hide Patch Queue"
 msgstr "Ukázat/skrýt frontu oprávek"
 
-#: tortoisehg\hgtk\commit.py:313 tortoisehg\hgtk\merge.py:190
+#: tortoisehg\hgtk\commit.py:313
+#: tortoisehg\hgtk\merge.py:190
 #: tortoisehg\hgtk\thgconfig.py:798
 msgid "Confirm Exit"
 msgstr "Potvrďte ukončení programu"
@@ -711,23 +767,33 @@ msgstr "Potvrďte ukončení programu"
 msgid "Save commit message at exit?"
 msgstr "Při ukončení programu uložit komentář commitu?"
 
-#: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
-#: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\history.py:175
-#: tortoisehg\hgtk\history.py:1915 tortoisehg\hgtk\status.py:1388
-#: tortoisehg\hgtk\status.py:1407 tortoisehg\hgtk\status.py:1731
-#: tortoisehg\hgtk\thgconfig.py:801 tortoisehg\hgtk\thgmq.py:345
+#: tortoisehg\hgtk\commit.py:315
+#: tortoisehg\hgtk\commit.py:1116
+#: tortoisehg\hgtk\commit.py:1120
+#: tortoisehg\hgtk\history.py:175
+#: tortoisehg\hgtk\history.py:1915
+#: tortoisehg\hgtk\status.py:1388
+#: tortoisehg\hgtk\status.py:1407
+#: tortoisehg\hgtk\status.py:1731
+#: tortoisehg\hgtk\thgconfig.py:801
+#: tortoisehg\hgtk\thgmq.py:345
 #: tortoisehg\hgtk\update.py:236
 msgid "&Cancel"
 msgstr "&Zrušit"
 
-#: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
-#: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\status.py:1731
-#: tortoisehg\hgtk\thgconfig.py:800 tortoisehg\hgtk\thgmq.py:345
+#: tortoisehg\hgtk\commit.py:315
+#: tortoisehg\hgtk\commit.py:1116
+#: tortoisehg\hgtk\commit.py:1120
+#: tortoisehg\hgtk\status.py:1731
+#: tortoisehg\hgtk\thgconfig.py:800
+#: tortoisehg\hgtk\thgmq.py:345
 msgid "&Yes"
 msgstr "&Ano"
 
-#: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
-#: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\thgstrip.py:217
+#: tortoisehg\hgtk\commit.py:315
+#: tortoisehg\hgtk\commit.py:1116
+#: tortoisehg\hgtk\commit.py:1120
+#: tortoisehg\hgtk\thgstrip.py:217
 msgid "&No"
 msgstr "&Ne"
 
@@ -755,11 +821,13 @@ msgstr "Rodič: %(rev)s"
 msgid "Not at head"
 msgstr "Nikoliv v čele"
 
-#: tortoisehg\hgtk\commit.py:519 tortoisehg\hgtk\status.py:534
+#: tortoisehg\hgtk\commit.py:519
+#: tortoisehg\hgtk\status.py:534
 msgid "Patch Preview"
 msgstr "Náhled oprávky"
 
-#: tortoisehg\hgtk\commit.py:521 tortoisehg\hgtk\status.py:538
+#: tortoisehg\hgtk\commit.py:521
+#: tortoisehg\hgtk\status.py:538
 msgid "Commit Preview"
 msgstr "Náhled komitu"
 
@@ -767,10 +835,14 @@ msgstr "Náhled komitu"
 msgid "Discard current commit message?"
 msgstr "Zavrhnout komentář stávajícího komitu?"
 
-#: tortoisehg\hgtk\commit.py:629 tortoisehg\hgtk\commit.py:902
-#: tortoisehg\hgtk\commit.py:953 tortoisehg\hgtk\commit.py:1182
-#: tortoisehg\hgtk\gdialog.py:485 tortoisehg\hgtk\history.py:224
-#: tortoisehg\hgtk\merge.py:130 tortoisehg\hgtk\thgconfig.py:664
+#: tortoisehg\hgtk\commit.py:629
+#: tortoisehg\hgtk\commit.py:902
+#: tortoisehg\hgtk\commit.py:953
+#: tortoisehg\hgtk\commit.py:1182
+#: tortoisehg\hgtk\gdialog.py:485
+#: tortoisehg\hgtk\history.py:224
+#: tortoisehg\hgtk\merge.py:130
+#: tortoisehg\hgtk\thgconfig.py:664
 msgid "Commit"
 msgstr "Commit"
 
@@ -792,11 +864,11 @@ msgstr "obnovit top MQ oprávku"
 
 #: tortoisehg\hgtk\commit.py:639
 msgid "_Commit (+1 head)"
-msgstr "_Commit (+1 head)"
+msgstr "Commit (+1 head)"
 
 #: tortoisehg\hgtk\commit.py:639
 msgid "_Commit (-1 head)"
-msgstr "_Commit (-1 head)"
+msgstr "Commit (-1 head)"
 
 #: tortoisehg\hgtk\commit.py:645
 msgid "commit to merge one head"
@@ -830,7 +902,8 @@ msgstr "Sloučit "
 msgid "Patch Contents"
 msgstr "Obsah oprávky"
 
-#: tortoisehg\hgtk\commit.py:886 tortoisehg\hgtk\commit.py:1028
+#: tortoisehg\hgtk\commit.py:886
+#: tortoisehg\hgtk\commit.py:1028
 msgid "Nothing Commited"
 msgstr "Nic nekomitováno"
 
@@ -854,7 +927,8 @@ msgstr "Potvrďte zrušení komitu"
 msgid "Undo last commit"
 msgstr "Zpět poslední komit"
 
-#: tortoisehg\hgtk\commit.py:990 tortoisehg\hgtk\commit.py:1005
+#: tortoisehg\hgtk\commit.py:990
+#: tortoisehg\hgtk\commit.py:1005
 msgid "Undo Commit"
 msgstr "Zrušit komit"
 
@@ -880,7 +954,8 @@ msgstr "Potvďte Přidat/Odebrat"
 msgid "Add/Remove the following files?"
 msgstr "Přidat/Odebrat následující soubory?"
 
-#: tortoisehg\hgtk\commit.py:1029 tortoisehg\hgtk\tagadd.py:224
+#: tortoisehg\hgtk\commit.py:1029
+#: tortoisehg\hgtk\tagadd.py:224
 msgid "Please enter commit message"
 msgstr "Zadejte prosím komentář komitu"
 
@@ -892,7 +967,8 @@ msgstr "Chyba"
 msgid "Message format configuration error"
 msgstr "Chyba v nastavení formátu sdělení"
 
-#: tortoisehg\hgtk\commit.py:1046 tortoisehg\hgtk\commit.py:1054
+#: tortoisehg\hgtk\commit.py:1046
+#: tortoisehg\hgtk\commit.py:1054
 #: tortoisehg\hgtk\commit.py:1066
 msgid "Confirm Commit"
 msgstr "Potvrďte commit"
@@ -977,22 +1053,35 @@ msgstr "Komit se nezdařil"
 msgid "Committing changes..."
 msgstr "Komitování změn..."
 
-#: tortoisehg\hgtk\commit.py:1183 tortoisehg\hgtk\history.py:537
-#: tortoisehg\hgtk\history.py:562 tortoisehg\hgtk\history.py:1620
-#: tortoisehg\hgtk\history.py:1699 tortoisehg\hgtk\history.py:1829
-#: tortoisehg\hgtk\history.py:1869 tortoisehg\hgtk\history.py:1936
-#: tortoisehg\hgtk\history.py:2277 tortoisehg\hgtk\history.py:2307
-#: tortoisehg\hgtk\history.py:2499 tortoisehg\hgtk\history.py:2527
-#: tortoisehg\hgtk\recovery.py:161 tortoisehg\hgtk\synch.py:540
+#: tortoisehg\hgtk\commit.py:1183
+#: tortoisehg\hgtk\history.py:537
+#: tortoisehg\hgtk\history.py:562
+#: tortoisehg\hgtk\history.py:1620
+#: tortoisehg\hgtk\history.py:1699
+#: tortoisehg\hgtk\history.py:1829
+#: tortoisehg\hgtk\history.py:1869
+#: tortoisehg\hgtk\history.py:1936
+#: tortoisehg\hgtk\history.py:2277
+#: tortoisehg\hgtk\history.py:2307
+#: tortoisehg\hgtk\history.py:2499
+#: tortoisehg\hgtk\history.py:2527
+#: tortoisehg\hgtk\recovery.py:161
+#: tortoisehg\hgtk\synch.py:540
 msgid "Cannot run now"
 msgstr "Nyní nelze spustit"
 
-#: tortoisehg\hgtk\commit.py:1184 tortoisehg\hgtk\history.py:538
-#: tortoisehg\hgtk\history.py:563 tortoisehg\hgtk\history.py:1621
-#: tortoisehg\hgtk\history.py:1700 tortoisehg\hgtk\history.py:1830
-#: tortoisehg\hgtk\history.py:1870 tortoisehg\hgtk\history.py:1937
-#: tortoisehg\hgtk\history.py:2278 tortoisehg\hgtk\history.py:2308
-#: tortoisehg\hgtk\history.py:2500 tortoisehg\hgtk\history.py:2528
+#: tortoisehg\hgtk\commit.py:1184
+#: tortoisehg\hgtk\history.py:538
+#: tortoisehg\hgtk\history.py:563
+#: tortoisehg\hgtk\history.py:1621
+#: tortoisehg\hgtk\history.py:1700
+#: tortoisehg\hgtk\history.py:1830
+#: tortoisehg\hgtk\history.py:1870
+#: tortoisehg\hgtk\history.py:1937
+#: tortoisehg\hgtk\history.py:2278
+#: tortoisehg\hgtk\history.py:2308
+#: tortoisehg\hgtk\history.py:2500
+#: tortoisehg\hgtk\history.py:2528
 msgid "Please try again after running operation is completed"
 msgstr "Zkuste prosím znova po ukončení probíhající operace"
 
@@ -1016,7 +1105,8 @@ msgstr "Požadováno Info"
 msgid "Message format needs to be configured"
 msgstr "Je zapotřebí nastavit formát komentáře"
 
-#: tortoisehg\hgtk\commit.py:1270 tortoisehg\hgtk\commit.py:1275
+#: tortoisehg\hgtk\commit.py:1270
+#: tortoisehg\hgtk\commit.py:1275
 msgid "Warning"
 msgstr "Varování"
 
@@ -1044,19 +1134,23 @@ msgstr "Shrnutí:"
 msgid "Age:"
 msgstr "Stáří:"
 
-#: tortoisehg\hgtk\csinfo.py:200 tortoisehg\hgtk\csinfo.py:201
+#: tortoisehg\hgtk\csinfo.py:200
+#: tortoisehg\hgtk\csinfo.py:201
 msgid "Date:"
 msgstr "Datum:"
 
-#: tortoisehg\hgtk\csinfo.py:200 tortoisehg\hgtk\csinfo.py:205
+#: tortoisehg\hgtk\csinfo.py:200
+#: tortoisehg\hgtk\csinfo.py:205
 msgid "User:"
 msgstr "Uživatel:"
 
-#: tortoisehg\hgtk\csinfo.py:201 tortoisehg\hgtk\csinfo.py:202
+#: tortoisehg\hgtk\csinfo.py:201
+#: tortoisehg\hgtk\csinfo.py:202
 msgid "Branch:"
 msgstr "Větev:"
 
-#: tortoisehg\hgtk\csinfo.py:202 tortoisehg\hgtk\csinfo.py:203
+#: tortoisehg\hgtk\csinfo.py:202
+#: tortoisehg\hgtk\csinfo.py:203
 msgid "Tags:"
 msgstr "Tagy:"
 
@@ -1066,11 +1160,11 @@ msgstr "Přemístit:"
 
 #: tortoisehg\hgtk\csinfo.py:204
 msgid "Perforce:"
-msgstr "lo_Perforce:"
+msgstr "Perforce:"
 
 #: tortoisehg\hgtk\csinfo.py:204
 msgid "Subversion:"
-msgstr "lo_Subversion:"
+msgstr "Subversion:"
 
 #: tortoisehg\hgtk\cslist.py:88
 msgid "Show all"
@@ -1108,9 +1202,12 @@ msgstr "Zobrazeno %(count)d z %(total)d položek"
 msgid "%s - datamine"
 msgstr "%s - zkoumání dat"
 
-#: tortoisehg\hgtk\datamine.py:54 tortoisehg\hgtk\hgcmd.py:44
-#: tortoisehg\hgtk\history.py:383 tortoisehg\hgtk\recovery.py:46
-#: tortoisehg\hgtk\serve.py:65 tortoisehg\hgtk\synch.py:59
+#: tortoisehg\hgtk\datamine.py:54
+#: tortoisehg\hgtk\hgcmd.py:44
+#: tortoisehg\hgtk\history.py:383
+#: tortoisehg\hgtk\recovery.py:46
+#: tortoisehg\hgtk\serve.py:65
+#: tortoisehg\hgtk\synch.py:59
 msgid "Stop"
 msgstr "Stop"
 
@@ -1126,7 +1223,8 @@ msgstr "Nové hledání"
 msgid "Open new search tab"
 msgstr "Otevřít záložku nového hledání"
 
-#: tortoisehg\hgtk\datamine.py:71 tortoisehg\hgtk\rename.py:29
+#: tortoisehg\hgtk\datamine.py:71
+#: tortoisehg\hgtk\rename.py:29
 #: tortoisehg\hgtk\thgconfig.py:1307
 msgid "Invalid path"
 msgstr "Neplatná cesta"
@@ -1139,19 +1237,25 @@ msgstr "Nelze anotovat adresář: %s"
 msgid "Filename"
 msgstr "Název souboru"
 
-#: tortoisehg\hgtk\datamine.py:136 tortoisehg\hgtk\datamine.py:650
-#: tortoisehg\hgtk\history.py:101 tortoisehg\hgtk\history.py:435
-#: tortoisehg\hgtk\history.py:619 tortoisehg\hgtk\logview\treeview.py:486
-#: tortoisehg\hgtk\thgconfig.py:191 tortoisehg\hgtk\thgconfig.py:299
+#: tortoisehg\hgtk\datamine.py:136
+#: tortoisehg\hgtk\datamine.py:650
+#: tortoisehg\hgtk\history.py:101
+#: tortoisehg\hgtk\history.py:435
+#: tortoisehg\hgtk\history.py:619
+#: tortoisehg\hgtk\logview\treeview.py:486
+#: tortoisehg\hgtk\thgconfig.py:191
+#: tortoisehg\hgtk\thgconfig.py:299
 msgid "User"
 msgstr "Uživatel"
 
-#: tortoisehg\hgtk\datamine.py:144 tortoisehg\hgtk\datamine.py:157
+#: tortoisehg\hgtk\datamine.py:144
+#: tortoisehg\hgtk\datamine.py:157
 #: tortoisehg\hgtk\history.py:1128
 msgid "Di_splay Change"
-msgstr "Zobrazit změnu"
+msgstr "Zobrazit změny"
 
-#: tortoisehg\hgtk\datamine.py:148 tortoisehg\hgtk\datamine.py:161
+#: tortoisehg\hgtk\datamine.py:148
+#: tortoisehg\hgtk\datamine.py:161
 msgid "_View File at Revision"
 msgstr "Zobrazit soubor v revizi"
 
@@ -1175,7 +1279,8 @@ msgstr "Nejde anotovat"
 msgid "Search"
 msgstr "Hledat"
 
-#: tortoisehg\hgtk\datamine.py:317 tortoisehg\hgtk\hgignore.py:60
+#: tortoisehg\hgtk\datamine.py:317
+#: tortoisehg\hgtk\hgignore.py:60
 msgid "Regexp:"
 msgstr "Regexp:"
 
@@ -1196,19 +1301,12 @@ msgid "Regular expression search pattern"
 msgstr "Vyhledávací vzor regulárního výrazu"
 
 #: tortoisehg\hgtk\datamine.py:326
-msgid ""
-"Comma separated list of inclusion patterns.  By default, the entire "
-"repository is searched."
-msgstr ""
-"CSV seznam inkluzivních vzorů . Implicitně je prohledáván cely repositář."
+msgid "Comma separated list of inclusion patterns.  By default, the entire repository is searched."
+msgstr "CSV seznam inkluzivních vzorů . Implicitně je prohledáván cely repositář."
 
 #: tortoisehg\hgtk\datamine.py:329
-msgid ""
-"Comma separated list of exclusion patterns.  Exclusion patterns are applied "
-"after inclusion patterns."
-msgstr ""
-"CSV seznam exkluzivních vzorů . Exkluzivní vzory jsou použity po "
-"inkluzivních vzorech."
+msgid "Comma separated list of exclusion patterns.  Exclusion patterns are applied after inclusion patterns."
+msgstr "CSV seznam exkluzivních vzorů . Exkluzivní vzory jsou použity po inkluzivních vzorech."
 
 #: tortoisehg\hgtk\datamine.py:335
 msgid "Follow copies and renames"
@@ -1226,12 +1324,14 @@ msgstr "Zobrazit čísla řádků"
 msgid "Show all matching revisions"
 msgstr "Zobrazit všechny shodné revize"
 
-#: tortoisehg\hgtk\datamine.py:369 tortoisehg\hgtk\datamine.py:648
+#: tortoisehg\hgtk\datamine.py:369
+#: tortoisehg\hgtk\datamine.py:648
 #: tortoisehg\hgtk\logview\treeview.py:415
 msgid "Rev"
 msgstr "Rev"
 
-#: tortoisehg\hgtk\datamine.py:370 tortoisehg\hgtk\datamine.py:649
+#: tortoisehg\hgtk\datamine.py:370
+#: tortoisehg\hgtk\datamine.py:649
 msgid "File"
 msgstr "Soubor"
 
@@ -1255,11 +1355,13 @@ msgstr "Nutno zadat vyhledávací výraz"
 msgid "Invalid regular expression"
 msgstr "Neplatný regulární výraz"
 
-#: tortoisehg\hgtk\datamine.py:444 tortoisehg\hgtk\thgshelve.py:210
+#: tortoisehg\hgtk\datamine.py:444
+#: tortoisehg\hgtk\thgshelve.py:210
 msgid "Error: %s"
 msgstr "Chyba: %s"
 
-#: tortoisehg\hgtk\datamine.py:466 tortoisehg\hgtk\datamine.py:767
+#: tortoisehg\hgtk\datamine.py:466
+#: tortoisehg\hgtk\datamine.py:767
 msgid "Abort: %s"
 msgstr "Zrušit: %s"
 
@@ -1279,7 +1381,8 @@ msgstr "Nelze anotovat "
 msgid "Line"
 msgstr "Řádek"
 
-#: tortoisehg\hgtk\datamine.py:651 tortoisehg\hgtk\guess.py:158
+#: tortoisehg\hgtk\datamine.py:651
+#: tortoisehg\hgtk\guess.py:158
 msgid "Source"
 msgstr "Zdroj"
 
@@ -1293,36 +1396,45 @@ msgstr "Výzva TortoiseHg"
 
 #: tortoisehg\hgtk\gdialog.py:482
 msgid "_Tools"
-msgstr "_Nástroje"
+msgstr "Nástroje"
 
-#: tortoisehg\hgtk\gdialog.py:483 tortoisehg\hgtk\history.py:185
-#: tortoisehg\hgtk\thgconfig.py:665 tortoisehg\util\menuthg.py:49
+#: tortoisehg\hgtk\gdialog.py:483
+#: tortoisehg\hgtk\history.py:185
+#: tortoisehg\hgtk\thgconfig.py:665
+#: tortoisehg\util\menuthg.py:49
 msgid "Repository Explorer"
 msgstr "Průzkumník repozitáře"
 
-#: tortoisehg\hgtk\gdialog.py:487 tortoisehg\hgtk\history.py:227
+#: tortoisehg\hgtk\gdialog.py:487
+#: tortoisehg\hgtk\history.py:227
 msgid "Datamine"
 msgstr "Datamine"
 
-#: tortoisehg\hgtk\gdialog.py:489 tortoisehg\hgtk\history.py:230
+#: tortoisehg\hgtk\gdialog.py:489
+#: tortoisehg\hgtk\history.py:230
 msgid "Recovery"
 msgstr "Obnova"
 
-#: tortoisehg\hgtk\gdialog.py:491 tortoisehg\hgtk\history.py:233
+#: tortoisehg\hgtk\gdialog.py:491
+#: tortoisehg\hgtk\history.py:233
 msgid "Serve"
-msgstr "Serve"
+msgstr "Server"
 
-#: tortoisehg\hgtk\gdialog.py:493 tortoisehg\hgtk\history.py:236
-#: tortoisehg\hgtk\synch.py:89 tortoisehg\hgtk\thgshelve.py:71
-#: tortoisehg\hgtk\thgshelve.py:139 tortoisehg\hgtk\thgshelve.py:145
+#: tortoisehg\hgtk\gdialog.py:493
+#: tortoisehg\hgtk\history.py:236
+#: tortoisehg\hgtk\synch.py:89
+#: tortoisehg\hgtk\thgshelve.py:71
+#: tortoisehg\hgtk\thgshelve.py:139
+#: tortoisehg\hgtk\thgshelve.py:145
 #: tortoisehg\hgtk\thgshelve.py:153
 msgid "Shelve"
 msgstr "Shelve"
 
-#: tortoisehg\hgtk\gdialog.py:495 tortoisehg\hgtk\thgconfig.py:667
+#: tortoisehg\hgtk\gdialog.py:495
+#: tortoisehg\hgtk\thgconfig.py:667
 #: tortoisehg\util\menuthg.py:55
 msgid "Synchronize"
-msgstr "Synchronizovat"
+msgstr "Sync"
 
 #: tortoisehg\hgtk\gdialog.py:497
 msgid "Settings"
@@ -1330,13 +1442,14 @@ msgstr "Nastavení"
 
 #: tortoisehg\hgtk\gdialog.py:500
 msgid "_Help"
-msgstr "_Nápověda"
+msgstr "Nápověda"
 
 #: tortoisehg\hgtk\gdialog.py:501
 msgid "Contents"
 msgstr "Obsah"
 
-#: tortoisehg\hgtk\gdialog.py:503 tortoisehg\hgtk\thgmq.py:831
+#: tortoisehg\hgtk\gdialog.py:503
+#: tortoisehg\hgtk\thgmq.py:831
 msgid "Index"
 msgstr "Index"
 
@@ -1360,11 +1473,13 @@ msgstr "provádí se snímek %d souborů z rev %s\n"
 msgid "edit failed"
 msgstr "úprava selhala"
 
-#: tortoisehg\hgtk\gdialog.py:678 tortoisehg\hgtk\gtklib.py:171
+#: tortoisehg\hgtk\gdialog.py:678
+#: tortoisehg\hgtk\gtklib.py:171
 msgid "No visual editor configured"
 msgstr "Žádný grafický editor není nastaven"
 
-#: tortoisehg\hgtk\gdialog.py:679 tortoisehg\hgtk\gtklib.py:172
+#: tortoisehg\hgtk\gdialog.py:679
+#: tortoisehg\hgtk\gtklib.py:172
 msgid "Please configure a visual editor."
 msgstr "Nastavte prosím grafický editor."
 
@@ -1448,7 +1563,8 @@ msgstr ""
 msgid "Lang \"%s\" can not be set.\n"
 msgstr "Jazyk \"%s\" nelze nastavit.\n"
 
-#: tortoisehg\hgtk\gtklib.py:873 tortoisehg\hgtk\thgconfig.py:657
+#: tortoisehg\hgtk\gtklib.py:873
+#: tortoisehg\hgtk\thgconfig.py:657
 msgid "Spell Check Language"
 msgstr "Jazyk pro kontrolu pravopisu"
 
@@ -1500,7 +1616,8 @@ msgstr ""
 "== %s a %s mají stejný obsah ==\n"
 "\n"
 
-#: tortoisehg\hgtk\hgcmd.py:186 tortoisehg\hgtk\hgcmd.py:529
+#: tortoisehg\hgtk\hgcmd.py:186
+#: tortoisehg\hgtk\hgcmd.py:529
 msgid ""
 "\n"
 "[command interrupted]"
@@ -1524,7 +1641,8 @@ msgstr "Ukončit transakci"
 msgid "Close this"
 msgstr "Toto uzavřít"
 
-#: tortoisehg\hgtk\hgcmd.py:464 tortoisehg\hgtk\hgcmd.py:481
+#: tortoisehg\hgtk\hgcmd.py:464
+#: tortoisehg\hgtk\hgcmd.py:481
 msgid "invalid state"
 msgstr "neplatný stav"
 
@@ -1548,7 +1666,8 @@ msgstr "Test"
 msgid "Show emails which would be sent"
 msgstr "Ukázat odesílané emaily"
 
-#: tortoisehg\hgtk\hgemail.py:43 tortoisehg\hgtk\serve.py:73
+#: tortoisehg\hgtk\hgemail.py:43
+#: tortoisehg\hgtk\serve.py:73
 #: tortoisehg\hgtk\synch.py:96
 msgid "Configure"
 msgstr "Nastavit"
@@ -1602,63 +1721,36 @@ msgid "Send changesets as Hg patches"
 msgstr "Poslat changesety jako oprávky"
 
 #: tortoisehg\hgtk\hgemail.py:102
-msgid ""
-"Hg patches (as generated by export command) are compatible with most patch "
-"programs.  They include a header which contains the most important changeset "
-"metadata."
-msgstr ""
-"Hg oprávky (generované přikazem export) jsou kompatibilní s většinou "
-"oprávkových programů. Zahrnují záhlaví, které obsahuje většinu "
-"nejdůležitějších metadat changesetu."
+msgid "Hg patches (as generated by export command) are compatible with most patch programs.  They include a header which contains the most important changeset metadata."
+msgstr "Hg oprávky (generované přikazem export) jsou kompatibilní s většinou oprávkových programů. Zahrnují záhlaví, které obsahuje většinu nejdůležitějších metadat changesetu."
 
 #: tortoisehg\hgtk\hgemail.py:107
 msgid "Use extended (git) patch format"
 msgstr "Použít rozšířený (git) oprávkový formát"
 
 #: tortoisehg\hgtk\hgemail.py:110
-msgid ""
-"Git patches can describe binary files, copies, and permission changes, but "
-"recipients may not be able to use them if they are not using git or "
-"Mercurial."
-msgstr ""
-"Oprávky git umějí popsat binární soubory, kopie a změny povolenek ale "
-"příjemci je nemusí umět použít, pokud nepoužívají git nebo Mercurial."
+msgid "Git patches can describe binary files, copies, and permission changes, but recipients may not be able to use them if they are not using git or Mercurial."
+msgstr "Oprávky git umějí popsat binární soubory, kopie a změny povolenek ale příjemci je nemusí umět použít, pokud nepoužívají git nebo Mercurial."
 
 #: tortoisehg\hgtk\hgemail.py:115
 msgid "Plain, do not prepend Hg header"
 msgstr "Bez záhlaví Mercurialu"
 
 #: tortoisehg\hgtk\hgemail.py:118
-msgid ""
-"Stripping Mercurial header removes username and parent information.  Only "
-"useful if recipient is not using Mercurial (and does not like to see the "
-"headers)."
-msgstr ""
-"Odejmutí záhlaví Mercurialu odstraní jméno uživatele a informaci o rodiči. "
-"Užitečné jen tehdy, když příjemce nepoužívá Mercurial (a nechce vidět "
-"záhlaví)."
+msgid "Stripping Mercurial header removes username and parent information.  Only useful if recipient is not using Mercurial (and does not like to see the headers)."
+msgstr "Odejmutí záhlaví Mercurialu odstraní jméno uživatele a informaci o rodiči. Užitečné jen tehdy, když příjemce nepoužívá Mercurial (a nechce vidět záhlaví)."
 
 #: tortoisehg\hgtk\hgemail.py:123
 msgid "Send single binary bundle, not patches"
 msgstr "Poslat jen binární svazek, ne oprávky"
 
 #: tortoisehg\hgtk\hgemail.py:127
-msgid ""
-"Bundles store complete changesets in binary form. Upstream users can pull "
-"from them. This is the safest way to send changes to recipient Mercurial "
-"users."
-msgstr ""
-"Svazky ukládají kompletní revize  v binární formě.  Ostatní uživatelé je "
-"mohou stáhnout akcí pull. Je to nejjistější způsob zaslání změn příjemcům "
-"užívajícím Mercurial"
+msgid "Bundles store complete changesets in binary form. Upstream users can pull from them. This is the safest way to send changes to recipient Mercurial users."
+msgstr "Svazky ukládají kompletní revize  v binární formě.  Ostatní uživatelé je mohou stáhnout akcí pull. Je to nejjistější způsob zaslání změn příjemcům užívajícím Mercurial"
 
 #: tortoisehg\hgtk\hgemail.py:133
-msgid ""
-"This feature is only available when sending outgoing changesets. It is not "
-"applicable with revision ranges."
-msgstr ""
-"Tato vlastnost je přístupná pouze při posílání odchozích revizí. Nelze ji "
-"použít pro rozsah revizí."
+msgid "This feature is only available when sending outgoing changesets. It is not applicable with revision ranges."
+msgstr "Tato vlastnost je přístupná pouze při posílání odchozích revizí. Nelze ji použít pro rozsah revizí."
 
 #: tortoisehg\hgtk\hgemail.py:136
 msgid "attach"
@@ -1697,19 +1789,11 @@ msgid "Patch Series (Bundle) Description"
 msgstr "Popis serie (svazku) oprávek"
 
 #: tortoisehg\hgtk\hgemail.py:221
-msgid ""
-"Patch series description is sent in initial summary email with [PATCH 0 of "
-"N] subject.  It should describe the effects of the entire patch series.  "
-"When emailing a bundle, these fields make up the message subject and body. "
-"Flags is a comma separated list of tags which are inserted into the message "
-"subject prefix."
-msgstr ""
-"Popis serie oprávek je poslán v počátečním souhrnu jako email s předmětem "
-"zprávy [PATCH 0 of N]. Měl by popsat účinek celé serie oprávek. Při "
-"odesílání svazku tvoří tato pole předmět a tělo zprávy. 'Flagy' je CSV "
-"seznam štítků, které jsou vloženy do předpony předmětu zprávy."
+msgid "Patch series description is sent in initial summary email with [PATCH 0 of N] subject.  It should describe the effects of the entire patch series.  When emailing a bundle, these fields make up the message subject and body. Flags is a comma separated list of tags which are inserted into the message subject prefix."
+msgstr "Popis serie oprávek je poslán v počátečním souhrnu jako email s předmětem zprávy [PATCH 0 of N]. Měl by popsat účinek celé serie oprávek. Při odesílání svazku tvoří tato pole předmět a tělo zprávy. 'Flagy' je CSV seznam štítků, které jsou vloženy do předpony předmětu zprávy."
 
-#: tortoisehg\hgtk\hgemail.py:268 tortoisehg\hgtk\hgemail.py:273
+#: tortoisehg\hgtk\hgemail.py:268
+#: tortoisehg\hgtk\hgemail.py:273
 #: tortoisehg\hgtk\hgemail.py:282
 msgid "Info required"
 msgstr "Požadováno Info"
@@ -1734,7 +1818,8 @@ msgstr "Seznam ignorovaných souborů - %s"
 msgid "Glob:"
 msgstr "Glob:"
 
-#: tortoisehg\hgtk\hgignore.py:77 tortoisehg\hgtk\thgconfig.py:599
+#: tortoisehg\hgtk\hgignore.py:77
+#: tortoisehg\hgtk\thgconfig.py:599
 msgid "Edit File"
 msgstr "Editace souboru"
 
@@ -1802,7 +1887,8 @@ msgstr "Zadejte cestu k adresáři"
 msgid "Unable to create new repository"
 msgstr "Nelze vytvořit nový repositář"
 
-#: tortoisehg\hgtk\hginit.py:121 tortoisehg\hgtk\hginit.py:126
+#: tortoisehg\hgtk\hginit.py:121
+#: tortoisehg\hgtk\hginit.py:126
 msgid "Error when creating repository"
 msgstr "Chyba při vytváření repositáře"
 
@@ -1814,7 +1900,8 @@ msgstr "Vytvořen nový repositář"
 msgid "in directory %s"
 msgstr "v adresáři %s"
 
-#: tortoisehg\hgtk\hgthread.py:70 tortoisehg\hgtk\hgthread.py:82
+#: tortoisehg\hgtk\hgthread.py:70
+#: tortoisehg\hgtk\hgthread.py:82
 #: tortoisehg\hgtk\hgthread.py:89
 msgid "response expected"
 msgstr "očekávána odpověď"
@@ -1871,7 +1958,8 @@ msgstr "hgtk: neznámý příkaz '%s'\n"
 msgid "abort: %s!\n"
 msgstr "zrušit: %s!\n"
 
-#: tortoisehg\hgtk\hgtk.py:256 tortoisehg\hgtk\hgtk.py:455
+#: tortoisehg\hgtk\hgtk.py:256
+#: tortoisehg\hgtk\hgtk.py:455
 msgid "There is no Mercurial repository here (.hg not found)"
 msgstr "Zde není žádný repositář (složka .hg nenalezena)."
 
@@ -1884,12 +1972,8 @@ msgid "unrecognized profiling format '%s' - Ignored\n"
 msgstr "nepoznaný profilující formát '%s' - Ignorováno\n"
 
 #: tortoisehg\hgtk\hgtk.py:289
-msgid ""
-"lsprof not available - install from "
-"http://codespeak.net/svn/user/arigo/hack/misc/lsprof/"
-msgstr ""
-"Isprof není dostupné - instalujte z "
-"http://codespeak.net/svn/user/arigo/hack/misc/lsprof/"
+msgid "lsprof not available - install from http://codespeak.net/svn/user/arigo/hack/misc/lsprof/"
+msgstr "Isprof není dostupné - instalujte z http://codespeak.net/svn/user/arigo/hack/misc/lsprof/"
 
 #: tortoisehg\hgtk\hgtk.py:395
 msgid "Rename error"
@@ -1907,7 +1991,8 @@ msgstr "chyba mpatch"
 msgid "mpatch expects *.rej file argument\n"
 msgstr "mpatch očekává argument  *.rej\n"
 
-#: tortoisehg\hgtk\hgtk.py:508 tortoisehg\hgtk\hgtk.py:515
+#: tortoisehg\hgtk\hgtk.py:508
+#: tortoisehg\hgtk\hgtk.py:515
 msgid "%s does not exist\n"
 msgstr "%s neexistuje\n"
 
@@ -1920,22 +2005,19 @@ msgid "use \"hgtk help\" for the full list of commands"
 msgstr "použijte \"hgtk help\" pro úplný seznam příkazů"
 
 #: tortoisehg\hgtk\hgtk.py:540
-msgid ""
-"use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
-msgstr ""
-"použijte \"hgtk help\" pro úplný seznam příkazů nebo \"hgtk -v\" pro detaily"
+msgid "use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
+msgstr "použijte \"hgtk help\" pro úplný seznam příkazů nebo \"hgtk -v\" pro detaily"
 
 #: tortoisehg\hgtk\hgtk.py:543
 msgid "use \"hgtk -v help%s\" to show aliases and global options"
-msgstr ""
-"použijte \"hgtk -v help%s\" k zobrazení náhradních názvů a globálních "
-"možností"
+msgstr "použijte \"hgtk -v help%s\" k zobrazení náhradních názvů a globálních možností"
 
 #: tortoisehg\hgtk\hgtk.py:546
 msgid "use \"hgtk -v help %s\" to show global options"
 msgstr "použijte \"hgtk -v help %s\" k zobrazení globálních možností"
 
-#: tortoisehg\hgtk\hgtk.py:558 tortoisehg\hgtk\hgtk.py:665
+#: tortoisehg\hgtk\hgtk.py:558
+#: tortoisehg\hgtk\hgtk.py:665
 msgid ""
 "list of commands:\n"
 "\n"
@@ -1951,7 +2033,8 @@ msgstr ""
 "\n"
 "aliasy: %s\n"
 
-#: tortoisehg\hgtk\hgtk.py:571 tortoisehg\hgtk\hgtk.py:634
+#: tortoisehg\hgtk\hgtk.py:571
+#: tortoisehg\hgtk\hgtk.py:634
 msgid "(No help text available)"
 msgstr "(Bez nápovědy)"
 
@@ -2095,7 +2178,8 @@ msgstr "revize k porovnání"
 msgid "hgtk status [FILE]..."
 msgstr "hgtk status [FILE]..."
 
-#: tortoisehg\hgtk\hgtk.py:761 tortoisehg\hgtk\hgtk.py:764
+#: tortoisehg\hgtk\hgtk.py:761
+#: tortoisehg\hgtk\hgtk.py:764
 msgid "field to give initial focus"
 msgstr "pole pro počáteční zaměření"
 
@@ -2159,7 +2243,8 @@ msgstr "aktualizovat všechny repositáře ve stávajícím adresáři"
 msgid "hgtk thgstatus [OPTION]"
 msgstr "hgtk thgstatus [OPTION]"
 
-#: tortoisehg\hgtk\hgtk.py:784 tortoisehg\hgtk\hgtk.py:799
+#: tortoisehg\hgtk\hgtk.py:784
+#: tortoisehg\hgtk\hgtk.py:799
 msgid "revision to update"
 msgstr "revize k aktualizaci"
 
@@ -2231,28 +2316,34 @@ msgstr "Přesunout nahoru"
 msgid "Move Down"
 msgstr "Přesunout dolů"
 
-#: tortoisehg\hgtk\history.py:51 tortoisehg\hgtk\history.py:408
+#: tortoisehg\hgtk\history.py:51
+#: tortoisehg\hgtk\history.py:408
 msgid "All"
 msgstr "Vše"
 
-#: tortoisehg\hgtk\history.py:56 tortoisehg\hgtk\history.py:410
+#: tortoisehg\hgtk\history.py:56
+#: tortoisehg\hgtk\history.py:410
 msgid "Tagged"
 msgstr "Značené"
 
-#: tortoisehg\hgtk\history.py:60 tortoisehg\hgtk\history.py:412
+#: tortoisehg\hgtk\history.py:60
+#: tortoisehg\hgtk\history.py:412
 msgid "Ancestry"
 msgstr "Předci"
 
-#: tortoisehg\hgtk\history.py:68 tortoisehg\hgtk\history.py:416
+#: tortoisehg\hgtk\history.py:68
+#: tortoisehg\hgtk\history.py:416
 #: tortoisehg\hgtk\history.py:1094
 msgid "Heads"
 msgstr "Čela"
 
-#: tortoisehg\hgtk\history.py:72 tortoisehg\hgtk\history.py:418
+#: tortoisehg\hgtk\history.py:72
+#: tortoisehg\hgtk\history.py:418
 msgid "Merges"
 msgstr "Sloučení"
 
-#: tortoisehg\hgtk\history.py:76 tortoisehg\hgtk\history.py:440
+#: tortoisehg\hgtk\history.py:76
+#: tortoisehg\hgtk\history.py:440
 msgid "Hide Merges"
 msgstr "Skrýt sloučení"
 
@@ -2272,15 +2363,18 @@ msgstr "Vlastní filtr"
 msgid "Rev Range"
 msgstr "Rozsah revizí"
 
-#: tortoisehg\hgtk\history.py:100 tortoisehg\hgtk\history.py:426
+#: tortoisehg\hgtk\history.py:100
+#: tortoisehg\hgtk\history.py:426
 msgid "File Patterns"
 msgstr "Vzory souborů"
 
-#: tortoisehg\hgtk\history.py:101 tortoisehg\hgtk\history.py:429
+#: tortoisehg\hgtk\history.py:101
+#: tortoisehg\hgtk\history.py:429
 msgid "Keywords"
 msgstr "Klíčová slova"
 
-#: tortoisehg\hgtk\history.py:101 tortoisehg\hgtk\history.py:432
+#: tortoisehg\hgtk\history.py:101
+#: tortoisehg\hgtk\history.py:432
 msgid "Date"
 msgstr "Datum"
 
@@ -2310,11 +2404,13 @@ msgstr "&Odmítnout"
 msgid " (Bundle Preview)"
 msgstr " (Náhled svazku)"
 
-#: tortoisehg\hgtk\history.py:203 tortoisehg\hgtk\status.py:173
+#: tortoisehg\hgtk\history.py:203
+#: tortoisehg\hgtk\status.py:173
 msgid "Re_fresh"
 msgstr "Obnovit"
 
-#: tortoisehg\hgtk\history.py:205 tortoisehg\hgtk\history.py:1393
+#: tortoisehg\hgtk\history.py:205
+#: tortoisehg\hgtk\history.py:1393
 msgid "Reload revision history"
 msgstr "Znovu načíst historii revizí"
 
@@ -2350,7 +2446,8 @@ msgstr "Spustit nástroj pro shelve"
 msgid "Branches"
 msgstr "Větve"
 
-#: tortoisehg\hgtk\history.py:296 tortoisehg\hgtk\history.py:623
+#: tortoisehg\hgtk\history.py:296
+#: tortoisehg\hgtk\history.py:623
 #: tortoisehg\hgtk\logview\treeview.py:533
 msgid "Tags"
 msgstr "Tagy"
@@ -2361,7 +2458,7 @@ msgstr "Synchronizační lišta"
 
 #: tortoisehg\hgtk\history.py:316
 msgid "_Perforce"
-msgstr "lo_Perforce"
+msgstr "Perforce"
 
 #: tortoisehg\hgtk\history.py:317
 msgid "Identify"
@@ -2369,15 +2466,17 @@ msgstr "Identifikovat"
 
 #: tortoisehg\hgtk\history.py:319
 msgid "Pending"
-msgstr "lo_Probíhající"
+msgstr "Nevyřízený"
 
-#: tortoisehg\hgtk\history.py:327 tortoisehg\hgtk\history.py:1317
+#: tortoisehg\hgtk\history.py:327
+#: tortoisehg\hgtk\history.py:1317
 msgid "Load more Revisions"
 msgstr "Načíst více revizí"
 
-#: tortoisehg\hgtk\history.py:329 tortoisehg\hgtk\history.py:1320
+#: tortoisehg\hgtk\history.py:329
+#: tortoisehg\hgtk\history.py:1320
 msgid "Load all Revisions"
-msgstr "Načíst všechny revize"
+msgstr "Načíst všechny "
 
 #: tortoisehg\hgtk\history.py:335
 msgid "Filter Bar"
@@ -2385,7 +2484,7 @@ msgstr "Lišta s filtry"
 
 #: tortoisehg\hgtk\history.py:341
 msgid "Reset Marks"
-msgstr "Vrátit značky na původní nastavení"
+msgstr "Obnovit původní značení"
 
 #: tortoisehg\hgtk\history.py:344
 msgid "Choose Details..."
@@ -2421,23 +2520,27 @@ msgstr "Revize..."
 
 #: tortoisehg\hgtk\history.py:372
 msgid "_Synchronize"
-msgstr "_Synchronizovat"
+msgstr "Synchronizovat"
 
-#: tortoisehg\hgtk\history.py:373 tortoisehg\hgtk\history.py:1698
+#: tortoisehg\hgtk\history.py:373
+#: tortoisehg\hgtk\history.py:1698
 #: tortoisehg\hgtk\synch.py:63
 msgid "Incoming"
 msgstr "Příchozí"
 
-#: tortoisehg\hgtk\history.py:375 tortoisehg\hgtk\history.py:1828
+#: tortoisehg\hgtk\history.py:375
+#: tortoisehg\hgtk\history.py:1828
 msgid "Pull"
 msgstr "Pull"
 
-#: tortoisehg\hgtk\history.py:377 tortoisehg\hgtk\history.py:1868
+#: tortoisehg\hgtk\history.py:377
+#: tortoisehg\hgtk\history.py:1868
 #: tortoisehg\hgtk\synch.py:74
 msgid "Outgoing"
 msgstr "Odchozí"
 
-#: tortoisehg\hgtk\history.py:379 tortoisehg\hgtk\history.py:1935
+#: tortoisehg\hgtk\history.py:379
+#: tortoisehg\hgtk\history.py:1935
 #: tortoisehg\hgtk\synch.py:79
 msgid "Push"
 msgstr "Push"
@@ -2474,7 +2577,8 @@ msgstr "Vynutit push"
 msgid "_Filter"
 msgstr "_Filtr"
 
-#: tortoisehg\hgtk\history.py:420 tortoisehg\hgtk\logview\treeview.py:452
+#: tortoisehg\hgtk\history.py:420
+#: tortoisehg\hgtk\logview\treeview.py:452
 msgid "Branch"
 msgstr "Větev"
 
@@ -2486,42 +2590,44 @@ msgstr "Uživatelský"
 msgid "Revision Range"
 msgstr "Rozsah revizí"
 
-#: tortoisehg\hgtk\history.py:515 tortoisehg\hgtk\p4pending.py:83
-#: tortoisehg\hgtk\p4pending.py:105 tortoisehg\hgtk\p4pending.py:110
+#: tortoisehg\hgtk\history.py:515
+#: tortoisehg\hgtk\p4pending.py:83
+#: tortoisehg\hgtk\p4pending.py:105
+#: tortoisehg\hgtk\p4pending.py:110
 msgid "Submitted"
 msgstr "Postoupeno"
 
 #: tortoisehg\hgtk\history.py:519
 msgid "Unable to parse p4pending output"
-msgstr "lo_Unable to parse p4pending output"
+msgstr "Nešlo analyzovat nevyřízený výstup p4"
 
 #: tortoisehg\hgtk\history.py:521
 msgid "%d pending changelists found"
-msgstr "lo_%d pending changelists found"
+msgstr "nalezeno %d nevyřízených changelistů"
 
 #: tortoisehg\hgtk\history.py:523
 msgid "No pending Perforce changelists"
-msgstr "lo_No pending Perforce changelists"
+msgstr "Žádné nevyřízené changelisty  Perforce"
 
 #: tortoisehg\hgtk\history.py:525
 msgid "Aborted p4pending"
-msgstr "lo_Aborted p4pending"
+msgstr "p4pending zrušeno"
 
 #: tortoisehg\hgtk\history.py:527
 msgid "Unable to determine pending changesets"
-msgstr "lo_Unable to determine pending changesets"
+msgstr "Nelze určit nevyřízené changesety"
 
 #: tortoisehg\hgtk\history.py:535
 msgid "Finding pending Perforce changelists..."
-msgstr "lo_Finding pending Perforce changelists..."
+msgstr "Nalezeny nevyřízené changelisty Perforce..."
 
 #: tortoisehg\hgtk\history.py:536
 msgid "Pending Perforce changelists"
-msgstr "lo_Pending Perforce changelists"
+msgstr "Nevyřízené changelisty Perforce"
 
 #: tortoisehg\hgtk\history.py:548
 msgid "Perforce changelist %s"
-msgstr "lo_Perforce changelist %s"
+msgstr "Perforce changelist %s"
 
 #: tortoisehg\hgtk\history.py:553
 msgid "Unable to find rev %s"
@@ -2529,21 +2635,22 @@ msgstr "Nelze nalézt rev %s"
 
 #: tortoisehg\hgtk\history.py:555
 msgid "Aborted p4identify"
-msgstr "lo_Aborted p4identify"
+msgstr "p4identify zrušeno"
 
 #: tortoisehg\hgtk\history.py:557
 msgid "Unable to identify Perforce tip"
-msgstr "lo_Unable to identify Perforce tip"
+msgstr "Nelze určit tip Perforce"
 
 #: tortoisehg\hgtk\history.py:560
 msgid "Finding tip Perforce changelist..."
-msgstr "lo_Finding tip Perforce changelist..."
+msgstr "Nalezen tip Perforce changelist..."
 
 #: tortoisehg\hgtk\history.py:561
 msgid "Identifying Perforce tip"
-msgstr "lo_Identifying Perforce tip"
+msgstr "Určení Perforce tip"
 
-#: tortoisehg\hgtk\history.py:606 tortoisehg\hgtk\logview\treeview.py:400
+#: tortoisehg\hgtk\history.py:606
+#: tortoisehg\hgtk\logview\treeview.py:400
 msgid "Graph"
 msgstr "Graf"
 
@@ -2563,16 +2670,20 @@ msgstr "Číslo revize/ID"
 msgid "Branch Name"
 msgstr "Název větve"
 
-#: tortoisehg\hgtk\history.py:617 tortoisehg\hgtk\logview\treeview.py:464
+#: tortoisehg\hgtk\history.py:617
+#: tortoisehg\hgtk\logview\treeview.py:464
 msgid "Changes"
 msgstr "Změny"
 
-#: tortoisehg\hgtk\history.py:618 tortoisehg\hgtk\logview\treeview.py:475
-#: tortoisehg\hgtk\thgmq.py:203 tortoisehg\hgtk\thgmq.py:833
+#: tortoisehg\hgtk\history.py:618
+#: tortoisehg\hgtk\logview\treeview.py:475
+#: tortoisehg\hgtk\thgmq.py:203
+#: tortoisehg\hgtk\thgmq.py:833
 msgid "Summary"
 msgstr "Souhrn"
 
-#: tortoisehg\hgtk\history.py:620 tortoisehg\hgtk\logview\treeview.py:497
+#: tortoisehg\hgtk\history.py:620
+#: tortoisehg\hgtk\logview\treeview.py:497
 msgid "Local Date"
 msgstr "Lokální datum"
 
@@ -2580,7 +2691,8 @@ msgstr "Lokální datum"
 msgid "UTC Date"
 msgstr "UTC datum"
 
-#: tortoisehg\hgtk\history.py:622 tortoisehg\hgtk\logview\treeview.py:521
+#: tortoisehg\hgtk\history.py:622
+#: tortoisehg\hgtk\logview\treeview.py:521
 msgid "Age"
 msgstr "Stáří"
 
@@ -2678,19 +2790,21 @@ msgstr "Push sem"
 
 #: tortoisehg\hgtk\history.py:1145
 msgid "_Update..."
-msgstr "_Aktualizovat..."
+msgstr "Aktualizovat..."
 
-#: tortoisehg\hgtk\history.py:1146 tortoisehg\hgtk\history.py:1265
+#: tortoisehg\hgtk\history.py:1146
+#: tortoisehg\hgtk\history.py:1265
 msgid "_Merge with..."
-msgstr "_Sloučit s ..."
+msgstr "Sloučit s ..."
 
 #: tortoisehg\hgtk\history.py:1147
 msgid "Backout..."
 msgstr "Odvolat"
 
-#: tortoisehg\hgtk\history.py:1148 tortoisehg\hgtk\status.py:1660
+#: tortoisehg\hgtk\history.py:1148
+#: tortoisehg\hgtk\status.py:1660
 msgid "_Revert"
-msgstr "_Revert (!)"
+msgstr "Revert (!)"
 
 #: tortoisehg\hgtk\history.py:1150
 msgid "Export"
@@ -2710,19 +2824,19 @@ msgstr "Přemístit k aktuální"
 
 #: tortoisehg\hgtk\history.py:1180
 msgid "Bisect"
-msgstr "lo_Bisect"
+msgstr "Bisect"
 
 #: tortoisehg\hgtk\history.py:1188
 msgid "_Export Patch..."
-msgstr "_Export oprávky..."
+msgstr "Export oprávky..."
 
 #: tortoisehg\hgtk\history.py:1189
 msgid "E_mail Patch..."
-msgstr "E_mail oprávky..."
+msgstr "Email oprávky..."
 
 #: tortoisehg\hgtk\history.py:1190
 msgid "_Bundle rev:tip..."
-msgstr "_Svazek rev:tip..."
+msgstr "Svazek rev:tip..."
 
 #: tortoisehg\hgtk\history.py:1192
 msgid "_Archive..."
@@ -2814,7 +2928,7 @@ msgstr "načíst další revize"
 
 #: tortoisehg\hgtk\history.py:1351
 msgid "Load all"
-msgstr "Načíst vše"
+msgstr "Načíst všechny"
 
 #: tortoisehg\hgtk\history.py:1351
 msgid "load all revisions"
@@ -2860,20 +2974,24 @@ msgstr "Zastavit probíhající transakci"
 msgid "After Pull:"
 msgstr "Po akci pull:"
 
-#: tortoisehg\hgtk\history.py:1449 tortoisehg\hgtk\synch.py:154
+#: tortoisehg\hgtk\history.py:1449
+#: tortoisehg\hgtk\synch.py:154
 msgid "Nothing"
 msgstr "Nic"
 
-#: tortoisehg\hgtk\history.py:1449 tortoisehg\hgtk\synch.py:154
+#: tortoisehg\hgtk\history.py:1449
+#: tortoisehg\hgtk\synch.py:154
 #: tortoisehg\hgtk\update.py:128
 msgid "Update"
 msgstr "Aktualizovat"
 
-#: tortoisehg\hgtk\history.py:1452 tortoisehg\hgtk\synch.py:157
+#: tortoisehg\hgtk\history.py:1452
+#: tortoisehg\hgtk\synch.py:157
 msgid "Fetch"
 msgstr "Fetch"
 
-#: tortoisehg\hgtk\history.py:1454 tortoisehg\hgtk\synch.py:159
+#: tortoisehg\hgtk\history.py:1454
+#: tortoisehg\hgtk\synch.py:159
 msgid "Rebase"
 msgstr "Přeskupit"
 
@@ -2889,14 +3007,18 @@ msgstr "Použití svazku..."
 msgid "Applying bundle"
 msgstr "Použití svazku"
 
-#: tortoisehg\hgtk\history.py:1664 tortoisehg\hgtk\history.py:1803
-#: tortoisehg\hgtk\history.py:1836 tortoisehg\hgtk\history.py:1889
+#: tortoisehg\hgtk\history.py:1664
+#: tortoisehg\hgtk\history.py:1803
+#: tortoisehg\hgtk\history.py:1836
+#: tortoisehg\hgtk\history.py:1889
 #: tortoisehg\hgtk\history.py:2469
 msgid "No remote path specified"
 msgstr "Vzdálená cesta nebyla určena"
 
-#: tortoisehg\hgtk\history.py:1665 tortoisehg\hgtk\history.py:1804
-#: tortoisehg\hgtk\history.py:1837 tortoisehg\hgtk\history.py:1890
+#: tortoisehg\hgtk\history.py:1665
+#: tortoisehg\hgtk\history.py:1804
+#: tortoisehg\hgtk\history.py:1837
+#: tortoisehg\hgtk\history.py:1890
 #: tortoisehg\hgtk\history.py:2470
 msgid "Please enter or select a remote path"
 msgstr "Zadejte či vyberte vzdálenou cestu"
@@ -2961,7 +3083,8 @@ msgstr "Ukončený pull"
 msgid "No changesets to pull"
 msgstr "Žádné changesety pro pull"
 
-#: tortoisehg\hgtk\history.py:1824 tortoisehg\hgtk\history.py:2522
+#: tortoisehg\hgtk\history.py:1824
+#: tortoisehg\hgtk\history.py:2522
 msgid "Aborted pull"
 msgstr "Zrušená akce pull"
 
@@ -2985,11 +3108,13 @@ msgstr "Žádné odchozí changesety"
 msgid "Checking outgoing changesets..."
 msgstr "Ověření odchozích changesetů..."
 
-#: tortoisehg\hgtk\history.py:1876 tortoisehg\hgtk\synch.py:495
+#: tortoisehg\hgtk\history.py:1876
+#: tortoisehg\hgtk\synch.py:495
 msgid "No repository selected"
 msgstr "Nevybrán žádný repositář"
 
-#: tortoisehg\hgtk\history.py:1877 tortoisehg\hgtk\synch.py:496
+#: tortoisehg\hgtk\history.py:1877
+#: tortoisehg\hgtk\synch.py:496
 msgid "Select a peer repository to compare with"
 msgstr "Vybrat repozitář pro srovnání"
 
@@ -3007,7 +3132,8 @@ msgstr ""
 "%s\n"
 "(případně vytvořit nová čela)?"
 
-#: tortoisehg\hgtk\history.py:1901 tortoisehg\hgtk\history.py:1911
+#: tortoisehg\hgtk\history.py:1901
+#: tortoisehg\hgtk\history.py:1911
 msgid "Forced &Push"
 msgstr "Vynucený push"
 
@@ -3047,7 +3173,8 @@ msgstr ""
 msgid "Finished push"
 msgstr "Ukončený push"
 
-#: tortoisehg\hgtk\history.py:1931 tortoisehg\hgtk\history.py:2494
+#: tortoisehg\hgtk\history.py:1931
+#: tortoisehg\hgtk\history.py:2494
 msgid "Aborted push"
 msgstr "Zrušený push"
 
@@ -3081,27 +3208,27 @@ msgstr "Zapsat svazek do"
 
 #: tortoisehg\hgtk\history.py:2263
 msgid "Bundling from %(base)s to %(rev)s..."
-msgstr "lo_Bundling from %(base)s to %(rev)s..."
+msgstr "Svazek od %(base)s k %(rev)s..."
 
 #: tortoisehg\hgtk\history.py:2265
 msgid "Bundling from %(base)s to tip..."
-msgstr "lo_Bundling from %(base)s to tip..."
+msgstr "Svazek od %(base)s k  tipu..."
 
 #: tortoisehg\hgtk\history.py:2270
 msgid "Finish bundling"
-msgstr "lo_Finish bundling"
+msgstr "Konec tvorby svazku"
 
 #: tortoisehg\hgtk\history.py:2272
 msgid "Aborted bundling"
-msgstr "lo_Aborted bundling"
+msgstr "Tvorba svazku zrušena"
 
 #: tortoisehg\hgtk\history.py:2274
 msgid "Failed to bundle"
-msgstr "lo_Failed to bundle"
+msgstr "Tvorba svazku selhala"
 
 #: tortoisehg\hgtk\history.py:2276
 msgid "Bundling"
-msgstr "lo_Bundling"
+msgstr "Tvorba svazku"
 
 #: tortoisehg\hgtk\history.py:2299
 msgid "Finish importing"
@@ -3111,7 +3238,8 @@ msgstr "Ukončit import"
 msgid "Aborted importing"
 msgstr "Zrušený import"
 
-#: tortoisehg\hgtk\history.py:2303 tortoisehg\hgtk\thgimport.py:184
+#: tortoisehg\hgtk\history.py:2303
+#: tortoisehg\hgtk\thgimport.py:184
 msgid "Failed to import"
 msgstr "Import se nezdařil"
 
@@ -3155,7 +3283,8 @@ msgstr "Stahování changesetů do revize %s..."
 msgid "Pull to %s"
 msgstr "Pull do %s"
 
-#: tortoisehg\hgtk\history.py:2539 tortoisehg\hgtk\status.py:1312
+#: tortoisehg\hgtk\history.py:2539
+#: tortoisehg\hgtk\status.py:1312
 msgid "Save patch to"
 msgstr "Uložit oprávku do"
 
@@ -3183,7 +3312,8 @@ msgstr "Univerzální datum"
 msgid "Merging in %s"
 msgstr "Sloučení v  %s"
 
-#: tortoisehg\hgtk\merge.py:47 tortoisehg\hgtk\merge.py:60
+#: tortoisehg\hgtk\merge.py:47
+#: tortoisehg\hgtk\merge.py:60
 msgid "Unable to merge"
 msgstr "Nelze sloučit"
 
@@ -3209,7 +3339,7 @@ msgstr "Aktuální revize (lokální)"
 
 #: tortoisehg\hgtk\merge.py:89
 msgid "Discard all changes from merge target (other) revision"
-msgstr "lo_Discard all changes from merge target (other) revision"
+msgstr "Zavrhnout všechny změny z cílové revize sloučení"
 
 #: tortoisehg\hgtk\merge.py:100
 msgid "Merge tools:"
@@ -3275,7 +3405,7 @@ msgstr "Čisté získání originální revize?"
 
 #: tortoisehg\hgtk\p4pending.py:30
 msgid "Pending Perforce Changelists - %s"
-msgstr "lo_Pending Perforce Changelists - %s"
+msgstr "Nevyřízené Perforce changelisty - %s"
 
 #: tortoisehg\hgtk\p4pending.py:43
 msgid "Changelist:"
@@ -3285,7 +3415,8 @@ msgstr "Seznam změn:"
 msgid "Submit"
 msgstr "Postoupit"
 
-#: tortoisehg\hgtk\p4pending.py:67 tortoisehg\hgtk\quickop.py:21
+#: tortoisehg\hgtk\p4pending.py:67
+#: tortoisehg\hgtk\quickop.py:21
 msgid "Revert"
 msgstr "Revert (!)"
 
@@ -3293,12 +3424,14 @@ msgstr "Revert (!)"
 msgid "Finished"
 msgstr "Ukončeno"
 
-#: tortoisehg\hgtk\p4pending.py:100 tortoisehg\hgtk\quickop.py:203
+#: tortoisehg\hgtk\p4pending.py:100
+#: tortoisehg\hgtk\quickop.py:203
 #: tortoisehg\hgtk\thgmq.py:863
 msgid "Canceled"
 msgstr "Zrušeno"
 
-#: tortoisehg\hgtk\p4pending.py:102 tortoisehg\hgtk\quickop.py:205
+#: tortoisehg\hgtk\p4pending.py:102
+#: tortoisehg\hgtk\quickop.py:205
 #: tortoisehg\hgtk\thgmq.py:865
 msgid "Failed"
 msgstr "Selhalo"
@@ -3347,13 +3480,16 @@ msgstr "odebraný"
 msgid "missing"
 msgstr "postrádáný"
 
-#: tortoisehg\hgtk\quickop.py:165 tortoisehg\hgtk\quickop.py:215
-#: tortoisehg\hgtk\serve.py:127 tortoisehg\util\version.py:47
+#: tortoisehg\hgtk\quickop.py:165
+#: tortoisehg\hgtk\quickop.py:215
+#: tortoisehg\hgtk\serve.py:127
+#: tortoisehg\util\version.py:47
 #: tortoisehg\util\version.py:65
 msgid "unknown"
 msgstr "neznámý"
 
-#: tortoisehg\hgtk\quickop.py:169 tortoisehg\hgtk\quickop.py:215
+#: tortoisehg\hgtk\quickop.py:169
+#: tortoisehg\hgtk\quickop.py:215
 msgid "ignored"
 msgstr "ignorovaný"
 
@@ -3385,7 +3521,8 @@ msgstr "Žádná operace k provedení"
 msgid "%s - recovery"
 msgstr "%s - obnova"
 
-#: tortoisehg\hgtk\recovery.py:46 tortoisehg\hgtk\synch.py:59
+#: tortoisehg\hgtk\recovery.py:46
+#: tortoisehg\hgtk\synch.py:59
 msgid "Stop the hg operation"
 msgstr "Zastavit operaci hg"
 
@@ -3403,8 +3540,7 @@ msgstr "Vrátit zpět"
 
 #: tortoisehg\hgtk\recovery.py:57
 msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
-msgstr ""
-"Vrátit zpět (zrušit) poslední transakci repozitáře (pull, commit, atp)"
+msgstr "Vrátit zpět (zrušit) poslední transakci repozitáře (pull, commit, atp)"
 
 #: tortoisehg\hgtk\recovery.py:61
 msgid "Recover"
@@ -3422,11 +3558,13 @@ msgstr "Ověřit"
 msgid "Validate repository consistency"
 msgstr "Potvrdit konzistenci repositáře"
 
-#: tortoisehg\hgtk\recovery.py:103 tortoisehg\hgtk\synch.py:394
+#: tortoisehg\hgtk\recovery.py:103
+#: tortoisehg\hgtk\synch.py:394
 msgid "Cannot close now"
 msgstr "Nyní nelze zavřít"
 
-#: tortoisehg\hgtk\recovery.py:104 tortoisehg\hgtk\synch.py:395
+#: tortoisehg\hgtk\recovery.py:104
+#: tortoisehg\hgtk\synch.py:395
 msgid "command is running"
 msgstr "příkaz je prováděn"
 
@@ -3446,11 +3584,13 @@ msgstr "Potvrdit návrat zpět v repozitáři"
 msgid "Rollback repository '%s' ?"
 msgstr "Návrat zpět v repozitáři '%s' ?"
 
-#: tortoisehg\hgtk\recovery.py:162 tortoisehg\hgtk\synch.py:541
+#: tortoisehg\hgtk\recovery.py:162
+#: tortoisehg\hgtk\synch.py:541
 msgid "Please try again after the previous command is completed"
 msgstr "Zkuste prosím znova po ukončení předchozího příkazu"
 
-#: tortoisehg\hgtk\recovery.py:224 tortoisehg\hgtk\synch.py:631
+#: tortoisehg\hgtk\recovery.py:224
+#: tortoisehg\hgtk\synch.py:631
 msgid "[command interrupted]"
 msgstr "[provádění příkazu přerušeno]"
 
@@ -3458,7 +3598,8 @@ msgstr "[provádění příkazu přerušeno]"
 msgid "Rename "
 msgstr "Přejmenovat "
 
-#: tortoisehg\hgtk\rename.py:76 tortoisehg\hgtk\rename.py:83
+#: tortoisehg\hgtk\rename.py:76
+#: tortoisehg\hgtk\rename.py:83
 msgid "rename error"
 msgstr "chyba při přejmenování"
 
@@ -3568,8 +3709,7 @@ msgstr "zobrazené jméno na webové stránce (implicitně: pracovní adresář)
 
 #: tortoisehg\hgtk\serve.py:362
 msgid "name of the webdir config file (serve more than one repo)"
-msgstr ""
-"název konfiguračního souboru pro webdir (slouží více než jednomu repozitáři)"
+msgstr "název konfiguračního souboru pro webdir (slouží více než jednomu repozitáři)"
 
 #: tortoisehg\hgtk\serve.py:364
 msgid "name of file to write process ID to"
@@ -3607,7 +3747,8 @@ msgstr "Konfigurace rozhranní TortoiseHg"
 msgid "OK"
 msgstr "OK"
 
-#: tortoisehg\hgtk\shellconf.py:28 tortoisehg\hgtk\thgshelve.py:157
+#: tortoisehg\hgtk\shellconf.py:28
+#: tortoisehg\hgtk\thgshelve.py:157
 msgid "Cancel"
 msgstr "Zrušit"
 
@@ -3715,7 +3856,8 @@ msgstr "Vybrané soubory při příštím komitu zapomenout"
 msgid "refresh"
 msgstr "Obnovit"
 
-#: tortoisehg\hgtk\status.py:306 tortoisehg\hgtk\thgmq.py:201
+#: tortoisehg\hgtk\status.py:306
+#: tortoisehg\hgtk\thgmq.py:201
 msgid "st"
 msgstr "st"
 
@@ -3795,7 +3937,8 @@ msgstr "Přejmenovat soubor na"
 msgid "Copy file to"
 msgstr "Kopírovat soubor do"
 
-#: tortoisehg\hgtk\status.py:960 tortoisehg\hgtk\status.py:1450
+#: tortoisehg\hgtk\status.py:960
+#: tortoisehg\hgtk\status.py:1450
 msgid "Nothing Removed"
 msgstr "Nic nebylo odstraněno"
 
@@ -3807,7 +3950,8 @@ msgstr "Je-li určeno více revizí nelze odstranit"
 msgid "Move is not enabled when multiple revisions are specified."
 msgstr "Je-li určeno více revizí nelze přemisťovat"
 
-#: tortoisehg\hgtk\status.py:978 tortoisehg\hgtk\status.py:1468
+#: tortoisehg\hgtk\status.py:978
+#: tortoisehg\hgtk\status.py:1468
 #: tortoisehg\hgtk\status.py:1476
 msgid "Nothing Moved"
 msgstr "Nic nebylo přemístěno"
@@ -3820,11 +3964,13 @@ msgstr "Je-li určeno více revizí nelze kopírovat"
 msgid "Nothing Copied"
 msgstr "Nic nebylo kopírováno"
 
-#: tortoisehg\hgtk\status.py:1059 tortoisehg\hgtk\status.py:1133
+#: tortoisehg\hgtk\status.py:1059
+#: tortoisehg\hgtk\status.py:1133
 msgid "===== Diff to first parent %d:%s =====\n"
 msgstr "===== Diff k prvnímu rodiči %d:%s =====\n"
 
-#: tortoisehg\hgtk\status.py:1063 tortoisehg\hgtk\status.py:1138
+#: tortoisehg\hgtk\status.py:1063
+#: tortoisehg\hgtk\status.py:1138
 msgid ""
 "\n"
 "===== Diff to second parent %d:%s =====\n"
@@ -3848,7 +3994,8 @@ msgstr "Nic nebylo diffováno"
 msgid "No diffable files selected"
 msgstr "Žádné diffovatelné soubory nebyly vybrány"
 
-#: tortoisehg\hgtk\status.py:1359 tortoisehg\hgtk\status.py:1367
+#: tortoisehg\hgtk\status.py:1359
+#: tortoisehg\hgtk\status.py:1367
 msgid "Nothing Reverted"
 msgstr "Nic nebylo vráceno k předchozímu stavu"
 
@@ -3962,15 +4109,15 @@ msgstr "Zobrazit další"
 
 #: tortoisehg\hgtk\status.py:1662
 msgid "L_og"
-msgstr "L_og"
+msgstr "Log"
 
 #: tortoisehg\hgtk\status.py:1666
 msgid "_Guess Rename..."
-msgstr "_Uhodnout změnu jména..."
+msgstr "Uhodnout změnu jména..."
 
 #: tortoisehg\hgtk\status.py:1667
 msgid "_Ignore"
-msgstr "_Ignorovat"
+msgstr "Ignorovat"
 
 #: tortoisehg\hgtk\status.py:1668
 msgid "Remove versioned"
@@ -3978,7 +4125,7 @@ msgstr "Odstranit verzovaný"
 
 #: tortoisehg\hgtk\status.py:1669
 msgid "_Delete unversioned"
-msgstr "_Smazat neverzovaný"
+msgstr "Smazat neverzovaný"
 
 #: tortoisehg\hgtk\status.py:1672
 msgid "_Copy..."
@@ -4030,7 +4177,7 @@ msgstr "neznámý název pole: %s"
 
 #: tortoisehg\hgtk\statusbar.py:94
 msgid "invalid pack direction: %s"
-msgstr "lo_invalid pack direction: %s"
+msgstr "neplatný pokyn pack: %s"
 
 #: tortoisehg\hgtk\statusbar.py:103
 msgid "invalid alignment value: %s"
@@ -4054,14 +4201,14 @@ msgstr "Stáhnout (pull) změny z vybraného repozitáře"
 
 #: tortoisehg\hgtk\synch.py:76
 msgid "Display local changes that will be  pushed to selected repository"
-msgstr ""
-"Zobrazit lokální změny, které mohou být vyslány do vybraného repozitáře"
+msgstr "Zobrazit lokální změny, které mohou být vyslány do vybraného repozitáře"
 
 #: tortoisehg\hgtk\synch.py:81
 msgid "Push local changes to selected repository"
 msgstr "Vyslat (push) lokální změny do vybraného repozitáře"
 
-#: tortoisehg\hgtk\synch.py:84 tortoisehg\hgtk\thgconfig.py:671
+#: tortoisehg\hgtk\synch.py:84
+#: tortoisehg\hgtk\thgconfig.py:671
 msgid "Email"
 msgstr "Email"
 
@@ -4193,7 +4340,8 @@ msgstr "Zadejte prosím název tagu"
 msgid "Custom commit message is empty"
 msgstr "Komentář komitu nebyl zadán"
 
-#: tortoisehg\hgtk\tagadd.py:232 tortoisehg\hgtk\tagadd.py:264
+#: tortoisehg\hgtk\tagadd.py:232
+#: tortoisehg\hgtk\tagadd.py:264
 msgid "Tagging completed"
 msgstr "Označení tagem ukončeno"
 
@@ -4201,8 +4349,10 @@ msgstr "Označení tagem ukončeno"
 msgid "Tag \"%s\" has been added"
 msgstr "Byl přidán tag \"%s\""
 
-#: tortoisehg\hgtk\tagadd.py:236 tortoisehg\hgtk\tagadd.py:239
-#: tortoisehg\hgtk\tagadd.py:268 tortoisehg\hgtk\tagadd.py:271
+#: tortoisehg\hgtk\tagadd.py:236
+#: tortoisehg\hgtk\tagadd.py:239
+#: tortoisehg\hgtk\tagadd.py:268
+#: tortoisehg\hgtk\tagadd.py:271
 msgid "Error in tagging"
 msgstr "Chyba v zadání tagu"
 
@@ -4255,35 +4405,16 @@ msgid "Three-way Merge Tool"
 msgstr "Nástroj pro sloučení"
 
 #: tortoisehg\hgtk\thgconfig.py:28
-msgid ""
-"Graphical merge program for resolving merge conflicts.  If left unspecified, "
-"Mercurial will use the first applicable tool it finds on your system or use "
-"its internal merge tool that leaves conflict markers in place.  Chose "
-"internal:merge to force conflict markers, internal:prompt to always select "
-"local or other, or internal:dump to leave files in the working directory for "
-"manual merging"
-msgstr ""
-"Grafický  program pro řešení konfliktů při slučování. Není-li určen, vybere "
-"Mercurial první použitelný nástroj, který nalezne v našem systému, nebo "
-"použije vlastní nástroj, který konflikty jenom označí. Tuto poslední možnost "
-"lze přikázat výběrem  'internal:merge'. Volba 'internal:prompt' vždy vybere "
-"lokální nástroj a volba 'internal:dump' ponechá soubory v pracovním adresáři "
-"pro ruční sloučení."
+msgid "Graphical merge program for resolving merge conflicts.  If left unspecified, Mercurial will use the first applicable tool it finds on your system or use its internal merge tool that leaves conflict markers in place.  Chose internal:merge to force conflict markers, internal:prompt to always select local or other, or internal:dump to leave files in the working directory for manual merging"
+msgstr "Grafický  program pro řešení konfliktů při slučování. Není-li určen, vybere Mercurial první použitelný nástroj, který nalezne v našem systému, nebo použije vlastní nástroj, který konflikty jenom označí. Tuto poslední možnost lze přikázat výběrem  'internal:merge'. Volba 'internal:prompt' vždy vybere lokální nástroj a volba 'internal:dump' ponechá soubory v pracovním adresáři pro ruční sloučení."
 
 #: tortoisehg\hgtk\thgconfig.py:34
 msgid "Visual Diff Tool"
 msgstr "Nástroj Visual Diff"
 
 #: tortoisehg\hgtk\thgconfig.py:35
-msgid ""
-"Specify visual diff tool, as described in the [merge-tools] section of your "
-"Mercurial configuration files.  If left unspecified, TortoiseHg will use the "
-"selected merge tool. Failing that it uses the first applicable tool it finds."
-msgstr ""
-"lo_Specify visual diff tool, as described in the [merge-tools] section of "
-"your Mercurial configuration files.  If left unspecified, TortoiseHg will "
-"use the selected merge tool. Failing that it uses the first applicable tool "
-"it finds."
+msgid "Specify visual diff tool, as described in the [merge-tools] section of your Mercurial configuration files.  If left unspecified, TortoiseHg will use the selected merge tool. Failing that it uses the first applicable tool it finds."
+msgstr "lo_Specify visual diff tool, as described in the [merge-tools] section of your Mercurial configuration files.  If left unspecified, TortoiseHg will use the selected merge tool. Failing that it uses the first applicable tool it finds."
 
 #: tortoisehg\hgtk\thgconfig.py:39
 msgid "Visual Editor"
@@ -4298,87 +4429,56 @@ msgid "CLI Editor"
 msgstr "Editor CLI"
 
 #: tortoisehg\hgtk\thgconfig.py:42
-msgid ""
-"The editor to use during a commit and other instances where Mercurial needs "
-"multiline input from the user.  Used by command line commands, including "
-"patch import."
-msgstr ""
-"Editor, použitý při komitu a v dalších případech, kdy Mercurial vyžaduje "
-"víceřádkový vstup od uživatele. Používá se pro příkazy z příkazového řádku."
+msgid "The editor to use during a commit and other instances where Mercurial needs multiline input from the user.  Used by command line commands, including patch import."
+msgstr "Editor, použitý při komitu a v dalších případech, kdy Mercurial vyžaduje víceřádkový vstup od uživatele. Používá se pro příkazy z příkazového řádku."
 
 #: tortoisehg\hgtk\thgconfig.py:45
 msgid "Tab Width"
 msgstr "Šířka záložky"
 
 #: tortoisehg\hgtk\thgconfig.py:46
-msgid ""
-"Specify the number of spaces that tabs expand to in various TortoiseHg "
-"windows. Default: Not expanded"
-msgstr ""
-"Určit počet mezer pro šířku záložky v různých oknech TortoiseHg. Implicitně "
-"je: Not expanded"
+msgid "Specify the number of spaces that tabs expand to in various TortoiseHg windows. Default: Not expanded"
+msgstr "Určit počet mezer pro šířku záložky v různých oknech TortoiseHg. Implicitně je: Not expanded"
 
 #: tortoisehg\hgtk\thgconfig.py:49
 msgid "Max Diff Size"
 msgstr "Max. velikost diffu"
 
 #: tortoisehg\hgtk\thgconfig.py:50
-msgid ""
-"The maximum size file (in KB) that TortoiseHg will show changes for in the "
-"changelog, status, and commit windows. A value of zero implies no limit.  "
-"Default: 1024 (1MB)"
-msgstr ""
-"Maximální velikost souboru (v KB) pro zobrazení změn v oknech pro changelog, "
-"status a commit. Nulová hodnota je pro nastavení bez limitu. Implicitní "
-"nastavení je 1024 (1MB)"
+msgid "The maximum size file (in KB) that TortoiseHg will show changes for in the changelog, status, and commit windows. A value of zero implies no limit.  Default: 1024 (1MB)"
+msgstr "Maximální velikost souboru (v KB) pro zobrazení změn v oknech pro changelog, status a commit. Nulová hodnota je pro nastavení bez limitu. Implicitní nastavení je 1024 (1MB)"
 
 #: tortoisehg\hgtk\thgconfig.py:53
 msgid "Bottom Diffs"
 msgstr "Diff. panel dole"
 
 #: tortoisehg\hgtk\thgconfig.py:54
-msgid ""
-"Show the diff panel below the file list in status, shelve, and commit "
-"dialogs. Default: False (show diffs to right of file list)"
-msgstr ""
-"Zobrazit diffový panel pod seznamem souborů v okně pro status, shelve a "
-"commit. Implicitně je False (zobrazit diffy vpravo od seznamu)"
+msgid "Show the diff panel below the file list in status, shelve, and commit dialogs. Default: False (show diffs to right of file list)"
+msgstr "Zobrazit diffový panel pod seznamem souborů v okně pro status, shelve a commit. Implicitně je False (zobrazit diffy vpravo od seznamu)"
 
 #: tortoisehg\hgtk\thgconfig.py:57
 msgid "Capture stderr"
 msgstr "Zachytit stderr"
 
 #: tortoisehg\hgtk\thgconfig.py:58
-msgid ""
-"Redirect stderr to a buffer which is parsed at the end of the process for "
-"runtime errors. Default: True"
-msgstr ""
-"Přesměrovat stderr k bufferu, který je vyhodnocen na konci procesu pro chyby "
-"při běhu programu.  Implicitně je True"
+msgid "Redirect stderr to a buffer which is parsed at the end of the process for runtime errors. Default: True"
+msgstr "Přesměrovat stderr k bufferu, který je vyhodnocen na konci procesu pro chyby při běhu programu.  Implicitně je True"
 
 #: tortoisehg\hgtk\thgconfig.py:60
 msgid "Fork hgtk"
 msgstr "Dělit hgtk"
 
 #: tortoisehg\hgtk\thgconfig.py:61
-msgid ""
-"When running hgtk from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
-msgstr ""
-"Při zadání  hgtk z příkazového řádku rozdělit proces na pozadí, aby "
-"zobrazoval grafické dialogy. Implicitně je True"
+msgid "When running hgtk from the command line, fork a background process to run graphical dialogs.  Default: True"
+msgstr "Při zadání  hgtk z příkazového řádku rozdělit proces na pozadí, aby zobrazoval grafické dialogy. Implicitně je True"
 
 #: tortoisehg\hgtk\thgconfig.py:63
 msgid "Full Path Title"
 msgstr "Název úplné cesty"
 
 #: tortoisehg\hgtk\thgconfig.py:64
-msgid ""
-"Show a full directory path of the repository in the dialog title instead of "
-"just the root directory name.  Default: False"
-msgstr ""
-"Zobrazit úplnou cestu k repozitáři v titulku dialogového okna místo pouhého "
-"názvu kořenového adresáře. Implicitně je False"
+msgid "Show a full directory path of the repository in the dialog title instead of just the root directory name.  Default: False"
+msgstr "Zobrazit úplnou cestu k repozitáři v titulku dialogového okna místo pouhého názvu kořenového adresáře. Implicitně je False"
 
 #: tortoisehg\hgtk\thgconfig.py:68
 msgid "Username"
@@ -4393,113 +4493,72 @@ msgid "Summary Line Length"
 msgstr "Délka souhrnného řádku"
 
 #: tortoisehg\hgtk\thgconfig.py:71
-msgid ""
-"Maximum length of the commit message summary line. If set, TortoiseHg will "
-"issue a warning if the summary line is too long or not separated by a blank "
-"line. Default: 0 (unenforced)"
-msgstr ""
-"Maximální délka souhrnného řádku komitu. Aplikace vydá varování při "
-"překročení zadané délky, nebo není-li souhrnný řádek oddělen od případného "
-"dalšího textu prázdným řádkem. Implicitní nastavení je: 0 (nevynuceno)"
+msgid "Maximum length of the commit message summary line. If set, TortoiseHg will issue a warning if the summary line is too long or not separated by a blank line. Default: 0 (unenforced)"
+msgstr "Maximální délka souhrnného řádku komitu. Aplikace vydá varování při překročení zadané délky, nebo není-li souhrnný řádek oddělen od případného dalšího textu prázdným řádkem. Implicitní nastavení je: 0 (nevynuceno)"
 
 #: tortoisehg\hgtk\thgconfig.py:75
 msgid "Message Line Length"
-msgstr "Délka řádku komentáře"
+msgstr "Délka řádku zprávy"
 
 #: tortoisehg\hgtk\thgconfig.py:76
-msgid ""
-"Word wrap length of the commit message.  If set, the popup menu can be used "
-"to format the message and a warning will be issued if any lines are too long "
-"at commit.  Default: 0 (unenforced)"
-msgstr ""
-"Zalomení řádků komentáře komitu. Je-li zadáno, lze použít vysouvací menu pro "
-"formátování komentáře. Při překročení délky se zobrazí varování. Implicitní "
-"nastavení je: 0 (nevynuceno)"
+msgid "Word wrap length of the commit message.  If set, the popup menu can be used to format the message and a warning will be issued if any lines are too long at commit.  Default: 0 (unenforced)"
+msgstr "Zalomení řádků komentáře komitu. Je-li zadáno, lze použít vysouvací menu pro formátování komentáře. Při překročení délky se zobrazí varování. Implicitní nastavení je: 0 (nevynuceno)"
 
 #: tortoisehg\hgtk\thgconfig.py:81
 msgid "Push After Commit"
 msgstr "Push po komitu"
 
 #: tortoisehg\hgtk\thgconfig.py:82
-msgid ""
-"Attempt to push to default push target after every successful commit.  "
-"Default: False"
-msgstr ""
-"Pokus o push k nastavenému cíli po každém úspěšném komitu. Implicitně je "
-"False"
+msgid "Attempt to push to default push target after every successful commit.  Default: False"
+msgstr "Pokus o push k nastavenému cíli po každém úspěšném komitu. Implicitně je False"
 
 #: tortoisehg\hgtk\thgconfig.py:84
 msgid "Auto Commit List"
 msgstr "Seznam  auto-include"
 
 #: tortoisehg\hgtk\thgconfig.py:85
-msgid ""
-"Comma separated list of files that are automatically included in every "
-"commit.  Intended for use only as a repository setting.  Default: None"
-msgstr ""
-"CSV seznam souborů automaticky připojených do každého komitu. Zamýšleno "
-"pouze pro nastavení repozitáře. Implicitně je None"
+msgid "Comma separated list of files that are automatically included in every commit.  Intended for use only as a repository setting.  Default: None"
+msgstr "CSV seznam souborů automaticky připojených do každého komitu. Zamýšleno pouze pro nastavení repozitáře. Implicitně je None"
 
 #: tortoisehg\hgtk\thgconfig.py:88
 msgid "Auto Exclude List"
 msgstr "Seznam auto-exclude"
 
 #: tortoisehg\hgtk\thgconfig.py:89
-msgid ""
-"Comma separated list of files that are automatically unchecked when the "
-"status, commit, and shelve dialogs are opened.  Default: None"
-msgstr ""
-"CSV seznam souborů automaticky vyloučených z akce při otevření dialogů "
-"status, commit a shelve. Implicitně je None"
+msgid "Comma separated list of files that are automatically unchecked when the status, commit, and shelve dialogs are opened.  Default: None"
+msgstr "CSV seznam souborů automaticky vyloučených z akce při otevření dialogů status, commit a shelve. Implicitně je None"
 
 #: tortoisehg\hgtk\thgconfig.py:95
 msgid "Author Coloring"
 msgstr "Zabarvení podle autora"
 
 #: tortoisehg\hgtk\thgconfig.py:96
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
-msgstr ""
-"Zabarvit changesety podle jména autora. Není-li povoleno, jsou normální "
-"změny zabarveny černě, změny netriviálních rodičů červeně a změny pro "
-"sloučení zeleně. Implicitně je False"
+msgid "Color changesets by author name.  If not enabled, the changes are colored green for merge, red for non-trivial parents, black for normal. Default: False"
+msgstr "Zabarvit changesety podle jména autora. Není-li povoleno, jsou normální změny zabarveny černě, změny netriviálních rodičů červeně a změny pro sloučení zeleně. Implicitně je False"
 
 #: tortoisehg\hgtk\thgconfig.py:100
 msgid "Long Summary"
 msgstr "Dlouhý souhrn"
 
 #: tortoisehg\hgtk\thgconfig.py:101
-msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
-msgstr ""
-"Je-li zadáno, jsou řádky changesetu spojovány až od celkové délky 80 znaků. "
-"Implicitně je False"
+msgid "If true, concatenate multiple lines of changeset summary until they reach 80 characters. Default: False"
+msgstr "Je-li zadáno, jsou řádky changesetu spojovány až od celkové délky 80 znaků. Implicitně je False"
 
 #: tortoisehg\hgtk\thgconfig.py:104
 msgid "Log Batch Size"
 msgstr "Velikost dávky logu"
 
 #: tortoisehg\hgtk\thgconfig.py:105
-msgid ""
-"The number of revisions to read and display in the changelog viewer in a "
-"single batch. Default: 500"
-msgstr ""
-"Počet revizí v jedné dávce pro zobrazení v Průzkumníku HG. Implicitně je 500"
+msgid "The number of revisions to read and display in the changelog viewer in a single batch. Default: 500"
+msgstr "Počet revizí v jedné dávce pro zobrazení v Průzkumníku HG. Implicitně je 500"
 
 #: tortoisehg\hgtk\thgconfig.py:108
 msgid "Dead Branches"
 msgstr "Mrtvé větve"
 
 #: tortoisehg\hgtk\thgconfig.py:109
-msgid ""
-"Comma separated list of branch names that should be ignored when building a "
-"list of branch names for a repository. Default: None"
-msgstr ""
-"CSV seznam jmen větví, které mají být ignorovány při vytváření seznamu větví "
-"pro repozitář. Implicitně je None"
+msgid "Comma separated list of branch names that should be ignored when building a list of branch names for a repository. Default: None"
+msgstr "CSV seznam jmen větví, které mají být ignorovány při vytváření seznamu větví pro repozitář. Implicitně je None"
 
 #: tortoisehg\hgtk\thgconfig.py:112
 msgid "Branch Colors"
@@ -4507,29 +4566,17 @@ msgstr "Barvy větví"
 
 #: tortoisehg\hgtk\thgconfig.py:113
 msgid ""
-"Space separated list of branch names and colors of the form branch:#XXXXXX. "
-"Spaces and colons in the branch name must be escaped using a backslash (\\). "
-"Likewise some other characters can be escaped in this way, e.g. \\u0040 will "
-"be decoded to the @ character, and \\n to a linefeed. Default: None"
-msgstr ""
-"Seznam mezerami oddělených jmen větví a barev ve formátu 'branch:#XXXXXX'. "
-"Mezery a dvojtečky ve jménu větve musí být předznamenány zpětnými lomítky (\\"
-"). Podobně mohou být předznamenány i jiné znaky, např. \\u0040 bude "
-"dekódováno jako znak @ a \\ jako linefeed. Implicitně je None"
+"Space separated list of branch names and colors of the form branch:#XXXXXX. Spaces and colons in the branch name must be escaped using a backslash (\\). Likewise some other characters can be escaped in this way, e.g. \\u0040 will be decoded to the @ character, and \\n"
+" to a linefeed. Default: None"
+msgstr "Seznam mezerami oddělených jmen větví a barev ve formátu 'branch:#XXXXXX'. Mezery a dvojtečky ve jménu větve musí být předznamenány zpětnými lomítky (\\). Podobně mohou být předznamenány i jiné znaky, např. \\u0040 bude dekódováno jako znak @ a \\ jako linefeed. Implicitně je None"
 
 #: tortoisehg\hgtk\thgconfig.py:119
 msgid "Hide Tags"
 msgstr "Skrýt tagy"
 
 #: tortoisehg\hgtk\thgconfig.py:120
-msgid ""
-"Space separated list of tags that will not be shown. Useful example: Specify "
-"\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
-"Queues Extension. Default: None"
-msgstr ""
-"Seznam mezerami oddělených jmen tagů, které nebudou zobrazovány. Užitečný "
-"příklad: Po zadání \" qbase qparent qtip \" budou skryty standardní tagy "
-"vkládané extenzí MQ. Implicitně je None"
+msgid "Space separated list of tags that will not be shown. Useful example: Specify \"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial Queues Extension. Default: None"
+msgstr "Seznam mezerami oddělených jmen tagů, které nebudou zobrazovány. Užitečný příklad: Po zadání \" qbase qparent qtip \" budou skryty standardní tagy vkládané extenzí MQ. Implicitně je None"
 
 #: tortoisehg\hgtk\thgconfig.py:124
 msgid "Use Expander"
@@ -4544,39 +4591,27 @@ msgid "Toolbar Style"
 msgstr "Styl nástrojové lišty"
 
 #: tortoisehg\hgtk\thgconfig.py:128
-msgid ""
-"Adjust the display of the main toolbar in the Repository Explorer.  Values: "
-"small, large, or theme.  Default: theme"
-msgstr ""
-"Úprava zobrazení hlavní nástrojové lišty v Průzkumníku repozitáře. Hodnoty: "
-"small, large nebo theme. Implicitně: theme"
+msgid "Adjust the display of the main toolbar in the Repository Explorer.  Values: small, large, or theme.  Default: theme"
+msgstr "Úprava zobrazení hlavní nástrojové lišty v Průzkumníku repozitáře. Hodnoty: small, large nebo theme. Implicitně: theme"
 
 #: tortoisehg\hgtk\thgconfig.py:133
 msgid "After Pull Operation"
 msgstr "Operace po akci pull"
 
 #: tortoisehg\hgtk\thgconfig.py:135
-msgid ""
-"Operation which is performed directly after a successful pull. update "
-"equates to pull --update, fetch equates to the fetch extension, rebase "
-"equates to pull --rebase.  Default: none"
-msgstr ""
-"Operace, které se provedou přímo po úspěšném provedení akce pull. Hodnota "
-"'update' odpovídá pull --update, 'fetch' je extenze fetch, 'rebase' odpovídá "
-"pull --rebase. Implicitně je none"
+msgid "Operation which is performed directly after a successful pull. update equates to pull --update, fetch equates to the fetch extension, rebase equates to pull --rebase.  Default: none"
+msgstr "Operace, které se provedou přímo po úspěšném provedení akce pull. Hodnota 'update' odpovídá pull --update, 'fetch' je extenze fetch, 'rebase' odpovídá pull --rebase. Implicitně je none"
 
 #: tortoisehg\hgtk\thgconfig.py:140
 msgid "Name"
 msgstr "Název"
 
 #: tortoisehg\hgtk\thgconfig.py:141
-msgid ""
-"Repository name to use in the web interface. Default is the working "
-"directory."
-msgstr ""
-"Název repozitáře pro webové rozhraní. Implicitně to je pracovní adresář."
+msgid "Repository name to use in the web interface. Default is the working directory."
+msgstr "Název repozitáře pro webové rozhraní. Implicitně to je pracovní adresář."
 
-#: tortoisehg\hgtk\thgconfig.py:143 tortoisehg\hgtk\thgconfig.py:680
+#: tortoisehg\hgtk\thgconfig.py:143
+#: tortoisehg\hgtk\thgconfig.py:680
 msgid "Description"
 msgstr "Popis"
 
@@ -4612,7 +4647,8 @@ msgstr "CSV seznam archivovacích formátů povolených při stahování."
 msgid "Port to listen on"
 msgstr "Port, kterému má být nasloucháno"
 
-#: tortoisehg\hgtk\thgconfig.py:155 tortoisehg\hgtk\thgconfig.py:297
+#: tortoisehg\hgtk\thgconfig.py:155
+#: tortoisehg\hgtk\thgconfig.py:297
 msgid "Port"
 msgstr "Port"
 
@@ -4621,24 +4657,16 @@ msgid "Push Requires SSL"
 msgstr "Push vyžaduje SSL"
 
 #: tortoisehg\hgtk\thgconfig.py:157
-msgid ""
-"Whether to require that inbound pushes be transported over SSL to prevent "
-"password sniffing."
-msgstr ""
-"Zda požadovat, aby byl příchozí push transportován přes SSL jako prevence "
-"proti 'čmuchání' po heslu"
+msgid "Whether to require that inbound pushes be transported over SSL to prevent password sniffing."
+msgstr "Zda požadovat, aby byl příchozí push transportován přes SSL jako prevence proti 'čmuchání' po heslu"
 
 #: tortoisehg\hgtk\thgconfig.py:159
 msgid "Stripes"
 msgstr "Pruhy"
 
 #: tortoisehg\hgtk\thgconfig.py:160
-msgid ""
-"How many lines a \"zebra stripe\" should span in multiline output. Default "
-"is 1; set to 0 to disable."
-msgstr ""
-"Kolik řádků mají zabrat \"pruhy zebry \" ve víceřádkovém výstupu. Implicitně "
-"je 1; 0 volbu vypne"
+msgid "How many lines a \"zebra stripe\" should span in multiline output. Default is 1; set to 0 to disable."
+msgstr "Kolik řádků mají zabrat \"pruhy zebry \" ve víceřádkovém výstupu. Implicitně je 1; 0 volbu vypne"
 
 #: tortoisehg\hgtk\thgconfig.py:162
 msgid "Max Files"
@@ -4661,36 +4689,16 @@ msgid "Allow Push"
 msgstr "Povolit push"
 
 #: tortoisehg\hgtk\thgconfig.py:167
-msgid ""
-"Whether to allow pushing to the repository. If empty or not set, push is not "
-"allowed. If the special value \"*\", any remote user can push, including "
-"unauthenticated users. Otherwise, the remote user must have been "
-"authenticated, and the authenticated user name must be present in this list "
-"(separated by whitespace or \",\"). The contents of the allow_push list are "
-"examined after the deny_push list."
-msgstr ""
-"Zda povolit vyslání revize do repozitáře. Není-li zadáno, push není dovolen. "
-"Při zadání hodnolty \"*\" může push provést každý vzdálený uživatel, i "
-"neověřený. Jinak musí být každý vzdálený uživatel  uveden v seznamu "
-"oprávněných osob. Obsah seznamu allow_ push je zkoumán po seznamu deny_push."
+msgid "Whether to allow pushing to the repository. If empty or not set, push is not allowed. If the special value \"*\", any remote user can push, including unauthenticated users. Otherwise, the remote user must have been authenticated, and the authenticated user name must be present in this list (separated by whitespace or \",\"). The contents of the allow_push list are examined after the deny_push list."
+msgstr "Zda povolit vyslání revize do repozitáře. Není-li zadáno, push není dovolen. Při zadání hodnolty \"*\" může push provést každý vzdálený uživatel, i neověřený. Jinak musí být každý vzdálený uživatel  uveden v seznamu oprávněných osob. Obsah seznamu allow_ push je zkoumán po seznamu deny_push."
 
 #: tortoisehg\hgtk\thgconfig.py:174
 msgid "Deny Push"
 msgstr "Odmítnout push"
 
 #: tortoisehg\hgtk\thgconfig.py:175
-msgid ""
-"Whether to deny pushing to the repository. If empty or not set, push is not "
-"denied. If the special value \"*\", all remote users are denied push. "
-"Otherwise, unauthenticated users are all denied, and any authenticated user "
-"name present in this list (separated by whitespace or \",\") is also denied. "
-"The contents of the deny_push list are examined before the allow_push list."
-msgstr ""
-"Zda odmítnout vyslání revize do repozitáře. Není-li zadáno, push není "
-"odepřen. Při zadání hodnolty \"*\" jsou odmítnuti všichni vzdálení "
-"uživatelé. Jinak jsou odmítnuti neověření uživatelé a ti ověření, kteří jsou "
-"uvedeni v tomto seznamu.  Obsah seznamu deny_ push je zkoumán před seznamem "
-"allow_push."
+msgid "Whether to deny pushing to the repository. If empty or not set, push is not denied. If the special value \"*\", all remote users are denied push. Otherwise, unauthenticated users are all denied, and any authenticated user name present in this list (separated by whitespace or \",\") is also denied. The contents of the deny_push list are examined before the allow_push list."
+msgstr "Zda odmítnout vyslání revize do repozitáře. Není-li zadáno, push není odepřen. Při zadání hodnolty \"*\" jsou odmítnuti všichni vzdálení uživatelé. Jinak jsou odmítnuti neověření uživatelé a ti ověření, kteří jsou uvedeni v tomto seznamu.  Obsah seznamu deny_ push je zkoumán před seznamem allow_push."
 
 #: tortoisehg\hgtk\thgconfig.py:181
 msgid "Encoding"
@@ -4700,30 +4708,29 @@ msgstr "Kódování"
 msgid "Character encoding name"
 msgstr "Název kódování znaků"
 
-#: tortoisehg\hgtk\thgconfig.py:185 tortoisehg\hgtk\thgconfig.py:298
+#: tortoisehg\hgtk\thgconfig.py:185
+#: tortoisehg\hgtk\thgconfig.py:298
 msgid "Host"
 msgstr "Hostitel"
 
 #: tortoisehg\hgtk\thgconfig.py:186
-msgid ""
-"Host name and (optional) port of proxy server, for example \"myproxy:8000\""
-msgstr ""
-"Jméno hostitele a případně port proxy serveru, např. \"myproxy:8000\""
+msgid "Host name and (optional) port of proxy server, for example \"myproxy:8000\""
+msgstr "Jméno hostitele a případně port proxy serveru, např. \"myproxy:8000\""
 
 #: tortoisehg\hgtk\thgconfig.py:188
 msgid "Bypass List"
 msgstr "Seznam pro bypass"
 
 #: tortoisehg\hgtk\thgconfig.py:189
-msgid ""
-"Optional. Comma-separated list of host names that should bypass the proxy"
+msgid "Optional. Comma-separated list of host names that should bypass the proxy"
 msgstr "Nepovinné. CSV seznam jmen hostitelů, které by měly obejít proxy"
 
 #: tortoisehg\hgtk\thgconfig.py:192
 msgid "Optional. User name to authenticate with at the proxy server"
 msgstr "Volitelné. Jméno uživatele pro připojení k proxy serveru"
 
-#: tortoisehg\hgtk\thgconfig.py:194 tortoisehg\hgtk\thgconfig.py:299
+#: tortoisehg\hgtk\thgconfig.py:194
+#: tortoisehg\hgtk\thgconfig.py:299
 msgid "Password"
 msgstr "Heslo"
 
@@ -4768,20 +4775,8 @@ msgid "method"
 msgstr "Metoda"
 
 #: tortoisehg\hgtk\thgconfig.py:210
-msgid ""
-"Optional. Method to use to send email messages. If value is \"smtp\" "
-"(default), use SMTP (configured below).  Otherwise, use as name of program "
-"to run that acts like sendmail (takes \"-f\" option for sender, list of "
-"recipients on command line, message on stdin). Normally, setting this to "
-"\"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send "
-"messages."
-msgstr ""
-"Nepovinné. Použitá metoda pro odeslání mailové zprávy. Je-li hodnota "
-"\"smtp\" (default), použije se SMTP.  Otherwise, use as name of program to "
-"run that acts like sendmail (takes \"-f\" option for sender, list of "
-"recipients on command line, message on stdin). Normally, setting this to "
-"\"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send "
-"messages."
+msgid "Optional. Method to use to send email messages. If value is \"smtp\" (default), use SMTP (configured below).  Otherwise, use as name of program to run that acts like sendmail (takes \"-f\" option for sender, list of recipients on command line, message on stdin). Normally, setting this to \"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send messages."
+msgstr "Nepovinné. Použitá metoda pro odeslání mailové zprávy. Je-li hodnota \"smtp\" (default), použije se SMTP.  Otherwise, use as name of program to run that acts like sendmail (takes \"-f\" option for sender, list of recipients on command line, message on stdin). Normally, setting this to \"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send messages."
 
 #: tortoisehg\hgtk\thgconfig.py:215
 msgid "Host name of mail server"
@@ -4829,21 +4824,15 @@ msgstr "Lokální jméno hostitele"
 
 #: tortoisehg\hgtk\thgconfig.py:227
 msgid "Hostname the sender can use to identify itself to the mail server."
-msgstr ""
-"Jméno hostitele, které může odesílatel použít pro identifikaci u mailovéh "
-"serveru"
+msgstr "Jméno hostitele, které může odesílatel použít pro identifikaci u mailovéh serveru"
 
 #: tortoisehg\hgtk\thgconfig.py:230
 msgid "Patch EOL"
 msgstr "Oprávka  EOL"
 
 #: tortoisehg\hgtk\thgconfig.py:231
-msgid ""
-"Normalize file line endings during and after patch to lf or crlf.  Strict "
-"does no normalization. Default: strict"
-msgstr ""
-"Normalizovat ukončování řádků v souboru na lf nebo crlf během a po akci "
-"patch.  Strict normalizaci neprovádí. Implicitně je strict"
+msgid "Normalize file line endings during and after patch to lf or crlf.  Strict does no normalization. Default: strict"
+msgstr "Normalizovat ukončování řádků v souboru na lf nebo crlf během a po akci patch.  Strict normalizaci neprovádí. Implicitně je strict"
 
 #: tortoisehg\hgtk\thgconfig.py:234
 msgid "Git Format"
@@ -4879,7 +4868,7 @@ msgstr "Ignorovat prázdné znaky při porovnávání řádků. Výchozí: False
 
 #: tortoisehg\hgtk\thgconfig.py:246
 msgid "Ignore WS Amount"
-msgstr "Množství ignorovaných WS"
+msgstr "Ignorovat množství WS"
 
 #: tortoisehg\hgtk\thgconfig.py:247
 msgid "Ignore changes in the amount of white space. Default: False"
@@ -4898,23 +4887,16 @@ msgid "Coloring Style"
 msgstr "Styl zabarvení"
 
 #: tortoisehg\hgtk\thgconfig.py:254
-msgid ""
-"Adjust the coloring style of diff lines in the changeset viewer. Default: "
-"foreground"
-msgstr ""
-"Úprava stylu zabarvení diffových řádků v prohlížeči changesetů. Implicitně: "
-"foreground"
+msgid "Adjust the coloring style of diff lines in the changeset viewer. Default: foreground"
+msgstr "Úprava stylu zabarvení diffových řádků v prohlížeči changesetů. Implicitně: foreground"
 
 #: tortoisehg\hgtk\thgconfig.py:258
 msgid "Commit Message"
-msgstr "Komitovat komentář"
+msgstr "Zpráva komitu"
 
 #: tortoisehg\hgtk\thgconfig.py:259
-msgid ""
-"Font used in changeset viewer and commit log text. Default: monospace 10"
-msgstr ""
-"Font použitý v prohlížeči changesetů a v zápisech při komitu. Implicitně: "
-"monospace 10"
+msgid "Font used in changeset viewer and commit log text. Default: monospace 10"
+msgstr "Font použitý v prohlížeči changesetů a v zápisech při komitu. Implicitně: monospace 10"
 
 #: tortoisehg\hgtk\thgconfig.py:261
 msgid "Diff Text"
@@ -4922,8 +4904,7 @@ msgstr "Text diffu"
 
 #: tortoisehg\hgtk\thgconfig.py:262
 msgid "Font used for diffs in status and commit tools. Default: monospace 10"
-msgstr ""
-"Font použitý pro diffy v okně pro status a komit. Implicitně: monospace 10"
+msgstr "Font použitý pro diffy v okně pro status a komit. Implicitně: monospace 10"
 
 #: tortoisehg\hgtk\thgconfig.py:264
 msgid "File List"
@@ -4931,9 +4912,7 @@ msgstr "Seznam souborů"
 
 #: tortoisehg\hgtk\thgconfig.py:265
 msgid "Font used in file lists in status and commit tools. Default: sans 9"
-msgstr ""
-"Font použitý v seznamech souborů v oknech pro status a komit. Implicitně: "
-"sans 9"
+msgstr "Font použitý v seznamech souborů v oknech pro status a komit. Implicitně: sans 9"
 
 #: tortoisehg\hgtk\thgconfig.py:267
 msgid "Command Output"
@@ -4975,7 +4954,8 @@ msgstr "URL"
 msgid "Folder"
 msgstr "Složka"
 
-#: tortoisehg\hgtk\thgconfig.py:300 tortoisehg\hgtk\thgconfig.py:998
+#: tortoisehg\hgtk\thgconfig.py:300
+#: tortoisehg\hgtk\thgconfig.py:998
 msgid "Alias"
 msgstr "Alias"
 
@@ -4999,7 +4979,8 @@ msgstr "Náhradní označení není zadáno"
 msgid "Please enter alias name"
 msgstr "Prosím, zadejte náhradní označení"
 
-#: tortoisehg\hgtk\thgconfig.py:504 tortoisehg\hgtk\thgconfig.py:932
+#: tortoisehg\hgtk\thgconfig.py:504
+#: tortoisehg\hgtk\thgconfig.py:932
 msgid "Overwrite existing '%s' path?"
 msgstr "Přepsat stávající cestu k  '%s' ?"
 
@@ -5017,8 +4998,7 @@ msgstr "Balíček iniparse nenalezen"
 
 #: tortoisehg\hgtk\thgconfig.py:575
 msgid "Can't change settings without iniparse package - view is readonly."
-msgstr ""
-"Nelze změnit nastavení bez balíčku iniparse - zobrazení je jen pro čtení"
+msgstr "Nelze změnit nastavení bez balíčku iniparse - zobrazení je jen pro čtení"
 
 #: tortoisehg\hgtk\thgconfig.py:592
 msgid "User global settings"
@@ -5029,16 +5009,13 @@ msgid "%s repository settings"
 msgstr "Nastavení repozitáře %s"
 
 #: tortoisehg\hgtk\thgconfig.py:658
-msgid ""
-"Default language for spell check. System language is used if not specified. "
-"Examples: en, en_GB, en_US"
-msgstr ""
-"Výchozí jazyk pro kontrolu  pravopisu. Použit systémový, není-li jinak "
-"určeno. Například: en, en_GB, en_US"
+msgid "Default language for spell check. System language is used if not specified. Examples: en, en_GB, en_US"
+msgstr "Výchozí jazyk pro kontrolu  pravopisu. Použit systémový, není-li jinak určeno. Například: en, en_GB, en_US"
 
-#: tortoisehg\hgtk\thgconfig.py:669 tortoisehg\util\menuthg.py:58
+#: tortoisehg\hgtk\thgconfig.py:669
+#: tortoisehg\util\menuthg.py:58
 msgid "Web Server"
-msgstr "Webový server"
+msgstr "Web"
 
 #: tortoisehg\hgtk\thgconfig.py:670
 msgid "Proxy"
@@ -5094,11 +5071,11 @@ msgstr "Cesta k repozitáři"
 
 #: tortoisehg\hgtk\thgconfig.py:1024
 msgid "_Edit"
-msgstr "_Editovat"
+msgstr "Editovat"
 
 #: tortoisehg\hgtk\thgconfig.py:1034
 msgid "_Test"
-msgstr "_Testovat"
+msgstr "Testovat"
 
 #: tortoisehg\hgtk\thgconfig.py:1039
 msgid "Set as _default"
@@ -5176,7 +5153,8 @@ msgstr "Importovat ze schránky"
 msgid "Source:"
 msgstr "Zdroj:"
 
-#: tortoisehg\hgtk\thgimport.py:101 tortoisehg\hgtk\thgstrip.py:76
+#: tortoisehg\hgtk\thgimport.py:101
+#: tortoisehg\hgtk\thgstrip.py:76
 msgid "Preview:"
 msgstr "Náhled:"
 
@@ -5260,7 +5238,8 @@ msgstr "Oprávka"
 msgid "Yes (&keep)"
 msgstr "Ano (&zachovat)"
 
-#: tortoisehg\hgtk\thgmq.py:348 tortoisehg\hgtk\thgmq.py:352
+#: tortoisehg\hgtk\thgmq.py:348
+#: tortoisehg\hgtk\thgmq.py:352
 msgid "Confirm Delete"
 msgstr "Potvrdit smazání"
 
@@ -5272,29 +5251,22 @@ msgstr "Chcete smazat  '%(name)s'?"
 msgid "Do you want to delete these patches?"
 msgstr "Chcete smazat tyto oprávky?"
 
-#: tortoisehg\hgtk\thgmq.py:442 tortoisehg\hgtk\thgmq.py:446
+#: tortoisehg\hgtk\thgmq.py:442
+#: tortoisehg\hgtk\thgmq.py:446
 msgid "Confirm Fold"
 msgstr "Potvrdit sbalení"
 
 #: tortoisehg\hgtk\thgmq.py:443
-msgid ""
-"Do you want to fold un-applied patch '%(target)s' into current patch "
-"'%(qtip)s'?"
-msgstr ""
-"Chcete připojit nepoužitou  oprávku '%(target)s' do stávající oprávky "
-"'%(qtip)s'?"
+msgid "Do you want to fold un-applied patch '%(target)s' into current patch '%(qtip)s'?"
+msgstr "Chcete připojit nepoužitou  oprávku '%(target)s' do stávající oprávky '%(qtip)s'?"
 
 #: tortoisehg\hgtk\thgmq.py:447
-msgid ""
-"Do you want to fold following un-applied patches into the current patch "
-"'%(qtip)s'?"
-msgstr ""
-"Chcete zahrnout následující nepoužité oprávky do stávající oprávky "
-"'%(qtip)s'?"
+msgid "Do you want to fold following un-applied patches into the current patch '%(qtip)s'?"
+msgstr "Chcete zahrnout následující nepoužité oprávky do stávající oprávky '%(qtip)s'?"
 
 #: tortoisehg\hgtk\thgmq.py:502
 msgid "invalid reorder operation: %s"
-msgstr "lo_neplatná 'reorder' operace: %s"
+msgstr "neplatná změna pořadí: %s"
 
 #: tortoisehg\hgtk\thgmq.py:741
 msgid "Top"
@@ -5314,27 +5286,30 @@ msgstr "Dole"
 
 #: tortoisehg\hgtk\thgmq.py:768
 msgid "_Goto"
-msgstr "_Goto"
+msgstr "Goto"
 
 #: tortoisehg\hgtk\thgmq.py:770
 msgid "_Rename"
-msgstr "_Přejmenovat"
+msgstr "Přejmenovat"
 
 #: tortoisehg\hgtk\thgmq.py:772
 msgid "_Finish Applied"
-msgstr "_Finish Applied"
+msgstr "Použita akce Finish"
 
-#: tortoisehg\hgtk\thgmq.py:775 tortoisehg\hgtk\thgmq.py:805
+#: tortoisehg\hgtk\thgmq.py:775
+#: tortoisehg\hgtk\thgmq.py:805
 msgid "_Delete"
-msgstr "_Smazat"
+msgstr "Smazat"
 
-#: tortoisehg\hgtk\thgmq.py:777 tortoisehg\hgtk\thgmq.py:808
+#: tortoisehg\hgtk\thgmq.py:777
+#: tortoisehg\hgtk\thgmq.py:808
 msgid "F_old"
-msgstr "lo_Fold"
+msgstr "Fold"
 
-#: tortoisehg\hgtk\thgmq.py:780 tortoisehg\hgtk\thgmq.py:812
+#: tortoisehg\hgtk\thgmq.py:780
+#: tortoisehg\hgtk\thgmq.py:812
 msgid "Reorder"
-msgstr "lo_Reorder"
+msgstr "Změnit pořadí"
 
 #: tortoisehg\hgtk\thgmq.py:832
 msgid "Status"
@@ -5404,7 +5379,8 @@ msgstr "Odtrhnout -%s"
 msgid "Strip:"
 msgstr "Odtrhnout:"
 
-#: tortoisehg\hgtk\thgstrip.py:85 tortoisehg\hgtk\update.py:94
+#: tortoisehg\hgtk\thgstrip.py:85
+#: tortoisehg\hgtk\update.py:94
 msgid "Options:"
 msgstr "Možnosti"
 
@@ -5582,11 +5558,13 @@ msgstr "Selhalo spuštění nástroje"
 msgid "%s : %s"
 msgstr "%s : %s"
 
-#: tortoisehg\hgtk\visdiff.py:88 tortoisehg\hgtk\visdiff.py:156
+#: tortoisehg\hgtk\visdiff.py:88
+#: tortoisehg\hgtk\visdiff.py:156
 msgid "No diff tool found"
 msgstr "Diffový nástroj nenalezen"
 
-#: tortoisehg\hgtk\visdiff.py:89 tortoisehg\hgtk\visdiff.py:157
+#: tortoisehg\hgtk\visdiff.py:89
+#: tortoisehg\hgtk\visdiff.py:157
 msgid "No visual diff tools were detected"
 msgstr "Vizuální diffový nástroj nenalezen"
 
@@ -5648,15 +5626,15 @@ msgstr "Dočasné soubory se odstraní  po ukončení tohoto dialogu"
 
 #: tortoisehg\hgtk\visdiff.py:381
 msgid "Dir diff to p1"
-msgstr "lo_Dir diff to p1"
+msgstr "Diff adr. k  p1"
 
 #: tortoisehg\hgtk\visdiff.py:383
 msgid "Dir diff to p2"
-msgstr "lo_Dir diff to p2"
+msgstr "Diff adr. k  p2"
 
 #: tortoisehg\hgtk\visdiff.py:385
 msgid "3-way dir diff"
-msgstr "lo_3-way dir diff"
+msgstr "Trojí diff adresáře"
 
 #: tortoisehg\hgtk\visdiff.py:391
 msgid "Directory diff"
@@ -5668,8 +5646,7 @@ msgstr "Nelze smazat dočasné soubory"
 
 #: tortoisehg\hgtk\visdiff.py:525
 msgid "Close diff tools and try again, or quit to leak files?"
-msgstr ""
-"Zavřít nástroje pro diffy a zkusit znova, nebo ukončit a uvolnit soubory?"
+msgstr "Zavřít nástroje pro diffy a zkusit znova, nebo ukončit a uvolnit soubory?"
 
 #: tortoisehg\hgtk\visdiff.py:526
 msgid "&Quit"
@@ -5691,19 +5668,19 @@ msgstr "Nepodporovaný typ konce řádku: %s"
 msgid "unknown patch content: %r"
 msgstr "neznámý obsah oprávky: %r"
 
-#: tortoisehg\util\hgshelve.py:126 tortoisehg\util\hgshelve.py:153
+#: tortoisehg\util\hgshelve.py:126
+#: tortoisehg\util\hgshelve.py:153
 msgid "this modifies a binary file (all or nothing)\n"
 msgstr "toto upravuje binární soubor (vše nebo nic)\n"
 
-#: tortoisehg\util\hgshelve.py:131 tortoisehg\util\hgshelve.py:158
+#: tortoisehg\util\hgshelve.py:131
+#: tortoisehg\util\hgshelve.py:158
 msgid "this is a binary file\n"
 msgstr "toto je binární soubor\n"
 
 #: tortoisehg\util\hgshelve.py:142
-msgid ""
-"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
-msgstr ""
-"celkem: %d porcí (%d změněných řádků), vybráno: %d porcí (%d změněných řádků)"
+msgid "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+msgstr "celkem: %d porcí (%d změněných řádků), vybráno: %d porcí (%d změněných řádků)"
 
 #: tortoisehg\util\hgshelve.py:161
 msgid "%d hunks, %d lines changed\n"
@@ -5757,7 +5734,8 @@ msgstr "použití oprávky\n"
 msgid "saving patch to shelve\n"
 msgstr "oprávka ukládána k odložení\n"
 
-#: tortoisehg\util\hgshelve.py:533 tortoisehg\util\hgshelve.py:584
+#: tortoisehg\util\hgshelve.py:533
+#: tortoisehg\util\hgshelve.py:584
 msgid "restoring %r to %r\n"
 msgstr "%r se obnovuje k %r\n"
 
@@ -5881,7 +5859,8 @@ msgstr "Vrátit změny souboru"
 msgid "Forget Files..."
 msgstr "Zapomenout soubory..."
 
-#: tortoisehg\util\menuthg.py:41 tortoisehg\util\menuthg.py:44
+#: tortoisehg\util\menuthg.py:41
+#: tortoisehg\util\menuthg.py:44
 msgid "Remove files from version control"
 msgstr "Odstranit soubory ze správy verzí"
 
@@ -5959,7 +5938,7 @@ msgstr "Upravit nastavení repositáře"
 
 #: tortoisehg\util\menuthg.py:76
 msgid "Explorer Extension Settings"
-msgstr "Nastavení extenzí průzkumníka"
+msgstr "Nastavení kontext. nabídek"
 
 #: tortoisehg\util\menuthg.py:77
 msgid "Configure Explorer extension"
@@ -5975,7 +5954,7 @@ msgstr "Zobrazit dialog About"
 
 #: tortoisehg\util\menuthg.py:82
 msgid "Annotate Files"
-msgstr "Anotovat soubory"
+msgstr "Anotace souboru"
 
 #: tortoisehg\util\menuthg.py:83
 msgid "Changeset information per file line"
@@ -6049,12 +6028,14 @@ msgstr "Porce #%d úspěšná v %d (offset %d řádky).\n"
 msgid "Hunk #%d FAILED at %d\n"
 msgstr "Porce #%d SELHALA při %d\n"
 
-#: tortoisehg\util\prej.py:318 tortoisehg\util\prej.py:344
+#: tortoisehg\util\prej.py:318
+#: tortoisehg\util\prej.py:344
 #: tortoisehg\util\prej.py:376
 msgid "bad hunk #%d"
 msgstr "špatná porce #%d"
 
-#: tortoisehg\util\prej.py:363 tortoisehg\util\prej.py:405
+#: tortoisehg\util\prej.py:363
+#: tortoisehg\util\prej.py:405
 msgid "bad hunk #%d old text line %d"
 msgstr "špatná porce #%d starý řádek textu %d"
 
@@ -6088,159 +6069,109 @@ msgstr "repozitář %s nenalezen"
 
 #~ msgid "unrecognized response\n"
 #~ msgstr "nerozeznaná odpověď\n"
-
 #~ msgid "repository '%s' is not local"
 #~ msgstr "repozitář '%s' není místní"
-
 #~ msgid "extension '%s' overrides commands: %s\n"
 #~ msgstr "rozšíření '%s' přepíše příkazy: %s\n"
-
 #~ msgid "changeset:"
 #~ msgstr "sada změny:"
-
 #~ msgid "Create Clone"
 #~ msgstr "Vytvořit klon"
-
 #~ msgid "Repository status"
 #~ msgstr "Stav repozitáře"
-
 #~ msgid "Remove Files"
 #~ msgstr "Odstranit soubory"
-
 #~ msgid "Add Files"
 #~ msgstr "Přidat soubory"
-
 #~ msgid "Synchronize..."
 #~ msgstr "Synchronizovat..."
-
 #~ msgid "View Changelog"
 #~ msgstr "Zobrazit záznam změn"
-
 #~ msgid "View revision history"
 #~ msgstr "Zobrazit historii revizí"
-
 #~ msgid "Copyright 2009 TK Soh and others"
 #~ msgstr "Copyright 2009 TK Soh and others"
-
 #~ msgid "Options..."
 #~ msgstr "Možnosti..."
-
 #~ msgid "user:"
 #~ msgstr "uživatel:"
-
 #~ msgid "date:"
 #~ msgstr "datum:"
-
 #~ msgid "tags:"
 #~ msgstr "značky:"
-
 #~ msgid "_file history"
 #~ msgstr "_historie souboru"
-
 #~ msgid "tags"
 #~ msgstr "značky"
-
 #~ msgid "summary"
 #~ msgstr "shrnutí"
-
 #~ msgid "user"
 #~ msgstr "uživatel"
-
 #~ msgid "TortoiseHg RPC server"
 #~ msgstr "TortoiseHg RPC server"
-
 #~ msgid "Stat"
 #~ msgstr "Stat"
-
 #~ msgid "Canceled cloning"
 #~ msgstr "Klonování zrušeno"
-
 #~ msgid "not at head revision"
 #~ msgstr "ne při čelní revizi"
-
 #~ msgid "no parent is a head, commit to add a new head"
 #~ msgstr "žádný rodič není čelem, proveďte komit pro přidání nového čela"
-
 #~ msgid "C_onfigure Format"
 #~ msgstr "Nastavit formát"
-
 #~ msgid "di_splay change"
 #~ msgstr "zob_razit změnu"
-
 #~ msgid "_view file at revision"
 #~ msgstr "_zobrazit soubor při revizi"
-
 #~ msgid "_zoom to change"
 #~ msgstr "nastavit velikost podle změny"
-
 #~ msgid "Changelog"
 #~ msgstr "Changelog"
-
 #~ msgid "directly use raw extdiff command"
 #~ msgstr "přímo použít příkaz raw extdiff"
-
 #~ msgid "%s - changelog"
 #~ msgstr "%s - changelog"
-
 #~ msgid "Launch synchronize tool"
 #~ msgstr "Spustit synchronizační nástroj"
-
 #~ msgid "custom filter"
 #~ msgstr "vlastní filtr"
-
 #~ msgid "_Copy hash"
 #~ msgstr "_Kopírovat hash"
-
 #~ msgid "Transp_lant to local"
 #~ msgstr "Přemístit k lokálnímu"
-
 #~ msgid "qimport"
 #~ msgstr "qimport"
-
 #~ msgid "qimport from here to selected"
 #~ msgstr "qimport odsud k vybranému"
-
 #~ msgid "Invalid Remote Repository"
 #~ msgstr "Neplatný vzdálený repositář"
-
 #~ msgid "===== Diff to first parent =====\n"
 #~ msgstr "===== Diff vůči prvnímu rodiči =====\n"
-
 #~ msgid ""
 #~ "\n"
 #~ "===== Diff to second parent =====\n"
 #~ msgstr ""
 #~ "\n"
 #~ "===== Diff vůči druhému rodiči =====\n"
-
 #~ msgid "Running"
 #~ msgstr "Běžící"
-
 #~ msgid "Tag '%s' does not exist"
 #~ msgstr "Tag '%s' neexistuje"
-
 #~ msgid "TortoiseHg Taskbar"
 #~ msgstr "Hlavní panel TortoiseHg"
-
 #~ msgid "Top ->"
 #~ msgstr "Top ->"
-
 #~ msgid "<- Sub"
 #~ msgstr "<- Sub"
-
 #~ msgid "Event Log"
 #~ msgstr "Záznam událostí"
-
 #~ msgid "Visual Diff Command"
 #~ msgstr "Příkaz Visual Diff"
-
 #~ msgid "Specify visual diff tool; must be an extdiff command"
 #~ msgstr ""
 #~ "Určit nástroj pro zobrazení diffů; musí to být příkaz extenze extdiff"
-
 #~ msgid "Skip Diff Window"
 #~ msgstr "Přeskočit okno Diff"
-
 #~ msgid ""
 #~ "Bypass the builtin visual diff dialog and directly use your visual diff "
 #~ "tool's directory diff feature.  Only enable this feature if you know your "
@@ -6249,27 +6180,22 @@ msgstr "repozitář %s nenalezen"
 #~ "Obejít vestavěný dialog pro visual diff a přímo použít vlastní nainstalovaný "
 #~ "nástroj. Tuto volbu povolte jen tehdy, když víte, že váš diffový nástroj má "
 #~ "platnou extdiff konfiguraci. Implicitně je: False"
-
 #~ msgid ""
 #~ "The editor to use during a commit and other instances where Mercurial needs "
 #~ "multiline input from the user.  Only used by command line interface commands."
 #~ msgstr ""
 #~ "Editor pro použití při komitu a v jiných případech, kdy Mercurial vyžaduje "
 #~ "víceřádkový vstup od uživatele. Používá se pro příkazy z příkazového řádku."
-
 #~ msgid ""
 #~ "Specify the number of spaces that tabs expand to in various TortoiseHG "
 #~ "windows. Default: Not expanded"
 #~ msgstr ""
 #~ "Určit počet mezer pro šířku záložky v různých oknech TortoiseHg. Implicitně "
 #~ "je: Not expanded"
-
 #~ msgid "Capture Stderr"
 #~ msgstr "Zachytit stderr"
-
 #~ msgid "Full path title"
 #~ msgstr "Úplný název cesty"
-
 #~ msgid ""
 #~ "Maximum length of the commit message summary line. If set, TortoiseHG will "
 #~ "issue a warning if the summary line is too long or not separated by a blank "
@@ -6278,89 +6204,64 @@ msgstr "repozitář %s nenalezen"
 #~ "Maximální délka souhrnného řádku komitu. Aplikace vydá varování při "
 #~ "překročení zadané délky, nebo není-li souhrnný řádek oddělen od případného "
 #~ "dalšího textu prázdným řádkem. Implicitní nastavení je: 0 (nevynuceno)"
-
 #~ msgid "Copy Hash"
 #~ msgstr "Kopírovat hash"
-
 #~ msgid ""
 #~ "Allow the changelog viewer to copy the changeset hash of the currently "
 #~ "selected changeset into the clipboard. DEPRECATED. Default: False"
 #~ msgstr ""
 #~ "Dovolit, aby Průzkumník HG zkopíroval hash vybraného changesetu do schránky. "
 #~ "DEPRECATED. Implicitně je False"
-
 #~ msgid "After pull operation"
 #~ msgstr "Operace po akci pull"
-
 #~ msgid ""
 #~ "Please install iniparse package\n"
 #~ "Settings are only shown, no changing is possible"
 #~ msgstr ""
 #~ "Prosím instalujte balíček iniparse\n"
 #~ "Nastavení je pouze zobrazeno, změny nejsou možné"
-
 #~ msgid "Sync"
 #~ msgstr "Sync"
-
 #~ msgid "Web"
 #~ msgstr "Web"
-
 #~ msgid "_goto"
 #~ msgstr "_goto"
-
 #~ msgid "_rename"
 #~ msgstr "_přejmenovat"
-
 #~ msgid "_finish applied"
 #~ msgstr "použita aktivita _finish"
-
 #~ msgid "_delete"
 #~ msgstr "_smazat"
-
 #~ msgid "delete --keep"
 #~ msgstr "delete --keep"
-
 #~ msgid "f_old"
 #~ msgstr "f_old"
-
 #~ msgid "make it _next"
 #~ msgstr "provést _příště"
-
 #~ msgid "Show index"
 #~ msgstr "Zobrazit index"
-
 #~ msgid "Show status"
 #~ msgstr "Zobrazit status"
-
 #~ msgid "Show name"
 #~ msgstr "Zobrazit jméno"
-
 #~ msgid "Show summary"
 #~ msgstr "Zobrazit souhrn"
-
 #~ msgid "_shelve"
 #~ msgstr "_Odložit do regálu"
-
 #~ msgid "No changesets to display"
 #~ msgstr "Žádné changesety k zobrazení"
-
 #~ msgid "Displaying all changesets"
 #~ msgstr "Zobrazení všech changesetů"
-
 #~ msgid "Displaying %(count)d of %(total)d changesets"
 #~ msgstr "Zobrazení %(count)d z %(total)d changesetů"
-
 #~ msgid "Always launch single files"
 #~ msgstr "Vždy spustit jednotlivé soubory"
-
 #~ msgid "No repository"
 #~ msgstr "Žádný repositář"
-
 #~ msgid "Select diff tool"
 #~ msgstr "Vyberte nástroj pro diff"
-
 #~ msgid "revisions "
 #~ msgstr "revize "
-
 #~ msgid "Extdiff command not recognized\n"
 #~ msgstr "Příkaz extdiff nerozpoznán\n"
+

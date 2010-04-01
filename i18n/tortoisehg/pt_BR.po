@@ -7,20 +7,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2010-03-31 16:33+0000\n"
+"POT-Creation-Date: 2010-04-01 05:09+0000\n"
 "PO-Revision-Date: 2010-03-31 20:26+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-01 03:44+0000\n"
+"X-Launchpad-Export-Date: 2010-04-01 06:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: tortoisehg\hgtk\history.py:417 tortoisehg\hgtk\history.py:1957
 #: tortoisehg\hgtk\synch.py:79
 msgid "Push"
 msgstr "Push"
+
+#: TortoiseHgOverlayServer.py:36
+msgid "TortoiseHg Overlay Icon Server"
+msgstr "Servidor de Ícones Sobrepostos do TortoiseHg"
+
+#: TortoiseHgOverlayServer.py:117
+msgid "Exit"
+msgstr "Sair"
 
 #: tortoisehg\hgtk\about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
@@ -2482,8 +2490,7 @@ msgstr "Faixa de Revisões"
 msgid "%s (submitted)"
 msgstr "%s (enviada)"
 
-#: tortoisehg\hgtk\history.py:557
-#: tortoisehg\hgtk\history.py:563
+#: tortoisehg\hgtk\history.py:557 tortoisehg\hgtk\history.py:563
 msgid "%s (pending)"
 msgstr "%s (pendente)"
 
@@ -3212,12 +3219,12 @@ msgid "Merge target (other)"
 msgstr "Alvo da mesclagem (outra)"
 
 #: tortoisehg\hgtk\merge.py:84
-msgid "Current revision (local)"
-msgstr "Versão atual (local)"
-
-#: tortoisehg\hgtk\merge.py:89
 msgid "Discard all changes from merge target (other) revision"
 msgstr "Descarta todas as mudanças da revisão alvo da mesclagem (other)"
+
+#: tortoisehg\hgtk\merge.py:89
+msgid "Current revision (local)"
+msgstr "Versão atual (local)"
 
 #: tortoisehg\hgtk\merge.py:100
 msgid "Merge tools:"
@@ -5394,8 +5401,7 @@ msgstr "E_xcluir"
 msgid "F_old"
 msgstr "C_ombinar"
 
-#: tortoisehg\hgtk\thgmq.py:784
-#: tortoisehg\hgtk\thgmq.py:816
+#: tortoisehg\hgtk\thgmq.py:784 tortoisehg\hgtk\thgmq.py:816
 msgid "Reorder"
 msgstr "Reordenar"
 
@@ -5673,72 +5679,72 @@ msgstr "Arquivos sem alteração"
 msgid "There are no file changes to view"
 msgstr "Não existem alterações de arquivos para ver"
 
-#: tortoisehg\hgtk\visdiff.py:292
+#: tortoisehg\hgtk\visdiff.py:293
 msgid "cleaning up temp directory\n"
 msgstr "limpando diretório temporário\n"
 
-#: tortoisehg\hgtk\visdiff.py:309
+#: tortoisehg\hgtk\visdiff.py:310
 msgid "Visual Diffs"
 msgstr "Diffs Visuais"
 
-#: tortoisehg\hgtk\visdiff.py:314
+#: tortoisehg\hgtk\visdiff.py:315
 msgid "working changes"
 msgstr "diferenças de trabalho"
 
-#: tortoisehg\hgtk\visdiff.py:316
+#: tortoisehg\hgtk\visdiff.py:317
 msgid "changeset "
 msgstr "revisão "
 
-#: tortoisehg\hgtk\visdiff.py:318
+#: tortoisehg\hgtk\visdiff.py:319
 msgid "revisions %d to %d"
 msgstr "revisões %d a %d"
 
-#: tortoisehg\hgtk\visdiff.py:319
+#: tortoisehg\hgtk\visdiff.py:320
 msgid "Visual Diffs - "
 msgstr "Visual Diffs - "
 
-#: tortoisehg\hgtk\visdiff.py:321
+#: tortoisehg\hgtk\visdiff.py:322
 msgid " filtered"
 msgstr " filtradas"
 
-#: tortoisehg\hgtk\visdiff.py:335
+#: tortoisehg\hgtk\visdiff.py:336
 msgid "Temporary files are removed when this dialog is closed"
 msgstr "Arquivos temporários são removidos ao fechar este diálogo"
 
-#: tortoisehg\hgtk\visdiff.py:389
+#: tortoisehg\hgtk\visdiff.py:390
 msgid "Dir diff to p1"
 msgstr "Diff do diretório com pai 1"
 
-#: tortoisehg\hgtk\visdiff.py:391
+#: tortoisehg\hgtk\visdiff.py:392
 msgid "Dir diff to p2"
 msgstr "Diff do diretório com pai 2"
 
-#: tortoisehg\hgtk\visdiff.py:393
+#: tortoisehg\hgtk\visdiff.py:394
 msgid "3-way dir diff"
 msgstr "Diff de diretório de 3 vias"
 
-#: tortoisehg\hgtk\visdiff.py:399
+#: tortoisehg\hgtk\visdiff.py:400
 msgid "Directory diff"
 msgstr "Diff de diretório"
 
-#: tortoisehg\hgtk\visdiff.py:532
+#: tortoisehg\hgtk\visdiff.py:533
 msgid "Unable to delete temp files"
 msgstr "Incapaz de remover arquivos temporários"
 
-#: tortoisehg\hgtk\visdiff.py:533
+#: tortoisehg\hgtk\visdiff.py:534
 msgid "Close diff tools and try again, or quit to leak files?"
 msgstr ""
 "Fechar o utilitário de diff e tentar novamente, ou sair e deixar os arquivos?"
 
-#: tortoisehg\hgtk\visdiff.py:534
+#: tortoisehg\hgtk\visdiff.py:535
 msgid "&Quit"
 msgstr "Sa&ir"
 
-#: tortoisehg\hgtk\visdiff.py:534
+#: tortoisehg\hgtk\visdiff.py:535
 msgid "Try &Again"
 msgstr "Tentar Nov&amente"
 
-#: tortoisehg\hgtk\visdiff.py:630
+#: tortoisehg\hgtk\visdiff.py:631
 msgid "No repository found here"
 msgstr "Nenhum repositório encontrado aqui"
 
@@ -6887,9 +6893,6 @@ msgstr "repositório %s não encontrado"
 
 #~ msgid "TortoiseHg RPC server"
 #~ msgstr "Servidor RPC do TortoiseHg"
-
-#~ msgid "Exit"
-#~ msgstr "Sair"
 
 #~ msgid "user:"
 #~ msgstr "usuário:"
