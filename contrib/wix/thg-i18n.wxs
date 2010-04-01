@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+    <?include thg-guids.wxi ?>
+
     <?define thg_po_langs = cs;da;de;en_GB;es;fa;fr;he;hr;hu;it;ja;ko;nl;nn;oc;pl;pt;pt_BR;ru;sv;tr;uk;zh_CN;zh_TW ?>
     <!-- lang 'ca' is used for key path -->
 
     <Fragment>
         <DirectoryRef Id="i18ndir">
             <Directory Id="thgI18nFolder" Name="tortoisehg">
-                <Component Id="thgI18nFolder" Guid="{69E6E182-BCD2-4b03-A941-7B9A054DF7AF}">
+                <Component Id="thgI18nFolder" Guid="$(var.thgI18nFolder.guid)">
                     <File Id="thg.ca.po" Source="$(var.SourceDir)\tortoisehg\ca.po" KeyPath="yes" />
                     <?foreach LANG in $(var.thg_po_langs) ?>
                         <File Id="thg.$(var.LANG).po" Source="$(var.SourceDir)\tortoisehg\$(var.LANG).po" />
