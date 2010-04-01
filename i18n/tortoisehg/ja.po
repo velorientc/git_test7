@@ -7,15 +7,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2010-03-31 16:33+0000\n"
+"POT-Creation-Date: 2010-04-01 05:09+0000\n"
 "PO-Revision-Date: 2010-03-31 16:55+0000\n"
 "Last-Translator: Yuki Kodama <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-01 03:44+0000\n"
+"X-Launchpad-Export-Date: 2010-04-01 06:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
+
+#: TortoiseHgOverlayServer.py:36
+msgid "TortoiseHg Overlay Icon Server"
+msgstr "TortoiseHg キャッシュサーバ"
+
+#: TortoiseHgOverlayServer.py:117
+msgid "Exit"
+msgstr "終了"
 
 #: tortoisehg\hgtk\about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
@@ -2463,8 +2471,7 @@ msgstr "リビジョン範囲"
 msgid "%s (submitted)"
 msgstr "%s (送信完了)"
 
-#: tortoisehg\hgtk\history.py:557
-#: tortoisehg\hgtk\history.py:563
+#: tortoisehg\hgtk\history.py:557 tortoisehg\hgtk\history.py:563
 msgid "%s (pending)"
 msgstr "%s (保留中)"
 
@@ -3190,12 +3197,12 @@ msgid "Merge target (other)"
 msgstr "マージ対象 (他のリビジョン)"
 
 #: tortoisehg\hgtk\merge.py:84
-msgid "Current revision (local)"
-msgstr "現在のリビジョン (ローカル)"
-
-#: tortoisehg\hgtk\merge.py:89
 msgid "Discard all changes from merge target (other) revision"
 msgstr "全ての変更点をマージ対象(other)のリビジョンから破棄する"
+
+#: tortoisehg\hgtk\merge.py:89
+msgid "Current revision (local)"
+msgstr "現在のリビジョン (ローカル)"
 
 #: tortoisehg\hgtk\merge.py:100
 msgid "Merge tools:"
@@ -5285,8 +5292,7 @@ msgstr "削除(_D)"
 msgid "F_old"
 msgstr "統合(_F)"
 
-#: tortoisehg\hgtk\thgmq.py:784
-#: tortoisehg\hgtk\thgmq.py:816
+#: tortoisehg\hgtk\thgmq.py:784 tortoisehg\hgtk\thgmq.py:816
 msgid "Reorder"
 msgstr "並べ替え"
 
@@ -5564,71 +5570,71 @@ msgstr "ローカルとの差分"
 msgid "There are no file changes to view"
 msgstr "ローカルとの間に変更点はありませんでした。"
 
-#: tortoisehg\hgtk\visdiff.py:292
+#: tortoisehg\hgtk\visdiff.py:293
 msgid "cleaning up temp directory\n"
 msgstr "一時ディレクトリを削除します\n"
 
-#: tortoisehg\hgtk\visdiff.py:309
+#: tortoisehg\hgtk\visdiff.py:310
 msgid "Visual Diffs"
 msgstr "GUI 差分表示"
 
-#: tortoisehg\hgtk\visdiff.py:314
+#: tortoisehg\hgtk\visdiff.py:315
 msgid "working changes"
 msgstr "作業ディレクトリの変更"
 
-#: tortoisehg\hgtk\visdiff.py:316
+#: tortoisehg\hgtk\visdiff.py:317
 msgid "changeset "
 msgstr "チェンジセット "
 
-#: tortoisehg\hgtk\visdiff.py:318
+#: tortoisehg\hgtk\visdiff.py:319
 msgid "revisions %d to %d"
 msgstr "リビジョン %d から %d"
 
-#: tortoisehg\hgtk\visdiff.py:319
+#: tortoisehg\hgtk\visdiff.py:320
 msgid "Visual Diffs - "
 msgstr "GUI 差分表示 - "
 
-#: tortoisehg\hgtk\visdiff.py:321
+#: tortoisehg\hgtk\visdiff.py:322
 msgid " filtered"
 msgstr " フィルタ適用"
 
-#: tortoisehg\hgtk\visdiff.py:335
+#: tortoisehg\hgtk\visdiff.py:336
 msgid "Temporary files are removed when this dialog is closed"
 msgstr "このダイアログを閉じると一時ファイルが削除されます"
 
-#: tortoisehg\hgtk\visdiff.py:389
+#: tortoisehg\hgtk\visdiff.py:390
 msgid "Dir diff to p1"
 msgstr "1番目の親へのディレクトリ差分"
 
-#: tortoisehg\hgtk\visdiff.py:391
+#: tortoisehg\hgtk\visdiff.py:392
 msgid "Dir diff to p2"
 msgstr "2番目の親へのディレクトリ差分"
 
-#: tortoisehg\hgtk\visdiff.py:393
+#: tortoisehg\hgtk\visdiff.py:394
 msgid "3-way dir diff"
 msgstr "3-way ディレクトリ差分"
 
-#: tortoisehg\hgtk\visdiff.py:399
+#: tortoisehg\hgtk\visdiff.py:400
 msgid "Directory diff"
 msgstr "ディレクトリ差分"
 
-#: tortoisehg\hgtk\visdiff.py:532
+#: tortoisehg\hgtk\visdiff.py:533
 msgid "Unable to delete temp files"
 msgstr "一時ファイルの削除に失敗しました"
 
-#: tortoisehg\hgtk\visdiff.py:533
+#: tortoisehg\hgtk\visdiff.py:534
 msgid "Close diff tools and try again, or quit to leak files?"
 msgstr "差分表示ツールを閉じてリトライしますか? それとも終了しますか?"
 
-#: tortoisehg\hgtk\visdiff.py:534
+#: tortoisehg\hgtk\visdiff.py:535
 msgid "&Quit"
 msgstr "終了(&Q)"
 
-#: tortoisehg\hgtk\visdiff.py:534
+#: tortoisehg\hgtk\visdiff.py:535
 msgid "Try &Again"
 msgstr "リトライ(&A)"
 
-#: tortoisehg\hgtk\visdiff.py:630
+#: tortoisehg\hgtk\visdiff.py:631
 msgid "No repository found here"
 msgstr "ここにはリポジトリがありません"
 
@@ -6102,9 +6108,6 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "Recent Commit Messages..."
 #~ msgstr "最近のコミットメッセージ..."
-
-#~ msgid "Exit"
-#~ msgstr "終了"
 
 #~ msgid "Undo commit"
 #~ msgstr "コミットの取り消し"
