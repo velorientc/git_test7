@@ -331,6 +331,7 @@ class CloneDialog(gdialog.GDialog):
         cmdline.append('--verbose')
         cmdline.append(hglib.fromutf(src))
         if dest:
+            cmdline.append('--')
             cmdline.append(hglib.fromutf(dest))
 
         # start cloning

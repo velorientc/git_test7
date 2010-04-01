@@ -1732,7 +1732,7 @@ class GLog(gdialog.GWindow):
                 # load the rebase extension explicitly
                 hglib.loadextension(self.ui, 'rebase')
 
-        cmdline = ['hg'] + cmd + [self.bfile]
+        cmdline = ['hg'] + cmd + ['--', self.bfile]
 
         def callback(return_code, *args):
             self.remove_overlay('--rebase' in cmd)
@@ -1928,7 +1928,7 @@ class GLog(gdialog.GWindow):
                            self).run()
             self.pathentry.grab_focus()
             return
-        cmdline = ['hg'] + cmd + self.get_proxy_args() + [remote_path]
+        cmdline = ['hg'] + cmd + self.get_proxy_args() + ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
@@ -2013,7 +2013,7 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
             cmdline += ['--force']
-        cmdline += [remote_path]
+        cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
@@ -2359,6 +2359,7 @@ class GLog(gdialog.GWindow):
             status = _('Bundling from %(base)s to %(rev)s...') % data
         else:
             status = _('Bundling from %(base)s to tip...') % data
+        cmdline.append('--')
         cmdline.append(result)
 
         def callback(return_code, *args):
@@ -2600,9 +2601,10 @@ class GLog(gdialog.GWindow):
         
         node = self.repo[self.currevid].node()
         rev = str(self.currevid)
-        cmdline = ['hg', 'push', '--rev', rev, remote_path]
+        cmdline = ['hg', 'push', '--rev', rev]
         if self.forcepush:
             cmdline += ['--force']
+        cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
@@ -2631,7 +2633,7 @@ class GLog(gdialog.GWindow):
 
     def pull_to(self, menuitem):
         rev = str(self.currevid)
-        cmdline = ['hg', 'pull', '--rev', rev, self.bfile]
+        cmdline = ['hg', 'pull', '--rev', rev, '--', self.bfile]
 
         def callback(return_code, *args):
             if return_code == 0:

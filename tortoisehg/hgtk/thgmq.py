@@ -298,7 +298,7 @@ class MQWidget(gtk.VBox):
         """
         if not self.is_operable():
             return
-        cmdline = ['hg', 'qgoto', patch]
+        cmdline = ['hg', 'qgoto', '--', patch]
         self.cmd.execute(cmdline, self.cmd_done)
 
     def qpop(self, all=False):
@@ -358,9 +358,11 @@ class MQWidget(gtk.VBox):
                 keep = True
             else:
                 return
-        cmdline = ['hg', 'qdelete'] + unapplied
+        cmdline = ['hg', 'qdelete']
         if keep:
             cmdline.append('--keep')
+        cmdline.append('--')
+        cmdline.extned(unapplied)
         self.cmd.execute(cmdline, self.cmd_done, noemit=True)
 
     def qrename(self, name, patch='qtip'):
@@ -374,7 +376,7 @@ class MQWidget(gtk.VBox):
         """
         if not name or not self.has_patch():
             return
-        cmdline = ['hg', 'qrename', patch, name]
+        cmdline = ['hg', 'qrename', '--', patch, name]
         self.cmd.execute(cmdline, self.cmd_done)
 
     def qrename_ui(self, patch='qtip'):
@@ -448,7 +450,7 @@ class MQWidget(gtk.VBox):
                       " into the current patch '%(qtip)s'?") % data).run()
         if ret != gtk.RESPONSE_YES:
             return
-        cmdline = ['hg', 'qfold'] + unapplied
+        cmdline = ['hg', 'qfold', '--'] + unapplied
         self.cmd.execute(cmdline, self.cmd_done)
 
     def qreorder(self, patch, op):

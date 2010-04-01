@@ -341,7 +341,7 @@ class ImportDialog(gdialog.GDialog):
             raise _('unexpected destination name: %s') % dest
 
         # prepare command line
-        cmdline = ['hg', cmd, '--verbose']
+        cmdline = ['hg', cmd, '--verbose', '--']
         cmdline.extend(files)
 
         # start importing
