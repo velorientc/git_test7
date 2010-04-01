@@ -226,6 +226,7 @@ class ArchiveDialog(gdialog.GDialog):
             cmdline.append(rev)
         cmdline.append('-t')
         cmdline.append(type)
+        cmdline.append('--')
         cmdline.append(hglib.fromutf(dest))
 
         # start archiving

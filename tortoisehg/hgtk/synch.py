@@ -553,7 +553,7 @@ class SynchDialog(gtk.Window):
         cmdline += ['--verbose']
         if proxy_host and not use_proxy:
             cmdline += ["--config", "http_proxy.host="]
-        cmdline += [remote_path]
+        cmdline += ['--', remote_path]
         self.lastcmd = cmdline
 
         # show command to be executed

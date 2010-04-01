@@ -937,7 +937,7 @@ class ConfigDialog(gtk.Dialog):
             return
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--verbose', testpath]
+        cmdline = ['hg', 'incoming', '--verbose', '--', testpath]
         dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
         dlg.run()
         dlg.hide()

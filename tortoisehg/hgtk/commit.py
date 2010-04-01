@@ -1017,7 +1017,7 @@ class GCommit(GStatus):
         # prompts). Problem?
         self.opts['addremove'] = True
         if self.qnew or self.qheader is not None:
-            cmdline = ['hg', 'addremove', '--verbose']
+            cmdline = ['hg', 'addremove', '--verbose', '--']
             cmdline += [self.repo.wjoin(x) for x in files]
             self.execute_command(cmdline, force=True)
         return True
@@ -1146,6 +1146,7 @@ class GCommit(GStatus):
         cmdline += ['--message', hglib.fromutf(self.opts['message'])]
         if self.qnew:
             cmdline += [hglib.fromutf(self.get_qnew_name())]
+        cmdline.append('--')
         cmdline += files
         if autopush:
             cmdline = (cmdline, ['hg', 'push'])

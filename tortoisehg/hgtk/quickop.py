@@ -237,9 +237,11 @@ class QuickOpDialog(gdialog.GDialog):
             return
 
         # prepare command line
-        cmdline = ['hg', self.command, '--verbose'] + list
+        cmdline = ['hg', self.command, '--verbose']
         if hasattr(self, 'nobackup') and self.nobackup.get_active():
             cmdline.append('--no-backup')
+        cmdline.append('--')
+        cmdline += list
 
         # execute command
         self.execute_command(cmdline, list)
