@@ -3,6 +3,10 @@
   <!-- cmenu-i18n.wxs -->
   <?define cmenuI18n.guid = {B0AB4947-248C-4c6b-841C-49284EF99022} ?>
 
+  <!-- icons.wxs -->
+  <?define Icons.guid = {30E997E7-FB02-4d34-AF61-A6FD6C93E268} ?>
+  <?define SvgIcons.guid = {7C87CCC7-8377-49c8-ACFD-1F246ED14747} ?>
+
   <!-- thg-i18n.wxs -->
   <?define thgI18nFolder.guid = {69E6E182-BCD2-4b03-A941-7B9A054DF7AF} ?>
 

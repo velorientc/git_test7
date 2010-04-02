@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+  <?include thg-guids.wxi ?>
+
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
 
       <Directory Id="IconsDirectory" Name="icons">
 
-        <Component Id='Icons' Guid='{30E997E7-FB02-4d34-AF61-A6FD6C93E268}'>
+        <Component Id='Icons' Guid='$(var.Icons.guid)'>
           <File Source="$(var.SourceDir)\branch.ico" KeyPath="yes" />
           <File Source="$(var.SourceDir)\detect_rename.ico" />
           <File Source="$(var.SourceDir)\fileadd.ico" />
@@ -52,7 +54,7 @@
         </Component>
 
         <Directory Id="SvgDirectory" Name="svg">
-          <Component Id='SvgIcons' Guid='{7C87CCC7-8377-49c8-ACFD-1F246ED14747}'>
+          <Component Id='SvgIcons' Guid='$(var.SvgIcons.guid)'>
             <File Source="$(var.SourceDir)\svg\add.svg" KeyPath="yes" />
             <File Source="$(var.SourceDir)\svg\checkout.svg" />
             <File Source="$(var.SourceDir)\svg\clone.svg" />
