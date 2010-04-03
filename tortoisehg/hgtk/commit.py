@@ -25,7 +25,8 @@ keep = i18n.keepgettext()
 
 from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
 from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
-from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd, thgmq
+from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
+from tortoisehg.hgtk import thgmq, textview
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, repo):
@@ -436,7 +437,7 @@ class GCommit(GStatus):
         self.add_accelerator('thg-reflow', accelgroup, key,
                         modifier, gtk.ACCEL_VISIBLE)
 
-        self.text = gtk.TextView()
+        self.text = textview.UndoableTextView(accelgroup=accelgroup)
         self.text.connect('populate-popup', self.msg_add_to_popup)
         self.connect('thg-reflow', self.thgreflow, self.text)
         self.text.modify_font(self.fonts['comment'])
@@ -1178,7 +1179,7 @@ class GCommit(GStatus):
                     self.mode = 'commit'
                     self.qnew = False
                 elif self.qheader is None:
-                    self.text.set_buffer(gtk.TextBuffer())
+                    self.text.set_buffer(textview.UndoableTextBuffer())
                     self.msg_cbbox.set_active(-1)
                     self.last_commit_id = self.get_tip_rev(True)
                 if self.notify_func:
