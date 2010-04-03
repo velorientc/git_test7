@@ -62,8 +62,8 @@ NEW_REV_COLOR = DGREEN
 CHANGE_HEADER = GREY
 
 TextBufferTags = {
-    'error' :           dict(weight=pango.WEIGHT_HEAVY, foreground=DRED),
-    'control' :         dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
+    'error':            dict(weight=pango.WEIGHT_HEAVY, foreground=DRED),
+    'control':          dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
     'ui.status':        dict(foreground=DGRAY),
     'ui.note':          dict(foreground=BLACK),
     'log.description':  dict(foreground=DGRAY),
@@ -76,8 +76,8 @@ TextBufferTags = {
     'diff.inserted':    dict(foreground=DGREEN),
     'diff.deleted':     dict(foreground=RED),
     'diff.hunk':        dict(foreground=BLUE),
-    'diff.file_a' :     dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
-    'diff.file_b' :     dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
+    'diff.file_a':      dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
+    'diff.file_b':      dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
 }
 
 UP_ARROW_COLOR = '#feaf3e'
