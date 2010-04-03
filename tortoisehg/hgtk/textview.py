@@ -7,12 +7,14 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
+import gobject
 
 from tortoisehg.hgtk import gtklib
 
 class UndoableInsert(object):
     """something that has been inserted into our textbuffer"""
     def __init__(self, text_iter, text, length):
+        self.time = gobject.get_current_time()
         self.offset = text_iter.get_offset()
         self.text = text
         self.length = length
@@ -24,6 +26,7 @@ class UndoableInsert(object):
 class UndoableDelete(object):
     """something that has ben deleted from our textbuffer"""
     def __init__(self, text_buffer, start_iter, end_iter):
+        self.time = gobject.get_current_time()
         self.text = text_buffer.get_text(start_iter, end_iter)
         self.start = start_iter.get_offset()
         self.end = end_iter.get_offset()
@@ -38,6 +41,11 @@ class UndoableDelete(object):
             self.mergeable = False
         else:
             self.mergeable = True
+
+class UndoableReplace(object):
+    def __init__(self, first, second):
+        self.first = first
+        self.second = second
 
 class UndoableTextBuffer(gtk.TextBuffer):
     """text buffer with added undo capabilities
@@ -95,7 +103,10 @@ class UndoableTextBuffer(gtk.TextBuffer):
             self.undo_stack.append(undo_action)
             return
         if not isinstance(prev_insert, UndoableInsert):
-            self.undo_stack.append(prev_insert)
+            if prev_insert.time == undo_action.time:
+                undo_action = UndoableReplace(prev_insert, undo_action)
+            else:
+                self.undo_stack.append(prev_insert)
             self.undo_stack.append(undo_action)
             return
         if can_be_merged(prev_insert, undo_action):
@@ -141,7 +152,10 @@ class UndoableTextBuffer(gtk.TextBuffer):
             self.undo_stack.append(undo_action)
             return
         if not isinstance(prev_delete, UndoableDelete):
-            self.undo_stack.append(prev_delete)
+            if prev_delete.time == undo_action.time:
+                undo_action = UndoableReplace(prev_delete, undo_action)
+            else:
+                self.undo_stack.append(prev_delete)
             self.undo_stack.append(undo_action)
             return
         if can_be_merged(prev_delete, undo_action):
@@ -179,21 +193,31 @@ class UndoableTextBuffer(gtk.TextBuffer):
         self.undo_in_progress = True
         undo_action = self.undo_stack.pop()
         self.redo_stack.append(undo_action)
-        if isinstance(undo_action, UndoableInsert):
-            start = self.get_iter_at_offset(undo_action.offset)
+        def do_insert(action):
+            start = self.get_iter_at_offset(action.offset)
             stop = self.get_iter_at_offset(
-                undo_action.offset + undo_action.length
+                action.offset + action.length
             )
             self.delete(start, stop)
             self.place_cursor(start)
-        else:
-            start = self.get_iter_at_offset(undo_action.start)
-            self.insert(start, undo_action.text)
-            stop = self.get_iter_at_offset(undo_action.end)
-            if undo_action.delete_key_used:
+        def do_delete(action):
+            start = self.get_iter_at_offset(action.start)
+            self.insert(start, action.text)
+            stop = self.get_iter_at_offset(action.end)
+            if action.delete_key_used:
                 self.place_cursor(start)
             else:
                 self.place_cursor(stop)
+        def do(action):
+            if isinstance(action, UndoableInsert):
+                do_insert(action)
+            elif isinstance(action, UndoableDelete):
+                do_delete(action)
+        if isinstance(undo_action, UndoableReplace):
+            do(undo_action.second)
+            do(undo_action.first)
+        else:
+            do(undo_action)
         self.end_not_undoable_action()
         self.undo_in_progress = False
 
@@ -207,18 +231,28 @@ class UndoableTextBuffer(gtk.TextBuffer):
         self.undo_in_progress = True
         redo_action = self.redo_stack.pop()
         self.undo_stack.append(redo_action)
-        if isinstance(redo_action, UndoableInsert):
-            start = self.get_iter_at_offset(redo_action.offset)
-            self.insert(start, redo_action.text)
+        def do_insert(action):
+            start = self.get_iter_at_offset(action.offset)
+            self.insert(start, action.text)
             new_cursor_pos = self.get_iter_at_offset(
-                redo_action.offset + redo_action.length
+                action.offset + action.length
             )
             self.place_cursor(new_cursor_pos)
-        else:
-            start = self.get_iter_at_offset(redo_action.start)
-            stop = self.get_iter_at_offset(redo_action.end)
+        def do_delete(action):
+            start = self.get_iter_at_offset(action.start)
+            stop = self.get_iter_at_offset(action.end)
             self.delete(start, stop)
             self.place_cursor(start)
+        def do(action):
+            if isinstance(action, UndoableInsert):
+                do_insert(action)
+            elif isinstance(action, UndoableDelete):
+                do_delete(action)
+        if isinstance(redo_action, UndoableReplace):
+            do(redo_action.first)
+            do(redo_action.second)
+        else:
+            do(redo_action)
         self.end_not_undoable_action()
         self.undo_in_progress = False
 
