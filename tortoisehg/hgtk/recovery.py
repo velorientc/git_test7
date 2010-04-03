@@ -202,6 +202,12 @@ class RecoveryDialog(gtk.Window):
         Handle all the messages currently in the queue (if any).
         """
         self.hgthread.process_dialogs()
+        while self.hgthread.geterrqueue().qsize():
+            try:
+                msg = self.hgthread.geterrqueue().get(0)
+                self.write_err(msg)
+            except Queue.Empty:
+                pass
         enditer = self.textbuffer.get_end_iter()
         while self.hgthread.getqueue().qsize():
             try:
@@ -219,12 +225,6 @@ class RecoveryDialog(gtk.Window):
                 else:
                     self.textbuffer.insert(enditer, msg)
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
-            except Queue.Empty:
-                pass
-        while self.hgthread.geterrqueue().qsize():
-            try:
-                msg = self.hgthread.geterrqueue().get(0)
-                self.write_err(msg)
             except Queue.Empty:
                 pass
 
