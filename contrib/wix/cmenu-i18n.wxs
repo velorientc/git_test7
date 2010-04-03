@@ -10,11 +10,11 @@
 
   <Fragment>
     <DirectoryRef Id="i18ndir">
-      <Directory Id="cmenuI18n" Name="cmenu">
+      <Directory Id="cmenuI18n" Name="cmenu" FileSource="$(var.SourceDir)">
         <Component Id="cmenuI18n" Guid="$(var.cmenuI18n.guid)">
-          <File Source="$(var.SourceDir)\thg-cmenu-ca.reg" KeyPath="yes"/>
+          <File Name="thg-cmenu-ca.reg" KeyPath="yes"/>
           <?foreach LANG in $(var.thgcmenulangs) ?>
-            <File Source="$(var.SourceDir)\thg-cmenu-$(var.LANG).reg" />
+            <File Name="thg-cmenu-$(var.LANG).reg" />
           <?endforeach?>
         </Component>
       </Directory>

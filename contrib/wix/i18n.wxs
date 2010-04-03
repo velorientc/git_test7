@@ -9,12 +9,12 @@
 
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
-      <Directory Id="i18ndir" Name="i18n">
+      <Directory Id="i18ndir" Name="i18n" FileSource="$(var.SourceDir)">
         <Component Id="i18nFolder" Guid="$(var.i18nFolder.guid)">
-          <File Source="$(var.SourceDir)\hggettext" KeyPath="yes" />
+          <File Name="hggettext" KeyPath="yes" />
           <?foreach LANG in $(var.hg_po_langs) ?>
             <File Id="hg.$(var.LANG).po" 
-                  Source="$(var.SourceDir)\$(var.LANG).po" 
+                  Name="$(var.LANG).po" 
             />
           <?endforeach?>
         </Component>

@@ -5,18 +5,18 @@
 
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
-      <Directory Id="helpdir" Name="help">
+      <Directory Id="helpdir" Name="help" FileSource="$(var.SourceDir)">
         <Component Id="helpFolder" Guid="$(var.helpFolder.guid)">
-          <File Source="$(var.SourceDir)\config.txt" KeyPath="yes" />
-          <File Source="$(var.SourceDir)\dates.txt" />
-          <File Source="$(var.SourceDir)\diffs.txt" />
-          <File Source="$(var.SourceDir)\environment.txt" />
-          <File Source="$(var.SourceDir)\extensions.txt" />
-          <File Source="$(var.SourceDir)\multirevs.txt" />
-          <File Source="$(var.SourceDir)\patterns.txt" />
-          <File Source="$(var.SourceDir)\revisions.txt" />
-          <File Source="$(var.SourceDir)\templates.txt" />
-          <File Source="$(var.SourceDir)\urls.txt" />
+          <File Name="config.txt" KeyPath="yes" />
+          <File Name="dates.txt" />
+          <File Name="diffs.txt" />
+          <File Name="environment.txt" />
+          <File Name="extensions.txt" />
+          <File Name="multirevs.txt" />
+          <File Name="patterns.txt" />
+          <File Name="revisions.txt" />
+          <File Name="templates.txt" />
+          <File Name="urls.txt" />
         </Component>
       </Directory>
     </DirectoryRef>

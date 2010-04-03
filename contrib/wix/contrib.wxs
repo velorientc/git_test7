@@ -12,27 +12,27 @@
 
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
-      <Directory Id="contribdir" Name="contrib">
+      <Directory Id="contribdir" Name="contrib" FileSource="$(var.SourceDir)">
         <Component Id="contrib" Guid="$(var.contrib.guid)">
-          <File Source="$(var.SourceDir)\bash_completion" KeyPath="yes" />
-          <File Source="$(var.SourceDir)\hgk" />
-          <File Source="$(var.SourceDir)\hgwebdir.fcgi" />
-          <File Source="$(var.SourceDir)\hgwebdir.wsgi" />
-          <File Source="$(var.SourceDir)\logo-droplets.svg" />
-          <File Source="$(var.SourceDir)\mercurial.el" />
-          <File Source="$(var.SourceDir)\sample.hgrc" />
-          <File Source="$(var.SourceDir)\tcsh_completion" />
-          <File Source="$(var.SourceDir)\tcsh_completion_build.sh" />
-          <File Source="$(var.SourceDir)\xml.rnc" />
-          <File Source="$(var.SourceDir)\zsh_completion" />
+          <File Name="bash_completion" KeyPath="yes" />
+          <File Name="hgk" />
+          <File Name="hgwebdir.fcgi" />
+          <File Name="hgwebdir.wsgi" />
+          <File Name="logo-droplets.svg" />
+          <File Name="mercurial.el" />
+          <File Name="sample.hgrc" />
+          <File Name="tcsh_completion" />
+          <File Name="tcsh_completion_build.sh" />
+          <File Name="xml.rnc" />
+          <File Name="zsh_completion" />
         </Component>
         <Directory Id="vimdir" Name="vim">
           <Component Id="contrib.vim" Guid="$(var.contrib.vim.guid)">
-            <File Source="$(var.SourceDir)\vim\hg-menu.vim" KeyPath="yes" />
-            <File Source="$(var.SourceDir)\vim\HGAnnotate.vim" />
-            <File Source="$(var.SourceDir)\vim\hgcommand.vim" />
-            <File Source="$(var.SourceDir)\vim\patchreview.txt" />
-            <File Source="$(var.SourceDir)\vim\patchreview.vim" />
+            <File Name="hg-menu.vim" KeyPath="yes" />
+            <File Name="HGAnnotate.vim" />
+            <File Name="hgcommand.vim" />
+            <File Name="patchreview.txt" />
+            <File Name="patchreview.vim" />
           </Component>
         </Directory>
       </Directory>
