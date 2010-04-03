@@ -10,6 +10,7 @@ import os
 import sys
 import gtk
 import gobject
+import pango
 import Queue
 import urllib
 import threading
@@ -59,6 +60,25 @@ GREY = 'grey'
 NORMAL = BLACK
 NEW_REV_COLOR = DGREEN
 CHANGE_HEADER = GREY
+
+TextBufferTags = {
+    'error' :           dict(weight=pango.WEIGHT_HEAVY, foreground=DRED),
+    'control' :         dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
+    'ui.status':        dict(foreground=DGRAY),
+    'ui.note':          dict(foreground=BLACK),
+    'log.description':  dict(foreground=DGRAY),
+    'log.changeset':    dict(foreground=GREY),
+    'log.tag':          dict(foreground=RED),
+    'log.user':         dict(foreground=BLUE),
+    'log.date':         dict(foreground=BLACK),
+    'log.files':        dict(foreground=BLACK),
+    'diff.diffline':    dict(foreground=BLACK),
+    'diff.inserted':    dict(foreground=DGREEN),
+    'diff.deleted':     dict(foreground=RED),
+    'diff.hunk':        dict(foreground=BLUE),
+    'diff.file_a' :     dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
+    'diff.file_b' :     dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
+}
 
 UP_ARROW_COLOR = '#feaf3e'
 DOWN_ARROW_COLOR = '#8ae234'

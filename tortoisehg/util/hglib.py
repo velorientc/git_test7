@@ -162,16 +162,6 @@ def getfontconfig(_ui=None):
                 _fontconfig[name] = val
     return _fontconfig
 
-def uiwrite(u, args):
-    '''
-    write args if there are buffers
-    returns True if the caller shall handle writing
-    '''
-    if u._buffers:
-        ui.ui.write(u, *args)
-        return False
-    return True
-
 def invalidaterepo(repo):
     repo.dirstate.invalidate()
     if isinstance(repo, bundlerepo.bundlerepository):
@@ -330,8 +320,10 @@ def hgcmd_toq(q, *args):
             super(Qui, self).__init__(src)
             self.setconfig('ui', 'interactive', 'off')
 
-        def write(self, *args):
-            if uiwrite(self, args):
+        def write(self, *args, **opts):
+            if self._buffers:
+                self._buffers[-1].extend([str(a) for a in args])
+            else:
                 for a in args:
                     q.put(str(a))
     u = Qui()
