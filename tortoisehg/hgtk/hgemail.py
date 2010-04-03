@@ -16,7 +16,7 @@ from mercurial import hg, ui, extensions, error
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings
 
-from tortoisehg.hgtk import gtklib, dialog, thgconfig, hgcmd
+from tortoisehg.hgtk import gtklib, dialog, thgconfig, hgcmd, textview
 
 class EmailDialog(gtk.Window):
     """ Send patches or bundles via email """
@@ -168,7 +168,9 @@ class EmailDialog(gtk.Window):
         vbox.pack_start(hbox, False, False, 4)
 
         # Description TextView
-        self.descview = gtk.TextView(buffer=None)
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        self.descview = textview.UndoableTextView(accelgroup=accelgroup)
         self.descview.set_editable(True)
         fontcomment = hglib.getfontconfig()['fontcomment']
         self.descview.modify_font(pango.FontDescription(fontcomment))
