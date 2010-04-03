@@ -157,6 +157,20 @@ class CmdDialog(gtk.Dialog):
         """
         self.hgthread.process_dialogs()
         enditer = self.textbuffer.get_end_iter()
+        while self.hgthread.geterrqueue().qsize():
+            try:
+                msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+            except Queue.Empty:
+                pass
+        while self.stdoutq.qsize():
+            try:
+                msg = hglib.toutf(self.stdoutq.get(0))
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+            except Queue.Empty:
+                pass
         while self.hgthread.getqueue().qsize():
             try:
                 msg, label = self.hgthread.getqueue().get(0)
@@ -172,20 +186,6 @@ class CmdDialog(gtk.Dialog):
                     self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
                 else:
                     self.textbuffer.insert(enditer, msg)
-                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
-            except Queue.Empty:
-                pass
-        while self.hgthread.geterrqueue().qsize():
-            try:
-                msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
-                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
-                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
-            except Queue.Empty:
-                pass
-        while self.stdoutq.qsize():
-            try:
-                msg = hglib.toutf(self.stdoutq.get(0))
-                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
@@ -563,16 +563,16 @@ class CmdWidget(gtk.VBox):
         self.hgthread.process_dialogs()
 
         # output to buffer
-        while self.hgthread.getqueue().qsize():
-            try:
-                msg, label = self.hgthread.getqueue().get(0)
-                self.log.append(hglib.toutf(msg))
-            except Queue.Empty:
-                pass
         while self.hgthread.geterrqueue().qsize():
             try:
                 msg = self.hgthread.geterrqueue().get(0)
                 self.log.append(hglib.toutf(msg), error=True)
+            except Queue.Empty:
+                pass
+        while self.hgthread.getqueue().qsize():
+            try:
+                msg, label = self.hgthread.getqueue().get(0)
+                self.log.append(hglib.toutf(msg))
             except Queue.Empty:
                 pass
 
