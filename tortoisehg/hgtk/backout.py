@@ -12,7 +12,7 @@ import pango
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, i18n
 
-from tortoisehg.hgtk import csinfo, gdialog
+from tortoisehg.hgtk import csinfo, gdialog, textview
 
 keep = i18n.keepgettext()
 
@@ -58,8 +58,9 @@ class BackoutDialog(gdialog.GDialog):
         self.cmsgframe = frame
 
         ## message text area
-        self.logview = gtk.TextView(buffer=None)
-        self.logview.set_editable(True)
+        accelgroup = gtk.AccelGroup()
+        self.add_accel_group(accelgroup)
+        self.logview = textview.UndoableTextView(accelgroup=accelgroup)
         fontcomment = hglib.getfontconfig()['fontcomment']
         self.logview.modify_font(pango.FontDescription(fontcomment))
         self.buf = self.logview.get_buffer()
