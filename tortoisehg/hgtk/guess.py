@@ -259,7 +259,7 @@ class DetectRenameDialog(gtk.Window):
         self.settings.set_value('dims', (rect.width, rect.height))
         self.settings.write()
 
-    def find_renames(self):
+    def find_renames(self, copy=False):
         'User pressed "find renames" button'
         canmodel = self.cantree.get_model()
         canmodel.clear()
@@ -268,7 +268,8 @@ class DetectRenameDialog(gtk.Window):
             return
         tgts = [ umodel[p][0] for p in upaths ]
         q = Queue.Queue()
-        thread = thread2.Thread(target=self.search_thread, args=(q, tgts))
+        thread = thread2.Thread(target=self.search_thread,
+                                args=(q, tgts, copy))
         thread.start()
         self.stbar.begin()
         text = _('finding source of ') + ', '.join(tgts)
@@ -277,7 +278,7 @@ class DetectRenameDialog(gtk.Window):
         self.stbar.set_text(text)
         gobject.timeout_add(50, self.search_wait, thread, q)
 
-    def search_thread(self, q, tgts):
+    def search_thread(self, q, tgts, copy):
         hglib.invalidaterepo(self.repo)
         srcs = []
         audit_path = util.path_auditor(self.repo.root)
@@ -293,13 +294,13 @@ class DetectRenameDialog(gtk.Window):
             if (not good or not util.lexists(target)
                 or (os.path.isdir(target) and not os.path.islink(target))):
                 srcs.append(abs)
-            elif not self.adjustment and status == 'n':
+            elif copy and status == 'n':
                 # looking for copies, so any revisioned file is a
                 # potential source (yes, this will be expensive)
                 # Added and removed files are not considered as copy
                 # sources.
                 srcs.append(abs)
-        if self.adjustment:
+        if not copy:
             simularity = self.adjustment.get_value() / 100.0;
             gen = cmdutil.findrenames
         else:
@@ -323,7 +324,7 @@ class DetectRenameDialog(gtk.Window):
     def find_copies(self):
         'User pressed "find copies" button'
         # call rename function with simularity = 100%
-        self.find_renames()
+        self.find_renames(copy=True)
 
     def accept_match(self):
         'User pressed "accept match" button'
