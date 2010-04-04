@@ -1,4 +1,8 @@
 <Include>
+  <!-- These are component GUIDs used for TortoiseHg installers.
+       YOU MUST CHANGE ALL GUIDs below when copying this file
+       and replace 'TortoiseHg' in this notice with the name of
+       your project. Component GUIDs have global namespace!      -->
 
   <!-- cmenu-i18n.wxs -->
   <?define cmenuI18n.guid = {B0AB4947-248C-4c6b-841C-49284EF99022} ?>

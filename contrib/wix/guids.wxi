@@ -1,4 +1,8 @@
 <Include>
+  <!-- These are component GUIDs used for TortoiseHg installers.
+       YOU MUST CHANGE ALL GUIDs below when copying this file
+       and replace 'TortoiseHg' in this notice with the name of
+       your project. Component GUIDs have global namespace!      -->
 
   <!-- contrib.wxs -->
   <?define contrib.guid = {509AE2EF-3AC6-4661-A9C3-51F663BE83B2} ?>
