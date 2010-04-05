@@ -78,11 +78,14 @@ class UndoableTextBuffer(gtk.TextBuffer):
             """see if we can merge multiple inserts here
 
             will try to merge words or whitespace
+            can't merge if prev is not UndoableInsert
             can't merge if prev and cur are not mergeable in the first place
             can't merge when user set the input bar somewhere else
             can't merge across word boundaries"""
             WHITESPACE = (' ', '\t')
-            if not cur.mergeable or not prev.mergeable:
+            if not isinstance(prev, UndoableInsert):
+                return False
+            elif not cur.mergeable or not prev.mergeable:
                 return False
             elif cur.offset != (prev.offset + prev.length):
                 return False
@@ -91,6 +94,8 @@ class UndoableTextBuffer(gtk.TextBuffer):
             elif prev.text in WHITESPACE and not cur.text in WHITESPACE:
                 return False
             return True
+        def can_be_replaced(prev, cur):
+            return isinstance(prev, UndoableDelete) and prev.time == cur.time
 
         if not self.undo_in_progress:
             self.redo_stack = []
@@ -98,36 +103,34 @@ class UndoableTextBuffer(gtk.TextBuffer):
             return
         undo_action = UndoableInsert(text_iter, text, length)
         try:
-            prev_insert = self.undo_stack.pop()
+            prev_action = self.undo_stack.pop()
         except IndexError:
             self.undo_stack.append(undo_action)
             return
-        if not isinstance(prev_insert, UndoableInsert):
-            if prev_insert.time == undo_action.time:
-                undo_action = UndoableReplace(prev_insert, undo_action)
-            else:
-                self.undo_stack.append(prev_insert)
-            self.undo_stack.append(undo_action)
-            return
-        if can_be_merged(prev_insert, undo_action):
-            prev_insert.length += undo_action.length
-            prev_insert.text += undo_action.text
-            self.undo_stack.append(prev_insert)
+        if can_be_replaced(prev_action, undo_action):
+            undo_action = UndoableReplace(prev_action, undo_action)
+        elif can_be_merged(prev_action, undo_action):
+            prev_action.length += undo_action.length
+            prev_action.text += undo_action.text
+            undo_action = prev_action
         else:
-            self.undo_stack.append(prev_insert)
-            self.undo_stack.append(undo_action)
+            self.undo_stack.append(prev_action)
+        self.undo_stack.append(undo_action)
 
     def on_delete_range(self, text_buffer, start_iter, end_iter):
         def can_be_merged(prev, cur):
             """see if we can merge multiple deletions here
 
             will try to merge words or whitespace
+            can't merge if prev is not UndoableDelete
             can't merge if prev and cur are not mergeable in the first place
             can't merge if delete and backspace key were both used
             can't merge across word boundaries"""
 
             WHITESPACE = (' ', '\t')
-            if not cur.mergeable or not prev.mergeable:
+            if not isinstance(prev, UndoableDelete):
+                return False
+            elif not cur.mergeable or not prev.mergeable:
                 return False
             elif prev.delete_key_used != cur.delete_key_used:
                 return False
@@ -140,6 +143,8 @@ class UndoableTextBuffer(gtk.TextBuffer):
                prev.text not in WHITESPACE:
                 return False
             return True
+        def can_be_replaced(prev, cur):
+            return isinstance(prev, UndoableInsert) and prev.time == cur.time
 
         if not self.undo_in_progress:
             self.redo_stack = []
@@ -147,29 +152,24 @@ class UndoableTextBuffer(gtk.TextBuffer):
             return
         undo_action = UndoableDelete(text_buffer, start_iter, end_iter)
         try:
-            prev_delete = self.undo_stack.pop()
+            prev_action = self.undo_stack.pop()
         except IndexError:
             self.undo_stack.append(undo_action)
             return
-        if not isinstance(prev_delete, UndoableDelete):
-            if prev_delete.time == undo_action.time:
-                undo_action = UndoableReplace(prev_delete, undo_action)
-            else:
-                self.undo_stack.append(prev_delete)
-            self.undo_stack.append(undo_action)
-            return
-        if can_be_merged(prev_delete, undo_action):
-            if prev_delete.start == undo_action.start: # delete key used
-                prev_delete.text += undo_action.text
-                prev_delete.end += (undo_action.end - undo_action.start)
+        if can_be_replaced(prev_action, undo_action):
+            undo_action = UndoableReplace(prev_action, undo_action)
+        elif can_be_merged(prev_action, undo_action):
+            if prev_action.start == undo_action.start: # delete key used
+                prev_action.text += undo_action.text
+                prev_action.end += (undo_action.end - undo_action.start)
             else: # Backspace used
-                prev_delete.text = '%s%s' % (undo_action.text,
-                                             prev_delete.text)
-                prev_delete.start = undo_action.start
-            self.undo_stack.append(prev_delete)
+                prev_action.text = '%s%s' % (undo_action.text,
+                                             prev_action.text)
+                prev_action.start = undo_action.start
+            undo_action = prev_action
         else:
-            self.undo_stack.append(prev_delete)
-            self.undo_stack.append(undo_action)
+            self.undo_stack.append(prev_action)
+        self.undo_stack.append(undo_action)
 
     def begin_not_undoable_action(self):
         """don't record the next actions
