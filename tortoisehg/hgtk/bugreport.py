@@ -74,7 +74,7 @@ class BugReport(gdialog.GWindow):
                         arch = 'x64'
                     elif archval == 0:
                         arch = 'x86'
-                except ImportError:
+                except (ImportError, AttributeError):
                     pass
                 text += '** Processor architecture: %s\n' % arch
             text += self.opts['error']
