@@ -9,14 +9,12 @@
   <!-- lang 'ca' is used for key path -->
 
   <Fragment>
-    <DirectoryRef Id="i18ndir">
+    <DirectoryRef Id="i18ndir" FileSource="$(var.SourceDir)">
       <Directory Id="thgI18nFolder" Name="tortoisehg">
         <Component Id="thgI18nFolder" Guid="$(var.thgI18nFolder.guid)">
-          <File Id="thg.ca.po" Source="$(var.SourceDir)\tortoisehg\ca.po" KeyPath="yes" />
+          <File Id="thg.ca.po" Name="ca.po" KeyPath="yes" />
           <?foreach LANG in $(var.thg_po_langs) ?>
-            <File Id="thg.$(var.LANG).po" 
-                  Source="$(var.SourceDir)\tortoisehg\$(var.LANG).po"
-            />
+            <File Id="thg.$(var.LANG).po" Name="$(var.LANG).po" />
           <?endforeach?>
         </Component>
       </Directory>

@@ -15,13 +15,11 @@
 
   <?foreach LOC in $(var.thglocales) ?>
     <Fragment>
-      <DirectoryRef Id="localedir">
+      <DirectoryRef Id="localedir" FileSource="$(var.SourceDir)">
         <Directory Id="thg.locale.$(var.LOC)" Name="$(var.LOC)">
           <Directory Id="thg.locale.$(var.LOC).LC_MESSAGES" Name="LC_MESSAGES">
             <Component Id="thg.locale.$(var.LOC)" Guid="*">
-              <File Id="tortoisehg.mo.$(var.LOC)" KeyPath="yes" 
-                    Source="$(var.SourceDir)\$(var.LOC)\LC_MESSAGES\tortoisehg.mo"
-              />
+              <File Id="tortoisehg.mo.$(var.LOC)" Name="tortoisehg.mo" KeyPath="yes" />
             </Component>
           </Directory>
         </Directory>
