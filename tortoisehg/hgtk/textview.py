@@ -78,12 +78,14 @@ class UndoableTextBuffer(gtk.TextBuffer):
             """see if we can merge multiple inserts here
 
             will try to merge words or whitespace
-            can't merge if prev is not UndoableInsert
+            can't merge if prev is UndoableDelete
             can't merge if prev and cur are not mergeable in the first place
             can't merge when user set the input bar somewhere else
             can't merge across word boundaries"""
             WHITESPACE = (' ', '\t')
-            if not isinstance(prev, UndoableInsert):
+            if isinstance(prev, UndoableReplace):
+                prev = prev.second
+            if isinstance(prev, UndoableDelete):
                 return False
             elif not cur.mergeable or not prev.mergeable:
                 return False
@@ -110,8 +112,12 @@ class UndoableTextBuffer(gtk.TextBuffer):
         if can_be_replaced(prev_action, undo_action):
             undo_action = UndoableReplace(prev_action, undo_action)
         elif can_be_merged(prev_action, undo_action):
-            prev_action.length += undo_action.length
-            prev_action.text += undo_action.text
+            if isinstance(prev_action, UndoableReplace):
+                merge_action = prev_action.second
+            else:
+                merge_action = prev_action
+            merge_action.length += undo_action.length
+            merge_action.text += undo_action.text
             undo_action = prev_action
         else:
             self.undo_stack.append(prev_action)
@@ -122,13 +128,15 @@ class UndoableTextBuffer(gtk.TextBuffer):
             """see if we can merge multiple deletions here
 
             will try to merge words or whitespace
-            can't merge if prev is not UndoableDelete
+            can't merge if prev is UndoableInsert
             can't merge if prev and cur are not mergeable in the first place
             can't merge if delete and backspace key were both used
             can't merge across word boundaries"""
 
             WHITESPACE = (' ', '\t')
-            if not isinstance(prev, UndoableDelete):
+            if isinstance(prev, UndoableReplace):
+                prev = prev.second
+            if isinstance(prev, UndoableInsert):
                 return False
             elif not cur.mergeable or not prev.mergeable:
                 return False
@@ -159,13 +167,17 @@ class UndoableTextBuffer(gtk.TextBuffer):
         if can_be_replaced(prev_action, undo_action):
             undo_action = UndoableReplace(prev_action, undo_action)
         elif can_be_merged(prev_action, undo_action):
-            if prev_action.start == undo_action.start: # delete key used
-                prev_action.text += undo_action.text
-                prev_action.end += (undo_action.end - undo_action.start)
+            if isinstance(prev_action, UndoableReplace):
+                merge_action = prev_action.second
+            else:
+                merge_action = prev_action
+            if merge_action.start == undo_action.start: # delete key used
+                merge_action.text += undo_action.text
+                merge_action.end += (undo_action.end - undo_action.start)
             else: # Backspace used
-                prev_action.text = '%s%s' % (undo_action.text,
-                                             prev_action.text)
-                prev_action.start = undo_action.start
+                merge_action.text = '%s%s' % (undo_action.text,
+                                              merge_action.text)
+                merge_action.start = undo_action.start
             undo_action = prev_action
         else:
             self.undo_stack.append(prev_action)
