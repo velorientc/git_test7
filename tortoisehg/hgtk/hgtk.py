@@ -105,7 +105,6 @@ def portable_fork(ui, opts):
     os.environ['THG_HGTK_SPAWN'] = '1'
     cmdline = subprocess.list2cmdline(args)
     subprocess.Popen(cmdline,
-                     close_fds=True,
                      creationflags=openflags,
                      shell=True)
     sys.exit(0)
