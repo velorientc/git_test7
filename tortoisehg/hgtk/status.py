@@ -1047,14 +1047,17 @@ class GStatus(gdialog.GWindow):
             opts.git = True
             wctx = self.repo[None]
             pctx1, pctx2 = wctx.parents()
-            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
-                        pctx1.rev(), str(pctx1))]
-            for s in patch.diff(self.repo, pctx1.node(), None, opts=opts):
-                difftext.extend(s.splitlines(True))
-            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
-                            pctx2.rev(), str(pctx2)))
-            for s in patch.diff(self.repo, pctx2.node(), None, opts=opts):
-                difftext.extend(s.splitlines(True))
+            header = _('===== Diff to %s parent %d:%s =====\n')
+            difftext = [header % (_('first'), pctx1.rev(), str(pctx1))]
+            try:
+                for s in patch.diff(self.repo, pctx1.node(), None, opts=opts):
+                    difftext.extend(s.splitlines(True))
+                difftext.append('\n')
+                difftext.append(header % (_('second'), pctx2.rev(), str(pctx2)))
+                for s in patch.diff(self.repo, pctx2.node(), None, opts=opts):
+                    difftext.extend(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
         else:
             buf = cStringIO.StringIO()
             for row in self.filemodel:
@@ -1118,23 +1121,29 @@ class GStatus(gdialog.GWindow):
         opts = patch.diffopts(self.ui, self.opts)
         opts.git = True
         difftext = []
+        header = _('===== Diff to %s parent %d:%s =====\n') 
         if self.is_merge():
             wctx = self.repo[None]
             pctx1, pctx2 = wctx.parents()
-            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
-                        pctx1.rev(), str(pctx1))]
-            for s in patch.diff(self.repo, pctx1.node(), None,
-                                match=matcher, opts=opts):
-                difftext.extend(s.splitlines(True))
-            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
-                            pctx2.rev(), str(pctx2)))
-            for s in patch.diff(self.repo, pctx2.node(), None,
-                                match=matcher, opts=opts):
-                difftext.extend(s.splitlines(True))
+            difftext = [header % (_('first'), pctx1.rev(), str(pctx1))]
+            try:
+                for s in patch.diff(self.repo, pctx1.node(), None,
+                                    match=matcher, opts=opts):
+                    difftext.extend(s.splitlines(True))
+                difftext.append('\n')
+                difftext.append(header % (_('second'), pctx2.rev(), str(pctx2)))
+                for s in patch.diff(self.repo, pctx2.node(), None,
+                                    match=matcher, opts=opts):
+                    difftext.extend(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
         else:
-            for s in patch.diff(self.repo, self._node1, self._node2,
-                    match=matcher, opts=opts):
-                difftext.extend(s.splitlines(True))
+            try:
+                for s in patch.diff(self.repo, self._node1, self._node2,
+                        match=matcher, opts=opts):
+                    difftext.extend(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
         return self.diff_highlight_buffer(difftext)
 
 
@@ -1174,9 +1183,12 @@ class GStatus(gdialog.GWindow):
         else:
             matcher = cmdutil.matchfiles(self.repo, [pfile])
             diffopts = mdiff.diffopts(git=True, nodates=True)
-            for s in patch.diff(self.repo, self._node1, self._node2,
-                    match=matcher, opts=diffopts):
-                difftext.writelines(s.splitlines(True))
+            try:
+                for s in patch.diff(self.repo, self._node1, self._node2,
+                        match=matcher, opts=diffopts):
+                    difftext.writelines(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
             difftext.seek(0)
         return hgshelve.parsepatch(difftext)
 
