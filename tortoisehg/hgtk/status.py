@@ -760,7 +760,7 @@ class GStatus(gdialog.GWindow):
                                      clean=clean,
                                      unknown=unknown)
                 self.status = status
-            except (IOError, util.Abort), e:
+            except (OSError, IOError, util.Abort), e:
                 self.status_error = str(e)
             self.subrepos = []
             wctx = repo[None]
@@ -768,7 +768,7 @@ class GStatus(gdialog.GWindow):
                 for s in wctx.substate:
                     if matcher(s) and wctx.sub(s).dirty():
                         self.subrepos.append(s)
-            except (IOError, error.ConfigError), e:
+            except (OSError, IOError, error.ConfigError), e:
                 self.status_error = str(e)
 
         def status_wait(thread):
