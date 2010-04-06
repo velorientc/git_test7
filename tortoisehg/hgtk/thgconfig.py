@@ -65,9 +65,9 @@ INFO = (
         _('Show a full directory path of the repository in the dialog title'
         ' instead of just the root directory name.  Default: False')),
     ) + (gtklib.hasspellcheck() and
-    (_('Spell Check Language'), 'tortoisehg.spellcheck', [],
+    ((_('Spell Check Language'), 'tortoisehg.spellcheck', [],
         _('Default language for spell check. System language is'
-        ' used if not specified. Examples: en, en_GB, en_US'),) or ())),
+        ' used if not specified. Examples: en, en_GB, en_US')),) or ())),
 
 ({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit.ico'}, (
     (_('Username'), 'ui.username', [],
