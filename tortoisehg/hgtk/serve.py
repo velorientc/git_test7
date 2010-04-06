@@ -18,7 +18,7 @@ import threading
 import time
 
 from mercurial import hg, ui, commands, cmdutil, util, error
-from mercurial.hgweb import server
+from mercurial.hgweb import server, hgweb_mod
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -214,9 +214,8 @@ class ServeDialog(gtk.Window):
             threading.Thread(target=start_browser).start()
 
     def _on_conf_clicked(self, *args):
-        dlg = thgconfig.ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True, focus='web.name')
         dlg.show_all()
-        dlg.focus_field('web.name')
         dlg.run()
         dlg.hide()
         self._get_config()
@@ -312,7 +311,8 @@ def thg_serve(ui, repo, **opts):
                         baseui.setconfig("web", o, str(opts[o]))
                         if repoui:
                             repoui.setconfig("web", o, str(opts[o]))
-                self.httpd = server.create_server(ui, repo)
+                app = hgweb_mod.hgweb(hg.repository(repo.ui, repo.root))
+                self.httpd = server.create_server(ui, app)
             except socket.error, inst:
                 raise util.Abort(_('cannot start server: ') + inst.args[1])
 
