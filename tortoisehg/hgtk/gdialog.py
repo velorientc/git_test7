@@ -731,6 +731,9 @@ class GDialog(gtk.Dialog):
         # signal handler
         self.connect('realize', self.realized)
 
+        # disable entire dialog
+        self.set_sensitive(False)
+
     ### Overridable Functions ###
 
     def get_title(self, reponame):
@@ -799,6 +802,16 @@ class GDialog(gtk.Dialog):
         # add Abort button
         self.action_area.add(self.buttons['abort'])
 
+        # enable entire dialog
+        self.set_sensitive(True)
+
+        # focus on default button if needs
+        name = self.get_default_button()
+        if name:
+            btn = self.buttons.get(name)
+            if btn:
+                btn.grab_focus()
+
     def do_switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
             normal = True
@@ -855,13 +868,6 @@ class GDialog(gtk.Dialog):
         if self.earlyout:
             gtklib.idle_add_single_call(self.destroy)
             return
-
-        # focus on default button if needs
-        name = self.get_default_button()
-        if name:
-            btn = self.buttons.get(name)
-            if btn:
-                btn.grab_focus()
 
         # signal handler
         self.connect('response', self.dialog_response)
