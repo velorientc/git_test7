@@ -845,7 +845,7 @@ class GDialog(gtk.Dialog):
         self.do_switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
-    ### Signal Handler ###
+    ### Signal Handlers ###
 
     def realized(self, *args):
         # set title
