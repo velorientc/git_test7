@@ -326,9 +326,11 @@ def hgcmd_toq(q, *args):
             else:
                 for a in args:
                     q.put(str(a))
+
+        def plain(self):
+            return True
+
     u = Qui()
-    for k, v in u.configitems('defaults'):
-        u.setconfig('defaults', k, '')
     return dispatch._dispatch(u, list(args))
 
 def get_reponame(repo):
