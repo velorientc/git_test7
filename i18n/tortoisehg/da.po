@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
 "POT-Creation-Date: 2010-04-01 05:09+0000\n"
-"PO-Revision-Date: 2010-04-03 19:38+0000\n"
+"PO-Revision-Date: 2010-04-05 13:36+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-04 03:55+0000\n"
+"X-Launchpad-Export-Date: 2010-04-06 04:05+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: TortoiseHgOverlayServer.py:36
@@ -2485,7 +2485,8 @@ msgstr ""
 msgid "%s (submitted)"
 msgstr "%s (indsendt)"
 
-#: tortoisehg\hgtk\history.py:557 tortoisehg\hgtk\history.py:563
+#: tortoisehg\hgtk\history.py:557
+#: tortoisehg\hgtk\history.py:563
 msgid "%s (pending)"
 msgstr ""
 
@@ -5342,7 +5343,8 @@ msgstr ""
 msgid "F_old"
 msgstr ""
 
-#: tortoisehg\hgtk\thgmq.py:784 tortoisehg\hgtk\thgmq.py:816
+#: tortoisehg\hgtk\thgmq.py:784
+#: tortoisehg\hgtk\thgmq.py:816
 msgid "Reorder"
 msgstr ""
 

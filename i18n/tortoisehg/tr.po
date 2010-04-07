@@ -6,15 +6,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"Report-Msgid-Bugs-To: Turkish <tr@li.org>\n"
 "POT-Creation-Date: 2010-04-01 05:09+0000\n"
-"PO-Revision-Date: 2010-04-05 03:05+0000\n"
-"Last-Translator: Göksel GÜREN <Unknown>\n"
+"PO-Revision-Date: 2010-04-05 12:18+0000\n"
+"Last-Translator: Turkish <Unknown>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-05 03:56+0000\n"
+"X-Launchpad-Export-Date: 2010-04-06 04:07+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: TortoiseHgOverlayServer.py:36
@@ -2417,7 +2417,8 @@ msgstr ""
 msgid "%s (submitted)"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:557 tortoisehg\hgtk\history.py:563
+#: tortoisehg\hgtk\history.py:557
+#: tortoisehg\hgtk\history.py:563
 msgid "%s (pending)"
 msgstr ""
 
@@ -5172,7 +5173,8 @@ msgstr ""
 msgid "F_old"
 msgstr ""
 
-#: tortoisehg\hgtk\thgmq.py:784 tortoisehg\hgtk\thgmq.py:816
+#: tortoisehg\hgtk\thgmq.py:784
+#: tortoisehg\hgtk\thgmq.py:816
 msgid "Reorder"
 msgstr ""
 
@@ -5914,3 +5916,6 @@ msgstr ""
 #: tortoisehg\util\version.py:17
 msgid "repository %s not found"
 msgstr ""
+
+#~ msgid "Options..."
+#~ msgstr "Seçenekler..."

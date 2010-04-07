@@ -21,6 +21,9 @@ LABELS = { 'add': (_('Select files to add'), _('Add')),
            'revert': (_('Select files to revert'), _('Revert')),
            'remove': (_('Select files to remove'), _('Remove')),}
 
+DEFAULT_SIZE = (450, 300)
+DEFAULT_POS = (0, 0)
+
 class QuickOpDialog(gdialog.GDialog):
     """ Dialog for performing quick dirstate operations """
     def __init__(self, command, pats):
@@ -46,7 +49,10 @@ class QuickOpDialog(gdialog.GDialog):
         return 'hg.ico'
 
     def get_defsize(self):
-        return (450, 300)
+        return self.defsize
+
+    def get_setting_name(self):
+        return 'quickop'
 
     def get_body(self, vbox):
         os.chdir(self.repo.root)
@@ -207,6 +213,36 @@ class QuickOpDialog(gdialog.GDialog):
             self.cmd.set_result(_('Canceled'), style='error')
         else:
             self.cmd.set_result(_('Failed'), style='error')
+
+    def before_show(self):
+        # restore dialog state
+        if self.defmax:
+            self.maximize()
+
+        # restore dialog position
+        screen = self.get_screen()
+        w, h = screen.get_width(), screen.get_height()
+        x, y = self.defpos
+        if x >= 0 and x < w and y >= 0 and y < h:
+            self.move(x, y)
+
+    def load_settings(self):
+        self.defsize = self.settings.get_value('size', DEFAULT_SIZE)
+        self.defpos = self.settings.get_value('pos', DEFAULT_POS)
+        self.defmax = self.settings.get_value('maximize', False)
+
+    def store_settings(self):
+        state = self.window.get_state()
+        ismaximized = bool(state & gtk.gdk.WINDOW_STATE_MAXIMIZED)
+        if ismaximized or state & gtk.gdk.WINDOW_STATE_ICONIFIED:
+            self.settings.set_value('size', DEFAULT_SIZE)
+            self.settings.set_value('pos', DEFAULT_POS)
+        else:
+            rect = self.get_allocation()
+            self.settings.set_value('size', (rect.width, rect.height))
+            self.settings.set_value('pos', self.get_position())
+        self.settings.set_value('maximize', ismaximized)
+        self.settings.write()
 
     ### End of Overriding Section ###
 
