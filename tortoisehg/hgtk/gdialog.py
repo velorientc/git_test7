@@ -770,6 +770,9 @@ class GDialog(gtk.Dialog):
     def command_done(self, returncode, useraborted, *args):
         pass
 
+    def before_show(self):
+        pass
+
     def before_close(self):
         return True
 
@@ -874,6 +877,7 @@ class GDialog(gtk.Dialog):
         self.connect('response', self.dialog_response)
 
         # prepare to show
+        self.before_show()
         self.vbox.show_all()
         gtklib.idle_add_single_call(self.after_init)
 
