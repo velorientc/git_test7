@@ -54,7 +54,7 @@ class SynchDialog(gtk.Window):
 
         # toolbar
         self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
+        self.tips = gtklib.Tooltips()
         self.stop_button = self.toolbutton(gtk.STOCK_STOP,
                 _('Stop'), self.stop_clicked, tip=_('Stop the hg operation'))
         self.stop_button.set_sensitive(False)
@@ -415,7 +415,7 @@ class SynchDialog(gtk.Window):
 
         tbutton.set_label(label)
         if tip:
-            tbutton.set_tooltip(self.tips, tip)
+            self.tips.set_tip(tbutton, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
 

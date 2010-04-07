@@ -1763,13 +1763,13 @@ class GLog(gdialog.GWindow):
 
         # create apply/reject toolbar buttons
         apply = gtk.ToolButton(gtk.STOCK_APPLY)
-        apply.set_tooltip(self.tooltips,
+        self.tooltips.set_tip(apply,
                           _('Accept incoming previewed changesets'))
         apply.set_label(_('Accept'))
         apply.show()
 
         reject = gtk.ToolButton(gtk.STOCK_DIALOG_ERROR)
-        reject.set_tooltip(self.tooltips,
+        self.tooltips.set_tip(reject,
                            _('Reject incoming previewed changesets'))
         reject.set_label(_('Reject'))
         reject.show()

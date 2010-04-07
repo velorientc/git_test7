@@ -44,6 +44,17 @@ PBLUE = '#aaddff'
 PYELLOW = '#ffffaa'
 PORANGE = '#ffddaa'
 
+if gtk.pygtk_version < (2, 12, 0):
+    # old nasty
+    Tooltips = gtk.Tooltips
+else:
+    # new shiny
+    class Tooltips(object):
+        def __init__(self):
+            pass
+        def set_tip(self, widget, tip):
+            widget.set_tooltip_text(tip)
+
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
     if ico: window.set_icon_from_file(ico)

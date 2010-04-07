@@ -32,7 +32,7 @@ class GotoRevDialog(gtk.Dialog):
 
         self.gotofunc = gotofunc
 
-        self.tips = gtk.Tooltips()
+        self.tips = gtklib.Tooltips()
 
         hbox = gtk.HBox()
         self.revEntry = gtk.Entry()

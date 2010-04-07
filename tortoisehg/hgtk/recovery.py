@@ -41,7 +41,7 @@ class RecoveryDialog(gtk.Window):
 
         # toolbar
         self.tbar = gtk.Toolbar()
-        self.tips = gtk.Tooltips()
+        self.tips = gtklib.Tooltips()
         self._stop_button = self._toolbutton(gtk.STOCK_STOP,
                 _('Stop'), self._stop_clicked, tip=_('Stop the hg operation'))
         self._stop_button.set_sensitive(False)
@@ -115,7 +115,7 @@ class RecoveryDialog(gtk.Window):
 
         tbutton.set_label(label)
         if tip:
-            tbutton.set_tooltip(self.tips, tip)
+            self.tips.set_tip(tbutton, tip)
         tbutton.connect('clicked', handler, userdata)
         return tbutton
 

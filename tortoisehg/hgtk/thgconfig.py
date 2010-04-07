@@ -657,7 +657,7 @@ class ConfigDialog(gtk.Dialog):
 
         self.dirty = False
         self.pages = {}
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = gtklib.Tooltips()
         self.history = settings.Settings('thgconfig')
 
         # add spell ckeck entry if spell check is supported

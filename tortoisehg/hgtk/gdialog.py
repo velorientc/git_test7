@@ -260,7 +260,7 @@ class GWindow(gtk.Window):
             self.show_all()
         else:
             self._parse_opts()
-            self.tooltips = gtk.Tooltips()
+            self.tooltips = gtklib.Tooltips()
 
 
     def test_opt(self, opt):
@@ -326,7 +326,7 @@ class GWindow(gtk.Window):
             tbutton = gtk.ToolButton(stock)
 
         if tip:
-            tbutton.set_tooltip(self.tooltips, tip)
+            self.tooltips.set_tip(tbutton, tip)
         if icon:
             image = gtklib.get_icon_image(icon)
             tbutton.set_icon_widget(image)
@@ -461,7 +461,7 @@ class GWindow(gtk.Window):
         if x >= 0 and x < w and y >= 0 and y < h:
             self.move(x, y)
 
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = gtklib.Tooltips()
         toolbar = gtk.Toolbar()
         tbuttons =  self.get_tbbuttons()
         for tbutton in tbuttons:

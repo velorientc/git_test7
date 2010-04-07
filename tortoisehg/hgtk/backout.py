@@ -71,7 +71,7 @@ class BackoutDialog(gdialog.GDialog):
         msgvbox.pack_start(scrolledwindow)
 
         ## tooltips
-        self.tips = gtk.Tooltips()
+        self.tips = gtklib.Tooltips()
         self.tips.set_tip(frame,
                 _('Commit message text for new changeset that reverses the'
                 '  effect of the change being backed out.'))

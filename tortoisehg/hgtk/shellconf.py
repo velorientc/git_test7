@@ -126,7 +126,7 @@ class ShellConfigWindow(gtk.Window):
         hbox.pack_start(self.hgighlight_taskbaricon, False, False, 2)        
 
         # Tooltips
-        tips = gtk.Tooltips()
+        tips = gtklib.Tooltips()
 
         tooltip = _('Enable/Disable the overlay icons globally')
         tips.set_tip(self.ovenable, tooltip)

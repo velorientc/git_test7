@@ -56,7 +56,7 @@ class ServeDialog(gtk.Window):
 
         # toolbar
         self.tbar = gtk.Toolbar()
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = gtklib.Tooltips()
         self._button_start = self._toolbutton(gtk.STOCK_MEDIA_PLAY,
                                               _('Start'),
                                               self._on_start_clicked,
@@ -142,7 +142,7 @@ class ServeDialog(gtk.Window):
             tbutton = gtk.ToolButton(stock)
 
         if tip:
-            tbutton.set_tooltip(self.tooltips, tip)
+            self.tooltips.set_tip(tbutton, tip)
 
         tbutton.set_label(label)
         tbutton.connect('clicked', handler, userdata)

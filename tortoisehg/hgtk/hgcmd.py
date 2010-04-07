@@ -257,7 +257,7 @@ class CmdWidget(gtk.VBox):
 
         # tooltips
         if tooltips is None:
-            tooltips = gtk.Tooltips()
+            tooltips = gtklib.Tooltips()
 
         # log viewer
         if self.is_normal:
