@@ -337,10 +337,12 @@ class EmailDialog(gtk.Window):
             cmdline += ['--intro']
         tmpfile = None
         try:
-            fd, tmpfile = tempfile.mkstemp(prefix="thg_emaildesc_")
-            os.write(fd, desc)
-            os.close(fd)
-            cmdline += ['--desc', tmpfile]
+            if desc or not hasattr(extensions.find('patchbomb'), 'introneeded'):
+                # --desc is interpreted differently after hg 1.5
+                fd, tmpfile = tempfile.mkstemp(prefix="thg_emaildesc_")
+                os.write(fd, desc)
+                os.close(fd)
+                cmdline += ['--desc', tmpfile]
             cmdline.extend(self.revargs)
 
             dlg = hgcmd.CmdDialog(cmdline)
