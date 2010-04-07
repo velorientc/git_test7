@@ -658,7 +658,7 @@ class GCommit(GStatus):
 
         btn = self.get_toolbutton('commit')
         btn.set_label(label)
-        btn.set_tooltip(self.tooltips, tooltip)
+        self.tooltips.set_tip(btn, tooltip)
 
     def get_head_info(self):
         def ishead(ctx):

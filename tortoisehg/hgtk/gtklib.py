@@ -49,6 +49,17 @@ PBLUE = '#aaddff'
 PYELLOW = '#ffffaa'
 PORANGE = '#ffddaa'
 
+if gtk.pygtk_version < (2, 12, 0):
+    # old nasty
+    Tooltips = gtk.Tooltips
+else:
+    # new shiny
+    class Tooltips(object):
+        def __init__(self):
+            pass
+        def set_tip(self, widget, tip):
+            widget.set_tooltip_text(tip)
+
 RED = 'red'
 GREEN = 'green'
 BLUE = 'blue'
