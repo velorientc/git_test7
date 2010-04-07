@@ -722,12 +722,6 @@ class GDialog(gtk.Dialog):
         name = self.get_setting_name()
         if name:
             self.settings = settings.Settings(name)
-            self.load_settings()
-
-        # dialog size
-        defsize = self.get_defsize()
-        if defsize != (-1, -1):
-            self.set_default_size(*defsize)
 
         # signal handler
         self.connect('realize', self.realized)
@@ -872,6 +866,14 @@ class GDialog(gtk.Dialog):
         if self.earlyout:
             gtklib.idle_add_single_call(self.destroy)
             return
+
+        # load persistent settings
+        self.load_settings()
+
+        # dialog size
+        defsize = self.get_defsize()
+        if defsize != (-1, -1):
+            self.set_default_size(*defsize)
 
         # signal handler
         self.connect('response', self.dialog_response)
