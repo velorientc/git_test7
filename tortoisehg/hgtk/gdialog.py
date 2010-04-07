@@ -722,6 +722,7 @@ class GDialog(gtk.Dialog):
         name = self.get_setting_name()
         if name:
             self.settings = settings.Settings(name)
+            self.load_settings()
 
         # dialog size
         defsize = self.get_defsize()
@@ -873,7 +874,6 @@ class GDialog(gtk.Dialog):
         self.connect('response', self.dialog_response)
 
         # prepare to show
-        self.load_settings()
         self.vbox.show_all()
         gtklib.idle_add_single_call(self.after_init)
 
