@@ -204,9 +204,15 @@ def visualdiff(ui, repo, pats, opts):
     diffcmd, diffopts, mergeopts = detectedtools[preferred]
 
     # Disable 3-way merge if there is only one parent or no tool support
-    do3way = bool(mergeopts) and ctx1b is not None
-    if do3way:
-        args = mergeopts
+    do3way = False
+    if ctx1b:
+        if mergeopts:
+            do3way = True
+            args = mergeopts
+        else:
+            args = diffopts
+            if str(ctx1b.rev()) in revs:
+                ctx1a = ctx1b
     else:
         args = diffopts
 
