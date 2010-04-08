@@ -86,6 +86,7 @@ class GStatus(gdialog.GWindow):
         self.mode = 'status'
         self.ready = False
         self.filechunks = {}
+        self.diffmodelfile = None
         self.status = (None,) * 7
         self.status_error = None
         self.preview_tab_name_label = None
@@ -703,6 +704,7 @@ class GStatus(gdialog.GWindow):
             if row[FM_PARTIAL_SELECTED]:
                 self.update_hunk_model(i, self.filetree)
                 self.diffmodel.clear()
+                self.diffmodelfile = None
 
         # recover selections
         firstrow = None
@@ -722,6 +724,7 @@ class GStatus(gdialog.GWindow):
             self.preview_text.set_buffer(gtk.TextBuffer())
             if not is_merge:
                 self.diffmodel.clear()
+                self.diffmodelfile = None
 
         self.filetree.show()
         if self.mode == 'commit':
@@ -828,6 +831,8 @@ class GStatus(gdialog.GWindow):
         chunks = self.filechunks[wfile]
         for chunk in chunks:
             chunk.active = selected
+        if wfile != self.diffmodelfile:
+            return
         for n, chunk in enumerate(chunks):
             if n == 0:
                 continue
@@ -1152,6 +1157,7 @@ class GStatus(gdialog.GWindow):
         # Read this file's diffs into hunk selection model
         wfile = self.filemodel[path][FM_PATH]
         self.diffmodel.clear()
+        self.diffmodelfile = wfile
         if not self.is_merge():
             self.append_diff_hunks(wfile)
             if len(self.diffmodel):
