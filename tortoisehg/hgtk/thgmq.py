@@ -85,6 +85,9 @@ class MQWidget(gtk.VBox):
                           gobject.TYPE_NONE,
                           (object, # list of dropped files/dirs
                            str))   # raw string data
+        ,'close-mq': (gobject.SIGNAL_RUN_FIRST,
+                      gobject.TYPE_NONE,
+                      ())
     }
 
     def __init__(self, repo, accelgroup=None, tooltips=None):
@@ -130,6 +133,10 @@ class MQWidget(gtk.VBox):
             menubtn.child.get_children()[0].hide()
         gtklib.idle_add_single_call(after_init)
         self.pack_start(tbar, False, False)
+
+        closebtn = tbar.append_button(gtk.STOCK_CLOSE, _('Close'))
+        closebtn.connect('clicked', lambda *a: self.emit('close-mq'))
+        self.btn['close'] = closebtn
 
         # center pane
         mainbox = gtk.VBox()

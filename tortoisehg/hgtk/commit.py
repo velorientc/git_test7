@@ -453,6 +453,7 @@ class GCommit(GStatus):
             self.mqwidget = thgmq.MQWidget(self.repo, accelgroup,
                                            self.tooltips)
             self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
+            self.mqwidget.connect('close-mq', lambda *a: self.enable_mqpanel(False))
 
             def wrapframe(widget):
                 frame = gtk.Frame()

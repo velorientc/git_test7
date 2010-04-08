@@ -1649,6 +1649,7 @@ class GLog(gdialog.GWindow):
             self.mqwidget.connect('patch-selected', self.patch_selected)
             self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
             self.mqwidget.connect('files-dropped', self.files_dropped)
+            self.mqwidget.connect('close-mq', lambda *a: self.enable_mqpanel(False))
 
             def wrapframe(widget):
                 frame = gtk.Frame()
