@@ -1,383 +1,86 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Fragment>
-        <ComponentGroup Id="iconsFolder">
-            <Component Id="cmp940F6861897C3B3E9FC0E30442A700E4" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{A0A2787C-213B-4E15-9680-78E92BC0854B}">
-                <File Id="filE301430596796E88DF8537536E3243B5" KeyPath="yes" Source="$(var.SourceDir)\branch.ico" />
-            </Component>
-            <Component Id="cmp8444A6872D2A3B1F5CB3E0650085F4DF" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{38B88524-7291-46DF-BB6D-64BB0CBCEF1D}">
-                <File Id="filD68BB470D104852C3A143524C5728F7D" KeyPath="yes" Source="$(var.SourceDir)\detect_rename.ico" />
-            </Component>
-            <Component Id="cmp19762004C87B2DDCE2ACE5FFF8B1D2FE" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{CA54A711-9E52-48C3-B5BD-492E697BB3DC}">
-                <File Id="filDC4FD3B70B9D31BA4B80AC9638C71D2D" KeyPath="yes" Source="$(var.SourceDir)\fileadd.ico" />
-            </Component>
-            <Component Id="cmp1BC5F46F987CB5D41308690EAC251F5C" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{D22F3B74-45E9-44F5-A8B6-D45802F643A9}">
-                <File Id="fil6704DB5DF40C77EA1069E35C1ED58F55" KeyPath="yes" Source="$(var.SourceDir)\filedelete.ico" />
-            </Component>
-            <Component Id="cmp05844B78F017832C3CDF256FF4D9BEA4" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{3E3A249C-BCB8-4706-8C2B-F0C79224511A}">
-                <File Id="fil34C975A4633ADA70A98FCA050C2F6DF4" KeyPath="yes" Source="$(var.SourceDir)\filemodify.ico" />
-            </Component>
-            <Component Id="cmpBC3509093C0E0DC76F447CD7C13D611C" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{37D473C4-7DEB-43FF-A17F-35217CBD5C65}">
-                <File Id="fil9C7E366BCEA59A42D455B659F306B4D1" KeyPath="yes" Source="$(var.SourceDir)\general.ico" />
-            </Component>
-            <Component Id="cmp43F3267B7E3A23EDE40E8E1636D70833" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{3220FCD5-1F5E-4E84-AE15-31FF68E05BB1}">
-                <File Id="fil8E75672B7DF2F90BE706DFE2D5439E36" KeyPath="yes" Source="$(var.SourceDir)\hg.ico" />
-            </Component>
-            <Component Id="cmp0DE2DB90084512BF788BA64C189B7A9E" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{43A2E176-428E-483B-BB29-B85DCFFE797E}">
-                <File Id="fil11A37B983F320ECEF963FB8C11AFD83C" KeyPath="yes" Source="$(var.SourceDir)\hgB.ico" />
-            </Component>
-            <Component Id="cmpB45252071A67D987BEE956EDFD2A7591" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{86FF0C5C-06FE-4272-9BD7-9A90B353DCBD}">
-                <File Id="filD0E7CACC3FE8E6CACD7DFC3F5AE50C0A" KeyPath="yes" Source="$(var.SourceDir)\hg_60.ico" />
-            </Component>
-            <Component Id="cmp2463C7A17B0598A94B7D79E1E24ED91F" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{E3861129-1172-4071-AEC1-B7D921F69249}">
-                <File Id="filCA999B4550C6DA46752535933A8B513E" KeyPath="yes" Source="$(var.SourceDir)\ignore.ico" />
-            </Component>
-            <Component Id="cmp8E30BF02526D87F2B74EBF79734E194A" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{A5DE3AA7-2543-4FE6-A2B1-321CDACF5A22}">
-                <File Id="filB6F43A78D058A96EDDA135DD3B116078" KeyPath="yes" Source="$(var.SourceDir)\menuabout.ico" />
-            </Component>
-            <Component Id="cmp15C6F4E4573A5E2E8CB8DEFF3D5F55C8" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{50F43BD3-19E7-4853-8033-C5FF9CB59521}">
-                <File Id="fil8097592CBFD53D6B8D42AC3B9341464D" KeyPath="yes" Source="$(var.SourceDir)\menuadd.ico" />
-            </Component>
-            <Component Id="cmpD42F493F4448B33A00DD1B5EA68FB466" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{B8519503-CE38-4E16-85DC-BD17F4585E1C}">
-                <File Id="fil5CD793619C9B829D783663BCBAB7F3F2" KeyPath="yes" Source="$(var.SourceDir)\menublame.ico" />
-            </Component>
-            <Component Id="cmp382B798F7B5D675C4AE2C8F377FF5EDB" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{1698CFF7-2C72-4E51-9F59-E3726453C49A}">
-                <File Id="filBDE855C24F5CF9958BF130ABC163D83D" KeyPath="yes" Source="$(var.SourceDir)\menucheckout.ico" />
-            </Component>
-            <Component Id="cmpE4D30970CFF52C9658121148A51B8B2B" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{25138801-A4E6-4D1C-A44E-2B6A80E3C8AD}">
-                <File Id="fil2F1C5EB5CE5502C441D65F1045D379F7" KeyPath="yes" Source="$(var.SourceDir)\menuclone.ico" />
-            </Component>
-            <Component Id="cmp8636AD47938B73D2908045141F3F0D15" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{1EA67ED3-EA5A-46D1-BB05-27BAA7EC283F}">
-                <File Id="filBC4008920F14B777C93DA31B010D35C0" KeyPath="yes" Source="$(var.SourceDir)\menucommit.ico" />
-            </Component>
-            <Component Id="cmp8825C9F7DE175849A4D7836722CEC812" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{6C6DB4E9-B0BC-4253-9A6D-8EF98A8E4BD4}">
-                <File Id="fil7FA80CFD0D08172D498F8C09E4D7E223" KeyPath="yes" Source="$(var.SourceDir)\menucreaterepos.ico" />
-            </Component>
-            <Component Id="cmp5EE58480D5C9CB9B9ED5350260394B1E" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{3FE3A28D-D3D7-4A2F-988D-5EAD980FC019}">
-                <File Id="fil11CB17BF5668C273B402E0F3C4374670" KeyPath="yes" Source="$(var.SourceDir)\menudelete.ico" />
-            </Component>
-            <Component Id="cmpC0EC8333CB4C8D2CFEB141DDC8F79791" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{2049A4F0-E4DF-4231-9380-242F64C50F86}">
-                <File Id="fil5F70DAEC180798E53B4A693A203E5055" KeyPath="yes" Source="$(var.SourceDir)\menudiff.ico" />
-            </Component>
-            <Component Id="cmp84CF4CA63C489ACA2E0D15CE6B8C2E03" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{ECCA51BB-80C6-467F-98CF-AED5FC3748DE}">
-                <File Id="fil463615CE5BC263C352E338DF6EAC20DE" KeyPath="yes" Source="$(var.SourceDir)\menuhelp.ico" />
-            </Component>
-            <Component Id="cmpA97F1606670D9118B5F6834B3F8E627D" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{3E6AD3C3-B9F8-4AFD-BE4B-6F11ECF20ECB}">
-                <File Id="fil9760E6A7C5ADE8E78F7F570692FF9816" KeyPath="yes" Source="$(var.SourceDir)\menuimport.ico" />
-            </Component>
-            <Component Id="cmpC3EFACA18E76D45046FA5679D358DD81" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{A503951E-2F4E-4422-AB1B-968F3E5D02EA}">
-                <File Id="fil119E696AB67B8CD5961708FB2463F07B" KeyPath="yes" Source="$(var.SourceDir)\menulog.ico" />
-            </Component>
-            <Component Id="cmpBA8EDE2F06AF0770383A8C39AF4DD973" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{BEFE19EB-F4A2-4151-9CA3-D7A52D696462}">
-                <File Id="fil58FDBAF5DE0ACC0DEE04843F6A754AB1" KeyPath="yes" Source="$(var.SourceDir)\menumerge.ico" />
-            </Component>
-            <Component Id="cmpF6CC351B4C89DAD084FFAA78A2B2EDED" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{D6E846F9-5206-4924-B9D0-F5983B83B2FC}">
-                <File Id="filD36F1D8C962D8045D04D15B73AC9D363" KeyPath="yes" Source="$(var.SourceDir)\menupatch.ico" />
-            </Component>
-            <Component Id="cmpDBEDFD6AAEBAB75BB3FD0780095C8C77" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{D821F6FB-5AD3-4C70-8D2D-80B6E960DFEC}">
-                <File Id="fil25FF590FDA5704380176425BAA644139" KeyPath="yes" Source="$(var.SourceDir)\menurelocate.ico" />
-            </Component>
-            <Component Id="cmp011C8A997B265ACC62EDBCAAFF0BFA46" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{F122BD40-6040-49FC-8F44-A84C1927AC7F}">
-                <File Id="fil5A02937C9A73D41B4C5B811827053227" KeyPath="yes" Source="$(var.SourceDir)\menurepobrowse.ico" />
-            </Component>
-            <Component Id="cmp0E4568555584B076DBC563195D75DD2D" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{4C549E02-B4D6-43CA-99B4-3DC42D0595A0}">
-                <File Id="fil140977C9460E7C2885C46DA608B92C81" KeyPath="yes" Source="$(var.SourceDir)\menurevert.ico" />
-            </Component>
-            <Component Id="cmpA5DBCAD1D8CF0BAD3CEC01EF586DD3E3" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{F12A00C4-2A25-4D1D-99B8-D0750A729A46}">
-                <File Id="filE94FD6D0501C5D1EE0A944D7371034CC" KeyPath="yes" Source="$(var.SourceDir)\menurevisiongraph.ico" />
-            </Component>
-            <Component Id="cmpAEDC20E15C12D2A7AAEC6091D81C9B8F" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{B3586DE2-8CD9-482D-9D4C-4271A0EDA326}">
-                <File Id="filA2A5ED3052FFE0670DB76AD35B49A112" KeyPath="yes" Source="$(var.SourceDir)\menusettings.ico" />
-            </Component>
-            <Component Id="cmp6B60C549011388970D70B43F139DAC64" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{2C5C463E-42CE-4E30-BFFE-16E383E1A529}">
-                <File Id="fil92FB53F81D2255051EA56ABB8E259B93" KeyPath="yes" Source="$(var.SourceDir)\menushowchanged.ico" />
-            </Component>
-            <Component Id="cmp1BA0F6BDF2BFAC6403487C879A6B2E0D" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{BEA1A332-DD4F-421D-83F0-2C0C06A1BF79}">
-                <File Id="filD230F8D6F9C625EDDEE87A49411E3A23" KeyPath="yes" Source="$(var.SourceDir)\menusynch.ico" />
-            </Component>
-            <Component Id="cmpE652EA7BFC2783183905716BEFC56E6F" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{D2D80D04-6CCF-42DF-ABB3-E0BB02EC647D}">
-                <File Id="fil21B8B22224DCF326FA51DBECBE06C457" KeyPath="yes" Source="$(var.SourceDir)\menuunmerge.ico" />
-            </Component>
-            <Component Id="cmpF2BBB327887ABDFCD2E1EB48E753C557" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{4AF8F0A2-5332-43D0-8A68-6BBECFE6655D}">
-                <File Id="fil5EF56709CEEFF7D343BAFAB68D7587A8" KeyPath="yes" Source="$(var.SourceDir)\proxy.ico" />
-            </Component>
-            <Component Id="cmpE90A6F4A4A8A9A151B0C84527F6CE771" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{4FF83F9E-F324-4DFC-960F-587BDE81DC12}">
-                <File Id="fil28C7B3D39529AE31E9944DC712466E10" KeyPath="yes" Source="$(var.SourceDir)\python.ico" />
-            </Component>
-            <Component Id="cmpD75653F8B16D6ABB694BE5D4C567628F" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{A355CA6B-036C-48AF-99DA-0C4084831ADD}">
-                <File Id="fil77D28EC8BA8139E61915BB8268211D55" KeyPath="yes" Source="$(var.SourceDir)\README.txt" />
-            </Component>
-            <Component Id="cmpD31956A0395D1EDDBD03432D4A37AC85" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{69D6034B-B48C-4077-B686-A7D1020EFFB2}">
-                <File Id="filDC3807C2B6EBDF5D67D73BFEB32EFA89" KeyPath="yes" Source="$(var.SourceDir)\refresh_overlays.ico" />
-            </Component>
-            <Component Id="cmp2EBF34455300D4162A0625C6B2653CCF" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{910D8792-FAA9-4717-ADC0-1679F71E4708}">
-                <File Id="fil64ABFC627A023301F1FF395F5EA17E54" KeyPath="yes" Source="$(var.SourceDir)\settings_repo.ico" />
-            </Component>
-            <Component Id="cmpF95049B877BFDA4E405F948B9295F753" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{FA29B9EC-8123-4B6F-B8CF-C6DA5EE6A12F}">
-                <File Id="fil3C2CC2AF6AFEBFB6028277C1F6B4B8C9" KeyPath="yes" Source="$(var.SourceDir)\settings_user.ico" />
-            </Component>
-            <Component Id="cmpAB5A1D8BA2C4D7FB1AA8A645E74639C8" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{D5F9D6FD-C37F-4E89-BFA1-C636B2375800}">
-                <File Id="fil2EE1108AE7615C66D572F99854D08313" KeyPath="yes" Source="$(var.SourceDir)\shelve.ico" />
-            </Component>
-            <Component Id="cmp7FDE6E12D0D6D93E8D8179CF30E453EC" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{4E1AFE33-8221-41EC-A70C-3AD0DF098C68}">
-                <File Id="fil141972B1248F43DCE8328B91875C1C72" KeyPath="yes" Source="$(var.SourceDir)\thg_logo.ico" />
-            </Component>
-            <Component Id="cmpE3AEF885BB753AD9E15D87207EE8384C" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{9A9FF3BB-6B11-4255-80C5-BD36ABCD3EB4}">
-                <File Id="fil5E84C7D3D1E5D7BB16F7428F2E711FAA" KeyPath="yes" Source="$(var.SourceDir)\thg_logo_92x50.png" />
-            </Component>
-            <Component Id="cmp8398BE7BCCB2B3D5B287547C01E8A1FA" Directory="dirC7301CA94EB0B731B7D04EAEA95A6F50" Guid="{2A289880-2E6F-41A0-836C-4496D0063FFD}">
-                <File Id="filEF7E4AE2143E5F9B11B6F4C49764AEE1" KeyPath="yes" Source="$(var.SourceDir)\TortoiseMerge.ico" />
-            </Component>
-            <Component Id="cmp10BCCB45490CC9BFABB991F3F57BD853" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{C8C9F531-2457-4861-9A58-B5AB11202893}">
-                <File Id="fil171BF27EB4D656BDF526DAC544DD1523" KeyPath="yes" Source="$(var.SourceDir)\svg\add.svg" />
-            </Component>
-            <Component Id="cmp22C18821E863733F8D8062D17CAAD6FD" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{F2C8937B-7FEE-442F-8CB0-615D19F9BA03}">
-                <File Id="filA7746154204618AEA9A8E0233AEF1793" KeyPath="yes" Source="$(var.SourceDir)\svg\checkout.svg" />
-            </Component>
-            <Component Id="cmpE4057B6A63AC2BD85B5CD23CFF239FBF" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{64CE9325-A81A-4C43-9454-44C7EC3D1469}">
-                <File Id="fil4DD1CC6B2ABA3981E0F991626250255B" KeyPath="yes" Source="$(var.SourceDir)\svg\clone.svg" />
-            </Component>
-            <Component Id="cmp18EF572C897D588D53389F336BC569AE" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{031229C9-3525-4812-B834-1658DF4D20F6}">
-                <File Id="fil90F28462FDB48CFF71E11637ABE87F27" KeyPath="yes" Source="$(var.SourceDir)\svg\commit.svg" />
-            </Component>
-            <Component Id="cmpBF5B7AB0524DFE558C41A7A50698E735" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{91A54D60-7263-43FF-9B66-848BA010871C}">
-                <File Id="fil408389166A9689F1D9872D69CF02D17A" KeyPath="yes" Source="$(var.SourceDir)\svg\detect_rename.svg" />
-            </Component>
-            <Component Id="cmp5BFA4FCA36B772F080ED935538A3AE8A" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{F7A88BEB-D81F-43D0-9340-14DD90A6767A}">
-                <File Id="filBD97DFCC77966B50B5FE55B915F90F2A" KeyPath="yes" Source="$(var.SourceDir)\svg\ignore.svg" />
-            </Component>
-            <Component Id="cmp07274739EA35B87BCB98E0A18C4D5B44" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{F223EC5A-6BB5-4DB9-B15E-E3DA15FE2871}">
-                <File Id="fil60AE4FCD3089E2B8446DC5A8BCA3814B" KeyPath="yes" Source="$(var.SourceDir)\svg\init.svg" />
-            </Component>
-            <Component Id="cmp1F4C865D3B8987140F79D14637ECC729" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{34419B74-763B-4C9C-A9C2-874278F734F4}">
-                <File Id="fil2B3AD3BF313A79EDFB80B7B403888D84" KeyPath="yes" Source="$(var.SourceDir)\svg\log.svg" />
-            </Component>
-            <Component Id="cmpA5863053A332A0F69442819D443847F7" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{89220823-AE09-4B44-BA4F-0CB260E08B8E}">
-                <File Id="filB90E03F2136780339062999B270DDD2F" KeyPath="yes" Source="$(var.SourceDir)\svg\merge.svg" />
-            </Component>
-            <Component Id="cmp2F06170A79882BBE91BFA6ED60C442F5" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{193113D2-660D-41E2-9428-D1CBE5E68A9A}">
-                <File Id="filF6A69A125AE6FF2AA8491FB4CF00AB97" KeyPath="yes" Source="$(var.SourceDir)\svg\proxy.svg" />
-            </Component>
-            <Component Id="cmpFAF20D9215DC847CB9808BF6F98C2018" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{48E07B6C-AE17-4C58-B512-0D81FAD28213}">
-                <File Id="filD7FE142A2E9EBF7BA4F2D5C654995B0E" KeyPath="yes" Source="$(var.SourceDir)\svg\recovery.svg" />
-            </Component>
-            <Component Id="cmp59CF9A6BCC613239734B59C0CA6E8659" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{0850F9D8-B0E0-4392-AD6F-27D5F47BF376}">
-                <File Id="fil68C9EFD9879855149E2C42DEC867FE80" KeyPath="yes" Source="$(var.SourceDir)\svg\refresh_overlays.svg" />
-            </Component>
-            <Component Id="cmpD3E2E89B08E65F34C36D13950BA86645" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{39243B71-9011-4890-B057-BBE3CAEA7730}">
-                <File Id="fil20DDF2B76FDC31ACF843E442BF1F00AC" KeyPath="yes" Source="$(var.SourceDir)\svg\remove.svg" />
-            </Component>
-            <Component Id="cmp2C95AACEDF22FE48DAB6514BA8A65D8D" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{B7EB9B87-72E9-4E98-BA7B-59CD2B5CEF70}">
-                <File Id="fil47D550E4F23AAEE13A2CEBD21A48A115" KeyPath="yes" Source="$(var.SourceDir)\svg\repobrowse.svg" />
-            </Component>
-            <Component Id="cmp25F4462491BC6AEFEB71F926BBC40E1B" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{ECE274A3-C70D-49A3-BDFA-4EA944308D1D}">
-                <File Id="filEEF068D59B997645AF78B7D7244D701A" KeyPath="yes" Source="$(var.SourceDir)\svg\revert.svg" />
-            </Component>
-            <Component Id="cmp7C0E9F1A6666E8B728392826570677D9" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{4155FE4D-B715-46C9-90EC-74079867D743}">
-                <File Id="fil8A1894E10D9925F5510FC3A26159EBE7" KeyPath="yes" Source="$(var.SourceDir)\svg\shelve.svg" />
-            </Component>
-            <Component Id="cmpCFB0E0DF64F68F7772650DF50160D08F" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{53014AD0-B33E-4EB1-A54E-886E3F932F04}">
-                <File Id="fil61F48C7ECC7A38084A90790C7C46E198" KeyPath="yes" Source="$(var.SourceDir)\svg\status.svg" />
-            </Component>
-            <Component Id="cmp7EA68898EDBC3FA8081FB69457CCC549" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{AC8805DB-EE54-4D10-B433-2EB23F79839D}">
-                <File Id="fil92EB359A7687BCA18CD89C7EA6B76B66" KeyPath="yes" Source="$(var.SourceDir)\svg\sync.svg" />
-            </Component>
-            <Component Id="cmp6CBE283BC1FC6D30FD64A649E60CD545" Directory="dir67FF3FC4DF698B48A4E6EE91076313E9" Guid="{5EC7A104-4436-493B-96FF-951FA31B16F9}">
-                <File Id="filFADD57CE82F2F3C227053E5E3C3E506B" KeyPath="yes" Source="$(var.SourceDir)\svg\thg_logo.svg" />
-            </Component>
-        </ComponentGroup>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" Name="icons" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir67FF3FC4DF698B48A4E6EE91076313E9" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC7301CA94EB0B731B7D04EAEA95A6F50">
-            <Directory Id="dir67FF3FC4DF698B48A4E6EE91076313E9" Name="svg" />
-        </DirectoryRef>
-    </Fragment>
+
+  <?include thg-guids.wxi ?>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+
+      <Directory Id="IconsDirectory" Name="icons" FileSource="$(var.SourceDir)">
+
+        <Component Id='Icons' Guid='$(var.Icons.guid)'>
+          <File Name="branch.ico" KeyPath="yes" />
+          <File Name="detect_rename.ico" />
+          <File Name="fileadd.ico" />
+          <File Name="filedelete.ico" />
+          <File Name="filemodify.ico" />
+          <File Name="general.ico" />
+          <File Name="hg.ico" />
+          <File Name="hg_60.ico" />
+          <File Name="hgB.ico" />
+          <File Name="ignore.ico" />
+          <File Name="menuabout.ico" />
+          <File Name="menuadd.ico" />
+          <File Name="menublame.ico" />
+          <File Name="menucheckout.ico" />
+          <File Name="menuclone.ico" />
+          <File Name="menucommit.ico" />
+          <File Name="menucreaterepos.ico" />
+          <File Name="menudelete.ico" />
+          <File Name="menudiff.ico" />
+          <File Name="menuhelp.ico" />
+          <File Name="menuimport.ico" />
+          <File Name="menulog.ico" />
+          <File Name="menumerge.ico" />
+          <File Name="menupatch.ico" />
+          <File Name="menurelocate.ico" />
+          <File Name="menurepobrowse.ico" />
+          <File Name="menurevert.ico" />
+          <File Name="menurevisiongraph.ico" />
+          <File Name="menusettings.ico" />
+          <File Name="menushowchanged.ico" />
+          <File Name="menusynch.ico" />
+          <File Name="menuunmerge.ico" />
+          <File Name="proxy.ico" />
+          <File Name="python.ico" />
+          <File Name="README.txt" />
+          <File Name="refresh_overlays.ico" />
+          <File Name="settings_repo.ico" />
+          <File Name="settings_user.ico" />
+          <File Name="shelve.ico" />
+          <File Name="thg_logo.ico" />
+          <File Name="thg_logo_92x50.png" />
+          <File Name="TortoiseMerge.ico" />
+        </Component>
+
+        <Directory Id="SvgDirectory" Name="svg">
+          <Component Id='SvgIcons' Guid='$(var.SvgIcons.guid)'>
+            <File Name="add.svg" KeyPath="yes" />
+            <File Name="checkout.svg" />
+            <File Name="clone.svg" />
+            <File Name="commit.svg" />
+            <File Name="detect_rename.svg" />
+            <File Name="ignore.svg" />
+            <File Name="init.svg" />
+            <File Name="log.svg" />
+            <File Name="merge.svg" />
+            <File Name="proxy.svg" />
+            <File Name="recovery.svg" />
+            <File Name="refresh_overlays.svg" />
+            <File Name="remove.svg" />
+            <File Name="repobrowse.svg" />
+            <File Name="revert.svg" />
+            <File Name="shelve.svg" />
+            <File Name="status.svg" />
+            <File Name="sync.svg" />
+            <File Name="thg_logo.svg" />
+          </Component>
+
+        </Directory>
+
+      </Directory>
+
+    </DirectoryRef>
+  </Fragment>
+
 </Wix>
