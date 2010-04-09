@@ -297,7 +297,11 @@ def visualdiff(ui, repo, pats, opts):
             dodiff(tmproot)
         finally:
             ui.note(_('cleaning up temp directory\n'))
-            shutil.rmtree(tmproot)
+            try:
+                shutil.rmtree(tmproot)
+            except (IOError, OSError), e:
+                # Leaking temporary files, fix your diff tool config
+                ui.note(_('unable to clean temp directory: %s\n'), str(e))
 
     tmproot = tempfile.mkdtemp(prefix='visualdiff.')
     if opts.get('mainapp'):
