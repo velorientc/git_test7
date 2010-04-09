@@ -699,12 +699,17 @@ class GStatus(gdialog.GWindow):
 
         self.auto_check() # may check more files
 
-        # manually refresh partially selected files
         for i, row in enumerate(model):
             if row[FM_PARTIAL_SELECTED]:
+                # force refresh of partially selected files
                 self.update_hunk_model(i, self.filetree)
                 self.diffmodel.clear()
                 self.diffmodelfile = None
+            else:
+                # demand refresh of full or non selection
+                wfile = row[FM_PATH]
+                if wfile in self.filechunks:
+                    del self.filechunks[wfile]
 
         # recover selections
         firstrow = None
