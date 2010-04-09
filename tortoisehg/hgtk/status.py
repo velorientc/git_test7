@@ -15,13 +15,13 @@ import gobject
 import pango
 import threading
 
-from mercurial import cmdutil, util, commands, patch, mdiff, error, hg
+from mercurial import cmdutil, util, patch, mdiff, error, hg
 from mercurial import merge as merge_
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, shlib, paths, hgshelve
+from tortoisehg.util import hglib, paths, hgshelve
 
-from tortoisehg.hgtk import dialog, gdialog, gtklib, guess, hgignore, statusbar
+from tortoisehg.hgtk import dialog, gdialog, gtklib, guess, hgignore, statusbar, statusact
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -92,6 +92,7 @@ class GStatus(gdialog.GWindow):
         self.preview_tab_name_label = None
         self.subrepos = []
         self.colorstyle = self.repo.ui.config('tortoisehg', 'diffcolorstyle')
+        self.act = statusact.statusact(self)
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -933,81 +934,6 @@ class GStatus(gdialog.GWindow):
             text_renderer.set_property('foreground', gtklib.NORMAL)
 
 
-    def rename_file(self, wfile):
-        fdir, fname = os.path.split(wfile)
-        utf_fname = hglib.toutf(fname)
-        newfile = dialog.entry_dialog(self, _('Rename file to:'),
-                         True, utf_fname)
-        if newfile and newfile != utf_fname:
-            self.hg_move([wfile, os.path.join(fdir, hglib.fromutf(newfile))])
-        return True
-
-
-    def copy_file(self, wfile):
-        wfile = self.repo.wjoin(wfile)
-        fdir, fname = os.path.split(wfile)
-        result = gtklib.NativeSaveFileDialogWrapper(title=_('Copy file to'),
-                                                    initial=fdir,
-                                                    filename=fname).run()
-        if not result:
-            return
-        if result != wfile:
-            self.hg_copy([wfile, result])
-        return True
-
-
-    def hg_remove(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Removed'),
-              _('Remove is not enabled when multiple revisions are specified.'),
-              self).run()
-            return
-
-        # Create new opts, so nothing unintented gets through
-        removeopts = self.merge_opts(commands.table['^remove|rm'][1],
-                                     ('include', 'exclude'))
-        def dohgremove():
-            commands.remove(self.ui, self.repo, *wfiles, **removeopts)
-        success, outtext = self._hg_call_wrapper('Remove', dohgremove)
-        if success:
-            self.reload_status()
-
-
-    def hg_move(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Moved'), _('Move is not enabled when '
-                    'multiple revisions are specified.'), self).run()
-            return
-
-        # Create new opts, so nothing unintented gets through
-        moveopts = self.merge_opts(commands.table['rename|mv'][1],
-                ('include', 'exclude'))
-        def dohgmove():
-            #moveopts['force'] = True
-            commands.rename(self.ui, self.repo, *wfiles, **moveopts)
-        success, outtext = self._hg_call_wrapper('Move', dohgmove)
-        if success:
-            self.reload_status()
-
-
-    def hg_copy(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Copied'), _('Copy is not enabled when '
-                    'multiple revisions are specified.'), self).run()
-            return
-
-        # Create new opts, so nothing unintented gets through
-        cmdopts = self.merge_opts(commands.table['copy|cp'][1],
-                ('include', 'exclude'))
-        def dohgcopy():
-            commands.copy(self.ui, self.repo, *wfiles, **cmdopts)
-        success, outtext = self._hg_call_wrapper('Copy', dohgcopy)
-        if success:
-            self.reload_status()
-
     def tree_sel_changed(self, selection, tree, page_num=None):
         'Selection changed in file tree'
         # page_num may be supplied, if called from switch-page event
@@ -1366,98 +1292,28 @@ class GStatus(gdialog.GWindow):
     def revert_clicked(self, toolbutton, data=None):
         revert_list = self.relevant_checked_files('MAR!')
         if len(revert_list) > 0:
-            self.hg_revert(revert_list)
+            self.act.hg_revert(revert_list)
         else:
             gdialog.Prompt(_('Nothing Reverted'),
                    _('No revertable files selected'), self).run()
         return True
 
-
-    def hg_revert(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Reverted'),
-                   _('Revert not allowed when viewing revision range.'),
-                   self).run()
-            return
-
-        # Create new opts,  so nothing unintented gets through.
-        revertopts = self.merge_opts(commands.table['revert'][1],
-                                     ('include', 'exclude', 'rev'))
-        def dohgrevert():
-            commands.revert(self.ui, self.repo, *wfiles, **revertopts)
-
-        def filelist(files):
-            text = '\n'.join(files[:5])
-            if len(files) > 5:
-                text += '  ...\n'
-            return hglib.toutf(text)
-
-        if self.is_merge():
-            res = gdialog.CustomPrompt(
-                    _('Uncommited merge - please select a parent revision'),
-                    _('Revert files to local or other parent?'),
-                    self, (_('&Local'), _('&Other'), _('&Cancel')), 2).run()
-            if res == 0:
-                revertopts['rev'] = self.repo[None].p1().rev()
-            elif res == 1:
-                revertopts['rev'] = self.repo[None].p2().rev()
-            else:
-                return
-            response = None
-        else:
-            # response: 0=Yes, 1=Yes,no backup, 2=Cancel
-            revs = revertopts['rev']
-            if revs and type(revs) == list:
-                revertopts['rev'] = revs[0]
-            else:
-                revertopts['rev'] = str(self.repo['.'].rev())
-            response = gdialog.CustomPrompt(_('Confirm Revert'),
-                    _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
-                    filelist(files)), self, (_('&Yes (backup changes)'),
-                                             _('Yes (&discard changes)'),
-                                             _('&Cancel')), 2, 2).run()
-        if response in (None, 0, 1):
-            if response == 1:
-                revertopts['no_backup'] = True
-            success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
-            if success:
-                shlib.shell_notify(wfiles)
-                self.reload_status()
-
-    def hg_forget(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        commands.forget(self.ui, self.repo, *wfiles)
-        self.reload_status()
-
     def add_clicked(self, toolbutton, data=None):
         add_list = self.relevant_checked_files('?I')
         if len(add_list) > 0:
-            self.hg_add(add_list)
+            self.act.hg_add(add_list)
         else:
             gdialog.Prompt(_('Nothing Added'),
                    _('No addable files selected'), self).run()
         return True
 
-    def hg_add(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        # Create new opts, so nothing unintented gets through
-        addopts = self.merge_opts(commands.table['^add'][1],
-                                  ('include', 'exclude'))
-        def dohgadd():
-            commands.add(self.ui, self.repo, *wfiles, **addopts)
-        success, outtext = self._hg_call_wrapper('Add', dohgadd)
-        if success:
-            shlib.shell_notify(wfiles)
-            self.reload_status()
-
     def remove_clicked(self, toolbutton, data=None):
         remove_list = self.relevant_checked_files('C!')
         delete_list = self.relevant_checked_files('?I')
         if len(remove_list) > 0:
-            self.hg_remove(remove_list)
+            self.act.hg_remove(remove_list)
         if len(delete_list) > 0:
-            self.delete_files(delete_list)
+            self.act.delete_files(delete_list)
         if not remove_list and not delete_list:
             gdialog.Prompt(_('Nothing Removed'),
                    _('No removable files selected'), self).run()
@@ -1483,7 +1339,7 @@ class GStatus(gdialog.GWindow):
 
             # move the files to dest directory
             move_list.append(hglib.fromutf(destdir))
-            self.hg_move(move_list)
+            self.act.hg_move(move_list)
         else:
             gdialog.Prompt(_('Nothing Moved'), _('No movable files selected\n\n'
                     'Note: only clean files can be moved.'), self).run()
@@ -1492,30 +1348,10 @@ class GStatus(gdialog.GWindow):
     def forget_clicked(self, toolbutton, data=None):
         forget_list = self.relevant_checked_files('CM')
         if len(forget_list) > 0:
-            self.hg_forget(forget_list)
+            self.act.hg_forget(forget_list)
         else:
             gdialog.Prompt(_('Nothing Forgotten'),
                    _('No clean files selected'), self).run()
-
-    def delete_files(self, files):
-        dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self,
-                _('Delete the following unrevisioned files?'))
-        if dlg.run() == gtk.RESPONSE_YES:
-            errors = ''
-            for wfile in files:
-                try:
-                    os.unlink(self.repo.wjoin(wfile))
-                except Exception, inst:
-                    errors += str(inst) + '\n\n'
-
-            if errors:
-                errors = errors.replace('\\\\', '\\')
-                if len(errors) > 500:
-                    errors = errors[:errors.find('\n',500)] + '\n...'
-                gdialog.Prompt(_('Delete Errors'), errors, self).run()
-
-            self.reload_status()
-        return True
 
     def ignoremask_updated(self):
         '''User has changed the ignore mask in hgignore dialog'''
@@ -1608,21 +1444,21 @@ class GStatus(gdialog.GWindow):
         def other(menuitem, files):
             self._view_files(files, True)
         def revert(menuitem, files):
-            self.hg_revert(files)
+            self.act.hg_revert(files)
         def remove(menuitem, files):
-            self.hg_remove(files)
+            self.act.hg_remove(files)
         def log(menuitem, files):
             from tortoisehg.hgtk import history
             dlg = history.run(self.ui, canonpats=files)
             dlg.display()
         def forget(menuitem, files, paths):
-            self.hg_forget(files)
+            self.act.hg_forget(files)
             self.set_file_states(paths, state=False)
         def add(menuitem, files, paths):
-            self.hg_add(files)
+            self.act.hg_add(files)
             self.set_file_states(paths, state=True)
         def delete(menuitem, files):
-            self.delete_files(files)
+            self.act.delete_files(files)
         def unmark(menuitem, files):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
@@ -1651,9 +1487,9 @@ class GStatus(gdialog.GWindow):
                 else:
                     del os.environ['HGMERGE']
         def rename(menuitem, files):
-            self.rename_file(files[0])
+            self.act.rename_file(files[0])
         def copy(menuitem, files):
-            self.copy_file(files[0])
+            self.act.copy_file(files[0])
         def guess_rename(menuitem, files):
             dlg = guess.DetectRenameDialog()
             dlg.show_all()
