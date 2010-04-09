@@ -120,7 +120,8 @@ class TagAddDialog(gtk.Dialog):
         """ update revision entry based on tag """
         tagmap = self.repo.tags()
         tag = self.tagentry.get_text()
-        if not tag or hglib.fromutf(tag) not in tagmap:
+        replace = self.replacechk.get_active()
+        if not tag or hglib.fromutf(tag) not in tagmap or replace:
             if self.initial_rev:
                 self.reventry.set_text(self.initial_rev)
             return
@@ -155,6 +156,7 @@ class TagAddDialog(gtk.Dialog):
         is_local = self.repo.tagtype(hglib.fromutf(tag))
         if affectlocal and is_local is not None:
             self.localchk.set_active(is_local == 'local')
+        self.update_revision()
 
     def load_settings(self):
         expanded = self.settings.get_value('expanded', False, True)
