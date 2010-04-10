@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-  <?include thg-guids.wxi ?>
+  <?include guids.wxi ?>
 
   <?define thg_po_langs =
     cs;da;de;en_GB;es;fa;fr;he;hr;hu;it;ja;ko;nl;nn;oc;pl;pt;pt_BR;ru;sv;tr;uk;zh_CN;zh_TW
