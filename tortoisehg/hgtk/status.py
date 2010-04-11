@@ -260,12 +260,18 @@ class GStatus(gdialog.GWindow):
 
         return accelgroup
                 
-
     def get_body(self):
         is_merge = self.is_merge()
 
         # model stores the file list.
-        fm = gtk.ListStore(bool, str, str, str, str, bool)
+        fm = gtk.ListStore(
+              bool, # FM_CHECKED
+              str,  # FM_STATUS
+              str,  # FM_PATH_UTF8
+              str,  # FM_PATH
+              str,  # FM_MERGE_STATUS
+              bool  # FM_PARTIAL_SELECTED
+            )
         fm.set_sort_func(1001, self.sort_by_stat)
         fm.set_default_sort_func(self.sort_by_stat)
         self.filemodel = fm
