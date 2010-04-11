@@ -936,8 +936,8 @@ class GCommit(GStatus):
                 cf = util.pconvert(f)
                 if cf in self.subrepos: continue
                 if cf not in self.status[0]: continue
-                if f not in self.filechunks: continue
-                chunks = self.filechunks[f]
+                if f not in self.chunks: continue
+                chunks = self.chunks[f]
                 if len(chunks) < 2: continue
 
                 # unfiltered files do not go through backup-revert-patch cycle
@@ -1178,7 +1178,7 @@ class GCommit(GStatus):
                 # refresh overlay icons and commit dialog
                 self.closebranch = False
                 self.nextbranch = None
-                self.filechunks = {} # force re-read of chunks
+                self.chunks.clear_filechunks()  # force re-read of chunks
                 buf = self.text.get_buffer()
                 if buf.get_modified():
                     self.update_recent_messages(self.opts['message'])
