@@ -772,8 +772,16 @@ class GCommit(GStatus):
         self.branchbutton.set_label(text)
 
     def check_undo(self):
-        can_undo = os.path.exists(self.repo.sjoin("undo")) and \
-                self.last_commit_id is not None
+        can_undo = False
+        if os.path.exists(self.repo.sjoin('undo')):
+            can_undo = (self.last_commit_id is not None)
+            try:
+                # when hg-1.5 support is dropped, self.last_commit_id
+                # can be removed
+                args = self.repo.opener('undo.desc', 'r').read().split(',')
+                can_undo = args[1] == 'commit'
+            except (IOError, IndexError):
+                pass
         self.cmd_set_sensitive('undo', can_undo)
 
     def check_merge(self):
