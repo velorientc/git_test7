@@ -916,6 +916,19 @@ class GCommit(GStatus):
                 gdialog.Prompt(_('Commit'),
                         _('Unable to create ') + backupdir, self).run()
                 return
+
+        def finish():
+            os.chdir(cwd)
+            # restore backup files
+            try:
+                for realname, tmpname in backups.iteritems():
+                    util.copyfile(tmpname, repo.wjoin(realname))
+                    os.unlink(tmpname)
+                os.rmdir(backupdir)
+            except OSError:
+                pass
+            callback()
+
         try:
             # backup continues
             allchunks = []
@@ -967,18 +980,6 @@ class GCommit(GStatus):
                         gdialog.Prompt(_('Commit'),
                                 _('Unable to apply patch'), self).run()
                         return
-
-            def finish():
-                os.chdir(cwd)
-                # restore backup files
-                try:
-                    for realname, tmpname in backups.iteritems():
-                        util.copyfile(tmpname, repo.wjoin(realname))
-                        os.unlink(tmpname)
-                    os.rmdir(backupdir)
-                except OSError:
-                    pass
-                callback()
 
             # 4. We prepared working directory according to filtered patch.
             #    Now is the time to delegate the job to commit/qrefresh
