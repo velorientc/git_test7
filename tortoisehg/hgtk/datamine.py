@@ -461,7 +461,7 @@ class DataMineDialog(gdialog.GWindow):
 
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args, label=True)
+                hglib.hgcmd_toq(q, True, args)
             except (util.Abort, error.LookupError), e:
                 self.stbar.set_text(_('Abort: %s') % str(e))
 
@@ -773,7 +773,7 @@ class DataMineDialog(gdialog.GWindow):
         '''
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, False, args)
             except (util.Abort, error.LookupError), e:
                 self.stbar.set_text(_('Abort: %s') % str(e))
 

@@ -223,7 +223,7 @@ class ServeDialog(gtk.Window):
     def _start_server(self):
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, False, args)
             except util.Abort, e:
                 self._write(_('Abort: %s\n') % str(e))
 

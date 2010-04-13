@@ -940,8 +940,9 @@ class ChangeSet(gdialog.GWindow):
             return
         try:
             q = Queue.Queue()
-            hglib.hgcmd_toq(q, 'cat', '--rev',
-                str(self.currev), '--output', hglib.fromutf(result), self.curfile)
+            hglib.hgcmd_toq(q, False, ('cat', '--rev',
+                            str(self.currev), '--output', hglib.fromutf(result),
+                            self.curfile))
         except (util.Abort, IOError), e:
             gdialog.Prompt(_('Unable to save file'), str(e), self).run()
 

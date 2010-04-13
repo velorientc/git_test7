@@ -310,12 +310,11 @@ def difftools(ui):
     return tools
 
 
-def hgcmd_toq(q, *args, **opts):
+def hgcmd_toq(q, label, args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
     object.  Assumes command is completely noninteractive.
     '''
-    label = opts.get('label', False)
     class Qui(ui.ui):
         def __init__(self, src=None):
             super(Qui, self).__init__(src)
