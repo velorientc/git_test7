@@ -365,10 +365,10 @@ class DataMineDialog(gdialog.GWindow):
                                 str) # file path (utf-8)
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_grep)
-        for title, width, col, emode in (
-                (_('Rev'), 10, GCOL_REVID, pango.ELLIPSIZE_NONE),
-                (_('File'), 25, GCOL_PATH, pango.ELLIPSIZE_START),
-                (_('Matches'), 80, GCOL_LINE, pango.ELLIPSIZE_END)):
+        for title, width, ttype, col, emode in (
+                (_('Rev'), 10, 'text', GCOL_REVID, pango.ELLIPSIZE_NONE),
+                (_('File'), 25, 'text', GCOL_PATH, pango.ELLIPSIZE_START),
+                (_('Matches'), 80, 'markup', GCOL_LINE, pango.ELLIPSIZE_END)):
             cell = gtk.CellRendererText()
             cell.set_property('width-chars', width)
             cell.set_property('ellipsize', emode)
@@ -378,7 +378,7 @@ class DataMineDialog(gdialog.GWindow):
             column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
-            column.add_attribute(cell, 'text', col)
+            column.add_attribute(cell, ttype, col)
             treeview.append_column(column)
         if hasattr(treeview, 'set_tooltip_column'):
             treeview.set_tooltip_column(GCOL_DESC)
@@ -461,7 +461,7 @@ class DataMineDialog(gdialog.GWindow):
 
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, *args, label=True)
             except (util.Abort, error.LookupError), e:
                 self.stbar.set_text(_('Abort: %s') % str(e))
 
@@ -492,7 +492,11 @@ class DataMineDialog(gdialog.GWindow):
         """
         text = ''
         while q.qsize():
-            text += q.get(0)
+            data, label = q.get(0)
+            if label == 'grep.match':
+                text += '<span foreground="red"><b>%s</b></span>' % data
+            else:
+                text += data
         
         for line in text.splitlines():
             try:
