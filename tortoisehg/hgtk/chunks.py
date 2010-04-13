@@ -12,6 +12,8 @@ import gtk
 import pango
 import cStringIO
 
+from mercurial import cmdutil, util, patch, mdiff, error
+
 from tortoisehg.util import hglib, hgshelve
 
 from tortoisehg.hgtk import gtklib
@@ -173,7 +175,7 @@ class chunks(object):
         if wfile in self.filechunks:
             chunks = self.filechunks[wfile]
         else:
-            chunks = self.stat.read_file_chunks(wfile)
+            chunks = self.read_file_chunks(wfile)
             for c in chunks:
                 c.active = True
             self.filechunks[wfile] = chunks
@@ -191,7 +193,7 @@ class chunks(object):
 
     def append_diff_hunks(self, wfile, checked):
         'Append diff hunks of one file to the diffmodel'
-        chunks = self.stat.read_file_chunks(wfile)
+        chunks = self.read_file_chunks(wfile)
         if not chunks:
             if wfile in self.filechunks:
                 del self.filechunks[wfile]
@@ -289,7 +291,7 @@ class chunks(object):
             if wfile in self.filechunks:
                 chunks = self.filechunks[wfile]
             else:
-                chunks = self.stat.read_file_chunks(wfile)
+                chunks = self.read_file_chunks(wfile)
                 for c in chunks:
                     c.active = True
             for i, chunk in enumerate(chunks):
@@ -331,3 +333,23 @@ class chunks(object):
         fp.seek(0)
         self.stat.clipboard.set_text(fp.read())
 
+    def read_file_chunks(self, wfile):
+        'Get diffs of working file, parse into (c)hunks'
+        difftext = cStringIO.StringIO()
+        pfile = util.pconvert(wfile)
+        lines = self.stat.check_max_diff(pfile)
+        if lines:
+            difftext.writelines(lines)
+            difftext.seek(0)
+        else:
+            matcher = cmdutil.matchfiles(self.stat.repo, [pfile])
+            diffopts = mdiff.diffopts(git=True, nodates=True)
+            try:
+                node1, node2 = self.stat.nodes()
+                for s in patch.diff(self.stat.repo, node1, node2,
+                        match=matcher, opts=diffopts):
+                    difftext.writelines(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stat.stbar.set_text(str(e))
+            difftext.seek(0)
+        return hgshelve.parsepatch(difftext)

@@ -14,7 +14,7 @@ import gtk
 import gobject
 import threading
 
-from mercurial import cmdutil, util, patch, mdiff, error, hg
+from mercurial import cmdutil, util, patch, error, hg
 from mercurial import merge as merge_
 
 from tortoisehg.util.i18n import _
@@ -721,6 +721,9 @@ class GStatus(gdialog.GWindow):
         gobject.timeout_add(50, status_wait, thread)
         return True
 
+    def nodes(self):
+        return (self._node1, self._node2)
+
     def set_file_states(self, paths, state=True):
         for p in paths:
             self.filemodel[p][FM_CHECKED] = state
@@ -965,26 +968,6 @@ class GStatus(gdialog.GWindow):
             lines.append('--- a/%s\n' % pfile)
             lines.append('+++ b/%s\n' % pfile)
         return lines
-
-    def read_file_chunks(self, wfile):
-        'Get diffs of working file, parse into (c)hunks'
-        difftext = cStringIO.StringIO()
-        pfile = util.pconvert(wfile)
-        lines = self.check_max_diff(pfile)
-        if lines:
-            difftext.writelines(lines)
-            difftext.seek(0)
-        else:
-            matcher = cmdutil.matchfiles(self.repo, [pfile])
-            diffopts = mdiff.diffopts(git=True, nodates=True)
-            try:
-                for s in patch.diff(self.repo, self._node1, self._node2,
-                        match=matcher, opts=diffopts):
-                    difftext.writelines(s.splitlines(True))
-            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-                self.stbar.set_text(str(e))
-            difftext.seek(0)
-        return hgshelve.parsepatch(difftext)
 
     def update_check_state(self, wfile, partial, newvalue):
         for fr in self.filemodel:
