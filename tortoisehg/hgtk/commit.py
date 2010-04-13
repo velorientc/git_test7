@@ -778,7 +778,7 @@ class GCommit(GStatus):
             try:
                 # when hg-1.5 support is dropped, self.last_commit_id
                 # can be removed
-                args = self.repo.opener('undo.desc', 'r').read().split(',')
+                args = self.repo.opener('undo.desc', 'r').read().splitlines()
                 can_undo = args[1] == 'commit'
             except (IOError, IndexError):
                 pass
