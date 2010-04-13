@@ -493,6 +493,7 @@ class DataMineDialog(gdialog.GWindow):
         text = ''
         while q.qsize():
             data, label = q.get(0)
+            data = gtklib.markup_escape_text(hglib.toutf(data))
             if label == 'grep.match':
                 text += '<span foreground="red"><b>%s</b></span>' % data
             else:
@@ -506,8 +507,7 @@ class DataMineDialog(gdialog.GWindow):
             desc, user = self.get_rev_desc(long(revid))
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, hglib.toutf(text[:512]), desc,
-                          hglib.toutf(path)))
+            model.append((revid, text, desc, hglib.toutf(path)))
         if thread.isAlive():
             return True
         else:
