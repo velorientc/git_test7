@@ -490,8 +490,11 @@ class DataMineDialog(gdialog.GWindow):
         """
         Handle all the messages currently in the queue (if any).
         """
+        text = ''
         while q.qsize():
-            line = q.get(0).rstrip('\r\n')
+            text += q.get(0)
+        
+        for line in text.splitlines():
             try:
                 (path, revid, text) = line.split(':', 2)
             except ValueError:
