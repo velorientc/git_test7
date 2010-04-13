@@ -81,7 +81,9 @@ class chunks(object):
         if getattr(difftree, 'enable-grid-lines', None) is not None:
             difftree.set_property('enable-grid-lines', True)
         self.difftree = difftree
-        
+
+        difftree.connect('row-activated', self.diff_tree_row_act)
+
         cell = gtk.CellRendererText()
         diffcol = gtk.TreeViewColumn('diff', cell)
         diffcol.set_resizable(True)
@@ -245,11 +247,12 @@ class chunks(object):
         
         return len(rows)
 
-    def diff_tree_row_act(self, dtree, path, checked):
+    def diff_tree_row_act(self, dtree, path, column):
         'Row in diff tree (hunk) activated/toggled'
         dmodel = dtree.get_model()
         row = dmodel[path]
         wfile = row[DM_PATH]
+        checked = self.stat.get_checked(wfile)
         try:
             chunks = self.filechunks[wfile]
         except IndexError:
@@ -270,7 +273,8 @@ class chunks(object):
             newvalue = nonrej and True or False
             partial = rej and nonrej and True or False
         self.update_diff_header(dmodel, wfile, newvalue)
-        return partial, newvalue
+
+        self.stat.update_check_state(wfile, partial, newvalue)
 
     def get_wfile(self, dtree, path):
         dmodel = dtree.get_model()

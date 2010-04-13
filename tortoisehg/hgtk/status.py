@@ -357,8 +357,7 @@ class GStatus(gdialog.GWindow):
         self.chunks = chunks.chunks(self)
         difftree = self.chunks.get_difftree()
         self.difftree = difftree
-        difftree.connect('row-activated', self.diff_tree_row_act)
-        
+
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroller.add(difftree)
@@ -987,22 +986,21 @@ class GStatus(gdialog.GWindow):
             difftext.seek(0)
         return hgshelve.parsepatch(difftext)
 
-    def diff_tree_row_act(self, dtree, path, column):
-        'Row in diff tree (hunk) activated/toggled'       
-        wfile = self.chunks.get_wfile(dtree, path)
- 
+    def update_check_state(self, wfile, partial, newvalue):
         for fr in self.filemodel:
             if fr[FM_PATH] == wfile:
-                break
+                if fr[FM_PARTIAL_SELECTED] != partial:
+                    fr[FM_PARTIAL_SELECTED] = partial
+                if fr[FM_CHECKED] != newvalue:
+                    fr[FM_CHECKED] = newvalue
+                    self.update_check_count()
+                return
 
-        partial, newvalue = self.chunks.diff_tree_row_act(dtree, path, fr[FM_CHECKED])
-
-        # Update file's check status
-        if fr[FM_PARTIAL_SELECTED] != partial:
-            fr[FM_PARTIAL_SELECTED] = partial
-        if fr[FM_CHECKED] != newvalue:
-            fr[FM_CHECKED] = newvalue
-            self.update_check_count()
+    def get_checked(self, wfile):
+        for fr in self.filemodel:
+            if fr[FM_PATH] == wfile:
+                return fr[FM_CHECKED]
+        return False
 
     def refresh_clicked(self, toolbutton, data=None):
         self.reload_status()
