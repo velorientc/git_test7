@@ -133,8 +133,18 @@ class RecoveryDialog(gtk.Window):
         shlib.shell_notify([self.repo.root])
 
     def _rollback_clicked(self, toolbutton, data=None):
+        try:
+            args = self.repo.opener('undo.desc', 'r').read().splitlines()
+            if len(args) >= 3:
+                msg = _("Rollback repository '%s' to %s, undo %s from %s?") % (
+                    self.reponame, args[0], args[1], args[2])
+            else:
+                msg = _("Rollback repository '%s' to %s, undo %s?") % (
+                    self.reponame, args[0], args[1])
+        except (IOError, IndexError):
+            msg = _("Rollback repository '%s' ?") % self.reponame
         response = gdialog.Confirm(_('Confirm rollback repository'), [], self,
-                _("Rollback repository '%s' ?") % self.reponame).run()
+                                   msg).run()
         if response != gtk.RESPONSE_YES:
             return
         cmd = ['rollback']
