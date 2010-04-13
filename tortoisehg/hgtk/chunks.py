@@ -57,6 +57,22 @@ def hunk_unmarkup(text):
     return hunk
 
 
+def check_max_diff(ctx, pfile):
+    lines = []
+    try:
+        fctx = ctx.filectx(pfile)
+    except error.LookupError:
+        fctx = None
+    if fctx and fctx.size() > hglib.getmaxdiffsize(ctx._repo.ui):
+        # Fake patch that displays size warning
+        lines = ['diff --git a/%s b/%s\n' % (pfile, pfile)]
+        lines.append(_('File is larger than the specified max size.\n'))
+        lines.append(_('Hunk selection is disabled for this file.\n'))
+        lines.append('--- a/%s\n' % pfile)
+        lines.append('+++ b/%s\n' % pfile)
+    return lines
+
+
 class chunks(object):
 
     def __init__(self, stat):
@@ -337,7 +353,7 @@ class chunks(object):
         'Get diffs of working file, parse into (c)hunks'
         difftext = cStringIO.StringIO()
         pfile = util.pconvert(wfile)
-        lines = self.stat.check_max_diff(pfile)
+        lines = check_max_diff(self.stat.get_ctx(), pfile)
         if lines:
             difftext.writelines(lines)
             difftext.seek(0)

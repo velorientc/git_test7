@@ -724,6 +724,9 @@ class GStatus(gdialog.GWindow):
     def nodes(self):
         return (self._node1, self._node2)
 
+    def get_ctx(self):
+        return self.repo[self._node1]
+
     def set_file_states(self, paths, state=True):
         for p in paths:
             self.filemodel[p][FM_CHECKED] = state
@@ -914,7 +917,7 @@ class GStatus(gdialog.GWindow):
     def generate_text_diffs(self, row):
         wfile = self.filemodel[row][FM_PATH]
         pfile = util.pconvert(wfile)
-        lines = self.check_max_diff(pfile)
+        lines = chunks.check_max_diff(self.get_ctx(), pfile)
         if lines:
             return self.diff_highlight_buffer(lines)
         matcher = cmdutil.matchfiles(self.repo, [pfile])
@@ -952,22 +955,6 @@ class GStatus(gdialog.GWindow):
         self.chunks.update_hunk_model(row[FM_PATH], row[FM_CHECKED])
         if not self.is_merge() and self.chunks.len():
             tree.scroll_to_cell(0, use_align=True, row_align=0.0)
-
-    def check_max_diff(self, pfile):
-        lines = []
-        ctx = self.repo[self._node1]
-        try:
-            fctx = ctx.filectx(pfile)
-        except error.LookupError:
-            fctx = None
-        if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
-            # Fake patch that displays size warning
-            lines = ['diff --git a/%s b/%s\n' % (pfile, pfile)]
-            lines.append(_('File is larger than the specified max size.\n'))
-            lines.append(_('Hunk selection is disabled for this file.\n'))
-            lines.append('--- a/%s\n' % pfile)
-            lines.append('+++ b/%s\n' % pfile)
-        return lines
 
     def update_check_state(self, wfile, partial, newvalue):
         for fr in self.filemodel:
