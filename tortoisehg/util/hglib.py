@@ -331,7 +331,12 @@ def hgcmd_toq(q, *args):
             return True
 
     u = Qui()
-    return dispatch._dispatch(u, list(args))
+    oldterm = os.environ.get('TERM')
+    os.environ['TERM'] = 'dumb'
+    ret = dispatch._dispatch(u, list(args))
+    if oldterm:
+        os.environ['TERM'] = oldterm
+    return ret
 
 def get_reponame(repo):
     if repo.ui.config('tortoisehg', 'fullpath', False):
