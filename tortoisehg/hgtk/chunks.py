@@ -14,6 +14,7 @@ import cStringIO
 
 from mercurial import cmdutil, util, patch, mdiff, error
 
+from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, hgshelve
 
 from tortoisehg.hgtk import gtklib
@@ -103,8 +104,9 @@ class chunks(object):
         if getattr(dt, 'enable-grid-lines', None) is not None:
             dt.set_property('enable-grid-lines', True)
 
-        dt.connect('row-activated', self.diff_tree_row_act)
         dt.connect('copy-clipboard', self.copy_to_clipboard)
+        dt.connect('popup-menu', self.tree_popup_menu)
+        dt.connect('button-release-event', self.tree_button_release)
 
         cell = gtk.CellRendererText()
         diffcol = gtk.TreeViewColumn('diff', cell)
@@ -269,12 +271,9 @@ class chunks(object):
         
         return len(rows)
 
-    def diff_tree_row_act(self, dtree, path, column):
-        'Row in diff tree (hunk) activated/toggled'
-        dmodel = dtree.get_model()
-        row = dmodel[path]
+    def activate_chunk(self, row, active):
+        dmodel = self.diffmodel
         wfile = row[DM_PATH]
-        checked = self.stat.get_checked(wfile)
         try:
             chunks = self.filechunks[wfile]
         except IndexError:
@@ -282,13 +281,13 @@ class chunks(object):
         chunkrows = xrange(1, len(chunks))
         if row[DM_IS_HEADER]:
             for n, chunk in enumerate(chunks[1:]):
-                chunk.active = not checked
+                chunk.active = active
                 self.update_diff_hunk(dmodel[n+1])
-            newvalue = not checked
+            newvalue = active
             partial = False
         else:
             chunk = chunks[row[DM_CHUNK_ID]]
-            chunk.active = not chunk.active
+            chunk.active = active
             self.update_diff_hunk(row)
             rej = [ n for n in chunkrows if dmodel[n][DM_REJECTED] ]
             nonrej = [ n for n in chunkrows if not dmodel[n][DM_REJECTED] ]
@@ -373,3 +372,31 @@ class chunks(object):
                 self.stat.stbar.set_text(str(e))
             difftext.seek(0)
         return hgshelve.parsepatch(difftext)
+
+    def tree_button_release(self, treeview, event):
+        if event.button != 3:
+            return False
+        self.tree_popup_menu(treeview)
+        return True
+
+    def tree_popup_menu(self, treeview):
+        model, tpaths = treeview.get_selection().get_selected_rows()
+        srows = [model[p] for p in tpaths]
+
+        def select(menuitem):
+            for row in srows:
+                self.activate_chunk(row, True)
+ 
+        def deselect(menuitem):
+            for row in srows:
+                self.activate_chunk(row, False)
+
+        menu = gtklib.MenuBuilder()
+        menu.append(_('_Select'), select)
+        menu.append(_('_Deselect'), deselect)
+
+        menu = menu.build()
+        if len(menu.get_children()) > 0:
+            menu.show_all()
+            menu.popup(None, None, None, 0, 0)
+            return True
