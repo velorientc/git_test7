@@ -1,84 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Fragment>
-        <ComponentGroup Id="cmenuI18n">
-            <Component Id="cmp8708D9E3BC7A3F365AA22FB05B9FDF85" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{100413B0-1924-4980-BA09-251FCBF99059}">
-                <File Id="fil34592251F1AB69B84704FBB768CACFE6" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-ca.reg" />
-            </Component>
-            <Component Id="cmpAA66F751DDD6F97FCF2AE7BCCBFBF946" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{16A81F32-F585-42EE-AC89-B8125121382A}">
-                <File Id="filE545DA833E2D12BC6D510647EC55F0AB" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-cs.reg" />
-            </Component>
-            <Component Id="cmp238B20E39A5A44F3E0A2841F1871D6C7" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{52D23E53-0F72-40B5-8151-02ACB4EC7603}">
-                <File Id="fil0C7CDE954420422B5CF874D01A54770F" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-da.reg" />
-            </Component>
-            <Component Id="cmpE27ECB7D926C0731D91FD3B46E42992B" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{1D13FF21-1296-4C79-8C18-8FD199FFF954}">
-                <File Id="fil857F2C86A63B7198E0BDD42F65B6E480" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-de.reg" />
-            </Component>
-            <Component Id="cmp8F805C448FAB68B8F2132DFFA91E50C5" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{1D058762-2513-4141-9AB1-245AA578827D}">
-                <File Id="fil6DE6839DEEF3906AC976C04D4AAEB1DF" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-en_GB.reg" />
-            </Component>
-            <Component Id="cmpD9B314A6F0F0E3D2B210CF76D81D7D36" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{208E1C3A-B383-4F2A-8B8C-D10D5746F112}">
-                <File Id="fil43269232FC331753F26137D3B99D2453" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-en_US.reg" />
-            </Component>
-            <Component Id="cmp24A5C34B34547D915EF98355098867B5" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{44E211A9-0CD5-4D42-905F-A0A27AE7C298}">
-                <File Id="fil47E2958ED8AAD4030E5A117575119FE3" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-es.reg" />
-            </Component>
-            <Component Id="cmp0A77DAB515AECF033F614A206FE4C486" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{9C040E50-6803-4E45-BBE3-C9465CB9DC57}">
-                <File Id="fil11714D0F1C2ACCF26EF3CEA3FC04C9CE" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-fa.reg" />
-            </Component>
-            <Component Id="cmp502E03239FB58F0D63024244989AF7E0" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{620B42DA-2DF2-4A11-9CE3-1AFADBE0C96E}">
-                <File Id="fil5FDBF3248DED306FC9C9B1E70DD36B84" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-fr.reg" />
-            </Component>
-            <Component Id="cmpB25781959651E9C92526FC240CD4FBA1" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{EDEDEBF5-35F6-4747-B90E-3B2E8F7358F7}">
-                <File Id="fil7D2909387B45E55961295D73E4C90771" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-he.reg" />
-            </Component>
-            <Component Id="cmp34954B8F12900BB195055662296D42A5" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{FE100736-D101-414B-A60E-BD542DA3DE0A}">
-                <File Id="fil820C3121E73E593AD8CCF3A64B6B5485" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-hr.reg" />
-            </Component>
-            <Component Id="cmpA1D84B2EF3F62730C23D7EEAC69062FF" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{AC57717E-2F80-4B11-9A89-F026261EA0C4}">
-                <File Id="filE92C5B5421B14D2047F73B6A8490243F" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-it.reg" />
-            </Component>
-            <Component Id="cmp9A43667CB3AB67745BB031DC4149A368" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{DD7B59E1-A9B5-44F8-A6C8-7372BCD83745}">
-                <File Id="fil8C4843AC59727C6886CAFC7C2F060B0E" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-ja.reg" />
-            </Component>
-            <Component Id="cmp7CF763E009BA6FE0C5F5C5E78CEDC5CE" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{CD66CCC8-AF8C-41FD-A850-38EF61109884}">
-                <File Id="fil519F9D41618860D32AF628B4C2D471D3" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-ko.reg" />
-            </Component>
-            <Component Id="cmp7F0BED83B066AA4256A9E9A88E861260" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{98586BA9-39CB-4DEB-B91A-D1C92A1CDF01}">
-                <File Id="fil09301D9AB6B31637C1F44D94456744D7" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-nl.reg" />
-            </Component>
-            <Component Id="cmp86644712486B38587B20819491BBED9F" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{EF685426-22A9-4F46-B1C5-94F49AB17C4F}">
-                <File Id="fil45E027B68B2C6BA7693EF8E5284F0B1F" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-nn.reg" />
-            </Component>
-            <Component Id="cmp8DC0EFF8720B424B2EF2FF4C84F559CD" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{60E372CD-620E-424C-9FAE-7093A7F64F1C}">
-                <File Id="fil2C4D4B7BD19766AE99F6E7188484F580" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-pl.reg" />
-            </Component>
-            <Component Id="cmp32ACAC9D2A6D81033F6C4F7CA1B20612" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{075D898B-BADC-466C-99E9-B7918060CD22}">
-                <File Id="filCFFB79D7D3D1794835CB4B0AE7A50C82" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-pt.reg" />
-            </Component>
-            <Component Id="cmpABCB551315BC96FBD5C0DB2BEBC75448" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{8BB16F00-4B44-445B-B302-9154FF2888AB}">
-                <File Id="fil905821AEA5C058AC7212BF9B636F634A" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-pt_BR.reg" />
-            </Component>
-            <Component Id="cmp9FC2BC37EA7362ED50FF63569022BF43" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{C1004F50-1E1E-481B-88CF-64DC610E4EC7}">
-                <File Id="fil3BFDCE2F286D397D12BD4ABCED6C062A" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-ru.reg" />
-            </Component>
-            <Component Id="cmpC010C64955D52218ECB3F0FE58614928" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{A87D8C9E-1C55-4810-B898-CF970C4F58AD}">
-                <File Id="fil5D604D1A5A7E0599F246AD181E051AED" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-tr.reg" />
-            </Component>
-            <Component Id="cmpF26B183E23A8CDB76FFC49CFAE470A0B" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{EF2AB165-248E-4D1E-90C5-776A32AD2BBB}">
-                <File Id="fil5FC49A3ED520225A28D809D586AFB094" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-uk.reg" />
-            </Component>
-            <Component Id="cmp653479493896AD777E009018E31A9748" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{39F024A6-7D9F-4AF1-87D8-61FA4A80B7DF}">
-                <File Id="fil25E9FC5FB9196E97133ABC05CCF3F06F" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-zh_CN.reg" />
-            </Component>
-            <Component Id="cmpB10C4F48B7FF5C78F9FD20C8561538A2" Directory="dir6734C7C09FF52B288189BB08CF42BBBC" Guid="{D9487D22-A44C-4AEA-B784-41CA13E20FF9}">
-                <File Id="fil9C8C6DD08D8735C2CB4A1EB4477A0E7C" KeyPath="yes" Source="$(var.SourceDir)\thg-cmenu-zh_TW.reg" />
-            </Component>
-        </ComponentGroup>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirE238460D44340499CA44F8E5739FEA52">
-            <Directory Id="dir6734C7C09FF52B288189BB08CF42BBBC" Name="cmenu" />
-        </DirectoryRef>
-    </Fragment>
+
+  <?include guids.wxi ?>
+
+  <?define thgcmenulangs = 
+    cs;da;de;en_GB;en_US;es;fa;fr;he;hr;it;ja;ko;nl;nn;pl;pt;pt_BR;ru;tr;uk;zh_CN;zh_TW
+  ?>
+  <!-- lang 'ca' is used for key path -->
+
+  <Fragment>
+    <DirectoryRef Id="i18ndir">
+      <Directory Id="cmenuI18n" Name="cmenu" FileSource="$(var.SourceDir)">
+        <Component Id="cmenuI18n" Guid="$(var.cmenuI18n.guid)">
+          <File Name="thg-cmenu-ca.reg" KeyPath="yes"/>
+          <?foreach LANG in $(var.thgcmenulangs) ?>
+            <File Name="thg-cmenu-$(var.LANG).reg" />
+          <?endforeach?>
+        </Component>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
 </Wix>
