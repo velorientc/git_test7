@@ -29,6 +29,8 @@ class RecoveryDialog(gtk.Window):
         self.set_default_size(600, 400)
         self.connect('delete-event', self._delete)
         self.hgthread = None
+        self.inprogress = False
+        self.last_pbar_update = 0
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
@@ -90,8 +92,12 @@ class RecoveryDialog(gtk.Window):
                                    foreground=gtklib.DRED)
         vbox.pack_start(scrolledwindow, True, True)
 
-        self.stbar = statusbar.StatusBar()
-        vbox.pack_start(self.stbar, False, False, 2)
+        self.progstat = gtk.Label()
+        vbox.pack_start(self.progstat, False, False, 0)
+        self.progstat.set_alignment(0, 0.5)
+        self.progstat.set_ellipsize(pango.ELLIPSIZE_END)
+        self.pbar = gtk.ProgressBar()
+        vbox.pack_start(self.pbar, False, False, 2)
 
     def _delete(self, widget, event):
         if not self.should_live():
@@ -175,8 +181,9 @@ class RecoveryDialog(gtk.Window):
         gobject.timeout_add(10, self.process_queue)
         self.hgthread = hgthread.HgThread(cmdline, postfunc)
         self.hgthread.start()
-        self.stbar.begin()
-        self.stbar.set_text('hg ' + ' '.join(cmdline))
+        self.pbar.set_text('hg ' + ' '.join(cmdline))
+        self.inprogress = True
+        self.pbar.show()
 
     def _cmd_running(self):
         if self.hgthread and self.hgthread.isAlive():
@@ -214,15 +221,63 @@ class RecoveryDialog(gtk.Window):
                 self.write_err(msg)
             except Queue.Empty:
                 pass
-
+        self.update_progress()
         if self._cmd_running():
             return True
         else:
-            self.stbar.end()
             self._stop_button.set_sensitive(False)
             if self.hgthread.return_code() is None:
                 self.write_err(_('[command interrupted]'))
             return False # Stop polling this function
+
+    def clear_progress(self):
+        self.pbar.set_fraction(0)
+        self.pbar.set_text('')
+        self.progstat.set_text('')
+        self.inprogress = False
+
+    def update_progress(self):
+        if not self.hgthread.isAlive():
+            self.clear_progress()
+            return
+
+        data = None
+        while self.hgthread.getprogqueue().qsize():
+            try:
+                data = self.hgthread.getprogqueue().get_nowait()
+            except Queue.Empty:
+                pass
+        counting = False
+        if data:
+            topic, item, pos, total, unit = data
+            if pos is None:
+                self.clear_progress()
+                return
+            if total is None:
+                count = '%d' % pos
+                counting = True
+            else:
+                self.pbar.set_fraction(float(pos) / float(total))
+                count = '%d / %d' % (pos, total)
+            if unit:
+                count += ' ' + unit
+            self.pbar.set_text(count)
+            if item:
+                status = '%s: %s' % (topic, item)
+            else:
+                status = _('Status: %s') % topic
+            self.progstat.set_text(status)
+            if self.progstat.get_property('visible') is False:
+                self.progstat.show()
+            self.inprogress = True
+
+        if not self.inprogress or counting:
+            # pulse the progress bar every ~100ms
+            tm = shlib.get_system_times()[4]
+            if tm - self.last_pbar_update < 0.100:
+                return
+            self.last_pbar_update = tm
+            self.pbar.pulse()
 
 def run(ui, *pats, **opts):
     return RecoveryDialog()
