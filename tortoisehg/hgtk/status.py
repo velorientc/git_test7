@@ -174,8 +174,9 @@ class GStatus(gdialog.GWindow):
         self.connect('thg-refresh', self.thgrefresh)
 
         # set CTRL-c accelerator for copy-clipboard
-        gtklib.add_accelerator(self.difftree, 'copy-clipboard', accelgroup, mod+'c')
-        self.difftree.connect('copy-clipboard', self.chunks.copy_to_clipboard)
+        dt = self.chunks.difftree()
+        gtklib.add_accelerator(dt, 'copy-clipboard', accelgroup, mod+'c')
+        dt.connect('copy-clipboard', self.chunks.copy_to_clipboard)
 
         def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
             page_num = self.diff_notebook.get_current_page()
@@ -354,13 +355,12 @@ class GStatus(gdialog.GWindow):
         # use treeview to show selectable diff hunks
         self.clipboard = gtk.Clipboard()
 
+        # create chunks object
         self.chunks = chunks.chunks(self)
-        difftree = self.chunks.difftree()
-        self.difftree = difftree
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.add(difftree)
+        scroller.add(self.chunks.difftree())
         self.append_page('hunk-selection', scroller, gtk.Label(_('Hunk Selection')))
 
         # Add a page for commit preview
@@ -828,7 +828,7 @@ class GStatus(gdialog.GWindow):
             fmrow = self.filemodel[row]
             self.chunks.update_hunk_model(fmrow[FM_PATH], fmrow[FM_CHECKED])
             if not self.is_merge() and self.chunks.len():
-                self.difftree.scroll_to_cell(0, use_align=True, row_align=0.0)
+                self.chunks.difftree().scroll_to_cell(0, use_align=True, row_align=0.0)
         elif pname == 'commit-preview':
             self.update_commit_preview()
 
