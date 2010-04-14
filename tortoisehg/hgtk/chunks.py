@@ -108,6 +108,15 @@ class chunks(object):
         dt.connect('popup-menu', self.tree_popup_menu)
         dt.connect('button-release-event', self.tree_button_release)
 
+        toggle_cell = gtk.CellRendererToggle()
+        toggle_cell.connect('toggled', self.select_toggle)
+        toggle_cell.set_property('activatable', True)
+
+        col0 = gtk.TreeViewColumn('', toggle_cell)
+        col0.set_resizable(False)
+        col0.set_cell_data_func(toggle_cell, self.selected_cell_func)
+        dt.append_column(col0)
+
         cell = gtk.CellRendererText()
         diffcol = gtk.TreeViewColumn('diff', cell)
         diffcol.set_resizable(True)
@@ -130,6 +139,20 @@ class chunks(object):
         dt.append_column(diffcol)
         
         return dt
+
+    def select_toggle(self, cell_renderer, path):
+        'User manually toggled file status via checkbox'
+        row = self.diffmodel[path]
+        rejected = not row[DM_REJECTED]
+        row[DM_REJECTED] = rejected
+        self.activate_chunk(row, not rejected)
+        return True
+
+    def selected_cell_func(self, column, cell_renderer, model, iter):
+        is_header = model.get_value(iter, DM_IS_HEADER)
+        cell_renderer.set_property('visible', not is_header)
+        is_rejected = model.get_value(iter, DM_REJECTED)
+        cell_renderer.set_property('active', not is_rejected)
 
     def __getitem__(self, wfile):
         return self.filechunks[wfile]
