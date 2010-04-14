@@ -390,8 +390,7 @@ class GStatus(gdialog.GWindow):
         sel.set_mode(gtk.SELECTION_MULTIPLE)
         self.treeselid = sel.connect('changed', self.tree_sel_changed)
 
-        self.diff_notebook.connect('switch-page', self.page_switched,
-                                   sel, difftree)
+        self.diff_notebook.connect('switch-page', self.page_switched, sel)
 
         # add keyboard accelerators
         accelgroup = self.get_accelgroup()     
@@ -403,7 +402,7 @@ class GStatus(gdialog.GWindow):
         num = self.diff_notebook.append_page(child,  label)
         self.diff_notebook_pages[num] = name
 
-    def page_switched(self, notebook, page, page_num, filesel, difftree):
+    def page_switched(self, notebook, page, page_num, filesel):
         self.tree_sel_changed(filesel, page_num)
 
     def get_extras(self):
