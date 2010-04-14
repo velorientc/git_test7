@@ -104,6 +104,7 @@ class chunks(object):
             difftree.set_property('enable-grid-lines', True)
 
         difftree.connect('row-activated', self.diff_tree_row_act)
+        difftree.connect('copy-clipboard', self.copy_to_clipboard)
 
         cell = gtk.CellRendererText()
         diffcol = gtk.TreeViewColumn('diff', cell)

@@ -174,9 +174,7 @@ class GStatus(gdialog.GWindow):
         self.connect('thg-refresh', self.thgrefresh)
 
         # set CTRL-c accelerator for copy-clipboard
-        dt = self.chunks.difftree()
-        gtklib.add_accelerator(dt, 'copy-clipboard', accelgroup, mod+'c')
-        dt.connect('copy-clipboard', self.chunks.copy_to_clipboard)
+        gtklib.add_accelerator(self.chunks.difftree(), 'copy-clipboard', accelgroup, mod+'c')
 
         def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
             page_num = self.diff_notebook.get_current_page()
