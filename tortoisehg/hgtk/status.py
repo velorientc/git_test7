@@ -355,7 +355,7 @@ class GStatus(gdialog.GWindow):
         self.clipboard = gtk.Clipboard()
 
         self.chunks = chunks.chunks(self)
-        difftree = self.chunks.get_difftree()
+        difftree = self.chunks.difftree()
         self.difftree = difftree
 
         scroller = gtk.ScrolledWindow()

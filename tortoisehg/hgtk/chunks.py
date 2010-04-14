@@ -79,9 +79,12 @@ class chunks(object):
         self.stat = stat
         self.filechunks = {}
         self.diffmodelfile = None
+        self._difftree = None
 
+    def difftree(self):
+        if self._difftree != None:
+            return self._difftree
 
-    def get_difftree(self):
         self.diffmodel = gtk.ListStore(
                 bool, # DM_REJECTED
                 str,  # DM_DISP_TEXT
@@ -92,13 +95,13 @@ class chunks(object):
             )
 
         difftree = gtk.TreeView(self.diffmodel)
+        self._difftree = difftree
         
         difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         difftree.set_headers_visible(False)
         difftree.set_enable_search(False)
         if getattr(difftree, 'enable-grid-lines', None) is not None:
             difftree.set_property('enable-grid-lines', True)
-        self.difftree = difftree
 
         difftree.connect('row-activated', self.diff_tree_row_act)
 
