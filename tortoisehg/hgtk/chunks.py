@@ -94,17 +94,17 @@ class chunks(object):
                 pango.FontDescription # DM_FONT
             )
 
-        difftree = gtk.TreeView(self.diffmodel)
-        self._difftree = difftree
+        dt = gtk.TreeView(self.diffmodel)
+        self._difftree = dt
         
-        difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        difftree.set_headers_visible(False)
-        difftree.set_enable_search(False)
-        if getattr(difftree, 'enable-grid-lines', None) is not None:
-            difftree.set_property('enable-grid-lines', True)
+        dt.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        dt.set_headers_visible(False)
+        dt.set_enable_search(False)
+        if getattr(dt, 'enable-grid-lines', None) is not None:
+            dt.set_property('enable-grid-lines', True)
 
-        difftree.connect('row-activated', self.diff_tree_row_act)
-        difftree.connect('copy-clipboard', self.copy_to_clipboard)
+        dt.connect('row-activated', self.diff_tree_row_act)
+        dt.connect('copy-clipboard', self.copy_to_clipboard)
 
         cell = gtk.CellRendererText()
         diffcol = gtk.TreeViewColumn('diff', cell)
@@ -125,9 +125,9 @@ class chunks(object):
         cell.set_property('foreground', gtklib.STATUS_REJECT_FOREGROUND)
         diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
         diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
-        difftree.append_column(diffcol)
+        dt.append_column(diffcol)
         
-        return difftree
+        return dt
 
     def __getitem__(self, wfile):
         return self.filechunks[wfile]
