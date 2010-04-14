@@ -610,15 +610,14 @@ class GStatus(gdialog.GWindow):
 
         self.auto_check() # may check more files
 
-        for i, row in enumerate(model):
+        for row in model:
             if row[FM_PARTIAL_SELECTED]:
                 # force refresh of partially selected files
-                self.update_hunk_model(i, self.filetree)
+                self.chunks.update_hunk_model(row[FM_PATH], row[FM_CHECKED])
                 self.chunks.clear()
             else:
                 # demand refresh of full or non selection
-                wfile = row[FM_PATH]
-                self.chunks.del_file(wfile)
+                self.chunks.del_file(row[FM_PATH])
 
         # recover selections
         firstrow = None
@@ -828,7 +827,10 @@ class GStatus(gdialog.GWindow):
             buf = self.generate_text_diffs(row)
             self.diff_text.set_buffer(buf)
         elif pname == 'hunk-selection':
-            self.update_hunk_model(row, tree)
+            fmrow = self.filemodel[row]
+            self.chunks.update_hunk_model(fmrow[FM_PATH], fmrow[FM_CHECKED])
+            if not self.is_merge() and self.chunks.len():
+                self.difftree.scroll_to_cell(0, use_align=True, row_align=0.0)
         elif pname == 'commit-preview':
             self.update_commit_preview()
 
@@ -948,13 +950,6 @@ class GStatus(gdialog.GWindow):
             except (IOError, error.RepoError, error.LookupError, util.Abort), e:
                 self.stbar.set_text(str(e))
         return self.diff_highlight_buffer(difftext)
-
-    def update_hunk_model(self, path, tree):
-        # Read this file's diffs into hunk selection model
-        row = self.filemodel[path]
-        self.chunks.update_hunk_model(row[FM_PATH], row[FM_CHECKED])
-        if not self.is_merge() and self.chunks.len():
-            tree.scroll_to_cell(0, use_align=True, row_align=0.0)
 
     def update_check_state(self, wfile, partial, newvalue):
         for fr in self.filemodel:
