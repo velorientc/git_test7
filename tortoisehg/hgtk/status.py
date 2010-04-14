@@ -388,8 +388,7 @@ class GStatus(gdialog.GWindow):
 
         sel = self.filetree.get_selection()
         sel.set_mode(gtk.SELECTION_MULTIPLE)
-        self.treeselid = sel.connect('changed', self.tree_sel_changed,
-                difftree)
+        self.treeselid = sel.connect('changed', self.tree_sel_changed)
 
         self.diff_notebook.connect('switch-page', self.page_switched,
                                    sel, difftree)
@@ -405,7 +404,7 @@ class GStatus(gdialog.GWindow):
         self.diff_notebook_pages[num] = name
 
     def page_switched(self, notebook, page, page_num, filesel, difftree):
-        self.tree_sel_changed(filesel, difftree, page_num)
+        self.tree_sel_changed(filesel, page_num)
 
     def get_extras(self):
         self.stbar = statusbar.StatusBar()
@@ -804,7 +803,7 @@ class GStatus(gdialog.GWindow):
             text_renderer.set_property('foreground', gtklib.NORMAL)
 
 
-    def tree_sel_changed(self, selection, tree, page_num=None):
+    def tree_sel_changed(self, selection, page_num=None):
         'Selection changed in file tree'
         # page_num may be supplied, if called from switch-page event
         model, paths = selection.get_selected_rows()
