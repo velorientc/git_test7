@@ -1747,7 +1747,13 @@ class GStatus(gdialog.GWindow):
         return False
 
 def run(ui, *pats, **opts):
-    showclean = util.any(os.path.isfile(e) for e in pats)
+    # When hg-1.4 support is dropped, use util.any
+    #showclean = util.any(os.path.isfile(e) for e in pats)
+    showclean = False
+    for e in pats:
+        if os.path.isfile(e):
+            showclean = True
+            break
     rev = opts.get('rev', [])
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
