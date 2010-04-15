@@ -29,7 +29,7 @@ except ImportError:
     openflags = 0
 
 # Match parent2 first, so 'parent1?' will match both parent1 and parent
-_regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel)'
+_regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|chash)'
 
 _nonexistant = _('[non-existant]')
 
@@ -92,6 +92,7 @@ def filemerge(ui, fname, patchedfname):
     diffcmd, diffopts, mergeopts = detectedtools[preferred]
     replace = dict(parent=fname, parent1=fname,
                    plabel1=fname + _('[working copy]'),
+                   repo='', phash1='', phash2='', chash='',
                    child=patchedfname, clabel=_('[original]'))
     launchtool(diffcmd, diffopts, replace, True)
 
@@ -267,10 +268,11 @@ def visualdiff(ui, repo, pats, opts):
             label1b += '[other]'
             label2 += '[merged]'
 
-        # Function to quote file/dir names in the argument string
         replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
                        plabel1=label1a, plabel2=label1b,
-                       clabel=label2, child=dir2)
+                       phash1=str(ctx1a), phash2=str(ctx1b),
+                       repo=hglib.get_reponame(repo),
+                       clabel=label2, child=dir2, chash=str(ctx2))
         launchtool(diffcmd, args, replace, True)
 
         # detect if changes were made to mirrored working files
@@ -322,6 +324,7 @@ class FileSelectionDialog(gtk.Dialog):
 
         self.set_default_size(400, 250)
         self.set_has_separator(False)
+        self.reponame=hglib.get_reponame(repo)
 
         self.ctxs = (ctx1a, ctx1b, ctx2)
         self.copies = cpy
@@ -572,6 +575,8 @@ class FileSelectionDialog(gtk.Dialog):
         # Function to quote file/dir names in the argument string
         replace = dict(parent=file1a, parent1=file1a, plabel1=label1a,
                        parent2=file1b, plabel2=label1b,
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
                        clabel=label2, child=file2)
         args = ctx1b and self.mergeopts or self.diffopts
         launchtool(self.diffpath, args, replace, False)
@@ -579,24 +584,33 @@ class FileSelectionDialog(gtk.Dialog):
     def p1dirdiff(self, button):
         dir1a, dir1b, dir2 = self.dirs
         rev1a, rev1b, rev2 = self.revs
+        ctx1a, ctx1b, ctx2 = self.ctxs
 
         replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
                        parent2='', plabel2='', clabel=rev2, child=dir2)
         launchtool(self.diffpath, self.diffopts, replace, False)
 
     def p2dirdiff(self, button):
         dir1a, dir1b, dir2 = self.dirs
         rev1a, rev1b, rev2 = self.revs
+        ctx1a, ctx1b, ctx2 = self.ctxs
 
         replace = dict(parent=dir1b, parent1=dir1b, plabel1=rev1b,
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
                        parent2='', plabel2='', clabel=rev2, child=dir2)
         launchtool(self.diffpath, self.diffopts, replace, False)
 
     def threewaydirdiff(self, button):
         dir1a, dir1b, dir2 = self.dirs
         rev1a, rev1b, rev2 = self.revs
+        ctx1a, ctx1b, ctx2 = self.ctxs
 
         replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
                        parent2=dir1b, plabel2=rev1b, clabel=dir2, child=rev2)
         launchtool(self.diffpath, self.mergeopts, replace, False)
 
