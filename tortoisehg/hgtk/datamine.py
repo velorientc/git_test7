@@ -160,6 +160,7 @@ class DataMineDialog(gdialog.GWindow):
                  'menublame.ico', args=[objs])
         m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
         m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
+        m.append(_('_Diff to Local'), self.cmenu_local_diff)
         menu = m.build()
         menu.show_all()
         return menu
@@ -231,6 +232,10 @@ class DataMineDialog(gdialog.GWindow):
         self.trigger_annotate(parent_revid, filepath, objs)
         graphview.scroll_to_revision(int(parent_revid))
         graphview.set_revision_id(int(parent_revid))
+
+    def cmenu_local_diff(self, menuitem):
+        opts = {'rev':[str(self.currev)], 'bundle':None}
+        self._do_diff([self.curpath], opts)
 
     def cmenu_file_log(self, menuitem):
         from tortoisehg.hgtk import history
