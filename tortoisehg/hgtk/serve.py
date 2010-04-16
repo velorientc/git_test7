@@ -18,7 +18,7 @@ import threading
 import time
 
 from mercurial import hg, ui, commands, cmdutil, util, error
-from mercurial.hgweb import server, hgweb_mod
+from mercurial.hgweb import server, hgweb_mod, hgwebdir_mod
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -311,7 +311,10 @@ def thg_serve(ui, repo, **opts):
                         baseui.setconfig("web", o, str(opts[o]))
                         if repoui:
                             repoui.setconfig("web", o, str(opts[o]))
-                app = hgweb_mod.hgweb(hg.repository(repo.ui, repo.root))
+                if opts.get('webdir_conf'):
+                    app = hgwebdir_mod.hgwebdir(opts['webdir_conf'], repo.ui)
+                else:
+                    app = hgweb_mod.hgweb(hg.repository(repo.ui, repo.root))
                 self.httpd = server.create_server(ui, app)
             except socket.error, inst:
                 raise util.Abort(_('cannot start server: ') + inst.args[1])
