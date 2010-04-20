@@ -1,0 +1,275 @@
+# shellconf.py - User interface for the TortoiseHg shell extension settings
+#
+# Copyright 2009 Steve Borho <steve@borho.org>
+# Copyright 2010 Adrian Buehlmann <adrian@cadifra.com>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2 or any later version.
+
+import sys
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+from tortoisehg.util.i18n import _
+from tortoisehg.util import menuthg
+
+from _winreg import (HKEY_CURRENT_USER, REG_SZ, REG_DWORD,
+                     OpenKey, CreateKey, QueryValueEx, SetValueEx)
+
+THGKEY = 'TortoiseHg'
+OVLKEY = 'TortoiseOverlays'
+
+# reading functions
+def is_true(x): return x in ('1', 'True')
+def nonzero(x): return x != 0
+
+# writing functions
+def one_str(x): 
+    if x: return '1'
+    return '0'
+def one_int(x):
+    if x: return 1
+    return 0
+
+def noop(x): return x
+
+vars = {
+    # name: 
+    #   default, regkey, regtype, evalfunc, wrfunc, checkbuttonattribute
+    'EnableOverlays':       
+        [True,     THGKEY, REG_SZ, is_true, one_str, 'ovenable'],
+    'LocalDisksOnly':
+        [False,    THGKEY, REG_SZ, is_true, one_str, 'localonly'],
+    'ShowTaskbarIcon':      
+        [True,     THGKEY, REG_SZ, is_true, one_str, 'show_taskbaricon'],
+    'HighlightTaskbarIcon':
+        [True,     THGKEY, REG_SZ, is_true, one_str, 'highlight_taskbaricon'],
+    'PromotedItems':
+        ['commit', THGKEY, REG_SZ, noop, noop, None],
+    'ShowUnversionedOverlay':
+        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableUnversionedHandler'],
+    'ShowIgnoredOverlay':
+        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableIgnoredHandler'],
+    'ShowLockedOverlay':
+        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableLockedHandler'],
+    'ShowReadonlyOverlay':
+        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableReadonlyHandler'],
+    'ShowDeletedOverlay':
+        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableDeletedHandler'],
+    'ShowAddedOverlay':
+        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableAddedHandler'] 
+}
+
+
+class ShellConfigWindow(QDialog):
+
+    def __init__(self, parent=None):
+        super(ShellConfigWindow, self).__init__(parent)
+
+        self.menu_cmds = {}
+        self.dirty = False
+
+        layout = QVBoxLayout()
+
+        tw = QTabWidget()
+        layout.addWidget(tw)
+
+        # cmenu tab
+        cmenuwidget = QWidget()
+        grid = QGridLayout()
+        cmenuwidget.setLayout(grid)
+        tw.addTab(cmenuwidget, _("Contex Menu"))
+
+        w = QLabel(_("Top menu items:"))
+        grid.addWidget(w, 0, 0)
+        self.topmenulist = w = QListWidget()
+        grid.addWidget(w, 1, 0, 4, 1)
+        self.connect(w, SIGNAL("itemSelectionChanged ()"), self.update_states)
+
+        w = QLabel(_("Sub menu items:"))
+        grid.addWidget(w, 0, 2)
+        self.submenulist = w = QListWidget()
+        grid.addWidget(w, 1, 2, 4, 1)
+        self.connect(w, SIGNAL("itemSelectionChanged ()"), self.update_states)
+
+        self.top_button = w = QPushButton(_("<- Top"))
+        grid.addWidget(w, 2, 1)
+        self.connect(w, SIGNAL("clicked()"), self.top_clicked)
+        self.sub_button = w = QPushButton(_("Sub ->"))
+        grid.addWidget(w, 3, 1)
+        self.connect(w, SIGNAL("clicked()"), self.sub_clicked)
+
+        grid.setRowStretch(1, 10)
+        grid.setRowStretch(4, 10)
+
+        # Icons tab
+        iconswidget = QWidget()
+        iconslayout = QVBoxLayout()
+        iconswidget.setLayout(iconslayout)
+        tw.addTab(iconswidget, _("Icons"))
+
+        def checkbox(label):
+            cb = QCheckBox(label)
+            self.connect(cb, SIGNAL("stateChanged(int)"), self.stateChanged)
+            return cb
+
+        # Overlays group
+        gbox = QGroupBox(_("Overlays"))
+        iconslayout.addWidget(gbox)
+        hb = QHBoxLayout()
+        gbox.setLayout(hb)
+        self.ovenable = cb = checkbox(_("Enabled overlays"))
+        hb.addWidget(cb)
+        self.localonly = checkbox(_("Local disks only"))
+        hb.addWidget(self.localonly)
+        hb.addStretch()
+
+        # Enabled Overlay Handlers group
+        gbox = QGroupBox(_("Enabled Overlay Handlers"))
+        iconslayout.addWidget(gbox)
+        grid = QGridLayout()
+        gbox.setLayout(grid)
+        grid.setColumnStretch(3, 10)
+        w = QLabel(_("Warning: affects all Tortoises, logoff required after change"))
+        grid.addWidget(w, 0, 0, 1, 3)
+        self.enableAddedHandler = w = checkbox(_("Added"))
+        grid.addWidget(w, 1, 0)
+        self.enableLockedHandler = w = checkbox(_("Locked*"))
+        grid.addWidget(w, 1, 1)
+        self.enableIgnoredHandler = w = checkbox(_("Ignored*"))
+        grid.addWidget(w, 1, 2)
+        self.enableUnversionedHandler = w = checkbox(_("Unversioned"))
+        grid.addWidget(w, 2, 0)
+        self.enableReadonlyHandler = w = checkbox(_("Readonly*"))
+        grid.addWidget(w, 2, 1)
+        self.enableDeletedHandler = w = checkbox(_("Deleted*"))
+        grid.addWidget(w, 2, 2)
+        w = QLabel(_("*: not used by TortoiseHg"))
+        grid.addWidget(w, 3, 0, 1, 3)
+
+        # Taskbar group
+        gbox = QGroupBox(_("Taskbar"))
+        iconslayout.addWidget(gbox)
+        hb = QHBoxLayout()
+        gbox.setLayout(hb)
+        self.show_taskbaricon = cb = checkbox(_("Show Icon"))
+        hb.addWidget(cb)
+        self.highlight_taskbaricon = cb = checkbox(_("Highlight Icon"))
+        hb.addWidget(cb)
+        hb.addStretch()
+
+        iconslayout.addStretch()
+
+        # dialog buttons
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Apply)
+        self.apply_button = bb.button(BB.Apply)
+        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.connect(bb.button(BB.Apply), SIGNAL("clicked()"), self.apply)
+        bb.button(BB.Ok).setDefault(True)
+        layout.addWidget(bb)
+
+        self.setLayout(layout)
+        self.setWindowTitle(_("TortoiseHg Shell Configuration"))
+
+        self.load_shell_configs()
+
+    def load_shell_configs(self):        
+        for name, info in vars.iteritems():
+            default, regkey, regtype, evalfunc, wrfunc, cbattr = info
+            try:
+                hkey = OpenKey(HKEY_CURRENT_USER, 'Software\\' + regkey)
+                v = QueryValueEx(hkey, name)[0]
+                vars[name][0] = evalfunc(v)
+            except (WindowsError, EnvironmentError):
+                pass
+            if cbattr != None:
+                checkbutton = getattr(self, cbattr)
+                checkbutton.setChecked(vars[name][0])
+
+        promoteditems = vars['PromotedItems'][0]
+        self.set_menulists(promoteditems)
+
+        self.dirty = False
+        self.update_states()
+
+    def set_menulists(self, promoteditems):
+        for list in (self.topmenulist, self.submenulist):
+            list.clear()
+            list.setSortingEnabled(True)
+        promoted = [pi.strip() for pi in promoteditems.split(',')]
+        for cmd, info in menuthg.thgcmenu.items():
+            label = info['label']['str']
+            self.menu_cmds[label] = cmd
+            if cmd in promoted:
+                self.topmenulist.addItem(label)
+            else:
+                self.submenulist.addItem(label)
+
+    def store_shell_configs(self):
+        if not  self.dirty:
+            return
+
+        promoted = []
+        list = self.topmenulist
+        for row in range(list.count()):
+            label = str(list.item(row).text())
+            cmd = self.menu_cmds[label]
+            promoted.append(cmd)
+
+        hkey = CreateKey(HKEY_CURRENT_USER, "Software\\" + THGKEY)
+        SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
+
+        for name, info in vars.iteritems():
+            default, regkey, regtype, evalfunc, wrfunc, cbattr = info
+            if cbattr == None:
+                continue
+            checkbutton = getattr(self, cbattr)
+            v = wrfunc(checkbutton.isChecked())
+            hkey = CreateKey(HKEY_CURRENT_USER, 'Software\\' + regkey)
+            SetValueEx(hkey, name, 0, regtype, v)
+
+        self.dirty = False
+        self.update_states()
+
+    def accept(self):
+        self.store_shell_configs()
+        QDialog.accept(self)
+
+    def reject(self):
+        QDialog.reject(self)
+
+    def apply(self):
+        self.store_shell_configs()
+
+    def top_clicked(self):
+        self.move_selected(self.submenulist, self.topmenulist)
+
+    def sub_clicked(self):
+        self.move_selected(self.topmenulist, self.submenulist)
+
+    def move_selected(self, fromlist, tolist):
+        row = fromlist.currentRow()
+        if row < 0:
+            return
+        item = fromlist.takeItem(row)
+        tolist.addItem(item)
+        self.dirty = True
+        self.update_states()
+
+    def update_states(self):
+        self.top_button.setEnabled(len(self.submenulist.selectedItems()) > 0)
+        self.sub_button.setEnabled(len(self.topmenulist.selectedItems()) > 0)
+        self.apply_button.setEnabled(self.dirty)
+
+    def stateChanged(self, state):
+        self.dirty = True
+        self.update_states()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    form = ShellConfigWindow()
+    form.show()
+    app.exec_()
