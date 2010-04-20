@@ -93,10 +93,13 @@ class ShellConfigWindow(QDialog):
         grid.addWidget(w, 1, 2, 4, 1)
         self.connect(w, SIGNAL("itemSelectionChanged ()"), self.update_states)
 
-        self.top_button = w = QPushButton(_("<- Top"))
+        style = QApplication.style()
+        icon = style.standardIcon(QStyle.SP_ArrowLeft)
+        self.top_button = w = QPushButton(icon, '')
         grid.addWidget(w, 2, 1)
         self.connect(w, SIGNAL("clicked()"), self.top_clicked)
-        self.sub_button = w = QPushButton(_("Sub ->"))
+        icon = style.standardIcon(QStyle.SP_ArrowRight)
+        self.sub_button = w = QPushButton(icon, '')
         grid.addWidget(w, 3, 1)
         self.connect(w, SIGNAL("clicked()"), self.sub_clicked)
 
