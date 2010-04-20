@@ -259,6 +259,8 @@ class ShellConfigWindow(QDialog):
             return
         item = fromlist.takeItem(row)
         tolist.addItem(item)
+        tolist.setCurrentItem(item)
+        fromlist.setCurrentItem(None)
         self.dirty = True
         self.update_states()
 
