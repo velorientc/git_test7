@@ -19,6 +19,7 @@ from _winreg import (HKEY_CURRENT_USER, REG_SZ, REG_DWORD,
 
 THGKEY = 'TortoiseHg'
 OVLKEY = 'TortoiseOverlays'
+PROMOTEDITEMS = 'PromotedItems'
 
 # reading functions
 def is_true(x): return x in ('1', 'True')
@@ -45,7 +46,7 @@ vars = {
         [True,     THGKEY, REG_SZ, is_true, one_str, 'show_taskbaricon'],
     'HighlightTaskbarIcon':
         [True,     THGKEY, REG_SZ, is_true, one_str, 'highlight_taskbaricon'],
-    'PromotedItems':
+    PROMOTEDITEMS:
         ['commit', THGKEY, REG_SZ, noop, noop, None],
     'ShowUnversionedOverlay':
         [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableUnversionedHandler'],
@@ -194,7 +195,7 @@ class ShellConfigWindow(QDialog):
                 checkbutton = getattr(self, cbattr)
                 checkbutton.setChecked(vars[name][0])
 
-        promoteditems = vars['PromotedItems'][0]
+        promoteditems = vars[PROMOTEDITEMS][0]
         self.set_menulists(promoteditems)
 
         self.dirty = False
@@ -225,7 +226,7 @@ class ShellConfigWindow(QDialog):
             promoted.append(cmd)
 
         hkey = CreateKey(HKEY_CURRENT_USER, "Software\\" + THGKEY)
-        SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(promoted))
+        SetValueEx(hkey, PROMOTEDITEMS, 0, REG_SZ, ','.join(promoted))
 
         for name, info in vars.iteritems():
             default, regkey, regtype, evalfunc, wrfunc, cbattr = info
