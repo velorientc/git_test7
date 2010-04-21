@@ -8,8 +8,8 @@
 
 import sys
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import SIGNAL, SLOT
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import menuthg
@@ -63,7 +63,7 @@ vars = {
 }
 
 
-class ShellConfigWindow(QDialog):
+class ShellConfigWindow(QtGui.QDialog):
 
     def __init__(self, parent=None):
         super(ShellConfigWindow, self).__init__(parent)
@@ -71,38 +71,38 @@ class ShellConfigWindow(QDialog):
         self.menu_cmds = {}
         self.dirty = False
 
-        layout = QVBoxLayout()
+        layout = QtGui.QVBoxLayout()
 
-        tw = QTabWidget()
+        tw = QtGui.QTabWidget()
         layout.addWidget(tw)
 
         # cmenu tab
-        cmenuwidget = QWidget()
-        grid = QGridLayout()
+        cmenuwidget = QtGui.QWidget()
+        grid = QtGui.QGridLayout()
         cmenuwidget.setLayout(grid)
         tw.addTab(cmenuwidget, _("Contex Menu"))
 
-        w = QLabel(_("Top menu items:"))
+        w = QtGui.QLabel(_("Top menu items:"))
         grid.addWidget(w, 0, 0)
-        self.topmenulist = w = QListWidget()
+        self.topmenulist = w = QtGui.QListWidget()
         grid.addWidget(w, 1, 0, 4, 1)
         self.connect(w, SIGNAL("itemClicked(QListWidgetItem*)"), 
             self.listItemClicked)
 
-        w = QLabel(_("Sub menu items:"))
+        w = QtGui.QLabel(_("Sub menu items:"))
         grid.addWidget(w, 0, 2)
-        self.submenulist = w = QListWidget()
+        self.submenulist = w = QtGui.QListWidget()
         grid.addWidget(w, 1, 2, 4, 1)
         self.connect(w, SIGNAL("itemClicked(QListWidgetItem*)"),
             self.listItemClicked)
 
-        style = QApplication.style()
-        icon = style.standardIcon(QStyle.SP_ArrowLeft)
-        self.top_button = w = QPushButton(icon, '')
+        style = QtGui.QApplication.style()
+        icon = style.standardIcon(QtGui.QStyle.SP_ArrowLeft)
+        self.top_button = w = QtGui.QPushButton(icon, '')
         grid.addWidget(w, 2, 1)
         self.connect(w, SIGNAL("clicked()"), self.top_clicked)
-        icon = style.standardIcon(QStyle.SP_ArrowRight)
-        self.sub_button = w = QPushButton(icon, '')
+        icon = style.standardIcon(QtGui.QStyle.SP_ArrowRight)
+        self.sub_button = w = QtGui.QPushButton(icon, '')
         grid.addWidget(w, 3, 1)
         self.connect(w, SIGNAL("clicked()"), self.sub_clicked)
 
@@ -110,20 +110,20 @@ class ShellConfigWindow(QDialog):
         grid.setRowStretch(4, 10)
 
         # Icons tab
-        iconswidget = QWidget()
-        iconslayout = QVBoxLayout()
+        iconswidget = QtGui.QWidget()
+        iconslayout = QtGui.QVBoxLayout()
         iconswidget.setLayout(iconslayout)
         tw.addTab(iconswidget, _("Icons"))
 
         def checkbox(label):
-            cb = QCheckBox(label)
+            cb = QtGui.QCheckBox(label)
             self.connect(cb, SIGNAL("stateChanged(int)"), self.stateChanged)
             return cb
 
         # Overlays group
-        gbox = QGroupBox(_("Overlays"))
+        gbox = QtGui.QGroupBox(_("Overlays"))
         iconslayout.addWidget(gbox)
-        hb = QHBoxLayout()
+        hb = QtGui.QHBoxLayout()
         gbox.setLayout(hb)
         self.ovenable = cb = checkbox(_("Enabled overlays"))
         hb.addWidget(cb)
@@ -132,12 +132,12 @@ class ShellConfigWindow(QDialog):
         hb.addStretch()
 
         # Enabled Overlay Handlers group
-        gbox = QGroupBox(_("Enabled Overlay Handlers"))
+        gbox = QtGui.QGroupBox(_("Enabled Overlay Handlers"))
         iconslayout.addWidget(gbox)
-        grid = QGridLayout()
+        grid = QtGui.QGridLayout()
         gbox.setLayout(grid)
         grid.setColumnStretch(3, 10)
-        w = QLabel(_("Warning: affects all Tortoises, logoff required after change"))
+        w = QtGui.QLabel(_("Warning: affects all Tortoises, logoff required after change"))
         grid.addWidget(w, 0, 0, 1, 3)
         self.enableAddedHandler = w = checkbox(_("Added"))
         grid.addWidget(w, 1, 0)
@@ -151,13 +151,13 @@ class ShellConfigWindow(QDialog):
         grid.addWidget(w, 2, 1)
         self.enableDeletedHandler = w = checkbox(_("Deleted*"))
         grid.addWidget(w, 2, 2)
-        w = QLabel(_("*: not used by TortoiseHg"))
+        w = QtGui.QLabel(_("*: not used by TortoiseHg"))
         grid.addWidget(w, 3, 0, 1, 3)
 
         # Taskbar group
-        gbox = QGroupBox(_("Taskbar"))
+        gbox = QtGui.QGroupBox(_("Taskbar"))
         iconslayout.addWidget(gbox)
-        hb = QHBoxLayout()
+        hb = QtGui.QHBoxLayout()
         gbox.setLayout(hb)
         self.show_taskbaricon = cb = checkbox(_("Show Icon"))
         hb.addWidget(cb)
@@ -168,8 +168,8 @@ class ShellConfigWindow(QDialog):
         iconslayout.addStretch()
 
         # dialog buttons
-        BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Apply)
+        BB = QtGui.QDialogButtonBox
+        bb = QtGui.QDialogButtonBox(BB.Ok|BB.Cancel|BB.Apply)
         self.apply_button = bb.button(BB.Apply)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
@@ -242,10 +242,10 @@ class ShellConfigWindow(QDialog):
 
     def accept(self):
         self.store_shell_configs()
-        QDialog.accept(self)
+        QtGui.QDialog.accept(self)
 
     def reject(self):
-        QDialog.reject(self)
+        QtGui.QDialog.reject(self)
 
     def apply(self):
         self.store_shell_configs()
@@ -284,7 +284,7 @@ class ShellConfigWindow(QDialog):
         self.update_states()
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QtGui.QApplication(sys.argv)
     form = ShellConfigWindow()
     form.show()
     app.exec_()
