@@ -85,13 +85,15 @@ class ShellConfigWindow(QDialog):
         grid.addWidget(w, 0, 0)
         self.topmenulist = w = QListWidget()
         grid.addWidget(w, 1, 0, 4, 1)
-        self.connect(w, SIGNAL("itemSelectionChanged ()"), self.update_states)
+        self.connect(w, SIGNAL("itemClicked(QListWidgetItem*)"), 
+            self.listItemClicked)
 
         w = QLabel(_("Sub menu items:"))
         grid.addWidget(w, 0, 2)
         self.submenulist = w = QListWidget()
         grid.addWidget(w, 1, 2, 4, 1)
-        self.connect(w, SIGNAL("itemSelectionChanged ()"), self.update_states)
+        self.connect(w, SIGNAL("itemClicked(QListWidgetItem*)"),
+            self.listItemClicked)
 
         style = QApplication.style()
         icon = style.standardIcon(QStyle.SP_ArrowLeft)
@@ -271,6 +273,13 @@ class ShellConfigWindow(QDialog):
 
     def stateChanged(self, state):
         self.dirty = True
+        self.update_states()
+
+    def listItemClicked(self, item):
+        itemlist = item.listWidget()
+        for list in (self.topmenulist, self.submenulist):
+            if list != itemlist:
+                list.setCurrentItem(None)
         self.update_states()
 
 if __name__ == "__main__":
