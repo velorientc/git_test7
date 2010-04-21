@@ -394,8 +394,12 @@ def repoconfig(ui, *pats, **opts):
 
 def shellconfig(ui, *pats, **opts):
     """Explorer extension configuration editor"""
-    from tortoisehg.hgtk.shellconf import run
-    gtkrun(run, ui, *pats, **opts)
+    from PyQt4 import QtGui
+    from tortoisehg.hgqt.shellconf import ShellConfigWindow
+    app = QtGui.QApplication(sys.argv)
+    form = ShellConfigWindow()
+    form.show()
+    app.exec_()
 
 def rename(ui, *pats, **opts):
     """rename a single file or directory"""
