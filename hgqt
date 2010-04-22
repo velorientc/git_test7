@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+#
+# hgqt - front-end script for TortoiseHg dialogs
+#
+# Copyright (C) 2008-2010 Steve Borho <steve@borho.org>
+# Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
+
+import os
+import sys
+
+thgpath = os.path.dirname(os.path.realpath(__file__))
+testpath = os.path.join(thgpath, 'tortoisehg')
+if os.path.isdir(testpath) and thgpath not in sys.path:
+    sys.path.insert(0, thgpath)
+
+if 'HGPATH' in os.environ:
+    hgpath = os.environ['HGPATH']
+    testpath = os.path.join(hgpath, 'mercurial')
+    if os.path.isdir(testpath) and hgpath not in sys.path:
+        sys.path.insert(0, hgpath)
+
+try:
+    import tortoisehg.hgqt.run
+except ImportError:
+    sys.stderr.write("abort: couldn't find hgtk libraries in [%s]\n" %
+                     ';'.join(sys.path))
+    sys.stderr.write("(check your install and PYTHONPATH)\n")
+    sys.exit(-1)
+
+sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
