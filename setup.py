@@ -57,6 +57,7 @@ def setup_windows(version):
     _scripts = []
     _data_files = []
     _packages = ['tortoisehg.hgtk', 'tortoisehg.hgtk.logview',
+                 'tortoisehg.hgqt',
                  'tortoisehg.util', 'tortoisehg']
     extra = {}
     hgextmods = []
