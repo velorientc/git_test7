@@ -58,7 +58,7 @@ def dispatch(args):
 
 origwdir = os.getcwd()
 def portable_fork(ui, opts):
-    if 'THG_HGTK_SPAWN' in os.environ or (
+    if 'THG_GUI_SPAWN' in os.environ or (
         not opts.get('fork') and opts.get('nofork')):
         return
     elif ui.configbool('tortoisehg', 'hgtkfork', None) is not None:
@@ -71,7 +71,7 @@ def portable_fork(ui, opts):
         args = sys.argv
     else:
         args = [sys.executable] + sys.argv
-    os.environ['THG_HGTK_SPAWN'] = '1'
+    os.environ['THG_GUI_SPAWN'] = '1'
     cmdline = subprocess.list2cmdline(args)
     os.chdir(origwdir)
     subprocess.Popen(cmdline,
