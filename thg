@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# hgqt - front-end script for TortoiseHg dialogs
+# thg - front-end script for TortoiseHg dialogs
 #
 # Copyright (C) 2008-2010 Steve Borho <steve@borho.org>
 # Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
