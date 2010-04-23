@@ -54,7 +54,7 @@ def dispatch(args):
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
     except:
-        pass
+        print traceback.format_exc()
 
 origwdir = os.getcwd()
 def portable_fork(ui, opts):

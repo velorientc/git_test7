@@ -22,6 +22,10 @@ if 'HGPATH' in os.environ:
     if os.path.isdir(testpath) and hgpath not in sys.path:
         sys.path.insert(0, hgpath)
 
+from mercurial import ui, util
+import cStringIO
+import traceback
+
 try:
     import tortoisehg.hgqt.run
 except ImportError:
@@ -30,4 +34,29 @@ except ImportError:
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
-sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
+_ui = ui.ui()
+capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
+
+if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
+    sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
+else:
+    mystderr = cStringIO.StringIO()
+    origstderr = sys.stderr
+    sys.stderr = mystderr
+    ret = 0
+    try:
+        ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
+        sys.stderr = origstderr
+        mystderr.seek(0)
+        for l in mystderr.readlines():
+            if l.startswith('Traceback') or l.startswith('TypeError') or \
+               l.startswith('NameError'):
+                print error
+                break
+        sys.exit(ret)
+    except:
+        if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
+            sys.stderr = origstderr
+            traceback.print_exc()
+        else:
+            raise SystemExit(ret)
