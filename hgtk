@@ -25,7 +25,6 @@ else:
 import pygtk
 pygtk.require('2.0')
 import gtk
-import PyQt4
 
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
@@ -37,7 +36,7 @@ import cStringIO
 import traceback
 
 try:
-    import tortoisehg.hgqt.hgtk
+    import tortoisehg.hgtk.hgtk
 except ImportError:
     sys.stderr.write("abort: couldn't find hgtk libraries in [%s]\n" %
                      ';'.join(sys.path))
@@ -53,21 +52,21 @@ if err:
     sys.exit(1)
 
 if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
-    sys.exit(tortoisehg.hgqt.hgtk.dispatch(sys.argv[1:]))
+    sys.exit(tortoisehg.hgtk.hgtk.dispatch(sys.argv[1:]))
 else:
     mystderr = cStringIO.StringIO()
     origstderr = sys.stderr
     sys.stderr = mystderr
     ret = 0
     try:
-        ret = tortoisehg.hgqt.hgtk.dispatch(sys.argv[1:])
+        ret = tortoisehg.hgtk.hgtk.dispatch(sys.argv[1:])
         sys.stderr = origstderr
         mystderr.seek(0)
         for l in mystderr.readlines():
             if l.startswith('Traceback') or l.startswith('TypeError') or \
                l.startswith('NameError'):
                 from tortoisehg.hgtk.bugreport import run
-                from tortoisehg.hgqt.hgtk import gtkrun
+                from tortoisehg.hgtk.hgtk import gtkrun
                 error = 'Recoverable runtime error (stderr):\n'
                 error += mystderr.getvalue()
                 opts = {}
