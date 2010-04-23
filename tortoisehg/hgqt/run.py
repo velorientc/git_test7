@@ -527,12 +527,25 @@ globalopts = [
 ]
 
 table = {
-    "^clone": (clone, [],  _('thg clone SOURCE [DEST]')),
+    "^clone":
+        (clone,
+         [('U', 'noupdate', None,
+           _('the clone will include an empty working copy '
+             '(only a repository)')),
+          ('u', 'updaterev', '',
+           _('revision, tag or branch to check out')),
+          ('r', 'rev', [], _('include the specified changeset')),
+          ('b', 'branch', [],
+           _('clone only the specified branch')),
+          ('', 'pull', None, _('use pull protocol to copy metadata')),
+          ('', 'uncompressed', None,
+           _('use uncompressed transfer (fast over LAN)')),],
+         _('thg clone [OPTION]... SOURCE [DEST]')),
     "^update|checkout|co":
         (update,
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
           ('r', 'rev', '', _('revision to update')),],
-         _('hgqt update [-C] [[-r] REV')),
+         _('thg update [-C] [[-r] REV')),
 }
 
 if os.name == 'nt':
