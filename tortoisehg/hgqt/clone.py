@@ -1,5 +1,7 @@
 # clone.py - Clone dialog for TortoiseHg
 #
+# Copyright 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright 2007 Steve Borho <steve@borho.org>
 # Copyright 2010 Yuki KODAMA <endflow.net@gmail.com>
 #
 # This software may be used and distributed according to the terms of the
