@@ -41,7 +41,7 @@ nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
 about help version thgstatus serve'''
 
 def dispatch(args):
-    "run the command specified in args"
+    """run the command specified in args"""
     try:
         u = _ui.ui()
         if '--traceback' in args:
@@ -168,16 +168,16 @@ def _runcatch(ui, args):
             ui.flush()
     except error.ParseError, inst:
         if inst.args[0]:
-            ui.status(_("hgtk %s: %s\n") % (inst.args[0], inst.args[1]))
+            ui.status(_("thg %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
-            ui.status(_("hgtk: %s\n") % inst.args[1])
+            ui.status(_("thg: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
     except error.AmbiguousCommand, inst:
-        ui.status(_("hgtk: command '%s' is ambiguous:\n    %s\n") %
+        ui.status(_("thg: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
     except error.UnknownCommand, inst:
-        ui.status(_("hgtk: unknown command '%s'\n") % inst.args[0])
+        ui.status(_("thg: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
     except error.RepoError, inst:
         ui.status(_("abort: %s!\n") % inst)
@@ -325,17 +325,17 @@ def help_(ui, name=None, with_version=False, **opts):
         if ui.verbose:
             option_lists.append((_("global options:"), globalopts))
             if name == 'shortlist':
-                option_lists.append((_('use "hgtk help" for the full list '
+                option_lists.append((_('use "thg help" for the full list '
                                        'of commands'), ()))
         else:
             if name == 'shortlist':
-                msg = _('use "hgtk help" for the full list of commands '
-                        'or "hgtk -v" for details')
+                msg = _('use "thg help" for the full list of commands '
+                        'or "thg -v" for details')
             elif aliases:
-                msg = _('use "hgtk -v help%s" to show aliases and '
+                msg = _('use "thg -v help%s" to show aliases and '
                         'global options') % (name and " " + name or "")
             else:
-                msg = _('use "hgtk -v help %s" to show global options') % name
+                msg = _('use "thg -v help %s" to show global options') % name
             option_lists.append((msg, ()))
 
     def helpcmd(name):
@@ -447,7 +447,7 @@ def help_(ui, name=None, with_version=False, **opts):
         if ui.verbose or with_version:
             version(ui)
         else:
-            ui.status(_("Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"))
+            ui.status(_("Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"))
         ui.status('\n')
 
         # list of commands
@@ -522,10 +522,9 @@ globalopts = [
 ]
 
 table = {
-    "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
+    "^clone": (clone, [],  _('thg clone SOURCE [DEST]')),
 }
 
 if os.name == 'nt':
     # TODO: extra detection to determine if shell extension is installed
-    table['shellconfig'] = (shellconfig, [], _('hgtk shellconfig'))
-
+    table['shellconfig'] = (shellconfig, [], _('thg shellconfig'))
