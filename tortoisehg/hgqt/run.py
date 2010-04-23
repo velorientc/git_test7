@@ -541,6 +541,7 @@ table = {
           ('', 'uncompressed', None,
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
+    "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":
         (update,
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
