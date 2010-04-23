@@ -304,6 +304,11 @@ def clone(ui, *pats, **opts):
     from tortoisehg.hgqt.clone import run
     qtrun(run, ui, *pats, **opts)
 
+def shellconfig(ui, *pats, **opts):
+    """Explorer extension configuration editor"""
+    from tortoisehg.hgqt.shellconf import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -519,3 +524,8 @@ globalopts = [
 table = {
     "^clone": (clone, [],  _('hgtk clone SOURCE [DEST]')),
 }
+
+if os.name == 'nt':
+    # TODO: extra detection to determine if shell extension is installed
+    table['shellconfig'] = (shellconfig, [], _('hgtk shellconfig'))
+

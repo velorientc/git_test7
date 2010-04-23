@@ -283,6 +283,9 @@ class ShellConfigWindow(QtGui.QDialog):
                 list.setCurrentItem(None)
         self.update_states()
 
+def run(ui, *pats, **opts):
+    return ShellConfigWindow()
+
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     form = ShellConfigWindow()
