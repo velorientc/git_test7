@@ -309,6 +309,11 @@ def shellconfig(ui, *pats, **opts):
     from tortoisehg.hgqt.shellconf import run
     qtrun(run, ui, *pats, **opts)
 
+def update(ui, *pats, **opts):
+    """update/checkout tool"""
+    from tortoisehg.hgqt.update import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -523,6 +528,11 @@ globalopts = [
 
 table = {
     "^clone": (clone, [],  _('thg clone SOURCE [DEST]')),
+    "^update|checkout|co":
+        (update,
+         [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
+          ('r', 'rev', '', _('revision to update')),],
+         _('hgqt update [-C] [[-r] REV')),
 }
 
 if os.name == 'nt':
