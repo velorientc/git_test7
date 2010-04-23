@@ -171,8 +171,7 @@ class CmdThread(QThread):
 
     def interact_handler(self, wrapper):
         prompt, password, choices, default = wrapper.data
-        if isinstance(prompt, str):
-            prompt = unicode(prompt, 'mbcs')
+        prompt = hglib.tounicode(prompt)
         if choices:
             dlg = QMessageBox(QMessageBox.Question,
                         _('TortoiseHg Prompt'), prompt,
@@ -180,7 +179,7 @@ class CmdThread(QThread):
             dlg.setDefaultButton(QMessageBox.Cancel)
             rmap = {}
             for index, choice in enumerate(choices):
-                button = dlg.addButton(unicode(choice, 'mbcs'),
+                button = dlg.addButton(hglib.tounicode(choice),
                                        QMessageBox.ActionRole)
                 rmap[id(button)] = index
             dlg.exec_()

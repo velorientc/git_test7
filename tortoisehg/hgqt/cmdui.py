@@ -9,6 +9,7 @@ from PyQt4.QtCore import Qt, QString
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QLabel, QProgressBar
 from PyQt4.QtGui import QTextEdit, QHBoxLayout, QGridLayout, QMessageBox
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, localgettext
 from tortoisehg.hgqt import qtlib, thread
 
@@ -112,8 +113,7 @@ class Dialog(QDialog):
         self.close_btn.setFocus()
 
     def append_output(self, msg, style=''):
-        if isinstance(msg, str):
-            msg = unicode(msg, 'mbcs')
+        msg = hglib.tounicode(msg)
         msg = msg.replace('\n', '<br />')
         self.log_text.insertHtml('<pre style="%s">%s</pre>' % (style, msg))
 
@@ -152,12 +152,12 @@ class Dialog(QDialog):
             count = '%d / %d' % (pos, total)
         if unit:
             count += ' ' + unit
-        self.prog_label.setText(unicode(count, 'mbcs'))
+        self.prog_label.setText(hglib.tounicode(count))
         if item:
             status = '%s: %s' % (topic, item)
         else:
             status = local._('Status: %s') % topic
-        self.status_label.setText(unicode(status, 'mbcs'))
+        self.status_label.setText(hglib.tounicode(status))
         self.inprogress = True
 
         if not self.inprogress or counting:
