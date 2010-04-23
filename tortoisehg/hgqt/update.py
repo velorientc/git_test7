@@ -13,4 +13,6 @@ def run(ui, *pats, **opts):
     args = ['update']
     if opts.get('rev'):
         args += ['-r', opts.get('rev')]
+    elif len(pats) == 1:
+        args += [pats[0]]    
     return cmdui.Dialog(args)
