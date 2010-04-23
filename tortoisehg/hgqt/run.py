@@ -546,7 +546,7 @@ table = {
         (update,
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
           ('r', 'rev', '', _('revision to update')),],
-         _('thg update [-C] [[-r] REV')),
+         _('thg update [-C] [[-r] REV]')),
 }
 
 if os.name == 'nt':
