@@ -33,6 +33,17 @@ if gobject.pygobject_version <= (2,12,1):
     # http://www.mail-archive.com/tortoisehg-develop@lists.sourceforge.net/msg06900.html
     raise Exception('incompatible version of gobject')
 
+if gtk.pygtk_version < (2, 12, 0):
+    # old nasty
+    Tooltips = gtk.Tooltips
+else:
+    # new shiny
+    class Tooltips(object):
+        def __init__(self):
+            pass
+        def set_tip(self, widget, tip):
+            widget.set_tooltip_text(tip)
+
 # common colors
 
 DRED = '#900000'
@@ -48,17 +59,6 @@ PGREEN = '#aaffaa'
 PBLUE = '#aaddff'
 PYELLOW = '#ffffaa'
 PORANGE = '#ffddaa'
-
-if gtk.pygtk_version < (2, 12, 0):
-    # old nasty
-    Tooltips = gtk.Tooltips
-else:
-    # new shiny
-    class Tooltips(object):
-        def __init__(self):
-            pass
-        def set_tip(self, widget, tip):
-            widget.set_tooltip_text(tip)
 
 RED = 'red'
 GREEN = 'green'
