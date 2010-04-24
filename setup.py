@@ -125,6 +125,11 @@ def setup_windows(version):
              'description':'TortoiseHg GUI tools for Mercurial SCM',
              'copyright':thgcopyright,
              'product_version':version},
+            {'script':'thg',
+             'icon_resources':[(0,'icons/thg_logo.ico')],
+             'description':'TortoiseHg GUI tools for Mercurial SCM',
+             'copyright':thgcopyright,
+             'product_version':version},
             {'script':'contrib/docdiff.py',
              'icon_resources':[(0,'icons/TortoiseMerge.ico')],
              'copyright':thgcopyright,
@@ -144,7 +149,7 @@ def setup_windows(version):
 def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
-    _scripts = ['hgtk']
+    _scripts = ['thg', 'hgtk']
     _packages = ['tortoisehg', 'tortoisehg.hgtk', 
                  'tortoisehg.hgtk.logview', 'tortoisehg.util']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
