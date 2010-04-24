@@ -1467,9 +1467,9 @@ class ConfigDialog(gtk.Dialog):
         self.refresh_vlist()
 
         try:
-            f = open(self.fn, 'w')
+            f = util.atomictempfile(self.fn, 'w', createmode=None)
             f.write(str(self.ini))
-            f.close()
+            f.rename()
             self._btn_apply.set_sensitive(False)
             self.dirty = False
         except IOError, e:

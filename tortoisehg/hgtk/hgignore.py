@@ -248,9 +248,10 @@ class HgIgnoreDialog(gtk.Window):
         else:
             out = [line + '\n' for line in self.ignorelines]
         try:
-            f = open(self.ignorefile, 'wb')
+            f = util.atomictempfile(self.ignorefile, 'wb',
+                                    createmode=None)
             f.writelines(out)
-            f.close()
+            f.rename()
         except IOError:
             pass
         shlib.shell_notify([self.ignorefile])
