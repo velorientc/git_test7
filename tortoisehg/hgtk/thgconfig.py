@@ -1474,7 +1474,7 @@ class ConfigDialog(gtk.Dialog):
             self.dirty = False
         except IOError, e:
             dialog.error_dialog(self, _('Unable to write configuration file'),
-                    str(e))
+                                hglib.tounicode(str(e)))
 
         return 0
 
