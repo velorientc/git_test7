@@ -50,8 +50,7 @@ else:
         sys.stderr = origstderr
         mystderr.seek(0)
         for l in mystderr.readlines():
-            if l.startswith('Traceback') or l.startswith('TypeError') or \
-               l.startswith('NameError'):
+            if l.startswith(('Traceback', 'TypeError', 'NameError')):
                 print error
                 break
         sys.exit(ret)
