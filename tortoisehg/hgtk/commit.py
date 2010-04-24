@@ -1197,9 +1197,9 @@ class GCommit(GStatus):
                 if self.notify_func:
                     self.notify_func(*self.notify_args)
                 if autopush:
-                    text = _('Finish committing and pushing')
+                    text = _('Finished committing and pushing')
                 else:
-                    text = _('Finish committing')
+                    text = _('Finished committing')
             elif return_code is None:
                 text = _('Aborted committing')
             else:
@@ -1210,7 +1210,7 @@ class GCommit(GStatus):
                     status=_('Committing changes...'),
                     title=_('Commit')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
+                           _('Please try again after the running '
                              'operation is completed'), self).run()
 
     def get_tip_rev(self, refresh=False):
