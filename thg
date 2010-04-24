@@ -30,8 +30,8 @@ import traceback
 try:
     import tortoisehg.hgqt.run
 except ImportError:
-    sys.stderr.write("abort: couldn't find hgtk libraries in [%s]\n" %
-                     ';'.join(sys.path))
+    sys.stderr.write("abort: couldn't find tortoisehg libraries in [%s]\n" %
+                     os.pathsep.join(sys.path))
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
