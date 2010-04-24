@@ -12,16 +12,16 @@ import os
 import cStringIO
 import gtk
 import gobject
-import pango
 import threading
 
-from mercurial import cmdutil, util, commands, patch, mdiff, error, hg
+from mercurial import cmdutil, util, patch, error, hg
 from mercurial import merge as merge_
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, shlib, paths, hgshelve
+from tortoisehg.util import hglib, paths, hgshelve
 
-from tortoisehg.hgtk import dialog, gdialog, gtklib, guess, hgignore, statusbar
+from tortoisehg.hgtk import dialog, gdialog, gtklib, guess, hgignore, statusbar, statusact
+from tortoisehg.hgtk import chunks
 
 # file model row enumerations
 FM_CHECKED = 0
@@ -31,41 +31,6 @@ FM_PATH = 3
 FM_MERGE_STATUS = 4
 FM_PARTIAL_SELECTED = 5
 
-# diffmodel row enumerations
-DM_REJECTED  = 0
-DM_DISP_TEXT = 1
-DM_IS_HEADER = 2
-DM_PATH      = 3
-DM_CHUNK_ID  = 4
-DM_FONT      = 5
-
-def hunk_markup(text):
-    'Format a diff hunk for display in a TreeView row with markup'
-    hunk = ''
-    # don't use splitlines, should split with only LF for the patch
-    lines = hglib.tounicode(text).split(u'\n')
-    for line in lines:
-        line = hglib.toutf(line[:512]) + '\n'
-        if line.startswith('---') or line.startswith('+++'):
-            hunk += gtklib.markup(line, color=gtklib.DBLUE)
-        elif line.startswith('-'):
-            hunk += gtklib.markup(line, color=gtklib.DRED)
-        elif line.startswith('+'):
-            hunk += gtklib.markup(line, color=gtklib.DGREEN)
-        elif line.startswith('@@'):
-            hunk = gtklib.markup(line, color='#FF8000')
-        else:
-            hunk += gtklib.markup(line)
-    return hunk
-
-def hunk_unmarkup(text):
-    'Format a diff hunk for display in a TreeView row without markup'
-    hunk = ''
-    # don't use splitlines, should split with only LF for the patch
-    lines = hglib.tounicode(text).split(u'\n')
-    for line in lines:
-        hunk += gtklib.markup(hglib.toutf(line[:512])) + '\n'
-    return hunk
 
 class GStatus(gdialog.GWindow):
     """GTK+ based dialog for displaying repository status
@@ -85,13 +50,12 @@ class GStatus(gdialog.GWindow):
         gdialog.GWindow.init(self)
         self.mode = 'status'
         self.ready = False
-        self.filechunks = {}
-        self.diffmodelfile = None
         self.status = (None,) * 7
         self.status_error = None
         self.preview_tab_name_label = None
         self.subrepos = []
         self.colorstyle = self.repo.ui.config('tortoisehg', 'diffcolorstyle')
+        self.act = statusact.statusact(self)
 
     def auto_check(self):
         # Only auto-check files once, and only if a pattern was given.
@@ -210,8 +174,7 @@ class GStatus(gdialog.GWindow):
         self.connect('thg-refresh', self.thgrefresh)
 
         # set CTRL-c accelerator for copy-clipboard
-        gtklib.add_accelerator(self.difftree, 'copy-clipboard', accelgroup, mod+'c')
-        self.difftree.connect('copy-clipboard', self.copy_to_clipboard)
+        gtklib.add_accelerator(self.chunks.difftree(), 'copy-clipboard', accelgroup, mod+'c')
 
         def scroll_diff_notebook(widget, direction=gtk.SCROLL_PAGE_DOWN):
             page_num = self.diff_notebook.get_current_page()
@@ -259,12 +222,18 @@ class GStatus(gdialog.GWindow):
 
         return accelgroup
                 
-
     def get_body(self):
         is_merge = self.is_merge()
 
         # model stores the file list.
-        fm = gtk.ListStore(bool, str, str, str, str, bool)
+        fm = gtk.ListStore(
+              bool, # FM_CHECKED
+              str,  # FM_STATUS
+              str,  # FM_PATH_UTF8
+              str,  # FM_PATH
+              str,  # FM_MERGE_STATUS
+              bool  # FM_PARTIAL_SELECTED
+            )
         fm.set_sort_func(1001, self.sort_by_stat)
         fm.set_default_sort_func(self.sort_by_stat)
         self.filemodel = fm
@@ -384,48 +353,12 @@ class GStatus(gdialog.GWindow):
         # use treeview to show selectable diff hunks
         self.clipboard = gtk.Clipboard()
 
-        self.diffmodel = gtk.ListStore(
-                bool, # DM_REJECTED
-                str,  # DM_DISP_TEXT
-                bool, # DM_IS_HEADER
-                str,  # DM_PATH
-                int,  # DM_CHUNK_ID
-                pango.FontDescription)
-
-        difftree = gtk.TreeView(self.diffmodel)
-        
-        difftree.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        difftree.set_headers_visible(False)
-        difftree.set_enable_search(False)
-        if getattr(difftree, 'enable-grid-lines', None) is not None:
-            difftree.set_property('enable-grid-lines', True)
-        difftree.connect('row-activated', self.diff_tree_row_act)
-        self.difftree = difftree
-        
-        cell = gtk.CellRendererText()
-        diffcol = gtk.TreeViewColumn('diff', cell)
-        diffcol.set_resizable(True)
-        diffcol.add_attribute(cell, 'markup', DM_DISP_TEXT)
-
-        # differentiate header chunks
-        cell.set_property('cell-background', '#DDDDDD')
-        diffcol.add_attribute(cell, 'cell_background_set', DM_IS_HEADER)
-        self.headerfont = self.difffont.copy()
-        self.headerfont.set_weight(pango.WEIGHT_HEAVY)
-
-        # differentiate rejected hunks
-        self.rejfont = self.difffont.copy()
-        self.rejfont.set_weight(pango.WEIGHT_LIGHT)
-        diffcol.add_attribute(cell, 'font-desc', DM_FONT)
-        cell.set_property('background', '#EEEEEE')
-        cell.set_property('foreground', '#888888')
-        diffcol.add_attribute(cell, 'background-set', DM_REJECTED)
-        diffcol.add_attribute(cell, 'foreground-set', DM_REJECTED)
-        difftree.append_column(diffcol)
+        # create chunks object
+        self.chunks = chunks.chunks(self)
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroller.add(difftree)
+        scroller.add(self.chunks.difftree())
         self.append_page('hunk-selection', scroller, gtk.Label(_('Hunk Selection')))
 
         # Add a page for commit preview
@@ -453,11 +386,9 @@ class GStatus(gdialog.GWindow):
 
         sel = self.filetree.get_selection()
         sel.set_mode(gtk.SELECTION_MULTIPLE)
-        self.treeselid = sel.connect('changed', self.tree_sel_changed,
-                difftree)
+        self.treeselid = sel.connect('changed', self.tree_sel_changed)
 
-        self.diff_notebook.connect('switch-page', self.page_switched,
-                                   sel, difftree)
+        self.diff_notebook.connect('switch-page', self.page_switched, sel)
 
         # add keyboard accelerators
         accelgroup = self.get_accelgroup()     
@@ -469,8 +400,8 @@ class GStatus(gdialog.GWindow):
         num = self.diff_notebook.append_page(child,  label)
         self.diff_notebook_pages[num] = name
 
-    def page_switched(self, notebook, page, page_num, filesel, difftree):
-        self.tree_sel_changed(filesel, difftree, page_num)
+    def page_switched(self, notebook, page, page_num, filesel):
+        self.tree_sel_changed(filesel, page_num)
 
     def get_extras(self):
         self.stbar = statusbar.StatusBar()
@@ -617,30 +548,6 @@ class GStatus(gdialog.GWindow):
     def thgrefresh(self, window):
         self.reload_status()
 
-    def copy_to_clipboard(self, treeview):
-        'Write highlighted hunks to the clipboard'
-        if not treeview.is_focus():
-            w = self.get_focus()
-            w.emit('copy-clipboard')
-            return False
-        saves = {}
-        model, tpaths = treeview.get_selection().get_selected_rows()
-        for row, in tpaths:
-            wfile, cid = model[row][DM_PATH], model[row][DM_CHUNK_ID]
-            if wfile not in saves:
-                saves[wfile] = [cid]
-            else:
-                saves[wfile].append(cid)
-        fp = cStringIO.StringIO()
-        for wfile in saves.keys():
-            chunks = self.filechunks[wfile]
-            chunks[0].write(fp)
-            for cid in saves[wfile]:
-                if cid != 0:
-                    chunks[cid].write(fp)
-        fp.seek(0)
-        self.clipboard.set_text(fp.read())
-
     def refresh_file_tree(self):
         """Clear out the existing ListStore model and reload it from the
         repository status.  Also recheck and reselect files that remain
@@ -699,17 +606,14 @@ class GStatus(gdialog.GWindow):
 
         self.auto_check() # may check more files
 
-        for i, row in enumerate(model):
+        for row in model:
             if row[FM_PARTIAL_SELECTED]:
                 # force refresh of partially selected files
-                self.update_hunk_model(i, self.filetree)
-                self.diffmodel.clear()
-                self.diffmodelfile = None
+                self.chunks.update_hunk_model(row[FM_PATH], row[FM_CHECKED])
+                self.chunks.clear()
             else:
                 # demand refresh of full or non selection
-                wfile = row[FM_PATH]
-                if wfile in self.filechunks:
-                    del self.filechunks[wfile]
+                self.chunks.del_file(row[FM_PATH])
 
         # recover selections
         firstrow = None
@@ -728,8 +632,7 @@ class GStatus(gdialog.GWindow):
             self.diff_text.set_buffer(gtk.TextBuffer())
             self.preview_text.set_buffer(gtk.TextBuffer())
             if not is_merge:
-                self.diffmodel.clear()
-                self.diffmodelfile = None
+                self.chunks.clear()
 
         self.filetree.show()
         if self.mode == 'commit':
@@ -813,6 +716,12 @@ class GStatus(gdialog.GWindow):
         gobject.timeout_add(50, status_wait, thread)
         return True
 
+    def nodes(self):
+        return (self._node1, self._node2)
+
+    def get_ctx(self):
+        return self.repo[self._node1]
+
     def set_file_states(self, paths, state=True):
         for p in paths:
             self.filemodel[p][FM_CHECKED] = state
@@ -831,48 +740,7 @@ class GStatus(gdialog.GWindow):
         fileentry[FM_PARTIAL_SELECTED] = False
         wfile = fileentry[FM_PATH]
         selected = fileentry[FM_CHECKED]
-        if wfile not in self.filechunks:
-            return
-        chunks = self.filechunks[wfile]
-        for chunk in chunks:
-            chunk.active = selected
-        if wfile != self.diffmodelfile:
-            return
-        for n, chunk in enumerate(chunks):
-            if n == 0:
-                continue
-            self.diffmodel[n][DM_REJECTED] = not selected
-            self.update_diff_hunk(self.diffmodel[n])
-        self.update_diff_header(self.diffmodel, wfile, selected)
-
-    def update_diff_hunk(self, row):
-        'Update the contents of a diff row based on its chunk state'
-        wfile = row[DM_PATH]
-        chunks = self.filechunks[wfile]
-        chunk = chunks[row[DM_CHUNK_ID]]
-        buf = cStringIO.StringIO()
-        chunk.pretty(buf)
-        buf.seek(0)
-        if chunk.active:
-            row[DM_REJECTED] = False
-            row[DM_FONT] = self.difffont
-            row[DM_DISP_TEXT] = hunk_markup(buf.read())
-        else:
-            row[DM_REJECTED] = True
-            row[DM_FONT] = self.rejfont
-            row[DM_DISP_TEXT] = hunk_unmarkup(buf.read())
-
-    def update_diff_header(self, dmodel, wfile, selected):
-        try:
-            chunks = self.filechunks[wfile]
-        except IndexError:
-            return
-        lasthunk = len(chunks)-1
-        sel = lambda x: x >= lasthunk or not dmodel[x+1][DM_REJECTED]
-        newtext = chunks[0].selpretty(sel)
-        if not selected:
-            newtext = "<span foreground='#888888'>" + newtext + "</span>"
-        dmodel[0][DM_DISP_TEXT] = newtext
+        self.chunks.update_chunk_state(wfile, selected)
 
     def updated_codes(self):
         types = [('modified', 'M'),
@@ -921,93 +789,18 @@ class GStatus(gdialog.GWindow):
         elif stat == 'R':
             text_renderer.set_property('foreground', gtklib.DRED)
         elif stat == 'C':
-            text_renderer.set_property('foreground', 'black')
+            text_renderer.set_property('foreground', gtklib.NORMAL)
         elif stat == '!':
-            text_renderer.set_property('foreground', 'red')
+            text_renderer.set_property('foreground', gtklib.RED)
         elif stat == '?':
-            text_renderer.set_property('foreground', '#AA5000')
+            text_renderer.set_property('foreground', gtklib.DORANGE)
         elif stat == 'I':
-            text_renderer.set_property('foreground', '#404040')
+            text_renderer.set_property('foreground', gtklib.DGRAY)
         else:
-            text_renderer.set_property('foreground', 'black')
+            text_renderer.set_property('foreground', gtklib.NORMAL)
 
 
-    def rename_file(self, wfile):
-        fdir, fname = os.path.split(wfile)
-        utf_fname = hglib.toutf(fname)
-        newfile = dialog.entry_dialog(self, _('Rename file to:'),
-                         True, utf_fname)
-        if newfile and newfile != utf_fname:
-            self.hg_move([wfile, os.path.join(fdir, hglib.fromutf(newfile))])
-        return True
-
-
-    def copy_file(self, wfile):
-        wfile = self.repo.wjoin(wfile)
-        fdir, fname = os.path.split(wfile)
-        result = gtklib.NativeSaveFileDialogWrapper(title=_('Copy file to'),
-                                                    initial=fdir,
-                                                    filename=fname).run()
-        if not result:
-            return
-        if result != wfile:
-            self.hg_copy([wfile, result])
-        return True
-
-
-    def hg_remove(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Removed'),
-              _('Remove is not enabled when multiple revisions are specified.'),
-              self).run()
-            return
-
-        # Create new opts, so nothing unintented gets through
-        removeopts = self.merge_opts(commands.table['^remove|rm'][1],
-                                     ('include', 'exclude'))
-        def dohgremove():
-            commands.remove(self.ui, self.repo, *wfiles, **removeopts)
-        success, outtext = self._hg_call_wrapper('Remove', dohgremove)
-        if success:
-            self.reload_status()
-
-
-    def hg_move(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Moved'), _('Move is not enabled when '
-                    'multiple revisions are specified.'), self).run()
-            return
-
-        # Create new opts, so nothing unintented gets through
-        moveopts = self.merge_opts(commands.table['rename|mv'][1],
-                ('include', 'exclude'))
-        def dohgmove():
-            #moveopts['force'] = True
-            commands.rename(self.ui, self.repo, *wfiles, **moveopts)
-        success, outtext = self._hg_call_wrapper('Move', dohgmove)
-        if success:
-            self.reload_status()
-
-
-    def hg_copy(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Copied'), _('Copy is not enabled when '
-                    'multiple revisions are specified.'), self).run()
-            return
-
-        # Create new opts, so nothing unintented gets through
-        cmdopts = self.merge_opts(commands.table['copy|cp'][1],
-                ('include', 'exclude'))
-        def dohgcopy():
-            commands.copy(self.ui, self.repo, *wfiles, **cmdopts)
-        success, outtext = self._hg_call_wrapper('Copy', dohgcopy)
-        if success:
-            self.reload_status()
-
-    def tree_sel_changed(self, selection, tree, page_num=None):
+    def tree_sel_changed(self, selection, page_num=None):
         'Selection changed in file tree'
         # page_num may be supplied, if called from switch-page event
         model, paths = selection.get_selected_rows()
@@ -1030,7 +823,10 @@ class GStatus(gdialog.GWindow):
             buf = self.generate_text_diffs(row)
             self.diff_text.set_buffer(buf)
         elif pname == 'hunk-selection':
-            self.update_hunk_model(row, tree)
+            fmrow = self.filemodel[row]
+            self.chunks.update_hunk_model(fmrow[FM_PATH], fmrow[FM_CHECKED])
+            if not self.is_merge() and self.chunks.len():
+                self.chunks.difftree().scroll_to_cell(0, use_align=True, row_align=0.0)
         elif pname == 'commit-preview':
             self.update_commit_preview()
 
@@ -1074,18 +870,13 @@ class GStatus(gdialog.GWindow):
                 if not row[FM_CHECKED]:
                     continue
                 wfile = row[FM_PATH]
-                if wfile in self.filechunks:
-                    chunks = self.filechunks[wfile]
-                else:
-                    chunks = self.read_file_chunks(wfile)
-                    for c in chunks:
-                        c.active = True
-                    self.filechunks[wfile] = chunks
+                chunks = self.chunks.get_chunks(wfile)
                 for i, chunk in enumerate(chunks):
                     if i == 0:
                         chunk.write(buf)
                     elif chunk.active:
                         chunk.write(buf)
+
             difftext = buf.getvalue().splitlines(True)
         self.preview_text.set_buffer(self.diff_highlight_buffer(difftext))
 
@@ -1100,7 +891,7 @@ class GStatus(gdialog.GWindow):
         else:
             buf.create_tag('removed', foreground=gtklib.DRED)
             buf.create_tag('added', foreground=gtklib.DGREEN)
-        buf.create_tag('position', foreground='#FF8000')
+        buf.create_tag('position', foreground=gtklib.DORANGE)
         buf.create_tag('header', foreground=gtklib.DBLUE)
 
         bufiter = buf.get_start_iter()
@@ -1124,7 +915,7 @@ class GStatus(gdialog.GWindow):
     def generate_text_diffs(self, row):
         wfile = self.filemodel[row][FM_PATH]
         pfile = util.pconvert(wfile)
-        lines = self.check_max_diff(pfile)
+        lines = chunks.check_max_diff(self.get_ctx(), pfile)
         if lines:
             return self.diff_highlight_buffer(lines)
         matcher = cmdutil.matchfiles(self.repo, [pfile])
@@ -1156,161 +947,21 @@ class GStatus(gdialog.GWindow):
                 self.stbar.set_text(str(e))
         return self.diff_highlight_buffer(difftext)
 
-
-    def update_hunk_model(self, path, tree):
-        # Read this file's diffs into hunk selection model
-        wfile = self.filemodel[path][FM_PATH]
-        self.diffmodel.clear()
-        self.diffmodelfile = wfile
-        if not self.is_merge():
-            self.append_diff_hunks(wfile)
-            if len(self.diffmodel):
-                tree.scroll_to_cell(0, use_align=True, row_align=0.0)
-
-    def check_max_diff(self, pfile):
-        lines = []
-        ctx = self.repo[self._node1]
-        try:
-            fctx = ctx.filectx(pfile)
-        except error.LookupError:
-            fctx = None
-        if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
-            # Fake patch that displays size warning
-            lines = ['diff --git a/%s b/%s\n' % (pfile, pfile)]
-            lines.append(_('File is larger than the specified max size.\n'))
-            lines.append(_('Hunk selection is disabled for this file.\n'))
-            lines.append('--- a/%s\n' % pfile)
-            lines.append('+++ b/%s\n' % pfile)
-        return lines
-
-    def read_file_chunks(self, wfile):
-        'Get diffs of working file, parse into (c)hunks'
-        difftext = cStringIO.StringIO()
-        pfile = util.pconvert(wfile)
-        lines = self.check_max_diff(pfile)
-        if lines:
-            difftext.writelines(lines)
-            difftext.seek(0)
-        else:
-            matcher = cmdutil.matchfiles(self.repo, [pfile])
-            diffopts = mdiff.diffopts(git=True, nodates=True)
-            try:
-                for s in patch.diff(self.repo, self._node1, self._node2,
-                        match=matcher, opts=diffopts):
-                    difftext.writelines(s.splitlines(True))
-            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-                self.stbar.set_text(str(e))
-            difftext.seek(0)
-        return hgshelve.parsepatch(difftext)
-
-    def append_diff_hunks(self, wfile):
-        'Append diff hunks of one file to the diffmodel'
-        chunks = self.read_file_chunks(wfile)
-        if not chunks:
-            if wfile in self.filechunks:
-                del self.filechunks[wfile]
-            return
-
+    def update_check_state(self, wfile, partial, newvalue):
         for fr in self.filemodel:
             if fr[FM_PATH] == wfile:
-                break
-        else:
-            # should not be possible
-            return
+                if fr[FM_PARTIAL_SELECTED] != partial:
+                    fr[FM_PARTIAL_SELECTED] = partial
+                if fr[FM_CHECKED] != newvalue:
+                    fr[FM_CHECKED] = newvalue
+                    self.update_check_count()
+                return
 
-        rows = []
-        for n, chunk in enumerate(chunks):
-            if isinstance(chunk, hgshelve.header):
-                # header chunk is always active
-                chunk.active = True
-                rows.append([False, '', True, wfile, n, self.headerfont])
-                if chunk.special():
-                    chunks = chunks[:1]
-                    break
-            else:
-                # chunks take file's selection state by default
-                chunk.active = fr[FM_CHECKED]
-                rows.append([False, '', False, wfile, n, self.difffont])
-
-
-        # recover old chunk selection/rejection states, match fromline
-        if wfile in self.filechunks:
-            ochunks = self.filechunks[wfile]
-            next = 1
-            for oc in ochunks[1:]:
-                for n in xrange(next, len(chunks)):
-                    nc = chunks[n]
-                    if oc.fromline == nc.fromline:
-                        nc.active = oc.active
-                        next = n+1
-                        break
-                    elif nc.fromline > oc.fromline:
-                        break
-
-        self.filechunks[wfile] = chunks
-
-        # Set row status based on chunk state
-        rej, nonrej = False, False
-        for n, row in enumerate(rows):
-            if not row[DM_IS_HEADER]:
-                if chunks[n].active:
-                    nonrej = True
-                else:
-                    rej = True
-                row[DM_REJECTED] = not chunks[n].active
-                self.update_diff_hunk(row)
-            self.diffmodel.append(row)
-
-        if len(rows) == 1:
-            newvalue = fr[FM_CHECKED]
-        else:
-            newvalue = nonrej
-            partial = rej and nonrej
-            if fr[FM_PARTIAL_SELECTED] != partial:
-                fr[FM_PARTIAL_SELECTED] = partial
-            if fr[FM_CHECKED] != newvalue:
-                fr[FM_CHECKED] = newvalue
-                self.update_check_count()
-        self.update_diff_header(self.diffmodel, wfile, newvalue)
-
-
-    def diff_tree_row_act(self, dtree, path, column):
-        'Row in diff tree (hunk) activated/toggled'
-        dmodel = dtree.get_model()
-        row = dmodel[path]
-        wfile = row[DM_PATH]
-        try:
-            chunks = self.filechunks[wfile]
-        except IndexError:
-            pass
-        chunkrows = xrange(1, len(chunks))
+    def get_checked(self, wfile):
         for fr in self.filemodel:
             if fr[FM_PATH] == wfile:
-                break
-        if row[DM_IS_HEADER]:
-            for n, chunk in enumerate(chunks[1:]):
-                chunk.active = not fr[FM_CHECKED]
-                self.update_diff_hunk(dmodel[n+1])
-            newvalue = not fr[FM_CHECKED]
-            partial = False
-        else:
-            chunk = chunks[row[DM_CHUNK_ID]]
-            chunk.active = not chunk.active
-            self.update_diff_hunk(row)
-            rej = [ n for n in chunkrows if dmodel[n][DM_REJECTED] ]
-            nonrej = [ n for n in chunkrows if not dmodel[n][DM_REJECTED] ]
-            newvalue = nonrej and True or False
-            partial = rej and nonrej and True or False
-
-        # Update file's check status
-        if fr[FM_PARTIAL_SELECTED] != partial:
-            fr[FM_PARTIAL_SELECTED] = partial
-        if fr[FM_CHECKED] != newvalue:
-            fr[FM_CHECKED] = newvalue
-            chunks[0].active = newvalue
-            self.update_check_count()
-        self.update_diff_header(dmodel, wfile, newvalue)
-
+                return fr[FM_CHECKED]
+        return False
 
     def refresh_clicked(self, toolbutton, data=None):
         self.reload_status()
@@ -1328,30 +979,13 @@ class GStatus(gdialog.GWindow):
 
         buf = cStringIO.StringIO()
         dmodel = self.diffmodel
+        files = []
         for row in self.filemodel:
             if not row[FM_CHECKED]:
                 continue
-            wfile = row[FM_PATH]
-            if wfile in self.filechunks:
-                chunks = self.filechunks[wfile]
-            else:
-                chunks = self.read_file_chunks(wfile)
-                for c in chunks:
-                    c.active = True
-            for i, chunk in enumerate(chunks):
-                if i == 0:
-                    chunk.write(buf)
-                elif chunk.active:
-                    chunk.write(buf)
-        buf.seek(0)
-        try:
-            try:
-                fp = open(result, 'wb')
-                fp.write(buf.read())
-            except OSError:
-                pass
-        finally:
-            fp.close()
+            files.append(row[FM_PATH])
+
+        self.chunks.save(files, result)
 
     def diff_clicked(self, toolbutton, data=None):
         diff_list = self.relevant_checked_files('MAR!')
@@ -1365,98 +999,28 @@ class GStatus(gdialog.GWindow):
     def revert_clicked(self, toolbutton, data=None):
         revert_list = self.relevant_checked_files('MAR!')
         if len(revert_list) > 0:
-            self.hg_revert(revert_list)
+            self.act.hg_revert(revert_list)
         else:
             gdialog.Prompt(_('Nothing Reverted'),
                    _('No revertable files selected'), self).run()
         return True
 
-
-    def hg_revert(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        if self.count_revs() > 1:
-            gdialog.Prompt(_('Nothing Reverted'),
-                   _('Revert not allowed when viewing revision range.'),
-                   self).run()
-            return
-
-        # Create new opts,  so nothing unintented gets through.
-        revertopts = self.merge_opts(commands.table['revert'][1],
-                                     ('include', 'exclude', 'rev'))
-        def dohgrevert():
-            commands.revert(self.ui, self.repo, *wfiles, **revertopts)
-
-        def filelist(files):
-            text = '\n'.join(files[:5])
-            if len(files) > 5:
-                text += '  ...\n'
-            return hglib.toutf(text)
-
-        if self.is_merge():
-            res = gdialog.CustomPrompt(
-                    _('Uncommited merge - please select a parent revision'),
-                    _('Revert files to local or other parent?'),
-                    self, (_('&Local'), _('&Other'), _('&Cancel')), 2).run()
-            if res == 0:
-                revertopts['rev'] = self.repo[None].p1().rev()
-            elif res == 1:
-                revertopts['rev'] = self.repo[None].p2().rev()
-            else:
-                return
-            response = None
-        else:
-            # response: 0=Yes, 1=Yes,no backup, 2=Cancel
-            revs = revertopts['rev']
-            if revs and type(revs) == list:
-                revertopts['rev'] = revs[0]
-            else:
-                revertopts['rev'] = str(self.repo['.'].rev())
-            response = gdialog.CustomPrompt(_('Confirm Revert'),
-                    _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
-                    filelist(files)), self, (_('&Yes (backup changes)'),
-                                             _('Yes (&discard changes)'),
-                                             _('&Cancel')), 2, 2).run()
-        if response in (None, 0, 1):
-            if response == 1:
-                revertopts['no_backup'] = True
-            success, outtext = self._hg_call_wrapper('Revert', dohgrevert)
-            if success:
-                shlib.shell_notify(wfiles)
-                self.reload_status()
-
-    def hg_forget(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        commands.forget(self.ui, self.repo, *wfiles)
-        self.reload_status()
-
     def add_clicked(self, toolbutton, data=None):
         add_list = self.relevant_checked_files('?I')
         if len(add_list) > 0:
-            self.hg_add(add_list)
+            self.act.hg_add(add_list)
         else:
             gdialog.Prompt(_('Nothing Added'),
                    _('No addable files selected'), self).run()
         return True
 
-    def hg_add(self, files):
-        wfiles = [self.repo.wjoin(x) for x in files]
-        # Create new opts, so nothing unintented gets through
-        addopts = self.merge_opts(commands.table['^add'][1],
-                                  ('include', 'exclude'))
-        def dohgadd():
-            commands.add(self.ui, self.repo, *wfiles, **addopts)
-        success, outtext = self._hg_call_wrapper('Add', dohgadd)
-        if success:
-            shlib.shell_notify(wfiles)
-            self.reload_status()
-
     def remove_clicked(self, toolbutton, data=None):
         remove_list = self.relevant_checked_files('C!')
         delete_list = self.relevant_checked_files('?I')
         if len(remove_list) > 0:
-            self.hg_remove(remove_list)
+            self.act.hg_remove(remove_list)
         if len(delete_list) > 0:
-            self.delete_files(delete_list)
+            self.act.delete_files(delete_list)
         if not remove_list and not delete_list:
             gdialog.Prompt(_('Nothing Removed'),
                    _('No removable files selected'), self).run()
@@ -1482,7 +1046,7 @@ class GStatus(gdialog.GWindow):
 
             # move the files to dest directory
             move_list.append(hglib.fromutf(destdir))
-            self.hg_move(move_list)
+            self.act.hg_move(move_list)
         else:
             gdialog.Prompt(_('Nothing Moved'), _('No movable files selected\n\n'
                     'Note: only clean files can be moved.'), self).run()
@@ -1491,30 +1055,10 @@ class GStatus(gdialog.GWindow):
     def forget_clicked(self, toolbutton, data=None):
         forget_list = self.relevant_checked_files('CM')
         if len(forget_list) > 0:
-            self.hg_forget(forget_list)
+            self.act.hg_forget(forget_list)
         else:
             gdialog.Prompt(_('Nothing Forgotten'),
                    _('No clean files selected'), self).run()
-
-    def delete_files(self, files):
-        dlg = gdialog.Confirm(_('Confirm Delete Unrevisioned'), files, self,
-                _('Delete the following unrevisioned files?'))
-        if dlg.run() == gtk.RESPONSE_YES:
-            errors = ''
-            for wfile in files:
-                try:
-                    os.unlink(self.repo.wjoin(wfile))
-                except Exception, inst:
-                    errors += str(inst) + '\n\n'
-
-            if errors:
-                errors = errors.replace('\\\\', '\\')
-                if len(errors) > 500:
-                    errors = errors[:errors.find('\n',500)] + '\n...'
-                gdialog.Prompt(_('Delete Errors'), errors, self).run()
-
-            self.reload_status()
-        return True
 
     def ignoremask_updated(self):
         '''User has changed the ignore mask in hgignore dialog'''
@@ -1607,21 +1151,21 @@ class GStatus(gdialog.GWindow):
         def other(menuitem, files):
             self._view_files(files, True)
         def revert(menuitem, files):
-            self.hg_revert(files)
+            self.act.hg_revert(files)
         def remove(menuitem, files):
-            self.hg_remove(files)
+            self.act.hg_remove(files)
         def log(menuitem, files):
             from tortoisehg.hgtk import history
             dlg = history.run(self.ui, canonpats=files)
             dlg.display()
         def forget(menuitem, files, paths):
-            self.hg_forget(files)
+            self.act.hg_forget(files)
             self.set_file_states(paths, state=False)
         def add(menuitem, files, paths):
-            self.hg_add(files)
+            self.act.hg_add(files)
             self.set_file_states(paths, state=True)
         def delete(menuitem, files):
-            self.delete_files(files)
+            self.act.delete_files(files)
         def unmark(menuitem, files):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
@@ -1650,9 +1194,9 @@ class GStatus(gdialog.GWindow):
                 else:
                     del os.environ['HGMERGE']
         def rename(menuitem, files):
-            self.rename_file(files[0])
+            self.act.rename_file(files[0])
         def copy(menuitem, files):
-            self.copy_file(files[0])
+            self.act.copy_file(files[0])
         def guess_rename(menuitem, files):
             dlg = guess.DetectRenameDialog()
             dlg.show_all()
@@ -1747,13 +1291,7 @@ class GStatus(gdialog.GWindow):
         return False
 
 def run(ui, *pats, **opts):
-    # When hg-1.4 support is dropped, use util.any
-    #showclean = util.any(os.path.isfile(e) for e in pats)
-    showclean = False
-    for e in pats:
-        if os.path.isfile(e):
-            showclean = True
-            break
+    showclean = util.any(os.path.isfile(e) for e in pats)
     rev = opts.get('rev', [])
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
