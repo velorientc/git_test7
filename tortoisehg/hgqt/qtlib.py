@@ -1,88 +1,63 @@
-# common colors
+# qtlib.py - Qt utility code
+#
+# Copyright 2010 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2 or any later version.
 
-DRED = '#900000'
-DGREEN = '#006400'
-DBLUE = '#000090'
-DYELLOW = '#6A6A00'
-DORANGE = '#AA5000'
-DGRAY = '#404040'
+from PyQt4 import QtGui
+from mercurial import extensions
 
-PRED = '#ffcccc'
-PGREEN = '#aaffaa'
-PBLUE = '#aaddff'
-PYELLOW = '#ffffaa'
-PORANGE = '#ffddaa'
+from tortoisehg.hgqt.i18n import _
+from hgext.color import _styles, mode
+# _styles maps from ui labels to effects
+# _effects maps an effect to font style properties.  We define a limited
+# set of _effects, since we convert color effect names to font style
+# effect programatically.
 
-RED = 'red'
-GREEN = 'green'
-BLUE = 'blue'
-YELLOW = 'yellow'
-BLACK = 'black'
-WHITE = 'white'
-GRAY = 'gray'
-
-NORMAL = BLACK
-NEW_REV_COLOR = DGREEN
-CHANGE_HEADER = GRAY
-UP_ARROW_COLOR = '#feaf3e'
-DOWN_ARROW_COLOR = '#8ae234'
-STAR_COLOR = '#fce94f'
-CELL_GRAY = '#2e3436'
-STATUS_HEADER = '#DDDDDD'
-STATUS_REJECT_BACKGROUND = '#EEEEEE'
-STATUS_REJECT_FOREGROUND = '#888888'
-
-LabelStyles = {
-    'error':            'font-weight: bold; color: %s;' % DRED,
-    'control':          'font-weight: bold; color: %s;' % BLACK,
-    'ui.debug':         'font-weight: lighter; color: %s;' % BLACK,
-    'ui.status':        'color: %s;' % DGRAY,
-    'ui.note':          'color: %s;' % BLACK,
-    'ui.warning':       'font-weight: bold; color: %s;' % RED,
-    'log.summary':      'color: %s;' % BLACK,
-    'log.description':  'color: %s;' % DGRAY,
-    'log.changeset':    'color: %s;' % GRAY,
-    'log.tag':          'color: %s;' % RED,
-    'log.user':         'color: %s;' % BLUE,
-    'log.date':         'color: %s;' % BLACK,
-    'log.files':        'color: %s;' % BLACK,
-    'log.copies':       'font-weight: bold; color: %s;' % BLACK,
-    'log.node':         'color: %s;' % BLACK,
-    'log.branch':       'color: %s;' % BLACK,
-    'log.parent':       'color: %s;' % BLACK,
-    'log.manifest':     'color: %s;' % BLACK,
-    'log.extra':        'color: %s;' % BLACK,
-    'diff.diffline':    'color: %s;' % BLACK,
-    'diff.inserted':    'color: %s;' % DGREEN,
-    'diff.deleted':     'color: %s;' % RED,
-    'diff.hunk':        'color: %s;' % BLUE,
-    'diff.file_a':      'font-weight: bold; color: %s;' % BLACK,
-    'diff.file_b':      'font-weight: bold; color: %s;' % BLACK,
+_effects = {
+    'bold': 'font-weight: bold',
+    'italic': 'font-style: italic',
+    'underline': 'text-decoration: underline',
 }
 
-# These labels are unreachable by TortoiseHg consoles, so we leave them
-# out for efficiency
-unusedLabelStyles = {
-    'qseries.applied':  'color: %s;' % BLACK,
-    'qseries.unapplied':'color: %s;' % DGRAY,
-    'qseries.guarded':  'color: %s;' % BLUE,
-    'qseries.missing':  'color: %s;' % DRED,
-    'qguard.patch':     'color: %s;' % BLACK,
-    'qguard.positive':  'color: %s;' % DGREEN,
-    'qguard.negagive':  'color: %s;' % BLUE,
-    'qguard.unguarded': 'color: %s;' % DGRAY,
-    'diffstat.inserted':'color: %s;' % DGREEN,
-    'diffstat.deleted': 'color: %s;' % RED,
-    'bookmarks.current':'font-weight: bold; color: %s;' % BLACK,
-    'resolve.resolved': 'color: %s;' % DGREEN,
-    'resolve.unresolved':'color: %s;' % RED,
-    'grep.match':       'font-weight: bold; color: %s;' % BLACK,
-    'status.modified':  'color: %s;' % BLACK,
-    'status.added':     'color: %s;' % BLACK,
-    'status.removed':   'color: %s;' % BLACK,
-    'status.missing':   'color: %s;' % BLACK,
-    'status.unknown':   'color: %s;' % BLACK,
-    'status.ignored':   'color: %s;' % BLACK,
-    'status.clean':     'color: %s;' % BLACK,
-    'status.copied':    'color: %s;' % BLACK,
-}
+def configstyles(ui):
+    # extensions may provide more labels and default effects
+    for name, ext in extensions.extensions():
+        _styles.update(getattr(ext, 'colortable', {}))
+
+    # tortoisehg defines a few labels and default effects
+    _styles.update({'ui.error':'red bold', 'control':'black bold'})
+
+    # allow the user to override
+    for status, cfgeffects in ui.configitems('color'):
+        if '.' not in status:
+            continue
+        cfgeffects = ui.configlist('color', status)
+        _styles[status] = ' '.join(cfgeffects)
+
+# See http://doc.trolltech.com/4.2/richtext-html-subset.html
+# and http://www.w3.org/TR/SVG/types.html#ColorKeywords
+
+def geteffect(labels):
+    'map labels like "log.date" to Qt font styles'
+    effects = []
+    # Multiple labels may be requested
+    for l in labels.split():
+        if not l:
+            continue
+        # Each label may request multiple effects
+        es = _styles.get(l, '')
+        for e in es.split():
+            if e in _effects:
+                effects.append(_effects[e])
+            elif e in QtGui.QColor.colorNames():
+                # Accept any valid QColor
+                effects.append('color: ' + e)
+            elif e.endswith('_background'):
+                e = e[:-11]
+                if e in QtGui.QColor.colorNames():
+                    effects.append('bgcolor: ' + e)
+    return ';'.join(effects)
+
+

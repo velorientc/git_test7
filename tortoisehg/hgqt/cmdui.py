@@ -119,12 +119,15 @@ class Dialog(QDialog):
 
     def output_received(self, wrapper):
         msg, label = wrapper.data
-        style = qtlib.LabelStyles.get(label, '')
-        style += 'font-size: 9pt;'
+        style = qtlib.geteffect(label)
+        style += ';font-size: 9pt'
         self.append_output(msg, style)
 
     def error_received(self, wrapper):
-        self.append_output(wrapper.data, qtlib.LabelStyles['error'])
+        msg, label = wrapper.data
+        style = qtlib.geteffect(label)
+        style += ';font-size: 9pt'
+        self.append_output(msg, style)
 
     def clear_progress(self):
         self.pbar.reset()

@@ -6,6 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
 import Queue
 import time
 import urllib2
@@ -17,6 +18,7 @@ from mercurial import ui, util, error, dispatch
 
 from tortoisehg.util import thread2, hglib
 from tortoisehg.hgqt.i18n import _, localgettext
+from tortoisehg.hgqt import qtlib
 
 local = localgettext()
 
@@ -38,6 +40,8 @@ class QtUi(ui.ui):
 
         self.setconfig('ui', 'interactive', 'on')
         self.setconfig('progress', 'disable', 'True')
+        os.environ['TERM'] = 'dumb'
+        qtlib.configstyles(self)
 
     def write(self, *args, **opts):
         if self._buffers:
@@ -49,7 +53,7 @@ class QtUi(ui.ui):
 
     def write_err(self, *args, **opts):
         for a in args:
-            data = DataWrapper(str(a))
+            data = DataWrapper((str(a), opts.get('label', 'ui.error')))
             self.sig.emit(SIG_ERROR, data)
 
     def label(self, msg, label):
