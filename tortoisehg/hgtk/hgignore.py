@@ -14,7 +14,7 @@ from mercurial import hg, ui, match, util, error
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib, paths
 
-from tortoisehg.hgtk import gtklib, gdialog
+from tortoisehg.hgtk import gtklib, gdialog, dialog
 
 class HgIgnoreDialog(gtk.Window):
     'Edit a reposiory .hgignore file'
@@ -252,8 +252,9 @@ class HgIgnoreDialog(gtk.Window):
                                     createmode=None)
             f.writelines(out)
             f.rename()
-        except IOError:
-            pass
+        except IOError, e:
+            dialog.error_dialog(self, _('Unable to write .hgignore file'),
+                                hglib.tounicode(str(e)))
         shlib.shell_notify([self.ignorefile])
         if self.notify_func:
             self.notify_func()
