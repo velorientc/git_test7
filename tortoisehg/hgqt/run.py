@@ -318,6 +318,7 @@ def qtrun(dlgfunc, ui, *args, **opts):
         bugreport = run(ui, **opts)
         bugreport.show()
     mainapp.exec_()
+    mainapp = None
 
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
