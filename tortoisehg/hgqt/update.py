@@ -14,5 +14,5 @@ def run(ui, *pats, **opts):
     if opts.get('rev'):
         args += ['-r', opts.get('rev')]
     elif len(pats) == 1:
-        args += [pats[0]]    
+        args += [pats[0]]
     return cmdui.Dialog(args)
