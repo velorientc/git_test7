@@ -9,7 +9,7 @@ from PyQt4 import QtGui
 from mercurial import extensions
 
 from tortoisehg.hgqt.i18n import _
-from hgext.color import _styles, mode
+from hgext.color import _styles
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
 # set of _effects, since we convert color effect names to font style
