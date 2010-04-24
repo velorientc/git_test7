@@ -20,10 +20,12 @@ class BugReport(QtGui.QDialog):
     def __init__(self, opts, parent=None):
         super(BugReport, self).__init__(parent)
 
+        self.text = self.gettext(opts)
+
         layout = QtGui.QVBoxLayout() 
 
         te = QtGui.QTextEdit()
-        te.setPlainText(self.gettext(opts))
+        te.setPlainText(self.text)
         te.setReadOnly(True)
         te.setWordWrapMode(QtGui.QTextOption.NoWrap)
         layout.addWidget(te)
@@ -75,8 +77,13 @@ class BugReport(QtGui.QDialog):
     def save(self):
         try:
             fd = QtGui.QFileDialog(self)
-            open(fd.getOpenFileName()).write(self.text)
-        except (OSError, IOError), e:
+            fname = fd.getSaveFileName(self,
+                        _('Save error report to'),
+                        os.path.join(os.getcwd(), 'bugreport.txt'),
+                        _('Text files (*.txt)'))
+            if fname:
+                open(fname, 'wb').write(self.text)
+        except (EnvironmentError), e:
             print e
 
 def run(ui, *pats, **opts):
