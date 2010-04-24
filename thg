@@ -11,16 +11,17 @@
 import os
 import sys
 
-thgpath = os.path.dirname(os.path.realpath(__file__))
-testpath = os.path.join(thgpath, 'tortoisehg')
-if os.path.isdir(testpath) and thgpath not in sys.path:
-    sys.path.insert(0, thgpath)
+if not hasattr(sys, "frozen"):
+    thgpath = os.path.dirname(os.path.realpath(__file__))
+    testpath = os.path.join(thgpath, 'tortoisehg')
+    if os.path.isdir(testpath) and thgpath not in sys.path:
+        sys.path.insert(0, thgpath)
 
-if 'HGPATH' in os.environ:
-    hgpath = os.environ['HGPATH']
-    testpath = os.path.join(hgpath, 'mercurial')
-    if os.path.isdir(testpath) and hgpath not in sys.path:
-        sys.path.insert(0, hgpath)
+    if 'HGPATH' in os.environ:
+        hgpath = os.environ['HGPATH']
+        testpath = os.path.join(hgpath, 'mercurial')
+        if os.path.isdir(testpath) and hgpath not in sys.path:
+            sys.path.insert(0, hgpath)
 
 from mercurial import ui, util
 import cStringIO
