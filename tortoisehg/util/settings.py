@@ -103,9 +103,12 @@ class Settings(object):
         if os.name == 'nt':
             try:
                 import pywintypes
-                from win32com.shell import shell, shellcon
-                appdir = shell.SHGetSpecialFolderPath(0, shellcon.CSIDL_APPDATA)
-            except (ImportError, pywintypes.com_error):
+                try:
+                    from win32com.shell import shell, shellcon
+                    appdir = shell.SHGetSpecialFolderPath(0, shellcon.CSIDL_APPDATA)
+                except pywintypes.com_error:
+                    appdir = os.environ['APPDATA']
+            except ImportError:
                 appdir = os.environ['APPDATA']
             return os.path.join(appdir, 'TortoiseHg', appname)
         else:
