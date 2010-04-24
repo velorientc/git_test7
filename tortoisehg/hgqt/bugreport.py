@@ -1,0 +1,89 @@
+# bugreport.py - Report Python tracebacks to the user
+#
+# Copyright 2010 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2 or any later version.
+
+import os
+import sys
+
+from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import SIGNAL, SLOT
+
+from mercurial import extensions
+from tortoisehg.util import hglib, version
+from tortoisehg.util.i18n import _
+
+class BugReport(QtGui.QDialog):
+
+    def __init__(self, opts, parent=None):
+        super(BugReport, self).__init__(parent)
+
+        layout = QtGui.QVBoxLayout() 
+
+        te = QtGui.QTextEdit()
+        te.setPlainText(self.gettext(opts))
+        te.setReadOnly(True)
+        te.setWordWrapMode(QtGui.QTextOption.NoWrap)
+        layout.addWidget(te)
+
+        # dialog buttons
+        BB = QtGui.QDialogButtonBox
+        bb = QtGui.QDialogButtonBox(BB.Ok|BB.Save)
+        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.connect(bb.button(BB.Save), SIGNAL("clicked()"), self.save)
+        bb.button(BB.Ok).setDefault(True)
+        layout.addWidget(bb)
+
+        self.setLayout(layout)
+        self.setWindowTitle(_('TortoiseHg Bug Report'))
+
+    def gettext(self, opts):
+        text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
+        text += _('** Please report this bug to'
+                ' http://bitbucket.org/tortoisehg/stable/issues\n')
+        text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
+                hglib.hgversion, version.version())
+        text += '** Command: %s\n' % (opts.get('cmd', 'N/A'))
+        text += '** CWD: %s\n' % os.getcwd()
+        extlist = [x[0] for x in extensions.extensions()]
+        text += '** Extensions loaded: %s\n' % ', '.join(extlist)
+        if os.name == 'nt':
+            text += self.getarch()
+        text += opts.get('error', 'N/A')
+        text += '\n}}}'
+        return text
+
+    def getarch(self):
+        text += '** Windows version: %s\n' % str(sys.getwindowsversion())
+        arch = 'unknown (failed to import win32api)'
+        try:
+            import win32api
+            arch = 'unknown'
+            archval = win32api.GetNativeSystemInfo()[0]
+            if archval == 9:
+                arch = 'x64'
+            elif archval == 0:
+                arch = 'x86'
+        except (ImportError, AttributeError):
+            pass
+        text += '** Processor architecture: %s\n' % arch
+        return text
+
+    def save(self):
+        try:
+            fd = QtGui.QFileDialog(self)
+            open(fd.getOpenFileName()).write(self.text)
+        except (OSError, IOError), e:
+            print e
+
+def run(ui, *pats, **opts):
+    return BugReport(opts)
+
+if __name__ == "__main__":
+    app = QtGui.QApplication(sys.argv)
+    form = BugReport({'cmd':'cmd', 'error':'error'})
+    form.show()
+    app.exec_()

@@ -40,6 +40,7 @@ except ImportError:
 nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
 about help version thgstatus serve'''
 
+mainapp = None
 def dispatch(args):
     """run the command specified in args"""
     try:
@@ -54,7 +55,15 @@ def dispatch(args):
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
     except:
-        print traceback.format_exc()
+        from tortoisehg.hgqt.bugreport import run
+        if '--debugger' in args:
+            pdb.post_mortem(sys.exc_info()[2])
+        error = traceback.format_exc()
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = error
+        opts['nofork'] = True
+        qtrun(run, u, **opts)
 
 origwdir = os.getcwd()
 def portable_fork(ui, opts):
@@ -287,12 +296,28 @@ def _runcommand(ui, options, cmd, cmdfunc):
 
 def qtrun(dlgfunc, ui, *args, **opts):
     portable_fork(ui, opts)
-    app = QtGui.QApplication(sys.argv)
-    dlg = dlgfunc(ui, *args, **opts)
-    if not dlg:
+
+    global mainapp
+    if mainapp:
+        dlg = dlgfunc(ui, *args, **opts)
+        dlg.show()
         return
-    dlg.show()
-    app.exec_()
+
+    mainapp = QtGui.QApplication(sys.argv)
+    try:
+        dlg = dlgfunc(ui, *args, **opts)
+        dlg.show()
+    except Exception, e:
+        from tortoisehg.hgqt.bugreport import run
+        error = _('Fatal error opening dialog\n')
+        error += traceback.format_exc()
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = error
+        opts['nofork'] = True
+        bugreport = run(ui, **opts)
+        bugreport.show()
+    mainapp.exec_()
 
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
@@ -302,6 +327,15 @@ def thgstatus(ui, *pats, **opts):
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt.clone import run
+    qtrun(run, ui, *pats, **opts)
+
+def bug(ui, *pats, **opts):
+    """bug report dialog"""
+    from tortoisehg.hgqt.bugreport import run
+    if len(pats) == 1:
+        opts['error'] = pats[0]
+    opts['cmd'] = sys.argv[1:]
+    opts['nofork'] = True
     qtrun(run, ui, *pats, **opts)
 
 def shellconfig(ui, *pats, **opts):
@@ -541,6 +575,7 @@ table = {
           ('', 'uncompressed', None,
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
+    "bug": (bug, [], _('thg bug [MESSAGE]')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":
         (update,
