@@ -15,7 +15,8 @@ import Queue
 import urllib
 import threading
 
-from mercurial import util
+from mercurial import util, extensions
+from hgext.color import _styles
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import paths, hglib, thread2
@@ -73,59 +74,66 @@ NEW_REV_COLOR = DGREEN
 CHANGE_HEADER = GREY
 
 TextBufferTags = {
-    'error':            dict(weight=pango.WEIGHT_HEAVY, foreground=DRED),
-    'control':          dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
-    'ui.debug':         dict(weight=pango.WEIGHT_LIGHT),
-    'ui.status':        dict(foreground=DGRAY),
-    'ui.note':          dict(foreground=BLACK),
-    'ui.warning':       dict(weight=pango.WEIGHT_HEAVY, foreground=RED),
-    'log.summary':      dict(foreground=BLACK),
-    'log.description':  dict(foreground=DGRAY),
-    'log.changeset':    dict(foreground=GREY),
-    'log.tag':          dict(foreground=RED),
-    'log.user':         dict(foreground=BLUE),
-    'log.date':         dict(foreground=BLACK),
-    'log.files':        dict(foreground=BLACK),
-    'log.copies':       dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
-    'log.node':         dict(foreground=BLACK),
-    'log.branch':       dict(foreground=BLACK),
-    'log.parent':       dict(foreground=BLACK),
-    'log.manifest':     dict(foreground=BLACK),
-    'log.extra':        dict(foreground=DGRAY),
-    'diff.diffline':    dict(foreground=BLACK),
-    'diff.inserted':    dict(foreground=DGREEN),
-    'diff.deleted':     dict(foreground=RED),
-    'diff.hunk':        dict(foreground=BLUE),
-    'diff.file_a':      dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
-    'diff.file_b':      dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
+    'red':              dict(foreground=DRED),
+    'black':            dict(foreground=BLACK),
+    'green':            dict(foreground=GREEN),
+    'yellow':           dict(foreground=YELLOW),
+    'blue':             dict(foreground=BLUE),
+    'magenta':          dict(foreground='magenta'),
+    'cyan':             dict(foreground='cyan'),
+    'white':            dict(foreground='white'),
+    'bold':             dict(weight=pango.WEIGHT_HEAVY),
+    'italic':           dict(style=pango.STYLE_ITALIC),
+    'underline':        dict(underline=pango.UNDERLINE_SINGLE),
+    'black_background': dict(background=BLACK),
+    'red_background':   dict(background=RED),
+    'green_background': dict(background=GREEN),
+    'yellow_background': dict(background=YELLOW),
+    'blue_background':  dict(background=BLUE),
+    'purple_background': dict(background='purple'),
+    'cyan_background':  dict(background='cyan'),
+    'white_background': dict(background=WHITE)
 }
 
-# These tags are unreachable by TortoiseHg consoles, so we leave them
-# out for efficiency
-unusedTextBufferTags = {
-    'qseries.applied':  dict(foreground=BLACK),
-    'qseries.unapplied':dict(foreground=DGRAY),
-    'qseries.guarded':  dict(foreground=BLUE),
-    'qseries.missing':  dict(foreground=DRED),
-    'qguard.patch':     dict(foreground=BLACK),
-    'qguard.positive':  dict(foreground=DGREEN),
-    'qguard.negagive':  dict(foreground=BLUE),
-    'qguard.unguarded': dict(foreground=DGRAY),
-    'diffstat.inserted':dict(foreground=DGREEN),
-    'diffstat.deleted': dict(foreground=RED),
-    'bookmarks.current':dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
-    'resolve.resolved': dict(foreground=DGREEN),
-    'resolve.unresolved':dict(foreground=RED),
-    'grep.match':       dict(weight=pango.WEIGHT_HEAVY, foreground=BLACK),
-    'status.modified':  dict(foreground=BLACK),
-    'status.added':     dict(foreground=BLACK),
-    'status.removed':   dict(foreground=BLACK),
-    'status.missing':   dict(foreground=BLACK),
-    'status.unknown':   dict(foreground=BLACK),
-    'status.ignored':   dict(foreground=BLACK),
-    'status.clean':     dict(foreground=BLACK),
-    'status.copied':    dict(foreground=BLACK),
+_thgstyles = {
+    'ui.error':      'red bold',
+    'control':       'black bold',
 }
+
+def configstyles(ui):
+    # extensions may provide more labels and default effects
+    for name, ext in extensions.extensions():
+        _styles.update(getattr(ext, 'colortable', {}))
+
+    # tortoisehg defines a few labels and default effects
+    _styles.update(_thgstyles)
+
+    # allow the user to override
+    for status, cfgeffects in ui.configitems('color'):
+        if '.' not in status:
+            continue
+        cfgeffects = ui.configlist('color', status)
+        good = []
+        for e in cfgeffects:
+            if e in TextBufferTags:
+                good.append(e)
+        if good:
+            _styles[status] = ' '.join(good)
+
+def gettags(labels):
+    'map labels like "log.date" to pango tags'
+    tags = []
+    # Multiple labels may be requested
+    for l in labels.split():
+        if not l:
+            continue
+        # Each label may request multiple effects
+        es = _styles.get(l, '')
+        for e in es.split():
+            if e in TextBufferTags:
+                tags.append(e)
+    return tags
+
 
 UP_ARROW_COLOR = '#feaf3e'
 DOWN_ARROW_COLOR = '#8ae234'

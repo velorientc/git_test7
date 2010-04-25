@@ -14,6 +14,8 @@ import sys
 import threading
 import Queue
 
+from mercurial import ui
+
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
@@ -88,6 +90,7 @@ class CmdDialog(gtk.Dialog):
         self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
+        gtklib.configstyles(ui.ui())
         for tag, argdict in gtklib.TextBufferTags.iteritems():
             self.textbuffer.create_tag(tag, **argdict)
 
@@ -159,29 +162,25 @@ class CmdDialog(gtk.Dialog):
         enditer = self.textbuffer.get_end_iter()
         while self.hgthread.geterrqueue().qsize():
             try:
+                tags = gtklib.gettags('ui.error')
                 msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
-                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
         while self.stdoutq.qsize():
             try:
+                tags = gtklib.gettags('ui.error')
                 msg = hglib.toutf(self.stdoutq.get(0))
-                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
         while self.hgthread.getqueue().qsize():
             try:
                 msg, label = self.hgthread.getqueue().get(0)
-                tags = []
-                for tag in label.split():
-                    tag.strip()
-                    if tag in gtklib.TextBufferTags:
-                        tags.append(tag)
-                    #else:
-                    #    print 'unknown tag:', tag
                 msg = hglib.toutf(msg)
+                tags = gtklib.gettags(label)
                 if tags:
                     self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
                 else:
