@@ -58,7 +58,7 @@ class BugReport(QtGui.QDialog):
         return text
 
     def getarch(self):
-        text += '** Windows version: %s\n' % str(sys.getwindowsversion())
+        text = '** Windows version: %s\n' % str(sys.getwindowsversion())
         arch = 'unknown (failed to import win32api)'
         try:
             import win32api
