@@ -16,7 +16,6 @@ import urllib
 import threading
 
 from mercurial import util, extensions
-from hgext.color import _styles
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import paths, hglib, thread2
@@ -72,6 +71,34 @@ GREY = 'grey'
 NORMAL = BLACK
 NEW_REV_COLOR = DGREEN
 CHANGE_HEADER = GREY
+
+try:
+    from hgext.color import _styles
+except ImportError:
+    # hg <= 1.5
+    _styles = {'grep.match': 'red bold',
+               'diff.changed': 'white',
+               'diff.deleted': 'red',
+               'diff.diffline': 'bold',
+               'diff.extended': 'cyan bold',
+               'diff.file_a': 'red bold',
+               'diff.file_b': 'green bold',
+               'diff.hunk': 'magenta',
+               'diff.inserted': 'green',
+               'diff.trailingwhitespace': 'bold red_background',
+               'diffstat.deleted': 'red',
+               'diffstat.inserted': 'green',
+               'log.changeset': 'yellow',
+               'resolve.resolved': 'green bold',
+               'resolve.unresolved': 'red bold',
+               'status.added': 'green bold',
+               'status.clean': 'none',
+               'status.copied': 'none',
+               'status.deleted': 'cyan bold underline',
+               'status.ignored': 'black bold',
+               'status.modified': 'blue bold',
+               'status.removed': 'red bold',
+               'status.unknown': 'magenta bold underline'}
 
 TextBufferTags = {
     'red':              dict(foreground=DRED),
