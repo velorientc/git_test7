@@ -74,6 +74,7 @@ CHANGE_HEADER = GREY
 
 try:
     from hgext.color import _styles
+    _styles.keys()
 except ImportError:
     # hg <= 1.5
     _styles = {'grep.match': 'red bold',
