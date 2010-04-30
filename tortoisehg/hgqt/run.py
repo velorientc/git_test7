@@ -40,7 +40,6 @@ except ImportError:
 nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
 about help version thgstatus serve'''
 
-mainapp = None
 def dispatch(args):
     """run the command specified in args"""
     try:
@@ -239,7 +238,6 @@ def runcommand(ui, args):
         raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
-    cmdoptions['mainapp'] = True
     d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
     return _runcommand(lui, options, cmd, d)
 
@@ -297,13 +295,17 @@ def _runcommand(ui, options, cmd, cmdfunc):
 def qtrun(dlgfunc, ui, *args, **opts):
     portable_fork(ui, opts)
 
-    global mainapp
-    if mainapp:
+    if QtGui.QApplication.instance():
         dlg = dlgfunc(ui, *args, **opts)
         dlg.show()
         return
 
     mainapp = QtGui.QApplication(sys.argv)
+    # default org is used by QSettings
+    mainapp.setApplicationName('TortoiseHg')
+    mainapp.setOrganizationName('TortoiseHg')
+    mainapp.setOrganizationDomain('tortoisehg.org')
+    mainapp.setApplicationVersion(thgversion.version())
     try:
         dlg = dlgfunc(ui, *args, **opts)
         dlg.show()
