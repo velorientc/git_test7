@@ -27,12 +27,12 @@ from mercurial.revlog import LookupError
 from PyQt4 import QtGui, QtCore, Qsci
 from PyQt4.QtCore import Qt
 
-from hgviewlib.util import tounicode
+from tortoisehg.hgqt.hgviewlib.util import tounicode
 
-from hgviewlib.qt4 import icon as geticon
-from hgviewlib.qt4.hgdialogmixin import HgDialogMixin
-from hgviewlib.qt4.hgrepomodel import ManifestModel
-from hgviewlib.qt4.lexers import get_lexer
+from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
+from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewlib.qt4.hgrepomodel import ManifestModel
+from tortoisehg.hgqt.hgviewlib.qt4.lexers import get_lexer
 
 connect = QtCore.QObject.connect
 disconnect = QtCore.QObject.disconnect

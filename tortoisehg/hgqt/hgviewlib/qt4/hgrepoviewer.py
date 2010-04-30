@@ -17,18 +17,20 @@ from PyQt4 import QtCore, QtGui, Qsci
 from mercurial import ui, hg
 from mercurial import util
 
-from hgviewlib.util import tounicode, has_closed_branch_support
-from hgviewlib.util import rootpath, find_repository
-from hgviewlib.hggraph import diff as revdiff
-from hgviewlib.decorators import timeit
+from tortoisehg.hgqt.hgviewlib.util import tounicode, has_closed_branch_support
+from tortoisehg.hgqt.hgviewlib.util import rootpath, find_repository
+from tortoisehg.hgqt.hgviewlib.hggraph import diff as revdiff
+from tortoisehg.hgqt.hgviewlib.decorators import timeit
 
-from hgviewlib.qt4 import icon as geticon
-from hgviewlib.qt4.hgrepomodel import HgRepoListModel, HgFileListModel
-from hgviewlib.qt4.hgfiledialog import FileViewer, FileDiffViewer
-from hgviewlib.qt4.hgmanifestdialog import ManifestViewer
-from hgviewlib.qt4.hgdialogmixin import HgDialogMixin
-from hgviewlib.qt4.quickbar import FindInGraphlogQuickBar
-from hgviewlib.qt4.helpviewer import HelpViewer
+from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
+from tortoisehg.hgqt.hgviewlib.qt4.hgrepomodel import HgRepoListModel, HgFileListModel
+from tortoisehg.hgqt.hgviewlib.qt4.hgfiledialog import FileViewer, FileDiffViewer
+from tortoisehg.hgqt.hgviewlib.qt4.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewlib.qt4.quickbar import FindInGraphlogQuickBar
+from tortoisehg.hgqt.hgviewlib.qt4.helpviewer import HelpViewer
+
+from tortoisehg.util import paths
 
 try:
     from mercurial.error import RepoError
@@ -517,90 +519,13 @@ class HgRepoViewer(QtGui.QMainWindow, HgDialogMixin):
         w.show()
         w.raise_()
         w.activateWindow()
-        
 
-def main():
-    from optparse import OptionParser
-    usage = '''%prog [options] [filename]
-
-    Starts a visual hg repository navigator.
-
-    - With no options, starts the main repository navigator.
-
-    - If a filename is given, starts in filelog diff mode (or in
-      filelog navigation mode if -n option is set).
-
-    - With -r option, starts in manifest viewer mode for given
-      revision.
-    '''
-    
-    parser = OptionParser(usage)
-    parser.add_option('-R', '--repository', dest='repo',
-                      help='location of the repository to explore')
-    parser.add_option('-r', '--rev', dest='rev', default=None,
-                      help='start in manifest navigation mode at rev R')
-    parser.add_option('-n', '--navigate', dest='navigate', default=False,
-                      action="store_true",
-                      help='(with filename) start in navigation mode')
-
-    opts, args = parser.parse_args()
-
-    if opts.navigate and len(args) != 1:
-        parser.error("You must provide a filename to start in navigate mode")
-
-    if len(args) > 1:
-        parser.error("Provide at most one file name")
-
-    dir_ = None
-    if opts.repo:
-        dir_ = opts.repo
-    else:
-        dir_ = os.getcwd()
-    dir_ = find_repository(dir_)
-
-    try:
-        u = ui.ui()
-        repo = hg.repository(u, dir_)
-    except:
-        parser.error("You are not in a repo, are you?")
-
-    # make Ctrl+C works
-    import signal
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-    app = QtGui.QApplication(sys.argv)
-    from hgviewlib.qt4 import setup_font_substitutions
+def run(ui, *pats, **opts):
+    from tortoisehg.hgqt.hgviewlib.qt4 import setup_font_substitutions
     setup_font_substitutions()
-    
-    if len(args) == 1:
-        filename = rootpath(repo, opts.rev, args[0])
-        if filename is None:
-            parser.error("%s is not a tracked file" % args[0])
-        
-        # should be a filename of a file managed in the repo
-        if opts.navigate:
-            mainwindow = FileViewer(repo, filename)
-        else:
-            mainwindow = FileDiffViewer(repo, filename)
-    else:
-        rev = opts.rev
-        if rev is not None:
-            try:
-                repo.changectx(rev)
-            except RepoError, e:
-                parser.error("Cannot find revision %s" % rev)
-            else:
-                mainwindow = ManifestViewer(repo, rev)                
-        else:
-            mainwindow = HgRepoViewer(repo)
 
-    mainwindow.show()    
-    sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    # remove current dir from sys.path
-    while sys.path.count('.'):
-        sys.path.remove('.')
-        print 'removed'
-    main()
+    repo = None
+    root = paths.find_root()
+    if root:
+        repo = hg.repository(ui, path=root)
+    return HgRepoViewer(repo)

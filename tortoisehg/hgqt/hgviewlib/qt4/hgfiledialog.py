@@ -28,14 +28,14 @@ from mercurial import ui, hg, util
 from PyQt4 import QtGui, QtCore, Qsci
 from PyQt4.QtCore import Qt
 
-from hgviewlib.util import tounicode, rootpath
+from tortoisehg.hgqt.hgviewlib.util import tounicode, rootpath
 
-from hgviewlib.qt4 import icon as geticon
-from hgviewlib.qt4.hgdialogmixin import HgDialogMixin
-from hgviewlib.qt4.hgrepomodel import FileRevModel
-from hgviewlib.qt4.blockmatcher import BlockList, BlockMatch
-from hgviewlib.qt4.lexers import get_lexer
-from hgviewlib.qt4.quickbar import FindInGraphlogQuickBar
+from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
+from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewlib.qt4.hgrepomodel import FileRevModel
+from tortoisehg.hgqt.hgviewlib.qt4.blockmatcher import BlockList, BlockMatch
+from tortoisehg.hgqt.hgviewlib.qt4.lexers import get_lexer
+from tortoisehg.hgqt.hgviewlib.qt4.quickbar import FindInGraphlogQuickBar
 
 connect = QtCore.QObject.connect
 disconnect = QtCore.QObject.disconnect

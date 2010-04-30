@@ -28,8 +28,8 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 Qt = QtCore.Qt
 
-from hgviewlib.config import HgConfig
-from hgviewlib.qt4 import should_rebuild
+from tortoisehg.hgqt.hgviewlib.config import HgConfig
+from tortoisehg.hgqt.hgviewlib.qt4 import should_rebuild
 
 class HgDialogMixin(object):
     """

@@ -359,6 +359,11 @@ def update(ui, *pats, **opts):
     from tortoisehg.hgqt.update import run
     qtrun(run, ui, *pats, **opts)
 
+def log(ui, *pats, **opts):
+    """Repository Explorer (changelog viewer)"""
+    from tortoisehg.hgqt.hgviewlib.qt4.hgrepoviewer import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -587,6 +592,9 @@ table = {
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
+    "^log|history|explorer": (log,
+        [('l', 'limit', '', _('limit number of changes displayed'))],
+        _('thg log [OPTIONS] [FILE]')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":

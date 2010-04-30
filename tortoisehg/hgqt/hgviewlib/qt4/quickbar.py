@@ -21,8 +21,8 @@ from mercurial import util
 
 from PyQt4 import QtCore, QtGui
 
-from hgviewlib.util import Curry
-from hgviewlib.qt4 import icon as geticon
+from tortoisehg.hgqt.hgviewlib.util import Curry
+from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
 
 Qt = QtCore.Qt
 connect = QtCore.QObject.connect

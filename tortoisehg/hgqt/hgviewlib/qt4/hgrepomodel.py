@@ -26,12 +26,12 @@ from mercurial.node import hex, short as short_hex
 from mercurial.revlog import LookupError
 from mercurial import util, error
 
-from hgviewlib.hggraph import Graph, ismerge, diff as revdiff
-from hgviewlib.hggraph import revision_grapher, filelog_grapher
-from hgviewlib.config import HgConfig
-from hgviewlib.util import tounicode, isbfile, Curry
-from hgviewlib.qt4 import icon as geticon
-from hgviewlib.decorators import timeit
+from tortoisehg.hgqt.hgviewlib.hggraph import Graph, ismerge, diff as revdiff
+from tortoisehg.hgqt.hgviewlib.hggraph import revision_grapher, filelog_grapher
+from tortoisehg.hgqt.hgviewlib.config import HgConfig
+from tortoisehg.hgqt.hgviewlib.util import tounicode, isbfile, Curry
+from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
+from tortoisehg.hgqt.hgviewlib.decorators import timeit
 
 from PyQt4 import QtCore, QtGui
 connect = QtCore.QObject.connect
