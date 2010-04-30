@@ -1,0 +1,23 @@
+<RCC>
+  <qresource prefix="/" >
+    <file>icons/quit.svg</file>
+    <file>icons/reload.svg</file>
+    <file>icons/back.svg</file>
+    <file>icons/forward.svg</file>
+    <file>icons/left.svg</file>
+    <file>icons/right.svg</file>
+    <file>icons/up.svg</file>
+    <file>icons/down.svg</file>
+    <file>icons/leftright.svg</file>
+    <file>icons/close.png</file>
+    <file>icons/help.svg</file>
+    <file>icons/find.svg</file>
+    <file>icons/goto.svg</file>
+    <file>icons/modified.svg</file>
+    <file>icons/clean.svg</file>
+    <file>icons/mqdiff.svg</file>
+    <file>icons/mqdiff_x.svg</file>
+    <file>icons/mqpatch.svg</file>
+    <file>icons/mqpatch_x.svg</file>
+  </qresource>
+</RCC>
