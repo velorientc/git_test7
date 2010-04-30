@@ -40,6 +40,7 @@ class BugReport(QtGui.QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle(_('TortoiseHg Bug Report'))
+        self.resize(550, 400)
 
     def gettext(self, opts):
         text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
