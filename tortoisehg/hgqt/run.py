@@ -297,7 +297,8 @@ def qtrun(dlgfunc, ui, *args, **opts):
 
     if QtGui.QApplication.instance():
         dlg = dlgfunc(ui, *args, **opts)
-        dlg.show()
+        if dlg:
+            dlg.show()
         return
 
     mainapp = QtGui.QApplication(sys.argv)
@@ -308,7 +309,9 @@ def qtrun(dlgfunc, ui, *args, **opts):
     mainapp.setApplicationVersion(thgversion.version())
     try:
         dlg = dlgfunc(ui, *args, **opts)
-        dlg.show()
+        if dlg:
+            dlg.show()
+            mainapp.exec_()
     except Exception, e:
         from tortoisehg.hgqt.bugreport import run
         error = _('Fatal error opening dialog\n')
@@ -319,7 +322,7 @@ def qtrun(dlgfunc, ui, *args, **opts):
         opts['nofork'] = True
         bugreport = run(ui, **opts)
         bugreport.show()
-    mainapp.exec_()
+        mainapp.exec_()
     mainapp = None
 
 def thgstatus(ui, *pats, **opts):
@@ -330,6 +333,11 @@ def thgstatus(ui, *pats, **opts):
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt.clone import run
+    qtrun(run, ui, *pats, **opts)
+
+def test(ui, *pats, **opts):
+    """bug report dialog"""
+    from tortoisehg.hgqt.chunkselect import run
     qtrun(run, ui, *pats, **opts)
 
 def bug(ui, *pats, **opts):
@@ -579,6 +587,7 @@ table = {
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
+    "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":
         (update,
