@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\hgview\hgviewlib\qt4\hgqv.ui'
+# Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-hgview\tortoisehg\hgqt\hgqv.ui'
 #
-# Created: Fri Apr 30 13:25:56 2010
+# Created: Fri Apr 30 22:49:41 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
