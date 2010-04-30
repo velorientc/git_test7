@@ -165,7 +165,7 @@ class RecoveryDialog(gtk.Window):
     def _exec_cmd(self, cmd, postfunc=None):
         if self._cmd_running():
             dialog.error_dialog(self, _('Cannot run now'),
-                _('Please try again after the previous command is completed'))
+                _('Please try again after the previous command has completed'))
             return
 
         self._stop_button.set_sensitive(True)
