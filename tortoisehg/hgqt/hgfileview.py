@@ -488,6 +488,7 @@ class HgFileListView(QtGui.QTableView):
     def __init__(self, parent=None):
         QtGui.QTableView.__init__(self, parent)
         self.setShowGrid(False)
+        self.horizontalHeader().hide()
         self.verticalHeader().hide()
         self.verticalHeader().setDefaultSectionSize(20)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
