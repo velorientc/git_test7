@@ -23,7 +23,7 @@ from PyQt4 import QtCore, QtGui
 
 from tortoisehg.util.util import Curry
 
-from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
+from tortoisehg.hgqt.hgviewlib import icon as geticon
 
 Qt = QtCore.Qt
 connect = QtCore.QObject.connect
@@ -318,7 +318,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
 
 if __name__ == "__main__":
     import sys
-    import hgviewlib.qt4 # to force importation of resource module w/ icons
+    import hgviewlib # to force importation of resource module w/ icons
     app = QtGui.QApplication(sys.argv)
     root = QtGui.QMainWindow()
     w = QtGui.QFrame()

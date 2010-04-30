@@ -14,8 +14,8 @@ import re
 
 from PyQt4 import QtCore, QtGui, Qsci
 
-from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
-from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewlib import icon as geticon
+from tortoisehg.hgqt.hgviewlib.hgdialogmixin import HgDialogMixin
 from tortoisehg.hgqt.hgviewlib.hgviewhelp import help_msg, get_options_helpmsg
 
 Qt = QtCore.Qt

@@ -29,7 +29,7 @@ SIGNAL = QtCore.SIGNAL
 Qt = QtCore.Qt
 
 from tortoisehg.hgqt.hgviewlib.config import HgConfig
-from tortoisehg.hgqt.hgviewlib.qt4 import should_rebuild
+from tortoisehg.hgqt.hgviewlib import should_rebuild
 
 class HgDialogMixin(object):
     """
@@ -50,7 +50,7 @@ class HgDialogMixin(object):
             os.system('pyuic4 %s -o %s' % (uifile, pyfile))
         try:
             modname = osp.splitext(osp.basename(uifile))[0] + "_ui"
-            modname = "hgviewlib.qt4.%s" % modname
+            modname = "hgviewlib.%s" % modname
             mod = __import__(modname, fromlist=['*'])
             classnames = [x for x in dir(mod) if x.startswith('Ui_')]
             if len(classnames) == 1:

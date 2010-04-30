@@ -29,10 +29,10 @@ from PyQt4.QtCore import Qt
 
 from tortoisehg.util.util import tounicode
 
-from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
-from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgviewlib.qt4.hgrepomodel import ManifestModel
-from tortoisehg.hgqt.hgviewlib.qt4.lexers import get_lexer
+from tortoisehg.hgqt.hgviewlib import icon as geticon
+from tortoisehg.hgqt.hgviewlib.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewlib.hgrepomodel import ManifestModel
+from tortoisehg.hgqt.hgviewlib.lexers import get_lexer
 
 connect = QtCore.QObject.connect
 disconnect = QtCore.QObject.disconnect

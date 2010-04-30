@@ -30,12 +30,12 @@ from PyQt4.QtCore import Qt
 
 from tortoisehg.util.util import tounicode, rootpath
 
-from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
-from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgviewlib.qt4.hgrepomodel import FileRevModel
-from tortoisehg.hgqt.hgviewlib.qt4.blockmatcher import BlockList, BlockMatch
-from tortoisehg.hgqt.hgviewlib.qt4.lexers import get_lexer
-from tortoisehg.hgqt.hgviewlib.qt4.quickbar import FindInGraphlogQuickBar
+from tortoisehg.hgqt.hgviewlib import icon as geticon
+from tortoisehg.hgqt.hgviewlib.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewlib.hgrepomodel import FileRevModel
+from tortoisehg.hgqt.hgviewlib.blockmatcher import BlockList, BlockMatch
+from tortoisehg.hgqt.hgviewlib.lexers import get_lexer
+from tortoisehg.hgqt.hgviewlib.quickbar import FindInGraphlogQuickBar
 
 connect = QtCore.QObject.connect
 disconnect = QtCore.QObject.disconnect
@@ -104,7 +104,7 @@ class AbstractFileDialog(QtGui.QMainWindow, HgDialogMixin):
         """
         if self.repoviewer is None:
             # prevent recursive import
-            from hgviewlib.qt4.hgrepoviewer import HgRepoViewer
+            from hgviewlib.hgrepoviewer import HgRepoViewer
             self.repoviewer = HgRepoViewer(self.repo)
         self.repoviewer.goto(rev)
         self.repoviewer.show()

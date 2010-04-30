@@ -34,9 +34,9 @@ from tortoisehg.util.util import format_desc, xml_escape
 
 from tortoisehg.hgqt.hgviewlib.decorators import timeit
 from tortoisehg.hgqt.hgviewlib.config import HgConfig
-from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
-from tortoisehg.hgqt.hgviewlib.qt4.hgmanifestdialog import ManifestViewer
-from tortoisehg.hgqt.hgviewlib.qt4.quickbar import QuickBar
+from tortoisehg.hgqt.hgviewlib import icon as geticon
+from tortoisehg.hgqt.hgviewlib.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.hgviewlib.quickbar import QuickBar
 
 class GotoQuickBar(QuickBar):
     def __init__(self, parent):

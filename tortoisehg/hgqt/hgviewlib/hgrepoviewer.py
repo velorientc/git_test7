@@ -23,13 +23,13 @@ from tortoisehg.util.util import rootpath, find_repository
 from tortoisehg.hgqt.hgviewlib.hggraph import diff as revdiff
 from tortoisehg.hgqt.hgviewlib.decorators import timeit
 
-from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
-from tortoisehg.hgqt.hgviewlib.qt4.hgrepomodel import HgRepoListModel, HgFileListModel
-from tortoisehg.hgqt.hgviewlib.qt4.hgfiledialog import FileViewer, FileDiffViewer
-from tortoisehg.hgqt.hgviewlib.qt4.hgmanifestdialog import ManifestViewer
-from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgviewlib.qt4.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt.hgviewlib.qt4.helpviewer import HelpViewer
+from tortoisehg.hgqt.hgviewlib import icon as geticon
+from tortoisehg.hgqt.hgviewlib.hgrepomodel import HgRepoListModel, HgFileListModel
+from tortoisehg.hgqt.hgviewlib.hgfiledialog import FileViewer, FileDiffViewer
+from tortoisehg.hgqt.hgviewlib.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.hgviewlib.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewlib.quickbar import FindInGraphlogQuickBar
+from tortoisehg.hgqt.hgviewlib.helpviewer import HelpViewer
 
 from tortoisehg.util import paths
 
@@ -522,7 +522,7 @@ class HgRepoViewer(QtGui.QMainWindow, HgDialogMixin):
         w.activateWindow()
 
 def run(ui, *pats, **opts):
-    from tortoisehg.hgqt.hgviewlib.qt4 import setup_font_substitutions
+    from tortoisehg.hgqt.hgviewlib import setup_font_substitutions
     setup_font_substitutions()
 
     repo = None
