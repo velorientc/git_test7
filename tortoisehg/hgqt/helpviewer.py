@@ -14,9 +14,9 @@ import re
 
 from PyQt4 import QtCore, QtGui, Qsci
 
-from tortoisehg.hgqt.hgviewlib import icon as geticon
-from tortoisehg.hgqt.hgviewlib.hgdialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgviewlib.hgviewhelp import help_msg, get_options_helpmsg
+from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.hgviewhelp import help_msg, get_options_helpmsg
 
 Qt = QtCore.Qt
 bold = QtGui.QFont.Bold

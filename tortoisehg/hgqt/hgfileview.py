@@ -34,15 +34,15 @@ nullvariant = QtCore.QVariant()
 
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
-from tortoisehg.hgqt.hgviewlib.decorators import timeit
-from tortoisehg.hgqt.hgviewlib.config import HgConfig
+from tortoisehg.hgqt.decorators import timeit
+from tortoisehg.hgqt.config import HgConfig
 
-from tortoisehg.hgqt.hgviewlib import icon as geticon
-from tortoisehg.hgqt.hgviewlib.hgfiledialog import FileViewer, FileDiffViewer 
-from tortoisehg.hgqt.hgviewlib.hgmanifestdialog import ManifestViewer
-from tortoisehg.hgqt.hgviewlib.quickbar import QuickBar
-from tortoisehg.hgqt.hgviewlib.lexers import get_lexer
-from tortoisehg.hgqt.hgviewlib.blockmatcher import BlockList
+from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.hgfiledialog import FileViewer, FileDiffViewer 
+from tortoisehg.hgqt.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.quickbar import QuickBar
+from tortoisehg.hgqt.lexers import get_lexer
+from tortoisehg.hgqt.blockmatcher import BlockList
 
 qsci = Qsci.QsciScintilla
 

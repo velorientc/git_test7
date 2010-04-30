@@ -20,16 +20,16 @@ from mercurial import util
 from tortoisehg.util.util import tounicode, has_closed_branch_support
 from tortoisehg.util.util import rootpath, find_repository
 
-from tortoisehg.hgqt.hgviewlib.hggraph import diff as revdiff
-from tortoisehg.hgqt.hgviewlib.decorators import timeit
+from tortoisehg.hgqt.hggraph import diff as revdiff
+from tortoisehg.hgqt.decorators import timeit
 
-from tortoisehg.hgqt.hgviewlib import icon as geticon
-from tortoisehg.hgqt.hgviewlib.hgrepomodel import HgRepoListModel, HgFileListModel
-from tortoisehg.hgqt.hgviewlib.hgfiledialog import FileViewer, FileDiffViewer
-from tortoisehg.hgqt.hgviewlib.hgmanifestdialog import ManifestViewer
-from tortoisehg.hgqt.hgviewlib.hgdialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgviewlib.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt.hgviewlib.helpviewer import HelpViewer
+from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.hgrepomodel import HgRepoListModel, HgFileListModel
+from tortoisehg.hgqt.hgfiledialog import FileViewer, FileDiffViewer
+from tortoisehg.hgqt.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
+from tortoisehg.hgqt.helpviewer import HelpViewer
 
 from tortoisehg.util import paths
 
@@ -502,7 +502,7 @@ class HgRepoViewer(QtGui.QMainWindow, HgDialogMixin):
 
     def on_about(self, *args):
         """ Display about dialog """
-        from hgviewlib.__pkginfo__ import modname, version, short_desc, long_desc
+        from __pkginfo__ import modname, version, short_desc, long_desc
         try:
             from mercurial.version import get_version
             hgversion = get_version()
@@ -522,7 +522,7 @@ class HgRepoViewer(QtGui.QMainWindow, HgDialogMixin):
         w.activateWindow()
 
 def run(ui, *pats, **opts):
-    from tortoisehg.hgqt.hgviewlib import setup_font_substitutions
+    from tortoisehg.hgqt import setup_font_substitutions
     setup_font_substitutions()
 
     repo = None

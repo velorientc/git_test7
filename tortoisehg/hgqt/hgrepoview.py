@@ -32,11 +32,11 @@ nullvariant = QtCore.QVariant()
 
 from tortoisehg.util.util import format_desc, xml_escape
 
-from tortoisehg.hgqt.hgviewlib.decorators import timeit
-from tortoisehg.hgqt.hgviewlib.config import HgConfig
-from tortoisehg.hgqt.hgviewlib import icon as geticon
-from tortoisehg.hgqt.hgviewlib.hgmanifestdialog import ManifestViewer
-from tortoisehg.hgqt.hgviewlib.quickbar import QuickBar
+from tortoisehg.hgqt.decorators import timeit
+from tortoisehg.hgqt.config import HgConfig
+from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.quickbar import QuickBar
 
 class GotoQuickBar(QuickBar):
     def __init__(self, parent):
@@ -467,7 +467,7 @@ class RevDisplay(QtGui.QTextBrowser):
 if __name__ == "__main__":
     from mercurial import ui, hg
     from optparse import OptionParser
-    from hgviewlib.qt4.hgrepomodel import FileRevModel, HgRepoListModel
+    from hgrepomodel import FileRevModel, HgRepoListModel
     p = OptionParser()
     p.add_option('-R', '--root', default='.',
                  dest='root',
