@@ -599,8 +599,8 @@ class GLog(gdialog.GWindow):
                     status=_('Finding pending Perforce changelists...'),
                     title=_('Pending Perforce changelists')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def p4identify(self, button):
         cmd = ['hg', 'p4identify']
@@ -624,8 +624,8 @@ class GLog(gdialog.GWindow):
                     status=_('Finding tip Perforce changelist...'),
                     title=_('Identifying Perforce tip')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -1742,8 +1742,8 @@ class GLog(gdialog.GWindow):
                     status=_('Applying bundle...'),
                     title=_('Applying bundle')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def remove_overlay(self, resettip):
         self.bfile = None
@@ -1821,8 +1821,8 @@ class GLog(gdialog.GWindow):
                     status=_('Checking incoming changesets...'),
                     title=_('Incoming')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def set_bundlefile(self, bfile, **kwopts):
         self.origurl = self.urlcombo.get_active()
@@ -1951,8 +1951,8 @@ class GLog(gdialog.GWindow):
                     status=_('Pulling changesets...'),
                     title=_('Pull')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def outgoing_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -1991,8 +1991,8 @@ class GLog(gdialog.GWindow):
                     status=_('Checking outgoing changesets...'),
                     title=_('Outgoing')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def email_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -2029,8 +2029,8 @@ class GLog(gdialog.GWindow):
                     status=_('Pushing changesets...'),
                     title=_('Push')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def conf_clicked(self, *args):
         newpath = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -2373,8 +2373,8 @@ class GLog(gdialog.GWindow):
             self.stbar.set_idle_text(text)
         if not self.execute_command(cmdline, callback, status, _('Bundling')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def qimport_rev(self, menuitem):
         """QImport selected revision."""
@@ -2403,8 +2403,8 @@ class GLog(gdialog.GWindow):
         if not self.execute_command(cmdline, callback, title=_('Importing'),
                                     status=_('Importing to Patch Queue...')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def rebase_selected(self, menuitem):
         """Rebase revision on top of selection (1st on top of 2nd).""" 
@@ -2629,8 +2629,8 @@ class GLog(gdialog.GWindow):
                     status=_('Pushing changesets to revision %s...') % rev,
                     title=_('Push to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def pull_to(self, menuitem):
         rev = str(self.currevid)
@@ -2657,8 +2657,8 @@ class GLog(gdialog.GWindow):
                     status=_('Pulling changesets to revision %s...') % rev,
                     title=_('Pull to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def copy_hash(self, menuitem):
         hash = self.repo[self.currevid].hex()
