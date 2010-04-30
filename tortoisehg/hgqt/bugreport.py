@@ -83,7 +83,7 @@ class BugReport(QtGui.QDialog):
             if fname:
                 open(fname, 'wb').write(self.text)
         except (EnvironmentError), e:
-            print e
+            QMessageBox.critical(self, _('Error writing file'), str(e))
 
 def run(ui, *pats, **opts):
     return BugReport(opts)
