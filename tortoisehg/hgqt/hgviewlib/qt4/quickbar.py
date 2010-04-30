@@ -21,7 +21,8 @@ from mercurial import util
 
 from PyQt4 import QtCore, QtGui
 
-from tortoisehg.hgqt.hgviewlib.util import Curry
+from tortoisehg.util.util import Curry
+
 from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
 
 Qt = QtCore.Qt

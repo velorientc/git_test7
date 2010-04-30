@@ -32,8 +32,9 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 nullvariant = QtCore.QVariant()
 
+from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
+
 from tortoisehg.hgqt.hgviewlib.decorators import timeit
-from tortoisehg.hgqt.hgviewlib.util import exec_flag_changed, isbfile, bfilepath
 from tortoisehg.hgqt.hgviewlib.config import HgConfig
 
 from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon

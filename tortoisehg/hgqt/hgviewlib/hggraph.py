@@ -26,8 +26,9 @@ import difflib
 from mercurial.node import nullrev
 from mercurial import patch, util, match
 
+from tortoisehg.util.util import tounicode, isbfile
+
 import tortoisehg.hgqt.hgviewlib # force apply monkeypatches
-from tortoisehg.hgqt.hgviewlib.util import tounicode, isbfile
 
 def diff(repo, ctx1, ctx2=None, files=None):
     """

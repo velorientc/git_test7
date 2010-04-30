@@ -30,9 +30,10 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 nullvariant = QtCore.QVariant()
 
+from tortoisehg.util.util import format_desc, xml_escape
+
 from tortoisehg.hgqt.hgviewlib.decorators import timeit
 from tortoisehg.hgqt.hgviewlib.config import HgConfig
-from tortoisehg.hgqt.hgviewlib.util import format_desc, xml_escape
 from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
 from tortoisehg.hgqt.hgviewlib.qt4.hgmanifestdialog import ManifestViewer
 from tortoisehg.hgqt.hgviewlib.qt4.quickbar import QuickBar

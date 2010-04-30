@@ -17,8 +17,9 @@ from PyQt4 import QtCore, QtGui, Qsci
 from mercurial import ui, hg
 from mercurial import util
 
-from tortoisehg.hgqt.hgviewlib.util import tounicode, has_closed_branch_support
-from tortoisehg.hgqt.hgviewlib.util import rootpath, find_repository
+from tortoisehg.util.util import tounicode, has_closed_branch_support
+from tortoisehg.util.util import rootpath, find_repository
+
 from tortoisehg.hgqt.hgviewlib.hggraph import diff as revdiff
 from tortoisehg.hgqt.hgviewlib.decorators import timeit
 

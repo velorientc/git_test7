@@ -28,7 +28,7 @@ from mercurial import ui, hg, util
 from PyQt4 import QtGui, QtCore, Qsci
 from PyQt4.QtCore import Qt
 
-from tortoisehg.hgqt.hgviewlib.util import tounicode, rootpath
+from tortoisehg.util.util import tounicode, rootpath
 
 from tortoisehg.hgqt.hgviewlib.qt4 import icon as geticon
 from tortoisehg.hgqt.hgviewlib.qt4.hgdialogmixin import HgDialogMixin
