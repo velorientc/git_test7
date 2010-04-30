@@ -35,7 +35,10 @@ class htmlui(ui.ui):
     def label(self, msg, label):
         msg = hglib.tounicode(msg)
         style = qtlib.geteffect(label)
-        return '<pre style="%s">%s</pre>' % (style, msg)
+        if style:
+            return '<pre style="%s">%s</pre>' % (style, msg)
+        else:
+            return '<pre>%s</pre>' % msg
 
     def popbuffer(self, labeled=False):
         b = self._buffers.pop()

@@ -93,8 +93,9 @@ class HTMLDelegate(QStyledItemDelegate):
         doc.setHtml(index.data().toString())
 
         painter.save()
-        options.widget.style().drawControl(QStyle.CE_ItemViewItem,
-                options, painter)
+        if options.widget:
+            options.widget.style().drawControl(QStyle.CE_ItemViewItem,
+                                               options, painter)
         painter.translate(options.rect.left(), options.rect.top())
         clip = QRectF(0, 0, options.rect.width(), options.rect.height())
         doc.drawContents(painter, clip)
