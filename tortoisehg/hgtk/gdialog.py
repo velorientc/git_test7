@@ -581,6 +581,10 @@ class GWindow(gtk.Window):
             except (util.Abort, IOError, OSError), inst:
                 Prompt(title + _(' Aborted'), str(inst), self).run()
                 return False, ''
+            except error.LookupError, inst:
+                Prompt(title + _(' Aborted'), str(inst) + 
+                        _(', please refresh'), self).run()
+                return False, ''
         finally:
             sys.stderr = saved
             textout = self.ui.popbuffer()
