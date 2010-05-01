@@ -330,7 +330,7 @@ def hgcmd_toq(q, *args):
             super(Qui, self).__init__(src)
             self.setconfig('ui', 'interactive', 'off')
 
-        def write(self, *args):
+        def write(self, *args, **opts):
             if uiwrite(self, args):
                 for a in args:
                     q.put(str(a))

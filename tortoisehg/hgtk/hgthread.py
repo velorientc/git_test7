@@ -42,12 +42,12 @@ class GtkUi(ui.ui):
         self.setconfig('ui', 'interactive', 'on')
         self.setconfig('progress', 'disable', 'True')
 
-    def write(self, *args):
+    def write(self, *args, **opts):
         if hglib.uiwrite(self, args):
             for a in args:
                 self.outputq.put(str(a))
 
-    def write_err(self, *args):
+    def write_err(self, *args, **opts):
         for a in args:
             self.errorq.put(str(a))
 
