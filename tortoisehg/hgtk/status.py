@@ -198,7 +198,12 @@ class GStatus(gdialog.GWindow):
             self.mqmode = True
 
     def is_merge(self):
-        return self.count_revs() < 2 and len(self.repo.parents()) == 2
+        try:
+            numparents = len(self.repo.parents())
+        except error.Abort, e:
+            self.stbar.set_text(str(e) + _(', please refresh'))
+            numparents = 1
+        return self.count_revs() < 2 and numparents == 2
 
 
     def get_accelgroup(self):
