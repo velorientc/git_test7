@@ -2341,7 +2341,7 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'rebase', '--source', str(revs[0]),
                    '--dest', str(revs[1])]
         self.execute_command(cmdline, force=True)
-        self.repo.invalidate()
+        hglib.invalidaterepo(self.repo)
         self.reload_log()
         self.changeview.clear()
 
