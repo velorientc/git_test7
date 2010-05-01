@@ -104,8 +104,8 @@ class AbstractFileDialog(QtGui.QMainWindow, HgDialogMixin):
         """
         if self.repoviewer is None:
             # prevent recursive import
-            from hgrepoviewer import HgRepoViewer
-            self.repoviewer = HgRepoViewer(self.repo)
+            from workbench import Workbench
+            self.repoviewer = Workbench(self.repo)
         self.repoviewer.goto(rev)
         self.repoviewer.show()
         self.repoviewer.activateWindow()

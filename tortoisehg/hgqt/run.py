@@ -361,7 +361,7 @@ def update(ui, *pats, **opts):
 
 def log(ui, *pats, **opts):
     """Repository Explorer (changelog viewer)"""
-    from tortoisehg.hgqt.hgrepoviewer import run
+    from tortoisehg.hgqt.workbench import run
     qtrun(run, ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()

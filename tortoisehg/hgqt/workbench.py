@@ -1,13 +1,13 @@
 # -*- coding: iso-8859-1 -*-
 #!/usr/bin/env python
-# main.py - qt4-based hg rev log browser
+# workbench.py - main TortoiseHg Window
 #
 # Copyright (C) 2007-2010 Logilab. All rights reserved.
 #
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 """
-Main Qt4 application for hgview
+Main Qt4 application for TortoiseHg
 """
 import sys, os
 import re
@@ -44,7 +44,7 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
 
-class HgRepoViewer(QtGui.QMainWindow, HgDialogMixin):
+class Workbench(QtGui.QMainWindow, HgDialogMixin):
     """hg repository viewer/browser application"""
     _uifile = 'hgqv.ui'
     def __init__(self, repo, fromhead=None):
@@ -58,7 +58,7 @@ class HgRepoViewer(QtGui.QMainWindow, HgDialogMixin):
         QtGui.QMainWindow.__init__(self)
         HgDialogMixin.__init__(self)
 
-        self.setWindowTitle('hgview: %s' % os.path.abspath(self.repo.root))
+        self.setWindowTitle('TortoiseHg Workbench: %s' % os.path.abspath(self.repo.root))
         self.menubar.hide()
 
         self.splitter_2.setStretchFactor(0, 1)
@@ -529,4 +529,4 @@ def run(ui, *pats, **opts):
     root = paths.find_root()
     if root:
         repo = hg.repository(ui, path=root)
-    return HgRepoViewer(repo)
+    return Workbench(repo)
