@@ -297,8 +297,10 @@ class TreeModel(gtk.GenericTreeModel):
     def text_color_default(self, rev, author):
         return int(rev) >= self.origtip and gtklib.NEW_REV_COLOR or gtklib.NORMAL
 
-    colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
-     slateblue red2 navy dimgrey'''.split()
+    colors = [gtklib.NORMAL, gtklib.RED, gtklib.GREEN, gtklib.BLUE,
+              gtklib.YELLOW, gtklib.MAGENTA, gtklib.OLIVE, gtklib.ORANGE,
+              gtklib.PINK, gtklib.BROWN, gtklib.VIOLET]
+    
     color_cache = {}
 
     def text_color_author(self, rev, author):

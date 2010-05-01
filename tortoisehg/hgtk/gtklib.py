@@ -64,9 +64,16 @@ RED = 'red'
 GREEN = 'green'
 BLUE = 'blue'
 YELLOW = 'yellow'
+MAGENTA = 'magenta'
+OLIVE = 'olive'
+ORANGE = 'orange'
+BROWN = 'brown'
+PINK = 'pink'
+VIOLET = 'violet'
 BLACK = 'black'
 WHITE = 'white'
 GREY = 'grey'
+
 
 NORMAL = BLACK
 NEW_REV_COLOR = DGREEN
