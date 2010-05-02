@@ -104,9 +104,17 @@ class HgRepoView(QtGui.QTableView):
                 self.goto)
 
     def _action_defs(self):
-        a = [("back", self.tr("Back"), 'back', None, QtGui.QKeySequence(QtGui.QKeySequence.Back), self.back),
-             ("forward", self.tr("Forward"), 'forward', None, QtGui.QKeySequence(QtGui.QKeySequence.Forward), self.forward),
-             ("manifest", self.tr("Show at rev..."), None, self.tr("Show the manifest at selected revision"), None, self.showAtRev),
+        a = [("back", self.tr("Back"), 'back', None,
+              QtGui.QKeySequence(QtGui.QKeySequence.Back),
+              self.back),
+             ("forward", self.tr("Forward"), 'forward', None,
+              QtGui.QKeySequence(QtGui.QKeySequence.Forward),
+              self.forward),
+             ("manifest", self.tr("Show at rev..."), None,
+              self.tr("Show the manifest at selected revision"), None,
+              self.showAtRev),
+             ("update", self.tr("Update to rev..."), None, None, None,
+              self.updateToRev),
              ]
         return a
 
@@ -132,9 +140,12 @@ class HgRepoView(QtGui.QTableView):
     def showAtRev(self):
         self.emit(SIGNAL('revisionActivated'), self.current_rev)
 
+    def updateToRev(self):
+        self.emit(SIGNAL('updateToRevision'), self.current_rev)
+
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
-        for act in ['manifest', None, 'back', 'forward']:
+        for act in ['update', 'manifest', None, 'back', 'forward']:
             if act:
                 menu.addAction(self._actions[act])
             else:
