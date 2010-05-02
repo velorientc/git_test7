@@ -38,7 +38,7 @@ from tortoisehg.hgqt.decorators import timeit
 from tortoisehg.hgqt.config import HgConfig
 
 from tortoisehg.hgqt import icon as geticon
-from tortoisehg.hgqt.filedialog import FileLogDialog, FileDiffDialog 
+from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 from tortoisehg.hgqt.manifestdialog import ManifestViewer
 from tortoisehg.hgqt.quickbar import QuickBar
 from tortoisehg.hgqt.lexers import get_lexer

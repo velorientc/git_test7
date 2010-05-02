@@ -25,7 +25,7 @@ from tortoisehg.hgqt.decorators import timeit
 
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.repomodel import HgRepoListModel, HgFileListModel
-from tortoisehg.hgqt.filedialog import FileLogDialog, FileDiffDialog
+from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestdialog import ManifestViewer
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
