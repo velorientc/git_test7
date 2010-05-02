@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-hgview\tortoisehg\hgqt\helpviewer.ui'
+# Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\HelpDialog.ui'
 #
-# Created: Fri Apr 30 22:50:25 2010
+# Created: Sun May 02 13:55:03 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!

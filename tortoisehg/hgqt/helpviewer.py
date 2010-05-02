@@ -26,7 +26,7 @@ from docutils.core import publish_string
 
 class HelpDialog(QtGui.QDialog, HgDialogMixin):
     """hgview simple help viewer"""
-    _uifile = 'helpviewer.ui'
+    _uifile = 'HelpDialog.ui'
     def __init__(self, repo, parent=None):
         self.repo = repo
         QtGui.QDialog.__init__(self, parent)
