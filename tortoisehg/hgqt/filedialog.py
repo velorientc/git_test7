@@ -224,7 +224,7 @@ class FileLogDialog(AbstractFileDialog):
         self.actionNextDiff.setEnabled(self.textView.fileMode() and self.textView.nDiffs())
 
 
-class FileDiffViewer(AbstractFileDialog):
+class FileDiffDialog(AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
@@ -535,7 +535,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication([])
 
     if options.diff:
-        view = FileDiffViewer(repo, filename)
+        view = FileDiffDialog(repo, filename)
     else:
         view = FileLogDialog(repo, filename)
     view.show()

@@ -38,7 +38,7 @@ from tortoisehg.hgqt.decorators import timeit
 from tortoisehg.hgqt.config import HgConfig
 
 from tortoisehg.hgqt import icon as geticon
-from tortoisehg.hgqt.filedialog import FileLogDialog, FileDiffViewer 
+from tortoisehg.hgqt.filedialog import FileLogDialog, FileDiffDialog 
 from tortoisehg.hgqt.manifestdialog import ManifestViewer
 from tortoisehg.hgqt.quickbar import QuickBar
 from tortoisehg.hgqt.lexers import get_lexer
@@ -549,7 +549,7 @@ class HgFileListView(QtGui.QTableView):
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
 
     def diffNavigate(self, filename=None):
-        self._navigate(filename, FileDiffViewer, self._diff_dialogs)
+        self._navigate(filename, FileDiffDialog, self._diff_dialogs)
 
     def _navigate(self, filename, dlgclass, dlgdict):
         if filename is None:
