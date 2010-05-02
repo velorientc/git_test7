@@ -13,11 +13,11 @@ TortoiseHg About dialog - PyQt4 version
 
 import os, sys, urllib2
 
-from PyQt4.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
+from PyQt4.QtCore import PYQT_VERSION_STR, QT_VERSION_STR, Qt
 from PyQt4.QtGui import QIcon, QPixmap, QDialog
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import version, hglib, shlib
+from tortoisehg.util import version, hglib, shlib, paths
 
 def make_version(tuple):
     vers = ".".join([str(x) for x in tuple])
@@ -36,16 +36,19 @@ class AboutDialog(QDialog):
 
     def __init__(self, parent=None):
         super(AboutDialog, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self._qui = Ui_AboutDialog()
         self._qui.setupUi(self)
 
+        iconfile = paths.get_tortoise_icon('thg_logo.ico')
         icon = QIcon()
-        icon.addPixmap(QPixmap("icons/thg_logo.ico"), QIcon.Normal, QIcon.Off)
+        icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
         self.setWindowTitle(_('About TortoiseHg'))
 
-        self._qui.logo_label.setPixmap(QPixmap("icons/thg_logo_92x50.png"))
+        thglogofile = paths.get_tortoise_icon('thg_logo_92x50.png')
+        self._qui.logo_label.setPixmap(QPixmap(thglogofile))
 
         thgv = version.version()
         if '+' in thgv:

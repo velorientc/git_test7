@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'license.ui'
+# Form implementation generated from reading ui file 'tortoisehg/hgqt/license.ui'
 #
-# Created: Mon May 10 22:26:55 2010
+# Created: Mon May 17 22:22:10 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,7 +21,6 @@ class Ui_LicenseDialog(object):
         LicenseDialog.setSizePolicy(sizePolicy)
         LicenseDialog.setMaximumSize(QtCore.QSize(16777215, 16777215))
         LicenseDialog.setWhatsThis("None")
-        LicenseDialog.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         LicenseDialog.setSizeGripEnabled(False)
         LicenseDialog.setModal(True)
         self.verticalLayout = QtGui.QVBoxLayout(LicenseDialog)
@@ -37,7 +36,6 @@ class Ui_LicenseDialog(object):
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.btnClose = QtGui.QPushButton(LicenseDialog)
-        self.btnClose.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.btnClose.setFlat(False)
         self.btnClose.setObjectName("btnClose")
         self.horizontalLayout.addWidget(self.btnClose)

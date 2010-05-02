@@ -11,9 +11,11 @@
 TortoiseHg License dialog - PyQt4 version
 """
 
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QDialog, QIcon, QPixmap
 
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.util import paths
 
 try:
     from tortoisehg.hgqt.license_ui import Ui_LicenseDialog
@@ -26,14 +28,16 @@ class LicenseDialog(QDialog):
     """Dialog for showing the TortoiseHg license"""
     def __init__(self, parent=None):
         super(LicenseDialog, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self._qui = Ui_LicenseDialog()
         self._qui.setupUi(self)
+        iconfile = paths.get_tortoise_icon('thg_logo.ico')
         icon = QIcon()
-        icon.addPixmap(QPixmap("icons/thg_logo.ico"), QIcon.Normal, QIcon.Off)
+        icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
         self.setWindowTitle(_('License'))
         try:
-            lic = open('COPYING.txt', 'rb').read()
+            lic = open(paths.get_license_path(), 'rb').read()
             self._qui.licenseText.setPlainText(lic)
         except (IOError):
             pass
