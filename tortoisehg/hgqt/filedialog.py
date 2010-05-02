@@ -111,7 +111,7 @@ class AbstractFileDialog(QtGui.QMainWindow, HgDialogMixin):
         self.repoviewer.activateWindow()
         self.repoviewer.raise_()
 
-class FileViewer(AbstractFileDialog):
+class FileLogDialog(AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
@@ -537,7 +537,7 @@ if __name__ == '__main__':
     if options.diff:
         view = FileDiffViewer(repo, filename)
     else:
-        view = FileViewer(repo, filename)
+        view = FileLogDialog(repo, filename)
     view.show()
     sys.exit(app.exec_())
 
