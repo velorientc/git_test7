@@ -24,7 +24,7 @@ SIGNAL = QtCore.SIGNAL
 
 from docutils.core import publish_string
 
-class HelpViewer(QtGui.QDialog, HgDialogMixin):
+class HelpDialog(QtGui.QDialog, HgDialogMixin):
     """hgview simple help viewer"""
     _uifile = 'helpviewer.ui'
     def __init__(self, repo, parent=None):

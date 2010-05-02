@@ -29,7 +29,7 @@ from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestdialog import ManifestDialog
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt.helpviewer import HelpViewer
+from tortoisehg.hgqt.helpviewer import HelpDialog
 
 from tortoisehg.util import paths
 
@@ -516,7 +516,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         QtGui.QMessageBox.about(self, "About %s" % modname, msg)
 
     def on_help(self, *args):
-        w = HelpViewer(self.repo, self)
+        w = HelpDialog(self.repo, self)
         w.show()
         w.raise_()
         w.activateWindow()
