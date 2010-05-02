@@ -223,7 +223,7 @@ class CmdThread(QThread):
             else:
                 msg = _('[command interrupted %s]')
         elif self.ret:
-            msg = _('[command returned code %d %%s]') % int(ret)
+            msg = _('[command returned code %d %%s]') % int(self.ret)
         else:
             msg = _('[command completed successfully %s]')
         self.ui.write(msg % time.asctime() + '\n', label='control')
