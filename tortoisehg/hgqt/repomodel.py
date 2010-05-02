@@ -13,26 +13,19 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""
-Qt4 model for hg repo changelogs and filelogs
-"""
-import sys
-import mx.DateTime as dt
-import re
-import os, os.path as osp
 
-from mercurial.node import nullrev
-from mercurial.node import hex, short as short_hex
+import sys
+import re
+
 from mercurial.revlog import LookupError
-from mercurial import util, error
+from mercurial import error
 
 from tortoisehg.util.util import tounicode, isbfile, Curry
 
 from tortoisehg.hgqt.graph import Graph, ismerge, diff as revdiff
-from tortoisehg.hgqt.graph import revision_grapher, filelog_grapher
+from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt import icon as geticon
-from tortoisehg.hgqt.decorators import timeit
 
 from PyQt4 import QtCore, QtGui
 connect = QtCore.QObject.connect
@@ -94,14 +87,9 @@ _columnmap = {'ID': lambda model, ctx, gnode: ctx.rev() is not None and str(ctx.
               'Filename': lambda model, ctx, gnode: gnode.extra[0],
               }
 
-_tooltips = {'ID': lambda model, ctx, gnode: ctx.rev() is not None and ctx.hex() or "Working Directory",
+_tooltips = {'ID': lambda model, ctx,
+                   gnode: ctx.rev() is not None and ctx.hex() or "Working Directory",
              }
-
-def auth_width(model, repo):
-    auths = model._aliases.values()
-    if not auths:
-        return None
-    return sorted(auths, cmp=lambda x,y: cmp(len(x), len(y)))[-1]
 
 # in following lambdas, r is a hg repo
 _maxwidth = {'ID': lambda self, r: str(len(r.changelog)),
@@ -437,53 +425,6 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
     def notify_data_changed(self):
         self.emit(SIGNAL("layoutChanged()"))
 
-class FileRevModel(HgRepoListModel):
-    """
-    Model used to manage the list of revisions of a file, in file
-    viewer of in diff-file viewer dialogs.
-    """
-    _allcolumns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Tags', 'Filename')
-    _columns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Filename')
-    _stretchs = {'Log': 1, }
-    _getcolumns = "getFilelogColumns"
-
-    def __init__(self, repo, filename=None, parent=None):
-        """
-        data is a HgHLRepo instance
-        """
-        HgRepoListModel.__init__(self, repo, parent=parent)
-        self.setFilename(filename)
-
-    def setRepo(self, repo, branch='', fromhead=None, follow=False):
-        self.repo = repo
-        self._datacache = {}
-        self.load_config()
-
-    def setFilename(self, filename):
-        self.filename = filename
-
-        self._user_colors = {}
-        self._branch_colors = {}
-
-        self.rowcount = 0
-        self._datacache = {}
-
-        if self.filename:
-            grapher = filelog_grapher(self.repo, self.filename)
-            self.graph = Graph(self.repo, grapher, self.max_file_size)
-            fl = self.repo.file(self.filename)
-            # we use fl.index here (instead of linkrev) cause
-            # linkrev API changed between 1.0 and 1.?. So this
-            # works with both versions.
-            self.heads = [fl.index[fl.rev(x)][4] for x in fl.heads()]
-            self.ensureBuilt(row=self.fill_step/2)
-            QtCore.QTimer.singleShot(0, Curry(self.emit, SIGNAL('filled')))
-            self._fill_timer = self.startTimer(500)
-        else:
-            self.graph = None
-            self.heads = []
-
-
 replus = re.compile(r'^[+][^+].*', re.M)
 reminus = re.compile(r'^[-][^-].*', re.M)
 
@@ -758,40 +699,3 @@ class HgFileListModel(QtCore.QAbstractTableModel):
             return QtCore.QVariant(header[section])
 
         return nullvariant
-
-
-if __name__ == "__main__":
-    from mercurial import ui, hg
-    from optparse import OptionParser
-    p = OptionParser()
-    p.add_option('-R', '--root', default='.',
-                 dest='root',
-                 help="Repository main directory")
-    p.add_option('-f', '--file', default=None,
-                 dest='filename',
-                 help="display the revision graph of this file (if not given, display the whole rev graph)")
-
-    opt, args = p.parse_args()
-
-    u = ui.ui()
-    repo = hg.repository(u, opt.root)
-    app = QtGui.QApplication(sys.argv)
-    if opt.filename is not None:
-        model = FileRevModel(repo, opt.filename)
-    else:
-        model = HgRepoListModel(repo)
-
-    view = QtGui.QTableView()
-    #delegate = GraphDelegate()
-    #view.setItemDelegateForColumn(1, delegate)
-    view.setShowGrid(False)
-    view.verticalHeader().hide()
-    view.verticalHeader().setDefaultSectionSize(20)
-    view.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-    view.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-    view.setModel(model)
-    view.setWindowTitle("Simple Hg List Model")
-    view.show()
-    view.setAlternatingRowColors(True)
-    #view.resizeColumnsToContents()
-    sys.exit(app.exec_())
