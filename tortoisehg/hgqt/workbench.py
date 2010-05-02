@@ -30,6 +30,7 @@ from tortoisehg.hgqt.manifestdialog import ManifestDialog
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.helpdialog import HelpDialog
+from tortoisehg.hgqt import cmdui
 
 from tortoisehg.util import paths
 
@@ -381,6 +382,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         view.installEventFilter(self)
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
+        connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
         connect(self.textview_header, SIGNAL('revisionSelected'), view.goto)
         connect(self.textview_header, SIGNAL('parentRevisionSelected'), self.textview_status.displayDiff)
         self.attachQuickBar(view.goto_toolbar)
@@ -428,6 +430,14 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             rev = self.tableView_revisions.current_rev
         self._manifestdlg = ManifestDialog(self.repo, rev)
         self._manifestdlg.show()
+
+    def updateToRevision(self, rev):
+        print "workbench: updateToRevision called, rev=%s" % rev
+        args = ['update']
+        args += ['-r', str(rev)]
+        dlg = cmdui.Dialog(args)
+        dlg.show()
+        self._updatedlg = dlg
 
     def file_displayed(self, filename):
         self.actionPrevDiff.setEnabled(False)
