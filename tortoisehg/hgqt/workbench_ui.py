@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sun May 02 11:53:07 2010
+# Created: Sun May 02 12:03:11 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -143,4 +143,4 @@ class Ui_MainWindow(object):
 
 from fileview import HgFileView, HgFileListView
 from repoview import HgRepoView, RevDisplay
-import hgqv_rc
+import workbench_rc

@@ -30,8 +30,8 @@ def should_rebuild(srcfile, pyfile):
 # automatically load resource module, creating it on the fly if
 # required
 curdir = osp.dirname(__file__)
-pyfile = osp.join(curdir, "hgqv_rc.py")
-rcfile = osp.join(curdir, "hgqv.qrc")
+pyfile = osp.join(curdir, "workbench_rc.py")
+rcfile = osp.join(curdir, "workbench.qrc")
 if should_rebuild(rcfile, pyfile):
     if os.system('pyrcc4 %s -o %s' % (rcfile, pyfile)):
         print "ERROR: Cannot convert the resource file '%s' into a python module."
@@ -45,7 +45,7 @@ from PyQt4 import QtGui, uic
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 Qt = QtCore.Qt
-import hgqv_rc
+import workbench_rc
 
 
 _icons = {}
@@ -76,7 +76,7 @@ def icon(name):
 import repoview, fileview
 sys.modules['repoview'] = repoview
 sys.modules['fileview'] = fileview
-sys.modules['hgqv_rc'] = hgqv_rc
+sys.modules['workbench_rc'] = workbench_rc
 
 def setup_font_substitutions():
     # be sure monospace default font for diffs have a decent substitution

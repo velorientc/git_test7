@@ -249,7 +249,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="hgqv.qrc"/>
+  <include location="workbench.qrc"/>
  </resources>
  <connections/>
 </ui>
