@@ -228,7 +228,7 @@ class FileDiffDialog(AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-    _uifile = 'filediffviewer.ui'
+    _uifile = 'FileDiffDialog.ui'
 
     def setupViews(self):
         self.tableView_revisions = self.tableView_revisions_left
