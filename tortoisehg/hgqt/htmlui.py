@@ -8,6 +8,7 @@
 import os
 
 from mercurial import ui
+from PyQt4 import QtCore
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
 
@@ -34,9 +35,7 @@ class htmlui(ui.ui):
 
     def label(self, msg, label):
         msg = hglib.tounicode(msg)
-        msg = msg.replace('&','&amp;')
-        msg = msg.replace('<','&lt;')
-        msg = msg.replace('>','&gt;')
+        msg = QtCore.Qt.escape(msg)
         style = qtlib.geteffect(label)
         if style:
             return '<pre style="%s">%s</pre>' % (style, msg)
