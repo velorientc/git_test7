@@ -39,7 +39,7 @@ from tortoisehg.hgqt.config import HgConfig
 
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.filedialog import FileViewer, FileDiffViewer 
-from tortoisehg.hgqt.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.manifestdialog import ManifestViewer
 from tortoisehg.hgqt.quickbar import QuickBar
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList

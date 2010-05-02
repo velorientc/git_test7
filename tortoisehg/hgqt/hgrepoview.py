@@ -35,7 +35,7 @@ from tortoisehg.util.util import format_desc, xml_escape
 from tortoisehg.hgqt.decorators import timeit
 from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt import icon as geticon
-from tortoisehg.hgqt.hgmanifestdialog import ManifestViewer
+from tortoisehg.hgqt.manifestdialog import ManifestViewer
 from tortoisehg.hgqt.quickbar import QuickBar
 
 class GotoQuickBar(QuickBar):
