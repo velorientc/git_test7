@@ -34,6 +34,9 @@ class htmlui(ui.ui):
 
     def label(self, msg, label):
         msg = hglib.tounicode(msg)
+        msg = msg.replace('&','&amp;')
+        msg = msg.replace('<','&lt;')
+        msg = msg.replace('>','&gt;')
         style = qtlib.geteffect(label)
         if style:
             return '<pre style="%s">%s</pre>' % (style, msg)
@@ -59,3 +62,4 @@ if __name__ == "__main__":
     u = htmlui()
     repo = hg.repository(u)
     repo.status()
+    print u.getdata()[0]
