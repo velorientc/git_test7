@@ -234,7 +234,7 @@
   <customwidget>
    <class>RevDisplay</class>
    <extends>QTextBrowser</extends>
-   <header>repoview.h</header>
+   <header>changeset.h</header>
   </customwidget>
   <customwidget>
    <class>HgFileListView</class>
