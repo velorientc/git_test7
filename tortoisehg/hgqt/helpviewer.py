@@ -1,13 +1,12 @@
 # -*- coding: iso-8859-1 -*-
 #!/usr/bin/env python
-# main.py - qt4-based hg rev log browser
 #
 # Copyright (C) 2007-2010 Logilab. All rights reserved.
 #
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 """
-Help window for hgview
+Help window
 """
 import sys, os
 import re
@@ -16,7 +15,7 @@ from PyQt4 import QtCore, QtGui, Qsci
 
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgviewhelp import help_msg, get_options_helpmsg
+from tortoisehg.hgqt.viewhelp import help_msg, get_options_helpmsg
 
 Qt = QtCore.Qt
 bold = QtGui.QFont.Bold
