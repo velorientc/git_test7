@@ -76,7 +76,7 @@ class GotoQuickBar(QuickBar):
 
 class HgRepoView(QtGui.QTableView):
     """
-    A QTableView for displaying a FileRevModel or a HgRepoListModel,
+    A QTableView for displaying a HgRepoListModel,
     with actions, shortcuts, etc.
     """
     def __init__(self, parent=None):
@@ -462,44 +462,3 @@ class RevDisplay(QtGui.QTextBrowser):
         desc = desc.replace('\n', '<br/>\n')
         buf += '<div class="diff_desc"><p>%s</p></div>\n' % desc
         self.setHtml(buf)
-
-
-if __name__ == "__main__":
-    from mercurial import ui, hg
-    from optparse import OptionParser
-    from repomodel import FileRevModel, HgRepoListModel
-    p = OptionParser()
-    p.add_option('-R', '--root', default='.',
-                 dest='root',
-                 help="Repository main directory")
-    p.add_option('-f', '--file', default=None,
-                 dest='filename',
-                 help="display the revision graph of this file (if not given, display the whole rev graph)")
-
-    opt, args = p.parse_args()
-
-    u = ui.ui()
-    repo = hg.repository(u, opt.root)
-    app = QtGui.QApplication(sys.argv)
-    if opt.filename is not None:
-        model = FileRevModel(repo, opt.filename)
-    else:
-        model = HgRepoListModel(repo)
-    root = QtGui.QMainWindow()
-    w = QtGui.QWidget()
-    root.setCentralWidget(w)
-    l = QtGui.QVBoxLayout(w)
-
-    view = HgRepoView(w)
-    view.setModel(model)
-    view.setWindowTitle("Simple Hg List Model")
-
-    disp = RevDisplay(w)
-    connect(view, SIGNAL('revisionSelected'), lambda rev: disp.displayRevision(repo.changectx(rev)))
-    connect(disp, SIGNAL('revisionSelected'), view.goto)
-    #connect(view, SIGNAL('revisionActivated'), rev_act)
-
-    l.addWidget(view, 2)
-    l.addWidget(disp)
-    root.show()
-    sys.exit(app.exec_())
