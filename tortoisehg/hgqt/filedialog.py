@@ -115,7 +115,7 @@ class FileLogDialog(AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
-    _uifile = 'fileviewer.ui'
+    _uifile = 'FileLogDialog.ui'
 
     def setupViews(self):
         self.textView.setFont(self._font)
