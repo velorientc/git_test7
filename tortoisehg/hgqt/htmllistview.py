@@ -10,6 +10,8 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from tortoisehg.hgqt import qtlib
+
 class HtmlModel(QAbstractListModel):
     
     def __init__(self, strings):
@@ -92,6 +94,7 @@ class HTMLDelegate(QStyledItemDelegate):
         palette = QApplication.palette()
         doc = QTextDocument()
         doc.setDefaultFont(option.font)
+        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
         painter.save()
         if option.state & QStyle.State_Selected:
             doc.setHtml('<font color=%s>%s</font>' % (
@@ -105,9 +108,9 @@ class HTMLDelegate(QStyledItemDelegate):
         painter.restore()
 
     def sizeHint(self, option, index):
-        fm = option.fontMetrics
         text = index.model().data(index, Qt.DisplayRole).toString()
         doc = QTextDocument()
+        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
         doc.setDefaultFont(option.font)
         doc.setHtml(text)
         doc.setTextWidth(option.rect.width())

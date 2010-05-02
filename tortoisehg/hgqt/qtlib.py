@@ -21,6 +21,8 @@ _effects = {
     'underline': 'text-decoration: underline',
 }
 
+thgstylesheet = '* { white-space: pre; font-family: monospace; }'
+
 def configstyles(ui):
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
