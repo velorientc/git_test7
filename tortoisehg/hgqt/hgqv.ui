@@ -229,12 +229,12 @@
   <customwidget>
    <class>HgRepoView</class>
    <extends>QTableView</extends>
-   <header>hgrepoview.h</header>
+   <header>repoview.h</header>
   </customwidget>
   <customwidget>
    <class>RevDisplay</class>
    <extends>QTextBrowser</extends>
-   <header>hgrepoview.h</header>
+   <header>repoview.h</header>
   </customwidget>
   <customwidget>
    <class>HgFileListView</class>

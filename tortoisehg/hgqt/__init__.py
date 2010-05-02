@@ -73,8 +73,8 @@ def icon(name):
 
 
 # dirty hack to please PyQt4 uic
-import hgrepoview, hgfileview
-sys.modules['hgrepoview'] = hgrepoview
+import repoview, hgfileview
+sys.modules['repoview'] = repoview
 sys.modules['hgfileview'] = hgfileview
 sys.modules['hgqv_rc'] = hgqv_rc
 
