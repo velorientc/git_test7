@@ -76,7 +76,7 @@ def run(ui, *pats, **opts):
     matcher = cmdutil.matchall(repo)
     diffopts = mdiff.diffopts(git=True, nodates=True)
     try:
-        node1, node2 = repo['tip'].node(), repo['tip'].parents()[0].node()
+        node2, node1 = repo['tip'].node(), repo['tip'].parents()[0].node()
         for s in patch.diff(repo, node1, node2, match=matcher, opts=diffopts):
             fp.writelines(s.splitlines(True))
     except (IOError, error.RepoError, error.LookupError, util.Abort), e:
