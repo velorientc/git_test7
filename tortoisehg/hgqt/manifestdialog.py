@@ -44,7 +44,7 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
-    _uifile = 'manifestviewer.ui'
+    _uifile = 'ManifestDialog.ui'
     def __init__(self, repo, noderev):
         self.repo = repo
         QtGui.QMainWindow.__init__(self)
