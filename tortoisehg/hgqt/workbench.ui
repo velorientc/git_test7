@@ -239,7 +239,7 @@
   <customwidget>
    <class>HgFileListView</class>
    <extends>QTableView</extends>
-   <header>fileview.h</header>
+   <header>filelistview.h</header>
   </customwidget>
   <customwidget>
    <class>HgFileView</class>

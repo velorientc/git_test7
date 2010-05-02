@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sun May 02 12:03:11 2010
+# Created: Sun May 02 14:21:29 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -141,6 +141,7 @@ class Ui_MainWindow(object):
         self.actionDisplayAllBranches.setText(QtGui.QApplication.translate("MainWindow", "displayAllBranches", None, QtGui.QApplication.UnicodeUTF8))
         self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
 
-from fileview import HgFileView, HgFileListView
+from filelistview import HgFileListView
+from fileview import HgFileView
 from repoview import HgRepoView, RevDisplay
 import workbench_rc
