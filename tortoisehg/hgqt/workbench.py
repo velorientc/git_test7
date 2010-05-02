@@ -29,7 +29,7 @@ from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestdialog import ManifestDialog
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt.helpviewer import HelpDialog
+from tortoisehg.hgqt.helpdialog import HelpDialog
 
 from tortoisehg.util import paths
 
