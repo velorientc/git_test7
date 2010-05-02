@@ -379,6 +379,11 @@ def vdiff(ui, *pats, **opts):
     from tortoisehg.hgqt.visdiff import run
     qtrun(run, ui, *pats, **opts)
 
+def about(ui, *pats, **opts):
+    """about dialog"""
+    from tortoisehg.hgqt.about import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -592,6 +597,7 @@ globalopts = [
 ]
 
 table = {
+    "about": (about, [], _('thg about')),
     "^clone":
         (clone,
          [('U', 'noupdate', None,
