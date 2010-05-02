@@ -30,7 +30,7 @@ from PyQt4.QtCore import Qt
 from tortoisehg.util.util import tounicode
 
 from tortoisehg.hgqt import icon as geticon
-from tortoisehg.hgqt.hgdialogmixin import HgDialogMixin
+from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.hgrepomodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
 
