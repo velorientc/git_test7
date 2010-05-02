@@ -40,7 +40,7 @@ SIGNAL = QtCore.SIGNAL
 nullvariant = QtCore.QVariant()
 
         
-class ManifestViewer(QtGui.QMainWindow, HgDialogMixin):
+class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     repo = hg.repository(u, options.repo)
     app = QtGui.QApplication([])
 
-    view = ManifestViewer(repo, int(rev))
+    view = ManifestDialog(repo, int(rev))
     view.show()
     sys.exit(app.exec_())
 

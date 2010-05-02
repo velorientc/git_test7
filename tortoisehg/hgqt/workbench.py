@@ -26,7 +26,7 @@ from tortoisehg.hgqt.decorators import timeit
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.repomodel import HgRepoListModel, HgFileListModel
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
-from tortoisehg.hgqt.manifestdialog import ManifestViewer
+from tortoisehg.hgqt.manifestdialog import ManifestDialog
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.helpviewer import HelpViewer
@@ -426,7 +426,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         """
         if rev is None:
             rev = self.tableView_revisions.current_rev
-        self._manifestdlg = ManifestViewer(self.repo, rev)
+        self._manifestdlg = ManifestDialog(self.repo, rev)
         self._manifestdlg.show()
 
     def file_displayed(self, filename):
