@@ -20,8 +20,46 @@ from mercurial.node import short as short_hex
 
 from PyQt4 import QtCore
 
-from tortoisehg.hgqt.repomodel import TreeItem
+class _TreeItem(object):
+    def __init__(self, data, parent=None):
+        self.parentItem = parent
+        self.itemData = data
+        self.childItems = []
 
+    def appendChild(self, item):
+        self.childItems.append(item)
+        return item
+    addChild = appendChild
+
+    def child(self, row):
+        return self.childItems[row]
+
+    def childCount(self):
+        return len(self.childItems)
+
+    def columnCount(self):
+        return len(self.itemData)
+
+    def data(self, column):
+        return self.itemData[column]
+
+    def parent(self):
+        return self.parentItem
+
+    def row(self):
+        if self.parentItem:
+            return self.parentItem.childItems.index(self)
+        return 0
+
+    def __getitem__(self, idx):
+        return self.childItems[idx]
+
+    def __len__(self):
+        return len(self.childItems)
+
+    def __iter__(self):
+        for ch in self.childItems:
+            yield ch
 
 class ManifestModel(QtCore.QAbstractItemModel):
     """
@@ -100,7 +138,7 @@ class ManifestModel(QtCore.QAbstractItemModel):
     def setupModelData(self):
         rootData = ["rev %s:%s" % (self.changectx.rev(),
                                    short_hex(self.changectx.node()))]
-        self.rootItem = TreeItem(rootData)
+        self.rootItem = _TreeItem(rootData)
 
         for path in sorted(self.changectx.manifest()):
             path = path.split(osp.sep)
@@ -112,7 +150,7 @@ class ManifestModel(QtCore.QAbstractItemModel):
                         node = ch
                         break
                 else:
-                    node = node.addChild(TreeItem([p], node))
+                    node = node.addChild(_TreeItem([p], node))
 
     def pathFromIndex(self, index):
         idxs = []
