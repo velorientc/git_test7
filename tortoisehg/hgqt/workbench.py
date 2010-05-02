@@ -20,7 +20,7 @@ from mercurial import util
 from tortoisehg.util.util import tounicode, has_closed_branch_support
 from tortoisehg.util.util import rootpath, find_repository
 
-from tortoisehg.hgqt.hggraph import diff as revdiff
+from tortoisehg.hgqt.graph import diff as revdiff
 from tortoisehg.hgqt.decorators import timeit
 
 from tortoisehg.hgqt import icon as geticon

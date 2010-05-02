@@ -28,8 +28,8 @@ from mercurial import util, error
 
 from tortoisehg.util.util import tounicode, isbfile, Curry
 
-from tortoisehg.hgqt.hggraph import Graph, ismerge, diff as revdiff
-from tortoisehg.hgqt.hggraph import revision_grapher, filelog_grapher
+from tortoisehg.hgqt.graph import Graph, ismerge, diff as revdiff
+from tortoisehg.hgqt.graph import revision_grapher, filelog_grapher
 from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.decorators import timeit
