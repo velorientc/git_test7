@@ -50,26 +50,34 @@ DRED = '#900000'
 DGREEN = '#006400'
 DBLUE = '#000090'
 DYELLOW = '#6A6A00'
+DLIME = '#4a9500'
 DORANGE = '#AA5000'
-# DORANGE = '#FF8000'
+DPINK = '#A83838'
+DTURQUOISE = '#007070'
+DBROWN = '#55200B'
+
 DGRAY = '#404040'
 
 PRED = '#ffcccc'
 PGREEN = '#aaffaa'
 PBLUE = '#aaddff'
 PYELLOW = '#ffffaa'
+PLIME = '#80FF00'
 PORANGE = '#ffddaa'
+PPINK = '#ff5555'
+PTURQUOISE = '#00ffee'
+PBROWN = '#CA4C1A'
 
 RED = 'red'
 GREEN = 'green'
 BLUE = 'blue'
 YELLOW = 'yellow'
-MAGENTA = 'magenta'
-OLIVE = 'olive'
 ORANGE = 'orange'
 BROWN = 'brown'
 PINK = 'pink'
 VIOLET = 'violet'
+MAGENTA = 'magenta'
+INDIGO = 'indigo'
 BLACK = 'black'
 WHITE = 'white'
 GREY = 'grey'
@@ -219,10 +227,14 @@ def _init_colors():
         
         # adjust colors for a dark color scheme:
         if hasattr(normal, 'value') and normal.value > 0.5 or max(MAINLINE_COLOR) > 0.5:
+
             global RED, GREEN, BLUE, BLACK, WHITE, \
-                DRED, DGREEN, DBLUE, DYELLOW, DORANGE, \
-                PRED, PGREEN, PBLUE, PYELLOW, PORANGE, \
-                NEW_REV_COLOR, LINE_COLORS, CHANGE_HEADER
+                   DRED, DGREEN, DBLUE, DYELLOW, DORANGE, DPINK, \
+                   DTURQUOISE, DLIME, DBROWN, \
+                   PRED, PGREEN, PBLUE, PYELLOW, PORANGE, PPINK, \
+                   PTURQUOISE, PLIME, PBROWN, \
+                   NEW_REV_COLOR, LINE_COLORS, \
+                   CHANGE_HEADER
             
             RED = PRED
             GREEN = NEW_REV_COLOR = PGREEN
@@ -234,6 +246,10 @@ def _init_colors():
             DBLUE, PBLUE = PBLUE, DBLUE
             DYELLOW, PYELLOW = PYELLOW, DYELLOW
             DORANGE, PORANGE = PORANGE, DORANGE
+            DPINK, PPINK = PPINK, DPINK
+            DTURQUOISE, PTURQUOISE = PTURQUOISE, DTURQUOISE
+            DLIME, PLIME = PLIME, DLIME
+            DBROWN, PBROWN = PBROWN, DBROWN
             BLACK, WHITE = WHITE, BLACK
 
             CHANGE_HEADER = '#404040'
