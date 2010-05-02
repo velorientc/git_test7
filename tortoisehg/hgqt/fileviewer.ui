@@ -99,7 +99,7 @@
   <customwidget>
    <class>HgFileView</class>
    <extends>QWidget</extends>
-   <header>hgfileview.h</header>
+   <header>fileview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

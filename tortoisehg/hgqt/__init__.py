@@ -73,9 +73,9 @@ def icon(name):
 
 
 # dirty hack to please PyQt4 uic
-import repoview, hgfileview
+import repoview, fileview
 sys.modules['repoview'] = repoview
-sys.modules['hgfileview'] = hgfileview
+sys.modules['fileview'] = fileview
 sys.modules['hgqv_rc'] = hgqv_rc
 
 def setup_font_substitutions():

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\hgqv.ui'
 #
-# Created: Sun May 02 11:28:46 2010
+# Created: Sun May 02 11:37:41 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -141,6 +141,6 @@ class Ui_MainWindow(object):
         self.actionDisplayAllBranches.setText(QtGui.QApplication.translate("MainWindow", "displayAllBranches", None, QtGui.QApplication.UnicodeUTF8))
         self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
 
-from hgfileview import HgFileView, HgFileListView
+from fileview import HgFileView, HgFileListView
 from repoview import HgRepoView, RevDisplay
 import hgqv_rc

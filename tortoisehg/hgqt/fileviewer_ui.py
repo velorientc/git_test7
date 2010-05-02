@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\fileviewer.ui'
 #
-# Created: Sun May 02 11:32:38 2010
+# Created: Sun May 02 11:37:46 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -55,5 +55,5 @@ class Ui_MainWindow(object):
         self.actionReload.setText(QtGui.QApplication.translate("MainWindow", "Reload", None, QtGui.QApplication.UnicodeUTF8))
         self.actionReload.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+R", None, QtGui.QApplication.UnicodeUTF8))
 
-from hgfileview import HgFileView
+from fileview import HgFileView
 from repoview import HgRepoView
