@@ -88,25 +88,30 @@ class HTMLDelegate(QStyledItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def paint(self, painter, option, index):
-        options = QStyleOptionViewItemV4(option)
+        text = index.model().data(index, Qt.DisplayRole).toString()
+        palette = QApplication.palette()
         doc = QTextDocument()
-        doc.setHtml(index.data().toString())
-
+        doc.setDefaultFont(option.font)
         painter.save()
-        if options.widget:
-            options.widget.style().drawControl(QStyle.CE_ItemViewItem,
-                                               options, painter)
-        painter.translate(options.rect.left(), options.rect.top())
-        clip = QRectF(0, 0, options.rect.width(), options.rect.height())
-        doc.drawContents(painter, clip)
+        if option.state & QStyle.State_Selected:
+            doc.setHtml('<font color=%s>%s</font>' % (
+                palette.highlightedText().color().name(), text))
+            bgcolor = palette.highlight().color()
+            painter.fillRect(option.rect, bgcolor)
+        else:
+            doc.setHtml(text)
+        painter.translate(option.rect.left(), option.rect.top())
+        doc.drawContents(painter)
         painter.restore()
 
     def sizeHint(self, option, index):
-        options = QStyleOptionViewItemV4(option)
+        fm = option.fontMetrics
+        text = index.model().data(index, Qt.DisplayRole).toString()
         doc = QTextDocument()
-        doc.setHtml(index.data().toString())
-        doc.setTextWidth(options.rect.width())
-        return QSize(doc.idealWidth(), doc.size().height())
+        doc.setDefaultFont(option.font)
+        doc.setHtml(text)
+        doc.setTextWidth(option.rect.width())
+        return QSize(doc.idealWidth() + 5, doc.size().height())
 
 
 if __name__ == "__main__":
