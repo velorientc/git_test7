@@ -32,7 +32,7 @@ from tortoisehg.util.util import tounicode, rootpath
 
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgrepomodel import FileRevModel
+from tortoisehg.hgqt.repomodel import FileRevModel
 from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar

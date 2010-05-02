@@ -31,7 +31,7 @@ from tortoisehg.util.util import tounicode
 
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
-from tortoisehg.hgqt.hgrepomodel import ManifestModel
+from tortoisehg.hgqt.repomodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
 
 connect = QtCore.QObject.connect

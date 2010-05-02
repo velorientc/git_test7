@@ -467,7 +467,7 @@ class RevDisplay(QtGui.QTextBrowser):
 if __name__ == "__main__":
     from mercurial import ui, hg
     from optparse import OptionParser
-    from hgrepomodel import FileRevModel, HgRepoListModel
+    from repomodel import FileRevModel, HgRepoListModel
     p = OptionParser()
     p.add_option('-R', '--root', default='.',
                  dest='root',
