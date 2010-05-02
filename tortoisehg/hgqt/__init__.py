@@ -17,7 +17,7 @@
 
 #
 # make sure the Qt rc files are converted into python modules, then load them
-# this must be done BEFORE other hgqv qt4 modules are loaded.
+# this must be done BEFORE other tortoisehg modules are loaded.
 import os
 import os.path as osp
 import sys

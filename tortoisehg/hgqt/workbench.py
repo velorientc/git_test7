@@ -46,7 +46,7 @@ SIGNAL = QtCore.SIGNAL
 
 class Workbench(QtGui.QMainWindow, HgDialogMixin):
     """hg repository viewer/browser application"""
-    _uifile = 'hgqv.ui'
+    _uifile = 'workbench.ui'
     def __init__(self, repo, fromhead=None):
         self.repo = repo
         self._closed_branch_supp = has_closed_branch_support(self.repo)
