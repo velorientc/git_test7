@@ -211,22 +211,14 @@ def get_gtk_colors():
 
 def is_dark_theme():
     global NORMAL, MAINLINE_COLOR
-
     gtk_colors = get_gtk_colors()
-
-    try:
-        normal = gtk_colors['fg_color']
-    except KeyError:
-        # TODO: find out how to log such errors
-        pass
-    else:
-        NORMAL = str(normal)
-        MAINLINE_COLOR = (
-                normal.red / 65535.0,
-                normal.green / 65535.0,
-                normal.blue / 65535.0
-            )
-        
+    normal = gtk_colors.get('fg_color', gtk.gdk.color_parse('black'))
+    NORMAL = str(normal)
+    MAINLINE_COLOR = (
+            normal.red / 65535.0,
+            normal.green / 65535.0,
+            normal.blue / 65535.0
+        )
     return hasattr(normal, 'value') \
                and normal.value > 0.5 or max(MAINLINE_COLOR) > 0.5
 
