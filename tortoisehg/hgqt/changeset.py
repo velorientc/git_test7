@@ -26,14 +26,22 @@ from tortoisehg.util.util import format_desc, xml_escape
 from tortoisehg.hgqt.config import HgConfig
 
 
-class RevDisplay(QtGui.QTextBrowser):
+class RevDisplay(QtGui.QWidget):
     """
     Display metadata for one revision (rev, author, description, etc.)
     """
     def __init__(self, parent=None):
-        QtGui.QTextBrowser.__init__(self, parent)
+        QtGui.QWidget.__init__(self, parent)
+
+        self._details = QtGui.QTextBrowser()
+        vb = QtGui.QVBoxLayout()
+        vb.setMargin(0)
+        vb.addWidget(self._details)
+        self.setLayout(vb)
+
         self.descwidth = 60 # number of chars displayed for parent/child descriptions
-        connect(self,
+
+        connect(self._details,
                 SIGNAL('anchorClicked(const QUrl &)'),
                 self.anchorClicked)
 
@@ -177,4 +185,4 @@ class RevDisplay(QtGui.QTextBrowser):
         desc = xml_escape(unicode(ctx.description(), 'utf-8', 'replace'))
         desc = desc.replace('\n', '<br/>\n')
         buf += '<div class="diff_desc"><p>%s</p></div>\n' % desc
-        self.setHtml(buf)
+        self._details.setHtml(buf)
