@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-04-01 05:09+0000\n"
-"PO-Revision-Date: 2010-04-05 17:41+0000\n"
-"Last-Translator: William Glover <Unknown>\n"
+"PO-Revision-Date: 2010-04-09 11:56+0000\n"
+"Last-Translator: Diemo Gebhardt <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-04-06 04:05+0000\n"
+"X-Launchpad-Export-Date: 2010-04-10 03:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: TortoiseHgOverlayServer.py:36
@@ -226,7 +226,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\bookmark.py:37
 msgid "Bookmark - %s"
-msgstr ""
+msgstr "Lesezeichen hinzufügen - %s"
 
 #: tortoisehg\hgtk\bookmark.py:48 tortoisehg\hgtk\hgignore.py:50
 #: tortoisehg\hgtk\hgignore.py:58 tortoisehg\hgtk\quickop.py:19
@@ -246,7 +246,7 @@ msgstr "Entfernen"
 
 #: tortoisehg\hgtk\bookmark.py:52
 msgid "Rename"
-msgstr ""
+msgstr "Umbenennen"
 
 #: tortoisehg\hgtk\bookmark.py:54
 msgid "Set Current"
@@ -255,15 +255,15 @@ msgstr ""
 #: tortoisehg\hgtk\bookmark.py:56 tortoisehg\hgtk\bookmark.py:182
 #: tortoisehg\hgtk\merge.py:178
 msgid "unexpected type: %s"
-msgstr ""
+msgstr "unerwarteter Typ: %s"
 
 #: tortoisehg\hgtk\bookmark.py:69
 msgid "Old name:"
-msgstr ""
+msgstr "Alter Name:"
 
 #: tortoisehg\hgtk\bookmark.py:71
 msgid "Bookmark:"
-msgstr ""
+msgstr "Lesezeichen:"
 
 #: tortoisehg\hgtk\bookmark.py:83 tortoisehg\hgtk\csinfo.py:198
 #: tortoisehg\hgtk\csinfo.py:199 tortoisehg\hgtk\cslist.py:142
@@ -273,7 +273,7 @@ msgstr "Revision:"
 
 #: tortoisehg\hgtk\bookmark.py:86
 msgid "New Name:"
-msgstr ""
+msgstr "Neuer Name:"
 
 #: tortoisehg\hgtk\bookmark.py:92
 msgid "Make new/moved bookmark current"
@@ -292,17 +292,17 @@ msgstr ""
 #: tortoisehg\hgtk\bookmark.py:209 tortoisehg\hgtk\bookmark.py:239
 #: tortoisehg\hgtk\bookmark.py:293 tortoisehg\hgtk\bookmark.py:325
 msgid "Please enter bookmark name"
-msgstr ""
+msgstr "Bitte geben Sie den Namen des Lesezeichens ein"
 
 #: tortoisehg\hgtk\bookmark.py:216 tortoisehg\hgtk\bookmark.py:246
 #: tortoisehg\hgtk\bookmark.py:274 tortoisehg\hgtk\bookmark.py:306
 #: tortoisehg\hgtk\bookmark.py:332
 msgid "Bookmarking completed"
-msgstr ""
+msgstr "Lesezeichen hinzugefügt"
 
 #: tortoisehg\hgtk\bookmark.py:217
 msgid "Bookmark \"%s\" has been added"
-msgstr ""
+msgstr "Das Lesezeichen \"%s\" wurde hinzugefügt"
 
 #: tortoisehg\hgtk\bookmark.py:224 tortoisehg\hgtk\bookmark.py:227
 #: tortoisehg\hgtk\bookmark.py:254 tortoisehg\hgtk\bookmark.py:257
@@ -314,11 +314,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\bookmark.py:247
 msgid "Bookmark \"%s\" has been moved"
-msgstr ""
+msgstr "Das Lesezeichen \"%s\" wurde verschoben"
 
 #: tortoisehg\hgtk\bookmark.py:267
 msgid "Bookmark name is empty"
-msgstr ""
+msgstr "Der Name des Lesezeichens ist leer"
 
 #: tortoisehg\hgtk\bookmark.py:268
 msgid "Please select bookmark name to remove"
@@ -326,7 +326,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\bookmark.py:275
 msgid "Bookmark \"%s\" has been removed"
-msgstr ""
+msgstr "Das Lesezeichen \"%s\" wurde entfernt"
 
 #: tortoisehg\hgtk\bookmark.py:298
 msgid "Bookmark new name input is empty"
@@ -334,11 +334,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\bookmark.py:299
 msgid "Please enter new bookmark name"
-msgstr ""
+msgstr "Bitte geben Sie den Namen des Lesezeichens ein"
 
 #: tortoisehg\hgtk\bookmark.py:307
 msgid "Bookmark \"%s\" has been renamed to \"%s\""
-msgstr ""
+msgstr "Das Lesezeichen \"%s\" wurde in \"%s\" umbenannt"
 
 #: tortoisehg\hgtk\bookmark.py:333
 msgid "Bookmark \"%s\" has been made current"
@@ -346,15 +346,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\bookmark.py:346 tortoisehg\hgtk\bookmark.py:373
 msgid "a bookmark named \"%s\" already exists"
-msgstr ""
+msgstr "ein Lesezeichen mit dem Namen \"%s\" existiert bereits"
 
 #: tortoisehg\hgtk\bookmark.py:355 tortoisehg\hgtk\bookmark.py:382
 msgid "No bookmark named \"%s\" exists"
-msgstr ""
+msgstr "Es existiert kein Lesezeichen mit dem Namen \"%s\""
 
 #: tortoisehg\hgtk\bookmark.py:364
 msgid "Bookmark '%s' does not exist"
-msgstr ""
+msgstr "Das Lesezeichen '%s' existiert nicht"
 
 #: tortoisehg\hgtk\browse.py:112 tortoisehg\hgtk\quickop.py:100
 #: tortoisehg\hgtk\status.py:130
@@ -363,7 +363,7 @@ msgstr "Status"
 
 #: tortoisehg\hgtk\browse.py:136
 msgid "type"
-msgstr ""
+msgstr "Typ"
 
 #: tortoisehg\hgtk\browse.py:142 tortoisehg\hgtk\quickop.py:103
 #: tortoisehg\hgtk\status.py:318
@@ -372,7 +372,7 @@ msgstr "Pfad"
 
 #: tortoisehg\hgtk\browse.py:344 tortoisehg\hgtk\browse.py:346
 msgid "browser"
-msgstr ""
+msgstr "Browser"
 
 #: tortoisehg\hgtk\bugreport.py:25
 msgid "TortoiseHg Bug Report"
@@ -380,7 +380,7 @@ msgstr "TortoiseHg Fehlerbericht"
 
 #: tortoisehg\hgtk\bugreport.py:45
 msgid "Save as.."
-msgstr ""
+msgstr "Speichern unter..."
 
 #: tortoisehg\hgtk\bugreport.py:48 tortoisehg\hgtk\hgcmd.py:48
 msgid "Close"
@@ -391,6 +391,9 @@ msgid ""
 "** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues "
 "or tortoisehg-discuss@lists.sourceforge.net\n"
 msgstr ""
+"** Bitte melden Sie diesen Fehlerbericht an "
+"http://bitbucket.org/tortoisehg/stable/issues oder tortoisehg-"
+"discuss@lists.sourceforge.net\n"
 
 #: tortoisehg\hgtk\bugreport.py:87
 msgid "Save error report to"
@@ -398,7 +401,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\changeset.py:43
 msgid "%s changeset "
-msgstr ""
+msgstr "%s Änderungssatz "
 
 #: tortoisehg\hgtk\changeset.py:168 tortoisehg\hgtk\changeset.py:198
 msgid "[All Files]"
@@ -451,19 +454,19 @@ msgstr ""
 
 #: tortoisehg\hgtk\changeset.py:544
 msgid "Changeset:"
-msgstr ""
+msgstr "Änderungssatz:"
 
 #: tortoisehg\hgtk\changeset.py:546 tortoisehg\hgtk\update.py:90
 msgid "Parent:"
-msgstr ""
+msgstr "Übergeordnetes Element:"
 
 #: tortoisehg\hgtk\changeset.py:548
 msgid "Child:"
-msgstr ""
+msgstr "Untergeordnetes Element:"
 
 #: tortoisehg\hgtk\changeset.py:550 tortoisehg\hgtk\cslist.py:143
 msgid "Patch:"
-msgstr ""
+msgstr "Korrektur:"
 
 #: tortoisehg\hgtk\changeset.py:747
 msgid "Diff to second Parent"
@@ -475,7 +478,7 @@ msgstr "Datein speichern unter"
 
 #: tortoisehg\hgtk\changeset.py:933
 msgid "Unable to save file"
-msgstr ""
+msgstr "Datei konnte nicht gespeichert werden"
 
 #: tortoisehg\hgtk\changeset.py:1005
 msgid "Confirm revert file to old revision"
@@ -503,7 +506,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\clone.py:90
 msgid "Source path:"
-msgstr ""
+msgstr "Quellpfad:"
 
 #: tortoisehg\hgtk\clone.py:91
 msgid "Select Source Folder"
@@ -511,7 +514,7 @@ msgstr "Quellordner auswählen"
 
 #: tortoisehg\hgtk\clone.py:117 tortoisehg\hgtk\tagadd.py:69
 msgid "Advanced options"
-msgstr ""
+msgstr "Erweiterte Einstellungen"
 
 #: tortoisehg\hgtk\clone.py:127
 msgid "Clone to revision:"
@@ -523,7 +526,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\clone.py:141
 msgid "Do not update the new working directory"
-msgstr ""
+msgstr "Das neue Arbeitsverzeichnis nicht aktualisieren"
 
 #: tortoisehg\hgtk\clone.py:142
 msgid "Use pull protocol to copy metadata"
@@ -531,12 +534,12 @@ msgstr ""
 
 #: tortoisehg\hgtk\clone.py:143
 msgid "Use uncompressed transfer"
-msgstr ""
+msgstr "Unkomprimierten Transfer verwenden"
 
 #: tortoisehg\hgtk\clone.py:149 tortoisehg\hgtk\history.py:440
 #: tortoisehg\hgtk\synch.py:183
 msgid "Use proxy server"
-msgstr ""
+msgstr "Proxy-Server verwenden"
 
 #: tortoisehg\hgtk\clone.py:159 tortoisehg\hgtk\synch.py:204
 msgid "Remote command:"
@@ -548,11 +551,11 @@ msgstr "Klonen"
 
 #: tortoisehg\hgtk\clone.py:191
 msgid "Cloned successfully"
-msgstr ""
+msgstr "Klonen erfolgreich"
 
 #: tortoisehg\hgtk\clone.py:193 tortoisehg\hgtk\update.py:154
 msgid "Canceled updating"
-msgstr ""
+msgstr "Aktualisierung abgebrochen"
 
 #: tortoisehg\hgtk\clone.py:195
 msgid "Failed to clone"
@@ -572,11 +575,11 @@ msgstr "Bitte einen gültigen Quellpfad angeben"
 
 #: tortoisehg\hgtk\clone.py:292
 msgid "Source and destination are the same"
-msgstr ""
+msgstr "Quelle und Ziel sind identisch"
 
 #: tortoisehg\hgtk\clone.py:293
 msgid "Please specify different paths"
-msgstr ""
+msgstr "Bitte geben Sie unterschiedliche Pfade an"
 
 #: tortoisehg\hgtk\commit.py:33
 msgid "Branch Operations"
@@ -630,16 +633,16 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:223 tortoisehg\hgtk\history.py:370
 msgid "Toolbar"
-msgstr ""
+msgstr "Werkzeugleiste"
 
 #: tortoisehg\hgtk\commit.py:225
 msgid "Advanced"
-msgstr ""
+msgstr "Erweitert"
 
 #: tortoisehg\hgtk\commit.py:227 tortoisehg\hgtk\history.py:65
 #: tortoisehg\hgtk\history.py:452 tortoisehg\hgtk\history.py:1136
 msgid "Parents"
-msgstr ""
+msgstr "Übergeordnete Elemente"
 
 #: tortoisehg\hgtk\commit.py:231 tortoisehg\hgtk\hgignore.py:142
 #: tortoisehg\hgtk\history.py:377
@@ -652,7 +655,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:235 tortoisehg\hgtk\history.py:393
 msgid "Always Show Output"
-msgstr ""
+msgstr "Ausgabe immer anzeigen"
 
 #: tortoisehg\hgtk\commit.py:238
 msgid "_Operations"
@@ -718,22 +721,22 @@ msgstr "Versionsmeldung beim Verlassen speichern?"
 #: tortoisehg\hgtk\thgconfig.py:717 tortoisehg\hgtk\thgconfig.py:825
 #: tortoisehg\hgtk\thgmq.py:345 tortoisehg\hgtk\update.py:239
 msgid "&Cancel"
-msgstr ""
+msgstr "&Abbrechen"
 
 #: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
 #: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\status.py:1719
 #: tortoisehg\hgtk\thgconfig.py:824 tortoisehg\hgtk\thgmq.py:345
 msgid "&Yes"
-msgstr ""
+msgstr "&Ja"
 
 #: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
 #: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\thgstrip.py:217
 msgid "&No"
-msgstr ""
+msgstr "&Nein"
 
 #: tortoisehg\hgtk\commit.py:361
 msgid "Committer:"
-msgstr ""
+msgstr "Beitragender:"
 
 #: tortoisehg\hgtk\commit.py:375
 msgid "Auto-includes:"
@@ -749,7 +752,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:486
 msgid "Parent: %(rev)s"
-msgstr ""
+msgstr "Übergeordnet: %(rev)s"
 
 #: tortoisehg\hgtk\commit.py:494
 msgid "Not at head"
@@ -757,11 +760,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:519 tortoisehg\hgtk\status.py:530
 msgid "Patch Preview"
-msgstr ""
+msgstr "Vorschau aktualisieren"
 
 #: tortoisehg\hgtk\commit.py:521 tortoisehg\hgtk\status.py:534
 msgid "Commit Preview"
-msgstr ""
+msgstr "Vorschau übernehmen"
 
 #: tortoisehg\hgtk\commit.py:565
 msgid "Discard current commit message?"
@@ -824,7 +827,7 @@ msgstr "Zweig: "
 
 #: tortoisehg\hgtk\commit.py:786
 msgid "Merge "
-msgstr ""
+msgstr "Zusammenführen "
 
 #: tortoisehg\hgtk\commit.py:822
 msgid "Patch Contents"
@@ -1014,7 +1017,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:1260
 msgid "Info Required"
-msgstr ""
+msgstr "Informationen Erforderlich"
 
 #: tortoisehg\hgtk\commit.py:1261
 msgid "Message format needs to be configured"
@@ -1046,7 +1049,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\csinfo.py:200
 msgid "Age:"
-msgstr ""
+msgstr "Alter:"
 
 #: tortoisehg\hgtk\csinfo.py:200 tortoisehg\hgtk\csinfo.py:201
 msgid "Date:"
@@ -1054,15 +1057,15 @@ msgstr "Datum:"
 
 #: tortoisehg\hgtk\csinfo.py:200 tortoisehg\hgtk\csinfo.py:205
 msgid "User:"
-msgstr ""
+msgstr "Benutzer:"
 
 #: tortoisehg\hgtk\csinfo.py:201 tortoisehg\hgtk\csinfo.py:202
 msgid "Branch:"
-msgstr ""
+msgstr "Zweig:"
 
 #: tortoisehg\hgtk\csinfo.py:202 tortoisehg\hgtk\csinfo.py:203
 msgid "Tags:"
-msgstr ""
+msgstr "Schlagwörter:"
 
 #: tortoisehg\hgtk\csinfo.py:203
 msgid "Transplant:"
@@ -1078,11 +1081,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\cslist.py:88
 msgid "Show all"
-msgstr ""
+msgstr "Zeige alle"
 
 #: tortoisehg\hgtk\cslist.py:91
 msgid "Use compact view"
-msgstr ""
+msgstr "Kompakte Ansicht verwenden"
 
 #: tortoisehg\hgtk\cslist.py:384
 msgid "No items to display"
@@ -1090,7 +1093,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\cslist.py:397
 msgid "Updating..."
-msgstr ""
+msgstr "Aktualisiere..."
 
 #: tortoisehg\hgtk\cslist.py:400
 msgid "Selecting %(sel)d of %(total)d, displaying all items"
@@ -1169,7 +1172,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:186
 msgid "No parent file"
-msgstr ""
+msgstr "Keine übergeordnete Datei"
 
 #: tortoisehg\hgtk\datamine.py:187
 msgid "Unable to annotate"
@@ -1290,7 +1293,7 @@ msgstr "Quelle"
 
 #: tortoisehg\hgtk\datamine.py:713
 msgid "Loading history..."
-msgstr ""
+msgstr "Lade Verlauf..."
 
 #: tortoisehg\hgtk\dialog.py:34
 msgid "TortoiseHg Prompt"
@@ -1311,7 +1314,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\gdialog.py:489 tortoisehg\hgtk\history.py:266
 msgid "Recovery"
-msgstr ""
+msgstr "Wiederherstellung"
 
 #: tortoisehg\hgtk\gdialog.py:491 tortoisehg\hgtk\history.py:269
 msgid "Serve"
@@ -1331,7 +1334,7 @@ msgstr "Synchronisieren"
 
 #: tortoisehg\hgtk\gdialog.py:497
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: tortoisehg\hgtk\gdialog.py:500
 msgid "_Help"
@@ -1339,7 +1342,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\gdialog.py:501
 msgid "Contents"
-msgstr ""
+msgstr "Inhalt"
 
 #: tortoisehg\hgtk\gdialog.py:503 tortoisehg\hgtk\thgmq.py:835
 msgid "Index"
@@ -1516,7 +1519,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgcmd.py:324
 msgid "Stop transaction"
-msgstr ""
+msgstr "Transaktion beenden"
 
 #: tortoisehg\hgtk\hgcmd.py:326
 msgid "Close this"
@@ -1536,15 +1539,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgemail.py:38
 msgid "Send emails"
-msgstr ""
+msgstr "Emails senden"
 
 #: tortoisehg\hgtk\hgemail.py:39
 msgid "Test"
-msgstr ""
+msgstr "Testen"
 
 #: tortoisehg\hgtk\hgemail.py:41
 msgid "Show emails which would be sent"
-msgstr ""
+msgstr "Zeige welche Emails gesendet werden würden"
 
 #: tortoisehg\hgtk\hgemail.py:43 tortoisehg\hgtk\serve.py:73
 #: tortoisehg\hgtk\synch.py:96
@@ -1686,7 +1689,7 @@ msgstr "Betreff:"
 
 #: tortoisehg\hgtk\hgemail.py:166
 msgid "Flags:"
-msgstr ""
+msgstr "Markierungen:"
 
 #: tortoisehg\hgtk\hgemail.py:180
 msgid "Patch Series (Bundle) Description"
@@ -1732,7 +1735,7 @@ msgstr "Datei bearbeiten"
 
 #: tortoisehg\hgtk\hgignore.py:79
 msgid "Apply to:"
-msgstr ""
+msgstr "Anwenden auf:"
 
 #: tortoisehg\hgtk\hgignore.py:88
 msgid "Filters"
@@ -5896,7 +5899,7 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:61
 msgid "Update..."
-msgstr ""
+msgstr "Aktualisieren..."
 
 #: tortoisehg\util\menuthg.py:62
 msgid "Update working directory"
