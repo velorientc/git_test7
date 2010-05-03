@@ -38,6 +38,24 @@ def tounicode(s):
             pass
     return s.decode(_fallbackencoding, 'replace')
 
+def fromunicode(s, errors='strict'):
+    """
+    Convert the encoding of string from Unicode to MBCS.
+
+    Return 'str' type string.
+
+    If you don't want an exception for conversion failure,
+    specify errors='replace'.
+    """
+    s = unicode(s)  # s can be QtCore.QString
+    for enc in (_encoding, _fallbackencoding):
+        try:
+            return s.encode(enc)
+        except UnicodeEncodeError:
+            pass
+
+    return s.encode(_encoding, errors)  # last ditch
+
 def toutf(s):
     """
     Convert the encoding of string from MBCS to UTF-8.
