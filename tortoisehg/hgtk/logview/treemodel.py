@@ -295,14 +295,30 @@ class TreeModel(gtk.GenericTreeModel):
                 self.color_func = self.text_color_author
 
     def text_color_default(self, rev, author):
-        return int(rev) >= self.origtip and gtklib.NEW_REV_COLOR or gtklib.NORMAL
-
-    colors = [gtklib.NORMAL, gtklib.DRED, gtklib.DGREEN, gtklib.DBLUE,
-              gtklib.DYELLOW, gtklib.MAGENTA, gtklib.DTURQUOISE,
-              gtklib.DORANGE, gtklib.DLIME,
-              gtklib.DPINK, gtklib.DBROWN, gtklib.VIOLET]
-    
+        return int(rev) >= self.origtip and gtklib.NEW_REV_COLOR or gtklib.NORMAL  
     color_cache = {}
+
+    def hash_author(self, author):
+        h = hash(author) % 0x1000000; #hash, not HSV hue
+
+        r = h % 0x100
+        h /= 0x100
+
+        g = h % 0x100
+        h /= 0x100
+
+        b = h % 0x100
+
+        c= [r,g,b]
+
+        #For a dark theme, use upper two thirds of the RGB scale.
+        if gtklib.is_dark_theme():
+            c = [2*x/3 + 85 for x in c]
+        #Else, use bottom two thirds. 
+        else:
+            c = [2*x/3 for x in c]
+
+        return "#%02x%02x%02x" % (c[0],c[1],c[2])
 
     def text_color_author(self, rev, author):
         if int(rev) >= self.origtip:
@@ -311,7 +327,7 @@ class TreeModel(gtk.GenericTreeModel):
             if (re.search(author)):
                 return v
         if author not in self.color_cache:
-            color = self.colors[len(self.color_cache.keys()) % len(self.colors)]
+            color = self.hash_author(author)
             self.color_cache[author] = color
         return self.color_cache[author]
 
