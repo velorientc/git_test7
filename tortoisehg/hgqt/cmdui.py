@@ -43,6 +43,7 @@ class Dialog(QDialog):
         # command output area
         self.log_text = QTextEdit()
         self.log_text.setReadOnly(True)
+        self.log_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         grid.addWidget(self.log_text, 2, 0, 5, 0)
         grid.setRowStretch(2, 1)
 
@@ -113,20 +114,21 @@ class Dialog(QDialog):
         self.close_btn.setFocus()
 
     def append_output(self, msg, style=''):
-        msg = hglib.tounicode(msg)
         msg = msg.replace('\n', '<br />')
-        self.log_text.insertHtml('<pre style="%s">%s</pre>' % (style, msg))
+        self.log_text.insertHtml('<font style="%s">%s</pre>' % (style, msg))
 
     def output_received(self, wrapper):
         msg, label = wrapper.data
+        msg = hglib.tounicode(msg)
+        msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
-        style += ';font-size: 9pt'
         self.append_output(msg, style)
 
     def error_received(self, wrapper):
         msg, label = wrapper.data
+        msg = hglib.tounicode(msg)
+        msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
-        style += ';font-size: 9pt'
         self.append_output(msg, style)
 
     def clear_progress(self):
