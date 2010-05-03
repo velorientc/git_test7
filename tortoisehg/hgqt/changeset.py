@@ -33,23 +33,27 @@ class RevDisplay(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
-        self._details = QtGui.QTextBrowser()
         vb = QtGui.QVBoxLayout()
         vb.setMargin(0)
-        vb.addWidget(self._details)
+
+        self._header = w = QtGui.QLabel()
+        vb.addWidget(w)
+        self._message = w = QtGui.QTextBrowser()
+        vb.addWidget(w)
+
         self.setLayout(vb)
 
         self.descwidth = 60 # number of chars displayed for parent/child descriptions
 
-        connect(self._details,
-                SIGNAL('anchorClicked(const QUrl &)'),
+        connect(self._header,
+                SIGNAL('linkActivated(const QString&)'),
                 self.anchorClicked)
 
     def anchorClicked(self, qurl):
         """
         Callback called when a link is clicked in the text browser
         """
-        rev = str(qurl.toString())
+        rev = str(qurl)
         if rev.startswith('diff_'):
             self.diffrev = int(rev[5:])
             self.refreshDisplay()
@@ -182,7 +186,9 @@ class RevDisplay(QtGui.QWidget):
                        '\n' % (p.rev(), p.rev(), short, desc)
 
         buf += "</table>\n"
+        self._header.setText(buf)
+
         desc = xml_escape(unicode(ctx.description(), 'utf-8', 'replace'))
         desc = desc.replace('\n', '<br/>\n')
-        buf += '<div class="diff_desc"><p>%s</p></div>\n' % desc
-        self._details.setHtml(buf)
+        buf = '<div class="diff_desc"><p>%s</p></div>' % desc
+        self._message.setHtml(buf)
