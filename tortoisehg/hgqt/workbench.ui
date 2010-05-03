@@ -233,7 +233,7 @@
   </customwidget>
   <customwidget>
    <class>RevDisplay</class>
-   <extends>QTextBrowser</extends>
+   <extends>QWidget</extends>
    <header>changeset.h</header>
   </customwidget>
   <customwidget>
