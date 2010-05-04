@@ -124,31 +124,31 @@ class WctxModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self)
         data = []
         for m in wctx.modified():
-            data.append(('M', m))
+            rows.append(('M', m))
         for a in wctx.added():
-            data.append(('A', a))
+            rows.append(('A', a))
         for r in wctx.removed():
-            data.append(('R', r))
+            rows.append(('R', r))
         for d in wctx.deleted():
-            data.append(('!', d))
+            rows.append(('!', d))
         for u in wctx.unknown():
-            data.append(('?', u))
+            rows.append(('?', u))
         # TODO: wctx.ignored() does not exist
         #for i in wctx.ignored():
-        #    data.append(('I', i))
+        #    rows.append(('I', i))
         for c in wctx.clean():
-            data.append(('C', c))
+            rows.append(('C', c))
         try:
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
-                    data.append(('S', s))
+                    rows.append(('S', s))
         except (OSError, IOError, error.ConfigError), e:
             self.status_error = str(e)
-        self.data = data
+        self.rows = rows
         self.headers = (_('Stat'), _('Filename'))
 
     def rowCount(self, parent):
-        return len(self.data)
+        return len(self.rows)
 
     def columnCount(self, parent):
         return 2
@@ -156,9 +156,7 @@ class WctxModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid() or role != Qt.DisplayRole:
             return QVariant()
-        if index.row() < 0 or index.row() >= len(self.data):
-            return QVariant()
-        return QVariant(self.data[index.row()][index.column()])
+        return QVariant(self.rows[index.row()][index.column()])
 
     def headerData(self, col, orientation, role):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
