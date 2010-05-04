@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 04 14:34:06 2010
+# Created: Tue May 04 15:11:07 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -54,6 +54,11 @@ class Ui_MainWindow(object):
         self.tableView_filelist = HgFileListView(self.splitter_2)
         self.tableView_filelist.setObjectName("tableView_filelist")
         self.frame = QtGui.QFrame(self.splitter_2)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
         self.frame.setFrameShape(QtGui.QFrame.NoFrame)
         self.frame.setObjectName("frame")
         self.verticalLayout = QtGui.QVBoxLayout(self.frame)

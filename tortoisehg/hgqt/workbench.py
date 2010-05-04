@@ -62,9 +62,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.setWindowTitle('TortoiseHg Workbench: %s' % os.path.abspath(self.repo.root))
         self.menubar.hide()
 
-        self.splitter_2.setStretchFactor(0, 1)
-        self.splitter_2.setStretchFactor(1, 2)
-
         self.createActions()
         self.createToolbars()
 
