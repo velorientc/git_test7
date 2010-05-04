@@ -120,9 +120,9 @@ class StatusWidget(QWidget):
 
 
 class WctxModel(QAbstractTableModel):
-    def __init__(self, wctx):
-        QAbstractTableModel.__init__(self)
-        data = []
+    def __init__(self, wctx, parent=None):
+        QAbstractTableModel.__init__(self, parent)
+        rows = []
         for m in wctx.modified():
             rows.append(('M', m))
         for a in wctx.added():
@@ -160,8 +160,6 @@ class WctxModel(QAbstractTableModel):
 
     def headerData(self, col, orientation, role):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
-            return QVariant()
-        elif col >= len(self.headers):
             return QVariant()
         else:
             return QVariant(self.headers[col])
