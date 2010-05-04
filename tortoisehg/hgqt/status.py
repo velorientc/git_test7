@@ -20,37 +20,30 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
 
-# A QuickOp style dialog will need to create the workingctx instance by
-# hand, not using repo[None], in order to pass in the results from its
-# own call to localrepo.status(), else it will not be able to see clean
-# or ignored files.
-
 # Technical Debt
 #  filter using pats
-#  show example of wctx manual creation
-#  wctx.ignored() does not exist, need a back-door
 #  Handle large files, binary files, subrepos better
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
-#  Need a mechanism to clear pats
-#  Save splitter position, use parent's QSetting
+#  Need mechanisms to clear pats and toggle visibility options
+#  Save splitter position to parent's QSetting
 #  Show merge status column, when appropriate
 #  Context menu, toolbar
 #  Sorting, filtering of working files
 #  Chunk selection
 #  tri-state checkboxes for commit
-#  File type (unknown/deleted) toggles
 #  Investigate Qt.DecorationRole and possible use of overlay icons
 #  Investigate folding/nesting of files
 
 class StatusWidget(QWidget):
-    def __init__(self, pats, parent=None):
+    def __init__(self, pats, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         root = paths.find_root()
         assert(root)
         self.repo = hg.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
+        self.opts = opts
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -94,8 +87,9 @@ class StatusWidget(QWidget):
         hglib.invalidaterepo(self.repo)
         wctx = self.repo[None]
         try:
-            # Force wctx to load _status property
-            wctx.unknown()
+            wctx.status(unknown=self.opts.get('unknown', True),
+                        clean=self.opts.get('clean', False),
+                        ignored=self.opts.get('ignored', False))
         except (OSError, IOError, util.Abort), e:
             self.status_error = str(e)
         self.wctx = wctx
@@ -104,7 +98,7 @@ class StatusWidget(QWidget):
         return bool(self.wctx.p2())
 
     def updateModel(self):
-        tm = WctxModel(self.wctx)
+        tm = WctxModel(self.wctx, self.opts)
         self.tv.setModel(tm)
         self.tv.setItemsExpandable(False)
         self.tv.setRootIsDecorated(False)
@@ -195,7 +189,7 @@ color_labels = {
 colors = {}
 
 class WctxModel(QAbstractTableModel):
-    def __init__(self, wctx, parent=None):
+    def __init__(self, wctx, opts, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         for m in wctx.modified():
@@ -206,13 +200,15 @@ class WctxModel(QAbstractTableModel):
             rows.append([True, 'R', hglib.tounicode(r), r])
         for d in wctx.deleted():
             rows.append([False, '!', hglib.tounicode(d), d])
-        for u in wctx.unknown():
-            rows.append([False, '?', hglib.tounicode(u), u])
-        # TODO: wctx.ignored() does not exist
-        #for i in wctx.ignored():
-        #    rows.append([False, 'I', hglib.tounicode(i), i])
-        for c in wctx.clean():
-            rows.append([False, 'C', hglib.tounicode(c), c])
+        if opts.get('unknown', True):
+            for u in wctx.unknown():
+            	rows.append([False, '?', hglib.tounicode(u), u])
+        if opts.get('ignored', False):
+            for i in wctx.ignored():
+            	rows.append([False, 'I', hglib.tounicode(i), i])
+        if opts.get('clean', False):
+            for c in wctx.clean():
+            	rows.append([False, 'C', hglib.tounicode(c), c])
         try:
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
@@ -282,4 +278,4 @@ class WctxModel(QAbstractTableModel):
 
 
 def run(ui, *pats, **opts):
-    return StatusWidget(pats, None)
+    return StatusWidget(pats, None, **opts)
