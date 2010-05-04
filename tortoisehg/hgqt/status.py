@@ -22,7 +22,6 @@ from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTableView, QTextEdit, 
 # or ignored files.
 
 # Technical Debt
-#  use proper 'fromunicode'
 #  filter using pats
 #  show example of wctx manual creation
 #  wctx.ignored() does not exist, need a back-door
@@ -103,7 +102,7 @@ class StatusWidget(QWidget):
 
     def rowSelected(self, index):
         pfile = index.sibling(index.row(), 1).data().toString()
-        pfile = str(pfile) # TODO: use proper 'fromunicode'
+        pfile = hglib.fromunicode(pfile)
         wfile = util.pconvert(pfile)
         hu = htmlui.htmlui()
         try:
