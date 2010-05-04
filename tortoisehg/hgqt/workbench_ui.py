@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 04 20:18:35 2010
+# Created: Tue May 04 20:25:55 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,18 +43,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setMargin(0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.splitter_2 = QtGui.QSplitter(self.frame_maincontent)
+        self.filelist_splitter = QtGui.QSplitter(self.frame_maincontent)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.splitter_2.sizePolicy().hasHeightForWidth())
-        self.splitter_2.setSizePolicy(sizePolicy)
-        self.splitter_2.setOrientation(QtCore.Qt.Horizontal)
-        self.splitter_2.setChildrenCollapsible(False)
-        self.splitter_2.setObjectName("splitter_2")
-        self.tableView_filelist = HgFileListView(self.splitter_2)
+        sizePolicy.setHeightForWidth(self.filelist_splitter.sizePolicy().hasHeightForWidth())
+        self.filelist_splitter.setSizePolicy(sizePolicy)
+        self.filelist_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.filelist_splitter.setChildrenCollapsible(False)
+        self.filelist_splitter.setObjectName("filelist_splitter")
+        self.tableView_filelist = HgFileListView(self.filelist_splitter)
         self.tableView_filelist.setObjectName("tableView_filelist")
-        self.frame = QtGui.QFrame(self.splitter_2)
+        self.frame = QtGui.QFrame(self.filelist_splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
@@ -113,7 +113,7 @@ class Ui_MainWindow(object):
         self.textview_status.setMinimumSize(QtCore.QSize(0, 0))
         self.textview_status.setObjectName("textview_status")
         self.verticalLayout.addWidget(self.splitter)
-        self.verticalLayout_2.addWidget(self.splitter_2)
+        self.verticalLayout_2.addWidget(self.filelist_splitter)
         self.verticalLayout_3.addWidget(self.revisions_splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
