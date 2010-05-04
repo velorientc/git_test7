@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 04 20:25:55 2010
+# Created: Tue May 04 20:29:14 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -79,20 +79,20 @@ class Ui_MainWindow(object):
         self.textview_header.setFont(font)
         self.textview_header.setObjectName("textview_header")
         self.verticalLayout.addWidget(self.textview_header)
-        self.splitter = QtGui.QSplitter(self.frame)
+        self.message_splitter = QtGui.QSplitter(self.frame)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
-        self.splitter.setSizePolicy(sizePolicy)
-        self.splitter.setMinimumSize(QtCore.QSize(50, 50))
-        self.splitter.setFrameShape(QtGui.QFrame.NoFrame)
-        self.splitter.setLineWidth(0)
-        self.splitter.setMidLineWidth(0)
-        self.splitter.setOrientation(QtCore.Qt.Vertical)
-        self.splitter.setOpaqueResize(True)
-        self.splitter.setObjectName("splitter")
-        self.message = RevMessage(self.splitter)
+        sizePolicy.setHeightForWidth(self.message_splitter.sizePolicy().hasHeightForWidth())
+        self.message_splitter.setSizePolicy(sizePolicy)
+        self.message_splitter.setMinimumSize(QtCore.QSize(50, 50))
+        self.message_splitter.setFrameShape(QtGui.QFrame.NoFrame)
+        self.message_splitter.setLineWidth(0)
+        self.message_splitter.setMidLineWidth(0)
+        self.message_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.message_splitter.setOpaqueResize(True)
+        self.message_splitter.setObjectName("message_splitter")
+        self.message = RevMessage(self.message_splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -104,7 +104,7 @@ class Ui_MainWindow(object):
         font.setPointSize(9)
         self.message.setFont(font)
         self.message.setObjectName("message")
-        self.textview_status = HgFileView(self.splitter)
+        self.textview_status = HgFileView(self.message_splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(1)
@@ -112,7 +112,7 @@ class Ui_MainWindow(object):
         self.textview_status.setSizePolicy(sizePolicy)
         self.textview_status.setMinimumSize(QtCore.QSize(0, 0))
         self.textview_status.setObjectName("textview_status")
-        self.verticalLayout.addWidget(self.splitter)
+        self.verticalLayout.addWidget(self.message_splitter)
         self.verticalLayout_2.addWidget(self.filelist_splitter)
         self.verticalLayout_3.addWidget(self.revisions_splitter)
         MainWindow.setCentralWidget(self.centralwidget)

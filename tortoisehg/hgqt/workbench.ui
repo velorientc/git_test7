@@ -114,7 +114,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QSplitter" name="splitter">
+             <widget class="QSplitter" name="message_splitter">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                 <horstretch>0</horstretch>
