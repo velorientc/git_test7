@@ -32,13 +32,12 @@ class RevDisplay(QtGui.QWidget):
     """
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
+        self._message = None
 
         vb = QtGui.QVBoxLayout()
         vb.setMargin(0)
 
         self._header = w = QtGui.QLabel()
-        vb.addWidget(w)
-        self._message = w = QtGui.QTextBrowser()
         vb.addWidget(w)
 
         self.setLayout(vb)
@@ -48,6 +47,15 @@ class RevDisplay(QtGui.QWidget):
         connect(self._header,
                 SIGNAL('linkActivated(const QString&)'),
                 self.anchorClicked)
+
+    def sizeHint(self):
+        return self.minimumSizeHint()
+
+    def minimumSizeHint(self):
+        return self._header.minimumSizeHint()
+
+    def setMessageWidget(self, w):
+        self._message = w
 
     def anchorClicked(self, qurl):
         """
@@ -82,7 +90,7 @@ class RevDisplay(QtGui.QWidget):
             self.mqseries = []
             self.mqunapplied = []
             self.mqpatch = None
-            
+
         self.refreshDisplay()
 
     def selectNone(self):
@@ -188,7 +196,52 @@ class RevDisplay(QtGui.QWidget):
         buf += "</table>\n"
         self._header.setText(buf)
 
+        self._message.displayRevision(ctx)
+
+
+class RevMessage(QtGui.QWidget):
+
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+
+        vb = QtGui.QVBoxLayout()
+        vb.setMargin(0)
+
+        self._message = w = QtGui.QTextBrowser()
+        vb.addWidget(w)
+
+        self.setLayout(vb)
+
+    def displayRevision(self, ctx):
+        self.ctx = ctx
         desc = xml_escape(unicode(ctx.description(), 'utf-8', 'replace'))
         desc = desc.replace('\n', '<br/>\n')
         buf = '<div class="diff_desc"><p>%s</p></div>' % desc
         self._message.setHtml(buf)
+
+    def selectNone(self):
+        cursor = self.textCursor()
+        cursor.clearSelection()
+        cursor.setPosition(0)
+        self.setTextCursor(cursor)
+        self.setExtraSelections([])
+
+    def searchString(self, text):
+        self.selectNone()
+        if text in unicode(self.toPlainText()):
+            clist = []
+            while self.find(text):
+                eselect = self.ExtraSelection()
+                eselect.cursor = self.textCursor()
+                eselect.format.setBackground(QtGui.QColor('#ffffbb'))
+                clist.append(eselect)
+            self.selectNone()
+            self.setExtraSelections(clist)
+            def finditer(self, text):
+                if text:
+                    while True:
+                        if self.find(text):
+                            yield self.ctx.rev(), None                
+                        else:
+                            break
+            return finditer(self, text)

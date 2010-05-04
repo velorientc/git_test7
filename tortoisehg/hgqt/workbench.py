@@ -74,6 +74,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         connect(self.tableView_revisions, SIGNAL('showMessage'),
                 self.statusBar().showMessage)
 
+        self.textview_header.setMessageWidget(self.message)
+
         # setup tables and views
         self.setupHeaderTextview()
         connect(self.textview_status, SIGNAL('fileDisplayed'),
