@@ -303,7 +303,7 @@ def qtrun(dlgfunc, ui, *args, **opts):
 
     mainapp = QtGui.QApplication(sys.argv)
     # default org is used by QSettings
-    mainapp.setApplicationName('TortoiseHg')
+    mainapp.setApplicationName('TortoiseHgQt')
     mainapp.setOrganizationName('TortoiseHg')
     mainapp.setOrganizationDomain('tortoisehg.org')
     mainapp.setApplicationVersion(thgversion.version())
