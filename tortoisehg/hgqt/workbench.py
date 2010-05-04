@@ -83,14 +83,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             self.startrev_entry.setText(str(fromhead))
         self.setupRevisionTable()
 
-        settings = QtCore.QSettings()
-        V = QtCore.QVariant
-        S = QtCore.QSize
-        P = QtCore.QPoint
-        size = settings.value("Workbench/Size", V(S(600, 500))).toSize()
-        self.resize(size)
-        pos = settings.value("Workbench/Position", V(P(0, 0))).toPoint()
-        self.move(pos)
+        s = QtCore.QSettings()
+        self.restoreGeometry(s.value("Workbench/geometry").toByteArray())
 
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
@@ -552,9 +546,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         if not self.okToContinue():
             event.ignore()
         s = QtCore.QSettings()
-        V = QtCore.QVariant
-        s.setValue("Workbench/Size", V(self.size()))
-        s.setValue("Workbench/Position", V(self.pos()))
+        s.setValue("Workbench/geometry", self.saveGeometry());
 
 def run(ui, *pats, **opts):
     from tortoisehg.hgqt import setup_font_substitutions
