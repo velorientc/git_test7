@@ -38,6 +38,7 @@ class RevDisplay(QtGui.QWidget):
         vb.setMargin(0)
 
         self._header = w = QtGui.QLabel()
+        w.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
         vb.addWidget(w)
 
         self.setLayout(vb)
