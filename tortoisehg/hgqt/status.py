@@ -110,7 +110,8 @@ class StatusWidget(QWidget):
             m = cmdutil.matchfiles(self.repo, [wfile])
             opts = mdiff.diffopts(git=True, nodates=True)
             n2, n1 = None, self.wctx.p1().node()
-            for s, l in patch.difflabel(patch.diff, self.repo, n1, n2, match=m, opts=opts):
+            for s, l in patch.difflabel(patch.diff, self.repo, n1, n2,
+                                        match=m, opts=opts):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
             self.status_error = str(e)
