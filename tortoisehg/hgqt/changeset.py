@@ -95,32 +95,11 @@ class RevDisplay(QtGui.QWidget):
         self.refreshDisplay()
 
     def selectNone(self):
-        cursor = self.textCursor()
-        cursor.clearSelection()
-        cursor.setPosition(0)
-        self.setTextCursor(cursor)
-        self.setExtraSelections([])
-        
+        self._message.selectNone()
+
     def searchString(self, text):
-        self.selectNone()
-        if text in unicode(self.toPlainText()):
-            clist = []
-            while self.find(text):
-                eselect = self.ExtraSelection()
-                eselect.cursor = self.textCursor()
-                eselect.format.setBackground(QtGui.QColor('#ffffbb'))
-                clist.append(eselect)
-            self.selectNone()
-            self.setExtraSelections(clist)
-            def finditer(self, text):
-                if text:
-                    while True:
-                        if self.find(text):
-                            yield self.ctx.rev(), None                
-                        else:
-                            break
-            return finditer(self, text)
-        
+        self._message.searchString(text)
+
     def refreshDisplay(self):
         ctx = self.ctx
         rev = ctx.rev()
@@ -221,28 +200,30 @@ class RevMessage(QtGui.QWidget):
         self._message.setHtml(buf)
 
     def selectNone(self):
-        cursor = self.textCursor()
+        msg = self._message
+        cursor = msg.textCursor()
         cursor.clearSelection()
         cursor.setPosition(0)
-        self.setTextCursor(cursor)
-        self.setExtraSelections([])
+        msg.setTextCursor(cursor)
+        msg.setExtraSelections([])
 
     def searchString(self, text):
+        msg = self._message
         self.selectNone()
-        if text in unicode(self.toPlainText()):
+        if text in unicode(msg.toPlainText()):
             clist = []
-            while self.find(text):
-                eselect = self.ExtraSelection()
-                eselect.cursor = self.textCursor()
+            while msg.find(text):
+                eselect = msg.ExtraSelection()
+                eselect.cursor = msg.textCursor()
                 eselect.format.setBackground(QtGui.QColor('#ffffbb'))
                 clist.append(eselect)
             self.selectNone()
-            self.setExtraSelections(clist)
-            def finditer(self, text):
+            msg.setExtraSelections(clist)
+            def finditer(msg, text):
                 if text:
                     while True:
-                        if self.find(text):
+                        if msg.find(text):
                             yield self.ctx.rev(), None                
                         else:
                             break
-            return finditer(self, text)
+            return finditer(msg, text)
