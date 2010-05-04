@@ -99,9 +99,9 @@ class HgRepoView(QtGui.QTableView):
         QtGui.QTableView.mousePressEvent(self, event)
 
     def createToolbars(self):
-        self.goto_toolbar = GotoQuickBar(self)
-        connect(self.goto_toolbar, SIGNAL('goto'),
-                self.goto)
+        self.goto_toolbar = tb = GotoQuickBar(self)
+        tb.setObjectName("goto_toolbar")
+        connect(tb, SIGNAL('goto'), self.goto)
 
     def _action_defs(self):
         a = [("back", self.tr("Back"), 'back', None,

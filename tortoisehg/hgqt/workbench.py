@@ -85,6 +85,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         s = QtCore.QSettings()
         self.restoreGeometry(s.value("Workbench/geometry").toByteArray())
+        self.restoreState(s.value("Workbench/windowState").toByteArray())
 
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
@@ -122,18 +123,16 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def createToolbars(self):
         # find quickbar
-        self.find_toolbar = FindInGraphlogQuickBar(self)
-        self.find_toolbar.attachFileView(self.textview_status)
-        self.find_toolbar.attachHeaderView(self.textview_header)
-        connect(self.find_toolbar, SIGNAL('revisionSelected'),
-                self.tableView_revisions.goto)
-        connect(self.find_toolbar, SIGNAL('fileSelected'),
-                self.tableView_filelist.selectFile)
-        connect(self.find_toolbar, SIGNAL('showMessage'),
-                self.statusBar().showMessage,
+        self.find_toolbar = tb = FindInGraphlogQuickBar(self)
+        tb.setObjectName("find_toolbar")
+        tb.attachFileView(self.textview_status)
+        tb.attachHeaderView(self.textview_header)
+        connect(tb, SIGNAL('revisionSelected'), self.tableView_revisions.goto)
+        connect(tb, SIGNAL('fileSelected'), self.tableView_filelist.selectFile)
+        connect(tb, SIGNAL('showMessage'), self.statusBar().showMessage,
                 Qt.QueuedConnection)
 
-        self.attachQuickBar(self.find_toolbar)
+        self.attachQuickBar(tb)
 
         # navigation toolbar
         self.toolBar_edit.addAction(self.tableView_revisions._actions['back'])
@@ -547,6 +546,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             event.ignore()
         s = QtCore.QSettings()
         s.setValue("Workbench/geometry", self.saveGeometry());
+        s.setValue("Workbench/windowState", self.saveState())
 
 def run(ui, *pats, **opts):
     from tortoisehg.hgqt import setup_font_substitutions
