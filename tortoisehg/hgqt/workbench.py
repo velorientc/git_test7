@@ -540,13 +540,12 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         return True # we currently have no data to loose
 
     def closeEvent(self, event):
-        print "closeEvent"
         if not self.okToContinue():
             event.ignore()
         s = QtCore.QSettings()
         V = QtCore.QVariant
-        s.setValue("MainWindow/Size", V(self.size()))
-        s.setValue("MainWindow/Position", V(self.pos()))
+        s.setValue("Workbench/Size", V(self.size()))
+        s.setValue("Workbench/Position", V(self.pos()))
 
 def run(ui, *pats, **opts):
     from tortoisehg.hgqt import setup_font_substitutions
