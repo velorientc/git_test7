@@ -336,8 +336,8 @@ def clone(ui, *pats, **opts):
     qtrun(run, ui, *pats, **opts)
 
 def test(ui, *pats, **opts):
-    """bug report dialog"""
-    from tortoisehg.hgqt.chunkselect import run
+    """test arbitrary widgets"""
+    from tortoisehg.hgqt.status import run
     qtrun(run, ui, *pats, **opts)
 
 def bug(ui, *pats, **opts):
