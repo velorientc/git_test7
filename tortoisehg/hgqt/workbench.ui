@@ -68,6 +68,9 @@
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
+          <property name="childrenCollapsible">
+           <bool>false</bool>
+          </property>
           <widget class="HgFileListView" name="tableView_filelist"/>
           <widget class="QFrame" name="frame">
            <property name="sizePolicy">

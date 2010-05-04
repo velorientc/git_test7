@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 04 15:11:07 2010
+# Created: Tue May 04 17:29:27 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -50,6 +50,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.splitter_2.sizePolicy().hasHeightForWidth())
         self.splitter_2.setSizePolicy(sizePolicy)
         self.splitter_2.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter_2.setChildrenCollapsible(False)
         self.splitter_2.setObjectName("splitter_2")
         self.tableView_filelist = HgFileListView(self.splitter_2)
         self.tableView_filelist.setObjectName("tableView_filelist")
