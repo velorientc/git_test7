@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 04 17:29:27 2010
+# Created: Tue May 04 18:53:26 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -74,6 +74,9 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.textview_header.sizePolicy().hasHeightForWidth())
         self.textview_header.setSizePolicy(sizePolicy)
         self.textview_header.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        self.textview_header.setFont(font)
         self.textview_header.setObjectName("textview_header")
         self.verticalLayout.addWidget(self.textview_header)
         self.splitter = QtGui.QSplitter(self.frame)
@@ -96,6 +99,10 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.message.sizePolicy().hasHeightForWidth())
         self.message.setSizePolicy(sizePolicy)
         self.message.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier")
+        font.setPointSize(9)
+        self.message.setFont(font)
         self.message.setObjectName("message")
         self.textview_status = HgFileView(self.splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
