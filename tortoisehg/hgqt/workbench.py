@@ -83,6 +83,15 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             self.startrev_entry.setText(str(fromhead))
         self.setupRevisionTable()
 
+        settings = QtCore.QSettings()
+        V = QtCore.QVariant
+        S = QtCore.QSize
+        P = QtCore.QPoint
+        size = settings.value("Workbench/Size", V(S(600, 500))).toSize()
+        self.resize(size)
+        pos = settings.value("Workbench/Position", V(P(0, 0))).toPoint()
+        self.move(pos)
+
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
 
