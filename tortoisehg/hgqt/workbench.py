@@ -83,9 +83,17 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             self.startrev_entry.setText(str(fromhead))
         self.setupRevisionTable()
 
+        # restore settings
         s = QtCore.QSettings()
-        self.restoreGeometry(s.value("Workbench/geometry").toByteArray())
-        self.restoreState(s.value("Workbench/windowState").toByteArray())
+        wb = "Workbench/"
+        self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
+        self.restoreState(s.value(wb + 'windowState').toByteArray())
+        self.splitternames = []
+        sn = ('revisions', 'filelist', 'message')
+        for n in sn:
+            n += '_splitter'
+            self.splitternames.append(n)
+            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
 
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
@@ -545,8 +553,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         if not self.okToContinue():
             event.ignore()
         s = QtCore.QSettings()
-        s.setValue("Workbench/geometry", self.saveGeometry());
-        s.setValue("Workbench/windowState", self.saveState())
+        wb = "Workbench/"
+        s.setValue(wb + 'geometry', self.saveGeometry())
+        s.setValue(wb + 'windowState', self.saveState())
+        for n in self.splitternames:
+            s.setValue(wb + n, getattr(self, n).saveState())
 
 def run(ui, *pats, **opts):
     from tortoisehg.hgqt import setup_font_substitutions
