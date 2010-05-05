@@ -123,6 +123,17 @@ COL_STATUS = 1
 COL_PATH_DISPLAY = 2
 COL_PATH = 3
 
+tips = {
+       'M': _('%s is modified'),
+       'A': _('%s is added'),
+       'R': _('%s is removed'),
+       '?': _('%s is not tracked (unknown)'),
+       '!': _('%s is missing!'),
+       'I': _('%s is ignored'),
+       'C': _('%s is not modified (clean)'),
+       'S': _('%s is a dirty subrepo'),
+}
+
 class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -169,6 +180,10 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Unchecked
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
+        elif role == Qt.ToolTipRole:
+            checked, status, upath, path = self.rows[index.row()]
+            if status in tips:
+                return QVariant(tips[status] % upath)
         return QVariant()
 
     def headerData(self, col, orientation, role):
