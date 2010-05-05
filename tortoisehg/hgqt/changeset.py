@@ -34,6 +34,11 @@ headerstyle = '''
 </style>
 '''
 
+linkfmt = '<span class="rev_number">%s</span>:<a href="%s" class="rev_hash">%s</a>'
+
+csetfmt = '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
+          '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
+
 class RevDisplay(QtGui.QWidget):
     """
     Display metadata for one revision (rev, author, description, etc.)
@@ -171,9 +176,6 @@ class RevDisplay(QtGui.QWidget):
             buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
                    '<td>%s (%s)</td></tr>\n' % (labelwidth, 'Date', dispt, age)
 
-            linkfmt = '<span class="rev_number">%s</span>:<a href="%s" class="rev_hash">%s</a>'
-            csetfmt = '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
-                      '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
             parents = [p for p in ctx.parents() if p]
             for p in parents:
                 if p.rev() > -1:
