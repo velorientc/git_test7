@@ -163,7 +163,7 @@ class RevDisplay(QtGui.QWidget):
         if self._expanded:
             buf += '<table width=100%>\n'
             buf += '<tr><td width=50 align="right"><span class="label">Author&nbsp;</span></td>'\
-                   '<td colspan=5>%s</td></tr>'\
+                   '<td>%s</td></tr>'\
                    '\n' %  xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
             d = ctx.date()
             buf += '<tr><td width=50 align="right"><span class="label">Date&nbsp;</span></td>'\
