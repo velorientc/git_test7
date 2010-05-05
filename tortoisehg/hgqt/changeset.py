@@ -36,8 +36,9 @@ headerstyle = '''
 
 linkfmt = '<span class="rev_number">%s</span>:<a href="%s" class="rev_hash">%s</a>'
 
-csetfmt = '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
-          '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
+labelfmt = '<td width=%i align="right"><span class="label">%s&nbsp;</span></td>'
+
+csetfmt = '<tr>' + labelfmt + '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
 
 class RevDisplay(QtGui.QWidget):
     """
@@ -161,22 +162,22 @@ class RevDisplay(QtGui.QWidget):
                    '<span class="rev_hash">%s&nbsp;</span>' \
                    '<span class="short_desc"><b>%s</b></span></td>' \
                    '\n' % (ctx.rev(), short_hex(ctx.node()), desc)
-        buf += '<td width=%i align=right><span class="label">%s&nbsp;</span></td>' \
-               '<td>%s</td>\n' % (labelwidth, 'Branch', ctx.branch())
+
+        buf += (labelfmt + '<td>%s</td>\n') % (labelwidth, 'Branch', ctx.branch())
         buf += '</tr></table>\n'
 
         if self._expanded:
             buf += '<table width=100%>\n'
 
             user = xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
-            buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
-                   '<td>%s</td></tr>\n' %  (labelwidth, 'Author', user)
+            buf += ('<tr>' +  labelfmt + '<td>%s</td></tr>\n') % (
+                       labelwidth, 'Author', user)
 
             date = ctx.date()
             disptime = hglib.displaytime(date)
             age = hglib.age(date)
-            buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
-                   '<td>%s (%s)</td></tr>\n' % (labelwidth, 'Date', disptime, age)
+            buf += ('<tr>' + labelfmt + '<td>%s (%s)</td></tr>\n') % (
+                       labelwidth, 'Date', disptime, age)
 
             def cset(ctx, label):
                 short = short_hex(ctx.node())
