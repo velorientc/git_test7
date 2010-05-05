@@ -13,7 +13,7 @@ from tortoisehg.util.i18n import _
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel
 from PyQt4.QtCore import QObject, QEvent
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView
-from PyQt4.QtGui import QTextEdit, QFont
+from PyQt4.QtGui import QTextEdit, QFont, QColor
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -47,6 +47,16 @@ class StatusWidget(QWidget):
         assert(root)
         self.repo = hg.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
+
+        # determine the user configured status colors
+        # (in the future, we could support full rich-text tags)
+        qtlib.configstyles(self.repo.ui)
+        for stat in color_labels.keys():
+            effect = qtlib.geteffect(color_labels[stat])
+            for e in effect.split(';'):
+                if e.startswith('color:'):
+                    colors[stat] = QColor(e[7:])
+                    break
 
         split = QSplitter(Qt.Horizontal)
         layout = QVBoxLayout()
@@ -149,6 +159,19 @@ tips = {
    'S': _('%s is a dirty subrepo'),
 }
 
+color_labels = {
+   'M': 'status.modified',
+   'A': 'status.added',
+   'R': 'status.removed',
+   '?': 'status.unknown',
+   '!': 'status.deleted',
+   'I': 'status.ignored',
+   'C': 'status.clean',
+   'S': 'status.subrepo',
+}
+
+colors = {}
+
 class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -195,8 +218,11 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Unchecked
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
+
+        checked, status, upath, path = self.rows[index.row()]
+        if role == Qt.TextColorRole:
+            return colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
-            checked, status, upath, path = self.rows[index.row()]
             if status in tips:
                 return QVariant(tips[status] % upath)
         return QVariant()
