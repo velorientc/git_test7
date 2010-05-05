@@ -11,6 +11,7 @@ from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel
+from PyQt4.QtCore import QObject, QEvent
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView
 from PyQt4.QtGui import QTextEdit, QFont
 
@@ -54,6 +55,7 @@ class StatusWidget(QWidget):
 
         self.tv = QTreeView(split)
         self.connect(self.tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
+        self.tv.installEventFilter(TvEventFilter(self))
 
         self.te = QTextEdit(split)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -116,6 +118,18 @@ class StatusWidget(QWidget):
             self.status_error = str(e)
         o, e = hu.getdata()
         self.te.setHtml(o)
+
+
+class TvEventFilter(QObject):
+    '''Event filter for our QTreeView'''
+    def __init__(self, parent):
+        QObject.__init__(self, parent)
+    def eventFilter(self, treeview, event):
+        if event.type() == QEvent.KeyPress and event.key() == 32:
+            for index in treeview.selectedIndexes():
+                treeview.model().toggleRow(index)
+            return True
+        return treeview.eventFilter(treeview, event)
 
 
 COL_CHECK = 0
