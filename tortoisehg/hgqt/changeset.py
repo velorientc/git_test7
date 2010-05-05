@@ -42,20 +42,41 @@ class RevDisplay(QtGui.QWidget):
         QtGui.QWidget.__init__(self, parent)
         self._message = None
 
-        vb = QtGui.QVBoxLayout()
-        vb.setMargin(0)
+        hb = QtGui.QHBoxLayout()
+        hb.setMargin(0)
+        self.setLayout(hb)
 
         self._header = w = QtGui.QLabel()
         w.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
-        vb.addWidget(w)
+        hb.addWidget(w)
 
-        self.setLayout(vb)
+        vb = QtGui.QVBoxLayout()
+        hb.addLayout(vb)
+
+        # expand header button
+        self._expander = w = QtGui.QToolButton()
+        w.setArrowType(Qt.UpArrow)
+        w.setIconSize(QtCore.QSize(10, 10))
+        a = QtGui.QAction(self)
+        connect(a, SIGNAL("triggered()"), self.expand)
+        w.setDefaultAction(a)
+        vb.addWidget(w, 0, Qt.AlignTop)
+        self._expanded = True
 
         self.descwidth = 80 # number of chars displayed for parent/child descriptions
 
         connect(self._header,
                 SIGNAL('linkActivated(const QString&)'),
                 self.anchorClicked)
+
+    def expand(self):
+        self._expanded = not self._expanded
+        if self._expanded:
+            t = Qt.UpArrow
+        else:
+            t = Qt.DownArrow
+        self._expander.setArrowType(t)
+        self.refreshDisplay()
 
     def sizeHint(self):
         return self.minimumSizeHint()
@@ -139,52 +160,54 @@ class RevDisplay(QtGui.QWidget):
                '\n' % ctx.branch()
         buf += '</tr></table>\n'
 
-        buf += '<table width=100%>\n'
-        buf += '<tr><td width=50 align="right"><span class="label">Author&nbsp;</span></td>'\
-               '<td colspan=5>%s</td></tr>'\
-               '\n' %  xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
-        d = ctx.date()
-        buf += '<tr><td width=50 align="right"><span class="label">Date&nbsp;</span></td>'\
-               '<td>%s (%s)</td></tr>'\
-               '\n' % (hglib.displaytime(d), hglib.age(d))
+        if self._expanded:
+            buf += '<table width=100%>\n'
+            buf += '<tr><td width=50 align="right"><span class="label">Author&nbsp;</span></td>'\
+                   '<td colspan=5>%s</td></tr>'\
+                   '\n' %  xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
+            d = ctx.date()
+            buf += '<tr><td width=50 align="right"><span class="label">Date&nbsp;</span></td>'\
+                   '<td>%s (%s)</td></tr>'\
+                   '\n' % (hglib.displaytime(d), hglib.age(d))
 
-        parents = [p for p in ctx.parents() if p]
-        for p in parents:
-            if p.rev() > -1:
+            parents = [p for p in ctx.parents() if p]
+            for p in parents:
+                if p.rev() > -1:
+                    short = short_hex(p.node())
+                    desc = format_desc(p.description(), self.descwidth)
+                    p_rev = p.rev()
+                    p_fmt = '<span class="rev_number">%s</span>:'\
+                            '<a href="%s" class="rev_hash">%s</a>'
+                    p_rev = p_fmt % (p_rev, p_rev, short)
+                    buf += '<tr><td width=50 align="right"><span class="label">Parent&nbsp;</span></td>'\
+                           '<td>%s'\
+                           '<span class="short_desc">&nbsp;%s</span></td></tr>'\
+                           '\n' % (p_rev, desc)
+            if len(parents) == 2:
+                p = parents[0].ancestor(parents[1])
                 short = short_hex(p.node())
                 desc = format_desc(p.description(), self.descwidth)
                 p_rev = p.rev()
                 p_fmt = '<span class="rev_number">%s</span>:'\
                         '<a href="%s" class="rev_hash">%s</a>'
                 p_rev = p_fmt % (p_rev, p_rev, short)
-                buf += '<tr><td width=50 align="right"><span class="label">Parent&nbsp;</span></td>'\
-                       '<td>%s'\
-                       '<span class="short_desc">&nbsp;%s</span></td></tr>'\
-                       '\n' % (p_rev, desc)
-        if len(parents) == 2:
-            p = parents[0].ancestor(parents[1])
-            short = short_hex(p.node())
-            desc = format_desc(p.description(), self.descwidth)
-            p_rev = p.rev()
-            p_fmt = '<span class="rev_number">%s</span>:'\
-                    '<a href="%s" class="rev_hash">%s</a>'
-            p_rev = p_fmt % (p_rev, p_rev, short)
-            buf += '<tr><td width=50 align="right"><span class="label">Ancestor</span></td>'\
-                   '<td>%s&nbsp;'\
-                   '<span class="short_desc">%s</span></td></tr>'\
-                   '\n' % (p_rev, desc)
-
-        for p in ctx.children():
-            if p.rev() > -1:
-                short = short_hex(p.node())
-                desc = format_desc(p.description(), self.descwidth)
-                buf += '<tr><td align="right"><span class="label">Child&nbsp;</span></td>'\
-                       '<td><span class="rev_number">%d</span>:'\
-                       '<a href="%s" class="rev_hash">%s</a>&nbsp;'\
+                buf += '<tr><td width=50 align="right"><span class="label">Ancestor</span></td>'\
+                       '<td>%s&nbsp;'\
                        '<span class="short_desc">%s</span></td></tr>'\
-                       '\n' % (p.rev(), p.rev(), short, desc)
+                       '\n' % (p_rev, desc)
 
-        buf += "</table>\n"
+            for p in ctx.children():
+                if p.rev() > -1:
+                    short = short_hex(p.node())
+                    desc = format_desc(p.description(), self.descwidth)
+                    buf += '<tr><td align="right"><span class="label">Child&nbsp;</span></td>'\
+                           '<td><span class="rev_number">%d</span>:'\
+                           '<a href="%s" class="rev_hash">%s</a>&nbsp;'\
+                           '<span class="short_desc">%s</span></td></tr>'\
+                           '\n' % (p.rev(), p.rev(), short, desc)
+
+            buf += "</table>\n"
+
         self._header.setText(buf)
 
         self._message.displayRevision(ctx)
