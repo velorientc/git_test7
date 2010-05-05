@@ -41,6 +41,15 @@ labelfmt = '<td width=%i align="right"><span class="label">%s&nbsp;</span></td>'
 csetfmt = '<tr>' + labelfmt + '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
 
 labelwidth = 50
+descwidth = 80  # number of chars displayed for parent/child descriptions
+
+def cset(ctx, labelname):
+    short = short_hex(ctx.node())
+    desc = format_desc(ctx.description(), descwidth)
+    rev = ctx.rev()
+    rev = linkfmt % (rev, rev, short)
+    return csetfmt % (labelwidth, labelname, rev, desc)
+
 
 class RevDisplay(QtGui.QWidget):
     """
@@ -70,8 +79,6 @@ class RevDisplay(QtGui.QWidget):
         w.setDefaultAction(a)
         vb.addWidget(w, 0, Qt.AlignTop)
         self._expanded = True
-
-        self.descwidth = 80 # number of chars displayed for parent/child descriptions
 
         connect(self._header,
                 SIGNAL('linkActivated(const QString&)'),
@@ -191,24 +198,17 @@ class RevDisplay(QtGui.QWidget):
         parents = [p for p in ctx.parents() if p]
         for p in parents:
             if p.rev() > -1:
-                buf += self.cset(p, 'Parent')
+                buf += cset(p, 'Parent')
         if len(parents) == 2:
             a = parents[0].ancestor(parents[1])
-            buf += self.cset(a, 'Ancestor')
+            buf += cset(a, 'Ancestor')
 
         for c in ctx.children():
             if c.rev() > -1:
-                buf += self.cset(c, 'Child')
+                buf += cset(c, 'Child')
 
         buf += "</table>\n"
         return buf
-
-    def cset(self, ctx, label):
-        short = short_hex(ctx.node())
-        desc = format_desc(ctx.description(), self.descwidth)
-        rev = ctx.rev()
-        rev = linkfmt % (rev, rev, short)
-        return csetfmt % (labelwidth, label, rev, desc)
 
 
 class RevMessage(QtGui.QWidget):
