@@ -10,8 +10,9 @@ from tortoisehg.hgqt import qtlib, htmlui
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
-from PyQt4.QtCore import Qt, QAbstractTableModel, QVariant, SIGNAL
-from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTableView, QTextEdit, QFont
+from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel
+from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView
+from PyQt4.QtGui import QTextEdit, QFont
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -47,12 +48,15 @@ class StatusWidget(QWidget):
         self.repo = hg.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
 
-        self.tv = QTableView()
-        vh = self.tv.verticalHeader()
-        vh.setVisible(False)
+        split = QSplitter(Qt.Horizontal)
+        layout = QVBoxLayout()
+        layout.addWidget(split)
+        self.setLayout(layout)
+
+        self.tv = QTreeView(split)
         self.connect(self.tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
 
-        self.te = QTextEdit()
+        self.te = QTextEdit(split)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.te.setReadOnly(True)
         self.te.setLineWrapMode(QTextEdit.NoWrap)
@@ -62,13 +66,6 @@ class StatusWidget(QWidget):
         f.setPointSize(9)
         self.te.setFont(f)
 
-        split = QSplitter(Qt.Horizontal)
-        split.addWidget(self.tv)
-        split.addWidget(self.te)
-
-        layout = QVBoxLayout()
-        layout.addWidget(split)
-        self.setLayout(layout)
         if not parent:
             self.setWindowTitle(_('TortoiseHg Status'))
             self.resize(650, 400)
@@ -94,11 +91,13 @@ class StatusWidget(QWidget):
 
     def updateModel(self):
         tm = WctxModel(self.wctx)
+        self.tv.setItemsExpandable(False)
+        self.tv.setRootIsDecorated(False)
+        self.tv.setSortingEnabled(True)
+        self.tv.sortByColumn(1)
         self.tv.setModel(tm)
-        self.tv.resizeColumnsToContents()
-        self.tv.resizeRowsToContents()
-        hh = self.tv.horizontalHeader()
-        hh.setStretchLastSection(True)
+        self.tv.resizeColumnToContents(0)
+        self.tv.resizeColumnToContents(1)
 
     def rowSelected(self, index):
         pfile = index.sibling(index.row(), 1).data().toString()
