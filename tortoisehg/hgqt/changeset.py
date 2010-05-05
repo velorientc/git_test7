@@ -40,6 +40,8 @@ labelfmt = '<td width=%i align="right"><span class="label">%s&nbsp;</span></td>'
 
 csetfmt = '<tr>' + labelfmt + '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
 
+labelwidth = 50
+
 class RevDisplay(QtGui.QWidget):
     """
     Display metadata for one revision (rev, author, description, etc.)
@@ -152,7 +154,6 @@ class RevDisplay(QtGui.QWidget):
             buf += '</td></tr>\n'
             buf += "</table>\n"
 
-        labelwidth = 50
         buf += '<table width=100%>\n<tr>'
         if rev is None:
             buf += '<td><b>%s</b></td>' % 'Working Directory'
@@ -167,42 +168,47 @@ class RevDisplay(QtGui.QWidget):
         buf += '</tr></table>\n'
 
         if self._expanded:
-            buf += '<table width=100%>\n'
-
-            user = xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
-            buf += ('<tr>' +  labelfmt + '<td>%s</td></tr>\n') % (
-                       labelwidth, 'Author', user)
-
-            date = ctx.date()
-            disptime = hglib.displaytime(date)
-            age = hglib.age(date)
-            buf += ('<tr>' + labelfmt + '<td>%s (%s)</td></tr>\n') % (
-                       labelwidth, 'Date', disptime, age)
-
-            def cset(ctx, label):
-                short = short_hex(ctx.node())
-                desc = format_desc(ctx.description(), self.descwidth)
-                rev = ctx.rev()
-                rev = linkfmt % (rev, rev, short)
-                return csetfmt % (labelwidth, label, rev, desc)
- 
-            parents = [p for p in ctx.parents() if p]
-            for p in parents:
-                if p.rev() > -1:
-                    buf += cset(p, 'Parent')
-            if len(parents) == 2:
-                a = parents[0].ancestor(parents[1])
-                buf += cset(a, 'Ancestor')
-
-            for c in ctx.children():
-                if c.rev() > -1:
-                    buf += cset(c, 'Child')
-
-            buf += "</table>\n"
+            buf += self.expandedText()
 
         self._header.setText(buf)
 
         self._message.displayRevision(ctx)
+
+    def expandedText(self):
+        ctx = self.ctx
+        buf = '<table width=100%>\n'
+
+        user = xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
+        buf += ('<tr>' +  labelfmt + '<td>%s</td></tr>\n') % (
+                   labelwidth, 'Author', user)
+
+        date = ctx.date()
+        disptime = hglib.displaytime(date)
+        age = hglib.age(date)
+        buf += ('<tr>' + labelfmt + '<td>%s (%s)</td></tr>\n') % (
+                   labelwidth, 'Date', disptime, age)
+
+        parents = [p for p in ctx.parents() if p]
+        for p in parents:
+            if p.rev() > -1:
+                buf += self.cset(p, 'Parent')
+        if len(parents) == 2:
+            a = parents[0].ancestor(parents[1])
+            buf += self.cset(a, 'Ancestor')
+
+        for c in ctx.children():
+            if c.rev() > -1:
+                buf += self.cset(c, 'Child')
+
+        buf += "</table>\n"
+        return buf
+
+    def cset(self, ctx, label):
+        short = short_hex(ctx.node())
+        desc = format_desc(ctx.description(), self.descwidth)
+        rev = ctx.rev()
+        rev = linkfmt % (rev, rev, short)
+        return csetfmt % (labelwidth, label, rev, desc)
 
 
 class RevMessage(QtGui.QWidget):
