@@ -146,65 +146,57 @@ class RevDisplay(QtGui.QWidget):
             buf += '</td></tr>\n'
             buf += "</table>\n"
 
+        labelwidth = 50
         buf += '<table width=100%>\n<tr>'
         if rev is None:
-            buf += '<td><b>Working Directory</b></td>'
+            buf += '<td><b>%s</b></td>' % 'Working Directory'
         else:
             desc = format_desc(ctx.description(), 80)
-            buf += '<td><span class="rev_number">%d:</span>'\
-                   '<span class="rev_hash">%s&nbsp;</span>'\
-                   '<span class="short_desc"><b>%s</b></span></td>'\
+            buf += '<td><span class="rev_number">%d:</span>' \
+                   '<span class="rev_hash">%s&nbsp;</span>' \
+                   '<span class="short_desc"><b>%s</b></span></td>' \
                    '\n' % (ctx.rev(), short_hex(ctx.node()), desc)
-        buf += '<td width=50 align=right><span class="label">Branch&nbsp;</span></td>'\
-               '<td>%s</td>'\
-               '\n' % ctx.branch()
+        buf += '<td width=%i align=right><span class="label">%s&nbsp;</span></td>' \
+               '<td>%s</td>\n' % (labelwidth, 'Branch', ctx.branch())
         buf += '</tr></table>\n'
 
         if self._expanded:
             buf += '<table width=100%>\n'
-            buf += '<tr><td width=50 align="right"><span class="label">Author&nbsp;</span></td>'\
-                   '<td>%s</td></tr>'\
-                   '\n' %  xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
+            usr = xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
+            buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
+                   '<td>%s</td></tr>\n' %  (labelwidth, 'Author', usr)
             d = ctx.date()
-            buf += '<tr><td width=50 align="right"><span class="label">Date&nbsp;</span></td>'\
-                   '<td>%s (%s)</td></tr>'\
-                   '\n' % (hglib.displaytime(d), hglib.age(d))
+            dispt = hglib.displaytime(d)
+            age = hglib.age(d)
+            buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
+                   '<td>%s (%s)</td></tr>\n' % (labelwidth, 'Date', dispt, age)
 
+            linkfmt = '<span class="rev_number">%s</span>:<a href="%s" class="rev_hash">%s</a>'
+            csetfmt = '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
+                      '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
             parents = [p for p in ctx.parents() if p]
             for p in parents:
                 if p.rev() > -1:
                     short = short_hex(p.node())
                     desc = format_desc(p.description(), self.descwidth)
                     p_rev = p.rev()
-                    p_fmt = '<span class="rev_number">%s</span>:'\
-                            '<a href="%s" class="rev_hash">%s</a>'
-                    p_rev = p_fmt % (p_rev, p_rev, short)
-                    buf += '<tr><td width=50 align="right"><span class="label">Parent&nbsp;</span></td>'\
-                           '<td>%s'\
-                           '<span class="short_desc">&nbsp;%s</span></td></tr>'\
-                           '\n' % (p_rev, desc)
+                    p_rev = linkfmt % (p_rev, p_rev, short)
+                    buf += csetfmt % (labelwidth, 'Parent', p_rev, desc)
             if len(parents) == 2:
                 p = parents[0].ancestor(parents[1])
                 short = short_hex(p.node())
                 desc = format_desc(p.description(), self.descwidth)
                 p_rev = p.rev()
-                p_fmt = '<span class="rev_number">%s</span>:'\
-                        '<a href="%s" class="rev_hash">%s</a>'
-                p_rev = p_fmt % (p_rev, p_rev, short)
-                buf += '<tr><td width=50 align="right"><span class="label">Ancestor</span></td>'\
-                       '<td>%s&nbsp;'\
-                       '<span class="short_desc">%s</span></td></tr>'\
-                       '\n' % (p_rev, desc)
+                p_rev = linkfmt % (p_rev, p_rev, short)
+                buf += csetfmt % (labelwidth, 'Ancestor', p_rev, desc)
 
             for p in ctx.children():
                 if p.rev() > -1:
                     short = short_hex(p.node())
                     desc = format_desc(p.description(), self.descwidth)
-                    buf += '<tr><td align="right"><span class="label">Child&nbsp;</span></td>'\
-                           '<td><span class="rev_number">%d</span>:'\
-                           '<a href="%s" class="rev_hash">%s</a>&nbsp;'\
-                           '<span class="short_desc">%s</span></td></tr>'\
-                           '\n' % (p.rev(), p.rev(), short, desc)
+                    p_rev = p.rev()
+                    p_rev = linkfmt % (p_rev, p_rev, short)
+                    buf += csetfmt % (labelwidth, 'Child', p_rev, desc)
 
             buf += "</table>\n"
 
