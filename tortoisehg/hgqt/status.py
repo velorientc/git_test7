@@ -104,6 +104,7 @@ class StatusWidget(QWidget):
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
 
     def rowSelected(self, index):
+        'Connected to treeview "clicked" signal'
         pfile = index.model().getPath(index)
         wfile = util.pconvert(pfile)
         hu = htmlui.htmlui()
@@ -219,12 +220,14 @@ class WctxModel(QAbstractTableModel):
         return self.rows[index.row()][COL_PATH]
 
     def toggleRow(self, index):
+        'Connected to "activated" signal, emitted by dbl-click or enter'
         assert index.isValid()
         row = index.row()
         self.rows[row][COL_CHECK] = not self.rows[row][COL_CHECK]
         self.emit(SIGNAL("layoutChanged()"))
 
     def pressedRow(self, index):
+        'Connected to "pressed" signal, emitted by mouse clicks'
         assert index.isValid()
         if index.column() == COL_CHECK:
             self.toggleRow(index)
