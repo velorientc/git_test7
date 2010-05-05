@@ -176,29 +176,24 @@ class RevDisplay(QtGui.QWidget):
             buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
                    '<td>%s (%s)</td></tr>\n' % (labelwidth, 'Date', dispt, age)
 
+            def cset(ctx, label):
+                short = short_hex(ctx.node())
+                desc = format_desc(ctx.description(), self.descwidth)
+                rev = ctx.rev()
+                rev = linkfmt % (rev, rev, short)
+                return csetfmt % (labelwidth, label, rev, desc)
+ 
             parents = [p for p in ctx.parents() if p]
             for p in parents:
                 if p.rev() > -1:
-                    short = short_hex(p.node())
-                    desc = format_desc(p.description(), self.descwidth)
-                    p_rev = p.rev()
-                    p_rev = linkfmt % (p_rev, p_rev, short)
-                    buf += csetfmt % (labelwidth, 'Parent', p_rev, desc)
+                    buf += cset(p, 'Parent')
             if len(parents) == 2:
-                p = parents[0].ancestor(parents[1])
-                short = short_hex(p.node())
-                desc = format_desc(p.description(), self.descwidth)
-                p_rev = p.rev()
-                p_rev = linkfmt % (p_rev, p_rev, short)
-                buf += csetfmt % (labelwidth, 'Ancestor', p_rev, desc)
+                a = parents[0].ancestor(parents[1])
+                buf += cset(a, 'Ancestor')
 
-            for p in ctx.children():
-                if p.rev() > -1:
-                    short = short_hex(p.node())
-                    desc = format_desc(p.description(), self.descwidth)
-                    p_rev = p.rev()
-                    p_rev = linkfmt % (p_rev, p_rev, short)
-                    buf += csetfmt % (labelwidth, 'Child', p_rev, desc)
+            for c in ctx.children():
+                if c.rev() > -1:
+                    buf += cset(c, 'Child')
 
             buf += "</table>\n"
 
