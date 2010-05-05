@@ -34,11 +34,12 @@ headerstyle = '''
 </style>
 '''
 
-linkfmt = '<span class="rev_number">%s</span>:<a href="%s" class="rev_hash">%s</a>'
+linkfmt = '<span class="rev_number">%s</span>:' \
+              '<span class="rev_hash"><a href="%s">%s</a>&nbsp;</span>'
 
-labelfmt = '<td width=%i align="right"><span class="label">%s&nbsp;</span></td>'
+labelfmt = '<td width=%i align="right"><span class="label">%s&nbsp;&nbsp;</span></td>'
 
-csetfmt = '<tr>' + labelfmt + '<td>%s&nbsp;<span class="short_desc">%s</span></td></tr>\n'
+csetfmt = '<tr>' + labelfmt + '<td>%s<span class="short_desc">%s</span></td></tr>\n'
 
 labelwidth = 50
 descwidth = 80  # number of chars displayed for parent/child descriptions
