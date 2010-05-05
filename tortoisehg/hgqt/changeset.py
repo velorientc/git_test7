@@ -22,6 +22,7 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
 from tortoisehg.util.util import format_desc, xml_escape
+from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.config import HgConfig
 
@@ -29,6 +30,7 @@ headerstyle = '''
 <style type="text/css">
 .rev_number { font-family:Courier; }
 .rev_hash { font-family:Courier; }
+.label { color:gray; }
 </style>
 '''
 
@@ -49,7 +51,7 @@ class RevDisplay(QtGui.QWidget):
 
         self.setLayout(vb)
 
-        self.descwidth = 60 # number of chars displayed for parent/child descriptions
+        self.descwidth = 80 # number of chars displayed for parent/child descriptions
 
         connect(self._header,
                 SIGNAL('linkActivated(const QString&)'),
@@ -110,8 +112,8 @@ class RevDisplay(QtGui.QWidget):
         ctx = self.ctx
         rev = ctx.rev()
         buf = headerstyle
-        buf += "<table width=100%>\n"
         if self.mqpatch:
+            buf += "<table width=100%>\n"
             buf += '<tr bgcolor=%s>' % HgConfig(ctx._repo.ui).getMQFGColor()
             buf += '<td colspan=3 width=100%><b>Patch queue:</b>&nbsp;'
             for p in self.mqseries:
@@ -121,23 +123,31 @@ class RevDisplay(QtGui.QWidget):
                     p = "<b>%s</b>" % p
                 buf += '&nbsp;%s&nbsp;' % (p)
             buf += '</td></tr>\n'
+            buf += "</table>\n"
 
-        buf += '<tr>'
+        buf += '<table width=100%>\n<tr>'
         if rev is None:
-            buf += "<td><b>Working Directory</b></td>\n"
+            buf += '<td><b>Working Directory</b></td>'
         else:
-            buf += '<td><b>Revision:</b>&nbsp;'\
-                   '<span class="rev_number">%d</span>:'\
-                   '<span class="rev_hash">%s</span></td>'\
-                   '\n' % (ctx.rev(), short_hex(ctx.node()))
+            desc = format_desc(ctx.description(), 80)
+            buf += '<td><b><span class="rev_number">%d:</span>'\
+                   '<span class="rev_hash">%s&nbsp;</span>'\
+                   '<span class="short_desc">%s</span></b></td>'\
+                   '\n' % (ctx.rev(), short_hex(ctx.node()), desc)
+        buf += '<td width=50 align=right><span class="label">Branch&nbsp;</span></td>'\
+               '<td>%s</td>'\
+               '\n' % ctx.branch()
+        buf += '</tr></table>\n'
 
-        buf += '<td><b>Author:</b>&nbsp;'\
-               '%s</td>'\
-               '\n' %  unicode(ctx.user(), 'utf-8', 'replace')
-        buf += '<td><b>Branch:</b>&nbsp;%s</td>' % ctx.branch()
-        buf += '</tr>'
-        buf += "</table>\n"
-        buf += "<table width=100%>\n"
+        buf += '<table width=100%>\n'
+        buf += '<tr><td width=50 align="right"><span class="label">Author&nbsp;</span></td>'\
+               '<td colspan=5>%s</td></tr>'\
+               '\n' %  xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
+        d = ctx.date()
+        buf += '<tr><td width=50 align="right"><span class="label">Date&nbsp;</span></td>'\
+               '<td>%s (%s)</td></tr>'\
+               '\n' % (hglib.displaytime(d), hglib.age(d))
+
         parents = [p for p in ctx.parents() if p]
         for p in parents:
             if p.rev() > -1:
@@ -146,13 +156,10 @@ class RevDisplay(QtGui.QWidget):
                 p_rev = p.rev()
                 p_fmt = '<span class="rev_number">%s</span>:'\
                         '<a href="%s" class="rev_hash">%s</a>'
-                if p_rev == self.diffrev:
-                    p_rev = '<b>%s</b>' % (p_fmt % (p_rev, p_rev, short))
-                else:
-                    p_rev = p_fmt % ('<a href="diff_%s" class="rev_diff">%s</a>' % (p_rev, p_rev), p_rev, short)
-                buf += '<tr><td width=50 class="label"><b>Parent:</b></td>'\
-                       '<td colspan=5>%s&nbsp;'\
-                       '<span class="short_desc">%s</span></td></tr>'\
+                p_rev = p_fmt % (p_rev, p_rev, short)
+                buf += '<tr><td width=50 align="right"><span class="label">Parent&nbsp;</span></td>'\
+                       '<td>%s'\
+                       '<span class="short_desc">&nbsp;%s</span></td></tr>'\
                        '\n' % (p_rev, desc)
         if len(parents) == 2:
             p = parents[0].ancestor(parents[1])
@@ -161,12 +168,9 @@ class RevDisplay(QtGui.QWidget):
             p_rev = p.rev()
             p_fmt = '<span class="rev_number">%s</span>:'\
                     '<a href="%s" class="rev_hash">%s</a>'
-            if p_rev == self.diffrev:
-                p_rev = '<b>%s</b>' % (p_fmt % (p_rev, p_rev, short))
-            else:
-                p_rev = p_fmt % ('<a href="diff_%s" class="rev_diff">%s</a>' % (p_rev, p_rev), p_rev, short)
-            buf += '<tr><td width=50 class="label"><b>Ancestor:</b></td>'\
-                   '<td colspan=5>%s&nbsp;'\
+            p_rev = p_fmt % (p_rev, p_rev, short)
+            buf += '<tr><td width=50 align="right"><span class="label">Ancestor</span></td>'\
+                   '<td>%s&nbsp;'\
                    '<span class="short_desc">%s</span></td></tr>'\
                    '\n' % (p_rev, desc)
 
@@ -174,8 +178,8 @@ class RevDisplay(QtGui.QWidget):
             if p.rev() > -1:
                 short = short_hex(p.node())
                 desc = format_desc(p.description(), self.descwidth)
-                buf += '<tr><td class="label"><b>Child:</b></td>'\
-                       '<td colspan=5><span class="rev_number">%d</span>:'\
+                buf += '<tr><td align="right"><span class="label">Child&nbsp;</span></td>'\
+                       '<td><span class="rev_number">%d</span>:'\
                        '<a href="%s" class="rev_hash">%s</a>&nbsp;'\
                        '<span class="short_desc">%s</span></td></tr>'\
                        '\n' % (p.rev(), p.rev(), short, desc)
