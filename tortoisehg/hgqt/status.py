@@ -5,13 +5,15 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
+
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
 from tortoisehg.hgqt import qtlib, htmlui
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel
-from PyQt4.QtCore import QObject, QEvent, QMimeData, QPoint
+from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView
 from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 
@@ -65,7 +67,7 @@ class StatusWidget(QWidget):
         layout.addWidget(split)
         self.setLayout(layout)
 
-        self.tv = WctxFileTree(split)
+        self.tv = WctxFileTree(root, split)
         self.connect(self.tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
 
         self.te = QTextEdit(split)
@@ -133,8 +135,9 @@ class StatusWidget(QWidget):
 
 
 class WctxFileTree(QTreeView):
-    def __init__(self, parent=None):
+    def __init__(self, root, parent=None):
         QTreeView.__init__(self, parent)
+        self.root = root
 
     def keyPressEvent(self, event):
         if event.key() == 32:
@@ -143,15 +146,18 @@ class WctxFileTree(QTreeView):
 
     def dragObject(self):
         rows = set()
-        fnames = []
+        urls = []
         for index in self.selectedIndexes():
             if index.row() not in rows:
                 rows.add(index.row())
-                fnames.append(self.model().getPath(index))
+                path = self.model().getPath(index)
+                u = QUrl()
+                u.setPath('file://' + os.path.join(self.root, path))
+                urls.append(u)
         if rows:
             d = QDrag(self)
             m = QMimeData()
-            m.setText(', '.join(fnames))
+            m.setUrls(urls)
             d.setMimeData(m)
             d.start(Qt.CopyAction)
 
