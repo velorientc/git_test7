@@ -151,9 +151,9 @@ class RevDisplay(QtGui.QWidget):
             buf += '<td><b>Working Directory</b></td>'
         else:
             desc = format_desc(ctx.description(), 80)
-            buf += '<td><b><span class="rev_number">%d:</span>'\
+            buf += '<td><span class="rev_number">%d:</span>'\
                    '<span class="rev_hash">%s&nbsp;</span>'\
-                   '<span class="short_desc">%s</span></b></td>'\
+                   '<span class="short_desc"><b>%s</b></span></td>'\
                    '\n' % (ctx.rev(), short_hex(ctx.node()), desc)
         buf += '<td width=50 align=right><span class="label">Branch&nbsp;</span></td>'\
                '<td>%s</td>'\
