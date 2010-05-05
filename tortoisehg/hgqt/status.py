@@ -90,6 +90,10 @@ class StatusWidget(QWidget):
             wctx.status(unknown=self.opts.get('unknown', True),
                         clean=self.opts.get('clean', False),
                         ignored=self.opts.get('ignored', False))
+        except AttributeError:
+            # your mercurial source is not new enough, falling back
+            # to triggering implicit status() call.
+            wctx.modified()
         except (OSError, IOError, util.Abort), e:
             self.status_error = str(e)
         self.wctx = wctx
