@@ -292,10 +292,12 @@ def _runcommand(ui, options, cmd, cmdfunc):
     else:
         return checkargs()
 
+mainapp = None
 def qtrun(dlgfunc, ui, *args, **opts):
     portable_fork(ui, opts)
 
-    if QtGui.QApplication.instance():
+    global mainapp
+    if mainapp:
         dlg = dlgfunc(ui, *args, **opts)
         if dlg:
             dlg.show()
