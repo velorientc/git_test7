@@ -98,6 +98,7 @@ class StatusWidget(QWidget):
         self.tv.setModel(tm)
         self.tv.resizeColumnToContents(0)
         self.tv.resizeColumnToContents(1)
+        self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
 
     def rowSelected(self, index):
         pfile = index.model().getPath(index)
@@ -147,6 +148,7 @@ class WctxModel(QAbstractTableModel):
             self.status_error = str(e)
         self.rows = rows
         self.headers = (_('Stat'), _('Filename'))
+        self.checked = [False,] * len(rows)
 
     def rowCount(self, parent):
         return len(self.rows)
@@ -155,13 +157,17 @@ class WctxModel(QAbstractTableModel):
         return len(self.headers)
 
     def data(self, index, role):
-        if not index.isValid() or role != Qt.DisplayRole:
+        if not index.isValid():
             return QVariant()
-        return QVariant(self.rows[index.row()][index.column()])
-
-    def getPath(self, index):
-        assert index.isValid()
-        return self.rows[index.row()][COL_PATH]
+        if role == Qt.DisplayRole:
+            return QVariant(self.rows[index.row()][index.column()])
+        if role == Qt.CheckStateRole and index.column() == COL_STATUS:
+            # also Qt.PartiallyChecked
+            if self.checked[index.row()]:
+                return Qt.Checked
+            else:
+                return Qt.Unchecked
+        return QVariant()
 
     def headerData(self, col, orientation, role):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
@@ -170,7 +176,21 @@ class WctxModel(QAbstractTableModel):
             return QVariant(self.headers[col])
 
     def flags(self, index):
-        return Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        if index.column() == COL_STATUS:
+            flags |= Qt.ItemIsUserCheckable
+        return flags
+
+    # Custom methods
+
+    def getPath(self, index):
+        assert index.isValid()
+        return self.rows[index.row()][COL_PATH]
+
+    def toggleRow(self, index):
+        assert index.isValid()
+        self.checked[index.row()] = not self.checked[index.row()]
+        self.emit(SIGNAL("layoutChanged()"))
 
 
 def run(ui, *pats, **opts):
