@@ -25,6 +25,12 @@ from tortoisehg.util.util import format_desc, xml_escape
 
 from tortoisehg.hgqt.config import HgConfig
 
+headerstyle = '''
+<style type="text/css">
+.rev_number { font-family:Courier; }
+.rev_hash { font-family:Courier; }
+</style>
+'''
 
 class RevDisplay(QtGui.QWidget):
     """
@@ -103,7 +109,8 @@ class RevDisplay(QtGui.QWidget):
     def refreshDisplay(self):
         ctx = self.ctx
         rev = ctx.rev()
-        buf = "<table width=100%>\n"
+        buf = headerstyle
+        buf += "<table width=100%>\n"
         if self.mqpatch:
             buf += '<tr bgcolor=%s>' % HgConfig(ctx._repo.ui).getMQFGColor()
             buf += '<td colspan=3 width=100%><b>Patch queue:</b>&nbsp;'
@@ -145,7 +152,7 @@ class RevDisplay(QtGui.QWidget):
                     p_rev = p_fmt % ('<a href="diff_%s" class="rev_diff">%s</a>' % (p_rev, p_rev), p_rev, short)
                 buf += '<tr><td width=50 class="label"><b>Parent:</b></td>'\
                        '<td colspan=5>%s&nbsp;'\
-                       '<span class="short_desc"><i>%s</i></span></td></tr>'\
+                       '<span class="short_desc">%s</span></td></tr>'\
                        '\n' % (p_rev, desc)
         if len(parents) == 2:
             p = parents[0].ancestor(parents[1])
@@ -160,7 +167,7 @@ class RevDisplay(QtGui.QWidget):
                 p_rev = p_fmt % ('<a href="diff_%s" class="rev_diff">%s</a>' % (p_rev, p_rev), p_rev, short)
             buf += '<tr><td width=50 class="label"><b>Ancestor:</b></td>'\
                    '<td colspan=5>%s&nbsp;'\
-                   '<span class="short_desc"><i>%s</i></span></td></tr>'\
+                   '<span class="short_desc">%s</span></td></tr>'\
                    '\n' % (p_rev, desc)
 
         for p in ctx.children():
@@ -170,7 +177,7 @@ class RevDisplay(QtGui.QWidget):
                 buf += '<tr><td class="label"><b>Child:</b></td>'\
                        '<td colspan=5><span class="rev_number">%d</span>:'\
                        '<a href="%s" class="rev_hash">%s</a>&nbsp;'\
-                       '<span class="short_desc"><i>%s</i></span></td></tr>'\
+                       '<span class="short_desc">%s</span></td></tr>'\
                        '\n' % (p.rev(), p.rev(), short, desc)
 
         buf += "</table>\n"
