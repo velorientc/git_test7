@@ -167,14 +167,16 @@ class RevDisplay(QtGui.QWidget):
 
         if self._expanded:
             buf += '<table width=100%>\n'
-            usr = xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
+
+            user = xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
             buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
-                   '<td>%s</td></tr>\n' %  (labelwidth, 'Author', usr)
-            d = ctx.date()
-            dispt = hglib.displaytime(d)
-            age = hglib.age(d)
+                   '<td>%s</td></tr>\n' %  (labelwidth, 'Author', user)
+
+            date = ctx.date()
+            disptime = hglib.displaytime(date)
+            age = hglib.age(date)
             buf += '<tr><td width=%i align="right"><span class="label">%s&nbsp;</span></td>' \
-                   '<td>%s (%s)</td></tr>\n' % (labelwidth, 'Date', dispt, age)
+                   '<td>%s (%s)</td></tr>\n' % (labelwidth, 'Date', disptime, age)
 
             def cset(ctx, label):
                 short = short_hex(ctx.node())
