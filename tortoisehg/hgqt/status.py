@@ -36,7 +36,6 @@ from PyQt4.QtGui import QTextEdit, QFont
 #  Sorting, filtering of working files
 #  Chunk selection
 #  tri-state checkboxes for commit
-#  Select entire table row when clicked
 #  File type (unknown/deleted) toggles
 
 class StatusWidget(QWidget):
@@ -91,14 +90,16 @@ class StatusWidget(QWidget):
 
     def updateModel(self):
         tm = WctxModel(self.wctx)
+        self.tv.setModel(tm)
         self.tv.setItemsExpandable(False)
         self.tv.setRootIsDecorated(False)
         self.tv.setSortingEnabled(True)
-        self.tv.sortByColumn(1)
-        self.tv.setModel(tm)
-        self.tv.resizeColumnToContents(0)
-        self.tv.resizeColumnToContents(1)
+        self.tv.sortByColumn(COL_PATH_DISPLAY)
+        self.tv.resizeColumnToContents(COL_CHECK)
+        self.tv.resizeColumnToContents(COL_STATUS)
+        self.tv.resizeColumnToContents(COL_PATH_DISPLAY)
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
+        self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
 
     def rowSelected(self, index):
         pfile = index.model().getPath(index)
@@ -117,38 +118,38 @@ class StatusWidget(QWidget):
         self.te.setHtml(o)
 
 
-COL_STATUS = 0
-COL_PATH_DISPLAY = 1
-COL_PATH = 2
+COL_CHECK = 0
+COL_STATUS = 1
+COL_PATH_DISPLAY = 2
+COL_PATH = 3
 
 class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         for m in wctx.modified():
-            rows.append(('M', hglib.tounicode(m), m))
+            rows.append([True, 'M', hglib.tounicode(m), m])
         for a in wctx.added():
-            rows.append(('A', hglib.tounicode(a), a))
+            rows.append([True, 'A', hglib.tounicode(a), a])
         for r in wctx.removed():
-            rows.append(('R', hglib.tounicode(r), r))
+            rows.append([True, 'R', hglib.tounicode(r), r])
         for d in wctx.deleted():
-            rows.append(('!', hglib.tounicode(d), d))
+            rows.append([False, '!', hglib.tounicode(d), d])
         for u in wctx.unknown():
-            rows.append(('?', hglib.tounicode(u), u))
+            rows.append([False, '?', hglib.tounicode(u), u])
         # TODO: wctx.ignored() does not exist
         #for i in wctx.ignored():
-        #    rows.append(('I', hglib.tounicode(i), i))
+        #    rows.append([False, 'I', hglib.tounicode(i), i])
         for c in wctx.clean():
-            rows.append(('C', hglib.tounicode(c), c))
+            rows.append([False, 'C', hglib.tounicode(c), c])
         try:
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
-                    rows.append(('S', hglib.tounicode(s), s))
+                    rows.append([False, 'S', hglib.tounicode(s), s])
         except (OSError, IOError, error.ConfigError), e:
             self.status_error = str(e)
         self.rows = rows
-        self.headers = (_('Stat'), _('Filename'))
-        self.checked = [False,] * len(rows)
+        self.headers = ('*', _('Stat'), _('Filename'))
 
     def rowCount(self, parent):
         return len(self.rows)
@@ -159,14 +160,15 @@ class WctxModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        if role == Qt.DisplayRole:
+        if index.column() == COL_CHECK:
+            if role == Qt.CheckStateRole:
+                # also Qt.PartiallyChecked
+                if self.rows[index.row()][COL_CHECK]:
+                    return Qt.Checked
+                else:
+                    return Qt.Unchecked
+        elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
-        if role == Qt.CheckStateRole and index.column() == COL_STATUS:
-            # also Qt.PartiallyChecked
-            if self.checked[index.row()]:
-                return Qt.Checked
-            else:
-                return Qt.Unchecked
         return QVariant()
 
     def headerData(self, col, orientation, role):
@@ -177,7 +179,7 @@ class WctxModel(QAbstractTableModel):
 
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-        if index.column() == COL_STATUS:
+        if index.column() == COL_CHECK:
             flags |= Qt.ItemIsUserCheckable
         return flags
 
@@ -189,8 +191,14 @@ class WctxModel(QAbstractTableModel):
 
     def toggleRow(self, index):
         assert index.isValid()
-        self.checked[index.row()] = not self.checked[index.row()]
+        row = index.row()
+        self.rows[row][COL_CHECK] = not self.rows[row][COL_CHECK]
         self.emit(SIGNAL("layoutChanged()"))
+
+    def pressedRow(self, index):
+        assert index.isValid()
+        if index.column() == COL_CHECK:
+            self.toggleRow(index)
 
 
 def run(ui, *pats, **opts):
