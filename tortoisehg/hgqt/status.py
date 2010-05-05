@@ -100,8 +100,7 @@ class StatusWidget(QWidget):
         self.tv.resizeColumnToContents(1)
 
     def rowSelected(self, index):
-        pfile = index.sibling(index.row(), 1).data().toString()
-        pfile = hglib.fromunicode(pfile)
+        pfile = index.model().getPath(index)
         wfile = util.pconvert(pfile)
         hu = htmlui.htmlui()
         try:
@@ -117,29 +116,33 @@ class StatusWidget(QWidget):
         self.te.setHtml(o)
 
 
+COL_STATUS = 0
+COL_PATH_DISPLAY = 1
+COL_PATH = 2
+
 class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         for m in wctx.modified():
-            rows.append(('M', m))
+            rows.append(('M', hglib.tounicode(m), m))
         for a in wctx.added():
-            rows.append(('A', a))
+            rows.append(('A', hglib.tounicode(a), a))
         for r in wctx.removed():
-            rows.append(('R', r))
+            rows.append(('R', hglib.tounicode(r), r))
         for d in wctx.deleted():
-            rows.append(('!', d))
+            rows.append(('!', hglib.tounicode(d), d))
         for u in wctx.unknown():
-            rows.append(('?', u))
+            rows.append(('?', hglib.tounicode(u), u))
         # TODO: wctx.ignored() does not exist
         #for i in wctx.ignored():
-        #    rows.append(('I', i))
+        #    rows.append(('I', hglib.tounicode(i), i))
         for c in wctx.clean():
-            rows.append(('C', c))
+            rows.append(('C', hglib.tounicode(c), c))
         try:
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
-                    rows.append(('S', s))
+                    rows.append(('S', hglib.tounicode(s), s))
         except (OSError, IOError, error.ConfigError), e:
             self.status_error = str(e)
         self.rows = rows
@@ -149,12 +152,16 @@ class WctxModel(QAbstractTableModel):
         return len(self.rows)
 
     def columnCount(self, parent):
-        return 2
+        return len(self.headers)
 
     def data(self, index, role):
         if not index.isValid() or role != Qt.DisplayRole:
             return QVariant()
         return QVariant(self.rows[index.row()][index.column()])
+
+    def getPath(self, index):
+        assert index.isValid()
+        return self.rows[index.row()][COL_PATH]
 
     def headerData(self, col, orientation, role):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
