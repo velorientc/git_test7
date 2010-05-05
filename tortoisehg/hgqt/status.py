@@ -138,14 +138,14 @@ COL_PATH_DISPLAY = 2
 COL_PATH = 3
 
 tips = {
-       'M': _('%s is modified'),
-       'A': _('%s is added'),
-       'R': _('%s is removed'),
-       '?': _('%s is not tracked (unknown)'),
-       '!': _('%s is missing!'),
-       'I': _('%s is ignored'),
-       'C': _('%s is not modified (clean)'),
-       'S': _('%s is a dirty subrepo'),
+   'M': _('%s is modified'),
+   'A': _('%s is added'),
+   'R': _('%s is removed'),
+   '?': _('%s is not tracked (unknown)'),
+   '!': _('%s is missing!'),
+   'I': _('%s is ignored'),
+   'C': _('%s is not modified (clean)'),
+   'S': _('%s is a dirty subrepo'),
 }
 
 class WctxModel(QAbstractTableModel):
