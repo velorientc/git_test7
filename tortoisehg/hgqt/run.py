@@ -337,6 +337,11 @@ def clone(ui, *pats, **opts):
     from tortoisehg.hgqt.clone import run
     qtrun(run, ui, *pats, **opts)
 
+def email(ui, *pats, **opts):
+    """send changesets by email"""
+    from tortoisehg.hgqt.hgemail import run
+    qtrun(run, ui, *pats, **opts)
+
 def test(ui, *pats, **opts):
     """test arbitrary widgets"""
     from tortoisehg.hgqt.status import run
@@ -594,6 +599,7 @@ table = {
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
+    "email": (email, [], _('thg email [REVS]')),
     "^log|history|explorer": (log,
         [('l', 'limit', '', _('limit number of changes displayed'))],
         _('thg log [OPTIONS] [FILE]')),
