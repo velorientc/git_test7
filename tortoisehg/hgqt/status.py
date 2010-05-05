@@ -38,6 +38,8 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor
 #  Chunk selection
 #  tri-state checkboxes for commit
 #  File type (unknown/deleted) toggles
+#  Investigate Qt.DecorationRole and possible use of overlay icons
+#  Investigate folding/nesting of files
 
 class StatusWidget(QWidget):
     def __init__(self, pats, parent=None):
