@@ -39,7 +39,8 @@ except ImportError, e:
 _ui = ui.ui()
 capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
 
-errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError')
+errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError',
+          'NotImplementedError')
 
 if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
     sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
