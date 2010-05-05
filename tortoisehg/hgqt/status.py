@@ -11,9 +11,9 @@ from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel
-from PyQt4.QtCore import QObject, QEvent
+from PyQt4.QtCore import QObject, QEvent, QMimeData, QPoint
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView
-from PyQt4.QtGui import QTextEdit, QFont, QColor
+from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -65,9 +65,8 @@ class StatusWidget(QWidget):
         layout.addWidget(split)
         self.setLayout(layout)
 
-        self.tv = QTreeView(split)
+        self.tv = WctxFileTree(split)
         self.connect(self.tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
-        self.tv.installEventFilter(TvEventFilter(self))
 
         self.te = QTextEdit(split)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -133,16 +132,31 @@ class StatusWidget(QWidget):
         self.te.setHtml(o)
 
 
-class TvEventFilter(QObject):
-    '''Event filter for our QTreeView'''
-    def __init__(self, parent):
-        QObject.__init__(self, parent)
-    def eventFilter(self, treeview, event):
-        if event.type() == QEvent.KeyPress and event.key() == 32:
-            for index in treeview.selectedIndexes():
-                treeview.model().toggleRow(index)
-            return True
-        return treeview.eventFilter(treeview, event)
+class WctxFileTree(QTreeView):
+    def __init__(self, parent=None):
+        QTreeView.__init__(self, parent)
+
+    def keyPressEvent(self, event):
+        if event.key() == 32:
+            for index in self.selectedIndexes():
+                self.model().toggleRow(index)
+
+    def dragObject(self):
+        rows = set()
+        fnames = []
+        for index in self.selectedIndexes():
+            if index.row() not in rows:
+                rows.add(index.row())
+                fnames.append(self.model().getPath(index))
+        if rows:
+            d = QDrag(self)
+            m = QMimeData()
+            m.setText(', '.join(fnames))
+            d.setMimeData(m)
+            d.start(Qt.CopyAction)
+
+    def mouseMoveEvent(self, event):
+        self.dragObject()
 
 
 COL_CHECK = 0
@@ -236,7 +250,7 @@ class WctxModel(QAbstractTableModel):
             return QVariant(self.headers[col])
 
     def flags(self, index):
-        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
         if index.column() == COL_CHECK:
             flags |= Qt.ItemIsUserCheckable
         return flags
