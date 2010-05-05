@@ -19,7 +19,6 @@ _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
 
 from tortoisehg.util import paths
-from tortoisehg.util.i18n import _
 from tortoisehg.util.hgversion import hgversion
 
 def tounicode(s):
