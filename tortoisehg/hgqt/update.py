@@ -187,5 +187,5 @@ def run(ui, *pats, **opts):
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
-        rev = [pats[0]]
+        rev = pats[0]
     return UpdateDialog(rev, opts=opts)
