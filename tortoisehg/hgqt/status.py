@@ -86,6 +86,14 @@ class StatusWidget(QWidget):
         self.refreshWctx()
         self.updateModel()
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_F5:
+            self.te.clear()
+            self.refreshWctx()
+            self.updateModel()
+        else:
+            return super(StatusWidget, self).keyPressEvent(event)
+
     def refreshWctx(self):
         hglib.invalidaterepo(self.repo)
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
