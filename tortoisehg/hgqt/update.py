@@ -117,6 +117,11 @@ class UpdateDialog(QDialog):
         self.update_btn = buttons.addButton(_('&Update'),
                                             QDialogButtonBox.ActionRole)
         self.update_btn.clicked.connect(self.update_clicked)
+        self.detail_btn = buttons.addButton(_('Detail'),
+                                            QDialogButtonBox.ResetRole)
+        self.detail_btn.setAutoDefault(False)
+        self.detail_btn.setCheckable(True)
+        self.detail_btn.toggled.connect(self.detail_toggled)
         box.addWidget(buttons)
 
         # signal handlers
@@ -133,6 +138,7 @@ class UpdateDialog(QDialog):
         self.rev_combo.lineEdit().selectAll()
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
+        self.detail_btn.setHidden(True)
         self.update_info()
 
     ### Private Methods ###
@@ -164,6 +170,9 @@ class UpdateDialog(QDialog):
     def cancel_clicked(self):
         self.cmd.cancel()
 
+    def detail_toggled(self, checked):
+        self.cmd.show_output(checked)
+
     def command_started(self):
         self.cmd.setShown(True)
         if self.showlog_chk.isChecked():
@@ -171,6 +180,7 @@ class UpdateDialog(QDialog):
         self.update_btn.setHidden(True)
         self.close_btn.setHidden(True)
         self.cancel_btn.setShown(True)
+        self.detail_btn.setShown(True)
 
     def command_finished(self, wrapper):
         if wrapper.data is not 0 or self.cmd.is_show_output():
