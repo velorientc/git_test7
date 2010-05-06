@@ -22,16 +22,17 @@ def check_max_diff(ctx, wfile):
     lines = []
     try:
         fctx = ctx.filectx(wfile)
-    except error.LookupError:
+        size = fctx.size()
+    except (EnvironmentError, error.LookupError):
         fctx = None
-    if fctx and fctx.size() > hglib.getmaxdiffsize(ctx._repo.ui):
+    if fctx and size > hglib.getmaxdiffsize(ctx._repo.ui):
         # Fake patch that displays size warning
         lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
         lines.append(_('File is larger than the specified max size.\n'))
         lines.append(_('Hunk selection is disabled for this file.\n'))
         lines.append('--- a/%s\n' % wfile)
         lines.append('+++ b/%s\n' % wfile)
-    elif '\0' in fctx.data():
+    elif fctx and '\0' in fctx.data():
         # Fake patch that displays binary file warning
         lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
         lines.append(_('File is binary.\n'))
