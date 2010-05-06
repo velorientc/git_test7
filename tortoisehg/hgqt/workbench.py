@@ -443,7 +443,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def updateToRevision(self, rev):
         opts = {}
-        dlg = UpdateDialog(rev, self.repo, opts=opts)
+        dlg = UpdateDialog(rev, self.repo, self, opts=opts)
         dlg.show()
         self._updatedlg = dlg
 
