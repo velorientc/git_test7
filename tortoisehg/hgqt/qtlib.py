@@ -5,9 +5,10 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from PyQt4 import QtGui
+from PyQt4 import QtCore, QtGui
 from mercurial import extensions
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 # _styles maps from ui labels to effects
@@ -62,4 +63,22 @@ def geteffect(labels):
                     effects.append('bgcolor: ' + e)
     return ';'.join(effects)
 
+NAME_MAP = {
+    'fg': 'color', 'bg': 'background-color', 'family': 'font-family',
+    'size': 'font-size', 'weight': 'font-weight', 'space': 'white-space',
+    'style': 'font-style', 'decoration': 'text-decoration',
+}
 
+def markup(msg, **styles):
+    style = []
+    for name, value in styles.items():
+        if not value:
+            continue
+        if NAME_MAP.has_key(name):
+            name = NAME_MAP[name]
+        style.append('%s: %s' % (name, value))
+    style = ';'.join(style)
+    msg = hglib.tounicode(msg)
+    msg = QtCore.Qt.escape(msg)
+    msg = msg.replace('\n', '<br />')
+    return '<font style="%s">%s</font>' % (style, msg)
