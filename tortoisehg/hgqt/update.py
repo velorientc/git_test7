@@ -156,9 +156,6 @@ class UpdateDialog(QDialog):
 
     ### Signal Handlers ###
 
-    def target_changed(self, target):
-        self.update_info()
-
     def update_clicked(self):
         self.cmd.run(['update', hglib.fromunicode(self.rev_combo.currentText())])
 
