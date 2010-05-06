@@ -130,8 +130,8 @@ class UpdateDialog(QDialog):
         self.setWindowTitle(_('Update - %s') % hglib.get_reponame(self.repo))
 
         # prepare to show
+        self.rev_combo.lineEdit().selectAll()
         self.cmd.setHidden(True)
-        self.update_btn.setFocus()
         self.cancel_btn.setHidden(True)
         self.update_info()
 
