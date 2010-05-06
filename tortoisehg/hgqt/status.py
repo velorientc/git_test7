@@ -15,7 +15,7 @@ from tortoisehg.util.i18n import _
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel
 from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView
-from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
+from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QAction, QMenu
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -62,7 +62,7 @@ class StatusWidget(QWidget):
         layout.addWidget(split)
         self.setLayout(layout)
 
-        self.tv = WctxFileTree(root, split)
+        self.tv = WctxFileTree(self.repo, split)
         self.connect(self.tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
 
         self.te = QTextEdit(split)
@@ -189,9 +189,12 @@ class StatusWidget(QWidget):
 
 
 class WctxFileTree(QTreeView):
-    def __init__(self, root, parent=None):
+    def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
-        self.root = root
+        self.repo = repo
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
+                     self.customContextMenuRequested)
 
     def keyPressEvent(self, event):
         if event.key() == 32:
@@ -208,7 +211,7 @@ class WctxFileTree(QTreeView):
                 rows.add(index.row())
                 path = self.model().getPath(index)
                 u = QUrl()
-                u.setPath('file://' + os.path.join(self.root, path))
+                u.setPath('file://' + os.path.join(self.repo.root, path))
                 urls.append(u)
         if rows:
             d = QDrag(self)
@@ -219,6 +222,102 @@ class WctxFileTree(QTreeView):
 
     def mouseMoveEvent(self, event):
         self.dragObject()
+
+    def customContextMenuRequested(self, point):
+        rows = set()
+        selstats = set()
+        selrows = []
+        for index in self.selectedIndexes():
+            if index.row() not in rows:
+                rows.add(index.row())
+                r = self.model().getRow(index)
+                selrows.append(r)
+                selstats.add(r[COL_STATUS])
+                selstats.add(r[COL_MERGE_STATE].lower())
+        if not selrows:
+            return None
+
+        def vdiff(files):
+            print 'vdiff', files
+        def edit(files):
+            print 'edit'
+        def viewmissing(files):
+            print 'viewmissing'
+        def other(files):
+            print 'other'
+        def revert(files):
+            print 'revert'
+        def log(files):
+            print 'log'
+        def forget(files):
+            print 'forget'
+        def add(files):
+            print 'add'
+        def guess_rename(files):
+            print 'guess_rename'
+        def ignore(files):
+            print 'ignore'
+        def remove(files):
+            print 'remove'
+        def delete(files):
+            print 'delete'
+        def copy(files):
+            print 'copy'
+        def rename(files):
+            print 'rename'
+        def resolve(files):
+            print 'resolve'
+        def unmark(files):
+            print 'unmark'
+        def mark(files):
+            print 'mark'
+        def resolve_with(tool, files):
+            print 'resolve_with', tool
+
+        menu = QMenu()
+        def make(text, func, types, icon=None, test=True):
+            if not test or not (frozenset(types) & selstats):
+                return None
+            action = menu.addAction(text)
+            if icon:
+                action.setIcon(icon)
+            files = [r[COL_PATH] for r in selrows if r[COL_STATUS] in types or \
+                                        r[COL_MERGE_STATE].lower() in types]
+            action.wrapper = lambda files=files: func(files)
+            self.connect(action, SIGNAL('triggered()'), action.wrapper)
+            return action
+        make(_('&Visual Diff'), vdiff, 'MAR!ru')
+        make(_('Edit'), edit, 'MACI?ru')
+        make(_('View missing'), viewmissing, 'R!')
+        make(_('View other'), other, 'MAru', None, len(self.repo.parents())>1)
+        menu.addSeparator()
+        make(_('&Revert'), revert, 'MAR!ru')
+        menu.addSeparator()
+        make(_('L&og'), log, 'MARC!ru')
+        menu.addSeparator()
+        make(_('&Forget'), forget, 'MAC!ru')
+        make(_('&Add'), add, 'I?')
+        make(_('&Guess Rename...'), guess_rename, '?!')
+        make(_('&Ignore'), ignore, '?')
+        make(_('Remove versioned'), remove, 'C')
+        make(_('&Delete unversioned'), delete, '?I')
+        if len(selrows) == 1:
+            menu.addSeparator()
+            make(_('&Copy...'), copy, 'MC')
+            make(_('Rename...'), rename, 'MC')
+        menu.addSeparator()
+        make(_('Mark unresolved'), unmark, 'r')
+        make(_('Mark resolved'), mark, 'u')
+        f = make(_('Restart Merge...'), resolve, 'u')
+        if f:
+            files = [r[COL_PATH] for r in selrows if r[COL_MERGE_STATE] == 'U']
+            rmenu = QMenu(_('Restart merge with'))
+            for tool in hglib.mergetools(self.repo.ui):
+                action = rmenu.addAction(tool)
+                action.wrapper = lambda tool=tool: resolve_with(tool, files)
+                self.connect(action, SIGNAL('triggered()'), action.wrapper)
+            menu.addMenu(rmenu)
+        menu.exec_(point)
 
 
 COL_CHECK = 0
@@ -345,6 +444,10 @@ class WctxModel(QAbstractTableModel):
     def getPath(self, index):
         assert index.isValid()
         return self.rows[index.row()][COL_PATH]
+
+    def getRow(self, index):
+        assert index.isValid()
+        return self.rows[index.row()]
 
     def toggleRow(self, index):
         'Connected to "activated" signal, emitted by dbl-click or enter'
