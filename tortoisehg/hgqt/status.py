@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, hg, util, patch, cmdutil, error, mdiff, context
+from mercurial import ui, hg, util, patch, cmdutil, error, mdiff, context, merge
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
@@ -21,7 +21,6 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # working copy browser.
 
 # Technical Debt
-#  Show merge status column, when appropriate
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Need mechanisms to clear pats and toggle visibility options
@@ -46,6 +45,7 @@ class StatusWidget(QWidget):
         self.opts = dict(unknown=True, clean=False, ignored=False)
         self.opts.update(opts)
         self.pats = pats
+        self.ms = {}
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -95,6 +95,7 @@ class StatusWidget(QWidget):
 
     def refreshWctx(self):
         hglib.invalidaterepo(self.repo)
+        self.ms = merge.mergestate(self.repo)
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
         stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
         if self.pats:
@@ -117,15 +118,15 @@ class StatusWidget(QWidget):
         return bool(self.wctx.p2())
 
     def updateModel(self):
-        tm = WctxModel(self.wctx, self.opts)
+        tm = WctxModel(self.wctx, self.ms, self.opts)
         self.tv.setModel(tm)
         self.tv.setItemsExpandable(False)
         self.tv.setRootIsDecorated(False)
         self.tv.setSortingEnabled(True)
         self.tv.sortByColumn(COL_PATH_DISPLAY)
-        self.tv.resizeColumnToContents(COL_CHECK)
-        self.tv.resizeColumnToContents(COL_STATUS)
-        self.tv.resizeColumnToContents(COL_PATH_DISPLAY)
+        for col in xrange(COL_PATH):
+            self.tv.resizeColumnToContents(col)
+        self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
 
@@ -222,8 +223,9 @@ class WctxFileTree(QTreeView):
 
 COL_CHECK = 0
 COL_STATUS = 1
-COL_PATH_DISPLAY = 2
-COL_PATH = 3
+COL_MERGE_STATE = 2
+COL_PATH_DISPLAY = 3
+COL_PATH = 4
 
 tips = {
    'M': _('%s is modified'),
@@ -250,34 +252,38 @@ color_labels = {
 colors = {}
 
 class WctxModel(QAbstractTableModel):
-    def __init__(self, wctx, opts, parent=None):
+    def __init__(self, wctx, ms, opts, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         for m in wctx.modified():
-            rows.append([True, 'M', hglib.tounicode(m), m])
+            mst = m in ms and ms[m].upper() or ""
+            rows.append([True, 'M', mst, hglib.tounicode(m), m])
         for a in wctx.added():
-            rows.append([True, 'A', hglib.tounicode(a), a])
+            mst = a in ms and ms[a].upper() or ""
+            rows.append([True, 'A', mst, hglib.tounicode(a), a])
         for r in wctx.removed():
-            rows.append([True, 'R', hglib.tounicode(r), r])
+            mst = r in ms and ms[r].upper() or ""
+            rows.append([True, 'R', mst, hglib.tounicode(r), r])
         for d in wctx.deleted():
-            rows.append([False, '!', hglib.tounicode(d), d])
+            mst = d in ms and ms[d].upper() or ""
+            rows.append([False, '!', mst, hglib.tounicode(d), d])
         if opts['unknown']:
             for u in wctx.unknown():
-            	rows.append([False, '?', hglib.tounicode(u), u])
+            	rows.append([False, '?', '', hglib.tounicode(u), u])
         if opts['ignored']:
             for i in wctx.ignored():
-            	rows.append([False, 'I', hglib.tounicode(i), i])
+            	rows.append([False, 'I', '', hglib.tounicode(i), i])
         if opts['clean']:
             for c in wctx.clean():
-            	rows.append([False, 'C', hglib.tounicode(c), c])
+            	rows.append([False, 'C', '', hglib.tounicode(c), c])
         try:
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
-                    rows.append([False, 'S', hglib.tounicode(s), s])
+                    rows.append([False, 'S', '', hglib.tounicode(s), s])
         except (OSError, IOError, error.ConfigError), e:
             self.status_error = str(e)
+        self.headers = ('*', _('Stat'), _('M'), _('Filename'))
         self.rows = rows
-        self.headers = ('*', _('Stat'), _('Filename'))
 
     def rowCount(self, parent):
         return len(self.rows)
@@ -298,12 +304,17 @@ class WctxModel(QAbstractTableModel):
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
 
-        checked, status, upath, path = self.rows[index.row()]
+        checked, status, mst, upath, path = self.rows[index.row()]
         if role == Qt.TextColorRole:
             return colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
             if status in tips:
-                return QVariant(tips[status] % upath)
+                tip = tips[status] % upath
+                if mst == 'R':
+                    tip += _(', resolved merge')
+                elif mst == 'U':
+                    tip += _(', unresolved merge')
+                return QVariant(tip)
         return QVariant()
 
     def headerData(self, col, orientation, role):
@@ -319,6 +330,12 @@ class WctxModel(QAbstractTableModel):
         return flags
 
     # Custom methods
+
+    def anyMerge(self):
+        for r in self.rows:
+            if r[COL_MERGE_STATE]:
+                return True
+        return False
 
     def getPath(self, index):
         assert index.isValid()
