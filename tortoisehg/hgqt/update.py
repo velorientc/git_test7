@@ -164,12 +164,14 @@ class UpdateDialog(QDialog):
 
     def command_started(self):
         self.cmd.setShown(True)
+        if self.showlog_chk.isVisible():
+            self.cmd.show_output(True)
         self.update_btn.setHidden(True)
         self.close_btn.setHidden(True)
         self.cancel_btn.setShown(True)
 
     def command_finished(self, wrapper):
-        if wrapper.data is not 0:
+        if wrapper.data is not 0 or self.cmd.is_show_output():
             self.cmd.show_output(True)
             self.close_btn.setShown(True)
             self.cancel_btn.setHidden(True)
