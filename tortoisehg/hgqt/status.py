@@ -162,6 +162,8 @@ class WctxFileTree(QTreeView):
         if event.key() == 32:
             for index in self.selectedIndexes():
                 self.model().toggleRow(index)
+        else:
+            return super(WctxFileTree, self).keyPressEvent(event)
 
     def dragObject(self):
         rows = set()
