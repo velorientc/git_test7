@@ -10,7 +10,7 @@ import os
 import binascii
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QTextEdit, QWidget, QFrame, QPalette, QColor, QSizePolicy
+from PyQt4.QtGui import QTextEdit, QWidget, QFrame, QPalette, QTextBrowser
 
 from mercurial import patch, util, error
 from mercurial.node import hex
@@ -585,18 +585,19 @@ class SummaryPanel(SummaryBase, QWidget):
 
 LABEL_PAT = re.compile(r'(?:(?<=%%)|(?<!%)%\()(\w+)(?:\)s)')
 
-class SummaryLabel(SummaryBase, QTextEdit):
+class SummaryLabel(SummaryBase, QTextBrowser):
 
     def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)
-        QTextEdit.__init__(self)
+        QTextBrowser.__init__(self)
 
-        self.setReadOnly(True)
         self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
         palette = self.palette()
         color = palette.color(QPalette.Disabled, QPalette.Window)
-        self.setStyleSheet('QTextEdit { background-color: rgb(%s, %s, %s); }' % (color.red(), color.green(), color.blue()))
-        self.setFixedHeight(34)
+        css = 'QTextBrowser { background-color: rgb(%s, %s, %s); }' % \
+                (color.red(), color.green(), color.blue())
+        self.setStyleSheet(css)
+        self.setFixedHeight(32)
         self.document().setDefaultStyleSheet('* { white-space: pre }')
         self.document().setDocumentMargin(0.0)
         self.csstyle = style
