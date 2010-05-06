@@ -20,7 +20,7 @@ from tortoisehg.hgqt import cmdui, csinfo
 
 class UpdateDialog(QDialog):
 
-    def __init__(self, rev=None, repo=None, parent=None):
+    def __init__(self, rev=None, repo=None, parent=None, opts=None):
         super(UpdateDialog, self).__init__(parent, Qt.WindowTitleHint or
                                                    Qt.WindowSystemMenuHint)
 
@@ -97,6 +97,8 @@ class UpdateDialog(QDialog):
         optbox.addWidget(self.discard_chk)
         optbox.addWidget(self.merge_chk)
         optbox.addWidget(self.showlog_chk)
+
+        self.discard_chk.setChecked(bool(opts.get('clean', False)))
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -186,4 +188,4 @@ def run(ui, *pats, **opts):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = [pats[0]]
-    return UpdateDialog(rev)
+    return UpdateDialog(rev, opts=opts)
