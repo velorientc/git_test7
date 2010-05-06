@@ -600,9 +600,10 @@ table = {
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
     "email": (email, [], _('thg email [REVS]')),
-    "^log|history|explorer": (log,
-        [('l', 'limit', '', _('limit number of changes displayed'))],
-        _('thg log [OPTIONS] [FILE]')),
+    "^log|history|explorer|workbench":
+        (log,
+         [('l', 'limit', '', _('limit number of changes displayed'))],
+         _('thg log [OPTIONS] [FILE]')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":
