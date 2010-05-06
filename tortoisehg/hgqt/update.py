@@ -9,8 +9,7 @@
 
 from PyQt4.QtCore import QString, Qt
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout
-from PyQt4.QtGui import QComboBox, QLabel, QLayout, QSpacerItem, QCheckBox
-from PyQt4.QtGui import QPushButton
+from PyQt4.QtGui import QComboBox, QLabel, QLayout, QCheckBox, QMessageBox
 
 from mercurial import hg, ui, error
 
@@ -116,7 +115,7 @@ class UpdateDialog(QDialog):
         self.close_btn.setAutoDefault(False)
         self.update_btn = buttons.addButton(_('&Update'),
                                             QDialogButtonBox.ActionRole)
-        self.update_btn.clicked.connect(self.update_clicked)
+        self.update_btn.clicked.connect(self.update)
         self.detail_btn = buttons.addButton(_('Detail'),
                                             QDialogButtonBox.ResetRole)
         self.detail_btn.setAutoDefault(False)
@@ -126,7 +125,7 @@ class UpdateDialog(QDialog):
 
         # signal handlers
         self.rev_combo.editTextChanged.connect(lambda *a: self.update_info())
-        self.rev_combo.lineEdit().returnPressed.connect(self.update_clicked)
+        self.rev_combo.lineEdit().returnPressed.connect(self.update)
         self.discard_chk.toggled.connect(lambda *a: self.update_info())
 
         # dialog setting
@@ -162,10 +161,84 @@ class UpdateDialog(QDialog):
             self.target_info.setPlainText(_('unknown revision!'))
             self.update_btn.setDisabled(True)
 
-    ### Signal Handlers ###
+    def update(self):
+        cmdline = ['update', '--verbose']
+        rev = hglib.fromunicode(self.rev_combo.currentText())
+        cmdline.append('--rev')
+        cmdline.append(rev)
 
-    def update_clicked(self):
-        self.cmd.run(['update', hglib.fromunicode(self.rev_combo.currentText())])
+        if self.discard_chk.isChecked():
+            cmdline.append('--clean')
+        else:
+            cur = self.repo['.']
+            node = self.repo[rev]
+            def isclean():
+                '''whether WD is changed'''
+                wc = self.repo[None]
+                return not (wc.modified() or wc.added() or wc.removed())
+            def ismergedchange():
+                '''whether the local changes are merged (have 2 parents)'''
+                wc = self.repo[None]
+                return len(wc.parents()) == 2
+            def iscrossbranch(p1, p2):
+                '''whether p1 -> p2 crosses branch'''
+                pa = p1.ancestor(p2)
+                return p1.branch() != p2.branch() or (p1 != pa and p2 != pa)
+            def islocalmerge(p1, p2, clean=None):
+                if clean is None:
+                    clean = isclean()
+                pa = p1.ancestor(p2)
+                return not clean and (p1 == pa or p2 == pa)
+            def confirmupdate(clean=None):
+                if clean is None:
+                    clean = isclean()
+
+                msg = _('Detected uncommitted local changes in working tree.\n'
+                        'Please select to continue:\n\n')
+                data = {'discard': (_('&Discard'),
+                                    _('Discard - discard local changes, no backup')),
+                        'patch': (_('&Patch'),
+                                  _('Patch - move local changes to MQ patch')),
+                        'merge': (_('&Merge'),
+                                  _('Merge - allow to merge with local changes')),}
+
+                opts = [data['discard']]
+                if not ismergedchange():
+                    opts.append(data['patch'])
+                if islocalmerge(cur, node, clean):
+                    opts.append(data['merge'])
+
+                msg += '\n'.join([desc for label, desc in opts if desc])
+                dlg = QMessageBox(QMessageBox.Question, _('Confirm Update'),
+                                  msg, QMessageBox.Cancel, self)
+                buttons = {}
+                for name in ('discard', 'patch', 'merge'):
+                    label, desc = data[name]
+                    buttons[name] = dlg.addButton(label, QMessageBox.ActionRole)
+                dlg.exec_()
+                return buttons, dlg.clickedButton()
+
+            # If merge-by-default, we want to merge whenever possible,
+            # without prompting user (similar to command-line behavior)
+            defaultmerge = self.merge_chk.isChecked()
+            clean = isclean()
+            if clean:
+                cmdline.append('--check')
+            elif not (defaultmerge and islocalmerge(cur, node, clean)):
+                buttons, clicked = confirmupdate(clean)
+                if buttons['discard'] == clicked:
+                    cmdline.append('--clean')
+                elif buttons['patch'] == clicked:
+                    return # TODO: not implemented yet
+                elif buttons['merge'] == clicked:
+                    pass # no args
+                else:
+                    return
+
+        # start updating
+        self.cmd.run(cmdline)
+
+    ### Signal Handlers ###
 
     def cancel_clicked(self):
         self.cmd.cancel()
@@ -176,7 +249,7 @@ class UpdateDialog(QDialog):
     def command_started(self):
         self.cmd.setShown(True)
         if self.showlog_chk.isChecked():
-            self.cmd.show_output(True)
+            self.detail_btn.setChecked(True)
         self.update_btn.setHidden(True)
         self.close_btn.setHidden(True)
         self.cancel_btn.setShown(True)
@@ -184,8 +257,10 @@ class UpdateDialog(QDialog):
 
     def command_finished(self, wrapper):
         if wrapper.data is not 0 or self.cmd.is_show_output():
-            self.cmd.show_output(True)
+            self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
+            self.close_btn.setAutoDefault(True)
+            self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:
             self.reject()
