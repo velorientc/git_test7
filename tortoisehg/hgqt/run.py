@@ -599,7 +599,7 @@ table = {
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
-    "email": (email, [], _('thg email [REVS]')),
+    "^email": (email, [], _('thg email [REVS]')),
     "^log|history|explorer|workbench":
         (log,
          [('l', 'limit', '', _('limit number of changes displayed'))],
