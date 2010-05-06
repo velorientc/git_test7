@@ -28,6 +28,7 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel, HgFileListModel
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestdialog import ManifestDialog
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
+from tortoisehg.hgqt.update import UpdateDialog
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.helpdialog import HelpDialog
 from tortoisehg.hgqt import cmdui
@@ -441,10 +442,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self._manifestdlg.show()
 
     def updateToRevision(self, rev):
-        print "workbench: updateToRevision called, rev=%s" % rev
-        args = ['update']
-        args += ['-r', str(rev)]
-        dlg = cmdui.Dialog(args)
+        opts = {}
+        dlg = UpdateDialog(rev, self.repo, opts=opts)
         dlg.show()
         self._updatedlg = dlg
 
