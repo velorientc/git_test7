@@ -7,7 +7,7 @@
 
 from PyQt4.QtCore import Qt, QObject, pyqtSignal
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QLabel, QProgressBar
-from PyQt4.QtGui import QTextEdit, QHBoxLayout, QGridLayout, QMessageBox
+from PyQt4.QtGui import QTextBrowser, QHBoxLayout, QGridLayout, QMessageBox
 from PyQt4.QtGui import QWidget, QVBoxLayout
 
 from tortoisehg.util import hglib
@@ -75,8 +75,7 @@ class Core(QObject):
         super(Core, self).__init__()
 
         self.thread = None
-        self.output_text = QTextEdit()
-        self.output_text.setReadOnly(True)
+        self.output_text = QTextBrowser()
         self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.pmon = None
 
