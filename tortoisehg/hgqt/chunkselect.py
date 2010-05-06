@@ -13,7 +13,8 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, commands, util, cmdutil, mdiff, error, patch
 
-from tortoisehg.util import hgshelve
+from tortoisehg.util import hgshelve, hglib
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt.htmllistview import HtmlListView
 from tortoisehg.hgqt import htmlui
 

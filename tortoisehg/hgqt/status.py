@@ -8,7 +8,7 @@
 import os
 
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff, context
-from tortoisehg.hgqt import qtlib, htmlui
+from tortoisehg.hgqt import qtlib, htmlui, chunkselect
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
@@ -21,12 +21,14 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # working copy browser.
 
 # Technical Debt
-#  Handle large files, binary files, subrepos better
+#  Show diffs to both parents, when applicable
+#  Show merge status column, when appropriate
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Need mechanisms to clear pats and toggle visibility options
+#  Need mechanism to override file size/binary check
+#  Show subrepos better
 #  Save splitter position to parent's QSetting
-#  Show merge status column, when appropriate
 #  Context menu, toolbar
 #  Sorting, filtering of working files
 #  Chunk selection
@@ -124,6 +126,13 @@ class StatusWidget(QWidget):
         'Connected to treeview "clicked" signal'
         pfile = index.model().getPath(index)
         wfile = util.pconvert(pfile)
+
+        warnings = chunkselect.check_max_diff(self.wctx, wfile)
+        if warnings:
+            text = '<b>Diffs not displayed: %s</b>' % warnings[1]
+            self.te.setHtml(text)
+            return
+
         hu = htmlui.htmlui()
         try:
             m = cmdutil.matchfiles(self.repo, [wfile])
