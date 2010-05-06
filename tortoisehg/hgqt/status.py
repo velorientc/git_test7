@@ -77,10 +77,10 @@ class StatusWidget(QWidget):
 
         if not parent:
             self.setWindowTitle(_('TortoiseHg Status'))
-            self.resize(650, 400)
-            # 60% for diff pane
-            split.setStretchFactor(0, 2)
-            split.setStretchFactor(1, 5)
+            self.resize(800, 500)
+            # 75% for diff pane
+            split.setStretchFactor(0, 1)
+            split.setStretchFactor(1, 2)
 
         self.refreshWctx()
         self.updateModel()
