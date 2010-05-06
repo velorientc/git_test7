@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
+from mercurial import ui, hg, util, patch, cmdutil, error, mdiff, context
 from tortoisehg.hgqt import qtlib, htmlui
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
@@ -21,7 +21,6 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # working copy browser.
 
 # Technical Debt
-#  filter using pats
 #  Handle large files, binary files, subrepos better
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
@@ -36,14 +35,16 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 #  Investigate folding/nesting of files
 
 class StatusWidget(QWidget):
-    def __init__(self, pats, parent=None, **opts):
+    def __init__(self, pats, opts, parent=None):
         QWidget.__init__(self, parent)
 
         root = paths.find_root()
         assert(root)
         self.repo = hg.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
-        self.opts = opts
+        self.opts = dict(unknown=True, clean=False, ignored=False)
+        self.opts.update(opts)
+        self.pats = pats
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -85,11 +86,16 @@ class StatusWidget(QWidget):
 
     def refreshWctx(self):
         hglib.invalidaterepo(self.repo)
+        extract = lambda x, y: dict(zip(x, map(y.get, x)))
+        stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
+        if self.pats:
+            m = cmdutil.match(self.repo, self.pats)
+            status = self.repo.status(match=m, **stopts)
+            self.wctx = context.workingctx(self.repo, changes=status)
+            return
         wctx = self.repo[None]
         try:
-            wctx.status(unknown=self.opts.get('unknown', True),
-                        clean=self.opts.get('clean', False),
-                        ignored=self.opts.get('ignored', False))
+            wctx.status(**stopts)
         except AttributeError:
             # your mercurial source is not new enough, falling back
             # to triggering implicit status() call.
@@ -210,13 +216,13 @@ class WctxModel(QAbstractTableModel):
             rows.append([True, 'R', hglib.tounicode(r), r])
         for d in wctx.deleted():
             rows.append([False, '!', hglib.tounicode(d), d])
-        if opts.get('unknown', True):
+        if opts['unknown']:
             for u in wctx.unknown():
             	rows.append([False, '?', hglib.tounicode(u), u])
-        if opts.get('ignored', False):
+        if opts['ignored']:
             for i in wctx.ignored():
             	rows.append([False, 'I', hglib.tounicode(i), i])
-        if opts.get('clean', False):
+        if opts['clean']:
             for c in wctx.clean():
             	rows.append([False, 'C', hglib.tounicode(c), c])
         try:
@@ -288,4 +294,4 @@ class WctxModel(QAbstractTableModel):
 
 
 def run(ui, *pats, **opts):
-    return StatusWidget(pats, None, **opts)
+    return StatusWidget(pats, opts)
