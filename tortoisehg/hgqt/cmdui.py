@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import Qt, QString
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QLabel, QProgressBar
 from PyQt4.QtGui import QTextEdit, QHBoxLayout, QGridLayout, QMessageBox
 
