@@ -166,7 +166,7 @@ class UpdateDialog(QDialog):
 
     def command_started(self):
         self.cmd.setShown(True)
-        if self.showlog_chk.isVisible():
+        if self.showlog_chk.isChecked():
             self.cmd.show_output(True)
         self.update_btn.setHidden(True)
         self.close_btn.setHidden(True)
