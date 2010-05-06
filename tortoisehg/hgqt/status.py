@@ -21,7 +21,6 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # working copy browser.
 
 # Technical Debt
-#  Show diffs to both parents, when applicable
 #  Show merge status column, when appropriate
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
@@ -141,9 +140,16 @@ class StatusWidget(QWidget):
             self.te.setHtml(text)
             return
 
+        if self.isMerge():
+            header = _('===== Diff to first parent %d:%s =====\n') % (
+                    self.wctx.p1().rev(), str(self.wctx.p1()))
+            header = '<h3>' + header + '</h3></br>'
+        else:
+            header = ''
+
         hu = htmlui.htmlui()
+        m = cmdutil.matchfiles(self.repo, [wfile])
         try:
-            m = cmdutil.matchfiles(self.repo, [wfile])
             try:
                 for s, l in patch.difflabel(self.wctx.diff, match=m):
                     hu.write(s, label=l)
@@ -157,8 +163,28 @@ class StatusWidget(QWidget):
                     hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
             self.status_error = str(e)
+            return
         o, e = hu.getdata()
-        self.te.setHtml(o)
+        diff = o or _('<em>No change</em>')
+        if self.isMerge():
+            text = header + diff
+        else:
+            self.te.setHtml(header + diff)
+            return
+
+        try:
+            for s, l in patch.difflabel(self.wctx.diff, self.wctx.p2(), match=m):
+                hu.write(s, label=l)
+        except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+            self.status_error = str(e)
+            return
+        text += '</br><h3>'
+        text += _('===== Diff to second parent %d:%s =====\n') % (
+                self.wctx.p2().rev(), str(self.wctx.p2()))
+        text += '</h3></br>'
+        o, e = hu.getdata()
+        diff = o or _('<em>No change</em>')
+        self.te.setHtml(text + diff)
 
 
 class WctxFileTree(QTreeView):
