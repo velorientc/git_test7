@@ -233,6 +233,9 @@ class Widget(QWidget):
     def show_output(self, visible):
         self.core.output_text.setShown(visible)
 
+    def is_show_output(self):
+        return self.core.output_text.isVisible()
+
 class Dialog(QDialog):
     """A dialog for running random Mercurial command"""
 
