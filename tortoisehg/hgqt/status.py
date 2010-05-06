@@ -247,6 +247,8 @@ color_labels = {
    'I': 'status.ignored',
    'C': 'status.clean',
    'S': 'status.subrepo',
+   'r': 'resolve.resolved',
+   'u': 'resolve.unresolved',
 }
 
 colors = {}
@@ -306,7 +308,10 @@ class WctxModel(QAbstractTableModel):
 
         checked, status, mst, upath, path = self.rows[index.row()]
         if role == Qt.TextColorRole:
-            return colors.get(status, QColor('black'))
+            if mst:
+                return colors.get(mst.lower(), QColor('black'))
+            else:
+                return colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
             if status in tips:
                 tip = tips[status] % upath
