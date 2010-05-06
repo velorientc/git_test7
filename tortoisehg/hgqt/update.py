@@ -113,6 +113,7 @@ class UpdateDialog(QDialog):
         self.cancel_btn.clicked.connect(self.cancel_clicked)
         self.close_btn = buttons.addButton(QDialogButtonBox.Close)
         self.close_btn.clicked.connect(self.reject)
+        self.close_btn.setAutoDefault(False)
         self.update_btn = buttons.addButton(_('&Update'),
                                             QDialogButtonBox.ActionRole)
         self.update_btn.clicked.connect(self.update_clicked)
