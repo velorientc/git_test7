@@ -173,7 +173,10 @@ class UpdateDialog(QDialog):
             cmdline.append('--clean')
         else:
             cur = self.repo['.']
-            node = self.repo[rev]
+            try:
+                node = self.repo[rev]
+            except (error.LookupError, error.RepoLookupError, error.RepoError):
+                return
             def isclean():
                 '''whether WD is changed'''
                 wc = self.repo[None]
