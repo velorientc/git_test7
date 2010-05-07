@@ -55,6 +55,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self._reload_rev = None
         self._reload_file = None
         self._loading = True
+        self._scanForRepoChanges = True
 
         QtGui.QMainWindow.__init__(self)
         HgDialogMixin.__init__(self)
@@ -100,7 +101,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def timerEvent(self, event):
         if event.timerId() == self._watchrepotimer:
-            if self.loading():
+            if not self._scanForRepoChanges or self.loading():
                 return
             mtime = self._getrepomtime()
             if mtime > self._repodate:
@@ -454,11 +455,22 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self._manifestdlg = ManifestDialog(self.repo, rev)
         self._manifestdlg.show()
 
+    def setScanForRepoChanges(self, enable):
+        saved = self._scanForRepoChanges
+        self._scanForRepoChanges = enable
+        return saved
+
     def updateToRevision(self, rev):
+        saved = self.setScanForRepoChanges(False)
         opts = {}
         dlg = UpdateDialog(rev, self.repo, self, opts=opts)
-        dlg.show()
         self._updatedlg = dlg
+        def quit():
+            if dlg.completed:
+                self.reload()  # TODO: implement something less drastic than a full reload
+            self.setScanForRepoChanges(saved)            
+        dlg.quitsignal.connect(quit)
+        dlg.show()
 
     def file_displayed(self, filename):
         self.actionPrevDiff.setEnabled(False)
