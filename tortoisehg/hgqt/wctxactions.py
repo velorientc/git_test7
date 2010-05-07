@@ -95,7 +95,8 @@ def run(func, parent, files, repo):
     return notify
 
 def vdiff(parent, ui, repo, files):
-    raise NotImplementedError()
+    from tortoisehg.hgqt.visdiff import visualdiff
+    visualdiff(ui, repo, files, {})
 
 def edit(parent, ui, repo, files):
     raise NotImplementedError()
