@@ -120,3 +120,6 @@ class CustomPrompt(QtGui.QMessageBox):
             if event.text() == k:
                 btn.emit(QtCore.SIGNAL('clicked()'))
         super(CustomPrompt, self).keyPressEvent(event)
+
+def setup_font_substitutions():
+    QtGui.QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])

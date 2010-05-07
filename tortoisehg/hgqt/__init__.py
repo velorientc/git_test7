@@ -70,8 +70,3 @@ import repoview, fileview
 sys.modules['repoview'] = repoview
 sys.modules['fileview'] = fileview
 sys.modules['workbench_rc'] = workbench_rc
-
-def setup_font_substitutions():
-    # be sure monospace default font for diffs have a decent substitution
-    # on MacOS
-    QtGui.QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
