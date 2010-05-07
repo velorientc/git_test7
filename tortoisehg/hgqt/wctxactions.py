@@ -27,7 +27,7 @@ def wctxactions(parent, point, repo, selrows):
         action = menu.addAction(text)
         if icon:
             action.setIcon(icon)
-        action.wrapper = lambda files=files: run(func, files, repo)
+        action.wrapper = lambda files=files: run(func, parent, files, repo)
         parent.connect(action, SIGNAL('triggered()'), action.wrapper)
         return action
 
@@ -66,7 +66,7 @@ def wctxactions(parent, point, repo, selrows):
         menu.addMenu(rmenu)
     return menu.exec_(point)
 
-def run(func, files, repo):
+def run(func, parent, files, repo):
     'run wrapper for all action methods'
     wfiles = [repo.wjoin(x) for x in files]
     hu = htmlui.htmlui()
@@ -77,16 +77,16 @@ def run(func, files, repo):
         notify = func(hu, wfiles, repo)
         o, e = hu.getdata()
         if e:
-            QMessageBox.warning(None, name + _(' reported errors'), str(e))
+            QMessageBox.warning(parent, name + _(' reported errors'), str(e))
         elif o:
-            QMessageBox.information(None, name + _(' reported errors'), str(o))
+            QMessageBox.information(parent, name + _(' reported errors'), str(o))
         elif notify:
             shlib.shell_notify(wfiles)
         return notify
     except (util.Abort, IOError, OSError), e:
-        QMessageBox.critical(None, name + _(' Aborted'), str(e))
+        QMessageBox.critical(parent, name + _(' Aborted'), str(e))
     except (error.LookupError), e:
-        QMessageBox.critical(None, name + _(' Aborted'), str(e))
+        QMessageBox.critical(parent, name + _(' Aborted'), str(e))
     return False
 
 def filelist(files):
