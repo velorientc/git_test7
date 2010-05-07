@@ -21,6 +21,10 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # working copy browser.
 
 # Technical Debt
+#  Add some initial drag distance before starting QDrag
+#   (it interferes with selection the way it is now)
+#  CTRL-D, double-click visual diffs
+#  Disable check column when wctx has two parents
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Need mechanisms to clear pats and toggle visibility options
