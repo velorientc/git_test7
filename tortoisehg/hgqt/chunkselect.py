@@ -76,8 +76,7 @@ def run(ui, *pats, **opts):
     repo = hg.repository(ui)
     fp = cStringIO.StringIO()
     try:
-        diffopts = mdiff.diffopts(git=True, nodates=True)
-        for p in patch.diff(repo, repo['.'].node(), None, opts=diffopts):
+        for p in repo[None].diff(opts={'git':True,'nodates':True}):
             fp.write(p)
     except (IOError, error.RepoError, error.LookupError, util.Abort), e:
         print e
