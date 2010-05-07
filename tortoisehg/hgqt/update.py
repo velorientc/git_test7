@@ -7,7 +7,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, pyqtSignal
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout
 from PyQt4.QtGui import QComboBox, QLabel, QLayout, QCheckBox, QMessageBox
 
@@ -19,9 +19,13 @@ from tortoisehg.hgqt import cmdui, csinfo
 
 class UpdateDialog(QDialog):
 
+    quitsignal = pyqtSignal()
+
     def __init__(self, rev=None, repo=None, parent=None, opts=None):
         super(UpdateDialog, self).__init__(parent, Qt.WindowTitleHint or
                                                    Qt.WindowSystemMenuHint)
+
+        self.completed = False
 
         self.ui = ui.ui()
         if repo:
@@ -252,6 +256,10 @@ class UpdateDialog(QDialog):
 
     ### Signal Handlers ###
 
+    def reject(self):
+        self.quitsignal.emit()
+        super(UpdateDialog, self).reject()
+
     def cancel_clicked(self):
         self.cmd.cancel()
 
@@ -272,6 +280,7 @@ class UpdateDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, wrapper):
+        self.completed = True
         if wrapper.data is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
