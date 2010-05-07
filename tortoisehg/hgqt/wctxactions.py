@@ -142,7 +142,8 @@ def forget(parent, ui, repo, files):
     return True
 
 def add(parent, ui, repo, files):
-    raise NotImplementedError()
+    commands.add(ui, repo, *files)
+    return True
 
 def guessRename(parent, ui, repo, files):
     raise NotImplementedError()
@@ -155,7 +156,15 @@ def remove(parent, ui, repo, files):
     return True
 
 def delete(parent, ui, repo, files):
-    raise NotImplementedError()
+    res = qtlib.CustomPrompt(
+            _('Confirm Delete Unrevisioned'),
+            _('Delete the following unrevisioned files?'),
+            parent, (_('&Delete'), _('&Cancel')), 1, 1, files).run()
+    if res == 1:
+        return
+    for wfile in files:
+        os.unlink(wfile)
+    return True
 
 def copy(parent, ui, repo, files):
     raise NotImplementedError()
