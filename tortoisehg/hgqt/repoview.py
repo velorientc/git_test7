@@ -14,10 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-try:
-    from mercurial.error import RepoError
-except ImportError: # old API
-    from mercurial.repo import RepoError
+from mercurial.error import RepoError
 
 from PyQt4 import QtCore, QtGui
 Qt = QtCore.Qt

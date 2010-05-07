@@ -36,10 +36,7 @@ from tortoisehg.hgqt import cmdui
 
 from tortoisehg.util import paths
 
-try:
-    from mercurial.error import RepoError
-except ImportError: # old API
-    from mercurial.repo import RepoError
+from mercurial.error import RepoError
 
 Qt = QtCore.Qt
 bold = QtGui.QFont.Bold
