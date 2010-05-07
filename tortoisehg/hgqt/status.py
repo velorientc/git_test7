@@ -233,6 +233,7 @@ class WctxFileTree(QTreeView):
             rows.add(index.row())
             c, status, mst, u, path = self.model().getRow(index)
             selrows.append((set(status+mst.lower()), path))
+        point = self.mapToGlobal(point)
         action = wctxactions.wctxactions(self, point, self.repo, selrows)
         if action:
             print action.text(), 'performed' # maybe should refresh
