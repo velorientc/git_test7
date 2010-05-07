@@ -447,9 +447,10 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def file_displayed(self, filename):
         self.actionPrevDiff.setEnabled(False)
-        connect(self.textview_status, SIGNAL('filled'),
-                lambda self=self: self.actionNextDiff.setEnabled(self.textview_status.fileMode() \
-                                                                 and self.textview_status.nDiffs()))
+        def filled():
+            self.actionNextDiff.setEnabled(
+                self.textview_status.fileMode() and self.textview_status.nDiffs())
+        connect(self.textview_status, SIGNAL('filled'), filled)
 
     def revision_selected(self, rev):
         """
