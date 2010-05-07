@@ -192,6 +192,7 @@ class WctxFileTree(QTreeView):
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
         self.repo = repo
+        self.setSelectionMode(QTreeView.ExtendedSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
