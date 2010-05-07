@@ -76,7 +76,7 @@ def run(ui, *pats, **opts):
     repo = hg.repository(ui)
     fp = cStringIO.StringIO()
     try:
-        for p in repo[None].diff(opts={'git':True,'nodates':True}):
+        for p in repo[None].diff(git=True, nodates=True):
             fp.write(p)
     except (IOError, error.RepoError, error.LookupError, util.Abort), e:
         print e
