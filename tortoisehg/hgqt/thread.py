@@ -11,7 +11,7 @@ import Queue
 import time
 import urllib2
 
-from PyQt4.QtCore import SIGNAL, pyqtSignal, QObject, QThread
+from PyQt4.QtCore import SIGNAL, pyqtSignal, QObject, QThread, QTimer
 from PyQt4.QtGui import QMessageBox, QInputDialog, QLineEdit
 
 from mercurial import ui, util, error, dispatch
@@ -47,9 +47,8 @@ class QtUi(ui.ui):
         if self._buffers:
             self._buffers[-1].extend([str(a) for a in args])
         else:
-            for a in args:
-                data = DataWrapper((str(a), opts.get('label', '')))
-                self.sig.emit(SIG_OUTPUT, data)
+            wrapper = DataWrapper((''.join(args), opts.get('label', '')))
+            self.sig.emit(SIG_OUTPUT, wrapper)
 
     def write_err(self, *args, **opts):
         for a in args:
@@ -124,7 +123,7 @@ class CmdThread(QThread):
     # (msg=str, label=str) [wrapped]
     outputReceived = pyqtSignal(DataWrapper)
 
-    # msg=str [wrapped]
+    # (msg=str, label=str) [wrapped]
     errorReceived = pyqtSignal(DataWrapper)
 
     # (msg=str, password=bool, choices=tuple, default=str) [wrapped]
@@ -141,7 +140,7 @@ class CmdThread(QThread):
     #         others - return code of command
     commandFinished = pyqtSignal(DataWrapper)
 
-    def __init__(self, cmdline, parent=None):
+    def __init__(self, cmdline, parent=None, buffering=True):
         super(CmdThread, self).__init__()
 
         self.cmdline = cmdline
@@ -150,12 +149,13 @@ class CmdThread(QThread):
         self.abortbyuser = False
         self.responseq = Queue.Queue()
         self.ui = QtUi(responseq=self.responseq)
+        self.buffering = buffering
+        self.buffer = []
 
         # Re-emit all ui.sig's signals to CmdThread (self).
         # QSignalMapper doesn't help for this since our SIGNAL
         # parameters contain 'PyQt_PyObject' types.
-        for name, sig in ((SIG_OUTPUT, self.outputReceived),
-                          (SIG_ERROR, self.errorReceived),
+        for name, sig in ((SIG_ERROR, self.errorReceived),
                           (SIG_INTERACT, self.interactReceived),
                           (SIG_PROGRESS, self.progressReceived)):
             def repeater(sig): # hide 'sig' local variable name
@@ -164,14 +164,34 @@ class CmdThread(QThread):
 
         self.finished.connect(self.thread_finished)
         self.interactReceived.connect(self.interact_handler)
+        self.connect(self.ui.sig, SIG_OUTPUT, self.output_handler)
 
     def abort(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
             self.abortbyuser = True
             thread2._async_raise(self.thread_id, KeyboardInterrupt)
 
+    def flush(self):
+        for item in self.buffer:
+            self.outputReceived.emit(item)
+        self.buffer = []
+
     def thread_finished(self):
+        self.flush()
         self.commandFinished.emit(DataWrapper(self.ret))
+
+    def output_handler(self, wrapper):
+        if self.buffering:
+            if len(self.buffer) > 0:
+                last = self.buffer.pop()
+                if last.data[1] == wrapper.data[1]:
+                    wrapper = DataWrapper((last.data[0] + wrapper.data[0],
+                                           last.data[1]))
+            else:
+                QTimer.singleShot(20, self.flush)
+            self.buffer.append(wrapper)
+        else:
+            self.outputReceived.emit(wrapper)
 
     def interact_handler(self, wrapper):
         prompt, password, choices, default = wrapper.data
