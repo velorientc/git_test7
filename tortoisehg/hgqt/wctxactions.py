@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
+
 from mercurial import util, cmdutil, error, merge, commands
 from tortoisehg.hgqt import qtlib, htmlui
 from tortoisehg.util import hglib, shlib
@@ -68,118 +70,106 @@ def wctxactions(parent, point, repo, selrows):
 
 def run(func, parent, files, repo):
     'run wrapper for all action methods'
-    wfiles = [repo.wjoin(x) for x in files]
     hu = htmlui.htmlui()
     name = func.__name__.title()
+    notify = False
+    cwd = os.getcwd()
+    os.chdir(repo.root)
     try:
         # All operations should quietly succeed.  Any error should
         # result in a message box
-        notify = func(hu, wfiles, repo)
+        notify = func(parent, hu, repo, files)
         o, e = hu.getdata()
         if e:
             QMessageBox.warning(parent, name + _(' reported errors'), str(e))
         elif o:
-            QMessageBox.information(parent, name + _(' reported errors'), str(o))
+            QMessageBox.information(parent, name + _(' output'), str(o))
         elif notify:
+            wfiles = [repo.wjoin(x) for x in files]
             shlib.shell_notify(wfiles)
-        return notify
     except (util.Abort, IOError, OSError), e:
         QMessageBox.critical(parent, name + _(' Aborted'), str(e))
     except (error.LookupError), e:
         QMessageBox.critical(parent, name + _(' Aborted'), str(e))
-    return False
+    os.chdir(cwd)
+    return notify
 
-def filelist(files):
-    'utility function to present file list'
-    text = '\n'.join(files[:5])
-    if len(files) > 5:
-        text += '  ...\n'
-    return hglib.tounicode(text)
-
-def vdiff(ui, repo, files):
+def vdiff(parent, ui, repo, files):
     raise NotImplementedError()
 
-def edit(ui, repo, files):
+def edit(parent, ui, repo, files):
     raise NotImplementedError()
 
-def viewmissing(ui, repo, files):
+def viewmissing(parent, ui, repo, files):
     raise NotImplementedError()
 
-def other(ui, repo, files):
+def other(parent, ui, repo, files):
     raise NotImplementedError()
 
-def revert(ui, repo, files):
-    raise NotImplementedError()
-    # Needs work
-    revertopts = {}
+def revert(parent, ui, repo, files):
+    revertopts = {'date': None, 'rev': '.'}
 
     if len(repo.parents()) > 1:
-        res = QMessageBox.Question(
-                None,
+        res = qtlib.CustomPrompt(
                 _('Uncommited merge - please select a parent revision'),
-                _('Revert files to local or other parent?'),
-                (_('&Local'), _('&Other'), _('&Cancel')), 2).run()
+                _('Revert files to local or other parent?'), parent,
+                (_('&Local'), _('&Other'), ('&Cancel')), 0, 2, files).run()
         if res == 0:
             revertopts['rev'] = repo[None].p1().rev()
         elif res == 1:
             revertopts['rev'] = repo[None].p2().rev()
         else:
             return
-        response = None
+        commands.revert(ui, repo, *files, **revertopts)
     else:
-        # response: 0=Yes, 1=Yes,no backup, 2=Cancel
-        revs = revertopts['rev']
-        if revs and type(revs) == list:
-            revertopts['rev'] = revs[0]
-        else:
-            revertopts['rev'] = str(self.stat.repo['.'].rev())
-        response = gdialog.CustomPrompt(_('Confirm Revert'),
-                _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
-                filelist(files)), self.stat, (_('&Yes (backup changes)'),
-                                         _('Yes (&discard changes)'),
-                                         _('&Cancel')), 2, 2).run()
-    if response in (None, 0, 1):
-        if response == 1:
+        res = qtlib.CustomPrompt(
+                 _('Confirm Revert'),
+                 _('Revert changes to files?'), parent,
+                 (_('&Yes (backup changes)'), _('Yes (&discard changes)'),
+                  _('&Cancel')), 2, 2, files).run()
+        if res == 2:
+            return False
+        if res == 1:
             revertopts['no_backup'] = True
-        commands.revert(ui, repo, *wfiles, **revertopts)
+        commands.revert(ui, repo, *files, **revertopts)
         return True
 
-def log(ui, repo, files):
+def log(parent, ui, repo, files):
     raise NotImplementedError()
 
-def forget(ui, repo, files):
+def forget(parent, ui, repo, files):
     commands.forget(ui, repo, *files)
     return True
 
-def add(ui, repo, files):
+def add(parent, ui, repo, files):
     raise NotImplementedError()
 
-def guessRename(ui, repo, files):
+def guessRename(parent, ui, repo, files):
     raise NotImplementedError()
 
-def ignore(ui, repo, files):
+def ignore(parent, ui, repo, files):
     raise NotImplementedError()
 
-def remove(ui, repo, files):
+def remove(parent, ui, repo, files):
     commands.remove(ui, repo, *files)
     return True
 
-def delete(ui, repo, files):
+def delete(parent, ui, repo, files):
     raise NotImplementedError()
 
-def copy(ui, repo, files):
+def copy(parent, ui, repo, files):
     raise NotImplementedError()
 
-def rename(ui, repo, files):
+def rename(parent, ui, repo, files):
     raise NotImplementedError()
 
-def resolve(ui, repo, files):
+def resolve(parent, ui, repo, files):
     raise NotImplementedError()
 
-def unmark(ui, repo, files):
+def unmark(parent, ui, repo, files):
     raise NotImplementedError()
 
-def mark(ui, repo, files):
+def mark(parent, ui, repo, files):
     raise NotImplementedError()
 
 def resolve_with(tool, repo, files):
