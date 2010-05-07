@@ -11,6 +11,7 @@ from mercurial import extensions
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
+
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
 # set of _effects, since we convert color effect names to font style
@@ -82,3 +83,40 @@ def markup(msg, **styles):
     msg = QtCore.Qt.escape(msg)
     msg = msg.replace('\n', '<br />')
     return '<font style="%s">%s</font>' % (style, msg)
+
+class CustomPrompt(QtGui.QMessageBox):
+    def __init__(self, title, message, parent, choices, default=None,
+                 esc=None, files=None):
+        QtGui.QMessageBox.__init__(self, parent)
+
+        self.setWindowTitle(hglib.toutf(title))
+        self.setText(hglib.toutf(message))
+        if files:
+            msg = ''
+            for i, file in enumerate(files):
+                msg += '   %s\n' % file
+                if i == 9:
+                    msg += '   ...\n'
+                    break
+            self.setDetailedText(hglib.toutf(msg))
+        self.hotkeys = {}
+        for i, s in enumerate(choices):
+            btn = self.addButton(s, QtGui.QMessageBox.AcceptRole)
+            try:
+                char = s[s.index('&')+1].lower()
+                self.hotkeys[char] = btn
+                if default == i:
+                    self.setDefaultButton(btn)
+                if esc == i:
+                    self.setEscapeButton(btn)
+            except ValueError:
+                pass
+
+    def run(self):
+        return self.exec_()
+
+    def keyPressEvent(self, event):
+        for k, btn in self.hotkeys.iteritems():
+            if event.text() == k:
+                btn.emit(QtCore.SIGNAL('clicked()'))
+        super(CustomPrompt, self).keyPressEvent(event)
