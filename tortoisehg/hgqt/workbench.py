@@ -230,6 +230,10 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         # Next/Prev diff (in full file mode)
         self.actionNextDiff = QtGui.QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
+        def filled():
+            self.actionNextDiff.setEnabled(
+                self.textview_status.fileMode() and self.textview_status.nDiffs())
+        connect(self.textview_status, SIGNAL('filled'), filled)
         self.actionPrevDiff = QtGui.QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         connect(self.actionNextDiff, SIGNAL('triggered()'),
@@ -447,10 +451,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def file_displayed(self, filename):
         self.actionPrevDiff.setEnabled(False)
-        def filled():
-            self.actionNextDiff.setEnabled(
-                self.textview_status.fileMode() and self.textview_status.nDiffs())
-        connect(self.textview_status, SIGNAL('filled'), filled)
 
     def revision_selected(self, rev):
         """
