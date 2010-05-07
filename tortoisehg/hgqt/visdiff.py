@@ -478,12 +478,12 @@ class FileSelectionDialog(QtGui.QDialog):
             if name == selected:
                 combo.set_active(i)
 
-    def should_live(self):
-        # TODO
+    def closeEvent(self, event):
         while self.tmproot:
             try:
                 shutil.rmtree(self.tmproot)
-                return False
+                event.accept()
+                return
             except (IOError, OSError), e:
                 resp = qtlib.CustomPrompt(_('Unable to delete temp files'),
                     _('Close diff tools and try again, or quit to leak files?'),
@@ -491,8 +491,8 @@ class FileSelectionDialog(QtGui.QDialog):
                 if resp == 0:
                     continue
                 else:
-                    return False
-        return False
+                    event.accept()
+                    return
 
     def itemActivated(self, item):
         'A QListWidgetItem has been activated'
