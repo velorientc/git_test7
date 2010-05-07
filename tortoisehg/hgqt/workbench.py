@@ -104,10 +104,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
                 return
             mtime = self._getrepomtime()
             if mtime > self._repodate:
-                self.statusBar().showMessage("Repository has been modified, "
-                                             "reloading...", 2000)
-
-                self.reload()
+                self.statusBar().showMessage("Repository has been modified "
+                                             "(reloading is recommended)")
 
     def loading(self):
         return self._loading
