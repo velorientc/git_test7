@@ -355,8 +355,13 @@ class FileSelectionDialog(QtGui.QDialog):
         self.tools = tools
 
         if len(tools) > 1:
+            hbox = QtGui.QHBoxLayout() 
             combo = QtGui.QComboBox()
-            layout.addWidget(combo)
+            lbl = QtGui.QLabel(_('Select Tool:'))
+            lbl.setBuddy(combo)
+            hbox.addWidget(lbl)
+            hbox.addWidget(combo, 1)
+            layout.addLayout(hbox)
             for i, name in enumerate(tools.iterkeys()):
                 combo.addItem(name)
                 if name == preferred:
