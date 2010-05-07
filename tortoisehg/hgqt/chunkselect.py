@@ -85,10 +85,10 @@ def run(ui, *pats, **opts):
     hu = htmlui.htmlui()
     items = []
     for chunk in hgshelve.parsepatch(fp):
-        fp = cStringIO.StringIO()
-        chunk.write(fp)
-        fp.seek(0)
-        for a, l in patch.difflabel(fp.readlines):
+        ui.pushbuffer()
+        chunk.write(ui)
+        data = ui.popbuffer()
+        for a, l in patch.difflabel(data.splitlines, True):
             hu.write(a, label=l)
         o, e = hu.getdata()
         items.append(o)
