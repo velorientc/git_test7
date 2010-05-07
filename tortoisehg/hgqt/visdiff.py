@@ -370,7 +370,7 @@ class FileSelectionDialog(QtGui.QDialog):
             patterns = repo.ui.configitems('diff-patterns')
             patterns = [(p, t) for p,t in patterns if t in tools]
 
-            callable = lambda row: self.fileselect(row, repo, combo,
+            callable = lambda row: self.fileSelect(row, repo, combo,
                                                    patterns, preferred)
             self.connect(list, QtCore.SIGNAL('currentRowChanged(int)'),
                          callable)
@@ -468,7 +468,7 @@ class FileSelectionDialog(QtGui.QDialog):
             d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
             self.dbutton.setEnabled(d2)
 
-    def fileselect(self, row, repo, combo, patterns, preferred):
+    def fileSelect(self, row, repo, combo, patterns, preferred):
         'user selected a file, pick an appropriate tool from combo'
         fname = self.list.item(row).text()[2:]
         fname = hglib.fromunicode(fname)
