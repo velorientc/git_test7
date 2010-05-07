@@ -75,14 +75,12 @@ class ChunkModel(QAbstractListModel):
 def run(ui, *pats, **opts):
     repo = hg.repository(ui)
     fp = cStringIO.StringIO()
-    matcher = cmdutil.matchall(repo)
-    diffopts = mdiff.diffopts(git=True, nodates=True)
     try:
-        node2, node1 = repo['tip'].node(), repo['tip'].parents()[0].node()
-        for s in patch.diff(repo, node1, node2, match=matcher, opts=diffopts):
-            fp.writelines(s.splitlines(True))
+        diffopts = mdiff.diffopts(git=True, nodates=True)
+        for p in patch.diff(repo, repo['.'].node(), None, opts=diffopts):
+            fp.write(p)
     except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-        self.stat.stbar.set_text(str(e))
+        print e
     fp.seek(0)
     hu = htmlui.htmlui()
     items = []
@@ -91,7 +89,7 @@ def run(ui, *pats, **opts):
         chunk.write(fp)
         fp.seek(0)
         for a, l in patch.difflabel(fp.readlines):
-            if a: hu.write(a, label=l)
+            hu.write(a, label=l)
         o, e = hu.getdata()
         items.append(o)
 
