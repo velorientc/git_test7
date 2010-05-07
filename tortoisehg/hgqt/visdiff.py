@@ -313,6 +313,7 @@ class FileSelectionDialog(QtGui.QDialog):
         'Initialize the Dialog'
         QtGui.QDialog.__init__(self)
         self.setWindowTitle(_('Visual Diffs'))
+        self.curFile = None
 
         # TODO: Connect CTRL-D to row activation
         #qtlib.set_tortoise_icon(self, 'menushowchanged.ico')
@@ -351,6 +352,25 @@ class FileSelectionDialog(QtGui.QDialog):
         tools = hglib.difftools(repo.ui)
         preferred = besttool(repo.ui, tools)
         self.diffpath, self.diffopts, self.mergeopts = tools[preferred]
+        self.tools = tools
+
+        if len(tools) > 1:
+            combo = QtGui.QComboBox()
+            layout.addWidget(combo)
+            for i, name in enumerate(tools.iterkeys()):
+                combo.addItem(name)
+                if name == preferred:
+                    defrow = i
+            combo.setCurrentIndex(defrow)
+            patterns = repo.ui.configitems('diff-patterns')
+            patterns = [(p, t) for p,t in patterns if t in tools]
+
+            callable = lambda row: self.fileselect(row, repo, combo,
+                                                   patterns, preferred)
+            self.connect(list, QtCore.SIGNAL('currentRowChanged(int)'),
+                         callable)
+            self.connect(combo, QtCore.SIGNAL('currentIndexChanged(QString)'),
+                         self.toolSelect)
 
         BB = QtGui.QDialogButtonBox
         bb = BB()
@@ -372,24 +392,6 @@ class FileSelectionDialog(QtGui.QDialog):
             self.dbutton.pressed.connect(self.p1dirdiff)
 
         self.updateDiffButtons(preferred)
-
-        '''
-        if len(tools) > 1:
-            combo = gtk.combo_box_new_text()
-            for i, name in enumerate(tools.iterkeys()):
-                combo.append_text(name)
-                if name == preferred:
-                    defrow = i
-            combo.set_active(defrow)
-            combo.connect('changed', self.toolselect, tools)
-            hbox.pack_start(combo, False, False, 2)
-
-            patterns = repo.ui.configitems('diff-patterns')
-            patterns = [(p, t) for p,t in patterns if t in tools]
-            filesel = treeview.get_selection()
-            filesel.connect('changed', self.fileselect, repo, combo, tools,
-                            patterns, preferred)
-        '''
 
         callable = lambda: self.fillmodel(repo, sa, sb)
         QtCore.QTimer.singleShot(0, callable)
@@ -443,12 +445,12 @@ class FileSelectionDialog(QtGui.QDialog):
             row = QtCore.QString('%s %s' % (status, hglib.tounicode(f)))
             self.list.addItem(row)
 
-    def toolselect(self, combo, tools):
+    def toolSelect(self, tool):
         'user selected a tool from the tool combo'
-        #sel = combo.get_active_text()
-        #if sel in tools:
-        #    self.diffpath, self.diffopts, self.mergeopts = tools[sel]
-        #    self.updateDiffButtons(sel)
+        tool = hglib.fromunicode(tool)
+        assert tool in self.tools
+        self.diffpath, self.diffopts, self.mergeopts = self.tools[tool]
+        self.updateDiffButtons(tool)
 
     def updateDiffButtons(self, tool):
         if hasattr(self, 'p1button'):
@@ -461,12 +463,13 @@ class FileSelectionDialog(QtGui.QDialog):
             d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
             self.dbutton.setEnabled(d2)
 
-    def currentItemChanges(self, list, item):
-        pass # connect to below
-
-    def fileselect(self, selection, repo, combo, tools, patterns, preferred):
+    def fileselect(self, row, repo, combo, patterns, preferred):
         'user selected a file, pick an appropriate tool from combo'
-        fname = self.list.selectedItem().text()[2:]
+        fname = self.list.item(row).text()[2:]
+        fname = hglib.fromunicode(fname)
+        if self.curFile == fname:
+            return
+        self.curFile = fname
         for pat, tool in patterns:
             mf = match.match(repo.root, '', [pat])
             if mf(fname):
@@ -474,9 +477,9 @@ class FileSelectionDialog(QtGui.QDialog):
                 break
         else:
             selected = preferred
-        for i, name in enumerate(tools.iterkeys()):
+        for i, name in enumerate(self.tools.iterkeys()):
             if name == selected:
-                combo.set_active(i)
+                combo.setCurrentIndex(i)
 
     def closeEvent(self, event):
         while self.tmproot:
