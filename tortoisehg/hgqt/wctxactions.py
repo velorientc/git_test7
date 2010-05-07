@@ -173,13 +173,31 @@ def rename(parent, ui, repo, files):
     raise NotImplementedError()
 
 def resolve(parent, ui, repo, files):
-    raise NotImplementedError()
+    wctx = repo[None]
+    mctx = wctx.parents()[-1]
+    ms = merge.mergestate(repo)
+    for wfile in files:
+        ms.resolve(wfile, wctx, mctx)
+    return True
 
 def unmark(parent, ui, repo, files):
-    raise NotImplementedError()
+    ms = merge.mergestate(repo)
+    for wfile in files:
+        ms.mark(wfile, 'u')
+    return True
 
 def mark(parent, ui, repo, files):
-    raise NotImplementedError()
+    ms = merge.mergestate(repo)
+    for wfile in files:
+        ms.mark(wfile, 'r')
+    return True
 
 def resolve_with(tool, repo, files):
-    raise NotImplementedError()
+    oldmergeenv = os.environ.get('HGMERGE')
+    os.environ['HGMERGE'] = tool
+    resolve(None, None, repo, files)
+    if oldmergeenv:
+        os.environ['HGMERGE'] = oldmergeenv
+    else:
+        del os.environ['HGMERGE']
+    return True
