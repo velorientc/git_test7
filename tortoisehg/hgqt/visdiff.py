@@ -314,9 +314,9 @@ class FileSelectionDialog(QtGui.QDialog):
         QtGui.QDialog.__init__(self)
         self.setWindowTitle(_('Visual Diffs'))
 
-        '''
-        gtklib.set_tortoise_icon(self, 'menushowchanged.ico')
-        gtklib.set_tortoise_keys(self)
+        # TODO: Connect CTRL-D to row activation
+        #qtlib.set_tortoise_icon(self, 'menushowchanged.ico')
+        #qtlib.set_tortoise_keys(self)
 
         if ctx2.rev() is None:
             title = _('working changes')
@@ -328,84 +328,52 @@ class FileSelectionDialog(QtGui.QDialog):
         if pats:
             title += _(' filtered')
 
-        self.set_default_size(400, 250)
-        self.set_has_separator(False)
-        self.reponame=hglib.get_reponame(repo)
+        self.resize(400, 250)
+        self.reponame = hglib.get_reponame(repo)
 
         self.ctxs = (ctx1a, ctx1b, ctx2)
         self.copies = cpy
         self.ui = repo.ui
 
-        lbl = gtk.Label(_('Temporary files are removed when this dialog'
+        layout = QtGui.QVBoxLayout() 
+        self.setLayout(layout)
+
+        lbl = QtGui.QLabel(_('Temporary files are removed when this dialog'
             ' is closed'))
-        self.vbox.pack_start(lbl, False, False, 2)
+        layout.addWidget(lbl)
 
-        scroller = gtk.ScrolledWindow()
-        scroller.set_shadow_type(gtk.SHADOW_IN)
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        treeview = gtk.TreeView()
-        self.treeview = treeview
-        treeview.get_selection().set_mode(gtk.SELECTION_SINGLE)
-        treeview.set_search_equal_func(self.search_filelist)
-        scroller.add(treeview)
-        self.vbox.pack_start(scroller, True, True, 2)
-
-        treeview.connect('row-activated', self.rowactivated)
-        treeview.set_headers_visible(False)
-        treeview.set_property('enable-grid-lines', True)
-        treeview.set_enable_search(False)
-
-        accelgroup = gtk.AccelGroup()
-        self.add_accel_group(accelgroup)
-        mod = gtklib.get_thg_modifier()
-        key, modifier = gtk.accelerator_parse(mod+'d')
-        treeview.add_accelerator('thg-diff', accelgroup, key,
-                        modifier, gtk.ACCEL_VISIBLE)
-        treeview.connect('thg-diff', self.rowactivated)
-
-        cell = gtk.CellRendererText()
-        stcol = gtk.TreeViewColumn('Status', cell)
-        stcol.set_resizable(True)
-        stcol.add_attribute(cell, 'text', 0)
-        treeview.append_column(stcol)
-
-        cell = gtk.CellRendererText()
-        fcol = gtk.TreeViewColumn('Filename', cell)
-        fcol.set_resizable(True)
-        fcol.add_attribute(cell, 'text', 1)
-        treeview.append_column(fcol)
-
-        model = gtk.ListStore(str, str)
-        treeview.set_model(model)
+        list = QtGui.QListWidget()
+        layout.addWidget(list)
+        self.list = list
+        self.connect(list, QtCore.SIGNAL('itemActivated(QListWidgetItem *)'),
+            self.itemActivated)
 
         tools = hglib.difftools(repo.ui)
         preferred = besttool(repo.ui, tools)
         self.diffpath, self.diffopts, self.mergeopts = tools[preferred]
 
-        hbox = gtk.HBox()
-        self.vbox.pack_start(hbox, False, False, 2)
+        BB = QtGui.QDialogButtonBox
+        bb = BB()
+        layout.addWidget(bb)
 
         if ctx2.rev() is None:
             pass
             # Do not offer directory diffs when the working directory
             # is being referenced directly
         elif ctx1b:
-            self.p1button = gtk.Button(_('Dir diff to p1'))
-            self.p1button.connect('pressed', self.p1dirdiff)
-            self.p2button = gtk.Button(_('Dir diff to p2'))
-            self.p2button.connect('pressed', self.p2dirdiff)
-            self.p3button = gtk.Button(_('3-way dir diff'))
-            self.p3button.connect('pressed', self.threewaydirdiff)
-            hbox.pack_end(self.p3button, False, False)
-            hbox.pack_end(self.p2button, False, False)
-            hbox.pack_end(self.p1button, False, False)
+            self.p1button = bb.addButton(_('Dir diff to p1'), BB.ActionRole)
+            self.p1button.pressed.connect(self.p1dirdiff)
+            self.p2button = bb.addButton(_('Dir diff to p2'), BB.ActionRole)
+            self.p2button.pressed.connect(self.p2dirdiff)
+            self.p3button = bb.addButton(_('3-way dir diff'), BB.ActionRole)
+            self.p3button.pressed.connect(self.threewaydirdiff)
         else:
-            self.dbutton = gtk.Button(_('Directory diff'))
-            self.dbutton.connect('pressed', self.p1dirdiff)
-            hbox.pack_end(self.dbutton, False, False)
+            self.dbutton = bb.addButton(_('Directory diff'), BB.ActionRole)
+            self.dbutton.pressed.connect(self.p1dirdiff)
 
-        self.update_diff_buttons(preferred)
+        self.updateDiffButtons(preferred)
 
+        '''
         if len(tools) > 1:
             combo = gtk.combo_box_new_text()
             for i, name in enumerate(tools.iterkeys()):
@@ -421,11 +389,12 @@ class FileSelectionDialog(QtGui.QDialog):
             filesel = treeview.get_selection()
             filesel.connect('changed', self.fileselect, repo, combo, tools,
                             patterns, preferred)
-
-        gobject.idle_add(self.fillmodel, repo, model, sa, sb)
         '''
 
-    def fillmodel(self, repo, model, sa, sb):
+        callable = lambda: self.fillmodel(repo, sa, sb)
+        QtCore.QTimer.singleShot(0, callable)
+
+    def fillmodel(self, repo, sa, sb):
         ctx1a, ctx1b, ctx2 = self.ctxs
         mod_a, add_a, rem_a = sa
         mod_b, add_b, rem_b = sb
@@ -470,42 +439,34 @@ class FileSelectionDialog(QtGui.QDialog):
             return ' '
 
         for f in sorted(mod_a | add_a | rem_a):
-            model.append([get_status(f, mod_a, add_a, rem_a), hglib.toutf(f)])
-
-        self.connect('response', self.response)
-
-    def search_filelist(self, model, column, key, iter):
-        'case insensitive filename search'
-        key = key.lower()
-        if key in model.get_value(iter, 1).lower():
-            return False
-        return True
+            status = get_status(f, mod_a, add_a, rem_a)
+            row = QtCore.QString('%s %s' % (status, hglib.tounicode(f)))
+            self.list.addItem(row)
 
     def toolselect(self, combo, tools):
         'user selected a tool from the tool combo'
-        sel = combo.get_active_text()
-        if sel in tools:
-            self.diffpath, self.diffopts, self.mergeopts = tools[sel]
-            self.update_diff_buttons(sel)
+        #sel = combo.get_active_text()
+        #if sel in tools:
+        #    self.diffpath, self.diffopts, self.mergeopts = tools[sel]
+        #    self.updateDiffButtons(sel)
 
-    def update_diff_buttons(self, tool):
+    def updateDiffButtons(self, tool):
         if hasattr(self, 'p1button'):
             d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
             d3 = self.ui.configbool('merge-tools', tool + '.dir3diff')
-            self.p1button.set_sensitive(d2)
-            self.p2button.set_sensitive(d2)
-            self.p3button.set_sensitive(d3)
+            self.p1button.setEnabled(d2)
+            self.p2button.setEnabled(d2)
+            self.p3button.setEnabled(d3)
         elif hasattr(self, 'dbutton'):
             d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
-            self.dbutton.set_sensitive(d2)
+            self.dbutton.setEnabled(d2)
+
+    def currentItemChanges(self, list, item):
+        pass # connect to below
 
     def fileselect(self, selection, repo, combo, tools, patterns, preferred):
         'user selected a file, pick an appropriate tool from combo'
-        model, path = selection.get_selected()
-        if not path:
-            return
-        row = model[path]
-        fname = row[-1]
+        fname = self.list.selectedItem().text()[2:]
         for pat, tool in patterns:
             mf = match.match(repo.root, '', [pat])
             if mf(fname):
@@ -517,10 +478,8 @@ class FileSelectionDialog(QtGui.QDialog):
             if name == selected:
                 combo.set_active(i)
 
-    def response(self, window, resp):
-        self.should_live()
-
     def should_live(self):
+        # TODO
         while self.tmproot:
             try:
                 shutil.rmtree(self.tmproot)
@@ -535,15 +494,12 @@ class FileSelectionDialog(QtGui.QDialog):
                     return False
         return False
 
-    def rowactivated(self, tree, *args):
-        selection = tree.get_selection()
-        if selection.count_selected_rows() != 1:
-            return False
-        model, paths = selection.get_selected_rows()
-        self.launch(*model[paths[0]])
+    def itemActivated(self, item):
+        'A QListWidgetItem has been activated'
+        self.launch(item.text()[2:])
 
-    def launch(self, st, fname):
-        fname = hglib.fromutf(fname)
+    def launch(self, fname):
+        fname = hglib.fromunicode(fname)
         source = self.copies.get(fname, None)
         dir1a, dir1b, dir2 = self.dirs
         rev1a, rev1b, rev2 = self.revs
