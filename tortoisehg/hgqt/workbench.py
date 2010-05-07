@@ -54,6 +54,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         # these are used to know where to go after a reload
         self._reload_rev = None
         self._reload_file = None
+        self._loading = True
 
         QtGui.QMainWindow.__init__(self)
         HgDialogMixin.__init__(self)
@@ -99,12 +100,22 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def timerEvent(self, event):
         if event.timerId() == self._watchrepotimer:
+            if self.loading():
+                return
             mtime = self._getrepomtime()
             if mtime > self._repodate:
                 self.statusBar().showMessage("Repository has been modified, "
                                              "reloading...", 2000)
 
                 self.reload()
+
+    def loading(self):
+        return self._loading
+
+    def loaded(self):
+        print "loaded()"
+        self._repodate = self._getrepomtime()
+        self._loading = False
 
     def setupBranchCombo(self, *args):
         allbranches = sorted(self.repo.branchtags().items())
@@ -370,6 +381,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.repomodel = HgRepoListModel(self.repo, fromhead=fromhead)
         connect(self.repomodel, SIGNAL('filled'),
                 self.on_filled)
+        connect(self.repomodel, SIGNAL('loaded'),
+                self.loaded)
         connect(self.repomodel, SIGNAL('showMessage'),
                 self.statusBar().showMessage,
                 Qt.QueuedConnection)
@@ -486,7 +499,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def reload(self):
         """Reload the repository"""
+        print "reload() called"
         self._reload_rev = self.tableView_revisions.current_rev
+        self._loading = True
         self._reload_file = self.tableView_filelist.currentFile()
         self.repo = hg.repository(self.repo.ui, self.repo.root)
         self._repodate = self._getrepomtime()
