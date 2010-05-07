@@ -297,8 +297,6 @@ mainapp = None
 def qtrun(dlgfunc, ui, *args, **opts):
     portable_fork(ui, opts)
 
-    qtlib.setup_font_substitutions()
-
     global mainapp
     if mainapp:
         dlg = dlgfunc(ui, *args, **opts)
@@ -312,6 +310,7 @@ def qtrun(dlgfunc, ui, *args, **opts):
     mainapp.setOrganizationName('TortoiseHg')
     mainapp.setOrganizationDomain('tortoisehg.org')
     mainapp.setApplicationVersion(thgversion.version())
+    qtlib.setup_font_substitutions()
     try:
         dlg = dlgfunc(ui, *args, **opts)
         if dlg:
