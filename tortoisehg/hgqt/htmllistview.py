@@ -45,7 +45,7 @@ class HtmlListView(QListView):
         self.setWindowTitle('HtmlListView')
         self.setModel(model)
         self.setSelectionBehavior(QAbstractItemView.SelectItems)
-        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setSelectionMode(QAbstractItemView.MultiSelection)
         self.resize(600, 200)
         self.setItemDelegate(HTMLDelegate(self))
         self._supportsSelection = QApplication.clipboard().supportsSelection()
