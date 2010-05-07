@@ -122,6 +122,11 @@ class UpdateDialog(QDialog):
         self.detail_btn.setAutoDefault(False)
         self.detail_btn.setCheckable(True)
         self.detail_btn.toggled.connect(self.detail_toggled)
+        self.options_btn = buttons.addButton(_('Options'),
+                                            QDialogButtonBox.ResetRole)
+        self.options_btn.setAutoDefault(False)
+        self.options_btn.setCheckable(True)
+        self.options_btn.toggled.connect(self.options_clicked)
         box.addWidget(buttons)
 
         # signal handlers
@@ -140,6 +145,8 @@ class UpdateDialog(QDialog):
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
+        self.merge_chk.setHidden(True)
+        self.showlog_chk.setHidden(True)
         self.update_info()
 
     ### Private Methods ###
@@ -250,6 +257,10 @@ class UpdateDialog(QDialog):
 
     def detail_toggled(self, checked):
         self.cmd.show_output(checked)
+
+    def options_clicked(self, checked):
+        self.merge_chk.setShown(checked)
+        self.showlog_chk.setShown(checked)
 
     def command_started(self):
         self.cmd.setShown(True)
