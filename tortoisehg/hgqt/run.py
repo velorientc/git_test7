@@ -239,6 +239,7 @@ def runcommand(ui, args):
         raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
 
+    cmdoptions['mainapp'] = True
     d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
     return _runcommand(lui, options, cmd, d)
 
@@ -371,6 +372,11 @@ def update(ui, *pats, **opts):
 def log(ui, *pats, **opts):
     """Repository Explorer (changelog viewer)"""
     from tortoisehg.hgqt.workbench import run
+    qtrun(run, ui, *pats, **opts)
+
+def vdiff(ui, *pats, **opts):
+    """launch configured visual diff tool"""
+    from tortoisehg.hgqt.visdiff import run
     qtrun(run, ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
@@ -613,6 +619,11 @@ table = {
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
           ('r', 'rev', '', _('revision to update')),],
          _('thg update [-C] [[-r] REV]')),
+    "^vdiff": (vdiff,
+        [('c', 'change', '', _('changeset to view in diff tool')),
+         ('r', 'rev', [], _('revisions to view in diff tool')),
+         ('b', 'bundle', '', _('bundle file to preview'))],
+            _('launch visual diff tool')),
 }
 
 if os.name == 'nt':
