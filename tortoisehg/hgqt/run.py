@@ -26,6 +26,7 @@ from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib
 from tortoisehg.util import version as thgversion
+from tortoisehg.hgqt import setup_font_substitutions
 try:
     from tortoisehg.util.config import nofork as config_nofork
 except ImportError:
@@ -295,6 +296,8 @@ def _runcommand(ui, options, cmd, cmdfunc):
 mainapp = None
 def qtrun(dlgfunc, ui, *args, **opts):
     portable_fork(ui, opts)
+
+    setup_font_substitutions()
 
     global mainapp
     if mainapp:

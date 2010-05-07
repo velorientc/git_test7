@@ -559,9 +559,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             s.setValue(wb + n, getattr(self, n).saveState())
 
 def run(ui, *pats, **opts):
-    from tortoisehg.hgqt import setup_font_substitutions
-    setup_font_substitutions()
-
     repo = None
     root = paths.find_root()
     if root:
