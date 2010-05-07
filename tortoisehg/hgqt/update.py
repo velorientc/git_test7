@@ -7,7 +7,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import QString, Qt
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout
 from PyQt4.QtGui import QComboBox, QLabel, QLayout, QCheckBox, QMessageBox
 
@@ -49,9 +49,10 @@ class UpdateDialog(QDialog):
         grid.addWidget(combo, 0, 1)
 
         if rev is None:
-            combo.addItem(self.repo.dirstate.branch())
+            rev = self.repo.dirstate.branch()
         else:
-            combo.addItem(QString(rev))
+            rev = str(rev)
+        combo.addItem(hglib.tounicode(rev))
         combo.setCurrentIndex(0)
         for name in hglib.getlivebranch(self.repo):
             combo.addItem(name)
