@@ -69,11 +69,6 @@ class StatusWidget(QWidget):
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.te.setReadOnly(True)
         self.te.setLineWrapMode(QTextEdit.NoWrap)
-        # it is not clear why I had to set this QFont to get monospace
-        f = QFont("Monospace")
-        f.setStyleHint(QFont.TypeWriter)
-        f.setPointSize(9)
-        self.te.setFont(f)
 
         if not parent:
             self.setWindowTitle(_('TortoiseHg Status'))
