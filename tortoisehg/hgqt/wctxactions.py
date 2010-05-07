@@ -91,6 +91,9 @@ def run(func, parent, files, repo):
         QMessageBox.critical(parent, name + _(' Aborted'), str(e))
     except (error.LookupError), e:
         QMessageBox.critical(parent, name + _(' Aborted'), str(e))
+    except NotImplementedError:
+        QMessageBox.critical(parent, name + _(' not implemented'), 
+                'Please add it :)')
     os.chdir(cwd)
     return notify
 
