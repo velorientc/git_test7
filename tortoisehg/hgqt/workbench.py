@@ -431,20 +431,16 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.header_diff_format.setBackground(Qt.gray)
 
     def on_filled(self):
-        # called the first time the model is filled, so we select
-        # the first available revision
         tv = self.tableView_revisions
         if self._reload_rev is not None:
-            torev = self._reload_rev
-            self._reload_rev = None
             try:
-                tv.goto(torev)
+                tv.goto(self._reload_rev)
                 self.tableView_filelist.selectFile(self._reload_file)
-                self._reload_file = None
                 return
             except IndexError:
                 pass
-        tv.setCurrentIndex(tv.model().index(0, 0))
+        else:
+            tv.setCurrentIndex(tv.model().index(0, 0))
 
     def revision_activated(self, rev=None):
         """
@@ -517,8 +513,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self._repodate = self._getrepomtime()
         self.setupBranchCombo()
         self.setupModels()
-        # XXX workaround: see refreshRevisionTable method 
-        self.refreshRevisionTable(sender=self)
 
     #@timeit
     def refreshRevisionTable(self, *args, **kw):
