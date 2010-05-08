@@ -283,16 +283,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
-        <widget class="QTextEdit" name="preview_edit">
-         <property name="font">
-          <font>
-           <family>Monospace</family>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <widget class="QsciScintilla" name="preview_edit"/>
        </item>
       </layout>
      </widget>
@@ -343,6 +334,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QsciScintilla</class>
+   <extends>QFrame</extends>
+   <header>Qsci/qsciscintilla.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>main_tabs</tabstop>
   <tabstop>to_edit</tabstop>

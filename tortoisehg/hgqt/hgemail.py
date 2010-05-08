@@ -14,7 +14,7 @@ from PyQt4.QtGui import QDialog
 from mercurial import hg, error, extensions, util
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, lexers
 
 try:
     from tortoisehg.hgqt.ui_hgemail import Ui_EmailDialog
@@ -207,6 +207,14 @@ class EmailDialog(QDialog):
         return len(self._revs) > 1
 
     def _initpreviewtab(self):
+        def initqsci(w):
+            w.setUtf8(True)
+            w.setReadOnly(True)
+            w.setMarginWidth(1, 0)  # hide area for line numbers
+            w.setLexer(lexers.DiffLexerSelector().lexer())
+            # TODO: better way to setup diff lexer
+        initqsci(self._qui.preview_edit)
+
         self.connect(self._qui.main_tabs, SIGNAL('currentChanged(int)'),
                      self._refreshpreviewtab)
         self._refreshpreviewtab(self._qui.main_tabs.currentIndex())
