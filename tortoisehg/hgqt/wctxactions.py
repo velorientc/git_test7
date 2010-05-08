@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import subprocess
 
 from mercurial import util, cmdutil, error, merge, commands
 from tortoisehg.hgqt import qtlib, htmlui
@@ -13,7 +14,7 @@ from tortoisehg.util import hglib, shlib
 from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import Qt, SIGNAL
-from PyQt4.QtGui import QAction, QMenu, QMessageBox
+from PyQt4.QtGui import QAction, QMenu, QMessageBox, QFileDialog
 
 def wctxactions(parent, point, repo, selrows):
     if not selrows:
@@ -102,7 +103,30 @@ def vdiff(parent, ui, repo, files):
     visualdiff(ui, repo, files, {})
 
 def edit(parent, ui, repo, files):
-    raise NotImplementedError()
+    editor = (ui.config('tortoisehg', 'editor') or
+              ui.config('gtools', 'editor') or
+              os.environ.get('HGEDITOR') or
+              ui.config('ui', 'editor') or
+              os.environ.get('EDITOR', 'vi'))
+    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+        res = QtGui.QMessageBox.critical(parent,
+                       _('No visual editor configured'),
+                       _('Please configure a visual editor.'))
+        #dlg = thgconfig.ConfigDialog(False, focus='tortoisehg.editor')
+        #dlg.exec_()
+        return
+
+    cmdline = ' '.join([editor] + [util.localpath(f) for f in files])
+    cmdline = util.quotecommand(cmdline)
+    try:
+        from tortoisehg.hgqt.visdiff import openflags
+        subprocess.Popen(cmdline, shell=True, creationflags=openflags,
+                         stderr=None, stdout=None, stdin=None)
+    except (OSError, EnvironmentError), e:
+        QtGui.QMessageBox.warning(parent,
+                 _('Editor launch failure'),
+                 _('%s : %s') % (cmd, str(e)))
+    return False
 
 def viewmissing(parent, ui, repo, files):
     raise NotImplementedError()
@@ -171,9 +195,19 @@ def delete(parent, ui, repo, files):
     return True
 
 def copy(parent, ui, repo, files):
-    raise NotImplementedError()
+    assert len(files) == 1
+    wfile = repo.wjoin(files[0])
+    fd = QFileDialog(parent)
+    fname = fd.getSaveFileName(parent, _('Copy file to'), wfile)
+    if not fname:
+        return
+    fname = hglib.fromunicode(fname)
+    wfiles = [wfile, fname]
+    commands.copy(ui, repo, *wfiles)
+    return True
 
 def rename(parent, ui, repo, files):
+    # needs rename dialog
     raise NotImplementedError()
 
 def resolve(parent, ui, repo, files):
