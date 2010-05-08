@@ -102,7 +102,7 @@ class UpdateDialog(QDialog):
         optbox.addWidget(self.merge_chk)
         optbox.addWidget(self.showlog_chk)
 
-        self.discard_chk.setChecked(bool(opts.get('clean', False)))
+        self.discard_chk.setChecked(bool(opts['clean']))
 
         ## command widget
         self.cmd = cmdui.Widget()
