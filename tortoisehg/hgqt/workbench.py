@@ -461,8 +461,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         opts = { 'clean':False }
         dlg = UpdateDialog(rev, self.repo, self, opts=opts)
         self._updatedlg = dlg
-        def quit():
-            if dlg.completed:
+        def quit(status):
+            if status == 0:
                 self.reload()  # TODO: implement something less drastic than a full reload
             self.setScanForRepoChanges(saved)            
         dlg.quitsignal.connect(quit)
