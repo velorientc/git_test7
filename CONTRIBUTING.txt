@@ -14,7 +14,7 @@ if later versions of a library are found to be present at runtime, provided the
 application is still reasonably usable with the base library versions listed
 below.
 
-PyQt: 4.3
+PyQt: 4.5
 
 === Python version ===
 
