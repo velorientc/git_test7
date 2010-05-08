@@ -458,7 +458,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def updateToRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
-        opts = {}
+        opts = { 'clean':False }
         dlg = UpdateDialog(rev, self.repo, self, opts=opts)
         self._updatedlg = dlg
         def quit():
