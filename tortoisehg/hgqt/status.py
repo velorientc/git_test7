@@ -63,13 +63,16 @@ class StatusWidget(QWidget):
 
         split = QSplitter(Qt.Horizontal)
         layout = QVBoxLayout()
+        layout.setMargin(0)
         layout.addWidget(split)
         self.setLayout(layout)
 
         vbox = QVBoxLayout()
+        vbox.setMargin(0)
         frame = QFrame(split)
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
+        hbox.setContentsMargins (5, 7, 0, 0)
         lbl = QLabel(_('Filter:'))
         le = QLineEdit()
         hbox.addWidget(lbl)
