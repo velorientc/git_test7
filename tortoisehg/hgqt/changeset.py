@@ -56,6 +56,9 @@ class RevDisplay(QtGui.QWidget):
     """
     Display metadata for one revision (rev, author, description, etc.)
     """
+
+    commitsignal = QtCore.pyqtSignal()
+
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self._message = None
@@ -67,9 +70,14 @@ class RevDisplay(QtGui.QWidget):
         self._header = w = QtGui.QLabel()
         w.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
         hb.addWidget(w)
+        hb.addStretch(0)
 
         vb = QtGui.QVBoxLayout()
         hb.addLayout(vb)
+
+        hb2 = QtGui.QHBoxLayout()
+        hb2.addStretch(0)
+        vb.addLayout(hb2)
 
         # expand header button
         self._expander = w = QtGui.QToolButton()
@@ -78,12 +86,22 @@ class RevDisplay(QtGui.QWidget):
         a = QtGui.QAction(self)
         connect(a, SIGNAL("triggered()"), self.expand)
         w.setDefaultAction(a)
-        vb.addWidget(w, 0, Qt.AlignTop)
+        hb2.addWidget(w, 0, Qt.AlignTop)
         self._expanded = True
+
+        hb3 = QtGui.QHBoxLayout()
+        hb3.addStretch(0)
+        vb.addLayout(hb3)
+        self._commitbutton = w = QtGui.QPushButton('Commit')
+        hb3.addWidget(w, 0, Qt.AlignBottom)
+        connect(w, SIGNAL('clicked()'), self.commit)
 
         connect(self._header,
                 SIGNAL('linkActivated(const QString&)'),
                 self.anchorClicked)
+
+    def commit(self):
+        self.commitsignal.emit()
 
     def expand(self):
         self._expanded = not self._expanded
@@ -148,6 +166,11 @@ class RevDisplay(QtGui.QWidget):
     def refreshDisplay(self):
         ctx = self.ctx
         rev = ctx.rev()
+
+        enableci = self._expanded and not rev
+        self._commitbutton.setVisible(enableci)
+        self._message.setEditable(enableci)
+
         buf = headerstyle
         if self.mqpatch:
             buf += "<table width=100%>\n"
@@ -224,6 +247,12 @@ class RevMessage(QtGui.QWidget):
         vb.addWidget(w)
 
         self.setLayout(vb)
+
+    def setEditable(self, editable):
+        self._message.setReadOnly(not editable)
+
+    def text(self):
+        return str(self._message.toPlainText())
 
     def displayRevision(self, ctx):
         self.ctx = ctx

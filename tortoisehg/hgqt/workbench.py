@@ -74,6 +74,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self.textview_header.setMessageWidget(self.message)
 
+        self.textview_header.commitsignal.connect(self.commit)
+
         # setup tables and views
         self.setupHeaderTextview()
         connect(self.textview_status, SIGNAL('fileDisplayed'),
@@ -98,6 +100,13 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
+
+    def commit(self):
+        args = ['commit']
+        args += ['-v', '-m', self.message.text()]
+        dlg = cmdui.Dialog(args)
+        dlg.show()
+        self._commitdlg = dlg
 
     def timerEvent(self, event):
         if event.timerId() == self._watchrepotimer:
