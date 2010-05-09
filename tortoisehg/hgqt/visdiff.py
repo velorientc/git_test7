@@ -33,14 +33,16 @@ _regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|ch
 
 _nonexistant = _('[non-existant]')
 
-def snapshot(repo, files, ctx, tmproot):
+def snapshot(repo, files, ctx):
     '''snapshot files as of some revision'''
     dirname = os.path.basename(repo.root) or 'root'
     if ctx.rev() is not None:
         dirname = '%s.%s' % (dirname, str(ctx))
-    base = os.path.join(tmproot, dirname)
-    os.mkdir(base)
+    base = os.path.join(qtlib.gettempdir(), dirname)
     fns_and_mtime = []
+    if os.path.exists(base):
+        return base, fns_and_mtime
+    os.mkdir(base)
     for fn in files:
         wfn = util.pconvert(fn)
         if not wfn in ctx:
@@ -221,16 +223,16 @@ def visualdiff(ui, repo, pats, opts):
     else:
         args = diffopts
 
-    def dodiff(tmproot):
+    def dodiff():
         fns_and_mtime = []
 
         # Always make a copy of ctx1a (and ctx1b, if applicable)
         files = mod_a | rem_a | ((mod_b | add_b) - add_a)
-        dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
+        dir1a = snapshot(repo, files, ctx1a)[0]
         label1a = '@%d' % ctx1a.rev()
         if do3way:
             files = mod_b | rem_b | ((mod_a | add_a) - add_b)
-            dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
+            dir1b = snapshot(repo, files, ctx1b)[0]
             label1b = '@%d' % ctx1b.rev()
         else:
             dir1b =  None
@@ -238,7 +240,7 @@ def visualdiff(ui, repo, pats, opts):
 
         if ctx2.rev() is not None:
             # If ctx2 is not the working copy, create a snapshot for it
-            dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
+            dir2 = snapshot(repo, MA, ctx2)[0]
             label2 = '@%d' % ctx2.rev()
         elif len(MAR) == 1:
             # This lets the diff tool open the changed file directly
@@ -247,14 +249,14 @@ def visualdiff(ui, repo, pats, opts):
         else:
             # Create a snapshot, record mtime to detect mods made by
             # diff tool
-            dir2, fns_and_mtime = snapshot(repo, MA, ctx2, tmproot)
+            dir2, fns_and_mtime = snapshot(repo, MA, ctx2)
             label2 = 'working files'
 
         def getfile(fname, dir, label):
-            file = os.path.join(tmproot, dir, fname)
+            file = os.path.join(qtlib.gettempdir(), dir, fname)
             if os.path.isfile(file):
                 return fname+label, file
-            nullfile = os.path.join(tmproot, 'empty')
+            nullfile = os.path.join(qtlib.gettempdir(), 'empty')
             fp = open(nullfile, 'w')
             fp.close()
             return _nonexistant+label, nullfile
@@ -288,16 +290,11 @@ def visualdiff(ui, repo, pats, opts):
 
     def dodiffwrapper():
         try:
-            dodiff(tmproot)
+            dodiff()
         finally:
+            # cleanup happens atexit
             ui.note(_('cleaning up temp directory\n'))
-            try:
-                shutil.rmtree(tmproot)
-            except (IOError, OSError), e:
-                # Leaking temporary files, fix your diff tool config
-                ui.note(_('unable to clean temp directory: %s\n'), str(e))
 
-    tmproot = tempfile.mkdtemp(prefix='visualdiff.')
     if opts.get('mainapp'):
         dodiffwrapper()
     else:
@@ -410,16 +407,13 @@ class FileSelectionDialog(QtGui.QDialog):
         MA = mod_a | add_a | mod_b | add_b
         MAR = MA | rem_a | rem_b | sources
 
-        tmproot = tempfile.mkdtemp(prefix='visualdiff.')
-        self.tmproot = tmproot
-
         # Always make a copy of node1a (and node1b, if applicable)
         files = sources | mod_a | rem_a | ((mod_b | add_b) - add_a)
-        dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
+        dir1a = snapshot(repo, files, ctx1a)[0]
         rev1a = '@%d' % ctx1a.rev()
         if ctx1b:
             files = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
-            dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
+            dir1b = snapshot(repo, files, ctx1b)[0]
             rev1b = '@%d' % ctx1b.rev()
         else:
             dir1b = None
@@ -430,7 +424,7 @@ class FileSelectionDialog(QtGui.QDialog):
             dir2 = repo.root
             rev2 = ''
         else:
-            dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
+            dir2 = snapshot(repo, MA, ctx2)[0]
             rev2 = '@%d' % ctx2.rev()
 
         self.dirs = (dir1a, dir1b, dir2)
@@ -486,22 +480,6 @@ class FileSelectionDialog(QtGui.QDialog):
             if name == selected:
                 combo.setCurrentIndex(i)
 
-    def closeEvent(self, event):
-        while self.tmproot:
-            try:
-                shutil.rmtree(self.tmproot)
-                event.accept()
-                return
-            except (IOError, OSError), e:
-                resp = qtlib.CustomPrompt(_('Unable to delete temp files'),
-                    _('Close diff tools and try again, or quit to leak files?'),
-                    self, (_('Try &Again'), _('&Quit')), 1).run()
-                if resp == 0:
-                    continue
-                else:
-                    event.accept()
-                    return
-
     def itemActivated(self, item):
         'A QListWidgetItem has been activated'
         self.launch(item.text()[2:])
@@ -522,7 +500,7 @@ class FileSelectionDialog(QtGui.QDialog):
                 path = os.path.join(dir, util.localpath(source))
                 return source, path
             else:
-                nullfile = os.path.join(self.tmproot, 'empty')
+                nullfile = os.path.join(qtlib.gettempdir(), 'empty')
                 fp = open(nullfile, 'w')
                 fp.close()
                 return _nonexistant, nullfile
