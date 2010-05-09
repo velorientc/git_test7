@@ -39,7 +39,7 @@ def wctxactions(parent, point, repo, selrows):
     make(_('Edit'), edit, frozenset('MACI?'))
     make(_('View missing'), viewmissing, frozenset('R!'))
     if len(repo.parents()) > 1:
-        make(_('View other'), other, frozenset('MA'))
+        make(_('View other'), viewother, frozenset('MA'))
     menu.addSeparator()
     make(_('&Revert'), revert, frozenset('MAR!'))
     menu.addSeparator()
@@ -131,7 +131,7 @@ def viewmissing(parent, ui, repo, files):
     base, _ = visdiff.snapshot(repo, files, repo['.'])
     edit(parent, ui, repo, [os.path.join(base, f) for f in files])
 
-def other(parent, ui, repo, files):
+def viewother(parent, ui, repo, files):
     wctx = repo[None]
     assert bool(wctx.p2())
     base, _ = visdiff.snapshot(repo, files, wctx.p2())
