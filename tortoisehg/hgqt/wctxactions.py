@@ -75,27 +75,29 @@ def run(func, parent, files, repo):
     name = func.__name__.title()
     notify = False
     cwd = os.getcwd()
-    os.chdir(repo.root)
     try:
-        # All operations should quietly succeed.  Any error should
-        # result in a message box
-        notify = func(parent, hu, repo, files)
-        o, e = hu.getdata()
-        if e:
-            QMessageBox.warning(parent, name + _(' reported errors'), str(e))
-        elif o:
-            QMessageBox.information(parent, name + _(' output'), str(o))
-        elif notify:
-            wfiles = [repo.wjoin(x) for x in files]
-            shlib.shell_notify(wfiles)
-    except (util.Abort, IOError, OSError), e:
-        QMessageBox.critical(parent, name + _(' Aborted'), str(e))
-    except (error.LookupError), e:
-        QMessageBox.critical(parent, name + _(' Aborted'), str(e))
-    except NotImplementedError:
-        QMessageBox.critical(parent, name + _(' not implemented'), 
-                'Please add it :)')
-    os.chdir(cwd)
+        os.chdir(repo.root)
+        try:
+            # All operations should quietly succeed.  Any error should
+            # result in a message box
+            notify = func(parent, hu, repo, files)
+            o, e = hu.getdata()
+            if e:
+                QMessageBox.warning(parent, name + _(' errors'), str(e))
+            elif o:
+                QMessageBox.information(parent, name + _(' output'), str(o))
+            elif notify:
+                wfiles = [repo.wjoin(x) for x in files]
+                shlib.shell_notify(wfiles)
+        except (util.Abort, IOError, OSError), e:
+            QMessageBox.critical(parent, name + _(' Aborted'), str(e))
+        except (error.LookupError), e:
+            QMessageBox.critical(parent, name + _(' Aborted'), str(e))
+        except NotImplementedError:
+            QMessageBox.critical(parent, name + _(' not implemented'), 
+                    'Please add it :)')
+    finally:
+        os.chdir(cwd)
     return notify
 
 def vdiff(parent, ui, repo, files):
