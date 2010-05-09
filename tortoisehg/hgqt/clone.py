@@ -18,7 +18,7 @@ from mercurial import ui
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, qtlib
 
 class CloneDialog(QDialog):
 
@@ -180,24 +180,16 @@ class CloneDialog(QDialog):
 
         # verify input
         if src == '':
-            msg = QMessageBox(self)
-            msg.setIcon(QMessageBox.Warning)
-            msg.setWindowTitle(_('TortoiseHg Clone'))
-            msg.setStandardButtons(QMessageBox.Close)
-            msg.setText(_('<b>Source path is empty</b>'))
-            msg.setInformativeText(_('<nobr>Please enter a valid source path.</nobr>'))
-            msg.exec_()
+            qtlib.ErrorMsgBox(_('TortoiseHg Clone'),
+                  _('Source path is empty'),
+                  _('Please enter a valid source path.'))
             self.src_combo.setFocus()
             return False
 
         if src == dest:
-            msg = QMessageBox(self)
-            msg.setIcon(QMessageBox.Warning)
-            msg.setWindowTitle(_('TortoiseHg Clone'))
-            msg.setStandardButtons(QMessageBox.Close)
-            msg.setText(_('<b>Source and destination are the same</b>'))
-            msg.setInformativeText(_('<nobr>Please specify different paths.</nobr>'))
-            msg.exec_()
+            qtlib.ErrorMsgBox(_('TortoiseHg Clone'),
+                  _('Source and destination are the same'),
+                  _('Please specify different paths.'))
             return False
 
         if dest == os.getcwd():
