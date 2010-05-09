@@ -5,12 +5,27 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import atexit
+import shutil
+import tempfile
+
 from PyQt4 import QtCore, QtGui
 from mercurial import extensions
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
+
+tmproot = None
+def gettempdir():
+    global tmproot
+    def cleanup():
+        try: shutil.rmtree(tmproot)
+        except: pass
+    if not tmproot:
+        tmproot = tempfile.mkdtemp(prefix='thg.')
+        atexit.register(cleanup)
+    return tmproot
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
