@@ -23,19 +23,20 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # Technical Debt
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
-#  double-click visual diffs
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Need mechanisms to clear pats and toggle visibility options
 #  Need mechanism to override file size/binary check
 #  Show subrepos better
 #  Save splitter position to parent's QSetting
-#  Context menu, toolbar
 #  Sorting, filtering of working files
 #  Chunk selection
 #  tri-state checkboxes for commit
 #  Investigate Qt.DecorationRole and possible use of overlay icons
 #  Investigate folding/nesting of files
+# Maybe, Maybe Not
+#  Toolbar
+#  double-click visual diffs
 
 class StatusWidget(QWidget):
     def __init__(self, pats, opts, parent=None):
