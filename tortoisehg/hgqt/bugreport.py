@@ -14,6 +14,7 @@ from PyQt4.QtCore import SIGNAL, SLOT
 from mercurial import extensions
 from tortoisehg.util import hglib, version
 from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib
 
 class BugReport(QtGui.QDialog):
 
@@ -24,11 +25,13 @@ class BugReport(QtGui.QDialog):
 
         layout = QtGui.QVBoxLayout() 
 
-        te = QtGui.QTextEdit()
-        te.setPlainText(self.text)
-        te.setReadOnly(True)
-        te.setWordWrapMode(QtGui.QTextOption.NoWrap)
-        layout.addWidget(te)
+        tb = QtGui.QTextBrowser()
+        tb.document().setDefaultStyleSheet(qtlib.thgstylesheet)
+        msg = hglib.tounicode(self.text)
+        msg = QtCore.Qt.escape(msg)
+        tb.setHtml('<font>' + msg + '</font>')
+        tb.setWordWrapMode(QtGui.QTextOption.NoWrap)
+        layout.addWidget(tb)
 
         # dialog buttons
         BB = QtGui.QDialogButtonBox
@@ -40,7 +43,7 @@ class BugReport(QtGui.QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle(_('TortoiseHg Bug Report'))
-        self.resize(550, 400)
+        self.resize(650, 400)
 
     def gettext(self, opts):
         text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
