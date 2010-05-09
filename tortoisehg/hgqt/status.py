@@ -24,7 +24,6 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
 #  double-click visual diffs
-#  Disable check column when wctx has two parents
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Need mechanisms to clear pats and toggle visibility options
@@ -125,6 +124,7 @@ class StatusWidget(QWidget):
         self.tv.sortByColumn(COL_PATH_DISPLAY)
         for col in xrange(COL_PATH):
             self.tv.resizeColumnToContents(col)
+        self.tv.setColumnHidden(COL_CHECK, self.isMerge())
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
