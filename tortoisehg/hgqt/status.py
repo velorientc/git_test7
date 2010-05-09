@@ -67,6 +67,7 @@ class StatusWidget(QWidget):
 
         self.tv = WctxFileTree(self.repo, split)
         self.connect(self.tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
+        self.connect(self.tv, SIGNAL('menuAction()'), self.refreshWctx)
 
         self.te = QTextEdit(split)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -81,13 +82,11 @@ class StatusWidget(QWidget):
             split.setStretchFactor(1, 2)
 
         self.refreshWctx()
-        self.updateModel()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F5:
             self.te.clear()
             self.refreshWctx()
-            self.updateModel()
         else:
             return super(StatusWidget, self).keyPressEvent(event)
 
@@ -100,6 +99,7 @@ class StatusWidget(QWidget):
             m = cmdutil.match(self.repo, self.pats)
             status = self.repo.status(match=m, **stopts)
             self.wctx = context.workingctx(self.repo, changes=status)
+            self.updateModel()
             return
         wctx = self.repo[None]
         try:
@@ -111,6 +111,7 @@ class StatusWidget(QWidget):
         except (OSError, IOError, util.Abort), e:
             self.status_error = str(e)
         self.wctx = wctx
+        self.updateModel()
 
     def isMerge(self):
         return bool(self.wctx.p2())
@@ -244,7 +245,7 @@ class WctxFileTree(QTreeView):
         point = self.mapToGlobal(point)
         action = wctxactions.wctxactions(self, point, self.repo, selrows)
         if action:
-            print action.text(), 'performed' # maybe should refresh
+            self.emit(SIGNAL('menuAction()'))
 
 COL_CHECK = 0
 COL_STATUS = 1
