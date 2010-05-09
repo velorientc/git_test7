@@ -195,7 +195,7 @@ class CloneDialog(QDialog):
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle(_('TortoiseHg Clone'))
             msg.setStandardButtons(QMessageBox.Close)
-            msg.setText(_('Source and destination are the same'))
+            msg.setText(_('<b>Source and destination are the same</b>'))
             msg.setInformativeText(_('<nobr>Please specify different paths.</nobr>'))
             msg.exec_()
             return False
