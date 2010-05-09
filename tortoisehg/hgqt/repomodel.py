@@ -359,7 +359,9 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
                 tags = set(ctx.tags())
                 icn = None
 
-                if tags.intersection(self.mqueues):
+                if gnode.rev in self.wd_revs:
+                    icn = geticon('clean')
+                elif tags.intersection(self.mqueues):
                     icn = geticon('mqpatch')
 
                 if icn:
