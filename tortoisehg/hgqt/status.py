@@ -12,10 +12,11 @@ from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
-from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel
-from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl
-from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView
-from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
+from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT, QAbstractTableModel
+from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString
+from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
+from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QSortFilterProxyModel
+from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -29,7 +30,6 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 #  Need mechanism to override file size/binary check
 #  Show subrepos better
 #  Save splitter position to parent's QSetting
-#  Sorting, filtering of working files
 #  Chunk selection
 #  tri-state checkboxes for commit
 #  Investigate Qt.DecorationRole and possible use of overlay icons
@@ -66,9 +66,31 @@ class StatusWidget(QWidget):
         layout.addWidget(split)
         self.setLayout(layout)
 
-        self.tv = WctxFileTree(self.repo, split)
-        self.connect(self.tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
-        self.connect(self.tv, SIGNAL('menuAction()'), self.refreshWctx)
+        vbox = QVBoxLayout()
+        frame = QFrame(split)
+        frame.setLayout(vbox)
+        hbox = QHBoxLayout()
+        lbl = QLabel(_('Filter:'))
+        le = QLineEdit()
+        hbox.addWidget(lbl)
+        hbox.addWidget(le)
+        tv = WctxFileTree(self.repo)
+        vbox.addLayout(hbox)
+        vbox.addWidget(tv)
+        split.addWidget(frame)
+
+        self.connect(tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
+        self.connect(tv, SIGNAL('menuAction()'), self.refreshWctx)
+        tv.setItemsExpandable(False)
+        tv.setRootIsDecorated(False)
+        tv.setSortingEnabled(True)
+
+        self.proxy = WctxProxyModel()
+        self.proxy.setFilterKeyColumn(COL_PATH_DISPLAY)
+        self.connect(le, SIGNAL('textEdited(QString)'), self.proxy,
+                     SLOT('setFilterWildcard(QString)'))
+        tv.setModel(self.proxy)
+        self.tv = tv
 
         self.te = QTextEdit(split)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -114,22 +136,19 @@ class StatusWidget(QWidget):
         self.wctx = wctx
         self.updateModel()
 
-    def isMerge(self):
-        return bool(self.wctx.p2())
-
     def updateModel(self):
         tm = WctxModel(self.wctx, self.ms, self.opts)
-        self.tv.setModel(tm)
-        self.tv.setItemsExpandable(False)
-        self.tv.setRootIsDecorated(False)
-        self.tv.setSortingEnabled(True)
-        self.tv.sortByColumn(COL_PATH_DISPLAY)
+        self.rawmodel = tm
+        self.proxy.setSourceModel(tm)
         for col in xrange(COL_PATH):
             self.tv.resizeColumnToContents(col)
         self.tv.setColumnHidden(COL_CHECK, self.isMerge())
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
+
+    def isMerge(self):
+        return bool(self.wctx.p2())
 
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
@@ -390,6 +409,27 @@ class WctxModel(QAbstractTableModel):
         if index.column() == COL_CHECK:
             self.toggleRow(index)
 
+class WctxProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        QSortFilterProxyModel.__init__(self, parent)
+
+    def getPath(self, index):
+        index = self.mapToSource(index)
+        return self.sourceModel().getPath(index)
+
+    def getRow(self, index):
+        index = self.mapToSource(index)
+        return self.sourceModel().getRow(index)
+
+    def toggleRow(self, index):
+        'Connected to "activated" signal, emitted by dbl-click or enter'
+        index = self.mapToSource(index)
+        return self.sourceModel().toggleRow(index)
+
+    def pressedRow(self, index):
+        'Connected to "pressed" signal, emitted by mouse clicks'
+        index = self.mapToSource(index)
+        return self.sourceModel().pressedRow(index)
 
 def run(ui, *pats, **opts):
     return StatusWidget(pats, opts)
