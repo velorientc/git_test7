@@ -8,7 +8,7 @@
 import os
 
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff, context, merge
-from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions
+from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
@@ -23,7 +23,7 @@ from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 # Technical Debt
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
-#  CTRL-D, double-click visual diffs
+#  double-click visual diffs
 #  Disable check column when wctx has two parents
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
@@ -200,6 +200,15 @@ class WctxFileTree(QTreeView):
         if event.key() == 32:
             for index in self.selectedIndexes():
                 self.model().toggleRow(index)
+        if event.key() == Qt.Key_D and event.modifiers() == Qt.ControlModifier:
+            rows = set()
+            selfiles = []
+            for index in self.selectedIndexes():
+                if index.row() in rows:
+                    continue
+                rows.add(index.row())
+                selfiles.append(self.model().getRow(index)[COL_PATH])
+            visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
         else:
             return super(WctxFileTree, self).keyPressEvent(event)
 
