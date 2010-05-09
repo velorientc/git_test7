@@ -8,7 +8,7 @@
 import os
 import subprocess
 
-from mercurial import util, cmdutil, error, merge, commands
+from mercurial import util, error, merge, commands
 from tortoisehg.hgqt import qtlib, htmlui, visdiff
 from tortoisehg.util import hglib, shlib
 from tortoisehg.util.i18n import _
