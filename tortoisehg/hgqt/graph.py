@@ -103,8 +103,6 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
 
     If branch is set, only generated the subtree for the given named branch. 
     """
-    if start_rev is None and repo.status() == ([],)*7:
-        start_rev = len(repo.changelog)
     assert start_rev is None or start_rev >= stop_rev
     curr_rev = start_rev
     revs = []

@@ -69,7 +69,7 @@ def getlog(model, ctx, gnode):
         if msg:
             msg = msg.splitlines()[0]
     else:
-        msg = "WORKING DIRECTORY (locally modified)"
+        msg = "WORKING DIRECTORY"
     return msg
 
 # XXX maybe it's time to make these methods of the model...
@@ -158,7 +158,6 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         if self._hasmq:
             self.mqueues = self.repo.mq.series[:]
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
-        self.wd_status = [self.repo.status(ctx.node(), None)[:4] for ctx in wdctxs]
         self._user_colors = {}
         self._branch_colors = {}
         grapher = revision_grapher(self.repo, start_rev=fromhead,
@@ -302,14 +301,6 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
             return QtCore.QVariant(_columnmap[column](self, ctx, gnode))
         elif role == QtCore.Qt.ToolTipRole:
             msg = "<b>Branch:</b> %s<br>\n" % ctx.branch()
-            if gnode.rev in self.wd_revs:
-                msg += " <i>Working Directory position"
-                states = 'modified added removed deleted'.split()
-                status = self.wd_status[self.wd_revs.index(gnode.rev)]
-                status = [state for st, state in zip(status, states) if st]
-                if status:
-                    msg += ' (%s)' % (', '.join(status))
-                msg += "</i><br>\n"
             msg += _tooltips.get(column, _columnmap[column])(self, ctx, gnode)
             return QtCore.QVariant(msg)
         elif role == QtCore.Qt.ForegroundRole:
@@ -368,24 +359,8 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
                 tags = set(ctx.tags())
                 icn = None
 
-                modified = False
-                atwd = False
-                if gnode.rev in self.wd_revs:
-                    atwd = True
-                    status = self.wd_status[self.wd_revs.index(gnode.rev)]
-                    if [True for st in status if st]:
-                        modified = True
-
-                if gnode.rev is None:
-                    # WD is displayed only if there are local
-                    # modifications, so let's use the modified icon
-                    icn = geticon('modified')
-                elif tags.intersection(self.mqueues):
+                if tags.intersection(self.mqueues):
                     icn = geticon('mqpatch')
-                #elif modified:
-                #    icn = geticon('modified')
-                elif atwd:
-                    icn = geticon('clean')
 
                 if icn:
                     icn.paint(painter, dot_x-5, dot_y-5, 17, 17)
