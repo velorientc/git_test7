@@ -9,7 +9,7 @@ import os
 import subprocess
 
 from mercurial import util, cmdutil, error, merge, commands
-from tortoisehg.hgqt import qtlib, htmlui
+from tortoisehg.hgqt import qtlib, htmlui, visdiff
 from tortoisehg.util import hglib, shlib
 from tortoisehg.util.i18n import _
 
@@ -99,8 +99,7 @@ def run(func, parent, files, repo):
     return notify
 
 def vdiff(parent, ui, repo, files):
-    from tortoisehg.hgqt.visdiff import visualdiff
-    visualdiff(ui, repo, files, {})
+    visdiff.visualdiff(ui, repo, files, {})
 
 def edit(parent, ui, repo, files):
     editor = (ui.config('tortoisehg', 'editor') or
@@ -119,8 +118,7 @@ def edit(parent, ui, repo, files):
     cmdline = ' '.join([editor] + [util.localpath(f) for f in files])
     cmdline = util.quotecommand(cmdline)
     try:
-        from tortoisehg.hgqt.visdiff import openflags
-        subprocess.Popen(cmdline, shell=True, creationflags=openflags,
+        subprocess.Popen(cmdline, shell=True, creationflags=visdiff.openflags,
                          stderr=None, stdout=None, stdin=None)
     except (OSError, EnvironmentError), e:
         QtGui.QMessageBox.warning(parent,
@@ -128,11 +126,16 @@ def edit(parent, ui, repo, files):
                  _('%s : %s') % (cmd, str(e)))
     return False
 
+
 def viewmissing(parent, ui, repo, files):
-    raise NotImplementedError()
+    base, _ = visdiff.snapshot(repo, files, repo['.'])
+    edit(parent, ui, repo, [os.path.join(base, f) for f in files])
 
 def other(parent, ui, repo, files):
-    raise NotImplementedError()
+    wctx = repo[None]
+    assert bool(wctx.p2())
+    base, _ = visdiff.snapshot(repo, files, wctx.p2())
+    edit(parent, ui, repo, [os.path.join(base, f) for f in files])
 
 def revert(parent, ui, repo, files):
     revertopts = {'date': None, 'rev': '.'}
