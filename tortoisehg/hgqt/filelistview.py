@@ -111,10 +111,10 @@ class HgFileListView(QtGui.QTableView):
             dlg.activateWindow()
 
     def _action_defs(self):
-        a = [("navigate", self.tr("Navigate"), None ,
-              self.tr('Navigate the revision tree of this file'), None, self.navigate),
-             ("diffnavigate", self.tr("Diff-mode navigate"), None,
-              self.tr('Navigate the revision tree of this file in diff mode'), None, self.diffNavigate),
+        a = [("navigate", self.tr("File history"), None ,
+              self.tr('Show the history of the selected file'), None, self.navigate),
+             ("diffnavigate", self.tr("Compare file revisions"), None,
+              self.tr('Compare revisions of the selected file'), None, self.diffNavigate),
              ]
         return a
 
