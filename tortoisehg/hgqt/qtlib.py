@@ -99,6 +99,28 @@ def markup(msg, **styles):
     msg = msg.replace('\n', '<br />')
     return '<font style="%s">%s</font>' % (style, msg)
 
+def CommonMsgBox(icon, title, main, text='', buttons=QtGui.QMessageBox.Close,
+                 parent=None):
+    msg = QtGui.QMessageBox(parent)
+    msg.setIcon(icon)
+    msg.setWindowTitle(title)
+    msg.setStandardButtons(buttons)
+    msg.setText('<b>%s</b>' % main)
+    info = ''
+    for line in text.split('\n'):
+        info += '<nobr>%s</nobr><br />' % line
+    msg.setInformativeText(info)
+    return msg.exec_()
+
+def InfoMsgBox(*args, **kargs):
+    return CommonMsgBox(QtGui.QMessageBox.Information, *args, **kargs)
+
+def WarningMsgBox(*args, **kargs):
+    return CommonMsgBox(QtGui.QMessageBox.Warning, *args, **kargs)
+
+def ErrorMsgBox(*args, **kargs):
+    return CommonMsgBox(QtGui.QMessageBox.Critical, *args, **kargs)
+
 class CustomPrompt(QtGui.QMessageBox):
     def __init__(self, title, message, parent, choices, default=None,
                  esc=None, files=None):
