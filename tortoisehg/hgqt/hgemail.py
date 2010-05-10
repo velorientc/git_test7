@@ -9,7 +9,7 @@
 
 import os, tempfile, re
 from StringIO import StringIO
-from PyQt4.QtCore import SIGNAL, Qt, QAbstractTableModel, QVariant, QModelIndex
+from PyQt4.QtCore import Qt, QAbstractTableModel, QVariant, QModelIndex
 from PyQt4.QtGui import QDialog
 from mercurial import hg, error, extensions, util
 from tortoisehg.util import hglib, paths
@@ -161,12 +161,9 @@ class EmailDialog(QDialog):
     def _connectvalidateform(self):
         # TODO: connect programmatically
         for e in ('to_edit', 'from_edit', 'subject_edit'):
-            self.connect(getattr(self._qui, e),
-                         SIGNAL('textChanged(QString)'),
-                         self._validateform)
+            getattr(self._qui, e).textChanged.connect(self._validateform)
 
-        self.connect(self._qui.writeintro_check, SIGNAL('toggled(bool)'),
-                     self._validateform)
+        self._qui.writeintro_check.toggled.connect(self._validateform)
 
     def accept(self):
         # TODO: want to pass patchbombopts directly
@@ -215,8 +212,7 @@ class EmailDialog(QDialog):
             # TODO: better way to setup diff lexer
         initqsci(self._qui.preview_edit)
 
-        self.connect(self._qui.main_tabs, SIGNAL('currentChanged(int)'),
-                     self._refreshpreviewtab)
+        self._qui.main_tabs.currentChanged.connect(self._refreshpreviewtab)
         self._refreshpreviewtab(self._qui.main_tabs.currentIndex())
 
     def _refreshpreviewtab(self, index):
