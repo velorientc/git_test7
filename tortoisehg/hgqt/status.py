@@ -22,6 +22,8 @@ from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
 # working copy browser.
 
 # Technical Debt
+#  Selections are not surviving refresh
+#  Refresh can be too expensive; probably need to disable some signals
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
 #  Thread refreshWctx, connect to an external progress bar
