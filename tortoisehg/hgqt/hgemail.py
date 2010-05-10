@@ -9,7 +9,7 @@
 
 import os, tempfile, re
 from StringIO import StringIO
-from PyQt4.QtCore import Qt, QAbstractTableModel, QVariant, QModelIndex
+from PyQt4.QtCore import Qt, pyqtSlot, QAbstractTableModel, QVariant, QModelIndex
 from PyQt4.QtGui import QDialog
 from mercurial import hg, error, extensions, util
 from tortoisehg.util import hglib, paths
@@ -152,6 +152,7 @@ class EmailDialog(QDialog):
 
         return True
 
+    @pyqtSlot()
     def _validateform(self):
         """Check form values to update send/preview availability"""
         valid = self._isvalid()
@@ -215,6 +216,7 @@ class EmailDialog(QDialog):
         self._qui.main_tabs.currentChanged.connect(self._refreshpreviewtab)
         self._refreshpreviewtab(self._qui.main_tabs.currentIndex())
 
+    @pyqtSlot(int)
     def _refreshpreviewtab(self, index):
         """Generate preview text if current tab is preview"""
         if self._previewtabindex() != index:
