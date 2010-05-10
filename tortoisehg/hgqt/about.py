@@ -27,8 +27,7 @@ try:
     from tortoisehg.hgqt.about_ui import Ui_AboutDialog
 except ImportError:
     from PyQt4 import uic
-    Ui_AboutDialog = uic.loadUiType(os.path.join(os.path.dirname(__file__),
-																						'about.ui'))[0]
+    Ui_AboutDialog = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'about.ui'))[0]
 
 class AboutDialog(QDialog):
     """Dialog for showing info about TortoiseHg"""
