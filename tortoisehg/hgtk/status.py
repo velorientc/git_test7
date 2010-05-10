@@ -527,6 +527,12 @@ class GStatus(gdialog.GWindow):
         if not self.types_expander.get_expanded():
             self.status_types.hide()
         self.diffpane.set_position(self.setting_pos)
+        try:
+            tab = self.ui.config('tortoisehg', 'statustab', '0')
+            tab = int(tab)
+            self.diff_notebook.set_current_page(tab)
+        except (error.ConfigError, ValueError):
+            pass
         self.reload_status()
 
     def remove_filter(self, button):

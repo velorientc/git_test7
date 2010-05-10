@@ -99,6 +99,10 @@ INFO = (
          ' environment variables are set to a non-English language.'
          ' This setting is used by the Merge, Tag and Backout dialogs.'
          '  Default: False')),
+    (_('Default Tab'), 'tortoisehg.statustab', ['0', '1', '2'],
+        _('The tab on which the status and commit tools will open.'
+          ' 0 - TextDiff, 1 - Hunk Selection, 2 - Commit Preview.'
+          '  Default: 0')),
     )),
 
 ({'name': 'log', 'label': _('Repository Explorer'),
