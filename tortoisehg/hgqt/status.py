@@ -28,6 +28,7 @@ from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel
 #  Thread rowSelected, connect to an external progress bar
 #  Need mechanisms to clear pats and toggle visibility options
 #  Need mechanism to override file size/binary check
+#  Improve behavior of !?IC files in diff pane
 #  Show subrepos better
 #  Save splitter position to parent's QSetting
 #  Chunk selection
@@ -175,7 +176,7 @@ class StatusWidget(QWidget):
         m = cmdutil.matchfiles(self.repo, [wfile])
         try:
             try:
-                for s, l in patch.difflabel(self.wctx.diff, match=m):
+                for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
                     hu.write(s, label=l)
             except AttributeError:
                 # your mercurial source is not new enough, falling back
@@ -189,7 +190,7 @@ class StatusWidget(QWidget):
             self.status_error = str(e)
             return
         o, e = hu.getdata()
-        diff = o or _('<em>No change</em>')
+        diff = o or _('<em>No displayable differences</em>')
         if self.isMerge():
             text = header + diff
         else:
@@ -197,7 +198,8 @@ class StatusWidget(QWidget):
             return
 
         try:
-            for s, l in patch.difflabel(self.wctx.diff, self.wctx.p2(), match=m):
+            for s, l in patch.difflabel(self.wctx.diff, self.wctx.p2(),
+                                        match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
             self.status_error = str(e)
@@ -207,7 +209,7 @@ class StatusWidget(QWidget):
                 self.wctx.p2().rev(), str(self.wctx.p2()))
         text += '</h3></br>'
         o, e = hu.getdata()
-        diff = o or _('<em>No change</em>')
+        diff = o or _('<em>No displayable differences</em>')
         self.te.setHtml(text + diff)
 
 
