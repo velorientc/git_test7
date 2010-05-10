@@ -187,12 +187,11 @@ class EmailDialog(QDialog):
             cmd = cmdui.Dialog(['email'] + cmdargs(opts) + list(self._revs),
                                parent=self)
             cmd.setWindowTitle(_('Sending Email'))
-            cmd.exec_()
+            if cmd.exec_():
+                super(EmailDialog, self).accept()
         finally:
             if 'desc' in opts:
                 os.unlink(opts['desc'])  # TODO: don't use tempfile
-
-        super(EmailDialog, self).accept()  # TODO: if success
 
     def _initintrobox(self):
         self._qui.intro_box.hide()  # hidden by default
