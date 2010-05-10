@@ -41,6 +41,9 @@ from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
 #  Toolbar
 #  double-click visual diffs
 
+statusTypes = ('M modified', 'A added', 'R removed', '! deleted',
+               '? unknown', 'I ignored', 'C clean')
+
 class StatusWidget(QWidget):
     def __init__(self, pats, opts, parent=None):
         QWidget.__init__(self, parent)
@@ -94,18 +97,25 @@ class StatusWidget(QWidget):
         tv.setRootIsDecorated(False)
         tv.setSortingEnabled(True)
 
+        def setButtonText():
+            text = ''
+            for stat in statusTypes:
+                if self.opts[stat[2:]]:
+                    text += stat[0]
+            pb.setText(text)
         def statusTypeTrigger(isChecked):
             txt = hglib.fromunicode(self.sender().text())
             self.opts[txt[2:]] = isChecked
             self.refreshWctx()
+            setButtonText()
         menu = QMenu()
-        for stat in ('M modified', 'A added', 'R removed', '! deleted',
-                     '? unknown', 'I ignored', 'C clean'):
+        for stat in statusTypes:
             a = menu.addAction(stat)
             a.setCheckable(True)
             a.setChecked(self.opts[stat[2:]])
             a.triggered.connect(statusTypeTrigger)
         pb.setMenu(menu)
+        setButtonText()
         pb.storeref = menu
 
         self.proxy = WctxProxyModel()
