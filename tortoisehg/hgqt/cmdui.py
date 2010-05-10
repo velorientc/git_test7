@@ -299,7 +299,10 @@ class Dialog(QDialog):
             return
 
         # close dialog
-        QDialog.reject(self)
+        if self.core.thread.ret == 0:
+            self.accept()  # means command successfully finished
+        else:
+            super(Dialog, self).reject()
 
     ### Signal Handlers ###
 
