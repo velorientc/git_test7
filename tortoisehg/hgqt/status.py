@@ -16,7 +16,7 @@ from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT, QAbstractTableModel
 from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
 from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QSortFilterProxyModel
-from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel
+from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -26,7 +26,7 @@ from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel
 #   (it interferes with selection the way it is now)
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
-#  Need mechanisms to clear pats and toggle visibility options
+#  Need mechanism to clear pats
 #  Need mechanism to override file size/binary check
 #  Improve behavior of !?IC files in diff pane
 #  Show subrepos better
@@ -47,7 +47,8 @@ class StatusWidget(QWidget):
         assert(root)
         self.repo = hg.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
-        self.opts = dict(unknown=True, clean=False, ignored=False)
+        self.opts = dict(modified=True, added=True, removed=True, deleted=True,
+                         unknown=True, clean=False, ignored=False)
         self.opts.update(opts)
         self.pats = pats
         self.ms = {}
@@ -76,8 +77,10 @@ class StatusWidget(QWidget):
         hbox.setContentsMargins (5, 7, 0, 0)
         lbl = QLabel(_('Filter:'))
         le = QLineEdit()
+        pb = QPushButton(_('MAR!?IC')) # needs a better label
         hbox.addWidget(lbl)
         hbox.addWidget(le)
+        hbox.addWidget(pb)
         tv = WctxFileTree(self.repo)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
@@ -88,6 +91,20 @@ class StatusWidget(QWidget):
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
         tv.setSortingEnabled(True)
+
+        def statusTypeTrigger(isChecked):
+            txt = hglib.fromunicode(self.sender().text())
+            self.opts[txt[2:]] = isChecked
+            self.refreshWctx()
+        menu = QMenu()
+        for stat in ('M modified', 'A added', 'R removed', '! deleted',
+                     '? unknown', 'I ignored', 'C clean'):
+            a = menu.addAction(stat)
+            a.setCheckable(True)
+            a.setChecked(self.opts[stat[2:]])
+            a.triggered.connect(statusTypeTrigger)
+        pb.setMenu(menu)
+        pb.storeref = menu
 
         self.proxy = WctxProxyModel()
         self.proxy.setFilterKeyColumn(COL_PATH_DISPLAY)
@@ -308,18 +325,22 @@ class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, ms, opts, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
-        for m in wctx.modified():
-            mst = m in ms and ms[m].upper() or ""
-            rows.append([True, 'M', mst, hglib.tounicode(m), m])
-        for a in wctx.added():
-            mst = a in ms and ms[a].upper() or ""
-            rows.append([True, 'A', mst, hglib.tounicode(a), a])
-        for r in wctx.removed():
-            mst = r in ms and ms[r].upper() or ""
-            rows.append([True, 'R', mst, hglib.tounicode(r), r])
-        for d in wctx.deleted():
-            mst = d in ms and ms[d].upper() or ""
-            rows.append([False, '!', mst, hglib.tounicode(d), d])
+        if opts['modified']:
+            for m in wctx.modified():
+                mst = m in ms and ms[m].upper() or ""
+                rows.append([True, 'M', mst, hglib.tounicode(m), m])
+        if opts['added']:
+            for a in wctx.added():
+                mst = a in ms and ms[a].upper() or ""
+                rows.append([True, 'A', mst, hglib.tounicode(a), a])
+        if opts['removed']:
+            for r in wctx.removed():
+                mst = r in ms and ms[r].upper() or ""
+                rows.append([True, 'R', mst, hglib.tounicode(r), r])
+        if opts['deleted']:
+            for d in wctx.deleted():
+                mst = d in ms and ms[d].upper() or ""
+                rows.append([False, '!', mst, hglib.tounicode(d), d])
         if opts['unknown']:
             for u in wctx.unknown():
             	rows.append([False, '?', '', hglib.tounicode(u), u])
