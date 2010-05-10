@@ -221,17 +221,21 @@ class MQWidget(gtk.VBox):
                     self.qrename_ui(model[paths[0]][MQ_NAME])
             self.list.connect('thg-rename', thgrename)
 
-            mod = gtk.gdk.CONTROL_MASK
-            def add(name, key, func, *args):
+            def add(name, key, mod, func, *args):
                 self.list.add_accelerator(name, accelgroup, key, mod, 0)
                 self.list.connect(name, lambda *a: func(*args))
-            add('mq-move-top', gtk.keysyms.Page_Up, self.qreorder_ui, MOVE_TOP)
-            add('mq-move-up', gtk.keysyms.Up, self.qreorder_ui, MOVE_UP)
-            add('mq-move-down', gtk.keysyms.Down, self.qreorder_ui, MOVE_DOWN)
-            add('mq-move-bottom', gtk.keysyms.Page_Down, self.qreorder_ui,
-                MOVE_BOTTOM)
-            add('mq-pop', gtk.keysyms.Left, self.qpop)
-            add('mq-push', gtk.keysyms.Right, self.qpush)
+            mod = gtk.gdk.CONTROL_MASK|gtk.gdk.SHIFT_MASK
+            add('mq-move-top', gtk.keysyms.Page_Up, mod,
+                self.qreorder_ui, MOVE_TOP)
+            add('mq-move-up', gtk.keysyms.Up, mod,
+                self.qreorder_ui, MOVE_UP)
+            add('mq-move-down', gtk.keysyms.Down, mod,
+                self.qreorder_ui, MOVE_DOWN)
+            add('mq-move-bottom', gtk.keysyms.Page_Down, mod,
+                self.qreorder_ui, MOVE_BOTTOM)
+            mod = gtk.gdk.CONTROL_MASK
+            add('mq-pop', gtk.keysyms.Up, mod, self.qpop)
+            add('mq-push', gtk.keysyms.Down, mod, self.qpush)
 
     ### public functions ###
 

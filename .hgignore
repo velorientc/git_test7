@@ -3,6 +3,7 @@ syntax: glob
 *.orig
 *.rej
 *.pyc
+*.pyo
 build/
 build-ja/
 build-cs/
