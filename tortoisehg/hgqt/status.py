@@ -17,12 +17,14 @@ from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
 from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QSortFilterProxyModel
 from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
+from PyQt4.QtGui import QIcon, QPixmap
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
 
 # Technical Debt
 #  Selections are not surviving refresh
+#  We need a real icon set for file status types
 #  Refresh can be too expensive; probably need to disable some signals
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
@@ -34,7 +36,6 @@ from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
 #  Save splitter position to parent's QSetting
 #  Chunk selection
 #  tri-state checkboxes for commit
-#  Investigate Qt.DecorationRole and possible use of overlay icons
 #  Investigate folding/nesting of files
 # Maybe, Maybe Not
 #  Toolbar
@@ -181,10 +182,11 @@ class StatusWidget(QWidget):
         tm = WctxModel(self.wctx, self.ms, self.opts)
         self.rawmodel = tm
         self.proxy.setSourceModel(tm)
-        for col in xrange(COL_PATH):
-            self.tv.resizeColumnToContents(col)
+        self.tv.sortByColumn(COL_PATH_DISPLAY)
         self.tv.setColumnHidden(COL_CHECK, self.isMerge())
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
+        for col in xrange(COL_PATH):
+            self.tv.resizeColumnToContents(col)
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
 
@@ -326,6 +328,18 @@ tips = {
    'S': _('%s is a dirty subrepo'),
 }
 
+# TODO: We need real icons here
+icons = {
+   'M': 'menucommit.ico',
+   'A': 'fileadd.ico',
+   'R': 'filedelete.ico',
+   '?': 'shelve.ico',
+   '!': 'menudelete.ico',
+   'I': 'ignore.ico',
+   'C': '',
+   'S': 'hg.ico',
+}
+
 color_labels = {
    'M': 'status.modified',
    'A': 'status.added',
@@ -395,6 +409,12 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Checked
                 else:
                     return Qt.Unchecked
+        elif role == Qt.DecorationRole and index.column() == COL_STATUS:
+            status = self.rows[index.row()][COL_STATUS]
+            if status in icons:
+                ico = QIcon()
+                ico.addPixmap(QPixmap('icons/' + icons[status]))
+                return QVariant(ico)
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
 
