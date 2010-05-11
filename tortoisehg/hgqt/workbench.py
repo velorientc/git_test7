@@ -75,7 +75,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.addRepoTab(self.repo, fromhead)
         tw = self.repoTabsWidget
         tw.removeTab(0)
+        self.repoTabChanged()
         connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
+        connect(tw, SIGNAL('currentChanged(int)'), self.repoTabChanged)
 
         # setup tables and views
         #self.setupHeaderTextview()
@@ -106,9 +108,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         if (tw.count() == 1):
             return # ignore request to close the last tab
         tw.removeTab(index)
-        self.updateCurrentRepoWidget()
 
-    def updateCurrentRepoWidget(self):
+    def repoTabChanged(self, index=0):
+        print "repoTabChanged(%i)" % index
         self.repowidget = self.repoTabsWidget.currentWidget()
 
     def addRepoTab(self, repo, fromhead=None):
@@ -118,7 +120,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
-        self.updateCurrentRepoWidget()
 
     def setupBranchCombo(self, *args):
         allbranches = sorted(self.repo.branchtags().items())
