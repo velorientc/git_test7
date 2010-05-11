@@ -28,7 +28,6 @@ from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
 #   (it interferes with selection the way it is now)
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
-#  Need mechanism to clear pats
 #  Need mechanism to override file size/binary check
 #  Improve behavior of !?IC files in diff pane
 #  Show subrepos better
@@ -90,6 +89,15 @@ class StatusWidget(QWidget):
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
         split.addWidget(frame)
+
+        if self.pats:
+            def clearPattern():
+                self.pats = []
+                self.refreshWctx()
+                cpb.setVisible(False)
+            cpb = QPushButton(_('Remove filter, show root'))
+            vbox.addWidget(cpb)
+            cpb.clicked.connect(clearPattern)
 
         self.connect(tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
         self.connect(tv, SIGNAL('menuAction()'), self.refreshWctx)
