@@ -302,31 +302,24 @@ class WctxFileTree(QTreeView):
 
     def keyPressEvent(self, event):
         if event.key() == 32:
-            for index in self.selectedIndexes():
+            for index in self.selectedRows():
                 self.model().toggleRow(index)
         if event.key() == Qt.Key_D and event.modifiers() == Qt.ControlModifier:
-            rows = set()
             selfiles = []
-            for index in self.selectedIndexes():
-                if index.row() in rows:
-                    continue
-                rows.add(index.row())
+            for index in self.selectedRows():
                 selfiles.append(self.model().getRow(index)[COL_PATH])
             visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
         else:
             return super(WctxFileTree, self).keyPressEvent(event)
 
     def dragObject(self):
-        rows = set()
         urls = []
-        for index in self.selectedIndexes():
-            if index.row() not in rows:
-                rows.add(index.row())
-                path = self.model().getPath(index)
-                u = QUrl()
-                u.setPath('file://' + os.path.join(self.repo.root, path))
-                urls.append(u)
-        if rows:
+        for index in self.selectedRows():
+            path = self.model().getRow(index)[COL_PATH]
+            u = QUrl()
+            u.setPath('file://' + os.path.join(self.repo.root, path))
+            urls.append(u)
+        if urls:
             d = QDrag(self)
             m = QMimeData()
             m.setUrls(urls)
@@ -337,18 +330,17 @@ class WctxFileTree(QTreeView):
         self.dragObject()
 
     def customContextMenuRequested(self, point):
-        rows = set()
         selrows = []
-        for index in self.selectedIndexes():
-            if index.row() in rows:
-                continue
-            rows.add(index.row())
+        for index in self.selectedRows():
             c, status, mst, u, path = self.model().getRow(index)
             selrows.append((set(status+mst.lower()), path))
         point = self.mapToGlobal(point)
         action = wctxactions.wctxactions(self, point, self.repo, selrows)
         if action:
             self.emit(SIGNAL('menuAction()'))
+
+    def selectedRows(self):
+        return self.selectionModel().selectedRows()
 
 COL_CHECK = 0
 COL_STATUS = 1
@@ -457,10 +449,6 @@ class WctxModel(QAbstractTableModel):
                 return True
         return False
 
-    def getPath(self, index):
-        assert index.isValid()
-        return self.rows[index.row()][COL_PATH]
-
     def getRow(self, index):
         assert index.isValid()
         return self.rows[index.row()]
@@ -481,10 +469,6 @@ class WctxModel(QAbstractTableModel):
 class WctxProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
-
-    def getPath(self, index):
-        index = self.mapToSource(index)
-        return self.sourceModel().getPath(index)
 
     def getRow(self, index):
         index = self.mapToSource(index)
