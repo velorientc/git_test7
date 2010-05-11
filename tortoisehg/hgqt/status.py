@@ -31,7 +31,6 @@ from PyQt4.QtGui import QIcon, QPixmap
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Need mechanism to override file size/binary check
-#  Improve behavior of !?IC files in diff pane
 #  Show subrepos better
 #  Save splitter position to parent's QSetting
 #  Chunk selection
@@ -224,8 +223,19 @@ class StatusWidget(QWidget):
 
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
-        pfile = index.model().getPath(index)
-        wfile = util.pconvert(pfile)
+        checked, status, mst, upath, path = index.model().getRow(index)
+        wfile = util.pconvert(path)
+
+        if status in '?IC':
+            # TODO: Display file contents if a button clicked,
+            # add to a toolbar above the diff panel
+            text = '<b>File is not tracked</b>'
+            self.te.setHtml(text)
+            return
+        elif status in '!':
+            text = '<b>File is missing!</b>'
+            self.te.setHtml(text)
+            return
 
         warnings = chunkselect.check_max_diff(self.wctx, wfile)
         if warnings:
