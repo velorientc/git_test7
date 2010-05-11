@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 04 20:29:14 2010
+# Created: Tue May 11 11:55:26 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -15,11 +15,22 @@ class Ui_MainWindow(object):
         MainWindow.resize(698, 642)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout_3 = QtGui.QVBoxLayout(self.centralwidget)
+        self.horizontalLayout = QtGui.QHBoxLayout(self.centralwidget)
+        self.horizontalLayout.setSpacing(0)
+        self.horizontalLayout.setMargin(0)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.repoTabsWidget = QtGui.QTabWidget(self.centralwidget)
+        self.repoTabsWidget.setDocumentMode(True)
+        self.repoTabsWidget.setTabsClosable(True)
+        self.repoTabsWidget.setMovable(True)
+        self.repoTabsWidget.setObjectName("repoTabsWidget")
+        self.firstRepoTab = QtGui.QWidget()
+        self.firstRepoTab.setObjectName("firstRepoTab")
+        self.verticalLayout_3 = QtGui.QVBoxLayout(self.firstRepoTab)
         self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setMargin(0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.revisions_splitter = QtGui.QSplitter(self.centralwidget)
+        self.revisions_splitter = QtGui.QSplitter(self.firstRepoTab)
         self.revisions_splitter.setOrientation(QtCore.Qt.Vertical)
         self.revisions_splitter.setObjectName("revisions_splitter")
         self.tableView_revisions = HgRepoView(self.revisions_splitter)
@@ -115,6 +126,8 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.message_splitter)
         self.verticalLayout_2.addWidget(self.filelist_splitter)
         self.verticalLayout_3.addWidget(self.revisions_splitter)
+        self.repoTabsWidget.addTab(self.firstRepoTab, "")
+        self.horizontalLayout.addWidget(self.repoTabsWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 698, 19))
@@ -172,10 +185,12 @@ class Ui_MainWindow(object):
         self.toolBar_help.addAction(self.actionHelp)
 
         self.retranslateUi(MainWindow)
+        self.repoTabsWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
+        self.repoTabsWidget.setTabText(self.repoTabsWidget.indexOf(self.firstRepoTab), QtGui.QApplication.translate("MainWindow", "repo1", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Edit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
