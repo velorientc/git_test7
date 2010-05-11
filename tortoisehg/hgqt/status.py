@@ -40,32 +40,13 @@ from PyQt4.QtGui import QIcon, QPixmap
 #  Toolbar
 #  double-click visual diffs
 
-class StatusType(object):
-    preferredOrder = 'MAR?!ICS'
-    def __init__(self, name, icon, desc, uilabel):
-        self.name = name
-        self.icon = icon
-        self.desc = desc
-        self.uilabel = uilabel
+COL_CHECK = 0
+COL_STATUS = 1
+COL_MERGE_STATE = 2
+COL_PATH_DISPLAY = 3
+COL_PATH = 4
 
-statusTypes = {
-    'M' : StatusType('modified', 'menucommit.ico', _('%s is modified'),
-                     'status.modified'),
-    'A' : StatusType('added', 'fileadd.ico', _('%s is added'),
-                     'status.added'),
-    'R' : StatusType('removed', 'filedelete.ico', _('%s is removed'),
-                     'status.removed'),
-    '?' : StatusType('unknown', 'shelve.ico', _('%s is not tracked (unknown)'),
-                     'status.unknown'),
-    '!' : StatusType('deleted', 'menudelete.ico', _('%s is missing!'),
-                     'status.deleted'),
-    'I' : StatusType('ignored', 'ignore.ico', _('%s is ignored'),
-                     'status.ignored'),
-    'C' : StatusType('clean', '', _('%s is not modified (clean)'),
-                     'status.clean'),
-    'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
-                     'status.subrepo'),
-}
+_colors = {}
 
 class StatusWidget(QWidget):
     def __init__(self, pats, opts, parent=None):
@@ -90,7 +71,7 @@ class StatusWidget(QWidget):
             effect = qtlib.geteffect(label)
             for e in effect.split(';'):
                 if e.startswith('color:'):
-                    colors[stat] = QColor(e[7:])
+                    _colors[stat] = QColor(e[7:])
                     break
 
         split = QSplitter(Qt.Horizontal)
@@ -342,14 +323,6 @@ class WctxFileTree(QTreeView):
     def selectedRows(self):
         return self.selectionModel().selectedRows()
 
-COL_CHECK = 0
-COL_STATUS = 1
-COL_MERGE_STATE = 2
-COL_PATH_DISPLAY = 3
-COL_PATH = 4
-
-colors = {}
-
 class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, ms, opts, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -417,9 +390,9 @@ class WctxModel(QAbstractTableModel):
         checked, status, mst, upath, path = self.rows[index.row()]
         if role == Qt.TextColorRole:
             if mst:
-                return colors.get(mst.lower(), QColor('black'))
+                return _colors.get(mst.lower(), QColor('black'))
             else:
-                return colors.get(status, QColor('black'))
+                return _colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
             if status in statusTypes:
                 tip = statusTypes[status].desc % upath
@@ -467,6 +440,7 @@ class WctxModel(QAbstractTableModel):
         if index.column() == COL_CHECK:
             self.toggleRow(index)
 
+
 class WctxProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
@@ -484,6 +458,33 @@ class WctxProxyModel(QSortFilterProxyModel):
         'Connected to "pressed" signal, emitted by mouse clicks'
         index = self.mapToSource(index)
         return self.sourceModel().pressedRow(index)
+
+class StatusType(object):
+    preferredOrder = 'MAR?!ICS'
+    def __init__(self, name, icon, desc, uilabel):
+        self.name = name
+        self.icon = icon
+        self.desc = desc
+        self.uilabel = uilabel
+
+statusTypes = {
+    'M' : StatusType('modified', 'menucommit.ico', _('%s is modified'),
+                     'status.modified'),
+    'A' : StatusType('added', 'fileadd.ico', _('%s is added'),
+                     'status.added'),
+    'R' : StatusType('removed', 'filedelete.ico', _('%s is removed'),
+                     'status.removed'),
+    '?' : StatusType('unknown', 'shelve.ico', _('%s is not tracked (unknown)'),
+                     'status.unknown'),
+    '!' : StatusType('deleted', 'menudelete.ico', _('%s is missing!'),
+                     'status.deleted'),
+    'I' : StatusType('ignored', 'ignore.ico', _('%s is ignored'),
+                     'status.ignored'),
+    'C' : StatusType('clean', '', _('%s is not modified (clean)'),
+                     'status.clean'),
+    'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
+                     'status.subrepo'),
+}
 
 def run(ui, *pats, **opts):
     return StatusWidget(pats, opts)
