@@ -184,6 +184,7 @@ class StatusWidget(QWidget):
             return super(StatusWidget, self).keyPressEvent(event)
 
     def refreshWctx(self):
+        self.te.clear()
         hglib.invalidaterepo(self.repo)
         self.ms = merge.mergestate(self.repo)
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
