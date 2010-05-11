@@ -111,10 +111,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def repoTabChanged(self, index=0):
         print "repoTabChanged(%i)" % index
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            # TODO: update toolbars
-            pass
+        self.setupBranchCombo()
 
     def addRepoTab(self, repo, fromhead=None):
         '''opens the given repo in a new tab'''
@@ -125,11 +122,19 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         tw.setCurrentIndex(index)
 
     def setupBranchCombo(self, *args):
-        allbranches = sorted(self.repo.branchtags().items())
+        w = self.repoTabsWidget.currentWidget()
+        if not w:
+            self.branch_label_action.setEnabled(False)
+            self.branch_comboBox_action.setEnabled(False)
+            self.branch_comboBox.clear()
+            return
+
+        repo = w.repo
+        allbranches = sorted(repo.branchtags().items())
         if self._closed_branch_supp:
             openbr = []
             for branch, brnode in allbranches:
-                openbr.extend(self.repo.branchheads(branch, closed=False))
+                openbr.extend(repo.branchheads(branch, closed=False))
             clbranches = [br for br, node in allbranches if node not in openbr]
             branches = [br for br, node in allbranches if node in openbr]
             if self.branch_checkBox_action.isChecked():
@@ -140,6 +145,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         if len(branches) == 1:
             self.branch_label_action.setEnabled(False)
             self.branch_comboBox_action.setEnabled(False)
+            self.branch_comboBox.clear()
         else:
             self.branchesmodel = QtGui.QStringListModel([''] + branches)
             self.branch_comboBox.setModel(self.branchesmodel)
