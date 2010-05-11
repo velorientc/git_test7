@@ -402,7 +402,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
     def reload(self):
         """Reload the repository"""
-        print "reload() called"
         self._reload_rev = self.tableView_revisions.current_rev
         self._loading = True
         self._reload_file = self.tableView_filelist.currentFile()
