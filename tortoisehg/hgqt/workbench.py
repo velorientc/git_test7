@@ -14,11 +14,13 @@ import re
 
 from PyQt4 import QtCore, QtGui, Qsci
 
-from mercurial import ui, hg
-from mercurial import util
+from mercurial import ui, hg, util
+from mercurial.error import RepoError
 
 from tortoisehg.util.util import tounicode, has_closed_branch_support
 from tortoisehg.util.util import rootpath, find_repository
+
+from tortoisehg.util.i18n import _
 
 from tortoisehg.hgqt.decorators import timeit
 
@@ -320,14 +322,17 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
                 self.openRepository)
 
     def openRepository(self):
-        caption = "Select repository directory to open"
+        caption = _('Select repository directory to open')
         FD = QtGui.QFileDialog
-        path = FD.getExistingDirectory(
-            parent=self, caption=caption,
+        path = FD.getExistingDirectory(parent=self, caption=caption,
             options=FD.ShowDirsOnly | FD.ReadOnly)
         path = str(path)
-        repo = hg.repository(self.ui, path=path)
-        self.addRepoTab(repo)
+        try:
+            repo = hg.repository(self.ui, path=path)
+            self.addRepoTab(repo)
+        except RepoError:
+            QtGui.QMessageBox.warning(self, _('Failed to open repository'), 
+                _('%s is not a valid repository') % path)
 
     def startAtCurrentRev(self):
         pass
