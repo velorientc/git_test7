@@ -272,6 +272,12 @@ class Dialog(QDialog):
         self.cancel_btn.clicked.connect(self.cancel_clicked)
         self.close_btn = buttons.addButton(QDialogButtonBox.Close)
         self.close_btn.clicked.connect(self.reject)
+        self.detail_btn = buttons.addButton(_('Detail'),
+                                            QDialogButtonBox.ResetRole)
+        self.detail_btn.setAutoDefault(False)
+        self.detail_btn.setCheckable(True)
+        self.detail_btn.setChecked(True)
+        self.detail_btn.toggled.connect(self.show_output)
         grid.addWidget(buttons, 7, 0)
 
         self.setLayout(grid)
@@ -283,6 +289,16 @@ class Dialog(QDialog):
 
         # start command
         self.core.run(cmdline)
+
+    def show_output(self, visible):
+        """show/hide command output"""
+        self.core.output_text.setVisible(visible)
+        self.detail_btn.setChecked(visible)
+
+        # workaround to adjust only window height
+        self.setMinimumWidth(self.width())
+        self.adjustSize()
+        self.setMinimumWidth(0)
 
     ### Private Method ###
 
