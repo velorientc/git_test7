@@ -41,8 +41,32 @@ from PyQt4.QtGui import QIcon, QPixmap
 #  Toolbar
 #  double-click visual diffs
 
-statusTypes = ('M modified', 'A added', 'R removed', '! deleted',
-               '? unknown', 'I ignored', 'C clean')
+class StatusType(object):
+    preferredOrder = 'MAR?!ICS'
+    def __init__(self, name, icon, desc, uilabel):
+        self.name = name
+        self.icon = icon
+        self.desc = desc
+        self.uilabel = uilabel
+
+statusTypes = {
+    'M' : StatusType('modified', 'menucommit.ico', _('%s is modified'),
+                     'status.modified'),
+    'A' : StatusType('added', 'fileadd.ico', _('%s is added'),
+                     'status.added'),
+    'R' : StatusType('removed', 'filedelete.ico', _('%s is removed'),
+                     'status.removed'),
+    '?' : StatusType('unknown', 'shelve.ico', _('%s is not tracked (unknown)'),
+                     'status.unknown'),
+    '!' : StatusType('deleted', 'menudelete.ico', _('%s is missing!'),
+                     'status.deleted'),
+    'I' : StatusType('ignored', 'ignore.ico', _('%s is ignored'),
+                     'status.ignored'),
+    'C' : StatusType('clean', '', _('%s is not modified (clean)'),
+                     'status.clean'),
+    'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
+                     'status.subrepo'),
+}
 
 class StatusWidget(QWidget):
     def __init__(self, pats, opts, parent=None):
@@ -53,7 +77,7 @@ class StatusWidget(QWidget):
         self.repo = hg.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
-                         unknown=True, clean=False, ignored=False)
+                         unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
         self.pats = pats
         self.ms = {}
@@ -61,8 +85,10 @@ class StatusWidget(QWidget):
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
         qtlib.configstyles(self.repo.ui)
-        for stat in color_labels.keys():
-            effect = qtlib.geteffect(color_labels[stat])
+        labels = [(stat, val.uilabel) for stat, val in statusTypes.items()]
+        labels.extend([('r', 'resolve.resolved'), ('u', 'resolve.unresolved')])
+        for stat, label in labels:
+            effect = qtlib.geteffect(label)
             for e in effect.split(';'):
                 if e.startswith('color:'):
                     colors[stat] = QColor(e[7:])
@@ -108,9 +134,10 @@ class StatusWidget(QWidget):
 
         def setButtonText():
             text = ''
-            for stat in statusTypes:
-                if self.opts[stat[2:]]:
-                    text += stat[0]
+            for stat in StatusType.preferredOrder:
+                name = statusTypes[stat].name
+                if self.opts[name]:
+                    text += stat
             pb.setText(text)
         def statusTypeTrigger(isChecked):
             txt = hglib.fromunicode(self.sender().text())
@@ -118,10 +145,11 @@ class StatusWidget(QWidget):
             self.refreshWctx()
             setButtonText()
         menu = QMenu()
-        for stat in statusTypes:
-            a = menu.addAction(stat)
+        for stat in StatusType.preferredOrder:
+            val = statusTypes[stat]
+            a = menu.addAction('%s %s' % (stat, val.name))
             a.setCheckable(True)
-            a.setChecked(self.opts[stat[2:]])
+            a.setChecked(self.opts[val.name])
             a.triggered.connect(statusTypeTrigger)
         pb.setMenu(menu)
         setButtonText()
@@ -317,42 +345,6 @@ COL_MERGE_STATE = 2
 COL_PATH_DISPLAY = 3
 COL_PATH = 4
 
-tips = {
-   'M': _('%s is modified'),
-   'A': _('%s is added'),
-   'R': _('%s is removed'),
-   '?': _('%s is not tracked (unknown)'),
-   '!': _('%s is missing!'),
-   'I': _('%s is ignored'),
-   'C': _('%s is not modified (clean)'),
-   'S': _('%s is a dirty subrepo'),
-}
-
-# TODO: We need real icons here
-icons = {
-   'M': 'menucommit.ico',
-   'A': 'fileadd.ico',
-   'R': 'filedelete.ico',
-   '?': 'shelve.ico',
-   '!': 'menudelete.ico',
-   'I': 'ignore.ico',
-   'C': '',
-   'S': 'hg.ico',
-}
-
-color_labels = {
-   'M': 'status.modified',
-   'A': 'status.added',
-   'R': 'status.removed',
-   '?': 'status.unknown',
-   '!': 'status.deleted',
-   'I': 'status.ignored',
-   'C': 'status.clean',
-   'S': 'status.subrepo',
-   'r': 'resolve.resolved',
-   'u': 'resolve.unresolved',
-}
-
 colors = {}
 
 class WctxModel(QAbstractTableModel):
@@ -411,9 +403,9 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Unchecked
         elif role == Qt.DecorationRole and index.column() == COL_STATUS:
             status = self.rows[index.row()][COL_STATUS]
-            if status in icons:
+            if status in statusTypes:
                 ico = QIcon()
-                ico.addPixmap(QPixmap('icons/' + icons[status]))
+                ico.addPixmap(QPixmap('icons/' + statusTypes[status].icon))
                 return QVariant(ico)
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
@@ -425,8 +417,8 @@ class WctxModel(QAbstractTableModel):
             else:
                 return colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
-            if status in tips:
-                tip = tips[status] % upath
+            if status in statusTypes:
+                tip = statusTypes[status].desc % upath
                 if mst == 'R':
                     tip += _(', resolved merge')
                 elif mst == 'U':
