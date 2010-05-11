@@ -163,7 +163,7 @@
     <string>Exit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionAbout">
