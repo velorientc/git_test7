@@ -94,8 +94,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                 return
             mtime = self._getrepomtime()
             if mtime > self._repodate:
-                self.statusBar().showMessage("Repository has been modified "
-                                             "(reloading is recommended)")
+                #self.statusBar().showMessage("Repository has been modified "
+                #                             "(reloading is recommended)")
+                pass
 
     def loading(self):
         return self._loading
