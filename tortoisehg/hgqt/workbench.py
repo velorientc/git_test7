@@ -41,7 +41,8 @@ SIGNAL = QtCore.SIGNAL
 class Workbench(QtGui.QMainWindow, HgDialogMixin):
     """hg repository viewer/browser application"""
     _uifile = 'workbench.ui'
-    def __init__(self, repo, fromhead=None):
+    def __init__(self, ui, repo, fromhead=None):
+        self.ui = ui
         self.repo = repo
         self._closed_branch_supp = has_closed_branch_support(self.repo)
 
@@ -55,7 +56,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         HgDialogMixin.__init__(self)
 
         self.setWindowTitle('TortoiseHg Workbench')
-        self.menubar.hide()
 
         self.createActions()
         self.createToolbars()
@@ -101,7 +101,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)
         self.repowidget = rw = RepoWidget(repo, fromhead)
-        self.repoTabsWidget.addTab(rw, reponame)
+        tw = self.repoTabsWidget
+        index = self.repoTabsWidget.addTab(rw, reponame)
+        tw.setCurrentIndex(index)
 
     def setupBranchCombo(self, *args):
         allbranches = sorted(self.repo.branchtags().items())
@@ -301,6 +303,19 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
                 self.clearStartAtRev)
         self.addAction(self.actionClearStartAtRev)
 
+        connect(self.actionOpen_repository, SIGNAL('triggered()'),
+                self.openRepository)
+
+    def openRepository(self):
+        caption = "Select repository directory to open"
+        FD = QtGui.QFileDialog
+        path = FD.getExistingDirectory(
+            parent=self, caption=caption,
+            options=FD.ShowDirsOnly | FD.ReadOnly)
+        path = str(path)
+        repo = hg.repository(self.ui, path=path)
+        self.addRepoTab(repo)
+
     def startAtCurrentRev(self):
         pass
 
@@ -380,4 +395,4 @@ def run(ui, *pats, **opts):
     root = paths.find_root()
     if root:
         repo = hg.repository(ui, path=root)
-    return Workbench(repo)
+    return Workbench(ui, repo)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 11 15:17:48 2010
+# Created: Tue May 11 19:47:28 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -36,8 +36,6 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName("menuFile")
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
-        self.menu_Edit = QtGui.QMenu(self.menubar)
-        self.menu_Edit.setObjectName("menu_Edit")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -78,7 +76,6 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionHelp)
         self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menu_Edit.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.toolBar_file.addAction(self.actionQuit)
         self.toolBar_file.addAction(self.actionRefresh)
@@ -93,7 +90,6 @@ class Ui_MainWindow(object):
         self.repoTabsWidget.setTabText(self.repoTabsWidget.indexOf(self.firstRepoTab), QtGui.QApplication.translate("MainWindow", "repo1", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
-        self.menu_Edit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_file.setWindowTitle(QtGui.QApplication.translate("MainWindow", "File toolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_edit.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Edit toolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_treefilters.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Filter toolbar", None, QtGui.QApplication.UnicodeUTF8))
