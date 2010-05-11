@@ -71,7 +71,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         #self.textview_header.commitsignal.connect(self.commit)
 
         self.addRepoTab(self.repo, fromhead)
-        self.repoTabsWidget.removeTab(0)
+        tw = self.repoTabsWidget
+        tw.removeTab(0)
+        connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
 
         # setup tables and views
         #self.setupHeaderTextview()
@@ -97,13 +99,24 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
         '''
 
+    def repoTabCloseRequested(self, index):
+        tw = self.repoTabsWidget
+        if (tw.count() == 1):
+            return # ignore request to close the last tab
+        tw.removeTab(index)
+        self.updateCurrentRepoWidget()
+
+    def updateCurrentRepoWidget(self):
+        self.repowidget = self.repoTabsWidget.currentWidget()
+
     def addRepoTab(self, repo, fromhead=None):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)
-        self.repowidget = rw = RepoWidget(repo, fromhead)
+        rw = RepoWidget(repo, fromhead)
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
+        self.updateCurrentRepoWidget()
 
     def setupBranchCombo(self, *args):
         allbranches = sorted(self.repo.branchtags().items())
