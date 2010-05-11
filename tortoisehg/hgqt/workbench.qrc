@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/log.svg</file>
     <file>icons/quit.svg</file>
     <file>icons/reload.svg</file>
     <file>icons/back.svg</file>
@@ -16,8 +17,6 @@
     <file>icons/modified.svg</file>
     <file>icons/clean.svg</file>
     <file>icons/mqdiff.svg</file>
-    <file>icons/mqdiff_x.svg</file>
     <file>icons/mqpatch.svg</file>
-    <file>icons/mqpatch_x.svg</file>
   </qresource>
 </RCC>
