@@ -90,11 +90,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         #self.setupRevisionTable()
 
         # restore settings
-        '''
         s = QtCore.QSettings()
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
+        '''
         self.splitternames = []
         sn = ('revisions', 'filelist', 'message')
         for n in sn:
@@ -400,11 +400,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def closeEvent(self, event):
         if not self.okToContinue():
             event.ignore()
-        '''
         s = QtCore.QSettings()
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
+        '''
         for n in self.splitternames:
             s.setValue(wb + n, getattr(self, n).saveState())
         '''
