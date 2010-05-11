@@ -379,12 +379,13 @@ class WctxModel(QAbstractTableModel):
         if opts['clean']:
             for c in wctx.clean():
             	rows.append([False, 'C', '', hglib.tounicode(c), c])
-        try:
-            for s in wctx.substate:
-                if wctx.sub(s).dirty():
-                    rows.append([False, 'S', '', hglib.tounicode(s), s])
-        except (OSError, IOError, error.ConfigError), e:
-            self.status_error = str(e)
+        if opts['subrepo']:
+            try:
+                for s in wctx.substate:
+                    if wctx.sub(s).dirty():
+                        rows.append([False, 'S', '', hglib.tounicode(s), s])
+            except (OSError, IOError, error.ConfigError), e:
+                self.status_error = str(e)
         self.headers = ('*', _('Stat'), _('M'), _('Filename'))
         self.rows = rows
 
