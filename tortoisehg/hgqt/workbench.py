@@ -111,7 +111,10 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def repoTabChanged(self, index=0):
         print "repoTabChanged(%i)" % index
-        self.repowidget = self.repoTabsWidget.currentWidget()
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            # TODO: update toolbars
+            pass
 
     def addRepoTab(self, repo, fromhead=None):
         '''opens the given repo in a new tab'''
@@ -361,7 +364,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def reload(self):
         """Reload the repository"""
         print "reload() called"
-        self.repowidget.reload()
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.reload()
 
     #@timeit
     def refreshRevisionTable(self, *args, **kw):
