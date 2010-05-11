@@ -70,12 +70,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         #self.textview_header.commitsignal.connect(self.commit)
 
-        tw = self.repoTabsWidget
-        reponame = os.path.basename(self.repo.root)
-        self.repowidget = rw = RepoWidget(repo, fromhead)
-        tw.setCurrentWidget(rw)
-        tw.addTab(rw, reponame)
-        tw.removeTab(0)
+        self.addRepoTab(self.repo, fromhead)
+        self.repoTabsWidget.removeTab(0)
 
         # setup tables and views
         #self.setupHeaderTextview()
@@ -100,6 +96,12 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             self.splitternames.append(n)
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
         '''
+
+    def addRepoTab(self, repo, fromhead=None):
+        '''opens the given repo in a new tab'''
+        reponame = os.path.basename(repo.root)
+        self.repowidget = rw = RepoWidget(repo, fromhead)
+        self.repoTabsWidget.addTab(rw, reponame)
 
     def setupBranchCombo(self, *args):
         allbranches = sorted(self.repo.branchtags().items())
