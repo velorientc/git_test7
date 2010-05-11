@@ -60,7 +60,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         QtGui.QMainWindow.__init__(self)
         HgDialogMixin.__init__(self)
 
-        self.setWindowTitle('TortoiseHg Workbench: %s' % os.path.abspath(self.repo.root))
+        self.setWindowTitle('TortoiseHg Workbench')
         self.menubar.hide()
 
         self.createActions()
@@ -75,6 +75,12 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.textview_header.setMessageWidget(self.message)
 
         self.textview_header.commitsignal.connect(self.commit)
+
+        # set name of current tab to repo name
+        reponame = os.path.basename(self.repo.root)
+        tw = self.repoTabsWidget
+        idx = tw.currentIndex()
+        tw.setTabText(idx, reponame)
 
         # setup tables and views
         self.setupHeaderTextview()
