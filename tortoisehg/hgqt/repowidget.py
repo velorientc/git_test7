@@ -19,6 +19,7 @@ from mercurial import util
 from tortoisehg.util.util import tounicode, has_closed_branch_support
 from tortoisehg.util.util import rootpath, find_repository
 
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.graph import diff as revdiff
 from tortoisehg.hgqt.decorators import timeit
 
@@ -87,8 +88,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         args = ['commit']
         args += ['-v', '-m', self.message.text()]
         dlg = cmdui.Dialog(args)
-        dlg.show()
-        self._commitdlg = dlg
+        dlg.setWindowTitle(_('Commit'))
+        if dlg.exec_():
+            self.reload('tip')
 
     def timerEvent(self, event):
         if event.timerId() == self._watchrepotimer:
@@ -402,9 +404,12 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         # humm, directory has probably been deleted, exiting...
         self.close()
 
-    def reload(self):
+    def reload(self, rev=None):
         """Reload the repository"""
-        self._reload_rev = self.tableView_revisions.current_rev
+        if rev == None:
+            self._reload_rev = self.tableView_revisions.current_rev
+        else:
+            self._reload_rev = rev
         self._loading = True
         self._reload_file = self.tableView_filelist.currentFile()
         self.repo = hg.repository(self.repo.ui, self.repo.root)
