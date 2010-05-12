@@ -299,10 +299,6 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
                 msg = _columnmap[column](self, ctx, gnode)
                 return QtCore.QVariant(msg)
             return QtCore.QVariant(_columnmap[column](self, ctx, gnode))
-        elif role == QtCore.Qt.ToolTipRole:
-            msg = "<b>Branch:</b> %s<br>\n" % ctx.branch()
-            msg += _tooltips.get(column, _columnmap[column])(self, ctx, gnode)
-            return QtCore.QVariant(msg)
         elif role == QtCore.Qt.ForegroundRole:
             if column == 'Author': #author
                 return QtCore.QVariant(QtGui.QColor(self.user_color(ctx.user())))
