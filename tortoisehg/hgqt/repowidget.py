@@ -68,6 +68,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.textview_header.commitsignal.connect(self.commit)
 
+        connect(self.message, SIGNAL('revisionSelected'), self.tableView_revisions.goto)
+
         # setup tables and views
         self.setupHeaderTextview()
         connect(self.textview_status, SIGNAL('fileDisplayed'),

@@ -14,6 +14,8 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+import re
+
 from mercurial.node import short as short_hex
 
 from PyQt4 import QtCore, QtGui
@@ -235,6 +237,14 @@ class RevDisplay(QtGui.QWidget):
         return buf
 
 
+# initialize changeset and url link regex
+csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
+httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
+regexp = r'%s|%s' % (csmatch, httpmatch)
+bodyre = re.compile(regexp)
+
+revhashprefix = 'rev_hash_'
+
 class RevMessage(QtGui.QWidget):
 
     def __init__(self, parent=None):
@@ -244,9 +254,20 @@ class RevMessage(QtGui.QWidget):
         vb.setMargin(0)
 
         self._message = w = QtGui.QTextBrowser()
+        w.setOpenLinks(False)
         vb.addWidget(w)
 
         self.setLayout(vb)
+
+        connect(self._message, SIGNAL('anchorClicked(QUrl)'), self.anchorClicked)
+
+    def anchorClicked(self, qurl):
+        link = str(qurl.toString())
+        if link.startswith(revhashprefix):
+            rev = link[len(revhashprefix):]
+            self.emit(SIGNAL('revisionSelected'), rev)
+        else:
+            QtGui.QDesktopServices.openUrl(qurl)
 
     def setEditable(self, editable):
         self._message.setReadOnly(not editable)
@@ -258,7 +279,25 @@ class RevMessage(QtGui.QWidget):
         self.ctx = ctx
         desc = xml_escape(unicode(ctx.description(), 'utf-8', 'replace'))
         desc = desc.replace('\n', '<br/>\n')
-        buf = '<div class="diff_desc"><p>%s</p></div>' % desc
+
+        buf = ''
+        pos = 0
+        for m in bodyre.finditer(desc):
+            a, b = m.span()
+            if a >= pos:
+                buf += desc[pos:a]
+                pos = b
+            groups = m.groups()
+            if groups[0]:
+                cslink = groups[0]
+                buf += '<a href="%s%s">%s</a>' % (revhashprefix, cslink, cslink)
+            if groups[1]:
+                urllink = groups[1]
+                buf += '<a href="%s">%s</a>' % (urllink, urllink)
+        if pos < len(desc):
+            buf += desc[pos:]
+
+        buf = '<div class="diff_desc"><p>%s</p></div>' % buf
         self._message.setHtml(buf)
 
     def selectNone(self):
