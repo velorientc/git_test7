@@ -107,7 +107,7 @@ class StatusWidget(QWidget):
         self.connect(tv, SIGNAL('menuAction()'), self.refreshWctx)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
-        tv.setSortingEnabled(True)
+        tv.sortByColumn(COL_PATH_DISPLAY)
 
         def setButtonText():
             text = ''
@@ -215,13 +215,14 @@ class StatusWidget(QWidget):
         self.updateModel()
 
     def updateModel(self):
+        self.tv.setSortingEnabled(False)
         if self.tv.model():
             checked = self.tv.model().getChecked()
         else:
             checked = {}
         tm = WctxModel(self.wctx, self.ms, self.opts, checked)
         self.tv.setModel(tm)
-        self.tv.sortByColumn(COL_PATH_DISPLAY)
+        self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, self.isMerge())
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
         for col in xrange(COL_PATH_DISPLAY):
