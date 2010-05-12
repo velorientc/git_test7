@@ -23,7 +23,6 @@ from PyQt4.QtGui import QIcon, QPixmap, QToolButton
 # working copy browser.
 
 # Technical Debt
-#  Need mechanism to override file size/binary check
 #  We need a real icon set for file status types
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
@@ -143,6 +142,10 @@ class StatusWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.setContentsMargins (5, 7, 0, 0)
         self.fnamelabel = QLabel()
+        self.fnamelabel.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.connect(self.fnamelabel,
+                     SIGNAL('customContextMenuRequested(const QPoint &)'),
+                     self.customContextMenuRequested)
         hbox.addWidget(self.fnamelabel)
         hbox.addStretch()
 
@@ -168,6 +171,17 @@ class StatusWidget(QWidget):
             split.setStretchFactor(1, 2)
 
         self.refreshWctx()
+
+    def customContextMenuRequested(self, point):
+        'menu request for filename label'
+        if self.curRow is None:
+            return
+        point = self.fnamelabel.mapToGlobal(point)
+        path, status, mst, u = self.curRow
+        selrows = [(set(status+mst.lower()), path), ]
+        action = wctxactions.wctxactions(self, point, self.repo, selrows)
+        if action:
+            self.emit(SIGNAL('menuAction()'))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_F5:
