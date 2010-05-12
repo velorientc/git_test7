@@ -49,8 +49,8 @@ class ProgressMonitor(QWidget):
     ### Public Methods ###
 
     def clear_progress(self):
-        self.pbar.reset()
         self.pbar.setMaximum(100)
+        self.pbar.reset()
         self.status_label.setText('')
         self.prog_label.setText('')
         self.inprogress = False
