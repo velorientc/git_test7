@@ -15,7 +15,7 @@ from tortoisehg.util.i18n import _
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT, QAbstractTableModel
 from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
-from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QSortFilterProxyModel
+from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
 from PyQt4.QtGui import QIcon, QPixmap
 
@@ -23,14 +23,12 @@ from PyQt4.QtGui import QIcon, QPixmap
 # working copy browser.
 
 # Technical Debt
-#  Selections are not surviving refresh
+#  Need mechanism to override file size/binary check
 #  We need a real icon set for file status types
-#  Refresh can be too expensive; probably need to disable some signals
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
-#  Need mechanism to override file size/binary check
 #  Show subrepos better
 #  Save splitter position to parent's QSetting
 #  Chunk selection
@@ -40,11 +38,10 @@ from PyQt4.QtGui import QIcon, QPixmap
 #  Toolbar
 #  double-click visual diffs
 
-COL_CHECK = 0
+COL_PATH = 0
 COL_STATUS = 1
 COL_MERGE_STATE = 2
 COL_PATH_DISPLAY = 3
-COL_PATH = 4
 
 _colors = {}
 
@@ -134,13 +131,8 @@ class StatusWidget(QWidget):
         pb.setMenu(menu)
         setButtonText()
         pb.storeref = menu
-
-        self.proxy = WctxProxyModel()
-        self.proxy.setFilterKeyColumn(COL_PATH_DISPLAY)
-        self.connect(le, SIGNAL('textEdited(QString)'), self.proxy,
-                     SLOT('setFilterWildcard(QString)'))
-        tv.setModel(self.proxy)
         self.tv = tv
+        self.le = le
 
         self.te = QTextEdit(split)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -188,23 +180,27 @@ class StatusWidget(QWidget):
         self.updateModel()
 
     def updateModel(self):
-        tm = WctxModel(self.wctx, self.ms, self.opts)
-        self.rawmodel = tm
-        self.proxy.setSourceModel(tm)
+        if self.tv.model():
+            checked = self.tv.model().getChecked()
+        else:
+            checked = {}
+        tm = WctxModel(self.wctx, self.ms, self.opts, checked)
+        self.tv.setModel(tm)
         self.tv.sortByColumn(COL_PATH_DISPLAY)
-        self.tv.setColumnHidden(COL_CHECK, self.isMerge())
+        self.tv.setColumnHidden(COL_PATH, self.isMerge())
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
-        for col in xrange(COL_PATH):
+        for col in xrange(COL_PATH_DISPLAY):
             self.tv.resizeColumnToContents(col)
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
+        self.connect(self.le, SIGNAL('textEdited(QString)'), tm.setFilter)
 
     def isMerge(self):
         return bool(self.wctx.p2())
 
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
-        checked, status, mst, upath, path = index.model().getRow(index)
+        path, status, mst, upath = index.model().getRow(index)
         wfile = util.pconvert(path)
 
         if status in '?IC':
@@ -324,42 +320,52 @@ class WctxFileTree(QTreeView):
         return self.selectionModel().selectedRows()
 
 class WctxModel(QAbstractTableModel):
-    def __init__(self, wctx, ms, opts, parent=None):
+    def __init__(self, wctx, ms, opts, checked, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         if opts['modified']:
             for m in wctx.modified():
                 mst = m in ms and ms[m].upper() or ""
-                rows.append([True, 'M', mst, hglib.tounicode(m), m])
+                checked[m] = checked.get(m, True)
+                rows.append([m, 'M', mst, hglib.tounicode(m)])
         if opts['added']:
             for a in wctx.added():
                 mst = a in ms and ms[a].upper() or ""
-                rows.append([True, 'A', mst, hglib.tounicode(a), a])
+                checked[a] = checked.get(a, True)
+                rows.append([a, 'A', mst, hglib.tounicode(a)])
         if opts['removed']:
             for r in wctx.removed():
                 mst = r in ms and ms[r].upper() or ""
-                rows.append([True, 'R', mst, hglib.tounicode(r), r])
+                checked[r] = checked.get(r, True)
+                rows.append([r, 'R', mst, hglib.tounicode(r)])
         if opts['deleted']:
             for d in wctx.deleted():
                 mst = d in ms and ms[d].upper() or ""
-                rows.append([False, '!', mst, hglib.tounicode(d), d])
+                checked[d] = checked.get(d, False)
+                rows.append([d, '!', mst, hglib.tounicode(d)])
         if opts['unknown']:
             for u in wctx.unknown():
-            	rows.append([False, '?', '', hglib.tounicode(u), u])
+                checked[u] = checked.get(u, False)
+            	rows.append([u, '?', '', hglib.tounicode(u)])
         if opts['ignored']:
             for i in wctx.ignored():
-            	rows.append([False, 'I', '', hglib.tounicode(i), i])
+                checked[i] = checked.get(i, False)
+            	rows.append([i, 'I', '', hglib.tounicode(i)])
         if opts['clean']:
             for c in wctx.clean():
-            	rows.append([False, 'C', '', hglib.tounicode(c), c])
+                checked[c] = checked.get(c, False)
+            	rows.append([c, 'C', '', hglib.tounicode(c)])
         if opts['subrepo']:
             try:
                 for s in wctx.substate:
                     if wctx.sub(s).dirty():
-                        rows.append([False, 'S', '', hglib.tounicode(s), s])
+                        checked[s] = checked.get(s, False)
+                        rows.append([s, 'S', '', hglib.tounicode(s)])
             except (OSError, IOError, error.ConfigError), e:
                 self.status_error = str(e)
         self.headers = ('*', _('Stat'), _('M'), _('Filename'))
+        self.checked = checked
+        self.unfiltered = rows
         self.rows = rows
 
     def rowCount(self, parent):
@@ -371,24 +377,23 @@ class WctxModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        if index.column() == COL_CHECK:
+
+        path, status, mst, upath = self.rows[index.row()]
+        if index.column() == COL_PATH:
             if role == Qt.CheckStateRole:
                 # also Qt.PartiallyChecked
-                if self.rows[index.row()][COL_CHECK]:
+                if self.checked[path]:
                     return Qt.Checked
                 else:
                     return Qt.Unchecked
+        elif role == Qt.DisplayRole:
+            return QVariant(self.rows[index.row()][index.column()])
         elif role == Qt.DecorationRole and index.column() == COL_STATUS:
-            status = self.rows[index.row()][COL_STATUS]
             if status in statusTypes:
                 ico = QIcon()
                 ico.addPixmap(QPixmap('icons/' + statusTypes[status].icon))
                 return QVariant(ico)
-        elif role == Qt.DisplayRole:
-            return QVariant(self.rows[index.row()][index.column()])
-
-        checked, status, mst, upath, path = self.rows[index.row()]
-        if role == Qt.TextColorRole:
+        elif role == Qt.TextColorRole:
             if mst:
                 return _colors.get(mst.lower(), QColor('black'))
             else:
@@ -411,7 +416,7 @@ class WctxModel(QAbstractTableModel):
 
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
-        if index.column() == COL_CHECK:
+        if index.column() == COL_PATH:
             flags |= Qt.ItemIsUserCheckable
         return flags
 
@@ -430,34 +435,39 @@ class WctxModel(QAbstractTableModel):
     def toggleRow(self, index):
         'Connected to "activated" signal, emitted by dbl-click or enter'
         assert index.isValid()
-        row = index.row()
-        self.rows[row][COL_CHECK] = not self.rows[row][COL_CHECK]
+        fname = self.rows[index.row()][COL_PATH]
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.checked[fname] = not self.checked[fname]
         self.emit(SIGNAL("layoutChanged()"))
 
     def pressedRow(self, index):
         'Connected to "pressed" signal, emitted by mouse clicks'
         assert index.isValid()
-        if index.column() == COL_CHECK:
+        if index.column() == COL_PATH:
             self.toggleRow(index)
 
+    def sort(self, col, order):
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        if col == COL_PATH:
+            c = self.checked
+            self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
+        else:
+            self.rows.sort(lambda x, y: cmp(x[col], y[col]))
+        if order == Qt.DescendingOrder:
+            self.rows.reverse()
+        self.emit(SIGNAL("layoutChanged()"))
+        self.reset()
 
-class WctxProxyModel(QSortFilterProxyModel):
-    def __init__(self, parent=None):
-        QSortFilterProxyModel.__init__(self, parent)
+    def setFilter(self, match):
+        'simple match in filename filter'
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.rows = [r for r in self.unfiltered if match in r[COL_PATH_DISPLAY]]
+        self.emit(SIGNAL("layoutChanged()"))
+        self.reset()
 
-    def getRow(self, index):
-        index = self.mapToSource(index)
-        return self.sourceModel().getRow(index)
+    def getChecked(self):
+        return self.checked.copy()
 
-    def toggleRow(self, index):
-        'Connected to "activated" signal, emitted by dbl-click or enter'
-        index = self.mapToSource(index)
-        return self.sourceModel().toggleRow(index)
-
-    def pressedRow(self, index):
-        'Connected to "pressed" signal, emitted by mouse clicks'
-        index = self.mapToSource(index)
-        return self.sourceModel().pressedRow(index)
 
 class StatusType(object):
     preferredOrder = 'MAR?!ICS'
