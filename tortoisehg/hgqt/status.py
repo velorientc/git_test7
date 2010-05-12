@@ -141,8 +141,12 @@ class StatusWidget(QWidget):
         docf.setLayout(vbox)
         hbox = QHBoxLayout()
         hbox.setContentsMargins (5, 7, 0, 0)
-        self.fnamelabel = QLabel('<insert filename here>')
+        self.fnamelabel = QLabel()
         hbox.addWidget(self.fnamelabel)
+        hbox.addStretch()
+        self.override = QPushButton(_('Show Contents'))
+        hbox.addWidget(self.override)
+        self.override.setVisible(False)
 
         self.te = QTextEdit()
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -217,22 +221,24 @@ class StatusWidget(QWidget):
         self.fnamelabel.setText(statusMessage(status, mst, upath))
 
         if status in '?IC':
-            # TODO: Display file contents if a button clicked,
-            # add to a toolbar above the diff panel
             diff = _('<em>No displayable differences</em>')
             self.te.setHtml(diff)
+            self.override.setVisible(True)
             return
         elif status in '!':
             diff = _('<em>No displayable differences</em>')
             self.te.setHtml(diff)
+            self.override.setVisible(True)
             return
 
         warnings = chunkselect.check_max_diff(self.wctx, wfile)
         if warnings:
             text = '<b>Diffs not displayed: %s</b>' % warnings[1]
             self.te.setHtml(text)
+            self.override.setVisible(True)
             return
 
+        self.override.setVisible(False)
         if self.isMerge():
             header = _('===== Diff to first parent %d:%s =====\n') % (
                     self.wctx.p1().rev(), str(self.wctx.p1()))
