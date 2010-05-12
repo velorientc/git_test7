@@ -18,7 +18,7 @@ import sys
 import subprocess
 import traceback
 
-from PyQt4 import QtGui
+from PyQt4 import QtCore, QtGui
 
 import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil, extensions, error
@@ -304,6 +304,8 @@ def qtrun(dlgfunc, ui, *args, **opts):
         if dlg:
             dlg.show()
         return
+
+    QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
 
     mainapp = QtGui.QApplication(sys.argv)
     # default org is used by QSettings
