@@ -172,11 +172,11 @@ class GShelve(GStatus):
                 if file not in wfiles:
                     # file was not selected for inclusion
                     continue
-                if file not in self.filechunks:
+                if file not in self.chunks:
                     # file was never filtered, accept all chunks
                     accepted.append(chunk)
                     continue
-                schunks = self.filechunks[file]
+                schunks = self.chunks[file]
                 for i, c in enumerate(schunks):
                     if chunk != c:
                         continue
@@ -194,7 +194,7 @@ class GShelve(GStatus):
         # shelve them!
         hgshelve.shelve(self.ui, self.repo, **opts)
         self.ui.setconfig('ui', 'interactive', 'off')
-        self.filechunks = {}       # do not keep chunks
+        self.chunks.clear_filechunks() # do not keep chunks
         self.reload_status()
 
     def unshelve(self):
