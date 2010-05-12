@@ -248,8 +248,9 @@ class StatusWidget(QWidget):
         self.fnamelabel.setText(statusMessage(status, mst, upath))
         showanyway = self.override.isChecked()
 
-        if status in '?IC':
+        if status in '?I':
             if showanyway:
+                # Read untracked file contents from working directory
                 diff = open(self.repo.wjoin(wfile), 'r').read()
                 if '\0' in diff:
                     diff = _('<b>Contents are binary, not previewable</b>')
@@ -261,8 +262,9 @@ class StatusWidget(QWidget):
                 self.te.setHtml(diff)
                 self.override.setVisible(True)
             return
-        elif status in '!':
+        elif status in '!C':
             if showanyway:
+                # Read file contents from parent revision
                 ctx = self.repo['.']
                 diff = ctx.filectx(wfile).data()
                 if '\0' in diff:
@@ -284,38 +286,29 @@ class StatusWidget(QWidget):
             return
 
         self.override.setVisible(False)
-        if self.isMerge():
-            header = _('===== Diff to first parent %d:%s =====\n') % (
-                    self.wctx.p1().rev(), str(self.wctx.p1()))
-            header = '<h3>' + header + '</h3></br>'
-        else:
-            header = ''
 
+        # Generate diffs to first parent
         hu = htmlui.htmlui()
         m = cmdutil.matchfiles(self.repo, [wfile])
         try:
-            try:
-                for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
-                    hu.write(s, label=l)
-            except AttributeError:
-                # your mercurial source is not new enough, falling back
-                # to manual patch.diff() call
-                opts = mdiff.diffopts(git=True, nodates=True)
-                n2, n1 = None, self.wctx.p1().node()
-                for s, l in patch.difflabel(patch.diff, self.repo, n1, n2,
-                                            match=m, opts=opts):
-                    hu.write(s, label=l)
+            for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
+                hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
             self.status_error = str(e)
             return
         o, e = hu.getdata()
         diff = o or _('<em>No displayable differences</em>')
+
         if self.isMerge():
+            header = _('===== Diff to first parent %d:%s =====\n') % (
+                    self.wctx.p1().rev(), str(self.wctx.p1()))
+            header = '<h3>' + header + '</h3></br>'
             text = header + diff
         else:
-            self.te.setHtml(header + diff)
+            self.te.setHtml(diff)
             return
 
+        # Generate diffs to second parent
         try:
             for s, l in patch.difflabel(self.wctx.diff, self.wctx.p2(),
                                         match=m, git=True):
