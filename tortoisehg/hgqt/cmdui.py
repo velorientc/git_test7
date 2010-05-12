@@ -55,6 +55,11 @@ class ProgressMonitor(QWidget):
         self.prog_label.setText('')
         self.inprogress = False
 
+    def fillup_progress(self):
+        """stick progress to full"""
+        self.clear_progress()
+        self.pbar.setValue(self.pbar.maximum())
+
     def unknown_progress(self):
         self.pbar.setMinimum(0)
         self.pbar.setMaximum(0)
@@ -123,8 +128,13 @@ class Core(QObject):
     def command_finished(self, wrapper):
         if hasattr(self, 'pmon'):
             ret = wrapper.data
-            if ret is None or self.pmon.pbar.maximum() == 0:
+            if ret is None:
                 self.pmon.clear_progress()
+            if self.pmon.pbar.maximum() == 0:  # busy indicator
+                if ret == 0:  # finished successfully
+                    self.pmon.fillup_progress()
+                else:
+                    self.pmon.clear_progress()
             if ret is None:
                 if self.thread.abortbyuser:
                     status = _('Terminated by user')
