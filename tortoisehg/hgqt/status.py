@@ -134,10 +134,22 @@ class StatusWidget(QWidget):
         self.tv = tv
         self.le = le
 
-        self.te = QTextEdit(split)
+        # Diff panel side of splitter
+        vbox = QVBoxLayout()
+        vbox.setMargin(0)
+        docf = QFrame(split)
+        docf.setLayout(vbox)
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins (5, 7, 0, 0)
+        self.fnamelabel = QLabel('<insert filename here>')
+        hbox.addWidget(self.fnamelabel)
+
+        self.te = QTextEdit()
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.te.setReadOnly(True)
         self.te.setLineWrapMode(QTextEdit.NoWrap)
+        vbox.addLayout(hbox)
+        vbox.addWidget(self.te)
 
         if not parent:
             self.setWindowTitle(_('TortoiseHg Status'))
@@ -202,16 +214,17 @@ class StatusWidget(QWidget):
         'Connected to treeview "clicked" signal'
         path, status, mst, upath = index.model().getRow(index)
         wfile = util.pconvert(path)
+        self.fnamelabel.setText(statusMessage(status, mst, upath))
 
         if status in '?IC':
             # TODO: Display file contents if a button clicked,
             # add to a toolbar above the diff panel
-            text = '<b>File is not tracked</b>'
-            self.te.setHtml(text)
+            diff = _('<em>No displayable differences</em>')
+            self.te.setHtml(diff)
             return
         elif status in '!':
-            text = '<b>File is missing!</b>'
-            self.te.setHtml(text)
+            diff = _('<em>No displayable differences</em>')
+            self.te.setHtml(diff)
             return
 
         warnings = chunkselect.check_max_diff(self.wctx, wfile)
@@ -399,13 +412,7 @@ class WctxModel(QAbstractTableModel):
             else:
                 return _colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
-            if status in statusTypes:
-                tip = statusTypes[status].desc % upath
-                if mst == 'R':
-                    tip += _(', resolved merge')
-                elif mst == 'U':
-                    tip += _(', unresolved merge')
-                return QVariant(tip)
+            return QVariant(statusMessage(status, mst, upath))
         return QVariant()
 
     def headerData(self, col, orientation, role):
@@ -468,6 +475,15 @@ class WctxModel(QAbstractTableModel):
     def getChecked(self):
         return self.checked.copy()
 
+def statusMessage(status, mst, upath):
+    tip = ''
+    if status in statusTypes:
+        tip = statusTypes[status].desc % upath
+        if mst == 'R':
+            tip += _(', resolved merge')
+        elif mst == 'U':
+            tip += _(', unresolved merge')
+    return tip
 
 class StatusType(object):
     preferredOrder = 'MAR?!ICS'
