@@ -17,7 +17,7 @@ from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
 from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
-from PyQt4.QtGui import QIcon, QPixmap
+from PyQt4.QtGui import QIcon, QPixmap, QToolButton
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -58,6 +58,7 @@ class StatusWidget(QWidget):
         self.opts.update(opts)
         self.pats = pats
         self.ms = {}
+        self.curRow = None
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -144,9 +145,13 @@ class StatusWidget(QWidget):
         self.fnamelabel = QLabel()
         hbox.addWidget(self.fnamelabel)
         hbox.addStretch()
-        self.override = QPushButton(_('Show Contents'))
-        hbox.addWidget(self.override)
+
+        self.override = QToolButton()
+        self.override.setText(_('Show Contents'))
+        self.override.setCheckable(True)
         self.override.setVisible(False)
+        self.override.toggled.connect(self.refreshDiff)
+        hbox.addWidget(self.override)
 
         self.te = QTextEdit()
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -216,23 +221,49 @@ class StatusWidget(QWidget):
 
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
-        path, status, mst, upath = index.model().getRow(index)
+        self.curRow = None
+        self.override.setChecked(False)
+        self.curRow = index.model().getRow(index)
+        self.refreshDiff()
+
+    def refreshDiff(self):
+        if self.curRow is None:
+            return
+        path, status, mst, upath = self.curRow
         wfile = util.pconvert(path)
         self.fnamelabel.setText(statusMessage(status, mst, upath))
+        showanyway = self.override.isChecked()
 
         if status in '?IC':
-            diff = _('<em>No displayable differences</em>')
-            self.te.setHtml(diff)
-            self.override.setVisible(True)
+            if showanyway:
+                diff = open(self.repo.wjoin(wfile), 'r').read()
+                if '\0' in diff:
+                    diff = _('<b>Contents are binary, not previewable</b>')
+                    self.te.setHtml(diff)
+                else:
+                    self.te.setText(diff)
+            else:
+                diff = _('<b>Not displayed</b>')
+                self.te.setHtml(diff)
+                self.override.setVisible(True)
             return
         elif status in '!':
-            diff = _('<em>No displayable differences</em>')
-            self.te.setHtml(diff)
-            self.override.setVisible(True)
+            if showanyway:
+                ctx = self.repo['.']
+                diff = ctx.filectx(wfile).data()
+                if '\0' in diff:
+                    diff = _('<b>Contents are binary, not previewable</b>')
+                    self.te.setHtml(diff)
+                else:
+                    self.te.setText(diff)
+            else:
+                diff = _('<b>Not displayed</b>')
+                self.te.setHtml(diff)
+                self.override.setVisible(True)
             return
 
         warnings = chunkselect.check_max_diff(self.wctx, wfile)
-        if warnings:
+        if warnings and not showanyway:
             text = '<b>Diffs not displayed: %s</b>' % warnings[1]
             self.te.setHtml(text)
             self.override.setVisible(True)
