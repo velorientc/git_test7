@@ -187,6 +187,7 @@ class EmailDialog(QDialog):
             cmd = cmdui.Dialog(['email'] + cmdargs(opts) + list(self._revs),
                                parent=self)
             cmd.setWindowTitle(_('Sending Email'))
+            cmd.show_output(False)
             if cmd.exec_():
                 super(EmailDialog, self).accept()
         finally:
