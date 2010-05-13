@@ -160,6 +160,7 @@ class DataMineDialog(gdialog.GWindow):
                  'menublame.ico', args=[objs])
         m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
         m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
+        m.append(_('_Diff to Local'), self.cmenu_local_diff)
         menu = m.build()
         menu.show_all()
         return menu
@@ -231,6 +232,10 @@ class DataMineDialog(gdialog.GWindow):
         self.trigger_annotate(parent_revid, filepath, objs)
         graphview.scroll_to_revision(int(parent_revid))
         graphview.set_revision_id(int(parent_revid))
+
+    def cmenu_local_diff(self, menuitem):
+        opts = {'rev':[str(self.currev)], 'bundle':None}
+        self._do_diff([self.curpath], opts)
 
     def cmenu_file_log(self, menuitem):
         from tortoisehg.hgtk import history
@@ -365,10 +370,10 @@ class DataMineDialog(gdialog.GWindow):
                                 str) # file path (utf-8)
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_grep)
-        for title, width, col, emode in (
-                (_('Rev'), 10, GCOL_REVID, pango.ELLIPSIZE_NONE),
-                (_('File'), 25, GCOL_PATH, pango.ELLIPSIZE_START),
-                (_('Matches'), 80, GCOL_LINE, pango.ELLIPSIZE_END)):
+        for title, width, ttype, col, emode in (
+                (_('Rev'), 10, 'text', GCOL_REVID, pango.ELLIPSIZE_NONE),
+                (_('File'), 25, 'text', GCOL_PATH, pango.ELLIPSIZE_START),
+                (_('Matches'), 80, 'markup', GCOL_LINE, pango.ELLIPSIZE_END)):
             cell = gtk.CellRendererText()
             cell.set_property('width-chars', width)
             cell.set_property('ellipsize', emode)
@@ -378,7 +383,7 @@ class DataMineDialog(gdialog.GWindow):
             column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
-            column.add_attribute(cell, 'text', col)
+            column.add_attribute(cell, ttype, col)
             treeview.append_column(column)
         if hasattr(treeview, 'set_tooltip_column'):
             treeview.set_tooltip_column(GCOL_DESC)
@@ -461,7 +466,7 @@ class DataMineDialog(gdialog.GWindow):
 
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, True, args)
             except (util.Abort, error.LookupError), e:
                 self.stbar.set_text(_('Abort: %s') % str(e))
 
@@ -490,8 +495,16 @@ class DataMineDialog(gdialog.GWindow):
         """
         Handle all the messages currently in the queue (if any).
         """
+        text = ''
         while q.qsize():
-            line = q.get(0).rstrip('\r\n')
+            data, label = q.get(0)
+            data = gtklib.markup_escape_text(hglib.toutf(data))
+            if label == 'grep.match':
+                text += '<span foreground="red"><b>%s</b></span>' % data
+            else:
+                text += data
+        
+        for line in text.splitlines():
             try:
                 (path, revid, text) = line.split(':', 2)
             except ValueError:
@@ -499,8 +512,7 @@ class DataMineDialog(gdialog.GWindow):
             desc, user = self.get_rev_desc(long(revid))
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, hglib.toutf(text[:512]), desc,
-                          hglib.toutf(path)))
+            model.append((revid, text, desc, hglib.toutf(path)))
         if thread.isAlive():
             return True
         else:
@@ -766,7 +778,7 @@ class DataMineDialog(gdialog.GWindow):
         '''
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, False, args)
             except (util.Abort, error.LookupError), e:
                 self.stbar.set_text(_('Abort: %s') % str(e))
 

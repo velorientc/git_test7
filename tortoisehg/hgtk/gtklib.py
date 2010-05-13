@@ -10,11 +10,12 @@ import os
 import sys
 import gtk
 import gobject
+import pango
 import Queue
 import urllib
 import threading
 
-from mercurial import util
+from mercurial import util, extensions
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import paths, hglib, thread2
@@ -32,18 +33,6 @@ if gobject.pygobject_version <= (2,12,1):
     # http://www.mail-archive.com/tortoisehg-develop@lists.sourceforge.net/msg06900.html
     raise Exception('incompatible version of gobject')
 
-# common colors
-
-DRED = '#900000'
-DGREEN = '#006400'
-DBLUE = '#000090'
-
-PRED = '#ffcccc'
-PGREEN = '#aaffaa'
-PBLUE = '#aaddff'
-PYELLOW = '#ffffaa'
-PORANGE = '#ffddaa'
-
 if gtk.pygtk_version < (2, 12, 0):
     # old nasty
     Tooltips = gtk.Tooltips
@@ -54,6 +43,231 @@ else:
             pass
         def set_tip(self, widget, tip):
             widget.set_tooltip_text(tip)
+
+# common colors
+
+DRED = '#900000'
+DGREEN = '#006400'
+DBLUE = '#000090'
+DYELLOW = '#969600'
+DLIME = '#4a9500'
+DORANGE = '#AA5000'
+DPINK = '#C83838'
+DTURQUOISE = '#007070'
+DVIOLET = '#6F466F'
+DBROWN = '#702F17'
+
+DGRAY = '#404040'
+
+PRED = '#ffcccc'
+PGREEN = '#aaffaa'
+PBLUE = '#aaddff'
+PYELLOW = '#ffffaa'
+PLIME = '#80FF00'
+PORANGE = '#ffddaa'
+PPINK = '#ff5555'
+PTURQUOISE = '#00ffee'
+PVIOLET = '#F198F1'
+PBROWN = '#CA4C1A'
+
+RED = 'red'
+GREEN = 'green'
+BLUE = 'blue'
+YELLOW = 'yellow'
+ORANGE = 'orange'
+BROWN = 'brown'
+PINK = 'pink'
+VIOLET = 'violet'
+MAGENTA = 'magenta'
+INDIGO = 'indigo'
+BLACK = 'black'
+WHITE = 'white'
+GREY = 'grey'
+
+
+NORMAL = BLACK
+NEW_REV_COLOR = DGREEN
+CHANGE_HEADER = GREY
+
+try:
+    from hgext.color import _styles
+    _styles.keys()
+except ImportError:
+    # hg <= 1.5
+    _styles = {'grep.match': 'red bold',
+               'diff.changed': 'white',
+               'diff.deleted': 'red',
+               'diff.diffline': 'bold',
+               'diff.extended': 'cyan bold',
+               'diff.file_a': 'red bold',
+               'diff.file_b': 'green bold',
+               'diff.hunk': 'magenta',
+               'diff.inserted': 'green',
+               'diff.trailingwhitespace': 'bold red_background',
+               'diffstat.deleted': 'red',
+               'diffstat.inserted': 'green',
+               'log.changeset': 'yellow',
+               'resolve.resolved': 'green bold',
+               'resolve.unresolved': 'red bold',
+               'status.added': 'green bold',
+               'status.clean': 'none',
+               'status.copied': 'none',
+               'status.deleted': 'cyan bold underline',
+               'status.ignored': 'black bold',
+               'status.modified': 'blue bold',
+               'status.removed': 'red bold',
+               'status.unknown': 'magenta bold underline'}
+
+TextBufferTags = {
+    'red':              dict(foreground=DRED),
+    'black':            dict(foreground=BLACK),
+    'green':            dict(foreground=GREEN),
+    'yellow':           dict(foreground=YELLOW),
+    'blue':             dict(foreground=BLUE),
+    'magenta':          dict(foreground='magenta'),
+    'cyan':             dict(foreground='cyan'),
+    'white':            dict(foreground='white'),
+    'bold':             dict(weight=pango.WEIGHT_HEAVY),
+    'italic':           dict(style=pango.STYLE_ITALIC),
+    'underline':        dict(underline=pango.UNDERLINE_SINGLE),
+    'black_background': dict(background=BLACK),
+    'red_background':   dict(background=RED),
+    'green_background': dict(background=GREEN),
+    'yellow_background': dict(background=YELLOW),
+    'blue_background':  dict(background=BLUE),
+    'purple_background': dict(background='purple'),
+    'cyan_background':  dict(background='cyan'),
+    'white_background': dict(background=WHITE)
+}
+
+_thgstyles = {
+    'ui.error':      'red bold',
+    'control':       'black bold',
+}
+
+def configstyles(ui):
+    # extensions may provide more labels and default effects
+    for name, ext in extensions.extensions():
+        _styles.update(getattr(ext, 'colortable', {}))
+
+    # tortoisehg defines a few labels and default effects
+    _styles.update(_thgstyles)
+
+    # allow the user to override
+    for status, cfgeffects in ui.configitems('color'):
+        if '.' not in status:
+            continue
+        cfgeffects = ui.configlist('color', status)
+        good = []
+        for e in cfgeffects:
+            if e in TextBufferTags:
+                good.append(e)
+        if good:
+            _styles[status] = ' '.join(good)
+
+def gettags(labels):
+    'map labels like "log.date" to pango tags'
+    tags = []
+    # Multiple labels may be requested
+    for l in labels.split():
+        if not l:
+            continue
+        # Each label may request multiple effects
+        es = _styles.get(l, '')
+        for e in es.split():
+            if e in TextBufferTags:
+                tags.append(e)
+    return tags
+
+
+UP_ARROW_COLOR = '#feaf3e'
+DOWN_ARROW_COLOR = '#8ae234'
+STAR_COLOR = '#fce94f'
+CELL_GREY = '#2e3436'
+STATUS_HEADER = '#DDDDDD'
+STATUS_REJECT_BACKGROUND = '#EEEEEE'
+STATUS_REJECT_FOREGROUND = '#888888'
+
+# line colors
+MAINLINE_COLOR = ( 0.0, 0.0, 0.0 )
+LINE_COLORS = [
+    ( 1.0, 0.0, 0.0 ),
+    ( 1.0, 1.0, 0.0 ),
+    ( 0.0, 1.0, 0.0 ),
+    ( 0.0, 1.0, 1.0 ),
+    ( 0.0, 0.0, 1.0 ),
+    ( 1.0, 0.0, 1.0 ),
+    ]
+
+def get_gtk_colors():
+    color_scheme = gtk.settings_get_default().get_property('gtk-color-scheme')
+    colors = {}
+    for color in color_scheme.split('\n'):
+        color = color.strip()
+        if color:
+            name, color = color.split(':')
+            colors[name.strip()] = gtk.gdk.color_parse(color.strip())
+    return colors
+
+def is_dark_theme():
+    global NORMAL, MAINLINE_COLOR
+    gtk_colors = get_gtk_colors()
+    normal = gtk_colors.get('fg_color', gtk.gdk.color_parse('black'))
+    NORMAL = str(normal)
+    MAINLINE_COLOR = (
+            normal.red / 65535.0,
+            normal.green / 65535.0,
+            normal.blue / 65535.0
+        )
+    return hasattr(normal, 'value') \
+               and normal.value > 0.5 or max(MAINLINE_COLOR) > 0.5
+
+def _init_colors():
+
+    if is_dark_theme():
+
+        global RED, GREEN, BLUE, BLACK, WHITE, \
+               DRED, DGREEN, DBLUE, DYELLOW, DORANGE, DPINK, \
+               DTURQUOISE, DLIME, DBROWN, DVIOLET, \
+               PRED, PGREEN, PBLUE, PYELLOW, PORANGE, PPINK, \
+               PTURQUOISE, PLIME, PBROWN, PVIOLET, \
+               NEW_REV_COLOR, LINE_COLORS, \
+               CHANGE_HEADER
+
+        RED = PRED
+        GREEN = NEW_REV_COLOR = PGREEN
+        BLUE = PBLUE
+        PRED = DRED
+        DRED = '#FF6161'
+#            DRED, PRED = PRED, DRED
+        DGREEN, PGREEN = PGREEN, DGREEN
+        DBLUE, PBLUE = PBLUE, DBLUE
+        DYELLOW, PYELLOW = PYELLOW, DYELLOW
+        DORANGE, PORANGE = PORANGE, DORANGE
+        DPINK, PPINK = PPINK, DPINK
+        DTURQUOISE, PTURQUOISE = PTURQUOISE, DTURQUOISE
+        DLIME, PLIME = PLIME, DLIME
+        DBROWN, PBROWN = PBROWN, DBROWN
+        DVIOLET, PVIOLET = PVIOLET, DVIOLET
+        black, WHITE = WHITE, BLACK
+
+        CHANGE_HEADER = '#404040'
+
+        LINE_COLORS = [
+            ( 1.0, 0.3804, 0.3804 ),
+            ( 1.0, 1.0, 0.0 ),
+            ( 0.0, 1.0, 0.0 ),
+            ( 0.0, 1.0, 1.0 ),
+            ( 0.2902, 0.4863, 0.851 ),
+            ( 1.0, 0.3882, 1.0 ),
+            ]
+
+        # TODO: dark color scheme for:
+        # UP_ARROW_COLOR, DOWN_ARROW_COLOR, STAR_COLOR,
+        # CELL_GREY, STATUS_HEADER, STATUS_REJECT_BACKGROUND,
+        # STATUS_REJECT_FOREGROUND
+
+_init_colors()
 
 def set_tortoise_icon(window, thgicon):
     ico = paths.get_tortoise_icon(thgicon)
