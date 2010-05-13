@@ -22,10 +22,8 @@ LABELS = { 'add': (_('Select files to add'), _('Add')),
            'remove': (_('Select files to remove'), _('Remove')),}
 
 # Technical Debt
-#
-# command running functionality
-# perhaps a check for no applicable files
-# initial check of selected files
+#  command running functionality
+#  perhaps a check for no applicable files
 
 class QuickOpDialog(QtGui.QDialog):
     """ Dialog for performing quick dirstate operations """
@@ -39,8 +37,8 @@ class QuickOpDialog(QtGui.QDialog):
         self.command = command
 
         repo = hg.repository(ui.ui(), path=paths.find_root())
-        os.chdir(repo.root)
         assert repo
+        os.chdir(repo.root)
         self.setWindowTitle('%s - hg %s' % (hglib.get_reponame(repo), command))
 
         layout = QtGui.QVBoxLayout()
