@@ -23,6 +23,7 @@ from PyQt4.QtGui import QIcon, QPixmap, QToolButton
 # working copy browser.
 
 # Technical Debt
+#  issue #1105 - columns for extension and size
 #  emit error strings to parent status bar
 #  We need a real icon set for file status types
 #  Add some initial drag distance before starting QDrag
