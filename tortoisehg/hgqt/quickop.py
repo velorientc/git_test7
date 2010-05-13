@@ -23,10 +23,10 @@ LABELS = { 'add': (_('Select files to add'), _('Add')),
 
 # Technical Debt
 #
-# show LABELS[cmd][0] somewhere
 # persistent geometry
 # command running functionality
 # perhaps a check for no applicable files
+# initial check of selected files
 
 class QuickOpDialog(QtGui.QDialog):
     """ Dialog for performing quick dirstate operations """
@@ -47,6 +47,9 @@ class QuickOpDialog(QtGui.QDialog):
         layout = QtGui.QVBoxLayout()
         self.setLayout(layout)
 
+        lbl = QtGui.QLabel(LABELS[command][0])
+        layout.addWidget(lbl)
+
         types = { 'add'    : 'I?',
                   'forget' : 'MAR!C',
                   'revert' : 'MAR!',
@@ -59,7 +62,7 @@ class QuickOpDialog(QtGui.QDialog):
             opts[val.name] = s in filetypes
 
         stwidget = status.StatusWidget(pats, opts, self)
-        layout.addWidget(stwidget)
+        layout.addWidget(stwidget, 1)
 
         if self.command == 'revert':
             ## no backup checkbox
