@@ -72,6 +72,15 @@ class QuickOpDialog(QtGui.QDialog):
         bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText(LABELS[command][1])
         layout.addWidget(bb)
+        self.bb = bb
+
+        cmd = cmdui.Widget()
+        cmd.commandStarted.connect(self.commandStarted)
+        cmd.commandFinished.connect(self.commandFinished)
+        cmd.commandCanceling.connect(self.commandCanceled)
+        layout.addWidget(cmd)
+        cmd.setHidden(True)
+        self.cmd = cmd
 
         s = QtCore.QSettings()
         stwidget.restoreState(s.value('quickop/state').toByteArray())
@@ -88,6 +97,20 @@ class QuickOpDialog(QtGui.QDialog):
             return
         return super(QtGui.QDialog, self).keyPressEvent(event)
 
+    def commandStarted(self):
+        self.cmd.setShown(True)
+        self.bb.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
+
+    def commandFinished(self, wrapper):
+        self.bb.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
+        if wrapper.data is not 0:
+            self.cmd.show_output(True)
+        else:
+            self.reject()
+
+    def commandCanceled(self):
+        self.bb.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
+
     def accept(self):
         cmdline = [self.command]
         if hasattr(self, 'chk') and self.chk.isChecked():
@@ -100,20 +123,16 @@ class QuickOpDialog(QtGui.QDialog):
                                 _('No operation to perform'),
                                 parent=self)
             return
-        cmd = cmdui.Dialog(cmdline, parent=self)
-        cmd.setWindowTitle('hg ' + self.command)
-        cmd.show_output(False)
-        if cmd.exec_():
+        self.cmd.run(cmdline)
+
+    def reject(self):
+        if self.cmd.core.is_running():
+            self.cmd.core.cancel()
+        else:
             s = QtCore.QSettings()
             s.setValue('quickop/state', self.stwidget.saveState())
             s.setValue('quickop/geom', self.saveGeometry())
-            QtGui.QDialog.accept(self)
-
-    def reject(self):
-        s = QtCore.QSettings()
-        s.setValue('quickop/state', self.stwidget.saveState())
-        s.setValue('quickop/geom', self.saveGeometry())
-        QtGui.QDialog.reject(self)
+            QtGui.QDialog.reject(self)
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
