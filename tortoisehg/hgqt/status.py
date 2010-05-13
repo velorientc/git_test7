@@ -226,6 +226,10 @@ class StatusWidget(QWidget):
             checked = self.tv.model().getChecked()
         else:
             checked = self.patchecked
+            if self.pats and not self.patchecked:
+                qtlib.WarningMsgBox(_('No appropriate files'),
+                                    _('No files found for this operation'),
+                                    parent=self)
         tm = WctxModel(self.wctx, self.ms, self.opts, checked)
         self.tv.setModel(tm)
         self.tv.setSortingEnabled(True)

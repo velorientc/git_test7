@@ -23,7 +23,6 @@ LABELS = { 'add': (_('Select files to add'), _('Add')),
 
 # Technical Debt
 #  command running functionality
-#  perhaps a check for no applicable files
 
 class QuickOpDialog(QtGui.QDialog):
     """ Dialog for performing quick dirstate operations """
