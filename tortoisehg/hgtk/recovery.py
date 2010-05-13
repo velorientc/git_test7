@@ -143,12 +143,12 @@ class RecoveryDialog(gtk.Window):
         try:
             args = self.repo.opener('undo.desc', 'r').read().splitlines()
             if len(args) >= 3:
-                msg = _("Rollback repository '%s' to %s, undo %s from %s?") % (
-                    self.reponame, args[0], args[1], args[2])
+                msg = _("Rollback repository '%s' to %d, undo %s from %s?") % (
+                    self.reponame, int(args[0])-1, args[1], args[2])
             else:
-                msg = _("Rollback repository '%s' to %s, undo %s?") % (
-                    self.reponame, args[0], args[1])
-        except (IOError, IndexError):
+                msg = _("Rollback repository '%s' to %d, undo %s?") % (
+                    self.reponame, int(args[0])-1, args[1])
+        except (IOError, IndexError, ValueError):
             msg = _("Rollback repository '%s' ?") % self.reponame
         response = gdialog.Confirm(_('Confirm rollback repository'), [], self,
                                    msg).run()
