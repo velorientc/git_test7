@@ -244,6 +244,13 @@ class StatusWidget(QWidget):
     def isMerge(self):
         return bool(self.wctx.p2())
 
+    def getChecked(self):
+        if self.tv.model():
+            checked = self.tv.model().getChecked()
+            return [f for f, v in checked.iteritems() if v]
+        else:
+            return []
+
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
         self.curRow = None
