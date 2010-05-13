@@ -102,6 +102,34 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
         '''
 
+        self.setAcceptDrops(True)
+
+    def find_root(self, url):
+        p = str(url.path())
+        if os.name == 'nt':
+            p = p[1:] # skip leading slash (needed on Windows)
+        return paths.find_root(p)
+
+    def dragEnterEvent(self, event):                
+        d = event.mimeData()
+        for u in d.urls():
+            root = self.find_root(u)
+            if root:
+                event.acceptProposedAction()
+                break
+
+    def dropEvent(self, event):
+        accept = False
+        d = event.mimeData()
+        for u in d.urls():            
+            root = self.find_root(u)
+            if root:
+                repo = hg.repository(self.ui, path=root)
+                self.addRepoTab(repo)
+                accept = True
+        if accept:
+            event.acceptProposedAction()
+
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
         tw.removeTab(index)
