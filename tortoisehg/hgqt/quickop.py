@@ -80,6 +80,16 @@ class QuickOpDialog(QtGui.QDialog):
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
 
+    def keyPressEvent(self, event):
+        if event.key() in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
+            if event.modifiers() == QtCore.Qt.ControlModifier:
+                self.accept()  # Ctrl+Enter
+            return
+        elif event.key() == QtCore.Qt.Key_Escape:
+            self.reject()
+            return
+        return super(QtGui.QDialog, self).keyPressEvent(event)
+
     def accept(self):
         s = QtCore.QSettings()
         s.setValue('quickop/state', self.stwidget.saveState())
