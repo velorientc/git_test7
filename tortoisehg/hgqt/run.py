@@ -332,6 +332,11 @@ def qtrun(dlgfunc, ui, *args, **opts):
         mainapp.exec_()
     mainapp = None
 
+def add(ui, *pats, **opts):
+    """add files"""
+    from tortoisehg.hgqt.quickop import run
+    qtrun(run, ui, *pats, **opts)
+
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
     from tortoisehg.util.thgstatus import run
@@ -359,6 +364,21 @@ def bug(ui, *pats, **opts):
         opts['error'] = pats[0]
     opts['cmd'] = sys.argv[1:]
     opts['nofork'] = True
+    qtrun(run, ui, *pats, **opts)
+
+def remove(ui, *pats, **opts):
+    """remove selected files"""
+    from tortoisehg.hgqt.quickop import run
+    qtrun(run, ui, *pats, **opts)
+
+def revert(ui, *pats, **opts):
+    """revert selected files"""
+    from tortoisehg.hgqt.quickop import run
+    qtrun(run, ui, *pats, **opts)
+
+def forget(ui, *pats, **opts):
+    """forget selected files"""
+    from tortoisehg.hgqt.quickop import run
     qtrun(run, ui, *pats, **opts)
 
 def shellconfig(ui, *pats, **opts):
@@ -600,6 +620,7 @@ globalopts = [
 
 table = {
     "about": (about, [], _('thg about')),
+    "add": (add, [], _('hgtk add [FILE]...')),
     "^clone":
         (clone,
          [('U', 'noupdate', None,
@@ -620,6 +641,9 @@ table = {
         (log,
          [('l', 'limit', '', _('limit number of changes displayed'))],
          _('thg log [OPTIONS] [FILE]')),
+    "remove|rm": (revert, [], _('hgtk remove [FILE]...')),
+    "revert": (revert, [], _('hgtk revert [FILE]...')),
+    "forget": (forget, [], _('hgtk forget [FILE]...')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":
