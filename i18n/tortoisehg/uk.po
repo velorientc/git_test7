@@ -749,7 +749,7 @@ msgstr "Нове повідомлення про фіксацію..."
 
 #: tortoisehg\hgtk\commit.py:486
 msgid "Parent: %(rev)s"
-msgstr "Попередник: %(редакція)s"
+msgstr "Попередник: %(rev)s"
 
 #: tortoisehg\hgtk\commit.py:494
 msgid "Not at head"
@@ -1105,7 +1105,7 @@ msgstr "Показати всі елементи"
 
 #: tortoisehg\hgtk\cslist.py:409
 msgid "Displaying %(count)d of %(total)d items"
-msgstr "Показати %(кількість)d з %(загалом)d елементів"
+msgstr "Показати %(count)d з %(total)d елементів"
 
 #: tortoisehg\hgtk\datamine.py:45
 msgid "%s - datamine"
@@ -2661,7 +2661,7 @@ msgstr "Поточний шлях: %s,  "
 
 #: tortoisehg\hgtk\history.py:1165
 msgid "%(count)d of %(total)d applied patches"
-msgstr "%(кількість)d з %(загалом)d прийнято патчів"
+msgstr "%(count)d з %(total)d прийнято патчів"
 
 #: tortoisehg\hgtk\history.py:1177
 msgid "Visualize Change"
@@ -3166,7 +3166,7 @@ msgstr "Зберегти латку до"
 
 #: tortoisehg\hgtk\logview\treeview.py:269
 msgid "%(count)d of %(total)d Revisions"
-msgstr "%(кількість)d у %(загалом)d редакціях"
+msgstr "%(count)d у %(total)d редакціях"
 
 #: tortoisehg\hgtk\logview\treeview.py:377
 msgid "Changeset not found in current view"
