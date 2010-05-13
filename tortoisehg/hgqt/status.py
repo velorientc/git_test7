@@ -155,7 +155,7 @@ class StatusWidget(QWidget):
         self.override = QToolButton()
         self.override.setText(_('Show Contents'))
         self.override.setCheckable(True)
-        self.override.setVisible(False)
+        self.override.setEnabled(False)
         self.override.toggled.connect(self.refreshDiff)
         hbox.addWidget(self.override)
 
@@ -289,7 +289,7 @@ class StatusWidget(QWidget):
             else:
                 diff = _('<b>Not displayed</b>')
                 self.te.setHtml(diff)
-                self.override.setVisible(True)
+                self.override.setEnabled(True)
             return
         elif status in '!C':
             if showanyway:
@@ -304,17 +304,17 @@ class StatusWidget(QWidget):
             else:
                 diff = _('<b>Not displayed</b>')
                 self.te.setHtml(diff)
-                self.override.setVisible(True)
+                self.override.setEnabled(True)
             return
 
         warnings = chunkselect.check_max_diff(self.wctx, wfile)
         if warnings and not showanyway:
             text = '<b>Diffs not displayed: %s</b>' % warnings[1]
             self.te.setHtml(text)
-            self.override.setVisible(True)
+            self.override.setEnabled(True)
             return
 
-        self.override.setVisible(False)
+        self.override.setEnabled(False)
 
         # Generate diffs to first parent
         hu = htmlui.htmlui()
