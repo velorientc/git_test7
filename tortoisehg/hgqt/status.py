@@ -29,7 +29,6 @@ from PyQt4.QtGui import QIcon, QPixmap, QToolButton
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Show subrepos better
-#  Save splitter position to parent's QSetting
 #  Chunk selection
 #  tri-state checkboxes for commit
 #  Investigate folding/nesting of files
@@ -170,7 +169,14 @@ class StatusWidget(QWidget):
             split.setStretchFactor(0, 1)
             split.setStretchFactor(1, 2)
 
+        self.split = split
         self.refreshWctx()
+
+    def restoreState(self, data):
+        return self.split.restoreState(data)
+
+    def saveState(self):
+        return self.split.saveState()
 
     def customContextMenuRequested(self, point):
         'menu request for filename label'

@@ -23,7 +23,6 @@ LABELS = { 'add': (_('Select files to add'), _('Add')),
 
 # Technical Debt
 #
-# persistent geometry
 # command running functionality
 # perhaps a check for no applicable files
 # initial check of selected files
@@ -79,10 +78,21 @@ class QuickOpDialog(QtGui.QDialog):
         bb.button(BB.Ok).setText(LABELS[command][1])
         layout.addWidget(bb)
 
+        s = QtCore.QSettings()
+        stwidget.restoreState(s.value('quickop/state').toByteArray())
+        self.restoreGeometry(s.value('quickop/geom').toByteArray())
+        self.stwidget = stwidget
+
     def accept(self):
+        s = QtCore.QSettings()
+        s.setValue('quickop/state', self.stwidget.saveState())
+        s.setValue('quickop/geom', self.saveGeometry())
         QtGui.QDialog.accept(self)
 
     def reject(self):
+        s = QtCore.QSettings()
+        s.setValue('quickop/state', self.stwidget.saveState())
+        s.setValue('quickop/geom', self.saveGeometry())
         QtGui.QDialog.reject(self)
 
 def run(ui, *pats, **opts):
