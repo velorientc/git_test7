@@ -23,6 +23,7 @@ from PyQt4.QtGui import QIcon, QPixmap, QToolButton
 # working copy browser.
 
 # Technical Debt
+#  emit error strings to parent status bar
 #  We need a real icon set for file status types
 #  Add some initial drag distance before starting QDrag
 #   (it interferes with selection the way it is now)
@@ -57,6 +58,7 @@ class StatusWidget(QWidget):
         self.pats = pats
         self.ms = {}
         self.curRow = None
+        self.patchecked = {}
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -202,21 +204,19 @@ class StatusWidget(QWidget):
         self.ms = merge.mergestate(self.repo)
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
         stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
-        if self.pats:
-            m = cmdutil.match(self.repo, self.pats)
-            status = self.repo.status(match=m, **stopts)
-            self.wctx = context.workingctx(self.repo, changes=status)
-            self.updateModel()
-            return
-        wctx = self.repo[None]
         try:
-            wctx.status(**stopts)
-        except AttributeError:
-            # your mercurial source is not new enough, falling back
-            # to triggering implicit status() call.
-            wctx.modified()
+            if self.pats:
+                m = cmdutil.match(self.repo, self.pats)
+                status = self.repo.status(match=m, **stopts)
+                # Record all matched files as initially checked
+                self.patchecked = dict([(fn, True) for group in status \
+                                                   for fn in group])
+                wctx = context.workingctx(self.repo, changes=status)
+            else:
+                wctx = self.repo[None]
+                wctx.status(**stopts)
         except (OSError, IOError, util.Abort), e:
-            self.status_error = str(e)
+            print e # TODO
         self.wctx = wctx
         self.updateModel()
 
@@ -225,7 +225,7 @@ class StatusWidget(QWidget):
         if self.tv.model():
             checked = self.tv.model().getChecked()
         else:
-            checked = {}
+            checked = self.patchecked
         tm = WctxModel(self.wctx, self.ms, self.opts, checked)
         self.tv.setModel(tm)
         self.tv.setSortingEnabled(True)
