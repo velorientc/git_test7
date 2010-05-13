@@ -117,7 +117,8 @@ def edit(parent, ui, repo, files):
         #dlg.exec_()
         return
 
-    cmdline = ' '.join([editor] + [util.localpath(f) for f in files])
+    files = [util.shellquote(util.localpath(f)) for f in files]
+    cmdline = ' '.join([editor] + files)
     cmdline = util.quotecommand(cmdline)
     try:
         subprocess.Popen(cmdline, shell=True, creationflags=visdiff.openflags,
