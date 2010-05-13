@@ -17,7 +17,7 @@ from PyQt4 import QtCore, QtGui, Qsci
 from mercurial import ui, hg, util
 from mercurial.error import RepoError
 
-from tortoisehg.util.util import tounicode, has_closed_branch_support
+from tortoisehg.util.util import tounicode
 from tortoisehg.util.util import rootpath, find_repository
 
 from tortoisehg.util.i18n import _
@@ -45,7 +45,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def __init__(self, ui, repo, fromhead=None):
         self.ui = ui
         self.repo = repo
-        self._closed_branch_supp = has_closed_branch_support(self.repo)
 
         # these are used to know where to go after a reload
         self._reload_rev = None
@@ -130,16 +129,14 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         repo = w.repo
         allbranches = sorted(repo.branchtags().items())
-        if self._closed_branch_supp:
-            openbr = []
-            for branch, brnode in allbranches:
-                openbr.extend(repo.branchheads(branch, closed=False))
-            clbranches = [br for br, node in allbranches if node not in openbr]
-            branches = [br for br, node in allbranches if node in openbr]
-            if self.branch_checkBox_action.isChecked():
-                branches = branches + clbranches
-        else:
-            branches = [br for br, node in allbranches] # open branches
+
+        openbr = []
+        for branch, brnode in allbranches:
+            openbr.extend(repo.branchheads(branch, closed=False))
+        clbranches = [br for br, node in allbranches if node not in openbr]
+        branches = [br for br, node in allbranches if node in openbr]
+        if self.branch_checkBox_action.isChecked():
+            branches = branches + clbranches
 
         if len(branches) == 1:
             self.branch_label_action.setEnabled(False)
