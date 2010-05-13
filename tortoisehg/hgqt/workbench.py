@@ -102,8 +102,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
-        if (tw.count() == 1):
-            return # ignore request to close the last tab
         tw.removeTab(index)
 
     def repoTabChanged(self, index=0):
