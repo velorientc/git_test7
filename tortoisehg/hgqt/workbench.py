@@ -42,7 +42,7 @@ SIGNAL = QtCore.SIGNAL
 class Workbench(QtGui.QMainWindow, HgDialogMixin):
     """hg repository viewer/browser application"""
     _uifile = 'workbench.ui'
-    def __init__(self, ui, repo, fromhead=None):
+    def __init__(self, ui, repo=None, fromhead=None):
         self.ui = ui
 
         # these are used to know where to go after a reload
@@ -69,7 +69,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         #self.textview_header.commitsignal.connect(self.commit)
 
-        self.addRepoTab(repo, fromhead)
+        if repo:
+            self.addRepoTab(repo, fromhead)
+
         tw = self.repoTabsWidget
         tw.removeTab(0)
         self.repoTabChanged()
