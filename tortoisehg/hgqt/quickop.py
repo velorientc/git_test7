@@ -14,15 +14,12 @@ from PyQt4 import QtCore, QtGui
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, paths
 
-from tortoisehg.hgqt import qtlib, status
+from tortoisehg.hgqt import qtlib, status, cmdui
 
 LABELS = { 'add': (_('Select files to add'), _('Add')),
            'forget': (_('Select files to forget'), _('Forget')),
            'revert': (_('Select files to revert'), _('Revert')),
            'remove': (_('Select files to remove'), _('Remove')),}
-
-# Technical Debt
-#  command running functionality
 
 class QuickOpDialog(QtGui.QDialog):
     """ Dialog for performing quick dirstate operations """
@@ -63,6 +60,7 @@ class QuickOpDialog(QtGui.QDialog):
         if self.command == 'revert':
             ## no backup checkbox
             chk = QtGui.QCheckBox(_('Do not save backup files (*.orig)'))
+            self.chk = chk
             layout.addWidget(chk)
 
         BB = QtGui.QDialogButtonBox
@@ -91,10 +89,25 @@ class QuickOpDialog(QtGui.QDialog):
         return super(QtGui.QDialog, self).keyPressEvent(event)
 
     def accept(self):
-        s = QtCore.QSettings()
-        s.setValue('quickop/state', self.stwidget.saveState())
-        s.setValue('quickop/geom', self.saveGeometry())
-        QtGui.QDialog.accept(self)
+        cmdline = [self.command]
+        if hasattr(self, 'chk') and self.chk.isChecked():
+            cmdline.append('--no-backup')
+        files = self.stwidget.getChecked()
+        if files:
+            cmdline.extend(files)
+        else:
+            qtlib.WarningMsgBox(_('No files selected'),
+                                _('No operation to perform'),
+                                parent=self)
+            return
+        cmd = cmdui.Dialog(cmdline, parent=self)
+        cmd.setWindowTitle('hg ' + self.command)
+        cmd.show_output(False)
+        if cmd.exec_():
+            s = QtCore.QSettings()
+            s.setValue('quickop/state', self.stwidget.saveState())
+            s.setValue('quickop/geom', self.saveGeometry())
+            QtGui.QDialog.accept(self)
 
     def reject(self):
         s = QtCore.QSettings()
