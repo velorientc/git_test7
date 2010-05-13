@@ -208,6 +208,13 @@ class StatusWidget(QWidget):
             if self.pats:
                 m = cmdutil.match(self.repo, self.pats)
                 status = self.repo.status(match=m, **stopts)
+                # Remove unwanted files before checking them
+                if not self.opts['modified']:
+                    status[0] = []
+                if not self.opts['added']:
+                    status[1] = []
+                if not self.opts['removed']:
+                    status[2] = []
                 # Record all matched files as initially checked
                 self.patchecked = dict([(fn, True) for group in status \
                                                    for fn in group])
