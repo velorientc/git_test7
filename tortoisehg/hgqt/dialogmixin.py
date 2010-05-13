@@ -38,10 +38,8 @@ class HgDialogMixin(object):
     preferences.
     The main class must define a '_ui_file' class attribute.
     """
-    def __init__(self):
-        # self.repo must be defined in actual class before calling __init__
-        assert self.repo is not None
-        self.load_config()
+    def __init__(self, ui):
+        self.load_config(ui)
 
         _path = osp.dirname(__file__)
         uifile = osp.join(_path, self._uifile)
@@ -108,8 +106,8 @@ class HgDialogMixin(object):
         else:
             self.close()
         
-    def load_config(self):
-        cfg = HgConfig(self.repo.ui)
+    def load_config(self, ui):
+        cfg = HgConfig(ui)
         fontstr = cfg.getFont()
         font = QtGui.QFont()
         try:
@@ -130,5 +128,4 @@ class HgDialogMixin(object):
         self.close()
     def reject(self):
         self.close()
-
-        
+      

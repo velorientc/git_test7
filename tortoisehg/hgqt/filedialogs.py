@@ -50,7 +50,7 @@ class AbstractFileDialog(QtGui.QMainWindow, HgDialogMixin):
     def __init__(self, repo, filename, repoviewer=None):
         self.repo = repo
         QtGui.QMainWindow.__init__(self)
-        HgDialogMixin.__init__(self)
+        HgDialogMixin.__init__(self, self.repo.ui)
 
         self.setRepoViewer(repoviewer)
         self._show_rev = None

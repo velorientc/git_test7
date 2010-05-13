@@ -48,7 +48,7 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
     def __init__(self, repo, noderev):
         self.repo = repo
         QtGui.QMainWindow.__init__(self)
-        HgDialogMixin.__init__(self)
+        HgDialogMixin.__init__(self, self.repo.ui)
         self.setWindowTitle('Hg manifest viewer - %s:%s' % (repo.root, noderev))
 
         # hg repo
@@ -59,8 +59,8 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
         self.createActions()
         self.setupTextview()
 
-    def load_config(self):
-        cfg = HgDialogMixin.load_config(self)
+    def load_config(self, ui):
+        cfg = HgDialogMixin.load_config(self, ui)
         self.max_file_size = cfg.getMaxFileSize()
 
     def setupModels(self):

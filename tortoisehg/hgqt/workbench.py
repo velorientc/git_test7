@@ -44,7 +44,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     _uifile = 'workbench.ui'
     def __init__(self, ui, repo, fromhead=None):
         self.ui = ui
-        self.repo = repo
 
         # these are used to know where to go after a reload
         self._reload_rev = None
@@ -53,7 +52,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self._scanForRepoChanges = True
 
         QtGui.QMainWindow.__init__(self)
-        HgDialogMixin.__init__(self)
+        HgDialogMixin.__init__(self, ui)
 
         self.setWindowTitle('TortoiseHg Workbench')
 
@@ -70,7 +69,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         #self.textview_header.commitsignal.connect(self.commit)
 
-        self.addRepoTab(self.repo, fromhead)
+        self.addRepoTab(repo, fromhead)
         tw = self.repoTabsWidget
         tw.removeTab(0)
         self.repoTabChanged()
@@ -355,8 +354,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def prevDiff(self):
         pass
 
-    def load_config(self):
-        cfg = HgDialogMixin.load_config(self)
+    def load_config(self, ui):
+        cfg = HgDialogMixin.load_config(self, ui)
         self.hidefinddelay = cfg.getHideFindDelay()
 
     def file_displayed(self, filename):
