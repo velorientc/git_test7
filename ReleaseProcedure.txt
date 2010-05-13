@@ -1,7 +1,6 @@
 Steps for making a release:
 
 * Pull latest translations from Launchpad
-* update ReleaseNotes.txt                           (major release only)
 * set revision number in tortoisehg/hgtk/gdialog.py (major release only)
 * set revision number in doc/source/conf.py
 * tag stable branch of repository, push
