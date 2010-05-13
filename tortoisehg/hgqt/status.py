@@ -452,11 +452,6 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Unchecked
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
-        elif role == Qt.DecorationRole and index.column() == COL_STATUS:
-            if status in statusTypes:
-                ico = QIcon()
-                ico.addPixmap(QPixmap('icons/' + statusTypes[status].icon))
-                return QVariant(ico)
         elif role == Qt.TextColorRole:
             if mst:
                 return _colors.get(mst.lower(), QColor('black'))
@@ -464,6 +459,13 @@ class WctxModel(QAbstractTableModel):
                 return _colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
             return QVariant(statusMessage(status, mst, upath))
+        '''
+        elif role == Qt.DecorationRole and index.column() == COL_STATUS:
+            if status in statusTypes:
+                ico = QIcon()
+                ico.addPixmap(QPixmap('icons/' + statusTypes[status].icon))
+                return QVariant(ico)
+        '''
         return QVariant()
 
     def headerData(self, col, orientation, role):
