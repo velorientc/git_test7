@@ -27,7 +27,6 @@ from tortoisehg.hgqt.decorators import timeit
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt.helpdialog import HelpDialog
 from tortoisehg.hgqt.repowidget import RepoWidget
 
 from tortoisehg.util import paths
@@ -394,10 +393,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         QtGui.QMessageBox.about(self, "About %s" % modname, msg)
 
     def on_help(self, *args):
-        w = HelpDialog(self.repo, self)
-        w.show()
-        w.raise_()
-        w.activateWindow()
+        pass
 
     def okToContinue(self):
         '''
