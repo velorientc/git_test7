@@ -16,10 +16,10 @@ from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt import qtlib, status, cmdui
 
-LABELS = { 'add': (_('Select files to add'), _('Add')),
-           'forget': (_('Select files to forget'), _('Forget')),
-           'revert': (_('Select files to revert'), _('Revert')),
-           'remove': (_('Select files to remove'), _('Remove')),}
+LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
+           'forget': (_('Checkmark files to forget'), _('Forget')),
+           'revert': (_('Checkmark files to revert'), _('Revert')),
+           'remove': (_('Checkmark files to remove'), _('Remove')),}
 
 class QuickOpDialog(QtGui.QDialog):
     """ Dialog for performing quick dirstate operations """

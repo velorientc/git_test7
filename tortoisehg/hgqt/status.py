@@ -103,6 +103,8 @@ class StatusWidget(QWidget):
             cpb = QPushButton(_('Remove filter, show root'))
             vbox.addWidget(cpb)
             cpb.clicked.connect(clearPattern)
+        self.countlbl = QLabel()
+        vbox.addWidget(self.countlbl)
 
         self.connect(tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
         self.connect(tv, SIGNAL('menuAction()'), self.refreshWctx)
@@ -247,6 +249,12 @@ class StatusWidget(QWidget):
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
         self.connect(self.le, SIGNAL('textEdited(QString)'), tm.setFilter)
+        self.connect(tm, SIGNAL('checkToggled()'), self.updateCheckCount)
+        self.updateCheckCount()
+
+    def updateCheckCount(self):
+        text = _('Checkmarked file count: %d') % len(self.getChecked())
+        self.countlbl.setText(text)
 
     def isMerge(self):
         return bool(self.wctx.p2())
@@ -517,6 +525,7 @@ class WctxModel(QAbstractTableModel):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
         self.checked[fname] = not self.checked[fname]
         self.emit(SIGNAL("layoutChanged()"))
+        self.emit(SIGNAL("checkToggled()"))
 
     def pressedRow(self, index):
         'Connected to "pressed" signal, emitted by mouse clicks'
