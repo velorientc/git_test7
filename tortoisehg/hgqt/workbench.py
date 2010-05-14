@@ -88,9 +88,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.setAcceptDrops(True)
 
     def find_root(self, url):
-        p = str(url.path())
-        if os.name == 'nt':
-            p = p[1:] # skip leading slash (needed on Windows)
+        p = str(url.toLocalFile())
         return paths.find_root(p)
 
     def dragEnterEvent(self, event):                
