@@ -221,6 +221,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
     def setAnnotate(self, ann):
         self.fileview.setAnnotate(ann)
 
+    def getAnnotate(self):
+        return self.fileview.getAnnotate()
+
     def nextDiff(self):
         notlast = self.fileview.nextDiff()
         self.actionNextDiff.setEnabled(self.fileview.fileMode() and notlast and self.fileview.nDiffs())
