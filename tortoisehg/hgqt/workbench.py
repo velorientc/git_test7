@@ -137,9 +137,13 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)
         rw = RepoWidget(repo, fromhead)
+        rw.showMessageSignal.connect(self.showMessage)
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
+
+    def showMessage(self, msg):
+        self.statusBar().showMessage(msg)
 
     def setupBranchCombo(self, *args):
         w = self.repoTabsWidget.currentWidget()

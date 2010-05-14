@@ -44,6 +44,9 @@ SIGNAL = QtCore.SIGNAL
 
 class RepoWidget(QtGui.QWidget, WidgetMixin):
     _uifile = 'repowidget.ui'
+
+    showMessageSignal = QtCore.pyqtSignal(str) 
+
     def __init__(self, repo, fromhead=None):
         self.repo = repo
         self._closed_branch_supp = has_closed_branch_support(self.repo)
@@ -56,6 +59,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         QtGui.QWidget.__init__(self)
         WidgetMixin.__init__(self)
+        
+        self.currentMessage = ''
 
         self.createActions()
 
@@ -83,8 +88,13 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self._watchrepotimer = self.startTimer(500)
 
     def showMessage(self, msg):
-        print "repowidget.showMessage(%s) called" % msg
-        # TODO: wire this higher up in the hierarchy
+        self.currentMessage = msg
+        if self.isVisible():
+            self.showMessageSignal.emit(msg)
+
+    def showEvent(self, event):
+        QtGui.QWidget.showEvent(self, event)
+        self.showMessageSignal.emit(self.currentMessage)
 
     def commit(self):
         args = ['commit']
