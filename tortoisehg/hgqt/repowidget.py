@@ -281,6 +281,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
     def setMode(self, mode):
         self.fileview.setMode(mode)
 
+    def getMode(self):
+        return self.fileview.getMode()
+
     def nextDiff(self):
         notlast = self.fileview.nextDiff()
         self.actionNextDiff.setEnabled(self.fileview.fileMode() and notlast and self.fileview.nDiffs())

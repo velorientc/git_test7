@@ -120,6 +120,13 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def repoTabChanged(self, index=0):
         self.setupBranchCombo()
 
+        w = self.repoTabsWidget.currentWidget()
+
+        mode = 'diff'
+        if w:
+            mode = w.getMode()
+        self.actionDiffMode.setChecked(mode == 'diff')
+
     def addRepoTab(self, repo, fromhead=None):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)

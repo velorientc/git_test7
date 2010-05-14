@@ -187,6 +187,9 @@ class HgFileView(QtGui.QFrame):
             
             self.displayFile()
 
+    def getMode(self):
+        return self._mode
+
     def setAnnotate(self, ann):
         self._annotate = ann
         if ann:
