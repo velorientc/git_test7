@@ -45,9 +45,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def __init__(self, ui, repo=None, fromhead=None):
         self.ui = ui
 
-        # these are used to know where to go after a reload
         self._reload_rev = None
         self._reload_file = None
+
         self._loading = True
         self._scanForRepoChanges = True
 
