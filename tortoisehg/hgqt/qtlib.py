@@ -97,7 +97,7 @@ def markup(msg, **styles):
     msg = hglib.tounicode(msg)
     msg = QtCore.Qt.escape(msg)
     msg = msg.replace('\n', '<br />')
-    return '<font style="%s">%s</font>' % (style, msg)
+    return '<span style="%s">%s</span>' % (style, msg)
 
 def CommonMsgBox(icon, title, main, text='', buttons=QtGui.QMessageBox.Close,
                  parent=None):
