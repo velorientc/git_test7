@@ -125,7 +125,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         tw.removeTab(index)
 
     def repoTabChanged(self, index=0):
-        print "repoTabChanged(%i)" % index
         self.setupBranchCombo()
 
     def addRepoTab(self, repo, fromhead=None):
