@@ -65,10 +65,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         #connect(self.tableView_revisions, SIGNAL('showMessage'),
         #        self.statusBar().showMessage)
 
-        #self.textview_header.setMessageWidget(self.message)
-
-        #self.textview_header.commitsignal.connect(self.commit)
-
         if repo:
             self.addRepoTab(repo, fromhead)
 
