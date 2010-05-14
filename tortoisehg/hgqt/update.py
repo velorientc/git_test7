@@ -71,7 +71,7 @@ class UpdateDialog(QDialog):
 
         ### target revision info
         items = ('%(rev)s', ' %(branch)s', ' %(tags)s', '<br />%(summary)s')
-        style = csinfo.labelstyle(contents=items, width=350)
+        style = csinfo.labelstyle(contents=items, width=350, selectable=True)
         factory = csinfo.factory(self.repo, style=style)
         self.target_info = factory()
         grid.addWidget(QLabel(_('Target:')), 1, 0, Qt.AlignLeft | Qt.AlignTop)
