@@ -86,14 +86,14 @@ NAME_MAP = {
 }
 
 def markup(msg, **styles):
-    style = []
+    style = {'white-space': 'pre'}
     for name, value in styles.items():
         if not value:
             continue
         if NAME_MAP.has_key(name):
             name = NAME_MAP[name]
-        style.append('%s: %s' % (name, value))
-    style = ';'.join(style)
+        style[name] = value
+    style = ';'.join(['%s: %s' % t for t in style.items()])
     msg = hglib.tounicode(msg)
     msg = QtCore.Qt.escape(msg)
     msg = msg.replace('\n', '<br />')
