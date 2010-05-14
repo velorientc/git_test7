@@ -59,7 +59,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.createActions()
         self.createToolbars()
 
-        #self.textview_status.setFont(self._font)
         #connect(self.textview_status, SIGNAL('showMessage'),
         #        self.statusBar().showMessage)
         #connect(self.tableView_revisions, SIGNAL('showMessage'),
