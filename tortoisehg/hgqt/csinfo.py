@@ -600,6 +600,11 @@ class SummaryLabel(SummaryBase, QLabel):
         if style is not None:
             self.csstyle = style
 
+        if 'selectable' in self.csstyle:
+            sel = self.csstyle['selectable']
+            val = sel and Qt.TextSelectableByMouse or Qt.TextBrowserInteraction
+            self.setTextInteractionFlags(val)
+
         if 'width' in self.csstyle:
             width = self.csstyle.get('width', 0)
             self.setMinimumWidth(width)
@@ -609,7 +614,6 @@ class SummaryLabel(SummaryBase, QLabel):
             self.setMinimumHeight(height)
 
         contents = self.csstyle.get('contents', None)
-        assert contents
 
         # build info
         info = ''
