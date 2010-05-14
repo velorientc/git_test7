@@ -376,8 +376,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         pass
 
     def reload(self):
-        """Reload the repository"""
-        print "reload() called"
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.reload()
