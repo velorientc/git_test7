@@ -186,24 +186,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.disab_shortcuts.append(self.actionActivateFile)
         self.disab_shortcuts.append(self.actionActivateRev)
 
-        self.actionStartAtRev = QtGui.QAction('Start at rev.', self)
-        self.actionStartAtRev.setShortcuts([Qt.Key_Backspace,])
-        connect(self.actionStartAtRev, SIGNAL('triggered()'),
-                self.startAtCurrentRev)
-        self.addAction(self.actionStartAtRev)
-
-        self.actionClearStartAtRev = QtGui.QAction('Clear start at rev.', self)
-        self.actionClearStartAtRev.setShortcuts([Qt.SHIFT + Qt.Key_Backspace,])
-        connect(self.actionClearStartAtRev, SIGNAL('triggered()'),
-                self.clearStartAtRev)
-        self.addAction(self.actionClearStartAtRev)
-
-    def startAtCurrentRev(self):
-        pass
-
-    def clearStartAtRev(self):
-        pass
-
     def setMode(self, mode):
         self.fileview.setMode(mode)
 
