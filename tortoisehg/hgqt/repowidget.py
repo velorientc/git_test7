@@ -280,9 +280,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
     def setMode(self, mode):
         self.textview_status.setMode(mode)
-        self.actionAnnMode.setEnabled(not mode)
-        self.actionNextDiff.setEnabled(not mode)
-        self.actionPrevDiff.setEnabled(not mode)
 
     def nextDiff(self):
         notlast = self.textview_status.nextDiff()

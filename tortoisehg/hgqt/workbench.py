@@ -56,17 +56,18 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self.setWindowTitle('TortoiseHg Workbench')
 
-        self.createActions()
-        self.createToolbars()
-
         if repo:
             self.addRepoTab(repo, fromhead)
 
         tw = self.repoTabsWidget
         tw.removeTab(0)
-        self.repoTabChanged()
         connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
         connect(tw, SIGNAL('currentChanged(int)'), self.repoTabChanged)
+
+        self.createActions()
+        self.createToolbars()
+
+        self.repoTabChanged()
 
         # setup tables and views
         #self.setupHeaderTextview()
@@ -359,7 +360,12 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         pass
 
     def setMode(self, mode):
-        pass
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.setMode(mode)
+        self.actionAnnMode.setEnabled(not mode)
+        self.actionNextDiff.setEnabled(not mode)
+        self.actionPrevDiff.setEnabled(not mode)
 
     def nextDiff(self):
         pass
