@@ -10,7 +10,7 @@ import os
 import binascii
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QTextEdit, QWidget, QFrame, QPalette, QTextBrowser
+from PyQt4.QtGui import QWidget, QFrame, QPalette, QLabel
 
 from mercurial import patch, util, error
 from mercurial.node import hex
@@ -399,8 +399,8 @@ class SummaryInfo(object):
                 markups = (markups,)
             labels = []
             for text in markups:
-                label = QTextEdit()
-                label.setHtml(text)
+                label = QLabel()
+                label.setText(text)
                 labels.append(label)
             return labels
         markups = self.get_markup(item, *args)
@@ -585,21 +585,12 @@ class SummaryPanel(SummaryBase, QWidget):
 
 LABEL_PAT = re.compile(r'(?:(?<=%%)|(?<!%)%\()(\w+)(?:\)s)')
 
-class SummaryLabel(SummaryBase, QTextBrowser):
+class SummaryLabel(SummaryBase, QLabel):
 
     def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)
-        QTextBrowser.__init__(self)
+        QLabel.__init__(self)
 
-        self.setFrameStyle(QFrame.NoFrame | QFrame.Plain)
-        palette = self.palette()
-        color = palette.color(QPalette.Disabled, QPalette.Window)
-        css = 'QTextBrowser { background-color: rgb(%s, %s, %s); }' % \
-                (color.red(), color.green(), color.blue())
-        self.setStyleSheet(css)
-        self.setFixedHeight(32)
-        self.document().setDefaultStyleSheet('* { white-space: pre }')
-        self.document().setDocumentMargin(0.0)
         self.csstyle = style
 
     def update(self, target=None, style=None, custom=None, repo=None):
@@ -638,6 +629,6 @@ class SummaryLabel(SummaryBase, QTextBrowser):
                 continue
             # insert data & append to label
             info += snip % data
-        self.setHtml(info)
+        self.setText(info)
 
         return True
