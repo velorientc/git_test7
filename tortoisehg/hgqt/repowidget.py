@@ -480,10 +480,3 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
             for n in self.splitternames:
                 s.setValue(wb + n, getattr(self, n).saveState())
         return True
-
-def run(ui, *pats, **opts):
-    repo = None
-    root = paths.find_root()
-    if root:
-        repo = hg.repository(ui, path=root)
-    return Workbench(repo)
