@@ -406,6 +406,11 @@ def about(ui, *pats, **opts):
     from tortoisehg.hgqt.about import run
     qtrun(run, ui, *pats, **opts)
 
+def grep(ui, *pats, **opts):
+    """grep/search dialog"""
+    from tortoisehg.hgqt.grep import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -636,6 +641,7 @@ table = {
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
+    "^grep|search": (grep, [], _('hgtk grep')),
     "^email": (email, [], _('thg email [REVS]')),
     "^log|history|explorer|workbench":
         (log,
