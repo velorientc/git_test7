@@ -199,18 +199,10 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.addAction(self.actionClearStartAtRev)
 
     def startAtCurrentRev(self):
-        crev = self.repoview.current_rev
-        if crev:
-            self.startrev_entry.setText(str(crev))
-            # XXX workaround: see refreshRevisionTable method 
-            self.refreshRevisionTable(sender=self)
+        pass
 
     def clearStartAtRev(self):
-        self.startrev_entry.setText("")
-        self._reload_rev = self.repoview.current_rev
-        self._reload_file = self.tableView_filelist.currentFile()
-        # XXX workaround: see refreshRevisionTable method 
-        self.refreshRevisionTable(sender=self)
+        pass
 
     def setMode(self, mode):
         self.fileview.setMode(mode)
@@ -378,27 +370,10 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.setupBranchCombo()
         self.setupModels()
 
-    #@timeit
-    def refreshRevisionTable(self, *args, **kw):
-        """Starts the process of filling the HgModel"""
-        branch = self.branch_comboBox.currentText()
-        branch = str(branch)
-        startrev = str(self.startrev_entry.text()).strip()
-        if not startrev:
-            startrev = None
-        # XXX workaround: self.sender() may provoque a core dump if
-        # this method is called directly (not via a connected signal);
-        # the 'sender' keyword is a way to discrimimne that the method
-        # has been called directly (thus caller MUST set this kw arg)
-        sender = kw.get('sender') or self.sender()
-        if sender is self.startrev_follow_action and startrev is None:
-            return
+    def setRepomodel(self, branch, startrev, follow):
         startrev = self.repo.changectx(startrev).rev()
-        follow = self.startrev_follow_action.isChecked()
-        self.revscompl_model.setStringList(self.repo.tags().keys())
-
-        self.repomodel.setRepo(self.repo, branch=branch, fromhead=startrev,
-                               follow=follow)
+        self.repomodel.setRepo(
+            self.repo, branch=branch, fromhead=startrev, follow=follow)
 
     def okToContinue(self):
         '''

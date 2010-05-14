@@ -402,7 +402,24 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     #@timeit
     def refreshRevisionTable(self, *args, **kw):
-        pass
+        """Starts the process of filling the HgModel"""
+        branch = self.branch_comboBox.currentText()
+        branch = str(branch)
+        startrev = str(self.startrev_entry.text()).strip()
+        if not startrev:
+            startrev = None
+        # XXX workaround: self.sender() may provoke a core dump if
+        # this method is called directly (not via a connected signal);
+        # the 'sender' keyword is a way to discrimimne that the method
+        # has been called directly (thus caller MUST set this kw arg)
+        sender = kw.get('sender') or self.sender()
+        if sender is self.startrev_follow_action and startrev is None:
+            return
+        follow = self.startrev_follow_action.isChecked()
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            self.revscompl_model.setStringList(w.repo.tags().keys())
+            w.setRepomodel(branch, startrev, follow)
 
     def on_about(self, *args):
         """ Display about dialog """
