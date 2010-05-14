@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error
 
-from tortoisehg.hgqt import htmlui, visdiff
+from tortoisehg.hgqt import htmlui, visdiff, qtlib
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
@@ -63,6 +63,8 @@ class SearchWidget(QWidget):
         tv.setRootIsDecorated(False)
         tm = MatchModel()
         tv.setModel(tm)
+        tv.setColumnHidden(COL_REVISION, True)
+        tv.setColumnHidden(COL_USER, True)
         layout.addWidget(tv)
         le.returnPressed.connect(self.searchActivated)
         self.repo = repo
@@ -87,31 +89,50 @@ class SearchWidget(QWidget):
         if not regexp:
             return
         self.le.selectAll()
+        searchre = re.compile(regexp, icase and re.I or 0)
+
         mode = self.cb.currentIndex()
         if mode == 0:
             ctx = self.repo[None]
         elif mode == 1:
             ctx = self.repo['.']
         else:
+            self.tv.setColumnHidden(COL_REVISION, False)
+            self.tv.setColumnHidden(COL_USER, False)
             # Full blown 'hg grep' call
             # show revision, user columns
             # hg grep [-i] -afn regexp
             return
 
-        # hide revision, user columns
-        # walk ctx.manifest, load file data, perform regexp, fill model
-        model.appendRow('path', 'line', 'rev', 'user', 'text')
+        self.tv.setColumnHidden(COL_REVISION, True)
+        self.tv.setColumnHidden(COL_USER, True)
+        hu = htmlui.htmlui()
+        # searching len(ctx.manifest()) files
+        for wfile in ctx:                     # walk manifest
+            data = ctx[wfile].data()          # load file data
+            if '\0' in data:
+                continue
+            for i, line in enumerate(data.splitlines()):
+                pos = 0
+                for m in searchre.finditer(line): # perform regexp
+                    hu.write(line[pos:m.start()])
+                    hu.write(line[m.start():m.end()], label='grep.match')
+                    pos = m.end()
+                if pos:
+                    hu.write(line[pos:])
+                    model.appendRow(wfile, i, None, None, hu.getdata()[0])
 
 COL_PATH     = 0
 COL_LINE     = 1
-COL_REVISION = 2  # Hidden if wctx
-COL_USER     = 3  # Hidden if wctx
+COL_REVISION = 2  # Hidden if ctx
+COL_USER     = 3  # Hidden if ctx
 COL_TEXT     = 4
 
 class MatchTree(QTreeView):
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
         self.repo = repo
+        self.setItemDelegate(HTMLDelegate(self))
         self.setSelectionMode(QTreeView.ExtendedSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
@@ -208,6 +229,39 @@ class MatchModel(QAbstractTableModel):
         self.beginRemoveRows(QModelIndex(), 0, len(self.rows)-1)
         self.rows = []
         self.endRemoveRows()
+
+class HTMLDelegate(QStyledItemDelegate):
+    def __init__(self, parent=0):
+        QStyledItemDelegate.__init__(self, parent)
+
+    def paint(self, painter, option, index):
+        if index.column() != COL_TEXT:
+            return QStyledItemDelegate.paint(self, painter, option, index)
+        text = index.model().data(index, Qt.DisplayRole).toString()
+        palette = QApplication.palette()
+        doc = QTextDocument()
+        doc.setDefaultFont(option.font)
+        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
+        painter.save()
+        if option.state & QStyle.State_Selected:
+            doc.setHtml('<font color=%s>%s</font>' % (
+                palette.highlightedText().color().name(), text))
+            bgcolor = palette.highlight().color()
+            painter.fillRect(option.rect, bgcolor)
+        else:
+            doc.setHtml(text)
+        painter.translate(option.rect.left(), option.rect.top())
+        doc.drawContents(painter)
+        painter.restore()
+
+    def sizeHint(self, option, index):
+        text = index.model().data(index, Qt.DisplayRole).toString()
+        doc = QTextDocument()
+        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
+        doc.setDefaultFont(option.font)
+        doc.setHtml(text)
+        doc.setTextWidth(option.rect.width())
+        return QSize(doc.idealWidth() + 5, doc.size().height())
 
 def run(ui, *pats, **opts):
     return SearchWidget()
