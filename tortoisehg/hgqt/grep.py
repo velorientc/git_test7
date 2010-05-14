@@ -102,7 +102,6 @@ class SearchWidget(QWidget):
             self.tv.setColumnHidden(COL_REVISION, False)
             self.tv.setColumnHidden(COL_USER, False)
             # Full blown 'hg grep' call
-            # show revision, user columns
             # hg grep [-i] -afn regexp
             return
 
