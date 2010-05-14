@@ -96,7 +96,7 @@ class AbstractFileDialog(QtGui.QMainWindow, HgDialogMixin):
             self._show_rev = None
         else:
             index = self.filerevmodel.index(0,0)
-        self.tableView_revisions.setCurrentIndex(index)
+        self.repoview.setCurrentIndex(index)
 
     def revisionActivated(self, rev):
         """
@@ -126,29 +126,29 @@ class FileLogDialog(AbstractFileDialog):
         self.find_toolbar = FindInGraphlogQuickBar(self)
         self.find_toolbar.attachFileView(self.textView)
         connect(self.find_toolbar, SIGNAL('revisionSelected'),
-                self.tableView_revisions.goto)
+                self.repoview.goto)
         connect(self.find_toolbar, SIGNAL('showMessage'),
                 self.statusBar().showMessage)
         self.attachQuickBar(self.find_toolbar)
 
         self.toolBar_edit.addSeparator()
-        self.toolBar_edit.addAction(self.tableView_revisions._actions['back'])
-        self.toolBar_edit.addAction(self.tableView_revisions._actions['forward'])
+        self.toolBar_edit.addAction(self.repoview._actions['back'])
+        self.toolBar_edit.addAction(self.repoview._actions['forward'])
         self.toolBar_edit.addSeparator()
         self.toolBar_edit.addAction(self.actionDiffMode)
         self.toolBar_edit.addAction(self.actionAnnMode)
         self.toolBar_edit.addAction(self.actionNextDiff)
         self.toolBar_edit.addAction(self.actionPrevDiff)
 
-        self.attachQuickBar(self.tableView_revisions.goto_toolbar)
+        self.attachQuickBar(self.repoview.goto_toolbar)
 
     def setupModels(self):
         self.filerevmodel = FileRevModel(self.repo)
-        self.tableView_revisions.setModel(self.filerevmodel)
-        connect(self.tableView_revisions,
+        self.repoview.setModel(self.filerevmodel)
+        connect(self.repoview,
                 SIGNAL('revisionSelected'),
                 self.revisionSelected)
-        connect(self.tableView_revisions,
+        connect(self.repoview,
                 SIGNAL('revisionActivated'),
                 self.revisionActivated)
         connect(self.filerevmodel, SIGNAL('showMessage'),
@@ -203,7 +203,7 @@ class FileLogDialog(AbstractFileDialog):
     def goto(self, rev):
         index = self.filerevmodel.indexFromRev(rev)
         if index is not None:
-            self.tableView_revisions.setCurrentIndex(index)
+            self.repoview.setCurrentIndex(index)
         else:
             self._show_rev = rev
 
@@ -231,7 +231,7 @@ class FileDiffDialog(AbstractFileDialog):
     _uifile = 'FileDiffDialog.ui'
 
     def setupViews(self):
-        self.tableView_revisions = self.tableView_revisions_left
+        self.repoview = self.tableView_revisions_left
         self.tableViews = {'left': self.tableView_revisions_left,
                            'right': self.tableView_revisions_right}
         # viewers are Scintilla editors

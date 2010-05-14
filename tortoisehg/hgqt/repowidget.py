@@ -66,13 +66,13 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.fileview.setFont(self._font)
         connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
-        connect(self.tableView_revisions, SIGNAL('showMessage'), self.showMessage)
+        connect(self.repoview, SIGNAL('showMessage'), self.showMessage)
 
         self.textview_header.setMessageWidget(self.message)
 
         self.textview_header.commitsignal.connect(self.commit)
 
-        connect(self.message, SIGNAL('revisionSelected'), self.tableView_revisions.goto)
+        connect(self.message, SIGNAL('revisionSelected'), self.repoview.goto)
 
         # setup tables and views
         self.setupHeaderTextview()
@@ -199,7 +199,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.addAction(self.actionClearStartAtRev)
 
     def startAtCurrentRev(self):
-        crev = self.tableView_revisions.current_rev
+        crev = self.repoview.current_rev
         if crev:
             self.startrev_entry.setText(str(crev))
             # XXX workaround: see refreshRevisionTable method 
@@ -207,7 +207,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
     def clearStartAtRev(self):
         self.startrev_entry.setText("")
-        self._reload_rev = self.tableView_revisions.current_rev
+        self._reload_rev = self.repoview.current_rev
         self._reload_file = self.tableView_filelist.currentFile()
         # XXX workaround: see refreshRevisionTable method 
         self.refreshRevisionTable(sender=self)
@@ -245,7 +245,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
     def setupModels(self, fromhead=None):
         self.create_models(fromhead)
-        self.tableView_revisions.setModel(self.repomodel)
+        self.repoview.setModel(self.repomodel)
         self.tableView_filelist.setModel(self.filelistmodel)
         self.fileview.setModel(self.repomodel)
         #self.find_toolbar.setModel(self.repomodel)
@@ -257,7 +257,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                 self.textview_header.setDiffRevision)
 
     def setupRevisionTable(self):
-        view = self.tableView_revisions
+        view = self.repoview
         view.installEventFilter(self)
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
@@ -286,7 +286,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.header_diff_format.setBackground(Qt.gray)
 
     def on_filled(self):
-        tv = self.tableView_revisions
+        tv = self.repoview
         if self._reload_rev is not None:
             try:
                 tv.goto(self._reload_rev)
@@ -302,7 +302,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         Callback called when a revision is double-clicked in the revisions table
         """
         if rev is None:
-            rev = self.tableView_revisions.current_rev
+            rev = self.repoview.current_rev
         self._manifestdlg = ManifestDialog(self.repo, rev)
         self._manifestdlg.show()
 
@@ -340,8 +340,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                 self.tableView_filelist.selectRow(0)
 
     def goto(self, rev):
-        if len(self.tableView_revisions.model().graph):
-            self.tableView_revisions.goto(rev)
+        if len(self.repoview.model().graph):
+            self.repoview.goto(rev)
         else:
             # store rev to show once it's available (when graph
             # filling is still running)
@@ -362,7 +362,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
     def reload(self, rev=None):
         """Reload the repository"""
         if rev == None:
-            self._reload_rev = self.tableView_revisions.current_rev
+            self._reload_rev = self.repoview.current_rev
         else:
             self._reload_rev = rev
         self._loading = True

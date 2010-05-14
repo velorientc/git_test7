@@ -174,7 +174,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         tb.setObjectName("find_toolbar")
         #tb.attachFileView(self.fileview)
         #tb.attachHeaderView(self.textview_header)
-        #connect(tb, SIGNAL('revisionSelected'), self.tableView_revisions.goto)
+        #connect(tb, SIGNAL('revisionSelected'), self.repoview.goto)
         #connect(tb, SIGNAL('fileSelected'), self.tableView_filelist.selectFile)
         connect(tb, SIGNAL('showMessage'), self.statusBar().showMessage,
                 Qt.QueuedConnection)
@@ -182,8 +182,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.attachQuickBar(tb)
 
         # navigation toolbar
-        #self.toolBar_edit.addAction(self.tableView_revisions._actions['back'])
-        #self.toolBar_edit.addAction(self.tableView_revisions._actions['forward'])
+        #self.toolBar_edit.addAction(self.repoview._actions['back'])
+        #self.toolBar_edit.addAction(self.repoview._actions['forward'])
 
         findaction = self.find_toolbar.toggleViewAction()
         findaction.setIcon(geticon('find'))
@@ -300,11 +300,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.actionNextRev = QtGui.QAction('Next revision', self)
         self.actionNextRev.setShortcut('Down')
         #connect(self.actionNextRev, SIGNAL('triggered()'),
-        #        self.tableView_revisions.nextRev)
+        #        self.repoview.nextRev)
         self.actionPrevRev = QtGui.QAction('Prev revision', self)
         self.actionPrevRev.setShortcut('Up')
         #connect(self.actionPrevRev, SIGNAL('triggered()'),
-        #        self.tableView_revisions.prevRev)
+        #        self.repoview.prevRev)
         self.addAction(self.actionNextRev)
         self.addAction(self.actionPrevRev)
         self.disab_shortcuts.append(self.actionNextRev)

@@ -30,7 +30,7 @@
       <property name="orientation" >
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="HgRepoView" name="tableView_revisions" >
+      <widget class="HgRepoView" name="repoview" >
        <property name="alternatingRowColors" >
         <bool>true</bool>
        </property>

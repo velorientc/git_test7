@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\repowidget.ui'
 #
-# Created: Fri May 14 15:00:21 2010
+# Created: Fri May 14 15:41:05 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,14 +20,14 @@ class Ui_Form(object):
         self.revisions_splitter = QtGui.QSplitter(Form)
         self.revisions_splitter.setOrientation(QtCore.Qt.Vertical)
         self.revisions_splitter.setObjectName("revisions_splitter")
-        self.tableView_revisions = HgRepoView(self.revisions_splitter)
+        self.repoview = HgRepoView(self.revisions_splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHeightForWidth(self.tableView_revisions.sizePolicy().hasHeightForWidth())
-        self.tableView_revisions.setSizePolicy(sizePolicy)
-        self.tableView_revisions.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.tableView_revisions.setObjectName("tableView_revisions")
+        sizePolicy.setHeightForWidth(self.repoview.sizePolicy().hasHeightForWidth())
+        self.repoview.setSizePolicy(sizePolicy)
+        self.repoview.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.repoview.setObjectName("repoview")
         self.frame_maincontent = QtGui.QFrame(self.revisions_splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)

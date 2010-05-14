@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\FileLogDialog.ui'
 #
-# Created: Sun May 02 12:30:26 2010
+# Created: Fri May 14 15:43:00 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,13 +22,13 @@ class Ui_MainWindow(object):
         self.splitter = QtGui.QSplitter(self.centralwidget)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName("splitter")
-        self.tableView_revisions = HgRepoView(self.splitter)
-        self.tableView_revisions.setAlternatingRowColors(True)
-        self.tableView_revisions.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.tableView_revisions.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.tableView_revisions.setShowGrid(False)
-        self.tableView_revisions.setGridStyle(QtCore.Qt.NoPen)
-        self.tableView_revisions.setObjectName("tableView_revisions")
+        self.repoview = HgRepoView(self.splitter)
+        self.repoview.setAlternatingRowColors(True)
+        self.repoview.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.repoview.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.repoview.setShowGrid(False)
+        self.repoview.setGridStyle(QtCore.Qt.NoPen)
+        self.repoview.setObjectName("repoview")
         self.textView = HgFileView(self.splitter)
         self.textView.setObjectName("textView")
         self.verticalLayout.addWidget(self.splitter)
