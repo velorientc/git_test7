@@ -117,7 +117,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         return self._loading
 
     def loaded(self):
-        print "loaded()"
+        reponame = os.path.basename(self.repo.root)
+        print "repository '%s' loaded" % reponame
         self._repodate = self._getrepomtime()
         self._loading = False
 
