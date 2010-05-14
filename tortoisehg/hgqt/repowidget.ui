@@ -161,7 +161,7 @@
                </font>
               </property>
              </widget>
-             <widget class="HgFileView" name="textview_status" native="true">
+             <widget class="HgFileView" name="fileview" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>

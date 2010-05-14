@@ -71,7 +71,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         # setup tables and views
         #self.setupHeaderTextview()
-        #connect(self.textview_status, SIGNAL('fileDisplayed'),
+        #connect(self.fileview, SIGNAL('fileDisplayed'),
         #        self.file_displayed)
         self.setupBranchCombo()
         # self.setupModels(fromhead)
@@ -165,7 +165,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         # find quickbar
         self.find_toolbar = tb = FindInGraphlogQuickBar(self)
         tb.setObjectName("find_toolbar")
-        #tb.attachFileView(self.textview_status)
+        #tb.attachFileView(self.fileview)
         #tb.attachHeaderView(self.textview_header)
         #connect(tb, SIGNAL('revisionSelected'), self.tableView_revisions.goto)
         #connect(tb, SIGNAL('fileSelected'), self.tableView_filelist.selectFile)
@@ -253,7 +253,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.actionAnnMode = QtGui.QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
         #connect(self.actionAnnMode, SIGNAL('toggled(bool)'),
-        #        self.textview_status.setAnnotate)
+        #        self.fileview.setAnnotate)
 
         self.actionHelp.setShortcut(Qt.Key_F1)
         self.actionHelp.setIcon(geticon('help'))
@@ -265,8 +265,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.actionNextDiff.setShortcut('Alt+Down')
         def filled():
             self.actionNextDiff.setEnabled(
-                self.textview_status.fileMode() and self.textview_status.nDiffs())
-        #connect(self.textview_status, SIGNAL('filled'), filled)
+                self.fileview.fileMode() and self.fileview.nDiffs())
+        #connect(self.fileview, SIGNAL('filled'), filled)
         self.actionPrevDiff = QtGui.QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         connect(self.actionNextDiff, SIGNAL('triggered()'),
@@ -307,22 +307,22 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.actionNextLine = QtGui.QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
         #connect(self.actionNextLine, SIGNAL('triggered()'),
-        #        self.textview_status.nextLine)
+        #        self.fileview.nextLine)
         self.addAction(self.actionNextLine)
         self.actionPrevLine = QtGui.QAction('Prev line', self)
         self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
         #connect(self.actionPrevLine, SIGNAL('triggered()'),
-        #        self.textview_status.prevLine)
+        #        self.fileview.prevLine)
         self.addAction(self.actionPrevLine)
         self.actionNextCol = QtGui.QAction('Next column', self)
         self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
         #connect(self.actionNextCol, SIGNAL('triggered()'),
-        #        self.textview_status.nextCol)
+        #        self.fileview.nextCol)
         self.addAction(self.actionNextCol)
         self.actionPrevCol = QtGui.QAction('Prev column', self)
         self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
         #connect(self.actionPrevCol, SIGNAL('triggered()'),
-        #        self.textview_status.prevCol)
+        #        self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
         self.actionStartAtRev = QtGui.QAction('Start at rev.', self)

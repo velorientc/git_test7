@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\repowidget.ui'
 #
-# Created: Tue May 11 16:08:13 2010
+# Created: Fri May 14 15:00:21 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -102,14 +102,14 @@ class Ui_Form(object):
         font.setPointSize(9)
         self.message.setFont(font)
         self.message.setObjectName("message")
-        self.textview_status = HgFileView(self.message_splitter)
+        self.fileview = HgFileView(self.message_splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHeightForWidth(self.textview_status.sizePolicy().hasHeightForWidth())
-        self.textview_status.setSizePolicy(sizePolicy)
-        self.textview_status.setMinimumSize(QtCore.QSize(0, 0))
-        self.textview_status.setObjectName("textview_status")
+        sizePolicy.setHeightForWidth(self.fileview.sizePolicy().hasHeightForWidth())
+        self.fileview.setSizePolicy(sizePolicy)
+        self.fileview.setMinimumSize(QtCore.QSize(0, 0))
+        self.fileview.setObjectName("fileview")
         self.verticalLayout.addWidget(self.message_splitter)
         self.verticalLayout_2.addWidget(self.filelist_splitter)
         self.horizontalLayout.addWidget(self.revisions_splitter)

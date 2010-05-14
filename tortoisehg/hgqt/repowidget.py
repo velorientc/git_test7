@@ -64,8 +64,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.createActions()
 
-        self.textview_status.setFont(self._font)
-        connect(self.textview_status, SIGNAL('showMessage'), self.showMessage)
+        self.fileview.setFont(self._font)
+        connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
         connect(self.tableView_revisions, SIGNAL('showMessage'), self.showMessage)
 
         self.textview_header.setMessageWidget(self.message)
@@ -76,7 +76,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         # setup tables and views
         self.setupHeaderTextview()
-        connect(self.textview_status, SIGNAL('fileDisplayed'),
+        connect(self.fileview, SIGNAL('fileDisplayed'),
                 self.file_displayed)
         self.setupBranchCombo()
         self.setupModels(fromhead)
@@ -151,7 +151,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         #self.actionAnnMode = QtGui.QAction('Annotate', self)
         #self.actionAnnMode.setCheckable(True)
         #connect(self.actionAnnMode, SIGNAL('toggled(bool)'),
-        #        self.textview_status.setAnnotate)
+        #        self.fileview.setAnnotate)
         
         # Next/Prev diff (in full file mode)
         '''
@@ -159,8 +159,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.actionNextDiff.setShortcut('Alt+Down')
         def filled():
             self.actionNextDiff.setEnabled(
-                self.textview_status.fileMode() and self.textview_status.nDiffs())
-        connect(self.textview_status, SIGNAL('filled'), filled)
+                self.fileview.fileMode() and self.fileview.nDiffs())
+        connect(self.fileview, SIGNAL('filled'), filled)
         self.actionPrevDiff = QtGui.QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         connect(self.actionNextDiff, SIGNAL('triggered()'),
@@ -206,22 +206,22 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.actionNextLine = QtGui.QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
         connect(self.actionNextLine, SIGNAL('triggered()'),
-                self.textview_status.nextLine)
+                self.fileview.nextLine)
         self.addAction(self.actionNextLine)
         self.actionPrevLine = QtGui.QAction('Prev line', self)
         self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
         connect(self.actionPrevLine, SIGNAL('triggered()'),
-                self.textview_status.prevLine)
+                self.fileview.prevLine)
         self.addAction(self.actionPrevLine)
         self.actionNextCol = QtGui.QAction('Next column', self)
         self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
         connect(self.actionNextCol, SIGNAL('triggered()'),
-                self.textview_status.nextCol)
+                self.fileview.nextCol)
         self.addAction(self.actionNextCol)
         self.actionPrevCol = QtGui.QAction('Prev column', self)
         self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
         connect(self.actionPrevCol, SIGNAL('triggered()'),
-                self.textview_status.prevCol)
+                self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
         # Activate file (file diff navigator)
@@ -279,17 +279,17 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.refreshRevisionTable(sender=self)
 
     def setMode(self, mode):
-        self.textview_status.setMode(mode)
+        self.fileview.setMode(mode)
 
     def nextDiff(self):
-        notlast = self.textview_status.nextDiff()
-        self.actionNextDiff.setEnabled(self.textview_status.fileMode() and notlast and self.textview_status.nDiffs())
-        self.actionPrevDiff.setEnabled(self.textview_status.fileMode() and self.textview_status.nDiffs())
+        notlast = self.fileview.nextDiff()
+        self.actionNextDiff.setEnabled(self.fileview.fileMode() and notlast and self.fileview.nDiffs())
+        self.actionPrevDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
 
     def prevDiff(self):
-        notfirst = self.textview_status.prevDiff()
-        self.actionPrevDiff.setEnabled(self.textview_status.fileMode() and notfirst and self.textview_status.nDiffs())
-        self.actionNextDiff.setEnabled(self.textview_status.fileMode() and self.textview_status.nDiffs())
+        notfirst = self.fileview.prevDiff()
+        self.actionPrevDiff.setEnabled(self.fileview.fileMode() and notfirst and self.fileview.nDiffs())
+        self.actionNextDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
 
     def load_config(self):
         cfg = WidgetMixin.load_config(self)
@@ -310,13 +310,13 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.create_models(fromhead)
         self.tableView_revisions.setModel(self.repomodel)
         self.tableView_filelist.setModel(self.filelistmodel)
-        self.textview_status.setModel(self.repomodel)
+        self.fileview.setModel(self.repomodel)
         #self.find_toolbar.setModel(self.repomodel)
 
         filetable = self.tableView_filelist
         connect(filetable, SIGNAL('fileSelected'),
-                self.textview_status.displayFile)
-        connect(self.textview_status, SIGNAL('revForDiffChanged'),
+                self.fileview.displayFile)
+        connect(self.fileview, SIGNAL('revForDiffChanged'),
                 self.textview_header.setDiffRevision)
 
     def setupRevisionTable(self):
@@ -326,7 +326,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
         connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
         connect(self.textview_header, SIGNAL('revisionSelected'), view.goto)
-        connect(self.textview_header, SIGNAL('parentRevisionSelected'), self.textview_status.displayDiff)
+        connect(self.textview_header, SIGNAL('parentRevisionSelected'), self.fileview.displayDiff)
         self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -396,7 +396,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         """
         if self.repomodel.graph:
             ctx = self.repomodel.repo.changectx(rev)
-            self.textview_status.setContext(ctx)
+            self.fileview.setContext(ctx)
             self.textview_header.displayRevision(ctx)
             self.filelistmodel.setSelectedRev(ctx)
             if len(self.filelistmodel):
