@@ -65,11 +65,17 @@ class DataMineDialog(gdialog.GWindow):
         root = self.repo.root
         cf = []
         for f in self.pats:
-            if os.path.isfile(f):
-                cf.append(util.canonpath(root, self.cwd, f))
-            elif os.path.isdir(f):
-                gdialog.Prompt(_('Invalid path'),
-                       _('Cannot annotate directory: %s') % f, None).run()
+            try:
+                if os.path.isfile(f):
+                    cf.append(util.canonpath(root, self.cwd, f))
+                elif os.path.isdir(f):
+                    for fn in os.listdir(f):
+                        fname = os.path.join(f, fn)
+                        if not os.path.isfile(fname):
+                            continue
+                        cf.append(util.canonpath(root, self.cwd, fname))
+            except util.Abort:
+                pass
         for f in cf:
             self.add_annotate_page(f, '.')
         if not self.notebook.get_n_pages():
