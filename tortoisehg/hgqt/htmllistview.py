@@ -87,7 +87,7 @@ class HtmlListView(QListView):
 
 class HTMLDelegate(QStyledItemDelegate):
     def __init__(self, parent=0):
-        QItemDelegate.__init__(self, parent)
+        QStyledItemDelegate.__init__(self, parent)
 
     def paint(self, painter, option, index):
         text = index.model().data(index, Qt.DisplayRole).toString()
