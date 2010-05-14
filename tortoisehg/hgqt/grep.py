@@ -21,13 +21,15 @@ from PyQt4.QtGui import *
 # prove search features
 
 # Technical Debt
-#  uhm, do some searching
+#  hg grep functionality
+#  thread the searches
 #  draggable matches from history
 #  tortoisehg.editor with line number
 #  smart visual diffs
 #  context menu for matches
 #  emit errors to parent's status bar
 #  emit to parent's progress bar
+#  turn HTMLDelegate into a column delegate, merge back with htmllistview
 
 class SearchWidget(QWidget):
     def __init__(self, root=None, parent=None):
