@@ -60,10 +60,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.createActions()
 
         self.textview_status.setFont(self._font)
-        #connect(self.textview_status, SIGNAL('showMessage'),
-        #        self.statusBar().showMessage)
-        #connect(self.tableView_revisions, SIGNAL('showMessage'),
-        #        self.statusBar().showMessage)
+        connect(self.textview_status, SIGNAL('showMessage'), self.showMessage)
+        connect(self.tableView_revisions, SIGNAL('showMessage'), self.showMessage)
 
         self.textview_header.setMessageWidget(self.message)
 
@@ -84,6 +82,10 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
 
+    def showMessage(self, msg):
+        print "repowidget.showMessage(%s) called" % msg
+        # TODO: wire this higher up in the hierarchy
+
     def commit(self):
         args = ['commit']
         args += ['-v', '-m', self.message.text()]
@@ -98,9 +100,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                 return
             mtime = self._getrepomtime()
             if mtime > self._repodate:
-                #self.statusBar().showMessage("Repository has been modified "
-                #                             "(reloading is recommended)")
-                pass
+                self.showMessage(_("Repository has been modified "
+                                   "(reloading is recommended)"))
 
     def loading(self):
         return self._loading
@@ -282,9 +283,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                 self.on_filled)
         connect(self.repomodel, SIGNAL('loaded'),
                 self.loaded)
-        #connect(self.repomodel, SIGNAL('showMessage'),
-        #        self.statusBar().showMessage,
-        #        Qt.QueuedConnection)
+        connect(self.repomodel, SIGNAL('showMessage'),
+                self.showMessage, Qt.QueuedConnection)
 
         self.filelistmodel = HgFileListModel(self.repo)
 
