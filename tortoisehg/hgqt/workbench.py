@@ -83,14 +83,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
-        '''
-        self.splitternames = []
-        sn = ('revisions', 'filelist', 'message')
-        for n in sn:
-            n += '_splitter'
-            self.splitternames.append(n)
-            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
-        '''
 
         self.setAcceptDrops(True)
 
@@ -424,14 +416,23 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def closeEvent(self, event):
         if not self.okToContinue():
             event.ignore()
+
         s = QtCore.QSettings()
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
-        '''
-        for n in self.splitternames:
-            s.setValue(wb + n, getattr(self, n).saveState())
-        '''
+
+        if not self.closeRepoTabs():
+            event.ignore()
+
+    def closeRepoTabs(self):
+        '''returns False if close should be aborted'''
+        tw = self.repoTabsWidget
+        for idx in range(tw.count()):
+            rw = tw.widget(idx)
+            if not rw.closeRepoWidget():
+                return False
+        return True
 
 def run(ui, *pats, **opts):
     repo = None

@@ -87,6 +87,16 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
 
+        # restore settings
+        s = QtCore.QSettings()
+        wb = "RepoWidget/"
+        self.splitternames = []
+        sn = ('revisions', 'filelist', 'message')
+        for n in sn:
+            n += '_splitter'
+            self.splitternames.append(n)
+            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
+
     def showMessage(self, msg):
         self.currentMessage = msg
         if self.isVisible():
@@ -449,6 +459,27 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.repomodel.setRepo(self.repo, branch=branch, fromhead=startrev,
                                follow=follow)
+
+    def okToContinue(self):
+        '''
+        returns False if there is unsaved data
+        
+        If there is unsaved data, present a dialog asking the user if it is ok to
+        discard the changes made.
+        '''
+        return True # TODO: check if there is an unsaved commit message
+
+    def closeRepoWidget(self):
+        '''returns False if close should be aborted'''
+        if not self.okToContinue():
+            return False
+        if self.isVisible():
+            # assuming here that there is at most one RepoWidget visible
+            s = QtCore.QSettings()
+            wb = "RepoWidget/"
+            for n in self.splitternames:
+                s.setValue(wb + n, getattr(self, n).saveState())
+        return True
 
 def run(ui, *pats, **opts):
     repo = None
