@@ -11,7 +11,7 @@ import os, tempfile, re
 from StringIO import StringIO
 from PyQt4.QtCore import Qt, pyqtSlot, QAbstractTableModel, QVariant, QModelIndex
 from PyQt4.QtGui import QDialog
-from mercurial import hg, error, extensions, util
+from mercurial import hg, error, extensions, util, cmdutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, lexers
@@ -36,7 +36,7 @@ class EmailDialog(QDialog):
         self._qui.bundle_radio.setEnabled(False)  # TODO: bundle support
         self._qui.settings_button.setEnabled(False)  # TODO: open settings dialog
 
-        changesets = _ChangesetsModel(self._repo, self._revs, parent=self)
+        changesets = _ChangesetsModel(self._repo, self._purerevs, parent=self)
         self._qui.changesets_view.setModel(changesets)
 
         self._initpreviewtab()
@@ -147,7 +147,7 @@ class EmailDialog(QDialog):
                 return False
 
         # TODO: is it nice if we can choose revisions to send?
-        if not self._revs:
+        if not self._purerevs:
             return False
 
         return True
@@ -202,7 +202,7 @@ class EmailDialog(QDialog):
 
     def _introrequired(self):
         """Is intro message required?"""
-        return len(self._revs) > 1
+        return len(self._purerevs) > 1
 
     def _initpreviewtab(self):
         def initqsci(w):
@@ -261,6 +261,11 @@ class EmailDialog(QDialog):
     def _previewtabindex(self):
         """Index of preview tab"""
         return self._qui.main_tabs.indexOf(self._qui.preview_tab)
+
+    @util.propertycache
+    def _purerevs(self):
+        """Extract revranges to list of pure revision numbers"""
+        return cmdutil.revrange(self._repo, self._revs)
 
 class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewer?
     _COLUMNS = [('rev', lambda ctx: '%d:%s' % (ctx.rev(), ctx)),
