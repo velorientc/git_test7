@@ -642,7 +642,10 @@ table = {
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
     "^grep|search": (grep, [], _('hgtk grep')),
-    "^email": (email, [], _('thg email [REVS]')),
+    "^email":
+        (email,
+         [('r', 'rev', [], _('a revision to send')),],
+         _('thg email [REVS]')),
     "^log|history|explorer|workbench":
         (log,
          [('l', 'limit', '', _('limit number of changes displayed'))],

@@ -297,5 +297,10 @@ def run(ui, *revs, **opts):
     # TODO: same options as patchbomb
     # TODO: repo should be specified as an argument?
     # TODO: if no revs specified?
+    if opts.get('rev'):
+        if revs:
+            raise util.Abort(_('use only one form to specify the revision'))
+        revs = opts.get('rev')
+
     repo = hg.repository(ui, paths.find_root())
     return EmailDialog(repo.ui, repo, revs)
