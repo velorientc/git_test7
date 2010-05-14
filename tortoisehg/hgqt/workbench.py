@@ -119,16 +119,18 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.setupBranchCombo()
 
         w = self.repoTabsWidget.currentWidget()
-
         mode = 'diff'
         ann = False
+        tags = []
         if w:
             mode = w.getMode()
             ann = w.getAnnotate()
+            tags = w.repo.tags().keys()
         else:
             self.actionDiffMode.setEnabled(False)
         self.actionDiffMode.setChecked(mode == 'diff')
         self.actionAnnMode.setChecked(ann)
+        self.revscompl_model.setStringList(tags)
 
     def addRepoTab(self, repo, fromhead=None):
         '''opens the given repo in a new tab'''
