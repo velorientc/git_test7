@@ -166,14 +166,14 @@ class UpdateDialog(QDialog):
         try:
             new_ctx = self.repo[new_rev]
             if not merge and new_ctx.rev() == self.ctxs[0].rev():
-                self.target_info.setPlainText(_('(same as parent)'))
+                self.target_info.setText(_('(same as parent)'))
                 clean = self.discard_chk.isChecked()
                 self.update_btn.setEnabled(clean)
             else:
                 self.target_info.update(self.repo[new_rev])
                 self.update_btn.setEnabled(True)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
-            self.target_info.setPlainText(_('unknown revision!'))
+            self.target_info.setText(_('unknown revision!'))
             self.update_btn.setDisabled(True)
 
     def update(self):
