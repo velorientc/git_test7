@@ -192,8 +192,9 @@ class HgFileView(QtGui.QFrame):
 
     def setAnnotate(self, ann):
         self._annotate = ann
-        if ann:
-            self.displayFile()
+        self.blk.setVisible(self._mode == 'file')
+        self.ann.setVisible(self._mode == 'file' and self._annotate)
+        self.displayFile()
         
     def setModel(self, model):
         # XXX we really need only the "Graph" instance

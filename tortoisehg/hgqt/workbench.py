@@ -259,8 +259,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self.actionAnnMode = QtGui.QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
-        #connect(self.actionAnnMode, SIGNAL('toggled(bool)'),
-        #        self.fileview.setAnnotate)
+        connect(self.actionAnnMode, SIGNAL('toggled(bool)'), self.setAnnotate)
 
         self.actionHelp.setShortcut(Qt.Key_F1)
         self.actionHelp.setIcon(geticon('help'))
@@ -373,6 +372,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.actionAnnMode.setEnabled(not mode)
         self.actionNextDiff.setEnabled(not mode)
         self.actionPrevDiff.setEnabled(not mode)
+
+    def setAnnotate(self, ann):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.setAnnotate(ann)
 
     def nextDiff(self):
         pass
