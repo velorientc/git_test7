@@ -186,6 +186,12 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.disab_shortcuts.append(self.actionActivateFile)
         self.disab_shortcuts.append(self.actionActivateRev)
 
+    def back(self):
+        self.repoview.back()
+
+    def forward(self):
+        self.repoview.forward()
+
     def setMode(self, mode):
         self.fileview.setMode(mode)
 

@@ -102,6 +102,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionBack"/>
+   <addaction name="actionForward"/>
   </widget>
   <widget class="QToolBar" name="toolBar_treefilters">
    <property name="enabled">
@@ -183,6 +185,24 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionBack">
+   <property name="icon">
+    <iconset resource="workbench.qrc">
+     <normaloff>:/icons/back.svg</normaloff>:/icons/back.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+  </action>
+  <action name="actionForward">
+   <property name="icon">
+    <iconset resource="workbench.qrc">
+     <normaloff>:/icons/forward.svg</normaloff>:/icons/forward.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Forward</string>
    </property>
   </action>
  </widget>

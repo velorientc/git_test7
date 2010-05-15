@@ -186,10 +186,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self.attachQuickBar(tb)
 
-        # navigation toolbar
-        #self.toolBar_edit.addAction(self.repoview._actions['back'])
-        #self.toolBar_edit.addAction(self.repoview._actions['forward'])
-
         findaction = self.find_toolbar.toggleViewAction()
         findaction.setIcon(geticon('find'))
         self.toolBar_edit.addAction(findaction)
@@ -248,12 +244,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def createActions(self):
         # main window actions (from .ui file)
-        connect(self.actionRefresh, SIGNAL('triggered()'),
-                self.reload)
-        connect(self.actionAbout, SIGNAL('triggered()'),
-                self.on_about)
-        connect(self.actionQuit, SIGNAL('triggered()'),
-                self.close)
+        connect(self.actionRefresh, SIGNAL('triggered()'), self.reload)
+        connect(self.actionAbout, SIGNAL('triggered()'), self.on_about)
+        connect(self.actionQuit, SIGNAL('triggered()'), self.close)
+        connect(self.actionBack, SIGNAL('triggered()'), self.back)
+        connect(self.actionForward, SIGNAL('triggered()'), self.forward)
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
 
@@ -350,6 +345,16 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         connect(self.actionOpen_repository, SIGNAL('triggered()'),
                 self.openRepository)
+
+    def back(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.back()
+
+    def forward(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.forward()
 
     def openRepository(self):
         caption = _('Select repository directory to open')
