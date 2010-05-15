@@ -55,7 +55,7 @@ class HgConfig(object):
         return self.ui.config(self.section, 'font', 'Monospace')
 
     @cached
-    def getFontSize(self, default=9):
+    def getFontSize(self, default=10):
         """
         fontsize: text size in file content viewer
         """
