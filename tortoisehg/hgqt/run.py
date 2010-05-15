@@ -650,7 +650,6 @@ table = {
     "forget": (forget, [], _('thg forget [FILE]...')),
     "^status": (status,
          [('c', 'clean', False, _('show files without changes')),
-          ('u', 'unknown', False, _('show unknown (not tracked) files')),
           ('i', 'ignored', False, _('show ignored files'))],
         _('thg status [OPTIONS] [FILE]')),
     "test": (test, [], _('thg test')),
