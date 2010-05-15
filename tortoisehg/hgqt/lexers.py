@@ -136,11 +136,6 @@ class DiffLexerSelector(_ScriptLexerSelector):
         font.setPointSize(size)
         lexer.setFont(font, -1)
 
-        bfont = QtGui.QFont(font)
-        bfont.setBold(True)
-        lexer.setFont(bfont, 5)
-        lexer.setFont(bfont, 6)
-
         return lexer
 
     

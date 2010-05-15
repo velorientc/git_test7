@@ -206,21 +206,21 @@ class HgConfig(object):
         return self.ui.config(self.section, 'difffgcolor', default)
 
     @cached
-    def getDiffPlusColor(self, default='green'):
+    def getDiffPlusColor(self, default='#006400'):
         """
         diffpluscolor: text color of added lines in diffs
         """
         return self.ui.config(self.section, 'diffpluscolor', default)
 
     @cached
-    def getDiffMinusColor(self, default='red'):
+    def getDiffMinusColor(self, default='#900000'):
         """
         diffminuscolor: text color of removed lines in diffs
         """
         return self.ui.config(self.section, 'diffminuscolor', default)
 
     @cached
-    def getDiffSectionColor(self, default='magenta'):
+    def getDiffSectionColor(self, default='blue'):
         """
         diffsectioncolor: text color of new section in diffs
         """
