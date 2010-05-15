@@ -362,15 +362,6 @@ def test(ui, *pats, **opts):
     from tortoisehg.hgqt.chunkselect import run
     qtrun(run, ui, *pats, **opts)
 
-def bug(ui, *pats, **opts):
-    """bug report dialog"""
-    from tortoisehg.hgqt.bugreport import run
-    if len(pats) == 1:
-        opts['error'] = pats[0]
-    opts['cmd'] = sys.argv[1:]
-    opts['nofork'] = True
-    qtrun(run, ui, *pats, **opts)
-
 def remove(ui, *pats, **opts):
     """remove selected files"""
     from tortoisehg.hgqt.quickop import run
@@ -645,7 +636,6 @@ table = {
           ('', 'uncompressed', None,
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
-    "bug": (bug, [], _('thg bug [MESSAGE]')),
     "^grep|search": (grep, [], _('thg grep')),
     "^email":
         (email,
