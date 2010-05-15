@@ -13,11 +13,11 @@ from tortoisehg.util import paths, hglib
 from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT, QAbstractTableModel
-from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString
+from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString, QSettings
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
 from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag
 from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
-from PyQt4.QtGui import QIcon, QPixmap, QToolButton
+from PyQt4.QtGui import QIcon, QPixmap, QToolButton, QDialog
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
@@ -591,5 +591,33 @@ statusTypes = {
                      'status.subrepo'),
 }
 
+class StatusDialog(QDialog):
+    'Standalone status browser'
+    def __init__(self, pats, opts, parent=None):
+        QDialog.__init__(self, parent)
+        layout = QVBoxLayout()
+        layout.setMargin(0)
+        self.setLayout(layout)
+        self.stwidget = StatusWidget(pats, opts, self)
+        layout.addWidget(self.stwidget)
+        s = QSettings()
+        self.stwidget.restoreState(s.value('status/state').toByteArray())
+        self.restoreGeometry(s.value('status/geom').toByteArray())
+
+        repo = hg.repository(ui.ui(), path=paths.find_root())
+        self.setWindowTitle('%s - status' % hglib.get_reponame(repo))
+
+    def accept(self):
+        s = QSettings()
+        s.setValue('status/state', self.stwidget.saveState())
+        s.setValue('status/geom', self.saveGeometry())
+        QDialog.accept(self)
+
+    def reject(self):
+        s = QSettings()
+        s.setValue('status/state', self.stwidget.saveState())
+        s.setValue('status/geom', self.saveGeometry())
+        QDialog.reject(self)
+
 def run(ui, *pats, **opts):
-    return StatusWidget(pats, opts)
+    return StatusDialog(pats, opts)

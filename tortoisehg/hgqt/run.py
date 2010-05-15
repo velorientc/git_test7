@@ -352,9 +352,14 @@ def email(ui, *pats, **opts):
     from tortoisehg.hgqt.hgemail import run
     qtrun(run, ui, *pats, **opts)
 
+def status(ui, *pats, **opts):
+    """browse working copy status"""
+    from tortoisehg.hgqt.status import run
+    qtrun(run, ui, *pats, **opts)
+
 def test(ui, *pats, **opts):
     """test arbitrary widgets"""
-    from tortoisehg.hgqt.status import run
+    from tortoisehg.hgqt.chunkselect import run
     qtrun(run, ui, *pats, **opts)
 
 def bug(ui, *pats, **opts):
@@ -653,6 +658,11 @@ table = {
     "remove|rm": (revert, [], _('thg remove [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
+    "status": (status,
+         [('c', 'clean', False, _('show files without changes')),
+          ('u', 'unknown', False, _('show unknown (not tracked) files')),
+          ('i', 'ignored', False, _('show ignored files'))],
+        _('thg status [OPTIONS] [FILE]')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":
