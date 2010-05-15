@@ -29,7 +29,7 @@ class BugReport(QtGui.QDialog):
         tb.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         msg = hglib.tounicode(self.text)
         msg = QtCore.Qt.escape(msg)
-        tb.setHtml('<font>' + msg + '</font>')
+        tb.setHtml('<span>' + msg + '</span>')
         tb.setWordWrapMode(QtGui.QTextOption.NoWrap)
         layout.addWidget(tb)
 
