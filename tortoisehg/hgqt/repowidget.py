@@ -75,7 +75,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(self.message, SIGNAL('revisionSelected'), self.repoview.goto)
 
         # setup tables and views
-        self.setupHeaderTextview()
         connect(self.fileview, SIGNAL('fileDisplayed'),
                 self.file_displayed)
         self.setupModels(fromhead)
@@ -259,9 +258,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         table.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         table.setAlternatingRowColors(True)
-
-    def setupHeaderTextview(self):
-        pass
 
     def on_filled(self):
         tv = self.repoview
