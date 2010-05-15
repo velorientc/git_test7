@@ -658,7 +658,7 @@ table = {
     "remove|rm": (revert, [], _('thg remove [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
-    "status": (status,
+    "^status": (status,
          [('c', 'clean', False, _('show files without changes')),
           ('u', 'unknown', False, _('show unknown (not tracked) files')),
           ('i', 'ignored', False, _('show ignored files'))],
