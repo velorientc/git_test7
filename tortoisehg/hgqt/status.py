@@ -23,7 +23,6 @@ from PyQt4.QtGui import QIcon, QPixmap, QToolButton, QDialog
 # working copy browser.
 
 # Technical Debt
-#  issue #1105 - columns for extension and size
 #  emit error strings to parent status bar
 #  We need a real icon set for file status types
 #  Add some initial drag distance before starting QDrag
@@ -42,6 +41,8 @@ COL_PATH = 0
 COL_STATUS = 1
 COL_MERGE_STATE = 2
 COL_PATH_DISPLAY = 3
+COL_EXTENSION = 4
+COL_SIZE = 5
 
 _colors = {}
 
@@ -243,7 +244,7 @@ class StatusWidget(QWidget):
         self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, self.isMerge())
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
-        for col in xrange(COL_PATH_DISPLAY):
+        for col in xrange(COL_SIZE):
             self.tv.resizeColumnToContents(col)
         self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
         self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
@@ -275,7 +276,7 @@ class StatusWidget(QWidget):
     def refreshDiff(self):
         if self.curRow is None:
             return
-        path, status, mst, upath = self.curRow
+        path, status, mst, upath, ext, sz = self.curRow
         wfile = util.pconvert(path)
         self.fnamelabel.setText(statusMessage(status, mst, upath))
         showanyway = self.override.isChecked()
@@ -411,48 +412,59 @@ class WctxFileTree(QTreeView):
 class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, ms, opts, checked, parent=None):
         QAbstractTableModel.__init__(self, parent)
+        repo = wctx._repo
         rows = []
+        def mkrow(fname, st):
+            ext, sizek = '', ''
+            try:
+                mst = fname in ms and ms[fname].upper() or ""
+                path = repo.wjoin(fname)
+                name, ext = os.path.splitext(fname)
+                sizebytes = os.path.getsize(path)
+                sizek = (sizebytes + 1023) // 1024
+            except EnvironmentError:
+                pass
+            return [fname, st, mst, hglib.tounicode(fname), ext[1:], sizek]
         if opts['modified']:
             for m in wctx.modified():
-                mst = m in ms and ms[m].upper() or ""
                 checked[m] = checked.get(m, True)
-                rows.append([m, 'M', mst, hglib.tounicode(m)])
+                rows.append(mkrow(m, 'M'))
         if opts['added']:
             for a in wctx.added():
-                mst = a in ms and ms[a].upper() or ""
                 checked[a] = checked.get(a, True)
-                rows.append([a, 'A', mst, hglib.tounicode(a)])
+                rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
                 mst = r in ms and ms[r].upper() or ""
                 checked[r] = checked.get(r, True)
-                rows.append([r, 'R', mst, hglib.tounicode(r)])
+                rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
                 mst = d in ms and ms[d].upper() or ""
                 checked[d] = checked.get(d, False)
-                rows.append([d, '!', mst, hglib.tounicode(d)])
+                rows.append(mkrow(d, '!'))
         if opts['unknown']:
             for u in wctx.unknown():
                 checked[u] = checked.get(u, False)
-            	rows.append([u, '?', '', hglib.tounicode(u)])
+                rows.append(mkrow(u, '?'))
         if opts['ignored']:
             for i in wctx.ignored():
                 checked[i] = checked.get(i, False)
-            	rows.append([i, 'I', '', hglib.tounicode(i)])
+                rows.append(mkrow(i, 'I'))
         if opts['clean']:
             for c in wctx.clean():
                 checked[c] = checked.get(c, False)
-            	rows.append([c, 'C', '', hglib.tounicode(c)])
+                rows.append(mkrow(c, 'C'))
         if opts['subrepo']:
             try:
                 for s in wctx.substate:
                     if wctx.sub(s).dirty():
                         checked[s] = checked.get(s, False)
-                        rows.append([s, 'S', '', hglib.tounicode(s)])
+                        rows.append(mkrow(s, 'S'))
             except (OSError, IOError, error.ConfigError), e:
                 self.status_error = str(e)
-        self.headers = ('*', _('Stat'), _('M'), _('Filename'))
+        self.headers = ('*', _('Stat'), _('M'), _('Filename'), 
+                        _('Type'), _('Size (KB)'))
         self.checked = checked
         self.unfiltered = rows
         self.rows = rows
@@ -467,7 +479,7 @@ class WctxModel(QAbstractTableModel):
         if not index.isValid():
             return QVariant()
 
-        path, status, mst, upath = self.rows[index.row()]
+        path, status, mst, upath, ext, sz = self.rows[index.row()]
         if index.column() == COL_PATH:
             if role == Qt.CheckStateRole:
                 # also Qt.PartiallyChecked
