@@ -96,11 +96,14 @@ class HgFileView(QtGui.QFrame):
         l.setSpacing(0)
         
         self.topLayout = QtGui.QVBoxLayout()
-        self.filenamelabel = QtGui.QLabel()
-        self.filenamelabel.setWordWrap(True)
+
+        self.filenamelabel = w = QtGui.QLabel()
+        w.setWordWrap(True)
+        w.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.topLayout.addWidget(w)
+
         self.execflaglabel = QtGui.QLabel()
         self.execflaglabel.setWordWrap(True)
-        self.topLayout.addWidget(self.filenamelabel)
         self.topLayout.addWidget(self.execflaglabel)
         self.execflaglabel.hide()
         framelayout.addLayout(self.topLayout)
