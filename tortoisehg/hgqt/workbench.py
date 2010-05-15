@@ -400,6 +400,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.reload()
+            self.setupBranchCombo()
 
     #@timeit
     def refreshRevisionTable(self, *args, **kw):
