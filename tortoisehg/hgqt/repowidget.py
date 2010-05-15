@@ -85,15 +85,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self._repodate = self._getrepomtime()
         self._watchrepotimer = self.startTimer(500)
 
-        # restore settings
-        s = QtCore.QSettings()
-        wb = "RepoWidget/"
-        self.splitternames = []
-        sn = ('revisions', 'filelist', 'message')
-        for n in sn:
-            n += '_splitter'
-            self.splitternames.append(n)
-            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
+        self.restoreSettings()
 
     def showMessage(self, msg):
         self.currentMessage = msg
@@ -359,14 +351,27 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         '''
         return True # TODO: check if there is an unsaved commit message
 
+    def storeSettings(self):
+        s = QtCore.QSettings()
+        wb = "RepoWidget/"
+        for n in self.splitternames:
+            s.setValue(wb + n, getattr(self, n).saveState())
+
+    def restoreSettings(self):
+        s = QtCore.QSettings()
+        wb = "RepoWidget/"
+        self.splitternames = []
+        sn = ('revisions', 'filelist', 'message')
+        for n in sn:
+            n += '_splitter'
+            self.splitternames.append(n)
+            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
+
     def closeRepoWidget(self):
         '''returns False if close should be aborted'''
         if not self.okToContinue():
             return False
         if self.isVisible():
             # assuming here that there is at most one RepoWidget visible
-            s = QtCore.QSettings()
-            wb = "RepoWidget/"
-            for n in self.splitternames:
-                s.setValue(wb + n, getattr(self, n).saveState())
+            self.storeSettings()
         return True
