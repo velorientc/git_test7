@@ -196,7 +196,7 @@
   <customwidget>
    <class>RevDisplay</class>
    <extends>QWidget</extends>
-   <header>changeset.h</header>
+   <header>revdisplay.h</header>
   </customwidget>
   <customwidget>
    <class>HgFileListView</class>
@@ -212,7 +212,7 @@
   <customwidget>
    <class>RevMessage</class>
    <extends>QWidget</extends>
-   <header>changeset.h</header>
+   <header>revdisplay.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

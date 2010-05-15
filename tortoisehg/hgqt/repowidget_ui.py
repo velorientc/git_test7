@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\repowidget.ui'
 #
-# Created: Sat May 15 18:50:17 2010
+# Created: Sat May 15 18:55:13 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -120,7 +120,7 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
 
-from changeset import RevDisplay, RevMessage
+from revdisplay import RevDisplay, RevMessage
 from filelistview import HgFileListView
 from fileview import HgFileView
 from repoview import HgRepoView
