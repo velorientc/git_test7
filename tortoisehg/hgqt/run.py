@@ -413,6 +413,11 @@ def hgignore(ui, *pats, **opts):
     from tortoisehg.hgqt.hgignore import run
     qtrun(run, ui, *pats, **opts)
 
+def serve(ui, *pats, **opts):
+    """start stand-alone webserver"""
+    from tortoisehg.hgqt.serve import run
+    qtrun(run, ui, *pats, **opts)
+
 def shellconfig(ui, *pats, **opts):
     """explorer extension configuration editor"""
     from tortoisehg.hgqt.shellconf import run
@@ -723,6 +728,7 @@ table = {
     "remove|rm": (remove, [], _('thg remove [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
+    "^serve": (serve, [], _('thg serve [OPTION]')),
     "^status": (status,
          [('c', 'clean', False, _('show files without changes')),
           ('i', 'ignored', False, _('show ignored files'))],
