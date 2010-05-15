@@ -92,7 +92,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="RevDisplay" name="textview_header" native="true">
+            <widget class="RevDisplay" name="revdisplay" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                <horstretch>0</horstretch>

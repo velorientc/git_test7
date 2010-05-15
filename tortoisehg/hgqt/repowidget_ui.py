@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\repowidget.ui'
 #
-# Created: Sat May 15 11:32:44 2010
+# Created: Sat May 15 18:50:17 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -65,18 +65,18 @@ class Ui_Form(object):
         self.verticalLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.textview_header = RevDisplay(self.frame)
+        self.revdisplay = RevDisplay(self.frame)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.textview_header.sizePolicy().hasHeightForWidth())
-        self.textview_header.setSizePolicy(sizePolicy)
-        self.textview_header.setMinimumSize(QtCore.QSize(0, 0))
+        sizePolicy.setHeightForWidth(self.revdisplay.sizePolicy().hasHeightForWidth())
+        self.revdisplay.setSizePolicy(sizePolicy)
+        self.revdisplay.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setPointSize(9)
-        self.textview_header.setFont(font)
-        self.textview_header.setObjectName("textview_header")
-        self.verticalLayout.addWidget(self.textview_header)
+        self.revdisplay.setFont(font)
+        self.revdisplay.setObjectName("revdisplay")
+        self.verticalLayout.addWidget(self.revdisplay)
         self.message_splitter = QtGui.QSplitter(self.frame)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)

@@ -168,7 +168,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.find_toolbar = tb = FindInGraphlogQuickBar(self)
         tb.setObjectName("find_toolbar")
         #tb.attachFileView(self.fileview)
-        #tb.attachHeaderView(self.textview_header)
+        #tb.attachHeaderView(self.revdisplay)
         #connect(tb, SIGNAL('revisionSelected'), self.repoview.goto)
         #connect(tb, SIGNAL('fileSelected'), self.tableView_filelist.selectFile)
         connect(tb, SIGNAL('showMessage'), self.statusBar().showMessage,

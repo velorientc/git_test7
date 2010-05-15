@@ -68,9 +68,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
         connect(self.repoview, SIGNAL('showMessage'), self.showMessage)
 
-        self.textview_header.setMessageWidget(self.message)
+        self.revdisplay.setMessageWidget(self.message)
 
-        self.textview_header.commitsignal.connect(self.commit)
+        self.revdisplay.commitsignal.connect(self.commit)
 
         connect(self.message, SIGNAL('revisionSelected'), self.repoview.goto)
 
@@ -227,7 +227,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(filetable, SIGNAL('fileSelected'),
                 self.fileview.displayFile)
         connect(self.fileview, SIGNAL('revForDiffChanged'),
-                self.textview_header.setDiffRevision)
+                self.revdisplay.setDiffRevision)
 
     def setupRevisionTable(self):
         view = self.repoview
@@ -235,8 +235,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
         connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
-        connect(self.textview_header, SIGNAL('revisionSelected'), view.goto)
-        connect(self.textview_header, SIGNAL('parentRevisionSelected'), self.fileview.displayDiff)
+        connect(self.revdisplay, SIGNAL('revisionSelected'), view.goto)
+        connect(self.revdisplay, SIGNAL('parentRevisionSelected'), self.fileview.displayDiff)
         self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -300,7 +300,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         if self.repomodel.graph:
             ctx = self.repomodel.repo.changectx(rev)
             self.fileview.setContext(ctx)
-            self.textview_header.displayRevision(ctx)
+            self.revdisplay.displayRevision(ctx)
             self.filelistmodel.setSelectedRev(ctx)
             if len(self.filelistmodel):
                 self.tableView_filelist.selectRow(0)
