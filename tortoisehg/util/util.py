@@ -124,7 +124,7 @@ def format_desc(desc, width):
     Helper function to format a ctx description for oneliner
     representation (summary view)
     """
-    desc = xml_escape(unicode(desc, 'utf-8', 'replace').split('\n', 1)[0])
+    desc = xml_escape(tounicode(desc).split('\n', 1)[0])
     if len(desc) > width:
         desc = desc[:width] + '...'
     return desc

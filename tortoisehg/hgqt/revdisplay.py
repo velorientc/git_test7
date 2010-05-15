@@ -290,7 +290,7 @@ class RevMessage(QtGui.QWidget):
 
     def displayRevision(self, ctx):
         self.ctx = ctx
-        desc = xml_escape(unicode(ctx.description(), 'utf-8', 'replace'))
+        desc = xml_escape(tounicode(ctx.description()))
         desc = desc.replace('\n', '<br/>\n')
 
         buf = ''
