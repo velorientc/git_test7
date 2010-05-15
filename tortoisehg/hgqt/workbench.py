@@ -73,11 +73,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         if fromhead:
             self.startrev_entry.setText(str(fromhead))
 
-        # restore settings
-        s = QtCore.QSettings()
-        wb = "Workbench/"
-        self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
-        self.restoreState(s.value(wb + 'windowState').toByteArray())
+        self.restoreSettings()
 
         self.setAcceptDrops(True)
 
@@ -450,15 +446,22 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         '''
         return True # we currently have no data to loose
 
-    def closeEvent(self, event):
-        if not self.okToContinue():
-            event.ignore()
-
+    def storeSettings(self):
         s = QtCore.QSettings()
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
 
+    def restoreSettings(self):
+        s = QtCore.QSettings()
+        wb = "Workbench/"
+        self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
+        self.restoreState(s.value(wb + 'windowState').toByteArray())
+
+    def closeEvent(self, event):
+        if not self.okToContinue():
+            event.ignore()
+        self.storeSettings()
         if not self.closeRepoTabs():
             event.ignore()
 
