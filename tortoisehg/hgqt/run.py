@@ -625,7 +625,7 @@ globalopts = [
 
 table = {
     "about": (about, [], _('thg about')),
-    "add": (add, [], _('hgtk add [FILE]...')),
+    "add": (add, [], _('thg add [FILE]...')),
     "^clone":
         (clone,
          [('U', 'noupdate', None,
@@ -641,7 +641,7 @@ table = {
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
     "bug": (bug, [], _('thg bug [MESSAGE]')),
-    "^grep|search": (grep, [], _('hgtk grep')),
+    "^grep|search": (grep, [], _('thg grep')),
     "^email":
         (email,
          [('r', 'rev', [], _('a revision to send')),],
@@ -650,9 +650,9 @@ table = {
         (log,
          [('l', 'limit', '', _('limit number of changes displayed'))],
          _('thg log [OPTIONS] [FILE]')),
-    "remove|rm": (revert, [], _('hgtk remove [FILE]...')),
-    "revert": (revert, [], _('hgtk revert [FILE]...')),
-    "forget": (forget, [], _('hgtk forget [FILE]...')),
+    "remove|rm": (revert, [], _('thg remove [FILE]...')),
+    "revert": (revert, [], _('thg revert [FILE]...')),
+    "forget": (forget, [], _('thg forget [FILE]...')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":
