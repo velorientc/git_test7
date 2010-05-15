@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\repowidget.ui'
 #
-# Created: Fri May 14 15:41:05 2010
+# Created: Sat May 15 11:32:44 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -73,7 +73,7 @@ class Ui_Form(object):
         self.textview_header.setSizePolicy(sizePolicy)
         self.textview_header.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
-        font.setPointSize(8)
+        font.setPointSize(9)
         self.textview_header.setFont(font)
         self.textview_header.setObjectName("textview_header")
         self.verticalLayout.addWidget(self.textview_header)
