@@ -213,6 +213,8 @@ class StatusWidget(QWidget):
                 status = self.repo.status(match=m, **stopts)
                 # Record all matched files as initially checked
                 for i, stat in enumerate(StatusType.preferredOrder):
+                    if stat == 'S':
+                        continue
                     val = statusTypes[stat]
                     if self.opts[val.name]:
                         d = dict([(fn, True) for fn in status[i]])
