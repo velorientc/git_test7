@@ -261,11 +261,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         table.setAlternatingRowColors(True)
 
     def setupHeaderTextview(self):
-        self.header_diff_format = QtGui.QTextCharFormat()
-        self.header_diff_format.setFont(self._font)
-        self.header_diff_format.setFontWeight(bold)
-        self.header_diff_format.setForeground(Qt.black)
-        self.header_diff_format.setBackground(Qt.gray)
+        pass
 
     def on_filled(self):
         tv = self.repoview
