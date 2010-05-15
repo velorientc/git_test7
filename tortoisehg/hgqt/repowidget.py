@@ -78,7 +78,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.setupHeaderTextview()
         connect(self.fileview, SIGNAL('fileDisplayed'),
                 self.file_displayed)
-        self.setupBranchCombo()
         self.setupModels(fromhead)
         if fromhead:
             self.startrev_entry.setText(str(fromhead))
@@ -131,9 +130,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         print "repository '%s' loaded" % reponame
         self._repodate = self._getrepomtime()
         self._loading = False
-
-    def setupBranchCombo(self, *args):
-        pass
 
     def createActions(self):
         # navigate in file viewer
@@ -355,7 +351,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self._reload_file = self.tableView_filelist.currentFile()
         self.repo = hg.repository(self.repo.ui, self.repo.root)
         self._repodate = self._getrepomtime()
-        self.setupBranchCombo()
         self.setupModels()
 
     def setRepomodel(self, branch, startrev, follow):
