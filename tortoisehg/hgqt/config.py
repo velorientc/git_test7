@@ -42,7 +42,7 @@ class HgConfig(object):
     """
     Class managing user configuration from hg standard configuration system (.hgrc)
     """
-    def __init__(self, ui, section="hgview"):
+    def __init__(self, ui, section="TortoiseHgQt"):
         self.ui = ui
         self.section = section
         self._cache = {}
