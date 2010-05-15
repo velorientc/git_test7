@@ -387,7 +387,7 @@ def forget(ui, *pats, **opts):
     qtrun(run, ui, *pats, **opts)
 
 def shellconfig(ui, *pats, **opts):
-    """Explorer extension configuration editor"""
+    """explorer extension configuration editor"""
     from tortoisehg.hgqt.shellconf import run
     qtrun(run, ui, *pats, **opts)
 
@@ -397,7 +397,7 @@ def update(ui, *pats, **opts):
     qtrun(run, ui, *pats, **opts)
 
 def log(ui, *pats, **opts):
-    """Repository Explorer (changelog viewer)"""
+    """workbench application"""
     from tortoisehg.hgqt.workbench import run
     qtrun(run, ui, *pats, **opts)
 
