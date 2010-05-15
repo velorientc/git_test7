@@ -87,7 +87,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionRefresh"/>
   </widget>
   <widget class="QToolBar" name="toolBar_edit">
    <property name="enabled">
@@ -102,6 +101,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionRefresh"/>
    <addaction name="actionBack"/>
    <addaction name="actionForward"/>
   </widget>
