@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sat May 15 19:47:55 2010
+# Created: Sat May 15 20:00:23 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -89,8 +89,10 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.toolBar_edit.addAction(self.actionRefresh)
+        self.toolBar_edit.addSeparator()
         self.toolBar_edit.addAction(self.actionBack)
         self.toolBar_edit.addAction(self.actionForward)
+        self.toolBar_edit.addSeparator()
         self.toolBar_help.addAction(self.actionHelp)
 
         self.retranslateUi(MainWindow)
