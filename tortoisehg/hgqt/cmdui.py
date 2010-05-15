@@ -255,8 +255,8 @@ class Dialog(QDialog):
     commandCanceling = pyqtSignal()
 
     def __init__(self, cmdline, parent=None):
-        super(Dialog, self).__init__(parent, Qt.WindowTitleHint or
-                                             Qt.WindowSystemMenuHint)
+        super(Dialog, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.core = Core()
         self.core.commandFinished.connect(self.command_finished)

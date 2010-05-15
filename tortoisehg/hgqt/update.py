@@ -24,8 +24,8 @@ class UpdateDialog(QDialog):
                  ) 
 
     def __init__(self, rev=None, repo=None, parent=None, opts=None):
-        super(UpdateDialog, self).__init__(parent, Qt.WindowTitleHint or
-                                                   Qt.WindowSystemMenuHint)
+        super(UpdateDialog, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self._finished = False
 
