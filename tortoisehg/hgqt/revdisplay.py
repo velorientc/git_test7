@@ -23,7 +23,7 @@ Qt = QtCore.Qt
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
-from tortoisehg.util.util import format_desc, xml_escape
+from tortoisehg.util.util import format_desc, xml_escape, tounicode
 from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.config import HgConfig
@@ -224,7 +224,7 @@ class RevDisplay(QtGui.QWidget):
         ctx = self.ctx
         buf = '<table width=100%>\n'
 
-        user = xml_escape(unicode(ctx.user(), 'utf-8', 'replace'))
+        user = xml_escape(tounicode(ctx.user()))
         buf += ('<tr>' +  labelfmt + '<td>%s</td></tr>\n') % (
                    labelwidth, 'Author', user)
 
