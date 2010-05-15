@@ -64,6 +64,7 @@ class RevDisplay(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self._message = None
+        self.ctx = None
 
         hb = QtGui.QHBoxLayout()
         hb.setMargin(0)
@@ -106,13 +107,22 @@ class RevDisplay(QtGui.QWidget):
         self.commitsignal.emit()
 
     def expand(self):
-        self._expanded = not self._expanded
+        self.setExpanded(not self._expanded)
+
+    def setExpanded(self, state):
+        state = bool(state)
+        if (state == self._expanded):
+            return
+        self._expanded = state
         if self._expanded:
             t = Qt.UpArrow
         else:
             t = Qt.DownArrow
         self._expander.setArrowType(t)
         self.refreshDisplay()
+
+    def expanded(self):
+        return self._expanded
 
     def sizeHint(self):
         return self.minimumSizeHint()
@@ -166,6 +176,9 @@ class RevDisplay(QtGui.QWidget):
         self._message.searchString(text)
 
     def refreshDisplay(self):
+        if self.ctx == None:
+            return
+
         ctx = self.ctx
         rev = ctx.rev()
 
