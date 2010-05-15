@@ -69,15 +69,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self.repoTabChanged()
 
-        # setup tables and views
-        #self.setupHeaderTextview()
-        #connect(self.fileview, SIGNAL('fileDisplayed'),
-        #        self.file_displayed)
         self.setupBranchCombo()
-        # self.setupModels(fromhead)
         if fromhead:
             self.startrev_entry.setText(str(fromhead))
-        #self.setupRevisionTable()
 
         # restore settings
         s = QtCore.QSettings()
