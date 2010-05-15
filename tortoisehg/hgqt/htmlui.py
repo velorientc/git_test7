@@ -38,7 +38,7 @@ class htmlui(ui.ui):
         msg = QtCore.Qt.escape(msg)
         msg = msg.replace('\n', '<br />')
         style = qtlib.geteffect(label)
-        return '<font style="%s">%s</font>' % (style, msg)
+        return '<span style="%s">%s</span>' % (style, msg)
 
     def popbuffer(self, labeled=False):
         b = self._buffers.pop()
