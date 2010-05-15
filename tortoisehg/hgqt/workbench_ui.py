@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sat May 15 19:46:04 2010
+# Created: Sat May 15 19:47:55 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,9 +43,6 @@ class Ui_MainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.toolBar_file = QtGui.QToolBar(MainWindow)
-        self.toolBar_file.setObjectName("toolBar_file")
-        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_file)
         self.toolBar_edit = QtGui.QToolBar(MainWindow)
         self.toolBar_edit.setEnabled(True)
         self.toolBar_edit.setObjectName("toolBar_edit")
@@ -105,7 +102,6 @@ class Ui_MainWindow(object):
         self.repoTabsWidget.setTabText(self.repoTabsWidget.indexOf(self.firstRepoTab), QtGui.QApplication.translate("MainWindow", "repo1", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
-        self.toolBar_file.setWindowTitle(QtGui.QApplication.translate("MainWindow", "File toolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_edit.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Edit toolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_treefilters.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Filter toolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_diff.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Diff toolbar", None, QtGui.QApplication.UnicodeUTF8))
