@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sun May 16 15:00:51 2010
+# Created: Sun May 16 15:17:17 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,8 +26,18 @@ class Ui_MainWindow(object):
         self.reporegistry_splitter.setOrientation(QtCore.Qt.Horizontal)
         self.reporegistry_splitter.setObjectName("reporegistry_splitter")
         self.reporegistry = RepoRegistryView(self.reporegistry_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.reporegistry.sizePolicy().hasHeightForWidth())
+        self.reporegistry.setSizePolicy(sizePolicy)
         self.reporegistry.setObjectName("reporegistry")
         self.repoTabsWidget = QtGui.QTabWidget(self.reporegistry_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.repoTabsWidget.sizePolicy().hasHeightForWidth())
+        self.repoTabsWidget.setSizePolicy(sizePolicy)
         self.repoTabsWidget.setDocumentMode(True)
         self.repoTabsWidget.setTabsClosable(True)
         self.repoTabsWidget.setMovable(True)
