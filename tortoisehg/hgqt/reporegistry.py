@@ -142,6 +142,12 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         all = self.allrepos
         all.appendChild(RepoItem(reporoot))
 
+    def getRepoItem(self, reporoot):
+        for c in self.allrepos.childs:
+            if c.rootpath == reporoot:
+                return c
+        return None
+
 
 class RepoRegistryView(QWidget):
     def __init__(self, parent=None):
@@ -166,4 +172,6 @@ class RepoRegistryView(QWidget):
         self.tview.expandToDepth(0)
 
     def addRepo(self, reporoot):
-        self.tmodel.addRepo(reporoot)
+        m = self.tmodel
+        if m.getRepoItem(reporoot) == None:
+            m.addRepo(reporoot)
