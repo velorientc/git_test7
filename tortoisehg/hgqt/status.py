@@ -13,13 +13,8 @@ from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT, QAbstractTableModel
-from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString, QSettings
-from PyQt4.QtCore import QTime
-from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
-from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QApplication
-from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
-from PyQt4.QtGui import QIcon, QPixmap, QToolButton, QDialog, QStatusBar
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
