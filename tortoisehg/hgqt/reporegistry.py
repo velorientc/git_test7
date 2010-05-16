@@ -53,9 +53,6 @@ class RepoItem(RepoTreeItem):
         RepoTreeItem.__init__(self, parent)
         self.rootpath = rootpath
 
-    def columnCount(self):
-        return 2
-
     def data(self, column):
         if column == 0:
             return QVariant(os.path.basename(self.rootpath))
@@ -68,9 +65,6 @@ class RepoGroupItem(RepoTreeItem):
     def __init__(self, name, parent=None):
         RepoTreeItem.__init__(self, parent)
         self.name = name
-
-    def columnCount(self):
-        return 2
 
     def data(self, column):
         if column == 0:
