@@ -106,7 +106,7 @@ class Core(QObject):
         self.pmon = pmon
 
     def is_running(self):
-        return self.thread.isRunning()
+        return self.thread and self.thread.isRunning()
 
     ### Private Method ###
 
