@@ -399,7 +399,7 @@ class WctxFileTree(QTreeView):
     def customContextMenuRequested(self, point):
         selrows = []
         for index in self.selectedRows():
-            path, status, mst, u = self.model().getRow(index)
+            path, status, mst, u, ext, sz = self.model().getRow(index)
             selrows.append((set(status+mst.lower()), path))
         point = self.mapToGlobal(point)
         action = wctxactions.wctxactions(self, point, self.repo, selrows)
