@@ -54,7 +54,7 @@ class QuickOpDialog(QtGui.QDialog):
         for s, val in status.statusTypes.iteritems():
             opts[val.name] = s in filetypes
 
-        stwidget = status.StatusWidget(pats, opts, self)
+        stwidget = status.StatusWidget(pats, opts, repo.root, self)
         layout.addWidget(stwidget, 1)
 
         if self.command == 'revert':
@@ -86,6 +86,13 @@ class QuickOpDialog(QtGui.QDialog):
         stwidget.restoreState(s.value('quickop/state').toByteArray())
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
+
+        self.connect(self.stwidget, QtCore.SIGNAL('errorMessage'),
+                     self.errorMessage)
+
+    def errorMessage(self, msg):
+        # TODO: Does not appear to work
+        self.cmd.pmon.set_text(msg)
 
     def keyPressEvent(self, event):
         if event.key() in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):

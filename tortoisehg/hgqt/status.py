@@ -19,13 +19,12 @@ from PyQt4.QtCore import QTime
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
 from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QApplication
 from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
-from PyQt4.QtGui import QIcon, QPixmap, QToolButton, QDialog
+from PyQt4.QtGui import QIcon, QPixmap, QToolButton, QDialog, QStatusBar
 
 # This widget can be used as the basis of the commit tool or any other
 # working copy browser.
 
 # Technical Debt
-#  emit error strings to parent status bar
 #  We need a real icon set for file status types
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
@@ -47,10 +46,16 @@ COL_SIZE = 5
 _colors = {}
 
 class StatusWidget(QWidget):
-    def __init__(self, pats, opts, parent=None):
+    '''Working copy status widget
+       SIGNALS:
+       loadComplete()
+       errorMessage(QString)
+       titleTextChanged(QString)
+    '''
+    def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
 
-        root = paths.find_root()
+        root = paths.find_root(root)
         assert(root)
         self.repo = hg.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
@@ -102,9 +107,11 @@ class StatusWidget(QWidget):
                 self.pats = []
                 self.refreshWctx()
                 cpb.setVisible(False)
+                self.emit(SIGNAL('titleTextChanged'), QString(self.getTitle()))
             cpb = QPushButton(_('Remove filter, show root'))
             vbox.addWidget(cpb)
             cpb.clicked.connect(clearPattern)
+
         self.countlbl = QLabel()
         vbox.addWidget(self.countlbl)
 
@@ -178,6 +185,14 @@ class StatusWidget(QWidget):
         self.split = split
         self.refreshWctx()
 
+    def getTitle(self):
+        if self.pats:
+            return hglib.tounicode(_('%s - status (selection filtered)') %
+                                   hglib.get_reponame(self.repo))
+        else:
+            return hglib.tounicode(_('%s - status') %
+                                   hglib.get_reponame(self.repo))
+
     def restoreState(self, data):
         return self.split.restoreState(data)
 
@@ -225,7 +240,16 @@ class StatusWidget(QWidget):
                 wctx = self.repo[None]
                 wctx.status(**stopts)
         except (OSError, IOError, util.Abort), e:
-            print e # TODO
+            err = hglib.tounicode(e)
+            self.emit(SIGNAL('errorMessage'), QString(err))
+        try:
+            wctx.dirtySubrepos = []
+            for s in wctx.substate:
+                if wctx.sub(s).dirty():
+                    wctx.dirtySubrepos.append(s)
+        except (OSError, IOError, util.Abort, error.ConfigError), e:
+            err = hglib.tounicode(e)
+            self.emit(SIGNAL('errorMessage'), QString(err))
         self.wctx = wctx
         self.updateModel()
 
@@ -251,6 +275,7 @@ class StatusWidget(QWidget):
         self.connect(self.le, SIGNAL('textEdited(QString)'), tm.setFilter)
         self.connect(tm, SIGNAL('checkToggled()'), self.updateCheckCount)
         self.updateCheckCount()
+        self.emit(SIGNAL('loadComplete()'))
 
     def updateCheckCount(self):
         text = _('Checkmarked file count: %d') % len(self.getChecked())
@@ -327,7 +352,8 @@ class StatusWidget(QWidget):
             for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            self.status_error = str(e)
+            err = hglib.tounicode(e)
+            self.emit(SIGNAL('errorMessage'), QString(err))
             return
         o, e = hu.getdata()
         diff = o or _('<em>No displayable differences</em>')
@@ -347,7 +373,8 @@ class StatusWidget(QWidget):
                                         match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            self.status_error = str(e)
+            err = hglib.tounicode(e)
+            self.emit(SIGNAL('errorMessage'), QString(err))
             return
         text += '</br><h3>'
         text += _('===== Diff to second parent %d:%s =====\n') % (
@@ -468,13 +495,9 @@ class WctxModel(QAbstractTableModel):
                 checked[c] = checked.get(c, False)
                 rows.append(mkrow(c, 'C'))
         if opts['subrepo']:
-            try:
-                for s in wctx.substate:
-                    if wctx.sub(s).dirty():
-                        checked[s] = checked.get(s, False)
-                        rows.append(mkrow(s, 'S'))
-            except (OSError, IOError, error.ConfigError), e:
-                self.status_error = str(e)
+            for s in wctx.dirtySubrepos:
+                checked[s] = checked.get(s, False)
+                rows.append(mkrow(s, 'S'))
         self.headers = ('*', _('Stat'), _('M'), _('Filename'), 
                         _('Type'), _('Size (KB)'))
         self.checked = checked
@@ -622,14 +645,25 @@ class StatusDialog(QDialog):
         layout = QVBoxLayout()
         layout.setMargin(0)
         self.setLayout(layout)
-        self.stwidget = StatusWidget(pats, opts, self)
-        layout.addWidget(self.stwidget)
+        self.stwidget = StatusWidget(pats, opts, None, self)
+        layout.addWidget(self.stwidget, 1)
+
+        self.stbar = QStatusBar(self)
+        layout.addWidget(self.stbar)
+
         s = QSettings()
         self.stwidget.restoreState(s.value('status/state').toByteArray())
         self.restoreGeometry(s.value('status/geom').toByteArray())
 
-        repo = hg.repository(ui.ui(), path=paths.find_root())
-        self.setWindowTitle('%s - status' % hglib.get_reponame(repo))
+        self.connect(self.stwidget, SIGNAL('titleTextChanged'), self.setTitle)
+        self.connect(self.stwidget, SIGNAL('errorMessage'), self.errorMessage)
+        self.setTitle(self.stwidget.getTitle())
+
+    def setTitle(self, title):
+        self.setWindowTitle(title)
+
+    def errorMessage(self, msg):
+        self.stbar.showMessage(msg)
 
     def accept(self):
         s = QSettings()
