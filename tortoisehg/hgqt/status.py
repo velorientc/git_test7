@@ -23,10 +23,9 @@ from PyQt4.QtGui import *
 #  We need a real icon set for file status types
 #  Thread rowSelected, connect to an external progress bar
 #  Show subrepos better
-#  Chunk selection
-#  tri-state checkboxes for commit
-#  Investigate folding/nesting of files
+#  Chunk selection, tri-state checkboxes for commit
 # Maybe, Maybe Not
+#  Investigate folding/nesting of files
 #  Toolbar
 #  double-click visual diffs
 
