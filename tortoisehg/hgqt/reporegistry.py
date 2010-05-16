@@ -163,5 +163,10 @@ class RepoRegistryView(QWidget):
         lay.addWidget(tv)
         tv.setModel(m)
 
+        QtCore.QTimer.singleShot(0, self.initialized)
+
+    def initialized(self):
+        self.tview.expandToDepth(0)
+
     def addRepo(self, reporoot):
         self.tmodel.addRepo(reporoot)
