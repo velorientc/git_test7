@@ -21,7 +21,6 @@ from PyQt4.QtGui import *
 
 # Technical Debt
 #  We need a real icon set for file status types
-#  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Show subrepos better
 #  Chunk selection
@@ -43,9 +42,10 @@ _colors = {}
 class StatusWidget(QWidget):
     '''Working copy status widget
        SIGNALS:
-       loadComplete()
-       errorMessage(QString)
-       titleTextChanged(QString)
+       loadBegin()                  - for progress bar
+       loadComplete()               - for progress bar
+       errorMessage(QString)        - for status bar
+       titleTextChanged(QString)    - for window title
     '''
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
@@ -61,6 +61,7 @@ class StatusWidget(QWidget):
         self.ms = {}
         self.curRow = None
         self.patchecked = {}
+        self.refreshing = None
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -213,40 +214,24 @@ class StatusWidget(QWidget):
             return super(StatusWidget, self).keyPressEvent(event)
 
     def refreshWctx(self):
+        if self.refreshing:
+            return
         self.te.clear()
-        hglib.invalidaterepo(self.repo)
+        self.fnamelabel.clear()
+        self.emit(SIGNAL('loadBegin()'))
+        self.refreshing = StatusThread(self.repo, self.pats, self.opts)
+        self.connect(self.refreshing, SIGNAL('finished'), self.reloadComplete)
+        # re-emit error messages from this object
+        self.connect(self.refreshing, SIGNAL('errorMessage'),
+                     lambda msg: self.emit(SIGNAL('errorMessage'), msg))
+        self.refreshing.start()
+
+    def reloadComplete(self, wctx):
         self.ms = merge.mergestate(self.repo)
-        extract = lambda x, y: dict(zip(x, map(y.get, x)))
-        stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
-        try:
-            if self.pats:
-                m = cmdutil.match(self.repo, self.pats)
-                status = self.repo.status(match=m, **stopts)
-                # Record all matched files as initially checked
-                for i, stat in enumerate(StatusType.preferredOrder):
-                    if stat == 'S':
-                        continue
-                    val = statusTypes[stat]
-                    if self.opts[val.name]:
-                        d = dict([(fn, True) for fn in status[i]])
-                        self.patchecked.update(d)
-                wctx = context.workingctx(self.repo, changes=status)
-            else:
-                wctx = self.repo[None]
-                wctx.status(**stopts)
-        except (OSError, IOError, util.Abort), e:
-            err = hglib.tounicode(e)
-            self.emit(SIGNAL('errorMessage'), QString(err))
-        try:
-            wctx.dirtySubrepos = []
-            for s in wctx.substate:
-                if wctx.sub(s).dirty():
-                    wctx.dirtySubrepos.append(s)
-        except (OSError, IOError, util.Abort, error.ConfigError), e:
-            err = hglib.tounicode(e)
-            self.emit(SIGNAL('errorMessage'), QString(err))
         self.wctx = wctx
         self.updateModel()
+        self.emit(SIGNAL('loadComplete()'))
+        self.refreshing = None
 
     def updateModel(self):
         self.tv.setSortingEnabled(False)
@@ -270,7 +255,6 @@ class StatusWidget(QWidget):
         self.connect(self.le, SIGNAL('textEdited(QString)'), tm.setFilter)
         self.connect(tm, SIGNAL('checkToggled()'), self.updateCheckCount)
         self.updateCheckCount()
-        self.emit(SIGNAL('loadComplete()'))
 
     def updateCheckCount(self):
         text = _('Checkmarked file count: %d') % len(self.getChecked())
@@ -378,6 +362,48 @@ class StatusWidget(QWidget):
         o, e = hu.getdata()
         diff = o or _('<em>No displayable differences</em>')
         self.te.setHtml(text + diff)
+
+
+class StatusThread(QThread):
+    '''Background thread for generating a workingctx'''
+    def __init__(self, repo, pats, opts, parent=None):
+        super(StatusThread, self).__init__()
+        self.repo = repo
+        self.pats = pats
+        self.opts = opts
+
+    def run(self):
+        hglib.invalidaterepo(self.repo)
+        extract = lambda x, y: dict(zip(x, map(y.get, x)))
+        stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
+        try:
+            if self.pats:
+                m = cmdutil.match(self.repo, self.pats)
+                status = self.repo.status(match=m, **stopts)
+                # Record all matched files as initially checked
+                for i, stat in enumerate(StatusType.preferredOrder):
+                    if stat == 'S':
+                        continue
+                    val = statusTypes[stat]
+                    if self.opts[val.name]:
+                        d = dict([(fn, True) for fn in status[i]])
+                        self.patchecked.update(d)
+                wctx = context.workingctx(self.repo, changes=status)
+            else:
+                wctx = self.repo[None]
+                wctx.status(**stopts)
+        except (OSError, IOError, util.Abort), e:
+            err = hglib.tounicode(e)
+            self.emit(SIGNAL('errorMessage'), QString(err))
+        try:
+            wctx.dirtySubrepos = []
+            for s in wctx.substate:
+                if wctx.sub(s).dirty():
+                    wctx.dirtySubrepos.append(s)
+        except (OSError, IOError, util.Abort, error.ConfigError), e:
+            err = hglib.tounicode(e)
+            self.emit(SIGNAL('errorMessage'), QString(err))
+        self.emit(SIGNAL('finished'), wctx)
 
 
 class WctxFileTree(QTreeView):
