@@ -7,7 +7,8 @@
 
 import os
 
-from mercurial import ui, hg, util, patch, cmdutil, error, mdiff, context, merge
+from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
+from mercurial import context, merge
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
