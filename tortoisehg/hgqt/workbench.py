@@ -452,11 +452,21 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
 
+        for n in self.splitternames:
+            s.setValue(wb + n, getattr(self, n).saveState())
+
     def restoreSettings(self):
         s = QtCore.QSettings()
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
+
+        self.splitternames = []
+        sn = ('reporegistry', )
+        for n in sn:
+            n += '_splitter'
+            self.splitternames.append(n)
+            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
 
     def closeEvent(self, event):
         if not self.okToContinue():

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sun May 16 12:30:17 2010
+# Created: Sun May 16 15:00:51 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,12 +22,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setMargin(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.reporegistrysplitter = QtGui.QSplitter(self.centralwidget)
-        self.reporegistrysplitter.setOrientation(QtCore.Qt.Horizontal)
-        self.reporegistrysplitter.setObjectName("reporegistrysplitter")
-        self.reporegistry = RepoRegistryView(self.reporegistrysplitter)
+        self.reporegistry_splitter = QtGui.QSplitter(self.centralwidget)
+        self.reporegistry_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.reporegistry_splitter.setObjectName("reporegistry_splitter")
+        self.reporegistry = RepoRegistryView(self.reporegistry_splitter)
         self.reporegistry.setObjectName("reporegistry")
-        self.repoTabsWidget = QtGui.QTabWidget(self.reporegistrysplitter)
+        self.repoTabsWidget = QtGui.QTabWidget(self.reporegistry_splitter)
         self.repoTabsWidget.setDocumentMode(True)
         self.repoTabsWidget.setTabsClosable(True)
         self.repoTabsWidget.setMovable(True)
@@ -35,7 +35,7 @@ class Ui_MainWindow(object):
         self.firstRepoTab = QtGui.QWidget()
         self.firstRepoTab.setObjectName("firstRepoTab")
         self.repoTabsWidget.addTab(self.firstRepoTab, "")
-        self.horizontalLayout.addWidget(self.reporegistrysplitter)
+        self.horizontalLayout.addWidget(self.reporegistry_splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 671, 19))

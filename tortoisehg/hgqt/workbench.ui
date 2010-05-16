@@ -26,7 +26,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QSplitter" name="reporegistrysplitter">
+     <widget class="QSplitter" name="reporegistry_splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
