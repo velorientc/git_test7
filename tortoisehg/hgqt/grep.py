@@ -12,7 +12,7 @@ from mercurial import ui, hg, error
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib
 from tortoisehg.util import paths, hglib
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

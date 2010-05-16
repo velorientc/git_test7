@@ -11,7 +11,7 @@ import subprocess
 from mercurial import util, error, merge, commands
 from tortoisehg.hgqt import qtlib, htmlui, visdiff
 from tortoisehg.util import hglib, shlib
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import Qt, SIGNAL
 from PyQt4.QtGui import QAction, QMenu, QMessageBox, QFileDialog

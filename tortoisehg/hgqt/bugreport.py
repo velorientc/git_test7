@@ -13,7 +13,7 @@ from PyQt4.QtCore import SIGNAL, SLOT
 
 from mercurial import extensions
 from tortoisehg.util import hglib, version
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
 class BugReport(QtGui.QDialog):

@@ -16,7 +16,7 @@ import os, sys, urllib2
 from PyQt4.QtCore import PYQT_VERSION_STR, QT_VERSION_STR
 from PyQt4.QtGui import QIcon, QPixmap, QDialog
 
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import version, hglib, shlib
 
 def make_version(tuple):

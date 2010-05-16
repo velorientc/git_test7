@@ -11,7 +11,7 @@ from mercurial import hg, ui, cmdutil, util
 
 from PyQt4 import QtCore, QtGui
 
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt import qtlib, status, cmdui

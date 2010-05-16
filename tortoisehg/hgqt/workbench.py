@@ -20,7 +20,7 @@ from mercurial.error import RepoError
 from tortoisehg.util.util import tounicode
 from tortoisehg.util.util import rootpath, find_repository
 
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 
 from tortoisehg.hgqt.decorators import timeit
 

@@ -10,7 +10,7 @@ import os
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff, context, merge
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT, QAbstractTableModel
 from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString, QSettings

@@ -15,7 +15,7 @@ import re
 
 from mercurial import hg, cmdutil, util, error, match, copies
 
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt import qtlib
 

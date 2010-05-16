@@ -23,7 +23,7 @@ from PyQt4 import QtCore, QtGui
 import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
-from tortoisehg.util.i18n import agettext as _
+from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import qtlib

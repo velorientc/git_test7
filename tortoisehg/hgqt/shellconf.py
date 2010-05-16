@@ -11,7 +11,7 @@ import sys
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import SIGNAL, SLOT
 
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import menuthg
 
 from _winreg import (HKEY_CURRENT_USER, REG_SZ, REG_DWORD,

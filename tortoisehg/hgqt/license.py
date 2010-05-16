@@ -13,7 +13,7 @@ TortoiseHg License dialog - PyQt4 version
 
 from PyQt4.QtGui import QDialog, QIcon, QPixmap
 
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 
 try:
     from tortoisehg.hgqt.license_ui import Ui_LicenseDialog
