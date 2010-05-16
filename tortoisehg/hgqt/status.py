@@ -172,7 +172,7 @@ class StatusWidget(QWidget):
         vbox.addWidget(self.te)
 
         self.split = split
-        self.refreshWctx()
+        QTimer.singleShot(0, self.refreshWctx)
 
     def getTitle(self):
         if self.pats:
