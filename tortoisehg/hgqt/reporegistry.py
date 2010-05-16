@@ -10,7 +10,7 @@ import os
 from PyQt4 import QtCore, QtGui
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT
-from PyQt4.QtCore import QModelIndex
+from PyQt4.QtCore import QModelIndex, QString
 
 from PyQt4.QtGui import QWidget, QVBoxLayout
 
@@ -19,8 +19,7 @@ from tortoisehg.hgqt.i18n import _
 connect = QtCore.QObject.connect
 
 class RepoTreeItem:
-    def __init__(self, name, parent=None):
-        self.name = name
+    def __init__(self, parent=None):
         self._parent = parent
         self.childs = []
         self._row = 0
@@ -37,10 +36,10 @@ class RepoTreeItem:
         return len(self.childs)
 
     def columnCount(self):
-        return 1
+        return 2
 
     def data(self, column):
-        return QVariant(self.name)
+        return QVariant()
 
     def row(self):
         return self._row
@@ -49,13 +48,43 @@ class RepoTreeItem:
         return self._parent
 
 
+class RepoItem(RepoTreeItem):
+    def __init__(self, rootpath, parent=None):
+        RepoTreeItem.__init__(self, parent)
+        self.rootpath = rootpath
+
+    def columnCount(self):
+        return 2
+
+    def data(self, column):
+        if column == 0:
+            return QVariant(os.path.basename(self.rootpath))
+        elif column == 1:
+            return QVariant(self.rootpath)
+        return QVariant()
+
+
+class RepoGroupItem(RepoTreeItem):
+    def __init__(self, name, parent=None):
+        RepoTreeItem.__init__(self, parent)
+        self.name = name
+
+    def columnCount(self):
+        return 2
+
+    def data(self, column):
+        if column == 0:
+            return QVariant(self.name)
+        return QVariant()
+
+
 class RepoTreeModel(QtCore.QAbstractItemModel):
     def __init__(self, parent=None):
         QtCore.QAbstractItemModel.__init__(self, parent)
 
-        self.rootItem = root = RepoTreeItem('')
+        self.rootItem = root = RepoTreeItem()
 
-        self.allrepos = all = RepoTreeItem(_('All Repositories'))
+        self.allrepos = all = RepoGroupItem(_('All Repositories'))
         root.appendChild(all)
 
     def index(self, row, column, parent):
@@ -103,15 +132,22 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         item = index.internalPointer()
         return item.data(index.column())
 
+    def headerData(self, section, orientation, role):
+        if role == Qt.DisplayRole:
+            if orientation == Qt.Horizontal:
+                if section == 1:
+                    return QString(_('Path'))
+        return QVariant()
+
     def flags(self, index):
         if not index.isValid():
             return 0
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def addRepo(self, reporoot):
-        reponame = os.path.basename(reporoot)
         all = self.allrepos
-        all.appendChild(RepoTreeItem(reponame))
+        all.appendChild(RepoItem(reporoot))
+
 
 class RepoRegistryView(QWidget):
     def __init__(self, parent=None):
@@ -126,7 +162,6 @@ class RepoRegistryView(QWidget):
         self.tview = tv = QtGui.QTreeView()
         lay.addWidget(tv)
         tv.setModel(m)
-        tv.setHeaderHidden(True)
 
     def addRepo(self, reporoot):
         self.tmodel.addRepo(reporoot)
