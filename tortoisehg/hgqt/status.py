@@ -8,7 +8,7 @@
 import os
 
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
-from mercurial import context, merge
+from mercurial import context, merge, commands
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
@@ -22,7 +22,6 @@ from PyQt4.QtGui import *
 # Technical Debt
 #  We need a real icon set for file status types
 #  Thread rowSelected, connect to an external progress bar
-#  Show subrepos better
 #  Chunk selection, tri-state checkboxes for commit
 # Maybe, Maybe Not
 #  Investigate folding/nesting of files
@@ -277,6 +276,7 @@ class StatusWidget(QWidget):
         wfile = util.pconvert(path)
         self.fnamelabel.setText(statusMessage(status, mst, upath))
         showanyway = self.override.isChecked()
+        hu = htmlui.htmlui()
 
         if status in '?I':
             if showanyway:
@@ -307,6 +307,20 @@ class StatusWidget(QWidget):
                 self.te.setHtml(diff)
                 self.override.setEnabled(True)
             return
+        elif status in 'S':
+            if showanyway:
+                try:
+                    sroot = self.repo.wjoin(path)
+                    srepo = hg.repository(hu, path=sroot)
+                    commands.status(hu, srepo)
+                    diff = hu.getdata()[0]
+                except error.RepoError:
+                    diff = _('<b>Not an hg subrepo, not previewable</b>')
+            else:
+                diff = _('<b>Subrepository status not displayed</b>')
+            self.te.setHtml(diff)
+            self.override.setEnabled(True)
+            return
 
         warnings = chunkselect.check_max_diff(self.wctx, wfile)
         if warnings and not showanyway:
@@ -318,7 +332,6 @@ class StatusWidget(QWidget):
         self.override.setEnabled(False)
 
         # Generate diffs to first parent
-        hu = htmlui.htmlui()
         m = cmdutil.matchfiles(self.repo, [wfile])
         try:
             for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
