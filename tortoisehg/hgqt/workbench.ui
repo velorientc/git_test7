@@ -26,23 +26,29 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="repoTabsWidget">
-      <property name="currentIndex">
-       <number>0</number>
+     <widget class="QSplitter" name="reporegistrysplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <property name="documentMode">
-       <bool>true</bool>
-      </property>
-      <property name="tabsClosable">
-       <bool>true</bool>
-      </property>
-      <property name="movable">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="firstRepoTab">
-       <attribute name="title">
-        <string>repo1</string>
-       </attribute>
+      <widget class="RepoRegistryView" name="reporegistry" native="true"/>
+      <widget class="QTabWidget" name="repoTabsWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <property name="documentMode">
+        <bool>true</bool>
+       </property>
+       <property name="tabsClosable">
+        <bool>true</bool>
+       </property>
+       <property name="movable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="firstRepoTab">
+        <attribute name="title">
+         <string>repo1</string>
+        </attribute>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -197,6 +203,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RepoRegistryView</class>
+   <extends>QWidget</extends>
+   <header>reporegistry.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="workbench.qrc"/>
  </resources>
