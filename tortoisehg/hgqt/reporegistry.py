@@ -124,3 +124,4 @@ class RepoRegistryView(QWidget):
         self.tview = tv = QtGui.QTreeView()
         lay.addWidget(tv)
         tv.setModel(m)
+        tv.setHeaderHidden(True)
