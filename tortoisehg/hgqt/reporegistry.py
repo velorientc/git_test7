@@ -162,7 +162,9 @@ class RepoRegistryView(QWidget):
         self.tview = tv = QtGui.QTreeView()
         lay.addWidget(tv)
         tv.setModel(m)
+
         tv.setIndentation(10)
+        tv.setFirstColumnSpanned(0, QModelIndex(), True)
 
         QtCore.QTimer.singleShot(0, self.initialized)
 
