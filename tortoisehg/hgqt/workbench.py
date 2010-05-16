@@ -130,6 +130,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
+        self.reporegistry.addRepo(repo.root)
 
     def showMessage(self, msg):
         self.statusBar().showMessage(msg)

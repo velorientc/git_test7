@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import os
+
 from PyQt4 import QtCore, QtGui
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT
@@ -56,10 +58,6 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         self.allrepos = all = RepoTreeItem(_('All Repositories'))
         root.appendChild(all)
 
-        all.appendChild(RepoTreeItem('dummy-repo-A'))
-        all.appendChild(RepoTreeItem('dummy-repo-B'))
-        all.appendChild(RepoTreeItem('dummy-repo-C'))
-
     def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
@@ -110,6 +108,10 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
             return 0
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
+    def addRepo(self, reporoot):
+        reponame = os.path.basename(reporoot)
+        all = self.allrepos
+        all.appendChild(RepoTreeItem(reponame))
 
 class RepoRegistryView(QWidget):
     def __init__(self, parent=None):
@@ -125,3 +127,6 @@ class RepoRegistryView(QWidget):
         lay.addWidget(tv)
         tv.setModel(m)
         tv.setHeaderHidden(True)
+
+    def addRepo(self, reporoot):
+        self.tmodel.addRepo(reporoot)
