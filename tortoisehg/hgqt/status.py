@@ -14,6 +14,7 @@ from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT, QAbstractTableModel
 from PyQt4.QtCore import QObject, QEvent, QMimeData, QUrl, QString, QSettings
+from PyQt4.QtCore import QTime
 from PyQt4.QtGui import QWidget, QVBoxLayout, QSplitter, QTreeView, QLineEdit
 from PyQt4.QtGui import QTextEdit, QFont, QColor, QDrag, QApplication
 from PyQt4.QtGui import QFrame, QHBoxLayout, QLabel, QPushButton, QMenu
@@ -393,12 +394,17 @@ class WctxFileTree(QTreeView):
 
     def mousePressEvent(self, event):
         self.pressPos = event.pos()
+        self.pressTime = QTime.currentTime()
         return QTreeView.mousePressEvent(self, event)
 
     def mouseMoveEvent(self, event):
-        if (event.pos() - self.pressPos).manhattanLength() > \
-                QApplication.startDragDistance():
-            self.dragObject()
+        d = event.pos() - self.pressPos
+        if d.manhattanLength() < QApplication.startDragDistance():
+            return
+        elapsed = self.pressTime.msecsTo(QTime.currentTime())
+        if elapsed < QApplication.startDragTime():
+            return
+        self.dragObject()
         return QTreeView.mouseMoveEvent(self, event)
 
     def customContextMenuRequested(self, point):
