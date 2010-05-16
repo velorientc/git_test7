@@ -25,8 +25,6 @@ from PyQt4.QtGui import QIcon, QPixmap, QToolButton, QDialog
 # Technical Debt
 #  emit error strings to parent status bar
 #  We need a real icon set for file status types
-#  Add some initial drag distance before starting QDrag
-#   (it interferes with selection the way it is now)
 #  Thread refreshWctx, connect to an external progress bar
 #  Thread rowSelected, connect to an external progress bar
 #  Show subrepos better
@@ -393,8 +391,15 @@ class WctxFileTree(QTreeView):
             d.setMimeData(m)
             d.start(Qt.CopyAction)
 
+    def mousePressEvent(self, event):
+        self.pressPos = event.pos()
+        return QTreeView.mousePressEvent(self, event)
+
     def mouseMoveEvent(self, event):
-        self.dragObject()
+        dist = event.pos() - self.pressPos
+        if abs(dist.x()) > 5 or abs(dist.y()) > 2:
+            self.dragObject()
+        return QTreeView.mouseMoveEvent(self, event)
 
     def customContextMenuRequested(self, point):
         selrows = []
