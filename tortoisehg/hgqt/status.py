@@ -171,13 +171,6 @@ class StatusWidget(QWidget):
         vbox.addLayout(hbox)
         vbox.addWidget(self.te)
 
-        if not parent:
-            self.setWindowTitle(_('TortoiseHg Status'))
-            self.resize(800, 500)
-            # 75% for diff pane
-            split.setStretchFactor(0, 1)
-            split.setStretchFactor(1, 2)
-
         self.split = split
         self.refreshWctx()
 
