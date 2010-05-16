@@ -71,6 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING.txt doc/build/html/
 %{_bindir}/hgtk
 %{python_sitelib}/tortoisehg/
+%{python_sitelib}/tortoisehg-*.egg-info
 %{_datadir}/pixmaps/tortoisehg/
 
 # /usr/share/zsh/site-functions/ is owned by zsh package which we don't want to
