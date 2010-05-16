@@ -219,9 +219,10 @@ class StatusWidget(QWidget):
                      lambda msg: self.emit(SIGNAL('errorMessage'), msg))
         self.refreshing.start()
 
-    def reloadComplete(self, wctx):
+    def reloadComplete(self, wctx, patchecked):
         self.ms = merge.mergestate(self.repo)
         self.wctx = wctx
+        self.patchecked = patchecked.copy()
         self.updateModel()
         self.emit(SIGNAL('loadComplete()'))
         self.refreshing = None
@@ -369,6 +370,7 @@ class StatusThread(QThread):
         hglib.invalidaterepo(self.repo)
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
         stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
+        patchecked = {}
         try:
             if self.pats:
                 m = cmdutil.match(self.repo, self.pats)
@@ -380,7 +382,7 @@ class StatusThread(QThread):
                     val = statusTypes[stat]
                     if self.opts[val.name]:
                         d = dict([(fn, True) for fn in status[i]])
-                        self.patchecked.update(d)
+                        patchecked.update(d)
                 wctx = context.workingctx(self.repo, changes=status)
             else:
                 wctx = self.repo[None]
@@ -396,7 +398,7 @@ class StatusThread(QThread):
         except (OSError, IOError, util.Abort, error.ConfigError), e:
             err = hglib.tounicode(e)
             self.emit(SIGNAL('errorMessage'), QString(err))
-        self.emit(SIGNAL('finished'), wctx)
+        self.emit(SIGNAL('finished'), wctx, patchecked)
 
 
 class WctxFileTree(QTreeView):
