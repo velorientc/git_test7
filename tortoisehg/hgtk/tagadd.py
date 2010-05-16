@@ -80,6 +80,8 @@ class TagAddDialog(gtk.Dialog):
         self.replacechk.connect('toggled',
                                   lambda *a: self.update_sensitives())
         self.engchk = gtk.CheckButton(_('Use English commit message'))
+        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+        self.engchk.set_active(engmsg)
         table.add_row(self.localchk)
         table.add_row(self.replacechk)
         table.add_row(self.engchk)
@@ -162,15 +164,9 @@ class TagAddDialog(gtk.Dialog):
         expanded = self.settings.get_value('expanded', False, True)
         self.expander.set_property('expanded', expanded)
 
-        checked = self.settings.get_value('english', False, True)
-        self.engchk.set_active(checked)
-
     def store_settings(self):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
-
-        checked = self.engchk.get_active()
-        self.settings.set_value('english', checked)
 
         self.settings.write()
 
