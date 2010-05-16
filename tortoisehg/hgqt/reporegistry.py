@@ -166,12 +166,14 @@ class RepoRegistryView(QWidget):
         tv.setIndentation(10)
         tv.setFirstColumnSpanned(0, QModelIndex(), True)
 
-        QtCore.QTimer.singleShot(0, self.initialized)
+        QtCore.QTimer.singleShot(0, self.expand)
 
-    def initialized(self):
+    def expand(self):
         self.tview.expandToDepth(0)
 
     def addRepo(self, reporoot):
         m = self.tmodel
         if m.getRepoItem(reporoot) == None:
             m.addRepo(reporoot)
+            self.tview.reset()
+            QtCore.QTimer.singleShot(0, self.expand)
