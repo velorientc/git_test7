@@ -68,10 +68,11 @@ class EmailDialog(QDialog):
             except error.Abort:
                 return ''
 
-        # TODO: ui.config's encoding?
-        self._qui.to_edit.setText(self._ui.config('email', 'to', ''))
-        self._qui.cc_edit.setText(self._ui.config('email', 'cc', ''))
-        self._qui.from_edit.setText(getfromaddr(self._ui))
+        self._qui.to_edit.setText(
+            hglib.tounicode(self._ui.config('email', 'to', '')))
+        self._qui.cc_edit.setText(
+            hglib.tounicode(self._ui.config('email', 'cc', '')))
+        self._qui.from_edit.setText(hglib.tounicode(getfromaddr(self._ui)))
 
         self.setdiffformat(self._ui.configbool('diff', 'git') and 'git' or 'hg')
 
