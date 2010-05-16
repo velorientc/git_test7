@@ -400,10 +400,10 @@ class WctxFileTree(QTreeView):
     def mouseMoveEvent(self, event):
         d = event.pos() - self.pressPos
         if d.manhattanLength() < QApplication.startDragDistance():
-            return
+            return QTreeView.mouseMoveEvent(self, event)
         elapsed = self.pressTime.msecsTo(QTime.currentTime())
         if elapsed < QApplication.startDragTime():
-            return
+            return QTreeView.mouseMoveEvent(self, event)
         self.dragObject()
         return QTreeView.mouseMoveEvent(self, event)
 
