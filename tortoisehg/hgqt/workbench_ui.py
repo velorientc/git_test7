@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sun May 16 15:17:17 2010
+# Created: Tue May 18 01:00:57 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -54,6 +54,8 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName("menuFile")
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
+        self.menuView = QtGui.QMenu(self.menubar)
+        self.menuView.setObjectName("menuView")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -95,13 +97,18 @@ class Ui_MainWindow(object):
         icon2.addPixmap(QtGui.QPixmap(":/icons/forward.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionForward.setIcon(icon2)
         self.actionForward.setObjectName("actionForward")
+        self.actionShowPaths = QtGui.QAction(MainWindow)
+        self.actionShowPaths.setCheckable(True)
+        self.actionShowPaths.setObjectName("actionShowPaths")
         self.menuFile.addAction(self.actionOpen_repository)
         self.menuFile.addAction(self.actionRefresh)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionHelp)
+        self.menuView.addAction(self.actionShowPaths)
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.toolBar_edit.addAction(self.actionRefresh)
         self.toolBar_edit.addSeparator()
@@ -119,6 +126,7 @@ class Ui_MainWindow(object):
         self.repoTabsWidget.setTabText(self.repoTabsWidget.indexOf(self.firstRepoTab), QtGui.QApplication.translate("MainWindow", "repo1", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_edit.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Edit toolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_treefilters.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Filter toolbar", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar_diff.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Diff toolbar", None, QtGui.QApplication.UnicodeUTF8))
@@ -135,6 +143,7 @@ class Ui_MainWindow(object):
         self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.actionBack.setText(QtGui.QApplication.translate("MainWindow", "Back", None, QtGui.QApplication.UnicodeUTF8))
         self.actionForward.setText(QtGui.QApplication.translate("MainWindow", "Forward", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionShowPaths.setText(QtGui.QApplication.translate("MainWindow", "Show paths", None, QtGui.QApplication.UnicodeUTF8))
 
 from reporegistry import RepoRegistryView
 import workbench_rc

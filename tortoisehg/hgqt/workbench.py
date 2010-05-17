@@ -255,6 +255,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         connect(self.actionQuit, SIGNAL('triggered()'), self.close)
         connect(self.actionBack, SIGNAL('triggered()'), self.back)
         connect(self.actionForward, SIGNAL('triggered()'), self.forward)
+        connect(self.actionShowPaths, SIGNAL('toggled(bool)'), self.actionShowPathsToggled)
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
 
@@ -351,6 +352,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         connect(self.actionOpen_repository, SIGNAL('triggered()'),
                 self.openRepository)
+
+    def actionShowPathsToggled(self, show):
+        self.reporegistry.showPaths(show)
 
     def back(self):
         w = self.repoTabsWidget.currentWidget()

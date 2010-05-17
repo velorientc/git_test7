@@ -241,6 +241,7 @@ class RepoRegistryView(QWidget):
         tv.setIndentation(10)
         tv.setFirstColumnSpanned(0, QModelIndex(), True)
 
+        self.tview.setColumnHidden(1, True)
         QtCore.QTimer.singleShot(0, self.expand)
 
     def expand(self):
@@ -253,3 +254,9 @@ class RepoRegistryView(QWidget):
 
     def openrepo(self, path):
         self.openRepoSignal.emit(path)
+
+    def showPaths(self, show):
+        self.tview.setColumnHidden(1, not show)
+        if show:
+            self.tview.resizeColumnToContents(0)
+            self.tview.resizeColumnToContents(1)
