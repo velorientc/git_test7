@@ -35,6 +35,7 @@ class SearchWidget(QWidget):
     def __init__(self, root=None, parent=None):
         QWidget.__init__(self, parent)
 
+        self.thread = None
         root = paths.find_root(root)
         repo = hg.repository(ui.ui(), path=root)
         assert(repo)
@@ -84,15 +85,24 @@ class SearchWidget(QWidget):
 
     def searchActivated(self):
         'User pressed [Return] in QLineEdit'
+        if self.thread and self.thread.isRunning():
+            return
+
         model = self.tv.model()
         model.reset()
-        regexp = hglib.fromunicode(self.le.text())
-        icase = self.chk.isChecked()
-        if not regexp:
+        pattern = hglib.fromunicode(self.le.text())
+        if not pattern:
             return
-        self.le.selectAll()
-        searchre = re.compile(regexp, icase and re.I or 0)
+        try:
+            icase = self.chk.isChecked()
+            regexp = re.compile(pattern, icase and re.I or 0)
+        except Exception, inst:
+            msg = _('grep: invalid match pattern: %s\n') % inst
+            self.emit(SIGNAL('errorMessage'), msg)
+            print inst
+            return
 
+        self.le.selectAll()
         mode = self.cb.currentIndex()
         if mode == 0:
             ctx = self.repo[None]
@@ -107,21 +117,44 @@ class SearchWidget(QWidget):
 
         self.tv.setColumnHidden(COL_REVISION, True)
         self.tv.setColumnHidden(COL_USER, True)
+        self.le.setEnabled(False)
+
+        self.thread = CtxSearchThread(self.repo, regexp, ctx)
+        self.connect(self.thread, SIGNAL('finished'),
+                     lambda: self.le.setEnabled(True))
+        self.connect(self.thread, SIGNAL('matchedRow'),
+                     lambda row: model.appendRow(*row))
+        self.thread.start()
+
+
+
+class CtxSearchThread(QThread):
+    '''Background thread for searching a changectx'''
+    def __init__(self, repo, regexp, ctx, parent=None):
+        super(CtxSearchThread, self).__init__()
+        self.repo = repo
+        self.regexp = regexp
+        self.ctx = ctx
+
+    def run(self):
         hu = htmlui.htmlui()
         # searching len(ctx.manifest()) files
-        for wfile in ctx:                     # walk manifest
-            data = ctx[wfile].data()          # load file data
+        for wfile in self.ctx:                # walk manifest
+            data = self.ctx[wfile].data()     # load file data
             if '\0' in data:
                 continue
             for i, line in enumerate(data.splitlines()):
                 pos = 0
-                for m in searchre.finditer(line): # perform regexp
+                for m in self.regexp.finditer(line): # perform regexp
                     hu.write(line[pos:m.start()])
                     hu.write(line[m.start():m.end()], label='grep.match')
                     pos = m.end()
                 if pos:
                     hu.write(line[pos:])
-                    model.appendRow(wfile, i, None, None, hu.getdata()[0])
+                    row = [wfile, i, None, None, hu.getdata()[0]]
+                    self.emit(SIGNAL('matchedRow'), row)
+        self.emit(SIGNAL('finished'))
+
 
 COL_PATH     = 0
 COL_LINE     = 1
