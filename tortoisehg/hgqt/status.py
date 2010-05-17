@@ -315,11 +315,21 @@ class StatusWidget(QWidget):
                     srev = self.wctx.substate.get(path, subrepo.nullstate)[1]
                     sactual = srepo['.'].hex()
                     commands.status(hu, srepo)
-                    diff = hu.getdata()[0]
+                    out = [hu.getdata()[0]]
                     if srev != sactual:
-                        diff += '<br>'
-                        diff += _('revision changed from %s to %s') % (
-                                srev[:12], sactual[:12])
+                        out.append('<b>')
+                        out.append(_('revision changed from:'))
+                        out.append('</b><br>')
+                        opts = {'date':None, 'user':None, 'rev':[srev]}
+                        commands.log(hu, srepo, **opts)
+                        out.append(hu.getdata()[0])
+                        out.append('<b>')
+                        out.append(_('to:'))
+                        out.append('</b><br>')
+                        opts['rev'] = [sactual]
+                        commands.log(hu, srepo, **opts)
+                        out.append(hu.getdata()[0])
+                        diff = ''.join(out)
                 except error.RepoError:
                     diff = _('<b>Not an hg subrepo, not previewable</b>')
             else:
