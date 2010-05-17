@@ -154,11 +154,15 @@ class HistorySearchThread(QThread):
                 else:
                     self.fullmsg += msg
                 if self.fullmsg.endswith('\0'):
-                    fname, line, rev, addremove, user, text = \
-                            self.fullmsg.split('\0', 5) 
-                    text = '<span>%s %s</span>' % (addremove, text[:-1])
-                    row = [fname, line, rev, user, text]
-                    self.obj.emit(SIGNAL('matchedRow'), row)
+                    try:
+                        fname, line, rev, addremove, user, text = \
+                                self.fullmsg.split('\0', 5) 
+                        text = '<b>%s</b> <span>%s</span>' % (
+                                addremove, text[:-1])
+                        row = [fname, line, rev, user, text]
+                        self.obj.emit(SIGNAL('matchedRow'), row)
+                    except ValueError:
+                        pass
                     self.fullmsg = ''
 
             def label(self, msg, label):
