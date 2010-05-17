@@ -40,15 +40,17 @@ def snapshot(repo, files, ctx):
         dirname = '%s.%s' % (dirname, str(ctx))
     base = os.path.join(qtlib.gettempdir(), dirname)
     fns_and_mtime = []
-    if os.path.exists(base):
-        return base, fns_and_mtime
-    os.mkdir(base)
+    if not os.path.exists(base):
+        os.mkdir(base)
     for fn in files:
         wfn = util.pconvert(fn)
         if not wfn in ctx:
             # File doesn't exist; could be a bogus modify
             continue
         dest = os.path.join(base, wfn)
+        if os.path.exists(dest):
+            # File has already been snapshot
+            continue
         destdir = os.path.dirname(dest)
         if not os.path.isdir(destdir):
             os.makedirs(destdir)
