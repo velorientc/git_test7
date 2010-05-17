@@ -120,6 +120,16 @@ def getlivebranch(repo):
         lives.append(branch.replace('\0', ''))
     return lives
 
+def getlivebheads(repo):
+    '''return a list of revs of live branch heads'''
+    bheads = []
+    for b, ls in repo.branchmap().iteritems():
+        bheads += [repo[x] for x in ls]
+    heads = [x.rev() for x in bheads if not x.extra().get('close')]
+    heads.sort()
+    heads.reverse()
+    return heads
+
 _hidetags = None
 def gethidetags(ui):
     global _hidetags
