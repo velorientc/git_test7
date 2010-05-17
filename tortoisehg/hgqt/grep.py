@@ -145,18 +145,17 @@ class HistorySearchThread(QThread):
                 self.fullmsg = ''
 
             def write(self, msg, *args, **opts):
-                if msg.endswith('\n'):
+                if opts.get('label'):
+                    self.fullmsg += self.label(msg, opts['label'])
+                else:
                     self.fullmsg += msg
+                if self.fullmsg.endswith('\0'):
                     fname, line, rev, addremove, user, text = \
-                            self.fullmsg.split(':', 5) 
-                    row = [fname, line, rev, user, addremove + ' ' + text]
+                            self.fullmsg.split('\0', 5) 
+                    text = '<span>%s %s</span>' % (addremove, text[:-1])
+                    row = [fname, line, rev, user, text]
                     self.obj.emit(SIGNAL('matchedRow'), row)
                     self.fullmsg = ''
-                else:
-                    if opts.get('label'):
-                        self.fullmsg += self.label(msg, opts['label'])
-                    else:
-                        self.fullmsg += msg
 
             def label(self, msg, label):
                 msg = hglib.tounicode(msg)
@@ -167,7 +166,7 @@ class HistorySearchThread(QThread):
 
         # hg grep [-i] -afn regexp
         opts = {'all':True, 'user':True, 'follow':True, 'rev':[],
-                'line_number':True, 'print0':False,
+                'line_number':True, 'print0':True,
                 'ignore_case':self.icase,
                 }
         u = incrui()
