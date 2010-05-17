@@ -77,6 +77,12 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self.setAcceptDrops(True)
 
+        self.reporegistry.openRepoSignal.connect(self.openRepo)
+
+    def openRepo(self, repopath):
+        repo = hg.repository(self.ui, path=str(repopath))
+        self.addRepoTab(repo)
+
     def find_root(self, url):
         p = str(url.toLocalFile())
         return paths.find_root(p)

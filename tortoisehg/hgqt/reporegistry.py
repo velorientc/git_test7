@@ -47,18 +47,27 @@ class RepoTreeItem:
     def parent(self):
         return self._parent
 
+    def menulist(self):
+        return []
+
 
 class RepoItem(RepoTreeItem):
     def __init__(self, rootpath, parent=None):
         RepoTreeItem.__init__(self, parent)
-        self.rootpath = rootpath
+        self._rootpath = rootpath
+        
+    def rootpath(self):
+        return self._rootpath
 
     def data(self, column):
         if column == 0:
-            return QVariant(os.path.basename(self.rootpath))
+            return QVariant(os.path.basename(self._rootpath))
         elif column == 1:
-            return QVariant(self.rootpath)
+            return QVariant(self._rootpath)
         return QVariant()
+
+    def menulist(self):
+        return ['open']
 
 
 class RepoGroupItem(RepoTreeItem):
@@ -154,12 +163,68 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
 
     def getRepoItem(self, reporoot):
         for c in self.allrepos.childs:
-            if c.rootpath == reporoot:
+            if c.rootpath() == reporoot:
                 return c
         return None
 
 
+class RepoTreeView(QtGui.QTreeView):
+    def __init__(self, parent):
+        QtGui.QTreeView.__init__(self)
+        self.parent = parent
+        self.selitem = None
+        self.createActions()
+
+    def contextMenuEvent(self, event):
+        selection = self.selectedIndexes()
+        if len(selection) == 0:
+            return
+        self.selitem = selection[0].internalPointer()
+        menulist = self.selitem.menulist()
+        if len(menulist) > 0:
+            menu = QtGui.QMenu(self)
+            for act in menulist:
+                if act:
+                    menu.addAction(self._actions[act])
+                else:
+                    menu.addSeparator()
+            menu.exec_(event.globalPos())
+
+    def _action_defs(self):
+        a = [("open", _("Open"), None, 
+                _("Opens the repository in a new tab"), None, self.open)
+             ]
+        return a
+
+    def createActions(self):
+        self._actions = {}
+        for name, desc, icon, tip, key, cb in self._action_defs():
+            self._actions[name] = QtGui.QAction(desc, self)
+        QtCore.QTimer.singleShot(0, self.configureActions)
+
+    def configureActions(self):
+        for name, desc, icon, tip, key, cb in self._action_defs():
+            act = self._actions[name]
+            '''
+            if icon:
+                act.setIcon(geticon(icon))
+            '''
+            if tip:
+                act.setStatusTip(tip)
+            if key:
+                act.setShortcut(key)
+            if cb:
+                connect(act, SIGNAL('triggered()'), cb)
+            self.addAction(act)
+
+    def open(self):
+        self.parent.openrepo(self.selitem.rootpath())
+
+
 class RepoRegistryView(QWidget):
+
+    openRepoSignal = QtCore.pyqtSignal(QtCore.QString)
+
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
 
@@ -169,7 +234,7 @@ class RepoRegistryView(QWidget):
 
         self.tmodel = m = RepoTreeModel()
 
-        self.tview = tv = QtGui.QTreeView()
+        self.tview = tv = RepoTreeView(self)
         lay.addWidget(tv)
         tv.setModel(m)
 
@@ -185,3 +250,6 @@ class RepoRegistryView(QWidget):
         m = self.tmodel
         if m.getRepoItem(reporoot) == None:
             m.addRepo(reporoot)
+
+    def openrepo(self, path):
+        self.openRepoSignal.emit(path)
