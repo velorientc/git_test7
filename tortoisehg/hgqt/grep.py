@@ -8,7 +8,7 @@
 import os
 import re
 
-from mercurial import ui, hg, error
+from mercurial import ui, hg, error, commands
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib
 from tortoisehg.util import paths, hglib
@@ -21,14 +21,13 @@ from PyQt4.QtGui import *
 # prove search features
 
 # Technical Debt
-#  hg grep functionality
-#  thread the searches
 #  draggable matches from history
 #  tortoisehg.editor with line number
 #  smart visual diffs
 #  context menu for matches
 #  emit errors to parent's status bar
 #  emit to parent's progress bar
+#  ESC should cancel current search
 #  turn HTMLDelegate into a column delegate, merge back with htmllistview
 
 class SearchWidget(QWidget):
@@ -99,27 +98,26 @@ class SearchWidget(QWidget):
         except Exception, inst:
             msg = _('grep: invalid match pattern: %s\n') % inst
             self.emit(SIGNAL('errorMessage'), msg)
-            print inst
             return
 
         self.le.selectAll()
         mode = self.cb.currentIndex()
         if mode == 0:
+            self.tv.setColumnHidden(COL_REVISION, True)
+            self.tv.setColumnHidden(COL_USER, True)
             ctx = self.repo[None]
+            self.thread = CtxSearchThread(self.repo, regexp, ctx)
         elif mode == 1:
+            self.tv.setColumnHidden(COL_REVISION, True)
+            self.tv.setColumnHidden(COL_USER, True)
             ctx = self.repo['.']
+            self.thread = CtxSearchThread(self.repo, regexp, ctx)
         else:
             self.tv.setColumnHidden(COL_REVISION, False)
             self.tv.setColumnHidden(COL_USER, False)
-            # Full blown 'hg grep' call
-            # hg grep [-i] -afn regexp
-            return
+            self.thread = HistorySearchThread(self.repo, pattern, icase)
 
-        self.tv.setColumnHidden(COL_REVISION, True)
-        self.tv.setColumnHidden(COL_USER, True)
         self.le.setEnabled(False)
-
-        self.thread = CtxSearchThread(self.repo, regexp, ctx)
         self.connect(self.thread, SIGNAL('finished'),
                      lambda: self.le.setEnabled(True))
         self.connect(self.thread, SIGNAL('matchedRow'),
@@ -127,6 +125,55 @@ class SearchWidget(QWidget):
         self.thread.start()
 
 
+class HistorySearchThread(QThread):
+    '''Background thread for searching repository history'''
+    def __init__(self, repo, pattern, icase, parent=None):
+        super(HistorySearchThread, self).__init__()
+        self.repo = repo
+        self.pattern = pattern
+        self.icase = icase
+
+    def run(self):
+        # special purpose - not for general use
+        class incrui(ui.ui):
+            def __init__(self, src=None):
+                super(incrui, self).__init__(src)
+                self.setconfig('ui', 'interactive', 'off')
+                self.setconfig('progress', 'disable', 'True')
+                os.environ['TERM'] = 'dumb'
+                qtlib.configstyles(self)
+                self.fullmsg = ''
+
+            def write(self, msg, *args, **opts):
+                if msg.endswith('\n'):
+                    self.fullmsg += msg
+                    fname, line, rev, addremove, user, text = \
+                            self.fullmsg.split(':', 5) 
+                    row = [fname, line, rev, user, addremove + ' ' + text]
+                    self.obj.emit(SIGNAL('matchedRow'), row)
+                    self.fullmsg = ''
+                else:
+                    if opts.get('label'):
+                        self.fullmsg += self.label(msg, opts['label'])
+                    else:
+                        self.fullmsg += msg
+
+            def label(self, msg, label):
+                msg = hglib.tounicode(msg)
+                msg = Qt.escape(msg)
+                msg = msg.replace('\n', '<br />')
+                style = qtlib.geteffect(label)
+                return '<span style="%s">%s</span>' % (style, msg)
+
+        # hg grep [-i] -afn regexp
+        opts = {'all':True, 'user':True, 'follow':True, 'rev':[],
+                'line_number':True, 'print0':False,
+                'ignore_case':self.icase,
+                }
+        u = incrui()
+        u.obj = self
+        commands.grep(u, self.repo, self.pattern, **opts)
+        self.emit(SIGNAL('finished'))
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
@@ -137,6 +184,7 @@ class CtxSearchThread(QThread):
         self.ctx = ctx
 
     def run(self):
+        # this will eventually be: hg grep -c 
         hu = htmlui.htmlui()
         # searching len(ctx.manifest()) files
         for wfile in self.ctx:                # walk manifest
