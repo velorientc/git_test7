@@ -81,6 +81,8 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         self.allrepos = all = RepoGroupItem(_('All Repositories'))
         root.appendChild(all)
 
+    # see http://doc.qt.nokia.com/4.6/model-view-model-subclassing.html
+
     def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
@@ -138,9 +140,17 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
             return 0
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
+    # functions not defined in QAbstractItemModel
+
+    def allreposIndex(self):
+        return self.createIndex(0, 0, self.allrepos)
+
     def addRepo(self, reporoot):
         all = self.allrepos
+        cc = all.childCount()
+        self.beginInsertRows(self.allreposIndex(), cc, cc + 1)
         all.appendChild(RepoItem(reporoot))
+        self.endInsertRows()
 
     def getRepoItem(self, reporoot):
         for c in self.allrepos.childs:
@@ -175,5 +185,3 @@ class RepoRegistryView(QWidget):
         m = self.tmodel
         if m.getRepoItem(reporoot) == None:
             m.addRepo(reporoot)
-            self.tview.reset()
-            QtCore.QTimer.singleShot(0, self.expand)
