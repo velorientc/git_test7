@@ -21,6 +21,7 @@ from PyQt4.QtGui import *
 # prove search features
 
 # Technical Debt
+#  add 'optional' entries for -c, -I, -X
 #  draggable matches from history
 #  tortoisehg.editor with line number
 #  smart visual diffs
@@ -261,8 +262,20 @@ class MatchTree(QTreeView):
             d.setMimeData(m)
             d.start(Qt.CopyAction)
 
+    def mousePressEvent(self, event):
+        self.pressPos = event.pos()
+        self.pressTime = QTime.currentTime()
+        return QTreeView.mousePressEvent(self, event)
+
     def mouseMoveEvent(self, event):
+        d = event.pos() - self.pressPos
+        if d.manhattanLength() < QApplication.startDragDistance():
+            return QTreeView.mouseMoveEvent(self, event)
+        elapsed = self.pressTime.msecsTo(QTime.currentTime())
+        if elapsed < QApplication.startDragTime():
+            return QTreeView.mouseMoveEvent(self, event)
         self.dragObject()
+        return QTreeView.mouseMoveEvent(self, event)
 
     def customContextMenuRequested(self, point):
         selrows = []
