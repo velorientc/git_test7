@@ -22,9 +22,8 @@ from PyQt4.QtGui import *
 
 # Technical Debt
 #  add 'optional' entries for -c, -I, -X
-#  draggable matches from history
 #  tortoisehg.editor with line number
-#  smart visual diffs
+#  smart visual diffs (what does this mean?)
 #  context menu for matches
 
 class SearchWidget(QWidget):
@@ -203,6 +202,7 @@ class CtxSearchThread(QThread):
     def run(self):
         # this will eventually be: hg grep -c 
         hu = htmlui.htmlui()
+        rev = self.ctx.rev()
         # searching len(ctx.manifest()) files
         for wfile in self.ctx:                # walk manifest
             data = self.ctx[wfile].data()     # load file data
@@ -216,7 +216,7 @@ class CtxSearchThread(QThread):
                     pos = m.end()
                 if pos:
                     hu.write(line[pos:])
-                    row = [wfile, i, None, None, hu.getdata()[0]]
+                    row = [wfile, i, rev, None, hu.getdata()[0]]
                     self.emit(SIGNAL('matchedRow'), row)
         self.emit(SIGNAL('finished'))
 
@@ -238,23 +238,24 @@ class MatchTree(QTreeView):
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_D and event.modifiers() == Qt.ControlModifier:
-            selfiles = []
-            for index in self.selectedRows():
-                # TODO: record rev, prune dups
-                selfiles.append(self.model().getRow(index)[COL_PATH])
-            visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
-        else:
-            return super(MatchTree, self).keyPressEvent(event)
-
     def dragObject(self):
-        urls = []
+        snapshots = {}
         for index in self.selectedRows():
-            path = self.model().getRow(index)[COL_PATH]
-            u = QUrl()
-            u.setPath('file://' + os.path.join(self.repo.root, path))
-            urls.append(u)
+            path, line, rev, user, text = self.model().getRow(index)
+            if rev not in snapshots:
+                snapshots[rev] = [path]
+            else:
+                snapshots[rev].append(path)
+        urls = []
+        for rev, paths in snapshots.iteritems():
+            if rev is not None:
+                base, _ = visdiff.snapshot(self.repo, paths, self.repo[rev])
+            else:
+                base = self.repo.root
+            for p in paths:
+                u = QUrl()
+                u.setPath('file://' + os.path.join(base, path))
+                urls.append(u)
         if urls:
             d = QDrag(self)
             m = QMimeData()
@@ -341,6 +342,10 @@ class MatchModel(QAbstractTableModel):
         self.beginRemoveRows(QModelIndex(), 0, len(self.rows)-1)
         self.rows = []
         self.endRemoveRows()
+
+    def getRow(self, index):
+        assert index.isValid()
+        return self.rows[index.row()]
 
 def run(ui, *pats, **opts):
     return SearchWidget()
