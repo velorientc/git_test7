@@ -27,7 +27,6 @@ from PyQt4.QtGui import *
 #  context menu for matches
 #  emit errors to parent's status bar
 #  emit to parent's progress bar
-#  ESC should cancel current search
 #  turn HTMLDelegate into a column delegate, merge back with htmllistview
 
 class SearchWidget(QWidget):
@@ -78,7 +77,14 @@ class SearchWidget(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.close()
+            if self.thread and self.thread.isRunning():
+                self.thread.terminate()
+                self.thread.wait()
+                for col in xrange(COL_TEXT):
+                    self.tv.resizeColumnToContents(col)
+                self.le.setEnabled(True)
+            else:
+                self.close()
         else:
             return super(SearchWidget, self).keyPressEvent(event)
 
