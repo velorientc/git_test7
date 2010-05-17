@@ -145,6 +145,7 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
     def setRepo(self, repo, branch='', fromhead=None, follow=False):
         oldrepo = self.repo
         self.repo = repo
+        self._branch = branch
         if oldrepo.root != repo.root:
             self.load_config()
         self._datacache = {}
@@ -169,6 +170,9 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         self.ensureBuilt(row=self.fill_step)
         QtCore.QTimer.singleShot(0, Curry(self.emit, SIGNAL('filled')))
         self._fill_timer = self.startTimer(50)
+
+    def branch(self):
+        return self._branch
 
     def ensureBuilt(self, rev=None, row=None):
         """

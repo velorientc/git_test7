@@ -342,6 +342,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.repomodel.setRepo(
             self.repo, branch=branch, fromhead=startrev, follow=follow)
 
+    def filterbranch(self):
+        return self.repomodel.branch()
+
     def okToContinue(self):
         '''
         returns False if there is unsaved data

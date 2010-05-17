@@ -159,10 +159,19 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             self.branch_comboBox_action.setEnabled(False)
             self.branch_comboBox.clear()
         else:
-            self.branchesmodel = QtGui.QStringListModel([''] + branches)
+            branches = [''] + branches
+            self.branchesmodel = QtGui.QStringListModel(branches)
             self.branch_comboBox.setModel(self.branchesmodel)
             self.branch_label_action.setEnabled(True)
             self.branch_comboBox_action.setEnabled(True)
+
+            branch = w.filterbranch()
+            index = -1
+            for i, b in enumerate(branches):
+                if b == branch:
+                    index = i
+                    break
+            self.branch_comboBox.setCurrentIndex(index)
 
     def createToolbars(self):
         # find quickbar
