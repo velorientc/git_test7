@@ -26,9 +26,14 @@ from PyQt4.QtGui import *
 #  smart visual diffs
 #  context menu for matches
 #  emit errors to parent's status bar
-#  emit to parent's progress bar
 
 class SearchWidget(QWidget):
+    '''Working copy and repository search widget
+       SIGNALS:
+       loadBegin()                  - for progress bar
+       loadComplete()               - for progress bar
+       errorMessage(QString)        - for status bar
+    '''
     def __init__(self, root=None, parent=None):
         QWidget.__init__(self, parent)
 
@@ -79,9 +84,7 @@ class SearchWidget(QWidget):
             if self.thread and self.thread.isRunning():
                 self.thread.terminate()
                 self.thread.wait()
-                for col in xrange(COL_TEXT):
-                    self.tv.resizeColumnToContents(col)
-                self.le.setEnabled(True)
+                self.finished()
             else:
                 self.close()
         else:
@@ -122,16 +125,18 @@ class SearchWidget(QWidget):
             self.tv.setColumnHidden(COL_USER, False)
             self.thread = HistorySearchThread(self.repo, pattern, icase)
 
-        def finished():
-            for col in xrange(COL_TEXT):
-                self.tv.resizeColumnToContents(col)
-            self.le.setEnabled(True)
-
         self.le.setEnabled(False)
-        self.connect(self.thread, SIGNAL('finished'), finished)
+        self.connect(self.thread, SIGNAL('finished'), self.finished)
         self.connect(self.thread, SIGNAL('matchedRow'),
                      lambda row: model.appendRow(*row))
+        self.emit(SIGNAL('loadBegin'))
         self.thread.start()
+
+    def finished(self):
+        for col in xrange(COL_TEXT):
+            self.tv.resizeColumnToContents(col)
+        self.le.setEnabled(True)
+        self.emit(SIGNAL('loadComplete'))
 
 
 class HistorySearchThread(QThread):
