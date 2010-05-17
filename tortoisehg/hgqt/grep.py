@@ -269,7 +269,7 @@ class MatchModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.rows = []
-        self.headers = (_('File'), _('Line'), _('Revision'), _('User'),
+        self.headers = (_('File'), _('Line'), _('Rev'), _('User'),
                         _('Match Text'))
 
     def rowCount(self, parent):
