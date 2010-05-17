@@ -35,7 +35,8 @@ class htmlui(ui.ui):
 
     def label(self, msg, label):
         msg = hglib.tounicode(msg)
-        msg = QtCore.Qt.escape(msg)
+        if label:
+            msg = QtCore.Qt.escape(msg)
         msg = msg.replace('\n', '<br />')
         style = qtlib.geteffect(label)
         return '<span style="%s">%s</span>' % (style, msg)
