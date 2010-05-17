@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error, commands
 
-from tortoisehg.hgqt import htmlui, visdiff, qtlib
+from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
 
@@ -27,7 +27,6 @@ from PyQt4.QtGui import *
 #  context menu for matches
 #  emit errors to parent's status bar
 #  emit to parent's progress bar
-#  turn HTMLDelegate into a column delegate, merge back with htmllistview
 
 class SearchWidget(QWidget):
     def __init__(self, root=None, parent=None):
@@ -227,7 +226,8 @@ class MatchTree(QTreeView):
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
         self.repo = repo
-        self.setItemDelegate(HTMLDelegate(self))
+        self.delegate = htmllistview.HTMLDelegate(self)
+        self.setItemDelegateForColumn(COL_TEXT, self.delegate)
         self.setSelectionMode(QTreeView.ExtendedSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
@@ -324,39 +324,6 @@ class MatchModel(QAbstractTableModel):
         self.beginRemoveRows(QModelIndex(), 0, len(self.rows)-1)
         self.rows = []
         self.endRemoveRows()
-
-class HTMLDelegate(QStyledItemDelegate):
-    def __init__(self, parent=0):
-        QStyledItemDelegate.__init__(self, parent)
-
-    def paint(self, painter, option, index):
-        if index.column() != COL_TEXT:
-            return QStyledItemDelegate.paint(self, painter, option, index)
-        text = index.model().data(index, Qt.DisplayRole).toString()
-        palette = QApplication.palette()
-        doc = QTextDocument()
-        doc.setDefaultFont(option.font)
-        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
-        painter.save()
-        if option.state & QStyle.State_Selected:
-            doc.setHtml('<font color=%s>%s</font>' % (
-                palette.highlightedText().color().name(), text))
-            bgcolor = palette.highlight().color()
-            painter.fillRect(option.rect, bgcolor)
-        else:
-            doc.setHtml(text)
-        painter.translate(option.rect.left(), option.rect.top())
-        doc.drawContents(painter)
-        painter.restore()
-
-    def sizeHint(self, option, index):
-        text = index.model().data(index, Qt.DisplayRole).toString()
-        doc = QTextDocument()
-        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
-        doc.setDefaultFont(option.font)
-        doc.setHtml(text)
-        doc.setTextWidth(option.rect.width())
-        return QSize(doc.idealWidth() + 5, doc.size().height())
 
 def run(ui, *pats, **opts):
     return SearchWidget()

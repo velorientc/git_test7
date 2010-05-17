@@ -86,10 +86,13 @@ class HtmlListView(QListView):
 
 
 class HTMLDelegate(QStyledItemDelegate):
-    def __init__(self, parent=0):
+    def __init__(self, parent=0, cols=None):
         QStyledItemDelegate.__init__(self, parent)
+        self.cols = cols
 
     def paint(self, painter, option, index):
+        if self.cols and index.column() not in self.cols:
+            return QStyledItemDelegate.paint(self, painter, option, index)
         text = index.model().data(index, Qt.DisplayRole).toString()
         palette = QApplication.palette()
         doc = QTextDocument()
