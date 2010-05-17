@@ -55,6 +55,12 @@ def configstyles(ui):
         cfgeffects = ui.configlist('color', status)
         _styles[status] = ' '.join(cfgeffects)
 
+    for status, cfgeffects in ui.configitems('thg-color'):
+        if '.' not in status:
+            continue
+        cfgeffects = ui.configlist('thg-color', status)
+        _styles[status] = ' '.join(cfgeffects)
+
 # See http://doc.trolltech.com/4.2/richtext-html-subset.html
 # and http://www.w3.org/TR/SVG/types.html#ColorKeywords
 
