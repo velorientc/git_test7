@@ -25,7 +25,6 @@ from PyQt4.QtGui import *
 #  tortoisehg.editor with line number
 #  smart visual diffs
 #  context menu for matches
-#  emit errors to parent's status bar
 
 class SearchWidget(QWidget):
     '''Working copy and repository search widget
