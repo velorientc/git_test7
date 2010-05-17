@@ -82,8 +82,10 @@ class SearchWidget(QWidget):
         if event.key() == Qt.Key_Escape:
             if self.thread and self.thread.isRunning():
                 self.thread.terminate()
-                self.thread.wait()
+                # This can lockup, so stop waiting after 2sec
+                self.thread.wait( 2000 )
                 self.finished()
+                self.thread = None
             else:
                 self.close()
         else:
