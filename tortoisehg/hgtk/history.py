@@ -1136,7 +1136,7 @@ class GLog(gdialog.GWindow):
             filtertext += _("Parents")
         elif self.filter == 'heads':
             ftitle(_('heads'))
-            heads = [self.repo[x].rev() for x in self.repo.heads()]
+            heads = hglib.getlivebheads(self.repo)
             opts['revlist'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], opts)
             filtertext += _("Heads")
