@@ -117,9 +117,13 @@ class SearchWidget(QWidget):
             self.tv.setColumnHidden(COL_USER, False)
             self.thread = HistorySearchThread(self.repo, pattern, icase)
 
+        def finished():
+            for col in xrange(COL_TEXT):
+                self.tv.resizeColumnToContents(col)
+            self.le.setEnabled(True)
+
         self.le.setEnabled(False)
-        self.connect(self.thread, SIGNAL('finished'),
-                     lambda: self.le.setEnabled(True))
+        self.connect(self.thread, SIGNAL('finished'), finished)
         self.connect(self.thread, SIGNAL('matchedRow'),
                      lambda row: model.appendRow(*row))
         self.thread.start()
