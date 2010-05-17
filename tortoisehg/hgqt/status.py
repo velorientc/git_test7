@@ -8,7 +8,7 @@
 import os
 
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
-from mercurial import context, merge, commands
+from mercurial import context, merge, commands, subrepo
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
@@ -312,8 +312,14 @@ class StatusWidget(QWidget):
                 try:
                     sroot = self.repo.wjoin(path)
                     srepo = hg.repository(hu, path=sroot)
+                    srev = self.wctx.substate.get(path, subrepo.nullstate)[1]
+                    sactual = srepo['.'].hex()
                     commands.status(hu, srepo)
                     diff = hu.getdata()[0]
+                    if srev != sactual:
+                        diff += '<br>'
+                        diff += _('revision changed from %s to %s') % (
+                                srev[:12], sactual[:12])
                 except error.RepoError:
                     diff = _('<b>Not an hg subrepo, not previewable</b>')
             else:
