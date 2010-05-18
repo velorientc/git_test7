@@ -495,15 +495,13 @@ class WctxFileTree(QTreeView):
 class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, ms, opts, checked, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        repo = wctx._repo
         rows = []
         def mkrow(fname, st):
             ext, sizek = '', ''
             try:
                 mst = fname in ms and ms[fname].upper() or ""
-                path = repo.wjoin(fname)
                 name, ext = os.path.splitext(fname)
-                sizebytes = os.path.getsize(path)
+                sizebytes = wctx[fname].size()
                 sizek = (sizebytes + 1023) // 1024
             except EnvironmentError:
                 pass
