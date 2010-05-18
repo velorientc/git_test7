@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'tortoisehg/hgqt/about.ui'
 #
-# Created: Tue May 18 19:41:14 2010
+# Created: Tue May 18 21:54:26 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -131,6 +131,7 @@ class Ui_AboutDialog(object):
         self.button_hlayout = QtGui.QHBoxLayout()
         self.button_hlayout.setObjectName("button_hlayout")
         self.license_button = QtGui.QPushButton(AboutDialog)
+        self.license_button.setAutoDefault(False)
         self.license_button.setObjectName("license_button")
         self.button_hlayout.addWidget(self.license_button)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
