@@ -434,10 +434,13 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         if sender is self.startrev_follow_action and startrev is None:
             return
         follow = self.startrev_follow_action.isChecked()
-        w = self.repoTabsWidget.currentWidget()
+        tw = self.repoTabsWidget
+        w = tw.currentWidget()
         if w:
             self.revscompl_model.setStringList(w.repo.tags().keys())
             w.setRepomodel(branch, startrev, follow)
+            tabtext = '%s [%s]' % (w.reponame(), branch)
+            tw.setTabText(tw.currentIndex(), tabtext)
 
     def on_about(self, *args):
         """ Display about dialog """

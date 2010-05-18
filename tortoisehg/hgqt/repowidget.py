@@ -87,6 +87,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.restoreSettings()
 
+    def reponame(self):
+        return os.path.basename(self.repo.root)
+
     def showMessage(self, msg):
         self.currentMessage = msg
         if self.isVisible():
