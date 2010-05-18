@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'tortoisehg/hgqt/about.ui'
 #
-# Created: Tue May 18 19:29:40 2010
+# Created: Tue May 18 19:41:14 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -15,6 +15,7 @@ class Ui_AboutDialog(object):
         AboutDialog.resize(327, 306)
         AboutDialog.setModal(True)
         self.verticalLayout = QtGui.QVBoxLayout(AboutDialog)
+        self.verticalLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
         self.verticalLayout.setObjectName("verticalLayout")
         self.info_vlayout = QtGui.QVBoxLayout()
         self.info_vlayout.setObjectName("info_vlayout")
