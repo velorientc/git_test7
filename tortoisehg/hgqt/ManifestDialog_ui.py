@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\ManifestDialog.ui'
 #
-# Created: Sun May 02 13:47:20 2010
+# Created: Tue May 18 11:33:55 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -14,7 +14,6 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(400, 300)
         self.centralwidget = QtGui.QWidget(MainWindow)
-        self.centralwidget.setGeometry(QtCore.QRect(0, 33, 400, 267))
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setMargin(2)
@@ -40,24 +39,10 @@ class Ui_MainWindow(object):
         self.mainFrame.setObjectName("mainFrame")
         self.verticalLayout.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.toolBar = QtGui.QToolBar(MainWindow)
-        self.toolBar.setGeometry(QtCore.QRect(0, 0, 400, 33))
-        self.toolBar.setObjectName("toolBar")
-        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar)
-        self.actionClose = QtGui.QAction(MainWindow)
-        self.actionClose.setObjectName("actionClose")
-        self.actionReload = QtGui.QAction(MainWindow)
-        self.actionReload.setObjectName("actionReload")
-        self.toolBar.addAction(self.actionClose)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
-        self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionClose.setText(QtGui.QApplication.translate("MainWindow", "Close", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionClose.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Q", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionReload.setText(QtGui.QApplication.translate("MainWindow", "Reload", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionReload.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+R", None, QtGui.QApplication.UnicodeUTF8))
 

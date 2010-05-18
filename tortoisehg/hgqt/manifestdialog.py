@@ -71,9 +71,7 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
                 self.fileSelected)
 
     def createActions(self):
-        connect(self.actionClose, SIGNAL('triggered()'),
-                self.close)
-        self.actionClose.setIcon(geticon('quit'))
+        pass
 
     def setupTextview(self):
         lay = QtGui.QHBoxLayout(self.mainFrame)
