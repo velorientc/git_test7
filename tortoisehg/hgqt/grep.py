@@ -8,7 +8,7 @@
 import os
 import re
 
-from mercurial import ui, hg, error, commands
+from mercurial import ui, hg, error, commands, cmdutil, util
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview
 from tortoisehg.util import paths, hglib
@@ -21,7 +21,6 @@ from PyQt4.QtGui import *
 # prove search features
 
 # Technical Debt
-#  add 'optional' entries for -c, -I, -X
 #  tortoisehg.editor with line number
 #  smart visual diffs (what does this mean?)
 #  context menu for matches
@@ -50,17 +49,46 @@ class SearchWidget(QWidget):
         lbl = QLabel(_('Regexp:'))
         le = QLineEdit()
         lbl.setBuddy(le)
+
         cb = QComboBox()
         cb.addItems([_('Working Copy'),
                      _('Parent Revision'),
                      _('All History')])
         chk = QCheckBox(_('Ignore case'))
 
+        incle = QLineEdit()
+        excle = QLineEdit()
+        working = QRadioButton(_('Working Copy'))
+        revision = QRadioButton(_('Revision'))
+        history = QRadioButton(_('All History'))
+        revle = QLineEdit()
+        form = QFormLayout()
+        form.addRow(QLabel(), working)
+        form.addRow(revle, revision)
+        form.addRow(QLabel(), history)
+        form.addRow(_('Includes:'), incle)
+        form.addRow(_('Excludes:'), excle)
+        working.setChecked(True)
+
+        def expandtoggled(checked):
+            for w in (incle, excle, working, history, revision, revle):
+                w.setVisible(checked)
+                l = form.labelForField(w)
+                if l: l.setVisible(checked)
+            expand.setArrowType(checked and Qt.UpArrow or Qt.DownArrow)
+        expand = QToolButton()
+        expand.setIconSize(QSize(12, 12))
+        expand.setArrowType(Qt.DownArrow)
+        expand.setCheckable(True)
+        expand.toggled.connect(expandtoggled)
+        expandtoggled(False)
+
         hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
-        hbox.addWidget(cb)
         hbox.addWidget(chk)
+        hbox.addWidget(expand)
         layout.addLayout(hbox)
+        layout.addLayout(form)
 
         tv = MatchTree(repo, self)
         tv.setItemsExpandable(False)
@@ -72,7 +100,9 @@ class SearchWidget(QWidget):
         layout.addWidget(tv)
         le.returnPressed.connect(self.searchActivated)
         self.repo = repo
-        self.tv, self.le, self.cb, self.chk = tv, le, cb, chk
+        self.tv, self.le, self.chk = tv, le, chk
+        self.incle, self.excle, self.revle = incle, excle, revle
+        self.wctxradio, self.ctxradio, self.aradio = working, revision, history
 
         if not parent:
             self.setWindowTitle(_('TortoiseHg Search'))
@@ -110,21 +140,32 @@ class SearchWidget(QWidget):
             return
 
         self.le.selectAll()
-        mode = self.cb.currentIndex()
-        if mode == 0:
+        inc = hglib.fromunicode(self.incle.text())
+        if inc: inc = inc.split(', ')
+        exc = hglib.fromunicode(self.excle.text())
+        if exc: exc = exc.split(', ')
+        rev = hglib.fromunicode(self.revle.text()).strip()
+        if self.wctxradio.isChecked():
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
             ctx = self.repo[None]
-            self.thread = CtxSearchThread(self.repo, regexp, ctx)
-        elif mode == 1:
+            self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc)
+        elif self.ctxradio.isChecked():
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
-            ctx = self.repo['.']
-            self.thread = CtxSearchThread(self.repo, regexp, ctx)
+            try:
+                ctx = self.repo[rev or '.']
+            except error.RepoError, e:
+                msg = _('grep: %s\n') % e
+                self.emit(SIGNAL('errorMessage'), msg)
+                return
+            self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc)
         else:
+            assert self.aradio.isChecked()
             self.tv.setColumnHidden(COL_REVISION, False)
             self.tv.setColumnHidden(COL_USER, False)
-            self.thread = HistorySearchThread(self.repo, pattern, icase)
+            self.thread = HistorySearchThread(self.repo, pattern, icase,
+                                              inc, exc)
 
         self.le.setEnabled(False)
         self.connect(self.thread, SIGNAL('finished'), self.finished)
@@ -142,11 +183,13 @@ class SearchWidget(QWidget):
 
 class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
-    def __init__(self, repo, pattern, icase, parent=None):
+    def __init__(self, repo, pattern, icase, inc, exc):
         super(HistorySearchThread, self).__init__()
         self.repo = repo
         self.pattern = pattern
         self.icase = icase
+        self.inc = inc
+        self.exc = exc
 
     def run(self):
         # special purpose - not for general use
@@ -186,7 +229,8 @@ class HistorySearchThread(QThread):
         # hg grep [-i] -afn regexp
         opts = {'all':True, 'user':True, 'follow':True, 'rev':[],
                 'line_number':True, 'print0':True,
-                'ignore_case':self.icase,
+                'ignore_case':self.icase, 'include':self.inc,
+                'exclude':self.exc,
                 }
         u = incrui()
         u.obj = self
@@ -195,20 +239,27 @@ class HistorySearchThread(QThread):
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
-    def __init__(self, repo, regexp, ctx, parent=None):
+    def __init__(self, repo, regexp, ctx, inc, exc):
         super(CtxSearchThread, self).__init__()
         self.repo = repo
         self.regexp = regexp
         self.ctx = ctx
+        self.inc = inc
+        self.exc = exc
 
     def run(self):
         # this will eventually be: hg grep -c 
         hu = htmlui.htmlui()
         rev = self.ctx.rev()
+        opts = {'include':self.inc, 'exclude':self.exc}
+        matchfn = cmdutil.match(self.repo, [], opts)
+
         # searching len(ctx.manifest()) files
         for wfile in self.ctx:                # walk manifest
+            if not matchfn(wfile):
+                continue
             data = self.ctx[wfile].data()     # load file data
-            if '\0' in data:
+            if util.binary(data):
                 continue
             for i, line in enumerate(data.splitlines()):
                 pos = 0
