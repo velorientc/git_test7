@@ -80,6 +80,9 @@ class RepoGroupItem(RepoTreeItem):
             return QVariant(self.name)
         return QVariant()
 
+    def menulist(self):
+        return ['newGroup']
+
 
 class RepoTreeModel(QtCore.QAbstractItemModel):
     def __init__(self, parent=None):
@@ -192,7 +195,9 @@ class RepoTreeView(QtGui.QTreeView):
 
     def _action_defs(self):
         a = [("open", _("Open"), None, 
-                _("Opens the repository in a new tab"), None, self.open)
+                _("Opens the repository in a new tab"), None, self.open),
+             ("newGroup", _("New Group"), None, 
+                _("Create a new group"), None, self.newGroup),
              ]
         return a
 
@@ -219,6 +224,9 @@ class RepoTreeView(QtGui.QTreeView):
 
     def open(self):
         self.parent.openrepo(self.selitem.rootpath())
+
+    def newGroup(self):
+        pass
 
 
 class RepoRegistryView(QWidget):
