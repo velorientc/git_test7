@@ -170,6 +170,13 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
                 return c
         return None
 
+    def addGroup(self, name):
+        ri = self.rootItem
+        cc = ri.childCount()
+        self.beginInsertRows(QModelIndex(), cc, cc + 1)
+        ri.appendChild(RepoGroupItem(name, ri))
+        self.endInsertRows()
+
 
 class RepoTreeView(QtGui.QTreeView):
     def __init__(self, parent):
@@ -226,7 +233,8 @@ class RepoTreeView(QtGui.QTreeView):
         self.parent.openrepo(self.selitem.rootpath())
 
     def newGroup(self):
-        pass
+        m = self.model()
+        m.addGroup(_('New Group'))
 
 
 class RepoRegistryView(QWidget):
