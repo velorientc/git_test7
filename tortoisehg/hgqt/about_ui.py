@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'tortoisehg/hgqt/about.ui'
 #
-# Created: Mon May 17 22:21:59 2010
+# Created: Tue May 18 19:21:37 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -162,7 +162,7 @@ class Ui_AboutDialog(object):
         self.download_url_label.setText(QtGui.QApplication.translate("AboutDialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+"</style></head><body>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://thg_download_url\"><span style=\" text-decoration: underline; color:#0000ff;\">http://thg-download-url</span></a></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.license_button.setText(QtGui.QApplication.translate("AboutDialog", "&License", None, QtGui.QApplication.UnicodeUTF8))
         self.close_button.setText(QtGui.QApplication.translate("AboutDialog", "&Close", None, QtGui.QApplication.UnicodeUTF8))
