@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'tortoisehg/hgqt/about.ui'
 #
-# Created: Tue May 18 19:21:37 2010
+# Created: Tue May 18 19:29:40 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -135,6 +135,7 @@ class Ui_AboutDialog(object):
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.button_hlayout.addItem(spacerItem)
         self.close_button = QtGui.QPushButton(AboutDialog)
+        self.close_button.setDefault(True)
         self.close_button.setObjectName("close_button")
         self.button_hlayout.addWidget(self.close_button)
         self.verticalLayout.addLayout(self.button_hlayout)
