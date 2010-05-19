@@ -194,7 +194,6 @@ class RevDisplay(QtGui.QWidget):
             else:
                 self._commitbutton.setText(_('Commit'))
         self._commitbutton.setVisible(enableci)
-        self._message.setEditable(enableci)
 
         buf = headerstyle
         if self.mqpatch:
@@ -292,14 +291,13 @@ class RevMessage(QtGui.QWidget):
         else:
             QtGui.QDesktopServices.openUrl(qurl)
 
-    def setEditable(self, editable):
-        self._message.setReadOnly(not editable)
-
     def text(self):
         return str(self._message.toPlainText())
 
     def displayRevision(self, ctx, mqpatch):
         self.ctx = ctx
+
+        self._message.setReadOnly(ctx.rev() is not None)
 
         if ctx.rev() is None and mqpatch:
             ctx = ctx.p1()
