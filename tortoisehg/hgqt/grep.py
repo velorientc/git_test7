@@ -59,6 +59,7 @@ class SearchWidget(QWidget):
         working = QRadioButton(_('Working Copy'))
         revision = QRadioButton(_('Revision'))
         history = QRadioButton(_('All History'))
+        singlematch = QCheckBox(_('Report only the first match per file'))
         revle = QLineEdit()
         grid = QGridLayout()
         grid.addWidget(working, 0, 0)
@@ -66,6 +67,7 @@ class SearchWidget(QWidget):
         grid.addWidget(revle, 1, 1)
         grid.addWidget(history, 2, 0)
         working.setChecked(True)
+        grid.addWidget(singlematch, 0, 3)
         ilabel = QLabel(_('Includes:'))
         elabel = QLabel(_('Excludes:'))
         grid.addWidget(ilabel, 1, 2)
@@ -105,6 +107,7 @@ class SearchWidget(QWidget):
         self.tv, self.le, self.chk = tv, le, chk
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
+        self.singlematch = singlematch
 
         if not parent:
             self.setWindowTitle(_('TortoiseHg Search'))
@@ -151,7 +154,8 @@ class SearchWidget(QWidget):
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
             ctx = self.repo[None]
-            self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc)
+            self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc,
+                                          once=self.singlematch.isChecked())
         elif self.ctxradio.isChecked():
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
@@ -161,7 +165,8 @@ class SearchWidget(QWidget):
                 msg = _('grep: %s\n') % e
                 self.emit(SIGNAL('errorMessage'), msg)
                 return
-            self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc)
+            self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc,
+                                          once=self.singlematch.isChecked())
         else:
             assert self.aradio.isChecked()
             self.tv.setColumnHidden(COL_REVISION, False)
@@ -241,13 +246,14 @@ class HistorySearchThread(QThread):
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
-    def __init__(self, repo, regexp, ctx, inc, exc):
+    def __init__(self, repo, regexp, ctx, inc, exc, once):
         super(CtxSearchThread, self).__init__()
         self.repo = repo
         self.regexp = regexp
         self.ctx = ctx
         self.inc = inc
         self.exc = exc
+        self.once = once
 
     def run(self):
         # this will eventually be: hg grep -c 
@@ -273,6 +279,8 @@ class CtxSearchThread(QThread):
                     hu.write(line[pos:])
                     row = [wfile, i, rev, None, hu.getdata()[0]]
                     self.emit(SIGNAL('matchedRow'), row)
+                    if self.once:
+                        break
         self.emit(SIGNAL('finished'))
 
 
