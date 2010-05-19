@@ -99,11 +99,14 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         QtGui.QWidget.showEvent(self, event)
         self.showMessageSignal.emit(self.currentMessage)
 
-    def commit(self):
-        args = ['commit']
+    def commit(self, action='commit'):
+        args = [str(action)]
         args += ['-v', '-m', self.message.text()]
         dlg = cmdui.Dialog(args)
-        dlg.setWindowTitle(_('Commit'))
+        if action == 'commit':
+            dlg.setWindowTitle(_('Commit'))
+        elif action == 'qrefresh':
+            dlg.setWindowTitle(_('QRefresh'))
         if dlg.exec_():
             self.reload('tip')
 

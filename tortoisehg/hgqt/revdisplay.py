@@ -26,6 +26,7 @@ SIGNAL = QtCore.SIGNAL
 from tortoisehg.util.util import format_desc, xml_escape, tounicode
 from tortoisehg.util import hglib
 
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.config import HgConfig
 
 headerstyle = '''
@@ -59,7 +60,7 @@ class RevDisplay(QtGui.QWidget):
     Display metadata for one revision (rev, author, description, etc.)
     """
 
-    commitsignal = QtCore.pyqtSignal()
+    commitsignal = QtCore.pyqtSignal(QtCore.QString)
 
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
@@ -95,7 +96,7 @@ class RevDisplay(QtGui.QWidget):
         hb3 = QtGui.QHBoxLayout()
         hb3.addStretch(0)
         vb.addLayout(hb3)
-        self._commitbutton = w = QtGui.QPushButton('Commit')
+        self._commitbutton = w = QtGui.QPushButton()
         hb3.addWidget(w, 0, Qt.AlignBottom)
         connect(w, SIGNAL('clicked()'), self.commit)
 
@@ -104,7 +105,11 @@ class RevDisplay(QtGui.QWidget):
                 self.anchorClicked)
 
     def commit(self):
-        self.commitsignal.emit()
+        if self.mqpatch:
+            action = 'qrefresh'
+        else:
+            action = 'commit'
+        self.commitsignal.emit(action)
 
     def expand(self):
         self.setExpanded(not self._expanded)
@@ -183,6 +188,11 @@ class RevDisplay(QtGui.QWidget):
         rev = ctx.rev()
 
         enableci = self._expanded and not rev
+        if enableci:
+            if self.mqpatch:
+                self._commitbutton.setText(_('QRefresh'))
+            else:
+                self._commitbutton.setText(_('Commit'))
         self._commitbutton.setVisible(enableci)
         self._message.setEditable(enableci)
 
