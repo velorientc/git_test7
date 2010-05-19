@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\repowidget.ui'
+# Form implementation generated from reading ui file 'repowidget.ui'
 #
-# Created: Sat May 15 18:55:13 2010
+# Created: Mon May 17 15:12:58 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -65,18 +65,6 @@ class Ui_Form(object):
         self.verticalLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.revdisplay = RevDisplay(self.frame)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.revdisplay.sizePolicy().hasHeightForWidth())
-        self.revdisplay.setSizePolicy(sizePolicy)
-        self.revdisplay.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        self.revdisplay.setFont(font)
-        self.revdisplay.setObjectName("revdisplay")
-        self.verticalLayout.addWidget(self.revdisplay)
         self.message_splitter = QtGui.QSplitter(self.frame)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -120,7 +108,7 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
 
-from revdisplay import RevDisplay, RevMessage
+from revdisplay import RevMessage
 from filelistview import HgFileListView
 from fileview import HgFileView
 from repoview import HgRepoView

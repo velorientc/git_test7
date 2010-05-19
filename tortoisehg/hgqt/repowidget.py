@@ -30,9 +30,9 @@ from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestdialog import ManifestDialog
 from tortoisehg.hgqt.widgetmixin import WidgetMixin
 from tortoisehg.hgqt.update import UpdateDialog
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, csinfo, qtlib
 
-from tortoisehg.util import paths
+from tortoisehg.util import paths, hglib
 
 from mercurial.error import RepoError
 
@@ -65,13 +65,116 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.createActions()
 
+        def label_func(widget, item):
+            if item == 'cset':
+                return _('Changeset:')
+            elif item == 'parents':
+                return _('Parent:')
+            elif item == 'children':
+                return _('Child:')
+            elif item == 'patch':
+                return _('Patch:')
+            raise csinfo.UnknownItem(item)
+        def revid_markup(revid, **kargs):
+            opts = dict(family='monospace', size='9pt')
+            opts.update(kargs)
+            return qtlib.markup(revid, **opts)
+        def data_func(widget, item, ctx):
+            def summary_line(desc):
+                desc = desc.replace('\0', '').split('\n')[0]
+                return hglib.tounicode(desc[:80])
+            def revline_data(ctx, hl=False, branch=None):
+                if isinstance(ctx, basestring):
+                    return ctx
+                desc = ctx.description()
+                return (str(ctx.rev()), str(ctx), summary_line(desc), hl, branch)
+            if item == 'cset':
+                return revline_data(ctx)
+            elif item == 'branch':
+                value = hglib.tounicode(ctx.branch())
+                return value != 'default' and value or None
+            elif item == 'parents':
+                # TODO: need to put 'diff to other' checkbox
+                #pindex = self.diff_other_parent() and 1 or 0
+                pindex = 0 # always show diff with first parent
+                pctxs = ctx.parents()
+                parents = []
+                for pctx in pctxs:
+                    highlight = len(pctxs) == 2 and pctx == pctxs[pindex]
+                    branch = None
+                    if hasattr(pctx, 'branch') and pctx.branch() != ctx.branch():
+                        branch = pctx.branch()
+                    parents.append(revline_data(pctx, highlight, branch))
+                return parents
+            elif item == 'children':
+                children = []
+                for cctx in ctx.children():
+                    branch = None
+                    if hasattr(cctx, 'branch') and cctx.branch() != ctx.branch():
+                        branch = cctx.branch()
+                    children.append(revline_data(cctx, branch=branch))
+                return children
+            elif item in ('transplant', 'p4', 'svn'):
+                ts = widget.get_data(item, usepreset=True)
+                if not ts:
+                    return None
+                try:
+                    tctx = self.repo[ts]
+                    return revline_data(tctx)
+                except (error.LookupError, error.RepoLookupError, error.RepoError):
+                    return ts
+            elif item == 'patch':
+                if hasattr(ctx, '_patchname'):
+                    desc = ctx.description()
+                    return (ctx._patchname, str(ctx), summary_line(desc))
+                return None
+            raise csinfo.UnknownItem(item)
+        def markup_func(widget, item, value):
+            def revline_markup(revnum, revid, summary, highlight=None, branch=None):
+                def branch_markup(branch):
+                    opts = dict(fg='black', bg='#aaffaa')
+                    return qtlib.markup(' %s ' % branch, **opts)
+                revnum = qtlib.markup(revnum)
+                summary = qtlib.markup(summary)
+                if revid:
+                    revid = revid_markup(revid)
+                    if branch:
+                        branch = branch_markup(branch)
+                        return '%s (%s) %s %s' % (revnum, revid, branch, summary)
+                    return '%s (%s) %s' % (revnum, revid, summary)
+                else:
+                    if branch:
+                        branch = branch_markup(branch)
+                        return '%s - %s %s' % (revnum, branch, summary)
+                    return '%s - %s' % (revnum, summary)
+            if item in ('cset', 'transplant', 'patch', 'p4', 'svn'):
+                if isinstance(value, basestring):
+                    return revid_markup(value)
+                return revline_markup(*value)
+            elif item in ('parents', 'children'):
+                csets = []
+                for cset in value:
+                    if isinstance(cset, basestring):
+                        csets.append(revid_markup(cset))
+                    else:
+                        csets.append(revline_markup(*cset))
+                return csets
+            raise csinfo.UnknownItem(item)
+
+        custom = csinfo.custom(data=data_func, label=label_func,
+                               markup=markup_func)
+        style = csinfo.panelstyle(contents=('cset', 'branch', 'user',
+                       'dateage', 'parents', 'children', 'tags',
+                       'transplant', 'p4', 'svn'), selectable=True)
+        self.revpanel = csinfo.create(self.repo, style=style, custom=custom)
+        self.verticalLayout.insertWidget(0, self.revpanel)
+
         self.fileview.setFont(self._font)
         connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
         connect(self.repoview, SIGNAL('showMessage'), self.showMessage)
 
-        self.revdisplay.setMessageWidget(self.message)
-
-        self.revdisplay.commitsignal.connect(self.commit)
+#        self.revdisplay.setMessageWidget(self.message)
+#        self.revdisplay.commitsignal.connect(self.commit)
 
         connect(self.message, SIGNAL('revisionSelected'), self.repoview.goto)
 
@@ -234,8 +337,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         filetable = self.tableView_filelist
         connect(filetable, SIGNAL('fileSelected'),
                 self.fileview.displayFile)
-        connect(self.fileview, SIGNAL('revForDiffChanged'),
-                self.revdisplay.setDiffRevision)
+#        connect(self.fileview, SIGNAL('revForDiffChanged'),
+#                self.revdisplay.setDiffRevision)
 
     def setupRevisionTable(self):
         view = self.repoview
@@ -243,8 +346,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
         connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
-        connect(self.revdisplay, SIGNAL('revisionSelected'), view.goto)
-        connect(self.revdisplay, SIGNAL('parentRevisionSelected'), self.fileview.displayDiff)
+#        connect(self.revdisplay, SIGNAL('revisionSelected'), view.goto)
+#        connect(self.revdisplay, SIGNAL('parentRevisionSelected'), self.fileview.displayDiff)
         self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -308,7 +411,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         if self.repomodel.graph:
             ctx = self.repomodel.repo.changectx(rev)
             self.fileview.setContext(ctx)
-            self.revdisplay.displayRevision(ctx)
+#            self.revdisplay.displayRevision(ctx)
+            self.revpanel.update(ctx.rev())
             self.filelistmodel.setSelectedRev(ctx)
             if len(self.filelistmodel):
                 self.tableView_filelist.selectRow(0)
@@ -379,7 +483,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         wb = "RepoWidget/"
         for n in self.splitternames:
             s.setValue(wb + n, getattr(self, n).saveState())
-        s.setValue(wb + 'revdisplay.expanded', self.revdisplay.expanded())
+#        s.setValue(wb + 'revdisplay.expanded', self.revdisplay.expanded())
 
     def restoreSettings(self):
         s = QtCore.QSettings()
@@ -390,8 +494,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
             n += '_splitter'
             self.splitternames.append(n)
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
-        expanded = s.value(wb + 'revdisplay.expanded', True).toBool()
-        self.revdisplay.setExpanded(expanded)
+#        expanded = s.value(wb + 'revdisplay.expanded', True).toBool()
+#        self.revdisplay.setExpanded(expanded)
 
     def closeRepoWidget(self):
         '''returns False if close should be aborted'''

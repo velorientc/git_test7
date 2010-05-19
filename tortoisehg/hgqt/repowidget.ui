@@ -92,27 +92,6 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="RevDisplay" name="revdisplay" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QSplitter" name="message_splitter">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -192,11 +171,6 @@
    <class>HgRepoView</class>
    <extends>QTableView</extends>
    <header>repoview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>RevDisplay</class>
-   <extends>QWidget</extends>
-   <header>revdisplay.h</header>
   </customwidget>
   <customwidget>
    <class>HgFileListView</class>
