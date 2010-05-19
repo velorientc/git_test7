@@ -510,6 +510,8 @@ class SummaryBase(object):
             return False # cannot update
         return True
 
+PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
+
 class SummaryPanel(SummaryBase, QWidget):
 
     def __init__(self, target, style, custom, repo, info):
@@ -567,10 +569,11 @@ class SummaryPanel(SummaryBase, QWidget):
             if not markups:
                 continue
             label = qtlib.markup(self.get_label(item), weight='bold')
-            buf += '<tr><td style="padding-right: 6px;">' + label + '</td><td>'
             if isinstance(markups, basestring):
-                markups = (markups,)
-            buf += ', '.join(markups) + '</td></tr>'
+                markups = [markups,]
+            buf += PANEL_TMPL % (label, markups.pop(0))
+            for markup in markups:
+                buf += PANEL_TMPL % ('&nbsp;', markup)
         buf += '</table>'
         self.revlabel.setText(buf)
 
