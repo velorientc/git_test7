@@ -74,6 +74,8 @@ class SearchWidget(QWidget):
         grid.addWidget(incle, 1, 3)
         grid.addWidget(elabel, 2, 2)
         grid.addWidget(excle, 2, 3)
+        grid.setColumnStretch(3, 1)
+        grid.setColumnStretch(1, 0)
         frame = QFrame()
         frame.setFrameStyle(QFrame.Panel | QFrame.Sunken)
 
