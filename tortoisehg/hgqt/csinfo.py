@@ -10,7 +10,7 @@ import os
 import binascii
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QWidget, QFrame, QPalette, QLabel
+from PyQt4.QtGui import QWidget, QLabel
 
 from mercurial import patch, util, error
 from mercurial.node import hex
@@ -510,21 +510,13 @@ class SummaryBase(object):
             return False # cannot update
         return True
 
-# FIXME: SummaryPanel porting is not completed
-class SummaryPanel(SummaryBase, QWidget):
+class SummaryPanel(SummaryBase, QLabel):
 
     def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)
-        QWidget.__init__(self)
+        QLabel.__init__(self)
 
-#        self.set_shadow_type(gtk.SHADOW_NONE)
         self.csstyle = style
-
-#        self.expander = gtk.Expander()
-#        self.expander.set_expanded(False)
-
-        # layout table for contents
-#        self.table = gtklib.LayoutTable(ypad=1, headopts={'weight': 'bold'})
 
     def update(self, target=None, style=None, custom=None, repo=None):
         if not SummaryBase.update(self, target, custom, repo):
@@ -533,53 +525,45 @@ class SummaryPanel(SummaryBase, QWidget):
         if style is not None:
             self.csstyle = style
 
-        if 'label' in self.csstyle:
-            label = self.csstyle['label']
-            assert isinstance(label, basestring)
-            self.set_label(label)
+        if 'selectable' in self.csstyle:
+            sel = self.csstyle['selectable']
+            val = sel and Qt.TextSelectableByMouse or Qt.TextBrowserInteraction
+            self.setTextInteractionFlags(val)
+
+#        if 'label' in self.csstyle:
+#            label = self.csstyle['label']
+#            assert isinstance(label, basestring)
+#            self.set_label(label)
 #            self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+
+#        if 'padding' in self.csstyle:
+#            padding = self.csstyle['padding']
+             # 'border' range is 0-65535
+#            assert isinstance(padding, (int, long))
+#            assert 0 <= padding and padding <= 65535
+#            self.table.set_border_width(padding)
+
+        # build info
+        contents = self.csstyle.get('contents', ())
 
         if 'margin' in self.csstyle:
             margin = self.csstyle['margin']
-            # 'border' range is 0-65535
             assert isinstance(margin, (int, long))
-            assert 0 <= margin and margin <= 65535
-            self.set_border_width(margin)
+            buf = '<table style="margin: %spx">' % margin
+        else:
+            buf = '<table>'
 
-        if 'padding' in self.csstyle:
-            padding = self.csstyle['padding']
-            # 'border' range is 0-65535
-            assert isinstance(padding, (int, long))
-            assert 0 <= padding and padding <= 65535
-            self.table.set_border_width(padding)
-
-        contents = self.csstyle.get('contents', None)
-        assert contents
-
-        use_expander = self.csstyle.get('expander', False)
-
-        # build info
-        first = True
-        self.table.clear_rows()
         for item in contents:
-            widgets = self.get_widget(item)
-            if not widgets:
+            markups = self.get_markup(item)
+            if not markups:
                 continue
-            if isinstance(widgets, QWidget):
-                widgets = (widgets,)
-            if not self.get_child():
-                if use_expander:
-                    self.add(self.expander)
-                    self.expander.add(self.table)
-                else:
-                    self.add(self.table)
-            for widget in widgets:
-                if use_expander and first:
-                    self.expander.set_label_widget(widget)
-                    first = False
-                else:
-                    self.table.add_row(self.get_label(item), widget)
-        self.show_all()
+            label = qtlib.markup(self.get_label(item), weight='bold')
+            buf += '<tr><td style="padding-right: 6px;">' + label + '</td><td>'
+            if isinstance(markups, basestring):
+                markups = (markups,)
+            buf += ', '.join(markups) + '</td></tr>'
+        buf += '</table>'
+        self.setText(buf)
 
         return True
 
