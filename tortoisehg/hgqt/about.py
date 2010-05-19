@@ -50,15 +50,14 @@ class AboutDialog(QDialog):
         thglogofile = paths.get_tortoise_icon('thg_logo_92x50.png')
         self._qui.logo_label.setPixmap(QPixmap(thglogofile))
 
-        thgv = version.version()
-        if '+' in thgv:
-            thgv = thgv[0:thgv.index('+')]
-        self._qui.name_version_label.setText(_('TortoiseHg (version %s)') % thgv)
-
-        lib_versions = (_("with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s") % \
-            (hglib.hgversion, make_version(sys.version_info[0:3]),
-            PYQT_VERSION_STR, QT_VERSION_STR))
-        self._qui.libs_label.setText(lib_versions)
+        thgv = (_('version  %s') % version.version())
+        libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') % \
+              (hglib.hgversion, make_version(sys.version_info[0:3]),
+              PYQT_VERSION_STR, QT_VERSION_STR))
+        nvl = hglib.fromunicode(self._qui.name_version_libs_label.text())
+        nvl = nvl.replace('*version_string*', thgv)
+        nvl = nvl.replace('*libs_string*', libv)
+        self._qui.name_version_libs_label.setText(nvl)
 
         self._qui.copyright_label.setText(_('Copyright 2008-2010 Steve Borho and others'))
         self._qui.courtesy_label.setText(

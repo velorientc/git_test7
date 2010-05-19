@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'tortoisehg/hgqt/about.ui'
 #
-# Created: Tue May 18 21:54:26 2010
+# Created: Wed May 19 20:14:16 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_AboutDialog(object):
     def setupUi(self, AboutDialog):
         AboutDialog.setObjectName("AboutDialog")
-        AboutDialog.resize(327, 306)
+        AboutDialog.resize(327, 343)
         AboutDialog.setModal(True)
         self.verticalLayout = QtGui.QVBoxLayout(AboutDialog)
         self.verticalLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
@@ -38,31 +38,10 @@ class Ui_AboutDialog(object):
         self.label_6.setText("")
         self.label_6.setObjectName("label_6")
         self.info_vlayout.addWidget(self.label_6)
-        self.name_version_label = QtGui.QLabel(AboutDialog)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.name_version_label.sizePolicy().hasHeightForWidth())
-        self.name_version_label.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setWeight(75)
-        font.setBold(True)
-        self.name_version_label.setFont(font)
-        self.name_version_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.name_version_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.name_version_label.setObjectName("name_version_label")
-        self.info_vlayout.addWidget(self.name_version_label)
-        self.libs_label = QtGui.QLabel(AboutDialog)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.libs_label.sizePolicy().hasHeightForWidth())
-        self.libs_label.setSizePolicy(sizePolicy)
-        self.libs_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.libs_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.libs_label.setObjectName("libs_label")
-        self.info_vlayout.addWidget(self.libs_label)
+        self.name_version_libs_label = QtGui.QLabel(AboutDialog)
+        self.name_version_libs_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.name_version_libs_label.setObjectName("name_version_libs_label")
+        self.info_vlayout.addWidget(self.name_version_libs_label)
         self.label_8 = QtGui.QLabel(AboutDialog)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -116,6 +95,7 @@ class Ui_AboutDialog(object):
         self.download_url_label.setSizePolicy(sizePolicy)
         self.download_url_label.setMouseTracking(True)
         self.download_url_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.download_url_label.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse)
         self.download_url_label.setObjectName("download_url_label")
         self.info_vlayout.addWidget(self.download_url_label)
         self.label_10 = QtGui.QLabel(AboutDialog)
@@ -157,8 +137,13 @@ class Ui_AboutDialog(object):
     def retranslateUi(self, AboutDialog):
         AboutDialog.setWindowTitle(QtGui.QApplication.translate("AboutDialog", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
         self.logo_label.setText(QtGui.QApplication.translate("AboutDialog", "thg logo", None, QtGui.QApplication.UnicodeUTF8))
-        self.name_version_label.setText(QtGui.QApplication.translate("AboutDialog", "TortoiseHg (version %s)", None, QtGui.QApplication.UnicodeUTF8))
-        self.libs_label.setText(QtGui.QApplication.translate("AboutDialog", "with Mercurial-%s, Python-%s, PyQt4-%s, Qt-%s", None, QtGui.QApplication.UnicodeUTF8))
+        self.name_version_libs_label.setText(QtGui.QApplication.translate("AboutDialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600;\">TortoiseHg</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">*version_string*</span></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span>*libs_string*</span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.copyright_label.setText(QtGui.QApplication.translate("AboutDialog", "Copyright 2008-2010 Steve Borho and  others", None, QtGui.QApplication.UnicodeUTF8))
         self.courtesy_label.setText(QtGui.QApplication.translate("AboutDialog", "Several icons are courtesy of the TortoiseSVN project", None, QtGui.QApplication.UnicodeUTF8))
         self.download_label.setText(QtGui.QApplication.translate("AboutDialog", "A new version of TortoiseHg is ready for download!", None, QtGui.QApplication.UnicodeUTF8))
