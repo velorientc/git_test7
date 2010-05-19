@@ -42,7 +42,7 @@ SIGNAL = QtCore.SIGNAL
 class Workbench(QtGui.QMainWindow, HgDialogMixin):
     """hg repository viewer/browser application"""
     _uifile = 'workbench.ui'
-    def __init__(self, ui, repo=None, fromhead=None):
+    def __init__(self, ui, repo=None):
         self.ui = ui
 
         self._reload_rev = None
@@ -57,7 +57,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.setWindowTitle('TortoiseHg Workbench')
 
         if repo:
-            self.addRepoTab(repo, fromhead)
+            self.addRepoTab(repo)
 
         tw = self.repoTabsWidget
         tw.removeTab(0)
@@ -70,8 +70,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.repoTabChanged()
 
         self.setupBranchCombo()
-        if fromhead:
-            self.startrev_entry.setText(str(fromhead))
 
         self.restoreSettings()
 
@@ -128,12 +126,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             self.actionDiffMode.setEnabled(False)
         self.actionDiffMode.setChecked(mode == 'diff')
         self.actionAnnMode.setChecked(ann)
-        self.revscompl_model.setStringList(tags)
 
-    def addRepoTab(self, repo, fromhead=None):
+    def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)
-        rw = RepoWidget(repo, fromhead)
+        rw = RepoWidget(repo)
         rw.showMessageSignal.connect(self.showMessage)
         rw.switchToSignal.connect(self.switchTo)
         tw = self.repoTabsWidget
@@ -223,30 +220,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.branch_label_action = self.toolBar_treefilters.addWidget(self.branch_label)
         self.branch_comboBox_action = self.toolBar_treefilters.addWidget(self.branch_comboBox)
         self.toolBar_treefilters.addSeparator()
-
-        self.startrev_label = QtGui.QToolButton()
-        self.startrev_label.setText("Start rev.")
-        self.startrev_label.setStatusTip("Display graph from this revision")
-        self.startrev_label.setPopupMode(QtGui.QToolButton.InstantPopup)
-        self.startrev_entry = QtGui.QLineEdit()
-        self.startrev_entry.setStatusTip("Display graph from this revision")
-        self.startrev_menu = QtGui.QMenu()
-        follow_action = self.startrev_menu.addAction("Follow mode")
-        follow_action.setCheckable(True)
-        follow_action.setStatusTip("Follow changeset history from start revision")
-        self.startrev_follow_action = follow_action
-        self.startrev_label.setMenu(self.startrev_menu)
-
-        self.revscompl_model = QtGui.QStringListModel(['tip'])
-        self.revcompleter = QtGui.QCompleter(self.revscompl_model, self)
-        self.startrev_entry.setCompleter(self.revcompleter)
-
-        connect(self.startrev_entry, SIGNAL('editingFinished()'),
-                self.refreshRevisionTable)
-        connect(self.startrev_follow_action, SIGNAL('toggled(bool)'),
-                self.refreshRevisionTable)
-        self.startrev_label_action = self.toolBar_treefilters.addWidget(self.startrev_label)
-        self.startrev_entry_action = self.toolBar_treefilters.addWidget(self.startrev_entry)
 
         # diff mode toolbar
         self.toolBar_diff.addAction(self.actionDiffMode)
@@ -344,18 +317,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         #        self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
-        self.actionStartAtRev = QtGui.QAction('Start at rev.', self)
-        self.actionStartAtRev.setShortcuts([Qt.Key_Backspace,])
-        connect(self.actionStartAtRev, SIGNAL('triggered()'),
-                self.startAtCurrentRev)
-        self.addAction(self.actionStartAtRev)
-
-        self.actionClearStartAtRev = QtGui.QAction('Clear start at rev.', self)
-        self.actionClearStartAtRev.setShortcuts([Qt.SHIFT + Qt.Key_Backspace,])
-        connect(self.actionClearStartAtRev, SIGNAL('triggered()'),
-                self.clearStartAtRev)
-        self.addAction(self.actionClearStartAtRev)
-
         connect(self.actionOpen_repository, SIGNAL('triggered()'),
                 self.openRepository)
 
@@ -384,12 +345,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         except RepoError:
             QtGui.QMessageBox.warning(self, _('Failed to open repository'), 
                 _('%s is not a valid repository') % path)
-
-    def startAtCurrentRev(self):
-        pass
-
-    def clearStartAtRev(self):
-        pass
 
     def setMode(self, mode):
         w = self.repoTabsWidget.currentWidget()
@@ -429,22 +384,10 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         """Starts the process of filling the HgModel"""
         branch = self.branch_comboBox.currentText()
         branch = str(branch)
-        startrev = str(self.startrev_entry.text()).strip()
-        if not startrev:
-            startrev = None
-        # XXX workaround: self.sender() may provoke a core dump if
-        # this method is called directly (not via a connected signal);
-        # the 'sender' keyword is a way to discrimimne that the method
-        # has been called directly (thus caller MUST set this kw arg)
-        sender = kw.get('sender') or self.sender()
-        if sender is self.startrev_follow_action and startrev is None:
-            return
-        follow = self.startrev_follow_action.isChecked()
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         if w:
-            self.revscompl_model.setStringList(w.repo.tags().keys())
-            w.setRepomodel(branch, startrev, follow)
+            w.setRepomodel(branch)
             if branch:
                 tabtext = '%s [%s]' % (w.reponame(), branch)
             else:
