@@ -34,9 +34,11 @@ class CommitWidget(QWidget):
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
         form = QFormLayout()
-        userle = QLineEdit()
+        usercombo = QComboBox()
+        usercombo.addItem(self.stwidget.repo[None].user())
+        usercombo.setEditable(True)
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
-        form.addRow(_('User:'), userle)
+        form.addRow(_('User:'), usercombo)
         form.addRow(_('Parent:'), QLabel('Description of ' +
                                          str(self.stwidget.repo['.'])))
         frame = QFrame()
@@ -72,10 +74,8 @@ class CommitWidget(QWidget):
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
         msgte.setFocus()
-
-        # TODO add commit widgets
-        # branchop dialog
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
+        self.usercombo = usercombo
 
     def restoreState(self, data):
         return self.stwidget.restoreState(data)
