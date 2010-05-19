@@ -23,7 +23,7 @@ from PyQt4.QtGui import *
 # Technical Debt
 #  tortoisehg.editor with line number
 #  smart visual diffs (what does this mean?)
-#  context menu for matches
+#  context menu for matches (view file, annotate file)
 
 class SearchWidget(QWidget):
     '''Working copy and repository search widget
