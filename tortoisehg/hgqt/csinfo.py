@@ -9,7 +9,7 @@ import re
 import os
 import binascii
 
-from PyQt4.QtCore import Qt, QSize
+from PyQt4.QtCore import Qt, QSize, QString, pyqtSignal
 from PyQt4.QtGui import QWidget, QLabel, QHBoxLayout, QPushButton
 
 from mercurial import patch, util, error
@@ -466,6 +466,8 @@ PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
 
 class SummaryPanel(SummaryBase, QWidget):
 
+    linkActivated = pyqtSignal(QString)
+
     def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)
         QWidget.__init__(self)
@@ -488,6 +490,8 @@ class SummaryPanel(SummaryBase, QWidget):
 
         if self.revlabel is None:
             self.revlabel = QLabel()
+            self.revlabel.linkActivated.connect(
+                 lambda s: self.linkActivated.emit(s))
             self.layout().addWidget(self.revlabel, alignment=Qt.AlignTop)
 
         if 'expandable' in self.csstyle and self.csstyle['expandable']:
@@ -502,10 +506,12 @@ class SummaryPanel(SummaryBase, QWidget):
         elif self.expand_btn is not None:
             self.expand_btn.setHidden(True)
 
-        if 'selectable' in self.csstyle:
-            sel = self.csstyle['selectable']
-            val = sel and Qt.TextSelectableByMouse or Qt.TextBrowserInteraction
-            self.revlabel.setTextInteractionFlags(val)
+        interact = Qt.LinksAccessibleByMouse
+
+        if 'selectable' in self.csstyle and self.csstyle['selectable']:
+            interact |= Qt.TextBrowserInteraction
+
+        self.revlabel.setTextInteractionFlags(interact)
 
         # build info
         contents = self.csstyle.get('contents', ())
