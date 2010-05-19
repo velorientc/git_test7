@@ -9,15 +9,15 @@ import re
 import os
 import binascii
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QWidget, QLabel, QHBoxLayout
+from PyQt4.QtCore import Qt, QSize
+from PyQt4.QtGui import QWidget, QLabel, QHBoxLayout, QPushButton
 
 from mercurial import patch, util, error
 from mercurial.node import hex
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, icon
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags',
                  'transplant', 'p4', 'svn')
@@ -474,8 +474,10 @@ class SummaryPanel(SummaryBase, QWidget):
 
         hbox = QHBoxLayout()
         hbox.setMargin(0)
+        hbox.setSpacing(0)
         self.setLayout(hbox)
         self.revlabel = None
+        self.expand_btn = None
 
     def update(self, target=None, style=None, custom=None, repo=None):
         if not SummaryBase.update(self, target, custom, repo):
@@ -486,7 +488,19 @@ class SummaryPanel(SummaryBase, QWidget):
 
         if self.revlabel is None:
             self.revlabel = QLabel()
-            self.layout().addWidget(self.revlabel)
+            self.layout().addWidget(self.revlabel, alignment=Qt.AlignTop)
+
+        if 'expandable' in self.csstyle and self.csstyle['expandable']:
+            if self.expand_btn is None:
+                self.expand_btn = qtlib.PMButton()
+                self.expand_btn.clicked.connect(lambda: self.update())
+                margin = QHBoxLayout()
+                margin.setMargin(3)
+                margin.addWidget(self.expand_btn, alignment=Qt.AlignTop)
+                self.layout().insertLayout(0, margin)
+            self.expand_btn.setShown(True)
+        elif self.expand_btn is not None:
+            self.expand_btn.setHidden(True)
 
         if 'selectable' in self.csstyle:
             sel = self.csstyle['selectable']
@@ -501,6 +515,9 @@ class SummaryPanel(SummaryBase, QWidget):
 
         # build info
         contents = self.csstyle.get('contents', ())
+        if 'expandable' in self.csstyle and self.expand_btn is not None \
+                                        and self.expand_btn.is_collapsed():
+            contents = contents[0:1]
 
         if 'margin' in self.csstyle:
             margin = self.csstyle['margin']

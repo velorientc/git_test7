@@ -18,5 +18,7 @@
     <file>icons/clean.svg</file>
     <file>icons/mqdiff.svg</file>
     <file>icons/mqpatch.svg</file>
+    <file>icons/plus.png</file>
+    <file>icons/minus.png</file>
   </qresource>
 </RCC>
