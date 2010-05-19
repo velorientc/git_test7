@@ -67,6 +67,7 @@ class CommitWidget(QWidget):
 
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
+        msgte.setFocus()
 
         # TODO add commit widgets
         # branchop dialog
