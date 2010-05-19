@@ -50,7 +50,7 @@ class AboutDialog(QDialog):
         thglogofile = paths.get_tortoise_icon('thg_logo_92x50.png')
         self._qui.logo_label.setPixmap(QPixmap(thglogofile))
 
-        thgv = (_('version  %s') % version.version())
+        thgv = (_('version %s') % version.version())
         libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') % \
               (hglib.hgversion, make_version(sys.version_info[0:3]),
               PYQT_VERSION_STR, QT_VERSION_STR))
