@@ -10,7 +10,7 @@ import os
 import binascii
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QWidget, QLabel
+from PyQt4.QtGui import QWidget, QLabel, QHBoxLayout
 
 from mercurial import patch, util, error
 from mercurial.node import hex
@@ -510,13 +510,18 @@ class SummaryBase(object):
             return False # cannot update
         return True
 
-class SummaryPanel(SummaryBase, QLabel):
+class SummaryPanel(SummaryBase, QWidget):
 
     def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)
-        QLabel.__init__(self)
+        QWidget.__init__(self)
 
         self.csstyle = style
+
+        hbox = QHBoxLayout()
+        hbox.setMargin(0)
+        self.setLayout(hbox)
+        self.revlabel = None
 
     def update(self, target=None, style=None, custom=None, repo=None):
         if not SummaryBase.update(self, target, custom, repo):
@@ -525,10 +530,14 @@ class SummaryPanel(SummaryBase, QLabel):
         if style is not None:
             self.csstyle = style
 
+        if self.revlabel is None:
+            self.revlabel = QLabel()
+            self.layout().addWidget(self.revlabel)
+
         if 'selectable' in self.csstyle:
             sel = self.csstyle['selectable']
             val = sel and Qt.TextSelectableByMouse or Qt.TextBrowserInteraction
-            self.setTextInteractionFlags(val)
+            self.revlabel.setTextInteractionFlags(val)
 
 #        if 'label' in self.csstyle:
 #            label = self.csstyle['label']
@@ -563,7 +572,7 @@ class SummaryPanel(SummaryBase, QLabel):
                 markups = (markups,)
             buf += ', '.join(markups) + '</td></tr>'
         buf += '</table>'
-        self.setText(buf)
+        self.revlabel.setText(buf)
 
         return True
 
