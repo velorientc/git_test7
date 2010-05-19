@@ -186,7 +186,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
         connect(self.repoview, SIGNAL('showMessage'), self.showMessage)
 
-#        self.revdisplay.setMessageWidget(self.message)
 #        self.revdisplay.commitsignal.connect(self.commit)
 
         connect(self.message, SIGNAL('revisionSelected'), self.repoview.goto)
@@ -423,6 +422,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
             ctx = self.repomodel.repo.changectx(rev)
             self.fileview.setContext(ctx)
             self.revpanel.update(ctx.rev())
+            self.message.displayRevision(ctx, None)
             self.filelistmodel.setSelectedRev(ctx)
             if len(self.filelistmodel):
                 self.tableView_filelist.selectRow(0)
