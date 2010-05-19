@@ -122,7 +122,7 @@ class SearchWidget(QWidget):
         layout.addWidget(tv)
         le.returnPressed.connect(self.searchActivated)
         self.repo = repo
-        self.tv, self.le, self.chk = tv, le, chk
+        self.tv, self.regexple, self.chk = tv, le, chk
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
         self.singlematch = singlematch
@@ -151,7 +151,7 @@ class SearchWidget(QWidget):
 
         model = self.tv.model()
         model.reset()
-        pattern = hglib.fromunicode(self.le.text())
+        pattern = hglib.fromunicode(self.regexple.text())
         if not pattern:
             return
         try:
@@ -162,7 +162,7 @@ class SearchWidget(QWidget):
             self.emit(SIGNAL('errorMessage'), msg)
             return
 
-        self.le.selectAll()
+        self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
         if inc: inc = inc.split(', ')
         exc = hglib.fromunicode(self.excle.text())
@@ -192,7 +192,7 @@ class SearchWidget(QWidget):
             self.thread = HistorySearchThread(self.repo, pattern, icase,
                                               inc, exc)
 
-        self.le.setEnabled(False)
+        self.regexple.setEnabled(False)
         self.connect(self.thread, SIGNAL('finished'), self.finished)
         self.connect(self.thread, SIGNAL('matchedRow'),
                      lambda row: model.appendRow(*row))
@@ -202,8 +202,8 @@ class SearchWidget(QWidget):
     def finished(self):
         for col in xrange(COL_TEXT):
             self.tv.resizeColumnToContents(col)
-        self.le.setEnabled(True)
-        self.le.setFocus()
+        self.regexple.setEnabled(True)
+        self.regexple.setFocus()
         self.emit(SIGNAL('loadComplete'))
 
 
