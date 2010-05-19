@@ -50,6 +50,21 @@ class RepoTreeItem:
     def menulist(self):
         return []
 
+    def flags(self):
+        return Qt.NoItemFlags
+
+    def removeRows(self, row, count):
+        cs = self.childs
+        remove = cs[row : row + count]
+        keep = cs[:row] + cs[row + count:]
+        self.childs = keep
+        for c in remove:
+            c._row = 0
+            c._parent = QModelIndex()
+        for i, c in enumerate(keep):
+            c._row = i        
+        return True
+
 
 class RepoItem(RepoTreeItem):
     def __init__(self, rootpath, parent=None):
@@ -69,6 +84,12 @@ class RepoItem(RepoTreeItem):
     def menulist(self):
         return ['open']
 
+    def flags(self):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+
+    def removeRows(self, row, count):
+        return False
+
 
 class RepoGroupItem(RepoTreeItem):
     def __init__(self, name, parent=None):
@@ -82,6 +103,9 @@ class RepoGroupItem(RepoTreeItem):
 
     def menulist(self):
         return ['newGroup']
+
+    def flags(self):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
 
 
 class RepoTreeModel(QtCore.QAbstractItemModel):
@@ -149,8 +173,23 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
 
     def flags(self, index):
         if not index.isValid():
-            return 0
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.NoItemFlags
+        item = index.internalPointer()
+        return item.flags()
+
+    def supportedDropActions(self):
+        return Qt.MoveAction
+
+    def removeRows(self, row, count, parent):
+        self.beginRemoveRows(parent, row, row+count)
+        item = parent.internalPointer()
+        res = item.removeRows(row, count)
+        self.endRemoveRows()
+        return res
+
+    def insertRows(self, row, count, parent):
+        print "insertRows(row=%s, count=%s): not yet implemented" % (row, count)
+        return False
 
     # functions not defined in QAbstractItemModel
 
@@ -183,6 +222,14 @@ class RepoTreeView(QtGui.QTreeView):
         QtGui.QTreeView.__init__(self)
         self.parent = parent
         self.selitem = None
+
+        # enable drag and drop
+        # (see http://doc.qt.nokia.com/4.6/model-view-dnd.html)
+        self.setDragEnabled(True)
+        self.setAcceptDrops(True)
+        self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.setDropIndicatorShown(True)
+
         self.createActions()
 
     def contextMenuEvent(self, event):
