@@ -898,14 +898,14 @@ class GLog(gdialog.GWindow):
             self.filtercombo.set_active(1)
             path = hglib.escapepath(opts['filehist'])
             self.filterentry.set_text(hglib.toutf(path))
-            self.filter_entry_activated(self.filterentry, self.filtercombo)
+            self.activate_filter(path, MODE_FILEPATS)
         elif self.pats:
             self.filterbar.get_button('custom').set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             paths = [hglib.escapepath(p) for p in self.pats]
             self.filterentry.set_text(hglib.toutf(', '.join(paths)))
-            self.filter_entry_activated(self.filterentry, self.filtercombo)
+            self.activate_filter(', '.join(paths), MODE_FILEPATS)
         elif 'bundle' in opts:
             self.set_bundlefile(opts['bundle'])
             self.bundle_autoreject = True
@@ -1094,9 +1094,8 @@ class GLog(gdialog.GWindow):
                 kind, name = match._patsplit(npats[0], None)
                 if kind == 'path' and not os.path.isdir(name):
                     ftitle(_('file history: ') + hglib.toutf(name))
-                    lname = hglib.fromutf(name)
-                    opts['filehist'] = lname
-                    self.graphview.refresh(graphcol, [lname], opts)
+                    opts['filehist'] = name
+                    self.graphview.refresh(graphcol, [name], opts)
             if not opts.get('filehist'):
                 ftitle('%s: %s' % (self.filtercombo.get_active_text(),
                                    self.filterentry.get_text()))

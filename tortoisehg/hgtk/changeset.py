@@ -19,6 +19,8 @@ from tortoisehg.util import shlib, hglib, paths
 
 from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
 
+MODE_FILEPATS = 1 # mirrored from history.py
+
 class ChangeSet(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
     def __init__(self, ui, repo, cwd, pats, opts, stbar=None):
@@ -991,8 +993,7 @@ class ChangeSet(gdialog.GWindow):
             explorer.filtercombo.set_active(1)
             explorer.filterentry.set_text(fname)
             explorer.filterbar.get_button('custom').set_active(True)
-            explorer.filter_entry_activated(explorer.filterentry,
-                                            explorer.filtercombo)
+            explorer.activate_filter(path, MODE_FILEPATS)
         else:
             # Else launch our own glog instance
             from tortoisehg.hgtk import history
