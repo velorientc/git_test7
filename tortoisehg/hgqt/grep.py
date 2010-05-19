@@ -68,7 +68,13 @@ class SearchWidget(QWidget):
         grid.addWidget(revle, 2, 1)
         grid.addWidget(singlematch, 0, 3)
         ilabel = QLabel(_('Includes:'))
+        ilabel.setToolTip(_('Comma separated list of inclusion patterns.'
+                ' By default, the entire repository is searched.'))
+        ilabel.setBuddy(incle)
         elabel = QLabel(_('Excludes:'))
+        elabel.setToolTip(_('Comma separated list of exclusion patterns.'
+                ' Exclusion patterns are applied after inclusion patterns.'))
+        elabel.setBuddy(excle)
         grid.addWidget(ilabel, 1, 2)
         grid.addWidget(incle, 1, 3)
         grid.addWidget(elabel, 2, 2)
@@ -86,6 +92,8 @@ class SearchWidget(QWidget):
         history.toggled.connect(singlematch.setDisabled)
         revle.setEnabled(False)
         revle.returnPressed.connect(self.searchActivated)
+        excle.returnPressed.connect(self.searchActivated)
+        incle.returnPressed.connect(self.searchActivated)
         working.setChecked(True)
 
         def expandtoggled(checked):
@@ -194,6 +202,7 @@ class SearchWidget(QWidget):
         for col in xrange(COL_TEXT):
             self.tv.resizeColumnToContents(col)
         self.le.setEnabled(True)
+        self.le.setFocus()
         self.emit(SIGNAL('loadComplete'))
 
 
