@@ -296,7 +296,7 @@ class CtxSearchThread(QThread):
                     pos = m.end()
                 if pos:
                     hu.write(line[pos:])
-                    row = [wfile, i, rev, None, hu.getdata()[0]]
+                    row = [wfile, i + 1, rev, None, hu.getdata()[0]]
                     self.emit(SIGNAL('matchedRow'), row)
                     if self.once:
                         break
