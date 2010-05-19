@@ -507,12 +507,6 @@ class SummaryPanel(SummaryBase, QWidget):
             val = sel and Qt.TextSelectableByMouse or Qt.TextBrowserInteraction
             self.revlabel.setTextInteractionFlags(val)
 
-#        if 'label' in self.csstyle:
-#            label = self.csstyle['label']
-#            assert isinstance(label, basestring)
-#            self.set_label(label)
-#            self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-
         # build info
         contents = self.csstyle.get('contents', ())
         if 'expandable' in self.csstyle and self.expand_btn is not None \
