@@ -49,6 +49,7 @@ class SearchWidget(QWidget):
         lbl = QLabel(_('Regexp:'))
         le = QLineEdit()
         lbl.setBuddy(le)
+        lbl.setToolTip(_('Regular expression search pattern'))
         chk = QCheckBox(_('Ignore case'))
         hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
