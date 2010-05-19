@@ -291,11 +291,11 @@ class CtxSearchThread(QThread):
             for i, line in enumerate(data.splitlines()):
                 pos = 0
                 for m in self.regexp.finditer(line): # perform regexp
-                    hu.write(line[pos:m.start()])
+                    hu.write(line[pos:m.start()], label='ui.status')
                     hu.write(line[m.start():m.end()], label='grep.match')
                     pos = m.end()
                 if pos:
-                    hu.write(line[pos:])
+                    hu.write(line[pos:], label='ui.status')
                     row = [wfile, i + 1, rev, None, hu.getdata()[0]]
                     self.emit(SIGNAL('matchedRow'), row)
                     if self.once:
