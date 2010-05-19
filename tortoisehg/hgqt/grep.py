@@ -49,12 +49,10 @@ class SearchWidget(QWidget):
         lbl = QLabel(_('Regexp:'))
         le = QLineEdit()
         lbl.setBuddy(le)
-
-        cb = QComboBox()
-        cb.addItems([_('Working Copy'),
-                     _('Parent Revision'),
-                     _('All History')])
         chk = QCheckBox(_('Ignore case'))
+        hbox.addWidget(lbl)
+        hbox.addWidget(le, 1)
+        hbox.addWidget(chk)
 
         incle = QLineEdit()
         excle = QLineEdit()
@@ -89,9 +87,6 @@ class SearchWidget(QWidget):
         expand.toggled.connect(expandtoggled)
         expandtoggled(False)
 
-        hbox.addWidget(lbl)
-        hbox.addWidget(le, 1)
-        hbox.addWidget(chk)
         hbox.addWidget(expand)
         layout.addLayout(hbox)
         frame.setLayout(grid)
