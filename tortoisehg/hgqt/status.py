@@ -224,6 +224,7 @@ class StatusWidget(QWidget):
         self.patchecked = patchecked.copy()
         self.updateModel()
         self.emit(SIGNAL('loadComplete()'))
+        self.refreshing.wait()
         self.refreshing = None
 
     def updateModel(self):
