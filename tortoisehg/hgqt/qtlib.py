@@ -189,6 +189,14 @@ class PMButton(QtGui.QPushButton):
             self.setIcon(icon)
         self.clicked.connect(clicked)
 
+    def set_expanded(self, state=True):
+        icon = state and self.minus or self.plus
+        self.setIcon(icon)
+
+    def set_collapsed(self, state=True):
+        icon = state and self.plus or self.minus
+        self.setIcon(icon)
+
     def is_expanded(self):
         return self.icon().serialNumber() == self.minus.serialNumber()
 
