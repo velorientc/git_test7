@@ -55,7 +55,7 @@ class Factory(object):
         if style is None:
             style = panelstyle()
         self.csstyle = style
-        self.info = CachedSummaryInfo()
+        self.info = SummaryInfo()
 
         self.withupdate = withupdate
 
@@ -413,54 +413,6 @@ class SummaryInfo(object):
                 pass
         return default_func(widget, item, markups)
 
-class CachedSummaryInfo(SummaryInfo):
-
-    def __init__(self):
-        SummaryInfo.__init__(self)
-        self.clear_cache()
-
-    def try_cache(self, target, func, *args, **kargs):
-        item, widget, ctx, custom = args
-        if target != 'widget': # no cache for widget
-            root = ctx._repo.root
-            repoid = id(ctx._repo)
-            try:
-                cacheinfo = self.cache[root]
-                if cacheinfo[0] != repoid:
-                    del self.cache[root] # clear cache
-                    cacheinfo = None
-            except KeyError:
-                cacheinfo = None
-            if cacheinfo is None:
-                self.cache[root] = cacheinfo = (repoid, {})
-            revid = ctx.hex()
-            if not revid and hasattr(ctx, '_path'):
-                revid = ctx._path
-            key = target + item + revid + str(custom)
-            try:
-                return cacheinfo[1][key]
-            except KeyError:
-                pass
-        value = func(self, *args, **kargs)
-        if target != 'widget': # do not cache widgets
-            cacheinfo[1][key] = value
-        return value
-
-    def get_data(self, *args, **kargs):
-        return self.try_cache('data', SummaryInfo.get_data, *args, **kargs)
-
-    def get_label(self, *args, **kargs):
-        return self.try_cache('label', SummaryInfo.get_label, *args, **kargs)
-
-    def get_markup(self, *args, **kargs):
-        return self.try_cache('markup', SummaryInfo.get_markup, *args, **kargs)
-
-    def get_widget(self, *args, **kargs):
-        return self.try_cache('widget', SummaryInfo.get_widget, *args, **kargs)
-
-    def clear_cache(self):
-        self.cache = {}
-
 class SummaryBase(object):
 
     def __init__(self, target, custom, repo, info):
@@ -546,13 +498,6 @@ class SummaryPanel(SummaryBase, QWidget):
 #            assert isinstance(label, basestring)
 #            self.set_label(label)
 #            self.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-
-#        if 'padding' in self.csstyle:
-#            padding = self.csstyle['padding']
-             # 'border' range is 0-65535
-#            assert isinstance(padding, (int, long))
-#            assert 0 <= padding and padding <= 65535
-#            self.table.set_border_width(padding)
 
         # build info
         contents = self.csstyle.get('contents', ())
