@@ -158,7 +158,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                 link = item != 'cset'
                 if isinstance(value, basestring):
                     return revid_markup(value)
-                return revline_markup(*value, link=link)
+                return revline_markup(link=link, *value)
             elif item in ('parents', 'children'):
                 csets = []
                 for cset in value:
