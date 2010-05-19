@@ -62,19 +62,23 @@ class SearchWidget(QWidget):
         revision = QRadioButton(_('Revision'))
         history = QRadioButton(_('All History'))
         revle = QLineEdit()
-        form = QFormLayout()
-        form.addRow(QLabel(), working)
-        form.addRow(revle, revision)
-        form.addRow(QLabel(), history)
-        form.addRow(_('Includes:'), incle)
-        form.addRow(_('Excludes:'), excle)
+        grid = QGridLayout()
+        grid.addWidget(working, 0, 0)
+        grid.addWidget(revision, 1, 0)
+        grid.addWidget(revle, 1, 1)
+        grid.addWidget(history, 2, 0)
+        ilabel = QLabel(_('Includes:'))
+        elabel = QLabel(_('Excludes:'))
+        grid.addWidget(ilabel, 3, 0)
+        grid.addWidget(incle, 3, 1)
+        grid.addWidget(elabel, 4, 0)
+        grid.addWidget(excle, 4, 1)
         working.setChecked(True)
 
         def expandtoggled(checked):
-            for w in (incle, excle, working, history, revision, revle):
+            for w in (incle, excle, working, history, revision, revle,
+                      ilabel, elabel):
                 w.setVisible(checked)
-                l = form.labelForField(w)
-                if l: l.setVisible(checked)
             expand.setArrowType(checked and Qt.UpArrow or Qt.DownArrow)
         expand = QToolButton()
         expand.setIconSize(QSize(12, 12))
@@ -88,7 +92,7 @@ class SearchWidget(QWidget):
         hbox.addWidget(chk)
         hbox.addWidget(expand)
         layout.addLayout(hbox)
-        layout.addLayout(form)
+        layout.addLayout(grid)
 
         tv = MatchTree(repo, self)
         tv.setItemsExpandable(False)
