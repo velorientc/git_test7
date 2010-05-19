@@ -479,7 +479,7 @@ class SummaryPanel(SummaryBase, QWidget):
         hbox.setSpacing(0)
         self.setLayout(hbox)
         self.revlabel = None
-        self.expand_btn = None
+        self.expand_btn = qtlib.PMButton()
 
     def update(self, target=None, style=None, custom=None, repo=None):
         if not SummaryBase.update(self, target, custom, repo):
@@ -495,15 +495,14 @@ class SummaryPanel(SummaryBase, QWidget):
             self.layout().addWidget(self.revlabel, alignment=Qt.AlignTop)
 
         if 'expandable' in self.csstyle and self.csstyle['expandable']:
-            if self.expand_btn is None:
-                self.expand_btn = qtlib.PMButton()
+            if self.expand_btn.parentWidget() is None:
                 self.expand_btn.clicked.connect(lambda: self.update())
                 margin = QHBoxLayout()
                 margin.setMargin(3)
                 margin.addWidget(self.expand_btn, alignment=Qt.AlignTop)
                 self.layout().insertLayout(0, margin)
             self.expand_btn.setShown(True)
-        elif self.expand_btn is not None:
+        elif self.expand_btn.parentWidget() is not None:
             self.expand_btn.setHidden(True)
 
         interact = Qt.LinksAccessibleByMouse
@@ -515,7 +514,7 @@ class SummaryPanel(SummaryBase, QWidget):
 
         # build info
         contents = self.csstyle.get('contents', ())
-        if 'expandable' in self.csstyle and self.expand_btn is not None \
+        if 'expandable' in self.csstyle and self.csstyle['expandable'] \
                                         and self.expand_btn.is_collapsed():
             contents = contents[0:1]
 
@@ -540,6 +539,13 @@ class SummaryPanel(SummaryBase, QWidget):
         self.revlabel.setText(buf)
 
         return True
+
+    def set_expanded(self, state):
+        self.expand_btn.set_expanded(state)
+        self.update()
+
+    def is_expanded(self):
+        return self.expand_btn.is_expanded()
 
 LABEL_PAT = re.compile(r'(?:(?<=%%)|(?<!%)%\()(\w+)(?:\)s)')
 

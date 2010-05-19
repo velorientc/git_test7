@@ -493,7 +493,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         wb = "RepoWidget/"
         for n in self.splitternames:
             s.setValue(wb + n, getattr(self, n).saveState())
-#        s.setValue(wb + 'revdisplay.expanded', self.revdisplay.expanded())
+        s.setValue(wb + 'revpanel.expanded', self.revpanel.is_expanded())
 
     def restoreSettings(self):
         s = QtCore.QSettings()
@@ -504,8 +504,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
             n += '_splitter'
             self.splitternames.append(n)
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
-#        expanded = s.value(wb + 'revdisplay.expanded', True).toBool()
-#        self.revdisplay.setExpanded(expanded)
+        expanded = s.value(wb + 'revpanel.expanded', True).toBool()
+        self.revpanel.set_expanded(expanded)
 
     def closeRepoWidget(self):
         '''returns False if close should be aborted'''
