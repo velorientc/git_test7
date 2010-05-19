@@ -45,7 +45,8 @@ SIGNAL = QtCore.SIGNAL
 class RepoWidget(QtGui.QWidget, WidgetMixin):
     _uifile = 'repowidget.ui'
 
-    showMessageSignal = QtCore.pyqtSignal(str) 
+    showMessageSignal = QtCore.pyqtSignal(str)
+    switchToSignal = QtCore.pyqtSignal(QtGui.QWidget)
 
     def __init__(self, repo, fromhead=None):
         self.repo = repo
@@ -356,6 +357,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         if self.message.isSaved():
             res = True
         else:
+            self.switchTo()
             MB = QtGui.QMessageBox
             prompt = _("The message text for '%s' has not been saved.")
             mb = MB(MB.Warning, _("Unsaved Change Message"),
@@ -368,6 +370,9 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
             else:
                 res = True
         return res
+
+    def switchTo(self):
+        self.switchToSignal.emit(self)
 
     def storeSettings(self):
         s = QtCore.QSettings()
