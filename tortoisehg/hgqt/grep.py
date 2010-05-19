@@ -63,10 +63,9 @@ class SearchWidget(QWidget):
         revle = QLineEdit()
         grid = QGridLayout()
         grid.addWidget(working, 0, 0)
-        grid.addWidget(revision, 1, 0)
-        grid.addWidget(revle, 1, 1)
-        grid.addWidget(history, 2, 0)
-        working.setChecked(True)
+        grid.addWidget(history, 1, 0)
+        grid.addWidget(revision, 2, 0)
+        grid.addWidget(revle, 2, 1)
         grid.addWidget(singlematch, 0, 3)
         ilabel = QLabel(_('Includes:'))
         elabel = QLabel(_('Excludes:'))
@@ -78,6 +77,16 @@ class SearchWidget(QWidget):
         grid.setColumnStretch(1, 0)
         frame = QFrame()
         frame.setFrameStyle(QFrame.StyledPanel)
+        def revisiontoggled(checked):
+            revle.setEnabled(checked)
+            if checked:
+                revle.selectAll()
+                QTimer.singleShot(0, lambda:revle.setFocus())
+        revision.toggled.connect(revisiontoggled)
+        history.toggled.connect(singlematch.setDisabled)
+        revle.setEnabled(False)
+        revle.returnPressed.connect(self.searchActivated)
+        working.setChecked(True)
 
         def expandtoggled(checked):
             frame.setVisible(checked)
