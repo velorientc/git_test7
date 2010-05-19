@@ -77,7 +77,7 @@ class SearchWidget(QWidget):
         grid.setColumnStretch(3, 1)
         grid.setColumnStretch(1, 0)
         frame = QFrame()
-        frame.setFrameStyle(QFrame.Panel | QFrame.Sunken)
+        frame.setFrameStyle(QFrame.StyledPanel)
 
         def expandtoggled(checked):
             frame.setVisible(checked)
