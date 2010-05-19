@@ -347,6 +347,11 @@ def clone(ui, *pats, **opts):
     from tortoisehg.hgqt.clone import run
     qtrun(run, ui, *pats, **opts)
 
+def commit(ui, *pats, **opts):
+    """commit tool"""
+    from tortoisehg.hgqt.commit import run
+    qtrun(run, ui, *pats, **opts)
+
 def email(ui, *pats, **opts):
     """send changesets by email"""
     from tortoisehg.hgqt.hgemail import run
@@ -636,6 +641,10 @@ table = {
           ('', 'uncompressed', None,
            _('use uncompressed transfer (fast over LAN)')),],
          _('thg clone [OPTION]... SOURCE [DEST]')),
+    "^commit|ci": (commit,
+        [('u', 'user', '', _('record user as committer')),
+         ('d', 'date', '', _('record datecode as commit date'))],
+        _('thg commit [OPTIONS] [FILE]...')),
     "^grep|search": (grep, [], _('thg grep')),
     "^email":
         (email,
