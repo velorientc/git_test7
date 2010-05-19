@@ -164,8 +164,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         custom = csinfo.custom(data=data_func, label=label_func,
                                markup=markup_func)
         style = csinfo.panelstyle(contents=('cset', 'branch', 'user',
-                       'dateage', 'parents', 'children', 'tags',
-                       'transplant', 'p4', 'svn'), selectable=True)
+                       'dateage', 'parents', 'children', 'tags', 'transplant',
+                       'p4', 'svn'), selectable=True, expandable=True)
         self.revpanel = csinfo.create(self.repo, style=style, custom=custom)
         self.verticalLayout.insertWidget(0, self.revpanel)
 
