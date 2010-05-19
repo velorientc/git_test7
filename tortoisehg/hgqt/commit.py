@@ -33,12 +33,28 @@ class CommitWidget(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
+        vbox = self.stwidget.diffvbox
+        form = QFormLayout()
+        userle = QLineEdit()
+        form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
+        form.addRow(_('User:'), userle)
+        form.addRow(_('Parent:'), QLabel('Description of ' +
+                                         str(self.stwidget.repo['.'])))
+        frame = QFrame()
+        frame.setLayout(form)
+        frame.setFrameStyle(QFrame.StyledPanel)
+        vbox.insertWidget(0, frame, 0)
+        msgcombo = QComboBox()
+        msgcombo.addItem('Recent commit messages...')
+        vbox.insertWidget(1, msgcombo, 0)
+        msgte = QTextEdit()
+        msgte.setAcceptRichText(False)
+        # TODO
+        # http://www.qtcentre.org/threads/9840-QTextEdit-auto-resize
+        vbox.insertWidget(2, msgte, 0)
+        vbox.setStretchFactor(msgte, 0)
         # TODO add commit widgets
         # branchop dialog
-        # message history selection widget
-        # username entry 
-        # message entry
-        # parent text
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
 
     def restoreState(self, data):

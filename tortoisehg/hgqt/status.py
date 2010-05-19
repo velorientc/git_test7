@@ -167,9 +167,10 @@ class StatusWidget(QWidget):
         self.te.setReadOnly(True)
         self.te.setLineWrapMode(QTextEdit.NoWrap)
         vbox.addLayout(hbox)
-        vbox.addWidget(self.te)
+        vbox.addWidget(self.te, 1)
 
         self.split = split
+        self.diffvbox = vbox
         QTimer.singleShot(0, self.refreshWctx)
 
     def getTitle(self):
