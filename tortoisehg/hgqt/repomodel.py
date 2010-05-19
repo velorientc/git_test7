@@ -126,7 +126,7 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
     _stretchs = {'Log': 1, }
     _getcolumns = "getChangelogColumns"
 
-    def __init__(self, repo, branch='', fromhead=None, follow=False, parent=None):
+    def __init__(self, repo, branch='', parent=None):
         """
         repo is a hg repo instance
         """
@@ -140,9 +140,9 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         self.rowcount = 0
         self.repo = repo
         self.load_config()
-        self.setRepo(repo, branch=branch, fromhead=fromhead, follow=follow)
+        self.setRepo(repo, branch=branch)
 
-    def setRepo(self, repo, branch='', fromhead=None, follow=False):
+    def setRepo(self, repo, branch=''):
         oldrepo = self.repo
         self.repo = repo
         self._branch = branch
@@ -161,8 +161,8 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
         self._user_colors = {}
         self._branch_colors = {}
-        grapher = revision_grapher(self.repo, start_rev=fromhead,
-                                   follow=follow, branch=branch)
+        grapher = revision_grapher(self.repo, start_rev=None,
+                                   follow=False, branch=branch)
         self.graph = Graph(self.repo, grapher, self.max_file_size)
         self.rowcount = 0
         self.emit(SIGNAL('layoutChanged()'))

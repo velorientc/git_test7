@@ -48,7 +48,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
     showMessageSignal = QtCore.pyqtSignal(str)
     switchToSignal = QtCore.pyqtSignal(QtGui.QWidget)
 
-    def __init__(self, repo, fromhead=None):
+    def __init__(self, repo):
         self.repo = repo
         self._closed_branch_supp = has_closed_branch_support(self.repo)
 
@@ -193,9 +193,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         # setup tables and views
         connect(self.fileview, SIGNAL('fileDisplayed'),
                 self.file_displayed)
-        self.setupModels(fromhead)
-        if fromhead:
-            self.startrev_entry.setText(str(fromhead))
+        self.setupModels()
         self.setupRevisionTable()
 
         self._repodate = self._getrepomtime()
@@ -328,8 +326,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         cfg = WidgetMixin.load_config(self)
         self.hidefinddelay = cfg.getHideFindDelay()
 
-    def create_models(self, fromhead=None):
-        self.repomodel = HgRepoListModel(self.repo, fromhead=fromhead)
+    def create_models(self):
+        self.repomodel = HgRepoListModel(self.repo)
         connect(self.repomodel, SIGNAL('filled'),
                 self.on_filled)
         connect(self.repomodel, SIGNAL('loaded'),
@@ -339,8 +337,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.filelistmodel = HgFileListModel(self.repo)
 
-    def setupModels(self, fromhead=None):
-        self.create_models(fromhead)
+    def setupModels(self):
+        self.create_models()
         self.repoview.setModel(self.repomodel)
         self.tableView_filelist.setModel(self.filelistmodel)
         self.fileview.setModel(self.repomodel)
@@ -459,10 +457,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self._repodate = self._getrepomtime()
         self.setupModels()
 
-    def setRepomodel(self, branch, startrev, follow):
-        startrev = self.repo.changectx(startrev).rev()
-        self.repomodel.setRepo(
-            self.repo, branch=branch, fromhead=startrev, follow=follow)
+    def setRepomodel(self, branch):
+        self.repomodel.setRepo(self.repo, branch=branch)
 
     def filterbranch(self):
         return self.repomodel.branch()
