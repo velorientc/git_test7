@@ -445,7 +445,10 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         if w:
             self.revscompl_model.setStringList(w.repo.tags().keys())
             w.setRepomodel(branch, startrev, follow)
-            tabtext = '%s [%s]' % (w.reponame(), branch)
+            if branch:
+                tabtext = '%s [%s]' % (w.reponame(), branch)
+            else:
+                tabtext = w.reponame()
             tw.setTabText(tw.currentIndex(), tabtext)
 
     def on_about(self, *args):
