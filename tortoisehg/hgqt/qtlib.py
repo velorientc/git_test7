@@ -14,6 +14,7 @@ from mercurial import extensions
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import icon as geticon
 from hgext.color import _styles
 
 tmproot = None
@@ -166,3 +167,30 @@ class CustomPrompt(QtGui.QMessageBox):
 
 def setup_font_substitutions():
     QtGui.QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
+
+class PMButton(QtGui.QPushButton):
+    """Toggle button with plus/minus icon images"""
+
+    def __init__(self, expanded=True, parent=None):
+        QtGui.QPushButton.__init__(self, parent)
+
+        size = QtCore.QSize(11, 11)
+        self.setIconSize(size)
+        self.setMaximumSize(size)
+        self.setFlat(True)
+
+        self.plus = geticon('plus')
+        self.minus = geticon('minus')
+        icon = expanded and self.minus or self.plus
+        self.setIcon(icon)
+
+        def clicked():
+            icon = self.is_expanded() and self.plus or self.minus
+            self.setIcon(icon)
+        self.clicked.connect(clicked)
+
+    def is_expanded(self):
+        return self.icon().serialNumber() == self.minus.serialNumber()
+
+    def is_collapsed(self):
+        return not self.is_expanded()
