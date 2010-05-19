@@ -130,27 +130,35 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                 return None
             raise csinfo.UnknownItem(item)
         def markup_func(widget, item, value):
-            def revline_markup(revnum, revid, summary, highlight=None, branch=None):
+            def link_markup(revnum, revid, enable=True):
+                mrevid = revid_markup(revid)
+                if not enable:
+                    return '%s (%s)' % (revnum, mrevid)
+                link = 'cset://%s:%s' % (revnum, revid)
+                return '<a href="%s">%s (%s)</a>' % (link, revnum, mrevid)
+            def revline_markup(revnum, revid, summary, highlight=None,
+                               branch=None, link=True):
                 def branch_markup(branch):
                     opts = dict(fg='black', bg='#aaffaa')
                     return qtlib.markup(' %s ' % branch, **opts)
-                revnum = qtlib.markup(revnum)
                 summary = qtlib.markup(summary)
+                if branch:
+                    branch = branch_markup(branch)
                 if revid:
-                    revid = revid_markup(revid)
+                    rev = link_markup(revnum, revid, link)
                     if branch:
-                        branch = branch_markup(branch)
-                        return '%s (%s) %s %s' % (revnum, revid, branch, summary)
-                    return '%s (%s) %s' % (revnum, revid, summary)
+                        return '%s %s %s' % (rev, branch, summary)
+                    return '%s %s' % (rev, summary)
                 else:
+                    revnum = qtlib.markup(revnum)
                     if branch:
-                        branch = branch_markup(branch)
                         return '%s - %s %s' % (revnum, branch, summary)
                     return '%s - %s' % (revnum, summary)
             if item in ('cset', 'transplant', 'patch', 'p4', 'svn'):
+                link = item != 'cset'
                 if isinstance(value, basestring):
                     return revid_markup(value)
-                return revline_markup(*value)
+                return revline_markup(*value, link=link)
             elif item in ('parents', 'children'):
                 csets = []
                 for cset in value:
@@ -167,6 +175,11 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
                        'dateage', 'parents', 'children', 'tags', 'transplant',
                        'p4', 'svn'), selectable=True, expandable=True)
         self.revpanel = csinfo.create(self.repo, style=style, custom=custom)
+        def activated(url):
+            if url.startsWith('cset://'):
+                rev = url[7:].split(':')[0]
+                self.repoview.goto(rev)
+        self.revpanel.linkActivated.connect(activated)
         self.verticalLayout.insertWidget(0, self.revpanel)
 
         self.fileview.setFont(self._font)
@@ -346,8 +359,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
         connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
-#        connect(self.revdisplay, SIGNAL('revisionSelected'), view.goto)
-#        connect(self.revdisplay, SIGNAL('parentRevisionSelected'), self.fileview.displayDiff)
         self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -411,7 +422,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         if self.repomodel.graph:
             ctx = self.repomodel.repo.changectx(rev)
             self.fileview.setContext(ctx)
-#            self.revdisplay.displayRevision(ctx)
             self.revpanel.update(ctx.rev())
             self.filelistmodel.setSelectedRev(ctx)
             if len(self.filelistmodel):
