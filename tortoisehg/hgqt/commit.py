@@ -33,7 +33,6 @@ class CommitWidget(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
-        vbox = self.stwidget.diffvbox
         form = QFormLayout()
         userle = QLineEdit()
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
@@ -43,16 +42,32 @@ class CommitWidget(QWidget):
         frame = QFrame()
         frame.setLayout(form)
         frame.setFrameStyle(QFrame.StyledPanel)
-        vbox.insertWidget(0, frame, 0)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(frame, 0)
+        vbox.setMargin(0)
         msgcombo = QComboBox()
         msgcombo.addItem('Recent commit messages...')
-        vbox.insertWidget(1, msgcombo, 0)
+        vbox.addWidget(msgcombo, 0)
         msgte = QTextEdit()
         msgte.setAcceptRichText(False)
-        # TODO
-        # http://www.qtcentre.org/threads/9840-QTextEdit-auto-resize
-        vbox.insertWidget(2, msgte, 0)
-        vbox.setStretchFactor(msgte, 0)
+        vbox.addWidget(msgte, 1)
+        upperframe = QFrame()
+        upperframe.setLayout(vbox)
+
+        self.split = QSplitter(Qt.Vertical)
+        # Add our widgets to the top of our splitter
+        self.split.addWidget(upperframe)
+        # Add status widget document frame below our splitter
+        # this reparents the docf from the status splitter
+        self.split.addWidget(self.stwidget.docf)
+        h = self.split.sizeHint().height()
+        mh = upperframe.minimumSizeHint().height()
+        self.split.setSizes([mh, h-mh])
+
+        # add our splitter where the docf used to be
+        self.stwidget.split.addWidget(self.split)
+
         # TODO add commit widgets
         # branchop dialog
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home

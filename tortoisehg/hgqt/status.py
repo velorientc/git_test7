@@ -145,6 +145,7 @@ class StatusWidget(QWidget):
         vbox.setMargin(0)
         docf = QFrame(split)
         docf.setLayout(vbox)
+        self.docf = docf
         hbox = QHBoxLayout()
         hbox.setContentsMargins (5, 7, 0, 0)
         self.fnamelabel = QLabel()
