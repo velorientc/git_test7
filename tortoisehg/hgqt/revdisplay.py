@@ -228,7 +228,7 @@ class RevDisplay(QtGui.QWidget):
 
         self._header.setText(buf)
 
-        self._message.displayRevision(ctx)
+        self._message.displayRevision(ctx, self.mqpatch)
 
     def expandedText(self):
         ctx = self.ctx
@@ -298,8 +298,14 @@ class RevMessage(QtGui.QWidget):
     def text(self):
         return str(self._message.toPlainText())
 
-    def displayRevision(self, ctx):
+    def displayRevision(self, ctx, mqpatch):
         self.ctx = ctx
+
+        if ctx.rev() is None and mqpatch:
+            ctx = ctx.p1()
+            self._message.setText(ctx.description())
+            return
+
         desc = xml_escape(tounicode(ctx.description()))
         desc = desc.replace('\n', '<br/>\n')
 
