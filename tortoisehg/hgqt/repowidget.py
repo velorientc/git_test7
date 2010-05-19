@@ -108,6 +108,8 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         elif action == 'qrefresh':
             dlg.setWindowTitle(_('QRefresh'))
         if dlg.exec_():
+            self.message.setSaved()
+            self.message.clear()
             self.reload('tip')
 
     def timerEvent(self, event):
@@ -351,13 +353,21 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         return self.repomodel.branch()
 
     def okToContinue(self):
-        '''
-        returns False if there is unsaved data
-        
-        If there is unsaved data, present a dialog asking the user if it is ok to
-        discard the changes made.
-        '''
-        return True # TODO: check if there is an unsaved commit message
+        if self.message.isSaved():
+            res = True
+        else:
+            MB = QtGui.QMessageBox
+            prompt = _("The message text for '%s' has not been saved.")
+            mb = MB(MB.Warning, _("Unsaved Change Message"),
+                    prompt % self.reponame(), MB.Discard | MB.Cancel, self)
+            mb.setInformativeText(_("Discard changes and close anyway?"))
+            mb.setDefaultButton(MB.Cancel)
+            ret = mb.exec_()
+            if ret == MB.Cancel:
+                res = False
+            else:
+                res = True
+        return res
 
     def storeSettings(self):
         s = QtCore.QSettings()

@@ -109,7 +109,9 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
-        tw.removeTab(index)
+        w = tw.widget(index)
+        if w.okToContinue():
+            tw.removeTab(index)
 
     def repoTabChanged(self, index=0):
         self.setupBranchCombo()
@@ -467,7 +469,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         If there is unsaved data, present a dialog asking the user if it is ok to
         discard the changes made.
         '''
-        return True # we currently have no data to loose
+        return True
 
     def storeSettings(self):
         s = QtCore.QSettings()

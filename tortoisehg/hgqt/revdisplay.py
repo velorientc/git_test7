@@ -271,6 +271,8 @@ class RevMessage(QtGui.QWidget):
 
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
+        self.unsavedMessage = None
+        self.startEditMessage = ''
 
         vb = QtGui.QVBoxLayout()
         vb.setMargin(0)
@@ -282,6 +284,20 @@ class RevMessage(QtGui.QWidget):
         self.setLayout(vb)
 
         connect(self._message, SIGNAL('anchorClicked(QUrl)'), self.anchorClicked)
+
+    def isSaved(self):
+        if self._message.isReadOnly():
+            res = self.unsavedMessage is None or self.unsavedMessage == ''
+        else:
+            res = str(self._message.toPlainText()) == str(self.startEditMessage)
+        return res
+
+    def setSaved(self):
+        self.unsavedMessage = None
+        self._message.setReadOnly(True)
+
+    def clear(self):
+        self._message.setText('')
 
     def anchorClicked(self, qurl):
         link = str(qurl.toString())
@@ -297,12 +313,27 @@ class RevMessage(QtGui.QWidget):
     def displayRevision(self, ctx, mqpatch):
         self.ctx = ctx
 
-        self._message.setReadOnly(ctx.rev() is not None)
+        editing = not self._message.isReadOnly()
 
-        if ctx.rev() is None and mqpatch:
-            ctx = ctx.p1()
-            self._message.setText(ctx.description())
+        isWorkingDir = ctx.rev() is None
+        if isWorkingDir:
+            if not editing:
+                self._message.setReadOnly(False)
+                if self.unsavedMessage != None:
+                    msg = self.unsavedMessage
+                elif mqpatch:
+                    msg = ctx.p1().description()
+                    self.startEditMessage = msg
+                else:
+                    msg = ''
+                    self.startEditMessage = msg
+                self._message.setText(msg)
             return
+
+        if editing:
+            self.unsavedMessage = str(self._message.toPlainText())
+
+        self._message.setReadOnly(True)
 
         desc = xml_escape(tounicode(ctx.description()))
         desc = desc.replace('\n', '<br/>\n')
