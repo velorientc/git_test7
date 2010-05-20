@@ -27,8 +27,11 @@ class CommitWidget(QWidget):
 
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
+
         self.opts = opts # user, date
         self.stwidget = status.StatusWidget(pats, opts, root, self)
+        self.msghistory = []
+
         layout = QVBoxLayout()
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
@@ -75,6 +78,7 @@ class CommitWidget(QWidget):
         msgte.setFocus()
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
         self.usercombo = usercombo
+        self.msgte = msgte
 
     def restoreState(self, data):
         return self.stwidget.restoreState(data)
@@ -82,22 +86,48 @@ class CommitWidget(QWidget):
     def saveState(self):
         return self.stwidget.saveState()
 
-    def getChecked(self):
-        return self.stwidget.getChecked()
+    def getMessage(self):
+        text = self.msgte.toPlainText()
+        try:
+            text = hglib.fromunicode(text, 'strict')
+        except UnicodeEncodeError:
+            pass # Handle decoding errors
+        return text
 
     def canExit(self):
+        # Usually safe to exit, since we're saving messages implicitly
+        # We'll ask the user for confirmation later, if they have any
+        # files partially selected.
         return True
     
     def loadConfigs(self, s):
         'Load history, etc, from QSettings instance'
-        pass
+        repo = self.stwidget.repo
+        repoid = str(repo[0])
+        # message history is stored in unicode
+        self.msghistory = s.value('commit/history-'+repoid).toStringList()
+        try:
+            lastmsg = repo.opener('last-message.txt').read()
+            self.msgte.setPlainText(hglib.fromunicode(lastmsg))
+            self.msgte.document().setModified(False)
+            self.msgte.moveCursor(QTextCursor.End)
+        except EnvironmentError:
+            pass
 
     def storeConfigs(self, s):
         'Save history, etc, in QSettings instance'
-        pass
+        repo = self.stwidget.repo
+        repoid = str(repo[0])
+        s.setValue('commit/history-'+repoid, self.msghistory)
+        try:
+            # last message is stored in local encoding
+            repo.opener('last-message.txt', 'w').write(self.getMessage())
+        except EnvironmentError:
+            pass
 
     def commit(self):
-        cmdline = ['commit']
+        msg = self.getMessage()
+        cmdline = ['commit', '--message', msg]
         files = self.stwidget.getChecked()
         if files:
             cmdline.extend(files)
@@ -107,6 +137,12 @@ class CommitWidget(QWidget):
                                 parent=self)
             return
         print cmdline
+        umsg = self.msgte.toPlainText()
+        if umsg not in self.msghistory:
+            self.msghistory.insert(0, umsg)
+            self.msghistory = self.msghistory[:10]
+        self.msgte.clear()
+        self.msgte.document().setModified(False)
         return True
 
 class CommitDialog(QDialog):
