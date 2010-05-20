@@ -32,7 +32,7 @@ class SearchWidget(QWidget):
        loadComplete()               - for progress bar
        errorMessage(QString)        - for status bar
     '''
-    def __init__(self, root=None, parent=None):
+    def __init__(self, pats, root=None, parent=None):
         QWidget.__init__(self, parent)
 
         self.thread = None
@@ -50,6 +50,8 @@ class SearchWidget(QWidget):
         le = QLineEdit()
         lbl.setBuddy(le)
         lbl.setToolTip(_('Regular expression search pattern'))
+        if len(pats) >= 1:
+            le.setText(hglib.tounicode(pats[0]))
         bt = QPushButton(_('Search'))
         bt.setDefault(True)
         chk = QCheckBox(_('Ignore case'))
@@ -59,6 +61,8 @@ class SearchWidget(QWidget):
         hbox.addWidget(bt)
 
         incle = QLineEdit()
+        if len(pats) > 1:
+            incle.setText(','.join(pats[1:]))
         excle = QLineEdit()
         working = QRadioButton(_('Working Copy'))
         revision = QRadioButton(_('Revision'))
@@ -431,4 +435,4 @@ class MatchModel(QAbstractTableModel):
         return self.rows[index.row()]
 
 def run(ui, *pats, **opts):
-    return SearchWidget()
+    return SearchWidget(pats)
