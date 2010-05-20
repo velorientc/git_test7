@@ -231,14 +231,19 @@ class CommitDialog(QDialog):
 
         commit = CommitWidget(pats, opts, None, self)
         layout.addWidget(commit, 1)
+        layout.setContentsMargins(0, 0, 0, 0)
 
+        bbl = QHBoxLayout()
+        layout.addLayout(bbl)
+        layout.addSpacing(9)
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
         bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText('Commit')
-        layout.addWidget(bb)
+        bbl.addWidget(bb, alignment=Qt.AlignRight)
+        bbl.addSpacing(9)
         self.bb = bb
 
         s = QSettings()
