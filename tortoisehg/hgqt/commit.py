@@ -53,8 +53,8 @@ class CommitWidget(QWidget):
         hbox = QHBoxLayout()
         branchop = QPushButton('Branch: default')
         hbox.addWidget(branchop)
-        msgcombo = QComboBox()
-        msgcombo.addItem('Recent commit messages...')
+        msgcombo = MessageHistoryCombo()
+        self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
         hbox.addWidget(msgcombo, 1)
         vbox.addLayout(hbox, 0)
         msgte = QTextEdit()
@@ -79,6 +79,7 @@ class CommitWidget(QWidget):
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
         self.usercombo = usercombo
         self.msgte = msgte
+        self.msgcombo = msgcombo
 
     def restoreState(self, data):
         return self.stwidget.restoreState(data)
@@ -91,8 +92,18 @@ class CommitWidget(QWidget):
         try:
             text = hglib.fromunicode(text, 'strict')
         except UnicodeEncodeError:
-            pass # Handle decoding errors
+            pass # TODO: Handle decoding errors
         return text
+
+    def msgSelected(self, index):
+        doc = self.msgte.document()
+        if not doc.isEmpty() and doc.isModified():
+            # TODO: get confirmation before switching
+            pass
+        self.msgte.setPlainText(self.msghistory[index])
+        self.msgte.document().setModified(False)
+        self.msgte.moveCursor(QTextCursor.End)
+        self.msgte.setFocus()
 
     def canExit(self):
         # Usually safe to exit, since we're saving messages implicitly
@@ -105,10 +116,11 @@ class CommitWidget(QWidget):
         repo = self.stwidget.repo
         repoid = str(repo[0])
         # message history is stored in unicode
-        self.msghistory = s.value('commit/history-'+repoid).toStringList()
+        self.msghistory = list(s.value('commit/history-'+repoid).toStringList())
+        self.msgcombo.reset(self.msghistory)
         try:
-            lastmsg = repo.opener('last-message.txt').read()
-            self.msgte.setPlainText(hglib.fromunicode(lastmsg))
+            curmsg = repo.opener('cur-message.txt').read()
+            self.msgte.setPlainText(hglib.fromunicode(curmsg))
             self.msgte.document().setModified(False)
             self.msgte.moveCursor(QTextCursor.End)
         except EnvironmentError:
@@ -120,8 +132,8 @@ class CommitWidget(QWidget):
         repoid = str(repo[0])
         s.setValue('commit/history-'+repoid, self.msghistory)
         try:
-            # last message is stored in local encoding
-            repo.opener('last-message.txt', 'w').write(self.getMessage())
+            # current message is stored in local encoding
+            repo.opener('cur-message.txt', 'w').write(self.getMessage())
         except EnvironmentError:
             pass
 
@@ -136,14 +148,37 @@ class CommitWidget(QWidget):
                                 _('No operation to perform'),
                                 parent=self)
             return
+        # TODO: do something interesting here
         print cmdline
         umsg = self.msgte.toPlainText()
-        if umsg not in self.msghistory:
-            self.msghistory.insert(0, umsg)
-            self.msghistory = self.msghistory[:10]
+        if umsg in self.msghistory:
+            self.msghistory.remove(umsg)
+        self.msghistory.insert(0, umsg)
+        self.msghistory = self.msghistory[:10]
         self.msgte.clear()
         self.msgte.document().setModified(False)
+        self.msgcombo.reset(self.msghistory)
+        self.emit(SIGNAL('commitComplete'))
         return True
+
+class MessageHistoryCombo(QComboBox):
+    def __init__(self, parent=None):
+        QComboBox.__init__(self, parent)
+        self.reset([])
+
+    def reset(self, msgs):
+        self.clear()
+        self.addItem(_('Recent commit messages...'))
+        self.loaded = False
+        self.msgs = msgs
+
+    def showPopup(self):
+        if not self.loaded:
+            self.clear()
+            for s in self.msgs:
+                self.addItem(s.split('\n', 1)[0][:70])
+            self.loaded = True
+        QComboBox.showPopup(self)
 
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
