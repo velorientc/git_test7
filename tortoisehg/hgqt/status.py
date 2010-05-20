@@ -108,7 +108,10 @@ class StatusWidget(QWidget):
             cpb.clicked.connect(clearPattern)
 
         self.countlbl = QLabel()
-        vbox.addWidget(self.countlbl)
+        hcbox = QHBoxLayout()
+        vbox.addLayout(hcbox)
+        hcbox.addSpacing(6)
+        hcbox.addWidget(self.countlbl)
 
         self.connect(tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
         self.connect(tv, SIGNAL('menuAction()'), self.refreshWctx)
@@ -163,6 +166,7 @@ class StatusWidget(QWidget):
         self.override.setEnabled(False)
         self.override.toggled.connect(self.refreshDiff)
         hbox.addWidget(self.override)
+        hbox.addSpacing(6)
 
         self.te = QTextEdit()
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
