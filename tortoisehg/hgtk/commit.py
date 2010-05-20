@@ -746,7 +746,7 @@ class GCommit(GStatus):
     def get_custom_menus(self):
         def commit(menuitem, files):
             if self.ready_message() and self.isuptodate():
-                def callback():
+                def callback(ret):
                     self.reload_status()
                     abs = [self.repo.wjoin(file) for file in files]
                     shlib.shell_notify(abs)
@@ -873,10 +873,13 @@ class GCommit(GStatus):
                     commitable += '?!'
             return self.relevant_checked_files(commitable)
 
-        def callback():
-            self.reload_status()
-            files = [self.repo.wjoin(x) for x in commit_list]
-            shlib.shell_notify(files)
+        def callback(ret):
+            if ret == 0:
+                self.destroy()
+            else:
+                self.reload_status()
+                files = [self.repo.wjoin(x) for x in commit_list]
+                shlib.shell_notify(files)
 
         if self.qnew:
             commit_list = get_list()
@@ -919,7 +922,7 @@ class GCommit(GStatus):
                         _('Unable to create ') + backupdir, self).run()
                 return
 
-        def finish():
+        def finish(ret):
             os.chdir(cwd)
             # restore backup files
             try:
@@ -929,7 +932,7 @@ class GCommit(GStatus):
                 os.rmdir(backupdir)
             except OSError:
                 pass
-            callback()
+            callback(ret)
 
         try:
             # backup continues
@@ -1205,7 +1208,7 @@ class GCommit(GStatus):
             else:
                 text = _('Failed to commit')
             self.stbar.set_idle_text(text)
-            callback()
+            callback(return_code)
         if not self.execute_command(cmdline, done,
                     status=_('Committing changes...'),
                     title=_('Commit')):
