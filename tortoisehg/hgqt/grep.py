@@ -126,6 +126,7 @@ class SearchWidget(QWidget):
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
         self.singlematch = singlematch
+        self.regexple.setFocus()
 
         if not parent:
             self.setWindowTitle(_('TortoiseHg Search'))
