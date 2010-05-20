@@ -55,8 +55,8 @@ class SearchWidget(QWidget):
         chk = QCheckBox(_('Ignore case'))
         hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
-        hbox.addWidget(bt)
         hbox.addWidget(chk)
+        hbox.addWidget(bt)
 
         incle = QLineEdit()
         excle = QLineEdit()
@@ -101,17 +101,13 @@ class SearchWidget(QWidget):
         bt.clicked.connect(self.searchActivated)
         working.setChecked(True)
 
-        def expandtoggled(checked):
-            frame.setVisible(checked)
-            expand.setArrowType(checked and Qt.UpArrow or Qt.DownArrow)
-        expand = QToolButton()
-        expand.setIconSize(QSize(12, 12))
-        expand.setArrowType(Qt.DownArrow)
-        expand.setCheckable(True)
-        expand.toggled.connect(expandtoggled)
-        expandtoggled(False)
+        def expandtoggled():
+            frame.setVisible(expand.is_expanded())
+        expand = qtlib.PMButton(False, self)
+        expand.clicked.connect(expandtoggled)
+        expandtoggled()
+        hbox.insertWidget(0, expand)
 
-        hbox.addWidget(expand)
         layout.addLayout(hbox)
         frame.setLayout(grid)
         layout.addWidget(frame)
