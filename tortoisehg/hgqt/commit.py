@@ -97,8 +97,11 @@ class CommitWidget(QWidget):
     def msgSelected(self, index):
         doc = self.msgte.document()
         if not doc.isEmpty() and doc.isModified():
-            # TODO: get confirmation before switching
-            pass
+            d = QMessageBox.question(self, _('Confirm Discard Message'),
+                        _('Discard current commit message?'),
+                        QMessageBox.Ok | QMessageBox.Cancel)
+            if d != QMessageBox.Ok:
+                return
         self.msgte.setPlainText(self.msghistory[index])
         self.msgte.document().setModified(False)
         self.msgte.moveCursor(QTextCursor.End)
