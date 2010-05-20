@@ -210,6 +210,8 @@ class CommitDialog(QDialog):
 
         self.connect(self.commit, SIGNAL('errorMessage'),
                      self.errorMessage)
+        name = hglib.get_reponame(self.commit.stwidget.repo)
+        self.setWindowTitle('%s - commit' % name)
 
     def errorMessage(self, msg):
         # TODO - add a status bar
