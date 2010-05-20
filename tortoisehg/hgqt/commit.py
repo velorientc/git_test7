@@ -30,6 +30,8 @@ class CommitWidget(QWidget):
 
         self.opts = opts # user, date
         self.stwidget = status.StatusWidget(pats, opts, root, self)
+        self.connect(self.stwidget, SIGNAL('errorMessage'),
+                     lambda m: self.emit(SIGNAL('errorMessage'), m))
         self.msghistory = []
 
         layout = QVBoxLayout()
@@ -117,6 +119,7 @@ class CommitWidget(QWidget):
         repoid = str(repo[0])
         # message history is stored in unicode
         self.msghistory = list(s.value('commit/history-'+repoid).toStringList())
+        self.msghistory = [s for s in self.msghistory if s]
         self.msgcombo.reset(self.msghistory)
         try:
             curmsg = repo.opener('cur-message.txt').read()
@@ -137,27 +140,37 @@ class CommitWidget(QWidget):
         except EnvironmentError:
             pass
 
-    def commit(self):
-        msg = self.getMessage()
-        cmdline = ['commit', '--message', msg]
-        files = self.stwidget.getChecked()
-        if files:
-            cmdline.extend(files)
-        else:
-            qtlib.WarningMsgBox(_('No files selected'),
-                                _('No operation to perform'),
-                                parent=self)
-            return
-        # TODO: do something interesting here
-        print cmdline
+    def addMessageToHistory(self):
         umsg = self.msgte.toPlainText()
+        if not umsg:
+            return
         if umsg in self.msghistory:
             self.msghistory.remove(umsg)
         self.msghistory.insert(0, umsg)
         self.msghistory = self.msghistory[:10]
+        self.msgcombo.reset(self.msghistory)
+
+    def commit(self):
+        msg = self.getMessage()
+        if not msg:
+            qtlib.WarningMsgBox(_('Nothing Commited'),
+                                _('Please enter commit message'),
+                                parent=self)
+            self.msgte.setFocus()
+            return
+        files = self.stwidget.getChecked()
+        if not files:
+            qtlib.WarningMsgBox(_('No files selected'),
+                                _('No operation to perform'),
+                                parent=self)
+            self.stwidget.tv.setFocus()
+            return
+        cmdline = ['commit', '--message', msg] + files
+        # TODO: do something interesting here
+        print cmdline
+        self.addMessageToHistory()
         self.msgte.clear()
         self.msgte.document().setModified(False)
-        self.msgcombo.reset(self.msghistory)
         self.emit(SIGNAL('commitComplete'))
         return True
 
@@ -206,12 +219,11 @@ class CommitDialog(QDialog):
         commit.restoreState(s.value('commit/state').toByteArray())
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadConfigs(s)
-        self.commit = commit
+        commit.errorMessage.connect(self.errorMessage)
 
-        self.connect(self.commit, SIGNAL('errorMessage'),
-                     self.errorMessage)
-        name = hglib.get_reponame(self.commit.stwidget.repo)
+        name = hglib.get_reponame(commit.stwidget.repo)
         self.setWindowTitle('%s - commit' % name)
+        self.commit = commit
 
     def errorMessage(self, msg):
         # TODO - add a status bar
@@ -229,11 +241,7 @@ class CommitDialog(QDialog):
 
     def accept(self):
         if self.commit.commit():
-            s = QSettings()
-            s.setValue('commit/state', self.commit.saveState())
-            s.setValue('commit/geom', self.saveGeometry())
-            self.commit.storeConfigs(s)
-            QDialog.accept(self)
+            self.reject()
 
     def reject(self):
         if self.commit.canExit():
