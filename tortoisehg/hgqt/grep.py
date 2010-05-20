@@ -50,9 +50,12 @@ class SearchWidget(QWidget):
         le = QLineEdit()
         lbl.setBuddy(le)
         lbl.setToolTip(_('Regular expression search pattern'))
+        bt = QPushButton(_('Search'))
+        bt.setDefault(True)
         chk = QCheckBox(_('Ignore case'))
         hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
+        hbox.addWidget(bt)
         hbox.addWidget(chk)
 
         incle = QLineEdit()
@@ -95,6 +98,7 @@ class SearchWidget(QWidget):
         revle.returnPressed.connect(self.searchActivated)
         excle.returnPressed.connect(self.searchActivated)
         incle.returnPressed.connect(self.searchActivated)
+        bt.clicked.connect(self.searchActivated)
         working.setChecked(True)
 
         def expandtoggled(checked):
