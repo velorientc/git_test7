@@ -23,6 +23,7 @@ from PyQt4.QtGui import *
 #  We need a real icon set for file status types
 #  Thread rowSelected, connect to an external progress bar
 #  Chunk selection, tri-state checkboxes for commit
+#  TreeView steals CTRL-ENTER from parent widgets 
 # Maybe, Maybe Not
 #  Investigate folding/nesting of files
 #  Toolbar
