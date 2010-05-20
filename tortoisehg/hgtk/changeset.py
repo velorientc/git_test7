@@ -271,6 +271,11 @@ class ChangeSet(gdialog.GWindow):
         adj.set_value(0)
         adj = self.diffscroller.get_hadjustment()
         adj.set_value(0)
+        adj = self._filelist_tree.get_vadjustment()
+        adj.set_value(0)
+        adj = self._filelist_tree.get_hadjustment()
+        adj.set_value(0)
+        self._filelist_tree.columns_autosize()
 
     def generate_change_header(self):
         self.summarypanel.update(self.currev, self.csetstyle)
