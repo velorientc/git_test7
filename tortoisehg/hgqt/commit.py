@@ -57,7 +57,7 @@ class CommitWidget(QWidget):
         self.setLayout(layout)
         form = QFormLayout()
         usercombo = QComboBox()
-        usercombo.addItem(self.stwidget.repo[None].user())
+        usercombo.addItem(hglib.tounicode(self.stwidget.repo[None].user()))
         usercombo.setEditable(True)
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
         form.addRow(_('User:'), usercombo)
