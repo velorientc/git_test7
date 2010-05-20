@@ -17,6 +17,24 @@ from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt import qtlib, status, cmdui
 
+# Technical Debt for CommitWidget
+#  qrefresh support
+#  threaded / wrapped commit (need a CmdRunner equivalent)
+#  qctlib decode failure dialog (ask for locale, suggest HGENCODING)
+#  auto-add unknown files
+#  auto-rem missing files
+#  add rollback function with prompt
+#  +1 / -1 head indication (not as important with workbench integration)
+#  hook up username from command line to username combo
+#  recent committers history
+#  pushafterci, autoincludes list
+#  use username and date options
+#  implement a branchop dialog (in another file)
+#  qnew/shelve-patch creation dialog (in another file)
+#  reflow / auto-wrap / message format checks / paste filenames
+#  spell check / tab completion
+#  in-memory patching / committing chunk selected files
+
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
     loadBegin = pyqtSignal()
@@ -91,7 +109,7 @@ class CommitWidget(QWidget):
         try:
             text = hglib.fromunicode(text, 'strict')
         except UnicodeEncodeError:
-            pass # TODO: Handle decoding errors
+            pass
         return text
 
     def msgSelected(self, index):
@@ -197,6 +215,10 @@ class MessageHistoryCombo(QComboBox):
             self.loaded = True
         QComboBox.showPopup(self)
 
+# Technical Debt for standalone tool
+#   add a toolbar for refresh, undo, etc
+#   add a statusbar and simple progressbar
+
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
     def __init__(self, pats, opts, parent=None):
@@ -230,7 +252,6 @@ class CommitDialog(QDialog):
         self.commit = commit
 
     def errorMessage(self, msg):
-        # TODO - add a status bar
         print msg
 
     def keyPressEvent(self, event):
@@ -246,6 +267,8 @@ class CommitDialog(QDialog):
     def accept(self):
         if self.commit.commit():
             self.reject()
+        else:
+            self.commit.stwidget.refreshWctx()
 
     def reject(self):
         if self.commit.canExit():
