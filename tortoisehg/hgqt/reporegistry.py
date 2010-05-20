@@ -181,15 +181,50 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return Qt.MoveAction
 
     def removeRows(self, row, count, parent):
+        print "removeRows()"
         self.beginRemoveRows(parent, row, row+count)
         item = parent.internalPointer()
         res = item.removeRows(row, count)
         self.endRemoveRows()
         return res
 
-    def insertRows(self, row, count, parent):
-        print "insertRows(row=%s, count=%s): not yet implemented" % (row, count)
-        return False
+    def mimeTypes(self):
+        return QtCore.QStringList('application/thg-reporegistry')
+
+    def mimeData(self, indexes):
+        print "mimeData()"
+        i = indexes[0]
+        item = i.internalPointer()
+        buf = 'repo=%s' % item.rootpath()
+        print buf
+        d = QtCore.QMimeData()
+        d.setData('application/thg-reporegistry', buf)
+        return d
+
+    def dropMimeData(self, data, action, row, column, parent):
+        print "dropMimeData()"
+        print "action = %s" % action
+        print "formats:"
+        for s in data.formats():
+            print s
+        d = str(data.data('application/thg-reporegistry'))
+        d = d.split('=')
+        print d
+        if d[0] != 'repo':
+            print "not a repo"
+            return False
+        path = d[1]
+        print "path = %s" % path
+        group = parent.internalPointer()
+        print "group = %s" % group
+        cc = group.childCount()
+        self.beginInsertRows(parent, cc, cc)
+        print "1: group.childCount() = %s" % group.childCount()
+        group.appendChild(RepoItem(path))
+        print "2: group.childCount() = %s" % group.childCount()
+        self.endInsertRows()
+        return True
+
 
     # functions not defined in QAbstractItemModel
 
