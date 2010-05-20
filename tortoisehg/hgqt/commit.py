@@ -18,14 +18,13 @@ from tortoisehg.util import hglib, shlib, paths
 from tortoisehg.hgqt import qtlib, status, cmdui
 
 class CommitWidget(QWidget):
-    '''A widget that encompasses a StatusWidget and commit extras
-       SIGNALS:
-       loadBegin()                  - for progress bar
-       loadComplete()               - for progress bar
-       errorMessage(QString)        - for status bar
-       titleTextChanged(QString)    - for window title
-       commitComplete(QString)      - refresh notification
-    '''
+    'A widget that encompasses a StatusWidget and commit extras'
+    loadBegin = pyqtSignal()
+    loadComplete = pyqtSignal()
+    errorMessage = pyqtSignal(QString)
+    commitComplete = pyqtSignal()
+    commit = pyqtSlot()
+
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
         self.opts = opts # user, date
@@ -86,6 +85,30 @@ class CommitWidget(QWidget):
     def getChecked(self):
         return self.stwidget.getChecked()
 
+    def canExit(self):
+        return True
+    
+    def loadConfigs(self, s):
+        'Load history, etc, from QSettings instance'
+        pass
+
+    def storeConfigs(self, s):
+        'Save history, etc, in QSettings instance'
+        pass
+
+    def commit(self):
+        cmdline = ['commit']
+        files = self.stwidget.getChecked()
+        if files:
+            cmdline.extend(files)
+        else:
+            qtlib.WarningMsgBox(_('No files selected'),
+                                _('No operation to perform'),
+                                parent=self)
+            return
+        print cmdline
+        return True
+
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
     def __init__(self, pats, opts, parent=None):
@@ -101,34 +124,25 @@ class CommitDialog(QDialog):
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
-        self.connect(bb, SIGNAL("accepted()"),
-                     self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"),
-                     self, SLOT("reject()"))
+        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
         bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText('Commit')
         layout.addWidget(bb)
         self.bb = bb
 
-        cmd = cmdui.Widget()
-        cmd.commandStarted.connect(self.commandStarted)
-        cmd.commandFinished.connect(self.commandFinished)
-        cmd.commandCanceling.connect(self.commandCanceled)
-        layout.addWidget(cmd)
-        cmd.setHidden(True)
-        self.cmd = cmd
-
         s = QSettings()
         commit.restoreState(s.value('commit/state').toByteArray())
         self.restoreGeometry(s.value('commit/geom').toByteArray())
+        commit.loadConfigs(s)
         self.commit = commit
 
         self.connect(self.commit, SIGNAL('errorMessage'),
                      self.errorMessage)
 
     def errorMessage(self, msg):
-        # TODO: Does not appear to work
-        self.cmd.pmon.set_text(msg)
+        # TODO - add a status bar
+        print msg
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
@@ -140,40 +154,20 @@ class CommitDialog(QDialog):
             return
         return super(QDialog, self).keyPressEvent(event)
 
-    def commandStarted(self):
-        self.cmd.setShown(True)
-        self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
-
-    def commandFinished(self, wrapper):
-        self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
-        if wrapper.data is not 0:
-            self.cmd.show_output(True)
-        else:
-            self.reject()
-
-    def commandCanceled(self):
-        self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
-
     def accept(self):
-        cmdline = ['commit']
-        files = self.stwidget.getChecked()
-        if files:
-            cmdline.extend(files)
-        else:
-            qtlib.WarningMsgBox(_('No files selected'),
-                                _('No operation to perform'),
-                                parent=self)
-            return
-        print cmdline
-        #self.cmd.run(cmdline)
-
-    def reject(self):
-        if self.cmd.core.is_running():
-            self.cmd.core.cancel()
-        else:
+        if self.commit.commit():
             s = QSettings()
             s.setValue('commit/state', self.commit.saveState())
             s.setValue('commit/geom', self.saveGeometry())
+            self.commit.storeConfigs(s)
+            QDialog.accept(self)
+
+    def reject(self):
+        if self.commit.canExit():
+            s = QSettings()
+            s.setValue('commit/state', self.commit.saveState())
+            s.setValue('commit/geom', self.saveGeometry())
+            self.commit.storeConfigs(s)
             QDialog.reject(self)
 
 def run(ui, *pats, **opts):
