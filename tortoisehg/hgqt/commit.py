@@ -71,9 +71,6 @@ class CommitWidget(QWidget):
         # Add status widget document frame below our splitter
         # this reparents the docf from the status splitter
         self.split.addWidget(self.stwidget.docf)
-        h = self.split.sizeHint().height()
-        mh = upperframe.minimumSizeHint().height()
-        self.split.setSizes([mh, h-mh])
 
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
@@ -118,6 +115,7 @@ class CommitWidget(QWidget):
         repo = self.stwidget.repo
         repoid = str(repo[0])
         # message history is stored in unicode
+        self.split.restoreState(s.value('commit/split').toByteArray())
         self.msghistory = list(s.value('commit/history-'+repoid).toStringList())
         self.msghistory = [s for s in self.msghistory if s]
         self.msgcombo.reset(self.msghistory)
@@ -134,6 +132,7 @@ class CommitWidget(QWidget):
         repo = self.stwidget.repo
         repoid = str(repo[0])
         s.setValue('commit/history-'+repoid, self.msghistory)
+        s.setValue('commit/split', self.split.saveState())
         try:
             # current message is stored in local encoding
             repo.opener('cur-message.txt', 'w').write(self.getMessage())
