@@ -681,9 +681,8 @@ class GWindow(gtk.Window):
         if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
             Prompt(_('No visual editor configured'),
                    _('Please configure a visual editor.'), self).run()
-            dlg = thgconfig.ConfigDialog(False)
+            dlg = thgconfig.ConfigDialog(False, focus='tortoisehg.editor')
             dlg.show_all()
-            dlg.focus_field('tortoisehg.editor')
             dlg.run()
             dlg.hide()
             self.ui = ui.ui()
