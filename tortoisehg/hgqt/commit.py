@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, cmdutil, util
+from mercurial import hg, ui, cmdutil, util, dispatch
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -168,13 +168,15 @@ class CommitWidget(QWidget):
             self.stwidget.tv.setFocus()
             return
         cmdline = ['commit', '--message', msg] + files
-        # TODO: do something interesting here
-        print cmdline
-        self.addMessageToHistory()
-        self.msgte.clear()
-        self.msgte.document().setModified(False)
-        self.emit(SIGNAL('commitComplete'))
-        return True
+        ret = dispatch._dispatch(self.stwidget.repo.ui, cmdline)
+        if not ret:
+            self.addMessageToHistory()
+            self.msgte.clear()
+            self.msgte.document().setModified(False)
+            self.emit(SIGNAL('commitComplete'))
+            return True
+        else:
+            return False
 
 class MessageHistoryCombo(QComboBox):
     def __init__(self, parent=None):
