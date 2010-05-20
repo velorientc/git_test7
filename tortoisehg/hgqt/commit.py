@@ -53,9 +53,11 @@ class CommitWidget(QWidget):
         self.msghistory = []
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
         form = QFormLayout()
+        form.setContentsMargins(3, 9, 9, 0)
         usercombo = QComboBox()
         usercombo.addItem(hglib.tounicode(self.stwidget.repo[None].user()))
         usercombo.setEditable(True)
@@ -65,7 +67,7 @@ class CommitWidget(QWidget):
                                          str(self.stwidget.repo['.'])))
         frame = QFrame()
         frame.setLayout(form)
-        frame.setFrameStyle(QFrame.StyledPanel)
+        frame.setFrameStyle(QFrame.NoFrame)
 
         vbox = QVBoxLayout()
         vbox.addWidget(frame, 0)
@@ -76,6 +78,7 @@ class CommitWidget(QWidget):
         msgcombo = MessageHistoryCombo()
         self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
         hbox.addWidget(msgcombo, 1)
+        hbox.addSpacing(9)
         vbox.addLayout(hbox, 0)
         msgte = QTextEdit()
         msgte.setAcceptRichText(False)
