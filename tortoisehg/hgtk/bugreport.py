@@ -63,6 +63,7 @@ class BugReport(gdialog.GWindow):
             text += '** CWD: %s\n' % os.getcwd()
             extlist = [x[0] for x in extensions.extensions()]
             text += '** Extensions loaded: %s\n' % ', '.join(extlist)
+            text += '** Python %s\n' % sys.version.replace('\n', '')
             if os.name == 'nt':
                 text += '** sys.getwindowsversion(): %s\n' % str(sys.getwindowsversion())
                 arch = 'unknown (failed to import win32api)'
