@@ -110,6 +110,9 @@ class RepoTreeItem:
     def data(self, column):
         return QVariant()
 
+    def setData(self, column, value):
+        return False
+
     def row(self):
         return self._row
 
@@ -197,11 +200,18 @@ class RepoGroupItem(RepoTreeItem):
             return QVariant(self.name)
         return QVariant()
 
+    def setData(self, column, value):
+        if column == 0:
+            self.name = str(value.toString())
+            return True
+        return False
+
     def menulist(self):
         return ['newGroup', 'remove']
 
     def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+        return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+            | Qt.ItemIsEditable)
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)
@@ -354,6 +364,15 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         group.appendChild(itemread)
         self.endInsertRows()
         return True
+
+    def setData(self, index, value, role):
+        print "RepoTreeModel.setData(value='%s')" % str(value.toString())
+        if index.isValid() and role == Qt.EditRole:
+            item = index.internalPointer()
+            if item.setData(index.column(), value):
+                self.emit(SIGNAL('dataChanged(index, index)'), index, index)
+                return True
+        return False
 
     # functions not defined in QAbstractItemModel
 
