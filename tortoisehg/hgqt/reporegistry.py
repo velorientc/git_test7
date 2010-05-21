@@ -308,7 +308,7 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        if role != Qt.DisplayRole:
+        if role != Qt.DisplayRole and role != Qt.EditRole:
             return QVariant();
         item = index.internalPointer()
         return item.data(index.column())
