@@ -16,6 +16,7 @@ from PyQt4.QtCore import QModelIndex, QString
 from PyQt4.QtGui import QWidget, QVBoxLayout
 
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import icon as geticon
 
 connect = QtCore.QObject.connect
 
@@ -107,7 +108,7 @@ class RepoTreeItem:
     def columnCount(self):
         return 2
 
-    def data(self, column):
+    def data(self, column, role):
         return QVariant()
 
     def setData(self, column, value):
@@ -164,7 +165,12 @@ class RepoItem(RepoTreeItem):
     def rootpath(self):
         return self._root
 
-    def data(self, column):
+    def data(self, column, role):
+        if role == Qt.DecorationRole:
+            if column == 0:
+                ico = geticon('hg')
+                return QVariant(ico)
+            return QVariant()
         if column == 0:
             return QVariant(os.path.basename(self._root))
         elif column == 1:
@@ -198,7 +204,9 @@ class RepoGroupItem(RepoTreeItem):
         else:
             self.name = QString()
 
-    def data(self, column):
+    def data(self, column, role):
+        if role == Qt.DecorationRole:
+           return QVariant()
         if column == 0:
             return QVariant(self.name)
         return QVariant()
@@ -317,10 +325,11 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        if role != Qt.DisplayRole and role != Qt.EditRole:
-            return QVariant();
+        if (role != Qt.DisplayRole 
+                and role != Qt.EditRole and role != Qt.DecorationRole):
+            return QVariant()
         item = index.internalPointer()
-        return item.data(index.column())
+        return item.data(index.column(), role)
 
     def headerData(self, section, orientation, role):
         if role == Qt.DisplayRole:

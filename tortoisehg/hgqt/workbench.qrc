@@ -20,5 +20,6 @@
     <file>icons/mqpatch.svg</file>
     <file>icons/plus.png</file>
     <file>icons/minus.png</file>
+    <file>icons/hg.ico</file>
   </qresource>
 </RCC>
