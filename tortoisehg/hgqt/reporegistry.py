@@ -366,8 +366,11 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return True
 
     def setData(self, index, value, role):
-        print "RepoTreeModel.setData(value='%s')" % str(value.toString())
+        s = str(value.toString())
+        print "RepoTreeModel.setData(value='%s')" % s
         if index.isValid() and role == Qt.EditRole:
+            if len(s) == 0:
+                return False
             item = index.internalPointer()
             if item.setData(index.column(), value):
                 self.emit(SIGNAL('dataChanged(index, index)'), index, index)
