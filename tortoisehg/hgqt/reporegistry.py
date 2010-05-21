@@ -332,25 +332,20 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return QtCore.QStringList(repoRegMimeType)
 
     def mimeData(self, indexes):
-        print "mimeData()"
         i = indexes[0]
         item = i.internalPointer()
         buf = QtCore.QByteArray()
         writeXml(buf, item, extractXmlElementName)
-        print str(buf)
         d = QtCore.QMimeData()
         d.setData(repoRegMimeType, buf)
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
-        print "dropMimeData()"
-        print "action = %s" % action
+        print "dropMimeData(action=%s)" % action
         print "formats:"
         for s in data.formats():
             print s
         d = str(data.data(repoRegMimeType))
-        print "d = %s" % d
-
         itemread = readXml(d, extractXmlElementName)
 
         group = parent.internalPointer()
