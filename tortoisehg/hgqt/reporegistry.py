@@ -228,8 +228,14 @@ class AllRepoGroupItem(RepoGroupItem):
         RepoGroupItem.__init__(self, parent)
         self.name = _('All Repositories')
 
+    def setData(self, column, value):
+        return False
+
     def menulist(self):
         return ['newGroup']
+
+    def flags(self):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
 
     def dump(self, xw):
         RepoTreeItem.dump(self, xw)
