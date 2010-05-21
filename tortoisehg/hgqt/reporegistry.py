@@ -206,7 +206,11 @@ class RepoGroupItem(RepoTreeItem):
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
-           return QVariant()
+            if column == 0:
+                s = QtGui.QApplication.style()
+                ico = s.standardIcon(QtGui.QStyle.SP_DirIcon)
+                return QVariant(ico)
+            return QVariant()
         if column == 0:
             return QVariant(self.name)
         return QVariant()
@@ -240,7 +244,11 @@ class AllRepoGroupItem(RepoTreeItem):
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
-           return QVariant()
+            if column == 0:
+                s = QtGui.QApplication.style()
+                ico = s.standardIcon(QtGui.QStyle.SP_DirIcon)
+                return QVariant(ico)
+            return QVariant()
         if column == 0:
             return QVariant(_('all'))
         return QVariant()
