@@ -15,7 +15,7 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths
 
-from tortoisehg.hgqt import qtlib, status, cmdui
+from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
 #  qrefresh support
@@ -81,8 +81,12 @@ class CommitWidget(QWidget):
         vbox.addWidget(frame, 0)
         vbox.setMargin(0)
         hbox = QHBoxLayout()
+
         branchop = QPushButton('Branch: default')
+        branchop.pressed.connect(self.branchOp)
+        self.branchop = branchop
         hbox.addWidget(branchop)
+
         msgcombo = MessageHistoryCombo()
         self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
         hbox.addWidget(msgcombo, 1)
@@ -114,6 +118,10 @@ class CommitWidget(QWidget):
 
     def saveState(self):
         return self.stwidget.saveState()
+
+    def branchOp(self):
+        d = branchop.BranchOpDialog(self.stwidget.repo)
+        ret = d.exec_()
 
     def canUndo(self):
         'Returns undo description or None if not valid'
