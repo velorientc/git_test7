@@ -263,10 +263,19 @@ class StatusWidget(QWidget):
     def isMerge(self):
         return bool(self.wctx.p2())
 
-    def getChecked(self):
-        if self.tv.model():
-            checked = self.tv.model().getChecked()
-            return [f for f, v in checked.iteritems() if v]
+    def getChecked(self, types=None):
+        model = self.tv.model()
+        if model:
+            checked = model.getChecked()
+            if types is None:
+                return [f for f, v in checked.iteritems() if v]
+            else:
+                files = []
+                for row in model.getAllRows():
+                    path, status, mst, upath, ext, sz = row
+                    if status in types and checked[path]:
+                        files.append(path)
+                return files
         else:
             return []
 
@@ -614,6 +623,10 @@ class WctxModel(QAbstractTableModel):
     def getRow(self, index):
         assert index.isValid()
         return self.rows[index.row()]
+
+    def getAllRows(self):
+        for row in self.rows:
+            yield row
 
     def toggleRow(self, index):
         'Connected to "activated" signal, emitted by dbl-click or enter'
