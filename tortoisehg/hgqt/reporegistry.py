@@ -129,7 +129,7 @@ class RepoTreeItem:
         self.childs = keep
         for c in remove:
             c._row = 0
-            c._parent = QModelIndex()
+            c._parent = None
         for i, c in enumerate(keep):
             c._row = i        
         return True
@@ -169,7 +169,7 @@ class RepoItem(RepoTreeItem):
         return QVariant()
 
     def menulist(self):
-        return ['open']
+        return ['open', 'remove']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
@@ -198,7 +198,7 @@ class RepoGroupItem(RepoTreeItem):
         return QVariant()
 
     def menulist(self):
-        return ['newGroup']
+        return ['newGroup', 'remove']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
@@ -217,6 +217,9 @@ class AllRepoGroupItem(RepoGroupItem):
     def __init__(self, parent=None):
         RepoGroupItem.__init__(self, parent)
         self.name = _('All Repositories')
+
+    def menulist(self):
+        return ['newGroup']
 
     def dump(self, xw):
         RepoTreeItem.dump(self, xw)
@@ -317,9 +320,11 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return Qt.MoveAction
 
     def removeRows(self, row, count, parent):
-        print "removeRows()"
-        self.beginRemoveRows(parent, row, row+count)
+        print "removeRows(row=%s, count=%s)" % (row, count)
         item = parent.internalPointer()
+        if item is None:
+            item = self.rootItem
+        self.beginRemoveRows(parent, row, row+count-1)
         res = item.removeRows(row, count)
         self.endRemoveRows()
 
@@ -414,8 +419,8 @@ class RepoTreeView(QtGui.QTreeView):
         selection = self.selectedIndexes()
         if len(selection) == 0:
             return
-        self.selitem = selection[0].internalPointer()
-        menulist = self.selitem.menulist()
+        self.selitem = selection[0]
+        menulist = self.selitem.internalPointer().menulist()
         if len(menulist) > 0:
             menu = QtGui.QMenu(self)
             for act in menulist:
@@ -430,6 +435,8 @@ class RepoTreeView(QtGui.QTreeView):
                 _("Opens the repository in a new tab"), None, self.open),
              ("newGroup", _("New Group"), None, 
                 _("Create a new group"), None, self.newGroup),
+             ("remove", _("Remove entry"), None, 
+                _("Remove the entry"), None, self.removeSelected),
              ]
         return a
 
@@ -455,11 +462,18 @@ class RepoTreeView(QtGui.QTreeView):
             self.addAction(act)
 
     def open(self):
-        self.parent.openrepo(self.selitem.rootpath())
+        self.parent.openrepo(self.selitem.internalPointer().rootpath())
 
     def newGroup(self):
         m = self.model()
         m.addGroup(_('New Group'))
+
+    def removeSelected(self):
+        m = self.model()
+        s = self.selitem
+        row = s.row()
+        parent = s.parent()
+        m.removeRows(row, 1, parent)
 
 
 class RepoRegistryView(QWidget):
