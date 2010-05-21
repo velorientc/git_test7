@@ -23,10 +23,9 @@ from tortoisehg.hgqt import qtlib, status, cmdui
 #  qctlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  add rollback function with prompt
 #  +1 / -1 head indication (not as important with workbench integration)
-#  hook up username from command line to username combo
 #  recent committers history
 #  pushafterci, autoincludes list
-#  use username and date options
+#  use date option
 #  implement a branchop dialog (in another file)
 #  qnew/shelve-patch creation dialog (in another file)
 #  reflow / auto-wrap / message format checks / paste filenames
@@ -56,8 +55,17 @@ class CommitWidget(QWidget):
         self.setLayout(layout)
         form = QFormLayout()
         form.setContentsMargins(3, 9, 9, 0)
+
         usercombo = QComboBox()
-        usercombo.addItem(hglib.tounicode(self.stwidget.repo[None].user()))
+        try:
+            if opts.get('user'):
+                usercombo.addItem(hglib.tounicode(opts['user']))
+            usercombo.addItem(hglib.tounicode(self.stwidget.repo[None].user()))
+        except util.Abort:
+            import socket
+            user = '%s@%s' % (util.getuser(), socket.getfqdn())
+            usercombo.addItem(hglib.tounicode(user))
+
         usercombo.setEditable(True)
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
         form.addRow(_('User:'), usercombo)
@@ -187,6 +195,17 @@ class CommitWidget(QWidget):
                                 parent=self)
             self.stwidget.tv.setFocus()
             return
+        user = self.usercombo.currentText()
+        try:
+            user = hglib.fromunicode(user, 'strict')
+        except UnicodeEncodeError:
+            pass # TODO
+        if not user:
+            qtlib.WarningMsgBox(_('Username required'),
+                                _('Please enter a username'),
+                                parent=self)
+            self.usercombo.setFocus()
+            return
         checkedUnknowns = self.stwidget.getChecked('?I')
         if checkedUnknowns:
             res = qtlib.CustomPrompt(
@@ -209,7 +228,7 @@ class CommitWidget(QWidget):
                 dispatch._dispatch(ui, ['remove'] + checkedMissing)
             else:
                 return
-        cmdline = ['commit', '--message', msg] + files
+        cmdline = ['commit', '--user', user, '--message', msg] + files
         ret = dispatch._dispatch(ui, cmdline)
         if not ret:
             self.addMessageToHistory()
