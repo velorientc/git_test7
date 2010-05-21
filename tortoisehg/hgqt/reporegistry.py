@@ -425,6 +425,8 @@ class RepoTreeView(QtGui.QTreeView):
         self.parent = parent
         self.selitem = None
 
+        self.setExpandsOnDoubleClick(False)
+
         # enable drag and drop
         # (see http://doc.qt.nokia.com/4.6/model-view-dnd.html)
         self.setDragEnabled(True)
