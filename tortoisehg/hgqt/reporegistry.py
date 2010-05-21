@@ -191,9 +191,12 @@ class RepoItem(RepoTreeItem):
 
 
 class RepoGroupItem(RepoTreeItem):
-    def __init__(self, name='', parent=None):
+    def __init__(self, name=None, parent=None):
         RepoTreeItem.__init__(self, parent)
-        self.name = name
+        if name:
+            self.name = name
+        else:
+            self.name = QString()
 
     def data(self, column):
         if column == 0:
@@ -202,7 +205,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def setData(self, column, value):
         if column == 0:
-            self.name = str(value.toString())
+            self.name = value.toString()
             return True
         return False
 
@@ -219,7 +222,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def undump(self, xr):
         a = xr.attributes()
-        self.name = str(a.value('', 'name').toString())
+        self.name = a.value('', 'name').toString()
         RepoTreeItem.undump(self, xr)
 
 
@@ -372,15 +375,15 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return True
 
     def setData(self, index, value, role):
-        s = str(value.toString())
-        print "RepoTreeModel.setData(value='%s')" % s
-        if index.isValid() and role == Qt.EditRole:
-            if len(s) == 0:
-                return False
-            item = index.internalPointer()
-            if item.setData(index.column(), value):
-                self.emit(SIGNAL('dataChanged(index, index)'), index, index)
-                return True
+        if not index.isValid() or role != Qt.EditRole:
+            return False
+        s = value.toString()
+        if s.isEmpty():
+            return False
+        item = index.internalPointer()
+        if item.setData(index.column(), value):
+            self.emit(SIGNAL('dataChanged(index, index)'), index, index)
+            return True
         return False
 
     # functions not defined in QAbstractItemModel
