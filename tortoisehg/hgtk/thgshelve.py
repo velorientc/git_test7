@@ -72,6 +72,9 @@ class GShelve(GStatus):
                 self.shelve_clicked, tip=_('set aside selected changes'))
         self.unshelve_btn = self.make_toolbutton(gtk.STOCK_EDIT, _('Unshelve'),
                 self.unshelve_clicked, tip=_('restore shelved changes'))
+        self.abandon_btn = self.make_toolbutton(gtk.STOCK_CANCEL, _('Abandon'),
+                self.abandon_clicked, tip=_('abandon shelved changes'))
+        tbbuttons.insert(0, self.abandon_btn)
         tbbuttons.insert(0, self.unshelve_btn)
         tbbuttons.insert(0, self.shelve_btn)
         return tbbuttons
@@ -130,9 +133,11 @@ class GShelve(GStatus):
         if status:
             self.shelve_btn.set_sensitive(len(self.filemodel) > 0)
             self.unshelve_btn.set_sensitive(self.has_shelve_file())
+            self.abandon_btn.set_sensitive(self.has_shelve_file())
         else:
             self.shelve_btn.set_sensitive(False)
             self.unshelve_btn.set_sensitive(False)
+            self.abandon_btn.set_sensitive(False)
 
     def shelve_selected(self, files=[]):
         if len(self.filemodel) < 1:
@@ -209,6 +214,19 @@ class GShelve(GStatus):
             gdialog.Prompt(_('Unshelve Error'),
                     _('Error: %s') % e, self).run()
 
+    def abandon(self):
+        try:
+            response = gdialog.Confirm(_('Confirm Delete'), [], self,
+                                       _('Delete the shelf contents?')).run()
+            if response == gtk.RESPONSE_YES:
+                self.ui.quiet = True
+                hgshelve.abandon(self.ui, self.repo)
+                self.ui.quiet = False
+            self.reload_status()
+        except Exception, e:
+            gdialog.Prompt(_('Abandon Error'),
+                    _('Error: %s') % e, self).run()
+
     def shelve_clicked(self, toolbutton, data=None):
         if not self.isuptodate():
             return
@@ -219,6 +237,12 @@ class GShelve(GStatus):
         if not self.isuptodate():
             return
         self.unshelve()
+        self.activate_shelve_buttons(True)
+
+    def abandon_clicked(self, toolbutton, data=None):
+        if not self.isuptodate():
+            return
+        self.abandon()
         self.activate_shelve_buttons(True)
 
 def run(_ui, *pats, **opts):
