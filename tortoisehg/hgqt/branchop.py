@@ -18,7 +18,7 @@ from tortoisehg.hgqt import qtlib
 
 class BranchOpDialog(QtGui.QDialog):
     'Dialog for manipulating wctx.branch()'
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, oldbranchop, parent=None):
         QtGui.QDialog.__init__(self, parent)
         layout = QtGui.QVBoxLayout()
         self.setLayout(layout)
@@ -37,7 +37,7 @@ class BranchOpDialog(QtGui.QDialog):
             layout.addWidget(lbl)
 
             grid = QtGui.QGridLayout()
-            nochange = QtGui.QRadioButton(_('No Branch Changes'))
+            nochange = QtGui.QRadioButton(_('No branch changes'))
             newbranch = QtGui.QRadioButton(_('Open a new named branch'))
             closebranch = QtGui.QRadioButton(_('Close current named branch'))
             branchCombo = QtGui.QComboBox()
@@ -46,17 +46,31 @@ class BranchOpDialog(QtGui.QDialog):
                 if name == wctx.branch():
                     continue
                 branchCombo.addItem(hglib.tounicode(name))
+            branchCombo.activated.connect(self.accept)
             grid.addWidget(nochange, 0, 0)
             grid.addWidget(newbranch, 1, 0)
             grid.addWidget(branchCombo, 1, 1)
             grid.addWidget(closebranch, 2, 0)
             layout.addLayout(grid)
 
-            nochange.setChecked(True)
             newbranch.toggled.connect(branchCombo.setEnabled)
             branchCombo.setEnabled(False)
             if wctx.branch() == 'default':
                 closebranch.setEnabled(False)
+            if oldbranchop is None:
+                nochange.setChecked(True)
+            elif oldbranchop == False:
+                closebranch.setChecked(True)
+            else:
+                bc = branchCombo
+                names = [bc.itemText(i) for i in xrange(bc.count())]
+                if oldbranchop in names:
+                    bc.setCurrentIndex(names.index(oldbranchop))
+                else:
+                    bc.addItem(oldbranchop)
+                    bc.setCurrentIndex(len(names))
+                newbranch.setChecked(True)
+            self.closebranch = closebranch
 
         BB = QtGui.QDialogButtonBox
         bb = QtGui.QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -67,6 +81,7 @@ class BranchOpDialog(QtGui.QDialog):
         bb.button(BB.Ok).setDefault(True)
         layout.addWidget(bb)
         self.bb = bb
+        self.branchCombo = branchCombo
 
     def keyPressEvent(self, event):
         # todo - is this necessary for a derivation of QDialog?
@@ -78,3 +93,17 @@ class BranchOpDialog(QtGui.QDialog):
             self.reject()
             return
         return super(QtGui.QDialog, self).keyPressEvent(event)
+
+    def accept(self):
+        '''Branch operation is one of:
+            None  - leave wctx branch name untouched
+            False - close current branch
+            str   - open new named branch
+        '''
+        if self.branchCombo.isEnabled():
+            self.branchop = self.branchCombo.currentText()
+        elif self.closebranch.isChecked():
+            self.branchop = False
+        else:
+            self.branchop = None
+        QtGui.QDialog.accept(self)

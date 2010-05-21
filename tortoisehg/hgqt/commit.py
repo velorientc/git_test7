@@ -56,12 +56,14 @@ class CommitWidget(QWidget):
         self.setLayout(layout)
         form = QFormLayout()
         form.setContentsMargins(3, 9, 9, 0)
+        repo = self.stwidget.repo
+        wctx = repo[None]
 
         usercombo = QComboBox()
         try:
             if opts.get('user'):
                 usercombo.addItem(hglib.tounicode(opts['user']))
-            usercombo.addItem(hglib.tounicode(self.stwidget.repo[None].user()))
+            usercombo.addItem(hglib.tounicode(wctx.user()))
         except util.Abort:
             import socket
             user = '%s@%s' % (util.getuser(), socket.getfqdn())
@@ -70,8 +72,7 @@ class CommitWidget(QWidget):
         usercombo.setEditable(True)
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
         form.addRow(_('User:'), usercombo)
-        form.addRow(_('Parent:'), QLabel('Description of ' +
-                                         str(self.stwidget.repo['.'])))
+        form.addRow(_('Parent:'), QLabel('Description of ' + str(repo['.'])))
         frame = QFrame()
         frame.setLayout(form)
         frame.setFrameStyle(QFrame.NoFrame)
@@ -81,10 +82,12 @@ class CommitWidget(QWidget):
         vbox.setMargin(0)
         hbox = QHBoxLayout()
 
-        branchop = QPushButton('Branch: default')
-        branchop.pressed.connect(self.branchOp)
-        self.branchop = branchop
-        hbox.addWidget(branchop)
+        branchbutton = QPushButton(_('Branch: ') +
+                                   hglib.tounicode(wctx.branch()))
+        branchbutton.pressed.connect(self.branchOp)
+        self.branchbutton = branchbutton
+        self.branchop = None
+        hbox.addWidget(branchbutton)
 
         msgcombo = MessageHistoryCombo()
         self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
@@ -119,9 +122,18 @@ class CommitWidget(QWidget):
         return self.stwidget.saveState()
 
     def branchOp(self):
-        d = branchop.BranchOpDialog(self.stwidget.repo)
-        ret = d.exec_()
-        # TODO - do something useful here, and in _commit
+        d = branchop.BranchOpDialog(self.stwidget.repo, self.branchop)
+        if d.exec_() == QDialog.Accepted:
+            self.branchop = d.branchop
+            wctx = self.stwidget.repo[None]
+            cur = hglib.tounicode(wctx.branch())
+            if self.branchop is None:
+                title = _('Branch: ') + cur
+            elif self.branchop == False:
+                title = _('Close Branch: ') + cur
+            else:
+                title = _('New Branch: ') + self.branchop
+            self.branchbutton.setText(title)
 
     def canUndo(self):
         'Returns undo description or None if not valid'
