@@ -268,15 +268,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         # Activate file (file diff navigator)
         self.actionActivateFile = QtGui.QAction('Activate file', self)
-        self.actionActivateFile.setShortcuts([Qt.Key_Return, Qt.Key_Enter])
-        def enterkeypressed():
-            w = QtGui.QApplication.focusWidget()
-            if not isinstance(w, QtGui.QLineEdit):
-                self.tableView_filelist.fileActivated(self.tableView_filelist.currentIndex(),)
-            else:
-                w.emit(SIGNAL('editingFinished()'))
-        connect(self.actionActivateFile, SIGNAL('triggered()'),
-                enterkeypressed)
 
         self.actionActivateFileAlt = QtGui.QAction('Activate alt. file', self)
         self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return, Qt.ALT+Qt.Key_Enter])
