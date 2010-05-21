@@ -37,7 +37,6 @@ class CommitWidget(QWidget):
     loadComplete = pyqtSignal()
     errorMessage = pyqtSignal(QString)
     commitComplete = pyqtSignal()
-    commit = pyqtSlot()
 
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
@@ -46,6 +45,10 @@ class CommitWidget(QWidget):
         self.stwidget = status.StatusWidget(pats, opts, root, self)
         self.connect(self.stwidget, SIGNAL('errorMessage'),
                      lambda m: self.emit(SIGNAL('errorMessage'), m))
+        self.connect(self.stwidget, SIGNAL('loadBegin'),
+                     lambda: self.emit(SIGNAL('loadBegin')))
+        self.connect(self.stwidget, SIGNAL('loadComplete'),
+                     lambda: self.emit(SIGNAL('loadComplete')))
         self.msghistory = []
 
         layout = QVBoxLayout()
