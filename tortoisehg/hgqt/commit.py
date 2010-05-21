@@ -21,6 +21,7 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 #  qrefresh support
 #  threaded / wrapped commit (need a CmdRunner equivalent)
 #  qctlib decode failure dialog (ask for retry locale, suggest HGENCODING)
+#  Need a unicode-to-UTF8 function
 #  +1 / -1 head indication (not as important with workbench integration)
 #  recent committers history
 #  pushafterci, autoincludes list
@@ -245,8 +246,42 @@ class CommitWidget(QWidget):
                                 parent=self)
             self.msgte.setFocus()
             return
+        repo = self.stwidget.repo
+        if self.branchop is None:
+            brcmd = []
+        elif self.branchop == False:
+            brcmd = ['--close-branch']
+        else:
+            brcmd = []
+            # TODO: Need a unicode-to-UTF8 function
+            newbranch = hglib.fromunicode(self.branchop)
+            if newbranch in repo.branchtags():
+                # response: 0=Yes, 1=No, 2=Cancel
+                pb = [p.branch() for p in repo.parents()]
+                if self.nextbranch in pb:
+                    resp = 0
+                else:
+                    rev = repo[newbranch].rev()
+                    resp = qtlib.CustomPrompt(_('Confirm Branch Change'),
+                        _('Named branch "%s" already exists, '
+                          'last used in revision %d\n'
+                          'Yes\t- Make commit restarting this named branch\n'
+                          'No\t- Make commit without changing branch\n'
+                          'Cancel\t- Cancel this commit') % (newbranch, rev),
+                          self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+            else:
+                resp = qtlib.CustomPrompt(_('Confirm New Branch'),
+                    _('Create new named branch "%s" with this commit?\n'
+                      'Yes\t- Start new branch with this commit\n'
+                      'No\t- Make commit without branch change\n'
+                      'Cancel\t- Cancel this commit') % newbranch,
+                    self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+            if resp == 0:
+                repo.dirstate.setbranch(newbranch)
+            elif resp == 2:
+                return
         files = self.stwidget.getChecked('MAR?!S')
-        if not files:
+        if not (files or brcmd or repo[None].branch() != repo['.'].branch()):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
@@ -285,7 +320,8 @@ class CommitWidget(QWidget):
                 dispatch._dispatch(ui, ['remove'] + checkedMissing)
             else:
                 return
-        cmdline = ['commit', '--user', user, '--message', msg] + files
+        cmdline = ['commit', '--user', user, '--message', msg]
+        cmdline += brcmd + files
         ret = dispatch._dispatch(ui, cmdline)
         if not ret:
             self.addMessageToHistory()
