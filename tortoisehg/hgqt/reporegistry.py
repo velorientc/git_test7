@@ -320,19 +320,12 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return Qt.MoveAction
 
     def removeRows(self, row, count, parent):
-        print "removeRows(row=%s, count=%s)" % (row, count)
         item = parent.internalPointer()
         if item is None:
             item = self.rootItem
         self.beginRemoveRows(parent, row, row+count-1)
         res = item.removeRows(row, count)
         self.endRemoveRows()
-
-        # dump everything for debug purposes
-        buf = QtCore.QByteArray()
-        writeXml(buf, self.rootItem, reporegistryXmlElementName)
-        print buf
-
         return res
 
     def mimeTypes(self):
