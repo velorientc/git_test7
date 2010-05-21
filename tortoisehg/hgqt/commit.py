@@ -208,7 +208,16 @@ class CommitWidget(QWidget):
         self.msgcombo.reset(self.msghistory)
 
     def commit(self):
-        ui = self.stwidget.repo.ui
+        repo = self.stwidget.repo
+        ui = repo.ui
+        cwd = os.getcwd()
+        try:
+            os.chdir(repo.root)
+            self._commit(repo, ui)
+        finally:
+            os.chdir(cwd)
+
+    def _commit(self, repo, ui):
         msg = self.getMessage()
         if not msg:
             qtlib.WarningMsgBox(_('Nothing Commited'),
