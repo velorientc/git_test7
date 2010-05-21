@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial import error
+from mercurial import util, error
 
 from tortoisehg.util.util import tounicode, Curry
 
@@ -111,7 +111,10 @@ def datacached(meth):
         col = index.column()
         if (row, col, role) in self._datacache:
             return self._datacache[(row, col, role)]
-        result = meth(self, index, role)
+        try:
+            result = meth(self, index, role)
+        except util.Abort:
+            result = nullvariant
         if result is not nullvariant:
             self._datacache[(row, col, role)] = result
         return result
