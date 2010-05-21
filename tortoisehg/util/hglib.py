@@ -172,16 +172,6 @@ def getfontconfig(_ui=None):
                 _fontconfig[name] = val
     return _fontconfig
 
-def uiwrite(u, args):
-    '''
-    write args if there are buffers
-    returns True if the caller shall handle writing
-    '''
-    if u._buffers:
-        ui.ui.write(u, *args)
-        return False
-    return True
-
 def invalidaterepo(repo):
     repo.dirstate.invalidate()
     if isinstance(repo, bundlerepo.bundlerepository):
@@ -330,7 +320,7 @@ def difftools(ui):
     return tools
 
 
-def hgcmd_toq(q, *args):
+def hgcmd_toq(q, label, args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
     object.  Assumes command is completely noninteractive.
@@ -341,13 +331,25 @@ def hgcmd_toq(q, *args):
             self.setconfig('ui', 'interactive', 'off')
 
         def write(self, *args, **opts):
-            if uiwrite(self, args):
+            if self._buffers:
+                self._buffers[-1].extend([str(a) for a in args])
+            else:
                 for a in args:
-                    q.put(str(a))
+                    if label:
+                        q.put((str(a), opts.get('label', '')))
+                    else:
+                        q.put(str(a))
+
+        def plain(self):
+            return True
+
     u = Qui()
-    for k, v in u.configitems('defaults'):
-        u.setconfig('defaults', k, '')
-    return dispatch._dispatch(u, list(args))
+    oldterm = os.environ.get('TERM')
+    os.environ['TERM'] = 'dumb'
+    ret = dispatch._dispatch(u, list(args))
+    if oldterm:
+        os.environ['TERM'] = oldterm
+    return ret
 
 def get_reponame(repo):
     if repo.ui.config('tortoisehg', 'fullpath', False):

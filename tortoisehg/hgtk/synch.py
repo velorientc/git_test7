@@ -245,8 +245,9 @@ class SynchDialog(gtk.Window):
         scrolledwindow.add(self.textview)
         self.textview.connect('populate-popup', self.add_to_popup)
         self.textbuffer = self.textview.get_buffer()
-        self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground=gtklib.DRED)
+        gtklib.configstyles(self.repo.ui)
+        for tag, argdict in gtklib.TextBufferTags.iteritems():
+            self.textbuffer.create_tag(tag, **argdict)
         basevbox.pack_start(scrolledwindow, True, True)
 
         # statusbar
@@ -592,8 +593,9 @@ class SynchDialog(gtk.Window):
             self.textbuffer.set_text(msg)
 
     def write_err(self, msg):
+        tags = gtklib.gettags('ui.error')
         enditer = self.textbuffer.get_end_iter()
-        self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+        self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
         self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
 
     def process_queue(self):
@@ -601,10 +603,17 @@ class SynchDialog(gtk.Window):
         Handle all the messages currently in the queue (if any).
         """
         self.hgthread.process_dialogs()
+        enditer = self.textbuffer.get_end_iter()
         while self.hgthread.getqueue().qsize():
             try:
-                msg = self.hgthread.getqueue().get(0)
-                self.write(msg)
+                msg, label = self.hgthread.getqueue().get(0)
+                msg = hglib.toutf(msg)
+                tags = gtklib.gettags(label)
+                if tags:
+                    self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
+                else:
+                    self.textbuffer.insert(enditer, msg)
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
         while self.hgthread.geterrqueue().qsize():
