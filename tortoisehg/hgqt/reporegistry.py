@@ -22,6 +22,24 @@ connect = QtCore.QObject.connect
 extractXmlElementName = 'reporegextract'
 repoRegMimeType = 'application/thg-reporegistry'
 
+xmlClassMap = {
+      'group': 'RepoGroupItem',
+      'repo': 'RepoItem',
+      'treeitem': 'RepoTreeItem',
+    }
+
+inverseXmlClassMap = {}
+
+def xmlToClass(ele):
+    return xmlClassMap[ele]
+
+def classToXml(classname):
+    if len(inverseXmlClassMap) == 0:
+        for k,v in xmlClassMap.iteritems():
+            inverseXmlClassMap[v] = k
+    return inverseXmlClassMap[classname]
+
+
 class RepoTreeItem:
     def __init__(self, parent=None):
         self._parent = parent
@@ -85,7 +103,7 @@ class RepoTreeItem:
                 break
 
     def dumpObject(self, xw):
-        xw.writeStartElement(self.__class__.__name__)
+        xw.writeStartElement(classToXml(self.__class__.__name__))
         self.dump(xw)
         xw.writeEndElement()
 
@@ -105,7 +123,7 @@ def encodeToXml(item, rootElementName):
 
 def undumpObject(xr):
     print "undumpObject()"
-    classname = str(xr.name().toString())
+    classname = xmlToClass(str(xr.name().toString()))
     print "classname = %s" % classname
     class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
     obj = class_()
