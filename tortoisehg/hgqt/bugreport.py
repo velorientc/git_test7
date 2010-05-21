@@ -55,6 +55,7 @@ class BugReport(QtGui.QDialog):
         text += '** CWD: %s\n' % os.getcwd()
         extlist = [x[0] for x in extensions.extensions()]
         text += '** Extensions loaded: %s\n' % ', '.join(extlist)
+        text += '** Python version: %s\n' % sys.version.replace('\n', '')
         if os.name == 'nt':
             text += self.getarch()
         text += opts.get('error', 'N/A')
