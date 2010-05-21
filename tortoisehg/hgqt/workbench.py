@@ -461,11 +461,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
 
     def closeEvent(self, event):
-        if not self.okToContinue():
+        if not self.okToContinue() or not self.closeRepoTabs():
             event.ignore()
-        self.storeSettings()
-        if not self.closeRepoTabs():
-            event.ignore()
+        else:
+           self.storeSettings()
+           self.reporegistry.close()
 
     def closeRepoTabs(self):
         '''returns False if close should be aborted'''

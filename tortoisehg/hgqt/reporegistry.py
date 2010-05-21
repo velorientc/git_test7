@@ -19,10 +19,14 @@ from tortoisehg.hgqt.i18n import _
 
 connect = QtCore.QObject.connect
 
+
 extractXmlElementName = 'reporegextract'
+reporegistryXmlElementName = 'reporegistry'
+
 repoRegMimeType = 'application/thg-reporegistry'
 
 xmlClassMap = {
+      'allgroup': 'AllRepoGroupItem',
       'group': 'RepoGroupItem',
       'repo': 'RepoItem',
       'treeitem': 'RepoTreeItem',
@@ -38,6 +42,50 @@ def classToXml(classname):
         for k,v in xmlClassMap.iteritems():
             inverseXmlClassMap[v] = k
     return inverseXmlClassMap[classname]
+
+def settingsfilename():
+    s = QtCore.QSettings()
+    dir = os.path.dirname(str(s.fileName()))
+    return dir + '/' + 'thg-reporegistry.xml'
+
+def writeXml(target, item, rootElementName):
+    xw = QtCore.QXmlStreamWriter(target)
+    xw.setAutoFormatting(True)
+    xw.setAutoFormattingIndent(2)
+    xw.writeStartDocument()
+    xw.writeStartElement(rootElementName)
+    item.dumpObject(xw)
+    xw.writeEndElement()
+    xw.writeEndDocument()
+
+def readXml(source, rootElementName):
+    itemread = None
+    xr = QtCore.QXmlStreamReader(source)
+    if xr.readNextStartElement():
+        ele = str(xr.name().toString())
+        if ele != rootElementName:
+            print "unexpected xml element '%s' "\
+                  "(was looking for %s)" % (ele, rootElementName)
+            return
+    if xr.hasError():
+        print str(xr.errorString())
+    if xr.readNextStartElement():
+        itemread = undumpObject(xr)
+        xr.skipCurrentElement()
+    if xr.hasError():
+        print str(xr.errorString())
+
+    print "itemread = %s" % itemread
+    return itemread
+
+def undumpObject(xr):
+    print "undumpObject()"
+    classname = xmlToClass(str(xr.name().toString()))
+    print "classname = %s" % classname
+    class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
+    obj = class_()
+    obj.undump(xr)
+    return obj
 
 
 class RepoTreeItem:
@@ -98,7 +146,6 @@ class RepoTreeItem:
             if xr.isStartElement():
                 item = undumpObject(xr)
                 self.appendChild(item)
-                xr.skipCurrentElement()
             elif xr.isEndElement():
                 break
 
@@ -106,29 +153,6 @@ class RepoTreeItem:
         xw.writeStartElement(classToXml(self.__class__.__name__))
         self.dump(xw)
         xw.writeEndElement()
-
-
-def encodeToXml(item, rootElementName):
-    buf = QtCore.QByteArray()
-    xw = QtCore.QXmlStreamWriter(buf)
-    xw.setAutoFormatting(True)
-    xw.setAutoFormattingIndent(2)
-    xw.writeStartDocument()
-    xw.writeStartElement(rootElementName)
-    item.dumpObject(xw)
-    xw.writeEndElement()
-    xw.writeEndDocument()
-    return buf
-
-
-def undumpObject(xr):
-    print "undumpObject()"
-    classname = xmlToClass(str(xr.name().toString()))
-    print "classname = %s" % classname
-    class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
-    obj = class_()
-    obj.undump(xr)
-    return obj
 
 
 class RepoItem(RepoTreeItem):
@@ -169,7 +193,7 @@ class RepoItem(RepoTreeItem):
 
 
 class RepoGroupItem(RepoTreeItem):
-    def __init__(self, name, parent=None):
+    def __init__(self, name='', parent=None):
         RepoTreeItem.__init__(self, parent)
         self.name = name
 
@@ -196,16 +220,48 @@ class RepoGroupItem(RepoTreeItem):
         RepoTreeItem.undump(self, xr)
 
 
-class RepoTreeModel(QtCore.QAbstractItemModel):
+class AllRepoGroupItem(RepoGroupItem):
     def __init__(self, parent=None):
+        RepoGroupItem.__init__(self, parent)
+        self.name = _('All Repositories')
+
+    def dump(self, xw):
+        RepoTreeItem.dump(self, xw)
+
+    def undump(self, xr):
+        print "AllRepoGroupItem.undump()"
+        RepoTreeItem.undump(self, xr)
+
+
+class RepoTreeModel(QtCore.QAbstractItemModel):
+    def __init__(self, fn=None, parent=None):
         QtCore.QAbstractItemModel.__init__(self, parent)
 
-        self.rootItem = root = RepoTreeItem()
+        root = None
+        all = None
 
-        self.allrepos = all = RepoGroupItem(_('All Repositories'))
-        root.appendChild(all)
+        if fn:
+            f = QtCore.QFile(settingsfilename())
+            if f.open(QtCore.QIODevice.ReadOnly):
+                root = readXml(f, reporegistryXmlElementName)
+                f.close()
+                if root:
+                    for c in root.childs:
+                        if isinstance(c, AllRepoGroupItem):
+                            all = c
+                            break
+
+        if not root:
+            root = RepoTreeItem()
+            all = AllRepoGroupItem()
+            root.appendChild(all)
+
+        self.rootItem = root
+        self.allrepos = all
 
     # see http://doc.qt.nokia.com/4.6/model-view-model-subclassing.html
+
+    # overrides from QAbstractItemModel
 
     def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
@@ -276,8 +332,9 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         self.endRemoveRows()
 
         # dump everything for debug purposes
-        all = encodeToXml(self.rootItem, 'reporegistry')
-        print all
+        buf = QtCore.QByteArray()
+        writeXml(buf, self.rootItem, reporegistryXmlElementName)
+        print buf
 
         return res
 
@@ -288,7 +345,8 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         print "mimeData()"
         i = indexes[0]
         item = i.internalPointer()
-        buf = encodeToXml(item, extractXmlElementName)
+        buf = QtCore.QByteArray()
+        writeXml(buf, item, extractXmlElementName)
         print str(buf)
         d = QtCore.QMimeData()
         d.setData(repoRegMimeType, buf)
@@ -303,22 +361,7 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         d = str(data.data(repoRegMimeType))
         print "d = %s" % d
 
-        xr = QtCore.QXmlStreamReader(d)
-        if xr.readNextStartElement():
-            ele = str(xr.name().toString())
-            if ele != extractXmlElementName:
-                print "unexpected xml element '%s' "\
-                      "(was looking for %s)" % (ele, extractXmlElementName)
-                return
-        if xr.hasError():
-            print str(xr.errorString())
-        if xr.readNextStartElement():
-            itemread = undumpObject(xr)
-            xr.skipCurrentElement()
-        if xr.hasError():
-            print str(xr.errorString())
-
-        print "itemread = %s" % itemread
+        itemread = readXml(d, extractXmlElementName)
 
         group = parent.internalPointer()
         cc = group.childCount()
@@ -351,6 +394,13 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         self.beginInsertRows(QModelIndex(), cc, cc + 1)
         ri.appendChild(RepoGroupItem(name, ri))
         self.endInsertRows()
+
+    def write(self, fn):
+        print "RepoTreeModel.write(%s)" % fn
+        f = QtCore.QFile(fn)
+        f.open(QtCore.QIODevice.WriteOnly)
+        writeXml(f, self.rootItem, reporegistryXmlElementName)
+        f.close()
 
 
 class RepoTreeView(QtGui.QTreeView):
@@ -431,7 +481,7 @@ class RepoRegistryView(QWidget):
         lay.setContentsMargins(0, 0, 0, 0)
         self.setLayout(lay)
 
-        self.tmodel = m = RepoTreeModel()
+        self.tmodel = m = RepoTreeModel(settingsfilename())
 
         self.tview = tv = RepoTreeView(self)
         lay.addWidget(tv)
@@ -459,3 +509,6 @@ class RepoRegistryView(QWidget):
         if show:
             self.tview.resizeColumnToContents(0)
             self.tview.resizeColumnToContents(1)
+
+    def close(self):
+        self.tmodel.write(settingsfilename())
