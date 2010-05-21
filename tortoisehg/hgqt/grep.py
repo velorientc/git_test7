@@ -18,14 +18,14 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # This widget can be embedded in any application that would like to
-# prove search features
+# provide search features
 
 # Technical Debt
 #  tortoisehg.editor with line number
 #  smart visual diffs (what does this mean?)
 #  context menu for matches (view file, annotate file)
 
-class SearchWidget(QWidget):
+class SearchWidget(QDockWidget):
     '''Working copy and repository search widget
        SIGNALS:
        loadBegin()                  - for progress bar
@@ -33,16 +33,27 @@ class SearchWidget(QWidget):
        errorMessage(QString)        - for status bar
     '''
     def __init__(self, pats, root=None, parent=None):
-        QWidget.__init__(self, parent)
+        QDockWidget.__init__(self, parent)
+
+        if parent is None:
+            self.setFeatures(QDockWidget.NoDockWidgetFeatures)
+            self.setWindowTitle(_('TortoiseHg Search'))
+            self.resize(800, 500)
+        else:
+            self.setFeatures(QDockWidget.DockWidgetClosable |
+                             QDockWidget.DockWidgetMovable  |
+                             QDockWidget.DockWidgetFloatable)
+            self.setWindowTitle(_('Search'))
 
         self.thread = None
         root = paths.find_root(root)
         repo = hg.repository(ui.ui(), path=root)
         assert(repo)
 
-        layout = QVBoxLayout()
-        layout.setMargin(0)
-        self.setLayout(layout)
+        mainframe = QFrame()
+        mainvbox = QVBoxLayout()
+        mainframe.setLayout(mainvbox)
+        self.setWidget(mainframe)
 
         hbox = QHBoxLayout()
         hbox.setMargin(0)
@@ -112,9 +123,9 @@ class SearchWidget(QWidget):
         expandtoggled()
         hbox.insertWidget(0, expand)
 
-        layout.addLayout(hbox)
+        mainvbox.addLayout(hbox)
         frame.setLayout(grid)
-        layout.addWidget(frame)
+        mainvbox.addWidget(frame)
 
         tv = MatchTree(repo, self)
         tv.setItemsExpandable(False)
@@ -123,7 +134,7 @@ class SearchWidget(QWidget):
         tv.setModel(tm)
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
-        layout.addWidget(tv)
+        mainvbox.addWidget(tv)
         le.returnPressed.connect(self.searchActivated)
         self.repo = repo
         self.tv, self.regexple, self.chk = tv, le, chk
@@ -131,10 +142,6 @@ class SearchWidget(QWidget):
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
         self.singlematch = singlematch
         self.regexple.setFocus()
-
-        if not parent:
-            self.setWindowTitle(_('TortoiseHg Search'))
-            self.resize(800, 500)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:

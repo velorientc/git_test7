@@ -50,6 +50,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self._loading = True
         self._scanForRepoChanges = True
+        self._searchWidgets = []
 
         QtGui.QMainWindow.__init__(self)
         HgDialogMixin.__init__(self, ui)
@@ -220,6 +221,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.branch_label_action = self.toolBar_treefilters.addWidget(self.branch_label)
         self.branch_comboBox_action = self.toolBar_treefilters.addWidget(self.branch_comboBox)
         self.toolBar_treefilters.addSeparator()
+        self.toolBar_treefilters.addAction(self.actionSearch)
+        self.toolBar_treefilters.addSeparator()
 
         # diff mode toolbar
         self.toolBar_diff.addAction(self.actionDiffMode)
@@ -247,11 +250,14 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.actionAnnMode.setCheckable(True)
         connect(self.actionAnnMode, SIGNAL('toggled(bool)'), self.setAnnotate)
 
+        self.actionSearch = QtGui.QAction('Search', self)
+        self.actionSearch.setShortcut(Qt.Key_F3)
+        connect(self.actionSearch, SIGNAL('triggered()'), self.on_search)
+
         self.actionHelp.setShortcut(Qt.Key_F1)
         self.actionHelp.setIcon(geticon('help'))
-        connect(self.actionHelp, SIGNAL('triggered()'),
-                self.on_help)
-        
+        connect(self.actionHelp, SIGNAL('triggered()'), self.on_help)
+
         # Next/Prev diff (in full file mode)
         self.actionNextDiff = QtGui.QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
@@ -411,6 +417,17 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def on_help(self, *args):
         pass
+
+    def on_search(self, *args):
+        from tortoisehg.hgqt.grep import SearchWidget
+        # todo: get root of current repo, pass to search widget
+        root = None
+        s = SearchWidget('', root, self)
+        s.setAllowedAreas(QtCore.Qt.TopDockWidgetArea|
+                          QtCore.Qt.BottomDockWidgetArea)
+        s.show()
+        s.setObjectName("searchWidget%d" % len(self._searchWidgets))
+        self._searchWidgets.append(s)
 
     def okToContinue(self):
         '''
