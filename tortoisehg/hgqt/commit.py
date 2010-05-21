@@ -221,7 +221,7 @@ class CommitWidget(QWidget):
         cwd = os.getcwd()
         try:
             os.chdir(repo.root)
-            self._commit(repo, ui)
+            return self._commit(repo, ui)
         finally:
             os.chdir(cwd)
 
