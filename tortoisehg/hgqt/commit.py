@@ -20,9 +20,7 @@ from tortoisehg.hgqt import qtlib, status, cmdui
 # Technical Debt for CommitWidget
 #  qrefresh support
 #  threaded / wrapped commit (need a CmdRunner equivalent)
-#  qctlib decode failure dialog (ask for locale, suggest HGENCODING)
-#  auto-add unknown files
-#  auto-rem missing files
+#  qctlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  add rollback function with prompt
 #  +1 / -1 head indication (not as important with workbench integration)
 #  hook up username from command line to username combo
@@ -174,6 +172,7 @@ class CommitWidget(QWidget):
         self.msgcombo.reset(self.msghistory)
 
     def commit(self):
+        ui = self.stwidget.repo.ui
         msg = self.getMessage()
         if not msg:
             qtlib.WarningMsgBox(_('Nothing Commited'),
@@ -181,15 +180,37 @@ class CommitWidget(QWidget):
                                 parent=self)
             self.msgte.setFocus()
             return
-        files = self.stwidget.getChecked()
+        files = self.stwidget.getChecked('MAR?!S')
         if not files:
-            qtlib.WarningMsgBox(_('No files selected'),
-                                _('No operation to perform'),
+            qtlib.WarningMsgBox(_('No files checked'),
+                                _('No modified files checkmarked for commit'),
                                 parent=self)
             self.stwidget.tv.setFocus()
             return
+        checkedUnknowns = self.stwidget.getChecked('?I')
+        if checkedUnknowns:
+            res = qtlib.CustomPrompt(
+                    _('Confirm Add'),
+                    _('Add checked untracked files?'), self,
+                    (_('&Ok'), ('&Cancel')), 0, 1,
+                    checkedUnknowns).run()
+            if res == 0:
+                dispatch._dispatch(ui, ['add'] + checkedUnknowns)
+            else:
+                return
+        checkedMissing = self.stwidget.getChecked('!')
+        if checkedMissing:
+            res = qtlib.CustomPrompt(
+                    _('Confirm Remove'),
+                    _('Remove checked deleted files?'), self,
+                    (_('&Ok'), ('&Cancel')), 0, 1,
+                    checkedMissing).run()
+            if res == 0:
+                dispatch._dispatch(ui, ['remove'] + checkedMissing)
+            else:
+                return
         cmdline = ['commit', '--message', msg] + files
-        ret = dispatch._dispatch(self.stwidget.repo.ui, cmdline)
+        ret = dispatch._dispatch(ui, cmdline)
         if not ret:
             self.addMessageToHistory()
             self.msgte.clear()
