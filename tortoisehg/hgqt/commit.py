@@ -21,7 +21,6 @@ from tortoisehg.hgqt import qtlib, status, cmdui
 #  qrefresh support
 #  threaded / wrapped commit (need a CmdRunner equivalent)
 #  qctlib decode failure dialog (ask for retry locale, suggest HGENCODING)
-#  add rollback function with prompt
 #  +1 / -1 head indication (not as important with workbench integration)
 #  recent committers history
 #  pushafterci, autoincludes list
@@ -112,6 +111,32 @@ class CommitWidget(QWidget):
 
     def saveState(self):
         return self.stwidget.saveState()
+
+    def canUndo(self):
+        'Returns undo description or None if not valid'
+        repo = self.stwidget.repo
+        if os.path.exists(self.repo.sjoin('undo')):
+            try:
+                args = self.repo.opener('undo.desc', 'r').read().splitlines()
+                if args[1] != 'commit':
+                    return None
+                return _('Rollback commit to revision %d') % (int(args[0]) - 1)
+            except (IOError, IndexError, ValueError):
+                pass
+        return None
+
+    def rollback(self):
+        msg = self.canUndo()
+        if not msg:
+            return
+        d = QMessageBox.question(self, _('Confirm Undo'), msg,
+                                 QMessageBox.Ok | QMessageBox.Cancel)
+        if d != QMessageBox.Ok:
+            return
+        repo = self.stwidget.repo
+        repo.rollback()
+        self.stwidget.refreshWctx()
+        QTimer.singleShot(500, lambda: shlib.shell_notify([repo.root]))
 
     def getMessage(self):
         text = self.msgte.toPlainText()
