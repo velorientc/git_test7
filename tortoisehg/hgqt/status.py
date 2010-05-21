@@ -361,7 +361,7 @@ class StatusWidget(QWidget):
             for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            err = hglib.tounicode(e)
+            err = hglib.tounicode(str(e))
             self.emit(SIGNAL('errorMessage'), QString(err))
             return
         o, e = hu.getdata()
@@ -382,7 +382,7 @@ class StatusWidget(QWidget):
                                         match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            err = hglib.tounicode(e)
+            err = hglib.tounicode(str(e))
             self.emit(SIGNAL('errorMessage'), QString(err))
             return
         text += '</br><h3>'
@@ -424,15 +424,16 @@ class StatusThread(QThread):
                 wctx = self.repo[None]
                 wctx.status(**stopts)
         except (OSError, IOError, util.Abort), e:
-            err = hglib.tounicode(e)
+            err = hglib.tounicode(str(e))
             self.emit(SIGNAL('errorMessage'), QString(err))
         try:
             wctx.dirtySubrepos = []
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
                     wctx.dirtySubrepos.append(s)
-        except (OSError, IOError, util.Abort, error.ConfigError), e:
-            err = hglib.tounicode(e)
+        except (OSError, IOError, util.Abort,
+                error.RepoLookupError, error.ConfigError), e:
+            err = hglib.tounicode(str(e))
             self.emit(SIGNAL('errorMessage'), QString(err))
         self.emit(SIGNAL('finished'), wctx, patchecked)
 
