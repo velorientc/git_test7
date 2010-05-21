@@ -5,6 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import sys
 import os
 
 from PyQt4 import QtCore, QtGui
@@ -17,6 +18,9 @@ from PyQt4.QtGui import QWidget, QVBoxLayout
 from tortoisehg.hgqt.i18n import _
 
 connect = QtCore.QObject.connect
+
+extractXmlElementName = 'reporegextract'
+repoRegMimeType = 'application/thg-reporegistry'
 
 class RepoTreeItem:
     def __init__(self, parent=None):
@@ -65,9 +69,52 @@ class RepoTreeItem:
             c._row = i        
         return True
 
+    def dump(self, xw):
+        for c in self.childs:
+            c.dumpObject(xw)
+
+    def undump(self, xr):
+        print "RepoTreeItem.undump()"
+        while not xr.atEnd():
+            xr.readNext()
+            if xr.isStartElement():
+                item = undumpObject(xr)
+                self.appendChild(item)
+                xr.skipCurrentElement()
+            elif xr.isEndElement():
+                break
+
+    def dumpObject(self, xw):
+        xw.writeStartElement(self.__class__.__name__)
+        self.dump(xw)
+        xw.writeEndElement()
+
+
+def encodeToXml(item, rootElementName):
+    buf = QtCore.QByteArray()
+    xw = QtCore.QXmlStreamWriter(buf)
+    xw.setAutoFormatting(True)
+    xw.setAutoFormattingIndent(2)
+    xw.writeStartDocument()
+    xw.writeStartElement(rootElementName)
+    item.dumpObject(xw)
+    xw.writeEndElement()
+    xw.writeEndDocument()
+    return buf
+
+
+def undumpObject(xr):
+    print "undumpObject()"
+    classname = str(xr.name().toString())
+    print "classname = %s" % classname
+    class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
+    obj = class_()
+    obj.undump(xr)
+    return obj
+
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, rootpath, parent=None):
+    def __init__(self, rootpath='', parent=None):
         RepoTreeItem.__init__(self, parent)
         self._rootpath = rootpath
         
@@ -90,6 +137,18 @@ class RepoItem(RepoTreeItem):
     def removeRows(self, row, count):
         return False
 
+    def dump(self, xw):
+        RepoTreeItem.dump(self, xw)
+        xw.writeAttribute('rootpath', self._rootpath)
+
+    def undump(self, xr):
+        print "RepoItem.undump()"
+        a = xr.attributes()
+        self._rootpath = str(a.value('', 'rootpath').toString())
+        print "self._rootpath = %s" % self._rootpath
+        RepoTreeItem.undump(self, xr)
+        print "RepoItem.undump() finished"
+
 
 class RepoGroupItem(RepoTreeItem):
     def __init__(self, name, parent=None):
@@ -106,6 +165,17 @@ class RepoGroupItem(RepoTreeItem):
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
+
+    def dump(self, xw):
+        xw.writeAttribute('name', self.name)
+        RepoTreeItem.dump(self, xw)
+
+    def undump(self, xr):
+        print "RepoGroupItem.undump()"
+        a = xr.attributes()
+        self.name = str(a.value('', 'name').toString())
+        print "self.name = %s" % self.name
+        RepoTreeItem.undump(self, xr)
 
 
 class RepoTreeModel(QtCore.QAbstractItemModel):
@@ -186,19 +256,24 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         item = parent.internalPointer()
         res = item.removeRows(row, count)
         self.endRemoveRows()
+
+        # dump everything for debug purposes
+        all = encodeToXml(self.rootItem, 'reporegistry')
+        print all
+
         return res
 
     def mimeTypes(self):
-        return QtCore.QStringList('application/thg-reporegistry')
+        return QtCore.QStringList(repoRegMimeType)
 
     def mimeData(self, indexes):
         print "mimeData()"
         i = indexes[0]
         item = i.internalPointer()
-        buf = 'repo=%s' % item.rootpath()
-        print buf
+        buf = encodeToXml(item, extractXmlElementName)
+        print str(buf)
         d = QtCore.QMimeData()
-        d.setData('application/thg-reporegistry', buf)
+        d.setData(repoRegMimeType, buf)
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
@@ -207,24 +282,32 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         print "formats:"
         for s in data.formats():
             print s
-        d = str(data.data('application/thg-reporegistry'))
-        d = d.split('=')
-        print d
-        if d[0] != 'repo':
-            print "not a repo"
-            return False
-        path = d[1]
-        print "path = %s" % path
+        d = str(data.data(repoRegMimeType))
+        print "d = %s" % d
+
+        xr = QtCore.QXmlStreamReader(d)
+        if xr.readNextStartElement():
+            ele = str(xr.name().toString())
+            if ele != extractXmlElementName:
+                print "unexpected xml element '%s' "\
+                      "(was looking for %s)" % (ele, extractXmlElementName)
+                return
+        if xr.hasError():
+            print str(xr.errorString())
+        if xr.readNextStartElement():
+            itemread = undumpObject(xr)
+            xr.skipCurrentElement()
+        if xr.hasError():
+            print str(xr.errorString())
+
+        print "itemread = %s" % itemread
+
         group = parent.internalPointer()
-        print "group = %s" % group
         cc = group.childCount()
         self.beginInsertRows(parent, cc, cc)
-        print "1: group.childCount() = %s" % group.childCount()
-        group.appendChild(RepoItem(path))
-        print "2: group.childCount() = %s" % group.childCount()
+        group.appendChild(itemread)
         self.endInsertRows()
         return True
-
 
     # functions not defined in QAbstractItemModel
 
