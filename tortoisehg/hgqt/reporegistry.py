@@ -116,16 +116,16 @@ def undumpObject(xr):
 class RepoItem(RepoTreeItem):
     def __init__(self, rootpath='', parent=None):
         RepoTreeItem.__init__(self, parent)
-        self._rootpath = rootpath
+        self._root = rootpath
         
     def rootpath(self):
-        return self._rootpath
+        return self._root
 
     def data(self, column):
         if column == 0:
-            return QVariant(os.path.basename(self._rootpath))
+            return QVariant(os.path.basename(self._root))
         elif column == 1:
-            return QVariant(self._rootpath)
+            return QVariant(self._root)
         return QVariant()
 
     def menulist(self):
@@ -139,13 +139,13 @@ class RepoItem(RepoTreeItem):
 
     def dump(self, xw):
         RepoTreeItem.dump(self, xw)
-        xw.writeAttribute('rootpath', self._rootpath)
+        xw.writeAttribute('root', self._root)
 
     def undump(self, xr):
         print "RepoItem.undump()"
         a = xr.attributes()
-        self._rootpath = str(a.value('', 'rootpath').toString())
-        print "self._rootpath = %s" % self._rootpath
+        self._root = str(a.value('', 'root').toString())
+        print "self._root = %s" % self._root
         RepoTreeItem.undump(self, xr)
         print "RepoItem.undump() finished"
 
