@@ -79,9 +79,8 @@ def readXml(source, rootElementName):
     return itemread
 
 def undumpObject(xr):
-    print "undumpObject()"
     classname = xmlToClass(str(xr.name().toString()))
-    print "classname = %s" % classname
+    print "undumpObject(): classname = %s" % classname
     class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
     obj = class_()
     obj.undump(xr)
@@ -140,7 +139,6 @@ class RepoTreeItem:
             c.dumpObject(xw)
 
     def undump(self, xr):
-        print "RepoTreeItem.undump()"
         while not xr.atEnd():
             xr.readNext()
             if xr.isStartElement():
@@ -184,12 +182,9 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', self._root)
 
     def undump(self, xr):
-        print "RepoItem.undump()"
         a = xr.attributes()
         self._root = str(a.value('', 'root').toString())
-        print "self._root = %s" % self._root
         RepoTreeItem.undump(self, xr)
-        print "RepoItem.undump() finished"
 
 
 class RepoGroupItem(RepoTreeItem):
@@ -213,10 +208,8 @@ class RepoGroupItem(RepoTreeItem):
         RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
-        print "RepoGroupItem.undump()"
         a = xr.attributes()
         self.name = str(a.value('', 'name').toString())
-        print "self.name = %s" % self.name
         RepoTreeItem.undump(self, xr)
 
 
@@ -229,7 +222,6 @@ class AllRepoGroupItem(RepoGroupItem):
         RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
-        print "AllRepoGroupItem.undump()"
         RepoTreeItem.undump(self, xr)
 
 
