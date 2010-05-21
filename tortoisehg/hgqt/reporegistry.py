@@ -237,7 +237,7 @@ class RepoGroupItem(RepoTreeItem):
 class AllRepoGroupItem(RepoGroupItem):
     def __init__(self, parent=None):
         RepoGroupItem.__init__(self, parent)
-        self.name = _('All Repositories')
+        self.name = _('all')
 
     def setData(self, column, value):
         return False
@@ -334,6 +334,8 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
     def headerData(self, section, orientation, role):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
+                if section == 0:
+                    return QString(_('Repositories'))
                 if section == 1:
                     return QString(_('Path'))
         return QVariant()
