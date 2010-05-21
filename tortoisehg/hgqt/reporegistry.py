@@ -234,10 +234,16 @@ class RepoGroupItem(RepoTreeItem):
         RepoTreeItem.undump(self, xr)
 
 
-class AllRepoGroupItem(RepoGroupItem):
+class AllRepoGroupItem(RepoTreeItem):
     def __init__(self, parent=None):
-        RepoGroupItem.__init__(self, parent)
-        self.name = _('all')
+        RepoTreeItem.__init__(self, parent)
+
+    def data(self, column, role):
+        if role == Qt.DecorationRole:
+           return QVariant()
+        if column == 0:
+            return QVariant(_('all'))
+        return QVariant()
 
     def setData(self, column, value):
         return False
