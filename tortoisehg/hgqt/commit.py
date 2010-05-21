@@ -25,7 +25,6 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 #  recent committers history
 #  pushafterci, autoincludes list
 #  use date option
-#  implement a branchop dialog (in another file)
 #  qnew/shelve-patch creation dialog (in another file)
 #  reflow / auto-wrap / message format checks / paste filenames
 #  spell check / tab completion
@@ -122,6 +121,7 @@ class CommitWidget(QWidget):
     def branchOp(self):
         d = branchop.BranchOpDialog(self.stwidget.repo)
         ret = d.exec_()
+        # TODO - do something useful here, and in _commit
 
     def canUndo(self):
         'Returns undo description or None if not valid'
@@ -154,7 +154,7 @@ class CommitWidget(QWidget):
         try:
             text = hglib.fromunicode(text, 'strict')
         except UnicodeEncodeError:
-            pass
+            pass # TODO
         return text
 
     def msgSelected(self, index):
