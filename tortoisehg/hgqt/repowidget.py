@@ -468,6 +468,7 @@ class RepoWidget(QtGui.QWidget):
         self.repo = hg.repository(self.repo.ui, self.repo.root)
         self._repodate = self._getrepomtime()
         self.setupModels()
+        self.commitWidget.stwidget.refreshWctx()
 
     def setRepomodel(self, branch):
         self.repomodel.setRepo(self.repo, branch=branch)
