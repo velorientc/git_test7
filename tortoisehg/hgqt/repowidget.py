@@ -248,9 +248,9 @@ class RepoWidget(QtGui.QWidget):
         self.revisiondetails_frame.setFrameShape(QtGui.QFrame.NoFrame)
         self.revisiondetails_frame.setFrameShadow(QtGui.QFrame.Plain)
 
-        self.verticalLayout_2 = QtGui.QVBoxLayout(self.revisiondetails_frame)
-        self.verticalLayout_2.setSpacing(0)
-        self.verticalLayout_2.setMargin(0)
+        self.revisiondetails_layout = QtGui.QVBoxLayout(self.revisiondetails_frame)
+        self.revisiondetails_layout.setSpacing(0)
+        self.revisiondetails_layout.setMargin(0)
 
         self.filelist_splitter = QtGui.QSplitter(self.revisiondetails_frame)
         sp = SP(SP.Expanding, SP.Expanding)
@@ -310,7 +310,7 @@ class RepoWidget(QtGui.QWidget):
         self.fileview.setMinimumSize(QtCore.QSize(0, 0))
 
         self.verticalLayout.addWidget(self.message_splitter)
-        self.verticalLayout_2.addWidget(self.filelist_splitter)
+        self.revisiondetails_layout.addWidget(self.filelist_splitter)
         self.hbox.addWidget(self.revisions_splitter)
 
     def maybeClose(self):
