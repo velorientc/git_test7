@@ -67,7 +67,7 @@ class RepoWidget(QtGui.QWidget):
         
         self.load_config()
 
-        self.setupUi(self)
+        self.setupUi()
         self.load_ui()
         self.disab_shortcuts = []
 
@@ -221,14 +221,14 @@ class RepoWidget(QtGui.QWidget):
                 self.maybeClose)
         self._quickbars = []
 
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(510, 506)
-        self.horizontalLayout = QtGui.QHBoxLayout(Form)
+    def setupUi(self):
+        self.setObjectName("Form")
+        self.resize(510, 506)
+        self.horizontalLayout = QtGui.QHBoxLayout(self)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setMargin(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.revisions_splitter = QtGui.QSplitter(Form)
+        self.revisions_splitter = QtGui.QSplitter(self)
         self.revisions_splitter.setOrientation(QtCore.Qt.Vertical)
         self.revisions_splitter.setObjectName("revisions_splitter")
         self.repoview = HgRepoView(self.revisions_splitter)
@@ -313,7 +313,7 @@ class RepoWidget(QtGui.QWidget):
         self.verticalLayout_2.addWidget(self.filelist_splitter)
         self.horizontalLayout.addWidget(self.revisions_splitter)
 
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
     def maybeClose(self):
         for w in self._quickbars:
