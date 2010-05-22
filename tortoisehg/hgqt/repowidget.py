@@ -190,7 +190,7 @@ class RepoWidget(QtGui.QWidget):
                 rev = url[7:].split(':')[0]
                 self.repoview.goto(rev)
         self.revpanel.linkActivated.connect(activated)
-        self.verticalLayout.insertWidget(0, self.revpanel)
+        self.cset_and_file_details_layout.insertWidget(0, self.revpanel)
 
         self.fileview.setFont(self._font)
         connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
@@ -272,10 +272,11 @@ class RepoWidget(QtGui.QWidget):
         self.cset_and_file_details_frame.setSizePolicy(sp)
         self.cset_and_file_details_frame.setFrameShape(QtGui.QFrame.NoFrame)
 
-        self.verticalLayout = QtGui.QVBoxLayout(self.cset_and_file_details_frame)
-        self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
-        self.verticalLayout.setMargin(0)
+        vbox = QtGui.QVBoxLayout(self.cset_and_file_details_frame)
+        vbox.setSpacing(0)
+        vbox.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
+        vbox.setMargin(0)
+        self.cset_and_file_details_layout = vbox
 
         self.message_splitter = QtGui.QSplitter(self.cset_and_file_details_frame)
         sp = SP(SP.Preferred, SP.Expanding)
@@ -310,7 +311,7 @@ class RepoWidget(QtGui.QWidget):
         self.fileview.setSizePolicy(sp)
         self.fileview.setMinimumSize(QtCore.QSize(0, 0))
 
-        self.verticalLayout.addWidget(self.message_splitter)
+        self.cset_and_file_details_layout.addWidget(self.message_splitter)
         self.revisiondetails_layout.addWidget(self.filelist_splitter)
         self.hbox.addWidget(self.revisions_splitter)
 
