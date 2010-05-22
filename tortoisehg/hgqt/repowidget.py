@@ -313,11 +313,7 @@ class RepoWidget(QtGui.QWidget):
         self.verticalLayout_2.addWidget(self.filelist_splitter)
         self.horizontalLayout.addWidget(self.revisions_splitter)
 
-        self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
-
-    def retranslateUi(self, Form):
-        Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
 
     def maybeClose(self):
         for w in self._quickbars:
