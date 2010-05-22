@@ -76,12 +76,11 @@ def readXml(source, rootElementName):
     if xr.hasError():
         print str(xr.errorString())
 
-    print "itemread = %s" % itemread
+    print "readXml(): itemread = %s" % itemread
     return itemread
 
 def undumpObject(xr):
     classname = xmlToClass(str(xr.name().toString()))
-    print "undumpObject(): classname = %s" % classname
     class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
     obj = class_()
     obj.undump(xr)
