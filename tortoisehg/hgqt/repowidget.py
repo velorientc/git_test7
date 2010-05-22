@@ -155,7 +155,7 @@ class RepoWidget(QtGui.QWidget):
         vbox.setSpacing(0)
         vbox.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         vbox.setMargin(0)
-        self.cset_and_file_details_layout = vbox
+        cset_and_file_details_layout = vbox
 
         self.message_splitter = QtGui.QSplitter(self.cset_and_file_details_frame)
         sp = SP(SP.Preferred, SP.Expanding)
@@ -192,8 +192,8 @@ class RepoWidget(QtGui.QWidget):
 
         self.setupRevPanel()
 
-        self.cset_and_file_details_layout.addWidget(self.revpanel)
-        self.cset_and_file_details_layout.addWidget(self.message_splitter)
+        cset_and_file_details_layout.addWidget(self.revpanel)
+        cset_and_file_details_layout.addWidget(self.message_splitter)
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
