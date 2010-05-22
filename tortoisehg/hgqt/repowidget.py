@@ -127,9 +127,9 @@ class RepoWidget(QtGui.QWidget):
         self.revisionDetailsWidget.setFrameShape(QtGui.QFrame.NoFrame)
         self.revisionDetailsWidget.setFrameShadow(QtGui.QFrame.Plain)
 
-        self.revisiondetails_layout = QtGui.QVBoxLayout(self.revisionDetailsWidget)
-        self.revisiondetails_layout.setSpacing(0)
-        self.revisiondetails_layout.setMargin(0)
+        revisiondetails_layout = QtGui.QVBoxLayout(self.revisionDetailsWidget)
+        revisiondetails_layout.setSpacing(0)
+        revisiondetails_layout.setMargin(0)
 
         self.filelist_splitter = QtGui.QSplitter(self.revisionDetailsWidget)
         sp = SP(SP.Expanding, SP.Expanding)
@@ -195,7 +195,7 @@ class RepoWidget(QtGui.QWidget):
         self.cset_and_file_details_layout.addWidget(self.revpanel)
         self.cset_and_file_details_layout.addWidget(self.message_splitter)
 
-        self.revisiondetails_layout.addWidget(self.filelist_splitter)
+        revisiondetails_layout.addWidget(self.filelist_splitter)
 
     def setupRevPanel(self):
         def label_func(widget, item):
