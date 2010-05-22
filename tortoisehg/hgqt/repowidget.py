@@ -113,7 +113,7 @@ class RepoWidget(QtGui.QWidget):
 
         pats = {}
         opts = {}
-        self.commitWidget = CommitWidget(pats, opts)
+        self.commitWidget = CommitWidget(pats, opts, root=self.repo.root)
         self.stackedWidget.addWidget(self.commitWidget)
 
         self.hbox.addWidget(self.revisions_splitter)
