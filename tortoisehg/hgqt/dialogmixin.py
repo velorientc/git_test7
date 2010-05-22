@@ -66,11 +66,8 @@ class HgDialogMixin(object):
             # due to "QObject" not being a subclass of "object"
             self.__class__.__bases__ = self.__class__.__bases__ + (ui_class,)
         self.setupUi(self)
-        self.load_ui()
-        self.disab_shortcuts = []
-        
-    def load_ui(self):
         self._quickbars = []
+        self.disab_shortcuts = []
 
     def attachQuickBar(self, qbar):
         qbar.setParent(self)
