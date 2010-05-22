@@ -20,17 +20,13 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Technical Debt
-#   dirty indication
 #   stacked widget or pages need to be scrollable
-#   all entry widgets need virtual APIs for parent to set/query
-#     isDirty(), addHistory(), setCurValue(), getCurValue()
 #   hook up QSci as internal editor, enable ini syntax highlight
 #   initial focus not implemented
 #   add extensions page after THG 1.1 is released
 #   show icons in listview
 
 _unspecstr = _('<unspecified>')
-_unspeclocalstr = hglib.fromutf(_unspecstr)
 
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
@@ -64,11 +60,11 @@ class SettingsCombo(QComboBox):
                 cur = self.count()
         if self.defaults and self.previous:
             self.insertSeparator(len(self.defaults))
-        if cur:
-            self.setCurrentIndex(i)
+        if cur is not None:
+            self.setCurrentIndex(cur)
         elif self.curvalue == False:
             self.setCurrentIndex(0)
-        else:
+        elif self.curvalue:
             self.addItem(self.curvalue)
             self.setCurrentIndex(self.count()-1)
 
@@ -120,7 +116,10 @@ class PasswordEntry(QLineEdit):
 
     def setCurValue(self, curvalue):
         self.curvalue = curvalue
-        self.setPlainText(curvalue)
+        if curvalue:
+            self.setText(curvalue)
+        else:
+            self.setText('')
 
     def getValue(self):
         utext = self.text()
@@ -609,13 +608,9 @@ class SettingsDialog(QDialog):
         else:
             pages = ((pagename,) + self.pages[pagename],)
         for name, page_num, info, frame, widgets in pages:
-
-            # standard configs
             for row, (label, cpath, values, tooltip) in enumerate(info):
-                w = widgets[row]
                 curvalue = self.get_ini_config(cpath)
-                canedit = hasattr(w, 'isEditable') and w.isEditable()
-                # TODO: provide methods to add history, set cur value
+                widgets[row].setCurValue(curvalue)
 
     def get_ini_config(self, cpath):
         '''Retrieve a value from the parsed config file'''
@@ -674,9 +669,9 @@ class SettingsDialog(QDialog):
             return cfg
 
     def recordNewValue(self, cpath, newvalue, keephistory=True):
-        # 'newvalue' is converted to local encoding
+        # 'newvalue' is in local encoding
         section, key = cpath.split('.', 1)
-        if newvalue == _unspeclocalstr or newvalue == '':
+        if newvalue == False:
             try:
                 del self.ini[section][key]
             except KeyError:
