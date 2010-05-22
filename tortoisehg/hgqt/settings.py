@@ -32,65 +32,79 @@ from PyQt4.QtGui import *
 _unspecstr = _('<unspecified>')
 _unspeclocalstr = hglib.fromutf(_unspecstr)
 
-# These should be turned into derived classes
-def genEditCombo(defs):
-    'EditCombo - defaults provided, but generally editable'
-    c = QComboBox()
-    c.setEditable(True)
-    c.addItem(_unspecstr)
-    for d in defs:
-        c.addItem(d)
-    return c
-
-def genIntEditCombo():
-    'EditCombo, only allows integer values'
-    c = QComboBox()
-    c.setEditable(True)
-    c.addItem(_unspecstr)
-    c.setValidator(QIntValidator())
-    return c
-
-def genPasswordEntry():
-    'Generate a password entry box'
-    le = QLineEdit()
-    le.setEchoMode(QLineEdit.Password)
-    return le
-
-def genDefaultCombo(defs):
-    'DefaultCombo - user must select from a list'
-    c = QComboBox()
-    c.addItem(_unspecstr)
-    for d in defs:
-        c.addItem(d)
-    return c
-
-def genBoolCombo():
-    'BoolCombo - true, false, unspecified'
-    return genDefaultCombo(['True', 'False'])
-
-def genDeferredCombo(func):
-    'BoolCombo - true, false, unspecified'
-    return DeferredCombo(func)
-
-class DeferredCombo(QComboBox):
-    'DeferredCombo - do not load values until requested'
-    def __init__(self, func, parent=None):
+class SettingsCombo(QComboBox):
+    def __init__(self, parent=None, **opts):
         QComboBox.__init__(self, parent)
-        self.func = func
-        self.reset()
+        self.opts = opts
+        self.setEditable(opts.get('canedit', False))
+        val = opts.get('validator')
+        if val:
+            self.setValidator(val)
+        self.reset(opts.get('defaults', []))
 
-    def reset(self):
-        self.addItem('...')
-        self.loaded = False
+    def reset(self, msgs):
+        self.clear()
+        if self.opts.get('defer'):
+            self.loaded = False
+            self.addItem('...')
+            return
+        self.addItem(_unspecstr)
+        for m in msgs:
+            self.addItem(m)
+        self.loaded = True
 
     def showPopup(self):
         if not self.loaded:
             self.clear()
             self.addItem(_unspecstr)
-            for s in self.func():
+            for s in self.opts['defer']():
                 self.addItem(s)
             self.loaded = True
         QComboBox.showPopup(self)
+
+    def focusInEvent(self, e):
+        self.opts['descwidget'].setPlainText(self.opts['tooltip'])
+        QComboBox.focusInEvent(self, e)
+
+class PasswordEntry(QLineEdit):
+    def __init__(self, parent=None, **opts):
+        QLineEdit.__init__(self, parent)
+        self.opts = opts
+        self.setEchoMode(QLineEdit.Password)
+
+    def focusInEvent(self, e):
+        self.opts['descwidget'].setPlainText(self.opts['tooltip'])
+        QLineEdit.focusInEvent(self, e)
+
+def genEditCombo(opts, defaults=[]):
+    # supplied opts keys: cpath, tooltip, descwidget, defaults
+    opts['canedit'] = True
+    opts['defaults'] = defaults
+    return SettingsCombo(**opts)
+
+def genIntEditCombo(opts):
+    'EditCombo, only allows integer values'
+    opts['canedit'] = True
+    opts['validator'] = QIntValidator()
+    return SettingsCombo(**opts)
+
+def genPasswordEntry(opts):
+    'Generate a password entry box'
+    return PasswordEntry(**opts)
+
+def genDefaultCombo(opts, defaults=[]):
+    'DefaultCombo - user must select from a list'
+    opts['defaults'] = defaults
+    return SettingsCombo(**opts)
+
+def genBoolCombo(opts):
+    'BoolCombo - true, false, unspecified'
+    opts['defaults'] = ['True', 'False']
+    return SettingsCombo(**opts)
+
+def genDeferredCombo(opts, func):
+    opts['defer'] = func
+    return SettingsCombo(**opts)
 
 def findDiffTools():
     return hglib.difftools(ui.ui())
@@ -114,9 +128,9 @@ INFO = (
           ' section of your Mercurial configuration files.  If left'
           ' unspecified, TortoiseHg will use the selected merge tool.'
           ' Failing that it uses the first applicable tool it finds.')),
-    (_('Visual Editor'), 'tortoisehg.editor', (genEditCombo, []),
+    (_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
         _('Specify the visual editor used to view files, etc')),
-    (_('CLI Editor'), 'ui.editor', (genEditCombo, []),
+    (_('CLI Editor'), 'ui.editor', genEditCombo,
         _('The editor to use during a commit and other instances where'
         ' Mercurial needs multiline input from the user.  Used by'
         ' command line commands, including patch import.')),
@@ -154,18 +168,18 @@ INFO = (
         _('The number of revisions to read and display in the'
         ' changelog viewer in a single batch.'
         ' Default: 500')),
-    (_('Dead Branches'), 'tortoisehg.deadbranch', (genEditCombo, []),
+    (_('Dead Branches'), 'tortoisehg.deadbranch', genEditCombo,
         _('Comma separated list of branch names that should be ignored'
         ' when building a list of branch names for a repository.'
         ' Default: None')),
-    (_('Branch Colors'), 'tortoisehg.branchcolors', (genEditCombo, []),
+    (_('Branch Colors'), 'tortoisehg.branchcolors', genEditCombo,
         _('Space separated list of branch names and colors of the form'
         ' branch:#XXXXXX. Spaces and colons in the branch name must be'
         ' escaped using a backslash (\\). Likewise some other characters'
         ' can be escaped in this way, e.g. \\u0040 will be decoded to the'
         ' @ character, and \\n to a linefeed.'
         ' Default: None')),
-    (_('Hide Tags'), 'tortoisehg.hidetags', (genEditCombo, []),
+    (_('Hide Tags'), 'tortoisehg.hidetags', genEditCombo,
         _('Space separated list of tags that will not be shown.'
         ' Useful example: Specify "qbase qparent qtip" to hide the'
         ' standard tags inserted by the Mercurial Queues Extension.' 
@@ -175,7 +189,7 @@ INFO = (
     )),
 
 ({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit.ico'}, (
-    (_('Username'), 'ui.username', (genEditCombo, []),
+    (_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
        _('Maximum length of the commit message summary line.'
@@ -191,11 +205,11 @@ INFO = (
     (_('Push After Commit'), 'tortoisehg.pushafterci', genBoolCombo,
         _('Attempt to push to default push target after every successful'
           ' commit.  Default: False')),
-    (_('Auto Commit List'), 'tortoisehg.autoinc', (genEditCombo, []),
+    (_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,
        _('Comma separated list of files that are automatically included'
          ' in every commit.  Intended for use only as a repository setting.'
          '  Default: None')),
-    (_('Auto Exclude List'), 'tortoisehg.ciexclude', (genEditCombo, []),
+    (_('Auto Exclude List'), 'tortoisehg.ciexclude', genEditCombo,
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, commit, and shelve dialogs are opened.'
          '  Default: None')),
@@ -207,13 +221,13 @@ INFO = (
     )),
 
 ({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy.ico'}, (
-    (_('Name'), 'web.name', (genEditCombo, []),
+    (_('Name'), 'web.name', genEditCombo,
         _('Repository name to use in the web interface.'
         ' Default is the working directory.')),
-    (_('Description'), 'web.description', (genEditCombo, []),
+    (_('Description'), 'web.description', genEditCombo,
         _("Textual description of the repository's purpose or"
         ' contents.')),
-    (_('Contact'), 'web.contact', (genEditCombo, []),
+    (_('Contact'), 'web.contact', genEditCombo,
         _('Name or email address of the person in charge of the'
         ' repository.')),
     (_('Style'), 'web.style', (genDefaultCombo,
@@ -255,27 +269,27 @@ INFO = (
     )),
 
 ({'name': 'proxy', 'label': _('Proxy'), 'icon': 'general.ico'}, (
-    (_('Host'), 'http_proxy.host', (genEditCombo, []),
+    (_('Host'), 'http_proxy.host', genEditCombo,
         _('Host name and (optional) port of proxy server, for'
         ' example "myproxy:8000"')),
-    (_('Bypass List'), 'http_proxy.no', (genEditCombo, []),
+    (_('Bypass List'), 'http_proxy.no', genEditCombo,
         _('Optional. Comma-separated list of host names that'
         ' should bypass the proxy')),
-    (_('User'), 'http_proxy.user', (genEditCombo, []),
+    (_('User'), 'http_proxy.user', genEditCombo,
         _('Optional. User name to authenticate with at the proxy server')),
     (_('Password'), 'http_proxy.passwd', genPasswordEntry,
         _('Optional. Password to authenticate with at the proxy server')),
     )),
 
 ({'name': 'email', 'label': _('Email'), 'icon': 'general.ico'}, (
-    (_('From'), 'email.from', (genEditCombo, []),
+    (_('From'), 'email.from', genEditCombo,
         _('Email address to use in the "From" header and for'
         ' the SMTP envelope')),
-    (_('To'), 'email.to', (genEditCombo, []),
+    (_('To'), 'email.to', genEditCombo,
         _('Comma-separated list of recipient email addresses')),
-    (_('Cc'), 'email.cc', (genEditCombo, []),
+    (_('Cc'), 'email.cc', genEditCombo,
         _('Comma-separated list of carbon copy recipient email addresses')),
-    (_('Bcc'), 'email.bcc', (genEditCombo, []),
+    (_('Bcc'), 'email.bcc', genEditCombo,
         _('Comma-separated list of blind carbon copy recipient'
         ' email addresses')),
     (_('method'), 'email.method', (genEditCombo, ['smtp']),
@@ -285,7 +299,7 @@ INFO = (
         ' for sender, list of recipients on command line, message on stdin).'
         ' Normally, setting this to "sendmail" or "/usr/sbin/sendmail"'
         ' is enough to use sendmail to send messages.')),
-    (_('SMTP Host'), 'smtp.host', (genEditCombo, []),
+    (_('SMTP Host'), 'smtp.host', genEditCombo,
         _('Host name of mail server')),
     (_('SMTP Port'), 'smtp.port', genIntEditCombo,
         _('Port to connect to on mail server.'
@@ -293,11 +307,11 @@ INFO = (
     (_('SMTP TLS'), 'smtp.tls', genBoolCombo,
         _('Connect to mail server using TLS.'
         ' Default: False')),
-    (_('SMTP Username'), 'smtp.username', (genEditCombo, []),
+    (_('SMTP Username'), 'smtp.username', genEditCombo,
         _('Username to authenticate to mail server with')),
     (_('SMTP Password'), 'smtp.password', genPasswordEntry,
         _('Password to authenticate to mail server with')),
-    (_('Local Hostname'), 'smtp.local_hostname', (genEditCombo, []),
+    (_('Local Hostname'), 'smtp.local_hostname', genEditCombo,
         _('Hostname the sender can use to identify itself to the'
         ' mail server.')),
     )),
@@ -510,26 +524,23 @@ class SettingsDialog(QDialog):
                     widgets[n].grab_focus()
                     return
 
-    def setHelp(self, tooltip):
-        'Connect to widget focus'
-        text = ' '.join(tooltip.splitlines())
-        self.desctext.setPlainText(text)
-
     def fillFrame(self, frame, info):
         widgets = []
         form = QFormLayout()
         frame.setLayout(form)
 
+        # supplied opts keys: cpath, tooltip, descwidget, defaults
         for row, (label, cpath, values, tooltip) in enumerate(info):
+            opts = {'label':label, 'cpath':cpath, 'tooltip':tooltip,
+                    'descwidget':self.desctext}
             if isinstance(values, tuple):
                 func = values[0]
-                w = func(values[1])
+                w = func(opts, values[1])
             else:
                 func = values
-                w = func()
+                w = func(opts)
             form.addRow(label, w)
             widgets.append(w)
-            # TODO: Add a mechanism to set help text on focusInEvent
         return widgets
 
     def addPage(self, name):
