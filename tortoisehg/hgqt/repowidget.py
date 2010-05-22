@@ -223,7 +223,6 @@ class RepoWidget(QtGui.QWidget):
 
     def setupUi(self):
         self.setObjectName("Form")
-        self.resize(510, 506)
         self.horizontalLayout = QtGui.QHBoxLayout(self)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setMargin(0)
