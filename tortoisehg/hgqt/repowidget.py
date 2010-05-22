@@ -28,13 +28,19 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestdialog import ManifestDialog
-from tortoisehg.hgqt.widgetmixin import WidgetMixin
 from tortoisehg.hgqt.update import UpdateDialog
 from tortoisehg.hgqt import cmdui, csinfo, qtlib
+from tortoisehg.hgqt.config import HgConfig
+
+from revdisplay import RevMessage
+from filelistview import HgFileListView
+from fileview import HgFileView
+from repoview import HgRepoView
 
 from tortoisehg.util import paths, hglib
 
 from mercurial.error import RepoError
+
 
 Qt = QtCore.Qt
 bold = QtGui.QFont.Bold
@@ -42,8 +48,7 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
 
-class RepoWidget(QtGui.QWidget, WidgetMixin):
-    _uifile = 'repowidget.ui'
+class RepoWidget(QtGui.QWidget):
 
     showMessageSignal = QtCore.pyqtSignal(str)
     switchToSignal = QtCore.pyqtSignal(QtGui.QWidget)
@@ -59,8 +64,13 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self._scanForRepoChanges = True
 
         QtGui.QWidget.__init__(self)
-        WidgetMixin.__init__(self)
         
+        self.load_config()
+
+        self.setupUi(self)
+        self.load_ui()
+        self.disab_shortcuts = []
+
         self.currentMessage = ''
 
         self.createActions()
@@ -201,6 +211,141 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
 
         self.restoreSettings()
 
+    def load_ui(self):
+        # we explicitely create a QShortcut so we can disable it
+        # when a "helper context toolbar" is activated (which can be
+        # closed hitting the Esc shortcut)
+        self.esc_shortcut = QtGui.QShortcut(self)
+        self.esc_shortcut.setKey(Qt.Key_Escape)
+        connect(self.esc_shortcut, SIGNAL('activated()'),
+                self.maybeClose)
+        self._quickbars = []
+
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(510, 506)
+        self.horizontalLayout = QtGui.QHBoxLayout(Form)
+        self.horizontalLayout.setSpacing(0)
+        self.horizontalLayout.setMargin(0)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.revisions_splitter = QtGui.QSplitter(Form)
+        self.revisions_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.revisions_splitter.setObjectName("revisions_splitter")
+        self.repoview = HgRepoView(self.revisions_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.repoview.sizePolicy().hasHeightForWidth())
+        self.repoview.setSizePolicy(sizePolicy)
+        self.repoview.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.repoview.setObjectName("repoview")
+        self.frame_maincontent = QtGui.QFrame(self.revisions_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame_maincontent.sizePolicy().hasHeightForWidth())
+        self.frame_maincontent.setSizePolicy(sizePolicy)
+        self.frame_maincontent.setFrameShape(QtGui.QFrame.NoFrame)
+        self.frame_maincontent.setFrameShadow(QtGui.QFrame.Plain)
+        self.frame_maincontent.setObjectName("frame_maincontent")
+        self.verticalLayout_2 = QtGui.QVBoxLayout(self.frame_maincontent)
+        self.verticalLayout_2.setSpacing(0)
+        self.verticalLayout_2.setMargin(0)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.filelist_splitter = QtGui.QSplitter(self.frame_maincontent)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.filelist_splitter.sizePolicy().hasHeightForWidth())
+        self.filelist_splitter.setSizePolicy(sizePolicy)
+        self.filelist_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.filelist_splitter.setChildrenCollapsible(False)
+        self.filelist_splitter.setObjectName("filelist_splitter")
+        self.tableView_filelist = HgFileListView(self.filelist_splitter)
+        self.tableView_filelist.setObjectName("tableView_filelist")
+        self.frame = QtGui.QFrame(self.filelist_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy)
+        self.frame.setFrameShape(QtGui.QFrame.NoFrame)
+        self.frame.setObjectName("frame")
+        self.verticalLayout = QtGui.QVBoxLayout(self.frame)
+        self.verticalLayout.setSpacing(0)
+        self.verticalLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
+        self.verticalLayout.setMargin(0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.message_splitter = QtGui.QSplitter(self.frame)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.message_splitter.sizePolicy().hasHeightForWidth())
+        self.message_splitter.setSizePolicy(sizePolicy)
+        self.message_splitter.setMinimumSize(QtCore.QSize(50, 50))
+        self.message_splitter.setFrameShape(QtGui.QFrame.NoFrame)
+        self.message_splitter.setLineWidth(0)
+        self.message_splitter.setMidLineWidth(0)
+        self.message_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.message_splitter.setOpaqueResize(True)
+        self.message_splitter.setObjectName("message_splitter")
+        self.message = RevMessage(self.message_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.message.sizePolicy().hasHeightForWidth())
+        self.message.setSizePolicy(sizePolicy)
+        self.message.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier")
+        font.setPointSize(9)
+        self.message.setFont(font)
+        self.message.setObjectName("message")
+        self.fileview = HgFileView(self.message_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.fileview.sizePolicy().hasHeightForWidth())
+        self.fileview.setSizePolicy(sizePolicy)
+        self.fileview.setMinimumSize(QtCore.QSize(0, 0))
+        self.fileview.setObjectName("fileview")
+        self.verticalLayout.addWidget(self.message_splitter)
+        self.verticalLayout_2.addWidget(self.filelist_splitter)
+        self.horizontalLayout.addWidget(self.revisions_splitter)
+
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        Form.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
+
+    def maybeClose(self):
+        for w in self._quickbars:
+            if w.isVisible():
+                w.cancel()
+                break
+        else:
+            self.close()
+
+    def load_config(self):
+        cfg = HgConfig(self.repo.ui)
+        fontstr = cfg.getFont()
+        font = QtGui.QFont()
+        try:
+            if not font.fromString(fontstr):
+                raise Exception
+        except:
+            print "bad font name '%s'" % fontstr
+            font.setFamily("Monospace")
+            font.setFixedPitch(True)
+            font.setPointSize(10)
+        self._font = font
+
+        self.rowheight = cfg.getRowHeight()
+        self.users, self.aliases = cfg.getUsers()
+        self.hidefinddelay = cfg.getHideFindDelay()
+        return cfg
+
     def reponame(self):
         return os.path.basename(self.repo.root)
 
@@ -313,10 +458,6 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         self.actionPrevDiff.setEnabled(self.fileview.fileMode() and notfirst and self.fileview.nDiffs())
         self.actionNextDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
 
-    def load_config(self):
-        cfg = WidgetMixin.load_config(self)
-        self.hidefinddelay = cfg.getHideFindDelay()
-
     def create_models(self):
         self.repomodel = HgRepoListModel(self.repo)
         connect(self.repomodel, SIGNAL('filled'),
@@ -347,7 +488,7 @@ class RepoWidget(QtGui.QWidget, WidgetMixin):
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
         connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
-        self.attachQuickBar(view.goto_toolbar)
+        #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
         #self.toolBar_edit.addAction(gotoaction)
