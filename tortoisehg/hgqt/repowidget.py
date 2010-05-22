@@ -105,14 +105,17 @@ class RepoWidget(QtGui.QWidget):
         self.repoview.setSizePolicy(sp)
         self.repoview.setFrameShape(QtGui.QFrame.StyledPanel)
 
-        self.setupRevisionDetailsWidget(self.revisions_splitter)
+        self.stackedWidget = QtGui.QStackedWidget(self.revisions_splitter)
+
+        self.setupRevisionDetailsWidget()
+        self.stackedWidget.addWidget(self.revisionDetailsWidget)
 
         self.hbox.addWidget(self.revisions_splitter)
 
-    def setupRevisionDetailsWidget(self, parent):
+    def setupRevisionDetailsWidget(self):
         SP = QtGui.QSizePolicy
 
-        self.revisionDetailsWidget = QtGui.QFrame(parent)
+        self.revisionDetailsWidget = QtGui.QFrame()
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
