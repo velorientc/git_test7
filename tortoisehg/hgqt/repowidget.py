@@ -8,42 +8,31 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
-import sys, os
-import re
+import os
 
-from PyQt4 import QtCore, QtGui, Qsci
+from PyQt4 import QtCore, QtGui
 
-from mercurial import ui, hg
-from mercurial import util
+from mercurial import hg
 
-from tortoisehg.util.util import tounicode, has_closed_branch_support
-from tortoisehg.util.util import rootpath, find_repository
+from tortoisehg.util.util import has_closed_branch_support
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.graph import diff as revdiff
-from tortoisehg.hgqt.decorators import timeit
 
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.filelistmodel import HgFileListModel
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
-from tortoisehg.hgqt.manifestdialog import ManifestDialog
 from tortoisehg.hgqt.update import UpdateDialog
-from tortoisehg.hgqt import cmdui, csinfo, qtlib
+from tortoisehg.hgqt import cmdui
 from tortoisehg.hgqt.config import HgConfig
 
 from revdisplay import RevMessage
 from filelistview import HgFileListView
 from fileview import HgFileView
 from repoview import HgRepoView
-
-from tortoisehg.util import paths, hglib
-
-from mercurial.error import RepoError
+from revpanelwidget import RevPanelWidget
 
 
 Qt = QtCore.Qt
-bold = QtGui.QFont.Bold
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
@@ -101,7 +90,7 @@ class RepoWidget(QtGui.QWidget):
         self.hbox.setMargin(0)
 
         self.revisions_splitter = QtGui.QSplitter(self)
-        self.revisions_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.revisions_splitter.setOrientation(Qt.Vertical)
 
         self.repoview = HgRepoView(self.revisions_splitter)
         sp = SP(SP.Expanding, SP.Expanding)
@@ -167,7 +156,7 @@ class RepoWidget(QtGui.QWidget):
         self.message_splitter.setFrameShape(QtGui.QFrame.NoFrame)
         self.message_splitter.setLineWidth(0)
         self.message_splitter.setMidLineWidth(0)
-        self.message_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.message_splitter.setOrientation(Qt.Vertical)
         self.message_splitter.setOpaqueResize(True)
         self.message = RevMessage(self.message_splitter)
 
@@ -190,129 +179,12 @@ class RepoWidget(QtGui.QWidget):
         self.fileview.setSizePolicy(sp)
         self.fileview.setMinimumSize(QtCore.QSize(0, 0))
 
-        self.setupRevPanel()
+        self.revpanel = RevPanelWidget(self.repo, self.repoview)
 
         cset_and_file_details_layout.addWidget(self.revpanel)
         cset_and_file_details_layout.addWidget(self.message_splitter)
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
-
-    def setupRevPanel(self):
-        def label_func(widget, item):
-            if item == 'cset':
-                return _('Changeset:')
-            elif item == 'parents':
-                return _('Parent:')
-            elif item == 'children':
-                return _('Child:')
-            elif item == 'patch':
-                return _('Patch:')
-            raise csinfo.UnknownItem(item)
-        def revid_markup(revid, **kargs):
-            opts = dict(family='monospace', size='9pt')
-            opts.update(kargs)
-            return qtlib.markup(revid, **opts)
-        def data_func(widget, item, ctx):
-            def summary_line(desc):
-                desc = desc.replace('\0', '').split('\n')[0]
-                return hglib.tounicode(desc[:80])
-            def revline_data(ctx, hl=False, branch=None):
-                if isinstance(ctx, basestring):
-                    return ctx
-                desc = ctx.description()
-                return (str(ctx.rev()), str(ctx), summary_line(desc), hl, branch)
-            if item == 'cset':
-                return revline_data(ctx)
-            elif item == 'branch':
-                value = hglib.tounicode(ctx.branch())
-                return value != 'default' and value or None
-            elif item == 'parents':
-                # TODO: need to put 'diff to other' checkbox
-                #pindex = self.diff_other_parent() and 1 or 0
-                pindex = 0 # always show diff with first parent
-                pctxs = ctx.parents()
-                parents = []
-                for pctx in pctxs:
-                    highlight = len(pctxs) == 2 and pctx == pctxs[pindex]
-                    branch = None
-                    if hasattr(pctx, 'branch') and pctx.branch() != ctx.branch():
-                        branch = pctx.branch()
-                    parents.append(revline_data(pctx, highlight, branch))
-                return parents
-            elif item == 'children':
-                children = []
-                for cctx in ctx.children():
-                    branch = None
-                    if hasattr(cctx, 'branch') and cctx.branch() != ctx.branch():
-                        branch = cctx.branch()
-                    children.append(revline_data(cctx, branch=branch))
-                return children
-            elif item in ('transplant', 'p4', 'svn'):
-                ts = widget.get_data(item, usepreset=True)
-                if not ts:
-                    return None
-                try:
-                    tctx = self.repo[ts]
-                    return revline_data(tctx)
-                except (error.LookupError, error.RepoLookupError, error.RepoError):
-                    return ts
-            elif item == 'patch':
-                if hasattr(ctx, '_patchname'):
-                    desc = ctx.description()
-                    return (ctx._patchname, str(ctx), summary_line(desc))
-                return None
-            raise csinfo.UnknownItem(item)
-        def markup_func(widget, item, value):
-            def link_markup(revnum, revid, enable=True):
-                mrevid = revid_markup(revid)
-                if not enable:
-                    return '%s (%s)' % (revnum, mrevid)
-                link = 'cset://%s:%s' % (revnum, revid)
-                return '<a href="%s">%s (%s)</a>' % (link, revnum, mrevid)
-            def revline_markup(revnum, revid, summary, highlight=None,
-                               branch=None, link=True):
-                def branch_markup(branch):
-                    opts = dict(fg='black', bg='#aaffaa')
-                    return qtlib.markup(' %s ' % branch, **opts)
-                summary = qtlib.markup(summary)
-                if branch:
-                    branch = branch_markup(branch)
-                if revid:
-                    rev = link_markup(revnum, revid, link)
-                    if branch:
-                        return '%s %s %s' % (rev, branch, summary)
-                    return '%s %s' % (rev, summary)
-                else:
-                    revnum = qtlib.markup(revnum)
-                    if branch:
-                        return '%s - %s %s' % (revnum, branch, summary)
-                    return '%s - %s' % (revnum, summary)
-            if item in ('cset', 'transplant', 'patch', 'p4', 'svn'):
-                link = item != 'cset'
-                if isinstance(value, basestring):
-                    return revid_markup(value)
-                return revline_markup(link=link, *value)
-            elif item in ('parents', 'children'):
-                csets = []
-                for cset in value:
-                    if isinstance(cset, basestring):
-                        csets.append(revid_markup(cset))
-                    else:
-                        csets.append(revline_markup(*cset))
-                return csets
-            raise csinfo.UnknownItem(item)
-
-        custom = csinfo.custom(data=data_func, label=label_func,
-                               markup=markup_func)
-        style = csinfo.panelstyle(contents=('cset', 'branch', 'user',
-                       'dateage', 'parents', 'children', 'tags', 'transplant',
-                       'p4', 'svn'), selectable=True, expandable=True)
-        self.revpanel = csinfo.create(self.repo, style=style, custom=custom)
-        def activated(url):
-            if url.startsWith('cset://'):
-                rev = url[7:].split(':')[0]
-                self.repoview.goto(rev)
-        self.revpanel.linkActivated.connect(activated)
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
