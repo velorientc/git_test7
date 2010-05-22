@@ -342,6 +342,16 @@ def thgstatus(ui, *pats, **opts):
     from tortoisehg.util.thgstatus import run
     run(ui, *pats, **opts)
 
+def userconfig(ui, *pats, **opts):
+    """user configuration editor"""
+    from tortoisehg.hgqt.settings import run
+    qtrun(run, ui, *pats, **opts)
+
+def repoconfig(ui, *pats, **opts):
+    """repository configuration editor"""
+    from tortoisehg.hgqt.settings import run
+    qtrun(run, ui, *pats, **opts)
+
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt.clone import run
@@ -668,6 +678,12 @@ table = {
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
           ('r', 'rev', '', _('revision to update')),],
          _('thg update [-C] [[-r] REV]')),
+    "^userconfig": (userconfig,
+        [('', 'focus', '', _('field to give initial focus'))],
+        _('thg userconfig')),
+    "^repoconfig": (repoconfig,
+        [('', 'focus', '', _('field to give initial focus'))],
+        _('thg repoconfig')),
     "^vdiff": (vdiff,
         [('c', 'change', '', _('changeset to view in diff tool')),
          ('r', 'rev', [], _('revisions to view in diff tool')),
