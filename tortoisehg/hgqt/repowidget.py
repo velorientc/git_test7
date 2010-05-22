@@ -49,8 +49,11 @@ class RepoWidget(QtGui.QWidget):
         # these are used to know where to go after a reload
         self._reload_rev = None
         self._reload_file = None
+
         self._loading = True
         self._scanForRepoChanges = True
+
+        self.splitternames = []
 
         QtGui.QWidget.__init__(self)
         
@@ -90,6 +93,7 @@ class RepoWidget(QtGui.QWidget):
         self.hbox.setMargin(0)
 
         self.revisions_splitter = QtGui.QSplitter(self)
+        self.splitternames.append('revisions_splitter')
         self.revisions_splitter.setOrientation(Qt.Vertical)
 
         self.repoview = HgRepoView(self.revisions_splitter)
@@ -121,6 +125,8 @@ class RepoWidget(QtGui.QWidget):
         revisiondetails_layout.setMargin(0)
 
         self.filelist_splitter = QtGui.QSplitter(self.revisionDetailsWidget)
+        self.splitternames.append('filelist_splitter')
+
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
@@ -147,6 +153,7 @@ class RepoWidget(QtGui.QWidget):
         cset_and_file_details_layout = vbox
 
         self.message_splitter = QtGui.QSplitter(self.cset_and_file_details_frame)
+        self.splitternames.append('message_splitter')
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
@@ -485,11 +492,7 @@ class RepoWidget(QtGui.QWidget):
     def restoreSettings(self):
         s = QtCore.QSettings()
         wb = "RepoWidget/"
-        self.splitternames = []
-        sn = ('revisions', 'filelist', 'message')
-        for n in sn:
-            n += '_splitter'
-            self.splitternames.append(n)
+        for n in self.splitternames:
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
         expanded = s.value(wb + 'revpanel.expanded', True).toBool()
         self.revpanel.set_expanded(expanded)
