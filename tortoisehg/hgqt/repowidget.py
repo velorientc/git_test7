@@ -74,10 +74,6 @@ class RepoWidget(QtGui.QWidget):
 
         self.createActions()
 
-        self.setupRevPanel()
-        
-        self.cset_and_file_details_layout.insertWidget(0, self.revpanel)
-
         self.fileview.setFont(self._font)
         connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
         connect(self.repoview, SIGNAL('showMessage'), self.showMessage)
@@ -194,7 +190,11 @@ class RepoWidget(QtGui.QWidget):
         self.fileview.setSizePolicy(sp)
         self.fileview.setMinimumSize(QtCore.QSize(0, 0))
 
+        self.setupRevPanel()
+
+        self.cset_and_file_details_layout.addWidget(self.revpanel)
         self.cset_and_file_details_layout.addWidget(self.message_splitter)
+
         self.revisiondetails_layout.addWidget(self.filelist_splitter)
 
     def setupRevPanel(self):
