@@ -24,6 +24,7 @@ from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from tortoisehg.hgqt.update import UpdateDialog
 from tortoisehg.hgqt import cmdui
 from tortoisehg.hgqt.config import HgConfig
+from tortoisehg.hgqt.manifestdialog import ManifestDialog
 
 from revdisplay import RevMessage
 from filelistview import HgFileListView
