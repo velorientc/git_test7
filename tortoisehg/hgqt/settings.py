@@ -37,44 +37,97 @@ class SettingsCombo(QComboBox):
         QComboBox.__init__(self, parent)
         self.opts = opts
         self.setEditable(opts.get('canedit', False))
-        val = opts.get('validator')
-        if val:
-            self.setValidator(val)
-        self.reset(opts.get('defaults', []))
+        self.setValidator(opts.get('validator', None))
+        self.previous = []
+        self.defaults = opts.get('defaults', [])
+        self.curvalue = False
+        self.loaded = False
+        self.resetList()
 
-    def reset(self, msgs):
+    def resetList(self):
         self.clear()
-        if self.opts.get('defer'):
-            self.loaded = False
-            self.addItem('...')
+        if self.opts.get('defer') and not self.loaded:
+            if self.curvalue == False: # unspecified
+                self.addItem(_unspecstr)
+            else:
+                self.addItem(self.curvalue or '...')
             return
         self.addItem(_unspecstr)
-        for m in msgs:
+        cur = None
+        for s in self.defaults:
+            self.addItem(s)
+            if self.curvalue == s:
+                cur = self.count()
+        for m in self.previous:
             self.addItem(m)
-        self.loaded = True
+            if self.curvalue == s:
+                cur = self.count()
+        if self.defaults and self.previous:
+            self.insertSeparator(len(self.defaults))
+        if cur:
+            self.setCurrentIndex(i)
+        elif self.curvalue == False:
+            self.setCurrentIndex(0)
+        else:
+            self.addItem(self.curvalue)
+            self.setCurrentIndex(self.count()-1)
 
     def showPopup(self):
-        if not self.loaded:
-            self.clear()
-            self.addItem(_unspecstr)
-            for s in self.opts['defer']():
-                self.addItem(s)
+        if self.opts.get('defer') and not self.loaded:
+            self.defaults = self.opts['defer']()
             self.loaded = True
+            self.resetList()
         QComboBox.showPopup(self)
 
     def focusInEvent(self, e):
         self.opts['descwidget'].setPlainText(self.opts['tooltip'])
         QComboBox.focusInEvent(self, e)
 
+    ## common APIs for all edit widgets
+
+    def setHistory(self, oldvalues):
+        self.previous = oldvalues
+        self.resetList()
+
+    def setCurValue(self, curvalue):
+        self.curvalue = curvalue
+        self.resetList()
+
+    def getValue(self):
+        utext = self.currentText()
+        if utext == _unspecstr:
+            return False
+        return hglib.fromunicode(utext)
+
+    def isDirty(self):
+        return self.getValue() != self.curvalue
+
 class PasswordEntry(QLineEdit):
     def __init__(self, parent=None, **opts):
         QLineEdit.__init__(self, parent)
         self.opts = opts
+        self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
 
     def focusInEvent(self, e):
         self.opts['descwidget'].setPlainText(self.opts['tooltip'])
         QLineEdit.focusInEvent(self, e)
+
+    ## common APIs for all edit widgets
+
+    def setHistory(self, oldvalues):
+        pass # orly?
+
+    def setCurValue(self, curvalue):
+        self.curvalue = curvalue
+        self.setPlainText(curvalue)
+
+    def getValue(self):
+        utext = self.text()
+        return utext and hglib.fromunicode(utext) or False
+
+    def isDirty(self):
+        return self.getValue() != self.curvalue
 
 def genEditCombo(opts, defaults=[]):
     # supplied opts keys: cpath, tooltip, descwidget, defaults
@@ -409,7 +462,7 @@ class SettingsDialog(QDialog):
         stack = QStackedWidget()
         bothbox.addWidget(pageList, 0)
         bothbox.addWidget(stack, 1)
-        pageList.currentRowChanged.connect(self.setCurPage)
+        pageList.currentRowChanged.connect(stack.setCurrentIndex)
         self.stack = stack
 
         self.dirty = False
@@ -418,11 +471,6 @@ class SettingsDialog(QDialog):
 
         s = QSettings()
         self.restoreGeometry(s.value('settings/geom').toByteArray())
-
-        # add page items to treeview
-        for meta, info in INFO:
-            # TODO: set meta['icon']
-            pageList.addItem(meta['label'])
 
         desctext = QTextBrowser()
         layout.addWidget(desctext)
@@ -435,20 +483,18 @@ class SettingsDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
-        self.dirty = False
+        # add page items to treeview
+        for meta, info in INFO:
+            # TODO: set meta['icon']
+            pageList.addItem(meta['label'])
+            self.addPage(meta['name'])
+
         combo.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
         combo.currentIndexChanged.connect(self.refresh)
         self.refresh()
 
         # TODO: focus 'general' page or specified field
         pageList.setCurrentRow(0)
-
-    def setCurPage(self, index):
-        'create pages on demand'
-        meta, info = INFO[index]
-        if meta['name'] not in self.pages:
-            self.addPage(meta['name'])
-        self.stack.setCurrentIndex(index)
 
     def fileselect(self, combo):
         'select another hgrc file'
@@ -482,9 +528,6 @@ class SettingsDialog(QDialog):
         # refresh config values
         self.ini = self.load_config(self.rcpath)
         self.refreshHistory()
-
-        # clear modification status
-        self.dirty = False
 
     def editClicked(self, button):
         'Open internal editor in stacked widget'
@@ -555,9 +598,6 @@ class SettingsDialog(QDialog):
         pagenum = self.stack.addWidget(frame)
         self.pages[name] = (pagenum, info, frame, widgets)
 
-        # prepare to show
-        self.refreshHistory(name)
-
     def refreshHistory(self, pagename=None):
         # sotre modification status
         prev_dirty = self.dirty
@@ -576,11 +616,6 @@ class SettingsDialog(QDialog):
                 curvalue = self.get_ini_config(cpath)
                 canedit = hasattr(w, 'isEditable') and w.isEditable()
                 # TODO: provide methods to add history, set cur value
-
-        # clear modification status forcibly if need
-        if self.dirty != prev_dirty:
-            self._btn_apply.set_sensitive(False)
-            self.dirty = False
 
     def get_ini_config(self, cpath):
         '''Retrieve a value from the parsed config file'''
@@ -683,8 +718,6 @@ class SettingsDialog(QDialog):
             f = open(self.fn, 'w')
             f.write(str(self.ini))
             f.close()
-            self._btn_apply.set_sensitive(False)
-            self.dirty = False
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 str(e), parent=self)
