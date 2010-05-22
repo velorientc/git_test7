@@ -224,9 +224,9 @@ class RepoWidget(QtGui.QWidget):
     def setupUi(self):
         SP = QtGui.QSizePolicy
 
-        self.horizontalLayout = QtGui.QHBoxLayout(self)
-        self.horizontalLayout.setSpacing(0)
-        self.horizontalLayout.setMargin(0)
+        self.hbox = QtGui.QHBoxLayout(self)
+        self.hbox.setSpacing(0)
+        self.hbox.setMargin(0)
 
         self.revisions_splitter = QtGui.QSplitter(self)
         self.revisions_splitter.setOrientation(QtCore.Qt.Vertical)
@@ -311,7 +311,7 @@ class RepoWidget(QtGui.QWidget):
 
         self.verticalLayout.addWidget(self.message_splitter)
         self.verticalLayout_2.addWidget(self.filelist_splitter)
-        self.horizontalLayout.addWidget(self.revisions_splitter)
+        self.hbox.addWidget(self.revisions_splitter)
 
     def maybeClose(self):
         for w in self._quickbars:
