@@ -219,7 +219,6 @@ class RepoWidget(QtGui.QWidget):
         self.esc_shortcut.setKey(Qt.Key_Escape)
         connect(self.esc_shortcut, SIGNAL('activated()'),
                 self.maybeClose)
-        self._quickbars = []
 
     def setupUi(self):
         SP = QtGui.QSizePolicy
@@ -316,12 +315,7 @@ class RepoWidget(QtGui.QWidget):
         self.hbox.addWidget(self.revisions_splitter)
 
     def maybeClose(self):
-        for w in self._quickbars:
-            if w.isVisible():
-                w.cancel()
-                break
-        else:
-            self.close()
+        self.close()
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
