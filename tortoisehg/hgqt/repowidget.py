@@ -263,20 +263,21 @@ class RepoWidget(QtGui.QWidget):
 
         self.tableView_filelist = HgFileListView(self.filelist_splitter)
 
-        self.frame = QtGui.QFrame(self.filelist_splitter)
+        self.cset_and_file_details_frame = QtGui.QFrame(self.filelist_splitter)
         sp = SP(SP.Preferred, SP.Preferred)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(0)
-        sp.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
-        self.frame.setSizePolicy(sp)
-        self.frame.setFrameShape(QtGui.QFrame.NoFrame)
+        sp.setHeightForWidth(
+            self.cset_and_file_details_frame.sizePolicy().hasHeightForWidth())
+        self.cset_and_file_details_frame.setSizePolicy(sp)
+        self.cset_and_file_details_frame.setFrameShape(QtGui.QFrame.NoFrame)
 
-        self.verticalLayout = QtGui.QVBoxLayout(self.frame)
+        self.verticalLayout = QtGui.QVBoxLayout(self.cset_and_file_details_frame)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         self.verticalLayout.setMargin(0)
 
-        self.message_splitter = QtGui.QSplitter(self.frame)
+        self.message_splitter = QtGui.QSplitter(self.cset_and_file_details_frame)
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
