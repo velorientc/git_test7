@@ -51,6 +51,8 @@ class CommitWidget(QWidget):
                      lambda: self.emit(SIGNAL('loadComplete')))
         self.msghistory = []
 
+        SP = QSizePolicy
+
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.stwidget)
@@ -99,9 +101,16 @@ class CommitWidget(QWidget):
         msgte.setAcceptRichText(False)
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
+        sp = SP(SP.Expanding, SP.Expanding)
+        sp.setHorizontalStretch(1)
+        upperframe.setSizePolicy(sp)
         upperframe.setLayout(vbox)
 
         self.split = QSplitter(Qt.Vertical)
+        sp = SP(SP.Expanding, SP.Expanding)
+        sp.setHorizontalStretch(1)
+        sp.setVerticalStretch(0)
+        self.split.setSizePolicy(sp)
         # Add our widgets to the top of our splitter
         self.split.addWidget(upperframe)
         # Add status widget document frame below our splitter

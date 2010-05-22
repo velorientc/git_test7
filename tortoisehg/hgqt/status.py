@@ -74,6 +74,8 @@ class StatusWidget(QWidget):
                     _colors[stat] = QColor(e[7:])
                     break
 
+        SP = QSizePolicy
+
         split = QSplitter(Qt.Horizontal)
         layout = QVBoxLayout()
         layout.setMargin(0)
@@ -83,6 +85,10 @@ class StatusWidget(QWidget):
         vbox = QVBoxLayout()
         vbox.setMargin(0)
         frame = QFrame(split)
+        sp = SP(SP.Expanding, SP.Expanding)
+        sp.setHorizontalStretch(0)
+        sp.setVerticalStretch(0)
+        frame.setSizePolicy(sp)
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
         hbox.setContentsMargins (5, 7, 0, 0)
@@ -148,6 +154,10 @@ class StatusWidget(QWidget):
         vbox = QVBoxLayout()
         vbox.setMargin(0)
         docf = QFrame(split)
+        sp = SP(SP.Expanding, SP.Expanding)
+        sp.setHorizontalStretch(1)
+        sp.setVerticalStretch(0)
+        docf.setSizePolicy(sp)
         docf.setLayout(vbox)
         self.docf = docf
         hbox = QHBoxLayout()
