@@ -313,8 +313,6 @@ class RepoWidget(QtGui.QWidget):
         self.verticalLayout_2.addWidget(self.filelist_splitter)
         self.horizontalLayout.addWidget(self.revisions_splitter)
 
-        QtCore.QMetaObject.connectSlotsByName(self)
-
     def maybeClose(self):
         for w in self._quickbars:
             if w.isVisible():
