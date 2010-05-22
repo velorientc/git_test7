@@ -68,7 +68,6 @@ class RepoWidget(QtGui.QWidget):
         self.load_config()
 
         self.setupUi()
-        self.load_ui()
         self.disab_shortcuts = []
 
         self.currentMessage = ''
@@ -211,15 +210,6 @@ class RepoWidget(QtGui.QWidget):
 
         self.restoreSettings()
 
-    def load_ui(self):
-        # we explicitely create a QShortcut so we can disable it
-        # when a "helper context toolbar" is activated (which can be
-        # closed hitting the Esc shortcut)
-        self.esc_shortcut = QtGui.QShortcut(self)
-        self.esc_shortcut.setKey(Qt.Key_Escape)
-        connect(self.esc_shortcut, SIGNAL('activated()'),
-                self.maybeClose)
-
     def setupUi(self):
         SP = QtGui.QSizePolicy
 
@@ -313,9 +303,6 @@ class RepoWidget(QtGui.QWidget):
         self.cset_and_file_details_layout.addWidget(self.message_splitter)
         self.revisiondetails_layout.addWidget(self.filelist_splitter)
         self.hbox.addWidget(self.revisions_splitter)
-
-    def maybeClose(self):
-        self.close()
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
