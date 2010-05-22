@@ -228,7 +228,14 @@ class RepoWidget(QtGui.QWidget):
         self.repoview.setSizePolicy(sp)
         self.repoview.setFrameShape(QtGui.QFrame.StyledPanel)
 
-        self.revisionDetailsWidget = QtGui.QFrame(self.revisions_splitter)
+        self.setupRevisionDetailsWidget(self.revisions_splitter)
+
+        self.hbox.addWidget(self.revisions_splitter)
+
+    def setupRevisionDetailsWidget(self, parent):
+        SP = QtGui.QSizePolicy
+
+        self.revisionDetailsWidget = QtGui.QFrame(parent)
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
@@ -302,7 +309,6 @@ class RepoWidget(QtGui.QWidget):
 
         self.cset_and_file_details_layout.addWidget(self.message_splitter)
         self.revisiondetails_layout.addWidget(self.filelist_splitter)
-        self.hbox.addWidget(self.revisions_splitter)
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
