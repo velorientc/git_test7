@@ -31,6 +31,7 @@ from filelistview import HgFileListView
 from fileview import HgFileView
 from repoview import HgRepoView
 from revpanelwidget import RevPanelWidget
+from commit import CommitWidget
 
 
 Qt = QtCore.Qt
@@ -109,6 +110,11 @@ class RepoWidget(QtGui.QWidget):
 
         self.setupRevisionDetailsWidget()
         self.stackedWidget.addWidget(self.revisionDetailsWidget)
+
+        pats = {}
+        opts = {}
+        self.commitWidget = CommitWidget(pats, opts)
+        self.stackedWidget.addWidget(self.commitWidget)
 
         self.hbox.addWidget(self.revisions_splitter)
 
@@ -426,6 +432,10 @@ class RepoWidget(QtGui.QWidget):
             self.filelistmodel.setSelectedRev(ctx)
             if len(self.filelistmodel):
                 self.tableView_filelist.selectRow(0)
+            index = 0
+            if ctx.rev() is None:
+                index = 1
+            self.stackedWidget.setCurrentIndex(index)
 
     def goto(self, rev):
         if len(self.repoview.model().graph):
