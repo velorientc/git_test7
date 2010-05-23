@@ -25,7 +25,7 @@ qsci = Qsci.QsciScintilla
 # Technical Debt
 #   stacked widget or pages need to be scrollable
 #   add extensions page after THG 1.1 is released
-#   show icons in listview
+#   show icons in the page listview
 
 _unspecstr = _('<unspecified>')
 
@@ -45,7 +45,6 @@ class SettingsCombo(QComboBox):
             slist = settings.value('settings/'+opts['cpath']).toStringList()
             self.previous = [s for s in slist]
         self.setDisabled(opts['readonly'])
-        self.resetList()
 
     def resetList(self):
         self.clear()
@@ -109,6 +108,7 @@ class SettingsCombo(QComboBox):
     def isDirty(self):
         return self.value() != self.curvalue
 
+
 class PasswordEntry(QLineEdit):
     def __init__(self, parent=None, **opts):
         QLineEdit.__init__(self, parent)
@@ -137,8 +137,8 @@ class PasswordEntry(QLineEdit):
     def isDirty(self):
         return self.value() != self.curvalue
 
+
 def genEditCombo(opts, defaults=[]):
-    # supplied opts keys: cpath, tooltip, descwidget, defaults
     opts['canedit'] = True
     opts['defaults'] = defaults
     return SettingsCombo(**opts)
@@ -154,16 +154,17 @@ def genPasswordEntry(opts):
     return PasswordEntry(**opts)
 
 def genDefaultCombo(opts, defaults=[]):
-    'DefaultCombo - user must select from a list'
+    'user must select from a list'
     opts['defaults'] = defaults
     return SettingsCombo(**opts)
 
 def genBoolCombo(opts):
-    'BoolCombo - true, false, unspecified'
+    'true, false, unspecified'
     opts['defaults'] = ['True', 'False']
     return SettingsCombo(**opts)
 
 def genDeferredCombo(opts, func):
+    'Values retrieved from a function at popup time'
     opts['defer'] = func
     opts['nohist'] = True
     return SettingsCombo(**opts)
