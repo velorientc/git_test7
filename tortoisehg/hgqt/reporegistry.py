@@ -75,8 +75,6 @@ def readXml(source, rootElementName):
         xr.skipCurrentElement()
     if xr.hasError():
         print str(xr.errorString())
-
-    print "readXml(): itemread = %s" % itemread
     return itemread
 
 def undumpObject(xr):
@@ -436,7 +434,6 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         self.endInsertRows()
 
     def write(self, fn):
-        print "RepoTreeModel.write(%s)" % fn
         f = QtCore.QFile(fn)
         f.open(QtCore.QIODevice.WriteOnly)
         writeXml(f, self.rootItem, reporegistryXmlElementName)
