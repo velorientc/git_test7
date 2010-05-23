@@ -43,6 +43,7 @@ class SettingsCombo(QComboBox):
             settings = opts['settings']
             slist = settings.value('settings/'+opts['cpath']).toStringList()
             self.previous = [s for s in slist]
+        self.setDisabled(opts['readonly'])
         self.resetList()
 
     def resetList(self):
@@ -113,6 +114,7 @@ class PasswordEntry(QLineEdit):
         self.opts = opts
         self.curvalue = False
         self.setEchoMode(QLineEdit.Password)
+        self.setDisabled(opts['readonly'])
 
     def focusInEvent(self, e):
         self.opts['descwidget'].setPlainText(self.opts['tooltip'])
@@ -577,7 +579,8 @@ class SettingsDialog(QDialog):
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
             opts = {'label':label, 'cpath':cpath, 'tooltip':tooltip,
-                    'descwidget':self.desctext, 'settings':self.settings}
+                    'descwidget':self.desctext, 'settings':self.settings,
+                    'readonly':self.readonly}
             if isinstance(values, tuple):
                 func = values[0]
                 w = func(opts, values[1])
