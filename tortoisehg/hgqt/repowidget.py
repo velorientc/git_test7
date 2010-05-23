@@ -426,16 +426,18 @@ class RepoWidget(QtGui.QWidget):
         """
         if self.repomodel.graph:
             ctx = self.repomodel.repo.changectx(rev)
-            self.fileview.setContext(ctx)
-            self.revpanel.update(ctx.rev())
-            self.message.displayRevision(ctx, None)
-            self.filelistmodel.setSelectedRev(ctx)
             if len(self.filelistmodel):
                 self.tableView_filelist.selectRow(0)
-            index = 0
             if ctx.rev() is None:
-                index = 1
-            self.stackedWidget.setCurrentIndex(index)
+                # working copy
+                curridx = 1
+            else:
+                self.fileview.setContext(ctx)
+                self.revpanel.update(ctx.rev())
+                self.message.displayRevision(ctx, None)
+                self.filelistmodel.setSelectedRev(ctx)
+                curridx = 0
+            self.stackedWidget.setCurrentIndex(curridx)
 
     def goto(self, rev):
         if len(self.repoview.model().graph):
