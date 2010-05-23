@@ -47,30 +47,31 @@ class SettingsCombo(QComboBox):
 
     def resetList(self):
         self.clear()
+        ucur = hglib.tounicode(self.curvalue or '')
         if self.opts.get('defer') and not self.loaded:
             if self.curvalue == False: # unspecified
                 self.addItem(_unspecstr)
             else:
-                self.addItem(self.curvalue or '...')
+                self.addItem(ucur or '...')
             return
         self.addItem(_unspecstr)
-        cur = None
+        curindex = None
         for s in self.defaults:
+            if ucur == s:
+                curindex = self.count()
             self.addItem(s)
-            if self.curvalue == s:
-                cur = self.count()
-        for m in self.previous:
-            self.addItem(m)
-            if self.curvalue == s:
-                cur = self.count()
         if self.defaults and self.previous:
-            self.insertSeparator(len(self.defaults))
-        if cur is not None:
-            self.setCurrentIndex(cur)
+            self.insertSeparator(len(self.defaults)+1)
+        for m in self.previous:
+            if ucur == m and not curindex:
+                curindex = self.count()
+            self.addItem(m)
+        if curindex is not None:
+            self.setCurrentIndex(curindex)
         elif self.curvalue == False:
             self.setCurrentIndex(0)
         elif self.curvalue:
-            self.addItem(self.curvalue)
+            self.addItem(ucur)
             self.setCurrentIndex(self.count()-1)
 
     def showPopup(self):
@@ -96,10 +97,11 @@ class SettingsCombo(QComboBox):
             return False
         if 'nohist' in self.opts or utext in self.defaults + self.previous:
             return hglib.fromunicode(utext)
+        print 'saving', self.opts['cpath'], utext
         self.previous.insert(0, utext)
         self.previous = self.previous[:10]
         settings = QSettings()
-        settings.setValue('settings/'+opts['cpath'], self.previous)
+        settings.setValue('settings/'+self.opts['cpath'], self.previous)
         return hglib.fromunicode(utext)
 
     def isDirty(self):
@@ -109,7 +111,7 @@ class PasswordEntry(QLineEdit):
     def __init__(self, parent=None, **opts):
         QLineEdit.__init__(self, parent)
         self.opts = opts
-        self.curvalue = None
+        self.curvalue = False
         self.setEchoMode(QLineEdit.Password)
 
     def focusInEvent(self, e):
@@ -121,7 +123,7 @@ class PasswordEntry(QLineEdit):
     def setValue(self, curvalue):
         self.curvalue = curvalue
         if curvalue:
-            self.setText(curvalue)
+            self.setText(hglib.tounicode(curvalue))
         else:
             self.setText('')
 
@@ -501,7 +503,7 @@ class SettingsDialog(QDialog):
         'select another hgrc file'
         combo = self.confcombo
         if self.isDirty():
-            ret = qctlib.CustomPrompt(_('Confirm Switch'),
+            ret = qtlib.CustomPrompt(_('Confirm Switch'),
                     _('Switch after saving changes?'), self,
                     (_('&Save'), _('&Discard'), _('&Cancel')),
                     default=2, esc=2).run()
@@ -544,7 +546,6 @@ class SettingsDialog(QDialog):
         for info, widgets in self.pages.values():
             for w in widgets:
                 if w.isDirty():
-                    print w.opts['cpath']
                     return True
         return False
 
@@ -574,7 +575,6 @@ class SettingsDialog(QDialog):
         frame.setLayout(form)
         self.stack.addWidget(frame)
 
-        # supplied opts keys: cpath, tooltip, descwidget, defaults
         for row, (label, cpath, values, tooltip) in enumerate(info):
             opts = {'label':label, 'cpath':cpath, 'tooltip':tooltip,
                     'descwidget':self.desctext, 'settings':self.settings}
@@ -603,7 +603,7 @@ class SettingsDialog(QDialog):
             section, key = cpath.split('.', 1)
             return self.ini[section][key]
         except KeyError:
-            return None
+            return False
 
     def loadIniFile(self, rcpath):
         for fn in rcpath:
