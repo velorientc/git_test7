@@ -560,6 +560,7 @@ def unshelve(ui, repo, *pats, **opts):
             ui.status(fp.getvalue())
         else:
             files = []
+            fp.seek(0)
             for chunk in parsepatch(fp):
                 if isinstance(chunk, header):
                     files += chunk.files()
