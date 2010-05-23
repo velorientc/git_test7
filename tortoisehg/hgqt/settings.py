@@ -457,11 +457,11 @@ class SettingsDialog(QDialog):
         self.confcombo = combo
 
         edit = QPushButton(_('Edit File'))
-        refresh = QPushButton(_('Reload'))
-        refresh.pressed.connect(self.refresh)
+        reload = QPushButton(_('Reload'))
+        reload.pressed.connect(self.reloadClicked)
         tophbox.addWidget(combo)
         tophbox.addWidget(edit)
-        tophbox.addWidget(refresh)
+        tophbox.addWidget(reload)
         tophbox.addStretch(1)
 
         bothbox = QHBoxLayout()
@@ -551,7 +551,7 @@ class SettingsDialog(QDialog):
                     return True
         return False
 
-    def reloadClicked(self, button):
+    def reloadClicked(self):
         if self.isDirty():
             d = QMessageBox.question(self, _('Confirm Reload'),
                             _('Unsaved changes will be lost.\n'
