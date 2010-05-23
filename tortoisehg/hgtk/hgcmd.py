@@ -658,7 +658,7 @@ class CmdLogWidget(gtk.VBox):
         """
         enditer = self.buffer.get_end_iter()
         if error:
-            self.buffer.insert_with_tags_by_name(enditer, text, 'error')
+            self.buffer.insert_with_tags_by_name(enditer, text, 'ui.error')
         else:
             self.buffer.insert(enditer, text)
         self.textview.scroll_to_mark(self.buffer.get_insert(), 0)
