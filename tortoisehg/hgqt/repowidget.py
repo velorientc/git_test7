@@ -49,7 +49,7 @@ class RepoWidget(QtGui.QWidget):
         self._closed_branch_supp = has_closed_branch_support(self.repo)
 
         # these are used to know where to go after a reload
-        self._reload_rev = None
+        self._reload_rev = '.'
         self._reload_file = None
 
         self._loading = True
