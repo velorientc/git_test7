@@ -34,10 +34,15 @@ class SettingsCombo(QComboBox):
         self.opts = opts
         self.setEditable(opts.get('canedit', False))
         self.setValidator(opts.get('validator', None))
-        self.previous = []
         self.defaults = opts.get('defaults', [])
         self.curvalue = False
         self.loaded = False
+        if 'nohist' in opts:
+            self.previous = []
+        else:
+            settings = opts['settings']
+            slist = settings.value('settings/'+opts['cpath']).toStringList()
+            self.previous = [s for s in slist]
         self.resetList()
 
     def resetList(self):
@@ -81,22 +86,24 @@ class SettingsCombo(QComboBox):
 
     ## common APIs for all edit widgets
 
-    def setHistory(self, oldvalues):
-        self.previous = oldvalues
-        self.resetList()
-
-    def setCurValue(self, curvalue):
+    def setValue(self, curvalue):
         self.curvalue = curvalue
         self.resetList()
 
-    def getValue(self):
+    def value(self):
         utext = self.currentText()
         if utext == _unspecstr:
             return False
+        if 'nohist' in self.opts or utext in self.defaults + self.previous:
+            return hglib.fromunicode(utext)
+        self.previous.insert(0, utext)
+        self.previous = self.previous[:10]
+        settings = QSettings()
+        settings.setValue('settings/'+opts['cpath'], self.previous)
         return hglib.fromunicode(utext)
 
     def isDirty(self):
-        return self.getValue() != self.curvalue
+        return self.value() != self.curvalue
 
 class PasswordEntry(QLineEdit):
     def __init__(self, parent=None, **opts):
@@ -111,22 +118,19 @@ class PasswordEntry(QLineEdit):
 
     ## common APIs for all edit widgets
 
-    def setHistory(self, oldvalues):
-        pass # orly?
-
-    def setCurValue(self, curvalue):
+    def setValue(self, curvalue):
         self.curvalue = curvalue
         if curvalue:
             self.setText(curvalue)
         else:
             self.setText('')
 
-    def getValue(self):
+    def value(self):
         utext = self.text()
         return utext and hglib.fromunicode(utext) or False
 
     def isDirty(self):
-        return self.getValue() != self.curvalue
+        return self.value() != self.curvalue
 
 def genEditCombo(opts, defaults=[]):
     # supplied opts keys: cpath, tooltip, descwidget, defaults
@@ -156,6 +160,7 @@ def genBoolCombo(opts):
 
 def genDeferredCombo(opts, func):
     opts['defer'] = func
+    opts['nohist'] = True
     return SettingsCombo(**opts)
 
 def findDiffTools():
@@ -462,13 +467,12 @@ class SettingsDialog(QDialog):
         bothbox.addWidget(pageList, 0)
         bothbox.addWidget(stack, 1)
         pageList.currentRowChanged.connect(stack.setCurrentIndex)
-        self.stack = stack
 
-        self.dirty = False
         self.pages = {}
         self.stack = stack
 
         s = QSettings()
+        self.settings = s
         self.restoreGeometry(s.value('settings/geom').toByteArray())
 
         desctext = QTextBrowser()
@@ -489,26 +493,29 @@ class SettingsDialog(QDialog):
             self.addPage(meta['name'])
 
         combo.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
-        combo.currentIndexChanged.connect(self.refresh)
+        combo.currentIndexChanged.connect(self.fileselect)
         self.refresh()
+        self.focusField(focus or 'ui.merge')
 
-        # TODO: focus 'general' page or specified field
-        pageList.setCurrentRow(0)
-
-    def fileselect(self, combo):
+    def fileselect(self, newindex):
         'select another hgrc file'
-        if self.dirty:
+        combo = self.confcombo
+        if self.isDirty():
             ret = qctlib.CustomPrompt(_('Confirm Switch'),
                     _('Switch after saving changes?'), self,
                     (_('&Save'), _('&Discard'), _('&Cancel')),
                     default=2, esc=2).run()
             if ret == 2:
-                repo = combo.currentIndex() == CONF_GLOBAL
+                repo = newindex == CONF_GLOBAL
                 combo.setCurrentIndex(repo and CONF_REPO or CONF_GLOBAL)
                 return
             elif ret == 0:
                 self.applyChanges()
         self.refresh()
+
+    def editClicked(self, button):
+        'Open internal editor in stacked widget'
+        pass
 
     def refresh(self, *args):
         # determine target config file
@@ -525,15 +532,24 @@ class SettingsDialog(QDialog):
             #set_tortoise_icon(self, 'settings_user.ico')
 
         # refresh config values
-        self.ini = self.load_config(self.rcpath)
-        self.refreshHistory()
+        self.ini = self.loadIniFile(self.rcpath)
+        for info, widgets in self.pages.values():
+            for row, (label, cpath, values, tooltip) in enumerate(info):
+                curvalue = self.readCPath(cpath)
+                widgets[row].setValue(curvalue)
 
-    def editClicked(self, button):
-        'Open internal editor in stacked widget'
-        pass
+    def isDirty(self):
+        if self.readonly:
+            return False
+        for info, widgets in self.pages.values():
+            for w in widgets:
+                if w.isDirty():
+                    print w.opts['cpath']
+                    return True
+        return False
 
     def reloadClicked(self, button):
-        if self.dirty:
+        if self.isDirty():
             d = QMessageBox.question(self, _('Confirm Reload'),
                             _('Unsaved changes will be lost.\n'
                             'Do you want to reload?'),
@@ -542,39 +558,26 @@ class SettingsDialog(QDialog):
                 return
         self.refresh()
 
-    def canExit(self):
-        if self.dirty and not self.readonly:
-            ret = qtlib.CustomPrompt(_('Confirm Exit'),
-                            _('Apply changes before exit?'), self,
-                            (_('&Yes'), _('&No (discard changes)'),
-                         _  ('&Cancel')), default=2, esc=2).run()
-            if ret == 2:
-                return False
-            elif ret == 0:
-                self.applyChanges()
-                return True
-        return True
-
     def focusField(self, focusfield):
-        '''Set page and focus to requested datum'''
-        for meta, info in INFO:
+        'Set page and focus to requested datum'
+        for i, (meta, info) in enumerate(INFO):
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
-                    name = meta['name']
-                    self.show_page(name)
-                    widgets = self.pages[name][3]
-                    widgets[n].grab_focus()
+                    self.stack.setCurrentIndex(i)
+                    self.pages[meta['name']][1][n].setFocus()
                     return
 
-    def fillFrame(self, frame, info):
+    def fillFrame(self, info):
         widgets = []
+        frame = QFrame()
         form = QFormLayout()
         frame.setLayout(form)
+        self.stack.addWidget(frame)
 
         # supplied opts keys: cpath, tooltip, descwidget, defaults
         for row, (label, cpath, values, tooltip) in enumerate(info):
             opts = {'label':label, 'cpath':cpath, 'tooltip':tooltip,
-                    'descwidget':self.desctext}
+                    'descwidget':self.desctext, 'settings':self.settings}
             if isinstance(values, tuple):
                 func = values[0]
                 w = func(opts, values[1])
@@ -590,30 +593,11 @@ class SettingsDialog(QDialog):
             if name == data[0]['name']:
                 meta, info = data
                 break
-        frame = QFrame()
-        widgets = self.fillFrame(frame, info)
+        widgets = self.fillFrame(info)
+        self.pages[name] = info, widgets
 
-        # add to notebook
-        pagenum = self.stack.addWidget(frame)
-        self.pages[name] = (pagenum, info, frame, widgets)
-
-    def refreshHistory(self, pagename=None):
-        # sotre modification status
-        prev_dirty = self.dirty
-
-        # update configured values
-        if pagename is None:
-            pages = self.pages.values()
-            pages = [(key,) + data for key, data in self.pages.items()]
-        else:
-            pages = ((pagename,) + self.pages[pagename],)
-        for name, page_num, info, frame, widgets in pages:
-            for row, (label, cpath, values, tooltip) in enumerate(info):
-                curvalue = self.get_ini_config(cpath)
-                widgets[row].setCurValue(curvalue)
-
-    def get_ini_config(self, cpath):
-        '''Retrieve a value from the parsed config file'''
+    def readCPath(self, cpath):
+        'Retrieve a value from the parsed config file'
         try:
             # Presumes single section/key level depth
             section, key = cpath.split('.', 1)
@@ -621,7 +605,7 @@ class SettingsDialog(QDialog):
         except KeyError:
             return None
 
-    def load_config(self, rcpath):
+    def loadIniFile(self, rcpath):
         for fn in rcpath:
             if os.path.exists(fn):
                 break
@@ -668,7 +652,7 @@ class SettingsDialog(QDialog):
             self.readonly = True
             return cfg
 
-    def recordNewValue(self, cpath, newvalue, keephistory=True):
+    def recordNewValue(self, cpath, newvalue):
         # 'newvalue' is in local encoding
         section, key = cpath.split('.', 1)
         if newvalue == False:
@@ -683,31 +667,18 @@ class SettingsDialog(QDialog):
             else:
                 self.ini.new_namespace(section)
         self.ini[section][key] = newvalue
-        if not keephistory:
-            return
-        if cpath not in self.history.get_keys():
-            self.history.set_value(cpath, [])
-        elif newvalue in self.history.get_keys():
-            self.history.get_value(cpath).remove(newvalue)
-        self.history.mrul(cpath).add(newvalue)
 
     def applyChanges(self):
         if self.readonly:
             #dialog? Read only access, please install ...
             return
-        print 'not ready to write yet'
+        print 'leave on training wheels'
         return
-        # Reload history, since it may have been modified externally
-        self.history.read()
 
-        # Flush changes on all pages
-        for page_num, info, vbox, widgets in self.pages.values():
-            for n, (label, cpath, values, tip) in enumerate(info):
-                newvalue = hglib.fromutf(widgets[n].child.get_text())
+        for info, widgets in self.pages.values():
+            for row, (label, cpath, values, tip) in enumerate(info):
+                newvalue = widgets[row].value()
                 self.recordNewValue(cpath, newvalue)
-
-        self.history.write()
-        self.refreshHistory()
 
         try:
             f = open(self.fn, 'w')
@@ -717,17 +688,32 @@ class SettingsDialog(QDialog):
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 str(e), parent=self)
 
+    def canExit(self):
+        if self.isDirty():
+            ret = qtlib.CustomPrompt(_('Confirm Exit'),
+                            _('Apply changes before exit?'), self,
+                            (_('&Yes'), _('&No (discard changes)'),
+                         _  ('&Cancel')), default=2, esc=2).run()
+            if ret == 2:
+                return False
+            elif ret == 0:
+                self.applyChanges()
+                return True
+        return True
+
     def accept(self):
         self.applyChanges()
-        s = QSettings()
+        s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.sync()
         QDialog.accept(self)
 
     def reject(self):
         if not self.canExit():
             return
-        s = QSettings()
+        s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.sync()
         QDialog.reject(self)
 
 def run(ui, *pats, **opts):
