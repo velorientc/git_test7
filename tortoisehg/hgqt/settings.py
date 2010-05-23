@@ -673,10 +673,7 @@ class SettingsDialog(QDialog):
 
     def applyChanges(self):
         if self.readonly:
-            #dialog? Read only access, please install ...
             return
-        print 'leave on training wheels'
-        return
 
         for info, widgets in self.pages.values():
             for row, (label, cpath, values, tip) in enumerate(info):
@@ -684,9 +681,9 @@ class SettingsDialog(QDialog):
                 self.recordNewValue(cpath, newvalue)
 
         try:
-            f = open(self.fn, 'w')
+            f = util.atomictempfile(self.fn, 'w', createmode=None)
             f.write(str(self.ini))
-            f.close()
+            f.rename()
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 str(e), parent=self)
