@@ -425,8 +425,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         s = SearchWidget('', root, self)
         s.setAllowedAreas(QtCore.Qt.TopDockWidgetArea|
                           QtCore.Qt.BottomDockWidgetArea)
-        s.show()
         s.setObjectName("searchWidget%d" % len(self._searchWidgets))
+        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, s)
         self._searchWidgets.append(s)
 
     def okToContinue(self):
