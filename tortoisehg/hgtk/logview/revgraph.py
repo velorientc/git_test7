@@ -130,7 +130,8 @@ type_PLAIN = 0
 type_LOOSE_LOW = 1
 type_LOOSE_HIGH = 2
 
-def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, branch_color=False):
+def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False,
+    branch_color=False, hide_revs=[], prune_revs=[]):
     """incremental revision grapher
 
     This grapher generates a full graph where every edge is visible.
@@ -142,6 +143,9 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
     to show ancestors of a revision.
     if branch_color is True, the branch colour is determined by a hash
     of the branch tip, and will thus always be the same.
+    hide_revs is a list of revisions to be hidden from the graph
+    prune_revs is a list of revisions to be hidden from the graph,
+    together with their ancestors.
     """
 
     assert start_rev >= stop_rev
@@ -149,7 +153,25 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
     revs = []
     rev_color = {}
     nextcolor = [0]
+    
+    hidden_revs = set([repo[repo.lookup(r)].rev() for r in hide_revs])
+    pruned_desc = [repo[repo.lookup(r)].rev() for r in prune_revs]
+    pruned_desc.sort()
+    
+    def hidden(rev):
+        while pruned_desc and rev <= pruned_desc[-1]:
+            r = pruned_desc.pop()
+            hidden_revs.add(r)
+            for p in __get_parents(repo, r):
+                if p not in pruned_desc:
+                    pruned_desc.append(p)
+            pruned_desc.sort()
+        return rev in hidden_revs
+    
     while curr_rev >= stop_rev:
+        if hidden(curr_rev):
+            curr_rev -= 1
+            continue
         # Compute revs and next_revs.
         if curr_rev not in revs:
             if noheads and curr_rev != start_rev:
@@ -177,7 +199,7 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = __get_parents(repo, curr_rev)
+        parents = [p for p in __get_parents(repo, curr_rev) if not hidden(p)]
         parents_to_add = []
         preferred_color = [rev_color[curr_rev]]
         for parent in parents:
