@@ -16,13 +16,14 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
 from tortoisehg.hgqt import qtlib
 
+from PyQt4 import Qsci
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+qsci = Qsci.QsciScintilla
+
 # Technical Debt
 #   stacked widget or pages need to be scrollable
-#   hook up QSci as internal editor, enable ini syntax highlight
-#   initial focus not implemented
 #   add extensions page after THG 1.1 is released
 #   show icons in listview
 
@@ -455,10 +456,15 @@ class SettingsDialog(QDialog):
         else:
             combo.setEnabled(False)
         self.confcombo = combo
+        self.editpage = None
+        self.editor = None
 
         edit = QPushButton(_('Edit File'))
+        edit.clicked.connect(self.editClicked)
+        self.editbtn = edit
         reload = QPushButton(_('Reload'))
-        reload.pressed.connect(self.reloadClicked)
+        reload.clicked.connect(self.reloadClicked)
+        self.reloadbtn = reload
         tophbox.addWidget(combo)
         tophbox.addWidget(edit)
         tophbox.addWidget(reload)
@@ -474,6 +480,7 @@ class SettingsDialog(QDialog):
 
         self.pages = {}
         self.stack = stack
+        self.pageList = pageList
 
         s = QSettings()
         self.settings = s
@@ -517,9 +524,74 @@ class SettingsDialog(QDialog):
                 self.applyChanges()
         self.refresh()
 
-    def editClicked(self, button):
+    def editClicked(self):
         'Open internal editor in stacked widget'
-        pass
+        if self.isDirty():
+            ret = qtlib.CustomPrompt(_('Confirm Save'),
+                    _('Save changes before edit?'), self,
+                    (_('&Save'), _('&Discard'), _('&Cancel')),
+                    default=2, esc=2).run()
+            if ret == 0:
+                self.applyChanges()
+            elif ret == 2:
+                return
+
+        origrow = self.pageList.currentRow()
+        def cancelEditor():
+            self.editor.clear()
+            self.editor.setModified(False)
+            self.editpage.setEnabled(False)
+            self.pageList.setEnabled(True)
+            self.confcombo.setEnabled(True)
+            self.editbtn.setEnabled(True)
+            self.reloadbtn.setEnabled(True)
+            self.pageList.setCurrentRow(origrow)
+            self.stack.setCurrentIndex(origrow)
+            self.refresh()
+
+        def saveEditor():
+            try:
+                f = util.atomictempfile(self.fn, 'w', createmode=None)
+                f.write(self.editor.text())
+                f.rename()
+            except IOError, e:
+                qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                    str(e), parent=self)
+                return
+            cancelEditor()
+
+        if not self.editpage:
+            frame = QFrame()
+            self.stack.addWidget(frame)
+            vbox = QVBoxLayout()
+            frame.setLayout(vbox)
+            editor = qsci()
+            editor.setBraceMatching(qsci.SloppyBraceMatch)
+            vbox.addWidget(editor)
+            BB = QDialogButtonBox
+            bb = QDialogButtonBox(BB.Save|BB.Cancel)
+            self.connect(bb, SIGNAL("accepted()"), saveEditor)
+            self.connect(bb, SIGNAL("rejected()"), cancelEditor)
+            vbox.addWidget(bb)
+            lexer = Qsci.QsciLexerProperties() # QsciLexerLua?
+            editor.setLexer(lexer)
+            self.editor = editor
+            self.editpage = frame
+
+        self.editpage.setEnabled(True)
+        self.stack.setCurrentWidget(self.editpage)
+        self.pageList.setEnabled(False)
+        self.confcombo.setEnabled(False)
+        self.editbtn.setEnabled(False)
+        self.reloadbtn.setEnabled(False)
+        try:
+            contents = open(self.fn, 'rb').read()
+            self.editor.setText(contents)
+            self.editor.setModified(False)
+        except EnvironmentError, e:
+            qtlib.WarningMsgBox(_('Unable to read config file'),
+                   hglib.tounicode(e), parent=self)
+            cancelEditor()
 
     def refresh(self, *args):
         # determine target config file
@@ -543,6 +615,8 @@ class SettingsDialog(QDialog):
                 widgets[row].setValue(curvalue)
 
     def isDirty(self):
+        if self.editor and self.editor.isModified():
+            return True
         if self.readonly:
             return False
         for info, widgets in self.pages.values():
@@ -566,7 +640,7 @@ class SettingsDialog(QDialog):
         for i, (meta, info) in enumerate(INFO):
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
-                    self.stack.setCurrentIndex(i)
+                    self.pageList.setCurrentRow(i)
                     self.pages[meta['name']][1][n].setFocus()
                     return
 
