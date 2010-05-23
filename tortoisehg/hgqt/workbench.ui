@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>671</width>
-    <height>669</height>
+    <width>685</width>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,10 +18,7 @@
     <normaloff>:/icons/log.svg</normaloff>:/icons/log.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <property name="spacing">
-     <number>0</number>
-    </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="margin">
      <number>0</number>
     </property>
@@ -38,30 +35,58 @@
         </sizepolicy>
        </property>
       </widget>
-      <widget class="QTabWidget" name="repoTabsWidget">
+      <widget class="QFrame" name="repoframe">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>1</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="currentIndex">
-        <number>0</number>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="documentMode">
-        <bool>true</bool>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
        </property>
-       <property name="tabsClosable">
-        <bool>true</bool>
-       </property>
-       <property name="movable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="firstRepoTab">
-        <attribute name="title">
-         <string>repo1</string>
-        </attribute>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="repotabssplitter">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <widget class="QTabWidget" name="repoTabsWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <property name="documentMode">
+            <bool>true</bool>
+           </property>
+           <property name="tabsClosable">
+            <bool>true</bool>
+           </property>
+           <property name="movable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="firstRepoTab">
+            <attribute name="title">
+             <string>repo1</string>
+            </attribute>
+           </widget>
+          </widget>
+          <widget class="QStackedWidget" name="stackedWidget">
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -72,7 +97,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>671</width>
+     <width>685</width>
      <height>19</height>
     </rect>
    </property>

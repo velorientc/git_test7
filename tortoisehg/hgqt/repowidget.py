@@ -26,7 +26,6 @@ from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt.manifestdialog import ManifestDialog
 
 from repoview import HgRepoView
-from commit import CommitWidget
 from revdetailswidget import RevDetailsWidget
 
 
@@ -40,32 +39,26 @@ class RepoWidget(QtGui.QWidget):
     showMessageSignal = QtCore.pyqtSignal(str)
     switchToSignal = QtCore.pyqtSignal(QtGui.QWidget)
 
-    def __init__(self, repo):
+    def __init__(self, repo, stackedWidget, commitWidget):
         self.repo = repo
+        self.stackedWidget = stackedWidget
+        self.commitWidget = commitWidget
         self._closed_branch_supp = has_closed_branch_support(self.repo)
-
-        # these are used to know where to go after a reload
         self._reload_rev = '.'
-
         self._loading = True
         self._scanForRepoChanges = True
-
         self.splitternames = []
+        self.disab_shortcuts = []
+        self.currentMessage = ''
+        self.currenWidget = None
 
         QtGui.QWidget.__init__(self)
         
         self.load_config()
-
         self.setupUi()
-        self.disab_shortcuts = []
-
-        self.currentMessage = ''
-
         self.createActions()
 
         connect(self.repoview, SIGNAL('showMessage'), self.showMessage)
-
-#        self.revdisplay.commitsignal.connect(self.commit)
 
         self.setupModels()
         self.setupRevisionTable()
@@ -82,11 +75,8 @@ class RepoWidget(QtGui.QWidget):
         self.hbox.setSpacing(0)
         self.hbox.setMargin(0)
 
-        self.revisions_splitter = QtGui.QSplitter(self)
-        self.splitternames.append('revisions_splitter')
-        self.revisions_splitter.setOrientation(Qt.Vertical)
-
-        self.repoview = HgRepoView(self.revisions_splitter)
+        self.repoview = HgRepoView()
+        self.hbox.addWidget(self.repoview)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(1)
@@ -94,17 +84,8 @@ class RepoWidget(QtGui.QWidget):
         self.repoview.setSizePolicy(sp)
         self.repoview.setFrameShape(QtGui.QFrame.StyledPanel)
 
-        self.stackedWidget = QtGui.QStackedWidget(self.revisions_splitter)
-
         self.revDetailsWidget = RevDetailsWidget(self.repo, self.repoview)
         self.stackedWidget.addWidget(self.revDetailsWidget)
-
-        pats = {}
-        opts = {}
-        self.commitWidget = CommitWidget(pats, opts, root=self.repo.root)
-        self.stackedWidget.addWidget(self.commitWidget)
-
-        self.hbox.addWidget(self.revisions_splitter)
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
@@ -258,11 +239,11 @@ class RepoWidget(QtGui.QWidget):
             ctx = self.repomodel.repo.changectx(rev)
             if ctx.rev() is None:
                 # working copy
-                curridx = 1
+                self.currenWidget = self.commitWidget
             else:
                 self.revDetailsWidget.revision_selected(rev)
-                curridx = 0
-            self.stackedWidget.setCurrentIndex(curridx)
+                self.currenWidget = self.revDetailsWidget
+            self.stackedWidget.setCurrentWidget(self.currenWidget)
 
     def goto(self, rev):
         if len(self.repoview.model().graph):
@@ -308,6 +289,10 @@ class RepoWidget(QtGui.QWidget):
 
     def switchTo(self):
         self.switchToSignal.emit(self)
+ 
+    def switchedTo(self):
+        if self.currenWidget:
+            self.stackedWidget.setCurrentWidget(self.currenWidget)
 
     def storeSettings(self):
         s = QtCore.QSettings()
@@ -331,4 +316,5 @@ class RepoWidget(QtGui.QWidget):
         if self.isVisible():
             # assuming here that there is at most one RepoWidget visible
             self.storeSettings()
+        self.stackedWidget.removeWidget(self.revDetailsWidget)
         return True

@@ -28,6 +28,7 @@ from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
+from tortoisehg.hgqt.commit import CommitWidget
 
 from tortoisehg.util import paths
 
@@ -52,8 +53,14 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self._scanForRepoChanges = True
         self._searchWidgets = []
 
+        self.commitwidgets = {} # key: reporoot
+
         QtGui.QMainWindow.__init__(self)
         HgDialogMixin.__init__(self, ui)
+
+        self.dummywidget = QtGui.QWidget()
+        self.stackedWidget.addWidget(self.dummywidget)
+        self.stackedWidget.setCurrentWidget(self.dummywidget)
 
         self.setWindowTitle('TortoiseHg Workbench')
 
@@ -123,15 +130,28 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             mode = w.getMode()
             ann = w.getAnnotate()
             tags = w.repo.tags().keys()
+            w.switchedTo()
         else:
             self.actionDiffMode.setEnabled(False)
+            self.stackedWidget.setCurrentWidget(self.dummywidget)
+
         self.actionDiffMode.setChecked(mode == 'diff')
         self.actionAnnMode.setChecked(ann)
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)
-        rw = RepoWidget(repo)
+
+        if repo.root in self.commitwidgets:
+            cw = self.commitwidgets[repo.root]
+        else:
+            pats = {}
+            opts = {}
+            cw = CommitWidget(pats, opts, root=repo.root)
+            self.commitwidgets[repo.root] = cw
+            self.stackedWidget.addWidget(cw)
+
+        rw = RepoWidget(repo, self.stackedWidget, cw)
         rw.showMessageSignal.connect(self.showMessage)
         rw.switchToSignal.connect(self.switchTo)
         tw = self.repoTabsWidget

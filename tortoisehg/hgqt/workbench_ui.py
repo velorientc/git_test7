@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 18 01:00:57 2010
+# Created: Sun May 23 21:33:00 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,16 +12,15 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(671, 669)
+        MainWindow.resize(685, 721)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/log.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.horizontalLayout = QtGui.QHBoxLayout(self.centralwidget)
-        self.horizontalLayout.setSpacing(0)
-        self.horizontalLayout.setMargin(0)
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.verticalLayout_2 = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_2.setMargin(0)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.reporegistry_splitter = QtGui.QSplitter(self.centralwidget)
         self.reporegistry_splitter.setOrientation(QtCore.Qt.Horizontal)
         self.reporegistry_splitter.setObjectName("reporegistry_splitter")
@@ -32,10 +31,25 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.reporegistry.sizePolicy().hasHeightForWidth())
         self.reporegistry.setSizePolicy(sizePolicy)
         self.reporegistry.setObjectName("reporegistry")
-        self.repoTabsWidget = QtGui.QTabWidget(self.reporegistry_splitter)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.repoframe = QtGui.QFrame(self.reporegistry_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.repoframe.sizePolicy().hasHeightForWidth())
+        self.repoframe.setSizePolicy(sizePolicy)
+        self.repoframe.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.repoframe.setFrameShadow(QtGui.QFrame.Raised)
+        self.repoframe.setObjectName("repoframe")
+        self.verticalLayout = QtGui.QVBoxLayout(self.repoframe)
+        self.verticalLayout.setMargin(0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.repotabssplitter = QtGui.QSplitter(self.repoframe)
+        self.repotabssplitter.setOrientation(QtCore.Qt.Vertical)
+        self.repotabssplitter.setObjectName("repotabssplitter")
+        self.repoTabsWidget = QtGui.QTabWidget(self.repotabssplitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.repoTabsWidget.sizePolicy().hasHeightForWidth())
         self.repoTabsWidget.setSizePolicy(sizePolicy)
         self.repoTabsWidget.setDocumentMode(True)
@@ -45,10 +59,13 @@ class Ui_MainWindow(object):
         self.firstRepoTab = QtGui.QWidget()
         self.firstRepoTab.setObjectName("firstRepoTab")
         self.repoTabsWidget.addTab(self.firstRepoTab, "")
-        self.horizontalLayout.addWidget(self.reporegistry_splitter)
+        self.stackedWidget = QtGui.QStackedWidget(self.repotabssplitter)
+        self.stackedWidget.setObjectName("stackedWidget")
+        self.verticalLayout.addWidget(self.repotabssplitter)
+        self.verticalLayout_2.addWidget(self.reporegistry_splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 671, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 685, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
