@@ -131,6 +131,9 @@ def WarningMsgBox(*args, **kargs):
 def ErrorMsgBox(*args, **kargs):
     return CommonMsgBox(QtGui.QMessageBox.Critical, *args, **kargs)
 
+def QuestionMsgBox(*args, **kargs):
+    return CommonMsgBox(QtGui.QMessageBox.Question, *args, **kargs)
+
 class CustomPrompt(QtGui.QMessageBox):
     def __init__(self, title, message, parent, choices, default=None,
                  esc=None, files=None):
