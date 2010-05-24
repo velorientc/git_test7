@@ -128,7 +128,6 @@ class ArchiveDialog(QDialog):
         self.close_btn.setDefault(True)
         self.close_btn.setFocus()
         self.detail_btn = QPushButton(_('&Detail'))
-        self.detail_btn = QPushButton(_('&Detail'))
         self.detail_btn.setAutoDefault(False)
         self.detail_btn.setHidden(True)
         self.cancel_btn = QPushButton(_('Cancel'))
