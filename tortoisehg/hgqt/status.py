@@ -374,6 +374,7 @@ class StatusWidget(QWidget):
             return
 
         self.override.setEnabled(False)
+        self.override.setChecked(True)
 
         # Generate diffs to first parent
         m = cmdutil.matchfiles(self.repo, [wfile])
