@@ -98,7 +98,6 @@ class SettingsCombo(QComboBox):
             return None
         if 'nohist' in self.opts or utext in self.defaults + self.previous:
             return hglib.fromunicode(utext)
-        print 'saving', self.opts['cpath'], utext
         self.previous.insert(0, utext)
         self.previous = self.previous[:10]
         settings = QSettings()
