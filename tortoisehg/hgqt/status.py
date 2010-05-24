@@ -21,6 +21,7 @@ from PyQt4.QtGui import *
 
 # Technical Debt
 #  We need a real icon set for file status types
+#  Context menu should offer rename guesses
 #  Thread rowSelected, connect to an external progress bar
 #  Chunk selection, tri-state checkboxes for commit
 #  TreeView steals CTRL-ENTER from parent widgets 
