@@ -17,12 +17,6 @@
 # - Make the hgcmd_txt expand to show it's complete content (multiline eventualy).
 #
 # - Save/load qt settings (window position, ...).
-#
-# - See #251 : Make an archive with only the files modified in the selected revision.
-#       New checkbox "Only files modified/created in this revision".
-#       You can get the file list for any arbitrary revision with this code:
-#           ctx = repo[rev]
-#           files = ctx.modified() + ctx.added()
 
 
 import os
@@ -69,8 +63,9 @@ class ArchiveDialog(QDialog):
         self.rev_lbl.setAlignment(Qt.AlignRight)
         self.grid.addWidget(self.rev_lbl, 0, 0)
         self.grid.addWidget(self.rev_combo, 0, 1)
-        self.mod_in_rev_chk = QCheckBox(_('Only files modified/created in this revision'))
-        self.grid.addWidget(self.mod_in_rev_chk, 1, 1)
+        self.files_in_rev_chk = QCheckBox(
+                _('Only files modified/created in this revision'))
+        self.grid.addWidget(self.files_in_rev_chk, 1, 1)
 
         # destination lineedit and button
         self.dest_edit = QLineEdit()
@@ -108,7 +103,6 @@ class ArchiveDialog(QDialog):
         self.hgcmd_lbl.setAlignment(Qt.AlignRight)
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)
-#        self.hgcmd_txt.setGeometry(400, self.hgcmd_txt.height())
         self.grid.addWidget(self.hgcmd_lbl, 9, 0)
         self.grid.addWidget(self.hgcmd_txt, 9, 1)
 
@@ -249,7 +243,7 @@ class ArchiveDialog(QDialog):
 
     def rev_combo_changed(self, index):
         self.update_path()
-  
+
     def browse_clicked(self):
         """Select the destination directory or file"""
         dest = hglib.fromunicode(self.dest_edit.text())
@@ -275,16 +269,23 @@ class ArchiveDialog(QDialog):
 
     def compose_command(self, dest, type):
         cmdline = ['archive']
-        rev = hglib.fromunicode(self.rev_combo.currentText())
-        if rev != WD_PARENT:
-            cmdline.append('--rev')
+        rev = self.rev_combo.currentText()
+        if rev == WD_PARENT:
+            rev = '.'
+        else:
+            rev = hglib.fromunicode(rev)
+            cmdline.append('-r')
             cmdline.append(rev)
         cmdline.append('-t')
         cmdline.append(type)
+        if self.files_in_rev_chk.isChecked():
+            ctx = self.repo[rev]
+            for f in ctx.added() + ctx.removed():
+                cmdline.append('-I')
+                cmdline.append(f)
         cmdline.append('--')
         cmdline.append(hglib.fromunicode(dest))
         self.hgcmd_txt.setText(' '.join(cmdline))
-#        self.hgcmd_txt.resize(500, self.hgcmd_txt.height())
         return cmdline
 
     def archive(self):
