@@ -51,9 +51,6 @@ class RevMessage(QtGui.QWidget):
 
         connect(self._message, SIGNAL('anchorClicked(QUrl)'), self.anchorClicked)
 
-    def clear(self):
-        self._message.setText('')
-
     def anchorClicked(self, qurl):
         link = str(qurl.toString())
         if link.startswith(revhashprefix):
