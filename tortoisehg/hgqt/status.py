@@ -92,7 +92,7 @@ class StatusWidget(QWidget):
         frame.setSizePolicy(sp)
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
-        hbox.setContentsMargins (5, 7, 0, 0)
+        hbox.setContentsMargins (5, 0, 0, 0)
         lbl = QLabel(_('Filter:'))
         le = QLineEdit()
         pb = QPushButton(_('MAR!?IC')) # needs a better label
@@ -162,7 +162,7 @@ class StatusWidget(QWidget):
         docf.setLayout(vbox)
         self.docf = docf
         hbox = QHBoxLayout()
-        hbox.setContentsMargins (5, 7, 0, 0)
+        hbox.setContentsMargins (5, 0, 0, 0)
         self.fnamelabel = QLabel()
         self.fnamelabel.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self.fnamelabel,
@@ -718,7 +718,7 @@ class StatusDialog(QDialog):
     def __init__(self, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         layout = QVBoxLayout()
-        layout.setMargin(0)
+        layout.setContentsMargins(0, 6, 0, 0)
         self.setLayout(layout)
         self.stwidget = StatusWidget(pats, opts, None, self)
         layout.addWidget(self.stwidget, 1)
