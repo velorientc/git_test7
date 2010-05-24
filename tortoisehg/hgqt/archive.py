@@ -35,7 +35,7 @@ from PyQt4.QtGui import QCheckBox
 
 from mercurial import hg, error
 
-from tortoisehg.util.i18n import _
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt import cmdui, qtlib
 #import tortoisehg.hgqt # import connect
