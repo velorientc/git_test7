@@ -116,7 +116,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
         w = tw.widget(index)
-        if w.okToContinue():
+        if w.closeRepoWidget():
             tw.removeTab(index)
 
     def repoTabChanged(self, index=0):
@@ -150,6 +150,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             cw = CommitWidget(pats, opts, root=repo.root)
             self.commitwidgets[repo.root] = cw
             self.stackedWidget.addWidget(cw)
+            s = QtCore.QSettings()
+            cw.loadConfigs(s)
 
         rw = RepoWidget(repo, self.stackedWidget, cw)
         rw.showMessageSignal.connect(self.showMessage)

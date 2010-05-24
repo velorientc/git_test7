@@ -307,4 +307,6 @@ class RepoWidget(QtGui.QWidget):
             # assuming here that there is at most one RepoWidget visible
             self.storeSettings()
         self.stackedWidget.removeWidget(self.revDetailsWidget)
+        s = QtCore.QSettings()
+        self.commitWidget.storeConfigs(s)
         return True
