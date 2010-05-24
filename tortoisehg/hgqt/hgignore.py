@@ -18,6 +18,12 @@ from tortoisehg.util import shlib, hglib, paths
 
 from tortoisehg.hgqt import qtlib
 
+# Technical Debt:
+#  Labels for list widgets
+#  'del' and 'backspace' to delete lines of hgignore file
+#  clicking on an unknown should setup a glob for it
+#  right click on an unknown should offer extension & dir globs
+
 class HgignoreDialog(QDialog):
     'Edit a reposiory .hgignore file'
 
