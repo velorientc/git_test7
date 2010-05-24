@@ -680,6 +680,7 @@ class WctxModel(QAbstractTableModel):
 def statusMessage(status, mst, upath):
     tip = ''
     if status in statusTypes:
+        upath = "<span style='font-family:Courier'>%s </span>" % upath
         tip = statusTypes[status].desc % upath
         if mst == 'R':
             tip += _(', resolved merge')
