@@ -58,6 +58,8 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         QtGui.QMainWindow.__init__(self)
         HgDialogMixin.__init__(self, ui)
 
+        self.repotabs_splitter.setCollapsible(0, False)
+
         self.dummywidget = QtGui.QWidget()
         self.stackedWidget.addWidget(self.dummywidget)
         self.stackedWidget.setCurrentWidget(self.dummywidget)
