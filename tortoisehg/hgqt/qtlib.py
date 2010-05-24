@@ -10,12 +10,15 @@ import shutil
 import tempfile
 
 from PyQt4 import QtCore, QtGui
+from PyQt4 import Qsci
 from mercurial import extensions
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import icon as geticon
 from hgext.color import _styles
+
+qsci = Qsci.QsciScintilla
 
 tmproot = None
 def gettempdir():
@@ -202,3 +205,40 @@ class PMButton(QtGui.QPushButton):
 
     def is_collapsed(self):
         return not self.is_expanded()
+
+def fileEditor(filename):
+    'Open a simple modal file editing dialog'
+    dialog = QtGui.QDialog()
+    vbox = QtGui.QVBoxLayout()
+    dialog.setLayout(vbox)
+    editor = qsci()
+    editor.setBraceMatching(qsci.SloppyBraceMatch)
+    vbox.addWidget(editor)
+    BB = QtGui.QDialogButtonBox
+    bb = QtGui.QDialogButtonBox(BB.Save|BB.Cancel)
+    dialog.connect(bb, QtCore.SIGNAL('accepted()'),
+                   dialog, QtCore.SLOT('accept()'))
+    dialog.connect(bb, QtCore.SIGNAL('rejected()'),
+                   dialog, QtCore.SLOT('reject()'))
+    vbox.addWidget(bb)
+    lexer = Qsci.QsciLexerProperties()
+    editor.setLexer(lexer)
+    s = QtCore.QSettings()
+    ret = QtGui.QDialog.Rejected
+    try:
+        contents = open(filename, 'rb').read()
+        dialog.setWindowTitle(filename)
+        geomname = 'editor-geom'
+        editor.setText(contents)
+        editor.setModified(False)
+        dialog.restoreGeometry(s.value(geomname).toByteArray())
+        ret = dialog.exec_()
+        if ret == QtGui.QDialog.Accepted:
+            f = util.atomictempfile(filename, 'w', createmode=None)
+            f.write(editor.text())
+            f.rename()
+        s.setValue(geomname, dialog.saveGeometry())
+    except EnvironmentError, e:
+        qtlib.WarningMsgBox(_('Unable to read/write config file'),
+               hglib.tounicode(e), parent=dialog)
+    return ret

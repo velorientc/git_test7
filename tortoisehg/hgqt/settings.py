@@ -16,11 +16,8 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
 from tortoisehg.hgqt import qtlib
 
-from PyQt4 import Qsci
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-qsci = Qsci.QsciScintilla
 
 # Technical Debt
 #   stacked widget or pages need to be scrollable
@@ -535,37 +532,8 @@ class SettingsDialog(QDialog):
                 self.applyChanges()
             elif ret == 2:
                 return
-
-        dialog = QDialog()
-        vbox = QVBoxLayout()
-        dialog.setLayout(vbox)
-        editor = qsci()
-        editor.setBraceMatching(qsci.SloppyBraceMatch)
-        vbox.addWidget(editor)
-        BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Save|BB.Cancel)
-        self.connect(bb, SIGNAL("accepted()"), dialog, SLOT('accept()'))
-        self.connect(bb, SIGNAL("rejected()"), dialog, SLOT('reject()'))
-        vbox.addWidget(bb)
-        lexer = Qsci.QsciLexerProperties()
-        editor.setLexer(lexer)
-        s = self.settings
-        try:
-            contents = open(self.fn, 'rb').read()
-            dialog.setWindowTitle(self.fn)
-            geomname = 'settings/editor-geom'
-            editor.setText(contents)
-            editor.setModified(False)
-            dialog.restoreGeometry(s.value(geomname).toByteArray())
-            if dialog.exec_() == QDialog.Accepted:
-                f = util.atomictempfile(self.fn, 'w', createmode=None)
-                f.write(editor.text())
-                f.rename()
-                self.refresh()
-            s.setValue(geomname, dialog.saveGeometry())
-        except EnvironmentError, e:
-            qtlib.WarningMsgBox(_('Unable to read/write config file'),
-                   hglib.tounicode(e), parent=self)
+        if qtlib.fileEditor(self.fn) == QDialog.Accepted:
+            self.refresh()
 
     def refresh(self, *args):
         # determine target config file
