@@ -298,7 +298,7 @@ INFO = (
         ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old']),
         _('Which template map style to use')),
     (_('Archive Formats'), 'web.allow_archive', 
-        (genDefaultCombo, ['bz2', 'gz', 'zip']),
+        (genEditCombo, ['bz2', 'gz', 'zip']),
         _('Comma separated list of archive formats allowed for'
         ' downloading')),
     (_('Port'), 'web.port', genIntEditCombo, _('Port to listen on')),
