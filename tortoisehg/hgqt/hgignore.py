@@ -23,12 +23,12 @@ class HgignoreDialog(QDialog):
 
     ignoreFilterUpdated = pyqtSignal()
 
-    def __init__(self, parent=None, fileglob='', *pats):
+    def __init__(self, parent=None, root=None, fileglob='', *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
 
         try:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
+            repo = hg.repository(ui.ui(), path=paths.find_root(root))
         except error.RepoError:
             QDialog.reject(self)
             return
@@ -185,4 +185,4 @@ class HgignoreDialog(QDialog):
 def run(_ui, *pats, **opts):
     if pats and pats[0].endswith('.hgignore'):
         pats = []
-    return HgignoreDialog(None, *pats)
+    return HgignoreDialog(None, root=None, *pats)

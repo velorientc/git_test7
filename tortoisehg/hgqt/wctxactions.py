@@ -14,7 +14,7 @@ from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import Qt, SIGNAL
-from PyQt4.QtGui import QAction, QMenu, QMessageBox, QFileDialog
+from PyQt4.QtGui import QAction, QMenu, QMessageBox, QFileDialog, QDialog
 
 def wctxactions(parent, point, repo, selrows):
     if not selrows:
@@ -183,7 +183,9 @@ def guessRename(parent, ui, repo, files):
     raise NotImplementedError()
 
 def ignore(parent, ui, repo, files):
-    raise NotImplementedError()
+    from tortoisehg.hgqt.hgignore import HgignoreDialog
+    dlg = HgignoreDialog(parent, repo.root, '', files)
+    return dlg.exec_() == QDialog.Accepted
 
 def remove(parent, ui, repo, files):
     commands.remove(ui, repo, *files)
