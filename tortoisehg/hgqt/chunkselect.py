@@ -87,7 +87,7 @@ def run(ui, *pats, **opts):
         ui.pushbuffer()
         chunk.write(ui)
         data = ui.popbuffer()
-        for a, l in patch.difflabel(data.splitlines, True):
+        for a, l in qtlib.difflabel(data.splitlines, True):
             hu.write(a, label=l)
         o, e = hu.getdata()
         items.append(o)
