@@ -84,7 +84,7 @@ class HgignoreDialog(QDialog):
 
         # layer 4 - dialog buttons
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb = QDialogButtonBox(BB.Close)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
         vbox.addWidget(bb)
