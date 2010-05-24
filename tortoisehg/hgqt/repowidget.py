@@ -275,7 +275,7 @@ class RepoWidget(QtGui.QWidget):
         return self.repomodel.branch()
 
     def okToContinue(self):
-        return True
+        return self.commitWidget.canExit()
 
     def switchTo(self):
         self.switchToSignal.emit(self)
