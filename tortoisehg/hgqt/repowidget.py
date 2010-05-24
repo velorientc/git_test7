@@ -118,9 +118,6 @@ class RepoWidget(QtGui.QWidget):
         QtGui.QWidget.showEvent(self, event)
         self.showMessageSignal.emit(self.currentMessage)
 
-    def commit(self, action='commit'):
-        pass
-
     def timerEvent(self, event):
         if event.timerId() == self._watchrepotimer:
             if not self._scanForRepoChanges or self.loading():
