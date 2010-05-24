@@ -20,7 +20,7 @@ from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from filelistview import HgFileListView
 from fileview import HgFileView
 from revpanelwidget import RevPanelWidget
-from revdisplay import RevMessage
+from revmessage import RevMessage
 
 Qt = QtCore.Qt
 connect = QtCore.QObject.connect
