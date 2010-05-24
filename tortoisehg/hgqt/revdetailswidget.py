@@ -30,6 +30,7 @@ SIGNAL = QtCore.SIGNAL
 class RevDetailsWidget(QtGui.QWidget):
 
     showMessageSignal = QtCore.pyqtSignal(str)
+    revisionLinkClicked = QtCore.pyqtSignal(str)
 
     def __init__(self, repo, repoview):
         self.repo = repo
@@ -126,6 +127,7 @@ class RevDetailsWidget(QtGui.QWidget):
         self.message_splitter.setOrientation(Qt.Vertical)
         self.message_splitter.setOpaqueResize(True)
         self.message = RevMessage(self.message_splitter)
+        self.message.revisionLinkClicked.connect(self.revisionLinkClicked_)
 
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
@@ -171,6 +173,9 @@ class RevDetailsWidget(QtGui.QWidget):
         self.users, self.aliases = cfg.getUsers()
         self.hidefinddelay = cfg.getHideFindDelay()
         return cfg
+
+    def revisionLinkClicked_(self, rev):
+        self.revisionLinkClicked.emit(rev)
 
     def showMessage(self, msg):
         self.currentMessage = msg

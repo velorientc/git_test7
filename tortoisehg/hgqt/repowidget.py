@@ -84,8 +84,10 @@ class RepoWidget(QtGui.QWidget):
         self.repoview.setSizePolicy(sp)
         self.repoview.setFrameShape(QtGui.QFrame.StyledPanel)
 
-        self.revDetailsWidget = RevDetailsWidget(self.repo, self.repoview)
-        self.stackedWidget.addWidget(self.revDetailsWidget)
+        w = RevDetailsWidget(self.repo, self.repoview)
+        self.stackedWidget.addWidget(w)
+        w.revisionLinkClicked.connect(self.goto)
+        self.revDetailsWidget = w
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
@@ -237,6 +239,7 @@ class RepoWidget(QtGui.QWidget):
             self.stackedWidget.setCurrentWidget(self.currenWidget)
 
     def goto(self, rev):
+        rev = str(rev)
         if len(self.repoview.model().graph):
             self.repoview.goto(rev)
         else:

@@ -287,6 +287,7 @@ class HgRepoView(QtGui.QTableView):
         """
         Select revision 'rev' (can be anything understood by repo.changectx())
         """
+        rev = str(rev) # might be a QString
         repo = self.model().repo
         try:
             rev = repo.changectx(rev).rev()

@@ -36,6 +36,8 @@ revhashprefix = 'rev_hash_'
 
 class RevMessage(QtGui.QWidget):
 
+    revisionLinkClicked = QtCore.pyqtSignal(str)
+
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
@@ -54,7 +56,7 @@ class RevMessage(QtGui.QWidget):
         link = str(qurl.toString())
         if link.startswith(revhashprefix):
             rev = link[len(revhashprefix):]
-            self.emit(SIGNAL('revisionSelected'), rev)
+            self.revisionLinkClicked.emit(rev)
         else:
             QtGui.QDesktopServices.openUrl(qurl)
 
