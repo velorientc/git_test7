@@ -549,16 +549,20 @@ class SettingsDialog(QDialog):
         vbox.addWidget(bb)
         lexer = Qsci.QsciLexerProperties() # QsciLexerLua?
         editor.setLexer(lexer)
+        s = self.settings
         try:
             contents = open(self.fn, 'rb').read()
             dialog.setWindowTitle(self.fn)
+            geomname = 'settings/editor-geom'
             editor.setText(contents)
             editor.setModified(False)
+            dialog.restoreGeometry(s.value(geomname).toByteArray())
             if dialog.exec_() == QDialog.Accepted:
                 f = util.atomictempfile(self.fn, 'w', createmode=None)
                 f.write(editor.text())
                 f.rename()
                 self.refresh()
+            s.setValue(geomname, dialog.saveGeometry())
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to read/write config file'),
                    hglib.tounicode(e), parent=self)
