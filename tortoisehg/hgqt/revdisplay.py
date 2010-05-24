@@ -98,24 +98,3 @@ class RevMessage(QtGui.QWidget):
         cursor.setPosition(0)
         msg.setTextCursor(cursor)
         msg.setExtraSelections([])
-
-    def searchString(self, text):
-        msg = self._message
-        self.selectNone()
-        if text in unicode(msg.toPlainText()):
-            clist = []
-            while msg.find(text):
-                eselect = msg.ExtraSelection()
-                eselect.cursor = msg.textCursor()
-                eselect.format.setBackground(QtGui.QColor('#ffffbb'))
-                clist.append(eselect)
-            self.selectNone()
-            msg.setExtraSelections(clist)
-            def finditer(msg, text):
-                if text:
-                    while True:
-                        if msg.find(text):
-                            yield self.ctx.rev(), None                
-                        else:
-                            break
-            return finditer(msg, text)
