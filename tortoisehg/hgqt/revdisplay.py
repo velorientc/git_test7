@@ -90,11 +90,3 @@ class RevMessage(QtGui.QWidget):
 
         buf = '<div class="diff_desc"><p>%s</p></div>' % buf
         self._message.setHtml(buf)
-
-    def selectNone(self):
-        msg = self._message
-        cursor = msg.textCursor()
-        cursor.clearSelection()
-        cursor.setPosition(0)
-        msg.setTextCursor(cursor)
-        msg.setExtraSelections([])
