@@ -8,12 +8,14 @@
 import os
 
 from mercurial import hg, ui, cmdutil, util, dispatch
+from mercurial.node import short as short_hex
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths
+from tortoisehg.util.util import format_desc
 
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
@@ -76,8 +78,12 @@ class CommitWidget(QWidget):
 
         usercombo.setEditable(True)
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
+        ctx = repo['.']
+        desc = format_desc(ctx.description(), 80)
+        fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
+        ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
+        form.addRow(_('Parent:'), QLabel(ptext))
         form.addRow(_('User:'), usercombo)
-        form.addRow(_('Parent:'), QLabel('Description of ' + str(repo['.'])))
         frame = QFrame()
         frame.setLayout(form)
         frame.setFrameStyle(QFrame.NoFrame)
