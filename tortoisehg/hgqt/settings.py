@@ -156,11 +156,13 @@ def genPasswordEntry(opts):
 def genDefaultCombo(opts, defaults=[]):
     'user must select from a list'
     opts['defaults'] = defaults
+    opts['nohist'] = True
     return SettingsCombo(**opts)
 
 def genBoolCombo(opts):
     'true, false, unspecified'
     opts['defaults'] = ['True', 'False']
+    opts['nohist'] = True
     return SettingsCombo(**opts)
 
 def genDeferredCombo(opts, func):
