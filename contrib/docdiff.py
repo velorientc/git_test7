@@ -48,12 +48,13 @@ def main():
         sys.exit(1)
     elif len(args) == 2:
         local, other = [os.path.abspath(f) for f in args]
+        base, ext = os.path.splitext(local)
     else:
         local, base, other, output = [os.path.abspath(f) for f in args]
+        base, ext = os.path.splitext(output)
 
-    base, ext = os.path.splitext(local)
     if not ext or ext.lower()[1:] not in scripts.keys():
-        print 'Unsupported file type', local
+        print 'Unsupported file type', ext
         sys.exit(1)
 
     proc = win32api.GetCurrentProcess()
