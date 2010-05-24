@@ -60,7 +60,7 @@ class CommitWidget(QWidget):
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
         form = QFormLayout()
-        form.setContentsMargins(3, 9, 9, 0)
+        form.setContentsMargins(3, 0, 9, 0)
         repo = self.stwidget.repo
         wctx = repo[None]
 
@@ -378,7 +378,7 @@ class CommitDialog(QDialog):
 
         commit = CommitWidget(pats, opts, None, self)
         layout.addWidget(commit, 1)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0, 6, 0, 0)
 
         bbl = QHBoxLayout()
         layout.addLayout(bbl)
