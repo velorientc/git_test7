@@ -11,7 +11,7 @@ import tempfile
 
 from PyQt4 import QtCore, QtGui
 from PyQt4 import Qsci
-from mercurial import extensions
+from mercurial import extensions, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
