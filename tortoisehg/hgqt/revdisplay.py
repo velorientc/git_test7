@@ -22,7 +22,6 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
 from tortoisehg.util.util import xml_escape, tounicode
-from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.i18n import _
 
