@@ -547,7 +547,7 @@ class SettingsDialog(QDialog):
         self.connect(bb, SIGNAL("accepted()"), dialog, SLOT('accept()'))
         self.connect(bb, SIGNAL("rejected()"), dialog, SLOT('reject()'))
         vbox.addWidget(bb)
-        lexer = Qsci.QsciLexerProperties() # QsciLexerLua?
+        lexer = Qsci.QsciLexerProperties()
         editor.setLexer(lexer)
         s = self.settings
         try:
