@@ -105,7 +105,6 @@ def vdiff(parent, ui, repo, files):
 
 def edit(parent, ui, repo, files):
     editor = (ui.config('tortoisehg', 'editor') or
-              ui.config('gtools', 'editor') or
               os.environ.get('HGEDITOR') or
               ui.config('ui', 'editor') or
               os.environ.get('EDITOR', 'vi'))
@@ -113,8 +112,9 @@ def edit(parent, ui, repo, files):
         res = QtGui.QMessageBox.critical(parent,
                        _('No visual editor configured'),
                        _('Please configure a visual editor.'))
-        #dlg = thgconfig.ConfigDialog(False, focus='tortoisehg.editor')
-        #dlg.exec_()
+        from tortoisehg.hgqt.settings import SettingsDialog
+        dlg = SettingsDialog(False, focus='tortoisehg.editor')
+        dlg.exec_()
         return
 
     files = [util.shellquote(util.localpath(f)) for f in files]
