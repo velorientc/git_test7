@@ -67,16 +67,14 @@ class CommitWidget(QWidget):
         wctx = repo[None]
 
         usercombo = QComboBox()
+        usercombo.setEditable(True)
         try:
             if opts.get('user'):
                 usercombo.addItem(hglib.tounicode(opts['user']))
             usercombo.addItem(hglib.tounicode(wctx.user()))
         except util.Abort:
-            import socket
-            user = '%s@%s' % (util.getuser(), socket.getfqdn())
-            usercombo.addItem(hglib.tounicode(user))
+            pass
 
-        usercombo.setEditable(True)
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
         for ctx in repo.parents():
             desc = format_desc(ctx.description(), 80)
@@ -255,7 +253,7 @@ class CommitWidget(QWidget):
         finally:
             os.chdir(cwd)
 
-    def _commit(self, repo, ui):
+    def _commit(self, repo, _ui):
         msg = self.getMessage()
         if not msg:
             qtlib.WarningMsgBox(_('Nothing Commited'),
@@ -310,11 +308,21 @@ class CommitWidget(QWidget):
         except UnicodeEncodeError:
             pass # TODO
         if not user:
-            qtlib.WarningMsgBox(_('Username required'),
-                                _('Please enter a username'),
-                                parent=self)
-            self.usercombo.setFocus()
-            return
+            try:
+                QMessageBox.information(self, _('Please enter a username'),
+                        _('You must identify yourself to Mercurial'),
+                        QMessageBox.Ok)
+                from tortoisehg.hgqt.settings import SettingsDialog
+                dlg = SettingsDialog(False, focus='ui.username')
+                dlg.exec_()
+                user = ui.ui().username()
+                if user:
+                    self.usercombo.addItem(hglib.tounicode(user))
+            except util.Abort:
+                pass
+            if not user:
+                self.usercombo.setFocus()
+                return
         checkedUnknowns = self.stwidget.getChecked('?I')
         if checkedUnknowns:
             res = qtlib.CustomPrompt(
@@ -323,7 +331,7 @@ class CommitWidget(QWidget):
                     (_('&Ok'), ('&Cancel')), 0, 1,
                     checkedUnknowns).run()
             if res == 0:
-                dispatch._dispatch(ui, ['add'] + checkedUnknowns)
+                dispatch._dispatch(_ui, ['add'] + checkedUnknowns)
             else:
                 return
         checkedMissing = self.stwidget.getChecked('!')
@@ -334,12 +342,12 @@ class CommitWidget(QWidget):
                     (_('&Ok'), ('&Cancel')), 0, 1,
                     checkedMissing).run()
             if res == 0:
-                dispatch._dispatch(ui, ['remove'] + checkedMissing)
+                dispatch._dispatch(_ui, ['remove'] + checkedMissing)
             else:
                 return
         cmdline = ['commit', '--user', user, '--message', msg]
         cmdline += brcmd + files
-        ret = dispatch._dispatch(ui, cmdline)
+        ret = dispatch._dispatch(_ui, cmdline)
         if not ret:
             self.addMessageToHistory()
             self.msgte.clear()
