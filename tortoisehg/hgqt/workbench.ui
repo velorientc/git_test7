@@ -53,7 +53,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QSplitter" name="repotabssplitter">
+         <widget class="QSplitter" name="repotabs_splitter">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>

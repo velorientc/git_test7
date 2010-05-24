@@ -474,7 +474,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.restoreState(s.value(wb + 'windowState').toByteArray())
 
         self.splitternames = []
-        sn = ('reporegistry', )
+        sn = ('reporegistry', 'repotabs')
         for n in sn:
             n += '_splitter'
             self.splitternames.append(n)

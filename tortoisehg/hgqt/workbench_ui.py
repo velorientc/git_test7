@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Sun May 23 21:33:00 2010
+# Created: Mon May 24 11:13:32 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,10 +43,10 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtGui.QVBoxLayout(self.repoframe)
         self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.repotabssplitter = QtGui.QSplitter(self.repoframe)
-        self.repotabssplitter.setOrientation(QtCore.Qt.Vertical)
-        self.repotabssplitter.setObjectName("repotabssplitter")
-        self.repoTabsWidget = QtGui.QTabWidget(self.repotabssplitter)
+        self.repotabs_splitter = QtGui.QSplitter(self.repoframe)
+        self.repotabs_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.repotabs_splitter.setObjectName("repotabs_splitter")
+        self.repoTabsWidget = QtGui.QTabWidget(self.repotabs_splitter)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(1)
@@ -59,9 +59,9 @@ class Ui_MainWindow(object):
         self.firstRepoTab = QtGui.QWidget()
         self.firstRepoTab.setObjectName("firstRepoTab")
         self.repoTabsWidget.addTab(self.firstRepoTab, "")
-        self.stackedWidget = QtGui.QStackedWidget(self.repotabssplitter)
+        self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
         self.stackedWidget.setObjectName("stackedWidget")
-        self.verticalLayout.addWidget(self.repotabssplitter)
+        self.verticalLayout.addWidget(self.repotabs_splitter)
         self.verticalLayout_2.addWidget(self.reporegistry_splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
