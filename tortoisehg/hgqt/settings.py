@@ -36,7 +36,7 @@ class SettingsCombo(QComboBox):
         self.setEditable(opts.get('canedit', False))
         self.setValidator(opts.get('validator', None))
         self.defaults = opts.get('defaults', [])
-        self.curvalue = False
+        self.curvalue = None
         self.loaded = False
         if 'nohist' in opts:
             self.previous = []
@@ -50,7 +50,7 @@ class SettingsCombo(QComboBox):
         self.clear()
         ucur = hglib.tounicode(self.curvalue or '')
         if self.opts.get('defer') and not self.loaded:
-            if self.curvalue == False: # unspecified
+            if self.curvalue == None: # unspecified
                 self.addItem(_unspecstr)
             else:
                 self.addItem(ucur or '...')
@@ -69,7 +69,7 @@ class SettingsCombo(QComboBox):
             self.addItem(m)
         if curindex is not None:
             self.setCurrentIndex(curindex)
-        elif self.curvalue == False:
+        elif self.curvalue is None:
             self.setCurrentIndex(0)
         elif self.curvalue:
             self.addItem(ucur)
@@ -95,7 +95,7 @@ class SettingsCombo(QComboBox):
     def value(self):
         utext = self.currentText()
         if utext == _unspecstr:
-            return False
+            return None
         if 'nohist' in self.opts or utext in self.defaults + self.previous:
             return hglib.fromunicode(utext)
         print 'saving', self.opts['cpath'], utext
@@ -113,7 +113,7 @@ class PasswordEntry(QLineEdit):
     def __init__(self, parent=None, **opts):
         QLineEdit.__init__(self, parent)
         self.opts = opts
-        self.curvalue = False
+        self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
         self.setDisabled(opts['readonly'])
 
@@ -132,7 +132,7 @@ class PasswordEntry(QLineEdit):
 
     def value(self):
         utext = self.text()
-        return utext and hglib.fromunicode(utext) or False
+        return utext and hglib.fromunicode(utext) or None
 
     def isDirty(self):
         return self.value() != self.curvalue
@@ -681,7 +681,7 @@ class SettingsDialog(QDialog):
             section, key = cpath.split('.', 1)
             return self.ini[section][key]
         except KeyError:
-            return False
+            return None
 
     def loadIniFile(self, rcpath):
         for fn in rcpath:
@@ -733,7 +733,7 @@ class SettingsDialog(QDialog):
     def recordNewValue(self, cpath, newvalue):
         # 'newvalue' is in local encoding
         section, key = cpath.split('.', 1)
-        if newvalue == False:
+        if newvalue == None:
             try:
                 del self.ini[section][key]
             except KeyError:
