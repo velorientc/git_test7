@@ -392,6 +392,11 @@ def forget(ui, *pats, **opts):
     from tortoisehg.hgqt.quickop import run
     qtrun(run, ui, *pats, **opts)
 
+def hgignore(ui, *pats, **opts):
+    """ignore filter editor"""
+    from tortoisehg.hgqt.hgignore import run
+    qtrun(run, ui, *pats, **opts)
+
 def shellconfig(ui, *pats, **opts):
     """explorer extension configuration editor"""
     from tortoisehg.hgqt.shellconf import run
@@ -656,6 +661,7 @@ table = {
          ('d', 'date', '', _('record datecode as commit date'))],
         _('thg commit [OPTIONS] [FILE]...')),
     "^grep|search": (grep, [], _('thg grep')),
+    "^hgignore|ignore|filter": (hgignore, [], _('thg hgignore [FILE]')),
     "^email":
         (email,
          [('r', 'rev', [], _('a revision to send')),],
