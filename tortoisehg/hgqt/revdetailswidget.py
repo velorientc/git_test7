@@ -261,7 +261,7 @@ class RevDetailsWidget(QtGui.QWidget):
         if ctx.rev() is not None:
             self.fileview.setContext(ctx)
             self.revpanel.update(ctx.rev())
-            self.message.displayRevision(ctx, None)
+            self.message.displayRevision(ctx)
             self.filelistmodel.setSelectedRev(ctx)
 
     def reload(self, rev=None):

@@ -65,7 +65,7 @@ class RevMessage(QtGui.QWidget):
     def text(self):
         return str(self._message.toPlainText())
 
-    def displayRevision(self, ctx, mqpatch):
+    def displayRevision(self, ctx):
         self.ctx = ctx
 
         desc = xml_escape(tounicode(ctx.description()))
