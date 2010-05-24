@@ -458,8 +458,6 @@ class SettingsDialog(QDialog):
         else:
             combo.setEnabled(False)
         self.confcombo = combo
-        self.editpage = None
-        self.editor = None
 
         edit = QPushButton(_('Edit File'))
         edit.clicked.connect(self.editClicked)
@@ -538,62 +536,32 @@ class SettingsDialog(QDialog):
             elif ret == 2:
                 return
 
-        origrow = self.pageList.currentRow()
-        def cancelEditor():
-            self.editor.clear()
-            self.editor.setModified(False)
-            self.editpage.setEnabled(False)
-            self.pageList.setEnabled(True)
-            self.confcombo.setEnabled(True)
-            self.editbtn.setEnabled(True)
-            self.reloadbtn.setEnabled(True)
-            self.pageList.setCurrentRow(origrow)
-            self.stack.setCurrentIndex(origrow)
-            self.refresh()
-
-        def saveEditor():
-            try:
-                f = util.atomictempfile(self.fn, 'w', createmode=None)
-                f.write(self.editor.text())
-                f.rename()
-            except IOError, e:
-                qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                    str(e), parent=self)
-                return
-            cancelEditor()
-
-        if not self.editpage:
-            frame = QFrame()
-            self.stack.addWidget(frame)
-            vbox = QVBoxLayout()
-            frame.setLayout(vbox)
-            editor = qsci()
-            editor.setBraceMatching(qsci.SloppyBraceMatch)
-            vbox.addWidget(editor)
-            BB = QDialogButtonBox
-            bb = QDialogButtonBox(BB.Save|BB.Cancel)
-            self.connect(bb, SIGNAL("accepted()"), saveEditor)
-            self.connect(bb, SIGNAL("rejected()"), cancelEditor)
-            vbox.addWidget(bb)
-            lexer = Qsci.QsciLexerProperties() # QsciLexerLua?
-            editor.setLexer(lexer)
-            self.editor = editor
-            self.editpage = frame
-
-        self.editpage.setEnabled(True)
-        self.stack.setCurrentWidget(self.editpage)
-        self.pageList.setEnabled(False)
-        self.confcombo.setEnabled(False)
-        self.editbtn.setEnabled(False)
-        self.reloadbtn.setEnabled(False)
+        dialog = QDialog()
+        vbox = QVBoxLayout()
+        dialog.setLayout(vbox)
+        editor = qsci()
+        editor.setBraceMatching(qsci.SloppyBraceMatch)
+        vbox.addWidget(editor)
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Save|BB.Cancel)
+        self.connect(bb, SIGNAL("accepted()"), dialog, SLOT('accept()'))
+        self.connect(bb, SIGNAL("rejected()"), dialog, SLOT('reject()'))
+        vbox.addWidget(bb)
+        lexer = Qsci.QsciLexerProperties() # QsciLexerLua?
+        editor.setLexer(lexer)
         try:
             contents = open(self.fn, 'rb').read()
-            self.editor.setText(contents)
-            self.editor.setModified(False)
+            dialog.setWindowTitle(self.fn)
+            editor.setText(contents)
+            editor.setModified(False)
+            if dialog.exec_() == QDialog.Accepted:
+                f = util.atomictempfile(self.fn, 'w', createmode=None)
+                f.write(editor.text())
+                f.rename()
+                self.refresh()
         except EnvironmentError, e:
-            qtlib.WarningMsgBox(_('Unable to read config file'),
+            qtlib.WarningMsgBox(_('Unable to read/write config file'),
                    hglib.tounicode(e), parent=self)
-            cancelEditor()
 
     def refresh(self, *args):
         # determine target config file
@@ -617,8 +585,6 @@ class SettingsDialog(QDialog):
                 widgets[row].setValue(curvalue)
 
     def isDirty(self):
-        if self.editor and self.editor.isModified():
-            return True
         if self.readonly:
             return False
         for info, widgets in self.pages.values():
