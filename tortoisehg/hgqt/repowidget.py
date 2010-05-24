@@ -203,9 +203,6 @@ class RepoWidget(QtGui.QWidget):
             tv.setCurrentIndex(tv.model().index(0, 0))
 
     def revision_activated(self, rev=None):
-        """
-        Callback called when a revision is double-clicked in the revisions table
-        """
         if rev is None:
             rev = self.repoview.current_rev
         self._manifestdlg = ManifestDialog(self.repo, rev)
@@ -229,9 +226,6 @@ class RepoWidget(QtGui.QWidget):
         dlg.show()
 
     def revision_selected(self, rev):
-        """
-        Callback called when a revision is selected in the revisions table
-        """
         if self.repomodel.graph:
             ctx = self.repomodel.repo.changectx(rev)
             if ctx.rev() is None:
@@ -263,7 +257,6 @@ class RepoWidget(QtGui.QWidget):
         self.close()
 
     def reload(self, rev=None):
-        """Reload the repository"""
         if rev == None:
             self._reload_rev = self.repoview.current_rev
         else:
