@@ -874,7 +874,7 @@ class GCommit(GStatus):
             return self.relevant_checked_files(commitable)
 
         def callback(ret):
-            if ret == 0:
+            if ret == 0 and self.repo.ui.configbool('tortoisehg', 'closeci'):
                 self.destroy()
             else:
                 self.reload_status()
