@@ -19,6 +19,8 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
 #  qrefresh support
+#  auto-select a file at startup?
+#  re-select the previous file after refresh
 #  threaded / wrapped commit (need a CmdRunner equivalent)
 #  qctlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
