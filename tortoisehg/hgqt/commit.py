@@ -78,11 +78,11 @@ class CommitWidget(QWidget):
 
         usercombo.setEditable(True)
         form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
-        ctx = repo['.']
-        desc = format_desc(ctx.description(), 80)
-        fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
-        ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
-        form.addRow(_('Parent:'), QLabel(ptext))
+        for ctx in repo.parents():
+            desc = format_desc(ctx.description(), 80)
+            fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
+            ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
+            form.addRow(_('Parent:'), QLabel(ptext))
         form.addRow(_('User:'), usercombo)
         frame = QFrame()
         frame.setLayout(form)
