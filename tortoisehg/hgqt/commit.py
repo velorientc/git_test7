@@ -76,13 +76,15 @@ class CommitWidget(QWidget):
         except util.Abort:
             pass
 
-        form.addRow(_('Changeset:'), QLabel(_('Working Copy')))
+        def addrow(s, w):
+            form.addRow("<b>%s</b>" % s, w)
+        addrow(('Changeset:'), QLabel(_('Working Copy')))
         for ctx in repo.parents():
             desc = format_desc(ctx.description(), 80)
             fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
             ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
-            form.addRow(_('Parent:'), QLabel(ptext))
-        form.addRow(_('User:'), usercombo)
+            addrow(_('Parent:'), QLabel(ptext))
+        addrow(_('User:'), usercombo)
         frame = QFrame()
         frame.setLayout(form)
         frame.setFrameStyle(QFrame.NoFrame)
