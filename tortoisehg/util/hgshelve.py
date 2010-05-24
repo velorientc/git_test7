@@ -599,6 +599,20 @@ def unshelve(ui, repo, *pats, **opts):
     except IOError:
         ui.warn(_('nothing to unshelve\n'))
 
+
+def abandon(ui, repo):
+    '''abandon shelved changes'''
+    try:
+        if os.path.exists(repo.join('shelve')):
+            ui.debug(_('abandoning shelved file\n'))
+            os.unlink(repo.join('shelve'))
+            ui.status(_('shelved file abandoned\n'))
+        else:
+            ui.warn(_('nothing to abandon\n'))
+    except IOError:
+        ui.warn(_('abandon failed\n'))
+
+
 cmdtable = {
     "shelve":
         (shelve,

@@ -43,13 +43,18 @@ class GtkUi(ui.ui):
         self.setconfig('progress', 'disable', 'True')
 
     def write(self, *args, **opts):
-        if hglib.uiwrite(self, args):
+        if self._buffers:
+            self._buffers[-1].extend([str(a) for a in args])
+        else:
             for a in args:
-                self.outputq.put(str(a))
+                self.outputq.put((str(a), opts.get('label', '')))
 
     def write_err(self, *args, **opts):
         for a in args:
             self.errorq.put(str(a))
+
+    def label(self, msg, label):
+        return msg
 
     def flush(self):
         pass
@@ -168,12 +173,13 @@ class HgThread(thread2.Thread):
         try:
             for k, v in self.ui.configitems('defaults'):
                 self.ui.setconfig('defaults', k, '')
+            l = 'control'
             ret = hglib.dispatch._dispatch(self.ui, self.args)
             if ret:
-                self.ui.write(_('[command returned code %d ') % int(ret))
+                self.ui.write(_('[command returned code %d ') % int(ret), label=l)
             else:
-                self.ui.write(_('[command completed successfully '))
-            self.ui.write(time.asctime() + ']\n')
+                self.ui.write(_('[command completed successfully '), label=l)
+            self.ui.write(time.asctime() + ']\n', label=l)
             self.ret = ret or 0
             if self.postfunc:
                 self.postfunc(ret)
