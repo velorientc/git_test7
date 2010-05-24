@@ -62,9 +62,6 @@ class RevMessage(QtGui.QWidget):
         else:
             QtGui.QDesktopServices.openUrl(qurl)
 
-    def text(self):
-        return str(self._message.toPlainText())
-
     def displayRevision(self, ctx):
         self.ctx = ctx
 
