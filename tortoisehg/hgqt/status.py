@@ -171,7 +171,7 @@ class StatusWidget(QWidget):
         hbox.addWidget(self.fnamelabel)
         hbox.addStretch()
 
-        self.override = QToolButton()
+        self.override = QCheckBox()
         self.override.setText(_('Show Contents'))
         self.override.setCheckable(True)
         self.override.setEnabled(False)
