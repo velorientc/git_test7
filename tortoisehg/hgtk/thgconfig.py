@@ -83,6 +83,9 @@ INFO = (
          ' the message and a warning will be issued'
          ' if any lines are too long at commit.'
          '  Default: 0 (unenforced)')),
+    (_('Close After Commit'), 'tortoisehg.closeci', ['False', 'True'],
+        _('Close the commit tool after every successful'
+          ' commit.  Default: False')),
     (_('Push After Commit'), 'tortoisehg.pushafterci', ['False', 'True'],
         _('Attempt to push to default push target after every successful'
           ' commit.  Default: False')),
