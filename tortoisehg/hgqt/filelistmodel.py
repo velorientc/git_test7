@@ -154,7 +154,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
             _files = self._buildDesc(self.current_ctx.parents()[1], 'right')
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
-        self.fillFileStats()
 
     def setSelectedRev(self, ctx):
         if ctx != self.current_ctx:
@@ -162,65 +161,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
             self._datacache = {}
             self.loadFiles()
             self.emit(SIGNAL("layoutChanged()"))
-
-    def fillFileStats(self):
-        """
-        Method called to start the background process of computing
-        file stats, which are to be displayed in the 'Stats' column
-        """
-        self._fill_iter = self._fill()
-        self._fill_one_step()
-
-    def _fill_one_step(self):
-        if self._fill_iter is None:
-            return
-        try:
-            nextfill = self._fill_iter.next()
-            if nextfill is not None:
-                row, col = nextfill
-                idx = self.index(row, col)
-                self.emit(SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &)'),
-                          idx, idx)
-            QtCore.QTimer.singleShot(10, lambda self=self: self._fill_one_step())
-
-        except StopIteration:
-            self._fill_iter = None
-
-    def _fill(self):
-        # the generator used to fill file stats as a background process
-        for row, desc in enumerate(self._files):
-            filename = desc['path']
-            if desc['flag'] == '=' and self._displaydiff:
-                diff = revdiff(self.repo, self.current_ctx, desc['parent'],
-                               files=[filename])
-                try:
-                    tot = self.current_ctx.filectx(filename).data().count('\n')
-                except LookupError:
-                    tot = 0
-                add = len(replus.findall(diff))
-                rem = len(reminus.findall(diff))
-                if tot == 0:
-                    tot = max(add + rem, 1)
-                desc['stats'] = (tot, add, rem)
-                yield row, 1
-
-            if desc['flag'] == '+':
-                m = self.current_ctx.filectx(filename).renamed()
-                if m:
-                    removed = self.repo.status(desc['parent'].node(),
-                                               self.current_ctx.node())[2]
-                    oldname, node = m
-                    if oldname in removed:
-                        # removed.remove(oldname) XXX
-                        desc['renamedfrom'] = (oldname, node)
-                        desc['flag'] = '='
-                        desc['desc'] += '\n (was %s)' % oldname
-                    else:
-                        desc['copiedfrom'] = (oldname, node)
-                        desc['flag'] = '='
-                        desc['desc'] += '\n (copy of %s)' % oldname
-                    yield row, 0
-            yield None
 
     def data(self, index, role):
         if not index.isValid() or index.row()>len(self) or not self.current_ctx:
