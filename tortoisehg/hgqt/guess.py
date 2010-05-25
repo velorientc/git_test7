@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, mdiff, cmdutil, util, error, similar
+from mercurial import hg, ui, mdiff, similar
 
 from tortoisehg.util import hglib, shlib, paths
 
