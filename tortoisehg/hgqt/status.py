@@ -154,7 +154,8 @@ class StatusWidget(QWidget):
 
         # Diff panel side of splitter
         vbox = QVBoxLayout()
-        vbox.setMargin(0)
+        vbox.setSpacing(0)
+        vbox.setContentsMargins(0, 0, 0, 0)
         docf = QFrame(split)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(1)
@@ -163,7 +164,7 @@ class StatusWidget(QWidget):
         docf.setLayout(vbox)
         self.docf = docf
         hbox = QHBoxLayout()
-        hbox.setContentsMargins (5, 0, 0, 0)
+        hbox.setContentsMargins (0, 0, 0, 0)
         self.fnamelabel = QLabel()
         self.fnamelabel.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self.fnamelabel,
