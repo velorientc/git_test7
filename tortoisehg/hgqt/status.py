@@ -312,7 +312,10 @@ class StatusWidget(QWidget):
         if status in '?I':
             if showanyway:
                 # Read untracked file contents from working directory
-                diff = open(self.repo.wjoin(wfile), 'r').read()
+                try:
+                    diff = open(self.repo.wjoin(wfile), 'r').read()
+                except EnvironmentError, e:
+                    diff = '<b>%s</b>' % str(e)
                 if '\0' in diff:
                     diff = _('<b>Contents are binary, not previewable</b>')
                     self.te.setHtml(diff)
