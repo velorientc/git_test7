@@ -167,12 +167,6 @@ class DetectRenameDialog(QDialog):
                                     _('Select one or more rows for search'))
             return
 
-        def done():
-            for col in xrange(3):
-                self.matchlv.resizeColumnToContents(col)
-            self.findbtn.setEnabled(True)
-            self.matchbtn.setDisabled(model.isEmpty())
-
         pct = self.simslider.value() / 100.0
         copies = not self.copycheck.isChecked()
         model = self.matchlv.model()
@@ -184,8 +178,14 @@ class DetectRenameDialog(QDialog):
         self.thread.match.connect(model.appendRow)
         #self.thread.error.connect(print)
         #self.thread.progress.connect(print)
-        self.thread.searchComplete.connect(done)
+        self.thread.searchComplete.connect(self.finished)
         self.thread.start()
+
+    def finished(self):
+        for col in xrange(3):
+            self.matchlv.resizeColumnToContents(col)
+        self.findbtn.setEnabled(True)
+        self.matchbtn.setDisabled(model.isEmpty())
 
     def acceptMatch(self):
         'User pressed "accept match" button'
