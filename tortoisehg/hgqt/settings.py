@@ -475,10 +475,13 @@ class SettingsDialog(QDialog):
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
-        self.conftabs.addTab(SettingsForm(focus=focus, parent=self),
+        self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(),
+                                          focus=focus, parent=self),
                              _('User global settings'))
         if repo:
-            self.conftabs.addTab(SettingsForm(focus=focus, parent=self),
+            reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
+            self.conftabs.addTab(SettingsForm(rcpath=reporcpath,
+                                              focus=focus, parent=self),
                                  _('%s repository settings') % hglib.tounicode(name))
 
         # FIXME: workaround to sync tabs with combo; remove this later
@@ -566,8 +569,13 @@ class SettingsDialog(QDialog):
 class SettingsForm(QWidget):
     """Widget for each settings file"""
 
-    def __init__(self, focus=None, parent=None):
+    def __init__(self, rcpath, focus=None, parent=None):
         super(SettingsForm, self).__init__(parent)
+
+        if isinstance(rcpath, (list, tuple)):
+            self.rcpath = rcpath
+        else:
+            self.rcpath = [rcpath]
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -591,8 +599,6 @@ class SettingsForm(QWidget):
 
         self.settings = parent.settings  # FIXME
         self.readonly = parent.readonly  # FIXME
-        self.confcombo = parent.confcombo  # FIXME
-        self.root = parent.root  # FIXME
 
         # add page items to treeview
         for meta, info in INFO:
@@ -625,13 +631,6 @@ class SettingsForm(QWidget):
             self.refresh()
 
     def refresh(self, *args):
-        # determine target config file
-        if self.confcombo.currentIndex() == CONF_REPO:
-            repo = hg.repository(ui.ui(), self.root)
-            self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-        else:
-            self.rcpath = util.user_rcpath()
-
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
         for info, widgets in self.pages.values():
