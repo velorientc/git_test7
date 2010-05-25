@@ -22,7 +22,7 @@ from PyQt4.QtGui import *
 # Technical Debt
 #   stacked widget or pages need to be scrollable
 #   add extensions page after THG 1.1 is released
-#   show icons in the page listview
+#   we need a consistent icon set
 
 _unspecstr = _('<unspecified>')
 
@@ -214,8 +214,7 @@ INFO = (
         ' instead of just the root directory name.  Default: False')),
     )),
 
-({'name': 'log', 'label': _('Workbench'),
-  'icon': 'menulog.ico'}, (
+({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog.ico'}, (
     (_('Author Coloring'), 'tortoisehg.authorcolor', genBoolCombo,
         _('Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
@@ -330,7 +329,7 @@ INFO = (
         _('Character encoding name')),
     )),
 
-({'name': 'proxy', 'label': _('Proxy'), 'icon': 'general.ico'}, (
+({'name': 'proxy', 'label': _('Proxy'), 'icon': QStyle.SP_DriveNetIcon}, (
     (_('Host'), 'http_proxy.host', genEditCombo,
         _('Host name and (optional) port of proxy server, for'
         ' example "myproxy:8000"')),
@@ -343,7 +342,7 @@ INFO = (
         _('Optional. Password to authenticate with at the proxy server')),
     )),
 
-({'name': 'email', 'label': _('Email'), 'icon': 'general.ico'}, (
+({'name': 'email', 'label': _('Email'), 'icon': QStyle.SP_ArrowForward}, (
     (_('From'), 'email.from', genEditCombo,
         _('Email address to use in the "From" header and for'
         ' the SMTP envelope')),
@@ -378,7 +377,8 @@ INFO = (
         ' mail server.')),
     )),
 
-({'name': 'diff', 'label': _('Diff'), 'icon': 'general.ico'}, (
+({'name': 'diff', 'label': _('Diff'),
+  'icon': QStyle.SP_FileDialogContentsView}, (
     (_('Patch EOL'), 'patch.eol', (genDefaultCombo,
         ['auto', 'strict', 'crlf', 'lf']),
         _('Normalize file line endings during and after patch to lf or'
@@ -471,6 +471,7 @@ class SettingsDialog(QDialog):
         bothbox = QHBoxLayout()
         layout.addLayout(bothbox)
         pageList = QListWidget()
+        pageList.setUniformItemSizes(True)
         stack = QStackedWidget()
         bothbox.addWidget(pageList, 0)
         bothbox.addWidget(stack, 1)
@@ -497,8 +498,15 @@ class SettingsDialog(QDialog):
 
         # add page items to treeview
         for meta, info in INFO:
-            # TODO: set meta['icon']
-            pageList.addItem(meta['label'])
+            icon = QIcon()
+            if isinstance(meta['icon'], str):
+                iconfile = paths.get_tortoise_icon(meta['icon'])
+                icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
+            else:
+                style = QApplication.style()
+                icon.addPixmap(style.standardPixmap(meta['icon']))
+            item = QListWidgetItem(icon, meta['label'])
+            pageList.addItem(item)
             self.addPage(meta['name'])
 
         combo.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
