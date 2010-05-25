@@ -471,7 +471,7 @@ class SettingsDialog(QDialog):
         bothbox = QHBoxLayout()
         layout.addLayout(bothbox)
         pageList = QListWidget()
-        pageList.setUniformItemSizes(True)
+        pageList.setResizeMode(QListView.Fixed)
         stack = QStackedWidget()
         bothbox.addWidget(pageList, 0)
         bothbox.addWidget(stack, 1)
