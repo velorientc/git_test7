@@ -453,12 +453,12 @@ class SettingsDialog(QDialog):
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
         self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(),
-                                          focus=focus, parent=self),
+                                          focus=focus, readonly=self.readonly),
                              _('User global settings'))
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             self.conftabs.addTab(SettingsForm(rcpath=reporcpath,
-                                              focus=focus, parent=self),
+                                              focus=focus, readonly=self.readonly),
                                  _('%s repository settings') % hglib.tounicode(name))
 
         BB = QDialogButtonBox
@@ -522,7 +522,7 @@ class SettingsDialog(QDialog):
 class SettingsForm(QWidget):
     """Widget for each settings file"""
 
-    def __init__(self, rcpath, focus=None, parent=None):
+    def __init__(self, rcpath, focus=None, readonly=False, parent=None):
         super(SettingsForm, self).__init__(parent)
 
         if isinstance(rcpath, (list, tuple)):
@@ -569,8 +569,8 @@ class SettingsForm(QWidget):
         layout.addWidget(desctext)
         self.desctext = desctext
 
-        self.settings = parent.settings  # FIXME
-        self.readonly = parent.readonly  # FIXME
+        self.settings = QSettings()
+        self.readonly = readonly
 
         # add page items to treeview
         for meta, info in INFO:
