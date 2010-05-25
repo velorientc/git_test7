@@ -23,7 +23,7 @@ class HgignoreDialog(QDialog):
 
     ignoreFilterUpdated = pyqtSignal()
 
-    def __init__(self, parent=None, root=None, fileglob='', *pats):
+    def __init__(self, parent=None, root=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
 
@@ -34,6 +34,7 @@ class HgignoreDialog(QDialog):
             return
 
         self.repo = repo
+        self.pats = pats
         self.setWindowTitle(_('Ignore filter - %s') % hglib.get_reponame(repo))
 
         vbox = QVBoxLayout()
@@ -48,7 +49,6 @@ class HgignoreDialog(QDialog):
 
         le = QLineEdit()
         hbox.addWidget(le, 1)
-        le.setText(hglib.tounicode(fileglob))
         le.returnPressed.connect(self.addEntry)
 
         add = QPushButton(_('Add'))
@@ -220,6 +220,13 @@ class HgignoreDialog(QDialog):
         self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
         self.unknownlist.addItems([uni(u) for u in self.lclunknowns])
+        for i, u in enumerate(self.lclunknowns):
+            if u in self.pats:
+                item = self.unknownlist.item(i)
+                self.unknownlist.setItemSelected(item, True)
+                self.unknownlist.setCurrentItem(item)
+                # single selection only
+                break
 
         try:
             l = open(self.ignorefile, 'rb').readlines()
