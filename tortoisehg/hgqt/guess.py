@@ -18,7 +18,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Technical Debt
+#  Add a progress/status bar, connect to thread errors
 #  Give simularity routines a repo.ui that catches progress reports
+#  Disable buttons when lists are empty
+#  Remember slider position
 
 class DetectRenameDialog(QDialog):
     'Detect renames after they occur'
