@@ -71,7 +71,6 @@ class CloneDialog(QDialog):
         expander.expanded.connect(self.show_options)
         grid.addWidget(expander, 2, 0, Qt.AlignLeft | Qt.AlignTop)
 
-        ### options
         optbox = QVBoxLayout()
         optbox.setSpacing(6)
         grid.addLayout(optbox, 2, 1, 1, 2)
