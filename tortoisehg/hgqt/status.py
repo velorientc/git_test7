@@ -227,6 +227,9 @@ class StatusWidget(QWidget):
             return
         self.te.clear()
         self.fnamelabel.clear()
+        self.curRow = None
+        self.override.setChecked(False)
+        self.override.setEnabled(False)
         self.emit(SIGNAL('loadBegin()'))
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.connect(self.refreshing, SIGNAL('finished'), self.reloadComplete)
