@@ -258,4 +258,4 @@ class HgignoreDialog(QDialog):
 def run(_ui, *pats, **opts):
     if pats and pats[0].endswith('.hgignore'):
         pats = []
-    return HgignoreDialog(None, root=None, *pats)
+    return HgignoreDialog(None, None, *pats)

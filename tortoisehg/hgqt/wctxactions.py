@@ -184,7 +184,7 @@ def guessRename(parent, ui, repo, files):
 
 def ignore(parent, ui, repo, files):
     from tortoisehg.hgqt.hgignore import HgignoreDialog
-    dlg = HgignoreDialog(parent, repo.root, '', files)
+    dlg = HgignoreDialog(parent, repo.root, *files)
     return dlg.exec_() == QDialog.Accepted
 
 def remove(parent, ui, repo, files):
