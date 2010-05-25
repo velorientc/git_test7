@@ -97,6 +97,7 @@ class DetectRenameDialog(QDialog):
         matchtv.setItemsExpandable(False)
         matchtv.setRootIsDecorated(False)
         matchtv.setModel(MatchModel())
+        matchtv.setSortingEnabled(True)
         matchtv.clicked.connect(self.showDiff)
         buthbox = QHBoxLayout()
         matchbtn = QPushButton(_('Accept Selected Matches'))
@@ -364,11 +365,7 @@ class MatchModel(QAbstractTableModel):
 
     def sort(self, col, order):
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
-        if col == COL_PATH:
-            c = self.checked
-            self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
-        else:
-            self.rows.sort(lambda x, y: cmp(x[col], y[col]))
+        self.rows.sort(lambda x, y: cmp(x[col], y[col]))
         if order == Qt.DescendingOrder:
             self.rows.reverse()
         self.emit(SIGNAL("layoutChanged()"))
