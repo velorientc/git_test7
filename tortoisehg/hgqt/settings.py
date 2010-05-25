@@ -457,37 +457,25 @@ class SettingsDialog(QDialog):
             combo.setEnabled(False)
         self.confcombo = combo
 
+        # TODO: edit/reload button will be in tab widget
         edit = QPushButton(_('Edit File'))
-        edit.clicked.connect(self.editClicked)
+        edit.clicked.connect(lambda: self.settingsform.editClicked())  # FIXME
         self.editbtn = edit
         reload = QPushButton(_('Reload'))
-        reload.clicked.connect(self.reloadClicked)
+        reload.clicked.connect(lambda: self.settingsform.reloadClicked())  # FIXME
         self.reloadbtn = reload
         tophbox.addWidget(combo)
         tophbox.addWidget(edit)
         tophbox.addWidget(reload)
         tophbox.addStretch(1)
 
-        bothbox = QHBoxLayout()
-        layout.addLayout(bothbox)
-        pageList = QListWidget()
-        pageList.setResizeMode(QListView.Fixed)
-        stack = QStackedWidget()
-        bothbox.addWidget(pageList, 0)
-        bothbox.addWidget(stack, 1)
-        pageList.currentRowChanged.connect(stack.setCurrentIndex)
-
-        self.pages = {}
-        self.stack = stack
-        self.pageList = pageList
-
         s = QSettings()
         self.settings = s
         self.restoreGeometry(s.value('settings/geom').toByteArray())
 
-        desctext = QTextBrowser()
-        layout.addWidget(desctext)
-        self.desctext = desctext
+        # FIXME: use tab widget
+        self.settingsform = SettingsForm(focus=focus, parent=self)
+        layout.addWidget(self.settingsform)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -496,23 +484,9 @@ class SettingsDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
-        # add page items to treeview
-        for meta, info in INFO:
-            icon = QIcon()
-            if isinstance(meta['icon'], str):
-                iconfile = paths.get_tortoise_icon(meta['icon'])
-                icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
-            else:
-                style = QApplication.style()
-                icon.addPixmap(style.standardPixmap(meta['icon']))
-            item = QListWidgetItem(icon, meta['label'])
-            pageList.addItem(item)
-            self.addPage(meta['name'])
-
         combo.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
         combo.currentIndexChanged.connect(self.fileselect)
         self.refresh()
-        self.focusField(focus or 'ui.merge')
 
     def fileselect(self, newindex):
         'select another hgrc file'
@@ -529,6 +503,90 @@ class SettingsDialog(QDialog):
             elif ret == 0:
                 self.applyChanges()
         self.refresh()
+
+    def refresh(self, *args):
+        return self.settingsform.refresh()  # FIXME
+
+    def isDirty(self):
+        return self.settingsform.isDirty()  # FIXME
+
+    def applyChanges(self):
+        return self.settingsform.applyChanges()  # FIXME
+
+    def canExit(self):
+        if self.isDirty():
+            ret = qtlib.CustomPrompt(_('Confirm Exit'),
+                            _('Apply changes before exit?'), self,
+                            (_('&Yes'), _('&No (discard changes)'),
+                         _  ('&Cancel')), default=2, esc=2).run()
+            if ret == 2:
+                return False
+            elif ret == 0:
+                self.applyChanges()
+                return True
+        return True
+
+    def accept(self):
+        self.applyChanges()
+        s = self.settings
+        s.setValue('settings/geom', self.saveGeometry())
+        s.sync()
+        QDialog.accept(self)
+
+    def reject(self):
+        if not self.canExit():
+            return
+        s = self.settings
+        s.setValue('settings/geom', self.saveGeometry())
+        s.sync()
+        QDialog.reject(self)
+
+class SettingsForm(QWidget):
+    """Widget for each settings file"""
+
+    def __init__(self, focus=None, parent=None):
+        super(SettingsForm, self).__init__(parent)
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        bothbox = QHBoxLayout()
+        layout.addLayout(bothbox)
+        pageList = QListWidget()
+        pageList.setResizeMode(QListView.Fixed)
+        stack = QStackedWidget()
+        bothbox.addWidget(pageList, 0)
+        bothbox.addWidget(stack, 1)
+        pageList.currentRowChanged.connect(stack.setCurrentIndex)
+
+        self.pages = {}
+        self.stack = stack
+        self.pageList = pageList
+
+        desctext = QTextBrowser()
+        layout.addWidget(desctext)
+        self.desctext = desctext
+
+        self.settings = parent.settings  # FIXME
+        self.readonly = parent.readonly  # FIXME
+        self.confcombo = parent.confcombo  # FIXME
+        self.root = parent.root  # FIXME
+
+        # add page items to treeview
+        for meta, info in INFO:
+            icon = QIcon()
+            if isinstance(meta['icon'], str):
+                iconfile = paths.get_tortoise_icon(meta['icon'])
+                icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
+            else:
+                style = QApplication.style()
+                icon.addPixmap(style.standardPixmap(meta['icon']))
+            item = QListWidgetItem(icon, meta['label'])
+            pageList.addItem(item)
+            self.addPage(meta['name'])
+
+        self.refresh()
+        self.focusField(focus or 'ui.merge')
 
     def editClicked(self):
         'Open internal editor in stacked widget'
@@ -710,34 +768,6 @@ class SettingsDialog(QDialog):
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 str(e), parent=self)
-
-    def canExit(self):
-        if self.isDirty():
-            ret = qtlib.CustomPrompt(_('Confirm Exit'),
-                            _('Apply changes before exit?'), self,
-                            (_('&Yes'), _('&No (discard changes)'),
-                         _  ('&Cancel')), default=2, esc=2).run()
-            if ret == 2:
-                return False
-            elif ret == 0:
-                self.applyChanges()
-                return True
-        return True
-
-    def accept(self):
-        self.applyChanges()
-        s = self.settings
-        s.setValue('settings/geom', self.saveGeometry())
-        s.sync()
-        QDialog.accept(self)
-
-    def reject(self):
-        if not self.canExit():
-            return
-        s = self.settings
-        s.setValue('settings/geom', self.saveGeometry())
-        s.sync()
-        QDialog.reject(self)
 
 def run(ui, *pats, **opts):
     return SettingsDialog(opts.get('alias') == 'repoconfig',
