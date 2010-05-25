@@ -21,7 +21,6 @@ from PyQt4.QtGui import *
 #  Add a progress/status bar, connect to thread errors
 #  Give simularity routines a repo.ui that catches progress reports
 #  Disable buttons when lists are empty
-#  Remember slider position
 
 class DetectRenameDialog(QDialog):
     'Detect renames after they occur'
@@ -77,7 +76,7 @@ class DetectRenameDialog(QDialog):
         slider.changefunc = lambda v: lbl.setText(
                             _('Min Simularity: %d%%') % v)
         slider.valueChanged.connect(slider.changefunc)
-        slider.setValue(100)
+        slider.setValue(s.value('guess/simslider').toInt()[0])
         self.simslider = slider
         lbl.setBuddy(slider)
         simhbox.addWidget(lbl)
@@ -231,6 +230,7 @@ class DetectRenameDialog(QDialog):
         s.setValue('guess/geom', self.saveGeometry())
         s.setValue('guess/vsplit-state', self.vsplit.saveState())
         s.setValue('guess/hsplit-state', self.hsplit.saveState())
+        s.setValue('guess/simslider', self.simslider.value())
         QDialog.accept(self)
 
     def reject(self):
@@ -245,6 +245,7 @@ class DetectRenameDialog(QDialog):
             s.setValue('guess/geom', self.saveGeometry())
             s.setValue('guess/vsplit-state', self.vsplit.saveState())
             s.setValue('guess/hsplit-state', self.hsplit.saveState())
+            s.setValue('guess/simslider', self.simslider.value())
             QDialog.reject(self)
 
 
