@@ -180,7 +180,14 @@ def add(parent, ui, repo, files):
     return True
 
 def guessRename(parent, ui, repo, files):
-    raise NotImplementedError()
+    from tortoisehg.hgqt.guess import DetectRenameDialog
+    dlg = DetectRenameDialog(parent, repo.root, *files)
+    def matched():
+        ret = True
+    ret = False
+    dlg.matchAccepted.connect(matched)
+    dlg.exec_()
+    return ret
 
 def ignore(parent, ui, repo, files):
     from tortoisehg.hgqt.hgignore import HgignoreDialog
