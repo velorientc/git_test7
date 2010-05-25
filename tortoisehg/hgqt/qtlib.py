@@ -240,6 +240,7 @@ class PMButton(QtGui.QPushButton):
         self.setIconSize(size)
         self.setMaximumSize(size)
         self.setFlat(True)
+        self.setAutoDefault(False)
 
         self.plus = geticon('plus')
         self.minus = geticon('minus')
