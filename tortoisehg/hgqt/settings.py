@@ -536,13 +536,19 @@ class SettingsForm(QWidget):
         tophbox = QHBoxLayout()
         layout.addLayout(tophbox)
 
+        self.fnedit = QLineEdit()
+        self.fnedit.setReadOnly(True)
+        self.fnedit.setFrame(False)
+        self.fnedit.setFocusPolicy(Qt.NoFocus)
+        self.fnedit.setStyleSheet('QLineEdit { background: transparent; }')
         edit = QPushButton(_('Edit File'))
         edit.clicked.connect(self.editClicked)
         self.editbtn = edit
         reload = QPushButton(_('Reload'))
         reload.clicked.connect(self.reloadClicked)
         self.reloadbtn = reload
-        tophbox.addStretch()
+        tophbox.addWidget(QLabel(_('Settings File:')))
+        tophbox.addWidget(self.fnedit)
         tophbox.addWidget(edit)
         tophbox.addWidget(reload)
 
@@ -599,6 +605,7 @@ class SettingsForm(QWidget):
     def refresh(self, *args):
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
+        self.fnedit.setText(self.fn)
         for info, widgets in self.pages.values():
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 curvalue = self.readCPath(cpath)
