@@ -43,7 +43,6 @@ class DetectRenameDialog(QDialog):
 
         # vsplit for top & diff
         vsplit = QSplitter(Qt.Horizontal)
-        vsplit.restoreState(s.value('guess/vsplit-state').toByteArray())
         utframe = QFrame(vsplit)
         matchframe = QFrame(vsplit)
 
@@ -53,7 +52,6 @@ class DetectRenameDialog(QDialog):
         matchframe.setLayout(matchvbox)
 
         hsplit = QSplitter(Qt.Vertical)
-        hsplit.restoreState(s.value('guess/hsplit-state').toByteArray())
         layout.addWidget(hsplit)
         hsplit.addWidget(vsplit)
 
@@ -74,7 +72,6 @@ class DetectRenameDialog(QDialog):
         slider.changefunc = lambda v: lbl.setText(
                             _('Min Simularity: %d%%') % v)
         slider.valueChanged.connect(slider.changefunc)
-        slider.setValue(s.value('guess/simslider').toInt()[0])
         self.simslider = slider
         lbl.setBuddy(slider)
         simhbox.addWidget(lbl)
@@ -128,6 +125,9 @@ class DetectRenameDialog(QDialog):
         self.pmon.hide()
         layout.addWidget(self.pmon)
 
+        hsplit.restoreState(s.value('guess/hsplit-state').toByteArray())
+        vsplit.restoreState(s.value('guess/vsplit-state').toByteArray())
+        slider.setValue(s.value('guess/simslider').toInt()[0])
         self.vsplit, self.hsplit = vsplit, hsplit
         QTimer.singleShot(0, self.refresh)
 
