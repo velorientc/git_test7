@@ -15,7 +15,7 @@ from mercurial import hg, ui, error
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, csinfo
+from tortoisehg.hgqt import cmdui, csinfo, qtlib
 
 class UpdateDialog(QDialog):
 
@@ -94,7 +94,9 @@ class UpdateDialog(QDialog):
         ### options
         optbox = QVBoxLayout()
         optbox.setSpacing(6)
-        grid.addWidget(QLabel(_('Options:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
+        expander = qtlib.ExpanderLabel(_('Options:'), False)
+        expander.expanded.connect(self.show_options)
+        grid.addWidget(expander, 3, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, 3, 1)
 
         self.discard_chk = QCheckBox(_('Discard local changes, no backup (-C/--clean)'))
@@ -128,11 +130,6 @@ class UpdateDialog(QDialog):
         self.detail_btn.setAutoDefault(False)
         self.detail_btn.setCheckable(True)
         self.detail_btn.toggled.connect(self.detail_toggled)
-        self.options_btn = buttons.addButton(_('Options'),
-                                            QDialogButtonBox.ResetRole)
-        self.options_btn.setAutoDefault(False)
-        self.options_btn.setCheckable(True)
-        self.options_btn.toggled.connect(self.options_clicked)
         box.addWidget(buttons)
 
         # signal handlers
@@ -269,9 +266,9 @@ class UpdateDialog(QDialog):
     def detail_toggled(self, checked):
         self.cmd.show_output(checked)
 
-    def options_clicked(self, checked):
-        self.merge_chk.setShown(checked)
-        self.showlog_chk.setShown(checked)
+    def show_options(self, visible):
+        self.merge_chk.setShown(visible)
+        self.showlog_chk.setShown(visible)
 
     def command_started(self):
         self.cmd.setShown(True)
