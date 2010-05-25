@@ -22,6 +22,7 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
 from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.quickbar import QuickBar
 
 class GotoQuickBar(QuickBar):
@@ -100,16 +101,16 @@ class HgRepoView(QtGui.QTableView):
         connect(tb, SIGNAL('goto'), self.goto)
 
     def _action_defs(self):
-        a = [("back", self.tr("Back"), 'back', None,
+        a = [('back', _('Back'), 'back', None,
               QtGui.QKeySequence(QtGui.QKeySequence.Back),
               self.back),
-             ("forward", self.tr("Forward"), 'forward', None,
+             ('forward', _('Forward'), 'forward', None,
               QtGui.QKeySequence(QtGui.QKeySequence.Forward),
               self.forward),
-             ("manifest", self.tr("Show at rev..."), None,
-              self.tr("Show the manifest at selected revision"), None,
+             ('manifest', _('Show at rev...'), None,
+              _('Show the manifest at selected revision'), None,
               self.showAtRev),
-             ("update", self.tr("Update to rev..."), None, None, None,
+             ('update', _('Update to rev...'), None, None, None,
               self.updateToRev),
              ]
         return a

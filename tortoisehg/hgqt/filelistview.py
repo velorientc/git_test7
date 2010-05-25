@@ -19,6 +19,7 @@ Qt = QtCore.Qt
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import icon as geticon
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 
@@ -110,10 +111,10 @@ class HgFileListView(QtGui.QTableView):
             dlg.activateWindow()
 
     def _action_defs(self):
-        a = [("navigate", self.tr("File history"), None ,
-              self.tr('Show the history of the selected file'), None, self.navigate),
-             ("diffnavigate", self.tr("Compare file revisions"), None,
-              self.tr('Compare revisions of the selected file'), None, self.diffNavigate),
+        a = [('navigate', _('File history'), None, _('Show the history of '
+              'the selected file'), None, self.navigate),
+             ('diffnavigate', _('Compare file revisions'), None, _('Compare '
+              'revisions of the selected file'), None, self.diffNavigate),
              ]
         return a
 
