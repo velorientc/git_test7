@@ -89,10 +89,13 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.setupBranchCombo()
         self.restoreSettings()
         self.setAcceptDrops(True)
-        self.showRepoRegistry()
 
-    def showRepoRegistry(self):
-        self.reporegistry.show()
+        def gotVisible(state):
+            self.actionShowRepoRegistry.setChecked(state)
+        self.reporegistry.visibilityChanged.connect(gotVisible)
+
+    def showRepoRegistry(self, show):
+        self.reporegistry.setVisible(show)
 
     def openRepo(self, repopath):
         repo = hg.repository(self.ui, path=str(repopath))
@@ -269,6 +272,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         connect(self.actionBack, SIGNAL('triggered()'), self.back)
         connect(self.actionForward, SIGNAL('triggered()'), self.forward)
         connect(self.actionShowPaths, SIGNAL('toggled(bool)'), self.actionShowPathsToggled)
+        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
 

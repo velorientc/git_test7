@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Tue May 25 20:34:59 2010
+# Created: Tue May 25 21:23:46 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(685, 721)
+        MainWindow.resize(627, 721)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/log.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -43,7 +43,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.repotabs_splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 685, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -95,12 +95,16 @@ class Ui_MainWindow(object):
         self.actionShowPaths = QtGui.QAction(MainWindow)
         self.actionShowPaths.setCheckable(True)
         self.actionShowPaths.setObjectName("actionShowPaths")
+        self.actionShowRepoRegistry = QtGui.QAction(MainWindow)
+        self.actionShowRepoRegistry.setCheckable(True)
+        self.actionShowRepoRegistry.setObjectName("actionShowRepoRegistry")
         self.menuFile.addAction(self.actionOpen_repository)
         self.menuFile.addAction(self.actionRefresh)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionHelp)
+        self.menuView.addAction(self.actionShowRepoRegistry)
         self.menuView.addAction(self.actionShowPaths)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -139,5 +143,6 @@ class Ui_MainWindow(object):
         self.actionBack.setText(QtGui.QApplication.translate("MainWindow", "Back", None, QtGui.QApplication.UnicodeUTF8))
         self.actionForward.setText(QtGui.QApplication.translate("MainWindow", "Forward", None, QtGui.QApplication.UnicodeUTF8))
         self.actionShowPaths.setText(QtGui.QApplication.translate("MainWindow", "Show paths", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionShowRepoRegistry.setText(QtGui.QApplication.translate("MainWindow", "Show Repository Registry", None, QtGui.QApplication.UnicodeUTF8))
 
 import workbench_rc

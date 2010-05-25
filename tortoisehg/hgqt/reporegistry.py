@@ -519,6 +519,7 @@ class RepoTreeView(QtGui.QTreeView):
 class RepoRegistryView(QDockWidget):
 
     openRepoSignal = QtCore.pyqtSignal(QtCore.QString)
+    visibilityChanged = QtCore.pyqtSignal(bool)
 
     def __init__(self, parent):
         QDockWidget.__init__(self, parent)
@@ -526,7 +527,7 @@ class RepoRegistryView(QDockWidget):
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
                          QDockWidget.DockWidgetFloatable)
-        self.setWindowTitle(_('Repositories'))
+        self.setWindowTitle(_('Repository Registry'))
 
         mainframe = QFrame()
         lay = QVBoxLayout()
@@ -565,3 +566,9 @@ class RepoRegistryView(QDockWidget):
 
     def close(self):
         self.tmodel.write(settingsfilename())
+
+    def showEvent(self, event):
+        self.visibilityChanged.emit(True)
+
+    def hideEvent(self, event):
+        self.visibilityChanged.emit(False)
