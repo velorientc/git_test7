@@ -230,45 +230,8 @@ class HgFileListModel(QtCore.QAbstractTableModel):
 
         current_file_desc = self._files[row]
         current_file = current_file_desc['path']
-        stats = current_file_desc.get('stats')
-        if column == 1:
-            if stats is not None:
-                if role == QtCore.Qt.DecorationRole:
-                    tot, add, rem = stats
-                    w = self.diffwidth - 20
-                    h = 20
 
-                    np = int(w*add/tot)
-                    nm = int(w*rem/tot)
-                    nd = w-np-nm
-
-                    pix = QtGui.QPixmap(w+10, h)
-                    pix.fill(QtGui.QColor(0,0,0,0))
-                    painter = QtGui.QPainter(pix)
-
-                    for x0,w0, color in ((0, nm, 'red'),
-                                         (nm, np, 'green'),
-                                         (nm+np, nd, 'gray')):
-                        color = QtGui.QColor(color)
-                        painter.setBrush(color)
-                        painter.setPen(color)
-                        painter.drawRect(x0+5, 0, w0, h-3)
-                    painter.setBrush(QtGui.QColor(0,0,0,0))
-                    pen = QtGui.QPen(QtCore.Qt.black)
-                    pen.setWidth(0)
-                    painter.setPen(pen)
-                    painter.drawRect(5, 0, w+1, h-3)
-                    painter.end()
-                    return QtCore.QVariant(pix)
-                elif role == QtCore.Qt.ToolTipRole:
-                    tot, add, rem = stats
-                    msg = "Diff stats:<br>"
-                    msg += "&nbsp;<b>File:&nbsp;</b>%s lines<br>" % tot
-                    msg += "&nbsp;<b>added lines:&nbsp;</b> %s<br>" % add
-                    msg += "&nbsp;<b>removed lines:&nbsp;</b> %s" % rem
-                    return QtCore.QVariant(msg)
-
-        elif column == 0:
+        if column == 0:
             if role in (QtCore.Qt.DisplayRole, QtCore.Qt.ToolTipRole):
                 return QtCore.QVariant(current_file_desc['desc'])
             elif role == QtCore.Qt.DecorationRole:
@@ -294,11 +257,11 @@ class HgFileListModel(QtCore.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         if ismerge(self.current_ctx):
             if self._fulllist:
-                header = ('File (all)', 'Diff')
+                header = ('File (all)', '')
             else:
-                header = ('File (merged only)', 'Diff')
+                header = ('File (merged only)', '')
         else:
-            header = ('File', 'Diff')
+            header = ('File','')
 
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
             return QtCore.QVariant(header[section])
