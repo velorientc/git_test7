@@ -146,7 +146,10 @@ class HgignoreDialog(QDialog):
             self.writeIgnoreFile()
             self.refresh()
         point = self.unknownlist.mapToGlobal(point)
-        local = self.lclunknowns[self.unknownlist.currentRow()]
+        row = self.unknownlist.currentRow()
+        if row < 0:
+            return
+        local = self.lclunknowns[row]
         menu = QMenu(self)
         menu.setTitle(_('Add ignore filter...'))
         filters = [local]
