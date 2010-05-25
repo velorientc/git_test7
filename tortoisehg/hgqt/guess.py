@@ -28,11 +28,12 @@ class DetectRenameDialog(QDialog):
 
     matchAccepted = pyqtSignal()
 
-    def __init__(self, root=None, parent=None):
+    def __init__(self, parent=None, root=None, *pats):
         QDialog.__init__(self, parent)
 
         repo = hg.repository(ui.ui(), path=paths.find_root(root))
         self.repo = repo
+        self.pats = pats
         self.thread = None
 
         reponame = hglib.get_reponame(repo)
@@ -149,7 +150,9 @@ class DetectRenameDialog(QDialog):
             item = QListWidgetItem(hglib.tounicode(x))
             item.orig = x
             self.unrevlist.addItem(item)
+            self.unrevlist.setItemSelected(item, x in self.pats)
         self.difftb.clear()
+        self.pats = []
 
     def findRenames(self):
         'User pressed "find renames" button'
@@ -365,4 +368,4 @@ class RenameSearchThread(QThread):
                 self.match.emit(old, new, '%d%%' % (s*100))
 
 def run(ui, *pats, **opts):
-    return DetectRenameDialog()
+    return DetectRenameDialog(None, None, *pats)
