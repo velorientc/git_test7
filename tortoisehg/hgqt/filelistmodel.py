@@ -50,7 +50,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         self._filesdict = {}
         self.diffwidth = 100
         self._fulllist = False
-        self._fill_iter = None
 
     def toggleFullFileList(self):
         self._fulllist = not self._fulllist
@@ -145,7 +144,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         return _files
 
     def loadFiles(self):
-        self._fill_iter = None
         self._files = []
         self._datacache = {}
         self._files = self._buildDesc(self.current_ctx.parents()[0], 'left')
