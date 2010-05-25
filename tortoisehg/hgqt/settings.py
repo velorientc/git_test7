@@ -449,14 +449,6 @@ class SettingsDialog(QDialog):
         tophbox = QHBoxLayout()
         layout.addLayout(tophbox)
 
-        combo = QComboBox()
-        combo.addItem(_('User global settings'))
-        if repo:
-            combo.addItem(_('%s repository settings') % hglib.tounicode(name))
-        else:
-            combo.setEnabled(False)
-        self.confcombo = combo
-
         # TODO: edit/reload button will be in tab widget
         edit = QPushButton(_('Edit File'))
         edit.clicked.connect(lambda: self.settingsform.editClicked())  # FIXME
@@ -464,10 +456,9 @@ class SettingsDialog(QDialog):
         reload = QPushButton(_('Reload'))
         reload.clicked.connect(lambda: self.settingsform.reloadClicked())  # FIXME
         self.reloadbtn = reload
-        tophbox.addWidget(combo)
+        tophbox.addStretch()
         tophbox.addWidget(edit)
         tophbox.addWidget(reload)
-        tophbox.addStretch(1)
 
         s = QSettings()
         self.settings = s
@@ -484,10 +475,6 @@ class SettingsDialog(QDialog):
                                               focus=focus, parent=self),
                                  _('%s repository settings') % hglib.tounicode(name))
 
-        # FIXME: workaround to sync tabs with combo; remove this later
-        self.confcombo.currentIndexChanged.connect(self.conftabs.setCurrentIndex)
-        self.conftabs.currentChanged.connect(self.confcombo.setCurrentIndex)
-
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
@@ -495,32 +482,16 @@ class SettingsDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
-        combo.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
-        combo.currentIndexChanged.connect(self.fileselect)
-        self.refresh()
-
-    def fileselect(self, newindex):
-        'select another hgrc file'
-        combo = self.confcombo
-        if self.isDirty():
-            ret = qtlib.CustomPrompt(_('Confirm Switch'),
-                    _('Switch after saving changes?'), self,
-                    (_('&Save'), _('&Discard'), _('&Cancel')),
-                    default=2, esc=2).run()
-            if ret == 2:
-                repo = newindex == CONF_GLOBAL
-                combo.setCurrentIndex(repo and CONF_REPO or CONF_GLOBAL)
-                return
-            elif ret == 0:
-                self.applyChanges()
-        self.refresh()
+        self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
+        self.conftabs.currentChanged.connect(self.refreshtitle)
+        self.refreshtitle()
 
     @property
     def settingsform(self):  # FIXME: temporarily added; remove this later
         return self.conftabs.currentWidget()
 
-    def refresh(self, *args):
-        if self.confcombo.currentIndex() == CONF_REPO:
+    def refreshtitle(self, *args):
+        if self.conftabs.currentIndex() == CONF_REPO:
             repo = hg.repository(ui.ui(), self.root)
             name = hglib.get_reponame(repo)
             self.setWindowTitle(_('TortoiseHg Configure Repository - ') + \
@@ -530,13 +501,13 @@ class SettingsDialog(QDialog):
             self.setWindowTitle(_('TortoiseHg Configure User-Global Settings'))
             #set_tortoise_icon(self, 'settings_user.ico')
 
-        return self.settingsform.refresh()  # FIXME
-
     def isDirty(self):
-        return self.settingsform.isDirty()  # FIXME
+        return util.any(self.conftabs.widget(i).isDirty()
+                        for i in xrange(self.conftabs.count()))
 
     def applyChanges(self):
-        return self.settingsform.applyChanges()  # FIXME
+        for i in xrange(self.conftabs.count()):
+            self.conftabs.widget(i).applyChanges()
 
     def canExit(self):
         if self.isDirty():
