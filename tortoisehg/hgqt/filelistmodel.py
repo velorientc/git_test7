@@ -58,7 +58,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
-        self._displaydiff = cfg.getDisplayDiffStats()
 
     def setDiffWidth(self, w):
         if w != self.diffwidth:
@@ -75,7 +74,7 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         return len(self)
 
     def columnCount(self, parent=None):
-        return 1 + self._displaydiff
+        return 1
 
     def file(self, row):
         return self._files[row]['path']
