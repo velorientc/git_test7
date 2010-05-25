@@ -289,10 +289,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
                     font = QtGui.QFont()
                     font.setBold(True)
                     return QtCore.QVariant(font)
-            elif role == QtCore.Qt.ForegroundRole:
-                color = self._flagcolor.get(current_file_desc['flag'], 'black')
-                if color is not None:
-                    return QtCore.QVariant(QtGui.QColor(color))
         return nullvariant
 
     def headerData(self, section, orientation, role):
