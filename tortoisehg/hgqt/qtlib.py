@@ -245,6 +245,42 @@ class PMButton(QtGui.QPushButton):
     def is_collapsed(self):
         return not self.is_expanded()
 
+class ClickableLabel(QtGui.QLabel):
+
+    clicked = QtCore.pyqtSignal()
+
+    def __init__(self, label, parent=None):
+        QtGui.QLabel.__init__(self, parent)
+
+        self.setText(label)
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit()
+
+class ExpanderLabel(QtGui.QWidget):
+
+    expanded = QtCore.pyqtSignal(bool)
+
+    def __init__(self, label, expanded=True, stretch=True, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+
+        box = QtGui.QHBoxLayout()
+        box.setSpacing(4)
+        box.setContentsMargins(*(0,)*4)
+        self.button = PMButton(expanded, self)
+        self.button.clicked.connect(self.pm_clicked)
+        box.addWidget(self.button)
+        self.label = ClickableLabel(label, self)
+        self.label.clicked.connect(lambda: self.button.click())
+        box.addWidget(self.label)
+        if not stretch:
+            box.addStretch(0)
+
+        self.setLayout(box)
+
+    def pm_clicked(self):
+        self.expanded.emit(self.button.is_expanded())
+
 def fileEditor(filename):
     'Open a simple modal file editing dialog'
     dialog = QtGui.QDialog()
