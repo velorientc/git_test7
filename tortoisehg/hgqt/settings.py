@@ -446,20 +446,6 @@ class SettingsDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        tophbox = QHBoxLayout()
-        layout.addLayout(tophbox)
-
-        # TODO: edit/reload button will be in tab widget
-        edit = QPushButton(_('Edit File'))
-        edit.clicked.connect(lambda: self.settingsform.editClicked())  # FIXME
-        self.editbtn = edit
-        reload = QPushButton(_('Reload'))
-        reload.clicked.connect(lambda: self.settingsform.reloadClicked())  # FIXME
-        self.reloadbtn = reload
-        tophbox.addStretch()
-        tophbox.addWidget(edit)
-        tophbox.addWidget(reload)
-
         s = QSettings()
         self.settings = s
         self.restoreGeometry(s.value('settings/geom').toByteArray())
@@ -485,10 +471,6 @@ class SettingsDialog(QDialog):
         self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
         self.conftabs.currentChanged.connect(self.refreshtitle)
         self.refreshtitle()
-
-    @property
-    def settingsform(self):  # FIXME: temporarily added; remove this later
-        return self.conftabs.currentWidget()
 
     def refreshtitle(self, *args):
         if self.conftabs.currentIndex() == CONF_REPO:
@@ -550,6 +532,19 @@ class SettingsForm(QWidget):
 
         layout = QVBoxLayout()
         self.setLayout(layout)
+
+        tophbox = QHBoxLayout()
+        layout.addLayout(tophbox)
+
+        edit = QPushButton(_('Edit File'))
+        edit.clicked.connect(self.editClicked)
+        self.editbtn = edit
+        reload = QPushButton(_('Reload'))
+        reload.clicked.connect(self.reloadClicked)
+        self.reloadbtn = reload
+        tophbox.addStretch()
+        tophbox.addWidget(edit)
+        tophbox.addWidget(reload)
 
         bothbox = QHBoxLayout()
         layout.addLayout(bothbox)
