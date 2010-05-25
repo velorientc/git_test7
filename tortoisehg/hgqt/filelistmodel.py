@@ -21,7 +21,6 @@ from mercurial.revlog import LookupError
 from tortoisehg.util.util import isbfile, Curry
 
 from tortoisehg.hgqt.graph import ismerge, diff as revdiff
-from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt import icon as geticon
 
 from PyQt4 import QtCore, QtGui
@@ -44,7 +43,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self.repo = repo
         self._datacache = {}
-        self.load_config()
         self.current_ctx = None
         self._files = []
         self._filesdict = {}
@@ -55,9 +53,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         self._fulllist = not self._fulllist
         self.loadFiles()
         self.emit(SIGNAL('layoutChanged()'))
-
-    def load_config(self):
-        cfg = HgConfig(self.repo.ui)
 
     def setDiffWidth(self, w):
         if w != self.diffwidth:
