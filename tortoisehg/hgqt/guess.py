@@ -12,7 +12,7 @@ from mercurial import hg, ui, mdiff, cmdutil, util, error, similar
 from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, htmlui
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -99,6 +99,7 @@ class DetectRenameDialog(QDialog):
         self.matchlv.setItemsExpandable(False)
         self.matchlv.setRootIsDecorated(False)
         self.matchlv.setModel(MatchModel())
+        self.matchlv.clicked.connect(self.showDiff)
         buthbox = QHBoxLayout()
         matchbtn = QPushButton(_('Accept Selected Matches'))
         matchbtn.clicked.connect(self.acceptMatch)
@@ -116,6 +117,7 @@ class DetectRenameDialog(QDialog):
         difflabel = QLabel(_('<b>Differences from Source to Dest</b>'))
         diffvbox.addWidget(difflabel)
         difftb = QTextBrowser()
+        difftb.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         diffvbox.addWidget(difftb)
         self.difftb = difftb
 
@@ -198,27 +200,24 @@ class DetectRenameDialog(QDialog):
         self.matchAccepted.emit()
         self.refresh()
 
-    def showDiff(self):
+    def showDiff(self, index):
         'User selected a row in the candidate tree'
         hglib.invalidaterepo(self.repo)
         ctx = self.repo['.']
         hu = htmlui.htmlui()
-        for index in self.matchlv.selectedIndexes():
-            row = self.matchlv.model().getRow(index)
-            src, dest, percent = self.matchlv.model().getRow(index)
-            aa = self.repo.wread(dest)
-            rr = ctx.filectx(src).data()
-            opts = mdiff.defaultopts
-            difftext = mdiff.unidiff(rr, '', aa, '', src,
-                                     dest, None, opts=opts)
-            if not difftext:
-                t = _('%s and %s have identical contents\n\n') % (usrc, udest)
-                hu.write(t, label='ui.error')
-            else:
-                for t, l in qtlib.difflabel(difftext.splitlines, True):
-                    hu.write(t, label=l)
-            # for now, only show one at a time
-            break
+        row = self.matchlv.model().getRow(index)
+        src, dest, percent = self.matchlv.model().getRow(index)
+        aa = self.repo.wread(dest)
+        rr = ctx.filectx(src).data()
+        opts = mdiff.defaultopts
+        difftext = mdiff.unidiff(rr, '', aa, '', src,
+                                 dest, None, opts=opts)
+        if not difftext:
+            t = _('%s and %s have identical contents\n\n') % (src, dest)
+            hu.write(t, label='ui.error')
+        else:
+            for t, l in qtlib.difflabel(difftext.splitlines, True):
+                hu.write(t, label=l)
         self.difftb.setHtml(hu.getdata()[0])
 
     def accept(self):
@@ -229,12 +228,18 @@ class DetectRenameDialog(QDialog):
         QDialog.accept(self)
 
     def reject(self):
-        # cancel active thread
-        s = QSettings()
-        s.setValue('guess/geom', self.saveGeometry())
-        s.setValue('guess/vsplit-state', self.vsplit.saveState())
-        s.setValue('guess/hsplit-state', self.hsplit.saveState())
-        QDialog.reject(self)
+        if self.thread and self.thread.isRunning():
+            self.thread.terminate()
+            # This can lockup, so stop waiting after 2sec
+            self.thread.wait( 2000 )
+            self.finished()
+            self.thread = None
+        else:
+            s = QSettings()
+            s.setValue('guess/geom', self.saveGeometry())
+            s.setValue('guess/vsplit-state', self.vsplit.saveState())
+            s.setValue('guess/hsplit-state', self.hsplit.saveState())
+            QDialog.reject(self)
 
 
 class MatchModel(QAbstractTableModel):
