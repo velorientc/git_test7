@@ -517,6 +517,16 @@ class SettingsDialog(QDialog):
         return self.conftabs.currentWidget()
 
     def refresh(self, *args):
+        if self.confcombo.currentIndex() == CONF_REPO:
+            repo = hg.repository(ui.ui(), self.root)
+            name = hglib.get_reponame(repo)
+            self.setWindowTitle(_('TortoiseHg Configure Repository - ') + \
+                           hglib.tounicode(name))
+            #set_tortoise_icon(self, 'settings_repo.ico')
+        else:
+            self.setWindowTitle(_('TortoiseHg Configure User-Global Settings'))
+            #set_tortoise_icon(self, 'settings_user.ico')
+
         return self.settingsform.refresh()  # FIXME
 
     def isDirty(self):
@@ -618,15 +628,9 @@ class SettingsForm(QWidget):
         # determine target config file
         if self.confcombo.currentIndex() == CONF_REPO:
             repo = hg.repository(ui.ui(), self.root)
-            name = hglib.get_reponame(repo)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.setWindowTitle(_('TortoiseHg Configure Repository - ') + \
-                           hglib.tounicode(name))
-            #set_tortoise_icon(self, 'settings_repo.ico')
         else:
             self.rcpath = util.user_rcpath()
-            self.setWindowTitle(_('TortoiseHg Configure User-Global Settings'))
-            #set_tortoise_icon(self, 'settings_user.ico')
 
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
