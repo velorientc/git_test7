@@ -280,7 +280,7 @@ class ArchiveDialog(QDialog):
         cmdline.append(type)
         if self.files_in_rev_chk.isChecked():
             ctx = self.repo[rev]
-            for f in ctx.added() + ctx.removed():
+            for f in ctx.files():
                 cmdline.append('-I')
                 cmdline.append(f)
         cmdline.append('--')
