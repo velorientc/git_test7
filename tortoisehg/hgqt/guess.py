@@ -97,6 +97,7 @@ class DetectRenameDialog(QDialog):
         matchlbl = QLabel(_('<b>Candidate Matches</b>'))
         matchvbox.addWidget(matchlbl)
         self.matchlv = QTreeView()
+        self.matchlv.setSelectionMode(QTreeView.ExtendedSelection)
         self.matchlv.setItemsExpandable(False)
         self.matchlv.setRootIsDecorated(False)
         self.model = MatchModel()
@@ -228,17 +229,20 @@ class DetectRenameDialog(QDialog):
 
     def acceptMatch(self):
         'User pressed "accept match" button'
-        hglib.invalidaterepo(self.repo)
-        remdests = []
-        for index in self.matchlv.selectedIndexes():
+        remdests = {}
+        for index in self.matchlv.selectionModel().selectedRows():
             src, dest, percent = self.matchlv.model().getRow(index)
+            if dest in remdests:
+                QMessageBox.warning(self, _('Multiple sources chosen'),
+                    _('You have multiple renames selected for '
+                      'destination file:\n%s. Aborting!') % dest)
+                return
+            remdests[dest] = src
+        for dest, src in remdests.iteritems():
             if not os.path.exists(self.repo.wjoin(src)):
-                # Mark missing rename source as removed
-                self.repo.remove([src])
+                self.repo.remove([src]) # !->R
             self.repo.copy(src, dest)
             shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
-            remdests.append(dest)
-        for dest in remdests:
             self.matchlv.model().remove(dest)
         self.matchAccepted.emit()
         self.refresh()
