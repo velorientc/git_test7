@@ -229,6 +229,7 @@ class DetectRenameDialog(QDialog):
     def acceptMatch(self):
         'User pressed "accept match" button'
         hglib.invalidaterepo(self.repo)
+        remdests = []
         for index in self.matchlv.selectedIndexes():
             src, dest, percent = self.matchlv.model().getRow(index)
             if not os.path.exists(self.repo.wjoin(src)):
@@ -236,10 +237,9 @@ class DetectRenameDialog(QDialog):
                 self.repo.remove([src])
             self.repo.copy(src, dest)
             shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
-            # Mark all rows with this target file as non-sensitive
-            #for row in self.matchlv.model().getRows():
-            #    if row[1] == dest:
-            #        row[5] = False
+            remdests.append(dest)
+        for dest in remdests:
+            self.matchlv.model().remove(dest)
         self.matchAccepted.emit()
         self.refresh()
 
@@ -342,6 +342,17 @@ class MatchModel(QAbstractTableModel):
         self.beginRemoveRows(QModelIndex(), 0, len(self.rows)-1)
         self.rows = []
         self.endRemoveRows()
+        self.emit(SIGNAL("dataChanged()"))
+
+    def remove(self, dest):
+        i = 0
+        while i < len(self.rows):
+            if self.rows[i][1] == dest:
+                self.beginRemoveRows(QModelIndex(), i, i)
+                self.rows.pop(i)
+                self.endRemoveRows()
+            else:
+                i += 1
         self.emit(SIGNAL("dataChanged()"))
 
     def sort(self, col, order):
