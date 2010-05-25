@@ -67,10 +67,13 @@ class CloneDialog(QDialog):
         grid.addWidget(self.dest_btn, 1, 2)
 
         ### options
+        expander = qtlib.ExpanderLabel(_('Options'), False)
+        expander.expanded.connect(self.show_options)
+        grid.addWidget(expander, 2, 0, Qt.AlignLeft | Qt.AlignTop)
+
+        ### options
         optbox = QVBoxLayout()
         optbox.setSpacing(6)
-        self.optlabel = QLabel(_('Options:'))
-        grid.addWidget(self.optlabel, 2, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, 2, 1, 1, 2)
 
         hbox = QHBoxLayout()
@@ -126,11 +129,6 @@ class CloneDialog(QDialog):
         self.detail_btn.setAutoDefault(False)
         self.detail_btn.setCheckable(True)
         self.detail_btn.toggled.connect(self.detail_toggled)
-        self.options_btn = buttons.addButton(_('Options'),
-                                             QDialogButtonBox.ResetRole)
-        self.options_btn.setAutoDefault(False)
-        self.options_btn.setCheckable(True)
-        self.options_btn.toggled.connect(self.show_options)
         box.addWidget(buttons)
 
         # dialog setting
@@ -159,7 +157,6 @@ class CloneDialog(QDialog):
     ### Private Methods ###
 
     def show_options(self, visible):
-        self.optlabel.setVisible(visible)
         self.rev_chk.setVisible(visible)
         self.rev_text.setVisible(visible)
         self.noupdate_chk.setVisible(visible)
