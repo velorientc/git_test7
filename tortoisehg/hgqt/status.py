@@ -11,6 +11,7 @@ from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
 from mercurial import context, merge, commands, subrepo
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
 from tortoisehg.util import paths, hglib
+from tortoisehg.util.util import xml_escape
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
@@ -172,14 +173,16 @@ class StatusWidget(QWidget):
         hbox.addStretch()
 
         self.override = QCheckBox()
+        self.override.hide()
         self.override.setText(_('Show Contents'))
         self.override.setCheckable(True)
-        self.override.setEnabled(False)
         self.override.toggled.connect(self.refreshDiff)
         hbox.addWidget(self.override)
         hbox.addSpacing(6)
 
-        self.te = QTextEdit()
+        self.te = QTextBrowser()
+        self.te.setOpenLinks(False)
+        self.connect(self.te, SIGNAL('anchorClicked(QUrl)'), self.teLinkClicked)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.te.setReadOnly(True)
         self.te.setLineWrapMode(QTextEdit.NoWrap)
@@ -189,6 +192,9 @@ class StatusWidget(QWidget):
         self.split = split
         self.diffvbox = vbox
         QTimer.singleShot(0, self.refreshWctx)
+
+    def teLinkClicked(self, url):
+        self.override.setChecked(True)
 
     def getTitle(self):
         if self.pats:
@@ -309,6 +315,7 @@ class StatusWidget(QWidget):
         showanyway = self.override.isChecked()
         hu = htmlui.htmlui()
 
+        show = '&nbsp;&nbsp;(<a href="cmd:show">%s</a>)' % _('show anyway')
         if status in '?I':
             if showanyway:
                 # Read untracked file contents from working directory
@@ -320,11 +327,11 @@ class StatusWidget(QWidget):
                     diff = _('<b>Contents are binary, not previewable</b>')
                     self.te.setHtml(diff)
                 else:
-                    self.te.setText(diff)
+                    diff = '<pre>%s</pre>' % xml_escape(diff)
+                    self.te.setHtml(diff)
             else:
-                diff = _('<b>Not displayed</b>')
+                diff = _('<b>Not displayed</b>') + show
                 self.te.setHtml(diff)
-                self.override.setEnabled(True)
             return
         elif status in '!C':
             if showanyway:
@@ -337,9 +344,8 @@ class StatusWidget(QWidget):
                 else:
                     self.te.setText(diff)
             else:
-                diff = _('<b>Not displayed</b>')
+                diff = _('<b>Not displayed</b>') + show
                 self.te.setHtml(diff)
-                self.override.setEnabled(True)
             return
         elif status in 'S':
             if showanyway:
@@ -367,19 +373,16 @@ class StatusWidget(QWidget):
                 except error.RepoError:
                     diff = _('<b>Not an hg subrepo, not previewable</b>')
             else:
-                diff = _('<b>Subrepository status not displayed</b>')
+                diff = _('<b>Subrepository status not displayed</b>') + show
             self.te.setHtml(diff)
-            self.override.setEnabled(True)
             return
 
         warnings = chunkselect.check_max_diff(self.wctx, wfile)
         if warnings and not showanyway:
-            text = '<b>Diffs not displayed: %s</b>' % warnings[1]
+            text = '<b>Diffs not displayed: %s</b>' % warnings[1] + show
             self.te.setHtml(text)
-            self.override.setEnabled(True)
             return
 
-        self.override.setEnabled(False)
         self.override.setChecked(True)
 
         # Generate diffs to first parent
