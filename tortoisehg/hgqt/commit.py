@@ -42,7 +42,7 @@ class CommitWidget(QWidget):
     errorMessage = pyqtSignal(QString)
     commitComplete = pyqtSignal()
 
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, pats, opts, root=None, parent=None, hidebutton=False):
         QWidget.__init__(self, parent)
 
         self.opts = opts # user, date
@@ -76,9 +76,21 @@ class CommitWidget(QWidget):
         except util.Abort:
             pass
 
+        b = QPushButton(_('Commit'))
+        if hidebutton:
+            b.hide()
+        w = QWidget()
+        l = QHBoxLayout()
+        l.setMargin(0)
+        w.setLayout(l)
+        l.addWidget(QLabel(_('Working Copy')))
+        l.addStretch(1)
+        l.addWidget(b)
+        b.clicked.connect(self.commit)
+
         def addrow(s, w):
             form.addRow("<b>%s</b>" % s, w)
-        addrow(('Changeset:'), QLabel(_('Working Copy')))
+        addrow(('Changeset:'), w)
         for ctx in repo.parents():
             desc = format_desc(ctx.description(), 80)
             fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
@@ -393,7 +405,7 @@ class CommitDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        commit = CommitWidget(pats, opts, None, self)
+        commit = CommitWidget(pats, opts, None, self, hidebutton=True)
         layout.addWidget(commit, 1)
         layout.setContentsMargins(0, 6, 0, 0)
 
