@@ -12,8 +12,8 @@ import urlparse
 
 from mercurial import hg, ui, util, url, filemerge, error, extensions
 
-from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
 from PyQt4.QtCore import *
