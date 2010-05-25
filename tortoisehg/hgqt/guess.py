@@ -35,8 +35,6 @@ class DetectRenameDialog(QDialog):
 
         reponame = hglib.get_reponame(repo)
         self.setWindowTitle(_('Detect Copies/Renames in %s') % reponame)
-        s = QSettings()
-        self.restoreGeometry(s.value('guess/geom').toByteArray())
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -125,6 +123,8 @@ class DetectRenameDialog(QDialog):
         self.pmon.hide()
         layout.addWidget(self.pmon)
 
+        s = QSettings()
+        self.restoreGeometry(s.value('guess/geom').toByteArray())
         hsplit.restoreState(s.value('guess/hsplit-state').toByteArray())
         vsplit.restoreState(s.value('guess/vsplit-state').toByteArray())
         slider.setValue(s.value('guess/simslider').toInt()[0])
