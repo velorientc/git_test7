@@ -17,9 +17,6 @@ from tortoisehg.hgqt import qtlib, htmlui, cmdui
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-# Technical Debt
-#  Disable buttons when lists are empty
-
 class DetectRenameDialog(QDialog):
     'Detect renames after they occur'
 
@@ -83,11 +80,15 @@ class DetectRenameDialog(QDialog):
         copycheck.setChecked(True)
         findrenames = QPushButton(_('Find Rename'))
         findrenames.setToolTip(_('Find copy and/or rename sources'))
+        findrenames.setEnabled(False)
         findrenames.clicked.connect(self.findRenames)
         buthbox.addWidget(copycheck)
         buthbox.addStretch(1)
         buthbox.addWidget(findrenames)
         self.findbtn, self.copycheck = findrenames, copycheck
+        def itemselect():
+            self.findbtn.setEnabled(len(self.unrevlist.selectedItems()))
+        self.unrevlist.itemSelectionChanged.connect(itemselect)
 
         matchlbl = QLabel(_('<b>Candidate Matches</b>'))
         matchvbox.addWidget(matchlbl)
@@ -101,12 +102,16 @@ class DetectRenameDialog(QDialog):
         matchbtn = QPushButton(_('Accept Selected Matches'))
         matchbtn.clicked.connect(self.acceptMatch)
         matchbtn.setEnabled(False)
-        self.matchbtn = matchbtn
         buthbox.addStretch(1)
         buthbox.addWidget(matchbtn)
         matchvbox.addWidget(matchtv)
         matchvbox.addLayout(buthbox)
-        self.matchtv = matchtv
+        self.matchtv, self.matchbtn = matchtv, matchbtn
+        def matchselect(s, d):
+            count = len(matchtv.selectedIndexes())
+            self.matchbtn.setEnabled(count > 0)
+        selmodel = matchtv.selectionModel()
+        selmodel.selectionChanged.connect(matchselect)
 
         diffframe = QFrame(hsplit)
         diffvbox = QVBoxLayout()
@@ -168,7 +173,6 @@ class DetectRenameDialog(QDialog):
         pct = self.simslider.value() / 100.0
         copies = not self.copycheck.isChecked()
         self.findbtn.setEnabled(False)
-        self.matchbtn.setEnabled(False)
         self.errorstr = None
 
         self.matchtv.model().clear()
@@ -187,8 +191,7 @@ class DetectRenameDialog(QDialog):
             self.pmon.hide()
         for col in xrange(3):
             self.matchtv.resizeColumnToContents(col)
-        self.findbtn.setEnabled(True)
-        self.matchbtn.setDisabled(self.matchtv.model().isEmpty())
+        self.findbtn.setEnabled(len(self.unrevlist.selectedItems()))
 
     def rowReceived(self, args):
         self.matchtv.model().appendRow(*args)
