@@ -367,6 +367,11 @@ def email(ui, *pats, **opts):
     from tortoisehg.hgqt.hgemail import run
     qtrun(run, ui, *pats, **opts)
 
+def guess(ui, *pats, **opts):
+    """guess previous renames or copies"""
+    from tortoisehg.hgqt.guess import run
+    qtrun(run, ui, *pats, **opts)
+
 def status(ui, *pats, **opts):
     """browse working copy status"""
     from tortoisehg.hgqt.status import run
@@ -669,6 +674,7 @@ table = {
          ('d', 'date', '', _('record datecode as commit date'))],
         _('thg commit [OPTIONS] [FILE]...')),
     "^grep|search": (grep, [], _('thg grep')),
+    "^guess": (guess, [], _('thg guess')),
     "^hgignore|ignore|filter": (hgignore, [], _('thg hgignore [FILE]')),
     "^email":
         (email,
