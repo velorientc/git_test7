@@ -20,9 +20,6 @@ from tortoisehg.hgqt import qtlib
 
 # Technical Debt:
 #  Labels for list widgets
-#  'del' and 'backspace' to delete lines of hgignore file
-#  clicking on an unknown should setup a glob for it
-#  right click on an unknown should offer extension & dir globs
 
 class HgignoreDialog(QDialog):
     'Edit a reposiory .hgignore file'
@@ -87,6 +84,11 @@ class HgignoreDialog(QDialog):
 
         ignorelist = QListWidget(split)
         unknownlist = QListWidget(split)
+        unknownlist.currentTextChanged.connect(self.setGlobFilter)
+        unknownlist.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.connect(unknownlist,
+                     SIGNAL('customContextMenuRequested(const QPoint &)'),
+                     self.customContextMenuRequested)
 
         # layer 4 - dialog buttons
         BB = QDialogButtonBox
@@ -99,11 +101,56 @@ class HgignoreDialog(QDialog):
         le.setFocus()
         self.le, self.recombo, self.filecombo = le, recombo, filecombo
         self.ignorelist, self.unknownlist = ignorelist, unknownlist
+        ignorelist.installEventFilter(self)
         QTimer.singleShot(0, self.refresh)
 
         s = QSettings()
         self.restoreGeometry(s.value('hgignore/geom').toByteArray())
 
+    def eventFilter(self, obj, event):
+        if obj != self.ignorelist:
+            return False
+        if event.type() != QEvent.KeyPress:
+            return False
+        elif event.key() not in (Qt.Key_Backspace, Qt.Key_Delete):
+            return False
+        row = obj.currentRow()
+        if row < 0:
+            return False
+        self.ignorelines.pop(row)
+        self.writeIgnoreFile()
+        self.refresh()
+        return True
+
+    def customContextMenuRequested(self, point):
+        'context menu request for unknown list'
+        def trigger(text):
+            self.ignorelines.append('glob:'+text)
+            self.writeIgnoreFile()
+            self.refresh()
+        point = self.unknownlist.mapToGlobal(point)
+        local = self.lclunknowns[self.unknownlist.currentRow()]
+        menu = QMenu(self)
+        menu.setTitle(_('Add ignore filter...'))
+        filters = [local]
+        base, ext = os.path.splitext(local)
+        if ext:
+            filters.append('*'+ext)
+        dirname = os.path.dirname(local)
+        while dirname:
+            filters.append(dirname)
+            dirname = os.path.dirname(dirname)
+        for f in filters:
+            action = menu.addAction(_('Ignore ') + hglib.tounicode(f))
+            action.localtext = f
+            action.wrapper = lambda f=f: trigger(f)
+            self.connect(action, SIGNAL('triggered()'), action.wrapper)
+        menu.exec_(point)
+
+    def setGlobFilter(self, qstr):
+        'user selected an unknown file; prep a glob filter'
+        self.recombo.setCurrentIndex(0)
+        self.le.setText(qstr)
 
     def fileselect(self):
         'user selected another ignore file'
@@ -150,9 +197,9 @@ class HgignoreDialog(QDialog):
             qtlib.WarningMsgBox(_('Unable to read repository status'),
                                 uni(str(e)), parent=self)
 
-        self.unknown = wctx.unknown()
+        self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
-        self.unknownlist.addItems([uni(u) for u in self.unknown])
+        self.unknownlist.addItems([uni(u) for u in self.lclunknowns])
 
         try:
             l = open(self.ignorefile, 'rb').readlines()
