@@ -35,7 +35,6 @@ class HgFileListView(QtGui.QTableView):
         self.verticalHeader().setDefaultSectionSize(20)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.setAlternatingRowColors(True)
         self.setTextElideMode(Qt.ElideLeft)
 
         self.horizontalHeader().setToolTip('Double click to toggle merge mode')
