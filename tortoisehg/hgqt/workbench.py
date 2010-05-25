@@ -265,13 +265,14 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def createActions(self):
         # main window actions (from .ui file)
-        connect(self.actionRefresh, SIGNAL('triggered()'), self.reload)
-        connect(self.actionAbout, SIGNAL('triggered()'), self.on_about)
-        connect(self.actionQuit, SIGNAL('triggered()'), self.close)
-        connect(self.actionBack, SIGNAL('triggered()'), self.back)
-        connect(self.actionForward, SIGNAL('triggered()'), self.forward)
-        connect(self.actionShowPaths, SIGNAL('toggled(bool)'), self.actionShowPathsToggled)
+        self.actionRefresh.triggered.connect(self.reload)
+        self.actionAbout.triggered.connect(self.on_about)
+        self.actionQuit.triggered.connect(self.close)
+        self.actionBack.triggered.connect(self.back)
+        self.actionForward.triggered.connect(self.forward)
+        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
+
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
 
