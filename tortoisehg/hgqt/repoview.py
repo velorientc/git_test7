@@ -73,7 +73,6 @@ class HgRepoView(QtGui.QTableView):
         self.verticalHeader().setDefaultSectionSize(20)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.setAlternatingRowColors(True)
 
         self.createActions()
         self.createToolbars()
