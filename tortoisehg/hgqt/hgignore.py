@@ -171,7 +171,7 @@ class HgignoreDialog(QDialog):
 
     def fileselect(self):
         'user selected another ignore file'
-        self.ignorefile = hglib.fromunicode(self.filecombo.getCurrentText())
+        self.ignorefile = hglib.fromunicode(self.filecombo.currentText())
         self.refresh()
 
     def editClicked(self):
