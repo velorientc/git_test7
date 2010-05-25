@@ -76,7 +76,7 @@ class CommitWidget(QWidget):
         except util.Abort:
             pass
 
-        b = QPushButton(_('Commit'))
+        self.commitButton = b = QPushButton(_('Commit'))
         if hidebutton:
             b.hide()
         w = QWidget()
@@ -119,6 +119,7 @@ class CommitWidget(QWidget):
         hbox.addSpacing(9)
         vbox.addLayout(hbox, 0)
         msgte = QTextEdit()
+        msgte.textChanged.connect(self.msgChanged)
         msgte.setAcceptRichText(False)
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
@@ -145,6 +146,10 @@ class CommitWidget(QWidget):
         self.usercombo = usercombo
         self.msgte = msgte
         self.msgcombo = msgcombo
+
+    def msgChanged(self):
+        self.commitButton.setEnabled(
+            not self.msgte.toPlainText().isEmpty())
 
     def restoreState(self, data):
         return self.stwidget.restoreState(data)
