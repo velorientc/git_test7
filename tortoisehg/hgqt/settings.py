@@ -473,9 +473,17 @@ class SettingsDialog(QDialog):
         self.settings = s
         self.restoreGeometry(s.value('settings/geom').toByteArray())
 
-        # FIXME: use tab widget
-        self.settingsform = SettingsForm(focus=focus, parent=self)
-        layout.addWidget(self.settingsform)
+        self.conftabs = QTabWidget()
+        layout.addWidget(self.conftabs)
+        self.conftabs.addTab(SettingsForm(focus=focus, parent=self),
+                             _('User global settings'))
+        if repo:
+            self.conftabs.addTab(SettingsForm(focus=focus, parent=self),
+                                 _('%s repository settings') % hglib.tounicode(name))
+
+        # FIXME: workaround to sync tabs with combo; remove this later
+        self.confcombo.currentIndexChanged.connect(self.conftabs.setCurrentIndex)
+        self.conftabs.currentChanged.connect(self.confcombo.setCurrentIndex)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -503,6 +511,10 @@ class SettingsDialog(QDialog):
             elif ret == 0:
                 self.applyChanges()
         self.refresh()
+
+    @property
+    def settingsform(self):  # FIXME: temporarily added; remove this later
+        return self.conftabs.currentWidget()
 
     def refresh(self, *args):
         return self.settingsform.refresh()  # FIXME
