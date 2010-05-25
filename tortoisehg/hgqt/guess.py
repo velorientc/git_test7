@@ -173,7 +173,7 @@ class DetectRenameDialog(QDialog):
             self.findbtn.setEnabled(True)
             self.matchbtn.setDisabled(model.isEmpty())
 
-        pct = self.simslider.value() / 100
+        pct = self.simslider.value() / 100.0
         copies = not self.copycheck.isChecked()
         model = self.matchlv.model()
         model.clear()
@@ -359,9 +359,12 @@ class RenameSearchThread(QThread):
         # do not consider files of zero length
         added = sorted([fctx for fctx in added if fctx.size() > 0])
         removed = sorted([fctx for fctx in removed if fctx.size() > 0])
+        exacts = []
         for o, n in similar._findexactmatches(repo, added, removed):
             old, new = o.path(), n.path()
+            exacts.append(old)
             self.match.emit(old, new, '100%')
+        removed = [r for r in removed if r.path() not in exacts]
         if self.minpct < 1.0:
             for o, n, s in similar._findsimilarmatches(repo, added, removed,
                                                        self.minpct):
