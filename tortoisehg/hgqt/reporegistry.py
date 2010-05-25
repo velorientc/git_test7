@@ -13,7 +13,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT
 from PyQt4.QtCore import QModelIndex, QString
 
-from PyQt4.QtGui import QWidget, QVBoxLayout
+from PyQt4.QtGui import QVBoxLayout, QDockWidget, QFrame
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import icon as geticon
@@ -345,8 +345,6 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
     def headerData(self, section, orientation, role):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
-                if section == 0:
-                    return QString(_('Repositories'))
                 if section == 1:
                     return QString(_('Path'))
         return QVariant()
@@ -518,16 +516,23 @@ class RepoTreeView(QtGui.QTreeView):
         m.removeRows(row, 1, parent)
 
 
-class RepoRegistryView(QWidget):
+class RepoRegistryView(QDockWidget):
 
     openRepoSignal = QtCore.pyqtSignal(QtCore.QString)
 
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+    def __init__(self, parent):
+        QDockWidget.__init__(self, parent)
 
+        self.setFeatures(QDockWidget.DockWidgetClosable |
+                         QDockWidget.DockWidgetMovable  |
+                         QDockWidget.DockWidgetFloatable)
+        self.setWindowTitle(_('Repositories'))
+
+        mainframe = QFrame()
         lay = QVBoxLayout()
         lay.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(lay)
+        mainframe.setLayout(lay)
+        self.setWidget(mainframe)
 
         self.tmodel = m = RepoTreeModel(settingsfilename())
 

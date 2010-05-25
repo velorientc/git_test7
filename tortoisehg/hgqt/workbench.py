@@ -29,6 +29,7 @@ from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.commit import CommitWidget
+from tortoisehg.hgqt.reporegistry import RepoRegistryView
 
 from tortoisehg.util import paths
 
@@ -66,6 +67,13 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
         self.setWindowTitle('TortoiseHg Workbench')
 
+        self.reporegistry = rr = RepoRegistryView(self)
+        rr.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        rr.setObjectName('RepoRegistryView')
+        self.addDockWidget(Qt.LeftDockWidgetArea, rr)
+
+        rr.openRepoSignal.connect(self.openRepo)
+
         if repo:
             self.addRepoTab(repo)
 
@@ -78,14 +86,13 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.createToolbars()
 
         self.repoTabChanged()
-
         self.setupBranchCombo()
-
         self.restoreSettings()
-
         self.setAcceptDrops(True)
+        self.showRepoRegistry()
 
-        self.reporegistry.openRepoSignal.connect(self.openRepo)
+    def showRepoRegistry(self):
+        self.reporegistry.show()
 
     def openRepo(self, repopath):
         repo = hg.repository(self.ui, path=str(repopath))
@@ -478,7 +485,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.restoreState(s.value(wb + 'windowState').toByteArray())
 
         self.splitternames = []
-        sn = ('reporegistry', 'repotabs')
+        sn = ('repotabs', )
         for n in sn:
             n += '_splitter'
             self.splitternames.append(n)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\adi\hgrepos\thg-qt\tortoisehg\hgqt\workbench.ui'
 #
-# Created: Mon May 24 11:13:32 2010
+# Created: Tue May 25 20:34:59 2010
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,32 +18,11 @@ class Ui_MainWindow(object):
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout_2 = QtGui.QVBoxLayout(self.centralwidget)
-        self.verticalLayout_2.setMargin(0)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.reporegistry_splitter = QtGui.QSplitter(self.centralwidget)
-        self.reporegistry_splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.reporegistry_splitter.setObjectName("reporegistry_splitter")
-        self.reporegistry = RepoRegistryView(self.reporegistry_splitter)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.reporegistry.sizePolicy().hasHeightForWidth())
-        self.reporegistry.setSizePolicy(sizePolicy)
-        self.reporegistry.setObjectName("reporegistry")
-        self.repoframe = QtGui.QFrame(self.reporegistry_splitter)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.repoframe.sizePolicy().hasHeightForWidth())
-        self.repoframe.setSizePolicy(sizePolicy)
-        self.repoframe.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.repoframe.setFrameShadow(QtGui.QFrame.Raised)
-        self.repoframe.setObjectName("repoframe")
-        self.verticalLayout = QtGui.QVBoxLayout(self.repoframe)
+        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setSpacing(0)
         self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.repotabs_splitter = QtGui.QSplitter(self.repoframe)
+        self.repotabs_splitter = QtGui.QSplitter(self.centralwidget)
         self.repotabs_splitter.setOrientation(QtCore.Qt.Vertical)
         self.repotabs_splitter.setObjectName("repotabs_splitter")
         self.repoTabsWidget = QtGui.QTabWidget(self.repotabs_splitter)
@@ -62,7 +41,6 @@ class Ui_MainWindow(object):
         self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
         self.stackedWidget.setObjectName("stackedWidget")
         self.verticalLayout.addWidget(self.repotabs_splitter)
-        self.verticalLayout_2.addWidget(self.reporegistry_splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 685, 19))
@@ -162,5 +140,4 @@ class Ui_MainWindow(object):
         self.actionForward.setText(QtGui.QApplication.translate("MainWindow", "Forward", None, QtGui.QApplication.UnicodeUTF8))
         self.actionShowPaths.setText(QtGui.QApplication.translate("MainWindow", "Show paths", None, QtGui.QApplication.UnicodeUTF8))
 
-from reporegistry import RepoRegistryView
 import workbench_rc
