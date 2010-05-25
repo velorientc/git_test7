@@ -12,14 +12,12 @@ from mercurial import hg, ui, mdiff, cmdutil, util, error, similar
 from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, htmlui
+from tortoisehg.hgqt import qtlib, htmlui, cmdui
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Technical Debt
-#  Add a progress/status bar, connect to thread errors
-#  Give simularity routines a repo.ui that catches progress reports
 #  Disable buttons when lists are empty
 
 class DetectRenameDialog(QDialog):
@@ -101,7 +99,8 @@ class DetectRenameDialog(QDialog):
         self.matchlv = QTreeView()
         self.matchlv.setItemsExpandable(False)
         self.matchlv.setRootIsDecorated(False)
-        self.matchlv.setModel(MatchModel())
+        self.model = MatchModel()
+        self.matchlv.setModel(self.model)
         self.matchlv.clicked.connect(self.showDiff)
         buthbox = QHBoxLayout()
         matchbtn = QPushButton(_('Accept Selected Matches'))
@@ -124,12 +123,9 @@ class DetectRenameDialog(QDialog):
         diffvbox.addWidget(difftb)
         self.difftb = difftb
 
-        BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Close)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
-        layout.addWidget(bb)
-        self.bb = bb
+        self.pmon = cmdui.ProgressMonitor()
+        self.pmon.hide()
+        layout.addWidget(self.pmon)
 
         self.vsplit, self.hsplit = vsplit, hsplit
         QTimer.singleShot(0, self.refresh)
@@ -152,6 +148,7 @@ class DetectRenameDialog(QDialog):
             self.unrevlist.setItemSelected(item, x in self.pats)
         self.difftb.clear()
         self.pats = []
+        self.pmon.clear_progress()
 
     def findRenames(self):
         'User pressed "find renames" button'
@@ -169,29 +166,70 @@ class DetectRenameDialog(QDialog):
 
         pct = self.simslider.value() / 100.0
         copies = not self.copycheck.isChecked()
-        model = self.matchlv.model()
-        model.clear()
         self.findbtn.setEnabled(False)
         self.matchbtn.setEnabled(False)
+        self.errorstr = None
 
+        self.matchlv.model().clear()
         self.thread = RenameSearchThread(self.repo, ulist, pct, copies)
-        self.thread.match.connect(model.appendRow)
-        #self.thread.error.connect(print)
-        #self.thread.progress.connect(print)
+        self.connect(self.thread, SIGNAL('match'), self.rowReceived)
+        self.connect(self.thread, SIGNAL('progress'), self.progressReceived)
+        self.connect(self.thread, SIGNAL('error'), self.errorReceived)
         self.thread.searchComplete.connect(self.finished)
         self.thread.start()
 
     def finished(self):
+        self.pmon.fillup_progress()
+        if self.errorstr:
+            self.pmon.set_text(self.errorstr)
+        else:
+            self.pmon.hide()
         for col in xrange(3):
             self.matchlv.resizeColumnToContents(col)
         self.findbtn.setEnabled(True)
-        self.matchbtn.setDisabled(model.isEmpty())
+        self.matchbtn.setDisabled(self.matchlv.model().isEmpty())
+
+    def rowReceived(self, args):
+        self.matchlv.model().appendRow(*args)
+
+    def errorReceived(self, qstr):
+        self.errorstr = qstr
+        self.pmon.set_text(qstr)
+
+    def progressReceived(self, data):
+        if self.thread.isFinished():
+            return
+        self.pmon.show()
+        counting = False
+        topic, item, pos, total, unit = data
+        if pos is None:
+            self.pmon.clear_progress()
+            return
+        if total is None:
+            count = '%d' % pos
+            counting = True
+        else:
+            self.pmon.pbar.setMaximum(total)
+            self.pmon.pbar.setValue(pos)
+            count = '%d / %d' % (pos, total)
+        if unit:
+            count += ' ' + unit
+        self.pmon.prog_label.setText(hglib.tounicode(count))
+        if item:
+            status = '%s: %s' % (topic, item)
+        else:
+            status = _('Status: %s') % topic
+        self.pmon.status_label.setText(hglib.tounicode(status))
+        self.pmon.inprogress = True
+
+        if not self.pmon.inprogress or counting:
+            # use indeterminate mode
+            self.pmon.pbar.setMinimum(0)
 
     def acceptMatch(self):
         'User pressed "accept match" button'
         hglib.invalidaterepo(self.repo)
-        sel = self.matchlv.selectionModel()
-        for index in sel.selectedIndexes():
+        for index in self.matchlv.selectedIndexes():
             src, dest, percent = self.matchlv.model().getRow(index)
             if not os.path.exists(self.repo.wjoin(src)):
                 # Mark missing rename source as removed
@@ -296,8 +334,7 @@ class MatchModel(QAbstractTableModel):
 
     def appendRow(self, *args):
         self.beginInsertRows(QModelIndex(), len(self.rows), len(self.rows))
-        vals = [str(a) for a in args] # PyQt is upgrading to QString
-        self.rows.append(vals)
+        self.rows.append(args)
         self.endInsertRows()
         self.emit(SIGNAL("dataChanged()"))
 
@@ -324,9 +361,6 @@ class MatchModel(QAbstractTableModel):
 
 class RenameSearchThread(QThread):
     '''Background thread for searching repository history'''
-    match = pyqtSignal(str, str, str)
-    error = pyqtSignal(QString)
-    progress = pyqtSignal()
     searchComplete = pyqtSignal()
 
     def __init__(self, repo, ufiles, minpct, copies):
@@ -337,12 +371,33 @@ class RenameSearchThread(QThread):
         self.copies = copies
 
     def run(self):
+        class ProgUi(ui.ui):
+            def __init__(self, src=None):
+                super(ProgUi, self).__init__(src)
+                self.setconfig('ui', 'interactive', 'off')
+                self.setconfig('progress', 'disable', 'True')
+                os.environ['TERM'] = 'dumb'
+                if src:
+                    self.sig = src.sig
+                else:
+                    self.sig = QObject() # dummy object to emit signals
+            def progress(self, topic, pos, item='', unit='', total=None):
+                self.sig.emit(SIGNAL('progress'),
+                             [topic, item, pos, total, unit])
+        progui = ProgUi()
+        self.connect(progui.sig, SIGNAL('progress'), self.progress)
+        storeui = self.repo.ui
+        self.progui = progui
+        self.repo.ui = progui
         try:
             self.search(self.repo)
         except Exception, e:
-            self.error.emit(hglib.tounicode(str(e)))
-            print e
+            self.emit(SIGNAL('error'), hglib.tounicode(str(e)))
+        self.repo.ui = storeui
         self.searchComplete.emit()
+
+    def progress(self, wr):
+        self.emit(SIGNAL('progress'), wr)
 
     def search(self, repo):
         hglib.invalidaterepo(repo)
@@ -360,16 +415,18 @@ class RenameSearchThread(QThread):
         added = sorted([fctx for fctx in added if fctx.size() > 0])
         removed = sorted([fctx for fctx in removed if fctx.size() > 0])
         exacts = []
-        for o, n in similar._findexactmatches(repo, added, removed):
+        gen = similar._findexactmatches(repo, added, removed)
+        for o, n in gen:
             old, new = o.path(), n.path()
             exacts.append(old)
-            self.match.emit(old, new, '100%')
+            self.emit(SIGNAL('match'), [old, new, '100%'])
+        if self.minpct == 1.0:
+            return
         removed = [r for r in removed if r.path() not in exacts]
-        if self.minpct < 1.0:
-            for o, n, s in similar._findsimilarmatches(repo, added, removed,
-                                                       self.minpct):
-                old, new = o.path(), n.path()
-                self.match.emit(old, new, '%d%%' % (s*100))
+        gen = similar._findsimilarmatches(repo, added, removed, self.minpct)
+        for o, n, s in gen:
+            old, new, sim = o.path(), n.path(), '%d%%' % (s*100)
+            self.emit(SIGNAL('match'), [old, new, sim])
 
 def run(ui, *pats, **opts):
     return DetectRenameDialog(None, None, *pats)
