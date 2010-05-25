@@ -412,7 +412,7 @@ CONF_REPO   = 1
 class SettingsDialog(QDialog):
     'Dialog for editing Mercurial.ini or hgrc'
     def __init__(self, configrepo=False, focus=None, parent=None):
-        QDialog.__init__(self, parent=None)
+        QDialog.__init__(self, parent)
 
         self.ui = ui.ui()
         try:
