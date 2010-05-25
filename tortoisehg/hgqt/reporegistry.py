@@ -456,10 +456,6 @@ class RepoTreeView(QtGui.QTreeView):
         self.createActions()
 
     def contextMenuEvent(self, event):
-        selection = self.selectedIndexes()
-        if len(selection) == 0:
-            return
-        self.selitem = selection[0]
         menulist = self.selitem.internalPointer().menulist()
         if len(menulist) > 0:
             menu = QtGui.QMenu(self)
@@ -469,6 +465,16 @@ class RepoTreeView(QtGui.QTreeView):
                 else:
                     menu.addSeparator()
             menu.exec_(event.globalPos())
+
+    def mouseDoubleClickEvent(self, event):
+        self.open()
+
+    def selectionChanged(self, selected, deselected):
+        selection = self.selectedIndexes()
+        if len(selection) == 0:
+            self.selitem = None
+        else:
+            self.selitem = selection[0]       
 
     def _action_defs(self):
         a = [("open", _("Open"), None, 
@@ -502,6 +508,8 @@ class RepoTreeView(QtGui.QTreeView):
             self.addAction(act)
 
     def open(self):
+        if not self.selitem:
+            return
         self.parent.openrepo(self.selitem.internalPointer().rootpath())
 
     def newGroup(self):
@@ -509,6 +517,8 @@ class RepoTreeView(QtGui.QTreeView):
         m.addGroup(_('New Group'))
 
     def removeSelected(self):
+        if not self.selitem:
+            return
         m = self.model()
         s = self.selitem
         row = s.row()
