@@ -457,9 +457,10 @@ class SettingsDialog(QDialog):
                              _('User global settings'))
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
+            reponame = hglib.tounicode(os.path.basename(repo.root))
             self.conftabs.addTab(SettingsForm(rcpath=reporcpath,
                                               focus=focus, readonly=self.readonly),
-                                 _('%s repository settings') % hglib.tounicode(name))
+                                 _('%s repository settings') % reponame)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
