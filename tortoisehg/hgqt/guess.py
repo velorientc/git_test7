@@ -93,13 +93,12 @@ class DetectRenameDialog(QDialog):
 
         matchlbl = QLabel(_('<b>Candidate Matches</b>'))
         matchvbox.addWidget(matchlbl)
-        self.matchlv = QTreeView()
-        self.matchlv.setSelectionMode(QTreeView.ExtendedSelection)
-        self.matchlv.setItemsExpandable(False)
-        self.matchlv.setRootIsDecorated(False)
-        self.model = MatchModel()
-        self.matchlv.setModel(self.model)
-        self.matchlv.clicked.connect(self.showDiff)
+        matchtv = QTreeView()
+        matchtv.setSelectionMode(QTreeView.ExtendedSelection)
+        matchtv.setItemsExpandable(False)
+        matchtv.setRootIsDecorated(False)
+        matchtv.setModel(MatchModel())
+        matchtv.clicked.connect(self.showDiff)
         buthbox = QHBoxLayout()
         matchbtn = QPushButton(_('Accept Selected Matches'))
         matchbtn.clicked.connect(self.acceptMatch)
@@ -107,8 +106,9 @@ class DetectRenameDialog(QDialog):
         self.matchbtn = matchbtn
         buthbox.addStretch(1)
         buthbox.addWidget(matchbtn)
-        matchvbox.addWidget(self.matchlv)
+        matchvbox.addWidget(matchtv)
         matchvbox.addLayout(buthbox)
+        self.matchtv = matchtv
 
         diffframe = QFrame(hsplit)
         diffvbox = QVBoxLayout()
@@ -171,7 +171,7 @@ class DetectRenameDialog(QDialog):
         self.matchbtn.setEnabled(False)
         self.errorstr = None
 
-        self.matchlv.model().clear()
+        self.matchtv.model().clear()
         self.thread = RenameSearchThread(self.repo, ulist, pct, copies)
         self.connect(self.thread, SIGNAL('match'), self.rowReceived)
         self.connect(self.thread, SIGNAL('progress'), self.progressReceived)
@@ -186,12 +186,12 @@ class DetectRenameDialog(QDialog):
         else:
             self.pmon.hide()
         for col in xrange(3):
-            self.matchlv.resizeColumnToContents(col)
+            self.matchtv.resizeColumnToContents(col)
         self.findbtn.setEnabled(True)
-        self.matchbtn.setDisabled(self.matchlv.model().isEmpty())
+        self.matchbtn.setDisabled(self.matchtv.model().isEmpty())
 
     def rowReceived(self, args):
-        self.matchlv.model().appendRow(*args)
+        self.matchtv.model().appendRow(*args)
 
     def errorReceived(self, qstr):
         self.errorstr = qstr
@@ -230,8 +230,8 @@ class DetectRenameDialog(QDialog):
     def acceptMatch(self):
         'User pressed "accept match" button'
         remdests = {}
-        for index in self.matchlv.selectionModel().selectedRows():
-            src, dest, percent = self.matchlv.model().getRow(index)
+        for index in self.matchtv.selectionModel().selectedRows():
+            src, dest, percent = self.matchtv.model().getRow(index)
             if dest in remdests:
                 QMessageBox.warning(self, _('Multiple sources chosen'),
                     _('You have multiple renames selected for '
@@ -243,7 +243,7 @@ class DetectRenameDialog(QDialog):
                 self.repo.remove([src]) # !->R
             self.repo.copy(src, dest)
             shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
-            self.matchlv.model().remove(dest)
+            self.matchtv.model().remove(dest)
         self.matchAccepted.emit()
         self.refresh()
 
@@ -252,8 +252,8 @@ class DetectRenameDialog(QDialog):
         hglib.invalidaterepo(self.repo)
         ctx = self.repo['.']
         hu = htmlui.htmlui()
-        row = self.matchlv.model().getRow(index)
-        src, dest, percent = self.matchlv.model().getRow(index)
+        row = self.matchtv.model().getRow(index)
+        src, dest, percent = self.matchtv.model().getRow(index)
         aa = self.repo.wread(dest)
         rr = ctx.filectx(src).data()
         opts = mdiff.defaultopts
