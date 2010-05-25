@@ -18,9 +18,6 @@ from tortoisehg.util import shlib, hglib, paths
 
 from tortoisehg.hgqt import qtlib
 
-# Technical Debt:
-#  Labels for list widgets
-
 class HgignoreDialog(QDialog):
     'Edit a reposiory .hgignore file'
 
@@ -82,13 +79,33 @@ class HgignoreDialog(QDialog):
         split = QSplitter()
         vbox.addWidget(split, 1)
 
-        ignorelist = QListWidget(split)
-        unknownlist = QListWidget(split)
+        ignoregb = QFrame()
+        ignoregb.setFrameStyle(QFrame.Panel|QFrame.Raised)
+        ivbox = QVBoxLayout()
+        ignoregb.setLayout(ivbox)
+        lbl = QLabel(_('<b>Ignore Filter</b>'))
+        ivbox.addWidget(lbl)
+        split.addWidget(ignoregb)
+
+        unknowngb = QFrame()
+        unknowngb.setFrameStyle(QFrame.Panel|QFrame.Raised)
+        uvbox = QVBoxLayout()
+        unknowngb.setLayout(uvbox)
+        lbl = QLabel(_('<b>Untracked Files</b>'))
+        uvbox.addWidget(lbl)
+        split.addWidget(unknowngb)
+
+        ignorelist = QListWidget()
+        ivbox.addWidget(ignorelist)
+        unknownlist = QListWidget()
+        uvbox.addWidget(unknownlist)
         unknownlist.currentTextChanged.connect(self.setGlobFilter)
         unknownlist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(unknownlist,
                      SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
+        lbl = QLabel(_('Backspace or Del to remove a row'))
+        ivbox.addWidget(lbl)
 
         # layer 4 - dialog buttons
         BB = QDialogButtonBox
