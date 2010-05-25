@@ -280,6 +280,10 @@ class HgFileListModel(QtCore.QAbstractTableModel):
                     elif current_file_desc['fromside'] == 'right':
                         icn = geticon('right')
                     return QtCore.QVariant(icn.pixmap(20,20))
+                elif current_file_desc['flag'] == '+':
+                    return QtCore.QVariant(geticon('fileadd'))
+                elif current_file_desc['flag'] == '-':
+                    return QtCore.QVariant(geticon('filedelete'))
             elif role == QtCore.Qt.FontRole:
                 if self._fulllist and current_file_desc['infiles']:
                     font = QtGui.QFont()
