@@ -68,7 +68,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.setWindowTitle('TortoiseHg Workbench')
 
         self.reporegistry = rr = RepoRegistryView(self)
-        rr.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         rr.setObjectName('RepoRegistryView')
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
 
