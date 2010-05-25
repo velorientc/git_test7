@@ -58,11 +58,6 @@ class HgFileListModel(QtCore.QAbstractTableModel):
 
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
-        self._flagcolor = {}
-        self._flagcolor['='] = cfg.getFileModifiedColor(default='blue')
-        self._flagcolor['-'] = cfg.getFileRemovedColor(default='red')
-        self._flagcolor['-'] = cfg.getFileDeletedColor(default='red')
-        self._flagcolor['+'] = cfg.getFileAddedColor(default='green')
         self._displaydiff = cfg.getDisplayDiffStats()
 
     def setDiffWidth(self, w):
