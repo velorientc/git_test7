@@ -678,7 +678,7 @@ table = {
         (log,
          [('l', 'limit', '', _('limit number of changes displayed'))],
          _('thg log [OPTIONS] [FILE]')),
-    "remove|rm": (revert, [], _('thg remove [FILE]...')),
+    "remove|rm": (remove, [], _('thg remove [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
     "^status": (status,
