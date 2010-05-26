@@ -413,6 +413,7 @@ class SettingsDialog(QDialog):
     'Dialog for editing Mercurial.ini or hgrc'
     def __init__(self, configrepo=False, focus=None, parent=None):
         QDialog.__init__(self, parent)
+        self.setWindowTitle(_('TortoiseHg Settings'))
 
         self.ui = ui.ui()
         try:
@@ -470,19 +471,6 @@ class SettingsDialog(QDialog):
         self.bb = bb
 
         self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
-        self.conftabs.currentChanged.connect(self.refreshtitle)
-        self.refreshtitle()
-
-    def refreshtitle(self, *args):
-        if self.conftabs.currentIndex() == CONF_REPO:
-            repo = hg.repository(ui.ui(), self.root)
-            name = hglib.get_reponame(repo)
-            self.setWindowTitle(_('TortoiseHg Configure Repository - ') + \
-                           hglib.tounicode(name))
-            #set_tortoise_icon(self, 'settings_repo.ico')
-        else:
-            self.setWindowTitle(_('TortoiseHg Configure User-Global Settings'))
-            #set_tortoise_icon(self, 'settings_user.ico')
 
     def isDirty(self):
         return util.any(self.conftabs.widget(i).isDirty()
