@@ -447,12 +447,15 @@ class SettingsDialog(QDialog):
         self.settings = s
         self.restoreGeometry(s.value('settings/geom').toByteArray())
 
+        def username():
+            return util.username() or os.environ.get('USERNAME') or _('User')
+
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
         self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(),
                                           focus=focus, readonly=self.readonly),
                              QIcon(paths.get_tortoise_icon('settings_user.ico')),
-                             _('User global settings'))
+                             _("%s's global settings") % username())
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             reponame = hglib.tounicode(os.path.basename(repo.root))
