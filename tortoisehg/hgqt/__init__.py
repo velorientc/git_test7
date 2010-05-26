@@ -37,36 +37,8 @@ if should_rebuild(rcfile, pyfile):
         print "Please check the PyQt 'pyrcc4' tool is installed, or do it by hand running:"
         print "pyrcc4 %s -o %s" % (rcfile, pyfile)
 
-# load icons from resource and store them in a dict, no matter their
-# extension (.svg or .png)
-from PyQt4 import QtCore
-from PyQt4 import QtGui, uic
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
-Qt = QtCore.Qt
-import workbench_rc
-
-
-_icons = {}
-def _load_icons():
-    d = QtCore.QDir(':/icons')
-    for icn in d.entryList():
-        name, ext = osp.splitext(str(icn))
-        if name not in _icons or ext == ".svg":
-            _icons[name] = QtGui.QIcon(':/icons/%s' % icn)
-
-def icon(name):
-    """
-    Return a QIcon for the resource named 'name.(svg|png)' (the given
-    'name' parameter must *not* provide the extension).
-    """
-    if not _icons:
-        _load_icons()
-    return _icons.get(name)
-
-
 # dirty hack to please PyQt4 uic
-import repoview, fileview
+import repoview, fileview, workbench_rc
 sys.modules['repoview'] = repoview
 sys.modules['fileview'] = fileview
 sys.modules['workbench_rc'] = workbench_rc

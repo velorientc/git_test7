@@ -5,6 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import os
 import atexit
 import shutil
 import tempfile
@@ -143,6 +144,26 @@ def markup(msg, **styles):
     msg = QtCore.Qt.escape(msg)
     msg = msg.replace('\n', '<br />')
     return '<span style="%s">%s</span>' % (style, msg)
+
+_iconcache = {}
+
+def geticon(name):
+    """
+    Return a QIcon for the resource named 'name.(svg|png)' (the given
+    'name' parameter must *not* provide the extension).
+    """
+    try:
+        return _iconcache[name]
+    except KeyError:
+        for ext in ('svg', 'png', 'ico'):
+            path = ':/icons/%s.%s' % (name, ext)
+            if QtCore.QFile.exists(path):
+                icon = QtGui.QIcon(path)
+                break
+        else:
+            icon = QtGui.QIcon(':/icons/fallback.svg')
+        _iconcache[name] = icon
+        return icon
 
 def CommonMsgBox(icon, title, main, text='', buttons=QtGui.QMessageBox.Close,
                  parent=None):

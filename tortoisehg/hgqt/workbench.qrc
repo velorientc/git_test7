@@ -23,5 +23,6 @@
     <file>icons/hg.ico</file>
     <file>icons/fileadd.ico</file>
     <file>icons/filedelete.ico</file>
+    <file>icons/fallback.svg</file>
   </qresource>
 </RCC>
