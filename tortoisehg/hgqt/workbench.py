@@ -90,7 +90,7 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.setAcceptDrops(True)
 
         def gotVisible(state):
-            self.actionShowRepoRegistry.setChecked(state)
+            self.actionShowRepoRegistry.setChecked(self.reporegistry.isVisible())
         self.reporegistry.visibilityChanged.connect(gotVisible)
 
     def showRepoRegistry(self, show):
