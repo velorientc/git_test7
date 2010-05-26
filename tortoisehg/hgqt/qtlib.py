@@ -330,8 +330,8 @@ def fileEditor(filename):
         dialog.restoreGeometry(s.value(geomname).toByteArray())
         ret = dialog.exec_()
         if ret == QtGui.QDialog.Accepted:
-            f = util.atomictempfile(filename, 'w', createmode=None)
-            f.write(editor.text())
+            f = util.atomictempfile(filename, 'wb', createmode=None)
+            f.write(hglib.fromunicode(editor.text()))
             f.rename()
         s.setValue(geomname, dialog.saveGeometry())
     except EnvironmentError, e:
