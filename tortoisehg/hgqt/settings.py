@@ -455,12 +455,14 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.conftabs)
         self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(),
                                           focus=focus, readonly=self.readonly),
+                             QIcon(paths.get_tortoise_icon('settings_user.ico')),
                              _('User global settings'))
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             reponame = hglib.tounicode(os.path.basename(repo.root))
             self.conftabs.addTab(SettingsForm(rcpath=reporcpath,
                                               focus=focus, readonly=self.readonly),
+                                 QIcon(paths.get_tortoise_icon('settings_repo.ico')),
                                  _('%s repository settings') % reponame)
 
         BB = QDialogButtonBox
