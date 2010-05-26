@@ -415,6 +415,7 @@ class SettingsDialog(QDialog):
     def __init__(self, configrepo=False, focus=None, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('TortoiseHg Settings'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         try:
             root = paths.find_root()

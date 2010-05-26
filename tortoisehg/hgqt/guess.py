@@ -32,6 +32,7 @@ class DetectRenameDialog(QDialog):
 
         reponame = hglib.get_reponame(repo)
         self.setWindowTitle(_('Detect Copies/Renames in %s') % reponame)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         layout = QVBoxLayout()
         self.setLayout(layout)

@@ -26,6 +26,7 @@ class HgignoreDialog(QDialog):
     def __init__(self, parent=None, root=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root(root))

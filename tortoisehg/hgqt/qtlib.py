@@ -304,6 +304,7 @@ class ExpanderLabel(QtGui.QWidget):
 def fileEditor(filename):
     'Open a simple modal file editing dialog'
     dialog = QtGui.QDialog()
+    dialog.setWindowFlags(dialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
     vbox = QtGui.QVBoxLayout()
     dialog.setLayout(vbox)
     editor = qsci()

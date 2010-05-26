@@ -25,6 +25,7 @@ class QuickOpDialog(QtGui.QDialog):
     """ Dialog for performing quick dirstate operations """
     def __init__(self, command, pats, parent=None):
         QtGui.QDialog.__init__(self, parent)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.pats = pats
 
         # Handle rm alias
