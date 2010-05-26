@@ -686,7 +686,7 @@ class SettingsForm(QWidget):
             else:
                 qtlib.WarningMsgBox(_('Unable to create a Mercurial.ini file'),
                        _('Insufficient access rights, reverting to read-only'
-                         'mode.'), parent=self)
+                         ' mode.'), parent=self)
                 from mercurial import config
                 self.fn = rcpath[0]
                 cfg = config.config()
