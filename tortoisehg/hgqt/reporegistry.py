@@ -380,8 +380,6 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
-        print "dropMimeData(action=%s)" % action
-        print "formats:"
         for s in data.formats():
             print s
         d = str(data.data(repoRegMimeType))
