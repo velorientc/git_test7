@@ -16,7 +16,7 @@ from PyQt4.QtCore import QModelIndex, QString
 from PyQt4.QtGui import QVBoxLayout, QDockWidget, QFrame
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.qtlib import geticon
 
 connect = QtCore.QObject.connect
 

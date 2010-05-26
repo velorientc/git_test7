@@ -24,7 +24,7 @@ from tortoisehg.hgqt.i18n import _
 
 from tortoisehg.hgqt.decorators import timeit
 
-from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget

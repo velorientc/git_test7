@@ -21,7 +21,7 @@ from tortoisehg.util.util import tounicode, Curry
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.config import HgConfig
-from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.qtlib import geticon
 
 from PyQt4 import QtCore, QtGui
 connect = QtCore.QObject.connect

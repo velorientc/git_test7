@@ -23,7 +23,7 @@ from PyQt4 import QtCore, QtGui
 
 from tortoisehg.util.util import Curry
 
-from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.qtlib import geticon
 
 Qt = QtCore.Qt
 connect = QtCore.QObject.connect

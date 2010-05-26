@@ -18,7 +18,7 @@ from tortoisehg.util.util import has_closed_branch_support
 
 from tortoisehg.hgqt.i18n import _
 
-from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.update import UpdateDialog
 from tortoisehg.hgqt import cmdui

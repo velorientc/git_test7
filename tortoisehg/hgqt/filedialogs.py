@@ -30,7 +30,7 @@ from PyQt4.QtCore import Qt
 
 from tortoisehg.util.util import tounicode, rootpath
 
-from tortoisehg.hgqt import icon as geticon
+from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.filerevmodel import FileRevModel
 from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
