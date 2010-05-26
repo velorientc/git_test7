@@ -15,7 +15,6 @@ from mercurial import extensions, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import icon as geticon
 from hgext.color import _styles
 
 qsci = Qsci.QsciScintilla

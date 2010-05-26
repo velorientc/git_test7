@@ -17,7 +17,7 @@ from mercurial.node import hex
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, icon
+from tortoisehg.hgqt import qtlib
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags',
                  'transplant', 'p4', 'svn')
