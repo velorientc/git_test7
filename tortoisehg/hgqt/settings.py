@@ -415,16 +415,12 @@ class SettingsDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('TortoiseHg Settings'))
 
-        self.ui = ui.ui()
         try:
             root = paths.find_root()
             if root:
-                repo = hg.repository(self.ui, root)
-                name = hglib.get_reponame(repo)
-                self.ui = repo.ui
+                repo = hg.repository(ui.ui(), root)
             else:
                 repo = None
-            self.root = root
         except error.RepoError:
             repo = None
             if configrepo:
