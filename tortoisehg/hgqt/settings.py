@@ -46,7 +46,9 @@ class SettingsCombo(QComboBox):
 
     def resetList(self):
         self.clear()
-        ucur = hglib.tounicode(self.curvalue or '')
+        ucur = self.curvalue  # None is valid value for <unspecified>
+        if ucur:
+            ucur = hglib.tounicode(ucur)
         if self.opts.get('defer') and not self.loaded:
             if self.curvalue == None: # unspecified
                 self.addItem(_unspecstr)
