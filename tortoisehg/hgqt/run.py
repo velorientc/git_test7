@@ -377,6 +377,11 @@ def status(ui, *pats, **opts):
     from tortoisehg.hgqt.status import run
     qtrun(run, ui, *pats, **opts)
 
+def tag(ui, *pats, **opts):
+    """clone tool"""
+    from tortoisehg.hgqt.tag import run
+    qtrun(run, ui, *pats, **opts)
+
 def test(ui, *pats, **opts):
     """test arbitrary widgets"""
     from tortoisehg.hgqt.chunkselect import run
@@ -691,6 +696,14 @@ table = {
          [('c', 'clean', False, _('show files without changes')),
           ('i', 'ignored', False, _('show ignored files'))],
         _('thg status [OPTIONS] [FILE]')),
+    "^tag":
+        (tag,
+         [('f', 'force', None, _('replace existing tag')),
+          ('l', 'local', None, _('make the tag local')),
+          ('r', 'rev', '', _('revision to tag')),
+          ('', 'remove', None, _('remove a tag')),
+          ('m', 'message', '', _('use <text> as commit message')),],
+         _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^update|checkout|co":

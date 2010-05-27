@@ -21,6 +21,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.update import UpdateDialog
+from tortoisehg.hgqt.tag import TagDialog
 from tortoisehg.hgqt import cmdui
 from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt.manifestdialog import ManifestDialog
@@ -187,6 +188,7 @@ class RepoWidget(QtGui.QWidget):
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
         connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
+        connect(view, SIGNAL('tagToRevision'), self.tagToRevision)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -225,6 +227,15 @@ class RepoWidget(QtGui.QWidget):
                 self.reload()  # TODO: implement something less drastic than a full reload
             self.setScanForRepoChanges(saved)
         dlg.quitsignal.connect(quit)
+        dlg.show()
+
+    def tagToRevision(self, rev):
+        saved = self.setScanForRepoChanges(False)
+        dlg = TagDialog(self.repo, rev=str(rev), parent=self)
+        def invalidated():
+            self.reload()
+            self.setScanForRepoChanges(saved)
+        dlg.repoInvalidated.connect(invalidated) # TODO: implement something less drastic than a full reload
         dlg.show()
 
     def revision_selected(self, rev):

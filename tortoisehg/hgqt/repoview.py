@@ -112,6 +112,8 @@ class HgRepoView(QtGui.QTableView):
               self.showAtRev),
              ('update', _('Update to rev...'), None, None, None,
               self.updateToRev),
+             ('tag', _('Tag to rev...'), None, None, None,
+              self.tagToRev),
              ]
         return a
 
@@ -140,9 +142,12 @@ class HgRepoView(QtGui.QTableView):
     def updateToRev(self):
         self.emit(SIGNAL('updateToRevision'), self.current_rev)
 
+    def tagToRev(self):
+        self.emit(SIGNAL('tagToRevision'), self.current_rev)
+
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
-        for act in ['update', 'manifest', None, 'back', 'forward']:
+        for act in ['update', 'manifest', 'tag', None, 'back', 'forward']:
             if act:
                 menu.addAction(self._actions[act])
             else:
