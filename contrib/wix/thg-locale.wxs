@@ -1,271 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?define thglocales = 
+    ca;cs;da;de;en_GB;es;fa;fr;he;hr;hu;it;ja;nl;nn;pl;pt;pt_BR;ru;sv;tr;uk;zh_CN;zh_TW
+  ?>
+
+  <Fragment>
+    <ComponentGroup Id="thgLocaleFolder">
+      <?foreach LOC in $(var.thglocales) ?>
+        <ComponentRef Id="thg.locale.$(var.LOC)"/>
+      <?endforeach?>
+    </ComponentGroup>
+  </Fragment>
+
+  <?foreach LOC in $(var.thglocales) ?>
     <Fragment>
-        <ComponentGroup Id="thgLocaleFolder">
-            <Component Id="cmp97D2E343B1E5FE96DCE252E367D4B28A" Directory="dirC1FD4C7D897BEC19F3464230B84CBDC1" Guid="{3C7A8212-CBC6-4AEF-9991-30FD8747B341}">
-                <File Id="fil37DD82B0B54E8657B3A3B782454F4B4B" KeyPath="yes" Source="$(var.SourceDir)\ca\LC_MESSAGES\tortoisehg.mo" />
+      <DirectoryRef Id="localedir" FileSource="$(var.SourceDir)">
+        <Directory Id="thg.locale.$(var.LOC)" Name="$(var.LOC)">
+          <Directory Id="thg.locale.$(var.LOC).LC_MESSAGES" Name="LC_MESSAGES">
+            <Component Id="thg.locale.$(var.LOC)" Guid="*">
+              <File Id="tortoisehg.mo.$(var.LOC)" Name="tortoisehg.mo" KeyPath="yes" />
             </Component>
-            <Component Id="cmp6011E19DDB66EFA73083E6FA5B8CDFE3" Directory="dirF4C3C19F54614FF7FB5CDE601B52F9FF" Guid="{DF245201-3B86-4091-9C88-F19508734F9A}">
-                <File Id="fil4786EDF2BEBDF501DEF4E2C73F90DA36" KeyPath="yes" Source="$(var.SourceDir)\cs\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp67BB54C9C5EC7C5DA918208234F8CE66" Directory="dir37691BFCCBD5A038C2B503A0CA9FFDCC" Guid="{A3DBA602-A41D-46D9-AC88-BD4D28B980CB}">
-                <File Id="filE042F76EC66A409A37A786BF3DA80BB3" KeyPath="yes" Source="$(var.SourceDir)\da\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpF47DE3672DDFA6BF4BEF9F39D1E25097" Directory="dirFD5FFD33B2F5044881CA967A9603AD80" Guid="{D1281078-9679-4AD1-8BED-C3F220532E25}">
-                <File Id="fil4595CB9C05D584B44CE37B39749F2ECE" KeyPath="yes" Source="$(var.SourceDir)\de\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp7E3B6A375DFAF0ED1E9A9B44FE7D3EFD" Directory="dir30A08451227C5A2966AC0E244F29E12B" Guid="{E5A6DB9C-F784-46CC-A46F-80BC29D5680F}">
-                <File Id="filE16CC80A3162B00FEBF1A3265EEAA3AB" KeyPath="yes" Source="$(var.SourceDir)\en_GB\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpF66B4EFE600CC54E71DAFE30A024AF39" Directory="dir4D8AA0CB11320EA111F36F34FE854EA7" Guid="{4EF97F54-9231-4648-B1FB-025A4B86BBAC}">
-                <File Id="filDA0F0271713B1F6DD3B04F982A8E8EED" KeyPath="yes" Source="$(var.SourceDir)\es\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpEA9CF8407366542C435D6D797D49C715" Directory="dir6174B975FADC7378EBE9FC7445445A95" Guid="{DB3E1C53-CEC3-43C7-B657-014C6277FD90}">
-                <File Id="filBC9079C47F327BC563E4370F46DD2D48" KeyPath="yes" Source="$(var.SourceDir)\fa\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp1CCA97B73A57E65243EC021DCEAFBC51" Directory="dir76A360BADC007F88A0B6C012DBA071F0" Guid="{83058C4B-44A2-4336-8D32-AF0EDCC7872C}">
-                <File Id="fil793710E8E5F932B06A64F56C27757D6B" KeyPath="yes" Source="$(var.SourceDir)\fr\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp3098066B1C735F5375F53BD7F9F81B72" Directory="dirE64DB51EB8EB542ACCF53093EFA11771" Guid="{EF15D5D7-BFEF-40EE-AAAC-FCB2025BB517}">
-                <File Id="filFDCF3A2EB7850DE8085D1894BD024188" KeyPath="yes" Source="$(var.SourceDir)\he\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpD32A2A25848BEB6B69C855D6A554FD4E" Directory="dir9C2B7F0D28EF4F85DBAFBE955E3E5E39" Guid="{F58E7016-D76D-4079-85F4-D36E4DCA6C29}">
-                <File Id="fil29C5AC76523BD1B37056CCAE28C3CBB5" KeyPath="yes" Source="$(var.SourceDir)\hr\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp5C0C9E44A5FEDA006C83DE88F8BE7FC3" Directory="dir84C2343136F7D4B857D28FDACE545F33" Guid="{F2372D26-CFAC-4781-AEC2-95266B9D4B35}">
-                <File Id="fil0FF0E5A6C8190DA2555E4E22602B50AA" KeyPath="yes" Source="$(var.SourceDir)\it\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpC71C5EEB1C960C7E4B9CBF99DF547C98" Directory="dir29F26642414C1248A97432E9C4947B87" Guid="{23EA8FFB-073A-449D-A981-E7309B2F676C}">
-                <File Id="fil4E47109C76BC7A3F6F205D670399AEF6" KeyPath="yes" Source="$(var.SourceDir)\ja\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpF5CE8998AB2B34C3927E660184FC13A5" Directory="dir30B301BDDE0583AFBE20A7D3B9425E26" Guid="{408C2DA2-CDF4-48BC-AD5E-2961F890467E}">
-                <File Id="fil5A60B39ABBD3E9E2E40C5E66B3E49A17" KeyPath="yes" Source="$(var.SourceDir)\ko\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpDDCBD3CDEE962B84FF246CBA5DCE2A75" Directory="dirD79CE69AE73F26A7887CC5EC026D8864" Guid="{7636E335-E25C-4EA4-9D7A-29159461C8B8}">
-                <File Id="fil7ABB3A3E04EC4D42D221038D532E8487" KeyPath="yes" Source="$(var.SourceDir)\nl\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp6C5DE3B65A7A5ED2CC1DA130D63798A4" Directory="dir2F9BB0E446843095DAA815D3ACD94CCB" Guid="{DA16ECB2-B838-4DDD-B102-D06433E1C11C}">
-                <File Id="filFDF0115AF3D57F7FE6D73C3EEC95513E" KeyPath="yes" Source="$(var.SourceDir)\nn\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpC1CE97F6431E0A7327B078A414D10965" Directory="dir267CEE3F3F57B292C12FA8504EC333BB" Guid="{109255DE-AC62-40B3-A89E-A597D6943BCA}">
-                <File Id="fil10ECF6EDFEACD0FDD0F7B18B3F461865" KeyPath="yes" Source="$(var.SourceDir)\pl\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpBE2376291F6028CF0FF00F1E1BC90812" Directory="dir0D3F2C9CC9C090012AF41CCA12142C72" Guid="{9EF4D1F0-9BDD-4384-85AF-512FB6A7092B}">
-                <File Id="fil22E27384E228FEBDF8CE437AD43F678C" KeyPath="yes" Source="$(var.SourceDir)\pt\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpA4CBA143379B528F50A7BA7E7E3C1F00" Directory="dir669486A97BE07EA6B1A33203A89256A6" Guid="{35B4D851-DA5E-49DC-A3DE-7D111DC2B4E0}">
-                <File Id="fil44887C938C83FFB7D002C95CE4D74338" KeyPath="yes" Source="$(var.SourceDir)\pt_BR\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp8118FAE1E5D650BAFCE57F25AB5ADC39" Directory="dir037A86EB823B6909A282303C580B680C" Guid="{280FC7E1-023D-4E12-96E4-DF11749A14FD}">
-                <File Id="filEE1E40EEE4C3A71ECCC5BB92F1412120" KeyPath="yes" Source="$(var.SourceDir)\ru\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpF548DE235C24B8B7F2E09DF67E17EFEE" Directory="dir29BAE95B29962D11812BB8B0F7CC7A2B" Guid="{67C7ADF0-68AB-45CE-9271-E7B2037F45F8}">
-                <File Id="fil8103CB03F7A0D560445F73F4759A3E31" KeyPath="yes" Source="$(var.SourceDir)\tr\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp03F0A3EE67A36BF90400AB95442E17E8" Directory="dirAE93CB1A416E5A102D3A306088E1883C" Guid="{086E3CBF-EB45-4666-BD55-E8F1046FC435}">
-                <File Id="filA4C258D0AB75FAF0BB7C1B883FFA1852" KeyPath="yes" Source="$(var.SourceDir)\uk\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmpB4FEC952E14511130E7F08D942D82BF9" Directory="dir402295F841398275038CC187DA8A3179" Guid="{09CD45DB-7322-4B03-AB73-E4E612DB95E1}">
-                <File Id="filEA6E41639C93F1E072A6176325336A95" KeyPath="yes" Source="$(var.SourceDir)\zh_CN\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-            <Component Id="cmp5CCB089DD774F72464726F0268F425EE" Directory="dirF619ECAC819DE44FC21E11EB1715B156" Guid="{AD1E561D-E4A2-44BA-A513-DFC37141C1DC}">
-                <File Id="fil5674F9F9107910F7D11B1E51582C2004" KeyPath="yes" Source="$(var.SourceDir)\zh_TW\LC_MESSAGES\tortoisehg.mo" />
-            </Component>
-        </ComponentGroup>
+          </Directory>
+        </Directory>
+      </DirectoryRef>
     </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirAE93CB1A416E5A102D3A306088E1883C" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirE64DB51EB8EB542ACCF53093EFA11771" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirF4C3C19F54614FF7FB5CDE601B52F9FF" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir2F9BB0E446843095DAA815D3ACD94CCB" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir30A08451227C5A2966AC0E244F29E12B" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir037A86EB823B6909A282303C580B680C" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirC1FD4C7D897BEC19F3464230B84CBDC1" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir0D3F2C9CC9C090012AF41CCA12142C72" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir267CEE3F3F57B292C12FA8504EC333BB" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir9C2B7F0D28EF4F85DBAFBE955E3E5E39" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirD79CE69AE73F26A7887CC5EC026D8864" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir6174B975FADC7378EBE9FC7445445A95" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir29BAE95B29962D11812BB8B0F7CC7A2B" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir30B301BDDE0583AFBE20A7D3B9425E26" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir4D8AA0CB11320EA111F36F34FE854EA7" />
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir13D0F82BFAA1CFE1F52037FEC76D8113">
-            <Directory Id="dir037A86EB823B6909A282303C580B680C" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir5FBCA0EC6EE05D75F089064EA5F0274C">
-            <Directory Id="dir0D3F2C9CC9C090012AF41CCA12142C72" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir13D0F82BFAA1CFE1F52037FEC76D8113" Name="ru" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir1D03988AA210316C8AE2976CD33EBC29" Name="uk" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir6EE9F1386683AE34B8820D9E1E7B09E8">
-            <Directory Id="dir267CEE3F3F57B292C12FA8504EC333BB" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir277C9DA7278DF842254BCE2A790F2CAB" Name="nn" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir430120452AC64A6E75EB61F614BE7D48">
-            <Directory Id="dir29BAE95B29962D11812BB8B0F7CC7A2B" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir277C9DA7278DF842254BCE2A790F2CAB">
-            <Directory Id="dir2F9BB0E446843095DAA815D3ACD94CCB" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir72BC66F351AB67F3A76C3AB0643EDD81">
-            <Directory Id="dir30A08451227C5A2966AC0E244F29E12B" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirB887C4A528A05F5DE9A33640094F5AC3">
-            <Directory Id="dir30B301BDDE0583AFBE20A7D3B9425E26" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir383886C47DBB9D325DA589553654FC73" Name="fa" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir3A6F0F9C46863F494768D597212E204D" Name="he" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir430120452AC64A6E75EB61F614BE7D48" Name="tr" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir5AEBBEEE8A5DACAE22931E90E24E4634">
-            <Directory Id="dir4D8AA0CB11320EA111F36F34FE854EA7" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir5AEBBEEE8A5DACAE22931E90E24E4634" Name="es" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir5FBCA0EC6EE05D75F089064EA5F0274C" Name="pt" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir383886C47DBB9D325DA589553654FC73">
-            <Directory Id="dir6174B975FADC7378EBE9FC7445445A95" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir6EE9F1386683AE34B8820D9E1E7B09E8" Name="pl" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir6F4F817313B322AF28CB2D54623726E3" Name="ca" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dir72BC66F351AB67F3A76C3AB0643EDD81" Name="en_GB" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirAE825FC216458B2C7EC06F286059E51A">
-            <Directory Id="dir9C2B7F0D28EF4F85DBAFBE955E3E5E39" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dirAD5B14C820890DCFB07172C2E296CA8D" Name="cs" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dirAD7A0DB46076DD1C5FEDAF126738B74D" Name="nl" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dirAE825FC216458B2C7EC06F286059E51A" Name="hr" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir1D03988AA210316C8AE2976CD33EBC29">
-            <Directory Id="dirAE93CB1A416E5A102D3A306088E1883C" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirA42EA32F4A238F2C40AD5ACF4C831152">
-            <Directory Id="dirB887C4A528A05F5DE9A33640094F5AC3" Name="ko" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir6F4F817313B322AF28CB2D54623726E3">
-            <Directory Id="dirC1FD4C7D897BEC19F3464230B84CBDC1" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirAD7A0DB46076DD1C5FEDAF126738B74D">
-            <Directory Id="dirD79CE69AE73F26A7887CC5EC026D8864" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dir3A6F0F9C46863F494768D597212E204D">
-            <Directory Id="dirE64DB51EB8EB542ACCF53093EFA11771" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
-        <DirectoryRef Id="dirAD5B14C820890DCFB07172C2E296CA8D">
-            <Directory Id="dirF4C3C19F54614FF7FB5CDE601B52F9FF" Name="LC_MESSAGES" />
-        </DirectoryRef>
-    </Fragment>
+  <?endforeach?>
+
 </Wix>

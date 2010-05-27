@@ -88,8 +88,9 @@ class RecoveryDialog(gtk.Window):
         self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
-        self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground=gtklib.DRED)
+        gtklib.configstyles(repo.ui)
+        for tag, argdict in gtklib.TextBufferTags.iteritems():
+            self.textbuffer.create_tag(tag, **argdict)
         vbox.pack_start(scrolledwindow, True, True)
 
         self.progstat = gtk.Label()
@@ -139,8 +140,18 @@ class RecoveryDialog(gtk.Window):
         shlib.shell_notify([self.repo.root])
 
     def _rollback_clicked(self, toolbutton, data=None):
+        try:
+            args = self.repo.opener('undo.desc', 'r').read().splitlines()
+            if len(args) >= 3:
+                msg = _("Rollback repository '%s' to %d, undo %s from %s?") % (
+                    self.reponame, int(args[0])-1, args[1], args[2])
+            else:
+                msg = _("Rollback repository '%s' to %d, undo %s?") % (
+                    self.reponame, int(args[0])-1, args[1])
+        except (IOError, IndexError, ValueError):
+            msg = _("Rollback repository '%s' ?") % self.reponame
         response = gdialog.Confirm(_('Confirm rollback repository'), [], self,
-                _("Rollback repository '%s' ?") % self.reponame).run()
+                                   msg).run()
         if response != gtk.RESPONSE_YES:
             return
         cmd = ['rollback']
@@ -200,8 +211,9 @@ class RecoveryDialog(gtk.Window):
             self.textbuffer.set_text(msg)
 
     def write_err(self, msg):
+        tags = gtklib.gettags('ui.error')
         enditer = self.textbuffer.get_end_iter()
-        self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+        self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
         self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
 
     def process_queue(self):
@@ -209,16 +221,23 @@ class RecoveryDialog(gtk.Window):
         Handle all the messages currently in the queue (if any).
         """
         self.hgthread.process_dialogs()
-        while self.hgthread.getqueue().qsize():
-            try:
-                msg = self.hgthread.getqueue().get(0)
-                self.write(msg)
-            except Queue.Empty:
-                pass
         while self.hgthread.geterrqueue().qsize():
             try:
                 msg = self.hgthread.geterrqueue().get(0)
                 self.write_err(msg)
+            except Queue.Empty:
+                pass
+        enditer = self.textbuffer.get_end_iter()
+        while self.hgthread.getqueue().qsize():
+            try:
+                msg, label = self.hgthread.getqueue().get(0)
+                msg = hglib.toutf(msg)
+                tags = gtklib.gettags(label)
+                if tags:
+                    self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
+                else:
+                    self.textbuffer.insert(enditer, msg)
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
         self.update_progress()

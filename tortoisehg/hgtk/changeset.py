@@ -196,6 +196,16 @@ class ChangeSet(gdialog.GWindow):
 
     def load_patch_details(self, patchfile):
         'Load specified patch details into buffer and file list'
+        pf = open(patchfile)
+        self.load_patch_details_from_file_object(pf, patchfile)
+        
+    def load_patch_details_from_file_object(self, pf, patchfile, isTemp=False):
+        """ Load patch details into buffer and file list
+        :param pf: open file object
+        :param patchfile: path and name of patch file
+        :param isTemp: if True, then pf is a temporary file 
+            and patchfile does not exist
+        """
         self._filelist.clear()
         self._filelist.append(('*', _('[All Files]'), ''))
 
@@ -203,7 +213,11 @@ class ChangeSet(gdialog.GWindow):
         self.currev = -1
         self.curphunks = {}
         self.curpatch = patchfile
-        pf = open(self.curpatch)
+        if isTemp:
+            # pf is a temporary, so update panel cache while we can
+            patch_ctx = csinfo.patchctx(patchfile, self.repo, patchHandle=pf)
+            self.summarypanel.update(patch_ctx, self.patchstyle)
+            pf.seek(0)
         def get_path(a, b):
             type = (a == '/dev/null') and 'A' or 'M'
             type = (b == '/dev/null') and 'R' or type
@@ -350,7 +364,6 @@ class ChangeSet(gdialog.GWindow):
         tags, lines = self.prepare_diff(lines, offset, wfile)
         for l in lines:
             buf.insert(eob, l)
-
         # inserts the tags
         for name, p0, p1 in tags:
             i0 = buf.get_iter_at_offset(p0)
@@ -429,7 +442,7 @@ class ChangeSet(gdialog.GWindow):
                 tag = 'red'
                 l = hglib.diffexpand(l)
             else:
-                tag = 'black'
+                tag = 'normal'
                 l = hglib.diffexpand(l)
             l = l+"\n"
             length = len(l.decode('utf-8'))
@@ -585,7 +598,7 @@ class ChangeSet(gdialog.GWindow):
         def widget_func(widget, item, markups):
             def linkwidget(revnum, revid, summary, highlight=None, branch=None):
                 # revision label
-                opts = dict(underline='single', color='blue')
+                opts = dict(underline='single', color=gtklib.BLUE)
                 if highlight:
                     opts['weight'] = 'bold'
                 rev = '%s (%s)' % (gtklib.markup(revnum, **opts),
@@ -597,7 +610,7 @@ class ChangeSet(gdialog.GWindow):
                 # summary & branch label
                 sum = gtklib.markup(summary)
                 if branch:
-                    sum = gtklib.markup(branch, color='black',
+                    sum = gtklib.markup(branch, color=gtklib.NORMAL,
                         background=gtklib.PGREEN) + ' ' + sum
                 sumlabel = gtk.Label()
                 sumlabel.set_markup(sum)
@@ -800,7 +813,7 @@ class ChangeSet(gdialog.GWindow):
         tag_table = self._buffer.get_tag_table()
 
         tag_table.add(make_texttag('diff', font=self.rawfonts['fontdiff']))
-        tag_table.add(make_texttag('blue', foreground='blue'))
+        tag_table.add(make_texttag('blue', foreground=gtklib.BLUE))
         if self.colorstyle == 'background':
             tag_table.add(make_texttag('red',
                                        paragraph_background=gtklib.PRED))
@@ -812,21 +825,21 @@ class ChangeSet(gdialog.GWindow):
         else:
             tag_table.add(make_texttag('red', foreground=gtklib.DRED))
             tag_table.add(make_texttag('green', foreground=gtklib.DGREEN))
-        tag_table.add(make_texttag('black', foreground='black'))
+        tag_table.add(make_texttag('normal', foreground=gtklib.NORMAL))
         tag_table.add(make_texttag('greybg',
-                                   paragraph_background='grey',
+                                   paragraph_background=gtklib.CHANGE_HEADER,
                                    weight=pango.WEIGHT_BOLD))
-        tag_table.add(make_texttag('yellowbg', background='yellow'))
+        tag_table.add(make_texttag('yellowbg', background=gtklib.YELLOW))
 
-        issuelink_tag = make_texttag('issuelink', foreground='blue',
+        issuelink_tag = make_texttag('issuelink', foreground=gtklib.BLUE,
                                      underline=pango.UNDERLINE_SINGLE)
         issuelink_tag.connect('event', self.issuelink_event)
         tag_table.add(issuelink_tag)
-        urllink_tag = make_texttag('urllink', foreground='blue',
+        urllink_tag = make_texttag('urllink', foreground=gtklib.BLUE,
                                      underline=pango.UNDERLINE_SINGLE)
         urllink_tag.connect('event', self.urllink_event)
         tag_table.add(urllink_tag)
-        csetlink_tag = make_texttag('csetlink', foreground='blue',
+        csetlink_tag = make_texttag('csetlink', foreground=gtklib.BLUE,
                                     underline=pango.UNDERLINE_SINGLE)
         csetlink_tag.connect('event', self.csetlink_event)
         tag_table.add(csetlink_tag)
@@ -934,8 +947,9 @@ class ChangeSet(gdialog.GWindow):
             return
         try:
             q = Queue.Queue()
-            hglib.hgcmd_toq(q, 'cat', '--rev',
-                str(self.currev), '--output', hglib.fromutf(result), self.curfile)
+            hglib.hgcmd_toq(q, False, ('cat', '--rev',
+                            str(self.currev), '--output', hglib.fromutf(result),
+                            self.curfile))
         except (util.Abort, IOError), e:
             gdialog.Prompt(_('Unable to save file'), str(e), self).run()
 
