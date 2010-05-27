@@ -235,6 +235,19 @@ class StatusWidget(QWidget):
         self.curRow = None
         self.override.setChecked(False)
         self.override.setEnabled(False)
+
+        # store selected paths or current path
+        model = self.tv.model()
+        if model:
+            sp = [model.getRow(i)[COL_PATH] for i in self.tv.selectedRows()]
+            if not sp:
+                index = self.tv.selectionModel().currentIndex()
+                if index.isValid():
+                    sp = [model.getRow(index)[COL_PATH]]
+        else:
+            sp = None
+        self.sp = sp
+
         self.emit(SIGNAL('loadBegin()'))
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.connect(self.refreshing, SIGNAL('finished'), self.reloadComplete)
@@ -274,6 +287,22 @@ class StatusWidget(QWidget):
         self.connect(self.le, SIGNAL('textEdited(QString)'), tm.setFilter)
         self.connect(tm, SIGNAL('checkToggled()'), self.updateCheckCount)
         self.updateCheckCount()
+
+        # reset selection, or select first row
+        selmodel = self.tv.selectionModel()
+        flags = QItemSelectionModel.Select | QItemSelectionModel.Rows
+        if self.sp:
+            first = None
+            for i, row in enumerate(tm.getAllRows()):
+                if row[COL_PATH] in self.sp:
+                    index = tm.index(i, 0)
+                    selmodel.select(index, flags)
+                    if not first: first = index
+        else:
+            first = tm.index(0, 0)
+            selmodel.select(first, flags)
+        if first and first.isValid():
+            self.rowSelected(first)
 
     def updateCheckCount(self):
         text = _('Checkmarked file count: %d') % len(self.getChecked())
