@@ -165,6 +165,17 @@ def geticon(name):
         _iconcache[name] = icon
         return icon
 
+_pixmapcache = {}
+
+def getpixmap(name, width=16, height=16):
+    key = '%s_%sx%s' % (name, width, height)
+    try:
+        return _pixmapcache[key]
+    except KeyError:
+        pixmap = geticon(name).pixmap(width, height)
+    _pixmapcache[key] = pixmap
+    return pixmap
+
 def CommonMsgBox(icon, title, main, text='', buttons=QtGui.QMessageBox.Close,
                  parent=None):
     msg = QtGui.QMessageBox(parent)
