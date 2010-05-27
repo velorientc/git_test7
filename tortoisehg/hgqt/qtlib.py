@@ -152,18 +152,19 @@ def geticon(name):
     Return a QIcon for the resource named 'name.(svg|png)' (the given
     'name' parameter must *not* provide the extension).
     """
-    try:
-        return _iconcache[name]
-    except KeyError:
+    def findicon(name):
         for ext in ('svg', 'png', 'ico'):
             path = ':/icons/%s.%s' % (name, ext)
             if QtCore.QFile.exists(path):
-                icon = QtGui.QIcon(path)
-                break
-        else:
-            icon = QtGui.QIcon(':/icons/fallback.svg')
-        _iconcache[name] = icon
-        return icon
+                return QtGui.QIcon(path)
+
+        return QtGui.QIcon(':/icons/fallback.svg')
+
+    try:
+        return _iconcache[name]
+    except KeyError:
+        _iconcache[name] = findicon(name)
+        return _iconcache[name]
 
 _pixmapcache = {}
 
