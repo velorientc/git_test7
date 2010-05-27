@@ -20,9 +20,6 @@ from PyQt4.QtGui import *
 # This widget can be embedded in any application that would like to
 # provide search features
 
-# Technical Debt
-#  tortoisehg.editor with line number
-
 class SearchWidget(QDockWidget):
     '''Working copy and repository search widget
        SIGNALS:
@@ -407,14 +404,13 @@ class MatchTree(QTreeView):
         repo, ui = self.repo, self.repo.ui
         for rev, path, line in rows:
             path = hglib.fromunicode(path)
-            # TODO: do something with 'line'
             if rev is None:
                 files = [repo.wjoin(path)]
-                wctxactions.edit(self, ui, repo, files)
+                wctxactions.edit(self, ui, repo, files, line)
             else:
                 base, _ = visdiff.snapshot(repo, [path], repo[rev])
                 files = [os.path.join(base, path)]
-                wctxactions.edit(self, ui, repo, files)
+                wctxactions.edit(self, ui, repo, files, line)
 
     def vdiff(self, rows):
         repo, ui = self.repo, self.repo.ui
