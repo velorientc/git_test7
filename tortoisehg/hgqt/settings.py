@@ -175,7 +175,7 @@ def findMergeTools():
     return hglib.mergetools(ui.ui())
 
 INFO = (
-({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo.ico'}, (
+({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
     (_('Three-way Merge Tool'), 'ui.merge', 
         (genDeferredCombo, findMergeTools),
         _('Graphical merge program for resolving merge conflicts.  If left'
@@ -217,7 +217,7 @@ INFO = (
         ' instead of just the root directory name.  Default: False')),
     )),
 
-({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog.ico'}, (
+({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
     (_('Author Coloring'), 'tortoisehg.authorcolor', genBoolCombo,
         _('Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
@@ -251,7 +251,7 @@ INFO = (
         _('Show changeset details with an expander')),
     )),
 
-({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit.ico'}, (
+({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit'}, (
     (_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is\n'
           '"Full Name <email.com>"')),
@@ -284,7 +284,7 @@ INFO = (
          '  Default: False')),
     )),
 
-({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy.ico'}, (
+({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy'}, (
     (_('Name'), 'web.name', genEditCombo,
         _('Repository name to use in the web interface.'
         ' Default is the working directory.')),
@@ -458,14 +458,14 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.conftabs)
         self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(),
                                           focus=focus, readonly=self.readonly),
-                             QIcon(paths.get_tortoise_icon('settings_user.ico')),
+                             qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             reponame = hglib.tounicode(os.path.basename(repo.root))
             self.conftabs.addTab(SettingsForm(rcpath=reporcpath,
                                               focus=focus, readonly=self.readonly),
-                                 QIcon(paths.get_tortoise_icon('settings_repo.ico')),
+                                 qtlib.geticon('settings_repo'),
                                  _('%s repository settings') % reponame)
 
         BB = QDialogButtonBox
@@ -568,12 +568,11 @@ class SettingsForm(QWidget):
 
         # add page items to treeview
         for meta, info in INFO:
-            icon = QIcon()
             if isinstance(meta['icon'], str):
-                iconfile = paths.get_tortoise_icon(meta['icon'])
-                icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
+                icon = qtlib.geticon(meta['icon'])
             else:
                 style = QApplication.style()
+                icon = QIcon()
                 icon.addPixmap(style.standardPixmap(meta['icon']))
             item = QListWidgetItem(icon, meta['label'])
             pageList.addItem(item)
