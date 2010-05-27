@@ -14,7 +14,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4 import Qsci
 from mercurial import extensions, util
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
@@ -149,14 +149,19 @@ _iconcache = {}
 
 def geticon(name):
     """
-    Return a QIcon for the resource named 'name.(svg|png)' (the given
-    'name' parameter must *not* provide the extension).
+    Return a QIcon for the specified name. (the given 'name' parameter
+    must *not* provide the extension).
+
+    This searches for the icon from Qt resource or icons directory,
+    named as 'name.(svg|png|ico)'.
     """
+    # TODO: icons should be placed at single location before release
     def findicon(name):
-        for ext in ('svg', 'png', 'ico'):
-            path = ':/icons/%s.%s' % (name, ext)
-            if QtCore.QFile.exists(path):
-                return QtGui.QIcon(path)
+        for pfx in (':/icons', paths.get_icon_path()):
+            for ext in ('svg', 'png', 'ico'):
+                path = '%s/%s.%s' % (pfx, name, ext)
+                if QtCore.QFile.exists(path):
+                    return QtGui.QIcon(path)
 
         return QtGui.QIcon(':/icons/fallback.svg')
 
