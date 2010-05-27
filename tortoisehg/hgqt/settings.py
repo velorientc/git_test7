@@ -20,6 +20,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Technical Debt
+#   detect URLs in tooltips, make clickable
 #   stacked widget or pages need to be scrollable
 #   add extensions page after THG 1.1 is released
 #   we need a consistent icon set
@@ -190,7 +191,9 @@ INFO = (
           ' unspecified, TortoiseHg will use the selected merge tool.'
           ' Failing that it uses the first applicable tool it finds.')),
     (_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
-        _('Specify the visual editor used to view files, etc')),
+        _('Specify the visual editor used to view files.  Format:\n'
+          'myeditor -flags [$FILE --num=$LINENUM] -moreflags\n\n'
+          'See http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     (_('CLI Editor'), 'ui.editor', genEditCombo,
         _('The editor to use during a commit and other instances where'
         ' Mercurial needs multiline input from the user.  Used by'
