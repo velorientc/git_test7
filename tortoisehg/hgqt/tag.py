@@ -18,7 +18,7 @@ from mercurial import hg, ui, error
 from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.hgqt.qtlib import getpixmap
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.hgqt import qtlib
 
 keep = i18n.keepgettext()
 
