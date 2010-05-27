@@ -2524,20 +2524,26 @@ class GLog(gdialog.GWindow):
                         skip=False,
                         reset=True)
 
-    def bisect_good(self, menuitem):
-        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+    def run_bisect_step(self, cmd):
+        '''run one bisect step and scroll to the new working copy parent'''
         self.execute_command(cmd, force=True)
         self.refresh_model()
+        wcpar = [x.rev() for x in self.repo.parents()]
+        # unless something weird happened, wc has one parent
+        if len(wcpar) == 1:
+            self.graphview.scroll_to_revision(wcpar[0])
+
+    def bisect_good(self, menuitem):
+        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+        self.run_bisect_step(cmd)
 
     def bisect_bad(self, menuitem):
         cmd = ['hg', 'bisect', '--bad', str(self.currevid)]
-        self.execute_command(cmd, force=True)
-        self.refresh_model()
+        self.run_bisect_step(cmd)
 
     def bisect_skip(self, menuitem):
         cmd = ['hg', 'bisect', '--skip', str(self.currevid)]
-        self.execute_command(cmd, force=True)
-        self.refresh_model()
+        self.run_bisect_step(cmd)
 
     def show_status(self, menuitem):
         rev = self.currevid
