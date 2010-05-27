@@ -20,7 +20,6 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Technical Debt
-#   clicking on labels should show their description
 #   stacked widget or pages need to be scrollable
 #   add extensions page after THG 1.1 is released
 #   we need a consistent icon set
@@ -648,9 +647,17 @@ class SettingsForm(QWidget):
             else:
                 func = values
                 w = func(opts)
-            form.addRow(label, w)
+            lbl = QLabel(label)
+            lbl.installEventFilter(self)
+            lbl.tooltip = tooltip
+            form.addRow(lbl, w)
             widgets.append(w)
         return widgets
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Enter:
+            self.desctext.setText(obj.tooltip)
+        return False
 
     def addPage(self, name):
         for data in INFO:
