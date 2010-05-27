@@ -426,6 +426,7 @@ def fileEditor(filename):
         dialog.setWindowTitle(filename)
         geomname = 'editor-geom'
         editor.setText(contents)
+        editor.setUtf8(True)
         editor.setModified(False)
         dialog.restoreGeometry(s.value(geomname).toByteArray())
         ret = dialog.exec_()
