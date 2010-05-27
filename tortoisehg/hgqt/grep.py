@@ -22,8 +22,6 @@ from PyQt4.QtGui import *
 
 # Technical Debt
 #  tortoisehg.editor with line number
-#  smart visual diffs (what does this mean?)
-#  context menu for matches (view file, annotate file)
 
 class SearchWidget(QDockWidget):
     '''Working copy and repository search widget
@@ -374,13 +372,65 @@ class MatchTree(QTreeView):
 
     def customContextMenuRequested(self, point):
         selrows = []
+        wctxonly = True
+        allhistory = False
         for index in self.selectedRows():
             path, line, rev, user, text = self.model().getRow(index)
+            if rev is not None:
+                wctxonly = False
+            if user is not None:
+                allhistory = True
             selrows.append((rev, path, line))
+        if not selrows:
+            return
         point = self.mapToGlobal(point)
-        #action = wctxactions.wctxactions(self, point, self.repo, selrows)
-        #if action:
-        #    self.emit(SIGNAL('menuAction()'))
+        menus = [(_('View file'), self.view), (_('Annotate file'), self.ann)]
+        if not wctxonly:
+            menus.append((_('View Changeset'), self.ctx))
+        if allhistory:
+            # need to know files were modified at specified revision
+            menus.append((_('Visual Diff'), self.vdiff))
+        menu = QMenu(self)
+        for name, func in menus:
+            action = menu.addAction(name)
+            action.wrapper = lambda f=func: f(selrows)
+            self.connect(action, SIGNAL('triggered()'), action.wrapper)
+        menu.exec_(point)
+
+    def ann(self, rows):
+        raise NotImplementedError()
+    def ctx(self, rows):
+        raise NotImplementedError()
+
+    def view(self, rows):
+        from tortoisehg.hgqt import wctxactions
+        repo, ui = self.repo, self.repo.ui
+        for rev, path, line in rows:
+            path = hglib.fromunicode(path)
+            # TODO: do something with 'line'
+            if rev is None:
+                files = [repo.wjoin(path)]
+                wctxactions.edit(self, ui, repo, files)
+            else:
+                base, _ = visdiff.snapshot(repo, [path], repo[rev])
+                files = [os.path.join(base, path)]
+                wctxactions.edit(self, ui, repo, files)
+
+    def vdiff(self, rows):
+        repo, ui = self.repo, self.repo.ui
+        while rows:
+            defer = []
+            crev = rows[0][0]
+            files = [rows[0][1]]
+            for rev, path, line in rows[1:]:
+                if rev == crev:
+                    files.append(path)
+                else:
+                    defer.append([rev, path, line])
+            if crev is not None:
+                files = [hglib.fromunicode(f) for f in files]
+                visdiff.visualdiff(ui, repo, files, {'change':crev})
+            rows = defer
 
     def selectedRows(self):
         return self.selectionModel().selectedRows()
