@@ -313,6 +313,58 @@ class ExpanderLabel(QtGui.QWidget):
     def pm_clicked(self):
         self.expanded.emit(self.button.is_expanded())
 
+class StatusLabel(QtGui.QWidget):
+
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+
+        box = QtGui.QHBoxLayout()
+        box.setContentsMargins(*(0,)*4)
+        self.status_icon = QtGui.QLabel()
+        self.status_icon.setMaximumSize(16, 16)
+        self.status_icon.setAlignment(QtCore.Qt.AlignCenter)
+        box.addWidget(self.status_icon)
+        self.status_text = QtGui.QLabel()
+        self.status_text.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
+        box.addWidget(self.status_text)
+        box.addStretch(0)
+
+        self.setLayout(box)
+
+    def set_status(self, text, icon=None):
+        self.set_text(text)
+        self.set_icon(icon)
+
+    def clear_status(self):
+        self.clear_text()
+        self.clear_icon()
+
+    def set_text(self, text=''):
+        if text is None:
+            text = ''
+        self.status_text.setText(text)
+
+    def clear_text(self):
+        self.set_text()
+
+    def set_icon(self, icon=None):
+        if icon is None:
+            self.clear_icon()
+        else:
+            if isinstance(icon, bool):
+                pixmap = icon and getpixmap('success') or getpixmap('error')
+            elif isinstance(icon, QtGui.QIcon):
+                pixmap = icon.pixmap(16, 16)
+            elif isinstance(icon, QtGui.QPixmap):
+                pixmap = icon
+            else:
+                raise TypeError, '%s: bool, QIcon or QPixmap' % type(icon)
+            self.status_icon.setShown(True)
+            self.status_icon.setPixmap(pixmap)
+
+    def clear_icon(self):
+        self.status_icon.setHidden(True)
+
 def fileEditor(filename):
     'Open a simple modal file editing dialog'
     dialog = QtGui.QDialog()

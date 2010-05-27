@@ -24,5 +24,7 @@
     <file>icons/fileadd.ico</file>
     <file>icons/filedelete.ico</file>
     <file>icons/fallback.svg</file>
+    <file>icons/success.svg</file>
+    <file>icons/error.svg</file>
   </qresource>
 </RCC>
