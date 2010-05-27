@@ -251,7 +251,7 @@ class HistorySearchThread(QThread):
                                 self.fullmsg.split('\0', 5) 
                         text = '<b>%s</b> <span>%s</span>' % (
                                 addremove, text[:-1])
-                        row = [fname, line, rev, user, text]
+                        row = [fname, rev, line, user, text]
                         self.obj.emit(SIGNAL('matchedRow'), row)
                     except ValueError:
                         pass
