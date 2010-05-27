@@ -370,7 +370,8 @@ class StatusWidget(QWidget):
                     diff = _('<b>Contents are binary, not previewable</b>')
                     self.te.setHtml(diff)
                 else:
-                    self.te.setText(diff)
+                    diff = '<pre>%s</pre>' % xml_escape(diff)
+                    self.te.setHtml(diff)
             else:
                 diff = _('<b>Not displayed</b>') + show
                 self.te.setHtml(diff)
