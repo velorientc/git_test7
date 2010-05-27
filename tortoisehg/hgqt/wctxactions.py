@@ -53,8 +53,18 @@ def wctxactions(parent, point, repo, selrows):
     make(_('&Delete unversioned'), delete, frozenset('?I'))
     if len(selrows) == 1:
         menu.addSeparator()
-        make(_('&Copy...'), copy, frozenset('MC'))
-        make(_('Rename...'), rename, frozenset('MC'))
+        t, path = selrows[0]
+        wctx = repo[None]
+        if t & frozenset('?') and wctx.deleted():
+            rmenu = QMenu(_('Was renamed from'))
+            for d in wctx.deleted()[:15]:
+                action = rmenu.addAction(hglib.tounicode(d))
+                action.wrapper = lambda d=d: renamefromto(repo, d, path)
+                parent.connect(action, SIGNAL('triggered()'), action.wrapper)
+            menu.addMenu(rmenu)
+        else:
+            make(_('&Copy...'), copy, frozenset('MC'))
+            make(_('Rename...'), rename, frozenset('MC'))
     menu.addSeparator()
     make(_('Mark unresolved'), unmark, frozenset('r'))
     make(_('Mark resolved'), mark, frozenset('u'))
@@ -99,6 +109,10 @@ def run(func, parent, files, repo):
     finally:
         os.chdir(cwd)
     return notify
+
+def renamefromto(repo, deleted, unknown):
+    repo.remove([deleted]) # !->R
+    repo.copy(deleted, unknown)
 
 def vdiff(parent, ui, repo, files):
     visdiff.visualdiff(ui, repo, files, {})
