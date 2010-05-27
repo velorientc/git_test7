@@ -24,7 +24,6 @@ from PyQt4.QtGui import *
 #  We need a real icon set for file status types
 #  Thread rowSelected, connect to an external progress bar
 #  Chunk selection, tri-state checkboxes for commit
-#  TreeView steals CTRL-ENTER from parent widgets 
 # Maybe, Maybe Not
 #  Investigate folding/nesting of files
 #  Toolbar
@@ -651,6 +650,10 @@ class WctxModel(QAbstractTableModel):
 
     def toggleRow(self, index):
         'Connected to "activated" signal, emitted by dbl-click or enter'
+        if QApplication.keyboardModifiers() & Qt.ControlModifier:
+            # ignore Ctrl-Enter events, the user does not want a row
+            # toggled just as they are committing.
+            return
         assert index.isValid()
         fname = self.rows[index.row()][COL_PATH]
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
