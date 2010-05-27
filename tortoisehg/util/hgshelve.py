@@ -15,7 +15,6 @@ import errno
 import operator
 import os
 import re
-import shutil
 import tempfile
 
 from mercurial import cmdutil, commands, cmdutil, hg, mdiff, patch, revlog
@@ -420,6 +419,29 @@ def makebackup(ui, repo, dir, files):
 
     return backups
 
+
+def delete_backup(ui, repo, backupdir):
+    """remove the shelve backup files and directory"""
+
+    backupdir = os.path.normpath(repo.join(backupdir))
+
+    # Do a sanity check to ensure that unrelated files aren't destroyed.
+    # All shelve file and directory paths must start with "shelve" under
+    # the .hg directory.
+    if backupdir.startswith(repo.join('shelve')):
+        try:
+            backups = os.listdir(backupdir)
+            for filename in backups:
+                ui.debug(_('removing backup file : %r\n') % filename)
+                os.unlink(os.path.join(backupdir, filename))
+            os.rmdir(backupdir)
+        except OSError:
+            ui.warn(_('delete of shelve backup failed'))
+            pass
+    else:
+        ui.warn(_('bad shelve backup directory name'))
+
+
 def get_shelve_filename(repo):
     return repo.join('shelve')
 
@@ -543,13 +565,8 @@ def shelve(ui, repo, *pats, **opts):
 
             return 0
         finally:
-            try:
-                for realname, tmpname in backups.iteritems():
-                    ui.debug(_('removing backup for %r : %r\n') % (realname, tmpname))
-                    os.unlink(tmpname)
-                os.rmdir(backupdir)
-            except OSError:
-                pass
+            delete_backup(ui, repo, backupdir)
+
     fancyopts.fancyopts([], commands.commitopts, opts)
     return cmdutil.commit(ui, repo, shelvefunc, pats, opts)
 
@@ -576,6 +593,7 @@ def unshelve(ui, repo, *pats, **opts):
                 backups = makebackup(ui, repo, backupdir, set(files))
             except:
                 ui.warn(_('unshelve backup aborted\n'))
+                delete_backup(ui, repo, backupdir)
                 raise
 
             ui.debug(_('applying shelved patch\n'))
@@ -597,11 +615,7 @@ def unshelve(ui, repo, *pats, **opts):
                                      (tmpname, realname))
                             util.copyfile(tmpname, repo.wjoin(realname))
             finally:
-                try:
-                    ui.debug(_('removing backup files\n'))
-                    shutil.rmtree(backupdir, True)
-                except OSError:
-                    pass
+                delete_backup(ui, repo, backupdir)
 
             if patchdone:
                 ui.debug(_('removing shelved patches\n'))
