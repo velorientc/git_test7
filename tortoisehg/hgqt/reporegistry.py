@@ -59,7 +59,7 @@ def writeXml(target, item, rootElementName):
     xw.writeEndElement()
     xw.writeEndDocument()
 
-def readXml(source, rootElementName):
+def readXml(source, rootElementName, model):
     itemread = None
     xr = QtCore.QXmlStreamReader(source)
     if xr.readNextStartElement():
@@ -71,22 +71,23 @@ def readXml(source, rootElementName):
     if xr.hasError():
         print str(xr.errorString())
     if xr.readNextStartElement():
-        itemread = undumpObject(xr)
+        itemread = undumpObject(xr, model)
         xr.skipCurrentElement()
     if xr.hasError():
         print str(xr.errorString())
     return itemread
 
-def undumpObject(xr):
+def undumpObject(xr, model):
     classname = xmlToClass(str(xr.name().toString()))
     class_ = getattr(sys.modules[RepoTreeItem.__module__], classname)
-    obj = class_()
+    obj = class_(model)
     obj.undump(xr)
     return obj
 
 
 class RepoTreeItem:
-    def __init__(self, parent=None):
+    def __init__(self, model, parent=None):
+        self.model = model
         self._parent = parent
         self.childs = []
         self._row = 0
@@ -143,7 +144,7 @@ class RepoTreeItem:
         while not xr.atEnd():
             xr.readNext()
             if xr.isStartElement():
-                item = undumpObject(xr)
+                item = undumpObject(xr, self.model)
                 self.appendChild(item)
             elif xr.isEndElement():
                 break
@@ -153,10 +154,13 @@ class RepoTreeItem:
         self.dump(xw)
         xw.writeEndElement()
 
+    def open(self):
+        pass
+
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, rootpath='', parent=None):
-        RepoTreeItem.__init__(self, parent)
+    def __init__(self, model, rootpath='', parent=None):
+        RepoTreeItem.__init__(self, model, parent)
         self._root = rootpath
         
     def rootpath(self):
@@ -192,10 +196,13 @@ class RepoItem(RepoTreeItem):
         self._root = str(a.value('', 'root').toString())
         RepoTreeItem.undump(self, xr)
 
+    def open(self):
+        self.model.openrepofunc(self._root)
+
 
 class RepoGroupItem(RepoTreeItem):
-    def __init__(self, name=None, parent=None):
-        RepoTreeItem.__init__(self, parent)
+    def __init__(self, model, name=None, parent=None):
+        RepoTreeItem.__init__(self, model, parent)
         if name:
             self.name = name
         else:
@@ -236,8 +243,8 @@ class RepoGroupItem(RepoTreeItem):
 
 
 class AllRepoGroupItem(RepoTreeItem):
-    def __init__(self, parent=None):
-        RepoTreeItem.__init__(self, parent)
+    def __init__(self, model, parent=None):
+        RepoTreeItem.__init__(self, model, parent)
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -267,16 +274,18 @@ class AllRepoGroupItem(RepoTreeItem):
 
 
 class RepoTreeModel(QtCore.QAbstractItemModel):
-    def __init__(self, fn=None, parent=None):
+    def __init__(self, openrepofunc, filename=None, parent=None):
         QtCore.QAbstractItemModel.__init__(self, parent)
+
+        self.openrepofunc = openrepofunc
 
         root = None
         all = None
 
-        if fn:
+        if filename:
             f = QtCore.QFile(settingsfilename())
             if f.open(QtCore.QIODevice.ReadOnly):
-                root = readXml(f, reporegistryXmlElementName)
+                root = readXml(f, reporegistryXmlElementName, self)
                 f.close()
                 if root:
                     for c in root.childs:
@@ -383,7 +392,7 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         for s in data.formats():
             print s
         d = str(data.data(repoRegMimeType))
-        itemread = readXml(d, extractXmlElementName)
+        itemread = readXml(d, extractXmlElementName, self)
 
         group = parent.internalPointer()
         cc = group.childCount()
@@ -508,7 +517,7 @@ class RepoTreeView(QtGui.QTreeView):
     def open(self):
         if not self.selitem:
             return
-        self.parent.openrepo(self.selitem.internalPointer().rootpath())
+        self.selitem.internalPointer().open()
 
     def newGroup(self):
         m = self.model()
@@ -543,7 +552,7 @@ class RepoRegistryView(QDockWidget):
         mainframe.setLayout(lay)
         self.setWidget(mainframe)
 
-        self.tmodel = m = RepoTreeModel(settingsfilename())
+        self.tmodel = m = RepoTreeModel(self.openrepo, settingsfilename())
 
         self.tview = tv = RepoTreeView(self)
         lay.addWidget(tv)
