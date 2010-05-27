@@ -117,11 +117,33 @@ def renamefromto(repo, deleted, unknown):
 def vdiff(parent, ui, repo, files):
     visdiff.visualdiff(ui, repo, files, {})
 
-def edit(parent, ui, repo, files):
-    editor = (ui.config('tortoisehg', 'editor') or
-              os.environ.get('HGEDITOR') or
-              ui.config('ui', 'editor') or
-              os.environ.get('EDITOR', 'vi'))
+def edit(parent, ui, repo, files, lineno=None):
+    files = [util.shellquote(util.localpath(f)) for f in files]
+    editor = ui.config('tortoisehg', 'editor')
+    if editor:
+        try:
+            pre, ln = editor.split('[')
+            ln, post = ln.split(']')
+            if lineno is not None:
+                assert len(files) == 1 # lineno implies one file
+                ln = ln.replace('$LINENUM', str(lineno))
+                if '$FILE' in ln:
+                    ln = ln.replace('$FILE', files[0])
+                    cmdline = ' '.join([pre, ln, post])
+                else:
+                    cmdline = ' '.join([pre, ln, post] + files)
+            else:
+                cmdline = ' '.join([pre, post] + files)
+        except ValueError, e:
+            # '[' or ']' not found
+            cmdline = ' '.join([editor] + files)
+        except TypeError, e:
+            # variable expansion failed
+            cmdline = ' '.join([editor] + files)
+    else:
+        editor = os.environ.get('HGEDITOR') or ui.config('ui', 'editor') or \
+                 os.environ.get('EDITOR', 'vi')
+        cmdline = ' '.join([editor] + files)
     if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
         res = QtGui.QMessageBox.critical(parent,
                        _('No visual editor configured'),
@@ -131,8 +153,6 @@ def edit(parent, ui, repo, files):
         dlg.exec_()
         return
 
-    files = [util.shellquote(util.localpath(f)) for f in files]
-    cmdline = ' '.join([editor] + files)
     cmdline = util.quotecommand(cmdline)
     try:
         subprocess.Popen(cmdline, shell=True, creationflags=visdiff.openflags,
