@@ -411,7 +411,11 @@ def makebackup(ui, repo, dir, files):
                                        dir=dir)
         os.close(fd)
         ui.debug(_('backup %r as %r\n') % (f, tmpname))
-        util.copyfile(repo.wjoin(f), tmpname)
+        try:
+            util.copyfile(repo.wjoin(f), tmpname)
+        except:
+            ui.warn(_('file copy of %s failed\n') % f)
+            raise
         backups[f] = tmpname
 
     return backups
@@ -556,6 +560,9 @@ def unshelve(ui, repo, *pats, **opts):
     try:
         fp = cStringIO.StringIO()
         fp.write(repo.opener('shelve').read())
+    except:
+        ui.warn(_('nothing to unshelve\n'))
+    else:
         if opts['inspect']:
             ui.status(fp.getvalue())
         else:
@@ -565,7 +572,11 @@ def unshelve(ui, repo, *pats, **opts):
                 if isinstance(chunk, header):
                     files += chunk.files()
             backupdir = repo.join('shelve-backups')
-            backups = makebackup(ui, repo, backupdir, set(files))
+            try:
+                backups = makebackup(ui, repo, backupdir, set(files))
+            except:
+                ui.warn(_('unshelve backup aborted\n'))
+                raise
 
             ui.debug(_('applying shelved patch\n'))
             patchdone = 0
@@ -596,8 +607,8 @@ def unshelve(ui, repo, *pats, **opts):
                 ui.debug(_('removing shelved patches\n'))
                 os.unlink(repo.join('shelve'))
                 ui.status(_('unshelve completed\n'))
-    except IOError:
-        ui.warn(_('nothing to unshelve\n'))
+            else:
+                raise patch.PatchError
 
 cmdtable = {
     "shelve":

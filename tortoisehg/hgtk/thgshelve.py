@@ -10,7 +10,7 @@
 import os
 import gtk
 
-from mercurial import util
+from mercurial import util, patch, ui
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, hgshelve
@@ -30,6 +30,7 @@ class GShelve(GStatus):
     def init(self):
         GStatus.init(self)
         self.mode = 'shelve'
+        self.ui = ErrBufUI(self.ui)
 
     def parse_opts(self):
         GStatus.parse_opts(self)
@@ -201,13 +202,17 @@ class GShelve(GStatus):
         opts = {'addremove': None, 'include': [], 'force': None,
                 'append': None, 'exclude': [], 'inspect': None}
         try:
+            self.ui.errorq = []
             self.ui.quiet = True
             hgshelve.unshelve(self.ui, self.repo, **opts)
             self.ui.quiet = False
             self.reload_status()
+        except (util.Abort, IOError, patch.PatchError), e:
+            gdialog.Prompt(_('Unshelve Abort'),
+                           ''.join(self.ui.errorq), self).run()
         except Exception, e:
             gdialog.Prompt(_('Unshelve Error'),
-                    _('Error: %s') % e, self).run()
+                           _('Error: %s') % e, self).run()
 
     def shelve_clicked(self, toolbutton, data=None):
         if not self.isuptodate():
@@ -220,6 +225,22 @@ class GShelve(GStatus):
             return
         self.unshelve()
         self.activate_shelve_buttons(True)
+
+
+class ErrBufUI(ui.ui):
+    """ui subclass to save hg and thg errors"""
+
+    def __init__(self, src=None, errorq=[]):
+        ui.ui.__init__(self, src)
+        if src and hasattr(src, 'errorq'):
+            self.errorq = src.errorq
+        else:
+            self.errorq = errorq
+
+    def warn(self, *msg, **opts):
+        self.errorq.extend(msg)
+        ui.ui.warn(self, *msg, **opts)
+
 
 def run(_ui, *pats, **opts):
     cmdoptions = {
