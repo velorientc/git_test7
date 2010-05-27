@@ -115,6 +115,10 @@ class DetectRenameDialog(QDialog):
         selmodel = matchtv.selectionModel()
         selmodel.selectionChanged.connect(matchselect)
 
+        sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sp.setHorizontalStretch(1)
+        matchframe.setSizePolicy(sp)
+
         diffframe = QFrame(hsplit)
         diffvbox = QVBoxLayout()
         diffframe.setLayout(diffvbox)
