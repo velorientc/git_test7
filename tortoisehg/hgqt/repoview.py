@@ -110,7 +110,7 @@ class HgRepoView(QtGui.QTableView):
              ('manifest', _('Show at rev...'), None,
               _('Show the manifest at selected revision'), None,
               self.showAtRev),
-             ('update', _('Update...'), None, None, None,
+             ('update', _('Update...'), 'update', None, None,
               self.updateToRev),
              ('tag', _('Tag...'), 'tag', None, None,
               self.tagToRev),

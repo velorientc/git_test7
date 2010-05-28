@@ -29,5 +29,6 @@
     <file>icons/tag.svg</file>
     <file>icons/archive.svg</file>
     <file>icons/clone.svg</file>
+    <file>icons/update.svg</file>
   </qresource>
 </RCC>

@@ -142,6 +142,7 @@ class UpdateDialog(QDialog):
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         reponame = hglib.get_reponame(self.repo)
         self.setWindowTitle(_('Update - %s') % hglib.tounicode(reponame))
+        self.setWindowIcon(qtlib.geticon('update'))
 
         # prepare to show
         self.rev_combo.lineEdit().selectAll()
