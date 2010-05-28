@@ -22,7 +22,7 @@ from tortoisehg.hgqt import cmdui, qtlib
 
 class CloneDialog(QDialog):
 
-    def __init__(self, args=None, opts=None):
+    def __init__(self, args=None, opts={}):
         super(CloneDialog, self).__init__()
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui = ui.ui()
@@ -143,12 +143,13 @@ class CloneDialog(QDialog):
         self.rev_text.setDisabled(True)
         self.remote_text.setDisabled(True)
 
-        if opts.get('rev'):
+        rev = opts.get('rev')
+        if rev:
             self.rev_chk.setChecked(True)
-            self.rev_text.setText(hglib.tounicode(', '.join(opts['rev'])))
-        self.noupdate_chk.setChecked(bool(opts['noupdate']))
-        self.pproto_chk.setChecked(bool(opts['pull']))
-        self.uncomp_chk.setChecked(bool(opts['uncompressed']))
+            self.rev_text.setText(hglib.tounicode(', '.join(rev)))
+        self.noupdate_chk.setChecked(bool(opts.get('noupdate')))
+        self.pproto_chk.setChecked(bool(opts.get('pull')))
+        self.uncomp_chk.setChecked(bool(opts.get('uncompressed')))
 
         self.src_combo.setFocus()
         self.src_combo.lineEdit().selectAll()
