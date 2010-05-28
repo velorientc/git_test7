@@ -18,6 +18,8 @@
    sodipodi:docname="success.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1">
+  <title
+     id="title2819">Success</title>
   <defs
      id="defs3">
     <inkscape:perspective
@@ -60,7 +62,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
-     inkscape:cx="22.837454"
+     inkscape:cx="3.524954"
      inkscape:cy="23.389777"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -82,21 +84,21 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
         <cc:license
            rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
-        <dc:title />
+        <dc:title>Success</dc:title>
         <dc:creator>
           <cc:Agent>
-            <dc:title>Jakub Steiner</dc:title>
+            <dc:title>Yuki Kodama</dc:title>
           </cc:Agent>
         </dc:creator>
         <dc:subject>
-          <rdf:Bag>
-            <rdf:li>emblem</rdf:li>
-            <rdf:li>photos</rdf:li>
-            <rdf:li>pictures</rdf:li>
-            <rdf:li>raw</rdf:li>
-            <rdf:li>jpeg</rdf:li>
-          </rdf:Bag>
+          <rdf:Bag />
         </dc:subject>
+        <dc:date>2010-05-29</dc:date>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>TortoiseHg Project</dc:title>
+          </cc:Agent>
+        </dc:publisher>
       </cc:Work>
       <cc:License
          rdf:about="http://creativecommons.org/licenses/publicdomain/">

@@ -15,6 +15,8 @@
    version="1.1"
    inkscape:version="0.47 r22583"
    sodipodi:docname="tag.svg">
+  <title
+     id="title2824">Tag</title>
   <defs
      id="defs4">
     <inkscape:perspective
@@ -80,7 +82,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
-     inkscape:cx="36.981113"
+     inkscape:cx="17.668613"
      inkscape:cy="25.771301"
      inkscape:document-units="px"
      inkscape:current-layer="g3756"
@@ -100,7 +102,18 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title>Tag</dc:title>
+        <dc:date>2010-05-29</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Yuki Kodama</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>TortoiseHg Project</dc:title>
+          </cc:Agent>
+        </dc:publisher>
       </cc:Work>
     </rdf:RDF>
   </metadata>
