@@ -231,10 +231,12 @@ class RepoWidget(QtGui.QWidget):
     def tagToRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
         dlg = TagDialog(self.repo, rev=str(rev), parent=self)
-        def invalidated():
-            self.reload()
+        def finished(ret):
             self.setScanForRepoChanges(saved)
-        dlg.repoInvalidated.connect(invalidated) # TODO: implement something less drastic than a full reload
+        dlg.finished.connect(finished)
+        def invalidated():
+            self.reload() # TODO: implement something less drastic than a full reload
+        dlg.repoInvalidated.connect(invalidated)
         dlg.show()
 
     def revision_selected(self, rev):
