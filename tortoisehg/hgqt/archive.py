@@ -160,7 +160,8 @@ class ArchiveDialog(QDialog):
         self.make_connects()
 
         # dialog setting
-        self.setWindowTitle(_('TortoiseHg Archive - %s') % self.repo.root)
+        reponame = hglib.get_reponame(self.repo)
+        self.setWindowTitle(_('Archive - %s') % hglib.tounicode(reponame))
         iconfile = paths.get_tortoise_icon('menucheckout.ico')
         icon = QIcon()
         icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
