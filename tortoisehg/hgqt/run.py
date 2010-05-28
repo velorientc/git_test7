@@ -337,6 +337,11 @@ def add(ui, *pats, **opts):
     from tortoisehg.hgqt.quickop import run
     qtrun(run, ui, *pats, **opts)
 
+def backout(ui, *pats, **opts):
+    """backout tool"""
+    from tortoisehg.hgqt.backout import run
+    qtrun(run, ui, *pats, **opts)
+
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
     from tortoisehg.util.thgstatus import run
@@ -378,7 +383,7 @@ def status(ui, *pats, **opts):
     qtrun(run, ui, *pats, **opts)
 
 def tag(ui, *pats, **opts):
-    """clone tool"""
+    """tag tool"""
     from tortoisehg.hgqt.tag import run
     qtrun(run, ui, *pats, **opts)
 
@@ -660,6 +665,12 @@ table = {
     "archive": (archive,
         [('r', 'rev', '', _('revision to archive'))],
         _('thg archive')),
+    "^backout": (backout,
+        [('', 'merge', None,
+          _('merge with old dirstate parent after backout')),
+         ('', 'parent', '', _('parent to choose when backing out merge')),
+         ('r', 'rev', '', _('revision to backout'))],
+        _('thg backout [OPTION]... [[-r] REV]')),
     "^clone":
         (clone,
          [('U', 'noupdate', None,
