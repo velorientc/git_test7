@@ -23,7 +23,7 @@ class UpdateDialog(QDialog):
                      int  # status (0: succeeded, -1: failed)
                  ) 
 
-    def __init__(self, rev=None, repo=None, parent=None, opts=None):
+    def __init__(self, rev=None, repo=None, parent=None, opts={}):
         super(UpdateDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -106,7 +106,7 @@ class UpdateDialog(QDialog):
         optbox.addWidget(self.merge_chk)
         optbox.addWidget(self.showlog_chk)
 
-        self.discard_chk.setChecked(bool(opts['clean']))
+        self.discard_chk.setChecked(bool(opts.get('clean')))
 
         ## command widget
         self.cmd = cmdui.Widget()

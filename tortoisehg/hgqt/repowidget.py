@@ -219,8 +219,7 @@ class RepoWidget(QtGui.QWidget):
 
     def updateToRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
-        opts = { 'clean':False }
-        dlg = UpdateDialog(rev, self.repo, self, opts=opts)
+        dlg = UpdateDialog(rev, self.repo, self)
         self._updatedlg = dlg
         def quit(status):
             if status == 0:
