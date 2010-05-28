@@ -169,6 +169,7 @@ class SearchWidget(QDockWidget):
             self.emit(SIGNAL('errorMessage'), msg)
             return
 
+        self.tv.pattern = pattern
         self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
         if inc: inc = inc.split(', ')
@@ -331,6 +332,7 @@ class MatchTree(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
+        self.pattern = None
 
     def dragObject(self):
         snapshots = {}
@@ -406,15 +408,15 @@ class MatchTree(QTreeView):
 
     def view(self, rows):
         from tortoisehg.hgqt import wctxactions
-        repo, ui = self.repo, self.repo.ui
+        repo, ui, pattern = self.repo, self.repo.ui, self.pattern
         for rev, path, line in rows:
             if rev is None:
                 files = [repo.wjoin(path)]
-                wctxactions.edit(self, ui, repo, files, line)
+                wctxactions.edit(self, ui, repo, files, line, pattern)
             else:
                 base, _ = visdiff.snapshot(repo, [path], repo[rev])
                 files = [os.path.join(base, path)]
-                wctxactions.edit(self, ui, repo, files, line)
+                wctxactions.edit(self, ui, repo, files, line, pattern)
 
     def vdiff(self, rows):
         repo, ui = self.repo, self.repo.ui
