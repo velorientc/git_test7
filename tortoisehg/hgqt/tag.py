@@ -26,7 +26,7 @@ class TagDialog(QDialog):
 
     repoInvalidated = pyqtSignal()
 
-    def __init__(self, repo=None, tag='', rev='tip', parent=None, opts=None):
+    def __init__(self, repo=None, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -153,11 +153,11 @@ class TagDialog(QDialog):
         self.show_options(False)
         self.tag_combo.setFocus()
 
-        self.replace_chk.setChecked(bool(opts['force']))
-        self.local_chk.setChecked(bool(opts['local']))
-        if not opts['local'] and opts['message']:
+        self.replace_chk.setChecked(bool(opts.get('force')))
+        self.local_chk.setChecked(bool(opts.get('local')))
+        if not opts.get('local') and opts.get('message'):
             self.custom_chk.setChecked(True)
-            self.custom_text.setText(opts['message'])
+            self.custom_text.setText(opts.get('message', ''))
 
     ### Private Methods ###
 
