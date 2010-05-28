@@ -23,9 +23,9 @@ import os
 
 from PyQt4.QtCore import Qt, SIGNAL, SLOT, QObject, QString, SIGNAL
 from PyQt4.QtGui import QDialog, QComboBox, QVBoxLayout, QGridLayout, QLabel
-from PyQt4.QtGui import QLineEdit, QPushButton, QLayout, QRadioButton, QButtonGroup
+from PyQt4.QtGui import QLineEdit, QPushButton, QLayout, QRadioButton
 from PyQt4.QtGui import QHBoxLayout, QMessageBox, QIcon, QPixmap, QFileDialog
-from PyQt4.QtGui import QCheckBox
+from PyQt4.QtGui import QCheckBox, QButtonGroup
 
 from mercurial import hg, error
 
@@ -79,12 +79,14 @@ class ArchiveDialog(QDialog):
         self.grid.addWidget(self.dest_btn, 2, 2)
 
         # archive types
-        self.filesradio = QRadioButton(_('Directory of files'), None)
-        self.tarradio = QRadioButton(_('Uncompressed tar archive'), None)
-        self.tbz2radio = QRadioButton(_('Tar archive compressed using bzip2'), None)
-        self.tgzradio = QRadioButton(_('Tar archive compressed using gzip'), None)
-        self.uzipradio = QRadioButton(_('Uncompressed zip archive'), None)
-        self.zipradio = QRadioButton(_('Zip archive compressed using deflate'), None)
+        def radio(label):
+            return QRadioButton(label, None)
+        self.filesradio = radio(_('Directory of files'))
+        self.tarradio = radio(_('Uncompressed tar archive'))
+        self.tbz2radio = radio(_('Tar archive compressed using bzip2'))
+        self.tgzradio = radio(_('Tar archive compressed using gzip'))
+        self.uzipradio = radio(_('Uncompressed zip archive'))
+        self.zipradio = radio(_('Zip archive compressed using deflate'))
 
         self.types_lbl = QLabel(_('Archive types:'))
         self.types_lbl.setAlignment(Qt.AlignRight)
@@ -173,13 +175,17 @@ class ArchiveDialog(QDialog):
         if self.tarradio.isChecked():
             return {'type': 'tar', 'ext': '.tar', 'label': _('Tar archives')}
         elif self.tbz2radio.isChecked():
-            return {'type': 'tbz2', 'ext': '.tar.bz2', 'label': _('Bzip2 tar archives')}
+            return {'type': 'tbz2', 'ext': '.tar.bz2',
+                    'label': _('Bzip2 tar archives')}
         elif self.tgzradio.isChecked():
-            return {'type': 'tgz', 'ext': '.tar.gz', 'label': _('Gzip tar archives')}
+            return {'type': 'tgz', 'ext': '.tar.gz',
+                    'label': _('Gzip tar archives')}
         elif self.uzipradio.isChecked():
-            return {'type': 'uzip', 'ext': '.zip', 'label': ('Uncompressed zip archives')}
+            return {'type': 'uzip', 'ext': '.zip',
+                    'label': ('Uncompressed zip archives')}
         elif self.zipradio.isChecked():
-            return {'type': 'zip', 'ext': '.zip', 'label': _('Compressed zip archives')}
+            return {'type': 'zip', 'ext': '.zip',
+                    'label': _('Compressed zip archives')}
         return {'type': 'files', 'ext': '', 'label': _('Directory of files')}
 
     def update_path(self):
@@ -229,7 +235,8 @@ class ArchiveDialog(QDialog):
         self.compose_command(path, type)
 
     def make_connects(self):
-        self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'), self.rev_combo_changed)
+        self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'),
+                     self.rev_combo_changed)
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.filesradio.toggled.connect(self.update_path)
         self.tarradio.toggled.connect(self.update_path)
@@ -296,7 +303,8 @@ class ArchiveDialog(QDialog):
             if type == 'files':
                 if os.path.isfile(dest):
                     qtlib.WarningMsgBox(_('Duplicate Name'),
-                            _('The destination "%s" already exists as a file!' % dest))
+                            _('The destination "%s" already exists as '
+                              'a file!' % dest))
                     return False
                 elif os.listdir(dest):
                     if not qtlib.QuestionMsgBox(_('Confirm Overwrite'),
@@ -313,7 +321,8 @@ class ArchiveDialog(QDialog):
                         return False
                 else:
                     qtlib.WarningMsgBox(_('Duplicate Name'),
-                          _('The destination "%s" already exists as a folder!' % dest))
+                          _('The destination "%s" already exists as '
+                            'a folder!' % dest))
                     return False
 
         # prepare command line
