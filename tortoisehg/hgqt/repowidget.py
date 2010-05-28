@@ -20,11 +20,8 @@ from tortoisehg.hgqt.i18n import _
 
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.repomodel import HgRepoListModel
-from tortoisehg.hgqt.update import UpdateDialog
-from tortoisehg.hgqt.tag import TagDialog
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, update, tag, manifestdialog
 from tortoisehg.hgqt.config import HgConfig
-from tortoisehg.hgqt.manifestdialog import ManifestDialog
 
 from repoview import HgRepoView
 from revdetailswidget import RevDetailsWidget
@@ -209,7 +206,7 @@ class RepoWidget(QtGui.QWidget):
     def revision_activated(self, rev=None):
         if rev is None:
             rev = self.repoview.current_rev
-        self._manifestdlg = ManifestDialog(self.repo, rev)
+        self._manifestdlg = manifestdialog.ManifestDialog(self.repo, rev)
         self._manifestdlg.show()
 
     def setScanForRepoChanges(self, enable):
@@ -219,7 +216,7 @@ class RepoWidget(QtGui.QWidget):
 
     def updateToRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
-        dlg = UpdateDialog(rev, self.repo, self)
+        dlg = update.UpdateDialog(rev, self.repo, self)
         self._updatedlg = dlg
         def quit(status):
             if status == 0:
@@ -230,7 +227,7 @@ class RepoWidget(QtGui.QWidget):
 
     def tagToRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
-        dlg = TagDialog(self.repo, rev=str(rev), parent=self)
+        dlg = tag.TagDialog(self.repo, rev=str(rev), parent=self)
         def finished(ret):
             self.setScanForRepoChanges(saved)
         dlg.finished.connect(finished)
