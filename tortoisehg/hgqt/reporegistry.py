@@ -18,6 +18,8 @@ from PyQt4.QtGui import QVBoxLayout, QDockWidget, QFrame
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 
+from settings import SettingsDialog
+
 connect = QtCore.QObject.connect
 
 
@@ -162,6 +164,7 @@ class RepoItem(RepoTreeItem):
     def __init__(self, model, rootpath='', parent=None):
         RepoTreeItem.__init__(self, model, parent)
         self._root = rootpath
+        self._setttingsdlg = None
         
     def rootpath(self):
         return self._root
@@ -179,7 +182,7 @@ class RepoItem(RepoTreeItem):
         return QVariant()
 
     def menulist(self):
-        return ['open', 'remove']
+        return ['open', 'remove', None, 'settings']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
@@ -198,6 +201,12 @@ class RepoItem(RepoTreeItem):
 
     def open(self):
         self.model.openrepofunc(self._root)
+
+    def startSettings(self, parent):
+        if self._setttingsdlg is None:
+            self._setttingsdlg = SettingsDialog(
+                configrepo=True, parent=parent, root=self._root)
+        self._setttingsdlg.show()
 
 
 class RepoGroupItem(RepoTreeItem):
@@ -490,6 +499,8 @@ class RepoTreeView(QtGui.QTreeView):
                 _("Create a new group"), None, self.newGroup),
              ("rename", _("Rename"), None, 
                 _("Rename the entry"), None, self.startRename),
+             ("settings", _("Settings"), None, 
+                _("View the repository's settings"), None, self.startSettings),
              ("remove", _("Remove entry"), None, 
                 _("Remove the entry"), None, self.removeSelected),
              ]
@@ -515,6 +526,11 @@ class RepoTreeView(QtGui.QTreeView):
             if cb:
                 connect(act, SIGNAL('triggered()'), cb)
             self.addAction(act)
+
+    def startSettings(self):
+        if not self.selitem:
+            return
+        self.selitem.internalPointer().startSettings(self.parent)
 
     def startRename(self):
         if not self.selitem:

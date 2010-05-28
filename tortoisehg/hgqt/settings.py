@@ -416,13 +416,14 @@ CONF_REPO   = 1
 
 class SettingsDialog(QDialog):
     'Dialog for editing Mercurial.ini or hgrc'
-    def __init__(self, configrepo=False, focus=None, parent=None):
+    def __init__(self, configrepo=False, focus=None, parent=None, root=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('TortoiseHg Settings'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         try:
-            root = paths.find_root()
+            if root is None:
+                root = paths.find_root()
             if root:
                 repo = hg.repository(ui.ui(), root)
             else:
