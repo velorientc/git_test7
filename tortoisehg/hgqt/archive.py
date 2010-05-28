@@ -21,10 +21,10 @@
 
 import os
 
-from PyQt4.QtCore import Qt, SIGNAL, SLOT, QObject, QString, SIGNAL
+from PyQt4.QtCore import Qt, SIGNAL, SLOT, QObject
 from PyQt4.QtGui import QDialog, QComboBox, QVBoxLayout, QGridLayout, QLabel
 from PyQt4.QtGui import QLineEdit, QPushButton, QLayout, QRadioButton
-from PyQt4.QtGui import QHBoxLayout, QMessageBox, QIcon, QPixmap, QFileDialog
+from PyQt4.QtGui import QHBoxLayout, QIcon, QPixmap, QFileDialog
 from PyQt4.QtGui import QCheckBox, QButtonGroup
 
 from mercurial import hg, error
