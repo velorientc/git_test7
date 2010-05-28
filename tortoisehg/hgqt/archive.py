@@ -295,24 +295,24 @@ class ArchiveDialog(QDialog):
         if os.path.exists(dest):
             if type == 'files':
                 if os.path.isfile(dest):
-                    qtlib.WarningMsgBox(_('Duplicate name'),
+                    qtlib.WarningMsgBox(_('Duplicate Name'),
                             _('The destination "%s" already exists as a file!' % dest))
                     return False
                 elif os.listdir(dest):
-                    if not qtlib.QuestionMsgBox(_('Confirm overwrite'),
+                    if not qtlib.QuestionMsgBox(_('Confirm Overwrite'),
                                  _('The directory "%s" is not empty!\n\n'
                                    'Do you want to overwrite it?') % dest,
                                  parent=self):
                         return False
             else:
                 if os.path.isfile(dest):
-                    if not qtlib.QuestionMsgBox(_('Confirm overwrite'),
+                    if not qtlib.QuestionMsgBox(_('Confirm Overwrite'),
                                  _('The file "%s" already exists!\n\n'
                                    'Do you want to overwrite it?') % dest,
                                  parent=self):
                         return False
                 else:
-                    r = qtlib.WarningMsgBox(_('Duplicate name'),
+                    r = qtlib.WarningMsgBox(_('Duplicate Name'),
                             _('The destination "%s" already exists as a folder!' % dest))
                     return False
 
