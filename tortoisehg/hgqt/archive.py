@@ -162,10 +162,7 @@ class ArchiveDialog(QDialog):
         # dialog setting
         reponame = hglib.get_reponame(self.repo)
         self.setWindowTitle(_('Archive - %s') % hglib.tounicode(reponame))
-        iconfile = paths.get_tortoise_icon('menucheckout.ico')
-        icon = QIcon()
-        icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
-        self.setWindowIcon(icon)
+        self.setWindowIcon(qtlib.geticon('menucheckout'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
