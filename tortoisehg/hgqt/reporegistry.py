@@ -165,7 +165,7 @@ class RepoItem(RepoTreeItem):
         RepoTreeItem.__init__(self, model, parent)
         self._root = rootpath
         self._setttingsdlg = None
-        
+
     def rootpath(self):
         return self._root
 
@@ -191,8 +191,8 @@ class RepoItem(RepoTreeItem):
         return False
 
     def dump(self, xw):
-        RepoTreeItem.dump(self, xw)
         xw.writeAttribute('root', self._root)
+        RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
         a = xr.attributes()
@@ -293,7 +293,7 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         all = None
 
         if filename:
-            f = QtCore.QFile(settingsfilename())
+            f = QtCore.QFile(filename)
             if f.open(QtCore.QIODevice.ReadOnly):
                 root = readXml(f, reporegistryXmlElementName, self)
                 f.close()
@@ -304,8 +304,8 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
                             break
 
         if not root:
-            root = RepoTreeItem()
-            all = AllRepoGroupItem()
+            root = RepoTreeItem(self)
+            all = AllRepoGroupItem(self)
             root.appendChild(all)
 
         self.rootItem = root
@@ -430,7 +430,7 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         all = self.allrepos
         cc = all.childCount()
         self.beginInsertRows(self.allreposIndex(), cc, cc + 1)
-        all.appendChild(RepoItem(reporoot))
+        all.appendChild(RepoItem(self, reporoot))
         self.endInsertRows()
 
     def getRepoItem(self, reporoot):
