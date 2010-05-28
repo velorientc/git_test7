@@ -26,5 +26,6 @@
     <file>icons/fallback.svg</file>
     <file>icons/success.svg</file>
     <file>icons/error.svg</file>
+    <file>icons/tag.svg</file>
   </qresource>
 </RCC>
