@@ -633,7 +633,8 @@ class SettingsForm(QWidget):
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
                     self.pageList.setCurrentRow(i)
-                    self.pages[meta['name']][1][n].setFocus()
+                    QTimer.singleShot(0, lambda: \
+                            self.pages[meta['name']][1][n].setFocus())
                     return
 
     def fillFrame(self, info):
