@@ -20,7 +20,6 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # Technical Debt
-#   detect URLs in tooltips, make clickable
 #   stacked widget or pages need to be scrollable
 #   add extensions page after THG 1.1 is released
 #   we need a consistent icon set
@@ -83,7 +82,7 @@ class SettingsCombo(QComboBox):
         QComboBox.showPopup(self)
 
     def focusInEvent(self, e):
-        self.opts['descwidget'].setPlainText(self.opts['tooltip'])
+        self.opts['descwidget'].setHtml(self.opts['tooltip'])
         QComboBox.focusInEvent(self, e)
 
     ## common APIs for all edit widgets
@@ -117,7 +116,7 @@ class PasswordEntry(QLineEdit):
         self.setDisabled(opts['readonly'])
 
     def focusInEvent(self, e):
-        self.opts['descwidget'].setPlainText(self.opts['tooltip'])
+        self.opts['descwidget'].setHtml(self.opts['tooltip'])
         QLineEdit.focusInEvent(self, e)
 
     ## common APIs for all edit widgets
@@ -193,9 +192,10 @@ INFO = (
           ' unspecified, TortoiseHg will use the selected merge tool.'
           ' Failing that it uses the first applicable tool it finds.')),
     (_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
-        _('Specify the visual editor used to view files.  Format:\n'
-          'myeditor -flags [$FILE --num=$LINENUM] -moreflags\n\n'
-          'See http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
+        _('Specify the visual editor used to view files.  Format:<br>'
+          'myeditor -flags [$FILE --num=$LINENUM] -moreflags<br><br>'
+          'See <a href="%s">OpenAtLine</a>'
+          % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     (_('CLI Editor'), 'ui.editor', genEditCombo,
         _('The editor to use during a commit and other instances where'
         ' Mercurial needs multiline input from the user.  Used by'
@@ -562,6 +562,7 @@ class SettingsForm(QWidget):
         self.pageList = pageList
 
         desctext = QTextBrowser()
+        desctext.setOpenExternalLinks(True)
         layout.addWidget(desctext)
         self.desctext = desctext
 
@@ -660,7 +661,7 @@ class SettingsForm(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Enter:
-            self.desctext.setText(obj.tooltip)
+            self.desctext.setHtml(obj.tooltip)
         return False
 
     def addPage(self, name):
