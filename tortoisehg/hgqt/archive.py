@@ -312,8 +312,8 @@ class ArchiveDialog(QDialog):
                                  parent=self):
                         return False
                 else:
-                    r = qtlib.WarningMsgBox(_('Duplicate Name'),
-                            _('The destination "%s" already exists as a folder!' % dest))
+                    qtlib.WarningMsgBox(_('Duplicate Name'),
+                          _('The destination "%s" already exists as a folder!' % dest))
                     return False
 
         # prepare command line
