@@ -429,10 +429,10 @@ class MatchTree(QTreeView):
         while rows:
             defer = []
             crev = rows[0][0]
-            files = [rows[0][1]]
+            files = set([rows[0][1]])
             for rev, path, line in rows[1:]:
                 if rev == crev:
-                    files.append(path)
+                    files.add(path)
                 else:
                     defer.append([rev, path, line])
             if crev is not None:
