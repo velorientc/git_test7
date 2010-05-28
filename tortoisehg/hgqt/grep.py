@@ -409,7 +409,13 @@ class MatchTree(QTreeView):
     def view(self, rows):
         from tortoisehg.hgqt import wctxactions
         repo, ui, pattern = self.repo, self.repo.ui, self.pattern
+        seen = set()
         for rev, path, line in rows:
+            # Only open one editor instance per file
+            if path in seen:
+                continue
+            else:
+                seen.add(path)
             if rev is None:
                 files = [repo.wjoin(path)]
                 wctxactions.edit(self, ui, repo, files, line, pattern)
