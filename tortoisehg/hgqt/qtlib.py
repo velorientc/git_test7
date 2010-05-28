@@ -205,7 +205,9 @@ def ErrorMsgBox(*args, **kargs):
     return CommonMsgBox(QtGui.QMessageBox.Critical, *args, **kargs)
 
 def QuestionMsgBox(*args, **kargs):
-    return CommonMsgBox(QtGui.QMessageBox.Question, *args, **kargs)
+    btn = QtGui.QMessageBox.Yes | QtGui.QMessageBox.No
+    res = CommonMsgBox(QtGui.QMessageBox.Question, buttons=btn, *args, **kargs)
+    return res == QtGui.QMessageBox.Yes
 
 class CustomPrompt(QtGui.QMessageBox):
     def __init__(self, title, message, parent, choices, default=None,
