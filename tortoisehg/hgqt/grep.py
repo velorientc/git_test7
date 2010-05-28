@@ -202,7 +202,7 @@ class SearchWidget(QDockWidget):
         self.regexple.setEnabled(False)
         self.connect(self.thread, SIGNAL('finished'), self.finished)
         self.connect(self.thread, SIGNAL('matchedRow'),
-                     lambda row: model.appendRow(*row))
+                     lambda wrapper: model.appendRow(*wrapper.data))
         self.emit(SIGNAL('loadBegin'))
         self.thread.start()
 
@@ -213,6 +213,9 @@ class SearchWidget(QDockWidget):
         self.regexple.setFocus()
         self.emit(SIGNAL('loadComplete'))
 
+class DataWrapper(QObject):
+    def __init__(self, data):
+        self.data = data
 
 class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
@@ -247,7 +250,8 @@ class HistorySearchThread(QThread):
                         text = '<b>%s</b> <span>%s</span>' % (
                                 addremove, text[:-1])
                         row = [fname, rev, line, user, text]
-                        self.obj.emit(SIGNAL('matchedRow'), row)
+                        w = DataWrapper(row)
+                        self.obj.emit(SIGNAL('matchedRow'), w)
                     except ValueError:
                         pass
                     self.fullmsg = ''
@@ -304,7 +308,8 @@ class CtxSearchThread(QThread):
                 if pos:
                     hu.write(line[pos:], label='ui.status')
                     row = [wfile, i + 1, rev, None, hu.getdata()[0]]
-                    self.emit(SIGNAL('matchedRow'), row)
+                    w = DataWrapper(row)
+                    self.emit(SIGNAL('matchedRow'), w)
                     if self.once:
                         break
         self.emit(SIGNAL('finished'))
@@ -403,7 +408,6 @@ class MatchTree(QTreeView):
         from tortoisehg.hgqt import wctxactions
         repo, ui = self.repo, self.repo.ui
         for rev, path, line in rows:
-            path = hglib.fromunicode(path)
             if rev is None:
                 files = [repo.wjoin(path)]
                 wctxactions.edit(self, ui, repo, files, line)
@@ -424,7 +428,6 @@ class MatchTree(QTreeView):
                 else:
                     defer.append([rev, path, line])
             if crev is not None:
-                files = [hglib.fromunicode(f) for f in files]
                 visdiff.visualdiff(ui, repo, files, {'change':crev})
             rows = defer
 
