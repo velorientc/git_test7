@@ -112,7 +112,7 @@ class HgRepoView(QtGui.QTableView):
               self.showAtRev),
              ('update', _('Update...'), None, None, None,
               self.updateToRev),
-             ('tag', _('Tag...'), None, None, None,
+             ('tag', _('Tag...'), 'tag', None, None,
               self.tagToRev),
              ('backout', _('Backout...'), None, None, None,
               self.backoutToRev),
