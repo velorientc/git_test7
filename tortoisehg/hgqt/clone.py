@@ -27,8 +27,7 @@ class CloneDialog(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui = ui.ui()
 
-        src = hglib.tounicode(os.getcwd())
-        dest = src
+        dest = src = cwd = hglib.tounicode(os.getcwd())
         if len(args) > 1:
             src = args[0]
             dest = args[1]
@@ -133,7 +132,7 @@ class CloneDialog(QDialog):
         # dialog setting
         self.setLayout(box)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
-        self.setWindowTitle(_('Clone - TortoiseHg'))
+        self.setWindowTitle(_('Clone - %s') % cwd)
 
         # prepare to show
         self.cmd.setHidden(True)
