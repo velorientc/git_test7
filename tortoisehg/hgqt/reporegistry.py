@@ -33,6 +33,7 @@ xmlClassMap = {
       'group': 'RepoGroupItem',
       'repo': 'RepoItem',
       'treeitem': 'RepoTreeItem',
+      'paths': 'RepoPathsItem',
     }
 
 inverseXmlClassMap = {}
@@ -165,6 +166,9 @@ class RepoItem(RepoTreeItem):
         RepoTreeItem.__init__(self, model, parent)
         self._root = rootpath
         self._setttingsdlg = None
+        if rootpath:
+            pi = RepoPathsItem(model)
+            self.appendChild(pi)
 
     def rootpath(self):
         return self._root
@@ -208,6 +212,37 @@ class RepoItem(RepoTreeItem):
                 configrepo=True, focus='web.name', parent=parent,
                 root=self._root)
         self._setttingsdlg.show()
+
+
+class RepoPathsItem(RepoTreeItem):
+    def __init__(self, model, parent=None):
+        RepoTreeItem.__init__(self, model, parent)
+
+    def data(self, column, role):
+        if role == Qt.DecorationRole:
+            if column == 0:
+                s = QtGui.QApplication.style()
+                ico = s.standardIcon(QtGui.QStyle.SP_DirIcon)
+                return QVariant(ico)
+            return QVariant()
+        if column == 0:
+            return QVariant(_('Paths'))
+        return QVariant()
+
+    def setData(self, column, value):
+        return False
+
+    def menulist(self):
+        return []
+
+    def flags(self):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def dump(self, xw):
+        RepoTreeItem.dump(self, xw)
+
+    def undump(self, xr):
+        RepoTreeItem.undump(self, xr)
 
 
 class RepoGroupItem(RepoTreeItem):
