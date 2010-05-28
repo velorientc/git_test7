@@ -205,7 +205,8 @@ class RepoItem(RepoTreeItem):
     def startSettings(self, parent):
         if self._setttingsdlg is None:
             self._setttingsdlg = SettingsDialog(
-                configrepo=True, parent=parent, root=self._root)
+                configrepo=True, focus='web.name', parent=parent,
+                root=self._root)
         self._setttingsdlg.show()
 
 
