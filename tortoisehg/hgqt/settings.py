@@ -193,7 +193,7 @@ INFO = (
           ' Failing that it uses the first applicable tool it finds.')),
     (_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
         _('Specify the visual editor used to view files.  Format:<br>'
-          'myeditor -flags [$FILE --num=$LINENUM] -moreflags<br><br>'
+          'myeditor -flags [$FILE --num=$LINENUM][--search $SEARCH]<br><br>'
           'See <a href="%s">OpenAtLine</a>'
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     (_('CLI Editor'), 'ui.editor', genEditCombo,

@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import subprocess
 
 from mercurial import util, error, merge, commands
@@ -117,23 +118,35 @@ def renamefromto(repo, deleted, unknown):
 def vdiff(parent, ui, repo, files):
     visdiff.visualdiff(ui, repo, files, {})
 
-def edit(parent, ui, repo, files, lineno=None):
+def edit(parent, ui, repo, files, lineno=None, search=None):
     files = [util.shellquote(util.localpath(f)) for f in files]
     editor = ui.config('tortoisehg', 'editor')
+    assert len(files) == 1 or lineno == None
     if editor:
         try:
-            pre, ln = editor.split('[')
-            ln, post = ln.split(']')
-            if lineno is not None:
-                assert len(files) == 1 # lineno implies one file
-                ln = ln.replace('$LINENUM', str(lineno))
-                if '$FILE' in ln:
-                    ln = ln.replace('$FILE', files[0])
-                    cmdline = ' '.join([pre, ln, post])
-                else:
-                    cmdline = ' '.join([pre, ln, post] + files)
-            else:
-                cmdline = ' '.join([pre, post] + files)
+            regexp = re.compile('\[([^\]]*)\]')
+            expanded = []
+            pos = 0
+            for m in regexp.finditer(editor):
+                expanded.append(editor[pos:m.start()-1])
+                phrase = editor[m.start()+1:m.end()-1]
+                pos=m.end()+1
+                if '$LINENUM' in phrase:
+                    if lineno is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$LINENUM', str(lineno))
+                elif '$SEARCH' in phrase:
+                    if search is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$SEARCH', search)
+                if '$FILE' in phrase:
+                    phrase = phrase.replace('$FILE', files[0])
+                    files = []
+                expanded.append(phrase)
+            expanded.append(editor[pos:])
+            cmdline = ' '.join(expanded + files)
         except ValueError, e:
             # '[' or ']' not found
             cmdline = ' '.join([editor] + files)
