@@ -169,6 +169,7 @@ class SearchWidget(QDockWidget):
             self.emit(SIGNAL('errorMessage'), msg)
             return
 
+        self.tv.setSortingEnabled(False)
         self.tv.pattern = pattern
         self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
@@ -210,6 +211,8 @@ class SearchWidget(QDockWidget):
     def finished(self):
         for col in xrange(COL_TEXT):
             self.tv.resizeColumnToContents(col)
+        self.tv.sortByColumn(COL_REVISION)
+        self.tv.setSortingEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
         self.emit(SIGNAL('loadComplete'))
@@ -436,7 +439,7 @@ class MatchTree(QTreeView):
                 else:
                     defer.append([rev, path, line])
             if crev is not None:
-                visdiff.visualdiff(ui, repo, files, {'change':crev})
+                visdiff.visualdiff(ui, repo, list(files), {'change':crev})
             rows = defer
 
     def selectedRows(self):
