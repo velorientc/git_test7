@@ -373,6 +373,25 @@ class StatusLabel(QtGui.QWidget):
     def clear_icon(self):
         self.status_icon.setHidden(True)
 
+class LabeledSeparator(QtGui.QWidget):
+
+    def __init__(self, label=None, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+
+        box = QtGui.QHBoxLayout()
+        box.setContentsMargins(*(0,)*4)
+
+        if label:
+            label = QtGui.QLabel(label)
+            box.addWidget(label)
+
+        sep = QtGui.QFrame()
+        sep.setFrameShadow(QtGui.QFrame.Sunken)
+        sep.setFrameShape(QtGui.QFrame.HLine)
+        box.addWidget(sep, 1, QtCore.Qt.AlignVCenter)
+
+        self.setLayout(box)
+
 def fileEditor(filename):
     'Open a simple modal file editing dialog'
     dialog = QtGui.QDialog()
