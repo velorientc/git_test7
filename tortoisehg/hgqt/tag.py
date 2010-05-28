@@ -105,7 +105,7 @@ class TagDialog(QDialog):
         optbox.addWidget(self.replace_chk)
 
         self.eng_chk = QCheckBox(_('Use English commit message'))
-        engmsg = self.ui.configbool('tortoisehg', 'engmsg', False)
+        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
         self.eng_chk.setChecked(engmsg)
         optbox.addWidget(self.eng_chk)
 
