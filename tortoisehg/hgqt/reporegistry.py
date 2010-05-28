@@ -226,7 +226,7 @@ class RepoGroupItem(RepoTreeItem):
         return False
 
     def menulist(self):
-        return ['newGroup', 'remove']
+        return ['newGroup', None, 'rename', 'remove']
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
@@ -488,6 +488,8 @@ class RepoTreeView(QtGui.QTreeView):
                 _("Opens the repository in a new tab"), None, self.open),
              ("newGroup", _("New Group"), None, 
                 _("Create a new group"), None, self.newGroup),
+             ("rename", _("Rename"), None, 
+                _("Rename the entry"), None, self.startRename),
              ("remove", _("Remove entry"), None, 
                 _("Remove the entry"), None, self.removeSelected),
              ]
@@ -513,6 +515,11 @@ class RepoTreeView(QtGui.QTreeView):
             if cb:
                 connect(act, SIGNAL('triggered()'), cb)
             self.addAction(act)
+
+    def startRename(self):
+        if not self.selitem:
+            return
+        self.edit(self.selitem)
 
     def open(self):
         if not self.selitem:
