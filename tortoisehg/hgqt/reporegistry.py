@@ -398,8 +398,6 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
-        for s in data.formats():
-            print s
         d = str(data.data(repoRegMimeType))
         itemread = readXml(d, extractXmlElementName, self)
 
