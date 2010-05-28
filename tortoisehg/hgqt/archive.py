@@ -161,7 +161,7 @@ class ArchiveDialog(QDialog):
         # dialog setting
         reponame = hglib.get_reponame(self.repo)
         self.setWindowTitle(_('Archive - %s') % hglib.tounicode(reponame))
-        self.setWindowIcon(qtlib.geticon('menucheckout'))
+        self.setWindowIcon(qtlib.geticon('archive'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
