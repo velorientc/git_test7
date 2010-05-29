@@ -232,14 +232,8 @@ class RepoPathsItem(RepoTreeItem):
         RepoTreeItem.__init__(self, model, parent)
 
     def data(self, column, role):
-        if role == Qt.DecorationRole:
-            if column == 0:
-                s = QtGui.QApplication.style()
-                ico = s.standardIcon(QtGui.QStyle.SP_DirIcon)
-                return QVariant(ico)
-            return QVariant()
-        if column == 0:
-            return QVariant(_('Paths'))
+        if role == Qt.DisplayRole and column == 0:
+            return QVariant(_('Synchronize'))
         return QVariant()
 
     def setData(self, column, value):
