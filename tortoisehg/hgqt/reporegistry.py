@@ -8,7 +8,7 @@
 import sys
 import os
 
-from mercurial import hg
+from mercurial import hg, url
 
 from PyQt4 import QtCore, QtGui
 
@@ -270,7 +270,8 @@ class RepoPathItem(RepoTreeItem):
         if column == 0:
             return QVariant(self._alias)
         elif column == 1:
-            return QVariant(self._path)
+            path = url.hidepassword(self._path)
+            return QVariant(path)
         return QVariant()
 
     def menulist(self):
