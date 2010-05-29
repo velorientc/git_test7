@@ -117,27 +117,34 @@ class AnnotateView(QFrame):
         return super(AnnotateView, self).keyPressEvent(event)
 
     def fillModel(self, data):
-        sels = []
-        revs = []
+        revs, lines, lpos, sels = [], [], [], []
+        pos = 0
         for fctx, origline, text in data:
-            self.edit.appendPlainText(text[:-1])
-            self.edit.moveCursor(QTextCursor.NextBlock)
             rev = fctx.linkrev()
+            lines.append(text)
+            lpos.append(pos)
+            revs.append(str(rev))
+            pos += len(text)
+
+        self.edit.setPlainText(''.join(lines))
+        self.edit.revs = revs
+        width = max([len(r) for r in revs]) * self.edit.charwidth + 3
+        self.revarea.width = width
+        self.revarea.setFixedWidth(width)
+
+        for i, rev in enumerate(revs):
             ctx = self.repo[rev]
             rgb = self.cm.get_color(ctx, self.curdate)
             sel = QTextEdit.ExtraSelection()
             sel.bgcolor = QColor(rgb) # save a reference
             sel.format.setBackground(sel.bgcolor)
             sel.format.setProperty(QTextFormat.FullWidthSelection, True)
-            sel.cursor = self.edit.textCursor()
-            sel.cursor.select(QTextCursor.LineUnderCursor)
+            sel.cursor = QTextCursor(self.edit.document())
+            sel.cursor.setPosition(lpos[i])
+            sel.cursor.clearSelection()
             sels.append(sel)
-            revs.append(str(rev))
         self.colorsels = sels
-        width = max([len(r) for r in revs]) * self.edit.charwidth + 3
-        self.revarea.width = width
-        self.revarea.setFixedWidth(width)
-        self.edit.revs = revs
+
         self.edit.setExtraSelections(self.colorsels)
         self.edit.verticalScrollBar().setValue(0)
 
