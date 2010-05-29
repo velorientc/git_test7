@@ -224,7 +224,7 @@ class RepoItem(RepoTreeItem):
         self._setttingsdlg.show()
 
     def details(self):
-        return _('Local repository %s') % self._root
+        return _('Local Repository %s') % self._root
 
 
 class RepoPathsItem(RepoTreeItem):
