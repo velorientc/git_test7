@@ -11,7 +11,7 @@ import re
 from mercurial import ui, hg, error, commands, cmdutil, util
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import paths, hglib, colormap
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
@@ -86,9 +86,16 @@ class AnnotateView(QFrame):
 
         self.thread = None
 
-    def annotateFileAtRev(self, fctx):
+    def annotateFileAtRev(self, repo, ctx, wfile):
         if self.thread is not None:
             return
+        fctx = ctx[wfile]
+        curdate = fctx.date()[0]
+        basedate = repo.filectx(wfile, fileid=0).date()[0]
+        agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
+        self.cm = colormap.AnnotateColorSaturation(agedays)
+        self.curdate = curdate
+        self.repo = repo
         self.loadBegin.emit()
         self.thread = AnnotateThread(fctx)
         self.thread.done.connect(self.finished)
@@ -110,19 +117,32 @@ class AnnotateView(QFrame):
         return super(AnnotateView, self).keyPressEvent(event)
 
     def fillModel(self, data):
-        lines = []
+        sels = []
         revs = []
         for fctx, origline, text in data:
-            revs.append(str(fctx.linkrev()))
-            lines.append(text)
+            self.edit.appendPlainText(text[:-1])
+            self.edit.moveCursor(QTextCursor.NextBlock)
+            rev = fctx.linkrev()
+            ctx = self.repo[rev]
+            rgb = self.cm.get_color(ctx, self.curdate)
+            sel = QTextEdit.ExtraSelection()
+            sel.bgcolor = QColor(rgb) # save a reference
+            sel.format.setBackground(sel.bgcolor)
+            sel.format.setProperty(QTextFormat.FullWidthSelection, True)
+            sel.cursor = self.edit.textCursor()
+            sel.cursor.select(QTextCursor.LineUnderCursor)
+            sels.append(sel)
+            revs.append(str(rev))
+        self.colorsels = sels
         width = max([len(r) for r in revs]) * self.edit.charwidth + 3
         self.revarea.width = width
         self.revarea.setFixedWidth(width)
-        self.edit.setPlainText(''.join(lines))
         self.edit.revs = revs
+        self.edit.setExtraSelections(self.colorsels)
+        self.edit.verticalScrollBar().setValue(0)
 
     def searchText(self, regexp, icase):
-        extraSelections = []
+        extraSelections = self.colorsels[:]
         color = QColor(Qt.yellow)
         flags = QTextDocument.FindFlags()
         if not icase:
@@ -187,10 +207,10 @@ class AnnotateDialog(QDialog):
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
             ctx = repo[opts.get('rev', '.')]
-            fctx = ctx[pats[0]]
-            av.annotateFileAtRev(fctx)
+            fctx = ctx[pats[0]] # just for validation
         except Exception, e:
             self.status.setText(hglib.tounicode(str(e)))
+        av.annotateFileAtRev(repo, ctx, pats[0])
 
         s = QSettings()
         self.restoreGeometry(s.value('annotate/geom').toByteArray())
