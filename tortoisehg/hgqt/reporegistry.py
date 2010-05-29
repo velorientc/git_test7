@@ -295,7 +295,8 @@ class RepoPathItem(RepoTreeItem):
         RepoTreeItem.undump(self, xr)
 
     def details(self):
-        return url.hidepassword(self._path)
+        path = url.hidepassword(self._path)
+        return _('Repository URL %s') % path
 
 
 class RepoGroupItem(RepoTreeItem):
