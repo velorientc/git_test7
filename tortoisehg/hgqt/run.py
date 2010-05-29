@@ -447,6 +447,14 @@ def archive(ui, *pats, **opts):
     from tortoisehg.hgqt.archive import run
     qtrun(run, ui, *pats, **opts)
 
+def annotate(ui, *pats, **opts):
+    """annotate dialog"""
+    from tortoisehg.hgqt.annotate import run
+    if len(pats) != 1:
+        ui.warn(_('annotate requires a single filename\n'))
+        return
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -662,6 +670,9 @@ globalopts = [
 table = {
     "about": (about, [], _('thg about')),
     "add": (add, [], _('thg add [FILE]...')),
+    "^annotate|blame": (annotate, 
+          [('r', 'rev', '', _('revision to annotate'))],
+        _('thg annotate')),
     "archive": (archive,
         [('r', 'rev', '', _('revision to archive'))],
         _('thg archive')),
