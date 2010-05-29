@@ -163,6 +163,9 @@ class RepoTreeItem:
     def open(self):
         pass
 
+    def details(self):
+        return ''
+
 
 class RepoItem(RepoTreeItem):
     def __init__(self, model, rootpath='', parent=None):
@@ -219,6 +222,9 @@ class RepoItem(RepoTreeItem):
                 configrepo=True, focus='web.name', parent=parent,
                 root=self._root)
         self._setttingsdlg.show()
+
+    def details(self):
+        return self._root
 
 
 class RepoPathsItem(RepoTreeItem):
@@ -293,6 +299,9 @@ class RepoPathItem(RepoTreeItem):
         self._alias = str(a.value('', 'alias').toString())
         self._path = str(a.value('', 'path').toString())
         RepoTreeItem.undump(self, xr)
+
+    def details(self):
+        return url.hidepassword(self._path)
 
 
 class RepoGroupItem(RepoTreeItem):
@@ -540,12 +549,14 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
 
 
 class RepoTreeView(QtGui.QTreeView):
-    def __init__(self, parent):
+    def __init__(self, parent, showMessageFunc):
         QtGui.QTreeView.__init__(self)
         self.parent = parent
+        self.showMessageFunc = showMessageFunc
         self.selitem = None
 
         self.setExpandsOnDoubleClick(False)
+        self.setMouseTracking(True)
 
         # enable drag and drop
         # (see http://doc.qt.nokia.com/4.6/model-view-dnd.html)
@@ -566,6 +577,15 @@ class RepoTreeView(QtGui.QTreeView):
                 else:
                     menu.addSeparator()
             menu.exec_(event.globalPos())
+
+    def mouseMoveEvent(self, event):
+        msg = ''
+        pos = event.pos()
+        idx = self.indexAt(pos)
+        if idx.isValid():
+            item = idx.internalPointer()
+            msg = item.details()
+        self.showMessageFunc(msg)
 
     def mouseDoubleClickEvent(self, event):
         self.open()
@@ -646,7 +666,7 @@ class RepoRegistryView(QDockWidget):
     openRepoSignal = QtCore.pyqtSignal(QtCore.QString)
     visibilityChanged = QtCore.pyqtSignal(bool)
 
-    def __init__(self, ui, parent):
+    def __init__(self, ui, parent, showMessageFunc):
         QDockWidget.__init__(self, parent)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
@@ -662,7 +682,7 @@ class RepoRegistryView(QDockWidget):
 
         self.tmodel = m = RepoTreeModel(self.openrepo, ui, settingsfilename())
 
-        self.tview = tv = RepoTreeView(self)
+        self.tview = tv = RepoTreeView(self, showMessageFunc)
         lay.addWidget(tv)
         tv.setModel(m)
 
