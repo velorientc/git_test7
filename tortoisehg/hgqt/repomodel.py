@@ -23,6 +23,8 @@ from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt.qtlib import geticon
 
+from tortoisehg.hgqt.i18n import _
+
 from PyQt4 import QtCore, QtGui
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
@@ -69,7 +71,7 @@ def getlog(model, ctx, gnode):
         if msg:
             msg = msg.splitlines()[0]
     else:
-        msg = "WORKING DIRECTORY"
+        msg = '**  ' + _('Working copy changes') + '  **'
     return msg
 
 # XXX maybe it's time to make these methods of the model...
