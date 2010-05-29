@@ -456,6 +456,11 @@ def annotate(ui, *pats, **opts):
         return
     qtrun(run, ui, *pats, **opts)
 
+def init(ui, *pats, **opts):
+    """init dialog"""
+    from tortoisehg.hgqt.hginit import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -671,7 +676,7 @@ globalopts = [
 table = {
     "about": (about, [], _('thg about')),
     "add": (add, [], _('thg add [FILE]...')),
-    "^annotate|blame": (annotate, 
+    "^annotate|blame": (annotate,
           [('r', 'rev', '', _('revision to annotate')),
            ('n', 'line', '', _('open to line')),
            ('p', 'pattern', '', _('initial search pattern'))],
@@ -706,6 +711,7 @@ table = {
     "^grep|search": (grep, [], _('thg grep')),
     "^guess": (guess, [], _('thg guess')),
     "^hgignore|ignore|filter": (hgignore, [], _('thg hgignore [FILE]')),
+    "^init": (init, [], _('thg init [DEST]')),
     "^email":
         (email,
          [('r', 'rev', [], _('a revision to send')),],
