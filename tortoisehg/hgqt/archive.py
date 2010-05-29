@@ -340,7 +340,6 @@ class ArchiveDialog(QDialog):
     def command_started(self):
         self.dest_edit.setEnabled(False)
         self.rev_combo.setEnabled(False)
-        self.dest_edit.setEnabled(False)
         self.dest_btn.setEnabled(False)
         self.filesradio.setEnabled(False)
         self.tarradio.setEnabled(False)
