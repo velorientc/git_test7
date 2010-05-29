@@ -8,6 +8,8 @@
 import sys
 import os
 
+from mercurial import hg
+
 from PyQt4 import QtCore, QtGui
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT
@@ -34,6 +36,7 @@ xmlClassMap = {
       'repo': 'RepoItem',
       'treeitem': 'RepoTreeItem',
       'paths': 'RepoPathsItem',
+      'path': 'RepoPathItem',
     }
 
 inverseXmlClassMap = {}
@@ -169,6 +172,10 @@ class RepoItem(RepoTreeItem):
         if rootpath:
             pi = RepoPathsItem(model)
             self.appendChild(pi)
+            repo = hg.repository(model.ui, path=rootpath)
+            for alias, path in repo.ui.configitems('paths'):
+                item = RepoPathItem(model, alias, path)
+                pi.appendChild(item)
 
     def rootpath(self):
         return self._root
@@ -242,6 +249,48 @@ class RepoPathsItem(RepoTreeItem):
         RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
+        RepoTreeItem.undump(self, xr)
+
+
+class RepoPathItem(RepoTreeItem):
+    def __init__(self, model, alias='', path='', parent=None):
+        RepoTreeItem.__init__(self, model, parent)
+        self._alias = alias
+        self._path = path
+
+    def url(self):
+        return self._url
+
+    def data(self, column, role):
+        if role == Qt.DecorationRole:
+            if column == 0:
+                ico = geticon('sync')
+                return QVariant(ico)
+            return QVariant()
+        if column == 0:
+            return QVariant(self._alias)
+        elif column == 1:
+            return QVariant(self._path)
+        return QVariant()
+
+    def menulist(self):
+        return []
+
+    def flags(self):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+
+    def removeRows(self, row, count):
+        return False
+
+    def dump(self, xw):
+        xw.writeAttribute('alias', self._alias)
+        xw.writeAttribute('path', self._path)
+        RepoTreeItem.dump(self, xw)
+
+    def undump(self, xr):
+        a = xr.attributes()
+        self._alias = str(a.value('', 'alias').toString())
+        self._path = str(a.value('', 'path').toString())
         RepoTreeItem.undump(self, xr)
 
 
@@ -319,10 +368,11 @@ class AllRepoGroupItem(RepoTreeItem):
 
 
 class RepoTreeModel(QtCore.QAbstractItemModel):
-    def __init__(self, openrepofunc, filename=None, parent=None):
+    def __init__(self, openrepofunc, ui, filename=None, parent=None):
         QtCore.QAbstractItemModel.__init__(self, parent)
 
         self.openrepofunc = openrepofunc
+        self.ui = ui
 
         root = None
         all = None
@@ -595,7 +645,7 @@ class RepoRegistryView(QDockWidget):
     openRepoSignal = QtCore.pyqtSignal(QtCore.QString)
     visibilityChanged = QtCore.pyqtSignal(bool)
 
-    def __init__(self, parent):
+    def __init__(self, ui, parent):
         QDockWidget.__init__(self, parent)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
@@ -609,7 +659,7 @@ class RepoRegistryView(QDockWidget):
         mainframe.setLayout(lay)
         self.setWidget(mainframe)
 
-        self.tmodel = m = RepoTreeModel(self.openrepo, settingsfilename())
+        self.tmodel = m = RepoTreeModel(self.openrepo, ui, settingsfilename())
 
         self.tview = tv = RepoTreeView(self)
         lay.addWidget(tv)
