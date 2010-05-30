@@ -267,7 +267,7 @@ class AnnotateThread(QThread):
 
 class AnnotateDialog(QDialog):
     def __init__(self, *pats, **opts):
-        super(AnnotateDialog,self).__init__(parent = None)
+        super(AnnotateDialog,self).__init__(opts.get('parent'))
 
         mainvbox = QVBoxLayout()
         self.setLayout(mainvbox)
@@ -307,7 +307,7 @@ class AnnotateDialog(QDialog):
             line = int(line)
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
-            ctx = repo[opts.get('rev', '.')]
+            ctx = repo[opts.get('rev') or '.']
             fctx = ctx[pats[0]] # just for validation
         except Exception, e:
             self.status.setText(hglib.tounicode(str(e)))

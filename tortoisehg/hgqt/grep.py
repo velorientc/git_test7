@@ -405,7 +405,19 @@ class MatchTree(QTreeView):
         menu.exec_(point)
 
     def ann(self, rows):
-        raise NotImplementedError()
+        from tortoisehg.hgqt import annotate
+        repo, ui, pattern = self.repo, self.repo.ui, self.pattern
+        seen = set()
+        for rev, path, line in rows:
+            # Only open one annotate instance per file
+            if path in seen:
+                continue
+            else:
+                seen.add(path)
+            dlg = annotate.AnnotateDialog(path, rev=rev, line=line,
+                                          pattern=pattern, parent=self)
+            dlg.show()
+
     def ctx(self, rows):
         raise NotImplementedError()
 
