@@ -85,6 +85,7 @@ class AnnotateView(QFrame):
         hbox.addWidget(self.edit)
 
         self.thread = None
+        self.matches = []
 
     def annotateFileAtRev(self, repo, ctx, wfile):
         if self.thread is not None:
@@ -148,8 +149,22 @@ class AnnotateView(QFrame):
         self.edit.setExtraSelections(self.colorsels)
         self.edit.verticalScrollBar().setValue(0)
 
+    def nextMatch(self):
+        if not self.matches:
+            return
+        if self.curmatch < len(self.matches)-1:
+            self.curmatch += 1
+        self.edit.setTextCursor(self.matches[self.curmatch].cursor)
+
+    def prevMatch(self):
+        if not self.matches:
+            return
+        if self.curmatch > 0:
+            self.curmatch -= 1
+        self.edit.setTextCursor(self.matches[self.curmatch].cursor)
+
     def searchText(self, regexp, icase):
-        extraSelections = self.colorsels[:]
+        matches = []
         color = QColor(Qt.yellow)
         flags = QTextDocument.FindFlags()
         if not icase:
@@ -160,9 +175,13 @@ class AnnotateView(QFrame):
             selection = QTextEdit.ExtraSelection()
             selection.format.setBackground(color)
             selection.cursor = cursor
-            extraSelections.append(selection)
+            matches.append(selection)
             cursor = doc.find(regexp, cursor)
-        self.edit.setExtraSelections(extraSelections)
+        self.matches = matches
+        self.curmatch = 0
+        if matches:
+            self.edit.setTextCursor(matches[0].cursor)
+        self.edit.setExtraSelections(self.colorsels + self.matches)
 
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
@@ -233,6 +252,15 @@ class AnnotateDialog(QDialog):
             msg = _('grep: invalid match pattern: %s\n') % inst
             self.status.setText(hglib.tounicode(msg))
         self.av.searchText(QRegExp(pattern), icase)
+
+    def wheelEvent(self, event):
+        if self.childAt(event.pos()) != self.le:
+            event.ignore()
+            return
+        if event.delta() > 0:
+            self.av.prevMatch()
+        elif event.delta() < 0:
+            self.av.nextMatch()
 
     def accept(self):
         s = QSettings()
