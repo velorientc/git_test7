@@ -99,8 +99,9 @@ class Core(QObject):
 
     def cancel(self):
         '''Cancel running Mercurial command'''
-        self.thread.abort()
-        self.commandCanceling.emit()
+        if self.thread:
+            self.thread.abort()
+            self.commandCanceling.emit()
 
     def set_pmon(self, pmon):
         self.pmon = pmon
