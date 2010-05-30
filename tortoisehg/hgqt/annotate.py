@@ -123,7 +123,6 @@ class AnnotateView(QFrame):
                 def sann():
                     self.emit(SIGNAL('searchAnnotation'), selection)
                 menu = QMenu(self)
-                menu = QMenu(self)
                 for name, func in [(_('Search in original revision'), sorig),
                                    (_('Search in working revision'), sctx),
                                    (_('Search in current annotation'), sann),
