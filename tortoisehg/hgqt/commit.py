@@ -26,7 +26,6 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
 #  +1 / -1 head indication (not as important with workbench integration)
-#  recent committers history
 #  pushafterci list
 #  qnew/shelve-patch creation dialog (in another file)
 #  spell check / tab completion
@@ -64,12 +63,6 @@ class CommitWidget(QWidget):
 
         usercombo = QComboBox()
         usercombo.setEditable(True)
-        try:
-            if opts.get('user'):
-                usercombo.addItem(hglib.tounicode(opts['user']))
-            usercombo.addItem(hglib.tounicode(wctx.user()))
-        except util.Abort:
-            pass
 
         self.commitButton = b = QPushButton(_('Commit'))
         if hidebutton:
@@ -338,8 +331,10 @@ class CommitWidget(QWidget):
         # message history is stored in unicode
         self.split.restoreState(s.value('commit/split').toByteArray())
         self.msghistory = list(s.value('commit/history-'+repoid).toStringList())
-        self.msghistory = [s for s in self.msghistory if s]
+        self.msghistory = [m for m in self.msghistory if m]
         self.msgcombo.reset(self.msghistory)
+        self.userhist = s.value('commit/userhist').toStringList()
+        self.refreshUserList()
         try:
             curmsg = repo.opener('cur-message.txt').read()
             self.msgte.setPlainText(hglib.fromunicode(curmsg))
@@ -354,6 +349,7 @@ class CommitWidget(QWidget):
         repoid = str(repo[0])
         s.setValue('commit/history-'+repoid, self.msghistory)
         s.setValue('commit/split', self.split.saveState())
+        s.setValue('commit/userhist', self.userhist)
         try:
             # current message is stored in local encoding
             repo.opener('cur-message.txt', 'w').write(self.getMessage())
@@ -368,7 +364,31 @@ class CommitWidget(QWidget):
             self.msghistory.remove(umsg)
         self.msghistory.insert(0, umsg)
         self.msghistory = self.msghistory[:10]
-        self.msgcombo.reset(self.msghistory)
+
+    def refreshUserList(self):
+        l = []
+        try:
+            repo = self.stwidget.repo
+            wctx = repo[None]
+            if self.opts.get('user'):
+                val = hglib.tounicode(self.opts['user'])
+                l.append(val)
+            val = hglib.tounicode(wctx.user())
+            l.append(val)
+        except util.Abort:
+            pass
+        for name in self.userhist:
+            if name not in l:
+                l.append(name)
+        for name in l:
+            self.usercombo.addItem(name)
+
+    def addUsernameToHistory(self, user):
+        if user in self.userhist:
+            self.userhist.remove(user)
+        self.userhist.insert(0, user)
+        self.userhist = self.userhist[:10]
+        self.refreshUserList()
 
     def commit(self):
         repo = self.stwidget.repo
@@ -430,10 +450,8 @@ class CommitWidget(QWidget):
             self.stwidget.tv.setFocus()
             return
         user = self.usercombo.currentText()
-        try:
-            user = hglib.fromunicode(user, 'strict')
-        except UnicodeEncodeError:
-            pass # TODO
+        self.addUsernameToHistory(user)
+        user = hglib.fromunicode(user, 'strict')
         if not user:
             try:
                 QMessageBox.information(self, _('Please enter a username'),
