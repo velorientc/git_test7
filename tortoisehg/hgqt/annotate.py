@@ -52,6 +52,8 @@ class AnnotateView(QFrame):
             self.connect(self,
                     SIGNAL('customContextMenuRequested(const QPoint &)'),
                     self.customContextMenuRequested)
+            self.setTextInteractionFlags(Qt.TextSelectableByMouse |
+                                         Qt.TextSelectableByKeyboard)
             tm = QFontMetrics(self.font())
             self.charwidth = tm.width('9')
             self.charheight = tm.height()
