@@ -276,6 +276,7 @@ class AnnotateDialog(QDialog):
         hbox.setMargin(0)
         lbl = QLabel(_('Regexp:'))
         le = QLineEdit()
+        le.setText(hglib.tounicode(opts.get('pattern', '')))
         lbl.setBuddy(le)
         lbl.setToolTip(_('Regular expression search pattern'))
         bt = QPushButton(_('Search'))
@@ -301,13 +302,16 @@ class AnnotateDialog(QDialog):
         self.status = status
 
         self.opts = opts
+        line = opts.get('line')
+        if line and isinstance(line, str):
+            line = int(line)
         try:
             repo = hg.repository(ui.ui(), path=paths.find_root())
             ctx = repo[opts.get('rev', '.')]
             fctx = ctx[pats[0]] # just for validation
         except Exception, e:
             self.status.setText(hglib.tounicode(str(e)))
-        av.annotateFileAtRev(repo, ctx, pats[0])
+        av.annotateFileAtRev(repo, ctx, pats[0], line)
         self.setWindowTitle(_('Annotate %s@%d') % (pats[0], ctx.rev()))
         self.repo = repo
 
@@ -371,4 +375,4 @@ class AnnotateDialog(QDialog):
         super(AnnotateDialog, self).reject()
 
 def run(ui, *pats, **opts):
-    return AnnotateDialog(*pats)
+    return AnnotateDialog(*pats, **opts)
