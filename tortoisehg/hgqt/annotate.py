@@ -21,6 +21,7 @@ from PyQt4.QtGui import *
 #  Syntax Highlighting?
 #  Pass search parameters to grep
 #  forward/backward history buttons
+#  menu options for viewing appropriate changesets
 
 class AnnotateView(QFrame):
     loadBegin = pyqtSignal()
