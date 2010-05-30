@@ -1175,9 +1175,10 @@ class ConfigDialog(gtk.Dialog):
         for name, shortdesc in allexts():
             ck = gtk.CheckButton(name, use_underline=False)
             ck.connect('toggled', self.dirty_event)
-            ck.connect('focus-in-event', self.set_help, shortdesc)
+            ck.connect('focus-in-event', self.set_help,
+                       hglib.toutf(shortdesc))
             table.add_row(ck, padding=False)
-            self.tooltips.set_tip(ck, shortdesc)
+            self.tooltips.set_tip(ck, hglib.toutf(shortdesc))
             self.extensionschecks[name] = ck
 
     def refresh_extensions_frame(self):
