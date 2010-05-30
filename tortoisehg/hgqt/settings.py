@@ -40,7 +40,7 @@ class SettingsCombo(QComboBox):
         else:
             settings = opts['settings']
             slist = settings.value('settings/'+opts['cpath']).toStringList()
-            self.previous = [s for s in slist]
+            self.previous = [s for s in slist if s]
         self.setDisabled(opts['readonly'])
 
     def resetList(self):
@@ -71,6 +71,8 @@ class SettingsCombo(QComboBox):
         elif self.curvalue:
             self.addItem(ucur)
             self.setCurrentIndex(self.count()-1)
+        else:  # empty string
+            self.setEditText(ucur)
 
     def showPopup(self):
         if self.opts.get('defer') and not self.loaded:
@@ -93,7 +95,7 @@ class SettingsCombo(QComboBox):
         utext = self.currentText()
         if utext == _unspecstr:
             return None
-        if 'nohist' in self.opts or utext in self.defaults + self.previous:
+        if 'nohist' in self.opts or utext in self.defaults + self.previous or not utext:
             return hglib.fromunicode(utext)
         self.previous.insert(0, utext)
         self.previous = self.previous[:10]
