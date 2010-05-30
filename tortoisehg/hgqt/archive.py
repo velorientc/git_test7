@@ -8,14 +8,9 @@
 
 
 # TODO:
-#
-# - Allow manually adapting the destination path.
 # - Keep the selection via the browse btn as a basename (instead of repo.root).
-# - Make what is typed in in the lineedit of the rev_combo change dest_edit (and hgcmd_txt)
-# - Make what is manually changed in the dest_edit be reflected in the hgcmd.
-# - Update the hgcmd lineedit when/after manually changing the dest_edit.
+# - Make what is typed into the lineedit of the rev_combo change dest_edit (and hgcmd_txt)
 # - Make the hgcmd_txt expand to show it's complete content (multiline eventualy).
-#
 # - Save/load qt settings (window position, ...).
 
 
@@ -36,48 +31,46 @@ connect = QObject.connect
 
 WD_PARENT = _('= Working Directory Parent =')
 
+
 class ArchiveDialog(QDialog):
     """ Dialog to archive a particular Mercurial revision """
 
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ArchiveDialog, self).__init__(parent=None)
-        self.ui = ui
-        self.repo = repo
-        self.initrev = rev
 
-        # base layout box
+        # main layout
         self.vbox = QVBoxLayout()
         self.vbox.setSpacing(6)
-
-        # main layout grid
         self.grid = QGridLayout()
         self.grid.setSpacing(6)
         self.vbox.addLayout(self.grid)
 
-        # revision combo
+        # content selection
+        self.rev_lbl = QLabel(_('Archive revision:'))
+        self.rev_lbl.setAlignment(Qt.AlignRight)
         self.rev_combo = QComboBox()
         self.rev_combo.setEditable(True)
         self.rev_combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.rev_lbl = QLabel(_('Archive revision:'))
-        self.rev_lbl.setAlignment(Qt.AlignRight)
-        self.grid.addWidget(self.rev_lbl, 0, 0)
-        self.grid.addWidget(self.rev_combo, 0, 1)
         self.files_in_rev_chk = QCheckBox(
                 _('Only files modified/created in this revision'))
+        self.grid.addWidget(self.rev_lbl, 0, 0)
+        self.grid.addWidget(self.rev_combo, 0, 1)
         self.grid.addWidget(self.files_in_rev_chk, 1, 1)
 
-        # destination lineedit and button
+        # selecting a destination
+        self.dest_lbl = QLabel(_('Destination path:'))
+        self.dest_lbl.setAlignment(Qt.AlignRight)
         self.dest_edit = QLineEdit()
         self.dest_edit.setMinimumWidth(300)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
-        self.dest_lbl = QLabel(_('Destination path:'))
-        self.dest_lbl.setAlignment(Qt.AlignRight)
         self.grid.addWidget(self.dest_lbl, 2, 0)
         self.grid.addWidget(self.dest_edit, 2, 1)
         self.grid.addWidget(self.dest_btn, 2, 2)
 
-        # archive types
+        # archive type selection
+        self.types_lbl = QLabel(_('Archive types:'))
+        self.types_lbl.setAlignment(Qt.AlignRight)
         def radio(label):
             return QRadioButton(label, None)
         self.filesradio = radio(_('Directory of files'))
@@ -86,9 +79,6 @@ class ArchiveDialog(QDialog):
         self.tgzradio = radio(_('Tar archive compressed using gzip'))
         self.uzipradio = radio(_('Uncompressed zip archive'))
         self.zipradio = radio(_('Zip archive compressed using deflate'))
-
-        self.types_lbl = QLabel(_('Archive types:'))
-        self.types_lbl.setAlignment(Qt.AlignRight)
         self.grid.addWidget(self.types_lbl, 3, 0)
         self.grid.addWidget(self.filesradio, 3, 1)
         self.grid.addWidget(self.tarradio, 4, 1)
@@ -98,14 +88,14 @@ class ArchiveDialog(QDialog):
         self.grid.addWidget(self.zipradio, 8, 1)
 
         # some extras
-        self.keep_open_chk = QCheckBox(_('Always show output'))
-        self.grid.addWidget(self.keep_open_chk, 10, 1)
         self.hgcmd_lbl = QLabel(_('Hg command:'))
         self.hgcmd_lbl.setAlignment(Qt.AlignRight)
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)
+        self.keep_open_chk = QCheckBox(_('Always show output'))
         self.grid.addWidget(self.hgcmd_lbl, 9, 0)
         self.grid.addWidget(self.hgcmd_txt, 9, 1)
+        self.grid.addWidget(self.keep_open_chk, 10, 1)
 
         # command widget
         self.cmd = cmdui.Widget()
@@ -134,9 +124,27 @@ class ArchiveDialog(QDialog):
         self.hbox.addWidget(self.close_btn)
         self.hbox.addWidget(self.cancel_btn)
         self.vbox.addLayout(self.hbox)
-        self.rev_combo.setFocus()
+
+        # connecting slots
+        self.dest_edit.textEdited.connect(self.dest_edited)
+        self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'),
+                     self.rev_combo_changed)
+        self.dest_btn.clicked.connect(self.browse_clicked)
+        self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
+        self.filesradio.toggled.connect(self.update_path)
+        self.tarradio.toggled.connect(self.update_path)
+        self.tbz2radio.toggled.connect(self.update_path)
+        self.tgzradio.toggled.connect(self.update_path)
+        self.uzipradio.toggled.connect(self.update_path)
+        self.zipradio.toggled.connect(self.update_path)
+        self.arch_btn.clicked.connect(self.archive)
+        self.detail_btn.clicked.connect(self.detail_clicked)
+        self.close_btn.clicked.connect(self.close)
 
         # set default values
+        self.ui = ui
+        self.repo = repo
+        self.initrev = rev
         self.prevtarget = None
         if self.initrev:
             self.rev_combo.addItem(str(self.initrev))
@@ -155,9 +163,6 @@ class ArchiveDialog(QDialog):
         self.filesradio.setChecked(True)
         self.update_path()
 
-        # connecting slots
-        self.make_connects()
-
         # dialog setting
         reponame = hglib.get_reponame(self.repo)
         self.setWindowTitle(_('Archive - %s') % hglib.tounicode(reponame))
@@ -166,6 +171,37 @@ class ArchiveDialog(QDialog):
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.rev_combo.setFocus()
+
+    def rev_combo_changed(self, index):
+        self.update_path()
+
+    def dest_edited(self):
+        path = hglib.fromunicode(self.dest_edit.text())
+        type = self.get_selected_archive_type()['type']
+        self.compose_command(path, type)
+
+    def browse_clicked(self):
+        """Select the destination directory or file"""
+        dest = hglib.fromunicode(self.dest_edit.text())
+        if not os.path.exists(dest):
+            dest = os.path.dirname(dest)
+        select = self.get_selected_archive_type()
+        FD = QFileDialog
+        if select['type'] == 'files':
+            caption = _('Select Destination Folder')
+            path = FD.getExistingDirectory(parent=self, caption=caption,
+                    options=FD.ShowDirsOnly | FD.ReadOnly)
+            response = str(path)
+        else:
+            caption = _('Open File')
+            ext = '*' + select['ext']
+            filter = '%s (%s)\nAll Files (*.*)' % (select['label'], ext)
+            filename = FD.getOpenFileName(parent=self, caption=caption,
+                    directory=dest, filter=filter, options=FD.ReadOnly );
+            response = str(filename)
+        if response:
+            self.dest_edit.setText(response)
+            self.update_path()
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
@@ -230,46 +266,6 @@ class ArchiveDialog(QDialog):
         self.prevtarget = text
         type = self.get_selected_archive_type()['type']
         self.compose_command(path, type)
-
-    def make_connects(self):
-        self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'),
-                     self.rev_combo_changed)
-        self.dest_btn.clicked.connect(self.browse_clicked)
-        self.filesradio.toggled.connect(self.update_path)
-        self.tarradio.toggled.connect(self.update_path)
-        self.tbz2radio.toggled.connect(self.update_path)
-        self.tgzradio.toggled.connect(self.update_path)
-        self.uzipradio.toggled.connect(self.update_path)
-        self.zipradio.toggled.connect(self.update_path)
-        self.arch_btn.clicked.connect(self.archive)
-        self.detail_btn.clicked.connect(self.detail_clicked)
-        self.close_btn.clicked.connect(self.close)
-
-    def rev_combo_changed(self, index):
-        self.update_path()
-
-    def browse_clicked(self):
-        """Select the destination directory or file"""
-        dest = hglib.fromunicode(self.dest_edit.text())
-        if not os.path.exists(dest):
-            dest = os.path.dirname(dest)
-        select = self.get_selected_archive_type()
-        FD = QFileDialog
-        if select['type'] == 'files':
-            caption = _('Select Destination Folder')
-            path = FD.getExistingDirectory(parent=self, caption=caption,
-                    options=FD.ShowDirsOnly | FD.ReadOnly)
-            response = str(path)
-        else:
-            caption = _('Open File')
-            ext = '*' + select['ext']
-            filter = '%s (%s)\nAll Files (*.*)' % (select['label'], ext)
-            filename = FD.getOpenFileName(parent=self, caption=caption,
-                    directory=dest, filter=filter, options=FD.ReadOnly );
-            response = str(filename)
-        if response:
-            self.dest_edit.setText(response)
-            self.update_path()
 
     def compose_command(self, dest, type):
         cmdline = ['archive']
