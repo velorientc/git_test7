@@ -35,7 +35,6 @@ class EmailDialog(QDialog):
         self._qui = Ui_EmailDialog()
         self._qui.setupUi(self)
         self._qui.bundle_radio.setEnabled(False)  # TODO: bundle support
-        self._qui.settings_button.setEnabled(False)  # TODO: open settings dialog
 
         changesets = _ChangesetsModel(self._repo, self._purerevs, parent=self)
         self._qui.changesets_view.setModel(changesets)
@@ -268,6 +267,12 @@ class EmailDialog(QDialog):
     def _purerevs(self):
         """Extract revranges to list of pure revision numbers"""
         return cmdutil.revrange(self._repo, self._revs)
+
+    @pyqtSlot()
+    def on_settings_button_clicked(self):
+        from tortoisehg.hgqt import settings
+        settings.SettingsDialog(parent=self, focus='email.from').exec_()
+        # TODO: update form values and ui appropriately
 
 class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewer?
     _COLUMNS = [('rev', lambda ctx: '%d:%s' % (ctx.rev(), ctx)),
