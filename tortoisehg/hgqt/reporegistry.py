@@ -583,6 +583,7 @@ class RepoTreeView(QtGui.QTreeView):
             item = idx.internalPointer()
             self.msg  = item.details()
         self.workbench.showMessage(self.msg)
+        super(RepoTreeView, self).mouseMoveEvent(event)
 
     def leaveEvent(self, event):
         if self.msg != '':
