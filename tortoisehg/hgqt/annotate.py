@@ -416,7 +416,7 @@ class AnnotateDialog(QDialog):
         raise NotImplementedError()
 
     def searchAnnotation(self, pattern):
-        self.le.setText(pattern)
+        self.le.setText(QRegExp.escape(pattern))
         self.av.searchText(pattern, False)
 
     def searchText(self):
