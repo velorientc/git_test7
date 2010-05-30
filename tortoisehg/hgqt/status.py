@@ -46,6 +46,8 @@ class StatusWidget(QWidget):
        errorMessage(QString)        - for status bar
        titleTextChanged(QString)    - for window title
     '''
+    loadBegin = pyqtSignal()
+    loadComplete = pyqtSignal()
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
 
@@ -248,7 +250,7 @@ class StatusWidget(QWidget):
             sp = None
         self.sp = sp
 
-        self.emit(SIGNAL('loadBegin()'))
+        self.loadBegin.emit()
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.connect(self.refreshing, SIGNAL('finished'), self.reloadComplete)
         # re-emit error messages from this object
@@ -261,7 +263,7 @@ class StatusWidget(QWidget):
         self.wctx = wctx
         self.patchecked = patchecked.copy()
         self.updateModel()
-        self.emit(SIGNAL('loadComplete()'))
+        self.loadComplete.emit()
         self.refreshing.wait()
         self.refreshing = None
 

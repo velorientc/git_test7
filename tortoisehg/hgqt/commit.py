@@ -21,6 +21,7 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
 #  qrefresh support
+#  refresh parent changeset descriptions after refresh
 #  threaded / wrapped commit (need a CmdRunner equivalent)
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
@@ -46,10 +47,8 @@ class CommitWidget(QWidget):
         self.stwidget = status.StatusWidget(pats, opts, root, self)
         self.connect(self.stwidget, SIGNAL('errorMessage'),
                      lambda m: self.emit(SIGNAL('errorMessage'), m))
-        self.connect(self.stwidget, SIGNAL('loadBegin'),
-                     lambda: self.emit(SIGNAL('loadBegin')))
-        self.connect(self.stwidget, SIGNAL('loadComplete'),
-                     lambda: self.emit(SIGNAL('loadComplete')))
+        self.stwidget.loadBegin.connect(lambda: self.loadBegin.emit())
+        self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
 
         SP = QSizePolicy
@@ -171,9 +170,9 @@ class CommitWidget(QWidget):
     def canUndo(self):
         'Returns undo description or None if not valid'
         repo = self.stwidget.repo
-        if os.path.exists(self.repo.sjoin('undo')):
+        if os.path.exists(repo.sjoin('undo')):
             try:
-                args = self.repo.opener('undo.desc', 'r').read().splitlines()
+                args = repo.opener('undo.desc', 'r').read().splitlines()
                 if args[1] != 'commit':
                     return None
                 return _('Rollback commit to revision %d') % (int(args[0]) - 1)
@@ -405,7 +404,7 @@ class MessageHistoryCombo(QComboBox):
         QComboBox.showPopup(self)
 
 # Technical Debt for standalone tool
-#   add a toolbar for refresh, undo, etc
+#   add a toolbar for refresh
 #   add a statusbar and simple progressbar
 
 class CommitDialog(QDialog):
@@ -426,9 +425,13 @@ class CommitDialog(QDialog):
         layout.addLayout(bbl)
         layout.addSpacing(9)
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        bb.button(BB.Cancel).setDefault(False)
+        bb.button(BB.Discard).setDefault(False)
+        bb.button(BB.Discard).setText('Undo')
+        bb.button(BB.Discard).clicked.connect(commit.rollback)
         bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText('Commit')
         bbl.addWidget(bb, alignment=Qt.AlignRight)
@@ -444,6 +447,17 @@ class CommitDialog(QDialog):
         name = hglib.get_reponame(commit.stwidget.repo)
         self.setWindowTitle('%s - commit' % name)
         self.commit = commit
+        commit.loadComplete.connect(self.updateUndo)
+
+    def updateUndo(self):
+        BB = QDialogButtonBox
+        undomsg = self.commit.canUndo()
+        if undomsg:
+            self.bb.button(BB.Discard).setEnabled(True)
+            self.bb.button(BB.Discard).setToolTip(undomsg)
+        else:
+            self.bb.button(BB.Discard).setEnabled(False)
+            self.bb.button(BB.Discard).setToolTip('')
 
     def errorMessage(self, msg):
         print msg
