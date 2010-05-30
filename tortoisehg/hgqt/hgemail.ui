@@ -216,6 +216,9 @@
          <property name="text">
           <string>Write patch series (bundle) description</string>
          </property>
+         <property name="expander" stdset="0">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item row="2" column="0" colspan="2">
