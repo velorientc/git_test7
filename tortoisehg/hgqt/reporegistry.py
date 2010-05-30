@@ -657,8 +657,10 @@ class RepoTreeView(QtGui.QTreeView):
         url = pathitem.url()
         reporoot = pathitem.parent().parent().rootpath()
 
+        def finished():
+            self.workbench.reloadRepository(reporoot)
         args = ['pull', '-R', reporoot, url]
-        cmd = cmdui.Dialog(args, parent=self)
+        cmd = cmdui.Dialog(args, parent=self, finishfunc=finished)
         cmd.setWindowTitle(_('Pulling'))
         cmd.show_output(False)
         cmd.exec_()

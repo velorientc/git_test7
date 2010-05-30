@@ -420,6 +420,14 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
             w.reload()
             self.setupBranchCombo()
 
+    def reloadRepository(self, root):
+        tw = self.repoTabsWidget
+        for idx in range(tw.count()):
+            rw = tw.widget(idx)
+            if rw.repo.root == root:
+                rw.reload()
+        self.setupBranchCombo()
+
     #@timeit
     def refreshRevisionTable(self, *args, **kw):
         """Starts the process of filling the HgModel"""
