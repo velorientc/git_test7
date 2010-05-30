@@ -20,6 +20,7 @@ from tortoisehg.util.util import format_desc
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
+#  reflow / auto-wrap / paste filenames
 #  qrefresh support
 #  refresh parent changeset descriptions after refresh
 #  threaded / wrapped commit (need a CmdRunner equivalent)
@@ -29,7 +30,6 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 #  recent committers history
 #  pushafterci, autoincludes list
 #  qnew/shelve-patch creation dialog (in another file)
-#  reflow / auto-wrap / message format checks / paste filenames
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
 
