@@ -97,16 +97,27 @@ class AnnotateView(QFrame):
             point = self.mapToGlobal(point)
             fctx, line = self.links[line.blockNumber()]
             data = [fctx.path(), fctx.linkrev(), line]
-            def annparent():
+            def annorig():
                 self.emit(SIGNAL('revSelected'), data)
-            def editparent():
+            def editorig():
                 self.emit(SIGNAL('editSelected'), data)
             menu = QMenu(self)
-            for name, func in [(_('Annotate originating revision'), annparent),
-                               (_('View originating revision'), editparent)]:
+            for name, func in [(_('Annotate originating revision'), annorig),
+                               (_('View originating revision'), editorig)]:
                 action = menu.addAction(name)
                 action.wrapper = lambda f=func: f()
                 self.connect(action, SIGNAL('triggered()'), action.wrapper)
+            if fctx.linkrev() > 0:
+                data2 = [fctx.path(), fctx.linkrev()-1, line]
+                def annparent():
+                    self.emit(SIGNAL('revSelected'), data2)
+                def editparent():
+                    self.emit(SIGNAL('editSelected'), data2)
+                for name, func in [(_('Annotate parent revision'), annparent),
+                                   (_('View parent revision'), editparent)]:
+                    action = menu.addAction(name)
+                    action.wrapper = lambda f=func: f()
+                    self.connect(action, SIGNAL('triggered()'), action.wrapper)
             menu.exec_(point)
 
     def __init__(self, parent=None):
