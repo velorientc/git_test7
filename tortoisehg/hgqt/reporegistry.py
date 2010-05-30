@@ -549,6 +549,7 @@ class RepoTreeView(QtGui.QTreeView):
         self.parent = parent
         self.showMessageFunc = showMessageFunc
         self.selitem = None
+        self.msg  = ''
 
         self.setExpandsOnDoubleClick(False)
         self.setMouseTracking(True)
@@ -574,13 +575,17 @@ class RepoTreeView(QtGui.QTreeView):
             menu.exec_(event.globalPos())
 
     def mouseMoveEvent(self, event):
-        msg = ''
+        self.msg  = ''
         pos = event.pos()
         idx = self.indexAt(pos)
         if idx.isValid():
             item = idx.internalPointer()
-            msg = item.details()
-        self.showMessageFunc(msg)
+            self.msg  = item.details()
+        self.showMessageFunc(self.msg)
+
+    def leaveEvent(self, event):
+        if self.msg != '':
+            self.showMessageFunc('')
 
     def mouseDoubleClickEvent(self, event):
         self.open()
