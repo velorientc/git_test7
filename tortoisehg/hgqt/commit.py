@@ -144,8 +144,42 @@ class CommitWidget(QWidget):
         self.msgcombo = msgcombo
 
     def msgChanged(self):
-        self.commitButton.setEnabled(
-            not self.msgte.toPlainText().isEmpty())
+        text = self.msgte.toPlainText()
+        self.commitButton.setEnabled(not text.isEmpty())
+        sumlen, maxlen = self.getLengths()
+        if not sumlen and not maxlen:
+            self.msgte.setExtraSelections([])
+            return
+        pos, nextpos = 0, 0
+        sels = []
+        for i, line in enumerate(text.split('\n')):
+            pos = nextpos
+            length = len(line)
+            nextpos += length + 1 # include \n
+            if i == 0 and (length < sumlen or not sumlen):
+                continue
+            elif i == 1 and (length == 0 or not sumlen):
+                continue
+            elif i > 1 and (length < maxlen or not maxlen):
+                continue
+            sel = QTextEdit.ExtraSelection()
+            sel.bgcolor = QColor('red')
+            sel.format.setBackground(sel.bgcolor)
+            sel.format.setProperty(QTextFormat.FullWidthSelection, True)
+            sel.cursor = QTextCursor(self.msgte.document())
+            sel.cursor.setPosition(pos)
+            sel.cursor.clearSelection()
+            sels.append(sel)
+        self.msgte.setExtraSelections(sels)
+
+    def getLengths(self):
+        repo = self.stwidget.repo
+        try:
+            sumlen = int(repo.ui.config('tortoisehg', 'summarylen', 0))
+            maxlen = int(repo.ui.config('tortoisehg', 'messagewrap', 0))
+        except (TypeError, ValueError):
+            sumlen, maxlen = 0, 0
+        return sumlen, maxlen
 
     def restoreState(self, data):
         return self.stwidget.restoreState(data)
