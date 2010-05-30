@@ -197,9 +197,9 @@ INFO = (
           'See <a href="%s">OpenAtLine</a>'
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     (_('CLI Editor'), 'ui.editor', genEditCombo,
-        _('The editor to use during a commit and other instances where'
-        ' Mercurial needs multiline input from the user.  Used by'
-        ' command line commands, including patch import.')),
+        _('The editor used by Mercurial command line commands to '
+        ' collect multiline input from the user.  Most notably, '
+        ' commit messages.')),
     (_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
         _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHg windows.'
@@ -255,7 +255,7 @@ INFO = (
 
 ({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit'}, (
     (_('Username'), 'ui.username', genEditCombo,
-        _('Name associated with commits.  The common format is\n'
+        _('Name associated with commits.  The common format is<br>'
           '"Full Name <email.com>"')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
        _('Maximum length of the commit message summary line.'
