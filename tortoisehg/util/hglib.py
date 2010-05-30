@@ -28,6 +28,8 @@ def tounicode(s):
     Based on mercurial.util.tolocal().
     Return 'unicode' type string.
     """
+    if s is None:
+        return None
     if isinstance(s, unicode):
         return s
     for e in ('utf-8', _encoding):
@@ -46,6 +48,8 @@ def fromunicode(s, errors='strict'):
     If you don't want an exception for conversion failure,
     specify errors='replace'.
     """
+    if s is None:
+        return None
     s = unicode(s)  # s can be QtCore.QString
     for enc in (_encoding, _fallbackencoding):
         try:
@@ -61,6 +65,8 @@ def toutf(s):
 
     Return 'str' type string.
     """
+    if s is None:
+        return None
     return tounicode(s).encode('utf-8').replace('\0','')
 
 def fromutf(s):
@@ -69,6 +75,8 @@ def fromutf(s):
 
     Return 'str' type string.
     """
+    if s is None:
+        return None
     try:
         return s.decode('utf-8').encode(_encoding)
     except (UnicodeDecodeError, UnicodeEncodeError):
