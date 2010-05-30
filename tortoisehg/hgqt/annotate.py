@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error, commands, cmdutil, util
 
-from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview
+from tortoisehg.hgqt import visdiff, qtlib, wctxactions
 from tortoisehg.util import paths, hglib, colormap
 from tortoisehg.hgqt.i18n import _
 
@@ -20,8 +20,6 @@ from PyQt4.QtGui import *
 class AnnotateView(QFrame):
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    errorMessage = pyqtSignal(QString)
-    revSelected = pyqtSignal(int)
     revisionHint = pyqtSignal(QString)
 
     class RevArea(QWidget):
@@ -43,11 +41,17 @@ class AnnotateView(QFrame):
 
     class TextArea(QPlainTextEdit):
         'Display lines of annotation text'
+
         revisionHint = pyqtSignal(QString)
+
         def __init__(self, parent=None):
             QPlainTextEdit.__init__(self, parent)
             self.document().setDefaultStyleSheet(qtlib.thgstylesheet)
             self.setReadOnly(True)
+            self.setContextMenuPolicy(Qt.CustomContextMenu)
+            self.connect(self,
+                    SIGNAL('customContextMenuRequested(const QPoint &)'),
+                    self.customContextMenuRequested)
             tm = QFontMetrics(self.font())
             self.charwidth = tm.width('9')
             self.charheight = tm.height()
@@ -78,12 +82,32 @@ class AnnotateView(QFrame):
         def mouseMoveEvent(self, event):
             cursor = self.cursorForPosition(event.pos())
             line = cursor.block()
-            if not line.isValid():
+            if not line.isValid() or line.blockNumber() >= len(self.revs):
                 return
             rev = self.revs[line.blockNumber()]
             if rev != self.lastrev:
                 self.revisionHint.emit(self.summaries[rev])
                 self.lastrev = rev
+
+        def customContextMenuRequested(self, point):
+            cursor = self.cursorForPosition(point)
+            line = cursor.block()
+            if not line.isValid() or line.blockNumber() >= len(self.revs):
+                return
+            point = self.mapToGlobal(point)
+            fctx, line = self.links[line.blockNumber()]
+            data = [fctx.path(), fctx.linkrev(), line]
+            def annparent():
+                self.emit(SIGNAL('revSelected'), data)
+            def editparent():
+                self.emit(SIGNAL('editSelected'), data)
+            menu = QMenu(self)
+            for name, func in [(_('Annotate originating revision'), annparent),
+                               (_('View originating revision'), editparent)]:
+                action = menu.addAction(name)
+                action.wrapper = lambda f=func: f()
+                self.connect(action, SIGNAL('triggered()'), action.wrapper)
+            menu.exec_(point)
 
     def __init__(self, parent=None):
         super(AnnotateView, self).__init__(parent)
@@ -93,6 +117,10 @@ class AnnotateView(QFrame):
         self.revarea = self.RevArea(self.edit)
         self.edit.updateRequest.connect(self.revarea.updateContents)
         self.edit.revisionHint.connect(lambda h: self.revisionHint.emit(h))
+        self.connect(self.edit, SIGNAL('revSelected'),
+                lambda data: self.emit(SIGNAL('revSelected'), data))
+        self.connect(self.edit, SIGNAL('editSelected'),
+                lambda data: self.emit(SIGNAL('editSelected'), data))
 
         hbox = QHBoxLayout(self)
         hbox.setSpacing(10)
@@ -103,7 +131,7 @@ class AnnotateView(QFrame):
         self.thread = None
         self.matches = []
 
-    def annotateFileAtRev(self, repo, ctx, wfile):
+    def annotateFileAtRev(self, repo, ctx, wfile, line=None):
         if self.thread is not None:
             return
         fctx = ctx[wfile]
@@ -113,6 +141,7 @@ class AnnotateView(QFrame):
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
         self.repo = repo
+        self.resumeline = line
         self.annfile = wfile
         self.loadBegin.emit()
         self.thread = AnnotateThread(fctx)
@@ -124,6 +153,13 @@ class AnnotateView(QFrame):
         self.loadComplete.emit()
         if hasattr(self.thread, 'data'):
             self.fillModel(self.thread.data)
+        if self.resumeline and len(self.edit.revs) > self.resumeline:
+            cursor = self.edit.textCursor()
+            cursor.movePosition(QTextCursor.NextBlock,
+                                QTextCursor.MoveAnchor,
+                                self.resumeline)
+            self.edit.setTextCursor(cursor)
+            self.edit.ensureCursorVisible()
         self.thread = None
 
     def keyPressEvent(self, event):
@@ -135,7 +171,7 @@ class AnnotateView(QFrame):
         return super(AnnotateView, self).keyPressEvent(event)
 
     def fillModel(self, data):
-        revs, lines, lpos, sels = [], [], [], []
+        revs, lines, lpos, sels, links = [], [], [], [], []
         sums = {}
         pos = 0
         for fctx, origline, text in data:
@@ -143,22 +179,22 @@ class AnnotateView(QFrame):
             lines.append(text)
             lpos.append(pos)
             revs.append(rev)
+            links.append([fctx, origline])
             pos += len(text)
-            if rev in sums:
-                continue
-
-            author = hglib.username(fctx.user())
-            date = hglib.age(fctx.date())
-            l = fctx.description().replace(u'\0', '').splitlines()
-            summary = l and l[0] or ''
-            if fctx.path() == self.annfile:
-                source = ''
-            else:
-                source = '(%s)' % fctx.path()
-            desc = '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
-            sums[rev] = desc
+            if rev not in sums:
+                author = hglib.username(fctx.user())
+                date = hglib.age(fctx.date())
+                l = fctx.description().replace(u'\0', '').splitlines()
+                summary = l and l[0] or ''
+                if fctx.path() == self.annfile:
+                    source = ''
+                else:
+                    source = '(%s)' % fctx.path()
+                desc = '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
+                sums[rev] = desc
 
         self.edit.summaries = sums
+        self.edit.links = links
         self.edit.setPlainText(''.join(lines))
         self.edit.revs = revs
         width = max([len(str(r)) for r in revs]) * self.edit.charwidth + 3
@@ -260,6 +296,8 @@ class AnnotateDialog(QDialog):
         status = QLabel()
         mainvbox.addWidget(status)
         av.revisionHint.connect(status.setText)
+        self.connect(av, SIGNAL('revSelected'), self.revSelected)
+        self.connect(av, SIGNAL('editSelected'), self.editSelected)
         self.status = status
 
         self.opts = opts
@@ -270,9 +308,36 @@ class AnnotateDialog(QDialog):
         except Exception, e:
             self.status.setText(hglib.tounicode(str(e)))
         av.annotateFileAtRev(repo, ctx, pats[0])
+        self.setWindowTitle(_('Annotate %s@%d') % (pats[0], ctx.rev()))
+        self.repo = repo
 
         s = QSettings()
         self.restoreGeometry(s.value('annotate/geom').toByteArray())
+
+    def revSelected(self, args):
+        repo = self.repo
+        wfile, rev, line = args
+        try:
+            ctx = repo[rev]
+            fctx = ctx[wfile]
+        except Exception, e:
+            self.status.setText(hglib.tounicode(str(e)))
+        self.av.annotateFileAtRev(repo, ctx, wfile, line)
+        self.setWindowTitle(_('Annotate %s@%d') % (wfile, ctx.rev()))
+
+    def editSelected(self, args):
+        pattern = hglib.fromunicode(self.le.text()) or None
+        repo = self.repo
+        wfile, rev, line = args
+        try:
+            ctx = repo[rev]
+            fctx = ctx[wfile]
+        except Exception, e:
+            self.status.setText(hglib.tounicode(str(e)))
+
+        base, _ = visdiff.snapshot(repo, [wfile], repo[rev])
+        files = [os.path.join(base, wfile)]
+        wctxactions.edit(self, repo.ui, repo, files, line, pattern)
 
     def searchText(self):
         pattern = hglib.fromunicode(self.le.text())
