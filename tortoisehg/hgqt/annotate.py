@@ -22,6 +22,7 @@ class AnnotateView(QFrame):
     loadComplete = pyqtSignal()
     errorMessage = pyqtSignal(QString)
     revSelected = pyqtSignal(int)
+    revisionHint = pyqtSignal(QString)
 
     class RevArea(QWidget):
         'Display user@rev in front of each line'
@@ -42,6 +43,7 @@ class AnnotateView(QFrame):
 
     class TextArea(QPlainTextEdit):
         'Display lines of annotation text'
+        revisionHint = pyqtSignal(QString)
         def __init__(self, parent=None):
             QPlainTextEdit.__init__(self, parent)
             self.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -50,6 +52,9 @@ class AnnotateView(QFrame):
             self.charwidth = tm.width('9')
             self.charheight = tm.height()
             self.revs = []
+            self.summaries = []
+            self.setMouseTracking(True)
+            self.lastrev = None
 
         def paintRevArea(self, revarea, event):
             painter = QPainter(revarea)
@@ -65,10 +70,20 @@ class AnnotateView(QFrame):
                     break
                 painter.setPen(Qt.black)
                 rect = QRect(0, top, revarea.width, self.charheight)
-                painter.drawText(rect, Qt.AlignRight, self.revs[line])
+                painter.drawText(rect, Qt.AlignRight, str(self.revs[line]))
                 block = block.next()
                 top += self.blockBoundingGeometry(block).height()
                 line += 1
+
+        def mouseMoveEvent(self, event):
+            cursor = self.cursorForPosition(event.pos())
+            line = cursor.block()
+            if not line.isValid():
+                return
+            rev = self.revs[line.blockNumber()]
+            if rev != self.lastrev:
+                self.revisionHint.emit(self.summaries[rev])
+                self.lastrev = rev
 
     def __init__(self, parent=None):
         super(AnnotateView, self).__init__(parent)
@@ -77,6 +92,7 @@ class AnnotateView(QFrame):
         self.edit = self.TextArea(self)
         self.revarea = self.RevArea(self.edit)
         self.edit.updateRequest.connect(self.revarea.updateContents)
+        self.edit.revisionHint.connect(lambda h: self.revisionHint.emit(h))
 
         hbox = QHBoxLayout(self)
         hbox.setSpacing(10)
@@ -97,6 +113,7 @@ class AnnotateView(QFrame):
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
         self.repo = repo
+        self.annfile = wfile
         self.loadBegin.emit()
         self.thread = AnnotateThread(fctx)
         self.thread.done.connect(self.finished)
@@ -119,17 +136,32 @@ class AnnotateView(QFrame):
 
     def fillModel(self, data):
         revs, lines, lpos, sels = [], [], [], []
+        sums = {}
         pos = 0
         for fctx, origline, text in data:
             rev = fctx.linkrev()
             lines.append(text)
             lpos.append(pos)
-            revs.append(str(rev))
+            revs.append(rev)
             pos += len(text)
+            if rev in sums:
+                continue
 
+            author = hglib.username(fctx.user())
+            date = hglib.age(fctx.date())
+            l = fctx.description().replace(u'\0', '').splitlines()
+            summary = l and l[0] or ''
+            if fctx.path() == self.annfile:
+                source = ''
+            else:
+                source = '(%s)' % fctx.path()
+            desc = '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
+            sums[rev] = desc
+
+        self.edit.summaries = sums
         self.edit.setPlainText(''.join(lines))
         self.edit.revs = revs
-        width = max([len(r) for r in revs]) * self.edit.charwidth + 3
+        width = max([len(str(r)) for r in revs]) * self.edit.charwidth + 3
         self.revarea.width = width
         self.revarea.setFixedWidth(width)
 
@@ -227,6 +259,7 @@ class AnnotateDialog(QDialog):
 
         status = QLabel()
         mainvbox.addWidget(status)
+        av.revisionHint.connect(status.setText)
         self.status = status
 
         self.opts = opts
