@@ -153,13 +153,20 @@ class AnnotateView(QFrame):
         self.loadComplete.emit()
         if hasattr(self.thread, 'data'):
             self.fillModel(self.thread.data)
-        if self.resumeline and len(self.edit.revs) > self.resumeline:
+        lines = len(self.edit.revs) * 1.0
+        if self.resumeline and lines > self.resumeline:
             cursor = self.edit.textCursor()
             cursor.movePosition(QTextCursor.NextBlock,
                                 QTextCursor.MoveAnchor,
-                                self.resumeline)
+                                self.resumeline-1)
+            cursor.select(QTextCursor.LineUnderCursor)
             self.edit.setTextCursor(cursor)
+            sb = self.edit.verticalScrollBar()
+            val = int(sb.maximum() * self.resumeline / lines)
+            sb.setValue(val)
             self.edit.ensureCursorVisible()
+        else:
+            self.edit.verticalScrollBar().setValue(0)
         self.thread = None
 
     def keyPressEvent(self, event):
@@ -215,7 +222,6 @@ class AnnotateView(QFrame):
         self.colorsels = sels
 
         self.edit.setExtraSelections(self.colorsels)
-        self.edit.verticalScrollBar().setValue(0)
 
     def nextMatch(self):
         if not self.matches:
