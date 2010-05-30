@@ -20,7 +20,6 @@ from tortoisehg.util.util import format_desc
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
-#  auto-wrap
 #  qrefresh support
 #  refresh parent changeset descriptions after refresh
 #  threaded / wrapped commit (need a CmdRunner equivalent)
@@ -179,14 +178,14 @@ class CommitWidget(QWidget):
         'User pressed Alt-Q'
         if QApplication.focusWidget() != self.msgte:
             return
+        self.reflowBlock(self.msgte.textCursor().block())
 
+    def reflowBlock(self, block):
         sumlen, maxlen = self.getLengths()
         if not maxlen:
             return
-
         # In QtTextDocument land, a block is a sequence of text ending
         # in (and including) a carriage return.  Aka, a line of text.
-        block = self.msgte.textCursor().block()
         while block.length() and block.previous().length() > 1:
             block = block.previous()
         begin = block.position()
@@ -218,11 +217,21 @@ class CommitWidget(QWidget):
 
         # Replace selection with new sentence
         cursor.insertText(reflow)
+        return cursor.block()
 
     def customContextMenuRequested(self, point):
         cursor = self.msgte.cursorForPosition(point)
         point = self.msgte.mapToGlobal(point)
 
+        def apply():
+            sumlen, maxlen = self.getLengths()
+            if not maxlen:
+                return
+            block = self.msgte.document().firstBlock()
+            while block != self.msgte.document().end():
+                if block.length() > maxlen:
+                    block = self.reflowBlock(block)
+                block = block.next()
         def paste():
             files = self.stwidget.getChecked()
             cursor.insertText(', '.join(files))
@@ -233,6 +242,7 @@ class CommitWidget(QWidget):
 
         menu = self.msgte.createStandardContextMenu()
         for name, func in [(_('Paste &Filenames'), paste),
+                           (_('App&ly Format'), apply),
                            (_('C&onfigure Format'), settings)]:
             action = menu.addAction(name)
             action.wrapper = lambda f=func: f()
