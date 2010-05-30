@@ -14,9 +14,10 @@ TortoiseHg About dialog - PyQt4 version
 import os, sys, urllib2
 
 from PyQt4.QtCore import PYQT_VERSION_STR, QT_VERSION_STR, Qt
-from PyQt4.QtGui import QIcon, QPixmap, QDialog
+from PyQt4.QtGui import QPixmap, QDialog
 
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib
 from tortoisehg.util import version, hglib, shlib, paths
 
 def make_version(tuple):
@@ -41,10 +42,7 @@ class AboutDialog(QDialog):
         self._qui = Ui_AboutDialog()
         self._qui.setupUi(self)
 
-        iconfile = paths.get_tortoise_icon('thg_logo.ico')
-        icon = QIcon()
-        icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
-        self.setWindowIcon(icon)
+        self.setWindowIcon(qtlib.geticon('thg_logo'))
         self.setWindowTitle(_('About TortoiseHg'))
 
         thglogofile = paths.get_tortoise_icon('thg_logo_92x50.png')
@@ -94,7 +92,7 @@ class AboutDialog(QDialog):
         dlurl = hglib.fromunicode(self._qui.download_url_label.text())
         dlurl = dlurl.replace('http://thg-download-url', self._upgradeurl)
         self._qui.download_url_label.setText(dlurl)
-        
+
         self._qui.license_button.setText(_('&License'))
         self._qui.close_button.setText(_('&Close'))
 
