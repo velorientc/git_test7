@@ -91,12 +91,39 @@ class AnnotateView(QFrame):
 
         def customContextMenuRequested(self, point):
             cursor = self.cursorForPosition(point)
+            point = self.mapToGlobal(point)
+
             line = cursor.block()
             if not line.isValid() or line.blockNumber() >= len(self.revs):
                 return
-            point = self.mapToGlobal(point)
             fctx, line = self.links[line.blockNumber()]
             data = [fctx.path(), fctx.linkrev(), line]
+
+            # check if the user has opened a menu on a text selection
+            c = self.textCursor()
+            if cursor.position() >= c.selectionStart() and \
+                    cursor.position() <= c.selectionEnd():
+                selection = c.selection().toPlainText()
+                def sorig():
+                    sdata = [selection, fctx.linkrev()]
+                    self.emit(SIGNAL('searchAtRev'), sdata)
+                def sctx():
+                    self.emit(SIGNAL('searchAtParent'), selection)
+                def searchall():
+                    self.emit(SIGNAL('searchAll'), selection)
+                def sann():
+                    self.emit(SIGNAL('searchAnnotation'), selection)
+                menu = QMenu(self)
+                menu = QMenu(self)
+                for name, func in [(_('Search in original revision'), sorig),
+                                   (_('Search in working revision'), sctx),
+                                   (_('Search in current annotation'), sann),
+                                   (_('Search in history'), searchall)]:
+                    action = menu.addAction(name)
+                    action.wrapper = lambda f=func: f()
+                    self.connect(action, SIGNAL('triggered()'), action.wrapper)
+                return menu.exec_(point)
+
             def annorig():
                 self.emit(SIGNAL('revSelected'), data)
             def editorig():
@@ -132,6 +159,14 @@ class AnnotateView(QFrame):
                 lambda data: self.emit(SIGNAL('revSelected'), data))
         self.connect(self.edit, SIGNAL('editSelected'),
                 lambda data: self.emit(SIGNAL('editSelected'), data))
+        self.connect(self.edit, SIGNAL('searchAtRev'),
+                lambda data: self.emit(SIGNAL('searchAtRev'), data))
+        self.connect(self.edit, SIGNAL('searchAtParent'),
+                lambda pattern: self.emit(SIGNAL('searchAtParent'), pattern))
+        self.connect(self.edit, SIGNAL('searchAll'),
+                lambda pattern: self.emit(SIGNAL('searchAll'), pattern))
+        self.connect(self.edit, SIGNAL('searchAnnotation'),
+                lambda pattern: self.emit(SIGNAL('searchAnnotation'), pattern))
 
         hbox = QHBoxLayout(self)
         hbox.setSpacing(10)
@@ -248,20 +283,20 @@ class AnnotateView(QFrame):
             self.curmatch -= 1
         self.edit.setTextCursor(self.matches[self.curmatch].cursor)
 
-    def searchText(self, regexp, icase):
+    def searchText(self, match, icase):
         matches = []
         color = QColor(Qt.yellow)
         flags = QTextDocument.FindFlags()
         if not icase:
             flags |= QTextDocument.FindCaseSensitively
         doc = self.edit.document()
-        cursor = doc.find(regexp, 0, flags)
+        cursor = doc.find(match, 0, flags)
         while not cursor.isNull():
             selection = QTextEdit.ExtraSelection()
             selection.format.setBackground(color)
             selection.cursor = cursor
             matches.append(selection)
-            cursor = doc.find(regexp, cursor)
+            cursor = doc.find(match, cursor)
         self.matches = matches
         self.curmatch = 0
         if matches:
@@ -316,6 +351,11 @@ class AnnotateDialog(QDialog):
         av.revisionHint.connect(status.setText)
         self.connect(av, SIGNAL('revSelected'), self.revSelected)
         self.connect(av, SIGNAL('editSelected'), self.editSelected)
+        self.connect(av, SIGNAL('searchAtRev'), self.searchAtRev)
+        self.connect(av, SIGNAL('searchAtParent'), self.searchAtParent)
+        self.connect(av, SIGNAL('searchAll'), self.searchAll)
+        self.connect(av, SIGNAL('searchAnnotation'), self.searchAnnotation)
+
         self.status = status
 
         self.opts = opts
@@ -360,17 +400,41 @@ class AnnotateDialog(QDialog):
         files = [os.path.join(base, wfile)]
         wctxactions.edit(self, repo.ui, repo, files, line, pattern)
 
+    def searchAtRev(self, args):
+        # grep widget needs to support argument passing via **opts
+        # search repo[args[1]]
+        raise NotImplementedError()
+
+    def searchAtParent(self, pattern):
+        # grep widget needs to support argument passing via **opts
+        # search repo['.']
+        raise NotImplementedError()
+
+    def searchAll(self, pattern):
+        # grep widget needs to support argument passing via **opts
+        # search all history
+        raise NotImplementedError()
+
+    def searchAnnotation(self, pattern):
+        self.le.setText(pattern)
+        self.av.searchText(pattern, False)
+
     def searchText(self):
         pattern = hglib.fromunicode(self.le.text())
         if not pattern:
             return
         try:
-            icase = self.chk.isChecked()
-            regexp = re.compile(pattern, icase and re.I or 0)
+            regexp = re.compile(pattern)
         except Exception, inst:
             msg = _('grep: invalid match pattern: %s\n') % inst
             self.status.setText(hglib.tounicode(msg))
-        self.av.searchText(QRegExp(pattern), icase)
+        if self.chk.isChecked():
+            regexp = QRegExp(pattern)
+            icase = True
+        else:
+            icase = False
+            regexp = QRegExp(pattern, Qt.CaseSensitive)
+        self.av.searchText(regexp, icase)
 
     def wheelEvent(self, event):
         if self.childAt(event.pos()) != self.le:
