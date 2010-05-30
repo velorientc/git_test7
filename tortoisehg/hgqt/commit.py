@@ -20,7 +20,7 @@ from tortoisehg.util.util import format_desc
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
-#  reflow / auto-wrap / paste filenames
+#  auto-wrap / paste filenames
 #  qrefresh support
 #  refresh parent changeset descriptions after refresh
 #  threaded / wrapped commit (need a CmdRunner equivalent)
@@ -170,6 +170,50 @@ class CommitWidget(QWidget):
             sel.cursor.clearSelection()
             sels.append(sel)
         self.msgte.setExtraSelections(sels)
+
+    def msgReflow(self):
+        'User pressed Alt-Q'
+        if QApplication.focusWidget() != self.msgte:
+            return
+
+        sumlen, maxlen = self.getLengths()
+        if not maxlen:
+            return
+
+        # In QtTextDocument land, a block is a sequence of text ending
+        # in (and including) a carriage return.  Aka, a line of text.
+        block = self.msgte.textCursor().block()
+        while block.length() and block.previous().length() > 1:
+            block = block.previous()
+        begin = block.position()
+
+        while block.length() and block.next().length() > 1:
+            block = block.next()
+        end = block.position() + block.length() - 1
+
+        # select the contiguous lines of text under the cursor
+        cursor = self.msgte.textCursor()
+        cursor.setPosition(begin, QTextCursor.MoveAnchor)
+        cursor.setPosition(end, QTextCursor.KeepAnchor)
+        sentence = cursor.selection().toPlainText().simplified()
+
+        parts = sentence.split(' ', QString.SkipEmptyParts)
+        lines = QStringList()
+        line = QStringList()
+        partslen = 0
+        for part in parts:
+            if partslen + len(line) + len(part) + 1 > maxlen:
+                if line:
+                    lines.append(line.join(' '))
+                line, partslen = QStringList(), 0
+            line.append(part)
+            partslen += len(part)
+        if line:
+            lines.append(line.join(' '))
+        reflow = lines.join('\n')
+
+        # Replace selection with new sentence
+        cursor.insertText(reflow)
 
     def getLengths(self):
         repo = self.stwidget.repo
@@ -503,6 +547,11 @@ class CommitDialog(QDialog):
         elif event.key() == Qt.Key_Escape:
             self.reject()
             return
+        elif event.modifiers() == Qt.AltModifier and event.key() == Qt.Key_Q:
+            self.commit.msgReflow()
+        elif event.modifiers() == Qt.MetaModifier and event.key() == Qt.Key_R:
+            # On a Mac, CTRL-R will also reflow (until someone fixes this)
+            self.commit.msgReflow()
         return super(QDialog, self).keyPressEvent(event)
 
     def accept(self):
