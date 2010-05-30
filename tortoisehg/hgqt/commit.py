@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, cmdutil, util, dispatch
+from mercurial import hg, ui, cmdutil, util, dispatch, error
 from mercurial.node import short as short_hex
 
 from PyQt4.QtCore import *
@@ -22,12 +22,11 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 # Technical Debt for CommitWidget
 #  qrefresh support
 #  threaded / wrapped commit (need a CmdRunner equivalent)
-#  qctlib decode failure dialog (ask for retry locale, suggest HGENCODING)
+#  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
 #  +1 / -1 head indication (not as important with workbench integration)
 #  recent committers history
 #  pushafterci, autoincludes list
-#  use date option
 #  qnew/shelve-patch creation dialog (in another file)
 #  reflow / auto-wrap / message format checks / paste filenames
 #  spell check / tab completion
@@ -363,8 +362,19 @@ class CommitWidget(QWidget):
                 dispatch._dispatch(_ui, ['remove'] + checkedMissing)
             else:
                 return
+        try:
+            date = self.opts.get('date')
+            if date:
+                util.parsedate(date)
+                dcmd = ['--date', date]
+            else:
+                dcmd = []
+        except error.Abort, e:
+            self.emit(SIGNAL('errorMessage'), hglib.tounicode(str(e)))
+            dcmd = []
+
         cmdline = ['commit', '--user', user, '--message', msg]
-        cmdline += brcmd + files
+        cmdline += dcmd + brcmd + files
         ret = dispatch._dispatch(_ui, cmdline)
         if not ret:
             self.addMessageToHistory()
