@@ -20,7 +20,7 @@ from tortoisehg.util.util import format_desc
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
-#  auto-wrap / paste filenames
+#  auto-wrap
 #  qrefresh support
 #  refresh parent changeset descriptions after refresh
 #  threaded / wrapped commit (need a CmdRunner equivalent)
@@ -116,6 +116,10 @@ class CommitWidget(QWidget):
         vbox.addLayout(hbox, 0)
         msgte = QPlainTextEdit()
         msgte.textChanged.connect(self.msgChanged)
+        msgte.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.connect(msgte,
+                SIGNAL('customContextMenuRequested(const QPoint &)'),
+                self.customContextMenuRequested)
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
         sp = SP(SP.Expanding, SP.Expanding)
@@ -214,6 +218,26 @@ class CommitWidget(QWidget):
 
         # Replace selection with new sentence
         cursor.insertText(reflow)
+
+    def customContextMenuRequested(self, point):
+        cursor = self.msgte.cursorForPosition(point)
+        point = self.msgte.mapToGlobal(point)
+
+        def paste():
+            files = self.stwidget.getChecked()
+            cursor.insertText(', '.join(files))
+        def settings():
+            from tortoisehg.hgqt.settings import SettingsDialog
+            dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
+            return dlg.exec_()
+
+        menu = self.msgte.createStandardContextMenu()
+        for name, func in [(_('Paste &Filenames'), paste),
+                           (_('C&onfigure Format'), settings)]:
+            action = menu.addAction(name)
+            action.wrapper = lambda f=func: f()
+            self.connect(action, SIGNAL('triggered()'), action.wrapper)
+        return menu.exec_(point)
 
     def getLengths(self):
         repo = self.stwidget.repo
