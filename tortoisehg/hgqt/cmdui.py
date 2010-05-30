@@ -255,9 +255,11 @@ class Dialog(QDialog):
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
 
-    def __init__(self, cmdline, parent=None):
+    def __init__(self, cmdline, parent=None, finishfunc=None):
         super(Dialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+        self.finishfunc = finishfunc
 
         self.core = Core()
         self.core.commandFinished.connect(self.command_finished)
@@ -340,6 +342,8 @@ class Dialog(QDialog):
         self.cancel_btn.setHidden(True)
         self.close_btn.setShown(True)
         self.close_btn.setFocus()
+        if self.finishfunc:
+            self.finishfunc()
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
