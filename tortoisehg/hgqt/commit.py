@@ -539,15 +539,15 @@ class CommitDialog(QDialog):
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
-        bb.button(BB.Cancel).setDefault(False)
-        bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Discard).setText('Undo')
         bb.button(BB.Discard).clicked.connect(commit.rollback)
-        bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText('Commit')
         bbl.addWidget(bb, alignment=Qt.AlignRight)
         bbl.addSpacing(9)
         self.bb = bb
+        bb.button(BB.Cancel).setDefault(False)
+        bb.button(BB.Discard).setDefault(False)
+        bb.button(BB.Ok).setDefault(True)
 
         s = QSettings()
         commit.restoreState(s.value('commit/state').toByteArray())
