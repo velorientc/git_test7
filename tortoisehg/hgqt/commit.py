@@ -460,9 +460,11 @@ class CommitDialog(QDialog):
 
     def accept(self):
         if self.commit.commit():
-            self.reject()
-        else:
-            self.commit.stwidget.refreshWctx()
+            repo = self.commit.stwidget.repo
+            if repo.ui.configbool('tortoisehg', 'closeci'):
+                self.reject()
+                return
+        self.commit.stwidget.refreshWctx()
 
     def reject(self):
         if self.commit.canExit():
