@@ -17,6 +17,11 @@ from tortoisehg.hgqt.i18n import _
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+# Technical Debt
+#  Syntax Highlighting?
+#  Pass search parameters to grep
+#  forward/backward history buttons
+
 class AnnotateView(QFrame):
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
