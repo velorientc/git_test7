@@ -429,7 +429,7 @@ class AnnotateDialog(QDialog):
             msg = _('grep: invalid match pattern: %s\n') % inst
             self.status.setText(hglib.tounicode(msg))
         if self.chk.isChecked():
-            regexp = QRegExp(pattern)
+            regexp = QRegExp(pattern, Qt.CaseInsensitive)
             icase = True
         else:
             icase = False
