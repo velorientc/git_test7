@@ -27,7 +27,7 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 #  Need a unicode-to-UTF8 function
 #  +1 / -1 head indication (not as important with workbench integration)
 #  recent committers history
-#  pushafterci, autoincludes list
+#  pushafterci list
 #  qnew/shelve-patch creation dialog (in another file)
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
@@ -485,6 +485,12 @@ class CommitWidget(QWidget):
 
         cmdline = ['commit', '--user', user, '--message', msg]
         cmdline += dcmd + brcmd + files
+
+        for fname in repo.ui.config('tortoisehg', 'autoinc', '').split(','):
+            fname = fname.strip()
+            if fname:
+                cmdline.extend(['--include', fname])
+
         ret = dispatch._dispatch(_ui, cmdline)
         if not ret:
             self.addMessageToHistory()
