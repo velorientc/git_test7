@@ -109,7 +109,8 @@ class AnnotateView(QFrame):
 
             # check if the user has opened a menu on a text selection
             c = self.textCursor()
-            if cursor.position() >= c.selectionStart() and \
+            selection = c.selection().toPlainText()
+            if selection and cursor.position() >= c.selectionStart() and \
                     cursor.position() <= c.selectionEnd():
                 selection = c.selection().toPlainText()
                 def sorig():
