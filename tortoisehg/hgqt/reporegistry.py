@@ -654,14 +654,16 @@ class RepoTreeView(QtGui.QTreeView):
         if not self.selitem:
             return
         pathitem = self.selitem.internalPointer()
-        url = pathitem.url()
+        url_ = pathitem.url()
         reporoot = pathitem.parent().parent().rootpath()
 
         def finished():
             self.workbench.reloadRepository(reporoot)
-        args = ['pull', '-R', reporoot, url]
+        args = ['pull', '-R', reporoot, url_]
         cmd = cmdui.Dialog(args, parent=self, finishfunc=finished)
-        cmd.setWindowTitle(_('Pulling'))
+        what = _('Pulling from %s') % url.hidepassword(url_)
+        self.workbench.showMessage(what)
+        cmd.setWindowTitle(what)
         cmd.show_output(False)
         cmd.exec_()
 
