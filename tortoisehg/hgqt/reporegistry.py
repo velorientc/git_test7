@@ -19,8 +19,9 @@ from PyQt4.QtGui import QVBoxLayout, QDockWidget, QFrame
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt import cmdui
 
-from settings import SettingsDialog
+from tortoisehg.hgqt.settings import SettingsDialog
 
 connect = QtCore.QObject.connect
 
@@ -259,7 +260,7 @@ class RepoPathItem(RepoTreeItem):
         self._path = path
 
     def url(self):
-        return self._url
+        return self._path
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -275,7 +276,7 @@ class RepoPathItem(RepoTreeItem):
         return QVariant()
 
     def menulist(self):
-        return []
+        return ['pull']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
@@ -608,6 +609,8 @@ class RepoTreeView(QtGui.QTreeView):
                 _("View the repository's settings"), None, self.startSettings),
              ("remove", _("Remove entry"), None, 
                 _("Remove the entry"), None, self.removeSelected),
+             ("pull", _("Pull"), None, 
+                _("Pull from remote"), None, self.pull),
              ]
         return a
 
@@ -646,6 +649,19 @@ class RepoTreeView(QtGui.QTreeView):
         if not self.selitem:
             return
         self.selitem.internalPointer().open()
+
+    def pull(self):
+        if not self.selitem:
+            return
+        pathitem = self.selitem.internalPointer()
+        url = pathitem.url()
+        reporoot = pathitem.parent().parent().rootpath()
+
+        args = ['pull', '-R', reporoot, url]
+        cmd = cmdui.Dialog(args, parent=self)
+        cmd.setWindowTitle(_('Pulling'))
+        cmd.show_output(False)
+        cmd.exec_()
 
     def newGroup(self):
         m = self.model()
