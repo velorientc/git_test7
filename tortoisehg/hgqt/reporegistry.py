@@ -545,10 +545,10 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
 
 
 class RepoTreeView(QtGui.QTreeView):
-    def __init__(self, parent, showMessageFunc):
+    def __init__(self, parent, workbench):
         QtGui.QTreeView.__init__(self)
         self.parent = parent
-        self.showMessageFunc = showMessageFunc
+        self.workbench = workbench
         self.selitem = None
         self.msg  = ''
 
@@ -582,11 +582,11 @@ class RepoTreeView(QtGui.QTreeView):
         if idx.isValid():
             item = idx.internalPointer()
             self.msg  = item.details()
-        self.showMessageFunc(self.msg)
+        self.workbench.showMessage(self.msg)
 
     def leaveEvent(self, event):
         if self.msg != '':
-            self.showMessageFunc('')
+            self.workbench.showMessage('')
 
     def mouseDoubleClickEvent(self, event):
         self.open()
@@ -682,8 +682,8 @@ class RepoRegistryView(QDockWidget):
     openRepoSignal = QtCore.pyqtSignal(QtCore.QString)
     visibilityChanged = QtCore.pyqtSignal(bool)
 
-    def __init__(self, ui, parent, showMessageFunc):
-        QDockWidget.__init__(self, parent)
+    def __init__(self, ui, workbench):
+        QDockWidget.__init__(self, workbench)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
@@ -698,7 +698,7 @@ class RepoRegistryView(QDockWidget):
 
         self.tmodel = m = RepoTreeModel(self.openrepo, ui, settingsfilename())
 
-        self.tview = tv = RepoTreeView(self, showMessageFunc)
+        self.tview = tv = RepoTreeView(self, workbench)
         lay.addWidget(tv)
         tv.setModel(m)
 
