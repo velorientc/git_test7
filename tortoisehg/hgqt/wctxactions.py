@@ -45,6 +45,7 @@ def wctxactions(parent, point, repo, selrows):
     make(_('&Revert'), revert, frozenset('MAR!'))
     menu.addSeparator()
     make(_('L&og'), log, frozenset('MARC!'))
+    make(_('&Annotate'), annotate, frozenset('MARC!'))
     menu.addSeparator()
     make(_('&Forget'), forget, frozenset('MAC!'))
     make(_('&Add'), add, frozenset('I?'))
@@ -217,6 +218,12 @@ def revert(parent, ui, repo, files):
 
 def log(parent, ui, repo, files):
     raise NotImplementedError()
+
+def annotate(parent, ui, repo, files):
+    from tortoisehg.hgqt import annotate
+    dlg = annotate.AnnotateDialog(files[0], parent=parent)
+    dlg.show()
+    return False
 
 def forget(parent, ui, repo, files):
     commands.forget(ui, repo, *files)
