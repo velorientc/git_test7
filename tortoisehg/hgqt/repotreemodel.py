@@ -202,10 +202,7 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         self.endInsertRows()
 
     def getRepoItem(self, reporoot):
-        for c in self.allrepos.childs:
-            if c.rootpath() == reporoot:
-                return c
-        return None
+        return self.rootItem.getRepoItem(reporoot)
 
     def addGroup(self, name):
         ri = self.rootItem

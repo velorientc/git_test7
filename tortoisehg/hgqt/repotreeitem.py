@@ -123,6 +123,13 @@ class RepoTreeItem(object):
     def details(self):
         return ''
 
+    def getRepoItem(self, reporoot):
+        for c in self.childs:
+            ri = c.getRepoItem(reporoot)
+            if ri:
+                return ri
+        return None                
+
 
 class RepoItem(RepoTreeItem):
     def __init__(self, model, rootpath='', parent=None):
@@ -182,6 +189,11 @@ class RepoItem(RepoTreeItem):
 
     def details(self):
         return _('Local Repository %s') % self._root
+
+    def getRepoItem(self, reporoot):
+        if reporoot == self._root:
+            return self
+        return None                
 
 
 class RepoPathsItem(RepoTreeItem):
