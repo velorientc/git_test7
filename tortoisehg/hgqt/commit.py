@@ -366,6 +366,7 @@ class CommitWidget(QWidget):
         self.msghistory = self.msghistory[:10]
 
     def refreshUserList(self):
+        self.usercombo.clear()
         l = []
         try:
             repo = self.stwidget.repo
