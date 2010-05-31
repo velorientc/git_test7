@@ -244,6 +244,7 @@ class AnnotateView(QFrame):
             pos += len(text)
             if rev not in sums:
                 author = hglib.username(fctx.user())
+                author = hglib.tounicode(author)
                 date = hglib.age(fctx.date())
                 l = fctx.description().replace(u'\0', '').splitlines()
                 summary = l and l[0] or ''
