@@ -235,7 +235,7 @@ class RepoPathItem(RepoTreeItem):
         return ['pull']
 
     def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def removeRows(self, row, count):
         return False
