@@ -59,7 +59,7 @@ class Workbench(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self)
 
         self.load_config(ui)
-        self.setupUi(self)
+        self.setupUi()
         self._quickbars = []
         self.disab_shortcuts = []
 
@@ -139,14 +139,14 @@ class Workbench(QtGui.QMainWindow):
     def reject(self):
         self.close()
 
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(627, 721)
+    def setupUi(self):
+        self.resize(627, 721)
+
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/log.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
+        self.setWindowIcon(icon)
 
-        self.centralwidget = QtGui.QWidget(MainWindow)
+        self.centralwidget = QtGui.QWidget(self)
 
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setSpacing(0)
@@ -170,60 +170,60 @@ class Workbench(QtGui.QMainWindow):
 
         self.verticalLayout.addWidget(self.repotabs_splitter)
 
-        MainWindow.setCentralWidget(self.centralwidget)
+        self.setCentralWidget(self.centralwidget)
 
-        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar = QtGui.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 19))
 
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuView = QtGui.QMenu(self.menubar)
 
-        MainWindow.setMenuBar(self.menubar)
+        self.setMenuBar(self.menubar)
 
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        MainWindow.setStatusBar(self.statusbar)
+        self.statusbar = QtGui.QStatusBar(self)
+        self.setStatusBar(self.statusbar)
 
-        self.toolBar_edit = QtGui.QToolBar(MainWindow)
+        self.toolBar_edit = QtGui.QToolBar(self)
         self.toolBar_edit.setEnabled(True)
         self.toolBar_edit.setObjectName("toolBar_edit")
-        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
 
-        self.toolBar_treefilters = QtGui.QToolBar(MainWindow)
+        self.toolBar_treefilters = QtGui.QToolBar(self)
         self.toolBar_treefilters.setEnabled(True)
         self.toolBar_treefilters.setObjectName("toolBar_treefilters")
-        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_treefilters)
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_treefilters)
 
-        self.toolBar_diff = QtGui.QToolBar(MainWindow)
+        self.toolBar_diff = QtGui.QToolBar(self)
         self.toolBar_diff.setObjectName("toolBar_diff")
-        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_diff)
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_diff)
 
-        self.toolBar_help = QtGui.QToolBar(MainWindow)
+        self.toolBar_help = QtGui.QToolBar(self)
         self.toolBar_help.setObjectName("toolBar_help")
-        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_help)
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_help)
 
-        self.actionOpen_repository = QtGui.QAction(MainWindow)
-        self.actionRefresh = QtGui.QAction(MainWindow)
-        self.actionQuit = QtGui.QAction(MainWindow)
+        self.actionOpen_repository = QtGui.QAction(self)
+        self.actionRefresh = QtGui.QAction(self)
+        self.actionQuit = QtGui.QAction(self)
         self.actionQuit.setShortcut("None")
-        self.actionAbout = QtGui.QAction(MainWindow)
-        self.actionDisplayAllBranches = QtGui.QAction(MainWindow)
-        self.actionHelp = QtGui.QAction(MainWindow)
+        self.actionAbout = QtGui.QAction(self)
+        self.actionDisplayAllBranches = QtGui.QAction(self)
+        self.actionHelp = QtGui.QAction(self)
 
-        self.actionBack = QtGui.QAction(MainWindow)
+        self.actionBack = QtGui.QAction(self)
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/icons/back.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionBack.setIcon(icon1)
 
-        self.actionForward = QtGui.QAction(MainWindow)
+        self.actionForward = QtGui.QAction(self)
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/icons/forward.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionForward.setIcon(icon2)
 
-        self.actionShowPaths = QtGui.QAction(MainWindow)
+        self.actionShowPaths = QtGui.QAction(self)
         self.actionShowPaths.setCheckable(True)
 
-        self.actionShowRepoRegistry = QtGui.QAction(MainWindow)
+        self.actionShowRepoRegistry = QtGui.QAction(self)
         self.actionShowRepoRegistry.setCheckable(True)
 
         self.menuFile.addAction(self.actionOpen_repository)
