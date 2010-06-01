@@ -107,6 +107,7 @@ class CommitWidget(QWidget):
         hbox.addSpacing(9)
         vbox.addLayout(hbox, 0)
         msgte = QPlainTextEdit()
+        msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
         msgte.setFont(QFont('Monospace', 9))
         msgte.textChanged.connect(self.msgChanged)
         msgte.setContextMenuPolicy(Qt.CustomContextMenu)
