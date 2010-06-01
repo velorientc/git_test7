@@ -7,8 +7,8 @@
 
 import sys, os, httplib, socket
 from PyQt4.QtCore import Qt, pyqtSlot
-from PyQt4.QtGui import QDialog
-from mercurial import extensions, hgweb
+from PyQt4.QtGui import QDialog, QSystemTrayIcon
+from mercurial import extensions, hgweb, util
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
 
@@ -129,6 +129,34 @@ class ServeDialog(QDialog):
             return
 
         return super(ServeDialog, self).keyPressEvent(event)
+
+    def closeEvent(self, event):
+        if self.isstarted():
+            self._minimizetotray()
+            event.ignore()
+            return
+
+        return super(ServeDialog, self).closeEvent(event)
+
+    @util.propertycache
+    def _trayicon(self):
+        icon = QSystemTrayIcon(self.windowIcon(), parent=self)
+        icon.activated.connect(self._restorefromtray)
+        icon.setToolTip(self.windowTitle())
+        # TODO: context menu
+        return icon
+
+    # TODO: minimize to tray by minimize button
+
+    @pyqtSlot()
+    def _minimizetotray(self):
+        self._trayicon.show()
+        self.hide()
+
+    @pyqtSlot()
+    def _restorefromtray(self):
+        self._trayicon.hide()
+        self.show()
 
     @pyqtSlot()
     def on_settings_button_clicked(self):
