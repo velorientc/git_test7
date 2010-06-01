@@ -12,7 +12,8 @@ from PyQt4.QtCore import QModelIndex, QString
 
 from tortoisehg.hgqt.i18n import _
 
-from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem, RepoItem
+from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
+from repotreeitem import RepoItem, RepoTreeItem
 
 
 extractXmlElementName = 'reporegextract'
