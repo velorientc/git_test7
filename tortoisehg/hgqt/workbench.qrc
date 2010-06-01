@@ -26,6 +26,7 @@
     <file>icons/fallback.svg</file>
     <file>icons/success.svg</file>
     <file>icons/error.svg</file>
+    <file>icons/warning.svg</file>
     <file>icons/tag.svg</file>
     <file>icons/archive.svg</file>
     <file>icons/clone.svg</file>
