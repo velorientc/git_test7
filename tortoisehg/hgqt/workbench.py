@@ -183,11 +183,6 @@ class Workbench(QtGui.QMainWindow):
         self.statusbar = QtGui.QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.toolBar_edit = QtGui.QToolBar(self)
-        self.toolBar_edit.setEnabled(True)
-        self.toolBar_edit.setObjectName("toolBar_edit")
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
-
         self.toolBar_treefilters = QtGui.QToolBar(self)
         self.toolBar_treefilters.setEnabled(True)
         self.toolBar_treefilters.setObjectName("toolBar_treefilters")
@@ -240,11 +235,15 @@ class Workbench(QtGui.QMainWindow):
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.toolBar_edit.addAction(self.actionRefresh)
-        self.toolBar_edit.addSeparator()
-        self.toolBar_edit.addAction(self.actionBack)
-        self.toolBar_edit.addAction(self.actionForward)
-        self.toolBar_edit.addSeparator()
+        self.toolBar_edit = tb = QtGui.QToolBar(self)
+        tb.setEnabled(True)
+        tb.setObjectName("toolBar_edit")
+        tb.addAction(self.actionRefresh)
+        tb.addSeparator()
+        tb.addAction(self.actionBack)
+        tb.addAction(self.actionForward)
+        tb.addSeparator()
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
         self.toolBar_help.addAction(self.actionHelp)
 
