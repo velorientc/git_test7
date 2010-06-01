@@ -148,9 +148,9 @@ class Workbench(QtGui.QMainWindow):
 
         self.centralwidget = QtGui.QWidget(self)
 
-        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setMargin(0)
+        self.verticalLayout = vl = QtGui.QVBoxLayout(self.centralwidget)
+        vl.setSpacing(0)
+        vl.setMargin(0)
 
         self.repotabs_splitter = sp = QtGui.QSplitter(self.centralwidget)
         sp.setOrientation(QtCore.Qt.Vertical)
