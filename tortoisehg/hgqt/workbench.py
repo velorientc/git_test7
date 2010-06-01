@@ -152,8 +152,9 @@ class Workbench(QtGui.QMainWindow):
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setMargin(0)
 
-        self.repotabs_splitter = QtGui.QSplitter(self.centralwidget)
-        self.repotabs_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.repotabs_splitter = sp = QtGui.QSplitter(self.centralwidget)
+        sp.setOrientation(QtCore.Qt.Vertical)
+        self.verticalLayout.addWidget(sp)
 
         self.repoTabsWidget = tw = QtGui.QTabWidget(self.repotabs_splitter)
         tw.setDocumentMode(True)
@@ -166,8 +167,6 @@ class Workbench(QtGui.QMainWindow):
         tw.setSizePolicy(sp)
 
         self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
-
-        self.verticalLayout.addWidget(self.repotabs_splitter)
 
         self.setCentralWidget(self.centralwidget)
 
