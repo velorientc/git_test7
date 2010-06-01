@@ -156,16 +156,15 @@ class Workbench(QtGui.QMainWindow):
         self.repotabs_splitter.setOrientation(QtCore.Qt.Vertical)
         self.repotabs_splitter.setObjectName("repotabs_splitter")
 
-        self.repoTabsWidget = QtGui.QTabWidget(self.repotabs_splitter)
-
+        self.repoTabsWidget = tw = QtGui.QTabWidget(self.repotabs_splitter)
+        tw.setDocumentMode(True)
+        tw.setTabsClosable(True)
+        tw.setMovable(True)
         sp = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(1)
-        sp.setHeightForWidth(self.repoTabsWidget.sizePolicy().hasHeightForWidth())
-        self.repoTabsWidget.setSizePolicy(sp)
-        self.repoTabsWidget.setDocumentMode(True)
-        self.repoTabsWidget.setTabsClosable(True)
-        self.repoTabsWidget.setMovable(True)
+        sp.setHeightForWidth(tw.sizePolicy().hasHeightForWidth())
+        tw.setSizePolicy(sp)
 
         self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
 
