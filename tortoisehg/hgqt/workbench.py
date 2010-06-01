@@ -81,7 +81,6 @@ class Workbench(QtGui.QMainWindow):
             self.addRepoTab(repo)
 
         tw = self.repoTabsWidget
-        tw.removeTab(0)
         connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
         connect(tw, SIGNAL('currentChanged(int)'), self.repoTabChanged)
 
@@ -167,9 +166,6 @@ class Workbench(QtGui.QMainWindow):
         self.repoTabsWidget.setDocumentMode(True)
         self.repoTabsWidget.setTabsClosable(True)
         self.repoTabsWidget.setMovable(True)
-
-        self.firstRepoTab = QtGui.QWidget()
-        self.repoTabsWidget.addTab(self.firstRepoTab, "")
 
         self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
 
