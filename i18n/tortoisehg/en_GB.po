@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: English <United Kingdom)\n"
 "POT-Creation-Date: 2010-04-30 21:45+0000\n"
-"PO-Revision-Date: 2010-05-02 21:11+0000\n"
-"Last-Translator: JStoker <Unknown>\n"
+"PO-Revision-Date: 2010-05-13 11:44+0000\n"
+"Last-Translator: MoLE <Unknown>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-05-03 04:06+0000\n"
+"X-Launchpad-Export-Date: 2010-05-20 05:32+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: TortoiseHgOverlayServer.py:36
@@ -963,11 +963,11 @@ msgstr "Create new named branch \"%s\"?"
 
 #: tortoisehg\hgtk\commit.py:1176
 msgid "Finished committing and pushing"
-msgstr ""
+msgstr "Finished committing and pushing"
 
 #: tortoisehg\hgtk\commit.py:1178
 msgid "Finished committing"
-msgstr ""
+msgstr "Finished committing"
 
 #: tortoisehg\hgtk\commit.py:1180
 msgid "Aborted committing"
@@ -993,7 +993,7 @@ msgstr "Cannot run now"
 
 #: tortoisehg\hgtk\commit.py:1189
 msgid "Please try again after the running operation is completed"
-msgstr ""
+msgstr "Please try again after the running operation is completed"
 
 #: tortoisehg\hgtk\commit.py:1215
 msgid "Paste _Filenames"
@@ -1530,7 +1530,7 @@ msgstr "invalid state"
 
 #: tortoisehg\hgtk\hgcmd.py:536 tortoisehg\hgtk\recovery.py:268
 msgid "Status: %s"
-msgstr ""
+msgstr "Status: %s"
 
 #: tortoisehg\hgtk\hgcmd.py:665
 msgid "Command Log"
@@ -2530,7 +2530,7 @@ msgstr "Pending Perforce changelists"
 #: tortoisehg\hgtk\history.py:2585 tortoisehg\hgtk\recovery.py:168
 #: tortoisehg\hgtk\synch.py:541
 msgid "Please try again after the previous command has completed"
-msgstr ""
+msgstr "Please try again after the previous command has completed"
 
 #: tortoisehg\hgtk\history.py:595
 msgid "Perforce changelist %s"
@@ -5658,7 +5658,7 @@ msgstr "cleaning up temp directory\n"
 
 #: tortoisehg\hgtk\visdiff.py:304
 msgid "unable to clean temp directory: %s\n"
-msgstr ""
+msgstr "unable to clean temp directory: %s\n"
 
 #: tortoisehg\hgtk\visdiff.py:320
 msgid "Visual Diffs"
