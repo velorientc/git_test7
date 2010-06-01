@@ -69,6 +69,14 @@ def main():
         sys.exit(1)
 
     use = scripts[ext.lower()[1:]]
+
+    if 'xls' in use[0] and os.path.basename(local) == os.path.basename(other):
+        # XLS hack; Excel will not diff two files if they have the same
+        # basename.
+        othertmp = other+'~x1'
+        shutil.copy(other, othertmp)
+        other = othertmp
+
     if len(args) == 2:
         script = os.path.join(path, use[0])
         cmd = ['wscript', script, other, local]
