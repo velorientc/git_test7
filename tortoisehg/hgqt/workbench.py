@@ -174,10 +174,6 @@ class Workbench(QtGui.QMainWindow):
         self.menubar = QtGui.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 19))
 
-        self.menuFile = QtGui.QMenu(self.menubar)
-        self.menuHelp = QtGui.QMenu(self.menubar)
-        self.menuView = QtGui.QMenu(self.menubar)
-
         self.setMenuBar(self.menubar)
 
         self.statusbar = QtGui.QStatusBar(self)
@@ -220,14 +216,17 @@ class Workbench(QtGui.QMainWindow):
         self.actionShowRepoRegistry = QtGui.QAction(self)
         self.actionShowRepoRegistry.setCheckable(True)
 
+        self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.addAction(self.actionOpen_repository)
         self.menuFile.addAction(self.actionRefresh)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
 
+        self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionHelp)
 
+        self.menuView = QtGui.QMenu(self.menubar)
         self.menuView.addAction(self.actionShowRepoRegistry)
         self.menuView.addAction(self.actionShowPaths)
 
