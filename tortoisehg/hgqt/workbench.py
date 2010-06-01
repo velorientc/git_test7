@@ -154,7 +154,6 @@ class Workbench(QtGui.QMainWindow):
 
         self.repotabs_splitter = QtGui.QSplitter(self.centralwidget)
         self.repotabs_splitter.setOrientation(QtCore.Qt.Vertical)
-        self.repotabs_splitter.setObjectName("repotabs_splitter")
 
         self.repoTabsWidget = tw = QtGui.QTabWidget(self.repotabs_splitter)
         tw.setDocumentMode(True)
