@@ -196,14 +196,14 @@ class Workbench(QtGui.QMainWindow):
         self.actionHelp = QtGui.QAction(self)
 
         self.actionBack = QtGui.QAction(self)
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/back.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionBack.setIcon(icon1)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/back.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionBack.setIcon(icon)
 
         self.actionForward = QtGui.QAction(self)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/icons/forward.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionForward.setIcon(icon2)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/forward.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionForward.setIcon(icon)
 
         self.actionShowPaths = QtGui.QAction(self)
         self.actionShowPaths.setCheckable(True)
