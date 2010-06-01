@@ -17,8 +17,7 @@ class htmlui(ui.ui):
         super(htmlui, self).__init__(src)
         self.setconfig('ui', 'interactive', 'off')
         self.setconfig('progress', 'disable', 'True')
-        self.output = ''
-        self.error = ''
+        self.output, self.error = [], []
         os.environ['TERM'] = 'dumb'
         qtlib.configstyles(self)
 
@@ -27,11 +26,11 @@ class htmlui(ui.ui):
         if self._buffers:
             self._buffers[-1].extend([(str(a), label) for a in args])
         else:
-            self.output += self.label(''.join(args), label)
+            self.output.append(self.label(''.join(args), label))
 
     def write_err(self, *args, **opts):
         label = opts.get('label', 'ui.error')
-        self.error += self.label(''.join(args), label)
+        self.error.append(self.label(''.join(args), label))
 
     def label(self, msg, label):
         msg = hglib.tounicode(msg)
@@ -51,8 +50,8 @@ class htmlui(ui.ui):
         return True
 
     def getdata(self):
-        d, e = self.output, self.error
-        self.output, self.error = '', ''
+        d, e = ''.join(self.output), ''.join(self.error)
+        self.output, self.error = [], []
         return d, e
 
 if __name__ == "__main__":
