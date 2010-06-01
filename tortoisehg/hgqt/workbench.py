@@ -148,12 +148,10 @@ class Workbench(QtGui.QMainWindow):
         MainWindow.setWindowIcon(icon)
 
         self.centralwidget = QtGui.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
 
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setMargin(0)
-        self.verticalLayout.setObjectName("verticalLayout")
 
         self.repotabs_splitter = QtGui.QSplitter(self.centralwidget)
         self.repotabs_splitter.setOrientation(QtCore.Qt.Vertical)
@@ -169,14 +167,11 @@ class Workbench(QtGui.QMainWindow):
         self.repoTabsWidget.setDocumentMode(True)
         self.repoTabsWidget.setTabsClosable(True)
         self.repoTabsWidget.setMovable(True)
-        self.repoTabsWidget.setObjectName("repoTabsWidget")
 
         self.firstRepoTab = QtGui.QWidget()
-        self.firstRepoTab.setObjectName("firstRepoTab")
         self.repoTabsWidget.addTab(self.firstRepoTab, "")
 
         self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
-        self.stackedWidget.setObjectName("stackedWidget")
 
         self.verticalLayout.addWidget(self.repotabs_splitter)
 
@@ -184,21 +179,14 @@ class Workbench(QtGui.QMainWindow):
 
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 19))
-        self.menubar.setObjectName("menubar")
 
         self.menuFile = QtGui.QMenu(self.menubar)
-        self.menuFile.setObjectName("menuFile")
-
         self.menuHelp = QtGui.QMenu(self.menubar)
-        self.menuHelp.setObjectName("menuHelp")
-
         self.menuView = QtGui.QMenu(self.menubar)
-        self.menuView.setObjectName("menuView")
 
         MainWindow.setMenuBar(self.menubar)
 
         self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
         self.toolBar_edit = QtGui.QToolBar(MainWindow)
@@ -220,38 +208,28 @@ class Workbench(QtGui.QMainWindow):
         MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_help)
 
         self.actionOpen_repository = QtGui.QAction(MainWindow)
-        self.actionOpen_repository.setObjectName("actionOpen_repository")
         self.actionRefresh = QtGui.QAction(MainWindow)
-        self.actionRefresh.setObjectName("actionRefresh")
         self.actionQuit = QtGui.QAction(MainWindow)
         self.actionQuit.setShortcut("None")
-        self.actionQuit.setObjectName("actionQuit")
         self.actionAbout = QtGui.QAction(MainWindow)
-        self.actionAbout.setObjectName("actionAbout")
         self.actionDisplayAllBranches = QtGui.QAction(MainWindow)
-        self.actionDisplayAllBranches.setObjectName("actionDisplayAllBranches")
         self.actionHelp = QtGui.QAction(MainWindow)
-        self.actionHelp.setObjectName("actionHelp")
 
         self.actionBack = QtGui.QAction(MainWindow)
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/icons/back.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionBack.setIcon(icon1)
-        self.actionBack.setObjectName("actionBack")
 
         self.actionForward = QtGui.QAction(MainWindow)
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/icons/forward.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionForward.setIcon(icon2)
-        self.actionForward.setObjectName("actionForward")
 
         self.actionShowPaths = QtGui.QAction(MainWindow)
         self.actionShowPaths.setCheckable(True)
-        self.actionShowPaths.setObjectName("actionShowPaths")
 
         self.actionShowRepoRegistry = QtGui.QAction(MainWindow)
         self.actionShowRepoRegistry.setCheckable(True)
-        self.actionShowRepoRegistry.setObjectName("actionShowRepoRegistry")
 
         self.menuFile.addAction(self.actionOpen_repository)
         self.menuFile.addAction(self.actionRefresh)
@@ -277,7 +255,6 @@ class Workbench(QtGui.QMainWindow):
         self.toolBar_help.addAction(self.actionHelp)
 
         self.repoTabsWidget.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.menuFile.setTitle(_("&File"))
         self.menuHelp.setTitle(_("&Help"))
