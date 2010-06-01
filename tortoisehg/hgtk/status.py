@@ -751,17 +751,22 @@ class GStatus(gdialog.GWindow):
             # Create a new repo object
             repo = hg.repository(self.ui, path=self.repo.root)
             self.newrepo = repo
+            self.subrepos = []
 
-            if self.mqmode and self.mode != 'status':
-                # when a patch is applied, show diffs to parent of top patch
-                qtip = repo['.']
-                n1 = qtip.parents()[0].node()
-                n2 = None
-            else:
-                # node2 is None (the working dir) when 0 or 1 rev is specificed
-                n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
+            try:
+                if self.mqmode and self.mode != 'status':
+                    # when a patch is applied, show diffs to parent of top patch
+                    qtip = repo['.']
+                    n1 = qtip.parents()[0].node()
+                    n2 = None
+                else:
+                    # node2 is None (working dir) when 0 or 1 rev is specified
+                    n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
+            except (util.Abort, error.RepoError):
+                self.status_error = str(e)
+                return
 
-            self._node1, self._node2, = n1, n2
+            self._node1, self._node2 = n1, n2
             self.status_error = None
             matcher = cmdutil.match(repo, self.pats, self.opts)
             unknown = self.test_opt('unknown') and not self.is_merge()
@@ -775,7 +780,10 @@ class GStatus(gdialog.GWindow):
                 self.status = status
             except (OSError, IOError, util.Abort), e:
                 self.status_error = str(e)
-            self.subrepos = []
+
+            if n2 is not None or self.mqmode:
+                return
+
             wctx = repo[None]
             try:
                 for s in wctx.substate:
