@@ -2,7 +2,7 @@
 #
 # front-end script for TortoiseHg dialogs
 #
-# Copyright (C) 2008-9 Steve Borho <steve@borho.org>
+# Copyright (C) 2008-10 Steve Borho <steve@borho.org>
 # Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
 #
 
@@ -63,8 +63,7 @@ else:
         sys.stderr = origstderr
         mystderr.seek(0)
         for l in mystderr.readlines():
-            if l.startswith('Traceback') or l.startswith('TypeError') or \
-               l.startswith('NameError'):
+            if l.startswith(('Traceback', 'TypeError', 'NameError')):
                 from tortoisehg.hgtk.bugreport import run
                 from tortoisehg.hgtk.hgtk import gtkrun
                 error = 'Recoverable runtime error (stderr):\n'

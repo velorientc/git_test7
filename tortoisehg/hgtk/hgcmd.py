@@ -14,6 +14,8 @@ import sys
 import threading
 import Queue
 
+from mercurial import ui
+
 from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
@@ -88,8 +90,9 @@ class CmdDialog(gtk.Dialog):
         self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
-        self.textbuffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                                   foreground=gtklib.DRED)
+        gtklib.configstyles(ui.ui())
+        for tag, argdict in gtklib.TextBufferTags.iteritems():
+            self.textbuffer.create_tag(tag, **argdict)
 
         self.vbox.pack_start(scrolledwindow, True, True)
         self.connect('map_event', self._on_window_map_event)
@@ -157,24 +160,31 @@ class CmdDialog(gtk.Dialog):
         """
         self.hgthread.process_dialogs()
         enditer = self.textbuffer.get_end_iter()
-        while self.hgthread.getqueue().qsize():
-            try:
-                msg = self.hgthread.getqueue().get(0)
-                self.textbuffer.insert(enditer, hglib.toutf(msg))
-                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
-            except Queue.Empty:
-                pass
         while self.hgthread.geterrqueue().qsize():
             try:
+                tags = gtklib.gettags('ui.error')
                 msg = hglib.toutf(self.hgthread.geterrqueue().get(0))
-                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
         while self.stdoutq.qsize():
             try:
+                tags = gtklib.gettags('ui.error')
                 msg = hglib.toutf(self.stdoutq.get(0))
-                self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+                self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
+                self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
+            except Queue.Empty:
+                pass
+        while self.hgthread.getqueue().qsize():
+            try:
+                msg, label = self.hgthread.getqueue().get(0)
+                msg = hglib.toutf(msg)
+                tags = gtklib.gettags(label)
+                if tags:
+                    self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
+                else:
+                    self.textbuffer.insert(enditer, msg)
                 self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
             except Queue.Empty:
                 pass
@@ -420,7 +430,7 @@ class CmdWidget(gtk.VBox):
             markup = markup % (gtklib.DRED, 'bold')
             icons = {'error': True}
         else:
-            markup = markup % ('black', 'normal')
+            markup = markup % (gtklib.NORMAL, 'normal')
             icons = {}
         text = gtklib.markup_escape_text(text)
         self.rlabel.set_markup(markup % text)
@@ -552,16 +562,16 @@ class CmdWidget(gtk.VBox):
         self.hgthread.process_dialogs()
 
         # output to buffer
-        while self.hgthread.getqueue().qsize():
-            try:
-                msg = self.hgthread.getqueue().get(0)
-                self.log.append(hglib.toutf(msg))
-            except Queue.Empty:
-                pass
         while self.hgthread.geterrqueue().qsize():
             try:
                 msg = self.hgthread.geterrqueue().get(0)
                 self.log.append(hglib.toutf(msg), error=True)
+            except Queue.Empty:
+                pass
+        while self.hgthread.getqueue().qsize():
+            try:
+                msg, label = self.hgthread.getqueue().get(0)
+                self.log.append(hglib.toutf(msg))
             except Queue.Empty:
                 pass
 
@@ -634,8 +644,8 @@ class CmdLogWidget(gtk.VBox):
 
         # text buffer
         self.buffer = self.textview.get_buffer()
-        self.buffer.create_tag('error', weight=pango.WEIGHT_HEAVY,
-                               foreground=gtklib.DRED)
+        for tag, argdict in gtklib.TextBufferTags.iteritems():
+            self.buffer.create_tag(tag, **argdict)
 
     ### public functions ###
 
@@ -648,7 +658,8 @@ class CmdLogWidget(gtk.VBox):
         """
         enditer = self.buffer.get_end_iter()
         if error:
-            self.buffer.insert_with_tags_by_name(enditer, text, 'error')
+            tags = gtklib.gettags('ui.error')
+            self.buffer.insert_with_tags_by_name(enditer, text, *tags)
         else:
             self.buffer.insert(enditer, text)
         self.textview.scroll_to_mark(self.buffer.get_insert(), 0)
@@ -872,7 +883,7 @@ class CmdRunner(object):
         # receive messages from queue
         while self.hgthread.getqueue().qsize():
             try:
-                msg = hglib.toutf(self.hgthread.getqueue().get(0))
+                msg = hglib.toutf(self.hgthread.getqueue().get(0)[0])
                 self.buffer.append((msg, LOG_NORMAL))
                 self.dlg.log.append(msg)
             except Queue.Empty:
