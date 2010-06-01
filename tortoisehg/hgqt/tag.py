@@ -248,7 +248,7 @@ class TagDialog(QDialog):
         rev = hglib.fromunicode(self.rev_text.text())
         force = self.replace_chk.isChecked()
         english = self.eng_chk.isChecked()
-        message = hglib.fromunicode(self.custom_text.text())
+        message = self.custom_text.text()
 
         try:
             # tagging
@@ -260,6 +260,8 @@ class TagDialog(QDialog):
                 msgset = keep._('Added tag %s for changeset %s')
                 message = (english and msgset['id'] or msgset['str']) \
                             % (name, str(ctx))
+            if not isinstance(message, str):
+                message = hglib.fromunicode(message)
             self.repo.tag(lname, node, message, local, None, None)
 
             # update UI
