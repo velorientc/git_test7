@@ -149,22 +149,26 @@ class CommitWidget(QWidget):
         pos, nextpos = 0, 0
         sels = []
         for i, line in enumerate(text.split('\n')):
-            pos = nextpos
             length = len(line)
+            pos = nextpos
             nextpos += length + 1 # include \n
-            if i == 0 and (length < sumlen or not sumlen):
-                continue
-            elif i == 1 and (length == 0 or not sumlen):
-                continue
-            elif i > 1 and (length < maxlen or not maxlen):
-                continue
+            if i == 0:
+                if length < sumlen or not sumlen:
+                    continue
+                pos += sumlen
+            elif i == 1:
+                if length == 0 or not sumlen:
+                    continue
+            else:
+                if length < maxlen or not maxlen:
+                    continue
+                pos += maxlen
             sel = QTextEdit.ExtraSelection()
             sel.bgcolor = QColor('red')
             sel.format.setBackground(sel.bgcolor)
-            sel.format.setProperty(QTextFormat.FullWidthSelection, True)
             sel.cursor = QTextCursor(self.msgte.document())
             sel.cursor.setPosition(pos)
-            sel.cursor.clearSelection()
+            sel.cursor.movePosition(QTextCursor.EndOfLine, QTextCursor.KeepAnchor)
             sels.append(sel)
         self.msgte.setExtraSelections(sels)
 
