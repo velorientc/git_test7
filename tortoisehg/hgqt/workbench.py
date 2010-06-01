@@ -24,8 +24,8 @@ from tortoisehg.hgqt.i18n import _
 
 from tortoisehg.hgqt.decorators import timeit
 
+from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt.qtlib import geticon
-from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.commit import CommitWidget
@@ -41,9 +41,9 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
 
-class Workbench(QtGui.QMainWindow, HgDialogMixin):
+class Workbench(QtGui.QMainWindow):
     """hg repository viewer/browser application"""
-    _uifile = 'workbench.ui'
+
     def __init__(self, ui, repo=None):
         self.ui = ui
 
@@ -57,7 +57,11 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         self.commitwidgets = {} # key: reporoot
 
         QtGui.QMainWindow.__init__(self)
-        HgDialogMixin.__init__(self, ui)
+
+        self.load_config(ui)
+        self.setupUi(self)
+        self._quickbars = []
+        self.disab_shortcuts = []
 
         self.repotabs_splitter.setCollapsible(0, False)
 
@@ -92,6 +96,184 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
         def gotVisible(state):
             self.actionShowRepoRegistry.setChecked(self.reporegistry.isVisible())
         self.reporegistry.visibilityChanged.connect(gotVisible)
+
+    def attachQuickBar(self, qbar):
+        qbar.setParent(self)
+        self._quickbars.append(qbar)
+        connect(qbar, SIGNAL('escShortcutDisabled(bool)'),
+                self.setShortcutsEnabled)
+        self.addToolBar(Qt.BottomToolBarArea, qbar)
+        connect(qbar, SIGNAL('visible'),
+                self.ensureOneQuickBar)
+
+    def setShortcutsEnabled(self, enabled=True):
+        for sh in self.disab_shortcuts:
+            sh.setEnabled(enabled)
+        
+    def ensureOneQuickBar(self):
+        tb = self.sender()
+        for w in self._quickbars:
+            if w is not tb:
+                w.hide()
+        
+    def load_config(self, ui):
+        cfg = HgConfig(ui)
+        fontstr = cfg.getFont()
+        font = QtGui.QFont()
+        try:
+            if not font.fromString(fontstr):
+                raise Exception
+        except:
+            print "bad font name '%s'" % fontstr
+            font.setFamily("Monospace")
+            font.setFixedPitch(True)
+            font.setPointSize(10)
+        self._font = font
+
+        self.rowheight = cfg.getRowHeight()
+        self.users, self.aliases = cfg.getUsers()
+        return cfg
+
+    def accept(self):
+        self.close()
+
+    def reject(self):
+        self.close()
+
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(627, 721)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/icons/log.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        self.centralwidget = QtGui.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setSpacing(0)
+        self.verticalLayout.setMargin(0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.repotabs_splitter = QtGui.QSplitter(self.centralwidget)
+        self.repotabs_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.repotabs_splitter.setObjectName("repotabs_splitter")
+        self.repoTabsWidget = QtGui.QTabWidget(self.repotabs_splitter)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.repoTabsWidget.sizePolicy().hasHeightForWidth())
+        self.repoTabsWidget.setSizePolicy(sizePolicy)
+        self.repoTabsWidget.setDocumentMode(True)
+        self.repoTabsWidget.setTabsClosable(True)
+        self.repoTabsWidget.setMovable(True)
+        self.repoTabsWidget.setObjectName("repoTabsWidget")
+        self.firstRepoTab = QtGui.QWidget()
+        self.firstRepoTab.setObjectName("firstRepoTab")
+        self.repoTabsWidget.addTab(self.firstRepoTab, "")
+        self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
+        self.stackedWidget.setObjectName("stackedWidget")
+        self.verticalLayout.addWidget(self.repotabs_splitter)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 19))
+        self.menubar.setObjectName("menubar")
+        self.menuFile = QtGui.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuHelp = QtGui.QMenu(self.menubar)
+        self.menuHelp.setObjectName("menuHelp")
+        self.menuView = QtGui.QMenu(self.menubar)
+        self.menuView.setObjectName("menuView")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.toolBar_edit = QtGui.QToolBar(MainWindow)
+        self.toolBar_edit.setEnabled(True)
+        self.toolBar_edit.setObjectName("toolBar_edit")
+        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
+        self.toolBar_treefilters = QtGui.QToolBar(MainWindow)
+        self.toolBar_treefilters.setEnabled(True)
+        self.toolBar_treefilters.setObjectName("toolBar_treefilters")
+        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_treefilters)
+        self.toolBar_diff = QtGui.QToolBar(MainWindow)
+        self.toolBar_diff.setObjectName("toolBar_diff")
+        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_diff)
+        self.toolBar_help = QtGui.QToolBar(MainWindow)
+        self.toolBar_help.setObjectName("toolBar_help")
+        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_help)
+        self.actionOpen_repository = QtGui.QAction(MainWindow)
+        self.actionOpen_repository.setObjectName("actionOpen_repository")
+        self.actionRefresh = QtGui.QAction(MainWindow)
+        self.actionRefresh.setObjectName("actionRefresh")
+        self.actionQuit = QtGui.QAction(MainWindow)
+        self.actionQuit.setShortcut("None")
+        self.actionQuit.setObjectName("actionQuit")
+        self.actionAbout = QtGui.QAction(MainWindow)
+        self.actionAbout.setObjectName("actionAbout")
+        self.actionDisplayAllBranches = QtGui.QAction(MainWindow)
+        self.actionDisplayAllBranches.setObjectName("actionDisplayAllBranches")
+        self.actionHelp = QtGui.QAction(MainWindow)
+        self.actionHelp.setObjectName("actionHelp")
+        self.actionBack = QtGui.QAction(MainWindow)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/icons/back.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionBack.setIcon(icon1)
+        self.actionBack.setObjectName("actionBack")
+        self.actionForward = QtGui.QAction(MainWindow)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/icons/forward.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionForward.setIcon(icon2)
+        self.actionForward.setObjectName("actionForward")
+        self.actionShowPaths = QtGui.QAction(MainWindow)
+        self.actionShowPaths.setCheckable(True)
+        self.actionShowPaths.setObjectName("actionShowPaths")
+        self.actionShowRepoRegistry = QtGui.QAction(MainWindow)
+        self.actionShowRepoRegistry.setCheckable(True)
+        self.actionShowRepoRegistry.setObjectName("actionShowRepoRegistry")
+        self.menuFile.addAction(self.actionOpen_repository)
+        self.menuFile.addAction(self.actionRefresh)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionQuit)
+        self.menuHelp.addAction(self.actionAbout)
+        self.menuHelp.addAction(self.actionHelp)
+        self.menuView.addAction(self.actionShowRepoRegistry)
+        self.menuView.addAction(self.actionShowPaths)
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuView.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
+        self.toolBar_edit.addAction(self.actionRefresh)
+        self.toolBar_edit.addSeparator()
+        self.toolBar_edit.addAction(self.actionBack)
+        self.toolBar_edit.addAction(self.actionForward)
+        self.toolBar_edit.addSeparator()
+        self.toolBar_help.addAction(self.actionHelp)
+
+        self.retranslateUi(MainWindow)
+        self.repoTabsWidget.setCurrentIndex(0)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
+        self.repoTabsWidget.setTabText(self.repoTabsWidget.indexOf(self.firstRepoTab), QtGui.QApplication.translate("MainWindow", "repo1", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "&Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolBar_edit.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Edit toolbar", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolBar_treefilters.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Filter toolbar", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolBar_diff.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Diff toolbar", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolBar_help.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Help toolbar", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionOpen_repository.setText(QtGui.QApplication.translate("MainWindow", "&Open repository", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionOpen_repository.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+O", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionRefresh.setText(QtGui.QApplication.translate("MainWindow", "&Refresh", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionRefresh.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+R", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionQuit.setText(QtGui.QApplication.translate("MainWindow", "E&xit", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionQuit.setIconText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionQuit.setToolTip(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionDisplayAllBranches.setText(QtGui.QApplication.translate("MainWindow", "displayAllBranches", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionHelp.setText(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionBack.setText(QtGui.QApplication.translate("MainWindow", "Back", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionForward.setText(QtGui.QApplication.translate("MainWindow", "Forward", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionShowPaths.setText(QtGui.QApplication.translate("MainWindow", "Show paths", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionShowRepoRegistry.setText(QtGui.QApplication.translate("MainWindow", "Show Repository Registry", None, QtGui.QApplication.UnicodeUTF8))
 
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
@@ -405,10 +587,6 @@ class Workbench(QtGui.QMainWindow, HgDialogMixin):
 
     def prevDiff(self):
         pass
-
-    def load_config(self, ui):
-        cfg = HgDialogMixin.load_config(self, ui)
-        self.hidefinddelay = cfg.getHideFindDelay()
 
     def file_displayed(self, filename):
         # self.actionPrevDiff.setEnabled(False)
