@@ -250,8 +250,6 @@ class Workbench(QtGui.QMainWindow):
 
         self.toolBar_help.addAction(self.actionHelp)
 
-        self.repoTabsWidget.setCurrentIndex(0)
-
         self.menuFile.setTitle(_("&File"))
         self.menuHelp.setTitle(_("&Help"))
         self.menuView.setTitle(_("View"))
