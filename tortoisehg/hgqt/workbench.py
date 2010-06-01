@@ -212,7 +212,6 @@ class Workbench(QtGui.QMainWindow):
         self.actionShowRepoRegistry.setCheckable(True)
 
         self.menubar = QtGui.QMenuBar(self)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 627, 19))
         self.setMenuBar(self.menubar)
 
         self.menuFile = QtGui.QMenu(self.menubar)
