@@ -334,6 +334,7 @@ class CommitWidget(QWidget):
         self.msghistory = [m for m in self.msghistory if m]
         self.msgcombo.reset(self.msghistory)
         self.userhist = s.value('commit/userhist').toStringList()
+        self.userhist = [u for u in self.userhist if u]
         self.refreshUserList()
         try:
             curmsg = repo.opener('cur-message.txt').read()
