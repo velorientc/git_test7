@@ -14,6 +14,9 @@ import re
 
 from PyQt4 import QtCore, QtGui, Qsci
 
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
 from mercurial import ui, hg, util
 from mercurial.error import RepoError
 
@@ -35,13 +38,11 @@ from tortoisehg.util import paths
 
 from mercurial.error import RepoError
 
-Qt = QtCore.Qt
-bold = QtGui.QFont.Bold
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
+bold = QFont.Bold
+connect = QObject.connect
 
 
-class Workbench(QtGui.QMainWindow):
+class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
 
     def __init__(self, ui, repo=None):
@@ -56,7 +57,7 @@ class Workbench(QtGui.QMainWindow):
 
         self.commitwidgets = {} # key: reporoot
 
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
 
         self.load_config(ui)
         self.setupUi()
@@ -65,7 +66,7 @@ class Workbench(QtGui.QMainWindow):
 
         self.repotabs_splitter.setCollapsible(0, False)
 
-        self.dummywidget = QtGui.QWidget()
+        self.dummywidget = QWidget()
         self.stackedWidget.addWidget(self.dummywidget)
         self.stackedWidget.setCurrentWidget(self.dummywidget)
 
@@ -118,7 +119,7 @@ class Workbench(QtGui.QMainWindow):
     def load_config(self, ui):
         cfg = HgConfig(ui)
         fontstr = cfg.getFont()
-        font = QtGui.QFont()
+        font = QFont()
         try:
             if not font.fromString(fontstr):
                 raise Exception
@@ -142,88 +143,88 @@ class Workbench(QtGui.QMainWindow):
     def setupUi(self):
         self.resize(627, 721)
 
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/log.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/log.svg"), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
 
-        self.centralwidget = QtGui.QWidget(self)
+        self.centralwidget = QWidget(self)
 
-        self.verticalLayout = vl = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout = vl = QVBoxLayout(self.centralwidget)
         vl.setSpacing(0)
         vl.setMargin(0)
 
-        self.repotabs_splitter = sp = QtGui.QSplitter(self.centralwidget)
+        self.repotabs_splitter = sp = QSplitter(self.centralwidget)
         sp.setOrientation(QtCore.Qt.Vertical)
         self.verticalLayout.addWidget(sp)
 
-        self.repoTabsWidget = tw = QtGui.QTabWidget(self.repotabs_splitter)
+        self.repoTabsWidget = tw = QTabWidget(self.repotabs_splitter)
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
         tw.setMovable(True)
-        sp = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(1)
         sp.setHeightForWidth(tw.sizePolicy().hasHeightForWidth())
         tw.setSizePolicy(sp)
 
-        self.stackedWidget = QtGui.QStackedWidget(self.repotabs_splitter)
+        self.stackedWidget = QStackedWidget(self.repotabs_splitter)
 
         self.setCentralWidget(self.centralwidget)
 
-        self.statusbar = QtGui.QStatusBar(self)
+        self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.toolBar_treefilters = tb = QtGui.QToolBar(self)
+        self.toolBar_treefilters = tb = QToolBar(self)
         tb.setEnabled(True)
         tb.setObjectName("toolBar_treefilters")
         self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.toolBar_diff = tb = QtGui.QToolBar(self)
+        self.toolBar_diff = tb = QToolBar(self)
         tb.setObjectName("toolBar_diff")
         self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.toolBar_help = tb = QtGui.QToolBar(self)
+        self.toolBar_help = tb = QToolBar(self)
         tb.setObjectName("toolBar_help")
         self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.actionOpen_repository = QtGui.QAction(self)
-        self.actionRefresh = QtGui.QAction(self)
-        self.actionQuit = QtGui.QAction(self)
+        self.actionOpen_repository = QAction(self)
+        self.actionRefresh = QAction(self)
+        self.actionQuit = QAction(self)
         self.actionQuit.setShortcut("None")
-        self.actionAbout = QtGui.QAction(self)
-        self.actionDisplayAllBranches = QtGui.QAction(self)
-        self.actionHelp = QtGui.QAction(self)
+        self.actionAbout = QAction(self)
+        self.actionDisplayAllBranches = QAction(self)
+        self.actionHelp = QAction(self)
 
-        self.actionBack = QtGui.QAction(self)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/back.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionBack = QAction(self)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/back.svg"), QIcon.Normal, QIcon.Off)
         self.actionBack.setIcon(icon)
 
-        self.actionForward = QtGui.QAction(self)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/forward.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionForward = QAction(self)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/forward.svg"), QIcon.Normal, QIcon.Off)
         self.actionForward.setIcon(icon)
 
-        self.actionShowPaths = QtGui.QAction(self)
+        self.actionShowPaths = QAction(self)
         self.actionShowPaths.setCheckable(True)
 
-        self.actionShowRepoRegistry = QtGui.QAction(self)
+        self.actionShowRepoRegistry = QAction(self)
         self.actionShowRepoRegistry.setCheckable(True)
 
-        self.menubar = QtGui.QMenuBar(self)
+        self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
 
-        self.menuFile = m = QtGui.QMenu(self.menubar)
+        self.menuFile = m = QMenu(self.menubar)
         m.addAction(self.actionOpen_repository)
         m.addAction(self.actionRefresh)
         m.addSeparator()
         m.addAction(self.actionQuit)
 
-        self.menuHelp = m = QtGui.QMenu(self.menubar)
+        self.menuHelp = m = QMenu(self.menubar)
         m.addAction(self.actionAbout)
         m.addAction(self.actionHelp)
 
-        self.menuView = m = QtGui.QMenu(self.menubar)
+        self.menuView = m = QMenu(self.menubar)
         m.addAction(self.actionShowRepoRegistry)
         m.addAction(self.actionShowPaths)
 
@@ -231,7 +232,7 @@ class Workbench(QtGui.QMainWindow):
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.toolBar_edit = tb = QtGui.QToolBar(self)
+        self.toolBar_edit = tb = QToolBar(self)
         tb.setEnabled(True)
         tb.setObjectName("toolBar_edit")
         tb.addAction(self.actionRefresh)
@@ -375,7 +376,7 @@ class Workbench(QtGui.QMainWindow):
             self.branch_comboBox.clear()
         else:
             branches = [''] + branches
-            self.branchesmodel = QtGui.QStringListModel(branches)
+            self.branchesmodel = QStringListModel(branches)
             self.branch_comboBox.setModel(self.branchesmodel)
             self.branch_label_action.setEnabled(True)
             self.branch_comboBox_action.setEnabled(True)
@@ -406,16 +407,16 @@ class Workbench(QtGui.QMainWindow):
         self.toolBar_edit.addAction(findaction)
 
         # tree filters toolbar
-        self.branch_label = QtGui.QToolButton()
+        self.branch_label = QToolButton()
         self.branch_label.setText("Branch")
         self.branch_label.setStatusTip("Display graph the named branch only")
-        self.branch_label.setPopupMode(QtGui.QToolButton.InstantPopup)
-        self.branch_menu = QtGui.QMenu()
+        self.branch_label.setPopupMode(QToolButton.InstantPopup)
+        self.branch_menu = QMenu()
         cbranch_action = self.branch_menu.addAction("Display closed branches")
         cbranch_action.setCheckable(True)
         self.branch_checkBox_action = cbranch_action
         self.branch_label.setMenu(self.branch_menu)
-        self.branch_comboBox = QtGui.QComboBox()
+        self.branch_comboBox = QComboBox()
         connect(self.branch_comboBox, SIGNAL('activated(const QString &)'),
                 self.refreshRevisionTable)
         connect(cbranch_action, SIGNAL('toggled(bool)'),
@@ -448,16 +449,16 @@ class Workbench(QtGui.QMainWindow):
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
 
-        self.actionDiffMode = QtGui.QAction('Diff mode', self)
+        self.actionDiffMode = QAction('Diff mode', self)
         self.actionDiffMode.setCheckable(True)
         connect(self.actionDiffMode, SIGNAL('toggled(bool)'),
                 self.setMode)
 
-        self.actionAnnMode = QtGui.QAction('Annotate', self)
+        self.actionAnnMode = QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
         connect(self.actionAnnMode, SIGNAL('toggled(bool)'), self.setAnnotate)
 
-        self.actionSearch = QtGui.QAction('Search', self)
+        self.actionSearch = QAction('Search', self)
         self.actionSearch.setShortcut(Qt.Key_F3)
         connect(self.actionSearch, SIGNAL('triggered()'), self.on_search)
 
@@ -466,13 +467,13 @@ class Workbench(QtGui.QMainWindow):
         connect(self.actionHelp, SIGNAL('triggered()'), self.on_help)
 
         # Next/Prev diff (in full file mode)
-        self.actionNextDiff = QtGui.QAction(geticon('down'), 'Next diff', self)
+        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
         def filled():
             self.actionNextDiff.setEnabled(
                 self.fileview.fileMode() and self.fileview.nDiffs())
         #connect(self.fileview, SIGNAL('filled'), filled)
-        self.actionPrevDiff = QtGui.QAction(geticon('up'), 'Previous diff', self)
+        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         connect(self.actionNextDiff, SIGNAL('triggered()'),
                 self.nextDiff)
@@ -481,11 +482,11 @@ class Workbench(QtGui.QMainWindow):
         self.actionDiffMode.setChecked(True)
 
         # Next/Prev file
-        self.actionNextFile = QtGui.QAction('Next file', self)
+        self.actionNextFile = QAction('Next file', self)
         self.actionNextFile.setShortcut('Right')
         #connect(self.actionNextFile, SIGNAL('triggered()'),
         #        self.tableView_filelist.nextFile)
-        self.actionPrevFile = QtGui.QAction('Prev file', self)
+        self.actionPrevFile = QAction('Prev file', self)
         self.actionPrevFile.setShortcut('Left')
         #connect(self.actionPrevFile, SIGNAL('triggered()'),
         #        self.tableView_filelist.prevFile)
@@ -495,11 +496,11 @@ class Workbench(QtGui.QMainWindow):
         self.disab_shortcuts.append(self.actionPrevFile)
 
         # Next/Prev rev
-        self.actionNextRev = QtGui.QAction('Next revision', self)
+        self.actionNextRev = QAction('Next revision', self)
         self.actionNextRev.setShortcut('Down')
         #connect(self.actionNextRev, SIGNAL('triggered()'),
         #        self.repoview.nextRev)
-        self.actionPrevRev = QtGui.QAction('Prev revision', self)
+        self.actionPrevRev = QAction('Prev revision', self)
         self.actionPrevRev.setShortcut('Up')
         #connect(self.actionPrevRev, SIGNAL('triggered()'),
         #        self.repoview.prevRev)
@@ -509,22 +510,22 @@ class Workbench(QtGui.QMainWindow):
         self.disab_shortcuts.append(self.actionPrevRev)
 
         # navigate in file viewer
-        self.actionNextLine = QtGui.QAction('Next line', self)
+        self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
         #connect(self.actionNextLine, SIGNAL('triggered()'),
         #        self.fileview.nextLine)
         self.addAction(self.actionNextLine)
-        self.actionPrevLine = QtGui.QAction('Prev line', self)
+        self.actionPrevLine = QAction('Prev line', self)
         self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
         #connect(self.actionPrevLine, SIGNAL('triggered()'),
         #        self.fileview.prevLine)
         self.addAction(self.actionPrevLine)
-        self.actionNextCol = QtGui.QAction('Next column', self)
+        self.actionNextCol = QAction('Next column', self)
         self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
         #connect(self.actionNextCol, SIGNAL('triggered()'),
         #        self.fileview.nextCol)
         self.addAction(self.actionNextCol)
-        self.actionPrevCol = QtGui.QAction('Prev column', self)
+        self.actionPrevCol = QAction('Prev column', self)
         self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
         #connect(self.actionPrevCol, SIGNAL('triggered()'),
         #        self.fileview.prevCol)
@@ -548,7 +549,7 @@ class Workbench(QtGui.QMainWindow):
 
     def openRepository(self):
         caption = _('Select repository directory to open')
-        FD = QtGui.QFileDialog
+        FD = QFileDialog
         path = FD.getExistingDirectory(parent=self, caption=caption,
             options=FD.ShowDirsOnly | FD.ReadOnly)
         path = str(path)
@@ -556,7 +557,7 @@ class Workbench(QtGui.QMainWindow):
             repo = hg.repository(self.ui, path=path)
             self.addRepoTab(repo)
         except RepoError:
-            QtGui.QMessageBox.warning(self, _('Failed to open repository'), 
+            QMessageBox.warning(self, _('Failed to open repository'), 
                 _('%s is not a valid repository') % path)
 
     def setMode(self, mode):
@@ -624,7 +625,7 @@ class Workbench(QtGui.QMainWindow):
               {"appname": modname, "version": version, "hgversion": hgversion}
         msg += "<p><i>%s</i></p>" % short_desc.capitalize()
         msg += "<p>%s</p>" % long_desc
-        QtGui.QMessageBox.about(self, "About %s" % modname, msg)
+        QMessageBox.about(self, "About %s" % modname, msg)
 
     def on_help(self, *args):
         pass
