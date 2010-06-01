@@ -174,18 +174,18 @@ class Workbench(QtGui.QMainWindow):
         self.statusbar = QtGui.QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.toolBar_treefilters = QtGui.QToolBar(self)
-        self.toolBar_treefilters.setEnabled(True)
-        self.toolBar_treefilters.setObjectName("toolBar_treefilters")
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_treefilters)
+        self.toolBar_treefilters = tb = QtGui.QToolBar(self)
+        tb.setEnabled(True)
+        tb.setObjectName("toolBar_treefilters")
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.toolBar_diff = QtGui.QToolBar(self)
-        self.toolBar_diff.setObjectName("toolBar_diff")
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_diff)
+        self.toolBar_diff = tb = QtGui.QToolBar(self)
+        tb.setObjectName("toolBar_diff")
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.toolBar_help = QtGui.QToolBar(self)
-        self.toolBar_help.setObjectName("toolBar_help")
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_help)
+        self.toolBar_help = tb = QtGui.QToolBar(self)
+        tb.setObjectName("toolBar_help")
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
         self.actionOpen_repository = QtGui.QAction(self)
         self.actionRefresh = QtGui.QAction(self)
