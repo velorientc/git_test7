@@ -368,12 +368,14 @@ class StatusLabel(QtGui.QWidget):
         else:
             if isinstance(icon, bool):
                 pixmap = icon and getpixmap('success') or getpixmap('error')
+            elif isinstance(icon, basestring):
+                pixmap = getpixmap(icon)
             elif isinstance(icon, QtGui.QIcon):
                 pixmap = icon.pixmap(16, 16)
             elif isinstance(icon, QtGui.QPixmap):
                 pixmap = icon
             else:
-                raise TypeError, '%s: bool, QIcon or QPixmap' % type(icon)
+                raise TypeError, '%s: bool, str, QIcon or QPixmap' % type(icon)
             self.status_icon.setShown(True)
             self.status_icon.setPixmap(pixmap)
 
