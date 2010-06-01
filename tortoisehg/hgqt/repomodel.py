@@ -63,7 +63,7 @@ def gettags(model, ctx, gnode):
     tags = ctx.tags()
     if model.hide_mq_tags:
         tags = [t for t in tags if t not in mqtags]
-    return ",".join(tags)
+    return tounicode(",".join(tags))
 
 def getlog(model, ctx, gnode):
     if ctx.rev() is not None:
