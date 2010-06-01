@@ -246,11 +246,9 @@ class Workbench(QtGui.QMainWindow):
         self.toolBar_edit.addSeparator()
         self.toolBar_help.addAction(self.actionHelp)
 
-        self.retranslateUi(MainWindow)
         self.repoTabsWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self, MainWindow):
         self.menuFile.setTitle(_("&File"))
         self.menuHelp.setTitle(_("&Help"))
         self.menuView.setTitle(_("View"))
