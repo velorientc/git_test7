@@ -173,57 +173,64 @@ class Workbench(QMainWindow):
         self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.toolBar_treefilters = tb = QToolBar(self)
+        self.toolBar_treefilters = tb = QToolBar(_("Filter Toolbar"), self)
         tb.setEnabled(True)
         tb.setObjectName("toolBar_treefilters")
         self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.toolBar_diff = tb = QToolBar(self)
+        self.toolBar_diff = tb = QToolBar(_("Diff Toolbar"), self)
         tb.setObjectName("toolBar_diff")
         self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.toolBar_help = tb = QToolBar(self)
+        self.toolBar_help = tb = QToolBar(_("Help Toolbar"), self)
         tb.setObjectName("toolBar_help")
         self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
-        self.actionOpen_repository = QAction(self)
-        self.actionRefresh = QAction(self)
-        self.actionQuit = QAction(self)
-        self.actionQuit.setShortcut("None")
-        self.actionAbout = QAction(self)
-        self.actionDisplayAllBranches = QAction(self)
-        self.actionHelp = QAction(self)
+        self.actionOpen_repository = a = QAction(_("&Open Repository"), self)
+        a.setShortcut("Ctrl+O")
 
-        self.actionBack = QAction(self)
+        self.actionRefresh = a = QAction(_("&Refresh"), self)
+        a.setShortcut("Ctrl+R")
+
+        self.actionQuit = a = QAction(_("E&xit"), self)
+        a.setShortcut("None")
+        a.setIconText(_("Exit"))
+        a.setToolTip(_("Exit"))
+
+        self.actionAbout = QAction(_("About"), self)
+        self.actionDisplayAllBranches = QAction("displayAllBranches", self)
+        self.actionHelp = QAction(_("Help"), self)
+
+        self.actionBack = a = QAction(_("Back"), self)
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/back.svg"), QIcon.Normal, QIcon.Off)
-        self.actionBack.setIcon(icon)
+        a.setIcon(icon)
 
-        self.actionForward = QAction(self)
+        self.actionForward = a = QAction(_("Forward"), self)
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/forward.svg"), QIcon.Normal, QIcon.Off)
-        self.actionForward.setIcon(icon)
+        a.setIcon(icon)
 
-        self.actionShowPaths = QAction(self)
-        self.actionShowPaths.setCheckable(True)
+        self.actionShowPaths = a = QAction(_("Show Paths"), self)
+        a.setCheckable(True)
 
-        self.actionShowRepoRegistry = QAction(self)
-        self.actionShowRepoRegistry.setCheckable(True)
+        self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
+        a.setCheckable(True)
 
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
 
-        self.menuFile = m = QMenu(self.menubar)
+        self.menuFile = m = QMenu(_("&File"), self.menubar)
         m.addAction(self.actionOpen_repository)
         m.addAction(self.actionRefresh)
         m.addSeparator()
         m.addAction(self.actionQuit)
 
-        self.menuHelp = m = QMenu(self.menubar)
+        self.menuHelp = m = QMenu(_("&Help"), self.menubar)
         m.addAction(self.actionAbout)
         m.addAction(self.actionHelp)
 
-        self.menuView = m = QMenu(self.menubar)
+        self.menuView = m = QMenu(_("View"), self.menubar)
         m.addAction(self.actionShowRepoRegistry)
         m.addAction(self.actionShowPaths)
 
@@ -231,7 +238,7 @@ class Workbench(QMainWindow):
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.toolBar_edit = tb = QToolBar(self)
+        self.toolBar_edit = tb = QToolBar(_("Edit Toolbar"), self)
         tb.setEnabled(True)
         tb.setObjectName("toolBar_edit")
         tb.addAction(self.actionRefresh)
@@ -242,28 +249,6 @@ class Workbench(QMainWindow):
         self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
 
         self.toolBar_help.addAction(self.actionHelp)
-
-        self.menuFile.setTitle(_("&File"))
-        self.menuHelp.setTitle(_("&Help"))
-        self.menuView.setTitle(_("View"))
-        self.toolBar_edit.setWindowTitle(_("Edit Toolbar"))
-        self.toolBar_treefilters.setWindowTitle(_("Filter Toolbar"))
-        self.toolBar_diff.setWindowTitle(_("Diff toolbar"))
-        self.toolBar_help.setWindowTitle(_("Help toolbar"))
-        self.actionOpen_repository.setText(_("&Open Repository"))
-        self.actionOpen_repository.setShortcut("Ctrl+O")
-        self.actionRefresh.setText(_("&Refresh"))
-        self.actionRefresh.setShortcut("Ctrl+R")
-        self.actionQuit.setText(_("E&xit"))
-        self.actionQuit.setIconText(_("Exit"))
-        self.actionQuit.setToolTip(_("Exit"))
-        self.actionAbout.setText(_("About"))
-        self.actionDisplayAllBranches.setText("displayAllBranches")
-        self.actionHelp.setText(_("Help"))
-        self.actionBack.setText(_("Back"))
-        self.actionForward.setText(_("Forward"))
-        self.actionShowPaths.setText(_("Show Paths"))
-        self.actionShowRepoRegistry.setText(_("Show Repository Registry"))
 
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
