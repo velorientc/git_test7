@@ -72,6 +72,9 @@ class QuickOpDialog(QDialog):
             self.chk = chk
             layout.addWidget(chk)
 
+        self.statusbar = qtlib.StatusLabel(self)
+        layout.addWidget(self.statusbar)
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
@@ -95,7 +98,7 @@ class QuickOpDialog(QDialog):
         self.stwidget = stwidget
 
         self.connect(self.stwidget, SIGNAL('errorMessage'),
-                self.cmd.pmon.set_text)
+                self.statusbar.set_text)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
