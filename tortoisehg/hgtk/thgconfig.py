@@ -1186,8 +1186,27 @@ class ConfigDialog(gtk.Dialog):
             self.tooltips.set_tip(ck, hglib.toutf(shortdesc))
             self.extensionschecks[name] = ck
 
+    def _enabledextensions(self):
+        """list up to-be enabled extensions by reading fresh setting"""
+        from mercurial import config
+        cfg = config.config()
+        for f in util.rcpath():
+            if os.path.realpath(f) == os.path.realpath(self.fn):
+                continue  # can be modified by user; read from self.ini
+            try:
+                cfg.read(f)
+            except IOError:
+                pass
+
+        if 'extensions' in self.ini:
+            for k in self.ini['extensions']:
+                cfg.set('extensions', k, self.ini['extensions'][k])
+
+        return set(name for name, path in cfg.items('extensions')
+                   if not path.startswith('!'))
+
     def refresh_extensions_frame(self):
-        enabledexts, namemaxlen = extensions.enabled()
+        enabledexts = self._enabledextensions()
         def getinival(name):
             for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
                 try:
@@ -1211,7 +1230,7 @@ class ConfigDialog(gtk.Dialog):
             ck.set_sensitive(changable(name))
 
     def apply_extensions_changes(self):
-        enabledexts, namemaxlen = extensions.enabled()
+        enabledexts = self._enabledextensions()
         for name, ck in self.extensionschecks.iteritems():
             if ck.get_active() == (name in enabledexts):
                 continue  # unchanged
