@@ -214,8 +214,9 @@ class Workbench(QMainWindow):
         self.actionShowPaths = a = QAction(_("Show Paths"), self)
         a.setCheckable(True)
 
-        self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
+        a = QAction(_("Show Repository Registry"), self)
         a.setCheckable(True)
+        self.actionShowRepoRegistry = a
 
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
