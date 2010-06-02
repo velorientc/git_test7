@@ -329,7 +329,7 @@ class AnnotateThread(QThread):
 
 class AnnotateDialog(QDialog):
     def __init__(self, *pats, **opts):
-        super(AnnotateDialog,self).__init__(opts.get('parent'))
+        super(AnnotateDialog,self).__init__(opts.get('parent'), Qt.Window)
 
         mainvbox = QVBoxLayout()
         self.setLayout(mainvbox)
@@ -367,7 +367,7 @@ class AnnotateDialog(QDialog):
         self.connect(av, SIGNAL('searchAnnotation'), self.searchAnnotation)
 
         self.status = status
-        self.searchwidget = None
+        self.searchwidget = opts.get('searchwidget')
 
         self.opts = opts
         line = opts.get('line')
@@ -414,23 +414,26 @@ class AnnotateDialog(QDialog):
     def searchAtRev(self, args):
         if self.searchwidget is None:
             self.searchwidget = SearchWidget([args[0]], rev=args[1])
+            self.searchwidget.show()
         else:
             self.searchwidget.setSearch(args[0], rev=args[1])
-        self.searchwidget.show()
+            self.searchwidget.raise_()
 
     def searchAtParent(self, pattern):
         if self.searchwidget is None:
             self.searchwidget = SearchWidget([pattern], rev='.')
+            self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, rev='.')
-        self.searchwidget.show()
+            self.searchwidget.raise_()
 
     def searchAll(self, pattern):
         if self.searchwidget is None:
             self.searchwidget = SearchWidget([pattern], all=True)
+            self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, all=True)
-        self.searchwidget.show()
+            self.searchwidget.raise_()
 
     def searchAnnotation(self, pattern):
         self.le.setText(QRegExp.escape(pattern))

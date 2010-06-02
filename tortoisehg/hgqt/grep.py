@@ -350,6 +350,7 @@ class MatchTree(QTreeView):
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
         self.pattern = None
+        self.searchwidget = parent
 
     def dragObject(self):
         snapshots = {}
@@ -429,7 +430,8 @@ class MatchTree(QTreeView):
             else:
                 seen.add(path)
             dlg = annotate.AnnotateDialog(path, rev=rev, line=line,
-                                          pattern=pattern, parent=self)
+                                          pattern=pattern, parent=self,
+                                          searchwidget=self.searchwidget)
             dlg.show()
 
     def ctx(self, rows):
