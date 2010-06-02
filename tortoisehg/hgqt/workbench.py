@@ -38,7 +38,6 @@ from tortoisehg.util import paths
 
 from mercurial.error import RepoError
 
-bold = QFont.Bold
 connect = QObject.connect
 
 
