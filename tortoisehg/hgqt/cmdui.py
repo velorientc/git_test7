@@ -99,7 +99,7 @@ class Core(QObject):
 
     def cancel(self):
         '''Cancel running Mercurial command'''
-        if self.thread:
+        if self.is_running():
             self.thread.abort()
             self.commandCanceling.emit()
 
