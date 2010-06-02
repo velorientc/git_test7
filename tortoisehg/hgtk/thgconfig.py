@@ -1168,15 +1168,21 @@ class ConfigDialog(gtk.Dialog):
             return iter((name, exts[name])
                         for name in sorted(exts.iterkeys()))
 
-        parent.pack_start(table, False, False)
+        allextslist = list(allexts())
+
+        MAXCOLUMNS = 3
+        maxrows = (len(allextslist) + MAXCOLUMNS - 1) / MAXCOLUMNS
+        extstable = gtk.Table()
+        parent.pack_start(extstable, False, False)
 
         self.extensionschecks = {}
-        for name, shortdesc in allexts():
+        for i, (name, shortdesc) in enumerate(allextslist):
             ck = gtk.CheckButton(name, use_underline=False)
             ck.connect('toggled', self.dirty_event)
             ck.connect('focus-in-event', self.set_help,
                        hglib.toutf(shortdesc))
-            table.add_row(ck, padding=False)
+            col, row = i / maxrows, i % maxrows
+            extstable.attach(ck, col, col + 1, row, row + 1)
             self.tooltips.set_tip(ck, hglib.toutf(shortdesc))
             self.extensionschecks[name] = ck
 
