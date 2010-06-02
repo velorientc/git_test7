@@ -190,11 +190,13 @@ def getpixmap(name, width=16, height=16):
     return pixmap
 
 def CommonMsgBox(icon, title, main, text='', buttons=QtGui.QMessageBox.Close,
-                 parent=None):
+                 labels=[], parent=None):
     msg = QtGui.QMessageBox(parent)
     msg.setIcon(icon)
     msg.setWindowTitle(title)
     msg.setStandardButtons(buttons)
+    for button_id, label in labels:
+        msg.setButtonText(button_id, label)
     msg.setText('<b>%s</b>' % main)
     info = ''
     for line in text.split('\n'):
