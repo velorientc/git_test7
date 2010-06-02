@@ -166,8 +166,10 @@ class CommitWidget(QWidget):
                     continue
                 pos += maxlen
             sel = QTextEdit.ExtraSelection()
-            sel.bgcolor = QColor('red')
-            sel.format.setBackground(sel.bgcolor)
+            sel._bgcolor = QColor('LightSalmon')
+            sel._fgcolor = QColor('Black')
+            sel.format.setBackground(sel._bgcolor)
+            sel.format.setForeground(sel._fgcolor)
             sel.cursor = QTextCursor(self.msgte.document())
             sel.cursor.setPosition(pos)
             sel.cursor.movePosition(QTextCursor.EndOfLine, QTextCursor.KeepAnchor)
