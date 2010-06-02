@@ -120,7 +120,7 @@ class Core(QObject):
         self.thread.commandFinished.connect(self.command_finished)
         self.thread.outputReceived.connect(self.output_received)
         self.thread.errorReceived.connect(self.error_received)
-        if hasattr(self, 'pmon'):
+        if self.pmon:
             self.thread.progressReceived.connect(self.progress_received)
         self.thread.start()
 
@@ -135,7 +135,7 @@ class Core(QObject):
     ### Signal Handlers ###
 
     def command_started(self):
-        if hasattr(self, 'pmon'):
+        if self.pmon:
             self.pmon.set_text(_('Running...'))
             self.pmon.unknown_progress()
 
@@ -144,7 +144,7 @@ class Core(QObject):
     def command_finished(self, wrapper):
         ret = wrapper.data
 
-        if hasattr(self, 'pmon'):
+        if self.pmon:
             if ret is None:
                 self.pmon.clear_progress()
             if self.pmon.pbar.maximum() == 0:  # busy indicator
@@ -167,7 +167,7 @@ class Core(QObject):
         self.commandFinished.emit(wrapper)
 
     def command_canceling(self):
-        if hasattr(self, 'pmon'):
+        if self.pmon:
             self.pmon.set_text(_('Canceling...'))
             self.pmon.unknown_progress()
 
