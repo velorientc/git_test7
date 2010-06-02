@@ -11,33 +11,50 @@
 TortoiseHg License dialog - PyQt4 version
 """
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QDialog, QIcon, QPixmap
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib
 from tortoisehg.util import paths
 
-try:
-    from tortoisehg.hgqt.license_ui import Ui_LicenseDialog
-except ImportError:
-    from PyQt4 import uic
-    Ui_LicenseDialog = uic.loadUiType(os.path.join(os.path.dirname(__file__),
-																						'license.ui'))[0]
 
 class LicenseDialog(QDialog):
     """Dialog for showing the TortoiseHg license"""
     def __init__(self, parent=None):
         super(LicenseDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        self._qui = Ui_LicenseDialog()
-        self._qui.setupUi(self)
-        iconfile = paths.get_tortoise_icon('thg_logo.ico')
-        icon = QIcon()
-        icon.addPixmap(QPixmap(iconfile), QIcon.Normal, QIcon.Off)
-        self.setWindowIcon(icon)
+
+        self.setWindowIcon(qtlib.geticon('thg_logo'))
         self.setWindowTitle(_('License'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.resize(460, 360)
+
+        self.lic_txt = QPlainTextEdit()
+        self.lic_txt.setTextInteractionFlags(
+                Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
         try:
             lic = open(paths.get_license_path(), 'rb').read()
-            self._qui.licenseText.setPlainText(lic)
+            self.lic_txt.setPlainText(lic)
         except (IOError):
             pass
+
+        self.hspacer = QSpacerItem(40, 20,
+                QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.close_btn = QPushButton(_('&Close'))
+        self.close_btn.clicked.connect(self.close)
+
+        self.hbox = QHBoxLayout()
+        self.hbox.addItem(self.hspacer)
+        self.hbox.addWidget(self.close_btn)
+        self.vbox = QVBoxLayout()
+        self.vbox.setSpacing(6)
+        self.vbox.addWidget(self.lic_txt)
+        self.vbox.addLayout(self.hbox)
+
+        self.setLayout(self.vbox)
+        self.setModal(True)
+
+
+def run(ui, *args, **opts):
+    return LicenseDialog()
