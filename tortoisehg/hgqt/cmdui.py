@@ -83,19 +83,17 @@ class Core(QObject):
         self.output_text = QTextBrowser()
         self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.pmon = None
+        self.queue = []
 
     ### Public Methods ###
 
-    def run(self, cmdline):
-        '''Execute Mercurial command'''
-        self.thread = thread.CmdThread(cmdline)
-        self.thread.started.connect(self.command_started)
-        self.thread.commandFinished.connect(self.command_finished)
-        self.thread.outputReceived.connect(self.output_received)
-        self.thread.errorReceived.connect(self.error_received)
-        if hasattr(self, 'pmon'):
-            self.thread.progressReceived.connect(self.progress_received)
-        self.thread.start()
+    def run(self, cmdline, *cmdlines):
+        '''Execute or queue Mercurial command'''
+        self.queue.append(cmdline)
+        if len(cmdlines):
+            self.queue.extend(cmdlines)
+        if not self.is_running():
+            self.run_next()
 
     def cancel(self):
         '''Cancel running Mercurial command'''
@@ -110,6 +108,23 @@ class Core(QObject):
         return bool(self.thread and self.thread.isRunning())
 
     ### Private Method ###
+
+    def run_next(self):
+        try:
+            cmdline = self.queue.pop(0)
+            self.thread = thread.CmdThread(cmdline)
+        except IndexError:
+            return False
+
+        self.thread.started.connect(self.command_started)
+        self.thread.commandFinished.connect(self.command_finished)
+        self.thread.outputReceived.connect(self.output_received)
+        self.thread.errorReceived.connect(self.error_received)
+        if hasattr(self, 'pmon'):
+            self.thread.progressReceived.connect(self.progress_received)
+        self.thread.start()
+
+        return True
 
     def append_output(self, msg, style=''):
         msg = msg.replace('\n', '<br />')
@@ -127,8 +142,9 @@ class Core(QObject):
         self.commandStarted.emit()
 
     def command_finished(self, wrapper):
+        ret = wrapper.data
+
         if hasattr(self, 'pmon'):
-            ret = wrapper.data
             if ret is None:
                 self.pmon.clear_progress()
             if self.pmon.pbar.maximum() == 0:  # busy indicator
@@ -144,6 +160,9 @@ class Core(QObject):
             else:
                 status = _('Finished')
             self.pmon.set_text(status)
+
+        if ret == 0 and self.run_next():
+            return # run next command
 
         self.commandFinished.emit(wrapper)
 
@@ -236,8 +255,8 @@ class Widget(QWidget):
 
     ### Public Methods ###
 
-    def run(self, cmdline):
-        self.core.run(cmdline)
+    def run(self, cmdline, *args):
+        self.core.run(cmdline, *args)
 
     def cancel(self):
         self.core.cancel()
