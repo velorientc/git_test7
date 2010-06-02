@@ -1168,7 +1168,6 @@ class ConfigDialog(gtk.Dialog):
             return iter((name, exts[name])
                         for name in sorted(exts.iterkeys()))
 
-        vbox = gtk.VBox()
         parent.pack_start(table, False, False)
 
         self.extensionschecks = {}
