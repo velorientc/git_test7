@@ -30,6 +30,7 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 #  qnew/shelve-patch creation dialog (in another file)
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
+#  refresh UI instances, make a hglib func for it
 
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
@@ -237,6 +238,7 @@ class CommitWidget(QWidget):
         def settings():
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
+            # TODO: refresh UI instances, make a hglib func for it
             return dlg.exec_()
 
         menu = self.msgte.createStandardContextMenu()
