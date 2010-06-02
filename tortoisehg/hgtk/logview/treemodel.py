@@ -222,16 +222,18 @@ class TreeModel(gtk.GenericTreeModel):
 
             branch = ctx.branch()
             bstr = ''
+            status = 0
             if self.branchtags.get(branch) == node:
                 bstr += gtklib.markup(' %s ' % branch, color=gtklib.BLACK,
                                       background=gtklib.PGREEN) + ' '
+                status = 8
 
             if revid in self.wcparents:
                 sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
-                status = 4
+                status += 4
             else:
                 sumstr = bstr + tstr + summary
-                status = 0
+                status += 0
 
             if node in self.outgoing:
                 # outgoing
