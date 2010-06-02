@@ -13,6 +13,7 @@ from mercurial import ui, hg, error, commands, cmdutil, util
 from tortoisehg.hgqt import visdiff, qtlib, wctxactions
 from tortoisehg.util import paths, hglib, colormap
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt.grep import SearchWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -114,7 +115,7 @@ class AnnotateView(QFrame):
                     cursor.position() <= c.selectionEnd():
                 selection = c.selection().toPlainText()
                 def sorig():
-                    sdata = [selection, fctx.linkrev()]
+                    sdata = [selection, str(fctx.linkrev())]
                     self.emit(SIGNAL('searchAtRev'), sdata)
                 def sctx():
                     self.emit(SIGNAL('searchAtParent'), selection)
@@ -366,6 +367,7 @@ class AnnotateDialog(QDialog):
         self.connect(av, SIGNAL('searchAnnotation'), self.searchAnnotation)
 
         self.status = status
+        self.searchwidget = None
 
         self.opts = opts
         line = opts.get('line')
@@ -410,19 +412,25 @@ class AnnotateDialog(QDialog):
         wctxactions.edit(self, repo.ui, repo, files, line, pattern)
 
     def searchAtRev(self, args):
-        # grep widget needs to support argument passing via **opts
-        # search repo[args[1]]
-        raise NotImplementedError()
+        if self.searchwidget is None:
+            self.searchwidget = SearchWidget([args[0]], rev=args[1])
+        else:
+            self.searchwidget.setSearch(args[0], rev=args[1])
+        self.searchwidget.show()
 
     def searchAtParent(self, pattern):
-        # grep widget needs to support argument passing via **opts
-        # search repo['.']
-        raise NotImplementedError()
+        if self.searchwidget is None:
+            self.searchwidget = SearchWidget([pattern], rev='.')
+        else:
+            self.searchwidget.setSearch(pattern, rev='.')
+        self.searchwidget.show()
 
     def searchAll(self, pattern):
-        # grep widget needs to support argument passing via **opts
-        # search all history
-        raise NotImplementedError()
+        if self.searchwidget is None:
+            self.searchwidget = SearchWidget([pattern], all=True)
+        else:
+            self.searchwidget.setSearch(pattern, all=True)
+        self.searchwidget.show()
 
     def searchAnnotation(self, pattern):
         self.le.setText(QRegExp.escape(pattern))

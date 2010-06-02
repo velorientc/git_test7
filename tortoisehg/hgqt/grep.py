@@ -27,7 +27,7 @@ class SearchWidget(QDockWidget):
        loadComplete()               - for progress bar
        errorMessage(QString)        - for status bar
     '''
-    def __init__(self, pats, root=None, parent=None):
+    def __init__(self, upats, root=None, parent=None, **opts):
         QDockWidget.__init__(self, parent)
 
         if parent is None:
@@ -56,8 +56,6 @@ class SearchWidget(QDockWidget):
         le = QLineEdit()
         lbl.setBuddy(le)
         lbl.setToolTip(_('Regular expression search pattern'))
-        if len(pats) >= 1:
-            le.setText(hglib.tounicode(pats[0]))
         bt = QPushButton(_('Search'))
         bt.setDefault(True)
         chk = QCheckBox(_('Ignore case'))
@@ -67,8 +65,6 @@ class SearchWidget(QDockWidget):
         hbox.addWidget(bt)
 
         incle = QLineEdit()
-        if len(pats) > 1:
-            incle.setText(','.join(pats[1:]))
         excle = QLineEdit()
         working = QRadioButton(_('Working Copy'))
         revision = QRadioButton(_('Revision'))
@@ -131,12 +127,30 @@ class SearchWidget(QDockWidget):
         tv.setColumnHidden(COL_USER, True)
         mainvbox.addWidget(tv)
         le.returnPressed.connect(self.searchActivated)
+
         self.repo = repo
         self.tv, self.regexple, self.chk = tv, le, chk
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
-        self.singlematch = singlematch
+        self.singlematch, self.expand, self.eframe = singlematch, expand, frame
         self.regexple.setFocus()
+
+        if 'rev' in opts or 'all' in opts:
+            self.setSearch(upats[0], **opts)
+        elif len(upats) >= 1:
+            le.setText(upats[0])
+        if len(upats) > 1:
+            incle.setText(','.join(upats[1:]))
+
+    def setSearch(self, upattern, **opts):
+        self.regexple.setText(upattern)
+        if opts.get('all'):
+            self.aradio.setChecked(True)
+        elif opts.get('rev'):
+            self.ctxradio.setChecked(True)
+            self.revle.setText(opts['rev'])
+        if not self.eframe.isVisible():
+            self.expand.clicked.emit(True)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -514,4 +528,5 @@ class MatchModel(QAbstractTableModel):
         return self.rows[index.row()]
 
 def run(ui, *pats, **opts):
-    return SearchWidget(pats)
+    upats = [hglib.tounicode(p) for p in pats]
+    return SearchWidget(upats, **opts)
