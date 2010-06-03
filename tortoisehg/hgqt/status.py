@@ -617,9 +617,13 @@ class WctxModel(QAbstractTableModel):
         self.rows = rows
 
     def rowCount(self, parent):
+        if parent.isValid():
+            return 0 # no child
         return len(self.rows)
 
     def columnCount(self, parent):
+        if parent.isValid():
+            return 0 # no child
         return len(self.headers)
 
     def data(self, index, role):
