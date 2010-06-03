@@ -256,6 +256,9 @@ class HistorySearchThread(QThread):
                 qtlib.configstyles(self)
                 self.fullmsg = ''
 
+            def plain(self):
+                return True
+
             def write(self, msg, *args, **opts):
                 if opts.get('label'):
                     self.fullmsg += self.label(msg, opts['label'])
