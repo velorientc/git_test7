@@ -150,8 +150,8 @@ class AboutDialog(QDialog):
         shlib.browse_url(self.url)
 
     def showLicense(self):
-        from tortoisehg.hgqt import license2
-        ld = license2.LicenseDialog(self)
+        from tortoisehg.hgqt import license
+        ld = license.LicenseDialog(self)
         ld.show()
 
 
