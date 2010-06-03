@@ -472,6 +472,11 @@ def init(ui, *pats, **opts):
     from tortoisehg.hgqt.hginit import run
     qtrun(run, ui, *pats, **opts)
 
+def rename(ui, *pats, **opts):
+    """rename dialog"""
+    from tortoisehg.hgqt.rename import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -744,6 +749,7 @@ table = {
     "remove|rm": (remove, [], _('thg remove [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
+    "rename|mv": (rename, [], _('thg rename SOURCE [DEST]...')),
     "^serve": (serve, [], _('thg serve [OPTION]')),
     "^status": (status,
          [('c', 'clean', False, _('show files without changes')),
