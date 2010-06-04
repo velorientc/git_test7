@@ -147,9 +147,8 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             arc_start_position_y = cell_area.y + cell_area.height / 2;
 
             if status >= 8:   # branch head
-                ctx.rectangle(arc_start_position_x-box_size/2,
-                              arc_start_position_y-box_size/2,
-                              box_size, box_size)
+                ctx.arc(arc_start_position_x, arc_start_position_y,
+                    box_size /1.7, 0, 2 * math.pi)
                 self.set_colour(ctx, gtklib.PGREEN, 0.0, 1.0)
                 ctx.fill()
                 status -= 8
