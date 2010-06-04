@@ -173,12 +173,6 @@ class StatusWidget(QWidget):
         hbox.addWidget(self.fnamelabel)
         hbox.addStretch()
 
-        self.override = QCheckBox()
-        self.override.hide()
-        self.override.setText(_('Show Contents'))
-        self.override.setCheckable(True)
-        self.override.toggled.connect(self.refreshDiff)
-        hbox.addWidget(self.override)
         hbox.addSpacing(6)
 
         self.te = QTextBrowser()
@@ -192,10 +186,12 @@ class StatusWidget(QWidget):
 
         self.split = split
         self.diffvbox = vbox
+        self.override = False
         QTimer.singleShot(0, self.refreshWctx)
 
     def teLinkClicked(self, url):
-        self.override.setChecked(True)
+        self.override = True
+        self.refreshDiff()
 
     def getTitle(self):
         if self.pats:
@@ -235,8 +231,7 @@ class StatusWidget(QWidget):
         self.te.clear()
         self.fnamelabel.clear()
         self.curRow = None
-        self.override.setChecked(False)
-        self.override.setEnabled(False)
+        self.override = False
 
         # store selected paths or current path
         model = self.tv.model()
@@ -332,7 +327,7 @@ class StatusWidget(QWidget):
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
         self.curRow = None
-        self.override.setChecked(False)
+        self.override = False
         self.curRow = index.model().getRow(index)
         self.refreshDiff()
 
@@ -340,9 +335,9 @@ class StatusWidget(QWidget):
         if self.curRow is None:
             return
         path, status, mst, upath, ext, sz = self.curRow
+        showanyway = self.override
         wfile = util.pconvert(path)
         self.fnamelabel.setText(statusMessage(status, mst, upath))
-        showanyway = self.override.isChecked()
         hu = htmlui.htmlui()
 
         show = '&nbsp;&nbsp;(<a href="cmd:show">%s</a>)' % _('show anyway')
@@ -413,8 +408,6 @@ class StatusWidget(QWidget):
             text = '<b>Diffs not displayed: %s</b>' % warnings[1] + show
             self.te.setHtml(text)
             return
-
-        self.override.setChecked(True)
 
         # Generate diffs to first parent
         m = cmdutil.matchfiles(self.repo, [wfile])
