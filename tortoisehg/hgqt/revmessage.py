@@ -45,6 +45,7 @@ class RevMessage(QtGui.QWidget):
         vb.setMargin(0)
 
         self._message = w = QtGui.QTextBrowser()
+        w.setFont(QtGui.QFont('Monospace', 9))
         w.setOpenLinks(False)
         vb.addWidget(w)
 
