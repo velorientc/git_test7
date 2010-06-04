@@ -9,15 +9,13 @@
 """
 Main Qt4 application for TortoiseHg
 """
-import sys, os
-import re
 
-from PyQt4 import QtCore, QtGui, Qsci
+import os
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import ui, hg, util
+from mercurial import hg
 from mercurial.error import RepoError
 
 from tortoisehg.util.util import tounicode
