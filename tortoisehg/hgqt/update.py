@@ -175,7 +175,7 @@ class UpdateDialog(QDialog):
             self.update_btn.setDisabled(True)
 
     def update(self):
-        cmdline = ['update', '--verbose']
+        cmdline = ['update', '--repository', self.repo.root, '--verbose']
         rev = hglib.fromunicode(self.rev_combo.currentText())
         cmdline.append('--rev')
         cmdline.append(rev)
