@@ -16,10 +16,8 @@
 
 import re
 
-from PyQt4 import QtCore, QtGui
-Qt = QtCore.Qt
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from tortoisehg.util.util import xml_escape, tounicode
 
@@ -34,24 +32,24 @@ bodyre = re.compile(regexp)
 
 revhashprefix = 'rev_hash_'
 
-class RevMessage(QtGui.QWidget):
+class RevMessage(QWidget):
 
-    revisionLinkClicked = QtCore.pyqtSignal(str)
+    revisionLinkClicked = pyqtSignal(str)
 
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
-        vb = QtGui.QVBoxLayout()
+        vb = QVBoxLayout()
         vb.setMargin(0)
 
-        self._message = w = QtGui.QTextBrowser()
-        w.setFont(QtGui.QFont('Monospace', 9))
+        self._message = w = QTextBrowser()
+        w.setFont(QFont('Monospace', 9))
         w.setOpenLinks(False)
         vb.addWidget(w)
 
         self.setLayout(vb)
 
-        connect(self._message, SIGNAL('anchorClicked(QUrl)'), self.anchorClicked)
+        self._message.anchorClicked.connect(self.anchorClicked)
 
     def anchorClicked(self, qurl):
         link = str(qurl.toString())
@@ -59,7 +57,7 @@ class RevMessage(QtGui.QWidget):
             rev = link[len(revhashprefix):]
             self.revisionLinkClicked.emit(rev)
         else:
-            QtGui.QDesktopServices.openUrl(qurl)
+            QDesktopServices.openUrl(qurl)
 
     def displayRevision(self, ctx):
         self.ctx = ctx
