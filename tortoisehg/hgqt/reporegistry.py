@@ -13,6 +13,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt import cmdui
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
+from tortoisehg.hgqt.pathedit import PathEditDialog
 
 from PyQt4 import QtCore, QtGui
 
@@ -98,6 +99,8 @@ class RepoTreeView(QtGui.QTreeView):
                 _("Remove the entry"), None, self.removeSelected),
              ("pull", _("Pull"), None, 
                 _("Pull from remote"), None, self.pull),
+             ("editpath", _("Edit"), None, 
+                _("Edit Path"), None, self.editPath),
              ]
         return a
 
@@ -153,6 +156,17 @@ class RepoTreeView(QtGui.QTreeView):
         cmd.setWindowTitle(what)
         cmd.show_output(False)
         cmd.exec_()
+
+    def editPath(self):
+        if not self.selitem:
+            return
+        pathitem = self.selitem.internalPointer()
+        d = PathEditDialog(self, pathitem.alias(), pathitem.url())
+        d.show()
+        if d.exec_():
+            pathitem.setUrl(d.url())
+            i = self.selitem
+            self.model().dataChanged.emit(i, i)
 
     def newGroup(self):
         m = self.model()

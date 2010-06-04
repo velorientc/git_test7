@@ -230,6 +230,12 @@ class RepoPathItem(RepoTreeItem):
     def url(self):
         return self._path
 
+    def setUrl(self, url):
+        self._path = url
+
+    def alias(self):
+        return self._alias
+
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:
@@ -244,7 +250,7 @@ class RepoPathItem(RepoTreeItem):
         return QVariant()
 
     def menulist(self):
-        return ['pull']
+        return ['pull', None, 'editpath' ]
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
