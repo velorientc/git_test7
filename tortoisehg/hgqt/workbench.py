@@ -153,7 +153,7 @@ class Workbench(QMainWindow):
         vl.setMargin(0)
 
         self.repotabs_splitter = sp = QSplitter(self.centralwidget)
-        sp.setOrientation(QtCore.Qt.Vertical)
+        sp.setOrientation(Qt.Vertical)
         self.verticalLayout.addWidget(sp)
 
         self.repoTabsWidget = tw = QTabWidget(self.repotabs_splitter)
@@ -176,15 +176,15 @@ class Workbench(QMainWindow):
         self.toolBar_treefilters = tb = QToolBar(_("Filter Toolbar"), self)
         tb.setEnabled(True)
         tb.setObjectName("toolBar_treefilters")
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
         self.toolBar_diff = tb = QToolBar(_("Diff Toolbar"), self)
         tb.setObjectName("toolBar_diff")
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
         self.toolBar_help = tb = QToolBar(_("Help Toolbar"), self)
         tb.setObjectName("toolBar_help")
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
         self.actionOpen_repository = a = QAction(_("&Open Repository"), self)
         a.setShortcut("Ctrl+O")
@@ -247,7 +247,7 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionBack)
         tb.addAction(self.actionForward)
         tb.addSeparator()
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), tb)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
         self.toolBar_help.addAction(self.actionHelp)
 
@@ -319,7 +319,7 @@ class Workbench(QMainWindow):
             cw = CommitWidget(pats, opts, root=repo.root)
             self.commitwidgets[repo.root] = cw
             self.stackedWidget.addWidget(cw)
-            s = QtCore.QSettings()
+            s = QSettings()
             cw.loadConfigs(s)
 
         rw = RepoWidget(repo, self.stackedWidget, cw)
@@ -620,10 +620,9 @@ class Workbench(QMainWindow):
         # todo: get root of current repo, pass to search widget
         root = None
         s = SearchWidget('', root, self)
-        s.setAllowedAreas(QtCore.Qt.TopDockWidgetArea|
-                          QtCore.Qt.BottomDockWidgetArea)
+        s.setAllowedAreas(Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea)
         s.setObjectName("searchWidget%d" % len(self._searchWidgets))
-        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, s)
+        self.addDockWidget(Qt.BottomDockWidgetArea, s)
         self._searchWidgets.append(s)
 
     def okToContinue(self):
@@ -636,7 +635,7 @@ class Workbench(QMainWindow):
         return True
 
     def storeSettings(self):
-        s = QtCore.QSettings()
+        s = QSettings()
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
@@ -645,7 +644,7 @@ class Workbench(QMainWindow):
             s.setValue(wb + n, getattr(self, n).saveState())
 
     def restoreSettings(self):
-        s = QtCore.QSettings()
+        s = QSettings()
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
