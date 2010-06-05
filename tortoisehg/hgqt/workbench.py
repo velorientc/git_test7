@@ -1,3 +1,4 @@
+
 # -*- coding: iso-8859-1 -*-
 #!/usr/bin/env python
 # workbench.py - main TortoiseHg Window
@@ -226,8 +227,8 @@ class Workbench(QMainWindow):
         m.addAction(self.actionQuit)
 
         self.menuHelp = m = QMenu(_("&Help"), self.menubar)
-        m.addAction(self.actionAbout)
         m.addAction(self.actionHelp)
+        m.addAction(self.actionAbout)
 
         self.menuView = m = QMenu(_("View"), self.menubar)
         m.addAction(self.actionShowRepoRegistry)
@@ -597,18 +598,9 @@ class Workbench(QMainWindow):
 
     def on_about(self, *args):
         """ Display about dialog """
-        from __pkginfo__ import modname, version, short_desc, long_desc
-        try:
-            from mercurial.version import get_version
-            hgversion = get_version()
-        except:
-            from mercurial.__version__ import version as hgversion
-
-        msg = "<h2>About %(appname)s %(version)s</h2> (using hg %(hgversion)s)" % \
-              {"appname": modname, "version": version, "hgversion": hgversion}
-        msg += "<p><i>%s</i></p>" % short_desc.capitalize()
-        msg += "<p>%s</p>" % long_desc
-        QMessageBox.about(self, "About %s" % modname, msg)
+        from tortoisehg.hgqt.about import AboutDialog
+        ad = AboutDialog()
+        ad.exec_()
 
     def on_help(self, *args):
         pass
