@@ -24,6 +24,7 @@ class PathEditDialog(QDialog):
 
         form = QFormLayout()
         layout.addLayout(form)
+        form.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
 
         self.edit = QLineEdit(url_)
         form.addRow(alias, self.edit)
