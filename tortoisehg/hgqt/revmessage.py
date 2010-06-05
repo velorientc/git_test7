@@ -43,6 +43,8 @@ class RevMessage(QWidget):
         vb.setMargin(0)
 
         self._message = w = QTextBrowser()
+        w.setLineWrapMode(QTextEdit.NoWrap)
+        w.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         w.setFont(QFont('Monospace', 9))
         w.setOpenLinks(False)
         vb.addWidget(w)
