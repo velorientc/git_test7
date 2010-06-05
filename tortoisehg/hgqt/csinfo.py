@@ -547,6 +547,10 @@ class SummaryPanel(SummaryBase, QWidget):
     def is_expanded(self):
         return self.expand_btn.is_expanded()
 
+    def minimumSizeHint(self):
+        s = QWidget.minimumSizeHint(self)
+        return QSize(0, s.height())
+
 LABEL_PAT = re.compile(r'(?:(?<=%%)|(?<!%)%\()(\w+)(?:\)s)')
 
 class SummaryLabel(SummaryBase, QLabel):
