@@ -194,46 +194,16 @@ class DataMineDialog(gdialog.GWindow):
                            _('Unable to annotate'), self).run()
             return False
         (frame, treeview, filepath, graphview) = objs
-        anotrev = treeview.get_model().rev
-        graphmodel = graphview.treeview.get_model()
         path = graphview.get_path_at_revid(int(self.currev))
-        if not path:
+        filepath = graphview.get_wfile_at_path(path)
+        ctx = self.repo[self.currev]
+        fctx = ctx.filectx(filepath)
+        parents = fctx.parents()
+        if len(parents) == 0:
             return error_prompt()
-        iter = graphmodel.get_iter(path)
-        parent_iter = graphmodel.iter_next(iter)
-        if not parent_iter:
-            return error_prompt()
-        parent_path = graphmodel.get_path(parent_iter)
-        parent_revid = graphmodel[parent_path][LogTreeModelModule.REVID]
-        parent_ctx = self.repo[parent_revid]
-        try:
-            parent_ctx.filectx(filepath)
-        except error.LookupError:
-            # file was renamed/moved, try to find previous file path
-            end_iter = iter
-            path = graphview.get_path_at_revid(int(anotrev))
-            if not path:
-                return error_prompt()
-            iter = graphmodel.get_iter(path)
-            while iter and iter != end_iter:
-                path = graphmodel.get_path(iter)
-                revid = graphmodel[path][LogTreeModelModule.REVID]
-                ctx = self.repo[revid]
-                try:
-                    fctx = ctx.filectx(filepath)
-                    renamed = fctx.renamed()
-                    if renamed:
-                        filepath = renamed[0]
-                        break
-                except error.LookupError:
-                    # break iteration, but don't use 'break' statement
-                    # so that execute 'else' block for showing prompt.
-                    iter = end_iter
-                    continue
-                # move iterator to next
-                iter = graphmodel.iter_next(iter)
-            else:
-                return error_prompt()
+        parent_fctx = parents[0]
+        parent_revid = parent_fctx.changectx().rev()
+        filepath = parent_fctx.path()
         # annotate file of parent rev
         self.trigger_annotate(parent_revid, filepath, objs)
         graphview.scroll_to_revision(int(parent_revid))
