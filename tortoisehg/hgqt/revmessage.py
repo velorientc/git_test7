@@ -86,3 +86,6 @@ class RevMessage(QWidget):
 
         buf = '<div class="diff_desc"><p>%s</p></div>' % buf
         self._message.setHtml(buf)
+
+    def minimumSizeHint(self):
+        return QSize(0, 25)
