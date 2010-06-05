@@ -143,16 +143,18 @@ class AnnotateView(QFrame):
                 action = menu.addAction(name)
                 action.wrapper = lambda f=func: f()
                 self.connect(action, SIGNAL('triggered()'), action.wrapper)
-            if fctx.linkrev() > 0:
-                data2 = [fctx.path(), fctx.linkrev()-1, line]
-                def annparent():
-                    self.emit(SIGNAL('revSelected'), data2)
+            for pfctx in fctx.parents():
+                pdata = [pfctx.path(), pfctx.changectx().rev(), line]
+                def annparent(data):
+                    self.emit(SIGNAL('revSelected'), data)
                 def editparent():
-                    self.emit(SIGNAL('editSelected'), data2)
-                for name, func in [(_('Annotate parent revision'), annparent),
-                                   (_('View parent revision'), editparent)]:
+                    self.emit(SIGNAL('editSelected'), data)
+                for name, func in [(_('Annotate parent revision %d') % pdata[1],
+                                      annparent),
+                                   (_('View parent revision %d') % pdata[1],
+                                      editparent)]:
                     action = menu.addAction(name)
-                    action.wrapper = lambda f=func: f()
+                    action.wrapper = lambda f=func,d=pdata: f(d)
                     self.connect(action, SIGNAL('triggered()'), action.wrapper)
             menu.exec_(point)
 
