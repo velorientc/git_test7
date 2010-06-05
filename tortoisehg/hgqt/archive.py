@@ -16,18 +16,14 @@
 
 import os
 
-from PyQt4.QtCore import Qt, SIGNAL, SLOT, QObject
-from PyQt4.QtGui import QDialog, QComboBox, QVBoxLayout, QGridLayout, QLabel
-from PyQt4.QtGui import QLineEdit, QPushButton, QLayout, QRadioButton
-from PyQt4.QtGui import QHBoxLayout, QFileDialog, QCheckBox
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from mercurial import hg, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt import cmdui, qtlib
-#import tortoisehg.hgqt # import connect
-connect = QObject.connect
 
 WD_PARENT = _('= Working Directory Parent =')
 
