@@ -15,25 +15,21 @@ from tortoisehg.hgqt import cmdui
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
 from tortoisehg.hgqt.pathedit import PathEditDialog
 
-from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
-from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT
-from PyQt4.QtCore import QModelIndex, QString
-
-from PyQt4.QtGui import QVBoxLayout, QDockWidget, QFrame
-
-connect = QtCore.QObject.connect
+connect = QObject.connect
 
 
 def settingsfilename():
-    s = QtCore.QSettings()
+    s = QSettings()
     dir = os.path.dirname(str(s.fileName()))
     return dir + '/' + 'thg-reporegistry.xml'
 
 
-class RepoTreeView(QtGui.QTreeView):
+class RepoTreeView(QTreeView):
     def __init__(self, parent, workbench):
-        QtGui.QTreeView.__init__(self)
+        QTreeView.__init__(self)
         self.parent = parent
         self.workbench = workbench
         self.selitem = None
@@ -46,7 +42,7 @@ class RepoTreeView(QtGui.QTreeView):
         # (see http://doc.qt.nokia.com/4.6/model-view-dnd.html)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
-        self.setDragDropMode(QtGui.QAbstractItemView.DragDrop)
+        self.setDragDropMode(QAbstractItemView.DragDrop)
         self.setDropIndicatorShown(True)
 
         self.createActions()
@@ -54,7 +50,7 @@ class RepoTreeView(QtGui.QTreeView):
     def contextMenuEvent(self, event):
         menulist = self.selitem.internalPointer().menulist()
         if len(menulist) > 0:
-            menu = QtGui.QMenu(self)
+            menu = QMenu(self)
             for act in menulist:
                 if act:
                     menu.addAction(self._actions[act])
@@ -107,8 +103,8 @@ class RepoTreeView(QtGui.QTreeView):
     def createActions(self):
         self._actions = {}
         for name, desc, icon, tip, key, cb in self._action_defs():
-            self._actions[name] = QtGui.QAction(desc, self)
-        QtCore.QTimer.singleShot(0, self.configureActions)
+            self._actions[name] = QAction(desc, self)
+        QTimer.singleShot(0, self.configureActions)
 
     def configureActions(self):
         for name, desc, icon, tip, key, cb in self._action_defs():
@@ -184,8 +180,8 @@ class RepoTreeView(QtGui.QTreeView):
 
 class RepoRegistryView(QDockWidget):
 
-    openRepoSignal = QtCore.pyqtSignal(QtCore.QString)
-    visibilityChanged = QtCore.pyqtSignal(bool)
+    openRepoSignal = pyqtSignal(QString)
+    visibilityChanged = pyqtSignal(bool)
 
     def __init__(self, ui, workbench):
         QDockWidget.__init__(self, workbench)
@@ -211,7 +207,7 @@ class RepoRegistryView(QDockWidget):
         tv.setFirstColumnSpanned(0, QModelIndex(), True)
 
         self.tview.setColumnHidden(1, True)
-        QtCore.QTimer.singleShot(0, self.expand)
+        QTimer.singleShot(0, self.expand)
 
     def expand(self):
         self.tview.expandToDepth(0)
