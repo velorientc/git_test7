@@ -10,7 +10,8 @@ import atexit
 import shutil
 import tempfile
 
-from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 from PyQt4 import Qsci
 from mercurial import extensions, util
 
@@ -87,12 +88,12 @@ def geteffect(labels):
         for e in es.split():
             if e in _effects:
                 effects.append(_effects[e])
-            elif e in QtGui.QColor.colorNames():
+            elif e in QColor.colorNames():
                 # Accept any valid QColor
                 effects.append('color: ' + e)
             elif e.endswith('_background'):
                 e = e[:-11]
-                if e in QtGui.QColor.colorNames():
+                if e in QColor.colorNames():
                     effects.append('bgcolor: ' + e)
     return ';'.join(effects)
 
@@ -148,7 +149,7 @@ def markup(msg, **styles):
         style[name] = value
     style = ';'.join(['%s: %s' % t for t in style.items()])
     msg = hglib.tounicode(msg)
-    msg = QtCore.Qt.escape(msg)
+    msg = Qt.escape(msg)
     msg = msg.replace('\n', '<br />')
     return '<span style="%s">%s</span>' % (style, msg)
 
@@ -167,10 +168,10 @@ def geticon(name):
         for pfx in (':/icons', paths.get_icon_path()):
             for ext in ('svg', 'png', 'ico'):
                 path = '%s/%s.%s' % (pfx, name, ext)
-                if QtCore.QFile.exists(path):
-                    return QtGui.QIcon(path)
+                if QFile.exists(path):
+                    return QIcon(path)
 
-        return QtGui.QIcon(':/icons/fallback.svg')
+        return QIcon(':/icons/fallback.svg')
 
     try:
         return _iconcache[name]
@@ -189,9 +190,9 @@ def getpixmap(name, width=16, height=16):
     _pixmapcache[key] = pixmap
     return pixmap
 
-def CommonMsgBox(icon, title, main, text='', buttons=QtGui.QMessageBox.Close,
+def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Close,
                  labels=[], parent=None):
-    msg = QtGui.QMessageBox(parent)
+    msg = QMessageBox(parent)
     msg.setIcon(icon)
     msg.setWindowTitle(title)
     msg.setStandardButtons(buttons)
@@ -205,23 +206,23 @@ def CommonMsgBox(icon, title, main, text='', buttons=QtGui.QMessageBox.Close,
     return msg.exec_()
 
 def InfoMsgBox(*args, **kargs):
-    return CommonMsgBox(QtGui.QMessageBox.Information, *args, **kargs)
+    return CommonMsgBox(QMessageBox.Information, *args, **kargs)
 
 def WarningMsgBox(*args, **kargs):
-    return CommonMsgBox(QtGui.QMessageBox.Warning, *args, **kargs)
+    return CommonMsgBox(QMessageBox.Warning, *args, **kargs)
 
 def ErrorMsgBox(*args, **kargs):
-    return CommonMsgBox(QtGui.QMessageBox.Critical, *args, **kargs)
+    return CommonMsgBox(QMessageBox.Critical, *args, **kargs)
 
 def QuestionMsgBox(*args, **kargs):
-    btn = QtGui.QMessageBox.Yes | QtGui.QMessageBox.No
-    res = CommonMsgBox(QtGui.QMessageBox.Question, buttons=btn, *args, **kargs)
-    return res == QtGui.QMessageBox.Yes
+    btn = QMessageBox.Yes | QMessageBox.No
+    res = CommonMsgBox(QMessageBox.Question, buttons=btn, *args, **kargs)
+    return res == QMessageBox.Yes
 
-class CustomPrompt(QtGui.QMessageBox):
+class CustomPrompt(QMessageBox):
     def __init__(self, title, message, parent, choices, default=None,
                  esc=None, files=None):
-        QtGui.QMessageBox.__init__(self, parent)
+        QMessageBox.__init__(self, parent)
 
         self.setWindowTitle(hglib.toutf(title))
         self.setText(hglib.toutf(message))
@@ -235,7 +236,7 @@ class CustomPrompt(QtGui.QMessageBox):
             self.setDetailedText(hglib.toutf(msg))
         self.hotkeys = {}
         for i, s in enumerate(choices):
-            btn = self.addButton(s, QtGui.QMessageBox.AcceptRole)
+            btn = self.addButton(s, QMessageBox.AcceptRole)
             try:
                 char = s[s.index('&')+1].lower()
                 self.hotkeys[char] = btn
@@ -252,19 +253,19 @@ class CustomPrompt(QtGui.QMessageBox):
     def keyPressEvent(self, event):
         for k, btn in self.hotkeys.iteritems():
             if event.text() == k:
-                btn.emit(QtCore.SIGNAL('clicked()'))
+                btn.emit(SIGNAL('clicked()'))
         super(CustomPrompt, self).keyPressEvent(event)
 
 def setup_font_substitutions():
-    QtGui.QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
+    QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
 
-class PMButton(QtGui.QPushButton):
+class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
 
     def __init__(self, expanded=True, parent=None):
-        QtGui.QPushButton.__init__(self, parent)
+        QPushButton.__init__(self, parent)
 
-        size = QtCore.QSize(11, 11)
+        size = QSize(11, 11)
         self.setIconSize(size)
         self.setMaximumSize(size)
         self.setFlat(True)
@@ -294,26 +295,26 @@ class PMButton(QtGui.QPushButton):
     def is_collapsed(self):
         return not self.is_expanded()
 
-class ClickableLabel(QtGui.QLabel):
+class ClickableLabel(QLabel):
 
-    clicked = QtCore.pyqtSignal()
+    clicked = pyqtSignal()
 
     def __init__(self, label, parent=None):
-        QtGui.QLabel.__init__(self, parent)
+        QLabel.__init__(self, parent)
 
         self.setText(label)
 
     def mouseReleaseEvent(self, event):
         self.clicked.emit()
 
-class ExpanderLabel(QtGui.QWidget):
+class ExpanderLabel(QWidget):
 
-    expanded = QtCore.pyqtSignal(bool)
+    expanded = pyqtSignal(bool)
 
     def __init__(self, label, expanded=True, stretch=True, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
-        box = QtGui.QHBoxLayout()
+        box = QHBoxLayout()
         box.setSpacing(4)
         box.setContentsMargins(*(0,)*4)
         self.button = PMButton(expanded, self)
@@ -330,19 +331,19 @@ class ExpanderLabel(QtGui.QWidget):
     def pm_clicked(self):
         self.expanded.emit(self.button.is_expanded())
 
-class StatusLabel(QtGui.QWidget):
+class StatusLabel(QWidget):
 
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
-        box = QtGui.QHBoxLayout()
+        box = QHBoxLayout()
         box.setContentsMargins(*(0,)*4)
-        self.status_icon = QtGui.QLabel()
+        self.status_icon = QLabel()
         self.status_icon.setMaximumSize(16, 16)
-        self.status_icon.setAlignment(QtCore.Qt.AlignCenter)
+        self.status_icon.setAlignment(Qt.AlignCenter)
         box.addWidget(self.status_icon)
-        self.status_text = QtGui.QLabel()
-        self.status_text.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
+        self.status_text = QLabel()
+        self.status_text.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
         box.addWidget(self.status_text)
         box.addStretch(0)
 
@@ -372,9 +373,9 @@ class StatusLabel(QtGui.QWidget):
                 pixmap = icon and getpixmap('success') or getpixmap('error')
             elif isinstance(icon, basestring):
                 pixmap = getpixmap(icon)
-            elif isinstance(icon, QtGui.QIcon):
+            elif isinstance(icon, QIcon):
                 pixmap = icon.pixmap(16, 16)
-            elif isinstance(icon, QtGui.QPixmap):
+            elif isinstance(icon, QPixmap):
                 pixmap = icon
             else:
                 raise TypeError, '%s: bool, str, QIcon or QPixmap' % type(icon)
@@ -384,22 +385,22 @@ class StatusLabel(QtGui.QWidget):
     def clear_icon(self):
         self.status_icon.setHidden(True)
 
-class LabeledSeparator(QtGui.QWidget):
+class LabeledSeparator(QWidget):
 
     def __init__(self, label=None, parent=None):
-        QtGui.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
-        box = QtGui.QHBoxLayout()
+        box = QHBoxLayout()
         box.setContentsMargins(*(0,)*4)
 
         if label:
-            label = QtGui.QLabel(label)
+            label = QLabel(label)
             box.addWidget(label)
 
-        sep = QtGui.QFrame()
-        sep.setFrameShadow(QtGui.QFrame.Sunken)
-        sep.setFrameShape(QtGui.QFrame.HLine)
-        box.addWidget(sep, 1, QtCore.Qt.AlignVCenter)
+        sep = QFrame()
+        sep.setFrameShadow(QFrame.Sunken)
+        sep.setFrameShape(QFrame.HLine)
+        box.addWidget(sep, 1, Qt.AlignVCenter)
 
         self.setLayout(box)
 
@@ -450,24 +451,24 @@ class WidgetGroups(object):
 
 def fileEditor(filename):
     'Open a simple modal file editing dialog'
-    dialog = QtGui.QDialog()
-    dialog.setWindowFlags(dialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-    vbox = QtGui.QVBoxLayout()
+    dialog = QDialog()
+    dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+    vbox = QVBoxLayout()
     dialog.setLayout(vbox)
     editor = qsci()
     editor.setBraceMatching(qsci.SloppyBraceMatch)
     vbox.addWidget(editor)
-    BB = QtGui.QDialogButtonBox
-    bb = QtGui.QDialogButtonBox(BB.Save|BB.Cancel)
-    dialog.connect(bb, QtCore.SIGNAL('accepted()'),
-                   dialog, QtCore.SLOT('accept()'))
-    dialog.connect(bb, QtCore.SIGNAL('rejected()'),
-                   dialog, QtCore.SLOT('reject()'))
+    BB = QDialogButtonBox
+    bb = QDialogButtonBox(BB.Save|BB.Cancel)
+    dialog.connect(bb, SIGNAL('accepted()'),
+                   dialog, SLOT('accept()'))
+    dialog.connect(bb, SIGNAL('rejected()'),
+                   dialog, SLOT('reject()'))
     vbox.addWidget(bb)
     lexer = Qsci.QsciLexerProperties()
     editor.setLexer(lexer)
-    s = QtCore.QSettings()
-    ret = QtGui.QDialog.Rejected
+    s = QSettings()
+    ret = QDialog.Rejected
     try:
         contents = open(filename, 'rb').read()
         dialog.setWindowTitle(filename)
@@ -477,7 +478,7 @@ def fileEditor(filename):
         editor.setModified(False)
         dialog.restoreGeometry(s.value(geomname).toByteArray())
         ret = dialog.exec_()
-        if ret == QtGui.QDialog.Accepted:
+        if ret == QDialog.Accepted:
             f = util.atomictempfile(filename, 'wb', createmode=None)
             f.write(hglib.fromunicode(editor.text()))
             f.rename()
