@@ -10,8 +10,7 @@ import os
 from mercurial import url
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
 from tortoisehg.hgqt.pathedit import PathEditDialog
 
@@ -111,7 +110,7 @@ class RepoTreeView(QTreeView):
             act = self._actions[name]
             '''
             if icon:
-                act.setIcon(geticon(icon))
+                act.setIcon(qtlib.geticon(icon))
             '''
             if tip:
                 act.setStatusTip(tip)
@@ -170,6 +169,12 @@ class RepoTreeView(QTreeView):
 
     def removeSelected(self):
         if not self.selitem:
+            return
+        labels = [(QMessageBox.Yes, _('&Delete')),
+                  (QMessageBox.No, _('Cancel'))]
+        if not qtlib.QuestionMsgBox(_('Confirm Delete'), 
+            _('Delete the node and all its children?'),
+                 labels=labels, parent=self):
             return
         m = self.model()
         s = self.selitem
