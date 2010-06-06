@@ -10,14 +10,13 @@ import os
 
 from mercurial import hg, url
 
-from PyQt4 import QtCore, QtGui
-
-from PyQt4.QtCore import Qt, QVariant, QString
-
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 
 from tortoisehg.hgqt.settings import SettingsDialog
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 
 xmlClassMap = {
@@ -285,8 +284,8 @@ class RepoGroupItem(RepoTreeItem):
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:
-                s = QtGui.QApplication.style()
-                ico = s.standardIcon(QtGui.QStyle.SP_DirIcon)
+                s = QApplication.style()
+                ico = s.standardIcon(QStyle.SP_DirIcon)
                 return QVariant(ico)
             return QVariant()
         if column == 0:
@@ -323,8 +322,8 @@ class AllRepoGroupItem(RepoTreeItem):
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:
-                s = QtGui.QApplication.style()
-                ico = s.standardIcon(QtGui.QStyle.SP_DirIcon)
+                s = QApplication.style()
+                ico = s.standardIcon(QStyle.SP_DirIcon)
                 return QVariant(ico)
             return QVariant()
         if column == 0:
