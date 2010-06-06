@@ -11,8 +11,8 @@ import Queue
 import time
 import urllib2
 
-from PyQt4.QtCore import SIGNAL, pyqtSignal, QObject, QThread, QTimer
-from PyQt4.QtGui import QMessageBox, QInputDialog, QLineEdit
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from mercurial import ui, util, error, dispatch
 
