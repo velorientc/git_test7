@@ -5,10 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import Qt, QObject, pyqtSignal
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QLabel, QProgressBar
-from PyQt4.QtGui import QTextBrowser, QHBoxLayout, QGridLayout, QMessageBox
-from PyQt4.QtGui import QWidget, QVBoxLayout
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, localgettext
