@@ -7,9 +7,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import Qt, pyqtSignal
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout
-from PyQt4.QtGui import QComboBox, QLabel, QLayout, QCheckBox, QMessageBox
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from mercurial import hg, ui, error
 
