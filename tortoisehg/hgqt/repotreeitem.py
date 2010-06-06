@@ -127,7 +127,7 @@ class RepoTreeItem(object):
             ri = c.getRepoItem(reporoot)
             if ri:
                 return ri
-        return None                
+        return None
 
 
 class RepoItem(RepoTreeItem):
