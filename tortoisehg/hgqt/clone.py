@@ -9,10 +9,8 @@
 
 import os
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout
-from PyQt4.QtGui import QComboBox, QPushButton, QLabel, QLayout, QCheckBox
-from PyQt4.QtGui import QHBoxLayout, QLineEdit, QMessageBox
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from mercurial import ui
 
