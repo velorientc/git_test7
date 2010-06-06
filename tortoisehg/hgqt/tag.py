@@ -8,10 +8,8 @@
 import os
 import traceback
 
-from PyQt4.QtCore import Qt, pyqtSignal
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout
-from PyQt4.QtGui import QComboBox, QLabel, QLayout, QCheckBox, QGridLayout
-from PyQt4.QtGui import QLineEdit, QFrame
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from mercurial import hg, ui, error
 
