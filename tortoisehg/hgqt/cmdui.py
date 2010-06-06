@@ -367,3 +367,55 @@ class Dialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
+
+class Runner(QObject):
+    """A component for running Mercurial command without UI
+
+    This command runner doesn't show any UI element unless it gets a warning
+    or an error while the command is running.  Once an error or a warning is
+    received, it pops-up a small dialog which contains the command log.
+    """
+
+    commandStarted = pyqtSignal()
+    commandFinished = pyqtSignal(thread.DataWrapper)
+    commandCanceling = pyqtSignal()
+
+    def __init__(self, title=_('TortoiseHg'), parent=None):
+        super(Runner, self).__init__()
+
+        self.title = title
+        self.parent = parent
+
+        self.core = Core()
+        self.core.commandStarted.connect(lambda: self.commandStarted.emit())
+        self.core.commandFinished.connect(self.command_finished)
+        self.core.commandCanceling.connect(lambda: self.commandCanceling.emit())
+
+        self.core.output_text.setMinimumSize(460, 320)
+
+    ### Public Methods ###
+
+    def run(self, cmdline, *args):
+        self.core.run(cmdline, *args)
+
+    def cancel(self):
+        self.core.cancel()
+
+    def show_output(self, visible=True):
+        if not hasattr(self, 'dlg'):
+            self.dlg = QDialog(self.parent)
+            self.dlg.setWindowTitle(self.title)
+            flags = self.dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint
+            self.dlg.setWindowFlags(flags)
+            box = QVBoxLayout()
+            box.setContentsMargins(*(0,)*4)
+            box.addWidget(self.core.output_text)
+            self.dlg.setLayout(box)
+        self.dlg.setVisible(visible)
+
+    ### Signal Handler ###
+
+    def command_finished(self, wrapper):
+        if wrapper.data != 0:
+            self.show_output()
+        self.commandFinished.emit(wrapper)
