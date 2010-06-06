@@ -12,14 +12,12 @@ import tempfile
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import Qsci
+from PyQt4.Qsci import *
 from mercurial import extensions, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
-
-qsci = Qsci.QsciScintilla
 
 tmproot = None
 def gettempdir():
@@ -455,8 +453,8 @@ def fileEditor(filename):
     dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
     vbox = QVBoxLayout()
     dialog.setLayout(vbox)
-    editor = qsci()
-    editor.setBraceMatching(qsci.SloppyBraceMatch)
+    editor = QsciScintilla()
+    editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
     vbox.addWidget(editor)
     BB = QDialogButtonBox
     bb = QDialogButtonBox(BB.Save|BB.Cancel)
@@ -465,7 +463,7 @@ def fileEditor(filename):
     dialog.connect(bb, SIGNAL('rejected()'),
                    dialog, SLOT('reject()'))
     vbox.addWidget(bb)
-    lexer = Qsci.QsciLexerProperties()
+    lexer = QsciLexerProperties()
     editor.setLexer(lexer)
     s = QSettings()
     ret = QDialog.Rejected
