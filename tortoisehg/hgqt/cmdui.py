@@ -130,6 +130,9 @@ class Core(QObject):
         max = self.output_text.verticalScrollBar().maximum()
         self.output_text.verticalScrollBar().setSliderPosition(max)
 
+    def clear_output(self):
+        self.output_text.clear()
+
     ### Signal Handlers ###
 
     def command_started(self):
