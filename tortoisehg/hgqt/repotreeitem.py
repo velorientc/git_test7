@@ -248,11 +248,17 @@ class RepoPathItem(RepoTreeItem):
             return QVariant(path)
         return QVariant()
 
+    def setData(self, column, value):
+        if column == 0:
+            self._alias = str(value.toString())
+            return True
+        return False
+
     def menulist(self):
-        return ['pull', None, 'editpath' ]
+        return ['pull', None, 'editpath', None, 'rename' ]
 
     def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
     def removeRows(self, row, count):
         return False
