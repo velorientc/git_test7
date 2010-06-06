@@ -6,8 +6,8 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import sys, os, httplib, socket
-from PyQt4.QtCore import Qt, pyqtSlot
-from PyQt4.QtGui import QDialog, QSystemTrayIcon
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 from mercurial import extensions, hgweb, util
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
