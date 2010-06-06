@@ -9,8 +9,8 @@ import re
 import os
 import binascii
 
-from PyQt4.QtCore import Qt, QSize, QString, pyqtSignal
-from PyQt4.QtGui import QWidget, QLabel, QHBoxLayout, QPushButton
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from mercurial import patch, util, error
 from mercurial.node import hex
