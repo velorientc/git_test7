@@ -25,24 +25,26 @@ from tortoisehg.hgqt.qtlib import geticon
 
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4 import QtCore, QtGui
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
-nullvariant = QtCore.QVariant()
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+connect = QObject.connect
+nullvariant = QVariant()
+
 
 # XXX make this better than a poor hard written list...
 COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
-           "cyan", QtCore.Qt.darkYellow, "magenta", "darkred", "darkmagenta",
+           "cyan", Qt.darkYellow, "magenta", "darkred", "darkmagenta",
            "darkcyan", "gray", "yellow", ]
-COLORS = [str(QtGui.QColor(x).name()) for x in COLORS]
-#COLORS = [str(color) for color in QtGui.QColor.colorNames()]
+COLORS = [str(QColor(x).name()) for x in COLORS]
+#COLORS = [str(color) for color in QColor.colorNames()]
 
 def get_color(n, ignore=()):
     """
     Return a color at index 'n' rotating in the available
     colors. 'ignore' is a list of colors not to be chosen.
     """
-    ignore = [str(QtGui.QColor(x).name()) for x in ignore]
+    ignore = [str(QColor(x).name()) for x in ignore]
     colors = [x for x in COLORS if x not in ignore]
     if not colors: # ghh, no more available colors...
         colors = COLORS
@@ -54,7 +56,7 @@ def cvrt_date(date):
     formatted QString
     """
     date, tzdelay = date
-    return QtCore.QDateTime.fromTime_t(int(date)).toString(QtCore.Qt.LocaleDate)
+    return QDateTime.fromTime_t(int(date)).toString(Qt.LocaleDate)
 
 def gettags(model, ctx, gnode):
     if ctx.rev() is None:
@@ -122,7 +124,7 @@ def datacached(meth):
         return result
     return data
 
-class HgRepoListModel(QtCore.QAbstractTableModel):
+class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
@@ -135,7 +137,7 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         """
         repo is a hg repo instance
         """
-        QtCore.QAbstractTableModel.__init__(self, parent)
+        QAbstractTableModel.__init__(self, parent)
         self._datacache = {}
         self._hasmq = False
         self.mqueues = []
@@ -173,7 +175,7 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         self.emit(SIGNAL('layoutChanged()'))
         self.heads = [self.repo.changectx(x).rev() for x in self.repo.heads()]
         self.ensureBuilt(row=self.fill_step)
-        QtCore.QTimer.singleShot(0, Curry(self.emit, SIGNAL('filled')))
+        QTimer.singleShot(0, Curry(self.emit, SIGNAL('filled')))
         self._fill_timer = self.startTimer(50)
 
     def branch(self):
@@ -228,7 +230,7 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         currentlen = self.rowcount
         newlen = len(self.graph)
         if newlen > self.rowcount:
-            self.beginInsertRows(QtCore.QModelIndex(), currentlen, newlen-1)
+            self.beginInsertRows(QModelIndex(), currentlen, newlen-1)
             self.rowcount = newlen
             self.endInsertRows()
 
@@ -272,7 +274,7 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         if user in self._users:
             try:
                 color = self._users[user]['color']
-                color = QtGui.QColor(color).name()
+                color = QColor(color).name()
                 self._user_colors[user] = color
             except:
                 pass
@@ -301,19 +303,19 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
         column = self._columns[index.column()]
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
-        if role == QtCore.Qt.DisplayRole:
+        if role == Qt.DisplayRole:
             if column == 'Author': #author
-                return QtCore.QVariant(self.user_name(_columnmap[column](self, ctx, gnode)))
+                return QVariant(self.user_name(_columnmap[column](self, ctx, gnode)))
             elif column == 'Log':
                 msg = _columnmap[column](self, ctx, gnode)
-                return QtCore.QVariant(msg)
-            return QtCore.QVariant(_columnmap[column](self, ctx, gnode))
-        elif role == QtCore.Qt.ForegroundRole:
+                return QVariant(msg)
+            return QVariant(_columnmap[column](self, ctx, gnode))
+        elif role == Qt.ForegroundRole:
             if column == 'Author': #author
-                return QtCore.QVariant(QtGui.QColor(self.user_color(ctx.user())))
+                return QVariant(QColor(self.user_color(ctx.user())))
             if column == 'Branch': #branch
-                return QtCore.QVariant(QtGui.QColor(self.namedbranch_color(ctx.branch())))
-        elif role == QtCore.Qt.DecorationRole:
+                return QVariant(QColor(self.namedbranch_color(ctx.branch())))
+        elif role == Qt.DecorationRole:
             if column == 'Log':
                 radius = self.dot_radius
                 w = (gnode.cols)*(1*radius + 0) + 20
@@ -322,43 +324,43 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
                 dot_x = self.col2x(gnode.x) - radius / 2
                 dot_y = h / 2
 
-                pix = QtGui.QPixmap(w, h)
-                pix.fill(QtGui.QColor(0,0,0,0))
-                painter = QtGui.QPainter(pix)
-                painter.setRenderHint(QtGui.QPainter.Antialiasing)
+                pix = QPixmap(w, h)
+                pix.fill(QColor(0,0,0,0))
+                painter = QPainter(pix)
+                painter.setRenderHint(QPainter.Antialiasing)
 
-                pen = QtGui.QPen(QtCore.Qt.blue)
+                pen = QPen(Qt.blue)
                 pen.setWidth(2)
                 painter.setPen(pen)
 
-                lpen = QtGui.QPen(pen)
-                lpen.setColor(QtCore.Qt.black)
+                lpen = QPen(pen)
+                lpen.setColor(Qt.black)
                 painter.setPen(lpen)
 
                 for y1, y2, lines in ((0, h, gnode.bottomlines),
                                       (-h, 0, gnode.toplines)):
                     for start, end, color in lines:
-                        lpen = QtGui.QPen(pen)
-                        lpen.setColor(QtGui.QColor(get_color(color)))
+                        lpen = QPen(pen)
+                        lpen.setColor(QColor(get_color(color)))
                         lpen.setWidth(2)
                         painter.setPen(lpen)
                         x1 = self.col2x(start)
                         x2 = self.col2x(end)
                         painter.drawLine(x1, dot_y + y1, x2, dot_y + y2)
 
-                dot_color = QtGui.QColor(self.namedbranch_color(ctx.branch()))
-                dotcolor = QtGui.QColor(dot_color)
+                dot_color = QColor(self.namedbranch_color(ctx.branch()))
+                dotcolor = QColor(dot_color)
                 if gnode.rev in self.heads:
                     penradius = 2
                     pencolor = dotcolor.darker()
                 else:
                     penradius = 1
-                    pencolor = QtCore.Qt.black
+                    pencolor = Qt.black
 
                 dot_y = (h/2) - radius / 2
 
                 painter.setBrush(dotcolor)
-                pen = QtGui.QPen(pencolor)
+                pen = QPen(pencolor)
                 pen.setWidth(penradius)
                 painter.setPen(pen)
                 tags = set(ctx.tags())
@@ -374,13 +376,13 @@ class HgRepoListModel(QtCore.QAbstractTableModel):
                 else:
                     painter.drawEllipse(dot_x, dot_y, radius, radius)
                 painter.end()
-                ret = QtCore.QVariant(pix)
+                ret = QVariant(pix)
                 return ret
         return nullvariant
 
     def headerData(self, section, orientation, role):
-        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            return QtCore.QVariant(self._columns[section])
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(self._columns[section])
         return nullvariant
 
     def rowFromRev(self, rev):
