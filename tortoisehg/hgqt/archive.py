@@ -42,8 +42,8 @@ class ArchiveDialog(QDialog):
         self.vbox.addLayout(self.grid)
 
         # content selection
-        self.rev_lbl = QLabel(_('Archive revision:'))
-        self.rev_lbl.setAlignment(Qt.AlignRight)
+        self.rev_lbl = QLabel(_('Revision:'))
+        self.rev_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.rev_combo = QComboBox()
         self.rev_combo.setEditable(True)
         self.rev_combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -55,7 +55,7 @@ class ArchiveDialog(QDialog):
 
         # selecting a destination
         self.dest_lbl = QLabel(_('Destination path:'))
-        self.dest_lbl.setAlignment(Qt.AlignRight)
+        self.dest_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.dest_edit = QLineEdit()
         self.dest_edit.setMinimumWidth(300)
         self.dest_btn = QPushButton(_('Browse...'))
@@ -66,7 +66,7 @@ class ArchiveDialog(QDialog):
 
         # archive type selection
         self.types_lbl = QLabel(_('Archive types:'))
-        self.types_lbl.setAlignment(Qt.AlignRight)
+        self.types_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         def radio(label):
             return QRadioButton(label, None)
         self.filesradio = radio(_('Directory of files'))
@@ -85,7 +85,7 @@ class ArchiveDialog(QDialog):
 
         # some extras
         self.hgcmd_lbl = QLabel(_('Hg command:'))
-        self.hgcmd_lbl.setAlignment(Qt.AlignRight)
+        self.hgcmd_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)
         self.keep_open_chk = QCheckBox(_('Always show output'))
