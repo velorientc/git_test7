@@ -165,7 +165,8 @@ class Workbench(QMainWindow):
         sp.setHeightForWidth(tw.sizePolicy().hasHeightForWidth())
         tw.setSizePolicy(sp)
 
-        self.stackedWidget = QStackedWidget(self.repotabs_splitter)
+        self.stackedWidget = sw = QStackedWidget(self.repotabs_splitter)
+        sw.minimumSizeHint = lambda: QSize(0, 0)
 
         self.setCentralWidget(self.centralwidget)
 
