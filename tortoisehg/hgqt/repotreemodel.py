@@ -5,15 +5,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from PyQt4 import QtCore
-
-from PyQt4.QtCore import Qt, QVariant, SIGNAL, SLOT
-from PyQt4.QtCore import QModelIndex, QString
-
 from tortoisehg.hgqt.i18n import _
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
 from repotreeitem import RepoItem, RepoTreeItem
+
+from PyQt4.QtCore import *
 
 
 extractXmlElementName = 'reporegextract'
@@ -23,7 +20,7 @@ repoRegMimeType = 'application/thg-reporegistry'
 
 
 def writeXml(target, item, rootElementName):
-    xw = QtCore.QXmlStreamWriter(target)
+    xw = QXmlStreamWriter(target)
     xw.setAutoFormatting(True)
     xw.setAutoFormattingIndent(2)
     xw.writeStartDocument()
@@ -34,7 +31,7 @@ def writeXml(target, item, rootElementName):
 
 def readXml(source, rootElementName, model):
     itemread = None
-    xr = QtCore.QXmlStreamReader(source)
+    xr = QXmlStreamReader(source)
     if xr.readNextStartElement():
         ele = str(xr.name().toString())
         if ele != rootElementName:
@@ -51,9 +48,9 @@ def readXml(source, rootElementName, model):
     return itemread
 
 
-class RepoTreeModel(QtCore.QAbstractItemModel):
+class RepoTreeModel(QAbstractItemModel):
     def __init__(self, openrepofunc, ui, filename=None, parent=None):
-        QtCore.QAbstractItemModel.__init__(self, parent)
+        QAbstractItemModel.__init__(self, parent)
 
         self.openrepofunc = openrepofunc
         self.ui = ui
@@ -62,8 +59,8 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         all = None
 
         if filename:
-            f = QtCore.QFile(filename)
-            if f.open(QtCore.QIODevice.ReadOnly):
+            f = QFile(filename)
+            if f.open(QIODevice.ReadOnly):
                 root = readXml(f, reporegistryXmlElementName, self)
                 f.close()
                 if root:
@@ -156,14 +153,14 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         return res
 
     def mimeTypes(self):
-        return QtCore.QStringList(repoRegMimeType)
+        return QStringList(repoRegMimeType)
 
     def mimeData(self, indexes):
         i = indexes[0]
         item = i.internalPointer()
-        buf = QtCore.QByteArray()
+        buf = QByteArray()
         writeXml(buf, item, extractXmlElementName)
-        d = QtCore.QMimeData()
+        d = QMimeData()
         d.setData(repoRegMimeType, buf)
         return d
 
@@ -213,7 +210,7 @@ class RepoTreeModel(QtCore.QAbstractItemModel):
         self.endInsertRows()
 
     def write(self, fn):
-        f = QtCore.QFile(fn)
-        f.open(QtCore.QIODevice.WriteOnly)
+        f = QFile(fn)
+        f.open(QIODevice.WriteOnly)
         writeXml(f, self.rootItem, reporegistryXmlElementName)
         f.close()
