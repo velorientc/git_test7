@@ -10,8 +10,6 @@
 
 import os
 
-from PyQt4 import QtCore, QtGui
-
 from mercurial import hg
 
 from tortoisehg.util.util import has_closed_branch_support
@@ -26,16 +24,16 @@ from tortoisehg.hgqt.config import HgConfig
 from repoview import HgRepoView
 from revdetailswidget import RevDetailsWidget
 
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
-Qt = QtCore.Qt
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
+connect = QObject.connect
 
 
-class RepoWidget(QtGui.QWidget):
+class RepoWidget(QWidget):
 
-    showMessageSignal = QtCore.pyqtSignal(str)
-    switchToSignal = QtCore.pyqtSignal(QtGui.QWidget)
+    showMessageSignal = pyqtSignal(str)
+    switchToSignal = pyqtSignal(QWidget)
 
     def __init__(self, repo, stackedWidget, commitWidget):
         self.repo = repo
@@ -50,7 +48,7 @@ class RepoWidget(QtGui.QWidget):
         self.currentMessage = ''
         self.currenWidget = None
 
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
         
         self.load_config()
         self.setupUi()
@@ -67,9 +65,9 @@ class RepoWidget(QtGui.QWidget):
         self.restoreSettings()
 
     def setupUi(self):
-        SP = QtGui.QSizePolicy
+        SP = QSizePolicy
 
-        self.hbox = QtGui.QHBoxLayout(self)
+        self.hbox = QHBoxLayout(self)
         self.hbox.setSpacing(0)
         self.hbox.setMargin(0)
 
@@ -80,7 +78,7 @@ class RepoWidget(QtGui.QWidget):
         sp.setVerticalStretch(1)
         sp.setHeightForWidth(self.repoview.sizePolicy().hasHeightForWidth())
         self.repoview.setSizePolicy(sp)
-        self.repoview.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.repoview.setFrameShape(QFrame.StyledPanel)
 
         w = RevDetailsWidget(self.repo, self.repoview)
         self.stackedWidget.addWidget(w)
@@ -90,7 +88,7 @@ class RepoWidget(QtGui.QWidget):
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
         fontstr = cfg.getFont()
-        font = QtGui.QFont()
+        font = QFont()
         try:
             if not font.fromString(fontstr):
                 raise Exception
@@ -115,7 +113,7 @@ class RepoWidget(QtGui.QWidget):
             self.showMessageSignal.emit(msg)
 
     def showEvent(self, event):
-        QtGui.QWidget.showEvent(self, event)
+        QWidget.showEvent(self, event)
         self.showMessageSignal.emit(self.currentMessage)
 
     def timerEvent(self, event):
@@ -136,7 +134,7 @@ class RepoWidget(QtGui.QWidget):
         self._loading = False
 
     def createActions(self):
-        self.actionActivateRev = QtGui.QAction('Activate rev.', self)
+        self.actionActivateRev = QAction('Activate rev.', self)
         self.actionActivateRev.setShortcuts([Qt.SHIFT+Qt.Key_Return, Qt.SHIFT+Qt.Key_Enter])
         connect(self.actionActivateRev, SIGNAL('triggered()'),
                 self.revision_activated)
@@ -309,14 +307,14 @@ class RepoWidget(QtGui.QWidget):
             self.stackedWidget.setCurrentWidget(self.currenWidget)
 
     def storeSettings(self):
-        s = QtCore.QSettings()
+        s = QSettings()
         wb = "RepoWidget/"
         for n in self.splitternames:
             s.setValue(wb + n, getattr(self, n).saveState())
         self.revDetailsWidget.storeSettings()
 
     def restoreSettings(self):
-        s = QtCore.QSettings()
+        s = QSettings()
         wb = "RepoWidget/"
         for n in self.splitternames:
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
@@ -331,6 +329,6 @@ class RepoWidget(QtGui.QWidget):
             # assuming here that there is at most one RepoWidget visible
             self.storeSettings()
         self.stackedWidget.removeWidget(self.revDetailsWidget)
-        s = QtCore.QSettings()
+        s = QSettings()
         self.commitWidget.storeConfigs(s)
         return True
