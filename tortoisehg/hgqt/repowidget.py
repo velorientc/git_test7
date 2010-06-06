@@ -18,7 +18,7 @@ from tortoisehg.hgqt.i18n import _
 
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.repomodel import HgRepoListModel
-from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout
+from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
 from tortoisehg.hgqt.config import HgConfig
 
 from repoview import HgRepoView
@@ -183,6 +183,7 @@ class RepoWidget(QWidget):
         connect(view, SIGNAL('revisionSelected'), self.revision_selected)
         connect(view, SIGNAL('revisionActivated'), self.revision_activated)
         connect(view, SIGNAL('updateToRevision'), self.updateToRevision)
+        connect(view, SIGNAL('mergeWithRevision'), self.mergeWithRevision)
         connect(view, SIGNAL('tagToRevision'), self.tagToRevision)
         connect(view, SIGNAL('backoutToRevision'), self.backoutToRevision)
         #self.attachQuickBar(view.goto_toolbar)
@@ -222,6 +223,17 @@ class RepoWidget(QWidget):
                 self.reload()  # TODO: implement something less drastic than a full reload
             self.setScanForRepoChanges(saved)
         dlg.quitsignal.connect(quit)
+        dlg.show()
+
+    def mergeWithRevision(self, rev):
+        saved = self.setScanForRepoChanges(False)
+        dlg = merge.MergeDialog(rev, self.repo, self)
+        def finished(ret):
+            self.setScanForRepoChanges(saved)
+        dlg.finished.connect(finished)
+        def invalidated():
+            self.reload() # TODO: implement something less drastic than a full reload
+        dlg.repoInvalidated.connect(invalidated)
         dlg.show()
 
     def tagToRevision(self, rev):

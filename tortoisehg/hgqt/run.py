@@ -373,6 +373,11 @@ def email(ui, *pats, **opts):
     from tortoisehg.hgqt.hgemail import run
     qtrun(run, ui, *pats, **opts)
 
+def merge(ui, *pats, **opts):
+    """merge wizard"""
+    from tortoisehg.hgqt.merge import run
+    qtrun(run, ui, *pats, **opts)
+
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
     from tortoisehg.hgqt.guess import run
@@ -725,6 +730,10 @@ table = {
         (log,
          [('l', 'limit', '', _('limit number of changes displayed'))],
          _('thg log [OPTIONS] [FILE]')),
+    "^merge":
+        (merge, 
+         [('r', 'rev', '', _('revision to merge'))],
+         _('thg merge [[-r] REV]')),
     "remove|rm": (remove, [], _('thg remove [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
