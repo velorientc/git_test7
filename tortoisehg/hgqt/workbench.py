@@ -13,9 +13,6 @@ Main Qt4 application for TortoiseHg
 
 import os
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
 from mercurial import hg
 from mercurial.error import RepoError
 
@@ -35,7 +32,8 @@ from tortoisehg.hgqt.reporegistry import RepoRegistryView
 
 from tortoisehg.util import paths
 
-from mercurial.error import RepoError
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 connect = QObject.connect
 
