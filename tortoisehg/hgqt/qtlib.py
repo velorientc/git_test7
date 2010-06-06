@@ -403,6 +403,51 @@ class LabeledSeparator(QtGui.QWidget):
 
         self.setLayout(box)
 
+class WidgetGroups(object):
+    """ Support for bulk-updating properties of Qt widgets """
+
+    def __init__(self):
+        object.__init__(self)
+
+        self.clear(all=True)
+
+    ### Public Methods ###
+
+    def add(self, widget, group='default'):
+        if group not in self.groups:
+            self.groups[group] = []
+        widgets = self.groups[group]
+        if widget not in widgets:
+            widgets.append(widget)
+
+    def remove(self, widget, group='default'):
+        if group not in self.groups:
+            return
+        widgets = self.groups[group]
+        if widget in widgets:
+            widgets.remove(widget)
+
+    def clear(self, group='default', all=True):
+        if all:
+            self.groups = {}
+        else:
+            del self.groups[group]
+
+    def set_prop(self, prop, value, group='default', cond=None):
+        if group not in self.groups:
+            return
+        widgets = self.groups[group]
+        if callable(cond):
+            widgets = [w for w in widgets if cond(w)]
+        for widget in widgets:
+            getattr(widget, prop)(value)
+
+    def set_visible(self, *args, **kargs):
+        self.set_prop('setVisible', *args, **kargs)
+
+    def set_enable(self, *args, **kargs):
+        self.set_prop('setEnabled', *args, **kargs)
+
 def fileEditor(filename):
     'Open a simple modal file editing dialog'
     dialog = QtGui.QDialog()
