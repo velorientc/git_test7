@@ -9,8 +9,8 @@
 
 import os, tempfile, re
 from StringIO import StringIO
-from PyQt4.QtCore import Qt, pyqtSlot, QAbstractTableModel, QVariant, QModelIndex
-from PyQt4.QtGui import QDialog
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 from mercurial import hg, error, extensions, util, cmdutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
