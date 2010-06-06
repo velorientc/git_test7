@@ -33,5 +33,6 @@
     <file>icons/update.svg</file>
     <file>icons/sync.svg</file>
     <file>icons/merge.svg</file>
+    <file>icons/rename.svg</file>
   </qresource>
 </RCC>
