@@ -14,6 +14,7 @@ from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
 from tortoisehg.hgqt.repotreeitem import RepoPathItem
 from tortoisehg.hgqt.pathedit import PathEditDialog
+from tortoisehg.hgqt.clone import CloneDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -99,6 +100,8 @@ class RepoTreeView(QTreeView):
                 _("Pull from remote"), None, self.pull),
              ("editpath", _("Edit URL"), None, 
                 _("Edit Repository URL"), None, self.editPath),
+             ("clone", _("Clone"), None, 
+                _("Clone Repository"), None, self.cloneRepo),
              ]
         return a
 
@@ -190,6 +193,13 @@ class RepoTreeView(QTreeView):
         row = s.row()
         parent = s.parent()
         m.removeRows(row, 1, parent)
+
+    def cloneRepo(self):
+        if not self.selitem:
+            return
+        root = self.selitem.internalPointer().rootpath()
+        d = CloneDialog(args=[root], parent=self)
+        d.exec_()
 
 
 class RepoRegistryView(QDockWidget):

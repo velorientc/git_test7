@@ -20,8 +20,8 @@ from tortoisehg.hgqt import cmdui, qtlib
 
 class CloneDialog(QDialog):
 
-    def __init__(self, args=None, opts={}):
-        super(CloneDialog, self).__init__()
+    def __init__(self, args=None, opts={}, parent=None):
+        super(CloneDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui = ui.ui()
 
