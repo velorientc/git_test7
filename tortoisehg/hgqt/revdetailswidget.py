@@ -8,8 +8,6 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
-from PyQt4 import QtCore, QtGui
-
 from mercurial import hg
 
 from tortoisehg.hgqt.i18n import _
@@ -22,15 +20,16 @@ from fileview import HgFileView
 from revpanelwidget import RevPanelWidget
 from revmessage import RevMessage
 
-Qt = QtCore.Qt
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+connect = QObject.connect
 
 
-class RevDetailsWidget(QtGui.QWidget):
+class RevDetailsWidget(QWidget):
 
-    showMessageSignal = QtCore.pyqtSignal(str)
-    revisionLinkClicked = QtCore.pyqtSignal(str)
+    showMessageSignal = pyqtSignal(str)
+    revisionLinkClicked = pyqtSignal(str)
 
     def __init__(self, repo, repoview):
         self.repo = repo
@@ -41,7 +40,7 @@ class RevDetailsWidget(QtGui.QWidget):
 
         self.splitternames = []
 
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
         
         self.load_config()
 
@@ -59,9 +58,9 @@ class RevDetailsWidget(QtGui.QWidget):
         self.restoreSettings()
 
     def setupUi(self):
-        SP = QtGui.QSizePolicy
+        SP = QSizePolicy
 
-        self.hbox = QtGui.QHBoxLayout(self)
+        self.hbox = QHBoxLayout(self)
         self.hbox.setSpacing(0)
         self.hbox.setMargin(0)
 
@@ -70,22 +69,22 @@ class RevDetailsWidget(QtGui.QWidget):
         self.hbox.addWidget(self.revisionDetailsWidget)
 
     def setupRevisionDetailsWidget(self):
-        SP = QtGui.QSizePolicy
+        SP = QSizePolicy
 
-        self.revisionDetailsWidget = QtGui.QFrame()
+        self.revisionDetailsWidget = QFrame()
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(self.revisionDetailsWidget.sizePolicy().hasHeightForWidth())
         self.revisionDetailsWidget.setSizePolicy(sp)
-        self.revisionDetailsWidget.setFrameShape(QtGui.QFrame.NoFrame)
-        self.revisionDetailsWidget.setFrameShadow(QtGui.QFrame.Plain)
+        self.revisionDetailsWidget.setFrameShape(QFrame.NoFrame)
+        self.revisionDetailsWidget.setFrameShadow(QFrame.Plain)
 
-        revisiondetails_layout = QtGui.QVBoxLayout(self.revisionDetailsWidget)
+        revisiondetails_layout = QVBoxLayout(self.revisionDetailsWidget)
         revisiondetails_layout.setSpacing(0)
         revisiondetails_layout.setMargin(0)
 
-        self.filelist_splitter = QtGui.QSplitter(self.revisionDetailsWidget)
+        self.filelist_splitter = QSplitter(self.revisionDetailsWidget)
         self.splitternames.append('filelist_splitter')
 
         sp = SP(SP.Expanding, SP.Expanding)
@@ -93,35 +92,35 @@ class RevDetailsWidget(QtGui.QWidget):
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(self.filelist_splitter.sizePolicy().hasHeightForWidth())
         self.filelist_splitter.setSizePolicy(sp)
-        self.filelist_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.filelist_splitter.setOrientation(Qt.Horizontal)
         self.filelist_splitter.setChildrenCollapsible(False)
 
         self.tableView_filelist = HgFileListView(self.filelist_splitter)
 
-        self.cset_and_file_details_frame = QtGui.QFrame(self.filelist_splitter)
+        self.cset_and_file_details_frame = QFrame(self.filelist_splitter)
         sp = SP(SP.Preferred, SP.Preferred)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(
             self.cset_and_file_details_frame.sizePolicy().hasHeightForWidth())
         self.cset_and_file_details_frame.setSizePolicy(sp)
-        self.cset_and_file_details_frame.setFrameShape(QtGui.QFrame.NoFrame)
+        self.cset_and_file_details_frame.setFrameShape(QFrame.NoFrame)
 
-        vbox = QtGui.QVBoxLayout(self.cset_and_file_details_frame)
+        vbox = QVBoxLayout(self.cset_and_file_details_frame)
         vbox.setSpacing(0)
-        vbox.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
+        vbox.setSizeConstraint(QLayout.SetDefaultConstraint)
         vbox.setMargin(0)
         cset_and_file_details_layout = vbox
 
-        self.message_splitter = QtGui.QSplitter(self.cset_and_file_details_frame)
+        self.message_splitter = QSplitter(self.cset_and_file_details_frame)
         self.splitternames.append('message_splitter')
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(self.message_splitter.sizePolicy().hasHeightForWidth())
         self.message_splitter.setSizePolicy(sp)
-        self.message_splitter.setMinimumSize(QtCore.QSize(50, 50))
-        self.message_splitter.setFrameShape(QtGui.QFrame.NoFrame)
+        self.message_splitter.setMinimumSize(QSize(50, 50))
+        self.message_splitter.setFrameShape(QFrame.NoFrame)
         self.message_splitter.setLineWidth(0)
         self.message_splitter.setMidLineWidth(0)
         self.message_splitter.setOrientation(Qt.Vertical)
@@ -134,8 +133,8 @@ class RevDetailsWidget(QtGui.QWidget):
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(self.message.sizePolicy().hasHeightForWidth())
         self.message.setSizePolicy(sp)
-        self.message.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
+        self.message.setMinimumSize(QSize(0, 0))
+        font = QFont()
         font.setFamily("Courier")
         font.setPointSize(9)
         self.message.setFont(font)
@@ -146,7 +145,7 @@ class RevDetailsWidget(QtGui.QWidget):
         sp.setVerticalStretch(1)
         sp.setHeightForWidth(self.fileview.sizePolicy().hasHeightForWidth())
         self.fileview.setSizePolicy(sp)
-        self.fileview.setMinimumSize(QtCore.QSize(0, 0))
+        self.fileview.setMinimumSize(QSize(0, 0))
 
         self.revpanel = RevPanelWidget(self.repo, self.repoview)
 
@@ -158,7 +157,7 @@ class RevDetailsWidget(QtGui.QWidget):
     def load_config(self):
         cfg = HgConfig(self.repo.ui)
         fontstr = cfg.getFont()
-        font = QtGui.QFont()
+        font = QFont()
         try:
             if not font.fromString(fontstr):
                 raise Exception
@@ -183,36 +182,36 @@ class RevDetailsWidget(QtGui.QWidget):
             self.showMessageSignal.emit(msg)
 
     def showEvent(self, event):
-        QtGui.QWidget.showEvent(self, event)
+        QWidget.showEvent(self, event)
         self.showMessageSignal.emit(self.currentMessage)
 
     def createActions(self):
         # navigate in file viewer
-        self.actionNextLine = QtGui.QAction('Next line', self)
+        self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
         connect(self.actionNextLine, SIGNAL('triggered()'),
                 self.fileview.nextLine)
         self.addAction(self.actionNextLine)
-        self.actionPrevLine = QtGui.QAction('Prev line', self)
+        self.actionPrevLine = QAction('Prev line', self)
         self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
         connect(self.actionPrevLine, SIGNAL('triggered()'),
                 self.fileview.prevLine)
         self.addAction(self.actionPrevLine)
-        self.actionNextCol = QtGui.QAction('Next column', self)
+        self.actionNextCol = QAction('Next column', self)
         self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
         connect(self.actionNextCol, SIGNAL('triggered()'),
                 self.fileview.nextCol)
         self.addAction(self.actionNextCol)
-        self.actionPrevCol = QtGui.QAction('Prev column', self)
+        self.actionPrevCol = QAction('Prev column', self)
         self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
         connect(self.actionPrevCol, SIGNAL('triggered()'),
                 self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
         # Activate file (file diff navigator)
-        self.actionActivateFile = QtGui.QAction('Activate file', self)
+        self.actionActivateFile = QAction('Activate file', self)
 
-        self.actionActivateFileAlt = QtGui.QAction('Activate alt. file', self)
+        self.actionActivateFileAlt = QAction('Activate alt. file', self)
         self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return, Qt.ALT+Qt.Key_Enter])
         connect(self.actionActivateFileAlt, SIGNAL('triggered()'),
                 lambda self=self:
@@ -254,7 +253,7 @@ class RevDetailsWidget(QtGui.QWidget):
 
     def on_filled(self):
         self.tableView_filelist.selectFile(self._reload_file)
- 
+
     def file_displayed(self, filename):
         #self.actionPrevDiff.setEnabled(False)
         pass
@@ -275,14 +274,14 @@ class RevDetailsWidget(QtGui.QWidget):
         self.setupModels(self.repomodel)
 
     def storeSettings(self):
-        s = QtCore.QSettings()
+        s = QSettings()
         wb = "RevDetailsWidget/"
         for n in self.splitternames:
             s.setValue(wb + n, getattr(self, n).saveState())
         s.setValue(wb + 'revpanel.expanded', self.revpanel.is_expanded())
 
     def restoreSettings(self):
-        s = QtCore.QSettings()
+        s = QSettings()
         wb = "RevDetailsWidget/"
         for n in self.splitternames:
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
