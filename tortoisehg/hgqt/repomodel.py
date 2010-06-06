@@ -293,7 +293,7 @@ class HgRepoListModel(QAbstractTableModel):
         return self._branch_colors[branch]
 
     def col2x(self, col):
-        return (1.2*self.dot_radius + 0) * col + self.dot_radius/2 + 3
+        return 2 * self.dot_radius * col + self.dot_radius/2 + 3
 
     @datacached
     def data(self, index, role):
@@ -321,7 +321,7 @@ class HgRepoListModel(QAbstractTableModel):
         elif role == Qt.DecorationRole:
             if column == 'Log':
                 radius = self.dot_radius
-                w = (gnode.cols)*(1*radius + 0) + 20
+                w = self.col2x(gnode.cols) + 10
                 h = self.rowheight
 
                 dot_x = self.col2x(gnode.x) - radius / 2
