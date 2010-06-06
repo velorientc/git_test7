@@ -211,7 +211,7 @@ class RepoPathsItem(RepoTreeItem):
         return False
 
     def menulist(self):
-        return []
+        return ['newPath']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable

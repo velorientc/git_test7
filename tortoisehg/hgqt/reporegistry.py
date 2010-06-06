@@ -12,6 +12,7 @@ from mercurial import url
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
+from tortoisehg.hgqt.repotreeitem import RepoPathItem
 from tortoisehg.hgqt.pathedit import PathEditDialog
 
 from PyQt4.QtCore import *
@@ -86,6 +87,8 @@ class RepoTreeView(QTreeView):
                 _("Opens the repository in a new tab"), None, self.open),
              ("newGroup", _("New Group"), None, 
                 _("Create a new group"), None, self.newGroup),
+             ("newPath", _("New URL"), None,
+                _("Create a Repository URL Entry"), None, self.newPath),
              ("rename", _("Rename"), None, 
                 _("Rename the entry"), None, self.startRename),
              ("settings", _("Settings"), None, 
@@ -166,6 +169,16 @@ class RepoTreeView(QTreeView):
     def newGroup(self):
         m = self.model()
         m.addGroup(_('New Group'))
+
+    def newPath(self):
+        if not self.selitem:
+            return
+        m = self.model()
+        i = self.selitem.internalPointer()
+        cc = i.childCount()
+        m.beginInsertRows(self.selitem, cc, cc + 1)
+        i.appendChild(RepoPathItem(m, alias='new'))
+        m.endInsertRows()
 
     def removeSelected(self):
         if not self.selitem:
