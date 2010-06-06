@@ -11,7 +11,7 @@ import os
 from mercurial import hg, url
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt import qtlib
 
 from tortoisehg.hgqt.settings import SettingsDialog
 
@@ -129,6 +129,9 @@ class RepoTreeItem(object):
                 return ri
         return None
 
+    def okToDelete(self, parentWidget):
+        return True
+
 
 class RepoItem(RepoTreeItem):
     def __init__(self, model, rootpath='', parent=None):
@@ -149,7 +152,7 @@ class RepoItem(RepoTreeItem):
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:
-                ico = geticon('hg')
+                ico = qtlib.geticon('hg')
                 return QVariant(ico)
             return QVariant()
         if column == 0:
@@ -238,7 +241,7 @@ class RepoPathItem(RepoTreeItem):
     def data(self, column, role):
         if role == Qt.DecorationRole:
             if column == 0:
-                ico = geticon('sync')
+                ico = qtlib.geticon('sync')
                 return QVariant(ico)
             return QVariant()
         if column == 0:
@@ -319,6 +322,14 @@ class RepoGroupItem(RepoTreeItem):
         a = xr.attributes()
         self.name = a.value('', 'name').toString()
         RepoTreeItem.undump(self, xr)
+
+    def okToDelete(self, parentWidget):
+        labels = [(QMessageBox.Yes, _('&Delete')),
+                  (QMessageBox.No, _('Cancel'))]
+        return qtlib.QuestionMsgBox(
+            _('Confirm Delete'), 
+            _("Delete Group '%s' and all its entries?") % self.name,
+            labels=labels, parent=parentWidget)
 
 
 class AllRepoGroupItem(RepoTreeItem):

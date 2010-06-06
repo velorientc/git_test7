@@ -170,14 +170,10 @@ class RepoTreeView(QTreeView):
     def removeSelected(self):
         if not self.selitem:
             return
-        labels = [(QMessageBox.Yes, _('&Delete')),
-                  (QMessageBox.No, _('Cancel'))]
-        if not qtlib.QuestionMsgBox(_('Confirm Delete'), 
-            _('Delete the node and all its children?'),
-                 labels=labels, parent=self):
+        s = self.selitem
+        if not s.internalPointer().okToDelete(self):
             return
         m = self.model()
-        s = self.selitem
         row = s.row()
         parent = s.parent()
         m.removeRows(row, 1, parent)
