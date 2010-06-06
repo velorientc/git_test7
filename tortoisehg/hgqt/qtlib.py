@@ -482,6 +482,6 @@ def fileEditor(filename):
             f.rename()
         s.setValue(geomname, dialog.saveGeometry())
     except EnvironmentError, e:
-        qtlib.WarningMsgBox(_('Unable to read/write config file'),
-               hglib.tounicode(e), parent=dialog)
+        WarningMsgBox(_('Unable to read/write config file'),
+                      hglib.tounicode(e), parent=dialog)
     return ret
