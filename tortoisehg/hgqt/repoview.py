@@ -16,14 +16,15 @@
 
 from mercurial.error import RepoError
 
-from PyQt4 import QtCore, QtGui
-Qt = QtCore.Qt
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
-
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.quickbar import QuickBar
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+connect = QObject.connect
+
 
 class GotoQuickBar(QuickBar):
     def __init__(self, parent):
@@ -31,7 +32,7 @@ class GotoQuickBar(QuickBar):
 
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
-        self._actions['go'] = QtGui.QAction("Go", self)
+        self._actions['go'] = QAction("Go", self)
         connect(self._actions['go'], SIGNAL('triggered()'),
                 self.goto)
 
@@ -40,9 +41,9 @@ class GotoQuickBar(QuickBar):
 
     def createContent(self):
         QuickBar.createContent(self)
-        self.compl_model = QtGui.QStringListModel(['tip'])
-        self.completer = QtGui.QCompleter(self.compl_model, self)
-        self.entry = QtGui.QLineEdit(self)
+        self.compl_model = QStringListModel(['tip'])
+        self.completer = QCompleter(self.compl_model, self)
+        self.entry = QLineEdit(self)
         self.entry.setCompleter(self.completer)
         self.addWidget(self.entry)
         self.addAction(self._actions['go'])
@@ -61,19 +62,19 @@ class GotoQuickBar(QuickBar):
         # QObject::startTimer: QTimer can only be used with threads started with QThread
         self.entry.setCompleter(None)
 
-class HgRepoView(QtGui.QTableView):
+class HgRepoView(QTableView):
     """
     A QTableView for displaying a HgRepoListModel,
     with actions, shortcuts, etc.
     """
     def __init__(self, parent=None):
-        QtGui.QTableView.__init__(self, parent)
+        QTableView.__init__(self, parent)
         self.init_variables()
         self.setShowGrid(False)
         self.verticalHeader().hide()
         self.verticalHeader().setDefaultSectionSize(20)
-        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.createActions()
         self.createToolbars()
@@ -93,7 +94,7 @@ class HgRepoView(QtGui.QTableView):
         if event.button() == Qt.MidButton:
             self.gotoAncestor(index)
             return
-        QtGui.QTableView.mousePressEvent(self, event)
+        QTableView.mousePressEvent(self, event)
 
     def createToolbars(self):
         self.goto_toolbar = tb = GotoQuickBar(self)
@@ -102,10 +103,10 @@ class HgRepoView(QtGui.QTableView):
 
     def _action_defs(self):
         a = [('back', _('Back'), 'back', None,
-              QtGui.QKeySequence(QtGui.QKeySequence.Back),
+              QKeySequence(QKeySequence.Back),
               self.back),
              ('forward', _('Forward'), 'forward', None,
-              QtGui.QKeySequence(QtGui.QKeySequence.Forward),
+              QKeySequence(QKeySequence.Forward),
               self.forward),
              ('manifest', _('Show at rev...'), None,
               _('Show the manifest at selected revision'), None,
@@ -124,8 +125,8 @@ class HgRepoView(QtGui.QTableView):
     def createActions(self):
         self._actions = {}
         for name, desc, icon, tip, key, cb in self._action_defs():
-            self._actions[name] = QtGui.QAction(desc, self)
-        QtCore.QTimer.singleShot(0, self.configureActions)
+            self._actions[name] = QAction(desc, self)
+        QTimer.singleShot(0, self.configureActions)
 
     def configureActions(self):
         for name, desc, icon, tip, key, cb in self._action_defs():
@@ -156,7 +157,7 @@ class HgRepoView(QtGui.QTableView):
         self.emit(SIGNAL('backoutToRevision'), self.current_rev)
 
     def contextMenuEvent(self, event):
-        menu = QtGui.QMenu(self)
+        menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
                     None, 'back', 'forward']:
             if act:
@@ -178,24 +179,24 @@ class HgRepoView(QtGui.QTableView):
 
     def setModel(self, model):
         self.init_variables()
-        QtGui.QTableView.setModel(self, model)
+        QTableView.setModel(self, model)
         connect(self.selectionModel(),
-                QtCore.SIGNAL('currentRowChanged (const QModelIndex & , const QModelIndex & )'),
+                SIGNAL('currentRowChanged (const QModelIndex & , const QModelIndex & )'),
                 self.revisionSelected)
         self.goto_toolbar.compl_model.setStringList(model.repo.tags().keys())
         col = list(model._columns).index('Log')
-        self.horizontalHeader().setResizeMode(col, QtGui.QHeaderView.Stretch)
+        self.horizontalHeader().setResizeMode(col, QHeaderView.Stretch)
 
     def enableAutoResize(self, *args):
         self._autoresize =  True
 
     def disableAutoResize(self, *args):
         self._autoresize =  False
-        QtCore.QTimer.singleShot(100, self.enableAutoResize)
+        QTimer.singleShot(100, self.enableAutoResize)
 
     def resizeEvent(self, event):
         # we catch this event to resize smartly tables' columns
-        QtGui.QTableView.resizeEvent(self, event)
+        QTableView.resizeEvent(self, event)
         if self._autoresize:
             self.resizeColumns()
 
@@ -206,7 +207,7 @@ class HgRepoView(QtGui.QTableView):
         if not model:
             return
         col1_width = self.viewport().width()
-        fontm = QtGui.QFontMetrics(self.font())
+        fontm = QFontMetrics(self.font())
         tot_stretch = 0.0
         for c in range(model.columnCount()):
             if model._columns[c] in model._stretchs:
