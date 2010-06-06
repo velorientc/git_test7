@@ -95,8 +95,8 @@ class RepoTreeView(QTreeView):
                 _("Remove the entry"), None, self.removeSelected),
              ("pull", _("Pull"), None, 
                 _("Pull from remote"), None, self.pull),
-             ("editpath", _("Edit"), None, 
-                _("Edit Path"), None, self.editPath),
+             ("editpath", _("Edit URL"), None, 
+                _("Edit Repository URL"), None, self.editPath),
              ]
         return a
 

@@ -20,7 +20,7 @@ class PathEditDialog(QDialog):
         layout = QVBoxLayout()
 
         self.setLayout(layout)
-        self.setWindowTitle(_("Edit Path"))
+        self.setWindowTitle(_("Edit Repository URL"))
 
         form = QFormLayout()
         layout.addLayout(form)
