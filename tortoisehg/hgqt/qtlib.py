@@ -189,13 +189,15 @@ def getpixmap(name, width=16, height=16):
     return pixmap
 
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Close,
-                 labels=[], parent=None):
+                 labels=[], parent=None, defaultbutton=None):
     msg = QMessageBox(parent)
     msg.setIcon(icon)
     msg.setWindowTitle(title)
     msg.setStandardButtons(buttons)
     for button_id, label in labels:
         msg.setButtonText(button_id, label)
+    if defaultbutton:
+        msg.setDefaultButton(defaultbutton)
     msg.setText('<b>%s</b>' % main)
     info = ''
     for line in text.split('\n'):
