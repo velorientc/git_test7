@@ -168,6 +168,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
         self._user_colors = {}
         self._branch_colors = {}
+        self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor', False)
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
         self.graph = Graph(self.repo, grapher, self.max_file_size)
@@ -312,7 +313,9 @@ class HgRepoListModel(QAbstractTableModel):
             return QVariant(_columnmap[column](self, ctx, gnode))
         elif role == Qt.ForegroundRole:
             if column == 'Author': #author
-                return QVariant(QColor(self.user_color(ctx.user())))
+                if self.authorcolor:
+                    return QVariant(QColor(self.user_color(ctx.user())))
+                return nullvariant
             if column == 'Branch': #branch
                 return QVariant(QColor(self.namedbranch_color(ctx.branch())))
         elif role == Qt.DecorationRole:
