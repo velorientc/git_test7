@@ -361,11 +361,10 @@ class HgRepoListModel(QAbstractTableModel):
                         painter.drawPath(path)
 
                 # Draw node
-                # - rev / mqpatch
-                # - wd parent
                 dot_color = QColor(self.namedbranch_color(ctx.branch()))
-                dotcolor = QColor(dot_color).lighter()
-                pencolor = dotcolor.darker()
+                dotcolor = dot_color.lighter()
+                pencolor = dot_color.darker()
+                white = QColor("white")
 
                 pen = QPen(pencolor)
                 pen.setWidthF(1.5)                
@@ -380,13 +379,25 @@ class HgRepoListModel(QAbstractTableModel):
                                   centre_y - r,
                                   2 * r, 2 * r)
                     painter.drawEllipse(rect)                    
+                    
+                def diamond(r):
+                    poly = QPolygonF([QPointF(centre_x - r, centre_y),
+                                      QPointF(centre_x, centre_y - r),
+                                      QPointF(centre_x + r, centre_y),
+                                      QPointF(centre_x, centre_y + r),
+                                      QPointF(centre_x - r, centre_y),])
+                    painter.drawPolygon(poly)
 
                 tags = set(ctx.tags())
-                if tags.intersection(self.mqueues):
-                    pass
-                else:
+                if tags.intersection(self.mqueues):  # diamonds for patches
                     if gnode.rev in self.wd_revs:
-                        painter.setBrush(QColor(255,255,255,255))
+                        painter.setBrush(white)
+                        diamond(2 * 0.9 * radius / 1.5)
+                    painter.setBrush(dotcolor)
+                    diamond(radius / 1.5)
+                else:  # circles for normal revisions
+                    if gnode.rev in self.wd_revs:
+                        painter.setBrush(white)
                         circle(0.9 * radius)
                     painter.setBrush(dotcolor)
                     circle(0.5 * radius)
