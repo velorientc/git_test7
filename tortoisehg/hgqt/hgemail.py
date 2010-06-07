@@ -41,6 +41,7 @@ class EmailDialog(QDialog):
 
         self._initpreviewtab()
         self._initintrobox()
+        self._readhistory()
         self._filldefaults()
         self._connectvalidateform()
         self._validateform()
@@ -71,6 +72,26 @@ class EmailDialog(QDialog):
         s.setValue('email/geom', self.saveGeometry())
         s.setValue('email/intor_changesets_splitter',
                    self._qui.intro_changesets_splitter.saveState())
+
+    def _readhistory(self):
+        s = QSettings()
+        for k in ('to', 'cc', 'from', 'flag'):
+            w = getattr(self._qui, '%s_edit' % k)
+            w.addItems(s.value('email/%s_history' % k).toStringList())
+            w.setCurrentIndex(-1)  # unselect
+
+    def _writehistory(self):
+        def itercombo(w):
+            if w.currentText():
+                yield w.currentText()
+            for i in xrange(w.count()):
+                if w.itemText(i) != w.currentText():
+                    yield w.itemText(i)
+
+        s = QSettings()
+        for k in ('to', 'cc', 'from', 'flag'):
+            w = getattr(self._qui, '%s_edit' % k)
+            s.setValue('email/%s_history' % k, list(itercombo(w))[:10])
 
     def _filldefaults(self):
         """Fill form by default values"""
@@ -207,6 +228,7 @@ class EmailDialog(QDialog):
             cmd.setWindowTitle(_('Sending Email'))
             cmd.show_output(False)
             if cmd.exec_():
+                self._writehistory()
                 super(EmailDialog, self).accept()
         finally:
             if 'desc' in opts:
