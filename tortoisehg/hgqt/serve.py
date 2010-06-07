@@ -13,7 +13,7 @@ from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
 
 try:
-    from tortoisehg.hgqt.ui_serve import Ui_ServeDialog
+    from tortoisehg.hgqt.serve_ui import Ui_ServeDialog
 except ImportError:
     from PyQt4 import uic
     Ui_ServeDialog = uic.loadUiType(os.path.join(os.path.dirname(__file__),

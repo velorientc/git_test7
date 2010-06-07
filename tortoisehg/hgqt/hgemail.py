@@ -17,7 +17,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, lexers
 
 try:
-    from tortoisehg.hgqt.ui_hgemail import Ui_EmailDialog
+    from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 except ImportError:
     from PyQt4 import uic
     Ui_EmailDialog = uic.loadUiType(os.path.join(os.path.dirname(__file__),
