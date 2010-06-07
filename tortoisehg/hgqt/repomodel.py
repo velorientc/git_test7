@@ -365,6 +365,7 @@ class HgRepoListModel(QAbstractTableModel):
                 dotcolor = dot_color.lighter()
                 pencolor = dot_color.darker()
                 white = QColor("white")
+                fillcolor = gnode.rev is None and white or dotcolor
 
                 pen = QPen(pencolor)
                 pen.setWidthF(1.5)                
@@ -393,13 +394,13 @@ class HgRepoListModel(QAbstractTableModel):
                     if gnode.rev in self.wd_revs:
                         painter.setBrush(white)
                         diamond(2 * 0.9 * radius / 1.5)
-                    painter.setBrush(dotcolor)
+                    painter.setBrush(fillcolor)
                     diamond(radius / 1.5)
                 else:  # circles for normal revisions
                     if gnode.rev in self.wd_revs:
                         painter.setBrush(white)
                         circle(0.9 * radius)
-                    painter.setBrush(dotcolor)
+                    painter.setBrush(fillcolor)
                     circle(0.5 * radius)
 
                 painter.end()
