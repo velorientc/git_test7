@@ -299,9 +299,9 @@ class Workbench(QMainWindow):
             tags = w.repo.tags().keys()
             w.switchedTo()
         else:
-            self.actionDiffMode.setEnabled(False)
             self.stackedWidget.setCurrentWidget(self.dummywidget)
 
+        self.actionDiffMode.setEnabled(w is not None)
         self.actionDiffMode.setChecked(mode == 'diff')
         self.actionAnnMode.setChecked(ann)
 
