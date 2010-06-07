@@ -570,7 +570,7 @@ class FileData(object):
             self.flabel += _(' <i>(is a symlink)</i>')
             return
 
-        if type(ctx.rev()) == str:
+        if type(ctx.rev()) == str:  # unapplied patch
             chunks = ctx.thgmqpatchchunks(wfile)
             self.diff = '\n'.join(chunks)
             return

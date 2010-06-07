@@ -652,7 +652,7 @@ class patchctx(object):
             self._load_patch_details()
         if wfile in self.curphunks:
             return self.curphunks[wfile]
-        return None
+        return []
     def thgbranchhead(self): return False
     def thgmqunappliedpatch(self): return True
     def changesToParent(self, whichparent):
@@ -699,7 +699,8 @@ class patchctx(object):
         removed = []
         map = {'MODIFY': modified, 
                'ADD': added, 
-               'DELETE': removed}
+               'DELETE': removed,
+               'COPY': added}
 
         self._files = []
         self._changesToParent = [modified, added, removed]
@@ -712,8 +713,13 @@ class patchctx(object):
                     if state == 'git':
                         for m in values:
                             f = m.path
-                            map[m.op].append(f)
                             self._files.append(f)
+                            if m.op == 'RENAME': 
+                                added.append(f)
+                                self._files.append(m.oldpath)
+                                removed.append(m.oldpath)
+                            else:
+                                map[m.op].append(f)
                     elif state == 'file':
                         type, path = get_path(values[0], values[1])
                         self.curphunks[path] = hunks = []
