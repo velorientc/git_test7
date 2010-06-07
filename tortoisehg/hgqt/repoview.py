@@ -184,8 +184,6 @@ class HgRepoView(QTableView):
                 SIGNAL('currentRowChanged (const QModelIndex & , const QModelIndex & )'),
                 self.revisionSelected)
         self.goto_toolbar.compl_model.setStringList(model.repo.tags().keys())
-        col = list(model._columns).index('Log')
-        self.horizontalHeader().setResizeMode(col, QHeaderView.Stretch)
 
     def enableAutoResize(self, *args):
         self._autoresize =  True
