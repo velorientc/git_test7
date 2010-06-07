@@ -293,7 +293,7 @@ class HgRepoListModel(QAbstractTableModel):
         return self._branch_colors[branch]
 
     def col2x(self, col):
-        return 2 * self.dot_radius * col + self.dot_radius/2 + 3
+        return 2 * self.dot_radius * col + self.dot_radius/2 + 8
 
     @datacached
     def data(self, index, role):
@@ -320,11 +320,9 @@ class HgRepoListModel(QAbstractTableModel):
                 return QVariant(QColor(self.namedbranch_color(ctx.branch())))
         elif role == Qt.DecorationRole:
             if column == 'Log':
-                radius = self.dot_radius
                 w = self.col2x(gnode.cols) + 10
                 h = self.rowheight
 
-                dot_x = self.col2x(gnode.x) - radius / 2
                 dot_y = h / 2
 
                 pix = QPixmap(w, h)
@@ -362,30 +360,39 @@ class HgRepoListModel(QAbstractTableModel):
                                      x2, y4)
                         painter.drawPath(path)
 
+                # Draw node
+                # - rev / mqpatch
+                # - wd parent
                 dot_color = QColor(self.namedbranch_color(ctx.branch()))
                 dotcolor = QColor(dot_color).lighter()
-                penradius = 1
                 pencolor = dotcolor.darker()
 
-                dot_y = (h/2) - radius / 2
-
-                painter.setBrush(dotcolor)
                 pen = QPen(pencolor)
-                pen.setWidth(penradius)
+                pen.setWidthF(1.5)                
                 painter.setPen(pen)
+
+                radius = self.dot_radius
+                centre_x = self.col2x(gnode.x)
+                centre_y = h/2
+
+                def circle(r):
+                    rect = QRectF(centre_x - r,
+                                  centre_y - r,
+                                  2 * r, 2 * r)
+                    painter.drawEllipse(rect)                    
+
                 tags = set(ctx.tags())
-                icn = None
-
-                if gnode.rev in self.wd_revs:
-                    icn = geticon('clean')
-                elif tags.intersection(self.mqueues):
-                    icn = geticon('mqpatch')
-
-                if icn:
-                    icn.paint(painter, dot_x-5, dot_y-5, 17, 17)
+                if tags.intersection(self.mqueues):
+                    pass
                 else:
-                    painter.drawEllipse(dot_x, dot_y, radius, radius)
+                    if gnode.rev in self.wd_revs:
+                        painter.setBrush(QColor(255,255,255,255))
+                        circle(0.9 * radius)
+                    painter.setBrush(dotcolor)
+                    circle(0.5 * radius)
+
                 painter.end()
+
                 ret = QVariant(pix)
                 return ret
         return nullvariant
