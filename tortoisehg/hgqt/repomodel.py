@@ -363,13 +363,9 @@ class HgRepoListModel(QAbstractTableModel):
                         painter.drawPath(path)
 
                 dot_color = QColor(self.namedbranch_color(ctx.branch()))
-                dotcolor = QColor(dot_color)
-                if gnode.rev in self.heads:
-                    penradius = 2
-                    pencolor = dotcolor.darker()
-                else:
-                    penradius = 1
-                    pencolor = Qt.black
+                dotcolor = QColor(dot_color).lighter()
+                penradius = 1
+                pencolor = dotcolor.darker()
 
                 dot_y = (h/2) - radius / 2
 
