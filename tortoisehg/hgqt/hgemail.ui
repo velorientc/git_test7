@@ -53,7 +53,20 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="to_edit"/>
+           <widget class="QComboBox" name="to_edit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::InsertAtTop</enum>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="cc_label">
@@ -66,7 +79,20 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="cc_edit"/>
+           <widget class="QComboBox" name="cc_edit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::InsertAtTop</enum>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="from_label">
@@ -79,7 +105,20 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="from_edit"/>
+           <widget class="QComboBox" name="from_edit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::InsertAtTop</enum>
+            </property>
+           </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="inreplyto_label">
@@ -105,7 +144,20 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QLineEdit" name="flag_edit"/>
+           <widget class="QComboBox" name="flag_edit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::InsertAtTop</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

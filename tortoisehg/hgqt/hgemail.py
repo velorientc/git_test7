@@ -84,11 +84,11 @@ class EmailDialog(QDialog):
             except error.Abort:
                 return ''
 
-        self._qui.to_edit.setText(
+        self._qui.to_edit.setEditText(
             hglib.tounicode(self._ui.config('email', 'to', '')))
-        self._qui.cc_edit.setText(
+        self._qui.cc_edit.setEditText(
             hglib.tounicode(self._ui.config('email', 'cc', '')))
-        self._qui.from_edit.setText(hglib.tounicode(getfromaddr(self._ui)))
+        self._qui.from_edit.setEditText(hglib.tounicode(getfromaddr(self._ui)))
 
         self.setdiffformat(self._ui.configbool('diff', 'git') and 'git' or 'hg')
 
@@ -122,11 +122,11 @@ class EmailDialog(QDialog):
 
     def _patchbombopts(self, **opts):
         """Generate opts for patchbomb by form values"""
-        opts['to'] = [hglib.fromunicode(self._qui.to_edit.text())]
-        opts['cc'] = [hglib.fromunicode(self._qui.cc_edit.text())]
-        opts['from'] = hglib.fromunicode(self._qui.from_edit.text())
+        opts['to'] = [hglib.fromunicode(self._qui.to_edit.currentText())]
+        opts['cc'] = [hglib.fromunicode(self._qui.cc_edit.currentText())]
+        opts['from'] = hglib.fromunicode(self._qui.from_edit.currentText())
         opts['in_reply_to'] = hglib.fromunicode(self._qui.inreplyto_edit.text())
-        opts['flag'] = [hglib.fromunicode(self._qui.flag_edit.text())]
+        opts['flag'] = [hglib.fromunicode(self._qui.flag_edit.currentText())]
 
         def diffformat():
             n = self.getdiffformat()
@@ -156,13 +156,12 @@ class EmailDialog(QDialog):
 
     def _isvalid(self):
         """Filled all required values?"""
-        req = ['to_edit', 'from_edit']
-        if self._qui.writeintro_check.isChecked():
-            req.append('subject_edit')
-
-        for e in req:
-            if not getattr(self._qui, e).text():
+        for e in ('to_edit', 'from_edit'):
+            if not getattr(self._qui, e).currentText():
                 return False
+
+        if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.text():
+            return False
 
         # TODO: is it nice if we can choose revisions to send?
         if not self._purerevs:
@@ -179,9 +178,10 @@ class EmailDialog(QDialog):
 
     def _connectvalidateform(self):
         # TODO: connect programmatically
-        for e in ('to_edit', 'from_edit', 'subject_edit'):
-            getattr(self._qui, e).textChanged.connect(self._validateform)
+        for e in ('to_edit', 'from_edit'):
+            getattr(self._qui, e).editTextChanged.connect(self._validateform)
 
+        self._qui.subject_edit.textChanged.connect(self._validateform)
         self._qui.writeintro_check.toggled.connect(self._validateform)
 
     def accept(self):
