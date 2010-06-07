@@ -44,6 +44,7 @@ class EmailDialog(QDialog):
         self._filldefaults()
         self._connectvalidateform()
         self._validateform()
+        self._readsettings()
 
     def keyPressEvent(self, event):
         # don't send email by just hitting enter
@@ -54,6 +55,22 @@ class EmailDialog(QDialog):
             return
 
         super(EmailDialog, self).keyPressEvent(event)
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(EmailDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('email/geom').toByteArray())
+        self._qui.intro_changesets_splitter.restoreState(
+            s.value('email/intor_changesets_splitter').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('email/geom', self.saveGeometry())
+        s.setValue('email/intor_changesets_splitter',
+                   self._qui.intro_changesets_splitter.saveState())
 
     def _filldefaults(self):
         """Fill form by default values"""
