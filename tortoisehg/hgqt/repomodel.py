@@ -339,9 +339,12 @@ class HgRepoListModel(QAbstractTableModel):
                 lpen = QPen(pen)
                 lpen.setColor(Qt.black)
                 painter.setPen(lpen)
+                for y1, y4, lines in ((dot_y, dot_y + h, gnode.bottomlines),
+                                      (dot_y - h, dot_y, gnode.toplines)):
+                    y2 = y1 + 1 * (y4 - y1)/4
+                    ymid = (y1 + y4)/2
+                    y3 = y1 + 3 * (y4 - y1)/4
 
-                for y1, y2, lines in ((0, h, gnode.bottomlines),
-                                      (-h, 0, gnode.toplines)):
                     for start, end, color in lines:
                         lpen = QPen(pen)
                         lpen.setColor(QColor(get_color(color)))
@@ -349,7 +352,15 @@ class HgRepoListModel(QAbstractTableModel):
                         painter.setPen(lpen)
                         x1 = self.col2x(start)
                         x2 = self.col2x(end)
-                        painter.drawLine(x1, dot_y + y1, x2, dot_y + y2)
+                        path = QPainterPath()
+                        path.moveTo(x1, y1)
+                        path.cubicTo(x1, y2,
+                                     x1, y2,
+                                     (x1 + x2)/2, ymid)
+                        path.cubicTo(x2, y3,
+                                     x2, y3,
+                                     x2, y4)
+                        painter.drawPath(path)
 
                 dot_color = QColor(self.namedbranch_color(ctx.branch()))
                 dotcolor = QColor(dot_color)
