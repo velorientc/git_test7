@@ -53,7 +53,7 @@ class EmailDialog(QDialog):
 
             return
 
-        return super(EmailDialog, self).keyPressEvent(event)
+        super(EmailDialog, self).keyPressEvent(event)
 
     def _filldefaults(self):
         """Fill form by default values"""
