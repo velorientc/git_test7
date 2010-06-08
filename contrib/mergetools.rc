@@ -25,6 +25,16 @@ araxis.diff3args=/3 /a2 /wait /title1:"$plabel1" /title2:"$clabel" /title3:"$pla
 araxis.dirdiff=True
 araxis.dir3diff=True
 
+UltraCompare.regkey=Software\Microsoft\Windows\CurrentVersion\App Paths\UC.exe
+UltraCompare.args = $base $local $other -title1 base -title3 other
+UltraCompare.priority = -2
+UltraCompare.gui = True
+UltraCompare.binary = True
+UltraCompare.checkconflicts = True
+UltraCompare.checkchanged = True
+UltraCompare.diffargs=$child $parent -title1 $clabel -title2 $plabel1
+UltraCompare.diff3args=$parent1 $child $parent2 -title1 $plabel1 -title2 $clabel -title3 $plabel2
+
 kdiff3.priority=-3
 kdiff3.args=--auto --L1 base --L2 parent1 --L3 parent2 $base $local $other -o $output
 kdiff3.regkey=Software\KDiff3
