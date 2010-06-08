@@ -165,10 +165,18 @@ class HgignoreDialog(QDialog):
         menu.exec_(point)
 
     def insertFilter(self, pat, isregexp):
-        if isregexp:
-            self.ignorelines.append('relre:' + pat)
+        h = isregexp and 'syntax: regexp' or 'syntax: glob'
+        if h in self.ignorelines:
+            l = self.ignorelines.index(h)
+            for i, line in enumerate(self.ignorelines[l+1:]):
+                if line.startswith('syntax:'):
+                    self.ignorelines.insert(l+i+1, pat)
+                    break
+            else:
+                self.ignorelines.append(pat)
         else:
-            self.ignorelines.append('glob:' + pat)
+            self.ignorelines.append(h)
+            self.ignorelines.append(pat)
         self.writeIgnoreFile()
         self.refresh()
 
