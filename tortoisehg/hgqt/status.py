@@ -412,7 +412,7 @@ class StatusWidget(QWidget):
         # Generate diffs to first parent
         m = cmdutil.matchfiles(self.repo, [wfile])
         try:
-            for s, l in qtlib.difflabel(self.wctx.diff, match=m, git=True):
+            for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
             err = hglib.tounicode(str(e))
@@ -432,7 +432,7 @@ class StatusWidget(QWidget):
 
         # Generate diffs to second parent
         try:
-            for s, l in qtlib.difflabel(self.wctx.diff, self.wctx.p2(),
+            for s, l in patch.difflabel(self.wctx.diff, self.wctx.p2(),
                                         match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:

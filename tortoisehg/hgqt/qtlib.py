@@ -96,41 +96,6 @@ def geteffect(labels):
     return ';'.join(effects)
 
 
-# Copy of patch.difflabel from Mercurial, hacked to always return
-# a label for unmatched text, so it gets escaped by our htmlui
-def difflabel(func, *args, **kw):
-    '''yields 2-tuples of (output, label) based on the output of func()'''
-    prefixes = [('diff', 'diff.diffline'),
-                ('copy', 'diff.extended'),
-                ('rename', 'diff.extended'),
-                ('old', 'diff.extended'),
-                ('new', 'diff.extended'),
-                ('deleted', 'diff.extended'),
-                ('---', 'diff.file_a'),
-                ('+++', 'diff.file_b'),
-                ('@@', 'diff.hunk'),
-                ('-', 'diff.deleted'),
-                ('+', 'diff.inserted')]
-
-    for chunk in func(*args, **kw):
-        lines = chunk.split('\n')
-        for i, line in enumerate(lines):
-            if i != 0:
-                yield ('\n', '')
-            stripline = line
-            if line and line[0] in '+-':
-                # highlight trailing whitespace, but only in changed lines
-                stripline = line.rstrip()
-            for prefix, label in prefixes:
-                if stripline.startswith(prefix):
-                    yield (stripline, label)
-                    break
-            else:
-                yield (line, 'ui.status')
-            if line != stripline:
-                yield (line[len(stripline):], 'diff.trailingwhitespace')
-
-
 NAME_MAP = {
     'fg': 'color', 'bg': 'background-color', 'family': 'font-family',
     'size': 'font-size', 'weight': 'font-weight', 'space': 'white-space',

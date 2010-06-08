@@ -272,7 +272,7 @@ class DetectRenameDialog(QDialog):
             t = _('%s and %s have identical contents\n\n') % (src, dest)
             hu.write(t, label='ui.error')
         else:
-            for t, l in qtlib.difflabel(difftext.splitlines, True):
+            for t, l in patch.difflabel(difftext.splitlines, True):
                 hu.write(t, label=l)
         self.difftb.setHtml(hu.getdata()[0])
 
