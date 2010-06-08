@@ -179,7 +179,7 @@ class TreeModel(gtk.GenericTreeModel):
             if parent is None:
                 parent = ctx.parents()[0].node()
             M, A, R = self.repo.status(parent, ctx.node())[:3]
-            common = dict(color='black')
+            common = dict(color=gtklib.BLACK)
             M = M and gtklib.markup(' %s ' % len(M),
                              background=gtklib.PORANGE, **common) or ''
             A = A and gtklib.markup(' %s ' % len(A),
@@ -217,21 +217,23 @@ class TreeModel(gtk.GenericTreeModel):
                         bg = gtklib.PORANGE
                     elif tag in self.mqpatches:
                         bg = gtklib.PBLUE
-                    style = {'color': 'black', 'background': bg}
+                    style = {'color': gtklib.BLACK, 'background': bg}
                     tstr += gtklib.markup(' %s ' % tag, **style) + ' '
 
             branch = ctx.branch()
             bstr = ''
+            status = 0
             if self.branchtags.get(branch) == node:
-                bstr += gtklib.markup(' %s ' % branch, color='black',
+                bstr += gtklib.markup(' %s ' % branch, color=gtklib.BLACK,
                                       background=gtklib.PGREEN) + ' '
+                status = 8
 
             if revid in self.wcparents:
                 sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
-                status = 4
+                status += 4
             else:
                 sumstr = bstr + tstr + summary
-                status = 0
+                status += 0
 
             if node in self.outgoing:
                 # outgoing
@@ -295,20 +297,39 @@ class TreeModel(gtk.GenericTreeModel):
                 self.color_func = self.text_color_author
 
     def text_color_default(self, rev, author):
-        return int(rev) >= self.origtip and 'darkgreen' or 'black'
-
-    colors = '''black blue deeppink mediumorchid blue burlywood4 goldenrod
-     slateblue red2 navy dimgrey'''.split()
+        return int(rev) >= self.origtip and gtklib.NEW_REV_COLOR or gtklib.NORMAL  
     color_cache = {}
+
+    def hash_author(self, author):
+        h = hash(author) % 0x1000000; #hash, not HSV hue
+
+        r = h % 0x100
+        h /= 0x100
+
+        g = h % 0x100
+        h /= 0x100
+
+        b = h % 0x100
+
+        c= [r,g,b]
+
+        #For a dark theme, use upper two thirds of the RGB scale.
+        if gtklib.is_dark_theme():
+            c = [2*x/3 + 85 for x in c]
+        #Else, use bottom two thirds. 
+        else:
+            c = [2*x/3 for x in c]
+
+        return "#%02x%02x%02x" % (c[0],c[1],c[2])
 
     def text_color_author(self, rev, author):
         if int(rev) >= self.origtip:
-            return 'darkgreen'
+            return gtklib.NEW_REV_COLOR
         for re, v in self.author_pats:
             if (re.search(author)):
                 return v
         if author not in self.color_cache:
-            color = self.colors[len(self.color_cache.keys()) % len(self.colors)]
+            color = self.hash_author(author)
             self.color_cache[author] = color
         return self.color_cache[author]
 

@@ -18,10 +18,8 @@ except AttributeError:
 
 def checkhgversion(v):
     """range check the Mercurial version"""
-    # this is a series of hacks, but Mercurial's versioning scheme
-    # doesn't lend itself to a "correct" solution.  This will at least
-    # catch people who have old Mercurial packages.
-    reqver = ['1', '4']
+    reqver = ['1', '5']
+    v = v.split('+')[0]
     if not v or v == 'unknown' or len(v) >= 12:
         # can't make any intelligent decisions about unknown or hashes
         return

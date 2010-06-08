@@ -196,7 +196,7 @@ class DetectRenameDialog(gtk.Window):
         self.buf = gtk.TextBuffer()
         self.buf.create_tag('removed', foreground=gtklib.DRED)
         self.buf.create_tag('added', foreground=gtklib.DGREEN)
-        self.buf.create_tag('position', foreground='#FF8000')
+        self.buf.create_tag('position', foreground=gtklib.DORANGE)
         self.buf.create_tag('header', foreground=gtklib.DBLUE)
         diffview = gtk.TextView(self.buf)
         scroller.add(diffview)
@@ -302,7 +302,12 @@ class DetectRenameDialog(gtk.Window):
                 srcs.append(abs)
         if not copy:
             simularity = self.adjustment.get_value() / 100.0;
-            gen = cmdutil.findrenames
+            try:
+                gen = cmdutil.findrenames
+            except AttributeError:
+                # function was moved before 1.6
+                from mercurial import similar
+                gen = similar.findrenames
         else:
             simularity = 1.0
             gen = findmoves
