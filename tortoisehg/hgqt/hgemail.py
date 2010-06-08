@@ -325,7 +325,7 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
     def __init__(self, repo, revs, parent=None):
         super(_ChangesetsModel, self).__init__(parent)
         self._repo = repo
-        self._revs = revs
+        self._revs = list(reversed(sorted(revs)))
         self._selectedrevs = set(revs)
 
     @property
