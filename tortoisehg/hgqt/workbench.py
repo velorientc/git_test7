@@ -615,15 +615,6 @@ class Workbench(QMainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, s)
         self._searchWidgets.append(s)
 
-    def okToContinue(self):
-        '''
-        returns False if there is unsaved data
-        
-        If there is unsaved data, present a dialog asking the user if it is ok to
-        discard the changes made.
-        '''
-        return True
-
     def storeSettings(self):
         s = QSettings()
         wb = "Workbench/"
@@ -647,7 +638,7 @@ class Workbench(QMainWindow):
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
 
     def closeEvent(self, event):
-        if not self.okToContinue() or not self.closeRepoTabs():
+        if not self.closeRepoTabs():
             event.ignore()
         else:
            self.storeSettings()
