@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 from mercurial import hg, error, extensions, util, cmdutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, lexers
+from tortoisehg.hgqt import cmdui, lexers, qtlib
 
 try:
     from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
@@ -404,4 +404,9 @@ def run(ui, *revs, **opts):
         revs = opts.get('rev')
 
     repo = hg.repository(ui, paths.find_root())
-    return EmailDialog(repo.ui, repo, revs)
+
+    try:
+        return EmailDialog(repo.ui, repo, revs)
+    except error.RepoLookupError, e:
+        qtlib.ErrorMsgBox(_('Failed to open Email dialog'),
+                          hglib.tounicode(e.message))
