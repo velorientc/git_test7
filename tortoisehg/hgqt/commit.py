@@ -84,7 +84,9 @@ class CommitWidget(QWidget):
             desc = format_desc(ctx.description(), 80)
             fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
             ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
-            addrow(_('Parent:'), QLabel(ptext))
+            lbl = QLabel(ptext)
+            lbl.minimumSizeHint = lambda: QSize(0, 0)
+            addrow(_('Parent:'), lbl)
         addrow(_('User:'), usercombo)
         frame = QFrame()
         frame.setLayout(form)
