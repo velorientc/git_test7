@@ -214,9 +214,10 @@ class HgignoreDialog(QDialog):
             hglib.invalidaterepo(self.repo)
             wctx = self.repo[None]
             wctx.status(unknown=True)
-        except util.Abort, error.RepoError:
+        except (util.Abort, error.RepoError), e:
             qtlib.WarningMsgBox(_('Unable to read repository status'),
                                 uni(str(e)), parent=self)
+            return
 
         self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
