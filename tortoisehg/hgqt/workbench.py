@@ -606,9 +606,10 @@ class Workbench(QMainWindow):
 
     def on_search(self, *args):
         from tortoisehg.hgqt.grep import SearchWidget
-        # todo: get root of current repo, pass to search widget
-        root = None
-        s = SearchWidget('', root, self)
+        w = self.repoTabsWidget.currentWidget()
+        if w is None:
+            return
+        s = SearchWidget('', w.repo.root, self)
         s.setAllowedAreas(Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea)
         s.setObjectName("searchWidget%d" % len(self._searchWidgets))
         self.addDockWidget(Qt.BottomDockWidgetArea, s)
