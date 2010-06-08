@@ -65,12 +65,12 @@ class EmailDialog(QDialog):
         s = QSettings()
         self.restoreGeometry(s.value('email/geom').toByteArray())
         self._qui.intro_changesets_splitter.restoreState(
-            s.value('email/intor_changesets_splitter').toByteArray())
+            s.value('email/intro_changesets_splitter').toByteArray())
 
     def _writesettings(self):
         s = QSettings()
         s.setValue('email/geom', self.saveGeometry())
-        s.setValue('email/intor_changesets_splitter',
+        s.setValue('email/intro_changesets_splitter',
                    self._qui.intro_changesets_splitter.saveState())
 
     def _readhistory(self):
