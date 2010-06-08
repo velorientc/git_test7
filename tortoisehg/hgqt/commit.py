@@ -109,7 +109,9 @@ class CommitWidget(QWidget):
         vbox.addLayout(hbox, 0)
         msgte = QPlainTextEdit()
         msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
-        msgte.setFont(QFont('Monospace', 9))
+        msgfont = qtlib.getfont(self.stwidget.repo.ui, 'fontcomment')
+        msgte.setFont(msgfont.font())
+        self.connect(msgfont, SIGNAL('changed'), msgte.setFont)
         msgte.textChanged.connect(self.msgChanged)
         msgte.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(msgte,
