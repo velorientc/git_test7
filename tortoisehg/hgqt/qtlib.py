@@ -153,6 +153,31 @@ def getpixmap(name, width=16, height=16):
     _pixmapcache[key] = pixmap
     return pixmap
 
+class ThgFont(QObject):
+    changed = pyqtSignal(QFont)
+    def __init__(self, name):
+        QObject.__init__(self)
+        self.myfont = QFont(name)
+    def font(self):
+        return self.myfont
+    def setFont(self, f):
+        self.myfont = f
+        self.changed.emit(f)
+
+_fontdefaults = {
+    'fontcomment': 'monospace 10',
+    'fontdiff': 'monospace 10',
+    'fontlist': 'sans 9',
+    'fontlog': 'monospace 10'
+}
+_fontcache = {}
+def getfont(ui, name):
+    assert name in _fontdefaults
+    if name not in _fontcache:
+        fname = ui.config('tortoisehg', name, _fontdefaults[name])
+        _fontcache[name] = ThgFont(fname)
+    return _fontcache[name]
+
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Close,
                  labels=[], parent=None, defaultbutton=None):
     msg = QMessageBox(parent)
