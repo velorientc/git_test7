@@ -135,6 +135,47 @@ class PasswordEntry(QLineEdit):
     def isDirty(self):
         return self.value() != self.curvalue
 
+class FontEntry(QPushButton):
+    def __init__(self, parent=None, **opts):
+        QPushButton.__init__(self, parent)
+        self.opts = opts
+        self.curvalue = None
+        self.setDisabled(opts['readonly'])
+        self.clicked.connect(self.on_clicked)
+        cpath = self.opts['cpath']
+        assert cpath.startswith('tortoisehg.')
+        self.fname = cpath[11:]
+
+    def focusInEvent(self, e):
+        self.opts['descwidget'].setHtml(self.opts['tooltip'])
+        QPushButton.focusInEvent(self, e)
+
+    def on_clicked(self, checked):
+        thgf = qtlib.getfont(ui.ui(), self.fname)
+        dlg = QFontDialog(self)
+        dlg.setCurrentFont(QFont(self.value() or thgf.font()))
+        if dlg.exec_() == QDialog.Accepted:
+            thgf.setFont(dlg.selectedFont())
+            self.setText(thgf.font().toString())
+
+    ## common APIs for all edit widgets
+
+    def setValue(self, curvalue):
+        self.curvalue = curvalue
+        if curvalue:
+            self.setText(hglib.tounicode(curvalue))
+        else:
+            self.setText(_unspecstr)
+
+    def value(self):
+        utext = self.text()
+        if utext == _unspecstr:
+            return None
+        else:
+            return hglib.fromunicode(utext)
+
+    def isDirty(self):
+        return self.value() != self.curvalue
 
 def genEditCombo(opts, defaults=[]):
     opts['canedit'] = True
@@ -168,6 +209,9 @@ def genDeferredCombo(opts, func):
     opts['defer'] = func
     opts['nohist'] = True
     return SettingsCombo(**opts)
+
+def genFontEdit(opts):
+    return FontEntry(**opts)
 
 def findDiffTools():
     return hglib.difftools(ui.ui())
@@ -411,6 +455,18 @@ INFO = (
     (_('Ignore Blank Lines'), 'diff.ignoreblanklines', genBoolCombo,
         _('Ignore changes whose lines are all blank.'
         ' Default: False')),
+    )),
+
+({'name': 'fonts', 'label': _('Fonts'),
+  'icon': QStyle.SP_DesktopIcon}, ( # crap icon, I know
+    (_('Message Font'), 'tortoisehg.fontcomment', genFontEdit,
+        _('Font used to display commit messages. Default: monospace 10')),
+    (_('Diff Font'), 'tortoisehg.fontdiff', genFontEdit,
+        _('Font used to display text differences. Default: monospace 10')),
+    (_('List Font'), 'tortoisehg.fontlist', genFontEdit,
+        _('Font used to display file lists. Default: sans 9')),
+    (_('Log Font'), 'tortoisehg.fontlog', genFontEdit,
+        _('Font used to display changelog data. Default: monospace 10')),
     )),
 )
 
