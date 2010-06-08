@@ -333,9 +333,13 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
         return QVariant(hglib.tounicode(coldata(self._repo[rev])))
 
     def rowCount(self, parent=QModelIndex()):
+        if parent.isValid():
+            return 0  # no child
         return len(self._revs)
 
     def columnCount(self, parent=QModelIndex()):
+        if parent.isValid():
+            return 0  # no child
         return len(self._COLUMNS)
 
     def headerData(self, section, orientation, role):
