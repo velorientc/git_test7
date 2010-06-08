@@ -96,12 +96,14 @@ class EmailDialog(QDialog):
 
         self._changesets = _ChangesetsModel(self._repo, purerevs(revs),
                                             parent=self)
+        self._changesets.dataChanged.connect(self._validateform)
+        self._changesets.dataChanged.connect(self._updateintrobox)
         self._qui.changesets_view.setModel(self._changesets)
 
     @property
     def _revs(self):
         """Returns list of revisions to be sent"""
-        return self._changesets.revs
+        return self._changesets.selectedrevs
 
     def _filldefaults(self):
         """Fill form by default values"""
@@ -194,7 +196,6 @@ class EmailDialog(QDialog):
         if self._qui.writeintro_check.isChecked() and not self._qui.subject_edit.text():
             return False
 
-        # TODO: is it nice if we can choose revisions to send?
         if not self._revs:
             return False
 
@@ -246,9 +247,11 @@ class EmailDialog(QDialog):
 
     def _initintrobox(self):
         self._qui.intro_box.hide()  # hidden by default
-        if self._introrequired():
-            self._qui.writeintro_check.setChecked(True)
-            self._qui.writeintro_check.setEnabled(False)
+        self._qui.writeintro_check.setChecked(self._introrequired())
+        self._updateintrobox()
+
+    def _updateintrobox(self):  # TODO: merge into _validateform
+        self._qui.writeintro_check.setEnabled(not self._introrequired())
 
     def _introrequired(self):
         """Is intro message required?"""
@@ -328,18 +331,55 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
         super(_ChangesetsModel, self).__init__(parent)
         self._repo = repo
         self._revs = revs
+        self._selectedrevs = set(revs)
 
     @property
     def revs(self):
         return self._revs
 
+    @property
+    def selectedrevs(self):
+        """Return the list of selected revisions"""
+        return list(sorted(self._selectedrevs))
+
     def data(self, index, role):
-        if (not index.isValid()) or role != Qt.DisplayRole:
+        if not index.isValid():
             return QVariant()
 
-        coldata = self._COLUMNS[index.column()][1]
         rev = self._revs[index.row()]
-        return QVariant(hglib.tounicode(coldata(self._repo[rev])))
+        if index.column() == 0 and role == Qt.CheckStateRole:
+            return rev in self._selectedrevs and Qt.Checked or Qt.Unchecked
+        if role == Qt.DisplayRole:
+            coldata = self._COLUMNS[index.column()][1]
+            return QVariant(hglib.tounicode(coldata(self._repo[rev])))
+
+        return QVariant()
+
+    def setData(self, index, value, role=Qt.EditRole):
+        if not index.isValid():
+            return False
+
+        rev = self._revs[index.row()]
+        if index.column() == 0 and role == Qt.CheckStateRole:
+            origvalue = rev in self._selectedrevs
+            if value == Qt.Checked:
+                self._selectedrevs.add(rev)
+            else:
+                self._selectedrevs.remove(rev)
+
+            if origvalue != (rev in self._selectedrevs):
+                self.dataChanged.emit(index, index)
+
+            return True
+
+        return False
+
+    def flags(self, index):
+        v = super(_ChangesetsModel, self).flags(index)
+        if index.column() == 0:
+            return Qt.ItemIsUserCheckable | v
+        else:
+            return v
 
     def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
