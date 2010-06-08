@@ -142,10 +142,6 @@ class HgignoreDialog(QDialog):
 
     def customContextMenuRequested(self, point):
         'context menu request for unknown list'
-        def trigger(text):
-            self.ignorelines.append('glob:'+text)
-            self.writeIgnoreFile()
-            self.refresh()
         point = self.unknownlist.mapToGlobal(point)
         row = self.unknownlist.currentRow()
         if row < 0:
@@ -164,9 +160,17 @@ class HgignoreDialog(QDialog):
         for f in filters:
             action = menu.addAction(_('Ignore ') + hglib.tounicode(f))
             action.localtext = f
-            action.wrapper = lambda f=f: trigger(f)
+            action.wrapper = lambda f=f: self.insertFilter(f, False)
             self.connect(action, SIGNAL('triggered()'), action.wrapper)
         menu.exec_(point)
+
+    def insertFilter(self, pat, isregexp):
+        if isregexp:
+            self.ignorelines.append('relre:' + pat)
+        else:
+            self.ignorelines.append('glob:' + pat)
+        self.writeIgnoreFile()
+        self.refresh()
 
     def setGlobFilter(self, qstr):
         'user selected an unknown file; prep a glob filter'
@@ -187,26 +191,25 @@ class HgignoreDialog(QDialog):
         if newfilter == '':
             return
         if self.recombo.currentIndex() == 0:
-            newfilter = 'glob:' + newfilter
+            test = 'glob:' + newfilter
             try:
-                match.match(self.repo.root, '', [], [newfilter])
+                match.match(self.repo.root, '', [], [test])
+                self.insertFilter(newfilter, False)
             except util.Abort, inst:
                 qtlib.WarningMsgBox(_('Invalid glob expression'), str(inst),
                                     parent=self)
                 return
         else:
-            newfilter = 'relre:' + newfilter
+            test = 'relre:' + newfilter
             try:
-                match.match(self.repo.root, '', [], [newfilter])
-                re.compile(newfilter)
+                match.match(self.repo.root, '', [], [test])
+                re.compile(test)
+                self.insertFilter(newfilter, True)
             except (util.Abort, re.error), inst:
                 qtlib.WarningMsgBox(_('Invalid regexp expression'), str(inst),
                                     parent=self)
                 return
-        self.ignorelines.append(newfilter)
-        self.writeIgnoreFile()
         self.le.clear()
-        self.refresh()
 
     def refresh(self):
         uni = hglib.tounicode
