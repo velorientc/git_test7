@@ -211,6 +211,12 @@ def invalidaterepo(repo):
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
+def reloadui(root = None):
+    u = ui.ui()
+    if root:
+        u.readconfig(os.path.join(root, '.hg', 'hgrc'))
+    return u
+
 def loadextension(ui, name):
     # Between Mercurial revisions 1.2 and 1.3, extensions.load() stopped
     # calling uisetup() after loading an extension.  This could do

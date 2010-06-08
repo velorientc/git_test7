@@ -240,8 +240,10 @@ class CommitWidget(QWidget):
         def settings():
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
-            # TODO: refresh UI instances, make a hglib func for it
-            return dlg.exec_()
+            if dlg.exec_() == QDialog.Accepted:
+                repo = self.stwidget.repo
+                repo.ui = hglib.reloadui(repo.root)
+                self.msgChanged()
 
         menu = self.msgte.createStandardContextMenu()
         for name, func in [(_('Paste &Filenames'), paste),
