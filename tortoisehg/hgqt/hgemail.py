@@ -37,11 +37,11 @@ class EmailDialog(QDialog):
 
         self._initchangesets(revs)
         self._initpreviewtab()
+        self._initenvelopebox()
         self._initintrobox()
         self._readhistory()
         self._filldefaults()
-        self._connectvalidateform()
-        self._validateform()
+        self._updateforms()
         self._readsettings()
 
     def keyPressEvent(self, event):
@@ -96,8 +96,7 @@ class EmailDialog(QDialog):
 
         self._changesets = _ChangesetsModel(self._repo, purerevs(revs),
                                             parent=self)
-        self._changesets.dataChanged.connect(self._validateform)
-        self._changesets.dataChanged.connect(self._updateintrobox)
+        self._changesets.dataChanged.connect(self._updateforms)
         self._qui.changesets_view.setModel(self._changesets)
 
     @property
@@ -202,19 +201,18 @@ class EmailDialog(QDialog):
         return True
 
     @pyqtSlot()
-    def _validateform(self):
-        """Check form values to update send/preview availability"""
+    def _updateforms(self):
+        """Update availability of form widgets"""
         valid = self._isvalid()
         self._qui.send_button.setEnabled(valid)
         self._qui.main_tabs.setTabEnabled(self._previewtabindex(), valid)
+        self._qui.writeintro_check.setEnabled(not self._introrequired())
+        if self._introrequired():
+            self._qui.writeintro_check.setChecked(True)
 
-    def _connectvalidateform(self):
-        # TODO: connect programmatically
+    def _initenvelopebox(self):
         for e in ('to_edit', 'from_edit'):
-            getattr(self._qui, e).editTextChanged.connect(self._validateform)
-
-        self._qui.subject_edit.textChanged.connect(self._validateform)
-        self._qui.writeintro_check.toggled.connect(self._validateform)
+            getattr(self._qui, e).editTextChanged.connect(self._updateforms)
 
     def accept(self):
         # TODO: want to pass patchbombopts directly
@@ -247,11 +245,8 @@ class EmailDialog(QDialog):
 
     def _initintrobox(self):
         self._qui.intro_box.hide()  # hidden by default
-        self._qui.writeintro_check.setChecked(self._introrequired())
-        self._updateintrobox()
-
-    def _updateintrobox(self):  # TODO: merge into _validateform
-        self._qui.writeintro_check.setEnabled(not self._introrequired())
+        self._qui.subject_edit.textChanged.connect(self._updateforms)
+        self._qui.writeintro_check.toggled.connect(self._updateforms)
 
     def _introrequired(self):
         """Is intro message required?"""
