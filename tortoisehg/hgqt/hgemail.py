@@ -94,7 +94,10 @@ class EmailDialog(QDialog):
         def purerevs(revs):
             return cmdutil.revrange(self._repo, revs)
 
-        self._changesets = _ChangesetsModel(self._repo, purerevs(revs),
+        self._changesets = _ChangesetsModel(self._repo,
+                                            # TODO: [':'] is inefficient
+                                            revs=purerevs(revs or [':']),
+                                            selectedrevs=purerevs(revs),
                                             parent=self)
         self._changesets.dataChanged.connect(self._updateforms)
         self._qui.changesets_view.setModel(self._changesets)
@@ -322,11 +325,11 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
                 ('date', lambda ctx: util.shortdate(ctx.date())),
                 ('description', lambda ctx: ctx.description().splitlines()[0])]
 
-    def __init__(self, repo, revs, parent=None):
+    def __init__(self, repo, revs, selectedrevs, parent=None):
         super(_ChangesetsModel, self).__init__(parent)
         self._repo = repo
         self._revs = list(reversed(sorted(revs)))
-        self._selectedrevs = set(revs)
+        self._selectedrevs = set(selectedrevs)
 
     @property
     def revs(self):
@@ -395,7 +398,6 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
 def run(ui, *revs, **opts):
     # TODO: same options as patchbomb
     # TODO: repo should be specified as an argument?
-    # TODO: if no revs specified?
     if opts.get('rev'):
         if revs:
             raise util.Abort(_('use only one form to specify the revision'))
