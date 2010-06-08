@@ -30,15 +30,12 @@ class EmailDialog(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self._ui = ui
         self._repo = repo
-        self._revs = revs
 
         self._qui = Ui_EmailDialog()
         self._qui.setupUi(self)
         self._qui.bundle_radio.setEnabled(False)  # TODO: bundle support
 
-        changesets = _ChangesetsModel(self._repo, self._purerevs, parent=self)
-        self._qui.changesets_view.setModel(changesets)
-
+        self._initchangesets(revs)
         self._initpreviewtab()
         self._initintrobox()
         self._readhistory()
@@ -92,6 +89,19 @@ class EmailDialog(QDialog):
         for k in ('to', 'cc', 'from', 'flag'):
             w = getattr(self._qui, '%s_edit' % k)
             s.setValue('email/%s_history' % k, list(itercombo(w))[:10])
+
+    def _initchangesets(self, revs):
+        def purerevs(revs):
+            return cmdutil.revrange(self._repo, revs)
+
+        self._changesets = _ChangesetsModel(self._repo, purerevs(revs),
+                                            parent=self)
+        self._qui.changesets_view.setModel(self._changesets)
+
+    @property
+    def _revs(self):
+        """Returns list of revisions to be sent"""
+        return self._changesets.revs
 
     def _filldefaults(self):
         """Fill form by default values"""
@@ -185,7 +195,7 @@ class EmailDialog(QDialog):
             return False
 
         # TODO: is it nice if we can choose revisions to send?
-        if not self._purerevs:
+        if not self._revs:
             return False
 
         return True
@@ -223,7 +233,7 @@ class EmailDialog(QDialog):
 
         opts = self._patchbombopts()
         try:
-            cmd = cmdui.Dialog(['email'] + cmdargs(opts) + list(self._revs),
+            cmd = cmdui.Dialog(['email'] + cmdargs(opts) + list(map(str, self._revs)),
                                parent=self)
             cmd.setWindowTitle(_('Sending Email'))
             cmd.show_output(False)
@@ -242,7 +252,7 @@ class EmailDialog(QDialog):
 
     def _introrequired(self):
         """Is intro message required?"""
-        return len(self._purerevs) > 1
+        return len(self._revs) > 1
 
     def _initpreviewtab(self):
         def initqsci(w):
@@ -291,7 +301,7 @@ class EmailDialog(QDialog):
             if 'PAGER' in os.environ:
                 del os.environ['PAGER']
 
-            loadpatchbomb().patchbomb(ui, self._repo, *self._revs,
+            loadpatchbomb().patchbomb(ui, self._repo, *map(str, self._revs),
                                       **opts)
             return stripheadmsg(hglib.tounicode(buf.getvalue()))
         finally:
@@ -301,11 +311,6 @@ class EmailDialog(QDialog):
     def _previewtabindex(self):
         """Index of preview tab"""
         return self._qui.main_tabs.indexOf(self._qui.preview_tab)
-
-    @util.propertycache
-    def _purerevs(self):
-        """Extract revranges to list of pure revision numbers"""
-        return cmdutil.revrange(self._repo, self._revs)
 
     @pyqtSlot()
     def on_settings_button_clicked(self):
@@ -323,6 +328,10 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
         super(_ChangesetsModel, self).__init__(parent)
         self._repo = repo
         self._revs = revs
+
+    @property
+    def revs(self):
+        return self._revs
 
     def data(self, index, role):
         if (not index.isValid()) or role != Qt.DisplayRole:
