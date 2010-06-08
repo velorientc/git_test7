@@ -15,7 +15,7 @@ from tortoisehg.hgqt import csinfo, qtlib
 
 from tortoisehg.util import hglib
 
-from mercurial.error import RepoError
+from mercurial import error
 
 
 def RevPanelWidget(repo, repoview):
