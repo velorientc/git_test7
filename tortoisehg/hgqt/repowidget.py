@@ -46,7 +46,7 @@ class RepoWidget(QWidget):
         self.splitternames = []
         self.disab_shortcuts = []
         self.currentMessage = ''
-        self.currenWidget = None
+        self.currentWidget = None
 
         QWidget.__init__(self)
         
@@ -263,11 +263,11 @@ class RepoWidget(QWidget):
             ctx = self.repomodel.repo.changectx(rev)
             if ctx.rev() is None:
                 # working copy
-                self.currenWidget = self.commitWidget
+                self.currentWidget = self.commitWidget
             else:
                 self.revDetailsWidget.revision_selected(rev)
-                self.currenWidget = self.revDetailsWidget
-            self.stackedWidget.setCurrentWidget(self.currenWidget)
+                self.currentWidget = self.revDetailsWidget
+            self.stackedWidget.setCurrentWidget(self.currentWidget)
 
     def goto(self, rev):
         rev = str(rev)
@@ -315,8 +315,8 @@ class RepoWidget(QWidget):
         self.switchToSignal.emit(self)
  
     def switchedTo(self):
-        if self.currenWidget:
-            self.stackedWidget.setCurrentWidget(self.currenWidget)
+        if self.currentWidget:
+            self.stackedWidget.setCurrentWidget(self.currentWidget)
 
     def storeSettings(self):
         s = QSettings()
