@@ -79,6 +79,7 @@ def getlog(model, ctx, gnode):
 # XXX maybe it's time to make these methods of the model...
 # in following lambdas, ctx is a hg changectx
 _columnmap = {'ID': lambda model, ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
+              'Graph': lambda model, ctx, gnode: "",
               'Log': getlog,
               'Author': lambda model, ctx, gnode: tounicode(
                   templatefilters.person(ctx.user())),
@@ -129,8 +130,8 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
-    _allcolumns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',)
-    _columns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',)
+    _allcolumns = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
+    _columns = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
     _stretchs = {'Log': 1, }
     _getcolumns = "getChangelogColumns"
 
@@ -320,7 +321,7 @@ class HgRepoListModel(QAbstractTableModel):
             if column == 'Branch': #branch
                 return QVariant(QColor(self.namedbranch_color(ctx.branch())))
         elif role == Qt.DecorationRole:
-            if column == 'Log':
+            if column == 'Graph':
                 w = self.col2x(gnode.cols) + 10
                 h = self.rowheight
 
