@@ -314,11 +314,3 @@ class HgRepoView(QTableView):
             if idx is not None:
                 self.goto_toolbar.setVisible(False)
                 self.setCurrentIndex(idx)
-
-    def nextRev(self):
-        row = self.currentIndex().row()
-        self.setCurrentIndex(self.model().index(min(row+1,
-                             self.model().rowCount() - 1), 0))
-    def prevRev(self):
-        row = self.currentIndex().row()
-        self.setCurrentIndex(self.model().index(max(row - 1, 0), 0))

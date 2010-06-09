@@ -484,20 +484,6 @@ class Workbench(QMainWindow):
         self.disab_shortcuts.append(self.actionNextFile)
         self.disab_shortcuts.append(self.actionPrevFile)
 
-        # Next/Prev rev
-        self.actionNextRev = QAction('Next revision', self)
-        self.actionNextRev.setShortcut('Down')
-        #connect(self.actionNextRev, SIGNAL('triggered()'),
-        #        self.repoview.nextRev)
-        self.actionPrevRev = QAction('Prev revision', self)
-        self.actionPrevRev.setShortcut('Up')
-        #connect(self.actionPrevRev, SIGNAL('triggered()'),
-        #        self.repoview.prevRev)
-        self.addAction(self.actionNextRev)
-        self.addAction(self.actionPrevRev)
-        self.disab_shortcuts.append(self.actionNextRev)
-        self.disab_shortcuts.append(self.actionPrevRev)
-
         # navigate in file viewer
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
