@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial import util, error
+from mercurial import util, error, templatefilters
 
 from tortoisehg.util.util import tounicode, Curry
 
@@ -80,7 +80,8 @@ def getlog(model, ctx, gnode):
 # in following lambdas, ctx is a hg changectx
 _columnmap = {'ID': lambda model, ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
               'Log': getlog,
-              'Author': lambda model, ctx, gnode: tounicode(ctx.user()),
+              'Author': lambda model, ctx, gnode: tounicode(
+                  templatefilters.person(ctx.user())),
               'Date': lambda model, ctx, gnode: cvrt_date(ctx.date()),
               'Tags': gettags,
               'Branch': lambda model, ctx, gnode: ctx.branch(),
