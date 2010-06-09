@@ -478,4 +478,5 @@ class AnnotateDialog(QDialog):
         super(AnnotateDialog, self).reject()
 
 def run(ui, *pats, **opts):
+    pats = hglib.canonpaths(pats)
     return AnnotateDialog(*pats, **opts)
