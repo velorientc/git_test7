@@ -12,6 +12,9 @@ from PyQt4 import QtCore
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
 
+BEGINTAG = '\033'
+ENDTAG = '\032'
+
 class htmlui(ui.ui):
     def __init__(self, src=None):
         super(htmlui, self).__init__(src)
@@ -26,26 +29,58 @@ class htmlui(ui.ui):
         if self._buffers:
             self._buffers[-1].extend([(str(a), label) for a in args])
         else:
-            self.output.append(self.label(''.join(args), label))
+            self.output.extend(self.smartlabel(''.join(args), label))
 
     def write_err(self, *args, **opts):
         label = opts.get('label', 'ui.error')
-        self.error.append(self.label(''.join(args), label))
+        self.error.extend(self.smartlabel(''.join(args), label))
 
     def label(self, msg, label):
-        msg = hglib.tounicode(msg)
-        if label != 'ui.labeled':
-            msg = QtCore.Qt.escape(msg)
+        '''
+        Called by Mercurial to apply styling (formatting) to a piece of
+        text.  Our implementation wraps tags around the data so we can
+        find it later when it is passed to ui.write()
+        '''
+        return BEGINTAG + self.style(msg, label) + ENDTAG
+
+    def style(self, msg, label):
+        'Escape message for safe HTML, then apply specified style'
+        msg = QtCore.Qt.escape(msg)
         msg = msg.replace('\n', '<br />')
-        if label == 'ui.plain':
-            return msg
         style = qtlib.geteffect(label)
         return '<span style="%s">%s</span>' % (style, msg)
+
+    def smartlabel(self, text, label):
+        '''
+        Escape and apply style, excluding any text between BEGINTAG and
+        ENDTAG.  That text has already been escaped and styled.
+        '''
+        parts = []
+        try:
+            while True:
+                b = text.index(BEGINTAG)
+                e = text.index(ENDTAG)
+                if e > b:
+                    if b:
+                        parts.append(self.style(text[:b-1], label))
+                    parts.append(text[b+1:e])
+                    text = text[e+1:]
+                else:
+                    # invalid range, assume ENDTAG and BEGINTAG
+                    # are naturually occuring.  Style, append, and
+                    # consume up to the BEGINTAG and repeat.
+                    parts.append(self.style(text[:b], label))
+                    text = text[b:]
+        except ValueError:
+            pass
+        if text:
+            parts.append(self.style(text, label))
+        return parts
 
     def popbuffer(self, labeled=False):
         b = self._buffers.pop()
         if labeled:
-            return ''.join(self.label(a, label) for a, label in b)
+            return ''.join(self.style(a, label) for a, label in b)
         return ''.join(a for a, label in b)
 
     def plain(self):
