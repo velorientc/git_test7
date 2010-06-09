@@ -62,7 +62,7 @@ class htmlui(ui.ui):
                 e = text.index(ENDTAG)
                 if e > b:
                     if b:
-                        parts.append(self.style(text[:b-1], label))
+                        parts.append(self.style(text[:b], label))
                     parts.append(text[b+1:e])
                     text = text[e+1:]
                 else:
