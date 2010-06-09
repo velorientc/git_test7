@@ -439,7 +439,7 @@ class WidgetGroups(object):
     def set_enable(self, *args, **kargs):
         self.set_prop('setEnabled', *args, **kargs)
 
-def fileEditor(filename):
+def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
     dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -449,6 +449,8 @@ def fileEditor(filename):
     editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
     editor.setMarginLineNumbers(1, True)
     editor.setMarginWidth(1, '000')
+    if opts.get('foldable'):
+        editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
     vbox.addWidget(editor)
     BB = QDialogButtonBox
     bb = QDialogButtonBox(BB.Save|BB.Cancel)
