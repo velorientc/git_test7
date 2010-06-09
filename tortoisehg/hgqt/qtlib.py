@@ -447,6 +447,8 @@ def fileEditor(filename):
     dialog.setLayout(vbox)
     editor = QsciScintilla()
     editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+    editor.setMarginLineNumbers(1, True)
+    editor.setMarginWidth(1, '000')
     vbox.addWidget(editor)
     BB = QDialogButtonBox
     bb = QDialogButtonBox(BB.Save|BB.Cancel)
