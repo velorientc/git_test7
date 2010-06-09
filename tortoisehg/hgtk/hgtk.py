@@ -31,6 +31,8 @@ try:
 except ImportError:
     config_nofork = None
 
+from tortoisehg.hgtk import textview
+
 try:
     import win32con
     openflags = win32con.CREATE_NO_WINDOW
@@ -55,6 +57,9 @@ for sig in ('thg-exit', 'thg-close', 'thg-refresh', 'thg-accept',
             gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 for sig in ('thg-close', 'thg-new'):
     gobject.signal_new(sig, gtk.Notebook,
+        gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
+for sig in ('thg-undo', 'thg-redo'):
+    gobject.signal_new(sig, textview.UndoableTextView,
         gobject.SIGNAL_ACTION, gobject.TYPE_NONE, ())
 
 gtkmainalive = False
@@ -87,10 +92,10 @@ def dispatch(args):
         else:
             gtkrun(run, u, **opts)
 
+origwdir = os.getcwd()
 def portable_fork(ui, opts):
     if 'THG_HGTK_SPAWN' in os.environ or (
-            not opts.get('fork') and (
-                opts.get('nofork') or opts.get('repository'))):
+        not opts.get('fork') and opts.get('nofork')):
         return
     elif ui.configbool('tortoisehg', 'hgtkfork', None) is not None:
         if not ui.configbool('tortoisehg', 'hgtkfork'):
@@ -104,6 +109,7 @@ def portable_fork(ui, opts):
         args = [sys.executable] + sys.argv
     os.environ['THG_HGTK_SPAWN'] = '1'
     cmdline = subprocess.list2cmdline(args)
+    os.chdir(origwdir)
     subprocess.Popen(cmdline,
                      creationflags=openflags,
                      shell=True)
@@ -215,7 +221,6 @@ def _runcatch(ui, args):
     return -1
 
 def runcommand(ui, args):
-    fullargs = args
     cmd, func, args, options, cmdoptions, alias = _parse(ui, args)
     cmdoptions['alias'] = alias
     ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
@@ -620,7 +625,9 @@ def help_(ui, name=None, with_version=False, **opts):
                 commands = cmds[f].replace("|",", ")
                 ui.write(" %s:\n      %s\n"%(commands, h[f]))
             else:
-                ui.write(' %-*s   %s\n' % (m, f, util.wrap(h[f], m + 4)))
+                ui.write('%s\n' % (util.wrap(h[f],
+                                             initindent=' %-*s   ' % (m, f),
+                                             hangindent=' ' * (m + 4))))
 
         if not ui.quiet:
             addglobalopts(True)
@@ -687,7 +694,11 @@ def help_(ui, name=None, with_version=False, **opts):
         opts_len = max([len(line[0]) for line in opt_output if line[1]] or [0])
         for first, second in opt_output:
             if second:
-                ui.write(" %-*s  %s\n" % (opts_len, first, second))
+                initindent = ' %-*s  ' % (opts_len, first)
+                hangindent = ' ' * (opts_len + 3)
+                ui.write('%s\n' % (util.wrap(second,
+                                             initindent=initindent,
+                                             hangindent=hangindent)))
             else:
                 ui.write("%s\n" % first)
 

@@ -65,11 +65,17 @@ class DataMineDialog(gdialog.GWindow):
         root = self.repo.root
         cf = []
         for f in self.pats:
-            if os.path.isfile(f):
-                cf.append(util.canonpath(root, self.cwd, f))
-            elif os.path.isdir(f):
-                gdialog.Prompt(_('Invalid path'),
-                       _('Cannot annotate directory: %s') % f, None).run()
+            try:
+                if os.path.isfile(f):
+                    cf.append(util.canonpath(root, self.cwd, f))
+                elif os.path.isdir(f):
+                    for fn in os.listdir(f):
+                        fname = os.path.join(f, fn)
+                        if not os.path.isfile(fname):
+                            continue
+                        cf.append(util.canonpath(root, self.cwd, fname))
+            except util.Abort:
+                pass
         for f in cf:
             self.add_annotate_page(f, '.')
         if not self.notebook.get_n_pages():
@@ -156,10 +162,24 @@ class DataMineDialog(gdialog.GWindow):
                  args=[objs])
         m.append(_('Di_splay Change'), self.cmenu_display,
                  'menushowchanged.ico')
-        m.append(_('_Annotate Parent'), self.cmenu_annotate_parent,
-                 'menublame.ico', args=[objs])
+        (frame, treeview, filepath, graphview) = objs
+        path = graphview.get_path_at_revid(int(self.currev))
+        filepath = graphview.get_wfile_at_path(path)
+        ctx = self.repo[self.currev]
+        fctx = ctx.filectx(filepath)
+        parents = fctx.parents()
+        if len(parents) > 0:
+            if len(parents) == 1:
+                m.append(_('_Annotate Parent'), self.cmenu_annotate_1st_parent,
+                         'menublame.ico', args=[objs])
+            else:
+                m.append(_('_Annotate First Parent'), self.cmenu_annotate_1st_parent,
+                         'menublame.ico', args=[objs])
+                m.append(_('Annotate Second Parent'), self.cmenu_annotate_2nd_parent,
+                         'menublame.ico', args=[objs])
         m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
         m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
+        m.append(_('_Diff to Local'), self.cmenu_local_diff)
         menu = m.build()
         menu.show_all()
         return menu
@@ -181,56 +201,30 @@ class DataMineDialog(gdialog.GWindow):
     def cmenu_annotate(self, menuitem):
         self.add_annotate_page(self.curpath, self.currev)
 
-    def cmenu_annotate_parent(self, menuitem, objs):
-        def error_prompt():
-            gdialog.Prompt(_('No parent file'),
-                           _('Unable to annotate'), self).run()
-            return False
+    def cmenu_annotate_1st_parent(self, menuitem, objs):
+        self.annotate_parent(objs, 0)
+
+    def cmenu_annotate_2nd_parent(self, menuitem, objs):
+        self.annotate_parent(objs, 1)
+
+    def annotate_parent(self, objs, parent_idx):
         (frame, treeview, filepath, graphview) = objs
-        anotrev = treeview.get_model().rev
-        graphmodel = graphview.treeview.get_model()
         path = graphview.get_path_at_revid(int(self.currev))
-        if not path:
-            return error_prompt()
-        iter = graphmodel.get_iter(path)
-        parent_iter = graphmodel.iter_next(iter)
-        if not parent_iter:
-            return error_prompt()
-        parent_path = graphmodel.get_path(parent_iter)
-        parent_revid = graphmodel[parent_path][LogTreeModelModule.REVID]
-        parent_ctx = self.repo[parent_revid]
-        try:
-            parent_ctx.filectx(filepath)
-        except error.LookupError:
-            # file was renamed/moved, try to find previous file path
-            end_iter = iter
-            path = graphview.get_path_at_revid(int(anotrev))
-            if not path:
-                return error_prompt()
-            iter = graphmodel.get_iter(path)
-            while iter and iter != end_iter:
-                path = graphmodel.get_path(iter)
-                revid = graphmodel[path][LogTreeModelModule.REVID]
-                ctx = self.repo[revid]
-                try:
-                    fctx = ctx.filectx(filepath)
-                    renamed = fctx.renamed()
-                    if renamed:
-                        filepath = renamed[0]
-                        break
-                except error.LookupError:
-                    # break iteration, but don't use 'break' statement
-                    # so that execute 'else' block for showing prompt.
-                    iter = end_iter
-                    continue
-                # move iterator to next
-                iter = graphmodel.iter_next(iter)
-            else:
-                return error_prompt()
+        filepath = graphview.get_wfile_at_path(path)
+        ctx = self.repo[self.currev]
+        fctx = ctx.filectx(filepath)
+        parents = fctx.parents()
+        parent_fctx = parents[parent_idx]
+        parent_revid = parent_fctx.changectx().rev()
+        filepath = parent_fctx.path()
         # annotate file of parent rev
         self.trigger_annotate(parent_revid, filepath, objs)
         graphview.scroll_to_revision(int(parent_revid))
         graphview.set_revision_id(int(parent_revid))
+
+    def cmenu_local_diff(self, menuitem):
+        opts = {'rev':[str(self.currev)], 'bundle':None}
+        self._do_diff([self.curpath], opts)
 
     def cmenu_file_log(self, menuitem):
         from tortoisehg.hgtk import history
@@ -365,10 +359,10 @@ class DataMineDialog(gdialog.GWindow):
                                 str) # file path (utf-8)
         treeview.set_model(results)
         treeview.set_search_equal_func(self.search_in_grep)
-        for title, width, col, emode in (
-                (_('Rev'), 10, GCOL_REVID, pango.ELLIPSIZE_NONE),
-                (_('File'), 25, GCOL_PATH, pango.ELLIPSIZE_START),
-                (_('Matches'), 80, GCOL_LINE, pango.ELLIPSIZE_END)):
+        for title, width, ttype, col, emode in (
+                (_('Rev'), 10, 'text', GCOL_REVID, pango.ELLIPSIZE_NONE),
+                (_('File'), 25, 'text', GCOL_PATH, pango.ELLIPSIZE_START),
+                (_('Matches'), 80, 'markup', GCOL_LINE, pango.ELLIPSIZE_END)):
             cell = gtk.CellRendererText()
             cell.set_property('width-chars', width)
             cell.set_property('ellipsize', emode)
@@ -378,7 +372,7 @@ class DataMineDialog(gdialog.GWindow):
             column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             column.set_fixed_width(cell.get_size(treeview)[2])
             column.pack_start(cell, expand=True)
-            column.add_attribute(cell, 'text', col)
+            column.add_attribute(cell, ttype, col)
             treeview.append_column(column)
         if hasattr(treeview, 'set_tooltip_column'):
             treeview.set_tooltip_column(GCOL_DESC)
@@ -461,7 +455,7 @@ class DataMineDialog(gdialog.GWindow):
 
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, True, args)
             except (util.Abort, error.LookupError), e:
                 self.stbar.set_text(_('Abort: %s') % str(e))
 
@@ -490,8 +484,16 @@ class DataMineDialog(gdialog.GWindow):
         """
         Handle all the messages currently in the queue (if any).
         """
+        text = ''
         while q.qsize():
-            line = q.get(0).rstrip('\r\n')
+            data, label = q.get(0)
+            data = gtklib.markup_escape_text(hglib.toutf(data))
+            if label == 'grep.match':
+                text += '<span foreground="red"><b>%s</b></span>' % data
+            else:
+                text += data
+        
+        for line in text.splitlines():
             try:
                 (path, revid, text) = line.split(':', 2)
             except ValueError:
@@ -499,8 +501,7 @@ class DataMineDialog(gdialog.GWindow):
             desc, user = self.get_rev_desc(long(revid))
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
-            model.append((revid, hglib.toutf(text[:512]), desc,
-                          hglib.toutf(path)))
+            model.append((revid, text, desc, hglib.toutf(path)))
         if thread.isAlive():
             return True
         else:
@@ -766,7 +767,7 @@ class DataMineDialog(gdialog.GWindow):
         '''
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, False, args)
             except (util.Abort, error.LookupError), e:
                 self.stbar.set_text(_('Abort: %s') % str(e))
 

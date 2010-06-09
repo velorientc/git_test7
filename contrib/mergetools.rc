@@ -8,7 +8,6 @@ beyondcompare3.regname=ExePath
 beyondcompare3.gui=True
 beyondcompare3.diffargs=/lro /lefttitle='$plabel1' /righttitle='$clabel' /solo /expandall $parent $child
 beyondcompare3.diff3args=$parent1 $parent2 $child /lefttitle='$plabel1' /centertitle='$clabel' /righttitle='$plabel2' /solo /ro
-;beyondcompare3.diff3args=$parent1 $parent2 $ancestor /mergeoutput=$child /lefttitle='$plabel1' /centertitle='$alabel' /righttitle='$plabel2' /outputtitle='$clabel' /solo /expandall /ro
 beyondcompare3.dirdiff=True
 
 araxis.regkey=SOFTWARE\Classes\TypeLib\{46799e0a-7bd1-4330-911c-9660bb964ea2}\7.0\HELPDIR
@@ -44,7 +43,6 @@ kdiff3.premerge=False
 kdiff3.gui=True
 kdiff3.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
 kdiff3.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
-;kdiff3.diff3args=--L1 '$alabel' --L2 '$plabel1' --L3 '$plabel2' $ancestor $parent1 $parent2 -o $child
 kdiff3.dirdiff=True
 
 diffmerge.regkey=Software\SourceGear\SourceGear DiffMerge\
@@ -74,8 +72,6 @@ tortoisemerge.checkchanged=True
 tortoisemerge.gui=True
 tortoisemerge.diffargs=/base:$parent /mine:$child /basename:'$plabel1' /minename:'$clabel'
 ; TortoiseMerge does not support three-way file or directory comparisons
-; This command looked like it worked, but it overwrote the merge results
-;tortoisemerge.diff3args=/base:$ancestor /mine:$parent1 /theirs:$parent2 /merged:$child /basename:'$alabel' /minename:'$plabel1' /theirsname:'$plabel2' /mergedname:'$clabel'
 
 ecmerge.priority=-10
 ecmerge.args=$base $local $other --mode=merge3 --title0=base --title1=local --title2=other --to=$output
