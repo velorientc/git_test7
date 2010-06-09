@@ -260,7 +260,12 @@ class EmailDialog(QDialog):
             w.setUtf8(True)
             w.setReadOnly(True)
             w.setMarginWidth(1, 0)  # hide area for line numbers
-            w.setLexer(lexers.DiffLexerSelector().lexer())
+            lex = lexers.DiffLexerSelector().lexer()
+            fh = qtlib.getfont(self._ui, 'fontdiff')
+            fh.changed.connect(lambda f: lex.setFont(f))
+            # TODO: why cannot we connect directly, without lambda?
+            lex.setFont(fh.font())
+            w.setLexer(lex)
             # TODO: better way to setup diff lexer
         initqsci(self._qui.preview_edit)
 
