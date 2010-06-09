@@ -153,10 +153,18 @@ class FontEntry(QPushButton):
     def on_clicked(self, checked):
         thgf = qtlib.getfont(ui.ui(), self.fname)
         dlg = QFontDialog(self)
-        dlg.setCurrentFont(QFont(self.value() or thgf.font()))
+        dlg.setCurrentFont(self.currentFont() or thgf.font())
         if dlg.exec_() == QDialog.Accepted:
             thgf.setFont(dlg.selectedFont())
             self.setText(thgf.font().toString())
+
+    def currentFont(self):
+        """currently selected QFont if specified"""
+        if not self.value():
+            return None
+
+        f = QFont()
+        f.fromString(self.value())
 
     ## common APIs for all edit widgets
 

@@ -157,7 +157,8 @@ class ThgFont(QObject):
     changed = pyqtSignal(QFont)
     def __init__(self, name):
         QObject.__init__(self)
-        self.myfont = QFont(name)
+        self.myfont = QFont()
+        self.myfont.fromString(name)
     def font(self):
         return self.myfont
     def setFont(self, f):
@@ -165,10 +166,10 @@ class ThgFont(QObject):
         self.changed.emit(f)
 
 _fontdefaults = {
-    'fontcomment': 'monospace 10',
-    'fontdiff': 'monospace 10',
-    'fontlist': 'sans 9',
-    'fontlog': 'monospace 10'
+    'fontcomment': 'monospace,10',
+    'fontdiff': 'monospace,10',
+    'fontlist': 'sans,9',
+    'fontlog': 'monospace,10'
 }
 _fontcache = {}
 def getfont(ui, name):
