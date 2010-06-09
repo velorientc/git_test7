@@ -65,6 +65,7 @@ class Workbench(QMainWindow):
         self.dummywidget = QWidget()
         self.stackedWidget.addWidget(self.dummywidget)
         self.stackedWidget.setCurrentWidget(self.dummywidget)
+        self.currentRepoRoot = ''
 
         self.setWindowTitle('TortoiseHg Workbench')
 
@@ -298,12 +299,17 @@ class Workbench(QMainWindow):
             ann = w.getAnnotate()
             tags = w.repo.tags().keys()
             w.switchedTo()
+            self.currentRepoRoot = w.repo.root
         else:
             self.stackedWidget.setCurrentWidget(self.dummywidget)
+            self.currentRepoRoot = ''
 
         self.actionDiffMode.setEnabled(w is not None)
         self.actionDiffMode.setChecked(mode == 'diff')
         self.actionAnnMode.setChecked(ann)
+
+    def getCurentRepoRoot(self):
+        return self.currentRepoRoot
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
@@ -320,7 +326,7 @@ class Workbench(QMainWindow):
             s = QSettings()
             cw.loadConfigs(s)
 
-        rw = RepoWidget(repo, self.stackedWidget, cw)
+        rw = RepoWidget(repo, self, cw)
         rw.showMessageSignal.connect(self.showMessage)
         rw.switchToSignal.connect(self.switchTo)
         tw = self.repoTabsWidget

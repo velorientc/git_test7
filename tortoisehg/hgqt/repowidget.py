@@ -35,9 +35,10 @@ class RepoWidget(QWidget):
     showMessageSignal = pyqtSignal(str)
     switchToSignal = pyqtSignal(QWidget)
 
-    def __init__(self, repo, stackedWidget, commitWidget):
+    def __init__(self, repo, workbench, commitWidget):
         self.repo = repo
-        self.stackedWidget = stackedWidget
+        self.workbench = workbench
+        self.stackedWidget = workbench.stackedWidget
         self.commitWidget = commitWidget
         self._closed_branch_supp = has_closed_branch_support(self.repo)
         self._reload_rev = '.'
@@ -267,7 +268,8 @@ class RepoWidget(QWidget):
             else:
                 self.revDetailsWidget.revision_selected(rev)
                 self.currentWidget = self.revDetailsWidget
-            self.stackedWidget.setCurrentWidget(self.currentWidget)
+            if self.workbench.getCurentRepoRoot() == self.repo.root:
+                self.stackedWidget.setCurrentWidget(self.currentWidget)
 
     def goto(self, rev):
         rev = str(rev)
@@ -313,7 +315,7 @@ class RepoWidget(QWidget):
 
     def switchTo(self):
         self.switchToSignal.emit(self)
- 
+
     def switchedTo(self):
         if self.currentWidget:
             self.stackedWidget.setCurrentWidget(self.currentWidget)
