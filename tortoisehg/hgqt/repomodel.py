@@ -412,8 +412,11 @@ class HgRepoListModel(QAbstractTableModel):
         return nullvariant
 
     def headerData(self, section, orientation, role):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(self._columns[section])
+        if orientation == Qt.Horizontal:
+            if role == Qt.DisplayRole:
+                return QVariant(self._columns[section])
+            if role == Qt.TextAlignmentRole:
+                return QVariant(Qt.AlignLeft)
         return nullvariant
 
     def rowFromRev(self, rev):
