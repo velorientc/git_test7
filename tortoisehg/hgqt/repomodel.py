@@ -429,10 +429,7 @@ class HgRepoListModel(QAbstractTableModel):
         return None
 
     def clear(self):
-        """empty the list"""
+        'empty the list'
         self.graph = None
         self._datacache = {}
-        self.notify_data_changed()
-
-    def notify_data_changed(self):
         self.emit(SIGNAL("layoutChanged()"))
