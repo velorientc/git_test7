@@ -65,6 +65,7 @@ def gettags(ctx, gnode):
     return tounicode(",".join(tags))
 
 def getlog(ctx, gnode):
+    # TODO: add branch name / tag markups
     if ctx.rev() is not None:
         msg = tounicode(ctx.description())
         if msg:
