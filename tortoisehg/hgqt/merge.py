@@ -510,7 +510,7 @@ class CommitPage(BasePage):
         def markup_func(widget, item, value):
             if item == 'rev':
                 text, rev = value
-                return '%s (%s)' % (text, rev)
+                return '<a href="view">%s</a> (%s)' % (text, rev)
             elif item == 'parents':
                 def branch_markup(branch):
                     opts = dict(fg='black', bg='#aaffaa')
@@ -538,6 +538,8 @@ class CommitPage(BasePage):
         box.addWidget(rev_sep)
         rev_info = csinfo.create(repo, None, style, custom=custom,
                                  withupdate=True)
+        page = self.wizard().page(MERGE_PAGE)
+        rev_info.linkActivated.connect(page.link_activated)
         box.addWidget(rev_info)
 
         # commit message area
