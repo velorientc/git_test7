@@ -101,16 +101,16 @@ class UnknownItem(Exception):
     pass
 
 def create_context(repo, target):
-    if repo is None or target is None:
+    if repo is None:
         return None
+    if target is None:
+        return repo[None]
     ctx = PatchContext(repo, target)
     if ctx is None:
         ctx = ChangesetContext(repo, target)
     return ctx
 
 def ChangesetContext(repo, rev):
-    if repo is None or rev is None:
-        return None
     try:
         ctx = repo[rev]
     except (error.LookupError, error.RepoLookupError, error.RepoError):
@@ -118,8 +118,6 @@ def ChangesetContext(repo, rev):
     return ctx
 
 def PatchContext(repo, patchpath, cache={}):
-    if repo is None or patchpath is None:
-        return None
     # check path
     if not os.path.isabs(patchpath) or not os.path.isfile(patchpath):
         return None
@@ -240,7 +238,7 @@ class SummaryInfo(object):
             elif item == 'summary':
                 value = ctx.description().replace('\0', '').split('\n')[0]
                 if len(value) == 0:
-                    return  None
+                    return None
                 return hglib.toutf(hglib.tounicode(value)[:80])
             elif item == 'user':
                 return hglib.toutf(ctx.user())
