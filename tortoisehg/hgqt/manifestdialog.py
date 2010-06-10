@@ -58,10 +58,6 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
         self.createActions()
         self.setupTextview()
 
-    def load_config(self, ui):
-        cfg = HgDialogMixin.load_config(self, ui)
-        self.max_file_size = cfg.getMaxFileSize()
-
     def setupModels(self):
         self.treemodel = ManifestModel(self.repo, self.rev)
         self.treeView.setModel(self.treemodel)
