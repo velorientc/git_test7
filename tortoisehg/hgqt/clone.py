@@ -152,6 +152,9 @@ class CloneDialog(QDialog):
         self.src_combo.setFocus()
         self.src_combo.lineEdit().selectAll()
 
+    def getDest(self):
+        return hglib.fromunicode(self.dest_combo.currentText()).strip()
+
     ### Private Methods ###
 
     def show_options(self, visible):
