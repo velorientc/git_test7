@@ -20,7 +20,6 @@ from tortoisehg.util.util import tounicode, Curry
 
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
-from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt.qtlib import geticon
 
 from tortoisehg.hgqt.i18n import _
@@ -147,7 +146,7 @@ class HgRepoListModel(QAbstractTableModel):
         self._fill_timer = None
         self.rowcount = 0
         self.repo = repo
-        self.load_config()
+        self.reloadConfig()
         self.setRepo(repo, branch=branch)
 
     def setRepo(self, repo, branch=''):
@@ -155,7 +154,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.repo = repo
         self._branch = branch
         if oldrepo.root != repo.root:
-            self.load_config()
+            self.reloadConfig()
         self._datacache = {}
         try:
             wdctxs = self.repo.changectx(None).parents()
@@ -242,14 +241,12 @@ class HgRepoListModel(QAbstractTableModel):
     def columnCount(self, parent=None):
         return len(self._columns)
 
-    def load_config(self):
-        cfg = HgConfig(self.repo.ui)
-        self._users, self._aliases = cfg.getUsers()
-        self.dot_radius = cfg.getDotRadius(default=8)
-        self.rowheight = cfg.getRowHeight()
-        self.fill_step = cfg.getFillingStep()
-        self.max_file_size = cfg.getMaxFileSize()
-        self.hide_mq_tags = cfg.getMQHideTags()
+    def reloadConfig(self):
+        self.dot_radius = 8
+        self.rowheight = 20
+        self.fill_step = 500            # use hgtk logic
+        self.max_file_size = 1024*1024  # will be removed
+        self.hide_mq_tags = False       # use hgtk logic
         self.updateColumns()
 
     def updateColumns(self):
@@ -268,22 +265,10 @@ class HgRepoListModel(QAbstractTableModel):
         return None
 
     def user_color(self, user):
-        if user in self._aliases:
-            user = self._aliases[user]
-        if user in self._users:
-            try:
-                color = self._users[user]['color']
-                color = QColor(color).name()
-                self._user_colors[user] = color
-            except:
-                pass
-        if user not in self._user_colors:
-            self._user_colors[user] = get_color(len(self._user_colors),
-                                                self._user_colors.values())
+        'deprecated, please replace with hgtk color scheme'
+        self._user_colors[user] = get_color(len(self._user_colors),
+                                            self._user_colors.values())
         return self._user_colors[user]
-
-    def user_name(self, user):
-        return self._aliases.get(user, user)
 
     def namedbranch_color(self, branch):
         if branch not in self._branch_colors:
@@ -303,18 +288,18 @@ class HgRepoListModel(QAbstractTableModel):
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
         if role == Qt.DisplayRole:
-            if column == 'Author': #author
-                return QVariant(self.user_name(_columnmap[column](self, ctx, gnode)))
+            if column == 'Author':
+                return QVariant(_columnmap[column](self, ctx, gnode))
             elif column == 'Log':
                 msg = _columnmap[column](self, ctx, gnode)
                 return QVariant(msg)
             return QVariant(_columnmap[column](self, ctx, gnode))
         elif role == Qt.ForegroundRole:
-            if column == 'Author': #author
+            if column == 'Author':
                 if self.authorcolor:
                     return QVariant(QColor(self.user_color(ctx.user())))
                 return nullvariant
-            if column == 'Branch': #branch
+            if column == 'Branch':
                 return QVariant(QColor(self.namedbranch_color(ctx.branch())))
         elif role == Qt.DecorationRole:
             if column == 'Graph':
