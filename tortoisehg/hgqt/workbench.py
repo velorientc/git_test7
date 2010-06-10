@@ -17,6 +17,7 @@ from mercurial import hg
 from mercurial.error import RepoError
 
 from tortoisehg.util.hglib import tounicode
+from tortoisehg.hgqt import repomodel
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.decorators import timeit
 from tortoisehg.hgqt.qtlib import geticon, getfont
@@ -24,6 +25,7 @@ from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.commit import CommitWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
+from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 
 from tortoisehg.util import paths
 
@@ -197,6 +199,8 @@ class Workbench(QMainWindow):
         self.actionShowPaths = a = QAction(_("Show Paths"), self)
         a.setCheckable(True)
 
+        self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
+
         a = QAction(_("Show Repository Registry"), self)
         a.setCheckable(True)
         self.actionShowRepoRegistry = a
@@ -217,6 +221,7 @@ class Workbench(QMainWindow):
         self.menuView = m = QMenu(_("View"), self.menubar)
         m.addAction(self.actionShowRepoRegistry)
         m.addAction(self.actionShowPaths)
+        m.addAction(self.actionSelectColumns)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -416,6 +421,7 @@ class Workbench(QMainWindow):
         self.actionQuit.triggered.connect(self.close)
         self.actionBack.triggered.connect(self.back)
         self.actionForward.triggered.connect(self.forward)
+        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
         self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
 
@@ -495,6 +501,14 @@ class Workbench(QMainWindow):
 
     def actionShowPathsToggled(self, show):
         self.reporegistry.showPaths(show)
+
+    def setHistoryColumns(self, *args):
+        """Display the column selection dialog"""
+        dlg = ColumnSelectDialog(repomodel.ALLCOLUMNS)
+        dlg.exec_()
+        self.reload()
+        w = self.repoTabsWidget.currentWidget()
+        w.repoview.resizeColumns()
 
     def back(self):
         w = self.repoTabsWidget.currentWidget()

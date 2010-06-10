@@ -10,6 +10,7 @@ import os
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import repomodel
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -77,5 +78,4 @@ class ColumnSelectDialog(QDialog):
         QDialog.reject(self)
 
 def run(ui, *pats, **opts):
-    _allcolumns = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
-    return ColumnSelectDialog(_allcolumns)
+    return ColumnSelectDialog(repomodel.ALLCOLUMNS)

@@ -36,6 +36,7 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 #COLORS = [str(color) for color in QColor.colorNames()]
+ALLCOLUMNS = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
 
 def get_color(n, ignore=()):
     """
@@ -122,7 +123,6 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
-    _allcolumns = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
     _columns = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
     _stretchs = {'Log': 1, }
 
@@ -186,7 +186,7 @@ class HgRepoListModel(QAbstractTableModel):
         cols = s.value('workbench/columns').toStringList()
         cols = [str(col) for col in cols]
         if cols:
-            validcols = [col for col in cols if col in self._allcolumns]
+            validcols = [col for col in cols if col in ALLCOLUMNS]
             self._columns = tuple(validcols)
             self.emit(SIGNAL("layoutChanged()"))
 
