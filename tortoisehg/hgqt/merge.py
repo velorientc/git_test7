@@ -487,17 +487,60 @@ class CommitPage(BasePage):
         repo = self.wizard().repo
         box = QVBoxLayout()
 
+        # csinfo
+        def label_func(widget, item):
+            if item == 'rev':
+                return _('Revision:')
+            elif item == 'parents':
+                return _('Parents')
+            raise csinfo.UnknownItem()
+        def data_func(widget, item, ctx):
+            if item == 'rev':
+                return _('Working Directory'), str(ctx)
+            elif item == 'parents':
+                parents = []
+                cbranch = ctx.branch()
+                for pctx in ctx.parents():
+                    branch = None
+                    if hasattr(pctx, 'branch') and pctx.branch() != cbranch:
+                        branch = pctx.branch()
+                    parents.append((str(pctx.rev()), str(pctx), branch, pctx))
+                return parents
+            raise csinfo.UnknownItem()
+        def markup_func(widget, item, value):
+            if item == 'rev':
+                text, rev = value
+                return '%s (%s)' % (text, rev)
+            elif item == 'parents':
+                def branch_markup(branch):
+                    opts = dict(fg='black', bg='#aaffaa')
+                    return qtlib.markup(' %s ' % branch, **opts)
+                csets = []
+                for rnum, rid, branch, pctx in value:
+                    line = '%s (%s)' % (rnum, rid)
+                    if branch:
+                        line = '%s %s' % (line, branch_markup(branch))
+                    msg = widget.info.get_data('summary', widget,
+                                               pctx, widget.custom)
+                    if msg:
+                        line = '%s %s' % (line, msg)
+                    csets.append(line)
+                return csets
+            raise csinfo.UnknownItem()
+        custom = csinfo.custom(label=label_func, data=data_func,
+                               markup=markup_func)
+        contents = ('rev', 'user', 'dateage', 'branch', 'parents')
+        style = csinfo.panelstyle(contents=contents, margin=6)
+
+        # merged files
         box.addSpacing(12)
         rev_sep = qtlib.LabeledSeparator(_('Working Directory (merged)'))
         box.addWidget(rev_sep)
-        style = csinfo.panelstyle(margin=6)
-        rev_info = csinfo.create(repo, None, style, withupdate=True)
+        rev_info = csinfo.create(repo, None, style, custom=custom,
+                                 withupdate=True)
         box.addWidget(rev_info)
 
-        # TODO
-        todo = QLabel('<b>TODO:</b> Merged files are shown in here')
-        box.addWidget(todo)
-
+        # commit message area
         msg_sep = qtlib.LabeledSeparator(_('Commit message'))
         box.addWidget(msg_sep)
         msg_text = QTextEdit()
