@@ -15,6 +15,7 @@ import cStringIO
 from mercurial import cmdutil, util, patch, mdiff, error
 
 from tortoisehg.util import hglib, hgshelve
+from tortoisehg.util.i18n import _
 
 from tortoisehg.hgtk import gtklib
 
