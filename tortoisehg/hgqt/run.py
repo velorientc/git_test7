@@ -396,7 +396,8 @@ def tag(ui, *pats, **opts):
 
 def test(ui, *pats, **opts):
     """test arbitrary widgets"""
-    from tortoisehg.hgqt.chunkselect import run
+    from tortoisehg.hgqt.logcolumns import run
+    #from tortoisehg.hgqt.chunkselect import run
     qtrun(run, ui, *pats, **opts)
 
 def remove(ui, *pats, **opts):
