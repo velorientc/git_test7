@@ -385,7 +385,8 @@ class LabeledSeparator(QWidget):
         box.setContentsMargins(*(0,)*4)
 
         if label:
-            label = QLabel(label)
+            if isinstance(label, basestring):
+                label = QLabel(label)
             box.addWidget(label)
 
         sep = QFrame()
