@@ -10,15 +10,13 @@
 
 from mercurial import hg
 
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
-
-from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt.filelistmodel import HgFileListModel
-
-from filelistview import HgFileListView
-from fileview import HgFileView
-from revpanelwidget import RevPanelWidget
-from revmessage import RevMessage
+from tortoisehg.hgqt.filelistview import HgFileListView
+from tortoisehg.hgqt.fileview import HgFileView
+from tortoisehg.hgqt.revpanelwidget import RevPanelWidget
+from tortoisehg.hgqt.revmessage import RevMessage
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -155,23 +153,9 @@ class RevDetailsWidget(QWidget):
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
     def load_config(self):
-        cfg = HgConfig(self.repo.ui)
-        fontstr = cfg.getFont()
-        font = QFont()
-        try:
-            if not font.fromString(fontstr):
-                raise Exception
-        except:
-            print "bad font name '%s'" % fontstr
-            font.setFamily("Monospace")
-            font.setFixedPitch(True)
-            font.setPointSize(10)
-        self._font = font
-
-        self.rowheight = cfg.getRowHeight()
-        self.users, self.aliases = cfg.getUsers()
-        self.hidefinddelay = cfg.getHideFindDelay()
-        return cfg
+        self._font = qtlib.getfont(self.repo.ui, 'fontlog').font()
+        self.rowheight = 8
+        self.users, self.aliases = [], []
 
     def revisionLinkClicked_(self, rev):
         self.revisionLinkClicked.emit(rev)

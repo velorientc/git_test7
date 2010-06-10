@@ -14,6 +14,7 @@ class _LexerSelector(object):
         return self.cfg_lexer(self._lexer(), cfg)
 
     def cfg_lexer(self, lexer, cfg=None):
+        # TODO: get font from qtlib.getfont()
         if cfg:
             font = QtGui.QFont()
             fontstr = cfg.getFont()
@@ -142,12 +143,12 @@ class DiffLexerSelector(_ScriptLexerSelector):
 lexers = [cls() for clsname, cls in globals().items() if not clsname.startswith('_') and isinstance(cls, type) and \
           issubclass(cls, (_LexerSelector, _FilenameLexerSelector, _ScriptLexerSelector))]
 
-def get_lexer(filename, filedata, fileflag=None, cfg=None):
+def get_lexer(filename, filedata, fileflag=None):
     if fileflag == "=":
-        return DiffLexerSelector().lexer(cfg)
+        return DiffLexerSelector().lexer(None)
     for lselector in lexers:
         if lselector.match(filename, filedata):
-            return lselector.lexer(cfg)
+            return lselector.lexer(None)
     return None
 
         

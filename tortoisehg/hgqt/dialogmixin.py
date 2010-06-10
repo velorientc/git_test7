@@ -28,7 +28,6 @@ connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 Qt = QtCore.Qt
 
-from tortoisehg.hgqt.config import HgConfig
 from tortoisehg.hgqt import should_rebuild
 
 class HgDialogMixin(object):
@@ -89,22 +88,10 @@ class HgDialogMixin(object):
                 w.hide()
         
     def load_config(self, ui):
-        cfg = HgConfig(ui)
-        fontstr = cfg.getFont()
-        font = QtGui.QFont()
-        try:
-            if not font.fromString(fontstr):
-                raise Exception
-        except:
-            print "bad font name '%s'" % fontstr
-            font.setFamily("Monospace")
-            font.setFixedPitch(True)
-            font.setPointSize(10)
-        self._font = font
-
-        self.rowheight = cfg.getRowHeight()
-        self.users, self.aliases = cfg.getUsers()
-        return cfg
+        # TODO: connect to font changed signal
+        self._font = qtlib.getfont(ui, 'fontlog').font()
+        self.rowheight = 8
+        self.users, self.aliases = [], []
 
     def accept(self):
         self.close()

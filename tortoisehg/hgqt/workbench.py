@@ -16,15 +16,10 @@ import os
 from mercurial import hg
 from mercurial.error import RepoError
 
-from tortoisehg.util.util import tounicode
-from tortoisehg.util.util import rootpath, find_repository
-
+from tortoisehg.util.hglib import tounicode
 from tortoisehg.hgqt.i18n import _
-
 from tortoisehg.hgqt.decorators import timeit
-
-from tortoisehg.hgqt.config import HgConfig
-from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt.qtlib import geticon, getfont
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.commit import CommitWidget
@@ -114,22 +109,11 @@ class Workbench(QMainWindow):
                 w.hide()
         
     def load_config(self, ui):
-        cfg = HgConfig(ui)
-        fontstr = cfg.getFont()
-        font = QFont()
-        try:
-            if not font.fromString(fontstr):
-                raise Exception
-        except:
-            print "bad font name '%s'" % fontstr
-            font.setFamily("Monospace")
-            font.setFixedPitch(True)
-            font.setPointSize(10)
+        # TODO: connect to font changed signal
+        font = getfont(ui, 'fontlog').font()
         self._font = font
-
-        self.rowheight = cfg.getRowHeight()
-        self.users, self.aliases = cfg.getUsers()
-        return cfg
+        self.rowheight = 8
+        self.users, self.aliases = [], []
 
     def accept(self):
         self.close()

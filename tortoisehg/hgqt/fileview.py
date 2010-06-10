@@ -30,8 +30,6 @@ SIGNAL = QtCore.SIGNAL
 
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
-from tortoisehg.hgqt.config import HgConfig
-
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList
 
@@ -264,8 +262,7 @@ class HgFileView(QtGui.QFrame):
         if flag == '':
             return
         
-        cfg = HgConfig(self._model.repo.ui)
-        lexer = get_lexer(filename, data, flag, cfg)
+        lexer = get_lexer(filename, data, flag)
         if flag == "+":
             nlines = data.count('\n')
             self.sci.setMarginWidth(1, str(nlines)+'0')

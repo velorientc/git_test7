@@ -16,10 +16,9 @@ from tortoisehg.util.util import has_closed_branch_support
 
 from tortoisehg.hgqt.i18n import _
 
-from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt.qtlib import geticon, getfont
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
-from tortoisehg.hgqt.config import HgConfig
 
 from repoview import HgRepoView
 from revdetailswidget import RevDetailsWidget
@@ -87,23 +86,10 @@ class RepoWidget(QWidget):
         self.revDetailsWidget = w
 
     def load_config(self):
-        cfg = HgConfig(self.repo.ui)
-        fontstr = cfg.getFont()
-        font = QFont()
-        try:
-            if not font.fromString(fontstr):
-                raise Exception
-        except:
-            print "bad font name '%s'" % fontstr
-            font.setFamily("Monospace")
-            font.setFixedPitch(True)
-            font.setPointSize(10)
-        self._font = font
-
-        self.rowheight = cfg.getRowHeight()
-        self.users, self.aliases = cfg.getUsers()
-        self.hidefinddelay = cfg.getHideFindDelay()
-        return cfg
+        self._font = getfont(self.repo.ui, 'fontlog')
+        self.rowheight = 8
+        self.users, self.aliases = [], []
+        self.hidefinddelay = False
 
     def reponame(self):
         return os.path.basename(self.repo.root)
