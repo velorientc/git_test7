@@ -270,6 +270,7 @@ class HgRepoListModel(QAbstractTableModel):
         return self._user_colors[user]
 
     def namedbranch_color(self, branch):
+        'deprecated, please replace with hgtk color scheme'
         if branch not in self._branch_colors:
             self._branch_colors[branch] = get_color(len(self._branch_colors))
         return self._branch_colors[branch]
