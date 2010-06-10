@@ -16,8 +16,7 @@
 
 from mercurial import util, error, templatefilters
 
-from tortoisehg.util.util import tounicode, Curry
-
+from tortoisehg.util.hglib import tounicode
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.qtlib import geticon
@@ -171,7 +170,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.emit(SIGNAL('layoutChanged()'))
         self.heads = [self.repo.changectx(x).rev() for x in self.repo.heads()]
         self.ensureBuilt(row=self.fill_step)
-        QTimer.singleShot(0, Curry(self.emit, SIGNAL('filled')))
+        QTimer.singleShot(0, lambda: self.emit(SIGNAL('filled')))
         self.timerHandle = self.startTimer(50)
 
     def branch(self):
