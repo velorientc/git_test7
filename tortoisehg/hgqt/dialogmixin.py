@@ -29,6 +29,7 @@ SIGNAL = QtCore.SIGNAL
 Qt = QtCore.Qt
 
 from tortoisehg.hgqt import should_rebuild
+from tortoisehg.hgqt import qtlib
 
 class HgDialogMixin(object):
     """
