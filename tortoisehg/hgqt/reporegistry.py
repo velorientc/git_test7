@@ -198,7 +198,7 @@ class RepoTreeView(QTreeView):
         if not self.selitem:
             return
         root = self.selitem.internalPointer().rootpath()
-        d = CloneDialog(args=[root], parent=self)
+        d = CloneDialog(args=[root, root + '-clone'], parent=self)
         d.exec_()
 
 
