@@ -199,11 +199,11 @@ class RepoTreeView(QTreeView):
             return
         root = self.selitem.internalPointer().rootpath()
         d = CloneDialog(args=[root, root + '-clone'], parent=self)
-        def finished(res):
-            if res == QDialog.Accepted:
+        def cmdfinished(res):
+            if res == 0:
                 dest = d.getDest()
                 self.workbench.openRepo(dest)
-        d.finished.connect(finished)
+        d.cmdfinished.connect(cmdfinished)
         d.show()
 
 class RepoRegistryView(QDockWidget):
