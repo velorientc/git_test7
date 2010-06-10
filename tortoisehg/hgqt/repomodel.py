@@ -136,7 +136,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.mqueues = []
         self.wd_revs = []
         self.graph = None
-        self._fill_timer = None
+        self.timerHandle = None
         self.rowcount = 0
         self.repo = repo
         self.reloadConfig()
@@ -172,7 +172,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.heads = [self.repo.changectx(x).rev() for x in self.repo.heads()]
         self.ensureBuilt(row=self.fill_step)
         QTimer.singleShot(0, Curry(self.emit, SIGNAL('filled')))
-        self._fill_timer = self.startTimer(50)
+        self.timerHandle = self.startTimer(50)
 
     def branch(self):
         return self.filterbranch
@@ -205,19 +205,19 @@ class HgRepoListModel(QAbstractTableModel):
             self.updateRowCount()
 
     def timerEvent(self, event):
-        if event.timerId() == self._fill_timer:
+        if event.timerId() == self.timerHandle:
             self.emit(SIGNAL('showMessage'), 'filling (%s)'%(len(self.graph)))
             if self.graph.isfilled():
-                self.killTimer(self._fill_timer)
-                self._fill_timer = None
+                self.killTimer(self.timerHandle)
+                self.timerHandle = None
                 self.emit(SIGNAL('showMessage'), '')
                 self.emit(SIGNAL('loaded'))
             # we only fill the graph data strctures without telling
             # views (until we atually did the full job), to keep
             # maximal GUI reactivity
             elif not self.graph.build_nodes(nnodes=self.fill_step):
-                self.killTimer(self._fill_timer)
-                self._fill_timer = None
+                self.killTimer(self.timerHandle)
+                self.timerHandle = None
                 self.updateRowCount()
                 self.emit(SIGNAL('showMessage'), '')
                 self.emit(SIGNAL('loaded'))
