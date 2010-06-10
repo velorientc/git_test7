@@ -57,16 +57,15 @@ def cvrt_date(date):
     date, tzdelay = date
     return QDateTime.fromTime_t(int(date)).toString(Qt.LocaleDate)
 
-def gettags(model, ctx, gnode):
+def gettags(ctx, gnode):
     if ctx.rev() is None:
         return ""
     mqtags = ['qbase', 'qtip', 'qparent']
     tags = ctx.tags()
-    if model.hide_mq_tags:
-        tags = [t for t in tags if t not in mqtags]
+    tags = [t for t in tags if t not in mqtags]
     return tounicode(",".join(tags))
 
-def getlog(model, ctx, gnode):
+def getlog(ctx, gnode):
     if ctx.rev() is not None:
         msg = tounicode(ctx.description())
         if msg:
@@ -76,16 +75,14 @@ def getlog(model, ctx, gnode):
     return msg
 
 # XXX maybe it's time to make these methods of the model...
-# in following lambdas, ctx is a hg changectx
-_columnmap = {'ID': lambda model, ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
-              'Graph': lambda model, ctx, gnode: "",
+_columnmap = {'ID': lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
+              'Graph': lambda ctx, gnode: "",
               'Log': getlog,
-              'Author': lambda model, ctx, gnode: tounicode(
-                  templatefilters.person(ctx.user())),
-              'Date': lambda model, ctx, gnode: cvrt_date(ctx.date()),
+              'Author': lambda ctx, gnode: templatefilters.person(ctx.user()),
+              'Date': lambda ctx, gnode: cvrt_date(ctx.date()),
               'Tags': gettags,
-              'Branch': lambda model, ctx, gnode: ctx.branch(),
-              'Filename': lambda model, ctx, gnode: gnode.extra[0],
+              'Branch': lambda ctx, gnode: ctx.branch(),
+              'Filename': lambda ctx, gnode: gnode.extra[0],
               }
 
 # in following lambdas, r is a hg repo
@@ -145,15 +142,19 @@ class HgRepoListModel(QAbstractTableModel):
         self.reloadConfig()
         self.setRepo(repo, branch=branch)
 
+        # To be deleted
+        self._user_colors = {}
+        self._branch_colors = {}
+
     def setRepo(self, repo, branch=''):
-        oldrepo = self.repo
+        oldroot = self.repo.root
         self.repo = repo
-        self._branch = branch
-        if oldrepo.root != repo.root:
+        self.filterbranch = branch
+        if oldroot != repo.root:
             self.reloadConfig()
         self.datacache = {}
         try:
-            wdctxs = self.repo.changectx(None).parents()
+            wdctxs = self.repo.parents()
         except error.Abort:
             # might occur if reloading during a mq operation (or
             # whatever operation playing with hg history)
@@ -162,8 +163,6 @@ class HgRepoListModel(QAbstractTableModel):
         if self._hasmq:
             self.mqueues = self.repo.mq.series[:]
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
-        self._user_colors = {}
-        self._branch_colors = {}
         self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor')
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
@@ -176,7 +175,7 @@ class HgRepoListModel(QAbstractTableModel):
         self._fill_timer = self.startTimer(50)
 
     def branch(self):
-        return self._branch
+        return self.filterbranch
 
     def ensureBuilt(self, rev=None, row=None):
         """
@@ -242,7 +241,6 @@ class HgRepoListModel(QAbstractTableModel):
         self.rowheight = 20
         self.fill_step = 500            # use hgtk logic
         self.max_file_size = 1024*1024  # will be removed
-        self.hide_mq_tags = False       # use hgtk logic
         self.updateColumns()
 
     def updateColumns(self):
@@ -288,12 +286,10 @@ class HgRepoListModel(QAbstractTableModel):
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
         if role == Qt.DisplayRole:
-            if column == 'Author':
-                return QVariant(_columnmap[column](self, ctx, gnode))
-            elif column == 'Log':
-                msg = _columnmap[column](self, ctx, gnode)
-                return QVariant(msg)
-            return QVariant(_columnmap[column](self, ctx, gnode))
+            text = _columnmap[column](ctx, gnode)
+            if not isinstance(text, (QString, unicode)):
+                text = tounicode(text)
+            return QVariant(text)
         elif role == Qt.ForegroundRole:
             if column == 'Author':
                 if self.authorcolor:
