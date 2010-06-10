@@ -997,7 +997,6 @@ class GStatus(gdialog.GWindow):
             return
 
         buf = cStringIO.StringIO()
-        dmodel = self.diffmodel
         files = []
         for row in self.filemodel:
             if not row[FM_CHECKED]:
