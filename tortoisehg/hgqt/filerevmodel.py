@@ -43,7 +43,7 @@ class FileRevModel(HgRepoListModel):
     def setRepo(self, repo, branch='', fromhead=None, follow=False):
         self.repo = repo
         self._datacache = {}
-        self.load_config()
+        self.reloadConfig()
 
     def setFilename(self, filename):
         self.filename = filename

@@ -162,7 +162,6 @@ class HgRepoListModel(QAbstractTableModel):
         if self.hasmq:
             self.mqueues = self.repo.mq.series[:]
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
-        self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor')
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
         self.graph = Graph(self.repo, grapher, self.max_file_size)
@@ -172,6 +171,23 @@ class HgRepoListModel(QAbstractTableModel):
         self.ensureBuilt(row=self.fill_step)
         QTimer.singleShot(0, lambda: self.emit(SIGNAL('filled')))
         self.timerHandle = self.startTimer(50)
+
+    def reloadConfig(self):
+        self.dot_radius = 8
+        self.rowheight = 20
+        self.fill_step = 500            # use hgtk logic
+        self.max_file_size = 1024*1024  # will be removed
+        self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor')
+        self.updateColumns()
+
+    def updateColumns(self):
+        s = QSettings()
+        cols = s.value('workbench/columns').toStringList()
+        cols = [str(col) for col in cols]
+        if cols:
+            validcols = [col for col in cols if col in self._allcolumns]
+            self._columns = tuple(validcols)
+            self.emit(SIGNAL("layoutChanged()"))
 
     def branch(self):
         return self.filterbranch
@@ -234,22 +250,6 @@ class HgRepoListModel(QAbstractTableModel):
 
     def columnCount(self, parent=None):
         return len(self._columns)
-
-    def reloadConfig(self):
-        self.dot_radius = 8
-        self.rowheight = 20
-        self.fill_step = 500            # use hgtk logic
-        self.max_file_size = 1024*1024  # will be removed
-        self.updateColumns()
-
-    def updateColumns(self):
-        s = QSettings()
-        cols = s.value('workbench/columns').toStringList()
-        cols = [str(col) for col in cols]
-        if cols:
-            validcols = [col for col in cols if col in self._allcolumns]
-            self._columns = tuple(validcols)
-            self.emit(SIGNAL("layoutChanged()"))
 
     def maxWidthValueForColumn(self, column):
         column = self._columns[column]
