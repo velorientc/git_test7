@@ -239,6 +239,7 @@ class CloneDialog(QDialog):
 
     def cancel_clicked(self):
         self.cmd.cancel()
+        self.reject()
 
     def detail_toggled(self, checked):
         self.cmd.show_output(checked)
@@ -258,7 +259,7 @@ class CloneDialog(QDialog):
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:
-            self.reject()
+            self.accept()
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
