@@ -88,10 +88,6 @@ _columnmap = {'ID': lambda model, ctx, gnode: ctx.rev() is not None and str(ctx.
               'Filename': lambda model, ctx, gnode: gnode.extra[0],
               }
 
-_tooltips = {'ID': lambda model, ctx,
-                   gnode: ctx.rev() is not None and ctx.hex() or "Working Directory",
-             }
-
 # in following lambdas, r is a hg repo
 _maxwidth = {'ID': lambda self, r: str(len(r.changelog)),
              'Date': lambda self, r: cvrt_date(r.changectx(0).date()),
