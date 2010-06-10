@@ -23,12 +23,18 @@ if not hasattr(sys, "frozen"):
         if os.path.isdir(testpath) and hgpath not in sys.path:
             sys.path.insert(0, hgpath)
 
+from mercurial import demandimport
+demandimport.ignore.append('win32com.shell')
+demandimport.ignore.append('tortoisehg.util.config')
+demandimport.enable()
 from mercurial import ui, util
 import cStringIO
 import traceback
 
 try:
+    demandimport.disable()
     import tortoisehg.hgqt.run
+    demandimport.enable()
 except ImportError, e:
     sys.stderr.write(str(e)+'\n')
     sys.stderr.write("abort: couldn't find tortoisehg libraries in [%s]\n" %
