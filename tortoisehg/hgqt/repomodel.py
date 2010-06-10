@@ -133,7 +133,6 @@ class HgRepoListModel(QAbstractTableModel):
     _allcolumns = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
     _columns = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
     _stretchs = {'Log': 1, }
-    _getcolumns = "getChangelogColumns"
 
     def __init__(self, repo, branch='', parent=None):
         """
@@ -251,19 +250,16 @@ class HgRepoListModel(QAbstractTableModel):
         self.fill_step = cfg.getFillingStep()
         self.max_file_size = cfg.getMaxFileSize()
         self.hide_mq_tags = cfg.getMQHideTags()
-        
-        cols = getattr(cfg, self._getcolumns)()
-        if cols is not None:
+        self.updateColumns()
+
+    def updateColumns(self):
+        s = QSettings()
+        cols = s.value('workbench/columns').toStringList()
+        cols = [str(col) for col in cols]
+        if cols:
             validcols = [col for col in cols if col in self._allcolumns]
-            if len(validcols) != len(cols):
-                wrongcols = [col for col in cols if col not in self._allcolumns]
-                print "WARNING! %s are not valid column names. Check your configuration." % ','.join(wrongcols)
-                print "         reverting to default columns configuration"
-            elif 'Log' not in validcols or 'ID' not in validcols:
-                print "WARNING! 'Log' and 'ID' are mandatory. Check your configuration."
-                print "         reverting to default columns configuration"
-            else:
-                self._columns = tuple(validcols)
+            self._columns = tuple(validcols)
+            self.emit(SIGNAL("layoutChanged()"))
 
     def maxWidthValueForColumn(self, column):
         column = self._columns[column]
