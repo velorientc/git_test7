@@ -749,7 +749,7 @@ table = {
     "remove|rm": (remove, [], _('thg remove [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
-    "rename|mv": (rename, [], _('thg rename SOURCE [DEST]...')),
+    "rename|mv|copy": (rename, [], _('thg rename SOURCE [DEST]...')),
     "^serve": (serve, [], _('thg serve [OPTION]')),
     "^status": (status,
          [('c', 'clean', False, _('show files without changes')),

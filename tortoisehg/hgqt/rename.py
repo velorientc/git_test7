@@ -31,14 +31,14 @@ from tortoisehg.util import paths
 class RenameDialog(QDialog):
     """TortoiseHg rename dialog"""
 
-    def __init__(self, ui, pats, parent=None):
+    def __init__(self, ui, pats, parent=None, **opts):
         super(RenameDialog, self).__init__(parent=None)
         src = ''
         dest = ''
         src, dest = self.init_data(ui, pats)
         if not src:
             self.reject()
-        self.init_view(src, dest)
+        self.init_view(src, dest, opts.get('alias') == 'copy')
 
     def init_data(self, ui, pats):
         """calculate initial values for widgets"""
@@ -70,7 +70,7 @@ class RenameDialog(QDialog):
         self.opts['dry_run'] = False
         return (fname, target)
 
-    def init_view(self, src, dest):
+    def init_view(self, src, dest, iscopy):
         """define the view"""
 
         # widgets
@@ -157,6 +157,9 @@ class RenameDialog(QDialog):
         self.wintitle = _('Rename - %s') % hglib.tounicode(self.reponame)
         self.setWindowTitle(self.wintitle)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        if iscopy:
+            self.copy_chk.setChecked(True)
+
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.dest_txt.setFocus()
@@ -336,4 +339,4 @@ class RenameDialog(QDialog):
 
 
 def run(ui, *pats, **opts):
-    return RenameDialog(ui, pats)
+    return RenameDialog(ui, pats, **opts)
