@@ -114,14 +114,14 @@ def datacached(meth):
             return nullvariant
         row = index.row()
         col = index.column()
-        if (row, col, role) in self._datacache:
-            return self._datacache[(row, col, role)]
+        if (row, col, role) in self.datacache:
+            return self.datacache[(row, col, role)]
         try:
             result = meth(self, index, role)
         except util.Abort:
             result = nullvariant
         if result is not nullvariant:
-            self._datacache[(row, col, role)] = result
+            self.datacache[(row, col, role)] = result
         return result
     return data
 
@@ -138,7 +138,7 @@ class HgRepoListModel(QAbstractTableModel):
         repo is a hg repo instance
         """
         QAbstractTableModel.__init__(self, parent)
-        self._datacache = {}
+        self.datacache = {}
         self._hasmq = False
         self.mqueues = []
         self.wd_revs = []
@@ -155,7 +155,7 @@ class HgRepoListModel(QAbstractTableModel):
         self._branch = branch
         if oldrepo.root != repo.root:
             self.reloadConfig()
-        self._datacache = {}
+        self.datacache = {}
         try:
             wdctxs = self.repo.changectx(None).parents()
         except error.Abort:
@@ -416,5 +416,5 @@ class HgRepoListModel(QAbstractTableModel):
     def clear(self):
         'empty the list'
         self.graph = None
-        self._datacache = {}
+        self.datacache = {}
         self.emit(SIGNAL("layoutChanged()"))
