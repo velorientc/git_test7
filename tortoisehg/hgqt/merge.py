@@ -12,7 +12,7 @@ from mercurial import hg, ui
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status
 
 keep = i18n.keepgettext()
 
@@ -439,8 +439,8 @@ class MergePage(BasePage):
             self.runner.commandFinished.connect(finished)
             self.runner.run(['qrename', oldpatch, newpatch])
         elif cmd == 'view':
-            # TODO: show Status dialog to show local changes
-            print 'Not implemented: view'
+            dlg = status.StatusDialog([], {}, self)
+            dlg.exec_()
         elif cmd == 'skip':
             self.done = True
             self.wizard().next()
