@@ -89,8 +89,8 @@ _columnmap = {'ID': lambda model, ctx, gnode: ctx.rev() is not None and str(ctx.
               }
 
 # in following lambdas, r is a hg repo
-_maxwidth = {'ID': lambda self, r: str(len(r.changelog)),
-             'Date': lambda self, r: cvrt_date(r.changectx(0).date()),
+_maxwidth = {'ID': lambda self, r: str(len(r)),
+             'Date': lambda self, r: cvrt_date(r[None].date()),
              'Tags': lambda self, r: sorted(r.tags().keys(),
                                             key=lambda x: len(x))[-1][:10],
              'Branch': lambda self, r: sorted(r.branchtags().keys(),
@@ -256,8 +256,11 @@ class HgRepoListModel(QAbstractTableModel):
 
     def maxWidthValueForColumn(self, column):
         column = self._columns[column]
-        if column in _maxwidth:
-            return _maxwidth[column](self, self.repo)
+        try:
+            if column in _maxwidth:
+                return _maxwidth[column](self, self.repo)
+        except IndexError:
+            pass
         return None
 
     def user_color(self, user):
