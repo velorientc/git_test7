@@ -164,7 +164,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
         self._user_colors = {}
         self._branch_colors = {}
-        self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor', False)
+        self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor')
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
         self.graph = Graph(self.repo, grapher, self.max_file_size)
