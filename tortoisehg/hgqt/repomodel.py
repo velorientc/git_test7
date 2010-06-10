@@ -276,6 +276,93 @@ class HgRepoListModel(QAbstractTableModel):
     def col2x(self, col):
         return 2 * self.dot_radius * col + self.dot_radius/2 + 8
 
+    def graphctx(self, ctx, gnode):
+        w = self.col2x(gnode.cols) + 10
+        h = self.rowheight
+
+        dot_y = h / 2
+
+        pix = QPixmap(w, h)
+        pix.fill(QColor(0,0,0,0))
+        painter = QPainter(pix)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        pen = QPen(Qt.blue)
+        pen.setWidth(2)
+        painter.setPen(pen)
+
+        lpen = QPen(pen)
+        lpen.setColor(Qt.black)
+        painter.setPen(lpen)
+        for y1, y4, lines in ((dot_y, dot_y + h, gnode.bottomlines),
+                              (dot_y - h, dot_y, gnode.toplines)):
+            y2 = y1 + 1 * (y4 - y1)/4
+            ymid = (y1 + y4)/2
+            y3 = y1 + 3 * (y4 - y1)/4
+
+            for start, end, color in lines:
+                lpen = QPen(pen)
+                lpen.setColor(QColor(get_color(color)))
+                lpen.setWidth(2)
+                painter.setPen(lpen)
+                x1 = self.col2x(start)
+                x2 = self.col2x(end)
+                path = QPainterPath()
+                path.moveTo(x1, y1)
+                path.cubicTo(x1, y2,
+                             x1, y2,
+                             (x1 + x2)/2, ymid)
+                path.cubicTo(x2, y3,
+                             x2, y3,
+                             x2, y4)
+                painter.drawPath(path)
+
+        # Draw node
+        dot_color = QColor(self.namedbranch_color(ctx.branch()))
+        dotcolor = dot_color.lighter()
+        pencolor = dot_color.darker()
+        white = QColor("white")
+        fillcolor = gnode.rev is None and white or dotcolor
+
+        pen = QPen(pencolor)
+        pen.setWidthF(1.5)                
+        painter.setPen(pen)
+
+        radius = self.dot_radius
+        centre_x = self.col2x(gnode.x)
+        centre_y = h/2
+
+        def circle(r):
+            rect = QRectF(centre_x - r,
+                          centre_y - r,
+                          2 * r, 2 * r)
+            painter.drawEllipse(rect)                    
+            
+        def diamond(r):
+            poly = QPolygonF([QPointF(centre_x - r, centre_y),
+                              QPointF(centre_x, centre_y - r),
+                              QPointF(centre_x + r, centre_y),
+                              QPointF(centre_x, centre_y + r),
+                              QPointF(centre_x - r, centre_y),])
+            painter.drawPolygon(poly)
+
+        tags = set(ctx.tags())
+        if tags.intersection(self.mqueues):  # diamonds for patches
+            if gnode.rev in self.wd_revs:
+                painter.setBrush(white)
+                diamond(2 * 0.9 * radius / 1.5)
+            painter.setBrush(fillcolor)
+            diamond(radius / 1.5)
+        else:  # circles for normal revisions
+            if gnode.rev in self.wd_revs:
+                painter.setBrush(white)
+                circle(0.9 * radius)
+            painter.setBrush(fillcolor)
+            circle(0.5 * radius)
+
+        painter.end()
+        return QVariant(pix)
+
     @datacached
     def data(self, index, role):
         if not index.isValid():
@@ -299,93 +386,7 @@ class HgRepoListModel(QAbstractTableModel):
                 return QVariant(QColor(self.namedbranch_color(ctx.branch())))
         elif role == Qt.DecorationRole:
             if column == 'Graph':
-                w = self.col2x(gnode.cols) + 10
-                h = self.rowheight
-
-                dot_y = h / 2
-
-                pix = QPixmap(w, h)
-                pix.fill(QColor(0,0,0,0))
-                painter = QPainter(pix)
-                painter.setRenderHint(QPainter.Antialiasing)
-
-                pen = QPen(Qt.blue)
-                pen.setWidth(2)
-                painter.setPen(pen)
-
-                lpen = QPen(pen)
-                lpen.setColor(Qt.black)
-                painter.setPen(lpen)
-                for y1, y4, lines in ((dot_y, dot_y + h, gnode.bottomlines),
-                                      (dot_y - h, dot_y, gnode.toplines)):
-                    y2 = y1 + 1 * (y4 - y1)/4
-                    ymid = (y1 + y4)/2
-                    y3 = y1 + 3 * (y4 - y1)/4
-
-                    for start, end, color in lines:
-                        lpen = QPen(pen)
-                        lpen.setColor(QColor(get_color(color)))
-                        lpen.setWidth(2)
-                        painter.setPen(lpen)
-                        x1 = self.col2x(start)
-                        x2 = self.col2x(end)
-                        path = QPainterPath()
-                        path.moveTo(x1, y1)
-                        path.cubicTo(x1, y2,
-                                     x1, y2,
-                                     (x1 + x2)/2, ymid)
-                        path.cubicTo(x2, y3,
-                                     x2, y3,
-                                     x2, y4)
-                        painter.drawPath(path)
-
-                # Draw node
-                dot_color = QColor(self.namedbranch_color(ctx.branch()))
-                dotcolor = dot_color.lighter()
-                pencolor = dot_color.darker()
-                white = QColor("white")
-                fillcolor = gnode.rev is None and white or dotcolor
-
-                pen = QPen(pencolor)
-                pen.setWidthF(1.5)                
-                painter.setPen(pen)
-
-                radius = self.dot_radius
-                centre_x = self.col2x(gnode.x)
-                centre_y = h/2
-
-                def circle(r):
-                    rect = QRectF(centre_x - r,
-                                  centre_y - r,
-                                  2 * r, 2 * r)
-                    painter.drawEllipse(rect)                    
-                    
-                def diamond(r):
-                    poly = QPolygonF([QPointF(centre_x - r, centre_y),
-                                      QPointF(centre_x, centre_y - r),
-                                      QPointF(centre_x + r, centre_y),
-                                      QPointF(centre_x, centre_y + r),
-                                      QPointF(centre_x - r, centre_y),])
-                    painter.drawPolygon(poly)
-
-                tags = set(ctx.tags())
-                if tags.intersection(self.mqueues):  # diamonds for patches
-                    if gnode.rev in self.wd_revs:
-                        painter.setBrush(white)
-                        diamond(2 * 0.9 * radius / 1.5)
-                    painter.setBrush(fillcolor)
-                    diamond(radius / 1.5)
-                else:  # circles for normal revisions
-                    if gnode.rev in self.wd_revs:
-                        painter.setBrush(white)
-                        circle(0.9 * radius)
-                    painter.setBrush(fillcolor)
-                    circle(0.5 * radius)
-
-                painter.end()
-
-                ret = QVariant(pix)
-                return ret
+                return self.graphctx(ctx, gnode)
         return nullvariant
 
     def headerData(self, section, orientation, role):
