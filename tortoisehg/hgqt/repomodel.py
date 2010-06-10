@@ -132,7 +132,7 @@ class HgRepoListModel(QAbstractTableModel):
         """
         QAbstractTableModel.__init__(self, parent)
         self.datacache = {}
-        self._hasmq = False
+        self.hasmq = False
         self.mqueues = []
         self.wd_revs = []
         self.graph = None
@@ -159,8 +159,8 @@ class HgRepoListModel(QAbstractTableModel):
             # might occur if reloading during a mq operation (or
             # whatever operation playing with hg history)
             return
-        self._hasmq = hasattr(self.repo, "mq")
-        if self._hasmq:
+        self.hasmq = hasattr(self.repo, "mq")
+        if self.hasmq:
             self.mqueues = self.repo.mq.series[:]
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
         self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor')
