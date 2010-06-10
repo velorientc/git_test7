@@ -233,6 +233,12 @@ class AnnotateView(QFrame):
                 self.thread.terminate()
                 self.finished()
                 return
+        if event.key() == Qt.Key_F3:
+            if event.modifiers() == Qt.ShiftModifier:
+                self.prevMatch()
+            else:
+                self.nextMatch()
+            return
         return super(AnnotateView, self).keyPressEvent(event)
 
     def fillModel(self, data):
@@ -315,6 +321,7 @@ class AnnotateView(QFrame):
         if matches:
             self.edit.setTextCursor(matches[0].cursor)
         self.edit.setExtraSelections(self.colorsels + self.matches)
+        self.edit.setFocus()
 
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
