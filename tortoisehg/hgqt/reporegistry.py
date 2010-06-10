@@ -100,7 +100,7 @@ class RepoTreeView(QTreeView):
                 _("Pull from remote"), None, self.pull),
              ("editpath", _("Edit URL..."), None, 
                 _("Edit Repository URL"), None, self.editPath),
-             ("clone", _("Clone"), None, 
+             ("clone", _("Clone..."), None, 
                 _("Clone Repository"), None, self.cloneRepo),
              ]
         return a
