@@ -20,6 +20,7 @@ class ColumnSelectDialog(QDialog):
         QDialog.__init__(self, parent)
 
         self.setWindowTitle(_('Workbench Log Columns'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         s = QSettings()
         cols = s.value('workbench/columns').toStringList()
         if cols:
