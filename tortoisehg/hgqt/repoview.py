@@ -88,8 +88,8 @@ class HgItemDelegate(QStyledItemDelegate):
         model = index.model()
         record = model.data(index, Qt.DisplayRole)
         doc = QTextDocument(self)
-        opts = dict(fg='black', bg='#ffffaa') # FIXME expect this from the model
-        doc.setHtml(qtlib.markup(str(record.toString()), **opts))
+        #opts = dict(fg='black', bg='#ffffaa') # FIXME expect this from the model
+        doc.setHtml(str(record.toString()))
         doc.setTextWidth(option.rect.width())
         painter.save()
         painter.translate(option.rect.topLeft());
