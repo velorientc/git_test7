@@ -72,6 +72,10 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;hgeol =
 ;mercurial_keyring =
 
+; fixfrozenexts is enabled by default.  It allows extension help
+; to work "out of the box" from binary installers.
+fixfrozenexts =
+
 ;
 ; Define external diff commands, for hg command line use only
 ;
