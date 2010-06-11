@@ -73,10 +73,18 @@ class HgItemDelegate(QStyledItemDelegate):
 
     # This approach taken from 
     # http://stackoverflow.com/questions/2959850/how-to-make-item-view-render-rich-html-text-in-pyqt
-    def paint(self, painter, option, index):
-        if index.column() <> 3:  # FIXME hardcoded
-            QStyledItemDelegate.paint(self, painter, option, index)
+    def __init__(self,  parent = None):
+        super(HgItemDelegate,  self).__init__(parent)
+
+    def paint(self, painter, styleOption, index):
+        if index.column() <> 3:  # FIXME
+            QStyledItemDelegate.paint(self, painter, styleOption, index)
             return
+        option = QStyleOptionViewItemV4(styleOption)
+        #option.text = "blah"
+        
+        self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter)   
+
         model = index.model()
         record = model.data(index, Qt.DisplayRole)
         doc = QTextDocument(self)
@@ -90,6 +98,7 @@ class HgItemDelegate(QStyledItemDelegate):
         dl = doc.documentLayout()
         dl.draw(painter, ctx)
         painter.restore()
+
     """
     This was in the original example but perhaps not needed by thg?
     def sizeHint(self, option, index):
