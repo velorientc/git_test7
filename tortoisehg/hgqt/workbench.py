@@ -221,6 +221,7 @@ class Workbench(QMainWindow):
         self.menuView = m = QMenu(_("View"), self.menubar)
         m.addAction(self.actionShowRepoRegistry)
         m.addAction(self.actionShowPaths)
+        m.addSeparator()
         m.addAction(self.actionSelectColumns)
 
         self.menubar.addAction(self.menuFile.menuAction())
