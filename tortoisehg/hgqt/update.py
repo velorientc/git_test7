@@ -18,7 +18,7 @@ from tortoisehg.hgqt import cmdui, csinfo, qtlib
 
 class UpdateDialog(QDialog):
 
-    quitsignal = pyqtSignal(
+    cmdfinished = pyqtSignal(
                      int  # status (0: succeeded, -1: failed)
                  ) 
 
@@ -255,13 +255,9 @@ class UpdateDialog(QDialog):
 
     ### Signal Handlers ###
 
-    def reject(self):
-        if not self._finished:
-            self.quitsignal.emit(-1)
-        super(UpdateDialog, self).reject()
-
     def cancel_clicked(self):
         self.cmd.cancel()
+        self.reject()
 
     def detail_toggled(self, checked):
         self.cmd.show_output(checked)
@@ -280,8 +276,11 @@ class UpdateDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, wrapper):
-        self._finished = True
-        self.quitsignal.emit(0)
+        if wrapper.data is 0:
+            res = 0
+        else:
+            res = -1
+        self.cmdfinished.emit(res)
         if wrapper.data is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
@@ -289,7 +288,7 @@ class UpdateDialog(QDialog):
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:
-            self.reject()
+            self.accept()
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)

@@ -203,11 +203,11 @@ class RepoWidget(QWidget):
         saved = self.setScanForRepoChanges(False)
         dlg = update.UpdateDialog(rev, self.repo, self)
         self._updatedlg = dlg
-        def quit(status):
+        def cmdfinished(status):
             if status == 0:
                 self.reload()  # TODO: implement something less drastic than a full reload
             self.setScanForRepoChanges(saved)
-        dlg.quitsignal.connect(quit)
+        dlg.cmdfinished.connect(cmdfinished)
         dlg.show()
 
     def mergeWithRevision(self, rev):
