@@ -23,6 +23,8 @@ from tortoisehg.hgqt.quickbar import QuickBar
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from tortoisehg.hgqt import qtlib
+
 connect = QObject.connect
 
 
@@ -62,6 +64,43 @@ class GotoQuickBar(QuickBar):
         # QObject::startTimer: QTimer can only be used with threads started with QThread
         self.entry.setCompleter(None)
 
+class HgItemDelegate(QStyledItemDelegate):
+
+    # Possibly also useful:
+    # http://discussion.forum.nokia.com/forum/showthread.php?199279-qt-listview-problems
+    # http://talk.maemo.org/showthread.php?s=1b81e1a45eca6837ecc70e91f904b5ce&p=629592#post629592
+    # http://stackoverflow.com/questions/2434004/how-does-one-paint-the-entire-rows-background-in-a-qstyleditemdelegate
+
+    # This approach taken from 
+    # http://stackoverflow.com/questions/2959850/how-to-make-item-view-render-rich-html-text-in-pyqt
+    def paint(self, painter, option, index):
+        if index.column() <> 3:  # FIXME hardcoded
+            QStyledItemDelegate.paint(self, painter, option, index)
+            return
+        model = index.model()
+        record = model.data(index, Qt.DisplayRole)
+        doc = QTextDocument(self)
+        opts = dict(fg='black', bg='#ffffaa') # FIXME expect this from the model
+        doc.setHtml(qtlib.markup(str(record.toString()), **opts))
+        doc.setTextWidth(option.rect.width())
+        painter.save()
+        painter.translate(option.rect.topLeft());
+        painter.setClipRect(option.rect.translated(-option.rect.topLeft()))   
+        ctx = QAbstractTextDocumentLayout.PaintContext()
+        dl = doc.documentLayout()
+        dl.draw(painter, ctx)
+        painter.restore()
+    """
+    This was in the original example but perhaps not needed by thg?
+    def sizeHint(self, option, index):
+        model = index.model()
+        record = model.data[index.row()]
+        doc = QTextDocument(self)
+        doc.setHtml(get_html_box(record))
+        doc.setTextWidth(option.rect.width())
+        return QSize(doc.idealWidth(), doc.size().height())
+    """
+
 class HgRepoView(QTableView):
     """
     A QTableView for displaying a HgRepoListModel,
@@ -76,6 +115,9 @@ class HgRepoView(QTableView):
         self.horizontalHeader().setHighlightSections(False)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        
+        # FIXME use setItemDelegateForColumn
+        self.setItemDelegate(HgItemDelegate(self))
 
         self.createActions()
         self.createToolbars()
