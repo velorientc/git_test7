@@ -117,19 +117,22 @@ def ChangesetContext(repo, rev):
         ctx = None
     return ctx
 
-def PatchContext(repo, patchpath, cache={}):
+_pctxcache = {}
+
+def PatchContext(repo, patchpath):
     # check path
     if not os.path.isabs(patchpath) or not os.path.isfile(patchpath):
         return None
     # check cache
+    global _pctxcache
     mtime = os.path.getmtime(patchpath)
     key = repo.root + patchpath
-    holder = cache.get(key, None)
+    holder = _pctxcache.get(key, None)
     if holder is not None and mtime == holder[0]:
         return holder[1]
     # create a new context object
     ctx = patchctx(patchpath, repo)
-    cache[key] = (mtime, ctx)
+    _pctxcache[key] = (mtime, ctx)
     return ctx
 
 class patchctx(object):
