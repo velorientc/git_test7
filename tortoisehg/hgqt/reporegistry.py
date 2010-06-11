@@ -49,6 +49,8 @@ class RepoTreeView(QTreeView):
         self.createActions()
 
     def contextMenuEvent(self, event):
+        if not self.selitem:
+            return
         menulist = self.selitem.internalPointer().menulist()
         if len(menulist) > 0:
             menu = QMenu(self)
