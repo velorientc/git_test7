@@ -342,7 +342,7 @@ class StatusWidget(QWidget):
         hu = htmlui.htmlui()
 
         show = '&nbsp;&nbsp;(<a href="cmd:show">%s</a>)' % _('show anyway')
-        if status in '?I':
+        if status in '?IA':
             if showanyway:
                 # Read untracked file contents from working directory
                 try:
