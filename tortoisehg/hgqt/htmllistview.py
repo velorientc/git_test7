@@ -12,33 +12,6 @@ from PyQt4.QtGui import *
 
 from tortoisehg.hgqt import qtlib
 
-class HtmlModel(QAbstractListModel):
-    
-    def __init__(self, strings):
-        QAbstractTableModel.__init__(self)
-        self.strings = strings
-
-    def rowCount(self, parent):
-        if not parent.isValid():
-            return len(self.strings)
-        return 0
-
-    def data(self, index, role):
-        if not index.isValid() or role != Qt.DisplayRole:
-            return QVariant()
-        if index.row() < 0 or index.row() >= len(self.strings):
-            return QVariant()
-        return QVariant(self.strings[index.row()])
-
-    def headerData(self, col, orientation, role):
-        if col != 0 or role != Qt.DisplayRole or orientation != Qt.Horizontal:
-            return QVariant()
-        else:
-            return QVariant("Multiline Rich-Text List")
-
-    def flags(self, index):
-        return Qt.ItemIsSelectable | Qt.ItemIsEnabled
-
 class HtmlListView(QListView):
     def __init__(self, model):
         QListView.__init__(self)
@@ -83,6 +56,33 @@ class HtmlListView(QListView):
                 selectionText += '\t'
 
         QApplication.clipboard().setText(selectionText, mode)
+
+
+class HtmlModel(QAbstractListModel):
+    def __init__(self, strings):
+        QAbstractTableModel.__init__(self)
+        self.strings = strings
+
+    def rowCount(self, parent):
+        if not parent.isValid():
+            return len(self.strings)
+        return 0
+
+    def data(self, index, role):
+        if not index.isValid() or role != Qt.DisplayRole:
+            return QVariant()
+        if index.row() < 0 or index.row() >= len(self.strings):
+            return QVariant()
+        return QVariant(self.strings[index.row()])
+
+    def headerData(self, col, orientation, role):
+        if col != 0 or role != Qt.DisplayRole or orientation != Qt.Horizontal:
+            return QVariant()
+        else:
+            return QVariant("Multiline Rich-Text List")
+
+    def flags(self, index):
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
 
 class HTMLDelegate(QStyledItemDelegate):
