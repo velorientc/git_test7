@@ -28,7 +28,7 @@ from mercurial import ui, hg, util
 from PyQt4 import QtGui, QtCore, Qsci
 from PyQt4.QtCore import Qt
 
-from tortoisehg.util.util import tounicode, rootpath
+from tortoisehg.util.hglib import tounicode
 
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
@@ -507,6 +507,17 @@ class FileDiffDialog(AbstractFileDialog):
         vbar.setValue(bvalue)
         self._invbarchanged = False
 
+def rootpath(repo, rev, path):
+    """return the path name of 'path' relative to repo's root at
+    revision rev;
+    path is relative to cwd
+    """  
+    ctx = repo[rev]        
+    filenames = list(ctx.walk(cmdutil.match(repo, [path], {})))
+    if len(filenames) != 1 or filenames[0] not in ctx.manifest():
+        return None
+    else:
+        return filenames[0]
 
 if __name__ == '__main__':
     from mercurial import ui, hg

@@ -10,7 +10,6 @@ Several helper functions
 """
 import os
 import string
-from mercurial import cmdutil
 
 def tounicode(string):
     """
@@ -23,36 +22,16 @@ def tounicode(string):
             pass
     return unicode(string, 'utf-8', 'replace')
         
-def has_closed_branch_support(repo):
-    """
-    Return True is repository have support for closed branches
-    """
-    # what a hack... 
-    return "closed" in repo.heads.im_func.func_code.co_varnames
-
-def isexec(filectx):
-    """
-    Return True is the file at filectx revision is executable
-    """
-    if hasattr(filectx, "isexec"):        
-        return filectx.isexec()
     return "x" in filectx.flags()
     
 def exec_flag_changed(filectx):
     """
-    Return True if the file referenced by filectx has changed its exec
-    flag
+    Return 'set' or 'unset' on change, or '' if unchanged
     """
-    flag = isexec(filectx)
-    parents = filectx.parents()
-    if not parents:
-        return ""
-    
-    pflag = isexec(parents[0])
-    if flag != pflag:
-        if flag:
+    for pfctx in filectx.parents():
+        if 'x' in filectx.flags() and 'x' not in pfctx.flags():
             return "set"
-        else:
+        if 'x' not in filectx.flags() and 'x' in pfctx.flags():
             return "unset"
     return ""
 
@@ -62,31 +41,6 @@ def isbfile(filename):
 def bfilepath(filename):
     return filename and filename.replace('.hgbfiles' + os.sep, '')
 
-def find_repository(path):
-    """returns <path>'s mercurial repository
-
-    None if <path> is not under hg control
-    """
-    path = os.path.abspath(path)
-    while not os.path.isdir(os.path.join(path, ".hg")):
-        oldpath = path
-        path = os.path.dirname(path)
-        if path == oldpath:
-            return None
-    return path
-
-def rootpath(repo, rev, path):
-    """return the path name of 'path' relative to repo's root at
-    revision rev;
-    path is relative to cwd
-    """  
-    ctx = repo[rev]        
-    filenames = list(ctx.walk(cmdutil.match(repo, [path], {})))
-    if len(filenames) != 1 or filenames[0] not in ctx.manifest():
-        return None
-    else:
-        return filenames[0]
-    
 class Curry(object):
     """Curryfication de fonction (http://fr.wikipedia.org/wiki/Curryfication)"""
     def __init__(self, function, *additional_args, **additional_kwargs):

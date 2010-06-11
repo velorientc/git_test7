@@ -12,8 +12,6 @@ import os
 
 from mercurial import hg
 
-from tortoisehg.util.util import has_closed_branch_support
-
 from tortoisehg.hgqt.i18n import _
 
 from tortoisehg.hgqt.qtlib import geticon, getfont
@@ -39,7 +37,6 @@ class RepoWidget(QWidget):
         self.workbench = workbench
         self.stackedWidget = workbench.stackedWidget
         self.commitWidget = commitWidget
-        self._closed_branch_supp = has_closed_branch_support(self.repo)
         self._reload_rev = '.'
         self._loading = True
         self._scanForRepoChanges = True
