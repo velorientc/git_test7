@@ -77,7 +77,15 @@ class HgItemDelegate(QStyledItemDelegate):
         super(HgItemDelegate,  self).__init__(parent)
 
     def paint(self, painter, styleOption, index):
-        if index.column() <> 3:  # FIXME
+        # calculate index of log column
+        model = index.model()
+        logidx = -1
+        for i, v in enumerate(model._columns):
+            if v == 'Log':
+                logidx = i
+                break
+
+        if index.column() <> logidx:
             QStyledItemDelegate.paint(self, painter, styleOption, index)
             return
         option = QStyleOptionViewItemV4(styleOption)
@@ -85,7 +93,6 @@ class HgItemDelegate(QStyledItemDelegate):
         
         self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter)   
 
-        model = index.model()
         record = model.data(index, Qt.DisplayRole)
         doc = QTextDocument(self)
         #opts = dict(fg='black', bg='#ffffaa') # FIXME expect this from the model
