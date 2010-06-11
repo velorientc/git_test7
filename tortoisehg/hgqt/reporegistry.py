@@ -169,7 +169,12 @@ class RepoTreeView(QTreeView):
         url_ = pathitem.url()
         reporoot = pathitem.parent().parent().rootpath()
 
-        # TODO: add confirmation dialog
+        labels = [(QMessageBox.Yes, _('&Push')),
+                  (QMessageBox.No, _('Cancel'))]
+        if not qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'), 
+                     _('Push to remote repository ') + url_ + '?',
+                     labels=labels, parent=self):
+            return
         args = ['push', '-R', reporoot, url_]
         cmd = cmdui.Dialog(args, parent=self)
         what = _('Pushing to %s') % url.hidepassword(url_)
