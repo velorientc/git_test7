@@ -220,7 +220,7 @@ void InsertMenuItemWithIcon1(
     HMENU hMenu, UINT indexMenu, UINT idCmd,
     const std::wstring& menuText, const std::string& iconName)
 {
-    // MFT_STRING is obsolete a should not be used (replaced by MIIM_STRING
+    // MFT_STRING is obsolete and should not be used (replaced by MIIM_STRING
     // from Win2K onward)
     MENUITEMINFOW mi;
     memset(&mi, 0, sizeof(mi));
@@ -268,7 +268,7 @@ void InsertSubMenuItemWithIcon2(
     HMENU hMenu, HMENU hSubMenu, UINT indexMenu, UINT idCmd,
     const std::wstring& menuText, const std::string& iconName)
 {
-    // MFT_STRING is obsolete a should not be used (replaced by MIIM_STRING
+    // MFT_STRING is obsolete and should not be used (replaced by MIIM_STRING
     // from Win2K onward)
     MENUITEMINFOW mi;
     memset(&mi, 0, sizeof(mi));
