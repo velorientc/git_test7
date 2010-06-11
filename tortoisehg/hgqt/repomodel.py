@@ -20,8 +20,6 @@ from tortoisehg.util.hglib import tounicode
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.qtlib import geticon
-from tortoisehg.hgqt import qtlib
-
 
 from tortoisehg.hgqt.i18n import _
 
@@ -59,7 +57,7 @@ def cvrt_date(date):
     date, tzdelay = date
     return QDateTime.fromTime_t(int(date)).toString(Qt.LocaleDate)
 
-def gettags(ctx, gnode, repo):
+def gettags(ctx, gnode):
     if ctx.rev() is None:
         return ""
     mqtags = ['qbase', 'qtip', 'qparent']
@@ -67,49 +65,25 @@ def gettags(ctx, gnode, repo):
     tags = [t for t in tags if t not in mqtags]
     return tounicode(",".join(tags))
 
-def getlog(ctx, gnode, repo):
+def getlog(ctx, gnode):
     # TODO: add branch name / tag markups
     if ctx.rev() is not None:
         msg = tounicode(ctx.description())
         if msg:
             msg = msg.splitlines()[0]
-
-        node = ctx.node()
-        tags = repo.nodetags(node)
-        tstr = ''
-        for tag in tags:
-            # FIXME if tag not in self.hidetags:
-            bg = "yellow"
-            #if tag == self.curbookmark:
-            #    bg = "orange"
-            #elif tag in self.mqpatches:
-            #    bg = "blue"
-            style = {'fg': "black", 'bg': bg}
-            tstr += qtlib.markup(' %s ' % tag, **style) + ' '
-                    
-        branch = ctx.branch()
-        bstr = ''
-        #if self.branchtags.get(branch) == node:
-        #    bstr += gtklib.markup(' %s ' % branch, color=gtklib.BLACK,
-        #                          background=gtklib.PGREEN) + ' '
-        #if revid in self.wcparents:
-        #    sumstr = bstr + tstr + '<b><u>' + summary + '</u></b>'
-        #else:
-        msg = bstr + tstr + msg
-
     else:
         msg = '**  ' + _('Working copy changes') + '  **'
     return msg
 
 # XXX maybe it's time to make these methods of the model...
-_columnmap = {'ID': lambda ctx, gnode, repo: ctx.rev() is not None and str(ctx.rev()) or "",
-              'Graph': lambda ctx, gnode, repo: "",
+_columnmap = {'ID': lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
+              'Graph': lambda ctx, gnode: "",
               'Log': getlog,
-              'Author': lambda ctx, gnode, repo: templatefilters.person(ctx.user()),
-              'Date': lambda ctx, gnode, repo: cvrt_date(ctx.date()),
+              'Author': lambda ctx, gnode: templatefilters.person(ctx.user()),
+              'Date': lambda ctx, gnode: cvrt_date(ctx.date()),
               'Tags': gettags,
-              'Branch': lambda ctx, gnode, repo: ctx.branch(),
-              'Filename': lambda ctx, gnode, repo: gnode.extra[0],
+              'Branch': lambda ctx, gnode: ctx.branch(),
+              'Filename': lambda ctx, gnode: gnode.extra[0],
               }
 
 # in following lambdas, r is a hg repo
@@ -400,7 +374,7 @@ class HgRepoListModel(QAbstractTableModel):
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
         if role == Qt.DisplayRole:
-            text = _columnmap[column](ctx, gnode, self.repo)
+            text = _columnmap[column](ctx, gnode)
             if not isinstance(text, (QString, unicode)):
                 text = tounicode(text)
             return QVariant(text)
