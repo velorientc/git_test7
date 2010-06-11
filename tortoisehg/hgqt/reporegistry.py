@@ -100,6 +100,8 @@ class RepoTreeView(QTreeView):
                 _("Delete the node and all its subnodes"), None, self.removeSelected),
              ("pull", _("Pull"), None, 
                 _("Pull from remote"), None, self.pull),
+             ("push", _("Push"), None, 
+                _("Push to remote"), None, self.push),
              ("editpath", _("Edit URL..."), None, 
                 _("Edit Repository URL"), None, self.editPath),
              ("clone", _("Clone..."), None, 
@@ -155,6 +157,22 @@ class RepoTreeView(QTreeView):
         args = ['pull', '-R', reporoot, url_]
         cmd = cmdui.Dialog(args, parent=self, finishfunc=finished)
         what = _('Pulling from %s') % url.hidepassword(url_)
+        self.workbench.showMessage(what)
+        cmd.setWindowTitle(what)
+        cmd.show_output(False)
+        cmd.exec_()
+
+    def push(self):
+        if not self.selitem:
+            return
+        pathitem = self.selitem.internalPointer()
+        url_ = pathitem.url()
+        reporoot = pathitem.parent().parent().rootpath()
+
+        # TODO: add confirmation dialog
+        args = ['push', '-R', reporoot, url_]
+        cmd = cmdui.Dialog(args, parent=self)
+        what = _('Pushing to %s') % url.hidepassword(url_)
         self.workbench.showMessage(what)
         cmd.setWindowTitle(what)
         cmd.show_output(False)

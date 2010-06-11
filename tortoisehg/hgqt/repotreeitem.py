@@ -258,7 +258,7 @@ class RepoPathItem(RepoTreeItem):
         return False
 
     def menulist(self):
-        return ['pull', None, 'editpath', 'rename', None, 'remove' ]
+        return ['pull', 'push', None, 'editpath', 'rename', None, 'remove' ]
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
