@@ -262,7 +262,7 @@ class HgFileView(QtGui.QFrame):
         if flag == '':
             return
         
-        lexer = get_lexer(filename, data, flag)
+        lexer = get_lexer(filename, data, flag, self._ctx._repo.ui) # yuck
         if flag == "+":
             nlines = data.count('\n')
             self.sci.setMarginWidth(1, str(nlines)+'0')

@@ -103,7 +103,7 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
                 data = "binary file"
             else:
                 data = tounicode(data)
-                lexer = get_lexer(path, data)
+                lexer = get_lexer(path, data, self.repo.ui)
                 if lexer:
                     lexer.setFont(self._font)
                     self.textView.setLexer(lexer)

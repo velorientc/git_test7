@@ -82,7 +82,7 @@ class AbstractFileDialog(QtGui.QMainWindow, HgDialogMixin):
             data = f.read(head)
         else:
             data = '' # too big
-        lexer = get_lexer(self.filename, data)
+        lexer = get_lexer(self.filename, data, self.repo.ui)
         if lexer:
             lexer.setDefaultFont(self._font)
             lexer.setFont(self._font)

@@ -1,30 +1,21 @@
 import re
-from PyQt4 import QtCore, QtGui, Qsci, uic
+from PyQt4 import QtCore, QtGui, Qsci
 from PyQt4.QtCore import Qt
+from tortoisehg.hgqt import qtlib
 
 class _LexerSelector(object):
     _lexer = None
     def match(self, filename, filedata):
         return False
 
-    def lexer(self, cfg=None):
+    def lexer(self, ui):
         """
         Return a configured instance of the lexer
         """
-        return self.cfg_lexer(self._lexer(), cfg)
+        return self.cfg_lexer(self._lexer(), ui)
 
-    def cfg_lexer(self, lexer, cfg=None):
-        # TODO: get font from qtlib.getfont()
-        if cfg:
-            font = QtGui.QFont()
-            fontstr = cfg.getFont()
-            font.fromString(fontstr)            
-            size = cfg.getFontSize()
-        else:
-            font = QtGui.QFont('Monospace')
-            size = 9
-
-        font.setPointSize(size)
+    def cfg_lexer(self, lexer, ui):
+        font = qtlib.getfont(ui, 'fontlog').font()
         lexer.setFont(font, -1)
         return lexer
 
@@ -116,39 +107,31 @@ class DiffLexerSelector(_ScriptLexerSelector):
     extensions = ()
     _lexer = Qsci.QsciLexerDiff
     regex = re.compile(r'^@@ [-]\d+,\d+ [+]\d+,\d+ @@$')
-    def cfg_lexer(self, lexer, cfg=None):
-        """
-        Return a configured instance of the lexer
-        """
-        if cfg:
-            lexer.setDefaultPaper(QtGui.QColor(cfg.getDiffBGColor()))
-            lexer.setColor(QtGui.QColor(cfg.getDiffFGColor()), -1)
-            lexer.setColor(QtGui.QColor(cfg.getDiffPlusColor()), 6)
-            lexer.setColor(QtGui.QColor(cfg.getDiffMinusColor()), 5)
-            lexer.setColor(QtGui.QColor(cfg.getDiffSectionColor()), 4)
-            font = QtGui.QFont()
-            fontstr = cfg.getFont()
-            font.fromString(fontstr)            
-            size = cfg.getFontSize()
-        else:
-            font = QtGui.QFont('Monospace')
-            size = 9
-
-        font.setPointSize(size)
+    def cfg_lexer(self, lexer, ui):
+        qtlib.configstyles(ui)
+        #lexer.setDefaultPaper(QtGui.QColor(cfg.getDiffBGColor()))
+        #lexer.setColor(QtGui.QColor(cfg.getDiffFGColor()), -1)
+        for label, i in (('diff.inserted', 6),
+                         ('diff.deleted', 5),
+                         ('diff.hunk', 4)):
+            effect = qtlib.geteffect(label)
+            for e in effect.split(';'):
+                if e.startswith('color:'):
+                    lexer.setColor(QtGui.QColor(e[7:]), i)
+        font = qtlib.getfont(ui, 'fontdiff').font()
         lexer.setFont(font, -1)
-
         return lexer
 
     
 lexers = [cls() for clsname, cls in globals().items() if not clsname.startswith('_') and isinstance(cls, type) and \
           issubclass(cls, (_LexerSelector, _FilenameLexerSelector, _ScriptLexerSelector))]
 
-def get_lexer(filename, filedata, fileflag=None):
+def get_lexer(filename, filedata, fileflag=None, ui=None):
     if fileflag == "=":
-        return DiffLexerSelector().lexer(None)
+        return DiffLexerSelector().lexer(ui)
     for lselector in lexers:
         if lselector.match(filename, filedata):
-            return lselector.lexer(None)
+            return lselector.lexer(ui)
     return None
 
         
