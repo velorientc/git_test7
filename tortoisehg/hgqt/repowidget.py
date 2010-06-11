@@ -119,6 +119,7 @@ class RepoWidget(QWidget):
         reponame = os.path.basename(self.repo.root)
         self._repodate = self._getrepomtime()
         self._loading = False
+        self.repoview.resizeColumns()
 
     def createActions(self):
         self.actionActivateRev = QAction('Activate rev.', self)
