@@ -374,6 +374,7 @@ class MergePage(BasePage):
         if wrapper.data == 0:
             repo = self.wizard().repo
             hglib.invalidaterepo(repo)
+            self.wizard().repoInvalidated.emit()
             self.done = True
             self.wizard().next()
         else:
@@ -394,6 +395,7 @@ class MergePage(BasePage):
             def finished(wrapper):
                 if wrapper.data == 0:
                     hglib.invalidaterepo(self.wizard().repo)
+                    self.wizard().repoInvalidated.emit()
                     def callback():
                         text = _('Outstanding changes are saved to <b>'
                                  '%(name)s</b> in the patch queue.  <a href'
@@ -416,6 +418,7 @@ class MergePage(BasePage):
             def finished(wrapper):
                 if wrapper.data == 0:
                     hglib.invalidaterepo(self.wizard().repo)
+                    self.wizard().repoInvalidated.emit()
                     self.check_status()
             cmdline = ['update', '--clean', '--rev', self.wizard().local]
             self.runner = cmdui.Runner(_('Discard - TortoiseHg'), self)
@@ -609,6 +612,7 @@ class CommitPage(BasePage):
     def command_finished(self, wrapper):
         if wrapper.data == 0:
             hglib.invalidaterepo(self.wizard().repo)
+            self.wizard().repoInvalidated.emit()
             self.done = True
             self.wizard().next()
 
