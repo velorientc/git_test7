@@ -222,26 +222,27 @@ void InsertMenuItemWithIcon1(
     HMENU hMenu, UINT indexMenu, UINT idCmd,
     const std::wstring& menuText, const std::string& iconName)
 {
+    // MFT_STRING is obsolete a should not be used (replaced by MIIM_STRING
+    // from Win2K onward)
     MENUITEMINFOW mi;
     memset(&mi, 0, sizeof(mi));
     mi.cbSize = sizeof(mi);
+    mi.fMask = MIIM_ID | MIIM_STRING;
     mi.dwTypeData = const_cast<wchar_t*>(menuText.c_str());
     mi.cch = static_cast<UINT>(menuText.length());
     mi.wID = idCmd;
-    mi.fType = MFT_STRING;
 
     if (SysInfo::Instance().IsVistaOrLater())
     {
         HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
         if (hBmp)
         {
-            mi.fMask = MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_BITMAP;
+            mi.fMask |= MIIM_BITMAP;
             mi.hbmpItem = hBmp;
         }
         else
         {
             TDEBUG_TRACE("    ***** InsertMenuItemWithIcon1: can't find " + iconName);
-            mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
     else
@@ -249,14 +250,13 @@ void InsertMenuItemWithIcon1(
         HICON h = GetTortoiseIcon(iconName);
         if (h)
         {
-            mi.fMask = MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_BITMAP | MIIM_DATA;
+            mi.fMask |= MIIM_BITMAP | MIIM_DATA;
             mi.dwItemData = (ULONG_PTR) h;
             mi.hbmpItem = HBMMENU_CALLBACK;
         }
         else
         {
             TDEBUG_TRACE("    ***** InsertMenuItemWithIcon1: can't find " + iconName);
-            mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
     InsertMenuItemW(hMenu, indexMenu, TRUE, &mi);
@@ -270,10 +270,12 @@ void InsertSubMenuItemWithIcon2(
     HMENU hMenu, HMENU hSubMenu, UINT indexMenu, UINT idCmd,
     const std::wstring& menuText, const std::string& iconName)
 {
+    // MFT_STRING is obsolete a should not be used (replaced by MIIM_STRING
+    // from Win2K onward)
     MENUITEMINFOW mi;
     memset(&mi, 0, sizeof(mi));
     mi.cbSize = sizeof(mi);
-    mi.fType = MFT_STRING;
+    mi.fMask = MIIM_SUBMENU | MIIM_ID | MIIM_STRING;
     mi.dwTypeData = const_cast<wchar_t*>(menuText.c_str());
     mi.cch = static_cast<UINT>(menuText.length());
     mi.wID = idCmd;
@@ -284,13 +286,12 @@ void InsertSubMenuItemWithIcon2(
         HBITMAP hBmp = GetTortoiseIconBitmap(iconName);
         if (hBmp)
         {
-            mi.fMask = MIIM_SUBMENU | MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_BITMAP;
+            mi.fMask |= MIIM_BITMAP;
             mi.hbmpItem = hBmp;
         }
         else
         {
             TDEBUG_TRACE("    ***** InsertSubMenuItemWithIcon2: can't find " + iconName);
-            mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
     else
@@ -298,14 +299,13 @@ void InsertSubMenuItemWithIcon2(
         HICON h = GetTortoiseIcon(iconName);
         if (h)
         {
-            mi.fMask = MIIM_SUBMENU | MIIM_STRING | MIIM_ID;
+            mi.fMask |= MIIM_BITMAP | MIIM_DATA;
             mi.dwItemData = (ULONG_PTR) h;
             mi.hbmpItem = HBMMENU_CALLBACK;
         }
         else
         {
             TDEBUG_TRACE("    ***** InsertSubMenuItemWithIcon2: can't find " + iconName);
-            mi.fMask = MIIM_TYPE | MIIM_ID;
         }
     }
 
