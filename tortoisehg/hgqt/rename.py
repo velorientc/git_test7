@@ -7,25 +7,16 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 
-import os
-import sys
-import cStringIO
-import shutil
+import os, sys, cStringIO, shutil
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg
-from mercurial import ui
-from mercurial import util
-from mercurial import commands
-from mercurial import error
+from mercurial import hg, ui, util, commands, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
-from tortoisehg.hgqt import qtlib
-from tortoisehg.util import hglib
-from tortoisehg.util import paths
+from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.util import hglib, paths
 
 
 class RenameDialog(QDialog):
@@ -48,7 +39,7 @@ class RenameDialog(QDialog):
         try:
             self.root = paths.find_root()
             self.repo = hg.repository(ui, self.root)
-        except (ImportError, error.RepoError):
+        except (error.RepoError):
             qtlib.ErrorMsgBox(_('Rename Error'),
                     _('Could not find or initialize the repository'
                       ' from folder<p>%s</p>' % cwd))
@@ -194,12 +185,12 @@ class RenameDialog(QDialog):
             filter = 'All Files (*.*)'
             filename = FD.getOpenFileName(parent=self, caption=caption,
                     options=FD.ReadOnly)
-            response = str(filename)
+            response = hglib.fromunicode(filename)
         else:
             caption = _('Select %s Folder' % capt)
             path = FD.getExistingDirectory(parent=self, caption=caption,
                     options=FD.ShowDirsOnly | FD.ReadOnly)
-            response = str(path)
+            response = hglib.fromunicode(path)
         if response:
             response = os.path.relpath(response, start=self.root)
             if mode == 'src':
@@ -212,11 +203,14 @@ class RenameDialog(QDialog):
         if self.copy_chk.isChecked():
             sw = self.wintitle.replace(_('Rename'), _('Copy'))
             sb = self.rename_btn_txt.replace(_('Rename'), _('Copy'))
+            self.opts['after'] = False
         else:
             sw = self.wintitle.replace(_('Copy'), _('Rename'))
             sb = self.rename_btn_txt.replace(_('Copy'), _('Rename'))
+            self.opts['after'] = True
         self.setWindowTitle(sw)
         self.rename_btn.setText(sb)
+        self.show_command(self.compose_command(self.get_src(), self.get_dest()))
 
     def compose_command(self, src, dest):
         cmdline = ['rename']
@@ -230,7 +224,7 @@ class RenameDialog(QDialog):
         vcmdline.append(hglib.fromunicode(src))
         vcmdline.append(hglib.fromunicode(dest))
         vcmdline = ' '.join(vcmdline)
-        return cmdline, vcmdline
+        return (cmdline, vcmdline)
 
     def show_command(self, clinfo):
         cl, vcl = clinfo
@@ -282,25 +276,20 @@ class RenameDialog(QDialog):
                 if not os.path.isdir(targetdir):
                     os.makedirs(targetdir)
                 if self.copy_chk.isChecked():
-                    if os.path.isfile(curr_name):
-                        shutil.copy(curr_name, new_name)
-                    else:
-                        shutil.copytree(curr_name, new_name)
-                    addopts = {}
-                    commands.add(self.repo.ui, self.repo, new_name, **addopts)
+                    commands.copy(self.repo.ui, self.repo, curr_name, new_name, **opts)
                 else:
                     shutil.move(curr_name, new_name)
                     commands.rename(self.repo.ui, self.repo, curr_name, new_name, **opts)
             except (OSError, IOError, util.Abort, error.RepoError), inst:
                 qtlib.ErrorMsgBox(_('Rename Error'),
                         _('The following erorr was caught with rename :'),
-                        str(inst))
+                        hglib.tounicode(inst))
         finally:
             sys.stderr = saved
-            textout = errors.getvalue() + self.repo.ui.popbuffer()
+            textout = hglib.tounicode(errors.getvalue() + self.repo.ui.popbuffer())
             errors.close()
             if len(textout) > 1:
-                qtlib.ErrorMsgBox(_('rename error'), textout)
+                qtlib.ErrorMsgBox(_('Rename Error'), textout)
 
     def detail_clicked(self):
         if self.cmd.is_show_output():
