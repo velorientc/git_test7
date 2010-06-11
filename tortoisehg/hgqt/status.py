@@ -79,6 +79,7 @@ class StatusWidget(QWidget):
         SP = QSizePolicy
 
         split = QSplitter(Qt.Horizontal)
+        split.setChildrenCollapsible(False)
         layout = QVBoxLayout()
         layout.setMargin(0)
         layout.addWidget(split)
