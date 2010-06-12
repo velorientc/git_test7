@@ -213,7 +213,9 @@ class HgRepoView(QTableView):
                 tot_stretch += model._stretchs[model._columns[c]]
                 continue
             w = model.maxWidthValueForColumn(c)
-            if w is not None:
+            if isinstance(w, int):
+                self.setColumnWidth(c, w)
+            elif w is not None:
                 w = fontm.width(unicode(w) + 'w')
                 self.setColumnWidth(c, w)
             else:

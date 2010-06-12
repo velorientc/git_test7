@@ -86,17 +86,6 @@ _columnmap = {'ID': lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) 
               'Filename': lambda ctx, gnode: gnode.extra[0],
               }
 
-# in following lambdas, r is a hg repo
-_maxwidth = {'ID': lambda self, r: str(len(r)),
-             'Date': lambda self, r: cvrt_date(r[None].date()),
-             'Tags': lambda self, r: sorted(r.tags().keys(),
-                                            key=lambda x: len(x))[-1][:10],
-             'Branch': lambda self, r: sorted(r.branchtags().keys(),
-                                              key=lambda x: len(x))[-1],
-             'Author': lambda self, r: 'author name', # TODO get actual max
-             'Filename': lambda self, r: self.filename,
-             }
-
 def datacached(meth):
     """
     decorator used to cache 'data' method of Qt models. It will *not*
@@ -252,13 +241,29 @@ class HgRepoListModel(QAbstractTableModel):
     def columnCount(self, parent=None):
         return len(self._columns)
 
-    def maxWidthValueForColumn(self, column):
-        column = self._columns[column]
-        try:
-            if column in _maxwidth:
-                return _maxwidth[column](self, self.repo)
-        except IndexError:
-            pass
+    def maxWidthValueForColumn(self, col):
+        column = self._columns[col]
+        if column == 'ID':
+            return str(len(self.repo))
+        if column == 'Date':
+            return cvrt_date(self.repo[None].date())
+        if column == 'Tags':
+            try:
+                return sorted(r.tags().keys(), key=lambda x: len(x))[-1][:10]
+            except IndexError:
+                pass
+        if column == 'Branch':
+            try:
+                return sorted(r.branchtags().keys(), key=lambda x: len(x))[-1]
+            except IndexError:
+                pass
+        if column == 'Author':
+            return 'author name' # TODO get actual max
+        if column == 'Filename':
+            return self.filename
+        if column == 'Graph':
+            return self.col2x(self.graph.max_cols)
+        # Fall through for Log
         return None
 
     def user_color(self, user):
