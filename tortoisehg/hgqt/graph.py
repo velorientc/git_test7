@@ -83,10 +83,9 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
         # Compute revs and next_revs.
         if curr_rev not in revs:
             if branch:
-                ctx = repo.changectx(curr_rev)
-                if ctx.branch() != branch:
+                if repo[curr_rev].branch() != branch:
                     if curr_rev is None:
-                        curr_rev = len(repo.changelog)
+                        curr_rev = len(repo)
                     else:
                         curr_rev -= 1
                     yield None
@@ -145,7 +144,7 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
         yield (curr_rev, rev_index, curcolor, lines, parents)
         revs = next_revs
         if curr_rev is None:
-            curr_rev = len(repo.changelog)
+            curr_rev = len(repo)
         else:
             curr_rev -= 1
 
@@ -244,7 +243,7 @@ class Graph(object):
     def __init__(self, repo, grapher, maxfilesize=100000):
         self.maxfilesize = maxfilesize
         self.repo = repo
-        self.maxlog = len(self.repo.changelog)
+        self.maxlog = len(repo)
         self.grapher = grapher
         self.nodes = []
         self.nodesdict = {}
