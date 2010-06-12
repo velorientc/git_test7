@@ -5,15 +5,15 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
+import os, time
 
 from mercurial import ui
 from PyQt4 import QtCore
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
 
-BEGINTAG = '\033'
-ENDTAG = '\032'
+BEGINTAG = '\033' + str(time.time())
+ENDTAG = '\032' + str(time.time())
 
 class htmlui(ui.ui):
     def __init__(self, src=None):
