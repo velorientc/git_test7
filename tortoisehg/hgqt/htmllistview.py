@@ -115,7 +115,6 @@ class HTMLDelegate(QStyledItemDelegate):
         doc = QTextDocument()
         doc.setDefaultStyleSheet(qtlib.thgstylesheet)
         doc.setDefaultFont(option.font)
-        doc.setDocumentMargin(0)
         doc.setHtml(text)
         doc.setTextWidth(option.rect.width())
         return QSize(doc.idealWidth() + 5, doc.size().height())
