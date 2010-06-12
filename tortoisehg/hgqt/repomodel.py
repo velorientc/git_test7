@@ -249,12 +249,12 @@ class HgRepoListModel(QAbstractTableModel):
             return cvrt_date(self.repo[None].date())
         if column == 'Tags':
             try:
-                return sorted(r.tags().keys(), key=lambda x: len(x))[-1][:10]
+                return sorted(self.repo.tags().keys(), key=lambda x: len(x))[-1][:10]
             except IndexError:
                 pass
         if column == 'Branch':
             try:
-                return sorted(r.branchtags().keys(), key=lambda x: len(x))[-1]
+                return sorted(self.repo.branchtags().keys(), key=lambda x: len(x))[-1]
             except IndexError:
                 pass
         if column == 'Author':
