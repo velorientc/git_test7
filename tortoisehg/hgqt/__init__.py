@@ -38,7 +38,5 @@ if should_rebuild(rcfile, pyfile):
         print "pyrcc4 %s -o %s" % (rcfile, pyfile)
 
 # dirty hack to please PyQt4 uic
-import repoview, fileview, workbench_rc
-sys.modules['repoview'] = repoview
-sys.modules['fileview'] = fileview
+import workbench_rc
 sys.modules['workbench_rc'] = workbench_rc

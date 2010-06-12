@@ -26,15 +26,14 @@ if not hasattr(sys, "frozen"):
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.ignore.append('tortoisehg.util.config')
+demandimport.ignore.append('workbench_rc')
 demandimport.enable()
 from mercurial import ui, util
 import cStringIO
 import traceback
 
 try:
-    demandimport.disable()
     import tortoisehg.hgqt.run
-    demandimport.enable()
 except ImportError, e:
     sys.stderr.write(str(e)+'\n')
     sys.stderr.write("abort: couldn't find tortoisehg libraries in [%s]\n" %
