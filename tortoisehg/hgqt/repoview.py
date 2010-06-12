@@ -83,11 +83,6 @@ class HgRepoView(QTableView):
                 SIGNAL('doubleClicked (const QModelIndex &)'),
                 self.revisionActivated)
 
-        self._autoresize = True
-        connect(self.horizontalHeader(),
-                SIGNAL('sectionResized(int, int, int)'),
-                self.disableAutoResize)
-
     def mousePressEvent(self, event):
         index = self.indexAt(event.pos())
         if not index.isValid():
@@ -185,19 +180,6 @@ class HgRepoView(QTableView):
                 SIGNAL('currentRowChanged (const QModelIndex & , const QModelIndex & )'),
                 self.revisionSelected)
         self.goto_toolbar.compl_model.setStringList(model.repo.tags().keys())
-
-    def enableAutoResize(self, *args):
-        self._autoresize =  True
-
-    def disableAutoResize(self, *args):
-        self._autoresize =  False
-        QTimer.singleShot(100, self.enableAutoResize)
-
-    def resizeEvent(self, event):
-        # we catch this event to resize smartly tables' columns
-        QTableView.resizeEvent(self, event)
-        if self._autoresize:
-            self.resizeColumns()
 
     def resizeColumns(self, *args):
         # resize columns the smart way: the column holding Log
