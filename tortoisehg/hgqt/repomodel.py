@@ -169,6 +169,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.max_file_size = 1024*1024  # will be removed
         self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor')
         self.updateColumns()
+        self.maxauthor = 'author name'
 
     def updateColumns(self):
         s = QSettings()
@@ -230,6 +231,16 @@ class HgRepoListModel(QAbstractTableModel):
     def updateRowCount(self):
         currentlen = self.rowcount
         newlen = len(self.graph)
+
+        # This is not fast; the graph walker should do this, or only do
+        # it when the user asks for a resize.
+        authors = set()
+        for i in xrange(currentlen, newlen):
+            authors.add(self.repo[self.graph.nodes[i].rev].user())
+        sauthors = [templatefilters.person(user) for user in list(authors)]
+        sauthors.append(self.maxauthor)
+        self.maxauthor = sorted(sauthors, key=lambda x: len(x))[-1]
+
         if newlen > self.rowcount:
             self.beginInsertRows(QModelIndex(), currentlen, newlen-1)
             self.rowcount = newlen
@@ -258,7 +269,7 @@ class HgRepoListModel(QAbstractTableModel):
             except IndexError:
                 pass
         if column == 'Author':
-            return 'author name' # TODO get actual max
+            return self.maxauthor
         if column == 'Filename':
             return self.filename
         if column == 'Graph':
