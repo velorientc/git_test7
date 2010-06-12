@@ -71,9 +71,13 @@ class HgRepoView(QTableView):
         QTableView.__init__(self, parent)
         self.init_variables()
         self.setShowGrid(False)
-        self.verticalHeader().hide()
-        self.verticalHeader().setDefaultSectionSize(20)
+
+        vh = self.verticalHeader()
+        vh.hide()
+        vh.setDefaultSectionSize(20)
+
         self.horizontalHeader().setHighlightSections(False)
+
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
