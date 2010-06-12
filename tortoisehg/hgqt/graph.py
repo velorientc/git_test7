@@ -16,73 +16,44 @@
 
 """helper functions and classes to ease hg revision graph building
 
-Based on graphlog's algorithm, with insipration stolen to TortoiseHg
-revision grapher.
+Based on graphlog's algorithm, with insipration stolen from TortoiseHg
+revision grapher (now stolen back).
 """
 
-from cStringIO import StringIO
 import difflib
 
-from mercurial.node import nullrev
 from mercurial import patch, util, match
 
-from tortoisehg.util.util import tounicode, isbfile
+from tortoisehg.util.util import isbfile
+from tortoisehg.util.hglib import tounicode
 
-import tortoisehg.hgqt # force apply monkeypatches
-
-def diff(repo, ctx1, ctx2=None, files=None):
+def diff(repo, ctx1, ctx2, files):
     """
     Compute the diff of files between 2 changectx
     """
     if ctx2 is None:
-        ctx2 = ctx1.parents()[0]
+        ctx2 = ctx1.p1()
     if files is None:
         m = match.always(repo.root, repo.getcwd())
     else:
         m = match.exact(repo.root, repo.getcwd(), files)
-    # try/except for the sake of hg compatibility (API changes between
-    # 1.0 and 1.1)
-    try:
-        out = StringIO()
-        patch.diff(repo, ctx2.node(), ctx1.node(), match=m, fp=out)
-        diffdata = out.getvalue()
-    except:
-        diffdata = '\n'.join(patch.diff(repo, ctx2.node(), ctx1.node(),
-                                        match=m))
-    # XXX how to deal diff encodings?
-    try:
-        diffdata = unicode(diffdata, "utf-8")
-    except UnicodeError:
-        # XXX use a default encoding from config?
-        diffdata = unicode(diffdata, "iso-8859-15", 'ignore')
-    return diffdata
+    diffdata = '\n'.join(patch.diff(repo, ctx2.node(), ctx1.node(), match=m))
+    return tounicode(diffdata)
 
 
-def __get_parents(repo, rev, branch=None):
+def getparents(repo, rev, branch):
     """
     Return non-null parents of `rev`. If branch is given, only return
     parents that belongs to names branch `branch` (beware that this is
     much slower).
     """
     if not branch:
-        if rev is None:
-            return [x.rev() for x in repo.changectx(None).parents() if x]
-        return [x for x in repo.changelog.parentrevs(rev) if x != nullrev]
-    if rev is None:
-        return [x.rev() for x in repo.changectx(None).parents() \
-                if x and repo.changectx(rev).branch() == branch]
-    return [x for x in repo.changelog.parentrevs(rev) \
-            if (x != nullrev and repo.changectx(rev).branch() == branch)]
+        return [x.rev() for x in repo[rev].parents() if x]
+    return [x.rev() for x in repo[rev].parents() if x and x.branch() == branch]
 
 
 def ismerge(ctx):
-    """
-    Return True if the changecontext ctx is a merge mode (should work
-    with hg 1.0 and 1.2)
-    """
-    if ctx:
-        return len(ctx.parents()) == 2 and ctx.parents()[1]
-    return False
+    return len(ctx.parents()) > 1
 
 def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False):
     """incremental revision grapher
@@ -128,19 +99,19 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
             revs.append(curr_rev)
             rev_color[curr_rev] = curcolor = nextcolor
             nextcolor += 1
-            p_revs = __get_parents(repo, curr_rev, branch)
+            p_revs = getparents(repo, curr_rev, branch)
             while p_revs:
                 rev0 = p_revs[0]
                 if rev0 < stop_rev or rev0 in rev_color:
                     break
                 rev_color[rev0] = curcolor
-                p_revs = __get_parents(repo, rev0, branch)
+                p_revs = getparents(repo, rev0, branch)
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = __get_parents(repo, curr_rev, branch)
+        parents = getparents(repo, curr_rev, branch)
         parents_to_add = []
         if len(parents) > 1:
             preferred_color = None
