@@ -213,6 +213,7 @@ class HgRepoView(QTableView):
             if model._columns[c] in model._stretchs:
                 w = model._stretchs[model._columns[c]] / tot_stretch
                 self.setColumnWidth(c, col1_width * w)
+        self.horizontalHeader().setStretchLastSection(True)
 
     def revFromindex(self, index):
         if not index.isValid():
