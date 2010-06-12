@@ -93,7 +93,7 @@ _maxwidth = {'ID': lambda self, r: str(len(r)),
                                             key=lambda x: len(x))[-1][:10],
              'Branch': lambda self, r: sorted(r.branchtags().keys(),
                                               key=lambda x: len(x))[-1],
-             'Author': lambda self, r: 'author name',
+             'Author': lambda self, r: 'author name', # TODO get actual max
              'Filename': lambda self, r: self.filename,
              }
 
