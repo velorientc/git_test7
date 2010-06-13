@@ -948,7 +948,14 @@ STDMETHODIMP CShellExtCMenu::Initialize(
         myFolder = name;
     }
 
-    return S_OK;
+    // disable context menu if neither the folder nor the files
+    // have been found
+    if (myFolder.empty() && myFiles.empty()) {
+        TDEBUG_TRACE("  shell extension not available on this object");
+        return E_FAIL;
+    } else {
+        return S_OK;
+    }
 }
 
 
