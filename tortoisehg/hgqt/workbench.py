@@ -508,8 +508,9 @@ class Workbench(QMainWindow):
         dlg = ColumnSelectDialog(repomodel.ALLCOLUMNS)
         if dlg.exec_() == QDialog.Accepted:
             w = self.repoTabsWidget.currentWidget()
-            w.repoview.model().updateColumns()
-            w.repoview.resizeColumns()
+            if w:
+                w.repoview.model().updateColumns()
+                w.repoview.resizeColumns()
 
     def back(self):
         w = self.repoTabsWidget.currentWidget()
