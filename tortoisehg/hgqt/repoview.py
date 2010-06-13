@@ -188,9 +188,16 @@ class HgRepoView(QTableView):
     def resizeColumns(self, *args):
         # resize columns the smart way: the column holding Log
         # is resized according to the total widget size.
-        model = self.model()
-        if not model:
+        if not self.model():
             return
+        hh = self.horizontalHeader()
+        hh.setStretchLastSection(False)
+        self._resizeColumns()
+        hh.setStretchLastSection(True)
+
+    def _resizeColumns(self):
+        # _resizeColumns misbehaves if called with last section streched
+        model = self.model()
         col1_width = self.viewport().width()
         fontm = QFontMetrics(self.font())
         tot_stretch = 0.0
@@ -213,7 +220,6 @@ class HgRepoView(QTableView):
             if model._columns[c] in model._stretchs:
                 w = model._stretchs[model._columns[c]] / tot_stretch
                 self.setColumnWidth(c, col1_width * w)
-        #self.horizontalHeader().setStretchLastSection(True)
 
     def revFromindex(self, index):
         if not index.isValid():
