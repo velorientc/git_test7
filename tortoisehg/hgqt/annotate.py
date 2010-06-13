@@ -233,11 +233,11 @@ class AnnotateView(QFrame):
                 self.thread.terminate()
                 self.finished()
                 return
-        if event.key() == Qt.Key_F3:
-            if event.modifiers() == Qt.ShiftModifier:
-                self.prevMatch()
-            else:
-                self.nextMatch()
+        if event.matches(QKeySequence.FindNext):
+            self.nextMatch()
+            return
+        if event.matches(QKeySequence.FindPrevious):
+            self.prevMatch()
             return
         return super(AnnotateView, self).keyPressEvent(event)
 
