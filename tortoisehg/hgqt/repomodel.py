@@ -175,9 +175,10 @@ class HgRepoListModel(QAbstractTableModel):
         s = QSettings()
         cols = s.value('workbench/columns').toStringList()
         cols = [str(col) for col in cols]
-        if cols:
-            validcols = [col for col in cols if col in ALLCOLUMNS]
+        validcols = [col for col in cols if col in ALLCOLUMNS]
+        if validcols:
             self._columns = tuple(validcols)
+            self.datacache = {}
             self.emit(SIGNAL("layoutChanged()"))
 
     def branch(self):
