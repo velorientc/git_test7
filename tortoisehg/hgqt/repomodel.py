@@ -14,9 +14,9 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial import util, error, templatefilters
+from mercurial import util, error
 
-from tortoisehg.util.hglib import tounicode
+from tortoisehg.util.hglib import tounicode, username
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.qtlib import geticon
@@ -79,7 +79,7 @@ def getlog(ctx, gnode):
 _columnmap = {'ID': lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
               'Graph': lambda ctx, gnode: "",
               'Log': getlog,
-              'Author': lambda ctx, gnode: templatefilters.person(ctx.user()),
+              'Author': lambda ctx, gnode: username(ctx.user()),
               'Date': lambda ctx, gnode: cvrt_date(ctx.date()),
               'Tags': gettags,
               'Branch': lambda ctx, gnode: ctx.branch(),
@@ -238,7 +238,7 @@ class HgRepoListModel(QAbstractTableModel):
         authors = set()
         for i in xrange(currentlen, newlen):
             authors.add(self.repo[self.graph.nodes[i].rev].user())
-        sauthors = [templatefilters.person(user) for user in list(authors)]
+        sauthors = [username(user) for user in list(authors)]
         sauthors.append(self.maxauthor)
         self.maxauthor = sorted(sauthors, key=lambda x: len(x))[-1]
 
