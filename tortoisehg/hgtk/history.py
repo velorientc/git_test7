@@ -2643,6 +2643,7 @@ class GLog(gdialog.GWindow):
                         if self.repo[n].branch() != branch:
                             remain.append(n)
                     self.outgoing = remain
+                    self.reload_log()
                     text = _('Finished pushing branch %s') % branch
                 elif self.outgoing:
                     ancestors = set([self.repo[node].rev()])
