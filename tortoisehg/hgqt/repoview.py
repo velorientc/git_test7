@@ -210,7 +210,7 @@ class HgRepoView(QTableView):
             if isinstance(w, int):
                 self.setColumnWidth(c, w)
             elif w is not None:
-                w = fontm.width(hglib.tounicode(w) + 'w')
+                w = fontm.width(hglib.tounicode(str(w)) + 'w')
                 self.setColumnWidth(c, w)
             else:
                 w = self.sizeHintForColumn(c)
