@@ -256,7 +256,7 @@ class AnnotateView(QFrame):
                 author = hglib.username(fctx.user())
                 author = hglib.tounicode(author)
                 date = hglib.age(fctx.date())
-                l = fctx.description().replace(u'\0', '').splitlines()
+                l = hglib.tounicode(fctx.description()).replace('\0', '').splitlines()
                 summary = l and l[0] or ''
                 if fctx.path() == self.annfile:
                     source = ''
