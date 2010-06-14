@@ -267,7 +267,7 @@ class AnnotateView(QFrame):
 
         self.edit.summaries = sums
         self.edit.links = links
-        self.edit.setPlainText(''.join(lines))
+        self.edit.setPlainText(hglib.tounicode(''.join(lines)))
         self.edit.revs = revs
         width = max([len(str(r)) for r in revs]) * self.edit.charwidth + 3
         self.revarea.width = width
