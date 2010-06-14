@@ -17,6 +17,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
+from tortoisehg.hgqt import hgemail
 
 from repoview import HgRepoView
 from revdetailswidget import RevDetailsWidget
@@ -171,6 +172,7 @@ class RepoWidget(QWidget):
         connect(view, SIGNAL('mergeWithRevision'), self.mergeWithRevision)
         connect(view, SIGNAL('tagToRevision'), self.tagToRevision)
         connect(view, SIGNAL('backoutToRevision'), self.backoutToRevision)
+        connect(view, SIGNAL('emailRevision'), self.emailRevision)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -241,6 +243,10 @@ class RepoWidget(QWidget):
         def invalidated():
             self.reload() # TODO: implement something less drastic than a full reload
         dlg.repoInvalidated.connect(invalidated)
+        dlg.show()
+
+    def emailRevision(self, rev):
+        dlg = hgemail.EmailDialog(self.repo.ui, self.repo, [str(rev)], self)
         dlg.show()
 
     def revision_selected(self, rev):

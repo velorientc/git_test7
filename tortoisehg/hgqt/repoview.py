@@ -120,6 +120,9 @@ class HgRepoView(QTableView):
               self.tagToRev),
              ('backout', _('Backout...'), None, None, None,
               self.backoutToRev),
+             ('email', _('Email patch...'), None, None, None,
+              self.emailRev),
+
              ]
         return a
 
@@ -157,10 +160,13 @@ class HgRepoView(QTableView):
     def backoutToRev(self):
         self.emit(SIGNAL('backoutToRevision'), self.current_rev)
 
+    def emailRev(self):
+        self.emit(SIGNAL('emailRevision'), self.current_rev)
+
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
-                    None, 'back', 'forward']:
+                    'email', None, 'back', 'forward']:
             if act:
                 menu.addAction(self._actions[act])
             else:
