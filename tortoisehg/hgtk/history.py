@@ -186,6 +186,7 @@ class GLog(gdialog.GWindow):
         self.useproxy = None
         self.revrange = None
         self.forcepush = False
+        self.newbranch = False
         self.bundle_autoreject = False
         self.runner = hgcmd.CmdRunner()
         os.chdir(self.repo.root)
@@ -291,6 +292,8 @@ class GLog(gdialog.GWindow):
             self.useproxy = menuitem.get_active()
         def toggle_force(menuitem):
             self.forcepush = menuitem.get_active()
+        def toggle_newbranch(menuitem):
+            self.newbranch = menuitem.get_active()
         def refresh(menuitem, resetmarks):
             if resetmarks:
                 self.stbar.set_idle_text(None)
@@ -457,6 +460,8 @@ class GLog(gdialog.GWindow):
             dict(text=_('Use proxy server'), name='use-proxy-server',
                 ascheck=True, func=toggle_proxy),
             dict(text=_('Force push'), ascheck=True, func=toggle_force),
+            dict(text=_('Push new branch'), ascheck=True,
+                func=toggle_newbranch),
             ]),
 
         dict(text=_('_Filter'), subitems=[
@@ -1243,6 +1248,7 @@ class GLog(gdialog.GWindow):
         if self.repo[self.currevid].node() in self.outgoing:
             m.append_sep()
             m.append(_('Push to Here'), self.push_to, gtk.STOCK_GOTO_TOP)
+            m.append(_('Push this Branch'), self.push_branch, gtk.STOCK_GOTO_TOP)
         m.append_sep()
         m.append(_('_Update...'), self.checkout, 'menucheckout.ico')
         mmerge = m.append(_('_Merge with...'), self.domerge, 'menumerge.ico')
@@ -2013,6 +2019,8 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
             cmdline += ['--force']
+        elif self.newbranch:
+            cmdline += ['--new-branch']
         cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
@@ -2578,6 +2586,12 @@ class GLog(gdialog.GWindow):
                     text = _('Forced push to remote repository\n%s\n'
                              '(creating new heads in remote if needed)?') % original_path
                     buttontext = _('Forced &Push')
+                elif self.newbranch:
+                    title = _('Confirm Push of New Branches to Remote Repository')
+                    text = _('Push to remote repository\n%s\n'
+                             '(creating new branches in remote if needed)?') % original_path
+                    buttontext = _('&Push')
+                    confirm_push = True
                 else:
                     title = _('Confirm Push to remote Repository')
                     text = _('Push to remote repository\n%s\n?') % original_path
@@ -2600,16 +2614,24 @@ class GLog(gdialog.GWindow):
             else:
                 return remote_path    
 
-    def push_to(self, menuitem):
+    def push_branch(self, menuitem):
+        self.push_to(menuitem, branch=self.repo[self.currevid].branch())
+
+    def push_to(self, menuitem, branch=None):
         remote_path = self.validate_path()
         if not remote_path:
             return
         
         node = self.repo[self.currevid].node()
         rev = str(self.currevid)
-        cmdline = ['hg', 'push', '--rev', rev]
-        if self.forcepush:
-            cmdline += ['--force']
+        if branch:
+            cmdline = ['hg', 'push', '--new-branch', '--branch', branch]
+        else:
+            cmdline = ['hg', 'push', '--rev', rev]
+            if self.forcepush:
+                cmdline += ['--force']
+            elif self.newbranch:
+                cmdline += ['--new-branch']
         cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
