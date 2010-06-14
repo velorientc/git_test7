@@ -220,7 +220,7 @@ class StatusWidget(QWidget):
             self.emit(SIGNAL('menuAction()'))
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_F5:
+        if event.matches(QKeySequence.Refresh):
             self.te.clear()
             self.refreshWctx()
         else:
