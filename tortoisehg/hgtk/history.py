@@ -2636,7 +2636,15 @@ class GLog(gdialog.GWindow):
 
         def callback(return_code, *args):
             if return_code == 0:
-                if self.outgoing:
+                text = _('Finished push to revision %s') % rev
+                if branch:
+                    remain = []
+                    for n in self.outgoing:
+                        if self.repo[n].branch() != branch:
+                            remain.append(n)
+                    self.outgoing = remain
+                    text = _('Finished pushing branch %s') % branch
+                elif self.outgoing:
                     ancestors = set([self.repo[node].rev()])
                     while ancestors:
                         n = self.repo[ancestors.pop()]
@@ -2648,12 +2656,14 @@ class GLog(gdialog.GWindow):
                         for p in n.parents():
                             ancestors.add(p.rev())
                     self.reload_log()
-                text = _('Finished push to revision %s') % rev
             else:
                 text = _('Aborted push')
             self.stbar.set_idle_text(text)
-        if not self.execute_command(cmdline, callback,
-                    status=_('Pushing changesets to revision %s...') % rev,
+        if branch:
+            status = _('Pushing branch %s...') % branch
+        else:
+            status = _('Pushing changesets to revision %s...') % rev
+        if not self.execute_command(cmdline, callback, status=status,
                     title=_('Push to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after the previous '
