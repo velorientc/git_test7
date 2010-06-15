@@ -9,6 +9,7 @@ import sys, os, httplib, socket
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import extensions, hgweb, util
+from mercurial.hgweb import server
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
 
