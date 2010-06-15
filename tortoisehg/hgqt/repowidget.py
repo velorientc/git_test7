@@ -8,6 +8,7 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
+import binascii
 import os
 
 from mercurial import hg
@@ -173,6 +174,7 @@ class RepoWidget(QWidget):
         connect(view, SIGNAL('tagToRevision'), self.tagToRevision)
         connect(view, SIGNAL('backoutToRevision'), self.backoutToRevision)
         connect(view, SIGNAL('emailRevision'), self.emailRevision)
+        connect(view, SIGNAL('copyHash'), self.copyHash)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -248,6 +250,10 @@ class RepoWidget(QWidget):
     def emailRevision(self, rev):
         dlg = hgemail.EmailDialog(self.repo.ui, self.repo, [str(rev)], self)
         dlg.show()
+
+    def copyHash(self, rev):
+        clip = QApplication.clipboard()
+        clip.setText(binascii.hexlify(self.repo[rev].node()))
 
     def revision_selected(self, rev):
         if self.repomodel.graph:
