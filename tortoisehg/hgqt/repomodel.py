@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial import util, error
+from mercurial import util, error, node
 
 from tortoisehg.util.hglib import tounicode, username
 from tortoisehg.hgqt.graph import Graph
@@ -36,7 +36,8 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 #COLORS = [str(color) for color in QColor.colorNames()]
-ALLCOLUMNS = ('ID', 'Branch', 'Graph', 'Log', 'Author', 'Date', 'Tags',)
+ALLCOLUMNS = ('ID', 'Node', 'Branch', 'Graph', 'Log', 'Author', 'Date',
+              'Tags',)
 
 def get_color(n, ignore=()):
     """
@@ -77,6 +78,7 @@ def getlog(ctx, gnode):
 
 # XXX maybe it's time to make these methods of the model...
 _columnmap = {'ID': lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
+              'Node': lambda ctx, gnode: str(ctx),
               'Graph': lambda ctx, gnode: "",
               'Log': getlog,
               'Author': lambda ctx, gnode: username(ctx.user()),
@@ -112,7 +114,8 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
-    _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',)
+    _columns = ('Graph', 'ID', 'Node', 'Branch', 'Log', 'Author', 'Date',
+                'Tags',)
     _stretchs = {'Log': 1, }
 
     def __init__(self, repo, branch='', parent=None):
@@ -257,6 +260,8 @@ class HgRepoListModel(QAbstractTableModel):
         column = self._columns[col]
         if column == 'ID':
             return str(len(self.repo))
+        if column == 'Node':
+            return node.short(node.nullid)
         if column == 'Date':
             return cvrt_date(self.repo[None].date())
         if column == 'Tags':
