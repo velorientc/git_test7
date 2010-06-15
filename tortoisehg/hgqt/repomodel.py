@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial import util, error, node
+from mercurial import util, error
 
 from tortoisehg.util.hglib import tounicode, username
 from tortoisehg.hgqt.graph import Graph
@@ -114,8 +114,7 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
-    _columns = ('Graph', 'ID', 'Node', 'Branch', 'Log', 'Author', 'Date',
-                'Tags',)
+    _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',)
     _stretchs = {'Log': 1, }
 
     def __init__(self, repo, branch='', parent=None):
@@ -261,7 +260,7 @@ class HgRepoListModel(QAbstractTableModel):
         if column == 'ID':
             return str(len(self.repo))
         if column == 'Node':
-            return node.short(node.nullid)
+            return str(self.repo['.'])
         if column == 'Date':
             return cvrt_date(self.repo[None].date())
         if column == 'Tags':
