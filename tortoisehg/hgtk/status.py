@@ -1091,9 +1091,10 @@ class GStatus(gdialog.GWindow):
                     chunks = self.filechunks[wfile]
                 else:
                     chunks = self.read_file_chunks(wfile)
-                    for c in chunks:
-                        c.active = True
-                    self.filechunks[wfile] = chunks
+                    if chunks:
+                        for c in chunks:
+                            c.active = True
+                        self.filechunks[wfile] = chunks
                 for i, chunk in enumerate(chunks):
                     if i == 0:
                         chunk.write(buf)
