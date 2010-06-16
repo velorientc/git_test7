@@ -15,7 +15,7 @@ import tempfile
 import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
-from mercurial import hbisect, error
+from mercurial import error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -28,6 +28,7 @@ from tortoisehg.hgtk import gdialog, gtklib, hgcmd, gorev, thgstrip
 from tortoisehg.hgtk import backout, status, hgemail, tagadd, update, merge
 from tortoisehg.hgtk import archive, changeset, thgconfig, thgmq, histdetails
 from tortoisehg.hgtk import statusbar, bookmark, thgimport
+from tortoisehg.hgtk import thgpbranch
 
 MODE_REVRANGE = 0
 MODE_FILEPATS = 1
@@ -148,7 +149,7 @@ class FilterBar(gtklib.SlimToolbar):
         # refresh branch names
         self.branchcombo.get_model().clear()
         self.branchcombo.append_text(_('Branches...'))
-        for name in branch_names:
+        for name in sorted(branch_names):
             self.branchcombo.append_text(name)
 
         # try to restore previously selected item
@@ -185,6 +186,7 @@ class GLog(gdialog.GWindow):
         self.useproxy = None
         self.revrange = None
         self.forcepush = False
+        self.newbranch = False
         self.bundle_autoreject = False
         self.runner = hgcmd.CmdRunner()
         os.chdir(self.repo.root)
@@ -251,7 +253,17 @@ class GLog(gdialog.GWindow):
                             tip=_('Show/Hide Patch Queue'),
                             toggle=True,
                             icon='menupatch.ico')
-            tbar += [gtk.SeparatorToolItem(), self.mqtb]
+            tbar += [self.mqtb]
+        if 'pbranch' in self.exs:
+            self.pbranchtb = self.make_toolbutton(gtk.STOCK_DIRECTORY,
+                            _('Patch Branch'),
+                            self.pbranch_clicked, name='pbranch',
+                            tip=_('Show/Hide Patch Branch'),
+                            toggle=True,
+                            icon='menupatch.ico')
+            tbar += [self.pbranchtb]
+        if 'mq' in self.exs or 'pbranch' in self.exs:
+            tbar += [gtk.SeparatorToolItem()]
         sep = gtk.SeparatorToolItem()
         sep.set_expand(True)
         sep.set_draw(False)
@@ -280,6 +292,8 @@ class GLog(gdialog.GWindow):
             self.useproxy = menuitem.get_active()
         def toggle_force(menuitem):
             self.forcepush = menuitem.get_active()
+        def toggle_newbranch(menuitem):
+            self.newbranch = menuitem.get_active()
         def refresh(menuitem, resetmarks):
             if resetmarks:
                 self.stbar.set_idle_text(None)
@@ -360,6 +374,12 @@ class GLog(gdialog.GWindow):
         else:
             p4menu = []
 
+        if 'pbranch' in self.exs:
+            pbranch_item = [dict(text=_('Patch Branch'), name='pbranch', ascheck=True,
+                func=self.pbranch_clicked, check=self.setting_pbranchvis) ]
+        else:
+            pbranch_item = []
+
         return [
         dict(text=_('_View'), subitems=[
             dict(text=_('Load more Revisions'), name='load-more',
@@ -372,7 +392,7 @@ class GLog(gdialog.GWindow):
             ] + sync_bar_item + [
             dict(text=_('Filter Bar'), ascheck=True,
                 func=self.toggle_show_filterbar, check=self.show_filterbar),
-            ] + mq_item + [
+            ] + mq_item + pbranch_item + [
             dict(text='----'),
             dict(text=_('Refresh'), func=refresh, args=[False],
                 icon=gtk.STOCK_REFRESH),
@@ -440,6 +460,8 @@ class GLog(gdialog.GWindow):
             dict(text=_('Use proxy server'), name='use-proxy-server',
                 ascheck=True, func=toggle_proxy),
             dict(text=_('Force push'), ascheck=True, func=toggle_force),
+            dict(text=_('Push new branch'), ascheck=True,
+                func=toggle_newbranch),
             ]),
 
         dict(text=_('_Filter'), subitems=[
@@ -864,7 +886,24 @@ class GLog(gdialog.GWindow):
         else:
             self.goto_rev(revid)
 
-    def repo_invalidated(self, mqwidget):
+    def pbranch_selected(self, pbranchwidget, revid, patchname):
+        'if revid < 0 then the patch is listed in .hg/pgraph but not in repo'
+        self.stbar.set_text('')
+        pf = tempfile.TemporaryFile()
+        try:
+            try:
+                pf.writelines(pbranchwidget.pdiff(patchname))
+            except (util.Abort, error.RepoError), e:
+                self.stbar.set_text(str(e))
+                return
+            self.currevid = self.lastrevid = None
+            pf.seek(0)
+            self.changeview.load_patch_details_from_file_object(pf, patchname, isTemp=True)
+        finally:
+            pf.close()
+
+    def repo_invalidated(self, widget):
+        'Emitted from MQWidget and PBranchWidget'
         self.reload_log()
 
     def files_dropped(self, mqwidget, files, *args):
@@ -938,8 +977,9 @@ class GLog(gdialog.GWindow):
         else:
             item.set_sensitive(False)
 
-        # enable MQ panel
+        # enable panels
         self.enable_mqpanel()
+        self.enable_pbranchpanel()
 
     def get_proxy_args(self):
         item = self.get_menuitem('use-proxy-server')
@@ -971,6 +1011,13 @@ class GLog(gdialog.GWindow):
         else:
             settings['glog-mqpane'] = self.setting_mqhpos
             settings['glog-mqvis'] = self.setting_mqvis
+        if hasattr(self, 'pbranchpaned') and self.pbranchwidget.has_patch():
+            curpos = self.pbranchpaned.get_position()
+            settings['glog-pbranchpane'] = curpos or self.setting_pbranchhpos
+            settings['glog-pbranchvis'] = bool(curpos)
+        else:
+            settings['glog-pbranchpane'] = self.setting_pbranchhpos
+            settings['glog-pbranchvis'] = self.setting_pbranchvis
         settings['branch-color'] = self.graphview.get_property('branch-color')
         settings['show-output'] = self.showoutput
         settings['show-toolbar'] = self.show_toolbar
@@ -992,6 +1039,8 @@ class GLog(gdialog.GWindow):
         self.setting_hpos = settings.get('glog-hpane', -1)
         self.setting_mqhpos = settings.get('glog-mqpane', 140) or 140
         self.setting_mqvis = settings.get('glog-mqvis', False)
+        self.setting_pbranchhpos = settings.get('glog-pbranchpane', 140) or 140
+        self.setting_pbranchvis = settings.get('glog-pbranchvis', False)
         self.branch_color = settings.get('branch-color', False)
         self.showoutput = settings.get('show-output', False)
         self.show_toolbar = settings.get('show-toolbar', True)
@@ -1030,6 +1079,10 @@ class GLog(gdialog.GWindow):
         # refresh MQ widget if exists
         if hasattr(self, 'mqwidget'):
             self.mqwidget.refresh()
+
+        # refresh pbranch widget if exists
+        if hasattr(self, 'pbranchwidget'):
+            self.pbranchwidget.refresh()
 
         # force a redraw of the visible rows
         self.graphview.hide()
@@ -1093,12 +1146,12 @@ class GLog(gdialog.GWindow):
             if len(npats) == 1:
                 kind, name = match._patsplit(npats[0], None)
                 if kind == 'path' and not os.path.isdir(name):
-                    ftitle(_('file history: ') + hglib.toutf(name))
+                    ftitle(_('file patterns "%s"') % hglib.toutf(name))
                     opts['filehist'] = name
                     self.graphview.refresh(graphcol, [name], opts)
             if not opts.get('filehist'):
-                ftitle('%s: %s' % (self.filtercombo.get_active_text(),
-                                   self.filterentry.get_text()))
+                ftitle('%s "%s"' % (self.filtercombo.get_active_text(),
+                                    self.filterentry.get_text()))
                 self.graphview.refresh(False, npats, opts)
             filtertext += self.filtercombo.get_active_text()
         elif self.filter == 'all':
@@ -1168,6 +1221,10 @@ class GLog(gdialog.GWindow):
         # refresh filterbar
         self.filterbar.refresh(hglib.getlivebranch(self.repo))
 
+        # refresh pbranch widget if exists
+        if hasattr(self, 'pbranchwidget'):
+            self.pbranchwidget.refresh()
+
         # Remember options to next time reload_log is called
         self.filteropts = opts
 
@@ -1191,6 +1248,7 @@ class GLog(gdialog.GWindow):
         if self.repo[self.currevid].node() in self.outgoing:
             m.append_sep()
             m.append(_('Push to Here'), self.push_to, gtk.STOCK_GOTO_TOP)
+            m.append(_('Push this Branch'), self.push_branch, gtk.STOCK_GOTO_TOP)
         m.append_sep()
         m.append(_('_Update...'), self.checkout, 'menucheckout.ico')
         mmerge = m.append(_('_Merge with...'), self.domerge, 'menumerge.ico')
@@ -1357,6 +1415,7 @@ class GLog(gdialog.GWindow):
         # prepare statusbar
         self.stbar = statusbar.StatusBar()
         self.stbar.append_field('mq')
+        self.stbar.append_field('pbranch')
         self.stbar.append_field('filter')
         self.stbar.append_field('rev')
 
@@ -1568,6 +1627,25 @@ class GLog(gdialog.GWindow):
         midpane.pack_start(self.graphview)
         midpane.show_all()
 
+        # pbranch widget
+        if 'pbranch' in self.exs:
+            # create PBranchWidget
+            self.pbranchwidget = thgpbranch.PBranchWidget(
+                self, self.repo, self.stbar, accelgroup, self.tooltips)
+            self.pbranchwidget.connect('patch-selected', self.pbranch_selected)
+            self.pbranchwidget.connect('repo-invalidated', self.repo_invalidated)
+
+            def wrapframe(widget):
+                frame = gtk.Frame()
+                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+                frame.add(widget)
+                return frame
+            self.pbranchpaned = gtk.HPaned()
+            self.pbranchpaned.add1(wrapframe(self.pbranchwidget))
+            self.pbranchpaned.add2(wrapframe(midpane))
+
+            midpane = self.pbranchpaned
+
         # MQ widget
         if 'mq' in self.exs:
             # create MQWidget
@@ -1576,6 +1654,7 @@ class GLog(gdialog.GWindow):
             self.mqwidget.connect('patch-selected', self.patch_selected)
             self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
             self.mqwidget.connect('files-dropped', self.files_dropped)
+            self.mqwidget.connect('close-mq', lambda *a: self.enable_mqpanel(False))
 
             def wrapframe(widget):
                 frame = gtk.Frame()
@@ -1940,6 +2019,8 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
             cmdline += ['--force']
+        elif self.newbranch:
+            cmdline += ['--new-branch']
         cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
@@ -2071,6 +2152,8 @@ class GLog(gdialog.GWindow):
         self.hpaned.set_position(self.setting_hpos)
         if hasattr(self, 'mqpaned') and self.mqtb.get_active():
             self.mqpaned.set_position(self.setting_mqhpos)
+        if hasattr(self, 'pbranchpaned') and self.pbranchtb.get_active():
+            self.pbranchpaned.set_position(self.setting_pbranchhpos)
 
     def thgdiff(self, treeview):
         'ctrl-d handler'
@@ -2449,20 +2532,26 @@ class GLog(gdialog.GWindow):
                         skip=False,
                         reset=True)
 
-    def bisect_good(self, menuitem):
-        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+    def run_bisect_step(self, cmd):
+        '''run one bisect step and scroll to the new working copy parent'''
         self.execute_command(cmd, force=True)
         self.refresh_model()
+        wcpar = [x.rev() for x in self.repo.parents()]
+        # unless something weird happened, wc has one parent
+        if len(wcpar) == 1:
+            self.graphview.scroll_to_revision(wcpar[0])
+
+    def bisect_good(self, menuitem):
+        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+        self.run_bisect_step(cmd)
 
     def bisect_bad(self, menuitem):
         cmd = ['hg', 'bisect', '--bad', str(self.currevid)]
-        self.execute_command(cmd, force=True)
-        self.refresh_model()
+        self.run_bisect_step(cmd)
 
     def bisect_skip(self, menuitem):
         cmd = ['hg', 'bisect', '--skip', str(self.currevid)]
-        self.execute_command(cmd, force=True)
-        self.refresh_model()
+        self.run_bisect_step(cmd)
 
     def show_status(self, menuitem):
         rev = self.currevid
@@ -2497,6 +2586,12 @@ class GLog(gdialog.GWindow):
                     text = _('Forced push to remote repository\n%s\n'
                              '(creating new heads in remote if needed)?') % original_path
                     buttontext = _('Forced &Push')
+                elif self.newbranch:
+                    title = _('Confirm Push of New Branches to Remote Repository')
+                    text = _('Push to remote repository\n%s\n'
+                             '(creating new branches in remote if needed)?') % original_path
+                    buttontext = _('&Push')
+                    confirm_push = True
                 else:
                     title = _('Confirm Push to remote Repository')
                     text = _('Push to remote repository\n%s\n?') % original_path
@@ -2519,21 +2614,38 @@ class GLog(gdialog.GWindow):
             else:
                 return remote_path    
 
-    def push_to(self, menuitem):
+    def push_branch(self, menuitem):
+        self.push_to(menuitem, branch=self.repo[self.currevid].branch())
+
+    def push_to(self, menuitem, branch=None):
         remote_path = self.validate_path()
         if not remote_path:
             return
         
         node = self.repo[self.currevid].node()
         rev = str(self.currevid)
-        cmdline = ['hg', 'push', '--rev', rev]
-        if self.forcepush:
-            cmdline += ['--force']
+        if branch:
+            cmdline = ['hg', 'push', '--new-branch', '--branch', branch]
+        else:
+            cmdline = ['hg', 'push', '--rev', rev]
+            if self.forcepush:
+                cmdline += ['--force']
+            elif self.newbranch:
+                cmdline += ['--new-branch']
         cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
-                if self.outgoing:
+                text = _('Finished push to revision %s') % rev
+                if branch:
+                    remain = []
+                    for n in self.outgoing:
+                        if self.repo[n].branch() != branch:
+                            remain.append(n)
+                    self.outgoing = remain
+                    self.reload_log()
+                    text = _('Finished pushing branch %s') % branch
+                elif self.outgoing:
                     ancestors = set([self.repo[node].rev()])
                     while ancestors:
                         n = self.repo[ancestors.pop()]
@@ -2545,12 +2657,14 @@ class GLog(gdialog.GWindow):
                         for p in n.parents():
                             ancestors.add(p.rev())
                     self.reload_log()
-                text = _('Finished push to revision %s') % rev
             else:
                 text = _('Aborted push')
             self.stbar.set_idle_text(text)
-        if not self.execute_command(cmdline, callback,
-                    status=_('Pushing changesets to revision %s...') % rev,
+        if branch:
+            status = _('Pushing branch %s...') % branch
+        else:
+            status = _('Pushing changesets to revision %s...') % rev
+        if not self.execute_command(cmdline, callback, status=status,
                     title=_('Push to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
                            _('Please try again after the previous '
@@ -2693,6 +2807,26 @@ class GLog(gdialog.GWindow):
 
     def mq_clicked(self, widget, *args):
         self.enable_mqpanel(widget.get_active())
+
+    def enable_pbranchpanel(self, enable=None):
+        if not hasattr(self, 'pbranchpaned'):
+            return
+        if enable is None:
+            enable = self.setting_pbranchvis and self.pbranchwidget.has_patch()
+        oldpos = self.pbranchpaned.get_position()
+        self.pbranchpaned.set_position(enable and self.setting_pbranchhpos or 0)
+        if not enable and oldpos:
+            self.setting_pbranchhpos = oldpos
+
+        # set the state of PBranch toolbutton
+        if hasattr(self, 'pbranchtb'):
+            self.pbranchtb.handler_block_by_func(self.pbranch_clicked)
+            self.cmd_set_active('pbranch', enable)
+            self.pbranchtb.handler_unblock_by_func(self.pbranch_clicked)
+            self.cmd_set_sensitive('pbranch', self.pbranchwidget.has_pbranch())
+
+    def pbranch_clicked(self, widget, data=None):
+        self.enable_pbranchpanel(widget.get_active())
 
     def tree_button_press(self, tree, event):
         if event.button == 3 and not (event.state & (gtk.gdk.SHIFT_MASK |

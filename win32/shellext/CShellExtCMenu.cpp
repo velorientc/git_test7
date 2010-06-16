@@ -10,6 +10,8 @@
 #include "TortoiseIconBitmap.h"
 #include "ThgVersion.h"
 
+#include "Msi.h"
+
 #include <map>
 
 #include "CShellExtCMenu.h"
@@ -876,6 +878,18 @@ STDMETHODIMP CShellExtCMenu::Initialize(
     TCHAR name[MAX_PATH+1];
 
     TDEBUG_TRACE("CShellExtCMenu::Initialize");
+
+    // get installed MSI product id (for debugging purposes for now)
+#ifdef _M_X64
+    const char* shellexid = "{59FD2A49-BA62-40CC-B155-D11DB11EE611}";
+#else
+    const char* shellexid = "{1126CF42-3994-428B-A746-464E1BC680F3}";
+#endif
+    std::vector<char> product_id(50, 0);
+    UINT msires = ::MsiGetProductCodeA(shellexid, &product_id[0]);
+    TDEBUG_TRACE("MSI shellexid: " << shellexid);
+    TDEBUG_TRACE("MSI msires: " << msires);
+    TDEBUG_TRACE("MSI installed product id: " << &product_id[0]);
 
     TDEBUG_TRACEW(
         L"---- TortoiseHg shell extension version " 
