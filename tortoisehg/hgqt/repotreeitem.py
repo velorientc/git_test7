@@ -24,8 +24,6 @@ xmlClassMap = {
       'group': 'RepoGroupItem',
       'repo': 'RepoItem',
       'treeitem': 'RepoTreeItem',
-      'paths': 'RepoPathsItem',
-      'path': 'RepoPathItem',
     }
 
 inverseXmlClassMap = {}
@@ -138,13 +136,6 @@ class RepoItem(RepoTreeItem):
         RepoTreeItem.__init__(self, model, parent)
         self._root = rootpath
         self._setttingsdlg = None
-        if rootpath:
-            pi = RepoPathsItem(model)
-            self.appendChild(pi)
-            repo = hg.repository(model.ui, path=rootpath)
-            for alias, path in repo.ui.configitems('paths'):
-                item = RepoPathItem(model, alias, path)
-                pi.appendChild(item)
 
     def rootpath(self):
         return self._root
@@ -196,90 +187,6 @@ class RepoItem(RepoTreeItem):
         if reporoot == self._root:
             return self
         return None                
-
-
-class RepoPathsItem(RepoTreeItem):
-    def __init__(self, model, parent=None):
-        RepoTreeItem.__init__(self, model, parent)
-
-    def data(self, column, role):
-        if role == Qt.DisplayRole and column == 0:
-            return QVariant(_('Synchronize'))
-        return QVariant()
-
-    def setData(self, column, value):
-        return False
-
-    def menulist(self):
-        return ['newPath']
-
-    def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
-
-    def dump(self, xw):
-        RepoTreeItem.dump(self, xw)
-
-    def undump(self, xr):
-        RepoTreeItem.undump(self, xr)
-
-
-class RepoPathItem(RepoTreeItem):
-    def __init__(self, model, alias='', path='', parent=None):
-        RepoTreeItem.__init__(self, model, parent)
-        self._alias = alias
-        self._path = path
-
-    def url(self):
-        return self._path
-
-    def setUrl(self, url):
-        self._path = url
-
-    def alias(self):
-        return self._alias
-
-    def data(self, column, role):
-        if role == Qt.DecorationRole:
-            if column == 0:
-                ico = qtlib.geticon('sync')
-                return QVariant(ico)
-            return QVariant()
-        if column == 0:
-            return QVariant(self._alias)
-        elif column == 1:
-            path = url.hidepassword(self._path)
-            return QVariant(path)
-        return QVariant()
-
-    def setData(self, column, value):
-        if column == 0:
-            self._alias = str(value.toString())
-            return True
-        return False
-
-    def menulist(self):
-        return ['pull', 'push', None, 'editpath', 'rename', None, 'remove' ]
-
-    def flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-
-    def removeRows(self, row, count):
-        return False
-
-    def dump(self, xw):
-        xw.writeAttribute('alias', self._alias)
-        xw.writeAttribute('path', self._path)
-        RepoTreeItem.dump(self, xw)
-
-    def undump(self, xr):
-        a = xr.attributes()
-        self._alias = str(a.value('', 'alias').toString())
-        self._path = str(a.value('', 'path').toString())
-        RepoTreeItem.undump(self, xr)
-
-    def details(self):
-        path = url.hidepassword(self._path)
-        return _('Repository URL %s') % path
 
 
 class RepoGroupItem(RepoTreeItem):

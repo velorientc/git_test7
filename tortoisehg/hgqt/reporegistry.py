@@ -90,20 +90,12 @@ class RepoTreeView(QTreeView):
                 _("Opens the repository in a new tab"), None, self.open),
              ("newGroup", _("New Group"), None, 
                 _("Create a new group"), None, self.newGroup),
-             ("newPath", _("New URL"), None,
-                _("Create a Repository URL Entry"), None, self.newPath),
              ("rename", _("Rename"), None, 
                 _("Rename the entry"), None, self.startRename),
              ("settings", _("Settings..."), None, 
                 _("View the repository's settings"), None, self.startSettings),
              ("remove", _("Delete"), None, 
                 _("Delete the node and all its subnodes"), None, self.removeSelected),
-             ("pull", _("Pull"), None, 
-                _("Pull from remote"), None, self.pull),
-             ("push", _("Push"), None, 
-                _("Push to remote"), None, self.push),
-             ("editpath", _("Edit URL..."), None, 
-                _("Edit Repository URL"), None, self.editPath),
              ("clone", _("Clone..."), None, 
                 _("Clone Repository"), None, self.cloneRepo),
              ]
@@ -145,68 +137,9 @@ class RepoTreeView(QTreeView):
             return
         self.selitem.internalPointer().open()
 
-    def pull(self):
-        if not self.selitem:
-            return
-        pathitem = self.selitem.internalPointer()
-        url_ = pathitem.url()
-        reporoot = pathitem.parent().parent().rootpath()
-
-        def finished():
-            self.workbench.reloadRepository(reporoot)
-        args = ['pull', '-R', reporoot, url_]
-        cmd = cmdui.Dialog(args, parent=self, finishfunc=finished)
-        what = _('Pulling from %s') % url.hidepassword(url_)
-        self.workbench.showMessage(what)
-        cmd.setWindowTitle(what)
-        cmd.show_output(False)
-        cmd.exec_()
-
-    def push(self):
-        if not self.selitem:
-            return
-        pathitem = self.selitem.internalPointer()
-        url_ = pathitem.url()
-        reporoot = pathitem.parent().parent().rootpath()
-
-        labels = [(QMessageBox.Yes, _('&Push')),
-                  (QMessageBox.No, _('Cancel'))]
-        if not qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'), 
-                     _('Push to remote repository ') + url_ + '?',
-                     labels=labels, parent=self):
-            return
-        args = ['push', '-R', reporoot, url_]
-        cmd = cmdui.Dialog(args, parent=self)
-        what = _('Pushing to %s') % url.hidepassword(url_)
-        self.workbench.showMessage(what)
-        cmd.setWindowTitle(what)
-        cmd.show_output(False)
-        cmd.exec_()
-
-    def editPath(self):
-        if not self.selitem:
-            return
-        pathitem = self.selitem.internalPointer()
-        d = PathEditDialog(self, pathitem.alias(), pathitem.url())
-        d.show()
-        if d.exec_():
-            pathitem.setUrl(d.url())
-            i = self.selitem
-            self.model().dataChanged.emit(i, i)
-
     def newGroup(self):
         m = self.model()
         m.addGroup(_('New Group'))
-
-    def newPath(self):
-        if not self.selitem:
-            return
-        m = self.model()
-        i = self.selitem.internalPointer()
-        cc = i.childCount()
-        m.beginInsertRows(self.selitem, cc, cc + 1)
-        i.appendChild(RepoPathItem(m, alias='new'))
-        m.endInsertRows()
 
     def removeSelected(self):
         if not self.selitem:
