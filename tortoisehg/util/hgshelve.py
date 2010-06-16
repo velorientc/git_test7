@@ -560,8 +560,8 @@ def shelve(ui, repo, *pats, **opts):
                         util.copyfile(tmpname, repo.wjoin(realname))
                     ui.debug(_('removing shelve file\n'))
                     os.unlink(repo.join('shelve'))
-                except OSError:
-                    pass
+                except (IOError, OSError), e:
+                    ui.warn(_('abort: backup restore failed, %s\n') % str(e))
 
             return 0
         finally:
