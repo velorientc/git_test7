@@ -18,6 +18,12 @@ from tortoisehg.util import hglib, settings, paths
 
 from tortoisehg.hgtk import dialog, gdialog, gtklib, hgcmd
 
+try:
+    from iniparse.config import Undefined
+except ImportError:
+    class Undefined(object):
+        pass
+
 _unspecstr = _('<unspecified>')
 _unspeclocalstr = hglib.fromutf(_unspecstr)
 
@@ -1384,7 +1390,10 @@ class ConfigDialog(gtk.Dialog):
         try:
             # Presumes single section/key level depth
             section, key = cpath.split('.', 1)
-            return self.ini[section][key]
+            val = self.ini[section][key]
+            if isinstance(val, Undefined):
+                return None
+            return val
         except KeyError:
             return None
 
