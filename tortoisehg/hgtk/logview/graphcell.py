@@ -19,6 +19,8 @@ import gobject
 import pango
 import cairo
 
+from tortoisehg.hgtk import gtklib
+
 # Styles used when rendering revision graph edges
 style_SOLID = 0
 style_DASHED = 1
@@ -87,24 +89,15 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         colours and the fg parameter provides the multiplier that should be
         applied to the foreground colours.
         """
-        mainline_color = ( 0.0, 0.0, 0.0 )
-        colours = [
-            ( 1.0, 0.0, 0.0 ),
-            ( 1.0, 1.0, 0.0 ),
-            ( 0.0, 1.0, 0.0 ),
-            ( 0.0, 1.0, 1.0 ),
-            ( 0.0, 0.0, 1.0 ),
-            ( 1.0, 0.0, 1.0 ),
-            ]
 
         if isinstance(colour, str):
             r, g, b = colour[1:3], colour[3:5], colour[5:7]
             colour_rgb = int(r, 16) / 255., int(g, 16) / 255., int(b, 16) / 255.
         else:
             if colour == 0:
-                colour_rgb = mainline_color
+                colour_rgb = gtklib.MAINLINE_COLOR
             else:
-                colour_rgb = colours[colour % len(colours)]
+                colour_rgb = gtklib.LINE_COLORS[colour % len(gtklib.LINE_COLORS)]
 
         red   = (colour_rgb[0] * fg) or bg
         green = (colour_rgb[1] * fg) or bg
@@ -147,33 +140,44 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         box_size = self.box_size(widget)
 
+        # Maybe draw branch head highlight under revision node
+        if self.node:
+            (column, colour, status) = self.node
+            arc_start_position_x = cell_area.x + box_size * column + box_size / 2; 
+            arc_start_position_y = cell_area.y + cell_area.height / 2;
+
+            if status >= 8:   # branch head
+                ctx.arc(arc_start_position_x, arc_start_position_y,
+                    box_size /1.7, 0, 2 * math.pi)
+                self.set_colour(ctx, gtklib.PGREEN, 0.0, 1.0)
+                ctx.fill()
+                status -= 8
+
         ctx.set_line_width(box_size / 8)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
 
         # Draw lines into the cell
-        for start, end, colour, type in self.in_lines:
+        for start, end, lcolour, type in self.in_lines:
             style = style_SOLID
             if type & 1:
                 style = style_DASHED
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y, bg_area.height,
-                         start, end, colour, style)
+                         start, end, lcolour, style)
 
         # Draw lines out of the cell
-        for start, end, colour, type in self.out_lines:
+        for start, end, lcolour, type in self.out_lines:
             style = style_SOLID
             if type & 2:
                 style = style_DASHED
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y + bg_area.height, bg_area.height,
-                         start, end, colour, style)
+                         start, end, lcolour, style)
 
         # Draw the revision node in the right column
         if not self.node:
             return
-        (column, colour, status) = self.node
-        arc_start_position_x = cell_area.x + box_size * column + box_size / 2; 
-        arc_start_position_y = cell_area.y + cell_area.height / 2;
+
         if status >= 4:  # working directory parent
             ctx.arc(arc_start_position_x, arc_start_position_y,
                     box_size / 4, 0, 2 * math.pi)
@@ -189,7 +193,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         # Possible node status
         if status != 0:
             def draw_arrow(x, y, dir):
-                self.set_colour(ctx, '#2e3436', 0.0, 1.0)
+                self.set_colour(ctx, gtklib.CELL_GREY, 0.0, 1.0)
                 ctx.rectangle(x, y, 2, 5)
                 ax, ay = x, y + (dir == 'down' and 5 or 0)
                 inc = 3 * (dir == 'up' and -1 or 1)
@@ -198,12 +202,12 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                 ctx.line_to(ax + 1, ay + inc)
                 ctx.line_to(ax - 2, ay)
                 ctx.stroke_preserve()
-                fillcolor = dir == 'up' and '#feaf3e' or '#8ae234'
+                fillcolor = dir == 'up' and gtklib.UP_ARROW_COLOR or gtklib.DOWN_ARROW_COLOR
                 self.set_colour(ctx, fillcolor, 0.0, 1.0)
                 ctx.fill()
 
             def draw_star(x, y, radius, nodes, offset=False):
-                self.set_colour(ctx, '#2e3436', 0.0, 1.0)
+                self.set_colour(ctx, gtklib.CELL_GREY, 0.0, 1.0)
                 total_nodes = nodes * 2 #inner + outer nodes
                 angle = 2 * math.pi / total_nodes;
                 offset = offset and angle / 2 or 0
@@ -218,7 +222,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                     else:
                         ctx.line_to(arc_x, arc_y)
                 ctx.stroke_preserve()
-                self.set_colour(ctx, '#fce94f', 0.0, 1.0)
+                self.set_colour(ctx, gtklib.STAR_COLOR, 0.0, 1.0)
                 ctx.fill()
 
             arrow_y = arc_start_position_y - box_size / 4

@@ -29,7 +29,7 @@ except ImportError:
     openflags = 0
 
 # Match parent2 first, so 'parent1?' will match both parent1 and parent
-_regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|ancestor|alabel)'
+_regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|chash)'
 
 _nonexistant = _('[non-existant]')
 
@@ -92,6 +92,7 @@ def filemerge(ui, fname, patchedfname):
     diffcmd, diffopts, mergeopts = detectedtools[preferred]
     replace = dict(parent=fname, parent1=fname,
                    plabel1=fname + _('[working copy]'),
+                   repo='', phash1='', phash2='', chash='',
                    child=patchedfname, clabel=_('[original]'))
     launchtool(diffcmd, diffopts, replace, True)
 
@@ -227,18 +228,9 @@ def visualdiff(ui, repo, pats, opts):
             files = mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
             label1b = '@%d' % ctx1b.rev()
-            # snapshot for ancestor revision
-            ctxa = ctx1a.ancestor(ctx1b)
-            if ctxa == ctx1a:
-                dira = dir1a
-            elif ctxa == ctx1b:
-                dira = dir1b
-            else:
-                dira = snapshot(repo, MAR, ctxa, tmproot)[0]
-            labela = '@%d' % ctxa.rev()
         else:
-            dir1b, dira = None, None
-            label1b, labela = '', ''
+            dir1b =  None
+            label1b = ''
 
         if ctx2.rev() is not None:
             # If ctx2 is not the working copy, create a snapshot for it
@@ -270,19 +262,17 @@ def visualdiff(ui, repo, pats, opts):
             label1a, dir1a = getfile(lfile, dir1a, label1a)
             if do3way:
                 label1b, dir1b = getfile(lfile, dir1b, label1b)
-                labela, dira = getfile(lfile, dira, labela)
             label2, dir2 = getfile(lfile, dir2, label2)
         if do3way:
             label1a += '[local]'
             label1b += '[other]'
-            labela += '[ancestor]'
             label2 += '[merged]'
 
-        # Function to quote file/dir names in the argument string
         replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
                        plabel1=label1a, plabel2=label1b,
-                       ancestor=dira, alabel=labela,
-                       clabel=label2, child=dir2)
+                       phash1=str(ctx1a), phash2=str(ctx1b),
+                       repo=hglib.get_reponame(repo),
+                       clabel=label2, child=dir2, chash=str(ctx2))
         launchtool(diffcmd, args, replace, True)
 
         # detect if changes were made to mirrored working files
@@ -334,12 +324,9 @@ class FileSelectionDialog(gtk.Dialog):
 
         self.set_default_size(400, 250)
         self.set_has_separator(False)
+        self.reponame=hglib.get_reponame(repo)
 
-        if ctx1b:
-            ctxa = ctx1a.ancestor(ctx1b)
-        else:
-            ctxa = ctx1a
-        self.ctxs = (ctx1a, ctx1b, ctxa, ctx2)
+        self.ctxs = (ctx1a, ctx1b, ctx2)
         self.copies = cpy
         self.ui = repo.ui
 
@@ -432,7 +419,7 @@ class FileSelectionDialog(gtk.Dialog):
         gobject.idle_add(self.fillmodel, repo, model, sa, sb)
 
     def fillmodel(self, repo, model, sa, sb):
-        ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
+        ctx1a, ctx1b, ctx2 = self.ctxs
         mod_a, add_a, rem_a = sa
         mod_b, add_b, rem_b = sb
         sources = set(self.copies.values())
@@ -451,17 +438,9 @@ class FileSelectionDialog(gtk.Dialog):
             files = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
             dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
             rev1b = '@%d' % ctx1b.rev()
-            if ctxa == ctx1a:
-                dira = dir1a
-            elif ctxa == ctx1b:
-                dira = dir1b
-            else:
-                # snapshot for ancestor revision
-                dira = snapshot(repo, MAR, ctxa, tmproot)[0]
-            reva = '@%d' % ctxa.rev()
         else:
-            dir1b, dira = None, None
-            rev1b, reva = '', ''
+            dir1b = None
+            rev1b = ''
 
         # If ctx2 is the working copy, use it directly
         if ctx2.rev() is None:
@@ -471,8 +450,8 @@ class FileSelectionDialog(gtk.Dialog):
             dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
             rev2 = '@%d' % ctx2.rev()
 
-        self.dirs = (dir1a, dir1b, dira, dir2)
-        self.revs = (rev1a, rev1b, reva, rev2)
+        self.dirs = (dir1a, dir1b, dir2)
+        self.revs = (rev1a, rev1b, rev2)
 
         def get_status(file, mod, add, rem):
             if file in mod:
@@ -559,9 +538,9 @@ class FileSelectionDialog(gtk.Dialog):
     def launch(self, st, fname):
         fname = hglib.fromutf(fname)
         source = self.copies.get(fname, None)
-        dir1a, dir1b, dira, dir2 = self.dirs
-        rev1a, rev1b, reva, rev2 = self.revs
-        ctx1a, ctx1b, ctxa, ctx2 = self.ctxs
+        dir1a, dir1b, dir2 = self.dirs
+        rev1a, rev1b, rev2 = self.revs
+        ctx1a, ctx1b, ctx2 = self.ctxs
 
         def getfile(ctx, dir, fname, source):
             m = ctx.manifest()
@@ -580,56 +559,59 @@ class FileSelectionDialog(gtk.Dialog):
         local, file1a = getfile(ctx1a, dir1a, fname, source)
         if ctx1b:
             other, file1b = getfile(ctx1b, dir1b, fname, source)
-            ancestor, filea = getfile(ctxa, dira, fname, source)
         else:
-            other, ancestor = fname, fname
-            file1b, filea = None, None
+            other = fname
+            file1b = None
         fname, file2 = getfile(ctx2, dir2, fname, None)
 
         label1a = local+rev1a
         label1b = other+rev1b
-        labela = ancestor+reva
         label2 = fname+rev2
         if ctx1b:
             label1a += '[local]'
             label1b += '[other]'
-            labela += '[ancestor]'
             label2 += '[merged]'
 
         # Function to quote file/dir names in the argument string
         replace = dict(parent=file1a, parent1=file1a, plabel1=label1a,
                        parent2=file1b, plabel2=label1b,
-                       ancestor=filea, alabel=labela,
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
                        clabel=label2, child=file2)
         args = ctx1b and self.mergeopts or self.diffopts
         launchtool(self.diffpath, args, replace, False)
 
     def p1dirdiff(self, button):
-        dir1a, dir1b, dira, dir2 = self.dirs
-        rev1a, rev1b, reva, rev2 = self.revs
+        dir1a, dir1b, dir2 = self.dirs
+        rev1a, rev1b, rev2 = self.revs
+        ctx1a, ctx1b, ctx2 = self.ctxs
 
         replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
-                       parent2='', plabel2='', ancestor='', alabel='',
-                       clabel=rev2, child=dir2)
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
+                       parent2='', plabel2='', clabel=rev2, child=dir2)
         launchtool(self.diffpath, self.diffopts, replace, False)
 
     def p2dirdiff(self, button):
-        dir1a, dir1b, dira, dir2 = self.dirs
-        rev1a, rev1b, reva, rev2 = self.revs
+        dir1a, dir1b, dir2 = self.dirs
+        rev1a, rev1b, rev2 = self.revs
+        ctx1a, ctx1b, ctx2 = self.ctxs
 
         replace = dict(parent=dir1b, parent1=dir1b, plabel1=rev1b,
-                       parent2='', plabel2='', ancestor='', alabel='',
-                       clabel=rev2, child=dir2)
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
+                       parent2='', plabel2='', clabel=rev2, child=dir2)
         launchtool(self.diffpath, self.diffopts, replace, False)
 
     def threewaydirdiff(self, button):
-        dir1a, dir1b, dira, dir2 = self.dirs
-        rev1a, rev1b, reva, rev2 = self.revs
+        dir1a, dir1b, dir2 = self.dirs
+        rev1a, rev1b, rev2 = self.revs
+        ctx1a, ctx1b, ctx2 = self.ctxs
 
         replace = dict(parent=dir1a, parent1=dir1a, plabel1=rev1a,
-                       parent2=dir1b, plabel2=rev1b,
-                       ancestor=dira, alabel=reva,
-                       clabel=dir2, child=rev2)
+                       repo=self.reponame,
+                       phash1=str(ctx1a), phash2=str(ctx1b), chash=str(ctx2),
+                       parent2=dir1b, plabel2=rev1b, clabel=dir2, child=rev2)
         launchtool(self.diffpath, self.mergeopts, replace, False)
 
 
