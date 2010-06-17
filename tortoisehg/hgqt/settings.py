@@ -743,12 +743,13 @@ class SettingsForm(QWidget):
 
     def readCPath(self, cpath):
         'Retrieve a value from the parsed config file'
-        try:
-            # Presumes single section/key level depth
-            section, key = cpath.split('.', 1)
-            return self.ini[section][key]
-        except KeyError:
+        # Presumes single section/key level depth
+        section, key = cpath.split('.', 1)
+        if section not in self.ini:
             return None
+        if key not in self.ini[section]:
+            return None
+        return self.ini[section][key]
 
     def loadIniFile(self, rcpath):
         for fn in rcpath:
@@ -801,10 +802,11 @@ class SettingsForm(QWidget):
         # 'newvalue' is in local encoding
         section, key = cpath.split('.', 1)
         if newvalue == None:
-            try:
-                del self.ini[section][key]
-            except KeyError:
-                pass
+            if section not in self.ini:
+                return
+            if key not in self.ini[section]:
+                return
+            del self.ini[section][key]
             return
         if section not in self.ini:
             if hasattr(self.ini, '_new_namespace'):
