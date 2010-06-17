@@ -30,14 +30,14 @@ connect = QObject.connect
 nullvariant = QVariant()
 
 
-# XXX make this better than a poor hard written list...
+# TODO: Remove these two when we adopt GTK author color scheme
 COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "cyan", Qt.darkYellow, "magenta", "darkred", "darkmagenta",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
-#COLORS = [str(color) for color in QColor.colorNames()]
-ALLCOLUMNS = ('ID', 'Node', 'Branch', 'Graph', 'Log', 'Author', 'Date',
-              'Tags',)
+
+ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',
+              'Node')
 
 def get_color(n, ignore=()):
     """
