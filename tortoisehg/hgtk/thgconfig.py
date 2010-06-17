@@ -1214,6 +1214,8 @@ class ConfigDialog(gtk.Dialog):
     def refresh_extensions_frame(self):
         enabledexts = self._enabledextensions()
         def getinival(name):
+            if 'extensions' not in self.ini:
+                return None
             for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
                 try:
                     return self.ini['extensions'][cand]
@@ -1390,6 +1392,8 @@ class ConfigDialog(gtk.Dialog):
         try:
             # Presumes single section/key level depth
             section, key = cpath.split('.', 1)
+            if section not in self.ini:
+                return None
             val = self.ini[section][key]
             if isinstance(val, Undefined):
                 return None
@@ -1447,6 +1451,8 @@ class ConfigDialog(gtk.Dialog):
         # 'newvalue' is converted to local encoding
         section, key = cpath.split('.', 1)
         if newvalue == _unspeclocalstr or newvalue == '':
+            if section not in self.ini:
+                return
             try:
                 del self.ini[section][key]
             except KeyError:
