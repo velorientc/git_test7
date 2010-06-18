@@ -259,7 +259,7 @@ INFO = (
     (_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
         _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHg windows.'
-        ' Default: Not expanded')),
+        ' Default: 0, Not expanded')),
     (_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
         _('The maximum size file (in KB) that TortoiseHg will '
         'show changes for in the changelog, status, and commit windows.'
