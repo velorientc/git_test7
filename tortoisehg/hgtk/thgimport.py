@@ -82,6 +82,10 @@ class ImportDialog(gdialog.GDialog):
         table.add_row(_('Source:'), self.src_combo, 1,
                       self.files_btn, menubtn, expand=0)
 
+        self.p0check = gtk.CheckButton(_('Do no strip paths '
+                                         '(-p0), required for SVN patches'))
+        table.add_row(None, self.p0check, 1, expand=0)
+
         ## add MRU paths to source combo
         for path in self.recent:
             self.src_list.append([path])
@@ -343,6 +347,8 @@ class ImportDialog(gdialog.GDialog):
         # prepare command line
         cmdline = ['hg', cmd, '--verbose', '--']
         cmdline.extend(files)
+        if self.p0check.get_active():
+            cmdline.insert(2, '-p0')
 
         # start importing
         self.execute_command(cmdline)

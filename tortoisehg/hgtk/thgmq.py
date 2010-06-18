@@ -955,10 +955,12 @@ class MQWidget(gtk.VBox):
         if row[MQ_INDEX] < 0:
             return
         patchname = row[MQ_NAME]
-        try:
-            ctx = self.repo[patchname]
-            revid = ctx.rev()
-        except (error.RepoError, error.RepoLookupError, error.LookupError):
+        q = self.repo.mq
+        q.parse_series()
+        applied = q.isapplied(patchname)
+        if applied:
+            revid = self.repo[applied[1]].rev()
+        else:
             revid = -1
         self.emit('patch-selected', revid, patchname)
 
