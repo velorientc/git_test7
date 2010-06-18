@@ -15,7 +15,7 @@ import tempfile
 import atexit
 
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
-from mercurial import error
+from mercurial import error, revset
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -97,7 +97,7 @@ class FilterBar(gtklib.SlimToolbar):
         self.buttons['custom'] = self.custombutton
 
         self.filtercombo = gtk.combo_box_new_text()
-        self.filtercombo_entries = [_('Rev Range'), _('File Patterns'),
+        self.filtercombo_entries = [_('Revision Set'), _('File Patterns'),
                   _('Keywords'), _('Date'), _('User')]
         try:
             enclist = repo.ui.configlist('tortoisehg', 'fsencodings')
@@ -760,14 +760,23 @@ class GLog(gdialog.GWindow):
         self.activate_filter(text, mode)
 
     def check_filter_text(self, text, mode):
+        ret = True
         if not text:
             return False
         elif mode == 0:
             try:
-                cmdutil.revrange(self.repo, [text])
+                func = revset.match(text)
+                func(self.repo, range(0, 1))
+                l = []
+                for c in func(self.repo, range(len(self.repo))):
+                    l.append(c)
+                if not l:
+                    gdialog.Prompt(_('No matches'),
+                                   _('No revisions matched search'), self).run()
+                    return False
+                ret = l
             except Exception, e:
-                gdialog.Prompt(_('Invalid revision range'),
-                               str(e), self).run()
+                gdialog.Prompt(_('Invalid revision set'), str(e), self).run()
                 return False
         elif mode == 3:
             try:
@@ -776,14 +785,15 @@ class GLog(gdialog.GWindow):
                 gdialog.Prompt(_('Invalid date specification'),
                                str(e), self).run()
                 return False
-        return True
+        return ret
 
     def activate_filter(self, text, mode):
-        if not self.check_filter_text(text, mode):
+        ret = self.check_filter_text(text, mode)
+        if not ret:
             return
         opts = {}
         if mode == MODE_REVRANGE:
-            opts['revlist'] = cmdutil.revrange(self.repo, [text])
+            opts['revlist'] = ret
             name = 'revrange'
         elif mode == MODE_FILEPATS:
             opts['pats'] = [w.strip() for w in text.split(',')]
