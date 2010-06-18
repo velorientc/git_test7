@@ -25,6 +25,7 @@ from PyQt4.QtGui import *
 #   we need a consistent icon set
 
 _unspecstr = _('<unspecified>')
+ENTRY_WIDTH = 300
 
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
@@ -42,6 +43,7 @@ class SettingsCombo(QComboBox):
             slist = settings.value('settings/'+opts['cpath']).toStringList()
             self.previous = [s for s in slist if s]
         self.setDisabled(opts['readonly'])
+        self.setFixedWidth(ENTRY_WIDTH)
 
     def resetList(self):
         self.clear()
@@ -114,6 +116,7 @@ class PasswordEntry(QLineEdit):
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
         self.setDisabled(opts['readonly'])
+        self.setFixedWidth(ENTRY_WIDTH)
 
     def focusInEvent(self, e):
         self.opts['descwidget'].setHtml(self.opts['tooltip'])
@@ -145,6 +148,7 @@ class FontEntry(QPushButton):
         cpath = self.opts['cpath']
         assert cpath.startswith('tortoisehg.')
         self.fname = cpath[11:]
+        self.setFixedWidth(ENTRY_WIDTH)
 
     def focusInEvent(self, e):
         self.opts['descwidget'].setHtml(self.opts['tooltip'])
