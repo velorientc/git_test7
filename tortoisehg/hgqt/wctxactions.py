@@ -44,7 +44,7 @@ def wctxactions(parent, point, repo, selrows):
     menu.addSeparator()
     make(_('&Revert'), revert, frozenset('MAR!'))
     menu.addSeparator()
-    make(_('L&og'), log, frozenset('MARC!'))
+    make(_('File History'), log, frozenset('MARC!'))
     make(_('&Annotate'), annotate, frozenset('MARC!'))
     menu.addSeparator()
     make(_('&Forget'), forget, frozenset('MAC!'))
