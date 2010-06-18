@@ -44,7 +44,7 @@ DND_DEST_PATHENTRY = 1
 class FilterBar(gtklib.SlimToolbar):
     'Filter Toolbar for repository log'
 
-    def __init__(self, tooltips, filter_mode, branch_names):
+    def __init__(self, tooltips, filter_mode, branch_names, repo):
         gtklib.SlimToolbar.__init__(self, tooltips)
         self.filter_mode = filter_mode
         self.buttons = {}
@@ -97,8 +97,16 @@ class FilterBar(gtklib.SlimToolbar):
         self.buttons['custom'] = self.custombutton
 
         self.filtercombo = gtk.combo_box_new_text()
-        self.filtercombo_entries = (_('Rev Range'), _('File Patterns'),
-                  _('Keywords'), _('Date'), _('User'))
+        self.filtercombo_entries = [_('Rev Range'), _('File Patterns'),
+                  _('Keywords'), _('Date'), _('User')]
+        try:
+            enclist = repo.ui.configlist('tortoisehg', 'fsencodings')
+            if enclist:
+                l = [_('File Patterns') + ' (%s)' % enc for enc in enclist]
+                self.filtercombo_entries = self.filtercombo_entries[0] + l + \
+                        self.filtercombo_entries[2:]
+        except (error.ConfigError, error.Abort):
+            pass
         for f in self.filtercombo_entries:
             self.filtercombo.append_text(f)
         if (self.filter_mode >= len(self.filtercombo_entries) or
@@ -1597,7 +1605,8 @@ class GLog(gdialog.GWindow):
         # filter bar
         self.filterbar = FilterBar(self.tooltips,
                                    self.filter_mode, 
-                                   hglib.getlivebranch(self.repo))
+                                   hglib.getlivebranch(self.repo),
+                                   self.repo)
         filterbar = self.filterbar
         self.lastbranchrow = None
         self.lastfilterinfo = None

@@ -151,6 +151,9 @@ INFO = (
         ['small', 'large', 'theme'],
         _('Adjust the display of the main toolbar in the Repository'
         ' Explorer.  Values: small, large, or theme.  Default: theme')),
+    (_('F/S Encodings'), 'tortoisehg.fsencodings', [],
+        _('Comma separated list of encodings used for filenames'
+          ' on this computer. Default: none')),
     )),
 
 ({'name': 'sync', 'label': _('Synchronize'), 'icon': 'menusynch.ico',
