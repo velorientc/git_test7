@@ -1232,7 +1232,7 @@ class GStatus(gdialog.GWindow):
         menu.append_sep()
         make(_('_Revert'), revert, 'MAR!ru', gtk.STOCK_MEDIA_REWIND)
         menu.append_sep()
-        make(_('L_og'), log, 'MARC!ru', 'menulog.ico')
+        make(_('File History'), log, 'MARC!ru', 'menulog.ico')
         menu.append_sep()
         make(_('_Forget'), forget, 'MAC!ru', gtk.STOCK_CLEAR, paths=True)
         make(_('_Add'), add, 'I?', gtk.STOCK_ADD, paths=True)
