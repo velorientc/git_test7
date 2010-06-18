@@ -31,10 +31,10 @@ from tortoisehg.hgtk import statusbar, bookmark, thgimport
 from tortoisehg.hgtk import thgpbranch
 
 MODE_REVRANGE = 0
-MODE_FILEPATS = 1
-MODE_KEYWORDS = 2
-MODE_DATE     = 3
-MODE_USER     = 4
+MODE_KEYWORDS = 1
+MODE_DATE     = 2
+MODE_USER     = 3
+MODE_FILEPATS = 4
 
 HIST_DND_URI_LIST = 1024
 
@@ -97,14 +97,13 @@ class FilterBar(gtklib.SlimToolbar):
         self.buttons['custom'] = self.custombutton
 
         self.filtercombo = gtk.combo_box_new_text()
-        self.filtercombo_entries = [_('Revision Set'), _('File Patterns'),
-                  _('Keywords'), _('Date'), _('User')]
+        self.filtercombo_entries = [_('Revision Set'), _('Keywords'),
+                                    _('Date'), _('User'), _('File Patterns')]
         try:
             enclist = repo.ui.configlist('tortoisehg', 'fsencodings')
             if enclist:
                 l = [_('File Patterns') + ' (%s)' % enc for enc in enclist]
-                self.filtercombo_entries = self.filtercombo_entries[0] + l + \
-                        self.filtercombo_entries[2:]
+                self.filtercombo_entries = self.filtercombo_entries[:-1] + l
         except (error.ConfigError, error.Abort):
             pass
         for f in self.filtercombo_entries:
@@ -795,9 +794,6 @@ class GLog(gdialog.GWindow):
         if mode == MODE_REVRANGE:
             opts['revlist'] = ret
             name = 'revrange'
-        elif mode == MODE_FILEPATS:
-            opts['pats'] = [w.strip() for w in text.split(',')]
-            name = 'filepats'
         elif mode == MODE_KEYWORDS:
             opts['keyword'] = [w.strip() for w in text.split(',')]
             name = 'keywords'
@@ -807,8 +803,10 @@ class GLog(gdialog.GWindow):
         elif mode == MODE_USER:
             opts['user'] = [w.strip() for w in text.split(',')]
             name = 'user'
-        else:
-            return
+        elif mode >= MODE_FILEPATS:
+            opts['pats'] = [w.strip() for w in text.split(',')]
+            name = 'filepats'
+
         self.filterbar.get_button('custom').set_active(True)
         self.filter = 'custom'
         self.reload_log(**opts)
