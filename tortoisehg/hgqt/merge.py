@@ -8,7 +8,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui
+from mercurial import hg, ui, extensions
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
@@ -291,10 +291,13 @@ class MergePage(BasePage):
         self.groups.add(wd_merged, 'merged')
         box.addWidget(wd_merged)
 
-        wd_text = QLabel(_('To start merging, you need to '
-                           '<a href="shelve"><b>shelve</b></a> them, '
-                           '<a href="mq"><b>save</b></a> as MQ patch or '
-                           '<a href="discard"><b>discard</b></a> all.'))
+        text = _('To start merging, you need to '
+                 '<a href="shelve"><b>shelve</b></a> them')
+        exs = [ name for name, module in extensions.extensions() ]
+        if 'mq' in exs:
+            text = text + _(', <a href="mq"><b>save</b></a> as MQ patch')
+        text = text + (' or <a href="discard"><b>discard</b></a> all.')
+        wd_text = QLabel(text)
         wd_text.setContentsMargins(*MARGINS)
         wd_text.linkActivated.connect(self.link_activated)
         self.wd_text = wd_text
