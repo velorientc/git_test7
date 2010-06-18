@@ -1176,6 +1176,10 @@ class GStatus(gdialog.GWindow):
             from tortoisehg.hgtk import history
             dlg = history.run(self.ui, canonpats=files)
             dlg.display()
+        def annotate(menuitem, files):
+            from tortoisehg.hgtk import datamine
+            dlg = datamine.run(self.ui, *files)
+            dlg.display()
         def forget(menuitem, files, paths):
             self.act.hg_forget(files)
             self.set_file_states(paths, state=False)
@@ -1233,6 +1237,7 @@ class GStatus(gdialog.GWindow):
         make(_('_Revert'), revert, 'MAR!ru', gtk.STOCK_MEDIA_REWIND)
         menu.append_sep()
         make(_('File History'), log, 'MARC!ru', 'menulog.ico')
+        make(_('Annotate'), annotate, 'MARC!ru', 'menublame.ico')
         menu.append_sep()
         make(_('_Forget'), forget, 'MAC!ru', gtk.STOCK_CLEAR, paths=True)
         make(_('_Add'), add, 'I?', gtk.STOCK_ADD, paths=True)
