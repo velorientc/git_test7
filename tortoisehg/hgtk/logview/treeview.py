@@ -192,7 +192,9 @@ class TreeView(gtk.ScrolledWindow):
                     only_branch, self.opts.get('branch-color'))
             else:
                 self.grapher = revision_grapher(self.repo, start, end,
-                        only_branch, noheads, self.opts.get('branch-color'))
+                    only_branch, noheads, self.opts.get('branch-color'),
+                    self.repo.ui.configlist('tortoisehg', 'hide'),
+                    self.repo.ui.configlist('tortoisehg', 'prune'))
         elif opts.get('revlist', None):
             self.grapher = dumb_log_generator(self.repo, opts['revlist'])
         else:

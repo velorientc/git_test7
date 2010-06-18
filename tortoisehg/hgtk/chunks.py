@@ -15,6 +15,7 @@ import cStringIO
 from mercurial import cmdutil, util, patch, mdiff, error
 
 from tortoisehg.util import hglib, hgshelve
+from tortoisehg.util.i18n import _
 
 from tortoisehg.hgtk import gtklib
 
@@ -196,9 +197,10 @@ class chunks(object):
             chunks = self.filechunks[wfile]
         else:
             chunks = self.read_file_chunks(wfile)
-            for c in chunks:
-                c.active = True
-            self.filechunks[wfile] = chunks
+            if chunks:
+                for c in chunks:
+                    c.active = True
+                self.filechunks[wfile] = chunks
         return chunks
 
     def update_hunk_model(self, wfile, checked):

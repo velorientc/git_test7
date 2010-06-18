@@ -51,7 +51,7 @@ EOT
 %{__python} setup.py build
 
 (cd doc && make html)
-rm doc/build/html/.buildinfo
+rm -f doc/build/html/.buildinfo
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -68,7 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 
 %defattr(-,root,root,-)
-%doc COPYING.txt ReleaseNotes.txt doc/build/html/
+%doc COPYING.txt doc/build/html/
 %{_bindir}/hgtk
 %{python_sitelib}/tortoisehg/
 %{python_sitelib}/tortoisehg-*.egg-info

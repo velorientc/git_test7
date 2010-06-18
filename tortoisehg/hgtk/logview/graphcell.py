@@ -140,33 +140,44 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         box_size = self.box_size(widget)
 
+        # Maybe draw branch head highlight under revision node
+        if self.node:
+            (column, colour, status) = self.node
+            arc_start_position_x = cell_area.x + box_size * column + box_size / 2; 
+            arc_start_position_y = cell_area.y + cell_area.height / 2;
+
+            if status >= 8:   # branch head
+                ctx.arc(arc_start_position_x, arc_start_position_y,
+                    box_size /1.7, 0, 2 * math.pi)
+                self.set_colour(ctx, gtklib.PGREEN, 0.0, 1.0)
+                ctx.fill()
+                status -= 8
+
         ctx.set_line_width(box_size / 8)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
 
         # Draw lines into the cell
-        for start, end, colour, type in self.in_lines:
+        for start, end, lcolour, type in self.in_lines:
             style = style_SOLID
             if type & 1:
                 style = style_DASHED
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y, bg_area.height,
-                         start, end, colour, style)
+                         start, end, lcolour, style)
 
         # Draw lines out of the cell
-        for start, end, colour, type in self.out_lines:
+        for start, end, lcolour, type in self.out_lines:
             style = style_SOLID
             if type & 2:
                 style = style_DASHED
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y + bg_area.height, bg_area.height,
-                         start, end, colour, style)
+                         start, end, lcolour, style)
 
         # Draw the revision node in the right column
         if not self.node:
             return
-        (column, colour, status) = self.node
-        arc_start_position_x = cell_area.x + box_size * column + box_size / 2; 
-        arc_start_position_y = cell_area.y + cell_area.height / 2;
+
         if status >= 4:  # working directory parent
             ctx.arc(arc_start_position_x, arc_start_position_y,
                     box_size / 4, 0, 2 * math.pi)

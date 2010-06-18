@@ -210,6 +210,8 @@ class CloneDialog(gdialog.GDialog):
                      initial=entry.get_text().strip(), title=title).run()
         if res:
             entry.set_text(res)
+            entry.grab_focus()
+            entry.set_position(-1)
 
     def bundle_clicked(self, button, title, entry):
         path = entry.get_text().strip()

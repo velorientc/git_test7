@@ -14,7 +14,7 @@ araxis.regkey=SOFTWARE\Classes\TypeLib\{46799e0a-7bd1-4330-911c-9660bb964ea2}\7.
 araxis.regappend=\ConsoleCompare.exe
 ;araxis.executable=${ProgramFiles}/Araxis/Araxis Merge/ConsoleCompare.exe
 araxis.priority=-2
-araxis.args=/3 /a2 /wait /merge /title1:"Other" /title2:"Base" /title3:"Local :"$local $other $base $local $output
+araxis.args=/3 /a2 /wait /merge /title1:"Parent 1" /title2:"Merge Result: "$output /title3:"Parent 2" $local $base $other $output
 araxis.premerge=False
 araxis.checkconflict=True
 araxis.binary=True
@@ -23,6 +23,16 @@ araxis.diffargs=/2 /wait /title1:"$plabel1" /title2:"$clabel" $parent $child
 araxis.diff3args=/3 /a2 /wait /title1:"$plabel1" /title2:"$clabel" /title3:"$plabel2" $parent1 $child $parent2
 araxis.dirdiff=True
 araxis.dir3diff=True
+
+UltraCompare.regkey=Software\Microsoft\Windows\CurrentVersion\App Paths\UC.exe
+UltraCompare.args = $base $local $other -title1 base -title3 other
+UltraCompare.priority = -2
+UltraCompare.gui = True
+UltraCompare.binary = True
+UltraCompare.checkconflicts = True
+UltraCompare.checkchanged = True
+UltraCompare.diffargs=$child $parent -title1 $clabel -title2 $plabel1
+UltraCompare.diff3args=$parent1 $child $parent2 -title1 $plabel1 -title2 $clabel -title3 $plabel2
 
 kdiff3.priority=-3
 kdiff3.args=--auto --L1 base --L2 parent1 --L3 parent2 $base $local $other -o $output

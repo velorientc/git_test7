@@ -65,11 +65,17 @@ class DataMineDialog(gdialog.GWindow):
         root = self.repo.root
         cf = []
         for f in self.pats:
-            if os.path.isfile(f):
-                cf.append(util.canonpath(root, self.cwd, f))
-            elif os.path.isdir(f):
-                gdialog.Prompt(_('Invalid path'),
-                       _('Cannot annotate directory: %s') % f, None).run()
+            try:
+                if os.path.isfile(f):
+                    cf.append(util.canonpath(root, self.cwd, f))
+                elif os.path.isdir(f):
+                    for fn in os.listdir(f):
+                        fname = os.path.join(f, fn)
+                        if not os.path.isfile(fname):
+                            continue
+                        cf.append(util.canonpath(root, self.cwd, fname))
+            except util.Abort:
+                pass
         for f in cf:
             self.add_annotate_page(f, '.')
         if not self.notebook.get_n_pages():
@@ -156,8 +162,21 @@ class DataMineDialog(gdialog.GWindow):
                  args=[objs])
         m.append(_('Di_splay Change'), self.cmenu_display,
                  'menushowchanged.ico')
-        m.append(_('_Annotate Parent'), self.cmenu_annotate_parent,
-                 'menublame.ico', args=[objs])
+        (frame, treeview, filepath, graphview) = objs
+        path = graphview.get_path_at_revid(int(self.currev))
+        filepath = graphview.get_wfile_at_path(path)
+        ctx = self.repo[self.currev]
+        fctx = ctx.filectx(filepath)
+        parents = fctx.parents()
+        if len(parents) > 0:
+            if len(parents) == 1:
+                m.append(_('_Annotate Parent'), self.cmenu_annotate_1st_parent,
+                         'menublame.ico', args=[objs])
+            else:
+                m.append(_('_Annotate First Parent'), self.cmenu_annotate_1st_parent,
+                         'menublame.ico', args=[objs])
+                m.append(_('Annotate Second Parent'), self.cmenu_annotate_2nd_parent,
+                         'menublame.ico', args=[objs])
         m.append(_('_View File at Revision'), self.cmenu_view, gtk.STOCK_EDIT)
         m.append(_('_File History'), self.cmenu_file_log, 'menulog.ico')
         m.append(_('_Diff to Local'), self.cmenu_local_diff)
@@ -182,52 +201,22 @@ class DataMineDialog(gdialog.GWindow):
     def cmenu_annotate(self, menuitem):
         self.add_annotate_page(self.curpath, self.currev)
 
-    def cmenu_annotate_parent(self, menuitem, objs):
-        def error_prompt():
-            gdialog.Prompt(_('No parent file'),
-                           _('Unable to annotate'), self).run()
-            return False
+    def cmenu_annotate_1st_parent(self, menuitem, objs):
+        self.annotate_parent(objs, 0)
+
+    def cmenu_annotate_2nd_parent(self, menuitem, objs):
+        self.annotate_parent(objs, 1)
+
+    def annotate_parent(self, objs, parent_idx):
         (frame, treeview, filepath, graphview) = objs
-        anotrev = treeview.get_model().rev
-        graphmodel = graphview.treeview.get_model()
         path = graphview.get_path_at_revid(int(self.currev))
-        if not path:
-            return error_prompt()
-        iter = graphmodel.get_iter(path)
-        parent_iter = graphmodel.iter_next(iter)
-        if not parent_iter:
-            return error_prompt()
-        parent_path = graphmodel.get_path(parent_iter)
-        parent_revid = graphmodel[parent_path][LogTreeModelModule.REVID]
-        parent_ctx = self.repo[parent_revid]
-        try:
-            parent_ctx.filectx(filepath)
-        except error.LookupError:
-            # file was renamed/moved, try to find previous file path
-            end_iter = iter
-            path = graphview.get_path_at_revid(int(anotrev))
-            if not path:
-                return error_prompt()
-            iter = graphmodel.get_iter(path)
-            while iter and iter != end_iter:
-                path = graphmodel.get_path(iter)
-                revid = graphmodel[path][LogTreeModelModule.REVID]
-                ctx = self.repo[revid]
-                try:
-                    fctx = ctx.filectx(filepath)
-                    renamed = fctx.renamed()
-                    if renamed:
-                        filepath = renamed[0]
-                        break
-                except error.LookupError:
-                    # break iteration, but don't use 'break' statement
-                    # so that execute 'else' block for showing prompt.
-                    iter = end_iter
-                    continue
-                # move iterator to next
-                iter = graphmodel.iter_next(iter)
-            else:
-                return error_prompt()
+        filepath = graphview.get_wfile_at_path(path)
+        ctx = self.repo[self.currev]
+        fctx = ctx.filectx(filepath)
+        parents = fctx.parents()
+        parent_fctx = parents[parent_idx]
+        parent_revid = parent_fctx.changectx().rev()
+        filepath = parent_fctx.path()
         # annotate file of parent rev
         self.trigger_annotate(parent_revid, filepath, objs)
         graphview.scroll_to_revision(int(parent_revid))

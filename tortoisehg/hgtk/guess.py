@@ -302,7 +302,12 @@ class DetectRenameDialog(gtk.Window):
                 srcs.append(abs)
         if not copy:
             simularity = self.adjustment.get_value() / 100.0;
-            gen = cmdutil.findrenames
+            try:
+                gen = cmdutil.findrenames
+            except AttributeError:
+                # function was moved before 1.6
+                from mercurial import similar
+                gen = similar.findrenames
         else:
             simularity = 1.0
             gen = findmoves

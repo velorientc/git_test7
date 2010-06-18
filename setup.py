@@ -104,8 +104,6 @@ def setup_windows(version):
 
     extra['options'] = {
        "py2exe" : {
-           # This is one way to ensure that hgtk can find its icons when
-           # running in a py2exe environment. It also makes debugging easier.
            "skip_archive" : 0,
 
            # Don't pull in all this MFC stuff used by the makepy UI.

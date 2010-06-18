@@ -44,7 +44,7 @@ DND_DEST_PATHENTRY = 1
 class FilterBar(gtklib.SlimToolbar):
     'Filter Toolbar for repository log'
 
-    def __init__(self, tooltips, filter_mode, branch_names):
+    def __init__(self, tooltips, filter_mode, branch_names, repo):
         gtklib.SlimToolbar.__init__(self, tooltips)
         self.filter_mode = filter_mode
         self.buttons = {}
@@ -97,8 +97,16 @@ class FilterBar(gtklib.SlimToolbar):
         self.buttons['custom'] = self.custombutton
 
         self.filtercombo = gtk.combo_box_new_text()
-        self.filtercombo_entries = (_('Rev Range'), _('File Patterns'),
-                  _('Keywords'), _('Date'), _('User'))
+        self.filtercombo_entries = [_('Rev Range'), _('File Patterns'),
+                  _('Keywords'), _('Date'), _('User')]
+        try:
+            enclist = repo.ui.configlist('tortoisehg', 'fsencodings')
+            if enclist:
+                l = [_('File Patterns') + ' (%s)' % enc for enc in enclist]
+                self.filtercombo_entries = self.filtercombo_entries[0] + l + \
+                        self.filtercombo_entries[2:]
+        except (error.ConfigError, error.Abort):
+            pass
         for f in self.filtercombo_entries:
             self.filtercombo.append_text(f)
         if (self.filter_mode >= len(self.filtercombo_entries) or
@@ -186,6 +194,7 @@ class GLog(gdialog.GWindow):
         self.useproxy = None
         self.revrange = None
         self.forcepush = False
+        self.newbranch = False
         self.bundle_autoreject = False
         self.runner = hgcmd.CmdRunner()
         os.chdir(self.repo.root)
@@ -291,6 +300,8 @@ class GLog(gdialog.GWindow):
             self.useproxy = menuitem.get_active()
         def toggle_force(menuitem):
             self.forcepush = menuitem.get_active()
+        def toggle_newbranch(menuitem):
+            self.newbranch = menuitem.get_active()
         def refresh(menuitem, resetmarks):
             if resetmarks:
                 self.stbar.set_idle_text(None)
@@ -457,6 +468,8 @@ class GLog(gdialog.GWindow):
             dict(text=_('Use proxy server'), name='use-proxy-server',
                 ascheck=True, func=toggle_proxy),
             dict(text=_('Force push'), ascheck=True, func=toggle_force),
+            dict(text=_('Push new branch'), ascheck=True,
+                func=toggle_newbranch),
             ]),
 
         dict(text=_('_Filter'), subitems=[
@@ -599,8 +612,8 @@ class GLog(gdialog.GWindow):
                     status=_('Finding pending Perforce changelists...'),
                     title=_('Pending Perforce changelists')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def p4identify(self, button):
         cmd = ['hg', 'p4identify']
@@ -624,8 +637,8 @@ class GLog(gdialog.GWindow):
                     status=_('Finding tip Perforce changelist...'),
                     title=_('Identifying Perforce tip')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def more_clicked(self, button, data=None):
         self.graphview.next_revision_batch(self.limit)
@@ -932,14 +945,14 @@ class GLog(gdialog.GWindow):
             self.filtercombo.set_active(1)
             path = hglib.escapepath(opts['filehist'])
             self.filterentry.set_text(hglib.toutf(path))
-            self.filter_entry_activated(self.filterentry, self.filtercombo)
+            self.activate_filter(path, MODE_FILEPATS)
         elif self.pats:
             self.filterbar.get_button('custom').set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             paths = [hglib.escapepath(p) for p in self.pats]
             self.filterentry.set_text(hglib.toutf(', '.join(paths)))
-            self.filter_entry_activated(self.filterentry, self.filtercombo)
+            self.activate_filter(', '.join(paths), MODE_FILEPATS)
         elif 'bundle' in opts:
             self.set_bundlefile(opts['bundle'])
             self.bundle_autoreject = True
@@ -1142,9 +1155,8 @@ class GLog(gdialog.GWindow):
                 kind, name = match._patsplit(npats[0], None)
                 if kind == 'path' and not os.path.isdir(name):
                     ftitle(_('file patterns "%s"') % hglib.toutf(name))
-                    lname = hglib.fromutf(name)
-                    opts['filehist'] = lname
-                    self.graphview.refresh(graphcol, [lname], opts)
+                    opts['filehist'] = name
+                    self.graphview.refresh(graphcol, [name], opts)
             if not opts.get('filehist'):
                 ftitle('%s "%s"' % (self.filtercombo.get_active_text(),
                                     self.filterentry.get_text()))
@@ -1184,7 +1196,7 @@ class GLog(gdialog.GWindow):
             filtertext += _("Parents")
         elif self.filter == 'heads':
             ftitle(_('heads'))
-            heads = [self.repo[x].rev() for x in self.repo.heads()]
+            heads = hglib.getlivebheads(self.repo)
             opts['revlist'] = [str(x) for x in heads]
             self.graphview.refresh(False, [], opts)
             filtertext += _("Heads")
@@ -1244,6 +1256,7 @@ class GLog(gdialog.GWindow):
         if self.repo[self.currevid].node() in self.outgoing:
             m.append_sep()
             m.append(_('Push to Here'), self.push_to, gtk.STOCK_GOTO_TOP)
+            m.append(_('Push this Branch'), self.push_branch, gtk.STOCK_GOTO_TOP)
         m.append_sep()
         m.append(_('_Update...'), self.checkout, 'menucheckout.ico')
         mmerge = m.append(_('_Merge with...'), self.domerge, 'menumerge.ico')
@@ -1592,7 +1605,8 @@ class GLog(gdialog.GWindow):
         # filter bar
         self.filterbar = FilterBar(self.tooltips,
                                    self.filter_mode, 
-                                   hglib.getlivebranch(self.repo))
+                                   hglib.getlivebranch(self.repo),
+                                   self.repo)
         filterbar = self.filterbar
         self.lastbranchrow = None
         self.lastfilterinfo = None
@@ -1742,8 +1756,8 @@ class GLog(gdialog.GWindow):
                     status=_('Applying bundle...'),
                     title=_('Applying bundle')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def remove_overlay(self, resettip):
         self.bfile = None
@@ -1821,8 +1835,8 @@ class GLog(gdialog.GWindow):
                     status=_('Checking incoming changesets...'),
                     title=_('Incoming')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def set_bundlefile(self, bfile, **kwopts):
         self.origurl = self.urlcombo.get_active()
@@ -1951,8 +1965,8 @@ class GLog(gdialog.GWindow):
                     status=_('Pulling changesets...'),
                     title=_('Pull')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def outgoing_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -1991,8 +2005,8 @@ class GLog(gdialog.GWindow):
                     status=_('Checking outgoing changesets...'),
                     title=_('Outgoing')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def email_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -2014,6 +2028,8 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
             cmdline += ['--force']
+        elif self.newbranch:
+            cmdline += ['--new-branch']
         cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
@@ -2029,8 +2045,8 @@ class GLog(gdialog.GWindow):
                     status=_('Pushing changesets...'),
                     title=_('Push')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def conf_clicked(self, *args):
         newpath = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -2373,8 +2389,8 @@ class GLog(gdialog.GWindow):
             self.stbar.set_idle_text(text)
         if not self.execute_command(cmdline, callback, status, _('Bundling')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def qimport_rev(self, menuitem):
         """QImport selected revision."""
@@ -2403,8 +2419,8 @@ class GLog(gdialog.GWindow):
         if not self.execute_command(cmdline, callback, title=_('Importing'),
                                     status=_('Importing to Patch Queue...')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def rebase_selected(self, menuitem):
         """Rebase revision on top of selection (1st on top of 2nd).""" 
@@ -2416,7 +2432,7 @@ class GLog(gdialog.GWindow):
         cmdline = ['hg', 'rebase', '--source', str(revs[0]),
                    '--dest', str(revs[1])]
         self.execute_command(cmdline, force=True)
-        self.repo.invalidate()
+        hglib.invalidaterepo(self.repo)
         self.reload_log()
         self.changeview.clear()
 
@@ -2525,20 +2541,26 @@ class GLog(gdialog.GWindow):
                         skip=False,
                         reset=True)
 
-    def bisect_good(self, menuitem):
-        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+    def run_bisect_step(self, cmd):
+        '''run one bisect step and scroll to the new working copy parent'''
         self.execute_command(cmd, force=True)
         self.refresh_model()
+        wcpar = [x.rev() for x in self.repo.parents()]
+        # unless something weird happened, wc has one parent
+        if len(wcpar) == 1:
+            self.graphview.scroll_to_revision(wcpar[0])
+
+    def bisect_good(self, menuitem):
+        cmd = ['hg', 'bisect', '--good', str(self.currevid)]
+        self.run_bisect_step(cmd)
 
     def bisect_bad(self, menuitem):
         cmd = ['hg', 'bisect', '--bad', str(self.currevid)]
-        self.execute_command(cmd, force=True)
-        self.refresh_model()
+        self.run_bisect_step(cmd)
 
     def bisect_skip(self, menuitem):
         cmd = ['hg', 'bisect', '--skip', str(self.currevid)]
-        self.execute_command(cmd, force=True)
-        self.refresh_model()
+        self.run_bisect_step(cmd)
 
     def show_status(self, menuitem):
         rev = self.currevid
@@ -2573,6 +2595,12 @@ class GLog(gdialog.GWindow):
                     text = _('Forced push to remote repository\n%s\n'
                              '(creating new heads in remote if needed)?') % original_path
                     buttontext = _('Forced &Push')
+                elif self.newbranch:
+                    title = _('Confirm Push of New Branches to Remote Repository')
+                    text = _('Push to remote repository\n%s\n'
+                             '(creating new branches in remote if needed)?') % original_path
+                    buttontext = _('&Push')
+                    confirm_push = True
                 else:
                     title = _('Confirm Push to remote Repository')
                     text = _('Push to remote repository\n%s\n?') % original_path
@@ -2595,21 +2623,38 @@ class GLog(gdialog.GWindow):
             else:
                 return remote_path    
 
-    def push_to(self, menuitem):
+    def push_branch(self, menuitem):
+        self.push_to(menuitem, branch=self.repo[self.currevid].branch())
+
+    def push_to(self, menuitem, branch=None):
         remote_path = self.validate_path()
         if not remote_path:
             return
         
         node = self.repo[self.currevid].node()
         rev = str(self.currevid)
-        cmdline = ['hg', 'push', '--rev', rev]
-        if self.forcepush:
-            cmdline += ['--force']
+        if branch:
+            cmdline = ['hg', 'push', '--new-branch', '--branch', branch]
+        else:
+            cmdline = ['hg', 'push', '--rev', rev]
+            if self.forcepush:
+                cmdline += ['--force']
+            elif self.newbranch:
+                cmdline += ['--new-branch']
         cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
-                if self.outgoing:
+                text = _('Finished push to revision %s') % rev
+                if branch:
+                    remain = []
+                    for n in self.outgoing:
+                        if self.repo[n].branch() != branch:
+                            remain.append(n)
+                    self.outgoing = remain
+                    self.reload_log()
+                    text = _('Finished pushing branch %s') % branch
+                elif self.outgoing:
                     ancestors = set([self.repo[node].rev()])
                     while ancestors:
                         n = self.repo[ancestors.pop()]
@@ -2621,16 +2666,18 @@ class GLog(gdialog.GWindow):
                         for p in n.parents():
                             ancestors.add(p.rev())
                     self.reload_log()
-                text = _('Finished push to revision %s') % rev
             else:
                 text = _('Aborted push')
             self.stbar.set_idle_text(text)
-        if not self.execute_command(cmdline, callback,
-                    status=_('Pushing changesets to revision %s...') % rev,
+        if branch:
+            status = _('Pushing branch %s...') % branch
+        else:
+            status = _('Pushing changesets to revision %s...') % rev
+        if not self.execute_command(cmdline, callback, status=status,
                     title=_('Push to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def pull_to(self, menuitem):
         rev = str(self.currevid)
@@ -2657,8 +2704,8 @@ class GLog(gdialog.GWindow):
                     status=_('Pulling changesets to revision %s...') % rev,
                     title=_('Pull to %s') % rev):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
-                             'operation is completed'), self).run()
+                           _('Please try again after the previous '
+                             'command has completed'), self).run()
 
     def copy_hash(self, menuitem):
         hash = self.repo[self.currevid].hex()

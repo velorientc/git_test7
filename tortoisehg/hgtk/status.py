@@ -50,7 +50,7 @@ class GStatus(gdialog.GWindow):
         gdialog.GWindow.init(self)
         self.mode = 'status'
         self.ready = False
-        self.status = (None,) * 7
+        self.status = ([],) * 7
         self.status_error = None
         self.preview_tab_name_label = None
         self.subrepos = []
@@ -162,7 +162,12 @@ class GStatus(gdialog.GWindow):
             self.mqmode = True
 
     def is_merge(self):
-        return self.count_revs() < 2 and len(self.repo.parents()) == 2
+        try:
+            numparents = len(self.repo.parents())
+        except error.Abort, e:
+            self.stbar.set_text(str(e) + _(', please refresh'))
+            numparents = 1
+        return self.count_revs() < 2 and numparents == 2
 
 
     def get_accelgroup(self):
@@ -522,6 +527,12 @@ class GStatus(gdialog.GWindow):
         if not self.types_expander.get_expanded():
             self.status_types.hide()
         self.diffpane.set_position(self.setting_pos)
+        try:
+            tab = self.ui.config('tortoisehg', 'statustab', '0')
+            tab = int(tab)
+            self.diff_notebook.set_current_page(tab)
+        except (error.ConfigError, ValueError):
+            pass
         self.reload_status()
 
     def remove_filter(self, button):
@@ -649,17 +660,22 @@ class GStatus(gdialog.GWindow):
             # Create a new repo object
             repo = hg.repository(self.ui, path=self.repo.root)
             self.newrepo = repo
+            self.subrepos = []
 
-            if self.mqmode and self.mode != 'status':
-                # when a patch is applied, show diffs to parent of top patch
-                qtip = repo['.']
-                n1 = qtip.parents()[0].node()
-                n2 = None
-            else:
-                # node2 is None (the working dir) when 0 or 1 rev is specificed
-                n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
+            try:
+                if self.mqmode and self.mode != 'status':
+                    # when a patch is applied, show diffs to parent of top patch
+                    qtip = repo['.']
+                    n1 = qtip.parents()[0].node()
+                    n2 = None
+                else:
+                    # node2 is None (working dir) when 0 or 1 rev is specified
+                    n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
+            except (util.Abort, error.RepoError):
+                self.status_error = str(e)
+                return
 
-            self._node1, self._node2, = n1, n2
+            self._node1, self._node2 = n1, n2
             self.status_error = None
             matcher = cmdutil.match(repo, self.pats, self.opts)
             unknown = self.test_opt('unknown') and not self.is_merge()
@@ -673,13 +689,16 @@ class GStatus(gdialog.GWindow):
                 self.status = status
             except (OSError, IOError, util.Abort), e:
                 self.status_error = str(e)
-            self.subrepos = []
+
+            if n2 is not None or self.mqmode:
+                return
+
             wctx = repo[None]
             try:
                 for s in wctx.substate:
                     if matcher(s) and wctx.sub(s).dirty():
                         self.subrepos.append(s)
-            except (OSError, IOError, error.ConfigError), e:
+            except (OSError, IOError, error.ConfigError, error.RepoError), e:
                 self.status_error = str(e)
 
         def status_wait(thread):
@@ -853,13 +872,13 @@ class GStatus(gdialog.GWindow):
             opts.git = True
             wctx = self.repo[None]
             pctx1, pctx2 = wctx.parents()
-            header = _('===== Diff to %s parent %d:%s =====\n')
-            difftext = [header % (_('first'), pctx1.rev(), str(pctx1))]
+            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
+                        pctx1.rev(), str(pctx1))]
             try:
                 for s in patch.diff(self.repo, pctx1.node(), None, opts=opts):
                     difftext.extend(s.splitlines(True))
-                difftext.append('\n')
-                difftext.append(header % (_('second'), pctx2.rev(), str(pctx2)))
+                difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                                pctx2.rev(), str(pctx2)))
                 for s in patch.diff(self.repo, pctx2.node(), None, opts=opts):
                     difftext.extend(s.splitlines(True))
             except (IOError, error.RepoError, error.LookupError, util.Abort), e:
@@ -922,17 +941,17 @@ class GStatus(gdialog.GWindow):
         opts = patch.diffopts(self.ui, self.opts)
         opts.git = True
         difftext = []
-        header = _('===== Diff to %s parent %d:%s =====\n') 
         if self.is_merge():
             wctx = self.repo[None]
             pctx1, pctx2 = wctx.parents()
-            difftext = [header % (_('first'), pctx1.rev(), str(pctx1))]
+            difftext = [_('===== Diff to first parent %d:%s =====\n') % (
+                        pctx1.rev(), str(pctx1))]
             try:
                 for s in patch.diff(self.repo, pctx1.node(), None,
                                     match=matcher, opts=opts):
                     difftext.extend(s.splitlines(True))
-                difftext.append('\n')
-                difftext.append(header % (_('second'), pctx2.rev(), str(pctx2)))
+                difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                                pctx2.rev(), str(pctx2)))
                 for s in patch.diff(self.repo, pctx2.node(), None,
                                     match=matcher, opts=opts):
                     difftext.extend(s.splitlines(True))
@@ -978,7 +997,6 @@ class GStatus(gdialog.GWindow):
             return
 
         buf = cStringIO.StringIO()
-        dmodel = self.diffmodel
         files = []
         for row in self.filemodel:
             if not row[FM_CHECKED]:
@@ -1218,7 +1236,7 @@ class GStatus(gdialog.GWindow):
         menu.append_sep()
         make(_('_Forget'), forget, 'MAC!ru', gtk.STOCK_CLEAR, paths=True)
         make(_('_Add'), add, 'I?', gtk.STOCK_ADD, paths=True)
-        make(_('_Guess Rename...'), guess_rename, '?!', 'detect_rename.ico')
+        make(_('_Guess Rename...'), guess_rename, 'A?!', 'detect_rename.ico')
         make(_('_Ignore'), ignore, '?', 'ignore.ico')
         make(_('Remove versioned'), remove, 'C', 'menudelete.ico')
         make(_('_Delete unversioned'), delete, '?I', gtk.STOCK_DELETE)

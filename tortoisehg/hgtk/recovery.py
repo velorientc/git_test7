@@ -88,6 +88,7 @@ class RecoveryDialog(gtk.Window):
         self.textview.modify_font(pango.FontDescription(fontlog))
         scrolledwindow.add(self.textview)
         self.textbuffer = self.textview.get_buffer()
+        gtklib.configstyles(repo.ui)
         for tag, argdict in gtklib.TextBufferTags.iteritems():
             self.textbuffer.create_tag(tag, **argdict)
         vbox.pack_start(scrolledwindow, True, True)
@@ -142,12 +143,12 @@ class RecoveryDialog(gtk.Window):
         try:
             args = self.repo.opener('undo.desc', 'r').read().splitlines()
             if len(args) >= 3:
-                msg = _("Rollback repository '%s' to %s, undo %s from %s?") % (
-                    self.reponame, args[0], args[1], args[2])
+                msg = _("Rollback repository '%s' to %d, undo %s from %s?") % (
+                    self.reponame, int(args[0])-1, args[1], args[2])
             else:
-                msg = _("Rollback repository '%s' to %s, undo %s?") % (
-                    self.reponame, args[0], args[1])
-        except (IOError, IndexError):
+                msg = _("Rollback repository '%s' to %d, undo %s?") % (
+                    self.reponame, int(args[0])-1, args[1])
+        except (IOError, IndexError, ValueError):
             msg = _("Rollback repository '%s' ?") % self.reponame
         response = gdialog.Confirm(_('Confirm rollback repository'), [], self,
                                    msg).run()
@@ -175,7 +176,7 @@ class RecoveryDialog(gtk.Window):
     def _exec_cmd(self, cmd, postfunc=None):
         if self._cmd_running():
             dialog.error_dialog(self, _('Cannot run now'),
-                _('Please try again after the previous command is completed'))
+                _('Please try again after the previous command has completed'))
             return
 
         self._stop_button.set_sensitive(True)
@@ -210,8 +211,9 @@ class RecoveryDialog(gtk.Window):
             self.textbuffer.set_text(msg)
 
     def write_err(self, msg):
+        tags = gtklib.gettags('ui.error')
         enditer = self.textbuffer.get_end_iter()
-        self.textbuffer.insert_with_tags_by_name(enditer, msg, 'error')
+        self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
         self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
 
     def process_queue(self):
@@ -229,14 +231,8 @@ class RecoveryDialog(gtk.Window):
         while self.hgthread.getqueue().qsize():
             try:
                 msg, label = self.hgthread.getqueue().get(0)
-                tags = []
-                for tag in label.split():
-                    tag.strip()
-                    if tag in gtklib.TextBufferTags:
-                        tags.append(tag)
-                    #else:
-                    #    print 'unknown tag:', tag
                 msg = hglib.toutf(msg)
+                tags = gtklib.gettags(label)
                 if tags:
                     self.textbuffer.insert_with_tags_by_name(enditer, msg, *tags)
                 else:

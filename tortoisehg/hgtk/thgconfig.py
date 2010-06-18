@@ -18,6 +18,12 @@ from tortoisehg.util import hglib, settings, paths
 
 from tortoisehg.hgtk import dialog, gdialog, gtklib, hgcmd
 
+try:
+    from iniparse.config import Undefined
+except ImportError:
+    class Undefined(object):
+        pass
+
 _unspecstr = _('<unspecified>')
 _unspeclocalstr = hglib.fromutf(_unspecstr)
 
@@ -83,6 +89,9 @@ INFO = (
          ' the message and a warning will be issued'
          ' if any lines are too long at commit.'
          '  Default: 0 (unenforced)')),
+    (_('Close After Commit'), 'tortoisehg.closeci', ['False', 'True'],
+        _('Close the commit tool after every successful'
+          ' commit.  Default: False')),
     (_('Push After Commit'), 'tortoisehg.pushafterci', ['False', 'True'],
         _('Attempt to push to default push target after every successful'
           ' commit.  Default: False')),
@@ -99,6 +108,10 @@ INFO = (
          ' environment variables are set to a non-English language.'
          ' This setting is used by the Merge, Tag and Backout dialogs.'
          '  Default: False')),
+    (_('Default Tab'), 'tortoisehg.statustab', ['0', '1', '2'],
+        _('The tab on which the status and commit tools will open.'
+          ' 0 - TextDiff, 1 - Hunk Selection, 2 - Commit Preview.'
+          '  Default: 0')),
     )),
 
 ({'name': 'log', 'label': _('Repository Explorer'),
@@ -138,6 +151,9 @@ INFO = (
         ['small', 'large', 'theme'],
         _('Adjust the display of the main toolbar in the Repository'
         ' Explorer.  Values: small, large, or theme.  Default: theme')),
+    (_('F/S Encodings'), 'tortoisehg.fsencodings', [],
+        _('Comma separated list of encodings used for filenames'
+          ' on this computer. Default: none')),
     )),
 
 ({'name': 'sync', 'label': _('Synchronize'), 'icon': 'menusynch.ico',
@@ -1161,21 +1177,48 @@ class ConfigDialog(gtk.Dialog):
             return iter((name, exts[name])
                         for name in sorted(exts.iterkeys()))
 
-        vbox = gtk.VBox()
-        parent.pack_start(table, False, False)
+        allextslist = list(allexts())
+
+        MAXCOLUMNS = 3
+        maxrows = (len(allextslist) + MAXCOLUMNS - 1) / MAXCOLUMNS
+        extstable = gtk.Table()
+        parent.pack_start(extstable, False, False)
 
         self.extensionschecks = {}
-        for name, shortdesc in allexts():
+        for i, (name, shortdesc) in enumerate(allextslist):
             ck = gtk.CheckButton(name, use_underline=False)
             ck.connect('toggled', self.dirty_event)
-            ck.connect('focus-in-event', self.set_help, shortdesc)
-            table.add_row(ck, padding=False)
-            self.tooltips.set_tip(ck, shortdesc)
+            ck.connect('focus-in-event', self.set_help,
+                       hglib.toutf(shortdesc))
+            col, row = i / maxrows, i % maxrows
+            extstable.attach(ck, col, col + 1, row, row + 1)
+            self.tooltips.set_tip(ck, hglib.toutf(shortdesc))
             self.extensionschecks[name] = ck
 
+    def _enabledextensions(self):
+        """list up to-be enabled extensions by reading fresh setting"""
+        from mercurial import config
+        cfg = config.config()
+        for f in util.rcpath():
+            if os.path.realpath(f) == os.path.realpath(self.fn):
+                continue  # can be modified by user; read from self.ini
+            try:
+                cfg.read(f)
+            except IOError:
+                pass
+
+        if 'extensions' in self.ini:
+            for k in self.ini['extensions']:
+                cfg.set('extensions', k, self.ini['extensions'][k])
+
+        return set(name for name, path in cfg.items('extensions')
+                   if not path.startswith('!'))
+
     def refresh_extensions_frame(self):
-        enabledexts, namemaxlen = extensions.enabled()
+        enabledexts = self._enabledextensions()
         def getinival(name):
+            if 'extensions' not in self.ini:
+                return None
             for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
                 try:
                     return self.ini['extensions'][cand]
@@ -1198,7 +1241,7 @@ class ConfigDialog(gtk.Dialog):
             ck.set_sensitive(changable(name))
 
     def apply_extensions_changes(self):
-        enabledexts, namemaxlen = extensions.enabled()
+        enabledexts = self._enabledextensions()
         for name, ck in self.extensionschecks.iteritems():
             if ck.get_active() == (name in enabledexts):
                 continue  # unchanged
@@ -1352,7 +1395,12 @@ class ConfigDialog(gtk.Dialog):
         try:
             # Presumes single section/key level depth
             section, key = cpath.split('.', 1)
-            return self.ini[section][key]
+            if section not in self.ini:
+                return None
+            val = self.ini[section][key]
+            if isinstance(val, Undefined):
+                return None
+            return val
         except KeyError:
             return None
 
@@ -1406,6 +1454,8 @@ class ConfigDialog(gtk.Dialog):
         # 'newvalue' is converted to local encoding
         section, key = cpath.split('.', 1)
         if newvalue == _unspeclocalstr or newvalue == '':
+            if section not in self.ini:
+                return
             try:
                 del self.ini[section][key]
             except KeyError:
@@ -1467,14 +1517,14 @@ class ConfigDialog(gtk.Dialog):
         self.refresh_vlist()
 
         try:
-            f = open(self.fn, 'w')
+            f = util.atomictempfile(self.fn, 'w', createmode=None)
             f.write(str(self.ini))
-            f.close()
+            f.rename()
             self._btn_apply.set_sensitive(False)
             self.dirty = False
         except IOError, e:
             dialog.error_dialog(self, _('Unable to write configuration file'),
-                    str(e))
+                                hglib.tounicode(str(e)))
 
         return 0
 

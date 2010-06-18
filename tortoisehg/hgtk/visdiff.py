@@ -560,7 +560,7 @@ class FileSelectionDialog(gtk.Dialog):
         if ctx1b:
             other, file1b = getfile(ctx1b, dir1b, fname, source)
         else:
-            other = fname, fname
+            other = fname
             file1b = None
         fname, file2 = getfile(ctx2, dir2, fname, None)
 
