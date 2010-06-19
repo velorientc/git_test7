@@ -63,8 +63,8 @@ class htmlui(ui.ui):
                 if e > b:
                     if b:
                         parts.append(self.style(text[:b], label))
-                    parts.append(text[b+1:e])
-                    text = text[e+1:]
+                    parts.append(text[b + len(BEGINTAG):e])
+                    text = text[e + len(ENDTAG):]
                 else:
                     # invalid range, assume ENDTAG and BEGINTAG
                     # are naturually occuring.  Style, append, and
