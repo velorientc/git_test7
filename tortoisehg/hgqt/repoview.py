@@ -20,6 +20,7 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.quickbar import QuickBar
+from tortoisehg.hgqt import htmllistview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -78,6 +79,9 @@ class HgRepoView(QTableView):
         vh.setDefaultSectionSize(20)
 
         self.horizontalHeader().setHighlightSections(False)
+
+        self.standardDelegate = self.itemDelegate()
+        self.htmlDelegate = htmllistview.HTMLDelegate(self)
 
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -195,6 +199,24 @@ class HgRepoView(QTableView):
                 SIGNAL('currentRowChanged (const QModelIndex & , const QModelIndex & )'),
                 self.revisionSelected)
         self.goto_toolbar.compl_model.setStringList(model.repo.tags().keys())
+
+        self.resetDelegate()
+        connect(model,
+                SIGNAL('layoutChanged()'),
+                self.resetDelegate)
+
+    def resetDelegate(self):
+        # Model column layout has changed so we need to move
+        # our column delegate to correct location
+        if not self.model():
+            return
+        model = self.model()
+
+        for c in range(model.columnCount()):
+            if model._columns[c] == 'Log': 
+                self.setItemDelegateForColumn(c, self.htmlDelegate)
+            else:
+                self.setItemDelegateForColumn(c, self.standardDelegate)
 
     def resizeColumns(self, *args):
         # resize columns the smart way: the column holding Log
