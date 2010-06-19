@@ -106,7 +106,8 @@ class HTMLDelegate(QStyledItemDelegate):
             painter.fillRect(option.rect, bgcolor)
         else:
             doc.setHtml(text)
-        painter.translate(option.rect.left(), option.rect.top())
+        painter.translate(option.rect.topLeft());
+        painter.setClipRect(option.rect.translated(-option.rect.topLeft()))   
         doc.drawContents(painter)
         painter.restore()
 
