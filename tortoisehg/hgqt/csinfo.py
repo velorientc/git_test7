@@ -280,19 +280,9 @@ class SummaryInfo(object):
                     return value
                 return None
             elif item == 'rawtags':
-                value = [hglib.toutf(tag) for tag in ctx.tags()]
-                if len(value) == 0:
-                    return None
-                return value
+                return hglib.getrawctxtags(ctx)
             elif item == 'tags':
-                value = self.get_data('rawtags', *args)
-                if value:
-                    htlist = hglib.gethidetags(ctx._repo.ui)
-                    tags = [tag for tag in value if tag not in htlist]
-                    if len(tags) == 0:
-                        return None
-                    return tags
-                return None
+                return hglib.getctxtags(ctx)
             elif item == 'transplant':
                 extra = ctx.extra()
                 try:

@@ -172,6 +172,26 @@ def getfilteredtags(repo):
             filtered.append(tag)
     return filtered
 
+def getrawctxtags(changectx): 
+    '''Returns the tags for changectx, converted to UTF-8 but 
+    unfiltered for hidden tags'''
+    value = [toutf(tag) for tag in changectx.tags()]
+    if len(value) == 0:
+        return None
+    return value
+
+def getctxtags(changectx): 
+    '''Returns all unhidden tags for changectx, converted to UTF-8'''
+    value = getrawctxtags(changectx)
+    if value:
+        htlist = gethidetags(changectx._repo.ui)
+        tags = [tag for tag in value if tag not in htlist]
+        if len(tags) == 0:
+            return None
+        return tags
+    return None
+
+
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'
     if _tabwidth is None:
