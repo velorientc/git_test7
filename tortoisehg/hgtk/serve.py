@@ -311,8 +311,9 @@ def thg_serve(ui, repo, **opts):
                         baseui.setconfig("web", o, str(opts[o]))
                         if repoui:
                             repoui.setconfig("web", o, str(opts[o]))
-                if opts.get('webdir_conf'):
-                    app = hgwebdir_mod.hgwebdir(opts['webdir_conf'], repo.ui)
+                o = opts.get('web_conf') or opts.get('webdir_conf')
+                if o:
+                    app = hgwebdir_mod.hgwebdir(o, repo.ui)
                 else:
                     app = hgweb_mod.hgweb(hg.repository(repo.ui, repo.root))
                 self.httpd = server.create_server(ui, app)
@@ -362,8 +363,10 @@ thg_serve_cmd =  {"^serve":
           ('', 'prefix', '', _('prefix path to serve from (default: server root)')),
           ('n', 'name', '',
            _('name to show in web pages (default: working dir)')),
+          ('', 'web-conf', '',
+           _('name of the hgweb config file (serve more than one repository)')),
           ('', 'webdir-conf', '', _('name of the webdir config file'
-                                    ' (serve more than one repo)')),
+                                    ' (DEPRECATED)')),
           ('', 'pid-file', '', _('name of file to write process ID to')),
           ('', 'stdio', None, _('for remote clients')),
           ('t', 'templates', '', _('web templates to use')),
@@ -373,4 +376,4 @@ thg_serve_cmd =  {"^serve":
          _('hg serve [OPTION]...'))}
 
 def run(ui, *pats, **opts):
-    return ServeDialog(opts.get('webdir_conf'))
+    return ServeDialog(opts.get('web_conf') or opts.get('webdir_conf'))

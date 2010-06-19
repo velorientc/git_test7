@@ -460,7 +460,7 @@ def forget(ui, *pats, **opts):
 def serve(ui, *pats, **opts):
     """web server"""
     from tortoisehg.hgtk.serve import run
-    if paths.find_root() == None and not opts['webdir_conf']:
+    if paths.find_root() == None and not (opts['web_conf'] or opts['webdir_conf']):
         raise error.RepoError(_("There is no Mercurial repository here"
                     " (.hg not found)"))
     gtkrun(run, ui, *pats, **opts)
@@ -785,7 +785,10 @@ table = {
     "forget": (forget, [], _('hgtk forget [FILE]...')),
     "^serve":
         (serve,
-         [('', 'webdir-conf', '', _('name of the webdir config file'))],
+         [('', 'web-conf', '',
+           _('name of the hgweb config file (serve more than one repository)')),
+          ('', 'webdir-conf', '',
+           _('name of the hgweb config file (DEPRECATED)'))],
          _('hgtk serve [OPTION]...')),
     "thgstatus": (thgstatus,
         [('',  'delay', None, _('wait until the second ticks over')),
