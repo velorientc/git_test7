@@ -60,6 +60,9 @@ rm -rf $RPM_BUILD_ROOT
 
 install -m 644 -D contrib/_hgtk $RPM_BUILD_ROOT/%{_datadir}/zsh/site-functions/_hgtk
 
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/mercurial/hgrc.d
+install contrib/mergetools.rc $RPM_BUILD_ROOT%{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
+
 %find_lang %{name}
 
 %clean
@@ -78,6 +81,10 @@ rm -rf $RPM_BUILD_ROOT
 # require. We also don't want to create a sub-package just for this dependency.
 # Instead we just claim ownership of the zsh top folder ...
 %{_datadir}/zsh
+
+%dir %{_sysconfdir}/mercurial
+%dir %{_sysconfdir}/mercurial/hgrc.d
+%config(noreplace) %{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
 %files nautilus
 %defattr(-,root,root,-)
