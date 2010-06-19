@@ -77,7 +77,10 @@ class PerforcePending(gdialog.GDialog):
     def changelist_selected(self, combo):
         'User has selected a changelist, fill cslist'
         curcl = combo.get_active_text()
-        revs = [self.repo[hash] for hash in self.pending[curcl]]
+        try:
+            revs = [self.repo[hash] for hash in self.pending[curcl]]
+        except error.Abort, e:
+            revs = []
         self.cslist.clear()
         self.cslist.update(revs, self.repo)
         sensitive = not curcl.endswith('(submitted)')

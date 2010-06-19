@@ -1278,6 +1278,7 @@ class GLog(gdialog.GWindow):
 
         # disable/enable menus as required
         parents = self.repo.parents()
+
         if len(parents) > 1:
             can_merge = False
             can_backout = False
@@ -2870,11 +2871,21 @@ class GLog(gdialog.GWindow):
         return False
 
     def tree_popup_menu(self, treeview, button=0, time=0):
+        try:
+            self.repo.parents()
+        except error.Abort, e:
+            self.stbar.set_text(_('Refresh required'))
+            return True
         menu = self.tree_context_menu()
         menu.popup(None, None, None, button, time)
         return True
 
     def tree_popup_menu_diff(self, treeview, button=0, time=0):
+        try:
+            self.repo.parents()
+        except error.Abort, e:
+            self.stbar.set_text(_('Refresh required'))
+            return True
         menu = self.tree_diff_context_menu()
         menu.popup(None, None, None, button, time)
         return True
