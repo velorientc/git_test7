@@ -194,7 +194,8 @@ class TreeView(gtk.ScrolledWindow):
                 self.grapher = revision_grapher(self.repo, start, end,
                         only_branch, noheads, self.opts.get('branch-color'))
         elif opts.get('revlist', None):
-            self.grapher = dumb_log_generator(self.repo, opts['revlist'])
+            graphcol = True
+            self.grapher = revision_grapher(self.repo, only_revs=opts['revlist'])
         else:
             self.grapher = filtered_log_generator(self.repo, pats, opts)
         self.opts['show-graph'] = graphcol

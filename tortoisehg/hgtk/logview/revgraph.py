@@ -130,8 +130,8 @@ type_PLAIN = 0
 type_LOOSE_LOW = 1
 type_LOOSE_HIGH = 2
 
-def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False,
-    branch_color=False, hide_revs=[], prune_revs=[]):
+def revision_grapher(repo, start_rev=-1, stop_rev=-1, branch=None, noheads=False,
+    branch_color=False, only_revs=[]):
     """incremental revision grapher
 
     This grapher generates a full graph where every edge is visible.
@@ -143,10 +143,14 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False,
     to show ancestors of a revision.
     if branch_color is True, the branch colour is determined by a hash
     of the branch tip, and will thus always be the same.
-    hide_revs is a list of revisions to be hidden from the graph
-    prune_revs is a list of revisions to be hidden from the graph,
-    together with their ancestors.
+    if only_revs is not [], only those revisions will be shown.
     """
+
+    shown_revs = None
+    if only_revs:
+        shown_revs = set([repo[repo.lookup(r)].rev() for r in only_revs])
+        start_rev = max(shown_revs)
+        stop_rev = min(shown_revs)
 
     assert start_rev >= stop_rev
     curr_rev = start_rev
@@ -154,19 +158,8 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False,
     rev_color = {}
     nextcolor = [0]
     
-    hidden_revs = set([repo[repo.lookup(r)].rev() for r in hide_revs])
-    pruned_desc = [repo[repo.lookup(r)].rev() for r in prune_revs]
-    pruned_desc.sort()
-    
     def hidden(rev):
-        while pruned_desc and rev <= pruned_desc[-1]:
-            r = pruned_desc.pop()
-            hidden_revs.add(r)
-            for p in __get_parents(repo, r):
-                if p not in pruned_desc:
-                    pruned_desc.append(p)
-            pruned_desc.sort()
-        return rev in hidden_revs
+        return (shown_revs and (rev not in shown_revs)) or False
     
     while curr_rev >= stop_rev:
         if hidden(curr_rev):
