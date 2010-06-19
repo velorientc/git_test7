@@ -16,10 +16,11 @@
 
 from mercurial import util, error
 
-from tortoisehg.util.hglib import tounicode, username
+from tortoisehg.util.hglib import tounicode, username, getctxtags
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt import qtlib
 
 from tortoisehg.hgqt.i18n import _
 
@@ -67,14 +68,21 @@ def gettags(ctx, gnode):
     return tounicode(",".join(tags))
 
 def getlog(ctx, gnode):
-    # TODO: add branch name / tag markups
-    if ctx.rev() is not None:
-        msg = tounicode(ctx.description())
-        if msg:
-            msg = msg.splitlines()[0]
-    else:
-        msg = '**  ' + _('Working copy changes') + '  **'
-    return msg
+    # TODO: add branch name / bookmark / patches /
+    # wd parent markups
+    if ctx.rev() is None:
+        return '**  ' + _('Working copy changes') + '  **'
+
+    msg = tounicode(ctx.description())
+    if msg:
+        msg = msg.splitlines()[0]
+
+    tstr = ''
+    for tag in (getctxtags(ctx) or []):
+        style = {'fg': "black", 'bg': '#ffffaa'}
+        tstr += qtlib.markup(' %s ' % tag, **style) + ' '
+
+    return tstr + msg
 
 # XXX maybe it's time to make these methods of the model...
 _columnmap = {'ID': lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
