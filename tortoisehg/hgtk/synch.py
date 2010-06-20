@@ -180,12 +180,15 @@ class SynchDialog(gtk.Window):
         self.force = gtk.CheckButton(_('Force pull or push'))
         self.tips.set_tip(self.force, _('Run even when remote repository'
                 ' is unrelated.'))
+        self.newbranch = gtk.CheckButton(_('Push new branch'))
+        self.tips.set_tip(self.newbranch, _('Allow pushing a new branch'))
         self.use_proxy = gtk.CheckButton(_('Use proxy server'))
         if ui.ui().config('http_proxy', 'host', ''):
             self.use_proxy.set_active(True)
         else:
             self.use_proxy.set_sensitive(False)
         chkopthbox.pack_start(self.force, False, False, 4)
+        chkopthbox.pack_start(self.newbranch, False, False, 4)
         chkopthbox.pack_start(self.use_proxy, False, False, 4)
 
         ## target revision option
@@ -428,6 +431,8 @@ class SynchDialog(gtk.Window):
             opts['no-merges'] = ['--no-merges']
         if self.force.get_active():
             opts['force'] = ['--force']
+        if self.newbranch.get_active():
+            opts['newbranch'] = ['--new-branch']
         if self.newestfirst.get_active():
             opts['newest-first'] = ['--newest-first']
         remotecmd = self.cmdentry.get_text().strip()
@@ -465,6 +470,7 @@ class SynchDialog(gtk.Window):
         cmd = ['push']
         cmd += aopts.get('rev', [])
         cmd += aopts.get('force', [])
+        cmd += aopts.get('newbranch', [])
         cmd += aopts.get('remotecmd', [])
         self.exec_cmd(cmd)
 
@@ -653,6 +659,7 @@ class SynchDialog(gtk.Window):
         'reventry.text': '',
         'cmdentry.text': '',
         'force.active': False,
+        'newbranch.active': False,
         'showpatch.active': False,
         'newestfirst.active': False,
         'nomerge.active': False,}
