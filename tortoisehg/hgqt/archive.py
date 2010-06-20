@@ -167,6 +167,7 @@ class ArchiveDialog(QDialog):
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.rev_combo.setFocus()
+        self._readsettings()
 
     def rev_combo_changed(self, index):
         self.update_path()
@@ -359,6 +360,18 @@ class ArchiveDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(ArchiveDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('archive/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('archive/geom', self.saveGeometry())
 
 
 def run(ui, *revs, **opts):
