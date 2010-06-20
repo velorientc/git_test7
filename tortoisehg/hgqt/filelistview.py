@@ -38,7 +38,7 @@ class HgFileListView(QtGui.QTableView):
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.setTextElideMode(Qt.ElideLeft)
 
-        self.horizontalHeader().setToolTip('Double click to toggle merge mode')
+        self.horizontalHeader().setToolTip(_('Double click to toggle merge mode'))
 
         self.createActions()
 
@@ -103,7 +103,7 @@ class HgFileListView(QtGui.QTableView):
                                repoviewer=self.window())
                 dlgdict[filename] = dlg
                 
-                dlg.setWindowTitle('Hg file log viewer')
+                dlg.setWindowTitle(_('Hg file log viewer - ') + filename)
             dlg = dlgdict[filename] 
             dlg.goto(model.current_ctx.rev())
             dlg.show()
