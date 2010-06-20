@@ -54,7 +54,20 @@ class LicenseDialog(QDialog):
         self.vbox.addLayout(self.hbox)
 
         self.setLayout(self.vbox)
+        self._readsettings()
         self.setModal(True)
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(LicenseDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('license/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('license/geom', self.saveGeometry())
 
 
 def run(ui, *args, **opts):

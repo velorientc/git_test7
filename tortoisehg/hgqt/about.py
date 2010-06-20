@@ -100,6 +100,7 @@ class AboutDialog(QDialog):
 
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
+        self._readsettings()
         self.setModal(True)
 
     def getVersionInfo(self):
@@ -134,6 +135,18 @@ class AboutDialog(QDialog):
         from tortoisehg.hgqt import license
         ld = license.LicenseDialog(self)
         ld.show()
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(AboutDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('about/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('about/geom', self.saveGeometry())
 
 
 class AboutVersionThread(QThread):
