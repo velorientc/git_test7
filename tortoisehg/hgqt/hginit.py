@@ -121,10 +121,30 @@ class InitDialog(QDialog):
             self.dest_edit.setFocus()
             return False
 
+        dest = os.path.normpath(dest)
+        self.dest_edit.setText(dest)
+
         if not os.path.exists(dest):
+            p = dest
+            l = 0
+            while not os.path.exists(p):
+                l += 1
+                p, t = os.path.split(p)
+                if not t:
+                    break  # already root path
+            if l > 1:
+                res = qtlib.QuestionMsgBox(_('Init'),
+                        _('Are you sure about adding the new repository'
+                          ' %s extra levels deep?') % l,
+                        _('Path exists up to:\n%s\nand you asked for:\n%s')
+                            % (p, dest),
+                        defaultbutton=QMessageBox.No)
+                if not res:
+                    self.dest_edit.setFocus()
+                    return
             try:
                 # create the folder, just like Hg would
-                os.mkdir(dest)
+                os.makedirs(dest)
             except:
                 qtlib.ErrorMsgBox(_('Error executing init'),
                         _('Cannot create folder %s' % dest))
