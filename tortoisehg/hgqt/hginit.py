@@ -11,7 +11,7 @@ import os
 from mercurial import hg, ui, error, util
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib, shlib
 
 from PyQt4.QtCore import *
@@ -53,18 +53,10 @@ class InitDialog(QDialog):
         self.close_btn = QPushButton(_('&Close'))
         self.close_btn.setDefault(True)
         self.close_btn.setFocus()
-        self.detail_btn = QPushButton(_('&Detail'))
-        self.detail_btn.setAutoDefault(False)
-        self.detail_btn.setHidden(True)
-        self.cancel_btn = QPushButton(_('Cancel'))
-        self.cancel_btn.setAutoDefault(False)
-        self.cancel_btn.setHidden(True)
         self.hbox = QHBoxLayout()
-        self.hbox.addWidget(self.detail_btn)
         self.hbox.addStretch(0)
         self.hbox.addWidget(self.init_btn)
         self.hbox.addWidget(self.close_btn)
-        self.hbox.addWidget(self.cancel_btn)
         self.vbox.addLayout(self.hbox)
 
         # some extras
@@ -72,18 +64,8 @@ class InitDialog(QDialog):
         self.hgcmd_lbl.setAlignment(Qt.AlignRight)
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)
-        self.keep_open_chk = QCheckBox(_('Always show output'))
         self.grid.addWidget(self.hgcmd_lbl, 4, 0)
         self.grid.addWidget(self.hgcmd_txt, 4, 1)
-        self.grid.addWidget(self.keep_open_chk, 5, 1)
-
-        # command widget
-        self.cmd = cmdui.Widget()
-        self.cmd.commandStarted.connect(self.command_started)
-        self.cmd.commandFinished.connect(self.command_finished)
-        self.cmd.commandCanceling.connect(self.command_canceling)
-        self.cmd.setHidden(True)
-        self.vbox.addWidget(self.cmd)
 
         # init defaults
         self.cwd = os.getcwd()
@@ -108,7 +90,6 @@ class InitDialog(QDialog):
         self.dest_edit.textChanged.connect(self.compose_command)
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.init_btn.clicked.connect(self.init)
-        self.detail_btn.clicked.connect(self.detail_clicked)
         self.close_btn.clicked.connect(self.close)
 
     def browse_clicked(self):
@@ -123,15 +104,6 @@ class InitDialog(QDialog):
         response = str(path)
         if response:
             self.dest_edit.setText(response)
-
-    def detail_clicked(self):
-        if self.cmd.is_show_output():
-            self.cmd.show_output(False)
-        else:
-            self.cmd.show_output(True)
-
-    def cancel_clicked():
-        self.cmd.cancel()
 
     def compose_command(self):
         # just a stub for extension with extra options (--mq, --ssh, ...)
@@ -197,33 +169,6 @@ class InitDialog(QDialog):
                     pass
 
         shlib.shell_notify([dest])
-
-    def command_started(self):
-        self.dest_edit.setEnabled(False)
-        self.dest_btn.setEnabled(False)
-        self.add_files_chk.setEnabled(False)
-        self.make_old_chk.setEnabled(False)
-        self.hgcmd_txt.setEnabled(False)
-        self.cmd.setShown(True)
-        self.init_btn.setHidden(True)
-        self.close_btn.setHidden(True)
-        self.cancel_btn.setShown(True)
-        self.detail_btn.setShown(True)
-
-    def command_finished(self, wrapper):
-        if wrapper.data is not 0 or self.cmd.is_show_output()\
-                or self.keep_open_chk.isChecked():
-            if not self.cmd.is_show_output():
-                self.detail_btn.click()
-            self.cancel_btn.setHidden(True)
-            self.close_btn.setShown(True)
-            self.close_btn.setAutoDefault(True)
-            self.close_btn.setFocus()
-        else:
-            self.reject()
-
-    def command_canceling(self):
-        self.cancel_btn.setDisabled(True)
 
 def run(ui, *pats, **opts):
     return InitDialog(pats, opts)
