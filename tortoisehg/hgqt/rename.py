@@ -154,6 +154,7 @@ class RenameDialog(QDialog):
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.dest_txt.setFocus()
+        self._readsettings()
 
     def get_src(self):
         return hglib.fromunicode(self.src_txt.text())
@@ -325,6 +326,18 @@ class RenameDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(RenameDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('rename/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('rename/geom', self.saveGeometry())
 
 
 def run(ui, *pats, **opts):
