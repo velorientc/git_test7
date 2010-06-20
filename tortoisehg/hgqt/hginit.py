@@ -169,6 +169,9 @@ class InitDialog(QDialog):
                     pass
 
         shlib.shell_notify([dest])
+        qtlib.InfoMsgBox('Init',
+                _('Repository successfully created at'), dest)
+        self.accept()
 
 def run(ui, *pats, **opts):
     return InitDialog(pats, opts)
