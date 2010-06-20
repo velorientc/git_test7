@@ -109,7 +109,7 @@ class InitDialog(QDialog):
         # just a stub for extension with extra options (--mq, --ssh, ...)
         self.cmdline = ['init']
         self.cmdline.append(hglib.fromunicode(self.dest_edit.text()))
-        self.hgcmd_txt.setText(' '.join(self.cmdline))
+        self.hgcmd_txt.setText('hg ' + ' '.join(self.cmdline))
 
     def init(self):
         dest = hglib.fromunicode(self.dest_edit.text())

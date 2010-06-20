@@ -214,7 +214,7 @@ class RenameDialog(QDialog):
 
     def compose_command(self, src, dest):
         cmdline = ['rename']
-        vcmdline = ['rename']
+        vcmdline = ['hg rename']
         for k, v in self.opts.items():
             cmdline.append(k)
             cmdline.append(v)

@@ -281,7 +281,7 @@ class ArchiveDialog(QDialog):
                 cmdline.append(f)
         cmdline.append('--')
         cmdline.append(hglib.fromunicode(dest))
-        self.hgcmd_txt.setText(' '.join(cmdline))
+        self.hgcmd_txt.setText('hg ' + ' '.join(cmdline))
         return cmdline
 
     def archive(self):
