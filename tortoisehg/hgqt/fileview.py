@@ -208,7 +208,6 @@ class HgFileView(QtGui.QFrame):
     def setContext(self, ctx):
         self._ctx = ctx
         self._p_rev = None
-        self.sci.clear()
 
     def rev(self):
         return self._ctx.rev()
