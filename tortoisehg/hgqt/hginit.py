@@ -12,7 +12,7 @@ from mercurial import hg, ui, error, util
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, shlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -195,6 +195,8 @@ class InitDialog(QDialog):
                     open(hgignore, 'wb')
                 except:
                     pass
+
+        shlib.shell_notify([dest])
 
     def command_started(self):
         self.dest_edit.setEnabled(False)
