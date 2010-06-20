@@ -28,9 +28,10 @@ class LicenseDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('thg_logo'))
         self.setWindowTitle(_('License'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        self.resize(460, 360)
+        self.resize(700, 400)
 
         self.lic_txt = QPlainTextEdit()
+        self.lic_txt.setFont(QFont('Monospace'))
         self.lic_txt.setTextInteractionFlags(
                 Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
         try:
