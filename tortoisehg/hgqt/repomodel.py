@@ -286,7 +286,8 @@ class HgRepoListModel(QAbstractTableModel):
         if column == 'Filename':
             return self.filename
         if column == 'Graph':
-            return self.col2x(self.graph.max_cols)
+            res = self.col2x(self.graph.max_cols)
+            return min(res, 150)
         # Fall through for Log
         return None
 
