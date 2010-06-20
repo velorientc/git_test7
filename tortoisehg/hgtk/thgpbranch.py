@@ -10,7 +10,7 @@ import tempfile
 import gtk
 import gobject
 
-from mercurial import cmdutil, extensions
+from mercurial import cmdutil, extensions, util
 from mercurial import commands as hg
 import mercurial.ui
 
