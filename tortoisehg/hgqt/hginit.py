@@ -8,17 +8,14 @@
 
 import os
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QDialog, QLineEdit, QCheckBox, QLabel, QPushButton
-from PyQt4.QtGui import QVBoxLayout, QGridLayout, QHBoxLayout, QLayout
-from PyQt4.QtGui import QFileDialog
-
 from mercurial import hg, ui, error, util
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.util import hglib
 
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 class InitDialog(QDialog):
     """TortoiseHg init dialog"""
@@ -225,7 +222,6 @@ class InitDialog(QDialog):
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
-
 
 def run(ui, *pats, **opts):
     return InitDialog(pats, opts)
