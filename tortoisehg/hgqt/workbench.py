@@ -167,10 +167,6 @@ class Workbench(QMainWindow):
         tb.setObjectName("toolBar_diff")
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
-        self.toolBar_help = tb = QToolBar(_("Help Toolbar"), self)
-        tb.setObjectName("toolBar_help")
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
         self.actionOpen_repository = a = QAction(_("&Open Repository"), self)
         a.setShortcut("Ctrl+O")
 
@@ -237,8 +233,6 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionForward)
         tb.addSeparator()
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
-        self.toolBar_help.addAction(self.actionHelp)
 
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
