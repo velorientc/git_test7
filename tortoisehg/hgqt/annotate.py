@@ -475,6 +475,12 @@ class AnnotateDialog(QDialog):
         elif event.delta() < 0:
             self.av.nextMatch()
 
+    def keyPressEvent(self, event):
+        if event.matches(QKeySequence.Find):
+            self.searchText()
+            return
+        return super(AnnotateDialog, self).keyPressEvent(event)
+
     def accept(self):
         s = QSettings()
         s.setValue('annotate/geom', self.saveGeometry())
