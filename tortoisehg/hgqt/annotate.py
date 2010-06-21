@@ -363,7 +363,7 @@ class AnnotateDialog(QDialog):
         bt.setDefault(True)
         bt.clicked.connect(self.searchText)
         chk = QCheckBox(_('Ignore case'))
-        wrapchk = QCheckBox(_('Wrap around'))
+        wrapchk = QCheckBox(_('Wrap search'))
         hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
         hbox.addWidget(chk)
