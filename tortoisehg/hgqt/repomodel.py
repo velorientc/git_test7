@@ -16,7 +16,7 @@
 
 from mercurial import util, error
 
-from tortoisehg.util.hglib import tounicode, username, getctxtags
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.qtlib import geticon
@@ -112,7 +112,7 @@ class HgRepoListModel(QAbstractTableModel):
                            'Node':     lambda ctx, gnode: str(ctx),
                            'Graph':    lambda ctx, gnode: "",
                            'Log':      self.getlog,
-                           'Author':   lambda ctx, gnode: username(ctx.user()),
+                           'Author':   lambda ctx, gnode: hglib.username(ctx.user()),
                            'Date':     lambda ctx, gnode: cvrt_date(ctx.date()),
                            'Tags':     self.gettags,
                            'Branch':   lambda ctx, gnode: ctx.branch(),
@@ -223,7 +223,7 @@ class HgRepoListModel(QAbstractTableModel):
         authors = set()
         for i in xrange(currentlen, newlen):
             authors.add(self.repo[self.graph.nodes[i].rev].user())
-        sauthors = [username(user) for user in list(authors)]
+        sauthors = [hglib.username(user) for user in list(authors)]
         sauthors.append(self.maxauthor)
         self.maxauthor = sorted(sauthors, key=lambda x: len(x))[-1]
 
@@ -381,7 +381,7 @@ class HgRepoListModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             text = self._columnmap[column](ctx, gnode)
             if not isinstance(text, (QString, unicode)):
-                text = tounicode(text)
+                text = hglib.tounicode(text)
             return QVariant(text)
         elif role == Qt.ForegroundRole:
             if column == 'Author':
@@ -428,7 +428,7 @@ class HgRepoListModel(QAbstractTableModel):
         mqtags = ['qbase', 'qtip', 'qparent']
         tags = ctx.tags()
         tags = [t for t in tags if t not in mqtags]
-        return tounicode(",".join(tags))
+        return hglib.tounicode(",".join(tags))
     
     def getlog(self, ctx, gnode):
         # TODO: add branch name / bookmark / patches /
@@ -436,12 +436,12 @@ class HgRepoListModel(QAbstractTableModel):
         if ctx.rev() is None:
             return '**  ' + _('Working copy changes') + '  **'
         
-        msg = tounicode(ctx.description())
+        msg = hglib.tounicode(ctx.description())
         if msg:
             msg = msg.splitlines()[0]
                 
         tstr = ''
-        for tag in (getctxtags(ctx) or []):
+        for tag in (hglib.getctxtags(ctx) or []):
             style = {'fg': "black", 'bg': '#ffffaa'}
             tstr += qtlib.markup(' %s ' % tag, **style) + ' '
                 
