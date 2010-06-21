@@ -103,7 +103,7 @@ class HgFileListView(QtGui.QTableView):
                                repoviewer=self.window())
                 dlgdict[filename] = dlg
                 
-                dlg.setWindowTitle(_('Hg file log viewer - ') + filename)
+                dlg.setWindowTitle(_('Hg file log viewer - %s') % filename)
             dlg = dlgdict[filename] 
             dlg.goto(model.current_ctx.rev())
             dlg.show()
