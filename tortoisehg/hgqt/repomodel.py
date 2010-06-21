@@ -59,43 +59,6 @@ def cvrt_date(date):
     date, tzdelay = date
     return QDateTime.fromTime_t(int(date)).toString(Qt.LocaleDate)
 
-def gettags(ctx, gnode):
-    if ctx.rev() is None:
-        return ""
-    mqtags = ['qbase', 'qtip', 'qparent']
-    tags = ctx.tags()
-    tags = [t for t in tags if t not in mqtags]
-    return tounicode(",".join(tags))
-
-def getlog(ctx, gnode):
-    # TODO: add branch name / bookmark / patches /
-    # wd parent markups
-    if ctx.rev() is None:
-        return '**  ' + _('Working copy changes') + '  **'
-
-    msg = tounicode(ctx.description())
-    if msg:
-        msg = msg.splitlines()[0]
-
-    tstr = ''
-    for tag in (getctxtags(ctx) or []):
-        style = {'fg': "black", 'bg': '#ffffaa'}
-        tstr += qtlib.markup(' %s ' % tag, **style) + ' '
-
-    return tstr + msg
-
-# XXX maybe it's time to make these methods of the model...
-_columnmap = {'ID': lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
-              'Node': lambda ctx, gnode: str(ctx),
-              'Graph': lambda ctx, gnode: "",
-              'Log': getlog,
-              'Author': lambda ctx, gnode: username(ctx.user()),
-              'Date': lambda ctx, gnode: cvrt_date(ctx.date()),
-              'Tags': gettags,
-              'Branch': lambda ctx, gnode: ctx.branch(),
-              'Filename': lambda ctx, gnode: gnode.extra[0],
-              }
-
 def datacached(meth):
     """
     decorator used to cache 'data' method of Qt models. It will *not*
@@ -144,6 +107,18 @@ class HgRepoListModel(QAbstractTableModel):
         # To be deleted
         self._user_colors = {}
         self._branch_colors = {}
+
+        self._columnmap = {'ID':       lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
+                           'Node':     lambda ctx, gnode: str(ctx),
+                           'Graph':    lambda ctx, gnode: "",
+                           'Log':      self.getlog,
+                           'Author':   lambda ctx, gnode: username(ctx.user()),
+                           'Date':     lambda ctx, gnode: cvrt_date(ctx.date()),
+                           'Tags':     self.gettags,
+                           'Branch':   lambda ctx, gnode: ctx.branch(),
+                           'Filename': lambda ctx, gnode: gnode.extra[0],
+                           }
+
 
     def setRepo(self, repo, branch=''):
         oldroot = self.repo.root
@@ -404,7 +379,7 @@ class HgRepoListModel(QAbstractTableModel):
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
         if role == Qt.DisplayRole:
-            text = _columnmap[column](ctx, gnode)
+            text = self._columnmap[column](ctx, gnode)
             if not isinstance(text, (QString, unicode)):
                 text = tounicode(text)
             return QVariant(text)
@@ -446,3 +421,29 @@ class HgRepoListModel(QAbstractTableModel):
         self.graph = None
         self.datacache = {}
         self.emit(SIGNAL("layoutChanged()"))
+
+    def gettags(self, ctx, gnode):
+        if ctx.rev() is None:
+            return ""
+        mqtags = ['qbase', 'qtip', 'qparent']
+        tags = ctx.tags()
+        tags = [t for t in tags if t not in mqtags]
+        return tounicode(",".join(tags))
+    
+    def getlog(self, ctx, gnode):
+        # TODO: add branch name / bookmark / patches /
+        # wd parent markups
+        if ctx.rev() is None:
+            return '**  ' + _('Working copy changes') + '  **'
+        
+        msg = tounicode(ctx.description())
+        if msg:
+            msg = msg.splitlines()[0]
+                
+        tstr = ''
+        for tag in (getctxtags(ctx) or []):
+            style = {'fg': "black", 'bg': '#ffffaa'}
+            tstr += qtlib.markup(' %s ' % tag, **style) + ' '
+                
+        return tstr + msg
+
