@@ -19,7 +19,6 @@ from mercurial import util, error
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
-from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt import qtlib
 
 from tortoisehg.hgqt.i18n import _
