@@ -191,6 +191,13 @@ def getctxtags(changectx):
         return tags
     return None
 
+def getmqpatchtags(repo):
+    '''Returns all tag names used by MQ patches, or []'''
+    if hasattr(repo, 'mq'):
+        repo.mq.parse_series()
+        return repo.mq.series[:]
+    else:
+        return []
 
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'

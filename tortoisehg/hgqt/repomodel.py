@@ -94,7 +94,6 @@ class HgRepoListModel(QAbstractTableModel):
         """
         QAbstractTableModel.__init__(self, parent)
         self.datacache = {}
-        self.hasmq = False
         self.mqueues = []
         self.wd_revs = []
         self.graph = None
@@ -133,9 +132,7 @@ class HgRepoListModel(QAbstractTableModel):
             # might occur if reloading during a mq operation (or
             # whatever operation playing with hg history)
             return
-        self.hasmq = hasattr(self.repo, "mq")
-        if self.hasmq:
-            self.mqueues = self.repo.mq.series[:]
+        self.mqueues = hglib.getmqpatchtags(self.repo)
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
@@ -431,8 +428,7 @@ class HgRepoListModel(QAbstractTableModel):
         return hglib.tounicode(",".join(tags))
     
     def getlog(self, ctx, gnode):
-        # TODO: add branch name / bookmark / patches /
-        # wd parent markups
+        # TODO: add branch name / bookmark / wd parent markups
         if ctx.rev() is None:
             return '**  ' + _('Working copy changes') + '  **'
         
@@ -442,7 +438,11 @@ class HgRepoListModel(QAbstractTableModel):
                 
         tstr = ''
         for tag in (hglib.getctxtags(ctx) or []):
-            style = {'fg': "black", 'bg': '#ffffaa'}
+            bg = '#ffffaa'
+            if tag in self.mqueues:
+                bg = '#aaddff'
+            style = {'fg': "black", 'bg': bg}
+
             tstr += qtlib.markup(' %s ' % tag, **style) + ' '
                 
         return tstr + msg
