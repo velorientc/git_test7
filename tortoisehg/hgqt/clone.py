@@ -52,6 +52,7 @@ class CloneDialog(QDialog):
         self.src_combo.setEditText(src)
         self.src_btn = QPushButton(_('Browse...'))
         self.src_btn.setAutoDefault(False)
+        self.connect(self.src_btn, SIGNAL("clicked()"), self.browse_src)
         grid.addWidget(QLabel(_('Source:')), 0, 0)
         grid.addWidget(self.src_combo, 0, 1)
         grid.addWidget(self.src_btn, 0, 2)
@@ -63,6 +64,7 @@ class CloneDialog(QDialog):
         self.dest_combo.setEditText(dest)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
+        self.connect(self.dest_btn, SIGNAL("clicked()"), self.browse_dest)
         grid.addWidget(QLabel(_('Destination:')), 1, 0)
         grid.addWidget(self.dest_combo, 1, 1)
         grid.addWidget(self.dest_btn, 1, 2)
@@ -247,6 +249,24 @@ class CloneDialog(QDialog):
 
     def detail_toggled(self, checked):
         self.cmd.show_output(checked)
+
+    def browse_src(self):
+        FD = QFileDialog
+        caption = _("Select source repository")
+        path = FD.getExistingDirectory(self, caption)
+        response = str(path)
+        if response:
+            self.src_combo.setEditText(response)
+            self.src_combo.setFocus()
+
+    def browse_dest(self):
+        FD = QFileDialog
+        caption = _("Select destination repository")
+        path = FD.getExistingDirectory(self, caption)
+        response = str(path)
+        if response:
+            self.dest_combo.setEditText(response)
+            self.dest_combo.setFocus()
 
     def command_started(self):
         self.cmd.setShown(True)
