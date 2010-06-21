@@ -94,18 +94,15 @@ class HTMLDelegate(QStyledItemDelegate):
         if self.cols and index.column() not in self.cols:
             return QStyledItemDelegate.paint(self, painter, option, index)
         text = index.model().data(index, Qt.DisplayRole).toString()
-        palette = QApplication.palette()
+
+        # draw selection
+        option = QStyleOptionViewItemV4(option)
+        self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter) 
+
+        # draw text
         doc = QTextDocument()
-        doc.setDefaultFont(option.font)
-        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
         painter.save()
-        if option.state & QStyle.State_Selected:
-            doc.setHtml('<font color=%s>%s</font>' % (
-                palette.highlightedText().color().name(), text))
-            bgcolor = palette.highlight().color()
-            painter.fillRect(option.rect, bgcolor)
-        else:
-            doc.setHtml(text)
+        doc.setHtml(text)
         painter.translate(option.rect.topLeft());
         painter.setClipRect(option.rect.translated(-option.rect.topLeft()))   
         doc.drawContents(painter)
