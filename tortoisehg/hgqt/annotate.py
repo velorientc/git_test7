@@ -404,10 +404,7 @@ class AnnotateDialog(QDialog):
         self.setWindowTitle(_('Annotate %s@%d') % (pats[0], ctx.rev()))
         self.repo = repo
 
-        s = QSettings()
-        self.restoreGeometry(s.value('annotate/geom').toByteArray())
-        wrap = s.value('annotate/wrap', False).toBool()
-        wrapchk.setChecked(wrap)
+        self.restoreSettings()
 
     def revSelected(self, args):
         repo = self.repo
@@ -495,16 +492,23 @@ class AnnotateDialog(QDialog):
         return super(AnnotateDialog, self).keyPressEvent(event)
 
     def accept(self):
-        s = QSettings()
-        s.setValue('annotate/geom', self.saveGeometry())
-        s.setValue('annotate/wrap', self.wrapchk.isChecked())
+        self.storeSettings()
         super(AnnotateDialog, self).accept()
 
     def reject(self):
+        self.storeSettings()
+        super(AnnotateDialog, self).reject()
+
+    def storeSettings(self):
         s = QSettings()
         s.setValue('annotate/geom', self.saveGeometry())
         s.setValue('annotate/wrap', self.wrapchk.isChecked())
-        super(AnnotateDialog, self).reject()
+
+    def restoreSettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('annotate/geom').toByteArray())
+        wrap = s.value('annotate/wrap', False).toBool()
+        self.wrapchk.setChecked(wrap)
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
