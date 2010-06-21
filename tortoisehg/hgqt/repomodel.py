@@ -132,8 +132,8 @@ class HgRepoListModel(QAbstractTableModel):
             # might occur if reloading during a mq operation (or
             # whatever operation playing with hg history)
             return
-        self.mqueues = hglib.getmqpatchtags(self.repo)
         self.wd_revs = [ctx.rev() for ctx in wdctxs]
+        self.mqueues = hglib.getmqpatchtags(self.repo)
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
         self.graph = Graph(self.repo, grapher, self.max_file_size)
@@ -351,13 +351,13 @@ class HgRepoListModel(QAbstractTableModel):
 
         tags = set(ctx.tags())
         if tags.intersection(self.mqueues):  # diamonds for patches
-            if gnode.rev in self.wd_revs:
+            if self.is_working_directory_parent(gnode.rev):
                 painter.setBrush(white)
                 diamond(2 * 0.9 * radius / 1.5)
             painter.setBrush(fillcolor)
             diamond(radius / 1.5)
         else:  # circles for normal revisions
-            if gnode.rev in self.wd_revs:
+            if self.is_working_directory_parent(gnode.rev):
                 painter.setBrush(white)
                 circle(0.9 * radius)
             painter.setBrush(fillcolor)
@@ -426,16 +426,21 @@ class HgRepoListModel(QAbstractTableModel):
         tags = ctx.tags()
         tags = [t for t in tags if t not in mqtags]
         return hglib.tounicode(",".join(tags))
+
+    def is_working_directory_parent(self, rev):
+        return rev in self.wd_revs
     
     def getlog(self, ctx, gnode):
-        # TODO: add branch name / bookmark / wd parent markups
+        # TODO: add branch name / bookmark 
         if ctx.rev() is None:
             return '**  ' + _('Working copy changes') + '  **'
         
         msg = hglib.tounicode(ctx.description())
         if msg:
             msg = msg.splitlines()[0]
-                
+            if self.is_working_directory_parent(gnode.rev):
+                msg = qtlib.markup(msg, **{'weight': 'bold'})                
+
         tstr = ''
         for tag in (hglib.getctxtags(ctx) or []):
             bg = '#ffffaa'
