@@ -188,6 +188,7 @@ class AnnotateView(QFrame):
 
         self.thread = None
         self.matches = []
+        self.wrap = False
 
     def annotateFileAtRev(self, repo, ctx, wfile, line=None):
         if self.thread is not None:
@@ -293,6 +294,8 @@ class AnnotateView(QFrame):
             return
         if self.curmatch < len(self.matches)-1:
             self.curmatch += 1
+        elif self.wrap:
+            self.curmatch = 0
         self.edit.setTextCursor(self.matches[self.curmatch].cursor)
 
     def prevMatch(self):
@@ -300,6 +303,8 @@ class AnnotateView(QFrame):
             return
         if self.curmatch > 0:
             self.curmatch -= 1
+        elif self.wrap:
+            self.curmatch = len(self.matches)-1
         self.edit.setTextCursor(self.matches[self.curmatch].cursor)
 
     def searchText(self, match, icase):
@@ -322,6 +327,9 @@ class AnnotateView(QFrame):
             self.edit.setTextCursor(matches[0].cursor)
         self.edit.setExtraSelections(self.colorsels + self.matches)
         self.edit.setFocus()
+
+    def setWrapAround(self, wrap):
+        self.wrap = wrap
 
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
@@ -355,14 +363,18 @@ class AnnotateDialog(QDialog):
         bt.setDefault(True)
         bt.clicked.connect(self.searchText)
         chk = QCheckBox(_('Ignore case'))
+        wrapchk = QCheckBox(_('Wrap around'))
         hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
         hbox.addWidget(chk)
+        hbox.addWidget(wrapchk)
         hbox.addWidget(bt)
         mainvbox.addLayout(hbox)
         self.le, self.chk = le, chk
 
         av = AnnotateView(self)
+        av.setWrapAround(False)
+        wrapchk.stateChanged.connect(av.setWrapAround)
         mainvbox.addWidget(av)
         self.av = av
 
