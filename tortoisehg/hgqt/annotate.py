@@ -328,7 +328,7 @@ class AnnotateView(QFrame):
         self.edit.setExtraSelections(self.colorsels + self.matches)
         self.edit.setFocus()
 
-    def setWrapAround(self, wrap):
+    def setWrap(self, wrap):
         self.wrap = wrap
 
 class AnnotateThread(QThread):
@@ -373,8 +373,8 @@ class AnnotateDialog(QDialog):
         self.le, self.chk = le, chk
 
         av = AnnotateView(self)
-        av.setWrapAround(False)
-        wrapchk.stateChanged.connect(av.setWrapAround)
+        av.setWrap(False)
+        wrapchk.stateChanged.connect(av.setWrap)
         mainvbox.addWidget(av)
         self.av = av
 
