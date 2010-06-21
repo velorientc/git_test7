@@ -370,10 +370,9 @@ class AnnotateDialog(QDialog):
         hbox.addWidget(wrapchk)
         hbox.addWidget(bt)
         mainvbox.addLayout(hbox)
-        self.le, self.chk = le, chk
+        self.le, self.chk, self.wrapchk = le, chk, wrapchk
 
         av = AnnotateView(self)
-        av.setWrap(False)
         wrapchk.stateChanged.connect(av.setWrap)
         mainvbox.addWidget(av)
         self.av = av
@@ -407,6 +406,8 @@ class AnnotateDialog(QDialog):
 
         s = QSettings()
         self.restoreGeometry(s.value('annotate/geom').toByteArray())
+        wrap = s.value('annotate/wrap', False).toBool()
+        wrapchk.setChecked(wrap)
 
     def revSelected(self, args):
         repo = self.repo
@@ -496,11 +497,13 @@ class AnnotateDialog(QDialog):
     def accept(self):
         s = QSettings()
         s.setValue('annotate/geom', self.saveGeometry())
+        s.setValue('annotate/wrap', self.wrapchk.isChecked())
         super(AnnotateDialog, self).accept()
 
     def reject(self):
         s = QSettings()
         s.setValue('annotate/geom', self.saveGeometry())
+        s.setValue('annotate/wrap', self.wrapchk.isChecked())
         super(AnnotateDialog, self).reject()
 
 def run(ui, *pats, **opts):
