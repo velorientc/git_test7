@@ -671,7 +671,7 @@ class GStatus(gdialog.GWindow):
                 else:
                     # node2 is None (working dir) when 0 or 1 rev is specified
                     n1, n2 = cmdutil.revpair(repo, self.opts.get('rev'))
-            except (util.Abort, error.RepoError):
+            except (util.Abort, error.RepoError), e:
                 self.status_error = str(e)
                 return
 
