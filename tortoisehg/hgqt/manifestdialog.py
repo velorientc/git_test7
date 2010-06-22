@@ -25,7 +25,7 @@ from mercurial import ui, hg, util
 from mercurial.revlog import LookupError
 
 from PyQt4 import QtGui, QtCore, Qsci
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QSettings
 
 from tortoisehg.util.util import tounicode
 
@@ -57,6 +57,7 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
 
         self.createActions()
         self.setupTextview()
+        self._readsettings()
 
     def setupModels(self):
         self.treemodel = ManifestModel(self.repo, self.rev)
@@ -123,6 +124,20 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
                     index = newindex
                     break
         self.treeView.setCurrentIndex(index)
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(ManifestDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('manifest/geom').toByteArray())
+        self.splitter.restoreState(s.value('manifest/splitter').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('manifest/geom', self.saveGeometry())
+        s.setValue('manifest/splitter', self.splitter.saveState())
 
 
 if __name__ == '__main__':
