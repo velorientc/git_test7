@@ -252,7 +252,7 @@ class AnnotateView(QFrame):
             lpos.append(pos)
             revs.append(rev)
             links.append([fctx, origline])
-            pos += len(text)
+            pos += len(hglib.tounicode(text))
             if rev not in sums:
                 author = hglib.username(fctx.user())
                 author = hglib.tounicode(author)
