@@ -107,7 +107,7 @@ def markup(msg, **styles):
     for name, value in styles.items():
         if not value:
             continue
-        if NAME_MAP.has_key(name):
+        if name in NAME_MAP:
             name = NAME_MAP[name]
         style[name] = value
     style = ';'.join(['%s: %s' % t for t in style.items()])
