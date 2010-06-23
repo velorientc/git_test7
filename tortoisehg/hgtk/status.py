@@ -739,7 +739,11 @@ class GStatus(gdialog.GWindow):
         return (self._node1, self._node2)
 
     def get_ctx(self):
-        return self.repo[self._node1]
+        'Return current changectx or workingctx'
+        if self._node2 == None and not self.mqmode:
+            return self.repo[None]
+        else:
+            return self.repo[self._node1]
 
     def set_file_states(self, paths, state=True):
         for p in paths:
