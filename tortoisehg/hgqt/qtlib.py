@@ -95,13 +95,13 @@ def geteffect(labels):
         for e in es.split():
             if e in _effects:
                 effects.append(_effects[e])
-            elif e in QColor.colorNames():
-                # Accept any valid QColor
-                effects.append('color: ' + e)
             elif e.endswith('_background'):
                 e = e[:-11]
-                if e in QColor.colorNames():
-                    effects.append('bgcolor: ' + e)
+                if e.startswith('#') or e in QColor.colorNames():
+                    effects.append('background-color: ' + e)
+            elif e.startswith('#') or e in QColor.colorNames():
+                # Accept any valid QColor
+                effects.append('color: ' + e)
     return ';'.join(effects)
 
 
