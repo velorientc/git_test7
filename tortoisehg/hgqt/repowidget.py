@@ -37,7 +37,8 @@ class RepoWidget(QWidget):
     def __init__(self, repo, workbench, commitWidget):
         self.repo = repo
         self.workbench = workbench
-        self.stackedWidget = workbench.stackedWidget
+        self.revDetailsStackedWidget = workbench.revDetailsStackedWidget
+        self.commitStackedWidget = workbench.commitStackedWidget
         self.commitWidget = commitWidget
         self._reload_rev = '.'
         self._loading = True
@@ -45,7 +46,6 @@ class RepoWidget(QWidget):
         self.splitternames = []
         self.disab_shortcuts = []
         self.currentMessage = ''
-        self.currentWidget = None
 
         QWidget.__init__(self)
         
@@ -80,7 +80,7 @@ class RepoWidget(QWidget):
         self.repoview.setFrameShape(QFrame.StyledPanel)
 
         w = RevDetailsWidget(self.repo, self.repoview)
-        self.stackedWidget.addWidget(w)
+        self.revDetailsStackedWidget.addWidget(w)
         w.revisionLinkClicked.connect(self.goto)
         self.revDetailsWidget = w
 
@@ -260,12 +260,12 @@ class RepoWidget(QWidget):
             ctx = self.repomodel.repo.changectx(rev)
             if ctx.rev() is None:
                 # working copy
-                self.currentWidget = self.commitWidget
+                pass
             else:
                 self.revDetailsWidget.revision_selected(rev)
-                self.currentWidget = self.revDetailsWidget
             if self.workbench.getCurentRepoRoot() == self.repo.root:
-                self.stackedWidget.setCurrentWidget(self.currentWidget)
+                self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
+                self.commitStackedWidget.setCurrentWidget(self.commitWidget)
 
     def goto(self, rev):
         rev = str(rev)
@@ -313,8 +313,8 @@ class RepoWidget(QWidget):
         self.switchToSignal.emit(self)
 
     def switchedTo(self):
-        if self.currentWidget:
-            self.stackedWidget.setCurrentWidget(self.currentWidget)
+        self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
+        self.commitStackedWidget.setCurrentWidget(self.commitWidget)
 
     def storeSettings(self):
         s = QSettings()
@@ -338,7 +338,7 @@ class RepoWidget(QWidget):
         if self.isVisible():
             # assuming here that there is at most one RepoWidget visible
             self.storeSettings()
-        self.stackedWidget.removeWidget(self.revDetailsWidget)
+        self.revDetailsStackedWidget.removeWidget(self.revDetailsWidget)
         s = QSettings()
         self.commitWidget.storeConfigs(s)
         return True

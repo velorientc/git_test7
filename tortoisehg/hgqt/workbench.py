@@ -60,8 +60,8 @@ class Workbench(QMainWindow):
         self.repotabs_splitter.setCollapsible(0, False)
 
         self.dummywidget = QWidget()
-        self.stackedWidget.addWidget(self.dummywidget)
-        self.stackedWidget.setCurrentWidget(self.dummywidget)
+        self.revDetailsStackedWidget.addWidget(self.dummywidget)
+        self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
         self.currentRepoRoot = ''
 
         self.setWindowTitle('TortoiseHg Workbench')
@@ -150,8 +150,21 @@ class Workbench(QMainWindow):
         sp.setHeightForWidth(tw.sizePolicy().hasHeightForWidth())
         tw.setSizePolicy(sp)
 
-        self.stackedWidget = sw = QStackedWidget(self.repotabs_splitter)
+        self.taskTabsWidget = tt = QTabWidget(self.repotabs_splitter)
+        tt.setDocumentMode(True)
+        tt.setTabPosition(QTabWidget.East)
+        self.revDetailsStackedWidget = sw = QStackedWidget()
         sw.minimumSizeHint = lambda: QSize(0, 0)
+        index = tt.addTab(sw, geticon('log'), '')
+        tt.setTabToolTip(index, _("Revision details"))
+        self.commitStackedWidget = sw = QStackedWidget()
+        sw.minimumSizeHint = lambda: QSize(0, 0)
+        index = tt.addTab(sw, geticon('commit'), '')
+        tt.setTabToolTip(index, _("Commit"))
+        sw = QStackedWidget()
+        sw.minimumSizeHint = lambda: QSize(0, 0)
+        index = tt.addTab(sw, geticon('sync'), '')
+        tt.setTabToolTip(index, _("Synchronize"))
 
         self.setCentralWidget(self.centralwidget)
 
@@ -285,7 +298,7 @@ class Workbench(QMainWindow):
             w.switchedTo()
             self.currentRepoRoot = w.repo.root
         else:
-            self.stackedWidget.setCurrentWidget(self.dummywidget)
+            self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
             self.currentRepoRoot = ''
 
         self.actionDiffMode.setEnabled(w is not None)
@@ -306,7 +319,7 @@ class Workbench(QMainWindow):
             opts = {}
             cw = CommitWidget(pats, opts, root=repo.root)
             self.commitwidgets[repo.root] = cw
-            self.stackedWidget.addWidget(cw)
+            self.commitStackedWidget.addWidget(cw)
             s = QSettings()
             cw.loadConfigs(s)
 
