@@ -434,20 +434,18 @@ class HgRepoListModel(QAbstractTableModel):
         if ctx.rev() is None:
             return '**  ' + _('Working copy changes') + '  **'
         
+        parts = []
+        for tag in (hglib.getctxtags(ctx) or []):
+            style = tag in self.mqueues and 'log.patch' or 'log.tag'
+            effects = qtlib.geteffect(style)
+            text = qtlib.applyeffects(' %s ' % tag, effects)
+            parts.append(text)
+
         msg = hglib.tounicode(ctx.description())
         if msg:
             msg = msg.splitlines()[0]
             if self.is_working_directory_parent(gnode.rev):
-                msg = qtlib.markup(msg, **{'weight': 'bold'})                
+                msg = qtlib.markup(msg, weight='bold')
+        parts.append(msg)
 
-        tstr = ''
-        for tag in (hglib.getctxtags(ctx) or []):
-            bg = '#ffffaa'
-            if tag in self.mqueues:
-                bg = '#aaddff'
-            style = {'fg': "black", 'bg': bg}
-
-            tstr += qtlib.markup(' %s ' % tag, **style) + ' '
-                
-        return tstr + msg
-
+        return ' '.join(parts)
