@@ -354,7 +354,7 @@ class CommitWidget(QWidget):
         self.refreshUserList()
         try:
             curmsg = repo.opener('cur-message.txt').read()
-            self.msgte.setPlainText(hglib.fromunicode(curmsg))
+            self.msgte.setPlainText(hglib.tounicode(curmsg))
             self.msgte.document().setModified(False)
             self.msgte.moveCursor(QTextCursor.End)
         except EnvironmentError:
