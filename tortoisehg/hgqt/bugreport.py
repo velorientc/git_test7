@@ -9,7 +9,7 @@ import os
 import sys
 
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import SIGNAL, SLOT, QSettings
+from PyQt4.QtCore import SIGNAL, SLOT, QSettings, Qt
 
 from mercurial import extensions
 from tortoisehg.util import hglib, version
@@ -43,6 +43,7 @@ class BugReport(QtGui.QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle(_('TortoiseHg Bug Report'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.resize(650, 400)
         self._readsettings()
 
