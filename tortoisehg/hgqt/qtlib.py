@@ -104,6 +104,8 @@ def geteffect(labels):
                 effects.append('color: ' + e)
     return ';'.join(effects)
 
+def applyeffects(chars, effects):
+    return '<span style="white-space: pre;%s">%s</span>' % (effects, chars)
 
 NAME_MAP = {
     'fg': 'color', 'bg': 'background-color', 'family': 'font-family',
