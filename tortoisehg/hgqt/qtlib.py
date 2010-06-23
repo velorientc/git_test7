@@ -41,6 +41,15 @@ _effects = {
     'underline': 'text-decoration: underline',
 }
 
+_thgstyles = {
+   # Styles defined by TortoiseHg
+   'log.branch': '#aaffaa_background',
+   'log.patch': '#aaddff_background',
+   'log.tag': '#ffffaa_background',
+   'ui.error': 'red bold',
+   'control': 'black bold',
+}
+
 thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
 
 """app-global stylesheet"""
@@ -56,7 +65,7 @@ def configstyles(ui):
         _styles.update(getattr(ext, 'colortable', {}))
 
     # tortoisehg defines a few labels and default effects
-    _styles.update({'ui.error':'red bold', 'control':'black bold'})
+    _styles.update(_thgstyles)
 
     # allow the user to override
     for status, cfgeffects in ui.configitems('color'):
