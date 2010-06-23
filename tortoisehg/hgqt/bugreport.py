@@ -9,7 +9,7 @@ import os
 import sys
 
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import SIGNAL, SLOT
+from PyQt4.QtCore import SIGNAL, SLOT, QSettings
 
 from mercurial import extensions
 from tortoisehg.util import hglib, version
@@ -23,7 +23,7 @@ class BugReport(QtGui.QDialog):
 
         self.text = self.gettext(opts)
 
-        layout = QtGui.QVBoxLayout() 
+        layout = QtGui.QVBoxLayout()
 
         tb = QtGui.QTextBrowser()
         tb.document().setDefaultStyleSheet(qtlib.thgstylesheet)
@@ -44,6 +44,7 @@ class BugReport(QtGui.QDialog):
         self.setLayout(layout)
         self.setWindowTitle(_('TortoiseHg Bug Report'))
         self.resize(650, 400)
+        self._readsettings()
 
     def gettext(self, opts):
         text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
@@ -89,6 +90,22 @@ class BugReport(QtGui.QDialog):
                 open(fname, 'wb').write(self.text)
         except (EnvironmentError), e:
             QMessageBox.critical(self, _('Error writing file'), str(e))
+
+    def accept(self):
+        self._writesettings()
+        super(BugReport, self).accept()
+
+    def reject(self):
+        self._writesettings()
+        super(BugReport, self).reject()
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('bugreport/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('bugreport/geom', self.saveGeometry())
 
 def run(ui, *pats, **opts):
     return BugReport(opts)
