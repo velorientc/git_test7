@@ -320,18 +320,7 @@ class Workbench(QMainWindow):
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)
-
-        if repo.root in self.commitwidgets:
-            cw = self.commitwidgets[repo.root]
-        else:
-            pats = {}
-            opts = {}
-            cw = CommitWidget(pats, opts, root=repo.root)
-            self.commitwidgets[repo.root] = cw
-            self.commitStackedWidget.addWidget(cw)
-            s = QSettings()
-            cw.loadConfigs(s)
-
+        cw = self.getCommitWidget(repo.root)
         rw = RepoWidget(repo, self, cw)
         rw.showMessageSignal.connect(self.showMessage)
         rw.switchToSignal.connect(self.switchTo)
@@ -339,6 +328,19 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
+
+    def getCommitWidget(self, root):
+        if root in self.commitwidgets:
+            cw = self.commitwidgets[root]
+        else:
+            pats = {}
+            opts = {}
+            cw = CommitWidget(pats, opts, root=root)
+            self.commitwidgets[root] = cw
+            self.commitStackedWidget.addWidget(cw)
+            s = QSettings()
+            cw.loadConfigs(s)
+        return cw            
 
     def switchTo(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
