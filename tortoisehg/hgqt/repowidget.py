@@ -259,8 +259,7 @@ class RepoWidget(QWidget):
         if self.repomodel.graph:
             ctx = self.repomodel.repo.changectx(rev)
             if ctx.rev() is None:
-                # working copy
-                pass
+                self.workbench.workingCopySelected()
             else:
                 self.revDetailsWidget.revision_selected(rev)
             if self.workbench.getCurentRepoRoot() == self.repo.root:

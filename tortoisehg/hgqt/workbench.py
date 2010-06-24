@@ -248,6 +248,9 @@ class Workbench(QMainWindow):
         tb.addSeparator()
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
+    def workingCopySelected(self):
+        self.taskTabsWidget.setCurrentIndex(1)
+
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
 
