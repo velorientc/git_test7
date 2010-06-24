@@ -251,6 +251,9 @@ class Workbench(QMainWindow):
     def workingCopySelected(self):
         self.taskTabsWidget.setCurrentIndex(1)
 
+    def revisionSelected(self):
+        self.taskTabsWidget.setCurrentIndex(0)
+
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
 

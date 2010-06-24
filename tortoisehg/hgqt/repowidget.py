@@ -262,6 +262,7 @@ class RepoWidget(QWidget):
                 self.workbench.workingCopySelected()
             else:
                 self.revDetailsWidget.revision_selected(rev)
+                self.workbench.revisionSelected()
             if self.workbench.getCurentRepoRoot() == self.repo.root:
                 self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
                 self.commitStackedWidget.setCurrentWidget(self.commitWidget)
