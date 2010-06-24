@@ -34,12 +34,12 @@ class RepoWidget(QWidget):
     showMessageSignal = pyqtSignal(str)
     switchToSignal = pyqtSignal(QWidget)
 
-    def __init__(self, repo, workbench, commitWidget):
+    def __init__(self, repo, workbench):
         self.repo = repo
         self.workbench = workbench
         self.revDetailsStackedWidget = workbench.revDetailsStackedWidget
         self.commitStackedWidget = workbench.commitStackedWidget
-        self.commitWidget = commitWidget
+        self.commitWidget = None
         self._reload_rev = '.'
         self._loading = True
         self._scanForRepoChanges = True
@@ -256,16 +256,20 @@ class RepoWidget(QWidget):
         clip.setText(binascii.hexlify(self.repo[rev].node()))
 
     def revision_selected(self, rev):
-        if self.repomodel.graph:
-            ctx = self.repomodel.repo.changectx(rev)
-            if ctx.rev() is None:
-                self.workbench.workingCopySelected()
-            else:
-                self.revDetailsWidget.revision_selected(rev)
-                self.workbench.revisionSelected()
-            if self.workbench.getCurentRepoRoot() == self.repo.root:
-                self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
-                self.commitStackedWidget.setCurrentWidget(self.commitWidget)
+        if self.workbench.getCurentRepoRoot() != self.repo.root:
+            return
+        if self.repomodel.graph is None:
+            return
+        ctx = self.repomodel.repo.changectx(rev)
+        if ctx.rev() is None:
+            cw = self.workbench.getCommitWidget(self.repo.root)
+            self.commitWidget = cw
+            self.commitStackedWidget.setCurrentWidget(cw)
+            self.workbench.workingCopySelected()
+        else:
+            self.revDetailsWidget.revision_selected(rev)
+            self.workbench.revisionSelected()
+        self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
 
     def goto(self, rev):
         rev = str(rev)
@@ -297,7 +301,8 @@ class RepoWidget(QWidget):
         self.repo = hg.repository(self.repo.ui, self.repo.root)
         self._repodate = self._getrepomtime()
         self.setupModels()
-        self.commitWidget.stwidget.refreshWctx()
+        if self.commitWidget:
+            self.commitWidget.stwidget.refreshWctx()
         self.revDetailsWidget.reload(rev)
 
     def setRepomodel(self, branch):
@@ -307,14 +312,17 @@ class RepoWidget(QWidget):
         return self.repomodel.branch()
 
     def okToContinue(self):
-        return self.commitWidget.canExit()
+        if self.commitWidget:
+            return self.commitWidget.canExit()
+        return True
 
     def switchTo(self):
         self.switchToSignal.emit(self)
 
     def switchedTo(self):
         self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
-        self.commitStackedWidget.setCurrentWidget(self.commitWidget)
+        if self.commitWidget:
+            self.commitStackedWidget.setCurrentWidget(self.commitWidget)
 
     def storeSettings(self):
         s = QSettings()
@@ -340,5 +348,6 @@ class RepoWidget(QWidget):
             self.storeSettings()
         self.revDetailsStackedWidget.removeWidget(self.revDetailsWidget)
         s = QSettings()
-        self.commitWidget.storeConfigs(s)
+        if self.commitWidget:
+            self.commitWidget.storeConfigs(s)
         return True

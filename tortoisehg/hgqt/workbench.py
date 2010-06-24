@@ -320,8 +320,7 @@ class Workbench(QMainWindow):
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
         reponame = os.path.basename(repo.root)
-        cw = self.getCommitWidget(repo.root)
-        rw = RepoWidget(repo, self, cw)
+        rw = RepoWidget(repo, self)
         rw.showMessageSignal.connect(self.showMessage)
         rw.switchToSignal.connect(self.switchTo)
         tw = self.repoTabsWidget
@@ -335,6 +334,7 @@ class Workbench(QMainWindow):
         else:
             pats = {}
             opts = {}
+            print "creating commit widget for %s" % root
             cw = CommitWidget(pats, opts, root=root)
             self.commitwidgets[root] = cw
             self.commitStackedWidget.addWidget(cw)
