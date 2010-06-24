@@ -137,6 +137,7 @@ class Workbench(QMainWindow):
         vl.setMargin(0)
 
         self.repotabs_splitter = sp = QSplitter(self.centralwidget)
+        sp.hide()
         sp.setOrientation(Qt.Vertical)
         self.verticalLayout.addWidget(sp)
 
@@ -297,9 +298,11 @@ class Workbench(QMainWindow):
             tags = w.repo.tags().keys()
             w.switchedTo()
             self.currentRepoRoot = w.repo.root
+            self.repotabs_splitter.show()
         else:
             self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
             self.currentRepoRoot = ''
+            self.repotabs_splitter.hide()
 
         self.actionDiffMode.setEnabled(w is not None)
         self.actionDiffMode.setChecked(mode == 'diff')
