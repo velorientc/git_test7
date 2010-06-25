@@ -356,7 +356,7 @@ class Workbench(QMainWindow):
             self.commitStackedWidget.addWidget(cw)
             s = QSettings()
             cw.loadConfigs(s)
-        return cw            
+        return cw
 
     def switchTo(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
