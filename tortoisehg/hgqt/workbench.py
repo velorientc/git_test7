@@ -26,6 +26,7 @@ from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.commit import CommitWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
+from tortoisehg.hgqt.sync import SyncWidget
 
 from tortoisehg.util import paths
 
@@ -49,6 +50,7 @@ class Workbench(QMainWindow):
         self._searchWidgets = []
 
         self.commitwidgets = {} # key: reporoot
+        self.syncwidgets = {} # key: reporoot
 
         QMainWindow.__init__(self)
 
@@ -166,7 +168,7 @@ class Workbench(QMainWindow):
         sw.minimumSizeHint = lambda: QSize(0, 0)
         index = tt.addTab(sw, geticon('commit'), '')
         tt.setTabToolTip(index, _("Commit"))
-        sw = QStackedWidget()
+        self.syncStackedWidget = sw = QStackedWidget()
         sw.minimumSizeHint = lambda: QSize(0, 0)
         index = tt.addTab(sw, geticon('sync'), '')
         tt.setTabToolTip(index, _("Synchronize"))
@@ -309,12 +311,19 @@ class Workbench(QMainWindow):
             ann = w.getAnnotate()
             tags = w.repo.tags().keys()
             self.currentRepoRoot = root = w.repo.root
-            if self.taskTabsWidget.currentIndex() == 1:
+            ti = self.taskTabsWidget.currentIndex()
+            if ti == 1:
                 cw = self.getCommitWidget(root)
                 if cw:
                     self.commitStackedWidget.setCurrentWidget(cw)
                 else:
                     self.taskTabsWidget.setCurrentIndex(0)
+            elif ti == 2:
+                sw = self.getSyncWidget(root)
+                if sw:
+                    self.syncStackedWidget.setCurrentWidget(sw)
+                else:
+                    self.taskTabsWidget.setCurrentIndex(0)                    
             w.switchedTo()
             self.repotabs_splitter.show()
         else:
@@ -329,6 +338,9 @@ class Workbench(QMainWindow):
     def taskTabChanged(self, index=0):
         if index == 1:
             self.workingCopySelected()
+        elif index == 2:
+            sw = self.createSyncWidget(self.currentRepoRoot)
+            self.syncStackedWidget.setCurrentWidget(sw)
 
     def getCurentRepoRoot(self):
         return self.currentRepoRoot
@@ -360,6 +372,18 @@ class Workbench(QMainWindow):
     def getCommitWidget(self, root):
         '''returns None if no commit widget for that repo has been created yet'''
         return self.commitwidgets.get(root)
+
+    def createSyncWidget(self, root):
+        sw = self.getSyncWidget(root)
+        if sw is None:
+            print "creating sync widget for %s" % root
+            sw = SyncWidget(root)
+            self.syncwidgets[root] = sw
+            self.syncStackedWidget.addWidget(sw)
+        return sw
+
+    def getSyncWidget(self, root):
+        return self.syncwidgets.get(root)
 
     def switchTo(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
