@@ -79,6 +79,9 @@ class Workbench(QMainWindow):
         connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
         connect(tw, SIGNAL('currentChanged(int)'), self.repoTabChanged)
 
+        tw = self.taskTabsWidget
+        tw.currentChanged.connect(self.taskTabChanged)
+
         self.createActions()
         self.createToolbars()
 
@@ -314,6 +317,10 @@ class Workbench(QMainWindow):
         self.actionDiffMode.setEnabled(w is not None)
         self.actionDiffMode.setChecked(mode == 'diff')
         self.actionAnnMode.setChecked(ann)
+
+    def taskTabChanged(self, index=0):
+        if index == 1:
+            self.getCommitWidget(self.currentRepoRoot)
 
     def getCurentRepoRoot(self):
         return self.currentRepoRoot
