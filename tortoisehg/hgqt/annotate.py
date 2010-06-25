@@ -254,17 +254,7 @@ class AnnotateView(QFrame):
             links.append([fctx, origline])
             pos += len(hglib.tounicode(text))
             if rev not in sums:
-                author = hglib.username(fctx.user())
-                author = hglib.tounicode(author)
-                date = hglib.age(fctx.date())
-                l = hglib.tounicode(fctx.description()).replace('\0', '').splitlines()
-                summary = l and l[0] or ''
-                if fctx.path() == self.annfile:
-                    source = ''
-                else:
-                    source = '(%s)' % fctx.path()
-                desc = '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
-                sums[rev] = desc
+                sums[rev] = hglib.get_revision_desc(fctx, self.annfile)
 
         self.edit.summaries = sums
         self.edit.links = links

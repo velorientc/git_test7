@@ -433,6 +433,20 @@ def username(user):
         author = util.shortuser(user)
     return author
 
+def get_revision_desc(fctx, curpath=None):
+    """return the revision description as a string"""
+    author = tounicode(username(fctx.user()))
+    rev = fctx.linkrev()
+    # If the source path matches the current path, don't bother including it.
+    if curpath and curpath == fctx.path():
+        source = ''
+    else:
+        source = '(%s)' % fctx.path()
+    date = age(fctx.date())
+    l = fctx.description().replace(u'\0', '').splitlines()
+    summary = l and l[0] or ''
+    return '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
+
 def validate_synch_path(path, repo):
     '''
     Validate the path that must be used to sync operations (pull,
