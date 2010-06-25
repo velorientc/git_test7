@@ -253,7 +253,7 @@ class Workbench(QMainWindow):
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
     def workingCopySelected(self):
-        cw = self.getCommitWidget(self.currentRepoRoot)
+        cw = self.createCommitWidget(self.currentRepoRoot)
         self.commitStackedWidget.setCurrentWidget(cw)
         self.taskTabsWidget.setCurrentIndex(1)
 
@@ -344,7 +344,7 @@ class Workbench(QMainWindow):
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
 
-    def getCommitWidget(self, root):
+    def createCommitWidget(self, root):
         if root in self.commitwidgets:
             cw = self.commitwidgets[root]
         else:
