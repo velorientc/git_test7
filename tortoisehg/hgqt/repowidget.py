@@ -38,7 +38,6 @@ class RepoWidget(QWidget):
         self.repo = repo
         self.workbench = workbench
         self.revDetailsStackedWidget = workbench.revDetailsStackedWidget
-        self.commitStackedWidget = workbench.commitStackedWidget
         self.commitWidget = None
         self._reload_rev = '.'
         self._loading = True
@@ -262,9 +261,6 @@ class RepoWidget(QWidget):
             return
         ctx = self.repomodel.repo.changectx(rev)
         if ctx.rev() is None:
-            cw = self.workbench.getCommitWidget(self.repo.root)
-            self.commitWidget = cw
-            self.commitStackedWidget.setCurrentWidget(cw)
             self.workbench.workingCopySelected()
         else:
             self.revDetailsWidget.revision_selected(rev)
@@ -321,8 +317,6 @@ class RepoWidget(QWidget):
 
     def switchedTo(self):
         self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
-        if self.commitWidget:
-            self.commitStackedWidget.setCurrentWidget(self.commitWidget)
 
     def storeSettings(self):
         s = QSettings()

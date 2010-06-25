@@ -253,6 +253,8 @@ class Workbench(QMainWindow):
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
     def workingCopySelected(self):
+        cw = self.getCommitWidget(self.currentRepoRoot)
+        self.commitStackedWidget.setCurrentWidget(cw)
         self.taskTabsWidget.setCurrentIndex(1)
 
     def revisionSelected(self):
@@ -306,8 +308,14 @@ class Workbench(QMainWindow):
             mode = w.getMode()
             ann = w.getAnnotate()
             tags = w.repo.tags().keys()
+            self.currentRepoRoot = root = w.repo.root
+            if self.taskTabsWidget.currentIndex() == 1:
+                cw = self.commitwidgets.get(root)
+                if cw:
+                    self.commitStackedWidget.setCurrentWidget(cw)
+                else:
+                    self.taskTabsWidget.setCurrentIndex(0)
             w.switchedTo()
-            self.currentRepoRoot = w.repo.root
             self.repotabs_splitter.show()
         else:
             self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
@@ -320,7 +328,7 @@ class Workbench(QMainWindow):
 
     def taskTabChanged(self, index=0):
         if index == 1:
-            self.getCommitWidget(self.currentRepoRoot)
+            self.workingCopySelected()
 
     def getCurentRepoRoot(self):
         return self.currentRepoRoot
