@@ -41,7 +41,6 @@ class RepoWidget(QWidget):
         self._reload_rev = '.'
         self._loading = True
         self._scanForRepoChanges = True
-        self.splitternames = []
         self.disab_shortcuts = []
         self.currentMessage = ''
 
@@ -323,18 +322,9 @@ class RepoWidget(QWidget):
         self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
 
     def storeSettings(self):
-        s = QSettings()
-        wb = "RepoWidget/"
-        for n in self.splitternames:
-            s.setValue(wb + n, getattr(self, n).saveState())
         self.revDetailsWidget.storeSettings()
 
     def restoreSettings(self):
-        s = QSettings()
-        wb = "RepoWidget/"
-        for n in self.splitternames:
-            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
-        expanded = s.value(wb + 'revpanel.expanded', True).toBool()
         self.revDetailsWidget.restoreSettings()
 
     def closeRepoWidget(self):
