@@ -28,6 +28,7 @@ Qt = QtCore.Qt
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 
+from tortoisehg.util import hglib
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
 from tortoisehg.hgqt.lexers import get_lexer
@@ -73,16 +74,21 @@ class Annotator(qsci):
         
     def setFilectx(self, fctx):
         self.fctx = fctx
-        ann = [f.rev() for f, line in fctx.annotate(follow=True)]
-        self.setText('\n'.join(map(str, ann)))
-        allrevs = list(sorted(set(ann)))
-        for i, rev in enumerate(ann):
-            idx = allrevs.index(rev)
+        self.fctxann = [f for f, line in fctx.annotate(follow=True)]
+        revlist = [str(f.rev()) for f in self.fctxann]
+        self.setText('\n'.join(revlist))
+        uniqrevs = list(sorted(set(revlist)))
+        for i, rev in enumerate(revlist):
+            idx = uniqrevs.index(rev)
             self.markerAdd(i, self.markers[idx % len(self.markers)])
         
         
         
 class HgFileView(QtGui.QFrame):
+    """file diff and content viewer"""
+
+    showDescSignal = QtCore.pyqtSignal(QtCore.QString)
+
     def __init__(self, parent=None):
         QtGui.QFrame.__init__(self, parent)
         framelayout = QtGui.QVBoxLayout(self)
@@ -133,6 +139,8 @@ class HgFileView(QtGui.QFrame):
         self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markerminus, 0xA0A0FF)
         self.markertriangle = self.sci.markerDefine(qsci.Background)
         self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markertriangle, 0xFFA0A0)
+        self.lastrev = None
+        self.sci.mouseMoveEvent = self.mouseMoveEvent
 
         ll = QtGui.QVBoxLayout()
         ll.setContentsMargins(0, 0, 0, 0)
@@ -218,7 +226,27 @@ class HgFileView(QtGui.QFrame):
     def displayDiff(self, rev):
         if rev != self._p_rev:
             self.displayFile(rev=rev)
-        
+
+    def mouseMoveEvent(self, event):
+        if self._mode == 'file' and self._annotate:
+            # Calculate row index from the scroll offset and mouse position
+            scroll_offset = self.sci.verticalScrollBar().value()
+            idx = scroll_offset + event.pos().y() / self.sci.textHeight(0)
+            # It's possible to scroll below the bottom line
+            if idx >= len(self.ann.fctxann):
+                idx = len(self.ann.fctxann) - 1
+            ctx = self.ann.fctxann[idx]
+            rev = ctx.rev()
+            desc = hglib.get_revision_desc(ctx, self.filename())
+            if rev != self.lastrev:
+                self.showDescSignal.emit(desc)
+                self.lastrev = rev
+        qsci.mouseMoveEvent(self.sci, event)
+
+    def leaveEvent(self, event):
+        self.lastrev = None
+        self.showDescSignal.emit('')
+
     def displayFile(self, filename=None, rev=None):
         if self._mode == 'diff':
             self.sci.setMarginLineNumbers(1, False)

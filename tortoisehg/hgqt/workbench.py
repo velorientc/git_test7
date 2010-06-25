@@ -350,6 +350,7 @@ class Workbench(QMainWindow):
         reponame = os.path.basename(repo.root)
         rw = RepoWidget(repo, self)
         rw.showMessageSignal.connect(self.showMessage)
+        rw.revDetailsWidget.fileview.showDescSignal.connect(self.showMessage)
         rw.switchToSignal.connect(self.switchTo)
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, reponame)
