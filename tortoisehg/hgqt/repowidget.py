@@ -38,7 +38,6 @@ class RepoWidget(QWidget):
         self.repo = repo
         self.workbench = workbench
         self.revDetailsStackedWidget = workbench.revDetailsStackedWidget
-        self.commitWidget = None
         self._reload_rev = '.'
         self._loading = True
         self._scanForRepoChanges = True
@@ -297,8 +296,9 @@ class RepoWidget(QWidget):
         self.repo = hg.repository(self.repo.ui, self.repo.root)
         self._repodate = self._getrepomtime()
         self.setupModels()
-        if self.commitWidget:
-            self.commitWidget.stwidget.refreshWctx()
+        cw = self.workbench.getCommitWidget(self.repo.root)
+        if cw:
+            cw.stwidget.refreshWctx()
         self.revDetailsWidget.reload(rev)
 
     def setRepomodel(self, branch):
@@ -308,8 +308,9 @@ class RepoWidget(QWidget):
         return self.repomodel.branch()
 
     def okToContinue(self):
-        if self.commitWidget:
-            return self.commitWidget.canExit()
+        cw = self.workbench.getCommitWidget(self.repo.root)
+        if cw:
+            return cw.canExit()
         return True
 
     def switchTo(self):
@@ -342,6 +343,7 @@ class RepoWidget(QWidget):
             self.storeSettings()
         self.revDetailsStackedWidget.removeWidget(self.revDetailsWidget)
         s = QSettings()
-        if self.commitWidget:
-            self.commitWidget.storeConfigs(s)
+        cw = self.workbench.getCommitWidget(self.repo.root)
+        if cw:
+            cw.storeConfigs(s)
         return True
