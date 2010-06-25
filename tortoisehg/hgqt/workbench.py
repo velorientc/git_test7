@@ -310,7 +310,7 @@ class Workbench(QMainWindow):
             tags = w.repo.tags().keys()
             self.currentRepoRoot = root = w.repo.root
             if self.taskTabsWidget.currentIndex() == 1:
-                cw = self.commitwidgets.get(root)
+                cw = self.getCommitWidget(root)
                 if cw:
                     self.commitStackedWidget.setCurrentWidget(cw)
                 else:
@@ -345,9 +345,8 @@ class Workbench(QMainWindow):
         self.reporegistry.addRepo(repo.root)
 
     def createCommitWidget(self, root):
-        if root in self.commitwidgets:
-            cw = self.commitwidgets[root]
-        else:
+        cw = self.getCommitWidget(root)
+        if cw is None:
             pats = {}
             opts = {}
             print "creating commit widget for %s" % root
@@ -357,6 +356,10 @@ class Workbench(QMainWindow):
             s = QSettings()
             cw.loadConfigs(s)
         return cw
+
+    def getCommitWidget(self, root):
+        '''returns None if no commit widget for that repo has been created yet'''
+        return self.commitwidgets.get(root)
 
     def switchTo(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
