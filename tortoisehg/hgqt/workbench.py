@@ -20,7 +20,7 @@ from tortoisehg.util.hglib import tounicode
 from tortoisehg.hgqt import repomodel
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.decorators import timeit
-from tortoisehg.hgqt.qtlib import geticon, getfont
+from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.commit import CommitWidget
@@ -111,6 +111,7 @@ class Workbench(QMainWindow):
                 w.hide()
         
     def load_config(self, ui):
+        configstyles(ui)
         # TODO: connect to font changed signal
         font = getfont(ui, 'fontlog').font()
         self._font = font
