@@ -854,6 +854,8 @@ class ConfigDialog(gtk.Dialog):
 
     def new_path(self, newpath, alias='new'):
         '''Add a new path to [paths], give default name, focus'''
+        # This method may be called from hgtk.sync, so ensure page is visible
+        self.show_page('sync')
         i = self.pathdata.insert_before(None, None)
         safepath = url.hidepassword(newpath)
         if alias in [row[0] for row in self.pathdata]:
@@ -869,8 +871,6 @@ class ConfigDialog(gtk.Dialog):
                 self.pathdata.get_path(i),
                 self.pathtree.get_column(0))
         self.refresh_path_list()
-        # This method may be called from hgtk.sync, so ensure page is visible
-        self.show_page('sync')
         self.dirty_event()
 
     def dirty_event(self, *args):
