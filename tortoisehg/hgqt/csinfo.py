@@ -310,7 +310,7 @@ class SummaryInfo(object):
                 childbranches = [cctx.branch() for cctx in ctx.children()]
                 return ctx.branch() not in childbranches
             raise UnknownItem(item)
-        if custom.has_key('data') and not kargs.get('usepreset', False):
+        if 'data' in custom and not kargs.get('usepreset', False):
             try:
                 return custom['data'](widget, item, ctx)
             except UnknownItem:
@@ -329,7 +329,7 @@ class SummaryInfo(object):
                 return self.LABELS[item]
             except KeyError:
                 raise UnknownItem(item)
-        if custom.has_key('label') and not kargs.get('usepreset', False):
+        if 'label' in custom and not kargs.get('usepreset', False):
             try:
                 return custom['label'](widget, item)
             except UnknownItem:
@@ -372,7 +372,7 @@ class SummaryInfo(object):
         value = self.get_data(item, *args)
         if value is None:
             return None
-        if custom.has_key('markup') and not kargs.get('usepreset', False):
+        if 'markup' in custom and not kargs.get('usepreset', False):
             try:
                 return custom['markup'](widget, item, value)
             except UnknownItem:
@@ -397,7 +397,7 @@ class SummaryInfo(object):
         markups = self.get_markup(item, *args)
         if not markups:
             return None
-        if custom.has_key('widget') and not kargs.get('usepreset', False):
+        if 'widget' in custom and not kargs.get('usepreset', False):
             try:
                 return custom['widget'](widget, item, markups)
             except UnknownItem:
