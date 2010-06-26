@@ -103,8 +103,8 @@ class HTMLDelegate(QStyledItemDelegate):
         doc = QTextDocument()
         painter.save()
         doc.setHtml(text)
+        painter.setClipRect(option.rect)
         painter.translate(option.rect.topLeft())
-        painter.setClipRect(option.rect.translated(-option.rect.topLeft()))
         doc.drawContents(painter)
         painter.restore()
 
