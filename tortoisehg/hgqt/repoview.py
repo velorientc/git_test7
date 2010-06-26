@@ -65,12 +65,9 @@ class GotoQuickBar(QuickBar):
         self.entry.setCompleter(None)
 
 class HgRepoView(QTableView):
-    """
-    A QTableView for displaying a HgRepoListModel,
-    with actions, shortcuts, etc.
-    """
-    def __init__(self, parent=None):
+    def __init__(self, workbench, parent=None):
         QTableView.__init__(self, parent)
+        self.workbench = workbench
         self.init_variables()
         self.setShowGrid(False)
 
@@ -107,13 +104,7 @@ class HgRepoView(QTableView):
         connect(tb, SIGNAL('goto'), self.goto)
 
     def _action_defs(self):
-        a = [('back', _('Back'), 'back', None,
-              QKeySequence(QKeySequence.Back),
-              self.back),
-             ('forward', _('Forward'), 'forward', None,
-              QKeySequence(QKeySequence.Forward),
-              self.forward),
-             ('manifest', _('Show at rev...'), None,
+        a = [('manifest', _('Show at rev...'), None,
               _('Show the manifest at selected revision'), None,
               self.showAtRev),
              ('update', _('Update...'), 'update', None, None,
@@ -133,6 +124,8 @@ class HgRepoView(QTableView):
 
     def createActions(self):
         self._actions = {}
+        self._actions['back'] = self.workbench.actionBack
+        self._actions['forward'] = self.workbench.actionForward
         for name, desc, icon, tip, key, cb in self._action_defs():
             self._actions[name] = QAction(desc, self)
         QTimer.singleShot(0, self.configureActions)

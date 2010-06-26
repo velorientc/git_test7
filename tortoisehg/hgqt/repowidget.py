@@ -67,7 +67,7 @@ class RepoWidget(QWidget):
         self.hbox.setSpacing(0)
         self.hbox.setMargin(0)
 
-        self.repoview = HgRepoView()
+        self.repoview = HgRepoView(self.workbench)
         self.hbox.addWidget(self.repoview)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
