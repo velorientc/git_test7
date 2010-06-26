@@ -188,7 +188,7 @@ class Workbench(QMainWindow):
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
         self.actionOpen_repository = a = QAction(_("&Open Repository"), self)
-        a.setShortcut("Ctrl+O")
+        a.setShortcut(QKeySequence.Open)
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
         a.setShortcut(QKeySequence.Refresh)
