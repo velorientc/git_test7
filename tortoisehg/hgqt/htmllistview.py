@@ -107,7 +107,11 @@ class HTMLDelegate(QStyledItemDelegate):
         painter.translate(QPointF(
             option.rect.left(),
             option.rect.top() + (option.rect.height() - doc.size().height()) / 2))
-        doc.drawContents(painter)
+        ctx = QAbstractTextDocumentLayout.PaintContext()
+        if option.state & QStyle.State_Selected:
+            ctx.palette.setColor(QPalette.Text,
+                                 option.palette.color(QPalette.HighlightedText))
+        doc.documentLayout().draw(painter, ctx)
         painter.restore()
 
     def sizeHint(self, option, index):
