@@ -97,14 +97,14 @@ class HTMLDelegate(QStyledItemDelegate):
 
         # draw selection
         option = QStyleOptionViewItemV4(option)
-        self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter) 
+        self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter)
 
         # draw text
         doc = QTextDocument()
         painter.save()
         doc.setHtml(text)
-        painter.translate(option.rect.topLeft());
-        painter.setClipRect(option.rect.translated(-option.rect.topLeft()))   
+        painter.translate(option.rect.topLeft())
+        painter.setClipRect(option.rect.translated(-option.rect.topLeft()))
         doc.drawContents(painter)
         painter.restore()
 
