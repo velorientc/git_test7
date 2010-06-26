@@ -316,6 +316,7 @@ def qtrun(dlgfunc, ui, *args, **opts):
     mainapp.setApplicationVersion(thgversion.version())
     qtlib.setup_font_substitutions()
     mainapp.setStyleSheet(qtlib.appstylesheet)
+    mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
     try:
         dlg = dlgfunc(ui, *args, **opts)
         if dlg:
