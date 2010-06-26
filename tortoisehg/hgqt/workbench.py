@@ -203,11 +203,13 @@ class Workbench(QMainWindow):
         self.actionHelp = QAction(_("Help"), self)
 
         self.actionBack = a = QAction(_("Back"), self)
+        a.setEnabled(False)
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/back.svg"), QIcon.Normal, QIcon.Off)
         a.setIcon(icon)
 
         self.actionForward = a = QAction(_("Forward"), self)
+        a.setEnabled(False)
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/forward.svg"), QIcon.Normal, QIcon.Off)
         a.setIcon(icon)
