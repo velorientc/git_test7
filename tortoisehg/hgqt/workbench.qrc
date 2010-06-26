@@ -35,5 +35,6 @@
     <file>icons/merge.svg</file>
     <file>icons/rename.svg</file>
     <file>icons/commit.svg</file>
+    <file>icons/fonts.svg</file>
   </qresource>
 </RCC>

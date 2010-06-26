@@ -469,8 +469,7 @@ INFO = (
         ' Default: False')),
     )),
 
-({'name': 'fonts', 'label': _('Fonts'),
-  'icon': QStyle.SP_DesktopIcon}, ( # crap icon, I know
+({'name': 'fonts', 'label': _('Fonts'), 'icon': 'fonts'}, (
     (_('Message Font'), 'tortoisehg.fontcomment', genFontEdit,
         _('Font used to display commit messages. Default: monospace 10')),
     (_('Diff Font'), 'tortoisehg.fontdiff', genFontEdit,
