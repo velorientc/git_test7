@@ -50,9 +50,9 @@ class InitDialog(QDialog):
 
         # buttons
         self.init_btn = QPushButton(_('Create'))
+        self.init_btn.setDefault(True)
         self.close_btn = QPushButton(_('&Close'))
-        self.close_btn.setDefault(True)
-        self.close_btn.setFocus()
+        self.close_btn.setAutoDefault(False)
         self.hbox = QHBoxLayout()
         self.hbox.addStretch(0)
         self.hbox.addWidget(self.init_btn)
