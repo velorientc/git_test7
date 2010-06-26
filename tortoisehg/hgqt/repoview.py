@@ -285,6 +285,13 @@ class HgRepoView(QTableView):
         self.emit(SIGNAL('revisionSelected'), rev)
         self.set_navigation_button_state()
 
+        # disable most actions if rev is the working copy revision
+        enable = rev is not None
+        exclude = ('back', 'forward')
+        for name in self._actions:
+            if name not in exclude:
+                self._actions[name].setEnabled(enable)
+
     def gotoAncestor(self, index):
         rev = self.revFromindex(index)
         if rev is not None and self.current_rev is not None:
