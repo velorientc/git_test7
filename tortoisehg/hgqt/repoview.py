@@ -183,7 +183,7 @@ class HgRepoView(QTableView):
 
     def init_variables(self):
         # member variables
-        self.current_rev = None
+        self.current_rev = -1
         # rev navigation history (manage 'back' action)
         self._rev_history = []
         self._rev_pos = -1
@@ -269,24 +269,21 @@ class HgRepoView(QTableView):
             self.emit(SIGNAL('revisionActivated'), rev)
 
     def revisionSelected(self, index, index_from):
-        """
-        Callback called when a revision is selected in the revisions table
-        """
         rev = self.revFromindex(index)
-        if True:#rev is not None:
-            model = self.model()
-            if self.current_rev is not None and self.current_rev == rev:
-                return
-            if not self._in_history:
-                del self._rev_history[self._rev_pos+1:]
-                self._rev_history.append(rev)
-                self._rev_pos = len(self._rev_history)-1
 
-            self._in_history = False
-            self.current_rev = rev
+        if self.current_rev == rev:
+            return
 
-            self.emit(SIGNAL('revisionSelected'), rev)
-            self.set_navigation_button_state()
+        if not self._in_history:
+            del self._rev_history[self._rev_pos+1:]
+            self._rev_history.append(rev)
+            self._rev_pos = len(self._rev_history)-1
+
+        self._in_history = False
+        self.current_rev = rev
+
+        self.emit(SIGNAL('revisionSelected'), rev)
+        self.set_navigation_button_state()
 
     def gotoAncestor(self, index):
         rev = self.revFromindex(index)
