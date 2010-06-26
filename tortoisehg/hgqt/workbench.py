@@ -191,7 +191,7 @@ class Workbench(QMainWindow):
         a.setShortcut("Ctrl+O")
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
-        a.setShortcut("Ctrl+R")
+        a.setShortcut(QKeySequence.Refresh)
 
         self.actionQuit = a = QAction(_("E&xit"), self)
         a.setShortcut("None")
