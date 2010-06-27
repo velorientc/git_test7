@@ -305,12 +305,8 @@ class Workbench(QMainWindow):
         self.setupBranchCombo()
 
         w = self.repoTabsWidget.currentWidget()
-        mode = 'diff'
-        ann = False
         tags = []
         if w:
-            mode = w.getMode()
-            ann = w.getAnnotate()
             tags = w.repo.tags().keys()
             self.currentRepoRoot = root = w.repo.root
             ti = self.taskTabsWidget.currentIndex()
@@ -333,9 +329,10 @@ class Workbench(QMainWindow):
             self.currentRepoRoot = ''
             self.repotabs_splitter.hide()
 
-        self.actionDiffMode.setEnabled(w is not None)
-        self.actionDiffMode.setChecked(mode == 'diff')
-        self.actionAnnMode.setChecked(ann)
+            self.actionDiffMode.setEnabled(False)
+            self.actionAnnMode.setEnabled(False)
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
 
     def taskTabChanged(self, index):
         if index == self.commitTabIndex:
@@ -603,9 +600,6 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.setMode(mode)
-        self.actionAnnMode.setEnabled(not mode)
-        self.actionNextDiff.setEnabled(not mode)
-        self.actionPrevDiff.setEnabled(not mode)
 
     def setAnnotate(self, ann):
         w = self.repoTabsWidget.currentWidget()

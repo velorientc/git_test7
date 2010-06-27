@@ -133,6 +133,7 @@ class RepoWidget(QWidget):
 
     def setMode(self, mode):
         self.revDetailsWidget.setMode(mode)
+        self.updateActions()
 
     def getMode(self):
         return self.revDetailsWidget.getMode()
@@ -264,6 +265,7 @@ class RepoWidget(QWidget):
             self.revDetailsWidget.revision_selected(rev)
             self.workbench.revisionSelected()
         self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
+        self.updateActions()
 
     def goto(self, rev):
         rev = str(rev)
@@ -320,6 +322,19 @@ class RepoWidget(QWidget):
 
     def switchedTo(self):
         self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
+        self.updateActions()
+
+    def updateActions(self):
+        mode = self.getMode()
+        ann = self.getAnnotate()
+        wb = self.workbench
+        enable = self.repoview.current_rev is not None
+        wb.actionDiffMode.setEnabled(enable)
+        wb.actionDiffMode.setChecked(mode == 'diff')
+        wb.actionAnnMode.setChecked(ann)
+        wb.actionAnnMode.setEnabled(enable and mode != 'diff')
+        wb.actionNextDiff.setEnabled(enable and mode != 'diff')
+        wb.actionPrevDiff.setEnabled(enable and mode != 'diff')
         self.repoview.updateActions()
 
     def storeSettings(self):
