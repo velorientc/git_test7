@@ -79,7 +79,7 @@ class CommitWidget(QWidget):
 
         def addrow(s, w):
             form.addRow("<b>%s</b>" % s, w)
-        addrow(('Changeset:'), w)
+        addrow(_('Changeset:'), w)
         for ctx in repo.parents():
             desc = format_desc(ctx.description(), 80)
             fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
