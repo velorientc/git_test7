@@ -320,7 +320,7 @@ class RepoWidget(QWidget):
 
     def switchedTo(self):
         self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
-        self.repoview.updateNavigationActions()
+        self.repoview.updateActions()
 
     def storeSettings(self):
         self.revDetailsWidget.storeSettings()
