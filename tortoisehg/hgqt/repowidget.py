@@ -138,9 +138,6 @@ class RepoWidget(QWidget):
     def setAnnotate(self, ann):
         self.revDetailsWidget.setAnnotate(ann)
 
-    def getAnnotate(self):
-        return self.revDetailsWidget.getAnnotate()
-
     def nextDiff(self):
         self.revDetailsWidget.nextDiff()
 
@@ -323,11 +320,11 @@ class RepoWidget(QWidget):
 
     def updateActions(self):
         mode = self.revDetailsWidget.getMode()
-        ann = self.getAnnotate()
         wb = self.workbench
         enable = self.repoview.current_rev is not None
         wb.actionDiffMode.setEnabled(enable)
         wb.actionDiffMode.setChecked(mode == 'diff')
+        ann = self.revDetailsWidget.getAnnotate()
         wb.actionAnnMode.setChecked(ann)
         wb.actionAnnMode.setEnabled(enable and mode != 'diff')
         wb.actionNextDiff.setEnabled(enable and mode != 'diff')
