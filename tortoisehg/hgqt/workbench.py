@@ -472,9 +472,10 @@ class Workbench(QMainWindow):
 
         # diff mode toolbar
         self.toolBar_diff.addAction(self.actionDiffMode)
-        self.toolBar_diff.addAction(self.actionAnnMode)
         self.toolBar_diff.addAction(self.actionNextDiff)
         self.toolBar_diff.addAction(self.actionPrevDiff)
+        self.toolBar_diff.addSeparator()
+        self.toolBar_diff.addAction(self.actionAnnMode)
 
     def createActions(self):
         # main window actions (from .ui file)
