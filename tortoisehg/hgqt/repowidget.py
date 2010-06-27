@@ -135,9 +135,6 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.setMode(mode)
         self.updateActions()
 
-    def getMode(self):
-        return self.revDetailsWidget.getMode()
-
     def setAnnotate(self, ann):
         self.revDetailsWidget.setAnnotate(ann)
 
@@ -325,7 +322,7 @@ class RepoWidget(QWidget):
         self.updateActions()
 
     def updateActions(self):
-        mode = self.getMode()
+        mode = self.revDetailsWidget.getMode()
         ann = self.getAnnotate()
         wb = self.workbench
         enable = self.repoview.current_rev is not None
