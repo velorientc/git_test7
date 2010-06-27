@@ -139,7 +139,8 @@ def geticon(name):
     """
     # TODO: icons should be placed at single location before release
     def findicon(name):
-        for pfx in (':/icons', paths.get_icon_path()):
+        for pfx in (':/icons', os.path.join(paths.get_icon_path(), 'svg'),
+                    paths.get_icon_path()):
             for ext in ('svg', 'png', 'ico'):
                 path = '%s/%s.%s' % (pfx, name, ext)
                 if QFile.exists(path):
