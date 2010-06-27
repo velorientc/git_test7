@@ -276,7 +276,7 @@ class HgRepoView(QTableView):
         self.current_rev = rev
 
         self.emit(SIGNAL('revisionSelected'), rev)
-        self.set_navigation_button_state()
+        self.updateNavigationActions()
 
         # disable most actions if rev is the working copy revision
         enable = rev is not None
@@ -296,7 +296,7 @@ class HgRepoView(QTableView):
                       "Goto ancestor of %s and %s"%(ctx.rev(), ctx2.rev()), 2000)
             self.goto(ancestor.rev())
 
-    def set_navigation_button_state(self):
+    def updateNavigationActions(self):
         if len(self._rev_history) > 0:
             back = self._rev_pos > 0
             forw = self._rev_pos < len(self._rev_history)-1
@@ -313,7 +313,7 @@ class HgRepoView(QTableView):
             if idx is not None:
                 self._in_history = True
                 self.setCurrentIndex(idx)
-        self.set_navigation_button_state()
+        self.updateNavigationActions()
 
     def forward(self):
         if self._rev_history and self._rev_pos<(len(self._rev_history)-1):
@@ -322,7 +322,7 @@ class HgRepoView(QTableView):
             if idx is not None:
                 self._in_history = True
                 self.setCurrentIndex(idx)
-        self.set_navigation_button_state()
+        self.updateNavigationActions()
 
     def goto(self, rev):
         """
