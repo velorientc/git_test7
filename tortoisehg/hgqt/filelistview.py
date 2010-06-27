@@ -21,7 +21,6 @@ SIGNAL = QtCore.SIGNAL
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 
 
 class HgFileListView(QtGui.QTableView):
@@ -44,9 +43,6 @@ class HgFileListView(QtGui.QTableView):
 
         connect(self.horizontalHeader(), SIGNAL('sectionDoubleClicked(int)'),
                 self.toggleFullFileList)
-        connect(self,
-                SIGNAL('doubleClicked (const QModelIndex &)'),
-                self.fileActivated)
 
         connect(self.horizontalHeader(),
                 SIGNAL('sectionResized(int, int, int)'),
@@ -77,45 +73,11 @@ class HgFileListView(QtGui.QTableView):
     def selectFile(self, filename):
         self.setCurrentIndex(self.model().indexFromFile(filename))
 
-    def fileActivated(self, index, alternate=False):
-        sel_file = self.model().fileFromIndex(index)
-        if alternate:
-            self.navigate(sel_file)
-        else:
-            self.diffNavigate(sel_file)
-
     def toggleFullFileList(self, *args):
         self.model().toggleFullFileList()
 
-    def navigate(self, filename=None):
-        self._navigate(filename, FileLogDialog, self._nav_dialogs)
-
-    def diffNavigate(self, filename=None):
-        self._navigate(filename, FileDiffDialog, self._diff_dialogs)
-
-    def _navigate(self, filename, dlgclass, dlgdict):
-        if filename is None:
-            filename = self.currentFile()
-        model = self.model()
-        if filename is not None and len(model.repo.file(filename))>0:
-            if filename not in dlgdict:
-                dlg = dlgclass(model.repo, filename,
-                               repoviewer=self.window())
-                dlgdict[filename] = dlg
-                
-                dlg.setWindowTitle(_('Hg file log viewer - %s') % filename)
-            dlg = dlgdict[filename] 
-            dlg.goto(model.current_ctx.rev())
-            dlg.show()
-            dlg.raise_()
-            dlg.activateWindow()
-
     def _action_defs(self):
-        a = [('navigate', _('File history'), None, _('Show the history of '
-              'the selected file'), None, self.navigate),
-             ('diffnavigate', _('Compare file revisions'), None, _('Compare '
-              'revisions of the selected file'), None, self.diffNavigate),
-             ]
+        a = []
         return a
 
     def createActions(self):
@@ -135,7 +97,7 @@ class HgFileListView(QtGui.QTableView):
 
     def contextMenuEvent(self, event):
         menu = QtGui.QMenu(self)
-        for act in ['navigate', 'diffnavigate']:
+        for act in []:
             if act:
                 menu.addAction(self._actions[act])
             else:
