@@ -88,12 +88,9 @@ class CommitWidget(QWidget):
             lbl.minimumSizeHint = lambda: QSize(0, 0)
             addrow(_('Parent:'), lbl)
         addrow(_('User:'), usercombo)
-        frame = QFrame()
-        frame.setLayout(form)
-        frame.setFrameStyle(QFrame.NoFrame)
 
         vbox = QVBoxLayout()
-        vbox.addWidget(frame, 0)
+        vbox.addLayout(form, 0)
         vbox.setMargin(0)
         hbox = QHBoxLayout()
 
