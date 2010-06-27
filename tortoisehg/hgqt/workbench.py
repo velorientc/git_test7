@@ -162,16 +162,16 @@ class Workbench(QMainWindow):
         tt.setTabPosition(QTabWidget.East)
         self.revDetailsStackedWidget = sw = QStackedWidget()
         sw.minimumSizeHint = lambda: QSize(0, 0)
-        index = tt.addTab(sw, geticon('log'), '')
-        tt.setTabToolTip(index, _("Revision details"))
+        self.logTabIndex = idx = tt.addTab(sw, geticon('log'), '')
+        tt.setTabToolTip(idx, _("Revision details"))
         self.commitStackedWidget = sw = QStackedWidget()
         sw.minimumSizeHint = lambda: QSize(0, 0)
-        index = tt.addTab(sw, geticon('commit'), '')
-        tt.setTabToolTip(index, _("Commit"))
+        self.commitTabIndex = idx = tt.addTab(sw, geticon('commit'), '')
+        tt.setTabToolTip(idx, _("Commit"))
         self.syncStackedWidget = sw = QStackedWidget()
         sw.minimumSizeHint = lambda: QSize(0, 0)
-        index = tt.addTab(sw, geticon('sync'), '')
-        tt.setTabToolTip(index, _("Synchronize"))
+        self.syncTabIndex = idx = tt.addTab(sw, geticon('sync'), '')
+        tt.setTabToolTip(idx, _("Synchronize"))
 
         self.setCentralWidget(self.centralwidget)
 
@@ -314,13 +314,13 @@ class Workbench(QMainWindow):
             tags = w.repo.tags().keys()
             self.currentRepoRoot = root = w.repo.root
             ti = self.taskTabsWidget.currentIndex()
-            if ti == 1:
+            if ti == self.commitTabIndex:
                 cw = self.getCommitWidget(root)
                 if cw:
                     self.commitStackedWidget.setCurrentWidget(cw)
                 else:
                     self.taskTabsWidget.setCurrentIndex(0)
-            elif ti == 2:
+            elif ti == self.syncTabIndex:
                 sw = self.getSyncWidget(root)
                 if sw:
                     self.syncStackedWidget.setCurrentWidget(sw)
@@ -337,10 +337,10 @@ class Workbench(QMainWindow):
         self.actionDiffMode.setChecked(mode == 'diff')
         self.actionAnnMode.setChecked(ann)
 
-    def taskTabChanged(self, index=0):
-        if index == 1:
+    def taskTabChanged(self, index):
+        if index == self.commitTabIndex:
             self.workingCopySelected()
-        elif index == 2:
+        elif index == self.syncTabIndex:
             sw = self.createSyncWidget(self.currentRepoRoot)
             self.syncStackedWidget.setCurrentWidget(sw)
 
