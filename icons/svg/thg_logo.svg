@@ -465,31 +465,6 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Bitmaps"
-     style="opacity:1;display:none"
-     transform="translate(-89.535713,-215.00437)">
-    <image
-       style="display:inline"
-       y="203.93361"
-       x="93.178574"
-       id="image2225"
-       height="64"
-       width="84"
-       sodipodi:absref="C:\Documents and Settings\Peer\Skrivebord\tortoise.png"
-       xlink:href="tortoise.png" />
-    <image
-       style="display:inline"
-       xlink:href="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\TortoiseCVS.png"
-       sodipodi:absref="E:\Documents and Settings\Peer\Dokumenter\Billeder\THG\TortoiseCVS.png"
-       width="88.785721"
-       height="51.071426"
-       id="image3489"
-       x="90.996773"
-       y="209.09836" />
-  </g>
-  <g
      inkscape:label="Vector tortoise"
      inkscape:groupmode="layer"
      id="layer1"
