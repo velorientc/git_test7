@@ -194,7 +194,7 @@ class Workbench(QMainWindow):
         a.setShortcut(QKeySequence.Refresh)
 
         self.actionQuit = a = QAction(_("E&xit"), self)
-        a.setShortcut("None")
+        a.setShortcut(QKeySequence.Quit)
         a.setIconText(_("Exit"))
         a.setToolTip(_("Exit"))
 
