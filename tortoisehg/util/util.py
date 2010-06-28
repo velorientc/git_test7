@@ -13,19 +13,6 @@ import string
 
 from tortoisehg.util import hglib
 
-def tounicode(string):
-    """
-    Tries to convert s into a unicode string
-    """
-    for encoding in ('utf-8', 'iso-8859-15', 'cp1252'):
-        try:
-            return unicode(string, encoding)
-        except UnicodeDecodeError:
-            pass
-    return unicode(string, 'utf-8', 'replace')
-        
-    return "x" in filectx.flags()
-    
 def exec_flag_changed(filectx):
     """
     Return 'set' or 'unset' on change, or '' if unchanged
