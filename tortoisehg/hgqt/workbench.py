@@ -236,7 +236,7 @@ class Workbench(QMainWindow):
         m.addAction(self.actionHelp)
         m.addAction(self.actionAbout)
 
-        self.menuView = m = QMenu(_("View"), self.menubar)
+        self.menuView = m = QMenu(_("&View"), self.menubar)
         m.addAction(self.actionShowRepoRegistry)
         m.addAction(self.actionShowPaths)
         m.addSeparator()
