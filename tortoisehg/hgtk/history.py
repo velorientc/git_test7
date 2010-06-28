@@ -762,7 +762,7 @@ class GLog(gdialog.GWindow):
         ret = True
         if not text:
             return False
-        elif mode == 0:
+        elif mode == MODE_REVRANGE:
             try:
                 func = revset.match(text)
                 func(self.repo, range(0, 1))
@@ -777,7 +777,7 @@ class GLog(gdialog.GWindow):
             except Exception, e:
                 gdialog.Prompt(_('Invalid revision set'), str(e), self).run()
                 return False
-        elif mode == 3:
+        elif mode == MODE_DATE:
             try:
                 util.matchdate(text)
             except (ValueError, util.Abort), e:
