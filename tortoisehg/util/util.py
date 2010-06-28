@@ -11,6 +11,8 @@ Several helper functions
 import os
 import string
 
+from tortoisehg.util import hglib
+
 def tounicode(string):
     """
     Tries to convert s into a unicode string
@@ -78,7 +80,7 @@ def format_desc(desc, width):
     Helper function to format a ctx description for oneliner
     representation (summary view)
     """
-    desc = xml_escape(tounicode(desc).split('\n', 1)[0])
+    desc = xml_escape(hglib.tounicode(desc).split('\n', 1)[0])
     if len(desc) > width:
         desc = desc[:width] + '...'
     return desc

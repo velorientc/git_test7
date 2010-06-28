@@ -19,7 +19,8 @@ import re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from tortoisehg.util.util import xml_escape, tounicode
+from tortoisehg.util.util import xml_escape
+from tortoisehg.util.hglib import tounicode
 
 from tortoisehg.hgqt.i18n import _
 
