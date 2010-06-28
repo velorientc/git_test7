@@ -590,12 +590,13 @@ class Workbench(QMainWindow):
         path = FD.getExistingDirectory(parent=self, caption=caption,
             options=FD.ShowDirsOnly | FD.ReadOnly)
         path = str(path)
-        try:
-            repo = hg.repository(self.ui, path=path)
-            self.addRepoTab(repo)
-        except RepoError:
-            QMessageBox.warning(self, _('Failed to open repository'), 
-                _('%s is not a valid repository') % path)
+        if path:
+            try:
+                repo = hg.repository(self.ui, path=path)
+                self.addRepoTab(repo)
+            except RepoError:
+                QMessageBox.warning(self, _('Failed to open repository'),
+                    _('%s is not a valid repository') % path)
 
     def setMode(self, mode):
         w = self.repoTabsWidget.currentWidget()
