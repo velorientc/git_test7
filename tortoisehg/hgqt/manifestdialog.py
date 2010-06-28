@@ -27,7 +27,7 @@ from mercurial.revlog import LookupError
 from PyQt4 import QtGui, QtCore, Qsci
 from PyQt4.QtCore import Qt, QSettings
 
-from tortoisehg.util.util import tounicode
+from tortoisehg.util.hglib import tounicode
 
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.manifestmodel import ManifestModel
