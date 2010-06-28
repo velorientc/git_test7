@@ -79,6 +79,7 @@ class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
         sci.setMarginWidth(1, '000')
         sci.setReadOnly(True)
         sci.setFont(self._font)
+        sci.setUtf8(True)
 
         sci.SendScintilla(sci.SCI_SETSELEOLFILLED, True)
         self.textView = sci

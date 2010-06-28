@@ -118,6 +118,7 @@ class HgFileView(QtGui.QFrame):
         l.addWidget(self.sci, 1)
         self.sci.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.sci.setReadOnly(True)
+        self.sci.setUtf8(True)
 
         self.sci.SendScintilla(qsci.SCI_SETCARETSTYLE, 0)
 
