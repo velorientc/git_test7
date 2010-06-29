@@ -430,11 +430,16 @@ class HgRepoListModel(QAbstractTableModel):
         return rev in self.wd_revs
     
     def getlog(self, ctx, gnode):
-        # TODO: add branch name / bookmark 
+        # TODO: add bookmark
         if ctx.rev() is None:
             return '**  ' + _('Working copy changes') + '  **'
         
         parts = []
+        if ctx in [self.repo[x] for x in self.repo.branchmap()]:
+            effects = qtlib.geteffect('log.branch')
+            text = qtlib.applyeffects(' %s ' % ctx.branch(), effects)
+            parts.append(text)
+
         for tag in (hglib.getctxtags(ctx) or []):
             style = tag in self.mqueues and 'log.patch' or 'log.tag'
             effects = qtlib.geteffect(style)
