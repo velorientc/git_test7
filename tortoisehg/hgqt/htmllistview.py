@@ -109,8 +109,13 @@ class HTMLDelegate(QStyledItemDelegate):
             option.rect.top() + (option.rect.height() - doc.size().height()) / 2))
         ctx = QAbstractTextDocumentLayout.PaintContext()
         if option.state & QStyle.State_Selected:
+            if state & QStyle.State_Active:
+                colgroup = QPalette.Active
+            else:
+                colgroup = QPalette.Inactive
             ctx.palette.setColor(QPalette.Text,
-                                 option.palette.color(QPalette.HighlightedText))
+                                 option.palette.color(colgroup,
+                                                      QPalette.HighlightedText))
         doc.documentLayout().draw(painter, ctx)
         painter.restore()
 
