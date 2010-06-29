@@ -192,7 +192,7 @@ class GLog(gdialog.GWindow):
         self.outgoing = []
         self.useproxy = None
         self.revrange = None
-        self.forcepush = False
+        self.forcesync = False
         self.newbranch = False
         self.bundle_autoreject = False
         self.runner = hgcmd.CmdRunner()
@@ -298,7 +298,7 @@ class GLog(gdialog.GWindow):
         def toggle_proxy(menuitem):
             self.useproxy = menuitem.get_active()
         def toggle_force(menuitem):
-            self.forcepush = menuitem.get_active()
+            self.forcesync = menuitem.get_active()
         def toggle_newbranch(menuitem):
             self.newbranch = menuitem.get_active()
         def refresh(menuitem, resetmarks):
@@ -466,7 +466,7 @@ class GLog(gdialog.GWindow):
             dict(text='----'),
             dict(text=_('Use proxy server'), name='use-proxy-server',
                 ascheck=True, func=toggle_proxy),
-            dict(text=_('Force push'), ascheck=True, func=toggle_force),
+            dict(text=_('Force pull or push'), ascheck=True, func=toggle_force),
             dict(text=_('Push new branch'), ascheck=True,
                 func=toggle_newbranch),
             ]),
@@ -1826,7 +1826,10 @@ class GLog(gdialog.GWindow):
             bfile = bfile.replace(badchar, '')
         bfile = bfile.replace('/', '_')
         bfile = os.path.join(self.bundledir, bfile) + '.hg'
-        cmdline = ['hg', 'incoming', '--bundle', bfile]
+        cmdline = ['hg', 'incoming']
+        if self.forcesync:
+            cmdline += ['--force']
+        cmdline += ['--bundle', bfile]
         cmdline += self.get_proxy_args()
         cmdline += [hglib.validate_synch_path(path, self.repo)]
 
@@ -1985,11 +1988,14 @@ class GLog(gdialog.GWindow):
                            self).run()
             self.pathentry.grab_focus()
             return
+        cmd = ['hg', 'outgoing']
+        if self.forcesync:
+            cmd += ['--force']
         if path.startswith('p4://'):
             # hg out -q p4://server/client output hashes (thanks Frank)
-            cmd = ['hg', 'outgoing', '--quiet', path]
+            cmd += ['--quiet', path]
         else:
-            cmd = ['hg', 'outgoing', '--quiet', '--template', '{node}\n']
+            cmd += ['--quiet', '--template', '{node}\n']
             cmd += self.get_proxy_args()
             cmd += [hglib.validate_synch_path(path, self.repo)] 
 
@@ -2035,7 +2041,7 @@ class GLog(gdialog.GWindow):
             return
 
         cmdline = ['hg', 'push'] + self.get_proxy_args()
-        if self.forcepush:
+        if self.forcesync:
             cmdline += ['--force']
         elif self.newbranch:
             cmdline += ['--new-branch']
@@ -2599,7 +2605,7 @@ class GLog(gdialog.GWindow):
         else:
             confirm_push = False
             if not hg.islocal(remote_path):
-                if self.forcepush:
+                if self.forcesync:
                     title = _('Confirm Forced Push to Remote Repository')
                     text = _('Forced push to remote repository\n%s\n'
                              '(creating new heads in remote if needed)?') % original_path
@@ -2615,7 +2621,7 @@ class GLog(gdialog.GWindow):
                     text = _('Push to remote repository\n%s\n?') % original_path
                     buttontext = _('&Push')
                     confirm_push = True
-            elif self.forcepush:
+            elif self.forcesync:
                 title = _('Confirm Forced Push')
                 text = _('Forced push to repository\n%s\n'
                          '(creating new heads if needed)?') % original_path
@@ -2646,7 +2652,7 @@ class GLog(gdialog.GWindow):
             cmdline = ['hg', 'push', '--new-branch', '--branch', branch]
         else:
             cmdline = ['hg', 'push', '--rev', rev]
-            if self.forcepush:
+            if self.forcesync:
                 cmdline += ['--force']
             elif self.newbranch:
                 cmdline += ['--new-branch']
@@ -2690,7 +2696,10 @@ class GLog(gdialog.GWindow):
 
     def pull_to(self, menuitem):
         rev = str(self.currevid)
-        cmdline = ['hg', 'pull', '--rev', rev, '--', self.bfile]
+        cmdline = ['hg', 'pull']
+        if self.forcesync:
+            cmdline += ['--force']
+        cmdline += ['--rev', rev, '--', self.bfile]
 
         def callback(return_code, *args):
             if return_code == 0:
