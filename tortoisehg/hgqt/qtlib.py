@@ -43,9 +43,9 @@ _effects = {
 
 _thgstyles = {
    # Styles defined by TortoiseHg
-   'log.branch': '#aaffaa_background',
-   'log.patch': '#aaddff_background',
-   'log.tag': '#ffffaa_background',
+   'log.branch': 'black #aaffaa_background',
+   'log.patch': 'black #aaddff_background',
+   'log.tag': 'black #ffffaa_background',
    'ui.error': 'red bold',
    'control': 'black bold',
 }
