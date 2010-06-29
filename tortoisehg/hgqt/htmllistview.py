@@ -109,7 +109,7 @@ class HTMLDelegate(QStyledItemDelegate):
             option.rect.top() + (option.rect.height() - doc.size().height()) / 2))
         ctx = QAbstractTextDocumentLayout.PaintContext()
         if option.state & QStyle.State_Selected:
-            if state & QStyle.State_Active:
+            if option.state & QStyle.State_Active:
                 colgroup = QPalette.Active
             else:
                 colgroup = QPalette.Inactive
