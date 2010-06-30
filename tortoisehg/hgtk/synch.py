@@ -37,12 +37,6 @@ class SynchDialog(gtk.Window):
         self.last_drop_time = None
         self.lastcmd = []
 
-        # Replace stdout file descriptor with our own pipe
-        self.oldstdout = os.dup(sys.__stdout__.fileno())
-        self.stdoutq = Queue.Queue()
-        self.readfd, writefd = os.pipe()
-        os.dup2(writefd, sys.__stdout__.fileno())
-
         # persistent app data
         self._settings = settings.Settings('synch')
         self.set_default_size(655, 552)
@@ -284,8 +278,15 @@ class SynchDialog(gtk.Window):
                     self.stdoutq.put(o)
                 else:
                     break
-        thread = threading.Thread(target=pollstdout, args=[])
-        thread.start()
+        self.stdoutq = Queue.Queue()
+        if os.name == 'nt':
+            # Only capture stdout on Windows. See issue #783, #1316.
+            # Replace stdout file descriptor with our own pipe
+            self.readfd, writefd = os.pipe()
+            self.oldstdout = os.dup(sys.__stdout__.fileno())
+            os.dup2(writefd, sys.__stdout__.fileno())
+            thread = threading.Thread(target=pollstdout, args=[])
+            thread.start()
 
     def update_pull_setting(self):
         ppull = self.repo.ui.config('tortoisehg', 'postpull', 'none')
@@ -401,8 +402,9 @@ class SynchDialog(gtk.Window):
         else:
             self.update_settings()
             self._settings.write()
-            os.dup2(self.oldstdout, sys.__stdout__.fileno())
-            os.close(self.oldstdout)
+            if os.name == 'nt':
+                os.dup2(self.oldstdout, sys.__stdout__.fileno())
+                os.close(self.oldstdout)
             return False
 
     def delete(self, widget, event):
