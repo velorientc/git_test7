@@ -56,7 +56,7 @@ def cvrt_date(date):
     formatted QString
     """
     date, tzdelay = date
-    return QDateTime.fromTime_t(int(date)).toString(Qt.LocaleDate)
+    return QDateTime.fromTime_t(int(date)).toString(Qt.DefaultLocaleShortDate)
 
 def datacached(meth):
     """
