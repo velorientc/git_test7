@@ -159,7 +159,7 @@ def edit(parent, ui, repo, files, lineno=None, search=None):
                  os.environ.get('EDITOR', 'vi')
         cmdline = ' '.join([editor] + files)
     if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-        res = QtGui.QMessageBox.critical(parent,
+        res = QMessageBox.critical(parent,
                        _('No visual editor configured'),
                        _('Please configure a visual editor.'))
         from tortoisehg.hgqt.settings import SettingsDialog
@@ -172,7 +172,7 @@ def edit(parent, ui, repo, files, lineno=None, search=None):
         subprocess.Popen(cmdline, shell=True, creationflags=visdiff.openflags,
                          stderr=None, stdout=None, stdin=None)
     except (OSError, EnvironmentError), e:
-        QtGui.QMessageBox.warning(parent,
+        QMessageBox.warning(parent,
                  _('Editor launch failure'),
                  _('%s : %s') % (cmd, str(e)))
     return False
