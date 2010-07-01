@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-06-18 23:18+0000\n"
-"PO-Revision-Date: 2010-06-19 16:00+0000\n"
+"PO-Revision-Date: 2010-06-30 18:19+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-20 03:37+0000\n"
+"X-Launchpad-Export-Date: 2010-07-01 03:49+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: TortoiseHgOverlayServer.py:36
@@ -1177,11 +1177,11 @@ msgstr "_Anotar Pai"
 
 #: tortoisehg\hgtk\datamine.py:176
 msgid "_Annotate First Parent"
-msgstr ""
+msgstr "_Anotar Primeiro Pai"
 
 #: tortoisehg\hgtk\datamine.py:178
 msgid "Annotate Second Parent"
-msgstr ""
+msgstr "Anotar Segundo Pai"
 
 #: tortoisehg\hgtk\datamine.py:182
 msgid "_Diff to Local"
@@ -1368,7 +1368,7 @@ msgstr " Abortado"
 
 #: tortoisehg\hgtk\gdialog.py:586 tortoisehg\hgtk\status.py:168
 msgid ", please refresh"
-msgstr ""
+msgstr ", por favor releia o repositório"
 
 #: tortoisehg\hgtk\gdialog.py:597
 msgid " Messages and Errors"
@@ -2353,11 +2353,11 @@ msgstr "Remove marcações das revisões"
 
 #: tortoisehg\hgtk\history.py:266 tortoisehg\hgtk\history.py:385
 msgid "Patch Branch"
-msgstr ""
+msgstr "Ramo de Patches"
 
 #: tortoisehg\hgtk\history.py:268
 msgid "Show/Hide Patch Branch"
-msgstr ""
+msgstr "Mostrar/Ocultar Ramo de Patches"
 
 #: tortoisehg\hgtk\history.py:281
 msgid "Launch commit tool"
@@ -2505,7 +2505,7 @@ msgstr "Forçar push"
 
 #: tortoisehg\hgtk\history.py:470
 msgid "Push new branch"
-msgstr ""
+msgstr "Push de novo ramo"
 
 #: tortoisehg\hgtk\history.py:474
 msgid "_Filter"
@@ -5620,23 +5620,23 @@ msgstr "Mescla todas as dependências pendentes"
 
 #: tortoisehg\hgtk\thgpbranch.py:105
 msgid "Backout current patch branch"
-msgstr ""
+msgstr "Faz o backout do ramo de patches atual"
 
 #: tortoisehg\hgtk\thgpbranch.py:111
 msgid "Backport part of a changeset to a dependency"
-msgstr ""
+msgstr "Faz o backout de parte de uma revisão para uma dependência"
 
 #: tortoisehg\hgtk\thgpbranch.py:116
 msgid "Start a new patch branch"
-msgstr ""
+msgstr "Inicia um novo ramo de patches"
 
 #: tortoisehg\hgtk\thgpbranch.py:121
 msgid "Edit patch dependency graph"
-msgstr ""
+msgstr "Edita o grafo de dependências do patch"
 
 #: tortoisehg\hgtk\thgpbranch.py:209
 msgid "St"
-msgstr ""
+msgstr "St"
 
 #: tortoisehg\hgtk\thgpbranch.py:211
 msgid "Title"
@@ -5648,35 +5648,35 @@ msgstr "Mensagem"
 
 #: tortoisehg\hgtk\thgpbranch.py:329
 msgid "pending pmerges"
-msgstr ""
+msgstr "pmerges pendentes"
 
 #: tortoisehg\hgtk\thgpbranch.py:330
 msgid "no pending pmerges"
-msgstr ""
+msgstr "sem pmerges pendentes"
 
 #: tortoisehg\hgtk\thgpbranch.py:375
 msgid "needs merge of %i heads\n"
-msgstr ""
+msgstr "é necessário mesclar %i cabeças\n"
 
 #: tortoisehg\hgtk\thgpbranch.py:378
 msgid "needs merge with %s (through %s)\n"
-msgstr ""
+msgstr "é necessário mesclar com %s (através de %s)\n"
 
 #: tortoisehg\hgtk\thgpbranch.py:381
 msgid "needs merge with %s\n"
-msgstr ""
+msgstr "é necessário mesclar com %s\n"
 
 #: tortoisehg\hgtk\thgpbranch.py:383
 msgid "needs update of diff base to tip of %s\n"
-msgstr ""
+msgstr "é necessário atualizar a base do diff com a tip de %s\n"
 
 #: tortoisehg\hgtk\thgpbranch.py:432
 msgid "New Patch Name"
-msgstr ""
+msgstr "Novo Nome de Patch"
 
 #: tortoisehg\hgtk\thgpbranch.py:488
 msgid "Pending Pmerge"
-msgstr ""
+msgstr "Pmerge Pendente"
 
 #: tortoisehg\hgtk\thgpbranch.py:489
 msgid ""
@@ -5684,30 +5684,37 @@ msgid ""
 "pmerge will solve the following issues with %(patch)s:\n"
 "* %(issuelist)s"
 msgstr ""
+"Você não pode encerrar este ramo de patch sem antes executar pmerge.\n"
+"pmerge resolverá as seguintes pendências com %(patch)s:\n"
+"* %(issuelist)s"
 
 #: tortoisehg\hgtk\thgpbranch.py:499
 msgid "Uncommitted Local Changes"
-msgstr ""
+msgstr "Mudanças Locais Não Consolidadas"
 
 #: tortoisehg\hgtk\thgpbranch.py:500
 msgid ""
 "pfinish uses your working directory for temporary work.\n"
 "Please commit your local changes before issuing pfinish."
 msgstr ""
+"pfinish usa seu diretório de trabalho como área de temporários.\n"
+"Por favor consolide suas mudanças locais antes de executar pfinish."
 
 #: tortoisehg\hgtk\thgpbranch.py:507
 msgid "Applied MQ patch"
-msgstr ""
+msgstr "Patch MQ Aplicado"
 
 #: tortoisehg\hgtk\thgpbranch.py:508
 msgid ""
 "pfinish must be able to commit, but this is not allowed\n"
 "as long as you have MQ patches applied."
 msgstr ""
+"pfinish deve ser capaz de fazer um commit, mas isso não é permitido\n"
+"enquanto houver patches MQ aplicados."
 
 #: tortoisehg\hgtk\thgpbranch.py:551
 msgid "Patch branch finished"
-msgstr ""
+msgstr "Ramo de patches encerrado"
 
 #: tortoisehg\hgtk\thgpbranch.py:650
 msgid "_new"
@@ -5747,7 +5754,7 @@ msgstr "Mostrar nome"
 
 #: tortoisehg\hgtk\thgpbranch.py:696
 msgid "Show title"
-msgstr ""
+msgstr "Mostra título"
 
 #: tortoisehg\hgtk\thgpbranch.py:697
 msgid "Show message"
@@ -5775,7 +5782,7 @@ msgstr "Abandonar"
 
 #: tortoisehg\hgtk\thgshelve.py:77
 msgid "abandon shelved changes"
-msgstr ""
+msgstr "abandona mudanças na shelve"
 
 #: tortoisehg\hgtk\thgshelve.py:100
 msgid "Shelf Contents"
@@ -5807,7 +5814,7 @@ msgstr "Anexar"
 
 #: tortoisehg\hgtk\thgshelve.py:216
 msgid "Unshelve Abort"
-msgstr ""
+msgstr "Abortar Unshelve"
 
 #: tortoisehg\hgtk\thgshelve.py:219
 msgid "Unshelve Error"
@@ -5815,11 +5822,11 @@ msgstr "Erro ao Retirar do Adiamento (Unshelve)"
 
 #: tortoisehg\hgtk\thgshelve.py:225
 msgid "Delete the shelf contents?"
-msgstr ""
+msgstr "Remover o conteúdo da shelf?"
 
 #: tortoisehg\hgtk\thgshelve.py:232
 msgid "Abandon Error"
-msgstr ""
+msgstr "Erro no Abandono"
 
 #: tortoisehg\hgtk\thgstrip.py:36
 msgid "Strip - %s"
@@ -6165,19 +6172,19 @@ msgstr "gravando backup de %r como %r\n"
 
 #: tortoisehg\util\hgshelve.py:416
 msgid "file copy of %s failed\n"
-msgstr ""
+msgstr "cópia de arquivo de %s falhou\n"
 
 #: tortoisehg\util\hgshelve.py:435
 msgid "removing backup file : %r\n"
-msgstr ""
+msgstr "removendo arquivo de cópia de segurança : %r\n"
 
 #: tortoisehg\util\hgshelve.py:439
 msgid "delete of shelve backup failed"
-msgstr ""
+msgstr "remoção da cópia de segurança da shelve falhou"
 
 #: tortoisehg\util\hgshelve.py:442
 msgid "bad shelve backup directory name"
-msgstr ""
+msgstr "nome ruim do diretório de backup da shelve"
 
 #: tortoisehg\util\hgshelve.py:472
 msgid "shelve can only be run interactively"
@@ -6209,7 +6216,7 @@ msgstr "removendo arquivo de adiamento\n"
 
 #: tortoisehg\util\hgshelve.py:564
 msgid "abort: backup restore failed, %s\n"
-msgstr ""
+msgstr "abortado: restauração do backup falhou, %s\n"
 
 #: tortoisehg\util\hgshelve.py:581
 msgid "nothing to unshelve\n"
@@ -6217,7 +6224,7 @@ msgstr "nada para tirar do adiamento\n"
 
 #: tortoisehg\util\hgshelve.py:595
 msgid "unshelve backup aborted\n"
-msgstr ""
+msgstr "criação do backup de remoção da shelve abortada\n"
 
 #: tortoisehg\util\hgshelve.py:599
 msgid "applying shelved patch\n"
@@ -6237,19 +6244,19 @@ msgstr "retirada do adiamento completada\n"
 
 #: tortoisehg\util\hgshelve.py:632
 msgid "abandoning shelved file\n"
-msgstr ""
+msgstr "abandonando arquivo armazenado na shelve\n"
 
 #: tortoisehg\util\hgshelve.py:634
 msgid "shelved file abandoned\n"
-msgstr ""
+msgstr "arquivo armazenado na shelve abandonado\n"
 
 #: tortoisehg\util\hgshelve.py:636
 msgid "nothing to abandon\n"
-msgstr ""
+msgstr "nada para abandonar\n"
 
 #: tortoisehg\util\hgshelve.py:638
 msgid "abandon failed\n"
-msgstr ""
+msgstr "o abandono falhou\n"
 
 #: tortoisehg\util\hgshelve.py:645
 msgid "mark new/missing files as added/removed before shelving"
