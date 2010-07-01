@@ -119,8 +119,6 @@ class SearchWidget(QDockWidget):
         mainvbox.addWidget(frame)
 
         tv = MatchTree(repo, self)
-        tv.setItemsExpandable(False)
-        tv.setRootIsDecorated(False)
         tm = MatchModel(self)
         tv.setModel(tm)
         tv.setColumnHidden(COL_REVISION, True)
@@ -342,14 +340,20 @@ COL_REVISION = 2  # Hidden if ctx
 COL_USER     = 3  # Hidden if ctx
 COL_TEXT     = 4
 
-class MatchTree(QTreeView):
+class MatchTree(QTableView):
     def __init__(self, repo, parent=None):
-        QTreeView.__init__(self, parent)
+        QTableView.__init__(self, parent)
         self.repo = repo
         self.delegate = htmllistview.HTMLDelegate(self)
         self.setItemDelegateForColumn(COL_TEXT, self.delegate)
-        self.setSelectionMode(QTreeView.ExtendedSelection)
+        self.setSelectionMode(QTableView.ExtendedSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setShowGrid(False)
+        vh = self.verticalHeader()
+        vh.hide()
+        vh.setDefaultSectionSize(20)
+
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
         self.pattern = None
@@ -383,17 +387,17 @@ class MatchTree(QTreeView):
     def mousePressEvent(self, event):
         self.pressPos = event.pos()
         self.pressTime = QTime.currentTime()
-        return QTreeView.mousePressEvent(self, event)
+        return QTableView.mousePressEvent(self, event)
 
     def mouseMoveEvent(self, event):
         d = event.pos() - self.pressPos
         if d.manhattanLength() < QApplication.startDragDistance():
-            return QTreeView.mouseMoveEvent(self, event)
+            return QTableView.mouseMoveEvent(self, event)
         elapsed = self.pressTime.msecsTo(QTime.currentTime())
         if elapsed < QApplication.startDragTime():
-            return QTreeView.mouseMoveEvent(self, event)
+            return QTableView.mouseMoveEvent(self, event)
         self.dragObject()
-        return QTreeView.mouseMoveEvent(self, event)
+        return QTableView.mouseMoveEvent(self, event)
 
     def customContextMenuRequested(self, point):
         selrows = []
