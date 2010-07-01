@@ -354,6 +354,8 @@ class MatchTree(QTableView):
         vh.hide()
         vh.setDefaultSectionSize(20)
 
+        self.horizontalHeader().setStretchLastSection(True)
+
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
         self.pattern = None
