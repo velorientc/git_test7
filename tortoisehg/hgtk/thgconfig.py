@@ -1221,7 +1221,9 @@ class ConfigDialog(gtk.Dialog):
                 return None
             for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
                 try:
-                    return self.ini['extensions'][cand]
+                    v = self.ini['extensions'][cand]
+                    if not isinstance(v, Undefined):
+                        return v
                 except KeyError:
                     pass
 
