@@ -31,7 +31,7 @@ class SearchWidget(QDockWidget):
         QDockWidget.__init__(self, parent)
 
         if parent is None:
-            self.setFeatures(QDockWidget.NoDockWidgetFeatures)
+            self.setFeatures(QDockWidget.DockWidgetClosable)
             self.setWindowTitle(_('TortoiseHg Search'))
             self.resize(800, 500)
         else:
@@ -121,7 +121,7 @@ class SearchWidget(QDockWidget):
         tv = MatchTree(repo, self)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
-        tm = MatchModel()
+        tm = MatchModel(self)
         tv.setModel(tm)
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
