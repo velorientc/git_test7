@@ -40,7 +40,7 @@ def RevPanelWidget(repo, repoview):
     def data_func(widget, item, ctx):
         def summary_line(desc):
             desc = desc.replace('\0', '').split('\n')[0]
-            return hglib.tounicode(desc[:80])
+            return hglib.tounicode(desc)[:80]
         def revline_data(ctx, hl=False, branch=None):
             if isinstance(ctx, basestring):
                 return ctx
