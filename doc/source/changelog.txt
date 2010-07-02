@@ -166,10 +166,10 @@ Buttons from right to left...
 To specify a custom filter, the user selects the filter type, enters
 the search text of that type, and then hits return in the text entry.
 
-	:guilabel:`Rev Range`
-		Parse the user text as a revision range.  See
-		`hg.1.html#revisions <http://www.selenic.com/mercurial/hg.1.html#revisions>`_ 
-		for details on how to specify revision ranges.
+	:guilabel:`Revision Set`
+		Parse the user text as a revision set.  See
+		`hg.1.html#revisions <http://www.selenic.com/mercurial/hg.1.html#revsets>`_ 
+		for details on how to specify revision sets.
 	:guilabel:`File Patterns`
 		Parse the user text as a file pattern glob, unless the user text
 		is prefixed with a pattern type like *regexp:*.  See
@@ -237,6 +237,9 @@ revision context menu.
 	:guilabel:`Push to Here`
 		Performs the equivalent of 'push -r <rev>'.  This option is only
 		available on changesets marked as outgoing.
+	:guilabel:`Push this Branch`
+		Performs the equivalent of 'push --new-branch --branch <branch>'.
+		This option is only available on changesets marked as outgoing.
 	:guilabel:`Update...`
 		Update your working directory to this revision. Opens the
 		TortoiseHg update dialog with this revision selected.
@@ -307,7 +310,7 @@ operation on revision ranges.
 		Creates a bundle file with range of changesets.
 	:guilabel:`Export patches from here to selected`
 		Creates a patch file for each changeset in selected range.
-	:guilabel:`Merge with selected`
+	:guilabel:`Merge with ...`
 		Merges this revision with the other selected revision.  If
 		neither revision is currently checked out, the merge dialog will
 		be forced to update to the first selected revision before
@@ -321,9 +324,12 @@ operation on revision ranges.
 		Rebase selected changeset and ancestors on top of original
 		selected revision.  *Only visible when the rebase extension is
 		enabled*
-	:guilabel:`qimport from here to selected`
+	:guilabel:`Import from here to selected to MQ`
 		Import selected revision range into the current patch queue.
 		*Only visible when MQ is enabled*
+	:guilabel:`Select common ancestor`
+		Selects (highlights) the common ancestor of the two selected
+		revisions.  Helpful, when reviewing merges.
 
 .. [#rcm1] The strip command will store the stripped revisions in a bundle file
 		that can later be reapplied.

@@ -58,19 +58,27 @@ def hunk_unmarkup(text):
     return hunk
 
 
-def check_max_diff(ctx, pfile):
+def check_max_diff(ctx, wfile):
     lines = []
     try:
-        fctx = ctx.filectx(pfile)
-    except error.LookupError:
-        fctx = None
-    if fctx and fctx.size() > hglib.getmaxdiffsize(ctx._repo.ui):
+        fctx = ctx.filectx(wfile)
+        size = fctx.size()
+    except (EnvironmentError, error.LookupError):
+        return []
+    if size > hglib.getmaxdiffsize(ctx._repo.ui):
         # Fake patch that displays size warning
-        lines = ['diff --git a/%s b/%s\n' % (pfile, pfile)]
+        lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
         lines.append(_('File is larger than the specified max size.\n'))
         lines.append(_('Hunk selection is disabled for this file.\n'))
-        lines.append('--- a/%s\n' % pfile)
-        lines.append('+++ b/%s\n' % pfile)
+        lines.append('--- a/%s\n' % wfile)
+        lines.append('+++ b/%s\n' % wfile)
+    elif '\0' in fctx.data():
+        # Fake patch that displays binary file warning
+        lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
+        lines.append(_('File is binary.\n'))
+        lines.append(_('Hunk selection is disabled for this file.\n'))
+        lines.append('--- a/%s\n' % wfile)
+        lines.append('+++ b/%s\n' % wfile)
     return lines
 
 

@@ -430,6 +430,12 @@ Configurables
 	Configures a 'policy' limit for summary lines
 :menuselection:`Commit --> Message Line Length`
 	Configures a 'policy' limit for message lines
+:menuselection:`Commit --> Close After Commit`:
+	When set to True, the commit tool will close after a
+	successful commit.
+:menuselection:`Commit --> Default Tab`:
+	The tab on which the status and commit tools will open.
+	0 - Text Diff, 1 - Hunk Selection, 2 - Commit Preview.
 
 And three other features for *advanced* users.
 
@@ -447,8 +453,6 @@ And three other features for *advanced* users.
 	Toggles diff pane from left to below file list
 :menuselection:`TortoiseHg --> Max Diff Size`
 	Configures the diff size limit
-
-External tool configuration has been removed in 0.9
 
 From command line
 -----------------
