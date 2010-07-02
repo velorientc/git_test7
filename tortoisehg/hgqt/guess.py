@@ -239,6 +239,7 @@ class DetectRenameDialog(QDialog):
     def acceptMatch(self):
         'User pressed "accept match" button'
         remdests = {}
+        wctx = self.repo[None]
         for index in self.matchtv.selectionModel().selectedRows():
             src, dest, percent = self.matchtv.model().getRow(index)
             if dest in remdests:
@@ -249,8 +250,8 @@ class DetectRenameDialog(QDialog):
             remdests[dest] = src
         for dest, src in remdests.iteritems():
             if not os.path.exists(self.repo.wjoin(src)):
-                self.repo.remove([src]) # !->R
-            self.repo.copy(src, dest)
+                wctx.remove([src]) # !->R
+            wctx.copy(src, dest)
             shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
             self.matchtv.model().remove(dest)
         self.matchAccepted.emit()
