@@ -14,7 +14,7 @@ Frequently Asked Questions
 	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
-	five bonus extensions: hgfold, hgcr-gui, perfarce, mercurial-keyring.
+	four bonus extensions: hgfold, hgcr-gui, perfarce, mercurial-keyring.
 	python-svn for hgsubversion and convert extensions, and dulwich for
 	hg-git use.
 	See :file:`extension-versions.txt` in installer root for more details
