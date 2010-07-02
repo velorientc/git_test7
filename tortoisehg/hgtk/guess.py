@@ -334,6 +334,7 @@ class DetectRenameDialog(gtk.Window):
     def accept_match(self):
         'User pressed "accept match" button'
         hglib.invalidaterepo(self.repo)
+        wctx = self.repo[None]
         canmodel, upaths = self.cantree.get_selection().get_selected_rows()
         for path in upaths:
             row = canmodel[path]
@@ -342,8 +343,8 @@ class DetectRenameDialog(gtk.Window):
                 continue
             if not os.path.exists(self.repo.wjoin(src)):
                 # Mark missing rename source as removed
-                self.repo.remove([src])
-            self.repo.copy(src, dest)
+                wctx.remove([src])
+            wctx.copy(src, dest)
             shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
             if self.notify_func:
                 self.notify_func()
