@@ -9,6 +9,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
+import os
 import pango
 import cStringIO
 
@@ -59,10 +60,11 @@ def hunk_unmarkup(text):
 
 
 def check_max_diff(ctx, wfile):
-    lines = []
     try:
         fctx = ctx.filectx(wfile)
         size = fctx.size()
+        if not os.path.isfile(ctx._repo.wjoin(wfile)):
+            return []
     except (EnvironmentError, error.LookupError):
         return []
     if size > hglib.getmaxdiffsize(ctx._repo.ui):
@@ -72,14 +74,20 @@ def check_max_diff(ctx, wfile):
         lines.append(_('Hunk selection is disabled for this file.\n'))
         lines.append('--- a/%s\n' % wfile)
         lines.append('+++ b/%s\n' % wfile)
-    elif '\0' in fctx.data():
+        return lines
+    try:
+        contents = fctx.data()
+    except (EnvironmentError, util.Abort):
+        return []
+    if '\0' in contents:
         # Fake patch that displays binary file warning
         lines = ['diff --git a/%s b/%s\n' % (wfile, wfile)]
         lines.append(_('File is binary.\n'))
         lines.append(_('Hunk selection is disabled for this file.\n'))
         lines.append('--- a/%s\n' % wfile)
         lines.append('+++ b/%s\n' % wfile)
-    return lines
+        return lines
+    return []
 
 
 class chunks(object):
