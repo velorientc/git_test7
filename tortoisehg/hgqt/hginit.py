@@ -45,8 +45,11 @@ class InitDialog(QDialog):
                 _('Add special files (.hgignore, ...)'))
         self.make_old_chk = QCheckBox(
                 _('Make repo compatible with Mercurial 1.0'))
+        self.run_wb_chk = QCheckBox(
+                _('Show in Workbench after init'))
         self.grid.addWidget(self.add_files_chk, 1, 1)
         self.grid.addWidget(self.make_old_chk, 2, 1)
+        self.grid.addWidget(self.run_wb_chk, 3, 1)
 
         # buttons
         self.init_btn = QPushButton(_('Create'))
@@ -189,8 +192,23 @@ class InitDialog(QDialog):
                     pass
 
         shlib.shell_notify([dest])
-        qtlib.InfoMsgBox('Init',
-                _('Repository successfully created at'), dest)
+
+        if self.run_wb_chk.isChecked():
+            try:
+                os.chdir(dest)
+                from tortoisehg.hgqt.workbench import run as wbrun
+                wbui = ui.ui()
+                wb = wbrun(wbui)
+                wb.show()
+            except Exception, e:
+                qtlib.WarningMsgBox(_('Init'),
+                  _('<p>Repository successfully created at</p><p>%s</p>') % dest,
+                  _('<p>But could not run Workbench for it.</p><p>%s</p>')
+                    % hglib.tounicode(str(e)))
+        else:
+            qtlib.InfoMsgBox(_('Init'),
+                _('<p>Repository successfully created at</p><p>%s</p>') % dest)
+
         self.accept()
 
 def run(ui, *pats, **opts):
