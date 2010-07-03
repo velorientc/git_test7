@@ -104,9 +104,9 @@ class ArchiveDialog(QDialog):
         # bottom buttons
         self.hbox = QHBoxLayout()
         self.arch_btn = QPushButton(_('&Archive'))
-        self.arch_btn.setAutoDefault(False)
+        self.arch_btn.setDefault(True)
         self.close_btn = QPushButton(_('&Close'))
-        self.close_btn.setDefault(True)
+        self.close_btn.setAutoDefault(False)
         self.close_btn.setFocus()
         self.detail_btn = QPushButton(_('&Detail'))
         self.detail_btn.setAutoDefault(False)
