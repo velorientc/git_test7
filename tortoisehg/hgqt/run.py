@@ -783,6 +783,9 @@ table = {
          ('r', 'rev', [], _('revisions to view in diff tool')),
          ('b', 'bundle', '', _('bundle file to preview'))],
             _('launch visual diff tool')),
+    "^version": (version,
+        [('v', 'verbose', None, _('print license'))],
+	    _('thg version [OPTION]')),
 }
 
 if os.name == 'nt':
