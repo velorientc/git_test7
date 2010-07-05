@@ -234,7 +234,6 @@ class Workbench(QMainWindow):
 
         self.menuFile = m = QMenu(_("&File"), self.menubar)
         m.addAction(self.actionOpen_repository)
-        m.addAction(self.actionRefresh)
         m.addSeparator()
         m.addAction(self.actionQuit)
 
@@ -247,6 +246,8 @@ class Workbench(QMainWindow):
         m.addAction(self.actionShowPaths)
         m.addSeparator()
         m.addAction(self.actionSelectColumns)
+        m.addSeparator()
+        m.addAction(self.actionRefresh)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
