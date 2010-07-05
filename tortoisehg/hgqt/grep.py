@@ -30,9 +30,12 @@ class SearchWidget(QWidget):
     def __init__(self, upats, root=None, parent=None, **opts):
         QWidget.__init__(self, parent)
 
-        if parent is None:
+        if parent:
+            self.closeonesc = False
+        else:
             self.setWindowTitle(_('TortoiseHg Search'))
             self.resize(800, 550)
+            self.closeonesc = True
 
         self.thread = None
         root = paths.find_root(root)
@@ -141,7 +144,7 @@ class SearchWidget(QWidget):
                 self.thread.wait( 2000 )
                 self.finished()
                 self.thread = None
-            else:
+            elif self.closeonesc:
                 self.close()
         else:
             return super(SearchWidget, self).keyPressEvent(event)
