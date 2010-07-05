@@ -20,7 +20,7 @@ from PyQt4.QtGui import *
 # This widget can be embedded in any application that would like to
 # provide search features
 
-class SearchWidget(QDockWidget):
+class SearchWidget(QWidget):
     '''Working copy and repository search widget
        SIGNALS:
        loadBegin()                  - for progress bar
@@ -28,27 +28,19 @@ class SearchWidget(QDockWidget):
        errorMessage(QString)        - for status bar
     '''
     def __init__(self, upats, root=None, parent=None, **opts):
-        QDockWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         if parent is None:
-            self.setFeatures(QDockWidget.DockWidgetClosable)
             self.setWindowTitle(_('TortoiseHg Search'))
             self.resize(800, 500)
-        else:
-            self.setFeatures(QDockWidget.DockWidgetClosable |
-                             QDockWidget.DockWidgetMovable  |
-                             QDockWidget.DockWidgetFloatable)
-            self.setWindowTitle(_('Search'))
 
         self.thread = None
         root = paths.find_root(root)
         repo = hg.repository(ui.ui(), path=root)
         assert(repo)
 
-        mainframe = QFrame()
         mainvbox = QVBoxLayout()
-        mainframe.setLayout(mainvbox)
-        self.setWidget(mainframe)
+        self.setLayout(mainvbox)
 
         hbox = QHBoxLayout()
         hbox.setMargin(0)
