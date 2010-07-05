@@ -37,7 +37,7 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
 ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',
-              'Node')
+              'Node', 'Age')
 
 def get_color(n, ignore=()):
     """
@@ -84,7 +84,7 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
-    _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',)
+    _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Age', 'Tags',)
     _stretchs = {'Log': 1, }
 
     def __init__(self, repo, branch='', parent=None):
@@ -115,6 +115,7 @@ class HgRepoListModel(QAbstractTableModel):
                            'Tags':     self.gettags,
                            'Branch':   lambda ctx, gnode: ctx.branch(),
                            'Filename': lambda ctx, gnode: gnode.extra[0],
+                           'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
                            }
 
 
