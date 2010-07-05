@@ -32,7 +32,7 @@ class SearchWidget(QWidget):
 
         if parent is None:
             self.setWindowTitle(_('TortoiseHg Search'))
-            self.resize(800, 500)
+            self.resize(800, 550)
 
         self.thread = None
         root = paths.find_root(root)
@@ -99,13 +99,6 @@ class SearchWidget(QWidget):
         bt.clicked.connect(self.searchActivated)
         working.setChecked(True)
 
-        def expandtoggled():
-            frame.setVisible(expand.is_expanded())
-        expand = qtlib.PMButton(False, self)
-        expand.clicked.connect(expandtoggled)
-        expandtoggled()
-        hbox.insertWidget(0, expand)
-
         mainvbox.addLayout(hbox)
         frame.setLayout(grid)
         mainvbox.addWidget(frame)
@@ -122,7 +115,7 @@ class SearchWidget(QWidget):
         self.tv, self.regexple, self.chk = tv, le, chk
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
-        self.singlematch, self.expand, self.eframe = singlematch, expand, frame
+        self.singlematch, self.eframe = singlematch, frame
         self.regexple.setFocus()
 
         if 'rev' in opts or 'all' in opts:
@@ -139,8 +132,6 @@ class SearchWidget(QWidget):
         elif opts.get('rev'):
             self.ctxradio.setChecked(True)
             self.revle.setText(opts['rev'])
-        if not self.eframe.isVisible():
-            self.expand.clicked.emit(True)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
