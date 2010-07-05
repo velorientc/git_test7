@@ -20,8 +20,14 @@ from PyQt4.QtGui import *
 class InitDialog(QDialog):
     """TortoiseHg init dialog"""
 
-    def __init__(self, destdir=[], opts={}):
+    cmdfinished = pyqtSignal(
+                     int  # status (0: succeeded, -1: failed)
+                 )
+
+    def __init__(self, destdir=[], opts={}, caller=''):
         super(InitDialog, self).__init__()
+        
+        self.caller = caller
 
         # main layout
         self.vbox = QVBoxLayout()
@@ -49,7 +55,8 @@ class InitDialog(QDialog):
                 _('Show in Workbench after init'))
         self.grid.addWidget(self.add_files_chk, 1, 1)
         self.grid.addWidget(self.make_old_chk, 2, 1)
-        self.grid.addWidget(self.run_wb_chk, 3, 1)
+        if self.caller != 'workbench':
+            self.grid.addWidget(self.run_wb_chk, 3, 1)
 
         # buttons
         self.init_btn = QPushButton(_('Create'))
@@ -111,11 +118,14 @@ class InitDialog(QDialog):
     def compose_command(self):
         # just a stub for extension with extra options (--mq, --ssh, ...)
         self.cmdline = ['init']
-        self.cmdline.append(hglib.fromunicode(self.dest_edit.text()))
+        self.cmdline.append(self.getPath())
         self.hgcmd_txt.setText('hg ' + ' '.join(self.cmdline))
 
+    def getPath(self):
+        return hglib.fromunicode(self.dest_edit.text()).strip()
+
     def init(self):
-        dest = hglib.fromunicode(self.dest_edit.text())
+        dest = self.getPath()
 
         if dest == '':
             qtlib.ErrorMsgBox(_('Error executing init'),
@@ -200,16 +210,24 @@ class InitDialog(QDialog):
                 wbui = ui.ui()
                 wb = wbrun(wbui)
                 wb.show()
+                self.cmdfinished.emit(0)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Init'),
                   _('<p>Repository successfully created at</p><p>%s</p>') % dest,
                   _('<p>But could not run Workbench for it.</p><p>%s</p>')
                     % hglib.tounicode(str(e)))
         else:
-            qtlib.InfoMsgBox(_('Init'),
+            if self.caller == 'workbench':
+                self.cmdfinished.emit(0)
+            else:
+                qtlib.InfoMsgBox(_('Init'),
                 _('<p>Repository successfully created at</p><p>%s</p>') % dest)
 
         self.accept()
+
+    def reject(self):
+        self.cmdfinished.emit(-1)
+        super(InitDialog, self).reject()
 
 def run(ui, *pats, **opts):
     return InitDialog(pats, opts)

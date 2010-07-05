@@ -110,13 +110,13 @@ class Workbench(QMainWindow):
     def setShortcutsEnabled(self, enabled=True):
         for sh in self.disab_shortcuts:
             sh.setEnabled(enabled)
-        
+
     def ensureOneQuickBar(self):
         tb = self.sender()
         for w in self._quickbars:
             if w is not tb:
                 w.hide()
-        
+
     def load_config(self, ui):
         configstyles(ui)
         # TODO: connect to font changed signal
@@ -193,6 +193,9 @@ class Workbench(QMainWindow):
         tb.setObjectName("toolBar_diff")
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
+        self.actionNew_repository = a = QAction(_("&New Repository..."), self)
+        a.setShortcut(QKeySequence.New)
+
         self.actionOpen_repository = a = QAction(_("&Open Repository"), self)
         a.setShortcut(QKeySequence.Open)
 
@@ -233,6 +236,7 @@ class Workbench(QMainWindow):
         self.setMenuBar(self.menubar)
 
         self.menuFile = m = QMenu(_("&File"), self.menubar)
+        m.addAction(self.actionNew_repository)
         m.addAction(self.actionOpen_repository)
         m.addSeparator()
         m.addAction(self.actionQuit)
@@ -282,7 +286,7 @@ class Workbench(QMainWindow):
         p = str(url.toLocalFile())
         return paths.find_root(p)
 
-    def dragEnterEvent(self, event):                
+    def dragEnterEvent(self, event):
         d = event.mimeData()
         for u in d.urls():
             root = self.find_root(u)
@@ -293,7 +297,7 @@ class Workbench(QMainWindow):
     def dropEvent(self, event):
         accept = False
         d = event.mimeData()
-        for u in d.urls():            
+        for u in d.urls():
             root = self.find_root(u)
             if root:
                 repo = hg.repository(self.ui, path=root)
@@ -582,6 +586,8 @@ class Workbench(QMainWindow):
         #        self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
+        connect(self.actionNew_repository, SIGNAL('triggered()'),
+                self.newRepository)
         connect(self.actionOpen_repository, SIGNAL('triggered()'),
                 self.openRepository)
 
@@ -606,6 +612,17 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.forward()
+
+    def newRepository(self):
+        """ Run init dialog """
+        from tortoisehg.hgqt.hginit import InitDialog
+        initdlg = InitDialog(caller='workbench')
+        def cmdfinished(res):
+            if res == 0:
+                path = initdlg.getPath()
+                self.openRepo(path)
+        initdlg.cmdfinished.connect(cmdfinished)
+        initdlg.show()
 
     def openRepository(self):
         caption = _('Select repository directory to open')
