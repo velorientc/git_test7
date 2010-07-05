@@ -36,8 +36,8 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
-ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Date', 'Tags',
-              'Node', 'Age')
+ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Tags', 'Node',
+              'Age', 'LocalTime', 'UTCTime')
 
 def get_color(n, ignore=()):
     """
@@ -49,14 +49,6 @@ def get_color(n, ignore=()):
     if not colors: # ghh, no more available colors...
         colors = COLORS
     return colors[n % len(colors)]
-
-def cvrt_date(date):
-    """
-    Convert a date given the hg way, ie. couple (date, tz), into a
-    formatted QString
-    """
-    date, tzdelay = date
-    return QDateTime.fromTime_t(int(date)).toString(Qt.DefaultLocaleShortDate)
 
 def datacached(meth):
     """
@@ -111,11 +103,12 @@ class HgRepoListModel(QAbstractTableModel):
                            'Graph':    lambda ctx, gnode: "",
                            'Log':      self.getlog,
                            'Author':   lambda ctx, gnode: hglib.username(ctx.user()),
-                           'Date':     lambda ctx, gnode: cvrt_date(ctx.date()),
                            'Tags':     self.gettags,
                            'Branch':   lambda ctx, gnode: ctx.branch(),
                            'Filename': lambda ctx, gnode: gnode.extra[0],
                            'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
+                           'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
+                           'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
                            }
 
 
@@ -241,8 +234,8 @@ class HgRepoListModel(QAbstractTableModel):
             return str(len(self.repo))
         if column == 'Node':
             return str(self.repo['.'])
-        if column == 'Date':
-            return cvrt_date(self.repo[None].date())
+        if column in ('Age', 'LocalTime', 'UTCTime':
+            return hglib.displaytime(self.repo[None].date())
         if column == 'Tags':
             try:
                 return sorted(self.repo.tags().keys(), key=lambda x: len(x))[-1][:10]
