@@ -24,6 +24,7 @@ from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.commit import CommitWidget
+from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.sync import SyncWidget
@@ -50,6 +51,7 @@ class Workbench(QMainWindow):
         self._searchWidgets = []
 
         self.commitwidgets = {} # key: reporoot
+        self.grepwidgets = {} # key: reporoot
         self.syncwidgets = {} # key: reporoot
 
         QMainWindow.__init__(self)
@@ -172,6 +174,10 @@ class Workbench(QMainWindow):
         sw.minimumSizeHint = lambda: QSize(0, 0)
         self.syncTabIndex = idx = tt.addTab(sw, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
+        self.grepStackedWidget = gw = QStackedWidget()
+        gw.minimumSizeHint = lambda: QSize(0, 0)
+        self.grepTabIndex = idx = tt.addTab(gw, geticon('grep'), '') # TODO
+        tt.setTabToolTip(idx, _("Search"))
 
         self.setCentralWidget(self.centralwidget)
 
@@ -321,7 +327,13 @@ class Workbench(QMainWindow):
                 if sw:
                     self.syncStackedWidget.setCurrentWidget(sw)
                 else:
-                    self.taskTabsWidget.setCurrentIndex(0)                    
+                    self.taskTabsWidget.setCurrentIndex(0)
+            elif ti == self.grepTabIndex:
+                gw = self.getGrepWidget(root)
+                if gw:
+                    self.grepStackedWidget.setCurrentWidget(gw)
+                else:
+                    self.taskTabsWidget.setCurrentIndex(0)
             w.switchedTo()
             self.repotabs_splitter.show()
         else:
@@ -340,6 +352,9 @@ class Workbench(QMainWindow):
         elif index == self.syncTabIndex:
             sw = self.createSyncWidget(self.currentRepoRoot)
             self.syncStackedWidget.setCurrentWidget(sw)
+        elif index == self.grepTabIndex:
+            gw = self.createGrepWidget(self.currentRepoRoot)
+            self.grepStackedWidget.setCurrentWidget(gw)
 
     def getCurentRepoRoot(self):
         return self.currentRepoRoot
@@ -369,9 +384,22 @@ class Workbench(QMainWindow):
             cw.loadConfigs(s)
         return cw
 
+    def createGrepWidget(self, root):
+        gw = self.getGrepWidget(root)
+        if gw is None:
+            upats = {}
+            gw = SearchWidget(upats, root, self)
+            self.grepwidgets[root] = gw
+            self.grepStackedWidget.addWidget(gw)
+        return gw
+
     def getCommitWidget(self, root):
         '''returns None if no commit widget for that repo has been created yet'''
         return self.commitwidgets.get(root)
+
+    def getGrepWidget(self, root):
+        '''returns None if no grep widget for that repo has been created yet'''
+        return self.grepwidgets.get(root)
 
     def createSyncWidget(self, root):
         sw = self.getSyncWidget(root)
@@ -467,8 +495,6 @@ class Workbench(QMainWindow):
         self.branch_label_action = self.toolBar_treefilters.addWidget(self.branch_label)
         self.branch_comboBox_action = self.toolBar_treefilters.addWidget(self.branch_comboBox)
         self.toolBar_treefilters.addSeparator()
-        self.toolBar_treefilters.addAction(self.actionSearch)
-        self.toolBar_treefilters.addSeparator()
 
         # diff mode toolbar
         self.toolBar_diff.addAction(self.actionDiffMode)
@@ -499,10 +525,6 @@ class Workbench(QMainWindow):
         self.actionAnnMode = QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
         connect(self.actionAnnMode, SIGNAL('toggled(bool)'), self.setAnnotate)
-
-        self.actionSearch = QAction('Search', self)
-        self.actionSearch.setShortcut(Qt.Key_F3)
-        connect(self.actionSearch, SIGNAL('triggered()'), self.on_search)
 
         self.actionHelp.setShortcut(Qt.Key_F1)
         self.actionHelp.setIcon(geticon('help'))
@@ -655,17 +677,6 @@ class Workbench(QMainWindow):
 
     def on_help(self, *args):
         pass
-
-    def on_search(self, *args):
-        from tortoisehg.hgqt.grep import SearchWidget
-        w = self.repoTabsWidget.currentWidget()
-        if w is None:
-            return
-        s = SearchWidget('', w.repo.root, self)
-        s.setAllowedAreas(Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea)
-        s.setObjectName("searchWidget%d" % len(self._searchWidgets))
-        self.addDockWidget(Qt.BottomDockWidgetArea, s)
-        self._searchWidgets.append(s)
 
     def storeSettings(self):
         s = QSettings()
