@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, mdiff, similar
+from mercurial import hg, ui, mdiff, similar, patch
 
 from tortoisehg.util import hglib, shlib, paths
 
@@ -16,6 +16,10 @@ from tortoisehg.hgqt import qtlib, htmlui, cmdui
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+# Techincal debt
+# Try to cut down on the jitter when findRenames is pressed.  May
+# require a splitter.
 
 class DetectRenameDialog(QDialog):
     'Detect renames after they occur'
@@ -138,7 +142,7 @@ class DetectRenameDialog(QDialog):
         self.restoreGeometry(s.value('guess/geom').toByteArray())
         hsplit.restoreState(s.value('guess/hsplit-state').toByteArray())
         vsplit.restoreState(s.value('guess/vsplit-state').toByteArray())
-        slider.setValue(s.value('guess/simslider').toInt()[0])
+        slider.setValue(s.value('guess/simslider').toInt()[0] or 50)
         self.vsplit, self.hsplit = vsplit, hsplit
         QTimer.singleShot(0, self.refresh)
 
@@ -266,9 +270,8 @@ class DetectRenameDialog(QDialog):
         src, dest, percent = self.matchtv.model().getRow(index)
         aa = self.repo.wread(dest)
         rr = ctx.filectx(src).data()
-        opts = mdiff.defaultopts
-        difftext = mdiff.unidiff(rr, '', aa, '', src,
-                                 dest, None, opts=opts)
+        date = hglib.displaytime(ctx.date())
+        difftext = mdiff.unidiff(rr, date, aa, date, src, dest, None)
         if not difftext:
             t = _('%s and %s have identical contents\n\n') % (src, dest)
             hu.write(t, label='ui.error')
