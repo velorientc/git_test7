@@ -26,9 +26,7 @@ from tortoisehg.hgqt.i18n import _
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-connect = QObject.connect
 nullvariant = QVariant()
-
 
 # TODO: Remove these two when we adopt GTK author color scheme
 COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
@@ -194,8 +192,8 @@ class HgRepoListModel(QAbstractTableModel):
                 self.timerHandle = None
                 self.emit(SIGNAL('showMessage'), '')
                 self.emit(SIGNAL('loaded'))
-            # we only fill the graph data strctures without telling
-            # views (until we atually did the full job), to keep
+            # we only fill the graph data structures without telling
+            # views (until we actually did the full job), to keep
             # maximal GUI reactivity
             elif not self.graph.build_nodes(nnodes=self.fill_step):
                 self.killTimer(self.timerHandle)

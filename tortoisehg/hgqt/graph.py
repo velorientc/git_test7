@@ -293,15 +293,6 @@ class Graph(object):
     def isfilled(self):
         return self.grapher is None
 
-    def fill(self, step=100):
-        """
-        Return a generator that fills the graph by bursts of `step`
-        more nodes at each iteration.
-        """
-        while self.build_nodes(step):
-            yield len(self)
-        yield len(self)
-
     def __getitem__(self, idx):
         if isinstance(idx, slice):
             # XXX TODO: ensure nodes are built
