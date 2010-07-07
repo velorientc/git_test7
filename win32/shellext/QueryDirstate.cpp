@@ -219,6 +219,8 @@ int HgQueryDirstate(
     if (!outdated && last.path == path) 
     {
         outStatus = last.status;
+        if (outStatus == 'P')
+            outStatus = 'M';
         return 1;
     }
 
@@ -319,10 +321,15 @@ int HgQueryDirstate(
 
     outStatus = e->status(stat);
 
-    if (outStatus == 'M' && pdirsta)
+    if (unset)
+        goto exit;
+
+    bool update = false;
+
+    if (outStatus == 'M')
     {
         std::string relbase;
-        if (get_relpath(cur.hgroot, cur.basedir, relbase))
+        if (pdirsta && get_relpath(cur.hgroot, cur.basedir, relbase))
         {
             TDEBUG_TRACE(dp << "relbase = '" << relbase << "'");
 
@@ -330,21 +337,35 @@ int HgQueryDirstate(
             TDEBUG_TRACE(dp << "basedir_status = " << basedir_status);
 
             if (basedir_status != 'M')
-            {
-                if (unset)
-                {
-                    TDEBUG_TRACE(dp << "omitting Thgstatus::update");
-                }
-                else
-                {
-                    TDEBUG_TRACE(dp << "calling Thgstatus::update");
-                    Thgstatus::update(cur.hgroot);
-                }
-            }
+                update = true;
+        }        
+    }
+    else if (outStatus == 'P')
+    {
+        static unsigned lasttickcount;
+
+        const unsigned tc = ::GetTickCount();
+        const bool outdated = tc - lasttickcount > 6000;
+
+        if (outdated) // protect against endless update loops
+        {
+            update = true;
+            lasttickcount = tc;
         }
+
+        TDEBUG_TRACE(dp << "outStatus is 'P'");
     }
 
+    if (update)
+    {
+        TDEBUG_TRACE(dp << "calling Thgstatus::update");
+        Thgstatus::update(path);
+    }
+
+  exit:
     cur.status = outStatus;
+    if (outStatus == 'P')
+        outStatus = 'M';
     cur.tickcount = ::GetTickCount();
     last = cur;
     return 1;
