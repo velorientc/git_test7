@@ -111,12 +111,6 @@ class RepoWidget(QWidget):
     def loading(self):
         return self._loading
 
-    def loaded(self):
-        reponame = os.path.basename(self.repo.root)
-        self._repodate = self._getrepomtime()
-        self._loading = False
-        self.repoview.resizeColumns()
-
     def createActions(self):
         self.actionActivateRev = QAction('Activate rev.', self)
         self.actionActivateRev.setShortcuts([Qt.SHIFT+Qt.Key_Return, Qt.SHIFT+Qt.Key_Enter])
@@ -173,7 +167,14 @@ class RepoWidget(QWidget):
         #self.toolBar_edit.addAction(gotoaction)
 
     def on_filled(self):
+        'initial batch of revisions loaded'
+        self.repoview.resizeColumns()
+
+    def loaded(self):
+        'all revisions loaded (graph generator completed)'
         tv = self.repoview
+        self._repodate = self._getrepomtime()
+        self._loading = False
         if self._reload_rev is not None:
             try:
                 tv.goto(self._reload_rev)

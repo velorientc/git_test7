@@ -132,8 +132,9 @@ class HgRepoListModel(QAbstractTableModel):
         self.emit(SIGNAL('layoutChanged()'))
         self.heads = [self.repo.changectx(x).rev() for x in self.repo.heads()]
         self.ensureBuilt(row=self.fill_step)
+        # filled signal triggers column resize using first fill_step rows
         QTimer.singleShot(0, lambda: self.emit(SIGNAL('filled')))
-        self.timerHandle = self.startTimer(50)
+        self.timerHandle = self.startTimer(5)
 
     def reloadConfig(self):
         self.dot_radius = 8
