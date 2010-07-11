@@ -55,6 +55,7 @@ class AnnotateView(QFrame):
             QPlainTextEdit.__init__(self, parent)
             self.document().setDefaultStyleSheet(qtlib.thgstylesheet)
             self.setReadOnly(True)
+            self.setLineWrapMode(QPlainTextEdit.NoWrap)
             self.setFont(QFont('Monospace'))
             self.setContextMenuPolicy(Qt.CustomContextMenu)
             self.connect(self,
