@@ -516,10 +516,10 @@ class PBranchWidget(gtk.VBox):
                 src = None
                 super(CmdWidgetUi, self).__init__(src)
                 self.cmdLogWidget = cmdLogWidget
-            def write(self, *args):
+            def write(self, *args, **opts):
                 for a in args:
                     self.cmdLogWidget.append(str(a))
-            def write_err(self, *args):
+            def write_err(self, *args, **opts):
                 for a in args:
                     self.cmdLogWidget.append(str(a), error=True)
             def flush(self):

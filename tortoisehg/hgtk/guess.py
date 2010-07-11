@@ -14,25 +14,12 @@ import cStringIO
 import Queue
 
 from mercurial import hg, ui, mdiff, cmdutil, match, util, error
+from mercurial import similar
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib, paths, thread2, settings
 
 from tortoisehg.hgtk import gtklib, statusbar
-
-# This function and some key bits below borrowed ruthelessly from
-# Peter Arrenbrecht <peter.arrenbrecht@gmail.com>
-# Thanks!
-def findmoves(repo, added, removed, threshold):
-    '''find renamed files -- yields (before, after, score) tuples'''
-    ctx = repo['.']
-    for r in removed:
-        rr = ctx.filectx(r).data()
-        for a in added:
-            aa = repo.wread(a)
-            if aa == rr:
-                yield r, a, 1.0
-                break
 
 class DetectRenameDialog(gtk.Window):
     'Detect renames after they occur'
@@ -300,18 +287,13 @@ class DetectRenameDialog(gtk.Window):
                 # Added and removed files are not considered as copy
                 # sources.
                 srcs.append(abs)
-        if not copy:
-            simularity = self.adjustment.get_value() / 100.0;
-            try:
-                gen = cmdutil.findrenames
-            except AttributeError:
-                # function was moved before 1.6
-                from mercurial import similar
-                gen = similar.findrenames
-        else:
+        if copy:
             simularity = 1.0
-            gen = findmoves
-        for old, new, score in gen(self.repo, tgts, srcs, simularity):
+        else:
+            simularity = self.adjustment.get_value() / 100.0;
+
+        gen = similar.findrenames(self.repo, tgts, srcs, simularity)
+        for old, new, score in gen:
             q.put( [old, new, '%d%%' % (score*100)] )
 
     def search_wait(self, thread, q):

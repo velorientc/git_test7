@@ -53,12 +53,11 @@ char Direntry::status(const Winstat& stat) const
     switch (this->state)
     {
     case 'n':
-        if (this->mtime == (unsigned)stat.mtime
-            && this->size == (unsigned)stat.size
-            )
-            return 'C';
-        else
-            return 'M';
+        if (this->size != (unsigned)stat.size)
+            return 'M'; // modified
+        if (this->mtime == (unsigned)stat.mtime)
+            return 'C'; // clean
+        return 'P'; // must peek into file contents
     case 'm':
         return 'M';
     case 'r':

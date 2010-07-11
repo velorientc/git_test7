@@ -818,7 +818,6 @@ table = {
         [('r', 'rev', '', _('revision to update'))],
         ('hgtk archive')),
     "strip": (strip, [], ('hgtk strip [REV]')),
-    "browse": (browse, [], ('hgtk browse [REV]')),
     "^mpatch": (mpatch, [], ('hgtk mpatch file.rej')),
     "import": (thgimport,
         [('', 'repo', False, _('import to the repository')),
