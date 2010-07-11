@@ -531,7 +531,7 @@ class Workbench(QMainWindow):
         self.actionAnnMode.setCheckable(True)
         connect(self.actionAnnMode, SIGNAL('toggled(bool)'), self.setAnnotate)
 
-        self.actionHelp.setShortcut(Qt.Key_F1)
+        self.actionHelp.setShortcut(QKeySequence.HelpContents)
         self.actionHelp.setIcon(geticon('help'))
         connect(self.actionHelp, SIGNAL('triggered()'), self.on_help)
 
