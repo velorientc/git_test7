@@ -196,7 +196,7 @@ class Workbench(QMainWindow):
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
         a.setShortcut(QKeySequence.New)
 
-        self.actionOpen_repository = a = QAction(_("&Open Repository"), self)
+        self.actionOpen_repository = a = QAction(_("&Open Repository..."), self)
         a.setShortcut(QKeySequence.Open)
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
