@@ -178,7 +178,10 @@ class HgRepoListModel(QAbstractTableModel):
         if required or buildrev:
             self.graph.build_nodes(nnodes=required, rev=buildrev)
             self.updateRowCount()
-        elif row and row > self.rowcount:
+
+        if self.rowcount >= len(self.graph):
+            return  # no need to update row count
+        if row and row > self.rowcount:
             # asked row was already built, but views where not aware of this
             self.updateRowCount()
         elif rev is not None and rev <= self.graph[self.rowcount].rev:
