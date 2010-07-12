@@ -43,6 +43,7 @@ def wctxactions(parent, point, repo, selrows):
         make(_('View other'), viewother, frozenset('MA'))
     menu.addSeparator()
     make(_('&Revert'), revert, frozenset('MAR!'))
+    make(_('&Add'), add, frozenset('R'))
     menu.addSeparator()
     make(_('File History'), log, frozenset('MARC!'))
     make(_('&Annotate'), annotate, frozenset('MARC!'))
