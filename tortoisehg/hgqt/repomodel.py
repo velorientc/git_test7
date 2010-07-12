@@ -87,6 +87,8 @@ class HgRepoListModel(QAbstractTableModel):
         self.wd_revs = []
         self.graph = None
         self.timerHandle = None
+        self.dotradius = 8
+        self.rowheight = 20
         self.rowcount = 0
         self.repo = repo
         self.reloadConfig()
@@ -137,13 +139,12 @@ class HgRepoListModel(QAbstractTableModel):
         self.timerHandle = self.startTimer(1)
 
     def reloadConfig(self):
-        self.dot_radius = 8
-        self.rowheight = 20
-        self.fill_step = 500            # use hgtk logic
-        self.max_file_size = 1024*1024  # will be removed
-        self.authorcolor = self.repo.ui.configbool('tortoisehg', 'authorcolor')
-        self.updateColumns()
+        _ui = self.repo.ui
+        self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
+        self.max_file_size = hglib.getmaxdiffsize(_ui)
+        self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
         self.maxauthor = 'author name'
+        self.updateColumns()
 
     def updateColumns(self):
         s = QSettings()
@@ -264,7 +265,7 @@ class HgRepoListModel(QAbstractTableModel):
         return self._branch_colors[branch]
 
     def col2x(self, col):
-        return 2 * self.dot_radius * col + self.dot_radius/2 + 8
+        return 2 * self.dotradius * col + self.dotradius/2 + 8
 
     def graphctx(self, ctx, gnode):
         w = self.col2x(gnode.cols) + 10
@@ -318,7 +319,7 @@ class HgRepoListModel(QAbstractTableModel):
         pen.setWidthF(1.5)                
         painter.setPen(pen)
 
-        radius = self.dot_radius
+        radius = self.dotradius
         centre_x = self.col2x(gnode.x)
         centre_y = h/2
 
