@@ -134,7 +134,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.ensureBuilt(row=self.fill_step)
         # filled signal triggers column resize using first fill_step rows
         QTimer.singleShot(0, lambda: self.emit(SIGNAL('filled')))
-        self.timerHandle = self.startTimer(5)
+        self.timerHandle = self.startTimer(1)
 
     def reloadConfig(self):
         self.dot_radius = 8
@@ -194,9 +194,9 @@ class HgRepoListModel(QAbstractTableModel):
                 self.emit(SIGNAL('showMessage'), '')
                 self.emit(SIGNAL('loaded'))
             # we only fill the graph data structures without telling
-            # views (until we actually did the full job), to keep
-            # maximal GUI reactivity
-            elif not self.graph.build_nodes(nnodes=self.fill_step):
+            # views until the model is loaded, to keep maximal GUI
+            # reactivity
+            elif not self.graph.build_nodes():
                 self.killTimer(self.timerHandle)
                 self.timerHandle = None
                 self.updateRowCount()
@@ -207,8 +207,7 @@ class HgRepoListModel(QAbstractTableModel):
         currentlen = self.rowcount
         newlen = len(self.graph)
 
-        # This is not fast; the graph walker should do this, or only do
-        # it when the user asks for a resize.
+        # TODO: This is probably the slowest operation during a reload
         authors = set()
         for i in xrange(currentlen, newlen):
             authors.add(self.repo[self.graph.nodes[i].rev].user())

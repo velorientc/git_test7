@@ -21,6 +21,8 @@ revision grapher (now stolen back).
 """
 
 import difflib
+import time
+import os
 
 from mercurial import patch, util, match
 
@@ -259,6 +261,13 @@ class Graph(object):
         """
         if self.grapher is None:
             return False
+
+        if os.name == "nt":
+            timer = time.clock
+        else:
+            timer = time.time
+        startsec = timer()
+
         stopped = False
         mcol = [self.max_cols]
         for vnext in self.grapher:
@@ -281,8 +290,9 @@ class Graph(object):
                     nnodes -= 1
                     if not nnodes:
                         break
-                else:
-                    break
+            cursec = timer()
+            if cursec < startsec or cursec > startsec + 0.1:
+                break
         else:
             self.grapher = None
             stopped = True
