@@ -1028,7 +1028,7 @@ class GStatus(gdialog.GWindow):
         return True
 
     def add_clicked(self, toolbutton, data=None):
-        add_list = self.relevant_checked_files('?I')
+        add_list = self.relevant_checked_files('?IR')
         if len(add_list) > 0:
             self.act.hg_add(add_list)
         else:
@@ -1239,6 +1239,7 @@ class GStatus(gdialog.GWindow):
         make(_('View other'), other, 'MAru', None, self.is_merge())
         menu.append_sep()
         make(_('_Revert'), revert, 'MAR!ru', gtk.STOCK_MEDIA_REWIND)
+        make(_('_Add'), add, 'R', gtk.STOCK_ADD, paths=True)
         menu.append_sep()
         make(_('File History'), log, 'MARC!ru', 'menulog.ico')
         make(_('Annotate'), annotate, 'MARC!ru', 'menublame.ico')
