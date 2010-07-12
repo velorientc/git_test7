@@ -136,7 +136,6 @@ class HgRepoListModel(QAbstractTableModel):
         self.ensureBuilt(row=self.fill_step)
         # filled signal triggers column resize using first fill_step rows
         QTimer.singleShot(0, lambda: self.emit(SIGNAL('filled')))
-        self.timerHandle = self.startTimer(1)
 
     def reloadConfig(self):
         _ui = self.repo.ui
@@ -185,6 +184,10 @@ class HgRepoListModel(QAbstractTableModel):
         elif rev is not None and rev <= self.graph[self.rowcount].rev:
             # asked rev was already built, but views where not aware of this
             self.updateRowCount()
+
+    def loadall(self):
+        'TODO: Hook this to a toolbar action'
+        self.timerHandle = self.startTimer(1)
 
     def timerEvent(self, event):
         if event.timerId() == self.timerHandle:

@@ -38,8 +38,7 @@ class RepoWidget(QWidget):
         self.repo = repo
         self.workbench = workbench
         self.revDetailsStackedWidget = workbench.revDetailsStackedWidget
-        self._reload_rev = '.'
-        self._loading = True
+        self._reload_rev = '.' # select working parent at startup
         self._scanForRepoChanges = True
         self.disab_shortcuts = []
         self.currentMessage = ''
@@ -101,15 +100,12 @@ class RepoWidget(QWidget):
 
     def timerEvent(self, event):
         if event.timerId() == self._watchrepotimer:
-            if not self._scanForRepoChanges or self.loading():
+            if not self._scanForRepoChanges:
                 return
             mtime = self._getrepomtime()
             if mtime > self._repodate:
                 self.showMessage(_("Repository has been modified "
                                    "(reloading is recommended)"))
-
-    def loading(self):
-        return self._loading
 
     def createActions(self):
         self.actionActivateRev = QAction('Activate rev.', self)
@@ -169,12 +165,12 @@ class RepoWidget(QWidget):
     def on_filled(self):
         'initial batch of revisions loaded'
         self.repoview.resizeColumns()
+        self.loaded()
 
     def loaded(self):
         'all revisions loaded (graph generator completed)'
-        tv = self.repoview
         self._repodate = self._getrepomtime()
-        self._loading = False
+        tv = self.repoview
         if self._reload_rev is not None:
             try:
                 tv.goto(self._reload_rev)
@@ -284,11 +280,11 @@ class RepoWidget(QWidget):
         self.close()
 
     def reload(self, rev=None):
+        'Initiate a refresh of the repo model'
         if rev == None:
             self._reload_rev = self.repoview.current_rev
         else:
             self._reload_rev = rev
-        self._loading = True
         self.repo = hg.repository(self.repo.ui, self.repo.root)
         self._repodate = self._getrepomtime()
         self.setupModels()

@@ -294,9 +294,9 @@ class Graph(object):
                     nnodes -= 1
                     if not nnodes:
                         break
-            cursec = timer()
-            if cursec < startsec or cursec > startsec + 0.1:
-                break
+                cursec = timer()
+                if cursec < startsec or cursec > startsec + 0.1:
+                    break
         else:
             self.grapher = None
             stopped = True
