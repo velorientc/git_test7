@@ -207,11 +207,7 @@ class HgRepoListModel(QAbstractTableModel):
         currentlen = self.rowcount
         newlen = len(self.graph)
 
-        # TODO: This is probably the slowest operation during a reload
-        authors = set()
-        for i in xrange(currentlen, newlen):
-            authors.add(self.repo[self.graph.nodes[i].rev].user())
-        sauthors = [hglib.username(user) for user in list(authors)]
+        sauthors = [hglib.username(user) for user in list(self.graph.authors)]
         sauthors.append(self.maxauthor)
         self.maxauthor = sorted(sauthors, key=lambda x: len(x))[-1]
 

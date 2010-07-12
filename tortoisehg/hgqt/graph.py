@@ -43,15 +43,15 @@ def diff(repo, ctx1, ctx2, files):
     return tounicode(diffdata)
 
 
-def getparents(repo, rev, branch):
+def getparents(ctx, branch):
     """
     Return non-null parents of `rev`. If branch is given, only return
     parents that belongs to names branch `branch` (beware that this is
     much slower).
     """
     if not branch:
-        return [x.rev() for x in repo[rev].parents() if x]
-    return [x.rev() for x in repo[rev].parents() if x and x.branch() == branch]
+        return [x.rev() for x in ctx.parents() if x]
+    return [x.rev() for x in ctx.parents() if x and x.branch() == branch]
 
 
 def ismerge(ctx):
@@ -82,10 +82,11 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
     rev_color = {}
     nextcolor = 0
     while curr_rev is None or curr_rev >= stop_rev:
+        ctx = repo[curr_rev]
         # Compute revs and next_revs.
         if curr_rev not in revs:
             if branch:
-                if repo[curr_rev].branch() != branch:
+                if ctx.branch() != branch:
                     if curr_rev is None:
                         curr_rev = len(repo)
                     else:
@@ -100,19 +101,20 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
             revs.append(curr_rev)
             rev_color[curr_rev] = curcolor = nextcolor
             nextcolor += 1
-            p_revs = getparents(repo, curr_rev, branch)
+            p_revs = getparents(ctx, branch)
             while p_revs:
                 rev0 = p_revs[0]
                 if rev0 < stop_rev or rev0 in rev_color:
                     break
                 rev_color[rev0] = curcolor
-                p_revs = getparents(repo, rev0, branch)
+                p_revs = getparents(repo[rev0], branch)
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = getparents(repo, curr_rev, branch)
+        parents = getparents(ctx, branch)
+        author = ctx.user()
         parents_to_add = []
         if len(parents) > 1:
             preferred_color = None
@@ -143,7 +145,7 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
                     color = rev_color[parent]
                     lines.append( (i, next_revs.index(parent), color) )
 
-        yield (curr_rev, rev_index, curcolor, lines, parents)
+        yield (curr_rev, rev_index, curcolor, lines, parents, author)
         revs = next_revs
         if curr_rev is None:
             curr_rev = len(repo)
@@ -207,7 +209,7 @@ def filelog_grapher(repo, path):
 
         pcrevs = [pfc.rev() for pfc in fctx.parents()]
         yield (fctx.rev(), index, curcolor, lines, pcrevs,
-               _paths.get(fctx.rev(), path))
+               _paths.get(fctx.rev(), path), fctx.user())
         revs = next_revs
 
         if revs:
@@ -250,6 +252,7 @@ class Graph(object):
         self.nodes = []
         self.nodesdict = {}
         self.max_cols = 0
+        self.authors = set()
 
     def build_nodes(self, nnodes=None, rev=None):
         """
@@ -273,7 +276,8 @@ class Graph(object):
         for vnext in self.grapher:
             if vnext is None:
                 continue
-            nrev, xpos, color, lines, parents = vnext[:5]
+            nrev, xpos, color, lines, parents, author = vnext[:6]
+            self.authors.add(author)
             if nrev >= self.maxlog:
                 continue
             gnode = GraphNode(nrev, xpos, color, lines, parents,
