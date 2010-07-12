@@ -186,7 +186,6 @@ class HgRepoListModel(QAbstractTableModel):
             self.updateRowCount()
 
     def loadall(self):
-        'TODO: Hook this to a toolbar action'
         self.timerHandle = self.startTimer(1)
 
     def timerEvent(self, event):

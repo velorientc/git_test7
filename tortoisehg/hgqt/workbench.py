@@ -223,6 +223,12 @@ class Workbench(QMainWindow):
         icon.addPixmap(QPixmap(":/icons/forward.svg"), QIcon.Normal, QIcon.Off)
         a.setIcon(icon)
 
+        self.actionLoadAll = a = QAction(_("Load all"), self)
+        a.setEnabled(True)
+#        icon = QIcon()
+#        icon.addPixmap(QPixmap(":/icons/loadall.svg"), QIcon.Normal, QIcon.Off)
+#        a.setIcon(icon)
+
         self.actionShowPaths = a = QAction(_("Show Paths"), self)
         a.setCheckable(True)
 
@@ -264,6 +270,8 @@ class Workbench(QMainWindow):
         tb.addSeparator()
         tb.addAction(self.actionBack)
         tb.addAction(self.actionForward)
+        tb.addSeparator()
+        tb.addAction(self.actionLoadAll)
         tb.addSeparator()
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
@@ -515,6 +523,7 @@ class Workbench(QMainWindow):
         self.actionQuit.triggered.connect(self.close)
         self.actionBack.triggered.connect(self.back)
         self.actionForward.triggered.connect(self.forward)
+        self.actionLoadAll.triggered.connect(self.loadall)
         self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
         self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
@@ -613,6 +622,11 @@ class Workbench(QMainWindow):
         if w:
             w.forward()
 
+    def loadall(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.repoview.model().loadall()
+    
     def newRepository(self):
         """ Run init dialog """
         from tortoisehg.hgqt.hginit import InitDialog
