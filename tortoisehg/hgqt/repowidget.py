@@ -164,22 +164,19 @@ class RepoWidget(QWidget):
 
     def on_filled(self):
         'initial batch of revisions loaded'
+        self._repodate = self._getrepomtime()
         self.repoview.resizeColumns()
-        self.loaded()
+        if self._reload_rev is not None:
+            try:
+                self.repoview.goto(self._reload_rev)
+                self.revDetailsWidget.on_filled()
+            except IndexError:
+                pass
 
     def loaded(self):
         'all revisions loaded (graph generator completed)'
-        self._repodate = self._getrepomtime()
-        tv = self.repoview
-        if self._reload_rev is not None:
-            try:
-                tv.goto(self._reload_rev)
-                self.revDetailsWidget.on_filled()
-                return
-            except IndexError:
-                pass
-        else:
-            tv.setCurrentIndex(tv.model().index(0, 0))
+        # Perhaps we can update a GUI element later, to indicate full load
+        pass
 
     def revision_activated(self, rev=None):
         if rev is None:
