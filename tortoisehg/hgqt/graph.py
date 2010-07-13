@@ -265,11 +265,13 @@ class Graph(object):
         if self.grapher is None:
             return False
 
-        if os.name == "nt":
-            timer = time.clock
-        else:
-            timer = time.time
-        startsec = timer()
+        usetimer = nnodes is None and rev is None
+        if usetimer:
+            if os.name == "nt":
+                timer = time.clock
+            else:
+                timer = time.time
+            startsec = timer()
 
         stopped = False
         mcol = [self.max_cols]
@@ -294,6 +296,7 @@ class Graph(object):
                     nnodes -= 1
                     if not nnodes:
                         break
+            if usetimer:
                 cursec = timer()
                 if cursec < startsec or cursec > startsec + 0.1:
                     break
