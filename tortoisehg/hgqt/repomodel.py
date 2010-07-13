@@ -132,9 +132,8 @@ class HgRepoListModel(QAbstractTableModel):
         self.graph = Graph(self.repo, grapher, self.max_file_size)
         self.rowcount = 0
         self.emit(SIGNAL('layoutChanged()'))
-        self.heads = [self.repo.changectx(x).rev() for x in self.repo.heads()]
         self.ensureBuilt(row=self.fill_step)
-        # filled signal triggers column resize using first fill_step rows
+        self.emit(SIGNAL('showMessage'), '')
         QTimer.singleShot(0, lambda: self.emit(SIGNAL('filled')))
 
     def reloadConfig(self):
