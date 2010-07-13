@@ -6,13 +6,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-
 # TODO:
-# - Keep the selection via the browse btn as a basename (instead of repo.root).
 # - Make what is typed into the lineedit of the rev_combo change dest_edit (and hgcmd_txt)
-# - Make the hgcmd_txt expand to show it's complete content (multiline eventualy).
-# - Save/load qt settings (window position, ...).
-
 
 import os
 
@@ -26,7 +21,6 @@ from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt import cmdui, qtlib
 
 WD_PARENT = _('= Working Directory Parent =')
-
 
 class ArchiveDialog(QDialog):
     """ Dialog to archive a particular Mercurial revision """
@@ -373,9 +367,7 @@ class ArchiveDialog(QDialog):
         s = QSettings()
         s.setValue('archive/geom', self.saveGeometry())
 
-
 def run(ui, *revs, **opts):
     rev = opts.get('rev')
     repo = hg.repository(ui, paths.find_root())
     return ArchiveDialog(repo.ui, repo, rev)
-
