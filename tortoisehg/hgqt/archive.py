@@ -181,7 +181,7 @@ class ArchiveDialog(QDialog):
         if select['type'] == 'files':
             caption = _('Select Destination Folder')
             path = FD.getExistingDirectory(parent=self, caption=caption,
-                    options=FD.ShowDirsOnly | FD.ReadOnly)
+                    directory=dest, options=FD.ShowDirsOnly | FD.ReadOnly)
             response = str(path)
         else:
             caption = _('Open File')
