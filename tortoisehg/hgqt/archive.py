@@ -119,6 +119,8 @@ class ArchiveDialog(QDialog):
         self.dest_edit.textEdited.connect(self.dest_edited)
         self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'),
                      self.rev_combo_changed)
+        self.connect(self.rev_combo, SIGNAL('editTextChanged(QString)'),
+                     self.rev_combo_changed)
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
         self.filesradio.toggled.connect(self.update_path)
