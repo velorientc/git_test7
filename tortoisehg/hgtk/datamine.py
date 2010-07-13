@@ -18,8 +18,8 @@ from mercurial import util, error
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, thread2
 
-from tortoisehg.hgtk.logview.colormap import AnnotateColorMap
-from tortoisehg.hgtk.logview.colormap import AnnotateColorSaturation
+from tortoisehg.util.colormap import AnnotateColorMap
+from tortoisehg.util.colormap import AnnotateColorSaturation
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk.logview import treemodel as LogTreeModelModule
 from tortoisehg.hgtk import gtklib, gdialog, changeset, statusbar, csinfo

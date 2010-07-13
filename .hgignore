@@ -37,3 +37,5 @@ win32/*.reg
 *~
 tortoisehg/util/__version__.py
 *.wixobj
+tortoisehg/hgqt/workbench_rc.py
+tortoisehg/hgqt/*_ui.py
