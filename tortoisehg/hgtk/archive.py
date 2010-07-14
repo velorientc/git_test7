@@ -58,6 +58,10 @@ class ArchiveDialog(gdialog.GDialog):
 
         table.add_row(_('Archive revision:'), self.combo)
 
+        self.opt_files_in_rev = gtk.CheckButton(
+                    _('Only files modified/created in this revision'))
+        table.add_row('', self.opt_files_in_rev, ypad=0)
+
         ## dest combo & browse button
         self.destentry = gtk.Entry()
         self.destentry.set_width_chars(46)
@@ -226,6 +230,11 @@ class ArchiveDialog(gdialog.GDialog):
             cmdline.append(rev)
         cmdline.append('-t')
         cmdline.append(type)
+        if self.opt_files_in_rev.get_active():
+            ctx = self.repo[rev]
+            for f in ctx.files():
+                cmdline.append('-I')
+                cmdline.append(f)
         cmdline.append('--')
         cmdline.append(hglib.fromutf(dest))
 
