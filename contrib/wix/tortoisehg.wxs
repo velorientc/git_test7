@@ -88,7 +88,10 @@
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='TortoiseHg'>
           <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)'>
-            <File Id='hgtkEXE' Name='hgtk.exe' KeyPath='yes'
+            <File Id='thgEXE' Name='thg.exe' KeyPath='yes'
+                  Source='dist\thg.exe'
+            />
+            <File Id='hgtkEXE' Name='hgtk.exe'
                   Source='dist\hgtk.exe'
             />
             <File Id='hgEXE' Name='hg.exe'
