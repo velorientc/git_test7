@@ -93,8 +93,7 @@ class RenameDialog(QDialog):
         self.cmd.setHidden(True)
 
         # bottom buttons
-        self.rename_btn_txt = 'Rename'
-        self.rename_btn = QPushButton(_(self.rename_btn_txt))
+        self.rename_btn = QPushButton('')
         self.rename_btn.setAutoDefault(False)
         self.close_btn = QPushButton(_('&Close'))
         self.close_btn.setDefault(True)
@@ -144,9 +143,7 @@ class RenameDialog(QDialog):
 
         # dialog setting
         self.setWindowIcon(qtlib.geticon('rename'))
-        self.reponame = hglib.get_reponame(self.repo)
-        self.wintitle = _('Rename - %s') % hglib.tounicode(self.reponame)
-        self.setWindowTitle(self.wintitle)
+        self.setRenameCopy()
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         if iscopy:
             self.copy_chk.setChecked(True)
@@ -155,6 +152,17 @@ class RenameDialog(QDialog):
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.dest_txt.setFocus()
         self._readsettings()
+
+    def setRenameCopy(self):
+        if self.windowTitle() == '':
+            self.reponame = hglib.tounicode(hglib.get_reponame(self.repo))
+        if self.copy_chk.isChecked():
+            wt = (_('Copy - %s') % self.reponame)
+            self.rename_btn.setText(_('Copy'))
+        else:
+            wt = (_('Rename - %s') % self.reponame)
+            self.rename_btn.setText(_('Rename'))
+        self.setWindowTitle(wt)
 
     def get_src(self):
         return hglib.fromunicode(self.src_txt.text())
@@ -201,16 +209,11 @@ class RenameDialog(QDialog):
             self.compose_command(self.get_src(), self.get_dest())
 
     def copy_chk_toggled(self):
+        self.setRenameCopy()
         if self.copy_chk.isChecked():
-            sw = self.wintitle.replace(_('Rename'), _('Copy'))
-            sb = self.rename_btn_txt.replace(_('Rename'), _('Copy'))
             self.opts['after'] = False
         else:
-            sw = self.wintitle.replace(_('Copy'), _('Rename'))
-            sb = self.rename_btn_txt.replace(_('Copy'), _('Rename'))
             self.opts['after'] = True
-        self.setWindowTitle(sw)
-        self.rename_btn.setText(sb)
         self.show_command(self.compose_command(self.get_src(), self.get_dest()))
 
     def compose_command(self, src, dest):
