@@ -15,7 +15,7 @@ from mercurial import hg
 
 from tortoisehg.hgqt.i18n import _
 
-from tortoisehg.hgqt.qtlib import geticon, getfont
+from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
 from tortoisehg.hgqt import hgemail
@@ -157,6 +157,7 @@ class RepoWidget(QWidget):
         connect(view, SIGNAL('backoutToRevision'), self.backoutToRevision)
         connect(view, SIGNAL('emailRevision'), self.emailRevision)
         connect(view, SIGNAL('copyHash'), self.copyHash)
+        connect(view, SIGNAL('rebaseRevision'), self.rebaseRevision)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -240,6 +241,26 @@ class RepoWidget(QWidget):
     def copyHash(self, rev):
         clip = QApplication.clipboard()
         clip.setText(binascii.hexlify(self.repo[rev].node()))
+
+    def rebaseRevision(self, srcrev):
+        """Rebase selected revision on top of working directory parent"""
+        dstrev = self.repo['.'].rev()
+        saved = self.setScanForRepoChanges(False)
+        main = _("Confirm Rebase Revision")
+        text = _("Rebase revision %d on top of %d?") % (srcrev, dstrev)
+        labels = ((QMessageBox.Yes, _('&Yes')),
+                  (QMessageBox.No, _('&No')))
+        cmdline = ['rebase', '--source', str(srcrev), '--dest', str(dstrev),
+                   '--repository', self.repo.root]
+        if QuestionMsgBox(_('Confirm Rebase'), main, text, labels=labels,
+                          parent=self):
+            self.runner = cmdui.Runner(_('Rebase - TortoiseHg'), self)
+            def finished(ret):
+                # TODO: implement something less drastic than a full reload
+                self.reload()
+                self.setScanForRepoChanges(saved)
+            self.runner.commandFinished.connect(finished)
+            self.runner.run(cmdline)
 
     def revision_selected(self, rev):
         if self.workbench.getCurentRepoRoot() != self.repo.root:

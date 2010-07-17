@@ -14,6 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+from mercurial import extensions
 from mercurial.error import RepoError
 
 from tortoisehg.util import hglib
@@ -104,6 +105,7 @@ class HgRepoView(QTableView):
         connect(tb, SIGNAL('goto'), self.goto)
 
     def _action_defs(self):
+        exs = [name for name, module in extensions.extensions()]
         a = [('manifest', _('Show at rev...'), None,
               _('Show the manifest at selected revision'), None,
               self.showAtRev),
@@ -120,6 +122,9 @@ class HgRepoView(QTableView):
              ('copyhash', _('Copy hash'), None, None, None,
               self.copyHash),
              ]
+        if 'rebase' in exs:
+            a.append(('rebase', _('Rebase...'), None, None, None,
+                     self.rebase))
         return a
 
     def createActions(self):
@@ -164,10 +169,14 @@ class HgRepoView(QTableView):
     def copyHash(self):
         self.emit(SIGNAL('copyHash'), self.current_rev)
 
+    def rebase(self):
+        self.emit(SIGNAL('rebaseRevision'), self.current_rev)
+
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
-                    'email', 'copyhash', None, 'back', 'forward']:
+                    'email', 'copyhash', None, 'back', 'forward',
+                    None, 'rebase']:
             if act:
                 menu.addAction(self._actions[act])
             else:
