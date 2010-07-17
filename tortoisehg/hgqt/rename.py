@@ -214,7 +214,7 @@ class RenameDialog(QDialog):
         self.show_command(self.compose_command(self.get_src(), self.get_dest()))
 
     def compose_command(self, src, dest):
-        cmdline = ['rename']
+        cmdline = ['rename', '--repository', self.repo.root]
         vcmdline = ['hg rename']
         for k, v in self.opts.items():
             cmdline.append(k)

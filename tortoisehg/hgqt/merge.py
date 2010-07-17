@@ -341,12 +341,12 @@ class MergePage(BasePage):
         self.setTitle(_('Merging...'))
         self.setSubTitle(_('Please finish merging with launched merge tool.'))
 
+        cmdline = ['--repository', self.wizard().repo.root]
         if self.field('discard').toBool():
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
-            cmdline = ['debugsetparents', '.', self.wizard().other]
+            cmdline.extend(['debugsetparents', '.', self.wizard().other])
         else:
-            cmdline = []
             tool = self.field('mergetool').toString()
             if tool:
                 cmdline.extend(['--config', 'ui.merge=%s' % tool])
@@ -592,7 +592,8 @@ class CommitPage(BasePage):
 
         # merges must be committed without specifying file list
         message = hglib.fromunicode(self.msg_text.toPlainText())
-        cmdline = ['commit', '--verbose', '--message', message]
+        cmdline = ['commit', '--verbose', '--message', message,
+                   '--repository', self.wizard().repo.root]
         self.cmd.run(cmdline)
 
     def isComplete(self):

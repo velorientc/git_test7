@@ -140,7 +140,7 @@ class BackoutDialog(QDialog):
         # prepare command line
         msg = self.msg_text.toPlainText()
         revhex = self.target_info.get_data('revid')
-        cmdline = ['backout', '--rev', revhex]
+        cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
         if self.merge_chk.isChecked():
             cmdline += ['--merge']
         cmdline += ['--message', hglib.fromunicode(msg)]
