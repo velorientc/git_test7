@@ -266,6 +266,16 @@ class RenameDialog(QDialog):
         if not os.path.exists(src):
             qtlib.WarningMsgBox(_('Rename'), _('Source does not exists.'))
             return
+        fullsrc = os.path.abspath(src)
+        if not fullsrc.startswith(self.repo.root):
+            qtlib.ErrorMsgBox(_('Rename Error'),
+                    _('The source must be within the repository tree.'))
+            return
+        fulldest = os.path.abspath(dest)
+        if not fulldest.startswith(self.repo.root):
+            qtlib.ErrorMsgBox(_('Rename Error'),
+                    _('The destination must be within the repository tree.'))
+            return
 
         # prepare command line
         #cmdline, vcl = self.compose_command(self.get_src(), self.get_dest())
@@ -352,4 +362,5 @@ class RenameDialog(QDialog):
 
 
 def run(ui, *pats, **opts):
+    qtlib.InfoMsgBox('Rename/Copy', 'pats = %s' % str(pats), 'opts = %s' % str(opts))
     return RenameDialog(ui, pats, **opts)
