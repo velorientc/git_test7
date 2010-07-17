@@ -184,19 +184,23 @@ class RenameDialog(QDialog):
     def get_file_or_folder(self, mode):
         if mode == 'src':
             curr = self.get_src()
-            capt = 'Source'
+            if os.path.isfile(curr):
+                caption = _('Select Source File')
+            else:
+                caption = _('Select Source Folder')
         else:
             curr = self.get_dest()
-            capt = 'Destination'
+            if os.path.isfile(curr):
+                caption = _('Select Destination File')
+            else:
+                caption = _('Select Destination Folder')
         FD = QFileDialog
         if os.path.isfile(curr):
-            caption = _('Select %s File') % capt
             filter = 'All Files (*.*)'
             filename = FD.getOpenFileName(parent=self, caption=caption,
                     options=FD.ReadOnly)
             response = hglib.fromunicode(filename)
         else:
-            caption = _('Select %s Folder' % capt)
             path = FD.getExistingDirectory(parent=self, caption=caption,
                     options=FD.ShowDirsOnly | FD.ReadOnly)
             response = hglib.fromunicode(path)
