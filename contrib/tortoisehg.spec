@@ -16,8 +16,10 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # subpackage has to be arch-specific (because of lib64)
 # BuildArch:	noarch
 BuildRequires:	python, python-devel, gettext, python-sphinx
-Requires:	python >= 2.4, python-iniparse, mercurial >= 1.3, gnome-python2-gconf
+BuildRequires:	PyQt4-devel
+Requires:	python >= 2.4, python-iniparse, mercurial >= 1.6, gnome-python2-gconf
 Requires:	gnome-python2-gtksourceview, pycairo, pygobject2, pygtk2 >= 2.10
+Requires:	PyQt4 >= 4.6, qscintilla-python
 
 %description
 This package contains the hgtk command line tool which provides a 
@@ -73,6 +75,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc COPYING.txt doc/build/html/
 %{_bindir}/hgtk
+%{_bindir}/thg
 %{python_sitelib}/tortoisehg/
 %{python_sitelib}/tortoisehg-*.egg-info
 %{_datadir}/pixmaps/tortoisehg/
