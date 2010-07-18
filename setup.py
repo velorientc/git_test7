@@ -14,6 +14,7 @@ import subprocess
 from distutils.core import setup
 from distutils.command.build import build
 from distutils.spawn import spawn, find_executable
+from os.path import isdir, exists, join, walk, splitext
 
 thgcopyright = 'Copyright (C) 2010 Steve Borho and others'
 hgcopyright = 'Copyright (C) 2005-2010 Matt Mackall and others'
@@ -47,10 +48,44 @@ class build_mo(build):
             self.mkpath(modir)
             self.make_file([pofile], mofile, spawn, (cmd,))
 
+class build_qt(build):
+    def compile_ui(self, ui_file, py_file=None):
+        # Search for pyuic4 in python bin dir, then in the $Path.
+        if py_file is None:
+            py_file = splitext(ui_file)[0] + "_ui.py"
+        try:
+            from PyQt4 import uic
+            fp = open(py_file, 'w')
+            uic.compileUi(ui_file, fp)
+            fp.close()
+            print "compiled", ui_file, "into", py_file
+        except Exception, e:
+            print 'Unable to compile user interface', e
+            return
+
+    def compile_rc(self, qrc_file, py_file=None):
+        # Search for pyuic4 in python bin dir, then in the $Path.
+        if py_file is None:
+            py_file = splitext(qrc_file)[0] + "_rc.py"
+        if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
+            print "Unable to generate python module for resource file", qrc_file
+        
+    def run(self):
+        for dirpath, _, filenames in os.walk(join('tortoisehg', 'hgqt')):
+            for filename in filenames:
+                if filename.endswith('.ui'):
+                    self.compile_ui(join(dirpath, filename))
+                elif filename.endswith('.qrc'):
+                    self.compile_rc(join(dirpath, filename))
+        build.run(self)
+
+
 build.sub_commands.append(('build_mo', None))
 
 cmdclass = {
-        'build_mo': build_mo}
+        'build': build_qt ,
+        'build_mo': build_mo ,
+    }
 
 def setup_windows(version):
     # Specific definitios for Windows NT-alike installations
@@ -149,6 +184,7 @@ def setup_posix():
     _extra = {}
     _scripts = ['thg', 'hgtk']
     _packages = ['tortoisehg', 'tortoisehg.hgtk', 
+                 'tortoisehg.hgqt', 
                  'tortoisehg.hgtk.logview', 'tortoisehg.util']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
