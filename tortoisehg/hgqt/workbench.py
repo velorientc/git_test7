@@ -199,6 +199,9 @@ class Workbench(QMainWindow):
         self.actionOpen_repository = a = QAction(_("&Open Repository..."), self)
         a.setShortcut(QKeySequence.Open)
 
+        self.actionClose_repository = a = QAction(_("&Close Repository"), self)
+        a.setShortcut(QKeySequence.Close)
+
         self.actionRefresh = a = QAction(_("&Refresh"), self)
         a.setShortcut(QKeySequence.Refresh)
 
@@ -244,6 +247,7 @@ class Workbench(QMainWindow):
         self.menuFile = m = QMenu(_("&File"), self.menubar)
         m.addAction(self.actionNew_repository)
         m.addAction(self.actionOpen_repository)
+        m.addAction(self.actionClose_repository)
         m.addSeparator()
         m.addAction(self.actionQuit)
 
@@ -599,6 +603,8 @@ class Workbench(QMainWindow):
                 self.newRepository)
         connect(self.actionOpen_repository, SIGNAL('triggered()'),
                 self.openRepository)
+        connect(self.actionClose_repository, SIGNAL('triggered()'),
+                self.closeRepository)
 
     def actionShowPathsToggled(self, show):
         self.reporegistry.showPaths(show)
@@ -747,6 +753,11 @@ class Workbench(QMainWindow):
             if not rw.closeRepoWidget():
                 return False
         return True
+
+    def closeRepository(self):
+        """close the current repo tab"""
+        self.repoTabCloseRequested(self.repoTabsWidget.currentIndex())
+
 
 def run(ui, *pats, **opts):
     repo = None
