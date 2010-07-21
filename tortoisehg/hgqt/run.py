@@ -745,7 +745,7 @@ table = {
          [('l', 'limit', '', _('limit number of changes displayed'))],
          _('thg log [OPTIONS] [FILE]')),
     "^merge":
-        (merge, 
+        (merge,
          [('r', 'rev', '', _('revision to merge'))],
          _('thg merge [[-r] REV]')),
     "remove|rm": (remove, [], _('thg remove [FILE]...')),
@@ -785,7 +785,7 @@ table = {
             _('launch visual diff tool')),
     "^version": (version,
         [('v', 'verbose', None, _('print license'))],
-	    _('thg version [OPTION]')),
+        _('thg version [OPTION]')),
 }
 
 if os.name == 'nt':
