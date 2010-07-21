@@ -362,5 +362,4 @@ class RenameDialog(QDialog):
 
 
 def run(ui, *pats, **opts):
-    qtlib.InfoMsgBox('Rename/Copy', 'pats = %s' % str(pats), 'opts = %s' % str(opts))
     return RenameDialog(ui, pats, **opts)
