@@ -267,8 +267,8 @@ class ArchiveDialog(QDialog):
             rev = '.'
         else:
             rev = hglib.fromunicode(rev)
-            cmdline.append('-r')
-            cmdline.append(rev)
+        cmdline.append('-r')
+        cmdline.append(rev)
         cmdline.append('-t')
         cmdline.append(type)
         if self.files_in_rev_chk.isChecked():
