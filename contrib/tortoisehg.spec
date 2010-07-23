@@ -82,8 +82,6 @@ rm -rf $RPM_BUILD_ROOT
 # Instead we just claim ownership of the zsh top folder ...
 %{_datadir}/zsh
 
-%dir %{_sysconfdir}/mercurial
-%dir %{_sysconfdir}/mercurial/hgrc.d
 %config(noreplace) %{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
 %files nautilus
