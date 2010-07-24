@@ -11,6 +11,7 @@ import time
 import sys
 import os
 import subprocess
+from distutils import log
 from distutils.core import setup, Command
 from distutils.command.build import build
 from distutils.dep_util import newer
@@ -79,9 +80,9 @@ class build_qt(Command):
             fp = open(py_file, 'w')
             uic.compileUi(ui_file, fp)
             fp.close()
-            print "compiled", ui_file, "into", py_file
+            log.info('compiled %s into %s' % (ui_file, py_file))
         except Exception, e:
-            print 'Unable to compile user interface', e
+            self.warn('Unable to compile user interface %s' % e)
             return
 
     def compile_rc(self, qrc_file, py_file=None):
@@ -91,7 +92,8 @@ class build_qt(Command):
         if not(self.force or newer(qrc_file, py_file)):
             return
         if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
-            print "Unable to generate python module for resource file", qrc_file
+            self.warn("Unable to generate python module for resource file %s"
+                      % qrc_file)
         
     def run(self):
         for dirpath, _, filenames in os.walk(join('tortoisehg', 'hgqt')):
