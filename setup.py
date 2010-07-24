@@ -94,7 +94,9 @@ class build_qt(Command):
         if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
             self.warn("Unable to generate python module for resource file %s"
                       % qrc_file)
-        
+        else:
+            log.info('compiled %s into %s' % (qrc_file, py_file))
+
     def run(self):
         for dirpath, _, filenames in os.walk(join('tortoisehg', 'hgqt')):
             for filename in filenames:
