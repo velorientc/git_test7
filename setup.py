@@ -77,13 +77,13 @@ class build_qt(build):
                     self.compile_ui(join(dirpath, filename))
                 elif filename.endswith('.qrc'):
                     self.compile_rc(join(dirpath, filename))
-        build.run(self)
 
 
+build.sub_commands.insert(0, ('build_qt', None))
 build.sub_commands.append(('build_mo', None))
 
 cmdclass = {
-        'build': build_qt ,
+        'build_qt': build_qt ,
         'build_mo': build_mo ,
     }
 
