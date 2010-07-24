@@ -138,11 +138,7 @@ class ArchiveDialog(QDialog):
         self.repo = repo
         self.initrev = rev
         self.prevtarget = None
-        if self.initrev:
-            self.rev_combo.addItem(str(self.initrev))
-        else:
-            self.rev_combo.addItem(WD_PARENT)
-        self.rev_combo.setCurrentIndex(0)
+        self.rev_combo.addItem(WD_PARENT)
         for b in self.repo.branchtags():
             self.rev_combo.addItem(b)
         tags = list(self.repo.tags())
@@ -151,6 +147,11 @@ class ArchiveDialog(QDialog):
         for t in tags:
             self.rev_combo.addItem(t)
         self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
+        if self.initrev:
+            text = str(self.initrev)
+            if self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly)) == -1:
+                self.rev_combo.insertItems(0, [text])
+        self.rev_combo.setCurrentIndex(0)
         self.dest_edit.setText(self.repo.root)
         self.filesradio.setChecked(True)
         self.update_path()
