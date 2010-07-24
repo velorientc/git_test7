@@ -119,6 +119,7 @@ class HgRepoView(QTableView):
               self.backoutToRev),
              ('email', _('Email patch...'), None, None, None,
               self.emailRev),
+             ('archive', _('Archive...'), None, None, None, self.archiveRev),
              ('copyhash', _('Copy hash'), None, None, None,
               self.copyHash),
              ]
@@ -166,6 +167,9 @@ class HgRepoView(QTableView):
     def emailRev(self):
         self.emit(SIGNAL('emailRevision'), self.current_rev)
 
+    def archiveRev(self):
+        self.emit(SIGNAL('archiveRevision'), self.current_rev)
+
     def copyHash(self):
         self.emit(SIGNAL('copyHash'), self.current_rev)
 
@@ -175,7 +179,7 @@ class HgRepoView(QTableView):
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
-                    'email', 'copyhash', None, 'back', 'forward',
+                    'email', 'archive', 'copyhash', None, 'back', 'forward',
                     None, 'rebase']:
             if act:
                 menu.addAction(self._actions[act])
@@ -215,7 +219,7 @@ class HgRepoView(QTableView):
         model = self.model()
 
         for c in range(model.columnCount()):
-            if model._columns[c] == 'Log': 
+            if model._columns[c] == 'Log':
                 self.setItemDelegateForColumn(c, self.htmlDelegate)
             else:
                 self.setItemDelegateForColumn(c, self.standardDelegate)

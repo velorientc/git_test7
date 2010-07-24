@@ -18,7 +18,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
-from tortoisehg.hgqt import hgemail
+from tortoisehg.hgqt import hgemail, archive
 
 from repoview import HgRepoView
 from revdetailswidget import RevDetailsWidget
@@ -44,7 +44,7 @@ class RepoWidget(QWidget):
         self.currentMessage = ''
 
         QWidget.__init__(self)
-        
+
         self.load_config()
         self.setupUi()
         self.createActions()
@@ -156,6 +156,7 @@ class RepoWidget(QWidget):
         connect(view, SIGNAL('tagToRevision'), self.tagToRevision)
         connect(view, SIGNAL('backoutToRevision'), self.backoutToRevision)
         connect(view, SIGNAL('emailRevision'), self.emailRevision)
+        connect(view, SIGNAL('archiveRevision'), self.archiveRevision)
         connect(view, SIGNAL('copyHash'), self.copyHash)
         connect(view, SIGNAL('rebaseRevision'), self.rebaseRevision)
         #self.attachQuickBar(view.goto_toolbar)
@@ -238,6 +239,10 @@ class RepoWidget(QWidget):
         dlg = hgemail.EmailDialog(self.repo.ui, self.repo, [str(rev)], self)
         dlg.show()
 
+    def archiveRevision(self, rev):
+        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, rev, self)
+        dlg.show()
+
     def copyHash(self, rev):
         clip = QApplication.clipboard()
         clip.setText(binascii.hexlify(self.repo[rev].node()))
@@ -284,7 +289,7 @@ class RepoWidget(QWidget):
             # store rev to show once it's available (when graph
             # filling is still running)
             self._reload_rev = rev
-            
+
     def _getrepomtime(self):
         """Return the last modification time for the repo"""
         watchedfiles = [(self.repo.root, ".hg", "store", "00changelog.i"),

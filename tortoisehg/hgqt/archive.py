@@ -26,7 +26,7 @@ class ArchiveDialog(QDialog):
     """ Dialog to archive a particular Mercurial revision """
 
     def __init__(self, ui, repo, rev=None, parent=None):
-        super(ArchiveDialog, self).__init__(parent=None)
+        super(ArchiveDialog, self).__init__(parent)
 
         # main layout
         self.vbox = QVBoxLayout()
@@ -262,7 +262,7 @@ class ArchiveDialog(QDialog):
         self.compose_command(path, type)
 
     def compose_command(self, dest, type):
-        cmdline = ['archive']
+        cmdline = ['archive', '--repository', self.repo.root]
         rev = self.rev_combo.currentText()
         if rev == WD_PARENT:
             rev = '.'
