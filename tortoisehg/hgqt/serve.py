@@ -12,13 +12,7 @@ from mercurial import extensions, hgweb, util
 from mercurial.hgweb import server
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
-
-try:
-    from tortoisehg.hgqt.serve_ui import Ui_ServeDialog
-except ImportError:
-    from PyQt4 import uic
-    Ui_ServeDialog = uic.loadUiType(os.path.join(os.path.dirname(__file__),
-                                                 'serve.ui'))[0]
+from tortoisehg.hgqt.serve_ui import Ui_ServeDialog
 
 class ServeDialog(QDialog):
     """Dialog for serving repositories via web"""

@@ -40,31 +40,6 @@ class HgDialogMixin(object):
     """
     def __init__(self, ui):
         self.load_config(ui)
-
-        _path = osp.dirname(__file__)
-        uifile = osp.join(_path, self._uifile)
-        pyfile = uifile.replace(".ui", "_ui.py")
-        if should_rebuild(uifile, pyfile):
-            os.system('pyuic4 %s -o %s' % (uifile, pyfile))
-        try:
-            modname = osp.splitext(osp.basename(uifile))[0] + "_ui"
-            modname = "tortoisehg.hgqt.%s" % modname
-            mod = __import__(modname, fromlist=['*'])
-            classnames = [x for x in dir(mod) if x.startswith('Ui_')]
-            if len(classnames) == 1:
-                ui_class = getattr(mod, classnames[0])
-            elif 'Ui_MainWindow' in classnames:
-                ui_class = getattr(mod, 'Ui_MainWindow')
-            else:
-                raise ValueError("Can't determine which main class to use in %s" % modname)
-        except ImportError:
-            ui_class, base_class = uic.loadUiType(uifile)
-
-        if ui_class not in self.__class__.__bases__:
-            # hacking by adding the form class from ui file or pyuic4
-            # generated module because we cannot use metaclass here,
-            # due to "QObject" not being a subclass of "object"
-            self.__class__.__bases__ = self.__class__.__bases__ + (ui_class,)
         self.setupUi(self)
         self._quickbars = []
         self.disab_shortcuts = []

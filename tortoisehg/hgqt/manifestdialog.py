@@ -32,6 +32,7 @@ from tortoisehg.util.hglib import tounicode
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
+from tortoisehg.hgqt.ManifestDialog_ui import Ui_ManifestDialog
 
 connect = QtCore.QObject.connect
 disconnect = QtCore.QObject.disconnect
@@ -39,11 +40,10 @@ SIGNAL = QtCore.SIGNAL
 nullvariant = QtCore.QVariant()
 
 
-class ManifestDialog(QtGui.QMainWindow, HgDialogMixin):
+class ManifestDialog(QtGui.QMainWindow, Ui_ManifestDialog, HgDialogMixin):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
-    _uifile = 'ManifestDialog.ui'
     def __init__(self, repo, noderev):
         self.repo = repo
         QtGui.QMainWindow.__init__(self)

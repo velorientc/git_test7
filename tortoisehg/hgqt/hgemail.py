@@ -15,13 +15,7 @@ from mercurial import hg, error, extensions, util, cmdutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, lexers, qtlib
-
-try:
-    from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
-except ImportError:
-    from PyQt4 import uic
-    Ui_EmailDialog = uic.loadUiType(os.path.join(os.path.dirname(__file__),
-                                                 'hgemail.ui'))[0]
+from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
