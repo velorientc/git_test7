@@ -12,7 +12,6 @@ from mercurial import url
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
-from tortoisehg.hgqt.repotreeitem import RepoPathItem
 from tortoisehg.hgqt.pathedit import PathEditDialog
 from tortoisehg.hgqt.clone import CloneDialog
 
