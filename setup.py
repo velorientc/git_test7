@@ -11,7 +11,7 @@ import time
 import sys
 import os
 import subprocess
-from distutils.core import setup
+from distutils.core import setup, Command
 from distutils.command.build import build
 from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
@@ -19,9 +19,16 @@ from os.path import isdir, exists, join, walk, splitext
 thgcopyright = 'Copyright (C) 2010 Steve Borho and others'
 hgcopyright = 'Copyright (C) 2005-2010 Matt Mackall and others'
 
-class build_mo(build):
+class build_mo(Command):
 
     description = "build translations (.mo files)"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
 
     def run(self):
         if not find_executable('msgfmt'):
@@ -48,7 +55,15 @@ class build_mo(build):
             self.mkpath(modir)
             self.make_file([pofile], mofile, spawn, (cmd,))
 
-class build_qt(build):
+class build_qt(Command):
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
     def compile_ui(self, ui_file, py_file=None):
         # Search for pyuic4 in python bin dir, then in the $Path.
         if py_file is None:
