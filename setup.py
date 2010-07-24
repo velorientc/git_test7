@@ -13,6 +13,7 @@ import os
 import subprocess
 from distutils.core import setup, Command
 from distutils.command.build import build
+from distutils.dep_util import newer
 from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
 
@@ -57,18 +58,22 @@ class build_mo(Command):
 
 class build_qt(Command):
     description = "build PyQt GUIs (.ui) and resources (.qrc)"
-    user_options = []
+    user_options = [('force', 'f', 'forcibly compile everything'
+                     ' (ignore file timestamps)')]
+    boolean_options = ('force',)
 
     def initialize_options(self):
-        pass
+        self.force = None
 
     def finalize_options(self):
-        pass
+        self.set_undefined_options('build', ('force', 'force'))
 
     def compile_ui(self, ui_file, py_file=None):
         # Search for pyuic4 in python bin dir, then in the $Path.
         if py_file is None:
             py_file = splitext(ui_file)[0] + "_ui.py"
+        if not(self.force or newer(ui_file, py_file)):
+            return
         try:
             from PyQt4 import uic
             fp = open(py_file, 'w')
@@ -83,6 +88,8 @@ class build_qt(Command):
         # Search for pyuic4 in python bin dir, then in the $Path.
         if py_file is None:
             py_file = splitext(qrc_file)[0] + "_rc.py"
+        if not(self.force or newer(qrc_file, py_file)):
+            return
         if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
             print "Unable to generate python module for resource file", qrc_file
         
