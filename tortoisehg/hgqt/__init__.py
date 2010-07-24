@@ -31,7 +31,7 @@ def should_rebuild(srcfile, pyfile):
 curdir = osp.dirname(__file__)
 pyfile = osp.join(curdir, "workbench_rc.py")
 rcfile = osp.join(curdir, "workbench.qrc")
-if should_rebuild(rcfile, pyfile):
+if not hasattr(sys, "frozen") and should_rebuild(rcfile, pyfile):
     if os.system('pyrcc4 %s -o %s' % (rcfile, pyfile)):
         print "ERROR: Cannot convert the resource file '%s' into a python module."
         print "Please check the PyQt 'pyrcc4' tool is installed, or do it by hand running:"

@@ -91,9 +91,7 @@ def setup_windows(version):
     # Specific definitios for Windows NT-alike installations
     _scripts = []
     _data_files = []
-    _packages = ['tortoisehg.hgtk', 'tortoisehg.hgtk.logview',
-                 'tortoisehg.hgqt',
-                 'tortoisehg.util', 'tortoisehg']
+    _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg']
     extra = {}
     hgextmods = []
 
@@ -153,11 +151,6 @@ def setup_windows(version):
              'description':'Mercurial Distributed SCM',
              'copyright':hgcopyright,
              'product_version':version},
-            {'script':'hgtk',
-             'icon_resources':[(0,'icons/thg_logo.ico')],
-             'description':'TortoiseHg GUI tools for Mercurial SCM',
-             'copyright':thgcopyright,
-             'product_version':version},
             {'script':'thg',
              'icon_resources':[(0,'icons/thg_logo.ico')],
              'description':'TortoiseHg GUI tools for Mercurial SCM',
@@ -182,10 +175,8 @@ def setup_windows(version):
 def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
-    _scripts = ['thg', 'hgtk']
-    _packages = ['tortoisehg', 'tortoisehg.hgtk', 
-                 'tortoisehg.hgqt', 
-                 'tortoisehg.hgtk.logview', 'tortoisehg.util']
+    _scripts = ['thg']
+    _packages = ['tortoisehg', 'tortoisehg.hgqt', 'tortoisehg.util']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('icons')]
