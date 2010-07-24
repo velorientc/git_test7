@@ -56,6 +56,7 @@ class build_mo(Command):
             self.make_file([pofile], mofile, spawn, (cmd,))
 
 class build_qt(Command):
+    description = "build PyQt GUIs (.ui) and resources (.qrc)"
     user_options = []
 
     def initialize_options(self):
