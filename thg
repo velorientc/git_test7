@@ -23,6 +23,12 @@ if not hasattr(sys, "frozen"):
         if os.path.isdir(testpath) and hgpath not in sys.path:
             sys.path.insert(0, hgpath)
 
+    # compile .ui and .qrc for in-place use
+    if os.path.exists(os.path.join(os.path.dirname(__file__), 'setup.py')):
+        from distutils.dist import Distribution
+        from setup import build_qt
+        build_qt(Distribution()).run()
+
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.ignore.append('tortoisehg.util.config')

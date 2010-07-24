@@ -98,7 +98,8 @@ class build_qt(Command):
             log.info('compiled %s into %s' % (qrc_file, py_file))
 
     def run(self):
-        for dirpath, _, filenames in os.walk(join('tortoisehg', 'hgqt')):
+        basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
+        for dirpath, _, filenames in os.walk(basepath):
             for filename in filenames:
                 if filename.endswith('.ui'):
                     self.compile_ui(join(dirpath, filename))
