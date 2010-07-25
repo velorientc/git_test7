@@ -100,6 +100,7 @@ class build_qt(Command):
             log.info('compiled %s into %s' % (qrc_file, py_file))
 
     def run(self):
+        self._wrapuic()
         basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
         for dirpath, _, filenames in os.walk(basepath):
             for filename in filenames:
@@ -107,6 +108,30 @@ class build_qt(Command):
                     self.compile_ui(join(dirpath, filename))
                 elif filename.endswith('.qrc'):
                     self.compile_rc(join(dirpath, filename))
+
+    _wrappeduic = False
+    @classmethod
+    def _wrapuic(cls):
+        """wrap uic to use gettext's _() in place of tr()"""
+        if cls._wrappeduic:
+            return
+
+        from PyQt4.uic.Compiler import compiler, qtproxies, indenter
+
+        class _UICompiler(compiler.UICompiler):
+            def createToplevelWidget(self, classname, widgetname):
+                o = indenter.getIndenter()
+                o.level = 0
+                o.write('from tortoisehg.hgqt.i18n import _')
+                return super(_UICompiler, self).createToplevelWidget(classname, widgetname)
+        compiler.UICompiler = _UICompiler
+
+        class _i18n_string(qtproxies.i18n_string):
+            def __str__(self):
+                return "_('%s')" % (qtproxies.escape(self.string),)
+        qtproxies.i18n_string = _i18n_string
+
+        cls._wrappeduic = True
 
 class clean_local(Command):
     pats = ['*.py[co]', '*_ui.py', '*_rc.py', '*.orig', '*.rej']
