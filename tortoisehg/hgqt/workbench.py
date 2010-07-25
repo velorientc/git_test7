@@ -422,7 +422,7 @@ class Workbench(QMainWindow):
         sw = self.getSyncWidget(root)
         if sw is None:
             print "creating sync widget for %s" % root
-            sw = SyncWidget(root)
+            sw = SyncWidget(root, self)
             self.syncwidgets[root] = sw
             self.syncStackedWidget.addWidget(sw)
         return sw

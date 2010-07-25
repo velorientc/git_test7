@@ -426,6 +426,11 @@ def serve(ui, *pats, **opts):
     from tortoisehg.hgqt.serve import run
     qtrun(run, ui, *pats, **opts)
 
+def sync(ui, *pats, **opts):
+    """Synchronize with other repositories"""
+    from tortoisehg.hgqt.sync import run
+    qtrun(run, ui, *pats, **opts)
+
 def shellconfig(ui, *pats, **opts):
     """explorer extension configuration editor"""
     from tortoisehg.hgqt.shellconf import run
@@ -753,6 +758,7 @@ table = {
     "forget": (forget, [], _('thg forget [FILE]...')),
     "rename|mv|copy": (rename, [], _('thg rename SOURCE [DEST]...')),
     "^serve": (serve, [], _('thg serve [OPTION]')),
+    "^sync": (sync, [], _('thg sync')),
     "^status": (status,
          [('c', 'clean', False, _('show files without changes')),
           ('i', 'ignored', False, _('show ignored files'))],
