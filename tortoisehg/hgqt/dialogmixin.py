@@ -23,7 +23,7 @@ import os.path as osp
 import sys
 
 from PyQt4 import QtCore
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 Qt = QtCore.Qt
