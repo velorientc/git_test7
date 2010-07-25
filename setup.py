@@ -222,8 +222,15 @@ def setup_windows(version):
         _data_files = [(root, [os.path.join(root, file_) for file_ in files])
                             for root, dirs, files in os.walk('icons')]
 
-    # add library files to support PyGtk-based dialogs/windows
-    includes = ['dbhash', 'pango', 'atk', 'pangocairo', 'cairo', 'gobject']
+    # for PyQt, see http://www.py2exe.org/index.cgi/Py2exeAndPyQt
+    includes = ['sip']
+
+    # Qt4 plugins, see http://stackoverflow.com/questions/2206406/
+    def qt4_plugins(subdir, *dlls):
+        import PyQt4
+        pluginsdir = join(os.path.dirname(PyQt4.__file__), 'plugins')
+        return (subdir, [join(pluginsdir, subdir, e) for e in dlls])
+    _data_files.append(qt4_plugins('imageformats', 'qico4.dll', 'qsvg4.dll'))
 
     # Manually include other modules py2exe can't find by itself.
     if 'hgext.highlight' in hgextmods:
