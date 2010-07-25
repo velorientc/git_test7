@@ -11,9 +11,11 @@ import time
 import sys
 import os
 import subprocess
+from fnmatch import fnmatch
 from distutils import log
 from distutils.core import setup, Command
 from distutils.command.build import build as _build_orig
+from distutils.command.clean import clean as _clean_orig
 from distutils.dep_util import newer
 from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
@@ -106,16 +108,55 @@ class build_qt(Command):
                 elif filename.endswith('.qrc'):
                     self.compile_rc(join(dirpath, filename))
 
+class clean_local(Command):
+    pats = ['*.py[co]', '*_ui.py', '*_rc.py', '*.orig', '*.rej']
+    excludedirs = ['.hg', 'build', 'dist']
+    description = 'clean up generated files (%s)' % ', '.join(pats)
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        for e in self._walkpaths('.'):
+            log.info("removing '%s'" % e)
+            os.remove(e)
+
+    def _walkpaths(self, path):
+        for root, _dirs, files in os.walk(path):
+            if any(root == join(path, e) or root.startswith(join(path, e, ''))
+                   for e in self.excludedirs):
+                continue
+            for e in files:
+                fpath = join(root, e)
+                if any(fnmatch(fpath, p) for p in self.pats):
+                    yield fpath
+
 class build(_build_orig):
     sub_commands = [
         ('build_qt', None),
         ('build_mo', None),
         ] + _build_orig.sub_commands
 
+class clean(_clean_orig):
+    sub_commands = [
+        ('clean_local', None),
+        ] + _clean_orig.sub_commands
+
+    def run(self):
+        _clean_orig.run(self)
+        for e in self.get_sub_commands():
+            self.run_command(e)
+
 cmdclass = {
         'build': build,
         'build_qt': build_qt ,
         'build_mo': build_mo ,
+        'clean': clean,
+        'clean_local': clean_local,
     }
 
 def setup_windows(version):
