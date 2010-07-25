@@ -13,7 +13,7 @@ import os
 import subprocess
 from distutils import log
 from distutils.core import setup, Command
-from distutils.command.build import build
+from distutils.command.build import build as _build_orig
 from distutils.dep_util import newer
 from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
@@ -106,11 +106,14 @@ class build_qt(Command):
                 elif filename.endswith('.qrc'):
                     self.compile_rc(join(dirpath, filename))
 
-
-build.sub_commands.insert(0, ('build_qt', None))
-build.sub_commands.append(('build_mo', None))
+class build(_build_orig):
+    sub_commands = [
+        ('build_qt', None),
+        ('build_mo', None),
+        ] + _build_orig.sub_commands
 
 cmdclass = {
+        'build': build,
         'build_qt': build_qt ,
         'build_mo': build_mo ,
     }
