@@ -171,7 +171,8 @@ def setup_windows(version):
            "skip_archive" : 0,
 
            # Don't pull in all this MFC stuff used by the makepy UI.
-           "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list",
+           "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list"
+                        ",setup,distutils",  # required only for in-place use
            "includes" : includes,
            "optimize" : 1
        }
