@@ -138,7 +138,7 @@ class statusact(object):
             if revs and type(revs) == list:
                 revertopts['rev'] = revs[0]
             else:
-                revertopts['rev'] = str(self.stat.repo['.'].rev())
+                revertopts['rev'] = '.'
             response = gdialog.CustomPrompt(_('Confirm Revert'),
                     _('Revert files to revision %s?\n\n%s') % (revertopts['rev'],
                     filelist(files)), self.stat, (_('&Yes (backup changes)'),
