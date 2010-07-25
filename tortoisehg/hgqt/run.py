@@ -195,7 +195,6 @@ def _runcatch(ui, args):
     return -1
 
 def runcommand(ui, args):
-    fullargs = args
     cmd, func, args, options, cmdoptions, alias = _parse(ui, args)
     cmdoptions['alias'] = alias
     ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
