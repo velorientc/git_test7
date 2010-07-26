@@ -80,6 +80,10 @@ class RepoWidget(QWidget):
         w.revisionLinkClicked.connect(self.goto)
         self.revDetailsWidget = w
 
+        w = BlankMessageWidget(self.repoview)
+        self.revDetailsStackedWidget.addWidget(w)
+        self.blankMessageWidget = w
+
     def load_config(self):
         self._font = getfont(self.repo.ui, 'fontlog')
         self.rowheight = 8
@@ -272,8 +276,11 @@ class RepoWidget(QWidget):
             return
         if self.repomodel.graph is None:
             return
-        if type(rev) == str:
+        if type(rev) == str: # unapplied patch
+            self.revDetailsStackedWidget.setCurrentWidget(self.blankMessageWidget)
+            self.workbench.revisionSelected()
             return
+
         ctx = self.repomodel.repo.changectx(rev)
         if ctx.rev() is None:
             self.workbench.workingCopySelected()
@@ -337,7 +344,13 @@ class RepoWidget(QWidget):
         self.switchToSignal.emit(self)
 
     def switchedTo(self):
-        self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
+        rev = self.repoview.current_rev
+        if rev is None:
+            self.workbench.workingCopySelected()
+        elif type(rev) is str:
+            self.revDetailsStackedWidget.setCurrentWidget(self.blankMessageWidget)
+        else:
+            self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
         self.updateActions()
 
     def updateActions(self):
@@ -372,3 +385,15 @@ class RepoWidget(QWidget):
         if cw:
             cw.storeConfigs(s)
         return True
+
+class BlankMessageWidget(QWidget):
+
+    def __init__(self, parent=None):
+        QWidget.__init__(self, parent)
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(layout)
+
+        la = QLabel("Can't yet display change details for unapplied patches")
+        layout.addWidget(la)
