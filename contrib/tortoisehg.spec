@@ -5,7 +5,7 @@
 Name:		tortoisehg
 Version:	hg
 Release:	hg
-Summary:	Mercurial GUI command line tool hgtk
+Summary:	Mercurial GUI command line tool thg
 Group:		Development/Tools
 License:	GPLv2
 # Few files are under the more permissive GPLv2+
@@ -17,12 +17,13 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # BuildArch:	noarch
 BuildRequires:	python, python-devel, gettext, python-sphinx
 BuildRequires:	PyQt4-devel
-Requires:	python >= 2.4, python-iniparse, mercurial >= 1.6, gnome-python2-gconf
-Requires:	gnome-python2-gtksourceview, pycairo, pygobject2, pygtk2 >= 2.10
+Requires:	python >= 2.4, python-iniparse, mercurial >= 1.6
+# gconf needs at util/shlib.py for browse_url(url).
+Requires:	gnome-python2-gconf
 Requires:	PyQt4 >= 4.6, qscintilla-python
 
 %description
-This package contains the hgtk command line tool which provides a 
+This package contains the thg command line tool which provides a 
 graphical user interface to the Mercurial distributed revision control system. 
 
 %package	nautilus
@@ -74,7 +75,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %defattr(-,root,root,-)
 %doc COPYING.txt doc/build/html/
-%{_bindir}/hgtk
 %{_bindir}/thg
 %{python_sitelib}/tortoisehg/
 %{python_sitelib}/tortoisehg-*.egg-info
