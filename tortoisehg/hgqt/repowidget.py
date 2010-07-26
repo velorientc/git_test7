@@ -272,6 +272,8 @@ class RepoWidget(QWidget):
             return
         if self.repomodel.graph is None:
             return
+        if type(rev) == str:
+            return
         ctx = self.repomodel.repo.changectx(rev)
         if ctx.rev() is None:
             self.workbench.workingCopySelected()

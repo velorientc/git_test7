@@ -23,6 +23,7 @@ revision grapher (now stolen back).
 import difflib
 import time
 import os
+import itertools
 
 from mercurial import patch, util, match
 
@@ -219,6 +220,16 @@ def filelog_grapher(repo, path):
         if heads and rev <= heads[-1]:
             rev = heads.pop()
 
+def mq_patch_grapher(repo):
+    """Graphs unapplied MQ patches"""
+    q = repo.mq
+    q.parse_series()
+    applied = set([p.name for p in q.applied])
+
+    for patchname in reversed(q.series):
+        if not patchname in applied:
+            yield (patchname, 0, q.join(patchname), [], [], "")
+
 class GraphNode(object):
     """
     Simple class to encapsulate e hg node in the revision graph. Does
@@ -244,11 +255,15 @@ class Graph(object):
     method to build the graph progressively.
     """
     #@timeit
-    def __init__(self, repo, grapher, maxfilesize=100000):
+    def __init__(self, repo, grapher, maxfilesize=100000, include_mq=False):
         self.maxfilesize = maxfilesize
         self.repo = repo
         self.maxlog = len(repo)
-        self.grapher = grapher
+        if include_mq:
+            patch_grapher = mq_patch_grapher(self.repo)
+            self.grapher = itertools.chain(patch_grapher, grapher)
+        else:
+            self.grapher = grapher
         self.nodes = []
         self.nodesdict = {}
         self.max_cols = 0
@@ -275,12 +290,13 @@ class Graph(object):
 
         stopped = False
         mcol = [self.max_cols]
+
         for vnext in self.grapher:
             if vnext is None:
                 continue
             nrev, xpos, color, lines, parents, author = vnext[:6]
             self.authors.add(author)
-            if nrev >= self.maxlog:
+            if not type(nrev) == str and nrev >= self.maxlog:
                 continue
             gnode = GraphNode(nrev, xpos, color, lines, parents,
                               extra=vnext[5:])

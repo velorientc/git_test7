@@ -119,7 +119,7 @@ def ChangesetContext(repo, rev):
 
 _pctxcache = {}
 
-def PatchContext(repo, patchpath):
+def PatchContext(repo, patchpath, rev=None):
     # check path
     if not os.path.isabs(patchpath) or not os.path.isfile(patchpath):
         return None
@@ -131,13 +131,13 @@ def PatchContext(repo, patchpath):
     if holder is not None and mtime == holder[0]:
         return holder[1]
     # create a new context object
-    ctx = patchctx(patchpath, repo)
+    ctx = patchctx(patchpath, repo, rev=rev)
     _pctxcache[key] = (mtime, ctx)
     return ctx
 
 class patchctx(object):
 
-    def __init__(self, patchpath, repo, patchHandle=None):
+    def __init__(self, patchpath, repo, patchHandle=None, rev=None):
         """ Read patch context from file
         :param patchHandle: If set, then the patch is a temporary.
             The provided handle is used to read the patch and
@@ -174,6 +174,7 @@ class patchctx(object):
         self._desc = msg and msg or ''
         self._branch = branch and hglib.toutf(branch) or ''
         self._parents = []
+        self._rev = rev
         for p in (p1, p2):
             if not p:
                 continue
@@ -192,7 +193,7 @@ class patchctx(object):
         return self.rev()
 
     def node(self): return self._node
-    def rev(self): return None
+    def rev(self): return self._rev
     def hex(self):
         node = self.node()
         if node:

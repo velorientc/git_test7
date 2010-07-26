@@ -26,6 +26,8 @@ from tortoisehg.hgqt.i18n import _
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from tortoisehg.hgqt.csinfo import PatchContext
+
 nullvariant = QVariant()
 
 # TODO: Remove these two when we adopt GTK author color scheme
@@ -106,7 +108,7 @@ class HgRepoListModel(QAbstractTableModel):
                            'Tags':     self.gettags,
                            'Branch':   lambda ctx, gnode: ctx.branch(),
                            'Filename': lambda ctx, gnode: gnode.extra[0],
-                           'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
+                           'Age':      lambda ctx, gnode: ctx.date() and hglib.age(ctx.date())or "",
                            'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
                            'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
                            }
@@ -129,7 +131,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.mqueues = hglib.getmqpatchtags(self.repo)
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
-        self.graph = Graph(self.repo, grapher, self.max_file_size)
+        self.graph = Graph(self.repo, grapher, self.max_file_size, include_mq=True)
         self.rowcount = 0
         self.emit(SIGNAL('layoutChanged()'))
         self.ensureBuilt(row=self.fill_step)
@@ -366,7 +368,11 @@ class HgRepoListModel(QAbstractTableModel):
         self.ensureBuilt(row=row)
         column = self._columns[index.column()]
         gnode = self.graph[row]
-        ctx = self.repo.changectx(gnode.rev)
+        if type(gnode.rev) == str:
+            ctx = PatchContext(self.repo, gnode.color, rev=gnode.rev)
+        else:
+            ctx = self.repo.changectx(gnode.rev)
+
         if role == Qt.DisplayRole:
             text = self._columnmap[column](ctx, gnode)
             if not isinstance(text, (QString, unicode)):
@@ -426,7 +432,7 @@ class HgRepoListModel(QAbstractTableModel):
         # TODO: add bookmark
         if ctx.rev() is None:
             return '**  ' + _('Working copy changes') + '  **'
-        
+
         parts = []
         if ctx in [self.repo[x] for x in self.repo.branchmap()]:
             effects = qtlib.geteffect('log.branch')
