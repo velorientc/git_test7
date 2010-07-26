@@ -39,6 +39,8 @@ COLORS = [str(QColor(x).name()) for x in COLORS]
 ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Tags', 'Node',
               'Age', 'LocalTime', 'UTCTime')
 
+UNAPPLIED_PATCH_COLOR = '#999999'
+
 def get_color(n, ignore=()):
     """
     Return a color at index 'n' rotating in the available
@@ -350,6 +352,11 @@ class HgRepoListModel(QAbstractTableModel):
                 diamond(2 * 0.9 * radius / 1.5)
             painter.setBrush(fillcolor)
             diamond(radius / 1.5)
+        elif type(ctx.rev()) == str: # is not None and ctx.rev() < 0:
+            patchcolor = QColor('#dddddd')
+            painter.setBrush(patchcolor)
+            painter.setPen(patchcolor)
+            diamond(radius / 1.5)
         else:  # circles for normal revisions
             if self.is_working_directory_parent(gnode.rev):
                 painter.setBrush(white)
@@ -379,6 +386,8 @@ class HgRepoListModel(QAbstractTableModel):
                 text = hglib.tounicode(text)
             return QVariant(text)
         elif role == Qt.ForegroundRole:
+            if type(ctx.rev()) == str:
+                return QColor(UNAPPLIED_PATCH_COLOR)
             if column == 'Author':
                 if self.authorcolor:
                     return QVariant(QColor(self.user_color(ctx.user())))
@@ -433,6 +442,15 @@ class HgRepoListModel(QAbstractTableModel):
         if ctx.rev() is None:
             return '**  ' + _('Working copy changes') + '  **'
 
+        msg = hglib.tounicode(ctx.description())
+        if msg:
+            msg = msg.splitlines()[0]
+
+        if type(ctx.rev()) == str:
+            effects = qtlib.geteffect('log.unapplied_patch')
+            text = qtlib.applyeffects(' %s ' % ctx._patchname, effects)
+            return text + " " + qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)
+
         parts = []
         if ctx in [self.repo[x] for x in self.repo.branchmap()]:
             effects = qtlib.geteffect('log.branch')
@@ -445,9 +463,7 @@ class HgRepoListModel(QAbstractTableModel):
             text = qtlib.applyeffects(' %s ' % tag, effects)
             parts.append(text)
 
-        msg = hglib.tounicode(ctx.description())
         if msg:
-            msg = msg.splitlines()[0]
             if self.is_working_directory_parent(gnode.rev):
                 msg = qtlib.markup(msg, weight='bold')
         parts.append(msg)

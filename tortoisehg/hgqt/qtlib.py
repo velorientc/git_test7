@@ -45,6 +45,7 @@ _thgstyles = {
    # Styles defined by TortoiseHg
    'log.branch': 'black #aaffaa_background',
    'log.patch': 'black #aaddff_background',
+   'log.unapplied_patch': 'black #dddddd_background',
    'log.tag': 'black #ffffaa_background',
    'ui.error': 'red bold',
    'control': 'black bold',
