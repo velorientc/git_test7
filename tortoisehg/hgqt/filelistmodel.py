@@ -22,6 +22,7 @@ from tortoisehg.util.util import isbfile, Curry
 
 from tortoisehg.hgqt.graph import ismerge, diff as revdiff
 from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.util import hglib
 
 from PyQt4 import QtCore, QtGui
 connect = QtCore.QObject.connect
@@ -160,7 +161,7 @@ class HgFileListModel(QtCore.QAbstractTableModel):
 
         if column == 0:
             if role in (QtCore.Qt.DisplayRole, QtCore.Qt.ToolTipRole):
-                return QtCore.QVariant(current_file_desc['desc'])
+                return QtCore.QVariant(hglib.tounicode(current_file_desc['desc']))
             elif role == QtCore.Qt.DecorationRole:
                 if self._fulllist and ismerge(self.current_ctx):
                     if current_file_desc['infiles']:
