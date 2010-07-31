@@ -15,19 +15,69 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
+_schemes = ['local', 'ssh://', 'http://', 'https://']
+
 class SyncWidget(QWidget):
 
     def __init__(self, root, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(4)
         self.setLayout(layout)
 
         self.root = root
         self.thread = None
         self.tv = PathsTree(root, self)
         self.refresh()
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.addWidget(QLabel(_('URL:')))
+        self.urlentry = QLineEdit('http://user:pw@foo.bar/repo')
+        hbox.addWidget(self.urlentry)
+        self.inbutton = QPushButton(_('Incoming'))
+        hbox.addWidget(self.inbutton)
+        self.pullbutton = QPushButton(_('Pull'))
+        hbox.addWidget(self.pullbutton)
+        self.outbutton = QPushButton(_('Outgoing'))
+        hbox.addWidget(self.outbutton)
+        self.pushbutton = QPushButton(_('Push'))
+        hbox.addWidget(self.pushbutton)
+        self.emailbutton = QPushButton(_('Email'))
+        hbox.addWidget(self.emailbutton)
+        layout.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        self.schemes = QComboBox()
+        for s in _schemes:
+            self.schemes.addItem(s)
+        hbox.addWidget(self.schemes)
+        hbox.addWidget(QLabel(_('Hostname:')))
+        self.hostentry = QLineEdit('foo.bar')
+        hbox.addWidget(self.hostentry, 1)
+        hbox.addWidget(QLabel(_('Port:')))
+        self.portentry = QLineEdit()
+        hbox.addWidget(self.portentry)
+        self.siteauth = QPushButton(_('Site Authentication'))
+        hbox.addWidget(self.siteauth)
+        layout.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.addWidget(QLabel(_('Path:')))
+        self.pathentry = QLineEdit('repo')
+        hbox.addWidget(self.pathentry, 1)
+        hbox.addWidget(QLabel(_('Username:')))
+        self.userentry = QLineEdit('user')
+        hbox.addWidget(self.userentry)
+        hbox.addWidget(QLabel(_('Password:')))
+        self.pwentry = QLineEdit('pw')
+        hbox.addWidget(self.pwentry)
+        self.savebutton = QPushButton(_('Save'))
+        hbox.addWidget(self.savebutton)
+        layout.addLayout(hbox)
 
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.Panel|QFrame.Raised)
