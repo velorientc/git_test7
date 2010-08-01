@@ -101,6 +101,32 @@ class FileLogDialog(_AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
+    def __init__(self, repo, filename, repoviewer=None):
+        super(FileLogDialog, self).__init__(repo, filename, repoviewer)
+        self._readSettings()
+
+    def closeEvent(self, event):
+        self._writeSettings()
+        super(FileLogDialog, self).closeEvent(event)
+
+    def _readSettings(self):
+        s = QSettings()
+        s.beginGroup('filelog')
+        try:
+            self.restoreGeometry(s.value('geom').toByteArray())
+            self.splitter.restoreState(s.value('splitter').toByteArray())
+        finally:
+            s.endGroup()
+
+    def _writeSettings(self):
+        s = QSettings()
+        s.beginGroup('filelog')
+        try:
+            s.setValue('geom', self.saveGeometry())
+            s.setValue('splitter', self.splitter.saveState())
+        finally:
+            s.endGroup()
+
     def setupUi(self, o):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
         self.toolBar_edit = QToolBar(self)
@@ -248,6 +274,32 @@ class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
+    def __init__(self, repo, filename, repoviewer=None):
+        super(FileDiffDialog, self).__init__(repo, filename, repoviewer)
+        self._readSettings()
+
+    def closeEvent(self, event):
+        self._writeSettings()
+        super(FileDiffDialog, self).closeEvent(event)
+
+    def _readSettings(self):
+        s = QSettings()
+        s.beginGroup('filediff')
+        try:
+            self.restoreGeometry(s.value('geom').toByteArray())
+            self.splitter.restoreState(s.value('splitter').toByteArray())
+        finally:
+            s.endGroup()
+
+    def _writeSettings(self):
+        s = QSettings()
+        s.beginGroup('filediff')
+        try:
+            s.setValue('geom', self.saveGeometry())
+            s.setValue('splitter', self.splitter.saveState())
+        finally:
+            s.endGroup()
+
     def setupUi(self, o):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
         self.toolBar_edit = QToolBar(self)
