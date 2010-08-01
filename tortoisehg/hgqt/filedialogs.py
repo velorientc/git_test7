@@ -18,19 +18,13 @@
 Qt4 dialogs to display hg revisions of a file
 """
 
-import sys, os
-import os.path as osp
-
 import difflib
-
-from mercurial import ui, hg, util
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
-from tortoisehg.util.hglib import tounicode
-
+from mercurial import hg
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
@@ -43,7 +37,6 @@ from tortoisehg.hgqt.repoview import HgRepoView
 
 connect = QObject.connect
 disconnect = QObject.disconnect
-nullvariant = QVariant()
 
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
