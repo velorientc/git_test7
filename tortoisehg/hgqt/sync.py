@@ -43,6 +43,7 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.savebutton)
         hbox.addWidget(QLabel(_('URL:')))
         self.urlentry = QLineEdit()
+        self.urlentry.setReadOnly(True)
         hbox.addWidget(self.urlentry)
         self.inbutton = QPushButton(_('Incoming'))
         hbox.addWidget(self.inbutton)
@@ -61,17 +62,21 @@ class SyncWidget(QWidget):
         self.schemecombo = QComboBox()
         for s in _schemes:
             self.schemecombo.addItem(s)
+        self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
         hbox.addWidget(self.schemecombo)
         hbox.addWidget(QLabel(_('Hostname:')))
         self.hostentry = QLineEdit()
+        self.hostentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.hostentry)
         hbox.addWidget(QLabel(_('Port:')))
         self.portentry = QLineEdit()
         fontm = QFontMetrics(self.font())
         self.portentry.setFixedWidth(8 * fontm.width('9'))
+        self.portentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.portentry)
         hbox.addWidget(QLabel(_('Path:')))
         self.pathentry = QLineEdit()
+        self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
         self.siteauth = QPushButton(_('Site Authentication'))
         hbox.addWidget(self.siteauth)
@@ -131,6 +136,29 @@ class SyncWidget(QWidget):
         'User has changed schema/host/port/path'
         if self.updateInProgress:
             return
+        scheme = _schemes[self.schemecombo.currentIndex()]
+        if scheme == 'local':
+            self.hostentry.setEnabled(False)
+            self.portentry.setEnabled(False)
+            self.urlentry.setText(self.pathentry.text())
+        else:
+            self.hostentry.setEnabled(True)
+            self.portentry.setEnabled(True)
+            path = self.pathentry.text()
+            host = self.hostentry.text()
+            port = self.portentry.text()
+            parts = [scheme, '://']
+            if self.curuser:
+                parts.append(self.curuser)
+                if self.curpw:
+                    parts.append(':***')
+                parts.append('@')
+            parts.append(unicode(host))
+            if port:
+                parts.extend([':', unicode(port)])
+            parts.extend(['/', unicode(path)])
+            self.urlentry.setText(''.join(parts))
+
 
     def setUrl(self, newurl):
         'User has selected a new URL, in local encoding'
@@ -146,6 +174,8 @@ class SyncWidget(QWidget):
         self.pathentry.setText(hglib.tounicode(folder or ''))
         self.curuser = user
         self.curpw = passwd
+        self.hostentry.setEnabled(scheme != 'local')
+        self.portentry.setEnabled(scheme != 'local')
         self.updateInProgress = False
 
     def urlparse(self, path):
