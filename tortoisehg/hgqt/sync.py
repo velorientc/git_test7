@@ -78,7 +78,7 @@ class SyncWidget(QWidget):
         self.pathentry = QLineEdit()
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
-        self.siteauth = QPushButton(_('Site Authentication'))
+        self.authbutton = QPushButton(_('Site Authentication'))
         hbox.addWidget(self.siteauth)
         layout.addLayout(hbox)
 
@@ -96,9 +96,16 @@ class SyncWidget(QWidget):
         if parent:
             self.closeonesc = False
         else:
-            self.setWindowTitle(_('TortoiseHg Search'))
+            self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(800, 550)
             self.closeonesc = True
+
+        self.savebutton.clicked.connect(self.saveclicked)
+        self.authbutton.clicked.connect(self.authclicked)
+        self.inbutton.clicked.connect(self.inclicked)
+        self.pullbutton.clicked.connect(self.pullclicked)
+        self.outbutton.clicked.connect(self.outclicked)
+        self.pushbutton.clicked.connect(self.pushclicked)
 
         self.refresh()
         if 'default' in self.paths:
@@ -219,6 +226,20 @@ class SyncWidget(QWidget):
                 self.close()
         else:
             return super(SyncWidget, self).keyPressEvent(event)
+
+    def saveclicked(self):
+        pass
+    def authclicked(self):
+        pass
+
+    def inclicked(self):
+        pass
+    def pullclicked(self):
+        pass
+    def outclicked(self):
+        pass
+    def pushclicked(self):
+        pass
 
 class PathsTree(QTreeView):
     def __init__(self, root, parent=None):
