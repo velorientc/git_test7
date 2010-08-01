@@ -319,8 +319,14 @@ class AuthDialog(QDialog):
     def __init__(self, root, host, user, pw, parent):
         super(AuthDialog, self).__init__(parent)
         self.root = root
+        self.host = host
         layout = QVBoxLayout()
         self.setLayout(layout)
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('Site Alias')))
+        self.aliasentry = QLineEdit(host.split('.', 1)[0])
+        hbox.addWidget(self.aliasentry, 1)
+        layout.addLayout(hbox)
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Username')))
         self.userentry = QLineEdit(user)
@@ -355,20 +361,47 @@ class AuthDialog(QDialog):
         pass
 
     def saveInRepo(self):
-        if iniparse is None:
-            qtlib.WarningMsgBox(_('Unable to save authentication'),
-                   _('Iniparse must be installed.'), parent=self)
-            return
         fn = os.path.join(self.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile([fn], self)
-        super(AuthDialog, self).accept()
+        self.saveToPath([fn])
 
     def saveGlobal(self):
+        self.saveToPath(util.user_rcpath())
+
+    def saveToPath(self, path):
         if iniparse is None:
             qtlib.WarningMsgBox(_('Unable to save authentication'),
                    _('Iniparse must be installed.'), parent=self)
             return
-        fn, cfg = loadIniFile(util.user_rcpath(), self)
+        fn, cfg = loadIniFile(path, self)
+        if fn is None:
+            return
+        if 'auth' not in cfg:
+            cfg._new_namespace('auth')
+        username = hglib.fromunicode(self.userentry.text())
+        password = hglib.fromunicode(self.pwentry.text())
+        alias = hglib.fromunicode(self.aliasentry.text())
+        if self.host+'.prefix' in cfg['auth']:
+            if not qtlib.QuestionMsgBox(_('Confirm authentication replace'),
+                                        _('Authentication info for %s already'
+                                          'exists, replace?') % host):
+                return
+        cfg['auth'][alias+'.schemes'] = 'https http'
+        cfg['auth'][alias+'.username'] = username
+        cfg['auth'][alias+'.prefix'] = self.host
+        key = alias+'.password'
+        if password:
+            cfg['auth'][key] = password
+        elif not password and key in cfg['auth']:
+            del cfg['auth'][key]
+        try:
+            f = util.atomictempfile(fn, 'w', createmode=None)
+            f.write(str(cfg))
+            f.rename()
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn, cfg = loadIniFile([fn], self)
         super(AuthDialog, self).accept()
 
     def reject(self):
