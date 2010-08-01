@@ -87,6 +87,7 @@ class AbstractFileDialog(QMainWindow, HgDialogMixin):
     def modelFilled(self):
         disconnect(self.filerevmodel, SIGNAL('filled'),
                    self.modelFilled)
+        self.repoview.resizeColumns()
         if self._show_rev is not None:
             index = self.filerevmodel.indexFromRev(self._show_rev)
             self._show_rev = None
@@ -386,6 +387,8 @@ class FileDiffDialog(AbstractFileDialog):
     def modelFilled(self):
         disconnect(self.filerevmodel, SIGNAL('filled'),
                    self.modelFilled)
+        self.tableView_revisions_left.resizeColumns()
+        self.tableView_revisions_right.resizeColumns()
         if self._show_rev is not None:
             rev = self._show_rev
             self._show_rev = None
