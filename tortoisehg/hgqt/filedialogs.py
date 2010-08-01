@@ -30,12 +30,15 @@ from PyQt4.QtCore import Qt
 
 from tortoisehg.util.hglib import tounicode
 
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.filerevmodel import FileRevModel
 from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
+from tortoisehg.hgqt.fileview import HgFileView
+from tortoisehg.hgqt.repoview import HgRepoView
 
 connect = QtCore.QObject.connect
 disconnect = QtCore.QObject.disconnect
@@ -115,7 +118,27 @@ class FileLogDialog(AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
-    _uifile = 'FileLogDialog.ui'
+    def setupUi(self, o):
+        # TODO: workaround for HgDialogMixin; this should be done in constructor
+        self.toolBar_edit = QtGui.QToolBar(self)
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
+        self.actionClose = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Close)
+        self.actionReload = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Refresh)
+        self.toolBar_edit.addAction(self.actionClose)
+        self.toolBar_edit.addAction(self.actionReload)
+
+        # TODO: workaround for HgRepoView
+        self.actionBack = QtGui.QAction(_('Back'), self, enabled=False,
+                                        icon=geticon('back'))
+        self.actionForward = QtGui.QAction(_('Forward'), self, enabled=False,
+                                           icon=geticon('forward'))
+
+        self.splitter = QtGui.QSplitter(Qt.Vertical)
+        self.setCentralWidget(self.splitter)
+        self.repoview = HgRepoView(self)
+        self.textView = HgFileView(self)
+        self.splitter.addWidget(self.repoview)
+        self.splitter.addWidget(self.textView)
 
     def setupViews(self):
         self.textView.setFont(self._font)
@@ -189,6 +212,9 @@ class FileLogDialog(AbstractFileDialog):
                 self.nextDiff)
         connect(self.actionPrevDiff, SIGNAL('triggered()'),
                 self.prevDiff)
+
+        self.actionBack.triggered.connect(self.repoview.back)
+        self.actionForward.triggered.connect(self.repoview.forward)
 
     def revisionSelected(self, rev):
         pos = self.textView.verticalScrollBar().value()
