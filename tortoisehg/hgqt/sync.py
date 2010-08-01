@@ -146,16 +146,17 @@ class SyncWidget(QWidget):
         'User has changed schema/host/port/path'
         if self.updateInProgress:
             return
+        self.urlentry.setText(self.currentUrl(True))
+        notlocal = (self.schemecombo.currentIndex() != 0)
+        self.hostentry.setEnabled(notlocal)
+        self.portentry.setEnabled(notlocal)
+        self.authbutton.setEnabled(notlocal)
+
+    def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
         if scheme == 'local':
-            self.hostentry.setEnabled(False)
-            self.portentry.setEnabled(False)
-            self.authbutton.setEnabled(False)
-            self.urlentry.setText(self.pathentry.text())
+            return unicode(self.pathentry.text())
         else:
-            self.hostentry.setEnabled(True)
-            self.portentry.setEnabled(True)
-            self.authbutton.setEnabled(True)
             path = self.pathentry.text()
             host = self.hostentry.text()
             port = self.portentry.text()
@@ -163,13 +164,13 @@ class SyncWidget(QWidget):
             if self.curuser:
                 parts.append(self.curuser)
                 if self.curpw:
-                    parts.append(':***')
+                    parts.append(hidepw and ':***' or self.curpw)
                 parts.append('@')
             parts.append(unicode(host))
             if port:
                 parts.extend([':', unicode(port)])
             parts.extend(['/', unicode(path)])
-            self.urlentry.setText(''.join(parts))
+            return ''.join(parts)
 
     def pathSelected(self, index):
         pathindex = index.sibling(index.row(), 1)
@@ -254,13 +255,20 @@ class SyncWidget(QWidget):
             self.curuser, self.curpw = '', ''
 
     def inclicked(self):
-        pass
+        url = self.currentUrl(False)
+        print 'hg incoming', url
+
     def pullclicked(self):
-        pass
+        url = self.currentUrl(False)
+        print 'hg pull', url
+
     def outclicked(self):
-        pass
+        url = self.currentUrl(False)
+        print 'hg outgoing', url
+
     def pushclicked(self):
-        pass
+        url = self.currentUrl(False)
+        print 'hg push', url
 
 class SaveDialog(QDialog):
     def __init__(self, root, alias, url, parent):
