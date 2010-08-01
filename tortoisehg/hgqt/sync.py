@@ -82,6 +82,8 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.siteauth)
         layout.addLayout(hbox)
 
+        self.tv.clicked.connect(self.pathSelected)
+
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.Panel|QFrame.Raised)
         pathsbox = QVBoxLayout()
@@ -159,19 +161,26 @@ class SyncWidget(QWidget):
             parts.extend(['/', unicode(path)])
             self.urlentry.setText(''.join(parts))
 
+    def pathSelected(self, index):
+        pathindex = index.sibling(index.row(), 1)
+        path = pathindex.data(Qt.DisplayRole).toString()
+        self.setUrl(unicode(path))
+        aliasindex = index.sibling(index.row(), 0)
+        alias = aliasindex.data(Qt.DisplayRole).toString()
+        self.curalias = alias
 
     def setUrl(self, newurl):
-        'User has selected a new URL, in local encoding'
+        'User has selected a new URL'
         user, host, port, folder, passwd, scheme = self.urlparse(newurl)
         self.updateInProgress = True
-        self.urlentry.setText(hglib.tounicode(newurl))
+        self.urlentry.setText(newurl)
         for i, val in enumerate(_schemes):
             if scheme == val:
                 self.schemecombo.setCurrentIndex(i)
                 break
-        self.hostentry.setText(hglib.tounicode(host or ''))
-        self.portentry.setText(hglib.tounicode(port or ''))
-        self.pathentry.setText(hglib.tounicode(folder or ''))
+        self.hostentry.setText(host or '')
+        self.portentry.setText(port or '')
+        self.pathentry.setText(folder or '')
         self.curuser = user
         self.curpw = passwd
         self.hostentry.setEnabled(scheme != 'local')
@@ -214,7 +223,7 @@ class SyncWidget(QWidget):
 class PathsTree(QTreeView):
     def __init__(self, root, parent=None):
         QTreeView.__init__(self, parent)
-        self.setSelectionMode(QTreeView.ExtendedSelection)
+        self.setSelectionMode(QTreeView.SingleSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
                      self.customContextMenuRequested)
