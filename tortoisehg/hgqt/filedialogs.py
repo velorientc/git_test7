@@ -42,7 +42,7 @@ sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
 
-class AbstractFileDialog(QMainWindow, HgDialogMixin):
+class _AbstractFileDialog(QMainWindow, HgDialogMixin):
     def __init__(self, repo, filename, repoviewer=None):
         self.repo = repo
         QMainWindow.__init__(self)
@@ -97,7 +97,7 @@ class AbstractFileDialog(QMainWindow, HgDialogMixin):
         self.repoviewer.activateWindow()
         self.repoviewer.raise_()
 
-class FileLogDialog(AbstractFileDialog):
+class FileLogDialog(_AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
@@ -244,7 +244,7 @@ class FileLogDialog(AbstractFileDialog):
         self.actionNextDiff.setEnabled(self.textView.fileMode() and self.textView.nDiffs())
 
 
-class FileDiffDialog(AbstractFileDialog):
+class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
