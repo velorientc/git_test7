@@ -97,7 +97,7 @@ class SyncWidget(QWidget):
             self.closeonesc = False
         else:
             self.setWindowTitle(_('TortoiseHg Sync'))
-            self.resize(800, 550)
+            self.resize(850, 550)
             self.closeonesc = True
 
         self.savebutton.clicked.connect(self.saveclicked)
@@ -173,8 +173,7 @@ class SyncWidget(QWidget):
             return ''.join(parts)
 
     def pathSelected(self, index):
-        pathindex = index.sibling(index.row(), 1)
-        path = pathindex.data(Qt.DisplayRole).toString()
+        path = index.model().realUrl(index)
         self.setUrl(unicode(path))
         aliasindex = index.sibling(index.row(), 0)
         alias = aliasindex.data(Qt.DisplayRole).toString()
@@ -184,7 +183,6 @@ class SyncWidget(QWidget):
         'User has selected a new URL'
         user, host, port, folder, passwd, scheme = self.urlparse(newurl)
         self.updateInProgress = True
-        self.urlentry.setText(newurl)
         for i, val in enumerate(_schemes):
             if scheme == val:
                 self.schemecombo.setCurrentIndex(i)
@@ -194,10 +192,8 @@ class SyncWidget(QWidget):
         self.pathentry.setText(folder or '')
         self.curuser = user
         self.curpw = passwd
-        self.hostentry.setEnabled(scheme != 'local')
-        self.portentry.setEnabled(scheme != 'local')
-        self.authbutton.setEnabled(scheme != 'local')
         self.updateInProgress = False
+        self.refreshUrl()
 
     def urlparse(self, path):
         m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
@@ -403,8 +399,9 @@ class PathsModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
-        for alias, url in pathdict.iteritems():
-            self.rows.append([alias, url])
+        for alias, path in pathdict.iteritems():
+            safepath = url.hidepassword(path)
+            self.rows.append([alias, safepath, path])
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -432,6 +429,9 @@ class PathsModel(QAbstractTableModel):
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
         return flags
+
+    def realUrl(self, index):
+        return self.rows[index.row()][2]
 
 
 def run(ui, *pats, **opts):
