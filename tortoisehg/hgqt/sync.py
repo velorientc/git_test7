@@ -150,10 +150,12 @@ class SyncWidget(QWidget):
         if scheme == 'local':
             self.hostentry.setEnabled(False)
             self.portentry.setEnabled(False)
+            self.authbutton.setEnabled(False)
             self.urlentry.setText(self.pathentry.text())
         else:
             self.hostentry.setEnabled(True)
             self.portentry.setEnabled(True)
+            self.authbutton.setEnabled(True)
             path = self.pathentry.text()
             host = self.hostentry.text()
             port = self.portentry.text()
@@ -193,6 +195,7 @@ class SyncWidget(QWidget):
         self.curpw = passwd
         self.hostentry.setEnabled(scheme != 'local')
         self.portentry.setEnabled(scheme != 'local')
+        self.authbutton.setEnabled(scheme != 'local')
         self.updateInProgress = False
 
     def urlparse(self, path):
@@ -243,7 +246,12 @@ class SyncWidget(QWidget):
             self.curalias = unicode(dialog.aliasentry.text())
 
     def authclicked(self):
-        pass
+        host = unicode(self.hostentry.text())
+        user = self.curuser or ''
+        pw = self.curpw or ''
+        dialog = AuthDialog(self.root, host, user, pw, self)
+        if dialog.exec_() == QDialog.Accepted:
+            self.curuser, self.curpw = '', ''
 
     def inclicked(self):
         pass
@@ -274,7 +282,7 @@ class SaveDialog(QDialog):
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
-        bb.button(BB.Save).setDefault(True)
+        bb.button(BB.Save).setAutoDefault(True)
         self.bb = bb
         layout.addWidget(bb)
         self.aliasentry.selectAll()
@@ -286,6 +294,54 @@ class SaveDialog(QDialog):
 
     def reject(self):
         super(SaveDialog, self).reject()
+
+class AuthDialog(QDialog):
+    def __init__(self, root, host, user, pw, parent):
+        super(AuthDialog, self).__init__(parent)
+        self.root = root
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('Username')))
+        self.userentry = QLineEdit(user)
+        hbox.addWidget(self.userentry, 1)
+        layout.addLayout(hbox)
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('Password')))
+        self.pwentry = QLineEdit(pw)
+        self.pwentry.setEchoMode(QLineEdit.Password)
+        hbox.addWidget(self.pwentry, 1)
+        layout.addLayout(hbox)
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Help|BB.Cancel)
+        bb.rejected.connect(self.reject)
+        bb.helpRequested.connect(self.keyringHelp)
+        bb.button(BB.Help).setText(_('Keyring Help'))
+        sr = QPushButton(_('Save In Repo'))
+        sr.clicked.connect(self.saveInRepo)
+        bb.addButton(sr, BB.ActionRole)
+        sg = QPushButton(_('Save Global'))
+        sg.clicked.connect(self.saveGlobal)
+        sg.setAutoDefault(True)
+        bb.addButton(sg, BB.ActionRole)
+
+        self.bb = bb
+        layout.addWidget(bb)
+        self.setWindowTitle(_('Site Authentication: ') + host)
+        self.userentry.selectAll()
+        QTimer.singleShot(0, lambda:self.userentry.setFocus())
+
+    def keyringHelp(self):
+        pass
+
+    def saveInRepo(self):
+        super(AuthDialog, self).accept()
+
+    def saveGlobal(self):
+        super(AuthDialog, self).accept()
+
+    def reject(self):
+        super(AuthDialog, self).reject()
 
 
 class PathsTree(QTreeView):
