@@ -79,7 +79,7 @@ class SyncWidget(QWidget):
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
         self.authbutton = QPushButton(_('Site Authentication'))
-        hbox.addWidget(self.siteauth)
+        hbox.addWidget(self.authbutton)
         layout.addLayout(hbox)
 
         self.tv.clicked.connect(self.pathSelected)
@@ -110,6 +110,7 @@ class SyncWidget(QWidget):
         self.refresh()
         if 'default' in self.paths:
             self.setUrl(self.paths['default'])
+            self.curalias = 'default'
 
     def refresh(self):
         fn = os.path.join(self.root, '.hg', 'hgrc')
@@ -174,7 +175,7 @@ class SyncWidget(QWidget):
         self.setUrl(unicode(path))
         aliasindex = index.sibling(index.row(), 0)
         alias = aliasindex.data(Qt.DisplayRole).toString()
-        self.curalias = alias
+        self.curalias = unicode(alias)
 
     def setUrl(self, newurl):
         'User has selected a new URL'
@@ -215,7 +216,9 @@ class SyncWidget(QWidget):
         return user, host, port, folder, passwd, scheme
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+        if event.matches(QKeySequence.Refresh):
+            self.refresh()
+        elif event.key() == Qt.Key_Escape:
             if self.thread and self.thread.isRunning():
                 self.thread.terminate()
                 # This can lockup, so stop waiting after 2sec
@@ -228,7 +231,17 @@ class SyncWidget(QWidget):
             return super(SyncWidget, self).keyPressEvent(event)
 
     def saveclicked(self):
-        pass
+        if self.curalias:
+            alias = self.curalias
+        elif 'default' not in self.paths:
+            alias = 'default'
+        else:
+            alias = 'new'
+        url = unicode(self.urlentry.text())
+        dialog = SaveDialog(self.root, alias, url, self)
+        if dialog.exec_() == QDialog.Accepted:
+            self.curalias = unicode(dialog.aliasentry.text())
+
     def authclicked(self):
         pass
 
@@ -241,13 +254,46 @@ class SyncWidget(QWidget):
     def pushclicked(self):
         pass
 
+class SaveDialog(QDialog):
+    def __init__(self, root, alias, url, parent):
+        super(SaveDialog, self).__init__(parent)
+        self.root = root
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('Alias')))
+        self.aliasentry = QLineEdit(alias)
+        hbox.addWidget(self.aliasentry, 1)
+        layout.addLayout(hbox)
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('URL')))
+        self.urlentry = QLineEdit(url)
+        hbox.addWidget(self.urlentry, 1)
+        layout.addLayout(hbox)
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Save|BB.Cancel)
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
+        bb.button(BB.Save).setDefault(True)
+        self.bb = bb
+        layout.addWidget(bb)
+        self.aliasentry.selectAll()
+        self.setWindowTitle(_('Save URL: ') + url)
+        QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
+
+    def accept(self):
+        super(SaveDialog, self).accept()
+
+    def reject(self):
+        super(SaveDialog, self).reject()
+
+
 class PathsTree(QTreeView):
     def __init__(self, root, parent=None):
         QTreeView.__init__(self, parent)
         self.setSelectionMode(QTreeView.SingleSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
-                     self.customContextMenuRequested)
+        self.customContextMenuRequested.connect(self.menuRequest)
 
     def keyPressEvent(self, event):
         return super(PathsTree, self).keyPressEvent(event)
@@ -281,7 +327,7 @@ class PathsTree(QTreeView):
         self.dragObject()
         return super(PathsTree, self).mouseMoveEvent(event)
 
-    def customContextMenuRequested(self, point):
+    def menuRequest(self, point):
         point = self.mapToGlobal(point)
         pass
 
