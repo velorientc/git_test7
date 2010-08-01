@@ -25,8 +25,9 @@ import difflib
 
 from mercurial import ui, hg, util
 
-from PyQt4 import QtGui, QtCore, Qsci
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4.Qsci import QsciScintilla
 
 from tortoisehg.util.hglib import tounicode
 
@@ -40,19 +41,18 @@ from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 
-connect = QtCore.QObject.connect
-disconnect = QtCore.QObject.disconnect
-SIGNAL = QtCore.SIGNAL
-nullvariant = QtCore.QVariant()
+connect = QObject.connect
+disconnect = QObject.disconnect
+nullvariant = QVariant()
 
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
 
-class AbstractFileDialog(QtGui.QMainWindow, HgDialogMixin):
+class AbstractFileDialog(QMainWindow, HgDialogMixin):
     def __init__(self, repo, filename, repoviewer=None):
         self.repo = repo
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         HgDialogMixin.__init__(self, self.repo.ui)
 
         self.setRepoViewer(repoviewer)
@@ -120,20 +120,20 @@ class FileLogDialog(AbstractFileDialog):
     """
     def setupUi(self, o):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
-        self.toolBar_edit = QtGui.QToolBar(self)
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
-        self.actionClose = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Close)
-        self.actionReload = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Refresh)
+        self.toolBar_edit = QToolBar(self)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.toolBar_edit)
+        self.actionClose = QAction(self, shortcut=QKeySequence.Close)
+        self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
         self.toolBar_edit.addAction(self.actionClose)
         self.toolBar_edit.addAction(self.actionReload)
 
         # TODO: workaround for HgRepoView
-        self.actionBack = QtGui.QAction(_('Back'), self, enabled=False,
-                                        icon=geticon('back'))
-        self.actionForward = QtGui.QAction(_('Forward'), self, enabled=False,
-                                           icon=geticon('forward'))
+        self.actionBack = QAction(_('Back'), self, enabled=False,
+                                  icon=geticon('back'))
+        self.actionForward = QAction(_('Forward'), self, enabled=False,
+                                     icon=geticon('forward'))
 
-        self.splitter = QtGui.QSplitter(Qt.Vertical)
+        self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         self.repoview = HgRepoView(self)
         self.textView = HgFileView(self)
@@ -177,7 +177,7 @@ class FileLogDialog(AbstractFileDialog):
         connect(self.filerevmodel, SIGNAL('showMessage'),
                 self.statusBar().showMessage,
                 Qt.QueuedConnection)
-        connect(self.filerevmodel, QtCore.SIGNAL('filled'),
+        connect(self.filerevmodel, SIGNAL('filled'),
                 self.modelFilled)
         self.textView.setMode('file')
         self.textView.setModel(self.filerevmodel)
@@ -194,19 +194,19 @@ class FileLogDialog(AbstractFileDialog):
         self.actionClose.setIcon(geticon('quit'))
         self.actionReload.setIcon(geticon('reload'))
 
-        self.actionDiffMode = QtGui.QAction('Diff mode', self)
+        self.actionDiffMode = QAction('Diff mode', self)
         self.actionDiffMode.setCheckable(True)
         connect(self.actionDiffMode, SIGNAL('toggled(bool)'),
                 self.setMode)
 
-        self.actionAnnMode = QtGui.QAction('Annotate', self)
+        self.actionAnnMode = QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
         connect(self.actionAnnMode, SIGNAL('toggled(bool)'),
                 self.textView.setAnnotate)
 
-        self.actionNextDiff = QtGui.QAction(geticon('down'), 'Next diff', self)
+        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
-        self.actionPrevDiff = QtGui.QAction(geticon('up'), 'Previous diff', self)
+        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         connect(self.actionNextDiff, SIGNAL('triggered()'),
                 self.nextDiff)
@@ -256,31 +256,31 @@ class FileDiffDialog(AbstractFileDialog):
     """
     def setupUi(self, o):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
-        self.toolBar_edit = QtGui.QToolBar(self)
-        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
-        self.actionClose = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Close)
-        self.actionReload = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Refresh)
+        self.toolBar_edit = QToolBar(self)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.toolBar_edit)
+        self.actionClose = QAction(self, shortcut=QKeySequence.Close)
+        self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
         self.toolBar_edit.addAction(self.actionClose)
         self.toolBar_edit.addAction(self.actionReload)
 
         # TODO: workaround for HgRepoView
-        self.actionBack = QtGui.QAction(self)
-        self.actionForward = QtGui.QAction(self)
-        self.actionDiffMode = QtGui.QAction(self)
+        self.actionBack = QAction(self)
+        self.actionForward = QAction(self)
+        self.actionDiffMode = QAction(self)
 
         def layouttowidget(layout):
-            w = QtGui.QWidget()
+            w = QWidget()
             w.setLayout(layout)
             return w
 
-        self.splitter = QtGui.QSplitter(Qt.Vertical)
+        self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
-        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout = QHBoxLayout()
         self.tableView_revisions_left = HgRepoView(self)
         self.tableView_revisions_right = HgRepoView(self)
         self.horizontalLayout.addWidget(self.tableView_revisions_left)
         self.horizontalLayout.addWidget(self.tableView_revisions_right)
-        self.frame = QtGui.QFrame()
+        self.frame = QFrame()
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
 
@@ -293,17 +293,17 @@ class FileDiffDialog(AbstractFileDialog):
         # block are diff-block displayers
         self.block = {}
         self.diffblock = BlockMatch(self.frame)
-        lay = QtGui.QHBoxLayout(self.frame)
+        lay = QHBoxLayout(self.frame)
         lay.setSpacing(0)
         lay.setContentsMargins(0, 0, 0, 0)
         for side, idx  in (('left', 0), ('right', 3)):
-            sci = Qsci.QsciScintilla(self.frame)
+            sci = QsciScintilla(self.frame)
             sci.setFont(self._font)
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
-            sci.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-            sci.setFrameShape(QtGui.QFrame.NoFrame)
+            sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            sci.setFrameShape(QFrame.NoFrame)
             sci.setMarginLineNumbers(1, True)
             sci.SendScintilla(sci.SCI_SETSELEOLFILLED, True)
             if self.lexer:
@@ -321,11 +321,11 @@ class FileDiffDialog(AbstractFileDialog):
             sci.SendScintilla(sci.SCI_SETMARGINMASKN, 1, 0)
 
             # define markers for colorize zones of diff
-            self.markerplus = sci.markerDefine(Qsci.QsciScintilla.Background)
+            self.markerplus = sci.markerDefine(QsciScintilla.Background)
             sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markerplus, 0xB0FFA0)
-            self.markerminus = sci.markerDefine(Qsci.QsciScintilla.Background)
+            self.markerminus = sci.markerDefine(QsciScintilla.Background)
             sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markerminus, 0xA0A0FF)
-            self.markertriangle = sci.markerDefine(Qsci.QsciScintilla.Background)
+            self.markertriangle = sci.markerDefine(QsciScintilla.Background)
             sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markertriangle, 0xFFA0A0)
 
             self.viewers[side] = sci
@@ -344,7 +344,7 @@ class FileDiffDialog(AbstractFileDialog):
             connect(table, SIGNAL('revisionActivated'), self.revisionActivated)
 
             connect(self.viewers[side].verticalScrollBar(),
-                    QtCore.SIGNAL('valueChanged(int)'),
+                    SIGNAL('valueChanged(int)'),
                     lambda value, side=side: self.vbar_changed(value, side))
             self.attachQuickBar(table.goto_toolbar)
 
@@ -352,7 +352,7 @@ class FileDiffDialog(AbstractFileDialog):
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
 
         # timer used to fill viewers with diff block markers during GUI idle time
-        self.timer = QtCore.QTimer()
+        self.timer = QTimer()
         self.timer.setSingleShot(False)
         connect(self.timer, SIGNAL("timeout()"),
                 self.idle_fill_files)
@@ -361,7 +361,7 @@ class FileDiffDialog(AbstractFileDialog):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
         self.filerevmodel = FileRevModel(self.repo, self.filename)
-        connect(self.filerevmodel, QtCore.SIGNAL('filled'),
+        connect(self.filerevmodel, SIGNAL('filled'),
                 self.modelFilled)
         self.tableView_revisions_left.setModel(self.filerevmodel)
         self.tableView_revisions_right.setModel(self.filerevmodel)
@@ -374,9 +374,9 @@ class FileDiffDialog(AbstractFileDialog):
         self.actionClose.setIcon(geticon('quit'))
         self.actionReload.setIcon(geticon('reload'))
 
-        self.actionNextDiff = QtGui.QAction(geticon('down'), 'Next diff', self)
+        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
-        self.actionPrevDiff = QtGui.QAction(geticon('up'), 'Previous diff', self)
+        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         connect(self.actionNextDiff, SIGNAL('triggered()'),
                 self.nextDiff)
@@ -597,7 +597,7 @@ if __name__ == '__main__':
 
     u = ui.ui()
     repo = hg.repository(u, options.repo)
-    app = QtGui.QApplication([])
+    app = QApplication([])
 
     if options.diff:
         view = FileDiffDialog(repo, filename)
