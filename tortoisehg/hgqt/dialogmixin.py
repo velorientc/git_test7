@@ -15,20 +15,11 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#
-# make sur the Qt rc files are converted into python modules, then load them
-# this must be done BEFORE other hgview qt4 modules are loaded.
-import os
-import os.path as osp
-import sys
-
 from PyQt4 import QtCore
-from PyQt4 import QtGui
 connect = QtCore.QObject.connect
 SIGNAL = QtCore.SIGNAL
 Qt = QtCore.Qt
 
-from tortoisehg.hgqt import should_rebuild
 from tortoisehg.hgqt import qtlib
 
 class HgDialogMixin(object):
