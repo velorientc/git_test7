@@ -84,17 +84,6 @@ class AbstractFileDialog(QMainWindow, HgDialogMixin):
             lexer.setFont(self._font)
         self.lexer = lexer
 
-    def modelFilled(self):
-        disconnect(self.filerevmodel, SIGNAL('filled'),
-                   self.modelFilled)
-        self.repoview.resizeColumns()
-        if self._show_rev is not None:
-            index = self.filerevmodel.indexFromRev(self._show_rev)
-            self._show_rev = None
-        else:
-            index = self.filerevmodel.index(0,0)
-        self.repoview.setCurrentIndex(index)
-
     def revisionActivated(self, rev):
         """
         Callback called when a revision is double-clicked in the revisions table
@@ -209,6 +198,17 @@ class FileLogDialog(AbstractFileDialog):
 
         self.actionBack.triggered.connect(self.repoview.back)
         self.actionForward.triggered.connect(self.repoview.forward)
+
+    def modelFilled(self):
+        disconnect(self.filerevmodel, SIGNAL('filled'),
+                   self.modelFilled)
+        self.repoview.resizeColumns()
+        if self._show_rev is not None:
+            index = self.filerevmodel.indexFromRev(self._show_rev)
+            self._show_rev = None
+        else:
+            index = self.filerevmodel.index(0,0)
+        self.repoview.setCurrentIndex(index)
 
     def revisionSelected(self, rev):
         pos = self.textView.verticalScrollBar().value()
