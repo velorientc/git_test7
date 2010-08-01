@@ -254,7 +254,35 @@ class FileDiffDialog(AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-    _uifile = 'FileDiffDialog.ui'
+    def setupUi(self, o):
+        # TODO: workaround for HgDialogMixin; this should be done in constructor
+        self.toolBar_edit = QtGui.QToolBar(self)
+        self.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar_edit)
+        self.actionClose = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Close)
+        self.actionReload = QtGui.QAction(self, shortcut=QtGui.QKeySequence.Refresh)
+        self.toolBar_edit.addAction(self.actionClose)
+        self.toolBar_edit.addAction(self.actionReload)
+
+        # TODO: workaround for HgRepoView
+        self.actionBack = QtGui.QAction(self)
+        self.actionForward = QtGui.QAction(self)
+        self.actionDiffMode = QtGui.QAction(self)
+
+        def layouttowidget(layout):
+            w = QtGui.QWidget()
+            w.setLayout(layout)
+            return w
+
+        self.splitter = QtGui.QSplitter(Qt.Vertical)
+        self.setCentralWidget(self.splitter)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.tableView_revisions_left = HgRepoView(self)
+        self.tableView_revisions_right = HgRepoView(self)
+        self.horizontalLayout.addWidget(self.tableView_revisions_left)
+        self.horizontalLayout.addWidget(self.tableView_revisions_right)
+        self.frame = QtGui.QFrame()
+        self.splitter.addWidget(layouttowidget(self.horizontalLayout))
+        self.splitter.addWidget(self.frame)
 
     def setupViews(self):
         self.repoview = self.tableView_revisions_left
