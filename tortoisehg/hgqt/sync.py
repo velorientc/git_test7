@@ -8,14 +8,18 @@
 
 import os
 import re
+import urlparse
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from mercurial import url
+
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
-_schemes = ['local', 'ssh://', 'http://', 'https://']
+_schemes = ['local', 'ssh', 'http', 'https']
 
 class SyncWidget(QWidget):
 
@@ -28,15 +32,17 @@ class SyncWidget(QWidget):
 
         self.root = root
         self.thread = None
+        self.curuser = None
+        self.curpw = None
+        self.updateInProgress = False
         self.tv = PathsTree(root, self)
-        self.refresh()
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         self.savebutton = QPushButton(_('Save'))
         hbox.addWidget(self.savebutton)
         hbox.addWidget(QLabel(_('URL:')))
-        self.urlentry = QLineEdit('http://user:pw@foo.bar/repo')
+        self.urlentry = QLineEdit()
         hbox.addWidget(self.urlentry)
         self.inbutton = QPushButton(_('Incoming'))
         hbox.addWidget(self.inbutton)
@@ -52,18 +58,20 @@ class SyncWidget(QWidget):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        self.schemes = QComboBox()
+        self.schemecombo = QComboBox()
         for s in _schemes:
-            self.schemes.addItem(s)
-        hbox.addWidget(self.schemes)
+            self.schemecombo.addItem(s)
+        hbox.addWidget(self.schemecombo)
         hbox.addWidget(QLabel(_('Hostname:')))
-        self.hostentry = QLineEdit('foo.bar')
+        self.hostentry = QLineEdit()
         hbox.addWidget(self.hostentry)
         hbox.addWidget(QLabel(_('Port:')))
         self.portentry = QLineEdit()
+        fontm = QFontMetrics(self.font())
+        self.portentry.setFixedWidth(8 * fontm.width('9'))
         hbox.addWidget(self.portentry)
         hbox.addWidget(QLabel(_('Path:')))
-        self.pathentry = QLineEdit('repo')
+        self.pathentry = QLineEdit()
         hbox.addWidget(self.pathentry, 1)
         self.siteauth = QPushButton(_('Site Authentication'))
         hbox.addWidget(self.siteauth)
@@ -85,6 +93,9 @@ class SyncWidget(QWidget):
             self.resize(800, 550)
             self.closeonesc = True
 
+        self.refresh()
+        if 'default' in self.paths:
+            self.setUrl(self.paths['default'])
 
     def refresh(self):
         fn = os.path.join(self.root, '.hg', 'hgrc')
@@ -114,6 +125,48 @@ class SyncWidget(QWidget):
             self.paths[ alias ] = cfg['paths'][ alias ]
         tm = PathsModel(self.paths, self)
         self.tv.setModel(tm)
+
+
+    def refreshUrl(self):
+        'User has changed schema/host/port/path'
+        if self.updateInProgress:
+            return
+
+    def setUrl(self, newurl):
+        'User has selected a new URL, in local encoding'
+        user, host, port, folder, passwd, scheme = self.urlparse(newurl)
+        self.updateInProgress = True
+        self.urlentry.setText(hglib.tounicode(newurl))
+        for i, val in enumerate(_schemes):
+            if scheme == val:
+                self.schemecombo.setCurrentIndex(i)
+                break
+        self.hostentry.setText(hglib.tounicode(host or ''))
+        self.portentry.setText(hglib.tounicode(port or ''))
+        self.pathentry.setText(hglib.tounicode(folder or ''))
+        self.curuser = user
+        self.curpw = passwd
+        self.updateInProgress = False
+
+    def urlparse(self, path):
+        m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
+        if m:
+            user = m.group(2)
+            host = m.group(3)
+            port = m.group(5)
+            folder = m.group(7) or '.'
+            passwd = ''
+            scheme = 'ssh'
+        elif path.startswith('http://') or path.startswith('https://'):
+            snpaqf = urlparse.urlparse(path)
+            scheme, netloc, folder, params, query, fragment = snpaqf
+            host, port, user, passwd = url.netlocsplit(netloc)
+            if folder.startswith('/'): folder = folder[1:]
+        else:
+            user, host, port, passwd = [''] * 4
+            folder = path
+            scheme = 'local'
+        return user, host, port, folder, passwd, scheme
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
