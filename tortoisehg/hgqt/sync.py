@@ -87,7 +87,7 @@ class SyncWidget(QWidget):
         self.pathentry = QLineEdit()
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
-        self.authbutton = QPushButton(_('Site Authentication'))
+        self.authbutton = QPushButton(_('Authentication'))
         hbox.addWidget(self.authbutton)
         layout.addLayout(hbox)
 
@@ -272,6 +272,8 @@ class SaveDialog(QDialog):
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('URL')))
         self.urlentry = QLineEdit(url)
+        fontm = QFontMetrics(self.font())
+        self.urlentry.setFixedWidth(fontm.width(url)+5)
         hbox.addWidget(self.urlentry, 1)
         layout.addLayout(hbox)
         BB = QDialogButtonBox
@@ -282,7 +284,7 @@ class SaveDialog(QDialog):
         self.bb = bb
         layout.addWidget(bb)
         self.aliasentry.selectAll()
-        self.setWindowTitle(_('Save URL: ') + url)
+        self.setWindowTitle(_('Save Peer Path'))
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
     def accept(self):
@@ -319,25 +321,42 @@ class AuthDialog(QDialog):
     def __init__(self, root, host, user, pw, parent):
         super(AuthDialog, self).__init__(parent)
         self.root = root
-        self.host = host
         layout = QVBoxLayout()
         self.setLayout(layout)
+
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Site Alias')))
         self.aliasentry = QLineEdit(host.split('.', 1)[0])
         hbox.addWidget(self.aliasentry, 1)
         layout.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('Schemes')))
+        self.schemes = QComboBox()
+        for s in (('http https', 'http', 'https')):
+            self.schemes.addItem(s)
+        hbox.addWidget(self.schemes, 1)
+        layout.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('Prefix')))
+        self.prefixentry = QLineEdit(host)
+        hbox.addWidget(self.prefixentry, 1)
+        layout.addLayout(hbox)
+
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Username')))
         self.userentry = QLineEdit(user)
         hbox.addWidget(self.userentry, 1)
         layout.addLayout(hbox)
+
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Password')))
         self.pwentry = QLineEdit(pw)
         self.pwentry.setEchoMode(QLineEdit.Password)
         hbox.addWidget(self.pwentry, 1)
         layout.addLayout(hbox)
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Help|BB.Cancel)
         bb.rejected.connect(self.reject)
@@ -353,7 +372,7 @@ class AuthDialog(QDialog):
 
         self.bb = bb
         layout.addWidget(bb)
-        self.setWindowTitle(_('Site Authentication: ') + host)
+        self.setWindowTitle(_('Authentication: ') + host)
         self.userentry.selectAll()
         QTimer.singleShot(0, lambda:self.userentry.setFocus())
 
@@ -377,6 +396,8 @@ class AuthDialog(QDialog):
             return
         if 'auth' not in cfg:
             cfg._new_namespace('auth')
+        schemes = hglib.fromunicode(self.schemes.currentText())
+        prefix = hglib.fromunicode(self.prefixentry.text())
         username = hglib.fromunicode(self.userentry.text())
         password = hglib.fromunicode(self.pwentry.text())
         alias = hglib.fromunicode(self.aliasentry.text())
@@ -385,9 +406,9 @@ class AuthDialog(QDialog):
                                         _('Authentication info for %s already'
                                           'exists, replace?') % host):
                 return
-        cfg['auth'][alias+'.schemes'] = 'https http'
+        cfg['auth'][alias+'.schemes'] = schemes
         cfg['auth'][alias+'.username'] = username
-        cfg['auth'][alias+'.prefix'] = self.host
+        cfg['auth'][alias+'.prefix'] = prefix
         key = alias+'.password'
         if password:
             cfg['auth'][key] = password
