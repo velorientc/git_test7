@@ -182,12 +182,7 @@ class CmdThread(QThread):
 
     def output_handler(self, wrapper):
         if self.buffering:
-            if len(self.buffer) > 0:
-                last = self.buffer.pop()
-                if last.data[1] == wrapper.data[1]:
-                    wrapper = DataWrapper((last.data[0] + wrapper.data[0],
-                                           last.data[1]))
-            else:
+            if not self.buffer:
                 QTimer.singleShot(20, self.flush)
             self.buffer.append(wrapper)
         else:
