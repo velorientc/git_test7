@@ -13,11 +13,11 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import config, url, util
+from mercurial import config, hg, ui, url, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, cmdui, hgemail
 
 try:
     import iniparse
@@ -115,11 +115,39 @@ class SyncWidget(QWidget):
         self.pullbutton.clicked.connect(self.pullclicked)
         self.outbutton.clicked.connect(self.outclicked)
         self.pushbutton.clicked.connect(self.pushclicked)
+        self.emailbutton.clicked.connect(self.emailclicked)
+
+        self.opbuttons = (self.inbutton, self.pullbutton,
+                          self.outbutton, self.pushbutton,
+                          self.emailbutton)
+
+        cmd = cmdui.Widget()
+        cmd.commandStarted.connect(self.commandStarted)
+        cmd.commandFinished.connect(self.commandFinished)
+        cmd.commandCanceling.connect(self.commandCanceled)
+        layout.addWidget(cmd)
+        cmd.setHidden(True)
+        self.cmd = cmd
 
         self.refresh()
         if 'default' in self.paths:
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
+
+    def commandStarted(self):
+        for b in self.opbuttons:
+            b.setEnabled(False)
+        self.cmd.show_output(True)
+
+    def commandFinished(self, wrapper):
+        for b in self.opbuttons:
+            b.setEnabled(True)
+        if wrapper.data is not 0:
+            self.cmd.show_output(True)
+
+    def commandCanceled(self):
+        for b in self.opbuttons:
+            b.setEnabled(True)
 
     def refresh(self):
         fn = os.path.join(self.root, '.hg', 'hgrc')
@@ -209,12 +237,8 @@ class SyncWidget(QWidget):
         if event.matches(QKeySequence.Refresh):
             self.refresh()
         elif event.key() == Qt.Key_Escape:
-            if self.thread and self.thread.isRunning():
-                self.thread.terminate()
-                # This can lockup, so stop waiting after 2sec
-                self.thread.wait( 2000 )
-                self.finished()
-                self.thread = None
+            if self.cmd.core.is_running():
+                self.cmd.core.cancel()
             elif self.closeonesc:
                 self.close()
         else:
@@ -242,21 +266,41 @@ class SyncWidget(QWidget):
             self.curuser, self.curpw = '', ''
 
     def inclicked(self):
+        if self.cmd.core.is_running():
+            return
         url = self.currentUrl(False)
-        print 'hg incoming', url
+        cmdline = ['--repository', self.root, 'incoming', url]
+        self.cmd.run(cmdline)
 
     def pullclicked(self):
+        if self.cmd.core.is_running():
+            return
         url = self.currentUrl(False)
-        print 'hg pull', url
+        cmdline = ['--repository', self.root, 'pull', url]
+        self.cmd.run(cmdline)
 
     def outclicked(self):
+        if self.cmd.core.is_running():
+            return
         url = self.currentUrl(False)
-        print 'hg outgoing', url
+        cmdline = ['--repository', self.root, 'outgoing', url]
+        self.cmd.run(cmdline)
 
     def pushclicked(self):
+        if self.cmd.core.is_running():
+            return
         url = self.currentUrl(False)
-        print 'hg push', url
+        cmdline = ['--repository', self.root, 'push', url]
+        self.cmd.run(cmdline)
 
+    def emailclicked(self):
+        try:
+            _ui = ui.ui()
+            repo = hg.repository(_ui, path=self.root)
+        except error.RepoError:
+            return
+        dialog = hgemail.EmailDialog(_ui, repo, None, self)
+        dialog.exec_()
 
 class SaveDialog(QDialog):
     def __init__(self, root, alias, url, parent):
