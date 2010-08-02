@@ -308,16 +308,16 @@ class HgFileView(QtGui.QFrame):
         else:
             self.execflaglabel.hide()
 
-        labeltxt = ''
+        labeltxt = u''
         if isbfile(self._realfilename):
-            labeltxt += '[bfile tracked] '
-        labeltxt += "<b>%s</b>" % self._filename
+            labeltxt += u'[bfile tracked] '
+        labeltxt += u"<b>%s</b>" % hglib.tounicode(self._filename)
             
         if self._p_rev is not None:
-            labeltxt += ' (diff from rev %s)' % self._p_rev
+            labeltxt += u' (diff from rev %s)' % hglib.tounicode(self._p_rev)
         renamed = filectx.renamed()
         if renamed:
-            labeltxt += ' <i>(renamed from %s)</i>' % bfilepath(renamed[0])
+            labeltxt += u' <i>(renamed from %s)</i>' % hglib.tounicode(bfilepath(renamed[0]))
         self.filenamelabel.setText(labeltxt)
 
         self.sci.setText(data)
