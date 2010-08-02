@@ -137,7 +137,7 @@ class SyncWidget(QWidget):
     def commandStarted(self):
         for b in self.opbuttons:
             b.setEnabled(False)
-        self.cmd.show_output(True)
+        self.cmd.setHidden(False)
 
     def commandFinished(self, wrapper):
         for b in self.opbuttons:
