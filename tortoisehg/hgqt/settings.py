@@ -312,7 +312,7 @@ INFO = (
 ({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit'}, (
     (_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is<br>'
-          '"Full Name <email.com>"')),
+          '"Full Name &lt;email@example.com&gt;"')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
        _('Maximum length of the commit message summary line.'
          ' If set, TortoiseHg will issue a warning if the'
