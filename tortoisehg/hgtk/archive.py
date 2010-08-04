@@ -43,10 +43,10 @@ class ArchiveDialog(gdialog.GDialog):
         self.combo.child.set_width_chars(28)
         self.combo.child.connect('activate',
                                  lambda b: self.response(gtk.RESPONSE_OK))
-        if self.initrev:
-            self.combo.append_text(str(self.initrev))
-        else:
+        if self.initrev == '':
             self.combo.append_text(WD_PARENT)
+        else:
+            self.combo.append_text(str(self.initrev))
         self.combo.set_active(0)
         for b in self.repo.branchtags():
             self.combo.append_text(b)
