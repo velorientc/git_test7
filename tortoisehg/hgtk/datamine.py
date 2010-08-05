@@ -496,9 +496,9 @@ class DataMineDialog(gdialog.GWindow):
         for line in text.splitlines():
             try:
                 (path, revid, text) = line.split(':', 2)
+                desc, user = self.get_rev_desc(long(revid))
             except ValueError:
                 continue
-            desc, user = self.get_rev_desc(long(revid))
             if self.tabwidth:
                 text = text.expandtabs(self.tabwidth)
             model.append((revid, text, desc, hglib.toutf(path)))
