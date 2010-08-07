@@ -180,11 +180,14 @@ class HgRepoView(QTableView):
         menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
                     'email', 'archive', 'copyhash', None, 'back', 'forward',
-                    None, 'rebase']:
+                    None]:
             if act:
                 menu.addAction(self._actions[act])
             else:
                 menu.addSeparator()
+        exs = [name for name, module in extensions.extensions()]
+        if 'rebase' in exs:
+            menu.addAction(self._actions['rebase'])
         menu.exec_(event.globalPos())
 
     def init_variables(self):
