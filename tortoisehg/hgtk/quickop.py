@@ -150,7 +150,7 @@ class QuickOpDialog(gdialog.GDialog):
                                  clean='C' in filetypes,
                                  ignored='I' in filetypes,
                                  unknown='?' in filetypes)
-        except (IOError, util.Abort), e:
+        except (EnvironmentError, util.Abort), e:
             gdialog.Prompt(_('Unable to determine repository status'),
                            str(e), self).run()
             self.earlyout=True
@@ -265,7 +265,7 @@ class QuickOpDialog(gdialog.GDialog):
         for file in dellist:
             try:
                 os.unlink(file)
-            except IOError:
+            except EnvironmentError:
                 pass
 
         if not list:
