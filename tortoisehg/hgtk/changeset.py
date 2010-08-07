@@ -170,7 +170,7 @@ class ChangeSet(gdialog.GWindow):
         self._filelist.append(('*', _('[All Files]'), ''))
         try:
             modified, added, removed = self.repo.status(parent, ctx.node())[:3]
-        except error.LookupError:
+        except error.LookupError, error.RevlogError:
             modified, added, removed = [], [], []
         selrow = None
         for f in modified:
