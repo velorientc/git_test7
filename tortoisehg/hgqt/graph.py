@@ -72,6 +72,7 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
       - lines; a list of (col, next_col, color) indicating the edges between
         the current row and the next row
       - parent revisions of current revision
+      - author of the current revision
 
     If follow is True, only generated the subtree from the start_rev head.
 
