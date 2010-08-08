@@ -464,6 +464,8 @@ class CommitWidget(QWidget):
                                 parent=self)
             self.stwidget.tv.setFocus()
             return
+        if len(repo.parents()) > 1:
+            files = []
         user = self.usercombo.currentText()
         self.addUsernameToHistory(user)
         user = hglib.fromunicode(user, 'strict')
