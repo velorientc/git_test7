@@ -12,6 +12,9 @@ import gnomevfs
 import os
 import sys
 
+thg_main     = 'thg'
+idstr_prefix = 'HgNautilus2'
+
 try:
     from mercurial import demandimport
 except ImportError:
@@ -41,7 +44,7 @@ def _thg_path():
 _thg_path()
 
 from tortoisehg.util import paths, debugthg, cachethg
-from tortoisehg.hgtk import gtklib
+from tortoisehg.util import util as thgutil
 
 if debugthg.debug('N'):
     debugf = debugthg.debugf
@@ -63,7 +66,7 @@ class HgExtension(nautilus.MenuProvider,
         self.inv_dirs = set()
 
         from tortoisehg.util import menuthg
-        self.hgtk = paths.find_in_path('hgtk')
+        self.hgtk = paths.find_in_path(thg_main)
         self.menu = menuthg.menuThg()
         self.notify = os.path.expanduser('~/.tortoisehg/notify')
         try:
@@ -169,7 +172,7 @@ class HgExtension(nautilus.MenuProvider,
         else: #bg
             passcwd = self.cwd
         for menu_info in menus:
-            idstr = 'HgNautilus::%02d%s' % (self.pos, menu_info.hgcmd)
+            idstr = '%s::%02d%s' % (idstr_prefix ,self.pos, menu_info.hgcmd)
             self.pos += 1
             if menu_info.isSep():
                 # can not insert a separator till now
@@ -210,7 +213,7 @@ class HgExtension(nautilus.MenuProvider,
             return self.buildMenu(vfs_files, False)
 
     def get_columns(self):
-        return nautilus.Column("HgNautilus::80hg_status",
+        return nautilus.Column(idstr_prefix + "::80hg_status",
                                "hg_status",
                                "Hg Status",
                                "Version control status"),
@@ -340,7 +343,7 @@ class HgExtension(nautilus.MenuProvider,
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()
-        user = gtklib.markup_escape_text(user)
+        user = thgutil.xml_escape(user)
         tags = ', '.join(ctx.tags())
         branch = ctx.branch()
 

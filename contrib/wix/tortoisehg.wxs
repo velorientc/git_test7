@@ -88,8 +88,8 @@
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='TortoiseHg'>
           <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)'>
-            <File Id='hgtkEXE' Name='hgtk.exe' KeyPath='yes'
-                  Source='dist\hgtk.exe'
+            <File Id='thgEXE' Name='thg.exe' KeyPath='yes'
+                  Source='dist\thg.exe'
             />
             <File Id='hgEXE' Name='hg.exe'
                   Source='dist\hg.exe'
@@ -312,7 +312,7 @@
              Description='The complete package' >
       <Feature Id='MainProgram' Title='Program'
                Level='1' Absent='disallow' Display='hidden'
-               Description='Command line applications: hg, hgtk' >
+               Description='Command line applications: hg, thg' >
         <ComponentRef Id='MainExecutable' />
         <ComponentRef Id='ProgramMenuDir' />
         <ComponentRef Id='COPYING' />
@@ -321,7 +321,6 @@
         <ComponentRef Id='ExtensionVersions' />
         <ComponentRef Id='helpFolder' />
         <ComponentGroupRef Id='templatesFolder' />
-        <ComponentGroupRef Id='gtkFolder' />
         <ComponentRef Id='Icons' />
         <ComponentRef Id='SvgIcons' />
       </Feature>

@@ -586,7 +586,7 @@ CShellExtCMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
         if (iter != MenuIdMap.end())
         {
-            DoHgtk(iter->second.name);
+            RunDialog(iter->second.name);
             hr = S_OK;
         }
         else
@@ -785,20 +785,27 @@ CShellExtCMenu::HandleMenuMsg2(
 }
 
 
-void CShellExtCMenu::DoHgtk(const std::string &cmd)
+void CShellExtCMenu::RunDialog(const std::string &cmd)
 {
     std::string dir = GetTHgProgRoot();
     if (dir.empty())
     {
-        TDEBUG_TRACE("DoHgtk: THG root is empty");
+        TDEBUG_TRACE("RunDialog: THG root is empty");
         return;
     }
-    std::string hgcmd = dir + "\\hgtk.exe";
+    std::string hgcmd = dir + "\\thg.exe";
 
     WIN32_FIND_DATAA data;
     HANDLE hfind = FindFirstFileA(hgcmd.c_str(), &data);
     if (hfind == INVALID_HANDLE_VALUE)
-        hgcmd = dir + "\\hgtk.cmd";
+    {
+        hgcmd = dir + "\\hgtk.exe";
+        hfind = FindFirstFileA(hgcmd.c_str(), &data);
+        if (hfind == INVALID_HANDLE_VALUE)
+            hgcmd = dir + "\\thg.cmd";
+        else
+            FindClose(hfind);
+    }
     else
         FindClose(hfind);
 
@@ -815,7 +822,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
     }
     else
     {
-        TDEBUG_TRACE("***** DoHgtk: can't get cwd");
+        TDEBUG_TRACE("***** RunDialog: can't get cwd");
         return;
     }
 
@@ -825,11 +832,11 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
         const std::string tempfile = GetTemporaryFile();
         if (tempfile.empty())
         {
-            TDEBUG_TRACE("***** DoHgtk: error: GetTemporaryFile returned empty string");
+            TDEBUG_TRACE("***** RunDialog: error: GetTemporaryFile returned empty string");
             return;
         }
 
-        TDEBUG_TRACE("DoHgtk: temp file = " << tempfile);
+        TDEBUG_TRACE("RunDialog: temp file = " << tempfile);
         HANDLE tempfileHandle = CreateFileA(
             tempfile.c_str(), GENERIC_WRITE,
             FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
@@ -837,7 +844,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
 
         if (tempfileHandle == INVALID_HANDLE_VALUE)
         {
-            TDEBUG_TRACE("***** DoHgtk: error: failed to create file " << tempfile);
+            TDEBUG_TRACE("***** RunDialog: error: failed to create file " << tempfile);
             return;
         }
 
@@ -845,7 +852,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
         for (ST i = 0; i < myFiles.size(); i++)
         {
             DWORD dwWritten;
-            TDEBUG_TRACE("DoHgtk: temp file adding " << myFiles[i]);
+            TDEBUG_TRACE("RunDialog: temp file adding " << myFiles[i]);
             WriteFile(
                 tempfileHandle, myFiles[i].c_str(),
                 static_cast<DWORD>(myFiles[i].size()), &dwWritten, 0

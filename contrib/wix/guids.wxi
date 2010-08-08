@@ -45,7 +45,7 @@
   <!-- tortoisehg.wxs -->
   <?define ProductUpgradeCode = {838657CF-C9EC-452D-800D-0E70FC021D0A} ?>
 
-  <?define ComponentMainExecutableGUID = {5A98EB92-2C82-406E-81A5-1161CA87ED8E} ?>
+  <?define ComponentMainExecutableGUID = {CD691D8E-79AD-4e22-9234-89C62B5C2243} ?>
 
   <?define thgshellx86dll.guid = {1126CF42-3994-428B-A746-464E1BC680F3} ?>
   <?define thgshellx64dll.guid = {59FD2A49-BA62-40CC-B155-D11DB11EE611} ?>
