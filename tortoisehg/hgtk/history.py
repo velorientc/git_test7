@@ -896,7 +896,7 @@ class GLog(gdialog.GWindow):
 
     def patch_selected(self, mqwidget, revid, patchname):
         if revid < 0:
-            patchfile = os.path.join(self.repo.root, '.hg', 'patches', patchname)
+            patchfile = os.path.join(self.repo.mq.path, patchname)
             self.currevid = self.lastrevid = None
             self.changeview.load_patch_details(patchfile)
         else:
