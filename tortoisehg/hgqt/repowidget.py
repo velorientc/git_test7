@@ -164,6 +164,7 @@ class RepoWidget(QWidget):
         connect(view, SIGNAL('copyHash'), self.copyHash)
         connect(view, SIGNAL('rebaseRevision'), self.rebaseRevision)
         connect(view, SIGNAL('qimportRevision'), self.qimportRevision)
+        connect(view, SIGNAL('qfinishRevision'), self.qfinishRevision)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -282,6 +283,18 @@ class RepoWidget(QWidget):
         cmdline = ['qimport', '--rev', '%s::%s' % (rev, endrev),
                    '--repository', self.repo.root]
         self.runner = cmdui.Runner(_('QImport - TortoiseHg'), self)
+        def finished(ret):
+            self.reload()
+            self.setScanForRepoChanges(saved)
+        self.runner.commandFinished.connect(finished)
+        self.runner.run(cmdline)
+
+    def qfinishRevision(self, rev):
+        """Finish applied patches up to and including selected revision"""
+        saved = self.setScanForRepoChanges(False)
+        cmdline = ['qfinish', 'qbase::%s' % rev,
+                   '--repository', self.repo.root]
+        self.runner = cmdui.Runner(_('QFinish - TortoiseHg'), self)
         def finished(ret):
             self.reload()
             self.setScanForRepoChanges(saved)
