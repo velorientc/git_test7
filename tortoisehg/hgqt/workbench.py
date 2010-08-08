@@ -28,6 +28,7 @@ from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.sync import SyncWidget
+from tortoisehg.hgqt.docklog import LogDockWidget
 
 from tortoisehg.util import paths
 
@@ -74,6 +75,10 @@ class Workbench(QMainWindow):
         rr.setObjectName('RepoRegistryView')
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
 
+        self.log = LogDockWidget(self)
+        self.log.setObjectName('Log')
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.log)
+
         rr.openRepoSignal.connect(self.openRepo)
 
         if repo:
@@ -96,7 +101,11 @@ class Workbench(QMainWindow):
 
         def gotVisible(state):
             self.actionShowRepoRegistry.setChecked(self.reporegistry.isVisible())
+        def logVisible(state):
+            self.actionShowLog.setChecked(self.log.isVisible())
+
         self.reporegistry.visibilityChanged.connect(gotVisible)
+        self.log.visibilityChanged.connect(logVisible)
 
     def attachQuickBar(self, qbar):
         qbar.setParent(self)
@@ -241,6 +250,10 @@ class Workbench(QMainWindow):
         a.setCheckable(True)
         self.actionShowRepoRegistry = a
 
+        a = QAction(_("Show Output Log"), self)
+        a.setCheckable(True)
+        self.actionShowLog = a
+
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
 
@@ -258,6 +271,7 @@ class Workbench(QMainWindow):
         self.menuView = m = QMenu(_("&View"), self.menubar)
         m.addAction(self.actionShowRepoRegistry)
         m.addAction(self.actionShowPaths)
+        m.addAction(self.actionShowLog)
         m.addSeparator()
         m.addAction(self.actionSelectColumns)
         m.addSeparator()
