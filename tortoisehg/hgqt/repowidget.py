@@ -163,6 +163,7 @@ class RepoWidget(QWidget):
         connect(view, SIGNAL('archiveRevision'), self.archiveRevision)
         connect(view, SIGNAL('copyHash'), self.copyHash)
         connect(view, SIGNAL('rebaseRevision'), self.rebaseRevision)
+        connect(view, SIGNAL('qimportRevision'), self.qimportRevision)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -270,6 +271,22 @@ class RepoWidget(QWidget):
                 self.setScanForRepoChanges(saved)
             self.runner.commandFinished.connect(finished)
             self.runner.run(cmdline)
+
+    def qimportRevision(self, rev):
+        """QImport revision and all descendents to MQ"""
+        saved = self.setScanForRepoChanges(False)
+        if 'qparent' in self.repo.tags():
+            endrev = 'qparent'
+        else:
+            endrev = ''
+        cmdline = ['qimport', '--rev', '%s::%s' % (rev, endrev),
+                   '--repository', self.repo.root]
+        self.runner = cmdui.Runner(_('QImport - TortoiseHg'), self)
+        def finished(ret):
+            self.reload()
+            self.setScanForRepoChanges(saved)
+        self.runner.commandFinished.connect(finished)
+        self.runner.run(cmdline)
 
     def revision_selected(self, rev):
         if self.workbench.getCurentRepoRoot() != self.repo.root:
