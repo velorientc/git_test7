@@ -17,9 +17,6 @@ from tortoisehg.util import hglib
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-BEGINTAG = '\033' + str(time.time())
-ENDTAG = '\032' + str(time.time())
-
 class LogDockWidget(QDockWidget):
     visibilityChanged = pyqtSignal(bool)
 
@@ -37,7 +34,7 @@ class LogDockWidget(QDockWidget):
         mainframe.setLayout(vbox)
         self.setWidget(mainframe)
 
-        self.logte = QPlainTextEdit()
+        self.logte = QTextBrowser()
         vbox.addWidget(self.logte, 1)
 
         hbox = QHBoxLayout()
@@ -64,21 +61,24 @@ class LogDockWidget(QDockWidget):
             self.phbox.addWidget(pm)
         else:
             pm = self.topics[topic]
-        if item:
-            pm.status.setText(hglib.tounicode(item))
-        elif unit:
-            pm.status.setText(hglib.tounicode(unit))
         if total:
             pm.pbar.setValue(pos)
             pm.pbar.setMaximum(total)
+            count = '%d / %d' % (pos, total)
         else:
+            count = '%d' % pos
             pm.pbar.unknown()
+        if item:
+            pm.topic.setText(hglib.tounicode('%s: %s') % (topic, item))
+        if unit:
+            count = count + ' ' + unit
+        pm.status.setText(hglib.tounicode(count))
 
-    def logMessage(self, msg):
-        self.logte.appendPlainText(hglib.tounicode(msg))
-
-    def logErrorMessage(self, msg):
-        self.logte.appendPlainText(hglib.tounicode(msg))
+    def logMessage(self, msg, style=''):
+        msg = msg.replace('\n', '<br />')
+        self.logte.insertHtml('<font style="%s">%s</font>' % (style, msg))
+        max = self.logte.verticalScrollBar().maximum()
+        self.logte.verticalScrollBar().setSliderPosition(max)
 
     def showEvent(self, event):
         self.visibilityChanged.emit(True)
