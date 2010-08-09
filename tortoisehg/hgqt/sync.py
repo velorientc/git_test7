@@ -19,6 +19,10 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, hgemail
 
+# TODO
+# Send (secret-safe) command lines to log widget
+# cmdui/thread must log plain text output, for query
+
 try:
     import iniparse
     # Monkypatch this regex to prevent iniparse from considering
