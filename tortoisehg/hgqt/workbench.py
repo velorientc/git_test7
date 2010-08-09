@@ -304,6 +304,9 @@ class Workbench(QMainWindow):
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
 
+    def showLog(self, show):
+        self.log.setVisible(show)
+
     def openRepo(self, repopath):
         repo = hg.repository(self.ui, path=str(repopath))
         self.addRepoTab(repo)
@@ -545,6 +548,7 @@ class Workbench(QMainWindow):
         self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
         self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
+        self.actionShowLog.toggled.connect(self.showLog)
 
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
