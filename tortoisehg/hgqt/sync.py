@@ -100,7 +100,7 @@ class SyncWidget(QWidget):
         lbl = QLabel(_('<b>Configured Paths</b>'))
         pathsbox.addWidget(lbl)
         pathsbox.addWidget(self.tv)
-        layout.addWidget(pathsframe)
+        layout.addWidget(pathsframe, 1)
 
         if parent:
             self.closeonesc = False
