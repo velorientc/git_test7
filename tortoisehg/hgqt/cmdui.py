@@ -73,6 +73,7 @@ class Core(QObject):
     commandStarted = pyqtSignal()
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
+    progress = pyqtSignal(thread.DataWrapper)
 
     def __init__(self, logwidget=None):
         super(Core, self).__init__()
@@ -119,7 +120,9 @@ class Core(QObject):
         self.thread.commandFinished.connect(self.command_finished)
         self.thread.outputReceived.connect(self.output_received)
         self.thread.errorReceived.connect(self.error_received)
-        if self.pmon:
+        if self.log:
+            self.thread.progressReceived.connect(self.fwdprogress)
+        elif self.pmon:
             self.thread.progressReceived.connect(self.progress_received)
         self.thread.start()
 
@@ -195,15 +198,14 @@ class Core(QObject):
         else:
             self.append_output(msg, style)
 
-    def progress_received(self, wrapper):
-        if self.log:
-            topic, item, pos, total, unit = wrapper.data
-            if self.thread.isFinished():
-                self.log.progress(topic, None, item, unit, total)
-            else:
-                self.log.progress(topic, pos, item, unit, total)
-            return
+    def fwdprogress(self, wrapper):
+        topic, item, pos, total, unit = wrapper.data
+        if self.thread.isFinished():
+            self.progress.emit(thread.DataWrapper((topic, None, '', '', None)))
+        else:
+            self.progress.emit(wrapper)
 
+    def progress_received(self, wrapper):
         if self.thread.isFinished():
             self.pmon.clear_progress()
             return
@@ -249,6 +251,7 @@ class Widget(QWidget):
         self.core.commandFinished.connect(lambda w: self.commandFinished.emit(w))
         self.core.commandCanceling.connect(lambda: self.commandCanceling.emit())
         if logwidget:
+            self.core.progress.connect(logwidget.progress)
             return
 
         # main layout grid

@@ -40,42 +40,52 @@ class LogDockWidget(QDockWidget):
         self.logte.setMaximumBlockCount(1024)
         vbox.addWidget(self.logte, 1)
 
-        hbox = QHBoxLayout()
+        hbox = QVBoxLayout()
+        hbox.addWidget(QLabel(_('Progress:')))
         vbox.addLayout(hbox)
-        self.phbox = hbox
+        self.pvbox = hbox
+        self.pbars = []
         self.topics = {}
 
-    def progress(self, topic, pos, item='', unit='', total=None):
+    def progress(self, wrapper):
         # topic is current operation
         # pos is the current numeric position (revision, bytes)
         # item is a non-numeric marker of current position (current file)
         # unit is a string label
         # total is the highest expected pos
         # All topics should be marked closed by setting pos to None
+        topic, item, pos, total, unit = wrapper.data
         if pos is None:
             if topic in self.topics:
                 pm = self.topics[topic]
-                self.phbox.removeWidget(pm)
-                del self.topics[pm]
+                pm.clear()
+                del self.topics[topic]
+                self.pvbox.update()
             return
         if topic not in self.topics:
-            pm = ProgressMonitor(topic)
+            for pm in self.pbars:
+                if pm.idle:
+                    pm.reuse(topic)
+                    break
+            else:
+                pm = ProgressMonitor(topic)
+                self.pvbox.addWidget(pm)
+                self.pbars.append(pm)
+                self.pvbox.update()
             self.topics[topic] = pm
-            self.phbox.addWidget(pm)
         else:
             pm = self.topics[topic]
         if total:
-            pm.pbar.setValue(pos)
-            pm.pbar.setMaximum(total)
-            count = '%d / %d' % (pos, total)
+            fmt = '%d / %d ' % (pos, total)
+            if unit:
+                fmt += unit
+            pm.status.setText(fmt)
+            pm.setcounts(pos, total)
         else:
-            count = '%d' % pos
-            pm.pbar.unknown()
-        if item:
-            pm.topic.setText(hglib.tounicode('%s: %s') % (topic, item))
-        if unit:
-            count = count + ' ' + unit
-        pm.status.setText(hglib.tounicode(count))
+            if item:
+                item = hglib.tounicode(item)[-30:]
+            pm.status.setText('%d %s' % (pos, item))
+            pm.unknown()
 
     def logMessage(self, msg, style=''):
         if msg.endsWith('\n'):
@@ -97,9 +107,7 @@ class ProgressMonitor(QWidget):
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*(0,)*4)
         self.setLayout(hbox)
-
-        self.status = QLabel()
-        hbox.addWidget(self.status, 0)
+        self.idle = False
 
         self.topic = QLabel(topic)
         hbox.addWidget(self.topic, 0)
@@ -109,9 +117,28 @@ class ProgressMonitor(QWidget):
         self.pbar.setMinimum(0)
         hbox.addWidget(self.pbar)
 
+        self.status = QLabel()
+        hbox.addWidget(self.status, 1)
+
         self.pbar.setMaximum(100)
         self.pbar.reset()
         self.status.setText('')
+
+    def reuse(self, topic):
+        self.topic.setText(topic)
+        self.status.setText('')
+        self.idle = False
+
+    def clear(self):
+        self.pbar.setMinimum(0)
+        self.pbar.setMaximum(100)
+        self.pbar.setValue(100)
+        self.status.setText('')
+        self.idle = True
+
+    def setcounts(self, cur, max):
+        self.pbar.setMaximum(max)
+        self.pbar.setValue(cur)
 
     def unknown(self):
         self.pbar.setMinimum(0)
