@@ -410,7 +410,6 @@ class Workbench(QMainWindow):
         if cw is None:
             pats = {}
             opts = {}
-            print "creating commit widget for %s" % root
             cw = CommitWidget(pats, opts, root=root)
             self.commitwidgets[root] = cw
             self.commitStackedWidget.addWidget(cw)
@@ -438,7 +437,6 @@ class Workbench(QMainWindow):
     def createSyncWidget(self, root):
         sw = self.getSyncWidget(root)
         if sw is None:
-            print "creating sync widget for %s" % root
             sw = SyncWidget(root, self)
             self.syncwidgets[root] = sw
             self.syncStackedWidget.addWidget(sw)
