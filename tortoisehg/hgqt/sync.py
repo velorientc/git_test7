@@ -104,10 +104,12 @@ class SyncWidget(QWidget):
 
         if parent:
             self.closeonesc = False
+            log = parent.log
         else:
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
             self.closeonesc = True
+            log = None
 
         self.savebutton.clicked.connect(self.saveclicked)
         self.authbutton.clicked.connect(self.authclicked)
@@ -121,7 +123,7 @@ class SyncWidget(QWidget):
                           self.outbutton, self.pushbutton,
                           self.emailbutton)
 
-        cmd = cmdui.Widget()
+        cmd = cmdui.Widget(log)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.commandCanceling.connect(self.commandCanceled)
