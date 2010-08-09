@@ -74,7 +74,7 @@ class Core(QObject):
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, logwidget=None):
         super(Core, self).__init__()
 
         self.thread = None
@@ -82,6 +82,7 @@ class Core(QObject):
         self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.pmon = None
         self.queue = []
+        self.log = logwidget
 
     ### Public Methods ###
 
@@ -179,16 +180,30 @@ class Core(QObject):
         msg = hglib.tounicode(msg)
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
-        self.append_output(msg, style)
+        if self.log:
+            self.log.logMessage(msg, style)
+        else:
+            self.append_output(msg, style)
 
     def error_received(self, wrapper):
         msg, label = wrapper.data
         msg = hglib.tounicode(msg)
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
-        self.append_output(msg, style)
+        if self.log:
+            self.log.logMessage(msg, style)
+        else:
+            self.append_output(msg, style)
 
     def progress_received(self, wrapper):
+        if self.log:
+            topic, item, pos, total, unit = wrapper.data
+            if self.thread.isFinished():
+                self.log.progress(topic, None, item, unit, total)
+            else:
+                self.log.progress(topic, pos, item, unit, total)
+            return
+
         if self.thread.isFinished():
             self.pmon.clear_progress()
             return
@@ -226,13 +241,15 @@ class Widget(QWidget):
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, logwidget=None):
         super(Widget, self).__init__()
 
-        self.core = Core()
+        self.core = Core(logwidget)
         self.core.commandStarted.connect(lambda: self.commandStarted.emit())
         self.core.commandFinished.connect(lambda w: self.commandFinished.emit(w))
         self.core.commandCanceling.connect(lambda: self.commandCanceling.emit())
+        if logwidget:
+            return
 
         # main layout grid
         grid = QGridLayout()
@@ -263,6 +280,8 @@ class Widget(QWidget):
         self.core.cancel()
 
     def show_output(self, visible):
+        if self.core.log:
+            return
         self.core.output_text.setShown(visible)
 
     def is_show_output(self):
