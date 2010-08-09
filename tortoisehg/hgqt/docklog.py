@@ -109,13 +109,13 @@ class ProgressMonitor(QWidget):
         self.setLayout(hbox)
         self.idle = False
 
-        self.topic = QLabel(topic)
-        hbox.addWidget(self.topic, 0)
-
         self.pbar = QProgressBar()
         self.pbar.setTextVisible(False)
         self.pbar.setMinimum(0)
         hbox.addWidget(self.pbar)
+
+        self.topic = QLabel(topic)
+        hbox.addWidget(self.topic, 0)
 
         self.status = QLabel()
         hbox.addWidget(self.status, 1)
