@@ -22,6 +22,9 @@ from tortoisehg.hgqt import qtlib, cmdui, hgemail
 # TODO
 # Send (secret-safe) command lines to log widget
 # cmdui/thread must log plain text output, for query
+# Write keyring help, connect to help button
+# Ini file locking for sync.py and settings.py
+# Delete paths from ini file via 'Delete/Backspace'
 
 try:
     import iniparse
