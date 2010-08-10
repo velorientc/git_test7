@@ -276,7 +276,10 @@ class Widget(QWidget):
 
     ### Public Methods ###
 
-    def run(self, cmdline, *args):
+    def run(self, cmdline, *args, **opts):
+        if 'display' in opts:
+            w = thread.DataWrapper((opts['display'], ''))
+            self.core.output_received(w)
         self.core.run(cmdline, *args)
 
     def cancel(self):
