@@ -995,8 +995,9 @@ class GCommit(GStatus):
             cwd = os.getcwd()
             os.chdir(repo.root)
             self.hg_commit(files, finish)
-        except:
-            finish()
+        except Exception, e:
+            gdialog.Prompt(_('Commit failed'), hglib.toutf(e), self).run()
+            finish(1)
 
 
     def undo_clicked(self, toolbutton, data=None):
