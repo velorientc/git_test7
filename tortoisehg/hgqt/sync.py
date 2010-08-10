@@ -20,7 +20,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, hgemail
 
 # TODO
-# Send (secret-safe) command lines to log widget
 # cmdui/thread must log plain text output, for query
 # Write keyring help, connect to help button
 # Ini file locking for sync.py and settings.py
@@ -274,33 +273,26 @@ class SyncWidget(QWidget):
         if dialog.exec_() == QDialog.Accepted:
             self.curuser, self.curpw = '', ''
 
-    def inclicked(self):
+    def run(self, cmdline):
         if self.cmd.core.is_running():
             return
         url = self.currentUrl(False)
-        cmdline = ['--repository', self.root, 'incoming', url]
-        self.cmd.run(cmdline)
+        safeurl = self.currentUrl(True)
+        display = ' '.join(['hg'] + cmdline + [safeurl]) + '\n'
+        cmdline.append(url)
+        self.cmd.run(cmdline, display=display)
+
+    def inclicked(self):
+        self.run(['--repository', self.root, 'incoming'])
 
     def pullclicked(self):
-        if self.cmd.core.is_running():
-            return
-        url = self.currentUrl(False)
-        cmdline = ['--repository', self.root, 'pull', url]
-        self.cmd.run(cmdline)
+        self.run(['--repository', self.root, 'pull'])
 
     def outclicked(self):
-        if self.cmd.core.is_running():
-            return
-        url = self.currentUrl(False)
-        cmdline = ['--repository', self.root, 'outgoing', url]
-        self.cmd.run(cmdline)
+        self.run(['--repository', self.root, 'outgoing'])
 
     def pushclicked(self):
-        if self.cmd.core.is_running():
-            return
-        url = self.currentUrl(False)
-        cmdline = ['--repository', self.root, 'push', url]
-        self.cmd.run(cmdline)
+        self.run(['--repository', self.root, 'push'])
 
     def emailclicked(self):
         try:
