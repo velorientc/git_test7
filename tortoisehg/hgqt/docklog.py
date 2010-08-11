@@ -38,6 +38,7 @@ class LogDockWidget(QDockWidget):
         self.logte.setReadOnly(True)
         self.logte.setCenterOnScroll(True)
         self.logte.setMaximumBlockCount(1024)
+        self.logte.setWordWrapMode(QTextOption.NoWrap)
         vbox.addWidget(self.logte, 1)
 
         hbox = QVBoxLayout()
