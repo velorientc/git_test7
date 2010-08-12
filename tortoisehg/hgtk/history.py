@@ -790,6 +790,7 @@ class GLog(gdialog.GWindow):
         ret = self.check_filter_text(text, mode)
         if not ret:
             return
+        text = hglib.fromutf(text)
         opts = {}
         if mode == MODE_REVRANGE:
             opts['revlist'] = ret
