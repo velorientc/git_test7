@@ -26,7 +26,7 @@ class InitDialog(QDialog):
 
     def __init__(self, destdir=[], opts={}, caller=''):
         super(InitDialog, self).__init__()
-        
+
         self.caller = caller
 
         # main layout
@@ -101,6 +101,7 @@ class InitDialog(QDialog):
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.init_btn.clicked.connect(self.init)
         self.close_btn.clicked.connect(self.close)
+        self.make_old_chk.toggled.connect(self.compose_command)
 
     def browse_clicked(self):
         """Select the destination directory"""
@@ -118,6 +119,8 @@ class InitDialog(QDialog):
     def compose_command(self):
         # just a stub for extension with extra options (--mq, --ssh, ...)
         self.cmdline = ['init']
+        if self.make_old_chk.isChecked():
+            self.cmdline.append('--config format.usefncache=False')
         self.cmdline.append(self.getPath())
         self.hgcmd_txt.setText('hg ' + ' '.join(self.cmdline))
 
