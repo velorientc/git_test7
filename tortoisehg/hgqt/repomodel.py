@@ -87,8 +87,6 @@ class HgRepoListModel(QAbstractTableModel):
         """
         QAbstractTableModel.__init__(self, parent)
         self.datacache = {}
-        self.mqueues = []
-        self.wd_revs = []
         self.graph = None
         self.timerHandle = None
         self.dotradius = 8
@@ -123,14 +121,6 @@ class HgRepoListModel(QAbstractTableModel):
         if oldroot != repo.root:
             self.reloadConfig()
         self.datacache = {}
-        try:
-            wdctxs = self.repo.parents()
-        except error.Abort:
-            # might occur if reloading during a mq operation (or
-            # whatever operation playing with hg history)
-            return
-        self.wd_revs = [ctx.rev() for ctx in wdctxs]
-        self.mqueues = hglib.getmqpatchtags(self.repo)
         grapher = revision_grapher(self.repo, start_rev=None,
                                    follow=False, branch=branch)
         self.graph = Graph(self.repo, grapher, self.max_file_size, include_mq=True)
@@ -345,20 +335,19 @@ class HgRepoListModel(QAbstractTableModel):
                               QPointF(centre_x - r, centre_y),])
             painter.drawPolygon(poly)
 
-        tags = set(ctx.tags())
-        if tags.intersection(self.mqueues):  # diamonds for patches
-            if self.is_working_directory_parent(gnode.rev):
+        if ctx.thgmqpatch():  # diamonds for patches
+            if ctx.thgwdparent():
                 painter.setBrush(white)
                 diamond(2 * 0.9 * radius / 1.5)
             painter.setBrush(fillcolor)
             diamond(radius / 1.5)
-        elif type(ctx.rev()) == str: # is not None and ctx.rev() < 0:
+        elif type(ctx.rev()) == str:
             patchcolor = QColor('#dddddd')
             painter.setBrush(patchcolor)
             painter.setPen(patchcolor)
             diamond(radius / 1.5)
         else:  # circles for normal revisions
-            if self.is_working_directory_parent(gnode.rev):
+            if ctx.thgwdparent():
                 painter.setBrush(white)
                 circle(0.9 * radius)
             painter.setBrush(fillcolor)
@@ -433,9 +422,6 @@ class HgRepoListModel(QAbstractTableModel):
         tags = ctx.tags()
         tags = [t for t in tags if t not in mqtags]
         return hglib.tounicode(",".join(tags))
-
-    def is_working_directory_parent(self, rev):
-        return rev in self.wd_revs
     
     def getlog(self, ctx, gnode):
         # TODO: add bookmark
@@ -452,19 +438,19 @@ class HgRepoListModel(QAbstractTableModel):
             return text + " " + qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)
 
         parts = []
-        if ctx in [self.repo[x] for x in self.repo.branchmap()]:
+        if ctx.thgbranchhead():
             effects = qtlib.geteffect('log.branch')
             text = qtlib.applyeffects(' %s ' % ctx.branch(), effects)
             parts.append(text)
 
-        for tag in (hglib.getctxtags(ctx) or []):
-            style = tag in self.mqueues and 'log.patch' or 'log.tag'
+        for tag in ctx.thgtags():
+            style = self.repo.thgmqtag(tag) and 'log.patch' or 'log.tag'
             effects = qtlib.geteffect(style)
             text = qtlib.applyeffects(' %s ' % tag, effects)
             parts.append(text)
 
         if msg:
-            if self.is_working_directory_parent(gnode.rev):
+            if ctx.thgwdparent():
                 msg = qtlib.markup(msg, weight='bold')
         parts.append(msg)
 

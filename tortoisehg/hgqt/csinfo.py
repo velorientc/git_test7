@@ -207,6 +207,11 @@ class patchctx(object):
     def parents(self): return self._parents
     def children(self): return ()
     def extra(self): return {}
+    def thgtags(self): return []
+    def thgwdparent(self): return False
+    def thgmqpatch(self): return False
+    def thgbranchhead(self): return False
+
 
 class SummaryInfo(object):
 
