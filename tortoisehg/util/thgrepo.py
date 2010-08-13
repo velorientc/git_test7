@@ -9,6 +9,8 @@
 # to extending repositories and change contexts.
 
 from mercurial import hg
+from mercurial.util import propertycache
+
 from util import hglib
 
 def repository(ui, path='', create=False):
@@ -27,10 +29,12 @@ def _extendrepo(repo):
             changectx.__class__ = _extendchangectx(changectx)
             return changectx
 
+        @propertycache
         def _thghiddentags(self):
             hiddentags_opt = hglib.toutf(self.ui.config('tortoisehg', 'hidetags', ''))
             return [t.strip() for t in hiddentags_opt.split()]
         
+        @propertycache
         def _thgmqtags(self):
             '''Returns all tag names used by MQ patches. Returns [] 
             if MQ not in use.'''
@@ -42,7 +46,7 @@ def _extendrepo(repo):
 
         def thgmqtag(self, tag):
             '''True if tag is used to mark an applied MQ patch'''
-            return tag in self._thgmqtags()
+            return tag in self._thgmqtags
 
     return thgrepository
         
@@ -56,7 +60,7 @@ def _extendchangectx(changectx):
         def thgtags(self):
             '''Returns all unhidden tags for self, converted to UTF-8'''
             value = self._thgrawtags()
-            htlist = self._repo._thghiddentags()
+            htlist = self._repo._thghiddentags
             return [tag for tag in value if tag not in htlist]
  
         def thgwdparent(self):
@@ -68,7 +72,7 @@ def _extendchangectx(changectx):
         def thgmqpatch(self):
             '''True if self is an MQ applied patch'''
             mytags = set(self.tags())
-            patchtags = self._repo._thgmqtags()
+            patchtags = self._repo._thgmqtags
             return not not mytags.intersection(patchtags)
 
         def thgbranchhead(self):
