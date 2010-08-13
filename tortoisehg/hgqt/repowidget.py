@@ -11,10 +11,9 @@
 import binascii
 import os
 
-from mercurial import hg
+from tortoisehg.util import thgrepo
 
 from tortoisehg.hgqt.i18n import _
-
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
@@ -347,7 +346,7 @@ class RepoWidget(QWidget):
             self._reload_rev = self.repoview.current_rev
         else:
             self._reload_rev = rev
-        self.repo = hg.repository(self.repo.ui, self.repo.root)
+        self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
         self._repodate = self._getrepomtime()
         self.setupModels()
         cw = self.getCommitWidget()
