@@ -13,10 +13,12 @@ Main Qt4 application for TortoiseHg
 
 import os
 
-from mercurial import hg
 from mercurial.error import RepoError
 
 from tortoisehg.util.hglib import tounicode
+from tortoisehg.util import thgrepo
+from tortoisehg.util import paths
+
 from tortoisehg.hgqt import repomodel
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.decorators import timeit
@@ -29,8 +31,6 @@ from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.docklog import LogDockWidget
-
-from tortoisehg.util import paths
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -308,7 +308,7 @@ class Workbench(QMainWindow):
         self.log.setVisible(show)
 
     def openRepo(self, repopath):
-        repo = hg.repository(self.ui, path=str(repopath))
+        repo = thgrepo.repository(self.ui, path=str(repopath))
         self.addRepoTab(repo)
 
     def find_root(self, url):
@@ -329,7 +329,7 @@ class Workbench(QMainWindow):
         for u in d.urls():
             root = self.find_root(u)
             if root:
-                repo = hg.repository(self.ui, path=root)
+                repo = thgrepo.repository(self.ui, path=root)
                 self.addRepoTab(repo)
                 accept = True
         if accept:
@@ -668,7 +668,7 @@ class Workbench(QMainWindow):
         path = str(path)
         if path:
             try:
-                repo = hg.repository(self.ui, path=path)
+                repo = thgrepo.repository(self.ui, path=path)
                 self.addRepoTab(repo)
             except RepoError:
                 QMessageBox.warning(self, _('Failed to open repository'),
@@ -779,5 +779,5 @@ def run(ui, *pats, **opts):
     repo = None
     root = paths.find_root()
     if root:
-        repo = hg.repository(ui, path=root)
+        repo = thgrepo.repository(ui, path=root)
     return Workbench(ui, repo)
