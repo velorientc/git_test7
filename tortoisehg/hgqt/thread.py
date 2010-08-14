@@ -140,7 +140,7 @@ class CmdThread(QThread):
     #         others - return code of command
     commandFinished = pyqtSignal(DataWrapper)
 
-    def __init__(self, cmdline, parent=None, buffering=True):
+    def __init__(self, cmdline, parent=None, buffering=False):
         super(CmdThread, self).__init__()
 
         self.cmdline = cmdline
