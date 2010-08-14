@@ -145,13 +145,15 @@ class InitDialog(gtk.Dialog):
         shlib.shell_notify([dest])
 
         if self.optrunci.get_active():
-            os.chdir(dest)
-            from tortoisehg.hgtk.hgtk import gtkrun
-            from tortoisehg.hgtk.commit import run as cirun
-            ciui = ui.ui()
+            self.emit_stop_by_name('response')
+            self.emit_stop_by_name('destroy')
             self.hide()
-            gtkrun(cirun, ciui)
-            return
+            os.chdir(dest)
+            from tortoisehg.hgtk.commit import run as cirun
+            win = cirun(ui.ui())
+            win.display()
+            win.show_all()
+            win.connect('destroy', gtk.main_quit)
         else:
             self.response(gtk.RESPONSE_CLOSE)
 
