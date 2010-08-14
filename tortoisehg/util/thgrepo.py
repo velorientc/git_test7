@@ -8,7 +8,9 @@
 # See mercurial/extensions.py, comments to wrapfunction, for this approach
 # to extending repositories and change contexts.
 
-from mercurial import hg
+import os
+
+from mercurial import hg, patch, util, error
 from mercurial.util import propertycache
 
 from util import hglib
@@ -58,6 +60,7 @@ def _extendrepo(repo):
                     delattr(self, a)
 
     return thgrepository
+
         
 def _extendchangectx(changectx):
     class thgchangectx(changectx.__class__):
@@ -89,3 +92,100 @@ def _extendchangectx(changectx):
             return self in [self._repo[x] for x in self._repo.branchmap()]
 
     return thgchangectx
+
+
+_pctxcache = {}
+
+def PatchContext(repo, patchpath, rev=None):
+    # check path
+    if not os.path.isabs(patchpath) or not os.path.isfile(patchpath):
+        return None
+    # check cache
+    global _pctxcache
+    mtime = os.path.getmtime(patchpath)
+    key = repo.root + patchpath
+    holder = _pctxcache.get(key, None)
+    if holder is not None and mtime == holder[0]:
+        return holder[1]
+    # create a new context object
+    ctx = patchctx(patchpath, repo, rev=rev)
+    _pctxcache[key] = (mtime, ctx)
+    return ctx
+
+
+class patchctx(object):
+
+    def __init__(self, patchpath, repo, patchHandle=None, rev=None):
+        """ Read patch context from file
+        :param patchHandle: If set, then the patch is a temporary.
+            The provided handle is used to read the patch and
+            the patchpath contains the name of the patch. 
+            The handle is NOT closed.
+        """
+        self._path = patchpath
+        self._patchname = os.path.basename(patchpath)
+        self._repo = repo
+        if patchHandle:
+            pf = patchHandle
+            pf_start_pos = pf.tell()
+        else:
+            pf = open(patchpath)
+        try:
+            data = patch.extract(self._repo.ui, pf)
+            tmpfile, msg, user, date, branch, node, p1, p2 = data
+            if tmpfile:
+                os.unlink(tmpfile)
+        finally:
+            if patchHandle:
+                pf.seek(pf_start_pos)
+            else:
+                pf.close()
+        if not msg and hasattr(repo, 'mq'):
+            # attempt to get commit message
+            from hgext import mq
+            msg = mq.patchheader(repo.mq.join(self._patchname)).message
+            if msg:
+                msg = '\n'.join(msg)
+        self._node = node
+        self._user = user and hglib.toutf(user) or ''
+        self._date = date and util.parsedate(date) or None
+        self._desc = msg and msg or ''
+        self._branch = branch and hglib.toutf(branch) or ''
+        self._parents = []
+        self._rev = rev
+        for p in (p1, p2):
+            if not p:
+                continue
+            try:
+                self._parents.append(repo[p])
+            except (error.LookupError, error.RepoLookupError, error.RepoError):
+                self._parents.append(p)
+
+    def __str__(self):
+        node = self.node()
+        if node:
+            return node[:12]
+        return ''
+
+    def __int__(self):
+        return self.rev()
+
+    def node(self): return self._node
+    def rev(self): return self._rev
+    def hex(self):
+        node = self.node()
+        if node:
+            return hex(node)
+        return ''
+    def user(self): return self._user
+    def date(self): return self._date
+    def description(self): return self._desc
+    def branch(self): return self._branch
+    def tags(self): return ()
+    def parents(self): return self._parents
+    def children(self): return ()
+    def extra(self): return {}
+    def thgtags(self): return []
+    def thgwdparent(self): return False
+    def thgmqpatch(self): return False
+    def thgbranchhead(self): return False
