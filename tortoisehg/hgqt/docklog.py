@@ -94,6 +94,9 @@ class LogDockWidget(QDockWidget):
         msg = msg.replace('\n', '<br/>')
         self.logte.appendHtml('<font style="%s">%s</font>' % (style, msg))
 
+    def clear(self):
+        self.logte.clear()
+
     def showEvent(self, event):
         self.visibilityChanged.emit(True)
 
