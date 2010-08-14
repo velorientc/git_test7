@@ -27,6 +27,20 @@ def repository(ui, path='', create=False):
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
         def changectx(self, changeid):
+            '''Extends Mercurial's standard changectx() method to
+            a) return a thgchangectx with additional methods
+            b) return a PatchContext if changeid is the name of an MQ
+            unapplied patch'''
+            
+            # Mercurial's standard changectx() (rather, lookup()) 
+            # implies that tags and branch names live in the same namespace.
+            # This code throws patch names in the same namespace, but as 
+            # applied patches have a tag that matches their patch name this 
+            # seems safe.
+            if changeid in self.thgmqunappliedpatches:
+                q = self.mq # must have mq to pass the previous if
+                return PatchContext(self, q.join(changeid), rev=changeid)
+
             changectx = super(thgrepository, self).changectx(changeid)
             changectx.__class__ = _extendchangectx(changectx)
             return changectx
@@ -59,6 +73,18 @@ def _extendrepo(repo):
                 if a in self.__dict__:
                     delattr(self, a)
 
+        @propertycache
+        def thgmqunappliedpatches(self):
+            '''Returns a list of (patch name, patch path) of all self's 
+            unapplied MQ patches, in patch series order, first unapplied
+            patch first.'''
+            if not hasattr(self, 'mq'): return []
+            
+            q = self.mq 
+            applied = set([p.name for p in q.applied])
+            
+            return [pname for pname in q.series if not pname in applied]
+                    
     return thgrepository
 
         
@@ -92,6 +118,7 @@ def _extendchangectx(changectx):
             return self in [self._repo[x] for x in self._repo.branchmap()]
 
     return thgchangectx
+
 
 
 _pctxcache = {}
