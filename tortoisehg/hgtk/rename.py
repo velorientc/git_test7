@@ -67,9 +67,12 @@ def rename_resp(dlg, response):
         try:
             new_name = util.canonpath(root, root, new_name)
             targetdir = os.path.dirname(new_name) or '.'
-            if not os.path.isdir(targetdir):
-                os.makedirs(targetdir)
-            shutil.move(dlg.orig, new_name)
+            if dlg.orig.lower() == new_name.lower() and os.path.isdir(dlg.orig):
+                os.rename(dlg.orig, new_name)
+            else:
+                if not os.path.isdir(targetdir):
+                    os.makedirs(targetdir)
+                shutil.move(dlg.orig, new_name)
             commands.rename(repo.ui, repo, dlg.orig, new_name, **opts)
             toquit = True
         except (OSError, IOError, util.Abort, error.RepoError), inst:
