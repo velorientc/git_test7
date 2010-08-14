@@ -35,18 +35,17 @@ def _extendrepo(repo):
             return [t.strip() for t in hiddentags_opt.split()]
         
         @propertycache
-        def _thgmqtags(self):
+        def _thgmqpatchnames(self):
             '''Returns all tag names used by MQ patches. Returns [] 
             if MQ not in use.'''
-            if hasattr(self, 'mq'):
-                self.mq.parse_series()
-                return self.mq.series[:]
-            else:
-                return []
+            if not hasattr(self, 'mq'): return []
+
+            self.mq.parse_series()
+            return self.mq.series[:]
 
         def thgmqtag(self, tag):
             '''True if tag is used to mark an applied MQ patch'''
-            return tag in self._thgmqtags
+            return tag in self._thgmqpatchnames
 
     return thgrepository
         
@@ -72,7 +71,7 @@ def _extendchangectx(changectx):
         def thgmqpatch(self):
             '''True if self is an MQ applied patch'''
             mytags = set(self.tags())
-            patchtags = self._repo._thgmqtags
+            patchtags = self._repo._thgmqpatchnames
             return not not mytags.intersection(patchtags)
 
         def thgbranchhead(self):
