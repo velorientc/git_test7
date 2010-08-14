@@ -83,12 +83,14 @@ class Core(QObject):
         self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.pmon = None
         self.queue = []
+        self.rawoutput = []
         self.log = logwidget
 
     ### Public Methods ###
 
     def run(self, cmdline, *cmdlines):
         '''Execute or queue Mercurial command'''
+        self.rawoutput = []
         self.queue.append(cmdline)
         if len(cmdlines):
             self.queue.extend(cmdlines)
@@ -106,6 +108,9 @@ class Core(QObject):
 
     def is_running(self):
         return bool(self.thread and self.thread.isRunning())
+
+    def get_rawoutput(self):
+        return u''.join(self.rawoutput)
 
     ### Private Method ###
 
@@ -135,7 +140,10 @@ class Core(QObject):
         self.output_text.verticalScrollBar().setSliderPosition(max)
 
     def clear_output(self):
-        self.output_text.clear()
+        if self.log:
+            self.log.clear()
+        else:
+            self.output_text.clear()
 
     ### Signal Handlers ###
 
@@ -180,6 +188,7 @@ class Core(QObject):
 
     def output_received(self, wrapper):
         msg, label = wrapper.data
+        self.rawoutput.append(msg)
         msg = hglib.tounicode(msg)
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
@@ -292,6 +301,9 @@ class Widget(QWidget):
 
     def is_show_output(self):
         return self.core.output_text.isVisible()
+
+    def get_rawoutput(self):
+        return self.core.get_rawoutput()
 
 class Dialog(QDialog):
     """A dialog for running random Mercurial command"""
