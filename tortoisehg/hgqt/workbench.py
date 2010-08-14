@@ -315,6 +315,11 @@ class Workbench(QMainWindow):
         p = str(url.toLocalFile())
         return paths.find_root(p)
 
+    def outgoing_for_root(self, root, outgoing):
+        repo = thgrepo.repository(self.ui, path=root)
+        repo._outgoing = outgoing
+        # TODO: invalidate graphs for this repo, draw out arrows
+
     def dragEnterEvent(self, event):
         d = event.mimeData()
         for u in d.urls():

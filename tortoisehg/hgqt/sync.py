@@ -20,7 +20,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, hgemail
 
 # TODO
-# cmdui/thread must log plain text output, for query
 # Write keyring help, connect to help button
 # Ini file locking for sync.py and settings.py
 # Delete paths from ini file via 'Delete/Backspace'
@@ -46,7 +45,7 @@ class SyncWidget(QWidget):
         self.setLayout(layout)
 
         self.root = root
-        self.thread = None
+        self.finishfunc = None
         self.curuser = None
         self.curpw = None
         self.updateInProgress = False
@@ -109,12 +108,12 @@ class SyncWidget(QWidget):
         layout.addWidget(pathsframe, 1)
 
         if parent:
-            self.closeonesc = False
+            self.workbench = parent
             log = parent.log
         else:
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
-            self.closeonesc = True
+            self.workbench = None
             log = None
 
         self.savebutton.clicked.connect(self.saveclicked)
@@ -150,8 +149,10 @@ class SyncWidget(QWidget):
     def commandFinished(self, wrapper):
         for b in self.opbuttons:
             b.setEnabled(True)
-        if wrapper.data is not 0:
-            self.cmd.show_output(True)
+        self.cmd.show_output(True)
+        if wrapper.data == 0 and self.finishfunc:
+            output = self.cmd.get_rawoutput()
+            self.finishfunc( output )
 
     def commandCanceled(self):
         for b in self.opbuttons:
@@ -247,7 +248,7 @@ class SyncWidget(QWidget):
         elif event.key() == Qt.Key_Escape:
             if self.cmd.core.is_running():
                 self.cmd.core.cancel()
-            elif self.closeonesc:
+            elif not self.workbench:
                 self.close()
         else:
             return super(SyncWidget, self).keyPressEvent(event)
@@ -283,15 +284,27 @@ class SyncWidget(QWidget):
         self.cmd.run(cmdline, display=display)
 
     def inclicked(self):
+        self.finishfunc = None
         self.run(['--repository', self.root, 'incoming'])
 
     def pullclicked(self):
+        self.finishfunc = None
         self.run(['--repository', self.root, 'pull'])
 
     def outclicked(self):
-        self.run(['--repository', self.root, 'outgoing'])
+        if self.workbench:
+            def outputnodes(data):
+                nodestrs = data.splitlines()[:-1]
+                self.workbench.outgoing_for_root(self.root, nodestrs)
+            self.finishfunc = outputnodes
+            self.run(['--repository', self.root, 'outgoing',
+                      '--quiet', '--template', '{node}\n'])
+        else:
+            self.finishfunc = None
+            self.run(['--repository', self.root, 'outgoing'])
 
     def pushclicked(self):
+        self.finishfunc = None
         self.run(['--repository', self.root, 'push'])
 
     def emailclicked(self):
