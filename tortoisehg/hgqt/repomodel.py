@@ -372,7 +372,7 @@ class HgRepoListModel(QAbstractTableModel):
                 text = hglib.tounicode(text)
             return QVariant(text)
         elif role == Qt.ForegroundRole:
-            if type(ctx.rev()) == str:
+            if ctx.thgmqunappliedpatch():
                 return QColor(UNAPPLIED_PATCH_COLOR)
             if column == 'Author':
                 if self.authorcolor:
@@ -429,7 +429,7 @@ class HgRepoListModel(QAbstractTableModel):
         if msg:
             msg = msg.splitlines()[0]
 
-        if type(ctx.rev()) == str:
+        if ctx.thgmqunappliedpatch():
             effects = qtlib.geteffect('log.unapplied_patch')
             text = qtlib.applyeffects(' %s ' % ctx._patchname, effects)
             return text + " " + qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)

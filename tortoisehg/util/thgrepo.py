@@ -113,9 +113,13 @@ def _extendchangectx(changectx):
             patchtags = self._repo._thgmqpatchnames
             return not not mytags.intersection(patchtags)
 
+        def thgmqunappliedpatch(self): return False
+
         def thgbranchhead(self):
             '''True if self is a branch head'''
             return self in [self._repo[x] for x in self._repo.branchmap()]
+
+
 
     return thgchangectx
 
@@ -216,3 +220,4 @@ class patchctx(object):
     def thgwdparent(self): return False
     def thgmqpatch(self): return False
     def thgbranchhead(self): return False
+    def thgmqunappliedpatch(self): return True
