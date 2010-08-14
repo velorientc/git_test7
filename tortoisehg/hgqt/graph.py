@@ -223,13 +223,8 @@ def filelog_grapher(repo, path):
 
 def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
-    q = repo.mq
-    q.parse_series()
-    applied = set([p.name for p in q.applied])
-
-    for patchname in reversed(q.series):
-        if not patchname in applied:
-            yield (patchname, 0, q.join(patchname), [], [], "")
+    for patchname in reversed(repo.thgmqunappliedpatches):
+        yield (patchname, 0, "", [], [], "")
 
 class GraphNode(object):
     """
