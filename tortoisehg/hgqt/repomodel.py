@@ -364,10 +364,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.ensureBuilt(row=row)
         column = self._columns[index.column()]
         gnode = self.graph[row]
-        if type(gnode.rev) == str:
-            ctx = PatchContext(self.repo, gnode.color, rev=gnode.rev)
-        else:
-            ctx = self.repo.changectx(gnode.rev)
+        ctx = self.repo.changectx(gnode.rev)
 
         if role == Qt.DisplayRole:
             text = self._columnmap[column](ctx, gnode)
