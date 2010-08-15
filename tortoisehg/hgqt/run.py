@@ -89,7 +89,26 @@ def portable_fork(ui, opts):
                      shell=True)
     sys.exit(0)
 
-def get_list_from_file(filename):
+# Windows and Nautilus shellext execute
+# "thg subcmd --listfile TMPFILE" or "thg subcmd --listfileutf8 TMPFILE"(planning) .
+# Extensions written in .hg/hgrc is enabled after calling "hg.repository(ui, root)".
+#
+# 1. win32mbcs extension
+#     Japanese shift_jis and Chinese big5 include '0x5c'(backslash) in filename.
+#     Mercurial resolves this problem with win32mbcs extension.
+#     So, thg must parse path after loading win32mbcs extension.
+#
+# 2. fixutf8 extension
+#     fixutf8 extension requires paths encoding utf-8.
+#     So, thg need to convert to utf-8.
+#
+
+_lines     = []
+_linesutf8 = []
+
+def get_lines_from_listfile(filename, isutf8):
+    global _lines
+    global _linesutf8
     try:
         if filename == '-':
             lines = [ x.replace("\n", "") for x in sys.stdin.readlines() ]
@@ -98,9 +117,34 @@ def get_list_from_file(filename):
             lines = [ x.replace("\n", "") for x in fd.readlines() ]
             fd.close()
             os.unlink(filename)
+        if isutf8:
+          _linesutf8 = lines
+        else:
+          _lines = lines
     except IOError, e:
         sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
-        return []
+
+def get_files_from_listfile():
+    global _lines
+    global _linesutf8
+    lines = []
+    need_to_utf8 = False
+    if sys.platform == 'win32':
+      try:
+        fixutf8 = extensions.find("fixutf8")
+        if fixutf8:
+          need_to_utf8 = True
+      except KeyError:
+        pass
+
+    if need_to_utf8:
+      lines += _linesutf8
+      for l in _lines:
+        lines.append(hglib.toutf(l))
+    else:
+      lines += _lines
+      for l in _linesutf8:
+        lines.append(hglib.fromutf(l))
 
     # Convert absolute file paths to repo/cwd canonical
     cwd = os.getcwd()
@@ -166,7 +210,11 @@ def _parse(ui, args):
     listfile = options.get('listfile')
     if listfile:
         del options['listfile']
-        args += get_list_from_file(listfile)
+        get_lines_from_listfile(listfile, False)
+    listfileutf8 = options.get('listfileutf8')
+    if listfileutf8:
+        del options['listfileutf8']
+        get_lines_from_listfile(listfileutf8, True)
 
     return (cmd, cmd and i[0] or None, args, options, cmdoptions, alias)
 
@@ -231,6 +279,11 @@ def runcommand(ui, args):
         lui = ui
 
     extensions.loadall(ui)
+
+    if path:
+        lui2   = lui.copy()
+        lrepo2 = hg.repository(lui2, path=path)
+        args  += get_files_from_listfile()
 
     if options['quiet']:
         ui.quiet = True
@@ -699,6 +752,7 @@ globalopts = [
     ('', 'nofork', None, _('do not fork GUI process')),
     ('', 'fork', None, _('always fork GUI process')),
     ('', 'listfile', '', _('read file list from file')),
+    ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
 ]
 
 table = {
