@@ -80,7 +80,6 @@ class CommitWidget(QWidget):
             hbox.addWidget(QLabel('<b>%s</b>' % s))
             hbox.addWidget(w, 1)
             vbox.addLayout(hbox)
-        addrow(_('Changeset:'), QLabel(_('Working Copy')))
         for ctx in repo.parents():
             desc = format_desc(ctx.description(), 80)
             fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
