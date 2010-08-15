@@ -47,6 +47,16 @@ def _extendrepo(repo):
             '''True if tag is used to mark an applied MQ patch'''
             return tag in self._thgmqpatchnames
 
+        def thginvalidate(self):
+            self.dirstate.invalidate()
+            if not isinstance(repo, bundlerepo.bundlerepository):
+                self.invalidate()
+            if hasattr(self, 'mq'):
+                self.mq.invalidate()
+            for a in "_thgmqpatchnames _thghiddentags".split():
+                if a in self.__dict__:
+                    delattr(self, a)
+
     return thgrepository
         
 def _extendchangectx(changectx):
