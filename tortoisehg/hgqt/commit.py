@@ -50,32 +50,37 @@ class CommitWidget(QWidget):
         self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
 
-        SP = QSizePolicy
-
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
-        form = QFormLayout()
-        form.setVerticalSpacing(3)
-        form.setContentsMargins(3, 0, 9, 0)
+
+        vbox = QVBoxLayout()
+        vbox.setMargin(0)
+
+        hbox = QHBoxLayout()
         repo = self.stwidget.repo
         wctx = repo[None]
+        branchbutton = QPushButton(_('Branch: ') +
+                                   hglib.tounicode(wctx.branch()))
+        branchbutton.pressed.connect(self.branchOp)
+        self.branchbutton = branchbutton
+        self.branchop = None
+        hbox.addWidget(branchbutton)
+        self.buttonHBox = hbox
 
-        usercombo = QComboBox()
-        usercombo.setEditable(True)
-
-        w = QWidget()
-        l = QHBoxLayout()
-        l.setMargin(0)
-        w.setLayout(l)
-        l.addWidget(QLabel(_('Working Copy')))
-        l.addStretch(1)
-        self.buttonHBox = l
+        msgcombo = MessageHistoryCombo()
+        self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
+        hbox.addWidget(msgcombo, 1)
+        hbox.addSpacing(9)
+        vbox.addLayout(hbox, 0)
 
         def addrow(s, w):
-            form.addRow("<b>%s</b>" % s, w)
-        addrow(_('Changeset:'), w)
+            hbox = QHBoxLayout()
+            hbox.addWidget(QLabel('<b>%s</b>' % s))
+            hbox.addWidget(w, 1)
+            vbox.addLayout(hbox)
+        addrow(_('Changeset:'), QLabel(_('Working Copy')))
         for ctx in repo.parents():
             desc = format_desc(ctx.description(), 80)
             fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
@@ -83,25 +88,11 @@ class CommitWidget(QWidget):
             lbl = QLabel(ptext)
             lbl.minimumSizeHint = lambda: QSize(0, 0)
             addrow(_('Parent:'), lbl)
+
+        usercombo = QComboBox()
+        usercombo.setEditable(True)
         addrow(_('User:'), usercombo)
 
-        vbox = QVBoxLayout()
-        vbox.addLayout(form, 0)
-        vbox.setMargin(0)
-        hbox = QHBoxLayout()
-
-        branchbutton = QPushButton(_('Branch: ') +
-                                   hglib.tounicode(wctx.branch()))
-        branchbutton.pressed.connect(self.branchOp)
-        self.branchbutton = branchbutton
-        self.branchop = None
-        hbox.addWidget(branchbutton)
-
-        msgcombo = MessageHistoryCombo()
-        self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
-        hbox.addWidget(msgcombo, 1)
-        hbox.addSpacing(9)
-        vbox.addLayout(hbox, 0)
         msgte = QPlainTextEdit()
         msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
         msgfont = qtlib.getfont(self.stwidget.repo.ui, 'fontcomment')
@@ -114,6 +105,8 @@ class CommitWidget(QWidget):
                 self.customContextMenuRequested)
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
+
+        SP = QSizePolicy
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(1)
         upperframe.setSizePolicy(sp)
