@@ -370,8 +370,8 @@ class RepoWidget(QWidget):
     def getCommitWidget(self):
         return self.workbench.getCommitWidget(self.repo.root)
 
-    def setRepomodel(self, branch):
-        self.repomodel.setRepo(self.repo, branch=branch)
+    def setRepomodel(self, branch, allparents=True):
+        self.repomodel.setRepo(self.repo, branch=branch, allparents=allparents)
 
     def filterbranch(self):
         return self.repomodel.branch()

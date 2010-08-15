@@ -58,7 +58,8 @@ def getparents(ctx, branch):
 def ismerge(ctx):
     return len(ctx.parents()) > 1
 
-def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False):
+def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
+                     follow=False, allparents=True):
     """incremental revision grapher
 
     This generator function walks through the revision history from
@@ -77,12 +78,20 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
     If follow is True, only generated the subtree from the start_rev head.
 
     If branch is set, only generated the subtree for the given named branch. 
+
+    If allparents is set, include the branch heads for the selected named
+    branch heads and all ancestors. If not set, include only the revisions
+    on the selected named branch.
     """
     assert start_rev is None or start_rev >= stop_rev
     curr_rev = start_rev
     revs = []
     rev_color = {}
     nextcolor = 0
+    if allparents:
+        getbranch = None
+    else:
+        getbranch = branch
     while curr_rev is None or curr_rev >= stop_rev:
         ctx = repo[curr_rev]
         # Compute revs and next_revs.
@@ -103,19 +112,19 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None, follow=False
             revs.append(curr_rev)
             rev_color[curr_rev] = curcolor = nextcolor
             nextcolor += 1
-            p_revs = getparents(ctx, branch)
+            p_revs = getparents(ctx, getbranch)
             while p_revs:
                 rev0 = p_revs[0]
                 if rev0 < stop_rev or rev0 in rev_color:
                     break
                 rev_color[rev0] = curcolor
-                p_revs = getparents(repo[rev0], branch)
+                p_revs = getparents(repo[rev0], getbranch)
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = getparents(ctx, branch)
+        parents = getparents(ctx, getbranch)
         author = ctx.user()
         parents_to_add = []
         if len(parents) > 1:

@@ -477,7 +477,7 @@ class Workbench(QMainWindow):
             openbr.extend(repo.branchheads(branch, closed=False))
         clbranches = [br for br, node in allbranches if node not in openbr]
         branches = [br for br, node in allbranches if node in openbr]
-        if self.branch_checkBox_action.isChecked():
+        if self.cbranch_action.isChecked():
             branches = branches + clbranches
 
         if len(branches) == 1:
@@ -524,13 +524,18 @@ class Workbench(QMainWindow):
         self.branch_menu = QMenu()
         cbranch_action = self.branch_menu.addAction("Display closed branches")
         cbranch_action.setCheckable(True)
-        self.branch_checkBox_action = cbranch_action
+        self.cbranch_action = cbranch_action
+        allpar_action = self.branch_menu.addAction("Include all ancestors")
+        allpar_action.setCheckable(True)
+        self.allpar_action = allpar_action
         self.branch_label.setMenu(self.branch_menu)
         self.branch_comboBox = QComboBox()
         connect(self.branch_comboBox, SIGNAL('activated(const QString &)'),
                 self.refreshRevisionTable)
         connect(cbranch_action, SIGNAL('toggled(bool)'),
                 self.setupBranchCombo)
+        connect(allpar_action, SIGNAL('toggled(bool)'),
+                self.refreshRevisionTable)
 
         self.toolBar_treefilters.layout().setSpacing(3)
 
@@ -723,10 +728,11 @@ class Workbench(QMainWindow):
         """Starts the process of filling the HgModel"""
         branch = self.branch_comboBox.currentText()
         branch = str(branch)
+        allparents = self.allpar_action.isChecked()
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         if w:
-            w.setRepomodel(branch)
+            w.setRepomodel(branch, allparents)
             if branch:
                 tabtext = '%s [%s]' % (w.reponame(), branch)
             else:
