@@ -416,6 +416,8 @@ class Workbench(QMainWindow):
             pats = {}
             opts = {}
             cw = CommitWidget(pats, opts, root=root)
+            cw.errorMessage.connect(self.showMessage)
+            cw.commitComplete.connect(lambda: self.reloadRepository(root))
             self.commitwidgets[root] = cw
             self.commitStackedWidget.addWidget(cw)
             s = QSettings()

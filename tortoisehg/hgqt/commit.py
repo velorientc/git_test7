@@ -531,7 +531,7 @@ class CommitWidget(QWidget):
             self.addMessageToHistory()
             self.msgte.clear()
             self.msgte.document().setModified(False)
-            self.emit(SIGNAL('commitComplete'))
+            self.commitComplete.emit()
             return True
         else:
             return False
