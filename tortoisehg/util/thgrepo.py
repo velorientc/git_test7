@@ -23,6 +23,7 @@ def repository(ui, path='', create=False):
     repo.__class__ = _extendrepo(repo)
     return repo
 
+_thgrepoprops = '_thgmqpatchnames _thghiddentags thgmqunappliedpatches'.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
@@ -69,7 +70,7 @@ def _extendrepo(repo):
                 self.invalidate()
             if hasattr(self, 'mq'):
                 self.mq.invalidate()
-            for a in "_thgmqpatchnames _thghiddentags".split():
+            for a in _thgrepoprops:
                 if a in self.__dict__:
                     delattr(self, a)
 
