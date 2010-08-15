@@ -22,7 +22,6 @@ from tortoisehg.hgqt import qtlib, cmdui, hgemail
 # TODO
 # Write keyring help, connect to help button
 # Ini file locking for sync.py and settings.py
-# Delete paths from ini file via 'Delete/Backspace'
 
 try:
     import iniparse
@@ -316,6 +315,28 @@ class SyncWidget(QWidget):
         dialog = hgemail.EmailDialog(_ui, repo, None, self)
         dialog.exec_()
 
+    def removeAlias(self, alias):
+        if iniparse is None:
+            qtlib.WarningMsgBox(_('Unable to remove URL'),
+                   _('Iniparse must be installed.'), parent=self)
+            return
+        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn, cfg = loadIniFile([fn], self)
+        if fn is None:
+            return
+        if 'paths' in cfg:
+            if alias in cfg['paths']:
+                del cfg['paths'][alias]
+        try:
+            f = util.atomictempfile(fn, 'w', createmode=None)
+            f.write(str(cfg))
+            f.rename()
+            self.refresh()
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+
+
 class SaveDialog(QDialog):
     def __init__(self, root, alias, url, parent):
         super(SaveDialog, self).__init__(parent)
@@ -493,9 +514,23 @@ class PathsTree(QTreeView):
         self.setSelectionMode(QTreeView.SingleSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
+        self.parent = parent
 
     def keyPressEvent(self, event):
-        return super(PathsTree, self).keyPressEvent(event)
+        if event.matches(QKeySequence.Delete):
+            self.deleteSelected()
+        else:
+            return super(PathsTree, self).keyPressEvent(event)
+
+    def deleteSelected(self):
+        for index in self.selectedRows():
+            alias = index.data(Qt.DisplayRole).toString()
+            r = qtlib.QuestionMsgBox(_('Confirm path delete'),
+                    _('Delete %s from your repo configuration file?') % alias,
+                    parent=self)
+            if r:
+                alias = hglib.fromunicode(alias)
+                self.parent.removeAlias(alias)
 
     def dragObject(self):
         urls = []
