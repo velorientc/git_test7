@@ -131,6 +131,8 @@ class HgRepoView(QTableView):
                      self.qimport))
             a.append(('qfinish', _('Finish patch'), None, None, None,
                      self.qfinish))
+            a.append(('strip', _('Strip Revision...'), None, None, None,
+                     self.strip))
         return a
 
     def createActions(self):
@@ -187,6 +189,9 @@ class HgRepoView(QTableView):
     def qfinish(self):
         self.emit(SIGNAL('qfinishRevision'), self.current_rev)
 
+    def strip(self):
+        self.emit(SIGNAL('stripRevision'), self.current_rev)
+
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
@@ -202,6 +207,7 @@ class HgRepoView(QTableView):
         if 'mq' in exs:
             menu.addAction(self._actions['qimport'])
             menu.addAction(self._actions['qfinish'])
+            menu.addAction(self._actions['strip'])
         menu.exec_(event.globalPos())
 
     def init_variables(self):
