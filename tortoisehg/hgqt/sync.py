@@ -44,6 +44,15 @@ class SyncWidget(QWidget):
         layout.setSpacing(4)
         self.setLayout(layout)
 
+        if parent:
+            self.workbench = parent
+            log = parent.log
+        else:
+            self.setWindowTitle(_('TortoiseHg Sync'))
+            self.resize(850, 550)
+            self.workbench = None
+            log = None
+
         self.root = root
         self.finishfunc = None
         self.curuser = None
@@ -106,15 +115,6 @@ class SyncWidget(QWidget):
         pathsbox.addWidget(lbl)
         pathsbox.addWidget(self.tv)
         layout.addWidget(pathsframe, 1)
-
-        if parent:
-            self.workbench = parent
-            log = parent.log
-        else:
-            self.setWindowTitle(_('TortoiseHg Sync'))
-            self.resize(850, 550)
-            self.workbench = None
-            log = None
 
         self.savebutton.clicked.connect(self.saveclicked)
         self.authbutton.clicked.connect(self.authclicked)
