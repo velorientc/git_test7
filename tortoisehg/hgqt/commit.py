@@ -39,7 +39,7 @@ class CommitWidget(QWidget):
     errorMessage = pyqtSignal(QString)
     commitComplete = pyqtSignal()
 
-    def __init__(self, pats, opts, root=None, parent=None, hidebutton=False):
+    def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
 
         self.opts = opts # user, date
@@ -65,17 +65,13 @@ class CommitWidget(QWidget):
         usercombo = QComboBox()
         usercombo.setEditable(True)
 
-        self.commitButton = b = QPushButton(_('Commit'))
-        if hidebutton:
-            b.hide()
         w = QWidget()
         l = QHBoxLayout()
         l.setMargin(0)
         w.setLayout(l)
         l.addWidget(QLabel(_('Working Copy')))
         l.addStretch(1)
-        l.addWidget(b)
-        b.clicked.connect(self.commit)
+        self.buttonHBox = l
 
         def addrow(s, w):
             form.addRow("<b>%s</b>" % s, w)
@@ -144,7 +140,7 @@ class CommitWidget(QWidget):
 
     def msgChanged(self):
         text = self.msgte.toPlainText()
-        self.commitButton.setEnabled(not text.isEmpty())
+        self.buttonHBox.setEnabled(not text.isEmpty())
         sumlen, maxlen = self.getLengths()
         if not sumlen and not maxlen:
             self.msgte.setExtraSelections([])
@@ -569,7 +565,7 @@ class CommitDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        commit = CommitWidget(pats, opts, None, self, hidebutton=True)
+        commit = CommitWidget(pats, opts, None, self)
         layout.addWidget(commit, 1)
         layout.setContentsMargins(0, 6, 0, 0)
 
