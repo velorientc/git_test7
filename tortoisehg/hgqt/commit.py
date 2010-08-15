@@ -524,6 +524,13 @@ class CommitWidget(QWidget):
         else:
             return False
 
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            if event.modifiers() == Qt.ControlModifier:
+                self.commit()
+            return
+        return super(CommitWidget, self).keyPressEvent(event)
+
 class MessageHistoryCombo(QComboBox):
     def __init__(self, parent=None):
         QComboBox.__init__(self, parent)
@@ -603,11 +610,7 @@ class CommitDialog(QDialog):
         print msg
 
     def keyPressEvent(self, event):
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            if event.modifiers() == Qt.ControlModifier:
-                self.accept()  # Ctrl+Enter
-            return
-        elif event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key_Escape:
             self.reject()
             return
         elif event.modifiers() == Qt.AltModifier and event.key() == Qt.Key_Q:
@@ -615,7 +618,7 @@ class CommitDialog(QDialog):
         elif event.modifiers() == Qt.MetaModifier and event.key() == Qt.Key_R:
             # On a Mac, CTRL-R will also reflow (until someone fixes this)
             self.commit.msgReflow()
-        return super(QDialog, self).keyPressEvent(event)
+        return super(CommitDialog, self).keyPressEvent(event)
 
     def accept(self):
         if self.commit.commit():
