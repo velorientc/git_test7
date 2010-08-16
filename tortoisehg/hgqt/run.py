@@ -536,6 +536,11 @@ def rename(ui, *pats, **opts):
     from tortoisehg.hgqt.rename import run
     qtrun(run, ui, *pats, **opts)
 
+def strip(ui, *pats, **opts):
+    """strip dialog"""
+    from tortoisehg.hgqt.thgstrip import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -816,6 +821,11 @@ table = {
          [('c', 'clean', False, _('show files without changes')),
           ('i', 'ignored', False, _('show ignored files'))],
         _('thg status [OPTIONS] [FILE]')),
+    "^strip": (strip,
+        [('f', 'force', None, _('discard uncommitted changes (no backup)')),
+         ('n', 'nobackup', None, _('do not back up stripped revisions')),
+         ('r', 'rev', '', _('revision to strip')),],
+        _('thg strip [-f] [-n] [[-r] REV]')),
     "^tag":
         (tag,
          [('f', 'force', None, _('replace existing tag')),

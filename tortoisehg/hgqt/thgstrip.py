@@ -99,6 +99,7 @@ class StripDialog(QDialog):
         optbox.addWidget(self.nobackup_chk)
 
         self.discard_chk.setChecked(bool(opts.get('force')))
+        self.nobackup_chk.setChecked(bool(opts.get('nobackup')))
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -258,4 +259,4 @@ def run(ui, *pats, **opts):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return StripDialog(rev, opts=opts)
+    return StripDialog(rev=rev, opts=opts)
