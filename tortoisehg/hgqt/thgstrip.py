@@ -24,6 +24,7 @@ class StripDialog(QDialog):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
+        self.limit = 20
         self.ui = ui.ui()
         if repo:
             self.repo = repo
@@ -153,7 +154,7 @@ class StripDialog(QDialog):
             w = self.previewgrid.takeAt(0).widget()
             w.deleteLater()
 
-    def preview_updated(self, rev):
+    def preview_updated(self, rev, uselimit=True):
         items = ('%(rev)s', ' %(branch)s', ' %(tags)s', ' %(summary)s')
         style = csinfo.labelstyle(contents=items, width=350, selectable=True)
         factory = csinfo.factory(self.repo, style=style)
@@ -163,10 +164,18 @@ class StripDialog(QDialog):
         striprevs.sort()
         self.resultlbl.setText(_("%s will be stripped") % _("%s changesets")
                                % len(striprevs))
+        if uselimit and len(striprevs) > self.limit:
+            showrevs = striprevs[:self.limit - 1] + [striprevs[-1]]
+            addsnip = True
+        else:
+            showrevs = striprevs
+            addsnip = False
         self.clear_preview()
-        for striprev in striprevs:
+        for showrev in showrevs:
             info = factory()
-            info.update(self.repo[striprev])
+            info.update(self.repo[showrev])
+            if showrev == showrevs[-1] and addsnip:
+                self.previewgrid.addWidget(QLabel("..."))
             self.previewgrid.addWidget(info, Qt.AlignTop)
 
     def strip_info(self):
