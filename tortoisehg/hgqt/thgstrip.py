@@ -11,7 +11,7 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui, error
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, csinfo, qtlib
 
@@ -31,7 +31,7 @@ class StripDialog(QDialog):
         else:
             root = paths.find_root()
             if root:
-                self.repo = hg.repository(self.ui, path=root)
+                self.repo = thgrepo.repository(self.ui, path=root)
             else:
                 raise 'not repository'
 
