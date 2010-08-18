@@ -248,17 +248,6 @@ class RenameDialog(QDialog):
         self.src_txt.setText(curr_name)
         new_name = os.path.relpath(dest, start=self.root)
         self.dest_txt.setText(new_name)
-        if src == dest:
-            qtlib.ErrorMsgBox(_('Rename Error'),
-                    _('Please give a destination that differs from the source'))
-            return
-        if os.path.exists(dest) and os.path.isfile(dest):
-            res = qtlib.QuestionMsgBox(_('Rename'), '<p>%s</p><p>%s</p>' %
-                    (_('Destination file already exists.'),
-                    _('Are you sure you want to overwrite it ?')),
-                    defaultbutton=QMessageBox.No)
-            if not res:
-                return
         if not os.path.exists(src):
             qtlib.WarningMsgBox(_('Rename'), _('Source does not exists.'))
             return
@@ -272,6 +261,17 @@ class RenameDialog(QDialog):
             qtlib.ErrorMsgBox(_('Rename Error'),
                     _('The destination must be within the repository tree.'))
             return
+        if src == dest:
+            qtlib.ErrorMsgBox(_('Rename Error'),
+                    _('Please give a destination that differs from the source'))
+            return
+        if os.path.exists(dest) and os.path.isfile(dest):
+            res = qtlib.QuestionMsgBox(_('Rename'), '<p>%s</p><p>%s</p>' %
+                    (_('Destination file already exists.'),
+                    _('Are you sure you want to overwrite it ?')),
+                    defaultbutton=QMessageBox.No)
+            if not res:
+                return
 
         # prepare command line
         #cmdline, vcl = self.compose_command(self.get_src(), self.get_dest())
