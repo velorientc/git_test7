@@ -7,7 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 
-import os, sys, cStringIO, shutil
+import os, sys, cStringIO
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -300,7 +300,7 @@ class RenameDialog(QDialog):
                 if self.copy_chk.isChecked():
                     commands.copy(self.repo.ui, self.repo, curr_name, new_name, **opts)
                 else:
-                    shutil.move(curr_name, new_name)
+                    os.rename(curr_name, new_name)
                     commands.rename(self.repo.ui, self.repo, curr_name, new_name, **opts)
             except (OSError, IOError, util.Abort, error.RepoError), inst:
                 qtlib.ErrorMsgBox(_('Rename Error'),
