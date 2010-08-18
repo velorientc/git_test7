@@ -223,20 +223,15 @@ class RenameDialog(QDialog):
 
     def compose_command(self, src, dest):
         if self.copy_chk.isChecked():
-            cmdline = ['copy', '-R', self.repo.root]
-            vcmdline = ['hg copy -R ' + self.repo.root]
+            cmdline = ['copy']
         else:
-            cmdline = ['rename', '-R', self.repo.root]
-            vcmdline = ['hg rename -R ' + self.repo.root]
-        for k, v in self.opts.items():
-            cmdline.append(k)
-            cmdline.append(v)
-            vcmdline.append('--' + k.replace('_', '-') + "=" + str(v))
+            cmdline = ['rename']
+        cmdline += ['-R', self.repo.root]
+        if self.opts['after']:
+            cmdline.append('-A')
         cmdline.append(hglib.fromunicode(src))
         cmdline.append(hglib.fromunicode(dest))
-        vcmdline.append(hglib.fromunicode(src))
-        vcmdline.append(hglib.fromunicode(dest))
-        vcmdline = ' '.join(vcmdline)
+        vcmdline = ' '.join(['hg'] + cmdline)
         return (cmdline, vcmdline)
 
     def show_command(self, clinfo):
