@@ -142,15 +142,13 @@ class RenameDialog(QDialog):
 
         # dialog setting
         self.setWindowIcon(qtlib.geticon('rename'))
-        self.setRenameCopy()
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        if iscopy:
-            self.copy_chk.setChecked(True)
-
+        self.copy_chk.setChecked(iscopy)
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.dest_txt.setFocus()
         self._readsettings()
+        self.setRenameCopy()
 
     def setRenameCopy(self):
         if self.windowTitle() == '':
