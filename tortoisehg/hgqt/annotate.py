@@ -29,8 +29,8 @@ class AnnotateView(QFrame):
     loadComplete = pyqtSignal()
     revisionHint = pyqtSignal(QString)
 
-    class RevArea(QWidget):
-        'Display user@rev in front of each line'
+    class InfoArea(QWidget):
+        """Display information about each annotated line"""
         def __init__(self, edit, parent=None):
             QWidget.__init__(self, parent)
             self.edit = edit
@@ -43,7 +43,7 @@ class AnnotateView(QFrame):
             else:
                 self.update(0, rect.y(), self.width, rect.height())
         def paintEvent(self, event):
-            self.edit.paintRevArea(self, event)
+            self.edit.paintInfoArea(self, event)
             QWidget.paintEvent(self, event)
 
     class TextArea(QPlainTextEdit):
@@ -71,21 +71,28 @@ class AnnotateView(QFrame):
             self.setMouseTracking(True)
             self.lastrev = None
 
-        def paintRevArea(self, revarea, event):
-            painter = QPainter(revarea)
-            painter.fillRect(event.rect(), Qt.lightGray)
+        def paintInfoArea(self, area, event):
+            """Write information about the annotated lines.
 
+            Choose the text based on the current Area:
+             - line number
+             - revision number"""
+            painter = QPainter(area)
+            painter.fillRect(event.rect(), Qt.lightGray)
             block = self.firstVisibleBlock()
             line = block.blockNumber()
-
             offs = self.contentOffset()
             top = self.blockBoundingGeometry(block).translated(offs).top()
             while block.isValid() and line < len(self.revs):
                 if not block.isVisible() or top >= event.rect().bottom():
                     break
                 painter.setPen(Qt.black)
-                rect = QRect(0, top, revarea.width, self.charheight)
-                painter.drawText(rect, Qt.AlignRight, str(self.revs[line]))
+                rect = QRect(0, top, area.width, self.charheight)
+                if area == self.parent().lnumarea:
+                    text = str(line + 1)
+                else:
+                    text = str(self.revs[line])
+                painter.drawText(rect, Qt.AlignRight, text)
                 block = block.next()
                 top += self.blockBoundingGeometry(block).height()
                 line += 1
@@ -165,7 +172,9 @@ class AnnotateView(QFrame):
 
         self.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
         self.edit = self.TextArea(self)
-        self.revarea = self.RevArea(self.edit)
+        self.lnumarea = self.InfoArea(self.edit)
+        self.revarea = self.InfoArea(self.edit)
+        self.edit.updateRequest.connect(self.lnumarea.updateContents)
         self.edit.updateRequest.connect(self.revarea.updateContents)
         self.edit.revisionHint.connect(lambda h: self.revisionHint.emit(h))
         self.connect(self.edit, SIGNAL('revSelected'),
@@ -184,6 +193,7 @@ class AnnotateView(QFrame):
         hbox = QHBoxLayout(self)
         hbox.setSpacing(10)
         hbox.setMargin(0)
+        hbox.addWidget(self.lnumarea)
         hbox.addWidget(self.revarea)
         hbox.addWidget(self.edit)
 
@@ -261,6 +271,8 @@ class AnnotateView(QFrame):
         self.edit.links = links
         self.edit.setPlainText(hglib.tounicode(''.join(lines)))
         self.edit.revs = revs
+        self.lnumarea.width = len(str(len(revs))) * self.edit.charwidth + 3
+        self.lnumarea.setFixedWidth(self.lnumarea.width)
         width = max([len(str(r)) for r in revs]) * self.edit.charwidth + 3
         self.revarea.width = width
         self.revarea.setFixedWidth(width)
