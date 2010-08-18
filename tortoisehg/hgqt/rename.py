@@ -28,8 +28,6 @@ class RenameDialog(QDialog):
         src = ''
         dest = ''
         src, dest = self.init_data(ui, pats, iscopy)
-        if not src:
-            self.reject()
         self.init_view(src, dest, iscopy)
 
     def init_data(self, ui, pats, iscopy):
