@@ -24,14 +24,15 @@ class RenameDialog(QDialog):
 
     def __init__(self, ui, pats, parent=None, **opts):
         super(RenameDialog, self).__init__(parent=None)
+        iscopy = (opts.get('alias') == 'copy')
         src = ''
         dest = ''
-        src, dest = self.init_data(ui, pats)
+        src, dest = self.init_data(ui, pats, iscopy)
         if not src:
             self.reject()
-        self.init_view(src, dest, opts.get('alias') == 'copy')
+        self.init_view(src, dest, iscopy)
 
-    def init_data(self, ui, pats):
+    def init_data(self, ui, pats, iscopy):
         """calculate initial values for widgets"""
         fname = ''
         target = ''
@@ -57,7 +58,7 @@ class RenameDialog(QDialog):
             target = hglib.toutf(fname)
         self.opts = {}
         self.opts['force'] = False # Checkbox? Nah.
-        self.opts['after'] = True
+        self.opts['after'] = (not iscopy)
         self.opts['dry_run'] = False
         return (fname, target)
 
