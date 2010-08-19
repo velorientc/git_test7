@@ -10,7 +10,7 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui, extensions
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status
 
@@ -34,7 +34,7 @@ class MergeDialog(QWizard):
         else:
             root = paths.find_root()
             if root:
-                self.repo = hg.repository(self.ui, path=root)
+                self.repo = thgrepo.repository(self.ui, path=root)
             else:
                 raise 'not repository'
 
@@ -376,7 +376,7 @@ class MergePage(BasePage):
     def command_finished(self, wrapper):
         if wrapper.data == 0:
             repo = self.wizard().repo
-            hglib.invalidaterepo(repo)
+            repo.thginvalidate()
             self.wizard().repoInvalidated.emit()
             self.done = True
             self.wizard().next()
@@ -397,7 +397,7 @@ class MergePage(BasePage):
             patch = 'patch1'
             def finished(wrapper):
                 if wrapper.data == 0:
-                    hglib.invalidaterepo(self.wizard().repo)
+                    self.wizard().repo.thginvalidate()
                     self.wizard().repoInvalidated.emit()
                     def callback():
                         text = _('Outstanding changes are saved to <b>'
@@ -420,7 +420,7 @@ class MergePage(BasePage):
                     return
             def finished(wrapper):
                 if wrapper.data == 0:
-                    hglib.invalidaterepo(self.wizard().repo)
+                    self.wizard().repo.thginvalidate()
                     self.wizard().repoInvalidated.emit()
                     self.check_status()
             cmdline = ['update', '--clean', '--rev', self.wizard().local]
@@ -615,7 +615,7 @@ class CommitPage(BasePage):
 
     def command_finished(self, wrapper):
         if wrapper.data == 0:
-            hglib.invalidaterepo(self.wizard().repo)
+            self.wizard().repo.thginvalidate()
             self.wizard().repoInvalidated.emit()
             self.done = True
             self.wizard().next()
