@@ -396,13 +396,13 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
 
 def run(ui, *revs, **opts):
     # TODO: same options as patchbomb
-    # TODO: repo should be specified as an argument?
     if opts.get('rev'):
         if revs:
             raise util.Abort(_('use only one form to specify the revision'))
         revs = opts.get('rev')
 
-    repo = hg.repository(ui, paths.find_root())
+    # TODO: repo should be a required argument?
+    repo = opts.get('repo') or hg.repository(ui, paths.find_root())
 
     try:
         return EmailDialog(repo.ui, repo, revs)

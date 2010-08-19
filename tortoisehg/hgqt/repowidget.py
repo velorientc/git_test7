@@ -17,7 +17,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
-from tortoisehg.hgqt import hgemail, archive, thgstrip
+from tortoisehg.hgqt import archive, thgstrip, run
 
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
@@ -260,8 +260,7 @@ class RepoWidget(QWidget):
         dlg.show()
 
     def emailRevision(self, rev):
-        dlg = hgemail.EmailDialog(self.repo.ui, self.repo, [str(rev)], self)
-        dlg.show()
+        run.email(self.repo.ui, rev=[str(rev)], repo=self.repo)
 
     def archiveRevision(self, rev):
         dlg = archive.ArchiveDialog(self.repo.ui, self.repo, rev, self)
