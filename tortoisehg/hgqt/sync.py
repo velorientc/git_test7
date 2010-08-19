@@ -287,7 +287,12 @@ class SyncWidget(QWidget):
         self.run(['--repository', self.root, 'incoming'])
 
     def pullclicked(self):
-        self.finishfunc = None
+        if self.workbench:
+            def refresh(data):
+                self.workbench.reloadRepository(self.root)
+            self.finishfunc = refresh
+        else:
+            self.finishfunc = None
         self.run(['--repository', self.root, 'pull'])
 
     def outclicked(self):
