@@ -19,8 +19,8 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
 from tortoisehg.hgqt import hgemail, archive, thgstrip
 
-from repoview import HgRepoView
-from revdetailswidget import RevDetailsWidget
+from tortoisehg.hgqt.repoview import HgRepoView
+from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -203,7 +203,7 @@ class RepoWidget(QWidget):
         self._updatedlg = dlg
         def cmdfinished(status):
             if status == 0:
-                self.reload()  # TODO: implement something less drastic than a full reload
+                self.refresh()
             self.setScanForRepoChanges(saved)
         dlg.cmdfinished.connect(cmdfinished)
         dlg.show()
@@ -215,18 +215,24 @@ class RepoWidget(QWidget):
             self.setScanForRepoChanges(saved)
         dlg.finished.connect(finished)
         def invalidated():
-            self.reload() # TODO: implement something less drastic than a full reload
+            self.reload()
         dlg.repoInvalidated.connect(invalidated)
         dlg.show()
 
     def tagToRevision(self, rev):
+        origlen = len(self.repo)
         saved = self.setScanForRepoChanges(False)
         dlg = tag.TagDialog(self.repo, rev=str(rev), parent=self)
         def finished(ret):
             self.setScanForRepoChanges(saved)
         dlg.finished.connect(finished)
         def invalidated():
-            self.reload() # TODO: implement something less drastic than a full reload
+            self.repo.thginvalidate()
+            if len(self.repo) != origlen:
+                self.reload()
+            else:
+                self.refresh()
+            origlen = len(self.repo)
         dlg.repoInvalidated.connect(invalidated)
         dlg.show()
 
@@ -354,7 +360,7 @@ class RepoWidget(QWidget):
         self.close()
 
     def reload(self, rev=None):
-        'Initiate a refresh of the repo model'
+        'Initiate a refresh of the repo model, rebuild graph'
         if rev == None:
             self._reload_rev = self.repoview.current_rev
         else:
@@ -366,6 +372,17 @@ class RepoWidget(QWidget):
         if cw:
             cw.stwidget.refreshWctx()
         self.revDetailsWidget.reload(rev)
+
+    def refresh(self):
+        'Refresh the repo model view, clear cached data'
+        self.repo.thginvalidate()
+        self.repomodel.invalidate()
+        if self._reload_rev is not None:
+            try:
+                self.repoview.goto(self._reload_rev)
+                self.revDetailsWidget.on_filled()
+            except IndexError:
+                pass
 
     def getCommitWidget(self):
         return self.workbench.getCommitWidget(self.repo.root)
