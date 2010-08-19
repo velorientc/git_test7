@@ -318,7 +318,8 @@ class Workbench(QMainWindow):
     def outgoing_for_root(self, root, outgoing):
         repo = thgrepo.repository(self.ui, path=root)
         repo._outgoing = outgoing
-        # TODO: invalidate graphs for this repo, draw out arrows
+        self.refreshRepository(root)
+        # TODO: draw out arrows
 
     def dragEnterEvent(self, event):
         d = event.mimeData()
@@ -714,6 +715,13 @@ class Workbench(QMainWindow):
         if w:
             w.reload()
             self.setupBranchCombo()
+
+    def refreshRepository(self, root):
+        tw = self.repoTabsWidget
+        for idx in range(tw.count()):
+            rw = tw.widget(idx)
+            if rw.repo.root == root:
+                rw.refresh()
 
     def reloadRepository(self, root):
         tw = self.repoTabsWidget
