@@ -10,7 +10,7 @@
 
 import os
 
-from mercurial import hg, patch, util, error
+from mercurial import hg, patch, util, error, bundlerepo
 from mercurial.util import propertycache
 
 from util import hglib
