@@ -94,6 +94,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.rowcount = 0
         self.repo = repo
         self.reloadConfig()
+        self.updateColumns()
         self.setRepo(repo, branch=branch)
 
         # To be deleted
@@ -120,6 +121,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.filterbranch = branch
         if oldroot != repo.root:
             self.reloadConfig()
+            self.updateColumns()
         self.datacache = {}
         grapher = revision_grapher(self.repo, start_rev=None, follow=False,
                                    branch=branch, allparents=allparents)
@@ -136,7 +138,6 @@ class HgRepoListModel(QAbstractTableModel):
         self.max_file_size = hglib.getmaxdiffsize(_ui)
         self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
         self.maxauthor = 'author name'
-        self.updateColumns()
 
     def updateColumns(self):
         s = QSettings()
@@ -147,6 +148,11 @@ class HgRepoListModel(QAbstractTableModel):
             self._columns = tuple(validcols)
             self.datacache = {}
             self.emit(SIGNAL("layoutChanged()"))
+
+    def invalidate(self):
+        self.reloadConfig()
+        self.datacache = {}
+        self.emit(SIGNAL("layoutChanged()"))
 
     def branch(self):
         return self.filterbranch
