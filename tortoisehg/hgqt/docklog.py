@@ -56,7 +56,7 @@ class LogDockWidget(QDockWidget):
         # total is the highest expected pos
         # All topics should be marked closed by setting pos to None
         topic, item, pos, total, unit = wrapper.data
-        if pos is None:
+        if pos is None or (not pos and not total):
             if topic in self.topics:
                 pm = self.topics[topic]
                 pm.clear()
@@ -77,7 +77,7 @@ class LogDockWidget(QDockWidget):
         else:
             pm = self.topics[topic]
         if total:
-            fmt = '%d / %d ' % (pos, total)
+            fmt = '%s / %s ' % (str(pos), str(total))
             if unit:
                 fmt += unit
             pm.status.setText(fmt)
@@ -85,7 +85,7 @@ class LogDockWidget(QDockWidget):
         else:
             if item:
                 item = hglib.tounicode(item)[-30:]
-            pm.status.setText('%d %s' % (pos, item))
+            pm.status.setText('%s %s' % (str(pos), item))
             pm.unknown()
 
     def logMessage(self, msg, style=''):
