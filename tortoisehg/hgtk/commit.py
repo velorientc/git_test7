@@ -1186,9 +1186,8 @@ class GCommit(GStatus):
                 self.nextbranch = None
                 self.chunks.clear_filechunks()  # force re-read of chunks
                 buf = self.text.get_buffer()
-                if buf.get_modified():
-                    self.update_recent_messages(self.opts['message'])
-                    buf.set_modified(False)
+                self.update_recent_messages(self.opts['message'])
+                buf.set_modified(False)
                 if self.qnew:
                     self.qnew_name.set_text('')
                     hglib.invalidaterepo(self.repo)
