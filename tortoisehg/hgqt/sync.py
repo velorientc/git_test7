@@ -13,9 +13,9 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import config, hg, ui, url, util
+from mercurial import config, hg, ui, url, util, error
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, hgemail
 
@@ -314,7 +314,7 @@ class SyncWidget(QWidget):
     def emailclicked(self):
         try:
             _ui = ui.ui()
-            repo = hg.repository(_ui, path=self.root)
+            repo = thgrepo.repository(_ui, path=self.root)
         except error.RepoError:
             return
         dialog = hgemail.EmailDialog(_ui, repo, None, self)
