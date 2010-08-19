@@ -13,7 +13,7 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui, error
 
-from tortoisehg.util import hglib, paths, i18n
+from tortoisehg.util import hglib, paths, i18n, thgrepo
 from tortoisehg.hgqt.qtlib import getpixmap
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
@@ -34,7 +34,7 @@ class TagDialog(QDialog):
         else:
             root = paths.find_root()
             if root:
-                self.repo = hg.repository(self.ui, path=root)
+                self.repo = thgrepo.repository(self.ui, path=root)
             else:
                 raise 'not repository'
 
@@ -162,7 +162,7 @@ class TagDialog(QDialog):
 
     def update_tagcombo(self, clear=True):
         """ update display on dialog with recent repo data """
-        self.repo.invalidate()
+        self.repo.thginvalidate()
         tag_name = self.tag_combo.currentText()
         self.tag_combo.clear()
 
