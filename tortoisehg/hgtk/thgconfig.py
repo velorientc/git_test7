@@ -16,7 +16,7 @@ from mercurial import hg, ui, util, url, filemerge, error, extensions
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, paths
 
-from tortoisehg.hgtk import dialog, gdialog, gtklib, hgcmd
+from tortoisehg.hgtk import dialog, gdialog, gtklib, hgcmd, bugtraq
 
 try:
     from iniparse.config import Undefined
@@ -305,7 +305,28 @@ INFO = (
     )),
 
 ({'name': 'extensions', 'label': _('Extensions'), 'icon': gtk.STOCK_EXECUTE,
-  'extra': True}, ()),)
+  'extra': True}, ()),
+
+({'name': 'issue', 'label': _('Issue Tracking'), 'icon': gtk.STOCK_EDIT,
+  'extra': True}, (
+    (_('Issue Regex'), 'tortoisehg.issue.regex', [],
+        _('Defines the regex to match when picking up issue numbers.')),
+    (_('Issue Link'), 'tortoisehg.issue.link', [],
+        _('Defines the command to run when an issue number is recognized. '
+          'You may include groups in issue.regex, and corresponding {n} '
+          'tokens in issue.link (where n is a non-negative integer). '
+          '{0} refers to the entire string matched by issue.regex, '
+          'while {1} refers to the first group and so on. If no {n} tokens'
+          'are found in issue.link, the entire matched string is appended '
+          'instead.')),
+    (_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory',
+        ['False', 'True'],
+        _('When commiting an issue, force the user to specify a reference '
+            'to an issue. '
+          'In enabled, the regex configured in \'Issue Regex\' must find a '
+          'match in the commit message')),
+    )),
+)
 
 _font_presets = {
     'win-ja': (_('Japanese on Windows'), {
@@ -1265,6 +1286,84 @@ class ConfigDialog(gtk.Dialog):
     def set_help(self, widget, event, tooltip):
         text = ' '.join(tooltip.splitlines())
         self.descbuffer.set_text(text)
+
+    def fill_issue_frame(self, parent, table):
+        parent.pack_start(table, False, False)
+
+        issuetrackmodel = gtk.ListStore(str, # internal name
+                                    str) # GUI label
+        issuetrackmodel.append((None, _(' - Select Issue Tracker -')))
+        for (guid, label) in bugtraq.get_issue_plugins_with_names():
+            issuetrackmodel.append((guid, label))
+        issuetrackcombo = gtk.ComboBox(issuetrackmodel)
+        cell = gtk.CellRendererText()
+        issuetrackcombo.pack_start(cell)
+        issuetrackcombo.add_attribute(cell, 'text', 1)
+        self.issuetrackcombo = issuetrackcombo
+
+        table.add_row('Issue plugin:', issuetrackcombo, padding=False)
+
+        tooltip = _('Select issue tracker plugin to use. '
+            'Links to plugins can be found at '
+            'http://tortoisesvn.net/issuetrackerplugins')
+        self.tooltips.set_tip(issuetrackcombo, tooltip)
+
+        issuetrackcombo.connect('popup', self.set_help, '', tooltip)
+
+        configurepluginbutton = gtk.Button(_('Configure Plugin'))
+        table.add_row('', configurepluginbutton, padding=False)
+        self.configurepluginbutton = configurepluginbutton
+
+        def combo_changed(combo):
+            model = combo.get_model()
+            newvalue = ""
+            selection = model[self.issuetrackcombo.get_active()]
+            if not selection[0] == None:
+                newvalue = selection[0] + ' ' + selection[1]
+            self.record_new_value("tortoisehg.issue.bugtraqplugin",
+                    newvalue)
+            self.dirty_event()
+            self.configurepluginbutton.set_sensitive(newvalue != "")
+
+        def configure_bugtraq_plugin(button):
+            value = self.get_ini_config("tortoisehg.issue.bugtraqplugin")
+            if value == None or value == "":
+                return
+
+            guid = value.split(' ', 1)[0]
+            value = self.get_ini_config("tortoisehg.issue.bugtraqparameters")
+            if value == None:
+                value = ""
+
+            bugtr = bugtraq.BugTraq(guid)
+            newvalue = bugtr.show_options_dialog(value)
+
+            if value != newvalue:
+                self.record_new_value("tortoisehg.issue.bugtraqparameters", newvalue)
+                self.dirty_event()
+
+        issuetrackcombo.connect('changed', combo_changed)
+        configurepluginbutton.connect('clicked', configure_bugtraq_plugin)
+
+    def refresh_issue_frame(self):
+        value = self.get_ini_config("tortoisehg.issue.bugtraqplugin")
+        configuredguid = ""
+        if not value == None:
+            configuredguid = re.sub("[-{}]", "", value.split(' ', 1)[0])
+
+        model = self.issuetrackcombo.get_model()
+        index = 0
+        found = False
+        for (guid, label) in model:
+            if not guid == None:
+                if re.sub("[-{}]", "", guid) == configuredguid:
+                    found = True
+                    break
+            index = index + 1
+        if not found:
+            index = 0
+        self.issuetrackcombo.set_active(index)
+        self.configurepluginbutton.set_sensitive(configuredguid != "")
 
     def fill_frame(self, frame, info, build=True, width=32):
         widgets = []

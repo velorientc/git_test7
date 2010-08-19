@@ -8,6 +8,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import sys
 import errno
 import gtk
@@ -27,6 +28,7 @@ from tortoisehg.hgtk.status import GStatus, FM_STATUS, FM_CHECKED
 from tortoisehg.hgtk.status import FM_PATH, FM_PATH_UTF8
 from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 from tortoisehg.hgtk import thgmq, textview
+from tortoisehg.hgtk import bugtraq
 
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, repo):
@@ -150,6 +152,13 @@ class GCommit(GStatus):
             self.mqloaded = bool(extensions.find('mq'))
         except KeyError:
             self.mqloaded = False
+
+        bugtraqplugin = self.repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
+        if bugtraqplugin == None or bugtraqplugin == "":
+            self.bugtracker = None
+        else:
+            bugtraqquid = bugtraqplugin.split(' ', 1)[0]
+            self.bugtracker = bugtraq.BugTraq(bugtraqquid)
 
     def get_help_url(self):
         return 'commit.html'
@@ -395,6 +404,12 @@ class GCommit(GStatus):
             if branches[0] == branches[1]:
                 self.branchbutton.set_sensitive(False)
 
+        if not self.bugtracker == None:
+            self.bugtraqbutton = gtk.Button(use_underline=False)
+            self.bugtraqbutton.set_label('BugTraq')
+            self.bugtraqbutton.connect('clicked', self.bugtraq_clicked)
+            mbox.pack_start(self.bugtraqbutton, False, False, 2)
+
         if hasattr(self.repo, 'mq'):
             label = gtk.Label('QNew: ')
             mbox.pack_start(label, False, False, 2)
@@ -604,6 +619,14 @@ class GCommit(GStatus):
         elif dialog.closebranch:
             self.closebranch = True
         self.refresh_branchop()
+
+    def bugtraq_clicked(self, button):
+        buf = self.text.get_buffer()
+        begin, end = buf.get_bounds()
+        message = buf.get_text(begin, end)
+        bugtraqparameters = self.repo.ui.config('tortoisehg', 'issue.bugtraqparameters', "")
+        newmessage = self.bugtracker.get_commit_message(bugtraqparameters, message)
+        buf.set_text(newmessage)
 
     def repo_invalidated(self, mqwidget):
         self.reload_status()
@@ -874,6 +897,15 @@ class GCommit(GStatus):
             return self.relevant_checked_files(commitable)
 
         def callback(ret):
+            if ret == 0:
+                if not self.bugtracker == None:
+                    buf = self.text.get_buffer()
+                    commitmessage = buf.get_text(buf.get_start_iter(), buf.get_end_iter())
+                    errormessage = self.bugtracker.on_commit_finished(commitmessage)
+                    if errormessage != None and len(errormessage) > 0:
+                        gdialog.Prompt(_('Bug Traq'),
+                               errormessage, self).run()
+
             if ret == 0 and self.repo.ui.configbool('tortoisehg', 'closeci'):
                 self.destroy()
             else:
@@ -1050,6 +1082,24 @@ class GCommit(GStatus):
                    _('Please enter commit message'), self).run()
             self.text.grab_focus()
             return False
+
+        linkmandatory = self.repo.ui.config('tortoisehg',
+                'issue.linkmandatory', "False")
+        if linkmandatory == "True":
+            issueregex = self.repo.ui.config('tortoisehg',
+                    'issue.regex', "")
+            if issueregex:
+                commitmessage = buf.get_text(buf.get_start_iter(), 
+                        buf.get_end_iter())
+
+                m = re.search(issueregex, commitmessage)
+                if not m:
+                    gdialog.Prompt(_('Nothing Commited'),
+                           _('No issue link found in the commit message.' 
+                             'The commit message should contain an issue link. Configure this '
+                             'in the \'Issue\' section in the settings'), self).run()
+                    self.text.grab_focus()
+                    return False
 
         try:
             sumlen, maxlen = self.get_lengths(noexcept=False)
