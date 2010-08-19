@@ -16,7 +16,7 @@ from mercurial import hg, ui, util, commands, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, thgrepo
 
 
 class RenameDialog(QDialog):
@@ -37,7 +37,7 @@ class RenameDialog(QDialog):
         cwd = os.getcwd()
         try:
             self.root = paths.find_root()
-            self.repo = hg.repository(ui, self.root)
+            self.repo = thgrepo.repository(ui, path=self.root)
         except (error.RepoError):
             qtlib.ErrorMsgBox(_('Rename Error'),
                     _('Could not find or initialize the repository'
