@@ -351,6 +351,7 @@ class _QtRunner(object):
     """Run Qt app and hold its windows"""
     def __init__(self):
         self._mainapp = None
+        self._dialogs = []
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         portable_fork(ui, opts)
@@ -393,7 +394,17 @@ class _QtRunner(object):
         if not dlg:
             return
 
+        self._dialogs.append(dlg)  # avoid garbage collection
+        if hasattr(dlg, 'finished'):
+            dlg.finished.connect(lambda: self._forgetdialog(dlg))
         dlg.show()
+
+    def _forgetdialog(self, dlg):
+        """forget the dialog to be garbage collectable"""
+        try:
+            self._dialogs.remove(dlg)
+        except ValueError:
+            pass
 
 qtrun = _QtRunner()
 
