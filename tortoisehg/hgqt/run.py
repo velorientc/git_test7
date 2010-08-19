@@ -28,6 +28,8 @@ from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, shlib
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt.bugreport import run as bugrun
+
 try:
     from tortoisehg.util.config import nofork as config_nofork
 except ImportError:
@@ -56,7 +58,6 @@ def dispatch(args):
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
     except:
-        from tortoisehg.hgqt.bugreport import run
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
         error = traceback.format_exc()
@@ -64,7 +65,7 @@ def dispatch(args):
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = error
         opts['nofork'] = True
-        qtrun(run, u, **opts)
+        qtrun(bugrun, u, **opts)
 
 origwdir = os.getcwd()
 def portable_fork(ui, opts):
@@ -347,11 +348,33 @@ def _runcommand(ui, options, cmd, cmdfunc):
     else:
         return checkargs()
 
-class _QtRunner(object):
+class _QtRunner(QObject):
     """Run Qt app and hold its windows"""
     def __init__(self):
+        QObject.__init__(self)
         self._mainapp = None
         self._dialogs = []
+        self.errors = []
+        self.stubui = _ui.ui()
+        self.ehandlertimer = False
+        sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
+
+    def ehook(self, etype, evalue, tracebackobj):
+        'Will be called by any thread, on any unhandled exception'
+        elist = traceback.format_exception(etype, evalue, tracebackobj)
+        if 'THGDEBUG' in os.environ:
+            sys.stderr.write(''.join(elist))
+        if not self.errors:
+            QTimer.singleShot(10, self.excepthandler)
+        self.errors.extend(elist)
+
+    def excepthandler(self):
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = ''.join(self.errors)
+        opts['nofork'] = True
+        self.errors = []
+        self(bugrun, self.stubui, **opts)
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         portable_fork(ui, opts)
@@ -371,21 +394,9 @@ class _QtRunner(object):
         qtlib.setup_font_substitutions()
         self._mainapp.setStyleSheet(qtlib.appstylesheet)
         self._mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
-        try:
-            dlg = dlgfunc(ui, *args, **opts)
-            if dlg:
-                dlg.show()
-                self._mainapp.exec_()
-        except Exception, e:
-            from tortoisehg.hgqt.bugreport import run
-            error = _('Fatal error opening dialog\n')
-            error += traceback.format_exc()
-            opts = {}
-            opts['cmd'] = ' '.join(sys.argv[1:])
-            opts['error'] = error
-            opts['nofork'] = True
-            bugreport = run(ui, **opts)
-            bugreport.show()
+        dlg = dlgfunc(ui, *args, **opts)
+        if dlg:
+            dlg.show()
             self._mainapp.exec_()
         self._mainapp = None
 
