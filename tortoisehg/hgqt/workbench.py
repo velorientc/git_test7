@@ -418,7 +418,10 @@ class Workbench(QMainWindow):
             opts = {}
             cw = CommitWidget(pats, opts, root=root)
             cw.errorMessage.connect(self.showMessage)
-            cw.commitComplete.connect(lambda: self.reloadRepository(root))
+            def commitcomplete():
+                self.reloadRepository(root)
+                cw.stwidget.refreshWctx()
+            cw.commitComplete.connect(commitcomplete)
             b = QPushButton(_('Commit'))
             cw.buttonHBox.addWidget(b)
             b.clicked.connect(cw.commit)
