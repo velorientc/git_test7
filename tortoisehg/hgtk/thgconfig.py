@@ -19,6 +19,12 @@ from tortoisehg.util import hglib, settings, paths
 from tortoisehg.hgtk import dialog, gdialog, gtklib, hgcmd, bugtraq
 
 try:
+    from tortoisehg.hgtk import bugtraq
+    bugtraq.get_issue_plugins_with_names()
+except ImportError:
+    bugtraq = None
+
+try:
     from iniparse.config import Undefined
 except ImportError:
     class Undefined(object):
@@ -721,6 +727,8 @@ class ConfigDialog(gtk.Dialog):
 
         # add page items to treeview
         for meta, info in INFO:
+            if meta['name'] == 'issue' and bugtraq is None:
+                continue
             pixbuf = gtklib.get_icon_pixbuf(meta['icon'],
                             gtk.ICON_SIZE_LARGE_TOOLBAR)
             self.confmodel.append((pixbuf, meta['label'], meta['name']))
