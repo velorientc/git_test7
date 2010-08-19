@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 from mercurial import hg, ui, match, util, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import shlib, hglib, paths
+from tortoisehg.util import shlib, hglib, paths, thgrepo
 
 from tortoisehg.hgqt import qtlib
 
@@ -29,7 +29,7 @@ class HgignoreDialog(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         try:
-            repo = hg.repository(ui.ui(), path=paths.find_root(root))
+            repo = thgrepo.repository(ui.ui(), path=paths.find_root(root))
         except error.RepoError:
             QDialog.reject(self)
             return
@@ -222,7 +222,7 @@ class HgignoreDialog(QDialog):
     def refresh(self):
         uni = hglib.tounicode
         try:
-            hglib.invalidaterepo(self.repo)
+            self.repo.thginvalidate()
             wctx = self.repo[None]
             wctx.status(unknown=True)
         except (util.Abort, error.RepoError), e:
