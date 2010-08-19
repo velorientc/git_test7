@@ -356,9 +356,7 @@ class _QtRunner(object):
         portable_fork(ui, opts)
 
         if self._mainapp:
-            dlg = dlgfunc(ui, *args, **opts)
-            if dlg:
-                dlg.show()
+            self._opendialog(dlgfunc, ui, *args, **opts)
             return
 
         QSettings.setDefaultFormat(QSettings.IniFormat)
@@ -389,6 +387,13 @@ class _QtRunner(object):
             bugreport.show()
             self._mainapp.exec_()
         self._mainapp = None
+
+    def _opendialog(self, dlgfunc, ui, *args, **opts):
+        dlg = dlgfunc(ui, *args, **opts)
+        if not dlg:
+            return
+
+        dlg.show()
 
 qtrun = _QtRunner()
 
