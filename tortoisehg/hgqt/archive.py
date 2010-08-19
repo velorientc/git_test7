@@ -17,7 +17,7 @@ from PyQt4.QtGui import *
 from mercurial import hg, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, thgrepo
 from tortoisehg.hgqt import cmdui, qtlib
 
 WD_PARENT = _('= Working Directory Parent =')
@@ -372,5 +372,5 @@ class ArchiveDialog(QDialog):
 
 def run(ui, *revs, **opts):
     rev = opts.get('rev')
-    repo = hg.repository(ui, paths.find_root())
+    repo = thgrepo.repository(ui, paths.find_root())
     return ArchiveDialog(repo.ui, repo, rev)
