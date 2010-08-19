@@ -595,6 +595,7 @@ class CommitDialog(QDialog):
         self.setWindowTitle('%s - commit' % name)
         self.commit = commit
         commit.loadComplete.connect(self.updateUndo)
+        commit.commitComplete.connect(self.postcommit)
 
     def updateUndo(self):
         BB = QDialogButtonBox
@@ -620,13 +621,15 @@ class CommitDialog(QDialog):
             self.commit.msgReflow()
         return super(CommitDialog, self).keyPressEvent(event)
 
-    def accept(self):
-        if self.commit.commit():
-            repo = self.commit.stwidget.repo
-            if repo.ui.configbool('tortoisehg', 'closeci'):
-                self.reject()
-                return
+    def postcommit(self):
+        repo = self.commit.stwidget.repo
+        if repo.ui.configbool('tortoisehg', 'closeci'):
+            self.reject()
+            return
         self.commit.stwidget.refreshWctx()
+
+    def accept(self):
+        self.commit.commit()
 
     def reject(self):
         if self.commit.canExit():
