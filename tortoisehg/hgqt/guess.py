@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, ui, mdiff, similar, patch
 
-from tortoisehg.util import hglib, shlib, paths
+from tortoisehg.util import hglib, shlib, paths, thgrepo
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, htmlui, cmdui
@@ -29,7 +29,7 @@ class DetectRenameDialog(QDialog):
     def __init__(self, parent=None, root=None, *pats):
         QDialog.__init__(self, parent)
 
-        repo = hg.repository(ui.ui(), path=paths.find_root(root))
+        repo = thgrepo.repository(ui.ui(), path=paths.find_root(root))
         self.repo = repo
         self.pats = pats
         self.thread = None
@@ -147,7 +147,7 @@ class DetectRenameDialog(QDialog):
         QTimer.singleShot(0, self.refresh)
 
     def refresh(self):
-        hglib.invalidaterepo(self.repo)
+        repo.thginvalidate()
         wctx = self.repo[None]
         wctx.status(unknown=True)
         self.unrevlist.clear()
@@ -263,7 +263,7 @@ class DetectRenameDialog(QDialog):
 
     def showDiff(self, index):
         'User selected a row in the candidate tree'
-        hglib.invalidaterepo(self.repo)
+        self.repo.thginvalidate()
         ctx = self.repo['.']
         hu = htmlui.htmlui()
         row = self.matchtv.model().getRow(index)
@@ -424,7 +424,7 @@ class RenameSearchThread(QThread):
         self.emit(SIGNAL('progress'), wr)
 
     def search(self, repo):
-        hglib.invalidaterepo(repo)
+        repo.thginvalidate()
         wctx = repo[None]
         pctx = repo['.']
         if self.copies:
