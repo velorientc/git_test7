@@ -10,7 +10,7 @@ import os
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
 from mercurial import context, merge, commands, subrepo
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import paths, hglib, thgrepo
 from tortoisehg.util.util import xml_escape
 from tortoisehg.hgqt.i18n import _
 
@@ -53,7 +53,7 @@ class StatusWidget(QWidget):
 
         root = paths.find_root(root)
         assert(root)
-        self.repo = hg.repository(ui.ui(), path=root)
+        self.repo = thgrepo.repository(ui.ui(), path=root)
         self.wctx = self.repo[None]
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
                          unknown=True, clean=False, ignored=False, subrepo=True)
@@ -378,7 +378,7 @@ class StatusWidget(QWidget):
             if showanyway:
                 try:
                     sroot = self.repo.wjoin(path)
-                    srepo = hg.repository(hu, path=sroot)
+                    srepo = thgrepo.repository(hu, path=sroot)
                     srev = self.wctx.substate.get(path, subrepo.nullstate)[1]
                     sactual = srepo['.'].hex()
                     commands.status(hu, srepo)
@@ -458,7 +458,7 @@ class StatusThread(QThread):
         self.opts = opts
 
     def run(self):
-        hglib.invalidaterepo(self.repo)
+        self.repo.thginvalidate()
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
         stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
         patchecked = {}
