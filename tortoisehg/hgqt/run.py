@@ -347,45 +347,50 @@ def _runcommand(ui, options, cmd, cmdfunc):
     else:
         return checkargs()
 
-mainapp = None
-def qtrun(dlgfunc, ui, *args, **opts):
-    portable_fork(ui, opts)
+class _QtRunner(object):
+    """Run Qt app and hold its windows"""
+    def __init__(self):
+        self._mainapp = None
 
-    global mainapp
-    if mainapp:
-        dlg = dlgfunc(ui, *args, **opts)
-        if dlg:
-            dlg.show()
-        return
+    def __call__(self, dlgfunc, ui, *args, **opts):
+        portable_fork(ui, opts)
 
-    QSettings.setDefaultFormat(QSettings.IniFormat)
+        if self._mainapp:
+            dlg = dlgfunc(ui, *args, **opts)
+            if dlg:
+                dlg.show()
+            return
 
-    mainapp = QApplication(sys.argv)
-    # default org is used by QSettings
-    mainapp.setApplicationName('TortoiseHgQt')
-    mainapp.setOrganizationName('TortoiseHg')
-    mainapp.setOrganizationDomain('tortoisehg.org')
-    mainapp.setApplicationVersion(thgversion.version())
-    qtlib.setup_font_substitutions()
-    mainapp.setStyleSheet(qtlib.appstylesheet)
-    mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
-    try:
-        dlg = dlgfunc(ui, *args, **opts)
-        if dlg:
-            dlg.show()
-            mainapp.exec_()
-    except Exception, e:
-        from tortoisehg.hgqt.bugreport import run
-        error = _('Fatal error opening dialog\n')
-        error += traceback.format_exc()
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = error
-        opts['nofork'] = True
-        bugreport = run(ui, **opts)
-        bugreport.show()
-        mainapp.exec_()
-    mainapp = None
+        QSettings.setDefaultFormat(QSettings.IniFormat)
+
+        self._mainapp = QApplication(sys.argv)
+        # default org is used by QSettings
+        self._mainapp.setApplicationName('TortoiseHgQt')
+        self._mainapp.setOrganizationName('TortoiseHg')
+        self._mainapp.setOrganizationDomain('tortoisehg.org')
+        self._mainapp.setApplicationVersion(thgversion.version())
+        qtlib.setup_font_substitutions()
+        self._mainapp.setStyleSheet(qtlib.appstylesheet)
+        self._mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
+        try:
+            dlg = dlgfunc(ui, *args, **opts)
+            if dlg:
+                dlg.show()
+                self._mainapp.exec_()
+        except Exception, e:
+            from tortoisehg.hgqt.bugreport import run
+            error = _('Fatal error opening dialog\n')
+            error += traceback.format_exc()
+            opts = {}
+            opts['cmd'] = ' '.join(sys.argv[1:])
+            opts['error'] = error
+            opts['nofork'] = True
+            bugreport = run(ui, **opts)
+            bugreport.show()
+            self._mainapp.exec_()
+        self._mainapp = None
+
+qtrun = _QtRunner()
 
 def add(ui, *pats, **opts):
     """add files"""
