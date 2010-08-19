@@ -95,8 +95,9 @@ class UpdateDialog(QDialog):
         optbox.setSpacing(6)
         expander = qtlib.ExpanderLabel(_('Options:'), False)
         expander.expanded.connect(self.show_options)
-        grid.addWidget(expander, 3, 0, Qt.AlignLeft | Qt.AlignTop)
-        grid.addLayout(optbox, 3, 1)
+        row = grid.rowCount()
+        grid.addWidget(expander, row, 0, Qt.AlignLeft | Qt.AlignTop)
+        grid.addLayout(optbox, row, 1)
 
         self.discard_chk = QCheckBox(_('Discard local changes, no backup (-C/--clean)'))
         self.merge_chk = QCheckBox(_('Always merge (when possible)'))
