@@ -228,16 +228,10 @@ class CustomPrompt(QMessageBox):
                  esc=None, files=None):
         QMessageBox.__init__(self, parent)
 
-        self.setWindowTitle(hglib.toutf(title))
-        self.setText(hglib.toutf(message))
+        self.setWindowTitle(hglib.tounicode(title))
+        self.setText(hglib.tounicode(message))
         if files:
-            msg = ''
-            for i, file in enumerate(files):
-                msg += '   %s\n' % file
-                if i == 9:
-                    msg += '   ...\n'
-                    break
-            self.setDetailedText(hglib.toutf(msg))
+            self.setDetailedText(hglib.tounicode('\n'.join(files)))
         self.hotkeys = {}
         for i, s in enumerate(choices):
             btn = self.addButton(s, QMessageBox.AcceptRole)
