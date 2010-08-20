@@ -55,17 +55,21 @@ class ManifestDialog(QMainWindow):
 
         self._initwidget()
         self.setupModels()
-
-        self.setupTextview()
         self._readsettings()
 
     def _initwidget(self):
         self.splitter = QSplitter()
         self.setCentralWidget(self.splitter)
         self.treeView = QTreeView()
-        self.mainFrame = QFrame()
+        self.textView = QsciScintilla()
+        self.textView.setMarginLineNumbers(1, True)
+        self.textView.setMarginWidth(1, '000')
+        self.textView.setReadOnly(True)
+        #self.textView.setFont(self._font)  TODO: use ThgFont
+        self.textView.setUtf8(True)
+        self.textView.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
         self.splitter.addWidget(self.treeView)
-        self.splitter.addWidget(self.mainFrame)
+        self.splitter.addWidget(self.textView)
         self.splitter.setStretchFactor(0, 1)
         self.splitter.setStretchFactor(1, 3)
 
@@ -75,21 +79,6 @@ class ManifestDialog(QMainWindow):
         connect(self.treeView.selectionModel(),
                 SIGNAL('currentChanged(const QModelIndex &, const QModelIndex &)'),
                 self.fileSelected)
-
-    def setupTextview(self):
-        lay = QHBoxLayout(self.mainFrame)
-        lay.setSpacing(0)
-        lay.setContentsMargins(0,0,0,0)
-        sci = QsciScintilla(self.mainFrame)
-        lay.addWidget(sci)
-        sci.setMarginLineNumbers(1, True)
-        sci.setMarginWidth(1, '000')
-        sci.setReadOnly(True)
-        #sci.setFont(self._font)  TODO: use ThgFont
-        sci.setUtf8(True)
-
-        sci.SendScintilla(sci.SCI_SETSELEOLFILLED, True)
-        self.textView = sci
 
     def fileSelected(self, index, *args):
         if not index.isValid():
