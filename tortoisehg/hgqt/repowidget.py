@@ -253,13 +253,9 @@ class RepoWidget(QWidget):
         """Strip the selected revision and all descendants"""
         saved = self.setScanForRepoChanges(False)
         dlg = thgstrip.StripDialog(self.repo, rev=str(rev), parent=self)
-        def finished(ret):
-            self.setScanForRepoChanges(saved)
-        dlg.finished.connect(finished)
-        def invalidated():
+        if dlg.exec_():
             self.reload() # TODO: implement something less drastic than a full reload
-        dlg.repoInvalidated.connect(invalidated)
-        dlg.show()
+        self.setScanForRepoChanges(saved)
 
     def emailRevision(self, rev):
         run.email(self.repo.ui, rev=[str(rev)], repo=self.repo)
