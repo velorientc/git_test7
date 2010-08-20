@@ -242,7 +242,7 @@ class CustomPrompt(QMessageBox):
                     self.setDefaultButton(btn)
                 if esc == i:
                     self.setEscapeButton(btn)
-            except ValueError:
+            except (ValueError, IndexError):
                 pass
 
     def run(self):
