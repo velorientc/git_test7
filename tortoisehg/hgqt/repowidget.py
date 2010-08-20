@@ -245,13 +245,9 @@ class RepoWidget(QWidget):
     def backoutToRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
         dlg = backout.BackoutDialog(self.repo, str(rev), self)
-        def finished(ret):
-            self.setScanForRepoChanges(saved)
-        dlg.finished.connect(finished)
-        def invalidated():
+        if dlg.exec_():
             self.reload() # TODO: implement something less drastic than a full reload
-        dlg.repoInvalidated.connect(invalidated)
-        dlg.show()
+        self.setScanForRepoChanges(saved)
 
     def stripRevision(self, rev):
         """Strip the selected revision and all descendants"""
