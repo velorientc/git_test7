@@ -42,10 +42,10 @@ class ManifestDialog(QMainWindow, Ui_ManifestDialog, HgDialogMixin):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
-    def __init__(self, repo, noderev):
+    def __init__(self, ui, repo, noderev):
         self.repo = repo
         QMainWindow.__init__(self)
-        HgDialogMixin.__init__(self, self.repo.ui)
+        HgDialogMixin.__init__(self, ui)
         self.setWindowTitle('Hg manifest viewer - %s:%s' % (repo.root, noderev))
 
         # hg repo
@@ -141,4 +141,4 @@ class ManifestDialog(QMainWindow, Ui_ManifestDialog, HgDialogMixin):
 
 def run(ui, *pats, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-    return ManifestDialog(repo, opts.get('rev'))
+    return ManifestDialog(ui, repo, opts.get('rev'))
