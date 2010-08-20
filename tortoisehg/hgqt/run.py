@@ -71,6 +71,7 @@ origwdir = os.getcwd()
 def portable_fork(ui, opts):
     if 'THG_GUI_SPAWN' in os.environ or (
         not opts.get('fork') and opts.get('nofork')):
+        os.environ['THG_GUI_SPAWN'] = '1'
         return
     elif ui.configbool('tortoisehg', 'hgtkfork', None) is not None:
         if not ui.configbool('tortoisehg', 'hgtkfork'):
@@ -82,7 +83,6 @@ def portable_fork(ui, opts):
         args = sys.argv
     else:
         args = [sys.executable] + sys.argv
-    os.environ['THG_GUI_SPAWN'] = '1'
     cmdline = subprocess.list2cmdline(args)
     os.chdir(origwdir)
     subprocess.Popen(cmdline,
