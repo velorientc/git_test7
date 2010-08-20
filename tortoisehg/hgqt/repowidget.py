@@ -407,6 +407,7 @@ class RepoWidget(QWidget):
         else:
             self._reload_rev = rev
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
+        self.repo.thginvalidate()
         self._repodate = self._getrepomtime()
         self.setupModels()
         cw = self.getCommitWidget()
@@ -418,12 +419,7 @@ class RepoWidget(QWidget):
         'Refresh the repo model view, clear cached data'
         self.repo.thginvalidate()
         self.repomodel.invalidate()
-        if self._reload_rev is not None:
-            try:
-                self.repoview.goto(self._reload_rev)
-                self.revDetailsWidget.on_filled()
-            except IndexError:
-                pass
+        self.revDetailsWidget.on_filled()
 
     def getCommitWidget(self):
         return self.workbench.getCommitWidget(self.repo.root)
