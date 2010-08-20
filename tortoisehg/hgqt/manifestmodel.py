@@ -14,8 +14,6 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-import os, os.path as osp
-
 from mercurial.node import short as short_hex
 
 from PyQt4.QtCore import *
@@ -145,7 +143,7 @@ class ManifestModel(QAbstractItemModel):
         self.rootItem = _TreeItem(rootData)
 
         for path in sorted(self.changectx.manifest()):
-            path = path.split(osp.sep)
+            path = path.split('/')
             node = self.rootItem
 
             for p in path:
@@ -161,4 +159,4 @@ class ManifestModel(QAbstractItemModel):
         while index.isValid():
             idxs.insert(0, index)
             index = self.parent(index)
-        return osp.sep.join([index.internalPointer().data(0) for index in idxs])
+        return '/'.join([index.internalPointer().data(0) for index in idxs])
