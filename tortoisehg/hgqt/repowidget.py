@@ -16,7 +16,7 @@ from tortoisehg.util import thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox
 from tortoisehg.hgqt.repomodel import HgRepoListModel
-from tortoisehg.hgqt import cmdui, update, tag, manifestdialog, backout, merge
+from tortoisehg.hgqt import cmdui, update, tag, backout, merge
 from tortoisehg.hgqt import archive, thgstrip, run
 
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -187,10 +187,8 @@ class RepoWidget(QWidget):
         pass
 
     def revision_activated(self, rev=None):
-        if rev is None:
-            rev = self.repoview.current_rev
-        self._manifestdlg = manifestdialog.ManifestDialog(self.repo, rev)
-        self._manifestdlg.show()
+        run.manifest(self.repo.ui, repo=self.repo,
+                     rev=rev or self.repoview.current_rev)
 
     def setScanForRepoChanges(self, enable):
         saved = self._scanForRepoChanges
