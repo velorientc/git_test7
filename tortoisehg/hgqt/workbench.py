@@ -581,6 +581,11 @@ class Workbench(QMainWindow):
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
         self.actionShowLog.toggled.connect(self.showLog)
 
+        self.actionVerify.triggered.connect(self.verify)
+        self.actionRecover.triggered.connect(self.recover)
+        self.actionRollback.triggered.connect(self.rollback)
+        self.actionPurge.triggered.connect(self.purge)
+
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
 
@@ -666,6 +671,18 @@ class Workbench(QMainWindow):
             if w:
                 w.repoview.model().updateColumns()
                 w.repoview.resizeColumns()
+
+    def verify(self):
+        pass
+
+    def recover(self):
+        pass
+
+    def rollback(self):
+        pass
+
+    def purge(self):
+        pass
 
     def back(self):
         w = self.repoTabsWidget.currentWidget()
