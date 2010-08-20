@@ -329,7 +329,7 @@ INFO = (
         ['False', 'True'],
         _('When commiting an issue, force the user to specify a reference '
             'to an issue. '
-          'In enabled, the regex configured in \'Issue Regex\' must find a '
+          'If enabled, the regex configured in \'Issue Regex\' must find a '
           'match in the commit message')),
     )),
 )
