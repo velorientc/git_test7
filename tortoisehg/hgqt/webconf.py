@@ -15,7 +15,6 @@ from tortoisehg.hgqt.webconf_ui import Ui_WebconfForm
 
 _FILE_FILTER = _('Config files (*.conf *.config *.ini);;Any files (*)')
 
-# TODO: edit repository map
 class WebconfForm(QWidget):
     """Widget to show/edit webconf"""
     def __init__(self, parent=None, webconf=None):
@@ -24,6 +23,7 @@ class WebconfForm(QWidget):
         self._qui.setupUi(self)
         self._initicons()
         self._qui.path_edit.currentIndexChanged.connect(self._updateview)
+        self._qui.path_edit.currentIndexChanged.connect(self._updateform)
 
         self.setwebconf(webconf or wconfig.config())
         self._updateform()
@@ -66,12 +66,19 @@ class WebconfForm(QWidget):
     def _updateview(self):
         m = WebconfModel(config=self.webconf, parent=self)
         self._qui.repos_view.setModel(m)
+        self._qui.repos_view.selectionModel().currentChanged.connect(
+            self._updateform)
 
     def _updateform(self):
         """Update availability of each widget"""
+        self._qui.repos_view.setEnabled(hasattr(self.webconf, 'write'))
         self._qui.add_button.setEnabled(hasattr(self.webconf, 'write'))
-        self._qui.edit_button.setEnabled(False)  # TODO
-        self._qui.remove_button.setEnabled(False)  # TODO
+        self._qui.edit_button.setEnabled(
+            hasattr(self.webconf, 'write')
+            and self._qui.repos_view.currentIndex().isValid())
+        self._qui.remove_button.setEnabled(
+            hasattr(self.webconf, 'write')
+            and self._qui.repos_view.currentIndex().isValid())
 
     @pyqtSlot()
     def on_open_button_clicked(self):
@@ -109,9 +116,37 @@ class WebconfForm(QWidget):
         if path:
             self._webconfmodel.addpathmap(path, localpath)
 
+    @pyqtSlot()
+    def on_edit_button_clicked(self):
+        self.on_repos_view_doubleClicked(self._qui.repos_view.currentIndex())
+
+    @pyqtSlot(QModelIndex)
+    def on_repos_view_doubleClicked(self, index):
+        assert index.isValid()
+        origpath, origlocalpath = self._webconfmodel.getpathmapat(index.row())
+        path, localpath = _PathDialog.geteditpathmap(
+            self, path=origpath, localpath=origlocalpath,
+            invalidpaths=set(self._webconfmodel.paths) - set([origpath]))
+        if not path:
+            return
+        if path != origpath:
+            # we cannot change config key without reordering
+            self._webconfmodel.removepathmap(origpath)
+            self._webconfmodel.addpathmap(path, localpath)
+        else:
+            self._webconfmodel.setpathmap(path, localpath)
+
+    @pyqtSlot()
+    def on_remove_button_clicked(self):
+        index = self._qui.repos_view.currentIndex()
+        assert index.isValid()
+        path, _localpath = self._webconfmodel.getpathmapat(index.row())
+        self._webconfmodel.removepathmap(path)
+
 class _PathDialog(QDialog):
     """Dialog to add/edit path mapping"""
-    def __init__(self, title, acceptlabel, invalidpaths=None, parent=None):
+    def __init__(self, title, acceptlabel, path=None, localpath=None,
+                 invalidpaths=None, parent=None):
         super(_PathDialog, self).__init__(parent)
         self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
                             & ~Qt.WindowContextHelpButtonHint)
@@ -120,6 +155,8 @@ class _PathDialog(QDialog):
         self.setLayout(QFormLayout())
         self._initfields()
         self._initbuttons(acceptlabel)
+        self._path_edit.setText(path or '')
+        self._localpath_edit.setText(localpath or '')
         self._updateform()
 
     def _initfields(self):
@@ -192,6 +229,15 @@ class _PathDialog(QDialog):
         else:
             return None, None
 
+    @classmethod
+    def geteditpathmap(cls, parent, path=None, localpath=None, invalidpaths=None):
+        d = cls(title=_('Edit Path to Serve'), acceptlabel=_('Edit'),
+                path=path, localpath=localpath,
+                invalidpaths=invalidpaths, parent=parent)
+        if d.exec_():
+            return d.path, d.localpath
+        else:
+            return None, None
 
 class WebconfModel(QAbstractTableModel):
     """Wrapper for webconf object to be a Qt's model object"""
@@ -230,6 +276,11 @@ class WebconfModel(QAbstractTableModel):
         """return list of known paths"""
         return [hglib.tounicode(e) for e in self._config['paths']]
 
+    def getpathmapat(self, row):
+        """return pair of (path, localpath) at the specified index"""
+        assert 0 <= row and row < self.rowCount()
+        return tuple(hglib.tounicode(e) for e in self._config.items('paths')[row])
+
     def addpathmap(self, path, localpath):
         """add path mapping to serve"""
         assert path not in self.paths
@@ -239,3 +290,25 @@ class WebconfModel(QAbstractTableModel):
                              hglib.fromunicode(localpath))
         finally:
             self.endInsertRows()
+
+    def setpathmap(self, path, localpath):
+        """change path mapping at the specified index"""
+        self._config.set('paths', hglib.fromunicode(path),
+                         hglib.fromunicode(localpath))
+        row = self._indexofpath(path)
+        self.dataChanged.emit(self.index(row, 0),
+                              self.index(row, self.columnCount()))
+
+    def removepathmap(self, path):
+        """remove path from mapping"""
+        row = self._indexofpath(path)
+        self.beginRemoveRows(QModelIndex(), row, row)
+        try:
+            del self._config['paths'][hglib.fromunicode(path)]
+        finally:
+            self.endRemoveRows()
+
+    def _indexofpath(self, path):
+        path = hglib.fromunicode(path)
+        assert path in self._config['paths']
+        return list(self._config['paths']).index(path)
