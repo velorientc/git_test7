@@ -196,7 +196,7 @@ def revert(parent, ui, repo, files):
         res = qtlib.CustomPrompt(
                 _('Uncommited merge - please select a parent revision'),
                 _('Revert files to local or other parent?'), parent,
-                (_('&Local'), _('&Other'), ('&Cancel')), 0, 2, files).run()
+                (_('&Local'), _('&Other'), _('&Cancel')), 0, 2, files).run()
         if res == 0:
             revertopts['rev'] = repo[None].p1().rev()
         elif res == 1:
