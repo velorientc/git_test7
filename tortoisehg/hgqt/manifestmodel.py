@@ -19,6 +19,7 @@ import os, os.path as osp
 from mercurial.node import short as short_hex
 
 from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 class _TreeItem(object):
     def __init__(self, data, parent=None):
@@ -77,11 +78,14 @@ class ManifestModel(QAbstractItemModel):
         if not index.isValid():
             return QVariant()
 
-        if role != Qt.DisplayRole:
-            return QVariant()
-
         item = index.internalPointer()
-        return QVariant(item.data(index.column()))
+        if role == Qt.DecorationRole:
+            return QApplication.style().standardIcon(
+                item.childItems and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
+        if role == Qt.DisplayRole:
+            return item.data(index.column())
+
+        return QVariant()
 
     def flags(self, index):
         if not index.isValid():
