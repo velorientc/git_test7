@@ -255,6 +255,11 @@ class Workbench(QMainWindow):
         a.setCheckable(True)
         self.actionShowLog = a
 
+        self.actionVerify = QAction(_("Verify"), self)
+        self.actionRecover = QAction(_("Recover"), self)
+        self.actionRollback = QAction(_("Rollback/Undo"), self)
+        self.actionPurge = QAction(_("Purge"), self)
+
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
 
@@ -278,9 +283,17 @@ class Workbench(QMainWindow):
         m.addSeparator()
         m.addAction(self.actionRefresh)
 
+        self.menuRepository = m = QMenu(_("&Repository"), self.menubar)
+        m.addAction(self.actionVerify)
+        m.addAction(self.actionRecover)
+        m.addSeparator()
+        m.addAction(self.actionRollback)
+        m.addAction(self.actionPurge)
+
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
+        self.menubar.addAction(self.menuRepository.menuAction())
 
         self.toolBar_edit = tb = QToolBar(_("Edit Toolbar"), self)
         tb.setEnabled(True)
