@@ -18,10 +18,9 @@
 Qt4 dialogs to display hg revisions of a file
 """
 
-import sys, os
 import os.path as osp
 
-from mercurial import ui, util
+from mercurial import util
 from mercurial.revlog import LookupError
 
 from PyQt4 import QtGui, QtCore, Qsci
