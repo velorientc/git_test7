@@ -19,9 +19,10 @@ from tortoisehg.util.hglib import tounicode
 from tortoisehg.util import thgrepo
 from tortoisehg.util import paths
 
+#from tortoisehg.hgqt.decorators import timeit
+
 from tortoisehg.hgqt import repomodel
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.decorators import timeit
 from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
