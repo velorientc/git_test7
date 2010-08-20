@@ -125,10 +125,14 @@ class RepoWidget(QWidget):
         self.repoview.forward()
 
     def verify(self):
-        pass
+        cmdline = ['--repository', self.repo.root, 'verify']
+        dlg = cmdui.Dialog(cmdline, self)
+        dlg.exec_()
 
     def recover(self):
-        pass
+        cmdline = ['--repository', self.repo.root, 'recover']
+        dlg = cmdui.Dialog(cmdline, self)
+        dlg.exec_()
 
     def rollback(self):
         pass
