@@ -349,7 +349,12 @@ def _runcommand(ui, options, cmd, cmdfunc):
         return checkargs()
 
 class _QtRunner(QObject):
-    """Run Qt app and hold its windows"""
+    """Run Qt app and hold its windows
+
+    NOTE: This object will be instantiated before QApplication, it means
+    there's a limitation on Qt's event handling. See
+    http://doc.qt.nokia.com/4.6/threads-qobject.html#per-thread-event-loop
+    """
     def __init__(self):
         QObject.__init__(self)
         self._mainapp = None
