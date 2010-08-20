@@ -27,6 +27,9 @@ from PyQt4.QtGui import *
 
 connect = QObject.connect
 
+# TODO
+# Unify use of cmdui.Runner, do not allow new runners while current is busy
+
 
 class RepoWidget(QWidget):
 
