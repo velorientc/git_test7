@@ -145,7 +145,7 @@ class RepoWidget(QWidget):
                     args = self.repo.opener('undo.desc', 'r').read().splitlines()
                     if args[1] != 'commit':
                         return None
-                    return args[1], int(args[0])-1
+                    return args[1], int(args[0])
                 except (IOError, IndexError, ValueError):
                     pass
             return None
@@ -162,7 +162,7 @@ class RepoWidget(QWidget):
         else:
             if not QuestionMsgBox(_('Undo last transaction?'),
                     _('Rollback to revision %d (undo %s)?') %
-                    (data[1], data[0])):
+                    (data[1]-1, data[0])):
                 return
             try:
                 rev = self.repo['.'].rev()
@@ -171,7 +171,7 @@ class RepoWidget(QWidget):
                            _('Unable to determine working copy revision\n') +
                            hglib.tounicode(e))
                 return
-            if rev > data[1] and not QuestionMsgBox(
+            if rev >= data[1] and not QuestionMsgBox(
                     _('Remove current working revision?'),
                     _('Your current working revision (%d) will be removed '
                       'by this rollback, leaving uncommitted changes.\n '
