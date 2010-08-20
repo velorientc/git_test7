@@ -18,8 +18,7 @@ import os, os.path as osp
 
 from mercurial.node import short as short_hex
 
-from PyQt4 import QtCore
-from PyQt4.QtCore import QModelIndex
+from PyQt4.QtCore import *
 
 class _TreeItem(object):
     def __init__(self, data, parent=None):
@@ -62,13 +61,13 @@ class _TreeItem(object):
         for ch in self.childItems:
             yield ch
 
-class ManifestModel(QtCore.QAbstractItemModel):
+class ManifestModel(QAbstractItemModel):
     """
     Qt model to display a hg manifest, ie. the tree of files at a
     given revision. To be used with a QTreeView.
     """
     def __init__(self, repo, rev, parent=None):
-        QtCore.QAbstractItemModel.__init__(self, parent)
+        QAbstractItemModel.__init__(self, parent)
 
         self.repo = repo
         self.changectx = self.repo.changectx(rev)
@@ -76,27 +75,27 @@ class ManifestModel(QtCore.QAbstractItemModel):
 
     def data(self, index, role):
         if not index.isValid():
-            return QtCore.QVariant()
+            return QVariant()
 
-        if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
+        if role != Qt.DisplayRole:
+            return QVariant()
 
         item = index.internalPointer()
-        return QtCore.QVariant(item.data(index.column()))
+        return QVariant(item.data(index.column()))
 
     def flags(self, index):
         if not index.isValid():
-            return QtCore.Qt.ItemIsEnabled
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def headerData(self, section, orientation, role):
-        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            return QtCore.QVariant(self.rootItem.data(section))
-        return QtCore.QVariant()
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(self.rootItem.data(section))
+        return QVariant()
 
     def index(self, row, column, parent=QModelIndex()):
         if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
-            return QtCore.QModelIndex()
+            return QModelIndex()
 
         if not parent.isValid():
             parentItem = self.rootItem
@@ -106,17 +105,17 @@ class ManifestModel(QtCore.QAbstractItemModel):
         if childItem is not None:
             return self.createIndex(row, column, childItem)
         else:
-            return QtCore.QModelIndex()
+            return QModelIndex()
 
     def parent(self, index):
         if not index.isValid():
-            return QtCore.QModelIndex()
+            return QModelIndex()
 
         childItem = index.internalPointer()
         parentItem = childItem.parent()
 
         if parentItem == self.rootItem:
-            return QtCore.QModelIndex()
+            return QModelIndex()
 
         return self.createIndex(parentItem.row(), 0, parentItem)
 
