@@ -18,8 +18,6 @@
 Qt4 dialogs to display hg revisions of a file
 """
 
-import os.path as osp
-
 from mercurial import util
 from mercurial.revlog import LookupError
 
@@ -103,18 +101,6 @@ class ManifestDialog(QMainWindow):
         nlines = data.count('\n')
         self.textView.setMarginWidth(1, str(nlines)+'00')
         self.textView.setText(data)
-
-    def setCurrentFile(self, filename):
-        index = QModelIndex()
-        path = filename.split(osp.sep)
-        for p in path:
-            self.treeView.expand(index)
-            for row in range(self.treemodel.rowCount(index)):
-                newindex = self.treemodel.index(row, 0, index)
-                if newindex.internalPointer().data(0) == p:
-                    index = newindex
-                    break
-        self.treeView.setCurrentIndex(index)
 
     def closeEvent(self, event):
         self._writesettings()
