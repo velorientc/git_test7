@@ -673,16 +673,24 @@ class Workbench(QMainWindow):
                 w.repoview.resizeColumns()
 
     def verify(self):
-        pass
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.verify()
 
     def recover(self):
-        pass
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.recover()
 
     def rollback(self):
-        pass
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.rollback()
 
     def purge(self):
-        pass
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.purge()
 
     def back(self):
         w = self.repoTabsWidget.currentWidget()

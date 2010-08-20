@@ -124,6 +124,18 @@ class RepoWidget(QWidget):
     def forward(self):
         self.repoview.forward()
 
+    def verify(self):
+        pass
+
+    def recover(self):
+        pass
+
+    def rollback(self):
+        pass
+
+    def purge(self):
+        pass
+
     def setMode(self, mode):
         self.revDetailsWidget.setMode(mode)
         self.updateActions()
