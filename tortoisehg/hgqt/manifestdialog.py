@@ -44,7 +44,6 @@ class ManifestDialog(QMainWindow):
     max_file_size = 100000  # TODO: make it configurable
 
     def __init__(self, ui, repo, noderev):
-        self.repo = repo
         QMainWindow.__init__(self)
         self.setWindowTitle('Hg manifest viewer - %s:%s' % (repo.root, noderev))
         self.resize(400, 300)
@@ -105,7 +104,6 @@ class ManifestDialog(QMainWindow):
                 lexer = get_lexer(path, data, ui=self._ui)
                 if lexer:
                     self.textView.setLexer(lexer)
-                self._cur_lexer = lexer
         nlines = data.count('\n')
         self.textView.setMarginWidth(1, str(nlines)+'00')
         self.textView.setText(data)
