@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import stat
 
 # Heavily influenced by Mercurial's purge extension
 
