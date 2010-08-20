@@ -78,6 +78,7 @@ def portable_fork(ui, opts):
             return
     elif config_nofork:
         return
+    os.environ['THG_GUI_SPAWN'] = '1'
     # Spawn background process and exit
     if hasattr(sys, "frozen"):
         args = sys.argv
