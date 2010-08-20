@@ -637,7 +637,7 @@ def loadIniFile(rcpath, parent):
         else:
             cfg = config.config()
             cfg.read(fn)
-            return cfg
+            return fn, cfg
     except Exception, e:
         qtlib.WarningMsgBox(_('Unable to parse a config file'),
                             hglib.tounicode(e), parent=parent)
