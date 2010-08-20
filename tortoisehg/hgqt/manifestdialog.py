@@ -36,8 +36,6 @@ from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.ManifestDialog_ui import Ui_ManifestDialog
 
 connect = QObject.connect
-disconnect = QObject.disconnect
-nullvariant = QVariant()
 
 
 class ManifestDialog(QMainWindow, Ui_ManifestDialog, HgDialogMixin):
