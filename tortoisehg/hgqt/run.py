@@ -391,18 +391,26 @@ class _QtRunner(QObject):
         QSettings.setDefaultFormat(QSettings.IniFormat)
 
         self._mainapp = QApplication(sys.argv)
-        # default org is used by QSettings
-        self._mainapp.setApplicationName('TortoiseHgQt')
-        self._mainapp.setOrganizationName('TortoiseHg')
-        self._mainapp.setOrganizationDomain('tortoisehg.org')
-        self._mainapp.setApplicationVersion(thgversion.version())
-        qtlib.setup_font_substitutions()
-        self._mainapp.setStyleSheet(qtlib.appstylesheet)
-        self._mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
-        dlg = dlgfunc(ui, *args, **opts)
-        if dlg:
-            dlg.show()
-            self._mainapp.exec_()
+        try:
+            # default org is used by QSettings
+            self._mainapp.setApplicationName('TortoiseHgQt')
+            self._mainapp.setOrganizationName('TortoiseHg')
+            self._mainapp.setOrganizationDomain('tortoisehg.org')
+            self._mainapp.setApplicationVersion(thgversion.version())
+            qtlib.setup_font_substitutions()
+            self._mainapp.setStyleSheet(qtlib.appstylesheet)
+            self._mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
+            dlg = dlgfunc(ui, *args, **opts)
+            if dlg:
+                dlg.show()
+        except:
+            # Exception before starting eventloop needs to be postponed;
+            # otherwise it will be ignored silently.
+            def reraise():
+                raise
+            QTimer.singleShot(0, reraise)
+
+        self._mainapp.exec_()
         self._mainapp = None
 
     def _opendialog(self, dlgfunc, ui, *args, **opts):
