@@ -16,8 +16,7 @@ import os
 from mercurial.error import RepoError
 
 from tortoisehg.util.hglib import tounicode
-from tortoisehg.util import thgrepo
-from tortoisehg.util import paths
+from tortoisehg.util import paths, thgrepo
 
 #from tortoisehg.hgqt.decorators import timeit
 
@@ -255,6 +254,7 @@ class Workbench(QMainWindow):
         a.setCheckable(True)
         self.actionShowLog = a
 
+        self.actionServe = QAction(_("Web Server"), self)
         self.actionVerify = QAction(_("Verify"), self)
         self.actionRecover = QAction(_("Recover"), self)
         self.actionRollback = QAction(_("Rollback/Undo"), self)
@@ -284,6 +284,8 @@ class Workbench(QMainWindow):
         m.addAction(self.actionRefresh)
 
         self.menuRepository = m = QMenu(_("&Repository"), self.menubar)
+        m.addAction(self.actionServe)
+        m.addSeparator()
         m.addAction(self.actionVerify)
         m.addAction(self.actionRecover)
         m.addSeparator()
@@ -581,6 +583,7 @@ class Workbench(QMainWindow):
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
         self.actionShowLog.toggled.connect(self.showLog)
 
+        self.actionServe.triggered.connect(self.serve)
         self.actionVerify.triggered.connect(self.verify)
         self.actionRecover.triggered.connect(self.recover)
         self.actionRollback.triggered.connect(self.rollback)
@@ -671,6 +674,12 @@ class Workbench(QMainWindow):
             if w:
                 w.repoview.model().updateColumns()
                 w.repoview.resizeColumns()
+
+    def serve(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            from tortoisehg.hgqt import run
+            run.serve(self.ui, root=w.repo.root)
 
     def verify(self):
         w = self.repoTabsWidget.currentWidget()
