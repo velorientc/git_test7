@@ -19,6 +19,7 @@ import os, os.path as osp
 from mercurial.node import short as short_hex
 
 from PyQt4 import QtCore
+from PyQt4.QtCore import QModelIndex
 
 class _TreeItem(object):
     def __init__(self, data, parent=None):
@@ -93,7 +94,7 @@ class ManifestModel(QtCore.QAbstractItemModel):
             return QtCore.QVariant(self.rootItem.data(section))
         return QtCore.QVariant()
 
-    def index(self, row, column, parent):
+    def index(self, row, column, parent=QModelIndex()):
         if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
             return QtCore.QModelIndex()
 
