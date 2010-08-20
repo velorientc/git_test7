@@ -29,6 +29,7 @@ from tortoisehg.util import paths, thgrepo
 from tortoisehg.util.hglib import tounicode
 
 from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
 
@@ -40,7 +41,7 @@ class ManifestDialog(QMainWindow):
 
     def __init__(self, ui, repo, noderev):
         QMainWindow.__init__(self)
-        self.setWindowTitle('Hg manifest viewer - %s:%s' % (repo.root, noderev))
+        self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (repo.root, noderev))
         self.resize(400, 300)
 
         # hg repo
@@ -87,12 +88,12 @@ class ManifestDialog(QMainWindow):
             return
 
         if fc.size() > self.max_file_size:
-            data = "file too big"
+            data = _("file too big")
         else:
             # return the whole file
             data = fc.data()
             if util.binary(data):
-                data = "binary file"
+                data = _("binary file")
             else:
                 data = tounicode(data)
                 lexer = get_lexer(path, data, ui=self._ui)
