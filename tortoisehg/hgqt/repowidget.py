@@ -266,7 +266,7 @@ class RepoWidget(QWidget):
 
     def archiveRevision(self, rev):
         dlg = archive.ArchiveDialog(self.repo.ui, self.repo, rev, self)
-        dlg.show()
+        dlg.exec_()
 
     def copyHash(self, rev):
         clip = QApplication.clipboard()
