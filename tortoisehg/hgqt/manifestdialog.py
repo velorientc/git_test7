@@ -23,8 +23,9 @@ import os.path as osp
 from mercurial import util
 from mercurial.revlog import LookupError
 
-from PyQt4 import QtGui, QtCore, Qsci
-from PyQt4.QtCore import Qt, QSettings
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4.Qsci import QsciScintilla
 
 from tortoisehg.util import paths, thgrepo
 from tortoisehg.util.hglib import tounicode
@@ -34,19 +35,18 @@ from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.ManifestDialog_ui import Ui_ManifestDialog
 
-connect = QtCore.QObject.connect
-disconnect = QtCore.QObject.disconnect
-SIGNAL = QtCore.SIGNAL
-nullvariant = QtCore.QVariant()
+connect = QObject.connect
+disconnect = QObject.disconnect
+nullvariant = QVariant()
 
 
-class ManifestDialog(QtGui.QMainWindow, Ui_ManifestDialog, HgDialogMixin):
+class ManifestDialog(QMainWindow, Ui_ManifestDialog, HgDialogMixin):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
     def __init__(self, repo, noderev):
         self.repo = repo
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         HgDialogMixin.__init__(self, self.repo.ui)
         self.setWindowTitle('Hg manifest viewer - %s:%s' % (repo.root, noderev))
 
@@ -70,10 +70,10 @@ class ManifestDialog(QtGui.QMainWindow, Ui_ManifestDialog, HgDialogMixin):
         pass
 
     def setupTextview(self):
-        lay = QtGui.QHBoxLayout(self.mainFrame)
+        lay = QHBoxLayout(self.mainFrame)
         lay.setSpacing(0)
         lay.setContentsMargins(0,0,0,0)
-        sci = Qsci.QsciScintilla(self.mainFrame)
+        sci = QsciScintilla(self.mainFrame)
         lay.addWidget(sci)
         sci.setMarginLineNumbers(1, True)
         sci.setMarginWidth(1, '000')
@@ -115,7 +115,7 @@ class ManifestDialog(QtGui.QMainWindow, Ui_ManifestDialog, HgDialogMixin):
         self.textView.setText(data)
 
     def setCurrentFile(self, filename):
-        index = QtCore.QModelIndex()
+        index = QModelIndex()
         path = filename.split(osp.sep)
         for p in path:
             self.treeView.expand(index)
