@@ -5,18 +5,20 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import sys, os, httplib, socket
+import sys, os, httplib, socket, tempfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import extensions, hgweb, util
 from mercurial.hgweb import server  # workaround for demandimport
+from tortoisehg.util import paths, wconfig
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.serve_ui import Ui_ServeDialog
+from tortoisehg.hgqt.webconf import WebconfForm
 
 class ServeDialog(QDialog):
     """Dialog for serving repositories via web"""
-    def __init__(self, parent=None):
+    def __init__(self, webconf, parent=None):
         super(ServeDialog, self).__init__(parent)
         self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
                             & ~Qt.WindowContextHelpButtonHint)
@@ -26,9 +28,9 @@ class ServeDialog(QDialog):
         self._qui = Ui_ServeDialog()
         self._qui.setupUi(self)
 
+        self._initwebconf(webconf)
         self._initcmd()
         self._initactions()
-        # TODO: webconf tab (multi-repo support)
         self._updateform()
 
     def _initcmd(self):
@@ -39,6 +41,10 @@ class ServeDialog(QDialog):
         self._cmd.hide()
         self._cmd.commandStarted.connect(self._updateform)
         self._cmd.commandFinished.connect(self._updateform)
+
+    def _initwebconf(self, webconf):
+        self._webconf_form = WebconfForm(webconf=webconf, parent=self)
+        self._qui.details_tabs.addTab(self._webconf_form, _('Repositories'))
 
     def _initactions(self):
         self._qui.start_button.clicked.connect(self.start)
@@ -52,6 +58,7 @@ class ServeDialog(QDialog):
         self._qui.stop_button.setEnabled(self.isstarted())
         self._qui.settings_button.setEnabled(not self.isstarted())
         self._qui.port_edit.setEnabled(not self.isstarted())
+        self._webconf_form.setEnabled(not self.isstarted())
 
     def _updatestatus(self):
         def statustext():
@@ -71,7 +78,44 @@ class ServeDialog(QDialog):
             return
 
         _setupwrapper()
-        self._cmd.run(['serve', '--port', str(self.port)])
+        self._cmd.run(self._cmdargs())
+
+    def _cmdargs(self):
+        """Build command args to run server"""
+        a = ['serve', '--port', str(self.port)]
+        if self._singlerepo:
+            a += ['-R', self._singlerepo]
+        else:
+            a += ['--web-conf', self._tempwebconf()]
+        return a
+
+    def _tempwebconf(self):
+        """Save current webconf to temporary file; return its path"""
+        if not hasattr(self._webconf, 'write'):
+            return self._webconf.path
+
+        fd, fname = tempfile.mkstemp(prefix='webconf_', dir=qtlib.gettempdir())
+        f = os.fdopen(fd, 'w')
+        try:
+            self._webconf.write(f)
+            return fname
+        finally:
+            f.close()
+
+    @property
+    def _webconf(self):
+        """Selected webconf object"""
+        return self._webconf_form.webconf
+
+    @property
+    def _singlerepo(self):
+        """Return repository path if serving single repository"""
+        # NOTE: we cannot use web-conf to serve single repository at '/' path
+        if len(self._webconf['paths']) != 1:
+            return
+        path = self._webconf.get('paths', '/')
+        if path and '*' not in path:  # exactly a single repo (no wildcard)
+            return path
 
     @pyqtSlot()
     def stop(self):
@@ -191,7 +235,21 @@ def _setupwrapper():
         _setupwrapper_done = True
 
 def run(ui, *pats, **opts):
-    # TODO: handle --web-conf
-    dlg = ServeDialog()
-    dlg.start()
+    repopath = paths.find_root()
+    webconfpath = opts.get('web_conf') or opts.get('webdir_conf')
+    dlg = ServeDialog(webconf=_newwebconf(repopath, webconfpath))
+    if repopath or webconfpath:
+        dlg.start()
     return dlg
+
+def _newwebconf(repopath, webconfpath):
+    """create config obj for hgweb"""
+    if webconfpath:
+        # TODO: handle file not found
+        c = wconfig.readfile(webconfpath)
+        c.path = os.path.abspath(webconfpath)
+        return c
+    elif repopath:  # imitate webconf for single repo
+        c = wconfig.config()
+        c.set('paths', '/', repopath)
+        return c
