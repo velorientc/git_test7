@@ -21,12 +21,13 @@ Qt4 dialogs to display hg revisions of a file
 import sys, os
 import os.path as osp
 
-from mercurial import ui, hg, util
+from mercurial import ui, util
 from mercurial.revlog import LookupError
 
 from PyQt4 import QtGui, QtCore, Qsci
 from PyQt4.QtCore import Qt, QSettings
 
+from tortoisehg.util import paths, thgrepo
 from tortoisehg.util.hglib import tounicode
 
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
@@ -141,25 +142,6 @@ class ManifestDialog(QtGui.QMainWindow, Ui_ManifestDialog, HgDialogMixin):
         s.setValue('manifest/splitter', self.splitter.saveState())
 
 
-if __name__ == '__main__':
-    from mercurial import ui, hg
-    from optparse import OptionParser
-    opt = OptionParser()
-    opt.add_option('-R', '--repo',
-                   dest='repo',
-                   default='.',
-                   help='Hg repository')
-
-    options, args = opt.parse_args()
-    if len(args) != 1:
-        opt.error('Please specify a revision number')
-    rev = args[0]
-
-    u = ui.ui()
-    repo = hg.repository(u, options.repo)
-    app = QtGui.QApplication([])
-
-    view = ManifestDialog(repo, int(rev))
-    view.show()
-    sys.exit(app.exec_())
-
+def run(ui, *pats, **opts):
+    repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
+    return ManifestDialog(repo, opts.get('rev'))

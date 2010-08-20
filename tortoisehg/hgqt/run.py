@@ -469,6 +469,11 @@ def merge(ui, *pats, **opts):
     from tortoisehg.hgqt.merge import run
     qtrun(run, ui, *pats, **opts)
 
+def manifest(ui, *pats, **opts):
+    """display the current or given revision of the project manifest"""
+    from tortoisehg.hgqt.manifestdialog import run
+    qtrun(run, ui, *pats, **opts)
+
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
     from tortoisehg.hgqt.guess import run
@@ -844,6 +849,10 @@ table = {
         (log,
          [('l', 'limit', '', _('limit number of changes displayed'))],
          _('thg log [OPTIONS] [FILE]')),
+    "manifest":
+        (manifest,
+         [('r', 'rev', '', _('revision to display'))],
+         _('thg manifest [-r REV]')),
     "^merge":
         (merge,
          [('r', 'rev', '', _('revision to merge'))],
