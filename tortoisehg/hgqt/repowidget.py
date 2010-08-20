@@ -231,9 +231,6 @@ class RepoWidget(QWidget):
         origlen = len(self.repo)
         saved = self.setScanForRepoChanges(False)
         dlg = tag.TagDialog(self.repo, rev=str(rev), parent=self)
-        def finished(ret):
-            self.setScanForRepoChanges(saved)
-        dlg.finished.connect(finished)
         def invalidated():
             self.repo.thginvalidate()
             if len(self.repo) != origlen:
@@ -242,7 +239,8 @@ class RepoWidget(QWidget):
                 self.refresh()
             origlen = len(self.repo)
         dlg.repoInvalidated.connect(invalidated)
-        dlg.show()
+        dlg.exec_()
+        self.setScanForRepoChanges(saved)
 
     def backoutToRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
