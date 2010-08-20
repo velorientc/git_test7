@@ -52,6 +52,7 @@ class ManifestDialog(QMainWindow):
         self._initwidget()
         self.setupModels()
         self._readsettings()
+        self.treeView.setCurrentIndex(self.treemodel.index(0, 0))
 
     def _initwidget(self):
         self.splitter = QSplitter()
