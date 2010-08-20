@@ -11,10 +11,10 @@
 import binascii
 import os
 
-from tortoisehg.util import thgrepo
+from tortoisehg.util import thgrepo, shlib, hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox
+from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge
 from tortoisehg.hgqt import archive, thgstrip, run
@@ -135,7 +135,51 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def rollback(self):
-        pass
+        def read_undo():
+            if os.path.exists(self.repo.sjoin('undo')):
+                try:
+                    args = self.repo.opener('undo.desc', 'r').read().splitlines()
+                    if args[1] != 'commit':
+                        return None
+                    return args[1], int(args[0])-1
+                except (IOError, IndexError, ValueError):
+                    pass
+            return None
+        data = read_undo()
+        if data is None:
+            InfoMsgBox(_('No transaction available'),
+                       _('There is no rollback transaction available'))
+            return
+        elif data[0] == 'commit':
+            if not QuestionMsgBox(_('Undo last commit?'),
+                   _('Undo most recent commit (%d), preserving file changes?') %
+                   data[1]):
+                return
+        else:
+            if not QuestionMsgBox(_('Undo last transaction?'),
+                    _('Rollback to revision %d (undo %s)?') %
+                    (data[1], data[0])):
+                return
+            try:
+                rev = self.repo['.'].rev()
+            except Exception, e:
+                InfoMsgBox(_('Repository Error'),
+                           _('Unable to determine working copy revision\n') +
+                           hglib.tounicode(e))
+                return
+            if rev > data[1] and not QuestionMsgBox(
+                    _('Remove current working revision?'),
+                    _('Your current working revision (%d) will be removed '
+                      'by this rollback, leaving uncommitted changes.\n '
+                      'Continue?' % rev)):
+                    return
+        saved = self.repo.ui.quiet
+        self.repo.ui.quiet = True
+        self.repo.rollback()
+        self.repo.ui.quiet = saved
+        self.reload()
+        QTimer.singleShot(500, lambda: shlib.shell_notify([self.repo.root]))
+
 
     def purge(self):
         pass
