@@ -235,7 +235,7 @@ def _setupwrapper():
         _setupwrapper_done = True
 
 def run(ui, *pats, **opts):
-    repopath = paths.find_root()
+    repopath = opts.get('root') or paths.find_root()
     webconfpath = opts.get('web_conf') or opts.get('webdir_conf')
     dlg = ServeDialog(webconf=_newwebconf(repopath, webconfpath))
     if repopath or webconfpath:
