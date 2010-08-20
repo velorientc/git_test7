@@ -57,6 +57,11 @@ class WebconfForm(QWidget):
 
         return curconf(self._qui.path_edit)
 
+    @property
+    def _webconfmodel(self):
+        """current model object of webconf"""
+        return self._qui.repos_view.model()
+
     @pyqtSlot()
     def _updateview(self):
         m = WebconfModel(config=self.webconf, parent=self)
@@ -64,7 +69,7 @@ class WebconfForm(QWidget):
 
     def _updateform(self):
         """Update availability of each widget"""
-        self._qui.add_button.setEnabled(False)  # TODO
+        self._qui.add_button.setEnabled(hasattr(self.webconf, 'write'))
         self._qui.edit_button.setEnabled(False)  # TODO
         self._qui.remove_button.setEnabled(False)  # TODO
 
@@ -97,6 +102,97 @@ class WebconfForm(QWidget):
         wconfig.writefile(self.webconf, path)
         self.openwebconf(path)  # reopen in case file path changed
 
+    @pyqtSlot()
+    def on_add_button_clicked(self):
+        path, localpath = _PathDialog.getaddpathmap(
+            self, invalidpaths=self._webconfmodel.paths)
+        if path:
+            self._webconfmodel.addpathmap(path, localpath)
+
+class _PathDialog(QDialog):
+    """Dialog to add/edit path mapping"""
+    def __init__(self, title, acceptlabel, invalidpaths=None, parent=None):
+        super(_PathDialog, self).__init__(parent)
+        self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
+                            & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowTitle(title)
+        self._invalidpaths = set(invalidpaths or [])
+        self.setLayout(QFormLayout())
+        self._initfields()
+        self._initbuttons(acceptlabel)
+        self._updateform()
+
+    def _initfields(self):
+        """initialize input fields"""
+        def addfield(key, label, *extras):
+            edit = QLineEdit(self)
+            edit.textChanged.connect(self._updateform)
+            if extras:
+                field = QHBoxLayout()
+                field.addWidget(edit)
+                for e in extras:
+                    field.addWidget(e)
+            else:
+                field = edit
+            self.layout().addRow(label, field)
+            setattr(self, '_%s_edit' % key, edit)
+
+        addfield('path', _('Path:'))
+        self._localpath_browse_button = QToolButton(
+            icon=self.style().standardIcon(QStyle.SP_DialogOpenButton))
+        addfield('localpath', _('Local Path:'), self._localpath_browse_button)
+        self._localpath_browse_button.clicked.connect(self._browse_localpath)
+
+    def _initbuttons(self, acceptlabel):
+        """initialize dialog buttons"""
+        self._buttons = QDialogButtonBox(self)
+        self._accept_button = self._buttons.addButton(QDialogButtonBox.Ok)
+        self._reject_button = self._buttons.addButton(QDialogButtonBox.Cancel)
+        self._accept_button.setText(acceptlabel)
+        self._buttons.accepted.connect(self.accept)
+        self._buttons.rejected.connect(self.reject)
+        self.layout().addRow(self._buttons)
+
+    @property
+    def path(self):
+        """value of path field"""
+        return unicode(self._path_edit.text())
+
+    @property
+    def localpath(self):
+        """value of localpath field"""
+        return unicode(self._localpath_edit.text())
+
+    @pyqtSlot()
+    def _browse_localpath(self):
+        path = QFileDialog.getExistingDirectory(self, _('Select Repository'),
+                                                self.localpath)
+        if not path:
+            return
+
+        self._localpath_edit.setText(path)
+        if not self.path:
+            self._path_edit.setText(os.path.basename(unicode(path)))
+
+    @pyqtSlot()
+    def _updateform(self):
+        """update availability of form elements"""
+        self._accept_button.setEnabled(self._isacceptable())
+
+    def _isacceptable(self):
+        return bool(self.path and self.localpath
+                    and self.path not in self._invalidpaths)
+
+    @classmethod
+    def getaddpathmap(cls, parent, invalidpaths=None):
+        d = cls(title=_('Add Path to Serve'), acceptlabel=_('Add'),
+                invalidpaths=invalidpaths, parent=parent)
+        if d.exec_():
+            return d.path, d.localpath
+        else:
+            return None, None
+
+
 class WebconfModel(QAbstractTableModel):
     """Wrapper for webconf object to be a Qt's model object"""
     _COLUMNS = [(_('Path'),),
@@ -128,3 +224,18 @@ class WebconfModel(QAbstractTableModel):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
             return None
         return self._COLUMNS[section][0]
+
+    @property
+    def paths(self):
+        """return list of known paths"""
+        return [hglib.tounicode(e) for e in self._config['paths']]
+
+    def addpathmap(self, path, localpath):
+        """add path mapping to serve"""
+        assert path not in self.paths
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        try:
+            self._config.set('paths', hglib.fromunicode(path),
+                             hglib.fromunicode(localpath))
+        finally:
+            self.endInsertRows()
