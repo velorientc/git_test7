@@ -34,9 +34,6 @@ from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
 
-connect = QObject.connect
-
-
 class ManifestDialog(QMainWindow):
     """
     Qt4 dialog to display all files of a repo at a given revision
@@ -76,11 +73,10 @@ class ManifestDialog(QMainWindow):
     def setupModels(self):
         self.treemodel = ManifestModel(self.repo, self.rev)
         self.treeView.setModel(self.treemodel)
-        connect(self.treeView.selectionModel(),
-                SIGNAL('currentChanged(const QModelIndex &, const QModelIndex &)'),
-                self.fileSelected)
+        self.treeView.selectionModel().currentChanged.connect(self.fileSelected)
 
-    def fileSelected(self, index, *args):
+    @pyqtSlot(QModelIndex)
+    def fileSelected(self, index):
         if not index.isValid():
             return
         path = self.treemodel.pathFromIndex(index)
