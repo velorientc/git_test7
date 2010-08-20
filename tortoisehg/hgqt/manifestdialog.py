@@ -30,35 +30,36 @@ from PyQt4.Qsci import QsciScintilla
 from tortoisehg.util import paths, thgrepo
 from tortoisehg.util.hglib import tounicode
 
-from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
 
 connect = QObject.connect
 
 
-class ManifestDialog(QMainWindow, HgDialogMixin):
+class ManifestDialog(QMainWindow):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
+    max_file_size = 100000  # TODO: make it configurable
+
     def __init__(self, ui, repo, noderev):
         self.repo = repo
         QMainWindow.__init__(self)
-        HgDialogMixin.__init__(self, ui)
         self.setWindowTitle('Hg manifest viewer - %s:%s' % (repo.root, noderev))
         self.resize(400, 300)
 
         # hg repo
+        self._ui = ui
         self.repo = repo
         self.rev = noderev
+
+        self._initwidget()
         self.setupModels()
 
-        self.createActions()
         self.setupTextview()
         self._readsettings()
 
-    def setupUi(self, o):
-        # TODO: workaround for HgDialogMixin
+    def _initwidget(self):
         self.splitter = QSplitter()
         self.setCentralWidget(self.splitter)
         self.treeView = QTreeView()
@@ -75,9 +76,6 @@ class ManifestDialog(QMainWindow, HgDialogMixin):
                 SIGNAL('currentChanged(const QModelIndex &, const QModelIndex &)'),
                 self.fileSelected)
 
-    def createActions(self):
-        pass
-
     def setupTextview(self):
         lay = QHBoxLayout(self.mainFrame)
         lay.setSpacing(0)
@@ -87,7 +85,7 @@ class ManifestDialog(QMainWindow, HgDialogMixin):
         sci.setMarginLineNumbers(1, True)
         sci.setMarginWidth(1, '000')
         sci.setReadOnly(True)
-        sci.setFont(self._font)
+        #sci.setFont(self._font)  TODO: use ThgFont
         sci.setUtf8(True)
 
         sci.SendScintilla(sci.SCI_SETSELEOLFILLED, True)
@@ -114,9 +112,9 @@ class ManifestDialog(QMainWindow, HgDialogMixin):
                 data = "binary file"
             else:
                 data = tounicode(data)
-                lexer = get_lexer(path, data, self.repo.ui)
+                lexer = get_lexer(path, data, ui=self._ui)
                 if lexer:
-                    lexer.setFont(self._font)
+                    #lexer.setFont(self._font)  # TODO
                     self.textView.setLexer(lexer)
                 self._cur_lexer = lexer
         nlines = data.count('\n')
