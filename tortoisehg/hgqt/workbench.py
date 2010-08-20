@@ -292,8 +292,8 @@ class Workbench(QMainWindow):
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
-        self.menubar.addAction(self.menuHelp.menuAction())
         self.menubar.addAction(self.menuRepository.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.toolBar_edit = tb = QToolBar(_("Edit Toolbar"), self)
         tb.setEnabled(True)
