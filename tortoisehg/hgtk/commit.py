@@ -1083,11 +1083,14 @@ class GCommit(GStatus):
             self.text.grab_focus()
             return False
 
-        linkmandatory = self.repo.ui.config('tortoisehg',
-                'issue.linkmandatory', "False")
-        if linkmandatory == "True":
-            issueregex = self.repo.ui.config('tortoisehg',
-                    'issue.regex', "")
+        try:
+            linkmandatory = self.repo.ui.configbool('tortoisehg',
+                    'issue.linkmandatory')
+        except error.ConfigError:
+            linkmandatory = False
+
+        if linkmandatory:
+            issueregex = self.repo.ui.config('tortoisehg', 'issue.regex')
             if issueregex:
                 commitmessage = buf.get_text(buf.get_start_iter(), 
                         buf.get_end_iter())
