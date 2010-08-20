@@ -221,13 +221,11 @@ class RepoWidget(QWidget):
     def mergeWithRevision(self, rev):
         saved = self.setScanForRepoChanges(False)
         dlg = merge.MergeDialog(rev, self.repo, self)
-        def finished(ret):
-            self.setScanForRepoChanges(saved)
-        dlg.finished.connect(finished)
         def invalidated():
             self.reload()
         dlg.repoInvalidated.connect(invalidated)
-        dlg.show()
+        dlg.exec_()
+        self.setScanForRepoChanges(saved)
 
     def tagToRevision(self, rev):
         origlen = len(self.repo)
