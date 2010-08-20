@@ -33,12 +33,11 @@ from tortoisehg.util.hglib import tounicode
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
-from tortoisehg.hgqt.ManifestDialog_ui import Ui_ManifestDialog
 
 connect = QObject.connect
 
 
-class ManifestDialog(QMainWindow, Ui_ManifestDialog, HgDialogMixin):
+class ManifestDialog(QMainWindow, HgDialogMixin):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
@@ -47,6 +46,7 @@ class ManifestDialog(QMainWindow, Ui_ManifestDialog, HgDialogMixin):
         QMainWindow.__init__(self)
         HgDialogMixin.__init__(self, ui)
         self.setWindowTitle('Hg manifest viewer - %s:%s' % (repo.root, noderev))
+        self.resize(400, 300)
 
         # hg repo
         self.repo = repo
@@ -56,6 +56,17 @@ class ManifestDialog(QMainWindow, Ui_ManifestDialog, HgDialogMixin):
         self.createActions()
         self.setupTextview()
         self._readsettings()
+
+    def setupUi(self, o):
+        # TODO: workaround for HgDialogMixin
+        self.splitter = QSplitter()
+        self.setCentralWidget(self.splitter)
+        self.treeView = QTreeView()
+        self.mainFrame = QFrame()
+        self.splitter.addWidget(self.treeView)
+        self.splitter.addWidget(self.mainFrame)
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 3)
 
     def setupModels(self):
         self.treemodel = ManifestModel(self.repo, self.rev)
