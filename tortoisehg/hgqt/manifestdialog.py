@@ -30,6 +30,7 @@ from PyQt4.Qsci import QsciScintilla
 from tortoisehg.util import paths, thgrepo
 from tortoisehg.util.hglib import tounicode
 
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
 
@@ -65,7 +66,7 @@ class ManifestDialog(QMainWindow):
         self.textView.setMarginLineNumbers(1, True)
         self.textView.setMarginWidth(1, '000')
         self.textView.setReadOnly(True)
-        #self.textView.setFont(self._font)  TODO: use ThgFont
+        self.textView.setFont(qtlib.getfont(self._ui, 'fontlog').font())
         self.textView.setUtf8(True)
         self.textView.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
         self.splitter.addWidget(self.treeView)
@@ -103,7 +104,6 @@ class ManifestDialog(QMainWindow):
                 data = tounicode(data)
                 lexer = get_lexer(path, data, ui=self._ui)
                 if lexer:
-                    #lexer.setFont(self._font)  # TODO
                     self.textView.setLexer(lexer)
                 self._cur_lexer = lexer
         nlines = data.count('\n')
