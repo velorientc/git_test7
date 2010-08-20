@@ -150,6 +150,7 @@ class _PathDialog(QDialog):
         super(_PathDialog, self).__init__(parent)
         self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
                             & ~Qt.WindowContextHelpButtonHint)
+        self.resize(QFontMetrics(self.font()).width('M') * 50, self.height())
         self.setWindowTitle(title)
         self._invalidpaths = set(invalidpaths or [])
         self.setLayout(QFormLayout())
