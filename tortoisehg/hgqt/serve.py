@@ -125,7 +125,6 @@ class ServeDialog(QDialog):
 
         self._cmd.cancel()
         self._fake_request()
-        # TODO: sometimes it doesn't release the port
 
     def _fake_request(self):
         """Send fake request for server to run python code"""
@@ -211,8 +210,16 @@ def _create_server(orig, ui, app):
 
     def serve_forever(orig):
         server._serving = True
-        while server._serving:
-            server.handle_request()
+        try:
+            while server._serving:
+                server.handle_request()
+        except KeyboardInterrupt:
+            # raised outside try-block around process_request().
+            # see SocketServer.BaseServer
+            pass
+        finally:
+            server._serving = False
+            server.server_close()
 
     def handle_error(orig, request, client_address):
         type = sys.exc_info()[0]
