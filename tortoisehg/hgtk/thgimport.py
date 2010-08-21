@@ -82,7 +82,7 @@ class ImportDialog(gdialog.GDialog):
         table.add_row(_('Source:'), self.src_combo, 1,
                       self.files_btn, menubtn, expand=0)
 
-        self.p0check = gtk.CheckButton(_('Do no strip paths '
+        self.p0check = gtk.CheckButton(_('Do not strip paths '
                                          '(-p0), required for SVN patches'))
         table.add_row(None, self.p0check, 1, expand=0)
 
