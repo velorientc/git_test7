@@ -661,7 +661,7 @@ class SettingsForm(QWidget):
     def refresh(self, *args):
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
-        self.readonly = not hasattr(self.ini, 'write')
+        self.readonly = not (hasattr(self.ini, 'write') and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
         self.fnedit.setText(self.fn)
         for info, widgets in self.pages.values():
