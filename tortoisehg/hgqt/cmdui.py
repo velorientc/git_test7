@@ -135,7 +135,9 @@ class Core(QObject):
 
     def append_output(self, msg, style=''):
         msg = msg.replace('\n', '<br />')
-        self.output_text.insertHtml('<font style="%s">%s</font>' % (style, msg))
+        cursor = self.output_text.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        cursor.insertHtml('<font style="%s">%s</font>' % (style, msg))
         max = self.output_text.verticalScrollBar().maximum()
         self.output_text.verticalScrollBar().setSliderPosition(max)
 
