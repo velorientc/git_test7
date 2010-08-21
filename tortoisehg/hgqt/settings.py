@@ -503,10 +503,7 @@ class SettingsDialog(QDialog):
                 self.reject()
                 return
 
-        try:
-            import iniparse
-            iniparse.INIConfig
-        except ImportError:
+        if not hasattr(wconfig.config(), 'write'):
             qtlib.ErrorMsgBox(_('Iniparse package not found'),
                          _("Can't change settings without iniparse package - "
                            'view is readonly.'), parent=self)
