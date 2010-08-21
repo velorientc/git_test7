@@ -12,7 +12,7 @@ import urlparse
 
 from mercurial import hg, ui, util, url, filemerge, error, extensions
 
-from tortoisehg.util import hglib, settings, paths
+from tortoisehg.util import hglib, settings, paths, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
@@ -672,6 +672,7 @@ class SettingsForm(QWidget):
     def refresh(self, *args):
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
+        self.readonly = not hasattr(self.ini, 'write')
         self.fnedit.setText(self.fn)
         for info, widgets in self.pages.values():
             for row, (label, cpath, values, tooltip) in enumerate(info):
@@ -748,11 +749,7 @@ class SettingsForm(QWidget):
         'Retrieve a value from the parsed config file'
         # Presumes single section/key level depth
         section, key = cpath.split('.', 1)
-        if section not in self.ini:
-            return None
-        if key not in self.ini[section]:
-            return None
-        return self.ini[section][key]
+        return self.ini.get(section, key)
 
     def loadIniFile(self, rcpath):
         for fn in rcpath:
@@ -774,49 +771,22 @@ class SettingsForm(QWidget):
                          ' mode.'), parent=self)
                 from mercurial import config
                 self.fn = rcpath[0]
-                cfg = config.config()
-                self.readonly = True
-                return cfg
+                return config.config()
         self.fn = fn
-        try:
-            import iniparse
-            # Monkypatch this regex to prevent iniparse from considering
-            # 'rem' as a comment
-            iniparse.ini.CommentLine.regex = \
-                       re.compile(r'^(?P<csep>[%;#])(?P<comment>.*)$')
-            return iniparse.INIConfig(file(fn), optionxformvalue=None)
-        except ImportError:
-            from mercurial import config
-            cfg = config.config()
-            cfg.read(fn)
-            self.readonly = True
-            return cfg
-        except Exception, e:
-            qtlib.WarningMsgBox(_('Unable to parse a config file'),
-                    _('%s\nReverting to read-only mode.') % str(e), 
-                    parent=self)
-            from mercurial import config
-            cfg = config.config()
-            cfg.read(fn)
-            self.readonly = True
-            return cfg
+        return wconfig.readfile(self.fn)
 
     def recordNewValue(self, cpath, newvalue):
         # 'newvalue' is in local encoding
         section, key = cpath.split('.', 1)
-        if newvalue == None:
-            if section not in self.ini:
-                return
-            if key not in self.ini[section]:
-                return
-            del self.ini[section][key]
+        if newvalue == self.ini.get(section, key):
             return
-        if section not in self.ini:
-            if hasattr(self.ini, '_new_namespace'):
-                self.ini._new_namespace(section)
-            else:
-                self.ini.new_namespace(section)
-        self.ini[section][key] = newvalue
+        if newvalue == None:
+            try:
+                del self.ini[section][key]
+            except KeyError:
+                pass
+        else:
+            self.ini.set(section, key, newvalue)
 
     def applyChanges(self):
         if self.readonly:
@@ -828,9 +798,7 @@ class SettingsForm(QWidget):
                 self.recordNewValue(cpath, newvalue)
 
         try:
-            f = util.atomictempfile(self.fn, 'w', createmode=None)
-            f.write(str(self.ini))
-            f.rename()
+            wconfig.writefile(self.ini, self.fn)
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 str(e), parent=self)
