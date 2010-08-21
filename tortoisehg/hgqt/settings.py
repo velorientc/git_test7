@@ -42,7 +42,6 @@ class SettingsCombo(QComboBox):
             settings = opts['settings']
             slist = settings.value('settings/'+opts['cpath']).toStringList()
             self.previous = [s for s in slist if s]
-        self.setDisabled(opts['readonly'])
         self.setFixedWidth(ENTRY_WIDTH)
 
     def resetList(self):
@@ -115,7 +114,6 @@ class PasswordEntry(QLineEdit):
         self.opts = opts
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
-        self.setDisabled(opts['readonly'])
         self.setFixedWidth(ENTRY_WIDTH)
 
     def focusInEvent(self, e):
@@ -143,7 +141,6 @@ class FontEntry(QPushButton):
         QPushButton.__init__(self, parent)
         self.opts = opts
         self.curvalue = None
-        self.setDisabled(opts['readonly'])
         self.clicked.connect(self.on_clicked)
         cpath = self.opts['cpath']
         assert cpath.startswith('tortoisehg.')
@@ -509,13 +506,11 @@ class SettingsDialog(QDialog):
         try:
             import iniparse
             iniparse.INIConfig
-            self.readonly = False
         except ImportError:
             qtlib.ErrorMsgBox(_('Iniparse package not found'),
                          _("Can't change settings without iniparse package - "
                            'view is readonly.'), parent=self)
             print 'Please install http://code.google.com/p/iniparse/'
-            self.readonly = True
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -529,15 +524,13 @@ class SettingsDialog(QDialog):
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
-        self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(),
-                                          focus=focus, readonly=self.readonly),
+        self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(), focus=focus),
                              qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             reponame = hglib.tounicode(os.path.basename(repo.root))
-            self.conftabs.addTab(SettingsForm(rcpath=reporcpath,
-                                              focus=focus, readonly=self.readonly),
+            self.conftabs.addTab(SettingsForm(rcpath=reporcpath, focus=focus),
                                  qtlib.geticon('settings_repo'),
                                  _('%s repository settings') % reponame)
 
@@ -589,7 +582,7 @@ class SettingsDialog(QDialog):
 class SettingsForm(QWidget):
     """Widget for each settings file"""
 
-    def __init__(self, rcpath, focus=None, readonly=False, parent=None):
+    def __init__(self, rcpath, focus=None, parent=None):
         super(SettingsForm, self).__init__(parent)
 
         if isinstance(rcpath, (list, tuple)):
@@ -638,7 +631,6 @@ class SettingsForm(QWidget):
         self.desctext = desctext
 
         self.settings = QSettings()
-        self.readonly = readonly
 
         # add page items to treeview
         for meta, info in INFO:
@@ -673,6 +665,7 @@ class SettingsForm(QWidget):
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
         self.readonly = not hasattr(self.ini, 'write')
+        self.stack.setDisabled(self.readonly)
         self.fnedit.setText(self.fn)
         for info, widgets in self.pages.values():
             for row, (label, cpath, values, tooltip) in enumerate(info):
@@ -717,8 +710,7 @@ class SettingsForm(QWidget):
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
             opts = {'label':label, 'cpath':cpath, 'tooltip':tooltip,
-                    'descwidget':self.desctext, 'settings':self.settings,
-                    'readonly':self.readonly}
+                    'descwidget':self.desctext, 'settings':self.settings}
             if isinstance(values, tuple):
                 func = values[0]
                 w = func(opts, values[1])
