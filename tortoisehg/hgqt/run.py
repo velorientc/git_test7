@@ -421,15 +421,16 @@ class _QtRunner(QObject):
 
         self._dialogs.append(dlg)  # avoid garbage collection
         if hasattr(dlg, 'finished'):
-            dlg.finished.connect(lambda: self._forgetdialog(dlg))
+            dlg.finished.connect(dlg.deleteLater)
+        # NOTE: Somehow `destroyed` signal doesn't emit the original obj.
+        # So we cannot write `dlg.destroyed.connect(self._forgetdialog)`.
+        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
         dlg.show()
 
     def _forgetdialog(self, dlg):
         """forget the dialog to be garbage collectable"""
-        try:
-            self._dialogs.remove(dlg)
-        except ValueError:
-            pass
+        assert dlg in self._dialogs
+        self._dialogs.remove(dlg)
 
 qtrun = _QtRunner()
 
