@@ -65,10 +65,49 @@ class ManifestDialog(QMainWindow):
         s.setValue('manifest/splitter',
                    self._manifest_widget._splitter.saveState())
 
-class ManifestWidget(QWidget):
-    """Display file tree and contents at the specified revision"""
+class _FileTextView(QsciScintilla):
     max_file_size = 100000  # TODO: make it configurable
 
+    def __init__(self, ui, repo, parent=None):
+        super(_FileTextView, self).__init__(parent)
+        self._ui = ui
+        self._repo = repo
+
+        self.setMarginLineNumbers(1, True)
+        self.setMarginWidth(1, '000')
+        self.setReadOnly(True)
+        self.setFont(qtlib.getfont(self._ui, 'fontlog').font())
+        self.setUtf8(True)
+        self.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
+
+    @pyqtSlot(unicode, object)
+    def setsource(self, path, rev):
+        try:
+            fc = self._repo.changectx(rev).filectx(path)
+        except LookupError:
+            # may occur when a directory is selected
+            self.setMarginWidth(1, '00')
+            self.setText('')
+            return
+
+        if fc.size() > self.max_file_size:
+            data = _("file too big")
+        else:
+            # return the whole file
+            data = fc.data()
+            if util.binary(data):
+                data = _("binary file")
+            else:
+                data = tounicode(data)
+                lexer = get_lexer(path, data, ui=self._ui)
+                if lexer:
+                    self.setLexer(lexer)
+        nlines = data.count('\n')
+        self.setMarginWidth(1, str(nlines)+'00')
+        self.setText(data)
+
+class ManifestWidget(QWidget):
+    """Display file tree and contents at the specified revision"""
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
         self._ui = ui
@@ -84,17 +123,14 @@ class ManifestWidget(QWidget):
         self._splitter = QSplitter()
         self.layout().addWidget(self._splitter)
         self._treeview = QTreeView()
-        self._textview = QsciScintilla()
-        self._textview.setMarginLineNumbers(1, True)
-        self._textview.setMarginWidth(1, '000')
-        self._textview.setReadOnly(True)
-        self._textview.setFont(qtlib.getfont(self._ui, 'fontlog').font())
-        self._textview.setUtf8(True)
-        self._textview.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
+        self._contentview = QStackedWidget()
         self._splitter.addWidget(self._treeview)
-        self._splitter.addWidget(self._textview)
+        self._splitter.addWidget(self._contentview)
         self._splitter.setStretchFactor(0, 1)
         self._splitter.setStretchFactor(1, 3)
+
+        self._textview = _FileTextView(self._ui, self._repo)
+        self._contentview.addWidget(self._textview)
 
     def _initmodel(self):
         self._treemodel = ManifestModel(self._repo, self._rev)
@@ -106,29 +142,7 @@ class ManifestWidget(QWidget):
         if not index.isValid():
             return
         path = self._treemodel.pathFromIndex(index)
-        try:
-            fc = self._repo.changectx(self._rev).filectx(path)
-        except LookupError:
-            # may occur when a directory is selected
-            self._textview.setMarginWidth(1, '00')
-            self._textview.setText('')
-            return
-
-        if fc.size() > self.max_file_size:
-            data = _("file too big")
-        else:
-            # return the whole file
-            data = fc.data()
-            if util.binary(data):
-                data = _("binary file")
-            else:
-                data = tounicode(data)
-                lexer = get_lexer(path, data, ui=self._ui)
-                if lexer:
-                    self._textview.setLexer(lexer)
-        nlines = data.count('\n')
-        self._textview.setMarginWidth(1, str(nlines)+'00')
-        self._textview.setText(data)
+        self._contentview.currentWidget().setsource(path, self._rev)
 
 
 def run(ui, *pats, **opts):
