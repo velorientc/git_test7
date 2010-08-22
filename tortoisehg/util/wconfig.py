@@ -18,7 +18,7 @@ if _hasiniparse:
     try:
         from iniparse import change_comment_syntax  # iniparse>=0.3.2
         change_comment_syntax(allow_rem=False)
-    except ImportError:
+    except (ImportError, TypeError):
         # TODO: yet need to care about iniparse<0.3.2 ??
         import re
         from iniparse.ini import CommentLine
