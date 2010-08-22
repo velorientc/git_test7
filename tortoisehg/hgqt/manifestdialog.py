@@ -140,7 +140,7 @@ class ManifestWidget(QWidget):
         self._rev = rev
 
         self._initwidget()
-        self._initmodel()
+        self._setupmodel()
         self.setfileview('cat')
         self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
 
@@ -166,10 +166,17 @@ class ManifestWidget(QWidget):
         self._contentview.currentChanged.connect(
             lambda: self._fileselected(self._treeview.currentIndex()))
 
-    def _initmodel(self):
+    def _setupmodel(self):
         self._treemodel = ManifestModel(self._repo, self._rev)
         self._treeview.setModel(self._treemodel)
         self._treeview.selectionModel().currentChanged.connect(self._fileselected)
+
+    @pyqtSlot(object)
+    def setrev(self, rev):
+        """Change revision to show"""
+        self._rev = rev
+        self._setupmodel()
+        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))  # TODO
 
     @pyqtSlot(QModelIndex)
     def _fileselected(self, index):
