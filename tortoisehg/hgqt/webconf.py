@@ -173,7 +173,7 @@ class _PathDialog(QDialog):
         self.resize(QFontMetrics(self.font()).width('M') * 50, self.height())
         self.setWindowTitle(title)
         self._invalidpaths = set(invalidpaths or [])
-        self.setLayout(QFormLayout())
+        self.setLayout(QFormLayout(fieldGrowthPolicy=QFormLayout.ExpandingFieldsGrow))
         self._initfields()
         self._initbuttons(acceptlabel)
         self._path_edit.setText(path or os.path.basename(localpath or ''))
