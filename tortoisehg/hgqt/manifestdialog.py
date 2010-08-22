@@ -55,7 +55,7 @@ class ManifestDialog(QMainWindow):
         s = QSettings()
         self.restoreGeometry(s.value('manifest/geom').toByteArray())
         # TODO: don't call deeply
-        self._manifest_widget.splitter.restoreState(
+        self._manifest_widget._splitter.restoreState(
             s.value('manifest/splitter').toByteArray())
 
     def _writesettings(self):
@@ -63,7 +63,7 @@ class ManifestDialog(QMainWindow):
         s.setValue('manifest/geom', self.saveGeometry())
         # TODO: don't call deeply
         s.setValue('manifest/splitter',
-                   self._manifest_widget.splitter.saveState())
+                   self._manifest_widget._splitter.saveState())
 
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
@@ -72,46 +72,46 @@ class ManifestWidget(QWidget):
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
         self._ui = ui
-        self.repo = repo
-        self.rev = rev
+        self._repo = repo
+        self._rev = rev
 
         self._initwidget()
-        self.setupModels()
-        self.treeView.setCurrentIndex(self.treemodel.index(0, 0))
+        self._initmodel()
+        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
 
     def _initwidget(self):
         self.setLayout(QVBoxLayout())
-        self.splitter = QSplitter()
-        self.layout().addWidget(self.splitter)
-        self.treeView = QTreeView()
-        self.textView = QsciScintilla()
-        self.textView.setMarginLineNumbers(1, True)
-        self.textView.setMarginWidth(1, '000')
-        self.textView.setReadOnly(True)
-        self.textView.setFont(qtlib.getfont(self._ui, 'fontlog').font())
-        self.textView.setUtf8(True)
-        self.textView.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
-        self.splitter.addWidget(self.treeView)
-        self.splitter.addWidget(self.textView)
-        self.splitter.setStretchFactor(0, 1)
-        self.splitter.setStretchFactor(1, 3)
+        self._splitter = QSplitter()
+        self.layout().addWidget(self._splitter)
+        self._treeview = QTreeView()
+        self._textview = QsciScintilla()
+        self._textview.setMarginLineNumbers(1, True)
+        self._textview.setMarginWidth(1, '000')
+        self._textview.setReadOnly(True)
+        self._textview.setFont(qtlib.getfont(self._ui, 'fontlog').font())
+        self._textview.setUtf8(True)
+        self._textview.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
+        self._splitter.addWidget(self._treeview)
+        self._splitter.addWidget(self._textview)
+        self._splitter.setStretchFactor(0, 1)
+        self._splitter.setStretchFactor(1, 3)
 
-    def setupModels(self):
-        self.treemodel = ManifestModel(self.repo, self.rev)
-        self.treeView.setModel(self.treemodel)
-        self.treeView.selectionModel().currentChanged.connect(self.fileSelected)
+    def _initmodel(self):
+        self._treemodel = ManifestModel(self._repo, self._rev)
+        self._treeview.setModel(self._treemodel)
+        self._treeview.selectionModel().currentChanged.connect(self._fileselected)
 
     @pyqtSlot(QModelIndex)
-    def fileSelected(self, index):
+    def _fileselected(self, index):
         if not index.isValid():
             return
-        path = self.treemodel.pathFromIndex(index)
+        path = self._treemodel.pathFromIndex(index)
         try:
-            fc = self.repo.changectx(self.rev).filectx(path)
+            fc = self._repo.changectx(self._rev).filectx(path)
         except LookupError:
             # may occur when a directory is selected
-            self.textView.setMarginWidth(1, '00')
-            self.textView.setText('')
+            self._textview.setMarginWidth(1, '00')
+            self._textview.setText('')
             return
 
         if fc.size() > self.max_file_size:
@@ -125,10 +125,10 @@ class ManifestWidget(QWidget):
                 data = tounicode(data)
                 lexer = get_lexer(path, data, ui=self._ui)
                 if lexer:
-                    self.textView.setLexer(lexer)
+                    self._textview.setLexer(lexer)
         nlines = data.count('\n')
-        self.textView.setMarginWidth(1, str(nlines)+'00')
-        self.textView.setText(data)
+        self._textview.setMarginWidth(1, str(nlines)+'00')
+        self._textview.setText(data)
 
 
 def run(ui, *pats, **opts):
