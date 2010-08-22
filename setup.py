@@ -261,7 +261,7 @@ def setup_windows(version):
              'description':'TortoiseHg GUI tools for Mercurial SCM',
              'copyright':thgcopyright,
              'product_version':version},
-            {'script':'contrib/docdiff.py',
+            {'script':'win32/docdiff.py',
              'icon_resources':[(0,'icons/TortoiseMerge.ico')],
              'copyright':thgcopyright,
              'product_version':version}

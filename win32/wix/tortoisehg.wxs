@@ -14,7 +14,7 @@
     <?define IsX64 = no ?>
   <?endif?>
 
-  <?define ProgramRegKey = Software\TortoiseHg ?>
+  <?define ProgramRegKey = Software\TortoiseHg2 ?>
 
   <?include TortoiseOverlaysDefines.wxi ?>
 
@@ -86,7 +86,7 @@
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
-        <Directory Id='INSTALLDIR' Name='TortoiseHg'>
+        <Directory Id='INSTALLDIR' Name='TortoiseHg2'>
           <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)'>
             <File Id='thgEXE' Name='thg.exe' KeyPath='yes'
                   Source='dist\thg.exe'
@@ -212,7 +212,7 @@
           <Directory Id='HGRCD' Name='hgrc.d'>
             <Component Id='mercurial.rc' Guid='$(var.mercurial.rc.guid)'>
               <File Id='mercurial.rc' Name='Mercurial.rc' ReadOnly='yes'
-                    Source='contrib\win32\mercurial.rc'
+                    Source='win32\mercurial.rc'
               />
             </Component>
             <Component Id='mergetools.rc' Guid='$(var.mergetools.rc.guid)'>
@@ -223,7 +223,7 @@
             <Component Id="mergepatterns.rc" Guid='$(var.mergepatterns.rc.guid)'>
               <File Id='mergepatterns.rc' Name='MergePatterns.rc'
                     ReadOnly='yes' KeyPath='yes'
-                    Source='contrib\win32\mergepatterns.rc'
+                    Source='win32\mergepatterns.rc'
               />
             </Component>
           </Directory>
@@ -477,9 +477,9 @@
       "NOTE: Logoff/logon or restarting explorer may be needed to start the overlay icons"
     />
 
-    <WixVariable Id="WixUILicenseRtf" Value="contrib\wix\COPYING.rtf" />
-    <WixVariable Id="WixUIBannerBmp" Value="contrib\wix\WixUIBannerBmp.bmp" />
-    <WixVariable Id="WixUIDialogBmp" Value="contrib\wix\WixUIDialogBmp.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="win32\wix\COPYING.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="win32\wix\WixUIBannerBmp.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="win32\wix\WixUIDialogBmp.bmp" />
 
     <Icon Id="thgIcon.ico" SourceFile="icons\thg_logo.ico" />
     <Icon Id="hgIcon.ico" SourceFile="icons\hg.ico" />
