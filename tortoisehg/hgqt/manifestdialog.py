@@ -19,7 +19,6 @@ Qt4 dialogs to display hg revisions of a file
 """
 
 from mercurial import util
-from mercurial.revlog import LookupError
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -95,14 +94,7 @@ class _FileTextView(QsciScintilla):
 
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):
-        try:
-            fc = self._repo.changectx(rev).filectx(path)
-        except LookupError:
-            # may occur when a directory is selected
-            self.setMarginWidth(1, '00')
-            self.setText('')
-            return
-
+        fc = self._repo.changectx(rev).filectx(path)
         if fc.size() > self.max_file_size:
             data = _("file too big")
         else:
@@ -128,9 +120,16 @@ class _FileAnnotateView(annotate.AnnotateView):
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):
         ctx = self._repo[rev]
-        if path not in ctx:
-            return  # TODO
         self.annotateFileAtRev(self._repo, ctx, path)
+
+class _NullView(QWidget):
+    """empty widget for content view"""
+    def __init__(self, parent=None):
+        super(_NullView, self).__init__(parent)
+
+    @pyqtSlot(unicode, object)
+    def setsource(self, path, rev):
+        pass
 
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
@@ -142,8 +141,8 @@ class ManifestWidget(QWidget):
 
         self._initwidget()
         self._initmodel()
-        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
         self.setfileview('cat')
+        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
 
     def _initwidget(self):
         self.setLayout(QVBoxLayout())
@@ -156,6 +155,8 @@ class ManifestWidget(QWidget):
         self._splitter.setStretchFactor(0, 1)
         self._splitter.setStretchFactor(1, 3)
 
+        self._nullcontent = _NullView()
+        self._contentview.addWidget(self._nullcontent)
         self._filewidgets = {
             'cat': _FileTextView(self._ui, self._repo),
             'annotate': _FileAnnotateView(self._ui, self._repo),
@@ -172,9 +173,12 @@ class ManifestWidget(QWidget):
 
     @pyqtSlot(QModelIndex)
     def _fileselected(self, index):
-        if not index.isValid():
-            return
         path = self._treemodel.pathFromIndex(index)
+        if path not in self._repo[self._rev]:
+            self._contentview.setCurrentWidget(self._nullcontent)
+            return
+
+        self._contentview.setCurrentWidget(self._curfileview)
         self._contentview.currentWidget().setsource(path, self._rev)
 
     @pyqtSlot(unicode)
