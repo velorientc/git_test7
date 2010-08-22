@@ -163,6 +163,9 @@ class ManifestWidget(QWidget):
             }
         for w in self._filewidgets.itervalues():
             self._contentview.addWidget(w)
+        # TODO: abstract way to connect this kind of signals
+        self.connect(self._filewidgets['annotate'], SIGNAL('revSelected'),
+                     lambda a: self.setsource(path=a[0], rev=a[1]))
         self._contentview.currentChanged.connect(
             lambda: self._fileselected(self._treeview.currentIndex()))
 
@@ -174,10 +177,14 @@ class ManifestWidget(QWidget):
     @pyqtSlot(object)
     def setrev(self, rev):
         """Change revision to show"""
-        origpath = self.path
+        self.setsource(self.path, rev)
+
+    @pyqtSlot(unicode, object)
+    def setsource(self, path, rev):
+        """Change path and revision to show at once"""
         self._rev = rev
         self._setupmodel()
-        self.setpath(origpath)
+        self.setpath(path)
 
     @property
     def path(self):
