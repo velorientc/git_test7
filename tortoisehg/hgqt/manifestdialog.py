@@ -28,7 +28,7 @@ from PyQt4.Qsci import QsciScintilla
 from tortoisehg.util import paths, thgrepo
 from tortoisehg.util.hglib import tounicode
 
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, annotate
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
@@ -45,7 +45,20 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget = ManifestWidget(ui, repo, rev)
         self.setCentralWidget(self._manifest_widget)
 
+        self._initactions()
         self._readsettings()
+
+    def _initactions(self):
+        self._toolbar = QToolBar()
+        self.addToolBar(self._toolbar)
+        # TODO: not sure 'Annotate' mode is good for toolbar
+        self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
+        self._action_annotate_mode.toggled.connect(self._annotate_mode_toggled)
+        self._toolbar.addAction(self._action_annotate_mode)
+
+    @pyqtSlot(bool)
+    def _annotate_mode_toggled(self, checked):
+        self._manifest_widget.setfileview(checked and 'annotate' or 'cat')
 
     def closeEvent(self, event):
         self._writesettings()
@@ -106,6 +119,19 @@ class _FileTextView(QsciScintilla):
         self.setMarginWidth(1, str(nlines)+'00')
         self.setText(data)
 
+class _FileAnnotateView(annotate.AnnotateView):
+    def __init__(self, ui, repo, parent=None):
+        super(_FileAnnotateView, self).__init__(parent)
+        self._ui = ui
+        self._repo = repo
+
+    @pyqtSlot(unicode, object)
+    def setsource(self, path, rev):
+        ctx = self._repo[rev]
+        if path not in ctx:
+            return  # TODO
+        self.annotateFileAtRev(self._repo, ctx, path)
+
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
     def __init__(self, ui, repo, rev=None, parent=None):
@@ -117,6 +143,7 @@ class ManifestWidget(QWidget):
         self._initwidget()
         self._initmodel()
         self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
+        self.setfileview('cat')
 
     def _initwidget(self):
         self.setLayout(QVBoxLayout())
@@ -129,8 +156,14 @@ class ManifestWidget(QWidget):
         self._splitter.setStretchFactor(0, 1)
         self._splitter.setStretchFactor(1, 3)
 
-        self._textview = _FileTextView(self._ui, self._repo)
-        self._contentview.addWidget(self._textview)
+        self._filewidgets = {
+            'cat': _FileTextView(self._ui, self._repo),
+            'annotate': _FileAnnotateView(self._ui, self._repo),
+            }
+        for w in self._filewidgets.itervalues():
+            self._contentview.addWidget(w)
+        self._contentview.currentChanged.connect(
+            lambda: self._fileselected(self._treeview.currentIndex()))
 
     def _initmodel(self):
         self._treemodel = ManifestModel(self._repo, self._rev)
@@ -143,6 +176,13 @@ class ManifestWidget(QWidget):
             return
         path = self._treemodel.pathFromIndex(index)
         self._contentview.currentWidget().setsource(path, self._rev)
+
+    @pyqtSlot(unicode)
+    def setfileview(self, mode):
+        """Change widget for file content view"""
+        assert mode in self._filewidgets
+        self._curfileview = self._filewidgets[mode]
+        self._contentview.setCurrentWidget(self._curfileview)
 
 
 def run(ui, *pats, **opts):
