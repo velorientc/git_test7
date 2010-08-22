@@ -42,7 +42,7 @@ class RepoTreeView(QTreeView):
         # (see http://doc.qt.nokia.com/4.6/model-view-dnd.html)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
-        self.setDragDropMode(QAbstractItemView.DragDrop)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setDropIndicatorShown(True)
 
         self.createActions()

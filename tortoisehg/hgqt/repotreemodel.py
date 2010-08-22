@@ -141,7 +141,7 @@ class RepoTreeModel(QAbstractItemModel):
         return item.flags()
 
     def supportedDropActions(self):
-        return Qt.MoveAction
+        return Qt.CopyAction | Qt.MoveAction | Qt.LinkAction
 
     def removeRows(self, row, count, parent):
         item = parent.internalPointer()
