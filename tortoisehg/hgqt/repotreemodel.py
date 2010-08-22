@@ -162,6 +162,7 @@ class RepoTreeModel(QAbstractItemModel):
         writeXml(buf, item, extractXmlElementName)
         d = QMimeData()
         d.setData(repoRegMimeType, buf)
+        d.setUrls([QUrl.fromLocalFile(item.rootpath())])
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
