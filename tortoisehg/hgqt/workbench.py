@@ -342,7 +342,8 @@ class Workbench(QMainWindow):
         for u in d.urls():
             root = self.find_root(u)
             if root:
-                event.acceptProposedAction()
+                event.setDropAction(Qt.LinkAction)
+                event.accept()
                 break
 
     def dropEvent(self, event):
@@ -355,7 +356,8 @@ class Workbench(QMainWindow):
                 self.addRepoTab(repo)
                 accept = True
         if accept:
-            event.acceptProposedAction()
+            event.setDropAction(Qt.LinkAction)
+            event.accept()
 
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
