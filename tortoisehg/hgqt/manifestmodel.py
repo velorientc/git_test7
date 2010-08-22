@@ -72,7 +72,7 @@ class ManifestModel(QAbstractItemModel):
         self.changectx = self.repo.changectx(rev)
         self.setupModelData()
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
 
@@ -160,3 +160,16 @@ class ManifestModel(QAbstractItemModel):
             idxs.insert(0, index)
             index = self.parent(index)
         return '/'.join([index.internalPointer().data(0) for index in idxs])
+
+    def indexFromPath(self, path):
+        """Return index for the specified path if found; otherwise invalid index"""
+        def search(paths, parent=QModelIndex()):
+            if not paths:
+                return parent
+            for r in xrange(self.rowCount(parent)):
+                i = self.index(r, 0, parent)
+                if self.data(i) == paths[0]:
+                    return search(paths[1:], i)
+            return QModelIndex()  # not found
+
+        return search(path.split('/'))
