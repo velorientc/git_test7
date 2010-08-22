@@ -174,9 +174,20 @@ class ManifestWidget(QWidget):
     @pyqtSlot(object)
     def setrev(self, rev):
         """Change revision to show"""
+        origpath = self.path
         self._rev = rev
         self._setupmodel()
-        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))  # TODO
+        self.setpath(origpath)
+
+    @property
+    def path(self):
+        """Return currently selected path"""
+        return self._treemodel.pathFromIndex(self._treeview.currentIndex())
+
+    @pyqtSlot(unicode)
+    def setpath(self, path):
+        """Change path to show"""
+        self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
 
     @pyqtSlot(QModelIndex)
     def _fileselected(self, index):
