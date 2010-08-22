@@ -38,14 +38,16 @@ class ManifestDialog(QMainWindow):
     """
     def __init__(self, ui, repo, rev=None, parent=None):
         QMainWindow.__init__(self, parent)
-        self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (repo.root, rev))
+        self._repo = repo
         self.resize(400, 300)
 
         self._manifest_widget = ManifestWidget(ui, repo, rev)
+        self._manifest_widget.revchanged.connect(self._updatewindowtitle)
         self.setCentralWidget(self._manifest_widget)
 
         self._initactions()
         self._readsettings()
+        self._updatewindowtitle()
 
     def _initactions(self):
         self._toolbar = QToolBar()
@@ -54,6 +56,11 @@ class ManifestDialog(QMainWindow):
         self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
         self._action_annotate_mode.toggled.connect(self._annotate_mode_toggled)
         self._toolbar.addAction(self._action_annotate_mode)
+
+    @pyqtSlot()
+    def _updatewindowtitle(self):
+        self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (
+            self._repo.root, self._manifest_widget.rev))
 
     @pyqtSlot(bool)
     def _annotate_mode_toggled(self, checked):
@@ -133,6 +140,8 @@ class _NullView(QWidget):
 
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
+    revchanged = pyqtSignal(object)  # emit when curret revision changed
+
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
         self._ui = ui
@@ -174,6 +183,11 @@ class ManifestWidget(QWidget):
         self._treeview.setModel(self._treemodel)
         self._treeview.selectionModel().currentChanged.connect(self._fileselected)
 
+    @property
+    def rev(self):
+        """Return current revision"""
+        return self._rev
+
     @pyqtSlot(object)
     def setrev(self, rev):
         """Change revision to show"""
@@ -182,8 +196,10 @@ class ManifestWidget(QWidget):
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):
         """Change path and revision to show at once"""
-        self._rev = rev
-        self._setupmodel()
+        if self._rev != rev:
+            self._rev = rev
+            self._setupmodel()
+            self.revchanged.emit(rev)
         self.setpath(path)
 
     @property
