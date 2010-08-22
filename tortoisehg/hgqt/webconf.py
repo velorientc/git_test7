@@ -24,6 +24,7 @@ class WebconfForm(QWidget):
         self._initicons()
         self._qui.path_edit.currentIndexChanged.connect(self._updateview)
         self._qui.path_edit.currentIndexChanged.connect(self._updateform)
+        self._qui.add_button.clicked.connect(self._addpathmap)
 
         self.setwebconf(webconf or wconfig.config())
         self._updateform()
@@ -110,9 +111,10 @@ class WebconfForm(QWidget):
         self.openwebconf(path)  # reopen in case file path changed
 
     @pyqtSlot()
-    def on_add_button_clicked(self):
+    def _addpathmap(self, path=None, localpath=None):
         path, localpath = _PathDialog.getaddpathmap(
-            self, invalidpaths=self._webconfmodel.paths)
+            self, path=path, localpath=localpath,
+            invalidpaths=self._webconfmodel.paths)
         if path:
             self._webconfmodel.addpathmap(path, localpath)
 
@@ -156,7 +158,7 @@ class _PathDialog(QDialog):
         self.setLayout(QFormLayout())
         self._initfields()
         self._initbuttons(acceptlabel)
-        self._path_edit.setText(path or '')
+        self._path_edit.setText(path or os.path.basename(localpath or ''))
         self._localpath_edit.setText(localpath or '')
         self._updateform()
 
@@ -222,8 +224,9 @@ class _PathDialog(QDialog):
                     and self.path not in self._invalidpaths)
 
     @classmethod
-    def getaddpathmap(cls, parent, invalidpaths=None):
+    def getaddpathmap(cls, parent, path=None, localpath=None, invalidpaths=None):
         d = cls(title=_('Add Path to Serve'), acceptlabel=_('Add'),
+                path=path, localpath=localpath,
                 invalidpaths=invalidpaths, parent=parent)
         if d.exec_():
             return d.path, d.localpath
