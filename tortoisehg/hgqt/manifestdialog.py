@@ -37,26 +37,52 @@ class ManifestDialog(QMainWindow):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
-    max_file_size = 100000  # TODO: make it configurable
-
-    def __init__(self, ui, repo, noderev):
-        QMainWindow.__init__(self)
-        self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (repo.root, noderev))
+    def __init__(self, ui, repo, rev=None, parent=None):
+        QMainWindow.__init__(self, parent)
+        self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (repo.root, rev))
         self.resize(400, 300)
 
-        # hg repo
+        self._manifest_widget = ManifestWidget(ui, repo, rev)
+        self.setCentralWidget(self._manifest_widget)
+
+        self._readsettings()
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(ManifestDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('manifest/geom').toByteArray())
+        # TODO: don't call deeply
+        self._manifest_widget.splitter.restoreState(
+            s.value('manifest/splitter').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('manifest/geom', self.saveGeometry())
+        # TODO: don't call deeply
+        s.setValue('manifest/splitter',
+                   self._manifest_widget.splitter.saveState())
+
+class ManifestWidget(QWidget):
+    """Display file tree and contents at the specified revision"""
+    max_file_size = 100000  # TODO: make it configurable
+
+    def __init__(self, ui, repo, rev=None, parent=None):
+        super(ManifestWidget, self).__init__(parent)
         self._ui = ui
         self.repo = repo
-        self.rev = noderev
+        self.rev = rev
 
         self._initwidget()
         self.setupModels()
-        self._readsettings()
         self.treeView.setCurrentIndex(self.treemodel.index(0, 0))
 
     def _initwidget(self):
+        self.setLayout(QVBoxLayout())
         self.splitter = QSplitter()
-        self.setCentralWidget(self.splitter)
+        self.layout().addWidget(self.splitter)
         self.treeView = QTreeView()
         self.textView = QsciScintilla()
         self.textView.setMarginLineNumbers(1, True)
@@ -103,20 +129,6 @@ class ManifestDialog(QMainWindow):
         nlines = data.count('\n')
         self.textView.setMarginWidth(1, str(nlines)+'00')
         self.textView.setText(data)
-
-    def closeEvent(self, event):
-        self._writesettings()
-        super(ManifestDialog, self).closeEvent(event)
-
-    def _readsettings(self):
-        s = QSettings()
-        self.restoreGeometry(s.value('manifest/geom').toByteArray())
-        self.splitter.restoreState(s.value('manifest/splitter').toByteArray())
-
-    def _writesettings(self):
-        s = QSettings()
-        s.setValue('manifest/geom', self.saveGeometry())
-        s.setValue('manifest/splitter', self.splitter.saveState())
 
 
 def run(ui, *pats, **opts):
