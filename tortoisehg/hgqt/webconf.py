@@ -18,7 +18,7 @@ _FILE_FILTER = _('Config files (*.conf *.config *.ini);;Any files (*)')
 class WebconfForm(QWidget):
     """Widget to show/edit webconf"""
     def __init__(self, parent=None, webconf=None):
-        super(WebconfForm, self).__init__(parent)
+        super(WebconfForm, self).__init__(parent, acceptDrops=True)
         self._qui = Ui_WebconfForm()
         self._qui.setupUi(self)
         self._initicons()
@@ -38,6 +38,24 @@ class WebconfForm(QWidget):
         self._qui.add_button.setIcon(qtlib.geticon('fileadd'))
         self._qui.edit_button.setIcon(qtlib.geticon('fallback'))  # TODO
         self._qui.remove_button.setIcon(qtlib.geticon('filedelete'))
+
+    def dragEnterEvent(self, event):
+        if self._getlocalpath_from_dropevent(event):
+            event.setDropAction(Qt.LinkAction)
+            event.accept()
+
+    def dropEvent(self, event):
+        localpath = self._getlocalpath_from_dropevent(event)
+        if localpath:
+            event.setDropAction(Qt.LinkAction)
+            event.accept()
+            self._addpathmap(localpath=localpath)
+
+    @staticmethod
+    def _getlocalpath_from_dropevent(event):
+        m = event.mimeData()
+        if m.hasFormat('text/uri-list') and len(m.urls()) == 1:
+            return unicode(m.urls()[0].toLocalFile())
 
     def setwebconf(self, webconf):
         """set current webconf object"""
