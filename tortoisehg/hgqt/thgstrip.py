@@ -13,7 +13,7 @@ from mercurial import hg, ui, error
 
 from tortoisehg.util import hglib, paths, thgrepo
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, csinfo, qtlib
+from tortoisehg.hgqt import cmdui, cslist, qtlib
 
 class StripDialog(QDialog):
     """Dialog to strip changesets"""
@@ -24,7 +24,6 @@ class StripDialog(QDialog):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
-        self.limit = 20
         self.ui = ui.ui()
         if repo:
             self.repo = repo
@@ -71,20 +70,8 @@ class StripDialog(QDialog):
             combo.addItem(hglib.tounicode(tag))
 
         ### preview box, contained in scroll area, contains preview grid
-        self.scrollarea = QScrollArea()
-        self.scrollarea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.scrollarea.setWidgetResizable(True)
-        self.previewbox = QWidget()
-        self.previewbox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.previewgrid = QVBoxLayout()
-
-        #### preview layout grid, contains Factory objects (one per revision)
-        self.previewgrid.setSpacing(6)
-        self.previewgrid.setSizeConstraint(QLayout.SetMinAndMaxSize)
-        self.previewbox.setLayout(self.previewgrid)
-
-        self.scrollarea.setWidget(self.previewbox)
-        grid.addWidget(self.scrollarea, 2, 1, Qt.AlignLeft | Qt.AlignTop)
+        self.cslist = cslist.ChangesetList()
+        grid.addWidget(self.cslist, 2, 1, Qt.AlignLeft | Qt.AlignTop)
 
         ### options
         optbox = QVBoxLayout()
@@ -127,9 +114,9 @@ class StripDialog(QDialog):
         box.addWidget(buttons)
 
         # signal handlers
-        self.rev_combo.editTextChanged.connect(lambda *a: self.strip_info())
+        self.rev_combo.editTextChanged.connect(lambda *a: self.preview())
         self.rev_combo.lineEdit().returnPressed.connect(self.strip)
-        self.discard_chk.toggled.connect(lambda *a: self.strip_info())
+        self.discard_chk.toggled.connect(lambda *a: self.preview())
 
         # dialog setting
         self.setLayout(box)
@@ -140,56 +127,46 @@ class StripDialog(QDialog):
 
         # prepare to show
         self.rev_combo.lineEdit().selectAll()
-        self.previewbox.setHidden(False)
+        self.cslist.setHidden(False)
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
         self.nobackup_chk.setHidden(True)
-        self.strip_info()
+        self.preview()
 
     ### Private Methods ###
 
-    def clear_preview(self):
-        while self.previewgrid.count():
-            w = self.previewgrid.takeAt(0).widget()
-            w.deleteLater()
+    def get_rev(self):
+        """Return the integer revision number of the input or None"""
+        revstr = hglib.fromunicode(self.rev_combo.currentText())
+        if not revstr:
+            return None
+        try:
+            rev = self.repo[revstr].rev()
+        except (error.RepoError, error.LookupError):
+            return None
+        return rev
 
-    def preview_updated(self, rev, uselimit=True):
-        items = ('%(rev)s', ' %(branch)s', ' %(tags)s', ' %(summary)s')
-        style = csinfo.labelstyle(contents=items, width=350, selectable=True)
-        factory = csinfo.factory(self.repo, style=style)
-        parctxs = self.repo[None].parents()
+    def updatecslist(self, uselimit=True):
+        """Update the cs list and return the success status as a bool"""
+        rev = self.get_rev()
+        if not rev:
+            return False
         striprevs = list(self.repo.changelog.descendants(rev))
         striprevs.append(rev)
         striprevs.sort()
-        self.resultlbl.setText(_("%s will be stripped") % _("%s changesets")
-                               % len(striprevs))
-        if uselimit and len(striprevs) > self.limit:
-            showrevs = striprevs[:self.limit - 1] + [striprevs[-1]]
-            addsnip = True
-        else:
-            showrevs = striprevs
-            addsnip = False
-        self.clear_preview()
-        for showrev in showrevs:
-            info = factory()
-            info.update(self.repo[showrev])
-            if showrev == showrevs[-1] and addsnip:
-                self.previewgrid.addWidget(QLabel("..."))
-            self.previewgrid.addWidget(info, Qt.AlignTop)
+        self.cslist.clear()
+        self.cslist.update(self.repo, striprevs)
+        return True
 
-    def strip_info(self):
-        revstr = hglib.fromunicode(self.rev_combo.currentText())
-        if not revstr:
-            self.clear_preview()
-            self.resultlbl.setText(_('unknown revision!'))
-            self.strip_btn.setDisabled(True)
-            return
-        try:
-            self.preview_updated(self.repo[revstr].rev())
+    def preview(self):
+        if self.updatecslist():
+            striprevs = self.cslist.curitems
+            self.resultlbl.setText(_("%s will be stripped") %
+                                   _("%s changesets") % len(striprevs))
             self.strip_btn.setEnabled(True)
-        except (error.LookupError, error.RepoLookupError, error.RepoError):
-            self.clear_preview()
+        else:
+            self.cslist.clear()
             self.resultlbl.setText(_('unknown revision!'))
             self.strip_btn.setDisabled(True)
 
