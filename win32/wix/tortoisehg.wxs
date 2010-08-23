@@ -91,15 +91,6 @@
             <File Id='thgEXE' Name='thg.exe' KeyPath='yes'
                   Source='dist\thg.exe'
             />
-            <File Id='hgEXE' Name='hg.exe'
-                  Source='dist\hg.exe'
-            />
-            <File Id='libraryZIP' Name='library.zip'
-                  Source='dist\library.zip'
-            />
-            <File Id='pythonDLL' Name='python26.dll'
-                  Source='dist\python26.dll'
-            />
             <Environment Id="Environment" Name="PATH" Part="last" System="yes"
                          Permanent="no" Value="[INSTALLDIR]" Action="set"
             />
@@ -320,6 +311,7 @@
         <ComponentRef Id='mergetools.rc' />
         <ComponentRef Id='ExtensionVersions' />
         <ComponentRef Id='helpFolder' />
+        <ComponentRef Id='distOutput' />
         <ComponentGroupRef Id='templatesFolder' />
         <ComponentRef Id='Icons' />
         <ComponentRef Id='SvgIcons' />
