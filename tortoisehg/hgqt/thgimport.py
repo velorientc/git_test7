@@ -6,6 +6,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -15,7 +17,6 @@ from tortoisehg.util import hglib, paths, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, cslist, qtlib
 
-_FILE_SEP = ";"
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
 
@@ -123,7 +124,7 @@ class ImportDialog(QDialog):
         path = QFileDialog.getOpenFileNames(parent=self, caption=caption,
             filter=_FILE_FILTER)
         if path:
-            response = _FILE_SEP.join([str(x) for x in path])
+            response = os.pathsep.join([str(x) for x in path])
             self.src_combo.setEditText(response)
             self.src_combo.setFocus()
 
@@ -145,7 +146,7 @@ class ImportDialog(QDialog):
             self.cslist.clear()
             self.import_btn.setDisabled(True)
         else:
-            patches = patches.split(_FILE_SEP)
+            patches = patches.split(os.pathsep)
             self.cslist.update(self.repo, patches)
             self.import_btn.setEnabled(True)
         self.updatestatus()
