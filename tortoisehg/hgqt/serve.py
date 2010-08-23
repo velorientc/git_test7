@@ -222,11 +222,11 @@ def _create_server(orig, ui, app):
             server.server_close()
 
     def handle_error(orig, request, client_address):
-        type = sys.exc_info()[0]
+        type, value, _traceback = sys.exc_info()
         if issubclass(type, KeyboardInterrupt):
             server._serving = False
         else:
-            orig(request, client_address)
+            ui.write_err('%s\n' % value)
 
     extensions.wrapfunction(server, 'serve_forever', serve_forever)
     extensions.wrapfunction(server, 'handle_error', handle_error)
