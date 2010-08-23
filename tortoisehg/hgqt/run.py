@@ -593,6 +593,11 @@ def strip(ui, *pats, **opts):
     from tortoisehg.hgqt.thgstrip import run
     qtrun(run, ui, *pats, **opts)
 
+def thgimport(ui, *pats, **opts):
+    """import an ordered set of patches"""
+    from tortoisehg.hgqt.thgimport import run
+    qtrun(run, ui, *pats, **opts)
+
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
@@ -850,6 +855,10 @@ table = {
     "^grep|search": (grep, [], _('thg grep')),
     "^guess": (guess, [], _('thg guess')),
     "^hgignore|ignore|filter": (hgignore, [], _('thg hgignore [FILE]')),
+    "import": (thgimport,
+        [('', 'repo', False, _('import to the repository')),
+         ('', 'mq', False, _('import to the patch queue (MQ)'))],
+        _('thg import [OPTION] [SOURCE]...')),
     "^init": (init, [], _('thg init [DEST]')),
     "^email":
         (email,
