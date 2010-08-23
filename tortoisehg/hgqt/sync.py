@@ -17,7 +17,7 @@ from mercurial import config, hg, ui, url, util, error
 
 from tortoisehg.util import hglib, thgrepo
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, hgemail
+from tortoisehg.hgqt import qtlib, cmdui
 
 # TODO
 # Write keyring help, connect to help button
@@ -312,13 +312,8 @@ class SyncWidget(QWidget):
         self.run(['--repository', self.root, 'push'])
 
     def emailclicked(self):
-        try:
-            _ui = ui.ui()
-            repo = thgrepo.repository(_ui, path=self.root)
-        except error.RepoError:
-            return
-        dialog = hgemail.EmailDialog(_ui, repo, None, self)
-        dialog.exec_()
+        from tortoisehg.hgqt import run as _run
+        _run.email(ui.ui(), root=self.root)
 
     def removeAlias(self, alias):
         if iniparse is None:
