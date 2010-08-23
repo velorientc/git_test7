@@ -330,7 +330,6 @@
         <ComponentRef Id='HgCmd' />
         <ComponentGroupRef Id='templatesFolder' />
         <ComponentRef Id='Icons' />
-        <ComponentRef Id='SvgIcons' />
       </Feature>
       <Feature Id='VCRedist' Title='Visual C++ 9.0 Runtime'
                AllowAdvertise='no' Display='hidden' Level='1'>

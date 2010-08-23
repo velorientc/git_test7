@@ -41,7 +41,6 @@
 
   <!-- icons.wxs -->
   <?define Icons.guid = {BBC91828-1D14-4BD2-AE23-892770DAD3FF} ?>
-  <?define SvgIcons.guid = {75139DBD-8E51-4332-A5B4-7299E68FFBE9} ?>
 
   <!-- thg-i18n.wxs -->
   <?define thgI18nFolder.guid = {55DC742A-1E22-4A6C-B090-FD1E91AB8646} ?>
