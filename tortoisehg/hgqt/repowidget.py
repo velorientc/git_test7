@@ -18,7 +18,7 @@ from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge
-from tortoisehg.hgqt import archive, thgstrip, run
+from tortoisehg.hgqt import archive, thgimport, thgstrip, run
 
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
@@ -127,6 +127,10 @@ class RepoWidget(QWidget):
 
     def forward(self):
         self.repoview.forward()
+
+    def thgimport(self):
+        dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
+        dlg.exec_()
 
     def verify(self):
         cmdline = ['--repository', self.repo.root, 'verify']

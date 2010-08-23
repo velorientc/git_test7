@@ -255,6 +255,7 @@ class Workbench(QMainWindow):
         self.actionShowLog = a
 
         self.actionServe = QAction(_("Web Server"), self)
+        self.actionImport = QAction(_("Import"), self)
         self.actionVerify = QAction(_("Verify"), self)
         self.actionRecover = QAction(_("Recover"), self)
         self.actionRollback = QAction(_("Rollback/Undo"), self)
@@ -285,6 +286,8 @@ class Workbench(QMainWindow):
 
         self.menuRepository = m = QMenu(_("&Repository"), self.menubar)
         m.addAction(self.actionServe)
+        m.addSeparator()
+        m.addAction(self.actionImport)
         m.addSeparator()
         m.addAction(self.actionVerify)
         m.addAction(self.actionRecover)
@@ -579,6 +582,7 @@ class Workbench(QMainWindow):
         self.actionQuit.triggered.connect(self.close)
         self.actionBack.triggered.connect(self.back)
         self.actionForward.triggered.connect(self.forward)
+        self.actionImport.triggered.connect(self.thgimport)
         self.actionLoadAll.triggered.connect(self.loadall)
         self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
         self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
@@ -682,6 +686,11 @@ class Workbench(QMainWindow):
         if w:
             from tortoisehg.hgqt import run
             run.serve(self.ui, root=w.repo.root)
+
+    def thgimport(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.thgimport()
 
     def verify(self):
         w = self.repoTabsWidget.currentWidget()
