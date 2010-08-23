@@ -26,7 +26,7 @@ class LogDockWidget(QDockWidget):
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
                          QDockWidget.DockWidgetFloatable)
-        self.setWindowTitle(_('Progress Log'))
+        self.setWindowTitle(_('Output Log'))
 
         mainframe = QFrame()
         vbox = QVBoxLayout()
