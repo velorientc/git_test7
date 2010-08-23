@@ -51,6 +51,37 @@
           <File Name="thg_logo.ico" />
           <File Name="thg_logo_92x50.png" />
           <File Name="TortoiseMerge.ico" />
+
+          <File Name="archive.svg" />
+          <File Name="back.svg" />
+          <File Name="clean.svg" />
+          <File Name="clone.svg" />
+          <File Name="commit.svg" />
+          <File Name="down.svg" />
+          <File Name="error.svg" />
+          <File Name="fallback.svg" />
+          <File Name="find.svg" />
+          <File Name="fonts.svg" />
+          <File Name="forward.svg" />
+          <File Name="goto.svg" />
+          <File Name="help.svg" />
+          <File Name="left.svg" />
+          <File Name="leftright.svg" />
+          <File Name="log.svg" />
+          <File Name="merge.svg" />
+          <File Name="modified.svg" />
+          <File Name="mqdiff.svg" />
+          <File Name="mqpatch.svg" />
+          <File Name="quit.svg" />
+          <File Name="reload.svg" />
+          <File Name="rename.svg" />
+          <File Name="right.svg" />
+          <File Name="success.svg" />
+          <File Name="sync.svg" />
+          <File Name="tag.svg" />
+          <File Name="up.svg" />
+          <File Name="update.svg" />
+          <File Name="warning.svg" />
         </Component>
       </Directory>
 
