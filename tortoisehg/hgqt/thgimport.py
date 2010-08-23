@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
+import os, tempfile
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -29,6 +29,8 @@ class ImportDialog(QDialog):
         super(ImportDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
+
+        self.tempfiles = []
 
         self.ui = ui.ui()
         if repo:
@@ -58,19 +60,25 @@ class ImportDialog(QDialog):
         self.file_btn = QPushButton(_('Browse...'))
         self.file_btn.setAutoDefault(False)
         self.connect(self.file_btn, SIGNAL("clicked()"), self.browsefiles)
+        self.clip_btn = QPushButton(_('Import from Clipboard'))
+        self.clip_btn.setAutoDefault(False)
+        self.connect(self.clip_btn, SIGNAL("clicked()"), self.getcliptext)
         grid.addWidget(QLabel(_('Source:')), 0, 0)
         grid.addWidget(self.src_combo, 0, 1)
-        grid.addWidget(self.file_btn, 0, 2)
+        srcbox = QHBoxLayout()
+        srcbox.addWidget(self.file_btn)
+        srcbox.addWidget(self.clip_btn)
+        grid.addLayout(srcbox, 1, 1)
         self.p0chk = QCheckBox(_('Do not strip paths (-p0), '
                                  'required for SVN patches'))
-        grid.addWidget(self.p0chk, 1, 1, Qt.AlignLeft)
-        grid.addWidget(QLabel(_('Preview:')), 2, 0, Qt.AlignLeft | Qt.AlignTop)
+        grid.addWidget(self.p0chk, 2, 1, Qt.AlignLeft)
+        grid.addWidget(QLabel(_('Preview:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
         self.status = QLabel("")
-        grid.addWidget(self.status, 2, 1, Qt.AlignLeft | Qt.AlignTop)
+        grid.addWidget(self.status, 3, 1, Qt.AlignLeft | Qt.AlignTop)
 
         ### patch list
         self.cslist = cslist.ChangesetList()
-        grid.addWidget(self.cslist, 3, 1, Qt.AlignLeft | Qt.AlignTop)
+        grid.addWidget(self.cslist, 4, 1, Qt.AlignLeft | Qt.AlignTop)
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -128,6 +136,17 @@ class ImportDialog(QDialog):
             self.src_combo.setEditText(response)
             self.src_combo.setFocus()
 
+    def getcliptext(self):
+        text = hglib.fromunicode(QApplication.clipboard().text())
+        if not text:
+            return
+        filename = self.writetempfile(text)
+        curtext = self.src_combo.currentText()
+        if curtext:
+            self.src_combo.setEditText(curtext + os.pathsep + filename)
+        else:
+            self.src_combo.setEditText(filename)
+
     def updatestatus(self):
         items = self.cslist.curitems
         count = items and len(items) or 0
@@ -160,6 +179,29 @@ class ImportDialog(QDialog):
         cmdline.extend(self.cslist.curitems)
 
         self.cmd.run(cmdline)
+
+    def writetempfile(self, text):
+        fd, filename = tempfile.mkstemp(suffix='.patch', prefix='thg-import-')
+        try:
+            os.write(fd, text)
+        finally:
+            os.close(fd)
+        self.tempfiles.append(filename)
+        return filename
+
+    def unlinktempfiles(self):
+        for path in self.tempfiles:
+            os.unlink(path)
+
+    ### Override Handlers ###
+
+    def accept(self):
+        self.unlinktempfiles()
+        super(ImportDialog, self).accept()
+
+    def reject(self):
+        self.unlinktempfiles()
+        super(ImportDialog, self).reject()
 
     ### Signal Handlers ###
 
