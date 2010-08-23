@@ -461,7 +461,7 @@ def get_revision_desc(fctx, curpath=None):
     else:
         source = '(%s)' % fctx.path()
     date = age(fctx.date())
-    l = fctx.description().replace(u'\0', '').splitlines()
+    l = tounicode(fctx.description()).replace('\0', '').splitlines()
     summary = l and l[0] or ''
     return '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
 
