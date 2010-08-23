@@ -92,7 +92,7 @@
                   Source='dist\thg.exe'
             />
             <Environment Id="Environment" Name="PATH" Part="last" System="yes"
-                         Permanent="no" Value="[INSTALLDIR]" Action="set"
+                         Permanent="no" Value="[INSTALLDIR]bin" Action="set"
             />
           </Component>
           <Component Id='ExtensionVersions' Guid='$(var.ExtensionVersions.guid)'>
@@ -160,16 +160,6 @@
                   Source='..\contrib\kdiff3.exe'
             />
           </Component>
-          <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)'>
-            <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
-                  Source='..\contrib\TortoisePlink.exe'
-            />
-          </Component>
-          <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)'>
-            <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
-                  Source='..\contrib\Pageant.exe'
-            />
-          </Component>
           <Directory Id='docFolder' Name='doc'>
             <Component Id='chmFile' Guid='$(var.chmFile.guid)'>
               <File Id='chmFile' Name='TortoiseHg.chm' KeyPath='yes'
@@ -197,6 +187,29 @@
                             Icon="hgIcon.ico" IconIndex="0" Advertise="yes"
                   />
               </File>
+            </Component>
+          </Directory>
+
+          <Directory Id='binFolder' Name='bin'>
+            <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)'>
+              <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
+                    Source='..\contrib\TortoisePlink.exe'
+              />
+            </Component>
+            <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)'>
+              <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
+                    Source='..\contrib\Pageant.exe'
+              />
+            </Component>
+            <Component Id='ThgCmd' Guid='$(var.thgcmd.guid)'>
+              <File Id='Thg.Cmd' Name='thg.cmd' KeyPath='yes'
+                    Source='win32\thg.cmd'
+              />
+            </Component>
+            <Component Id='HgCmd' Guid='$(var.hgcmd.guid)'>
+              <File Id='Hg.Cmd' Name='hg.cmd' KeyPath='yes'
+                    Source='win32\hg.cmd'
+              />
             </Component>
           </Directory>
 
@@ -312,6 +325,8 @@
         <ComponentRef Id='ExtensionVersions' />
         <ComponentRef Id='helpFolder' />
         <ComponentRef Id='distOutput' />
+        <ComponentRef Id='ThgCmd' />
+        <ComponentRef Id='HgCmd' />
         <ComponentGroupRef Id='templatesFolder' />
         <ComponentRef Id='Icons' />
         <ComponentRef Id='SvgIcons' />

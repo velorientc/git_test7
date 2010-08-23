@@ -66,8 +66,11 @@
 
   <?define docdiffEXE.guid = {F4A6629F-85C1-406E-8262-C02E8DBDB4FA} ?>
   <?define KDiff3EXE.guid = {075ECC11-1B44-48DB-B7FD-D3207BB801A4} ?>
+
   <?define TortoisePlinkEXE.guid = {7679909C-7390-4546-9FCA-A5A31520DA50} ?>
   <?define PageantEXE.guid = {228F24A3-FA1C-4439-BCB4-71DF790E61DC} ?>
+  <?define thgcmd.guid = {7B660ED7-CAEA-4851-8ABD-751251842457} ?>
+  <?define hgcmd.guid = {4A986763-BD4D-46DC-89CD-A36F037D847E} ?>
 
   <?define chmFile.guid = {422C758A-6CB2-4531-BE6A-366B3CD1FD8D} ?>
   <?define pdfFile.guid = {A0EC2473-996A-4DBC-9F44-76B63B57AE31} ?>
