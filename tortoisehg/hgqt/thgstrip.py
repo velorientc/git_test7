@@ -51,8 +51,8 @@ class StripDialog(QDialog):
         grid.addWidget(QLabel(_('Strip:')), 0, 0)
         grid.addWidget(combo, 0, 1)
         grid.addWidget(QLabel(_('Preview:')), 1, 0, Qt.AlignLeft | Qt.AlignTop)
-        self.resultlbl = QLabel("")
-        grid.addWidget(self.resultlbl, 1, 1, Qt.AlignLeft | Qt.AlignTop)
+        self.status = QLabel("")
+        grid.addWidget(self.status, 1, 1, Qt.AlignLeft | Qt.AlignTop)
 
         if rev is None:
             rev = self.repo.dirstate.branch()
@@ -162,12 +162,15 @@ class StripDialog(QDialog):
     def preview(self):
         if self.updatecslist():
             striprevs = self.cslist.curitems
-            self.resultlbl.setText(_("%s will be stripped") %
-                                   _("%s changesets") % len(striprevs))
+            cstext = qtlib.markup(_("%s changesets") % len(striprevs),
+                                  weight='bold')
+            self.status.setText(_("%s will be stripped") % cstext)
             self.strip_btn.setEnabled(True)
         else:
             self.cslist.clear()
-            self.resultlbl.setText(_('unknown revision!'))
+            cstext = qtlib.markup(_('Unknown revision!'), fg='red',
+                                  weight='bold')
+            self.status.setText(cstext)
             self.strip_btn.setDisabled(True)
 
     def strip(self):

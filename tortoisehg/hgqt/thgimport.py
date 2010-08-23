@@ -130,12 +130,14 @@ class ImportDialog(QDialog):
     def updatestatus(self):
         items = self.cslist.curitems
         count = items and len(items) or 0
-        countstr = _("%s patches") % count
+        countstr = qtlib.markup(_("%s patches") % count, weight='bold')
         if count:
             self.status.setText(_('%s will be imported to the repository') %
                                 countstr)
         else:
-            self.status.setText(_('Nothing to import'))
+            text = qtlib.markup(_('Nothing to import'), weight='bold',
+                                fg='red')
+            self.status.setText(text)
 
     def preview(self):
         patches = hglib.fromunicode(self.src_combo.currentText())
