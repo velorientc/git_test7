@@ -87,6 +87,14 @@ def check_getitem_empty_then_set_no_effect():
     assert not c.get('unknown', 'bar')
 
 @with_both
+def check_set_followed_by_getitem_empty():
+    c = newwconfig()
+    c['unknown']
+    c.set('unknown', 'foo', 'bar')
+    assert_equals('bar', c.get('unknown', 'foo'))
+    assert_equals('bar', c['unknown']['foo'])
+
+@with_both
 def check_dict_contains():
     c = newwconfig({'foo.bar': 'x'})
     assert 'bar' in c['foo']

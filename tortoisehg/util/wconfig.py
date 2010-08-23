@@ -134,8 +134,11 @@ class _wconfig(object):
         try:
             return self._sections[section]
         except KeyError:
-            self._sections[section] = _wsortdict(self._config[section])
-            return self._sections[section]
+            if self._config[section]:
+                self._sections[section] = _wsortdict(self._config[section])
+                return self._sections[section]
+            else:
+                return {}
 
     def __iter__(self):
         return iter(self._config)
