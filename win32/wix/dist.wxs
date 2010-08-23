@@ -56,8 +56,8 @@
     <DirectoryRef Id="INSTALLDIR">
       <Directory Id="imgFmtDir" Name="imageformats" FileSource="$(var.SourceDir)/imageformats">
         <Component Id="imageFormats" Guid="$(var.imageformats.guid)">
-          <File Name="qico4.exe" KeyPath="yes" />
-          <File Name="qsvg4.exe" />
+          <File Name="qico4.dll" KeyPath="yes" />
+          <File Name="qsvg4.dll" />
         </Component>
       </Directory>
     </DirectoryRef>

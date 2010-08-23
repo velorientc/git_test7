@@ -325,6 +325,7 @@
         <ComponentRef Id='ExtensionVersions' />
         <ComponentRef Id='helpFolder' />
         <ComponentRef Id='distOutput' />
+        <ComponentRef Id='imageFormats' />
         <ComponentRef Id='ThgCmd' />
         <ComponentRef Id='HgCmd' />
         <ComponentGroupRef Id='templatesFolder' />
