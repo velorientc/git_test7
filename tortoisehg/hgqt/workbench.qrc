@@ -1,0 +1,40 @@
+<RCC>
+  <qresource prefix="/" >
+    <file>icons/log.svg</file>
+    <file>icons/quit.svg</file>
+    <file>icons/reload.svg</file>
+    <file>icons/back.svg</file>
+    <file>icons/forward.svg</file>
+    <file>icons/left.svg</file>
+    <file>icons/right.svg</file>
+    <file>icons/up.svg</file>
+    <file>icons/down.svg</file>
+    <file>icons/leftright.svg</file>
+    <file>icons/close.png</file>
+    <file>icons/help.svg</file>
+    <file>icons/find.svg</file>
+    <file>icons/goto.svg</file>
+    <file>icons/modified.svg</file>
+    <file>icons/clean.svg</file>
+    <file>icons/mqdiff.svg</file>
+    <file>icons/mqpatch.svg</file>
+    <file>icons/plus.png</file>
+    <file>icons/minus.png</file>
+    <file>icons/hg.ico</file>
+    <file>icons/fileadd.ico</file>
+    <file>icons/filedelete.ico</file>
+    <file>icons/fallback.svg</file>
+    <file>icons/success.svg</file>
+    <file>icons/error.svg</file>
+    <file>icons/warning.svg</file>
+    <file>icons/tag.svg</file>
+    <file>icons/archive.svg</file>
+    <file>icons/clone.svg</file>
+    <file>icons/update.svg</file>
+    <file>icons/sync.svg</file>
+    <file>icons/merge.svg</file>
+    <file>icons/rename.svg</file>
+    <file>icons/commit.svg</file>
+    <file>icons/fonts.svg</file>
+  </qresource>
+</RCC>

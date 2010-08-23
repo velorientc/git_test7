@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include guids.wxi ?>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR" FileSource="$(var.SourceDir)">
+      <Component Id="distOutput" Guid="$(var.dist.guid)">
+        <File Name="library.zip" KeyPath="yes" />
+        <File Name="hg.exe" />
+        <File Name="mercurial.base85.pyd" />
+        <File Name="mercurial.bdiff.pyd" />
+        <File Name="mercurial.diffhelpers.pyd" />
+        <File Name="mercurial.mpatch.pyd" />
+        <File Name="mercurial.osutil.pyd" />
+        <File Name="mercurial.parsers.pyd" />
+        <File Name="mingwm10.dll" />
+        <File Name="pyexpat.pyd" />
+        <File Name="PyQt4.Qsci.pyd" />
+        <File Name="PyQt4.QtCore.pyd" />
+        <File Name="PyQt4.QtGui.pyd" />
+        <File Name="libgcc_s_dw2-1.dll" />
+        <File Name="python26.dll" />
+        <File Name="pythoncom26.dll" />
+        <File Name="pywintypes26.dll" />
+        <File Name="QtCore4.dll" />
+        <File Name="QtGui4.dll" />
+        <File Name="qscintilla2.dll" />
+        <File Name="select.pyd" />
+        <File Name="sip.pyd" />
+        <File Name="unicodedata.pyd" />
+        <File Name="win32api.pyd" />
+        <File Name="win32com.shell.shell.pyd" />
+        <File Name="win32console.pyd" />
+        <File Name="win32cred.pyd" />
+        <File Name="win32event.pyd" />
+        <File Name="win32file.pyd" />
+        <File Name="win32gui.pyd" />
+        <File Name="win32net.pyd" />
+        <File Name="win32pipe.pyd" />
+        <File Name="win32process.pyd" />
+        <File Name="win32security.pyd" />
+        <File Name="win32trace.pyd" />
+        <File Name="_ctypes.pyd" />
+        <File Name="_ctypes_test.pyd" />
+        <File Name="_elementtree.pyd" />
+        <File Name="_hashlib.pyd" />
+        <File Name="_socket.pyd" />
+        <File Name="_ssl.pyd" />
+        <File Name="_win32sysloader.pyd" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+      <Directory Id="imgFmtDir" Name="imageformats" FileSource="$(var.SourceDir)/imageformats">
+        <Component Id="imageFormats" Guid="$(var.imageformats.guid)">
+          <File Name="qico4.dll" KeyPath="yes" />
+          <File Name="qsvg4.dll" />
+        </Component>
+      </Directory>
+    </DirectoryRef>
+  </Fragment>
+
+</Wix>
