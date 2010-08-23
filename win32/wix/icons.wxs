@@ -52,32 +52,6 @@
           <File Name="thg_logo_92x50.png" />
           <File Name="TortoiseMerge.ico" />
         </Component>
-
-        <Directory Id="SvgDirectory" Name="svg">
-          <Component Id='SvgIcons' Guid='$(var.SvgIcons.guid)'>
-            <File Name="add.svg" KeyPath="yes" />
-            <File Name="checkout.svg" />
-            <File Name="clone.svg" />
-            <File Name="commit.svg" />
-            <File Name="detect_rename.svg" />
-            <File Name="ignore.svg" />
-            <File Name="init.svg" />
-            <File Name="log.svg" />
-            <File Name="merge.svg" />
-            <File Name="proxy.svg" />
-            <File Name="recovery.svg" />
-            <File Name="refresh_overlays.svg" />
-            <File Name="remove.svg" />
-            <File Name="repobrowse.svg" />
-            <File Name="revert.svg" />
-            <File Name="shelve.svg" />
-            <File Name="status.svg" />
-            <File Name="sync.svg" />
-            <File Name="thg_logo.svg" />
-          </Component>
-
-        </Directory>
-
       </Directory>
 
     </DirectoryRef>
