@@ -270,20 +270,6 @@ class Workbench(QMainWindow):
         tb.addSeparator()
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
-    # FIXME: remove this later
-    def __getattr__(self, name):
-        if name == '_dummystackedwidget':
-            self._dummystackedwidget = QStackedWidget(self)
-            return self._dummystackedwidget
-
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            print 'FIXME: accessing to %s via Workbench' % name
-            return getattr(w, name)
-        else:
-            print 'FIXME: returned dummy widget for %s' % name
-            return self._dummystackedwidget
-
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
 
