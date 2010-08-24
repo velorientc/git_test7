@@ -46,7 +46,7 @@
   <?define thgI18nFolder.guid = {55DC742A-1E22-4A6C-B090-FD1E91AB8646} ?>
 
   <!-- tortoisehg.wxs -->
-  <?define ProductUpgradeCode = {F6FC11E9-0629-4D51-9286-E7ED9C8A54BD} ?>
+  <?define ProductUpgradeCode = {838657CF-C9EC-452D-800D-0E70FC021D0A} ?>
 
   <?define ComponentMainExecutableGUID = {D648EC48-559C-4C66-A4CE-2D40A495DC5B} ?>
 

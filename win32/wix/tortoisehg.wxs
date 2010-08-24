@@ -14,7 +14,7 @@
     <?define IsX64 = no ?>
   <?endif?>
 
-  <?define ProgramRegKey = Software\TortoiseHg2 ?>
+  <?define ProgramRegKey = Software\TortoiseHg ?>
 
   <?include TortoiseOverlaysDefines.wxi ?>
 
@@ -86,7 +86,7 @@
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
-        <Directory Id='INSTALLDIR' Name='TortoiseHg2'>
+        <Directory Id='INSTALLDIR' Name='TortoiseHg'>
           <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)'>
             <File Id='thgEXE' Name='thg.exe' KeyPath='yes'
                   Source='dist\thg.exe'
