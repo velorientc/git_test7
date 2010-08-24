@@ -47,7 +47,7 @@ kdiff3.dirdiff=True
 
 thgKdiff3.regkey=Software\TortoiseHg\
 thgKdiff3.regname=KDiff3Path
-thgKdiff3.priority=-3
+thgKdiff3.priority=-4
 thgKdiff3.args=--auto --L1 base --L2 parent1 --L3 parent2 $base $local $other -o $output
 thgKdiff3.fixeol=True
 thgKdiff3.premerge=False
