@@ -24,7 +24,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
-from tortoisehg.hgqt.commit import CommitWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
@@ -50,7 +49,6 @@ class Workbench(QMainWindow):
         self._scanForRepoChanges = True
         self._searchWidgets = []
 
-        self.commitwidgets = {} # key: reporoot
         self.grepwidgets = {} # key: reporoot
         self.syncwidgets = {} # key: reporoot
 
@@ -297,8 +295,6 @@ class Workbench(QMainWindow):
             return self._dummystackedwidget
 
     def workingCopySelected(self):
-        cw = self.createCommitWidget(self.currentRepoRoot)
-        self.commitStackedWidget.setCurrentWidget(cw)
         self.taskTabsWidget.setCurrentIndex(1)
 
     def revisionSelected(self):
@@ -361,13 +357,7 @@ class Workbench(QMainWindow):
             tags = w.repo.tags().keys()
             self.currentRepoRoot = root = w.repo.root
             ti = self.taskTabsWidget.currentIndex()
-            if ti == self.commitTabIndex:
-                cw = self.getCommitWidget(root)
-                if cw:
-                    self.commitStackedWidget.setCurrentWidget(cw)
-                else:
-                    self.taskTabsWidget.setCurrentIndex(0)
-            elif ti == self.syncTabIndex:
+            if ti == self.syncTabIndex:
                 sw = self.getSyncWidget(root)
                 if sw:
                     self.syncStackedWidget.setCurrentWidget(sw)
@@ -413,26 +403,6 @@ class Workbench(QMainWindow):
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
 
-    def createCommitWidget(self, root):
-        cw = self.getCommitWidget(root)
-        if cw is None:
-            pats = {}
-            opts = {}
-            cw = CommitWidget(pats, opts, root=root)
-            cw.errorMessage.connect(self.showMessage)
-            def commitcomplete():
-                self.reloadRepository(root)
-                cw.stwidget.refreshWctx()
-            cw.commitComplete.connect(commitcomplete)
-            b = QPushButton(_('Commit'))
-            cw.buttonHBox.addWidget(b)
-            b.clicked.connect(cw.commit)
-            self.commitwidgets[root] = cw
-            self.commitStackedWidget.addWidget(cw)
-            s = QSettings()
-            cw.loadConfigs(s)
-        return cw
-
     def createGrepWidget(self, root):
         gw = self.getGrepWidget(root)
         if gw is None:
@@ -441,10 +411,6 @@ class Workbench(QMainWindow):
             self.grepwidgets[root] = gw
             self.grepStackedWidget.addWidget(gw)
         return gw
-
-    def getCommitWidget(self, root):
-        '''returns None if no commit widget for that repo has been created yet'''
-        return self.commitwidgets.get(root)
 
     def getGrepWidget(self, root):
         '''returns None if no grep widget for that repo has been created yet'''

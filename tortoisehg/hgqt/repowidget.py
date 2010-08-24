@@ -22,6 +22,7 @@ from tortoisehg.hgqt import archive, thgimport, thgstrip, run
 
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
+from tortoisehg.hgqt.commit import CommitWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -103,10 +104,14 @@ class RepoWidget(QWidget):
         sw.minimumSizeHint = lambda: QSize(0, 0)
         self.logTabIndex = idx = tt.addTab(sw, geticon('log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
+
         self.commitStackedWidget = sw = QStackedWidget()
         sw.minimumSizeHint = lambda: QSize(0, 0)
         self.commitTabIndex = idx = tt.addTab(sw, geticon('commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
+        self.commitStackedWidget.addWidget(self.createCommitWidget())
+        # TODO: unstack commit widget
+
         self.syncStackedWidget = sw = QStackedWidget()
         sw.minimumSizeHint = lambda: QSize(0, 0)
         self.syncTabIndex = idx = tt.addTab(sw, geticon('sync'), '')
@@ -115,6 +120,23 @@ class RepoWidget(QWidget):
         gw.minimumSizeHint = lambda: QSize(0, 0)
         self.grepTabIndex = idx = tt.addTab(gw, geticon('grep'), '') # TODO
         tt.setTabToolTip(idx, _("Search"))
+
+    def createCommitWidget(self):
+        pats = {}
+        opts = {}
+        # TODO: pass repo directly instead of repo.root ?
+        cw = CommitWidget(pats, opts, root=self.repo.root)
+        cw.errorMessage.connect(self.workbench.showMessage)
+        def commitcomplete():
+            self.reload()
+            cw.stwidget.refreshWctx()
+        cw.commitComplete.connect(commitcomplete)
+        b = QPushButton(_('Commit'))
+        cw.buttonHBox.addWidget(b)
+        b.clicked.connect(cw.commit)
+        s = QSettings()
+        cw.loadConfigs(s)
+        return cw
 
     def load_config(self):
         self._font = getfont(self.repo.ui, 'fontlog')
@@ -501,7 +523,7 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.on_filled()
 
     def getCommitWidget(self):
-        return self.workbench.getCommitWidget(self.repo.root)
+        return self.commitStackedWidget.currentWidget()
 
     def setRepomodel(self, branch, allparents=True):
         self.repomodel.setRepo(self.repo, branch=branch, allparents=allparents)
