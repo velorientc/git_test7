@@ -64,12 +64,14 @@ class RepoWidget(QWidget):
     def setupUi(self):
         SP = QSizePolicy
 
-        self.hbox = QHBoxLayout(self)
-        self.hbox.setSpacing(0)
-        self.hbox.setMargin(0)
+        self.repotabs_splitter = QSplitter(orientation=Qt.Vertical)
+        self.setLayout(QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().addWidget(self.repotabs_splitter)
 
         self.repoview = HgRepoView(self.workbench)
-        self.hbox.addWidget(self.repoview)
+        self.repotabs_splitter.addWidget(self.repoview)
+        self.repotabs_splitter.setCollapsible(0, False)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(1)
@@ -89,10 +91,11 @@ class RepoWidget(QWidget):
         self.blankMessageWidget = w
 
     def _inittasktabs(self):
-        # TODO: move self.repotabs_splitter to RepoWidget
-        self.taskTabsWidget = tt = QTabWidget(self.workbench.repotabs_splitter)
+        self.taskTabsWidget = tt = QTabWidget()
         tt.setDocumentMode(True)
         tt.setTabPosition(QTabWidget.East)
+        self.repotabs_splitter.addWidget(self.taskTabsWidget)
+
         self.revDetailsStackedWidget = sw = QStackedWidget()
         self.dummywidget = QWidget()
         self.revDetailsStackedWidget.addWidget(self.dummywidget)
@@ -540,9 +543,17 @@ class RepoWidget(QWidget):
 
     def storeSettings(self):
         self.revDetailsWidget.storeSettings()
+        s = QSettings()
+        # TODO: should it be 'repowidget/xxx' ?
+        s.setValue('Workbench/repotabs_splitter',
+                   self.repotabs_splitter.saveState())
 
     def restoreSettings(self):
         self.revDetailsWidget.restoreSettings()
+        s = QSettings()
+        # TODO: should it be 'repowidget/xxx' ?
+        self.repotabs_splitter.restoreState(
+            s.value('Workbench/repotabs_splitter').toByteArray())
 
     def closeRepoWidget(self):
         '''returns False if close should be aborted'''

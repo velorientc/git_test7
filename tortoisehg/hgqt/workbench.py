@@ -61,8 +61,6 @@ class Workbench(QMainWindow):
         self._quickbars = []
         self.disab_shortcuts = []
 
-        self.repotabs_splitter.setCollapsible(0, False)
-
         self.currentRepoRoot = ''
 
         self.setWindowTitle('TortoiseHg Workbench')
@@ -149,12 +147,7 @@ class Workbench(QMainWindow):
         vl.setSpacing(0)
         vl.setMargin(0)
 
-        self.repotabs_splitter = sp = QSplitter(self.centralwidget)
-        sp.hide()
-        sp.setOrientation(Qt.Vertical)
-        self.verticalLayout.addWidget(sp)
-
-        self.repoTabsWidget = tw = QTabWidget(self.repotabs_splitter)
+        self.repoTabsWidget = tw = QTabWidget()
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
         tw.setMovable(True)
@@ -163,6 +156,7 @@ class Workbench(QMainWindow):
         sp.setVerticalStretch(1)
         sp.setHeightForWidth(tw.sizePolicy().hasHeightForWidth())
         tw.setSizePolicy(sp)
+        vl.addWidget(tw)
 
         self.setCentralWidget(self.centralwidget)
 
@@ -386,11 +380,9 @@ class Workbench(QMainWindow):
                 else:
                     self.taskTabsWidget.setCurrentIndex(0)
             w.switchedTo()
-            self.repotabs_splitter.show()
         else:
             self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
             self.currentRepoRoot = ''
-            self.repotabs_splitter.hide()
 
             self.actionDiffMode.setEnabled(False)
             self.actionAnnMode.setEnabled(False)
@@ -814,21 +806,11 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
 
-        for n in self.splitternames:
-            s.setValue(wb + n, getattr(self, n).saveState())
-
     def restoreSettings(self):
         s = QSettings()
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
-
-        self.splitternames = []
-        sn = ('repotabs', )
-        for n in sn:
-            n += '_splitter'
-            self.splitternames.append(n)
-            getattr(self, n).restoreState(s.value(wb + n).toByteArray())
 
     def closeEvent(self, event):
         if not self.closeRepoTabs():
