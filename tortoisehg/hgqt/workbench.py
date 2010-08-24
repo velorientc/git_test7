@@ -341,12 +341,8 @@ class Workbench(QMainWindow):
     def repoTabChanged(self, index=0):
         self.setupBranchCombo()
 
-        # TODO: code to switch task tab should be no longer used
         w = self.repoTabsWidget.currentWidget()
-        tags = []
         if w:
-            tags = w.repo.tags().keys()
-            ti = self.taskTabsWidget.currentIndex()
             w.switchedTo()
         else:
 
