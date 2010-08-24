@@ -75,9 +75,6 @@ class Workbench(QMainWindow):
         connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
         connect(tw, SIGNAL('currentChanged(int)'), self.repoTabChanged)
 
-        tw = self.taskTabsWidget
-        tw.currentChanged.connect(self.taskTabChanged)
-
         self.createActions()
         self.createToolbars()
 
@@ -361,11 +358,6 @@ class Workbench(QMainWindow):
             self.actionAnnMode.setEnabled(False)
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
-
-    def taskTabChanged(self, index):
-        # TODO: maybe unused?
-        if index == self.commitTabIndex:
-            self.workingCopySelected()
 
     def getCurentRepoRoot(self):
         return self.currentRepoRoot
