@@ -23,6 +23,7 @@ from tortoisehg.hgqt import archive, thgimport, thgstrip, run
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
+from tortoisehg.hgqt.sync import SyncWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -116,6 +117,9 @@ class RepoWidget(QWidget):
         sw.minimumSizeHint = lambda: QSize(0, 0)
         self.syncTabIndex = idx = tt.addTab(sw, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
+        self.syncStackedWidget.addWidget(self.createSyncWidget())
+        # TODO: unstack sync widget
+
         self.grepStackedWidget = gw = QStackedWidget()
         gw.minimumSizeHint = lambda: QSize(0, 0)
         self.grepTabIndex = idx = tt.addTab(gw, geticon('grep'), '') # TODO
@@ -137,6 +141,12 @@ class RepoWidget(QWidget):
         s = QSettings()
         cw.loadConfigs(s)
         return cw
+
+    def createSyncWidget(self):
+        # TODO: pass repo directly instead of repo.root ?
+        # TODO: don't pass workbench
+        sw = SyncWidget(root=self.repo.root, parent=self.workbench)
+        return sw
 
     def load_config(self):
         self._font = getfont(self.repo.ui, 'fontlog')

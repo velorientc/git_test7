@@ -27,7 +27,6 @@ from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
-from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.docklog import LogDockWidget
 
 from PyQt4.QtCore import *
@@ -50,7 +49,6 @@ class Workbench(QMainWindow):
         self._searchWidgets = []
 
         self.grepwidgets = {} # key: reporoot
-        self.syncwidgets = {} # key: reporoot
 
         QMainWindow.__init__(self)
 
@@ -357,13 +355,7 @@ class Workbench(QMainWindow):
             tags = w.repo.tags().keys()
             self.currentRepoRoot = root = w.repo.root
             ti = self.taskTabsWidget.currentIndex()
-            if ti == self.syncTabIndex:
-                sw = self.getSyncWidget(root)
-                if sw:
-                    self.syncStackedWidget.setCurrentWidget(sw)
-                else:
-                    self.taskTabsWidget.setCurrentIndex(0)
-            elif ti == self.grepTabIndex:
+            if ti == self.grepTabIndex:
                 gw = self.getGrepWidget(root)
                 if gw:
                     self.grepStackedWidget.setCurrentWidget(gw)
@@ -381,9 +373,6 @@ class Workbench(QMainWindow):
     def taskTabChanged(self, index):
         if index == self.commitTabIndex:
             self.workingCopySelected()
-        elif index == self.syncTabIndex:
-            sw = self.createSyncWidget(self.currentRepoRoot)
-            self.syncStackedWidget.setCurrentWidget(sw)
         elif index == self.grepTabIndex:
             gw = self.createGrepWidget(self.currentRepoRoot)
             self.grepStackedWidget.setCurrentWidget(gw)
@@ -415,17 +404,6 @@ class Workbench(QMainWindow):
     def getGrepWidget(self, root):
         '''returns None if no grep widget for that repo has been created yet'''
         return self.grepwidgets.get(root)
-
-    def createSyncWidget(self, root):
-        sw = self.getSyncWidget(root)
-        if sw is None:
-            sw = SyncWidget(root, self)
-            self.syncwidgets[root] = sw
-            self.syncStackedWidget.addWidget(sw)
-        return sw
-
-    def getSyncWidget(self, root):
-        return self.syncwidgets.get(root)
 
     def switchTo(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
