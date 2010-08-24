@@ -490,7 +490,7 @@ class RepoWidget(QWidget):
 
         ctx = self.repomodel.repo.changectx(rev)
         if ctx.rev() is None:
-            self.workbench.workingCopySelected()
+            self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
         else:
             self.revDetailsWidget.revision_selected(rev)
             self.workbench.revisionSelected()
@@ -560,7 +560,7 @@ class RepoWidget(QWidget):
     def switchedTo(self):
         rev = self.repoview.current_rev
         if rev is None:
-            self.workbench.workingCopySelected()
+            self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
         elif type(rev) is str:
             self.revDetailsStackedWidget.setCurrentWidget(self.blankMessageWidget)
         else:

@@ -284,9 +284,6 @@ class Workbench(QMainWindow):
             print 'FIXME: returned dummy widget for %s' % name
             return self._dummystackedwidget
 
-    def workingCopySelected(self):
-        self.taskTabsWidget.setCurrentIndex(1)
-
     def revisionSelected(self):
         self.taskTabsWidget.setCurrentIndex(0)
 
