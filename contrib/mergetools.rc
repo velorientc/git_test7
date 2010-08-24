@@ -45,6 +45,17 @@ kdiff3.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
 kdiff3.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
 kdiff3.dirdiff=True
 
+thgKdiff3.regkey=Software\TortoiseHg\
+thgKdiff3.regname=KDiff3Path
+thgKdiff3.priority=-3
+thgKdiff3.args=--auto --L1 base --L2 parent1 --L3 parent2 $base $local $other -o $output
+thgKdiff3.fixeol=True
+thgKdiff3.premerge=False
+thgKdiff3.gui=True
+thgKdiff3.diffargs=--L1 '$plabel1' --L2 '$clabel' $parent $child
+thgKdiff3.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child $parent2
+thgKdiff3.dirdiff=True
+
 diffmerge.regkey=Software\SourceGear\SourceGear DiffMerge\
 diffmerge.regname=Location
 diffmerge.priority=-7
