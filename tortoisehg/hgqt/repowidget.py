@@ -40,7 +40,6 @@ class RepoWidget(QWidget):
     def __init__(self, repo, workbench):
         self.repo = repo
         self.workbench = workbench
-        self.revDetailsStackedWidget = workbench.revDetailsStackedWidget
         self._reload_rev = '.' # select working parent at startup
         self._scanForRepoChanges = True
         self.disab_shortcuts = []
@@ -78,6 +77,8 @@ class RepoWidget(QWidget):
         self.repoview.setSizePolicy(sp)
         self.repoview.setFrameShape(QFrame.StyledPanel)
 
+        self._inittasktabs()
+
         w = RevDetailsWidget(self.repo, self.repoview)
         self.revDetailsStackedWidget.addWidget(w)
         w.revisionLinkClicked.connect(self.goto)
@@ -86,6 +87,31 @@ class RepoWidget(QWidget):
         w = BlankMessageWidget(self.repoview)
         self.revDetailsStackedWidget.addWidget(w)
         self.blankMessageWidget = w
+
+    def _inittasktabs(self):
+        # TODO: move self.repotabs_splitter to RepoWidget
+        self.taskTabsWidget = tt = QTabWidget(self.workbench.repotabs_splitter)
+        tt.setDocumentMode(True)
+        tt.setTabPosition(QTabWidget.East)
+        self.revDetailsStackedWidget = sw = QStackedWidget()
+        self.dummywidget = QWidget()
+        self.revDetailsStackedWidget.addWidget(self.dummywidget)
+        self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
+        sw.minimumSizeHint = lambda: QSize(0, 0)
+        self.logTabIndex = idx = tt.addTab(sw, geticon('log'), '')
+        tt.setTabToolTip(idx, _("Revision details"))
+        self.commitStackedWidget = sw = QStackedWidget()
+        sw.minimumSizeHint = lambda: QSize(0, 0)
+        self.commitTabIndex = idx = tt.addTab(sw, geticon('commit'), '')
+        tt.setTabToolTip(idx, _("Commit"))
+        self.syncStackedWidget = sw = QStackedWidget()
+        sw.minimumSizeHint = lambda: QSize(0, 0)
+        self.syncTabIndex = idx = tt.addTab(sw, geticon('sync'), '')
+        tt.setTabToolTip(idx, _("Synchronize"))
+        self.grepStackedWidget = gw = QStackedWidget()
+        gw.minimumSizeHint = lambda: QSize(0, 0)
+        self.grepTabIndex = idx = tt.addTab(gw, geticon('grep'), '') # TODO
+        tt.setTabToolTip(idx, _("Search"))
 
     def load_config(self):
         self._font = getfont(self.repo.ui, 'fontlog')

@@ -63,9 +63,6 @@ class Workbench(QMainWindow):
 
         self.repotabs_splitter.setCollapsible(0, False)
 
-        self.dummywidget = QWidget()
-        self.revDetailsStackedWidget.addWidget(self.dummywidget)
-        self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
         self.currentRepoRoot = ''
 
         self.setWindowTitle('TortoiseHg Workbench')
@@ -166,26 +163,6 @@ class Workbench(QMainWindow):
         sp.setVerticalStretch(1)
         sp.setHeightForWidth(tw.sizePolicy().hasHeightForWidth())
         tw.setSizePolicy(sp)
-
-        self.taskTabsWidget = tt = QTabWidget(self.repotabs_splitter)
-        tt.setDocumentMode(True)
-        tt.setTabPosition(QTabWidget.East)
-        self.revDetailsStackedWidget = sw = QStackedWidget()
-        sw.minimumSizeHint = lambda: QSize(0, 0)
-        self.logTabIndex = idx = tt.addTab(sw, geticon('log'), '')
-        tt.setTabToolTip(idx, _("Revision details"))
-        self.commitStackedWidget = sw = QStackedWidget()
-        sw.minimumSizeHint = lambda: QSize(0, 0)
-        self.commitTabIndex = idx = tt.addTab(sw, geticon('commit'), '')
-        tt.setTabToolTip(idx, _("Commit"))
-        self.syncStackedWidget = sw = QStackedWidget()
-        sw.minimumSizeHint = lambda: QSize(0, 0)
-        self.syncTabIndex = idx = tt.addTab(sw, geticon('sync'), '')
-        tt.setTabToolTip(idx, _("Synchronize"))
-        self.grepStackedWidget = gw = QStackedWidget()
-        gw.minimumSizeHint = lambda: QSize(0, 0)
-        self.grepTabIndex = idx = tt.addTab(gw, geticon('grep'), '') # TODO
-        tt.setTabToolTip(idx, _("Search"))
 
         self.setCentralWidget(self.centralwidget)
 
@@ -310,6 +287,20 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionLoadAll)
         tb.addSeparator()
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
+
+    # FIXME: remove this later
+    def __getattr__(self, name):
+        if name == '_dummystackedwidget':
+            self._dummystackedwidget = QStackedWidget(self)
+            return self._dummystackedwidget
+
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            print 'FIXME: accessing to %s via Workbench' % name
+            return getattr(w, name)
+        else:
+            print 'FIXME: returned dummy widget for %s' % name
+            return self._dummystackedwidget
 
     def workingCopySelected(self):
         cw = self.createCommitWidget(self.currentRepoRoot)
