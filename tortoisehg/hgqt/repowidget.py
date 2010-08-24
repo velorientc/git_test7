@@ -481,8 +481,6 @@ class RepoWidget(QWidget):
         self.runner.run(cmdline)
 
     def revision_selected(self, rev):
-        if self.workbench.getCurentRepoRoot() != self.repo.root:
-            return
         if self.repomodel.graph is None:
             return
         if type(rev) == str: # unapplied patch

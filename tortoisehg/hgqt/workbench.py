@@ -54,8 +54,6 @@ class Workbench(QMainWindow):
         self._quickbars = []
         self.disab_shortcuts = []
 
-        self.currentRepoRoot = ''
-
         self.setWindowTitle('TortoiseHg Workbench')
 
         self.reporegistry = rr = RepoRegistryView(ui, self)
@@ -348,19 +346,14 @@ class Workbench(QMainWindow):
         tags = []
         if w:
             tags = w.repo.tags().keys()
-            self.currentRepoRoot = root = w.repo.root
             ti = self.taskTabsWidget.currentIndex()
             w.switchedTo()
         else:
-            self.currentRepoRoot = ''
 
             self.actionDiffMode.setEnabled(False)
             self.actionAnnMode.setEnabled(False)
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
-
-    def getCurentRepoRoot(self):
-        return self.currentRepoRoot
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
