@@ -24,6 +24,7 @@ from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
 from tortoisehg.hgqt.sync import SyncWidget
+from tortoisehg.hgqt.grep import SearchWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -124,6 +125,8 @@ class RepoWidget(QWidget):
         gw.minimumSizeHint = lambda: QSize(0, 0)
         self.grepTabIndex = idx = tt.addTab(gw, geticon('grep'), '') # TODO
         tt.setTabToolTip(idx, _("Search"))
+        self.grepStackedWidget.addWidget(self.createGrepWidget())
+        # TODO: unstack grep widget
 
     def createCommitWidget(self):
         pats = {}
@@ -147,6 +150,12 @@ class RepoWidget(QWidget):
         # TODO: don't pass workbench
         sw = SyncWidget(root=self.repo.root, parent=self.workbench)
         return sw
+
+    def createGrepWidget(self):
+        # TODO: pass repo directly instead of repo.root ?
+        upats = {}
+        gw = SearchWidget(upats, self.repo.root, self)
+        return gw
 
     def load_config(self):
         self._font = getfont(self.repo.ui, 'fontlog')

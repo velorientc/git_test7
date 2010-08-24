@@ -24,7 +24,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
-from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.docklog import LogDockWidget
@@ -47,8 +46,6 @@ class Workbench(QMainWindow):
         self._loading = True
         self._scanForRepoChanges = True
         self._searchWidgets = []
-
-        self.grepwidgets = {} # key: reporoot
 
         QMainWindow.__init__(self)
 
@@ -349,18 +346,13 @@ class Workbench(QMainWindow):
     def repoTabChanged(self, index=0):
         self.setupBranchCombo()
 
+        # TODO: code to switch task tab should be no longer used
         w = self.repoTabsWidget.currentWidget()
         tags = []
         if w:
             tags = w.repo.tags().keys()
             self.currentRepoRoot = root = w.repo.root
             ti = self.taskTabsWidget.currentIndex()
-            if ti == self.grepTabIndex:
-                gw = self.getGrepWidget(root)
-                if gw:
-                    self.grepStackedWidget.setCurrentWidget(gw)
-                else:
-                    self.taskTabsWidget.setCurrentIndex(0)
             w.switchedTo()
         else:
             self.currentRepoRoot = ''
@@ -371,11 +363,9 @@ class Workbench(QMainWindow):
             self.actionPrevDiff.setEnabled(False)
 
     def taskTabChanged(self, index):
+        # TODO: maybe unused?
         if index == self.commitTabIndex:
             self.workingCopySelected()
-        elif index == self.grepTabIndex:
-            gw = self.createGrepWidget(self.currentRepoRoot)
-            self.grepStackedWidget.setCurrentWidget(gw)
 
     def getCurentRepoRoot(self):
         return self.currentRepoRoot
@@ -391,19 +381,6 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
-
-    def createGrepWidget(self, root):
-        gw = self.getGrepWidget(root)
-        if gw is None:
-            upats = {}
-            gw = SearchWidget(upats, root, self)
-            self.grepwidgets[root] = gw
-            self.grepStackedWidget.addWidget(gw)
-        return gw
-
-    def getGrepWidget(self, root):
-        '''returns None if no grep widget for that repo has been created yet'''
-        return self.grepwidgets.get(root)
 
     def switchTo(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
