@@ -182,17 +182,15 @@ def _parse(ui, args):
 
     if args:
         alias, args = args[0], args[1:]
-        aliases, i = cmdutil.findcmd(alias, table, ui.config("ui", "strict"))
-        for a in aliases:
-            if a.startswith(alias):
-                alias = a
-                break
-        cmd = aliases[0]
-        c = list(i[1])
     else:
-        alias = None
-        cmd = None
-        c = []
+        alias, args = 'workbench', []
+    aliases, i = cmdutil.findcmd(alias, table, ui.config("ui", "strict"))
+    for a in aliases:
+        if a.startswith(alias):
+            alias = a
+            break
+    cmd = aliases[0]
+    c = list(i[1])
 
     # combine global options into local
     for o in globalopts:
@@ -251,8 +249,6 @@ def runcommand(ui, args):
 
     if options['help']:
         return help_(ui, cmd)
-    elif not cmd:
-        return help_(ui, 'shortlist')
 
     path = options['repository']
     if path:
