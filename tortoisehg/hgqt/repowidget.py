@@ -558,13 +558,6 @@ class RepoWidget(QWidget):
         self.switchToSignal.emit(self)
 
     def switchedTo(self):
-        rev = self.repoview.current_rev
-        if rev is None:
-            self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
-        elif type(rev) is str:
-            self.revDetailsStackedWidget.setCurrentWidget(self.blankMessageWidget)
-        else:
-            self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
         self.updateActions()
 
     def updateActions(self):
