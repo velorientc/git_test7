@@ -284,9 +284,6 @@ class Workbench(QMainWindow):
             print 'FIXME: returned dummy widget for %s' % name
             return self._dummystackedwidget
 
-    def revisionSelected(self):
-        self.taskTabsWidget.setCurrentIndex(0)
-
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
 

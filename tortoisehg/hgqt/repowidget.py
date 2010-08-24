@@ -485,7 +485,7 @@ class RepoWidget(QWidget):
             return
         if type(rev) == str: # unapplied patch
             self.revDetailsStackedWidget.setCurrentWidget(self.blankMessageWidget)
-            self.workbench.revisionSelected()
+            self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
             return
 
         ctx = self.repomodel.repo.changectx(rev)
@@ -493,7 +493,7 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
         else:
             self.revDetailsWidget.revision_selected(rev)
-            self.workbench.revisionSelected()
+            self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
         self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
         self.updateActions()
 
