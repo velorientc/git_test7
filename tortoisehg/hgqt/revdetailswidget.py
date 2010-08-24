@@ -39,7 +39,7 @@ class RevDetailsWidget(QWidget):
         self.splitternames = []
 
         QWidget.__init__(self)
-        
+
         self.load_config()
 
         self.setupUi()

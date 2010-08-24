@@ -324,7 +324,7 @@ class CommitWidget(QWidget):
         # We'll ask the user for confirmation later, if they have any
         # files partially selected.
         return True
-    
+
     def loadConfigs(self, s):
         'Load history, etc, from QSettings instance'
         repo = self.stwidget.repo

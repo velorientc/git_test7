@@ -1,4 +1,3 @@
-
 # -*- coding: iso-8859-1 -*-
 #!/usr/bin/env python
 # workbench.py - main TortoiseHg Window
@@ -726,7 +725,7 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.repoview.model().loadall()
-    
+
     def newRepository(self):
         """ Run init dialog """
         from tortoisehg.hgqt.hginit import InitDialog
