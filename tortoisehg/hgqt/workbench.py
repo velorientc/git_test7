@@ -381,7 +381,6 @@ class Workbench(QMainWindow):
                     self.taskTabsWidget.setCurrentIndex(0)
             w.switchedTo()
         else:
-            self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
             self.currentRepoRoot = ''
 
             self.actionDiffMode.setEnabled(False)
