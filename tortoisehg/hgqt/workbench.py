@@ -642,19 +642,21 @@ class Workbench(QMainWindow):
             self.setupBranchCombo()
 
     def refreshRepository(self, root):
-        tw = self.repoTabsWidget
-        for idx in range(tw.count()):
-            rw = tw.widget(idx)
-            if rw.repo.root == root:
-                rw.refresh()
+        for rw in self._findrepowidget(root):
+            rw.refresh()
 
     def reloadRepository(self, root):
+        for rw in self._findrepowidget(root):
+            rw.reload()
+        self.setupBranchCombo()
+
+    def _findrepowidget(self, root):
+        """Iterates RepoWidget for the specified root"""
         tw = self.repoTabsWidget
         for idx in range(tw.count()):
             rw = tw.widget(idx)
             if rw.repo.root == root:
-                rw.reload()
-        self.setupBranchCombo()
+                yield rw
 
     #@timeit
     def refreshRevisionTable(self, *args, **kw):
