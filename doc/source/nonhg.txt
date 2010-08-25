@@ -160,8 +160,8 @@ Then enable hggit and bookmarks in your Mercurial.ini file::
 
 You can verify that worked by typing :command:`hg help hggit`
 
-Current versions of TortoiseHg include dulwich version 0.6.0.  We
-recommend to use hg-git version 0.2.2 with this version of dulwich.
+Current versions of TortoiseHg include dulwich version 0.6.1.  We
+recommend to use hg-git version 0.2.4 with this version of dulwich.
 
 See the hggit documentation for details of use.
 
