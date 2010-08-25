@@ -21,6 +21,7 @@ class ColumnSelectDialog(QDialog):
 
         self.setWindowTitle(_('Workbench Log Columns'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setMinimumSize(250, 265)
         s = QSettings()
         cols = s.value('workbench/columns').toStringList()
         if cols:
