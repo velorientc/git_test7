@@ -164,11 +164,6 @@
             <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
                   Source='..\contrib\kdiff3.exe'
             />
-            <RegistryValue
-              Name='KDiff3Path'
-              Root='HKLM' Key='$(var.ProgramRegKey)'
-              Type='string' Value='[INSTALLDIR]kdiff3.exe'
-            />
           </Component>
 
           <Directory Id='docFolder' Name='doc'>
