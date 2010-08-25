@@ -490,3 +490,34 @@ def fileEditor(filename, **opts):
         WarningMsgBox(_('Unable to read/write config file'),
                       hglib.tounicode(e), parent=dialog)
     return ret
+
+class SharedWidget(QWidget):
+    """Share a single widget by many parents
+
+    It makes a widget sharable by many parent widgets. When the user shows
+    the widget (showEvent occured), it reparents the stored widget to the
+    latest active widget.
+
+    NOTE: This doesn't reconnect signals when the parent changed.
+    So it's up to you if you want to emit signals only to the active parent.
+    """
+    parentChanged = pyqtSignal()
+
+    def __init__(self, widget, parent=None):
+        super(SharedWidget, self).__init__(parent)
+        self._widget = widget
+        self.setLayout(QVBoxLayout())
+
+    def showEvent(self, event):
+        """Change the parent of the stored widget if necessary"""
+        if self._widget.parent() != self:
+            self.layout().addWidget(self._widget)
+            self.parentChanged.emit()
+        super(SharedWidget, self).showEvent(event)
+
+    def get(self):
+        """Returns the stored widget"""
+        return self._widget
+
+    def __getattr__(self, name):
+        return getattr(self._widget, name)
