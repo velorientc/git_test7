@@ -15,13 +15,18 @@ from mercurial.util import propertycache
 
 from util import hglib
 
+_repocache = {}
+
 def repository(ui, path='', create=False):
     '''Returns a subclassed Mercurial repository to which new 
     THG-specific methods have been added. The repository object
     is obtained using mercurial.hg.repository()'''
-    repo = hg.repository(ui, path, create)  
-    repo.__class__ = _extendrepo(repo)
-    return repo
+    if create or path not in _repocache:
+        repo = hg.repository(ui, path, create)
+        repo.__class__ = _extendrepo(repo)
+        _repocache[path] = repo
+        return repo
+    return _repocache[path]
 
 _thgrepoprops = '_thgmqpatchnames _thghiddentags thgmqunappliedpatches'.split()
 
