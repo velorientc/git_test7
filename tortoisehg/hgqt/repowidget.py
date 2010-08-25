@@ -15,7 +15,7 @@ from tortoisehg.util import thgrepo, shlib, hglib, purge
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
-from tortoisehg.hgqt.qtlib import CustomPrompt
+from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run
@@ -111,7 +111,7 @@ class RepoWidget(QWidget):
         sw.minimumSizeHint = lambda: QSize(0, 0)
         self.commitTabIndex = idx = tt.addTab(sw, geticon('commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
-        self.commitStackedWidget.addWidget(self.createCommitWidget())
+        self.commitStackedWidget.addWidget(SharedWidget(self.createCommitWidget()))
         # TODO: unstack commit widget
 
         self.syncStackedWidget = sw = QStackedWidget()
@@ -129,20 +129,24 @@ class RepoWidget(QWidget):
         # TODO: unstack grep widget
 
     def createCommitWidget(self):
+        cw = getattr(self.repo, '_commitwidget', None)  # TODO: ugly
+        if cw:
+            cw.commitComplete.connect(self.reload)
+            return cw
+
         pats = {}
         opts = {}
         # TODO: pass repo directly instead of repo.root ?
         cw = CommitWidget(pats, opts, root=self.repo.root)
         cw.errorMessage.connect(self.workbench.showMessage)
-        def commitcomplete():
-            self.reload()
-            cw.stwidget.refreshWctx()
-        cw.commitComplete.connect(commitcomplete)
+        cw.commitComplete.connect(self.reload)
+        cw.commitComplete.connect(cw.stwidget.refreshWctx)
         b = QPushButton(_('Commit'))
         cw.buttonHBox.addWidget(b)
         b.clicked.connect(cw.commit)
         s = QSettings()
         cw.loadConfigs(s)
+        self.repo._commitwidget = cw
         return cw
 
     def createSyncWidget(self):
