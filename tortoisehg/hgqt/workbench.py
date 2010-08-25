@@ -305,8 +305,7 @@ class Workbench(QMainWindow):
         for u in d.urls():
             root = self.find_root(u)
             if root:
-                repo = thgrepo.repository(self.ui, path=root)
-                self.addRepoTab(repo)
+                self.openRepo(root)
                 accept = True
         if accept:
             event.setDropAction(Qt.LinkAction)
