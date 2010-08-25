@@ -94,6 +94,11 @@
             <Environment Id="Environment" Name="PATH" Part="last" System="yes"
                          Permanent="no" Value="[INSTALLDIR]bin" Action="set"
             />
+           <Shortcut Id="desktopTHG" Directory="DesktopFolder"
+                     Name="TortoiseHg Workbench"
+                     WorkingDirectory='INSTALLDIR'
+                     Icon="thgIcon.ico" IconIndex="0"
+                     Advertise="yes" />
           </Component>
           <Component Id='ExtensionVersions' Guid='$(var.ExtensionVersions.guid)'>
             <File Id='ExtensionVersions' Name='extension-versions.txt'
@@ -258,14 +263,7 @@
         </Directory>
       </Directory>
 
-      <!-- Directory Id="AppDataFolder" Name="AppData">
-        <Directory Id="ThgAppData" Name="TortoiseHg">
-          <Component Id="ThgAppData" Guid="$(var.ThgAppData.guid)">
-            <RemoveFolder Id='ThgAppData' On='uninstall' />
-            <RegistryValue Root='HKCU' Key='Software\TortoiseHg\AppData' KeyPath='yes' />
-          </Component>
-        </Directory>
-      </Directory -->
+      <Directory Id="DesktopFolder" Name="Desktop"/>
 
       <Merge Id='VCRedist' DiskId='1' Language='1033'
              SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x86_msm.msm'
