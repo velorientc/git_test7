@@ -15,7 +15,7 @@ from tortoisehg.hgqt.i18n import _
 
 _SPACING = 6
 
-class ChangesetList(QScrollArea):
+class ChangesetList(QWidget):
 
     def __init__(self, parent=None):
         super(ChangesetList, self).__init__()
@@ -25,24 +25,32 @@ class ChangesetList(QScrollArea):
         self.showitems = None
         self.limit = 20
 
-        # scroll area
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.setWidgetResizable(True)
-        self.setMinimumSize(400, 200)
-
         # main layout
-        self.csmain = QWidget()
-        self.csmain.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.setWidget(self.csmain)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.mainvbox = QVBoxLayout()
+        self.mainvbox.setSpacing(_SPACING)
+        self.mainvbox.setSizeConstraint(QLayout.SetMinAndMaxSize)
+        self.setLayout(self.mainvbox)
 
-        ## cs layout grid, contains Factory objects, one per revision
+        ## status box
+        self.statusbox = QHBoxLayout()
+        self.statuslabel = QLabel('')
+        self.statusbox.addWidget(self.statuslabel)
+        self.mainvbox.addLayout(self.statusbox)
+
+        ## scroll area
+        self.scrollarea = QScrollArea()
+        self.scrollarea.setMinimumSize(400, 200)
+        self.scrollarea.setWidgetResizable(True)
+        self.mainvbox.addWidget(self.scrollarea)
+
+        ### cs layout grid, contains Factory objects, one per revision
+        self.scrollbox = QWidget()
         self.csvbox = QVBoxLayout()
         self.csvbox.setSpacing(_SPACING)
         self.csvbox.setSizeConstraint(QLayout.SetMinAndMaxSize)
-        self.csmain.setLayout(self.csvbox)
-
-        # add the main layout
-        self.setWidget(self.csmain)
+        self.scrollbox.setLayout(self.csvbox)
+        self.scrollarea.setWidget(self.scrollbox)
 
     def clear(self):
         """Clear the item list"""
