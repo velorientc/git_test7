@@ -1,0 +1,85 @@
+<Include>
+  <!-- These are component GUIDs used for TortoiseHg installers.
+       YOU MUST CHANGE ALL GUIDs below when copying this file
+       and replace 'TortoiseHg' in this notice with the name of
+       your project. Component GUIDs have global namespace!      -->
+
+  <!-- contrib.wxs -->
+  <?define contrib.guid = {FB2DD7A3-B0D8-4E4A-BA52-71B32647AD6E} ?>
+  <?define contrib.vim.guid = {7B712AF4-6BBE-41A4-95F3-05AD4D8BFDE3} ?>
+
+  <!-- doc.wxs -->
+  <?define doc.hg.1.html.guid = {3EDDF378-AB13-4B49-ADDF-67EFDD30AA69} ?>
+  <?define doc.hgignore.5.html.guid = {98A703CD-DCD5-422B-BB41-5B1BE196979B} ?>
+  <?define doc.hgrc.5.html = {AC2F61E1-E9D1-4C67-B592-17FA68F75A0A} ?>
+  <?define doc.style.css = {F42E2E5F-6329-4269-B6D8-805C6CFD8D5E} ?>
+
+  <!-- help.wxs -->
+  <?define helpFolder.guid = {FED1C75C-EA84-4446-BF0D-9946A37DA0BB} ?>
+  
+  <!-- i18n.wxs -->
+  <?define i18nFolder.guid = {F88D7B07-D61C-4EE8-9BE0-B8CB6E8A52DB} ?>
+
+  <!-- templates.wxs -->
+  <?define templates.root.guid = {6A82D0BF-6878-42F3-92FD-AB39F7A97EEF} ?>
+  <?define templates.atom.guid = {602F0A54-F5AF-4D22-A2FE-80A188531D02} ?>
+  <?define templates.coal.guid = {89768AB3-A942-470B-8C1C-9C026B80FF8E} ?>
+  <?define templates.gitweb.guid = {AD6698BB-3112-4ECE-9B7D-8D2C75F784A9} ?>
+  <?define templates.monoblue.guid = {0E6F72ED-1CE9-4D62-9A0A-D79DB65C334A} ?>
+  <?define templates.paper.guid = {937903FD-5C1C-4CDF-B83E-E4F710640989} ?>
+  <?define templates.raw.guid = {936139F7-9A73-4685-80D2-F17A2BC42EAD} ?>
+  <?define templates.rss.guid = {891DA56F-B02B-456F-8471-FE47024051E7} ?>
+  <?define templates.spartan.guid = {C49A4A44-53EB-4C37-AA0B-159070F46E84} ?>
+  <?define templates.static.guid = {ECF8D1EF-910D-4586-9508-86A6236B4FD5} ?>
+
+  <!-- dist.wxs -->
+  <?define dist.guid = {2AE187A2-638D-42D5-8F7E-D5B9722F3296} ?>
+  <?define imageformats.guid = {056DFB00-3EB1-4ACA-A43B-55CD5004DED1} ?>
+
+  <!-- cmenu-i18n.wxs -->
+  <?define cmenuI18n.guid = {25A9DAFA-FF37-420C-9958-5920301E293A} ?>
+
+  <!-- icons.wxs -->
+  <?define Icons.guid = {BBC91828-1D14-4BD2-AE23-892770DAD3FF} ?>
+
+  <!-- thg-i18n.wxs -->
+  <?define thgI18nFolder.guid = {55DC742A-1E22-4A6C-B090-FD1E91AB8646} ?>
+
+  <!-- tortoisehg.wxs -->
+  <?define ProductUpgradeCode = {838657CF-C9EC-452D-800D-0E70FC021D0A} ?>
+
+  <?define ComponentMainExecutableGUID = {D648EC48-559C-4C66-A4CE-2D40A495DC5B} ?>
+
+  <?define thgshellx86dll.guid = {728E8840-5878-4EA7-918F-281C2697ABB1} ?>
+  <?define thgshellx64dll.guid = {D5D1E532-CDAD-4FFD-9695-757B8A29B4BA} ?>
+
+  <?define CmenuShellRegistrationX86.guid = {2BF442D0-EBD9-4B03-8F78-0F45C28F8AB5} ?>
+  <?define CmenuShellRegistrationX64.guid = {858CE519-8BA2-4E80-BBEB-591AE78384FA} ?>
+
+  <?define OverlaysShellRegistrationX86.guid = {8505A107-D6B1-4EAF-9929-3D6E847B5FCB} ?>
+  <?define OverlaysShellRegistrationX64.guid = {9A678A1C-72D3-4713-AD8A-E7C08ED64DC9} ?>
+  <?define OverlayServerEXE.guid = {62C58746-BE5D-45F0-8AB7-2FE2AB9C57B0} ?>
+
+  <?define ExtensionVersions.guid = {4ADF436B-9B25-4D95-B6AC-88717F5A037A} ?>
+  <?define COPYING.guid = {09DEF174-D0AB-4E8B-8A4E-1AD5B7E4C9BD} ?>
+
+  <?define docdiffEXE.guid = {F4A6629F-85C1-406E-8262-C02E8DBDB4FA} ?>
+  <?define KDiff3EXE.guid = {075ECC11-1B44-48DB-B7FD-D3207BB801A4} ?>
+
+  <?define TortoisePlinkEXE.guid = {7679909C-7390-4546-9FCA-A5A31520DA50} ?>
+  <?define PageantEXE.guid = {228F24A3-FA1C-4439-BCB4-71DF790E61DC} ?>
+  <?define thgcmd.guid = {7B660ED7-CAEA-4851-8ABD-751251842457} ?>
+  <?define hgcmd.guid = {4A986763-BD4D-46DC-89CD-A36F037D847E} ?>
+
+  <?define chmFile.guid = {422C758A-6CB2-4531-BE6A-366B3CD1FD8D} ?>
+  <?define pdfFile.guid = {A0EC2473-996A-4DBC-9F44-76B63B57AE31} ?>
+  <?define hgbook.guid = {BC46DD44-1A5B-408F-86E2-BB89C8A380C1} ?>
+
+  <?define mercurial.rc.guid = {97EC54BA-02F7-40CD-B876-0572AF7D894B} ?>
+  <?define mergetools.rc.guid = {EA7F7766-FC75-489F-91AE-3B16E5FE936E} ?>
+  <?define mergepatterns.rc.guid = {3372ED83-BCE1-4AD3-B5EA-65158C715B54} ?>
+
+  <?define ProgramMenuDir.guid = {77EDD1A4-FF9A-41CB-83D7-8141D67F0367} ?>
+  <?define ThgAppData.guid = {4264E496-A992-48E7-92EB-A3BF21E71E41} ?>
+
+</Include>
