@@ -22,8 +22,16 @@ class ChangesetList(QWidget):
 
         self.currepo = None
         self.curitems = None
+        self.curfactory = None
         self.showitems = None
         self.limit = 20
+        contents = ('%(revnum)s:', ' %(branch)s', ' %(tags)s', ' %(summary)s')
+        self.lstyle = csinfo.labelstyle(contents=contents, width=350,
+                                        selectable=True)
+        contents = ('rev', 'summary', 'user', 'dateage', 'rawbranch',
+                    'tags', 'transplant', 'p4', 'svn')
+        self.pstyle = csinfo.panelstyle(contents=contents, width=350,
+                                        selectable=True)
 
         # main layout
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -34,8 +42,10 @@ class ChangesetList(QWidget):
 
         ## status box
         self.statusbox = QHBoxLayout()
-        self.statuslabel = QLabel('')
+        self.statuslabel = QLabel(_('No items to display'))
+        self.compactchk = QCheckBox(_('Use compact view'))
         self.statusbox.addWidget(self.statuslabel)
+        self.statusbox.addWidget(self.compactchk)
         self.mainvbox.addLayout(self.statusbox)
 
         ## scroll area
@@ -52,6 +62,10 @@ class ChangesetList(QWidget):
         self.scrollbox.setLayout(self.csvbox)
         self.scrollarea.setWidget(self.scrollbox)
 
+        # signal handlers
+        self.compactchk.toggled.connect(lambda *a: self.update(self.currepo,
+                                                               self.curitems))
+
     def clear(self):
         """Clear the item list"""
         while self.csvbox.count():
@@ -66,7 +80,8 @@ class ChangesetList(QWidget):
         pos: Number, an index of insertion point.  If -1, indicates
         the end of the item list.
         """
-        info = self.curfactory(item)
+        style = self.compactchk.isChecked() and self.lstyle or self.pstyle
+        info = self.curfactory(item, style=style)
         info.update(item)
         self.csvbox.addWidget(info, Qt.AlignTop)
 
@@ -92,10 +107,7 @@ class ChangesetList(QWidget):
         """
         # setup
         self.clear()
-        contents = ('%(rev)s', ' %(branch)s', ' %(tags)s', ' %(summary)s')
-        style = csinfo.labelstyle(contents=contents, width=350,
-                                  selectable=True)
-        self.curfactory = csinfo.factory(repo, style=style)
+        self.curfactory = csinfo.factory(repo)
 
         # initialize variables
         self.currepo = repo
