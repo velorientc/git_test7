@@ -211,7 +211,7 @@ class MergePage(BasePage):
         create = csinfo.factory(repo, custom, style, withupdate=True)
 
         ## merge target
-        other_sep = qtlib.LabeledSeparator(_('Merge target (other)'))
+        other_sep = qtlib.LabeledSeparator(_('Merge from (other revision)'))
         box.addWidget(other_sep)
         other_info = create(self.wizard().other)
         other_info.setContentsMargins(5, 0, 0, 0)
@@ -250,7 +250,7 @@ class MergePage(BasePage):
 
         ## current revision
         box.addSpacing(6)
-        local_sep = qtlib.LabeledSeparator(_('Current revision (local)'))
+        local_sep = qtlib.LabeledSeparator(_('Merge to (working directory)'))
         box.addWidget(local_sep)
         local_info = create(self.wizard().local)
         local_info.setContentsMargins(5, 0, 0, 0)
@@ -327,7 +327,7 @@ class MergePage(BasePage):
 
     def ready(self):
         self.done = False
-        self.setTitle(_('Merge working directory with another revision'))
+        self.setTitle(_('Merge another revision to the working directory'))
         self.groups.set_visible(False, 'dirty')
         self.groups.set_visible(False, 'merged')
         self.groups.set_visible(False, 'detail')
