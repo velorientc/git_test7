@@ -168,6 +168,7 @@ class StripDialog(QDialog):
             self.strip_btn.setEnabled(True)
         else:
             self.cslist.clear()
+            self.cslist.updatestatus()
             cstext = qtlib.markup(_('Unknown revision!'), fg='red',
                                   weight='bold')
             self.status.setText(cstext)

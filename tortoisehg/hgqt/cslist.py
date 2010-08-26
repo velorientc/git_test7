@@ -59,6 +59,25 @@ class ChangesetList(QWidget):
             w.deleteLater()
         self.curitems = None
 
+    def insertcs(self, item, pos):
+        """Insert changeset info into the item list.
+
+        item: String, revision number or patch file path to display.
+        pos: Number, an index of insertion point.  If -1, indicates
+        the end of the item list.
+        """
+        info = self.curfactory(item)
+        info.update(item)
+        self.csvbox.addWidget(info, Qt.AlignTop)
+
+    def updatestatus(self):
+        if self.curitems is None:
+            text = _('No items to display')
+        else:
+            num = dict(count=len(self.showitems), total=len(self.curitems))
+            text = _('Displaying %(count)d of %(total)d items') % num
+        self.statuslabel.setText(text)
+
     def update(self, repo, items, uselimit=True):
         """Update the item list.
 
@@ -76,11 +95,15 @@ class ChangesetList(QWidget):
         contents = ('%(rev)s', ' %(branch)s', ' %(tags)s', ' %(summary)s')
         style = csinfo.labelstyle(contents=contents, width=350,
                                   selectable=True)
-        factory = csinfo.factory(repo, style=style)
+        self.curfactory = csinfo.factory(repo, style=style)
 
         # initialize variables
         self.currepo = repo
         self.curitems = items
+
+        if not items or not repo:
+            self.updatestatus()
+            return False
 
         # determine the items to show
         if uselimit and self.limit < len(items):
@@ -92,12 +115,10 @@ class ChangesetList(QWidget):
 
         # show items
         for item in showitems:
-            info = factory()
-            info.update(item)
-            self.csvbox.addWidget(info, Qt.AlignTop)
+            self.insertcs(item, -1)
         if lastitem:
             self.csvbox.addWidget(QLabel("..."))
-            info = factory()
-            info.update(lastitem)
-            self.csvbox.addWidget(info, Qt.AlignTop)
+            self.insertcs(lastitem, -1)
+        self.updatestatus()
+        return True
 
