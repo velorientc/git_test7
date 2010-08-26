@@ -11,6 +11,7 @@ Main Qt4 application for TortoiseHg
 """
 
 import os
+import subprocess
 
 from mercurial.error import RepoError
 
@@ -218,6 +219,7 @@ class Workbench(QMainWindow):
         self.actionRecover = QAction(_("Recover"), self)
         self.actionRollback = QAction(_("Rollback/Undo"), self)
         self.actionPurge = QAction(_("Purge"), self)
+        self.actionExplore = QAction(_("Explore"), self)
 
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
@@ -252,6 +254,8 @@ class Workbench(QMainWindow):
         m.addSeparator()
         m.addAction(self.actionRollback)
         m.addAction(self.actionPurge)
+        m.addSeparator()
+        m.addAction(self.actionExplore)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -456,6 +460,7 @@ class Workbench(QMainWindow):
         self.actionRecover.triggered.connect(self.recover)
         self.actionRollback.triggered.connect(self.rollback)
         self.actionPurge.triggered.connect(self.purge)
+        self.actionExplore.triggered.connect(self.explore)
 
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
@@ -713,6 +718,18 @@ class Workbench(QMainWindow):
     def closeRepository(self):
         """close the current repo tab"""
         self.repoTabCloseRequested(self.repoTabsWidget.currentIndex())
+
+    def explore(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            self.launchExplorer(w.repo.root)
+
+    def launchExplorer(self, root):
+        """open Windows Explorer at the repo root"""
+        if os.name == 'nt':
+            subprocess.call(['explorer.exe', root])
+        elif os.name == 'posix':
+            subprocess.call(['nautilus', root])
 
 
 def run(ui, *pats, **opts):

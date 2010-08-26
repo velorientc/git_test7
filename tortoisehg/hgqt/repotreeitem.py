@@ -153,7 +153,7 @@ class RepoItem(RepoTreeItem):
         return QVariant()
 
     def menulist(self):
-        return ['open', 'remove', 'clone', None, 'settings']
+        return ['open', 'remove', 'clone', None, 'explore', None, 'settings']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled

@@ -97,6 +97,8 @@ class RepoTreeView(QTreeView):
                 _("Delete the node and all its subnodes"), None, self.removeSelected),
              ("clone", _("Clone..."), None, 
                 _("Clone Repository"), None, self.cloneRepo),
+             ("explore", _("Explore"), None,
+                _("Open the repository in Windows Explorer"), None, self.explore),
              ]
         return a
 
@@ -162,6 +164,12 @@ class RepoTreeView(QTreeView):
                 self.workbench.openRepo(dest)
         d.cmdfinished.connect(cmdfinished)
         d.show()
+
+    def explore(self):
+        if not self.selitem:
+            return
+        root = self.selitem.internalPointer().rootpath()
+        self.workbench.launchExplorer(root)
 
 class RepoRegistryView(QDockWidget):
 
