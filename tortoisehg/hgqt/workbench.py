@@ -726,10 +726,7 @@ class Workbench(QMainWindow):
 
     def launchExplorer(self, root):
         """open Windows Explorer at the repo root"""
-        if os.name == 'nt':
-            subprocess.call(['explorer.exe', root])
-        elif os.name == 'posix':
-            subprocess.call(['nautilus', root])
+        QDesktopServices.openUrl(QUrl.fromLocalFile(root))
 
 
 def run(ui, *pats, **opts):
