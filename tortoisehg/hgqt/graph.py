@@ -424,9 +424,11 @@ class Graph(object):
                 flag = "="
                 if isinstance(mode, int):
                     parentctx = self.repo.changectx(mode)
-                else:
+                elif rev in self.nodesdict:
                     parent = self.fileparent(filename, rev)
                     parentctx = self.repo.changectx(parent)
+                else:
+                    return flag, ''
                 # return the diff but the 3 first lines
                 data = diff(self.repo, ctx, parentctx, files=[filename])
                 data = u'\n'.join(data.splitlines()[3:])
