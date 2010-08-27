@@ -553,7 +553,7 @@ class SettingsDialog(QDialog):
             ret = qtlib.CustomPrompt(_('Confirm Exit'),
                             _('Apply changes before exit?'), self,
                             (_('&Yes'), _('&No (discard changes)'),
-                         _  ('&Cancel')), default=2, esc=2).run()
+                         _  ('Cancel')), default=2, esc=2).run()
             if ret == 2:
                 return False
             elif ret == 0:
@@ -649,7 +649,7 @@ class SettingsForm(QWidget):
         if self.isDirty():
             ret = qtlib.CustomPrompt(_('Confirm Save'),
                     _('Save changes before edit?'), self,
-                    (_('&Save'), _('&Discard'), _('&Cancel')),
+                    (_('&Save'), _('&Discard'), _('Cancel')),
                     default=2, esc=2).run()
             if ret == 0:
                 self.applyChanges()

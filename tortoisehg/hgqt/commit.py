@@ -433,14 +433,14 @@ class CommitWidget(QWidget):
                           'Yes\t- Make commit restarting this named branch\n'
                           'No\t- Make commit without changing branch\n'
                           'Cancel\t- Cancel this commit') % (newbranch, rev),
-                          self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+                          self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
             else:
                 resp = qtlib.CustomPrompt(_('Confirm New Branch'),
                     _('Create new named branch "%s" with this commit?\n'
                       'Yes\t- Start new branch with this commit\n'
                       'No\t- Make commit without branch change\n'
                       'Cancel\t- Cancel this commit') % newbranch,
-                    self, (_('&Yes'), _('&No'), _('&Cancel')), 2, 2).run()
+                    self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
             if resp == 0:
                 repo.dirstate.setbranch(newbranch)
             elif resp == 2:
@@ -478,7 +478,7 @@ class CommitWidget(QWidget):
             res = qtlib.CustomPrompt(
                     _('Confirm Add'),
                     _('Add checked untracked files?'), self,
-                    (_('&OK'), _('&Cancel')), 0, 1,
+                    (_('&OK'), _('Cancel')), 0, 1,
                     checkedUnknowns).run()
             if res == 0:
                 dispatch._dispatch(_ui, ['add'] + checkedUnknowns)
@@ -489,7 +489,7 @@ class CommitWidget(QWidget):
             res = qtlib.CustomPrompt(
                     _('Confirm Remove'),
                     _('Remove checked deleted files?'), self,
-                    (_('&OK'), _('&Cancel')), 0, 1,
+                    (_('&OK'), _('Cancel')), 0, 1,
                     checkedMissing).run()
             if res == 0:
                 dispatch._dispatch(_ui, ['remove'] + checkedMissing)

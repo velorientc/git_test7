@@ -196,7 +196,7 @@ def revert(parent, ui, repo, files):
         res = qtlib.CustomPrompt(
                 _('Uncommited merge - please select a parent revision'),
                 _('Revert files to local or other parent?'), parent,
-                (_('&Local'), _('&Other'), _('&Cancel')), 0, 2, files).run()
+                (_('&Local'), _('&Other'), _('Cancel')), 0, 2, files).run()
         if res == 0:
             revertopts['rev'] = repo[None].p1().rev()
         elif res == 1:
@@ -209,7 +209,7 @@ def revert(parent, ui, repo, files):
                  _('Confirm Revert'),
                  _('Revert changes to files?'), parent,
                  (_('&Yes (backup changes)'), _('Yes (&discard changes)'),
-                  _('&Cancel')), 2, 2, files).run()
+                  _('Cancel')), 2, 2, files).run()
         if res == 2:
             return False
         if res == 1:
@@ -257,7 +257,7 @@ def delete(parent, ui, repo, files):
     res = qtlib.CustomPrompt(
             _('Confirm Delete Unrevisioned'),
             _('Delete the following unrevisioned files?'),
-            parent, (_('&Delete'), _('&Cancel')), 1, 1, files).run()
+            parent, (_('&Delete'), _('Cancel')), 1, 1, files).run()
     if res == 1:
         return
     for wfile in files:

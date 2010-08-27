@@ -268,7 +268,7 @@ class RepoWidget(QWidget):
                 _('%d unknown files\n'
                   '%d files ignored by .hgignore filter\n'
                   'Purge unknown, ignored, or both?') % (len(U), len(I)), self,
-                (_('&Unknown'), _('&Ignored'), _('&Both'), _('&Cancel')),
+                (_('&Unknown'), _('&Ignored'), _('&Both'), _('Cancel')),
                     0, 3, U+I).run()
             if res == 3:
                 return
