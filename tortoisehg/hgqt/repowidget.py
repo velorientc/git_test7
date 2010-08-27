@@ -55,8 +55,6 @@ class RepoWidget(QWidget):
         self.setupUi()
         self.createActions()
 
-        connect(self.repoview, SIGNAL('showMessage'), self.showMessage)
-
         self.setupModels()
         self.setupRevisionTable()
 
@@ -330,6 +328,7 @@ class RepoWidget(QWidget):
         view.qimportRevision.connect(self.qimportRevision)
         view.qfinishRevision.connect(self.qfinishRevision)
         view.stripRevision.connect(self.stripRevision)
+        view.showMessage.connect(self.showMessage)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
