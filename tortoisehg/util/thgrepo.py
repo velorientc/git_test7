@@ -9,6 +9,7 @@
 # to extending repositories and change contexts.
 
 import os
+import sys
 
 from mercurial import hg, patch, util, error, bundlerepo
 from mercurial.util import propertycache
@@ -28,7 +29,8 @@ def repository(ui, path='', create=False):
         return repo
     return _repocache[path]
 
-_thgrepoprops = '_thgmqpatchnames _thghiddentags thgmqunappliedpatches'.split()
+_thgrepoprops = '''_thgmqpatchnames _thghiddentags
+                   thgmqunappliedpatches _shell'''.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
@@ -64,6 +66,21 @@ def _extendrepo(repo):
 
             self.mq.parse_series()
             return self.mq.series[:]
+
+        @propertycache
+        def _shell(self):
+            s = self.ui.config('tortoisehg', 'shell')
+            if s:
+                return s
+            if sys.platform == 'darwin':
+                return None # Terminal.App does not support open-to-folder
+            elif os.name == 'nt':
+                return 'cmd.exe'
+            else:
+                return 'xterm'
+
+        def shell(self):
+            return self._shell
 
         def thgmqtag(self, tag):
             '''True if tag is used to mark an applied MQ patch'''
