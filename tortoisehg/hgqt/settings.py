@@ -249,6 +249,8 @@ INFO = (
           'myeditor -flags [$FILE --num=$LINENUM][--search $SEARCH]<br><br>'
           'See <a href="%s">OpenAtLine</a>'
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
+    (_('Shell'), 'tortoisehg.shell', genEditCombo,
+        _('Specify your preferred terminal shell application')),
     (_('CLI Editor'), 'ui.editor', genEditCombo,
         _('The editor used by Mercurial command line commands to '
         ' collect multiline input from the user.  Most notably, '
