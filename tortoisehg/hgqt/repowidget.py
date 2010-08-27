@@ -387,7 +387,7 @@ class RepoWidget(QWidget):
         saved = self.setScanForRepoChanges(False)
         dlg = update.UpdateDialog(rev, self.repo, self)
         if dlg.exec_():
-            self.refresh()
+            self.reload()
         self.setScanForRepoChanges(saved)
 
     def mergeWithRevision(self, rev):
@@ -418,7 +418,7 @@ class RepoWidget(QWidget):
         saved = self.setScanForRepoChanges(False)
         dlg = backout.BackoutDialog(self.repo, str(rev), self)
         if dlg.exec_():
-            self.reload() # TODO: implement something less drastic than a full reload
+            self.reload()
         self.setScanForRepoChanges(saved)
 
     def stripRevision(self, rev):
@@ -426,7 +426,7 @@ class RepoWidget(QWidget):
         saved = self.setScanForRepoChanges(False)
         dlg = thgstrip.StripDialog(self.repo, rev=str(rev), parent=self)
         if dlg.exec_():
-            self.reload() # TODO: implement something less drastic than a full reload
+            self.reload()
         self.setScanForRepoChanges(saved)
 
     def emailRevision(self, rev):
@@ -454,7 +454,6 @@ class RepoWidget(QWidget):
                           parent=self):
             self.runner = cmdui.Runner(_('Rebase - TortoiseHg'), self)
             def finished(ret):
-                # TODO: implement something less drastic than a full reload
                 self.reload()
                 self.setScanForRepoChanges(saved)
             self.runner.commandFinished.connect(finished)
@@ -528,11 +527,10 @@ class RepoWidget(QWidget):
 
     def reload(self, rev=None):
         'Initiate a refresh of the repo model, rebuild graph'
-        if rev == None:
+        if rev is None:
             self._reload_rev = self.repoview.current_rev
         else:
             self._reload_rev = rev
-        self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
         self.repo.thginvalidate()
         self._repodate = self._getrepomtime()
         self.setupModels()
