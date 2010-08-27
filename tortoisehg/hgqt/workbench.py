@@ -281,8 +281,12 @@ class Workbench(QMainWindow):
         self.log.setVisible(show)
 
     def openRepo(self, repopath):
-        repo = thgrepo.repository(self.ui, path=str(repopath))
-        self.addRepoTab(repo)
+        try:
+            repo = thgrepo.repository(self.ui, path=str(repopath))
+            self.addRepoTab(repo)
+        except RepoError:
+            QMessageBox.warning(self, _('Failed to open repository'),
+                _('%s is not a valid repository') % repopath)
 
     def find_root(self, url):
         p = str(url.toLocalFile())
