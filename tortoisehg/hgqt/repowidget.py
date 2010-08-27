@@ -203,8 +203,12 @@ class RepoWidget(QWidget):
         self.repoview.forward()
 
     def thgimport(self):
+        l = len(self.repo)
         dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
         dlg.exec_()
+        self.repo.thginvalidate()
+        if len(self.repo) != l:
+            self.reload()
 
     def verify(self):
         cmdline = ['--repository', self.repo.root, 'verify']
