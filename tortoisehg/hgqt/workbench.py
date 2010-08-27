@@ -220,6 +220,7 @@ class Workbench(QMainWindow):
         self.actionRollback = QAction(_("Rollback/Undo"), self)
         self.actionPurge = QAction(_("Purge"), self)
         self.actionExplore = QAction(_("Explore"), self)
+        self.actionTerminal = QAction(_("Terminal"), self)
 
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
@@ -256,6 +257,7 @@ class Workbench(QMainWindow):
         m.addAction(self.actionPurge)
         m.addSeparator()
         m.addAction(self.actionExplore)
+        m.addAction(self.actionTerminal)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -472,6 +474,7 @@ class Workbench(QMainWindow):
         self.actionRollback.triggered.connect(self.rollback)
         self.actionPurge.triggered.connect(self.purge)
         self.actionExplore.triggered.connect(self.explore)
+        self.actionTerminal.triggered.connect(self.terminal)
 
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
@@ -735,9 +738,24 @@ class Workbench(QMainWindow):
         if w:
             self.launchExplorer(w.repo.root)
 
+    def terminal(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            self.launchTerminal(w.repo)
+
     def launchExplorer(self, root):
         """open Windows Explorer at the repo root"""
         QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+
+    def launchTerminal(self, repo):
+        shell = repo.shell()
+        if shell:
+            cwd = os.getcwd()
+            try:
+                os.chdir(repo.root)
+                QProcess.startDetached(shell)
+            finally:
+                os.chdir(cwd)
 
 
 def run(ui, *pats, **opts):
