@@ -490,21 +490,6 @@ class SettingsDialog(QDialog):
         self.setWindowTitle(_('TortoiseHg Settings'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
-        try:
-            if root is None:
-                root = paths.find_root()
-            if root:
-                repo = hg.repository(ui.ui(), root)
-            else:
-                repo = None
-        except error.RepoError:
-            repo = None
-            if configrepo:
-                qtlib.ErrorMsgBox(_('No repository found'),
-                                  _('no repo at ') + root, parent=self)
-                self.reject()
-                return
-
         if not hasattr(wconfig.config(), 'write'):
             qtlib.ErrorMsgBox(_('Iniparse package not found'),
                          _("Can't change settings without iniparse package - "
@@ -526,6 +511,19 @@ class SettingsDialog(QDialog):
         self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(), focus=focus),
                              qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
+        try:
+            if root is None:
+                root = paths.find_root()
+            if root:
+                repo = hg.repository(ui.ui(), root)
+            else:
+                repo = None
+        except error.RepoError:
+            repo = None
+            if configrepo:
+                qtlib.ErrorMsgBox(_('No repository found'),
+                                  _('no repo at ') + root, parent=self)
+
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             reponame = hglib.tounicode(os.path.basename(repo.root))
