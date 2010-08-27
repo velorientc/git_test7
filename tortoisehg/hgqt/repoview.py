@@ -149,6 +149,8 @@ class HgRepoView(QTableView):
                      self.qfinish))
             a.append(('strip', _('Strip Revision...'), None, None, None,
                      self.strip))
+            a.append(('qgoto', _('Goto patch'), None, None, None,
+                      self.qgoto))
         return a
 
     def createActions(self):
@@ -208,6 +210,10 @@ class HgRepoView(QTableView):
     def strip(self):
         self.stripRevision.emit(self.current_rev)
 
+    def qgoto(self):
+        ctx = self.context(self.current_rev)
+        self.emit(SIGNAL('qgotoRevision'), ctx.thgmqpatchname())
+
     def contextMenuEvent(self, event):
         menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
@@ -224,6 +230,7 @@ class HgRepoView(QTableView):
             menu.addAction(self._actions['qimport'])
             menu.addAction(self._actions['qfinish'])
             menu.addAction(self._actions['strip'])
+            menu.addAction(self._actions['qgoto'])
         menu.exec_(event.globalPos())
 
     def init_variables(self):
@@ -346,10 +353,12 @@ class HgRepoView(QTableView):
         ctx = self.context(self.current_rev)
         enable = self.current_rev is not None and not ctx.thgmqunappliedpatch()
         self.workbench.actionDiffMode.setEnabled(enable)
-        exclude = ('back', 'forward')
+        exclude = ('back', 'forward', 'qgoto')
         for name in self._actions:
             if name not in exclude:
                 self._actions[name].setEnabled(enable)
+
+        self._actions['qgoto'].setEnabled(ctx.thgmqappliedpatch() or ctx.thgmqunappliedpatch())
 
         if len(self._rev_history) > 0:
             back = self._rev_pos > 0

@@ -330,6 +330,7 @@ class RepoWidget(QWidget):
         view.qfinishRevision.connect(self.qfinishRevision)
         view.stripRevision.connect(self.stripRevision)
         view.showMessage.connect(self.showMessage)
+        connect(view, SIGNAL('qgotoRevision'), self.qgotoRevision)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
@@ -469,6 +470,18 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
         else:
             self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
+
+    def qgotoRevision(self, patchname):
+        """Goto patch REV"""
+        saved = self.setScanForRepoChanges(False)
+        cmdline = ['qgoto', patchname,  # FIXME force option
+                   '--repository', self.repo.root]
+        self.runner = cmdui.Runner(_('QGoto - TortoiseHg'), self)
+        def finished(ret):
+            self.reload()
+            self.setScanForRepoChanges(saved)
+        self.runner.commandFinished.connect(finished)
+        self.runner.run(cmdline)       
 
     def revision_selected(self, rev):
         'View selection changed, could be a reload'
