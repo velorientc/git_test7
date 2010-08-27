@@ -144,6 +144,12 @@ def _extendchangectx(changectx):
 
         def thgmqunappliedpatch(self): return False
 
+        def thgmqpatchname(self):
+            '''Return self's MQ patch name. AssertionError if self not an MQ patch'''
+            patchtags = self._thgmqpatchtags()
+            assert len(patchtags) == 1, "thgmqpatchname: called on non-mq patch"
+            return list(patchtags)[0]
+
         def thgbranchhead(self):
             '''True if self is a branch head'''
             return self in [self._repo[x] for x in self._repo.branchmap()]
@@ -248,5 +254,6 @@ class patchctx(object):
     def thgtags(self): return []
     def thgwdparent(self): return False
     def thgmqappliedpatch(self): return False
+    def thgmqpatchname(self): return self._patchname
     def thgbranchhead(self): return False
     def thgmqunappliedpatch(self): return True
