@@ -190,7 +190,8 @@ class RepoWidget(QWidget):
 
     def createActions(self):
         self.actionActivateRev = QAction('Activate rev.', self)
-        self.actionActivateRev.setShortcuts([Qt.SHIFT+Qt.Key_Return, Qt.SHIFT+Qt.Key_Enter])
+        self.actionActivateRev.setShortcuts([Qt.SHIFT+Qt.Key_Return,
+                                             Qt.SHIFT+Qt.Key_Enter])
         connect(self.actionActivateRev, SIGNAL('triggered()'),
                 self.revision_activated)
         self.addAction(self.actionActivateRev)
