@@ -85,49 +85,28 @@ class RepoWidget(QWidget):
 
         self._inittasktabs()
 
-        w = RevDetailsWidget(self.repo, self.repoview)
-        self.revDetailsStackedWidget.addWidget(w)
-        w.revisionLinkClicked.connect(self.goto)
-        self.revDetailsWidget = w
-
-        w = BlankMessageWidget(self.repoview)
-        self.revDetailsStackedWidget.addWidget(w)
-        self.blankMessageWidget = w
-
     def _inittasktabs(self):
         self.taskTabsWidget = tt = QTabWidget()
         tt.setDocumentMode(True)
         tt.setTabPosition(QTabWidget.East)
         self.repotabs_splitter.addWidget(self.taskTabsWidget)
 
-        self.revDetailsStackedWidget = sw = QStackedWidget()
-        self.dummywidget = QWidget()
-        self.revDetailsStackedWidget.addWidget(self.dummywidget)
-        self.revDetailsStackedWidget.setCurrentWidget(self.dummywidget)
-        sw.minimumSizeHint = lambda: QSize(0, 0)
-        self.logTabIndex = idx = tt.addTab(sw, geticon('log'), '')
+        self.revDetailsWidget = w = RevDetailsWidget(self.repo, self.repoview)
+        w.revisionLinkClicked.connect(self.goto)
+        self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
-        self.commitStackedWidget = sw = QStackedWidget()
-        sw.minimumSizeHint = lambda: QSize(0, 0)
-        self.commitTabIndex = idx = tt.addTab(sw, geticon('commit'), '')
+        w = SharedWidget(self.createCommitWidget())
+        self.commitTabIndex = idx = tt.addTab(w, geticon('commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
-        self.commitStackedWidget.addWidget(SharedWidget(self.createCommitWidget()))
-        # TODO: unstack commit widget
 
-        self.syncStackedWidget = sw = QStackedWidget()
-        sw.minimumSizeHint = lambda: QSize(0, 0)
-        self.syncTabIndex = idx = tt.addTab(sw, geticon('sync'), '')
+        w = self.createSyncWidget()
+        self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
-        self.syncStackedWidget.addWidget(self.createSyncWidget())
-        # TODO: unstack sync widget
 
-        self.grepStackedWidget = gw = QStackedWidget()
-        gw.minimumSizeHint = lambda: QSize(0, 0)
-        self.grepTabIndex = idx = tt.addTab(gw, geticon('grep'), '') # TODO
+        w = self.createGrepWidget()
+        self.grepTabIndex = idx = tt.addTab(w, geticon('grep'), '')
         tt.setTabToolTip(idx, _("Search"))
-        self.grepStackedWidget.addWidget(self.createGrepWidget())
-        # TODO: unstack grep widget
 
     def createCommitWidget(self):
         cw = getattr(self.repo, '_commitwidget', None)  # TODO: ugly
@@ -137,7 +116,6 @@ class RepoWidget(QWidget):
 
         pats = {}
         opts = {}
-        # TODO: pass repo directly instead of repo.root ?
         cw = CommitWidget(pats, opts, root=self.repo.root)
         cw.errorMessage.connect(self.workbench.showMessage)
         cw.commitComplete.connect(self.reload)
@@ -151,13 +129,11 @@ class RepoWidget(QWidget):
         return cw
 
     def createSyncWidget(self):
-        # TODO: pass repo directly instead of repo.root ?
         # TODO: don't pass workbench
         sw = SyncWidget(root=self.repo.root, parent=self.workbench)
         return sw
 
     def createGrepWidget(self):
-        # TODO: pass repo directly instead of repo.root ?
         upats = {}
         gw = SearchWidget(upats, self.repo.root, self)
         return gw
@@ -492,8 +468,8 @@ class RepoWidget(QWidget):
         if self.repomodel.graph is None:
             return
         if type(rev) == str: # unapplied patch
-            self.revDetailsStackedWidget.setCurrentWidget(self.blankMessageWidget)
             self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
+            self.revDetailsWidget.revision_selected(None)
             return
 
         ctx = self.repomodel.repo.changectx(rev)
@@ -502,7 +478,6 @@ class RepoWidget(QWidget):
         else:
             self.revDetailsWidget.revision_selected(rev)
             self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
-        self.revDetailsStackedWidget.setCurrentWidget(self.revDetailsWidget)
         self.updateActions()
 
     def goto(self, rev):
@@ -549,9 +524,6 @@ class RepoWidget(QWidget):
         self.repomodel.invalidate()
         self.revDetailsWidget.on_filled()
 
-    def getCommitWidget(self):
-        return self.commitStackedWidget.currentWidget()
-
     def setRepomodel(self, branch, allparents=True):
         self.repomodel.setRepo(self.repo, branch=branch, allparents=allparents)
 
@@ -559,7 +531,7 @@ class RepoWidget(QWidget):
         return self.repomodel.branch()
 
     def okToContinue(self):
-        cw = self.getCommitWidget()
+        cw = getattr(self.repo, '_commitwidget', None)  # TODO: ugly
         if cw:
             return cw.canExit()
         return True
@@ -604,7 +576,7 @@ class RepoWidget(QWidget):
         if self.isVisible():
             # assuming here that there is at most one RepoWidget visible
             self.storeSettings()
-        self.revDetailsStackedWidget.removeWidget(self.revDetailsWidget)
+        self.revDetailsWidget.storeSettings()
         s = QSettings()
         cw = self.getCommitWidget()
         if cw:
