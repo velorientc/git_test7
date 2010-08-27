@@ -341,13 +341,13 @@ class HgRepoListModel(QAbstractTableModel):
                               QPointF(centre_x - r, centre_y),])
             painter.drawPolygon(poly)
 
-        if ctx.thgmqpatch():  # diamonds for patches
+        if ctx.thgmqappliedpatch():  # diamonds for patches
             if ctx.thgwdparent():
                 painter.setBrush(white)
                 diamond(2 * 0.9 * radius / 1.5)
             painter.setBrush(fillcolor)
             diamond(radius / 1.5)
-        elif type(ctx.rev()) == str:
+        elif ctx.thgmqunappliedpatch():
             patchcolor = QColor('#dddddd')
             painter.setBrush(patchcolor)
             painter.setPen(patchcolor)

@@ -130,11 +130,17 @@ def _extendchangectx(changectx):
             # see old __init__ for repomodel
             return self.rev() in [ctx.rev() for ctx in self._repo.parents()]
 
-        def thgmqpatch(self):
-            '''True if self is an MQ applied patch'''
+        def _thgmqpatchtags(self):
+            '''Returns the set of self's tags which are MQ patch names'''
             mytags = set(self.tags())
             patchtags = self._repo._thgmqpatchnames
-            return not not mytags.intersection(patchtags)
+            result = mytags.intersection(patchtags)
+            assert len(result) <= 1, "thgmqpatchname: rev has more than one tag in series"
+            return result
+
+        def thgmqappliedpatch(self):
+            '''True if self is an MQ applied patch'''
+            return bool(self._thgmqpatchtags())
 
         def thgmqunappliedpatch(self): return False
 
@@ -241,6 +247,6 @@ class patchctx(object):
     def extra(self): return {}
     def thgtags(self): return []
     def thgwdparent(self): return False
-    def thgmqpatch(self): return False
+    def thgmqappliedpatch(self): return False
     def thgbranchhead(self): return False
     def thgmqunappliedpatch(self): return True
