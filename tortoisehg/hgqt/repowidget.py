@@ -15,7 +15,7 @@ from tortoisehg.util import thgrepo, shlib, hglib, purge
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
-from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget
+from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run
@@ -83,9 +83,6 @@ class RepoWidget(QWidget):
         self.repoview.setSizePolicy(sp)
         self.repoview.setFrameShape(QFrame.StyledPanel)
 
-        self._inittasktabs()
-
-    def _inittasktabs(self):
         self.taskTabsWidget = tt = QTabWidget()
         tt.setDocumentMode(True)
         tt.setTabPosition(QTabWidget.East)
@@ -96,20 +93,23 @@ class RepoWidget(QWidget):
         self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
-        w = SharedWidget(self.createCommitWidget())
+        w = DemandWidget(self.createCommitWidget)
         self.commitTabIndex = idx = tt.addTab(w, geticon('commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
-        w = self.createSyncWidget()
+        w = DemandWidget(self.createSyncWidget)
         self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
-        w = self.createGrepWidget()
+        w = DemandWidget(self.createGrepWidget)
         self.grepTabIndex = idx = tt.addTab(w, geticon('grep'), '')
         tt.setTabToolTip(idx, _("Search"))
 
+    def getCommitWidget(self):
+        return getattr(self.repo, '_commitwidget', None)  # TODO: ugly
+
     def createCommitWidget(self):
-        cw = getattr(self.repo, '_commitwidget', None)  # TODO: ugly
+        cw = self.getCommitWidget()
         if cw:
             cw.commitComplete.connect(self.reload)
             return cw
@@ -126,7 +126,7 @@ class RepoWidget(QWidget):
         s = QSettings()
         cw.loadConfigs(s)
         self.repo._commitwidget = cw
-        return cw
+        return SharedWidget(cw)
 
     def createSyncWidget(self):
         # TODO: don't pass workbench
@@ -531,7 +531,7 @@ class RepoWidget(QWidget):
         return self.repomodel.branch()
 
     def okToContinue(self):
-        cw = getattr(self.repo, '_commitwidget', None)  # TODO: ugly
+        cw = self.getCommitWidget()
         if cw:
             return cw.canExit()
         return True
