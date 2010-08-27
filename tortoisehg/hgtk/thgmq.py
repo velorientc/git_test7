@@ -70,6 +70,11 @@ class MQWidget(gtk.VBox):
                             'ShowQParent',
                             "Show 'qparent'",
                             False,
+                            gobject.PARAM_READWRITE),
+        'force-pushpop': (gobject.TYPE_BOOLEAN,
+                            'ForcePushPop',
+                            "Force",
+                            False,
                             gobject.PARAM_READWRITE)
     }
 
@@ -321,6 +326,10 @@ class MQWidget(gtk.VBox):
         if not self.is_operable():
             return
         cmdline = ['hg', 'qpop']
+
+        if self.get_property('force-pushpop'):
+            cmdline.append('-f')
+
         if all:
             cmdline.append('--all')
         self.cmd.execute(cmdline, self.cmd_done)
@@ -334,6 +343,10 @@ class MQWidget(gtk.VBox):
         if not self.is_operable():
             return
         cmdline = ['hg', 'qpush']
+
+        if self.get_property('force-pushpop'):
+            cmdline.append('-f')
+
         if all:
             cmdline.append('--all')
         self.cmd.execute(cmdline, self.cmd_done)
@@ -859,6 +872,11 @@ class MQWidget(gtk.VBox):
         item = m.append(_("Show 'qparent'"), lambda item: self.refresh(),
                         ascheck=True, check=True)
         self.vmenu['show-qparent'] = item
+
+        item = m.append(_("Force"), lambda item: self.refresh(),
+                        ascheck=True, check=False)
+        self.vmenu['force-pushpop'] = item
+
 
         menu = m.build()
         menu.show_all()
