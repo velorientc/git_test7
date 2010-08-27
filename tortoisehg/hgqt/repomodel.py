@@ -109,7 +109,7 @@ class HgRepoListModel(QAbstractTableModel):
                            'Tags':     self.gettags,
                            'Branch':   lambda ctx, gnode: ctx.branch(),
                            'Filename': lambda ctx, gnode: gnode.extra[0],
-                           'Age':      lambda ctx, gnode: ctx.date() and hglib.age(ctx.date())or "",
+                           'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
                            'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
                            'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
                            }
@@ -234,7 +234,7 @@ class HgRepoListModel(QAbstractTableModel):
         if column == 'Node':
             return str(self.repo['.'])
         if column in ('Age', 'LocalTime', 'UTCTime'):
-            return hglib.displaytime(self.repo[None].date())
+            return hglib.displaytime(util.makedate())
         if column == 'Tags':
             try:
                 return sorted(self.repo.tags().keys(), key=lambda x: len(x))[-1][:10]

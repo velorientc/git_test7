@@ -202,7 +202,7 @@ class patchctx(object):
                 msg = '\n'.join(msg)
         self._node = node
         self._user = user and hglib.toutf(user) or ''
-        self._date = date and util.parsedate(date) or None
+        self._date = date and util.parsedate(date) or util.makedate()
         self._desc = msg and msg or ''
         self._branch = branch and hglib.toutf(branch) or ''
         self._parents = []
