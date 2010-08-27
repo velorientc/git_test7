@@ -272,6 +272,8 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionBack)
         tb.addAction(self.actionForward)
         tb.addSeparator()
+        tb.addAction(self.actionShowLog)
+        tb.addAction(self.actionShowRepoRegistry)
         tb.addAction(self.actionLoadAll)
         tb.addSeparator()
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
