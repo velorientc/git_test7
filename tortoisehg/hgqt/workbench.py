@@ -67,9 +67,6 @@ class Workbench(QMainWindow):
 
         rr.openRepoSignal.connect(self.openRepo)
 
-        if repo:
-            self.addRepoTab(repo)
-
         tw = self.repoTabsWidget
         connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
         connect(tw, SIGNAL('currentChanged(int)'), self.repoTabChanged)
@@ -89,6 +86,11 @@ class Workbench(QMainWindow):
 
         self.reporegistry.visibilityChanged.connect(gotVisible)
         self.log.visibilityChanged.connect(logVisible)
+
+        if repo:
+            self.addRepoTab(repo)
+        else:
+            self.reporegistry.setVisible(True)
 
     def attachQuickBar(self, qbar):
         qbar.setParent(self)
