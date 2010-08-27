@@ -67,6 +67,7 @@ class GotoQuickBar(QuickBar):
 
 class HgRepoView(QTableView):
 
+    revisionClicked = pyqtSignal(object)
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
     updateToRevision = pyqtSignal(object)
@@ -103,6 +104,7 @@ class HgRepoView(QTableView):
         self.createActions()
         self.createToolbars()
         self.doubleClicked.connect(self.revActivated)
+        self.clicked.connect(self.revClicked)
 
     def mousePressEvent(self, event):
         index = self.indexAt(event.pos())
@@ -301,6 +303,10 @@ class HgRepoView(QTableView):
             gnode = model.graph[row]
             return gnode.rev
 
+    def revClicked(self, index):
+        rev = self.revFromindex(index)
+        self.revisionClicked.emit(rev)
+
     def revActivated(self, index):
         rev = self.revFromindex(index)
         if rev is not None:
@@ -308,7 +314,6 @@ class HgRepoView(QTableView):
 
     def revSelected(self, index, index_from):
         rev = self.revFromindex(index)
-
         if self.current_rev == rev:
             return
 
