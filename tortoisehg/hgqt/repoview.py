@@ -303,6 +303,9 @@ class HgRepoView(QTableView):
             gnode = model.graph[row]
             return gnode.rev
 
+    def context(self, rev):
+        return self.model().repo.changectx(rev)
+
     def revClicked(self, index):
         rev = self.revFromindex(index)
         self.revisionClicked.emit(rev)
@@ -340,7 +343,8 @@ class HgRepoView(QTableView):
             self.goto(ancestor.rev())
 
     def updateActions(self):
-        enable = self.current_rev is not None
+        ctx = self.context(self.current_rev)
+        enable = self.current_rev is not None and not ctx.thgmqunappliedpatch()
         self.workbench.actionDiffMode.setEnabled(enable)
         exclude = ('back', 'forward')
         for name in self._actions:
