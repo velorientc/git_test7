@@ -66,6 +66,22 @@ class GotoQuickBar(QuickBar):
         self.entry.setCompleter(None)
 
 class HgRepoView(QTableView):
+
+    revisionSelected = pyqtSignal(object)
+    revisionActivated = pyqtSignal(object)
+    updateToRevision = pyqtSignal(object)
+    mergeWithRevision = pyqtSignal(object)
+    tagToRevision = pyqtSignal(object)
+    backoutToRevision = pyqtSignal(object)
+    emailRevision = pyqtSignal(object)
+    archiveRevision = pyqtSignal(object)
+    copyHashSignal = pyqtSignal(object)
+    rebaseRevision = pyqtSignal(object)
+    qimportRevision = pyqtSignal(object)
+    qfinishRevision = pyqtSignal(object)
+    stripRevision = pyqtSignal(object)
+    showMessage = pyqtSignal(str)
+
     def __init__(self, workbench, parent=None):
         QTableView.__init__(self, parent)
         self.workbench = workbench
@@ -86,9 +102,7 @@ class HgRepoView(QTableView):
 
         self.createActions()
         self.createToolbars()
-        connect(self,
-                SIGNAL('doubleClicked (const QModelIndex &)'),
-                self.revisionActivated)
+        self.doubleClicked.connect(self.revActivated)
 
     def mousePressEvent(self, event):
         index = self.indexAt(event.pos())
@@ -157,40 +171,40 @@ class HgRepoView(QTableView):
             self.addAction(act)
 
     def showAtRev(self):
-        self.emit(SIGNAL('revisionActivated'), self.current_rev)
+        self.revisionActivated.emit(self.current_rev)
 
     def updateToRev(self):
-        self.emit(SIGNAL('updateToRevision'), self.current_rev)
+        self.updateToRevision.emit(self.current_rev)
 
     def mergeWithRev(self):
-        self.emit(SIGNAL('mergeWithRevision'), self.current_rev)
+        self.mergeWithRevision.emit(self.current_rev)
 
     def tagToRev(self):
-        self.emit(SIGNAL('tagToRevision'), self.current_rev)
+        self.tagToRevision.emit(self.current_rev)
 
     def backoutToRev(self):
-        self.emit(SIGNAL('backoutToRevision'), self.current_rev)
+        self.backoutToRevision.emit(self.current_rev)
 
     def emailRev(self):
-        self.emit(SIGNAL('emailRevision'), self.current_rev)
+        self.emailRevision.emit(self.current_rev)
 
     def archiveRev(self):
-        self.emit(SIGNAL('archiveRevision'), self.current_rev)
+        self.archiveRevision.emit(self.current_rev)
 
     def copyHash(self):
-        self.emit(SIGNAL('copyHash'), self.current_rev)
+        self.copyHashSignal.emit(self.current_rev)
 
     def rebase(self):
-        self.emit(SIGNAL('rebaseRevision'), self.current_rev)
+        self.rebaseRevision.emit(self.current_rev)
 
     def qimport(self):
-        self.emit(SIGNAL('qimportRevision'), self.current_rev)
+        self.qimportRevision.emit(self.current_rev)
 
     def qfinish(self):
-        self.emit(SIGNAL('qfinishRevision'), self.current_rev)
+        self.qfinishRevision.emit(self.current_rev)
 
     def strip(self):
-        self.emit(SIGNAL('stripRevision'), self.current_rev)
+        self.stripRevision.emit(self.current_rev)
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)
@@ -224,15 +238,10 @@ class HgRepoView(QTableView):
     def setModel(self, model):
         self.init_variables()
         QTableView.setModel(self, model)
-        connect(self.selectionModel(),
-                SIGNAL('currentRowChanged (const QModelIndex & , const QModelIndex & )'),
-                self.revisionSelected)
+        self.selectionModel().currentRowChanged.connect(self.revSelected)
         self.goto_toolbar.compl_model.setStringList(model.repo.tags().keys())
-
         self.resetDelegate()
-        connect(model,
-                SIGNAL('layoutChanged()'),
-                self.resetDelegate)
+        model.layoutChanged.connect(self.resetDelegate)
 
     def resetDelegate(self):
         # Model column layout has changed so we need to move
@@ -292,12 +301,12 @@ class HgRepoView(QTableView):
             gnode = model.graph[row]
             return gnode.rev
 
-    def revisionActivated(self, index):
+    def revActivated(self, index):
         rev = self.revFromindex(index)
         if rev is not None:
-            self.emit(SIGNAL('revisionActivated'), rev)
+            self.revisionActivated.emit(rev)
 
-    def revisionSelected(self, index, index_from):
+    def revSelected(self, index, index_from):
         rev = self.revFromindex(index)
 
         if self.current_rev == rev:
@@ -311,7 +320,7 @@ class HgRepoView(QTableView):
         self._in_history = False
         self.current_rev = rev
 
-        self.emit(SIGNAL('revisionSelected'), rev)
+        self.revisionSelected.emit(rev)
         self.updateActions()
 
     def gotoAncestor(self, index):
@@ -321,7 +330,7 @@ class HgRepoView(QTableView):
             ctx = repo[self.current_rev]
             ctx2 = repo[rev]
             ancestor = ctx.ancestor(ctx2)
-            self.emit(SIGNAL('showMessage'),
+            self.showMessage.emit(
                       "Goto ancestor of %s and %s"%(ctx.rev(), ctx2.rev()), 2000)
             self.goto(ancestor.rev())
 
@@ -369,7 +378,7 @@ class HgRepoView(QTableView):
         try:
             rev = repo.changectx(rev).rev()
         except RepoError:
-            self.emit(SIGNAL('showMessage'), "Can't find revision '%s'"%rev, 2000)
+            self.showMessage.emit("Can't find revision '%s'"%rev, 2000)
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
