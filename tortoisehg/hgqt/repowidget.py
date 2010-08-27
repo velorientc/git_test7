@@ -39,6 +39,7 @@ class RepoWidget(QWidget):
 
     showMessageSignal = pyqtSignal(str)
     switchToSignal = pyqtSignal(QWidget)
+    closeSelfSignal = pyqtSignal(QWidget)
 
     def __init__(self, repo, workbench):
         self.repo = repo
@@ -361,7 +362,6 @@ class RepoWidget(QWidget):
 
     def on_filled(self):
         'initial batch of revisions loaded'
-        self._repodate = self._getrepomtime()
         self.repoview.resizeColumns()
         if self._reload_rev is not None:
             try:
@@ -519,12 +519,15 @@ class RepoWidget(QWidget):
         watchedfiles = [(self.repo.root, ".hg", "store", "00changelog.i"),
                         (self.repo.root, ".hg", "dirstate")]
         watchedfiles = [os.path.join(*wf) for wf in watchedfiles]
-        mtime = [os.path.getmtime(wf) for wf in watchedfiles \
-                 if os.path.isfile(wf)]
-        if mtime:
-            return max(mtime)
-        # humm, directory has probably been deleted, exiting...
-        self.close()
+        try:
+            mtime = [os.path.getmtime(wf) for wf in watchedfiles \
+                     if os.path.isfile(wf)]
+            if mtime:
+                return max(mtime)
+        except EnvironmentError:
+            return None
+        self._scanForRepoChanges = False
+        self.closeSelfSignal.emit(self)
 
     def reload(self, rev=None):
         'Initiate a refresh of the repo model, rebuild graph'

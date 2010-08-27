@@ -315,6 +315,12 @@ class Workbench(QMainWindow):
             event.setDropAction(Qt.LinkAction)
             event.accept()
 
+    def repoTabCloseSelf(self, widget):
+        self.repoTabsWidget.setCurrentWidget(widget)
+        index = self.repoTabsWidget.currentIndex()
+        if widget.closeRepoWidget():
+            self.repoTabsWidget.removeTab(index)
+
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
         w = tw.widget(index)
@@ -341,6 +347,7 @@ class Workbench(QMainWindow):
         rw.showMessageSignal.connect(self.showMessage)
         rw.revDetailsWidget.fileview.showDescSignal.connect(self.showMessage)
         rw.switchToSignal.connect(self.switchTo)
+        rw.closeSelfSignal.connect(self.repoTabCloseSelf)
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
