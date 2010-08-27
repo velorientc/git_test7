@@ -316,6 +316,7 @@ class RepoWidget(QWidget):
     def setupRevisionTable(self):
         view = self.repoview
         view.revisionSelected.connect(self.revision_selected)
+        view.revisionClicked.connect(self.revision_clicked)
         view.revisionActivated.connect(self.revision_activated)
         view.updateToRevision.connect(self.updateToRevision)
         view.mergeWithRevision.connect(self.mergeWithRevision)
@@ -462,20 +463,21 @@ class RepoWidget(QWidget):
         self.runner.commandFinished.connect(finished)
         self.runner.run(cmdline)
 
+    def revision_clicked(self, rev):
+        'User clicked on a repoview row'
+        if rev is None:
+            self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
+        else:
+            self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
+
     def revision_selected(self, rev):
+        'View selection changed, could be a reload'
         if self.repomodel.graph is None:
             return
         if type(rev) == str: # unapplied patch
-            self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
             self.revDetailsWidget.revision_selected(None)
-            return
-
-        ctx = self.repomodel.repo.changectx(rev)
-        if ctx.rev() is None:
-            self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
         else:
             self.revDetailsWidget.revision_selected(rev)
-            self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
         self.updateActions()
 
     def goto(self, rev):
