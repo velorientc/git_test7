@@ -506,7 +506,9 @@ class SharedWidget(QWidget):
     def __init__(self, widget, parent=None):
         super(SharedWidget, self).__init__(parent)
         self._widget = widget
-        self.setLayout(QVBoxLayout())
+        vbox = QVBoxLayout()
+        vbox.setContentsMargins(*(0,)*4)
+        self.setLayout(vbox)
 
     def showEvent(self, event):
         """Change the parent of the stored widget if necessary"""
@@ -517,6 +519,33 @@ class SharedWidget(QWidget):
 
     def get(self):
         """Returns the stored widget"""
+        return self._widget
+
+    def __getattr__(self, name):
+        return getattr(self._widget, name)
+
+
+class DemandWidget(QWidget):
+    'Create a widget the first time it is shown'
+
+    def __init__(self, createfunc, parent=None):
+        super(DemandWidget, self).__init__(parent)
+        self._createfunc = createfunc
+        self._widget = None
+        vbox = QVBoxLayout()
+        vbox.setContentsMargins(*(0,)*4)
+        self.setLayout(vbox)
+
+    def showEvent(self, event):
+        """create the widget if necessary"""
+        self.get()
+        super(DemandWidget, self).showEvent(event)
+
+    def get(self):
+        """Returns the stored widget"""
+        if self._widget is None:
+            self._widget = self._createfunc()
+            self.layout().addWidget(self._widget)
         return self._widget
 
     def __getattr__(self, name):
