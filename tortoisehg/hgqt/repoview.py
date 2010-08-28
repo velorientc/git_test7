@@ -80,6 +80,7 @@ class HgRepoView(QTableView):
     rebaseRevision = pyqtSignal(object)
     qimportRevision = pyqtSignal(object)
     qfinishRevision = pyqtSignal(object)
+    qgotoRevision = pyqtSignal(str)
     stripRevision = pyqtSignal(object)
     showMessage = pyqtSignal(str)
 
@@ -212,7 +213,7 @@ class HgRepoView(QTableView):
 
     def qgoto(self):
         ctx = self.context(self.current_rev)
-        self.emit(SIGNAL('qgotoRevision'), ctx.thgmqpatchname())
+        self.qgotoRevision.emit(ctx.thgmqpatchname())
 
     def contextMenuEvent(self, event):
         menu = QMenu(self)

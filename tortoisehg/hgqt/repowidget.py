@@ -330,7 +330,7 @@ class RepoWidget(QWidget):
         view.qfinishRevision.connect(self.qfinishRevision)
         view.stripRevision.connect(self.stripRevision)
         view.showMessage.connect(self.showMessage)
-        connect(view, SIGNAL('qgotoRevision'), self.qgotoRevision)
+        view.qgotoRevision.connect(self.qgotoRevision)
         #self.attachQuickBar(view.goto_toolbar)
         gotoaction = view.goto_toolbar.toggleViewAction()
         gotoaction.setIcon(geticon('goto'))
