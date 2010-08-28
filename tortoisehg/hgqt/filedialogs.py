@@ -177,12 +177,8 @@ class FileLogDialog(_AbstractFileDialog):
     def setupModels(self):
         self.filerevmodel = FileRevModel(self.repo)
         self.repoview.setModel(self.filerevmodel)
-        connect(self.repoview,
-                SIGNAL('revisionSelected'),
-                self.revisionSelected)
-        connect(self.repoview,
-                SIGNAL('revisionActivated'),
-                self.revisionActivated)
+        self.repoview.revisionSelected.connect(self.revisionSelected)
+        self.repoview.revisionActivated.connect(self.revisionActivated)
         connect(self.filerevmodel, SIGNAL('showMessage'),
                 self.statusBar().showMessage,
                 Qt.QueuedConnection)
@@ -386,8 +382,8 @@ class FileDiffDialog(_AbstractFileDialog):
             table = getattr(self, 'tableView_revisions_%s' % side)
             table.setTabKeyNavigation(False)
             #table.installEventFilter(self)
-            connect(table, SIGNAL('revisionSelected'), self.revisionSelected)
-            connect(table, SIGNAL('revisionActivated'), self.revisionActivated)
+            table.revisionSelected.connect(self.revisionSelected)
+            table.revisionActivated.connect(self.revisionActivated)
 
             connect(self.viewers[side].verticalScrollBar(),
                     SIGNAL('valueChanged(int)'),
@@ -447,7 +443,7 @@ class FileDiffDialog(_AbstractFileDialog):
         else:
             rev = self.filerevmodel.graph[0].rev
         self.goto(rev)
-        
+
     def revisionSelected(self, rev):
         if self.sender() is self.tableView_revisions_right:
             side = 'right'
