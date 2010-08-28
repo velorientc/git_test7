@@ -13,24 +13,14 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import config, hg, ui, url, util, error
+from mercurial import hg, ui, url, util, error
 
-from tortoisehg.util import hglib, thgrepo
+from tortoisehg.util import hglib, thgrepo, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui
 
 # TODO
 # Write keyring help, connect to help button
-# Ini file locking for sync.py and settings.py
-
-try:
-    import iniparse
-    # Monkypatch this regex to prevent iniparse from considering
-    # 'rem' as a comment
-    iniparse.ini.CommentLine.regex = \
-               re.compile(r'^(?P<csep>[%;#])(?P<comment>.*)$')
-except ImportError:
-    iniparse = None
 
 _schemes = ['local', 'ssh', 'http', 'https']
 
@@ -316,21 +306,18 @@ class SyncWidget(QWidget):
         _run.email(ui.ui(), root=self.root)
 
     def removeAlias(self, alias):
-        if iniparse is None:
+        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn, cfg = loadIniFile([fn], self)
+        if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to remove URL'),
                    _('Iniparse must be installed.'), parent=self)
             return
-        fn = os.path.join(self.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile([fn], self)
         if fn is None:
             return
-        if 'paths' in cfg:
-            if alias in cfg['paths']:
-                del cfg['paths'][alias]
+        if alias in cfg['paths']:
+            del cfg['paths'][alias]
         try:
-            f = util.atomictempfile(fn, 'w', createmode=None)
-            f.write(str(cfg))
-            f.rename()
+            wconfig.writefile(cfg, fn)
             self.refresh()
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
@@ -367,27 +354,23 @@ class SaveDialog(QDialog):
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
     def accept(self):
-        if iniparse is None:
+        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn, cfg = loadIniFile([fn], self)
+        if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save an URL'),
                    _('Iniparse must be installed.'), parent=self)
             return
-        fn = os.path.join(self.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile([fn], self)
         if fn is None:
             return
-        if 'paths' not in cfg:
-            cfg.new_namespace('paths')
         alias = hglib.fromunicode(self.aliasentry.text())
         path = hglib.fromunicode(self.urlentry.text())
         if alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
                     _('%s already exists, replace URL?') % alias):
                 return
-        cfg['paths'][alias] = path
+        cfg.set('paths', alias, path)
         try:
-            f = util.atomictempfile(fn, 'w', createmode=None)
-            f.write(str(cfg))
-            f.rename()
+            wconfig.writefile(cfg, fn)
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
@@ -466,15 +449,13 @@ class AuthDialog(QDialog):
         self.saveToPath(util.user_rcpath())
 
     def saveToPath(self, path):
-        if iniparse is None:
+        fn, cfg = loadIniFile(path, self)
+        if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
                    _('Iniparse must be installed.'), parent=self)
             return
-        fn, cfg = loadIniFile(path, self)
         if fn is None:
             return
-        if 'auth' not in cfg:
-            cfg._new_namespace('auth')
         schemes = hglib.fromunicode(self.schemes.currentText())
         prefix = hglib.fromunicode(self.prefixentry.text())
         username = hglib.fromunicode(self.userentry.text())
@@ -485,18 +466,16 @@ class AuthDialog(QDialog):
                                         _('Authentication info for %s already'
                                           'exists, replace?') % host):
                 return
-        cfg['auth'][alias+'.schemes'] = schemes
-        cfg['auth'][alias+'.username'] = username
-        cfg['auth'][alias+'.prefix'] = prefix
+        cfg.set('auth', alias+'.schemes', schemes)
+        cfg.set('auth', alias+'.username', username)
+        cfg.set('auth', alias+'.prefix', prefix)
         key = alias+'.password'
         if password:
-            cfg['auth'][key] = password
+            cfg.set('auth', key, password)
         elif not password and key in cfg['auth']:
             del cfg['auth'][key]
         try:
-            f = util.atomictempfile(fn, 'w', createmode=None)
-            f.write(str(cfg))
-            f.rename()
+            wconfig.writefile(cfg, fn)
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
@@ -626,17 +605,8 @@ def loadIniFile(rcpath, parent):
             qtlib.WarningMsgBox(_('Unable to create a config file'),
                    _('Insufficient access rights.'), parent=parent)
             return None, {}
-    try:
-        if iniparse:
-            return fn, iniparse.INIConfig(file(fn), optionxformvalue=None)
-        else:
-            cfg = config.config()
-            cfg.read(fn)
-            return fn, cfg
-    except Exception, e:
-        qtlib.WarningMsgBox(_('Unable to parse a config file'),
-                            hglib.tounicode(e), parent=parent)
-        return None, {}
+
+    return fn, wconfig.readfile(fn)
 
 
 
