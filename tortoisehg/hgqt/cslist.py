@@ -74,12 +74,10 @@ class ChangesetList(QWidget):
             w.deleteLater()
         self.curitems = None
 
-    def insertcs(self, item, pos):
+    def insertcs(self, item):
         """Insert changeset info into the item list.
 
         item: String, revision number or patch file path to display.
-        pos: Number, an index of insertion point.  If -1, indicates
-        the end of the item list.
         """
         style = self.compactchk.isChecked() and self.lstyle or self.pstyle
         info = self.curfactory(item, style=style)
@@ -128,10 +126,10 @@ class ChangesetList(QWidget):
 
         # show items
         for item in showitems:
-            self.insertcs(item, -1)
+            self.insertcs(item)
         if lastitem:
             self.csvbox.addWidget(QLabel("..."))
-            self.insertcs(lastitem, -1)
+            self.insertcs(lastitem)
         self.updatestatus()
         return True
 
