@@ -256,17 +256,17 @@ def setup_windows(version):
              'description':'Mercurial Distributed SCM',
              'copyright':hgcopyright,
              'product_version':version},
-            {'script':'thg',
-             'icon_resources':[(0,'icons/thg_logo.ico')],
-             'description':'TortoiseHg GUI tools for Mercurial SCM',
-             'copyright':thgcopyright,
-             'product_version':version},
             {'script':'win32/docdiff.py',
              'icon_resources':[(0,'icons/TortoiseMerge.ico')],
              'copyright':thgcopyright,
              'product_version':version}
             ]
     extra['windows'] = [
+            {'script':'thg',
+             'icon_resources':[(0,'icons/thg_logo.ico')],
+             'description':'TortoiseHg GUI tools for Mercurial SCM',
+             'copyright':thgcopyright,
+             'product_version':version},
             {'script':'TortoiseHgOverlayServer.py',
              'icon_resources':[(0,'icons/thg_logo.ico')],
              'description':'TortoiseHg Overlay Icon Server',
