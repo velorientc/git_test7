@@ -359,7 +359,8 @@ class HgRepoView(QTableView):
             if name not in exclude:
                 self._actions[name].setEnabled(enable)
 
-        self._actions['qgoto'].setEnabled(ctx.thgmqappliedpatch() or ctx.thgmqunappliedpatch())
+        if 'qgoto' in self._actions:
+            self._actions['qgoto'].setEnabled(ctx.thgmqappliedpatch() or ctx.thgmqunappliedpatch())
 
         if len(self._rev_history) > 0:
             back = self._rev_pos > 0
