@@ -10,6 +10,7 @@
 import time
 import sys
 import os
+import shutil
 import subprocess
 from fnmatch import fnmatch
 from distutils import log
@@ -250,7 +251,13 @@ def setup_windows(version):
            "optimize" : 1
        }
     }
+    shutil.copyfile('thg', 'thgw')
     extra['console'] = [
+            {'script':'thg',
+             'icon_resources':[(0,'icons/thg_logo.ico')],
+             'description':'TortoiseHg GUI tools for Mercurial SCM',
+             'copyright':thgcopyright,
+             'product_version':version},
             {'script':'contrib/hg', 
              'icon_resources':[(0,'icons/hg.ico')],
              'description':'Mercurial Distributed SCM',
@@ -262,7 +269,7 @@ def setup_windows(version):
              'product_version':version}
             ]
     extra['windows'] = [
-            {'script':'thg',
+            {'script':'thgw',
              'icon_resources':[(0,'icons/thg_logo.ico')],
              'description':'TortoiseHg GUI tools for Mercurial SCM',
              'copyright':thgcopyright,
