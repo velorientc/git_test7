@@ -49,8 +49,6 @@ class ImportDialog(QDialog):
         ## main layout grid
         self.grid = grid = QGridLayout()
         grid.setSpacing(6)
-        grid.setColumnStretch(0, 0)
-        grid.setColumnStretch(1, 1)
         box.addLayout(grid)
 
         ### source input
@@ -78,13 +76,18 @@ class ImportDialog(QDialog):
 
         ### patch list
         self.cslist = cslist.ChangesetList()
-        grid.addWidget(self.cslist, 4, 1, Qt.AlignLeft | Qt.AlignTop)
+        self.cslistrow = cslistrow = 4
+        self.cslistcol = cslistcol = 1
+        grid.addWidget(self.cslist, cslistrow, cslistcol,
+                       Qt.AlignLeft | Qt.AlignTop)
 
         ## command widget
         self.cmd = cmdui.Widget()
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)
+        grid.setRowStretch(cslistrow, 1)
+        grid.setColumnStretch(cslistcol, 1)
         box.addWidget(self.cmd)
 
         ## bottom buttons
@@ -126,6 +129,11 @@ class ImportDialog(QDialog):
         self.preview()
 
     ### Private Methods ###
+
+    def resizeEvent(self, event):
+        w = self.grid.cellRect(self.cslistrow, self.cslistcol).width()
+        h = self.grid.cellRect(self.cslistrow, self.cslistcol).height()
+        self.cslist.resize(w, h)
 
     def browsefiles(self):
         caption = _("Select patches")

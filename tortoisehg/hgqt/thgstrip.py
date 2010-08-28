@@ -41,8 +41,6 @@ class StripDialog(QDialog):
         ## main layout grid
         self.grid = grid = QGridLayout()
         grid.setSpacing(6)
-        grid.setColumnStretch(0, 0)
-        grid.setColumnStretch(1, 1)
         box.addLayout(grid)
 
         ### target revision combo
@@ -71,7 +69,10 @@ class StripDialog(QDialog):
 
         ### preview box, contained in scroll area, contains preview grid
         self.cslist = cslist.ChangesetList()
-        grid.addWidget(self.cslist, 2, 1, Qt.AlignLeft | Qt.AlignTop)
+        self.cslistrow = cslistrow = 2
+        self.cslistcol = cslistcol = 1
+        grid.addWidget(self.cslist, cslistrow, cslistcol,
+                       Qt.AlignLeft | Qt.AlignTop)
 
         ### options
         optbox = QVBoxLayout()
@@ -111,6 +112,8 @@ class StripDialog(QDialog):
         self.detail_btn.setAutoDefault(False)
         self.detail_btn.setCheckable(True)
         self.detail_btn.toggled.connect(self.detail_toggled)
+        grid.setRowStretch(cslistrow, 1)
+        grid.setColumnStretch(cslistcol, 1)
         box.addWidget(buttons)
 
         # signal handlers
@@ -135,6 +138,11 @@ class StripDialog(QDialog):
         self.preview()
 
     ### Private Methods ###
+
+    def resizeEvent(self, event):
+        w = self.grid.cellRect(self.cslistrow, self.cslistcol).width()
+        h = self.grid.cellRect(self.cslistrow, self.cslistcol).height()
+        self.cslist.resize(w, h)
 
     def get_rev(self):
         """Return the integer revision number of the input or None"""

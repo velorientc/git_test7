@@ -51,6 +51,7 @@ class ChangesetList(QWidget):
         ## scroll area
         self.scrollarea = QScrollArea()
         self.scrollarea.setMinimumSize(400, 200)
+        self.scrollarea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.scrollarea.setWidgetResizable(True)
         self.mainvbox.addWidget(self.scrollarea)
 
