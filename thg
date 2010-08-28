@@ -11,7 +11,11 @@
 import os
 import sys
 
-if not hasattr(sys, "frozen"):
+if hasattr(sys, "frozen"):
+    if 'THGDEBUG' in os.environ:
+        import win32traceutil
+        print 'starting'
+else:
     thgpath = os.path.dirname(os.path.realpath(__file__))
     testpath = os.path.join(thgpath, 'tortoisehg')
     if os.path.isdir(testpath) and thgpath not in sys.path:
