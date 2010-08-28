@@ -50,7 +50,7 @@ class BugReport(QtGui.QDialog):
     def gettext(self, opts):
         text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
         text += _('** Please report this bug to'
-                ' http://bitbucket.org/tortoisehg/stable/issues\n')
+                ' http://bitbucket.org/tortoisehg/thg/issues\n')
         text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                 hglib.hgversion, version.version())
         text += '** Command: %s\n' % (opts.get('cmd', 'N/A'))
