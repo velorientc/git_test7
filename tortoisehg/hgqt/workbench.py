@@ -76,8 +76,6 @@ class Workbench(QMainWindow):
 
         self.repoTabChanged()
         self.setupBranchCombo()
-        self.restoreSettings()
-        self.setAcceptDrops(True)
 
         def gotVisible(state):
             self.actionShowRepoRegistry.setChecked(self.reporegistry.isVisible())
@@ -86,6 +84,9 @@ class Workbench(QMainWindow):
 
         self.reporegistry.visibilityChanged.connect(gotVisible)
         self.log.visibilityChanged.connect(logVisible)
+
+        self.restoreSettings()
+        self.setAcceptDrops(True)
 
         if repo:
             self.addRepoTab(repo)
