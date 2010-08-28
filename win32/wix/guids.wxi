@@ -49,6 +49,7 @@
   <?define ProductUpgradeCode = {838657CF-C9EC-452D-800D-0E70FC021D0A} ?>
 
   <?define ComponentMainExecutableGUID = {D648EC48-559C-4C66-A4CE-2D40A495DC5B} ?>
+  <?define ComponentWinExecutableGUID = {B4115B52-4FD3-478C-B605-D3F618287335} ?>
 
   <?define thgshellx86dll.guid = {728E8840-5878-4EA7-918F-281C2697ABB1} ?>
   <?define thgshellx64dll.guid = {D5D1E532-CDAD-4FFD-9695-757B8A29B4BA} ?>

@@ -94,11 +94,13 @@
             <Environment Id="Environment" Name="PATH" Part="last" System="yes"
                          Permanent="no" Value="[INSTALLDIR]bin" Action="set"
             />
-           <Shortcut Id="desktopTHG" Directory="DesktopFolder"
-                     Name="TortoiseHg Workbench"
-                     WorkingDirectory='INSTALLDIR'
-                     Icon="thgIcon.ico" IconIndex="0"
-                     Advertise="yes" />
+          </Component>
+          <Component Id='WinExecutable' Guid='$(var.ComponentWinExecutableGUID)'>
+            <File Id='thgwEXE' Name='thgw.exe' Source='dist\thgw.exe' />
+            <Shortcut Id="thgStartMenu" Directory="ProgramMenuDir"
+                      Name="TortoiseHg Workbench"
+                      Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
+            />
           </Component>
           <Component Id='ExtensionVersions' Guid='$(var.ExtensionVersions.guid)'>
             <File Id='ExtensionVersions' Name='extension-versions.txt'
@@ -258,8 +260,6 @@
         </Directory>
       </Directory>
 
-      <Directory Id="DesktopFolder" Name="Desktop"/>
-
       <Merge Id='VCRedist' DiskId='1' Language='1033'
              SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x86_msm.msm'
       />
@@ -317,6 +317,7 @@
                Level='1' Absent='disallow' Display='hidden'
                Description='Command line applications: hg, thg' >
         <ComponentRef Id='MainExecutable' />
+        <ComponentRef Id='WinExecutable' />
         <ComponentRef Id='ProgramMenuDir' />
         <ComponentRef Id='COPYING' />
         <ComponentRef Id='mercurial.rc' />
