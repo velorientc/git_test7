@@ -336,7 +336,7 @@ class HgRepoView(QTableView):
             ctx2 = repo[rev]
             ancestor = ctx.ancestor(ctx2)
             self.showMessage.emit(
-                      "Goto ancestor of %s and %s"%(ctx.rev(), ctx2.rev()), 2000)
+                      "Goto ancestor of %s and %s"%(ctx.rev(), ctx2.rev()))
             self.goto(ancestor.rev())
 
     def updateActions(self):
@@ -383,7 +383,7 @@ class HgRepoView(QTableView):
         try:
             rev = repo.changectx(rev).rev()
         except RepoError:
-            self.showMessage.emit("Can't find revision '%s'"%rev, 2000)
+            self.showMessage.emit("Can't find revision '%s'" % rev)
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
