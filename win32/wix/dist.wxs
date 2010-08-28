@@ -26,6 +26,7 @@
         <File Name="QtCore4.dll" />
         <File Name="QtGui4.dll" />
         <File Name="qscintilla2.dll" />
+        <File Name="bz2.pyd" />
         <File Name="select.pyd" />
         <File Name="sip.pyd" />
         <File Name="unicodedata.pyd" />
