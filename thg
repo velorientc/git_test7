@@ -12,7 +12,7 @@ import os
 import sys
 
 if hasattr(sys, "frozen"):
-    if 'THGDEBUG' in os.environ:
+    if sys.frozen == 'windows_exe' and 'THGDEBUG' in os.environ:
         import win32traceutil
         print 'starting'
 else:
