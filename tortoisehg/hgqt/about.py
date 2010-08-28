@@ -206,8 +206,11 @@ class AboutUpdateThread(QThread):
         except:
             pass
         try:
+            thgv = version.version()
+            if '+' in thgv:
+                thgv = thgv[:thgv.index('+')]
             curver = tuple([int(p) for p in thgv.split('.')])
-        except:
+        except Exception, e:
             curver = (0,0,0)
         dlurl = ('<p style=\" margin-top:0px; margin-bottom:0px;\">'
                 '<a href=\"site-url--or--download-url\">'
