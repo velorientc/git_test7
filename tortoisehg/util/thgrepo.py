@@ -11,7 +11,7 @@
 import os
 import sys
 
-from mercurial import hg, patch, util, error, bundlerepo
+from mercurial import hg, patch, util, error, bundlerepo, ui
 from mercurial.util import propertycache
 
 from util import hglib
@@ -29,8 +29,8 @@ def repository(ui, path='', create=False):
         return repo
     return _repocache[path]
 
-_thgrepoprops = '''_thgmqpatchnames _thghiddentags
-                   thgmqunappliedpatches _shell'''.split()
+_uiprops = '''_uifiles _shell _thghiddentags'''.split()
+_thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
@@ -55,9 +55,22 @@ def _extendrepo(repo):
 
         @propertycache
         def _thghiddentags(self):
-            hiddentags_opt = hglib.toutf(self.ui.config('tortoisehg', 'hidetags', ''))
+            t = self.ui.config('tortoisehg', 'hidetags', '')
+            hiddentags_opt = hglib.tounicode(t)
             return [t.strip() for t in hiddentags_opt.split()]
         
+        @propertycache
+        def thgmqunappliedpatches(self):
+            '''Returns a list of (patch name, patch path) of all self's
+            unapplied MQ patches, in patch series order, first unapplied
+            patch first.'''
+            if not hasattr(self, 'mq'): return []
+
+            q = self.mq
+            applied = set([p.name for p in q.applied])
+
+            return [pname for pname in q.series if not pname in applied]
+
         @propertycache
         def _thgmqpatchnames(self):
             '''Returns all tag names used by MQ patches. Returns [] 
@@ -79,8 +92,20 @@ def _extendrepo(repo):
             else:
                 return 'xterm'
 
+        @propertycache
+        def _uifiles(self):
+            cfg = self.ui._ucfg
+            files = set()
+            for line in cfg._source.values():
+                f = line.rsplit(':', 1)[0]
+                files.add(f)
+            return files
+
         def shell(self):
             return self._shell
+
+        def uifiles(self):
+            return self._uifiles
 
         def thgmqtag(self, tag):
             '''True if tag is used to mark an applied MQ patch'''
@@ -92,22 +117,18 @@ def _extendrepo(repo):
                 self.invalidate()
             if hasattr(self, 'mq'):
                 self.mq.invalidate()
-            for a in _thgrepoprops:
+            for a in _thgrepoprops + _uiprops:
                 if a in self.__dict__:
                     delattr(self, a)
 
-        @propertycache
-        def thgmqunappliedpatches(self):
-            '''Returns a list of (patch name, patch path) of all self's 
-            unapplied MQ patches, in patch series order, first unapplied
-            patch first.'''
-            if not hasattr(self, 'mq'): return []
-            
-            q = self.mq 
-            applied = set([p.name for p in q.applied])
-            
-            return [pname for pname in q.series if not pname in applied]
-                    
+        def invalidateui(self):
+            'Should be called when mtime of ui files are changed'
+            self.ui = ui.ui()
+            self.ui.readconfig(self.join('hgrc'))
+            for a in _uiprops:
+                if a in self.__dict__:
+                    delattr(self, a)
+
     return thgrepository
 
         
