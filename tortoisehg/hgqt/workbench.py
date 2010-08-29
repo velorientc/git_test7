@@ -135,8 +135,8 @@ class Workbench(QMainWindow):
         tb.setObjectName("filterToolbar")
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
-        self.toolBar_diff = tb = QToolBar(_("Diff Toolbar"), self)
-        tb.setObjectName("toolBar_diff")
+        self.diffToolbar = tb = QToolBar(_("Diff Toolbar"), self)
+        tb.setObjectName("diffToolbar")
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
@@ -412,11 +412,11 @@ class Workbench(QMainWindow):
         self.filterToolbar.addSeparator()
 
         # diff mode toolbar
-        self.toolBar_diff.addAction(self.actionDiffMode)
-        self.toolBar_diff.addAction(self.actionNextDiff)
-        self.toolBar_diff.addAction(self.actionPrevDiff)
-        self.toolBar_diff.addSeparator()
-        self.toolBar_diff.addAction(self.actionAnnMode)
+        self.diffToolbar.addAction(self.actionDiffMode)
+        self.diffToolbar.addAction(self.actionNextDiff)
+        self.diffToolbar.addAction(self.actionPrevDiff)
+        self.diffToolbar.addSeparator()
+        self.diffToolbar.addAction(self.actionAnnMode)
 
     def createActions(self):
         # main window actions (from .ui file)
