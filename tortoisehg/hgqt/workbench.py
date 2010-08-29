@@ -351,9 +351,9 @@ class Workbench(QMainWindow):
     def setupBranchCombo(self, *args):
         w = self.repoTabsWidget.currentWidget()
         if not w:
-            self.branch_label_action.setEnabled(False)
-            self.branch_comboBox_action.setEnabled(False)
-            self.branch_comboBox.clear()
+            self.branchLabelAction.setEnabled(False)
+            self.branchComboAction.setEnabled(False)
+            self.branchCombo.clear()
             return
 
         repo = w.repo
@@ -368,15 +368,15 @@ class Workbench(QMainWindow):
             branches = branches + clbranches
 
         if len(branches) == 1:
-            self.branch_label_action.setEnabled(False)
-            self.branch_comboBox_action.setEnabled(False)
-            self.branch_comboBox.clear()
+            self.branchLabelAction.setEnabled(False)
+            self.branchComboAction.setEnabled(False)
+            self.branchCombo.clear()
         else:
             branches = [''] + branches
             self.branchesmodel = QStringListModel(branches)
-            self.branch_comboBox.setModel(self.branchesmodel)
-            self.branch_label_action.setEnabled(True)
-            self.branch_comboBox_action.setEnabled(True)
+            self.branchCombo.setModel(self.branchesmodel)
+            self.branchLabelAction.setEnabled(True)
+            self.branchComboAction.setEnabled(True)
 
             branch = w.filterbranch()
             index = -1
@@ -384,14 +384,14 @@ class Workbench(QMainWindow):
                 if b == branch:
                     index = i
                     break
-            self.branch_comboBox.setCurrentIndex(index)
+            self.branchCombo.setCurrentIndex(index)
 
     def createToolbars(self):
         # tree filters toolbar
-        self.branch_label = QToolButton()
-        self.branch_label.setText("Branch")
-        self.branch_label.setStatusTip("Display graph the named branch only")
-        self.branch_label.setPopupMode(QToolButton.InstantPopup)
+        self.branchLabel = QToolButton()
+        self.branchLabel.setText("Branch")
+        self.branchLabel.setStatusTip("Display graph the named branch only")
+        self.branchLabel.setPopupMode(QToolButton.InstantPopup)
         self.branch_menu = QMenu()
         cbranch_action = self.branch_menu.addAction("Display closed branches")
         cbranch_action.setCheckable(True)
@@ -399,16 +399,16 @@ class Workbench(QMainWindow):
         allpar_action = self.branch_menu.addAction("Include all ancestors")
         allpar_action.setCheckable(True)
         self.allpar_action = allpar_action
-        self.branch_label.setMenu(self.branch_menu)
-        self.branch_comboBox = QComboBox()
-        self.branch_comboBox.activated.connect(self.refreshRevisionTable)
+        self.branchLabel.setMenu(self.branch_menu)
+        self.branchCombo = QComboBox()
+        self.branchCombo.activated.connect(self.refreshRevisionTable)
         cbranch_action.toggled.connect(self.setupBranchCombo)
         allpar_action.toggled.connect(self.refreshRevisionTable)
 
         self.filterToolbar.layout().setSpacing(3)
 
-        self.branch_label_action = self.filterToolbar.addWidget(self.branch_label)
-        self.branch_comboBox_action = self.filterToolbar.addWidget(self.branch_comboBox)
+        self.branchLabelAction = self.filterToolbar.addWidget(self.branchLabel)
+        self.branchComboAction = self.filterToolbar.addWidget(self.branchCombo)
         self.filterToolbar.addSeparator()
 
         # diff mode toolbar
@@ -639,7 +639,7 @@ class Workbench(QMainWindow):
     #@timeit
     def refreshRevisionTable(self, *args, **kw):
         """Starts the process of filling the HgModel"""
-        branch = self.branch_comboBox.currentText()
+        branch = self.branchCombo.currentText()
         branch = str(branch)
         allparents = self.allpar_action.isChecked()
         tw = self.repoTabsWidget
