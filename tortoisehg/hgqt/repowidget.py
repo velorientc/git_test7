@@ -23,6 +23,7 @@ from tortoisehg.hgqt import archive, thgimport, thgstrip, run
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
+from tortoisehg.hgqt.manifestdialog import ManifestWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 
@@ -95,6 +96,10 @@ class RepoWidget(QWidget):
         self.commitTabIndex = idx = tt.addTab(w, geticon('commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
+        self.manifestWidget = w = DemandWidget(self.createManifestWidget)
+        self.manifestTabIndex = idx = tt.addTab(w, geticon('manifest'), '')
+        tt.setTabToolTip(idx, _('Manifest'))
+
         w = DemandWidget(self.createSyncWidget)
         self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
@@ -125,6 +130,17 @@ class RepoWidget(QWidget):
         cw.loadConfigs(s)
         self.repo._commitwidget = cw
         return SharedWidget(cw)
+
+    def createManifestWidget(self):
+        w = ManifestWidget(self.repo.ui, self.repo, rev=self.rev, parent=self)
+        def filterrev(rev):
+            if isinstance(rev, basestring):  # unapplied patch
+                return None  # TODO
+            else:
+                return rev
+        self.repoview.revisionClicked.connect(lambda rev: w.setrev(filterrev(rev)))
+        w.revchanged.connect(self.repoview.goto)
+        return w
 
     def createSyncWidget(self):
         # TODO: don't pass workbench
@@ -300,6 +316,10 @@ class RepoWidget(QWidget):
     def setAnnotate(self, ann):
         self.revDetailsWidget.setAnnotate(ann)
 
+        # TODO: Workaround for switching manifest file view.
+        # Maybe we need to move this kind of switches to task tab widget itself.
+        self.manifestWidget.setfileview(ann and 'annotate' or 'cat')
+
     def nextDiff(self):
         self.revDetailsWidget.nextDiff()
 
@@ -357,6 +377,7 @@ class RepoWidget(QWidget):
         pass
 
     def revision_activated(self, rev=None):
+        # TODO: remove this entry or connect to manifest tab?
         run.manifest(self.repo.ui, repo=self.repo,
                      rev=rev or self.rev)
 
