@@ -420,7 +420,6 @@ class RepoWidget(QWidget):
     def rebaseRevision(self, srcrev):
         """Rebase selected revision on top of working directory parent"""
         dstrev = self.repo['.'].rev()
-        saved = self.setScanForRepoChanges(False)
         main = _("Confirm Rebase Revision")
         text = _("Rebase revision %d on top of %d?") % (srcrev, dstrev)
         labels = ((QMessageBox.Yes, _('&Yes')),
@@ -429,40 +428,23 @@ class RepoWidget(QWidget):
                    '--repository', self.repo.root]
         if QuestionMsgBox(_('Confirm Rebase'), main, text, labels=labels,
                           parent=self):
-            self.runner = cmdui.Runner(_('Rebase - TortoiseHg'), self)
-            def finished(ret):
-                self.reload()
-                self.setScanForRepoChanges(saved)
-            self.runner.commandFinished.connect(finished)
-            self.runner.run(cmdline)
+            self.runCommand(_('Rebase - TortoiseHg'), cmdline)
 
     def qimportRevision(self, rev):
         """QImport revision and all descendents to MQ"""
-        saved = self.setScanForRepoChanges(False)
         if 'qparent' in self.repo.tags():
             endrev = 'qparent'
         else:
             endrev = ''
         cmdline = ['qimport', '--rev', '%s::%s' % (rev, endrev),
                    '--repository', self.repo.root]
-        self.runner = cmdui.Runner(_('QImport - TortoiseHg'), self)
-        def finished(ret):
-            self.reload()
-            self.setScanForRepoChanges(saved)
-        self.runner.commandFinished.connect(finished)
-        self.runner.run(cmdline)
+        self.runCommand(_('QImport - TortoiseHg'), cmdline)
 
     def qfinishRevision(self, rev):
         """Finish applied patches up to and including selected revision"""
-        saved = self.setScanForRepoChanges(False)
         cmdline = ['qfinish', 'qbase::%s' % rev,
                    '--repository', self.repo.root]
-        self.runner = cmdui.Runner(_('QFinish - TortoiseHg'), self)
-        def finished(ret):
-            self.reload()
-            self.setScanForRepoChanges(saved)
-        self.runner.commandFinished.connect(finished)
-        self.runner.run(cmdline)
+        self.runCommand(_('QFinish - TortoiseHg'), cmdline)
 
     def revision_clicked(self, rev):
         'User clicked on a repoview row'
@@ -472,16 +454,10 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
 
     def qgotoRevision(self, patchname):
-        """Goto patch REV"""
-        saved = self.setScanForRepoChanges(False)
-        cmdline = ['qgoto', patchname,  # FIXME force option
+        """Make PATCHNAME the top applied patch"""
+        cmdline = ['qgoto', str(patchname),  # FIXME force option
                    '--repository', self.repo.root]
-        self.runner = cmdui.Runner(_('QGoto - TortoiseHg'), self)
-        def finished(ret):
-            self.reload()
-            self.setScanForRepoChanges(saved)
-        self.runner.commandFinished.connect(finished)
-        self.runner.run(cmdline)       
+        self.runCommand(_('QGoto - TortoiseHg'), cmdline)
 
     def revision_selected(self, rev):
         'View selection changed, could be a reload'
@@ -595,6 +571,15 @@ class RepoWidget(QWidget):
         if cw:
             cw.storeConfigs(s)
         return True
+
+    def runCommand(self, title, cmdline):      
+        saved = self.setScanForRepoChanges(False)
+        self.runner = cmdui.Runner(title, self)
+        def finished(ret):
+            self.reload()
+            self.setScanForRepoChanges(saved)
+        self.runner.commandFinished.connect(finished)
+        self.runner.run(cmdline)       
 
 class BlankMessageWidget(QWidget):
 
