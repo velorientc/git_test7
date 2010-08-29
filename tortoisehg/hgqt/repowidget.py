@@ -145,6 +145,11 @@ class RepoWidget(QWidget):
     def reponame(self):
         return os.path.basename(self.repo.root)
 
+    @property
+    def rev(self):
+        """Returns the current active revision"""
+        return self.repoview.current_rev
+
     def showMessage(self, msg):
         self.currentMessage = msg
         if self.isVisible():
@@ -353,7 +358,7 @@ class RepoWidget(QWidget):
 
     def revision_activated(self, rev=None):
         run.manifest(self.repo.ui, repo=self.repo,
-                     rev=rev or self.repoview.current_rev)
+                     rev=rev or self.rev)
 
     def setScanForRepoChanges(self, enable):
         saved = self._scanForRepoChanges
@@ -496,7 +501,7 @@ class RepoWidget(QWidget):
     def reload(self, rev=None):
         'Initiate a refresh of the repo model, rebuild graph'
         if rev is None:
-            self._reload_rev = self.repoview.current_rev
+            self._reload_rev = self.rev
         else:
             self._reload_rev = rev
         self.repo.thginvalidate()
@@ -534,7 +539,7 @@ class RepoWidget(QWidget):
     def updateActions(self):
         mode = self.revDetailsWidget.getMode()
         wb = self.workbench
-        enable = self.repoview.current_rev is not None
+        enable = self.rev is not None
         wb.actionDiffMode.setEnabled(enable)
         wb.actionDiffMode.setChecked(mode == 'diff')
         ann = self.revDetailsWidget.getAnnotate()
