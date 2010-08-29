@@ -477,7 +477,9 @@ class RepoWidget(QWidget):
         if rev is None:
             self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
         else:
-            self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
+            revwidgets = (self.revDetailsWidget, self.manifestWidget)
+            if self.taskTabsWidget.currentWidget() not in revwidgets:
+                self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
 
     def qgotoRevision(self, patchname):
         """Make PATCHNAME the top applied patch"""
