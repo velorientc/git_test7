@@ -14,54 +14,45 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     
-from PyQt4 import QtCore, QtGui, Qsci
-Qt = QtCore.Qt
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
-
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
-class HgFileListView(QtGui.QTableView):
+class HgFileListView(QTableView):
     """
     A QTableView for displaying a HgFileListModel
     """
+    fileRevSelected = pyqtSignal(object, object)
+
     def __init__(self, parent=None):
-        QtGui.QTableView.__init__(self, parent)
+        QTableView.__init__(self, parent)
         self.setShowGrid(False)
         self.horizontalHeader().hide()
         self.verticalHeader().hide()
         self.verticalHeader().setDefaultSectionSize(20)
-        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setTextElideMode(Qt.ElideLeft)
 
-        self.horizontalHeader().setToolTip(_('Double click to toggle merge mode'))
+        hh = self.horizontalHeader()
+        hh.setToolTip(_('Double click to toggle merge mode'))
+        hh.sectionDoubleClicked.connect(self.toggleFullFileList)
+        hh.sectionResized.connect(self.sectionResized)
 
         self.createActions()
 
-        connect(self.horizontalHeader(), SIGNAL('sectionDoubleClicked(int)'),
-                self.toggleFullFileList)
-        connect(self,
-                SIGNAL('doubleClicked (const QModelIndex &)'),
-                self.fileActivated)
-
-        connect(self.horizontalHeader(),
-                SIGNAL('sectionResized(int, int, int)'),
-                self.sectionResized)
+        self.doubleClicked.connect(self.fileActivated)
         self._diff_dialogs = {}
         self._nav_dialogs = {}
         
     def setModel(self, model):
-        QtGui.QTableView.setModel(self, model)
-        connect(model, SIGNAL('layoutChanged()'),
-                self.fileSelected)
-        connect(self.selectionModel(),
-                SIGNAL('currentRowChanged (const QModelIndex & , const QModelIndex & )'),
-                self.fileSelected)
-        self.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Stretch)
+        QTableView.setModel(self, model)
+        model.layoutChanged.connect(self.fileSelected)
+        self.selectionModel().currentRowChanged.connect(self.fileSelected)
+        self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -72,7 +63,7 @@ class HgFileListView(QtGui.QTableView):
             index = self.currentIndex()
         sel_file = self.model().fileFromIndex(index)
         from_rev = self.model().revFromIndex(index)
-        self.emit(SIGNAL('fileSelected'), sel_file, from_rev)
+        self.fileRevSelected.emit(sel_file, from_rev)
 
     def selectFile(self, filename):
         self.setCurrentIndex(self.model().indexFromFile(filename))
@@ -88,6 +79,9 @@ class HgFileListView(QtGui.QTableView):
         self.model().toggleFullFileList()
 
     def navigate(self, filename=None):
+        if not filename:
+            # Convert False to None
+            filename = None
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
 
     def diffNavigate(self, filename=None):
@@ -121,7 +115,7 @@ class HgFileListView(QtGui.QTableView):
     def createActions(self):
         self._actions = {}
         for name, desc, icon, tip, key, cb in self._action_defs():
-            act = QtGui.QAction(desc, self)
+            act = QAction(desc, self)
             if icon:
                 act.setIcon(geticon(icon))
             if tip:
@@ -129,12 +123,12 @@ class HgFileListView(QtGui.QTableView):
             if key:
                 act.setShortcut(key)
             if cb:
-                connect(act, SIGNAL('triggered()'), cb)
+                act.triggered.connect(cb)
             self._actions[name] = act
             self.addAction(act)
 
     def contextMenuEvent(self, event):
-        menu = QtGui.QMenu(self)
+        menu = QMenu(self)
         for act in ['navigate', 'diffnavigate']:
             if act:
                 menu.addAction(self._actions[act])
@@ -149,7 +143,7 @@ class HgFileListView(QtGui.QTableView):
         col_width = vp_width - sum(col_widths)
         col_width = max(col_width, 50)
         self.setColumnWidth(0, col_width)
-        QtGui.QTableView.resizeEvent(self, event)
+        QTableView.resizeEvent(self, event)
 
     def sectionResized(self, idx, oldsize, newsize):
         if idx == 1:

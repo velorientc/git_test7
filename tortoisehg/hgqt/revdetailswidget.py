@@ -8,9 +8,7 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
-from mercurial import hg
-
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt.qtlib import getfont, geticon
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from tortoisehg.hgqt.filelistview import HgFileListView
@@ -21,38 +19,29 @@ from tortoisehg.hgqt.revmessage import RevMessage
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-connect = QObject.connect
-
-
 class RevDetailsWidget(QWidget):
 
     showMessageSignal = pyqtSignal(str)
     revisionLinkClicked = pyqtSignal(str)
 
     def __init__(self, repo, repoview):
+        QWidget.__init__(self)
+
         self.repo = repo
         self.repoview = repoview
+        self.currentMessage = ''
+        self.splitternames = []
 
         # these are used to know where to go after a reload
         self._reload_file = None
 
-        self.splitternames = []
-
-        QWidget.__init__(self)
-
         self.load_config()
-
         self.setupUi()
-        self.disab_shortcuts = []
-
-        self.currentMessage = ''
-
         self.createActions()
 
         self.fileview.setFont(self._font)
-        connect(self.fileview, SIGNAL('showMessage'), self.showMessage)
-        connect(self.fileview, SIGNAL('fileDisplayed'), self.file_displayed)
-
+        self.fileview.showMessage.connect(self.showMessage)
+        self.fileview.fileDisplayed.connect(self.file_displayed)
         self.restoreSettings()
 
     def setupUi(self):
@@ -93,7 +82,7 @@ class RevDetailsWidget(QWidget):
         self.filelist_splitter.setOrientation(Qt.Horizontal)
         self.filelist_splitter.setChildrenCollapsible(False)
 
-        self.tableView_filelist = HgFileListView(self.filelist_splitter)
+        self.filelist = HgFileListView(self.filelist_splitter)
 
         self.cset_and_file_details_frame = QFrame(self.filelist_splitter)
         sp = SP(SP.Preferred, SP.Preferred)
@@ -153,7 +142,7 @@ class RevDetailsWidget(QWidget):
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
     def load_config(self):
-        self._font = qtlib.getfont(self.repo.ui, 'fontlog').font()
+        self._font = getfont(self.repo.ui, 'fontlog').font()
         self.rowheight = 8
         self.users, self.aliases = [], []
 
@@ -170,37 +159,78 @@ class RevDetailsWidget(QWidget):
         self.showMessageSignal.emit(self.currentMessage)
 
     def createActions(self):
+        self.actionDiffMode = QAction('Diff mode', self)
+        self.actionDiffMode.setCheckable(True)
+        self.actionDiffMode.toggled.connect(self.setMode)
+        self.actionDiffMode.setChecked(True)
+
+        self.actionAnnMode = QAction('Annotate', self)
+        self.actionAnnMode.setCheckable(True)
+        self.actionAnnMode.toggled.connect(self.setAnnotate)
+
+        # Next/Prev diff (in full file mode)
+        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
+        self.actionNextDiff.setShortcut('Alt+Down')
+        self.actionNextDiff.triggered.connect(self.nextDiff)
+
+        def filled():
+            self.actionNextDiff.setEnabled(
+                self.fileview.fileMode() and self.fileview.nDiffs())
+        self.fileview.filled.connect(filled)
+        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
+        self.actionPrevDiff.setShortcut('Alt+Up')
+        self.actionPrevDiff.triggered.connect(self.prevDiff)
+
+        # Next/Prev file
+        self.actionNextFile = QAction('Next file', self)
+        self.actionNextFile.setShortcut('Right')
+        self.actionNextFile.triggered.connect(self.filelist.nextFile)
+        self.actionPrevFile = QAction('Prev file', self)
+        self.actionPrevFile.setShortcut('Left')
+        self.actionPrevFile.triggered.connect(self.filelist.prevFile)
+        self.addAction(self.actionNextFile)
+        self.addAction(self.actionPrevFile)
+
         # navigate in file viewer
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
-        connect(self.actionNextLine, SIGNAL('triggered()'),
-                self.fileview.nextLine)
+        self.actionNextLine.triggered.connect(self.fileview.nextLine)
         self.addAction(self.actionNextLine)
         self.actionPrevLine = QAction('Prev line', self)
         self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
-        connect(self.actionPrevLine, SIGNAL('triggered()'),
-                self.fileview.prevLine)
+        self.actionPrevLine.triggered.connect(self.fileview.prevLine)
         self.addAction(self.actionPrevLine)
         self.actionNextCol = QAction('Next column', self)
         self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
-        connect(self.actionNextCol, SIGNAL('triggered()'),
-                self.fileview.nextCol)
+        self.actionNextCol.triggered.connect(self.fileview.nextCol)
         self.addAction(self.actionNextCol)
         self.actionPrevCol = QAction('Prev column', self)
         self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
-        connect(self.actionPrevCol, SIGNAL('triggered()'),
-                self.fileview.prevCol)
+        self.actionPrevCol.triggered.connect(self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
         # Activate file (file diff navigator)
         self.actionActivateFile = QAction('Activate file', self)
-
         self.actionActivateFileAlt = QAction('Activate alt. file', self)
         self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return, Qt.ALT+Qt.Key_Enter])
-        connect(self.actionActivateFileAlt, SIGNAL('triggered()'),
+        self.actionActivateFileAlt.triggered.connect(
                 lambda self=self:
-                self.tableView_filelist.fileActivated(self.tableView_filelist.currentIndex(),
+                self.filelist.fileActivated(self.filelist.currentIndex(),
                                                       alternate=True))
+
+        # toolbar
+        '''
+        self.diffToolbar = tb = QToolBar(_("Diff Toolbar"), self)
+        tb.setObjectName("diffToolbar")
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
+
+        self.diffToolbar.addAction(self.actionDiffMode)
+        self.diffToolbar.addAction(self.actionNextDiff)
+        self.diffToolbar.addAction(self.actionPrevDiff)
+        self.diffToolbar.addSeparator()
+        self.diffToolbar.addAction(self.actionAnnMode)
+        '''
+
 
     def setMode(self, mode):
         self.fileview.setMode(mode)
@@ -216,13 +246,17 @@ class RevDetailsWidget(QWidget):
 
     def nextDiff(self):
         notlast = self.fileview.nextDiff()
-        #self.actionNextDiff.setEnabled(self.fileview.fileMode() and notlast and self.fileview.nDiffs())
-        #self.actionPrevDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
+        filemode = self.fileview.fileMode()
+        nDiffs = self.fileview.nDiffs()
+        self.actionNextDiff.setEnabled(filemode and notlast and nDiffs)
+        self.actionPrevDiff.setEnabled(filemode and nDiffs)
 
     def prevDiff(self):
         notfirst = self.fileview.prevDiff()
-        #self.actionPrevDiff.setEnabled(self.fileview.fileMode() and notfirst and self.fileview.nDiffs())
-        #self.actionNextDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
+        filemode = self.fileview.fileMode()
+        nDiffs = self.fileview.nDiffs()
+        self.actionPrevDiff.setEnabled(filemode and notfirst and nDiffs)
+        self.actionNextDiff.setEnabled(filemode and nDiffs)
 
     def create_models(self):
         self.filelistmodel = HgFileListModel(self.repo)
@@ -230,31 +264,35 @@ class RevDetailsWidget(QWidget):
     def setupModels(self, repomodel):
         self.repomodel = repomodel
         self.create_models()
-        self.tableView_filelist.setModel(self.filelistmodel)
+        self.filelist.setModel(self.filelistmodel)
         self.fileview.setModel(repomodel)
-        filetable = self.tableView_filelist
-        connect(filetable, SIGNAL('fileSelected'), self.fileview.displayFile)
+        self.filelist.fileRevSelected.connect(self.fileview.displayFile)
 
     def on_filled(self):
-        self.tableView_filelist.selectFile(self._reload_file)
+        self.filelist.selectFile(self._reload_file)
 
     def file_displayed(self, filename):
-        #self.actionPrevDiff.setEnabled(False)
-        pass
+        self.actionPrevDiff.setEnabled(False)
 
     def revision_selected(self, rev):
+        # TODO: handle rev == patch name
         ctx = self.repo[rev]
         if len(self.filelistmodel):
-            self.tableView_filelist.selectRow(0)
+            self.filelist.selectRow(0)
         if ctx.rev() is not None:
             self.fileview.setContext(ctx)
             self.revpanel.update(ctx.rev())
             self.message.displayRevision(ctx)
             self.filelistmodel.setSelectedRev(ctx)
+        enable = rev is not None
+        mode = self.getMode()
+        self.actionDiffMode.setEnabled(enable)
+        self.actionAnnMode.setEnabled(enable and mode != 'diff')
+        self.actionNextDiff.setEnabled(enable and mode != 'diff')
+        self.actionPrevDiff.setEnabled(enable and mode != 'diff')
 
     def reload(self, rev=None):
-        self._reload_file = self.tableView_filelist.currentFile()
-        self.repo = hg.repository(self.repo.ui, self.repo.root)
+        self._reload_file = self.filelist.currentFile()
         self.setupModels(self.repomodel)
 
     def storeSettings(self):

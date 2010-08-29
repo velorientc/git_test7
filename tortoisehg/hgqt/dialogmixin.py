@@ -15,10 +15,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from PyQt4 import QtCore
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
-Qt = QtCore.Qt
+from PyQt4.QtCore import *
 
 from tortoisehg.hgqt import qtlib
 
@@ -32,26 +29,11 @@ class HgDialogMixin(object):
     def __init__(self, ui):
         self.load_config(ui)
         self.setupUi(self)
-        self._quickbars = []
-        self.disab_shortcuts = []
 
     def attachQuickBar(self, qbar):
         qbar.setParent(self)
-        qbar.escShortcutDisabled.connect(self.setShortcutsEnabled)
-        qbar.visible.connect(self.ensureOneQuickBar)
-        self._quickbars.append(qbar)
         self.addToolBar(Qt.BottomToolBarArea, qbar)
 
-    def setShortcutsEnabled(self, enabled=True):
-        for sh in self.disab_shortcuts:
-            sh.setEnabled(enabled)
-        
-    def ensureOneQuickBar(self):
-        tb = self.sender()
-        for w in self._quickbars:
-            if w is not tb:
-                w.hide()
-        
     def load_config(self, ui):
         # TODO: connect to font changed signal
         self._font = qtlib.getfont(ui, 'fontlog').font()

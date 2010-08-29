@@ -135,10 +135,6 @@ class Workbench(QMainWindow):
         tb.setObjectName("filterToolbar")
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
-        self.diffToolbar = tb = QToolBar(_("Diff Toolbar"), self)
-        tb.setObjectName("diffToolbar")
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
         a.setShortcut(QKeySequence.New)
 
@@ -319,15 +315,9 @@ class Workbench(QMainWindow):
 
     def repoTabChanged(self, index=0):
         self.setupBranchCombo()
-
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.switchedTo()
-        else:
-            self.actionDiffMode.setEnabled(False)
-            self.actionAnnMode.setEnabled(False)
-            self.actionNextDiff.setEnabled(False)
-            self.actionPrevDiff.setEnabled(False)
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
@@ -411,13 +401,6 @@ class Workbench(QMainWindow):
         self.branchComboAction = self.filterToolbar.addWidget(self.branchCombo)
         self.filterToolbar.addSeparator()
 
-        # diff mode toolbar
-        self.diffToolbar.addAction(self.actionDiffMode)
-        self.diffToolbar.addAction(self.actionNextDiff)
-        self.diffToolbar.addAction(self.actionPrevDiff)
-        self.diffToolbar.addSeparator()
-        self.diffToolbar.addAction(self.actionAnnMode)
-
     def createActions(self):
         # main window actions (from .ui file)
         self.actionFind.triggered.connect(self.find)
@@ -444,58 +427,10 @@ class Workbench(QMainWindow):
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
 
-        self.actionDiffMode = QAction('Diff mode', self)
-        self.actionDiffMode.setCheckable(True)
-        self.actionDiffMode.toggled.connect(self.setMode)
-
-        self.actionAnnMode = QAction('Annotate', self)
-        self.actionAnnMode.setCheckable(True)
-        self.actionAnnMode.toggled.connect(self.setAnnotate)
-
         self.actionHelp.setShortcut(QKeySequence.HelpContents)
         self.actionHelp.setIcon(geticon('help'))
         self.actionHelp.triggered.connect(self.on_help)
 
-        # Next/Prev diff (in full file mode)
-        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
-        self.actionNextDiff.setShortcut('Alt+Down')
-        self.actionNextDiff.triggered.connect(self.nextDiff)
-        #def filled():
-        #    self.actionNextDiff.setEnabled(
-        #        self.fileview.fileMode() and self.fileview.nDiffs())
-        #self.fileview.filled.connect(filled)
-        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
-        self.actionPrevDiff.setShortcut('Alt+Up')
-        self.actionPrevDiff.triggered.connect(self.prevDiff)
-        self.actionDiffMode.setChecked(True)
-
-        # Next/Prev file
-        self.actionNextFile = QAction('Next file', self)
-        self.actionNextFile.setShortcut('Right')
-        #self.actionNextFile.triggered.connect(self.tableView_filelist.nextFile)
-        self.actionPrevFile = QAction('Prev file', self)
-        self.actionPrevFile.setShortcut('Left')
-        #self.actionPrevFile.triggered.connect(self.tableView_filelist.prevFile)
-        self.addAction(self.actionNextFile)
-        self.addAction(self.actionPrevFile)
-
-        # navigate in file viewer
-        self.actionNextLine = QAction('Next line', self)
-        self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
-        #self.actionNextLine.triggered.connect(self.fileview.nextLine)
-        self.addAction(self.actionNextLine)
-        self.actionPrevLine = QAction('Prev line', self)
-        self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
-        #self.actionPrevLine.triggered.connect(self.fileview.prevLine)
-        self.addAction(self.actionPrevLine)
-        self.actionNextCol = QAction('Next column', self)
-        self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
-        #self.actionNextCol.triggered.connect(self.fileview.nextCol)
-        self.addAction(self.actionNextCol)
-        self.actionPrevCol = QAction('Prev column', self)
-        self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
-        #self.actionPrevCol.triggered.connect(self.fileview.prevCol)
-        self.addAction(self.actionPrevCol)
 
         self.actionNew_repository.triggered.connect(self.newRepository)
         self.actionOpen_repository.triggered.connect(self.openRepository)
@@ -588,30 +523,6 @@ class Workbench(QMainWindow):
             except RepoError:
                 QMessageBox.warning(self, _('Failed to open repository'),
                     _('%s is not a valid repository') % path)
-
-    def setMode(self, mode):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.setMode(mode)
-
-    def setAnnotate(self, ann):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.setAnnotate(ann)
-
-    def nextDiff(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.revDetailsWidget.nextDiff()
-
-    def prevDiff(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.revDetailsWidget.prevDiff()
-
-    def file_displayed(self, filename):
-        # self.actionPrevDiff.setEnabled(False)
-        pass
 
     def reload(self):
         w = self.repoTabsWidget.currentWidget()

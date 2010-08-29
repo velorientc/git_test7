@@ -353,7 +353,6 @@ class HgRepoView(QTableView):
     def updateActions(self):
         ctx = self.context(self.current_rev)
         enable = self.current_rev is not None and not ctx.thgmqunappliedpatch()
-        self.workbench.actionDiffMode.setEnabled(enable)
         exclude = ('back', 'forward', 'qgoto')
         for name in self._actions:
             if name not in exclude:

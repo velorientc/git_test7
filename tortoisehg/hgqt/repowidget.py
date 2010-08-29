@@ -109,7 +109,7 @@ class RepoWidget(QWidget):
         #tb.attachHeaderView(self.revDetailsWidget)
         tb.revisionSelected.connect(self.repoview.goto)
         tb.attachFileView(d.fileview)
-        tb.fileSelected.connect(d.tableView_filelist.selectFile)
+        tb.fileSelected.connect(d.filelist.selectFile)
         tb.showMessage.connect(self.workbench.showMessage)
         self.layout().addWidget(tb)
 
@@ -317,23 +317,6 @@ class RepoWidget(QWidget):
                 _('Unable to delete %d files or folders') %
                 len(failures), self, (_('&Ok'),), 0, 0, failures).run()
 
-    def setMode(self, mode):
-        self.revDetailsWidget.setMode(mode)
-        self.updateActions()
-
-    def setAnnotate(self, ann):
-        self.revDetailsWidget.setAnnotate(ann)
-
-        # TODO: Workaround for switching manifest file view.
-        # Maybe we need to move this kind of switches to task tab widget itself.
-        self.manifestWidget.setfileview(ann and 'annotate' or 'cat')
-
-    def nextDiff(self):
-        self.revDetailsWidget.nextDiff()
-
-    def prevDiff(self):
-        self.revDetailsWidget.prevDiff()
-
     def create_models(self):
         self.repomodel = HgRepoListModel(self.repo)
         self.repomodel.filled.connect(self.modelFilled)
@@ -502,7 +485,6 @@ class RepoWidget(QWidget):
             self.revDetailsWidget.revision_selected(None)
         else:
             self.revDetailsWidget.revision_selected(rev)
-        self.updateActions()
 
     def goto(self, rev):
         rev = str(rev)
@@ -579,16 +561,6 @@ class RepoWidget(QWidget):
         self.updateActions()
 
     def updateActions(self):
-        mode = self.revDetailsWidget.getMode()
-        wb = self.workbench
-        enable = self.rev is not None
-        wb.actionDiffMode.setEnabled(enable)
-        wb.actionDiffMode.setChecked(mode == 'diff')
-        ann = self.revDetailsWidget.getAnnotate()
-        wb.actionAnnMode.setChecked(ann)
-        wb.actionAnnMode.setEnabled(enable and mode != 'diff')
-        wb.actionNextDiff.setEnabled(enable and mode != 'diff')
-        wb.actionPrevDiff.setEnabled(enable and mode != 'diff')
         self.repoview.updateActions()
 
     def storeSettings(self):
@@ -632,15 +604,3 @@ class RepoWidget(QWidget):
             self.runner = None
         self.runner.commandFinished.connect(finished)
         self.runner.run(cmdline)       
-
-class BlankMessageWidget(QWidget):
-
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
-
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(layout)
-
-        la = QLabel("Can't yet display change details for unapplied patches")
-        layout.addWidget(la)
