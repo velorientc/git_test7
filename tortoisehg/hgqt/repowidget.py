@@ -32,9 +32,6 @@ from PyQt4.QtGui import *
 
 connect = QObject.connect
 
-# TODO
-# Unify use of cmdui.Runner, do not allow new runners while current is busy
-
 
 class RepoWidget(QWidget):
 
@@ -49,6 +46,7 @@ class RepoWidget(QWidget):
         self._scanForRepoChanges = True
         self.disab_shortcuts = []
         self.currentMessage = ''
+        self.runner = None
 
         QWidget.__init__(self)
 
@@ -601,11 +599,16 @@ class RepoWidget(QWidget):
         return True
 
     def runCommand(self, title, cmdline):      
+        if self.runner:
+            InfoMsgBox(_('Unable to start'),
+                       _('Previous command is still running'))
+            return
         saved = self.setScanForRepoChanges(False)
         self.runner = cmdui.Runner(title, self)
         def finished(ret):
             self.reload()
             self.setScanForRepoChanges(saved)
+            self.runner = None
         self.runner.commandFinished.connect(finished)
         self.runner.run(cmdline)       
 
