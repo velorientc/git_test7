@@ -22,7 +22,7 @@ from tortoisehg.util import paths, thgrepo
 
 from tortoisehg.hgqt import repomodel
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
+from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles, InfoMsgBox
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
@@ -761,6 +761,9 @@ class Workbench(QMainWindow):
                 QProcess.startDetached(shell)
             finally:
                 os.chdir(cwd)
+        else:
+            InfoMsgBox(_('No shell configured'),
+                       _('A terminal shell must be configured'))
 
 
 def run(ui, *pats, **opts):
