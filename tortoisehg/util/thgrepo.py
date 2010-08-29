@@ -29,7 +29,7 @@ def repository(ui, path='', create=False):
         return repo
     return _repocache[path]
 
-_uiprops = '''_uifiles _shell _thghiddentags'''.split()
+_uiprops = '''_uifiles _uimtime _shell _thghiddentags'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
@@ -101,11 +101,21 @@ def _extendrepo(repo):
                 files.add(f)
             return files
 
+        @propertycache
+        def _uimtime(self):
+            mtimes = []
+            for f in self._uifiles:
+                try:
+                    mtimes.append(os.path.getmtime(f))
+                except EnvironmentError:
+                    pass
+            return max(mtimes)
+
         def shell(self):
             return self._shell
 
         def uifiles(self):
-            return self._uifiles
+            return self._uimtime, self._uifiles
 
         def thgmqtag(self, tag):
             '''True if tag is used to mark an applied MQ patch'''
