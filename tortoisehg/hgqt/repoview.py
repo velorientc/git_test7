@@ -261,7 +261,7 @@ class HgRepoView(QTableView):
         model = self.model()
 
         for c in range(model.columnCount()):
-            if model._columns[c] == 'Log':
+            if model._columns[c] in ['Log', 'Changes']:
                 self.setItemDelegateForColumn(c, self.htmlDelegate)
             else:
                 self.setItemDelegateForColumn(c, self.standardDelegate)

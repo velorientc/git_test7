@@ -47,6 +47,9 @@ _thgstyles = {
    'log.patch': 'black #aaddff_background',
    'log.unapplied_patch': 'black #dddddd_background',
    'log.tag': 'black #ffffaa_background',
+   'log.modified': 'black #ffddaa_background',
+   'log.added': 'black #aaffaa_background',
+   'log.removed': 'black #ffcccc_background',
    'ui.error': 'red bold',
    'control': 'black bold',
 }

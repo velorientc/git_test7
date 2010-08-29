@@ -37,7 +37,7 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
 ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Tags', 'Node',
-              'Age', 'LocalTime', 'UTCTime')
+              'Age', 'LocalTime', 'UTCTime', 'Changes')
 
 UNAPPLIED_PATCH_COLOR = '#999999'
 
@@ -112,6 +112,7 @@ class HgRepoListModel(QAbstractTableModel):
                            'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
                            'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
                            'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
+                           'Changes':  self.getchanges,
                            }
 
 
@@ -252,6 +253,8 @@ class HgRepoListModel(QAbstractTableModel):
         if column == 'Graph':
             res = self.col2x(self.graph.max_cols)
             return min(res, 150)
+        if column == 'Changes':
+            return 'Changes'
         # Fall through for Log
         return None
 
@@ -458,3 +461,20 @@ class HgRepoListModel(QAbstractTableModel):
         parts.append(msg)
 
         return ' '.join(parts)
+
+    def getchanges(self, ctx, gnode):
+        """Return the MAR status for the given ctx."""
+        changes = []
+        par = ctx.parents()
+        M, A, R = self.repo.status(par[0], self.repo[ctx.rev()])[:3]
+        def addtotal(files, style):
+            effects = qtlib.geteffect(style)
+            text = qtlib.applyeffects(' %s ' % len(files), effects)
+            changes.append(text)
+        if M:
+            addtotal(M, 'log.modified')
+        if A:
+            addtotal(A, 'log.added')
+        if R:
+            addtotal(R, 'log.removed')
+        return ''.join(changes)
