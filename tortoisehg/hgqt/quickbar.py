@@ -25,9 +25,6 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.qtlib import geticon
 
 class QuickBar(QToolBar):
-    escShortcutDisabled = pyqtSignal(bool)
-    visible = pyqtSignal()
-
     def __init__(self, name, key, desc=None, parent=None):
         self.original_parent = parent
         # used to remember who had the focus before bar steel it
@@ -63,16 +60,6 @@ class QuickBar(QToolBar):
                 
         self._actions = {'open': openact,
                          'close': closeact,}
-
-    def setVisible(self, visible=True):
-        if visible and not self.isVisible():
-            self.visible.emit()
-            self._focusw = QApplication.focusWidget()
-        QToolBar.setVisible(self, visible)
-        self.escShortcutDisabled.emit(not visible)
-        if not visible and self._focusw:
-            self._focusw.setFocus()
-            self._focusw = None
 
     def createContent(self):
         self.addAction(self._actions['close'])

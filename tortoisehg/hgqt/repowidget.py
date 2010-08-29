@@ -17,6 +17,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
+from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run
 
@@ -29,7 +30,6 @@ from tortoisehg.hgqt.grep import SearchWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
 
 class RepoWidget(QWidget):
 
@@ -103,6 +103,18 @@ class RepoWidget(QWidget):
         w = DemandWidget(self.createGrepWidget)
         self.grepTabIndex = idx = tt.addTab(w, geticon('grep'), '')
         tt.setTabToolTip(idx, _("Search"))
+
+        d = self.revDetailsWidget
+        self.findToolbar = tb = FindInGraphlogQuickBar(self)
+        #tb.attachHeaderView(self.revDetailsWidget)
+        tb.revisionSelected.connect(self.repoview.goto)
+        tb.attachFileView(d.fileview)
+        tb.fileSelected.connect(d.tableView_filelist.selectFile)
+        tb.showMessage.connect(self.workbench.showMessage)
+        self.layout().addWidget(tb)
+
+    def find(self):
+        self.findToolbar.setVisible(True)
 
     def getCommitWidget(self):
         return getattr(self.repo, '_commitwidget', None)  # TODO: ugly

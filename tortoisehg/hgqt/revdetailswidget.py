@@ -216,13 +216,13 @@ class RevDetailsWidget(QWidget):
 
     def nextDiff(self):
         notlast = self.fileview.nextDiff()
-        self.actionNextDiff.setEnabled(self.fileview.fileMode() and notlast and self.fileview.nDiffs())
-        self.actionPrevDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
+        #self.actionNextDiff.setEnabled(self.fileview.fileMode() and notlast and self.fileview.nDiffs())
+        #self.actionPrevDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
 
     def prevDiff(self):
         notfirst = self.fileview.prevDiff()
-        self.actionPrevDiff.setEnabled(self.fileview.fileMode() and notfirst and self.fileview.nDiffs())
-        self.actionNextDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
+        #self.actionPrevDiff.setEnabled(self.fileview.fileMode() and notfirst and self.fileview.nDiffs())
+        #self.actionNextDiff.setEnabled(self.fileview.fileMode() and self.fileview.nDiffs())
 
     def create_models(self):
         self.filelistmodel = HgFileListModel(self.repo)

@@ -23,7 +23,6 @@ from tortoisehg.util import paths, thgrepo
 from tortoisehg.hgqt import repomodel
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles, InfoMsgBox
-from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
@@ -49,8 +48,6 @@ class Workbench(QMainWindow):
 
         self.load_config(ui)
         self.setupUi()
-        self._quickbars = []
-        self.disab_shortcuts = []
 
         self.setWindowTitle('TortoiseHg Workbench')
 
@@ -89,23 +86,6 @@ class Workbench(QMainWindow):
             self.addRepoTab(repo)
         else:
             self.reporegistry.setVisible(True)
-
-    def attachQuickBar(self, qbar):
-        qbar.setParent(self)
-        qbar.escShortcutDisabled.connect(self.setShortcutsEnabled)
-        qbar.visible.connect(self.ensureOneQuickBar)
-        self._quickbars.append(qbar)
-        self.addToolBar(Qt.BottomToolBarArea, qbar)
-
-    def setShortcutsEnabled(self, enabled=True):
-        for sh in self.disab_shortcuts:
-            sh.setEnabled(enabled)
-
-    def ensureOneQuickBar(self):
-        tb = self.sender()
-        for w in self._quickbars:
-            if w is not tb:
-                w.hide()
 
     def load_config(self, ui):
         configstyles(ui)
@@ -170,6 +150,9 @@ class Workbench(QMainWindow):
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
         a.setShortcut(QKeySequence.Refresh)
+
+        self.actionFind = a = QAction(_('Find'), self)
+        a.setIcon(geticon('find'))
 
         self.actionQuit = a = QAction(_("E&xit"), self)
         a.setShortcut(QKeySequence.Quit)
@@ -274,6 +257,7 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionShowRepoRegistry)
         tb.addAction(self.actionLoadAll)
         tb.addSeparator()
+        tb.addAction(self.actionFind)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
     def showRepoRegistry(self, show):
@@ -340,7 +324,6 @@ class Workbench(QMainWindow):
         if w:
             w.switchedTo()
         else:
-
             self.actionDiffMode.setEnabled(False)
             self.actionAnnMode.setEnabled(False)
             self.actionNextDiff.setEnabled(False)
@@ -404,22 +387,6 @@ class Workbench(QMainWindow):
             self.branch_comboBox.setCurrentIndex(index)
 
     def createToolbars(self):
-        # find quickbar
-        self.find_toolbar = tb = FindInGraphlogQuickBar(self)
-        tb.setObjectName("find_toolbar")
-        # TODO: find toolbar needs to be moved to repowidget
-        #tb.attachFileView(self.fileview)
-        #tb.attachHeaderView(self.revdisplay)
-        #tb.revisionSelected.connect(self.repoview.goto)
-        #tb.fileSelected.connect(self.tableView_filelist.selectFile)
-        tb.showMessage.connect(self.statusBar().showMessage)
-
-        self.attachQuickBar(tb)
-
-        findaction = self.find_toolbar.toggleViewAction()
-        findaction.setIcon(geticon('find'))
-        self.toolBar_edit.addAction(findaction)
-
         # tree filters toolbar
         self.branch_label = QToolButton()
         self.branch_label.setText("Branch")
@@ -453,6 +420,7 @@ class Workbench(QMainWindow):
 
     def createActions(self):
         # main window actions (from .ui file)
+        self.actionFind.triggered.connect(self.find)
         self.actionRefresh.triggered.connect(self.reload)
         self.actionAbout.triggered.connect(self.on_about)
         self.actionQuit.triggered.connect(self.close)
@@ -492,9 +460,9 @@ class Workbench(QMainWindow):
         self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
         self.actionNextDiff.triggered.connect(self.nextDiff)
-        def filled():
-            self.actionNextDiff.setEnabled(
-                self.fileview.fileMode() and self.fileview.nDiffs())
+        #def filled():
+        #    self.actionNextDiff.setEnabled(
+        #        self.fileview.fileMode() and self.fileview.nDiffs())
         #self.fileview.filled.connect(filled)
         self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
@@ -510,8 +478,6 @@ class Workbench(QMainWindow):
         #self.actionPrevFile.triggered.connect(self.tableView_filelist.prevFile)
         self.addAction(self.actionNextFile)
         self.addAction(self.actionPrevFile)
-        self.disab_shortcuts.append(self.actionNextFile)
-        self.disab_shortcuts.append(self.actionPrevFile)
 
         # navigate in file viewer
         self.actionNextLine = QAction('Next line', self)
@@ -588,6 +554,11 @@ class Workbench(QMainWindow):
         if w:
             w.forward()
 
+    def find(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.find()
+
     def loadall(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
@@ -629,10 +600,14 @@ class Workbench(QMainWindow):
             w.setAnnotate(ann)
 
     def nextDiff(self):
-        pass
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.revDetailsWidget.nextDiff()
 
     def prevDiff(self):
-        pass
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.revDetailsWidget.prevDiff()
 
     def file_displayed(self, filename):
         # self.actionPrevDiff.setEnabled(False)
