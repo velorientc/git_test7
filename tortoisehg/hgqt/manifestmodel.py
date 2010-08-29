@@ -16,6 +16,8 @@
 
 from mercurial.node import short as short_hex
 
+from tortoisehg.hgqt.i18n import _
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -138,9 +140,14 @@ class ManifestModel(QAbstractItemModel):
             return self.rootItem.columnCount()
 
     def setupModelData(self):
-        rootData = ["rev %s:%s" % (self.changectx.rev(),
-                                   short_hex(self.changectx.node()))]
-        self.rootItem = _TreeItem(rootData)
+        # TODO: it shouldn't be in header of file tree view?
+        def formatrev(ctx):
+            if ctx.rev():
+                return _('rev %s:%s') % (ctx.rev(),
+                                         short_hex(ctx.node()))
+            else:
+                return _('working copy')
+        self.rootItem = _TreeItem([formatrev(self.changectx)])
 
         for path in sorted(self.changectx.manifest()):
             path = path.split('/')
