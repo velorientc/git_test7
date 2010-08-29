@@ -18,15 +18,11 @@ Qt4 high level widgets for hg repo changelogs and filelogs
 """
 import difflib
 
-try:
-    from mercurial.error import LookupError
-except ImportError:
-    from mercurial.revlog import LookupError
+from mercurial.error import LookupError
     
-from PyQt4 import QtCore, QtGui, Qsci
-Qt = QtCore.Qt
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4 import Qsci
 
 from tortoisehg.util import hglib
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
@@ -49,7 +45,7 @@ class Annotator(qsci):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setReadOnly(True)
-        self.sizePolicy().setControlType(QtGui.QSizePolicy.Slider)
+        self.sizePolicy().setControlType(QSizePolicy.Slider)
         self.setMinimumWidth(20)
         self.setMaximumWidth(40) # XXX TODO make this computed
         self.setFont(textarea.font())
@@ -68,8 +64,7 @@ class Annotator(qsci):
             self.SendScintilla(qsci.SCI_MARKERSETBACK, marker, color)
             self.markers.append(marker)
 
-        connect(textarea.verticalScrollBar(),
-                SIGNAL('valueChanged(int)'),
+        textarea.verticalScrollBar().valueChanged.connect(
                 self.verticalScrollBar().setValue)
         
     def setFilectx(self, fctx):
@@ -84,29 +79,33 @@ class Annotator(qsci):
         
         
         
-class HgFileView(QtGui.QFrame):
+class HgFileView(QFrame):
     """file diff and content viewer"""
 
-    showDescSignal = QtCore.pyqtSignal(QtCore.QString)
+    showDescSignal = pyqtSignal(QString)
+    fileDisplayed = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
+    revForDiffChanged = pyqtSignal(int)
+    filled = pyqtSignal()
 
     def __init__(self, parent=None):
-        QtGui.QFrame.__init__(self, parent)
-        framelayout = QtGui.QVBoxLayout(self)
+        QFrame.__init__(self, parent)
+        framelayout = QVBoxLayout(self)
         framelayout.setContentsMargins(0,0,0,0)
         framelayout.setSpacing(0)
 
-        l = QtGui.QHBoxLayout()
+        l = QHBoxLayout()
         l.setContentsMargins(0,0,0,0)
         l.setSpacing(0)
         
-        self.topLayout = QtGui.QVBoxLayout()
+        self.topLayout = QVBoxLayout()
 
-        self.filenamelabel = w = QtGui.QLabel()
+        self.filenamelabel = w = QLabel()
         w.setWordWrap(True)
         w.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.topLayout.addWidget(w)
 
-        self.execflaglabel = QtGui.QLabel()
+        self.execflaglabel = QLabel()
         self.execflaglabel.setWordWrap(True)
         self.topLayout.addWidget(self.execflaglabel)
         self.execflaglabel.hide()
@@ -116,7 +115,7 @@ class HgFileView(QtGui.QFrame):
         self.sci = qsci(self)
         self.sci.setFrameStyle(0)
         l.addWidget(self.sci, 1)
-        self.sci.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
 
@@ -143,18 +142,18 @@ class HgFileView(QtGui.QFrame):
         self.lastrev = None
         self.sci.mouseMoveEvent = self.mouseMoveEvent
 
-        ll = QtGui.QVBoxLayout()
+        ll = QVBoxLayout()
         ll.setContentsMargins(0, 0, 0, 0)
         ll.setSpacing(0)
         l.insertLayout(0, ll)
 
-        ll2 = QtGui.QHBoxLayout()
+        ll2 = QHBoxLayout()
         ll2.setContentsMargins(0, 0, 0, 0)
         ll2.setSpacing(0)
         ll.addLayout(ll2)
 
         # used to fill height of the horizontal scroll bar
-        w = QtGui.QWidget(self)
+        w = QWidget(self)
         ll.addWidget(w)
         self._spacer = w
 
@@ -175,13 +174,12 @@ class HgFileView(QtGui.QFrame):
         self._mode = "diff" # can be 'diff' or 'file'
         self.filedata = None
 
-        self.timer = QtCore.QTimer()
+        self.timer = QTimer()
         self.timer.setSingleShot(False)
-        self.connect(self.timer, QtCore.SIGNAL("timeout()"),
-                     self.idle_fill_files)
+        self.timer.timeout.connect(self.idle_fill_files)
 
     def resizeEvent(self, event):
-        QtGui.QFrame.resizeEvent(self, event)
+        QFrame.resizeEvent(self, event)
         h = self.sci.horizontalScrollBar().height()
         self._spacer.setMinimumHeight(h)
         self._spacer.setMaximumHeight(h)
@@ -268,7 +266,7 @@ class HgFileView(QtGui.QFrame):
             
         if rev is not None:
             self._p_rev = rev
-            self.emit(SIGNAL('revForDiffChanged'), rev)
+            self.revForDiffChanged.emit(rev)
         self.sci.clear()
         self.ann.clear()
         self.filenamelabel.setText(" ")
@@ -323,7 +321,7 @@ class HgFileView(QtGui.QFrame):
         self.sci.setText(data)
         if self._find_text:
             self.highlightSearchString(self._find_text)
-        self.emit(SIGNAL('fileDisplayed'), self._filename)
+        self.fileDisplayed.emit(self._filename)
         self.updateDiffDecorations()
         if self._mode == 'file' and self._annotate:
             if filectx.rev() is None: # XXX hide also for binary files
@@ -445,9 +443,9 @@ class HgFileView(QtGui.QFrame):
             self.sci.SendScintilla(qsci.SCI_INDICATORFILLRANGE, pos[-1], n)
             pos.append(data.find(text, pos[-1]+1))
         pos = [x for x in pos if x > -1]
-        self.emit(SIGNAL('showMessage'),
-                  "Found %d occurrences of '%s' in current file or diff" % (len(pos), text),
-                  2000)
+        self.showMessage.emit(
+             "Found %d occurrences of '%s' in current file or diff" % (
+                 len(pos), text))
         return pos
 
     def highlightCurrentSearchString(self, pos, text):
@@ -472,7 +470,7 @@ class HgFileView(QtGui.QFrame):
             if self._diff is None or not self._diff.get_opcodes():
                 self._diff = None
                 self.timer.stop()
-                self.emit(SIGNAL('filled'))
+                self.filled.emit()
                 break
 
             tag, alo, ahi, blo, bhi = self._diff.get_opcodes().pop(0)

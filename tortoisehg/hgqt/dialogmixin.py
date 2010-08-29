@@ -37,12 +37,10 @@ class HgDialogMixin(object):
 
     def attachQuickBar(self, qbar):
         qbar.setParent(self)
+        qbar.escShortcutDisabled.connect(self.setShortcutsEnabled)
+        qbar.visible.connect(self.ensureOneQuickBar)
         self._quickbars.append(qbar)
-        connect(qbar, SIGNAL('escShortcutDisabled(bool)'),
-                self.setShortcutsEnabled)
         self.addToolBar(Qt.BottomToolBarArea, qbar)
-        connect(qbar, SIGNAL('visible'),
-                self.ensureOneQuickBar)
 
     def setShortcutsEnabled(self, enabled=True):
         for sh in self.disab_shortcuts:

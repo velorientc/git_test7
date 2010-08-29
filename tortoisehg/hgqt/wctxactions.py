@@ -14,7 +14,7 @@ from tortoisehg.hgqt import qtlib, htmlui, visdiff
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4.QtCore import Qt, SIGNAL
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QAction, QMenu, QMessageBox, QFileDialog, QDialog
 
 def wctxactions(parent, point, repo, selrows):
@@ -32,7 +32,7 @@ def wctxactions(parent, point, repo, selrows):
         if icon:
             action.setIcon(icon)
         action.wrapper = lambda files=files: run(func, parent, files, repo)
-        parent.connect(action, SIGNAL('triggered()'), action.wrapper)
+        action.triggered.connect(action.wrapper)
         return action
 
     menu = QMenu(parent)
@@ -63,7 +63,7 @@ def wctxactions(parent, point, repo, selrows):
             for d in wctx.deleted()[:15]:
                 action = rmenu.addAction(hglib.tounicode(d))
                 action.wrapper = lambda d=d: renamefromto(repo, d, path)
-                parent.connect(action, SIGNAL('triggered()'), action.wrapper)
+                action.triggered.connect(action.wrapper)
             menu.addMenu(rmenu)
         else:
             make(_('&Copy...'), copy, frozenset('MC'))
@@ -78,7 +78,7 @@ def wctxactions(parent, point, repo, selrows):
         for tool in hglib.mergetools(repo.ui):
             action = rmenu.addAction(tool)
             action.wrapper = lambda tool=tool: resolve_with(tool, repo, files)
-            parent.connect(action, SIGNAL('triggered()'), action.wrapper)
+            action.triggered.connect(action.wrapper)
         menu.addMenu(rmenu)
     return menu.exec_(point)
 

@@ -19,24 +19,21 @@ Qt4 QToolBar-based class for quick bars XXX
 
 from mercurial import util
 
-from PyQt4 import QtCore, QtGui
-
-from tortoisehg.util.util import Curry
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.qtlib import geticon
 
-Qt = QtCore.Qt
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
+class QuickBar(QToolBar):
+    escShortcutDisabled = pyqtSignal(bool)
+    visible = pyqtSignal()
 
-
-class QuickBar(QtGui.QToolBar):
     def __init__(self, name, key, desc=None, parent=None):
         self.original_parent = parent
         # used to remember who had the focus before bar steel it
         self._focusw = None
-        QtGui.QToolBar.__init__(self, name, parent)
-        self.setIconSize(QtCore.QSize(16,16))
+        QToolBar.__init__(self, name, parent)
+        self.setIconSize(QSize(16,16))
         self.setFloatable(False)
         self.setMovable(False)
         self.setAllowedAreas(Qt.BottomToolBarArea)
@@ -44,7 +41,7 @@ class QuickBar(QtGui.QToolBar):
         self.createContent()
         if parent:
             parent = parent.window()            
-        if isinstance(parent, QtGui.QMainWindow):
+        if isinstance(parent, QMainWindow):
             parent.addToolBar(Qt.BottomToolBarArea, self)
         self.setVisible(False)
         
@@ -54,27 +51,25 @@ class QuickBar(QtGui.QToolBar):
 
         if not desc:
             desc = "Open"
-        openact = QtGui.QAction(desc, parent)
+        openact = QAction(desc, parent)
         openact.setCheckable(True)        
         openact.setChecked(False)
-        openact.setShortcut(QtGui.QKeySequence(openkey))
-        connect(openact, SIGNAL('triggered()'),
-                Curry(self.setVisible, True))
+        openact.setShortcut(QKeySequence(openkey))
+        openact.triggered.connect(lambda: self.setVisible(True))
 
-        closeact = QtGui.QAction('Close', self)
+        closeact = QAction('Close', self)
         closeact.setIcon(geticon('close'))
-        connect(closeact, SIGNAL('triggered()'),
-                Curry(self.setVisible, False))
+        closeact.triggered.connect(lambda: self.setVisible(False))
                 
         self._actions = {'open': openact,
                          'close': closeact,}
 
     def setVisible(self, visible=True):
         if visible and not self.isVisible():
-            self.emit(SIGNAL('visible'))
-            self._focusw = QtGui.QApplication.focusWidget()
-        QtGui.QToolBar.setVisible(self, visible)
-        self.emit(SIGNAL('escShortcutDisabled(bool)'), not visible)
+            self.visible.emit()
+            self._focusw = QApplication.focusWidget()
+        QToolBar.setVisible(self, visible)
+        self.escShortcutDisabled.emit(not visible)
         if not visible and self._focusw:
             self._focusw.setFocus()
             self._focusw = None
@@ -97,6 +92,10 @@ class QuickBar(QtGui.QToolBar):
 
 
 class FindQuickBar(QuickBar):
+    find = pyqtSignal(QString)
+    findnext = pyqtSignal(QString)
+    cancel = pyqtSignal()
+
     def __init__(self, parent):
         QuickBar.__init__(self, "Find", "/", "Find", parent)
         self.addShortcut('open', 'Ctrl+F')
@@ -104,22 +103,22 @@ class FindQuickBar(QuickBar):
         
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
-        self._actions['findnext'] = QtGui.QAction("Find next", self)
-        self._actions['findnext'].setShortcut(QtGui.QKeySequence("Ctrl+N"))
-        connect(self._actions['findnext'], SIGNAL('triggered()'), self.find)
-        self._actions['cancel'] = QtGui.QAction("Cancel", self)
-        connect(self._actions['cancel'], SIGNAL('triggered()'), self.cancel)
+        self._actions['findnext'] = QAction("Find next", self)
+        self._actions['findnext'].setShortcut(QKeySequence("Ctrl+N"))
+        self._actions['findnext'].triggered.connect(self.findText)
+        self._actions['cancel'] = QAction("Cancel", self)
+        self._actions['cancel'].triggered.connect(self.on_cancel)
 
-    def find(self, *args):
+    def findText(self, *args):
         text = unicode(self.entry.text())
         if text == self.currenttext:
-            self.emit(SIGNAL('findnext'), text)
+            self.findnext.emit(text)
         else:
             self.currenttext = text
-            self.emit(SIGNAL('find'), text)            
+            self.find.emit(text)
 
-    def cancel(self):
-        self.emit(SIGNAL('cancel'))
+    def on_cancel(self):
+        self.cancel.emit()
 
     def setCancelEnabled(self, enabled=True):
         self._actions['cancel'].setEnabled(enabled)
@@ -127,19 +126,16 @@ class FindQuickBar(QuickBar):
         
     def createContent(self):
         QuickBar.createContent(self)
-        self.compl_model = QtGui.QStringListModel()
-        self.completer = QtGui.QCompleter(self.compl_model, self)
-        self.entry = QtGui.QLineEdit(self)
+        self.compl_model = QStringListModel()
+        self.completer = QCompleter(self.compl_model, self)
+        self.entry = QLineEdit(self)
         self.entry.setCompleter(self.completer)
         self.addWidget(self.entry)
         self.addAction(self._actions['findnext'])
         self.addAction(self._actions['cancel'])
         self.setCancelEnabled(False)
-        
-        connect(self.entry, SIGNAL('returnPressed()'),
-                self.find)
-        connect(self.entry, SIGNAL('textEdited(const QString &)'),
-                self.find)
+        self.entry.returnPressed.connect(self.findText)
+        self.entry.textEdited.connect(self.findText)
         
     def setVisible(self, visible=True):
         QuickBar.setVisible(self, visible)
@@ -157,6 +153,10 @@ class FindQuickBar(QuickBar):
         self.entry.setCompleter(None)
 
 class FindInGraphlogQuickBar(FindQuickBar):
+    revisionSelected = pyqtSignal(int)
+    fileSelected = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
+
     def __init__(self, parent):
         FindQuickBar.__init__(self, parent)
         self._findinfile_iter = None
@@ -166,12 +166,9 @@ class FindInGraphlogQuickBar(FindQuickBar):
         self._headerview = None
         self._filter_files = None
         self._mode = 'diff'
-        connect(self, SIGNAL('find'),
-                self.on_find_text_changed)
-        connect(self, SIGNAL('findnext'),
-                self.on_findnext)
-        connect(self, SIGNAL('cancel'),
-                self.on_cancelsearch)
+        self.find.connect(self.on_find_text_changed)
+        self.findnext.connect(self.on_findnext)
+        self.cancel.connect(self.on_cancelsearch)
 
     def setFilterFiles(self, files):
         self._filter_files = files
@@ -221,16 +218,16 @@ class FindInGraphlogQuickBar(FindQuickBar):
                 else:
                     yield None
 
-    def cancel(self):
+    def on_cancel(self):
         if self._actions['cancel'].isEnabled():
-            self.emit(SIGNAL('cancel'))
+            self.cancel.emit()
         else:
             self.hide()
 
     def on_cancelsearch(self, *args):
         self._findinlog_iter = None
         self.setCancelEnabled(False)
-        self.emit(SIGNAL('showMessage'), 'Search cancelled!', 2000)
+        self.showMessage.emit('Search cancelled!')
 
     def on_findnext(self):
         """
@@ -252,7 +249,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
             # no more found text in currently displayed file
             self._findinfile_iter = None
                 
-        if self._findinlog_iter is None:
+        if self._findinlog_iter is None and self._fileview:
             # start searching in the graphlog from current position
             rev = self._fileview.rev()
             filename = self._fileview.filename()
@@ -273,26 +270,26 @@ class FindInGraphlogQuickBar(FindQuickBar):
         for next_find in self._findinlog_iter:
             if next_find is None: # not yet found, let's animate a bit the GUI
                 if (step % 20) == 0:
-                    self.emit(SIGNAL("showMessage"), 'Searching'+'.'*(step/20))
+                    self.showMessage.emit('Searching'+'.'*(step/20))
                 step += 1
-                QtCore.QTimer.singleShot(0, Curry(self.find_next_in_log, (step % 80)))
+                QTimer.singleShot(0, lambda: self.find_next_in_log(step % 80))
             else:
-                self.emit(SIGNAL("showMessage"), '')
+                self.showMessage.emit('')
                 self.setCancelEnabled(False)
                 
                 rev, filename = next_find
-                self.emit(SIGNAL('revisionSelected'), rev)
+                self.revisionSelected.emit(rev)
                 text = unicode(self.entry.text())
                 if filename is None and self._headerview:
                     self._findindesc_iter = self._headerview.searchString(text)
                     self.on_findnext()
                 else:
-                    self.emit(SIGNAL('fileSelected'), filename)
+                    self.fileSelected.emit(filename)
                     if self._fileview:
                         self._findinfile_iter = self._fileview.searchString(text)
                         self.on_findnext()
             return
-        self.emit(SIGNAL('showMessage'), 'No more matches found in repository', 2000)
+        self.showMessage.emit('No more matches found in repository')
         self.setCancelEnabled(False)
         self._findinlog_iter = None
 
@@ -309,22 +306,9 @@ class FindInGraphlogQuickBar(FindQuickBar):
             self._findinfile_iter = self._fileview.searchString(newtext)
         if newtext.strip():
             if self._findindesc_iter is None and self._findindesc_iter is None:
-                self.emit(SIGNAL('showMessage'),
+                self.showMessage.emit(
                           'Search string not found in current diff. '
                           'Hit "Find next" button to start searching '
-                          'in the repository', 2000)
+                          'in the repository')
             else:
                 self.on_findnext()
-
-if __name__ == "__main__":
-    import sys
-    # import hgviewlib # to force importation of resource module w/ icons
-    app = QtGui.QApplication(sys.argv)
-    root = QtGui.QMainWindow()
-    w = QtGui.QFrame()
-    root.setCentralWidget(w)
-    
-    qbar = QuickBar("test", "Ctrl+G", "toto", w)
-    root.show()
-    app.exec_()
-    

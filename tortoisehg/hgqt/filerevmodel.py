@@ -14,20 +14,18 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from tortoisehg.util.util import Curry
-
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.graph import Graph, filelog_grapher
 
-from PyQt4 import QtCore
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
+from PyQt4.QtCore import *
 
 class FileRevModel(HgRepoListModel):
     """
     Model used to manage the list of revisions of a file, in file
     viewer of in diff-file viewer dialogs.
     """
+    filled = pyqtSignal()
+
     _allcolumns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Tags', 'Filename')
     _columns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Filename')
     _stretchs = {'Log': 1, }
@@ -63,7 +61,7 @@ class FileRevModel(HgRepoListModel):
             # works with both versions.
             self.heads = [fl.index[fl.rev(x)][4] for x in fl.heads()]
             self.ensureBuilt(row=self.fill_step/2)
-            QtCore.QTimer.singleShot(0, Curry(self.emit, SIGNAL('filled')))
+            QTimer.singleShot(0, lambda: self.filled.emit())
             self._fill_timer = self.startTimer(500)
         else:
             self.graph = None

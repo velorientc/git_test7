@@ -151,16 +151,13 @@ class FileLogDialog(_AbstractFileDialog):
 
     def setupViews(self):
         self.textView.setFont(self._font)
-        connect(self.textView, SIGNAL('showMessage'),
-                self.statusBar().showMessage)
+        self.textView.showMessage.connect(self.statusBar().showMessage)
 
     def setupToolbars(self):
         self.find_toolbar = FindInGraphlogQuickBar(self)
         self.find_toolbar.attachFileView(self.textView)
-        connect(self.find_toolbar, SIGNAL('revisionSelected'),
-                self.repoview.goto)
-        connect(self.find_toolbar, SIGNAL('showMessage'),
-                self.statusBar().showMessage)
+        self.find_toolbar.revisionSelected.connect(self.repoview.goto)
+        self.find_toolbar.showMessage.connect(self.statusBar().showMessage)
         self.attachQuickBar(self.find_toolbar)
 
         self.toolBar_edit.addSeparator()
@@ -179,11 +176,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.repoview.setModel(self.filerevmodel)
         self.repoview.revisionSelected.connect(self.revisionSelected)
         self.repoview.revisionActivated.connect(self.revisionActivated)
-        connect(self.filerevmodel, SIGNAL('showMessage'),
-                self.statusBar().showMessage,
-                Qt.QueuedConnection)
-        connect(self.filerevmodel, SIGNAL('filled'),
-                self.modelFilled)
+        self.filerevmodel.showMessage.connect(self.statusBar().showMessage)
+        self.filerevmodel.filled.connect(self.modelFilled)
         self.textView.setMode('file')
         self.textView.setModel(self.filerevmodel)
         self.find_toolbar.setModel(self.filerevmodel)
@@ -192,38 +186,31 @@ class FileLogDialog(_AbstractFileDialog):
         self.filerevmodel.setFilename(self.filename)
 
     def createActions(self):
-        connect(self.actionClose, SIGNAL('triggered()'),
-                self.close)
-        connect(self.actionReload, SIGNAL('triggered()'),
-                self.reload)
+        self.actionClose.triggered.connect(self.close)
+        self.actionReload.triggered.connect(self.reload)
         self.actionClose.setIcon(geticon('quit'))
         self.actionReload.setIcon(geticon('reload'))
 
         self.actionDiffMode = QAction('Diff mode', self)
         self.actionDiffMode.setCheckable(True)
-        connect(self.actionDiffMode, SIGNAL('toggled(bool)'),
-                self.setMode)
+        self.actionDiffMode.toggled.connect(self.setMode)
 
         self.actionAnnMode = QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
-        connect(self.actionAnnMode, SIGNAL('toggled(bool)'),
-                self.textView.setAnnotate)
+        self.actionAnnMode.toggled.connect(self.textView.setAnnotate)
 
         self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
+        self.actionNextDiff.triggered.connect(self.nextDiff)
         self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
-        connect(self.actionNextDiff, SIGNAL('triggered()'),
-                self.nextDiff)
-        connect(self.actionPrevDiff, SIGNAL('triggered()'),
-                self.prevDiff)
+        self.actionPrevDiff.triggered.connect(self.prevDiff)
 
         self.actionBack.triggered.connect(self.repoview.back)
         self.actionForward.triggered.connect(self.repoview.forward)
 
     def modelFilled(self):
-        disconnect(self.filerevmodel, SIGNAL('filled'),
-                   self.modelFilled)
+        self.filerevmodel.filled.disconnect(self.modelFilled)
         self.repoview.resizeColumns()
         if self._show_rev is not None:
             index = self.filerevmodel.indexFromRev(self._show_rev)
@@ -239,8 +226,10 @@ class FileLogDialog(_AbstractFileDialog):
         self.textView.displayFile(self.filerevmodel.graph.filename(rev))
         self.textView.verticalScrollBar().setValue(pos)
         self.actionPrevDiff.setEnabled(False)
-        connect(self.textView, SIGNAL('filled'),
-                lambda self=self: self.actionNextDiff.setEnabled(self.textView.fileMode() and self.textView.nDiffs()))
+        def textfilled():
+            enabled = self.textView.fileMode() and self.textView.nDiffs()
+            self.actionNextDiff.setEnabled(enabled)
+        self.textView.filled.connect(textfilled)
 
     def goto(self, rev):
         index = self.filerevmodel.indexFromRev(rev)

@@ -48,6 +48,9 @@ class StatusWidget(QWidget):
     '''
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
+    titleTextChanged = pyqtSignal(QString)
+    errorMessage = pyqtSignal(QString)
+
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
 
@@ -111,7 +114,7 @@ class StatusWidget(QWidget):
                 self.pats = []
                 self.refreshWctx()
                 cpb.setVisible(False)
-                self.emit(SIGNAL('titleTextChanged'), QString(self.getTitle()))
+                self.titleTextChanged.emit(QString(self.getTitle()))
             cpb = QPushButton(_('Remove filter, show root'))
             vbox.addWidget(cpb)
             cpb.clicked.connect(clearPattern)
@@ -122,8 +125,8 @@ class StatusWidget(QWidget):
         hcbox.addSpacing(6)
         hcbox.addWidget(self.countlbl)
 
-        self.connect(tv, SIGNAL('clicked(QModelIndex)'), self.rowSelected)
-        self.connect(tv, SIGNAL('menuAction()'), self.refreshWctx)
+        tv.clicked.connect(self.rowSelected)
+        tv.menuAction.connect(self.refreshWctx)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
         tv.sortByColumn(COL_PATH_DISPLAY)
@@ -168,9 +171,8 @@ class StatusWidget(QWidget):
         hbox.setContentsMargins (0, 0, 0, 0)
         self.fnamelabel = QLabel()
         self.fnamelabel.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.connect(self.fnamelabel,
-                     SIGNAL('customContextMenuRequested(const QPoint &)'),
-                     self.customContextMenuRequested)
+        self.fnamelabel.customContextMenuRequested.connect(
+                     self.menuRequested)
         hbox.addWidget(self.fnamelabel)
         hbox.addStretch()
 
@@ -178,7 +180,7 @@ class StatusWidget(QWidget):
 
         self.te = QTextBrowser()
         self.te.setOpenLinks(False)
-        self.connect(self.te, SIGNAL('anchorClicked(QUrl)'), self.teLinkClicked)
+        self.te.anchorClicked.connect(self.teLinkClicked)
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.te.setReadOnly(True)
         self.te.setLineWrapMode(QTextEdit.NoWrap)
@@ -208,7 +210,7 @@ class StatusWidget(QWidget):
     def saveState(self):
         return self.split.saveState()
 
-    def customContextMenuRequested(self, point):
+    def menuRequested(self, point):
         'menu request for filename label'
         if self.curRow is None:
             return
@@ -217,7 +219,7 @@ class StatusWidget(QWidget):
         selrows = [(set(status+mst.lower()), path), ]
         action = wctxactions.wctxactions(self, point, self.repo, selrows)
         if action:
-            self.emit(SIGNAL('menuAction()'))
+            self.refreshWctx()
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
@@ -248,10 +250,10 @@ class StatusWidget(QWidget):
 
         self.loadBegin.emit()
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
-        self.connect(self.refreshing, SIGNAL('finished'), self.reloadComplete)
+        self.refreshing.finished.connect(self.reloadComplete)
         # re-emit error messages from this object
-        self.connect(self.refreshing, SIGNAL('errorMessage'),
-                     lambda msg: self.emit(SIGNAL('errorMessage'), msg))
+        self.refreshing.errorMessage.connect(
+                     lambda msg: self.errorMessage.emit(msg))
         self.refreshing.start()
 
     def reloadComplete(self, wctx, patchecked):
@@ -280,10 +282,10 @@ class StatusWidget(QWidget):
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
         for col in xrange(COL_SIZE):
             self.tv.resizeColumnToContents(col)
-        self.connect(self.tv, SIGNAL('activated(QModelIndex)'), tm.toggleRow)
-        self.connect(self.tv, SIGNAL('pressed(QModelIndex)'), tm.pressedRow)
-        self.connect(self.le, SIGNAL('textEdited(QString)'), tm.setFilter)
-        self.connect(tm, SIGNAL('checkToggled()'), self.updateCheckCount)
+        self.tv.activated.connect(tm.toggleRow)
+        self.tv.pressed.connect(tm.pressedRow)
+        self.le.textEdited.connect(tm.setFilter)
+        tm.checkToggled.connect(self.updateCheckCount)
         self.updateCheckCount()
 
         # reset selection, or select first row
@@ -417,7 +419,7 @@ class StatusWidget(QWidget):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
             err = hglib.tounicode(str(e))
-            self.emit(SIGNAL('errorMessage'), QString(err))
+            self.errorMessage.emit(QString(err))
             return
         o, e = hu.getdata()
         diff = o or _('<em>No displayable differences</em>')
@@ -438,7 +440,7 @@ class StatusWidget(QWidget):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
             err = hglib.tounicode(str(e))
-            self.emit(SIGNAL('errorMessage'), QString(err))
+            self.errorMessage.emit(QString(err))
             return
         text += '</br><h3>'
         text += _('===== Diff to second parent %d:%s =====\n') % (
@@ -451,6 +453,10 @@ class StatusWidget(QWidget):
 
 class StatusThread(QThread):
     '''Background thread for generating a workingctx'''
+
+    finished = pyqtSignal(object, object)
+    errorMessage = pyqtSignal(QString)
+
     def __init__(self, repo, pats, opts, parent=None):
         super(StatusThread, self).__init__()
         self.repo = repo
@@ -480,7 +486,7 @@ class StatusThread(QThread):
                 wctx.status(**stopts)
         except (OSError, IOError, util.Abort), e:
             err = hglib.tounicode(str(e))
-            self.emit(SIGNAL('errorMessage'), QString(err))
+            self.errorMessage.emit(QString(err))
         try:
             wctx.dirtySubrepos = []
             for s in wctx.substate:
@@ -489,18 +495,19 @@ class StatusThread(QThread):
         except (OSError, IOError, util.Abort,
                 error.RepoLookupError, error.ConfigError), e:
             err = hglib.tounicode(str(e))
-            self.emit(SIGNAL('errorMessage'), QString(err))
-        self.emit(SIGNAL('finished'), wctx, patchecked)
+            self.errorMessage.emit(QString(err))
+        self.finished.emit(wctx, patchecked)
 
 
 class WctxFileTree(QTreeView):
+    menuAction = pyqtSignal()
+
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
         self.repo = repo
         self.setSelectionMode(QTreeView.ExtendedSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
-                     self.customContextMenuRequested)
+        self.customContextMenuRequested.connect(self.menuRequested)
 
     def keyPressEvent(self, event):
         if event.key() == 32:
@@ -543,7 +550,7 @@ class WctxFileTree(QTreeView):
         self.dragObject()
         return QTreeView.mouseMoveEvent(self, event)
 
-    def customContextMenuRequested(self, point):
+    def menuRequested(self, point):
         selrows = []
         for index in self.selectedRows():
             path, status, mst, u, ext, sz = self.model().getRow(index)
@@ -551,12 +558,14 @@ class WctxFileTree(QTreeView):
         point = self.mapToGlobal(point)
         action = wctxactions.wctxactions(self, point, self.repo, selrows)
         if action:
-            self.emit(SIGNAL('menuAction()'))
+            self.menuAction.emit()
 
     def selectedRows(self):
         return self.selectionModel().selectedRows()
 
 class WctxModel(QAbstractTableModel):
+    checkToggled = pyqtSignal()
+
     def __init__(self, wctx, ms, opts, checked, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
@@ -686,10 +695,10 @@ class WctxModel(QAbstractTableModel):
             return
         assert index.isValid()
         fname = self.rows[index.row()][COL_PATH]
-        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.layoutAboutToBeChanged.emit()
         self.checked[fname] = not self.checked[fname]
-        self.emit(SIGNAL("layoutChanged()"))
-        self.emit(SIGNAL("checkToggled()"))
+        self.layoutChanged.emit()
+        self.checkToggled.emit()
 
     def pressedRow(self, index):
         'Connected to "pressed" signal, emitted by mouse clicks'
@@ -698,7 +707,7 @@ class WctxModel(QAbstractTableModel):
             self.toggleRow(index)
 
     def sort(self, col, order):
-        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.layoutAboutToBeChanged.emit()
         if col == COL_PATH:
             c = self.checked
             self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
@@ -706,14 +715,14 @@ class WctxModel(QAbstractTableModel):
             self.rows.sort(lambda x, y: cmp(x[col], y[col]))
         if order == Qt.DescendingOrder:
             self.rows.reverse()
-        self.emit(SIGNAL("layoutChanged()"))
+        self.layoutChanged.emit()
         self.reset()
 
     def setFilter(self, match):
         'simple match in filename filter'
-        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.layoutAboutToBeChanged.emit()
         self.rows = [r for r in self.unfiltered if match in r[COL_PATH_DISPLAY]]
-        self.emit(SIGNAL("layoutChanged()"))
+        self.layoutChanged.emit()
         self.reset()
 
     def getChecked(self):
@@ -774,15 +783,9 @@ class StatusDialog(QDialog):
         self.stwidget.restoreState(s.value('status/state').toByteArray())
         self.restoreGeometry(s.value('status/geom').toByteArray())
 
-        self.connect(self.stwidget, SIGNAL('titleTextChanged'), self.setTitle)
-        self.connect(self.stwidget, SIGNAL('errorMessage'), self.errorMessage)
-        self.setTitle(self.stwidget.getTitle())
-
-    def setTitle(self, title):
-        self.setWindowTitle(title)
-
-    def errorMessage(self, msg):
-        self.stbar.showMessage(msg)
+        self.stwidget.titleTextChanged.connect(self.setWindowTitle)
+        self.stwidget.errorMessage.connect(self.stbar.showMessage)
+        self.setWindowTitle(self.stwidget.getTitle())
 
     def accept(self):
         s = QSettings()

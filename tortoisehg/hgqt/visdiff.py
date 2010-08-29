@@ -342,8 +342,7 @@ class FileSelectionDialog(QtGui.QDialog):
         list = QtGui.QListWidget()
         layout.addWidget(list)
         self.list = list
-        self.connect(list, QtCore.SIGNAL('itemActivated(QListWidgetItem *)'),
-            self.itemActivated)
+        list.itemActivated.connect(self.itemActivated)
 
         tools = hglib.difftools(repo.ui)
         preferred = besttool(repo.ui, tools)
@@ -368,10 +367,8 @@ class FileSelectionDialog(QtGui.QDialog):
 
             callable = lambda row: self.fileSelect(row, repo, combo,
                                                    patterns, preferred)
-            self.connect(list, QtCore.SIGNAL('currentRowChanged(int)'),
-                         callable)
-            self.connect(combo, QtCore.SIGNAL('currentIndexChanged(QString)'),
-                         self.toolSelect)
+            list.currentRowChanged.connect(callable)
+            combo.currentIndexChanged.connect(self.toolSelect)
 
         BB = QtGui.QDialogButtonBox
         bb = BB()

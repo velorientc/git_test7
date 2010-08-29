@@ -32,9 +32,6 @@ from tortoisehg.hgqt.docklog import LogDockWidget
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-connect = QObject.connect
-
-
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
 
@@ -68,8 +65,8 @@ class Workbench(QMainWindow):
         rr.openRepoSignal.connect(self.openRepo)
 
         tw = self.repoTabsWidget
-        connect(tw, SIGNAL('tabCloseRequested(int)'), self.repoTabCloseRequested)
-        connect(tw, SIGNAL('currentChanged(int)'), self.repoTabChanged)
+        tw.tabCloseRequested.connect(self.repoTabCloseRequested)
+        tw.currentChanged.connect(self.repoTabChanged)
 
         self.createActions()
         self.createToolbars()
@@ -95,12 +92,10 @@ class Workbench(QMainWindow):
 
     def attachQuickBar(self, qbar):
         qbar.setParent(self)
+        qbar.escShortcutDisabled.connect(self.setShortcutsEnabled)
+        qbar.visible.connect(self.ensureOneQuickBar)
         self._quickbars.append(qbar)
-        connect(qbar, SIGNAL('escShortcutDisabled(bool)'),
-                self.setShortcutsEnabled)
         self.addToolBar(Qt.BottomToolBarArea, qbar)
-        connect(qbar, SIGNAL('visible'),
-                self.ensureOneQuickBar)
 
     def setShortcutsEnabled(self, enabled=True):
         for sh in self.disab_shortcuts:
@@ -412,12 +407,12 @@ class Workbench(QMainWindow):
         # find quickbar
         self.find_toolbar = tb = FindInGraphlogQuickBar(self)
         tb.setObjectName("find_toolbar")
+        # TODO: find toolbar needs to be moved to repowidget
         #tb.attachFileView(self.fileview)
         #tb.attachHeaderView(self.revdisplay)
-        #connect(tb, SIGNAL('revisionSelected'), self.repoview.goto)
-        #connect(tb, SIGNAL('fileSelected'), self.tableView_filelist.selectFile)
-        connect(tb, SIGNAL('showMessage'), self.statusBar().showMessage,
-                Qt.QueuedConnection)
+        #tb.revisionSelected.connect(self.repoview.goto)
+        #tb.fileSelected.connect(self.tableView_filelist.selectFile)
+        tb.showMessage.connect(self.statusBar().showMessage)
 
         self.attachQuickBar(tb)
 
@@ -439,12 +434,9 @@ class Workbench(QMainWindow):
         self.allpar_action = allpar_action
         self.branch_label.setMenu(self.branch_menu)
         self.branch_comboBox = QComboBox()
-        connect(self.branch_comboBox, SIGNAL('activated(const QString &)'),
-                self.refreshRevisionTable)
-        connect(cbranch_action, SIGNAL('toggled(bool)'),
-                self.setupBranchCombo)
-        connect(allpar_action, SIGNAL('toggled(bool)'),
-                self.refreshRevisionTable)
+        self.branch_comboBox.activated.connect(self.refreshRevisionTable)
+        cbranch_action.toggled.connect(self.setupBranchCombo)
+        allpar_action.toggled.connect(self.refreshRevisionTable)
 
         self.toolBar_treefilters.layout().setSpacing(3)
 
@@ -486,41 +478,36 @@ class Workbench(QMainWindow):
 
         self.actionDiffMode = QAction('Diff mode', self)
         self.actionDiffMode.setCheckable(True)
-        connect(self.actionDiffMode, SIGNAL('toggled(bool)'),
-                self.setMode)
+        self.actionDiffMode.toggled.connect(self.setMode)
 
         self.actionAnnMode = QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
-        connect(self.actionAnnMode, SIGNAL('toggled(bool)'), self.setAnnotate)
+        self.actionAnnMode.toggled.connect(self.setAnnotate)
 
         self.actionHelp.setShortcut(QKeySequence.HelpContents)
         self.actionHelp.setIcon(geticon('help'))
-        connect(self.actionHelp, SIGNAL('triggered()'), self.on_help)
+        self.actionHelp.triggered.connect(self.on_help)
 
         # Next/Prev diff (in full file mode)
         self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
+        self.actionNextDiff.triggered.connect(self.nextDiff)
         def filled():
             self.actionNextDiff.setEnabled(
                 self.fileview.fileMode() and self.fileview.nDiffs())
-        #connect(self.fileview, SIGNAL('filled'), filled)
+        #self.fileview.filled.connect(filled)
         self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
-        connect(self.actionNextDiff, SIGNAL('triggered()'),
-                self.nextDiff)
-        connect(self.actionPrevDiff, SIGNAL('triggered()'),
-                self.prevDiff)
+        self.actionPrevDiff.triggered.connect(self.prevDiff)
         self.actionDiffMode.setChecked(True)
 
         # Next/Prev file
         self.actionNextFile = QAction('Next file', self)
         self.actionNextFile.setShortcut('Right')
-        #connect(self.actionNextFile, SIGNAL('triggered()'),
-        #        self.tableView_filelist.nextFile)
+        #self.actionNextFile.triggered.connect(self.tableView_filelist.nextFile)
         self.actionPrevFile = QAction('Prev file', self)
         self.actionPrevFile.setShortcut('Left')
-        #connect(self.actionPrevFile, SIGNAL('triggered()'),
-        #        self.tableView_filelist.prevFile)
+        #self.actionPrevFile.triggered.connect(self.tableView_filelist.prevFile)
         self.addAction(self.actionNextFile)
         self.addAction(self.actionPrevFile)
         self.disab_shortcuts.append(self.actionNextFile)
@@ -529,31 +516,24 @@ class Workbench(QMainWindow):
         # navigate in file viewer
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
-        #connect(self.actionNextLine, SIGNAL('triggered()'),
-        #        self.fileview.nextLine)
+        #self.actionNextLine.triggered.connect(self.fileview.nextLine)
         self.addAction(self.actionNextLine)
         self.actionPrevLine = QAction('Prev line', self)
         self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
-        #connect(self.actionPrevLine, SIGNAL('triggered()'),
-        #        self.fileview.prevLine)
+        #self.actionPrevLine.triggered.connect(self.fileview.prevLine)
         self.addAction(self.actionPrevLine)
         self.actionNextCol = QAction('Next column', self)
         self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
-        #connect(self.actionNextCol, SIGNAL('triggered()'),
-        #        self.fileview.nextCol)
+        #self.actionNextCol.triggered.connect(self.fileview.nextCol)
         self.addAction(self.actionNextCol)
         self.actionPrevCol = QAction('Prev column', self)
         self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
-        #connect(self.actionPrevCol, SIGNAL('triggered()'),
-        #        self.fileview.prevCol)
+        #self.actionPrevCol.triggered.connect(self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
-        connect(self.actionNew_repository, SIGNAL('triggered()'),
-                self.newRepository)
-        connect(self.actionOpen_repository, SIGNAL('triggered()'),
-                self.openRepository)
-        connect(self.actionClose_repository, SIGNAL('triggered()'),
-                self.closeRepository)
+        self.actionNew_repository.triggered.connect(self.newRepository)
+        self.actionOpen_repository.triggered.connect(self.openRepository)
+        self.actionClose_repository.triggered.connect(self.closeRepository)
 
     def actionShowPathsToggled(self, show):
         self.reporegistry.showPaths(show)

@@ -18,7 +18,7 @@ import re
 
 from mercurial.revlog import LookupError
 
-from tortoisehg.util.util import isbfile, Curry
+from tortoisehg.util.util import isbfile
 
 from tortoisehg.hgqt.graph import ismerge, diff as revdiff
 from tortoisehg.hgqt.qtlib import geticon
