@@ -130,9 +130,9 @@ class Workbench(QMainWindow):
         self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.toolBar_treefilters = tb = QToolBar(_("Filter Toolbar"), self)
+        self.filterToolbar = tb = QToolBar(_("Filter Toolbar"), self)
         tb.setEnabled(True)
-        tb.setObjectName("toolBar_treefilters")
+        tb.setObjectName("filterToolbar")
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
         self.toolBar_diff = tb = QToolBar(_("Diff Toolbar"), self)
@@ -405,11 +405,11 @@ class Workbench(QMainWindow):
         cbranch_action.toggled.connect(self.setupBranchCombo)
         allpar_action.toggled.connect(self.refreshRevisionTable)
 
-        self.toolBar_treefilters.layout().setSpacing(3)
+        self.filterToolbar.layout().setSpacing(3)
 
-        self.branch_label_action = self.toolBar_treefilters.addWidget(self.branch_label)
-        self.branch_comboBox_action = self.toolBar_treefilters.addWidget(self.branch_comboBox)
-        self.toolBar_treefilters.addSeparator()
+        self.branch_label_action = self.filterToolbar.addWidget(self.branch_label)
+        self.branch_comboBox_action = self.filterToolbar.addWidget(self.branch_comboBox)
+        self.filterToolbar.addSeparator()
 
         # diff mode toolbar
         self.toolBar_diff.addAction(self.actionDiffMode)
