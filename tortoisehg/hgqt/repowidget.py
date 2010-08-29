@@ -30,8 +30,6 @@ from tortoisehg.hgqt.grep import SearchWidget
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-connect = QObject.connect
-
 
 class RepoWidget(QWidget):
 
@@ -177,6 +175,7 @@ class RepoWidget(QWidget):
         if event.timerId() == self._watchrepotimer:
             if not self._scanForRepoChanges:
                 return
+            self._checkuimtime()
             mtime = self._getrepomtime()
             if mtime > self._repodate:
                 self.showMessage(_("Repository has been modified "
@@ -516,6 +515,18 @@ class RepoWidget(QWidget):
             return None
         self._scanForRepoChanges = False
         self.closeSelfSignal.emit(self)
+
+    def _checkuimtime(self):
+        'Check for modified config files, or a new .hg/hgrc file'
+        try:
+            oldmtime, files = self.repo.uifiles()
+            files.add(os.path.join(self.repo.root, '.hg', 'hgrc'))
+            mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
+            if max(mtime) > oldmtime:
+                self.showMessage('Configuration change detected.')
+                self.repo.invalidateui()
+        except EnvironmentError, ValueError:
+            return None
 
     def reload(self, rev=None):
         'Initiate a refresh of the repo model, rebuild graph'
