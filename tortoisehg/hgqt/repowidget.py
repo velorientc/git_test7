@@ -186,8 +186,7 @@ class RepoWidget(QWidget):
         self.actionActivateRev = QAction('Activate rev.', self)
         self.actionActivateRev.setShortcuts([Qt.SHIFT+Qt.Key_Return,
                                              Qt.SHIFT+Qt.Key_Enter])
-        connect(self.actionActivateRev, SIGNAL('triggered()'),
-                self.revision_activated)
+        self.actionActivateRev.triggered.connect(self.revision_activated)
         self.addAction(self.actionActivateRev)
         self.disab_shortcuts.append(self.actionActivateRev)
 
@@ -326,10 +325,9 @@ class RepoWidget(QWidget):
 
     def create_models(self):
         self.repomodel = HgRepoListModel(self.repo)
-        connect(self.repomodel, SIGNAL('filled'), self.on_filled)
-        connect(self.repomodel, SIGNAL('loaded'), self.loaded)
-        connect(self.repomodel, SIGNAL('showMessage'),
-                self.showMessage, Qt.QueuedConnection)
+        self.repomodel.filled.connect(self.modelFilled)
+        self.repomodel.loaded.connect(self.modelLoaded)
+        self.repomodel.showMessage.connect(self.showMessage)
 
     def setupModels(self):
         self.create_models()
@@ -359,7 +357,7 @@ class RepoWidget(QWidget):
         gotoaction.setIcon(geticon('goto'))
         #self.toolBar_edit.addAction(gotoaction)
 
-    def on_filled(self):
+    def modelFilled(self):
         'initial batch of revisions loaded'
         self.repoview.resizeColumns()
         if self._reload_rev is not None:
@@ -369,7 +367,7 @@ class RepoWidget(QWidget):
             except IndexError:
                 pass
 
-    def loaded(self):
+    def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
         # Perhaps we can update a GUI element later, to indicate full load
         pass

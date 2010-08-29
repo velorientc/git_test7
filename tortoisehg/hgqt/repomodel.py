@@ -78,6 +78,10 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
+    showMessage = pyqtSignal(str)
+    filled = pyqtSignal()
+    loaded = pyqtSignal()
+
     _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Age', 'Tags',)
     _stretchs = {'Log': 1, }
 
@@ -130,8 +134,8 @@ class HgRepoListModel(QAbstractTableModel):
         self.rowcount = 0
         self.emit(SIGNAL('layoutChanged()'))
         self.ensureBuilt(row=self.fill_step)
-        self.emit(SIGNAL('showMessage'), '')
-        QTimer.singleShot(0, lambda: self.emit(SIGNAL('filled')))
+        self.showMessage.emit('')
+        QTimer.singleShot(0, lambda: self.filled.emit())
 
     def reloadConfig(self):
         _ui = self.repo.ui
@@ -193,12 +197,12 @@ class HgRepoListModel(QAbstractTableModel):
 
     def timerEvent(self, event):
         if event.timerId() == self.timerHandle:
-            self.emit(SIGNAL('showMessage'), 'filling (%s)'%(len(self.graph)))
+            self.showMessage.emit('filling (%d)'%(len(self.graph)))
             if self.graph.isfilled():
                 self.killTimer(self.timerHandle)
                 self.timerHandle = None
-                self.emit(SIGNAL('showMessage'), '')
-                self.emit(SIGNAL('loaded'))
+                self.showMessage.emit('')
+                self.loaded.emit()
             # we only fill the graph data structures without telling
             # views until the model is loaded, to keep maximal GUI
             # reactivity
@@ -206,8 +210,8 @@ class HgRepoListModel(QAbstractTableModel):
                 self.killTimer(self.timerHandle)
                 self.timerHandle = None
                 self.updateRowCount()
-                self.emit(SIGNAL('showMessage'), '')
-                self.emit(SIGNAL('loaded'))
+                self.showMessage.emit('')
+                self.loaded.emit()
 
     def updateRowCount(self):
         currentlen = self.rowcount
