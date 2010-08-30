@@ -76,7 +76,7 @@ class ManifestModel(QAbstractItemModel):
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
-            return QVariant()
+            return
 
         item = index.internalPointer()
         if role == Qt.DecorationRole:
@@ -84,8 +84,6 @@ class ManifestModel(QAbstractItemModel):
                 item.childItems and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
         if role == Qt.DisplayRole:
             return item.data(index.column())
-
-        return QVariant()
 
     def flags(self, index):
         if not index.isValid():
@@ -118,7 +116,7 @@ class ManifestModel(QAbstractItemModel):
 
         return self.createIndex(parentItem.row(), 0, parentItem)
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         if parent.column() > 0:
             return 0
 
@@ -128,7 +126,7 @@ class ManifestModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
         return parentItem.childCount()
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
             return parent.internalPointer().columnCount()
         else:
