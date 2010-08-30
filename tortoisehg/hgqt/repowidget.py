@@ -108,7 +108,7 @@ class RepoWidget(QWidget):
         self.findToolbar = tb = FindInGraphlogQuickBar(self)
         tb.revisionSelected.connect(self.repoview.goto)
         tb.fileSelected.connect(d.filelist.selectFile)
-        tb.showMessage.connect(self.workbench.showMessage)
+        tb.showMessage.connect(self.showMessage)
         tb.attachFileView(d.fileview)
         self.layout().addWidget(tb)
 
@@ -127,7 +127,7 @@ class RepoWidget(QWidget):
         pats = {}
         opts = {}
         cw = CommitWidget(pats, opts, root=self.repo.root)
-        cw.errorMessage.connect(self.workbench.showMessage)
+        cw.errorMessage.connect(self.showMessage)
         cw.commitComplete.connect(self.reload)
         cw.commitComplete.connect(cw.stwidget.refreshWctx)
         b = QPushButton(_('Commit'))
