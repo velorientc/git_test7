@@ -228,7 +228,8 @@ class RevDetailsWidget(QWidget):
         # Activate file (file diff navigator)
         self.actionActivateFile = QAction('Activate file', self)
         self.actionActivateFileAlt = QAction('Activate alt. file', self)
-        self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return, Qt.ALT+Qt.Key_Enter])
+        self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return,
+                                                 Qt.ALT+Qt.Key_Enter])
         self.actionActivateFileAlt.triggered.connect(
                 lambda self=self:
                 self.filelist.fileActivated(self.filelist.currentIndex(),
