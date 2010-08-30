@@ -470,7 +470,9 @@ class HgRepoListModel(QAbstractTableModel):
         """Return the MAR status for the given ctx."""
         changes = []
         par = ctx.parents()
-        M, A, R = self.repo.status(par[0], self.repo[ctx.rev()])[:3]
+        if ctx.thgmqunappliedpatch():
+            return ''
+        M, A, R = self.repo.status(par[0], ctx)[:3]
         def addtotal(files, style):
             effects = qtlib.geteffect(style)
             text = qtlib.applyeffects(' %s ' % len(files), effects)
