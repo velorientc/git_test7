@@ -43,9 +43,6 @@ MenuDescription menuDescList[] =
     {"status",      L"View File Status",
                     L"Repository status & changes",
                     "menushowchanged.ico", 0},
-    {"shelve",      L"Shelve Changes",
-                    L"Shelve or unshelve file changes",
-                    "shelve.ico", 0},
     {"add",         L"Add Files...",
                     L"Add files to version control",
                     "menuadd.ico", 0},
@@ -58,8 +55,11 @@ MenuDescription menuDescList[] =
     {"rename",      L"Rename File...",
                     L"Rename file or directory",
                     "general.ico", 0},
-    {"log",         L"Repository Explorer",
-                    L"View change history in repository",
+    {"workbench",   L"Workbench",
+                    L"View change history of repository",
+                    "menulog.ico", 0},
+    {"log",         L"Revision History",
+                    L"View change history of selected files",
                     "menulog.ico", 0},
     {"synch",       L"Synchronize",
                     L"Synchronize with remote repository",
@@ -70,9 +70,6 @@ MenuDescription menuDescList[] =
     {"update",      L"Update...",
                     L"Update working directory",
                     "menucheckout.ico", 0},
-    {"recover",     L"Recovery...",
-                    L"Repair and recovery of repository",
-                    "general.ico", 0},
     {"thgstatus",   L"Update Icons",
                     L"Update icons for this repository",
                     "refresh_overlays.ico", 0},
@@ -85,9 +82,6 @@ MenuDescription menuDescList[] =
     {"about",       L"About TortoiseHg",
                     L"Show About Dialog",
                     "menuabout.ico", 0},
-    {"datamine",    L"Annotate Files",
-                    L"Changeset information per file line",
-                    "menublame.ico", 0},
     {"vdiff",       L"Visual Diff",
                     L"View changes using GUI diff tool",
                     "TortoiseMerge.ico", 0},
@@ -114,11 +108,11 @@ MenuDescription menuDescList[] =
 };
 
 const char* const RepoNoFilesMenu =
-    "commit status shelve vdiff sep"
+    "commit status vdiff sep"
     " add revert rename forget remove sep"
-    " log update grep sep"
+    " workbench update grep sep"
     " synch serve clone init thgstatus sep"
-    " hgignore guess recover sep"
+    " hgignore guess sep"
     " shellconf repoconf userconf sep"
     " about"
 ;
@@ -126,7 +120,7 @@ const char* const RepoNoFilesMenu =
 const char* const RepoFilesMenu =
     "commit status vdiff sep"
     " add revert rename forget remove sep"
-    " log datamine sep"
+    " log sep"
     " about"
 ;
 
