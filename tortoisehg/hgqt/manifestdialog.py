@@ -44,27 +44,15 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget = ManifestWidget(ui, repo, rev)
         self._manifest_widget.revchanged.connect(self._updatewindowtitle)
         self.setCentralWidget(self._manifest_widget)
+        self.addToolBar(self._manifest_widget.toolbar)
 
-        self._initactions()
         self._readsettings()
         self._updatewindowtitle()
-
-    def _initactions(self):
-        self._toolbar = QToolBar()
-        self.addToolBar(self._toolbar)
-        # TODO: not sure 'Annotate' mode is good for toolbar
-        self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
-        self._action_annotate_mode.toggled.connect(self._annotate_mode_toggled)
-        self._toolbar.addAction(self._action_annotate_mode)
 
     @pyqtSlot()
     def _updatewindowtitle(self):
         self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (
             self._repo.root, self._manifest_widget.rev))
-
-    @pyqtSlot(bool)
-    def _annotate_mode_toggled(self, checked):
-        self._manifest_widget.setfileview(checked and 'annotate' or 'cat')
 
     def closeEvent(self, event):
         self._writesettings()
@@ -149,6 +137,7 @@ class ManifestWidget(QWidget):
         self._rev = rev
 
         self._initwidget()
+        self._initactions()
         self._setupmodel()
         self.setfileview('cat')
         self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
@@ -157,9 +146,18 @@ class ManifestWidget(QWidget):
         self.setLayout(QVBoxLayout())
         self._splitter = QSplitter()
         self.layout().addWidget(self._splitter)
+
+        navlayout = QVBoxLayout()
+        navlayout.setContentsMargins(0, 0, 0, 0)
+        self._toolbar = QToolBar()
         self._treeview = QTreeView()
+        navlayout.addWidget(self._toolbar)
+        navlayout.addWidget(self._treeview)
+        navlayoutw = QWidget()
+        navlayoutw.setLayout(navlayout)
+
         self._contentview = QStackedWidget()
-        self._splitter.addWidget(self._treeview)
+        self._splitter.addWidget(navlayoutw)
         self._splitter.addWidget(self._contentview)
         self._splitter.setStretchFactor(0, 1)
         self._splitter.setStretchFactor(1, 3)
@@ -177,6 +175,17 @@ class ManifestWidget(QWidget):
                      lambda a: self.setsource(path=a[0], rev=a[1]))
         self._contentview.currentChanged.connect(
             lambda: self._fileselected(self._treeview.currentIndex()))
+
+    def _initactions(self):
+        self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
+        self._action_annotate_mode.toggled.connect(
+            lambda checked: self.setfileview(checked and 'annotate' or 'cat'))
+        self._toolbar.addAction(self._action_annotate_mode)
+
+    @property
+    def toolbar(self):
+        """Return toolbar for manifest widget"""
+        return self._toolbar
 
     def _setupmodel(self):
         self._treemodel = ManifestModel(self._repo, self._rev)
