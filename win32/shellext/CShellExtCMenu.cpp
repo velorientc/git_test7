@@ -429,7 +429,7 @@ CShellExtCMenu::QueryContextMenu(
     typedef std::vector<std::string> entriesT;
     typedef entriesT::const_iterator entriesIter;
 
-    std::string promoted_string = "commit,log"; // default value if key not found
+    std::string promoted_string = "commit,workbench"; // default value if key not found
     GetRegistryConfig("PromotedItems", promoted_string);
 
     entriesT promoted;
