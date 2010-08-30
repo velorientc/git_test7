@@ -92,11 +92,6 @@ class ManifestModel(QAbstractItemModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
-    def headerData(self, section, orientation, role):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(self.rootItem.data(section))
-        return QVariant()
-
     def index(self, row, column, parent=QModelIndex()):
         if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
             return QModelIndex()
@@ -140,14 +135,7 @@ class ManifestModel(QAbstractItemModel):
             return self.rootItem.columnCount()
 
     def setupModelData(self):
-        # TODO: it shouldn't be in header of file tree view?
-        def formatrev(ctx):
-            if ctx.rev():
-                return _('rev %s:%s') % (ctx.rev(),
-                                         short_hex(ctx.node()))
-            else:
-                return _('working copy')
-        self.rootItem = _TreeItem([formatrev(self.changectx)])
+        self.rootItem = _TreeItem([''])
 
         for path in sorted(self.changectx.manifest()):
             path = path.split('/')

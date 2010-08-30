@@ -150,7 +150,7 @@ class ManifestWidget(QWidget):
         navlayout = QVBoxLayout()
         navlayout.setContentsMargins(0, 0, 0, 0)
         self._toolbar = QToolBar()
-        self._treeview = QTreeView()
+        self._treeview = QTreeView(headerHidden=True)
         navlayout.addWidget(self._toolbar)
         navlayout.addWidget(self._treeview)
         navlayoutw = QWidget()
