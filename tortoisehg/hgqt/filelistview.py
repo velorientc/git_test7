@@ -79,16 +79,13 @@ class HgFileListView(QTableView):
         self.model().toggleFullFileList()
 
     def navigate(self, filename=None):
-        if not filename:
-            # Convert False to None
-            filename = None
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
 
     def diffNavigate(self, filename=None):
         self._navigate(filename, FileDiffDialog, self._diff_dialogs)
 
     def _navigate(self, filename, dlgclass, dlgdict):
-        if filename is None:
+        if not filename:
             filename = self.currentFile()
         model = self.model()
         if filename is not None and len(model.repo.file(filename))>0:
