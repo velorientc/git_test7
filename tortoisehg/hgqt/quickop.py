@@ -77,8 +77,8 @@ class QuickOpDialog(QDialog):
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
         bb.button(BB.Ok).setDefault(True)
         bb.button(BB.Ok).setText(LABELS[command][1])
         layout.addWidget(bb)
@@ -97,8 +97,7 @@ class QuickOpDialog(QDialog):
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
 
-        self.connect(self.stwidget, SIGNAL('errorMessage'),
-                self.statusbar.set_text)
+        self.stwidget.errorMessage.connect(self.statusbar.set_text)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
