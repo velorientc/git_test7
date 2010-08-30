@@ -26,21 +26,19 @@ from tortoisehg.hgqt import htmllistview
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-connect = QObject.connect
-
-
 class GotoQuickBar(QuickBar):
+    gotoSignal = pyqtSignal(unicode)
+
     def __init__(self, parent):
         QuickBar.__init__(self, "Goto", "Ctrl+G", "Goto", parent)
 
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
         self._actions['go'] = QAction("Go", self)
-        connect(self._actions['go'], SIGNAL('triggered()'),
-                self.goto)
+        self._actions['go'].triggered.connect(self.goto)
 
     def goto(self):
-        self.emit(SIGNAL('goto'), unicode(self.entry.text()))
+        self.gotoSignal.emit(unicode(self.entry.text()))
 
     def createContent(self):
         QuickBar.createContent(self)
@@ -50,9 +48,7 @@ class GotoQuickBar(QuickBar):
         self.entry.setCompleter(self.completer)
         self.addWidget(self.entry)
         self.addAction(self._actions['go'])
-
-        connect(self.entry, SIGNAL('returnPressed()'),
-                self._actions['go'].trigger)
+        self.entry.returnPressed.connect(self._actions['go'].trigger)
 
     def setVisible(self, visible=True):
         QuickBar.setVisible(self, visible)
@@ -119,7 +115,7 @@ class HgRepoView(QTableView):
     def createToolbars(self):
         self.goto_toolbar = tb = GotoQuickBar(self)
         tb.setObjectName("goto_toolbar")
-        connect(tb, SIGNAL('goto'), self.goto)
+        tb.gotoSignal.connect(self.goto)
 
     def _action_defs(self):
         exs = [name for name, module in extensions.extensions()]
@@ -172,7 +168,7 @@ class HgRepoView(QTableView):
             if key:
                 act.setShortcut(key)
             if cb:
-                connect(act, SIGNAL('triggered()'), cb)
+                act.triggered.connect(cb)
             self.addAction(act)
 
     def showAtRev(self):
