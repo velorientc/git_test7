@@ -31,8 +31,9 @@ def wctxactions(parent, point, repo, selrows):
         action = menu.addAction(text)
         if icon:
             action.setIcon(icon)
-        action.wrapper = lambda files=files: run(func, parent, files, repo)
-        action.triggered.connect(action.wrapper)
+        action.args = (func, parent, files, repo)
+        action.run = lambda: run(*action.args)
+        action.triggered.connect(action.run)
         return action
 
     menu = QMenu(parent)
@@ -62,8 +63,9 @@ def wctxactions(parent, point, repo, selrows):
             rmenu = QMenu(_('Was renamed from'))
             for d in wctx.deleted()[:15]:
                 action = rmenu.addAction(hglib.tounicode(d))
-                action.wrapper = lambda d=d: renamefromto(repo, d, path)
-                action.triggered.connect(action.wrapper)
+                action.args = (repo, d, path)
+                action.run = lambda: renamefromto(*action.args)
+                action.triggered.connect(action.run)
             menu.addMenu(rmenu)
         else:
             make(_('&Copy...'), copy, frozenset('MC'))
@@ -77,8 +79,9 @@ def wctxactions(parent, point, repo, selrows):
         rmenu = QMenu(_('Restart merge with'))
         for tool in hglib.mergetools(repo.ui):
             action = rmenu.addAction(tool)
-            action.wrapper = lambda tool=tool: resolve_with(tool, repo, files)
-            action.triggered.connect(action.wrapper)
+            action.args = (tool, repo, files)
+            action.run = lambda: resolve_with(*action.args)
+            action.triggered.connect(action.run)
         menu.addMenu(rmenu)
     return menu.exec_(point)
 
