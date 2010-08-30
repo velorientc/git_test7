@@ -82,7 +82,23 @@ class RevDetailsWidget(QWidget):
         self.filelist_splitter.setOrientation(Qt.Horizontal)
         self.filelist_splitter.setChildrenCollapsible(False)
 
-        self.filelist = HgFileListView(self.filelist_splitter)
+        self.diffToolbar = QToolBar(_('Diff Toolbar'))
+        self.filelist = HgFileListView()
+
+        self.tbarFileListFrame = QFrame(self.filelist_splitter)
+        sp = SP(SP.Preferred, SP.Preferred)
+        sp.setHorizontalStretch(1)
+        sp.setVerticalStretch(0)
+        sp.setHeightForWidth(
+            self.tbarFileListFrame.sizePolicy().hasHeightForWidth())
+        self.tbarFileListFrame.setSizePolicy(sp)
+        self.tbarFileListFrame.setFrameShape(QFrame.NoFrame)
+        vbox = QVBoxLayout()
+        vbox.setSpacing(0)
+        vbox.setMargin(0)
+        vbox.addWidget(self.diffToolbar)
+        vbox.addWidget(self.filelist)
+        self.tbarFileListFrame.setLayout(vbox)
 
         self.cset_and_file_details_frame = QFrame(self.filelist_splitter)
         sp = SP(SP.Preferred, SP.Preferred)
@@ -162,7 +178,6 @@ class RevDetailsWidget(QWidget):
         self.actionDiffMode = QAction('Diff mode', self)
         self.actionDiffMode.setCheckable(True)
         self.actionDiffMode.toggled.connect(self.setMode)
-        self.actionDiffMode.setChecked(True)
 
         self.actionAnnMode = QAction('Annotate', self)
         self.actionAnnMode.setCheckable(True)
@@ -172,14 +187,15 @@ class RevDetailsWidget(QWidget):
         self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
         self.actionNextDiff.triggered.connect(self.nextDiff)
-
         def filled():
             self.actionNextDiff.setEnabled(
                 self.fileview.fileMode() and self.fileview.nDiffs())
         self.fileview.filled.connect(filled)
+
         self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
+        self.actionDiffMode.setChecked(True)
 
         # Next/Prev file
         self.actionNextFile = QAction('Next file', self)
@@ -217,23 +233,24 @@ class RevDetailsWidget(QWidget):
                 lambda self=self:
                 self.filelist.fileActivated(self.filelist.currentIndex(),
                                                       alternate=True))
-
         # toolbar
-        '''
-        self.diffToolbar = tb = QToolBar(_("Diff Toolbar"), self)
-        tb.setObjectName("diffToolbar")
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
-        self.diffToolbar.addAction(self.actionDiffMode)
-        self.diffToolbar.addAction(self.actionNextDiff)
-        self.diffToolbar.addAction(self.actionPrevDiff)
-        self.diffToolbar.addSeparator()
-        self.diffToolbar.addAction(self.actionAnnMode)
-        '''
-
+        tb = self.diffToolbar
+        tb.addAction(self.actionDiffMode)
+        tb.addAction(self.actionNextDiff)
+        tb.addAction(self.actionPrevDiff)
+        tb.addSeparator()
+        tb.addAction(self.actionAnnMode)
 
     def setMode(self, mode):
         self.fileview.setMode(mode)
+        if mode:
+            self.actionAnnMode.setEnabled(False)
+            self.actionAnnMode.setChecked(False)
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
+        else:
+            self.actionAnnMode.setEnabled(True)
+            # next/prev actions are enabled via signals
 
     def getMode(self):
         return self.fileview.getMode()
