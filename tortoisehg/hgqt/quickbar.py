@@ -56,6 +56,7 @@ class QuickBar(QToolBar):
 
         closeact = QAction('Close', self)
         closeact.setIcon(geticon('close'))
+        closeact.setShortcut(Qt.Key_Escape)
         closeact.triggered.connect(lambda: self.setVisible(False))
                 
         self._actions = {'open': openact,
@@ -148,9 +149,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
         FindQuickBar.__init__(self, parent)
         self._findinfile_iter = None
         self._findinlog_iter = None
-        self._findindesc_iter = None
         self._fileview = None
-        self._headerview = None
         self._filter_files = None
         self._mode = 'diff'
         self.find.connect(self.on_find_text_changed)
@@ -170,9 +169,6 @@ class FindInGraphlogQuickBar(FindQuickBar):
     def attachFileView(self, fileview):
         self._fileview = fileview
 
-    def attachHeaderView(self, view):
-        self._headerview = view
-        
     def find_in_graphlog(self, fromrev, fromfile=None):
         """
         Find text in the whole repo from rev 'fromrev', from file
@@ -220,18 +216,9 @@ class FindInGraphlogQuickBar(FindQuickBar):
         """
         callback called by 'Find' quicktoolbar (on findnext signal)
         """
-        if self._findindesc_iter is not None:
-            for pos in self._findindesc_iter:
-                # just highlight next found text in fileview
-                # (handled by _findinfile_iter)
-                return
-            # no more found text in currently displayed file
-            self._findindesc_iter = None
-
         if self._findinfile_iter is not None:
             for pos in self._findinfile_iter:
                 # just highlight next found text in descview
-                # (handled by _findindesc_iter)
                 return
             # no more found text in currently displayed file
             self._findinfile_iter = None
@@ -252,7 +239,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
         process, so the GUI is not frozen, and as a cancellable task).
         """
         if self._findinlog_iter is None:
-            # when search has been cancelled
+            # search has been cancelled
             return
         for next_find in self._findinlog_iter:
             if next_find is None: # not yet found, let's animate a bit the GUI
@@ -267,14 +254,10 @@ class FindInGraphlogQuickBar(FindQuickBar):
                 rev, filename = next_find
                 self.revisionSelected.emit(rev)
                 text = unicode(self.entry.text())
-                if filename is None and self._headerview:
-                    self._findindesc_iter = self._headerview.searchString(text)
+                self.fileSelected.emit(filename)
+                if self._fileview:
+                    self._findinfile_iter = self._fileview.searchString(text)
                     self.on_findnext()
-                else:
-                    self.fileSelected.emit(filename)
-                    if self._fileview:
-                        self._findinfile_iter = self._fileview.searchString(text)
-                        self.on_findnext()
             return
         self.showMessage.emit('No more matches found in repository')
         self.setCancelEnabled(False)
@@ -287,12 +270,10 @@ class FindInGraphlogQuickBar(FindQuickBar):
         newtext = unicode(newtext)
         self._findinlog_iter = None
         self._findinfile_iter = None
-        if self._headerview:
-            self._findindesc_iter = self._headerview.searchString(newtext)
         if self._fileview:
             self._findinfile_iter = self._fileview.searchString(newtext)
         if newtext.strip():
-            if self._findindesc_iter is None and self._findindesc_iter is None:
+            if self._findinfile_iter is None:
                 self.showMessage.emit(
                           'Search string not found in current diff. '
                           'Hit "Find next" button to start searching '

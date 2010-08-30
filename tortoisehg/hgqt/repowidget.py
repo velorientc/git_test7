@@ -106,11 +106,10 @@ class RepoWidget(QWidget):
 
         d = self.revDetailsWidget
         self.findToolbar = tb = FindInGraphlogQuickBar(self)
-        #tb.attachHeaderView(self.revDetailsWidget)
         tb.revisionSelected.connect(self.repoview.goto)
-        tb.attachFileView(d.fileview)
         tb.fileSelected.connect(d.filelist.selectFile)
         tb.showMessage.connect(self.workbench.showMessage)
+        tb.attachFileView(d.fileview)
         self.layout().addWidget(tb)
 
     def find(self):
@@ -322,6 +321,7 @@ class RepoWidget(QWidget):
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
+        self.findToolbar.setModel(self.repomodel)
 
     def setupModels(self):
         self.create_models()
