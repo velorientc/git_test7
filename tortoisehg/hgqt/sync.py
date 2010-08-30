@@ -97,7 +97,7 @@ class SyncWidget(QWidget):
         self.tv.clicked.connect(self.pathSelected)
 
         pathsframe = QFrame()
-        pathsframe.setFrameStyle(QFrame.Panel|QFrame.Raised)
+        pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
         pathsbox = QVBoxLayout()
         pathsframe.setLayout(pathsbox)
         lbl = QLabel(_('<b>Configured Paths</b>'))
