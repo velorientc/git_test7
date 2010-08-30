@@ -212,7 +212,9 @@ class ManifestWidget(QWidget):
         """Change path to show"""
         self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
 
-    @pyqtSlot(QModelIndex)
+    # disabled due to the issue of PyQt 4.7.4.
+    # see http://thread.gmane.org/gmane.comp.python.pyqt-pykde/19836
+    #@pyqtSlot(QModelIndex)
     def _fileselected(self, index):
         path = self._treemodel.pathFromIndex(index)
         if path not in self._repo[self._rev]:
