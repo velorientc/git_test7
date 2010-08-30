@@ -102,17 +102,15 @@ class HgignoreDialog(QDialog):
         uvbox.addWidget(unknownlist)
         unknownlist.currentTextChanged.connect(self.setGlobFilter)
         unknownlist.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.connect(unknownlist,
-                     SIGNAL('customContextMenuRequested(const QPoint &)'),
-                     self.customContextMenuRequested)
+        unknownlist.customContextMenuRequested.connect(self.menuRequest)
         lbl = QLabel(_('Backspace or Del to remove a row'))
         ivbox.addWidget(lbl)
 
         # layer 4 - dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Close)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
         vbox.addWidget(bb)
         self.bb = bb
 
@@ -140,7 +138,7 @@ class HgignoreDialog(QDialog):
         self.refresh()
         return True
 
-    def customContextMenuRequested(self, point):
+    def menuRequest(self, point):
         'context menu request for unknown list'
         point = self.unknownlist.mapToGlobal(point)
         row = self.unknownlist.currentRow()
@@ -159,9 +157,9 @@ class HgignoreDialog(QDialog):
             dirname = os.path.dirname(dirname)
         for f in filters:
             action = menu.addAction(_('Ignore ') + hglib.tounicode(f))
-            action.localtext = f
-            action.wrapper = lambda f=f: self.insertFilter(f, False)
-            self.connect(action, SIGNAL('triggered()'), action.wrapper)
+            action.args = (f,False)
+            action.run = lambda: self.insertFilter(*action.args)
+            action.triggered.connect(action.run)
         menu.exec_(point)
 
     def insertFilter(self, pat, isregexp):
@@ -260,7 +258,7 @@ class HgignoreDialog(QDialog):
             f.write(out)
             f.rename()
             shlib.shell_notify([self.ignorefile])
-            self.emit(SIGNAL('ignoreFilterUpdated'))
+            self.ignoreFilterUpdated.emit()
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write .hgignore file'),
                                 hglib.tounicode(str(e)), parent=self)

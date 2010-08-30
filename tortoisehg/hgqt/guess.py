@@ -147,7 +147,7 @@ class DetectRenameDialog(QDialog):
         QTimer.singleShot(0, self.refresh)
 
     def refresh(self):
-        repo.thginvalidate()
+        self.repo.thginvalidate()
         wctx = self.repo[None]
         wctx.status(unknown=True)
         self.unrevlist.clear()
@@ -180,6 +180,7 @@ class DetectRenameDialog(QDialog):
                                     _('Select one or more rows for search'))
             return
 
+        self.repo.thginvalidate()
         pct = self.simslider.value() / 100.0
         copies = not self.copycheck.isChecked()
         self.findbtn.setEnabled(False)
@@ -187,9 +188,9 @@ class DetectRenameDialog(QDialog):
 
         self.matchtv.model().clear()
         self.thread = RenameSearchThread(self.repo, ulist, pct, copies)
-        self.connect(self.thread, SIGNAL('match'), self.rowReceived)
-        self.connect(self.thread, SIGNAL('progress'), self.progressReceived)
-        self.connect(self.thread, SIGNAL('error'), self.errorReceived)
+        self.thread.match.connect(self.rowReceived)
+        self.thread.progress.connect(self.progressReceived)
+        self.thread.error.connect(self.errorReceived)
         self.thread.searchComplete.connect(self.finished)
         self.thread.start()
 
@@ -353,13 +354,13 @@ class MatchModel(QAbstractTableModel):
         self.beginInsertRows(QModelIndex(), len(self.rows), len(self.rows))
         self.rows.append(args)
         self.endInsertRows()
-        self.emit(SIGNAL("dataChanged()"))
+        self.layoutChanged.emit()
 
     def clear(self):
         self.beginRemoveRows(QModelIndex(), 0, len(self.rows)-1)
         self.rows = []
         self.endRemoveRows()
-        self.emit(SIGNAL("dataChanged()"))
+        self.layoutChanged.emit()
 
     def remove(self, dest):
         i = 0
@@ -370,14 +371,14 @@ class MatchModel(QAbstractTableModel):
                 self.endRemoveRows()
             else:
                 i += 1
-        self.emit(SIGNAL("dataChanged()"))
+        self.layoutChanged.emit()
 
     def sort(self, col, order):
-        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.layoutAboutToBeChanged.emit()
         self.rows.sort(lambda x, y: cmp(x[col], y[col]))
         if order == Qt.DescendingOrder:
             self.rows.reverse()
-        self.emit(SIGNAL("layoutChanged()"))
+        self.layoutChanged.emit()
         self.reset()
 
     def isEmpty(self):
@@ -386,6 +387,9 @@ class MatchModel(QAbstractTableModel):
 class RenameSearchThread(QThread):
     '''Background thread for searching repository history'''
     searchComplete = pyqtSignal()
+    match = pyqtSignal(object)
+    progress = pyqtSignal(object)
+    error = pyqtSignal(object)
 
     def __init__(self, repo, ufiles, minpct, copies):
         super(RenameSearchThread, self).__init__()
@@ -406,25 +410,23 @@ class RenameSearchThread(QThread):
                 else:
                     self.sig = QObject() # dummy object to emit signals
             def progress(self, topic, pos, item='', unit='', total=None):
-                self.sig.emit(SIGNAL('progress'),
-                             [topic, item, pos, total, unit])
+                self.sig.emit("SIGNAL(progress)", [topic, item, pos, total, unit])
         progui = ProgUi()
-        self.connect(progui.sig, SIGNAL('progress'), self.progress)
+        self.connect(progui.sig, SIGNAL('progress'), self.progressRecvd)
         storeui = self.repo.ui
         self.progui = progui
         self.repo.ui = progui
         try:
             self.search(self.repo)
         except Exception, e:
-            self.emit(SIGNAL('error'), hglib.tounicode(str(e)))
+            self.error.emit(hglib.tounicode(str(e)))
         self.repo.ui = storeui
         self.searchComplete.emit()
 
-    def progress(self, wr):
-        self.emit(SIGNAL('progress'), wr)
+    def progressRecvd(self, wr):
+        self.progress.emit(wr)
 
     def search(self, repo):
-        repo.thginvalidate()
         wctx = repo[None]
         pctx = repo['.']
         if self.copies:
@@ -443,14 +445,14 @@ class RenameSearchThread(QThread):
         for o, n in gen:
             old, new = o.path(), n.path()
             exacts.append(old)
-            self.emit(SIGNAL('match'), [old, new, '100%'])
+            self.match.emit([old, new, '100%'])
         if self.minpct == 1.0:
             return
         removed = [r for r in removed if r.path() not in exacts]
         gen = similar._findsimilarmatches(repo, added, removed, self.minpct)
         for o, n, s in gen:
             old, new, sim = o.path(), n.path(), '%d%%' % (s*100)
-            self.emit(SIGNAL('match'), [old, new, sim])
+            self.match.emit([old, new, sim])
 
 def run(ui, *pats, **opts):
     return DetectRenameDialog(None, None, *pats)

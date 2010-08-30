@@ -254,7 +254,7 @@ class CustomPrompt(QMessageBox):
     def keyPressEvent(self, event):
         for k, btn in self.hotkeys.iteritems():
             if event.text() == k:
-                btn.emit(SIGNAL('clicked()'))
+                btn.clicked.emit()
         super(CustomPrompt, self).keyPressEvent(event)
 
 def setup_font_substitutions():
@@ -466,10 +466,8 @@ def fileEditor(filename, **opts):
     vbox.addWidget(editor)
     BB = QDialogButtonBox
     bb = QDialogButtonBox(BB.Save|BB.Cancel)
-    dialog.connect(bb, SIGNAL('accepted()'),
-                   dialog, SLOT('accept()'))
-    dialog.connect(bb, SIGNAL('rejected()'),
-                   dialog, SLOT('reject()'))
+    bb.accepted.connect(dialog.accept)
+    bb.rejected.connect(dialog.reject)
     vbox.addWidget(bb)
     lexer = QsciLexerProperties()
     editor.setLexer(lexer)

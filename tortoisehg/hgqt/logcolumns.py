@@ -61,8 +61,8 @@ class ColumnSelectDialog(QDialog):
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         self.apply_button = bb.button(BB.Apply)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
         bb.button(BB.Ok).setDefault(True)
         layout.addWidget(bb)
 

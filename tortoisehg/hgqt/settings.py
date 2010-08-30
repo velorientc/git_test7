@@ -533,8 +533,8 @@ class SettingsDialog(QDialog):
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
         layout.addWidget(bb)
         self.bb = bb
 

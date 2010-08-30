@@ -132,7 +132,7 @@ class HgRepoListModel(QAbstractTableModel):
                                    branch=branch, allparents=allparents)
         self.graph = Graph(self.repo, grapher, self.max_file_size, include_mq=True)
         self.rowcount = 0
-        self.emit(SIGNAL('layoutChanged()'))
+        self.layoutChanged.emit()
         self.ensureBuilt(row=self.fill_step)
         self.showMessage.emit('')
         QTimer.singleShot(0, lambda: self.filled.emit())
@@ -152,12 +152,12 @@ class HgRepoListModel(QAbstractTableModel):
         if validcols:
             self._columns = tuple(validcols)
             self.datacache = {}
-            self.emit(SIGNAL("layoutChanged()"))
+            self.layoutChanged.emit()
 
     def invalidate(self):
         self.reloadConfig()
         self.datacache = {}
-        self.emit(SIGNAL("layoutChanged()"))
+        self.layoutChanged.emit()
 
     def branch(self):
         return self.filterbranch
@@ -423,7 +423,7 @@ class HgRepoListModel(QAbstractTableModel):
         'empty the list'
         self.graph = None
         self.datacache = {}
-        self.emit(SIGNAL("layoutChanged()"))
+        self.layoutChanged.emit()
 
     def gettags(self, ctx, gnode):
         if ctx.rev() is None:
