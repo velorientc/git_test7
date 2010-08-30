@@ -461,10 +461,10 @@ class AuthDialog(QDialog):
         username = hglib.fromunicode(self.userentry.text())
         password = hglib.fromunicode(self.pwentry.text())
         alias = hglib.fromunicode(self.aliasentry.text())
-        if self.host+'.prefix' in cfg['auth']:
+        if alias+'.prefix' in cfg['auth']:
             if not qtlib.QuestionMsgBox(_('Confirm authentication replace'),
                                         _('Authentication info for %s already'
-                                          'exists, replace?') % host):
+                                          'exists, replace?') % alias):
                 return
         cfg.set('auth', alias+'.schemes', schemes)
         cfg.set('auth', alias+'.username', username)
