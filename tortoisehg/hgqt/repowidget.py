@@ -139,12 +139,12 @@ class RepoWidget(QWidget):
         return SharedWidget(cw)
 
     def createManifestWidget(self):
-        w = ManifestWidget(self.repo.ui, self.repo, rev=self.rev, parent=self)
         def filterrev(rev):
             if isinstance(rev, basestring):  # unapplied patch
                 return None  # TODO
             else:
                 return rev
+        w = ManifestWidget(self.repo.ui, self.repo, rev=filterrev(self.rev), parent=self)
         self.repoview.revisionClicked.connect(lambda rev: w.setrev(filterrev(rev)))
         w.revchanged.connect(self.repoview.goto)
         return w
