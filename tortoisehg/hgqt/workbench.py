@@ -442,9 +442,9 @@ class Workbench(QMainWindow):
 
     def setHistoryColumns(self, *args):
         """Display the column selection dialog"""
-        dlg = ColumnSelectDialog(repomodel.ALLCOLUMNS)
+        w = self.repoTabsWidget.currentWidget()
+        dlg = ColumnSelectDialog(repomodel.ALLCOLUMNS, w and w.repoview.model().columns)
         if dlg.exec_() == QDialog.Accepted:
-            w = self.repoTabsWidget.currentWidget()
             if w:
                 w.repoview.model().updateColumns()
                 w.repoview.resizeColumns()

@@ -154,6 +154,11 @@ class HgRepoListModel(QAbstractTableModel):
             self.datacache = {}
             self.layoutChanged.emit()
 
+    @property
+    def columns(self):
+        """Return names of visible columns"""
+        return self._columns
+
     def invalidate(self):
         self.reloadConfig()
         self.datacache = {}

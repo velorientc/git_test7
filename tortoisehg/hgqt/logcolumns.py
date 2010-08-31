@@ -16,18 +16,21 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 class ColumnSelectDialog(QDialog):
-    def __init__(self, all, parent=None):
+    def __init__(self, all, curcolumns=None, parent=None):
         QDialog.__init__(self, parent)
 
         self.setWindowTitle(_('Workbench Log Columns'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setMinimumSize(250, 265)
-        s = QSettings()
-        cols = s.value('workbench/columns').toStringList()
-        if cols:
-            self.curcolumns = [c for c in cols if c in all]
-        else:
-            self.curcolumns = all
+
+        self.curcolumns = curcolumns
+        if not self.curcolumns:
+            s = QSettings()
+            cols = s.value('workbench/columns').toStringList()
+            if cols:
+                self.curcolumns = [c for c in cols if c in all]
+            else:
+                self.curcolumns = all
         self.disabled = [c for c in all if c not in self.curcolumns]
 
         layout = QVBoxLayout()
