@@ -257,9 +257,6 @@ class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-
-    diffFilled = pyqtSignal()
-
     def __init__(self, repo, filename, repoviewer=None):
         super(FileDiffDialog, self).__init__(repo, filename, repoviewer)
         self._readSettings()
@@ -478,7 +475,6 @@ class FileDiffDialog(_AbstractFileDialog):
                 self._diff = None
                 self.timer.stop()
                 self.setDiffNavActions(-1)
-                self.diffFilled.emit()
                 break
 
             tag, alo, ahi, blo, bhi = self._diff.get_opcodes().pop(0)
