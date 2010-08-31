@@ -26,8 +26,9 @@ class FileRevModel(HgRepoListModel):
     """
     filled = pyqtSignal()
 
-    _allcolumns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Tags', 'Filename')
-    _columns = ('ID', 'Branch', 'Log', 'Author', 'Date', 'Filename')
+    _allcolumns = ('ID', 'Branch', 'Log', 'Author', 'Age', 'LocalTime',
+                   'UTCTime', 'Tags', 'Filename')
+    _columns = ('ID', 'Branch', 'Log', 'Author', 'Age', 'Filename')
     _stretchs = {'Log': 1, }
     _getcolumns = "getFilelogColumns"
 
