@@ -102,7 +102,8 @@ class Workbench(QMainWindow):
         self.close()
 
     def setupUi(self):
-        self.resize(627, 721)
+        desktopgeom = qApp.desktop().availableGeometry()
+        self.resize(desktopgeom.size() * 0.8)
 
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/log.svg"), QIcon.Normal, QIcon.Off)
