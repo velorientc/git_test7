@@ -530,6 +530,10 @@ class Workbench(QMainWindow):
             w.reload()
             self.setupBranchCombo()
 
+    def goto(self, root, rev):
+        for rw in self._findrepowidget(root):
+            rw.goto(rev)
+
     def refreshRepository(self, root):
         for rw in self._findrepowidget(root):
             rw.refresh()
