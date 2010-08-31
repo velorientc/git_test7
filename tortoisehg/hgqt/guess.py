@@ -210,6 +210,7 @@ class DetectRenameDialog(QDialog):
     def errorReceived(self, qstr):
         self.errorstr = qstr
         self.pmon.set_text(qstr)
+        self.pmon.show()
 
     def progressReceived(self, data):
         if self.thread.isFinished():
@@ -399,20 +400,20 @@ class RenameSearchThread(QThread):
         self.copies = copies
 
     def run(self):
-        class ProgUi(ui.ui):
+        class ProgUi(ui.ui, QObject):
+            psig = pyqtSignal(object)
             def __init__(self, src=None):
                 super(ProgUi, self).__init__(src)
+                QObject.__init__(self)
                 self.setconfig('ui', 'interactive', 'off')
                 self.setconfig('progress', 'disable', 'True')
                 os.environ['TERM'] = 'dumb'
                 if src:
-                    self.sig = src.sig
-                else:
-                    self.sig = QObject() # dummy object to emit signals
+                    src.psig.connect(self.psig)
             def progress(self, topic, pos, item='', unit='', total=None):
-                self.sig.emit("SIGNAL(progress)", [topic, item, pos, total, unit])
+                self.psig.emit([topic, item, pos, total, unit])
         progui = ProgUi()
-        self.connect(progui.sig, SIGNAL('progress'), self.progressRecvd)
+        progui.psig.connect(self.progress)
         storeui = self.repo.ui
         self.progui = progui
         self.repo.ui = progui
@@ -422,9 +423,6 @@ class RenameSearchThread(QThread):
             self.error.emit(hglib.tounicode(str(e)))
         self.repo.ui = storeui
         self.searchComplete.emit()
-
-    def progressRecvd(self, wr):
-        self.progress.emit(wr)
 
     def search(self, repo):
         wctx = repo[None]
