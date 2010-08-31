@@ -24,8 +24,8 @@ class InitDialog(QDialog):
                      int  # status (0: succeeded, -1: failed)
                  )
 
-    def __init__(self, destdir=[], opts={}, caller=''):
-        super(InitDialog, self).__init__()
+    def __init__(self, destdir=[], opts={}, caller='', parent=None):
+        super(InitDialog, self).__init__(parent)
 
         self.caller = caller
 
