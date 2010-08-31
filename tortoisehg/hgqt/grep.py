@@ -8,7 +8,7 @@
 import os
 import re
 
-from mercurial import ui, hg, error, commands, cmdutil, util
+from mercurial import ui, hg, error, commands, match, util
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview
 from tortoisehg.util import paths, hglib
@@ -25,11 +25,11 @@ class SearchWidget(QWidget):
        SIGNALS:
        loadBegin()                  - for progress bar
        loadComplete()               - for progress bar
-       errorMessage(QString)        - for status bar
+       errorMessage(unicode)        - for status bar
     '''
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    errorMessage = pyqtSignal(str)
+    errorMessage = pyqtSignal(unicode)
 
     def __init__(self, upats, root=None, parent=None, **opts):
         QWidget.__init__(self, parent)
@@ -205,6 +205,7 @@ class SearchWidget(QWidget):
 
         self.regexple.setEnabled(False)
         self.thread.finished.connect(self.finished)
+        self.thread.errorMessage.connect(self.errorMessage)
         self.thread.matchedRow.connect(
                      lambda wrapper: model.appendRow(*wrapper.data))
         self.loadBegin.emit()
@@ -226,6 +227,7 @@ class DataWrapper(QObject):
 class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
     matchedRow = pyqtSignal(object)
+    errorMessage = pyqtSignal(unicode)
     finished = pyqtSignal()
 
     def __init__(self, repo, pattern, icase, inc, exc):
@@ -268,6 +270,10 @@ class HistorySearchThread(QThread):
                         pass
                     self.fullmsg = ''
 
+            def write_err(self, msg, *args, **opts):
+                msg = htlib.tounicode(msg)
+                self.obj.errorMessage.emit(msg)
+
             def label(self, msg, label):
                 msg = hglib.tounicode(msg)
                 msg = Qt.escape(msg)
@@ -289,6 +295,7 @@ class HistorySearchThread(QThread):
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
     matchedRow = pyqtSignal(object)
+    errorMessage = pyqtSignal(unicode)
     finished = pyqtSignal()
 
     def __init__(self, repo, regexp, ctx, inc, exc, once):
@@ -301,11 +308,14 @@ class CtxSearchThread(QThread):
         self.once = once
 
     def run(self):
-        # this will eventually be: hg grep -c 
         hu = htmlui.htmlui()
         rev = self.ctx.rev()
-        opts = {'include':self.inc, 'exclude':self.exc}
-        matchfn = cmdutil.match(self.repo, [], opts)
+        # generate match function relative to repo root
+        matchfn = match.match(self.repo.root, '', [], self.inc, self.exc)
+        def badfn(f, msg):
+            e = hglib.tounicode("%s: %s" % (matchfn.rel(f), msg))
+            self.errorMessage.emit(e)
+        matchfn.bad = badfn
 
         # searching len(ctx.manifest()) files
         for wfile in self.ctx:                # walk manifest
