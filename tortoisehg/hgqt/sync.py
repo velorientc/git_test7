@@ -171,7 +171,7 @@ class SyncWidget(QWidget):
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
         if scheme == 'local':
-            return unicode(self.pathentry.text())
+            return hglib.fromunicode(self.pathentry.text())
         else:
             path = self.pathentry.text()
             host = self.hostentry.text()
@@ -182,18 +182,18 @@ class SyncWidget(QWidget):
                 if self.curpw:
                     parts.append(hidepw and ':***' or self.curpw)
                 parts.append('@')
-            parts.append(unicode(host))
+            parts.append(hglib.fromunicode(host))
             if port:
-                parts.extend([':', unicode(port)])
-            parts.extend(['/', unicode(path)])
+                parts.extend([':', hglib.fromunicode(port)])
+            parts.extend(['/', hglib.fromunicode(path)])
             return ''.join(parts)
 
     def pathSelected(self, index):
         path = index.model().realUrl(index)
-        self.setUrl(unicode(path))
+        self.setUrl(hglib.fromunicode(path))
         aliasindex = index.sibling(index.row(), 0)
         alias = aliasindex.data(Qt.DisplayRole).toString()
-        self.curalias = unicode(alias)
+        self.curalias = hglib.fromunicode(alias)
 
     def setUrl(self, newurl):
         'User has selected a new URL'
@@ -249,14 +249,14 @@ class SyncWidget(QWidget):
             alias = 'default'
         else:
             alias = 'new'
-        url = unicode(self.urlentry.text())
+        url = hglib.fromunicode(self.urlentry.text())
         dialog = SaveDialog(self.root, alias, url, self)
         if dialog.exec_() == QDialog.Accepted:
-            self.curalias = unicode(dialog.aliasentry.text())
+            self.curalias = hglib.fromunicode(dialog.aliasentry.text())
             self.refresh()
 
     def authclicked(self):
-        host = unicode(self.hostentry.text())
+        host = hglib.fromunicode(self.hostentry.text())
         user = self.curuser or ''
         pw = self.curpw or ''
         dialog = AuthDialog(self.root, host, user, pw, self)
