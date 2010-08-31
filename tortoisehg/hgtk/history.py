@@ -784,6 +784,13 @@ class GLog(gdialog.GWindow):
                 gdialog.Prompt(_('Invalid date specification'),
                                str(e), self).run()
                 return False
+        elif mode == MODE_FILEPATS:
+            try:
+                match.match(self.repo.root, self.repo.root, text)
+            except (ValueError, util.Abort), e:
+                gdialog.Prompt(_('Invalid file pattern'),
+                               str(e), self).run()
+                return False
         return ret
 
     def activate_filter(self, text, mode):
