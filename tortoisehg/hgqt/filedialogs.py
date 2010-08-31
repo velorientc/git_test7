@@ -63,11 +63,12 @@ class _AbstractFileDialog(QMainWindow, HgDialogMixin):
     def setRepoViewer(self, repoviewer=None):
         self.repoviewer = repoviewer
         if repoviewer:
-            connect(repoviewer, SIGNAL('finished(int)'),
-                    lambda x: self.setRepoViewer())
+            # remove reference to parent workbench when it closes
+            self.connect(repoviewer, SIGNAL('finished(int)'),
+                         lambda x: self.setRepoViewer(None))
 
     def reload(self):
-        self.repo = hg.repository(self.repo.ui, self.repo.root)
+        self.repo.thginvalidate()
         self.setupModels()
 
     def findLexer(self):
@@ -131,9 +132,7 @@ class FileLogDialog(_AbstractFileDialog):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
         self.toolBar_edit = QToolBar(self)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.toolBar_edit)
-        self.actionClose = QAction(self, shortcut=QKeySequence.Close)
         self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
-        self.toolBar_edit.addAction(self.actionClose)
         self.toolBar_edit.addAction(self.actionReload)
 
         # TODO: workaround for HgRepoView
@@ -186,9 +185,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.filerevmodel.setFilename(self.filename)
 
     def createActions(self):
-        self.actionClose.triggered.connect(self.close)
         self.actionReload.triggered.connect(self.reload)
-        self.actionClose.setIcon(geticon('quit'))
         self.actionReload.setIcon(geticon('reload'))
 
         self.actionDiffMode = QAction('Diff mode', self)
@@ -289,9 +286,7 @@ class FileDiffDialog(_AbstractFileDialog):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
         self.toolBar_edit = QToolBar(self)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.toolBar_edit)
-        self.actionClose = QAction(self, shortcut=QKeySequence.Close)
         self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
-        self.toolBar_edit.addAction(self.actionClose)
         self.toolBar_edit.addAction(self.actionReload)
 
         # TODO: workaround for HgRepoView
@@ -398,11 +393,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self.tableView_revisions_right.setModel(self.filerevmodel)
 
     def createActions(self):
-        connect(self.actionClose, SIGNAL('triggered()'),
-                self.close)
         connect(self.actionReload, SIGNAL('triggered()'),
                 self.reload)
-        self.actionClose.setIcon(geticon('quit'))
         self.actionReload.setIcon(geticon('reload'))
 
         self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
