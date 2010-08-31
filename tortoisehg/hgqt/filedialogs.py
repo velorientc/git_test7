@@ -35,9 +35,6 @@ from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 
-connect = QObject.connect
-disconnect = QObject.disconnect
-
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
@@ -243,19 +240,26 @@ class FileLogDialog(_AbstractFileDialog):
 
     def nextDiff(self):
         notlast = self.textView.nextDiff()
-        self.actionNextDiff.setEnabled(self.textView.fileMode() and notlast and self.textView.nDiffs())
-        self.actionPrevDiff.setEnabled(self.textView.fileMode() and self.textView.nDiffs())
+        mode = self.textView.fileMode()
+        ndiffs = self.textView.nDiffs()
+        self.actionNextDiff.setEnabled(mode and notlast and ndiffs)
+        self.actionPrevDiff.setEnabled(mode and ndiffs)
 
     def prevDiff(self):
         notfirst = self.textView.prevDiff()
-        self.actionPrevDiff.setEnabled(self.textView.fileMode() and notfirst and self.textView.nDiffs())
-        self.actionNextDiff.setEnabled(self.textView.fileMode() and self.textView.nDiffs())
+        mode = self.textView.fileMode()
+        ndiffs = self.textView.nDiffs()
+        self.actionPrevDiff.setEnabled(mode and notfirst and ndiffs)
+        self.actionNextDiff.setEnabled(mode and ndiffs)
 
 
 class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
+
+    diffFilled = pyqtSignal()
+
     def __init__(self, repo, filename, repoviewer=None):
         super(FileDiffDialog, self).__init__(repo, filename, repoviewer)
         self._readSettings()
@@ -369,8 +373,7 @@ class FileDiffDialog(_AbstractFileDialog):
             table.revisionSelected.connect(self.revisionSelected)
             table.revisionActivated.connect(self.revisionActivated)
 
-            connect(self.viewers[side].verticalScrollBar(),
-                    SIGNAL('valueChanged(int)'),
+            self.viewers[side].verticalScrollBar().valueChanged.connect(
                     lambda value, side=side: self.vbar_changed(value, side))
             self.attachQuickBar(table.goto_toolbar)
 
@@ -380,31 +383,28 @@ class FileDiffDialog(_AbstractFileDialog):
         # timer used to fill viewers with diff block markers during GUI idle time
         self.timer = QTimer()
         self.timer.setSingleShot(False)
-        connect(self.timer, SIGNAL("timeout()"),
-                self.idle_fill_files)
+        self.timer.timeout.connect(self.idle_fill_files)
 
     def setupModels(self):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
         self.filerevmodel = FileRevModel(self.repo, self.filename)
-        connect(self.filerevmodel, SIGNAL('filled'),
-                self.modelFilled)
+        self.filerevmodel.filled.connect(self.modelFilled)
         self.tableView_revisions_left.setModel(self.filerevmodel)
         self.tableView_revisions_right.setModel(self.filerevmodel)
 
     def createActions(self):
-        connect(self.actionReload, SIGNAL('triggered()'),
-                self.reload)
+        self.actionReload.triggered.connect(self.reload)
         self.actionReload.setIcon(geticon('reload'))
 
         self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
+        self.actionNextDiff.triggered.connect(self.nextDiff)
+
         self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
-        connect(self.actionNextDiff, SIGNAL('triggered()'),
-                self.nextDiff)
-        connect(self.actionPrevDiff, SIGNAL('triggered()'),
-                self.prevDiff)
+        self.actionPrevDiff.triggered.connect(self.prevDiff)
+
         self.actionNextDiff.setEnabled(False)
         self.actionPrevDiff.setEnabled(False)
 
@@ -414,8 +414,7 @@ class FileDiffDialog(_AbstractFileDialog):
         self.toolBar_edit.addAction(self.actionPrevDiff)
 
     def modelFilled(self):
-        disconnect(self.filerevmodel, SIGNAL('filled'),
-                   self.modelFilled)
+        self.filerevmodel.filled.connect(self.modelFilled)
         self.tableView_revisions_left.resizeColumns()
         self.tableView_revisions_right.resizeColumns()
         if self._show_rev is not None:
@@ -479,7 +478,7 @@ class FileDiffDialog(_AbstractFileDialog):
                 self._diff = None
                 self.timer.stop()
                 self.setDiffNavActions(-1)
-                self.emit(SIGNAL('diffFilled'))
+                self.diffFilled.emit()
                 break
 
             tag, alo, ahi, blo, bhi = self._diff.get_opcodes().pop(0)
