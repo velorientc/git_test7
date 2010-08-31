@@ -68,6 +68,8 @@ class BlockList(QtGui.QWidget):
                   self._minimum, self._maximum)
 
     def setRange(self, minimum, maximum):
+        if minimum == maximum:
+            return
         self._minimum = minimum
         self._maximum = maximum
         self.update()
