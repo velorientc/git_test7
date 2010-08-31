@@ -428,10 +428,10 @@ class MatchTree(QTableView):
             menus.append((_('Visual Diff'), self.vdiff))
         menu = QMenu(self)
         for name, func in menus:
-            action = menu.addAction(name)
-            action.selrows = selrows
-            action.run = lambda f=func: f(selrows)
-            action.triggered.connect(action.run)
+            def add(name, func):
+                action = menu.addAction(name)
+                action.triggered.connect(lambda: func(selrows))
+            add(name, func)
         menu.exec_(point)
 
     def ann(self, rows):
