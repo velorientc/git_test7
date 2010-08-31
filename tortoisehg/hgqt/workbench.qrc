@@ -36,5 +36,6 @@
     <file>icons/rename.svg</file>
     <file>icons/commit.svg</file>
     <file>icons/fonts.svg</file>
+    <file>icons/reloadtt.svg</file>
   </qresource>
 </RCC>

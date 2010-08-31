@@ -147,6 +147,12 @@ class Workbench(QMainWindow):
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
         a.setShortcut(QKeySequence.Refresh)
+        a.setToolTip(_('Refresh all for current repository'))
+
+        self.actionRefreshTaskTab = a = QAction(_("&Refresh Task Tab"), self)
+        b = QKeySequence.keyBindings(QKeySequence.Refresh)
+        a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
+        a.setToolTip(_('Refresh only the current task tab'))
 
         self.actionFind = a = QAction(_('Find'), self)
         a.setIcon(geticon('find'))
@@ -222,6 +228,7 @@ class Workbench(QMainWindow):
         m.addAction(self.actionSelectColumns)
         m.addSeparator()
         m.addAction(self.actionRefresh)
+        m.addAction(self.actionRefreshTaskTab)
 
         self.menuRepository = m = QMenu(_("&Repository"), self.menubar)
         m.addAction(self.actionServe)
@@ -246,6 +253,7 @@ class Workbench(QMainWindow):
         tb.setEnabled(True)
         tb.setObjectName("toolBar_edit")
         tb.addAction(self.actionRefresh)
+        tb.addAction(self.actionRefreshTaskTab)
         tb.addSeparator()
         tb.addAction(self.actionBack)
         tb.addAction(self.actionForward)
@@ -400,6 +408,7 @@ class Workbench(QMainWindow):
         # main window actions (from .ui file)
         self.actionFind.triggered.connect(self.find)
         self.actionRefresh.triggered.connect(self.reload)
+        self.actionRefreshTaskTab.triggered.connect(self.reloadTaskTab)
         self.actionAbout.triggered.connect(self.on_about)
         self.actionQuit.triggered.connect(self.close)
         self.actionBack.triggered.connect(self.back)
@@ -421,6 +430,7 @@ class Workbench(QMainWindow):
 
         self.actionQuit.setIcon(geticon('quit'))
         self.actionRefresh.setIcon(geticon('reload'))
+        self.actionRefreshTaskTab.setIcon(geticon('reloadtt'))
 
         self.actionHelp.setShortcut(QKeySequence.HelpContents)
         self.actionHelp.setIcon(geticon('help'))
@@ -521,6 +531,11 @@ class Workbench(QMainWindow):
         if w:
             w.reload()
             self.setupBranchCombo()
+
+    def reloadTaskTab(self, root):
+        rw = self.repoTabsWidget.currentWidget()
+        if rw:
+            rw.reloadTaskTab()
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):

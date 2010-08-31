@@ -392,6 +392,10 @@ class CommitWidget(QWidget):
         self.userhist = self.userhist[:10]
         self.refreshUserList()
 
+    def reload(self):
+        # TODO
+        pass
+
     def commit(self):
         repo = self.stwidget.repo
         ui = repo.ui

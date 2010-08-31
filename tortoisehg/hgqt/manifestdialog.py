@@ -192,6 +192,10 @@ class ManifestWidget(QWidget):
         self._treeview.setModel(self._treemodel)
         self._treeview.selectionModel().currentChanged.connect(self._fileselected)
 
+    def reload(self):
+        # TODO
+        pass
+
     @property
     def rev(self):
         """Return current revision"""

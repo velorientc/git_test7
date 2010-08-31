@@ -220,6 +220,10 @@ class SearchWidget(QWidget):
         self.loadBegin.emit()
         self.thread.start()
 
+    def reload(self):
+        # TODO
+        pass
+
     def finished(self):
         for col in xrange(COL_TEXT):
             self.tv.resizeColumnToContents(col)
@@ -269,7 +273,7 @@ class HistorySearchThread(QThread):
                 if self.fullmsg.endswith('\0'):
                     try:
                         fname, line, rev, addremove, user, text = \
-                                self.fullmsg.split('\0', 5) 
+                                self.fullmsg.split('\0', 5)
                         text = '<b>%s</b> <span>%s</span>' % (
                                 addremove, text[:-1])
                         row = [fname, rev, line, user, text]

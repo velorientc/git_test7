@@ -543,6 +543,21 @@ class RepoWidget(QWidget):
             cw.stwidget.refreshWctx()
         self.revDetailsWidget.reload(rev)
 
+    def reloadTaskTab(self):
+        tti = self.taskTabsWidget.currentIndex()
+        if tti == self.logTabIndex:
+            ttw = self.revDetailsWidget
+        elif tti == self.commitTabIndex:
+            ttw = self.commitDemand.get()
+        elif tti == self.manifestTabIndex:
+            ttw = self.manifestDemand.get()
+        elif tti == self.syncTabIndex:
+            ttw = self.syncDemand.get()
+        elif tti == self.grepTabIndex:
+            ttw = self.grepDemand.get()
+        if ttw:
+            ttw.reload()
+
     def refresh(self):
         'Refresh the repo model view, clear cached data'
         self.repo.thginvalidate()
@@ -598,7 +613,7 @@ class RepoWidget(QWidget):
             cw.storeConfigs(s)
         return True
 
-    def runCommand(self, title, cmdline):      
+    def runCommand(self, title, cmdline):
         if self.runner:
             InfoMsgBox(_('Unable to start'),
                        _('Previous command is still running'))
@@ -610,4 +625,4 @@ class RepoWidget(QWidget):
             self.setScanForRepoChanges(saved)
             self.runner = None
         self.runner.commandFinished.connect(finished)
-        self.runner.run(cmdline)       
+        self.runner.run(cmdline)
