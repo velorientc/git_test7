@@ -154,6 +154,7 @@ def _extendrepo(repo):
             for a in _uiprops:
                 if a in self.__dict__:
                     delattr(self, a)
+            # todo: extensions.loadall(self.ui)
 
     return thgrepository
 
