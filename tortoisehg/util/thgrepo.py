@@ -11,7 +11,7 @@
 import os
 import sys
 
-from mercurial import hg, patch, util, error, bundlerepo, ui
+from mercurial import hg, patch, util, error, bundlerepo, ui, extensions
 from mercurial.util import propertycache
 
 from util import hglib
@@ -29,7 +29,7 @@ def repository(ui, path='', create=False):
         return repo
     return _repocache[path]
 
-_uiprops = '''_uifiles _uimtime _shell _thghiddentags'''.split()
+_uiprops = '''_uifiles _uimtime _shell _exts _thghiddentags'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
@@ -111,17 +111,33 @@ def _extendrepo(repo):
                     pass
             return max(mtimes)
 
+        @propertycache
+        def _exts(self):
+            lclexts = []
+            allexts = [n for n,m in extensions.extensions()]
+            for name, path in self.ui.configitems('extensions'):
+                if name in allexts:
+                    lclexts.append(name)
+            return lclexts
+
         def shell(self):
+            'Returns terminal shell configured for this repo'
             return self._shell
 
         def uifiles(self):
+            'Returns latest mtime and complete list of config files'
             return self._uimtime, self._uifiles
 
+        def extensions(self):
+            'Returns list of extensions enabled in this repository'
+            return self._exts
+
         def thgmqtag(self, tag):
-            '''True if tag is used to mark an applied MQ patch'''
+            'Returns true if `tag` marks an applied MQ patch'
             return tag in self._thgmqpatchnames
 
         def thginvalidate(self):
+            'Should be called when mtime of repo store/dirstate are changed'
             self.dirstate.invalidate()
             if not isinstance(repo, bundlerepo.bundlerepository):
                 self.invalidate()
