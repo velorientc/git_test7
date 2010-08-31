@@ -93,7 +93,8 @@ def portable_fork(ui, opts):
 
 # Windows and Nautilus shellext execute
 # "thg subcmd --listfile TMPFILE" or "thg subcmd --listfileutf8 TMPFILE"(planning) .
-# Extensions written in .hg/hgrc is enabled after calling "hg.repository(ui, root)".
+# Extensions written in .hg/hgrc is enabled after calling
+# extensions.loadall(lui)
 #
 # 1. win32mbcs extension
 #     Japanese shift_jis and Chinese big5 include '0x5c'(backslash) in filename.
@@ -132,21 +133,21 @@ def get_files_from_listfile():
     lines = []
     need_to_utf8 = False
     if os.name == 'nt':
-      try:
-        fixutf8 = extensions.find("fixutf8")
-        if fixutf8:
-          need_to_utf8 = True
-      except KeyError:
-        pass
+        try:
+            fixutf8 = extensions.find("fixutf8")
+            if fixutf8:
+                need_to_utf8 = True
+        except KeyError:
+            pass
 
     if need_to_utf8:
-      lines += _linesutf8
-      for l in _lines:
-        lines.append(hglib.toutf(l))
+        lines += _linesutf8
+        for l in _lines:
+            lines.append(hglib.toutf(l))
     else:
-      lines += _lines
-      for l in _linesutf8:
-        lines.append(hglib.fromutf(l))
+        lines += _lines
+        for l in _linesutf8:
+            lines.append(hglib.fromutf(l))
 
     # Convert absolute file paths to repo/cwd canonical
     cwd = os.getcwd()
