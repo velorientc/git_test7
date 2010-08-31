@@ -8,7 +8,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, extensions
+from mercurial import hg, ui
 
 from tortoisehg.util import hglib, paths, thgrepo
 from tortoisehg.hgqt.i18n import _
@@ -36,7 +36,7 @@ class MergeDialog(QWizard):
             if root:
                 self.repo = thgrepo.repository(self.ui, path=root)
             else:
-                raise 'not repository'
+                raise 'no repository found'
 
         self.other = str(other)
         self.local = str(self.repo.parents()[0].rev())
@@ -293,8 +293,7 @@ class MergePage(BasePage):
 
         text = _('To start merging, you need to '
                  '<a href="shelve"><b>shelve</b></a> them')
-        exs = [ name for name, module in extensions.extensions() ]
-        if 'mq' in exs:
+        if 'mq' in repo.extensions():
             text = text + _(', <a href="mq"><b>save</b></a> as MQ patch')
         text = text + (' or <a href="discard"><b>discard</b></a> all.')
         wd_text = QLabel(text)

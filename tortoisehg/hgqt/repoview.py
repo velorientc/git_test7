@@ -14,7 +14,6 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial import extensions
 from mercurial.error import RepoError
 
 from tortoisehg.util import hglib
@@ -80,9 +79,10 @@ class HgRepoView(QTableView):
     stripRevision = pyqtSignal(object)
     showMessage = pyqtSignal(str)
 
-    def __init__(self, workbench, parent=None):
+    def __init__(self, workbench, repo, parent=None):
         QTableView.__init__(self, parent)
         self.workbench = workbench
+        self.repo = repo
         self.init_variables()
         self.setShowGrid(False)
 
@@ -118,7 +118,7 @@ class HgRepoView(QTableView):
         tb.gotoSignal.connect(self.goto)
 
     def _action_defs(self):
-        exs = [name for name, module in extensions.extensions()]
+        exs = self.repo.extensions()
         a = [('manifest', _('Show at rev...'), None,
               _('Show the manifest at selected revision'), None,
               self.showAtRev),
@@ -220,7 +220,7 @@ class HgRepoView(QTableView):
                 menu.addAction(self._actions[act])
             else:
                 menu.addSeparator()
-        exs = [name for name, module in extensions.extensions()]
+        exs = self.repo.extensions()
         if 'rebase' in exs:
             menu.addAction(self._actions['rebase'])
         if 'mq' in exs:
@@ -245,7 +245,7 @@ class HgRepoView(QTableView):
         self.init_variables()
         QTableView.setModel(self, model)
         self.selectionModel().currentRowChanged.connect(self.revSelected)
-        self.goto_toolbar.compl_model.setStringList(model.repo.tags().keys())
+        self.goto_toolbar.compl_model.setStringList(self.repo.tags().keys())
         self.resetDelegate()
         model.layoutChanged.connect(self.resetDelegate)
 
@@ -308,7 +308,7 @@ class HgRepoView(QTableView):
             return gnode.rev
 
     def context(self, rev):
-        return self.model().repo.changectx(rev)
+        return self.repo.changectx(rev)
 
     def revClicked(self, index):
         rev = self.revFromindex(index)
@@ -390,7 +390,7 @@ class HgRepoView(QTableView):
         Select revision 'rev' (can be anything understood by repo.changectx())
         """
         rev = str(rev) # might be a QString
-        repo = self.model().repo
+        repo = self.repo
         try:
             rev = repo.changectx(rev).rev()
         except RepoError:

@@ -68,7 +68,7 @@ class RepoWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.repotabs_splitter)
 
-        self.repoview = HgRepoView(self.workbench)
+        self.repoview = HgRepoView(self.workbench, self.repo)
         self.repotabs_splitter.addWidget(self.repoview)
         self.repotabs_splitter.setCollapsible(0, False)
         sp = SP(SP.Expanding, SP.Expanding)
