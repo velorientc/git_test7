@@ -131,7 +131,7 @@ def get_files_from_listfile():
     global _linesutf8
     lines = []
     need_to_utf8 = False
-    if sys.platform == 'win32':
+    if os.name == 'nt':
       try:
         fixutf8 = extensions.find("fixutf8")
         if fixutf8:
@@ -276,12 +276,9 @@ def runcommand(ui, args):
     else:
         lui = ui
 
-    extensions.loadall(ui)
+    extensions.loadall(lui)
 
-    if path:
-        lui2   = lui.copy()
-        lrepo2 = hg.repository(lui2, path=path)
-        args  += get_files_from_listfile()
+    args += get_files_from_listfile()
 
     if options['quiet']:
         ui.quiet = True
