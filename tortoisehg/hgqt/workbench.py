@@ -502,7 +502,7 @@ class Workbench(QMainWindow):
     def newRepository(self):
         """ Run init dialog """
         from tortoisehg.hgqt.hginit import InitDialog
-        initdlg = InitDialog(caller='workbench', parent=self)
+        initdlg = InitDialog(parent=self)
         if initdlg.exec_():
             path = initdlg.getPath()
             self.openRepo(path)

@@ -20,14 +20,8 @@ from PyQt4.QtGui import *
 class InitDialog(QDialog):
     """TortoiseHg init dialog"""
 
-    cmdfinished = pyqtSignal(
-                     int  # status (0: succeeded, -1: failed)
-                 )
-
-    def __init__(self, destdir=[], opts={}, caller='', parent=None):
+    def __init__(self, destdir=[], opts={}, parent=None):
         super(InitDialog, self).__init__(parent)
-
-        self.caller = caller
 
         # main layout
         self.vbox = QVBoxLayout()
@@ -55,7 +49,7 @@ class InitDialog(QDialog):
                 _('Show in Workbench after init'))
         self.grid.addWidget(self.add_files_chk, 1, 1)
         self.grid.addWidget(self.make_old_chk, 2, 1)
-        if self.caller != 'workbench':
+        if not self.parent():
             self.grid.addWidget(self.run_wb_chk, 3, 1)
 
         # buttons
@@ -213,23 +207,19 @@ class InitDialog(QDialog):
                 wbui = ui.ui()
                 wb = wbrun(wbui)
                 wb.show()
-                self.cmdfinished.emit(0)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Init'),
                   _('<p>Repository successfully created at</p><p>%s</p>') % dest,
                   _('<p>But could not run Workbench for it.</p><p>%s</p>')
                     % hglib.tounicode(str(e)))
         else:
-            if self.caller == 'workbench':
-                self.cmdfinished.emit(0)
-            else:
+            if not self.parent():
                 qtlib.InfoMsgBox(_('Init'),
                 _('<p>Repository successfully created at</p><p>%s</p>') % dest)
 
         self.accept()
 
     def reject(self):
-        self.cmdfinished.emit(-1)
         super(InitDialog, self).reject()
 
 def run(ui, *pats, **opts):
