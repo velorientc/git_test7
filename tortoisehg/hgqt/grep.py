@@ -27,6 +27,10 @@ class SearchWidget(QWidget):
        loadComplete()               - for progress bar
        errorMessage(QString)        - for status bar
     '''
+    loadBegin = pyqtSignal()
+    loadComplete = pyqtSignal()
+    errorMessage = pyqtSignal(str)
+
     def __init__(self, upats, root=None, parent=None, **opts):
         QWidget.__init__(self, parent)
 
@@ -163,8 +167,8 @@ class SearchWidget(QWidget):
             icase = self.chk.isChecked()
             regexp = re.compile(pattern, icase and re.I or 0)
         except Exception, inst:
-            msg = _('grep: invalid match pattern: %s\n') % inst
-            self.emit(SIGNAL('errorMessage'), msg)
+            msg = _('grep: invalid match pattern: %s\n') % hglib.tounicode(inst)
+            self.errorMessage.emit(msg)
             return
 
         self.tv.setSortingEnabled(False)
@@ -187,8 +191,8 @@ class SearchWidget(QWidget):
             try:
                 ctx = self.repo[rev or '.']
             except error.RepoError, e:
-                msg = _('grep: %s\n') % e
-                self.emit(SIGNAL('errorMessage'), msg)
+                msg = _('grep: %s\n') % hglib.tounicode(e)
+                self.errorMessage.emit(msg)
                 return
             self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc,
                                           once=self.singlematch.isChecked())
@@ -200,10 +204,10 @@ class SearchWidget(QWidget):
                                               inc, exc)
 
         self.regexple.setEnabled(False)
-        self.connect(self.thread, SIGNAL('finished'), self.finished)
-        self.connect(self.thread, SIGNAL('matchedRow'),
+        self.thread.finished.connect(self.finished)
+        self.thread.matchedRow.connect(
                      lambda wrapper: model.appendRow(*wrapper.data))
-        self.emit(SIGNAL('loadBegin'))
+        self.loadBegin.emit()
         self.thread.start()
 
     def finished(self):
@@ -213,7 +217,7 @@ class SearchWidget(QWidget):
         self.tv.setSortingEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
-        self.emit(SIGNAL('loadComplete'))
+        self.loadComplete.emit()
 
 class DataWrapper(QObject):
     def __init__(self, data):
@@ -221,6 +225,9 @@ class DataWrapper(QObject):
 
 class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
+    matchedRow = pyqtSignal(object)
+    finished = pyqtSignal()
+
     def __init__(self, repo, pattern, icase, inc, exc):
         super(HistorySearchThread, self).__init__()
         self.repo = repo
@@ -256,7 +263,7 @@ class HistorySearchThread(QThread):
                                 addremove, text[:-1])
                         row = [fname, rev, line, user, text]
                         w = DataWrapper(row)
-                        self.obj.emit(SIGNAL('matchedRow'), w)
+                        self.obj.matchedRow.emit(w)
                     except ValueError:
                         pass
                     self.fullmsg = ''
@@ -277,10 +284,13 @@ class HistorySearchThread(QThread):
         u = incrui()
         u.obj = self
         commands.grep(u, self.repo, self.pattern, **opts)
-        self.emit(SIGNAL('finished'))
+        self.finished.emit()
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
+    matchedRow = pyqtSignal(object)
+    finished = pyqtSignal()
+
     def __init__(self, repo, regexp, ctx, inc, exc, once):
         super(CtxSearchThread, self).__init__()
         self.repo = repo
@@ -314,10 +324,10 @@ class CtxSearchThread(QThread):
                     hu.write(line[pos:], label='ui.status')
                     row = [wfile, i + 1, rev, None, hu.getdata()[0]]
                     w = DataWrapper(row)
-                    self.emit(SIGNAL('matchedRow'), w)
+                    self.matchedRow.emit(w)
                     if self.once:
                         break
-        self.emit(SIGNAL('finished'))
+        self.finished.emit()
 
 
 COL_PATH     = 0
@@ -342,8 +352,7 @@ class MatchTree(QTableView):
 
         self.horizontalHeader().setStretchLastSection(True)
 
-        self.connect(self, SIGNAL('customContextMenuRequested(const QPoint &)'),
-                     self.customContextMenuRequested)
+        self.customContextMenuRequested.connect(self.menuRequest)
         self.pattern = None
         self.searchwidget = parent
 
@@ -387,7 +396,7 @@ class MatchTree(QTableView):
         self.dragObject()
         return QTableView.mouseMoveEvent(self, event)
 
-    def customContextMenuRequested(self, point):
+    def menuRequest(self, point):
         selrows = []
         wctxonly = True
         allhistory = False
@@ -410,8 +419,9 @@ class MatchTree(QTableView):
         menu = QMenu(self)
         for name, func in menus:
             action = menu.addAction(name)
-            action.wrapper = lambda f=func: f(selrows)
-            self.connect(action, SIGNAL('triggered()'), action.wrapper)
+            action.selrows = selrows
+            action.run = lambda f=func: f(selrows)
+            action.triggered.connect(action.run)
         menu.exec_(point)
 
     def ann(self, rows):
@@ -501,24 +511,26 @@ class MatchModel(QAbstractTableModel):
         return flags
 
     def sort(self, col, order):
-        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        self.layoutAboutToBeChanged.emit()
         self.rows.sort(lambda x, y: cmp(x[col], y[col]))
         if order == Qt.DescendingOrder:
             self.rows.reverse()
-        self.emit(SIGNAL("layoutChanged()"))
+        self.layoutChanged.emit()
 
     ## Custom methods
 
     def appendRow(self, *args):
-        self.beginInsertRows(QModelIndex(), len(self.rows), len(self.rows))
+        l = len(self.rows)
+        self.beginInsertRows(QModelIndex(), l, l)
         self.rows.append(args)
         self.endInsertRows()
-        self.emit(SIGNAL("dataChanged()"))
+        self.layoutChanged.emit()
 
     def reset(self):
         self.beginRemoveRows(QModelIndex(), 0, len(self.rows)-1)
         self.rows = []
         self.endRemoveRows()
+        self.layoutChanged.emit()
 
     def getRow(self, index):
         assert index.isValid()
