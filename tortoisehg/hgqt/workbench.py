@@ -635,7 +635,7 @@ class Workbench(QMainWindow):
 
 def run(ui, *pats, **opts):
     repo = None
-    root = paths.find_root()
+    root = opts.get('root') or paths.find_root()
     if root:
         repo = thgrepo.repository(ui, path=root)
     return Workbench(ui, repo)
