@@ -132,6 +132,15 @@ class SearchWidget(QWidget):
         if len(upats) > 1:
             incle.setText(','.join(upats[1:]))
 
+    def setRevision(self, rev):
+        if isinstance(rev, basestring):  # unapplied patch
+            return
+        elif rev is None:
+            self.wctxradio.setChecked(True)
+        else:
+            self.ctxradio.setChecked(True)
+            self.revle.setText(str(rev))
+
     def setSearch(self, upattern, **opts):
         self.regexple.setText(upattern)
         if opts.get('all'):
