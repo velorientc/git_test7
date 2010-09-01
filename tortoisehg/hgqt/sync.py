@@ -632,7 +632,7 @@ class PathsTree(QTreeView):
     def dragObject(self):
         urls = []
         for index in self.selectedRows():
-            url = self.model().data(index)[1]
+            url = index.sibling(index.row(), 1).data(Qt.DisplayRole).toString()
             u = QUrl()
             u.setPath(url)
             urls.append(u)
