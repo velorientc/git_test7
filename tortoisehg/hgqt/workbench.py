@@ -653,7 +653,8 @@ class Workbench(QMainWindow):
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         twrepo = (w and w.repo.root or '')
-        sd = SettingsDialog(configrepo=False, parent=self, root=twrepo)
+        sd = SettingsDialog(configrepo=False, focus='tortoisehg.authorcolor',
+                            parent=self, root=twrepo)
         sd.exec_()
 
 
