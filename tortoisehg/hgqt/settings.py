@@ -304,8 +304,11 @@ INFO = (
         ' Useful example: Specify "qbase qparent qtip" to hide the'
         ' standard tags inserted by the Mercurial Queues Extension.' 
         ' Default: None')),
-    (_('Use Expander'), 'tortoisehg.changeset-expander', genBoolCombo,
-        _('Show changeset details with an expander')),
+    (_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
+        ['none', 'update', 'fetch', 'rebase']),
+        _('Operation which is performed directly after a successful pull.'
+        ' update equates to pull --update, fetch equates to the fetch'
+        ' extension, rebase equates to pull --rebase.  Default: none')),
     )),
 
 ({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit'}, (
