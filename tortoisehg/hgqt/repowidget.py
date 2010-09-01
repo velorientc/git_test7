@@ -93,7 +93,7 @@ class RepoWidget(QWidget):
         tt.setTabToolTip(idx, _("Commit"))
 
         self.manifestDemand = w = DemandWidget(self.createManifestWidget)
-        self.manifestTabIndex = idx = tt.addTab(w, geticon('manifest'), '')
+        self.manifestTabIndex = idx = tt.addTab(w, geticon('annotate'), '')
         tt.setTabToolTip(idx, _('Manifest'))
 
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
@@ -101,7 +101,7 @@ class RepoWidget(QWidget):
         tt.setTabToolTip(idx, _("Synchronize"))
 
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
-        self.grepTabIndex = idx = tt.addTab(w, geticon('grep'), '')
+        self.grepTabIndex = idx = tt.addTab(w, geticon('repobrowse'), '')
         tt.setTabToolTip(idx, _("Search"))
 
         d = self.revDetailsWidget

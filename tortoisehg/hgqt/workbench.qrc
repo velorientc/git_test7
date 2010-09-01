@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/annotate.svg</file>
     <file>icons/log.svg</file>
     <file>icons/quit.svg</file>
     <file>icons/reload.svg</file>
@@ -38,6 +39,7 @@
     <file>icons/fonts.svg</file>
     <file>icons/reloadtt.svg</file>
     <file>icons/repotree.svg</file>
+    <file>icons/repobrowse.svg</file>
     <file>icons/loadall.png</file>
     <file>icons/showlog.png</file>
   </qresource>
