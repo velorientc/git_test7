@@ -26,6 +26,7 @@ from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.docklog import LogDockWidget
+from tortoisehg.hgqt.settings import SettingsDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -144,11 +145,14 @@ class Workbench(QMainWindow):
         self.actionClose_repository = a = QAction(_("&Close Repository"), self)
         a.setShortcut(QKeySequence.Close)
 
+        self.actionSettings = a = QAction(_('&Settings...'), self)
+        a.setIcon(geticon('settings_user'))
+
         self.actionRefresh = a = QAction(_("&Refresh"), self)
         a.setShortcut(QKeySequence.Refresh)
         a.setToolTip(_('Refresh all for current repository'))
 
-        self.actionRefreshTaskTab = a = QAction(_("&Refresh Task Tab"), self)
+        self.actionRefreshTaskTab = a = QAction(_("Refresh &Task Tab"), self)
         b = QKeySequence.keyBindings(QKeySequence.Refresh)
         a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
         a.setToolTip(_('Refresh only the current task tab'))
@@ -216,6 +220,8 @@ class Workbench(QMainWindow):
         m.addAction(self.actionNew_repository)
         m.addAction(self.actionOpen_repository)
         m.addAction(self.actionClose_repository)
+        m.addSeparator()
+        m.addAction(self.actionSettings)
         m.addSeparator()
         m.addAction(self.actionQuit)
 
@@ -441,6 +447,7 @@ class Workbench(QMainWindow):
         self.actionHelp.setIcon(geticon('help'))
         self.actionHelp.triggered.connect(self.on_help)
 
+        self.actionSettings.triggered.connect(self.editSettings)
 
         self.actionNew_repository.triggered.connect(self.newRepository)
         self.actionOpen_repository.triggered.connect(self.openRepository)
@@ -641,6 +648,13 @@ class Workbench(QMainWindow):
         else:
             InfoMsgBox(_('No shell configured'),
                        _('A terminal shell must be configured'))
+
+    def editSettings(self):
+        tw = self.repoTabsWidget
+        w = tw.currentWidget()
+        twrepo = (w and w.repo.root or '')
+        sd = SettingsDialog(configrepo=False, parent=self, root=twrepo)
+        sd.exec_()
 
 
 def run(ui, *pats, **opts):
