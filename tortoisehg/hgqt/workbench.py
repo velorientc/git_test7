@@ -179,22 +179,26 @@ class Workbench(QMainWindow):
 
         self.actionLoadAll = a = QAction(_("Load all"), self)
         a.setEnabled(True)
-#        icon = QIcon()
-#        icon.addPixmap(QPixmap(":/icons/loadall.svg"), QIcon.Normal, QIcon.Off)
-#        a.setIcon(icon)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/loadall.png"), QIcon.Normal, QIcon.Off)
+        a.setIcon(icon)
 
         self.actionShowPaths = a = QAction(_("Show Paths"), self)
         a.setCheckable(True)
 
         self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
 
-        a = QAction(_("Show Repository Registry"), self)
+        self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
         a.setCheckable(True)
-        self.actionShowRepoRegistry = a
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/repotree.svg"), QIcon.Normal, QIcon.Off)
+        a.setIcon(icon)
 
-        a = QAction(_("Show Output Log"), self)
+        self.actionShowLog = a = QAction(_("Show Output Log"), self)
         a.setCheckable(True)
-        self.actionShowLog = a
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/showlog.png"), QIcon.Normal, QIcon.Off)
+        a.setIcon(icon)
 
         self.actionServe = QAction(_("Web Server"), self)
         self.actionImport = QAction(_("Import"), self)
@@ -257,8 +261,8 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionBack)
         tb.addAction(self.actionForward)
         tb.addSeparator()
-        tb.addAction(self.actionShowLog)
         tb.addAction(self.actionShowRepoRegistry)
+        tb.addAction(self.actionShowLog)
         tb.addAction(self.actionLoadAll)
         tb.addSeparator()
         tb.addAction(self.actionFind)
