@@ -88,19 +88,19 @@ class RepoWidget(QWidget):
         self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
-        w = DemandWidget(self.createCommitWidget)
+        self.commeitDemand = w = DemandWidget(self.createCommitWidget)
         self.commitTabIndex = idx = tt.addTab(w, geticon('commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
-        self.manifestWidget = w = DemandWidget(self.createManifestWidget)
+        self.manifestDemand = w = DemandWidget(self.createManifestWidget)
         self.manifestTabIndex = idx = tt.addTab(w, geticon('manifest'), '')
         tt.setTabToolTip(idx, _('Manifest'))
 
-        w = DemandWidget(self.createSyncWidget)
+        self.syncDemand = w = DemandWidget(self.createSyncWidget)
         self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
-        w = DemandWidget(self.createGrepWidget)
+        self.grepDemand = w = DemandWidget(self.createGrepWidget)
         self.grepTabIndex = idx = tt.addTab(w, geticon('grep'), '')
         tt.setTabToolTip(idx, _("Search"))
 
@@ -162,6 +162,7 @@ class RepoWidget(QWidget):
     def createGrepWidget(self):
         upats = {}
         gw = SearchWidget(upats, self.repo.root, self)
+        gw.setRevision(self.repoview.current_rev)
         return gw
 
     def load_config(self):
@@ -472,7 +473,7 @@ class RepoWidget(QWidget):
         if rev is None:
             self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
         else:
-            revwidgets = (self.revDetailsWidget, self.manifestWidget)
+            revwidgets = (self.revDetailsWidget, self.manifestDemand)
             if self.taskTabsWidget.currentWidget() not in revwidgets:
                 self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
 
@@ -490,6 +491,7 @@ class RepoWidget(QWidget):
             self.revDetailsWidget.revision_selected(None)
         else:
             self.revDetailsWidget.revision_selected(rev)
+            self.grepDemand.forward('setRevision', rev)
 
     def goto(self, rev):
         rev = str(rev)
