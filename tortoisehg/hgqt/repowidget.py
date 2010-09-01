@@ -122,7 +122,7 @@ class RepoWidget(QWidget):
         cw = self.getCommitWidget()
         if cw:
             cw.commitComplete.connect(self.reload)
-            return cw
+            return SharedWidget(cw)
 
         pats = {}
         opts = {}
