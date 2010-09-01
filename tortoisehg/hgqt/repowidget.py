@@ -88,7 +88,7 @@ class RepoWidget(QWidget):
         self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
-        self.commeitDemand = w = DemandWidget(self.createCommitWidget)
+        self.commitDemand = w = DemandWidget(self.createCommitWidget)
         self.commitTabIndex = idx = tt.addTab(w, geticon('commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
