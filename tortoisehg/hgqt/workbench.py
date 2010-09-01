@@ -15,8 +15,7 @@ import subprocess
 
 from mercurial.error import RepoError
 
-from tortoisehg.util.hglib import tounicode
-from tortoisehg.util import paths, thgrepo
+from tortoisehg.util import paths, thgrepo, hglib
 
 #from tortoisehg.hgqt.decorators import timeit
 
@@ -517,10 +516,9 @@ class Workbench(QMainWindow):
         FD = QFileDialog
         path = FD.getExistingDirectory(parent=self, caption=caption,
             options=FD.ShowDirsOnly | FD.ReadOnly)
-        path = str(path)
         if path:
             try:
-                repo = thgrepo.repository(self.ui, path=path)
+                repo = thgrepo.repository(self.ui, path=hglib.fromunicode(path))
                 self.addRepoTab(repo)
             except RepoError:
                 QMessageBox.warning(self, _('Failed to open repository'),
