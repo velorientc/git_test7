@@ -29,7 +29,8 @@ def repository(ui, path='', create=False):
         return repo
     return _repocache[path]
 
-_uiprops = '''_uifiles _uimtime _shell _exts _thghiddentags'''.split()
+_uiprops = '''_uifiles _uimtime _shell postpull
+              _exts _thghiddentags'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
@@ -119,6 +120,13 @@ def _extendrepo(repo):
                 if name in allexts:
                     lclexts.append(name)
             return lclexts
+
+        @propertycache
+        def postpull(self):
+            pp = self.ui.config('tortoisehg', 'postpull')
+            if pp in ('rebase', 'update', 'fetch'):
+                return pp
+            return 'none'
 
         def shell(self):
             'Returns terminal shell configured for this repo'
