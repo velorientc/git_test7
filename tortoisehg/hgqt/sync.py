@@ -203,7 +203,10 @@ class SyncWidget(QWidget):
 
     def setUrl(self, newurl):
         'User has selected a new URL'
-        user, host, port, folder, passwd, scheme = self.urlparse(newurl)
+        try:
+            user, host, port, folder, passwd, scheme = self.urlparse(newurl)
+        except TypeError:
+            return
         self.updateInProgress = True
         for i, val in enumerate(_schemes):
             if scheme == val:
@@ -226,12 +229,12 @@ class SyncWidget(QWidget):
     def dropEvent(self, event):
         data = event.mimeData()
         if data.hasUrls():
-            url = hglib.fromunicode(data.urls()[0])
-            self.setUrl(url)
+            url = data.urls()[0]
+            self.setUrl(hglib.fromunicode(url.toString()))
             event.accept()
         elif data.hasText():
-            text = hglib.fromunicode(data.text())
-            self.setUrl(text)
+            text = data.text()
+            self.setUrl(hglib.fromunicode(text))
             event.accept()
 
     def urlparse(self, path):
