@@ -408,7 +408,7 @@ class PostPullDialog(QDialog):
         layout.addWidget(bb)
 
     def saveInRepo(self):
-        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn = os.path.join(self.repo.root, '.hg', 'hgrc')
         self.saveToPath([fn])
 
     def saveGlobal(self):
@@ -427,7 +427,7 @@ class PostPullDialog(QDialog):
     def saveToPath(self, path):
         fn, cfg = loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
-            qtlib.WarningMsgBox(_('Unable to save authentication'),
+            qtlib.WarningMsgBox(_('Unable to save post pull operation'),
                    _('Iniparse must be installed.'), parent=self)
             return
         if fn is None:
@@ -438,8 +438,6 @@ class PostPullDialog(QDialog):
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
-        fn = os.path.join(self.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile([fn], self)
         super(PostPullDialog, self).accept()
 
     def reject(self):
@@ -600,8 +598,6 @@ class AuthDialog(QDialog):
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
-        fn = os.path.join(self.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile([fn], self)
         super(AuthDialog, self).accept()
 
     def reject(self):
