@@ -41,6 +41,7 @@ class SyncWidget(QWidget):
             self.resize(850, 550)
 
         self.root = root
+        self.repo = thgrepo.repository(ui.ui(), root)
         self.finishfunc = None
         self.curuser = None
         self.curpw = None
@@ -90,6 +91,8 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.pathentry, 1)
         self.authbutton = QPushButton(_('Authentication'))
         hbox.addWidget(self.authbutton)
+        self.postpullbutton = QPushButton()
+        hbox.addWidget(self.postpullbutton)
         layout.addLayout(hbox)
 
         self.tv.clicked.connect(self.pathSelected)
@@ -110,6 +113,7 @@ class SyncWidget(QWidget):
         self.outbutton.clicked.connect(self.outclicked)
         self.pushbutton.clicked.connect(self.pushclicked)
         self.emailbutton.clicked.connect(self.emailclicked)
+        self.postpullbutton.clicked.connect(self.postpullclicked)
 
         self.opbuttons = (self.inbutton, self.pullbutton,
                           self.outbutton, self.pushbutton,
@@ -123,7 +127,7 @@ class SyncWidget(QWidget):
         cmd.setHidden(True)
         self.cmd = cmd
 
-        self.refresh()
+        self.reload()
         if 'default' in self.paths:
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
@@ -145,7 +149,7 @@ class SyncWidget(QWidget):
         for b in self.opbuttons:
             b.setEnabled(True)
 
-    def refresh(self):
+    def reload(self):
         fn = os.path.join(self.root, '.hg', 'hgrc')
         fn, cfg = loadIniFile([fn], self)
         self.paths = {}
@@ -155,6 +159,9 @@ class SyncWidget(QWidget):
             self.paths[ alias ] = cfg['paths'][ alias ]
         tm = PathsModel(self.paths, self)
         self.tv.setModel(tm)
+        self.cachedpp = self.repo.postpull
+        name = _('Post Pull: ') + self.repo.postpull.title()
+        self.postpullbutton.setText(name)
 
     def refreshUrl(self):
         'User has changed schema/host/port/path'
@@ -231,7 +238,7 @@ class SyncWidget(QWidget):
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
-            self.refresh()
+            self.reload()
         elif event.key() == Qt.Key_Escape:
             if self.cmd.core.is_running():
                 self.cmd.core.cancel()
@@ -251,7 +258,8 @@ class SyncWidget(QWidget):
         dialog = SaveDialog(self.root, alias, url, self)
         if dialog.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dialog.aliasentry.text())
-            self.refresh()
+            self.repo.invalidateui()
+            self.reload()
 
     def authclicked(self):
         host = hglib.fromunicode(self.hostentry.text())
@@ -279,7 +287,14 @@ class SyncWidget(QWidget):
             self.finishfunc = lambda: self.invalidate.emit(self.root)
         else:
             self.finishfunc = None
-        self.run(['--repository', self.root, 'pull'])
+        cmdline = ['--repository', self.root, 'pull']
+        if self.cachedpp == 'rebase':
+            cmdline.append('--rebase')
+        elif self.cachedpp == 'update':
+            cmdline.append('--update')
+        elif self.cachedpp == 'fetch':
+            cmdline[2] = 'fetch'
+        self.run(cmdline)
 
     def outclicked(self):
         if self.log:
@@ -296,6 +311,12 @@ class SyncWidget(QWidget):
     def pushclicked(self):
         self.finishfunc = None
         self.run(['--repository', self.root, 'push'])
+
+    def postpullclicked(self):
+        dlg = PostPullDialog(self.repo, self)
+        if dlg.exec_() == QDialog.Accepted:
+            self.repo.invalidateui()
+            self.reload()
 
     def emailclicked(self):
         from tortoisehg.hgqt import run as _run
@@ -314,11 +335,94 @@ class SyncWidget(QWidget):
             del cfg['paths'][alias]
         try:
             wconfig.writefile(cfg, fn)
-            self.refresh()
+            self.repo.invalidateui()
+            self.reload()
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
 
+
+class PostPullDialog(QDialog):
+    def __init__(self, repo, parent):
+        super(PostPullDialog, self).__init__(parent)
+        self.repo = repo
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        self.setWindowTitle(_('Post Pull Behavior'))
+
+        self.none = QRadioButton(_('None - simply pull changesets'))
+        self.update = QRadioButton(_('Update - pull, then try to update'))
+        layout.addWidget(self.none)
+        layout.addWidget(self.update)
+
+        if 'fetch' in repo.extensions() or repo.postpull == 'fetch':
+            self.fetch = QRadioButton(_('Fetch - use fetch extension'))
+            layout.addWidget(self.fetch)
+        if 'rebase' in repo.extensions() or repo.postpull == 'rebase':
+            self.rebase = QRadioButton(_('Rebase - use rebase extension'))
+            layout.addWidget(self.rebase)
+
+        self.none.setChecked(True)
+        if repo.postpull == 'update':
+            self.update.setChecked(True)
+        elif repo.postpull == 'fetch':
+            self.fetch.setChecked(True)
+        elif repo.postpull == 'rebase':
+            self.rebase.setChecked(True)
+
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Cancel)
+        bb.rejected.connect(self.reject)
+
+        sr = QPushButton(_('Save In Repo'))
+        sr.clicked.connect(self.saveInRepo)
+        bb.addButton(sr, BB.ActionRole)
+
+        sg = QPushButton(_('Save Global'))
+        sg.clicked.connect(self.saveGlobal)
+        sg.setAutoDefault(True)
+        bb.addButton(sg, BB.ActionRole)
+
+        self.bb = bb
+        layout.addWidget(bb)
+
+    def saveInRepo(self):
+        fn = os.path.join(self.root, '.hg', 'hgrc')
+        self.saveToPath([fn])
+
+    def saveGlobal(self):
+        self.saveToPath(util.user_rcpath())
+
+    def getValue(self):
+        if self.none.isChecked():
+            return 'none'
+        elif self.update.isChecked():
+            return 'update'
+        elif self.fetch.isChecked():
+            return 'fetch'
+        else:
+            return 'rebase'
+
+    def saveToPath(self, path):
+        fn, cfg = loadIniFile(path, self)
+        if not hasattr(cfg, 'write'):
+            qtlib.WarningMsgBox(_('Unable to save authentication'),
+                   _('Iniparse must be installed.'), parent=self)
+            return
+        if fn is None:
+            return
+        try:
+            cfg.set('tortoisehg', 'postpull', self.getValue())
+            wconfig.writefile(cfg, fn)
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn, cfg = loadIniFile([fn], self)
+        super(PostPullDialog, self).accept()
+
+    def reject(self):
+        super(PostPullDialog, self).reject()
 
 class SaveDialog(QDialog):
     def __init__(self, root, alias, url, parent):
