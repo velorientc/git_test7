@@ -305,7 +305,7 @@ class SyncWidget(QWidget):
 
     def pullclicked(self):
         if self.log:
-            self.finishfunc = lambda output: self.invalidate.emit(self.root)
+            self.finishfunc = lambda output: self.invalidate.emit()
         else:
             self.finishfunc = None
         cmdline = ['--repository', self.root, 'pull']
