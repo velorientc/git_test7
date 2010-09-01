@@ -150,9 +150,14 @@ class RepoWidget(QWidget):
         return w
 
     def createSyncWidget(self):
-        # TODO: don't pass workbench
-        sw = SyncWidget(root=self.repo.root, parent=self.workbench)
+        sw = SyncWidget(root=self.repo.root, log=self.workbench.log)
+        sw.outgoingNodes.connect(self.setOutgoingNodes)
+        sw.invalidate.connect(self.reload)
         return sw
+
+    def setOutgoingNodes(self, nodes):
+        self.repo._outgoing = nodes
+        self.refresh()
 
     def createGrepWidget(self):
         upats = {}

@@ -25,22 +25,20 @@ from tortoisehg.hgqt import qtlib, cmdui
 _schemes = ['local', 'ssh', 'http', 'https']
 
 class SyncWidget(QWidget):
+    invalidate = pyqtSignal()
+    outgoingNodes = pyqtSignal(object)
 
-    def __init__(self, root, parent=None, **opts):
+    def __init__(self, root, parent=None, log=None, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
         layout.setSpacing(4)
         self.setLayout(layout)
 
-        if parent:
-            self.workbench = parent
-            log = parent.log
-        else:
+        self.log = log
+        if not log:
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
-            self.workbench = None
-            log = None
 
         self.root = root
         self.finishfunc = None
@@ -237,7 +235,7 @@ class SyncWidget(QWidget):
         elif event.key() == Qt.Key_Escape:
             if self.cmd.core.is_running():
                 self.cmd.core.cancel()
-            elif not self.workbench:
+            elif not self.log:
                 self.close()
         else:
             return super(SyncWidget, self).keyPressEvent(event)
@@ -277,19 +275,17 @@ class SyncWidget(QWidget):
         self.run(['--repository', self.root, 'incoming'])
 
     def pullclicked(self):
-        if self.workbench:
-            def refresh(data):
-                self.workbench.reloadRepository(self.root)
-            self.finishfunc = refresh
+        if self.log:
+            self.finishfunc = lambda: self.invalidate.emit(self.root)
         else:
             self.finishfunc = None
         self.run(['--repository', self.root, 'pull'])
 
     def outclicked(self):
-        if self.workbench:
+        if self.log:
             def outputnodes(data):
                 nodestrs = data.splitlines()[:-1]
-                self.workbench.outgoing_for_root(self.root, nodestrs)
+                self.outgoingNodes.emit(nodestrs)
             self.finishfunc = outputnodes
             self.run(['--repository', self.root, 'outgoing',
                       '--quiet', '--template', '{node}\n'])

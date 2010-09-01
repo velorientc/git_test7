@@ -275,12 +275,6 @@ class Workbench(QMainWindow):
         p = str(url.toLocalFile())
         return paths.find_root(p)
 
-    def outgoing_for_root(self, root, outgoing):
-        repo = thgrepo.repository(self.ui, path=root)
-        repo._outgoing = outgoing
-        self.refreshRepository(root)
-        # TODO: draw out arrows
-
     def dragEnterEvent(self, event):
         d = event.mimeData()
         for u in d.urls():
@@ -531,10 +525,6 @@ class Workbench(QMainWindow):
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):
             rw.goto(rev)
-
-    def refreshRepository(self, root):
-        for rw in self._findrepowidget(root):
-            rw.refresh()
 
     def reloadRepository(self, root):
         for rw in self._findrepowidget(root):
