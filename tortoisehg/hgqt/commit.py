@@ -44,8 +44,7 @@ class CommitWidget(QWidget):
 
         self.opts = opts # user, date
         self.stwidget = status.StatusWidget(pats, opts, root, self)
-        self.connect(self.stwidget, SIGNAL('errorMessage'),
-                     lambda m: self.emit(SIGNAL('errorMessage'), m))
+        self.stwidget.errorMessage.connect(self.errorMessage)
         self.stwidget.loadBegin.connect(lambda: self.loadBegin.emit())
         self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
@@ -166,7 +165,7 @@ class CommitWidget(QWidget):
         self.msgte.setExtraSelections(sels)
 
     def msgReflow(self):
-        'User pressed Alt-Q'
+        'User pressed Control-E, reflow current paragraph'
         if QApplication.focusWidget() != self.msgte:
             return
         self.reflowBlock(self.msgte.textCursor().block())
@@ -503,7 +502,7 @@ class CommitWidget(QWidget):
             else:
                 dcmd = []
         except error.Abort, e:
-            self.emit(SIGNAL('errorMessage'), hglib.tounicode(str(e)))
+            self.errorMessage.emit(hglib.tounicode(str(e)))
             dcmd = []
 
         cmdline = ['commit', '--user', user, '--message', msg]
@@ -529,6 +528,8 @@ class CommitWidget(QWidget):
             if event.modifiers() == Qt.ControlModifier:
                 self.commit()
             return
+        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
+            self.msgReflow()
         return super(CommitWidget, self).keyPressEvent(event)
 
 class MessageHistoryCombo(QComboBox):
@@ -614,11 +615,6 @@ class CommitDialog(QDialog):
         if event.key() == Qt.Key_Escape:
             self.reject()
             return
-        elif event.modifiers() == Qt.AltModifier and event.key() == Qt.Key_Q:
-            self.commit.msgReflow()
-        elif event.modifiers() == Qt.MetaModifier and event.key() == Qt.Key_R:
-            # On a Mac, CTRL-R will also reflow (until someone fixes this)
-            self.commit.msgReflow()
         return super(CommitDialog, self).keyPressEvent(event)
 
     def postcommit(self):
