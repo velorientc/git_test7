@@ -9,6 +9,7 @@ import os
 
 from mercurial import url
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
@@ -211,7 +212,7 @@ class RepoRegistryView(QDockWidget):
             m.addRepo(reporoot)
 
     def openrepo(self, path):
-        self.openRepoSignal.emit(path)
+        self.openRepoSignal.emit(hglib.tounicode(path))
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)

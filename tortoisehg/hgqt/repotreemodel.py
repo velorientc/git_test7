@@ -5,6 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
 from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
@@ -162,7 +163,7 @@ class RepoTreeModel(QAbstractItemModel):
         writeXml(buf, item, extractXmlElementName)
         d = QMimeData()
         d.setData(repoRegMimeType, buf)
-        d.setUrls([QUrl.fromLocalFile(item.rootpath())])
+        d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
         return d
 
     def dropMimeData(self, data, action, row, column, parent):

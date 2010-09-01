@@ -10,6 +10,8 @@ import os
 
 from mercurial import hg, url
 
+from tortoisehg.util import hglib
+
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
@@ -147,9 +149,9 @@ class RepoItem(RepoTreeItem):
                 return QVariant(ico)
             return QVariant()
         if column == 0:
-            return QVariant(os.path.basename(self._root))
+            return QVariant(hglib.tounicode(os.path.basename(self._root)))
         elif column == 1:
-            return QVariant(self._root)
+            return QVariant(hglib.tounicode(self._root))
         return QVariant()
 
     def menulist(self):
@@ -162,12 +164,12 @@ class RepoItem(RepoTreeItem):
         return False
 
     def dump(self, xw):
-        xw.writeAttribute('root', self._root)
+        xw.writeAttribute('root', hglib.tounicode(self._root))
         RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
         a = xr.attributes()
-        self._root = str(a.value('', 'root').toString())
+        self._root = hglib.fromunicode(a.value('', 'root').toString())
         RepoTreeItem.undump(self, xr)
 
     def open(self):
@@ -181,7 +183,7 @@ class RepoItem(RepoTreeItem):
         self._setttingsdlg.show()
 
     def details(self):
-        return _('Local Repository %s') % self._root
+        return _('Local Repository %s') % hglib.tounicode(self._root)
 
     def getRepoItem(self, reporoot):
         if reporoot == self._root:
