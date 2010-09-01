@@ -34,6 +34,7 @@ class SyncWidget(QWidget):
         layout = QVBoxLayout()
         layout.setSpacing(4)
         self.setLayout(layout)
+        self.setAcceptDrops(True)
 
         self.log = log
         if not log:
@@ -215,6 +216,23 @@ class SyncWidget(QWidget):
         self.curpw = passwd
         self.updateInProgress = False
         self.refreshUrl()
+
+    def dragEnterEvent(self, event):
+        event.acceptProposedAction()
+
+    def dragMoveEvent(self, event):
+        event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        data = event.mimeData()
+        if data.hasUrls():
+            url = hglib.fromunicode(data.urls()[0])
+            self.setUrl(url)
+            event.accept()
+        elif data.hasText():
+            text = hglib.fromunicode(data.text())
+            self.setUrl(text)
+            event.accept()
 
     def urlparse(self, path):
         m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
