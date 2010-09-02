@@ -378,6 +378,8 @@ class PostPullDialog(QDialog):
         if 'fetch' in repo.extensions() or repo.postpull == 'fetch':
             self.fetch = QRadioButton(_('Fetch - use fetch extension'))
             layout.addWidget(self.fetch)
+        else:
+            self.fetch = None
         if 'rebase' in repo.extensions() or repo.postpull == 'rebase':
             self.rebase = QRadioButton(_('Rebase - use rebase extension'))
             layout.addWidget(self.rebase)
@@ -418,7 +420,7 @@ class PostPullDialog(QDialog):
             return 'none'
         elif self.update.isChecked():
             return 'update'
-        elif self.fetch.isChecked():
+        elif (self.fetch and self.fetch.isChecked()):
             return 'fetch'
         else:
             return 'rebase'
