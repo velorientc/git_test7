@@ -22,10 +22,17 @@ from tortoisehg.hgqt import qtlib
 
 local = localgettext()
 
-SIG_OUTPUT = SIGNAL('output(PyQt_PyObject)')
-SIG_ERROR = SIGNAL('error(PyQt_PyObject)')
-SIG_INTERACT = SIGNAL('interact(PyQt_PyObject)')
-SIG_PROGRESS = SIGNAL('progress(PyQt_PyObject)')
+class DataWrapper(object):
+    def __init__(self, data):
+        self.data = data
+
+class UiSignal(QObject):
+    writeSignal = pyqtSignal(DataWrapper)
+    errorSignal = pyqtSignal(DataWrapper)
+    interactSignal = pyqtSignal(DataWrapper)
+    progressSignal = pyqtSignal(DataWrapper)
+    def __init__(self):
+        QObject.__init__(self)
 
 class QtUi(ui.ui):
     def __init__(self, src=None, responseq=None):
@@ -35,7 +42,7 @@ class QtUi(ui.ui):
             self.sig = src.sig
             self.responseq = src.responseq
         else:
-            self.sig = QObject() # dummy object to emit signals
+            self.sig = UiSignal()
             self.responseq = responseq
 
         self.setconfig('ui', 'interactive', 'on')
@@ -48,12 +55,12 @@ class QtUi(ui.ui):
             self._buffers[-1].extend([str(a) for a in args])
         else:
             wrapper = DataWrapper((''.join(args), opts.get('label', '')))
-            self.sig.emit(SIG_OUTPUT, wrapper)
+            self.sig.writeSignal.emit(wrapper)
 
     def write_err(self, *args, **opts):
         for a in args:
             data = DataWrapper((str(a), opts.get('label', 'ui.error')))
-            self.sig.emit(SIG_ERROR, data)
+            self.sig.errorSignal.emit(data)
 
     def label(self, msg, label):
         return msg
@@ -64,9 +71,8 @@ class QtUi(ui.ui):
     def prompt(self, msg, choices=None, default='y'):
         if not self.interactive(): return default
         try:
-            # emit SIG_INTERACT signal
             data = DataWrapper((msg, False, choices, None))
-            self.sig.emit(SIG_INTERACT, data)
+            self.sig.interactSignal.emit(data)
             # await response
             r = self.responseq.get(True)
             if r is None:
@@ -84,9 +90,8 @@ class QtUi(ui.ui):
     def promptchoice(self, msg, choices, default=0):
         if not self.interactive(): return default
         try:
-            # emit SIG_INTERACT signal
             data = DataWrapper((msg, False, choices, default))
-            self.sig.emit(SIG_INTERACT, data)
+            self.sig.interactSignal.emit(data)
             # await response
             r = self.responseq.get(True)
             if r is None:
@@ -96,9 +101,8 @@ class QtUi(ui.ui):
             raise util.Abort(local._('response expected'))
 
     def getpass(self, prompt=_('password: '), default=None):
-        # emit SIG_INTERACT signal
         data = DataWrapper((prompt, True, None, default))
-        self.sig.emit(SIG_INTERACT, data)
+        self.sig.interactSignal.emit(data)
         # await response
         r = self.responseq.get(True)
         if r is None:
@@ -107,12 +111,8 @@ class QtUi(ui.ui):
 
     def progress(self, topic, pos, item='', unit='', total=None):
         data = DataWrapper((topic, item, pos, total, unit))
-        self.sig.emit(SIG_PROGRESS, data)
+        self.sig.progressSignal.emit(data)
 
-class DataWrapper(QObject):
-    def __init__(self, data):
-        super(DataWrapper, self).__init__(None)
-        self.data = data
 
 class CmdThread(QThread):
     """Run an Mercurial command in a background thread, implies output
@@ -152,19 +152,13 @@ class CmdThread(QThread):
         self.buffering = buffering
         self.buffer = []
 
-        # Re-emit all ui.sig's signals to CmdThread (self).
-        # QSignalMapper doesn't help for this since our SIGNAL
-        # parameters contain 'PyQt_PyObject' types.
-        for name, sig in ((SIG_ERROR, self.errorReceived),
-                          (SIG_INTERACT, self.interactReceived),
-                          (SIG_PROGRESS, self.progressReceived)):
-            def repeater(sig): # hide 'sig' local variable name
-                return lambda data: sig.emit(data)
-            self.connect(self.ui.sig, name, repeater(sig))
+        self.ui.sig.writeSignal.connect(self.output_handler)
+        self.ui.sig.errorSignal.connect(self.errorReceived)
+        self.ui.sig.interactSignal.connect(self.interactReceived)
+        self.ui.sig.progressSignal.connect(self.progressReceived)
 
         self.finished.connect(self.thread_finished)
         self.interactReceived.connect(self.interact_handler)
-        self.connect(self.ui.sig, SIG_OUTPUT, self.output_handler)
 
     def abort(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
@@ -178,7 +172,20 @@ class CmdThread(QThread):
 
     def thread_finished(self):
         self.flush()
-        self.commandFinished.emit(DataWrapper(self.ret))
+
+        if self.ret is None:
+            if self.abortbyuser:
+                msg = _('[command terminated by user %s]')
+            else:
+                msg = _('[command interrupted %s]')
+        elif self.ret:
+            msg = _('[command returned code %d %%s]') % int(self.ret)
+        else:
+            msg = _('[command completed successfully %s]')
+        msg = msg % time.asctime() + '\n'
+        w = DataWrapper(self.ret)
+        w.message = msg
+        self.commandFinished.emit(w)
 
     def output_handler(self, wrapper):
         if self.buffering:
@@ -231,14 +238,3 @@ class CmdThread(QThread):
             self.ui.write_err(str(e) + '\n')
         except KeyboardInterrupt:
             pass
-
-        if self.ret is None:
-            if self.abortbyuser:
-                msg = _('[command terminated by user %s]')
-            else:
-                msg = _('[command interrupted %s]')
-        elif self.ret:
-            msg = _('[command returned code %d %%s]') % int(self.ret)
-        else:
-            msg = _('[command completed successfully %s]')
-        self.ui.write(msg % time.asctime() + '\n', label='control')
