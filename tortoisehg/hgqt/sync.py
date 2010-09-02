@@ -369,6 +369,7 @@ class PostPullDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.setWindowTitle(_('Post Pull Behavior'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.none = QRadioButton(_('None - simply pull changesets'))
         self.update = QRadioButton(_('Update - pull, then try to update'))
@@ -479,6 +480,7 @@ class SaveDialog(QDialog):
         layout.addWidget(bb)
         self.aliasentry.selectAll()
         self.setWindowTitle(_('Save Peer Path'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
     def accept(self):
@@ -563,6 +565,7 @@ class AuthDialog(QDialog):
         self.bb = bb
         layout.addWidget(bb)
         self.setWindowTitle(_('Authentication: ') + host)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.userentry.selectAll()
         QTimer.singleShot(0, lambda:self.userentry.setFocus())
 
