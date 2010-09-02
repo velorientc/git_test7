@@ -11,7 +11,7 @@ import time
 from mercurial import ui
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, thread
 from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
@@ -48,6 +48,7 @@ class LogDockWidget(QDockWidget):
         self.pbars = []
         self.topics = {}
 
+    @pyqtSlot(thread.DataWrapper)
     def progress(self, wrapper):
         # topic is current operation
         # pos is the current numeric position (revision, bytes)
@@ -88,12 +89,21 @@ class LogDockWidget(QDockWidget):
             pm.status.setText('%s %s' % (str(pos), item))
             pm.unknown()
 
+    @pyqtSlot(thread.DataWrapper)
+    def output(self, wrapper):
+        msg, label = wrapper.data
+        msg = hglib.tounicode(msg)
+        msg = Qt.escape(msg)
+        style = qtlib.geteffect(label)
+        self.logMessage(msg, style)
+
     def logMessage(self, msg, style=''):
         if msg.endsWith('\n'):
             msg.chop(1)
         msg = msg.replace('\n', '<br/>')
         self.logte.appendHtml('<font style="%s">%s</font>' % (style, msg))
 
+    @pyqtSlot()
     def clear(self):
         self.logte.clear()
 

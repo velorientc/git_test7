@@ -140,7 +140,7 @@ class CmdThread(QThread):
     #         others - return code of command
     commandFinished = pyqtSignal(DataWrapper)
 
-    def __init__(self, cmdline, parent=None, buffering=False):
+    def __init__(self, cmdline, parent=None):
         super(CmdThread, self).__init__()
 
         self.cmdline = cmdline
@@ -149,8 +149,7 @@ class CmdThread(QThread):
         self.abortbyuser = False
         self.responseq = Queue.Queue()
         self.ui = QtUi(responseq=self.responseq)
-        self.buffering = buffering
-        self.buffer = []
+        self.rawoutput = []
 
         self.ui.sig.writeSignal.connect(self.output_handler)
         self.ui.sig.errorSignal.connect(self.errorReceived)
@@ -165,14 +164,7 @@ class CmdThread(QThread):
             self.abortbyuser = True
             thread2._async_raise(self.thread_id, KeyboardInterrupt)
 
-    def flush(self):
-        for item in self.buffer:
-            self.outputReceived.emit(item)
-        self.buffer = []
-
     def thread_finished(self):
-        self.flush()
-
         if self.ret is None:
             if self.abortbyuser:
                 msg = _('[command terminated by user %s]')
@@ -188,12 +180,8 @@ class CmdThread(QThread):
         self.commandFinished.emit(w)
 
     def output_handler(self, wrapper):
-        if self.buffering:
-            if not self.buffer:
-                QTimer.singleShot(20, self.flush)
-            self.buffer.append(wrapper)
-        else:
-            self.outputReceived.emit(wrapper)
+        self.rawoutput.append(wrapper.data[0])
+        self.outputReceived.emit(wrapper)
 
     def interact_handler(self, wrapper):
         prompt, password, choices, default = wrapper.data

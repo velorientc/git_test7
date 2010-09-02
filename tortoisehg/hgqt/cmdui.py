@@ -74,6 +74,7 @@ class Core(QObject):
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
     progress = pyqtSignal(thread.DataWrapper)
+    clearSignal = pyqtSignal()
 
     def __init__(self, logwidget=None):
         super(Core, self).__init__()
@@ -83,14 +84,14 @@ class Core(QObject):
         self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.pmon = None
         self.queue = []
-        self.rawoutput = []
         self.log = logwidget
+        self.display = None
 
     ### Public Methods ###
 
-    def run(self, cmdline, *cmdlines):
+    def run(self, cmdline, *cmdlines, **opts):
         '''Execute or queue Mercurial command'''
-        self.rawoutput = []
+        self.display = opts.get('display')
         self.queue.append(cmdline)
         if len(cmdlines):
             self.queue.extend(cmdlines)
@@ -110,7 +111,10 @@ class Core(QObject):
         return bool(self.thread and self.thread.isRunning())
 
     def get_rawoutput(self):
-        return u''.join(self.rawoutput)
+        if self.thread:
+            return ''.join(self.thread.rawoutput)
+        else:
+            return ''
 
     ### Private Method ###
 
@@ -123,12 +127,18 @@ class Core(QObject):
 
         self.thread.started.connect(self.command_started)
         self.thread.commandFinished.connect(self.command_finished)
-        self.thread.outputReceived.connect(self.output_received)
         self.thread.errorReceived.connect(self.error_received)
         if self.log:
-            self.thread.progressReceived.connect(self.fwdprogress)
+            self.thread.outputReceived.connect(self.log.output)
+            self.thread.progressReceived.connect(self.log.progress)
+            self.clearSignal.connect(self.log.clear)
         elif self.pmon:
+            self.thread.outputReceived.connect(self.output_received)
             self.thread.progressReceived.connect(self.progress_received)
+            self.clearSignal.connect(self.output_text.clear)
+        if self.display:
+            w = thread.DataWrapper((self.display, ''))
+            self.thread.outputReceived.emit(w)
         self.thread.start()
 
         return True
@@ -142,10 +152,7 @@ class Core(QObject):
         self.output_text.verticalScrollBar().setSliderPosition(max)
 
     def clear_output(self):
-        if self.log:
-            self.log.clear()
-        else:
-            self.output_text.clear()
+        self.clearSignal.emit()
 
     ### Signal Handlers ###
 
@@ -157,8 +164,8 @@ class Core(QObject):
         self.commandStarted.emit()
 
     def command_finished(self, wrapper):
-        ret = wrapper.data
-        self.writemsg(wrapper.message, 'control')
+        ret, msg = wrapper.data, wrapper.message
+        self.thread.outputReceived.emit(thread.DataWrapper((msg, 'control')))
 
         if self.pmon:
             if ret is None:
@@ -191,7 +198,6 @@ class Core(QObject):
 
     def output_received(self, wrapper):
         msg, label = wrapper.data
-        self.rawoutput.append(msg)
         msg = hglib.tounicode(msg)
         self.writemsg(Qt.escape(msg), label)
 
@@ -203,17 +209,7 @@ class Core(QObject):
     def writemsg(self, msg, label):
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
-        if self.log:
-            self.log.logMessage(msg, style)
-        else:
-            self.append_output(msg, style)
-
-    def fwdprogress(self, wrapper):
-        topic, item, pos, total, unit = wrapper.data
-        if self.thread.isFinished():
-            self.progress.emit(thread.DataWrapper((topic, None, '', '', None)))
-        else:
-            self.progress.emit(wrapper)
+        self.append_output(msg, style)
 
     def progress_received(self, wrapper):
         if self.thread.isFinished():
@@ -287,10 +283,7 @@ class Widget(QWidget):
     ### Public Methods ###
 
     def run(self, cmdline, *args, **opts):
-        if 'display' in opts:
-            w = thread.DataWrapper((opts['display'], ''))
-            self.core.output_received(w)
-        self.core.run(cmdline, *args)
+        self.core.run(cmdline, *args, **opts)
 
     def cancel(self):
         self.core.cancel()
@@ -433,8 +426,8 @@ class Runner(QObject):
 
     ### Public Methods ###
 
-    def run(self, cmdline, *args):
-        self.core.run(cmdline, *args)
+    def run(self, cmdline, *args, **opts):
+        self.core.run(cmdline, *args, **opts)
 
     def cancel(self):
         self.core.cancel()
