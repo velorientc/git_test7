@@ -22,7 +22,9 @@ keep = i18n.keepgettext()
 
 class TagDialog(QDialog):
 
-    repoInvalidated = pyqtSignal()
+    tagChanged = pyqtSignal()
+    localTagChanged = pyqtSignal()
+    showMessage = pyqtSignal(str)
 
     def __init__(self, repo=None, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
@@ -36,7 +38,7 @@ class TagDialog(QDialog):
             if root:
                 self.repo = thgrepo.repository(self.ui, path=root)
             else:
-                raise 'not repository'
+                raise 'no repository found'
 
         if not tag and rev and rev != 'tip':
             bmarks = hglib.get_repo_bookmarks(self.repo)
@@ -234,6 +236,7 @@ class TagDialog(QDialog):
         self.status.setShown(True)
         self.sep.setShown(True)
         self.status.set_status(text, icon)
+        self.showMessage.emit(text)
 
     def clear_statue(self):
         self.status.setHidden(True)
@@ -266,8 +269,11 @@ class TagDialog(QDialog):
             self.set_status(_("Tag '%s' has been added") % name, True)
             self.update_tagcombo()
             self.close_btn.setFocus()
-            self.repoInvalidated.emit()
-
+            self.repo.thginvalidate()
+            if local:
+                self.localTagChanged.emit()
+            else:
+                self.tagChanged.emit()
         except:
             self.set_status(_('Error in tagging'), False)
             print traceback.format_exc()
@@ -298,8 +304,11 @@ class TagDialog(QDialog):
             self.set_status(_("Tag '%s' has been removed") % name, True)
             self.update_tagcombo()
             self.close_btn.setFocus()
-            self.repoInvalidated.emit()
-
+            self.repo.thginvalidate()
+            if local:
+                self.localTagChanged.emit()
+            else:
+                self.tagChanged.emit()
         except:
             self.set_status(_('Error in tagging'), False)
             print traceback.format_exc()

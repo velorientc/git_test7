@@ -602,17 +602,11 @@ class RepoWidget(QWidget):
 
     def tagToRevision(self, rev=None):
         rev = rev or self.rev
-        origlen = len(self.repo)
         saved = self.setScanForRepoChanges(False)
         dlg = tag.TagDialog(self.repo, rev=str(rev), parent=self)
-        def invalidated():
-            self.repo.thginvalidate()
-            origlen = len(self.repo)
-            if len(self.repo) != origlen:
-                self.reload()
-            else:
-                self.refresh()
-        dlg.repoInvalidated.connect(invalidated)
+        dlg.tagChanged.connect(self.reload)
+        dlg.localTagChanged.connect(self.refresh)
+        dlg.showMessage.connect(self.showMessage)
         dlg.exec_()
         self.setScanForRepoChanges(saved)
 
