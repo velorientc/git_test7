@@ -666,7 +666,7 @@ class SettingsForm(QWidget):
         self.ini = self.loadIniFile(self.rcpath)
         self.readonly = not (hasattr(self.ini, 'write') and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
-        self.fnedit.setText(self.fn)
+        self.fnedit.setText(hglib.tounicode(self.fn))
         for info, widgets in self.pages.values():
             for row, (label, cpath, values, tooltip) in enumerate(info):
                 curvalue = self.readCPath(cpath)
