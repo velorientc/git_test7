@@ -18,7 +18,7 @@ from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt import cmdui, update, tag, backout, merge
+from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run
 
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -37,20 +37,18 @@ class RepoWidget(QWidget):
     closeSelfSignal = pyqtSignal(QWidget)
 
     def __init__(self, repo, workbench):
+        QWidget.__init__(self)
+
         self.repo = repo
         self.workbench = workbench
         self._reload_rev = '.' # select working parent at startup
         self._scanForRepoChanges = True
-        self.disab_shortcuts = []
         self.currentMessage = ''
         self.runner = None
-
-        QWidget.__init__(self)
 
         self.load_config()
         self.setupUi()
         self.createActions()
-
         self.setupModels()
 
         self._repodate = self._getrepomtime()
@@ -70,19 +68,9 @@ class RepoWidget(QWidget):
         view.revisionSelected.connect(self.revision_selected)
         view.revisionClicked.connect(self.revision_clicked)
         view.revisionActivated.connect(self.revision_activated)
-        view.updateToRevision.connect(self.updateToRevision)
-        view.mergeWithRevision.connect(self.mergeWithRevision)
-        view.tagToRevision.connect(self.tagToRevision)
-        view.backoutToRevision.connect(self.backoutToRevision)
-        view.emailRevision.connect(self.emailRevision)
-        view.archiveRevision.connect(self.archiveRevision)
-        view.copyHashSignal.connect(self.copyHash)
-        view.rebaseRevision.connect(self.rebaseRevision)
-        view.qimportRevision.connect(self.qimportRevision)
-        view.qfinishRevision.connect(self.qfinishRevision)
-        view.stripRevision.connect(self.stripRevision)
         view.showMessage.connect(self.showMessage)
-        view.qgotoRevision.connect(self.qgotoRevision)
+        view.menuRequested.connect(self.viewMenuRequest)
+
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(1)
@@ -222,7 +210,37 @@ class RepoWidget(QWidget):
                                              Qt.SHIFT+Qt.Key_Enter])
         self.actionActivateRev.triggered.connect(self.revision_activated)
         self.addAction(self.actionActivateRev)
-        self.disab_shortcuts.append(self.actionActivateRev)
+
+        allactions = [
+            ('manifest', _('Browse at rev...'), None,
+                _('Show the manifest at selected revision'), None, self.manifestRevision),
+            ('update', _('Update...'), 'update', None, None, self.updateToRevision),
+            ('merge', _('Merge with...'), 'merge', None, None, self.mergeWithRevision),
+            ('tag', _('Tag...'), 'tag', None, None, self.tagToRevision),
+            ('backout', _('Backout...'), None, None, None, self.backoutToRevision),
+            ('email', _('Email patch...'), None, None, None, self.emailRevision),
+            ('archive', _('Archive...'), None, None, None, self.archiveRevision),
+            ('copyhash', _('Copy hash'), None, None, None, self.copyHash),
+            ('rebase', _('Rebase...'), None, None, None, self.rebaseRevision),
+            ('qimport', _('Import Revision to MQ'), None, None, None,
+                self.qimportRevision),
+            ('qfinish', _('Finish patch'), None, None, None, self.qfinishRevision),
+            ('strip', _('Strip Revision...'), None, None, None, self.stripRevision),
+            ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision)
+        ]
+
+        self._actions = {}
+        for name, desc, icon, tip, key, cb in allactions:
+            self._actions[name] = act = QAction(desc, self)
+            if icon:
+                act.setIcon(geticon(icon))
+            if tip:
+                act.setStatusTip(tip)
+            if key:
+                act.setShortcut(key)
+            if cb:
+                act.triggered.connect(cb)
+            self.addAction(act)
 
     def back(self):
         self.repoview.back()
@@ -367,117 +385,20 @@ class RepoWidget(QWidget):
         # Perhaps we can update a GUI element later, to indicate full load
         pass
 
-    def revision_activated(self, rev=None):
-        # TODO: launch visual diff of this revision.  Manifest should
-        # be available as a menu option
-        run.manifest(self.repo.ui, repo=self.repo,
-                     rev=rev or self.rev)
-
     def setScanForRepoChanges(self, enable):
         saved = self._scanForRepoChanges
         self._scanForRepoChanges = enable
         return saved
 
-    def updateToRevision(self, rev):
-        saved = self.setScanForRepoChanges(False)
-        dlg = update.UpdateDialog(rev, self.repo, self)
-        if dlg.exec_():
-            self.reload()
-        self.setScanForRepoChanges(saved)
-
-    def mergeWithRevision(self, rev):
-        saved = self.setScanForRepoChanges(False)
-        dlg = merge.MergeDialog(rev, self.repo, self)
-        def invalidated():
-            self.reload()
-        dlg.repoInvalidated.connect(invalidated)
-        dlg.exec_()
-        self.setScanForRepoChanges(saved)
-
-    def tagToRevision(self, rev):
-        origlen = len(self.repo)
-        saved = self.setScanForRepoChanges(False)
-        dlg = tag.TagDialog(self.repo, rev=str(rev), parent=self)
-        def invalidated():
-            self.repo.thginvalidate()
-            if len(self.repo) != origlen:
-                self.reload()
-            else:
-                self.refresh()
-            origlen = len(self.repo)
-        dlg.repoInvalidated.connect(invalidated)
-        dlg.exec_()
-        self.setScanForRepoChanges(saved)
-
-    def backoutToRevision(self, rev):
-        saved = self.setScanForRepoChanges(False)
-        dlg = backout.BackoutDialog(self.repo, str(rev), self)
-        if dlg.exec_():
-            self.reload()
-        self.setScanForRepoChanges(saved)
-
-    def stripRevision(self, rev):
-        """Strip the selected revision and all descendants"""
-        saved = self.setScanForRepoChanges(False)
-        dlg = thgstrip.StripDialog(self.repo, rev=str(rev), parent=self)
-        if dlg.exec_():
-            self.reload()
-        self.setScanForRepoChanges(saved)
-
-    def emailRevision(self, rev):
-        run.email(self.repo.ui, rev=[str(rev)], repo=self.repo)
-
-    def archiveRevision(self, rev):
-        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, rev, self)
-        dlg.exec_()
-
-    def copyHash(self, rev):
-        clip = QApplication.clipboard()
-        clip.setText(binascii.hexlify(self.repo[rev].node()))
-
-    def rebaseRevision(self, srcrev):
-        """Rebase selected revision on top of working directory parent"""
-        dstrev = self.repo['.'].rev()
-        main = _("Confirm Rebase Revision")
-        text = _("Rebase revision %d on top of %d?") % (srcrev, dstrev)
-        labels = ((QMessageBox.Yes, _('&Yes')),
-                  (QMessageBox.No, _('&No')))
-        cmdline = ['rebase', '--source', str(srcrev), '--dest', str(dstrev),
-                   '--repository', self.repo.root]
-        if QuestionMsgBox(_('Confirm Rebase'), main, text, labels=labels,
-                          parent=self):
-            self.runCommand(_('Rebase - TortoiseHg'), cmdline)
-
-    def qimportRevision(self, rev):
-        """QImport revision and all descendents to MQ"""
-        if 'qparent' in self.repo.tags():
-            endrev = 'qparent'
-        else:
-            endrev = ''
-        cmdline = ['qimport', '--rev', '%s::%s' % (rev, endrev),
-                   '--repository', self.repo.root]
-        self.runCommand(_('QImport - TortoiseHg'), cmdline)
-
-    def qfinishRevision(self, rev):
-        """Finish applied patches up to and including selected revision"""
-        cmdline = ['qfinish', 'qbase::%s' % rev,
-                   '--repository', self.repo.root]
-        self.runCommand(_('QFinish - TortoiseHg'), cmdline)
-
-    def qgotoRevision(self, patchname):
-        """Make PATCHNAME the top applied patch"""
-        cmdline = ['qgoto', str(patchname),  # FIXME force option
-                   '--repository', self.repo.root]
-        self.runCommand(_('QGoto - TortoiseHg'), cmdline)
-
     def revision_clicked(self, rev):
         'User clicked on a repoview row'
+        tw = self.taskTabsWidget
         if rev is None:
-            self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
+            tw.setCurrentIndex(self.commitTabIndex)
         else:
             revwidgets = (self.revDetailsWidget, self.manifestDemand)
-            if self.taskTabsWidget.currentWidget() not in revwidgets:
-                self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
+            if tw.currentWidget() not in revwidgets:
+                tw.setCurrentIndex(self.logTabIndex)
 
     def revision_selected(self, rev):
         'View selection changed, could be a reload'
@@ -497,6 +418,12 @@ class RepoWidget(QWidget):
             # store rev to show once it's available (when graph
             # filling is still running)
             self._reload_rev = rev
+
+    def revision_activated(self, rev=None):
+        rev = rev or self.rev
+        if isinstance(rev, basestring):  # unapplied patch
+            return
+        visdiff.visualdiff(self.repo.ui, self.repo, [], {'change':rev})
 
     def _getrepomtime(self):
         """Return the last modification time for the repo"""
@@ -619,3 +546,143 @@ class RepoWidget(QWidget):
             self.runner = None
         self.runner.commandFinished.connect(finished)
         self.runner.run(cmdline)
+
+    ##
+    ## Repoview context menu
+    ##
+
+    def viewMenuRequest(self, point, selection):
+        'User requested a context menu in repo view widget'
+        # TODO: selection is ignored at the moment
+        menu = QMenu(self)
+        for act in ['update', 'manifest', 'merge', 'tag', 'backout',
+                    'email', 'archive', 'copyhash', None,
+                    None]:
+            if act:
+                menu.addAction(self._actions[act])
+            else:
+                menu.addSeparator()
+        exs = self.repo.extensions()
+        if 'rebase' in exs:
+            menu.addSeparator()
+            menu.addAction(self._actions['rebase'])
+        if 'mq' in exs:
+            ctx = self.repo.changectx(self.rev)
+            menu.addSeparator()
+            if ctx.thgmqappliedpatch():
+                menu.addAction(self._actions['qfinish'])
+            elif ctx.thgmqunappliedpatch():
+                menu.addAction(self._actions['qgoto'])
+            else:
+                menu.addAction(self._actions['qimport'])
+            menu.addAction(self._actions['strip'])
+        menu.exec_(point)
+
+    def updateToRevision(self, rev=None):
+        rev = rev or self.rev
+        saved = self.setScanForRepoChanges(False)
+        dlg = update.UpdateDialog(rev, self.repo, self)
+        if dlg.exec_():
+            self.reload()
+        self.setScanForRepoChanges(saved)
+
+    def manifestRevision(self, rev=None):
+        rev = rev or self.rev
+        run.manifest(self.repo.ui, repo=self.repo, rev=rev or self.rev)
+
+    def mergeWithRevision(self, rev=None):
+        rev = rev or self.rev
+        saved = self.setScanForRepoChanges(False)
+        dlg = merge.MergeDialog(rev, self.repo, self)
+        def invalidated():
+            self.reload()
+        dlg.repoInvalidated.connect(invalidated)
+        dlg.exec_()
+        self.setScanForRepoChanges(saved)
+
+    def tagToRevision(self, rev=None):
+        rev = rev or self.rev
+        origlen = len(self.repo)
+        saved = self.setScanForRepoChanges(False)
+        dlg = tag.TagDialog(self.repo, rev=str(rev), parent=self)
+        def invalidated():
+            self.repo.thginvalidate()
+            if len(self.repo) != origlen:
+                self.reload()
+            else:
+                self.refresh()
+            origlen = len(self.repo)
+        dlg.repoInvalidated.connect(invalidated)
+        dlg.exec_()
+        self.setScanForRepoChanges(saved)
+
+    def backoutToRevision(self, rev=None):
+        rev = rev or self.rev
+        saved = self.setScanForRepoChanges(False)
+        dlg = backout.BackoutDialog(self.repo, str(rev), self)
+        if dlg.exec_():
+            self.reload()
+        self.setScanForRepoChanges(saved)
+
+    def stripRevision(self, rev=None):
+        """Strip the selected revision and all descendants"""
+        rev = rev or self.rev
+        saved = self.setScanForRepoChanges(False)
+        dlg = thgstrip.StripDialog(self.repo, rev=str(rev), parent=self)
+        if dlg.exec_():
+            self.reload()
+        self.setScanForRepoChanges(saved)
+
+    def emailRevision(self, rev=None):
+        rev = rev or self.rev
+        run.email(self.repo.ui, rev=[str(rev)], repo=self.repo)
+
+    def archiveRevision(self, rev=None):
+        rev = rev or self.rev
+        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, rev, self)
+        dlg.exec_()
+
+    def copyHash(self, rev=None):
+        rev = rev or self.rev
+        clip = QApplication.clipboard()
+        clip.setText(binascii.hexlify(self.repo[rev].node()))
+
+    def rebaseRevision(self, srcrev=None):
+        """Rebase selected revision on top of working directory parent"""
+        srcrev = srcrev or self.rev
+        dstrev = self.repo['.'].rev()
+        main = _("Confirm Rebase Revision")
+        text = _("Rebase revision %d on top of %d?") % (srcrev, dstrev)
+        labels = ((QMessageBox.Yes, _('&Yes')),
+                  (QMessageBox.No, _('&No')))
+        cmdline = ['rebase', '--source', str(srcrev), '--dest', str(dstrev),
+                   '--repository', self.repo.root]
+        if QuestionMsgBox(_('Confirm Rebase'), main, text, labels=labels,
+                          parent=self):
+            self.runCommand(_('Rebase - TortoiseHg'), cmdline)
+
+    def qimportRevision(self, rev=None):
+        """QImport revision and all descendents to MQ"""
+        rev = rev or self.rev
+        if 'qparent' in self.repo.tags():
+            endrev = 'qparent'
+        else:
+            endrev = ''
+        cmdline = ['qimport', '--rev', '%s::%s' % (rev, endrev),
+                   '--repository', self.repo.root]
+        self.runCommand(_('QImport - TortoiseHg'), cmdline)
+
+    def qfinishRevision(self, rev=None):
+        """Finish applied patches up to and including selected revision"""
+        rev = rev or self.rev
+        cmdline = ['qfinish', 'qbase::%s' % rev,
+                   '--repository', self.repo.root]
+        self.runCommand(_('QFinish - TortoiseHg'), cmdline)
+
+    def qgotoRevision(self, patchname=None):
+        """Make PATCHNAME the top applied patch"""
+        patchname = patchname or self.rev
+        cmdline = ['qgoto', str(patchname),  # FIXME force option
+                   '--repository', self.repo.root]
+        self.runCommand(_('QGoto - TortoiseHg'), cmdline)
+
