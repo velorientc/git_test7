@@ -232,10 +232,6 @@ class Workbench(QMainWindow):
         m.addSeparator()
         m.addAction(self.actionQuit)
 
-        self.menuHelp = m = QMenu(_("&Help"), self.menubar)
-        m.addAction(self.actionHelp)
-        m.addAction(self.actionAbout)
-
         self.menuView = m = QMenu(_("&View"), self.menubar)
         m.addAction(self.actionShowRepoRegistry)
         m.addAction(self.actionShowPaths)
@@ -259,6 +255,10 @@ class Workbench(QMainWindow):
         m.addSeparator()
         m.addAction(self.actionExplore)
         m.addAction(self.actionTerminal)
+
+        self.menuHelp = m = QMenu(_("&Help"), self.menubar)
+        m.addAction(self.actionHelp)
+        m.addAction(self.actionAbout)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -438,6 +438,11 @@ class Workbench(QMainWindow):
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
         self.actionShowLog.toggled.connect(self.showLog)
 
+        self.actionNew_repository.triggered.connect(self.newRepository)
+        self.actionOpen_repository.triggered.connect(self.openRepository)
+        self.actionClose_repository.triggered.connect(self.closeRepository)
+        self.actionSettings.triggered.connect(self.editSettings)
+
         self.actionServe.triggered.connect(self.serve)
         self.actionVerify.triggered.connect(self.verify)
         self.actionRecover.triggered.connect(self.recover)
@@ -446,11 +451,7 @@ class Workbench(QMainWindow):
         self.actionExplore.triggered.connect(self.explore)
         self.actionTerminal.triggered.connect(self.terminal)
 
-        self.actionNew_repository.triggered.connect(self.newRepository)
-        self.actionOpen_repository.triggered.connect(self.openRepository)
-        self.actionClose_repository.triggered.connect(self.closeRepository)
         self.actionHelp.triggered.connect(self.on_help)
-        self.actionSettings.triggered.connect(self.editSettings)
 
 
     def actionShowPathsToggled(self, show):
