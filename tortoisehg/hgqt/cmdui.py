@@ -158,6 +158,7 @@ class Core(QObject):
 
     def command_finished(self, wrapper):
         ret = wrapper.data
+        self.writemsg(wrapper.message, 'control')
 
         if self.pmon:
             if ret is None:
@@ -192,16 +193,14 @@ class Core(QObject):
         msg, label = wrapper.data
         self.rawoutput.append(msg)
         msg = hglib.tounicode(msg)
-        msg = Qt.escape(msg)
-        style = qtlib.geteffect(label)
-        if self.log:
-            self.log.logMessage(msg, style)
-        else:
-            self.append_output(msg, style)
+        self.writemsg(Qt.escape(msg), label)
 
     def error_received(self, wrapper):
         msg, label = wrapper.data
         msg = hglib.tounicode(msg)
+        self.writemsg(Qt.escape(msg), label)
+
+    def writemsg(self, msg, label):
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
         if self.log:
