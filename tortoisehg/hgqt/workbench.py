@@ -405,9 +405,9 @@ class Workbench(QMainWindow):
         self.allpar_action = allpar_action
         self.branchLabel.setMenu(self.branch_menu)
         self.branchCombo = QComboBox()
-        self.branchCombo.activated.connect(self.refreshRevisionTable)
+        self.branchCombo.activated.connect(self.setBranch)
         cbranch_action.toggled.connect(self.setupBranchCombo)
-        allpar_action.toggled.connect(self.refreshRevisionTable)
+        allpar_action.toggled.connect(self.setBranch)
 
         self.filterToolbar.layout().setSpacing(3)
 
@@ -560,15 +560,15 @@ class Workbench(QMainWindow):
                 yield rw
 
     #@timeit
-    def refreshRevisionTable(self, *args, **kw):
-        """Starts the process of filling the HgModel"""
+    def setBranch(self, *args, **kw):
+        'Handle new branch choice or allparents toggle'
         branch = self.branchCombo.currentText()
         branch = str(branch)
         allparents = self.allpar_action.isChecked()
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         if w:
-            w.setRepomodel(branch, allparents)
+            w.setBranch(branch, allparents)
             if branch:
                 tabtext = '%s [%s]' % (w.reponame(), branch)
             else:

@@ -99,7 +99,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.repo = repo
         self.reloadConfig()
         self.updateColumns()
-        self.setRepo(repo, branch=branch)
+        self.setBranch(branch)
 
         # To be deleted
         self._user_colors = {}
@@ -120,17 +120,13 @@ class HgRepoListModel(QAbstractTableModel):
                            }
 
 
-    def setRepo(self, repo, branch='', allparents=True):
-        oldroot = self.repo.root
-        self.repo = repo
+    def setBranch(self, branch='', allparents=True):
         self.filterbranch = branch
-        if oldroot != repo.root:
-            self.reloadConfig()
-            self.updateColumns()
         self.datacache = {}
         grapher = revision_grapher(self.repo, start_rev=None, follow=False,
                                    branch=branch, allparents=allparents)
-        self.graph = Graph(self.repo, grapher, self.max_file_size, include_mq=True)
+        self.graph = Graph(self.repo, grapher, self.max_file_size,
+                           include_mq=True)
         self.rowcount = 0
         self.layoutChanged.emit()
         self.ensureBuilt(row=self.fill_step)

@@ -557,8 +557,9 @@ class RepoWidget(QWidget):
         self.repomodel.invalidate()
         self.revDetailsWidget.on_filled()
 
-    def setRepomodel(self, branch, allparents=True):
-        self.repomodel.setRepo(self.repo, branch=branch, allparents=allparents)
+    def setBranch(self, branch, allparents=True):
+        'Triggered by workbench on branch selection'
+        self.repomodel.setBranch(branch=branch, allparents=allparents)
 
     def filterbranch(self):
         return self.repomodel.branch()
@@ -570,9 +571,7 @@ class RepoWidget(QWidget):
         return True
 
     def switchedTo(self):
-        self.updateActions()
-
-    def updateActions(self):
+        'Update back / forward actions'
         self.repoview.updateActions()
 
     def storeSettings(self):
