@@ -596,12 +596,16 @@ class Workbench(QMainWindow):
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
+        s.setValue(wb + 'showPaths', self.actionShowPaths.isChecked())
 
     def restoreSettings(self):
         s = QSettings()
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
+        # Allow repo registry to assemble itself before toggling path state
+        sp = s.value(wb + 'showPaths').toBool()
+        QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
 
     def closeEvent(self, event):
         if not self.closeRepoTabs():
