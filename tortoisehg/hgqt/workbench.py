@@ -150,6 +150,7 @@ class Workbench(QMainWindow):
         a.setShortcut(QKeySequence.Close)
 
         self.actionSettings = a = QAction(_('&Settings...'), self)
+        a.setShortcut(QKeySequence.Preferences)
         a.setIcon(geticon('settings_user'))
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
