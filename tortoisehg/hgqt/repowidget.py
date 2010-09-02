@@ -34,7 +34,6 @@ from PyQt4.QtGui import *
 class RepoWidget(QWidget):
 
     showMessageSignal = pyqtSignal(str)
-    switchToSignal = pyqtSignal(QWidget)
     closeSelfSignal = pyqtSignal(QWidget)
 
     def __init__(self, repo, workbench):
@@ -575,9 +574,6 @@ class RepoWidget(QWidget):
         if cw:
             return cw.canExit()
         return True
-
-    def switchTo(self):
-        self.switchToSignal.emit(self)
 
     def switchedTo(self):
         self.updateActions()

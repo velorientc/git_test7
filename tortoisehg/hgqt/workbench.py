@@ -61,15 +61,10 @@ class Workbench(QMainWindow):
 
         rr.openRepoSignal.connect(self.openRepo)
 
-        tw = self.repoTabsWidget
-        tw.tabCloseRequested.connect(self.repoTabCloseRequested)
-        tw.currentChanged.connect(self.repoTabChanged)
-
         self.createActions()
         self.createToolbars()
 
         self.repoTabChanged()
-        self.setupBranchCombo()
 
         def gotVisible(state):
             self.actionShowRepoRegistry.setChecked(self.reporegistry.isVisible())
@@ -124,6 +119,8 @@ class Workbench(QMainWindow):
         sp.setVerticalStretch(1)
         sp.setHeightForWidth(tw.sizePolicy().hasHeightForWidth())
         tw.setSizePolicy(sp)
+        tw.tabCloseRequested.connect(self.repoTabCloseRequested)
+        tw.currentChanged.connect(self.repoTabChanged)
         vl.addWidget(tw)
 
         self.setCentralWidget(self.centralwidget)
@@ -346,15 +343,11 @@ class Workbench(QMainWindow):
         rw = RepoWidget(repo, self)
         rw.showMessageSignal.connect(self.showMessage)
         rw.revDetailsWidget.fileview.showDescSignal.connect(self.showMessage)
-        rw.switchToSignal.connect(self.switchTo)
         rw.closeSelfSignal.connect(self.repoTabCloseSelf)
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, reponame)
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
-
-    def switchTo(self, widget):
-        self.repoTabsWidget.setCurrentWidget(widget)
 
     def showMessage(self, msg):
         self.statusBar().showMessage(msg)
