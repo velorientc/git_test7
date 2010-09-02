@@ -159,8 +159,10 @@ class RepoWidget(QWidget):
                 return None  # TODO
             else:
                 return rev
-        w = ManifestWidget(self.repo.ui, self.repo, rev=filterrev(self.rev), parent=self)
-        self.repoview.revisionClicked.connect(lambda rev: w.setrev(filterrev(rev)))
+        w = ManifestWidget(self.repo.ui, self.repo, rev=filterrev(self.rev),
+                           parent=self)
+        self.repoview.revisionClicked.connect(lambda rev:
+                           w.setrev(filterrev(rev)))
         w.revchanged.connect(self.repoview.goto)
         return w
 
@@ -366,7 +368,8 @@ class RepoWidget(QWidget):
         pass
 
     def revision_activated(self, rev=None):
-        # TODO: remove this entry or connect to manifest tab?
+        # TODO: launch visual diff of this revision.  Manifest should
+        # be available as a menu option
         run.manifest(self.repo.ui, repo=self.repo,
                      rev=rev or self.rev)
 
