@@ -138,7 +138,7 @@ class Core(QObject):
             self.thread.progressReceived.connect(self.progress_received)
             self.clearSignal.connect(self.output_text.clear)
         if self.display:
-            w = thread.DataWrapper(('> ' + self.display, 'control'))
+            w = thread.DataWrapper(('% ' + self.display, 'control'))
             self.thread.outputReceived.emit(w)
         self.thread.start()
 
@@ -199,7 +199,6 @@ class Core(QObject):
     def output_received(self, wrapper):
         msg, label = wrapper.data
         msg = hglib.tounicode(msg)
-        self.writemsg(Qt.escape(msg), label)
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
         self.append_output(msg, style)
