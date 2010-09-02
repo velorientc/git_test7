@@ -51,11 +51,7 @@ else:
 
 nofilecmds = 'about serve synch repoconfig userconfig merge unmerge'.split()
 
-
-class HgExtension(nautilus.MenuProvider,
-                  nautilus.ColumnProvider,
-                  nautilus.InfoProvider,
-                  nautilus.PropertyPageProvider):
+class HgExtensionDefault:
 
     def __init__(self):
         self.scanStack = []
@@ -228,34 +224,6 @@ class HgExtension(nautilus.MenuProvider,
         emblem, status = cache2state.get(cachestate, (None, '?'))
         return emblem, status
 
-    def update_file_info(self, file):
-        '''Queue file for emblem and hg status update'''
-        self.scanStack.append(file)
-        if len(self.scanStack) == 1:
-            gobject.idle_add(self.fileinfo_on_idle)
-
-    def fileinfo_on_idle(self):
-        '''Update emblem and hg status for files when there is time'''
-        if not self.scanStack:
-            return False
-        try:
-            vfs_file = self.scanStack.pop()
-            path = self.get_path_for_vfs_file(vfs_file, False)
-            if not path:
-                return True
-            oldvfs = self.get_vfs(path)
-            if oldvfs and oldvfs != vfs_file:
-                #file has changed on disc (not invalidated)
-                self.get_path_for_vfs_file(vfs_file) #save new vfs
-                self.invalidate([os.path.dirname(path)])
-            emblem, status = self._get_file_status(path)
-            if emblem is not None:
-                vfs_file.add_emblem(emblem)
-            vfs_file.add_string_attribute('hg_status', status)
-        except StandardError, e:
-            debugf(e)
-        return True
-
     def notified(self, mon_uri=None, event_uri=None, event=None):
         debugf('notified from hgtk, %s', event, level='n')
         f = open(self.notify, 'a+')
@@ -364,3 +332,40 @@ class HgExtension(nautilus.MenuProvider,
         self.table.show()
         return nautilus.PropertyPage("MercurialPropertyPage::status",
                                      self.property_label, self.table),
+
+class HgExtensionIcons(HgExtensionDefault):
+
+    def update_file_info(self, file):
+        '''Queue file for emblem and hg status update'''
+        self.scanStack.append(file)
+        if len(self.scanStack) == 1:
+            gobject.idle_add(self.fileinfo_on_idle)
+
+    def fileinfo_on_idle(self):
+        '''Update emblem and hg status for files when there is time'''
+        if not self.scanStack:
+            return False
+        try:
+            vfs_file = self.scanStack.pop()
+            path = self.get_path_for_vfs_file(vfs_file, False)
+            if not path:
+                return True
+            oldvfs = self.get_vfs(path)
+            if oldvfs and oldvfs != vfs_file:
+                #file has changed on disc (not invalidated)
+                self.get_path_for_vfs_file(vfs_file) #save new vfs
+                self.invalidate([os.path.dirname(path)])
+            emblem, status = self._get_file_status(path)
+            if emblem is not None:
+                vfs_file.add_emblem(emblem)
+            vfs_file.add_string_attribute('hg_status', status)
+        except StandardError, e:
+            debugf(e)
+        return True
+
+if ui.ui().configbool("tortoisehg", "overlayicons", default = True):
+	class HgExtension(HgExtensionIcons, nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.PropertyPageProvider, nautilus.InfoProvider):
+		pass
+else:
+	class HgExtension(HgExtensionDefault, nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.PropertyPageProvider):
+		pass
