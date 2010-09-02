@@ -165,19 +165,7 @@ class CmdThread(QThread):
             thread2._async_raise(self.thread_id, KeyboardInterrupt)
 
     def thread_finished(self):
-        if self.ret is None:
-            if self.abortbyuser:
-                msg = _('[command terminated by user %s]')
-            else:
-                msg = _('[command interrupted %s]')
-        elif self.ret:
-            msg = _('[command returned code %d %%s]') % int(self.ret)
-        else:
-            msg = _('[command completed successfully %s]')
-        msg = msg % time.asctime() + '\n'
-        w = DataWrapper(self.ret)
-        w.message = msg
-        self.commandFinished.emit(w)
+        self.commandFinished.emit(DataWrapper(self.ret))
 
     def output_handler(self, wrapper):
         self.rawoutput.append(wrapper.data[0])
@@ -226,3 +214,15 @@ class CmdThread(QThread):
             self.ui.write_err(str(e) + '\n')
         except KeyboardInterrupt:
             pass
+
+        if self.ret is None:
+            if self.abortbyuser:
+                msg = _('[command terminated by user %s]')
+            else:
+                msg = _('[command interrupted %s]')
+        elif self.ret:
+            msg = _('[command returned code %d %%s]') % int(self.ret)
+        else:
+            msg = _('[command completed successfully %s]')
+        w = DataWrapper((msg % time.asctime() + '\n', 'control'))
+        self.outputReceived.emit(w)

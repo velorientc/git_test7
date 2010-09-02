@@ -127,13 +127,14 @@ class Core(QObject):
 
         self.thread.started.connect(self.command_started)
         self.thread.commandFinished.connect(self.command_finished)
-        self.thread.errorReceived.connect(self.error_received)
         if self.log:
             self.thread.outputReceived.connect(self.log.output)
+            self.thread.errorReceived.connect(self.log.output)
             self.thread.progressReceived.connect(self.log.progress)
             self.clearSignal.connect(self.log.clear)
         elif self.pmon:
             self.thread.outputReceived.connect(self.output_received)
+            self.thread.errorReceived.connect(self.output_received)
             self.thread.progressReceived.connect(self.progress_received)
             self.clearSignal.connect(self.output_text.clear)
         if self.display:
@@ -164,8 +165,7 @@ class Core(QObject):
         self.commandStarted.emit()
 
     def command_finished(self, wrapper):
-        ret, msg = wrapper.data, wrapper.message
-        self.thread.outputReceived.emit(thread.DataWrapper((msg, 'control')))
+        ret = wrapper.data
 
         if self.pmon:
             if ret is None:
@@ -200,13 +200,6 @@ class Core(QObject):
         msg, label = wrapper.data
         msg = hglib.tounicode(msg)
         self.writemsg(Qt.escape(msg), label)
-
-    def error_received(self, wrapper):
-        msg, label = wrapper.data
-        msg = hglib.tounicode(msg)
-        self.writemsg(Qt.escape(msg), label)
-
-    def writemsg(self, msg, label):
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
         self.append_output(msg, style)
