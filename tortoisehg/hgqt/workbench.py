@@ -136,6 +136,10 @@ class Workbench(QMainWindow):
         tb.setObjectName("filterToolbar")
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
+        self.actionHelp = a = QAction(_("Help"), self)
+        a.setShortcut(QKeySequence.HelpContents)
+        a.setIcon(geticon('help'))
+
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
         a.setShortcut(QKeySequence.New)
 
@@ -149,10 +153,12 @@ class Workbench(QMainWindow):
         a.setIcon(geticon('settings_user'))
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
+        a.setIcon(geticon('reload'))
         a.setShortcut(QKeySequence.Refresh)
         a.setToolTip(_('Refresh all for current repository'))
 
         self.actionRefreshTaskTab = a = QAction(_("Refresh &Task Tab"), self)
+        a.setIcon(geticon('reloadtt'))
         b = QKeySequence.keyBindings(QKeySequence.Refresh)
         a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
         a.setToolTip(_('Refresh only the current task tab'))
@@ -161,13 +167,13 @@ class Workbench(QMainWindow):
         a.setIcon(geticon('find'))
 
         self.actionQuit = a = QAction(_("E&xit"), self)
+        a.setIcon(geticon('quit'))
         a.setShortcut(QKeySequence.Quit)
         a.setIconText(_("Exit"))
         a.setToolTip(_("Exit"))
 
         self.actionAbout = QAction(_("About"), self)
         self.actionDisplayAllBranches = QAction("displayAllBranches", self)
-        self.actionHelp = QAction(_("Help"), self)
 
         self.actionBack = a = QAction(_("Back"), self)
         a.setEnabled(False)
@@ -439,19 +445,12 @@ class Workbench(QMainWindow):
         self.actionExplore.triggered.connect(self.explore)
         self.actionTerminal.triggered.connect(self.terminal)
 
-        self.actionQuit.setIcon(geticon('quit'))
-        self.actionRefresh.setIcon(geticon('reload'))
-        self.actionRefreshTaskTab.setIcon(geticon('reloadtt'))
-
-        self.actionHelp.setShortcut(QKeySequence.HelpContents)
-        self.actionHelp.setIcon(geticon('help'))
-        self.actionHelp.triggered.connect(self.on_help)
-
-        self.actionSettings.triggered.connect(self.editSettings)
-
         self.actionNew_repository.triggered.connect(self.newRepository)
         self.actionOpen_repository.triggered.connect(self.openRepository)
         self.actionClose_repository.triggered.connect(self.closeRepository)
+        self.actionHelp.triggered.connect(self.on_help)
+        self.actionSettings.triggered.connect(self.editSettings)
+
 
     def actionShowPathsToggled(self, show):
         self.reporegistry.showPaths(show)
