@@ -320,8 +320,7 @@ class SyncWidget(QWidget):
     def outclicked(self):
         if self.log:
             def outputnodes(data):
-                nodestrs = data.splitlines()[:-1]
-                self.outgoingNodes.emit(nodestrs)
+                self.outgoingNodes.emit(data.splitlines())
             self.finishfunc = outputnodes
             self.run(['--repository', self.root, 'outgoing',
                       '--quiet', '--template', '{node}\n'])
