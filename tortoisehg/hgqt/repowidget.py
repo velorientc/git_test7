@@ -460,6 +460,12 @@ class RepoWidget(QWidget):
                    '--repository', self.repo.root]
         self.runCommand(_('QFinish - TortoiseHg'), cmdline)
 
+    def qgotoRevision(self, patchname):
+        """Make PATCHNAME the top applied patch"""
+        cmdline = ['qgoto', str(patchname),  # FIXME force option
+                   '--repository', self.repo.root]
+        self.runCommand(_('QGoto - TortoiseHg'), cmdline)
+
     def revision_clicked(self, rev):
         'User clicked on a repoview row'
         if rev is None:
@@ -468,12 +474,6 @@ class RepoWidget(QWidget):
             revwidgets = (self.revDetailsWidget, self.manifestDemand)
             if self.taskTabsWidget.currentWidget() not in revwidgets:
                 self.taskTabsWidget.setCurrentIndex(self.logTabIndex)
-
-    def qgotoRevision(self, patchname):
-        """Make PATCHNAME the top applied patch"""
-        cmdline = ['qgoto', str(patchname),  # FIXME force option
-                   '--repository', self.repo.root]
-        self.runCommand(_('QGoto - TortoiseHg'), cmdline)
 
     def revision_selected(self, rev):
         'View selection changed, could be a reload'
