@@ -518,6 +518,7 @@ class RepoWidget(QWidget):
             if max(mtime) > oldmtime:
                 self.showMessage('Configuration change detected.')
                 self.repo.invalidateui()
+                self.syncDemand.forward('reload')
         except EnvironmentError, ValueError:
             return None
 
