@@ -339,7 +339,7 @@ class Workbench(QMainWindow):
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
-        reponame = os.path.basename(repo.root)
+        reponame = hglib.tounicode(os.path.basename(repo.root))
         rw = RepoWidget(repo, self)
         rw.showMessageSignal.connect(self.showMessage)
         rw.revDetailsWidget.fileview.showDescSignal.connect(self.showMessage)
