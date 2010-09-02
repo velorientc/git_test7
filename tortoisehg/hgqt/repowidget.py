@@ -172,6 +172,7 @@ class RepoWidget(QWidget):
 
     def setOutgoingNodes(self, nodes):
         self.repo._outgoing = nodes
+        self.showMessage(_('%d outgoing changesets') % len(nodes))
         self.refresh()
 
     def createGrepWidget(self):
