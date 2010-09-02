@@ -137,7 +137,7 @@ class Core(QObject):
             self.thread.progressReceived.connect(self.progress_received)
             self.clearSignal.connect(self.output_text.clear)
         if self.display:
-            w = thread.DataWrapper((self.display, ''))
+            w = thread.DataWrapper(('> ' + self.display, 'control'))
             self.thread.outputReceived.emit(w)
         self.thread.start()
 
