@@ -135,7 +135,7 @@ def _extendrepo(repo):
                 tw = int(tw)
                 tw = min(tw, 16)
                 return max(tw, 2)
-            except ValueError:
+            except (ValueError, TypeError):
                 return 8
 
         def shell(self):
