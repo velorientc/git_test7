@@ -57,12 +57,12 @@ class CommitWidget(QWidget):
 
         vbox = QVBoxLayout()
         vbox.setMargin(0)
+        vbox.setContentsMargins(*(0,)*4)
 
         hbox = QHBoxLayout()
-        repo = self.stwidget.repo
-        wctx = repo[None]
-        branchbutton = QPushButton(_('Branch: ') +
-                                   hglib.tounicode(wctx.branch()))
+        hbox.setMargin(0)
+        hbox.setContentsMargins(*(0,)*4)
+        branchbutton = QPushButton(_('Branch: '))
         branchbutton.pressed.connect(self.branchOp)
         self.branchbutton = branchbutton
         self.branchop = None
@@ -72,25 +72,17 @@ class CommitWidget(QWidget):
         msgcombo = MessageHistoryCombo()
         self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
         hbox.addWidget(msgcombo, 1)
-        hbox.addSpacing(9)
+        hbox.addSpacing(2)
         vbox.addLayout(hbox, 0)
 
-        def addrow(s, w):
-            hbox = QHBoxLayout()
-            hbox.addWidget(QLabel('<b>%s</b>' % s))
-            hbox.addWidget(w, 1)
-            vbox.addLayout(hbox)
-        for ctx in repo.parents():
-            desc = format_desc(ctx.description(), 80)
-            fmt =  "<span style='font-family:Courier'>%s(%s)</span> %s"
-            ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
-            lbl = QLabel(ptext)
-            lbl.minimumSizeHint = lambda: QSize(0, 0)
-            addrow(_('Parent:'), lbl)
+        self.parentvbox = QVBoxLayout()
+        self.parentlabels = [QLabel('<b>Parent:</b>')]
+        self.parentvbox.addWidget(self.parentlabels[0])
+        vbox.addLayout(self.parentvbox, 0)
 
+        # TODO: move to details widget
         usercombo = QComboBox()
         usercombo.setEditable(True)
-        addrow(_('User:'), usercombo)
 
         msgte = QPlainTextEdit()
         msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
@@ -99,9 +91,7 @@ class CommitWidget(QWidget):
         msgfont.changed.connect(lambda fnt: msgte.setFont(fnt))
         msgte.textChanged.connect(self.msgChanged)
         msgte.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.connect(msgte,
-                SIGNAL('customContextMenuRequested(const QPoint &)'),
-                self.customContextMenuRequested)
+        msgte.customContextMenuRequested.connect(self.menuRequested)
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
 
@@ -131,8 +121,49 @@ class CommitWidget(QWidget):
         self.msgcombo = msgcombo
 
     def reload(self):
+        repo = self.stwidget.repo
+        wctx = repo[None]
+
+        # Update qrefresh mode
+        if repo.changectx('.').thgmqappliedpatch():
+            self.commitButtonName.emit(_('QRefresh'))
+            self.qref = True
+        else:
+            self.commitButtonName.emit(_('Commit'))
+            self.qref = False
+
+        # Update message list
+        self.msgcombo.reset(self.msghistory)
+
+        # Update branch operation button
+        cur = hglib.tounicode(wctx.branch())
+        if self.branchop is None:
+            title = _('Branch: ') + cur
+        elif self.branchop == False:
+            title = _('Close Branch: ') + cur
+        else:
+            title = _('New Branch: ') + self.branchop
+        self.branchbutton.setText(title)
+
+        # Update parent revision(s)
+        for i, ctx in enumerate(repo.parents()):
+            desc = format_desc(ctx.description(), 80)
+            fmt = "<span style='font-family:Courier'>%s(%s)</span> %s"
+            ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
+            ptext = _('<b>Parent: </b>') + ptext
+            if i > len(self.parentlabels):
+                lbl = QLabel(ptext)
+                #lbl.minimumSizeHint = lambda: QSize(0, 0)
+                self.parentvbox.addWidget(lbl)
+                self.parentlabels.append(lbl)
+            else:
+                self.parentlabels[i].setText(ptext)
+        while len(repo.parents()) > len(self.parentlabels):
+            w = self.parentlabels.pop()
+            self.parentvbox.removeWidget(w)
+
+        # Trigger reload of working context
         self.stwidget.refreshWctx()
-        self.commitButtonName.emit(_('Commit'))
 
     def msgChanged(self):
         text = self.msgte.toPlainText()
@@ -214,7 +245,7 @@ class CommitWidget(QWidget):
         cursor.insertText(reflow)
         return cursor.block()
 
-    def customContextMenuRequested(self, point):
+    def menuRequested(self, point):
         cursor = self.msgte.cursorForPosition(point)
         point = self.msgte.mapToGlobal(point)
 
@@ -266,15 +297,7 @@ class CommitWidget(QWidget):
         d = branchop.BranchOpDialog(self.stwidget.repo, self.branchop)
         if d.exec_() == QDialog.Accepted:
             self.branchop = d.branchop
-            wctx = self.stwidget.repo[None]
-            cur = hglib.tounicode(wctx.branch())
-            if self.branchop is None:
-                title = _('Branch: ') + cur
-            elif self.branchop == False:
-                title = _('Close Branch: ') + cur
-            else:
-                title = _('New Branch: ') + self.branchop
-            self.branchbutton.setText(title)
+            self.reload()
 
     def canUndo(self):
         'Returns undo description or None if not valid'
