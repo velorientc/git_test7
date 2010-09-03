@@ -25,7 +25,7 @@ import time
 import os
 import itertools
 
-from mercurial import patch, util, match
+from mercurial import patch, util, match, error
 
 from tortoisehg.util.util import isbfile
 from tortoisehg.util.hglib import tounicode
@@ -125,7 +125,10 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
 
         # Add parents to next_revs.
         parents = getparents(ctx, getbranch)
-        author = ctx.user()
+        try:
+            author = ctx.user()
+        except error.Abort:
+            author = ''
         parents_to_add = []
         if len(parents) > 1:
             preferred_color = None

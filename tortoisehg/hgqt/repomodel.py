@@ -109,7 +109,7 @@ class HgRepoListModel(QAbstractTableModel):
                            'Node':     lambda ctx, gnode: str(ctx),
                            'Graph':    lambda ctx, gnode: "",
                            'Log':      self.getlog,
-                           'Author':   lambda ctx, gnode: hglib.username(ctx.user()),
+                           'Author':   self.getauthor,
                            'Tags':     self.gettags,
                            'Branch':   lambda ctx, gnode: ctx.branch(),
                            'Filename': lambda ctx, gnode: gnode.extra[0],
@@ -434,6 +434,12 @@ class HgRepoListModel(QAbstractTableModel):
         tags = [t for t in tags if t not in mqtags]
         return hglib.tounicode(",".join(tags))
     
+    def getauthor(self, ctx, gnode):
+        try:
+            return hglib.username(ctx.user())
+        except error.Abort:
+            return _('Mercurial User')
+
     def getlog(self, ctx, gnode):
         # TODO: add bookmark
         if ctx.rev() is None:
