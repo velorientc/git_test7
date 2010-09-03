@@ -36,7 +36,7 @@ class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    errorMessage = pyqtSignal(QString)
+    showMessage = pyqtSignal(str)
     commitComplete = pyqtSignal()
 
     def __init__(self, pats, opts, root=None, parent=None):
@@ -44,7 +44,7 @@ class CommitWidget(QWidget):
 
         self.opts = opts # user, date
         self.stwidget = status.StatusWidget(pats, opts, root, self)
-        self.stwidget.errorMessage.connect(self.errorMessage)
+        self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.loadBegin.connect(lambda: self.loadBegin.emit())
         self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
@@ -506,7 +506,7 @@ class CommitWidget(QWidget):
             else:
                 dcmd = []
         except error.Abort, e:
-            self.errorMessage.emit(hglib.tounicode(str(e)))
+            self.showMessage.emit(hglib.tounicode(str(e)))
             dcmd = []
 
         cmdline = ['commit', '--user', user, '--message', msg]
@@ -594,13 +594,13 @@ class CommitDialog(QDialog):
         commit.restoreState(s.value('commit/state').toByteArray())
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadConfigs(s)
-        commit.errorMessage.connect(self.errorMessage)
+        commit.showMessage.connect(self.showMessage)
+        commit.loadComplete.connect(self.updateUndo)
+        commit.commitComplete.connect(self.postcommit)
 
         name = hglib.get_reponame(commit.stwidget.repo)
         self.setWindowTitle('%s - commit' % name)
         self.commit = commit
-        commit.loadComplete.connect(self.updateUndo)
-        commit.commitComplete.connect(self.postcommit)
 
     def updateUndo(self):
         BB = QDialogButtonBox
@@ -612,7 +612,7 @@ class CommitDialog(QDialog):
             self.bb.button(BB.Discard).setEnabled(False)
             self.bb.button(BB.Discard).setToolTip('')
 
-    def errorMessage(self, msg):
+    def showMessage(self, msg):
         print msg
 
     def keyPressEvent(self, event):

@@ -43,13 +43,13 @@ class StatusWidget(QWidget):
        SIGNALS:
        loadBegin()                  - for progress bar
        loadComplete()               - for progress bar
-       errorMessage(QString)        - for status bar
-       titleTextChanged(QString)    - for window title
+       showMessage(str)             - for status bar
+       titleTextChanged(str)        - for window title
     '''
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    titleTextChanged = pyqtSignal(QString)
-    errorMessage = pyqtSignal(QString)
+    titleTextChanged = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
@@ -252,8 +252,7 @@ class StatusWidget(QWidget):
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.refreshing.finished.connect(self.reloadComplete)
         # re-emit error messages from this object
-        self.refreshing.errorMessage.connect(
-                     lambda msg: self.errorMessage.emit(msg))
+        self.refreshing.showMessage.connect(self.showMessage)
         self.refreshing.start()
 
     def reloadComplete(self, wctx, patchecked):
@@ -418,8 +417,7 @@ class StatusWidget(QWidget):
             for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            err = hglib.tounicode(str(e))
-            self.errorMessage.emit(QString(err))
+            self.showMessage.emit(hglib.tounicode(str(e)))
             return
         o, e = hu.getdata()
         diff = o or _('<em>No displayable differences</em>')
@@ -439,8 +437,7 @@ class StatusWidget(QWidget):
                                         match=m, git=True):
                 hu.write(s, label=l)
         except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            err = hglib.tounicode(str(e))
-            self.errorMessage.emit(QString(err))
+            self.showMessage.emit(hglib.tounicode(str(e)))
             return
         text += '</br><h3>'
         text += _('===== Diff to second parent %d:%s =====\n') % (
@@ -455,7 +452,7 @@ class StatusThread(QThread):
     '''Background thread for generating a workingctx'''
 
     finished = pyqtSignal(object, object)
-    errorMessage = pyqtSignal(QString)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, repo, pats, opts, parent=None):
         super(StatusThread, self).__init__()
@@ -485,8 +482,7 @@ class StatusThread(QThread):
                 wctx = self.repo[None]
                 wctx.status(**stopts)
         except (OSError, IOError, util.Abort), e:
-            err = hglib.tounicode(str(e))
-            self.errorMessage.emit(QString(err))
+            self.showMessage.emit(hglib.tounicode(str(e)))
         try:
             wctx.dirtySubrepos = []
             for s in wctx.substate:
@@ -494,8 +490,7 @@ class StatusThread(QThread):
                     wctx.dirtySubrepos.append(s)
         except (OSError, IOError, util.Abort,
                 error.RepoLookupError, error.ConfigError), e:
-            err = hglib.tounicode(str(e))
-            self.errorMessage.emit(QString(err))
+            self.showMessage.emit(hglib.tounicode(str(e)))
         self.finished.emit(wctx, patchecked)
 
 
@@ -784,7 +779,7 @@ class StatusDialog(QDialog):
         self.restoreGeometry(s.value('status/geom').toByteArray())
 
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
-        self.stwidget.errorMessage.connect(self.stbar.showMessage)
+        self.stwidget.showMessage.connect(self.stbar.showMessage)
         self.setWindowTitle(self.stwidget.getTitle())
 
     def accept(self):
