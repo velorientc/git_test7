@@ -129,15 +129,16 @@ class RepoWidget(QWidget):
 
         pats = {}
         opts = {}
+        b = QPushButton('Commit')
         cw = CommitWidget(pats, opts, root=self.repo.root)
         cw.showMessage.connect(self.showMessage)
         cw.commitComplete.connect(self.reload)
         cw.commitComplete.connect(cw.stwidget.refreshWctx)
-        b = QPushButton(_('Commit'))
         cw.buttonHBox.addWidget(b)
+        cw.commitButtonName.connect(lambda n: b.setText(n))
+        cw.loadConfigs(QSettings())
+        cw.reload()
         b.clicked.connect(cw.commit)
-        s = QSettings()
-        cw.loadConfigs(s)
         self.repo._commitwidget = cw
         return SharedWidget(cw)
 
@@ -251,10 +252,8 @@ class RepoWidget(QWidget):
     def thgimport(self):
         l = len(self.repo)
         dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
+        dlg.repoInvalidated.connect(self.reload)
         dlg.exec_()
-        self.repo.thginvalidate()
-        if len(self.repo) != l:
-            self.reload()
 
     def verify(self):
         cmdline = ['--repository', self.repo.root, 'verify']

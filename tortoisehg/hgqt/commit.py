@@ -36,6 +36,7 @@ class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
+    commitButtonName = pyqtSignal(str)
     showMessage = pyqtSignal(str)
     commitComplete = pyqtSignal()
 
@@ -128,6 +129,10 @@ class CommitWidget(QWidget):
         self.usercombo = usercombo
         self.msgte = msgte
         self.msgcombo = msgcombo
+
+    def reload(self):
+        self.stwidget.refreshWctx()
+        self.commitButtonName.emit(_('Commit'))
 
     def msgChanged(self):
         text = self.msgte.toPlainText()
@@ -294,7 +299,8 @@ class CommitWidget(QWidget):
             return
         repo = self.stwidget.repo
         repo.rollback()
-        self.stwidget.refreshWctx()
+        repo.thginvalidate()
+        self.reload()
         QTimer.singleShot(500, lambda: shlib.shell_notify([repo.root]))
 
     def getMessage(self):
@@ -391,10 +397,6 @@ class CommitWidget(QWidget):
         self.userhist.insert(0, user)
         self.userhist = self.userhist[:10]
         self.refreshUserList()
-
-    def reload(self):
-        # TODO
-        pass
 
     def commit(self):
         repo = self.stwidget.repo
@@ -582,7 +584,6 @@ class CommitDialog(QDialog):
         self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
         bb.button(BB.Discard).setText('Undo')
         bb.button(BB.Discard).clicked.connect(commit.rollback)
-        bb.button(BB.Ok).setText('Commit')
         bbl.addWidget(bb, alignment=Qt.AlignRight)
         bbl.addSpacing(9)
         self.bb = bb
@@ -597,10 +598,15 @@ class CommitDialog(QDialog):
         commit.showMessage.connect(self.showMessage)
         commit.loadComplete.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
+        commit.commitButtonName.connect(self.setButtonName)
 
         name = hglib.get_reponame(commit.stwidget.repo)
         self.setWindowTitle('%s - commit' % name)
         self.commit = commit
+        self.commit.reload()
+
+    def setButtonName(self, name):
+        self.bb.button(QDialogButtonBox.Ok).setText(name)
 
     def updateUndo(self):
         BB = QDialogButtonBox
@@ -619,6 +625,8 @@ class CommitDialog(QDialog):
         if event.key() == Qt.Key_Escape:
             self.reject()
             return
+        elif event.matches(QKeySequence.Refresh):
+            self.commit.reload()
         return super(CommitDialog, self).keyPressEvent(event)
 
     def postcommit(self):
@@ -626,7 +634,7 @@ class CommitDialog(QDialog):
         if repo.ui.configbool('tortoisehg', 'closeci'):
             self.reject()
             return
-        self.commit.stwidget.refreshWctx()
+        self.commit.reload()
 
     def accept(self):
         self.commit.commit()

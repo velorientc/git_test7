@@ -190,7 +190,6 @@ class StatusWidget(QWidget):
         self.split = split
         self.diffvbox = vbox
         self.override = False
-        QTimer.singleShot(0, self.refreshWctx)
 
     def teLinkClicked(self, url):
         self.override = True
@@ -781,6 +780,7 @@ class StatusDialog(QDialog):
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
         self.stwidget.showMessage.connect(self.stbar.showMessage)
         self.setWindowTitle(self.stwidget.getTitle())
+        QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def accept(self):
         s = QSettings()

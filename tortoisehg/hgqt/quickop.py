@@ -96,8 +96,8 @@ class QuickOpDialog(QDialog):
         stwidget.restoreState(s.value('quickop/state').toByteArray())
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
-
-        self.stwidget.errorMessage.connect(self.statusbar.set_text)
+        stwidget.showMessage.connect(self.statusbar.set_text)
+        QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
