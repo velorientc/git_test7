@@ -133,7 +133,7 @@ class RepoWidget(QWidget):
         cw = CommitWidget(pats, opts, root=self.repo.root)
         cw.showMessage.connect(self.showMessage)
         cw.commitComplete.connect(self.reload)
-        cw.commitComplete.connect(cw.stwidget.refreshWctx)
+        cw.commitComplete.connect(cw.reload)
         cw.buttonHBox.addWidget(b)
         cw.commitButtonName.connect(lambda n: b.setText(n))
         cw.loadConfigs(QSettings())
