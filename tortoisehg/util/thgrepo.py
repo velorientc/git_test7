@@ -29,7 +29,7 @@ def repository(ui, path='', create=False):
         return repo
     return _repocache[path]
 
-_uiprops = '''_uifiles _uimtime _shell postpull
+_uiprops = '''_uifiles _uimtime _shell postpull tabwidth
               _exts _thghiddentags'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
@@ -127,6 +127,16 @@ def _extendrepo(repo):
             if pp in ('rebase', 'update', 'fetch'):
                 return pp
             return 'none'
+
+        @propertycache
+        def tabwidth(self):
+            tw = self.ui.config('tortoisehg', 'tabwidth')
+            try:
+                tw = int(tw)
+                tw = min(tw, 16)
+                return max(tw, 2)
+            except ValueError:
+                return 8
 
         def shell(self):
             'Returns terminal shell configured for this repo'
