@@ -51,7 +51,7 @@ def wctxactions(parent, point, repo, selrows):
     menu.addSeparator()
     make(_('&Forget'), forget, frozenset('MAC!'))
     make(_('&Add'), add, frozenset('I?'))
-    make(_('&Guess Rename...'), guessRename, frozenset('A?!'))
+    make(_('&Detect Renames...'), guessRename, frozenset('A?!'))
     make(_('&Ignore'), ignore, frozenset('?'))
     make(_('Remove versioned'), remove, frozenset('C'))
     make(_('&Delete unversioned'), delete, frozenset('?I'))
