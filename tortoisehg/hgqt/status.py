@@ -220,13 +220,6 @@ class StatusWidget(QWidget):
         if action:
             self.refreshWctx()
 
-    def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Refresh):
-            self.te.clear()
-            self.refreshWctx()
-        else:
-            return super(StatusWidget, self).keyPressEvent(event)
-
     def refreshWctx(self):
         if self.refreshing:
             return
@@ -781,6 +774,12 @@ class StatusDialog(QDialog):
         self.stwidget.showMessage.connect(self.stbar.showMessage)
         self.setWindowTitle(self.stwidget.getTitle())
         QTimer.singleShot(0, self.stwidget.refreshWctx)
+
+    def keyPressEvent(self, event):
+        if event.matches(QKeySequence.Refresh):
+            self.stwidget.refreshWctx()
+        else:
+            return super(StatusWidget, self).keyPressEvent(event)
 
     def accept(self):
         s = QSettings()

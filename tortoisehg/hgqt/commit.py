@@ -20,8 +20,6 @@ from tortoisehg.util.util import format_desc
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 
 # Technical Debt for CommitWidget
-#  qrefresh support
-#  refresh parent changeset descriptions after refresh
 #  threaded / wrapped commit (need a CmdRunner equivalent)
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
@@ -30,7 +28,6 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 #  qnew/shelve-patch creation dialog (in another file)
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
-#  refresh UI instances, make a hglib func for it
 
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
@@ -49,6 +46,7 @@ class CommitWidget(QWidget):
         self.stwidget.loadBegin.connect(lambda: self.loadBegin.emit())
         self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
+        self.qref = False
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -122,15 +120,18 @@ class CommitWidget(QWidget):
 
     def reload(self):
         repo = self.stwidget.repo
+        repo.thginvalidate()
         wctx = repo[None]
 
         # Update qrefresh mode
         if repo.changectx('.').thgmqappliedpatch():
             self.commitButtonName.emit(_('QRefresh'))
-            self.qref = True
+            if not self.qref:
+                self.initQRefreshMode()
         else:
             self.commitButtonName.emit(_('Commit'))
-            self.qref = False
+            if self.qref:
+                self.endQRefreshMode()
 
         # Update message list
         self.msgcombo.reset(self.msghistory)
@@ -164,6 +165,22 @@ class CommitWidget(QWidget):
 
         # Trigger reload of working context
         self.stwidget.refreshWctx()
+
+    def initQRefreshMode(self):
+        'Working parent is a patch.  Is it refreshable?'
+        repo = self.stwidget.repo
+        if repo['qtip'] != repo['.']:
+            self.showMessage.emit(_('Cannot refresh non-tip patch'))
+            self.commitButtonName.emit(_('N/A'))
+            return
+        self.msgte.setPlainText(hglib.tounicode(repo['qtip'].description()))
+        self.msgte.document().setModified(False)
+        self.msgte.moveCursor(QTextCursor.End)
+        self.qref = True
+
+    def endQRefreshMode(self):
+        self.msgte.clear()
+        self.qref = False
 
     def msgChanged(self):
         text = self.msgte.toPlainText()
@@ -474,7 +491,8 @@ class CommitWidget(QWidget):
             elif resp == 2:
                 return
         files = self.stwidget.getChecked('MAR?!S')
-        if not (files or brcmd or repo[None].branch() != repo['.'].branch()):
+        if not (files or brcmd or repo[None].branch() != repo['.'].branch() \
+                or self.qref):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
@@ -536,6 +554,8 @@ class CommitWidget(QWidget):
 
         cmdline = ['commit', '--user', user, '--message', msg]
         cmdline += dcmd + brcmd + files
+        if self.qref:
+            cmdline[0] = 'qrefresh'
 
         for fname in repo.ui.config('tortoisehg', 'autoinc', '').split(','):
             fname = fname.strip()
@@ -545,7 +565,8 @@ class CommitWidget(QWidget):
         ret = dispatch._dispatch(_ui, cmdline)
         if not ret:
             self.addMessageToHistory()
-            self.msgte.clear()
+            if not self.qref:
+                self.msgte.clear()
             self.msgte.document().setModified(False)
             self.commitComplete.emit()
             return True

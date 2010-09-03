@@ -104,6 +104,8 @@ class QuickOpDialog(QDialog):
             if event.modifiers() == Qt.ControlModifier:
                 self.accept()  # Ctrl+Enter
             return
+        elif event.matches(QKeySequence.Refresh):
+            self.stwidget.refreshWctx()
         elif event.key() == Qt.Key_Escape:
             self.reject()
             return
