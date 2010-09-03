@@ -213,7 +213,8 @@ class FileLogDialog(_AbstractFileDialog):
             self._show_rev = None
         else:
             index = self.filerevmodel.index(0,0)
-        self.repoview.setCurrentIndex(index)
+        if index is not None:
+            self.repoview.setCurrentIndex(index)
 
     def revisionSelected(self, rev):
         pos = self.textView.verticalScrollBar().value()
