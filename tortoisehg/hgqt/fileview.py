@@ -215,6 +215,7 @@ class HgFileView(QFrame):
     def setContext(self, ctx):
         self._ctx = ctx
         self._p_rev = None
+        self.sci.setTabWidth(ctx._repo.tabwidth)
 
     def rev(self):
         return self._ctx.rev()
