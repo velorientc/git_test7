@@ -130,7 +130,7 @@ class RepoWidget(QWidget):
         pats = {}
         opts = {}
         cw = CommitWidget(pats, opts, root=self.repo.root)
-        cw.errorMessage.connect(self.showMessage)
+        cw.showMessage.connect(self.showMessage)
         cw.commitComplete.connect(self.reload)
         cw.commitComplete.connect(cw.stwidget.refreshWctx)
         b = QPushButton(_('Commit'))
