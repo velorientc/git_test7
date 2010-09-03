@@ -159,11 +159,11 @@ class RepoWidget(QWidget):
         sw = SyncWidget(root=self.repo.root, log=self.workbench.log)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.invalidate.connect(self.reload)
+        sw.showMessage.connect(self.showMessage)
         return sw
 
     def setOutgoingNodes(self, nodes):
         self.repo._outgoing = nodes
-        self.showMessage(_('%d outgoing changesets') % len(nodes))
         self.refresh()
 
     def createGrepWidget(self):

@@ -27,6 +27,7 @@ _schemes = ['local', 'ssh', 'http', 'https']
 class SyncWidget(QWidget):
     invalidate = pyqtSignal()
     outgoingNodes = pyqtSignal(object)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, root, parent=None, log=None, **opts):
         QWidget.__init__(self, parent)
@@ -142,9 +143,9 @@ class SyncWidget(QWidget):
     def commandFinished(self, wrapper):
         for b in self.opbuttons:
             b.setEnabled(True)
-        if wrapper.data == 0 and self.finishfunc:
+        if self.finishfunc:
             output = self.cmd.get_rawoutput()
-            self.finishfunc( output )
+            self.finishfunc(wrapper.data, output)
 
     def commandCanceled(self):
         for b in self.opbuttons:
@@ -300,14 +301,16 @@ class SyncWidget(QWidget):
         self.cmd.run(cmdline, display=display)
 
     def inclicked(self):
-        self.finishfunc = None
+        def finished(ret, output):
+            self.showMessage.emit(_('Incoming finished, ret %d') % ret)
+        self.finishfunc = finished
         self.run(['--repository', self.root, 'incoming'])
 
     def pullclicked(self):
-        if self.log:
-            self.finishfunc = lambda output: self.invalidate.emit()
-        else:
-            self.finishfunc = None
+        def finished(ret, output):
+            self.invalidate.emit()
+            self.showMessage.emit(_('Pull finished, ret %d') % ret)
+        self.finishfunc = finished
         cmdline = ['--repository', self.root, 'pull']
         if self.cachedpp == 'rebase':
             cmdline.append('--rebase')
@@ -319,8 +322,14 @@ class SyncWidget(QWidget):
 
     def outclicked(self):
         if self.log:
-            def outputnodes(data):
-                self.outgoingNodes.emit(data.splitlines())
+            def outputnodes(ret, data):
+                if ret == 0:
+                    nodes = data.splitlines()
+                    self.outgoingNodes.emit(nodes)
+                    self.showMessage.emit(_('%d outgoing changesets') %
+                                          len(nodes))
+                else:
+                    self.showMessage.emit(_('Outgoing finished, ret %d') % ret)
             self.finishfunc = outputnodes
             self.run(['--repository', self.root, 'outgoing',
                       '--quiet', '--template', '{node}\n'])
@@ -329,7 +338,9 @@ class SyncWidget(QWidget):
             self.run(['--repository', self.root, 'outgoing'])
 
     def pushclicked(self):
-        self.finishfunc = None
+        def finished(ret, output):
+            self.showMessage.emit(_('Push finished, ret %d') % ret)
+        self.finishfunc = finished
         self.run(['--repository', self.root, 'push'])
 
     def postpullclicked(self):
