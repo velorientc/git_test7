@@ -580,9 +580,13 @@ class RepoWidget(QWidget):
     def updateToRevision(self, rev=None):
         rev = rev or self.rev
         saved = self.setScanForRepoChanges(False)
+        def finished(ret):
+            if ret == 0:
+                self.reload()
+                self.commitDemand.forward('reload')
         dlg = update.UpdateDialog(rev, self.repo, self)
-        if dlg.exec_():
-            self.reload()
+        dlg.cmdfinished.connect(finished)
+        dlg.exec_()
         self.setScanForRepoChanges(saved)
 
     def manifestRevision(self, rev=None):
