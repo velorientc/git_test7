@@ -543,6 +543,8 @@ class RepoWidget(QWidget):
             self.reload()
             self.setScanForRepoChanges(saved)
             self.runner = None
+            # When we run commands, we typically change working parent
+            self.commitDemand.forward('reload')
         self.runner.commandFinished.connect(finished)
         self.runner.run(cmdline)
 
@@ -682,4 +684,3 @@ class RepoWidget(QWidget):
         cmdline = ['qgoto', str(patchname),  # FIXME force option
                    '--repository', self.repo.root]
         self.runCommand(_('QGoto - TortoiseHg'), cmdline)
-
