@@ -449,6 +449,7 @@ class RepoWidget(QWidget):
                 self.showMessage('Configuration change detected.')
                 self.repo.invalidateui()
                 self.syncDemand.forward('reload')
+                self.repomodel.invalidate() # username, author colors, fonts
         except EnvironmentError, ValueError:
             return None
 
