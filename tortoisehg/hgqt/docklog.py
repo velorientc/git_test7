@@ -41,12 +41,9 @@ class LogDockWidget(QDockWidget):
         self.logte.setWordWrapMode(QTextOption.NoWrap)
         vbox.addWidget(self.logte, 1)
 
-        hbox = QVBoxLayout()
-        hbox.addWidget(QLabel(_('Progress:')))
-        vbox.addLayout(hbox)
-        self.pvbox = hbox
-        self.pbars = []
         self.topics = {}
+        self.stbar = QStatusBar()
+        vbox.addWidget(self.stbar)
 
     @pyqtSlot(thread.DataWrapper)
     def progress(self, wrapper):
@@ -60,20 +57,12 @@ class LogDockWidget(QDockWidget):
         if pos is None or (not pos and not total):
             if topic in self.topics:
                 pm = self.topics[topic]
-                pm.clear()
+                self.stbar.removeWidget(pm)
                 del self.topics[topic]
-                self.pvbox.update()
             return
         if topic not in self.topics:
-            for pm in self.pbars:
-                if pm.idle:
-                    pm.reuse(topic)
-                    break
-            else:
-                pm = ProgressMonitor(topic)
-                self.pvbox.addWidget(pm)
-                self.pbars.append(pm)
-                self.pvbox.update()
+            pm = ProgressMonitor(topic)
+            self.stbar.addWidget(pm)
             self.topics[topic] = pm
         else:
             pm = self.topics[topic]
