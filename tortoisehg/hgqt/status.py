@@ -243,7 +243,6 @@ class StatusWidget(QWidget):
         self.loadBegin.emit()
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.refreshing.finished.connect(self.reloadComplete)
-        # re-emit error messages from this object
         self.refreshing.showMessage.connect(self.showMessage)
         self.refreshing.start()
 
@@ -556,6 +555,7 @@ class WctxModel(QAbstractTableModel):
     def __init__(self, wctx, ms, opts, checked, parent=None):
         QAbstractTableModel.__init__(self, parent)
         rows = []
+        nchecked = {}
         def mkrow(fname, st):
             ext, sizek = '', ''
             try:
@@ -568,41 +568,41 @@ class WctxModel(QAbstractTableModel):
             return [fname, st, mst, hglib.tounicode(fname), ext[1:], sizek]
         if opts['modified']:
             for m in wctx.modified():
-                checked[m] = checked.get(m, True)
+                nchecked[m] = checked.get(m, True)
                 rows.append(mkrow(m, 'M'))
         if opts['added']:
             for a in wctx.added():
-                checked[a] = checked.get(a, True)
+                nchecked[a] = checked.get(a, True)
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
                 mst = r in ms and ms[r].upper() or ""
-                checked[r] = checked.get(r, True)
+                nchecked[r] = checked.get(r, True)
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
                 mst = d in ms and ms[d].upper() or ""
-                checked[d] = checked.get(d, False)
+                nchecked[d] = checked.get(d, False)
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
             for u in wctx.unknown():
-                checked[u] = checked.get(u, False)
+                nchecked[u] = checked.get(u, False)
                 rows.append(mkrow(u, '?'))
         if opts['ignored']:
             for i in wctx.ignored():
-                checked[i] = checked.get(i, False)
+                nchecked[i] = checked.get(i, False)
                 rows.append(mkrow(i, 'I'))
         if opts['clean']:
             for c in wctx.clean():
-                checked[c] = checked.get(c, False)
+                nchecked[c] = checked.get(c, False)
                 rows.append(mkrow(c, 'C'))
         if opts['subrepo']:
             for s in wctx.dirtySubrepos:
-                checked[s] = checked.get(s, False)
+                nchecked[s] = checked.get(s, False)
                 rows.append(mkrow(s, 'S'))
         self.headers = ('*', _('Stat'), _('M'), _('Filename'), 
                         _('Type'), _('Size (KB)'))
-        self.checked = checked
+        self.checked = nchecked
         self.unfiltered = rows
         self.rows = rows
 
