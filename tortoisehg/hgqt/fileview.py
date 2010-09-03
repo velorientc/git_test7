@@ -216,6 +216,10 @@ class HgFileView(QFrame):
         self._ctx = ctx
         self._p_rev = None
         self.sci.setTabWidth(ctx._repo.tabwidth)
+        if ctx._repo.wsvisible:
+            self.sci.setWhitespaceVisibility(qsci.WsVisible)
+        else:
+            self.sci.setWhitespaceVisibility(qsci.WsInvisible)
 
     def rev(self):
         return self._ctx.rev()

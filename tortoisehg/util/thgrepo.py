@@ -29,7 +29,7 @@ def repository(ui, path='', create=False):
         return repo
     return _repocache[path]
 
-_uiprops = '''_uifiles _uimtime _shell postpull tabwidth
+_uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible
               _exts _thghiddentags'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
@@ -137,6 +137,10 @@ def _extendrepo(repo):
                 return max(tw, 2)
             except (ValueError, TypeError):
                 return 8
+
+        @propertycache
+        def wsvisible(self):
+            return self.ui.configbool('tortoisehg', 'wsvisible')
 
         def shell(self):
             'Returns terminal shell configured for this repo'
