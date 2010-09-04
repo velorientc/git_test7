@@ -161,7 +161,6 @@ class CommitWidget(QWidget):
             ptext = _('<b>Parent: </b>') + ptext
             if i > len(self.parentlabels):
                 lbl = QLabel(ptext)
-                #lbl.minimumSizeHint = lambda: QSize(0, 0)
                 self.parentvbox.addWidget(lbl)
                 self.parentlabels.append(lbl)
             else:
@@ -176,17 +175,22 @@ class CommitWidget(QWidget):
     def initQRefreshMode(self):
         'Working parent is a patch.  Is it refreshable?'
         repo = self.stwidget.repo
-        if repo['qtip'] != repo['.']:
+        qtip = repo['qtip']
+        if qtip != repo['.']:
             self.showMessage.emit(_('Cannot refresh non-tip patch'))
             self.commitButtonName.emit(_('N/A'))
             return
-        self.msgte.setPlainText(hglib.tounicode(repo['qtip'].description()))
+        self.opts['user'] = qtip.user()
+        self.opts['date'] = hglib.displaytime(qtip.date())
+        self.msgte.setPlainText(hglib.tounicode(qtip.description()))
         self.msgte.document().setModified(False)
         self.msgte.moveCursor(QTextCursor.End)
         self.qref = True
 
     def endQRefreshMode(self):
         self.msgte.clear()
+        self.opts['user'] = ''
+        self.opts['date'] = ''
         self.qref = False
 
     def msgChanged(self):
@@ -620,7 +624,7 @@ class DetailsDialog(QDialog):
 
         l = []
         if opts.get('user'):
-            val = hglib.tounicode(self.opts['user'])
+            val = hglib.tounicode(opts['user'])
             self.usercb.setChecked(True)
             l.append(val)
         try:
@@ -660,7 +664,7 @@ class DetailsDialog(QDialog):
         curdate.setEnabled(False)
         self.datecb.toggled.connect(curdate.setEnabled)
         curdate.clicked.connect( lambda: self.datele.setText(
-                hglib.tounicode(hglib.utctime(util.makedate()))))
+                hglib.tounicode(hglib.displaytime(util.makedate()))))
         if opts.get('date'):
             self.datele.setText(opts['date'])
             self.datecb.setChecked(True)
