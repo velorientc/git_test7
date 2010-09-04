@@ -7,8 +7,8 @@ def setup():
     global _repo
     _repo = get_fixture_repo('subdirs')
 
-def newmodel():
-    return ManifestModel(_repo, rev=0)
+def newmodel(rev=0):
+    return ManifestModel(_repo, rev=rev)
 
 def test_data():
     m = newmodel()
@@ -51,3 +51,7 @@ def test_indexfrompath():
     assert_equals(m.index(1, 0), m.indexFromPath('bar'))
     assert_equals(m.index(0, 0), m.indexFromPath('baz'))
     assert_equals(m.index(0, 0, m.index(0, 0)), m.indexFromPath('baz/bax'))
+
+def test_removed_should_be_listed():
+    m = newmodel(rev=1)
+    assert m.indexFromPath('baz/box').isValid()

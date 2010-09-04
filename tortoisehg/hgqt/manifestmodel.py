@@ -14,16 +14,23 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+import itertools
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import util
+from tortoisehg.hgqt import qtlib
 
 class ManifestModel(QAbstractItemModel):
     """
     Qt model to display a hg manifest, ie. the tree of files at a
     given revision. To be used with a QTreeView.
     """
+    _STATUS_ICONS = {'modified': 'modified',
+                     'added': 'fileadd',
+                     'removed': 'filedelete'}
+
     def __init__(self, repo, rev, parent=None):
         QAbstractItemModel.__init__(self, parent)
 
@@ -36,10 +43,16 @@ class ManifestModel(QAbstractItemModel):
 
         e = index.internalPointer()
         if role == Qt.DecorationRole:
-            return QApplication.style().standardIcon(
-                len(e) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
+            return self._iconforentry(e)
         if role == Qt.DisplayRole:
             return e.name
+
+    def _iconforentry(self, e):
+        ic = QApplication.style().standardIcon(
+            len(e) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
+        if e.status:
+            ic = _overlaidicon(ic, qtlib.geticon(self._STATUS_ICONS[e.status]))
+        return ic
 
     def flags(self, index):
         if not index.isValid():
@@ -78,14 +91,21 @@ class ManifestModel(QAbstractItemModel):
     @util.propertycache
     def _rootentry(self):
         roote = _Entry()
-        for path in self._repo[self._rev].manifest():
-            path = path.split('/')
+        ctx = self._repo[self._rev]
+        status = dict(zip(('modified', 'added', 'removed'),
+                          self._repo.status(ctx.parents()[0], ctx)[:3]))
+        for path in itertools.chain(ctx.manifest(), status['removed']):
             e = roote
-
-            for p in path:
+            for p in path.split('/'):
                 if not p in e:
                     e.addchild(p)
                 e = e[p]
+
+            for st, files in status.iteritems():
+                if path in files:
+                    # TODO: what if added & removed at once?
+                    e.setstatus(st)
+                    break
 
         roote.sort()
         return roote
@@ -111,11 +131,22 @@ class ManifestModel(QAbstractItemModel):
 
         return self.createIndex(e.parent.index(e.name), 0, e)
 
+def _overlaidicon(base, overlay):
+    """Generate overlaid icon"""
+    # TODO: generalize this function as a utility
+    pixmap = base.pixmap(16, 16)
+    painter = QPainter(pixmap)
+    painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+    painter.drawPixmap(0, 0, overlay.pixmap(16, 16))
+    del painter
+    return QIcon(pixmap)
+
 class _Entry(object):
     """Each file or directory"""
     def __init__(self, name='', parent=None):
         self._name = name
         self._parent = parent
+        self._status = None
         self._child = {}
         self._nameindex = []
 
@@ -133,6 +164,15 @@ class _Entry(object):
     @property
     def name(self):
         return self._name
+
+    @property
+    def status(self):
+        """Return 'modified', 'added', 'removed' or None"""
+        return self._status
+
+    def setstatus(self, status):
+        assert status in ('modified', 'added', 'removed')
+        self._status = status
 
     def __len__(self):
         return len(self._child)
