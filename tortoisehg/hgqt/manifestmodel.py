@@ -14,10 +14,6 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial.node import short as short_hex
-
-from tortoisehg.hgqt.i18n import _
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
