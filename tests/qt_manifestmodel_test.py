@@ -12,19 +12,19 @@ def newmodel():
 
 def test_data():
     m = newmodel()
-    assert_equals('bar', m.data(m.index(0, 0)))
-    assert_equals('baz', m.data(m.index(1, 0)))
+    assert_equals('bar', m.data(m.index(1, 0)))
+    assert_equals('baz', m.data(m.index(0, 0)))
     assert_equals('foo', m.data(m.index(2, 0)))
 
 def test_data_subdir():
     m = newmodel()
-    assert_equals('bax', m.data(m.index(0, 0, m.index(1, 0))))
-    assert_equals('box', m.data(m.index(1, 0, m.index(1, 0))))
+    assert_equals('bax', m.data(m.index(0, 0, m.index(0, 0))))
+    assert_equals('box', m.data(m.index(1, 0, m.index(0, 0))))
 
 def test_data_inexistent():
     m = newmodel()
     assert_equals(None, m.data(QModelIndex()))
-    assert_equals(None, m.data(m.index(0, 0, m.index(0, 0))))
+    assert_equals(None, m.data(m.index(0, 0, m.index(1, 0))))
 
 def test_rowcount():
     m = newmodel()
@@ -32,22 +32,22 @@ def test_rowcount():
 
 def test_rowcount_subdirs():
     m = newmodel()
-    assert_equals(2, m.rowCount(m.index(1, 0)))
+    assert_equals(2, m.rowCount(m.index(0, 0)))
 
 def test_rowcount_invalid():
     m = newmodel()
-    assert_equals(0, m.rowCount(m.index(0, 0)))
+    assert_equals(0, m.rowCount(m.index(1, 0)))
 
 def test_pathfromindex():
     m = newmodel()
     assert_equals('', m.pathFromIndex(QModelIndex()))
-    assert_equals('bar', m.pathFromIndex(m.index(0, 0)))
-    assert_equals('baz', m.pathFromIndex(m.index(1, 0)))
-    assert_equals('baz/bax', m.pathFromIndex(m.index(0, 0, m.index(1, 0))))
+    assert_equals('bar', m.pathFromIndex(m.index(1, 0)))
+    assert_equals('baz', m.pathFromIndex(m.index(0, 0)))
+    assert_equals('baz/bax', m.pathFromIndex(m.index(0, 0, m.index(0, 0))))
 
 def test_indexfrompath():
     m = newmodel()
     assert_equals(QModelIndex(), m.indexFromPath(''))
-    assert_equals(m.index(0, 0), m.indexFromPath('bar'))
-    assert_equals(m.index(1, 0), m.indexFromPath('baz'))
-    assert_equals(m.index(0, 0, m.index(1, 0)), m.indexFromPath('baz/bax'))
+    assert_equals(m.index(1, 0), m.indexFromPath('bar'))
+    assert_equals(m.index(0, 0), m.indexFromPath('baz'))
+    assert_equals(m.index(0, 0, m.index(0, 0)), m.indexFromPath('baz/bax'))

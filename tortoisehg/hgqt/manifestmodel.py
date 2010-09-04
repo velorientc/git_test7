@@ -78,7 +78,7 @@ class ManifestModel(QAbstractItemModel):
     @util.propertycache
     def _rootentry(self):
         roote = _Entry()
-        for path in sorted(self.changectx.manifest()):
+        for path in self.changectx.manifest():
             path = path.split('/')
             e = roote
 
@@ -86,6 +86,8 @@ class ManifestModel(QAbstractItemModel):
                 if not p in e:
                     e.addchild(p)
                 e = e[p]
+
+        roote.sort()
         return roote
 
     def pathFromIndex(self, index):
@@ -151,3 +153,11 @@ class _Entry(object):
 
     def index(self, name):
         return self._nameindex.index(name)
+
+    def sort(self, reverse=False):
+        """Sort the entries recursively; directories first"""
+        for e in self._child.itervalues():
+            e.sort(reverse=reverse)
+        self._nameindex.sort(
+            key=lambda s: '%s%s' % (self[s] and 'D' or 'F', s),
+            reverse=reverse)
