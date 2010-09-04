@@ -715,9 +715,22 @@ class DetailsDialog(QDialog):
         hbox.addWidget(autoincsave)
         layout.addLayout(hbox)
 
-        if 'mq' in self.repo.extensions():
-            #  qnew/shelve-patch creation dialog (in another file)
-            hbox = QHBoxLayout()
+        hbox = QHBoxLayout()
+        #  qnew/shelve-patch creation dialog (in another file)
+        lbl = QLabel(_('New patch (QNew)'))
+        self.patchle = QLineEdit()
+        self.patchle.returnPressed.connect(self.newPatch)
+        createpatch = QPushButton(_('Create'))
+        createpatch.clicked.connect(self.newPatch)
+        def changed(text):
+            createpatch.setEnabled(bool(text))
+        self.patchle.textChanged.connect(changed)
+        createpatch.setEnabled(False)
+        hbox.addWidget(lbl)
+        hbox.addWidget(self.patchle)
+        hbox.addWidget(createpatch)
+        layout.addStretch(10)
+        layout.addLayout(hbox)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -728,6 +741,10 @@ class DetailsDialog(QDialog):
 
         name = hglib.get_reponame(self.repo)
         self.setWindowTitle('%s - commit details' % name)
+
+    def newPatch(self):
+        name = hglib.fromunicode(self.patchle.text())
+        # TODO
 
     def saveInRepo(self):
         fn = os.path.join(self.repo.root, '.hg', 'hgrc')
