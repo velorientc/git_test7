@@ -73,14 +73,14 @@ class CommitWidget(QWidget):
         hbox.addSpacing(2)
         vbox.addLayout(hbox, 0)
 
+        self.detailsbutton = QPushButton(_('Details'))
+        self.detailsbutton.pressed.connect(self.details)
+        self.buttonHBox.addWidget(self.detailsbutton)
+
         self.parentvbox = QVBoxLayout()
         self.parentlabels = [QLabel('<b>Parent:</b>')]
         self.parentvbox.addWidget(self.parentlabels[0])
         vbox.addLayout(self.parentvbox, 0)
-
-        # TODO: move to details widget
-        usercombo = QComboBox()
-        usercombo.setEditable(True)
 
         msgte = QPlainTextEdit()
         msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
@@ -114,9 +114,13 @@ class CommitWidget(QWidget):
         self.stwidget.split.addWidget(self.split)
         msgte.setFocus()
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
-        self.usercombo = usercombo
         self.msgte = msgte
         self.msgcombo = msgcombo
+
+    def details(self):
+        dlg = DetailsDialog(self.opts, self.userhist, self)
+        if dlg.exec_() == QDialog.Accepted:
+            self.opts.update(dlg.outopts)
 
     def reload(self):
         repo = self.stwidget.repo
@@ -381,7 +385,6 @@ class CommitWidget(QWidget):
         self.msgcombo.reset(self.msghistory)
         self.userhist = s.value('commit/userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
-        self.refreshUserList()
         try:
             curmsg = repo.opener('cur-message.txt').read()
             self.msgte.setPlainText(hglib.tounicode(curmsg))
@@ -412,31 +415,36 @@ class CommitWidget(QWidget):
         self.msghistory.insert(0, umsg)
         self.msghistory = self.msghistory[:10]
 
-    def refreshUserList(self):
-        self.usercombo.clear()
-        l = []
-        try:
-            repo = self.stwidget.repo
-            wctx = repo[None]
-            if self.opts.get('user'):
-                val = hglib.tounicode(self.opts['user'])
-                l.append(val)
-            val = hglib.tounicode(wctx.user())
-            l.append(val)
-        except util.Abort:
-            pass
-        for name in self.userhist:
-            if name not in l:
-                l.append(name)
-        for name in l:
-            self.usercombo.addItem(name)
-
     def addUsernameToHistory(self, user):
         if user in self.userhist:
             self.userhist.remove(user)
         self.userhist.insert(0, user)
         self.userhist = self.userhist[:10]
-        self.refreshUserList()
+
+    def getCurrentUsername(self):
+        # 1. Override has highest priority
+        user = self.opts.get('user')
+        if user:
+            return user
+
+        # 2. Read from repository
+        try:
+            return self.stwidget.repo.ui.username()
+        except error.Abort:
+            pass
+
+        # 3. Get a username from the user
+        QMessageBox.information(self, _('Please enter a username'),
+                    _('You must identify yourself to Mercurial'),
+                    QMessageBox.Ok)
+        from tortoisehg.hgqt.settings import SettingsDialog
+        dlg = SettingsDialog(False, focus='ui.username')
+        dlg.exec_()
+        self.stwidget.repo.ui.invalidateui()
+        try:
+            return self.stwidget.repo.ui.username()
+        except error.Abort:
+            return None
 
     def commit(self):
         repo = self.stwidget.repo
@@ -500,25 +508,12 @@ class CommitWidget(QWidget):
             return
         if len(repo.parents()) > 1:
             files = []
-        user = self.usercombo.currentText()
-        self.addUsernameToHistory(user)
-        user = hglib.fromunicode(user, 'strict')
+
+        user = self.getCurrentUsername()
         if not user:
-            try:
-                QMessageBox.information(self, _('Please enter a username'),
-                        _('You must identify yourself to Mercurial'),
-                        QMessageBox.Ok)
-                from tortoisehg.hgqt.settings import SettingsDialog
-                dlg = SettingsDialog(False, focus='ui.username')
-                dlg.exec_()
-                user = ui.ui().username()
-                if user:
-                    self.usercombo.addItem(hglib.tounicode(user))
-            except util.Abort:
-                pass
-            if not user:
-                self.usercombo.setFocus()
-                return
+            return
+        self.addUsernameToHistory(user)
+
         checkedUnknowns = self.stwidget.getChecked('?I')
         if checkedUnknowns:
             res = qtlib.CustomPrompt(
@@ -601,6 +596,153 @@ class MessageHistoryCombo(QComboBox):
             self.loaded = True
         QComboBox.showPopup(self)
 
+
+class DetailsDialog(QDialog):
+    'Utility dialog for configuring uncommon settings'
+    def __init__(self, opts, userhistory, parent):
+        QDialog.__init__(self, parent)
+        self.repo = parent.stwidget.repo
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        hbox = QHBoxLayout()
+        self.usercb = QCheckBox(_('Set username:'))
+
+        usercombo = QComboBox()
+        usercombo.setEditable(True)
+        usercombo.setEnabled(False)
+        self.usercb.toggled.connect(usercombo.setEnabled)
+
+        l = []
+        if opts.get('user'):
+            val = hglib.tounicode(self.opts['user'])
+            self.usercb.setChecked(True)
+            l.append(val)
+        try:
+            val = hglib.tounicode(self.repo.ui.username())
+            l.append(val)
+        except util.Abort:
+            pass
+        for name in userhistory:
+            if name not in l:
+                l.append(name)
+        for name in l:
+            usercombo.addItem(name)
+        self.usercombo = usercombo
+
+        usersaverepo = QPushButton(_('Save in Repo'))
+        usersaverepo.clicked.connect(self.saveInRepo)
+        usersaverepo.setEnabled(False)
+        self.usercb.toggled.connect(usersaverepo.setEnabled)
+
+        usersaveglobal = QPushButton(_('Save Global'))
+        usersaveglobal.clicked.connect(self.saveGlobal)
+        usersaveglobal.setEnabled(False)
+        self.usercb.toggled.connect(usersaveglobal.setEnabled)
+
+        hbox.addWidget(self.usercb)
+        hbox.addWidget(self.usercombo)
+        hbox.addWidget(usersaverepo)
+        hbox.addWidget(usersaveglobal)
+        layout.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        self.datecb = QCheckBox(_('Set Date:'))
+        self.datele = QLineEdit()
+        self.datele.setEnabled(False)
+        self.datecb.toggled.connect(self.datele.setEnabled)
+        curdate = QPushButton(_('Update'))
+        curdate.setEnabled(False)
+        self.datecb.toggled.connect(curdate.setEnabled)
+        curdate.clicked.connect( lambda: self.datele.setText(
+                hglib.tounicode(hglib.utctime(util.makedate()))))
+        if opts.get('date'):
+            self.datele.setText(opts['date'])
+            self.datecb.setChecked(True)
+        else:
+            self.datecb.setChecked(False)
+            curdate.clicked.emit(True)
+
+        hbox.addWidget(self.datecb)
+        hbox.addWidget(self.datele)
+        hbox.addWidget(curdate)
+        layout.addLayout(hbox)
+
+        if 'mq' in self.repo.extensions():
+            hbox = QHBoxLayout()
+
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.bb = bb
+        layout.addWidget(bb)
+
+        name = hglib.get_reponame(self.repo)
+        self.setWindowTitle('%s - commit details' % name)
+
+    def saveInRepo(self):
+        fn = os.path.join(self.repo.root, '.hg', 'hgrc')
+        self.saveToPath([fn])
+
+    def saveGlobal(self):
+        self.saveToPath(util.user_rcpath())
+
+    def saveToPath(self, path):
+        from tortoisehg.hgqt.sync import loadIniFile
+        fn, cfg = loadIniFile(path, self)
+        if not hasattr(cfg, 'write'):
+            qtlib.WarningMsgBox(_('Unable to save post pull operation'),
+                   _('Iniparse must be installed.'), parent=self)
+            return
+        if fn is None:
+            return
+        try:
+            user = hglib.fromunicode(self.usercombo.currentText())
+            if user:
+                cfg.set('ui', 'username', user)
+            else:
+                try:
+                    del cfg['ui']['username']
+                except KeyError:
+                    pass
+            wconfig.writefile(cfg, fn)
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+
+    def accept(self):
+        outopts = {}
+        if self.datecb.isChecked():
+            date = hglib.fromunicode(self.datele.text())
+            try:
+                util.parsedate(date)
+            except error.Abort, e:
+                qtlib.WarningMsgBox(_('Invalid date format'),
+                                    hglib.tounicode(e), parent=self)
+                return
+            outopts['date'] = date
+        else:
+            outopts['date'] = ''
+
+        if self.usercb.isChecked():
+            user = hglib.fromunicode(self.usercombo.currentText())
+        else:
+            user = ''
+
+        outopts['user'] = user
+        if not user:
+            try:
+                self.repo.ui.username()
+            except util.Abort, e:
+                qtlib.WarningMsgBox(_('No username configured'),
+                                    hglib.tounicode(e), parent=self)
+                return
+
+        self.outopts = outopts
+        QDialog.accept(self)
+
 # Technical Debt for standalone tool
 #   add a toolbar for refresh
 #   add a statusbar and simple progressbar
@@ -617,23 +759,18 @@ class CommitDialog(QDialog):
 
         commit = CommitWidget(pats, opts, None, self)
         layout.addWidget(commit, 1)
-        layout.setContentsMargins(0, 6, 0, 0)
 
-        bbl = QHBoxLayout()
-        layout.addLayout(bbl)
-        layout.addSpacing(9)
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
         bb.button(BB.Discard).setText('Undo')
         bb.button(BB.Discard).clicked.connect(commit.rollback)
-        bbl.addWidget(bb, alignment=Qt.AlignRight)
-        bbl.addSpacing(9)
-        self.bb = bb
         bb.button(BB.Cancel).setDefault(False)
         bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Ok).setDefault(True)
+        layout.addWidget(bb)
+        self.bb = bb
 
         s = QSettings()
         commit.restoreState(s.value('commit/state').toByteArray())
