@@ -327,9 +327,9 @@ INFO = (
     (_('Close After Commit'), 'tortoisehg.closeci', genBoolCombo,
         _('Close the commit tool after every successful'
           ' commit.  Default: False')),
-    (_('Push After Commit'), 'tortoisehg.pushafterci', genBoolCombo,
-        _('Attempt to push to default push target after every successful'
-          ' commit.  Default: False')),
+    (_('Push After Commit'), 'tortoisehg.cipushafter', genEditCombo,
+        _('Attempt to push to specified URL or alias after each successful'
+          ' commit.  Default: No push')),
     (_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,
        _('Comma separated list of files that are automatically included'
          ' in every commit.  Intended for use only as a repository setting.'

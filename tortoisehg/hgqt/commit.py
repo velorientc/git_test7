@@ -14,18 +14,17 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, shlib, paths
+from tortoisehg.util import hglib, shlib, paths, wconfig
 from tortoisehg.util.util import format_desc
 
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
+from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
 #  threaded / wrapped commit (need a CmdRunner equivalent)
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
 #  +1 / -1 head indication (not as important with workbench integration)
-#  pushafterci list
-#  qnew/shelve-patch creation dialog (in another file)
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
 
@@ -47,6 +46,8 @@ class CommitWidget(QWidget):
         self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
         self.qref = False
+        self.opts['pushafter'] = self.stwidget.repo.ui.config('tortoisehg',
+                                                              'cipushafter', '')
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -557,6 +558,7 @@ class CommitWidget(QWidget):
             if fname:
                 cmdline.extend(['--include', fname])
 
+        # TODO: self.opts['pushafter']
         ret = dispatch._dispatch(_ui, cmdline)
         if not ret:
             self.addMessageToHistory()
@@ -669,7 +671,30 @@ class DetailsDialog(QDialog):
         hbox.addWidget(curdate)
         layout.addLayout(hbox)
 
+        #  pushafterci
+        hbox = QHBoxLayout()
+        self.pushaftercb = QCheckBox(_('Push After Commit:'))
+        self.pushafterle = QLineEdit()
+        self.pushafterle.setEnabled(False)
+        self.pushaftercb.toggled.connect(self.pushafterle.setEnabled)
+
+        pushaftersave = QPushButton(_('Save in Repo'))
+        pushaftersave.clicked.connect(self.savePushAfter)
+        pushaftersave.setEnabled(False)
+        self.pushaftercb.toggled.connect(pushaftersave.setEnabled)
+
+        if opts.get('pushafter'):
+            val = hglib.tounicode(opts['pushafter'])
+            self.pushafterle.setText(val)
+            self.pushaftercb.setChecked(True)
+
+        hbox.addWidget(self.pushaftercb)
+        hbox.addWidget(self.pushafterle)
+        hbox.addWidget(pushaftersave)
+        layout.addLayout(hbox)
+
         if 'mq' in self.repo.extensions():
+            #  qnew/shelve-patch creation dialog (in another file)
             hbox = QHBoxLayout()
 
         BB = QDialogButtonBox
@@ -690,10 +715,9 @@ class DetailsDialog(QDialog):
         self.saveToPath(util.user_rcpath())
 
     def saveToPath(self, path):
-        from tortoisehg.hgqt.sync import loadIniFile
         fn, cfg = loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
-            qtlib.WarningMsgBox(_('Unable to save post pull operation'),
+            qtlib.WarningMsgBox(_('Unable to save username'),
                    _('Iniparse must be installed.'), parent=self)
             return
         if fn is None:
@@ -705,6 +729,29 @@ class DetailsDialog(QDialog):
             else:
                 try:
                     del cfg['ui']['username']
+                except KeyError:
+                    pass
+            wconfig.writefile(cfg, fn)
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+
+    def savePushAfter(self):
+        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        fn, cfg = loadIniFile([path], self)
+        if not hasattr(cfg, 'write'):
+            qtlib.WarningMsgBox(_('Unable to save after commit push'),
+                   _('Iniparse must be installed.'), parent=self)
+            return
+        if fn is None:
+            return
+        try:
+            remote = hglib.fromunicode(self.pushafterle.text())
+            if remote:
+                cfg.set('tortoisehg', 'cipushafter', remote)
+            else:
+                try:
+                    del cfg['tortoisehg']['cipushafter']
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
@@ -730,7 +777,6 @@ class DetailsDialog(QDialog):
             user = hglib.fromunicode(self.usercombo.currentText())
         else:
             user = ''
-
         outopts['user'] = user
         if not user:
             try:
@@ -739,6 +785,12 @@ class DetailsDialog(QDialog):
                 qtlib.WarningMsgBox(_('No username configured'),
                                     hglib.tounicode(e), parent=self)
                 return
+
+        if self.pushaftercb.isChecked():
+            remote = hglib.fromunicode(self.pushafterle.text())
+            outopts['pushafter'] = remote
+        else:
+            outopts['pushafter'] = ''
 
         self.outopts = outopts
         QDialog.accept(self)
