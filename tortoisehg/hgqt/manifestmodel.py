@@ -17,46 +17,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class _TreeItem(object):
-    def __init__(self, data, parent=None):
-        self.parentItem = parent
-        self.itemData = data
-        self.childItems = []
-
-    def appendChild(self, item):
-        self.childItems.append(item)
-        return item
-    addChild = appendChild
-
-    def child(self, row):
-        return self.childItems[row]
-
-    def childCount(self):
-        return len(self.childItems)
-
-    def columnCount(self):
-        return len(self.itemData)
-
-    def data(self, column):
-        return self.itemData[column]
-
-    def parent(self):
-        return self.parentItem
-
-    def row(self):
-        if self.parentItem:
-            return self.parentItem.childItems.index(self)
-        return 0
-
-    def __getitem__(self, idx):
-        return self.childItems[idx]
-
-    def __len__(self):
-        return len(self.childItems)
-
-    def __iter__(self):
-        for ch in self.childItems:
-            yield ch
+from mercurial import util
 
 class ManifestModel(QAbstractItemModel):
     """
@@ -68,18 +29,17 @@ class ManifestModel(QAbstractItemModel):
 
         self.repo = repo
         self.changectx = self.repo.changectx(rev)
-        self.setupModelData()
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return
 
-        item = index.internalPointer()
+        e = index.internalPointer()
         if role == Qt.DecorationRole:
             return QApplication.style().standardIcon(
-                item.childItems and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
+                len(e) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
         if role == Qt.DisplayRole:
-            return item.data(index.column())
+            return e.name
 
     def flags(self, index):
         if not index.isValid():
@@ -87,78 +47,107 @@ class ManifestModel(QAbstractItemModel):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def index(self, row, column, parent=QModelIndex()):
-        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
-            return QModelIndex()
-
-        if not parent.isValid():
-            parentItem = self.rootItem
-        else:
-            parentItem = parent.internalPointer()
-        childItem = parentItem.child(row)
-        if childItem is not None:
-            return self.createIndex(row, column, childItem)
-        else:
+        try:
+            return self.createIndex(row, column,
+                                    self._parententry(parent).at(row))
+        except IndexError:
             return QModelIndex()
 
     def parent(self, index):
         if not index.isValid():
             return QModelIndex()
 
-        childItem = index.internalPointer()
-        parentItem = childItem.parent()
-
-        if parentItem == self.rootItem:
+        e = index.internalPointer()
+        if e.path:
+            return self.indexFromPath(e.parent.path)
+        else:
             return QModelIndex()
 
-        return self.createIndex(parentItem.row(), 0, parentItem)
+    def _parententry(self, parent):
+        if parent.isValid():
+            return parent.internalPointer()
+        else:
+            return self._rootentry
 
     def rowCount(self, parent=QModelIndex()):
-        if parent.column() > 0:
-            return 0
-
-        if not parent.isValid():
-            parentItem = self.rootItem
-        else:
-            parentItem = parent.internalPointer()
-        return parentItem.childCount()
+        return len(self._parententry(parent))
 
     def columnCount(self, parent=QModelIndex()):
-        if parent.isValid():
-            return parent.internalPointer().columnCount()
-        else:
-            return self.rootItem.columnCount()
+        return 1
 
-    def setupModelData(self):
-        self.rootItem = _TreeItem([''])
-
+    @util.propertycache
+    def _rootentry(self):
+        roote = _Entry()
         for path in sorted(self.changectx.manifest()):
             path = path.split('/')
-            node = self.rootItem
+            e = roote
 
             for p in path:
-                for ch in node:
-                    if ch.data(0) == p:
-                        node = ch
-                        break
-                else:
-                    node = node.addChild(_TreeItem([p], node))
+                if not p in e:
+                    e.addchild(p)
+                e = e[p]
+        return roote
 
     def pathFromIndex(self, index):
-        idxs = []
-        while index.isValid():
-            idxs.insert(0, index)
-            index = self.parent(index)
-        return '/'.join([index.internalPointer().data(0) for index in idxs])
+        if not index.isValid():
+            return ''
+
+        return index.internalPointer().path
 
     def indexFromPath(self, path):
         """Return index for the specified path if found; otherwise invalid index"""
-        def search(paths, parent=QModelIndex()):
-            if not paths:
-                return parent
-            for r in xrange(self.rowCount(parent)):
-                i = self.index(r, 0, parent)
-                if self.data(i) == paths[0]:
-                    return search(paths[1:], i)
-            return QModelIndex()  # not found
+        if not path:
+            return QModelIndex()
 
-        return search(path.split('/'))
+        e = self._rootentry
+        paths = path and path.split('/') or []
+        try:
+            for p in paths:
+                e = e[p]
+        except KeyError:
+            return QModelIndex()
+
+        return self.createIndex(e.parent.index(e.name), 0, e)
+
+class _Entry(object):
+    """Each file or directory"""
+    def __init__(self, name='', parent=None):
+        self._name = name
+        self._parent = parent
+        self._child = {}
+        self._nameindex = []
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @property
+    def path(self):
+        if self.parent is None or not self.parent.name:
+            return self.name
+        else:
+            return self.parent.path + '/' + self.name
+
+    @property
+    def name(self):
+        return self._name
+
+    def __len__(self):
+        return len(self._child)
+
+    def __getitem__(self, name):
+        return self._child[name]
+
+    def addchild(self, name):
+        if name not in self._child:
+            self._nameindex.append(name)
+        self._child[name] = self.__class__(name, parent=self)
+
+    def __contains__(self, item):
+        return item in self._child
+
+    def at(self, index):
+        return self._child[self._nameindex[index]]
+
+    def index(self, name):
+        return self._nameindex.index(name)
