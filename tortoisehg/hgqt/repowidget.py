@@ -462,10 +462,8 @@ class RepoWidget(QWidget):
         self.repo.thginvalidate()
         self._repodate = self._getrepomtime()
         self.setupModels()
-        cw = self.getCommitWidget()
-        if cw:
-            cw.stwidget.refreshWctx()
-        self.revDetailsWidget.reload(rev)
+        self.commitDemand.forward('reload')
+        self.revDetailsWidget.reload()
 
     def reloadTaskTab(self):
         tti = self.taskTabsWidget.currentIndex()
@@ -528,9 +526,7 @@ class RepoWidget(QWidget):
             self.storeSettings()
         self.revDetailsWidget.storeSettings()
         s = QSettings()
-        cw = self.getCommitWidget()
-        if cw:
-            cw.storeConfigs(s)
+        self.commitDemand.forward('storeConfigs', s)
         return True
 
     def runCommand(self, title, cmdline):
