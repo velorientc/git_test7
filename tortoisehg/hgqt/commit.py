@@ -46,8 +46,10 @@ class CommitWidget(QWidget):
         self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
         self.qref = False
-        self.opts['pushafter'] = self.stwidget.repo.ui.config('tortoisehg',
-                                                              'cipushafter', '')
+
+        repo = self.stwidget.repo
+        self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
+        self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -553,7 +555,7 @@ class CommitWidget(QWidget):
         if self.qref:
             cmdline[0] = 'qrefresh'
 
-        for fname in repo.ui.config('tortoisehg', 'autoinc', '').split(','):
+        for fname in self.opts.get('autoinc', '').split(','):
             fname = fname.strip()
             if fname:
                 cmdline.extend(['--include', fname])
@@ -671,7 +673,6 @@ class DetailsDialog(QDialog):
         hbox.addWidget(curdate)
         layout.addLayout(hbox)
 
-        #  pushafterci
         hbox = QHBoxLayout()
         self.pushaftercb = QCheckBox(_('Push After Commit:'))
         self.pushafterle = QLineEdit()
@@ -691,6 +692,27 @@ class DetailsDialog(QDialog):
         hbox.addWidget(self.pushaftercb)
         hbox.addWidget(self.pushafterle)
         hbox.addWidget(pushaftersave)
+        layout.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        self.autoinccb = QCheckBox(_('Auto Includes:'))
+        self.autoincle = QLineEdit()
+        self.autoincle.setEnabled(False)
+        self.autoinccb.toggled.connect(self.autoincle.setEnabled)
+
+        autoincsave = QPushButton(_('Save in Repo'))
+        autoincsave.clicked.connect(self.saveAutoInc)
+        autoincsave.setEnabled(False)
+        self.autoinccb.toggled.connect(autoincsave.setEnabled)
+
+        if opts.get('autoinc'):
+            val = hglib.tounicode(opts['autoinc'])
+            self.autoincle.setText(val)
+            self.autoinccb.setChecked(True)
+
+        hbox.addWidget(self.autoinccb)
+        hbox.addWidget(self.autoincle)
+        hbox.addWidget(autoincsave)
         layout.addLayout(hbox)
 
         if 'mq' in self.repo.extensions():
@@ -752,6 +774,29 @@ class DetailsDialog(QDialog):
             else:
                 try:
                     del cfg['tortoisehg']['cipushafter']
+                except KeyError:
+                    pass
+            wconfig.writefile(cfg, fn)
+        except IOError, e:
+            qtlib.WarningMsgBox(_('Unable to write configuration file'),
+                                hglib.tounicode(e), parent=self)
+
+    def saveAutoInc(self):
+        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        fn, cfg = loadIniFile([path], self)
+        if not hasattr(cfg, 'write'):
+            qtlib.WarningMsgBox(_('Unable to save auto include list'),
+                   _('Iniparse must be installed.'), parent=self)
+            return
+        if fn is None:
+            return
+        try:
+            list = hglib.fromunicode(self.autoincle.text())
+            if list:
+                cfg.set('tortoisehg', 'autoinc', list)
+            else:
+                try:
+                    del cfg['tortoisehg']['autoinc']
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
