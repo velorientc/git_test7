@@ -27,8 +27,8 @@ class ManifestModel(QAbstractItemModel):
     def __init__(self, repo, rev, parent=None):
         QAbstractItemModel.__init__(self, parent)
 
-        self.repo = repo
-        self.changectx = self.repo.changectx(rev)
+        self._repo = repo
+        self._rev = rev
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
@@ -78,7 +78,7 @@ class ManifestModel(QAbstractItemModel):
     @util.propertycache
     def _rootentry(self):
         roote = _Entry()
-        for path in self.changectx.manifest():
+        for path in self._repo[self._rev].manifest():
             path = path.split('/')
             e = roote
 
