@@ -140,7 +140,11 @@ def _extendrepo(repo):
 
         @propertycache
         def wsvisible(self):
-            return self.ui.configbool('tortoisehg', 'wsvisible')
+            val = self.ui.config('tortoisehg', 'wsvisible')
+            if val in ('Visible', 'VisibleAfterIndent'):
+                return val
+            else:
+                return 'Invisible'
 
         def shell(self):
             'Returns terminal shell configured for this repo'

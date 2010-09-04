@@ -251,8 +251,10 @@ INFO = (
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     (_('Shell'), 'tortoisehg.shell', genEditCombo,
         _('Specify your preferred terminal shell application')),
-    (_('Visible Whitespace'), 'tortoisehg.wsvisible', genBoolCombo,
-        _('Make whitespace visible in file and diff previews.')),
+    (_('Visible Whitespace'), 'tortoisehg.wsvisible', (genDefaultCombo,
+        ['Visible', 'Invisible', 'VisibleAfterIndent']),
+        _('Make whitespace visible in file and diff previews.'
+          ' Default: Invisible')),
     (_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
         _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHg windows.'

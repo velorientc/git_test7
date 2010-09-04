@@ -216,8 +216,10 @@ class HgFileView(QFrame):
         self._ctx = ctx
         self._p_rev = None
         self.sci.setTabWidth(ctx._repo.tabwidth)
-        if ctx._repo.wsvisible:
+        if ctx._repo.wsvisible == 'Visible':
             self.sci.setWhitespaceVisibility(qsci.WsVisible)
+        elif ctx._repo.wsvisible == 'VisibleAfterIndent':
+            self.sci.setWhitespaceVisibility(qsci.WsVisibleAfterIndent)
         else:
             self.sci.setWhitespaceVisibility(qsci.WsInvisible)
 
