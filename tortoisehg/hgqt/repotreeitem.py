@@ -137,7 +137,7 @@ class RepoItem(RepoTreeItem):
     def __init__(self, model, rootpath='', parent=None):
         RepoTreeItem.__init__(self, model, parent)
         self._root = rootpath
-        self._setttingsdlg = None
+        self._settingsdlg = None
 
     def rootpath(self):
         return self._root
@@ -176,11 +176,11 @@ class RepoItem(RepoTreeItem):
         self.model.openrepofunc(self._root)
 
     def startSettings(self, parent):
-        if self._setttingsdlg is None:
-            self._setttingsdlg = SettingsDialog(
+        if self._settingsdlg is None:
+            self._settingsdlg = SettingsDialog(
                 configrepo=True, focus='web.name', parent=parent,
                 root=self._root)
-        self._setttingsdlg.show()
+        self._settingsdlg.show()
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
