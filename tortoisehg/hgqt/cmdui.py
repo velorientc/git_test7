@@ -73,7 +73,6 @@ class Core(QObject):
     commandStarted = pyqtSignal()
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
-    progress = pyqtSignal(thread.DataWrapper)
     clearSignal = pyqtSignal()
 
     def __init__(self, logwidget=None):
@@ -245,11 +244,10 @@ class Widget(QWidget):
         super(Widget, self).__init__()
 
         self.core = Core(logwidget)
-        self.core.commandStarted.connect(lambda: self.commandStarted.emit())
-        self.core.commandFinished.connect(lambda w: self.commandFinished.emit(w))
-        self.core.commandCanceling.connect(lambda: self.commandCanceling.emit())
+        self.core.commandStarted.connect(self.commandStarted)
+        self.core.commandFinished.connect(self.commandFinished)
+        self.core.commandCanceling.connect(self.commandCanceling)
         if logwidget:
-            self.core.progress.connect(logwidget.progress)
             return
 
         # main layout grid
@@ -305,8 +303,9 @@ class Dialog(QDialog):
         self.finishfunc = finishfunc
 
         self.core = Core()
+        self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
-        self.core.commandCanceling.connect(lambda: self.commandCanceling.emit())
+        self.core.commandCanceling.connect(self.commandCanceling)
 
         # main layout grid
         grid = QGridLayout()
@@ -403,16 +402,16 @@ class Runner(QObject):
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
 
-    def __init__(self, title=_('TortoiseHg'), parent=None):
+    def __init__(self, title=_('TortoiseHg'), parent=None, log=None):
         super(Runner, self).__init__()
 
         self.title = title
         self.parent = parent
 
-        self.core = Core()
-        self.core.commandStarted.connect(lambda: self.commandStarted.emit())
+        self.core = Core(log)
+        self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
-        self.core.commandCanceling.connect(lambda: self.commandCanceling.emit())
+        self.core.commandCanceling.connect(self.commandCanceling)
 
         self.core.output_text.setMinimumSize(460, 320)
 
