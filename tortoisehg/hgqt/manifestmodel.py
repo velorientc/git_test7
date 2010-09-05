@@ -13,7 +13,6 @@ import itertools
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util
 from tortoisehg.hgqt import qtlib
 
 class ManifestModel(QAbstractItemModel):
@@ -85,8 +84,16 @@ class ManifestModel(QAbstractItemModel):
     def columnCount(self, parent=QModelIndex()):
         return 1
 
-    @util.propertycache
+    @property
     def _rootentry(self):
+        try:
+            return self.__rootentry
+        except AttributeError:
+            self._buildrootentry()
+            return self.__rootentry
+
+    def _buildrootentry(self):
+        """Rebuild the tree of files and directories"""
         roote = _Entry()
         ctx = self._repo[self._rev]
         status = dict(zip(('M', 'A', 'R'),
@@ -107,7 +114,10 @@ class ManifestModel(QAbstractItemModel):
                 e.setstatus('C')
 
         roote.sort()
-        return roote
+
+        self.beginResetModel()
+        self.__rootentry = roote
+        self.endResetModel()
 
     def filePath(self, index):
         if not index.isValid():
