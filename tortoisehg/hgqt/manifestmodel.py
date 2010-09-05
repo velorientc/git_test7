@@ -62,6 +62,12 @@ class ManifestModel(QAbstractItemModel):
             ic = _overlaidicon(ic, qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
         return ic
 
+    def isDir(self, index):
+        if not index.isValid():
+            return True  # root entry must be a directory
+        e = index.internalPointer()
+        return len(e) != 0
+
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled

@@ -26,6 +26,12 @@ def test_data_inexistent():
     assert_equals(None, m.data(QModelIndex()))
     assert_equals(None, m.data(m.index(0, 0, m.index(1, 0))))
 
+def test_isdir():
+    m = newmodel()
+    assert m.isDir(m.indexFromPath(''))
+    assert m.isDir(m.indexFromPath('baz'))
+    assert not m.isDir(m.indexFromPath('foo'))
+
 def test_rowcount():
     m = newmodel()
     assert_equals(3, m.rowCount())
