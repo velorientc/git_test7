@@ -21,9 +21,7 @@ class ManifestModel(QAbstractItemModel):
     Qt model to display a hg manifest, ie. the tree of files at a
     given revision. To be used with a QTreeView.
     """
-    _STATUS_ICONS = {'modified': 'modified',
-                     'added': 'fileadd',
-                     'removed': 'filedelete'}
+    _STATUS_ICONS = {'M': 'modified', 'A': 'fileadd', 'R': 'filedelete'}
 
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
@@ -49,7 +47,7 @@ class ManifestModel(QAbstractItemModel):
     def _iconforentry(self, e):
         ic = QApplication.style().standardIcon(
             len(e) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
-        if e.status:
+        if e.status in self._STATUS_ICONS:
             ic = _overlaidicon(ic, qtlib.geticon(self._STATUS_ICONS[e.status]))
         return ic
 
@@ -91,9 +89,9 @@ class ManifestModel(QAbstractItemModel):
     def _rootentry(self):
         roote = _Entry()
         ctx = self._repo[self._rev]
-        status = dict(zip(('modified', 'added', 'removed'),
+        status = dict(zip(('M', 'A', 'R'),
                           self._repo.status(ctx.parents()[0], ctx)[:3]))
-        for path in itertools.chain(ctx.manifest(), status['removed']):
+        for path in itertools.chain(ctx.manifest(), status['R']):
             e = roote
             for p in path.split('/'):
                 if not p in e:
@@ -105,6 +103,8 @@ class ManifestModel(QAbstractItemModel):
                     # TODO: what if added & removed at once?
                     e.setstatus(st)
                     break
+            else:
+                e.setstatus('C')
 
         roote.sort()
         return roote
@@ -166,11 +166,11 @@ class _Entry(object):
 
     @property
     def status(self):
-        """Return 'modified', 'added', 'removed' or None"""
+        """Return file change status"""
         return self._status
 
     def setstatus(self, status):
-        assert status in ('modified', 'added', 'removed')
+        assert status in 'MARC'
         self._status = status
 
     def __len__(self):
