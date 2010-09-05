@@ -26,12 +26,14 @@ class ManifestModel(QAbstractItemModel):
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
-    def __init__(self, repo, rev, parent=None):
+    def __init__(self, repo, rev, statusfilter='MAC', parent=None):
         QAbstractItemModel.__init__(self, parent)
 
         self._repo = repo
         self._rev = rev
-        self._statusfilter = 'MAC'
+
+        assert util.all(c in 'MARC' for c in statusfilter)
+        self._statusfilter = statusfilter
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():

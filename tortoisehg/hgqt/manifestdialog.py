@@ -27,7 +27,7 @@ from PyQt4.Qsci import QsciScintilla
 from tortoisehg.util import paths, thgrepo
 from tortoisehg.util.hglib import tounicode
 
-from tortoisehg.hgqt import qtlib, annotate
+from tortoisehg.hgqt import qtlib, annotate, status
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer
@@ -177,6 +177,9 @@ class ManifestWidget(QWidget):
             lambda: self._fileselected(self._treeview.currentIndex()))
 
     def _initactions(self):
+        self._statusfilter = _StatusFilterButton(text='MAC')
+        self._toolbar.addWidget(self._statusfilter)
+
         self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
         self._action_annotate_mode.toggled.connect(
             lambda checked: self.setfileview(checked and 'annotate' or 'cat'))
@@ -188,9 +191,11 @@ class ManifestWidget(QWidget):
         return self._toolbar
 
     def _setupmodel(self):
-        self._treemodel = ManifestModel(self._repo, self._rev)
+        self._treemodel = ManifestModel(self._repo, self._rev,
+                                        statusfilter=self._statusfilter.text)
         self._treeview.setModel(self._treemodel)
         self._treeview.selectionModel().currentChanged.connect(self._fileselected)
+        self._statusfilter.textChanged.connect(self._treemodel.setStatusFilter)
 
     def reload(self):
         # TODO
@@ -243,6 +248,57 @@ class ManifestWidget(QWidget):
         assert mode in self._filewidgets
         self._curfileview = self._filewidgets[mode]
         self._contentview.setCurrentWidget(self._curfileview)
+
+# TODO: share this menu with status widget?
+class _StatusFilterButton(QToolButton):
+    """Button with drop-down menu for status filter"""
+    textChanged = pyqtSignal(str)
+
+    _TYPES = 'MARC'
+
+    def __init__(self, text=_TYPES, parent=None):
+        super(_StatusFilterButton, self).__init__(
+            parent, popupMode=QToolButton.InstantPopup,
+            icon=qtlib.geticon('status'),
+            toolButtonStyle=Qt.ToolButtonTextBesideIcon)
+
+        self._initactions(text=text)
+        self._setText(self.text)
+
+    def _initactions(self, text):
+        self._actions = {}
+        menu = QMenu(self)
+        for c in self._TYPES:
+            st = status.statusTypes[c]
+            a = menu.addAction('%s %s' % (c, st.name))
+            if st.icon:
+                a.setIcon(qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
+            a.setCheckable(True)
+            a.setChecked(c in text)
+            a.toggled.connect(self._update)
+            self._actions[c] = a
+        self.setMenu(menu)
+
+    @pyqtSlot()
+    def _update(self):
+        self._setText(self.text)
+        self.textChanged.emit(self.text)
+
+    @property
+    def text(self):
+        """Return the text for status filter"""
+        return ''.join(c for c in self._TYPES
+                       if self._actions[c].isChecked())
+
+    @pyqtSlot(str)
+    def setText(self, text):
+        """Set the status text"""
+        assert util.all(c in self._TYPES for c in text)
+        for c in self._TYPES:
+            self._actions[c].setChecked(c in text)
+
+    def _setText(self, text):
+        super(_StatusFilterButton, self).setText(text)
 
 
 def run(ui, *pats, **opts):
