@@ -375,12 +375,8 @@ class RepoWidget(QWidget):
     def modelFilled(self):
         'initial batch of revisions loaded'
         self.repoview.resizeColumns()
-        if self._reload_rev is not None:
-            try:
-                self.repoview.goto(self._reload_rev)
-                self.revDetailsWidget.finishReload()
-            except IndexError:
-                pass
+        self.repoview.goto(self._reload_rev) # emits revision_selected
+        self.revDetailsWidget.finishReload()
 
     def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
@@ -477,16 +473,16 @@ class RepoWidget(QWidget):
         except EnvironmentError, ValueError:
             return None
 
-    def reload(self, rev=None):
+    def reload(self):
         'Initiate a refresh of the repo model, rebuild graph'
-        if rev is None:
-            self._reload_rev = self.rev
-        else:
-            self._reload_rev = rev
-        self.showMessage('')
         self._repomtime = self._getrepomtime()
         self._recorddirstate()
+        self.showMessage('')
         self.repo.thginvalidate()
+        if self.rev is not None and len(self.repo) >= self.rev:
+            self._reload_rev = '.'
+        else:
+            self._reload_rev = self.rev
         self.setupModels()
         self.revDetailsWidget.record()
         self.commitDemand.forward('reload')

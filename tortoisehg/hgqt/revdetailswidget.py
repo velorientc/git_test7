@@ -313,10 +313,11 @@ class RevDetailsWidget(QWidget):
 
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
-        if self._last_rev and len(self.repo) > self._last_rev:
-            f = self.filelist.currentFile()
-            self.revision_selected(self._last_rev)
-            self.filelist.selectFile(f)
+        if len(self.repo) <= self._last_rev:
+            self._last_rev = '.'
+        f = self.filelist.currentFile()
+        self.revision_selected(self._last_rev)
+        self.filelist.selectFile(f)
 
     def storeSettings(self):
         s = QSettings()
