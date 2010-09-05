@@ -259,10 +259,10 @@ class HgRepoView(QTableView):
         """
         Select revision 'rev' (can be anything understood by repo.changectx())
         """
-        rev = str(rev) # might be a QString
-        repo = self.repo
+        if rev is not None:
+            rev = str(rev) # might be a QString
         try:
-            rev = repo.changectx(rev).rev()
+            rev = self.repo.changectx(rev).rev()
         except RepoError:
             self.showMessage.emit("Can't find revision '%s'" % rev)
         else:
