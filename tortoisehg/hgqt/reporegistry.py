@@ -83,20 +83,20 @@ class RepoTreeView(QTreeView):
         if len(selection) == 0:
             self.selitem = None
         else:
-            self.selitem = selection[0]       
+            self.selitem = selection[0]
 
     def _action_defs(self):
-        a = [("open", _("Open"), None, 
+        a = [("open", _("Open"), None,
                 _("Opens the repository in a new tab"), None, self.open),
-             ("newGroup", _("New Group"), None, 
+             ("newGroup", _("New Group"), None,
                 _("Create a new group"), None, self.newGroup),
-             ("rename", _("Rename"), None, 
+             ("rename", _("Rename"), None,
                 _("Rename the entry"), None, self.startRename),
-             ("settings", _("Settings..."), None, 
+             ("settings", _("Settings..."), None,
                 _("View the repository's settings"), None, self.startSettings),
-             ("remove", _("Delete"), None, 
+             ("remove", _("Delete"), None,
                 _("Delete the node and all its subnodes"), None, self.removeSelected),
-             ("clone", _("Clone..."), None, 
+             ("clone", _("Clone..."), None,
                 _("Clone Repository"), None, self.cloneRepo),
              ("explore", _("Explore"), None,
                 _("Open the repository in Windows Explorer"), None, self.explore),

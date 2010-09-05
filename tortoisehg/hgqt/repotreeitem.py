@@ -95,7 +95,7 @@ class RepoTreeItem(object):
             c._row = 0
             c._parent = None
         for i, c in enumerate(keep):
-            c._row = i        
+            c._row = i
         return True
 
     def dump(self, xw):
@@ -188,7 +188,7 @@ class RepoItem(RepoTreeItem):
     def getRepoItem(self, reporoot):
         if reporoot == self._root:
             return self
-        return None                
+        return None
 
 
 class RepoGroupItem(RepoTreeItem):
@@ -236,7 +236,7 @@ class RepoGroupItem(RepoTreeItem):
         labels = [(QMessageBox.Yes, _('&Delete')),
                   (QMessageBox.No, _('Cancel'))]
         return qtlib.QuestionMsgBox(
-            _('Confirm Delete'), 
+            _('Confirm Delete'),
             _("Delete Group '%s' and all its entries?") % self.name,
             labels=labels, parent=parentWidget)
 
