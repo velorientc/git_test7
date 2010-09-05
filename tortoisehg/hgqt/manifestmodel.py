@@ -104,7 +104,7 @@ class ManifestModel(QAbstractItemModel):
         roote.sort()
         return roote
 
-    def pathFromIndex(self, index):
+    def filePath(self, index):
         if not index.isValid():
             return ''
 

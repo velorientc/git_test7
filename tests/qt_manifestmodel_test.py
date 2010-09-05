@@ -40,10 +40,10 @@ def test_rowcount_invalid():
 
 def test_pathfromindex():
     m = newmodel()
-    assert_equals('', m.pathFromIndex(QModelIndex()))
-    assert_equals('bar', m.pathFromIndex(m.index(1, 0)))
-    assert_equals('baz', m.pathFromIndex(m.index(0, 0)))
-    assert_equals('baz/bax', m.pathFromIndex(m.index(0, 0, m.index(0, 0))))
+    assert_equals('', m.filePath(QModelIndex()))
+    assert_equals('bar', m.filePath(m.index(1, 0)))
+    assert_equals('baz', m.filePath(m.index(0, 0)))
+    assert_equals('baz/bax', m.filePath(m.index(0, 0, m.index(0, 0))))
 
 def test_indexfrompath():
     m = newmodel()

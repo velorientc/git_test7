@@ -218,7 +218,7 @@ class ManifestWidget(QWidget):
     @property
     def path(self):
         """Return currently selected path"""
-        return self._treemodel.pathFromIndex(self._treeview.currentIndex())
+        return self._treemodel.filePath(self._treeview.currentIndex())
 
     @pyqtSlot(unicode)
     def setpath(self, path):
@@ -229,7 +229,7 @@ class ManifestWidget(QWidget):
     # see http://thread.gmane.org/gmane.comp.python.pyqt-pykde/19836
     #@pyqtSlot(QModelIndex)
     def _fileselected(self, index):
-        path = self._treemodel.pathFromIndex(index)
+        path = self._treemodel.filePath(index)
         if path not in self._repo[self._rev]:
             self._contentview.setCurrentWidget(self._nullcontent)
             return
