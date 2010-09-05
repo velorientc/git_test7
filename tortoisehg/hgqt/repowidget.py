@@ -51,7 +51,9 @@ class RepoWidget(QWidget):
         self.createActions()
         self.setupModels()
 
-        self._repodate = self._getrepomtime()
+        self._repomtime = self._getrepomtime()
+        self._dirstatemtime = self._getdirstatemtime()
+        self._oldparents = repo.parents()
         self._watchrepotimer = self.startTimer(500)
 
         self.restoreSettings()
@@ -200,8 +202,9 @@ class RepoWidget(QWidget):
             if not self._scanForRepoChanges:
                 return
             self._checkuimtime()
+            self._checkdirstate()
             mtime = self._getrepomtime()
-            if mtime > self._repodate:
+            if mtime > self._repomtime:
                 self.showMessage(_("Repository has been modified "
                                    "(reloading is recommended)"))
 
@@ -425,10 +428,9 @@ class RepoWidget(QWidget):
         visdiff.visualdiff(self.repo.ui, self.repo, [], {'change':rev})
 
     def _getrepomtime(self):
-        """Return the last modification time for the repo"""
-        watchedfiles = [(self.repo.root, ".hg", "store", "00changelog.i"),
-                        (self.repo.root, ".hg", "dirstate")]
-        watchedfiles = [os.path.join(*wf) for wf in watchedfiles]
+        'Return the last modification time for the repo'
+        watchedfiles = [self.repo.sjoin('00changelog.i'),
+                        self.repo.join('patches/status')]
         try:
             mtime = [os.path.getmtime(wf) for wf in watchedfiles \
                      if os.path.isfile(wf)]
@@ -439,14 +441,35 @@ class RepoWidget(QWidget):
         self._scanForRepoChanges = False
         self.closeSelfSignal.emit(self)
 
+    def _getdirstatemtime(self):
+        try:
+            f = self.repo.join('dirstate')
+            return os.path.getmtime(f)
+        except EnvironmentError, ValueError:
+            return None
+
+    def _checkdirstate(self):
+        'Check for new dirstate mtime, working parent changes'
+        mtime = self._getdirstatemtime()
+        if mtime <= self._dirstatemtime:
+            return
+        self._dirstatemtime = mtime
+        self.repo.dirstate.invalidate()
+        newp = self.repo.parents()
+        if newp != self._oldparents:
+            self._oldparents = newp
+            self.showMessage(_('Working parent(s) have changed '
+                               '(reloading is recommended)'))
+
+
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
         try:
             oldmtime, files = self.repo.uifiles()
-            files.add(os.path.join(self.repo.root, '.hg', 'hgrc'))
+            files.add(self.repo.join('hgrc'))
             mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
             if max(mtime) > oldmtime:
-                self.showMessage('Configuration change detected.')
+                self.showMessage(_('Configuration change detected.'))
                 self.repo.invalidateui()
                 self.syncDemand.forward('reload')
                 self.repomodel.invalidate() # username, author colors, fonts
@@ -459,8 +482,11 @@ class RepoWidget(QWidget):
             self._reload_rev = self.rev
         else:
             self._reload_rev = rev
+        self.showMessage('')
         self.repo.thginvalidate()
-        self._repodate = self._getrepomtime()
+        self._repomtime = self._getrepomtime()
+        self._dirstatemtime = self._getdirstatemtime()
+        self._oldparents = self.repo.parents()
         self.setupModels()
         self.commitDemand.forward('reload')
         self.revDetailsWidget.reload()
