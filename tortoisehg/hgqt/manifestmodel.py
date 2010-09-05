@@ -8,13 +8,13 @@
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
 
-import itertools
+import os, itertools
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import util
-from tortoisehg.hgqt import qtlib, status
+from tortoisehg.hgqt import qtlib, status, visdiff
 
 class ManifestModel(QAbstractItemModel):
     """
@@ -79,10 +79,30 @@ class ManifestModel(QAbstractItemModel):
         e = index.internalPointer()
         return len(e) != 0
 
+    def mimeData(self, indexes):
+        def preparefiles():
+            files = [self.filePath(i) for i in indexes if i.isValid()]
+            if self._rev is not None:
+                base, _fns = visdiff.snapshot(self._repo, files,
+                                              self._repo[self._rev])
+            else:  # working copy
+                base = self._repo.root
+            return iter(os.path.join(base, e) for e in files)
+
+        m = QMimeData()
+        m.setUrls([QUrl.fromLocalFile(e) for e in preparefiles()])
+        return m
+
+    def mimeTypes(self):
+        return ['text/uri-list']
+
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        f = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        if not (self.isDir(index) or self.fileStatus(index) == 'R'):
+            f |= Qt.ItemIsDragEnabled
+        return f
 
     def index(self, row, column, parent=QModelIndex()):
         try:
