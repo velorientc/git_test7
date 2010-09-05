@@ -293,17 +293,15 @@ class RevDetailsWidget(QWidget):
         ctx = self.repo[rev]
         if len(self.filelistmodel):
             self.filelist.selectRow(0)
-        if ctx.rev() is not None:
-            self.fileview.setContext(ctx)
-            self.revpanel.update(ctx.rev())
-            self.message.displayRevision(ctx)
-            self.filelistmodel.setSelectedRev(ctx)
-        enable = rev is not None
+        self.fileview.setContext(ctx)
+        self.revpanel.update(ctx.rev())
+        self.message.displayRevision(ctx)
+        self.filelistmodel.setSelectedRev(ctx)
+
         mode = self.getMode()
-        self.actionDiffMode.setEnabled(enable)
-        self.actionAnnMode.setEnabled(enable and mode != 'diff')
-        self.actionNextDiff.setEnabled(enable and mode != 'diff')
-        self.actionPrevDiff.setEnabled(enable and mode != 'diff')
+        self.actionAnnMode.setEnabled(mode != 'diff')
+        self.actionNextDiff.setEnabled(mode != 'diff')
+        self.actionPrevDiff.setEnabled(mode != 'diff')
 
     def record(self):
         'Repo widget is reloading, record current file'
