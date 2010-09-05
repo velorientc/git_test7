@@ -66,7 +66,7 @@ class ManifestModel(QAbstractItemModel):
 
         e = index.internalPointer()
         if e.path:
-            return self.indexFromPath(e.parent.path)
+            return self.indexFromPath(e.parent.path, index.column())
         else:
             return QModelIndex()
 
@@ -110,7 +110,7 @@ class ManifestModel(QAbstractItemModel):
 
         return index.internalPointer().path
 
-    def indexFromPath(self, path):
+    def indexFromPath(self, path, column=0):
         """Return index for the specified path if found; otherwise invalid index"""
         if not path:
             return QModelIndex()
@@ -123,7 +123,7 @@ class ManifestModel(QAbstractItemModel):
         except KeyError:
             return QModelIndex()
 
-        return self.createIndex(e.parent.index(e.name), 0, e)
+        return self.createIndex(e.parent.index(e.name), column, e)
 
 def _overlaidicon(base, overlay):
     """Generate overlaid icon"""
