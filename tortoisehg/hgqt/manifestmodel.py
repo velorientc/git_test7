@@ -38,9 +38,10 @@ class ManifestModel(QAbstractItemModel):
         if not index.isValid():
             return
 
-        e = index.internalPointer()
         if role == Qt.DecorationRole:
-            return self._iconforentry(e)
+            return self.fileIcon(index)
+
+        e = index.internalPointer()
         if role == self.StatusRole:
             return e.status
         if role == Qt.DisplayRole:
@@ -52,9 +53,12 @@ class ManifestModel(QAbstractItemModel):
 
         return index.internalPointer().path
 
-    def _iconforentry(self, e):
+    def fileIcon(self, index):
         ic = QApplication.style().standardIcon(
-            len(e) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
+            self.isDir(index) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
+        if not index.isValid():
+            return ic
+        e = index.internalPointer()
         if not e.status:
             return ic
         st = status.statusTypes[e.status]
