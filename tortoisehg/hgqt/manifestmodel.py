@@ -45,6 +45,12 @@ class ManifestModel(QAbstractItemModel):
         if role == Qt.DisplayRole:
             return e.name
 
+    def filePath(self, index):
+        if not index.isValid():
+            return ''
+
+        return index.internalPointer().path
+
     def _iconforentry(self, e):
         ic = QApplication.style().standardIcon(
             len(e) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
@@ -63,6 +69,21 @@ class ManifestModel(QAbstractItemModel):
                                     self._parententry(parent).at(row))
         except IndexError:
             return QModelIndex()
+
+    def indexFromPath(self, path, column=0):
+        """Return index for the specified path if found; otherwise invalid index"""
+        if not path:
+            return QModelIndex()
+
+        e = self._rootentry
+        paths = path and path.split('/') or []
+        try:
+            for p in paths:
+                e = e[p]
+        except KeyError:
+            return QModelIndex()
+
+        return self.createIndex(e.parent.index(e.name), column, e)
 
     def parent(self, index):
         if not index.isValid():
@@ -150,27 +171,6 @@ class ManifestModel(QAbstractItemModel):
         self.beginResetModel()
         self.__rootentry = roote
         self.endResetModel()
-
-    def filePath(self, index):
-        if not index.isValid():
-            return ''
-
-        return index.internalPointer().path
-
-    def indexFromPath(self, path, column=0):
-        """Return index for the specified path if found; otherwise invalid index"""
-        if not path:
-            return QModelIndex()
-
-        e = self._rootentry
-        paths = path and path.split('/') or []
-        try:
-            for p in paths:
-                e = e[p]
-        except KeyError:
-            return QModelIndex()
-
-        return self.createIndex(e.parent.index(e.name), column, e)
 
 def _overlaidicon(base, overlay):
     """Generate overlaid icon"""
