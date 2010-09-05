@@ -196,6 +196,14 @@ class ManifestWidget(QWidget):
         self._treeview.setModel(self._treemodel)
         self._treeview.selectionModel().currentChanged.connect(self._fileselected)
         self._statusfilter.textChanged.connect(self._treemodel.setStatusFilter)
+        self._statusfilter.textChanged.connect(self._autoexpandtree)
+        self._autoexpandtree()
+
+    @pyqtSlot()
+    def _autoexpandtree(self):
+        """expand file tree if the number of the items isn't large"""
+        if 'C' not in self._statusfilter.text:
+            self._treeview.expandAll()
 
     def reload(self):
         # TODO
