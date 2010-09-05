@@ -25,6 +25,9 @@ class ManifestModel(QAbstractItemModel):
                      'added': 'fileadd',
                      'removed': 'filedelete'}
 
+    StatusRole = Qt.UserRole + 1
+    """Role for file change status"""
+
     def __init__(self, repo, rev, parent=None):
         QAbstractItemModel.__init__(self, parent)
 
@@ -38,6 +41,8 @@ class ManifestModel(QAbstractItemModel):
         e = index.internalPointer()
         if role == Qt.DecorationRole:
             return self._iconforentry(e)
+        if role == self.StatusRole:
+            return e.status
         if role == Qt.DisplayRole:
             return e.name
 

@@ -55,3 +55,19 @@ def test_indexfrompath():
 def test_removed_should_be_listed():
     m = newmodel(rev=1)
     assert m.indexFromPath('baz/box').isValid()
+
+def test_status_role():
+    m = newmodel(rev=0)
+    assert_equals('added', m.data(m.indexFromPath('foo'),
+                                  role=ManifestModel.StatusRole))
+
+    m = newmodel(rev=1)
+    assert_equals(None, m.data(m.indexFromPath('foo'),
+                               role=ManifestModel.StatusRole))
+    assert_equals('removed', m.data(m.indexFromPath('baz/box'),
+                                    role=ManifestModel.StatusRole))
+
+def test_status_role_invalid():
+    m = newmodel()
+    assert_equals(None, m.data(QModelIndex(),
+                               role=ManifestModel.StatusRole))
