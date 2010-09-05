@@ -16,9 +16,16 @@ new file mode 100644
 # HG changeset patch
 # User test
 # Date 0 0
-# Node ID afe200a5ace85bc58771d0a606eb624fba545238
+# Node ID 8651fa2fe75d6fdaec4a477fb29a88f7dc97a7e2
 # Parent  5b65a3d842610f25b192d26e3dc9161ff53208d0
-remove baz/box
+remove baz/box, add zzz, modify bar
 
+diff --git a/bar b/bar
+--- a/bar
++++ b/bar
+@@ -0,0 +1,1 @@
++hello
 diff --git a/baz/box b/baz/box
 deleted file mode 100644
+diff --git a/zzz b/zzz
+new file mode 100644

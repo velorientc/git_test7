@@ -13,6 +13,7 @@ import itertools
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from mercurial import util
 from tortoisehg.hgqt import qtlib
 
 class ManifestModel(QAbstractItemModel):
@@ -30,6 +31,7 @@ class ManifestModel(QAbstractItemModel):
 
         self._repo = repo
         self._rev = rev
+        self._statusfilter = 'MAC'
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
@@ -84,6 +86,21 @@ class ManifestModel(QAbstractItemModel):
     def columnCount(self, parent=QModelIndex()):
         return 1
 
+    @pyqtSlot(str)
+    def setStatusFilter(self, status):
+        """Filter file tree by change status 'MARC'"""
+        status = str(status)
+        assert util.all(c in 'MARC' for c in status)
+        if self._statusfilter == status:
+            return  # for performance reason
+        self._statusfilter = status
+        self._buildrootentry()
+
+    @property
+    def statusFilter(self):
+        """Return the current status filter"""
+        return self._statusfilter
+
     @property
     def _rootentry(self):
         try:
@@ -96,9 +113,24 @@ class ManifestModel(QAbstractItemModel):
         """Rebuild the tree of files and directories"""
         roote = _Entry()
         ctx = self._repo[self._rev]
+
         status = dict(zip(('M', 'A', 'R'),
-                          self._repo.status(ctx.parents()[0], ctx)[:3]))
+                          (set(a) for a in self._repo.status(ctx.parents()[0],
+                                                             ctx)[:3])))
+        uncleanpaths = status['M'] | status['A'] | status['R']
+        def pathinstatus(path):
+            """Test path is included by the status filter"""
+            if util.any(c in self._statusfilter and path in e
+                        for c, e in status.iteritems()):
+                return True
+            if 'C' in self._statusfilter and path not in uncleanpaths:
+                return True
+            return False
+
         for path in itertools.chain(ctx.manifest(), status['R']):
+            if not pathinstatus(path):
+                continue
+
             e = roote
             for p in path.split('/'):
                 if not p in e:

@@ -54,6 +54,7 @@ def test_indexfrompath():
 
 def test_removed_should_be_listed():
     m = newmodel(rev=1)
+    m.setStatusFilter('MARC')
     assert m.indexFromPath('baz/box').isValid()
 
 def test_status_role():
@@ -62,6 +63,7 @@ def test_status_role():
                                   role=ManifestModel.StatusRole))
 
     m = newmodel(rev=1)
+    m.setStatusFilter('MARC')
     assert_equals('C', m.data(m.indexFromPath('foo'),
                               role=ManifestModel.StatusRole))
     assert_equals('R', m.data(m.indexFromPath('baz/box'),
@@ -71,3 +73,53 @@ def test_status_role_invalid():
     m = newmodel()
     assert_equals(None, m.data(QModelIndex(),
                                role=ManifestModel.StatusRole))
+
+def test_status_filter_modified():
+    m = newmodel(rev=1)
+    m.setStatusFilter('M')
+    assert_not_equals(QModelIndex(), m.indexFromPath('bar'))  # modified
+    assert_equals(QModelIndex(), m.indexFromPath('zzz'))  # added
+    assert_equals(QModelIndex(), m.indexFromPath('baz/box'))  # removed
+    assert_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
+
+def test_status_filter_added():
+    m = newmodel(rev=1)
+    m.setStatusFilter('A')
+    assert_equals(QModelIndex(), m.indexFromPath('bar'))  # modified
+    assert_not_equals(QModelIndex(), m.indexFromPath('zzz'))  # added
+    assert_equals(QModelIndex(), m.indexFromPath('baz/box'))  # removed
+    assert_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
+
+def test_status_filter_removed():
+    m = newmodel(rev=1)
+    m.setStatusFilter('R')
+    assert_equals(QModelIndex(), m.indexFromPath('bar'))  # modified
+    assert_equals(QModelIndex(), m.indexFromPath('zzz'))  # added
+    assert_not_equals(QModelIndex(), m.indexFromPath('baz/box'))  # removed
+    assert_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
+
+def test_status_filter_clean():
+    m = newmodel(rev=1)
+    m.setStatusFilter('C')
+    assert_equals(QModelIndex(), m.indexFromPath('bar'))  # modified
+    assert_equals(QModelIndex(), m.indexFromPath('zzz'))  # added
+    assert_equals(QModelIndex(), m.indexFromPath('baz/box'))  # removed
+    assert_not_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
+
+def test_status_filter_change():
+    m = newmodel(rev=1)
+    m.setStatusFilter('C')
+    assert_equals(QModelIndex(), m.indexFromPath('bar'))  # modified
+    assert_not_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
+
+    m.setStatusFilter('M')
+    assert_not_equals(QModelIndex(), m.indexFromPath('bar'))  # modified
+    assert_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
+
+def test_status_filter_multi():
+    m = newmodel(rev=1)
+    m.setStatusFilter('MC')
+    assert_not_equals(QModelIndex(), m.indexFromPath('bar'))  # modified
+    assert_equals(QModelIndex(), m.indexFromPath('zzz'))  # added
+    assert_equals(QModelIndex(), m.indexFromPath('baz/box'))  # removed
+    assert_not_equals(QModelIndex(), m.indexFromPath('foo'))  # clean
