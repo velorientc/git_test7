@@ -76,7 +76,7 @@ class RepoTreeView(QTreeView):
             self.workbench.showMessage('')
 
     def mouseDoubleClickEvent(self, event):
-        self.open()
+        self.showFirstTabOrOpen()
 
     def selectionChanged(self, selected, deselected):
         selection = self.selectedIndexes()
@@ -138,6 +138,11 @@ class RepoTreeView(QTreeView):
         if not self.selitem:
             return
         self.selitem.internalPointer().open()
+
+    def showFirstTabOrOpen(self):
+        if not self.selitem:
+            return
+        self.selitem.internalPointer().showFirstTabOrOpen(workbench=self.workbench)
 
     def newGroup(self):
         m = self.model()

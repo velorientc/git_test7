@@ -119,6 +119,9 @@ class RepoTreeItem(object):
     def open(self):
         pass
 
+    def showFirstTabOrOpen(self, workbench=None):
+        pass
+
     def details(self):
         return ''
 
@@ -174,6 +177,21 @@ class RepoItem(RepoTreeItem):
 
     def open(self):
         self.model.openrepofunc(self._root)
+
+    def showFirstTabOrOpen(self, workbench=None):
+        tw = workbench.repoTabsWidget
+        def getFirstTab():
+            for i in range(tw.count()):
+                tabtxt = tw.tabText(i)
+                regtxt = self.data(0, None).toString()
+                if tabtxt == regtxt:
+                    return i
+            return -1
+        tab = getFirstTab()
+        if tab == -1:
+            self.open()
+        else:
+            tw.setCurrentIndex(tab)
 
     def startSettings(self, parent):
         if self._settingsdlg is None:
