@@ -52,8 +52,7 @@ class RepoWidget(QWidget):
         self.setupModels()
 
         self._repomtime = self._getrepomtime()
-        self._dirstatemtime = self._getdirstatemtime()
-        self._oldparents = repo.parents()
+        self._recorddirstate()
         self._watchrepotimer = self.startTimer(500)
 
         self.restoreSettings()
@@ -442,23 +441,22 @@ class RepoWidget(QWidget):
         self._scanForRepoChanges = False
         self.closeSelfSignal.emit(self)
 
-    def _getdirstatemtime(self):
+    def _recorddirstate(self):
         try:
-            f = self.repo.join('dirstate')
-            return os.path.getmtime(f)
+            self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
+            self._parentnodes = self.repo.opener('dirstate').read(40)
         except EnvironmentError, ValueError:
             return None
 
     def _checkdirstate(self):
         'Check for new dirstate mtime, working parent changes'
-        mtime = self._getdirstatemtime()
+        mtime = os.path.getmtime(self.repo.join('dirstate'))
         if mtime <= self._dirstatemtime:
             return
         self._dirstatemtime = mtime
-        self.repo.dirstate.invalidate()
-        newp = self.repo.parents()
-        if newp != self._oldparents:
-            self._oldparents = newp
+        nodes = self.repo.opener('dirstate').read(40)
+        if nodes != self._parentnodes:
+            self._parentnodes = nodes
             self.showMessage(_('Working parent(s) have changed '
                                '(reloading is recommended)'))
 
@@ -484,10 +482,9 @@ class RepoWidget(QWidget):
         else:
             self._reload_rev = rev
         self.showMessage('')
-        self.repo.thginvalidate()
         self._repomtime = self._getrepomtime()
-        self._dirstatemtime = self._getdirstatemtime()
-        self._oldparents = self.repo.parents()
+        self._recorddirstate()
+        self.repo.thginvalidate()
         self.setupModels()
         self.revDetailsWidget.record()
         self.commitDemand.forward('reload')
