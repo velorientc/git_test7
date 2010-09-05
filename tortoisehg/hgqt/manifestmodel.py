@@ -40,10 +40,10 @@ class ManifestModel(QAbstractItemModel):
 
         if role == Qt.DecorationRole:
             return self.fileIcon(index)
+        if role == self.StatusRole:
+            return self.fileStatus(index)
 
         e = index.internalPointer()
-        if role == self.StatusRole:
-            return e.status
         if role == Qt.DisplayRole:
             return e.name
 
@@ -65,6 +65,13 @@ class ManifestModel(QAbstractItemModel):
         if st.icon:
             ic = _overlaidicon(ic, qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
         return ic
+
+    def fileStatus(self, index):
+        """Return the change status of the specified file"""
+        if not index.isValid():
+            return
+        e = index.internalPointer()
+        return e.status
 
     def isDir(self, index):
         if not index.isValid():
