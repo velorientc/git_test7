@@ -21,7 +21,6 @@ from tortoisehg.hgqt import qtlib, status, cmdui, branchop
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
-#  threaded / wrapped commit (need a CmdRunner equivalent)
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
 #  +1 / -1 head indication (not as important with workbench integration)
@@ -36,7 +35,7 @@ class CommitWidget(QWidget):
     showMessage = pyqtSignal(str)
     commitComplete = pyqtSignal()
 
-    def __init__(self, pats, opts, root=None, parent=None):
+    def __init__(self, pats, opts, root=None, parent=None, logwidget=None):
         QWidget.__init__(self, parent)
 
         self.opts = opts # user, date
@@ -46,6 +45,9 @@ class CommitWidget(QWidget):
         self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
         self.msghistory = []
         self.qref = False
+
+        self.runner = cmdui.Runner(_('Commit'), self, logwidget)
+        self.runner.commandFinished.connect(self.commandFinished)
 
         repo = self.stwidget.repo
         self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
@@ -455,15 +457,14 @@ class CommitWidget(QWidget):
 
     def commit(self):
         repo = self.stwidget.repo
-        ui = repo.ui
         cwd = os.getcwd()
         try:
             os.chdir(repo.root)
-            return self._commit(repo, ui)
+            return self._commit(repo)
         finally:
             os.chdir(cwd)
 
-    def _commit(self, repo, _ui):
+    def _commit(self, repo):
         msg = self.getMessage()
         if not msg:
             qtlib.WarningMsgBox(_('Nothing Commited'),
@@ -529,7 +530,7 @@ class CommitWidget(QWidget):
                     (_('&OK'), _('Cancel')), 0, 1,
                     checkedUnknowns).run()
             if res == 0:
-                dispatch._dispatch(_ui, ['add'] + checkedUnknowns)
+                dispatch._dispatch(repo.ui, ['add'] + checkedUnknowns)
             else:
                 return
         checkedMissing = self.stwidget.getChecked('!')
@@ -540,7 +541,7 @@ class CommitWidget(QWidget):
                     (_('&OK'), _('Cancel')), 0, 1,
                     checkedMissing).run()
             if res == 0:
-                dispatch._dispatch(_ui, ['remove'] + checkedMissing)
+                dispatch._dispatch(repo.ui, ['remove'] + checkedMissing)
             else:
                 return
         try:
@@ -554,7 +555,7 @@ class CommitWidget(QWidget):
             self.showMessage.emit(hglib.tounicode(str(e)))
             dcmd = []
 
-        cmdline = ['commit', '--user', user, '--message', msg]
+        cmdline = ['commit', '--verbose', '--user', user, '--message', msg]
         cmdline += dcmd + brcmd + files
         if self.qref:
             cmdline[0] = 'qrefresh'
@@ -564,17 +565,21 @@ class CommitWidget(QWidget):
             if fname:
                 cmdline.extend(['--include', fname])
 
-        # TODO: self.opts['pushafter']
-        ret = dispatch._dispatch(_ui, cmdline)
-        if not ret:
+        if self.opts.get('pushafter'):
+            pushcmd = ['push', self.opts['pushafter']]
+            display = ' '.join(['hg'] + cmdline + ['&&'] + pushcmd)
+            self.runner.run(cmdline, pushcmd, display=display)
+        else:
+            display = ' '.join(['hg'] + cmdline)
+            self.runner.run(cmdline, display=display)
+
+    def commandFinished(self, wrapper):
+        if not wrapper.data:
             self.addMessageToHistory()
             if not self.qref:
                 self.msgte.clear()
             self.msgte.document().setModified(False)
             self.commitComplete.emit()
-            return True
-        else:
-            return False
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):

@@ -132,7 +132,8 @@ class RepoWidget(QWidget):
         pats = {}
         opts = {}
         b = QPushButton('Commit')
-        cw = CommitWidget(pats, opts, root=self.repo.root)
+        cw = CommitWidget(pats, opts, self.repo.root, self,
+                          self.workbench.log)
         cw.showMessage.connect(self.showMessage)
         cw.commitComplete.connect(self.reload)
         cw.commitComplete.connect(cw.reload)
@@ -561,7 +562,7 @@ class RepoWidget(QWidget):
                        _('Previous command is still running'))
             return
         saved = self.setScanForRepoChanges(False)
-        self.runner = cmdui.Runner(title, self)
+        self.runner = cmdui.Runner(title, self, self.workbench.log)
         def finished(ret):
             self.reload()
             self.setScanForRepoChanges(saved)
@@ -569,7 +570,7 @@ class RepoWidget(QWidget):
             # When we run commands, we typically change working parent
             self.commitDemand.forward('reload')
         self.runner.commandFinished.connect(finished)
-        self.runner.run(cmdline)
+        self.runner.run(cmdline, display='hg ' + ' '.join(cmdline))
 
     ##
     ## Repoview context menu
