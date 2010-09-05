@@ -378,7 +378,7 @@ class RepoWidget(QWidget):
         if self._reload_rev is not None:
             try:
                 self.repoview.goto(self._reload_rev)
-                self.revDetailsWidget.on_filled()
+                self.revDetailsWidget.finishReload()
             except IndexError:
                 pass
 
@@ -488,8 +488,8 @@ class RepoWidget(QWidget):
         self._dirstatemtime = self._getdirstatemtime()
         self._oldparents = self.repo.parents()
         self.setupModels()
+        self.revDetailsWidget.record()
         self.commitDemand.forward('reload')
-        self.revDetailsWidget.reload()
 
     def reloadTaskTab(self):
         tti = self.taskTabsWidget.currentIndex()
@@ -510,7 +510,7 @@ class RepoWidget(QWidget):
         'Refresh the repo model view, clear cached data'
         self.repo.thginvalidate()
         self.repomodel.invalidate()
-        self.revDetailsWidget.on_filled()
+        self.revDetailsWidget.reload()
 
     def setBranch(self, branch, allparents=True):
         'Triggered by workbench on branch selection'

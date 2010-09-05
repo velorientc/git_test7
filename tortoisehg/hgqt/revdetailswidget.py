@@ -33,6 +33,7 @@ class RevDetailsWidget(QWidget):
         self.splitternames = []
 
         # these are used to know where to go after a reload
+        self._last_rev = None
         self._reload_file = None
 
         self.load_config()
@@ -41,7 +42,6 @@ class RevDetailsWidget(QWidget):
 
         self.fileview.setFont(self._font)
         self.fileview.showMessage.connect(self.showMessage)
-        self.fileview.fileDisplayed.connect(self.file_displayed)
         self.restoreSettings()
 
     def setupUi(self):
@@ -280,20 +280,16 @@ class RevDetailsWidget(QWidget):
         self.filelistmodel = HgFileListModel(self.repo)
 
     def setupModels(self, repomodel):
+        'Called directly from repowidget to establish repomodel'
         self.repomodel = repomodel
         self.create_models()
         self.filelist.setModel(self.filelistmodel)
         self.fileview.setModel(repomodel)
         self.filelist.fileRevSelected.connect(self.fileview.displayFile)
 
-    def on_filled(self):
-        self.filelist.selectFile(self._reload_file)
-
-    def file_displayed(self, filename):
-        self.actionPrevDiff.setEnabled(False)
-
     def revision_selected(self, rev):
         # TODO: handle rev == patch name
+        self._last_rev = rev
         ctx = self.repo[rev]
         if len(self.filelistmodel):
             self.filelist.selectRow(0)
@@ -309,9 +305,20 @@ class RevDetailsWidget(QWidget):
         self.actionNextDiff.setEnabled(enable and mode != 'diff')
         self.actionPrevDiff.setEnabled(enable and mode != 'diff')
 
-    def reload(self, rev=None):
+    def record(self):
+        'Repo widget is reloading, record current file'
         self._reload_file = self.filelist.currentFile()
-        self.setupModels(self.repomodel)
+
+    def finishReload(self):
+        'Finish reload by re-selecting previous file'
+        self.filelist.selectFile(self._reload_file)
+
+    def reload(self):
+        'Task tab is reloaded, or repowidget is refreshed'
+        if self._last_rev and len(self.repo) > self._last_rev:
+            f = self.filelist.currentFile()
+            self.revision_selected(self._last_rev)
+            self.filelist.selectFile(f)
 
     def storeSettings(self):
         s = QSettings()
