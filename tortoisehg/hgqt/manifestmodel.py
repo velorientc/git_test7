@@ -14,14 +14,13 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import util
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, status
 
 class ManifestModel(QAbstractItemModel):
     """
     Qt model to display a hg manifest, ie. the tree of files at a
     given revision. To be used with a QTreeView.
     """
-    _STATUS_ICONS = {'M': 'modified', 'A': 'fileadd', 'R': 'filedelete'}
 
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
@@ -56,8 +55,11 @@ class ManifestModel(QAbstractItemModel):
     def _iconforentry(self, e):
         ic = QApplication.style().standardIcon(
             len(e) and QStyle.SP_DirIcon or QStyle.SP_FileIcon)
-        if e.status in self._STATUS_ICONS:
-            ic = _overlaidicon(ic, qtlib.geticon(self._STATUS_ICONS[e.status]))
+        if not e.status:
+            return ic
+        st = status.statusTypes[e.status]
+        if st.icon:
+            ic = _overlaidicon(ic, qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
         return ic
 
     def flags(self, index):
