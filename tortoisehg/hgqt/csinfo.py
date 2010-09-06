@@ -338,6 +338,9 @@ class SummaryBase(object):
     def get_widget(self, item, **kargs):
         return self.info.get_widget(item, self, self.ctx, self.custom, **kargs)
 
+    def set_revision(self, rev):
+        self.target = rev
+
     def update(self, target=None, custom=None, repo=None):
         self.ctx = None
         if type(target) == thgrepo.patchctx:
