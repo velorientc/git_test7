@@ -15,11 +15,11 @@ import subprocess
 
 from mercurial.error import RepoError
 
-from tortoisehg.util import paths, thgrepo, hglib
+from tortoisehg.util import paths, hglib
 
 #from tortoisehg.hgqt.decorators import timeit
 
-from tortoisehg.hgqt import repomodel
+from tortoisehg.hgqt import repomodel, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles, InfoMsgBox
 from tortoisehg.hgqt.repowidget import RepoWidget

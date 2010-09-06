@@ -26,7 +26,7 @@ from tortoisehg.hgqt.i18n import _
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from tortoisehg.util.thgrepo import PatchContext
+from tortoisehg.hgqt.thgrepo import PatchContext
 
 nullvariant = QVariant()
 

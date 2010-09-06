@@ -12,9 +12,9 @@ from PyQt4.QtGui import *
 
 from mercurial import ui, error
 
-from tortoisehg.util import hglib, paths, thgrepo
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, csinfo, qtlib
+from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo
 
 class UpdateDialog(QDialog):
 

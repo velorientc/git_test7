@@ -13,9 +13,9 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui, error
 
-from tortoisehg.util import hglib, paths, thgrepo
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, cslist, qtlib
+from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo
 
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))

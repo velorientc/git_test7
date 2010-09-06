@@ -11,7 +11,7 @@
 import binascii
 import os
 
-from tortoisehg.util import thgrepo, shlib, hglib, purge
+from tortoisehg.util import shlib, hglib, purge
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
@@ -19,7 +19,7 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
-from tortoisehg.hgqt import archive, thgimport, thgstrip, run
+from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo
 
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget

@@ -13,10 +13,10 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui, error
 
-from tortoisehg.util import hglib, paths, i18n, thgrepo
+from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.hgqt.qtlib import getpixmap
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, thgrepo
 
 keep = i18n.keepgettext()
 

@@ -14,7 +14,7 @@ import sys
 from mercurial import hg, patch, util, error, bundlerepo, ui, extensions
 from mercurial.util import propertycache
 
-from util import hglib
+from tortoisehg.util import hglib
 
 _repocache = {}
 

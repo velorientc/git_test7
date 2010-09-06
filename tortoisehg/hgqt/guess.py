@@ -9,10 +9,10 @@ import os
 
 from mercurial import hg, ui, mdiff, similar, patch
 
-from tortoisehg.util import hglib, shlib, paths, thgrepo
+from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, htmlui, cmdui
+from tortoisehg.hgqt import qtlib, htmlui, cmdui, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

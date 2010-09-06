@@ -15,9 +15,9 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui, url, util, error
 
-from tortoisehg.util import hglib, thgrepo, wconfig
+from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.hgqt import qtlib, cmdui, thgrepo
 
 # TODO
 # Write keyring help, connect to help button

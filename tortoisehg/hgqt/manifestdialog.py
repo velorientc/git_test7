@@ -24,10 +24,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
-from tortoisehg.util import paths, thgrepo
+from tortoisehg.util import paths
 from tortoisehg.util.hglib import tounicode
 
-from tortoisehg.hgqt import qtlib, annotate, status
+from tortoisehg.hgqt import qtlib, annotate, status, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tortoisehg.hgqt.lexers import get_lexer

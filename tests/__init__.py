@@ -1,6 +1,6 @@
 import os, tempfile, shutil
 from mercurial import ui, commands, error
-from tortoisehg.util import thgrepo
+from tortoisehg.hgqt import thgrepo
 
 FIXTURES_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 

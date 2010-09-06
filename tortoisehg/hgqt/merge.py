@@ -10,9 +10,9 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui
 
-from tortoisehg.util import hglib, paths, thgrepo
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, thgrepo
 
 keep = i18n.keepgettext()
 

@@ -15,8 +15,8 @@ from PyQt4.QtGui import *
 from mercurial import hg, ui, util, commands, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib
-from tortoisehg.util import hglib, paths, thgrepo
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.util import hglib, paths
 
 
 class RenameDialog(QDialog):

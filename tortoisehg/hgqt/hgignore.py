@@ -14,9 +14,9 @@ from PyQt4.QtGui import *
 from mercurial import hg, ui, match, util, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import shlib, hglib, paths, thgrepo
+from tortoisehg.util import shlib, hglib, paths
 
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, thgrepo
 
 class HgignoreDialog(QDialog):
     'Edit a reposiory .hgignore file'
