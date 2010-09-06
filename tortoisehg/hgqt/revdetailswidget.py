@@ -286,6 +286,7 @@ class RevDetailsWidget(QWidget):
         self.filelist.setModel(self.filelistmodel)
         self.fileview.setModel(repomodel)
         self.filelist.fileRevSelected.connect(self.fileview.displayFile)
+        self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def revision_selected(self, rev):
         # TODO: handle rev == patch name
