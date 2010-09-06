@@ -19,7 +19,7 @@ from util import hglib
 _repocache = {}
 
 def repository(ui, path='', create=False):
-    '''Returns a subclassed Mercurial repository to which new 
+    '''Returns a subclassed Mercurial repository to which new
     THG-specific methods have been added. The repository object
     is obtained using mercurial.hg.repository()'''
     if create or path not in _repocache:
@@ -40,11 +40,11 @@ def _extendrepo(repo):
             a) return a thgchangectx with additional methods
             b) return a PatchContext if changeid is the name of an MQ
             unapplied patch'''
-            
-            # Mercurial's standard changectx() (rather, lookup()) 
+
+            # Mercurial's standard changectx() (rather, lookup())
             # implies that tags and branch names live in the same namespace.
-            # This code throws patch names in the same namespace, but as 
-            # applied patches have a tag that matches their patch name this 
+            # This code throws patch names in the same namespace, but as
+            # applied patches have a tag that matches their patch name this
             # seems safe.
             if changeid in self.thgmqunappliedpatches:
                 q = self.mq # must have mq to pass the previous if
@@ -59,7 +59,7 @@ def _extendrepo(repo):
             t = self.ui.config('tortoisehg', 'hidetags', '')
             hiddentags_opt = hglib.tounicode(t)
             return [t.strip() for t in hiddentags_opt.split()]
-        
+
         @propertycache
         def thgmqunappliedpatches(self):
             '''Returns a list of (patch name, patch path) of all self's
@@ -74,7 +74,7 @@ def _extendrepo(repo):
 
         @propertycache
         def _thgmqpatchnames(self):
-            '''Returns all tag names used by MQ patches. Returns [] 
+            '''Returns all tag names used by MQ patches. Returns []
             if MQ not in use.'''
             if not hasattr(self, 'mq'): return []
 
@@ -184,20 +184,20 @@ def _extendrepo(repo):
 
     return thgrepository
 
-        
+
 def _extendchangectx(changectx):
     class thgchangectx(changectx.__class__):
         def _thgrawtags(self):
-            '''Returns the tags for self, converted to UTF-8 but 
+            '''Returns the tags for self, converted to UTF-8 but
             unfiltered for hidden tags'''
             return [hglib.toutf(tag) for tag in self.tags()]
-        
+
         def thgtags(self):
             '''Returns all unhidden tags for self, converted to UTF-8'''
             value = self._thgrawtags()
             htlist = self._repo._thghiddentags
             return [tag for tag in value if tag not in htlist]
- 
+
         def thgwdparent(self):
             '''True if self is a parent of the working directory'''
             # FIXME doesn't handle error.Abort apparently raiseable by self._repo.parents()
@@ -259,7 +259,7 @@ class patchctx(object):
         """ Read patch context from file
         :param patchHandle: If set, then the patch is a temporary.
             The provided handle is used to read the patch and
-            the patchpath contains the name of the patch. 
+            the patchpath contains the name of the patch.
             The handle is NOT closed.
         """
         self._path = patchpath
