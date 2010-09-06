@@ -158,11 +158,14 @@ class RepoWidget(QWidget):
         return w
 
     def createSyncWidget(self):
-        sw = SyncWidget(root=self.repo.root, log=self.workbench.log)
+        sw = getattr(self.repo, '_syncwidget', None)  # TODO: ugly
+        if not sw:
+            sw = SyncWidget(root=self.repo.root, log=self.workbench.log)
+            self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.invalidate.connect(self.reload)
         sw.showMessage.connect(self.showMessage)
-        return sw
+        return SharedWidget(sw)
 
     def setOutgoingNodes(self, nodes):
         self.repo._outgoing = nodes
