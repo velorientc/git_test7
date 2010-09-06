@@ -182,9 +182,9 @@ class RepoItem(RepoTreeItem):
         tw = workbench.repoTabsWidget
         def getFirstTab():
             for i in range(tw.count()):
-                tabtxt = tw.tabText(i)
-                regtxt = self.data(0, None).toString()
-                if tabtxt == regtxt:
+                tabrootpath = tw.widget(i).repo.origroot
+                regrootpath = self.data(1, None).toString()
+                if tabrootpath == regrootpath:
                     return i
             return -1
         tab = getFirstTab()
