@@ -20,10 +20,10 @@ Qt4 widgets to display diffs as blocks
 """
 import sys, os
 
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import Qt, SIGNAL
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
 
-class BlockList(QtGui.QWidget):
+class BlockList(QWidget):
     """
     A simple widget to be 'linked' to the scrollbar of a diff text
     view.
@@ -32,21 +32,26 @@ class BlockList(QtGui.QWidget):
     currently viewed area by a semi-transparant rectangle sliding
     above them.
     """
+
+    rangeChanged = pyqtSignal(int,int)
+    valueChanged = pyqtSignal(int)
+    pageStepChanged = pyqtSignal(int)
+
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
         self._blocks = set()
         self._minimum = 0
         self._maximum = 100
-        self.blockTypes = {'+': QtGui.QColor(0xA0, 0xFF, 0xB0, ),#0xa5),
-                           '-': QtGui.QColor(0xFF, 0xA0, 0xA0, ),#0xa5),
-                           'x': QtGui.QColor(0xA0, 0xA0, 0xFF, ),#0xa5),
+        self.blockTypes = {'+': QColor(0xA0, 0xFF, 0xB0, ),#0xa5),
+                           '-': QColor(0xFF, 0xA0, 0xA0, ),#0xa5),
+                           'x': QColor(0xA0, 0xA0, 0xFF, ),#0xa5),
                            }
         self._sbar = None
         self._value = 0
         self._pagestep = 10
-        self._vrectcolor = QtGui.QColor(0x00, 0x00, 0x55, 0x25)
+        self._vrectcolor = QColor(0x00, 0x00, 0x55, 0x25)
         self._vrectbordercolor = self._vrectcolor.darker()
-        self.sizePolicy().setControlType(QtGui.QSizePolicy.Slider)
+        self.sizePolicy().setControlType(QSizePolicy.Slider)
         self.setMinimumWidth(20)
 
     def clear(self):
@@ -58,14 +63,12 @@ class BlockList(QtGui.QWidget):
     def setMaximum(self, maximum):
         self._maximum = maximum
         self.update()
-        self.emit(SIGNAL('rangeChanged(int, int)'),
-                  self._minimum, self._maximum)
+        self.rangeChanged.emit(self._minimum, self._maximum)
 
     def setMinimum(self, minimum):
         self._minimum = minimum
         self.update()
-        self.emit(SIGNAL('rangeChanged(int, int)'),
-                  self._minimum, self._maximum)
+        self.rangeChanged.emit(self._minimum, self._maximum)
 
     def setRange(self, minimum, maximum):
         if minimum == maximum:
@@ -73,20 +76,19 @@ class BlockList(QtGui.QWidget):
         self._minimum = minimum
         self._maximum = maximum
         self.update()
-        self.emit(SIGNAL('rangeChanged(int, int)'),
-                  self._minimum, self._maximum)
+        self.rangeChanged.emit(self._minimum, self._maximum)
         
     def setValue(self, val):
         if val != self._value:
             self._value = val
             self.update()
-            self.emit(SIGNAL('valueChanged(int)'), val)
+            self.valueChanged.emit(val)
 
     def setPageStep(self, pagestep):
         if pagestep != self._pagestep:
             self._pagestep = pagestep
             self.update()
-            self.emit(SIGNAL('pageStepChanged(int)'), pagestep)
+            self.pageStepChanged.emit(pagestep)
 
     def linkScrollBar(self, sbar):
         """
@@ -99,11 +101,13 @@ class BlockList(QtGui.QWidget):
         self.setPageStep(sbar.pageStep())
         self.setValue(sbar.value())        
         self.setUpdatesEnabled(True)
-        self.connect(sbar, SIGNAL('valueChanged(int)'), self.setValue)
-        self.connect(sbar, SIGNAL('rangeChanged(int, int)'), self.setRange)
-        self.connect(self, SIGNAL('valueChanged(int)'), sbar.setValue)
-        self.connect(self, SIGNAL('rangeChanged(int, int)'), sbar.setRange)
-        self.connect(self, SIGNAL('pageStepChanged(int)'), sbar.setPageStep)
+
+        sbar.valueChanged.connect(self.setValue)
+        sbar.rangeChanged.connect(self.setRange)
+
+        self.valueChanged.connect(sbar.setValue)
+        self.rangeChanged.connect(lambda x, y: sbar.setRange(x,y))
+        self.pageStepChanged.connect(lambda x: sbar.setPageStep(x))
 
     def syncPageStep(self):
         self.setPageStep(self._sbar.pageStep())
@@ -111,7 +115,7 @@ class BlockList(QtGui.QWidget):
     def paintEvent(self, event):
         w = self.width() - 1
         h = self.height()
-        p = QtGui.QPainter(self)
+        p = QPainter(self)
         p.scale(1.0, float(h)/(self._maximum - self._minimum + self._pagestep))
         p.setPen(Qt.NoPen)
         for typ, alo, ahi in self._blocks:
@@ -134,21 +138,26 @@ class BlockMatch(BlockList):
     It will show graphically matching diff blocks between the 2 text
     areas.
     """
+
+    rangeChanged = pyqtSignal(int, int, QString)
+    valueChanged = pyqtSignal(int, QString)
+    pageStepChanged = pyqtSignal(int, QString)
+
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self, *args)
+        QWidget.__init__(self, *args)
         self._blocks = set()
         self._minimum = {'left': 0, 'right': 0}
         self._maximum = {'left': 100, 'right': 100}
-        self.blockTypes = {'+': QtGui.QColor(0xA0, 0xFF, 0xB0, ),#0xa5),
-                           '-': QtGui.QColor(0xFF, 0xA0, 0xA0, ),#0xa5),
-                           'x': QtGui.QColor(0xA0, 0xA0, 0xFF, ),#0xa5),
+        self.blockTypes = {'+': QColor(0xA0, 0xFF, 0xB0, ),#0xa5),
+                           '-': QColor(0xFF, 0xA0, 0xA0, ),#0xa5),
+                           'x': QColor(0xA0, 0xA0, 0xFF, ),#0xa5),
                            }
         self._sbar = {}
         self._value =  {'left': 0, 'right': 0}
         self._pagestep =  {'left': 10, 'right': 10}
-        self._vrectcolor = QtGui.QColor(0x00, 0x00, 0x55, 0x25)
+        self._vrectcolor = QColor(0x00, 0x00, 0x55, 0x25)
         self._vrectbordercolor = self._vrectcolor.darker()
-        self.sizePolicy().setControlType(QtGui.QSizePolicy.Slider)
+        self.sizePolicy().setControlType(QSizePolicy.Slider)
         self.setMinimumWidth(20)
 
     def nDiffs(self):
@@ -201,7 +210,7 @@ class BlockMatch(BlockList):
     def paintEvent(self, event):
         w = self.width()
         h = self.height()
-        p = QtGui.QPainter(self)
+        p = QPainter(self)
         p.setRenderHint(p.Antialiasing)
         
         ps_l = float(self._pagestep['left'])
@@ -226,7 +235,7 @@ class BlockMatch(BlockList):
             p.save()
             p.setBrush(self.blockTypes[typ])
 
-            path = QtGui.QPainterPath()
+            path = QPainterPath()
             path.moveTo(0, scalel * (alo - ml))
             path.cubicTo(w/3.0, scalel * (alo - ml),
                          2*w/3.0, scaler * (blo - mr),
@@ -243,14 +252,12 @@ class BlockMatch(BlockList):
     def setMaximum(self, maximum, side):
         self._maximum[side] = maximum
         self.update()
-        self.emit(SIGNAL('rangeChanged(int, int, const QString &)'),
-                  self._minimum[side], self._maximum[side], side)
+        self.rangeChanged.emit(self._minimum[side], self._maximum[side], side)
 
     def setMinimum(self, minimum, side):
         self._minimum[side] = minimum
         self.update()
-        self.emit(SIGNAL('rangeChanged(int, int, const QString &)'),
-                  self._minimum[side], self._maximum[side], side)
+        self.rangeChanged.emit(self._minimum[side], self._maximum[side], side)
 
     def setRange(self, minimum, maximum, side=None):
         if side is None:
@@ -261,8 +268,7 @@ class BlockMatch(BlockList):
         self._minimum[side] = minimum
         self._maximum[side] = maximum
         self.update()
-        self.emit(SIGNAL('rangeChanged(int, int, const QString &)'),
-                  self._minimum[side], self._maximum[side], side)
+        self.rangeChanged.emit(self._minimum[side], self._maximum[side], side)
         
     def setValue(self, val, side=None):
         if side is None:
@@ -273,14 +279,13 @@ class BlockMatch(BlockList):
         if val != self._value[side]:
             self._value[side] = val
             self.update()
-            self.emit(SIGNAL('valueChanged(int, const QString &)'), val, side)
+            self.valueChanged.emit(val, side)
 
     def setPageStep(self, pagestep, side):
         if pagestep != self._pagestep[side]:
             self._pagestep[side] = pagestep
             self.update()
-            self.emit(SIGNAL('pageStepChanged(int, const QString &)'),
-                      pagestep, side)
+            self.pageStepChanged.emit(pagestep, side)
 
     def syncPageStep(self):
         for side in ['left', 'right']:
@@ -302,23 +307,22 @@ class BlockMatch(BlockList):
         self.setPageStep(sb.pageStep(), side)
         self.setValue(sb.value(), side)
         self.setUpdatesEnabled(True)
-        self.connect(sb, SIGNAL('valueChanged(int)'), self.setValue)
-        self.connect(sb, SIGNAL('rangeChanged(int, int)'), self.setRange)
+        sb.valueChanged.connect(self.setValue)
+        sb.rangeChanged.connect(self.setRange)
 
-        self.connect(self, SIGNAL('valueChanged(int, const QString &)'),
-                     lambda v, s: side==s and sb.setValue(v))
-        self.connect(self, SIGNAL('rangeChanged(int, int, const QString )'),
+        self.valueChanged.connect(lambda v, s: side==s and sb.setValue(v))
+        self.rangeChanged.connect(
                      lambda v1, v2, s: side==s and sb.setRange(v1, v2))
-        self.connect(self, SIGNAL('pageStepChanged(int, const QString )'),
+        self.pageStepChanged.connect(
                      lambda v, s: side==s and sb.setPageStep(v))
     
 if __name__ == '__main__':
-    a = QtGui.QApplication([])
-    f = QtGui.QFrame()
-    l = QtGui.QHBoxLayout(f)
+    a = QApplication([])
+    f = QFrame()
+    l = QHBoxLayout(f)
 
-    sb1 = QtGui.QScrollBar()
-    sb2 = QtGui.QScrollBar()
+    sb1 = QScrollBar()
+    sb2 = QScrollBar()
     
     w0 = BlockList()
     w0.addBlock('-', 200, 300)
