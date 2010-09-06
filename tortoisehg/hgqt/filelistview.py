@@ -63,7 +63,8 @@ class HgFileListView(QTableView):
             index = self.currentIndex()
         sel_file = self.model().fileFromIndex(index)
         from_rev = self.model().revFromIndex(index)
-        self.fileRevSelected.emit(sel_file, from_rev)
+        if sel_file:
+            self.fileRevSelected.emit(sel_file, from_rev)
 
     def selectFile(self, filename):
         self.setCurrentIndex(self.model().indexFromFile(filename))
