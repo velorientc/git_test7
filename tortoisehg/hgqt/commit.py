@@ -483,8 +483,7 @@ class CommitWidget(QWidget):
             newbranch = hglib.fromunicode(self.branchop)
             if newbranch in repo.branchtags():
                 # response: 0=Yes, 1=No, 2=Cancel
-                pb = [p.branch() for p in repo.parents()]
-                if self.nextbranch in pb:
+                if newbranch in [p.branch() for p in repo.parents()]:
                     resp = 0
                 else:
                     rev = repo[newbranch].rev()
