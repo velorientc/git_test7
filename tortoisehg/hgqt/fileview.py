@@ -253,6 +253,12 @@ class HgFileView(QFrame):
         self.lastrev = None
         self.showDescSignal.emit('')
 
+    def clearDisplay(self):
+        self.sci.clear()
+        self.ann.clear()
+        self.filenamelabel.setText(" ")
+        self.execflaglabel.clear()
+
     def displayFile(self, filename=None, rev=None):
         if self._mode == 'diff':
             self.sci.setMarginLineNumbers(1, False)
@@ -274,10 +280,8 @@ class HgFileView(QFrame):
         if rev is not None:
             self._p_rev = rev
             self.revForDiffChanged.emit(rev)
-        self.sci.clear()
-        self.ann.clear()
-        self.filenamelabel.setText(" ")
-        self.execflaglabel.clear()
+
+        self.clearDisplay()
         if filename is None:
             return
         try:
