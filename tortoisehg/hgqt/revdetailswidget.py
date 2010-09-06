@@ -295,7 +295,8 @@ class RevDetailsWidget(QWidget):
         if len(self.filelistmodel):
             self.filelist.selectRow(0)
         self.fileview.setContext(ctx)
-        self.revpanel.update(ctx.rev())
+        self.revpanel.set_revision(rev)
+        self.revpanel.update()
         self.message.displayRevision(ctx)
         self.filelistmodel.setSelectedRev(ctx)
 
