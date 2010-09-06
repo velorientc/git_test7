@@ -279,8 +279,6 @@ class _StatusFilterButton(QToolButton):
         for c in self._TYPES:
             st = status.statusTypes[c]
             a = menu.addAction('%s %s' % (c, st.name))
-            if st.icon:
-                a.setIcon(qtlib.geticon(st.icon.rstrip('.ico')))  # XXX
             a.setCheckable(True)
             a.setChecked(c in text)
             a.toggled.connect(self._update)
