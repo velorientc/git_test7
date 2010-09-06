@@ -25,7 +25,9 @@ class HgFileListView(QTableView):
     """
     A QTableView for displaying a HgFileListModel
     """
+
     fileRevSelected = pyqtSignal(object, object)
+    clearDisplay = pyqtSignal()
 
     def __init__(self, parent=None):
         QTableView.__init__(self, parent)
@@ -65,6 +67,8 @@ class HgFileListView(QTableView):
         from_rev = self.model().revFromIndex(index)
         if sel_file:
             self.fileRevSelected.emit(sel_file, from_rev)
+        else:
+            self.clearDisplay.emit()
 
     def selectFile(self, filename):
         self.setCurrentIndex(self.model().indexFromFile(filename))
