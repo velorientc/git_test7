@@ -282,7 +282,6 @@ class HgFileView(QFrame):
             return
         try:
             filectx = self._ctx.filectx(self._realfilename)
-            
         except LookupError: # occur on deleted files
             return
         if self._mode == 'diff' and self._p_rev is not None:
