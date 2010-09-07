@@ -186,9 +186,10 @@ class CommitWidget(QWidget):
                 self.parentlabels.append(lbl)
             else:
                 self.parentlabels[i].setText(ptext)
-        while len(self.repo.parents()) > len(self.parentlabels):
+        while len(self.repo.parents()) < len(self.parentlabels):
             w = self.parentlabels.pop()
             self.parentvbox.removeWidget(w)
+            w.hide()
 
     def initQRefreshMode(self):
         'Working parent is a patch.  Is it refreshable?'
