@@ -89,11 +89,11 @@ def RevPanelWidget(repo, repoview):
         raise csinfo.UnknownItem(item)
     def markup_func(widget, item, value):
         def link_markup(revnum, revid, enable=True):
-            mrevid = revid_markup(revid)
+            mrevid = revid_markup('%s (%s)' % (revnum, revid))
             if not enable:
-                return '%s (%s)' % (revnum, mrevid)
+                return mrevid
             link = 'cset://%s:%s' % (revnum, revid)
-            return '<a href="%s">%s (%s)</a>' % (link, revnum, mrevid)
+            return '<a href="%s">%s</a>' % (link, mrevid)
         def revline_markup(revnum, revid, summary, highlight=None,
                            branch=None, link=True):
             def branch_markup(branch):
