@@ -786,7 +786,7 @@ class GLog(gdialog.GWindow):
                 return False
         elif mode == MODE_FILEPATS:
             try:
-                match.match(self.repo.root, self.repo.root, text)
+                match.match(self.repo.root, self.repo.root, [text])
             except (ValueError, util.Abort), e:
                 gdialog.Prompt(_('Invalid file pattern'),
                                str(e), self).run()
