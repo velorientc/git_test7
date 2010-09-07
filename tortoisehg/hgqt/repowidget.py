@@ -538,10 +538,8 @@ class RepoWidget(QWidget):
         menu.exec_(point)
 
     def updateToRevision(self):
-        self.repo.incrementBusyCount()
         dlg = update.UpdateDialog(self.rev, self.repo, self)
         dlg.exec_()
-        self.repo.decrementBusyCount()
 
     def manifestRevision(self):
         run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)

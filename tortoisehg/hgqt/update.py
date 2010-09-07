@@ -252,6 +252,7 @@ class UpdateDialog(QDialog):
                     return
 
         # start updating
+        self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
     ### Signal Handlers ###
@@ -277,6 +278,7 @@ class UpdateDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, wrapper):
+        self.repo.decrementBusyCount()
         if wrapper.data is 0:
             res = 0
         else:
