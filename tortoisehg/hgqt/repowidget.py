@@ -548,7 +548,7 @@ class RepoWidget(QWidget):
         run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)
 
     def mergeWithRevision(self):
-        dlg = merge.MergeDialog(rev, self.repo, self)
+        dlg = merge.MergeDialog(self.rev, self.repo, self)
         def invalidated():
             # This could perhaps be better...
             self.repo.incrementBusyCount()
