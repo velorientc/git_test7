@@ -415,6 +415,7 @@ class RepoWidget(QWidget):
         'Initiate a refresh of the repo model, rebuild graph'
         self.repo.thginvalidate()
         self.rebuildGraph()
+        self.commitDemand.forward('reload')
 
     def rebuildGraph(self):
         self.showMessage('')
