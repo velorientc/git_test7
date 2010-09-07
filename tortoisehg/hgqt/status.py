@@ -780,7 +780,7 @@ class StatusDialog(QDialog):
         if event.matches(QKeySequence.Refresh):
             self.stwidget.refreshWctx()
         else:
-            return super(StatusWidget, self).keyPressEvent(event)
+            return super(StatusDialog, self).keyPressEvent(event)
 
     def accept(self):
         s = QSettings()
