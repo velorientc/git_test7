@@ -253,12 +253,14 @@ class DetectRenameDialog(QDialog):
                       'destination file:\n%s. Aborting!') % dest)
                 return
             remdests[dest] = src
+        self.repo.incrementBusyCount()
         for dest, src in remdests.iteritems():
             if not os.path.exists(self.repo.wjoin(src)):
                 wctx.remove([src]) # !->R
             wctx.copy(src, dest)
             shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
             self.matchtv.model().remove(dest)
+        self.repo.decrementBusyCount() # triggers invalidation
         self.matchAccepted.emit()
         self.refresh()
 
