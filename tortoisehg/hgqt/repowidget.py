@@ -540,7 +540,6 @@ class RepoWidget(QWidget):
     def updateToRevision(self):
         self.repo.incrementBusyCount()
         dlg = update.UpdateDialog(self.rev, self.repo, self)
-        dlg.cmdfinished.connect()
         dlg.exec_()
         self.repo.decrementBusyCount()
 
