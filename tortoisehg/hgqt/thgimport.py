@@ -137,10 +137,12 @@ class ImportDialog(QDialog):
 
     def browsefiles(self):
         caption = _("Select patches")
-        path = QFileDialog.getOpenFileNames(parent=self, caption=caption,
-            filter=_FILE_FILTER)
-        if path:
-            response = os.pathsep.join([str(x) for x in path])
+        filelist = QFileDialog.getOpenFileNames(parent=self, caption=caption,
+                                                filter=_FILE_FILTER)
+        if filelist:
+            # Qt file browser uses '/' in paths, even on Windows.
+            filelist = [str(x.replace('/', os.sep)) for x in filelist]
+            response = os.pathsep.join(filelist)
             self.src_combo.setEditText(response)
             self.src_combo.setFocus()
 
@@ -168,15 +170,27 @@ class ImportDialog(QDialog):
             self.status.setText(text)
 
     def preview(self):
-        patches = hglib.fromunicode(self.src_combo.currentText())
+        patches = self.getfilepaths()
         if not patches:
             self.cslist.clear()
             self.import_btn.setDisabled(True)
         else:
-            patches = patches.split(os.pathsep)
             self.cslist.update(self.repo, patches)
             self.import_btn.setEnabled(True)
         self.updatestatus()
+
+    def getfilepaths(self):
+        src = hglib.fromunicode(self.src_combo.currentText())
+        if not src:
+            return []
+        files = []
+        for path in src.split(os.pathsep):
+            path = path.strip('\r\n\t ')
+            if not os.path.exists(path) or path in files:
+                continue
+            elif os.path.isfile(path):
+                files.append(path)
+        return files
 
     def thgimport(self):
         hgcmd = 'import'
