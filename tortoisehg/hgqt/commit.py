@@ -53,6 +53,7 @@ class CommitWidget(QWidget):
 
         repo.configChanged.connect(self.configChanged)
         repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.workingBranchChanged.connect(self.workingBranchChanged)
 
         self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
@@ -131,6 +132,10 @@ class CommitWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
 
+    def workingBranchChanged(self):
+        'Repository has detected a change in .hg/branch'
+        self.refresh()
+
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         self.refresh()
@@ -146,8 +151,6 @@ class CommitWidget(QWidget):
         self.stwidget.refreshWctx() # Trigger reload of working context
 
     def refresh(self):
-        wctx = self.repo[None]
-
         # Update qrefresh mode
         if self.repo.changectx('.').thgmqappliedpatch():
             self.commitButtonName.emit(_('QRefresh'))
@@ -162,7 +165,7 @@ class CommitWidget(QWidget):
         self.msgcombo.reset(self.msghistory)
 
         # Update branch operation button
-        cur = hglib.tounicode(wctx.branch())
+        cur = hglib.tounicode(self.repo[None].branch())
         if self.branchop is None:
             title = _('Branch: ') + cur
         elif self.branchop == False:

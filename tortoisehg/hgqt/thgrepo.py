@@ -36,6 +36,7 @@ class ThgRepoWrapper(QObject):
 
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
+    workingBranchChanged = pyqtSignal()
 
     def __init__(self, repo):
         QObject.__init__(self)
@@ -43,6 +44,7 @@ class ThgRepoWrapper(QObject):
         self.busycount = 0
         repo.configChanged = self.configChanged
         repo.repositoryChanged = self.repositoryChanged
+        repo.workingBranchChanged = self.workingBranchChanged
         self.recordState()
         self.startTimer(500)
 
@@ -62,6 +64,7 @@ class ThgRepoWrapper(QObject):
             self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
             self._parentnodes = self.repo.opener('dirstate').read(40)
             self._repomtime = self._getrepomtime()
+            self._branchmtime = os.path.getmtime(self.repo.join('branch'))
         except EnvironmentError, ValueError:
             pass
 
@@ -84,6 +87,11 @@ class ThgRepoWrapper(QObject):
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
+        mtime = os.path.getmtime(self.repo.join('branch'))
+        if mtime > self._branchmtime:
+            self.recordState()
+            self.repo.dirstate.invalidate()
+            self.workingBranchChanged.emit()
 
     def _checkdirstate(self):
         'Check for new dirstate mtime, then working parent changes'
