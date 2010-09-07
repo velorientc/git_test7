@@ -146,7 +146,11 @@ class SyncWidget(QWidget):
             b.setEnabled(True)
         if self.finishfunc:
             output = self.cmd.get_rawoutput()
-            self.finishfunc(wrapper.data, output)
+            if wrapper.data is None:
+                # An exception ocurred, command did not finish
+                self.finishfunc(-1, output)
+            else:
+                self.finishfunc(wrapper.data, output)
 
     def commandCanceled(self):
         for b in self.opbuttons:
