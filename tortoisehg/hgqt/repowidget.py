@@ -549,11 +549,6 @@ class RepoWidget(QWidget):
 
     def mergeWithRevision(self):
         dlg = merge.MergeDialog(self.rev, self.repo, self)
-        def invalidated():
-            # This could perhaps be better...
-            self.repo.incrementBusyCount()
-            self.repo.decrementBusyCount()
-        dlg.repoInvalidated.connect(invalidated)
         dlg.exec_()
 
     def tagToRevision(self):

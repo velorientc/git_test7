@@ -22,8 +22,6 @@ RESULT_PAGE = 2
 
 class MergeDialog(QWizard):
 
-    repoInvalidated = pyqtSignal()
-
     def __init__(self, other, repo=None, parent=None):
         super(MergeDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -374,9 +372,8 @@ class MergePage(BasePage):
 
     def command_finished(self, wrapper):
         if wrapper.data == 0:
-            repo = self.wizard().repo
-            repo.thginvalidate()
-            self.wizard().repoInvalidated.emit()
+            self.wizard().repo.incrementBusyCount()
+            self.wizard().repo.decrementBusyCount()
             self.done = True
             self.wizard().next()
         else:
@@ -395,9 +392,10 @@ class MergePage(BasePage):
             # TODO: need to check existing patches
             patch = 'patch1'
             def finished(wrapper):
+                self.wizard().repo.decrementBusyCount()
                 if wrapper.data == 0:
-                    self.wizard().repo.thginvalidate()
-                    self.wizard().repoInvalidated.emit()
+                    self.wizard().repo.incrementBusyCount()
+                    self.wizard().repo.decrementBusyCount()
                     def callback():
                         text = _('Outstanding changes are saved to <b>'
                                  '%(name)s</b> in the patch queue.  <a href'
@@ -407,6 +405,7 @@ class MergePage(BasePage):
                     self.check_status(callback)
             self.runner = cmdui.Runner(_('MQ - TortoiseHg'), self)
             self.runner.commandFinished.connect(finished)
+            self.wizard().repo.incrementBusyCount()
             self.runner.run(['qnew', patch],
                             ['qpop', '--all'])
         elif cmd.startswith('discard'):
@@ -418,13 +417,13 @@ class MergePage(BasePage):
                          labels=labels, parent=self):
                     return
             def finished(wrapper):
+                self.wizard().repo.decrementBusyCount()
                 if wrapper.data == 0:
-                    self.wizard().repo.thginvalidate()
-                    self.wizard().repoInvalidated.emit()
                     self.check_status()
             cmdline = ['update', '--clean', '--rev', self.wizard().local]
             self.runner = cmdui.Runner(_('Discard - TortoiseHg'), self)
             self.runner.commandFinished.connect(finished)
+            self.wizard().repo.incrementBusyCount()
             self.runner.run(cmdline)
         elif cmd.startswith('rename:'):
             patch = cmd[7:]
@@ -435,6 +434,7 @@ class MergePage(BasePage):
             oldpatch = hglib.fromunicode(patch)
             newpatch = hglib.fromunicode(name)
             def finished(wrapper):
+                self.wizard().repo.decrementBusyCount()
                 if wrapper.data == 0:
                     text = _('The patch <b>%(old)s</b> is renamed to <b>'
                              '%(new)s</b>.  <a href="rename:%(new)s"><b>'
@@ -442,6 +442,7 @@ class MergePage(BasePage):
                     self.wd_text.setText(text % dict(old=patch, new=name))
             self.runner = cmdui.Runner(_('Rename - TortoiseHg'), self)
             self.runner.commandFinished.connect(finished)
+            self.wizard().repo.incrementBusyCount()
             self.runner.run(['qrename', oldpatch, newpatch])
         elif cmd == 'view':
             dlg = status.StatusDialog([], {}, self)
@@ -614,8 +615,8 @@ class CommitPage(BasePage):
 
     def command_finished(self, wrapper):
         if wrapper.data == 0:
-            self.wizard().repo.thginvalidate()
-            self.wizard().repoInvalidated.emit()
+            self.wizard().repo.incrementBusyCount()
+            self.wizard().repo.decrementBusyCount()
             self.done = True
             self.wizard().next()
 
