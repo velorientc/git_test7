@@ -274,6 +274,12 @@ def _extendrepo(repo):
             self._pyqtobj.busycount -= 1
             if self._pyqtobj.busycount == 0:
                 self._pyqtobj.pollStatus()
+            else:
+                # A lot of logic will depend on invalidation happening
+                # within the context of this call.  Signals will not be
+                # emitted till later, but we at least invalidate cached
+                # data in the repository
+                self.thginvalidate()
 
     return thgrepository
 
