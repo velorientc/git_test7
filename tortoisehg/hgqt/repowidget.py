@@ -40,20 +40,18 @@ class RepoWidget(QWidget):
         QWidget.__init__(self)
 
         self.repo = repo
+        repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.configChanged.connect(self.configChanged)
         self.workbench = workbench
         self._reload_rev = '.' # select working parent at startup
-        self._scanForRepoChanges = True
         self.currentMessage = ''
         self.runner = None
+        self.dirty = False
 
         self.load_config()
         self.setupUi()
         self.createActions()
         self.setupModels()
-
-        self._repomtime = self._getrepomtime()
-        self._recorddirstate()
-        self._watchrepotimer = self.startTimer(500)
 
         self.restoreSettings()
 
@@ -134,11 +132,11 @@ class RepoWidget(QWidget):
         cw = CommitWidget(pats, opts, self.repo.root, self,
                           self.workbench.log)
         cw.showMessage.connect(self.showMessage)
-        cw.commitComplete.connect(self.reload)
-        cw.commitComplete.connect(cw.reload)
         cw.buttonHBox.addWidget(b)
         cw.commitButtonName.connect(lambda n: b.setText(n))
         cw.loadConfigs(QSettings())
+        self.repo.configChanged.connect(cw.configChanged)
+        self.repo.repositoryChanged.connect(cw.repositoryChanged)
         cw.reload()
         b.clicked.connect(cw.commit)
         self.repo._commitwidget = cw
@@ -163,8 +161,8 @@ class RepoWidget(QWidget):
             sw = SyncWidget(root=self.repo.root, log=self.workbench.log)
             self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)
-        sw.invalidate.connect(self.reload)
         sw.showMessage.connect(self.showMessage)
+        self.repo.configChanged.connect(sw.configChanged)
         return SharedWidget(sw)
 
     def setOutgoingNodes(self, nodes):
@@ -199,17 +197,10 @@ class RepoWidget(QWidget):
     def showEvent(self, event):
         QWidget.showEvent(self, event)
         self.showMessageSignal.emit(self.currentMessage)
-
-    def timerEvent(self, event):
-        if event.timerId() == self._watchrepotimer:
-            if not self._scanForRepoChanges:
-                return
-            self._checkuimtime()
-            self._checkdirstate()
-            mtime = self._getrepomtime()
-            if mtime > self._repomtime:
-                self.showMessage(_("Repository has been modified "
-                                   "(reloading is recommended)"))
+        if self.dirty:
+            print 'page was dirty, reloading...'
+            self.reload()
+            self.dirty = False
 
     def createActions(self):
         self.actionActivateRev = QAction('Activate rev.', self)
@@ -386,11 +377,6 @@ class RepoWidget(QWidget):
         # Perhaps we can update a GUI element later, to indicate full load
         pass
 
-    def setScanForRepoChanges(self, enable):
-        saved = self._scanForRepoChanges
-        self._scanForRepoChanges = enable
-        return saved
-
     def revision_clicked(self, rev):
         'User clicked on a repoview row'
         tw = self.taskTabsWidget
@@ -428,67 +414,19 @@ class RepoWidget(QWidget):
             return
         visdiff.visualdiff(self.repo.ui, self.repo, [], {'change':rev})
 
-    def _getrepomtime(self):
-        'Return the last modification time for the repo'
-        watchedfiles = [self.repo.sjoin('00changelog.i'),
-                        self.repo.join('patches/status')]
-        try:
-            mtime = [os.path.getmtime(wf) for wf in watchedfiles \
-                     if os.path.isfile(wf)]
-            if mtime:
-                return max(mtime)
-        except EnvironmentError:
-            return None
-        self._scanForRepoChanges = False
-        self.closeSelfSignal.emit(self)
-
-    def _recorddirstate(self):
-        try:
-            self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
-            self._parentnodes = self.repo.opener('dirstate').read(40)
-        except EnvironmentError, ValueError:
-            return None
-
-    def _checkdirstate(self):
-        'Check for new dirstate mtime, working parent changes'
-        mtime = os.path.getmtime(self.repo.join('dirstate'))
-        if mtime <= self._dirstatemtime:
-            return
-        self._dirstatemtime = mtime
-        nodes = self.repo.opener('dirstate').read(40)
-        if nodes != self._parentnodes:
-            self._parentnodes = nodes
-            self.showMessage(_('Working parent(s) have changed '
-                               '(reloading is recommended)'))
-
-
-    def _checkuimtime(self):
-        'Check for modified config files, or a new .hg/hgrc file'
-        try:
-            oldmtime, files = self.repo.uifiles()
-            files.add(self.repo.join('hgrc'))
-            mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
-            if max(mtime) > oldmtime:
-                self.showMessage(_('Configuration change detected.'))
-                self.repo.invalidateui()
-                self.syncDemand.forward('reload')
-                self.repomodel.invalidate() # username, author colors, fonts
-        except EnvironmentError, ValueError:
-            return None
-
     def reload(self):
         'Initiate a refresh of the repo model, rebuild graph'
-        self._repomtime = self._getrepomtime()
-        self._recorddirstate()
-        self.showMessage('')
         self.repo.thginvalidate()
+        self.rebuildGraph()
+
+    def rebuildGraph(self):
+        self.showMessage('')
         if self.rev is not None and len(self.repo) >= self.rev:
             self._reload_rev = '.'
         else:
             self._reload_rev = self.rev
         self.setupModels()
         self.revDetailsWidget.record()
-        self.commitDemand.forward('reload')
 
     def reloadTaskTab(self):
         tti = self.taskTabsWidget.currentIndex()
@@ -510,6 +448,22 @@ class RepoWidget(QWidget):
         self.repo.thginvalidate()
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
+
+    def repositoryChanged(self):
+        'Repository has detected a changelog / dirstate change'
+        if self.isVisible():
+            self.rebuildGraph()
+        else:
+            self.dirty = True
+
+    def configChanged(self):
+        'Repository is reporting its config files have changed'
+        self.repomodel.invalidate()
+        self.revDetailsWidget.reload()
+
+    ##
+    ## Workbench methods
+    ##
 
     def setBranch(self, branch, allparents=True):
         'Triggered by workbench on branch selection'
@@ -554,22 +508,6 @@ class RepoWidget(QWidget):
         self.commitDemand.forward('storeConfigs', s)
         return True
 
-    def runCommand(self, title, cmdline):
-        if self.runner:
-            InfoMsgBox(_('Unable to start'),
-                       _('Previous command is still running'))
-            return
-        saved = self.setScanForRepoChanges(False)
-        self.runner = cmdui.Runner(title, self, self.workbench.log)
-        def finished(ret):
-            self.reload()
-            self.setScanForRepoChanges(saved)
-            self.runner = None
-            # When we run commands, we typically change working parent
-            self.commitDemand.forward('reload')
-        self.runner.commandFinished.connect(finished)
-        self.runner.run(cmdline, display='hg ' + ' '.join(cmdline))
-
     ##
     ## Repoview context menu
     ##
@@ -601,72 +539,57 @@ class RepoWidget(QWidget):
             menu.addAction(self._actions['strip'])
         menu.exec_(point)
 
-    def updateToRevision(self, rev=None):
-        rev = rev or self.rev
-        saved = self.setScanForRepoChanges(False)
-        def finished(ret):
-            if ret == 0:
-                self.reload()
-                self.commitDemand.forward('reload')
-        dlg = update.UpdateDialog(rev, self.repo, self)
-        dlg.cmdfinished.connect(finished)
+    def updateToRevision(self):
+        self.repo.incrementBusyCount()
+        dlg = update.UpdateDialog(self.rev, self.repo, self)
+        dlg.cmdfinished.connect()
         dlg.exec_()
-        self.setScanForRepoChanges(saved)
+        self.repo.decrementBusyCount()
 
-    def manifestRevision(self, rev=None):
-        rev = rev or self.rev
-        run.manifest(self.repo.ui, repo=self.repo, rev=rev or self.rev)
+    def manifestRevision(self):
+        run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)
 
-    def mergeWithRevision(self, rev=None):
-        rev = rev or self.rev
-        saved = self.setScanForRepoChanges(False)
+    def mergeWithRevision(self):
         dlg = merge.MergeDialog(rev, self.repo, self)
         def invalidated():
-            self.reload()
+            # This could perhaps be better...
+            self.repo.incrementBusyCount()
+            self.repo.decrementBusyCount()
         dlg.repoInvalidated.connect(invalidated)
         dlg.exec_()
-        self.setScanForRepoChanges(saved)
 
-    def tagToRevision(self, rev=None):
-        rev = rev or self.rev
-        saved = self.setScanForRepoChanges(False)
-        dlg = tag.TagDialog(self.repo, rev=str(rev), parent=self)
-        dlg.tagChanged.connect(self.reload)
+    def tagToRevision(self):
+        self.repo.incrementBusyCount()
+        dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
+        #dlg.tagChanged.connect(self.reload)
         dlg.localTagChanged.connect(self.refresh)
         dlg.showMessage.connect(self.showMessage)
         dlg.exec_()
-        self.setScanForRepoChanges(saved)
+        self.repo.decrementBusyCount()
 
-    def backoutToRevision(self, rev=None):
-        rev = rev or self.rev
-        saved = self.setScanForRepoChanges(False)
-        dlg = backout.BackoutDialog(self.repo, str(rev), self)
-        if dlg.exec_():
-            self.reload()
-        self.setScanForRepoChanges(saved)
+    def backoutToRevision(self):
+        self.repo.incrementBusyCount()
+        dlg = backout.BackoutDialog(self.repo, str(self.rev), self)
+        dlg.exec_()
+        self.repo.decrementBusyCount()
 
-    def stripRevision(self, rev=None):
-        """Strip the selected revision and all descendants"""
-        rev = rev or self.rev
-        saved = self.setScanForRepoChanges(False)
-        dlg = thgstrip.StripDialog(self.repo, rev=str(rev), parent=self)
-        if dlg.exec_():
-            self.reload()
-        self.setScanForRepoChanges(saved)
+    def stripRevision(self):
+        'Strip the selected revision and all descendants'
+        self.repo.incrementBusyCount()
+        dlg = thgstrip.StripDialog(self.repo, rev=str(self.rev), parent=self)
+        self.reload()
+        self.repo.decrementBusyCount()
 
-    def emailRevision(self, rev=None):
-        rev = rev or self.rev
-        run.email(self.repo.ui, rev=[str(rev)], repo=self.repo)
+    def emailRevision(self):
+        run.email(self.repo.ui, rev=[str(self.rev)], repo=self.repo)
 
-    def archiveRevision(self, rev=None):
-        rev = rev or self.rev
-        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, rev, self)
+    def archiveRevision(self):
+        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, self.rev, self)
         dlg.exec_()
 
-    def copyHash(self, rev=None):
-        rev = rev or self.rev
+    def copyHash(self):
         clip = QApplication.clipboard()
-        clip.setText(binascii.hexlify(self.repo[rev].node()))
+        clip.setText(binascii.hexlify(self.repo[self.rev].node()))
 
     def rebaseRevision(self, srcrev=None):
         """Rebase selected revision on top of working directory parent"""
@@ -706,3 +629,17 @@ class RepoWidget(QWidget):
         cmdline = ['qgoto', str(patchname),  # FIXME force option
                    '--repository', self.repo.root]
         self.runCommand(_('QGoto - TortoiseHg'), cmdline)
+
+    def runCommand(self, title, cmdline):
+        if self.runner:
+            InfoMsgBox(_('Unable to start'),
+                       _('Previous command is still running'))
+            return
+        self.runner = cmdui.Runner(title, self, self.workbench.log)
+        self.repo.incrementBusyCount()
+        def finished(ret):
+            self.repo.decrementBusyCount()
+            self.runner = None
+        self.runner.commandFinished.connect(finished)
+        self.runner.run(cmdline, display='hg ' + ' '.join(cmdline))
+
