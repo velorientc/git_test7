@@ -11,6 +11,8 @@
 import os
 import sys
 
+from PyQt4.QtCore import *
+
 from mercurial import hg, patch, util, error, bundlerepo, ui, extensions
 from mercurial.util import propertycache
 
@@ -24,10 +26,90 @@ def repository(ui, path='', create=False):
     is obtained using mercurial.hg.repository()'''
     if create or path not in _repocache:
         repo = hg.repository(ui, path, create)
+        repo._pyqtobj = ThgRepoWrapper(repo)
         repo.__class__ = _extendrepo(repo)
         _repocache[path] = repo
         return repo
     return _repocache[path]
+
+class ThgRepoWrapper(QObject):
+
+    configChanged = pyqtSignal()
+    repositoryChanged = pyqtSignal()
+
+    def __init__(self, repo):
+        QObject.__init__(self)
+        self.repo = repo
+        self.busycount = 0
+        repo.configChanged = self.configChanged
+        repo.repositoryChanged = self.repositoryChanged
+        self.recordState()
+        self.startTimer(500)
+
+    def timerEvent(self, event):
+        if self.busycount == 0:
+            self.pollStatus()
+        else:
+            print 'no poll, busy', self.busycount
+
+    def pollStatus(self):
+        self._checkrepotime()
+        self._checkdirstate()
+        self._checkuimtime()
+
+    def recordState(self):
+        try:
+            self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
+            self._parentnodes = self.repo.opener('dirstate').read(40)
+            self._repomtime = self._getrepomtime()
+        except EnvironmentError, ValueError:
+            pass
+
+    def _getrepomtime(self):
+        'Return the last modification time for the repo'
+        watchedfiles = [self.repo.sjoin('00changelog.i'),
+                        self.repo.join('patches/status')]
+        try:
+            mtime = [os.path.getmtime(wf) for wf in watchedfiles \
+                     if os.path.isfile(wf)]
+            if mtime:
+                return max(mtime)
+        except EnvironmentError:
+            return None
+
+    def _checkrepotime(self):
+        'Check for new changelog entries, or MQ status changes'
+        if self._repomtime < self._getrepomtime():
+            print 'detected repository change'
+            self.recordState()
+            self.repo.thginvalidate()
+            self.repositoryChanged.emit()
+
+    def _checkdirstate(self):
+        'Check for new dirstate mtime, then working parent changes'
+        mtime = os.path.getmtime(self.repo.join('dirstate'))
+        if mtime <= self._dirstatemtime:
+            return
+        self._dirstatemtime = mtime
+        nodes = self.repo.opener('dirstate').read(40)
+        if nodes != self._parentnodes:
+            print 'dirstate change found'
+            self.recordState()
+            self.repo.dirstate.invalidate()
+            self.repositoryChanged.emit()
+
+    def _checkuimtime(self):
+        'Check for modified config files, or a new .hg/hgrc file'
+        try:
+            oldmtime, files = self.repo.uifiles()
+            files.add(self.repo.join('hgrc'))
+            mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
+            if max(mtime) > oldmtime:
+                print 'config change detected'
+                self.repo.invalidateui()
+                self.configChanged.emit()
+        except EnvironmentError, ValueError:
+            pass
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible
               _exts _thghiddentags'''.split()
@@ -35,6 +117,7 @@ _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
+
         def changectx(self, changeid):
             '''Extends Mercurial's standard changectx() method to
             a) return a thgchangectx with additional methods
@@ -182,6 +265,16 @@ def _extendrepo(repo):
                     delattr(self, a)
             # todo: extensions.loadall(self.ui)
 
+        def incrementBusyCount(self):
+            'A GUI widget is starting a transaction'
+            self._pyqtobj.busycount += 1
+
+        def decrementBusyCount(self):
+            'A GUI widget has finished a transaction'
+            self._pyqtobj.busycount -= 1
+            if self._pyqtobj.busycount == 0:
+                self._pyqtobj.pollStatus()
+
     return thgrepository
 
 
@@ -287,10 +380,10 @@ class patchctx(object):
             if msg:
                 msg = '\n'.join(msg)
         self._node = node
-        self._user = user and hglib.toutf(user) or ''
+        self._user = user and hglib.tounicode(user) or ''
         self._date = date and util.parsedate(date) or util.makedate()
         self._desc = msg and msg or ''
-        self._branch = branch and hglib.toutf(branch) or ''
+        self._branch = branch and hglib.tounicode(branch) or ''
         self._parents = []
         self._rev = rev
         for p in (p1, p2):
