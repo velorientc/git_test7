@@ -42,5 +42,6 @@
     <file>icons/repobrowse.svg</file>
     <file>icons/loadall.png</file>
     <file>icons/showlog.png</file>
+    <file>icons/status.svg</file>
   </qresource>
 </RCC>
