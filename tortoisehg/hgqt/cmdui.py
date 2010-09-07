@@ -424,6 +424,9 @@ class Runner(QObject):
         self.core.cancel()
 
     def show_output(self, visible=True):
+        if self.core.log:
+            self.core.log.setShown(visible)
+            return
         if not hasattr(self, 'dlg'):
             self.dlg = QDialog(self.parent)
             self.dlg.setWindowTitle(self.title)
