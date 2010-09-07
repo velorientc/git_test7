@@ -161,7 +161,7 @@ class CommitWidget(QWidget):
             fmt = "<span style='font-family:Courier'>%s(%s)</span> %s"
             ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
             ptext = _('<b>Parent: </b>') + ptext
-            if i > len(self.parentlabels):
+            if i >= len(self.parentlabels):
                 lbl = QLabel(ptext)
                 self.parentvbox.addWidget(lbl)
                 self.parentlabels.append(lbl)
