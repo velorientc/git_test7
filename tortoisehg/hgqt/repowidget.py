@@ -135,8 +135,6 @@ class RepoWidget(QWidget):
         cw.buttonHBox.addWidget(b)
         cw.commitButtonName.connect(lambda n: b.setText(n))
         cw.loadConfigs(QSettings())
-        self.repo.configChanged.connect(cw.configChanged)
-        self.repo.repositoryChanged.connect(cw.repositoryChanged)
         cw.reload()
         b.clicked.connect(cw.commit)
         self.repo._commitwidget = cw
@@ -162,7 +160,6 @@ class RepoWidget(QWidget):
             self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
-        self.repo.configChanged.connect(sw.configChanged)
         return SharedWidget(sw)
 
     def setOutgoingNodes(self, nodes):

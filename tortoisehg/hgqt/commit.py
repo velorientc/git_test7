@@ -46,10 +46,14 @@ class CommitWidget(QWidget):
         self.msghistory = []
         self.qref = False
 
+        self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(_('Commit'), self, logwidget)
+        self.runner.commandStarted.connect(repo.incrementBusyCount)
         self.runner.commandFinished.connect(self.commandFinished)
 
-        repo = self.stwidget.repo
+        repo.configChanged.connect(self.configChanged)
+        repo.repositoryChanged.connect(self.repositoryChanged)
+
         self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
 
@@ -73,7 +77,7 @@ class CommitWidget(QWidget):
         self.buttonHBox = hbox
 
         msgcombo = MessageHistoryCombo()
-        self.connect(msgcombo, SIGNAL('activated(int)'), self.msgSelected)
+        msgcombo.activated.connect(self.msgSelected)
         hbox.addWidget(msgcombo, 1)
         hbox.addSpacing(2)
         vbox.addLayout(hbox, 0)
@@ -89,7 +93,7 @@ class CommitWidget(QWidget):
 
         msgte = QPlainTextEdit()
         msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
-        msgfont = qtlib.getfont(self.stwidget.repo.ui, 'fontcomment')
+        msgfont = qtlib.getfont(self.repo.ui, 'fontcomment')
         msgte.setFont(msgfont.font())
         msgfont.changed.connect(lambda fnt: msgte.setFont(fnt))
         msgte.textChanged.connect(self.msgChanged)
@@ -127,13 +131,25 @@ class CommitWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
 
+    def repositoryChanged(self):
+        'Repository has detected a changelog / dirstate change'
+        self.refresh()
+
+    def configChanged(self):
+        'Repository is reporting its config files have changed'
+        self.refresh()
+
     def reload(self):
-        repo = self.stwidget.repo
-        repo.thginvalidate()
-        wctx = repo[None]
+        'User has requested a reload'
+        self.repo.thginvalidate()
+        self.refresh()
+        self.stwidget.refreshWctx() # Trigger reload of working context
+
+    def refresh(self):
+        wctx = self.repo[None]
 
         # Update qrefresh mode
-        if repo.changectx('.').thgmqappliedpatch():
+        if self.repo.changectx('.').thgmqappliedpatch():
             self.commitButtonName.emit(_('QRefresh'))
             if not self.qref:
                 self.initQRefreshMode()
@@ -156,7 +172,7 @@ class CommitWidget(QWidget):
         self.branchbutton.setText(title)
 
         # Update parent revision(s)
-        for i, ctx in enumerate(repo.parents()):
+        for i, ctx in enumerate(self.repo.parents()):
             desc = format_desc(ctx.description(), 80)
             fmt = "<span style='font-family:Courier'>%s(%s)</span> %s"
             ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
@@ -167,18 +183,14 @@ class CommitWidget(QWidget):
                 self.parentlabels.append(lbl)
             else:
                 self.parentlabels[i].setText(ptext)
-        while len(repo.parents()) > len(self.parentlabels):
+        while len(self.repo.parents()) > len(self.parentlabels):
             w = self.parentlabels.pop()
             self.parentvbox.removeWidget(w)
 
-        # Trigger reload of working context
-        self.stwidget.refreshWctx()
-
     def initQRefreshMode(self):
         'Working parent is a patch.  Is it refreshable?'
-        repo = self.stwidget.repo
-        qtip = repo['qtip']
-        if qtip != repo['.']:
+        qtip = self.repo['qtip']
+        if qtip != self.repo['.']:
             self.showMessage.emit(_('Cannot refresh non-tip patch'))
             self.commitButtonName.emit(_('N/A'))
             return
@@ -294,25 +306,26 @@ class CommitWidget(QWidget):
         def settings():
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
-            if dlg.exec_() == QDialog.Accepted:
-                repo = self.stwidget.repo
-                repo.ui = hglib.reloadui(repo.root)
+            self.repo.incrementBusyCount()
+            ret = dlg.exec_()
+            self.repo.decrementBusyCount()
+            if ret == QDialog.Accepted:
                 self.msgChanged()
 
         menu = self.msgte.createStandardContextMenu()
         for name, func in [(_('Paste &Filenames'), paste),
                            (_('App&ly Format'), apply),
                            (_('C&onfigure Format'), settings)]:
-            action = menu.addAction(name)
-            action.wrapper = lambda f=func: f()
-            self.connect(action, SIGNAL('triggered()'), action.wrapper)
+            def add(name, func):
+                action = menu.addAction(name)
+                action.triggered.connect(lambda: func())
+            add(name, func)
         return menu.exec_(point)
 
     def getLengths(self):
-        repo = self.stwidget.repo
         try:
-            sumlen = int(repo.ui.config('tortoisehg', 'summarylen', 0))
-            maxlen = int(repo.ui.config('tortoisehg', 'messagewrap', 0))
+            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
+            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
         except (TypeError, ValueError):
             sumlen, maxlen = 0, 0
         return sumlen, maxlen
@@ -324,17 +337,17 @@ class CommitWidget(QWidget):
         return self.stwidget.saveState()
 
     def branchOp(self):
-        d = branchop.BranchOpDialog(self.stwidget.repo, self.branchop)
+        d = branchop.BranchOpDialog(self.repo, self.branchop)
+        self.repo.incrementBusyCount()
         if d.exec_() == QDialog.Accepted:
             self.branchop = d.branchop
-            self.reload()
+        self.repo.decrementBusyCount()
 
     def canUndo(self):
         'Returns undo description or None if not valid'
-        repo = self.stwidget.repo
-        if os.path.exists(repo.sjoin('undo')):
+        if os.path.exists(self.repo.sjoin('undo')):
             try:
-                args = repo.opener('undo.desc', 'r').read().splitlines()
+                args = self.repo.opener('undo.desc', 'r').read().splitlines()
                 if args[1] != 'commit':
                     return None
                 return _('Rollback commit to revision %d') % (int(args[0]) - 1)
@@ -350,11 +363,11 @@ class CommitWidget(QWidget):
                                  QMessageBox.Ok | QMessageBox.Cancel)
         if d != QMessageBox.Ok:
             return
-        repo = self.stwidget.repo
-        repo.rollback()
-        repo.thginvalidate()
+        self.repo.incrementBusyCount()
+        self.repo.rollback()
+        self.repo.decrementBusyCount()
         self.reload()
-        QTimer.singleShot(500, lambda: shlib.shell_notify([repo.root]))
+        QTimer.singleShot(500, lambda: shlib.shell_notify([self.repo.root]))
 
     def getMessage(self):
         text = self.msgte.toPlainText()
@@ -385,8 +398,7 @@ class CommitWidget(QWidget):
 
     def loadConfigs(self, s):
         'Load history, etc, from QSettings instance'
-        repo = self.stwidget.repo
-        repoid = str(repo[0])
+        repoid = str(self.repo[0])
         # message history is stored in unicode
         self.split.restoreState(s.value('commit/split').toByteArray())
         self.msghistory = list(s.value('commit/history-'+repoid).toStringList())
@@ -395,7 +407,7 @@ class CommitWidget(QWidget):
         self.userhist = s.value('commit/userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
         try:
-            curmsg = repo.opener('cur-message.txt').read()
+            curmsg = self.repo.opener('cur-message.txt').read()
             self.msgte.setPlainText(hglib.tounicode(curmsg))
             self.msgte.document().setModified(False)
             self.msgte.moveCursor(QTextCursor.End)
@@ -404,14 +416,13 @@ class CommitWidget(QWidget):
 
     def storeConfigs(self, s):
         'Save history, etc, in QSettings instance'
-        repo = self.stwidget.repo
-        repoid = str(repo[0])
+        repoid = str(self.repo[0])
         s.setValue('commit/history-'+repoid, self.msghistory)
         s.setValue('commit/split', self.split.saveState())
         s.setValue('commit/userhist', self.userhist)
         try:
             # current message is stored in local encoding
-            repo.opener('cur-message.txt', 'w').write(self.getMessage())
+            self.repo.opener('cur-message.txt', 'w').write(self.getMessage())
         except EnvironmentError:
             pass
 
@@ -438,7 +449,7 @@ class CommitWidget(QWidget):
 
         # 2. Read from repository
         try:
-            return self.stwidget.repo.ui.username()
+            return self.repo.ui.username()
         except error.Abort:
             pass
 
@@ -449,18 +460,17 @@ class CommitWidget(QWidget):
         from tortoisehg.hgqt.settings import SettingsDialog
         dlg = SettingsDialog(False, focus='ui.username')
         dlg.exec_()
-        self.stwidget.repo.ui.invalidateui()
+        self.repo.ui.invalidateui()
         try:
-            return self.stwidget.repo.ui.username()
+            return self.repo.ui.username()
         except error.Abort:
             return None
 
     def commit(self):
-        repo = self.stwidget.repo
         cwd = os.getcwd()
         try:
-            os.chdir(repo.root)
-            return self._commit(repo)
+            os.chdir(self.repo.root)
+            return self._commit(self.repo)
         finally:
             os.chdir(cwd)
 
@@ -472,7 +482,6 @@ class CommitWidget(QWidget):
                                 parent=self)
             self.msgte.setFocus()
             return
-        repo = self.stwidget.repo
         if self.branchop is None:
             brcmd = []
         elif self.branchop == False:
@@ -579,6 +588,8 @@ class CommitWidget(QWidget):
                 self.msgte.clear()
             self.msgte.document().setModified(False)
             self.commitComplete.emit()
+        self.repo.decrementBusyCount()
+        self.stwidget.refreshWctx()
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
@@ -613,7 +624,7 @@ class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
     def __init__(self, opts, userhistory, parent):
         QDialog.__init__(self, parent)
-        self.repo = parent.stwidget.repo
+        self.repo = parent.repo
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -742,8 +753,8 @@ class DetailsDialog(QDialog):
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
         self.bb = bb
         layout.addWidget(bb)
 
@@ -884,8 +895,8 @@ class CommitDialog(QDialog):
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
         bb.button(BB.Discard).setText('Undo')
         bb.button(BB.Discard).clicked.connect(commit.rollback)
         bb.button(BB.Cancel).setDefault(False)
@@ -903,7 +914,7 @@ class CommitDialog(QDialog):
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonName.connect(self.setButtonName)
 
-        name = hglib.get_reponame(commit.stwidget.repo)
+        name = hglib.get_reponame(commit.repo)
         self.setWindowTitle('%s - commit' % name)
         self.commit = commit
         self.commit.reload()
@@ -937,7 +948,6 @@ class CommitDialog(QDialog):
         if repo.ui.configbool('tortoisehg', 'closeci'):
             self.reject()
             return
-        self.commit.reload()
 
     def accept(self):
         self.commit.commit()

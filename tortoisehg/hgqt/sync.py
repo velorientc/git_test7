@@ -48,7 +48,8 @@ class SyncWidget(QWidget):
         if not log:
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
-            self.repo.configChanged.connect(self.configChanged)
+
+        self.repo.configChanged.connect(self.configChanged)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
