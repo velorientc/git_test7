@@ -164,7 +164,6 @@ class TagDialog(QDialog):
 
     def update_tagcombo(self, clear=True):
         """ update display on dialog with recent repo data """
-        self.repo.thginvalidate()
         tag_name = self.tag_combo.currentText()
         self.tag_combo.clear()
 

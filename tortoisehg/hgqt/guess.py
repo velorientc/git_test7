@@ -180,7 +180,6 @@ class DetectRenameDialog(QDialog):
                                     _('Select one or more rows for search'))
             return
 
-        self.repo.thginvalidate()
         pct = self.simslider.value() / 100.0
         copies = not self.copycheck.isChecked()
         self.findbtn.setEnabled(False)
@@ -265,7 +264,6 @@ class DetectRenameDialog(QDialog):
 
     def showDiff(self, index):
         'User selected a row in the candidate tree'
-        self.repo.thginvalidate()
         ctx = self.repo['.']
         hu = htmlui.htmlui()
         row = self.matchtv.model().getRow(index)
