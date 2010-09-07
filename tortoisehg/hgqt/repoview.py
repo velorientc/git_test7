@@ -83,7 +83,7 @@ class HgRepoView(QTableView):
         self.standardDelegate = self.itemDelegate()
         self.htmlDelegate = htmllistview.HTMLDelegate(self)
 
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.createToolbars()
