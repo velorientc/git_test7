@@ -62,11 +62,15 @@ class ThgRepoWrapper(QObject):
     def recordState(self):
         try:
             self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
-            self._parentnodes = self.repo.opener('dirstate').read(40)
+            self._parentnodes = self._getrawparents()
             self._repomtime = self._getrepomtime()
             self._branchmtime = os.path.getmtime(self.repo.join('branch'))
+            self._rawbranch = self.repo.opener('branch').read()
         except EnvironmentError, ValueError:
             pass
+
+    def _getrawparents(self):
+        return self.repo.opener('dirstate').read(40)
 
     def _getrepomtime(self):
         'Return the last modification time for the repo'
@@ -88,8 +92,13 @@ class ThgRepoWrapper(QObject):
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
         mtime = os.path.getmtime(self.repo.join('branch'))
-        if mtime > self._branchmtime:
-            self.recordState()
+        if mtime <= self._branchmtime:
+            return
+        self._branchmtime = mtime
+        newbranch = self.repo.opener('branch').read()
+        if newbranch != self._rawbranch:
+            print 'branch time change'
+            self._rawbranch = newbranch
             self.repo.dirstate.invalidate()
             self.workingBranchChanged.emit()
 
@@ -99,7 +108,7 @@ class ThgRepoWrapper(QObject):
         if mtime <= self._dirstatemtime:
             return
         self._dirstatemtime = mtime
-        nodes = self.repo.opener('dirstate').read(40)
+        nodes = self._getrawparents()
         if nodes != self._parentnodes:
             print 'dirstate change found'
             self.recordState()
