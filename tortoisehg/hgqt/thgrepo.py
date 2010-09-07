@@ -91,16 +91,6 @@ class ThgRepoWrapper(QObject):
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
-        mtime = os.path.getmtime(self.repo.join('branch'))
-        if mtime <= self._branchmtime:
-            return
-        self._branchmtime = mtime
-        newbranch = self.repo.opener('branch').read()
-        if newbranch != self._rawbranch:
-            print 'branch time change'
-            self._rawbranch = newbranch
-            self.repo.dirstate.invalidate()
-            self.workingBranchChanged.emit()
 
     def _checkdirstate(self):
         'Check for new dirstate mtime, then working parent changes'
@@ -114,6 +104,17 @@ class ThgRepoWrapper(QObject):
             self.recordState()
             self.repo.dirstate.invalidate()
             self.repositoryChanged.emit()
+            return
+        mtime = os.path.getmtime(self.repo.join('branch'))
+        if mtime <= self._branchmtime:
+            return
+        self._branchmtime = mtime
+        newbranch = self.repo.opener('branch').read()
+        if newbranch != self._rawbranch:
+            print 'branch time change'
+            self._rawbranch = newbranch
+            self.repo.dirstate.invalidate()
+            self.workingBranchChanged.emit()
 
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
