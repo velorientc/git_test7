@@ -58,6 +58,9 @@ class ImportDialog(QDialog):
         self.file_btn = QPushButton(_('Browse...'))
         self.file_btn.setAutoDefault(False)
         self.file_btn.clicked.connect(self.browsefiles)
+        self.dir_btn = QPushButton(_('Browse Directory...'))
+        self.dir_btn.setAutoDefault(False)
+        self.dir_btn.clicked.connect(self.browsedir)
         self.clip_btn = QPushButton(_('Import from Clipboard'))
         self.clip_btn.setAutoDefault(False)
         self.clip_btn.clicked.connect(self.getcliptext)
@@ -65,6 +68,7 @@ class ImportDialog(QDialog):
         grid.addWidget(self.src_combo, 0, 1)
         srcbox = QHBoxLayout()
         srcbox.addWidget(self.file_btn)
+        srcbox.addWidget(self.dir_btn)
         srcbox.addWidget(self.clip_btn)
         grid.addLayout(srcbox, 1, 1)
         self.p0chk = QCheckBox(_('Do not strip paths (-p0), '
@@ -146,6 +150,14 @@ class ImportDialog(QDialog):
             self.src_combo.setEditText(response)
             self.src_combo.setFocus()
 
+    def browsedir(self):
+        caption = _("Select Directory containing patches")
+        path = QFileDialog.getExistingDirectory(parent=self, caption=caption)
+        if path:
+            response = str(path.replace('/', os.sep))
+            self.src_combo.setEditText(response)
+            self.src_combo.setFocus()
+
     def getcliptext(self):
         text = hglib.fromunicode(QApplication.clipboard().text())
         if not text:
@@ -188,8 +200,14 @@ class ImportDialog(QDialog):
             path = path.strip('\r\n\t ')
             if not os.path.exists(path) or path in files:
                 continue
-            elif os.path.isfile(path):
+            if os.path.isfile(path):
                 files.append(path)
+            elif os.path.isdir(path):
+                entries = os.listdir(path)
+                for entry in sorted(entries):
+                    _file = os.path.join(path, entry)
+                    if os.path.isfile(_file) and not _file in files:
+                        files.append(_file)
         return files
 
     def thgimport(self):
