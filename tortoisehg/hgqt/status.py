@@ -453,7 +453,7 @@ class StatusThread(QThread):
         self.opts = opts
 
     def run(self):
-        self.repo.thginvalidate()
+        self.repo.dirstate.invalidate()
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
         stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
         patchecked = {}
