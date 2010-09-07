@@ -557,10 +557,8 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def backoutToRevision(self):
-        self.repo.incrementBusyCount()
         dlg = backout.BackoutDialog(self.repo, str(self.rev), self)
         dlg.exec_()
-        self.repo.decrementBusyCount()
 
     def stripRevision(self):
         'Strip the selected revision and all descendants'

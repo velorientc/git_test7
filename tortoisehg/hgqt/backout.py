@@ -18,8 +18,6 @@ keep = i18n.keepgettext()
 
 class BackoutDialog(QDialog):
 
-    repoInvalidated = pyqtSignal()
-
     def __init__(self, repo=None, rev='tip', parent=None, opts={}):
         super(BackoutDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -146,6 +144,7 @@ class BackoutDialog(QDialog):
         cmdline += ['--message', hglib.fromunicode(msg)]
 
         # start backing out
+        self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
     ### Signal Handlers ###
@@ -163,6 +162,7 @@ class BackoutDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, wrapper):
+        self.repo.decrementBusyCount()
         if wrapper.data is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
@@ -170,7 +170,6 @@ class BackoutDialog(QDialog):
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:
-            self.repoInvalidated.emit()
             self.accept()
 
     def command_canceling(self):
