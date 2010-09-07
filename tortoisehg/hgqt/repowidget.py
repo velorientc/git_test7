@@ -564,10 +564,8 @@ class RepoWidget(QWidget):
 
     def stripRevision(self):
         'Strip the selected revision and all descendants'
-        self.repo.incrementBusyCount()
         dlg = thgstrip.StripDialog(self.repo, rev=str(self.rev), parent=self)
-        self.reload()
-        self.repo.decrementBusyCount()
+        dlg.exec_()
 
     def emailRevision(self):
         run.email(self.repo.ui, rev=[str(self.rev)], repo=self.repo)

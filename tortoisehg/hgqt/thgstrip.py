@@ -18,8 +18,6 @@ from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo
 class StripDialog(QDialog):
     """Dialog to strip changesets"""
 
-    repoInvalidated = pyqtSignal()
-
     def __init__(self, repo=None, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
@@ -216,6 +214,7 @@ class StripDialog(QDialog):
             cmdline.append('--nobackup')
 
         # start the strip
+        self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
     ### Signal Handlers ###
@@ -238,6 +237,7 @@ class StripDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, wrapper):
+        self.repo.decrementBusyCount()
         if wrapper.data is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
@@ -245,7 +245,6 @@ class StripDialog(QDialog):
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:
-            self.repoInvalidated.emit()
             self.accept()
 
     def command_canceling(self):
