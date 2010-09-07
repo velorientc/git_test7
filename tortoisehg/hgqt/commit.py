@@ -75,17 +75,17 @@ class CommitWidget(QWidget):
         self.branchbutton = branchbutton
         self.branchop = None
         hbox.addWidget(branchbutton)
-        self.buttonHBox = hbox
+
+        self.detailsbutton = QPushButton(_('Details'))
+        self.detailsbutton.pressed.connect(self.details)
+        hbox.addWidget(self.detailsbutton)
 
         msgcombo = MessageHistoryCombo()
         msgcombo.activated.connect(self.msgSelected)
         hbox.addWidget(msgcombo, 1)
         hbox.addSpacing(2)
         vbox.addLayout(hbox, 0)
-
-        self.detailsbutton = QPushButton(_('Details'))
-        self.detailsbutton.pressed.connect(self.details)
-        self.buttonHBox.addWidget(self.detailsbutton)
+        self.buttonHBox = hbox
 
         self.parentvbox = QVBoxLayout()
         self.parentlabels = [QLabel('<b>Parent:</b>')]
