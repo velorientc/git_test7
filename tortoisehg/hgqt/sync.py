@@ -25,7 +25,6 @@ from tortoisehg.hgqt import qtlib, cmdui, thgrepo
 _schemes = ['local', 'ssh', 'http', 'https']
 
 class SyncWidget(QWidget):
-    invalidate = pyqtSignal()
     outgoingNodes = pyqtSignal(object)
     showMessage = pyqtSignal(str)
 
@@ -37,11 +36,6 @@ class SyncWidget(QWidget):
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
-        self.log = log
-        if not log:
-            self.setWindowTitle(_('TortoiseHg Sync'))
-            self.resize(850, 550)
-
         self.root = root
         self.repo = thgrepo.repository(ui.ui(), root)
         self.finishfunc = None
@@ -49,6 +43,12 @@ class SyncWidget(QWidget):
         self.curpw = None
         self.updateInProgress = False
         self.tv = PathsTree(root, self)
+
+        self.log = log
+        if not log:
+            self.setWindowTitle(_('TortoiseHg Sync'))
+            self.resize(850, 550)
+            self.repo.configChanged.connect(self.configChanged)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -150,6 +150,10 @@ class SyncWidget(QWidget):
     def commandCanceled(self):
         for b in self.opbuttons:
             b.setEnabled(True)
+
+    def configChanged(self):
+        'Repository is reporting its config files have changed'
+        self.reload()
 
     def reload(self):
         fn = os.path.join(self.root, '.hg', 'hgrc')
@@ -277,11 +281,11 @@ class SyncWidget(QWidget):
         else:
             alias = 'new'
         url = hglib.fromunicode(self.urlentry.text())
+        self.repo.incrementBusyCount()
         dialog = SaveDialog(self.root, alias, url, self)
         if dialog.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dialog.aliasentry.text())
-            self.repo.invalidateui()
-            self.reload()
+        self.repo.decrementBusyCount()
 
     def authclicked(self):
         host = hglib.fromunicode(self.hostentry.text())
@@ -308,7 +312,6 @@ class SyncWidget(QWidget):
 
     def pullclicked(self):
         def finished(ret, output):
-            self.invalidate.emit()
             self.showMessage.emit(_('Pull finished, ret %d') % ret)
         self.finishfunc = finished
         cmdline = ['--repository', self.root, 'pull']
@@ -345,9 +348,9 @@ class SyncWidget(QWidget):
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
-        if dlg.exec_() == QDialog.Accepted:
-            self.repo.invalidateui()
-            self.reload()
+        self.repo.incrementBusyCount()
+        dlg.exec_()
+        self.repo.decrementBusyCount()
 
     def emailclicked(self):
         from tortoisehg.hgqt import run as _run
@@ -364,13 +367,13 @@ class SyncWidget(QWidget):
             return
         if alias in cfg['paths']:
             del cfg['paths'][alias]
+        self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
-            self.repo.invalidateui()
-            self.reload()
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
+        self.repo.decrementBusyCount()
 
 
 class PostPullDialog(QDialog):
