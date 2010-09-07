@@ -88,11 +88,11 @@ class _AbstractFileDialog(QMainWindow, HgDialogMixin):
         if self.repoviewer is None:
             # prevent recursive import
             from workbench import Workbench
-            self.repoviewer = Workbench(self.repo)
-        self.repoviewer.goto(self.repo.root, rev)
+            self.repoviewer = Workbench(self.repo.ui, self.repo)
         self.repoviewer.show()
         self.repoviewer.activateWindow()
         self.repoviewer.raise_()
+        self.repoviewer.goto(self.repo.root, rev)
 
 class FileLogDialog(_AbstractFileDialog):
     """
