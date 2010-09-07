@@ -263,17 +263,17 @@ class TagDialog(QDialog):
                             % (name, str(ctx))
             if not isinstance(message, str):
                 message = hglib.fromunicode(message)
+
+            self.repo.incrementBusyCount()
             self.repo.tag(lname, node, message, local, None, None)
+            self.repo.decrementBusyCount()
+            if local:
+                self.localTagChanged.emit()
 
             # update UI
             self.set_status(_("Tag '%s' has been added") % name, True)
             self.update_tagcombo()
             self.close_btn.setFocus()
-            self.repo.thginvalidate()
-            if local:
-                self.localTagChanged.emit()
-            else:
-                self.tagChanged.emit()
         except:
             self.set_status(_('Error in tagging'), False)
             print traceback.format_exc()
@@ -297,18 +297,18 @@ class TagDialog(QDialog):
             if not message:
                 msgset = keep._('Removed tag %s')
                 message = (english and msgset['id'] or msgset['str']) % name
+
+            self.repo.incrementBusyCount()
             node = self.repo[-1].node()
             self.repo.tag(lname, node, message, local, None, None)
+            self.repo.decrementBusyCount()
+            if local:
+                self.localTagChanged.emit()
 
             # update UI
             self.set_status(_("Tag '%s' has been removed") % name, True)
             self.update_tagcombo()
             self.close_btn.setFocus()
-            self.repo.thginvalidate()
-            if local:
-                self.localTagChanged.emit()
-            else:
-                self.tagChanged.emit()
         except:
             self.set_status(_('Error in tagging'), False)
             print traceback.format_exc()

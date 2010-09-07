@@ -551,13 +551,10 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def tagToRevision(self):
-        self.repo.incrementBusyCount()
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
-        #dlg.tagChanged.connect(self.reload)
         dlg.localTagChanged.connect(self.refresh)
         dlg.showMessage.connect(self.showMessage)
         dlg.exec_()
-        self.repo.decrementBusyCount()
 
     def backoutToRevision(self):
         self.repo.incrementBusyCount()
