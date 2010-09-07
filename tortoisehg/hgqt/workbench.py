@@ -33,6 +33,7 @@ from PyQt4.QtGui import *
 
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
+    finished = pyqtSignal(int)
 
     def __init__(self, ui, repo=None):
         self.ui = ui
@@ -607,6 +608,8 @@ class Workbench(QMainWindow):
         else:
            self.storeSettings()
            self.reporegistry.close()
+           # mimic QDialog exit
+           self.finished.emit(0)
 
     def closeRepoTabs(self):
         '''returns False if close should be aborted'''
