@@ -61,16 +61,21 @@ class ThgRepoWrapper(QObject):
 
     def recordState(self):
         try:
-            self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
             self._parentnodes = self._getrawparents()
             self._repomtime = self._getrepomtime()
+            self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
             self._branchmtime = os.path.getmtime(self.repo.join('branch'))
             self._rawbranch = self.repo.opener('branch').read()
         except EnvironmentError, ValueError:
-            pass
+            self._dirstatemtime = None
+            self._branchmtime = None
+            self._rawbranch = None
 
     def _getrawparents(self):
-        return self.repo.opener('dirstate').read(40)
+        try:
+            return self.repo.opener('dirstate').read(40)
+        except EnvironmentError:
+            return None
 
     def _getrepomtime(self):
         'Return the last modification time for the repo'
@@ -94,7 +99,10 @@ class ThgRepoWrapper(QObject):
 
     def _checkdirstate(self):
         'Check for new dirstate mtime, then working parent changes'
-        mtime = os.path.getmtime(self.repo.join('dirstate'))
+        try:
+            mtime = os.path.getmtime(self.repo.join('dirstate'))
+        except EnvironmentError:
+            return
         if mtime <= self._dirstatemtime:
             return
         self._dirstatemtime = mtime
@@ -105,11 +113,17 @@ class ThgRepoWrapper(QObject):
             self.repo.dirstate.invalidate()
             self.repositoryChanged.emit()
             return
-        mtime = os.path.getmtime(self.repo.join('branch'))
+        try:
+            mtime = os.path.getmtime(self.repo.join('branch'))
+        except EnvironmentError:
+            return
         if mtime <= self._branchmtime:
             return
         self._branchmtime = mtime
-        newbranch = self.repo.opener('branch').read()
+        try:
+            newbranch = self.repo.opener('branch').read()
+        except EnvironmentError:
+            return
         if newbranch != self._rawbranch:
             print 'branch time change'
             self._rawbranch = newbranch
