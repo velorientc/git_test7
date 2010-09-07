@@ -112,7 +112,7 @@ class RepoTreeModel(QAbstractItemModel):
         else:
             parentItem = parent.internalPointer()
         return parentItem.childCount()
- 
+
     def columnCount(self, parent):
         if parent.isValid():
             return parent.internalPointer().columnCount()
@@ -169,11 +169,11 @@ class RepoTreeModel(QAbstractItemModel):
     def dropMimeData(self, data, action, row, column, parent):
         d = str(data.data(repoRegMimeType))
         itemread = readXml(d, extractXmlElementName, self)
-
         group = parent.internalPointer()
-        cc = group.childCount()
-        self.beginInsertRows(parent, cc, cc)
-        group.appendChild(itemread)
+        if row < 0:
+            row = 0
+        self.beginInsertRows(parent, row, row)
+        group.insertChild(row, itemread)
         self.endInsertRows()
         return True
 

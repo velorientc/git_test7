@@ -59,6 +59,11 @@ class RepoTreeItem(object):
         child._parent = self
         self.childs.append(child)
 
+    def insertChild(self, row, child):
+        child._row = row
+        child._parent = self
+        self.childs.insert(row, child)
+
     def child(self, row):
         return self.childs[row]
 
