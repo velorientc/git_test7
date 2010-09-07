@@ -60,11 +60,10 @@ class _AbstractFileDialog(QMainWindow, HgDialogMixin):
     def setRepoViewer(self, repoviewer=None):
         self.repoviewer = repoviewer
         if repoviewer:
-            # remove reference to parent workbench when it closes
-            self.connect(repoviewer, SIGNAL('finished(int)'),
-                         lambda x: self.setRepoViewer(None))
+            repoviewer.finished.connect(lambda x: self.setRepoViewer(None))
 
     def reload(self):
+        'Reload toolbar action handler'
         self.repo.thginvalidate()
         self.setupModels()
 
