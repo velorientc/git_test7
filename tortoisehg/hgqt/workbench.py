@@ -202,11 +202,12 @@ class Workbench(QMainWindow):
         icon.addPixmap(QPixmap(":/icons/repotree.svg"), QIcon.Normal, QIcon.Off)
         a.setIcon(icon)
 
-        self.actionShowLog = a = QAction(_("Show Output Log"), self)
+        self.actionShowLog = a = QAction(_("Show Output &Log"), self)
         a.setCheckable(True)
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/showlog.png"), QIcon.Normal, QIcon.Off)
         a.setIcon(icon)
+        a.setShortcut(QKeySequence("Ctrl+L"))
 
         self.actionServe = QAction(_("Web Server"), self)
         self.actionImport = QAction(_("Import"), self)
