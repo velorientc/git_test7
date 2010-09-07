@@ -397,13 +397,11 @@ class RepoWidget(QWidget):
             self.grepDemand.forward('setRevision', rev)
 
     def goto(self, rev):
-        rev = str(rev)
+        if rev is not None:
+            rev = str(rev)
+        self._reload_rev = rev
         if len(self.repoview.model().graph):
             self.repoview.goto(rev)
-        else:
-            # store rev to show once it's available (when graph
-            # filling is still running)
-            self._reload_rev = rev
 
     def revision_activated(self, rev=None):
         rev = rev or self.rev
