@@ -38,7 +38,7 @@ class QuickOpDialog(QDialog):
         repo = thgrepo.repository(path=paths.find_root())
         assert repo
         os.chdir(repo.root)
-        self.setWindowTitle('%s - hg %s' % repo.displayname, command))
+        self.setWindowTitle('%s - hg %s' % (repo.displayname, command))
 
         layout = QVBoxLayout()
         self.setLayout(layout)
