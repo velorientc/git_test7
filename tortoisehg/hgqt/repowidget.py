@@ -41,6 +41,7 @@ class RepoWidget(QWidget):
 
         self.repo = repo
         repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
         self.workbench = workbench
         self._reload_rev = '.' # select working parent at startup
@@ -445,6 +446,10 @@ class RepoWidget(QWidget):
         self.repo.thginvalidate()
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
+
+    def repositoryDestroyed(self):
+        'Repository has detected itself to be deleted'
+        self.closeSelfSignal.emit(self)
 
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
