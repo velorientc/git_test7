@@ -42,6 +42,7 @@ class ThgRepoWrapper(QObject):
 
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
+    repositoryDestroyed = pyqtSignal()
     workingBranchChanged = pyqtSignal()
 
     def __init__(self, repo):
@@ -51,8 +52,9 @@ class ThgRepoWrapper(QObject):
         repo.configChanged = self.configChanged
         repo.repositoryChanged = self.repositoryChanged
         repo.workingBranchChanged = self.workingBranchChanged
+        repo.repositoryDestroyed = self.repositoryDestroyed
         self.recordState()
-        self.startTimer(500)
+        self._timerevent = self.startTimer(500)
 
     def timerEvent(self, event):
         if self.busycount == 0:
@@ -61,6 +63,12 @@ class ThgRepoWrapper(QObject):
             print 'no poll, busy', self.busycount
 
     def pollStatus(self):
+        if not os.path.exists(self.repo.join('requires')):
+            print 'Repository destroyed', self.repo.root
+            self.repositoryDestroyed.emit()
+            self.killTimer(self._timerevent)
+            del _repocache[self.repo.root]
+            return
         self._checkrepotime()
         self._checkdirstate()
         self._checkuimtime()
