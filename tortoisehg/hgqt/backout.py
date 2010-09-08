@@ -12,7 +12,7 @@ from mercurial import hg, ui
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, thgrepo
 
 keep = i18n.keepgettext()
 
@@ -28,7 +28,7 @@ class BackoutDialog(QDialog):
         else:
             root = paths.find_root()
             if root:
-                self.repo = hg.repository(self.ui, path=root)
+                self.repo = thgrepo.repository(self.ui, path=root)
             else:
                 raise 'not repository'
 
