@@ -370,7 +370,7 @@ class SyncWidget(QWidget):
         self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
         self.repo.decrementBusyCount()
@@ -460,7 +460,7 @@ class PostPullDialog(QDialog):
         try:
             cfg.set('tortoisehg', 'postpull', self.getValue())
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
         self.repo.decrementBusyCount()
@@ -519,7 +519,7 @@ class SaveDialog(QDialog):
         self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
         self.repo.decrementBusyCount()
@@ -628,7 +628,7 @@ class AuthDialog(QDialog):
         self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
         self.repo.decrementBusyCount()
