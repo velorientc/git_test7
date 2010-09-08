@@ -161,13 +161,12 @@ class SyncWidget(QWidget):
         self.reload()
 
     def reload(self):
+        self.paths = {}
         fn = os.path.join(self.root, '.hg', 'hgrc')
         fn, cfg = loadIniFile([fn], self)
-        self.paths = {}
-        if 'paths' not in cfg:
-            return
-        for alias in cfg['paths']:
-            self.paths[ alias ] = cfg['paths'][ alias ]
+        if 'paths' in cfg:
+            for alias in cfg['paths']:
+                self.paths[ alias ] = cfg['paths'][ alias ]
         tm = PathsModel(self.paths, self)
         self.tv.setModel(tm)
         self.cachedpp = self.repo.postpull
