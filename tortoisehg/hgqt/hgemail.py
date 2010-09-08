@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 from mercurial import hg, error, extensions, util, cmdutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, lexers, qtlib
+from tortoisehg.hgqt import cmdui, lexers, qtlib, thgrepo
 from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
@@ -402,7 +402,7 @@ def run(ui, *revs, **opts):
         revs = opts.get('rev')
 
     # TODO: repo should be a required argument?
-    repo = opts.get('repo') or hg.repository(ui, paths.find_root())
+    repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
 
     try:
         return EmailDialog(repo.ui, repo, revs)
