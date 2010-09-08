@@ -622,5 +622,5 @@ class RepoWidget(QWidget):
             self.repo.decrementBusyCount()
             self.runner = None
         self.runner.commandFinished.connect(finished)
-        self.runner.run(cmdline, display='hg ' + ' '.join(cmdline))
+        self.runner.run(cmdline)
 
