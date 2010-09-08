@@ -415,8 +415,13 @@ class CommitWidget(QWidget):
         s.setValue('commit/split', self.split.saveState())
         s.setValue('commit/userhist', self.userhist)
         try:
-            # current message is stored in local encoding
-            self.repo.opener('cur-message.txt', 'w').write(self.getMessage())
+            if self.qref:
+                # don't store patch summary as current working comment
+                msg = ''
+            else:
+                # current message is stored in local encoding
+                msg = self.getMessage()
+            self.repo.opener('cur-message.txt', 'w').write(msg)
         except EnvironmentError:
             pass
 
