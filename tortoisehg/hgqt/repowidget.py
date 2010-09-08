@@ -179,7 +179,7 @@ class RepoWidget(QWidget):
         self.hidefinddelay = False
 
     def reponame(self):
-        return os.path.basename(self.repo.root)
+        return self.repo.shortname
 
     @property
     def rev(self):
