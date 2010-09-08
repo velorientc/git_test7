@@ -402,7 +402,7 @@ class MergePage(BasePage):
                         self.wd_text.setText(text % dict(name=patch))
                         self.wd_text.setShown(True)
                     self.check_status(callback)
-            self.runner = cmdui.Runner(_('MQ - TortoiseHg'), self)
+            self.runner = cmdui.Runner(_('MQ - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             self.wizard().repo.incrementBusyCount()
             self.runner.run(['qnew', patch],
@@ -420,7 +420,7 @@ class MergePage(BasePage):
                 if wrapper.data == 0:
                     self.check_status()
             cmdline = ['update', '--clean', '--rev', self.wizard().local]
-            self.runner = cmdui.Runner(_('Discard - TortoiseHg'), self)
+            self.runner = cmdui.Runner(_('Discard - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             self.wizard().repo.incrementBusyCount()
             self.runner.run(cmdline)
@@ -439,7 +439,7 @@ class MergePage(BasePage):
                              '%(new)s</b>.  <a href="rename:%(new)s"><b>'
                              'Rename</b></a> again?')
                     self.wd_text.setText(text % dict(old=patch, new=name))
-            self.runner = cmdui.Runner(_('Rename - TortoiseHg'), self)
+            self.runner = cmdui.Runner(_('Rename - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             self.wizard().repo.incrementBusyCount()
             self.runner.run(['qrename', oldpatch, newpatch])

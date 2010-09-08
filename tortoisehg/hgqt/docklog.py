@@ -41,43 +41,6 @@ class LogDockWidget(QDockWidget):
         self.logte.setWordWrapMode(QTextOption.NoWrap)
         vbox.addWidget(self.logte, 1)
 
-        self.topics = {}
-        self.stbar = QStatusBar()
-        vbox.addWidget(self.stbar)
-
-    @pyqtSlot(thread.DataWrapper)
-    def progress(self, wrapper):
-        # topic is current operation
-        # pos is the current numeric position (revision, bytes)
-        # item is a non-numeric marker of current position (current file)
-        # unit is a string label
-        # total is the highest expected pos
-        # All topics should be marked closed by setting pos to None
-        topic, item, pos, total, unit = wrapper.data
-        if pos is None or (not pos and not total):
-            if topic in self.topics:
-                pm = self.topics[topic]
-                self.stbar.removeWidget(pm)
-                del self.topics[topic]
-            return
-        if topic not in self.topics:
-            pm = ProgressMonitor(topic)
-            self.stbar.addWidget(pm)
-            self.topics[topic] = pm
-        else:
-            pm = self.topics[topic]
-        if total:
-            fmt = '%s / %s ' % (str(pos), str(total))
-            if unit:
-                fmt += unit
-            pm.status.setText(fmt)
-            pm.setcounts(pos, total)
-        else:
-            if item:
-                item = hglib.tounicode(item)[-30:]
-            pm.status.setText('%s %s' % (str(pos), item))
-            pm.unknown()
-
     @pyqtSlot(thread.DataWrapper)
     def output(self, wrapper):
         msg, label = wrapper.data
@@ -86,63 +49,18 @@ class LogDockWidget(QDockWidget):
         style = qtlib.geteffect(label)
         self.logMessage(msg, style)
 
+    @pyqtSlot()
+    def clear(self):
+        self.logte.clear()
+
     def logMessage(self, msg, style=''):
         if msg.endsWith('\n'):
             msg.chop(1)
         msg = msg.replace('\n', '<br/>')
         self.logte.appendHtml('<font style="%s">%s</font>' % (style, msg))
 
-    @pyqtSlot()
-    def clear(self):
-        self.logte.clear()
-
     def showEvent(self, event):
         self.visibilityChanged.emit(True)
 
     def hideEvent(self, event):
         self.visibilityChanged.emit(False)
-
-
-class ProgressMonitor(QWidget):
-    def __init__(self, topic):
-        super(ProgressMonitor, self).__init__()
-
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(*(0,)*4)
-        self.setLayout(hbox)
-        self.idle = False
-
-        self.pbar = QProgressBar()
-        self.pbar.setTextVisible(False)
-        self.pbar.setMinimum(0)
-        hbox.addWidget(self.pbar)
-
-        self.topic = QLabel(topic)
-        hbox.addWidget(self.topic, 0)
-
-        self.status = QLabel()
-        hbox.addWidget(self.status, 1)
-
-        self.pbar.setMaximum(100)
-        self.pbar.reset()
-        self.status.setText('')
-
-    def reuse(self, topic):
-        self.topic.setText(topic)
-        self.status.setText('')
-        self.idle = False
-
-    def clear(self):
-        self.pbar.setMinimum(0)
-        self.pbar.setMaximum(100)
-        self.pbar.setValue(100)
-        self.status.setText('')
-        self.idle = True
-
-    def setcounts(self, cur, max):
-        self.pbar.setMaximum(max)
-        self.pbar.setValue(cur)
-
-    def unknown(self):
-        self.pbar.setMinimum(0)
-        self.pbar.setMaximum(0)

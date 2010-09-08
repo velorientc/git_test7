@@ -15,55 +15,100 @@ from tortoisehg.hgqt import qtlib, thread
 local = localgettext()
 
 class ProgressMonitor(QWidget):
+    'Progress bar for use in workbench status bar'
+    def __init__(self, topic, parent):
+        super(ProgressMonitor, self).__init__(parent=parent)
 
-    def __init__(self):
-        super(ProgressMonitor, self).__init__()
-
-        # main layout box
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(*(0,)*4)
-        self.setLayout(vbox)
-
-        ## status layout box
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*(0,)*4)
-        vbox.addLayout(hbox)
+        self.setLayout(hbox)
+        self.idle = False
 
-        self.status_label = QLabel()
-        hbox.addWidget(self.status_label, 1)
-
-        self.prog_label = QLabel()
-        hbox.addWidget(self.prog_label, 0, Qt.AlignRight)
-
-        ## progressbar
         self.pbar = QProgressBar()
         self.pbar.setTextVisible(False)
         self.pbar.setMinimum(0)
-        vbox.addWidget(self.pbar)
+        hbox.addWidget(self.pbar)
 
-        # prepare to show
-        self.clear_progress()
+        self.topic = QLabel(topic)
+        hbox.addWidget(self.topic, 0)
 
-    ### Public Methods ###
+        self.status = QLabel()
+        hbox.addWidget(self.status, 1)
 
-    def clear_progress(self):
         self.pbar.setMaximum(100)
         self.pbar.reset()
-        self.status_label.setText('')
-        self.prog_label.setText('')
-        self.inprogress = False
+        self.status.setText('')
 
-    def fillup_progress(self):
-        """stick progress to full"""
-        self.clear_progress()
-        self.pbar.setValue(self.pbar.maximum())
+    def clear(self):
+        self.pbar.setMinimum(0)
+        self.pbar.setMaximum(100)
+        self.pbar.setValue(100)
+        self.status.setText('')
+        self.idle = True
 
-    def unknown_progress(self):
+    def setcounts(self, cur, max):
+        self.pbar.setMaximum(max)
+        self.pbar.setValue(cur)
+
+    def unknown(self):
         self.pbar.setMinimum(0)
         self.pbar.setMaximum(0)
 
-    def set_text(self, text):
-        self.status_label.setText(text)
+
+class ThgStatusBar(QStatusBar):
+    def __init__(self, parent=None):
+        QStatusBar.__init__(self, parent=parent)
+        self.topics = {}
+        self.lbl = QLabel()
+        self.addWidget(self.lbl)
+
+    def showMessage(self, str):
+        self.lbl.setText(str)
+
+    def clear(self):
+        for key in self.topics:
+            pm = self.topics[key]
+            self.removeWidget(pm)
+            del self.topics[key]
+
+    @pyqtSlot(thread.DataWrapper)
+    def progress(self, wrapper, root=None):
+        'Progress signal received from repowidget'
+        topic, item, pos, total, unit = wrapper.data
+        # topic is current operation
+        # pos is the current numeric position (revision, bytes)
+        # item is a non-numeric marker of current position (current file)
+        # unit is a string label
+        # total is the highest expected pos
+        # All topics should be marked closed by setting pos to None
+        if root:
+            key = (root, topic)
+        else:
+            key = topic
+        if pos is None or (not pos and not total):
+            if key in self.topics:
+                pm = self.topics[key]
+                self.removeWidget(pm)
+                del self.topics[key]
+            return
+        if key not in self.topics:
+            pm = ProgressMonitor(topic, self)
+            self.addWidget(pm)
+            self.topics[key] = pm
+        else:
+            pm = self.topics[key]
+        if total:
+            fmt = '%s / %s ' % (str(pos), str(total))
+            if unit:
+                fmt += unit
+            pm.status.setText(fmt)
+            pm.setcounts(pos, total)
+        else:
+            if item:
+                item = hglib.tounicode(item)[-30:]
+            pm.status.setText('%s %s' % (str(pos), item))
+            pm.unknown()
+
 
 class Core(QObject):
     """Core functionality for running Mercurial command.
@@ -73,18 +118,21 @@ class Core(QObject):
     commandStarted = pyqtSignal()
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
-    clearSignal = pyqtSignal()
 
-    def __init__(self, logwidget=None):
+    output = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(thread.DataWrapper)
+
+    def __init__(self, useInternal):
         super(Core, self).__init__()
 
         self.thread = None
-        self.output_text = QTextBrowser()
-        self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
-        self.pmon = None
+        self.stbar = None
         self.queue = []
-        self.log = logwidget
         self.display = None
+        self.internallog = useInternal
+        if useInternal:
+            self.output_text = QTextBrowser()
+            self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
 
     ### Public Methods ###
 
@@ -103,8 +151,8 @@ class Core(QObject):
             self.thread.abort()
             self.commandCanceling.emit()
 
-    def set_pmon(self, pmon):
-        self.pmon = pmon
+    def set_stbar(self, stbar):
+        self.stbar = stbar
 
     def is_running(self):
         return bool(self.thread and self.thread.isRunning())
@@ -126,17 +174,18 @@ class Core(QObject):
 
         self.thread.started.connect(self.command_started)
         self.thread.commandFinished.connect(self.command_finished)
-        if self.log:
-            self.thread.outputReceived.connect(self.log.output)
-            self.thread.errorReceived.connect(self.log.output)
-            self.thread.progressReceived.connect(self.log.progress)
-            self.clearSignal.connect(self.log.clear)
-        else:
+
+        self.thread.outputReceived.connect(self.output)
+        self.thread.errorReceived.connect(self.output)
+        self.thread.progressReceived.connect(self.progress)
+
+        if self.internallog:
             self.thread.outputReceived.connect(self.output_received)
-            self.thread.errorReceived.connect(self.output_received)
-            self.clearSignal.connect(self.output_text.clear)
-            if self.pmon:
-                self.thread.progressReceived.connect(self.progress_received)
+            self.thread.errorReceived.connect(self.output)
+
+        if self.stbar:
+            self.thread.progressReceived.connect(self.stbar.progress)
+
         if self.display:
             cmd = '%% hg %s\n' % self.display
         else:
@@ -156,36 +205,30 @@ class Core(QObject):
         self.output_text.verticalScrollBar().setSliderPosition(max)
 
     def clear_output(self):
-        self.clearSignal.emit()
+        if self.internallog:
+            self.output_text.clear()
 
     ### Signal Handlers ###
 
     def command_started(self):
-        if self.pmon:
-            self.pmon.set_text(_('Running...'))
-            self.pmon.unknown_progress()
+        if self.stbar:
+            self.stbar.showMessage(_('Running...'))
 
         self.commandStarted.emit()
 
     def command_finished(self, wrapper):
         ret = wrapper.data
 
-        if self.pmon:
+        if self.stbar:
             if ret is None:
-                self.pmon.clear_progress()
-            if self.pmon.pbar.maximum() == 0:  # busy indicator
-                if ret == 0:  # finished successfully
-                    self.pmon.fillup_progress()
-                else:
-                    self.pmon.clear_progress()
-            if ret is None:
+                self.stbar.clear()
                 if self.thread.abortbyuser:
                     status = _('Terminated by user')
                 else:
                     status = _('Terminated')
             else:
                 status = _('Finished')
-            self.pmon.set_text(status)
+            self.stbar.showMessage(status)
 
         if ret == 0 and self.run_next():
             return # run next command
@@ -193,9 +236,9 @@ class Core(QObject):
         self.commandFinished.emit(wrapper)
 
     def command_canceling(self):
-        if self.pmon:
-            self.pmon.set_text(_('Canceling...'))
-            self.pmon.unknown_progress()
+        if self.stbar:
+            self.stbar.showMessage(_('Canceling...'))
+            self.stbar.clear()
 
         self.commandCanceling.emit()
 
@@ -206,36 +249,6 @@ class Core(QObject):
         style = qtlib.geteffect(label)
         self.append_output(msg, style)
 
-    def progress_received(self, wrapper):
-        if self.thread.isFinished():
-            self.pmon.clear_progress()
-            return
-
-        counting = False
-        topic, item, pos, total, unit = wrapper.data
-        if pos is None:
-            self.pmon.clear_progress()
-            return
-        if total is None:
-            count = '%d' % pos
-            counting = True
-        else:
-            self.pmon.pbar.setMaximum(total)
-            self.pmon.pbar.setValue(pos)
-            count = '%d / %d' % (pos, total)
-        if unit:
-            count += ' ' + unit
-        self.pmon.prog_label.setText(hglib.tounicode(count))
-        if item:
-            status = '%s: %s' % (topic, item)
-        else:
-            status = local._('Status: %s') % topic
-        self.pmon.status_label.setText(hglib.tounicode(status))
-        self.pmon.inprogress = True
-
-        if not self.pmon.inprogress or counting:
-            # use indeterminate mode
-            self.pmon.pbar.setMinimum(0)
 
 class Widget(QWidget):
     """An embeddable widget for running Mercurial command"""
@@ -244,35 +257,39 @@ class Widget(QWidget):
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
 
-    def __init__(self, logwidget=None):
+    output = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(thread.DataWrapper)
+    makeLogVisible = pyqtSignal(bool)
+
+    def __init__(self, useInternal=True, parent=None):
         super(Widget, self).__init__()
 
-        self.core = Core(logwidget)
+        self.internallog = useInternal
+        self.core = Core(useInternal)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.commandFinished)
         self.core.commandCanceling.connect(self.commandCanceling)
-        if logwidget:
+        self.core.output.connect(self.output)
+        self.core.progress.connect(self.progress)
+        if not useInternal:
             return
 
-        # main layout grid
-        grid = QGridLayout()
-        grid.setSpacing(4)
-        grid.setContentsMargins(*(1,)*4)
-
-        ## status and progress labels
-        self.pmon = ProgressMonitor()
-        self.core.set_pmon(self.pmon)
-        grid.addWidget(self.pmon, 0, 0)
+        vbox = QVBoxLayout()
+        vbox.setSpacing(4)
+        vbox.setContentsMargins(*(1,)*4)
 
         # command output area
-        grid.addWidget(self.core.output_text, 1, 0, 5, 0)
-        grid.setRowStretch(1, 1)
+        self.core.output_text.setHidden(True)
+        vbox.addWidget(self.core.output_text, 1)
+
+        ## status and progress labels
+        self.stbar = ThgStatusBar()
+        #self.stbar.setSizeGripEnabled(False)
+        self.core.set_stbar(self.stbar)
+        vbox.addWidget(self.stbar)
 
         # widget setting
-        self.setLayout(grid)
-
-        # prepare to show
-        self.core.output_text.setHidden(True)
+        self.setLayout(vbox)
 
     ### Public Methods ###
 
@@ -283,12 +300,15 @@ class Widget(QWidget):
         self.core.cancel()
 
     def show_output(self, visible):
-        if self.core.log:
-            return
-        self.core.output_text.setShown(visible)
+        self.makeLogVisible.emit(True)
+        if self.internallog:
+            self.core.output_text.setShown(visible)
 
     def is_show_output(self):
-        return self.core.output_text.isVisible()
+        if self.internallog:
+            return self.core.output_text.isVisible()
+        else:
+            return False
 
     def get_rawoutput(self):
         return self.core.get_rawoutput()
@@ -306,24 +326,23 @@ class Dialog(QDialog):
 
         self.finishfunc = finishfunc
 
-        self.core = Core()
+        self.core = Core(True)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
 
-        # main layout grid
-        grid = QGridLayout()
-        grid.setSpacing(6)
-        grid.setContentsMargins(*(7,)*4)
-
-        ## status and progress labels
-        self.pmon = ProgressMonitor()
-        self.core.set_pmon(self.pmon)
-        grid.addWidget(self.pmon, 0, 0)
+        vbox = QVBoxLayout()
+        vbox.setSpacing(4)
+        vbox.setContentsMargins(*(1,)*4)
 
         # command output area
-        grid.addWidget(self.core.output_text, 1, 0, 5, 0)
-        grid.setRowStretch(1, 1)
+        vbox.addWidget(self.core.output_text, 1)
+
+        ## status and progress labels
+        self.stbar = ThgStatusBar()
+        #self.stbar.setSizeGripEnabled(False)
+        self.core.set_stbar(self.stbar)
+        vbox.addWidget(self.stbar)
 
         # bottom buttons
         buttons = QDialogButtonBox()
@@ -337,9 +356,9 @@ class Dialog(QDialog):
         self.detail_btn.setCheckable(True)
         self.detail_btn.setChecked(True)
         self.detail_btn.toggled.connect(self.show_output)
-        grid.addWidget(buttons, 7, 0)
+        vbox.addWidget(buttons)
 
-        self.setLayout(grid)
+        self.setLayout(vbox)
         self.setWindowTitle(_('TortoiseHg Command Dialog'))
         self.resize(540, 420)
 
@@ -406,18 +425,27 @@ class Runner(QObject):
     commandFinished = pyqtSignal(thread.DataWrapper)
     commandCanceling = pyqtSignal()
 
-    def __init__(self, title=_('TortoiseHg'), parent=None, log=None):
+    output = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(thread.DataWrapper)
+    makeLogVisible = pyqtSignal(bool)
+
+    def __init__(self, title=_('TortoiseHg'), useInternal=True, parent=None):
         super(Runner, self).__init__()
 
+        self.internallog = useInternal
         self.title = title
         self.parent = parent
 
-        self.core = Core(log)
+        self.core = Core(useInternal)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
 
-        self.core.output_text.setMinimumSize(460, 320)
+        self.core.output.connect(self.output)
+        self.core.progress.connect(self.progress)
+
+        if useInternal:
+            self.core.output_text.setMinimumSize(460, 320)
 
     ### Public Methods ###
 
@@ -428,8 +456,8 @@ class Runner(QObject):
         self.core.cancel()
 
     def show_output(self, visible=True):
-        if self.core.log:
-            self.core.log.setShown(visible)
+        self.makeLogVisible.emit(True)
+        if not self.internallog:
             return
         if not hasattr(self, 'dlg'):
             self.dlg = QDialog(self.parent)

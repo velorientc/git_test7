@@ -19,7 +19,7 @@ from tortoisehg.util import paths, hglib
 
 #from tortoisehg.hgqt.decorators import timeit
 
-from tortoisehg.hgqt import repomodel, thgrepo
+from tortoisehg.hgqt import repomodel, thgrepo, cmdui
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles, InfoMsgBox
 from tortoisehg.hgqt.repowidget import RepoWidget
@@ -126,7 +126,7 @@ class Workbench(QMainWindow):
 
         self.setCentralWidget(self.centralwidget)
 
-        self.statusbar = QStatusBar(self)
+        self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
         self.filterToolbar = tb = QToolBar(_("Filter Toolbar"), self)

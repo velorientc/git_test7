@@ -21,6 +21,7 @@ from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo
 
+from tortoisehg.hgqt.thread import DataWrapper
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
@@ -44,6 +45,7 @@ class RepoWidget(QWidget):
         repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
         self.workbench = workbench
+
         self._reload_rev = '.' # select working parent at startup
         self.currentMessage = ''
         self.runner = None
@@ -53,8 +55,19 @@ class RepoWidget(QWidget):
         self.setupUi()
         self.createActions()
         self.setupModels()
-
         self.restoreSettings()
+
+    @pyqtSlot(DataWrapper)
+    def progress(self, w):
+        self.workbench.statusbar.progress(w, self.repo.root)
+
+    @pyqtSlot(DataWrapper)
+    def output(self, w):
+        self.workbench.log.output(w)
+
+    @pyqtSlot(bool)
+    def makeLogVisible(self, v):
+        self.workbench.log.setShown(v)
 
     def setupUi(self):
         SP = QSizePolicy
@@ -130,8 +143,14 @@ class RepoWidget(QWidget):
         pats = {}
         opts = {}
         b = QPushButton('Commit')
-        cw = CommitWidget(pats, opts, self.repo.root, self,
-                          self.workbench.log)
+        cw = CommitWidget(pats, opts, self.repo.root, True, self)
+
+        # Shared widgets must be connected directly to workbench
+        cw.output.connect(self.workbench.log.output)
+        cw.progress.connect(lambda w:
+                self.workbench.statusbar.progress(w, self.repo.root))
+        cw.makeLogVisible.connect(self.workbench.statusbar.setShown)
+
         cw.showMessage.connect(self.showMessage)
         cw.buttonHBox.addWidget(b)
         cw.commitButtonName.connect(lambda n: b.setText(n))
@@ -157,7 +176,12 @@ class RepoWidget(QWidget):
     def createSyncWidget(self):
         sw = getattr(self.repo, '_syncwidget', None)  # TODO: ugly
         if not sw:
-            sw = SyncWidget(root=self.repo.root, log=self.workbench.log)
+            sw = SyncWidget(self.repo.root, True, self)
+            # Shared widgets must be connected directly to workbench
+            sw.output.connect(self.workbench.log.output)
+            sw.progress.connect(lambda w:
+                    self.workbench.statusbar.progress(w, self.repo.root))
+            sw.makeLogVisible.connect(self.workbench.statusbar.setShown)
             self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
@@ -629,11 +653,13 @@ class RepoWidget(QWidget):
             InfoMsgBox(_('Unable to start'),
                        _('Previous command is still running'))
             return
-        self.runner = cmdui.Runner(title, self, self.workbench.log)
-        self.repo.incrementBusyCount()
         def finished(ret):
             self.repo.decrementBusyCount()
             self.runner = None
+        self.runner = cmdui.Runner(title, False, self)
+        self.runner.output.connect(self.output)
+        self.runner.progress.connect(self.progress)
+        self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(finished)
+        self.repo.incrementBusyCount()
         self.runner.run(cmdline)
-

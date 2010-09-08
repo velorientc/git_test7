@@ -16,7 +16,7 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths, wconfig
 
-from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanelwidget
+from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanelwidget, thread
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
@@ -34,8 +34,12 @@ class CommitWidget(QWidget):
     showMessage = pyqtSignal(str)
     commitComplete = pyqtSignal()
 
-    def __init__(self, pats, opts, root=None, parent=None, logwidget=None):
-        QWidget.__init__(self, parent)
+    progress = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(thread.DataWrapper)
+    makeLogVisible = pyqtSignal(bool)
+
+    def __init__(self, pats, opts, root=None, embedded=False, parent=None):
+        QWidget.__init__(self, parent=parent)
 
         self.opts = opts # user, date
         self.stwidget = status.StatusWidget(pats, opts, root, self)
@@ -46,7 +50,10 @@ class CommitWidget(QWidget):
         self.qref = False
 
         self.repo = repo = self.stwidget.repo
-        self.runner = cmdui.Runner(_('Commit'), self, logwidget)
+        self.runner = cmdui.Runner(_('Commit'), not embedded, self)
+        self.runner.output.connect(self.output)
+        self.runner.progress.connect(self.progress)
+        self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.commandFinished)
 
         repo.configChanged.connect(self.configChanged)
@@ -864,10 +871,10 @@ class DetailsDialog(QDialog):
 
 # Technical Debt for standalone tool
 #   add a toolbar for refresh
-#   add a statusbar and simple progressbar
 
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
+
     def __init__(self, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.pats = pats
@@ -876,8 +883,13 @@ class CommitDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        commit = CommitWidget(pats, opts, None, self)
+        commit = CommitWidget(pats, opts, None, False, self)
         layout.addWidget(commit, 1)
+
+        self.statusbar = cmdui.ThgStatusBar(self)
+        layout.addWidget(self.statusbar)
+        commit.showMessage.connect(self.statusbar.showMessage)
+        commit.progress.connect(self.statusbar.progress)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
@@ -895,7 +907,6 @@ class CommitDialog(QDialog):
         commit.restoreState(s.value('commit/state').toByteArray())
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadConfigs(s)
-        commit.showMessage.connect(self.showMessage)
         commit.loadComplete.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonName.connect(self.setButtonName)
@@ -916,9 +927,6 @@ class CommitDialog(QDialog):
         else:
             self.bb.button(BB.Discard).setEnabled(False)
             self.bb.button(BB.Discard).setToolTip('')
-
-    def showMessage(self, msg):
-        print msg
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:

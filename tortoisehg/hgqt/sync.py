@@ -28,7 +28,11 @@ class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
     showMessage = pyqtSignal(str)
 
-    def __init__(self, root, parent=None, log=None, **opts):
+    output = pyqtSignal(object)
+    progress = pyqtSignal(object)
+    makeLogVisible = pyqtSignal(bool)
+
+    def __init__(self, root, embedded=False, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -44,8 +48,7 @@ class SyncWidget(QWidget):
         self.updateInProgress = False
         self.tv = PathsTree(root, self)
 
-        self.log = log
-        if not log:
+        if not embedded:
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
 
@@ -122,13 +125,19 @@ class SyncWidget(QWidget):
                           self.outbutton, self.pushbutton,
                           self.emailbutton)
 
-        cmd = cmdui.Widget(log)
+        cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.commandCanceling.connect(self.commandCanceled)
+
+        cmd.makeLogVisible.connect(self.makeLogVisible)
+        cmd.output.connect(self.output)
+        cmd.progress.connect(self.progress)
+
         layout.addWidget(cmd)
-        cmd.setHidden(True)
+        cmd.setVisible(False)
         self.cmd = cmd
+        self.embedded = embedded
 
         self.reload()
         if 'default' in self.paths:
@@ -138,8 +147,9 @@ class SyncWidget(QWidget):
     def commandStarted(self):
         for b in self.opbuttons:
             b.setEnabled(False)
-        self.cmd.show_output(True)
-        self.cmd.setHidden(False)
+        if not self.embedded:
+            self.cmd.show_output(True)
+            self.cmd.setVisible(True)
 
     def commandFinished(self, wrapper):
         for b in self.opbuttons:
@@ -271,8 +281,8 @@ class SyncWidget(QWidget):
             self.reload()
         elif event.key() == Qt.Key_Escape:
             if self.cmd.core.is_running():
-                self.cmd.core.cancel()
-            elif not self.log:
+                self.cmd.cancel()
+            elif not self.embedded:
                 self.close()
         else:
             return super(SyncWidget, self).keyPressEvent(event)
@@ -326,7 +336,7 @@ class SyncWidget(QWidget):
         self.run(cmdline)
 
     def outclicked(self):
-        if self.log:
+        if self.embedded:
             def outputnodes(ret, data):
                 if ret == 0:
                     nodes = data.splitlines()
