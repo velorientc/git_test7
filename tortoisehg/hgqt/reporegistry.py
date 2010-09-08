@@ -11,7 +11,7 @@ from mercurial import url
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
 from tortoisehg.hgqt.pathedit import PathEditDialog
 from tortoisehg.hgqt.clone import CloneDialog
@@ -100,6 +100,8 @@ class RepoTreeView(QTreeView):
                 _("Clone Repository"), None, self.cloneRepo),
              ("explore", _("Explore"), None,
                 _("Open the repository in Windows Explorer"), None, self.explore),
+             ("terminal", _("Terminal"), None,
+                _("Open a shell terminal in repository root"), None, self.terminal),
              ]
         return a
 
@@ -176,6 +178,13 @@ class RepoTreeView(QTreeView):
             return
         root = self.selitem.internalPointer().rootpath()
         self.workbench.launchExplorer(root)
+
+    def terminal(self):
+        if not self.selitem:
+            return
+        root = self.selitem.internalPointer().rootpath()
+        repo = thgrepo.repository(path=root)
+        self.workbench.launchTerminal(repo)
 
 class RepoRegistryView(QDockWidget):
 

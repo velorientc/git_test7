@@ -13,7 +13,7 @@ from mercurial import hg, url
 from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, thgrepo
 
 from tortoisehg.hgqt.settings import SettingsDialog
 
@@ -157,13 +157,17 @@ class RepoItem(RepoTreeItem):
                 return QVariant(ico)
             return QVariant()
         if column == 0:
-            return QVariant(hglib.tounicode(os.path.basename(self._root)))
+            try:
+                return QVariant(thgrepo.repository(path=self._root).shortname)
+            except RepoError:
+                return QVariant(hglib.tounicode(os.path.basename(self._root)))
         elif column == 1:
             return QVariant(hglib.tounicode(self._root))
         return QVariant()
 
     def menulist(self):
-        return ['open', 'remove', 'clone', None, 'explore', None, 'settings']
+        return ['open', 'remove', 'clone', None, 'explore', 'terminal',
+                None, 'settings']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
