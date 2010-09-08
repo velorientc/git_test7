@@ -134,7 +134,6 @@ class ThgRepoWrapper(QObject):
         'Check for modified config files, or a new .hg/hgrc file'
         try:
             oldmtime, files = self.repo.uifiles()
-            files.add(self.repo.join('hgrc'))
             mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
             if max(mtime) > oldmtime:
                 print 'config change detected'
@@ -215,14 +214,16 @@ def _extendrepo(repo):
             for line in cfg._source.values():
                 f = line.rsplit(':', 1)[0]
                 files.add(f)
+            files.add(self.join('hgrc'))
             return files
 
         @propertycache
         def _uimtime(self):
-            mtimes = []
+            mtimes = [0] # zero will be taken if no config files
             for f in self._uifiles:
                 try:
-                    mtimes.append(os.path.getmtime(f))
+                    if os.path.exists(f):
+                        mtimes.append(os.path.getmtime(f))
                 except EnvironmentError:
                     pass
             return max(mtimes)
