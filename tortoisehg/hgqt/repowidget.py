@@ -456,6 +456,13 @@ class RepoWidget(QWidget):
         'Repository is reporting its config files have changed'
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
+        branch = self.repomodel.branch()
+        if branch:
+            tabtext = '%s [%s]' % (self.repo.shortname, branch)
+        else:
+            tabtext = self.repo.shortname
+        idx = self.workbench.repoTabsWidget.indexOf(self)
+        self.workbench.repoTabsWidget.setTabText(idx, tabtext)
 
     ##
     ## Workbench methods
