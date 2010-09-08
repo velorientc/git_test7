@@ -131,15 +131,16 @@ class Core(QObject):
             self.thread.errorReceived.connect(self.log.output)
             self.thread.progressReceived.connect(self.log.progress)
             self.clearSignal.connect(self.log.clear)
-        elif self.pmon:
+        else:
             self.thread.outputReceived.connect(self.output_received)
             self.thread.errorReceived.connect(self.output_received)
-            self.thread.progressReceived.connect(self.progress_received)
             self.clearSignal.connect(self.output_text.clear)
+            if self.pmon:
+                self.thread.progressReceived.connect(self.progress_received)
         if self.display:
             cmd = '% ' + self.display
         else:
-            cmd = '% hg ' + ' '.join(cmdline)
+            cmd = '%% hg %s\n' % ' '.join(cmdline)
         w = thread.DataWrapper((cmd, 'control'))
         self.thread.outputReceived.emit(w)
         self.thread.start()
