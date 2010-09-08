@@ -285,17 +285,15 @@ class SyncWidget(QWidget):
         else:
             alias = 'new'
         url = hglib.fromunicode(self.urlentry.text())
-        self.repo.incrementBusyCount()
-        dialog = SaveDialog(self.root, alias, url, self)
+        dialog = SaveDialog(self.repo, alias, url, self)
         if dialog.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dialog.aliasentry.text())
-        self.repo.decrementBusyCount()
 
     def authclicked(self):
         host = hglib.fromunicode(self.hostentry.text())
         user = self.curuser or ''
         pw = self.curpw or ''
-        dialog = AuthDialog(self.root, host, user, pw, self)
+        dialog = AuthDialog(self.repo, host, user, pw, self)
         if dialog.exec_() == QDialog.Accepted:
             self.curuser, self.curpw = '', ''
 
@@ -352,9 +350,7 @@ class SyncWidget(QWidget):
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
-        self.repo.incrementBusyCount()
         dlg.exec_()
-        self.repo.decrementBusyCount()
 
     def emailclicked(self):
         from tortoisehg.hgqt import run as _run
@@ -460,21 +456,24 @@ class PostPullDialog(QDialog):
             return
         if fn is None:
             return
+        self.repo.incrementBusyCount()
         try:
             cfg.set('tortoisehg', 'postpull', self.getValue())
             wconfig.writefile(cfg, fn)
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
+        self.repo.decrementBusyCount()
         super(PostPullDialog, self).accept()
 
     def reject(self):
         super(PostPullDialog, self).reject()
 
 class SaveDialog(QDialog):
-    def __init__(self, root, alias, url, parent):
+    def __init__(self, repo, alias, url, parent):
         super(SaveDialog, self).__init__(parent)
-        self.root = root
+        self.repo = repo
+        self.root = repo.root
         layout = QVBoxLayout()
         self.setLayout(layout)
         hbox = QHBoxLayout()
@@ -517,20 +516,23 @@ class SaveDialog(QDialog):
                     _('%s already exists, replace URL?') % alias):
                 return
         cfg.set('paths', alias, path)
+        self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
+        self.repo.decrementBusyCount()
         super(SaveDialog, self).accept()
 
     def reject(self):
         super(SaveDialog, self).reject()
 
 class AuthDialog(QDialog):
-    def __init__(self, root, host, user, pw, parent):
+    def __init__(self, repo, host, user, pw, parent):
         super(AuthDialog, self).__init__(parent)
-        self.root = root
+        self.repo = repo
+        self.root = repo.root
         layout = QVBoxLayout()
         self.setLayout(layout)
 
@@ -623,11 +625,13 @@ class AuthDialog(QDialog):
             cfg.set('auth', key, password)
         elif not password and key in cfg['auth']:
             del cfg['auth'][key]
+        self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
+        self.repo.decrementBusyCount()
         super(AuthDialog, self).accept()
 
     def reject(self):
