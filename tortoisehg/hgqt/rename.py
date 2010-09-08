@@ -39,7 +39,7 @@ class RenameDialog(QDialog):
             self.root = paths.find_root()
             self.repo = thgrepo.repository(ui, path=self.root)
         except (error.RepoError):
-            qtlib.ErrorMsgBox(_('Rename Error'),
+            qtlib.ErrorMsgBox(_('Error'),
                     _('Could not find or initialize the repository'
                       ' from folder<p>%s</p>' % cwd))
             return ('', '')
@@ -155,10 +155,13 @@ class RenameDialog(QDialog):
             self.reponame = self.repo.displayname
         if self.copy_chk.isChecked():
             wt = (_('Copy - %s') % self.reponame)
-            self.rename_btn.setText(_('Copy'))
+            self.msgTitle = _('Copy')
+            self.errTitle = _('Copy Error')
         else:
             wt = (_('Rename - %s') % self.reponame)
-            self.rename_btn.setText(_('Rename'))
+            self.msgTitle = _('Rename')
+            self.errTitle = _('Rename Error')
+        self.rename_btn.setText(self.msgTitle)
         self.setWindowTitle(wt)
 
     def get_src(self):
@@ -245,24 +248,24 @@ class RenameDialog(QDialog):
         new_name = os.path.relpath(dest, start=self.root)
         self.dest_txt.setText(new_name)
         if not os.path.exists(src):
-            qtlib.WarningMsgBox(_('Rename'), _('Source does not exists.'))
+            qtlib.WarningMsgBox(self.msgTitle, _('Source does not exists.'))
             return
         fullsrc = os.path.abspath(src)
         if not fullsrc.startswith(self.repo.root):
-            qtlib.ErrorMsgBox(_('Rename Error'),
+            qtlib.ErrorMsgBox(self.errTitle,
                     _('The source must be within the repository tree.'))
             return
         fulldest = os.path.abspath(dest)
         if not fulldest.startswith(self.repo.root):
-            qtlib.ErrorMsgBox(_('Rename Error'),
+            qtlib.ErrorMsgBox(self.errTitle,
                     _('The destination must be within the repository tree.'))
             return
         if src == dest:
-            qtlib.ErrorMsgBox(_('Rename Error'),
+            qtlib.ErrorMsgBox(self.errTitle,
                     _('Please give a destination that differs from the source'))
             return
         if os.path.exists(dest) and os.path.isfile(dest):
-            res = qtlib.QuestionMsgBox(_('Rename'), '<p>%s</p><p>%s</p>' %
+            res = qtlib.QuestionMsgBox(self.msgTitle, '<p>%s</p><p>%s</p>' %
                     (_('Destination file already exists.'),
                     _('Are you sure you want to overwrite it ?')),
                     defaultbutton=QMessageBox.No)
@@ -290,20 +293,23 @@ class RenameDialog(QDialog):
                 if not os.path.isdir(targetdir):
                     os.makedirs(targetdir)
                 if self.copy_chk.isChecked():
-                    commands.copy(self.repo.ui, self.repo, curr_name, new_name, **opts)
+                    commands.copy(self.repo.ui, self.repo, curr_name,
+                                    new_name, **opts)
                 else:
                     os.rename(curr_name, new_name)
-                    commands.rename(self.repo.ui, self.repo, curr_name, new_name, **opts)
+                    commands.rename(self.repo.ui, self.repo, curr_name,
+                                    new_name, **opts)
             except (OSError, IOError, util.Abort, error.RepoError), inst:
-                qtlib.ErrorMsgBox(_('Rename Error'),
+                qtlib.ErrorMsgBox(self.errTitle,
                         _('The following erorr was caught with rename :'),
                         hglib.tounicode(inst))
         finally:
             sys.stderr = saved
-            textout = hglib.tounicode(errors.getvalue() + self.repo.ui.popbuffer())
+            textout = hglib.tounicode(errors.getvalue()
+                                        + self.repo.ui.popbuffer())
             errors.close()
             if len(textout) > 1:
-                qtlib.ErrorMsgBox(_('Rename Error'), textout)
+                qtlib.ErrorMsgBox(self.errTitle, textout)
 
     def detail_clicked(self):
         if self.cmd.is_show_output():
@@ -326,8 +332,8 @@ class RenameDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, wrapper):
-        if wrapper.data is not 0 or self.cmd.is_show_output()\
-                or self.keep_open_chk.isChecked():
+        if (wrapper.data is not 0 or self.cmd.is_show_output()
+                or self.keep_open_chk.isChecked()):
             if not self.cmd.is_show_output():
                 self.detail_btn.click()
             self.cancel_btn.setHidden(True)
