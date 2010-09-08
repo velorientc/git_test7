@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error, commands, match, util
 
-from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview
+from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview, thgrepo
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
 
@@ -31,13 +31,10 @@ class SearchWidget(QWidget):
     loadComplete = pyqtSignal()
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, upats, root=None, parent=None, **opts):
+    def __init__(self, upats, repo=None, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         self.thread = None
-        root = paths.find_root(root)
-        repo = hg.repository(ui.ui(), path=root)
-        assert(repo)
 
         mainvbox = QVBoxLayout()
         self.setLayout(mainvbox)
@@ -564,5 +561,6 @@ class MatchModel(QAbstractTableModel):
         return self.rows[index.row()]
 
 def run(ui, *pats, **opts):
+    repo = thgrepo.repository(ui, path=paths.find_root())
     upats = [hglib.tounicode(p) for p in pats]
-    return SearchWidget(upats, **opts)
+    return SearchWidget(upats, repo, **opts)
