@@ -48,7 +48,6 @@ class CommitWidget(QWidget):
 
         self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(_('Commit'), self, logwidget)
-        self.runner.commandStarted.connect(repo.incrementBusyCount)
         self.runner.commandFinished.connect(self.commandFinished)
 
         repo.configChanged.connect(self.configChanged)
@@ -471,14 +470,7 @@ class CommitWidget(QWidget):
             return None
 
     def commit(self):
-        cwd = os.getcwd()
-        try:
-            os.chdir(self.repo.root)
-            return self._commit(self.repo)
-        finally:
-            os.chdir(cwd)
-
-    def _commit(self, repo):
+        repo = self.repo
         msg = self.getMessage()
         if not msg:
             qtlib.WarningMsgBox(_('Nothing Commited'),
@@ -534,6 +526,8 @@ class CommitWidget(QWidget):
             return
         self.addUsernameToHistory(user)
 
+        commandlines = []
+
         checkedUnknowns = self.stwidget.getChecked('?I')
         if checkedUnknowns:
             res = qtlib.CustomPrompt(
@@ -542,7 +536,9 @@ class CommitWidget(QWidget):
                     (_('&OK'), _('Cancel')), 0, 1,
                     checkedUnknowns).run()
             if res == 0:
-                dispatch._dispatch(repo.ui, ['add'] + checkedUnknowns)
+                cmd = ['add', '--repository', repo.root] + \
+                      [repo.wjoin(f) for f in checkedUnknowns]
+                commandlines.append(cmd)
             else:
                 return
         checkedMissing = self.stwidget.getChecked('!')
@@ -553,7 +549,9 @@ class CommitWidget(QWidget):
                     (_('&OK'), _('Cancel')), 0, 1,
                     checkedMissing).run()
             if res == 0:
-                dispatch._dispatch(repo.ui, ['remove'] + checkedMissing)
+                cmd = ['remove', '--repository', repo.root] + \
+                      [repo.wjoin(f) for f in checkedMissing]
+                commandlines.append(cmd)
             else:
                 return
         try:
@@ -567,32 +565,33 @@ class CommitWidget(QWidget):
             self.showMessage.emit(hglib.tounicode(str(e)))
             dcmd = []
 
-        cmdline = ['commit', '--verbose', '--user', user, '--message', msg]
-        cmdline += dcmd + brcmd + files
+        cmdline = ['commit', '--repository', repo.root,
+                   '--verbose', '--user', user, '--message', msg]
+        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
         if self.qref:
             cmdline[0] = 'qrefresh'
-
         for fname in self.opts.get('autoinc', '').split(','):
             fname = fname.strip()
             if fname:
                 cmdline.extend(['--include', fname])
 
+        commandlines.append(cmdline)
+
         if self.opts.get('pushafter'):
-            pushcmd = ['push', self.opts['pushafter']]
-            display = ' '.join(['hg'] + cmdline + ['&&'] + pushcmd)
-            self.runner.run(cmdline, pushcmd, display=display)
-        else:
-            display = ' '.join(['hg'] + cmdline)
-            self.runner.run(cmdline, display=display)
+            cmd = ['push', '--repository', repo.root, self.opts['pushafter']]
+            commandlines.append(cmd)
+
+        repo.incrementBusyCount()
+        self.runner.run(*commandlines)
 
     def commandFinished(self, wrapper):
+        self.repo.decrementBusyCount()
         if not wrapper.data:
             self.addMessageToHistory()
             if not self.qref:
                 self.msgte.clear()
             self.msgte.document().setModified(False)
             self.commitComplete.emit()
-        self.repo.decrementBusyCount()
         self.stwidget.refreshWctx()
 
     def keyPressEvent(self, event):
