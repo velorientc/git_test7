@@ -143,7 +143,7 @@ class ThgRepoWrapper(QObject):
             pass
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible
-              _exts _thghiddentags'''.split()
+              _exts _thghiddentags displayname shortname'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
@@ -261,6 +261,26 @@ def _extendrepo(repo):
                 return val
             else:
                 return 'Invisible'
+
+        @propertycache
+        def displayname(self):
+            'Display name is for window titles and similar'
+            if self.ui.config('tortoisehg', 'fullpath', False):
+                name = self.root
+            elif self.ui.config('web', 'name', False):
+                name = self.ui.config('web', 'name')
+            else:
+                name = os.path.basename(self.root)
+            return hglib.tounicode(name)
+
+        @propertycache
+        def shortname(self):
+            'Short name is for tables, tabs, and sentences'
+            if self.ui.config('web', 'name', False):
+                name = self.ui.config('web', 'name')
+            else:
+                name = os.path.basename(self.root)
+            return hglib.tounicode(name)
 
         def shell(self):
             'Returns terminal shell configured for this repo'
