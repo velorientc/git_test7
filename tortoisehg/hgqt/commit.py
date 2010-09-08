@@ -558,9 +558,10 @@ class CommitWidget(QWidget):
 
         cmdline = ['commit', '--repository', repo.root,
                    '--verbose', '--user', user, '--message', msg]
-        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
         if self.qref:
             cmdline[0] = 'qrefresh'
+            files = []
+        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
         for fname in self.opts.get('autoinc', '').split(','):
             fname = fname.strip()
             if fname:
