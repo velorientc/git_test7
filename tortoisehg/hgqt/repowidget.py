@@ -37,6 +37,10 @@ class RepoWidget(QWidget):
     showMessageSignal = pyqtSignal(str)
     closeSelfSignal = pyqtSignal(QWidget)
 
+    progress = pyqtSignal(DataWrapper)
+    output = pyqtSignal(DataWrapper)
+    makeLogVisible = pyqtSignal(bool)
+
     def __init__(self, repo, workbench):
         QWidget.__init__(self)
 
@@ -56,18 +60,6 @@ class RepoWidget(QWidget):
         self.createActions()
         self.setupModels()
         self.restoreSettings()
-
-    @pyqtSlot(DataWrapper)
-    def progress(self, w):
-        self.workbench.statusbar.progress(w, self.repo.root)
-
-    @pyqtSlot(DataWrapper)
-    def output(self, w):
-        self.workbench.log.output(w)
-
-    @pyqtSlot(bool)
-    def makeLogVisible(self, v):
-        self.workbench.log.setShown(v)
 
     def setupUi(self):
         SP = QSizePolicy
