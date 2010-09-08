@@ -20,12 +20,14 @@ from tortoisehg.util import hglib
 
 _repocache = {}
 
-def repository(ui, path='', create=False):
+def repository(_ui=None, path='', create=False):
     '''Returns a subclassed Mercurial repository to which new
     THG-specific methods have been added. The repository object
     is obtained using mercurial.hg.repository()'''
     if create or path not in _repocache:
-        repo = hg.repository(ui, path, create)
+        if _ui is None:
+            _ui = ui.ui()
+        repo = hg.repository(_ui, path, create)
         repo._pyqtobj = ThgRepoWrapper(repo)
         repo.__class__ = _extendrepo(repo)
         _repocache[path] = repo
