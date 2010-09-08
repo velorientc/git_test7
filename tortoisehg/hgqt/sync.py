@@ -302,7 +302,7 @@ class SyncWidget(QWidget):
             return
         url = self.currentUrl(False)
         safeurl = self.currentUrl(True)
-        display = ' '.join(['hg'] + cmdline + [safeurl]) + '\n'
+        display = ' '.join(cmdline + [safeurl])
         cmdline.append(url)
         self.cmd.run(cmdline, display=display)
 

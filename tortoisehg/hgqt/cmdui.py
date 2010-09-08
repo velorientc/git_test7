@@ -138,7 +138,7 @@ class Core(QObject):
             if self.pmon:
                 self.thread.progressReceived.connect(self.progress_received)
         if self.display:
-            cmd = '% ' + self.display
+            cmd = '%% hg %s\n' % self.display
         else:
             cmd = '%% hg %s\n' % ' '.join(cmdline)
         w = thread.DataWrapper((cmd, 'control'))
