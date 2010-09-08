@@ -125,9 +125,8 @@ class Workbench(QMainWindow):
         vl.addWidget(tw)
 
         self.setCentralWidget(self.centralwidget)
-
         self.statusbar = cmdui.ThgStatusBar(self)
-        self.setStatusBar(self.statusbar)
+        vl.addWidget(self.statusbar)
 
         self.filterToolbar = tb = QToolBar(_("Filter Toolbar"), self)
         tb.setEnabled(True)
@@ -343,7 +342,6 @@ class Workbench(QMainWindow):
         '''opens the given repo in a new tab'''
         rw = RepoWidget(repo, self)
         rw.showMessageSignal.connect(self.showMessage)
-        rw.revDetailsWidget.fileview.showDescSignal.connect(self.showMessage)
         rw.closeSelfSignal.connect(self.repoTabCloseSelf)
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, repo.shortname)
@@ -351,7 +349,7 @@ class Workbench(QMainWindow):
         self.reporegistry.addRepo(repo.root)
 
     def showMessage(self, msg):
-        self.statusBar().showMessage(msg)
+        self.statusbar.showMessage(msg)
 
     def setupBranchCombo(self, *args):
         w = self.repoTabsWidget.currentWidget()

@@ -101,6 +101,7 @@ class RepoWidget(QWidget):
 
         self.revDetailsWidget = w = RevDetailsWidget(self.repo, self.repoview)
         w.revisionLinkClicked.connect(self.goto)
+        w.fileview.showDescSignal.connect(self.showMessage)
         self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
