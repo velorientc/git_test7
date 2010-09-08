@@ -16,7 +16,8 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths, wconfig
 
-from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanelwidget, thread
+from tortoisehg.hgqt import qtlib, status, cmdui, branchop
+from tortoisehg.hgqt import revpanelwidget, thread
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
@@ -28,8 +29,6 @@ from tortoisehg.hgqt.sync import loadIniFile
 
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
-    loadBegin = pyqtSignal()
-    loadComplete = pyqtSignal()
     commitButtonName = pyqtSignal(str)
     showMessage = pyqtSignal(str)
     commitComplete = pyqtSignal()
@@ -44,8 +43,8 @@ class CommitWidget(QWidget):
         self.opts = opts # user, date
         self.stwidget = status.StatusWidget(pats, opts, root, self)
         self.stwidget.showMessage.connect(self.showMessage)
-        self.stwidget.loadBegin.connect(lambda: self.loadBegin.emit())
-        self.stwidget.loadComplete.connect(lambda: self.loadComplete.emit())
+        self.stwidget.loadBegin.connect(self.loadBegin)
+        self.stwidget.loadComplete.connect(self.loadComplete)
         self.msghistory = []
         self.qref = False
 
@@ -129,6 +128,18 @@ class CommitWidget(QWidget):
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
         self.msgte = msgte
         self.msgcombo = msgcombo
+
+    def loadBegin(self):
+        'Status widget has started to refresh'
+        topic, item, pos, total, unit = 'Refresh', '...', 'status', None, None
+        w = thread.DataWrapper((topic, item, pos, total, unit))
+        self.progress.emit(w)
+
+    def loadComplete(self):
+        'Status widget refresh has finished'
+        topic, item, pos, total, unit = 'Refresh', 'status', None, None, None
+        w = thread.DataWrapper((topic, item, pos, total, unit))
+        self.progress.emit(w)
 
     def details(self):
         dlg = DetailsDialog(self.opts, self.userhist, self)
@@ -875,8 +886,6 @@ class DetailsDialog(QDialog):
         self.outopts = outopts
         QDialog.accept(self)
 
-# Technical Debt for standalone tool
-#   add a toolbar for refresh
 
 class CommitDialog(QDialog):
     'Standalone commit tool, a wrapper for CommitWidget'
@@ -893,6 +902,7 @@ class CommitDialog(QDialog):
         layout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
+        self.statusbar.setSizeGripEnabled(False)
         layout.addWidget(self.statusbar)
         commit.showMessage.connect(self.statusbar.showMessage)
         commit.progress.connect(self.statusbar.progress)
@@ -913,13 +923,14 @@ class CommitDialog(QDialog):
         commit.restoreState(s.value('commit/state').toByteArray())
         self.restoreGeometry(s.value('commit/geom').toByteArray())
         commit.loadConfigs(s)
-        commit.loadComplete.connect(self.updateUndo)
+        commit.repo.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonName.connect(self.setButtonName)
 
         self.setWindowTitle('%s - commit' % commit.repo.displayname)
         self.commit = commit
         self.commit.reload()
+        self.updateUndo()
 
     def setButtonName(self, name):
         self.bb.button(QDialogButtonBox.Ok).setText(name)
@@ -939,6 +950,7 @@ class CommitDialog(QDialog):
             self.reject()
             return
         elif event.matches(QKeySequence.Refresh):
+            self.updateUndo()
             self.commit.reload()
         return super(CommitDialog, self).keyPressEvent(event)
 
