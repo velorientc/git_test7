@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error, commands, cmdutil, util
 
-from tortoisehg.hgqt import visdiff, qtlib, wctxactions
+from tortoisehg.hgqt import visdiff, qtlib, wctxactions, thgrepo
 from tortoisehg.util import paths, hglib, colormap
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.grep import SearchWidget
@@ -398,7 +398,7 @@ class AnnotateDialog(QDialog):
         if line and isinstance(line, str):
             line = int(line)
         try:
-            repo = hg.repository(ui.ui(), path=paths.find_root())
+            repo = thgrepo.repository(ui.ui(), path=paths.find_root())
             ctx = repo[opts.get('rev') or '.']
             fctx = ctx[pats[0]] # just for validation
         except Exception, e:
