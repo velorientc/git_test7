@@ -94,7 +94,7 @@ class ThgRepoWrapper(QObject):
     def _getrepomtime(self):
         'Return the last modification time for the repo'
         watchedfiles = [self.repo.sjoin('00changelog.i'),
-                        self.repo.join('patches/status')]
+                        self.repo.join('patches/series')]
         try:
             mtime = [os.path.getmtime(wf) for wf in watchedfiles \
                      if os.path.isfile(wf)]
@@ -107,6 +107,11 @@ class ThgRepoWrapper(QObject):
         'Check for new changelog entries, or MQ status changes'
         if self._repomtime < self._getrepomtime():
             print 'detected repository change'
+            # Acquire and release repo dirstate lock to ensure current
+            # transaction is complete before invalidating, else we may
+            # only get partial invalidation
+            wlock = self.repo.wlock()
+            wlock.release()
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
