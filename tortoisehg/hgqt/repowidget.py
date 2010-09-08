@@ -170,6 +170,7 @@ class RepoWidget(QWidget):
         upats = {}
         gw = SearchWidget(upats, self.repo.root, self)
         gw.setRevision(self.repoview.current_rev)
+        gw.showMessage.connect(self.showMessage)
         return gw
 
     def load_config(self):

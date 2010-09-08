@@ -25,21 +25,14 @@ class SearchWidget(QWidget):
        SIGNALS:
        loadBegin()                  - for progress bar
        loadComplete()               - for progress bar
-       errorMessage(unicode)        - for status bar
+       showMessage(unicode)         - for status bar
     '''
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    errorMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(unicode)
 
     def __init__(self, upats, root=None, parent=None, **opts):
         QWidget.__init__(self, parent)
-
-        if parent:
-            self.closeonesc = False
-        else:
-            self.setWindowTitle(_('TortoiseHg Search'))
-            self.resize(800, 550)
-            self.closeonesc = True
 
         self.thread = None
         root = paths.find_root(root)
@@ -132,6 +125,16 @@ class SearchWidget(QWidget):
         if len(upats) > 1:
             incle.setText(','.join(upats[1:]))
 
+        if parent:
+            self.closeonesc = False
+        else:
+            self.setWindowTitle(_('TortoiseHg Search'))
+            self.resize(800, 550)
+            self.closeonesc = True
+            self.stbar = QStatusBar()
+            mainvbox.addWidget(self.stbar)
+            self.showMessage.connect(self.stbar.showMessage)
+
     def setRevision(self, rev):
         if isinstance(rev, basestring):  # unapplied patch
             return
@@ -176,8 +179,9 @@ class SearchWidget(QWidget):
             icase = self.chk.isChecked()
             regexp = re.compile(pattern, icase and re.I or 0)
         except Exception, inst:
-            msg = _('grep: invalid match pattern: %s\n') % hglib.tounicode(inst)
-            self.errorMessage.emit(msg)
+            msg = _('grep: invalid match pattern: %s\n') % \
+                    hglib.tounicode(str(inst))
+            self.showMessage.emit(msg)
             return
 
         self.tv.setSortingEnabled(False)
@@ -200,8 +204,8 @@ class SearchWidget(QWidget):
             try:
                 ctx = self.repo[rev or '.']
             except error.RepoError, e:
-                msg = _('grep: %s\n') % hglib.tounicode(e)
-                self.errorMessage.emit(msg)
+                msg = _('grep: %s\n') % hglib.tounicode(str(e))
+                self.showMessage.emit(msg)
                 return
             self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc,
                                           once=self.singlematch.isChecked())
@@ -214,7 +218,7 @@ class SearchWidget(QWidget):
 
         self.regexple.setEnabled(False)
         self.thread.finished.connect(self.finished)
-        self.thread.errorMessage.connect(self.errorMessage)
+        self.thread.showMessage.connect(self.showMessage)
         self.thread.matchedRow.connect(
                      lambda wrapper: model.appendRow(*wrapper.data))
         self.loadBegin.emit()
@@ -240,7 +244,7 @@ class DataWrapper(QObject):
 class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
     matchedRow = pyqtSignal(object)
-    errorMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(unicode)
     finished = pyqtSignal()
 
     def __init__(self, repo, pattern, icase, inc, exc):
@@ -285,7 +289,7 @@ class HistorySearchThread(QThread):
 
             def write_err(self, msg, *args, **opts):
                 msg = htlib.tounicode(msg)
-                self.obj.errorMessage.emit(msg)
+                self.obj.showMessage.emit(msg)
 
             def label(self, msg, label):
                 msg = hglib.tounicode(msg)
@@ -308,7 +312,7 @@ class HistorySearchThread(QThread):
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
     matchedRow = pyqtSignal(object)
-    errorMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(unicode)
     finished = pyqtSignal()
 
     def __init__(self, repo, regexp, ctx, inc, exc, once):
@@ -327,7 +331,7 @@ class CtxSearchThread(QThread):
         matchfn = match.match(self.repo.root, '', [], self.inc, self.exc)
         def badfn(f, msg):
             e = hglib.tounicode("%s: %s" % (matchfn.rel(f), msg))
-            self.errorMessage.emit(e)
+            self.showMessage.emit(e)
         matchfn.bad = badfn
 
         # searching len(ctx.manifest()) files
