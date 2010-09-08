@@ -15,9 +15,8 @@ from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths, wconfig
-from tortoisehg.util.util import format_desc
 
-from tortoisehg.hgqt import qtlib, status, cmdui, branchop
+from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanelwidget
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
@@ -86,10 +85,8 @@ class CommitWidget(QWidget):
         vbox.addLayout(hbox, 0)
         self.buttonHBox = hbox
 
-        self.parentvbox = QVBoxLayout()
-        self.parentlabels = [QLabel('<b>Parent:</b>')]
-        self.parentvbox.addWidget(self.parentlabels[0])
-        vbox.addLayout(self.parentvbox, 0)
+        self.pcsinfo = revpanelwidget.ParentWidget(repo)
+        vbox.addWidget(self.pcsinfo, 0)
 
         msgte = QPlainTextEdit()
         msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
@@ -173,22 +170,9 @@ class CommitWidget(QWidget):
             title = _('New Branch: ') + self.branchop
         self.branchbutton.setText(title)
 
-        # Update parent revision(s)
-        for i, ctx in enumerate(self.repo.parents()):
-            desc = format_desc(ctx.description(), 80)
-            fmt = "<span style='font-family:Courier'>%s(%s)</span> %s"
-            ptext = fmt % (ctx.rev(), short_hex(ctx.node()), desc)
-            ptext = _('<b>Parent: </b>') + ptext
-            if i >= len(self.parentlabels):
-                lbl = QLabel(ptext)
-                self.parentvbox.addWidget(lbl)
-                self.parentlabels.append(lbl)
-            else:
-                self.parentlabels[i].setText(ptext)
-        while len(self.repo.parents()) < len(self.parentlabels):
-            w = self.parentlabels.pop()
-            self.parentvbox.removeWidget(w)
-            w.hide()
+        # Update parent csinfo widget
+        self.pcsinfo.set_revision(None)
+        self.pcsinfo.update()
 
     def initQRefreshMode(self):
         'Working parent is a patch.  Is it refreshable?'
