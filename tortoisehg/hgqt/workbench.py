@@ -126,7 +126,7 @@ class Workbench(QMainWindow):
 
         self.setCentralWidget(self.centralwidget)
         self.statusbar = cmdui.ThgStatusBar(self)
-        vl.addWidget(self.statusbar)
+        self.setStatusBar(self.statusbar)
 
         self.filterToolbar = tb = QToolBar(_("Filter Toolbar"), self)
         tb.setEnabled(True)
