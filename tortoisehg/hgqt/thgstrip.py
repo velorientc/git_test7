@@ -122,8 +122,7 @@ class StripDialog(QDialog):
         # dialog setting
         self.setLayout(box)
         self.layout().setSizeConstraint(QLayout.SetMinAndMaxSize)
-        reponame = hglib.get_reponame(self.repo)
-        self.setWindowTitle(_('Strip - %s') % hglib.tounicode(reponame))
+        self.setWindowTitle(_('Strip - %s') % self.repo.displayname)
         #self.setWindowIcon(qtlib.geticon('strip'))
 
         # prepare to show

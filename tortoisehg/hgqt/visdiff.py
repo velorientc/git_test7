@@ -17,7 +17,7 @@ from mercurial import hg, cmdutil, util, error, match, copies
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, thgrepo
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
@@ -276,7 +276,7 @@ def visualdiff(ui, repo, pats, opts):
         replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
                        plabel1=label1a, plabel2=label1b,
                        phash1=str(ctx1a), phash2=str(ctx1b),
-                       repo=hglib.get_reponame(repo),
+                       repo=hglib.fromunicode(repo.displayname),
                        clabel=label2, child=dir2, chash=str(ctx2))
         launchtool(diffcmd, args, replace, True)
 
@@ -326,7 +326,7 @@ class FileSelectionDialog(QtGui.QDialog):
             title += _(' filtered')
 
         self.resize(400, 250)
-        self.reponame = hglib.get_reponame(repo)
+        self.reponame = hglib.fromunicode(repo.displayname)
 
         self.ctxs = (ctx1a, ctx1b, ctx2)
         self.copies = cpy
@@ -563,7 +563,7 @@ class FileSelectionDialog(QtGui.QDialog):
 def run(ui, *pats, **opts):
     try:
         path = opts.get('bundle') or paths.find_root()
-        repo = hg.repository(ui, path=path)
+        repo = thgrepo.repository(ui, path=path)
     except error.RepoError:
         ui.warn(_('No repository found here') + '\n')
         return None

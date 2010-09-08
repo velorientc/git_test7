@@ -198,11 +198,9 @@ class StatusWidget(QWidget):
 
     def getTitle(self):
         if self.pats:
-            return hglib.tounicode(_('%s - status (selection filtered)') %
-                                   hglib.get_reponame(self.repo))
+            return _('%s - status (selection filtered)') % self.repo.displayname
         else:
-            return hglib.tounicode(_('%s - status') %
-                                   hglib.get_reponame(self.repo))
+            return _('%s - status') % self.repo.displayname
 
     def restoreState(self, data):
         return self.split.restoreState(data)

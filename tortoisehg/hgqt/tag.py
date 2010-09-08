@@ -142,8 +142,7 @@ class TagDialog(QDialog):
         # dialog setting
         self.setLayout(base)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
-        reponame = hglib.get_reponame(self.repo)
-        self.setWindowTitle(_('Tag - %s') % hglib.tounicode(reponame))
+        self.setWindowTitle(_('Tag - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('tag'))
 
         # prepare to show

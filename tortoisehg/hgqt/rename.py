@@ -152,7 +152,7 @@ class RenameDialog(QDialog):
 
     def setRenameCopy(self):
         if self.windowTitle() == '':
-            self.reponame = hglib.tounicode(hglib.get_reponame(self.repo))
+            self.reponame = self.repo.displayname
         if self.copy_chk.isChecked():
             wt = (_('Copy - %s') % self.reponame)
             self.rename_btn.setText(_('Copy'))

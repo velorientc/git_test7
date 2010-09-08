@@ -119,8 +119,7 @@ class ImportDialog(QDialog):
         # dialog setting
         self.setLayout(box)
         self.layout().setSizeConstraint(QLayout.SetMinAndMaxSize)
-        reponame = hglib.get_reponame(self.repo)
-        self.setWindowTitle(_('Import - %s') % hglib.tounicode(reponame))
+        self.setWindowTitle(_('Import - %s') % self.repo.displayname)
         #self.setWindowIcon(qtlib.geticon('import'))
 
         # prepare to show

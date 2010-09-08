@@ -761,8 +761,7 @@ class DetailsDialog(QDialog):
         self.bb = bb
         layout.addWidget(bb)
 
-        name = hglib.get_reponame(self.repo)
-        self.setWindowTitle('%s - commit details' % name)
+        self.setWindowTitle('%s - commit details' % self.repo.displayname)
 
     def newPatch(self):
         name = hglib.fromunicode(self.patchle.text())
@@ -917,8 +916,7 @@ class CommitDialog(QDialog):
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonName.connect(self.setButtonName)
 
-        name = hglib.get_reponame(commit.repo)
-        self.setWindowTitle('%s - commit' % name)
+        self.setWindowTitle('%s - commit' % commit.repo.displayname)
         self.commit = commit
         self.commit.reload()
 

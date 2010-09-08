@@ -157,8 +157,7 @@ class ArchiveDialog(QDialog):
         self.update_path()
 
         # dialog setting
-        reponame = hglib.get_reponame(self.repo)
-        self.setWindowTitle(_('Archive - %s') % hglib.tounicode(reponame))
+        self.setWindowTitle(_('Archive - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('archive'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(self.vbox)

@@ -36,7 +36,7 @@ class HgignoreDialog(QDialog):
 
         self.repo = repo
         self.pats = pats
-        self.setWindowTitle(_('Ignore filter - %s') % hglib.get_reponame(repo))
+        self.setWindowTitle(_('Ignore filter - %s') % repo.displayname)
 
         vbox = QVBoxLayout()
         self.setLayout(vbox)

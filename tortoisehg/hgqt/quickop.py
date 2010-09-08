@@ -15,7 +15,7 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths
 
-from tortoisehg.hgqt import qtlib, status, cmdui
+from tortoisehg.hgqt import qtlib, status, cmdui, thgrepo
 
 LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
            'forget': (_('Checkmark files to forget'), _('Forget')),
@@ -35,10 +35,10 @@ class QuickOpDialog(QDialog):
             command = 'remove'
         self.command = command
 
-        repo = hg.repository(ui.ui(), path=paths.find_root())
+        repo = thgrepo.repository(path=paths.find_root())
         assert repo
         os.chdir(repo.root)
-        self.setWindowTitle('%s - hg %s' % (hglib.get_reponame(repo), command))
+        self.setWindowTitle('%s - hg %s' % repo.displayname, command))
 
         layout = QVBoxLayout()
         self.setLayout(layout)

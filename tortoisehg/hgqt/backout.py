@@ -104,9 +104,8 @@ class BackoutDialog(QDialog):
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
         self.resize(0, 340)
-        reponame = hglib.get_reponame(self.repo)
-        self.setWindowTitle(_("Backout '%s' - %s") \
-                                % (revhex, hglib.tounicode(reponame)))
+        self.setWindowTitle(_("Backout '%s' - %s") % (revhex,
+                            self.repo.displayname))
 
         self.merge_chk.setChecked(bool(opts.get('merge')))
 
