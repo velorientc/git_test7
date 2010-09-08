@@ -32,6 +32,10 @@ def repository(_ui=None, path='', create=False):
         repo.__class__ = _extendrepo(repo)
         _repocache[path] = repo
         return repo
+    if not os.path.exists(os.path.join(path, '.hg/')):
+        del _repocache[path]
+        # this error must be in local encoding
+        raise error.RepoError('%s is not a valid repository' % path)
     return _repocache[path]
 
 class ThgRepoWrapper(QObject):
