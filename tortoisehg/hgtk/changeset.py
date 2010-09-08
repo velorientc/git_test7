@@ -19,7 +19,7 @@ from tortoisehg.util import shlib, hglib, paths
 
 from tortoisehg.hgtk import csinfo, gdialog, gtklib, hgcmd, statusbar
 
-MODE_FILEPATS = 1 # mirrored from history.py
+MODE_FILEPATS = 4 # mirrored from history.py
 
 class ChangeSet(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
@@ -1012,7 +1012,7 @@ class ChangeSet(gdialog.GWindow):
             opts = {'pats': [fname]}
             explorer = self.glog_parent
             explorer.filter = 'custom'
-            explorer.filtercombo.set_active(1)
+            explorer.filtercombo.set_active(MODE_FILEPATS)
             explorer.filterentry.set_text(fname)
             explorer.filterbar.get_button('custom').set_active(True)
             explorer.activate_filter(path, MODE_FILEPATS)
