@@ -14,7 +14,7 @@ from mercurial import hg, ui, util, url, filemerge, error, extensions
 
 from tortoisehg.util import hglib, settings, paths, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -23,6 +23,7 @@ from PyQt4.QtGui import *
 #   stacked widget or pages need to be scrollable
 #   add extensions page after THG 1.1 is released
 #   we need a consistent icon set
+#   connect to thgrepo.configChanged signal and refresh
 
 _unspecstr = _('<unspecified>')
 ENTRY_WIDTH = 300
@@ -518,7 +519,7 @@ class SettingsDialog(QDialog):
             if root is None:
                 root = paths.find_root()
             if root:
-                repo = hg.repository(ui.ui(), root)
+                repo = thgrepo.repository(ui.ui(), root)
             else:
                 repo = None
         except error.RepoError:
