@@ -8,7 +8,7 @@
 import sys
 import os
 
-from mercurial import hg, url
+from mercurial import hg, url, error
 
 from tortoisehg.util import hglib
 
@@ -159,7 +159,7 @@ class RepoItem(RepoTreeItem):
         if column == 0:
             try:
                 return QVariant(thgrepo.repository(path=self._root).shortname)
-            except RepoError:
+            except error.RepoError:
                 return QVariant(hglib.tounicode(os.path.basename(self._root)))
         elif column == 1:
             return QVariant(hglib.tounicode(self._root))
