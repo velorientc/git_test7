@@ -268,7 +268,7 @@ class Widget(QWidget):
         self.internallog = useInternal
         self.core = Core(useInternal)
         self.core.commandStarted.connect(self.commandStarted)
-        self.core.commandFinished.connect(self.commandFinished)
+        self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
         self.core.output.connect(self.output)
         self.core.progress.connect(self.progress)
@@ -311,8 +311,12 @@ class Widget(QWidget):
         else:
             return False
 
-    def get_rawoutput(self):
-        return self.core.get_rawoutput()
+    ### Signal Handler ###
+
+    def command_finished(self, wrapper):
+        if wrapper.data is None:
+            self.show_output(True)
+        self.commandFinished.emit(wrapper)
 
 class Dialog(QDialog):
     """A dialog for running random Mercurial command"""

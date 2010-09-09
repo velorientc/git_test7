@@ -161,11 +161,10 @@ class SyncWidget(QWidget):
         for b in self.opbuttons:
             if b: b.setEnabled(True)
         if self.finishfunc:
-            output = self.cmd.get_rawoutput()
+            output = self.cmd.core.get_rawoutput()
             if wrapper.data is None:
                 # An exception ocurred, command did not finish
                 self.finishfunc(-1, output)
-                self.makeLogVisible.emit(True)
             else:
                 self.finishfunc(wrapper.data, output)
 
