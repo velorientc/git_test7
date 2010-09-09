@@ -23,7 +23,6 @@ from tortoisehg.hgqt.sync import loadIniFile
 # Technical Debt for CommitWidget
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  Need a unicode-to-UTF8 function
-#  +1 / -1 head indication (not as important with workbench integration)
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
 
