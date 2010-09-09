@@ -142,7 +142,7 @@ class RepoWidget(QWidget):
         cw.output.connect(self.workbench.log.output)
         cw.progress.connect(lambda w:
                 self.workbench.statusbar.progress(w, self.repo.root))
-        cw.makeLogVisible.connect(self.workbench.statusbar.setShown)
+        cw.makeLogVisible.connect(self.workbench.log.setShown)
 
         cw.showMessage.connect(self.showMessage)
         cw.buttonHBox.addWidget(b)
@@ -174,7 +174,7 @@ class RepoWidget(QWidget):
             sw.output.connect(self.workbench.log.output)
             sw.progress.connect(lambda w:
                     self.workbench.statusbar.progress(w, self.repo.root))
-            sw.makeLogVisible.connect(self.workbench.statusbar.setShown)
+            sw.makeLogVisible.connect(self.workbench.log.setShown)
             self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
