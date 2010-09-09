@@ -15,12 +15,16 @@ from PyQt4.QtGui import *
 from mercurial import hg, ui, util, commands, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo, thread
 from tortoisehg.util import hglib, paths
 
 
 class RenameDialog(QDialog):
     """TortoiseHg rename dialog"""
+
+    output = pyqtSignal(thread.DataWrapper)
+    makeLogVisible = pyqtSignal(bool)
+    progress = pyqtSignal(thread.DataWrapper)
 
     def __init__(self, ui, pats, parent=None, **opts):
         super(RenameDialog, self).__init__(parent=None)
@@ -89,6 +93,9 @@ class RenameDialog(QDialog):
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)
+        self.cmd.output.connect(self.output)
+        self.cmd.makeLogVisible.connect(self.makeLogVisible)
+        self.cmd.progress.connect(self.progress)
         self.cmd.setHidden(True)
 
         # bottom buttons
