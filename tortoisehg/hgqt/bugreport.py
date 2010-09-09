@@ -39,6 +39,7 @@ class BugReport(QDialog):
         bb.accepted.connect(self.accept)
         bb.button(BB.Save).clicked.connect(self.save)
         bb.button(BB.Ok).setDefault(True)
+        bb.addButton(_('Quit'), BB.DestructiveRole).clicked.connect(qApp.quit)
         layout.addWidget(bb)
 
         self.setLayout(layout)
