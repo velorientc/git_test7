@@ -94,8 +94,10 @@ class RepoTreeView(QTreeView):
                 _("Rename the entry"), None, self.startRename),
              ("settings", _("Settings..."), None,
                 _("View the repository's settings"), None, self.startSettings),
-             ("remove", _("Delete"), None,
-                _("Delete the node and all its subnodes"), None, self.removeSelected),
+             ("remove", _("Remove from registry"), None,
+                _("Remove the node and all its subnodes."
+                  " Repositories are not deleted from disk."),
+                  None, self.removeSelected),
              ("clone", _("Clone..."), None,
                 _("Clone Repository"), None, self.cloneRepo),
              ("explore", _("Explore"), None,
