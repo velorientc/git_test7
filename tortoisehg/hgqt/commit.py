@@ -28,8 +28,8 @@ from tortoisehg.hgqt.sync import loadIniFile
 
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
-    commitButtonName = pyqtSignal(str)
-    showMessage = pyqtSignal(str)
+    commitButtonName = pyqtSignal(QString)
+    showMessage = pyqtSignal(unicode)
     commitComplete = pyqtSignal()
 
     progress = pyqtSignal(thread.DataWrapper)
