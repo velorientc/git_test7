@@ -350,8 +350,8 @@ INFO = (
 
 ({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy'}, (
     (_('Name'), 'web.name', genEditCombo,
-        _('Repository name to use in the web interface.'
-        ' Default is the working directory.')),
+        _('Repository name to use in the web interface, and by TortoiseHg '
+        ' as a shorthand name.  Default is the working directory.')),
     (_('Description'), 'web.description', genEditCombo,
         _("Textual description of the repository's purpose or"
         ' contents.')),
