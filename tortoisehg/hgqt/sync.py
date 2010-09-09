@@ -349,6 +349,8 @@ class SyncWidget(QWidget):
                     self.outgoingNodes.emit(nodes)
                     self.showMessage.emit(_('%d outgoing changesets') %
                                           len(nodes))
+                elif ret == 1:
+                    self.showMessage.emit(_('No outgoing changesets'))
                 else:
                     self.showMessage.emit(_('Outgoing finished, ret %d') % ret)
             self.finishfunc = outputnodes
