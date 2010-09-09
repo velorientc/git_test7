@@ -356,7 +356,6 @@ class _QtRunner(QObject):
         self._mainapp = None
         self._dialogs = []
         self.errors = []
-        self.stubui = _ui.ui()
         self.ehandlertimer = False
         sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
 
@@ -370,12 +369,14 @@ class _QtRunner(QObject):
         self.errors.extend(elist)
 
     def excepthandler(self):
+        from tortoisehg.hgqt.bugreport import BugReport
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = ''.join(self.errors)
         opts['nofork'] = True
+        dlg = BugReport(opts, parent=self._mainapp.activeWindow())
+        dlg.exec_()
         self.errors = []
-        self(bugrun, self.stubui, **opts)
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         portable_fork(ui, opts)
