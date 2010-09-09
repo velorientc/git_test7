@@ -12,7 +12,7 @@ from mercurial import hg, ui, mdiff, similar, patch
 from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, htmlui, cmdui, thgrepo
+from tortoisehg.hgqt import qtlib, htmlui, cmdui, thgrepo, thread
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -133,9 +133,8 @@ class DetectRenameDialog(QDialog):
         diffvbox.addWidget(difftb)
         self.difftb = difftb
 
-        self.pmon = cmdui.ProgressMonitor()
-        self.pmon.hide()
-        layout.addWidget(self.pmon)
+        self.stbar = cmdui.ThgStatusBar()
+        layout.addWidget(self.stbar)
 
         s = QSettings()
         self.restoreGeometry(s.value('guess/geom').toByteArray())
@@ -163,7 +162,7 @@ class DetectRenameDialog(QDialog):
             self.unrevlist.setItemSelected(item, x in self.pats)
         self.difftb.clear()
         self.pats = []
-        self.pmon.clear_progress()
+        self.stbar.clear()
 
     def findRenames(self):
         'User pressed "find renames" button'
@@ -187,17 +186,17 @@ class DetectRenameDialog(QDialog):
         self.matchtv.model().clear()
         self.thread = RenameSearchThread(self.repo, ulist, pct, copies)
         self.thread.match.connect(self.rowReceived)
-        self.thread.progress.connect(self.progressReceived)
+        self.thread.progress.connect(self.stbar.progress)
         self.thread.error.connect(self.errorReceived)
         self.thread.searchComplete.connect(self.finished)
         self.thread.start()
 
     def finished(self):
-        self.pmon.fillup_progress()
+        self.stbar.clear()
         if self.errorstr:
-            self.pmon.set_text(self.errorstr)
+            self.stbar.showMessage(self.errorstr)
         else:
-            self.pmon.hide()
+            self.stbar.clearMessage()
         for col in xrange(3):
             self.matchtv.resizeColumnToContents(col)
         self.findbtn.setEnabled(len(self.unrevlist.selectedItems()))
@@ -207,38 +206,7 @@ class DetectRenameDialog(QDialog):
 
     def errorReceived(self, qstr):
         self.errorstr = qstr
-        self.pmon.set_text(qstr)
-        self.pmon.show()
-
-    def progressReceived(self, data):
-        if self.thread.isFinished():
-            return
-        self.pmon.show()
-        counting = False
-        topic, item, pos, total, unit = data
-        if pos is None:
-            self.pmon.clear_progress()
-            return
-        if total is None:
-            count = '%d' % pos
-            counting = True
-        else:
-            self.pmon.pbar.setMaximum(total)
-            self.pmon.pbar.setValue(pos)
-            count = '%d / %d' % (pos, total)
-        if unit:
-            count += ' ' + unit
-        self.pmon.prog_label.setText(hglib.tounicode(count))
-        if item:
-            status = '%s: %s' % (topic, item)
-        else:
-            status = _('Status: %s') % topic
-        self.pmon.status_label.setText(hglib.tounicode(status))
-        self.pmon.inprogress = True
-
-        if not self.pmon.inprogress or counting:
-            # use indeterminate mode
-            self.pmon.pbar.setMinimum(0)
+        self.stbar.showMessage(qstr)
 
     def acceptMatch(self):
         'User pressed "accept match" button'
@@ -410,7 +378,8 @@ class RenameSearchThread(QThread):
                 if src:
                     src.psig.connect(self.psig)
             def progress(self, topic, pos, item='', unit='', total=None):
-                self.psig.emit([topic, item, pos, total, unit])
+                w = thread.DataWrapper([topic, item, pos, total, unit])
+                self.psig.emit(w)
         progui = ProgUi()
         progui.psig.connect(self.progress)
         storeui = self.repo.ui
