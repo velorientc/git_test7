@@ -324,7 +324,12 @@ class SyncWidget(QWidget):
 
     def inclicked(self):
         def finished(ret, output):
-            self.showMessage.emit(_('Incoming finished, ret %d') % ret)
+            if ret == 0:
+                self.showMessage.emit(_('Incoming changesets found'))
+            elif ret == 1:
+                self.showMessage.emit(_('No incoming changesets'))
+            else:
+                self.showMessage.emit(_('Incoming finished, ret %d') % ret)
         self.finishfunc = finished
         self.run(['--repository', self.root, 'incoming'])
 
