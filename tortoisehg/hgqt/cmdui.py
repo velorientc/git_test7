@@ -66,7 +66,8 @@ class ThgStatusBar(QStatusBar):
         self.lbl.setText(str)
 
     def clear(self):
-        for key in self.topics:
+        keys = self.topics.keys()
+        for key in keys:
             pm = self.topics[key]
             self.removeWidget(pm)
             del self.topics[key]
