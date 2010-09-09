@@ -7,8 +7,6 @@
 
 import os
 
-from mercurial import hg, ui, cmdutil, util
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -72,7 +70,8 @@ class QuickOpDialog(QDialog):
             self.chk = chk
             layout.addWidget(chk)
 
-        self.statusbar = qtlib.StatusLabel(self)
+        self.statusbar = cmdui.ThgStatusBar(self)
+        stwidget.showMessage.connect(self.statusbar.showMessage)
         layout.addWidget(self.statusbar)
 
         BB = QDialogButtonBox
@@ -96,7 +95,7 @@ class QuickOpDialog(QDialog):
         stwidget.restoreState(s.value('quickop/state').toByteArray())
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
-        stwidget.showMessage.connect(self.statusbar.set_text)
+        cmd.progress.connect(self.statusbar.progress)
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def keyPressEvent(self, event):
