@@ -8,34 +8,34 @@
 import os
 import sys
 
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import SIGNAL, SLOT, QSettings, Qt
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from mercurial import extensions
 from tortoisehg.util import hglib, version
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
-class BugReport(QtGui.QDialog):
+class BugReport(QDialog):
 
     def __init__(self, opts, parent=None):
         super(BugReport, self).__init__(parent)
 
         self.text = self.gettext(opts)
 
-        layout = QtGui.QVBoxLayout()
+        layout = QVBoxLayout()
 
-        tb = QtGui.QTextBrowser()
+        tb = QTextBrowser()
         tb.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         msg = hglib.tounicode(self.text)
-        msg = QtCore.Qt.escape(msg)
+        msg = Qt.escape(msg)
         tb.setHtml('<span>' + msg + '</span>')
-        tb.setWordWrapMode(QtGui.QTextOption.NoWrap)
+        tb.setWordWrapMode(QTextOption.NoWrap)
         layout.addWidget(tb)
 
         # dialog buttons
-        BB = QtGui.QDialogButtonBox
-        bb = QtGui.QDialogButtonBox(BB.Ok|BB.Save)
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Ok|BB.Save)
         self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(bb.button(BB.Save), SIGNAL("clicked()"), self.save)
         bb.button(BB.Ok).setDefault(True)
@@ -82,7 +82,7 @@ class BugReport(QtGui.QDialog):
 
     def save(self):
         try:
-            fd = QtGui.QFileDialog(self)
+            fd = QFileDialog(self)
             fname = fd.getSaveFileName(self,
                         _('Save error report to'),
                         os.path.join(os.getcwd(), 'bugreport.txt'),
@@ -112,7 +112,7 @@ def run(ui, *pats, **opts):
     return BugReport(opts)
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     form = BugReport({'cmd':'cmd', 'error':'error'})
     form.show()
     app.exec_()
