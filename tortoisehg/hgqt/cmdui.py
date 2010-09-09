@@ -93,6 +93,7 @@ class ThgStatusBar(QStatusBar):
             return
         if key not in self.topics:
             pm = ProgressMonitor(topic, self)
+            pm.setMaximumHeight(self.lbl.sizeHint().height())
             self.addWidget(pm)
             self.topics[key] = pm
         else:
