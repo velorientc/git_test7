@@ -18,12 +18,16 @@ from mercurial import hg, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo, thread
 
 WD_PARENT = _('= Working Directory Parent =')
 
 class ArchiveDialog(QDialog):
     """ Dialog to archive a particular Mercurial revision """
+
+    output = pyqtSignal(thread.DataWrapper)
+    makeLogVisible = pyqtSignal(bool)
+    progress = pyqtSignal(thread.DataWrapper)
 
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ArchiveDialog, self).__init__(parent)
@@ -92,6 +96,9 @@ class ArchiveDialog(QDialog):
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)
+        self.cmd.output.connect(self.output)
+        self.cmd.makeLogVisible.connect(self.makeLogVisible)
+        self.cmd.progress.connect(self.progress)
         self.cmd.setHidden(True)
         self.vbox.addWidget(self.cmd)
 

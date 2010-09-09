@@ -596,6 +596,9 @@ class RepoWidget(QWidget):
 
     def archiveRevision(self):
         dlg = archive.ArchiveDialog(self.repo.ui, self.repo, self.rev, self)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.output.connect(self.output)
+        dlg.progress.connect(self.progress)
         dlg.exec_()
 
     def copyHash(self):
