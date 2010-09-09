@@ -99,6 +99,12 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.authbutton)
         self.postpullbutton = QPushButton()
         hbox.addWidget(self.postpullbutton)
+        if 'perfarce' in self.repo.extensions():
+            self.p4pbutton = QPushButton(_('p4pending'))
+            self.p4pbutton.clicked.connect(self.p4pending)
+            hbox.addWidget(self.p4pbutton)
+        else:
+            self.p4pbutton = None
         layout.addLayout(hbox)
 
         self.tv.clicked.connect(self.pathSelected)
@@ -123,7 +129,7 @@ class SyncWidget(QWidget):
 
         self.opbuttons = (self.inbutton, self.pullbutton,
                           self.outbutton, self.pushbutton,
-                          self.emailbutton)
+                          self.emailbutton, self.p4pbutton)
 
         cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
@@ -146,25 +152,26 @@ class SyncWidget(QWidget):
 
     def commandStarted(self):
         for b in self.opbuttons:
-            b.setEnabled(False)
+            if b: b.setEnabled(False)
         if not self.embedded:
             self.cmd.show_output(True)
             self.cmd.setVisible(True)
 
     def commandFinished(self, wrapper):
         for b in self.opbuttons:
-            b.setEnabled(True)
+            if b: b.setEnabled(True)
         if self.finishfunc:
             output = self.cmd.get_rawoutput()
             if wrapper.data is None:
                 # An exception ocurred, command did not finish
                 self.finishfunc(-1, output)
+                self.makeLogVisible.emit(True)
             else:
                 self.finishfunc(wrapper.data, output)
 
     def commandCanceled(self):
         for b in self.opbuttons:
-            b.setEnabled(True)
+            if b: b.setEnabled(True)
 
     def configChanged(self):
         'Repository is reporting its config files have changed'
@@ -326,7 +333,7 @@ class SyncWidget(QWidget):
         def finished(ret, output):
             self.showMessage.emit(_('Pull finished, ret %d') % ret)
         self.finishfunc = finished
-        cmdline = ['--repository', self.root, 'pull']
+        cmdline = ['--repository', self.root, 'pull', '--verbose']
         if self.cachedpp == 'rebase':
             cmdline.append('--rebase')
         elif self.cachedpp == 'update':
@@ -352,11 +359,50 @@ class SyncWidget(QWidget):
             self.finishfunc = None
             self.run(['--repository', self.root, 'outgoing'])
 
+    def p4pending(self):
+        def finished(ret, output):
+            pending = {}
+            if ret == 0:
+                for line in output.splitlines():
+                    try:
+                        hashes = line.split(' ')
+                        changelist = hashes.pop(0)
+                        if len(hashes)>1 and len(hashes[0])==1:
+                           state = hashes.pop(0)
+                           if state == 's':
+                               changelist = _('%s (submitted)') % changelist
+                           elif state == 'p':
+                               changelist = _('%s (pending)') % changelist
+                        else:
+                           if changelist == 'submitted':
+                               changelist = _('Submitted') + str(submitted)
+                               submitted += 1
+                           else:
+                               changelist = _('%s (pending)') % changelist
+                        pending[changelist] = hashes
+                    except (ValueError, IndexError):
+                        text = _('Unable to parse p4pending output')
+                if pending:
+                    text = _('%d pending changelists found') % len(pending)
+                else:
+                    text = _('No pending Perforce changelists')
+            elif ret is None:
+                text = _('Aborted p4pending')
+            else:
+                text = _('Unable to determine pending changesets')
+            self.showMessage.emit(text)
+            if pending:
+                from tortoisehg.hgqt.p4pending import PerforcePending
+                dlg = PerforcePending(self.repo, pending, self)
+                dlg.exec_()
+        self.finishfunc = finished
+        self.run(['--repository', self.root, 'p4pending', '--verbose'])
+
     def pushclicked(self):
         def finished(ret, output):
             self.showMessage.emit(_('Push finished, ret %d') % ret)
         self.finishfunc = finished
-        self.run(['--repository', self.root, 'push'])
+        self.run(['--repository', self.root, 'push', '--verbose'])
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
