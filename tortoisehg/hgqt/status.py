@@ -44,13 +44,13 @@ class StatusWidget(QWidget):
        SIGNALS:
        loadBegin()                  - for progress bar
        loadComplete()               - for progress bar
-       showMessage(str)             - for status bar
-       titleTextChanged(str)        - for window title
+       showMessage(unicode)         - for status bar
+       titleTextChanged(QString)    - for window title
     '''
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    titleTextChanged = pyqtSignal(str)
-    showMessage = pyqtSignal(str)
+    titleTextChanged = pyqtSignal(QString)
+    showMessage = pyqtSignal(unicode)
 
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
@@ -726,7 +726,7 @@ def statusMessage(status, mst, upath):
     return tip
 
 class StatusType(object):
-    preferredOrder = 'MAR?!ICS'
+    preferredOrder = 'MAR!?ICS'
     def __init__(self, name, icon, desc, uilabel):
         self.name = name
         self.icon = icon
