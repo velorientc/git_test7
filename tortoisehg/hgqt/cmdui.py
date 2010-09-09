@@ -182,7 +182,7 @@ class Core(QObject):
 
         if self.internallog:
             self.thread.outputReceived.connect(self.output_received)
-            self.thread.errorReceived.connect(self.output)
+            self.thread.errorReceived.connect(self.output_received)
 
         if self.stbar:
             self.thread.progressReceived.connect(self.stbar.progress)
