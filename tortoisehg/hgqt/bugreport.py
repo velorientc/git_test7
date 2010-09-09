@@ -36,8 +36,8 @@ class BugReport(QDialog):
         # dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Save)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb.button(BB.Save), SIGNAL("clicked()"), self.save)
+        bb.accepted.connect(self.accept)
+        bb.button(BB.Save).clicked.connect(self.save)
         bb.button(BB.Ok).setDefault(True)
         layout.addWidget(bb)
 
