@@ -81,6 +81,16 @@ class ThgStatusBar(QStatusBar):
         # unit is a string label
         # total is the highest expected pos
         # All topics should be marked closed by setting pos to None
+
+        if topic is None:
+            # special progress report, close all pbars for repo
+            for key in self.topics:
+                if root is None or key[0] == root:
+                    pm = self.topics[key]
+                    self.removeWidget(pm)
+                    del self.topics[key]
+            return
+
         if root:
             key = (root, topic)
         else:
@@ -234,6 +244,8 @@ class Core(QObject):
         if ret == 0 and self.run_next():
             return # run next command
 
+        # Emit 'close all progress bars' signal
+        self.progress.emit(thread.DataWrapper((None,)*5))
         self.commandFinished.emit(wrapper)
 
     def command_canceling(self):
