@@ -72,7 +72,7 @@ def data_func(widget, item, ctx):
         if not ts:
             return None
         try:
-            tctx = repo[ts]
+            tctx = ctx._repo[ts]
             return revline_data(tctx)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             return ts
