@@ -11,7 +11,7 @@ import os, tempfile, re
 from StringIO import StringIO
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import hg, error, extensions, util, cmdutil
+from mercurial import error, extensions, util, cmdutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, lexers, qtlib, thgrepo
