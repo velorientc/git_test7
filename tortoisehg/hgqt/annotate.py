@@ -50,6 +50,12 @@ class AnnotateView(QFrame):
         'Display lines of annotation text'
 
         revisionHint = pyqtSignal(QString)
+        searchAtParent = pyqtSignal(QString)
+        searchAll = pyqtSignal(QString)
+        searchAnnotation = pyqtSignal(QString)
+        searchAtRev = pyqtSignal(object)
+        revSelected = pyqtSignal(object)
+        editSelected = pyqtSignal(object)
 
         def __init__(self, parent=None):
             QPlainTextEdit.__init__(self, parent)
@@ -58,9 +64,7 @@ class AnnotateView(QFrame):
             self.setLineWrapMode(QPlainTextEdit.NoWrap)
             self.setFont(QFont('Monospace'))
             self.setContextMenuPolicy(Qt.CustomContextMenu)
-            self.connect(self,
-                    SIGNAL('customContextMenuRequested(const QPoint &)'),
-                    self.customContextMenuRequested)
+            self.customContextMenuRequested.connect(self.menuRequest)
             self.setTextInteractionFlags(Qt.TextSelectableByMouse |
                                          Qt.TextSelectableByKeyboard)
             tm = QFontMetrics(self.font())
@@ -107,7 +111,7 @@ class AnnotateView(QFrame):
                 self.revisionHint.emit(self.summaries[rev])
                 self.lastrev = rev
 
-        def customContextMenuRequested(self, point):
+        def menuRequest(self, point):
             cursor = self.cursorForPosition(point)
             point = self.mapToGlobal(point)
 
@@ -125,47 +129,59 @@ class AnnotateView(QFrame):
                 selection = c.selection().toPlainText()
                 def sorig():
                     sdata = [selection, str(fctx.linkrev())]
-                    self.emit(SIGNAL('searchAtRev'), sdata)
+                    self.searchAtRev.emit(sdata)
                 def sctx():
-                    self.emit(SIGNAL('searchAtParent'), selection)
+                    self.searchAtParent.emit(selection)
                 def searchall():
-                    self.emit(SIGNAL('searchAll'), selection)
+                    self.searchAll.emit(selection)
                 def sann():
-                    self.emit(SIGNAL('searchAnnotation'), selection)
+                    self.searchAnnotation.emit(selection)
                 menu = QMenu(self)
                 for name, func in [(_('Search in original revision'), sorig),
                                    (_('Search in working revision'), sctx),
                                    (_('Search in current annotation'), sann),
                                    (_('Search in history'), searchall)]:
-                    action = menu.addAction(name)
-                    action.wrapper = lambda f=func: f()
-                    self.connect(action, SIGNAL('triggered()'), action.wrapper)
+                    def add(name, func):
+                        action = menu.addAction(name)
+                        action.triggered.connect(func)
+                    add(name, func)
                 return menu.exec_(point)
 
             def annorig():
-                self.emit(SIGNAL('revSelected'), data)
+                self.revSelected.emit(data)
             def editorig():
-                self.emit(SIGNAL('editSelected'), data)
+                self.editSelected.emit(data)
             menu = QMenu(self)
             for name, func in [(_('Annotate originating revision'), annorig),
                                (_('View originating revision'), editorig)]:
-                action = menu.addAction(name)
-                action.wrapper = lambda f=func: f()
-                self.connect(action, SIGNAL('triggered()'), action.wrapper)
+                def add(name, func):
+                    action = menu.addAction(name)
+                    action.triggered.connect(func)
+                add(name, func)
             for pfctx in fctx.parents():
                 pdata = [pfctx.path(), pfctx.changectx().rev(), line]
                 def annparent(data):
-                    self.emit(SIGNAL('revSelected'), data)
+                    self.revSelected.emit(data)
                 def editparent():
-                    self.emit(SIGNAL('editSelected'), data)
+                    self.editSelected.emit(data)
                 for name, func in [(_('Annotate parent revision %d') % pdata[1],
                                       annparent),
                                    (_('View parent revision %d') % pdata[1],
                                       editparent)]:
-                    action = menu.addAction(name)
-                    action.wrapper = lambda f=func,d=pdata: f(d)
-                    self.connect(action, SIGNAL('triggered()'), action.wrapper)
+                    def add(name, func):
+                        action = menu.addAction(name)
+                        action.triggered.connect(lambda: func(d))
+                    add(name, func)
             menu.exec_(point)
+
+    revisionHint = pyqtSignal(QString)
+    searchAtParent = pyqtSignal(QString)
+    searchAll = pyqtSignal(QString)
+    searchAnnotation = pyqtSignal(QString)
+    searchAtRev = pyqtSignal(object)
+    revSelected = pyqtSignal(object)
+    editSelected = pyqtSignal(object)
+    closeSelf = pyqtSignal()
 
     def __init__(self, parent=None):
         super(AnnotateView, self).__init__(parent)
@@ -176,19 +192,13 @@ class AnnotateView(QFrame):
         self.revarea = self.InfoArea(self.edit)
         self.edit.updateRequest.connect(self.lnumarea.updateContents)
         self.edit.updateRequest.connect(self.revarea.updateContents)
-        self.edit.revisionHint.connect(lambda h: self.revisionHint.emit(h))
-        self.connect(self.edit, SIGNAL('revSelected'),
-                lambda data: self.emit(SIGNAL('revSelected'), data))
-        self.connect(self.edit, SIGNAL('editSelected'),
-                lambda data: self.emit(SIGNAL('editSelected'), data))
-        self.connect(self.edit, SIGNAL('searchAtRev'),
-                lambda data: self.emit(SIGNAL('searchAtRev'), data))
-        self.connect(self.edit, SIGNAL('searchAtParent'),
-                lambda pattern: self.emit(SIGNAL('searchAtParent'), pattern))
-        self.connect(self.edit, SIGNAL('searchAll'),
-                lambda pattern: self.emit(SIGNAL('searchAll'), pattern))
-        self.connect(self.edit, SIGNAL('searchAnnotation'),
-                lambda pattern: self.emit(SIGNAL('searchAnnotation'), pattern))
+        self.edit.revisionHint.connect(self.revisionHint)
+        self.edit.revSelected.connect(self.revSelected)
+        self.edit.editSelected.connect(self.editSelected)
+        self.edit.searchAtRev.connect(self.searchAtRev)
+        self.edit.searchAtParent.connect(self.searchAtParent)
+        self.edit.searchAll.connect(self.searchAll)
+        self.edit.searchAnnotation.connect(self.searchAnnotation)
 
         hbox = QHBoxLayout(self)
         hbox.setSpacing(10)
@@ -204,7 +214,13 @@ class AnnotateView(QFrame):
     def annotateFileAtRev(self, repo, ctx, wfile, line=None):
         if self.thread is not None:
             return
-        fctx = ctx[wfile]
+        try:
+            fctx = ctx[wfile]
+        except error.LookupError:
+            qtlib.ErrorMsgBox(_('Unable to annotate'),
+                    _('%s is not found in revision %d') % (wfile, ctx.rev()))
+            self.closeSelf.emit()
+            return
         curdate = fctx.date()[0]
         basedate = repo.filectx(wfile, fileid=0).date()[0]
         agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
@@ -383,12 +399,13 @@ class AnnotateDialog(QDialog):
         status = QLabel()
         mainvbox.addWidget(status)
         av.revisionHint.connect(status.setText)
-        self.connect(av, SIGNAL('revSelected'), self.revSelected)
-        self.connect(av, SIGNAL('editSelected'), self.editSelected)
-        self.connect(av, SIGNAL('searchAtRev'), self.searchAtRev)
-        self.connect(av, SIGNAL('searchAtParent'), self.searchAtParent)
-        self.connect(av, SIGNAL('searchAll'), self.searchAll)
-        self.connect(av, SIGNAL('searchAnnotation'), self.searchAnnotation)
+        av.revSelected.connect(self.revSelected)
+        av.editSelected.connect(self.editSelected)
+        av.searchAtRev.connect(self.searchAtRev)
+        av.searchAtParent.connect(self.searchAtParent)
+        av.searchAll.connect(self.searchAll)
+        av.searchAnnotation.connect(self.searchAnnotation)
+        av.closeSelf.connect(self.closeSelf)
 
         self.status = status
         self.searchwidget = opts.get('searchwidget')
@@ -408,6 +425,10 @@ class AnnotateDialog(QDialog):
         self.repo = repo
 
         self.restoreSettings()
+
+    def closeSelf(self):
+        self.close()
+        QTimer.singleShot(0, self.reject)
 
     def revSelected(self, args):
         repo = self.repo
