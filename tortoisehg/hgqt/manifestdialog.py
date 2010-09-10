@@ -87,6 +87,14 @@ class _FileTextView(QsciScintilla):
         self.setUtf8(True)
         self.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
 
+        self.setTabWidth(repo.tabwidth)
+        if repo.wsvisible == 'Visible':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
+        elif repo.wsvisible == 'VisibleAfterIndent':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
+        else:
+            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
+
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):
         fc = self._repo.changectx(rev).filectx(path)
