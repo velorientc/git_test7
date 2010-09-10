@@ -318,6 +318,9 @@ class SyncWidget(QWidget):
             scheme = 'local'
         return user, host, port, folder, passwd, scheme
 
+    def canExit(self):
+        return not self.cmd.core.is_running()
+
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
             self.reload()
