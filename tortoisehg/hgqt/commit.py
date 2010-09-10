@@ -17,7 +17,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths, wconfig
 
 from tortoisehg.hgqt import qtlib, status, cmdui, branchop
-from tortoisehg.hgqt import revpanelwidget, thread
+from tortoisehg.hgqt import revpanel, thread
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
@@ -90,7 +90,7 @@ class CommitWidget(QWidget):
         vbox.addLayout(hbox, 0)
         self.buttonHBox = hbox
 
-        self.pcsinfo = revpanelwidget.ParentWidget(repo)
+        self.pcsinfo = revpanel.ParentWidget(repo)
         vbox.addWidget(self.pcsinfo, 0)
 
         msgte = QPlainTextEdit()

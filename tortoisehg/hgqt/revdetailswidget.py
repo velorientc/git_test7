@@ -13,7 +13,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
-from tortoisehg.hgqt.revpanelwidget import RevPanelWidget
+from tortoisehg.hgqt.revpanel import RevPanelWidget
 from tortoisehg.hgqt.revmessage import RevMessage
 
 from PyQt4.QtCore import *
