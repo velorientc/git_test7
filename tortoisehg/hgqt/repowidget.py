@@ -540,22 +540,18 @@ class RepoWidget(QWidget):
         'User requested a context menu in repo view widget'
         # TODO: selection is ignored at the moment
         menu = QMenu(self)
-        for act in ['update', 'manifest', 'merge', 'tag', 'backout',
-                    'email', 'archive', 'copyhash']:
-            if act:
-                menu.addAction(self._actions[act])
-            else:
-                menu.addSeparator()
-        exs = self.repo.extensions()
-        if 'rebase' in exs:
+        
+        allactions = [['all',    ['update', 'manifest', 'merge', 'tag', 
+                                  'backout', 'email', 'archive', 'copyhash']],
+                      ['rebase', ['rebase']],
+                      ['mq',     ['qgoto', 'qimport', 'qfinish', 'strip']]]
+
+        exs = self.repo.extensions()        
+        for ext, actions in allactions:
+            if ext == 'all' or ext in exs:
+                for act in actions:
+                    menu.addAction(self._actions[act])
             menu.addSeparator()
-            menu.addAction(self._actions['rebase'])
-        if 'mq' in exs:
-            menu.addSeparator()
-            menu.addAction(self._actions['qgoto'])
-            menu.addAction(self._actions['qimport'])
-            menu.addAction(self._actions['qfinish'])
-            menu.addAction(self._actions['strip'])
 
         ctx = self.repo.changectx(self.rev)
 
