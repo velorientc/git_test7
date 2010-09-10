@@ -26,13 +26,13 @@ class RenameDialog(QDialog):
 
     def __init__(self, ui, pats, parent=None, **opts):
         super(RenameDialog, self).__init__(parent=None)
-        iscopy = (opts.get('alias') == 'copy')
+        self.iscopy = (opts.get('alias') == 'copy')
         src = ''
         dest = ''
-        src, dest = self.init_data(ui, pats, iscopy)
-        self.init_view(src, dest, iscopy)
+        src, dest = self.init_data(ui, pats)
+        self.init_view(src, dest)
 
-    def init_data(self, ui, pats, iscopy):
+    def init_data(self, ui, pats):
         """calculate initial values for widgets"""
         fname = ''
         target = ''
@@ -58,11 +58,10 @@ class RenameDialog(QDialog):
             target = hglib.toutf(fname)
         self.opts = {}
         self.opts['force'] = False # Checkbox? Nah.
-        self.opts['after'] = (not iscopy)
         self.opts['dry_run'] = False
         return (fname, target)
 
-    def init_view(self, src, dest, iscopy):
+    def init_view(self, src, dest):
         """define the view"""
 
         # widgets
@@ -148,7 +147,7 @@ class RenameDialog(QDialog):
         # dialog setting
         self.setWindowIcon(qtlib.geticon('rename'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        self.copy_chk.setChecked(iscopy)
+        self.copy_chk.setChecked(self.iscopy)
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.dest_txt.setFocus()
@@ -219,10 +218,6 @@ class RenameDialog(QDialog):
 
     def copy_chk_toggled(self):
         self.setRenameCopy()
-        if self.copy_chk.isChecked():
-            self.opts['after'] = False
-        else:
-            self.opts['after'] = True
         self.show_command(self.compose_command(self.get_src(), self.get_dest()))
 
     def compose_command(self, src, dest):
@@ -232,7 +227,7 @@ class RenameDialog(QDialog):
             cmdline = ['rename']
         cmdline += ['-R', self.repo.root]
         cmdline.append('-v')
-        if self.opts['after']:
+        if not self.copy_chk.isChecked():
             cmdline.append('-A')
         cmdline.append(hglib.fromunicode(src))
         cmdline.append(hglib.fromunicode(dest))
