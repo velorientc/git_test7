@@ -498,10 +498,6 @@ class RepoWidget(QWidget):
     def filterbranch(self):
         return self.repomodel.branch()
 
-    def okToContinue(self):
-        return self.commitDemand.forward('canExit', default=True) and \
-               self.syncDemand.forward('canExit', default=True)
-
     def switchedTo(self):
         'Update back / forward actions'
         self.repoview.updateActions()
@@ -519,6 +515,10 @@ class RepoWidget(QWidget):
         # TODO: should it be 'repowidget/xxx' ?
         self.repotabs_splitter.restoreState(
             s.value('Workbench/repotabs_splitter').toByteArray())
+
+    def okToContinue(self):
+        return self.commitDemand.forward('canExit', default=True) and \
+               self.syncDemand.forward('canExit', default=True)
 
     def closeRepoWidget(self):
         '''returns False if close should be aborted'''
