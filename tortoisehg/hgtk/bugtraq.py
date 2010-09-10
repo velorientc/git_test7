@@ -87,11 +87,19 @@ class BugTraq:
         pathlist = bstrarray.from_param(())
 
         bugtr = self._get_bugtraq_object()
-        (bugid, revPropNames, revPropValues, newmessage) = bugtr.GetCommitMessage2(
-                0, parameters, commonurl, commonurl, pathlist, logmessage, bugid)
+        if self.supports_bugtraq2_interface():
+            (bugid, revPropNames, revPropValues, newmessage) = bugtr.GetCommitMessage2(
+                    0, parameters, commonurl, commonroot, pathlist, logmessage, bugid)
+        else:
+            newmessage = bugtr.GetCommitMessage(
+                    0, parameters, commonroot, pathlist, logmessage)
+
         return newmessage
 
     def on_commit_finished(self, logmessage):
+        if not self.supports_bugtraq2_interface():
+            return ""
+
         commonroot = ""
         bstrarray = _midlSAFEARRAY(comtypes.BSTR)
         pathlist = bstrarray.from_param(())
@@ -110,12 +118,24 @@ class BugTraq:
         return options
     
     def has_options(self):
+        if not self.supports_bugtraq2_interface():
+            return False
+
         bugtr = self._get_bugtraq_object()
         return bugtr.HasOptions() != 0
-        
+
     def get_link_text(self, parameters):
         bugtr = self._get_bugtraq_object()
         return bugtr.GetLinkText(0, parameters)
+
+    def supports_bugtraq2_interface(self):
+        bugtr = self._get_bugtraq_object()
+        try:
+            bugtr.HasOptions()
+            return True
+        except ValueError:
+            return False
+
 
 def get_issue_plugins():
     cm = pythoncom.CoCreateInstance(pythoncom.CLSID_StdComponentCategoriesMgr,
@@ -134,12 +154,16 @@ def get_issue_plugins():
 
 def get_plugin_name(clsid):
     key = OpenKey(HKEY_CLASSES_ROOT, r"CLSID\%s" % clsid)
-    keyvalue = QueryValueEx(key, None) 
+    try:
+        keyvalue = QueryValueEx(key, None)[0]
+    except WindowsError:
+        keyvalue = None
     key.Close()
-    return keyvalue[0]
+    return keyvalue
 
 def get_issue_plugins_with_names():
     pluginclsids = get_issue_plugins()
-    return [(key, get_plugin_name(key)) for key in pluginclsids]
+    keyandnames = [(key, get_plugin_name(key)) for key in pluginclsids]
+    return [kn for kn in keyandnames if kn[1] is not None]
 
 
