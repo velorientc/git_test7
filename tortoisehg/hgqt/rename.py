@@ -6,7 +6,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-
 import os, sys, cStringIO
 
 from PyQt4.QtCore import *
@@ -17,7 +16,6 @@ from mercurial import hg, ui, util, commands, error
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo, thread
 from tortoisehg.util import hglib, paths
-
 
 class RenameDialog(QDialog):
     """TortoiseHg rename dialog"""
@@ -233,6 +231,7 @@ class RenameDialog(QDialog):
         else:
             cmdline = ['rename']
         cmdline += ['-R', self.repo.root]
+        cmdline.append('-v')
         if self.opts['after']:
             cmdline.append('-A')
         cmdline.append(hglib.fromunicode(src))
@@ -364,7 +363,6 @@ class RenameDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('rename/geom', self.saveGeometry())
-
 
 def run(ui, *pats, **opts):
     return RenameDialog(ui, pats, **opts)
