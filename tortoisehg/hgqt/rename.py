@@ -6,12 +6,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, sys, cStringIO
+import os, sys
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, util, commands, error
+from mercurial import hg, ui, util, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo, thread
@@ -56,9 +56,6 @@ class RenameDialog(QDialog):
             target = hglib.toutf(util.normpath(target))
         else:
             target = hglib.toutf(fname)
-        self.opts = {}
-        self.opts['force'] = False # Checkbox? Nah.
-        self.opts['dry_run'] = False
         return (fname, target)
 
     def init_view(self, src, dest):
@@ -273,44 +270,22 @@ class RenameDialog(QDialog):
             if not res:
                 return
 
-        # prepare command line
-        #cmdline, vcl = self.compose_command(self.get_src(), self.get_dest())
-        #qtlib.InfoMsgBox('from rename', cmdline)
-        #return
-
-        # start archiving
-        #self.cmd.run(cmdline)
-
-        opts = self.opts
-        saved = sys.stderr
-        errors = cStringIO.StringIO()
-        try:
-            sys.stderr = errors
-            self.repo.ui.pushbuffer()
-            self.repo.ui.quiet = True
+        cmdline, vcl = self.compose_command(src, dest)
+        self.show_command((cmdline, vcl))
+        new_name = util.canonpath(self.root, self.root, new_name)
+        targetdir = os.path.dirname(new_name) or '.'
+        if not os.path.isdir(targetdir):
+            os.makedirs(targetdir)
+        if not self.copy_chk.isChecked():
             try:
-                new_name = util.canonpath(self.root, self.root, new_name)
-                targetdir = os.path.dirname(new_name) or '.'
-                if not os.path.isdir(targetdir):
-                    os.makedirs(targetdir)
-                if self.copy_chk.isChecked():
-                    commands.copy(self.repo.ui, self.repo, curr_name,
-                                    new_name, **opts)
-                else:
-                    os.rename(curr_name, new_name)
-                    commands.rename(self.repo.ui, self.repo, curr_name,
-                                    new_name, **opts)
-            except (OSError, IOError, util.Abort, error.RepoError), inst:
+                os.rename(curr_name, new_name)
+            except (OSError, IOError), inst:
                 qtlib.ErrorMsgBox(self.errTitle,
                         _('The following erorr was caught with rename :'),
                         hglib.tounicode(inst))
-        finally:
-            sys.stderr = saved
-            textout = hglib.tounicode(errors.getvalue()
-                                        + self.repo.ui.popbuffer())
-            errors.close()
-            if len(textout) > 1:
-                qtlib.ErrorMsgBox(self.errTitle, textout)
+                return
+
+        self.cmd.run(cmdline)
 
     def detail_clicked(self):
         if self.cmd.is_show_output():
