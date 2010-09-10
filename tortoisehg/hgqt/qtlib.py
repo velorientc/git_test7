@@ -544,7 +544,7 @@ class DemandWidget(QWidget):
 
     def forward(self, funcname, *args, **opts):
         if self._widget:
-            getattr(self._widget, funcname)(*args)
+            return getattr(self._widget, funcname)(*args)
         return opts.get('default')
 
     def get(self):
