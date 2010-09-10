@@ -179,8 +179,8 @@ class ManifestWidget(QWidget):
         for w in self._filewidgets.itervalues():
             self._contentview.addWidget(w)
         # TODO: abstract way to connect this kind of signals
-        self.connect(self._filewidgets['annotate'], SIGNAL('revSelected'),
-                     lambda a: self.setsource(path=a[0], rev=a[1]))
+        self._filewidgets['annotate'].revSelected.connect(
+            lambda a: self.setsource(path=a[0], rev=a[1]))
         self._contentview.currentChanged.connect(
             lambda: self._fileselected(self._treeview.currentIndex()))
 
