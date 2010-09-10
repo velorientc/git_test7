@@ -1,4 +1,4 @@
-# docklog.py - Log / progress widget for the TortoiseHg Workbench
+# docklog.py - Log dock widget for the TortoiseHg Workbench
 #
 # Copyright 2010 Steve Borho <steve@borho.org>
 #

@@ -143,8 +143,11 @@ class Core(QObject):
         self.display = None
         self.internallog = useInternal
         if useInternal:
-            self.output_text = QTextBrowser()
-            self.output_text.document().setDefaultStyleSheet(qtlib.thgstylesheet)
+            self.output_text = QPlainTextEdit()
+            self.output_text.setReadOnly(True)
+            self.output_text.setCenterOnScroll(True)
+            self.output_text.setMaximumBlockCount(1024)
+            self.output_text.setWordWrapMode(QTextOption.NoWrap)
 
     ### Public Methods ###
 
@@ -314,7 +317,6 @@ class Widget(QWidget):
         self.core.cancel()
 
     def show_output(self, visible):
-        self.makeLogVisible.emit(True)
         if self.internallog:
             self.core.output_text.setShown(visible)
 
@@ -328,6 +330,7 @@ class Widget(QWidget):
 
     def command_finished(self, wrapper):
         if wrapper.data is None:
+            self.makeLogVisible.emit(True)
             self.show_output(True)
         self.commandFinished.emit(wrapper)
 
@@ -474,7 +477,6 @@ class Runner(QObject):
         self.core.cancel()
 
     def show_output(self, visible=True):
-        self.makeLogVisible.emit(True)
         if not self.internallog:
             return
         if not hasattr(self, 'dlg'):
@@ -492,5 +494,6 @@ class Runner(QObject):
 
     def command_finished(self, wrapper):
         if wrapper.data != 0:
+            self.makeLogVisible.emit(True)
             self.show_output()
         self.commandFinished.emit(wrapper)
