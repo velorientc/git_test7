@@ -46,7 +46,6 @@ class SyncWidget(QWidget):
         self.curuser = None
         self.curpw = None
         self.updateInProgress = False
-        self.tv = PathsTree(root, self)
 
         if not embedded:
             self.setWindowTitle(_('TortoiseHg Sync'))
@@ -107,16 +106,31 @@ class SyncWidget(QWidget):
             self.p4pbutton = None
         layout.addLayout(hbox)
 
-        self.tv.clicked.connect(self.pathSelected)
+        hbox = QHBoxLayout()
 
+        self.hgrctv = PathsTree(self, True)
+        self.hgrctv.clicked.connect(self.pathSelected)
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
         pathsbox = QVBoxLayout()
         pathsframe.setLayout(pathsbox)
         lbl = QLabel(_('<b>Configured Paths</b>'))
         pathsbox.addWidget(lbl)
-        pathsbox.addWidget(self.tv)
-        layout.addWidget(pathsframe, 1)
+        pathsbox.addWidget(self.hgrctv)
+        hbox.addWidget(pathsframe)
+
+        self.reltv = PathsTree(self, False)
+        self.reltv.clicked.connect(self.pathSelected)
+        pathsframe = QFrame()
+        pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
+        pathsbox = QVBoxLayout()
+        pathsframe.setLayout(pathsbox)
+        lbl = QLabel(_('<b>Related Paths</b>'))
+        pathsbox.addWidget(lbl)
+        pathsbox.addWidget(self.reltv)
+        hbox.addWidget(pathsframe)
+
+        layout.addLayout(hbox, 1)
 
         self.savebutton.clicked.connect(self.saveclicked)
         self.authbutton.clicked.connect(self.authclicked)
@@ -177,6 +191,7 @@ class SyncWidget(QWidget):
         self.reload()
 
     def reload(self):
+        # Refresh configured paths
         self.paths = {}
         fn = os.path.join(self.root, '.hg', 'hgrc')
         fn, cfg = loadIniFile([fn], self)
@@ -184,10 +199,31 @@ class SyncWidget(QWidget):
             for alias in cfg['paths']:
                 self.paths[ alias ] = cfg['paths'][ alias ]
         tm = PathsModel(self.paths, self)
-        self.tv.setModel(tm)
+        self.hgrctv.setModel(tm)
+
+        # Refresh post-pull
         self.cachedpp = self.repo.postpull
         name = _('Post Pull: ') + self.repo.postpull.title()
         self.postpullbutton.setText(name)
+
+        # Refresh related paths
+        known = set(self.paths.values())
+        known.add(self.repo.root)
+        related = {}
+        repoid = self.repo[0].node()
+        for repo in thgrepo._repocache.values():
+            if repo[0].node() != repoid:
+                continue
+            if repo.root not in known:
+                related[repo.root] = repo.shortname
+                known.add(repo.root)
+            for alias, path in repo.ui.configitems('paths'):
+                if path not in known:
+                    related[path] = alias
+                    known.add(path)
+        pairs = [(alias, path) for path, alias in related.items()]
+        tm = PathsModel(pairs, self)
+        self.reltv.setModel(tm)
 
     def refreshUrl(self):
         'User has changed schema/host/port/path'
@@ -701,15 +737,16 @@ class AuthDialog(QDialog):
 
 
 class PathsTree(QTreeView):
-    def __init__(self, root, parent=None):
+    def __init__(self, parent, editable):
         QTreeView.__init__(self, parent)
         self.setSelectionMode(QTreeView.SingleSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
         self.parent = parent
+        self.editable = editable
 
     def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Delete):
+        if self.editable and event.matches(QKeySequence.Delete):
             self.deleteSelected()
         else:
             return super(PathsTree, self).keyPressEvent(event)
@@ -761,13 +798,18 @@ class PathsTree(QTreeView):
         return self.selectionModel().selectedRows()
 
 class PathsModel(QAbstractTableModel):
-    def __init__(self, pathdict, parent=None):
+    def __init__(self, pathdictorlist, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
-        for alias, path in pathdict.iteritems():
-            safepath = url.hidepassword(path)
-            self.rows.append([alias, safepath, path])
+        if isinstance(pathdictorlist, dict):
+            for alias, path in pathdictorlist.iteritems():
+                safepath = url.hidepassword(path)
+                self.rows.append([alias, safepath, path])
+        else:
+            for alias, path in pathdictorlist:
+                safepath = url.hidepassword(path)
+                self.rows.append([alias, safepath, path])
 
     def rowCount(self, parent):
         if parent.isValid():
