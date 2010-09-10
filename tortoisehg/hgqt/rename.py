@@ -217,6 +217,11 @@ class RenameDialog(QDialog):
         self.setRenameCopy()
         self.show_command(self.compose_command(self.get_src(), self.get_dest()))
 
+    def isCaseFoldingOnWin(self):
+        fullsrc = os.path.abspath(self.get_src())
+        fulldest = os.path.abspath(self.get_dest())
+        return (fullsrc.upper() == fulldest.upper() and sys.platform == 'win32')
+
     def compose_command(self, src, dest):
         if self.copy_chk.isChecked():
             cmdline = ['copy']
@@ -224,7 +229,7 @@ class RenameDialog(QDialog):
             cmdline = ['rename']
         cmdline += ['-R', self.repo.root]
         cmdline.append('-v')
-        if not self.copy_chk.isChecked():
+        if self.isCaseFoldingOnWin():
             cmdline.append('-A')
         cmdline.append(hglib.fromunicode(src))
         cmdline.append(hglib.fromunicode(dest))
@@ -262,7 +267,7 @@ class RenameDialog(QDialog):
             qtlib.ErrorMsgBox(self.errTitle,
                     _('Please give a destination that differs from the source'))
             return
-        if os.path.exists(dest) and os.path.isfile(dest):
+        if (os.path.isfile(dest) and not self.isCaseFoldingOnWin()):
             res = qtlib.QuestionMsgBox(self.msgTitle, '<p>%s</p><p>%s</p>' %
                     (_('Destination file already exists.'),
                     _('Are you sure you want to overwrite it ?')),
@@ -273,18 +278,28 @@ class RenameDialog(QDialog):
         cmdline, vcl = self.compose_command(src, dest)
         self.show_command((cmdline, vcl))
         new_name = util.canonpath(self.root, self.root, new_name)
-        targetdir = os.path.dirname(new_name) or '.'
-        if not os.path.isdir(targetdir):
-            os.makedirs(targetdir)
-        if not self.copy_chk.isChecked():
-            try:
-                os.rename(curr_name, new_name)
-            except (OSError, IOError), inst:
+        if self.isCaseFoldingOnWin():
+            # We do the rename ourselves if it's a pure casefolding
+            # action on Windows. Because there is no way to make Hg
+            # do 'hg mv foo Foo' correctly there.
+            if self.copy_chk.isChecked():
                 qtlib.ErrorMsgBox(self.errTitle,
-                        _('The following erorr was caught with rename :'),
-                        hglib.tounicode(inst))
+                        _('Cannot do a pure casefolding copy on Windows'))
                 return
-
+            else:
+                try:
+                    targetdir = os.path.dirname(new_name) or '.'
+                    if not os.path.isdir(targetdir):
+                        os.makedirs(targetdir)
+                    os.rename(fullsrc, fulldest)
+                except (OSError, IOError), inst:
+                    if self.copy_chk.isChecked():
+                        txt = _('The following error was caught while copying:')
+                    else:
+                        txt = _('The following error was caught while renaming:')
+                    qtlib.ErrorMsgBox(self.errTitle, txt,
+                            hglib.tounicode(str(inst)))
+                    return
         self.cmd.run(cmdline)
 
     def detail_clicked(self):
