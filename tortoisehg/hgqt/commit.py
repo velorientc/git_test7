@@ -342,10 +342,8 @@ class CommitWidget(QWidget):
 
     def branchOp(self):
         d = branchop.BranchOpDialog(self.repo, self.branchop)
-        self.repo.incrementBusyCount()
         if d.exec_() == QDialog.Accepted:
             self.branchop = d.branchop
-        self.repo.decrementBusyCount()
 
     def canUndo(self):
         'Returns undo description or None if not valid'
