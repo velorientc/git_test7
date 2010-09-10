@@ -565,6 +565,9 @@ class RepoWidget(QWidget):
 
     def updateToRevision(self):
         dlg = update.UpdateDialog(self.rev, self.repo, self)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.progress.connect(self.progress)
         dlg.exec_()
 
     def manifestRevision(self):

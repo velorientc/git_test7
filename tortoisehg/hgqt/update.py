@@ -18,9 +18,9 @@ from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo
 
 class UpdateDialog(QDialog):
 
-    cmdfinished = pyqtSignal(
-                     int  # status (0: succeeded, -1: failed)
-                 ) 
+    output = pyqtSignal(object)
+    progress = pyqtSignal(object)
+    makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, rev=None, repo=None, parent=None, opts={}):
         super(UpdateDialog, self).__init__(parent)
@@ -113,6 +113,9 @@ class UpdateDialog(QDialog):
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)
+        self.cmd.output.connect(self.output)
+        self.cmd.makeLogVisible.connect(self.makeLogVisible)
+        self.cmd.progress.connect(self.progress)
         box.addWidget(self.cmd)
 
         ## bottom buttons
@@ -282,7 +285,6 @@ class UpdateDialog(QDialog):
             res = 0
         else:
             res = -1
-        self.cmdfinished.emit(res)
         if wrapper.data is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
