@@ -226,21 +226,26 @@ class SearchWidget(QWidget):
         pass
 
     def finished(self):
-        for col in xrange(COL_TEXT):
-            self.tv.resizeColumnToContents(col)
-        self.tv.sortByColumn(COL_REVISION)
-        self.tv.setSortingEnabled(True)
+        count = self.tv.model().rowCount(None)
+        if not count:
+            self.showMessage.emit(_('No matches found'))
+        else:
+            self.showMessage.emit(_('%d matches found') % count)
+            for col in xrange(COL_TEXT):
+                self.tv.resizeColumnToContents(col)
+            self.tv.sortByColumn(COL_REVISION)
+            self.tv.setSortingEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
         self.loadComplete.emit()
 
-class DataWrapper(QObject):
+class DataWrapper(object):
     def __init__(self, data):
         self.data = data
 
 class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
-    matchedRow = pyqtSignal(object)
+    matchedRow = pyqtSignal(DataWrapper)
     showMessage = pyqtSignal(unicode)
     finished = pyqtSignal()
 
