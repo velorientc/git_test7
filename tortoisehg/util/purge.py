@@ -8,15 +8,16 @@
 import os
 import stat
 
+from mercurial import cmdutil
+
 # Heavily influenced by Mercurial's purge extension
 
 def purge(repo, files):
-    directories = set()
+    directories = []
     failures = []
 
     def remove(remove_func, name):
         try:
-            directories.add(os.path.dirname(name) + '/')
             remove_func(repo.wjoin(name))
         except EnvironmentError:
             failures.append(name)
@@ -32,11 +33,15 @@ def purge(repo, files):
             os.chmod(path, stat.S_IMODE(s.st_mode) | stat.S_IWRITE)
             os.remove(path)
 
-    for f in sorted(files):
-        remove(removefile, f)
+    match = cmdutil.match(repo, [], {})
+    match.dir = directories.append
+    status = repo.status(match=match, ignored=True, unknown=True)
 
-    dirs = list(directories)
-    for f in sorted(dirs, reverse=True):
+    for f in sorted(status[4] + status[5]):
+        if f in files:
+            remove(removefile, f)
+
+    for f in sorted(directories, reverse=True):
         if not os.listdir(repo.wjoin(f)):
             remove(os.rmdir, f)
 
