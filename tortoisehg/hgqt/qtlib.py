@@ -542,9 +542,10 @@ class DemandWidget(QWidget):
         self.get()
         super(DemandWidget, self).showEvent(event)
 
-    def forward(self, funcname, *args):
+    def forward(self, funcname, *args, **opts):
         if self._widget:
             getattr(self._widget, funcname)(*args)
+        return opts.get('default')
 
     def get(self):
         """Returns the stored widget"""
