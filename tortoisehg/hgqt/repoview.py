@@ -66,7 +66,7 @@ class HgRepoView(QTableView):
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
     menuRequested = pyqtSignal(QPoint, object)
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(unicode)
 
     def __init__(self, workbench, repo, parent=None):
         QTableView.__init__(self, parent)
@@ -224,7 +224,7 @@ class HgRepoView(QTableView):
        if ctx.thgmqunappliedpatch() or ctx2.thgmqunappliedpatch():
            return
        ancestor = ctx.ancestor(ctx2)
-       self.showMessage.emit("Goto ancestor of %s and %s"%(ctx.rev(), ctx2.rev()))
+       self.showMessage.emit(_("Goto ancestor of %s and %s")%(ctx.rev(), ctx2.rev()))
        self.goto(ancestor.rev())
 
     def updateActions(self):
@@ -264,7 +264,7 @@ class HgRepoView(QTableView):
         try:
             rev = self.repo.changectx(rev).rev()
         except RepoError:
-            self.showMessage.emit("Can't find revision '%s'" % rev)
+            self.showMessage.emit(_("Can't find revision '%s'") % rev)
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
