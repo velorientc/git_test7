@@ -368,13 +368,16 @@ class SyncWidget(QWidget):
             elif ret == 1:
                 self.showMessage.emit(_('No incoming changesets'))
             else:
-                self.showMessage.emit(_('Incoming finished, ret %d') % ret)
+                self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
         self.finishfunc = finished
         self.run(['--repository', self.root, 'incoming'])
 
     def pullclicked(self):
         def finished(ret, output):
-            self.showMessage.emit(_('Pull finished, ret %d') % ret)
+            if ret == 0:
+                self.showMessage.emit(_('Pull completed successfully'))
+            else:
+                self.showMessage.emit(_('Pull aborted, ret %d') % ret)
         self.finishfunc = finished
         cmdline = ['--repository', self.root, 'pull', '--verbose']
         if self.cachedpp == 'rebase':
@@ -396,7 +399,7 @@ class SyncWidget(QWidget):
                 elif ret == 1:
                     self.showMessage.emit(_('No outgoing changesets'))
                 else:
-                    self.showMessage.emit(_('Outgoing finished, ret %d') % ret)
+                    self.showMessage.emit(_('Outgoing aborted, ret %d') % ret)
             self.finishfunc = outputnodes
             self.run(['--repository', self.root, 'outgoing',
                       '--quiet', '--template', '{node}\n'])
@@ -445,7 +448,10 @@ class SyncWidget(QWidget):
 
     def pushclicked(self):
         def finished(ret, output):
-            self.showMessage.emit(_('Push finished, ret %d') % ret)
+            if ret == 0:
+                self.showMessage.emit(_('Push completed successfully'))
+            else:
+                self.showMessage.emit(_('Push aborted, ret %d') % ret)
         self.finishfunc = finished
         self.run(['--repository', self.root, 'push', '--verbose'])
 
