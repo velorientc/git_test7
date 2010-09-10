@@ -236,10 +236,10 @@ class RepoWidget(QWidget):
             ('archive', _('Archive...'), None, None, None, self.archiveRevision),
             ('copyhash', _('Copy hash'), None, None, None, self.copyHash),
             ('rebase', _('Rebase...'), None, None, None, self.rebaseRevision),
-            ('qimport', _('Import Revision to MQ'), None, None, None,
+            ('qimport', _('Import to MQ'), None, None, None,
                 self.qimportRevision),
             ('qfinish', _('Finish patch'), None, None, None, self.qfinishRevision),
-            ('strip', _('Strip Revision...'), None, None, None, self.stripRevision),
+            ('strip', _('Strip...'), None, None, None, self.stripRevision),
             ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision)
         ]
 
