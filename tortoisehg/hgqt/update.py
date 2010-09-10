@@ -14,12 +14,12 @@ from mercurial import ui, error
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, thread
 
 class UpdateDialog(QDialog):
 
-    output = pyqtSignal(object)
-    progress = pyqtSignal(object)
+    output = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(thread.DataWrapper)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, rev=None, repo=None, parent=None, opts={}):
