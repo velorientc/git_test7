@@ -1,6 +1,15 @@
+# lexers.py - select Qsci lexer for a filename and contents
+#
+# Copyright 2010 Steve Borho <steve@borho.org>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
+
 import re
-from PyQt4 import QtCore, QtGui, Qsci
-from PyQt4.QtCore import Qt
+
+from PyQt4 import Qsci
+from PyQt4.QtGui import *
+
 from tortoisehg.hgqt import qtlib
 
 class _LexerSelector(object):
@@ -117,7 +126,7 @@ class DiffLexerSelector(_ScriptLexerSelector):
             effect = qtlib.geteffect(label)
             for e in effect.split(';'):
                 if e.startswith('color:'):
-                    lexer.setColor(QtGui.QColor(e[7:]), i)
+                    lexer.setColor(QColor(e[7:]), i)
         font = qtlib.getfont(ui, 'fontdiff').font()
         lexer.setFont(font, -1)
         return lexer
@@ -138,5 +147,3 @@ def get_lexer(filename, filedata, fileflag=None, ui=None):
         if lselector.match(filename, filedata):
             return lselector.lexer(ui)
     return None
-
-        
