@@ -499,10 +499,8 @@ class RepoWidget(QWidget):
         return self.repomodel.branch()
 
     def okToContinue(self):
-        cw = self.getCommitWidget()
-        if cw:
-            return cw.canExit()
-        return True
+        return self.commitDemand.forward('canExit', default=True) and \
+               self.syncDemand.forward('canExit', default=True)
 
     def switchedTo(self):
         'Update back / forward actions'
