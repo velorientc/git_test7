@@ -7,40 +7,39 @@
 
 import os
 
-from mercurial import util
-
-from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib
 
 from tortoisehg.hgqt import qtlib
 
-class BranchOpDialog(QtGui.QDialog):
+class BranchOpDialog(QDialog):
     'Dialog for manipulating wctx.branch()'
     def __init__(self, repo, oldbranchop, parent=None):
-        QtGui.QDialog.__init__(self, parent)
-        layout = QtGui.QVBoxLayout()
+        QDialog.__init__(self, parent)
+        layout = QVBoxLayout()
         self.setLayout(layout)
         wctx = repo[None]
 
         if len(wctx.parents()) == 2:
-            lbl = QtGui.QLabel('<b>'+_('Select branch of merge commit')+'</b>')
+            lbl = QLabel('<b>'+_('Select branch of merge commit')+'</b>')
             layout.addWidget(lbl)
-            branchCombo = QtGui.QComboBox()
+            branchCombo = QComboBox()
             for p in wctx.parents():
                 branchCombo.addItem(hglib.tounicode(p.branch()))
             layout.addWidget(branchCombo)
         else:
             text = '<b>'+_('Changes take effect on next commit')+'</b>'
-            lbl = QtGui.QLabel(text)
+            lbl = QLabel(text)
             layout.addWidget(lbl)
 
-            grid = QtGui.QGridLayout()
-            nochange = QtGui.QRadioButton(_('No branch changes'))
-            newbranch = QtGui.QRadioButton(_('Open a new named branch'))
-            closebranch = QtGui.QRadioButton(_('Close current named branch'))
-            branchCombo = QtGui.QComboBox()
+            grid = QGridLayout()
+            nochange = QRadioButton(_('No branch changes'))
+            newbranch = QRadioButton(_('Open a new named branch'))
+            closebranch = QRadioButton(_('Close current named branch'))
+            branchCombo = QComboBox()
             branchCombo.setEditable(True)
             for name in hglib.getlivebranch(repo):
                 if name == wctx.branch():
@@ -72,27 +71,25 @@ class BranchOpDialog(QtGui.QDialog):
                 newbranch.setChecked(True)
             self.closebranch = closebranch
 
-        BB = QtGui.QDialogButtonBox
-        bb = QtGui.QDialogButtonBox(BB.Ok|BB.Cancel)
-        self.connect(bb, QtCore.SIGNAL("accepted()"),
-                     self, QtCore.SLOT("accept()"))
-        self.connect(bb, QtCore.SIGNAL("rejected()"),
-                     self, QtCore.SLOT("reject()"))
-        bb.button(BB.Ok).setDefault(True)
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
+        bb.button(BB.Ok).setAutoDefault(True)
         layout.addWidget(bb)
         self.bb = bb
         self.branchCombo = branchCombo
 
     def keyPressEvent(self, event):
         # todo - is this necessary for a derivation of QDialog?
-        if event.key() in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
-            if event.modifiers() == QtCore.Qt.ControlModifier:
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            if event.modifiers() == Qt.ControlModifier:
                 self.accept()  # Ctrl+Enter
             return
-        elif event.key() == QtCore.Qt.Key_Escape:
+        elif event.key() == Qt.Key_Escape:
             self.reject()
             return
-        return super(QtGui.QDialog, self).keyPressEvent(event)
+        return super(QDialog, self).keyPressEvent(event)
 
     def accept(self):
         '''Branch operation is one of:
@@ -106,4 +103,4 @@ class BranchOpDialog(QtGui.QDialog):
             self.branchop = False
         else:
             self.branchop = None
-        QtGui.QDialog.accept(self)
+        QDialog.accept(self)
