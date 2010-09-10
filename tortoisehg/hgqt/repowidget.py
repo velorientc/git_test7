@@ -541,8 +541,7 @@ class RepoWidget(QWidget):
         # TODO: selection is ignored at the moment
         menu = QMenu(self)
         for act in ['update', 'manifest', 'merge', 'tag', 'backout',
-                    'email', 'archive', 'copyhash', None,
-                    None]:
+                    'email', 'archive', 'copyhash']:
             if act:
                 menu.addAction(self._actions[act])
             else:
@@ -552,15 +551,37 @@ class RepoWidget(QWidget):
             menu.addSeparator()
             menu.addAction(self._actions['rebase'])
         if 'mq' in exs:
-            ctx = self.repo.changectx(self.rev)
             menu.addSeparator()
-            if ctx.thgmqappliedpatch():
-                menu.addAction(self._actions['qfinish'])
-            elif ctx.thgmqunappliedpatch():
-                menu.addAction(self._actions['qgoto'])
-            else:
-                menu.addAction(self._actions['qimport'])
+            menu.addAction(self._actions['qgoto'])
+            menu.addAction(self._actions['qimport'])
+            menu.addAction(self._actions['qfinish'])
             menu.addAction(self._actions['strip'])
+
+        ctx = self.repo.changectx(self.rev)
+
+        workingdir = self.rev is None
+        appliedpatch = ctx.thgmqappliedpatch() 
+        unappliedpatch = ctx.thgmqunappliedpatch()
+        patch = appliedpatch or unappliedpatch
+        realrev = not unappliedpatch and not workingdir
+        normalrev = not patch and not workingdir
+
+        enabled = {'update': normalrev,
+                   'manifest': not unappliedpatch,
+                   'merge': normalrev,
+                   'tag': normalrev,
+                   'backout': normalrev,
+                   'email': not workingdir,
+                   'archive': realrev,
+                   'copyhash': realrev,
+                   'rebase': normalrev,
+                   'qgoto': patch,
+                   'qimport': normalrev,
+                   'qfinish': appliedpatch,
+                   'strip': normalrev}
+        for action, enabled in enabled.iteritems():
+            self._actions[action].setEnabled(enabled)
+
         menu.exec_(point)
 
     def updateToRevision(self):

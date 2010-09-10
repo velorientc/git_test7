@@ -385,7 +385,7 @@ def _extendchangectx(changectx):
 
         def thgmqappliedpatch(self):
             '''True if self is an MQ applied patch'''
-            return bool(self._thgmqpatchtags())
+            return self.rev() is not None and bool(self._thgmqpatchtags())
 
         def thgmqunappliedpatch(self): return False
 
