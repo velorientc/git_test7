@@ -122,9 +122,14 @@ class DiffLexerSelector(_ScriptLexerSelector):
         lexer.setFont(font, -1)
         return lexer
 
-    
-lexers = [cls() for clsname, cls in globals().items() if not clsname.startswith('_') and isinstance(cls, type) and \
-          issubclass(cls, (_LexerSelector, _FilenameLexerSelector, _ScriptLexerSelector))]
+
+lexers = []
+for clsname, cls in globals().items():
+    if clsname.startswith('_'):
+        continue
+    if isinstance(cls, type) and issubclass(cls, _LexerSelector):
+        #print clsname
+        lexers.append(cls())
 
 def get_lexer(filename, filedata, fileflag=None, ui=None):
     if fileflag == "=":
