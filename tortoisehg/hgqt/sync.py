@@ -198,7 +198,7 @@ class SyncWidget(QWidget):
         if 'paths' in cfg:
             for alias in cfg['paths']:
                 self.paths[ alias ] = cfg['paths'][ alias ]
-        tm = PathsModel(self.paths, self)
+        tm = PathsModel(self.paths.items(), self)
         self.hgrctv.setModel(tm)
 
         # Refresh post-pull
@@ -807,18 +807,13 @@ class PathsTree(QTreeView):
         return self.selectionModel().selectedRows()
 
 class PathsModel(QAbstractTableModel):
-    def __init__(self, pathdictorlist, parent=None):
+    def __init__(self, pathlist, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
-        if isinstance(pathdictorlist, dict):
-            for alias, path in pathdictorlist.iteritems():
-                safepath = url.hidepassword(path)
-                self.rows.append([alias, safepath, path])
-        else:
-            for alias, path in pathdictorlist:
-                safepath = url.hidepassword(path)
-                self.rows.append([alias, safepath, path])
+        for alias, path in pathlist:
+            safepath = url.hidepassword(path)
+            self.rows.append([alias, safepath, path])
 
     def rowCount(self, parent):
         if parent.isValid():
