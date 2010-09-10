@@ -23,7 +23,7 @@ from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo
 
 from tortoisehg.hgqt.thread import DataWrapper
 from tortoisehg.hgqt.repoview import HgRepoView
-from tortoisehg.hgqt.revdetailswidget import RevDetailsWidget
+from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
 from tortoisehg.hgqt.manifestdialog import ManifestWidget
 from tortoisehg.hgqt.sync import SyncWidget
