@@ -92,6 +92,18 @@ class HTMLLexerSelector(_FilenameLexerSelector):
     extensions = ('.htm', '.html', '.xhtml', '.xml')
     _lexer = Qsci.QsciLexerHTML
 
+class VerilogLexerSelector(_FilenameLexerSelector):
+    extensions = ('.v', '.vh')
+    _lexer = Qsci.QsciLexerVerilog
+
+class VHDLLexerSelector(_FilenameLexerSelector):
+    extensions = ('.vhd', '.vhdl')
+    _lexer = Qsci.QsciLexerVHDL
+
+class BatchLexerSelector(_FilenameLexerSelector):
+    extensions = ('.cmd', '.bat')
+    _lexer = Qsci.QsciLexerBatch
+
 class MakeLexerSelector(_FilenameLexerSelector):
     extensions = ('.mk', 'makefile')
     _lexer = Qsci.QsciLexerMakefile
