@@ -88,20 +88,18 @@
       <Directory Id='ProgramFilesFolder' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='TortoiseHg'>
           <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)'>
-            <File Id='hgtkEXE' Name='hgtk.exe' KeyPath='yes'
-                  Source='dist\hgtk.exe'
-            />
-            <File Id='hgEXE' Name='hg.exe'
-                  Source='dist\hg.exe'
-            />
-            <File Id='libraryZIP' Name='library.zip'
-                  Source='dist\library.zip'
-            />
-            <File Id='pythonDLL' Name='python26.dll'
-                  Source='dist\python26.dll'
+            <File Id='thgEXE' Name='thg.exe' KeyPath='yes'
+                  Source='dist\thg.exe'
             />
             <Environment Id="Environment" Name="PATH" Part="last" System="yes"
-                         Permanent="no" Value="[INSTALLDIR]" Action="set"
+                         Permanent="no" Value="[INSTALLDIR]bin" Action="set"
+            />
+          </Component>
+          <Component Id='WinExecutable' Guid='$(var.ComponentWinExecutableGUID)'>
+            <File Id='thgwEXE' Name='thgw.exe' Source='dist\thgw.exe' />
+            <Shortcut Id="thgStartMenu" Directory="ProgramMenuDir"
+                      Name="TortoiseHg Workbench"
+                      Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
             />
           </Component>
           <Component Id='ExtensionVersions' Guid='$(var.ExtensionVersions.guid)'>
@@ -169,16 +167,7 @@
                   Source='..\contrib\kdiff3.exe'
             />
           </Component>
-          <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)'>
-            <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
-                  Source='..\contrib\TortoisePlink.exe'
-            />
-          </Component>
-          <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)'>
-            <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
-                  Source='..\contrib\Pageant.exe'
-            />
-          </Component>
+
           <Directory Id='docFolder' Name='doc'>
             <Component Id='chmFile' Guid='$(var.chmFile.guid)'>
               <File Id='chmFile' Name='TortoiseHg.chm' KeyPath='yes'
@@ -209,10 +198,33 @@
             </Component>
           </Directory>
 
+          <Directory Id='binFolder' Name='bin'>
+            <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)'>
+              <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
+                    Source='..\contrib\TortoisePlink.exe'
+              />
+            </Component>
+            <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)'>
+              <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
+                    Source='..\contrib\Pageant.exe'
+              />
+            </Component>
+            <Component Id='ThgCmd' Guid='$(var.thgcmd.guid)'>
+              <File Id='Thg.Cmd' Name='thg.cmd' KeyPath='yes'
+                    Source='win32\thg.cmd'
+              />
+            </Component>
+            <Component Id='HgCmd' Guid='$(var.hgcmd.guid)'>
+              <File Id='Hg.Cmd' Name='hg.cmd' KeyPath='yes'
+                    Source='win32\hg.cmd'
+              />
+            </Component>
+          </Directory>
+
           <Directory Id='HGRCD' Name='hgrc.d'>
             <Component Id='mercurial.rc' Guid='$(var.mercurial.rc.guid)'>
               <File Id='mercurial.rc' Name='Mercurial.rc' ReadOnly='yes'
-                    Source='contrib\win32\mercurial.rc'
+                    Source='win32\mercurial.rc'
               />
             </Component>
             <Component Id='mergetools.rc' Guid='$(var.mergetools.rc.guid)'>
@@ -223,7 +235,7 @@
             <Component Id="mergepatterns.rc" Guid='$(var.mergepatterns.rc.guid)'>
               <File Id='mergepatterns.rc' Name='MergePatterns.rc'
                     ReadOnly='yes' KeyPath='yes'
-                    Source='contrib\win32\mergepatterns.rc'
+                    Source='win32\mergepatterns.rc'
               />
             </Component>
           </Directory>
@@ -231,7 +243,7 @@
       </Directory>
 
       <Directory Id="ProgramMenuFolder" Name="Programs">
-        <Directory Id="ProgramMenuDir" Name="TortoiseHg $(var.Version)">
+        <Directory Id="ProgramMenuDir" Name="TortoiseHg">
           <Component Id="ProgramMenuDir" Guid="$(var.ProgramMenuDir.guid)">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryValue
@@ -247,15 +259,6 @@
           </Component>
         </Directory>
       </Directory>
-
-      <!-- Directory Id="AppDataFolder" Name="AppData">
-        <Directory Id="ThgAppData" Name="TortoiseHg">
-          <Component Id="ThgAppData" Guid="$(var.ThgAppData.guid)">
-            <RemoveFolder Id='ThgAppData' On='uninstall' />
-            <RegistryValue Root='HKCU' Key='Software\TortoiseHg\AppData' KeyPath='yes' />
-          </Component>
-        </Directory>
-      </Directory -->
 
       <Merge Id='VCRedist' DiskId='1' Language='1033'
              SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x86_msm.msm'
@@ -312,18 +315,21 @@
              Description='The complete package' >
       <Feature Id='MainProgram' Title='Program'
                Level='1' Absent='disallow' Display='hidden'
-               Description='Command line applications: hg, hgtk' >
+               Description='Command line applications: hg, thg' >
         <ComponentRef Id='MainExecutable' />
+        <ComponentRef Id='WinExecutable' />
         <ComponentRef Id='ProgramMenuDir' />
         <ComponentRef Id='COPYING' />
         <ComponentRef Id='mercurial.rc' />
         <ComponentRef Id='mergetools.rc' />
         <ComponentRef Id='ExtensionVersions' />
         <ComponentRef Id='helpFolder' />
+        <ComponentRef Id='distOutput' />
+        <ComponentRef Id='imageFormats' />
+        <ComponentRef Id='ThgCmd' />
+        <ComponentRef Id='HgCmd' />
         <ComponentGroupRef Id='templatesFolder' />
-        <ComponentGroupRef Id='gtkFolder' />
         <ComponentRef Id='Icons' />
-        <ComponentRef Id='SvgIcons' />
       </Feature>
       <Feature Id='VCRedist' Title='Visual C++ 9.0 Runtime'
                AllowAdvertise='no' Display='hidden' Level='1'>
@@ -478,9 +484,9 @@
       "NOTE: Logoff/logon or restarting explorer may be needed to start the overlay icons"
     />
 
-    <WixVariable Id="WixUILicenseRtf" Value="contrib\wix\COPYING.rtf" />
-    <WixVariable Id="WixUIBannerBmp" Value="contrib\wix\WixUIBannerBmp.bmp" />
-    <WixVariable Id="WixUIDialogBmp" Value="contrib\wix\WixUIDialogBmp.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="win32\wix\COPYING.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="win32\wix\WixUIBannerBmp.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="win32\wix\WixUIDialogBmp.bmp" />
 
     <Icon Id="thgIcon.ico" SourceFile="icons\thg_logo.ico" />
     <Icon Id="hgIcon.ico" SourceFile="icons\hg.ico" />

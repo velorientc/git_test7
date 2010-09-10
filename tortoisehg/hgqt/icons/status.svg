@@ -19,8 +19,7 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="C:\src\thg\new-icons\icons\tortoise\commit-32.png"
    inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90"
-   sodipodi:docbase="E:\src\thg\thg-icons\icons\tortoise">
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -210,20 +209,6 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Bitmap"
-     style="display:none">
-    <image
-       y="0"
-       x="0"
-       id="image2738"
-       height="32"
-       width="32"
-       sodipodi:absref="C:\src\thg\new-icons\icons\tortoise\menushowchanged.ico"
-       xlink:href="menushowchanged.ico" />
-  </g>
   <g
      inkscape:label="Vector"
      inkscape:groupmode="layer"
