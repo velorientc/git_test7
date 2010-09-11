@@ -658,9 +658,10 @@ class RepoWidget(QWidget):
                    '--repository', self.repo.root]
         self.runCommand(_('QFinish - TortoiseHg'), cmdline)
 
-    def qgotoRevision(self, patchname=None):
-        """Make PATCHNAME the top applied patch"""
-        patchname = patchname or self.rev
+    def qgotoRevision(self, rev=None):
+        """Make REV the top applied patch"""
+        rev = rev or self.rev
+        patchname = self.repo.changectx(rev).thgmqpatchname()
         cmdline = ['qgoto', str(patchname),  # FIXME force option
                    '--repository', self.repo.root]
         self.runCommand(_('QGoto - TortoiseHg'), cmdline)
