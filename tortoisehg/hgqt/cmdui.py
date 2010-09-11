@@ -361,7 +361,7 @@ class Dialog(QDialog):
 
         ## status and progress labels
         self.stbar = ThgStatusBar()
-        #self.stbar.setSizeGripEnabled(False)
+        self.stbar.setSizeGripEnabled(False)
         self.core.set_stbar(self.stbar)
         vbox.addWidget(self.stbar)
 
