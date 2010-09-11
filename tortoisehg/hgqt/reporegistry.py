@@ -87,7 +87,7 @@ class RepoTreeView(QTreeView):
 
     def _action_defs(self):
         a = [("open", _("Open"), None,
-                _("Opens the repository in a new tab"), None, self.open),
+                _("Open the repository in a new tab"), None, self.open),
              ("newGroup", _("New Group"), None,
                 _("Create a new group"), None, self.newGroup),
              ("rename", _("Rename"), None,
@@ -104,6 +104,8 @@ class RepoTreeView(QTreeView):
                 _("Open the repository in Windows Explorer"), None, self.explore),
              ("terminal", _("Terminal"), None,
                 _("Open a shell terminal in repository root"), None, self.terminal),
+             ("add", _("Add repository..."), None,
+                _("Add a repository to this group"), None, self.addRepo),
              ]
         return a
 
@@ -187,6 +189,12 @@ class RepoTreeView(QTreeView):
         root = self.selitem.internalPointer().rootpath()
         repo = thgrepo.repository(path=root)
         self.workbench.launchTerminal(repo)
+
+    def addRepo(self):
+        if not self.selitem:
+            return
+        m = self.model()
+        m.addRepo('')
 
 class RepoRegistryView(QDockWidget):
 

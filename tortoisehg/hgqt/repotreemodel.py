@@ -5,6 +5,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+from mercurial import error
+
+from tortoisehg.hgqt import thgrepo
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
@@ -12,6 +15,7 @@ from repotreeitem import undumpObject, AllRepoGroupItem, RepoGroupItem
 from repotreeitem import RepoItem, RepoTreeItem
 
 from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 
 extractXmlElementName = 'reporegextract'
@@ -122,7 +126,7 @@ class RepoTreeModel(QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        if (role != Qt.DisplayRole 
+        if (role != Qt.DisplayRole
                 and role != Qt.EditRole and role != Qt.DecorationRole):
             return QVariant()
         item = index.internalPointer()
@@ -195,6 +199,20 @@ class RepoTreeModel(QAbstractItemModel):
         return self.createIndex(0, 0, self.allrepos)
 
     def addRepo(self, reporoot):
+        if reporoot == '':
+            caption = _('Select repository directory to add')
+            FD = QFileDialog
+            path = FD.getExistingDirectory(caption=caption,
+                    options=FD.ShowDirsOnly | FD.ReadOnly)
+            if path:
+                try:
+                    repo = thgrepo.repository(self.ui, path=hglib.fromunicode(path))
+                except error.RepoError:
+                    QMessageBox.warning(self, _('Failed to add repository'),
+                        _('%s is not a valid repository') % path)
+                    return
+            else:
+                return
         all = self.allrepos
         cc = all.childCount()
         self.beginInsertRows(self.allreposIndex(), cc, cc + 1)

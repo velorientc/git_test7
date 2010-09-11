@@ -244,7 +244,7 @@ class RepoGroupItem(RepoTreeItem):
         return False
 
     def menulist(self):
-        return ['newGroup', None, 'rename', 'remove']
+        return ['newGroup', None, 'add', 'rename', 'remove']
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
@@ -287,7 +287,7 @@ class AllRepoGroupItem(RepoTreeItem):
         return False
 
     def menulist(self):
-        return ['newGroup']
+        return ['newGroup', 'add']
 
     def flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
