@@ -458,18 +458,18 @@ class HgRepoListModel(QAbstractTableModel):
         if ctx.thgbranchhead():
             effects = qtlib.geteffect('log.branch')
             text = qtlib.applyeffects(' %s ' % ctx.branch(), effects)
-            parts.append(text)
+            parts.append(hglib.tounicode(text))
 
         for tag in ctx.thgtags():
             style = self.repo.thgmqtag(tag) and 'log.patch' or 'log.tag'
             effects = qtlib.geteffect(style)
             text = qtlib.applyeffects(' %s ' % tag, effects)
-            parts.append(text)
+            parts.append(hglib.tounicode(text))
 
         if msg:
             if ctx.thgwdparent():
                 msg = qtlib.markup(msg, weight='bold')
-        parts.append(msg)
+        parts.append(hglib.tounicode(msg))
 
         return ' '.join(parts)
 
