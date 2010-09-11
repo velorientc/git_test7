@@ -46,8 +46,8 @@ class MergeDialog(gdialog.GDialog):
         elif (not rev1 and rev1 != 0):
             gdialog.Prompt(_('Unable to merge'),
                            _('Must supply a target revision'), self).run()
-            gtklib.idle_add_single_call(self.destroy)
-            return
+            gtklib.idle_add_single_call(self.hide)
+            return False
         elif (not rev0 and rev0 != 0):
             rev0 = prevs[0]
         elif rev1 == prevs[0]:
@@ -59,8 +59,8 @@ class MergeDialog(gdialog.GDialog):
             if modified or added or removed or deleted:
                 gdialog.Prompt(_('Unable to merge'),
                                _('Outstanding uncommitted changes'), self).run()
-                gtklib.idle_add_single_call(self.destroy)
-                return
+                gtklib.idle_add_single_call(self.hide)
+                return False
             self.repo.ui.quiet = True
             commands.update(self.repo.ui, self.repo, rev=rev0, check=True)
             self.repo.ui.quiet = False
