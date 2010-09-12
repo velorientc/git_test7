@@ -126,11 +126,6 @@ class CmdThread(QThread):
     # (msg=str, label=str) [wrapped]
     errorReceived = pyqtSignal(DataWrapper)
 
-    # (msg=str, password=bool, choices=tuple, default=str) [wrapped]
-    # password: whether should be masked by asterisk chars
-    # choices:  tuple of choice strings
-    interactReceived = pyqtSignal(DataWrapper)
-
     # (topic=str, item=str, pos=int, total=int, unit=str) [wrapped]
     progressReceived = pyqtSignal(DataWrapper)
 
@@ -151,7 +146,6 @@ class CmdThread(QThread):
         self.rawoutput = []
 
         self.finished.connect(self.thread_finished)
-        self.interactReceived.connect(self.interact_handler)
 
     def abort(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
@@ -199,7 +193,7 @@ class CmdThread(QThread):
         ui = QtUi(responseq=self.responseq)
         ui.sig.writeSignal.connect(self.output_handler)
         ui.sig.errorSignal.connect(self.errorReceived)
-        ui.sig.interactSignal.connect(self.interactReceived)
+        ui.sig.interactSignal.connect(self.interact_handler)
         ui.sig.progressSignal.connect(self.progressReceived)
 
         try:
