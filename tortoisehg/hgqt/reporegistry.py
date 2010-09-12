@@ -194,7 +194,7 @@ class RepoTreeView(QTreeView):
         if not self.selitem:
             return
         m = self.model()
-        m.addRepo('')
+        m.addRepo(self.selitem, '')
 
 class RepoRegistryView(QDockWidget):
 
@@ -233,7 +233,7 @@ class RepoRegistryView(QDockWidget):
     def addRepo(self, reporoot):
         m = self.tmodel
         if m.getRepoItem(reporoot) == None:
-            m.addRepo(reporoot)
+            m.addRepo(None, reporoot)
 
     def openrepo(self, path):
         self.openRepoSignal.emit(hglib.tounicode(path))

@@ -198,8 +198,9 @@ class RepoTreeModel(QAbstractItemModel):
     def allreposIndex(self):
         return self.createIndex(0, 0, self.allrepos)
 
-    def addRepo(self, reporoot):
-        if reporoot == '':
+    def addRepo(self, group, reporoot):
+        ar = reporoot
+        if ar == '':
             caption = _('Select repository directory to add')
             FD = QFileDialog
             path = FD.getExistingDirectory(caption=caption,
@@ -207,16 +208,20 @@ class RepoTreeModel(QAbstractItemModel):
             if path:
                 try:
                     repo = thgrepo.repository(self.ui, path=hglib.fromunicode(path))
+                    ar = repo.root
                 except error.RepoError:
                     QMessageBox.warning(self, _('Failed to add repository'),
                         _('%s is not a valid repository') % path)
                     return
             else:
                 return
-        all = self.allrepos
-        cc = all.childCount()
-        self.beginInsertRows(self.allreposIndex(), cc, cc + 1)
-        all.appendChild(RepoItem(self, reporoot))
+        grp = group
+        if grp == None:
+            grp = self.allreposIndex()
+        rgi = grp.internalPointer()
+        cc = rgi.childCount()
+        self.beginInsertRows(grp, cc, cc + 1)
+        rgi.appendChild(RepoItem(self, rootpath=ar))
         self.endInsertRows()
 
     def getRepoItem(self, reporoot):
