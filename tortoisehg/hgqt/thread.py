@@ -148,13 +148,7 @@ class CmdThread(QThread):
         self.ret = None
         self.abortbyuser = False
         self.responseq = Queue.Queue()
-        self.ui = QtUi(responseq=self.responseq)
         self.rawoutput = []
-
-        self.ui.sig.writeSignal.connect(self.output_handler)
-        self.ui.sig.errorSignal.connect(self.errorReceived)
-        self.ui.sig.interactSignal.connect(self.interactReceived)
-        self.ui.sig.progressSignal.connect(self.progressReceived)
 
         self.finished.connect(self.thread_finished)
         self.interactReceived.connect(self.interact_handler)
@@ -202,16 +196,22 @@ class CmdThread(QThread):
         # save thread id in order to terminate by KeyboardInterrupt
         self.thread_id = int(QThread.currentThreadId())
 
+        ui = QtUi(responseq=self.responseq)
+        ui.sig.writeSignal.connect(self.output_handler)
+        ui.sig.errorSignal.connect(self.errorReceived)
+        ui.sig.interactSignal.connect(self.interactReceived)
+        ui.sig.progressSignal.connect(self.progressReceived)
+
         try:
-            for k, v in self.ui.configitems('defaults'):
-                self.ui.setconfig('defaults', k, '')
-            self.ret = dispatch._dispatch(self.ui, self.cmdline) or 0
+            for k, v in ui.configitems('defaults'):
+                ui.setconfig('defaults', k, '')
+            self.ret = dispatch._dispatch(ui, self.cmdline) or 0
         except util.Abort, e:
-            self.ui.write_err(local._('abort: ') + str(e) + '\n')
+            ui.write_err(local._('abort: ') + str(e) + '\n')
         except (error.RepoError, urllib2.HTTPError), e:
-            self.ui.write_err(str(e) + '\n')
+            ui.write_err(str(e) + '\n')
         except (Exception, OSError, IOError), e:
-            self.ui.write_err(str(e) + '\n')
+            ui.write_err(str(e) + '\n')
         except KeyboardInterrupt:
             pass
 
