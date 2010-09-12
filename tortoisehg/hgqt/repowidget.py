@@ -398,10 +398,8 @@ class RepoWidget(QWidget):
         tw = self.taskTabsWidget
         if rev is None:
             tw.setCurrentIndex(self.commitTabIndex)
-        else:
-            revwidgets = (self.revDetailsWidget, self.manifestDemand)
-            if tw.currentWidget() not in revwidgets:
-                tw.setCurrentIndex(self.logTabIndex)
+        elif tw.currentWidget() in (self.commitDemand, self.syncDemand):
+            tw.setCurrentIndex(self.logTabIndex)
 
     def revision_selected(self, rev):
         'View selection changed, could be a reload'
