@@ -125,7 +125,6 @@ class SyncWidget(QWidget):
         self.reltv.clicked.connect(self.pathSelected)
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
-        pathsframe.setContentsMargins(0, 0, 0, 0)
         pathsbox = QVBoxLayout()
         pathsbox.setContentsMargins(0, 0, 0, 0)
         pathsframe.setLayout(pathsbox)
