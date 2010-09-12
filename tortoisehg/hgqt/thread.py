@@ -71,10 +71,7 @@ class QtUi(ui.ui):
     def prompt(self, msg, choices=None, default='y'):
         if not self.interactive(): return default
         try:
-            data = DataWrapper((msg, False, choices, None))
-            self.sig.interactSignal.emit(data)
-            # await response
-            r = self.responseq.get(True)
+            r = self._waitresponse(msg, False, choices, None)
             if r is None:
                 raise EOFError
             if not r:
@@ -90,10 +87,7 @@ class QtUi(ui.ui):
     def promptchoice(self, msg, choices, default=0):
         if not self.interactive(): return default
         try:
-            data = DataWrapper((msg, False, choices, default))
-            self.sig.interactSignal.emit(data)
-            # await response
-            r = self.responseq.get(True)
+            r = self._waitresponse(msg, False, choices, default)
             if r is None:
                 raise EOFError
             return r
@@ -101,13 +95,17 @@ class QtUi(ui.ui):
             raise util.Abort(local._('response expected'))
 
     def getpass(self, prompt=_('password: '), default=None):
-        data = DataWrapper((prompt, True, None, default))
-        self.sig.interactSignal.emit(data)
-        # await response
-        r = self.responseq.get(True)
+        r = self._waitresponse(prompt, True, None, default)
         if r is None:
             raise util.Abort(local._('response expected'))
         return r
+
+    def _waitresponse(self, msg, password, choices, default):
+        """Request interaction with GUI and wait response from it"""
+        data = DataWrapper((msg, password, choices, default))
+        self.sig.interactSignal.emit(data)
+        # await response
+        return self.responseq.get(True)
 
     def progress(self, topic, pos, item='', unit='', total=None):
         data = DataWrapper((topic, item, pos, total, unit))
