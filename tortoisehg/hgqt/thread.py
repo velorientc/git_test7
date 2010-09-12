@@ -31,45 +31,21 @@ class UiSignal(QObject):
     errorSignal = pyqtSignal(DataWrapper)
     interactSignal = pyqtSignal(DataWrapper)
     progressSignal = pyqtSignal(DataWrapper)
-    def __init__(self):
+
+    def __init__(self, responseq):
         QObject.__init__(self)
-
-class QtUi(ui.ui):
-    def __init__(self, src=None, responseq=None):
-        super(QtUi, self).__init__(src)
-
-        if src:
-            self.sig = src.sig
-            self.responseq = src.responseq
-        else:
-            self.sig = UiSignal()
-            self.responseq = responseq
-
-        self.setconfig('ui', 'interactive', 'on')
-        self.setconfig('progress', 'disable', 'True')
-        os.environ['TERM'] = 'dumb'
-        qtlib.configstyles(self)
+        self.responseq = responseq
 
     def write(self, *args, **opts):
-        if self._buffers:
-            self._buffers[-1].extend([str(a) for a in args])
-        else:
-            wrapper = DataWrapper((''.join(args), opts.get('label', '')))
-            self.sig.writeSignal.emit(wrapper)
+        wrapper = DataWrapper((''.join(args), opts.get('label', '')))
+        self.writeSignal.emit(wrapper)
 
     def write_err(self, *args, **opts):
         for a in args:
             data = DataWrapper((str(a), opts.get('label', 'ui.error')))
-            self.sig.errorSignal.emit(data)
+            self.errorSignal.emit(data)
 
-    def label(self, msg, label):
-        return msg
-
-    def flush(self):
-        pass
-
-    def prompt(self, msg, choices=None, default='y'):
-        if not self.interactive(): return default
+    def prompt(self, msg, choices, default):
         try:
             r = self._waitresponse(msg, False, choices, None)
             if r is None:
@@ -84,8 +60,7 @@ class QtUi(ui.ui):
         except EOFError:
             raise util.Abort(local._('response expected'))
 
-    def promptchoice(self, msg, choices, default=0):
-        if not self.interactive(): return default
+    def promptchoice(self, msg, choices, default):
         try:
             r = self._waitresponse(msg, False, choices, default)
             if r is None:
@@ -94,7 +69,7 @@ class QtUi(ui.ui):
         except EOFError:
             raise util.Abort(local._('response expected'))
 
-    def getpass(self, prompt=_('password: '), default=None):
+    def getpass(self, prompt, default):
         r = self._waitresponse(prompt, True, None, default)
         if r is None:
             raise util.Abort(local._('response expected'))
@@ -103,13 +78,56 @@ class QtUi(ui.ui):
     def _waitresponse(self, msg, password, choices, default):
         """Request interaction with GUI and wait response from it"""
         data = DataWrapper((msg, password, choices, default))
-        self.sig.interactSignal.emit(data)
+        self.interactSignal.emit(data)
         # await response
         return self.responseq.get(True)
 
-    def progress(self, topic, pos, item='', unit='', total=None):
+    def progress(self, topic, pos, item, unit, total):
         data = DataWrapper((topic, item, pos, total, unit))
-        self.sig.progressSignal.emit(data)
+        self.progressSignal.emit(data)
+
+class QtUi(ui.ui):
+    def __init__(self, src=None, responseq=None):
+        super(QtUi, self).__init__(src)
+
+        if src:
+            self.sig = src.sig
+        else:
+            self.sig = UiSignal(responseq)
+
+        self.setconfig('ui', 'interactive', 'on')
+        self.setconfig('progress', 'disable', 'True')
+        os.environ['TERM'] = 'dumb'
+        qtlib.configstyles(self)
+
+    def write(self, *args, **opts):
+        if self._buffers:
+            self._buffers[-1].extend([str(a) for a in args])
+        else:
+            self.sig.write(*args, **opts)
+
+    def write_err(self, *args, **opts):
+        self.sig.write_err(*args, **opts)
+
+    def label(self, msg, label):
+        return msg
+
+    def flush(self):
+        pass
+
+    def prompt(self, msg, choices=None, default='y'):
+        if not self.interactive(): return default
+        return self.sig.prompt(msg, choices, default)
+
+    def promptchoice(self, msg, choices, default=0):
+        if not self.interactive(): return default
+        return self.sig.promptchoice(msg, choices, default)
+
+    def getpass(self, prompt=_('password: '), default=None):
+        return self.sig.getpass(prompt, default)
+
+    def progress(self, topic, pos, item='', unit='', total=None):
+        return self.sig.progress(topic, pos, item, unit, total)
 
 
 class CmdThread(QThread):
