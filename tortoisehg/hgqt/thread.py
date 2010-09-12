@@ -194,7 +194,7 @@ class CmdThread(QThread):
         else:
             mode = password and QLineEdit.Password \
                              or QLineEdit.Normal
-            text, ok = QInputDialog().getText(self.parent,
+            text, ok = QInputDialog.getText(self.parent,
                             _('TortoiseHg Prompt'), prompt, mode)
             self.responseq.put(ok and text or None)
 
