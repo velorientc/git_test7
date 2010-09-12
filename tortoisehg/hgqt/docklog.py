@@ -36,7 +36,6 @@ class LogDockWidget(QDockWidget):
 
         self.logte = QPlainTextEdit()
         self.logte.setReadOnly(True)
-        self.logte.setCenterOnScroll(True)
         self.logte.setMaximumBlockCount(1024)
         self.logte.setWordWrapMode(QTextOption.NoWrap)
         vbox.addWidget(self.logte, 1)
@@ -54,10 +53,12 @@ class LogDockWidget(QDockWidget):
         self.logte.clear()
 
     def logMessage(self, msg, style=''):
-        if msg.endsWith('\n'):
-            msg.chop(1)
         msg = msg.replace('\n', '<br/>')
-        self.logte.appendHtml('<font style="%s">%s</font>' % (style, msg))
+        cursor = self.logte.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        cursor.insertHtml('<font style="%s">%s</font>' % (style, msg))
+        max = self.logte.verticalScrollBar().maximum()
+        self.logte.verticalScrollBar().setSliderPosition(max)
 
     def showEvent(self, event):
         self.visibilityChanged.emit(True)

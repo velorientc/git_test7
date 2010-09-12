@@ -145,7 +145,6 @@ class Core(QObject):
         if useInternal:
             self.output_text = QPlainTextEdit()
             self.output_text.setReadOnly(True)
-            self.output_text.setCenterOnScroll(True)
             self.output_text.setMaximumBlockCount(1024)
             self.output_text.setWordWrapMode(QTextOption.NoWrap)
 
