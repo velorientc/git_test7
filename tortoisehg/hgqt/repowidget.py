@@ -530,6 +530,18 @@ class RepoWidget(QWidget):
         self.commitDemand.forward('storeConfigs', s)
         return True
 
+    def incoming(self):
+        self.syncDemand.get().incoming()
+
+    def pull(self):
+        self.syncDemand.get().pull()
+
+    def outgoing(self):
+        self.syncDemand.get().outgoing()
+
+    def push(self):
+        self.syncDemand.get().push()
+
     ##
     ## Repoview context menu
     ##
