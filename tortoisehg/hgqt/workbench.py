@@ -218,6 +218,16 @@ class Workbench(QMainWindow):
         self.actionExplore = QAction(_("Explore"), self)
         self.actionTerminal = QAction(_("Terminal"), self)
 
+        # TODO: Use long names when these have icons
+        self.actionIncoming = a = QAction(_('In'), self)
+        a.setToolTip(_('Check for incoming changes from default pull target'))
+        self.actionPull = a = QAction(_('Pull'), self)
+        a.setToolTip(_('Pull incoming changes from default pull target'))
+        self.actionOutgoing = a = QAction(_('Out'), self)
+        a.setToolTip(_('Detect outgoing changes to default push target'))
+        self.actionPush = a = QAction(_('Push'), self)
+        a.setToolTip(_('Push outgoing changes to default push target'))
+
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
 
@@ -263,6 +273,7 @@ class Workbench(QMainWindow):
         self.menubar.addAction(self.menuRepository.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
+    def createToolbars(self):
         self.toolBar_edit = tb = QToolBar(_("Edit Toolbar"), self)
         tb.setEnabled(True)
         tb.setObjectName("toolBar_edit")
@@ -278,6 +289,75 @@ class Workbench(QMainWindow):
         tb.addSeparator()
         tb.addAction(self.actionFind)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
+
+        self.synctbar = tb = QToolBar(_('Sync Toolbar'), self)
+        tb.setEnabled(True)
+        tb.setObjectName('synctbar')
+        tb.addAction(self.actionIncoming)
+        tb.addAction(self.actionPull)
+        tb.addAction(self.actionOutgoing)
+        tb.addAction(self.actionPush)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
+
+        # tree filters toolbar
+        self.branchLabel = QToolButton()
+        self.branchLabel.setText("Branch")
+        self.branchLabel.setStatusTip("Display graph the named branch only")
+        self.branchLabel.setPopupMode(QToolButton.InstantPopup)
+        self.branch_menu = QMenu()
+        cbranch_action = self.branch_menu.addAction("Display closed branches")
+        cbranch_action.setCheckable(True)
+        self.cbranch_action = cbranch_action
+        allpar_action = self.branch_menu.addAction("Include all ancestors")
+        allpar_action.setCheckable(True)
+        self.allpar_action = allpar_action
+        self.branchLabel.setMenu(self.branch_menu)
+        self.branchCombo = QComboBox()
+        self.branchCombo.activated.connect(self.setBranch)
+        cbranch_action.toggled.connect(self.setupBranchCombo)
+        allpar_action.toggled.connect(self.setBranch)
+
+        self.filterToolbar.layout().setSpacing(3)
+
+        self.branchLabelAction = self.filterToolbar.addWidget(self.branchLabel)
+        self.branchComboAction = self.filterToolbar.addWidget(self.branchCombo)
+        self.filterToolbar.addSeparator()
+
+    def createActions(self):
+        # main window actions (from .ui file)
+        self.actionFind.triggered.connect(self.find)
+        self.actionRefresh.triggered.connect(self.reload)
+        self.actionRefreshTaskTab.triggered.connect(self.reloadTaskTab)
+        self.actionAbout.triggered.connect(self.on_about)
+        self.actionQuit.triggered.connect(self.close)
+        self.actionBack.triggered.connect(self.back)
+        self.actionForward.triggered.connect(self.forward)
+        self.actionImport.triggered.connect(self.thgimport)
+        self.actionLoadAll.triggered.connect(self.loadall)
+        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
+        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
+        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
+        self.actionShowLog.toggled.connect(self.showLog)
+
+        self.actionNew_repository.triggered.connect(self.newRepository)
+        self.actionOpen_repository.triggered.connect(self.openRepository)
+        self.actionClose_repository.triggered.connect(self.closeRepository)
+        self.actionSettings.triggered.connect(self.editSettings)
+
+        self.actionServe.triggered.connect(self.serve)
+        self.actionVerify.triggered.connect(self.verify)
+        self.actionRecover.triggered.connect(self.recover)
+        self.actionRollback.triggered.connect(self.rollback)
+        self.actionPurge.triggered.connect(self.purge)
+        self.actionExplore.triggered.connect(self.explore)
+        self.actionTerminal.triggered.connect(self.terminal)
+
+        self.actionIncoming.triggered.connect(self.incoming)
+        self.actionPull.triggered.connect(self.pull)
+        self.actionOutgoing.triggered.connect(self.outgoing)
+        self.actionPush.triggered.connect(self.push)
+
+        self.actionHelp.triggered.connect(self.on_help)
 
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
@@ -392,62 +472,6 @@ class Workbench(QMainWindow):
                     index = i
                     break
             self.branchCombo.setCurrentIndex(index)
-
-    def createToolbars(self):
-        # tree filters toolbar
-        self.branchLabel = QToolButton()
-        self.branchLabel.setText("Branch")
-        self.branchLabel.setStatusTip("Display graph the named branch only")
-        self.branchLabel.setPopupMode(QToolButton.InstantPopup)
-        self.branch_menu = QMenu()
-        cbranch_action = self.branch_menu.addAction("Display closed branches")
-        cbranch_action.setCheckable(True)
-        self.cbranch_action = cbranch_action
-        allpar_action = self.branch_menu.addAction("Include all ancestors")
-        allpar_action.setCheckable(True)
-        self.allpar_action = allpar_action
-        self.branchLabel.setMenu(self.branch_menu)
-        self.branchCombo = QComboBox()
-        self.branchCombo.activated.connect(self.setBranch)
-        cbranch_action.toggled.connect(self.setupBranchCombo)
-        allpar_action.toggled.connect(self.setBranch)
-
-        self.filterToolbar.layout().setSpacing(3)
-
-        self.branchLabelAction = self.filterToolbar.addWidget(self.branchLabel)
-        self.branchComboAction = self.filterToolbar.addWidget(self.branchCombo)
-        self.filterToolbar.addSeparator()
-
-    def createActions(self):
-        # main window actions (from .ui file)
-        self.actionFind.triggered.connect(self.find)
-        self.actionRefresh.triggered.connect(self.reload)
-        self.actionRefreshTaskTab.triggered.connect(self.reloadTaskTab)
-        self.actionAbout.triggered.connect(self.on_about)
-        self.actionQuit.triggered.connect(self.close)
-        self.actionBack.triggered.connect(self.back)
-        self.actionForward.triggered.connect(self.forward)
-        self.actionImport.triggered.connect(self.thgimport)
-        self.actionLoadAll.triggered.connect(self.loadall)
-        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
-        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
-        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
-        self.actionShowLog.toggled.connect(self.showLog)
-
-        self.actionNew_repository.triggered.connect(self.newRepository)
-        self.actionOpen_repository.triggered.connect(self.openRepository)
-        self.actionClose_repository.triggered.connect(self.closeRepository)
-        self.actionSettings.triggered.connect(self.editSettings)
-
-        self.actionServe.triggered.connect(self.serve)
-        self.actionVerify.triggered.connect(self.verify)
-        self.actionRecover.triggered.connect(self.recover)
-        self.actionRollback.triggered.connect(self.rollback)
-        self.actionPurge.triggered.connect(self.purge)
-        self.actionExplore.triggered.connect(self.explore)
-        self.actionTerminal.triggered.connect(self.terminal)
-
-        self.actionHelp.triggered.connect(self.on_help)
 
 
     def actionShowPathsToggled(self, show):
@@ -634,6 +658,26 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             self.launchTerminal(w.repo)
+
+    def incoming(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.incoming()
+
+    def pull(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.pull()
+
+    def outgoing(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.outgoing()
+
+    def push(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            w.push()
 
     def launchExplorer(self, root):
         """open Windows Explorer at the repo root"""
