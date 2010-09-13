@@ -373,7 +373,6 @@ class _QtRunner(QObject):
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = ''.join(self.errors)
-        opts['nofork'] = True
         dlg = BugReport(opts, parent=self._mainapp.activeWindow())
         dlg.exec_()
         self.errors = []
