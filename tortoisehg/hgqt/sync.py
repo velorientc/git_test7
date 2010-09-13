@@ -364,6 +364,46 @@ class SyncWidget(QWidget):
         cmdline.append(url)
         self.cmd.run(cmdline, display=display)
 
+    ##
+    ## Workbench toolbar buttons
+    ##
+
+    def incoming(self):
+        if 'default' in self.paths:
+            self.setUrl(self.paths['default'])
+            self.curalias = 'default'
+            self.inclicked()
+
+    def pull(self):
+        if 'default' in self.paths:
+            self.setUrl(self.paths['default'])
+            self.curalias = 'default'
+            self.pullclicked()
+
+    def outgoing(self):
+        if 'default-push' in self.paths:
+            self.setUrl(self.paths['default-push'])
+            self.curalias = 'default-push'
+            self.outclicked()
+        elif 'default' in self.paths:
+            self.setUrl(self.paths['default'])
+            self.curalias = 'default'
+            self.outclicked()
+
+    def push(self):
+        if 'default-push' in self.paths:
+            self.setUrl(self.paths['default-push'])
+            self.curalias = 'default-push'
+            self.pushclicked()
+        elif 'default' in self.paths:
+            self.setUrl(self.paths['default'])
+            self.curalias = 'default'
+            self.pushclicked()
+
+    ##
+    ## Sync dialog buttons
+    ##
+
     def inclicked(self):
         def finished(ret, output):
             if ret == 0:
