@@ -636,9 +636,9 @@ class RepoWidget(QWidget):
         clip = QApplication.clipboard()
         clip.setText(binascii.hexlify(self.repo[self.rev].node()))
 
-    def rebaseRevision(self, srcrev=None):
+    def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
-        srcrev = srcrev or self.rev
+        srcrev = self.rev
         dstrev = self.repo['.'].rev()
         main = _("Confirm Rebase Revision")
         text = _("Rebase revision %d on top of %d?") % (srcrev, dstrev)
@@ -650,28 +650,25 @@ class RepoWidget(QWidget):
                           parent=self):
             self.runCommand(_('Rebase - TortoiseHg'), cmdline)
 
-    def qimportRevision(self, rev=None):
+    def qimportRevision(self):
         """QImport revision and all descendents to MQ"""
-        rev = rev or self.rev
         if 'qparent' in self.repo.tags():
             endrev = 'qparent'
         else:
             endrev = ''
-        cmdline = ['qimport', '--rev', '%s::%s' % (rev, endrev),
+        cmdline = ['qimport', '--rev', '%s::%s' % (self.rev, endrev),
                    '--repository', self.repo.root]
         self.runCommand(_('QImport - TortoiseHg'), cmdline)
 
-    def qfinishRevision(self, rev=None):
+    def qfinishRevision(self):
         """Finish applied patches up to and including selected revision"""
-        rev = rev or self.rev
-        cmdline = ['qfinish', 'qbase::%s' % rev,
+        cmdline = ['qfinish', 'qbase::%s' % self.rev,
                    '--repository', self.repo.root]
         self.runCommand(_('QFinish - TortoiseHg'), cmdline)
 
-    def qgotoRevision(self, rev=None):
+    def qgotoRevision(self):
         """Make REV the top applied patch"""
-        rev = rev or self.rev
-        patchname = self.repo.changectx(rev).thgmqpatchname()
+        patchname = self.repo.changectx(self.rev).thgmqpatchname()
         cmdline = ['qgoto', str(patchname),  # FIXME force option
                    '--repository', self.repo.root]
         self.runCommand(_('QGoto - TortoiseHg'), cmdline)
