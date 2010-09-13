@@ -27,9 +27,7 @@ class BugReport(QDialog):
 
         tb = QTextBrowser()
         tb.document().setDefaultStyleSheet(qtlib.thgstylesheet)
-        msg = hglib.tounicode(self.text)
-        msg = Qt.escape(msg)
-        tb.setHtml('<span>' + msg + '</span>')
+        tb.setHtml('<span>' + Qt.escape(self.text) + '</span>')
         tb.setWordWrapMode(QTextOption.NoWrap)
         layout.addWidget(tb)
 
@@ -54,14 +52,14 @@ class BugReport(QDialog):
                 ' http://bitbucket.org/tortoisehg/thg/issues\n')
         text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                 hglib.hgversion, version.version())
-        text += '** Command: %s\n' % (opts.get('cmd', 'N/A'))
-        text += '** CWD: %s\n' % os.getcwd()
+        text += '** Command: %s\n' % (hglib.tounicode(opts.get('cmd', 'N/A')))
+        text += '** CWD: %s\n' % hglib.tounicode(os.getcwd())
         extlist = [x[0] for x in extensions.extensions()]
         text += '** Extensions loaded: %s\n' % ', '.join(extlist)
         text += '** Python version: %s\n' % sys.version.replace('\n', '')
         if os.name == 'nt':
             text += self.getarch()
-        text += opts.get('error', 'N/A')
+        text += hglib.tounicode(opts.get('error', 'N/A'))
         text += '\n}}}'
         return text
 
