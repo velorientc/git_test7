@@ -603,7 +603,7 @@ def unshelve(ui, repo, *pats, **opts):
                     fp.seek(0)
                     pfiles = {}
                     internalpatch(fp, ui, 1, repo.root, files=pfiles)
-                    patch.updatedir(ui, repo, pfiles)
+                    hglib.updatedir(ui, repo, pfiles)
                     patchdone = 1
                 except:
                     if opts['force']:
