@@ -104,3 +104,12 @@ class PerforcePending(QDialog):
         self.bb.button(QDialogButtonBox.Discard).setEnabled(True)
         if wrapper.data == 0:
             self.reject()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            if self.cmd.isRunning():
+                self.cmd.cancel()
+            else:
+                self.reject()
+        else:
+            return super(PerforcePending, self).keyPressEvent(event)
