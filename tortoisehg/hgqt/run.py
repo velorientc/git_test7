@@ -356,7 +356,6 @@ class _QtRunner(QObject):
         self._mainapp = None
         self._dialogs = []
         self.errors = []
-        self.ehandlertimer = False
         sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
 
     def ehook(self, etype, evalue, tracebackobj):
