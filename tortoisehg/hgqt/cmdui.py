@@ -14,6 +14,14 @@ from tortoisehg.hgqt import qtlib, thread
 
 local = localgettext()
 
+def startProgress(topic, status):
+    topic, item, pos, total, unit = topic, '...', status, None, None
+    return thread.DataWrapper((topic, item, pos, total, unit))
+
+def stopProgress(topic):
+    topic, item, pos, total, unit = topic, None, None, None, None
+    return thread.DataWrapper((topic, item, pos, total, unit))
+
 class ProgressMonitor(QWidget):
     'Progress bar for use in workbench status bar'
     def __init__(self, topic, parent):
