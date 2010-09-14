@@ -57,21 +57,21 @@ class ThgRepoWrapper(QObject):
         self._timerevent = self.startTimer(500)
 
     def timerEvent(self, event):
-        if self.busycount == 0:
+        if not os.path.exists(self.repo.path):
+            print 'Repository destroyed', self.repo.root
+            self.repositoryDestroyed.emit()
+            self.killTimer(self._timerevent)
+            del _repocache[self.repo.root]
+        elif self.busycount == 0:
             self.pollStatus()
         else:
             print 'no poll, busy', self.busycount
 
     def pollStatus(self):
-        if not os.path.exists(self.repo.join('requires')):
-            print 'Repository destroyed', self.repo.root
-            self.repositoryDestroyed.emit()
-            self.killTimer(self._timerevent)
-            del _repocache[self.repo.root]
-            return
-        self._checkrepotime()
-        self._checkdirstate()
-        self._checkuimtime()
+        if os.path.exists(self.repo.path):
+            self._checkrepotime()
+            self._checkdirstate()
+            self._checkuimtime()
 
     def recordState(self):
         try:
