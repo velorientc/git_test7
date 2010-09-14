@@ -424,7 +424,7 @@ class SyncWidget(QWidget):
                 cmdline.append(val)
         url = self.currentUrl(False)
         safeurl = self.currentUrl(True)
-        display = ' '.join(cmdline + [safeurl])
+        display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
         cmdline.append(url)
         self.cmd.run(cmdline, display=display)
 
