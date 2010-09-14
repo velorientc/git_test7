@@ -107,6 +107,40 @@ class BugReport(QDialog):
         s = QSettings()
         s.setValue('bugreport/geom', self.saveGeometry())
 
+class ExceptionMsgBox(QDialog):
+    """Message box for recoverable exception"""
+    def __init__(self, main, text, opts, parent=None):
+        super(ExceptionMsgBox, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowTitle(_('TortoiseHg Error'))
+
+        self._opts = opts
+
+        labelflags = Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse
+
+        self.setLayout(QVBoxLayout())
+        self._mainlabel = QLabel('<b>%s</b>' % Qt.escape(main),
+                                 textInteractionFlags=labelflags)
+        self.layout().addWidget(self._mainlabel)
+
+        self._textlabel = QLabel(
+            text + "<br><br>" +
+            _('If you still have trouble, '
+              '<a href="#bugreport">please file a bug report</a>.'),
+            wordWrap=True, textInteractionFlags=labelflags)
+        self._textlabel.linkActivated.connect(self._openlink)
+        self.layout().addWidget(self._textlabel)
+
+        bb = QDialogButtonBox(QDialogButtonBox.Close, centerButtons=True)
+        bb.rejected.connect(self.reject)
+        self.layout().addWidget(bb)
+
+    @pyqtSlot(str)
+    def _openlink(self, ref):
+        if ref == '#bugreport':
+            return BugReport(self._opts, self).exec_()
+        QDesktopServices.openUrl(QUrl(ref))
+
 def run(ui, *pats, **opts):
     return BugReport(opts)
 

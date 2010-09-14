@@ -351,6 +351,13 @@ class _QtRunner(QObject):
     there's a limitation on Qt's event handling. See
     http://doc.qt.nokia.com/4.6/threads-qobject.html#per-thread-event-loop
     """
+
+    # {exception class: message}
+    # It doesn't check the hierarchy of exception classes for simplicity.
+    _recoverableexc = {
+        error.RepoLookupError: _('Try refreshing your repository.'),
+        }
+
     def __init__(self):
         QObject.__init__(self)
         self._mainapp = None
@@ -368,12 +375,18 @@ class _QtRunner(QObject):
         self.errors.append((etype, evalue, tracebackobj))
 
     def excepthandler(self):
-        from tortoisehg.hgqt.bugreport import BugReport
+        from tortoisehg.hgqt.bugreport import BugReport, ExceptionMsgBox
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = ''.join(''.join(traceback.format_exception(*args))
                                 for args in self.errors)
-        dlg = BugReport(opts, parent=self._mainapp.activeWindow())
+        etype, evalue = self.errors[0][:2]
+        if len(self.errors) == 1 and etype in self._recoverableexc:
+            dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
+                                  self._recoverableexc[etype], opts,
+                                  parent=self._mainapp.activeWindow())
+        else:
+            dlg = BugReport(opts, parent=self._mainapp.activeWindow())
         dlg.exec_()
         self.errors = []
 
