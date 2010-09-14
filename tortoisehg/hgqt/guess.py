@@ -162,7 +162,6 @@ class DetectRenameDialog(QDialog):
             self.unrevlist.setItemSelected(item, x in self.pats)
         self.difftb.clear()
         self.pats = []
-        self.stbar.clear()
 
     def findRenames(self):
         'User pressed "find renames" button'
@@ -181,32 +180,23 @@ class DetectRenameDialog(QDialog):
         pct = self.simslider.value() / 100.0
         copies = not self.copycheck.isChecked()
         self.findbtn.setEnabled(False)
-        self.errorstr = None
 
         self.matchtv.model().clear()
         self.thread = RenameSearchThread(self.repo, ulist, pct, copies)
         self.thread.match.connect(self.rowReceived)
         self.thread.progress.connect(self.stbar.progress)
-        self.thread.error.connect(self.errorReceived)
+        self.thread.showMessage.connect(self.stbar.showMessage)
         self.thread.searchComplete.connect(self.finished)
         self.thread.start()
 
     def finished(self):
         self.stbar.clear()
-        if self.errorstr:
-            self.stbar.showMessage(self.errorstr)
-        else:
-            self.stbar.clearMessage()
         for col in xrange(3):
             self.matchtv.resizeColumnToContents(col)
         self.findbtn.setEnabled(len(self.unrevlist.selectedItems()))
 
     def rowReceived(self, args):
         self.matchtv.model().appendRow(*args)
-
-    def errorReceived(self, qstr):
-        self.errorstr = qstr
-        self.stbar.showMessage(qstr)
 
     def acceptMatch(self):
         'User pressed "accept match" button'
@@ -356,8 +346,8 @@ class RenameSearchThread(QThread):
     '''Background thread for searching repository history'''
     searchComplete = pyqtSignal()
     match = pyqtSignal(object)
-    progress = pyqtSignal(object)
-    error = pyqtSignal(object)
+    progress = pyqtSignal(thread.DataWrapper)
+    showMessage = pyqtSignal(unicode)
 
     def __init__(self, repo, ufiles, minpct, copies):
         super(RenameSearchThread, self).__init__()
@@ -388,7 +378,7 @@ class RenameSearchThread(QThread):
         try:
             self.search(self.repo)
         except Exception, e:
-            self.error.emit(hglib.tounicode(str(e)))
+            self.showMessage.emit(hglib.tounicode(str(e)))
         self.repo.ui = storeui
         self.searchComplete.emit()
 
