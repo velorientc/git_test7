@@ -10,7 +10,7 @@ import os
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
 from mercurial import context, merge, commands, subrepo
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
-from tortoisehg.hgqt import thgrepo
+from tortoisehg.hgqt import thgrepo, cmdui, thread
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.util import xml_escape
 from tortoisehg.hgqt.i18n import _
@@ -42,13 +42,11 @@ _colors = {}
 class StatusWidget(QWidget):
     '''Working copy status widget
        SIGNALS:
-       loadBegin()                  - for progress bar
-       loadComplete()               - for progress bar
+       progress()                   - for progress bar
        showMessage(unicode)         - for status bar
        titleTextChanged(QString)    - for window title
     '''
-    loadBegin = pyqtSignal()
-    loadComplete = pyqtSignal()
+    progress = pyqtSignal(thread.DataWrapper)
     titleTextChanged = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
 
@@ -239,7 +237,7 @@ class StatusWidget(QWidget):
             sp = None
         self.sp = sp
 
-        self.loadBegin.emit()
+        self.progress.emit(cmdui.startProgress(_('Refresh'), _('status')))
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.refreshing.finished.connect(self.reloadComplete)
         self.refreshing.showMessage.connect(self.showMessage)
@@ -250,7 +248,7 @@ class StatusWidget(QWidget):
         self.wctx = wctx
         self.patchecked = patchecked.copy()
         self.updateModel()
-        self.loadComplete.emit()
+        self.progress.emit(cmdui.stopProgress(_('Refresh')))
         self.refreshing.wait()
         self.refreshing = None
 
@@ -442,7 +440,7 @@ class StatusThread(QThread):
     '''Background thread for generating a workingctx'''
 
     finished = pyqtSignal(object, object)
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(unicode)
 
     def __init__(self, repo, pats, opts, parent=None):
         super(StatusThread, self).__init__()
@@ -762,16 +760,17 @@ class StatusDialog(QDialog):
         self.stwidget = StatusWidget(pats, opts, None, self)
         layout.addWidget(self.stwidget, 1)
 
-        self.stbar = QStatusBar(self)
-        layout.addWidget(self.stbar)
-
         s = QSettings()
         self.stwidget.restoreState(s.value('status/state').toByteArray())
         self.restoreGeometry(s.value('status/geom').toByteArray())
 
+        self.statusbar = cmdui.ThgStatusBar(self)
+        layout.addWidget(self.statusbar)
+        self.stwidget.showMessage.connect(self.statusbar.showMessage)
+        self.stwidget.progress.connect(self.statusbar.progress)
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
-        self.stwidget.showMessage.connect(self.stbar.showMessage)
         self.setWindowTitle(self.stwidget.getTitle())
+
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def keyPressEvent(self, event):

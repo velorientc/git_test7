@@ -42,8 +42,7 @@ class CommitWidget(QWidget):
         self.opts = opts # user, date
         self.stwidget = status.StatusWidget(pats, opts, root, self)
         self.stwidget.showMessage.connect(self.showMessage)
-        self.stwidget.loadBegin.connect(self.loadBegin)
-        self.stwidget.loadComplete.connect(self.loadComplete)
+        self.stwidget.progress.connect(self.progress)
         self.msghistory = []
         self.qref = False
 
@@ -127,18 +126,6 @@ class CommitWidget(QWidget):
         # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
         self.msgte = msgte
         self.msgcombo = msgcombo
-
-    def loadBegin(self):
-        'Status widget has started to refresh'
-        topic, item, pos, total, unit = 'Refresh', '...', 'status', None, None
-        w = thread.DataWrapper((topic, item, pos, total, unit))
-        self.progress.emit(w)
-
-    def loadComplete(self):
-        'Status widget refresh has finished'
-        topic, item, pos, total, unit = 'Refresh', 'status', None, None, None
-        w = thread.DataWrapper((topic, item, pos, total, unit))
-        self.progress.emit(w)
 
     def details(self):
         dlg = DetailsDialog(self.opts, self.userhist, self)
