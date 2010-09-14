@@ -151,10 +151,11 @@ class CmdThread(QThread):
     #         others - return code of command
     commandFinished = pyqtSignal(DataWrapper)
 
-    def __init__(self, cmdline, parent=None):
+    def __init__(self, cmdline, display, parent=None):
         super(CmdThread, self).__init__()
 
         self.cmdline = cmdline
+        self.display = display
         self.parent = parent
         self.ret = None
         self.abortbyuser = False
@@ -211,6 +212,13 @@ class CmdThread(QThread):
         ui.sig.errorSignal.connect(self.errorReceived)
         ui.sig.interactSignal.connect(self.interact_handler)
         ui.sig.progressSignal.connect(self.progressReceived)
+
+        if self.display:
+            cmd = '%% hg %s\n' % self.display
+        else:
+            cmd = '%% hg %s\n' % ' '.join(self.cmdline)
+        w = DataWrapper((cmd, 'control'))
+        self.outputReceived.emit(w)
 
         try:
             for k, v in ui.configitems('defaults'):

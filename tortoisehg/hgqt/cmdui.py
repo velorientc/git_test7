@@ -190,7 +190,7 @@ class Core(QObject):
     def run_next(self):
         try:
             cmdline = self.queue.pop(0)
-            self.thread = thread.CmdThread(cmdline)
+            self.thread = thread.CmdThread(cmdline, self.display)
         except IndexError:
             return False
 
@@ -208,14 +208,7 @@ class Core(QObject):
         if self.stbar:
             self.thread.progressReceived.connect(self.stbar.progress)
 
-        if self.display:
-            cmd = '%% hg %s\n' % self.display
-        else:
-            cmd = '%% hg %s\n' % ' '.join(cmdline)
-        w = thread.DataWrapper((cmd, 'control'))
-        self.thread.outputReceived.emit(w)
         self.thread.start()
-
         return True
 
     def append_output(self, msg, style=''):
