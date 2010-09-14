@@ -129,7 +129,6 @@ class DiffLexerSelector(_ScriptLexerSelector):
     _lexer = Qsci.QsciLexerDiff
     regex = re.compile(r'^@@ [-]\d+,\d+ [+]\d+,\d+ @@$')
     def cfg_lexer(self, lexer, ui):
-        qtlib.configstyles(ui)
         #lexer.setDefaultPaper(QtGui.QColor(cfg.getDiffBGColor()))
         #lexer.setColor(QtGui.QColor(cfg.getDiffFGColor()), -1)
         for label, i in (('diff.inserted', 6),

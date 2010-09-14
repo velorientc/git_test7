@@ -406,6 +406,7 @@ class _QtRunner(object):
             self._mainapp.setOrganizationDomain('tortoisehg.org')
             self._mainapp.setApplicationVersion(thgversion.version())
             qtlib.setup_font_substitutions()
+            qtlib.configstyles(ui)
             self._mainapp.setStyleSheet(qtlib.appstylesheet)
             self._mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
             dlg = dlgfunc(ui, *args, **opts)

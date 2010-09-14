@@ -265,7 +265,6 @@ class HistorySearchThread(QThread):
                 self.setconfig('ui', 'interactive', 'off')
                 self.setconfig('progress', 'disable', 'True')
                 os.environ['TERM'] = 'dumb'
-                qtlib.configstyles(self)
                 self.fullmsg = ''
 
             def plain(self):

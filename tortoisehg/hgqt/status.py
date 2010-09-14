@@ -68,7 +68,6 @@ class StatusWidget(QWidget):
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
-        qtlib.configstyles(self.repo.ui)
         labels = [(stat, val.uilabel) for stat, val in statusTypes.items()]
         labels.extend([('r', 'resolve.resolved'), ('u', 'resolve.unresolved')])
         for stat, label in labels:

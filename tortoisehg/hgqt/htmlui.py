@@ -22,7 +22,6 @@ class htmlui(ui.ui):
         self.setconfig('progress', 'disable', 'True')
         self.output, self.error = [], []
         os.environ['TERM'] = 'dumb'
-        qtlib.configstyles(self)
 
     def write(self, *args, **opts):
         label = opts.get('label', '')

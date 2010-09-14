@@ -21,7 +21,7 @@ from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt import repomodel, thgrepo, cmdui
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles, InfoMsgBox
+from tortoisehg.hgqt.qtlib import geticon, getfont, InfoMsgBox
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
@@ -84,7 +84,6 @@ class Workbench(QMainWindow):
             self.reporegistry.setVisible(True)
 
     def load_config(self, ui):
-        configstyles(ui)
         # TODO: connect to font changed signal
         font = getfont(ui, 'fontlog').font()
         self._font = font
