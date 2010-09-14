@@ -54,7 +54,12 @@ class ThgRepoWrapper(QObject):
         repo.workingBranchChanged = self.workingBranchChanged
         repo.repositoryDestroyed = self.repositoryDestroyed
         self.recordState()
-        self._timerevent = self.startTimer(500)
+        try:
+            freq = repo.ui.config('tortoisehg', 'pollfreq', '500')
+            freq = max(100, int(freq))
+        except:
+            freq = 500
+        self._timerevent = self.startTimer(freq)
 
     def timerEvent(self, event):
         if not os.path.exists(self.repo.path):

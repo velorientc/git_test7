@@ -252,6 +252,10 @@ INFO = (
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     (_('Shell'), 'tortoisehg.shell', genEditCombo,
         _('Specify your preferred terminal shell application')),
+    (_('Poll Frequency'), 'tortoisehg.pollfreq', genIntEditCombo,
+        _('The period (in milliseconds) between modification time polling of '
+          'key repository files, looking for changes.  Values under '
+          '100ms are ignored.  Default: 500')),
     (_('Visible Whitespace'), 'tortoisehg.wsvisible', (genDefaultCombo,
         ['Visible', 'Invisible', 'VisibleAfterIndent']),
         _('Make whitespace visible in file and diff previews.'
