@@ -54,7 +54,8 @@ class PerforcePending(QDialog):
 
         clcombo.activated[QString].connect(self.p4clActivated)
         for changelist in self.pending:
-            clcombo.addItem(changelist)
+            clcombo.addItem(hglib.tounicode(changelist))
+        self.p4clActivated(clcombo.currentText())
 
         self.setWindowTitle(_('Pending Perforce Changelists - %s') % 
                             repo.displayname)
@@ -82,6 +83,8 @@ class PerforcePending(QDialog):
         self.repo.incrementBusyCount()
         self.cmd.setVisible(True)
         self.cmd.show_output(True)
+        self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.cmd.run(cmdline)
 
     def revert(self):
@@ -91,9 +94,13 @@ class PerforcePending(QDialog):
         self.repo.incrementBusyCount()
         self.cmd.setVisible(True)
         self.cmd.show_output(True)
+        self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.cmd.run(cmdline)
 
     def commandFinished(self, wrapper):
         self.repo.decrementBusyCount()
+        self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
+        self.bb.button(QDialogButtonBox.Discard).setEnabled(True)
         if wrapper.data == 0:
             self.reject()
