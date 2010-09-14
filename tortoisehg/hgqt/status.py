@@ -267,8 +267,13 @@ class StatusWidget(QWidget):
         self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, self.isMerge())
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
-        for col in xrange(COL_SIZE):
+
+        for col in (COL_PATH, COL_STATUS, COL_MERGE_STATE):
+            w = self.tv.sizeHintForColumn(col)
+            self.tv.setColumnWidth(col, w)
+        for col in (COL_PATH_DISPLAY, COL_EXTENSION, COL_SIZE):
             self.tv.resizeColumnToContents(col)
+
         self.tv.activated.connect(tm.toggleRow)
         self.tv.pressed.connect(tm.pressedRow)
         self.le.textEdited.connect(tm.setFilter)
