@@ -465,7 +465,8 @@ class MatchTree(QTableView):
                 seen.add(path)
             dlg = annotate.AnnotateDialog(path, rev=rev, line=line,
                                           pattern=pattern, parent=self,
-                                          searchwidget=self.searchwidget)
+                                          searchwidget=self.searchwidget,
+                                          root=repo.root)
             dlg.show()
 
     def ctx(self, rows):

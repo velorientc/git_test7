@@ -415,11 +415,15 @@ class AnnotateDialog(QDialog):
         if line and isinstance(line, str):
             line = int(line)
         try:
-            repo = thgrepo.repository(ui.ui(), path=paths.find_root())
+            root = opts.get('root') or paths.find_root()
+            repo = thgrepo.repository(ui.ui(), path=root)
             ctx = repo[opts.get('rev') or '.']
             fctx = ctx[pats[0]] # just for validation
         except Exception, e:
             self.status.setText(hglib.tounicode(str(e)))
+            self.close()
+            return
+
         av.annotateFileAtRev(repo, ctx, pats[0], line)
         self.setWindowTitle(_('Annotate %s@%d') % (pats[0], ctx.rev()))
         self.repo = repo
