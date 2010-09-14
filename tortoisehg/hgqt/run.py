@@ -365,13 +365,14 @@ class _QtRunner(QObject):
             sys.stderr.write(''.join(elist))
         if not self.errors:
             QTimer.singleShot(10, self.excepthandler)
-        self.errors.extend(elist)
+        self.errors.append((etype, evalue, tracebackobj))
 
     def excepthandler(self):
         from tortoisehg.hgqt.bugreport import BugReport
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = ''.join(self.errors)
+        opts['error'] = ''.join(''.join(traceback.format_exception(*args))
+                                for args in self.errors)
         dlg = BugReport(opts, parent=self._mainapp.activeWindow())
         dlg.exec_()
         self.errors = []
