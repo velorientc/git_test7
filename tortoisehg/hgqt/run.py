@@ -344,7 +344,7 @@ def _runcommand(ui, options, cmd, cmdfunc):
     else:
         return checkargs()
 
-class _QtRunner(QObject):
+class _QtRunner(object):
     """Run Qt app and hold its windows
 
     NOTE: This object will be instantiated before QApplication, it means
@@ -359,7 +359,6 @@ class _QtRunner(QObject):
         }
 
     def __init__(self):
-        QObject.__init__(self)
         self._mainapp = None
         self._dialogs = []
         self.errors = []
