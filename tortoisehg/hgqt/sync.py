@@ -1042,12 +1042,11 @@ class DetailsDialog(QDialog):
 
     def accept(self):
         outopts = {}
-
         for name, cb, le in (('branch', self.branchcb, self.branchle),
                              ('rev', self.revcb, self.revle),
                              ('remotecmd', self.remotecb, self.remotele)):
             if cb.isChecked():
-                outopts[name] = hglib.fromunicode(self.branchle.text())
+                outopts[name] = hglib.fromunicode(le.text())
             else:
                 outopts[name] = ''
 
