@@ -1008,7 +1008,7 @@ class GCommit(GStatus):
                     pfiles = {}
                     patch.internalpatch(fp, ui, 1, repo.root, files=pfiles,
                                         eolmode=None)
-                    patch.updatedir(ui, repo, pfiles)
+                    hglib.updatedir(ui, repo, pfiles)
                 except patch.PatchError, err:
                     s = str(err)
                     if s:

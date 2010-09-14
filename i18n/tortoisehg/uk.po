@@ -2715,7 +2715,7 @@ msgstr "Поточний шлях: %s,  "
 
 #: tortoisehg\hgtk\history.py:1233
 msgid "%(count)d of %(total)d applied patches"
-msgstr "%(кількість)d з %(загалом)d прийнято патчів"
+msgstr "%(count)d з %(total)d прийнято патчів"
 
 #: tortoisehg\hgtk\history.py:1249
 msgid "Visualize Change"
@@ -3246,7 +3246,7 @@ msgstr "Зберегти латку до"
 
 #: tortoisehg\hgtk\logview\treeview.py:271
 msgid "%(count)d of %(total)d Revisions"
-msgstr "%(кількість)d у %(загалом)d редакціях"
+msgstr "%(count)d у %(total)d редакціях"
 
 #: tortoisehg\hgtk\logview\treeview.py:379
 msgid "Changeset not found in current view"

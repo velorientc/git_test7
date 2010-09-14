@@ -11,6 +11,16 @@ import shlex
 import time
 import inspect
 
+from mercurial import demandimport
+demandimport.disable()
+try:
+    # hg >= 1.7
+    from mercurial.cmdutil import updatedir
+except ImportError:
+    # hg <= 1.6
+    from mercurial.patch import updatedir
+demandimport.enable()
+
 from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge
 
