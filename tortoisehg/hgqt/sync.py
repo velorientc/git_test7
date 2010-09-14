@@ -21,6 +21,7 @@ from tortoisehg.hgqt import qtlib, cmdui, thgrepo, thread
 
 # TODO
 # Write keyring help, connect to help button
+# outgoingNodes should go to thgrepo and trigger repo signal
 
 _schemes = ['local', 'ssh', 'http', 'https']
 
@@ -47,34 +48,38 @@ class SyncWidget(QWidget):
         self.curpw = None
         self.updateInProgress = False
 
+        self.repo.configChanged.connect(self.configChanged)
+
         if not embedded:
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
 
-        self.repo.configChanged.connect(self.configChanged)
+        toph = QHBoxLayout()
+        toph.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(toph)
+
+        urlframe = QFrame()
+        urlframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
+        urlvbox = QVBoxLayout()
+        urlvbox.setContentsMargins(0, 0, 0, 0)
+        urlvbox.setSpacing(4)
+        urlframe.setLayout(urlvbox)
+        toph.addWidget(urlframe, 1)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(4)
         self.savebutton = QPushButton(_('Save'))
         hbox.addWidget(self.savebutton)
         hbox.addWidget(QLabel(_('URL:')))
         self.urlentry = QLineEdit()
         self.urlentry.setReadOnly(True)
         hbox.addWidget(self.urlentry)
-        self.inbutton = QPushButton(_('Incoming'))
-        hbox.addWidget(self.inbutton)
-        self.pullbutton = QPushButton(_('Pull'))
-        hbox.addWidget(self.pullbutton)
-        self.outbutton = QPushButton(_('Outgoing'))
-        hbox.addWidget(self.outbutton)
-        self.pushbutton = QPushButton(_('Push'))
-        hbox.addWidget(self.pushbutton)
-        self.emailbutton = QPushButton(_('Email'))
-        hbox.addWidget(self.emailbutton)
-        layout.addLayout(hbox)
+        urlvbox.addLayout(hbox)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(4)
         self.schemecombo = QComboBox()
         for s in _schemes:
             self.schemecombo.addItem(s)
@@ -90,21 +95,63 @@ class SyncWidget(QWidget):
         self.portentry.setFixedWidth(8 * fontm.width('9'))
         self.portentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.portentry)
+        urlvbox.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(4)
         hbox.addWidget(QLabel(_('Path:')))
         self.pathentry = QLineEdit()
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
         self.authbutton = QPushButton(_('Authentication'))
         hbox.addWidget(self.authbutton)
+        urlvbox.addLayout(hbox)
+
+        buttonframe = QFrame()
+        buttonframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
+        buttonvbox = QVBoxLayout()
+        buttonvbox.setContentsMargins(0, 0, 0, 0)
+        buttonvbox.setSpacing(4)
+        buttonframe.setLayout(buttonvbox)
+        toph.addWidget(buttonframe)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(4)
+        self.inbutton = QPushButton(_('Incoming'))
+        hbox.addWidget(self.inbutton)
+        self.pullbutton = QPushButton(_('Pull'))
+        hbox.addWidget(self.pullbutton)
+        buttonvbox.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(4)
         self.postpullbutton = QPushButton()
         hbox.addWidget(self.postpullbutton)
+        self.detailsbutton = QPushButton(_('Details'))
+        hbox.addWidget(self.detailsbutton)
+        buttonvbox.addLayout(hbox)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(4)
+        self.outbutton = QPushButton(_('Outgoing'))
+        hbox.addWidget(self.outbutton)
+        self.pushbutton = QPushButton(_('Push'))
+        hbox.addWidget(self.pushbutton)
+        self.emailbutton = QPushButton(_('Email'))
+        hbox.addWidget(self.emailbutton)
+        buttonvbox.addLayout(hbox)
+
         if 'perfarce' in self.repo.extensions():
             self.p4pbutton = QPushButton(_('p4pending'))
             self.p4pbutton.clicked.connect(self.p4pending)
             hbox.addWidget(self.p4pbutton)
         else:
             self.p4pbutton = None
-        layout.addLayout(hbox)
+
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -143,10 +190,18 @@ class SyncWidget(QWidget):
         self.pushbutton.clicked.connect(self.pushclicked)
         self.emailbutton.clicked.connect(self.emailclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
+        self.detailsbutton.pressed.connect(self.details)
 
         self.opbuttons = (self.inbutton, self.pullbutton,
                           self.outbutton, self.pushbutton,
                           self.emailbutton, self.p4pbutton)
+
+        self.forcepush = False
+        self.newbranch = False
+        self.forcepull = False
+        self.torev = None
+        self.tobranch = None
+        self.remotecmd = None
 
         cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
@@ -192,6 +247,12 @@ class SyncWidget(QWidget):
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.reload()
+
+    def details(self):
+        pass
+        #dlg = DetailsDialog(self.opts, self.userhist, self)
+        #if dlg.exec_() == QDialog.Accepted:
+        #    self.opts.update(dlg.outopts)
 
     def reload(self):
         # Refresh configured paths
