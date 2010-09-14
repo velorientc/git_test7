@@ -21,7 +21,8 @@ from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt import repomodel, thgrepo, cmdui
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon, getfont, InfoMsgBox
+from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
+from tortoisehg.hgqt.qtlib import InfoMsgBox, WarningMsgBox
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
@@ -76,12 +77,27 @@ class Workbench(QMainWindow):
         self.reporegistry.visibilityChanged.connect(gotVisible)
         self.log.visibilityChanged.connect(logVisible)
 
+        self.savedrepos = []
         self.restoreSettings()
         self.setAcceptDrops(True)
 
+        for savedroot in self.savedrepos:
+            if repo and repo.root == savedroot:
+                # keep the passed-in repo at the saved position
+                self.addRepoTab(repo)
+                ti = self.repoTabsWidget.currentIndex()
+            else:
+                self._openRepo(path=savedroot)
         if repo:
-            self.addRepoTab(repo)
-        else:
+            if repo.root in self.savedrepos:
+                # explicitly give focus to the passed-in repo
+                self.repoTabsWidget.setCurrentIndex(ti)
+                self.repoTabChanged()
+            else:
+                # open the passed-in repo last if it's not in the saved repos,
+                # so it gets focus automatically
+                self.addRepoTab(repo)
+        if not repo and not self.savedrepos:
             self.reporegistry.setVisible(True)
 
     def load_config(self, ui):
@@ -199,6 +215,9 @@ class Workbench(QMainWindow):
 
         self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
 
+        self.actionSaveRepos = a = QAction(_("Save Open Repositories On Exit"), self)
+        a.setCheckable(True)
+
         self.actionGroupTaskView = ag = QActionGroup(self)
         ag.setEnabled(False)
         self.actionSelectTaskLog = a = QAction(_("Revision &Details"), ag)
@@ -271,6 +290,7 @@ class Workbench(QMainWindow):
         m.addAction(self.actionShowLog)
         m.addSeparator()
         m.addAction(self.actionSelectColumns)
+        m.addAction(self.actionSaveRepos)
         m.addSeparator()
         m.addActions(self.actionGroupTaskView.actions())
         m.addSeparator()
@@ -299,7 +319,7 @@ class Workbench(QMainWindow):
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuRepository.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
-        
+
         self.updateMenu()
 
     def createToolbars(self):
@@ -428,16 +448,12 @@ class Workbench(QMainWindow):
         rw = self.repoTabsWidget.currentWidget()
         if not rw: return
         rw.taskTabsWidget.setCurrentIndex(rw.grepTabIndex)
-        
+
     def openRepo(self, repopath):
+        """ Open repo by openRepoSignal from reporegistry """
         if isinstance(repopath, (unicode, QString)):  # as Qt slot
             repopath = hglib.fromunicode(repopath)
-        try:
-            repo = thgrepo.repository(self.ui, path=repopath)
-            self.addRepoTab(repo)
-        except RepoError:
-            QMessageBox.warning(self, _('Failed to open repository'),
-                _('%s is not a valid repository') % repopath)
+        self._openRepo(path=repopath)
 
     def find_root(self, url):
         p = hglib.fromunicode(url.toLocalFile())
@@ -468,12 +484,12 @@ class Workbench(QMainWindow):
         link = hglib.fromunicode(link)
         if link.startswith('subrepo:'):
             self.openRepo(link[8:])
-            
+
     def updateMenu(self):
         someRepoOpen = self.repoTabsWidget.count() > 0
         self.actionGroupTaskView.setEnabled(someRepoOpen)
         self.updateTaskViewMenu()
-        
+
         self.actionFind.setEnabled(someRepoOpen)
         self.actionRefresh.setEnabled(someRepoOpen)
         self.actionRefreshTaskTab.setEnabled(someRepoOpen)
@@ -541,7 +557,7 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.addTab(rw, repo.shortname)
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
-        
+
         self.updateMenu()
 
 
@@ -667,17 +683,21 @@ class Workbench(QMainWindow):
             self.openRepo(path)
 
     def openRepository(self):
+        """ Open repo from File menu """
         caption = _('Select repository directory to open')
         FD = QFileDialog
         path = FD.getExistingDirectory(parent=self, caption=caption,
             options=FD.ShowDirsOnly | FD.ReadOnly)
+        self._openRepo(path=hglib.fromunicode(path))
+
+    def _openRepo(self, path):
         if path:
             try:
-                repo = thgrepo.repository(self.ui, path=hglib.fromunicode(path))
+                repo = thgrepo.repository(path=path)
                 self.addRepoTab(repo)
             except RepoError:
-                QMessageBox.warning(self, _('Failed to open repository'),
-                    _('%s is not a valid repository') % path)
+                WarningMsgBox(_('Failed to open repository'),
+                        _('%s is not a valid repository') % path)
 
     def reload(self):
         w = self.repoTabsWidget.currentWidget()
@@ -738,12 +758,25 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
         s.setValue(wb + 'showPaths', self.actionShowPaths.isChecked())
+        s.setValue(wb + 'saveRepos', self.actionSaveRepos.isChecked())
+        repostosave = []
+        if self.actionSaveRepos.isChecked():
+            tw = self.repoTabsWidget
+            for idx in range(tw.count()):
+                rw = tw.widget(idx)
+                repostosave.append(rw.repo.root)
+        s.setValue(wb + 'openrepos', (',').join(repostosave))
 
     def restoreSettings(self):
         s = QSettings()
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
+        save = s.value(wb + 'saveRepos').toBool()
+        self.actionSaveRepos.setChecked(save)
+        sr = str(s.value(wb + 'openrepos').toString())
+        if sr:
+            self.savedrepos = sr.split(',')
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
