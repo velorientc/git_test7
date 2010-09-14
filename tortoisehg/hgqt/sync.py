@@ -47,6 +47,7 @@ class SyncWidget(QWidget):
         self.curuser = None
         self.curpw = None
         self.updateInProgress = False
+        self.opts = {}
 
         self.repo.configChanged.connect(self.configChanged)
 
@@ -196,13 +197,6 @@ class SyncWidget(QWidget):
                           self.outbutton, self.pushbutton,
                           self.emailbutton, self.p4pbutton)
 
-        self.forcepush = False
-        self.newbranch = False
-        self.forcepull = False
-        self.torev = None
-        self.tobranch = None
-        self.remotecmd = None
-
         cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
@@ -249,10 +243,9 @@ class SyncWidget(QWidget):
         self.reload()
 
     def details(self):
-        pass
-        #dlg = DetailsDialog(self.opts, self.userhist, self)
-        #if dlg.exec_() == QDialog.Accepted:
-        #    self.opts.update(dlg.outopts)
+        dlg = DetailsDialog(self.opts, self)
+        if dlg.exec_() == QDialog.Accepted:
+            self.opts.update(dlg.outopts)
 
     def reload(self):
         # Refresh configured paths
@@ -416,9 +409,19 @@ class SyncWidget(QWidget):
         if dialog.exec_() == QDialog.Accepted:
             self.curuser, self.curpw = '', ''
 
-    def run(self, cmdline):
+    def run(self, cmdline, details):
         if self.cmd.core.is_running():
             return
+        for name in list(details) + ['remotecmd']:
+            val = self.opts.get(name)
+            if not val:
+                continue
+            if isinstance(val, bool):
+                if val:
+                    cmdline.append('--' + name)
+            elif val:
+                cmdline.append('--' + name)
+                cmdline.append(val)
         url = self.currentUrl(False)
         safeurl = self.currentUrl(True)
         display = ' '.join(cmdline + [safeurl])
@@ -474,7 +477,8 @@ class SyncWidget(QWidget):
             else:
                 self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
         self.finishfunc = finished
-        self.run(['--repository', self.root, 'incoming'])
+        cmdline = ['--repository', self.root, 'incoming']
+        self.run(cmdline, ('force', 'branch', 'rev'))
 
     def pullclicked(self):
         def finished(ret, output):
@@ -490,7 +494,7 @@ class SyncWidget(QWidget):
             cmdline.append('--update')
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
-        self.run(cmdline)
+        self.run(cmdline, ('force', 'branch', 'rev'))
 
     def outclicked(self):
         if self.embedded:
@@ -505,11 +509,13 @@ class SyncWidget(QWidget):
                 else:
                     self.showMessage.emit(_('Outgoing aborted, ret %d') % ret)
             self.finishfunc = outputnodes
-            self.run(['--repository', self.root, 'outgoing',
-                      '--quiet', '--template', '{node}\n'])
+            cmdline = ['--repository', self.root, 'outgoing', '--quiet',
+                       '--template', '{node}\n']
+            self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
         else:
             self.finishfunc = None
-            self.run(['--repository', self.root, 'outgoing'])
+            cmdline = ['--repository', self.root, 'outgoing']
+            self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
 
     def p4pending(self):
         def finished(ret, output):
@@ -548,7 +554,7 @@ class SyncWidget(QWidget):
                 dlg = PerforcePending(self.repo, pending, self)
                 dlg.exec_()
         self.finishfunc = finished
-        self.run(['--repository', self.root, 'p4pending', '--verbose'])
+        self.run(['--repository', self.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self):
         def finished(ret, output):
@@ -557,7 +563,8 @@ class SyncWidget(QWidget):
             else:
                 self.showMessage.emit(_('Push aborted, ret %d') % ret)
         self.finishfunc = finished
-        self.run(['--repository', self.root, 'push', '--verbose'])
+        cmdline = ['--repository', self.root, 'push']
+        self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
@@ -971,6 +978,90 @@ def loadIniFile(rcpath, parent):
 
     return fn, wconfig.readfile(fn)
 
+
+class DetailsDialog(QDialog):
+    'Utility dialog for configuring uncommon settings'
+    def __init__(self, opts, parent):
+        QDialog.__init__(self, parent)
+        self.repo = parent.repo
+
+        layout = QFormLayout()
+        self.setLayout(layout)
+
+        self.newbranchcb = QCheckBox(_('Allow push of a new branch'))
+        self.newbranchcb.setChecked(opts.get('new-branch', False))
+        layout.addRow(self.newbranchcb, None)
+        self.forcecb = QCheckBox(_('Force pull or push (override checks)'))
+        self.forcecb.setChecked(opts.get('force', False))
+        layout.addRow(self.forcecb, None)
+
+        self.branchcb = QCheckBox(_('Specify branch for push/pull:'))
+        self.branchle = QLineEdit()
+        self.branchle.setEnabled(False)
+        self.branchcb.toggled.connect(self.branchle.setEnabled)
+        if opts.get('branch'):
+            self.branchcb.setChecked(True)
+            self.branchle.setText(hglib.tounicode(opts['branch']))
+        else:
+            self.branchcb.setChecked(False)
+            self.branchcb.clicked.emit(True)
+        layout.addRow(self.branchcb, self.branchle)
+
+        self.revcb = QCheckBox(_('Specify revision for push/pull:'))
+        self.revle = QLineEdit()
+        self.revle.setEnabled(False)
+        self.revcb.toggled.connect(self.revle.setEnabled)
+        if opts.get('rev'):
+            self.revcb.setChecked(True)
+            self.revle.setText(hglib.tounicode(opts['rev']))
+        else:
+            self.revcb.setChecked(False)
+            self.revcb.clicked.emit(True)
+        layout.addRow(self.revcb, self.revle)
+
+        self.remotecb = QCheckBox(_('Remote command:'))
+        self.remotele = QLineEdit()
+        self.remotele.setEnabled(False)
+        self.remotecb.toggled.connect(self.remotele.setEnabled)
+        if opts.get('remotecmd'):
+            self.remotecb.setChecked(True)
+            self.remotele.setText(hglib.tounicode(opts['remotecmd']))
+        else:
+            self.remotecb.setChecked(False)
+            self.remotecb.clicked.emit(True)
+        layout.addRow(self.remotecb, self.remotele)
+
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
+        self.bb = bb
+        layout.addWidget(bb)
+
+        self.setWindowTitle('%s - sync details' % self.repo.displayname)
+
+    def accept(self):
+        outopts = {}
+
+        for name, cb, le in (('branch', self.branchcb, self.branchle),
+                             ('rev', self.revcb, self.revle),
+                             ('remotecmd', self.remotecb, self.remotele)):
+            if cb.isChecked():
+                outopts[name] = hglib.fromunicode(self.branchle.text())
+            else:
+                outopts[name] = ''
+
+        if outopts.get('branch') and outopts.get('rev'):
+            qtlib.WarningMsgBox(_('Configuration Error'),
+                                _('You cannot specify a branch and revision'),
+                                parent=self)
+            return
+
+        outopts['force'] = self.forcecb.isChecked()
+        outopts['new-branch'] = self.newbranchcb.isChecked()
+
+        self.outopts = outopts
+        QDialog.accept(self)
 
 
 def run(ui, *pats, **opts):
