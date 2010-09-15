@@ -214,8 +214,10 @@ class Workbench(QMainWindow):
         self.actionRecover = QAction(_("Recover"), self)
         self.actionRollback = QAction(_("Rollback/Undo"), self)
         self.actionPurge = QAction(_("Purge"), self)
-        self.actionExplore = QAction(_("Explore"), self)
-        self.actionTerminal = QAction(_("Terminal"), self)
+        self.actionExplore = a = QAction(_("Explore"), self)
+        a.setShortcut(QKeySequence("Shift+Ctrl+S"))
+        self.actionTerminal = a = QAction(_("Terminal"), self)
+        a.setShortcut(QKeySequence("Shift+Ctrl+T"))
 
         # TODO: Use long names when these have icons
         self.actionIncoming = a = QAction(_('In'), self)
