@@ -70,8 +70,9 @@ class ThgStatusBar(QStatusBar):
         self.lbl = QLabel()
         self.addWidget(self.lbl)
 
-    def showMessage(self, str):
-        self.lbl.setText(str)
+    @pyqtSlot(unicode)
+    def showMessage(self, ustr):
+        self.lbl.setText(ustr)
 
     def clear(self):
         keys = self.topics.keys()
