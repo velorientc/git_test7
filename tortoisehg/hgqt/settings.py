@@ -252,6 +252,10 @@ INFO = (
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
     (_('Shell'), 'tortoisehg.shell', genEditCombo,
         _('Specify your preferred terminal shell application')),
+    (_('Immediate Operations'), 'tortoisehg.immediate', genEditCombo,
+        _('Space separated list of shell operations you would like '
+          'to be performed immediately, without user interaction. '
+          'Commands are "add remove revert forget" Default: None')),
     (_('Poll Frequency'), 'tortoisehg.pollfreq', genIntEditCombo,
         _('The period (in milliseconds) between modification time polling of '
           'key repository files, looking for changes.  Values under '
