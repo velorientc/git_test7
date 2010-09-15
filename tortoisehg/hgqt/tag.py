@@ -24,7 +24,7 @@ class TagDialog(QDialog):
 
     tagChanged = pyqtSignal()
     localTagChanged = pyqtSignal()
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(unicode)
 
     def __init__(self, repo=None, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)

@@ -27,7 +27,7 @@ _schemes = ['local', 'ssh', 'http', 'https']
 
 class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(unicode)
 
     output = pyqtSignal(thread.DataWrapper)
     progress = pyqtSignal(thread.DataWrapper)

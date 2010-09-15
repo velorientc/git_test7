@@ -27,6 +27,7 @@ from PyQt4 import Qsci
 from tortoisehg.util import hglib
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList
 
@@ -84,7 +85,7 @@ class HgFileView(QFrame):
 
     showDescSignal = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(str)
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(unicode)
     revForDiffChanged = pyqtSignal(int)
     filled = pyqtSignal()
 
@@ -454,7 +455,7 @@ class HgFileView(QFrame):
             pos.append(data.find(text, pos[-1]+1))
         pos = [x for x in pos if x > -1]
         self.showMessage.emit(
-             "Found %d occurrences of '%s' in current file or diff" % (
+             _("Found %d occurrences of '%s' in current file or diff") % (
                  len(pos), text))
         return pos
 

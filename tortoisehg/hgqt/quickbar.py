@@ -22,6 +22,7 @@ from mercurial import util
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 
 class QuickBar(QToolBar):
@@ -143,7 +144,7 @@ class FindQuickBar(QuickBar):
 class FindInGraphlogQuickBar(FindQuickBar):
     revisionSelected = pyqtSignal(int)
     fileSelected = pyqtSignal(str)
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(unicode)
 
     def __init__(self, parent):
         FindQuickBar.__init__(self, parent)
@@ -210,7 +211,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
     def on_cancelsearch(self, *args):
         self._findinlog_iter = None
         self.setCancelEnabled(False)
-        self.showMessage.emit('Search cancelled!')
+        self.showMessage.emit(_('Search cancelled!'))
 
     def on_findnext(self):
         """
@@ -244,7 +245,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
         for next_find in self._findinlog_iter:
             if next_find is None: # not yet found, let's animate a bit the GUI
                 if (step % 20) == 0:
-                    self.showMessage.emit('Searching'+'.'*(step/20))
+                    self.showMessage.emit(_('Searching')+'.'*(step/20))
                 step += 1
                 QTimer.singleShot(0, lambda: self.find_next_in_log(step % 80))
             else:
@@ -252,14 +253,15 @@ class FindInGraphlogQuickBar(FindQuickBar):
                 self.setCancelEnabled(False)
                 
                 rev, filename = next_find
-                self.revisionSelected.emit(rev)
-                text = unicode(self.entry.text())
-                self.fileSelected.emit(filename)
+                if rev is not None and filename is not None:
+                    self.revisionSelected.emit(rev)
+                    text = unicode(self.entry.text())
+                    self.fileSelected.emit(filename)
                 if self._fileview:
                     self._findinfile_iter = self._fileview.searchString(text)
                     self.on_findnext()
             return
-        self.showMessage.emit('No more matches found in repository')
+        self.showMessage.emit(_('No more matches found in repository'))
         self.setCancelEnabled(False)
         self._findinlog_iter = None
 
@@ -275,8 +277,8 @@ class FindInGraphlogQuickBar(FindQuickBar):
         if newtext.strip():
             if self._findinfile_iter is None:
                 self.showMessage.emit(
-                          'Search string not found in current diff. '
+                          _('Search string not found in current diff. '
                           'Hit "Find next" button to start searching '
-                          'in the repository')
+                          'in the repository'))
             else:
                 self.on_findnext()

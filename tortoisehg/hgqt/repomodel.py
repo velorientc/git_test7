@@ -78,7 +78,7 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(unicode)
     filled = pyqtSignal()
     loaded = pyqtSignal()
 
@@ -198,7 +198,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     def timerEvent(self, event):
         if event.timerId() == self.timerHandle:
-            self.showMessage.emit('filling (%d)'%(len(self.graph)))
+            self.showMessage.emit(_('filling (%d)')%(len(self.graph)))
             if self.graph.isfilled():
                 self.killTimer(self.timerHandle)
                 self.timerHandle = None
