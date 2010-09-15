@@ -11,7 +11,7 @@
 import binascii
 import os
 
-from tortoisehg.util import shlib, hglib, purge
+from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
@@ -19,7 +19,7 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
-from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo
+from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo, purge
 
 from tortoisehg.hgqt.thread import DataWrapper
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -331,44 +331,17 @@ class RepoWidget(QWidget):
         except Exception, e:
             InfoMsgBox(_('Repository Error'),
                        _('Unable to query unrevisioned files\n') +
-                       hglib.tounicode(e))
+                       hglib.tounicode(str(e)))
             return
         U, I = wctx.unknown(), wctx.ignored()
         if not U and not I:
             InfoMsgBox(_('No unrevisioned files'),
                        _('There are no purgable unrevisioned files'))
             return
-        elif not U:
-            if not QuestionMsgBox(_('Purge ignored files'),
-                    _('Purge (delete) all %d ignored files?') % len(I)):
-                return
-            dels = I
-        else:
-            res = CustomPrompt(_('Purge unrevisioned files'),
-                _('%d unknown files\n'
-                  '%d files ignored by .hgignore filter\n'
-                  'Purge unknown, ignored, or both?') % (len(U), len(I)), self,
-                (_('&Unknown'), _('&Ignored'), _('&Both'), _('Cancel')),
-                    0, 3, U+I).run()
-            if res == 3:
-                return
-            elif res == 2:
-                dels = U+I
-            elif res == 1:
-                dels = I
-            else:
-                dels = U
-        res = CustomPrompt(_('Confirm file deletions'),
-                _('Are you sure you want to delete these %d files?') %
-                len(dels), self, (_('&Yes'), _('&No')), 1, 1, dels).run()
-        if res == 1:
-            return
-
-        failures = purge.purge(self.repo, dels)
-        if failures:
-            CustomPrompt(_('Deletion failures'),
-                _('Unable to delete %d files or folders') %
-                len(failures), self, (_('&Ok'),), 0, 0, failures).run()
+        dlg = purge.PurgeDialog(self.repo, U, I, self)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        dlg.exec_()
 
     def create_models(self):
         self.repomodel = HgRepoListModel(self.repo)

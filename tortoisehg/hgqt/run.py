@@ -513,6 +513,11 @@ def test(ui, *pats, **opts):
     #from tortoisehg.hgqt.chunkselect import run
     qtrun(run, ui, *pats, **opts)
 
+def purge(ui, *pats, **opts):
+    """purge unknown and/or ignore files from repository"""
+    from tortoisehg.hgqt.purge import run
+    qtrun(run, ui, *pats, **opts)
+
 def remove(ui, *pats, **opts):
     """remove selected files"""
     from tortoisehg.hgqt.quickop import run
@@ -915,6 +920,7 @@ table = {
          _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
+    "^purge": (purge, [], _('thg purge')),
     "^update|checkout|co":
         (update,
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
