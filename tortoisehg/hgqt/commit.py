@@ -129,6 +129,8 @@ class CommitWidget(QWidget):
 
     def details(self):
         dlg = DetailsDialog(self.opts, self.userhist, self)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
 
@@ -328,9 +330,12 @@ class CommitWidget(QWidget):
         return self.stwidget.saveState()
 
     def branchOp(self):
-        d = branchop.BranchOpDialog(self.repo, self.branchop)
+        d = branchop.BranchOpDialog(self.repo, self.branchop, self)
+        d.setWindowFlags(Qt.Sheet)
+        d.setWindowModality(Qt.WindowModal)
         if d.exec_() == QDialog.Accepted:
             self.branchop = d.branchop
+            self.refresh()
 
     def canUndo(self):
         'Returns undo description or None if not valid'
