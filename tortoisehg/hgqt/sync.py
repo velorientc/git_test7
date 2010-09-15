@@ -511,11 +511,11 @@ class SyncWidget(QWidget):
             self.finishfunc = outputnodes
             cmdline = ['--repository', self.root, 'outgoing', '--quiet',
                        '--template', '{node}\n']
-            self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
+            self.run(cmdline, ('force', 'branch', 'rev'))
         else:
             self.finishfunc = None
             cmdline = ['--repository', self.root, 'outgoing']
-            self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
+            self.run(cmdline, ('force', 'branch', 'rev'))
 
     def p4pending(self):
         def finished(ret, output):
