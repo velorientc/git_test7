@@ -399,16 +399,20 @@ class SyncWidget(QWidget):
         else:
             alias = 'new'
         url = hglib.fromunicode(self.urlentry.text())
-        dialog = SaveDialog(self.repo, alias, url, self)
-        if dialog.exec_() == QDialog.Accepted:
-            self.curalias = hglib.fromunicode(dialog.aliasentry.text())
+        dlg = SaveDialog(self.repo, alias, url, self)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_() == QDialog.Accepted:
+            self.curalias = hglib.fromunicode(dlg.aliasentry.text())
 
     def authclicked(self):
         host = hglib.fromunicode(self.hostentry.text())
         user = self.curuser or ''
         pw = self.curpw or ''
-        dialog = AuthDialog(self.repo, host, user, pw, self)
-        if dialog.exec_() == QDialog.Accepted:
+        dlg = AuthDialog(self.repo, host, user, pw, self)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_() == QDialog.Accepted:
             self.curuser, self.curpw = '', ''
 
     def run(self, cmdline, details):
