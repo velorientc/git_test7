@@ -1,4 +1,4 @@
-# status.py - working copy browser
+# purge.py - working copy purge dialog, based on Mercurial purge extension
 #
 # Copyright 2010 Steve Borho <steve@borho.org>
 #
