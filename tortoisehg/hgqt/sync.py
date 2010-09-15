@@ -244,6 +244,8 @@ class SyncWidget(QWidget):
 
     def details(self):
         dlg = DetailsDialog(self.opts, self)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
 
@@ -568,6 +570,8 @@ class SyncWidget(QWidget):
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
         dlg.exec_()
 
     def emailclicked(self):
