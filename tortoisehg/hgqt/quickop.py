@@ -71,8 +71,17 @@ class QuickOpDialog(QDialog):
             layout.addWidget(chk)
 
         self.statusbar = cmdui.ThgStatusBar(self)
+        self.statusbar.setSizeGripEnabled(False)
         stwidget.showMessage.connect(self.statusbar.showMessage)
+        stwidget.progress.connect(self.progress)
         layout.addWidget(self.statusbar)
+
+        self.cmd = cmd = cmdui.Widget()
+        cmd.setHidden(True)
+        cmd.commandStarted.connect(self.commandStarted)
+        cmd.commandFinished.connect(self.commandFinished)
+        cmd.commandCanceling.connect(self.commandCanceled)
+        layout.addWidget(cmd)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -83,20 +92,22 @@ class QuickOpDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
-        cmd = cmdui.Widget()
-        cmd.commandStarted.connect(self.commandStarted)
-        cmd.commandFinished.connect(self.commandFinished)
-        cmd.commandCanceling.connect(self.commandCanceled)
-        layout.addWidget(cmd)
-        cmd.setHidden(True)
-        self.cmd = cmd
-
         s = QSettings()
         stwidget.restoreState(s.value('quickop/state').toByteArray())
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
         cmd.progress.connect(self.statusbar.progress)
-        QTimer.singleShot(0, self.stwidget.refreshWctx)
+        self.stwidget.refreshWctx()
+
+    def progress(self, wrapper):
+        topic, item, pos, total, unit = wrapper.data
+        if pos is None:
+            repo = self.stwidget.repo
+            imm = repo.ui.config('tortoisehg', 'immediate', '')
+            if self.command in imm.lower():
+                # Only do this trick once
+                QTimer.singleShot(0, self.accept)
+                self.stwidget.progress.disconnect(self.progress)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
