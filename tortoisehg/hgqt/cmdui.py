@@ -226,12 +226,14 @@ class Core(QObject):
 
     ### Signal Handlers ###
 
+    @pyqtSlot()
     def command_started(self):
         if self.stbar:
             self.stbar.showMessage(_('Running...'))
 
         self.commandStarted.emit()
 
+    @pyqtSlot(thread.DataWrapper)
     def command_finished(self, wrapper):
         ret = wrapper.data
 
@@ -253,6 +255,7 @@ class Core(QObject):
         self.progress.emit(thread.DataWrapper((None,)*5))
         self.commandFinished.emit(wrapper)
 
+    @pyqtSlot()
     def command_canceling(self):
         if self.stbar:
             self.stbar.showMessage(_('Canceling...'))
@@ -260,6 +263,7 @@ class Core(QObject):
 
         self.commandCanceling.emit()
 
+    @pyqtSlot(thread.DataWrapper)
     def output_received(self, wrapper):
         msg, label = wrapper.data
         msg = hglib.tounicode(msg)
@@ -329,6 +333,7 @@ class Widget(QWidget):
 
     ### Signal Handler ###
 
+    @pyqtSlot(thread.DataWrapper)
     def command_finished(self, wrapper):
         if wrapper.data is None:
             self.makeLogVisible.emit(True)
@@ -422,9 +427,11 @@ class Dialog(QDialog):
 
     ### Signal Handlers ###
 
+    @pyqtSlot()
     def cancel_clicked(self):
         self.core.cancel()
 
+    @pyqtSlot(thread.DataWrapper)
     def command_finished(self, wrapper):
         self.cancel_btn.setHidden(True)
         self.close_btn.setShown(True)
@@ -432,6 +439,7 @@ class Dialog(QDialog):
         if self.finishfunc:
             self.finishfunc()
 
+    @pyqtSlot()
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
 
@@ -493,6 +501,7 @@ class Runner(QObject):
 
     ### Signal Handler ###
 
+    @pyqtSlot(thread.DataWrapper)
     def command_finished(self, wrapper):
         if wrapper.data != 0:
             self.makeLogVisible.emit(True)
