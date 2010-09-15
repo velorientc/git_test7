@@ -216,28 +216,6 @@ class SyncWidget(QWidget):
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
 
-    def commandStarted(self):
-        for b in self.opbuttons:
-            if b: b.setEnabled(False)
-        if not self.embedded:
-            self.cmd.show_output(True)
-            self.cmd.setVisible(True)
-
-    def commandFinished(self, wrapper):
-        for b in self.opbuttons:
-            if b: b.setEnabled(True)
-        if self.finishfunc:
-            output = self.cmd.core.get_rawoutput()
-            if wrapper.data is None:
-                # An exception ocurred, command did not finish
-                self.finishfunc(-1, output)
-            else:
-                self.finishfunc(wrapper.data, output)
-
-    def commandCanceled(self):
-        for b in self.opbuttons:
-            if b: b.setEnabled(True)
-
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.reload()
@@ -415,6 +393,29 @@ class SyncWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.curuser, self.curpw = '', ''
 
+    def commandStarted(self):
+        for b in self.opbuttons:
+            if b: b.setEnabled(False)
+        if not self.embedded:
+            self.cmd.show_output(True)
+            self.cmd.setVisible(True)
+
+    def commandFinished(self, wrapper):
+        self.repo.decrementBusyCount()
+        for b in self.opbuttons:
+            if b: b.setEnabled(True)
+        if self.finishfunc:
+            output = self.cmd.core.get_rawoutput()
+            if wrapper.data is None:
+                # An exception ocurred, command did not finish
+                self.finishfunc(-1, output)
+            else:
+                self.finishfunc(wrapper.data, output)
+
+    def commandCanceled(self):
+        for b in self.opbuttons:
+            if b: b.setEnabled(True)
+
     def run(self, cmdline, details):
         if self.cmd.core.is_running():
             return
@@ -432,6 +433,7 @@ class SyncWidget(QWidget):
         safeurl = self.currentUrl(True)
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
         cmdline.append(url)
+        self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display)
 
     ##
