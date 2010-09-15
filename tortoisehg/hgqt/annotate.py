@@ -170,7 +170,9 @@ class AnnotateView(QFrame):
                                       editparent)]:
                     def add(name, func):
                         action = menu.addAction(name)
-                        action.triggered.connect(lambda: func(d))
+                        action.data = pdata
+                        action.run = lambda: func(action.data)
+                        action.triggered.connect(action.run)
                     add(name, func)
             menu.exec_(point)
 
