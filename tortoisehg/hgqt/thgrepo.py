@@ -112,11 +112,6 @@ class ThgRepoWrapper(QObject):
         'Check for new changelog entries, or MQ status changes'
         if self._repomtime < self._getrepomtime():
             print 'detected repository change'
-            # Acquire and release repo dirstate lock to ensure current
-            # transaction is complete before invalidating, else we may
-            # only get partial invalidation
-            wlock = self.repo.wlock()
-            wlock.release()
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
