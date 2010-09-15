@@ -162,7 +162,7 @@ class AnnotateView(QFrame):
                 pdata = [pfctx.path(), pfctx.changectx().rev(), line]
                 def annparent(data):
                     self.revSelected.emit(data)
-                def editparent():
+                def editparent(data):
                     self.editSelected.emit(data)
                 for name, func in [(_('Annotate parent revision %d') % pdata[1],
                                       annparent),
