@@ -143,7 +143,7 @@ class Core(QObject):
     output = pyqtSignal(thread.DataWrapper)
     progress = pyqtSignal(thread.DataWrapper)
 
-    def __init__(self, useInternal):
+    def __init__(self, useInternal, parent):
         super(Core, self).__init__()
 
         self.thread = None
@@ -151,8 +151,9 @@ class Core(QObject):
         self.queue = []
         self.display = None
         self.internallog = useInternal
+        self.parent = parent
         if useInternal:
-            self.output_text = QPlainTextEdit()
+            self.output_text = QPlainTextEdit(parent)
             self.output_text.setReadOnly(True)
             self.output_text.setMaximumBlockCount(1024)
             self.output_text.setWordWrapMode(QTextOption.NoWrap)
@@ -191,7 +192,7 @@ class Core(QObject):
     def run_next(self):
         try:
             cmdline = self.queue.pop(0)
-            self.thread = thread.CmdThread(cmdline, self.display)
+            self.thread = thread.CmdThread(cmdline, self.display, self.parent)
         except IndexError:
             return False
 
@@ -248,6 +249,7 @@ class Core(QObject):
                 status = _('Finished')
             self.stbar.showMessage(status)
 
+        self.display = None
         if ret == 0 and self.run_next():
             return # run next command
 
@@ -287,7 +289,7 @@ class Widget(QWidget):
         super(Widget, self).__init__()
 
         self.internallog = useInternal
-        self.core = Core(useInternal)
+        self.core = Core(useInternal, parent)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
@@ -353,7 +355,7 @@ class Dialog(QDialog):
 
         self.finishfunc = finishfunc
 
-        self.core = Core(True)
+        self.core = Core(True, self)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
@@ -466,7 +468,7 @@ class Runner(QObject):
         self.title = title
         self.parent = parent
 
-        self.core = Core(useInternal)
+        self.core = Core(useInternal, parent)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
