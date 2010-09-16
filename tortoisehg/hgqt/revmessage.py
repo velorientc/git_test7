@@ -23,7 +23,7 @@ from tortoisehg.util.util import xml_escape
 from tortoisehg.util.hglib import tounicode
 
 from tortoisehg.hgqt.i18n import _
-
+from tortoisehg.hgqt import qtlib
 
 # initialize changeset and url link regex
 csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
@@ -37,7 +37,7 @@ class RevMessage(QWidget):
 
     revisionLinkClicked = pyqtSignal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, ui, parent=None):
         QWidget.__init__(self, parent)
 
         vb = QVBoxLayout()
@@ -45,8 +45,10 @@ class RevMessage(QWidget):
 
         self._message = w = QTextBrowser()
         w.setLineWrapMode(QTextEdit.NoWrap)
-        w.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        w.setFont(QFont('Monospace', 9))
+        #w.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        f = qtlib.getfont(ui, 'fontcomment')
+        f.changed.connect(lambda newfont: self.setFont(newfont))
+        w.setFont(f.font())
         w.setOpenLinks(False)
         vb.addWidget(w)
 
