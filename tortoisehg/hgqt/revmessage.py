@@ -47,7 +47,7 @@ class RevMessage(QWidget):
         w.setLineWrapMode(QTextEdit.NoWrap)
         #w.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         f = qtlib.getfont(ui, 'fontcomment')
-        f.changed.connect(lambda newfont: self.setFont(newfont))
+        f.changed.connect(lambda newfont: w.setFont(newfont))
         w.setFont(f.font())
         w.setOpenLinks(False)
         vb.addWidget(w)
