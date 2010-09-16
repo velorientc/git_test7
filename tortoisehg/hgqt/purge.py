@@ -12,49 +12,15 @@ from mercurial import cmdutil
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, cmdui, thread
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-def purge(repo, ignored, unknown, delfolders, keephg):
-    directories = []
-    failures = []
-
-    def remove(remove_func, name):
-        try:
-            if keephg and name.startswith('.hg'):
-                return
-            remove_func(repo.wjoin(name))
-        except EnvironmentError:
-            failures.append(name)
-
-    def removefile(path):
-        try:
-            os.remove(path)
-        except OSError:
-            # read-only files cannot be unlinked under Windows
-            s = os.stat(path)
-            if (s.st_mode & stat.S_IWRITE) != 0:
-                raise
-            os.chmod(path, stat.S_IMODE(s.st_mode) | stat.S_IWRITE)
-            os.remove(path)
-
-    match = cmdutil.match(repo, [], {})
-    match.dir = directories.append
-    status = repo.status(match=match, ignored=ignored, unknown=unknown)
-
-    for f in sorted(status[4] + status[5]):
-        remove(removefile, f)
-
-    if delfolders:
-        for f in sorted(directories, reverse=True):
-            if not os.listdir(repo.wjoin(f)):
-                remove(os.rmdir, f)
-    return failures
-
-
 class PurgeDialog(QDialog):
+
+    progress = pyqtSignal(thread.DataWrapper)
+
     def __init__(self, repo, unknown, ignored, parent):
         QDialog.__init__(self, parent)
         self.setLayout(QVBoxLayout())
@@ -75,6 +41,12 @@ class PurgeDialog(QDialog):
         self.hgfilecb.setChecked(True)
         self.layout().addWidget(self.hgfilecb)
         self.files = (unknown, ignored)
+
+        self.stbar = cmdui.ThgStatusBar(self)
+        self.stbar.setSizeGripEnabled(False)
+        self.stbar.setVisible(False)
+        self.progress.connect(self.stbar.progress)
+        self.layout().addWidget(self.stbar)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -100,11 +72,54 @@ class PurgeDialog(QDialog):
             _('Are you sure you want to delete these files and/or folders?')):
             return
 
-        failures = purge(self.repo, ignored, unknown, delf, keep)
+        failures = self.purge(self.repo, ignored, unknown, delf, keep)
         if failures:
             qtlib.InfoMsgBox(_('Deletion failures'),
                 _('Unable to delete %d files or folders') % len(failures), self)
         QDialog.accept(self)
+
+    def purge(self, repo, ignored, unknown, delfolders, keephg):
+        directories = []
+        failures = []
+
+        self.stbar.setVisible(True)
+        match = cmdutil.match(repo, [], {})
+        match.dir = directories.append
+        status = repo.status(match=match, ignored=ignored, unknown=unknown)
+        files = status[4] + status[5]
+
+        def remove(remove_func, name):
+            try:
+                if keephg and name.startswith('.hg'):
+                    return
+                remove_func(repo.wjoin(name))
+            except EnvironmentError:
+                failures.append(name)
+
+        def removefile(path):
+            try:
+                os.remove(path)
+            except OSError:
+                # read-only files cannot be unlinked under Windows
+                s = os.stat(path)
+                if (s.st_mode & stat.S_IWRITE) != 0:
+                    raise
+                os.chmod(path, stat.S_IMODE(s.st_mode) | stat.S_IWRITE)
+                os.remove(path)
+
+        for i, f in enumerate(sorted(files)):
+            data = thread.DataWrapper(('deleting', f, i, len(files), None))
+            self.progress.emit(data)
+            remove(removefile, f)
+
+        if delfolders:
+            for i, f in enumerate(sorted(directories, reverse=True)):
+                if not os.listdir(repo.wjoin(f)):
+                    data = thread.DataWrapper(('rmdir', f, i,
+                                              len(directories), None))
+                    self.progress.emit(data)
+                    remove(os.rmdir, f)
+        return failures
 
 def run(ui, *pats, **opts):
     from tortoisehg.hgqt import thgrepo
