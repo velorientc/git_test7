@@ -430,6 +430,11 @@ class SyncWidget(QWidget):
                 cmdline.append('--' + name)
                 cmdline.append(val)
         url = self.currentUrl(False)
+        if not url:
+            qtlib.InfoMsgBox(_('No URL selected'),
+                    _('An URL must be selected for this operation.'),
+                    parent=self)
+            return
         safeurl = self.currentUrl(True)
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
         cmdline.append(url)
