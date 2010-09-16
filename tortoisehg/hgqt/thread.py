@@ -183,6 +183,8 @@ class CmdThread(QThread):
                         _('TortoiseHg Prompt'), prompt,
                         QMessageBox.Yes | QMessageBox.Cancel, self.parent)
             dlg.setDefaultButton(QMessageBox.Cancel)
+            dlg.setWindowFlags(Qt.Sheet)
+            dlg.setWindowModality(Qt.WindowModal)
             rmap = {}
             for index, choice in enumerate(choices):
                 button = dlg.addButton(hglib.tounicode(choice),
@@ -198,9 +200,16 @@ class CmdThread(QThread):
         else:
             mode = password and QLineEdit.Password \
                              or QLineEdit.Normal
-            text, ok = QInputDialog.getText(self.parent,
-                            _('TortoiseHg Prompt'), prompt, mode)
-            self.responseq.put(ok and text or None)
+            dlg = QInputDialog(self.parent, Qt.Sheet)
+            dlg.setWindowModality(Qt.WindowModal)
+            dlg.setWindowTitle(_('TortoiseHg Prompt'))
+            dlg.setLabelText(prompt.title())
+            dlg.setTextEchoMode(mode)
+            if dlg.exec_():
+                text = dlg.textValue()
+            else:
+                text = None
+            self.responseq.put(text)
 
     def run(self):
         # save thread id in order to terminate by KeyboardInterrupt
