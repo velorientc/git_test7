@@ -111,6 +111,8 @@ class PurgeDialog(QDialog):
             data = thread.DataWrapper(('deleting', f, i, len(files), None))
             self.progress.emit(data)
             remove(removefile, f)
+        data = thread.DataWrapper(('deleting', None, None, len(files), None))
+        self.progress.emit(data)
 
         if delfolders:
             for i, f in enumerate(sorted(directories, reverse=True)):
@@ -119,6 +121,9 @@ class PurgeDialog(QDialog):
                                               len(directories), None))
                     self.progress.emit(data)
                     remove(os.rmdir, f)
+            data = thread.DataWrapper(('rmdir', None, None,
+                                      len(directories), None))
+            self.progress.emit(data)
         return failures
 
 def run(ui, *pats, **opts):
