@@ -167,6 +167,7 @@ class FontEntry(QPushButton):
 
         f = QFont()
         f.fromString(self.value())
+        return f
 
     ## common APIs for all edit widgets
 
