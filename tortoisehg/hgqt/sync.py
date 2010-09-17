@@ -561,6 +561,9 @@ class SyncWidget(QWidget):
             if pending:
                 from tortoisehg.hgqt.p4pending import PerforcePending
                 dlg = PerforcePending(self.repo, pending, self)
+                dlg.showMessage.connect(self.showMessage)
+                dlg.output.connect(self.output)
+                dlg.makeLogVisible.connect(self.makeLogVisible)
                 dlg.exec_()
         self.finishfunc = finished
         self.run(['--repository', self.root, 'p4pending', '--verbose'], ())

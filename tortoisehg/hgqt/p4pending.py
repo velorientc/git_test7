@@ -19,6 +19,11 @@ from tortoisehg.hgqt import qtlib, cslist, cmdui
 
 class PerforcePending(QDialog):
     'Dialog for selecting a revision'
+
+    output = pyqtSignal(QString, QString)
+    makeLogVisible = pyqtSignal(bool)
+    showMessage = pyqtSignal(unicode)
+
     def __init__(self, repo, pending, parent):
         QDialog.__init__(self, parent)
         self.repo = repo
@@ -33,8 +38,10 @@ class PerforcePending(QDialog):
         self.cslist = cslist.ChangesetList()
         layout.addWidget(self.cslist)
 
-        self.cmd = cmdui.Widget()
+        self.cmd = cmdui.Runner(self)
         self.cmd.commandFinished.connect(self.commandFinished)
+        self.cmd.output.connect(self.output)
+        self.cmd.makeLogVisible.connect(self.makeLogVisible)
         self.cmd.setVisible(False)
         layout.addWidget(self.cmd)
 
@@ -85,6 +92,7 @@ class PerforcePending(QDialog):
         self.cmd.show_output(True)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
+        self.showMessage.emit(_('Submitting p4 changelist...'))
         self.cmd.run(cmdline)
 
     def revert(self):
@@ -96,9 +104,11 @@ class PerforcePending(QDialog):
         self.cmd.show_output(True)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
+        self.showMessage.emit(_('Reverting p4 changelist...'))
         self.cmd.run(cmdline)
 
     def commandFinished(self, ret):
+        self.showMessage.emit('')
         self.repo.decrementBusyCount()
         self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(True)
