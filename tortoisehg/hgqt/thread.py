@@ -14,7 +14,8 @@ import urllib2
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import ui, util, error, dispatch
+from mercurial import util, error, dispatch
+from mercurial import ui as uimod
 
 from tortoisehg.util import thread2, hglib
 from tortoisehg.hgqt.i18n import _, localgettext
@@ -88,7 +89,7 @@ class UiSignal(QObject):
         unit = hglib.tounicode(unit)
         self.progressSignal.emit(topic, pos, item, unit, total)
 
-class QtUi(ui.ui):
+class QtUi(uimod.ui):
     def __init__(self, src=None, responseq=None):
         super(QtUi, self).__init__(src)
 
@@ -159,7 +160,12 @@ class CmdThread(QThread):
         self.abortbyuser = False
         self.responseq = Queue.Queue()
         self.rawoutput = QStringList()
-
+        self.topics = {}
+        self.curstrs = QStringList()
+        self.curlabel = None
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.flush)
+        self.timer.start(100)
         self.finished.connect(self.thread_finished)
 
     def abort(self):
@@ -168,12 +174,36 @@ class CmdThread(QThread):
             thread2._async_raise(self.thread_id, KeyboardInterrupt)
 
     def thread_finished(self):
+        self.flush()
+        self.timer.stop()
         self.commandFinished.emit(self.ret)
+
+    def flush(self):
+        if self.curlabel is not None:
+            self.outputReceived.emit(self.curstrs.join(''), self.curlabel)
+        for topic in self.topics:
+            self.progressReceived.emit(topic, *self.topics[topic])
+        self.topics = {}
+        self.curlabel = None
 
     @pyqtSlot(QString, QString)
     def output_handler(self, msg, label):
-        self.rawoutput.append(msg)
+        if label != 'control':
+            self.rawoutput.append(msg)
 
+        if label == self.curlabel:
+            self.curstrs.append(msg)
+        else:
+            if self.curlabel is not None:
+                self.outputReceived.emit(self.curstrs.join(''), self.curlabel)
+            self.curstrs = QStringList(msg)
+            self.curlabel = label
+
+    @pyqtSlot(QString, object, QString, QString, object)
+    def progress_handler(self, topic, pos, item, unit, total):
+        self.topics[topic] = (pos, item, unit, total)
+
+    @pyqtSlot(DataWrapper)
     def interact_handler(self, wrapper):
         prompt, password, choices, default = wrapper.data
         prompt = hglib.tounicode(prompt)
@@ -215,16 +245,18 @@ class CmdThread(QThread):
         self.thread_id = int(QThread.currentThreadId())
 
         ui = QtUi(responseq=self.responseq)
-        ui.sig.writeSignal.connect(self.output_handler)
-        ui.sig.interactSignal.connect(self.interact_handler)
-        ui.sig.progressSignal.connect(self.progressReceived)
-        ui.sig.writeSignal.connect(self.outputReceived)
+        ui.sig.writeSignal.connect(self.output_handler,
+                Qt.QueuedConnection)
+        ui.sig.progressSignal.connect(self.progress_handler,
+                Qt.QueuedConnection)
+        ui.sig.interactSignal.connect(self.interact_handler,
+                Qt.QueuedConnection)
 
         if self.display:
             cmd = '%% hg %s\n' % self.display
         else:
             cmd = '%% hg %s\n' % ' '.join(self.cmdline)
-        self.outputReceived.emit(hglib.tounicode(cmd), 'control')
+        ui.write(cmd, label='control')
 
         try:
             for k, v in ui.configitems('defaults'):
@@ -239,7 +271,7 @@ class CmdThread(QThread):
         except KeyboardInterrupt:
             pass
 
-        if self.ret is None:
+        if self.ret == -1:
             if self.abortbyuser:
                 msg = _('[command terminated by user %s]')
             else:
@@ -248,5 +280,4 @@ class CmdThread(QThread):
             msg = _('[command returned code %d %%s]') % int(self.ret)
         else:
             msg = _('[command completed successfully %s]')
-        msg = hglib.tounicode(msg % time.asctime() + '\n')
-        self.outputReceived.emit(msg, 'control')
+        ui.write(msg % time.asctime() + '\n', label='control')
