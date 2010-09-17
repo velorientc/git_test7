@@ -118,7 +118,7 @@ class ThgStatusBar(QStatusBar):
         else:
             pm = self.topics[key]
         if total:
-            fmt = '%s / %s ' % (str(pos), str(total))
+            fmt = '%s / %s ' % (unicode(pos), unicode(total))
             if unit:
                 fmt += unit
             pm.status.setText(fmt)
@@ -126,7 +126,7 @@ class ThgStatusBar(QStatusBar):
         else:
             if item:
                 item = item[-30:]
-            pm.status.setText('%s %s' % (str(pos), item))
+            pm.status.setText('%s %s' % (unicode(pos), item))
             pm.unknown()
 
 
