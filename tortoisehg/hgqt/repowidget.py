@@ -18,10 +18,9 @@ from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
+from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff, thread
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo, purge
 
-from tortoisehg.hgqt.thread import DataWrapper
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
@@ -37,8 +36,8 @@ class RepoWidget(QWidget):
     showMessageSignal = pyqtSignal(str)
     closeSelfSignal = pyqtSignal(QWidget)
 
-    progress = pyqtSignal(DataWrapper)
-    output = pyqtSignal(DataWrapper)
+    progress = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, repo, workbench):

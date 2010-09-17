@@ -18,7 +18,7 @@ from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, thread
 
 class UpdateDialog(QDialog):
 
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     progress = pyqtSignal(thread.DataWrapper)
     makeLogVisible = pyqtSignal(bool)
 

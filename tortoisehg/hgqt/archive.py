@@ -25,7 +25,7 @@ WD_PARENT = _('= Working Directory Parent =')
 class ArchiveDialog(QDialog):
     """ Dialog to archive a particular Mercurial revision """
 
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(thread.DataWrapper)
 

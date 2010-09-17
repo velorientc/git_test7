@@ -29,7 +29,7 @@ class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
     showMessage = pyqtSignal(unicode)
 
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     progress = pyqtSignal(thread.DataWrapper)
     makeLogVisible = pyqtSignal(bool)
 

@@ -20,7 +20,7 @@ from tortoisehg.util import hglib, paths
 class RenameDialog(QDialog):
     """TortoiseHg rename dialog"""
 
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(thread.DataWrapper)
 

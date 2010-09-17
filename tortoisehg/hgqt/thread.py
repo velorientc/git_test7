@@ -27,8 +27,7 @@ class DataWrapper(object):
         self.data = data
 
 class UiSignal(QObject):
-    writeSignal = pyqtSignal(DataWrapper)
-    errorSignal = pyqtSignal(DataWrapper)
+    writeSignal = pyqtSignal(QString, QString)
     interactSignal = pyqtSignal(DataWrapper)
     progressSignal = pyqtSignal(DataWrapper)
 
@@ -37,13 +36,14 @@ class UiSignal(QObject):
         self.responseq = responseq
 
     def write(self, *args, **opts):
-        wrapper = DataWrapper((''.join(args), opts.get('label', '')))
-        self.writeSignal.emit(wrapper)
+        msg = hglib.tounicode(''.join(args))
+        label = hglib.tounicode(opts.get('label', ''))
+        self.writeSignal.emit(msg, label)
 
     def write_err(self, *args, **opts):
-        for a in args:
-            data = DataWrapper((str(a), opts.get('label', 'ui.error')))
-            self.errorSignal.emit(data)
+        msg = hglib.tounicode(''.join(args))
+        label = hglib.tounicode(opts.get('label', 'ui.error'))
+        self.writeSignal.emit(msg, label)
 
     def prompt(self, msg, choices, default):
         try:
@@ -135,11 +135,8 @@ class CmdThread(QThread):
     for feedback from Mercurial can be handled by the user via dialog
     windows.
     """
-    # (msg=str, label=str) [wrapped]
-    outputReceived = pyqtSignal(DataWrapper)
-
-    # (msg=str, label=str) [wrapped]
-    errorReceived = pyqtSignal(DataWrapper)
+    # (msg=str, label=str)
+    outputReceived = pyqtSignal(QString, QString)
 
     # (topic=str, item=str, pos=int, total=int, unit=str) [wrapped]
     progressReceived = pyqtSignal(DataWrapper)
@@ -158,7 +155,7 @@ class CmdThread(QThread):
         self.ret = -1
         self.abortbyuser = False
         self.responseq = Queue.Queue()
-        self.rawoutput = []
+        self.rawoutput = QStringList()
 
         self.finished.connect(self.thread_finished)
 
@@ -170,9 +167,9 @@ class CmdThread(QThread):
     def thread_finished(self):
         self.commandFinished.emit(self.ret)
 
-    def output_handler(self, wrapper):
-        self.rawoutput.append(wrapper.data[0])
-        self.outputReceived.emit(wrapper)
+    @pyqtSlot(QString, QString)
+    def output_handler(self, msg, label):
+        self.rawoutput.append(msg)
 
     def interact_handler(self, wrapper):
         prompt, password, choices, default = wrapper.data
@@ -216,16 +213,15 @@ class CmdThread(QThread):
 
         ui = QtUi(responseq=self.responseq)
         ui.sig.writeSignal.connect(self.output_handler)
-        ui.sig.errorSignal.connect(self.errorReceived)
         ui.sig.interactSignal.connect(self.interact_handler)
         ui.sig.progressSignal.connect(self.progressReceived)
+        ui.sig.writeSignal.connect(self.outputReceived)
 
         if self.display:
             cmd = '%% hg %s\n' % self.display
         else:
             cmd = '%% hg %s\n' % ' '.join(self.cmdline)
-        w = DataWrapper((cmd, 'control'))
-        self.outputReceived.emit(w)
+        self.outputReceived.emit(hglib.tounicode(cmd), 'control')
 
         try:
             for k, v in ui.configitems('defaults'):
@@ -249,5 +245,5 @@ class CmdThread(QThread):
             msg = _('[command returned code %d %%s]') % int(self.ret)
         else:
             msg = _('[command completed successfully %s]')
-        w = DataWrapper((msg % time.asctime() + '\n', 'control'))
-        self.outputReceived.emit(w)
+        msg = hglib.tounicode(msg % time.asctime() + '\n')
+        self.outputReceived.emit(msg, 'control')

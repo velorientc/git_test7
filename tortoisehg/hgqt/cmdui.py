@@ -140,7 +140,7 @@ class Core(QObject):
     commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     progress = pyqtSignal(thread.DataWrapper)
 
     def __init__(self, useInternal, parent):
@@ -183,7 +183,7 @@ class Core(QObject):
 
     def get_rawoutput(self):
         if self.thread:
-            return ''.join(self.thread.rawoutput)
+            return hglib.fromunicode(self.thread.rawoutput.join(''))
         else:
             return ''
 
@@ -200,26 +200,15 @@ class Core(QObject):
         self.thread.commandFinished.connect(self.command_finished)
 
         self.thread.outputReceived.connect(self.output)
-        self.thread.errorReceived.connect(self.output)
         self.thread.progressReceived.connect(self.progress)
 
         if self.internallog:
             self.thread.outputReceived.connect(self.output_received)
-            self.thread.errorReceived.connect(self.output_received)
-
         if self.stbar:
             self.thread.progressReceived.connect(self.stbar.progress)
 
         self.thread.start()
         return True
-
-    def append_output(self, msg, style=''):
-        msg = msg.replace('\n', '<br />')
-        cursor = self.output_text.textCursor()
-        cursor.movePosition(QTextCursor.End)
-        cursor.insertHtml('<font style="%s">%s</font>' % (style, msg))
-        max = self.output_text.verticalScrollBar().maximum()
-        self.output_text.verticalScrollBar().setSliderPosition(max)
 
     def clear_output(self):
         if self.internallog:
@@ -263,13 +252,16 @@ class Core(QObject):
 
         self.commandCanceling.emit()
 
-    @pyqtSlot(thread.DataWrapper)
-    def output_received(self, wrapper):
-        msg, label = wrapper.data
-        msg = hglib.tounicode(msg)
+    @pyqtSlot(QString, QString)
+    def output_received(self, msg, label):
         msg = Qt.escape(msg)
         style = qtlib.geteffect(label)
-        self.append_output(msg, style)
+        msg = msg.replace('\n', '<br />')
+        cursor = self.output_text.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        cursor.insertHtml('<font style="%s">%s</font>' % (style, msg))
+        max = self.output_text.verticalScrollBar().maximum()
+        self.output_text.verticalScrollBar().setSliderPosition(max)
 
 
 class Widget(QWidget):
@@ -279,7 +271,7 @@ class Widget(QWidget):
     commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     progress = pyqtSignal(thread.DataWrapper)
     makeLogVisible = pyqtSignal(bool)
 
@@ -455,7 +447,7 @@ class Runner(QObject):
     commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     progress = pyqtSignal(thread.DataWrapper)
     makeLogVisible = pyqtSignal(bool)
 

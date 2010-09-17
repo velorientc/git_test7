@@ -40,19 +40,14 @@ class LogDockWidget(QDockWidget):
         self.logte.setWordWrapMode(QTextOption.NoWrap)
         vbox.addWidget(self.logte, 1)
 
-    @pyqtSlot(thread.DataWrapper)
-    def output(self, wrapper):
-        msg, label = wrapper.data
-        msg = hglib.tounicode(msg)
-        msg = Qt.escape(msg)
-        style = qtlib.geteffect(label)
-        self.logMessage(msg, style)
-
     @pyqtSlot()
     def clear(self):
         self.logte.clear()
 
-    def logMessage(self, msg, style=''):
+    @pyqtSlot(QString, QString)
+    def output(self, msg, label):
+        msg = Qt.escape(msg)
+        style = qtlib.geteffect(label)
         msg = msg.replace('\n', '<br/>')
         cursor = self.logte.textCursor()
         cursor.movePosition(QTextCursor.End)

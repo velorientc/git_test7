@@ -89,6 +89,7 @@ def configstyles(ui):
 
 def geteffect(labels):
     'map labels like "log.date" to Qt font styles'
+    labels = str(labels) # Could be QString
     effects = []
     # Multiple labels may be requested
     for l in labels.split():

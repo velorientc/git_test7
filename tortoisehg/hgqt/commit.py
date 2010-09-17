@@ -33,7 +33,7 @@ class CommitWidget(QWidget):
     commitComplete = pyqtSignal()
 
     progress = pyqtSignal(thread.DataWrapper)
-    output = pyqtSignal(thread.DataWrapper)
+    output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, pats, opts, root=None, embedded=False, parent=None):
