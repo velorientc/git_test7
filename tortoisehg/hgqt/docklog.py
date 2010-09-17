@@ -27,6 +27,8 @@ class LogDockWidget(QDockWidget):
                          QDockWidget.DockWidgetMovable  |
                          QDockWidget.DockWidgetFloatable)
         self.setWindowTitle(_('Output Log'))
+        # Not enabled until we have a way to make it configurable
+        #self.setWindowFlags(Qt.Drawer)
 
         mainframe = QFrame()
         vbox = QVBoxLayout()
