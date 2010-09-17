@@ -19,6 +19,7 @@ class BranchOpDialog(QDialog):
     'Dialog for manipulating wctx.branch()'
     def __init__(self, repo, oldbranchop, parent=None):
         QDialog.__init__(self, parent)
+        self.setWindowTitle('%s - branch operation' % repo.displayname)
         layout = QVBoxLayout()
         self.setLayout(layout)
         wctx = repo[None]
