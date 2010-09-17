@@ -194,6 +194,11 @@ class Workbench(QMainWindow):
         a.setCheckable(True)
 
         self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
+        self.actionSelectTaskLog = QAction(_("Revision &Details"), self)
+        self.actionSelectTaskCommit = QAction(_("&Commit..."), self)
+        self.actionSelectTaskManifest = QAction(_("&Manifest..."), self)
+        self.actionSelectTaskSync = QAction(_("S&ynchronize..."), self)
+        self.actionSelectTaskGrep = QAction(_("&Search..."), self)
 
         self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
         a.setCheckable(True)
@@ -247,6 +252,12 @@ class Workbench(QMainWindow):
         m.addAction(self.actionShowLog)
         m.addSeparator()
         m.addAction(self.actionSelectColumns)
+        m.addSeparator()
+        m.addAction(self.actionSelectTaskLog)
+        m.addAction(self.actionSelectTaskCommit)
+        m.addAction(self.actionSelectTaskManifest)
+        m.addAction(self.actionSelectTaskSync)
+        m.addAction(self.actionSelectTaskGrep)
         m.addSeparator()
         m.addAction(self.actionRefresh)
         m.addAction(self.actionRefreshTaskTab)
@@ -340,6 +351,11 @@ class Workbench(QMainWindow):
         self.actionImport.triggered.connect(self.thgimport)
         self.actionLoadAll.triggered.connect(self.loadall)
         self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
+        self.actionSelectTaskLog.triggered.connect(self.showRepoTaskLog)
+        self.actionSelectTaskCommit.triggered.connect(self.showRepoTaskCommit)
+        self.actionSelectTaskManifest.triggered.connect(self.showRepoTaskManifest)
+        self.actionSelectTaskSync.triggered.connect(self.showRepoTaskSync)
+        self.actionSelectTaskGrep.triggered.connect(self.showRepoTaskGrep)
         self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
         self.actionShowLog.toggled.connect(self.showLog)
@@ -370,6 +386,31 @@ class Workbench(QMainWindow):
     def showLog(self, show):
         self.log.setVisible(show)
 
+    def showRepoTaskLog(self, show):
+        rw = self.repoTabsWidget.currentWidget()
+        if not rw: return
+        rw.taskTabsWidget.setCurrentIndex(rw.logTabIndex)
+
+    def showRepoTaskCommit(self, show):
+        rw = self.repoTabsWidget.currentWidget()
+        if not rw: return
+        rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
+
+    def showRepoTaskManifest(self, show):
+        rw = self.repoTabsWidget.currentWidget()
+        if not rw: return
+        rw.taskTabsWidget.setCurrentIndex(rw.manifestTabIndex)
+
+    def showRepoTaskSync(self, show):
+        rw = self.repoTabsWidget.currentWidget()
+        if not rw: return
+        rw.taskTabsWidget.setCurrentIndex(rw.syncTabIndex)
+
+    def showRepoTaskGrep(self, show):
+        rw = self.repoTabsWidget.currentWidget()
+        if not rw: return
+        rw.taskTabsWidget.setCurrentIndex(rw.grepTabIndex)
+        
     def openRepo(self, repopath):
         if isinstance(repopath, (unicode, QString)):  # as Qt slot
             repopath = hglib.fromunicode(repopath)
