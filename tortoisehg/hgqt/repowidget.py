@@ -104,13 +104,13 @@ class RepoWidget(QWidget):
         self.manifestTabIndex = idx = tt.addTab(w, geticon('annotate'), '')
         tt.setTabToolTip(idx, _('Manifest'))
 
-        self.syncDemand = w = DemandWidget(self.createSyncWidget)
-        self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
-        tt.setTabToolTip(idx, _("Synchronize"))
-
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
         self.grepTabIndex = idx = tt.addTab(w, geticon('repobrowse'), '')
         tt.setTabToolTip(idx, _("Search"))
+
+        self.syncDemand = w = DemandWidget(self.createSyncWidget)
+        self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
+        tt.setTabToolTip(idx, _("Synchronize"))
 
         d = self.revDetailsWidget
         self.findToolbar = tb = FindInGraphlogQuickBar(self)
