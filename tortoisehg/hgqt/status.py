@@ -10,7 +10,7 @@ import os
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
 from mercurial import context, merge, commands, subrepo
 from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
-from tortoisehg.hgqt import thgrepo, cmdui, thread
+from tortoisehg.hgqt import thgrepo, cmdui
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.util import xml_escape
 from tortoisehg.hgqt.i18n import _
@@ -46,7 +46,7 @@ class StatusWidget(QWidget):
        showMessage(unicode)         - for status bar
        titleTextChanged(QString)    - for window title
     '''
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
     titleTextChanged = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
 
@@ -236,7 +236,7 @@ class StatusWidget(QWidget):
             sp = None
         self.sp = sp
 
-        self.progress.emit(cmdui.startProgress(_('Refresh'), _('status')))
+        self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.refreshing.finished.connect(self.reloadComplete)
         self.refreshing.showMessage.connect(self.showMessage)
@@ -247,7 +247,7 @@ class StatusWidget(QWidget):
         self.wctx = wctx
         self.patchecked = patchecked.copy()
         self.updateModel()
-        self.progress.emit(cmdui.stopProgress(_('Refresh')))
+        self.progress.emit(*cmdui.stopProgress(_('Refresh')))
         self.refreshing.wait()
         self.refreshing = None
 

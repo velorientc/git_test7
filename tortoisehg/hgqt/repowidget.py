@@ -18,7 +18,7 @@ from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
-from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff, thread
+from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo, purge
 
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -36,8 +36,8 @@ class RepoWidget(QWidget):
     showMessageSignal = pyqtSignal(str)
     closeSelfSignal = pyqtSignal(QWidget)
 
-    progress = pyqtSignal(thread.DataWrapper)
     output = pyqtSignal(QString, QString)
+    progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, repo, workbench):
@@ -139,8 +139,8 @@ class RepoWidget(QWidget):
 
         # Shared widgets must be connected directly to workbench
         cw.output.connect(self.workbench.log.output)
-        cw.progress.connect(lambda w:
-                self.workbench.statusbar.progress(w, self.repo.root))
+        cw.progress.connect(lambda tp, p, i, u, tl:
+            self.workbench.statusbar.progress(tp, p, i, u, tl, self.repo.root))
         cw.makeLogVisible.connect(self.workbench.log.setShown)
 
         cw.showMessage.connect(self.showMessage)
@@ -171,8 +171,9 @@ class RepoWidget(QWidget):
             sw = SyncWidget(self.repo.root, True, self)
             # Shared widgets must be connected directly to workbench
             sw.output.connect(self.workbench.log.output)
-            sw.progress.connect(lambda w:
-                    self.workbench.statusbar.progress(w, self.repo.root))
+            sw.progress.connect(lambda tp, p, i, u, tl:
+                self.workbench.statusbar.progress(tp, p, i, u, tl,
+                                                  self.repo.root))
             sw.makeLogVisible.connect(self.workbench.log.setShown)
             self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)

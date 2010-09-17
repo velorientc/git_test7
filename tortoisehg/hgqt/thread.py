@@ -28,8 +28,8 @@ class DataWrapper(object):
 
 class UiSignal(QObject):
     writeSignal = pyqtSignal(QString, QString)
+    progressSignal = pyqtSignal(QString, object, QString, QString, object)
     interactSignal = pyqtSignal(DataWrapper)
-    progressSignal = pyqtSignal(DataWrapper)
 
     def __init__(self, responseq):
         QObject.__init__(self)
@@ -83,8 +83,10 @@ class UiSignal(QObject):
         return self.responseq.get(True)
 
     def progress(self, topic, pos, item, unit, total):
-        data = DataWrapper((topic, item, pos, total, unit))
-        self.progressSignal.emit(data)
+        topic = hglib.tounicode(topic)
+        item = hglib.tounicode(item)
+        unit = hglib.tounicode(unit)
+        self.progressSignal.emit(topic, pos, item, unit, total)
 
 class QtUi(ui.ui):
     def __init__(self, src=None, responseq=None):
@@ -138,8 +140,9 @@ class CmdThread(QThread):
     # (msg=str, label=str)
     outputReceived = pyqtSignal(QString, QString)
 
-    # (topic=str, item=str, pos=int, total=int, unit=str) [wrapped]
-    progressReceived = pyqtSignal(DataWrapper)
+    # (topic=str, pos=int, item=str, unit=str, total=int)
+    # pos and total are emitted as object, since they may be None
+    progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
     # result: -1 - command is incomplete, possibly exited with exception
     #          0 - command is finished successfully

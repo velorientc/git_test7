@@ -15,12 +15,12 @@ from tortoisehg.hgqt import qtlib, thread
 local = localgettext()
 
 def startProgress(topic, status):
-    topic, item, pos, total, unit = topic, '...', status, None, None
-    return thread.DataWrapper((topic, item, pos, total, unit))
+    topic, item, pos, total, unit = topic, '...', status, None, ''
+    return (topic, pos, item, unit, total)
 
 def stopProgress(topic):
-    topic, item, pos, total, unit = topic, None, None, None, None
-    return thread.DataWrapper((topic, item, pos, total, unit))
+    topic, item, pos, total, unit = topic, '', None, None, ''
+    return (topic, pos, item, unit, total)
 
 class ProgressMonitor(QWidget):
     'Progress bar for use in workbench status bar'
@@ -81,10 +81,9 @@ class ThgStatusBar(QStatusBar):
             self.removeWidget(pm)
             del self.topics[key]
 
-    @pyqtSlot(thread.DataWrapper)
-    def progress(self, wrapper, root=None):
+    @pyqtSlot(QString, object, QString, QString, object)
+    def progress(self, topic, pos, item, unit, total, root=None):
         'Progress signal received from repowidget'
-        topic, item, pos, total, unit = wrapper.data
         # topic is current operation
         # pos is the current numeric position (revision, bytes)
         # item is a non-numeric marker of current position (current file)
@@ -92,7 +91,7 @@ class ThgStatusBar(QStatusBar):
         # total is the highest expected pos
         # All topics should be marked closed by setting pos to None
 
-        if topic is None:
+        if not topic:
             # special progress report, close all pbars for repo
             for key in self.topics:
                 if root is None or key[0] == root:
@@ -126,7 +125,7 @@ class ThgStatusBar(QStatusBar):
             pm.setcounts(pos, total)
         else:
             if item:
-                item = hglib.tounicode(item)[-30:]
+                item = item[-30:]
             pm.status.setText('%s %s' % (str(pos), item))
             pm.unknown()
 
@@ -141,7 +140,7 @@ class Core(QObject):
     commandCanceling = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, useInternal, parent):
         super(Core, self).__init__()
@@ -241,7 +240,7 @@ class Core(QObject):
             return # run next command
 
         # Emit 'close all progress bars' signal
-        self.progress.emit(thread.DataWrapper((None,)*5))
+        self.progress.emit('', None, '', '', None)
         self.commandFinished.emit(ret)
 
     @pyqtSlot()
@@ -272,7 +271,7 @@ class Widget(QWidget):
     commandCanceling = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, useInternal=True, parent=None):
@@ -448,7 +447,7 @@ class Runner(QObject):
     commandCanceling = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, title=_('TortoiseHg'), useInternal=True, parent=None):

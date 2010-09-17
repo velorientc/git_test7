@@ -428,7 +428,8 @@ class Workbench(QMainWindow):
         rw = RepoWidget(repo, self)
         rw.showMessageSignal.connect(self.showMessage)
         rw.closeSelfSignal.connect(self.repoTabCloseSelf)
-        rw.progress.connect(lambda w: self.statusbar.progress(w, repo.root))
+        rw.progress.connect(lambda tp, p, i, u, tl:
+            self.statusbar.progress(tp, p, i, u, tl, repo.root))
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
 

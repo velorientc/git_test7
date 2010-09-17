@@ -16,8 +16,7 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths, wconfig
 
-from tortoisehg.hgqt import qtlib, status, cmdui, branchop
-from tortoisehg.hgqt import revpanel, thread
+from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
@@ -32,7 +31,7 @@ class CommitWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     commitComplete = pyqtSignal()
 
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 

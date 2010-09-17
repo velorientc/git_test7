@@ -14,7 +14,7 @@ from PyQt4.QtGui import *
 from mercurial import hg, ui, util, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo, thread
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo
 from tortoisehg.util import hglib, paths
 
 class RenameDialog(QDialog):
@@ -22,7 +22,7 @@ class RenameDialog(QDialog):
 
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, ui, pats, parent=None, **opts):
         super(RenameDialog, self).__init__(parent=None)

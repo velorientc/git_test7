@@ -17,7 +17,7 @@ from mercurial import hg, ui, url, util, error
 
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, thgrepo, thread
+from tortoisehg.hgqt import qtlib, cmdui, thgrepo
 
 # TODO
 # Write keyring help, connect to help button
@@ -30,7 +30,7 @@ class SyncWidget(QWidget):
     showMessage = pyqtSignal(unicode)
 
     output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, root, embedded=False, parent=None, **opts):

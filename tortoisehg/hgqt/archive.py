@@ -18,7 +18,7 @@ from mercurial import hg, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo, thread
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo
 
 WD_PARENT = _('= Working Directory Parent =')
 
@@ -27,7 +27,7 @@ class ArchiveDialog(QDialog):
 
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ArchiveDialog, self).__init__(parent)

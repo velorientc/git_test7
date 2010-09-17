@@ -12,7 +12,7 @@ from mercurial import hg, ui, mdiff, similar, patch
 from tortoisehg.util import hglib, shlib, paths
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, htmlui, cmdui, thgrepo, thread
+from tortoisehg.hgqt import qtlib, htmlui, cmdui, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -346,7 +346,7 @@ class RenameSearchThread(QThread):
     '''Background thread for searching repository history'''
     searchComplete = pyqtSignal()
     match = pyqtSignal(object)
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
     showMessage = pyqtSignal(unicode)
 
     def __init__(self, repo, ufiles, minpct, copies):
@@ -368,8 +368,7 @@ class RenameSearchThread(QThread):
                 if src:
                     src.psig.connect(self.psig)
             def progress(self, topic, pos, item='', unit='', total=None):
-                w = thread.DataWrapper([topic, item, pos, total, unit])
-                self.psig.emit(w)
+                self.psig.emit(topic, pos, item, unit, total)
         progui = ProgUi()
         progui.psig.connect(self.progress)
         storeui = self.repo.ui

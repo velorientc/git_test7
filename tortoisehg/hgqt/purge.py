@@ -12,14 +12,14 @@ from mercurial import cmdutil
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, thread
+from tortoisehg.hgqt import qtlib, cmdui
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 class PurgeDialog(QDialog):
 
-    progress = pyqtSignal(thread.DataWrapper)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, repo, unknown, ignored, parent):
         QDialog.__init__(self, parent)
@@ -108,22 +108,20 @@ class PurgeDialog(QDialog):
                 os.remove(path)
 
         for i, f in enumerate(sorted(files)):
-            data = thread.DataWrapper(('deleting', f, i, len(files), None))
-            self.progress.emit(data)
+            data = ('deleting', i, f, '', len(files))
+            self.progress.emit(*data)
             remove(removefile, f)
-        data = thread.DataWrapper(('deleting', None, None, len(files), None))
-        self.progress.emit(data)
+        data = ('deleting', None, '', '', len(files))
+        self.progress.emit(*data)
 
         if delfolders:
             for i, f in enumerate(sorted(directories, reverse=True)):
                 if not os.listdir(repo.wjoin(f)):
-                    data = thread.DataWrapper(('rmdir', f, i,
-                                              len(directories), None))
-                    self.progress.emit(data)
+                    data = ('rmdir', i, f, '', len(directories))
+                    self.progress.emit(*data)
                     remove(os.rmdir, f)
-            data = thread.DataWrapper(('rmdir', None, None,
-                                      len(directories), None))
-            self.progress.emit(data)
+            data = ('rmdir', None, f, '', len(directories))
+            self.progress.emit(*data)
         return failures
 
 def run(ui, *pats, **opts):
