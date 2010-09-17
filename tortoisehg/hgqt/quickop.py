@@ -125,9 +125,9 @@ class QuickOpDialog(QDialog):
         self.cmd.setShown(True)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
 
-    def commandFinished(self, wrapper):
+    def commandFinished(self, ret):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
-        if wrapper.data is not 0:
+        if ret is not 0:
             self.cmd.show_output(True)
         else:
             self.reject()

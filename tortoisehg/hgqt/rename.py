@@ -322,8 +322,8 @@ class RenameDialog(QDialog):
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
 
-    def command_finished(self, wrapper):
-        if (wrapper.data is not 0 or self.cmd.is_show_output()
+    def command_finished(self, ret):
+        if (ret is not 0 or self.cmd.is_show_output()
                 or self.keep_open_chk.isChecked()):
             if not self.cmd.is_show_output():
                 self.detail_btn.click()

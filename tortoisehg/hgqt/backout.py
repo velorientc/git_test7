@@ -160,9 +160,9 @@ class BackoutDialog(QDialog):
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
 
-    def command_finished(self, wrapper):
+    def command_finished(self, ret):
         self.repo.decrementBusyCount()
-        if wrapper.data is not 0 or self.cmd.is_show_output():
+        if ret is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)

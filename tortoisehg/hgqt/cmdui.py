@@ -137,7 +137,7 @@ class Core(QObject):
     """
 
     commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(thread.DataWrapper)
+    commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
     output = pyqtSignal(thread.DataWrapper)
@@ -234,10 +234,8 @@ class Core(QObject):
 
         self.commandStarted.emit()
 
-    @pyqtSlot(thread.DataWrapper)
-    def command_finished(self, wrapper):
-        ret = wrapper.data
-
+    @pyqtSlot(int)
+    def command_finished(self, ret):
         if self.stbar:
             if ret is None:
                 self.stbar.clear()
@@ -255,7 +253,7 @@ class Core(QObject):
 
         # Emit 'close all progress bars' signal
         self.progress.emit(thread.DataWrapper((None,)*5))
-        self.commandFinished.emit(wrapper)
+        self.commandFinished.emit(ret)
 
     @pyqtSlot()
     def command_canceling(self):
@@ -278,7 +276,7 @@ class Widget(QWidget):
     """An embeddable widget for running Mercurial command"""
 
     commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(thread.DataWrapper)
+    commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
     output = pyqtSignal(thread.DataWrapper)
@@ -335,18 +333,18 @@ class Widget(QWidget):
 
     ### Signal Handler ###
 
-    @pyqtSlot(thread.DataWrapper)
-    def command_finished(self, wrapper):
-        if wrapper.data is None:
+    @pyqtSlot(int)
+    def command_finished(self, ret):
+        if ret == -1:
             self.makeLogVisible.emit(True)
             self.show_output(True)
-        self.commandFinished.emit(wrapper)
+        self.commandFinished.emit(ret)
 
 class Dialog(QDialog):
     """A dialog for running random Mercurial command"""
 
     commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(thread.DataWrapper)
+    commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
     def __init__(self, cmdline, parent=None, finishfunc=None):
@@ -433,8 +431,8 @@ class Dialog(QDialog):
     def cancel_clicked(self):
         self.core.cancel()
 
-    @pyqtSlot(thread.DataWrapper)
-    def command_finished(self, wrapper):
+    @pyqtSlot(int)
+    def command_finished(self, ret):
         self.cancel_btn.setHidden(True)
         self.close_btn.setShown(True)
         self.close_btn.setFocus()
@@ -454,7 +452,7 @@ class Runner(QObject):
     """
 
     commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(thread.DataWrapper)
+    commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
     output = pyqtSignal(thread.DataWrapper)
@@ -503,9 +501,9 @@ class Runner(QObject):
 
     ### Signal Handler ###
 
-    @pyqtSlot(thread.DataWrapper)
-    def command_finished(self, wrapper):
-        if wrapper.data != 0:
+    @pyqtSlot(int)
+    def command_finished(self, ret):
+        if ret != 0:
             self.makeLogVisible.emit(True)
             self.show_output()
-        self.commandFinished.emit(wrapper)
+        self.commandFinished.emit(ret)

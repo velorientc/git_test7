@@ -400,17 +400,13 @@ class SyncWidget(QWidget):
             self.cmd.show_output(True)
             self.cmd.setVisible(True)
 
-    def commandFinished(self, wrapper):
+    def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         for b in self.opbuttons:
             if b: b.setEnabled(True)
         if self.finishfunc:
             output = self.cmd.core.get_rawoutput()
-            if wrapper.data is None:
-                # An exception ocurred, command did not finish
-                self.finishfunc(-1, output)
-            else:
-                self.finishfunc(wrapper.data, output)
+            self.finishfunc(ret, output)
 
     def commandCanceled(self):
         for b in self.opbuttons:

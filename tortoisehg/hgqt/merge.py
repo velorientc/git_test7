@@ -175,7 +175,7 @@ class BasePage(QWizardPage):
     def cancel_clicked(self):
         self.cancel()
 
-    def command_finished(self, wrapper):
+    def command_finished(self, ret):
         pass
 
     def command_canceling(self):
@@ -369,8 +369,8 @@ class MergePage(BasePage):
 
     ### Signal Handlers ###
 
-    def command_finished(self, wrapper):
-        if wrapper.data == 0:
+    def command_finished(self, ret):
+        if ret == 0:
             self.wizard().repo.incrementBusyCount()
             self.wizard().repo.decrementBusyCount()
             self.done = True
@@ -390,9 +390,9 @@ class MergePage(BasePage):
         elif cmd == 'mq':
             # TODO: need to check existing patches
             patch = 'patch1'
-            def finished(wrapper):
+            def finished(ret):
                 self.wizard().repo.decrementBusyCount()
-                if wrapper.data == 0:
+                if ret == 0:
                     self.wizard().repo.incrementBusyCount()
                     self.wizard().repo.decrementBusyCount()
                     def callback():
@@ -415,9 +415,9 @@ class MergePage(BasePage):
                          ' outstanding changes in working directory?'),
                          labels=labels, parent=self):
                     return
-            def finished(wrapper):
+            def finished(ret):
                 self.wizard().repo.decrementBusyCount()
-                if wrapper.data == 0:
+                if ret == 0:
                     self.check_status()
             cmdline = ['update', '--clean', '--rev', self.wizard().local]
             self.runner = cmdui.Runner(_('Discard - TortoiseHg'), True, self)
@@ -432,9 +432,9 @@ class MergePage(BasePage):
                 return
             oldpatch = hglib.fromunicode(patch)
             newpatch = hglib.fromunicode(name)
-            def finished(wrapper):
+            def finished(ret):
                 self.wizard().repo.decrementBusyCount()
-                if wrapper.data == 0:
+                if ret == 0:
                     text = _('The patch <b>%(old)s</b> is renamed to <b>'
                              '%(new)s</b>.  <a href="rename:%(new)s"><b>'
                              'Rename</b></a> again?')
@@ -612,8 +612,8 @@ class CommitPage(BasePage):
 
     ### Signal Handlers ###
 
-    def command_finished(self, wrapper):
-        if wrapper.data == 0:
+    def command_finished(self, ret):
+        if ret == 0:
             self.wizard().repo.incrementBusyCount()
             self.wizard().repo.decrementBusyCount()
             self.done = True

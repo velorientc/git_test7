@@ -144,11 +144,10 @@ class CmdThread(QThread):
     # (topic=str, item=str, pos=int, total=int, unit=str) [wrapped]
     progressReceived = pyqtSignal(DataWrapper)
 
-    # result=int or None [wrapped]
-    # result: None - command is incomplete, possibly exited with exception
-    #         0 - command is finished successfully
-    #         others - return code of command
-    commandFinished = pyqtSignal(DataWrapper)
+    # result: -1 - command is incomplete, possibly exited with exception
+    #          0 - command is finished successfully
+    #          others - return code of command
+    commandFinished = pyqtSignal(int)
 
     def __init__(self, cmdline, display, parent=None):
         super(CmdThread, self).__init__()
@@ -156,7 +155,7 @@ class CmdThread(QThread):
         self.cmdline = cmdline
         self.display = display
         self.parent = parent
-        self.ret = None
+        self.ret = -1
         self.abortbyuser = False
         self.responseq = Queue.Queue()
         self.rawoutput = []
@@ -169,7 +168,7 @@ class CmdThread(QThread):
             thread2._async_raise(self.thread_id, KeyboardInterrupt)
 
     def thread_finished(self):
-        self.commandFinished.emit(DataWrapper(self.ret))
+        self.commandFinished.emit(self.ret)
 
     def output_handler(self, wrapper):
         self.rawoutput.append(wrapper.data[0])

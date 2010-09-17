@@ -20,9 +20,7 @@ from tortoisehg.hgqt import cmdui, qtlib
 
 class CloneDialog(QDialog):
 
-    cmdfinished = pyqtSignal(
-                     int  # status (0: succeeded, -1: failed)
-                 ) 
+    cmdfinished = pyqtSignal(int)
 
     def __init__(self, args=None, opts={}, parent=None):
         super(CloneDialog, self).__init__(parent)
@@ -113,6 +111,7 @@ class CloneDialog(QDialog):
         self.cmd = cmdui.Widget()
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
+        self.cmd.commandFinished.connect(self.cmdfinished)
         self.cmd.commandCanceling.connect(self.command_canceling)
         box.addWidget(self.cmd)
 
@@ -275,13 +274,8 @@ class CloneDialog(QDialog):
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
 
-    def command_finished(self, wrapper):
-        if wrapper.data is 0:
-            res = 0
-        else:
-            res = -1
-        self.cmdfinished.emit(res)
-        if wrapper.data is not 0 or self.cmd.is_show_output():
+    def command_finished(self, ret):
+        if ret is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)

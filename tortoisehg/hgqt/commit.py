@@ -581,9 +581,9 @@ class CommitWidget(QWidget):
         repo.incrementBusyCount()
         self.runner.run(*commandlines)
 
-    def commandFinished(self, wrapper):
+    def commandFinished(self, ret):
         self.repo.decrementBusyCount()
-        if not wrapper.data:
+        if ret == 0:
             self.addMessageToHistory()
             if not self.qref:
                 self.msgte.clear()

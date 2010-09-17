@@ -98,11 +98,11 @@ class PerforcePending(QDialog):
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.cmd.run(cmdline)
 
-    def commandFinished(self, wrapper):
+    def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(True)
-        if wrapper.data == 0:
+        if ret == 0:
             self.reject()
 
     def keyPressEvent(self, event):
