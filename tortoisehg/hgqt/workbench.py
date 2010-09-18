@@ -196,6 +196,7 @@ class Workbench(QMainWindow):
         self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
 
         self.actionGroupTaskView = ag = QActionGroup(self)
+        ag.setEnabled(False)
         self.actionSelectTaskLog = QAction(_("Revision &Details"), ag)
         self.actionSelectTaskCommit = QAction(_("&Commit..."), ag)
         self.actionSelectTaskManifest = QAction(_("&Manifest..."), ag)
@@ -446,24 +447,38 @@ class Workbench(QMainWindow):
             event.setDropAction(Qt.LinkAction)
             event.accept()
 
+    def updateTaskViewMenu(self, taskIndex=-1):
+        '''Fetch selected task tab from current repowidget and check corresponding action in menu'''
+        if self.repoTabsWidget.currentIndex() == -1:
+            self.actionGroupTaskView.setEnabled(False)
+            for a in self.actionGroupTaskView.actions():
+                a.setChecked(False)
+        else:
+            self.actionGroupTaskView.setEnabled(True)
+            rw = self.repoTabsWidget.currentWidget()
+            taskIndex = rw.taskTabsWidget.currentIndex()
+            self.actionGroupTaskView.actions()[taskIndex].setChecked(True)
+
     def repoTabCloseSelf(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
         index = self.repoTabsWidget.currentIndex()
         if widget.closeRepoWidget():
             self.repoTabsWidget.removeTab(index)
+            self.updateTaskViewMenu()
 
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
         w = tw.widget(index)
         if w and w.closeRepoWidget():
             tw.removeTab(index)
+            self.updateTaskViewMenu()
 
     def repoTabChanged(self, index=0):
         self.setupBranchCombo()
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.switchedTo()
-            self.actionGroupTaskView.actions()[w.taskTabsWidget.currentIndex()].setChecked(True)
+            self.updateTaskViewMenu()
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
@@ -474,11 +489,15 @@ class Workbench(QMainWindow):
             self.statusbar.progress(tp, p, i, u, tl, repo.root))
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
+        rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
 
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, repo.shortname)
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
+        
+        self.actionGroupTaskView.setEnabled(True)
+
 
     def showMessage(self, msg):
         self.statusbar.showMessage(msg)
