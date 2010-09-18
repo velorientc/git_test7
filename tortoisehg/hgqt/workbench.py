@@ -197,11 +197,16 @@ class Workbench(QMainWindow):
 
         self.actionGroupTaskView = ag = QActionGroup(self)
         ag.setEnabled(False)
-        self.actionSelectTaskLog = QAction(_("Revision &Details"), ag)
-        self.actionSelectTaskCommit = QAction(_("&Commit..."), ag)
-        self.actionSelectTaskManifest = QAction(_("&Manifest..."), ag)
-        self.actionSelectTaskGrep = QAction(_("&Search..."), ag)
-        self.actionSelectTaskSync = QAction(_("S&ynchronize..."), ag)
+        self.actionSelectTaskLog = a = QAction(_("Revision &Details"), ag)
+        a.setIcon(geticon('log'))
+        self.actionSelectTaskCommit = a = QAction(_("&Commit..."), ag)
+        a.setIcon(geticon('commit'))
+        self.actionSelectTaskManifest = a = QAction(_("&Manifest..."), ag)
+        a.setIcon(geticon('annotate'))
+        self.actionSelectTaskGrep = a = QAction(_("&Search..."), ag)
+        a.setIcon(geticon('repobrowse'))
+        self.actionSelectTaskSync = a = QAction(_("S&ynchronize..."), ag)
+        a.setIcon(geticon('sync'))
         for a in ag.actions():
             a.setCheckable(True)
 
