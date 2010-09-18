@@ -846,7 +846,7 @@ class AuthDialog(QDialog):
         alias = hglib.fromunicode(self.aliasentry.text())
         if alias+'.prefix' in cfg['auth']:
             if not qtlib.QuestionMsgBox(_('Confirm authentication replace'),
-                                        _('Authentication info for %s already'
+                                        _('Authentication info for %s already '
                                           'exists, replace?') % alias):
                 return
         cfg.set('auth', alias+'.schemes', schemes)
