@@ -194,11 +194,15 @@ class Workbench(QMainWindow):
         a.setCheckable(True)
 
         self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
-        self.actionSelectTaskLog = QAction(_("Revision &Details"), self)
-        self.actionSelectTaskCommit = QAction(_("&Commit..."), self)
-        self.actionSelectTaskManifest = QAction(_("&Manifest..."), self)
-        self.actionSelectTaskGrep = QAction(_("&Search..."), self)
-        self.actionSelectTaskSync = QAction(_("S&ynchronize..."), self)
+
+        self.actionGroupTaskView = ag = QActionGroup(self)
+        self.actionSelectTaskLog = QAction(_("Revision &Details"), ag)
+        self.actionSelectTaskCommit = QAction(_("&Commit..."), ag)
+        self.actionSelectTaskManifest = QAction(_("&Manifest..."), ag)
+        self.actionSelectTaskGrep = QAction(_("&Search..."), ag)
+        self.actionSelectTaskSync = QAction(_("S&ynchronize..."), ag)
+        for a in ag.actions():
+            a.setCheckable(True)
 
         self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
         a.setCheckable(True)
@@ -253,11 +257,7 @@ class Workbench(QMainWindow):
         m.addSeparator()
         m.addAction(self.actionSelectColumns)
         m.addSeparator()
-        m.addAction(self.actionSelectTaskLog)
-        m.addAction(self.actionSelectTaskCommit)
-        m.addAction(self.actionSelectTaskManifest)
-        m.addAction(self.actionSelectTaskGrep)
-        m.addAction(self.actionSelectTaskSync)
+        m.addActions(self.actionGroupTaskView.actions())
         m.addSeparator()
         m.addAction(self.actionRefresh)
         m.addAction(self.actionRefreshTaskTab)
@@ -463,6 +463,7 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.switchedTo()
+            self.actionGroupTaskView.actions()[w.taskTabsWidget.currentIndex()].setChecked(True)
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''
