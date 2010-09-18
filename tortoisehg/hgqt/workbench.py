@@ -290,6 +290,8 @@ class Workbench(QMainWindow):
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuRepository.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
+        
+        self.updateMenu()
 
     def createToolbars(self):
         self.edittbar = tb = QToolBar(_("Edit Toolbar"), self)
@@ -451,17 +453,40 @@ class Workbench(QMainWindow):
         if accept:
             event.setDropAction(Qt.LinkAction)
             event.accept()
+            
+    def updateMenu(self):
+        someRepoOpen = self.repoTabsWidget.count() > 0
+        self.actionGroupTaskView.setEnabled(someRepoOpen)
+        self.updateTaskViewMenu()
+        
+        self.actionFind.setEnabled(someRepoOpen)
+        self.actionRefresh.setEnabled(someRepoOpen)
+        self.actionRefreshTaskTab.setEnabled(someRepoOpen)
+        self.actionLoadAll.setEnabled(someRepoOpen)
 
-    def updateTaskViewMenu(self, taskIndex=-1):
-        '''Fetch selected task tab from current repowidget and check corresponding action in menu'''
-        if self.repoTabsWidget.currentIndex() == -1:
-            self.actionGroupTaskView.setEnabled(False)
+        self.actionClose_repository.setEnabled(someRepoOpen)
+        self.actionImport.setEnabled(someRepoOpen)
+        self.actionServe.setEnabled(someRepoOpen)
+        self.actionVerify.setEnabled(someRepoOpen)
+        self.actionRecover.setEnabled(someRepoOpen)
+        self.actionRollback.setEnabled(someRepoOpen)
+        self.actionPurge.setEnabled(someRepoOpen)
+        self.actionExplore.setEnabled(someRepoOpen)
+        self.actionTerminal.setEnabled(someRepoOpen)
+
+        self.actionIncoming.setEnabled(someRepoOpen)
+        self.actionPull.setEnabled(someRepoOpen)
+        self.actionOutgoing.setEnabled(someRepoOpen)
+        self.actionPush.setEnabled(someRepoOpen)
+
+    def updateTaskViewMenu(self, taskIndex=0):
+        # Fetch selected task tab from current repowidget and check corresponding action in menu
+        if self.repoTabsWidget.count() == 0:
             for a in self.actionGroupTaskView.actions():
                 a.setChecked(False)
         else:
-            self.actionGroupTaskView.setEnabled(True)
-            rw = self.repoTabsWidget.currentWidget()
-            taskIndex = rw.taskTabsWidget.currentIndex()
+            repoWidget = self.repoTabsWidget.currentWidget()
+            taskIndex = repoWidget.taskTabsWidget.currentIndex()
             self.actionGroupTaskView.actions()[taskIndex].setChecked(True)
 
     def repoTabCloseSelf(self, widget):
@@ -469,14 +494,14 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.currentIndex()
         if widget.closeRepoWidget():
             self.repoTabsWidget.removeTab(index)
-            self.updateTaskViewMenu()
+            self.updateMenu()
 
     def repoTabCloseRequested(self, index):
         tw = self.repoTabsWidget
         w = tw.widget(index)
         if w and w.closeRepoWidget():
             tw.removeTab(index)
-            self.updateTaskViewMenu()
+            self.updateMenu()
 
     def repoTabChanged(self, index=0):
         self.setupBranchCombo()
@@ -501,7 +526,7 @@ class Workbench(QMainWindow):
         tw.setCurrentIndex(index)
         self.reporegistry.addRepo(repo.root)
         
-        self.actionGroupTaskView.setEnabled(True)
+        self.updateMenu()
 
 
     def showMessage(self, msg):
