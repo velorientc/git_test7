@@ -617,6 +617,9 @@ class PostPullDialog(QDialog):
         self.setWindowTitle(_('Post Pull Behavior'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
+        lbl = QLabel(_('Select post-pull operation for this repository'))
+        layout.addWidget(lbl)
+
         self.none = QRadioButton(_('None - simply pull changesets'))
         self.update = QRadioButton(_('Update - pull, then try to update'))
         layout.addWidget(self.none)
@@ -647,28 +650,27 @@ class PostPullDialog(QDialog):
         elif repo.postpull == 'rebase':
             self.rebase.setChecked(True)
 
+        cfglabel = QLabel(_('<a href="config">Launch settings tool...</a>'))
+        cfglabel.linkActivated.connect(self.linkactivated)
+        layout.addWidget(cfglabel)
+
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Cancel)
+        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
-
-        sr = QPushButton(_('Save In Repo'))
-        sr.clicked.connect(self.saveInRepo)
-        bb.addButton(sr, BB.ActionRole)
-
-        sg = QPushButton(_('Save Global'))
-        sg.clicked.connect(self.saveGlobal)
-        sg.setAutoDefault(True)
-        bb.addButton(sg, BB.ActionRole)
 
         self.bb = bb
         layout.addWidget(bb)
 
-    def saveInRepo(self):
-        fn = os.path.join(self.repo.root, '.hg', 'hgrc')
-        self.saveToPath([fn])
+    def linkactivated(self, command):
+        if command == 'config':
+            from tortoisehg.hgqt.settings import SettingsDialog
+            sd = SettingsDialog(configrepo=False, focus='tortoisehg.postpull',
+                            parent=self, root=self.repo.root)
+        sd.exec_()
 
-    def saveGlobal(self):
-        self.saveToPath(util.user_rcpath())
+
+def run(ui, *pats, **opts):
 
     def getValue(self):
         if self.none.isChecked():
@@ -680,7 +682,8 @@ class PostPullDialog(QDialog):
         else:
             return 'rebase'
 
-    def saveToPath(self, path):
+    def accept(self):
+        path = os.path.join(self.repo.root, '.hg', 'hgrc')
         fn, cfg = loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save post pull operation'),
