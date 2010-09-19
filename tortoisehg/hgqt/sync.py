@@ -667,10 +667,7 @@ class PostPullDialog(QDialog):
             from tortoisehg.hgqt.settings import SettingsDialog
             sd = SettingsDialog(configrepo=False, focus='tortoisehg.postpull',
                             parent=self, root=self.repo.root)
-        sd.exec_()
-
-
-def run(ui, *pats, **opts):
+            sd.exec_()
 
     def getValue(self):
         if self.none.isChecked():
@@ -684,7 +681,7 @@ def run(ui, *pats, **opts):
 
     def accept(self):
         path = os.path.join(self.repo.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile(path, self)
+        fn, cfg = loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save post pull operation'),
                    _('Iniparse must be installed.'), parent=self)
