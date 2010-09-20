@@ -20,6 +20,13 @@ from tortoisehg.util import hglib
 
 _repocache = {}
 
+if 'THGDEBUG' in os.environ:
+    def dbgoutput(*args):
+        sys.stdout.write(' '.join([str(a) for a in args])+'\n')
+else:
+    def dbgoutput(*args):
+        pass
+
 def repository(_ui=None, path='', create=False):
     '''Returns a subclassed Mercurial repository to which new
     THG-specific methods have been added. The repository object
@@ -63,14 +70,14 @@ class ThgRepoWrapper(QObject):
 
     def timerEvent(self, event):
         if not os.path.exists(self.repo.path):
-            print 'Repository destroyed', self.repo.root
+            dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
             self.killTimer(self._timerevent)
             del _repocache[self.repo.root]
         elif self.busycount == 0:
             self.pollStatus()
         else:
-            print 'no poll, busy', self.busycount
+            dbgoutput('no poll, busy', self.busycount)
 
     def pollStatus(self):
         if os.path.exists(self.repo.path):
@@ -111,7 +118,7 @@ class ThgRepoWrapper(QObject):
     def _checkrepotime(self):
         'Check for new changelog entries, or MQ status changes'
         if self._repomtime < self._getrepomtime():
-            print 'detected repository change'
+            dbgoutput('detected repository change')
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
@@ -127,7 +134,7 @@ class ThgRepoWrapper(QObject):
         self._dirstatemtime = mtime
         nodes = self._getrawparents()
         if nodes != self._parentnodes:
-            print 'dirstate change found'
+            dbgoutput('dirstate change found')
             self.recordState()
             self.repo.dirstate.invalidate()
             self.repositoryChanged.emit()
@@ -144,7 +151,7 @@ class ThgRepoWrapper(QObject):
         except EnvironmentError:
             return
         if newbranch != self._rawbranch:
-            print 'branch time change'
+            dbgoutput('branch time change')
             self._rawbranch = newbranch
             self.repo.dirstate.invalidate()
             self.workingBranchChanged.emit()
@@ -155,7 +162,7 @@ class ThgRepoWrapper(QObject):
             oldmtime, files = self.repo.uifiles()
             mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
             if max(mtime) > oldmtime:
-                print 'config change detected'
+                dbgoutput('config change detected')
                 self.repo.invalidateui()
                 self.configChanged.emit()
         except EnvironmentError, ValueError:
