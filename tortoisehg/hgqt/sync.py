@@ -655,7 +655,7 @@ class PostPullDialog(QDialog):
         layout.addWidget(cfglabel)
 
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
 
@@ -1005,45 +1005,28 @@ class DetailsDialog(QDialog):
         self.newbranchcb = QCheckBox(_('Allow push of a new branch'))
         self.newbranchcb.setChecked(opts.get('new-branch', False))
         layout.addRow(self.newbranchcb, None)
-        self.forcecb = QCheckBox(_('Force pull or push (override checks)'))
+        self.forcecb = QCheckBox(_('Force push or pull (override safety'
+                                   ' checks)'))
         self.forcecb.setChecked(opts.get('force', False))
         layout.addRow(self.forcecb, None)
 
-        self.branchcb = QCheckBox(_('Specify branch for push/pull:'))
+        lbl = QLabel(_('Specify branch for push/pull:'))
         self.branchle = QLineEdit()
-        self.branchle.setEnabled(False)
-        self.branchcb.toggled.connect(self.branchle.setEnabled)
         if opts.get('branch'):
-            self.branchcb.setChecked(True)
             self.branchle.setText(hglib.tounicode(opts['branch']))
-        else:
-            self.branchcb.setChecked(False)
-            self.branchcb.clicked.emit(True)
-        layout.addRow(self.branchcb, self.branchle)
+        layout.addRow(lbl, self.branchle)
 
-        self.revcb = QCheckBox(_('Specify revision for push/pull:'))
+        lbl = QLabel(_('Specify revision for push/pull:'))
         self.revle = QLineEdit()
-        self.revle.setEnabled(False)
-        self.revcb.toggled.connect(self.revle.setEnabled)
         if opts.get('rev'):
-            self.revcb.setChecked(True)
             self.revle.setText(hglib.tounicode(opts['rev']))
-        else:
-            self.revcb.setChecked(False)
-            self.revcb.clicked.emit(True)
-        layout.addRow(self.revcb, self.revle)
+        layout.addRow(lbl, self.revle)
 
-        self.remotecb = QCheckBox(_('Remote command:'))
+        lbl = QLabel(_('Remote command:'))
         self.remotele = QLineEdit()
-        self.remotele.setEnabled(False)
-        self.remotecb.toggled.connect(self.remotele.setEnabled)
         if opts.get('remotecmd'):
-            self.remotecb.setChecked(True)
             self.remotele.setText(hglib.tounicode(opts['remotecmd']))
-        else:
-            self.remotecb.setChecked(False)
-            self.remotecb.clicked.emit(True)
-        layout.addRow(self.remotecb, self.remotele)
+        layout.addRow(lbl, self.remotele)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -1056,13 +1039,9 @@ class DetailsDialog(QDialog):
 
     def accept(self):
         outopts = {}
-        for name, cb, le in (('branch', self.branchcb, self.branchle),
-                             ('rev', self.revcb, self.revle),
-                             ('remotecmd', self.remotecb, self.remotele)):
-            if cb.isChecked():
-                outopts[name] = hglib.fromunicode(le.text())
-            else:
-                outopts[name] = ''
+        for name, le in (('branch', self.branchle), ('rev', self.revle),
+                         ('remotecmd', self.remotele)):
+            outopts[name] = hglib.fromunicode(le.text()).strip()
 
         if outopts.get('branch') and outopts.get('rev'):
             qtlib.WarningMsgBox(_('Configuration Error'),
