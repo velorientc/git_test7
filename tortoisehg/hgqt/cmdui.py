@@ -89,17 +89,8 @@ class ThgStatusBar(QStatusBar):
         # item is a non-numeric marker of current position (current file)
         # unit is a string label
         # total is the highest expected pos
+        #
         # All topics should be marked closed by setting pos to None
-
-        if not topic:
-            # special progress report, close all pbars for repo
-            for key in self.topics:
-                if root is None or key[0] == root:
-                    pm = self.topics[key]
-                    self.removeWidget(pm)
-                    del self.topics[key]
-            return
-
         if root:
             key = (root, topic)
         else:
@@ -239,8 +230,6 @@ class Core(QObject):
         if ret == 0 and self.run_next():
             return # run next command
 
-        # Emit 'close all progress bars' signal
-        self.progress.emit('', None, '', '', None)
         self.commandFinished.emit(ret)
 
     @pyqtSlot()
