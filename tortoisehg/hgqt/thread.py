@@ -174,17 +174,26 @@ class CmdThread(QThread):
             thread2._async_raise(self.thread_id, KeyboardInterrupt)
 
     def thread_finished(self):
-        self.flush()
         self.timer.stop()
+        self.flush()
         self.commandFinished.emit(self.ret)
 
     def flush(self):
         if self.curlabel is not None:
             self.outputReceived.emit(self.curstrs.join(''), self.curlabel)
-        for topic in self.topics:
-            self.progressReceived.emit(topic, *self.topics[topic])
-        self.topics = {}
         self.curlabel = None
+        if self.timer.isActive():
+            keys = self.topics.keys()
+            for topic in keys:
+                pos, item, unit, total = self.topics[topic]
+                self.progressReceived.emit(topic, pos, item, unit, total)
+                if pos is None:
+                    del self.topics[topic]
+        else:
+            # Close all progress bars
+            for topic in self.topics:
+                self.progressReceived.emit(topic, None, '', '', None)
+            self.topics = {}
 
     @pyqtSlot(QString, QString)
     def output_handler(self, msg, label):
