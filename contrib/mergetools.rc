@@ -1,5 +1,5 @@
 [merge-tools]
-; Windows version of BeyondCompare
+; Windows version of BeyondCompare 3
 beyondcompare3.priority=-1
 beyondcompare3.args=$local $other $base /mergeoutput=$output /ro /lefttitle=parent1 /centertitle=base /righttitle=parent2 /outputtitle=merged /automerge /reviewconflicts /solo
 beyondcompare3.premerge=False
@@ -9,6 +9,15 @@ beyondcompare3.gui=True
 beyondcompare3.diffargs=/lro /lefttitle='$plabel1' /righttitle='$clabel' /solo /expandall $parent $child
 beyondcompare3.diff3args=$parent1 $parent2 $child /lefttitle='$plabel1' /centertitle='$clabel' /righttitle='$plabel2' /solo /ro
 beyondcompare3.dirdiff=True
+
+; Windows version of BeyondCompare 2 (2-way diff only)
+beyondcompare2.priority=-4
+beyondcompare2.args= /ro /title1="Original" /title2="Working copy" $local $other
+beyondcompare2.regkey=Software\Scooter Software\Beyond Compare
+beyondcompare2.regname=ExePath
+beyondcompare2.gui=True
+beyondcompare2.diffargs=/lro /title1='$plabel1' /title2='$clabel' $parent $child
+beyondcompare2.dirdiff=True
 
 araxis.regkey=SOFTWARE\Classes\TypeLib\{46799e0a-7bd1-4330-911c-9660bb964ea2}\7.0\HELPDIR
 araxis.regappend=\ConsoleCompare.exe
