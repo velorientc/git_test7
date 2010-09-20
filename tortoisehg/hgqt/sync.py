@@ -542,12 +542,8 @@ class SyncWidget(QWidget):
                                changelist = _('%s (submitted)') % changelist
                            elif state == 'p':
                                changelist = _('%s (pending)') % changelist
-                        else:
-                           if changelist == 'submitted':
-                               changelist = _('Submitted') + str(submitted)
-                               submitted += 1
                            else:
-                               changelist = _('%s (pending)') % changelist
+                               raise ValueError
                         pending[changelist] = hashes
                     except (ValueError, IndexError):
                         text = _('Unable to parse p4pending output')
