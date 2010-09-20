@@ -138,7 +138,6 @@ class UpdateDialog(QDialog):
 
         # signal handlers
         self.rev_combo.editTextChanged.connect(lambda *a: self.update_info())
-        self.rev_combo.lineEdit().returnPressed.connect(self.update)
         self.discard_chk.toggled.connect(lambda *a: self.update_info())
 
         # dialog setting
