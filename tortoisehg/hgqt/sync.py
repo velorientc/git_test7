@@ -765,73 +765,54 @@ class AuthDialog(QDialog):
         super(AuthDialog, self).__init__(parent)
         self.repo = repo
         self.root = repo.root
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        self.setLayout(QVBoxLayout())
 
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(_('Site Alias')))
+        form = QFormLayout()
         self.aliasentry = QLineEdit(host.split('.', 1)[0])
-        hbox.addWidget(self.aliasentry, 1)
-        layout.addLayout(hbox)
+        form.addRow(_('Site Alias'), self.aliasentry)
 
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(_('Schemes')))
         self.schemes = QComboBox()
-        for s in (('http https', 'http', 'https')):
-            self.schemes.addItem(s)
-        hbox.addWidget(self.schemes, 1)
-        layout.addLayout(hbox)
+        self.schemes.addItems(('http https', 'http', 'https'))
+        form.addRow(_('Schemes'), self.schemes)
 
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(_('Prefix')))
         self.prefixentry = QLineEdit(host)
-        hbox.addWidget(self.prefixentry, 1)
-        layout.addLayout(hbox)
+        form.addRow(_('Prefix'), self.prefixentry)
 
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(_('Username')))
         self.userentry = QLineEdit(user)
-        hbox.addWidget(self.userentry, 1)
-        layout.addLayout(hbox)
+        form.addRow(_('Username'), self.userentry)
 
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(_('Password')))
         self.pwentry = QLineEdit(pw)
         self.pwentry.setEchoMode(QLineEdit.Password)
-        hbox.addWidget(self.pwentry, 1)
-        layout.addLayout(hbox)
+        form.addRow(_('Password'), self.pwentry)
+        self.layout().addLayout(form)
+
+        self.globalcb = QCheckBox(_('Save this configuration globally'))
+        self.globalcb.setChecked(True)
+        self.layout().addWidget(self.globalcb)
 
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Help|BB.Cancel)
+        bb = QDialogButtonBox(BB.Help|BB.Save|BB.Cancel)
         bb.rejected.connect(self.reject)
+        bb.accepted.connect(self.accept)
         bb.helpRequested.connect(self.keyringHelp)
-        bb.button(BB.Help).setText(_('Keyring Help'))
-        sr = QPushButton(_('Save In Repo'))
-        sr.clicked.connect(self.saveInRepo)
-        bb.addButton(sr, BB.ActionRole)
-        sg = QPushButton(_('Save Global'))
-        sg.clicked.connect(self.saveGlobal)
-        sg.setAutoDefault(True)
-        bb.addButton(sg, BB.ActionRole)
-
         self.bb = bb
-        layout.addWidget(bb)
+        self.layout().addWidget(bb)
+
         self.setWindowTitle(_('Authentication: ') + host)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
         self.userentry.selectAll()
         QTimer.singleShot(0, lambda:self.userentry.setFocus())
 
     def keyringHelp(self):
         pass
 
-    def saveInRepo(self):
-        fn = os.path.join(self.root, '.hg', 'hgrc')
-        self.saveToPath([fn])
+    def accept(self):
+        if self.globalcb:
+            path = util.user_rcpath()
+        else:
+            path = [os.path.join(self.root, '.hg', 'hgrc')]
 
-    def saveGlobal(self):
-        self.saveToPath(util.user_rcpath())
-
-    def saveToPath(self, path):
         fn, cfg = loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
