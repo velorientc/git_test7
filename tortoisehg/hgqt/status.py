@@ -9,8 +9,8 @@ import os
 
 from mercurial import ui, hg, util, patch, cmdutil, error, mdiff
 from mercurial import context, merge, commands, subrepo
-from tortoisehg.hgqt import qtlib, htmlui, chunkselect, wctxactions, visdiff
-from tortoisehg.hgqt import thgrepo, cmdui
+from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff
+from tortoisehg.hgqt import thgrepo, cmdui, fileview
 from tortoisehg.util import paths, hglib
 from tortoisehg.util.util import xml_escape
 from tortoisehg.hgqt.i18n import _
@@ -165,16 +165,13 @@ class StatusWidget(QWidget):
         docf.setSizePolicy(sp)
         docf.setLayout(vbox)
         self.docf = docf
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins (0, 0, 0, 0)
-        self.fnamelabel = QLabel()
-        self.fnamelabel.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.fnamelabel.customContextMenuRequested.connect(
-                     self.menuRequested)
-        hbox.addWidget(self.fnamelabel)
-        hbox.addStretch()
 
-        hbox.addSpacing(6)
+        self.fvstack = QStackedWidget()
+
+        self.fileview = fileview.HgFileView(self)
+        self.fileview.showMessage.connect(self.showMessage)
+        self.fileview.setMode('diff')
+        self.fvstack.addWidget(self.fileview)
 
         self.te = QTextBrowser()
         self.te.setOpenLinks(False)
@@ -182,8 +179,9 @@ class StatusWidget(QWidget):
         self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
         self.te.setReadOnly(True)
         self.te.setLineWrapMode(QTextEdit.NoWrap)
-        vbox.addLayout(hbox)
-        vbox.addWidget(self.te, 1)
+        self.fvstack.addWidget(self.te)
+
+        vbox.addWidget(self.fvstack, 1)
 
         self.split = split
         self.diffvbox = vbox
@@ -205,22 +203,10 @@ class StatusWidget(QWidget):
     def saveState(self):
         return self.split.saveState()
 
-    def menuRequested(self, point):
-        'menu request for filename label'
-        if self.curRow is None:
-            return
-        point = self.fnamelabel.mapToGlobal(point)
-        path, status, mst, u = self.curRow
-        selrows = [(set(status+mst.lower()), path), ]
-        action = wctxactions.wctxactions(self, point, self.repo, selrows)
-        if action:
-            self.refreshWctx()
-
     def refreshWctx(self):
         if self.refreshing:
             return
-        self.te.clear()
-        self.fnamelabel.clear()
+        self.fileview.clearDisplay()
         self.curRow = None
         self.override = False
 
@@ -245,6 +231,7 @@ class StatusWidget(QWidget):
     def reloadComplete(self, wctx, patchecked):
         self.ms = merge.mergestate(self.repo)
         self.wctx = wctx
+        self.fileview.setContext(wctx)
         self.patchecked = patchecked.copy()
         self.updateModel()
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
@@ -331,43 +318,20 @@ class StatusWidget(QWidget):
         path, status, mst, upath, ext, sz = self.curRow
         showanyway = self.override
         wfile = util.pconvert(path)
-        self.fnamelabel.setText(statusMessage(status, mst, upath))
+        #self.fnamelabel.setText(statusMessage(status, mst, upath))
         hu = htmlui.htmlui()
 
         show = '&nbsp;&nbsp;(<a href="cmd:show">%s</a>)' % _('show anyway')
         if status in '?IA':
-            if showanyway:
-                # Read untracked file contents from working directory
-                try:
-                    diff = open(self.repo.wjoin(wfile), 'r').read()
-                except EnvironmentError, e:
-                    diff = '<b>%s</b>' % str(e)
-                if '\0' in diff:
-                    diff = _('<b>Contents are binary, not previewable</b>')
-                    self.te.setHtml(diff)
-                else:
-                    diff = '<pre>%s</pre>' % xml_escape(diff)
-                    self.te.setHtml(diff)
-            else:
-                diff = _('<b>Not displayed</b>') + show
-                self.te.setHtml(diff)
+            self.fileview.displayFile(wfile)
+            self.fvstack.setCurrentWidget(self.fileview)
             return
         elif status in '!C':
-            if showanyway:
-                # Read file contents from parent revision
-                ctx = self.repo['.']
-                diff = ctx.filectx(wfile).data()
-                if '\0' in diff:
-                    diff = _('<b>Contents are binary, not previewable</b>')
-                    self.te.setHtml(diff)
-                else:
-                    diff = '<pre>%s</pre>' % xml_escape(diff)
-                    self.te.setHtml(diff)
-            else:
-                diff = _('<b>Not displayed</b>') + show
-                self.te.setHtml(diff)
+            self.fileview.displayFile(wfile)
+            self.fvstack.setCurrentWidget(self.fileview)
             return
         elif status in 'S':
+            # TODO: move this to fileview, drop self.te
             if showanyway:
                 try:
                     sroot = self.repo.wjoin(path)
@@ -395,49 +359,11 @@ class StatusWidget(QWidget):
             else:
                 diff = _('<b>Subrepository status not displayed</b>') + show
             self.te.setHtml(diff)
+            self.fvstack.setCurrentWidget(self.te)
             return
 
-        warnings = chunkselect.check_max_diff(self.wctx, wfile)
-        if warnings and not showanyway:
-            text = '<b>Diffs not displayed: %s</b>' % warnings[1] + show
-            self.te.setHtml(text)
-            return
-
-        # Generate diffs to first parent
-        m = cmdutil.matchfiles(self.repo, [wfile])
-        try:
-            for s, l in patch.difflabel(self.wctx.diff, match=m, git=True):
-                hu.write(s, label=l)
-        except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            self.showMessage.emit(hglib.tounicode(str(e)))
-            return
-        o, e = hu.getdata()
-        diff = o or _('<em>No displayable differences</em>')
-
-        if self.isMerge():
-            header = _('===== Diff to first parent %d:%s =====\n') % (
-                    self.wctx.p1().rev(), str(self.wctx.p1()))
-            header = '<h3>' + header + '</h3></br>'
-            text = header + diff
-        else:
-            self.te.setHtml(diff)
-            return
-
-        # Generate diffs to second parent
-        try:
-            for s, l in patch.difflabel(self.wctx.diff, self.wctx.p2(),
-                                        match=m, git=True):
-                hu.write(s, label=l)
-        except (IOError, error.RepoError, error.LookupError, util.Abort), e:
-            self.showMessage.emit(hglib.tounicode(str(e)))
-            return
-        text += '</br><h3>'
-        text += _('===== Diff to second parent %d:%s =====\n') % (
-                self.wctx.p2().rev(), str(self.wctx.p2()))
-        text += '</h3></br>'
-        o, e = hu.getdata()
-        diff = o or _('<em>No displayable differences</em>')
-        self.te.setHtml(text + diff)
+        self.fileview.displayFile(wfile)
+        self.fvstack.setCurrentWidget(self.fileview)
 
 
 class StatusThread(QThread):

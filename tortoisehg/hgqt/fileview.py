@@ -18,13 +18,14 @@ Qt4 high level widgets for hg repo changelogs and filelogs
 """
 import difflib
 
-from mercurial.error import LookupError
+from mercurial import error, cmdutil
     
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
 from tortoisehg.util import hglib
+from tortoisehg.hgqt import chunkselect
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
 from tortoisehg.hgqt.i18n import _
@@ -135,11 +136,14 @@ class HgFileView(QFrame):
 
         # define markers for colorize zones of diff
         self.markerplus = self.sci.markerDefine(qsci.Background)
-        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markerplus, 0xB0FFA0)
+        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markerplus,
+                               0xB0FFA0)
         self.markerminus = self.sci.markerDefine(qsci.Background)
-        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markerminus, 0xA0A0FF)
+        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markerminus,
+                               0xA0A0FF)
         self.markertriangle = self.sci.markerDefine(qsci.Background)
-        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markertriangle, 0xFFA0A0)
+        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markertriangle,
+                               0xFFA0A0)
         self.lastrev = None
         self.sci.mouseMoveEvent = self.mouseMoveEvent
 
@@ -193,7 +197,6 @@ class HgFileView(QFrame):
             self._mode = mode
             self.blk.setVisible(self._mode == 'file')
             self.ann.setVisible(self._mode == 'file' and self._annotate)
-            
             self.displayFile()
 
     def getMode(self):
@@ -260,7 +263,7 @@ class HgFileView(QFrame):
         self.filenamelabel.setText(" ")
         self.execflaglabel.clear()
 
-    def displayFile(self, filename=None, rev=None):
+    def updateForMode(self):
         if self._mode == 'diff':
             self.sci.setMarginLineNumbers(1, False)
             self.sci.setMarginWidth(1, '')
@@ -268,6 +271,10 @@ class HgFileView(QFrame):
             # margin 1 is used for line numbers
             self.sci.setMarginLineNumbers(1, True)
             self.sci.setMarginWidth(1, '000')
+
+
+    def displayFile(self, filename=None, rev=None):
+        self.updateForMode()
 
         if filename is None:
             filename = self._filename
@@ -287,19 +294,46 @@ class HgFileView(QFrame):
             return
         try:
             filectx = self._ctx.filectx(self._realfilename)
-        except LookupError: # occur on deleted files
+        except error.LookupError: # occur on deleted files
             return
-        if self._mode == 'diff' and self._p_rev is not None:
-            mode = self._p_rev
+
+        repo = self._ctx._repo
+        if self._ctx.rev() is None:
+            # Wctx diff
+            data = None
+            if filename in self._ctx:
+                warnings = chunkselect.check_max_diff(self._ctx, filename)
+                if warnings:
+                    data = 'Diffs not displayed: %s' % warnings[1]
+                    self._mode = 'file'
+                else:
+                    m = cmdutil.matchfiles(repo, [filename])
+                    data = ''.join([c for c in self._ctx.diff(match=m)])
+                    data = hglib.tounicode(data)
+                    self._mode = 'diff'
+            if not data:
+                try:
+                    data = open(repo.wjoin(filename), 'r').read()
+                    if '\0' in data:
+                        data = 'binary file'
+                except EnvironmentError, e:
+                    data = hglib.tounicode(str(e))
+                self._mode = 'file'
+            self.updateForMode()
+            flag = '='
         else:
-            mode = self._mode
-        flag, data = self._model.graph.filedata(filename, self._ctx.rev(), mode)
-        if flag == '-':
-            return
-        if flag == '':
-            return
+            if self._mode == 'diff' and self._p_rev is not None:
+                mode = self._p_rev
+            else:
+                mode = self._mode
+            graph = self._model.graph
+            flag, data = graph.filedata(filename, self._ctx.rev(), mode)
+            if flag == '-':
+                return
+            if flag == '':
+                return
         
-        lexer = get_lexer(filename, data, flag, self._ctx._repo.ui) # yuck
+        lexer = get_lexer(filename, data, flag, repo.ui) # yuck
         if flag == "+":
             nlines = data.count('\n')
             self.sci.setMarginWidth(1, str(nlines)+'0')
@@ -352,11 +386,15 @@ class HgFileView(QFrame):
         responsible for filling diff decoration markers
         """
         self.blk.clear()
+        if not self._model:
+            self.blk.setVisible(False)
+            return
         if self._mode == 'file' and self.filedata is not None:
             if self.timer.isActive():
                 self.timer.stop()
 
-            parent = self._model.graph.fileparent(self._filename, self._ctx.rev())
+            parent = self._model.graph.fileparent(self._filename,
+                                                  self._ctx.rev())
             if parent is None:
                 return
             m = self._ctx.filectx(self._filename).renamed()
@@ -511,6 +549,6 @@ class HgFileView(QFrame):
             else:
                 raise ValueError, 'unknown tag %r' % (tag,)
 
-        # ok, let's enable GUI refresh for code viewers and diff-block displayers
+        # ok, enable GUI refresh for code viewers and diff-block displayers
         self.sci.setUpdatesEnabled(True)
         self.blk.setUpdatesEnabled(True)
