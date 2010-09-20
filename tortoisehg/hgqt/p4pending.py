@@ -42,7 +42,6 @@ class PerforcePending(QDialog):
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.setVisible(False)
         layout.addWidget(self.cmd)
 
         BB = QDialogButtonBox
@@ -88,8 +87,6 @@ class PerforcePending(QDialog):
         cmdline = ['p4submit', '--verbose', '--repository',
                 self.repo.root, self.curcl[:-10]]
         self.repo.incrementBusyCount()
-        self.cmd.setVisible(True)
-        self.cmd.show_output(True)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Submitting p4 changelist...'))
@@ -100,8 +97,6 @@ class PerforcePending(QDialog):
         cmdline = ['p4revert', '--verbose', '--repository',
                 self.repo.root, self.curcl[:-10]]
         self.repo.incrementBusyCount()
-        self.cmd.setVisible(True)
-        self.cmd.show_output(True)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Reverting p4 changelist...'))
