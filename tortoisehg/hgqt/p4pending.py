@@ -42,7 +42,6 @@ class PerforcePending(QDialog):
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        layout.addWidget(self.cmd)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
