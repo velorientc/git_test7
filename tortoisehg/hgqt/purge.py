@@ -75,7 +75,8 @@ class PurgeDialog(QDialog):
         failures = self.purge(self.repo, ignored, unknown, delf, keep)
         if failures:
             qtlib.InfoMsgBox(_('Deletion failures'),
-                _('Unable to delete %d files or folders') % len(failures), self)
+                _('Unable to delete %d files or folders') % len(failures),
+                parent=self)
         QDialog.accept(self)
 
     def purge(self, repo, ignored, unknown, delfolders, keephg):
