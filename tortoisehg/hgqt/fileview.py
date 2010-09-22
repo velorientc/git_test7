@@ -618,7 +618,7 @@ def filedata(ctx, ctx2, wfile, status=None):
         fr = hglib.tounicode(bfilepath(oldname))
         labeltxt += _(' <i>(renamed from %s)</i>') % fr
         fd['flabel'] = labeltxt
-        olddata = repo.filectx(oldname, fileid=node).data().splitlines()
+        olddata = repo.filectx(oldname, fileid=node).data()
     elif status == 'M':
         oldname = wfile
         olddata = ctx2[wfile].data()
