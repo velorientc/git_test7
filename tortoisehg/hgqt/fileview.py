@@ -500,7 +500,7 @@ def filedata(ctx, ctx2, wfile, status=None):
 
        The returned dictionary has several mandatory keys:
           status   - file status
-          p2status - file status in ctx2 or second parent
+          p2status - file status in ctx2
           flabel   - file label
 
        And several optional keys:
@@ -536,8 +536,6 @@ def filedata(ctx, ctx2, wfile, status=None):
     p2status = None
     if status is None:
         status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)
-        if ctx2 is None and len(ctx.parents()) > 1:
-            p2status = getstatus(repo, ctx.p2().node(), ctx.node(), wfile)
     if ctx2 is not None:
         p2status = getstatus(repo, ctx2.node(), ctx.node(), wfile)
     else:
