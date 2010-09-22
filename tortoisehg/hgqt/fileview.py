@@ -178,7 +178,6 @@ class HgFileView(QFrame):
         self._annotate = False
         self._find_text = None
         self._mode = "diff" # can be 'diff' or 'file'
-        self.filedata = None
 
         self.timer = QTimer()
         self.timer.setSingleShot(False)
@@ -306,7 +305,6 @@ class HgFileView(QFrame):
         self.filenamelabel.setText(fd['flabel'])
 
         if 'error' in fd:
-            self.filedata = None
             self.sci.setText(fd['error'])
             return
         diff = fd['diff']
@@ -314,14 +312,12 @@ class HgFileView(QFrame):
             lexer = get_diff_lexer(repo.ui)
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
-            self.filedata = diff
             self.sci.setText(diff)
         else:
             contents = fd['contents']
             lexer = get_lexer(filename, contents, repo.ui)
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
-            self.filedata = contents
             nlines = contents.count('\n')
             self.sci.setMarginWidth(1, str(nlines)+'0')
             self.sci.setText(contents)
@@ -330,8 +326,10 @@ class HgFileView(QFrame):
             self.highlightSearchString(self._find_text)
 
         self.fileDisplayed.emit(self._filename)
-        self.updateDiffDecorations()
-        if self._mode == 'file' and self._annotate:
+        if self._mode != 'file':
+            return
+
+        if self._annotate:
             if 'error' in fd:
                 self.ann.setVisible(False)
             else:
@@ -341,42 +339,25 @@ class HgFileView(QFrame):
                 else:
                     self.ann.setFont(self.sci.font())
                 self.ann.setFilectx(self._ctx[filename])
-        return True # SJB - why return True?
 
-    def updateDiffDecorations(self):
-        """
-        Recompute the diff and starts the timer
-        responsible for filling diff decoration markers
-        """
-        self.blk.clear()
-        if not self._model:
-            self.blk.setVisible(False)
-            return
-        if self._mode == 'file' and self.filedata is not None:
+        # Update diff margin
+        if 'contents' in fd and 'diff' in fd:
             if self.timer.isActive():
                 self.timer.stop()
 
-            # TODO: why get the parent from the graph?
-            parent = self._model.graph.fileparent(self._filename,
-                                                  self._ctx.rev())
-            if parent is None:
-                return
-            m = self._ctx.filectx(self._filename).renamed()
-            if m:
-                pfilename, pnode = m
+            if 'renamed' in fd:
+                pfilename, pnode = fd['renamed']
+                pfctx = self._ctx[self.pfilename]
             else:
-                pfilename = self._filename
-            _, parentdata = self._model.graph.filedata(pfilename,
-                                                       parent, 'file')
-            if parentdata is not None:
-                filedata = self.filedata.splitlines()
-                parentdata = parentdata.splitlines()
-                self._diff = difflib.SequenceMatcher(None,
-                                                     parentdata,
-                                                     filedata,)
-                self._diffs = []
-                self.blk.syncPageStep()
-                self.timer.start()
+                fctx = self._ctx[self._filename]
+                pfctx = fctx.parents()[0]
+
+            newdata = fd['contents'].splitlines()
+            parentdata = pfctx.data().splitlines()
+            self._diff = difflib.SequenceMatcher(None, parentdata, newdata)
+            self._diffs = []
+            self.blk.syncPageStep()
+            self.timer.start()
 
     def nextDiff(self):
         if self._mode == 'file':
