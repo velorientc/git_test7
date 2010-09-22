@@ -453,6 +453,11 @@ class Workbench(QMainWindow):
         if accept:
             event.setDropAction(Qt.LinkAction)
             event.accept()
+
+    def linkActivated(self, link):
+        link = hglib.fromunicode(link)
+        if link.startswith('subrepo:'):
+            self.openRepo(link[8:])
             
     def updateMenu(self):
         someRepoOpen = self.repoTabsWidget.count() > 0
