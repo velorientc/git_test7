@@ -28,6 +28,7 @@ from tortoisehg.hgqt.sync import loadIniFile
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
     commitButtonName = pyqtSignal(QString)
+    linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     commitComplete = pyqtSignal()
 
@@ -42,6 +43,7 @@ class CommitWidget(QWidget):
         self.stwidget = status.StatusWidget(pats, opts, root, self)
         self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.progress.connect(self.progress)
+        self.stwidget.linkActivated.connect(self.linkActivated)
         self.msghistory = []
         self.qref = False
 
@@ -886,7 +888,7 @@ class CommitDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        commit = CommitWidget(pats, opts, None, False, self)
+        commit = CommitWidget(pats, opts, opts.get('root'), False, self)
         layout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -894,6 +896,7 @@ class CommitDialog(QDialog):
         layout.addWidget(self.statusbar)
         commit.showMessage.connect(self.statusbar.showMessage)
         commit.progress.connect(self.statusbar.progress)
+        commit.linkActivated.connect(self.linkActivated)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
@@ -919,6 +922,12 @@ class CommitDialog(QDialog):
         self.commit = commit
         self.commit.reload()
         self.updateUndo()
+
+    def linkActivated(self, link):
+        link = hglib.fromunicode(link)
+        if link.startswith('subrepo:'):
+            from tortoisehg.hgqt.run import qtrun
+            qtrun(run, ui.ui(), root=link[8:])
 
     def setButtonName(self, name):
         self.bb.button(QDialogButtonBox.Ok).setText(name)
