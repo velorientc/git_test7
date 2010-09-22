@@ -454,7 +454,7 @@ class WctxModel(QAbstractTableModel):
                 rows.append(mkrow(c, 'C'))
         if opts['subrepo']:
             for s in wctx.dirtySubrepos:
-                nchecked[s] = checked.get(s, False)
+                nchecked[s] = checked.get(s, True)
                 rows.append(mkrow(s, 'S'))
         self.headers = ('*', _('Stat'), _('M'), _('Filename'), 
                         _('Type'), _('Size (KB)'))
