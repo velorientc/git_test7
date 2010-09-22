@@ -19,7 +19,7 @@ Qt4 high level widgets for hg repo changelogs and filelogs
 
 import difflib
 
-from mercurial import hg, error, match, patch, subrepo
+from mercurial import hg, error, match, patch, subrepo, commands
 from mercurial import ui as uimod
     
 from PyQt4.QtCore import *
@@ -547,6 +547,7 @@ def filedata(ctx, ctx2, wfile, status=None):
     if status == 'S':
         try:
             assert(ctx.rev() is None)
+            out = []
             _ui = uimod.ui()
             sroot = repo.wjoin(wfile)
             srepo = hg.repository(_ui, path=sroot)
@@ -554,19 +555,27 @@ def filedata(ctx, ctx2, wfile, status=None):
             sactual = srepo['.'].hex()
             _ui.pushbuffer()
             commands.status(_ui, srepo)
-            out = _ui.popbuffer()
-            if srev != sactual:
-                out.append(_('revision changed from:\n'))
+            data = _ui.popbuffer()
+            if data:
+                out.append(_('File Status:\n'))
+                out.append(data)
+                out.append('\n')
+            if srev == '':
+                out.append(_('New subrepository\n\n'))
+            elif srev != sactual:
+                out.append(_('Revision has changed from:\n\n'))
                 opts = {'date':None, 'user':None, 'rev':[srev]}
                 _ui.pushbuffer()
                 commands.log(_ui, srepo, **opts)
-                out = _ui.popbuffer()
-                out.append(_('\nto:\n'))
+                out.append(hglib.tounicode(_ui.popbuffer()))
+                out.append(_('To:\n'))
                 opts['rev'] = [sactual]
                 _ui.pushbuffer()
                 commands.log(_ui, srepo, **opts)
-                out.append(_ui.popbuffer())
-            fd['contents'] = u''.join([hglib.tounicode(l) for l in out])
+                out.append(hglib.tounicode(_ui.popbuffer()))
+            fd['contents'] = u''.join(out)
+            labeltxt += _(' <i>(is a dirty sub-repository)</i>')
+            fd['flabel'] = labeltxt
         except error.RepoError:
             fd['error'] = _('Not an hg subrepo, not previewable')
         return fd
