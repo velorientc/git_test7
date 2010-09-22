@@ -277,6 +277,22 @@ class Graph(object):
         self.max_cols = 0
         self.authors = set()
 
+    def __getitem__(self, idx):
+        if isinstance(idx, slice):
+            # XXX TODO: ensure nodes are built
+            return self.nodes.__getitem__(idx)
+        if idx >= len(self.nodes):
+            # build as many graph nodes as required to answer the
+            # requested idx
+            self.build_nodes(idx)
+        if idx > len(self):
+            return self.nodes[-1]
+        return self.nodes[idx]
+
+    def __len__(self):
+        # len(graph) is the number of actually built graph nodes
+        return len(self.nodes)
+
     def build_nodes(self, nnodes=None, rev=None):
         """
         Build up to `nnodes` more nodes in our graph, or build as many
@@ -334,22 +350,6 @@ class Graph(object):
     def isfilled(self):
         return self.grapher is None
 
-    def __getitem__(self, idx):
-        if isinstance(idx, slice):
-            # XXX TODO: ensure nodes are built
-            return self.nodes.__getitem__(idx)
-        if idx >= len(self.nodes):
-            # build as many graph nodes as required to answer the
-            # requested idx
-            self.build_nodes(idx)
-        if idx > len(self):
-            return self.nodes[-1]
-        return self.nodes[idx]
-
-    def __len__(self):
-        # len(graph) is the number of actually built graph nodes
-        return len(self.nodes)
-
     def index(self, rev):
         if len(self) == 0: # graph is empty, let's build some nodes
             self.build_nodes(10)
@@ -358,6 +358,10 @@ class Graph(object):
         if rev in self.nodesdict:
             return self.nodes.index(self.nodesdict[rev])
         return -1
+
+    #
+    # File graph methods
+    #
 
     def filename(self, rev):
         return self.nodesdict[rev].extra[0]
