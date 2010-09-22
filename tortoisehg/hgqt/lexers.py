@@ -151,9 +151,10 @@ for clsname, cls in globals().items():
         #print clsname
         lexers.append(cls())
 
-def get_lexer(filename, filedata, fileflag=None, ui=None):
-    if fileflag == "=":
-        return DiffLexerSelector().lexer(ui)
+def get_diff_lexer(ui=None):
+    return DiffLexerSelector().lexer(ui)
+
+def get_lexer(filename, filedata, ui=None):
     for lselector in lexers:
         if lselector.match(filename, filedata):
             return lselector.lexer(ui)
