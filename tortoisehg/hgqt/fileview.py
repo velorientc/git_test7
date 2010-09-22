@@ -85,6 +85,7 @@ class HgFileView(QFrame):
     """file diff and content viewer"""
 
     showDescSignal = pyqtSignal(QString)
+    linkActivated = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(str)
     showMessage = pyqtSignal(unicode)
     revForDiffChanged = pyqtSignal(int)
@@ -104,13 +105,16 @@ class HgFileView(QFrame):
 
         self.filenamelabel = w = QLabel()
         w.setWordWrap(True)
-        w.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        f = w.textInteractionFlags()
+        w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
+        w.linkActivated.connect(self.linkActivated)
         self.topLayout.addWidget(w)
 
-        self.execflaglabel = QLabel()
-        self.execflaglabel.setWordWrap(True)
-        self.topLayout.addWidget(self.execflaglabel)
-        self.execflaglabel.hide()
+        self.extralabel = w = QLabel()
+        w.setWordWrap(True)
+        w.linkActivated.connect(self.linkActivated)
+        self.topLayout.addWidget(w)
+        w.hide()
 
         framelayout.addLayout(self.topLayout)
         framelayout.addLayout(l, 1)
@@ -261,7 +265,7 @@ class HgFileView(QFrame):
         self.sci.clear()
         self.ann.clear()
         self.filenamelabel.clear()
-        self.execflaglabel.hide()
+        self.extralabel.hide()
 
     def displayFile(self, filename=None, rev=None, status=None):
         if self._mode == 'diff':
@@ -298,10 +302,10 @@ class HgFileView(QFrame):
         fd = filedata(ctx, ctx2, filename, status)
 
         if 'elabel' in fd:
-            self.execflaglabel.setText(fd['elabel'])
-            self.execflaglabel.show()
+            self.extralabel.setText(fd['elabel'])
+            self.extralabel.show()
         else:
-            self.execflaglabel.hide()
+            self.extralabel.hide()
         self.filenamelabel.setText(fd['flabel'])
 
         if 'error' in fd:
@@ -575,7 +579,8 @@ def filedata(ctx, ctx2, wfile, status=None):
                 out.append(hglib.tounicode(_ui.popbuffer()))
             fd['contents'] = u''.join(out)
             labeltxt += _(' <i>(is a dirty sub-repository)</i>')
-            fd['flabel'] = labeltxt
+            labeltxt += u' <a href="subrepo:%s">%s...</a>'
+            fd['flabel'] = labeltxt % (hglib.tounicode(sroot), _('open'))
         except error.RepoError:
             fd['error'] = _('Not an hg subrepo, not previewable')
         return fd
