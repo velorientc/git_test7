@@ -20,29 +20,14 @@ Based on graphlog's algorithm, with insipration stolen from TortoiseHg
 revision grapher (now stolen back).
 """
 
-import difflib
 import time
 import os
 import itertools
 
-from mercurial import patch, util, match, error
+from mercurial import util, error
 
 from tortoisehg.util.util import isbfile
 from tortoisehg.util.hglib import tounicode
-
-def diff(repo, ctx1, ctx2, files):
-    """
-    Compute the diff of files between 2 changectx
-    """
-    if ctx2 is None:
-        ctx2 = ctx1.p1()
-    if files is None:
-        m = match.always(repo.root, repo.getcwd())
-    else:
-        m = match.exact(repo.root, repo.getcwd(), files)
-    diffdata = '\n'.join(patch.diff(repo, ctx2.node(), ctx1.node(), match=m))
-    return tounicode(diffdata)
-
 
 def getparents(ctx, branch):
     """
