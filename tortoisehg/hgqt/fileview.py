@@ -341,20 +341,13 @@ class HgFileView(QFrame):
                 self.ann.setFilectx(self._ctx[filename])
 
         # Update diff margin
-        if 'contents' in fd and 'diff' in fd:
+        if 'contents' in fd and 'olddata' in fd:
             if self.timer.isActive():
                 self.timer.stop()
 
-            if 'renamed' in fd:
-                pfilename, pnode = fd['renamed']
-                pfctx = self._ctx[self.pfilename]
-            else:
-                fctx = self._ctx[self._filename]
-                pfctx = fctx.parents()[0]
-
+            olddata = fd['olddata'].splitlines()
             newdata = fd['contents'].splitlines()
-            parentdata = pfctx.data().splitlines()
-            self._diff = difflib.SequenceMatcher(None, parentdata, newdata)
+            self._diff = difflib.SequenceMatcher(None, olddata, newdata)
             self._diffs = []
             self.blk.syncPageStep()
             self.timer.start()
@@ -512,6 +505,7 @@ def filedata(ctx, ctx2, wfile, status=None):
 
        And several optional keys:
           contents - file contents or descriptive text
+          olddata  - parent data used to generate diff
           diff     - requested diff contents
           error    - an error that prevented content retrieval
           elabel   - exec flag change label
@@ -626,23 +620,21 @@ def filedata(ctx, ctx2, wfile, status=None):
         fr = hglib.tounicode(bfilepath(oldname))
         labeltxt += _(' <i>(renamed from %s)</i>') % fr
         fd['flabel'] = labeltxt
-
-        newdata = newdata.splitlines()
         olddata = repo.filectx(oldname, fileid=node).data().splitlines()
-        gen = difflib.unified_diff(olddata, newdata, oldname, wfile)
-        data = []
-        for chunk in gen:
-            data.extend(chunk.splitlines())
-        data = [hglib.tounicode(l) for l in data]
-        fd['diff'] = u'\n'.join(data[2:])
+    elif status == 'M':
+        oldname = wfile
+        olddata = ctx2[wfile].data()
+    else:
         return fd
 
-    m = match.exact(repo.root, repo.getcwd(), [wfile])
-    gen = patch.diff(repo, ctx2.node(), ctx.node(), match=m)
+    fd['olddata'] = olddata
+    olddata = olddata.splitlines()
+    newdata = newdata.splitlines()
+    gen = difflib.unified_diff(olddata, newdata, oldname, wfile)
     data = []
     for chunk in gen:
         data.extend(chunk.splitlines())
     data = [hglib.tounicode(l) for l in data]
-    fd['diff'] = u'\n'.join(data[3:])
+    fd['diff'] = u'\n'.join(data[2:])
     return fd
 
