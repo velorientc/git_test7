@@ -16,24 +16,21 @@
 
 import re
 
-from mercurial.revlog import LookupError
-
+from tortoisehg.util import hglib
 from tortoisehg.util.util import isbfile
 
-from tortoisehg.hgqt.graph import ismerge, diff as revdiff
+from tortoisehg.hgqt.graph import ismerge
 from tortoisehg.hgqt.qtlib import geticon
-from tortoisehg.util import hglib
 
-from PyQt4 import QtCore, QtGui
-connect = QtCore.QObject.connect
-SIGNAL = QtCore.SIGNAL
-nullvariant = QtCore.QVariant()
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
+nullvariant = QVariant()
 
 replus = re.compile(r'^[+][^+].*', re.M)
 reminus = re.compile(r'^[-][^-].*', re.M)
 
-class HgFileListModel(QtCore.QAbstractTableModel):
+class HgFileListModel(QAbstractTableModel):
     """
     Model used for listing (modified) files of a given Hg revision
     """
@@ -41,7 +38,7 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         """
         data is a HgHLRepo instance
         """
-        QtCore.QAbstractTableModel.__init__(self, parent)
+        QAbstractTableModel.__init__(self, parent)
         self.repo = repo
         self._datacache = {}
         self.current_ctx = None
@@ -53,15 +50,14 @@ class HgFileListModel(QtCore.QAbstractTableModel):
     def toggleFullFileList(self):
         self._fulllist = not self._fulllist
         self.loadFiles()
-        self.emit(SIGNAL('layoutChanged()'))
+        self.layoutChanged.emit()
 
     def setDiffWidth(self, w):
         if w != self.diffwidth:
             self.diffwidth = w
             self._datacache = {}
-            self.emit(SIGNAL('dataChanged(const QModelIndex &, const QModelIndex & )'),
-                      self.index(1, 0),
-                      self.index(1, self.rowCount()))
+            rc = self.rowCount()
+            self.dataChanged.emit(self.index(1, 0), self.index(1, rc))
 
     def __len__(self):
         return len(self._files)
@@ -105,7 +101,7 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         if filename in self._filesdict:
             row = self._files.index(self._filesdict[filename])
             return self.index(row, 0)
-        return QtCore.QModelIndex()
+        return QModelIndex()
 
     def _filterFile(self, filename, ctxfiles):
         if self._fulllist:
@@ -148,7 +144,7 @@ class HgFileListModel(QtCore.QAbstractTableModel):
             self.current_ctx = ctx
             self._datacache = {}
             self.loadFiles()
-            self.emit(SIGNAL("layoutChanged()"))
+            self.layoutChanged.emit()
 
     def data(self, index, role):
         if not index.isValid() or index.row()>len(self) or not self.current_ctx:
@@ -160,9 +156,9 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         current_file = current_file_desc['path']
 
         if column == 0:
-            if role in (QtCore.Qt.DisplayRole, QtCore.Qt.ToolTipRole):
-                return QtCore.QVariant(hglib.tounicode(current_file_desc['desc']))
-            elif role == QtCore.Qt.DecorationRole:
+            if role in (Qt.DisplayRole, Qt.ToolTipRole):
+                return QVariant(hglib.tounicode(current_file_desc['desc']))
+            elif role == Qt.DecorationRole:
                 if self._fulllist and ismerge(self.current_ctx):
                     if current_file_desc['infiles']:
                         icn = geticon('leftright')
@@ -170,16 +166,16 @@ class HgFileListModel(QtCore.QAbstractTableModel):
                         icn = geticon('left')
                     elif current_file_desc['fromside'] == 'right':
                         icn = geticon('right')
-                    return QtCore.QVariant(icn.pixmap(20,20))
+                    return QVariant(icn.pixmap(20,20))
                 elif current_file_desc['flag'] == '+':
-                    return QtCore.QVariant(geticon('fileadd'))
+                    return QVariant(geticon('fileadd'))
                 elif current_file_desc['flag'] == '-':
-                    return QtCore.QVariant(geticon('filedelete'))
-            elif role == QtCore.Qt.FontRole:
+                    return QVariant(geticon('filedelete'))
+            elif role == Qt.FontRole:
                 if self._fulllist and current_file_desc['infiles']:
-                    font = QtGui.QFont()
+                    font = QFont()
                     font.setBold(True)
-                    return QtCore.QVariant(font)
+                    return QVariant(font)
         return nullvariant
 
     def headerData(self, section, orientation, role):
@@ -191,7 +187,7 @@ class HgFileListModel(QtCore.QAbstractTableModel):
         else:
             header = ('File','')
 
-        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            return QtCore.QVariant(header[section])
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(header[section])
 
         return nullvariant
