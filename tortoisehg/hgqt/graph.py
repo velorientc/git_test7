@@ -359,98 +359,8 @@ class Graph(object):
             return self.nodes.index(self.nodesdict[rev])
         return -1
 
-    def fileflags(self, filename, rev):
-        """
-        Return a couple of flags ('=', '+', '-' or '?') depending on the nature
-        of the diff for filename between rev and its parents.
-        """
-        ctx = self.repo.changectx(rev)
-        flags = []
-        for p in ctx.parents():
-            changes = self.repo.status(p.node(), ctx.node())[:5]
-            # changes = modified, added, removed, deleted, unknown
-            for flag, lst in zip(["=", "+", "-", "-", "?"], changes):
-                if filename in lst:
-                    if flag == "+":
-                        renamed = ctx.filectx(filename).renamed()
-                        if renamed:
-                            flags.append(renamed)
-                            break
-                    flags.append(flag)
-                    break
-            else:
-                flags.append('')
-        return flags
-
-    def fileflag(self, filename, rev):
-        """
-        Return a flag (see fileflags) between rev and its first parent
-        """
-        return self.fileflags(filename, rev)[0]
-
     def filename(self, rev):
         return self.nodesdict[rev].extra[0]
-
-    def filedata(self, filename, rev, mode='diff'):
-        """XXX written under dubious encoding assumptions
-        """        
-        # XXX This really begins to be a dirty mess...
-        data = ""
-        flag = self.fileflag(filename, rev)
-        ctx = self.repo.changectx(rev)
-        try:
-            fctx = ctx.filectx(filename)
-        except LookupError:
-            fctx = None # may happen for renamed files?
-
-        if isbfile(filename):
-            data = "[bfile]\n"
-            if fctx:
-                data = fctx.data()
-                data += "footprint: %s\n" % data
-            return "+", data
-        if flag not in ('-', '?'):
-            if fctx is None:# or fctx.node() is None:
-                return '', None
-            if fctx.size() > self.maxfilesize:
-                data = "file too big"
-                return flag, data
-            if flag == "+" or mode == 'file':
-                flag = '+'
-                # return the whole file
-                data = fctx.data()
-                if util.binary(data):
-                    data = "binary file"
-                else: # tries to convert to unicode
-                    data = tounicode(data)
-            elif flag == "=" or isinstance(mode, int):
-                flag = "="
-                if isinstance(mode, int):
-                    parentctx = self.repo.changectx(mode)
-                elif rev in self.nodesdict:
-                    parent = self.fileparent(filename, rev)
-                    parentctx = self.repo.changectx(parent)
-                else:
-                    return flag, ''
-                # return the diff but the 3 first lines
-                data = diff(self.repo, ctx, parentctx, files=[filename])
-                data = u'\n'.join(data.splitlines()[3:])
-            elif flag == '':
-                data = ''
-            else: # file renamed
-                oldname, node = flag
-                newdata = fctx.data().splitlines()
-                olddata = self.repo.filectx(oldname, fileid=node)
-                olddata = olddata.data().splitlines()
-                data = list(difflib.unified_diff(olddata, newdata, oldname,
-                                                 filename))[2:]
-                if data:
-                    flag = "="
-                else:
-                    data = newdata
-                    flag = "+"
-                data = u'\n'.join(tounicode(elt) for elt in data)
-        return flag, data
 
     def fileparent(self, filename, rev):
         if rev is not None:
@@ -465,16 +375,3 @@ class Graph(object):
             if filename in allchanges:
                 return parent
         return None
-
-if __name__ == "__main__":
-    # pylint: disable-msg=C0103
-    import sys
-    from mercurial import ui, hg
-    u = ui.ui()
-    r = hg.repository(u, sys.argv[1])
-    if len(sys.argv) == 3:
-        rg = filelog_grapher(r, sys.argv[2])
-    else:
-        rg = revision_grapher(r)
-    g = Graph(r, rg)
-
