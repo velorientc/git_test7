@@ -16,9 +16,11 @@
 """
 Qt4 high level widgets for hg repo changelogs and filelogs
 """
+
 import difflib
 
-from mercurial import error, cmdutil
+from mercurial import hg, error, match, patch, subrepo
+from mercurial import ui as uimod
     
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -29,7 +31,7 @@ from tortoisehg.hgqt import chunkselect
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.lexers import get_lexer
+from tortoisehg.hgqt.lexers import get_lexer, get_diff_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList
 
 qsci = Qsci.QsciScintilla
@@ -78,9 +80,7 @@ class Annotator(qsci):
         for i, rev in enumerate(revlist):
             idx = uniqrevs.index(rev)
             self.markerAdd(i, self.markers[idx % len(self.markers)])
-        
-        
-        
+
 class HgFileView(QFrame):
     """file diff and content viewer"""
 
@@ -111,13 +111,14 @@ class HgFileView(QFrame):
         self.execflaglabel.setWordWrap(True)
         self.topLayout.addWidget(self.execflaglabel)
         self.execflaglabel.hide()
+
         framelayout.addLayout(self.topLayout)
         framelayout.addLayout(l, 1)
 
         self.sci = qsci(self)
         self.sci.setFrameStyle(0)
         l.addWidget(self.sci, 1)
-        self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        #self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
 
@@ -260,10 +261,10 @@ class HgFileView(QFrame):
     def clearDisplay(self):
         self.sci.clear()
         self.ann.clear()
-        self.filenamelabel.setText(" ")
-        self.execflaglabel.clear()
+        self.filenamelabel.clear()
+        self.execflaglabel.hide()
 
-    def updateForMode(self):
+    def displayFile(self, filename=None, rev=None, status=None):
         if self._mode == 'diff':
             self.sci.setMarginLineNumbers(1, False)
             self.sci.setMarginWidth(1, '')
@@ -271,10 +272,6 @@ class HgFileView(QFrame):
             # margin 1 is used for line numbers
             self.sci.setMarginLineNumbers(1, True)
             self.sci.setMarginWidth(1, '000')
-
-
-    def displayFile(self, filename=None, rev=None):
-        self.updateForMode()
 
         if filename is None:
             filename = self._filename
@@ -292,93 +289,59 @@ class HgFileView(QFrame):
         self.clearDisplay()
         if filename is None:
             return
-        try:
-            filectx = self._ctx.filectx(self._realfilename)
-        except error.LookupError: # occur on deleted files
-            return
 
-        repo = self._ctx._repo
-        if self._ctx.rev() is None:
-            # Wctx diff
-            data = None
-            if filename in self._ctx:
-                warnings = chunkselect.check_max_diff(self._ctx, filename)
-                if warnings:
-                    data = 'Diffs not displayed: %s' % warnings[1]
-                    self._mode = 'file'
-                else:
-                    m = cmdutil.matchfiles(repo, [filename])
-                    data = ''.join([c for c in self._ctx.diff(match=m)])
-                    data = hglib.tounicode(data)
-                    self._mode = 'diff'
-            if not data:
-                try:
-                    data = open(repo.wjoin(filename), 'r').read()
-                    if '\0' in data:
-                        data = 'binary file'
-                except EnvironmentError, e:
-                    data = hglib.tounicode(str(e))
-                self._mode = 'file'
-            self.updateForMode()
-            flag = '='
+        ctx = self._ctx
+        repo = ctx._repo
+        if self._p_rev is not None:
+            ctx2 = repo[self._p_rev]
         else:
-            if self._mode == 'diff' and self._p_rev is not None:
-                mode = self._p_rev
-            else:
-                mode = self._mode
-            graph = self._model.graph
-            flag, data = graph.filedata(filename, self._ctx.rev(), mode)
-            if flag == '-':
-                return
-            if flag == '':
-                return
-        
-        lexer = get_lexer(filename, data, flag, repo.ui) # yuck
-        if flag == "+":
-            nlines = data.count('\n')
-            self.sci.setMarginWidth(1, str(nlines)+'0')
-        self.sci.setLexer(lexer)
-        self._cur_lexer = lexer
-        if data not in ('file too big', 'binary file'):
-            self.filedata = data
-        else:
-            self.filedata = None
+            ctx2 = None
+        fd = filedata(ctx, ctx2, filename, status)
 
-        flag = exec_flag_changed(filectx)
-        if flag:
-            self.execflaglabel.setText("<b>exec mode has been <font color='red'>%s</font></b>" % flag)
+        if 'elabel' in fd:
+            self.execflaglabel.setText(fd['elabel'])
             self.execflaglabel.show()
         else:
             self.execflaglabel.hide()
+        self.filenamelabel.setText(fd['flabel'])
 
-        labeltxt = u''
-        if isbfile(self._realfilename):
-            labeltxt += u'[bfile tracked] '
-        labeltxt += u"<b>%s</b>" % hglib.tounicode(self._filename)
-            
-        if self._p_rev is not None:
-            labeltxt += u' (diff from rev %s)' % hglib.tounicode(self._p_rev)
-        renamed = filectx.renamed()
-        if renamed:
-            labeltxt += u' <i>(renamed from %s)</i>' % hglib.tounicode(bfilepath(renamed[0]))
-        self.filenamelabel.setText(labeltxt)
+        if 'error' in fd:
+            self.filedata = None
+            self.sci.setText(fd['error'])
+            return
+        diff = fd['diff']
+        if self._mode == 'diff' and diff:
+            lexer = get_diff_lexer(repo.ui)
+            self._cur_lexer = lexer # SJB - holding refcount?
+            self.sci.setLexer(lexer)
+            self.filedata = diff
+            self.sci.setText(diff)
+        else:
+            contents = fd['contents']
+            lexer = get_lexer(filename, contents, repo.ui)
+            self._cur_lexer = lexer # SJB - holding refcount?
+            self.sci.setLexer(lexer)
+            self.filedata = contents
+            nlines = contents.count('\n')
+            self.sci.setMarginWidth(1, str(nlines)+'0')
+            self.sci.setText(contents)
 
-        self.sci.setText(data)
         if self._find_text:
             self.highlightSearchString(self._find_text)
+
         self.fileDisplayed.emit(self._filename)
         self.updateDiffDecorations()
         if self._mode == 'file' and self._annotate:
-            if filectx.rev() is None: # XXX hide also for binary files
+            if 'error' in fd:
                 self.ann.setVisible(False)
-            else:                
+            else:
                 self.ann.setVisible(self._annotate)
                 if lexer is not None:
                     self.ann.setFont(lexer.font(0))
                 else:
                     self.ann.setFont(self.sci.font())
-                self.ann.setFilectx(filectx)
-        return True
+                self.ann.setFilectx(self._ctx[filename])
+        return True # SJB - why return True?
 
     def updateDiffDecorations(self):
         """
@@ -393,6 +356,7 @@ class HgFileView(QFrame):
             if self.timer.isActive():
                 self.timer.stop()
 
+            # TODO: why get the parent from the graph?
             parent = self._model.graph.fileparent(self._filename,
                                                   self._ctx.rev())
             if parent is None:
@@ -478,9 +442,11 @@ class HgFileView(QFrame):
     
     def clearHighlights(self):
         n = self.sci.length()
-        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 8) # highlight
+        # highlight
+        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 8)
         self.sci.SendScintilla(qsci.SCI_INDICATORCLEARRANGE, 0, n)
-        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 9) # current found occurrence
+        # current found occurrence
+        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 9)
         self.sci.SendScintilla(qsci.SCI_INDICATORCLEARRANGE, 0, n)
 
     def highlightSearchString(self, text):
@@ -507,7 +473,6 @@ class HgFileView(QFrame):
 
     def verticalScrollBar(self):
         return self.sci.verticalScrollBar()
-
 
     def idle_fill_files(self):
         # we make a burst of diff-lines computed at once, but we
@@ -552,3 +517,151 @@ class HgFileView(QFrame):
         # ok, enable GUI refresh for code viewers and diff-block displayers
         self.sci.setUpdatesEnabled(True)
         self.blk.setUpdatesEnabled(True)
+
+
+def filedata(ctx, ctx2, wfile, status=None):
+    '''Returns a dictionary describing the specified file at the given
+       revision context. If status is provided, it bypasses the
+       repo.status() calls.
+
+       The returned dictionary has several mandatory keys:
+          status   - file status
+          p2status - file status in ctx2 or second parent
+          flabel   - file label
+
+       And several optional keys:
+          contents - file contents or descriptive text
+          diff     - requested diff contents
+          error    - an error that prevented content retrieval
+          elabel   - exec flag change label
+
+       If the 'error' key is returned, the 'contents' and 'diff'
+       keys should be ignored.  All returned text values are in
+       unicode.
+    '''
+    def getstatus(repo, n1, n2, wfile):
+        m = match.exact(repo.root, repo.getcwd(), [wfile])
+        modified, added, removed = repo.status(n1, n2, match=m)[:3]
+        if wfile in modified:
+            return 'M'
+        if wfile in added:
+            return 'A'
+        if wfile in removed:
+            return 'R'
+        return None
+
+    # TODO: Teach this function about patch contexts
+
+    labeltxt = u''
+    if isbfile(wfile):
+        labeltxt += u'[bfile tracked] '
+    labeltxt += u'<b>%s</b>' % hglib.tounicode(wfile)
+
+    repo = ctx._repo
+    p2status = None
+    if status is None:
+        status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)
+        if ctx2 is None and len(ctx.parents()) > 1:
+            p2status = getstatus(repo, ctx.p2().node(), ctx.node(), wfile)
+    if ctx2 is not None:
+        p2status = getstatus(repo, ctx2.node(), ctx.node(), wfile)
+    else:
+        ctx2 = ctx.p1()
+
+    fd = dict(contents=None, diff=None, status=status, flabel=labeltxt,
+              p2status=p2status)
+
+    if status == 'S':
+        try:
+            assert(ctx.rev() is None)
+            _ui = uimod.ui()
+            sroot = repo.wjoin(wfile)
+            srepo = hg.repository(_ui, path=sroot)
+            srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
+            sactual = srepo['.'].hex()
+            _ui.pushbuffer()
+            commands.status(_ui, srepo)
+            out = _ui.popbuffer()
+            if srev != sactual:
+                out.append(_('revision changed from:\n'))
+                opts = {'date':None, 'user':None, 'rev':[srev]}
+                _ui.pushbuffer()
+                commands.log(_ui, srepo, **opts)
+                out = _ui.popbuffer()
+                out.append(_('\nto:\n'))
+                opts['rev'] = [sactual]
+                _ui.pushbuffer()
+                commands.log(_ui, srepo, **opts)
+                out.append(_ui.popbuffer())
+            fd['contents'] = u''.join([hglib.tounicode(l) for l in out])
+        except error.RepoError:
+            fd['error'] = _('Not an hg subrepo, not previewable')
+        return fd
+
+    if wfile in ctx:
+        warnings = chunkselect.check_max_diff(ctx, wfile)
+        if warnings:
+            fd['error'] = _('File or diffs not displayed: %s') % warnings[1]
+            return fd
+
+        if status != '!':
+            fctx = ctx[wfile]
+            newdata = fctx.data()
+            fd['contents'] = hglib.tounicode(newdata)
+            change = exec_flag_changed(fctx)
+            if change:
+                lbl = _("<b>exec mode has been <font color='red'>%s</font></b>")
+                fd['elabel'] = lbl % change
+
+    if status in ('R', '!'):
+        newdata = ctx.p1()[wfile].data()
+        fd['contents'] = hglib.tounicode(newdata)
+        labeltxt += _(' <i>(was deleted)</i>')
+        fd['flabel'] = labeltxt
+        return fd
+    elif status in ('I', '?'):
+        try:
+            data = open(repo.wjoin(wfile), 'r').read()
+            if '\0' in data:
+                fd['error'] = 'binary file'
+            else:
+                fd['contents'] = hglib.tounicode(data)
+                labeltxt += _(' <i>(is unversioned)</i>')
+                fd['flabel'] = labeltxt
+        except EnvironmentError, e:
+            fd['error'] = hglib.tounicode(str(e))
+        return fd
+
+    # TODO: elif check if a subdirectory (for manifest tool)
+
+    if status == 'A':
+        renamed = fctx.renamed()
+        if not renamed:
+            labeltxt += _(' <i>(was added)</i>')
+            fd['flabel'] = labeltxt
+            return fd
+
+        oldname, node = renamed
+        fr = hglib.tounicode(bfilepath(oldname))
+        labeltxt += _(' <i>(renamed from %s)</i>') % fr
+        fd['flabel'] = labeltxt
+
+        newdata = newdata.splitlines()
+        olddata = repo.filectx(oldname, fileid=node).data().splitlines()
+        gen = difflib.unified_diff(olddata, newdata, oldname, wfile)
+        data = []
+        for chunk in gen:
+            data.extend(chunk.splitlines())
+        data = [hglib.tounicode(l) for l in data]
+        fd['diff'] = u'\n'.join(data[2:])
+        return fd
+
+    m = match.exact(repo.root, repo.getcwd(), [wfile])
+    gen = patch.diff(repo, ctx2.node(), ctx.node(), match=m)
+    data = []
+    for chunk in gen:
+        data.extend(chunk.splitlines())
+    data = [hglib.tounicode(l) for l in data]
+    fd['diff'] = u'\n'.join(data[3:])
+    return fd
+

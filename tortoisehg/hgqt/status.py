@@ -62,7 +62,6 @@ class StatusWidget(QWidget):
         self.opts.update(opts)
         self.pats = pats
         self.ms = {}
-        self.curRow = None
         self.patchecked = {}
         self.refreshing = None
 
@@ -166,30 +165,13 @@ class StatusWidget(QWidget):
         docf.setLayout(vbox)
         self.docf = docf
 
-        self.fvstack = QStackedWidget()
-
         self.fileview = fileview.HgFileView(self)
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.setMode('diff')
-        self.fvstack.addWidget(self.fileview)
-
-        self.te = QTextBrowser()
-        self.te.setOpenLinks(False)
-        self.te.anchorClicked.connect(self.teLinkClicked)
-        self.te.document().setDefaultStyleSheet(qtlib.thgstylesheet)
-        self.te.setReadOnly(True)
-        self.te.setLineWrapMode(QTextEdit.NoWrap)
-        self.fvstack.addWidget(self.te)
-
-        vbox.addWidget(self.fvstack, 1)
+        vbox.addWidget(self.fileview, 1)
 
         self.split = split
         self.diffvbox = vbox
-        self.override = False
-
-    def teLinkClicked(self, url):
-        self.override = True
-        self.refreshDiff()
 
     def getTitle(self):
         if self.pats:
@@ -207,8 +189,6 @@ class StatusWidget(QWidget):
         if self.refreshing:
             return
         self.fileview.clearDisplay()
-        self.curRow = None
-        self.override = False
 
         # store selected paths or current path
         model = self.tv.model()
@@ -231,7 +211,6 @@ class StatusWidget(QWidget):
     def reloadComplete(self, wctx, patchecked):
         self.ms = merge.mergestate(self.repo)
         self.wctx = wctx
-        self.fileview.setContext(wctx)
         self.patchecked = patchecked.copy()
         self.updateModel()
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
@@ -307,63 +286,13 @@ class StatusWidget(QWidget):
 
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
-        self.curRow = None
-        self.override = False
-        self.curRow = index.model().getRow(index)
-        self.refreshDiff()
-
-    def refreshDiff(self):
-        if self.curRow is None:
+        row = index.model().getRow(index)
+        if row is None:
             return
-        path, status, mst, upath, ext, sz = self.curRow
-        showanyway = self.override
+        path, status, mst, upath, ext, sz = row
         wfile = util.pconvert(path)
-        #self.fnamelabel.setText(statusMessage(status, mst, upath))
-        hu = htmlui.htmlui()
-
-        show = '&nbsp;&nbsp;(<a href="cmd:show">%s</a>)' % _('show anyway')
-        if status in '?IA':
-            self.fileview.displayFile(wfile)
-            self.fvstack.setCurrentWidget(self.fileview)
-            return
-        elif status in '!C':
-            self.fileview.displayFile(wfile)
-            self.fvstack.setCurrentWidget(self.fileview)
-            return
-        elif status in 'S':
-            # TODO: move this to fileview, drop self.te
-            if showanyway:
-                try:
-                    sroot = self.repo.wjoin(path)
-                    srepo = thgrepo.repository(hu, path=sroot)
-                    srev = self.wctx.substate.get(path, subrepo.nullstate)[1]
-                    sactual = srepo['.'].hex()
-                    commands.status(hu, srepo)
-                    out = [hu.getdata()[0]]
-                    if srev != sactual:
-                        out.append('<b>')
-                        out.append(_('revision changed from:'))
-                        out.append('</b><br>')
-                        opts = {'date':None, 'user':None, 'rev':[srev]}
-                        commands.log(hu, srepo, **opts)
-                        out.append(hu.getdata()[0])
-                        out.append('<b>')
-                        out.append(_('to:'))
-                        out.append('</b><br>')
-                        opts['rev'] = [sactual]
-                        commands.log(hu, srepo, **opts)
-                        out.append(hu.getdata()[0])
-                        diff = ''.join(out)
-                except error.RepoError:
-                    diff = _('<b>Not an hg subrepo, not previewable</b>')
-            else:
-                diff = _('<b>Subrepository status not displayed</b>') + show
-            self.te.setHtml(diff)
-            self.fvstack.setCurrentWidget(self.te)
-            return
-
-        self.fileview.displayFile(wfile)
-        self.fvstack.setCurrentWidget(self.fileview)
+        self.fileview.setContext(self.wctx)
+        self.fileview.displayFile(wfile, status=status)
 
 
 class StatusThread(QThread):
