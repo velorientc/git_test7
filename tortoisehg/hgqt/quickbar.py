@@ -24,6 +24,7 @@ from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt import fileview
 
 class QuickBar(QToolBar):
     def __init__(self, name, key, desc=None, parent=None):
@@ -190,15 +191,16 @@ class FindInGraphlogQuickBar(FindQuickBar):
             if fromfile is not None and fromfile in files:
                 files = files[files.index(fromfile)+1:]
                 fromfile = None
-            for filename in files:
-                if self._mode == 'diff':
-                    flag, data = self._model.graph.filedata(filename, rev)
-                else:
-                    data = ctx.filectx(filename).data()
-                    if util.binary(data):
-                        data = "binary file"
+            for wfile in files:
+                fd = fileview.filedata(ctx, None, wfile)
+                if 'error' in fd:
+                    continue
+                if self._mode == 'diff' and fd['diff']:
+                    data = fd['diff']
+                elif 'contents' in fd:
+                    data = fd['contents']
                 if data and text in data:
-                    yield rev, filename
+                    yield rev, wfile
                 else:
                     yield None
 
