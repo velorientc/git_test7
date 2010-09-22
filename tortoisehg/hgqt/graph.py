@@ -360,22 +360,8 @@ class Graph(object):
         return -1
 
     #
-    # File graph methods
+    # File graph method
     #
 
     def filename(self, rev):
         return self.nodesdict[rev].extra[0]
-
-    def fileparent(self, filename, rev):
-        if rev is not None:
-            node = self.repo.changelog.node(rev)            
-        else:
-            node = self.repo.changectx(rev).node()
-        for parent in self.nodesdict[rev].parents:
-            pnode = self.repo.changelog.node(parent)
-            changes = self.repo.status(pnode, node)[:5]
-            allchanges = []
-            [allchanges.extend(e) for e in changes]
-            if filename in allchanges:
-                return parent
-        return None
