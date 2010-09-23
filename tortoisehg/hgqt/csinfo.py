@@ -147,16 +147,16 @@ class SummaryInfo(object):
             elif item == 'revid':
                 return str(ctx)
             elif item == 'desc':
-                return hglib.toutf(ctx.description().replace('\0', ''))
+                return hglib.tounicode(ctx.description().replace('\0', ''))
             elif item == 'summary':
                 value = ctx.description().replace('\0', '').split('\n')[0]
                 if len(value) == 0:
                     return None
-                return hglib.toutf(hglib.tounicode(value)[:80])
+                return hglib.tounicode(value)[:80]
             elif item == 'user':
-                return hglib.toutf(ctx.user())
+                return hglib.tounicode(ctx.user())
             elif item == 'shortuser':
-                return hglib.toutf(hglib.username(ctx.user()))
+                return hglib.tounicode(hglib.username(ctx.user()))
             elif item == 'dateage':
                 date = self.get_data('date', *args)
                 age = self.get_data('age', *args)
@@ -174,10 +174,7 @@ class SummaryInfo(object):
                     return hglib.age(date)
                 return None
             elif item == 'rawbranch':
-                value = ctx.branch()
-                if value:
-                    return hglib.toutf(value)
-                return None
+                return ctx.branch()
             elif item == 'branch':
                 value = self.get_data('rawbranch', *args)
                 if value:
