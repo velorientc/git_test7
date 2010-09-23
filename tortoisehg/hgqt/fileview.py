@@ -626,7 +626,7 @@ class FileData(object):
                     change = 'unset'
             if change:
                 lbl = _("exec mode has been <font color='red'>%s</font>")
-                sef.elabel = lbl % change
+                self.elabel = lbl % change
 
         if status == 'A':
             renamed = fctx.renamed()
