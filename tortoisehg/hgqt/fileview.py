@@ -299,32 +299,32 @@ class HgFileView(QFrame):
             ctx2 = repo[self._p_rev]
         else:
             ctx2 = None
-        fd = filedata(ctx, ctx2, filename, status)
+        fd = FileData(ctx, ctx2, filename, status)
 
-        if 'elabel' in fd:
-            self.extralabel.setText(fd['elabel'])
+        if fd.elabel:
+            self.extralabel.setText(fd.elabel)
             self.extralabel.show()
         else:
             self.extralabel.hide()
-        self.filenamelabel.setText(fd['flabel'])
+        self.filenamelabel.setText(fd.flabel)
 
-        if 'error' in fd:
-            self.sci.setText(fd['error'])
+        if not fd.isValid():
+            self.ann.setVisible(False)
+            self.sci.setText(fd.error)
             return
-        diff = fd['diff']
-        if self._mode == 'diff' and diff:
+
+        if self._mode == 'diff' and fd.diff:
             lexer = get_diff_lexer(repo.ui)
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
-            self.sci.setText(diff)
+            self.sci.setText(fd.diff)
         else:
-            contents = fd['contents']
-            lexer = get_lexer(filename, contents, repo.ui)
+            lexer = get_lexer(filename, fd.contents, repo.ui)
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
-            nlines = contents.count('\n')
+            nlines = fd.contents.count('\n')
             self.sci.setMarginWidth(1, str(nlines)+'0')
-            self.sci.setText(contents)
+            self.sci.setText(fd.contents)
 
         if self._find_text:
             self.highlightSearchString(self._find_text)
@@ -334,23 +334,20 @@ class HgFileView(QFrame):
             return
 
         if self._annotate:
-            if 'error' in fd:
-                self.ann.setVisible(False)
+            self.ann.setVisible(self._annotate)
+            if lexer is not None:
+                self.ann.setFont(lexer.font(0))
             else:
-                self.ann.setVisible(self._annotate)
-                if lexer is not None:
-                    self.ann.setFont(lexer.font(0))
-                else:
-                    self.ann.setFont(self.sci.font())
-                self.ann.setFilectx(self._ctx[filename])
+                self.ann.setFont(self.sci.font())
+            self.ann.setFilectx(self._ctx[filename])
 
         # Update diff margin
-        if 'contents' in fd and 'olddata' in fd:
+        if fd.contents and fd.olddata:
             if self.timer.isActive():
                 self.timer.stop()
 
-            olddata = fd['olddata'].splitlines()
-            newdata = fd['contents'].splitlines()
+            olddata = fd.olddata.splitlines()
+            newdata = fd.contents.splitlines()
             self._diff = difflib.SequenceMatcher(None, olddata, newdata)
             self._diffs = []
             self.blk.syncPageStep()
@@ -497,156 +494,136 @@ class HgFileView(QFrame):
         self.blk.setUpdatesEnabled(True)
 
 
-def filedata(ctx, ctx2, wfile, status=None):
-    '''Returns a dictionary describing the specified file at the given
-       revision context. If status is provided, it bypasses the
-       repo.status() calls.
+class FileData(object):
+    def __init__(self, ctx, ctx2, wfile, status=None):
+        self.contents = None
+        self.error = None
+        self.olddata = None
+        self.diff = None
+        self.flabel = u''
+        self.elabel = u''
+        self.readStatus(ctx, ctx2, wfile, status)
 
-       The returned dictionary has several mandatory keys:
-          status   - file status
-          p2status - file status in ctx2
-          flabel   - file label
+    def isValid(self):
+        return self.error is None
 
-       And several optional keys:
-          contents - file contents or descriptive text
-          olddata  - parent data used to generate diff
-          diff     - requested diff contents
-          error    - an error that prevented content retrieval
-          elabel   - exec flag change label
+    def readStatus(self, ctx, ctx2, wfile, status):
+        def getstatus(repo, n1, n2, wfile):
+            m = match.exact(repo.root, repo.getcwd(), [wfile])
+            modified, added, removed = repo.status(n1, n2, match=m)[:3]
+            if wfile in modified:
+                return 'M'
+            if wfile in added:
+                return 'A'
+            if wfile in removed:
+                return 'R'
+            return None
 
-       If the 'error' key is returned, the 'contents' and 'diff'
-       keys should be ignored.  All returned text values are in
-       unicode.
-    '''
-    def getstatus(repo, n1, n2, wfile):
-        m = match.exact(repo.root, repo.getcwd(), [wfile])
-        modified, added, removed = repo.status(n1, n2, match=m)[:3]
-        if wfile in modified:
-            return 'M'
-        if wfile in added:
-            return 'A'
-        if wfile in removed:
-            return 'R'
-        return None
+        repo = ctx._repo
+        if isbfile(wfile):
+            self.flabel += u'[bfile tracked] '
+        self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
-    # TODO: Teach this function about patch contexts
+        if status is None:
+            status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)
+        if ctx2 is None:
+            ctx2 = ctx.p1()
 
-    labeltxt = u''
-    if isbfile(wfile):
-        labeltxt += u'[bfile tracked] '
-    labeltxt += u'<b>%s</b>' % hglib.tounicode(wfile)
-
-    repo = ctx._repo
-    p2status = None
-    if status is None:
-        status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)
-    if ctx2 is not None:
-        p2status = getstatus(repo, ctx2.node(), ctx.node(), wfile)
-    else:
-        ctx2 = ctx.p1()
-
-    fd = dict(contents=None, diff=None, status=status, flabel=labeltxt,
-              p2status=p2status)
-
-    if status == 'S':
-        try:
-            assert(ctx.rev() is None)
-            out = []
-            _ui = uimod.ui()
-            sroot = repo.wjoin(wfile)
-            srepo = hg.repository(_ui, path=sroot)
-            srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
-            sactual = srepo['.'].hex()
-            _ui.pushbuffer()
-            commands.status(_ui, srepo)
-            data = _ui.popbuffer()
-            if data:
-                out.append(_('File Status:\n'))
-                out.append(data)
-                out.append('\n')
-            if srev == '':
-                out.append(_('New subrepository\n\n'))
-            elif srev != sactual:
-                out.append(_('Revision has changed from:\n\n'))
-                opts = {'date':None, 'user':None, 'rev':[srev]}
+        if status == 'S':
+            try:
+                assert(ctx.rev() is None)
+                out = []
+                _ui = uimod.ui()
+                sroot = repo.wjoin(wfile)
+                srepo = hg.repository(_ui, path=sroot)
+                srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
+                sactual = srepo['.'].hex()
                 _ui.pushbuffer()
-                commands.log(_ui, srepo, **opts)
-                out.append(hglib.tounicode(_ui.popbuffer()))
-                out.append(_('To:\n'))
-                opts['rev'] = [sactual]
-                _ui.pushbuffer()
-                commands.log(_ui, srepo, **opts)
-                out.append(hglib.tounicode(_ui.popbuffer()))
-            fd['contents'] = u''.join(out)
-            labeltxt += _(' <i>(is a dirty sub-repository)</i>')
-            labeltxt += u' <a href="subrepo:%s">%s...</a>'
-            fd['flabel'] = labeltxt % (hglib.tounicode(sroot), _('open'))
-        except error.RepoError:
-            fd['error'] = _('Not an hg subrepo, not previewable')
-        return fd
+                commands.status(_ui, srepo)
+                data = _ui.popbuffer()
+                if data:
+                    out.append(_('File Status:\n'))
+                    out.append(data)
+                    out.append('\n')
+                if srev == '':
+                    out.append(_('New subrepository\n\n'))
+                elif srev != sactual:
+                    out.append(_('Revision has changed from:\n\n'))
+                    opts = {'date':None, 'user':None, 'rev':[srev]}
+                    _ui.pushbuffer()
+                    commands.log(_ui, srepo, **opts)
+                    out.append(hglib.tounicode(_ui.popbuffer()))
+                    out.append(_('To:\n'))
+                    opts['rev'] = [sactual]
+                    _ui.pushbuffer()
+                    commands.log(_ui, srepo, **opts)
+                    out.append(hglib.tounicode(_ui.popbuffer()))
+                self.contents = u''.join(out)
+                labeltxt += _(' <i>(is a dirty sub-repository)</i>')
+                labeltxt += u' <a href="subrepo:%s">%s...</a>'
+                self.flabel += labeltxt % (hglib.tounicode(sroot), _('open'))
+            except error.RepoError:
+                self.error = _('Not an hg subrepo, not previewable')
+            return
 
-    if wfile in ctx:
-        warnings = chunkselect.check_max_diff(ctx, wfile)
-        if warnings:
-            fd['error'] = _('File or diffs not displayed: %s') % warnings[1]
-            return fd
+        if wfile in ctx:
+            warnings = chunkselect.check_max_diff(ctx, wfile)
+            if warnings:
+                self.error = _('File or diffs not displayed: %s') % warnings[1]
+                return
 
-        if status != '!':
-            fctx = ctx[wfile]
-            newdata = fctx.data()
-            fd['contents'] = hglib.tounicode(newdata)
-            change = exec_flag_changed(fctx)
-            if change:
-                lbl = _("<b>exec mode has been <font color='red'>%s</font></b>")
-                fd['elabel'] = lbl % change
+            if status != '!':
+                fctx = ctx[wfile]
+                newdata = fctx.data()
+                self.contents = hglib.tounicode(newdata)
+                change = exec_flag_changed(fctx)
+                if change:
+                    lbl = _("exec mode has been <font color='red'>%s</font>")
+                    sef.elabel = lbl % change
 
-    if status in ('R', '!'):
-        newdata = ctx.p1()[wfile].data()
-        fd['contents'] = hglib.tounicode(newdata)
-        labeltxt += _(' <i>(was deleted)</i>')
-        fd['flabel'] = labeltxt
-        return fd
-    elif status in ('I', '?'):
-        try:
-            data = open(repo.wjoin(wfile), 'r').read()
-            if '\0' in data:
-                fd['error'] = 'binary file'
-            else:
-                fd['contents'] = hglib.tounicode(data)
-                labeltxt += _(' <i>(is unversioned)</i>')
-                fd['flabel'] = labeltxt
-        except EnvironmentError, e:
-            fd['error'] = hglib.tounicode(str(e))
-        return fd
+        if status in ('R', '!'):
+            newdata = ctx.p1()[wfile].data()
+            self.contents = hglib.tounicode(newdata)
+            self.flabel += _(' <i>(was deleted)</i>')
+            return
+        elif status in ('I', '?'):
+            try:
+                data = open(repo.wjoin(wfile), 'r').read()
+                if '\0' in data:
+                    self.error = 'binary file'
+                else:
+                    self.contents = hglib.tounicode(data)
+                    self.flabel += _(' <i>(is unversioned)</i>')
+            except EnvironmentError, e:
+                self.error = hglib.tounicode(str(e))
+            return
 
-    # TODO: elif check if a subdirectory (for manifest tool)
+        # TODO: elif check if a subdirectory (for manifest tool)
 
-    if status == 'A':
-        renamed = fctx.renamed()
-        if not renamed:
-            labeltxt += _(' <i>(was added)</i>')
-            fd['flabel'] = labeltxt
-            return fd
+        if status == 'A':
+            renamed = fctx.renamed()
+            if not renamed:
+                self.flabel += _(' <i>(was added)</i>')
+                return
 
-        oldname, node = renamed
-        fr = hglib.tounicode(bfilepath(oldname))
-        labeltxt += _(' <i>(renamed from %s)</i>') % fr
-        fd['flabel'] = labeltxt
-        olddata = repo.filectx(oldname, fileid=node).data()
-    elif status == 'M':
-        oldname = wfile
-        olddata = ctx2[wfile].data()
-    else:
-        return fd
+            oldname, node = renamed
+            fr = hglib.tounicode(bfilepath(oldname))
+            self.flabel += _(' <i>(renamed from %s)</i>') % fr
+            olddata = repo.filectx(oldname, fileid=node).data()
+        elif status == 'M':
+            oldname = wfile
+            olddata = ctx2[wfile].data()
+        else:
+            return
 
-    fd['olddata'] = olddata
-    olddata = olddata.splitlines()
-    newdata = newdata.splitlines()
-    gen = difflib.unified_diff(olddata, newdata, oldname, wfile)
-    data = []
-    for chunk in gen:
-        data.extend(chunk.splitlines())
-    data = [hglib.tounicode(l) for l in data]
-    fd['diff'] = u'\n'.join(data[2:])
-    return fd
+        self.olddata = olddata
+        olddata = olddata.splitlines()
+        newdata = newdata.splitlines()
+        gen = difflib.unified_diff(olddata, newdata, oldname, wfile)
+        data = []
+        for chunk in gen:
+            data.extend(chunk.splitlines())
+        data = [hglib.tounicode(l) for l in data]
+        self.diff = u'\n'.join(data[2:])
+        return
 

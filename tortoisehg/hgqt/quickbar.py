@@ -192,13 +192,13 @@ class FindInGraphlogQuickBar(FindQuickBar):
                 files = files[files.index(fromfile)+1:]
                 fromfile = None
             for wfile in files:
-                fd = fileview.filedata(ctx, None, wfile)
-                if 'error' in fd:
+                fd = fileview.FileData(ctx, None, wfile)
+                if not fd.isValid():
                     continue
-                if self._mode == 'diff' and fd['diff']:
-                    data = fd['diff']
-                elif 'contents' in fd:
-                    data = fd['contents']
+                if self._mode == 'diff' and fd.diff:
+                    data = fd.diff
+                else:
+                    data = fd.contents
                 if data and text in data:
                     yield rev, wfile
                 else:
