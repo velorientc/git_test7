@@ -169,7 +169,7 @@ class ThgRepoWrapper(QObject):
             pass
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible maxdiff
-              _exts _thghiddentags displayname shortname'''.split()
+              deadbranches _exts _thghiddentags displayname shortname'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
@@ -298,6 +298,12 @@ def _extendrepo(repo):
             except (ValueError, TypeError):
                 maxdiff = 1024 # 1MB by default
             return maxdiff * 1024
+
+        @propertycache
+        def deadbranches(self):
+            db = hglib.tounicode(ui.config('tortoisehg', 'deadbranch', ''))
+            dblist = [b.strip() for b in db.split(',')]
+            return dblist
 
         @propertycache
         def displayname(self):
