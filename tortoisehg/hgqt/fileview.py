@@ -514,8 +514,9 @@ class FileData(object):
         try:
             fctx = ctx.filectx(wfile)
             size = fctx.size()
-        except (EnvironmentError, error.LookupError):
-            return False
+        except (EnvironmentError, error.LookupError), e:
+            self.error = p + hglib.tounicode(str(e))
+            return None
         if size > ctx._repo.maxdiff:
             self.error = p + _('File is larger than the specified max size.\n')
             return None
@@ -524,7 +525,8 @@ class FileData(object):
             if '\0' in data:
                 self.error = p + _('File is binary.\n')
                 return None
-        except (EnvironmentError):
+        except EnvironmentError, e:
+            self.error = p + hglib.tounicode(str(e))
             return None
         return fctx, data
 
