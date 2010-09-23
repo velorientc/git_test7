@@ -335,9 +335,6 @@ class SummaryBase(object):
             self.repo = repo
         if self.ctx is None:
             self.ctx = repo.changectx(target)
-        if self.ctx is None:  # FIXME won't get None - will get error instead
-            return False # cannot update
-        return True
 
 PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
 
@@ -359,8 +356,7 @@ class SummaryPanel(SummaryBase, QWidget):
         self.expand_btn = qtlib.PMButton()
 
     def update(self, target=None, style=None, custom=None, repo=None):
-        if not SummaryBase.update(self, target, custom, repo):
-            return False # cannot update
+        SummaryBase.update(self, target, custom, repo)
 
         if style is not None:
             self.csstyle = style
@@ -439,8 +435,7 @@ class SummaryLabel(SummaryBase, QLabel):
         self.csstyle = style
 
     def update(self, target=None, style=None, custom=None, repo=None):
-        if not SummaryBase.update(self, target, custom, repo):
-            return False # cannot update
+        SummaryBase.update(self, target, custom, repo)
 
         if style is not None:
             self.csstyle = style
