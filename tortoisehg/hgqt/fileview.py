@@ -510,7 +510,7 @@ class FileData(object):
             size = fctx.size()
         except (EnvironmentError, error.LookupError):
             return False
-        if size > hglib.getmaxdiffsize(ctx._repo.ui):
+        if size > ctx._repo.maxdiff:
             self.error = p + _('File is larger than the specified max size.\n')
             return None
         try:
