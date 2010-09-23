@@ -99,23 +99,6 @@ class Factory(object):
 class UnknownItem(Exception):
     pass
 
-def create_context(repo, target):
-    if repo is None:
-        return None
-    if target is None:
-        return repo[None]
-    ctx = thgrepo.PatchContext(repo, target)
-    if ctx is None:
-        ctx = ChangesetContext(repo, target)
-    return ctx
-
-def ChangesetContext(repo, rev):
-    try:
-        ctx = repo[rev]
-    except (error.LookupError, error.RepoLookupError, error.RepoError):
-        ctx = None
-    return ctx
-
 
 class SummaryInfo(object):
 
@@ -320,7 +303,7 @@ class SummaryBase(object):
         self.custom = custom
         self.repo = repo
         self.info = info
-        self.ctx = create_context(repo, self.target)
+        self.ctx = repo.changectx(self.target)
 
     def get_data(self, item, **kargs):
         return self.info.get_data(item, self, self.ctx, self.custom, **kargs)
@@ -339,12 +322,6 @@ class SummaryBase(object):
 
     def update(self, target=None, custom=None, repo=None):
         self.ctx = None
-        if type(target) == thgrepo.patchctx:
-            # If a patchctx is specified as target, use it instead
-            # of creating a context from revision or patch file
-            self.ctx = target
-            target = None
-            self.target = None
         if target is None:
             target = self.target
         if target is not None:
@@ -357,8 +334,8 @@ class SummaryBase(object):
         if repo is not None:
             self.repo = repo
         if self.ctx is None:
-            self.ctx = create_context(repo, target)
-        if self.ctx is None:
+            self.ctx = repo.changectx(target)
+        if self.ctx is None:  # FIXME won't get None - will get error instead
             return False # cannot update
         return True
 
