@@ -55,7 +55,7 @@ class FileRevModel(HgRepoListModel):
 
         if self.filename:
             grapher = filelog_grapher(self.repo, self.filename)
-            self.graph = Graph(self.repo, grapher, self.max_file_size)
+            self.graph = Graph(self.repo, grapher)
             fl = self.repo.file(self.filename)
             # we use fl.index here (instead of linkrev) cause
             # linkrev API changed between 1.0 and 1.?. So this

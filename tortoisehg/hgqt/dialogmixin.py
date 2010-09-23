@@ -39,7 +39,6 @@ class HgDialogMixin(object):
         self._font = qtlib.getfont(ui, 'fontlog').font()
         self.rowheight = 8
         self.users, self.aliases = [], []
-        self.max_file_size = 100000
 
     def accept(self):
         self.close()

@@ -125,8 +125,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.datacache = {}
         grapher = revision_grapher(self.repo, start_rev=None, follow=False,
                                    branch=branch, allparents=allparents)
-        self.graph = Graph(self.repo, grapher, self.max_file_size,
-                           include_mq=True)
+        self.graph = Graph(self.repo, grapher, include_mq=True)
         self.rowcount = 0
         self.layoutChanged.emit()
         self.ensureBuilt(row=self.fill_step)
@@ -136,7 +135,6 @@ class HgRepoListModel(QAbstractTableModel):
     def reloadConfig(self):
         _ui = self.repo.ui
         self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
-        self.max_file_size = hglib.getmaxdiffsize(_ui)
         self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
         self.maxauthor = 'author name'
 

@@ -248,8 +248,7 @@ class Graph(object):
     method to build the graph progressively.
     """
     #@timeit
-    def __init__(self, repo, grapher, maxfilesize=100000, include_mq=False):
-        self.maxfilesize = maxfilesize
+    def __init__(self, repo, grapher, include_mq=False):
         self.repo = repo
         self.maxlog = len(repo)
         if include_mq:
