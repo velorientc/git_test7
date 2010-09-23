@@ -505,8 +505,7 @@ class FileSelectionDialog(QtGui.QDialog):
         if ctx1b:
             other, file1b = getfile(ctx1b, dir1b, fname, source)
         else:
-            other = fname, fname
-            file1b = None
+            other, file1b = fname, None
         fname, file2 = getfile(ctx2, dir2, fname, None)
 
         label1a = local+rev1a
