@@ -264,7 +264,6 @@ class RepoWidget(QWidget):
         self.repoview.forward()
 
     def thgimport(self):
-        l = len(self.repo)
         dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
         dlg.repoInvalidated.connect(self.reload)
         dlg.exec_()
