@@ -304,6 +304,12 @@ class HgFileView(QFrame):
             ctx2 = repo[self._p_rev]
         else:
             ctx2 = None
+
+        # FIXME temporary bodge to stop patch files
+        # causing errors
+        if type(ctx.rev()) == str:
+            return
+
         fd = FileData(ctx, ctx2, filename, status)
 
         if fd.elabel:

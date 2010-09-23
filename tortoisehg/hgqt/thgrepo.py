@@ -423,7 +423,9 @@ def _extendchangectx(changectx):
             '''True if self is a branch head'''
             return self in [self._repo[x] for x in self._repo.branchmap()]
 
-
+        def changesToParent(self, whichparent):
+            parent = self.parents()[whichparent]
+            return self._repo.status(parent.node(), self.node())[:3]
 
     return thgchangectx
 
@@ -460,6 +462,7 @@ class patchctx(object):
         self._path = patchpath
         self._patchname = os.path.basename(patchpath)
         self._repo = repo
+        self._files = None
         if patchHandle:
             pf = patchHandle
             pf_start_pos = pf.tell()
@@ -526,3 +529,58 @@ class patchctx(object):
     def thgmqpatchname(self): return self._patchname
     def thgbranchhead(self): return False
     def thgmqunappliedpatch(self): return True
+    def changesToParent(self, whichparent):
+        if self._files is None:
+            self._load_patch_details()
+            
+        return self._changesToParent
+
+    def files(self):
+        if self._files is None:
+            self._load_patch_details()
+
+        return self._files
+
+    def _load_patch_details(self):
+        # taken from hgtk/changeset.py
+        def get_path(a, b):
+            type = (a == '/dev/null') and 'A' or 'M'
+            type = (b == '/dev/null') and 'R' or type
+            rawpath = (b != '/dev/null') and b or a
+            if not (rawpath.startswith('a/') or rawpath.startswith('b/')):
+                return type, rawpath
+            return type, rawpath.split('/', 1)[-1]
+
+        hunks = []
+        files = []
+        modified = []
+        added = []
+        removed = []
+        map = {'MODIFY': modified, 
+               'ADD': added, 
+               'DELETE': removed}
+
+        self._files = []
+        self._changesToParent = [modified, added, removed]
+        
+        pf = open(self._path)
+        try:
+            try:
+                for state, values in patch.iterhunks(self._repo.ui, pf):
+                    if state == 'git':
+                        for m in values:
+                            f = m.path
+                            self._files.append(f)
+                            if m.op == 'COPY':
+                                added.append(f)
+                            elif m.op == 'RENAME':
+                                added.append(f)
+                                self._files.append(m.oldpath)
+                                removed.append(m.oldpath)
+                            else:
+                                map[m.op].append(f)
+
+            except patch.NoHunks:
+                pass
+        finally:
+            pf.close()

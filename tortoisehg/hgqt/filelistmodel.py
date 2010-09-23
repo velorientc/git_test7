@@ -108,16 +108,17 @@ class HgFileListModel(QAbstractTableModel):
             return True
         return filename in ctxfiles #self.current_ctx.files()
 
-    def _buildDesc(self, parent, fromside):
+    def _buildDesc(self, whichparent, fromside):
         _files = []
         ctx = self.current_ctx
         ctxfiles = ctx.files()
-        changes = self.repo.status(parent.node(), ctx.node())[:3]
+        changes = ctx.changesToParent(whichparent)
         modified, added, removed = changes
         for lst, flag in ((added, '+'), (modified, '='), (removed, '-')):
             for f in [x for x in lst if self._filterFile(x, ctxfiles)]:
+                # FIXME which of the attributes here are used again?
                 _files.append({'path': f, 'flag': flag, 'desc': f,
-                               'parent': parent, 'fromside': fromside,
+                               'parent': whichparent, 'fromside': fromside,
                                'infiles': f in ctxfiles})
                 # renamed/copied files are handled by background
                 # filling process since it can be a bit long
@@ -132,10 +133,10 @@ class HgFileListModel(QAbstractTableModel):
     def loadFiles(self):
         self._files = []
         self._datacache = {}
-        self._files = self._buildDesc(self.current_ctx.parents()[0], 'left')
+        self._files = self._buildDesc(0, 'left')
         if ismerge(self.current_ctx):
             _paths = [x['path'] for x in self._files]
-            _files = self._buildDesc(self.current_ctx.parents()[1], 'right')
+            _files = self._buildDesc(1, 'right')
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
 
