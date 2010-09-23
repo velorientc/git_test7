@@ -301,7 +301,7 @@ def _extendrepo(repo):
 
         @propertycache
         def deadbranches(self):
-            db = hglib.toutf(ui.config('tortoisehg', 'deadbranch', ''))
+            db = hglib.toutf(self.ui.config('tortoisehg', 'deadbranch', ''))
             dblist = [b.strip() for b in db.split(',')]
             return dblist
 
