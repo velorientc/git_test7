@@ -27,7 +27,6 @@ from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt import chunkselect
 from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
 from tortoisehg.hgqt.i18n import _
@@ -504,6 +503,25 @@ class FileData(object):
         self.elabel = u''
         self.readStatus(ctx, ctx2, wfile, status)
 
+    def checkMaxDiff(self, ctx, wfile):
+        p = _('File or diffs not displayed: ')
+        try:
+            fctx = ctx.filectx(wfile)
+            size = fctx.size()
+        except (EnvironmentError, error.LookupError):
+            return False
+        if size > hglib.getmaxdiffsize(ctx._repo.ui):
+            self.error = p + _('File is larger than the specified max size.\n')
+            return None
+        try:
+            data = fctx.data()
+            if '\0' in data:
+                self.error = p + _('File is binary.\n')
+                return None
+        except (EnvironmentError):
+            return None
+        return fctx, data
+
     def isValid(self):
         return self.error is None
 
@@ -566,22 +584,17 @@ class FileData(object):
                 self.error = _('Not an hg subrepo, not previewable')
             return
 
-        if wfile in ctx:
-            warnings = chunkselect.check_max_diff(ctx, wfile)
-            if warnings:
-                self.error = _('File or diffs not displayed: %s') % warnings[1]
+        if status in ('M', 'A'):
+            res = self.checkMaxDiff(ctx, wfile)
+            if res is None:
                 return
-
-            if status != '!':
-                fctx = ctx[wfile]
-                newdata = fctx.data()
-                self.contents = hglib.tounicode(newdata)
-                change = exec_flag_changed(fctx)
-                if change:
-                    lbl = _("exec mode has been <font color='red'>%s</font>")
-                    sef.elabel = lbl % change
-
-        if status in ('R', '!'):
+            fctx, newdata = res
+            self.contents = hglib.tounicode(newdata)
+            change = exec_flag_changed(fctx)
+            if change:
+                lbl = _("exec mode has been <font color='red'>%s</font>")
+                sef.elabel = lbl % change
+        elif status in ('R', '!'):
             newdata = ctx.p1()[wfile].data()
             self.contents = hglib.tounicode(newdata)
             self.flabel += _(' <i>(was deleted)</i>')
