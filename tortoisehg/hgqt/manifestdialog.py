@@ -73,8 +73,6 @@ class ManifestDialog(QMainWindow):
                    self._manifest_widget._splitter.saveState())
 
 class _FileTextView(QsciScintilla):
-    max_file_size = 100000  # TODO: make it configurable
-
     def __init__(self, ui, repo, parent=None):
         super(_FileTextView, self).__init__(parent)
         self._ui = ui
@@ -98,7 +96,7 @@ class _FileTextView(QsciScintilla):
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):
         fc = self._repo.changectx(rev).filectx(path)
-        if fc.size() > self.max_file_size:
+        if fc.size() > self._repo.maxdiff:
             data = _("file too big")
         else:
             # return the whole file
