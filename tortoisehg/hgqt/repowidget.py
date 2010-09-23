@@ -597,7 +597,8 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def emailRevision(self):
-        run.email(self.repo.ui, rev=[str(self.rev)], repo=self.repo)
+        run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
+                  repo=self.repo)
 
     def archiveRevision(self):
         dlg = archive.ArchiveDialog(self.repo.ui, self.repo, self.rev, self)
