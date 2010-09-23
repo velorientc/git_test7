@@ -168,7 +168,7 @@ class ThgRepoWrapper(QObject):
         except EnvironmentError, ValueError:
             pass
 
-_uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible
+_uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible maxdiff
               _exts _thghiddentags displayname shortname'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
@@ -287,6 +287,17 @@ def _extendrepo(repo):
                 return val
             else:
                 return 'Invisible'
+
+        @propertycache
+        def maxdiff(self):
+            maxdiff = self.ui.config('tortoisehg', 'maxdiff')
+            try:
+                maxdiff = int(maxdiff)
+                if maxdiff < 1:
+                    return sys.maxint
+            except (ValueError, TypeError):
+                maxdiff = 1024 # 1MB by default
+            return maxdiff * 1024
 
         @propertycache
         def displayname(self):
