@@ -585,9 +585,9 @@ class FileData(object):
                     commands.log(_ui, srepo, **opts)
                     out.append(hglib.tounicode(_ui.popbuffer()))
                 self.contents = u''.join(out)
-                labeltxt += _(' <i>(is a dirty sub-repository)</i>')
-                labeltxt += u' <a href="subrepo:%s">%s...</a>'
-                self.flabel += labeltxt % (hglib.tounicode(sroot), _('open'))
+                self.flabel += _(' <i>(is a dirty sub-repository)</i>')
+                lbl = u' <a href="subrepo:%s">%s...</a>'
+                self.flabel += lbl % (hglib.tounicode(sroot), _('open'))
             except error.RepoError:
                 self.error = _('Not an hg subrepo, not previewable')
             return
