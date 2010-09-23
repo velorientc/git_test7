@@ -379,8 +379,11 @@ class RepoWidget(QWidget):
         if self.repomodel.graph is None:
             return
         if type(rev) == str: # unapplied patch
-            self.revDetailsWidget.revision_selected(None)
-            self.manifestDemand.forward('setrev', None)
+            # FIXME remove unapplied patch branch when
+            # patches fully handled downstream
+            self.revDetailsWidget.revision_selected(rev)
+            #self.manifestDemand.forward('setrev', rev)
+            # FIXME grep?
         else:
             self.revDetailsWidget.revision_selected(rev)
             self.manifestDemand.forward('setrev', rev)
