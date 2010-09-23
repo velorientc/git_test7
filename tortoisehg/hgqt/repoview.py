@@ -219,15 +219,16 @@ class HgRepoView(QTableView):
         self.updateActions()
 
     def gotoAncestor(self, index):
-       if rev is None or self.current_rev is None:
-           return
-       ctx = self.context(self.current_rev)
-       ctx2 = self.context(rev)
-       if ctx.thgmqunappliedpatch() or ctx2.thgmqunappliedpatch():
-           return
-       ancestor = ctx.ancestor(ctx2)
-       self.showMessage.emit(_("Goto ancestor of %s and %s")%(ctx.rev(), ctx2.rev()))
-       self.goto(ancestor.rev())
+        rev = self.revFromindex(index)
+        if rev is None or self.current_rev is None:
+            return
+        ctx = self.context(self.current_rev)
+        ctx2 = self.context(rev)
+        if ctx.thgmqunappliedpatch() or ctx2.thgmqunappliedpatch():
+            return
+        ancestor = ctx.ancestor(ctx2)
+        self.showMessage.emit(_("Goto ancestor of %s and %s")%(ctx.rev(), ctx2.rev()))
+        self.goto(ancestor.rev())
 
     def updateActions(self):
         if len(self._rev_history) > 0:
