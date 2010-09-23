@@ -174,7 +174,7 @@ class SummaryInfo(object):
                     return hglib.age(date)
                 return None
             elif item == 'rawbranch':
-                return ctx.branch()
+                return ctx.branch() or None
             elif item == 'branch':
                 value = self.get_data('rawbranch', *args)
                 if value:
