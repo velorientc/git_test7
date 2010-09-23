@@ -184,8 +184,7 @@ class SummaryInfo(object):
                     repo = ctx._repo
                     if ctx.node() not in repo.branchtags().values():
                         return None
-                    dblist = hglib.getdeadbranch(repo.ui)
-                    if value in dblist:
+                    if value in repo.deadbranches:
                         return None
                     return value
                 return None
