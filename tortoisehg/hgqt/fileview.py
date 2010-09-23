@@ -592,6 +592,26 @@ class FileData(object):
                 self.error = _('Not an hg subrepo, not previewable')
             return
 
+        # TODO: elif check if a subdirectory (for manifest tool)
+
+        if status in ('R', '!'):
+            newdata = ctx.p1()[wfile].data()
+            self.contents = hglib.tounicode(newdata)
+            self.flabel += _(' <i>(was deleted)</i>')
+            return
+
+        if status in ('I', '?'):
+            try:
+                data = open(repo.wjoin(wfile), 'r').read()
+                if '\0' in data:
+                    self.error = 'binary file'
+                else:
+                    self.contents = hglib.tounicode(data)
+                    self.flabel += _(' <i>(is unversioned)</i>')
+            except EnvironmentError, e:
+                self.error = hglib.tounicode(str(e))
+            return
+
         if status in ('M', 'A'):
             res = self.checkMaxDiff(ctx, wfile)
             if res is None:
@@ -607,24 +627,6 @@ class FileData(object):
             if change:
                 lbl = _("exec mode has been <font color='red'>%s</font>")
                 sef.elabel = lbl % change
-        elif status in ('R', '!'):
-            newdata = ctx.p1()[wfile].data()
-            self.contents = hglib.tounicode(newdata)
-            self.flabel += _(' <i>(was deleted)</i>')
-            return
-        elif status in ('I', '?'):
-            try:
-                data = open(repo.wjoin(wfile), 'r').read()
-                if '\0' in data:
-                    self.error = 'binary file'
-                else:
-                    self.contents = hglib.tounicode(data)
-                    self.flabel += _(' <i>(is unversioned)</i>')
-            except EnvironmentError, e:
-                self.error = hglib.tounicode(str(e))
-            return
-
-        # TODO: elif check if a subdirectory (for manifest tool)
 
         if status == 'A':
             renamed = fctx.renamed()
@@ -651,5 +653,3 @@ class FileData(object):
             data.extend(chunk.splitlines())
         data = [hglib.tounicode(l) for l in data]
         self.diff = u'\n'.join(data[2:])
-        return
-
