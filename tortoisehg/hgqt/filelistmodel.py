@@ -17,8 +17,8 @@
 import re
 
 from tortoisehg.util import hglib
-from tortoisehg.util.util import isbfile
 
+from tortoisehg.hgqt.fileview import isbfile
 from tortoisehg.hgqt.graph import ismerge
 from tortoisehg.hgqt.qtlib import geticon
 

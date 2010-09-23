@@ -8,27 +8,9 @@
 """
 Several helper functions
 """
-import os
 import string
 
 from tortoisehg.util import hglib
-
-def exec_flag_changed(filectx):
-    """
-    Return 'set' or 'unset' on change, or '' if unchanged
-    """
-    for pfctx in filectx.parents():
-        if 'x' in filectx.flags() and 'x' not in pfctx.flags():
-            return "set"
-        if 'x' not in filectx.flags() and 'x' in pfctx.flags():
-            return "unset"
-    return ""
-
-def isbfile(filename):
-    return filename and filename.startswith('.hgbfiles' + os.sep)
-
-def bfilepath(filename):
-    return filename and filename.replace('.hgbfiles' + os.sep, '')
 
 class Curry(object):
     """Curryfication de fonction (http://fr.wikipedia.org/wiki/Curryfication)"""

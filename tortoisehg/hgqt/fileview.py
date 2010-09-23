@@ -17,6 +17,7 @@
 Qt4 high level widgets for hg repo changelogs and filelogs
 """
 
+import os
 import difflib
 
 from mercurial import hg, error, match, patch, subrepo, commands
@@ -27,13 +28,18 @@ from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
 from tortoisehg.util import hglib
-from tortoisehg.util.util import exec_flag_changed, isbfile, bfilepath
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.lexers import get_lexer, get_diff_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList
 
 qsci = Qsci.QsciScintilla
+
+def isbfile(filename):
+    return filename and filename.startswith('.hgbfiles' + os.sep)
+
+def bfilepath(filename):
+    return filename and filename.replace('.hgbfiles' + os.sep, '')
 
 class Annotator(qsci):
     # we use a QScintilla for the annotater cause it makes
@@ -590,7 +596,12 @@ class FileData(object):
                 return
             fctx, newdata = res
             self.contents = hglib.tounicode(newdata)
-            change = exec_flag_changed(fctx)
+            change = None
+            for pfctx in fctx.parents():
+                if 'x' in fctx.flags() and 'x' not in pfctx.flags():
+                    change = 'set'
+                elif 'x' not in fctx.flags() and 'x' in pfctx.flags():
+                    change = 'unset'
             if change:
                 lbl = _("exec mode has been <font color='red'>%s</font>")
                 sef.elabel = lbl % change

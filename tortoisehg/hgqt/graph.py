@@ -26,7 +26,6 @@ import itertools
 
 from mercurial import util, error
 
-from tortoisehg.util.util import isbfile
 from tortoisehg.util.hglib import tounicode
 
 def getparents(ctx, branch):
