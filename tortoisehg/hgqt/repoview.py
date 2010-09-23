@@ -109,9 +109,7 @@ class HgRepoView(QTableView):
         tb.gotoSignal.connect(self.goto)
 
     def contextMenuEvent(self, event):
-        selmodel = self.selectionModel()
-        sels = [self.revFromindex(i) for i in selmodel.selectedRows()]
-        self.menuRequested.emit(event.globalPos(), sels)
+        self.menuRequested.emit(event.globalPos(), self.selectedRevisions())
 
     def init_variables(self):
         # member variables
@@ -217,6 +215,11 @@ class HgRepoView(QTableView):
 
         self.revisionSelected.emit(rev)
         self.updateActions()
+
+    def selectedRevisions(self):
+        """Return the list of selected revisions"""
+        selmodel = self.selectionModel()
+        return [self.revFromindex(i) for i in selmodel.selectedRows()]
 
     def gotoAncestor(self, index):
         rev = self.revFromindex(index)
