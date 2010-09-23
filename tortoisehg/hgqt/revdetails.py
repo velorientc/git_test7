@@ -291,7 +291,7 @@ class RevDetailsWidget(QWidget):
     def revision_selected(self, rev):
         # TODO: handle rev == patch name
         self._last_rev = rev
-        ctx = self.repo[rev]
+        ctx = self.repo.changectx(rev)
         if len(self.filelistmodel):
             self.filelist.selectRow(0)
         self.fileview.setContext(ctx)
