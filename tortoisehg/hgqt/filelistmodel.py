@@ -74,11 +74,6 @@ class HgFileListModel(QAbstractTableModel):
     def fileflag(self, fn):
         return self._filesdict[fn]['flag']
 
-    def fileparentctx(self, fn, ctx=None):
-        if ctx is None:
-            return self._filesdict[fn]['parent']
-        return ctx.parents()[0]
-
     def fileFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self.current_ctx:
             return None
@@ -108,17 +103,17 @@ class HgFileListModel(QAbstractTableModel):
             return True
         return filename in ctxfiles #self.current_ctx.files()
 
-    def _buildDesc(self, whichparent, fromside):
+    def _buildDesc(self, fromside):
         _files = []
         ctx = self.current_ctx
         ctxfiles = ctx.files()
+        whichparent = {'left': 0, 'right': 1}[fromside]
         changes = ctx.changesToParent(whichparent)
         modified, added, removed = changes
         for lst, flag in ((added, '+'), (modified, '='), (removed, '-')):
             for f in [x for x in lst if self._filterFile(x, ctxfiles)]:
-                # FIXME which of the attributes here are used again?
                 _files.append({'path': f, 'flag': flag, 'desc': f,
-                               'parent': whichparent, 'fromside': fromside,
+                               'fromside': fromside,
                                'infiles': f in ctxfiles})
                 # renamed/copied files are handled by background
                 # filling process since it can be a bit long
@@ -133,10 +128,10 @@ class HgFileListModel(QAbstractTableModel):
     def loadFiles(self):
         self._files = []
         self._datacache = {}
-        self._files = self._buildDesc(0, 'left')
+        self._files = self._buildDesc('left')
         if ismerge(self.current_ctx):
             _paths = [x['path'] for x in self._files]
-            _files = self._buildDesc(1, 'right')
+            _files = self._buildDesc('right')
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
 
