@@ -302,6 +302,13 @@ class _LogWidgetForConsole(LogWidget):
             return
         super(_LogWidgetForConsole, self).keyPressEvent(event)
 
+    def setPrompt(self, text):
+        if text == self._prompt:
+            return
+        self.clearPrompt()
+        self._prompt = text
+        self.openPrompt()
+
     @pyqtSlot()
     def openPrompt(self):
         """Show prompt line and enable user input"""
@@ -386,7 +393,7 @@ class ConsoleWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
         self._initcmdcore()
-        self._repo = None
+        self.setRepository(None)
         self.openPrompt()
 
     def _initlogwidget(self):
@@ -417,6 +424,7 @@ class ConsoleWidget(QWidget):
     def setRepository(self, repo):
         """Change the current working repository"""
         self._repo = repo
+        self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
 
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
