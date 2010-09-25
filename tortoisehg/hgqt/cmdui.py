@@ -373,6 +373,8 @@ class _ConsoleCmdTable(dict):
 
 class ConsoleWidget(QWidget):
     """Console to run hg/thg command and show output"""
+    closeRequested = pyqtSignal()
+
     _cmdtable = _ConsoleCmdTable()
 
     # TODO: support arbitrary shell commands
@@ -444,6 +446,12 @@ class ConsoleWidget(QWidget):
     def _cmd_clear(self, args):
         self.clear()
         self.openPrompt()
+
+    @_cmdtable
+    def _cmd_exit(self, args):
+        self.clear()
+        self.openPrompt()
+        self.closeRequested.emit()
 
 
 class Widget(QWidget):

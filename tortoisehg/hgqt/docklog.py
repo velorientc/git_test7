@@ -31,6 +31,7 @@ class LogDockWidget(QDockWidget):
         #self.setWindowFlags(Qt.Drawer)
 
         self.logte = cmdui.ConsoleWidget()
+        self.logte.closeRequested.connect(self.close)
         self.setWidget(self.logte)
 
     @pyqtSlot()
