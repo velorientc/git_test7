@@ -112,6 +112,19 @@ def geteffect(labels):
 def applyeffects(chars, effects):
     return '<span style="white-space: pre;%s">%s</span>' % (effects, chars)
 
+def getbgcoloreffect(labels):
+    """Map labels like "log.date" to background color if available
+
+    Returns QColor object. You may need to check validity by isValid().
+    """
+    for l in str(labels).split():
+        if not l:
+            continue
+        for e in _styles.get(l, '').split():
+            if e.endswith('_background'):
+                return QColor(e[:-11])
+    return QColor()
+
 NAME_MAP = {
     'fg': 'color', 'bg': 'background-color', 'family': 'font-family',
     'size': 'font-size', 'weight': 'font-weight', 'space': 'white-space',
