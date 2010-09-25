@@ -514,6 +514,7 @@ class Workbench(QMainWindow):
         if w:
             w.switchedTo()
             self.updateTaskViewMenu()
+        self.log.setRepository(w and w.repo or None)
 
     def addRepoTab(self, repo):
         '''opens the given repo in a new tab'''

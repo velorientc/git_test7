@@ -42,6 +42,10 @@ class LogDockWidget(QDockWidget):
     def output(self, msg, label):
         self.logte.appendLog(msg, label)
 
+    @pyqtSlot(object)
+    def setRepository(self, repo):
+        self.logte.setRepository(repo)
+
     def showEvent(self, event):
         self.visibilityChanged.emit(True)
 

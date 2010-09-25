@@ -379,7 +379,6 @@ class ConsoleWidget(QWidget):
 
     # TODO: support arbitrary shell commands
     # TODO: command history and completion
-    # TODO: sync with repo widget ?
 
     def __init__(self, parent=None):
         super(ConsoleWidget, self).__init__(parent)
@@ -387,6 +386,7 @@ class ConsoleWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
         self._initcmdcore()
+        self._repo = None
         self.openPrompt()
 
     def _initlogwidget(self):
@@ -413,6 +413,11 @@ class ConsoleWidget(QWidget):
         finally:
             self.openPrompt()
 
+    @pyqtSlot(object)
+    def setRepository(self, repo):
+        """Change the current working repository"""
+        self._repo = repo
+
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
         args = re.split(r'\s+', hglib.fromunicode(cmdline).strip())
@@ -430,6 +435,8 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_hg(self, args):
+        if self._repo:
+            args = ['-R', self._repo.root] + args
         self._cmdcore.run(args)
 
     @_cmdtable
@@ -437,6 +444,8 @@ class ConsoleWidget(QWidget):
         from tortoisehg.hgqt import run
         self.closePrompt()
         try:
+            if self._repo:
+                args = ['-R', self._repo.root] + args
             # TODO: show errors
             run.dispatch(args)
         finally:
