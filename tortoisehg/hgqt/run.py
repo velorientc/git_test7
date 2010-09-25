@@ -428,7 +428,7 @@ class _QtRunner(object):
             return
 
         self._dialogs.append(dlg)  # avoid garbage collection
-        if hasattr(dlg, 'finished'):
+        if hasattr(dlg, 'finished') and hasattr(dlg.finished, 'connect'):
             dlg.finished.connect(dlg.deleteLater)
         # NOTE: Somehow `destroyed` signal doesn't emit the original obj.
         # So we cannot write `dlg.destroyed.connect(self._forgetdialog)`.
