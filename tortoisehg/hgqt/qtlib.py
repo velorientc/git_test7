@@ -50,8 +50,8 @@ _thgstyles = {
    'log.modified': 'black #ffddaa_background',
    'log.added': 'black #aaffaa_background',
    'log.removed': 'black #ffcccc_background',
-   'ui.error': 'red bold',
-   'control': 'black bold',
+   'ui.error': 'red bold #ffcccc_background',
+   'control': 'black bold #dddddd_background',
 }
 
 thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
