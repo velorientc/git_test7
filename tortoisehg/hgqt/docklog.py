@@ -11,7 +11,7 @@ import time
 from mercurial import ui
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thread
+from tortoisehg.hgqt import qtlib, thread, cmdui
 from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
@@ -30,17 +30,8 @@ class LogDockWidget(QDockWidget):
         # Not enabled until we have a way to make it configurable
         #self.setWindowFlags(Qt.Drawer)
 
-        mainframe = QFrame()
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(0, 0, 0, 0)
-        mainframe.setLayout(vbox)
-        self.setWidget(mainframe)
-
-        self.logte = QPlainTextEdit()
-        self.logte.setReadOnly(True)
-        self.logte.setMaximumBlockCount(1024)
-        self.logte.setWordWrapMode(QTextOption.NoWrap)
-        vbox.addWidget(self.logte, 1)
+        self.logte = cmdui.LogWidget()
+        self.setWidget(self.logte)
 
     @pyqtSlot()
     def clear(self):
@@ -48,14 +39,7 @@ class LogDockWidget(QDockWidget):
 
     @pyqtSlot(QString, QString)
     def output(self, msg, label):
-        msg = Qt.escape(msg)
-        style = qtlib.geteffect(label)
-        msg = msg.replace('\n', '<br/>')
-        cursor = self.logte.textCursor()
-        cursor.movePosition(QTextCursor.End)
-        cursor.insertHtml('<font style="%s">%s</font>' % (style, msg))
-        max = self.logte.verticalScrollBar().maximum()
-        self.logte.verticalScrollBar().setSliderPosition(max)
+        self.logte.appendLog(msg, label)
 
     def showEvent(self, event):
         self.visibilityChanged.emit(True)

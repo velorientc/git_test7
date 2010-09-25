@@ -7,6 +7,7 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.Qsci import QsciScintilla
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, localgettext
@@ -143,10 +144,7 @@ class Core(QObject):
         self.internallog = useInternal
         self.parent = parent
         if useInternal:
-            self.output_text = QPlainTextEdit()
-            self.output_text.setReadOnly(True)
-            self.output_text.setMaximumBlockCount(1024)
-            self.output_text.setWordWrapMode(QTextOption.NoWrap)
+            self.output_text = LogWidget()
 
     ### Public Methods ###
 
@@ -193,7 +191,7 @@ class Core(QObject):
         self.thread.progressReceived.connect(self.progress)
 
         if self.internallog:
-            self.thread.outputReceived.connect(self.output_received)
+            self.thread.outputReceived.connect(self.output_text.appendLog)
         if self.stbar:
             self.thread.progressReceived.connect(self.stbar.progress)
 
@@ -240,16 +238,49 @@ class Core(QObject):
 
         self.commandCanceling.emit()
 
-    @pyqtSlot(QString, QString)
-    def output_received(self, msg, label):
-        msg = Qt.escape(msg)
-        style = qtlib.geteffect(label)
-        msg = msg.replace('\n', '<br />')
-        cursor = self.output_text.textCursor()
-        cursor.movePosition(QTextCursor.End)
-        cursor.insertHtml('<font style="%s">%s</font>' % (style, msg))
-        max = self.output_text.verticalScrollBar().maximum()
-        self.output_text.verticalScrollBar().setSliderPosition(max)
+
+class LogWidget(QsciScintilla):
+    """Output log viewer"""
+    def __init__(self, parent=None):
+        super(LogWidget, self).__init__(parent)
+        self.setReadOnly(True)
+        self.setUtf8(True)
+        self.setMarginWidth(1, 0)
+        self._initfont()
+        self._initmarkers()
+
+    def _initfont(self):
+        from mercurial import ui  # XXX workaround to pass fake ui obj
+        tf = qtlib.getfont(ui.ui(), 'fontlog')
+        tf.changed.connect(lambda f: self.setFont(f))
+        self.setFont(tf.font())
+
+    def _initmarkers(self):
+        self._markers = {}
+        for l in ('ui.error', 'control'):
+            self._markers[l] = m = self.markerDefine(QsciScintilla.Background)
+            c = QColor(qtlib.getbgcoloreffect(l))
+            if c.isValid():
+                self.setMarkerBackgroundColor(c, m)
+            # NOTE: self.setMarkerForegroundColor() doesn't take effect,
+            # because it's a *Background* marker.
+
+    @pyqtSlot(unicode, str)
+    def appendLog(self, msg, label):
+        """Append log text to the last line; scrolls down to there"""
+        self.append(msg)
+        self._setmarker(xrange(self.lines() - unicode(msg).count('\n') - 1,
+                               self.lines() - 1), label)
+        self.setCursorPosition(self.lines() - 1, 0)
+
+    def _setmarker(self, lines, label):
+        for m in self._markersforlabel(label):
+            for i in lines:
+                self.markerAdd(i, m)
+
+    def _markersforlabel(self, label):
+        return iter(self._markers[l] for l in str(label).split()
+                    if l in self._markers)
 
 
 class Widget(QWidget):
