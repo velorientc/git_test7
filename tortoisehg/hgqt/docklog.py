@@ -5,14 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import os
-import time
-
-from mercurial import ui
-
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thread, cmdui
-from tortoisehg.util import hglib
+from tortoisehg.hgqt import cmdui
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
