@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import re
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
@@ -281,6 +283,167 @@ class LogWidget(QsciScintilla):
     def _markersforlabel(self, label):
         return iter(self._markers[l] for l in str(label).split()
                     if l in self._markers)
+
+class _LogWidgetForConsole(LogWidget):
+    """Wrapped LogWidget for ConsoleWidget"""
+    returnPressed = pyqtSignal(unicode)
+
+    _prompt = '% '
+
+    def __init__(self, parent=None):
+        super(_LogWidgetForConsole, self).__init__(parent)
+        self._prompt_marker = self.markerDefine(QsciScintilla.Background)
+        self.setMarkerBackgroundColor(QColor('#e8f3fe'), self._prompt_marker)
+        self.cursorPositionChanged.connect(self._updatePrompt)
+
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            self.returnPressed.emit(self.commandText())
+            return
+        super(_LogWidgetForConsole, self).keyPressEvent(event)
+
+    @pyqtSlot()
+    def openPrompt(self):
+        """Show prompt line and enable user input"""
+        self.closePrompt()
+        self.markerAdd(self.lines() - 1, self._prompt_marker)
+        self.append(self._prompt)
+        self.setCursorPosition(self.lines() - 1, len(self._prompt))
+        self.setReadOnly(False)
+
+    @pyqtSlot()
+    def closePrompt(self):
+        """Disable user input"""
+        self.markerDelete(self.lines() - 1)
+        self._newline()
+        self.setCursorPosition(self.lines() - 1, 0)
+        self.setReadOnly(True)
+
+    @pyqtSlot()
+    def clearPrompt(self):
+        """Clear prompt line"""
+        line = self.lines() - 1
+        if not (self.markersAtLine(line) & (1 << self._prompt_marker)):
+            return
+        self.markerDelete(line)
+        self.setSelection(line, 0, line, self.lineLength(line))
+        self.removeSelectedText()
+
+    @pyqtSlot(int, int)
+    def _updatePrompt(self, line, pos):
+        """Update availability of user input"""
+        if self.markersAtLine(line) & (1 << self._prompt_marker):
+            self.setReadOnly(False)
+            self._ensurePrompt(line)
+        else:
+            self.setReadOnly(True)
+
+    def _ensurePrompt(self, line):
+        """Insert prompt string if not available"""
+        s = unicode(self.text(line))
+        if s.startswith(self._prompt):
+            return
+        for i, c in enumerate(self._prompt):
+            if s[i:i + 1] != c:
+                self.insertAt(self._prompt[i:], line, i)
+                break
+        self.setCursorPosition(line, self.lineLength(line))
+
+    def commandText(self):
+        """Return the current command text"""
+        l = self.lines() - 1
+        if self.markersAtLine(l) & (1 << self._prompt_marker):
+            return self.text(l)[len(self._prompt):]
+        else:
+            return ''
+
+    def _newline(self):
+        if self.lineLength(self.lines() - 1) > 0:
+            self.append('\n')
+
+class _ConsoleCmdTable(dict):
+    """Command table for ConsoleWidget"""
+    _cmdfuncprefix = '_cmd_'
+
+    def __call__(self, func):
+        if not func.__name__.startswith(self._cmdfuncprefix):
+            raise ValueError('bad command function name %s' % func.__name__)
+        self[func.__name__[len(self._cmdfuncprefix):]] = func
+        return func
+
+class ConsoleWidget(QWidget):
+    """Console to run hg/thg command and show output"""
+    _cmdtable = _ConsoleCmdTable()
+
+    # TODO: support arbitrary shell commands
+    # TODO: command history and completion
+    # TODO: sync with repo widget ?
+
+    def __init__(self, parent=None):
+        super(ConsoleWidget, self).__init__(parent)
+        self.setLayout(QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self._initlogwidget()
+        self._initcmdcore()
+        self.openPrompt()
+
+    def _initlogwidget(self):
+        self._logwidget = _LogWidgetForConsole(self)
+        self._logwidget.returnPressed.connect(self._runcommand)
+        self.layout().addWidget(self._logwidget)
+
+        # compatibility methods with LogWidget
+        for name in ('openPrompt', 'closePrompt', 'clear'):
+            setattr(self, name, getattr(self._logwidget, name))
+
+    def _initcmdcore(self):
+        self._cmdcore = Core(useInternal=False, parent=self)
+        self._cmdcore.output.connect(self._logwidget.appendLog)
+        self._cmdcore.commandStarted.connect(self.closePrompt)
+        self._cmdcore.commandFinished.connect(self.openPrompt)
+
+    @pyqtSlot(unicode, str)
+    def appendLog(self, msg, label):
+        """Append log text from another cmdui"""
+        self._logwidget.clearPrompt()
+        try:
+            self._logwidget.appendLog(msg, label)
+        finally:
+            self.openPrompt()
+
+    @pyqtSlot(unicode)
+    def _runcommand(self, cmdline):
+        args = re.split(r'\s+', hglib.fromunicode(cmdline).strip())
+        if args == ['']:
+            self.openPrompt()
+            return
+        cmd = args.pop(0)
+        try:
+            self._cmdtable[cmd](self, args)
+        except KeyError:
+            self.closePrompt()
+            self._logwidget.appendLog(_('command not found: %s\n')
+                                      % hglib.tounicode(cmd), 'ui.error')
+            self.openPrompt()
+
+    @_cmdtable
+    def _cmd_hg(self, args):
+        self._cmdcore.run(args)
+
+    @_cmdtable
+    def _cmd_thg(self, args):
+        from tortoisehg.hgqt import run
+        self.closePrompt()
+        try:
+            # TODO: show errors
+            run.dispatch(args)
+        finally:
+            self.openPrompt()
+
+    @_cmdtable
+    def _cmd_clear(self, args):
+        self.clear()
+        self.openPrompt()
 
 
 class Widget(QWidget):

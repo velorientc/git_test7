@@ -30,7 +30,7 @@ class LogDockWidget(QDockWidget):
         # Not enabled until we have a way to make it configurable
         #self.setWindowFlags(Qt.Drawer)
 
-        self.logte = cmdui.LogWidget()
+        self.logte = cmdui.ConsoleWidget()
         self.setWidget(self.logte)
 
     @pyqtSlot()
