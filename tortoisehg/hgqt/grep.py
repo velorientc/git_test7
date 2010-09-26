@@ -233,7 +233,6 @@ class SearchWidget(QWidget):
             self.showMessage.emit(_('%d matches found') % count)
             for col in xrange(COL_TEXT):
                 self.tv.resizeColumnToContents(col)
-            self.tv.sortByColumn(COL_REVISION)
             self.tv.setSortingEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
