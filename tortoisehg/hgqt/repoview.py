@@ -29,7 +29,7 @@ class GotoQuickBar(QuickBar):
     gotoSignal = pyqtSignal(unicode)
 
     def __init__(self, parent):
-        QuickBar.__init__(self, "Goto", "Ctrl+G", "Goto", parent)
+        QuickBar.__init__(self, "Goto", "Ctrl+Shift+G", "Goto", parent)
 
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
