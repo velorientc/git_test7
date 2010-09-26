@@ -57,6 +57,20 @@ class AnnotateView(QsciScintilla):
         self.thread = None
         self.wrap = False
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            if self.thread and self.thread.isRunning():
+                self.thread.terminate()
+                self.finished()
+                return
+        if event.matches(QKeySequence.FindNext):
+            self.nextMatch()
+            return
+        if event.matches(QKeySequence.FindPrevious):
+            self.prevMatch()
+            return
+        return super(AnnotateView, self).keyPressEvent(event)
+
     def mouseMoveEvent(self, event):
         line = self.lineAt(event.pos())
         if line < 0:
@@ -132,44 +146,6 @@ class AnnotateView(QsciScintilla):
                 add(name, func)
         menu.exec_(point)
 
-    @pyqtSlot()
-    def _updatemargin(self):
-        self.setMarginWidth(1, 'M' * (len(str(self.lines()))))
-        self.setMarginWidth(2, 'M' * 4) # XXX
-
-    def setLineBackground(self, line, color):
-        # TODO: assign markers from the latest
-        if color not in self._revmarkers and len(self._revmarkers) < 32:
-            m = len(self._revmarkers)
-            self.markerDefine(QsciScintilla.Background, m)
-            self.setMarkerBackgroundColor(QColor(color), m)
-            self._revmarkers[color] = m
-        if color in self._revmarkers:
-            self.markerAdd(line, self._revmarkers[color])
-
-    def setContent(self, text, revs, summaries, links):
-        self.setText(text)
-        self._revs = list(revs)
-        self._revmarkers.clear()
-        self._summaries = summaries.copy()
-        self._links = list(links)
-
-        for i, e in enumerate(self._revs):
-            self.setMarginText(i, str(e), self._margin_style)
-
-    @util.propertycache
-    def _margin_style(self):
-        """Style for margin area"""
-        s = QsciStyle()
-        s.setPaper(QApplication.palette().color(QPalette.Window))
-
-        # Workaround to set style of the current sci widget.
-        # QsciStyle sends style data only to the first sci widget.
-        # See qscintilla2/Qt4/qscistyle.cpp
-        self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
-                           s.style(), s.paper())
-        return s
-
     def annotateFileAtRev(self, repo, ctx, wfile, line=None):
         if self.thread is not None:
             return
@@ -200,20 +176,6 @@ class AnnotateView(QsciScintilla):
             self.fillModel(self.thread.data)
         self.thread = None
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            if self.thread and self.thread.isRunning():
-                self.thread.terminate()
-                self.finished()
-                return
-        if event.matches(QKeySequence.FindNext):
-            self.nextMatch()
-            return
-        if event.matches(QKeySequence.FindPrevious):
-            self.prevMatch()
-            return
-        return super(AnnotateView, self).keyPressEvent(event)
-
     def fillModel(self, data):
         revs, lines, lpos, sels, links = [], [], [], [], []
         sums = {}
@@ -235,6 +197,44 @@ class AnnotateView(QsciScintilla):
             ctx = self.repo[rev]
             rgb = self.cm.get_color(ctx, self.curdate)
             self.setLineBackground(i, rgb)
+
+    def setContent(self, text, revs, summaries, links):
+        self.setText(text)
+        self._revs = list(revs)
+        self._revmarkers.clear()
+        self._summaries = summaries.copy()
+        self._links = list(links)
+
+        for i, e in enumerate(self._revs):
+            self.setMarginText(i, str(e), self._margin_style)
+
+    def setLineBackground(self, line, color):
+        # TODO: assign markers from the latest
+        if color not in self._revmarkers and len(self._revmarkers) < 32:
+            m = len(self._revmarkers)
+            self.markerDefine(QsciScintilla.Background, m)
+            self.setMarkerBackgroundColor(QColor(color), m)
+            self._revmarkers[color] = m
+        if color in self._revmarkers:
+            self.markerAdd(line, self._revmarkers[color])
+
+    @util.propertycache
+    def _margin_style(self):
+        """Style for margin area"""
+        s = QsciStyle()
+        s.setPaper(QApplication.palette().color(QPalette.Window))
+
+        # Workaround to set style of the current sci widget.
+        # QsciStyle sends style data only to the first sci widget.
+        # See qscintilla2/Qt4/qscistyle.cpp
+        self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
+                           s.style(), s.paper())
+        return s
+
+    @pyqtSlot()
+    def _updatemargin(self):
+        self.setMarginWidth(1, 'M' * (len(str(self.lines()))))
+        self.setMarginWidth(2, 'M' * 4) # XXX
 
     def nextMatch(self):
         self.findNext()
