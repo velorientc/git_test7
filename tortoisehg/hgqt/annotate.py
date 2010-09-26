@@ -50,7 +50,7 @@ class AnnotateView(QsciScintilla):
         self.customContextMenuRequested.connect(self.menuRequest)
         self._revs = []  # by line
         self._links = []  # by line
-        self._revmarkers = {}  # by color
+        self._revmarkers = {}  # by rev
         self._summaries = {}  # by rev
         self._lastrev = None
 
@@ -196,26 +196,32 @@ class AnnotateView(QsciScintilla):
         self._links = links
 
         self._updaterevmargin()
-
-        for i, rev in enumerate(revs):
-            ctx = self.repo[rev]
-            rgb = self.cm.get_color(ctx, self.curdate)
-            self.setLineBackground(i, rgb)
+        self._updatemarkers()
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
         for i, e in enumerate(self._revs):
             self.setMarginText(i, str(e), self._margin_style)
 
-    def setLineBackground(self, line, color):
-        # TODO: assign markers from the latest
-        if color not in self._revmarkers and len(self._revmarkers) < 32:
-            m = len(self._revmarkers)
-            self.markerDefine(QsciScintilla.Background, m)
-            self.setMarkerBackgroundColor(QColor(color), m)
-            self._revmarkers[color] = m
-        if color in self._revmarkers:
-            self.markerAdd(line, self._revmarkers[color])
+    def _updatemarkers(self):
+        """Update markers which colorizes each line"""
+        self._redefinemarkers()
+        for i, rev in enumerate(self._revs):
+            m = self._revmarkers.get(rev)
+            if m is not None:
+                self.markerAdd(i, m)
+
+    def _redefinemarkers(self):
+        """Redefine line markers according to the current revs"""
+        self._revmarkers.clear()
+        # assign from the latest rev for maximum discrimination
+        for i, rev in enumerate(reversed(sorted(set(self._revs)))):
+            if i >= 32:
+                return  # no marker left
+            color = self.cm.get_color(self.repo[rev], self.curdate)
+            self.markerDefine(QsciScintilla.Background, i)
+            self.setMarkerBackgroundColor(QColor(color), i)
+            self._revmarkers[rev] = i
 
     @util.propertycache
     def _margin_style(self):
