@@ -121,6 +121,7 @@ class SearchWidget(QWidget):
             le.setText(upats[0])
         if len(upats) > 1:
             incle.setText(','.join(upats[1:]))
+        chk.setChecked(opts.get('ignorecase'))
 
         if parent:
             self.closeonesc = False
