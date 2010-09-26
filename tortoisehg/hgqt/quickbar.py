@@ -87,8 +87,7 @@ class FindQuickBar(QuickBar):
     cancel = pyqtSignal()
 
     def __init__(self, parent):
-        QuickBar.__init__(self, "Find", "/", "Find", parent)
-        self.addShortcut('open', 'Ctrl+F')
+        QuickBar.__init__(self, "Find", QKeySequence.Find, "Find", parent)
         self.currenttext = ''
         
     def createActions(self, openkey, desc):
