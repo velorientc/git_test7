@@ -105,19 +105,21 @@ class HgRepoListModel(QAbstractTableModel):
         self._user_colors = {}
         self._branch_colors = {}
 
-        self._columnmap = {'ID':       lambda ctx, gnode: ctx.rev() is not None and str(ctx.rev()) or "",
-                           'Node':     lambda ctx, gnode: str(ctx),
-                           'Graph':    lambda ctx, gnode: "",
-                           'Log':      self.getlog,
-                           'Author':   self.getauthor,
-                           'Tags':     self.gettags,
-                           'Branch':   lambda ctx, gnode: ctx.branch(),
-                           'Filename': lambda ctx, gnode: gnode.extra[0],
-                           'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
-                           'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
-                           'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
-                           'Changes':  self.getchanges,
-                           }
+        self._columnmap = {
+            'ID':       lambda ctx, gnode: ctx.rev() is not None and \
+                                           str(ctx.rev()) or "",
+            'Node':     lambda ctx, gnode: str(ctx),
+            'Graph':    lambda ctx, gnode: "",
+            'Log':      self.getlog,
+            'Author':   self.getauthor,
+            'Tags':     self.gettags,
+            'Branch':   lambda ctx, gnode: ctx.branch(),
+            'Filename': lambda ctx, gnode: gnode.extra[0],
+            'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
+            'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
+            'UTCTime':  lambda ctx, gnode: hglib.utctime(ctx.date()),
+            'Changes':  self.getchanges,
+        }
 
 
     def setBranch(self, branch='', allparents=True):
