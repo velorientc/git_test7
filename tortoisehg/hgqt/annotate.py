@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error, commands, cmdutil, util
 
-from tortoisehg.hgqt import visdiff, qtlib, wctxactions, thgrepo
+from tortoisehg.hgqt import visdiff, qtlib, wctxactions, thgrepo, lexers
 from tortoisehg.util import paths, hglib, colormap
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.grep import SearchWidget
@@ -20,7 +20,6 @@ from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciStyle
 
 # Technical Debt
-#  Syntax Highlighting?
 #  Pass search parameters to grep
 #  forward/backward history buttons
 #  menu options for viewing appropriate changesets
@@ -45,6 +44,7 @@ class AnnotateView(QsciScintilla):
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
         self.setMouseTracking(True)
+        self.setFont(qtlib.getfont(ui.ui(), 'fontlog').font())
         self.linesChanged.connect(self._updatemargin)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
@@ -164,6 +164,7 @@ class AnnotateView(QsciScintilla):
         self.repo = repo
         self.resumeline = line
         self.annfile = wfile
+        self._updatelexer(fctx)
         self.loadBegin.emit()
         self.thread = AnnotateThread(fctx)
         self.thread.done.connect(self.finished)
@@ -197,6 +198,13 @@ class AnnotateView(QsciScintilla):
 
         self._updaterevmargin()
         self._updatemarkers()
+
+    def _updatelexer(self, fctx):
+        """Update the lexer according to the given file"""
+        lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()),
+                               ui=self.repo.ui)
+        if lex:
+            self.setLexer(lex)
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
