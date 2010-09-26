@@ -58,6 +58,7 @@ class Workbench(QMainWindow):
 
         self.log = LogDockWidget(self)
         self.log.setObjectName('Log')
+        self.log.progressReceived.connect(self.statusbar.progress)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log)
 
         rr.openRepoSignal.connect(self.openRepo)

@@ -27,6 +27,8 @@ class LogDockWidget(QDockWidget):
         self.logte = cmdui.ConsoleWidget()
         self.logte.closeRequested.connect(self.close)
         self.setWidget(self.logte)
+        for name in ('setRepository', 'progressReceived'):
+            setattr(self, name, getattr(self.logte, name))
 
     @pyqtSlot()
     def clear(self):
@@ -35,10 +37,6 @@ class LogDockWidget(QDockWidget):
     @pyqtSlot(QString, QString)
     def output(self, msg, label):
         self.logte.appendLog(msg, label)
-
-    @pyqtSlot(object)
-    def setRepository(self, repo):
-        self.logte.setRepository(repo)
 
     def showEvent(self, event):
         self.visibilityChanged.emit(True)

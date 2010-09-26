@@ -384,6 +384,13 @@ class ConsoleWidget(QWidget):
     """Console to run hg/thg command and show output"""
     closeRequested = pyqtSignal()
 
+    progressReceived = pyqtSignal(unicode, object, unicode, unicode,
+                                  object, unicode)
+    """Emitted when progress received
+
+    Args: topic, pos, item, unit, total, reporoot
+    """
+
     _cmdtable = _ConsoleCmdTable()
 
     # TODO: support arbitrary shell commands
@@ -412,6 +419,7 @@ class ConsoleWidget(QWidget):
         self._cmdcore.output.connect(self._logwidget.appendLog)
         self._cmdcore.commandStarted.connect(self.closePrompt)
         self._cmdcore.commandFinished.connect(self.openPrompt)
+        self._cmdcore.progress.connect(self._emitProgress)
 
     @pyqtSlot(unicode, str)
     def appendLog(self, msg, label):
@@ -427,6 +435,11 @@ class ConsoleWidget(QWidget):
         """Change the current working repository"""
         self._repo = repo
         self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
+
+    @pyqtSlot(unicode, object, unicode, unicode, object)
+    def _emitProgress(self, *args):
+        self.progressReceived.emit(
+            *(args + (self._repo and self._repo.root or None,)))
 
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
