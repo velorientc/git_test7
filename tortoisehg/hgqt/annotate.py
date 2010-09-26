@@ -45,7 +45,6 @@ class AnnotateView(QsciScintilla):
         self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
         self.setMouseTracking(True)
         self.setFont(qtlib.getfont(ui.ui(), 'fontlog').font())
-        self.linesChanged.connect(self._updatemargin)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
         self._revs = []  # by line
@@ -198,6 +197,7 @@ class AnnotateView(QsciScintilla):
 
         self._updaterevmargin()
         self._updatemarkers()
+        self._updatemarginwidth()
 
     def _updatelexer(self, fctx):
         """Update the lexer according to the given file"""
@@ -245,9 +245,11 @@ class AnnotateView(QsciScintilla):
         return s
 
     @pyqtSlot()
-    def _updatemargin(self):
-        self.setMarginWidth(1, 'M' * (len(str(self.lines()))))
-        self.setMarginWidth(2, 'M' * 4) # XXX
+    def _updatemarginwidth(self):
+        def lentext(s):
+            return 'M' * (len(str(s)) + 2)  # 2 for margin
+        self.setMarginWidth(1, lentext(self.lines()))
+        self.setMarginWidth(2, lentext(max(self._revs + [0])))
 
     def nextMatch(self):
         self.findNext()
