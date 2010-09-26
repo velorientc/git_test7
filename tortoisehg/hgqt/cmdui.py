@@ -5,11 +5,13 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import re
+import os, glob, shlex
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
+
+from mercurial import util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, localgettext
@@ -436,6 +438,11 @@ class ConsoleWidget(QWidget):
         self._repo = repo
         self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
 
+    @property
+    def cwd(self):
+        """Return the current working directory"""
+        return self._repo and self._repo.root or os.getcwd()
+
     @pyqtSlot(unicode, object, unicode, unicode, object)
     def _emitProgress(self, *args):
         self.progressReceived.emit(
@@ -443,8 +450,14 @@ class ConsoleWidget(QWidget):
 
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
-        args = re.split(r'\s+', hglib.fromunicode(cmdline).strip())
-        if args == ['']:
+        try:
+            args = list(self._parsecmdline(cmdline))
+        except ValueError, e:
+            self.closePrompt()
+            self._logwidget.appendLog(unicode(e) + '\n', 'ui.error')
+            self.openPrompt()
+            return
+        if not args:
             self.openPrompt()
             return
         cmd = args.pop(0)
@@ -455,6 +468,24 @@ class ConsoleWidget(QWidget):
             self._logwidget.appendLog(_('command not found: %s\n')
                                       % hglib.tounicode(cmd), 'ui.error')
             self.openPrompt()
+
+    def _parsecmdline(self, cmdline):
+        """Split command line string to imitate a unix shell"""
+        try:
+            args = shlex.split(hglib.fromunicode(cmdline))
+        except ValueError, e:
+            raise ValueError(_('command parse error: %s') % e)
+        for e in args:
+            e = util.expandpath(e)
+            if util.any(c in e for c in '*?[]'):
+                expanded = glob.glob(os.path.join(self.cwd, e))
+                if not expanded:
+                    raise ValueError(_('no matches found: %s')
+                                     % hglib.tounicode(e))
+                for p in expanded:
+                    yield p
+            else:
+                yield e
 
     @_cmdtable
     def _cmd_hg(self, args):
