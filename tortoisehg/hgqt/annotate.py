@@ -190,21 +190,20 @@ class AnnotateView(QsciScintilla):
             if rev not in sums:
                 sums[rev] = hglib.get_revision_desc(fctx, self.annfile)
 
-        self.setContent(hglib.tounicode(''.join(lines)),
-                        revs, sums, links)
+        self.setText(hglib.tounicode(''.join(lines)))
+        self._revs = revs
+        self._summaries = sums
+        self._links = links
+
+        self._updaterevmargin()
 
         for i, rev in enumerate(revs):
             ctx = self.repo[rev]
             rgb = self.cm.get_color(ctx, self.curdate)
             self.setLineBackground(i, rgb)
 
-    def setContent(self, text, revs, summaries, links):
-        self.setText(text)
-        self._revs = list(revs)
-        self._revmarkers.clear()
-        self._summaries = summaries.copy()
-        self._links = list(links)
-
+    def _updaterevmargin(self):
+        """Update the content of margin area showing revisions"""
         for i, e in enumerate(self._revs):
             self.setMarginText(i, str(e), self._margin_style)
 
