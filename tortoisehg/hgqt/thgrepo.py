@@ -380,6 +380,19 @@ def _extendrepo(repo):
     return thgrepository
 
 
+def getcontext(repo, target):
+    """Return a context, either from the repo or for a patch."""
+    if target is None:
+        if repo is None:
+            return None
+        else:
+            return repo.changectx(target)
+    ctx = PatchContext(repo, target)
+    if ctx is None:
+        ctx = repo.changectx(target)
+    return ctx
+
+
 def _extendchangectx(changectx):
     class thgchangectx(changectx.__class__):
         def _thgrawtags(self):

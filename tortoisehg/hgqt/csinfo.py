@@ -303,7 +303,7 @@ class SummaryBase(object):
         self.custom = custom
         self.repo = repo
         self.info = info
-        self.ctx = repo.changectx(self.target)
+        self.ctx = thgrepo.getcontext(repo, self.target)
 
     def get_data(self, item, **kargs):
         return self.info.get_data(item, self, self.ctx, self.custom, **kargs)
@@ -334,7 +334,7 @@ class SummaryBase(object):
         if repo is not None:
             self.repo = repo
         if self.ctx is None:
-            self.ctx = repo.changectx(target)
+            self.ctx = thgrepo.getcontext(repo, target)
 
 PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
 
