@@ -35,6 +35,9 @@ class SettingsCombo(QComboBox):
         self.setEditable(opts.get('canedit', False))
         self.setValidator(opts.get('validator', None))
         self.defaults = opts.get('defaults', [])
+        if self.defaults and self.isEditable():
+            comp = QCompleter(self.defaults)
+            self.setCompleter(comp)
         self.curvalue = None
         self.loaded = False
         if 'nohist' in opts:
@@ -348,7 +351,7 @@ INFO = (
          '  Default: None')),
     (_('Auto Exclude List'), 'tortoisehg.ciexclude', genEditCombo,
        _('Comma separated list of files that are automatically unchecked'
-         ' when the status, commit, and shelve dialogs are opened.'
+         ' when the status, and commit dialogs are opened.'
          '  Default: None')),
     (_('English Messages'), 'tortoisehg.engmsg', genBoolCombo,
        _('Generate English commit messages even if LANGUAGE or LANG'
