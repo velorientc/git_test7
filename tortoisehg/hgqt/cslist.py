@@ -6,11 +6,13 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import os
+
 from mercurial import hg
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from tortoisehg.hgqt import csinfo
+from tortoisehg.hgqt import csinfo, qtlib, thgrepo
 from tortoisehg.hgqt.i18n import _
 
 _SPACING = 6
@@ -25,10 +27,10 @@ class ChangesetList(QWidget):
         self.curfactory = None
         self.showitems = None
         self.limit = 20
-        contents = ('%(revnum)s:', ' %(branch)s', ' %(tags)s', ' %(summary)s')
+        contents = ('%(item_l)s:', ' %(branch)s', ' %(tags)s', ' %(summary)s')
         self.lstyle = csinfo.labelstyle(contents=contents, width=350,
                                         selectable=True)
-        contents = ('rev', 'summary', 'user', 'dateage', 'rawbranch',
+        contents = ('item', 'summary', 'user', 'dateage', 'rawbranch',
                     'tags', 'transplant', 'p4', 'svn')
         self.pstyle = csinfo.panelstyle(contents=contents, width=350,
                                         selectable=True)
@@ -66,6 +68,41 @@ class ChangesetList(QWidget):
         # signal handlers
         self.compactchk.toggled.connect(lambda *a: self.update(self.currepo,
                                                                self.curitems))
+
+        # csetinfo
+        def datafunc(widget, item, ctx):
+            if item in ('item', 'item_l'):
+                if not isinstance(ctx, thgrepo.patchctx):
+                    return True
+                revid = widget.get_data('revid')
+                if not revid:
+                    return widget.target
+                filename = os.path.basename(widget.target)
+                return filename, revid
+            raise csinfo.UnknownItem(item)
+        def labelfunc(widget, item):
+            if item in ('item', 'item_l'):
+                if not isinstance(widget.ctx, thgrepo.patchctx):
+                    return _('Revision:')
+                return _('Patch:')
+            raise csinfo.UnknownItem(item)
+        def markupfunc(widget, item, value):
+            if item in ('item', 'item_l'):
+                if not isinstance(widget.ctx, thgrepo.patchctx):
+                    if item == 'item':
+                        return widget.get_markup('rev')
+                    return widget.get_markup('revnum')
+                mono = dict(face='monospace', size='9000')
+                if isinstance(value, basestring):
+                    return qtlib.markup(value, **mono)
+                filename = qtlib.markup(value[0])
+                revid = qtlib.markup(value[1], **mono)
+                if item == 'item':
+                    return '%s (%s)' % (filename, revid)
+                return filename
+            raise csinfo.UnknownItem(item)
+        self.custom = csinfo.custom(data=datafunc, label=labelfunc,
+                                    markup=markupfunc)
 
     def clear(self):
         """Clear the item list"""
@@ -106,7 +143,7 @@ class ChangesetList(QWidget):
         """
         # setup
         self.clear()
-        self.curfactory = csinfo.factory(repo)
+        self.curfactory = csinfo.factory(repo, self.custom)
 
         # initialize variables
         self.currepo = repo
