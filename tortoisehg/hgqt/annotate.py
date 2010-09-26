@@ -25,150 +25,10 @@ from PyQt4.Qsci import QsciScintilla, QsciStyle
 #  forward/backward history buttons
 #  menu options for viewing appropriate changesets
 
-class AnnotateView(QFrame):
+class AnnotateView(QsciScintilla):
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    revisionHint = pyqtSignal(QString)
-
-    class TextArea(QsciScintilla):
-        'Display lines of annotation text'
-
-        revisionHint = pyqtSignal(QString)
-        searchAtParent = pyqtSignal(QString)
-        searchAll = pyqtSignal(QString)
-        searchAnnotation = pyqtSignal(QString)
-        searchAtRev = pyqtSignal(object)
-        revSelected = pyqtSignal(object)
-        editSelected = pyqtSignal(object)
-
-        def __init__(self, parent=None):
-            super(AnnotateView.TextArea, self).__init__(parent)
-            self.setReadOnly(True)
-            self.setUtf8(True)
-            self.setMarginLineNumbers(1, True)
-            self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
-            self.setMouseTracking(True)
-            self.linesChanged.connect(self._updatemargin)
-            self.setContextMenuPolicy(Qt.CustomContextMenu)
-            self.customContextMenuRequested.connect(self.menuRequest)
-            self._revs = []  # by line
-            self._links = []  # by line
-            self._revmarkers = {}  # by color
-            self._summaries = {}  # by rev
-            self._lastrev = None
-
-        def mouseMoveEvent(self, event):
-            line = self.lineAt(event.pos())
-            if line < 0:
-                return
-            rev = self._revs[line]
-            if rev != self._lastrev:
-                self.revisionHint.emit(self._summaries[rev])
-                self._lastrev = rev
-
-        @pyqtSlot(QPoint)
-        def menuRequest(self, point):
-            line = self.lineAt(point)
-            point = self.mapToGlobal(point)
-            if line < 0:
-                return
-
-            fctx, line = self._links[line]
-            data = [fctx.path(), fctx.linkrev(), line]
-
-            """ XXX context menu for selected text
-            c = self.textCursor()
-            selection = c.selection().toPlainText()
-            if selection and cursor.position() >= c.selectionStart() and \
-                    cursor.position() <= c.selectionEnd():
-                selection = c.selection().toPlainText()
-                def sorig():
-                    sdata = [selection, str(fctx.linkrev())]
-                    self.searchAtRev.emit(sdata)
-                def sctx():
-                    self.searchAtParent.emit(selection)
-                def searchall():
-                    self.searchAll.emit(selection)
-                def sann():
-                    self.searchAnnotation.emit(selection)
-                menu = QMenu(self)
-                for name, func in [(_('Search in original revision'), sorig),
-                                   (_('Search in working revision'), sctx),
-                                   (_('Search in current annotation'), sann),
-                                   (_('Search in history'), searchall)]:
-                    def add(name, func):
-                        action = menu.addAction(name)
-                        action.triggered.connect(func)
-                    add(name, func)
-                return menu.exec_(point)
-            """
-
-            def annorig():
-                self.revSelected.emit(data)
-            def editorig():
-                self.editSelected.emit(data)
-            menu = QMenu(self)
-            for name, func in [(_('Annotate originating revision'), annorig),
-                               (_('View originating revision'), editorig)]:
-                def add(name, func):
-                    action = menu.addAction(name)
-                    action.triggered.connect(func)
-                add(name, func)
-            for pfctx in fctx.parents():
-                pdata = [pfctx.path(), pfctx.changectx().rev(), line]
-                def annparent(data):
-                    self.revSelected.emit(data)
-                def editparent(data):
-                    self.editSelected.emit(data)
-                for name, func in [(_('Annotate parent revision %d') % pdata[1],
-                                      annparent),
-                                   (_('View parent revision %d') % pdata[1],
-                                      editparent)]:
-                    def add(name, func):
-                        action = menu.addAction(name)
-                        action.data = pdata
-                        action.run = lambda: func(action.data)
-                        action.triggered.connect(action.run)
-                    add(name, func)
-            menu.exec_(point)
-
-        @pyqtSlot()
-        def _updatemargin(self):
-            self.setMarginWidth(1, 'M' * (len(str(self.lines()))))
-            self.setMarginWidth(2, 'M' * 4) # XXX
-
-        def setLineBackground(self, line, color):
-            # TODO: assign markers from the latest
-            if color not in self._revmarkers and len(self._revmarkers) < 32:
-                m = len(self._revmarkers)
-                self.markerDefine(QsciScintilla.Background, m)
-                self.setMarkerBackgroundColor(QColor(color), m)
-                self._revmarkers[color] = m
-            if color in self._revmarkers:
-                self.markerAdd(line, self._revmarkers[color])
-
-        def setContent(self, text, revs, summaries, links):
-            self.setText(text)
-            self._revs = list(revs)
-            self._revmarkers.clear()
-            self._summaries = summaries.copy()
-            self._links = list(links)
-
-            for i, e in enumerate(self._revs):
-                self.setMarginText(i, str(e), self._margin_style)
-
-        @util.propertycache
-        def _margin_style(self):
-            """Style for margin area"""
-            s = QsciStyle()
-            s.setPaper(QApplication.palette().color(QPalette.Window))
-
-            # Workaround to set style of the current sci widget.
-            # QsciStyle sends style data only to the first sci widget.
-            # See qscintilla2/Qt4/qscistyle.cpp
-            self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
-                               s.style(), s.paper())
-            return s
+    closeSelf = pyqtSignal()
 
     revisionHint = pyqtSignal(QString)
     searchAtParent = pyqtSignal(QString)
@@ -177,29 +37,138 @@ class AnnotateView(QFrame):
     searchAtRev = pyqtSignal(object)
     revSelected = pyqtSignal(object)
     editSelected = pyqtSignal(object)
-    closeSelf = pyqtSignal()
 
     def __init__(self, parent=None):
         super(AnnotateView, self).__init__(parent)
-
-        self.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
-        self.edit = self.TextArea(self)
-        self.edit.revisionHint.connect(self.revisionHint)
-        self.edit.revSelected.connect(self.revSelected)
-        self.edit.editSelected.connect(self.editSelected)
-        self.edit.searchAtRev.connect(self.searchAtRev)
-        self.edit.searchAtParent.connect(self.searchAtParent)
-        self.edit.searchAll.connect(self.searchAll)
-        self.edit.searchAnnotation.connect(self.searchAnnotation)
-
-        hbox = QHBoxLayout(self)
-        hbox.setSpacing(10)
-        hbox.setMargin(0)
-        hbox.addWidget(self.edit)
+        self.setReadOnly(True)
+        self.setUtf8(True)
+        self.setMarginLineNumbers(1, True)
+        self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
+        self.setMouseTracking(True)
+        self.linesChanged.connect(self._updatemargin)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menuRequest)
+        self._revs = []  # by line
+        self._links = []  # by line
+        self._revmarkers = {}  # by color
+        self._summaries = {}  # by rev
+        self._lastrev = None
 
         self.thread = None
-        self.matches = []
         self.wrap = False
+
+    def mouseMoveEvent(self, event):
+        line = self.lineAt(event.pos())
+        if line < 0:
+            return
+        rev = self._revs[line]
+        if rev != self._lastrev:
+            self.revisionHint.emit(self._summaries[rev])
+            self._lastrev = rev
+
+    @pyqtSlot(QPoint)
+    def menuRequest(self, point):
+        line = self.lineAt(point)
+        point = self.mapToGlobal(point)
+        if line < 0:
+            return
+
+        fctx, line = self._links[line]
+        data = [fctx.path(), fctx.linkrev(), line]
+
+        """ XXX context menu for selected text
+        c = self.textCursor()
+        selection = c.selection().toPlainText()
+        if selection and cursor.position() >= c.selectionStart() and \
+                cursor.position() <= c.selectionEnd():
+            selection = c.selection().toPlainText()
+            def sorig():
+                sdata = [selection, str(fctx.linkrev())]
+                self.searchAtRev.emit(sdata)
+            def sctx():
+                self.searchAtParent.emit(selection)
+            def searchall():
+                self.searchAll.emit(selection)
+            def sann():
+                self.searchAnnotation.emit(selection)
+            menu = QMenu(self)
+            for name, func in [(_('Search in original revision'), sorig),
+                               (_('Search in working revision'), sctx),
+                               (_('Search in current annotation'), sann),
+                               (_('Search in history'), searchall)]:
+                def add(name, func):
+                    action = menu.addAction(name)
+                    action.triggered.connect(func)
+                add(name, func)
+            return menu.exec_(point)
+        """
+
+        def annorig():
+            self.revSelected.emit(data)
+        def editorig():
+            self.editSelected.emit(data)
+        menu = QMenu(self)
+        for name, func in [(_('Annotate originating revision'), annorig),
+                           (_('View originating revision'), editorig)]:
+            def add(name, func):
+                action = menu.addAction(name)
+                action.triggered.connect(func)
+            add(name, func)
+        for pfctx in fctx.parents():
+            pdata = [pfctx.path(), pfctx.changectx().rev(), line]
+            def annparent(data):
+                self.revSelected.emit(data)
+            def editparent(data):
+                self.editSelected.emit(data)
+            for name, func in [(_('Annotate parent revision %d') % pdata[1],
+                                  annparent),
+                               (_('View parent revision %d') % pdata[1],
+                                  editparent)]:
+                def add(name, func):
+                    action = menu.addAction(name)
+                    action.data = pdata
+                    action.run = lambda: func(action.data)
+                    action.triggered.connect(action.run)
+                add(name, func)
+        menu.exec_(point)
+
+    @pyqtSlot()
+    def _updatemargin(self):
+        self.setMarginWidth(1, 'M' * (len(str(self.lines()))))
+        self.setMarginWidth(2, 'M' * 4) # XXX
+
+    def setLineBackground(self, line, color):
+        # TODO: assign markers from the latest
+        if color not in self._revmarkers and len(self._revmarkers) < 32:
+            m = len(self._revmarkers)
+            self.markerDefine(QsciScintilla.Background, m)
+            self.setMarkerBackgroundColor(QColor(color), m)
+            self._revmarkers[color] = m
+        if color in self._revmarkers:
+            self.markerAdd(line, self._revmarkers[color])
+
+    def setContent(self, text, revs, summaries, links):
+        self.setText(text)
+        self._revs = list(revs)
+        self._revmarkers.clear()
+        self._summaries = summaries.copy()
+        self._links = list(links)
+
+        for i, e in enumerate(self._revs):
+            self.setMarginText(i, str(e), self._margin_style)
+
+    @util.propertycache
+    def _margin_style(self):
+        """Style for margin area"""
+        s = QsciStyle()
+        s.setPaper(QApplication.palette().color(QPalette.Window))
+
+        # Workaround to set style of the current sci widget.
+        # QsciStyle sends style data only to the first sci widget.
+        # See qscintilla2/Qt4/qscistyle.cpp
+        self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
+                           s.style(), s.paper())
+        return s
 
     def annotateFileAtRev(self, repo, ctx, wfile, line=None):
         if self.thread is not None:
@@ -259,22 +228,22 @@ class AnnotateView(QFrame):
             if rev not in sums:
                 sums[rev] = hglib.get_revision_desc(fctx, self.annfile)
 
-        self.edit.setContent(hglib.tounicode(''.join(lines)),
-                             revs, sums, links)
+        self.setContent(hglib.tounicode(''.join(lines)),
+                        revs, sums, links)
 
         for i, rev in enumerate(revs):
             ctx = self.repo[rev]
             rgb = self.cm.get_color(ctx, self.curdate)
-            self.edit.setLineBackground(i, rgb)
+            self.setLineBackground(i, rgb)
 
     def nextMatch(self):
-        self.edit.findNext()
+        self.findNext()
 
     def prevMatch(self):
         pass # XXX
 
     def searchText(self, match, icase):
-        self.edit.findFirst(match.pattern(), True, icase, False, self.wrap)
+        self.findFirst(match.pattern(), True, icase, False, self.wrap)
 
     def setWrap(self, wrap):
         self.wrap = wrap
