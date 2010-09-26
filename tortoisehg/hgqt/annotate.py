@@ -17,6 +17,7 @@ from tortoisehg.hgqt.grep import SearchWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.Qsci import QsciScintilla, QsciStyle
 
 # Technical Debt
 #  Syntax Highlighting?
@@ -29,24 +30,7 @@ class AnnotateView(QFrame):
     loadComplete = pyqtSignal()
     revisionHint = pyqtSignal(QString)
 
-    class InfoArea(QWidget):
-        """Display information about each annotated line"""
-        def __init__(self, edit, parent=None):
-            QWidget.__init__(self, parent)
-            self.edit = edit
-            self.width = 0
-        def sizeHint(self):
-            return QSize(self.width, 0)
-        def updateContents(self, rect, scroll):
-            if scroll:
-                self.scroll(0, scroll)
-            else:
-                self.update(0, rect.y(), self.width, rect.height())
-        def paintEvent(self, event):
-            self.edit.paintInfoArea(self, event)
-            QWidget.paintEvent(self, event)
-
-    class TextArea(QPlainTextEdit):
+    class TextArea(QsciScintilla):
         'Display lines of annotation text'
 
         revisionHint = pyqtSignal(QString)
@@ -58,70 +42,41 @@ class AnnotateView(QFrame):
         editSelected = pyqtSignal(object)
 
         def __init__(self, parent=None):
-            QPlainTextEdit.__init__(self, parent)
-            self.document().setDefaultStyleSheet(qtlib.thgstylesheet)
+            super(AnnotateView.TextArea, self).__init__(parent)
             self.setReadOnly(True)
-            self.setLineWrapMode(QPlainTextEdit.NoWrap)
-            self.setFont(QFont('Monospace'))
+            self.setUtf8(True)
+            self.setMarginLineNumbers(1, True)
+            self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
+            self.setMouseTracking(True)
+            self.linesChanged.connect(self._updatemargin)
             self.setContextMenuPolicy(Qt.CustomContextMenu)
             self.customContextMenuRequested.connect(self.menuRequest)
-            self.setTextInteractionFlags(Qt.TextSelectableByMouse |
-                                         Qt.TextSelectableByKeyboard)
-            tm = QFontMetrics(self.font())
-            self.charwidth = tm.width('9')
-            self.charheight = tm.height()
-            self.revs = []
-            self.summaries = []
-            self.setMouseTracking(True)
-            self.lastrev = None
-
-        def paintInfoArea(self, area, event):
-            """Write information about the annotated lines.
-
-            Choose the text based on the current Area:
-             - line number
-             - revision number"""
-            painter = QPainter(area)
-            painter.fillRect(event.rect(), Qt.lightGray)
-            block = self.firstVisibleBlock()
-            line = block.blockNumber()
-            offs = self.contentOffset()
-            top = self.blockBoundingGeometry(block).translated(offs).top()
-            while block.isValid() and line < len(self.revs):
-                if not block.isVisible() or top >= event.rect().bottom():
-                    break
-                painter.setPen(Qt.black)
-                rect = QRect(0, top, area.width, self.charheight)
-                if area == self.parent().lnumarea:
-                    text = str(line + 1)
-                else:
-                    text = str(self.revs[line])
-                painter.drawText(rect, Qt.AlignRight, text)
-                block = block.next()
-                top += self.blockBoundingGeometry(block).height()
-                line += 1
+            self._revs = []  # by line
+            self._links = []  # by line
+            self._revmarkers = {}  # by color
+            self._summaries = {}  # by rev
+            self._lastrev = None
 
         def mouseMoveEvent(self, event):
-            cursor = self.cursorForPosition(event.pos())
-            line = cursor.block()
-            if not line.isValid() or line.blockNumber() >= len(self.revs):
+            line = self.lineAt(event.pos())
+            if line < 0:
                 return
-            rev = self.revs[line.blockNumber()]
-            if rev != self.lastrev:
-                self.revisionHint.emit(self.summaries[rev])
-                self.lastrev = rev
+            rev = self._revs[line]
+            if rev != self._lastrev:
+                self.revisionHint.emit(self._summaries[rev])
+                self._lastrev = rev
 
+        @pyqtSlot(QPoint)
         def menuRequest(self, point):
-            cursor = self.cursorForPosition(point)
+            line = self.lineAt(point)
             point = self.mapToGlobal(point)
-
-            line = cursor.block()
-            if not line.isValid() or line.blockNumber() >= len(self.revs):
+            if line < 0:
                 return
-            fctx, line = self.links[line.blockNumber()]
+
+            fctx, line = self._links[line]
             data = [fctx.path(), fctx.linkrev(), line]
 
-            # check if the user has opened a menu on a text selection
+            """ XXX context menu for selected text
             c = self.textCursor()
             selection = c.selection().toPlainText()
             if selection and cursor.position() >= c.selectionStart() and \
@@ -146,6 +101,7 @@ class AnnotateView(QFrame):
                         action.triggered.connect(func)
                     add(name, func)
                 return menu.exec_(point)
+            """
 
             def annorig():
                 self.revSelected.emit(data)
@@ -176,6 +132,44 @@ class AnnotateView(QFrame):
                     add(name, func)
             menu.exec_(point)
 
+        @pyqtSlot()
+        def _updatemargin(self):
+            self.setMarginWidth(1, 'M' * (len(str(self.lines()))))
+            self.setMarginWidth(2, 'M' * 4) # XXX
+
+        def setLineBackground(self, line, color):
+            # TODO: assign markers from the latest
+            if color not in self._revmarkers and len(self._revmarkers) < 32:
+                m = len(self._revmarkers)
+                self.markerDefine(QsciScintilla.Background, m)
+                self.setMarkerBackgroundColor(QColor(color), m)
+                self._revmarkers[color] = m
+            if color in self._revmarkers:
+                self.markerAdd(line, self._revmarkers[color])
+
+        def setContent(self, text, revs, summaries, links):
+            self.setText(text)
+            self._revs = list(revs)
+            self._revmarkers.clear()
+            self._summaries = summaries.copy()
+            self._links = list(links)
+
+            for i, e in enumerate(self._revs):
+                self.setMarginText(i, str(e), self._margin_style)
+
+        @util.propertycache
+        def _margin_style(self):
+            """Style for margin area"""
+            s = QsciStyle()
+            s.setPaper(QApplication.palette().color(QPalette.Window))
+
+            # Workaround to set style of the current sci widget.
+            # QsciStyle sends style data only to the first sci widget.
+            # See qscintilla2/Qt4/qscistyle.cpp
+            self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
+                               s.style(), s.paper())
+            return s
+
     revisionHint = pyqtSignal(QString)
     searchAtParent = pyqtSignal(QString)
     searchAll = pyqtSignal(QString)
@@ -190,10 +184,6 @@ class AnnotateView(QFrame):
 
         self.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
         self.edit = self.TextArea(self)
-        self.lnumarea = self.InfoArea(self.edit)
-        self.revarea = self.InfoArea(self.edit)
-        self.edit.updateRequest.connect(self.lnumarea.updateContents)
-        self.edit.updateRequest.connect(self.revarea.updateContents)
         self.edit.revisionHint.connect(self.revisionHint)
         self.edit.revSelected.connect(self.revSelected)
         self.edit.editSelected.connect(self.editSelected)
@@ -205,8 +195,6 @@ class AnnotateView(QFrame):
         hbox = QHBoxLayout(self)
         hbox.setSpacing(10)
         hbox.setMargin(0)
-        hbox.addWidget(self.lnumarea)
-        hbox.addWidget(self.revarea)
         hbox.addWidget(self.edit)
 
         self.thread = None
@@ -241,20 +229,6 @@ class AnnotateView(QFrame):
         self.loadComplete.emit()
         if hasattr(self.thread, 'data'):
             self.fillModel(self.thread.data)
-        lines = len(self.edit.revs) * 1.0
-        if self.resumeline and lines > self.resumeline:
-            cursor = self.edit.textCursor()
-            cursor.movePosition(QTextCursor.NextBlock,
-                                QTextCursor.MoveAnchor,
-                                self.resumeline-1)
-            cursor.select(QTextCursor.LineUnderCursor)
-            self.edit.setTextCursor(cursor)
-            sb = self.edit.verticalScrollBar()
-            val = int(sb.maximum() * self.resumeline / lines)
-            sb.setValue(val)
-            self.edit.ensureCursorVisible()
-        else:
-            self.edit.verticalScrollBar().setValue(0)
         self.thread = None
 
     def keyPressEvent(self, event):
@@ -285,69 +259,22 @@ class AnnotateView(QFrame):
             if rev not in sums:
                 sums[rev] = hglib.get_revision_desc(fctx, self.annfile)
 
-        self.edit.summaries = sums
-        self.edit.links = links
-        self.edit.setPlainText(hglib.tounicode(''.join(lines)))
-        self.edit.revs = revs
-        self.lnumarea.width = len(str(len(revs))) * self.edit.charwidth + 3
-        self.lnumarea.setFixedWidth(self.lnumarea.width)
-        width = max([len(str(r)) for r in revs]) * self.edit.charwidth + 3
-        self.revarea.width = width
-        self.revarea.setFixedWidth(width)
+        self.edit.setContent(hglib.tounicode(''.join(lines)),
+                             revs, sums, links)
 
         for i, rev in enumerate(revs):
             ctx = self.repo[rev]
             rgb = self.cm.get_color(ctx, self.curdate)
-            sel = QTextEdit.ExtraSelection()
-            sel.bgcolor = QColor(rgb) # save a reference
-            sel.format.setBackground(sel.bgcolor)
-            sel.format.setProperty(QTextFormat.FullWidthSelection, True)
-            sel.cursor = QTextCursor(self.edit.document())
-            sel.cursor.setPosition(lpos[i])
-            sel.cursor.clearSelection()
-            sels.append(sel)
-        self.colorsels = sels
-
-        self.edit.setExtraSelections(self.colorsels)
+            self.edit.setLineBackground(i, rgb)
 
     def nextMatch(self):
-        if not self.matches:
-            return
-        if self.curmatch < len(self.matches)-1:
-            self.curmatch += 1
-        elif self.wrap:
-            self.curmatch = 0
-        self.edit.setTextCursor(self.matches[self.curmatch].cursor)
+        self.edit.findNext()
 
     def prevMatch(self):
-        if not self.matches:
-            return
-        if self.curmatch > 0:
-            self.curmatch -= 1
-        elif self.wrap:
-            self.curmatch = len(self.matches)-1
-        self.edit.setTextCursor(self.matches[self.curmatch].cursor)
+        pass # XXX
 
     def searchText(self, match, icase):
-        matches = []
-        color = QColor(Qt.yellow)
-        flags = QTextDocument.FindFlags()
-        if not icase:
-            flags |= QTextDocument.FindCaseSensitively
-        doc = self.edit.document()
-        cursor = doc.find(match, 0, flags)
-        while not cursor.isNull():
-            selection = QTextEdit.ExtraSelection()
-            selection.format.setBackground(color)
-            selection.cursor = cursor
-            matches.append(selection)
-            cursor = doc.find(match, cursor)
-        self.matches = matches
-        self.curmatch = 0
-        if matches:
-            self.edit.setTextCursor(matches[0].cursor)
-        self.edit.setExtraSelections(self.colorsels + self.matches)
-        self.edit.setFocus()
+        self.edit.findFirst(match.pattern(), True, icase, False, self.wrap)
 
     def setWrap(self, wrap):
         self.wrap = wrap
