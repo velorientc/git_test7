@@ -321,7 +321,9 @@ class _LogWidgetForConsole(LogWidget):
     @pyqtSlot()
     def closePrompt(self):
         """Disable user input"""
-        self.markerDelete(self.lines() - 1)
+        if self.commandText():
+            self._setmarker((self.lines() - 1,), 'control')
+        self.markerDelete(self.lines() - 1, self._prompt_marker)
         self._newline()
         self.setCursorPosition(self.lines() - 1, 0)
         self.setReadOnly(True)
