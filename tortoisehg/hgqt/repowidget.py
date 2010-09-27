@@ -182,7 +182,7 @@ class RepoWidget(QWidget):
         return SharedWidget(sw)
 
     def setOutgoingNodes(self, nodes):
-        self.repo._outgoing = nodes
+        self.repomodel.revset = [self.repo[n].node() for n in nodes]
         self.refresh()
 
     def createGrepWidget(self):
