@@ -395,7 +395,6 @@ class ConsoleWidget(QWidget):
 
     _cmdtable = _ConsoleCmdTable()
 
-    # TODO: support arbitrary shell commands
     # TODO: command history and completion
 
     def __init__(self, parent=None):
@@ -424,6 +423,34 @@ class ConsoleWidget(QWidget):
         cmdcore.commandFinished.connect(self.openPrompt)
         cmdcore.progress.connect(self._emitProgress)
         return cmdcore
+
+    @util.propertycache
+    def _extproc(self):
+        extproc = QProcess(self)
+        extproc.started.connect(self.closePrompt)
+        extproc.finished.connect(self.openPrompt)
+
+        def handleerror(error):
+            msgmap = {
+                QProcess.FailedToStart: _('failed to run command\n'),
+                QProcess.Crashed: _('crashed\n')}
+            if extproc.state() == QProcess.NotRunning:
+                self._logwidget.closePrompt()
+            self._logwidget.appendLog(
+                msgmap.get(error, _('error while running command\n')),
+                'ui.error')
+            if extproc.state() == QProcess.NotRunning:
+                self._logwidget.openPrompt()
+        extproc.error.connect(handleerror)
+
+        def put(bytes, label=None):
+            self._logwidget.appendLog(hglib.tounicode(bytes.data()), label)
+        extproc.readyReadStandardOutput.connect(
+            lambda: put(extproc.readAllStandardOutput()))
+        extproc.readyReadStandardError.connect(
+            lambda: put(extproc.readAllStandardError(), 'ui.error'))
+
+        return extproc
 
     @pyqtSlot(unicode, str)
     def appendLog(self, msg, label):
@@ -466,10 +493,7 @@ class ConsoleWidget(QWidget):
         try:
             self._cmdtable[cmd](self, args)
         except KeyError:
-            self.closePrompt()
-            self._logwidget.appendLog(_('command not found: %s\n')
-                                      % hglib.tounicode(cmd), 'ui.error')
-            self.openPrompt()
+            return self._runextcommand(cmdline)
 
     def _parsecmdline(self, cmdline):
         """Split command line string to imitate a unix shell"""
@@ -488,6 +512,10 @@ class ConsoleWidget(QWidget):
                     yield p
             else:
                 yield e
+
+    def _runextcommand(self, cmdline):
+        self._extproc.setWorkingDirectory(hglib.tounicode(self.cwd))
+        self._extproc.start(cmdline, QIODevice.ReadOnly)
 
     @_cmdtable
     def _cmd_hg(self, args):
