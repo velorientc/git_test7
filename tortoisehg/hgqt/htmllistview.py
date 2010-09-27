@@ -110,12 +110,12 @@ class HTMLDelegate(QStyledItemDelegate):
         ctx = QAbstractTextDocumentLayout.PaintContext()
         if option.state & QStyle.State_Selected:
             if option.state & QStyle.State_Active:
-                colgroup = QPalette.Active
+                ctx.palette.setCurrentColorGroup(QPalette.Active)
             else:
-                colgroup = QPalette.Inactive
-            ctx.palette.setColor(QPalette.Text,
-                                 option.palette.color(colgroup,
-                                                      QPalette.HighlightedText))
+                ctx.palette.setCurrentColorGroup(QPalette.Inactive)
+        elif not option.state & QStyle.State_Enabled:
+            ctx.palette.setCurrentColorGroup(QPalette.Disabled)
+
         doc.documentLayout().draw(painter, ctx)
         painter.restore()
 
