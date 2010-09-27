@@ -83,6 +83,7 @@ class RevDetailsWidget(QWidget):
         self.filelist_splitter.setChildrenCollapsible(False)
 
         self.diffToolbar = QToolBar(_('Diff Toolbar'))
+        self.diffToolbar.setIconSize(QSize(16,16))
         self.filelist = HgFileListView()
 
         self.tbarFileListFrame = QFrame(self.filelist_splitter)
