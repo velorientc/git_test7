@@ -404,6 +404,7 @@ class ConsoleWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
         self._initcmdcore()
+        self.setFocusProxy(self._logwidget)
         self.setRepository(None)
         self.openPrompt()
 

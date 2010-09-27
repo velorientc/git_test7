@@ -30,6 +30,9 @@ class LogDockWidget(QDockWidget):
         for name in ('setRepository', 'progressReceived'):
             setattr(self, name, getattr(self.logte, name))
 
+        self.visibilityChanged.connect(
+            lambda visible: visible and self.logte.setFocus())
+
     @pyqtSlot()
     def clear(self):
         self.logte.clear()
