@@ -886,6 +886,8 @@ class CommitDialog(QDialog):
         self.opts = opts
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setMargin(0)
         self.setLayout(layout)
 
         commit = CommitWidget(pats, opts, opts.get('root'), False, self)

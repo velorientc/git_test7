@@ -124,6 +124,7 @@ class SearchWidget(QWidget):
         chk.setChecked(opts.get('ignorecase', False))
 
         if parent:
+            mainvbox.setContentsMargins(0, 0, 0, 0)
             self.closeonesc = False
         else:
             self.setWindowTitle(_('TortoiseHg Search'))
