@@ -29,6 +29,8 @@ from tortoisehg.hgqt import fileview
 class QuickBar(QToolBar):
     def __init__(self, name, key, desc=None, parent=None):
         QToolBar.__init__(self, name, parent)
+        # Without this extra reference, we have errors at exit about
+        # objects being deleted from the wrong thread
         self.original_parent = parent
         self.setIconSize(QSize(16,16))
         self.setFloatable(False)
@@ -68,8 +70,13 @@ class FindQuickBar(QuickBar):
     cancel = pyqtSignal()
 
     def __init__(self, parent):
-        QuickBar.__init__(self, "Find", QKeySequence.Find, "Find", parent)
+        QuickBar.__init__(self, 'Find', QKeySequence.Find, 'Find', parent)
         self.currenttext = ''
+
+    def __del__(self):
+        # if not present, we get errors at close about objects being
+        # deleted from the wrong thread
+        pass
 
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
@@ -96,10 +103,7 @@ class FindQuickBar(QuickBar):
 
     def createContent(self):
         QuickBar.createContent(self)
-        self.compl_model = QStringListModel()
-        self.completer = QCompleter(self.compl_model, self)
         self.entry = QLineEdit(self)
-        self.entry.setCompleter(self.completer)
         self.addWidget(self.entry)
         self.addAction(self._actions['findnext'])
         self.addAction(self._actions['cancel'])
@@ -116,11 +120,6 @@ class FindQuickBar(QuickBar):
     def text(self):
         if self.isVisible() and self.currenttext.strip():
             return self.currenttext
-
-    def __del__(self):
-        # prevent a warning in the console:
-        # QObject::startTimer: QTimer can only be used with threads started with QThread
-        self.entry.setCompleter(None)
 
 class FindInGraphlogQuickBar(FindQuickBar):
     revisionSelected = pyqtSignal(int)
