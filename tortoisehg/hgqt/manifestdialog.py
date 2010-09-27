@@ -152,10 +152,12 @@ class ManifestWidget(QWidget):
         self.setLayout(QVBoxLayout())
         self._splitter = QSplitter()
         self.layout().addWidget(self._splitter)
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
         navlayout = QVBoxLayout(spacing=0)
         navlayout.setContentsMargins(0, 0, 0, 0)
         self._toolbar = QToolBar()
+        self._toolbar.setIconSize(QSize(16,16))
         self._treeview = QTreeView(headerHidden=True, dragEnabled=True)
         navlayout.addWidget(self._toolbar)
         navlayout.addWidget(self._treeview)
