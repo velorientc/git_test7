@@ -127,7 +127,7 @@ class RepoTreeView(QTreeView):
             if key:
                 act.setShortcut(key)
             if cb:
-                connect(act, SIGNAL('triggered()'), cb)
+                act.triggered.connect(cb)
             self.addAction(act)
 
     def startSettings(self):
