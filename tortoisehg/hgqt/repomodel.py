@@ -100,6 +100,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.reloadConfig()
         self.updateColumns()
         self.setBranch(branch)
+        self.revset = ()
 
         # To be deleted
         self._user_colors = {}
@@ -398,6 +399,19 @@ class HgRepoListModel(QAbstractTableModel):
             if column == 'Graph':
                 return self.graphctx(ctx, gnode)
         return nullvariant
+
+    def flags(self, index):
+        if not index.isValid():
+            return 0
+
+        row = index.row()
+        self.ensureBuilt(row=row)
+        gnode = self.graph[row]
+        ctx = self.repo.changectx(gnode.rev)
+
+        if self.revset and ctx.node() not in self.revset:
+            return Qt.ItemFlags(0)
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal:
