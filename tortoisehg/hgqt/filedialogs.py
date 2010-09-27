@@ -126,11 +126,11 @@ class FileLogDialog(_AbstractFileDialog):
 
     def setupUi(self, o):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
-        self.toolBar_edit = QToolBar(self)
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.toolBar_edit)
+        self.editToolbar = QToolBar(self)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
         self.actionClose = QAction(self, shortcut=QKeySequence.Close)
         self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
-        self.toolBar_edit.addAction(self.actionReload)
+        self.editToolbar.addAction(self.actionReload)
         self.addAction(self.actionClose)
 
         # TODO: workaround for HgRepoView
@@ -151,22 +151,22 @@ class FileLogDialog(_AbstractFileDialog):
         self.textView.showMessage.connect(self.statusBar().showMessage)
 
     def setupToolbars(self):
-        self.find_toolbar = FindInGraphlogQuickBar(self)
-        self.find_toolbar.attachFileView(self.textView)
-        self.find_toolbar.revisionSelected.connect(self.repoview.goto)
-        self.find_toolbar.showMessage.connect(self.statusBar().showMessage)
-        self.attachQuickBar(self.find_toolbar)
+        self.findToolbar = FindInGraphlogQuickBar(self)
+        self.findToolbar.attachFileView(self.textView)
+        self.findToolbar.revisionSelected.connect(self.repoview.goto)
+        self.findToolbar.showMessage.connect(self.statusBar().showMessage)
+        self.attachQuickBar(self.findToolbar)
 
-        self.toolBar_edit.addSeparator()
-        self.toolBar_edit.addAction(self.repoview._actions['back'])
-        self.toolBar_edit.addAction(self.repoview._actions['forward'])
-        self.toolBar_edit.addSeparator()
-        self.toolBar_edit.addAction(self.actionDiffMode)
-        self.toolBar_edit.addAction(self.actionAnnMode)
-        self.toolBar_edit.addAction(self.actionNextDiff)
-        self.toolBar_edit.addAction(self.actionPrevDiff)
+        self.editToolbar.addSeparator()
+        self.editToolbar.addAction(self.repoview._actions['back'])
+        self.editToolbar.addAction(self.repoview._actions['forward'])
+        self.editToolbar.addSeparator()
+        self.editToolbar.addAction(self.actionDiffMode)
+        self.editToolbar.addAction(self.actionAnnMode)
+        self.editToolbar.addAction(self.actionNextDiff)
+        self.editToolbar.addAction(self.actionPrevDiff)
 
-        self.attachQuickBar(self.repoview.goto_toolbar)
+        self.attachQuickBar(self.repoview.gototb)
 
     def setupModels(self):
         self.filerevmodel = FileRevModel(self.repo)
@@ -177,9 +177,9 @@ class FileLogDialog(_AbstractFileDialog):
         self.filerevmodel.filled.connect(self.modelFilled)
         self.textView.setMode('file')
         self.textView.setModel(self.filerevmodel)
-        self.find_toolbar.setModel(self.filerevmodel)
-        self.find_toolbar.setFilterFiles([self.filename])
-        self.find_toolbar.setMode('file')
+        self.findToolbar.setModel(self.filerevmodel)
+        self.findToolbar.setFilterFiles([self.filename])
+        self.findToolbar.setMode('file')
         self.filerevmodel.setFilename(self.filename)
 
     def createActions(self):
@@ -287,11 +287,11 @@ class FileDiffDialog(_AbstractFileDialog):
 
     def setupUi(self, o):
         # TODO: workaround for HgDialogMixin; this should be done in constructor
-        self.toolBar_edit = QToolBar(self)
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.toolBar_edit)
+        self.editToolbar = QToolBar(self)
+        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
         self.actionClose = QAction(self, shortcut=QKeySequence.Close)
         self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
-        self.toolBar_edit.addAction(self.actionReload)
+        self.editToolbar.addAction(self.actionReload)
         self.addAction(self.actionClose)
 
         # TODO: workaround for HgRepoView
@@ -376,7 +376,7 @@ class FileDiffDialog(_AbstractFileDialog):
 
             self.viewers[side].verticalScrollBar().valueChanged.connect(
                     lambda value, side=side: self.vbar_changed(value, side))
-            self.attachQuickBar(table.goto_toolbar)
+            self.attachQuickBar(table.gototb)
 
         self.setTabOrder(table, self.viewers['left'])
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
@@ -411,9 +411,9 @@ class FileDiffDialog(_AbstractFileDialog):
         self.actionPrevDiff.setEnabled(False)
 
     def setupToolbars(self):
-        self.toolBar_edit.addSeparator()
-        self.toolBar_edit.addAction(self.actionNextDiff)
-        self.toolBar_edit.addAction(self.actionPrevDiff)
+        self.editToolbar.addSeparator()
+        self.editToolbar.addAction(self.actionNextDiff)
+        self.editToolbar.addAction(self.actionPrevDiff)
 
     def modelFilled(self):
         self.tableView_revisions_left.resizeColumns()
