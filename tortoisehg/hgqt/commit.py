@@ -895,7 +895,6 @@ class CommitDialog(QDialog):
 
         self.statusbar = cmdui.ThgStatusBar(self)
         self.statusbar.setSizeGripEnabled(False)
-        layout.addWidget(self.statusbar)
         commit.showMessage.connect(self.statusbar.showMessage)
         commit.progress.connect(self.statusbar.progress)
         commit.linkActivated.connect(self.linkActivated)
@@ -909,8 +908,14 @@ class CommitDialog(QDialog):
         bb.button(BB.Cancel).setDefault(False)
         bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Ok).setDefault(True)
-        layout.addWidget(bb)
         self.bb = bb
+
+        hbox = QHBoxLayout()
+        hbox.setMargin(0)
+        hbox.setContentsMargins(*(0,)*4)
+        hbox.addWidget(self.statusbar)
+        hbox.addWidget(self.bb)
+        layout.addLayout(hbox)
 
         s = QSettings()
         commit.restoreState(s.value('commit/state').toByteArray())
