@@ -28,30 +28,19 @@ from tortoisehg.hgqt import fileview
 
 class QuickBar(QToolBar):
     def __init__(self, name, key, desc=None, parent=None):
-        self.original_parent = parent
-        # used to remember who had the focus before bar steel it
-        self._focusw = None
         QToolBar.__init__(self, name, parent)
+        self.original_parent = parent
         self.setIconSize(QSize(16,16))
         self.setFloatable(False)
         self.setMovable(False)
         self.setAllowedAreas(Qt.BottomToolBarArea)
         self.createActions(key, desc)
         self.createContent()
-        if parent:
-            parent = parent.window()            
-        if isinstance(parent, QMainWindow):
-            parent.addToolBar(Qt.BottomToolBarArea, self)
         self.setVisible(False)
-        
-    def createActions(self, openkey, desc):
-        parent = self.parentWidget()
-        self._actions = {}
 
-        if not desc:
-            desc = "Open"
-        openact = QAction(desc, parent)
-        openact.setCheckable(True)        
+    def createActions(self, openkey, desc):
+        openact = QAction(desc or 'Open', self)
+        openact.setCheckable(True)
         openact.setChecked(False)
         openact.setShortcut(QKeySequence(openkey))
         openact.triggered.connect(lambda: self.setVisible(True))
@@ -60,9 +49,8 @@ class QuickBar(QToolBar):
         closeact.setIcon(geticon('close'))
         closeact.setShortcut(Qt.Key_Escape)
         closeact.triggered.connect(lambda: self.setVisible(False))
-                
-        self._actions = {'open': openact,
-                         'close': closeact,}
+
+        self._actions = {'open': openact, 'close': closeact}
 
     def createContent(self):
         self.addAction(self._actions['close'])
@@ -74,13 +62,6 @@ class QuickBar(QToolBar):
     def cancel(self):
         self.hide()
 
-    def addShortcut(self, desc, key):
-        act = self._actions[desc]
-        shortcuts = list(act.shortcuts())
-        shortcuts.append(key)
-        act.setShortcuts(shortcuts)
-
-
 class FindQuickBar(QuickBar):
     find = pyqtSignal(QString)
     findnext = pyqtSignal(QString)
@@ -89,7 +70,7 @@ class FindQuickBar(QuickBar):
     def __init__(self, parent):
         QuickBar.__init__(self, "Find", QKeySequence.Find, "Find", parent)
         self.currenttext = ''
-        
+
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
         self._actions['findnext'] = QAction("Find next", self)
@@ -112,7 +93,7 @@ class FindQuickBar(QuickBar):
     def setCancelEnabled(self, enabled=True):
         self._actions['cancel'].setEnabled(enabled)
         self._actions['findnext'].setEnabled(not enabled)
-        
+
     def createContent(self):
         QuickBar.createContent(self)
         self.compl_model = QStringListModel()
@@ -125,7 +106,7 @@ class FindQuickBar(QuickBar):
         self.setCancelEnabled(False)
         self.entry.returnPressed.connect(self.findText)
         self.entry.textEdited.connect(self.findText)
-        
+
     def setVisible(self, visible=True):
         QuickBar.setVisible(self, visible)
         if visible:
@@ -135,7 +116,7 @@ class FindQuickBar(QuickBar):
     def text(self):
         if self.isVisible() and self.currenttext.strip():
             return self.currenttext
-        
+
     def __del__(self):
         # prevent a warning in the console:
         # QObject::startTimer: QTimer can only be used with threads started with QThread
@@ -159,14 +140,14 @@ class FindInGraphlogQuickBar(FindQuickBar):
 
     def setFilterFiles(self, files):
         self._filter_files = files
-        
+
     def setModel(self, model):
         self._model = model
 
     def setMode(self, mode):
         assert mode in ('diff', 'file')
         self._mode = mode
-        
+
     def attachFileView(self, fileview):
         self._fileview = fileview
 
@@ -224,7 +205,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
                 return
             # no more found text in currently displayed file
             self._findinfile_iter = None
-                
+
         if self._findinlog_iter is None and self._fileview:
             # start searching in the graphlog from current position
             rev = self._fileview.rev()
@@ -233,7 +214,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
 
         self.setCancelEnabled(True)
         self.find_next_in_log()
-        
+
     def find_next_in_log(self, step=0):
         """
         to be called from 'on_find' callback (or recursively). Try to
@@ -252,7 +233,7 @@ class FindInGraphlogQuickBar(FindQuickBar):
             else:
                 self.showMessage.emit('')
                 self.setCancelEnabled(False)
-                
+
                 rev, filename = next_find
                 if rev is not None and filename is not None:
                     self.revisionSelected.emit(rev)
