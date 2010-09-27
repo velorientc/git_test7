@@ -403,7 +403,6 @@ class ConsoleWidget(QWidget):
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
-        self._initcmdcore()
         self.setFocusProxy(self._logwidget)
         self.setRepository(None)
         self.openPrompt()
@@ -417,12 +416,14 @@ class ConsoleWidget(QWidget):
         for name in ('openPrompt', 'closePrompt', 'clear'):
             setattr(self, name, getattr(self._logwidget, name))
 
-    def _initcmdcore(self):
-        self._cmdcore = Core(useInternal=False, parent=self)
-        self._cmdcore.output.connect(self._logwidget.appendLog)
-        self._cmdcore.commandStarted.connect(self.closePrompt)
-        self._cmdcore.commandFinished.connect(self.openPrompt)
-        self._cmdcore.progress.connect(self._emitProgress)
+    @util.propertycache
+    def _cmdcore(self):
+        cmdcore = Core(useInternal=False, parent=self)
+        cmdcore.output.connect(self._logwidget.appendLog)
+        cmdcore.commandStarted.connect(self.closePrompt)
+        cmdcore.commandFinished.connect(self.openPrompt)
+        cmdcore.progress.connect(self._emitProgress)
+        return cmdcore
 
     @pyqtSlot(unicode, str)
     def appendLog(self, msg, label):
