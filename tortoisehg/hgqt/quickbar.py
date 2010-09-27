@@ -80,10 +80,10 @@ class FindQuickBar(QuickBar):
 
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
-        self._actions['findnext'] = QAction("Find next", self)
+        self._actions['findnext'] = QAction('Find next', self)
         self._actions['findnext'].setShortcut(QKeySequence.FindNext)
         self._actions['findnext'].triggered.connect(self.findText)
-        self._actions['cancel'] = QAction("Cancel", self)
+        self._actions['cancel'] = QAction('Cancel', self)
         self._actions['cancel'].triggered.connect(self.on_cancel)
 
     def findText(self, *args):
