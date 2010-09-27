@@ -99,8 +99,8 @@ class HgRepoView(QTableView):
         QTableView.mousePressEvent(self, event)
 
     def createToolbars(self):
-        self.goto_toolbar = tb = GotoQuickBar(self)
-        tb.setObjectName("goto_toolbar")
+        self.gototb = tb = GotoQuickBar(self)
+        tb.setObjectName('gototb')
         tb.gotoSignal.connect(self.goto)
 
     def contextMenuEvent(self, event):
@@ -121,7 +121,7 @@ class HgRepoView(QTableView):
         self.init_variables()
         QTableView.setModel(self, model)
         self.selectionModel().currentRowChanged.connect(self.revSelected)
-        self.goto_toolbar.setCompletionKeys(self.repo.tags().keys())
+        self.gototb.setCompletionKeys(self.repo.tags().keys())
         self.resetDelegate()
         model.layoutChanged.connect(self.resetDelegate)
 
@@ -269,5 +269,5 @@ class HgRepoView(QTableView):
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
-                self.goto_toolbar.setVisible(False)
+                self.gototb.setVisible(False)
                 self.setCurrentIndex(idx)
