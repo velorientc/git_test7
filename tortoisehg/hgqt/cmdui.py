@@ -288,7 +288,9 @@ class LogWidget(QsciScintilla):
 
 class _LogWidgetForConsole(LogWidget):
     """Wrapped LogWidget for ConsoleWidget"""
+
     returnPressed = pyqtSignal(unicode)
+    """Return key pressed when cursor is on prompt line"""
 
     _prompt = '% '
 
@@ -300,7 +302,8 @@ class _LogWidgetForConsole(LogWidget):
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            self.returnPressed.emit(self.commandText())
+            if self._cursoronpromptline():
+                self.returnPressed.emit(self.commandText())
             return
         super(_LogWidgetForConsole, self).keyPressEvent(event)
 
@@ -371,6 +374,10 @@ class _LogWidgetForConsole(LogWidget):
     def _newline(self):
         if self.lineLength(self.lines() - 1) > 0:
             self.append('\n')
+
+    def _cursoronpromptline(self):
+        line = self.getCursorPosition()[0]
+        return self.markersAtLine(line) & (1 << self._prompt_marker)
 
 class _ConsoleCmdTable(dict):
     """Command table for ConsoleWidget"""
