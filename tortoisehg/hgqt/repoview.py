@@ -29,11 +29,11 @@ class GotoQuickBar(QuickBar):
     gotoSignal = pyqtSignal(unicode)
 
     def __init__(self, parent):
-        QuickBar.__init__(self, "Goto", "Ctrl+Shift+G", "Goto", parent)
+        QuickBar.__init__(self, 'Goto', 'Ctrl+Shift+G', 'Goto', parent)
 
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
-        self._actions['go'] = QAction("Go", self)
+        self._actions['go'] = QAction('Go', self)
         self._actions['go'].triggered.connect(self.goto)
 
     def goto(self):
@@ -41,10 +41,7 @@ class GotoQuickBar(QuickBar):
 
     def createContent(self):
         QuickBar.createContent(self)
-        self.compl_model = QStringListModel(['tip'])
-        self.completer = QCompleter(self.compl_model, self)
         self.entry = QLineEdit(self)
-        self.entry.setCompleter(self.completer)
         self.addWidget(self.entry)
         self.addAction(self._actions['go'])
         self.entry.returnPressed.connect(self._actions['go'].trigger)
@@ -55,10 +52,8 @@ class GotoQuickBar(QuickBar):
             self.entry.setFocus()
             self.entry.selectAll()
 
-    def __del__(self):
-        # prevent a warning in the console:
-        # QObject::startTimer: QTimer can only be used with threads started with QThread
-        self.entry.setCompleter(None)
+    def setCompletionKeys(self, keys):
+        self.entry.setCompleter(QCompleter(keys))
 
 class HgRepoView(QTableView):
 
@@ -126,7 +121,7 @@ class HgRepoView(QTableView):
         self.init_variables()
         QTableView.setModel(self, model)
         self.selectionModel().currentRowChanged.connect(self.revSelected)
-        self.goto_toolbar.compl_model.setStringList(self.repo.tags().keys())
+        self.goto_toolbar.setCompletionKeys(self.repo.tags().keys())
         self.resetDelegate()
         model.layoutChanged.connect(self.resetDelegate)
 
