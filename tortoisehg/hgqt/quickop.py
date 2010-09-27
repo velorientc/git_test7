@@ -39,6 +39,8 @@ class QuickOpDialog(QDialog):
         self.setWindowTitle('%s - hg %s' % (repo.displayname, command))
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setMargin(0)
         self.setLayout(layout)
 
         hbox = QHBoxLayout()
@@ -74,14 +76,12 @@ class QuickOpDialog(QDialog):
         self.statusbar.setSizeGripEnabled(False)
         stwidget.showMessage.connect(self.statusbar.showMessage)
         stwidget.progress.connect(self.progress)
-        layout.addWidget(self.statusbar)
 
-        self.cmd = cmd = cmdui.Widget()
-        cmd.setHidden(True)
+        self.cmd = cmd = cmdui.Runner()
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.commandCanceling.connect(self.commandCanceled)
-        layout.addWidget(cmd)
+        cmd.progress.connect(self.statusbar.progress)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -92,15 +92,21 @@ class QuickOpDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
+        hbox = QHBoxLayout()
+        hbox.setMargin(0)
+        hbox.setContentsMargins(*(0,)*4)
+        hbox.addWidget(self.statusbar)
+        hbox.addWidget(self.bb)
+        layout.addLayout(hbox)
+
         s = QSettings()
         stwidget.restoreState(s.value('quickop/state').toByteArray())
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
-        cmd.progress.connect(self.statusbar.progress)
         self.stwidget.refreshWctx()
 
-    def progress(self, wrapper):
-        topic, item, pos, total, unit = wrapper.data
+    @pyqtSlot(QString, object, QString, QString, object)
+    def progress(self, topic, pos, item, unit, total):
         if pos is None:
             repo = self.stwidget.repo
             imm = repo.ui.config('tortoisehg', 'immediate', '')
@@ -122,14 +128,11 @@ class QuickOpDialog(QDialog):
         return super(QDialog, self).keyPressEvent(event)
 
     def commandStarted(self):
-        self.cmd.setShown(True)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
 
     def commandFinished(self, ret):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
-        if ret is not 0:
-            self.cmd.show_output(True)
-        else:
+        if ret is 0:
             self.reject()
 
     def commandCanceled(self):
