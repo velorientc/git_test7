@@ -387,6 +387,8 @@ def getcontext(repo, target):
             return None
         else:
             return repo.changectx(target)
+    if type(target) is int:
+        return repo.changectx(target)
     ctx = PatchContext(repo, target)
     if ctx is None:
         ctx = repo.changectx(target)
@@ -540,12 +542,17 @@ class patchctx(object):
     def thgwdparent(self): return False
     def thgmqappliedpatch(self): return False
     def thgmqpatchname(self): return self._patchname
+    def thgmqpatchchunks(self, wfile):
+        if self._files is None:
+            self._load_patch_details()
+        if wfile in self.curphunks:
+            return self.curphunks[wfile]
+        return None
     def thgbranchhead(self): return False
     def thgmqunappliedpatch(self): return True
     def changesToParent(self, whichparent):
         if self._files is None:
             self._load_patch_details()
-            
         return self._changesToParent
 
     def files(self):
@@ -575,6 +582,7 @@ class patchctx(object):
 
         self._files = []
         self._changesToParent = [modified, added, removed]
+        self.curphunks = {}
         
         pf = open(self._path)
         try:
@@ -583,16 +591,23 @@ class patchctx(object):
                     if state == 'git':
                         for m in values:
                             f = m.path
+                            map[m.op].append(f)
                             self._files.append(f)
-                            if m.op == 'COPY':
-                                added.append(f)
-                            elif m.op == 'RENAME':
-                                added.append(f)
-                                self._files.append(m.oldpath)
-                                removed.append(m.oldpath)
+                    elif state == 'file':
+                        type, path = get_path(values[0], values[1])
+                        self.curphunks[path] = hunks = []
+                        if path not in self._files:
+                            if type == 'M':
+                                modified.append(path)
+                            elif type == 'R':
+                                removed.append(path)
                             else:
-                                map[m.op].append(f)
-
+                                added.append(path)
+                            self._files.append(path)
+                    elif state == 'hunk':
+                        hunks.extend([l.rstrip('\r\n') for l in values.hunk])
+                    else:
+                        raise _('unknown hunk type: %s') % state
             except patch.NoHunks:
                 pass
         finally:

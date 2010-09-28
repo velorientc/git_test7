@@ -369,7 +369,9 @@ class RepoWidget(QWidget):
     def revision_clicked(self, rev):
         'User clicked on a repoview row'
         tw = self.taskTabsWidget
-        if rev is None:
+        if type(rev) == str: # unapplied patch
+            tw.setCurrentIndex(self.logTabIndex)
+        elif rev is None:
             tw.setCurrentIndex(self.commitTabIndex)
         elif tw.currentWidget() in (self.commitDemand, self.syncDemand):
             tw.setCurrentIndex(self.logTabIndex)
@@ -382,8 +384,8 @@ class RepoWidget(QWidget):
             # FIXME remove unapplied patch branch when
             # patches fully handled downstream
             self.revDetailsWidget.revision_selected(rev)
-            #self.manifestDemand.forward('setrev', rev)
-            # FIXME grep?
+            # grep and manifest are unlikely to ever be able to use a
+            # patch ctx
         else:
             self.revDetailsWidget.revision_selected(rev)
             self.manifestDemand.forward('setrev', rev)

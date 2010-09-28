@@ -305,11 +305,6 @@ class HgFileView(QFrame):
         else:
             ctx2 = None
 
-        # FIXME temporary bodge to stop patch files
-        # causing errors
-        if type(ctx.rev()) == str:
-            return
-
         fd = FileData(ctx, ctx2, filename, status)
 
         if fd.elabel:
@@ -555,6 +550,11 @@ class FileData(object):
         if isbfile(wfile):
             self.flabel += u'[bfile tracked] '
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
+
+        if type(ctx.rev()) == str:
+            chunks = ctx.thgmqpatchchunks(wfile)
+            self.diff = '\n'.join(chunks)
+            return
 
         if status is None:
             status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)

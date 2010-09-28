@@ -15,6 +15,7 @@ from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
 from tortoisehg.hgqt.revmessage import RevMessage
+from tortoisehg.hgqt import thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -290,17 +291,20 @@ class RevDetailsWidget(QWidget):
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def revision_selected(self, rev):
-        # TODO: handle rev == patch name
         self._last_rev = rev
-        ctx = self.repo.changectx(rev)
-        if len(self.filelistmodel):
-            self.filelist.selectRow(0)
-        self.fileview.setContext(ctx)
+        ctx = thgrepo.getcontext(self.repo, rev)
         self.revpanel.set_revision(rev)
         self.revpanel.update()
         self.message.displayRevision(ctx)
+        if type(ctx.rev()) == str:
+            self.actionDiffMode.setChecked(True)
+            self.actionDiffMode.setEnabled(False)
+        else:
+            self.actionDiffMode.setEnabled(True)
+        self.fileview.setContext(ctx)
         self.filelistmodel.setSelectedRev(ctx)
-
+        if len(self.filelistmodel):
+            self.filelist.selectRow(0)
         mode = self.getMode()
         self.actionAnnMode.setEnabled(mode != 'diff')
         self.actionNextDiff.setEnabled(mode != 'diff')
