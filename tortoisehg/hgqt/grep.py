@@ -123,6 +123,16 @@ class SearchWidget(QWidget):
             incle.setText(','.join(upats[1:]))
         chk.setChecked(opts.get('ignorecase', False))
 
+        repoid = str(repo[0])
+        s = QSettings()
+        sh = list(s.value('grep/search-'+repoid).toStringList())
+        ph = list(s.value('grep/paths-'+repoid).toStringList())
+        self.pathshistory = [p for p in ph if p]
+        self.searchhistory = [s for s in sh if s]
+        self.regexple.setCompleter(QCompleter(self.searchhistory, self))
+        self.incle.setCompleter(QCompleter(self.pathshistory, self))
+        self.excle.setCompleter(QCompleter(self.pathshistory, self))
+
         if parent:
             mainvbox.setContentsMargins(0, 0, 0, 0)
             self.closeonesc = False
@@ -133,6 +143,21 @@ class SearchWidget(QWidget):
             self.stbar = QStatusBar()
             mainvbox.addWidget(self.stbar)
             self.showMessage.connect(self.stbar.showMessage)
+
+    def addHistory(self, search, incpaths, excpaths):
+        if search:
+            usearch = hglib.tounicode(search)
+            if usearch in self.searchhistory:
+                self.searchhistory.remove(usearch)
+            self.searchhistory = [usearch] + self.searchhistory[:9]
+        for p in incpaths + excpaths:
+            up = hglib.tounicode(p)
+            if up in self.pathshistory:
+                self.pathshistory.remove(up)
+            self.pathshistory = [up] + self.pathshistory[:9]
+        self.regexple.setCompleter(QCompleter(self.searchhistory, self))
+        self.incle.setCompleter(QCompleter(self.pathshistory, self))
+        self.excle.setCompleter(QCompleter(self.pathshistory, self))
 
     def setRevision(self, rev):
         if isinstance(rev, basestring):  # unapplied patch
@@ -164,6 +189,12 @@ class SearchWidget(QWidget):
         else:
             return super(SearchWidget, self).keyPressEvent(event)
 
+    def closeEvent(self, event):
+        repoid = str(self.repo[0])
+        s = QSettings()
+        s.setValue('grep/search-'+repoid, self.searchhistory)
+        s.setValue('grep/paths-'+repoid, self.pathshistory)
+
     def searchActivated(self):
         'User pressed [Return] in QLineEdit'
         if self.thread and self.thread.isRunning():
@@ -191,6 +222,8 @@ class SearchWidget(QWidget):
         exc = hglib.fromunicode(self.excle.text())
         if exc: exc = exc.split(', ')
         rev = hglib.fromunicode(self.revle.text()).strip()
+
+        self.addHistory(pattern, inc or [], exc or [])
         if self.wctxradio.isChecked():
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
