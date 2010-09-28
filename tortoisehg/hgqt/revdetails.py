@@ -49,7 +49,7 @@ class RevDetailsWidget(QWidget):
 
         self.hbox = QHBoxLayout(self)
         self.hbox.setSpacing(0)
-        self.hbox.setMargin(0)
+        self.hbox.setContentsMargins(2, 2, 2, 2)
 
         self.setupRevisionDetailsWidget()
 

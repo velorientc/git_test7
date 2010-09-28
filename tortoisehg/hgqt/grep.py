@@ -134,7 +134,7 @@ class SearchWidget(QWidget):
         self.excle.setCompleter(QCompleter(self.pathshistory, self))
 
         if parent:
-            mainvbox.setContentsMargins(0, 0, 0, 0)
+            mainvbox.setContentsMargins(2, 2, 2, 2)
             self.closeonesc = False
         else:
             self.setWindowTitle(_('TortoiseHg Search'))

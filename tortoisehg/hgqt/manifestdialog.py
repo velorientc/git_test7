@@ -152,7 +152,7 @@ class ManifestWidget(QWidget):
         self.setLayout(QVBoxLayout())
         self._splitter = QSplitter()
         self.layout().addWidget(self._splitter)
-        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setContentsMargins(2, 2, 2, 2)
 
         navlayout = QVBoxLayout(spacing=0)
         navlayout.setContentsMargins(0, 0, 0, 0)

@@ -62,7 +62,7 @@ class CommitWidget(QWidget):
         self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(2, 2, 2, 2)
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
 

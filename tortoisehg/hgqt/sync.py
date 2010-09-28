@@ -52,7 +52,7 @@ class SyncWidget(QWidget):
         self.repo.configChanged.connect(self.configChanged)
 
         if embedded:
-            layout.setContentsMargins(0, 0, 0, 0)
+            layout.setContentsMargins(2, 2, 2, 2)
         else:
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
