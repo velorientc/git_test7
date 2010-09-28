@@ -22,7 +22,8 @@ else:
         sys.path.insert(0, thgpath)
 
     # compile .ui and .qrc for in-place use
-    if os.path.exists(os.path.join(os.path.dirname(__file__), 'setup.py')):
+    fpath = os.path.realpath(__file__)
+    if os.path.exists(os.path.join(os.path.dirname(fpath), 'setup.py')):
         from distutils.dist import Distribution
         from setup import build_qt
         build_qt(Distribution()).run()
