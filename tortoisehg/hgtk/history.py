@@ -989,6 +989,10 @@ class GLog(gdialog.GWindow):
                 self.graphview.set_property(col + '-column-visible', vis)
             if vis:
                 columns.append(col)
+            width = self.colwidths.get(col)
+            if width:
+                column = self.graphview.tvcolumns[col]
+                column.set_fixed_width(width)
         self.graphview.set_columns(columns)
 
         self.cmd_set_sensitive('compact-graph', self.graphcol)
@@ -1052,6 +1056,9 @@ class GLog(gdialog.GWindow):
         for col in [col for col in COLS.split() if col != 'graph']:
             vis = self.graphview.get_property(col + '-column-visible')
             settings['glog-vis-'+col] = vis
+        for col in COLS.split():
+            column = self.graphview.tvcolumns[col]
+            settings['glog-width-' + col] = column.get_width()
         settings['filter-mode'] = self.filtercombo.get_active()
         settings['column-order'] = self.column_order
         return settings
@@ -1078,6 +1085,9 @@ class GLog(gdialog.GWindow):
         for col in [col for col in COLS.split() if col != 'graph']:
             key = 'glog-vis-' + col
             self.showcol[col] = settings.get(key, col in DEFAULT_COLS)
+        self.colwidths = {}
+        for col in COLS.split():
+            self.colwidths[col] = settings.get('glog-width-' + col)
         self.filter_mode = settings.get('filter-mode', 1)
         order = settings.get('column-order', COLS)
         order_list, def_list = order.split(), COLS.split()
