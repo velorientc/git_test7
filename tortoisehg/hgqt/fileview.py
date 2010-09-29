@@ -86,6 +86,18 @@ class Annotator(qsci):
             idx = uniqrevs.index(rev)
             self.markerAdd(i, self.markers[idx % len(self.markers)])
 
+class FileDisplay(qsci):
+    escapePressed = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super(FileDisplay, self).__init__(parent)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.escapePressed.emit()
+            return
+        super(FileDisplay, self).keyPressEvent(event)
+
 class HgFileView(QFrame):
     """file diff and content viewer"""
 
@@ -94,6 +106,7 @@ class HgFileView(QFrame):
     fileDisplayed = pyqtSignal(str)
     showMessage = pyqtSignal(unicode)
     revForDiffChanged = pyqtSignal(int)
+    escapePressed = pyqtSignal()
     filled = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -124,7 +137,8 @@ class HgFileView(QFrame):
         framelayout.addLayout(self.topLayout)
         framelayout.addLayout(l, 1)
 
-        self.sci = qsci(self)
+        self.sci = FileDisplay(self)
+        self.sci.escapePressed.connect(self.escapePressed)
         self.sci.setFrameStyle(0)
         l.addWidget(self.sci, 1)
         #self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
