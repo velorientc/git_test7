@@ -49,7 +49,7 @@ class _ScriptLexerSelector(_FilenameLexerSelector):
     def match(self, filename, filedata):
         if super(_ScriptLexerSelector, self).match(filename, filedata):
             return True
-        if self.regex:
+        if self.regex and filedata:
             for line in filedata.splitlines()[:self.headersize]:
                 if len(line)<1000 and self.regex.match(line):
                     return True
