@@ -36,7 +36,7 @@ class HgDialogMixin(object):
 
     def load_config(self, ui):
         # TODO: connect to font changed signal
-        self._font = qtlib.getfont(ui, 'fontlog').font()
+        self._font = qtlib.getfont('fontlog').font()
         self.rowheight = 8
         self.users, self.aliases = [], []
 

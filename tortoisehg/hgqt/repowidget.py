@@ -193,7 +193,7 @@ class RepoWidget(QWidget):
         return gw
 
     def load_config(self):
-        self._font = getfont(self.repo.ui, 'fontlog')
+        self._font = getfont('fontlog').font()
         self.rowheight = 8
         self.users, self.aliases = [], []
         self.hidefinddelay = False

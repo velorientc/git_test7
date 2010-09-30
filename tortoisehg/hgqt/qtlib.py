@@ -202,11 +202,14 @@ _fontdefaults = {
     'fontlog': 'monospace,10'
 }
 _fontcache = {}
-def getfont(ui, name):
-    assert name in _fontdefaults
-    if name not in _fontcache:
+
+def initfontcache(ui):
+    for name in _fontdefaults:
         fname = ui.config('tortoisehg', name, _fontdefaults[name])
         _fontcache[name] = ThgFont(fname)
+
+def getfont(name):
+    assert name in _fontdefaults
     return _fontcache[name]
 
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Close,

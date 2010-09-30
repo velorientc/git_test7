@@ -44,7 +44,7 @@ class AnnotateView(QsciScintilla):
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
         self.setMouseTracking(True)
-        self.setFont(qtlib.getfont(ui.ui(), 'fontlog').font())
+        self.setFont(qtlib.getfont('fontlog').font())
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
         self._revs = []  # by line
@@ -201,8 +201,7 @@ class AnnotateView(QsciScintilla):
 
     def _updatelexer(self, fctx):
         """Update the lexer according to the given file"""
-        lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()),
-                               ui=self.repo.ui)
+        lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()))
         if lex:
             self.setLexer(lex)
 

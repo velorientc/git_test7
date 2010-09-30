@@ -334,12 +334,12 @@ class HgFileView(QFrame):
             return
 
         if self._mode == 'diff' and fd.diff:
-            lexer = get_diff_lexer(repo.ui)
+            lexer = get_diff_lexer()
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
             self.sci.setText(fd.diff)
         else:
-            lexer = get_lexer(filename, fd.contents, repo.ui)
+            lexer = get_lexer(filename, fd.contents)
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
             nlines = fd.contents.count('\n')

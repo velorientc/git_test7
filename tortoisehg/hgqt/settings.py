@@ -156,7 +156,7 @@ class FontEntry(QPushButton):
         QPushButton.focusInEvent(self, e)
 
     def on_clicked(self, checked):
-        thgf = qtlib.getfont(ui.ui(), self.fname)
+        thgf = qtlib.getfont(self.fname)
         dlg = QFontDialog(self)
         dlg.setCurrentFont(self.currentFont() or thgf.font())
         if dlg.exec_() == QDialog.Accepted:

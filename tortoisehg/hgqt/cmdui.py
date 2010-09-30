@@ -254,8 +254,7 @@ class LogWidget(QsciScintilla):
         self._initmarkers()
 
     def _initfont(self):
-        from mercurial import ui  # XXX workaround to pass fake ui obj
-        tf = qtlib.getfont(ui.ui(), 'fontlog')
+        tf = qtlib.getfont('fontlog')
         tf.changed.connect(lambda f: self.setFont(f))
         self.setFont(tf.font())
 

@@ -95,7 +95,7 @@ class CommitWidget(QWidget):
 
         msgte = QPlainTextEdit()
         msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
-        msgfont = qtlib.getfont(self.repo.ui, 'fontcomment')
+        msgfont = qtlib.getfont('fontcomment')
         msgte.setFont(msgfont.font())
         msgfont.changed.connect(lambda fnt: msgte.setFont(fnt))
         msgte.textChanged.connect(self.msgChanged)

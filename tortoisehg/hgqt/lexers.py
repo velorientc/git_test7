@@ -17,14 +17,14 @@ class _LexerSelector(object):
     def match(self, filename, filedata):
         return False
 
-    def lexer(self, ui):
+    def lexer(self):
         """
         Return a configured instance of the lexer
         """
-        return self.cfg_lexer(self._lexer(), ui)
+        return self.cfg_lexer(self._lexer())
 
-    def cfg_lexer(self, lexer, ui):
-        font = qtlib.getfont(ui, 'fontlog').font()
+    def cfg_lexer(self, lexer):
+        font = qtlib.getfont('fontlog').font()
         lexer.setFont(font, -1)
         return lexer
 
@@ -128,7 +128,7 @@ class DiffLexerSelector(_ScriptLexerSelector):
     extensions = ()
     _lexer = Qsci.QsciLexerDiff
     regex = re.compile(r'^@@ [-]\d+,\d+ [+]\d+,\d+ @@$')
-    def cfg_lexer(self, lexer, ui):
+    def cfg_lexer(self, lexer):
         #lexer.setDefaultPaper(QtGui.QColor(cfg.getDiffBGColor()))
         #lexer.setColor(QtGui.QColor(cfg.getDiffFGColor()), -1)
         for label, i in (('diff.inserted', 6),
@@ -138,7 +138,7 @@ class DiffLexerSelector(_ScriptLexerSelector):
             for e in effect.split(';'):
                 if e.startswith('color:'):
                     lexer.setColor(QColor(e[7:]), i)
-        font = qtlib.getfont(ui, 'fontdiff').font()
+        font = qtlib.getfont('fontdiff').font()
         lexer.setFont(font, -1)
         return lexer
 
@@ -151,11 +151,11 @@ for clsname, cls in globals().items():
         #print clsname
         lexers.append(cls())
 
-def get_diff_lexer(ui=None):
-    return DiffLexerSelector().lexer(ui)
+def get_diff_lexer():
+    return DiffLexerSelector().lexer()
 
-def get_lexer(filename, filedata, ui=None):
+def get_lexer(filename, filedata):
     for lselector in lexers:
         if lselector.match(filename, filedata):
-            return lselector.lexer(ui)
+            return lselector.lexer()
     return None

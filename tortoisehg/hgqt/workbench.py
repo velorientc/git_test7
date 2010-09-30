@@ -86,8 +86,7 @@ class Workbench(QMainWindow):
 
     def load_config(self, ui):
         # TODO: connect to font changed signal
-        font = getfont(ui, 'fontlog').font()
-        self._font = font
+        self._font = getfont('fontlog').font()
         self.rowheight = 8
         self.users, self.aliases = [], []
 

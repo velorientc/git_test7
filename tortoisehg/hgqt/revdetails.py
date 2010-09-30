@@ -160,7 +160,7 @@ class RevDetailsWidget(QWidget):
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
     def load_config(self):
-        self._font = getfont(self.repo.ui, 'fontlog').font()
+        self._font = getfont('fontlog').font()
         self.rowheight = 8
         self.users, self.aliases = [], []
 

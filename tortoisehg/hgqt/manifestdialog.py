@@ -81,7 +81,7 @@ class _FileTextView(QsciScintilla):
         self.setMarginLineNumbers(1, True)
         self.setMarginWidth(1, '000')
         self.setReadOnly(True)
-        self.setFont(qtlib.getfont(self._ui, 'fontlog').font())
+        self.setFont(qtlib.getfont('fontlog').font())
         self.setUtf8(True)
         self.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
 
@@ -105,7 +105,7 @@ class _FileTextView(QsciScintilla):
                 data = _("binary file")
             else:
                 data = tounicode(data)
-                lexer = get_lexer(path, data, ui=self._ui)
+                lexer = get_lexer(path, data)
                 if lexer:
                     self.setLexer(lexer)
         nlines = data.count('\n')
