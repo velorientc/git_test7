@@ -329,16 +329,9 @@ INFO = (
         _('Name associated with commits.  The common format is<br>'
           '"Full Name &lt;email@example.com&gt;"')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
-       _('Maximum length of the commit message summary line.'
-         ' If set, TortoiseHg will issue a warning if the'
-         ' summary line is too long or not separated by a'
-         ' blank line. Default: 0 (unenforced)')),
-    (_('Message Line Length'), 'tortoisehg.messagewrap', genIntEditCombo,
-       _('Word wrap length of the commit message.  If'
-         ' set, the popup menu can be used to format'
-         ' the message and a warning will be issued'
-         ' if any lines are too long at commit.'
-         '  Default: 0 (unenforced)')),
+       _('Suggested length of commit message lines. A red vertical'
+         ' line will mark this length.  CTRL-E will reflow the current'
+         ' paragraph to the specified line length. Default: 80')),
     (_('Close After Commit'), 'tortoisehg.closeci', genBoolCombo,
         _('Close the commit tool after every successful'
           ' commit.  Default: False')),
