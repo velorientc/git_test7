@@ -51,6 +51,7 @@ class StatusWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     escapePressed = pyqtSignal()
+    fileDisplayed = pyqtSignal(QString)
 
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
@@ -171,6 +172,7 @@ class StatusWidget(QWidget):
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.escapePressed.connect(self.escapePressed)
+        self.fileview.fileDisplayed.connect(self.fileDisplayed)
         self.fileview.setMode('diff')
         vbox.addWidget(self.fileview, 1)
 
