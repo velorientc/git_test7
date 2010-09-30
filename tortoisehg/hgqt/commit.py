@@ -31,6 +31,7 @@ class CommitWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     commitComplete = pyqtSignal()
+    escapePressed = pyqtSignal()
 
     progress = pyqtSignal(QString, object, QString, QString, object)
     output = pyqtSignal(QString, QString)
@@ -44,6 +45,7 @@ class CommitWidget(QWidget):
         self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)
+        self.stwidget.escapePressed.connect(self.escapePressed)
         self.msghistory = []
         self.qref = False
 
@@ -898,6 +900,7 @@ class CommitDialog(QDialog):
         commit.showMessage.connect(self.statusbar.showMessage)
         commit.progress.connect(self.statusbar.progress)
         commit.linkActivated.connect(self.linkActivated)
+        commit.escapePressed.connect(self.reject)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
