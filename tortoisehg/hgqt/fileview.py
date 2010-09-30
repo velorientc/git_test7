@@ -88,6 +88,7 @@ class Annotator(qsci):
 
 class FileDisplay(qsci):
     escapePressed = pyqtSignal()
+    refreshPressed = pyqtSignal()
 
     def __init__(self, parent=None):
         super(FileDisplay, self).__init__(parent)
@@ -95,6 +96,9 @@ class FileDisplay(qsci):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.escapePressed.emit()
+            return
+        if event.matches(QKeySequence.Refresh):
+            self.refreshPressed.emit()
             return
         super(FileDisplay, self).keyPressEvent(event)
 
@@ -107,6 +111,7 @@ class HgFileView(QFrame):
     showMessage = pyqtSignal(unicode)
     revForDiffChanged = pyqtSignal(int)
     escapePressed = pyqtSignal()
+    refreshPressed = pyqtSignal()
     filled = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -139,6 +144,7 @@ class HgFileView(QFrame):
 
         self.sci = FileDisplay(self)
         self.sci.escapePressed.connect(self.escapePressed)
+        self.sci.refreshPressed.connect(self.refreshPressed)
         self.sci.setFrameStyle(0)
         l.addWidget(self.sci, 1)
         #self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
