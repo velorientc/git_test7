@@ -129,9 +129,8 @@ class build_qt(Command):
 
         class _i18n_string(qtproxies.i18n_string):
             def __str__(self):
-                return "_('%s')" % (qtproxies.escape(self.string),)
-        if hasattr(qtproxies, "escape"):
-            qtproxies.i18n_string = _i18n_string
+                return "_('%s')" % self.string.encode('string-escape')
+        qtproxies.i18n_string = _i18n_string
 
         cls._wrappeduic = True
 
