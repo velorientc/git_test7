@@ -80,10 +80,13 @@ class ThgRepoWrapper(QObject):
             dbgoutput('no poll, busy', self.busycount)
 
     def pollStatus(self):
-        if os.path.exists(self.repo.path):
-            self._checkrepotime()
-            self._checkdirstate()
-            self._checkuimtime()
+        if not os.path.exists(self.repo.path):
+            return
+        if os.path.exists(self.repo.join('wlock')):
+            return
+        self._checkrepotime()
+        self._checkdirstate()
+        self._checkuimtime()
 
     def recordState(self):
         try:
