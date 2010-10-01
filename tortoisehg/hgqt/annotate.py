@@ -78,6 +78,7 @@ class AnnotateView(QsciScintilla):
         if rev != self._lastrev:
             self.revisionHint.emit(self._summaries[rev])
             self._lastrev = rev
+        QsciScintilla.mouseMoveEvent(self, event)
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
