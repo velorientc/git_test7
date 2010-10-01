@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import sys
 import shlex
 import time
@@ -404,6 +405,21 @@ def difftools(ui):
         tools[t] = [filemerge._findtool(ui, t), dopts, mopts]
     _difftools = tools
     return tools
+
+
+_funcre = re.compile('\w')
+def getchunkfunction(data, linenum):
+    """Return the function containing the chunk at linenum.
+
+    Stolen from mercurial/mdiff.py.
+    """
+    # Walk backwards starting from the line before the chunk
+    # to find a line starting with an alphanumeric char.
+    for x in xrange(int(linenum) - 2, -1, -1):
+        t = data[x].rstrip()
+        if _funcre.match(t):
+            return ' ' + t[:40]
+    return None
 
 
 def hgcmd_toq(q, label, args):

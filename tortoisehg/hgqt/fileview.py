@@ -19,6 +19,7 @@ Qt4 high level widgets for hg repo changelogs and filelogs
 
 import os
 import difflib
+import re
 
 from mercurial import hg, error, match, patch, subrepo, commands
 from mercurial import ui as uimod
@@ -34,6 +35,7 @@ from tortoisehg.hgqt.lexers import get_lexer, get_diff_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList
 
 qsci = Qsci.QsciScintilla
+chunkhdrre = re.compile('^@@ -(\d+).*@@$')
 
 def isbfile(filename):
     return filename and filename.startswith('.hgbfiles' + os.sep)
@@ -675,9 +677,19 @@ class FileData(object):
         self.olddata = olddata
         olddata = olddata.splitlines()
         newdata = newdata.splitlines()
-        gen = difflib.unified_diff(olddata, newdata, oldname, wfile)
+        gen = difflib.unified_diff(olddata, newdata, oldname, wfile,
+                                   lineterm='')
         data = []
-        for chunk in gen:
-            data.extend(chunk.splitlines())
+        if repo.ui.config('diff', 'showfunc'):
+            for chunkline in gen:
+                chunkhdr = chunkhdrre.match(chunkline)
+                if chunkhdr:
+                    func = hglib.getchunkfunction(olddata, chunkhdr.group(1))
+                    if func:
+                        chunkline += func
+                data.append(chunkline)
+        else:
+            for chunkline in gen:
+                data.append(chunkline)
         data = [hglib.tounicode(l) for l in data]
         self.diff = u'\n'.join(data[2:])
