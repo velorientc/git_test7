@@ -237,12 +237,16 @@ class Workbench(QMainWindow):
         # TODO: Use long names when these have icons
         self.actionIncoming = a = QAction(_('In'), self)
         a.setToolTip(_('Check for incoming changes from default pull target'))
+        a.setIcon(QIcon(":/icons/incoming.svg"))
         self.actionPull = a = QAction(_('Pull'), self)
         a.setToolTip(_('Pull incoming changes from default pull target'))
+        a.setIcon(QIcon(":/icons/pull.svg"))
         self.actionOutgoing = a = QAction(_('Out'), self)
         a.setToolTip(_('Detect outgoing changes to default push target'))
+        a.setIcon(QIcon(":/icons/outgoing.svg"))
         self.actionPush = a = QAction(_('Push'), self)
         a.setToolTip(_('Push outgoing changes to default push target'))
+        a.setIcon(QIcon(":/icons/push.svg"))
 
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)

@@ -43,5 +43,9 @@
     <file>icons/loadall.png</file>
     <file>icons/showlog.png</file>
     <file>icons/status.svg</file>
+    <file>icons/incoming.svg</file>
+    <file>icons/outgoing.svg</file>
+    <file>icons/pull.svg</file>
+    <file>icons/push.svg</file>
   </qresource>
 </RCC>
