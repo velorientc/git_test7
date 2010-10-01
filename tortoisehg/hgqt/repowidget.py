@@ -553,7 +553,7 @@ class RepoWidget(QWidget):
         realrev = not unappliedpatch and not workingdir
         normalrev = not patch and not workingdir
 
-        enabled = {'update': normalrev,
+        enabled = {'update': not unappliedpatch,
                    'manifest': not unappliedpatch,
                    'merge': normalrev,
                    'tag': normalrev,
