@@ -412,10 +412,7 @@ class CommitWidget(QWidget):
         return text
 
     def msgSelected(self, index):
-        # TODO: broken by QSci
-        return
-        doc = self.msgte.document()
-        if not doc.isEmpty() and doc.isModified():
+        if self.msgte.text() and self.msgte.isModified():
             d = QMessageBox.question(self, _('Confirm Discard Message'),
                         _('Discard current commit message?'),
                         QMessageBox.Ok | QMessageBox.Cancel)
