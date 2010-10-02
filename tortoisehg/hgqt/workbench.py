@@ -138,6 +138,10 @@ class Workbench(QMainWindow):
 
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
         a.setShortcut(QKeySequence.New)
+        
+        self.actionClone_repository = a = QAction(_("Clone Repository..."), self)
+        b = QKeySequence.keyBindings(QKeySequence.New)
+        a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
 
         self.actionOpen_repository = a = QAction(_("&Open Repository..."), self)
         a.setShortcut(QKeySequence.Open)
@@ -253,6 +257,7 @@ class Workbench(QMainWindow):
 
         self.menuFile = m = QMenu(_("&File"), self.menubar)
         m.addAction(self.actionNew_repository)
+        m.addAction(self.actionClone_repository)
         m.addAction(self.actionOpen_repository)
         m.addAction(self.actionClose_repository)
         m.addSeparator()
@@ -373,6 +378,7 @@ class Workbench(QMainWindow):
         self.actionShowLog.toggled.connect(self.showLog)
 
         self.actionNew_repository.triggered.connect(self.newRepository)
+        self.actionClone_repository.triggered.connect(self.cloneRepository)
         self.actionOpen_repository.triggered.connect(self.openRepository)
         self.actionClose_repository.triggered.connect(self.closeRepository)
         self.actionSettings.triggered.connect(self.editSettings)
@@ -650,6 +656,14 @@ class Workbench(QMainWindow):
         initdlg = InitDialog(parent=self)
         if initdlg.exec_():
             path = initdlg.getPath()
+            self.openRepo(path)
+
+    def cloneRepository(self):
+        """ Run clone dialog """
+        from tortoisehg.hgqt.clone import CloneDialog
+        clonedlg = CloneDialog(args=[], parent=self)
+        if clonedlg.exec_():
+            path = clonedlg.getDest()
             self.openRepo(path)
 
     def openRepository(self):
