@@ -186,7 +186,9 @@ class ImportDialog(QDialog):
             self.cslist.clear()
             self.import_btn.setDisabled(True)
         else:
-            self.cslist.update(self.repo, patches)
+            self.cslist.update(self.repo,
+                               [os.path.abspath(p) for p in patches])
+            # thgrepo.getcontext() requires files in full paths
             self.import_btn.setEnabled(True)
         self.updatestatus()
 
@@ -208,6 +210,11 @@ class ImportDialog(QDialog):
                     if os.path.isfile(_file) and not _file in files:
                         files.append(_file)
         return files
+
+    def setfilepaths(self, paths):
+        """Set file paths of patches to import; paths is in locale encoding"""
+        self.src_combo.setEditText(
+            os.pathsep.join(hglib.tounicode(p) for p in paths))
 
     def thgimport(self):
         hgcmd = 'import'
@@ -273,4 +280,6 @@ class ImportDialog(QDialog):
         self.cancel_btn.setDisabled(True)
 
 def run(ui, *pats, **opts):
-    return ImportDialog(opts=opts)
+    dlg = ImportDialog(opts=opts)
+    dlg.setfilepaths(pats)
+    return dlg
