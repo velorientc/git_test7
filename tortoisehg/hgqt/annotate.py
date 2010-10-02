@@ -252,7 +252,7 @@ class AnnotateView(QsciScintilla):
         pass # XXX
 
     def searchText(self, match, icase):
-        self.findFirst(match, True, icase, False, self.wrap)
+        self.findFirst(match, True, not icase, False, self.wrap)
 
     def setWrap(self, wrap):
         self.wrap = wrap
