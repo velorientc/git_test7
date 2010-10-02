@@ -368,7 +368,8 @@ class AnnotateDialog(QDialog):
 
     def searchAtRev(self, args):
         if self.searchwidget is None:
-            self.searchwidget = SearchWidget([args[0]], rev=args[1])
+            self.searchwidget = SearchWidget([args[0]], repo=self.repo,
+                                             rev=args[1])
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(args[0], rev=args[1])
@@ -376,7 +377,8 @@ class AnnotateDialog(QDialog):
 
     def searchAtParent(self, pattern):
         if self.searchwidget is None:
-            self.searchwidget = SearchWidget([pattern], rev='.')
+            self.searchwidget = SearchWidget([pattern], repo=self.repo,
+                                             rev='.')
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, rev='.')
@@ -384,7 +386,8 @@ class AnnotateDialog(QDialog):
 
     def searchAll(self, pattern):
         if self.searchwidget is None:
-            self.searchwidget = SearchWidget([pattern], all=True)
+            self.searchwidget = SearchWidget([pattern], repo=self.repo,
+                                             all=True)
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, all=True)
