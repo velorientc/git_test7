@@ -172,16 +172,13 @@ class AnnotateView(QsciScintilla):
         self.thread = None
 
     def fillModel(self, data):
-        revs, lines, lpos, sels, links = [], [], [], [], []
+        revs, lines, links = [], [], []
         sums = {}
-        pos = 0
         for fctx, origline, text in data:
             rev = fctx.linkrev()
             lines.append(text)
-            lpos.append(pos)
             revs.append(rev)
             links.append([fctx, origline])
-            pos += len(hglib.tounicode(text))
             if rev not in sums:
                 sums[rev] = hglib.get_revision_desc(fctx, self.annfile)
 
