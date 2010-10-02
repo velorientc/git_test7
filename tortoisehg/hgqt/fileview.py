@@ -109,7 +109,7 @@ class HgFileView(QFrame):
 
     showDescSignal = pyqtSignal(QString)
     linkActivated = pyqtSignal(QString)
-    fileDisplayed = pyqtSignal(str)
+    fileDisplayed = pyqtSignal(QString, QString)
     showMessage = pyqtSignal(unicode)
     revForDiffChanged = pyqtSignal(int)
     escapePressed = pyqtSignal()
@@ -297,14 +297,6 @@ class HgFileView(QFrame):
         self.extralabel.hide()
 
     def displayFile(self, filename=None, rev=None, status=None):
-        if self._mode == 'diff':
-            self.sci.setMarginLineNumbers(1, False)
-            self.sci.setMarginWidth(1, '')
-        else:
-            # margin 1 is used for line numbers
-            self.sci.setMarginLineNumbers(1, True)
-            self.sci.setMarginWidth(1, '000')
-
         if filename is None:
             filename = self._filename
             
@@ -320,6 +312,8 @@ class HgFileView(QFrame):
 
         self.clearDisplay()
         if filename is None:
+            self.sci.setMarginLineNumbers(1, False)
+            self.sci.setMarginWidth(1, '')
             return
 
         ctx = self._ctx
@@ -341,6 +335,8 @@ class HgFileView(QFrame):
         if not fd.isValid():
             self.ann.setVisible(False)
             self.sci.setText(fd.error)
+            self.sci.setMarginLineNumbers(1, False)
+            self.sci.setMarginWidth(1, '')
             return
 
         if self._mode == 'diff' and fd.diff:
@@ -348,18 +344,23 @@ class HgFileView(QFrame):
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
             self.sci.setText(fd.diff)
+            self.sci.setMarginLineNumbers(1, False)
+            self.sci.setMarginWidth(1, '')
         else:
             lexer = get_lexer(filename, fd.contents)
             self._cur_lexer = lexer # SJB - holding refcount?
             self.sci.setLexer(lexer)
             nlines = fd.contents.count('\n')
+            # margin 1 is used for line numbers
+            self.sci.setMarginLineNumbers(1, True)
             self.sci.setMarginWidth(1, str(nlines)+'0')
             self.sci.setText(fd.contents)
 
         if self._find_text:
             self.highlightSearchString(self._find_text)
 
-        self.fileDisplayed.emit(self._filename)
+        uf = hglib.tounicode(self._filename)
+        self.fileDisplayed.emit(uf, fd.contents)
         if self._mode != 'file':
             return
 
