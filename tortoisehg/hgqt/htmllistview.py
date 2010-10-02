@@ -113,6 +113,7 @@ class HTMLDelegate(QStyledItemDelegate):
                 ctx.palette.setCurrentColorGroup(QPalette.Active)
             else:
                 ctx.palette.setCurrentColorGroup(QPalette.Inactive)
+            ctx.palette.setBrush(QPalette.Text, ctx.palette.highlightedText())
         elif not option.state & QStyle.State_Enabled:
             ctx.palette.setCurrentColorGroup(QPalette.Disabled)
 
