@@ -89,12 +89,8 @@ class AnnotateView(QsciScintilla):
         fctx, line = self._links[line]
         data = [fctx.path(), fctx.linkrev(), line]
 
-        """ XXX context menu for selected text
-        c = self.textCursor()
-        selection = c.selection().toPlainText()
-        if selection and cursor.position() >= c.selectionStart() and \
-                cursor.position() <= c.selectionEnd():
-            selection = c.selection().toPlainText()
+        if self.hasSelectedText():
+            selection = self.selectedText()
             def sorig():
                 sdata = [selection, str(fctx.linkrev())]
                 self.searchAtRev.emit(sdata)
@@ -114,7 +110,6 @@ class AnnotateView(QsciScintilla):
                     action.triggered.connect(func)
                 add(name, func)
             return menu.exec_(point)
-        """
 
         def annorig():
             self.revSelected.emit(data)
