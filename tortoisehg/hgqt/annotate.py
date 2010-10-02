@@ -5,10 +5,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-import re
+import os, re
 
-from mercurial import ui, hg, error, commands, cmdutil, util
+from mercurial import ui, error, util
 
 from tortoisehg.hgqt import visdiff, qtlib, wctxactions, thgrepo, lexers
 from tortoisehg.util import paths, hglib, colormap
