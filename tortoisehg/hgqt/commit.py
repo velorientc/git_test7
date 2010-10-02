@@ -12,11 +12,12 @@ from mercurial.node import short as short_hex
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerMakefile
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, paths, wconfig
 
-from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanel
+from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanel, lexers
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
@@ -24,6 +25,56 @@ from tortoisehg.hgqt.sync import loadIniFile
 #  Need a unicode-to-UTF8 function
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
+
+class MessageEntry(QsciScintilla):
+    escapePressed = pyqtSignal()
+    refreshPressed = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super(MessageEntry, self).__init__(parent)
+        self.setEdgeColor(QColor('LightSalmon'))
+        self.setEdgeMode(QsciScintilla.EdgeLine)
+        self.setWrapMode(QsciScintilla.WrapNone)
+        self.setReadOnly(False)
+        self.setUtf8(True)
+        self.setMarginWidth(1, 0)
+        self.setFont(qtlib.getfont('fontcomment').font())
+        self.setCaretWidth(10)
+        self.setCaretLineBackgroundColor(QColor("#e6fff0"))
+        self.setCaretLineVisible(True)
+        self.setAutoIndent(True)
+        self.setAutoCompletionThreshold(2)
+        self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
+        self.setAutoCompletionFillupsEnabled(True)
+        self.setLexer(QsciLexerMakefile(self))
+        self.lexer().setFont(qtlib.getfont('fontcomment').font())
+        self.setMatchedBraceBackgroundColor(Qt.yellow)
+        self.setIndentationsUseTabs(False)
+        self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+        #self.setIndentationGuidesBackgroundColor(QColor("#e6e6de"))
+        #self.setFolding(QsciScintilla.BoxedFoldStyle)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+    def refresh(self, repo):
+        self.setEdgeColumn(repo.summarylen)
+        self.setIndentationWidth(repo.tabwidth)
+        self.setTabWidth(repo.tabwidth)
+        if repo.wsvisible == 'Visible':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
+        elif repo.wsvisible == 'VisibleAfterIndent':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
+        else:
+            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.escapePressed.emit()
+            return
+        if event.matches(QKeySequence.Refresh):
+            self.refreshPressed.emit()
+            return
+        super(MessageEntry, self).keyPressEvent(event)
 
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
@@ -48,6 +99,7 @@ class CommitWidget(QWidget):
         self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.escapePressed.connect(self.escapePressed)
         self.stwidget.refreshPressed.connect(self.refreshPressed)
+        self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
         self.qref = False
 
@@ -97,14 +149,12 @@ class CommitWidget(QWidget):
         self.pcsinfo = revpanel.ParentWidget(repo)
         vbox.addWidget(self.pcsinfo, 0)
 
-        msgte = QPlainTextEdit()
-        msgte.setLineWrapMode(QPlainTextEdit.NoWrap)
-        msgfont = qtlib.getfont('fontcomment')
-        msgte.setFont(msgfont.font())
-        msgfont.changed.connect(lambda fnt: msgte.setFont(fnt))
-        msgte.textChanged.connect(self.msgChanged)
-        msgte.setContextMenuPolicy(Qt.CustomContextMenu)
-        msgte.customContextMenuRequested.connect(self.menuRequested)
+        msgte = MessageEntry(self)
+        msgte.escapePressed.connect(self.escapePressed)
+        msgte.refreshPressed.connect(self.refreshPressed)
+        #msgte.textChanged.connect(self.msgChanged)
+        #msgte.setContextMenuPolicy(Qt.CustomContextMenu)
+        #msgte.customContextMenuRequested.connect(self.menuRequested)
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
 
@@ -127,10 +177,38 @@ class CommitWidget(QWidget):
 
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
-        msgte.setFocus()
-        # Yuki's Mockup: http://bitbucket.org/kuy/thg-qt/wiki/Home
         self.msgte = msgte
         self.msgcombo = msgcombo
+
+    @pyqtSlot(QString, QString)
+    def fileDisplayed(self, wfilestr, contents):
+        'Status widget is displaying a new file'
+        wfile = hglib.fromunicode(wfilestr)
+        contents = hglib.fromunicode(contents)
+        if not (wfile and contents):
+            return
+        self._apis = QsciAPIs(self.msgte.lexer())
+        tokens = set()
+        for wfile in self.stwidget.getChecked():
+            tokens.add(wfile)
+            tokens.add(os.path.basename(wfile))
+        try:
+            from pygments.lexers import guess_lexer_for_filename
+            from pygments.token import Token
+            lexer = guess_lexer_for_filename(wfile, contents)
+            for tokentype, value in lexer.get_tokens(contents):
+                if tokentype is Token.Name and len(value) > 4:
+                    tokens.add(value)
+        except (pygments.util.ClassNotFound, ImportError):
+            pass
+        for n in sorted(list(tokens)):
+            self._apis.add(n)
+        self._apis.apiPreparationFinished.connect(self.apiPrepFinished)
+        self._apis.prepare()
+
+    def apiPrepFinished(self):
+        'QsciAPIs has finished parsing displayed file'
+        self.msgte.lexer().setAPIs(self._apis)
 
     def details(self):
         dlg = DetailsDialog(self.opts, self.userhist, self)
@@ -168,6 +246,8 @@ class CommitWidget(QWidget):
             if self.qref:
                 self.endQRefreshMode()
 
+        self.msgte.refresh(self.repo)
+
         # Update message list
         self.msgcombo.reset(self.msghistory)
 
@@ -194,62 +274,25 @@ class CommitWidget(QWidget):
             return
         self.opts['user'] = qtip.user()
         self.opts['date'] = hglib.displaytime(qtip.date())
-        self.msgte.setPlainText(hglib.tounicode(qtip.description()))
-        self.msgte.document().setModified(False)
-        self.msgte.moveCursor(QTextCursor.End)
+        self.setMessage(hglib.tounicode(qtip.description()))
         self.qref = True
 
     def endQRefreshMode(self):
-        self.msgte.clear()
+        self.setMessage('')
         self.opts['user'] = ''
         self.opts['date'] = ''
         self.qref = False
-
-    def msgChanged(self):
-        text = self.msgte.toPlainText()
-        self.buttonHBox.setEnabled(not text.isEmpty())
-        sumlen, maxlen = self.getLengths()
-        if not sumlen and not maxlen:
-            self.msgte.setExtraSelections([])
-            return
-        pos, nextpos = 0, 0
-        sels = []
-        for i, line in enumerate(text.split('\n')):
-            length = len(line)
-            pos = nextpos
-            nextpos += length + 1 # include \n
-            if i == 0:
-                if length < sumlen or not sumlen:
-                    continue
-                pos += sumlen
-            elif i == 1:
-                if length == 0 or not sumlen:
-                    continue
-            else:
-                if length < maxlen or not maxlen:
-                    continue
-                pos += maxlen
-            sel = QTextEdit.ExtraSelection()
-            sel._bgcolor = QColor('LightSalmon')
-            sel._fgcolor = QColor('Black')
-            sel.format.setBackground(sel._bgcolor)
-            sel.format.setForeground(sel._fgcolor)
-            sel.cursor = QTextCursor(self.msgte.document())
-            sel.cursor.setPosition(pos)
-            sel.cursor.movePosition(QTextCursor.EndOfLine, QTextCursor.KeepAnchor)
-            sels.append(sel)
-        self.msgte.setExtraSelections(sels)
 
     def msgReflow(self):
         'User pressed Control-E, reflow current paragraph'
         if QApplication.focusWidget() != self.msgte:
             return
+        # TODO: broken by Qsci
+        return
         self.reflowBlock(self.msgte.textCursor().block())
 
     def reflowBlock(self, block):
-        sumlen, maxlen = self.getLengths()
-        if not maxlen:
-            return
+        sumlen = self.repo.summarylen
         # In QtTextDocument land, a block is a sequence of text ending
         # in (and including) a carriage return.  Aka, a line of text.
         while block.length() and block.previous().length() > 1:
@@ -271,7 +314,7 @@ class CommitWidget(QWidget):
         line = QStringList()
         partslen = 0
         for part in parts:
-            if partslen + len(line) + len(part) + 1 > maxlen:
+            if partslen + len(line) + len(part) + 1 > sumlen:
                 if line:
                     lines.append(line.join(' '))
                 line, partslen = QStringList(), 0
@@ -286,29 +329,29 @@ class CommitWidget(QWidget):
         return cursor.block()
 
     def menuRequested(self, point):
+        # TODO: broken by Qsci
+        return
         cursor = self.msgte.cursorForPosition(point)
         point = self.msgte.mapToGlobal(point)
 
         def apply():
-            sumlen, maxlen = self.getLengths()
-            if not maxlen:
-                return
+            # TODO: broken by Qsci
+            return
+            sumlen = self.repo.summarylen
             block = self.msgte.document().firstBlock()
             while block != self.msgte.document().end():
-                if block.length() > maxlen:
+                if block.length() > sumlen:
                     block = self.reflowBlock(block)
                 block = block.next()
         def paste():
+            # TODO: broken by Qsci
+            return
             files = self.stwidget.getChecked()
             cursor.insertText(', '.join(files))
         def settings():
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
-            self.repo.incrementBusyCount()
-            ret = dlg.exec_()
-            self.repo.decrementBusyCount()
-            if ret == QDialog.Accepted:
-                self.msgChanged()
+            dlg.exec_()
 
         menu = self.msgte.createStandardContextMenu()
         for name, func in [(_('Paste &Filenames'), paste),
@@ -319,14 +362,6 @@ class CommitWidget(QWidget):
                 action.triggered.connect(lambda: func())
             add(name, func)
         return menu.exec_(point)
-
-    def getLengths(self):
-        try:
-            sumlen = int(self.repo.ui.config('tortoisehg', 'summarylen', 0))
-            maxlen = int(self.repo.ui.config('tortoisehg', 'messagewrap', 0))
-        except (TypeError, ValueError):
-            sumlen, maxlen = 0, 0
-        return sumlen, maxlen
 
     def restoreState(self, data):
         return self.stwidget.restoreState(data)
@@ -369,7 +404,7 @@ class CommitWidget(QWidget):
         QTimer.singleShot(500, lambda: shlib.shell_notify([self.repo.root]))
 
     def getMessage(self):
-        text = self.msgte.toPlainText()
+        text = self.msgte.text()
         try:
             text = hglib.fromunicode(text, 'strict')
         except UnicodeEncodeError:
@@ -377,6 +412,8 @@ class CommitWidget(QWidget):
         return text
 
     def msgSelected(self, index):
+        # TODO: broken by QSci
+        return
         doc = self.msgte.document()
         if not doc.isEmpty() and doc.isModified():
             d = QMessageBox.question(self, _('Confirm Discard Message'),
@@ -384,10 +421,18 @@ class CommitWidget(QWidget):
                         QMessageBox.Ok | QMessageBox.Cancel)
             if d != QMessageBox.Ok:
                 return
-        self.msgte.setPlainText(self.msghistory[index])
-        self.msgte.document().setModified(False)
-        self.msgte.moveCursor(QTextCursor.End)
+        self.setMessage(self.msghistory[index])
         self.msgte.setFocus()
+
+    def setMessage(self, msg):
+        self.msgte.setText(msg)
+        lines = self.msgte.lines()
+        if lines:
+            lines -= 1
+            pos = self.msgte.lineLength(lines)
+            self.msgte.setCursorPosition(lines, pos)
+            self.msgte.ensureLineVisible(lines)
+        self.msgte.setModified(False)
 
     def canExit(self):
         # Usually safe to exit, since we're saving messages implicitly
@@ -407,9 +452,7 @@ class CommitWidget(QWidget):
         self.userhist = [u for u in self.userhist if u]
         try:
             curmsg = self.repo.opener('cur-message.txt').read()
-            self.msgte.setPlainText(hglib.tounicode(curmsg))
-            self.msgte.document().setModified(False)
-            self.msgte.moveCursor(QTextCursor.End)
+            self.setMessage(hglib.tounicode(curmsg))
         except EnvironmentError:
             pass
 
@@ -431,7 +474,7 @@ class CommitWidget(QWidget):
             pass
 
     def addMessageToHistory(self):
-        umsg = self.msgte.toPlainText()
+        umsg = self.msgte.text()
         if not umsg:
             return
         if umsg in self.msghistory:
@@ -592,7 +635,7 @@ class CommitWidget(QWidget):
             self.addMessageToHistory()
             if not self.qref:
                 self.msgte.clear()
-            self.msgte.document().setModified(False)
+            self.msgte.setModified(False)
             self.commitComplete.emit()
         self.stwidget.refreshWctx()
 
@@ -935,6 +978,7 @@ class CommitDialog(QDialog):
         self.commit = commit
         self.commit.reload()
         self.updateUndo()
+        self.commit.msgte.setFocus()
 
     def linkActivated(self, link):
         link = hglib.fromunicode(link)
