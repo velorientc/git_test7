@@ -11,6 +11,8 @@
 import binascii
 import os
 
+from mercurial import util
+
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgqt.i18n import _
@@ -41,7 +43,7 @@ class RepoWidget(QWidget):
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, repo, workbench):
-        QWidget.__init__(self)
+        QWidget.__init__(self, acceptDrops=True)
 
         self.repo = repo
         repo.repositoryChanged.connect(self.repositoryChanged)
@@ -257,15 +259,31 @@ class RepoWidget(QWidget):
                 act.triggered.connect(cb)
             self.addAction(act)
 
+    def dragEnterEvent(self, event):
+        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
+        if util.any(os.path.isfile(p) for p in paths):
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
+
+    def dropEvent(self, event):
+        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
+        filepaths = [p for p in paths if os.path.isfile(p)]
+        if filepaths:
+            self.thgimport(filepaths)
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
+
     def back(self):
         self.repoview.back()
 
     def forward(self):
         self.repoview.forward()
 
-    def thgimport(self):
+    def thgimport(self, paths=None):
         dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
         dlg.repoInvalidated.connect(self.reload)
+        if paths:
+            dlg.setfilepaths(paths)
         dlg.exec_()
 
     def verify(self):
