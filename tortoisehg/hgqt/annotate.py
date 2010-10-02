@@ -159,6 +159,7 @@ class AnnotateView(QsciScintilla):
         self.resumeline = line
         self.annfile = wfile
         self._updatelexer(fctx)
+        self.setText(hglib.tounicode(fctx.data()))
         self.loadBegin.emit()
         self.thread = AnnotateThread(fctx)
         self.thread.done.connect(self.finished)
@@ -172,17 +173,15 @@ class AnnotateView(QsciScintilla):
         self.thread = None
 
     def fillModel(self, data):
-        revs, lines, links = [], [], []
+        revs, links = [], []
         sums = {}
         for fctx, origline, text in data:
             rev = fctx.linkrev()
-            lines.append(text)
             revs.append(rev)
             links.append([fctx, origline])
             if rev not in sums:
                 sums[rev] = hglib.get_revision_desc(fctx, self.annfile)
 
-        self.setText(hglib.tounicode(''.join(lines)))
         self._revs = revs
         self._summaries = sums
         self._links = links
