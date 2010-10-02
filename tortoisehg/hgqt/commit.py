@@ -29,6 +29,7 @@ from tortoisehg.hgqt.sync import loadIniFile
 class MessageEntry(QsciScintilla):
     escapePressed = pyqtSignal()
     refreshPressed = pyqtSignal()
+    reflowPressed = pyqtSignal()
 
     def __init__(self, parent=None):
         super(MessageEntry, self).__init__(parent)
@@ -74,6 +75,8 @@ class MessageEntry(QsciScintilla):
         if event.matches(QKeySequence.Refresh):
             self.refreshPressed.emit()
             return
+        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
+            self.reflowPressed.emit()
         super(MessageEntry, self).keyPressEvent(event)
 
 class CommitWidget(QWidget):
@@ -152,9 +155,9 @@ class CommitWidget(QWidget):
         msgte = MessageEntry(self)
         msgte.escapePressed.connect(self.escapePressed)
         msgte.refreshPressed.connect(self.refreshPressed)
-        #msgte.textChanged.connect(self.msgChanged)
-        #msgte.setContextMenuPolicy(Qt.CustomContextMenu)
-        #msgte.customContextMenuRequested.connect(self.menuRequested)
+        msgte.reflowPressed.connect(self.reflowPressed)
+        msgte.setContextMenuPolicy(Qt.CustomContextMenu)
+        msgte.customContextMenuRequested.connect(self.menuRequested)
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
 
@@ -283,77 +286,67 @@ class CommitWidget(QWidget):
         self.opts['date'] = ''
         self.qref = False
 
-    def msgReflow(self):
+    def reflowPressed(self):
         'User pressed Control-E, reflow current paragraph'
-        if QApplication.focusWidget() != self.msgte:
-            return
-        # TODO: broken by Qsci
-        return
-        self.reflowBlock(self.msgte.textCursor().block())
+        line, col = self.msgte.getCursorPosition()
+        self.reflowBlock(line)
 
-    def reflowBlock(self, block):
-        sumlen = self.repo.summarylen
-        # In QtTextDocument land, a block is a sequence of text ending
-        # in (and including) a carriage return.  Aka, a line of text.
-        while block.length() and block.previous().length() > 1:
-            block = block.previous()
-        begin = block.position()
+    def reflowBlock(self, line):
+        lines = self.msgte.text().split('\n', QString.KeepEmptyParts)
+        if line >= len(lines):
+            return None
+        if not len(lines[line]) > 1:
+            return line+1
 
-        while block.length() and block.next().length() > 1:
-            block = block.next()
-        end = block.position() + block.length() - 1
-
-        # select the contiguous lines of text under the cursor
-        cursor = self.msgte.textCursor()
-        cursor.setPosition(begin, QTextCursor.MoveAnchor)
-        cursor.setPosition(end, QTextCursor.KeepAnchor)
-        sentence = cursor.selection().toPlainText().simplified()
-
+        # find boundaries (empty lines or bounds)
+        b = line
+        while b and len(lines[b-1]) > 1:
+            b = b - 1
+        e = line
+        while e+1 < len(lines) and len(lines[e+1]) > 1:
+            e = e + 1
+        group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
+        sentence = group.join(' ')
         parts = sentence.split(' ', QString.SkipEmptyParts)
-        lines = QStringList()
+
+        outlines = QStringList()
         line = QStringList()
         partslen = 0
         for part in parts:
-            if partslen + len(line) + len(part) + 1 > sumlen:
+            if partslen + len(line) + len(part) + 1 > self.repo.summarylen:
                 if line:
-                    lines.append(line.join(' '))
+                    outlines.append(line.join(' '))
                 line, partslen = QStringList(), 0
             line.append(part)
             partslen += len(part)
         if line:
-            lines.append(line.join(' '))
-        reflow = lines.join('\n')
+            outlines.append(line.join(' '))
 
-        # Replace selection with new sentence
-        cursor.insertText(reflow)
-        return cursor.block()
+        lines = lines[0:b] + outlines + lines[e+1:]
+        self.msgte.setText(lines.join('\n'))
+        self.msgte.setCursorPosition(e, 0)
+        return e+1
 
     def menuRequested(self, point):
-        # TODO: broken by Qsci
-        return
-        cursor = self.msgte.cursorForPosition(point)
+        line = self.msgte.lineAt(point)
         point = self.msgte.mapToGlobal(point)
 
         def apply():
-            # TODO: broken by Qsci
-            return
-            sumlen = self.repo.summarylen
-            block = self.msgte.document().firstBlock()
-            while block != self.msgte.document().end():
-                if block.length() > sumlen:
-                    block = self.reflowBlock(block)
-                block = block.next()
+            line = 0
+            while True:
+                line = self.reflowBlock(line)
+                if line is None:
+                    break;
         def paste():
-            # TODO: broken by Qsci
-            return
             files = self.stwidget.getChecked()
-            cursor.insertText(', '.join(files))
+            self.msgte.insert(', '.join(files))
         def settings():
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
             dlg.exec_()
 
-        menu = self.msgte.createStandardContextMenu()
+        #menu = self.msgte.createStandardContextMenu()
+        menu = QMenu()
         for name, func in [(_('Paste &Filenames'), paste),
                            (_('App&ly Format'), apply),
                            (_('C&onfigure Format'), settings)]:
@@ -641,8 +634,6 @@ class CommitWidget(QWidget):
             if event.modifiers() == Qt.ControlModifier:
                 self.commit()
             return
-        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
-            self.msgReflow()
         return super(CommitWidget, self).keyPressEvent(event)
 
 class MessageHistoryCombo(QComboBox):
