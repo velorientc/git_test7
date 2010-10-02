@@ -373,6 +373,7 @@ class AnnotateDialog(QDialog):
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(args[0], rev=args[1])
+            self.searchwidget.show()
             self.searchwidget.raise_()
 
     def searchAtParent(self, pattern):
@@ -382,6 +383,7 @@ class AnnotateDialog(QDialog):
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, rev='.')
+            self.searchwidget.show()
             self.searchwidget.raise_()
 
     def searchAll(self, pattern):
@@ -391,6 +393,7 @@ class AnnotateDialog(QDialog):
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, all=True)
+            self.searchwidget.show()
             self.searchwidget.raise_()
 
     def searchAnnotation(self, pattern):
