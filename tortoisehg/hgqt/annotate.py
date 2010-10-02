@@ -150,6 +150,7 @@ class AnnotateView(QsciScintilla):
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
             self.closeSelf.emit()
             return
+        self.clear()
         curdate = fctx.date()[0]
         basedate = repo.filectx(wfile, fileid=0).date()[0]
         agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
@@ -189,6 +190,11 @@ class AnnotateView(QsciScintilla):
         self._updaterevmargin()
         self._updatemarkers()
         self._updatemarginwidth()
+
+    def clear(self):
+        super(AnnotateView, self).clear()
+        self.clearMarginText()
+        self.markerDeleteAll()
 
     def _updatelexer(self, fctx):
         """Update the lexer according to the given file"""
