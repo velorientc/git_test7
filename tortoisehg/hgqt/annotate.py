@@ -252,7 +252,7 @@ class AnnotateView(QsciScintilla):
         pass # XXX
 
     def searchText(self, match, icase):
-        self.findFirst(match.pattern(), True, icase, False, self.wrap)
+        self.findFirst(match, True, icase, False, self.wrap)
 
     def setWrap(self, wrap):
         self.wrap = wrap
@@ -398,18 +398,7 @@ class AnnotateDialog(QDialog):
         pattern = hglib.fromunicode(self.le.text())
         if not pattern:
             return
-        try:
-            regexp = re.compile(pattern)
-        except Exception, inst:
-            msg = _('grep: invalid match pattern: %s\n') % inst
-            self.status.setText(hglib.tounicode(msg))
-        if self.chk.isChecked():
-            regexp = QRegExp(pattern, Qt.CaseInsensitive)
-            icase = True
-        else:
-            icase = False
-            regexp = QRegExp(pattern, Qt.CaseSensitive)
-        self.av.searchText(regexp, icase)
+        self.av.searchText(pattern, icase=self.chk.isChecked())
 
     def wheelEvent(self, event):
         if self.childAt(event.pos()) != self.le:
