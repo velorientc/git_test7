@@ -52,7 +52,7 @@ class StatusWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     escapePressed = pyqtSignal()
     refreshPressed = pyqtSignal()
-    fileDisplayed = pyqtSignal(QString)
+    fileDisplayed = pyqtSignal(QString, QString)
 
     def __init__(self, pats, opts, root=None, parent=None):
         QWidget.__init__(self, parent)
