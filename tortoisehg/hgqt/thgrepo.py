@@ -396,7 +396,10 @@ def _extendrepo(repo):
 
 
 def getcontext(repo, target):
-    """Return a context, either from the repo or for a patch."""
+    """Return a context, either from the repo or for a patch.
+
+    patch target must be specified in full-path.
+    """
     if target is None:
         if repo is None:
             return None
@@ -405,6 +408,7 @@ def getcontext(repo, target):
     if type(target) is int:
         return repo.changectx(target)
     ctx = PatchContext(repo, target)
+    # XXX: ambiguos if target is like a path but a tag name
     if ctx is None:
         ctx = repo.changectx(target)
     return ctx
