@@ -5,10 +5,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-import re
+import os, re
 
-from mercurial import ui, hg, error, commands, cmdutil, util
+from mercurial import ui, error, util
 
 from tortoisehg.hgqt import visdiff, qtlib, wctxactions, thgrepo, lexers
 from tortoisehg.util import paths, hglib, colormap
@@ -90,12 +89,8 @@ class AnnotateView(QsciScintilla):
         fctx, line = self._links[line]
         data = [fctx.path(), fctx.linkrev(), line]
 
-        """ XXX context menu for selected text
-        c = self.textCursor()
-        selection = c.selection().toPlainText()
-        if selection and cursor.position() >= c.selectionStart() and \
-                cursor.position() <= c.selectionEnd():
-            selection = c.selection().toPlainText()
+        if self.hasSelectedText():
+            selection = self.selectedText()
             def sorig():
                 sdata = [selection, str(fctx.linkrev())]
                 self.searchAtRev.emit(sdata)
@@ -115,7 +110,6 @@ class AnnotateView(QsciScintilla):
                     action.triggered.connect(func)
                 add(name, func)
             return menu.exec_(point)
-        """
 
         def annorig():
             self.revSelected.emit(data)
@@ -258,7 +252,7 @@ class AnnotateView(QsciScintilla):
         pass # XXX
 
     def searchText(self, match, icase):
-        self.findFirst(match.pattern(), True, icase, False, self.wrap)
+        self.findFirst(match, True, not icase, False, self.wrap)
 
     def setWrap(self, wrap):
         self.wrap = wrap
@@ -374,26 +368,32 @@ class AnnotateDialog(QDialog):
 
     def searchAtRev(self, args):
         if self.searchwidget is None:
-            self.searchwidget = SearchWidget([args[0]], rev=args[1])
+            self.searchwidget = SearchWidget([args[0]], repo=self.repo,
+                                             rev=args[1])
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(args[0], rev=args[1])
+            self.searchwidget.show()
             self.searchwidget.raise_()
 
     def searchAtParent(self, pattern):
         if self.searchwidget is None:
-            self.searchwidget = SearchWidget([pattern], rev='.')
+            self.searchwidget = SearchWidget([pattern], repo=self.repo,
+                                             rev='.')
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, rev='.')
+            self.searchwidget.show()
             self.searchwidget.raise_()
 
     def searchAll(self, pattern):
         if self.searchwidget is None:
-            self.searchwidget = SearchWidget([pattern], all=True)
+            self.searchwidget = SearchWidget([pattern], repo=self.repo,
+                                             all=True)
             self.searchwidget.show()
         else:
             self.searchwidget.setSearch(pattern, all=True)
+            self.searchwidget.show()
             self.searchwidget.raise_()
 
     def searchAnnotation(self, pattern):
@@ -404,18 +404,7 @@ class AnnotateDialog(QDialog):
         pattern = hglib.fromunicode(self.le.text())
         if not pattern:
             return
-        try:
-            regexp = re.compile(pattern)
-        except Exception, inst:
-            msg = _('grep: invalid match pattern: %s\n') % inst
-            self.status.setText(hglib.tounicode(msg))
-        if self.chk.isChecked():
-            regexp = QRegExp(pattern, Qt.CaseInsensitive)
-            icase = True
-        else:
-            icase = False
-            regexp = QRegExp(pattern, Qt.CaseSensitive)
-        self.av.searchText(regexp, icase)
+        self.av.searchText(pattern, icase=self.chk.isChecked())
 
     def wheelEvent(self, event):
         if self.childAt(event.pos()) != self.le:
