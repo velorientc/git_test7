@@ -50,6 +50,9 @@ class ManifestDialog(QMainWindow):
             self._manifest_widget.searchText)
         self.addToolBar(self._searchbar)
 
+        self.setStatusBar(QStatusBar())
+        self._manifest_widget.revisionHint.connect(self.statusBar().showMessage)
+
         self._readsettings()
         self._updatewindowtitle()
 
@@ -89,6 +92,9 @@ class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
     revchanged = pyqtSignal(object)  # emit when curret revision changed
 
+    revisionHint = pyqtSignal(unicode)
+    """Emitted when to show revision summary as a hint"""
+
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
         self._ui = ui
@@ -127,6 +133,7 @@ class ManifestWidget(QWidget):
         self._fileview = annotate.AnnotateView(self._repo)
         self._contentview.addWidget(self._fileview)
         self._fileview.revSelected.connect(lambda a: self.setSource(*a[:2]))
+        self._fileview.revisionHint.connect(self.revisionHint)
         self._contentview.currentChanged.connect(
             lambda: self._fileselected(self._treeview.currentIndex()))
 

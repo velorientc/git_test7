@@ -166,6 +166,7 @@ class RepoWidget(QWidget):
         self.repoview.revisionClicked.connect(lambda rev:
                            w.setrev(filterrev(rev)))
         w.revchanged.connect(self.repoview.goto)
+        w.revisionHint.connect(self.showMessage)
         return w
 
     def createSyncWidget(self):
