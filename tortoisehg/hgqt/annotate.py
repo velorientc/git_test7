@@ -28,12 +28,12 @@ class AnnotateView(QsciScintilla):
     loadComplete = pyqtSignal()
 
     revisionHint = pyqtSignal(QString)
-    searchAtParent = pyqtSignal(QString)
-    searchAll = pyqtSignal(QString)
     searchAnnotation = pyqtSignal(QString)
-    searchAtRev = pyqtSignal(object)
     revSelected = pyqtSignal(object)
     editSelected = pyqtSignal(object)
+
+    grepRequested = pyqtSignal(QString, dict)
+    """Emitted (pattern, **opts) when user request to search changelog"""
 
     sourceChanged = pyqtSignal(unicode, object)
     """Emitted (path, rev) when the content source changed"""
@@ -101,20 +101,17 @@ class AnnotateView(QsciScintilla):
 
         if self.hasSelectedText():
             selection = self.selectedText()
-            def sorig():
-                sdata = [selection, str(fctx.linkrev())]
-                self.searchAtRev.emit(sdata)
-            def sctx():
-                self.searchAtParent.emit(selection)
-            def searchall():
-                self.searchAll.emit(selection)
+            def sreq(**opts):
+                return lambda: self.grepRequested.emit(selection, opts)
             def sann():
                 self.searchAnnotation.emit(selection)
             menu.addSeparator()
-            for name, func in [(_('Search in original revision'), sorig),
-                               (_('Search in working revision'), sctx),
+            for name, func in [(_('Search in original revision'),
+                                sreq(rev=fctx.linkrev())),
+                               (_('Search in working revision'),
+                                sreq(rev='.')),
                                (_('Search in current annotation'), sann),
-                               (_('Search in history'), searchall)]:
+                               (_('Search in history'), sreq(all=True))]:
                 def add(name, func):
                     action = menu.addAction(name)
                     action.triggered.connect(func)
@@ -438,9 +435,7 @@ class AnnotateDialog(QMainWindow):
         av.revisionHint.connect(status.showMessage)
         av.revSelected.connect(lambda data: self.av.setSource(*data))
         av.editSelected.connect(self.editSelected)
-        av.searchAtRev.connect(self.searchAtRev)
-        av.searchAtParent.connect(self.searchAtParent)
-        av.searchAll.connect(self.searchAll)
+        av.grepRequested.connect(self._openSearchWidget)
         av.searchAnnotation.connect(self.searchAnnotation)
 
         self._searchbar = SearchToolBar()
@@ -482,33 +477,15 @@ class AnnotateDialog(QMainWindow):
         files = [os.path.join(base, wfile)]
         wctxactions.edit(self, repo.ui, repo, files, line, pattern)
 
-    def searchAtRev(self, args):
-        if self.searchwidget is None:
-            self.searchwidget = SearchWidget([args[0]], repo=self.repo,
-                                             rev=args[1])
-            self.searchwidget.show()
-        else:
-            self.searchwidget.setSearch(args[0], rev=args[1])
-            self.searchwidget.show()
-            self.searchwidget.raise_()
-
-    def searchAtParent(self, pattern):
+    @pyqtSlot(unicode, dict)
+    def _openSearchWidget(self, pattern, opts):
+        opts = dict((str(k), str(v)) for k, v in opts.iteritems())
         if self.searchwidget is None:
             self.searchwidget = SearchWidget([pattern], repo=self.repo,
-                                             rev='.')
+                                             **opts)
             self.searchwidget.show()
         else:
-            self.searchwidget.setSearch(pattern, rev='.')
-            self.searchwidget.show()
-            self.searchwidget.raise_()
-
-    def searchAll(self, pattern):
-        if self.searchwidget is None:
-            self.searchwidget = SearchWidget([pattern], repo=self.repo,
-                                             all=True)
-            self.searchwidget.show()
-        else:
-            self.searchwidget.setSearch(pattern, all=True)
+            self.searchwidget.setSearch(pattern, **opts)
             self.searchwidget.show()
             self.searchwidget.raise_()
 
