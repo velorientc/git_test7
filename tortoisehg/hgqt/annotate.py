@@ -48,6 +48,7 @@ class AnnotateView(QsciScintilla):
         self.customContextMenuRequested.connect(self.menuRequest)
 
         self.repo = repo
+        self._rev = None
 
         self._revs = []  # by line
         self._links = []  # by line
@@ -143,16 +144,23 @@ class AnnotateView(QsciScintilla):
                 add(name, func)
         menu.exec_(point)
 
-    def annotateFileAtRev(self, ctx, wfile, line=None):
+    @property
+    def rev(self):
+        """Returns the current revision number"""
+        return self._rev
+
+    def annotateFileAtRev(self, wfile, rev, line=None):
         if self.thread is not None:
             return
         try:
+            ctx = self.repo[rev]
             fctx = ctx[wfile]
         except error.LookupError:
             qtlib.ErrorMsgBox(_('Unable to annotate'),
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
             self.closeSelf.emit()
             return
+        self._rev = ctx.rev()
         self.clear()
         curdate = fctx.date()[0]
         basedate = self.repo.filectx(wfile, fileid=0).date()[0]
@@ -366,16 +374,9 @@ class AnnotateDialog(QDialog):
         line = opts.get('line')
         if line and isinstance(line, str):
             line = int(line)
-        try:
-            ctx = repo[opts.get('rev') or '.']
-            fctx = ctx[pats[0]] # just for validation
-        except Exception, e:
-            self.status.setText(hglib.tounicode(str(e)))
-            self.close()
-            return
 
-        av.annotateFileAtRev(ctx, pats[0], line)
-        self.setWindowTitle(_('Annotate %s@%d') % (pats[0], ctx.rev()))
+        av.annotateFileAtRev(pats[0], opts.get('rev') or '.', line)
+        self.setWindowTitle(_('Annotate %s@%d') % (pats[0], av.rev))
         self.repo = repo
 
         self.restoreSettings()
@@ -385,15 +386,9 @@ class AnnotateDialog(QDialog):
         QTimer.singleShot(0, self.reject)
 
     def revSelected(self, args):
-        repo = self.repo
         wfile, rev, line = args
-        try:
-            ctx = repo[rev]
-            fctx = ctx[wfile]
-        except Exception, e:
-            self.status.setText(hglib.tounicode(str(e)))
-        self.av.annotateFileAtRev(ctx, wfile, line)
-        self.setWindowTitle(_('Annotate %s@%d') % (wfile, ctx.rev()))
+        self.av.annotateFileAtRev(wfile, rev, line)
+        self.setWindowTitle(_('Annotate %s@%d') % (wfile, self.av.rev))
 
     def editSelected(self, args):
         pattern = hglib.fromunicode(self.le.text()) or None

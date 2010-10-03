@@ -115,12 +115,10 @@ class _FileTextView(QsciScintilla):
 class _FileAnnotateView(annotate.AnnotateView):
     def __init__(self, ui, repo, parent=None):
         super(_FileAnnotateView, self).__init__(repo, parent)
-        self._ui = ui
 
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):
-        ctx = self.repo[rev]
-        self.annotateFileAtRev(ctx, path)
+        self.annotateFileAtRev(path, rev)
 
 class _NullView(QWidget):
     """empty widget for content view"""
