@@ -275,12 +275,17 @@ class AnnotateView(QsciScintilla):
         """Style for margin area"""
         s = QsciStyle()
         s.setPaper(QApplication.palette().color(QPalette.Window))
+        s.setFont(self.font())
 
         # Workaround to set style of the current sci widget.
         # QsciStyle sends style data only to the first sci widget.
         # See qscintilla2/Qt4/qscistyle.cpp
         self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
                            s.style(), s.paper())
+        self.SendScintilla(QsciScintilla.SCI_STYLESETFONT,
+                           s.style(), s.font().family().toAscii().data())
+        self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE,
+                           s.style(), s.font().pointSize())
         return s
 
     @pyqtSlot()
