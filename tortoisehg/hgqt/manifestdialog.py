@@ -22,15 +22,12 @@ from mercurial import util
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciScintilla
 
 from tortoisehg.util import paths
-from tortoisehg.util.hglib import tounicode
 
 from tortoisehg.hgqt import qtlib, annotate, status, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.manifestmodel import ManifestModel
-from tortoisehg.hgqt.lexers import get_lexer
 
 class ManifestDialog(QMainWindow):
     """
@@ -72,62 +69,13 @@ class ManifestDialog(QMainWindow):
         s.setValue('manifest/splitter',
                    self._manifest_widget._splitter.saveState())
 
-class _FileTextView(QsciScintilla):
-    def __init__(self, ui, repo, parent=None):
-        super(_FileTextView, self).__init__(parent)
-        self._ui = ui
-        self._repo = repo
-
-        self.setMarginLineNumbers(1, True)
-        self.setMarginWidth(1, '000')
-        self.setReadOnly(True)
-        self.setFont(qtlib.getfont('fontlog').font())
-        self.setUtf8(True)
-        self.SendScintilla(QsciScintilla.SCI_SETSELEOLFILLED, True)
-
-        self.setTabWidth(repo.tabwidth)
-        if repo.wsvisible == 'Visible':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
-        elif repo.wsvisible == 'VisibleAfterIndent':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
-        else:
-            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
-
-    @pyqtSlot(unicode, object)
-    def setsource(self, path, rev):
-        fc = self._repo.changectx(rev).filectx(path)
-        if fc.size() > self._repo.maxdiff:
-            data = _("file too big")
-        else:
-            # return the whole file
-            data = fc.data()
-            if util.binary(data):
-                data = _("binary file")
-            else:
-                data = tounicode(data)
-                lexer = get_lexer(path, data)
-                if lexer:
-                    self.setLexer(lexer)
-        nlines = data.count('\n')
-        self.setMarginWidth(1, str(nlines)+'00')
-        self.setText(data)
-
-class _FileAnnotateView(annotate.AnnotateView):
-    def __init__(self, ui, repo, parent=None):
-        super(_FileAnnotateView, self).__init__(repo, parent,
-                                                annotationEnabled=True)
-
-    @pyqtSlot(unicode, object)
-    def setsource(self, path, rev):
-        self.setSource(path, rev)
-
 class _NullView(QWidget):
     """empty widget for content view"""
     def __init__(self, parent=None):
         super(_NullView, self).__init__(parent)
 
     @pyqtSlot(unicode, object)
-    def setsource(self, path, rev):
+    def setSource(self, path, rev):
         pass
 
 class ManifestWidget(QWidget):
@@ -143,7 +91,6 @@ class ManifestWidget(QWidget):
         self._initwidget()
         self._initactions()
         self._setupmodel()
-        self.setfileview('cat')
         self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
 
     def _initwidget(self):
@@ -170,15 +117,9 @@ class ManifestWidget(QWidget):
 
         self._nullcontent = _NullView()
         self._contentview.addWidget(self._nullcontent)
-        self._filewidgets = {
-            'cat': _FileTextView(self._ui, self._repo),
-            'annotate': _FileAnnotateView(self._ui, self._repo),
-            }
-        for w in self._filewidgets.itervalues():
-            self._contentview.addWidget(w)
-        # TODO: abstract way to connect this kind of signals
-        self._filewidgets['annotate'].revSelected.connect(
-            lambda a: self.setsource(path=a[0], rev=a[1]))
+        self._fileview = annotate.AnnotateView(self._repo)
+        self._contentview.addWidget(self._fileview)
+        self._fileview.revSelected.connect(lambda a: self.setsource(*a[:2]))
         self._contentview.currentChanged.connect(
             lambda: self._fileselected(self._treeview.currentIndex()))
 
@@ -188,7 +129,7 @@ class ManifestWidget(QWidget):
 
         self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
         self._action_annotate_mode.toggled.connect(
-            lambda checked: self.setfileview(checked and 'annotate' or 'cat'))
+            self._fileview.setAnnotationEnabled)
         self._toolbar.addAction(self._action_annotate_mode)
 
     @property
@@ -253,15 +194,8 @@ class ManifestWidget(QWidget):
             self._contentview.setCurrentWidget(self._nullcontent)
             return
 
-        self._contentview.setCurrentWidget(self._curfileview)
-        self._contentview.currentWidget().setsource(path, self._rev)
-
-    @pyqtSlot(unicode)
-    def setfileview(self, mode):
-        """Change widget for file content view"""
-        assert mode in self._filewidgets
-        self._curfileview = self._filewidgets[mode]
-        self._contentview.setCurrentWidget(self._curfileview)
+        self._contentview.setCurrentWidget(self._fileview)
+        self._contentview.currentWidget().setSource(path, self._rev)
 
 # TODO: share this menu with status widget?
 class _StatusFilterButton(QToolButton):
