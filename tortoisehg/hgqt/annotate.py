@@ -36,6 +36,9 @@ class AnnotateView(QsciScintilla):
     revSelected = pyqtSignal(object)
     editSelected = pyqtSignal(object)
 
+    sourceChanged = pyqtSignal(unicode, object)
+    """Emitted (path, rev) when the content source changed"""
+
     def __init__(self, repo, parent=None):
         super(AnnotateView, self).__init__(parent)
         self.setReadOnly(True)
@@ -173,6 +176,7 @@ class AnnotateView(QsciScintilla):
         self.annfile = wfile
         self._updatelexer(fctx)
         self.setText(hglib.tounicode(fctx.data()))
+        self.sourceChanged.emit(wfile, self._rev)
         self.loadBegin.emit()
         self.thread = AnnotateThread(fctx)
         self.thread.done.connect(self.finished)
@@ -358,7 +362,7 @@ class AnnotateDialog(QDialog):
         status = QLabel()
         mainvbox.addWidget(status)
         av.revisionHint.connect(status.setText)
-        av.revSelected.connect(self.revSelected)
+        av.revSelected.connect(lambda data: self.av.setSource(*data))
         av.editSelected.connect(self.editSelected)
         av.searchAtRev.connect(self.searchAtRev)
         av.searchAtParent.connect(self.searchAtParent)
@@ -369,6 +373,8 @@ class AnnotateDialog(QDialog):
         self.le.textChanged.connect(self.highlightText)
         self.chk.toggled.connect(self.highlightText)
         self.le.textChanged.connect(lambda s: bt.setEnabled(bool(s)))
+        self.av.sourceChanged.connect(
+            lambda *args: self.setWindowTitle(_('Annotate %s@%d') % args))
 
         self.status = status
         self.searchwidget = opts.get('searchwidget')
@@ -379,7 +385,6 @@ class AnnotateDialog(QDialog):
             line = int(line)
 
         av.setSource(hglib.tounicode(pats[0]), opts.get('rev') or '.', line)
-        self.setWindowTitle(_('Annotate %s@%d') % (pats[0], av.rev))
         self.repo = repo
 
         self.restoreSettings()
@@ -387,11 +392,6 @@ class AnnotateDialog(QDialog):
     def closeSelf(self):
         self.close()
         QTimer.singleShot(0, self.reject)
-
-    def revSelected(self, args):
-        wfile, rev, line = args
-        self.av.setSource(wfile, rev, line)
-        self.setWindowTitle(_('Annotate %s@%d') % (wfile, self.av.rev))
 
     def editSelected(self, args):
         pattern = hglib.fromunicode(self.le.text()) or None
