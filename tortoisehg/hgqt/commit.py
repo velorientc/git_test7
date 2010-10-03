@@ -425,6 +425,8 @@ class CommitWidget(QWidget):
             pos = self.msgte.lineLength(lines)
             self.msgte.setCursorPosition(lines, pos)
             self.msgte.ensureLineVisible(lines)
+            hs = self.msgte.horizontalScrollBar()
+            hs.setSliderPosition(0)
         self.msgte.setModified(False)
 
     def canExit(self):
