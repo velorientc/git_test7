@@ -322,10 +322,13 @@ class CommitWidget(QWidget):
         if line:
             outlines.append(line.join(' '))
 
-        lines = lines[0:b] + outlines + lines[e+1:]
-        self.msgte.setText(lines.join('\n'))
-        self.msgte.setCursorPosition(e, 0)
-        return e+1
+        self.msgte.beginUndoAction()
+        self.msgte.setSelection(b, 0, e+1, 0)
+        self.msgte.removeSelectedText()
+        self.msgte.insertAt(outlines.join('\n')+'\n', b, 0)
+        self.msgte.endUndoAction()
+        self.msgte.setCursorPosition(b, 0)
+        return b + len(outlines) + 1
 
     def menuRequested(self, point):
         line = self.msgte.lineAt(point)
