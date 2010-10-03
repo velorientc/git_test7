@@ -28,7 +28,10 @@ class AnnotateView(QsciScintilla):
     loadComplete = pyqtSignal()
 
     revisionHint = pyqtSignal(QString)
-    searchAnnotation = pyqtSignal(QString)
+
+    searchRequested = pyqtSignal(QString)
+    """Emitted (pattern) when user request to search content"""
+
     revSelected = pyqtSignal(object)
     editSelected = pyqtSignal(object)
 
@@ -104,7 +107,7 @@ class AnnotateView(QsciScintilla):
             def sreq(**opts):
                 return lambda: self.grepRequested.emit(selection, opts)
             def sann():
-                self.searchAnnotation.emit(selection)
+                self.searchRequested.emit(selection)
             menu.addSeparator()
             for name, func in [(_('Search in original revision'),
                                 sreq(rev=fctx.linkrev())),
@@ -418,6 +421,12 @@ class SearchToolBar(QToolBar):
     def setWrapAround(self, wrap):
         self._wrapchk.setChecked(wrap)
 
+    @pyqtSlot(unicode)
+    def search(self, text):
+        """Request search with the given pattern"""
+        self.setPattern(text)
+        self._emitSearchRequested()
+
 class AnnotateDialog(QMainWindow):
     def __init__(self, *pats, **opts):
         super(AnnotateDialog,self).__init__(opts.get('parent'), Qt.Window)
@@ -436,13 +445,13 @@ class AnnotateDialog(QMainWindow):
         av.revSelected.connect(lambda data: self.av.setSource(*data))
         av.editSelected.connect(self.editSelected)
         av.grepRequested.connect(self._openSearchWidget)
-        av.searchAnnotation.connect(self.searchAnnotation)
 
         self._searchbar = SearchToolBar()
         self.addToolBar(self._searchbar)
         self._searchbar.setPattern(hglib.tounicode(opts.get('pattern', '')))
         self._searchbar.searchRequested.connect(self.av.searchText)
         self._searchbar.conditionChanged.connect(self.av.highlightText)
+        av.searchRequested.connect(self._searchbar.search)
 
         self.av.sourceChanged.connect(
             lambda *args: self.setWindowTitle(_('Annotate %s@%d') % args))
@@ -488,10 +497,6 @@ class AnnotateDialog(QMainWindow):
             self.searchwidget.setSearch(pattern, **opts)
             self.searchwidget.show()
             self.searchwidget.raise_()
-
-    def searchAnnotation(self, pattern):
-        self._searchbar.setPattern(QRegExp.escape(pattern))
-        self.av.searchText(pattern, False, wrap=self._searchbar.wrapAround())
 
     def wheelEvent(self, event):
         if self.childAt(event.pos()) != self.le:
