@@ -149,12 +149,14 @@ class AnnotateView(QsciScintilla):
         """Returns the current revision number"""
         return self._rev
 
-    def annotateFileAtRev(self, wfile, rev, line=None):
+    @pyqtSlot(unicode, object, int)
+    def setSource(self, wfile, rev, line=None):
+        """Change the content to the specified file at rev [unicode]"""
         if self.thread is not None:
             return
         try:
             ctx = self.repo[rev]
-            fctx = ctx[wfile]
+            fctx = ctx[hglib.fromunicode(wfile)]
         except error.LookupError:
             qtlib.ErrorMsgBox(_('Unable to annotate'),
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
@@ -163,7 +165,7 @@ class AnnotateView(QsciScintilla):
         self._rev = ctx.rev()
         self.clear()
         curdate = fctx.date()[0]
-        basedate = self.repo.filectx(wfile, fileid=0).date()[0]
+        basedate = self.repo.filectx(hglib.fromunicode(wfile), fileid=0).date()[0]
         agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
@@ -191,7 +193,8 @@ class AnnotateView(QsciScintilla):
             revs.append(rev)
             links.append([fctx, origline])
             if rev not in sums:
-                sums[rev] = hglib.get_revision_desc(fctx, self.annfile)
+                sums[rev] = hglib.get_revision_desc(
+                    fctx, hglib.fromunicode(self.annfile))
 
         self._revs = revs
         self._summaries = sums
@@ -375,7 +378,7 @@ class AnnotateDialog(QDialog):
         if line and isinstance(line, str):
             line = int(line)
 
-        av.annotateFileAtRev(pats[0], opts.get('rev') or '.', line)
+        av.setSource(hglib.tounicode(pats[0]), opts.get('rev') or '.', line)
         self.setWindowTitle(_('Annotate %s@%d') % (pats[0], av.rev))
         self.repo = repo
 
@@ -387,7 +390,7 @@ class AnnotateDialog(QDialog):
 
     def revSelected(self, args):
         wfile, rev, line = args
-        self.av.annotateFileAtRev(wfile, rev, line)
+        self.av.setSource(wfile, rev, line)
         self.setWindowTitle(_('Annotate %s@%d') % (wfile, self.av.rev))
 
     def editSelected(self, args):

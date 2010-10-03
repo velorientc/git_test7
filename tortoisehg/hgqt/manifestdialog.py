@@ -118,7 +118,7 @@ class _FileAnnotateView(annotate.AnnotateView):
 
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):
-        self.annotateFileAtRev(path, rev)
+        self.setSource(path, rev)
 
 class _NullView(QWidget):
     """empty widget for content view"""
