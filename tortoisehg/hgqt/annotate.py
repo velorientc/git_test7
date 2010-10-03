@@ -319,7 +319,7 @@ class AnnotateDialog(QDialog):
         le.setText(hglib.tounicode(opts.get('pattern', '')))
         lbl.setBuddy(le)
         lbl.setToolTip(_('Regular expression search pattern'))
-        bt = QPushButton(_('Search'))
+        bt = QPushButton(_('Search'), shortcut=QKeySequence.Find)
         bt.setDefault(True)
         bt.clicked.connect(self.searchText)
         chk = QCheckBox(_('Ignore case'))
@@ -456,12 +456,6 @@ class AnnotateDialog(QDialog):
             self.av.prevMatch()
         elif event.delta() < 0:
             self.av.nextMatch()
-
-    def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Find):
-            self.searchText()
-            return
-        return super(AnnotateDialog, self).keyPressEvent(event)
 
     def accept(self):
         self.storeSettings()
