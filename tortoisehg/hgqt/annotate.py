@@ -309,7 +309,10 @@ class AnnotateView(QsciScintilla):
 
     @pyqtSlot(unicode, bool)
     def highlightText(self, match, icase=False):
-        """Highlight text matching to the given regexp pattern [unicode]"""
+        """Highlight text matching to the given regexp pattern [unicode]
+
+        The previous highlight is cleared automatically.
+        """
         try:
             flags = 0
             if icase:
@@ -356,41 +359,78 @@ class AnnotateThread(QThread):
         self.data = data
         self.done.emit()
 
+class SearchToolBar(QToolBar):
+    conditionChanged = pyqtSignal(unicode, bool, bool)
+    """Emitted (pattern, icase, wrap) when search condition changed"""
+
+    searchRequested = pyqtSignal(unicode, bool, bool)
+    """Emitted (pattern, icase, wrap) when search button pressed"""
+
+    def __init__(self, parent=None):
+        super(SearchToolBar, self).__init__(_('Search'), parent,
+                                            objectName='search')
+        self._lbl = QLabel(_('Regexp:'),
+                           toolTip=_('Regular expression search pattern'))
+        self.addWidget(self._lbl)
+        self._le = QLineEdit()
+        self._le.textChanged.connect(self._emitConditionChanged)
+        self._le.returnPressed.connect(self._emitSearchRequested)
+        self._lbl.setBuddy(self._le)
+        self.addWidget(self._le)
+        self._chk = QCheckBox(_('Ignore case'))
+        self._chk.toggled.connect(self._emitConditionChanged)
+        self.addWidget(self._chk)
+        self._wrapchk = QCheckBox(_('Wrap search'))
+        self._wrapchk.toggled.connect(self._emitConditionChanged)
+        self.addWidget(self._wrapchk)
+        self._bt = QPushButton(_('Search'), enabled=False,
+                               shortcut=QKeySequence.Find)
+        self._bt.clicked.connect(self._emitSearchRequested)
+        self._le.textChanged.connect(lambda s: self._bt.setEnabled(bool(s)))
+        self.addWidget(self._bt)
+
+    @pyqtSlot()
+    def _emitConditionChanged(self):
+        self.conditionChanged.emit(self.pattern(), self.caseInsensitive(),
+                                   self.wrapAround())
+
+    @pyqtSlot()
+    def _emitSearchRequested(self):
+        self.searchRequested.emit(self.pattern(), self.caseInsensitive(),
+                                  self.wrapAround())
+
+    def pattern(self):
+        """Returns the current search pattern [unicode]"""
+        return self._le.text()
+
+    def setPattern(self, text):
+        """Set the search pattern [unicode]"""
+        self._le.setText(text)
+
+    def caseInsensitive(self):
+        """True if case-insensitive search is requested"""
+        return self._chk.isChecked()
+
+    def setCaseInsensitive(self, icase):
+        self._chk.setChecked(icase)
+
+    def wrapAround(self):
+        """True if wrap search is requested"""
+        return self._wrapchk.isChecked()
+
+    def setWrapAround(self, wrap):
+        self._wrapchk.setChecked(wrap)
+
 class AnnotateDialog(QMainWindow):
     def __init__(self, *pats, **opts):
         super(AnnotateDialog,self).__init__(opts.get('parent'), Qt.Window)
-
-        mainwidget = QWidget()
-        mainvbox = QVBoxLayout()
-        mainwidget.setLayout(mainvbox)
-        self.setCentralWidget(mainwidget)
-
-        hbox = QHBoxLayout()
-        hbox.setMargin(0)
-        lbl = QLabel(_('Regexp:'))
-        le = QLineEdit()
-        le.setText(hglib.tounicode(opts.get('pattern', '')))
-        lbl.setBuddy(le)
-        lbl.setToolTip(_('Regular expression search pattern'))
-        bt = QPushButton(_('Search'), enabled=False, default=True,
-                         shortcut=QKeySequence.Find)
-        bt.clicked.connect(self.searchText)
-        chk = QCheckBox(_('Ignore case'))
-        wrapchk = QCheckBox(_('Wrap search'))
-        hbox.addWidget(lbl)
-        hbox.addWidget(le, 1)
-        hbox.addWidget(chk)
-        hbox.addWidget(wrapchk)
-        hbox.addWidget(bt)
-        mainvbox.addLayout(hbox)
-        self.le, self.chk, self.wrapchk = le, chk, wrapchk
 
         root = opts.get('root') or paths.find_root()
         repo = thgrepo.repository(ui.ui(), path=root)
         # TODO: handle repo not found
 
         av = AnnotateView(repo, self, annotationEnabled=True)
-        mainvbox.addWidget(av)
+        self.setCentralWidget(av)
         self.av = av
 
         status = QStatusBar()
@@ -403,9 +443,12 @@ class AnnotateDialog(QMainWindow):
         av.searchAll.connect(self.searchAll)
         av.searchAnnotation.connect(self.searchAnnotation)
 
-        self.le.textChanged.connect(self.highlightText)
-        self.chk.toggled.connect(self.highlightText)
-        self.le.textChanged.connect(lambda s: bt.setEnabled(bool(s)))
+        self._searchbar = SearchToolBar()
+        self.addToolBar(self._searchbar)
+        self._searchbar.setPattern(hglib.tounicode(opts.get('pattern', '')))
+        self._searchbar.searchRequested.connect(self.av.searchText)
+        self._searchbar.conditionChanged.connect(self.av.highlightText)
+
         self.av.sourceChanged.connect(
             lambda *args: self.setWindowTitle(_('Annotate %s@%d') % args))
 
@@ -470,18 +513,8 @@ class AnnotateDialog(QMainWindow):
             self.searchwidget.raise_()
 
     def searchAnnotation(self, pattern):
-        self.le.setText(QRegExp.escape(pattern))
-        self.av.searchText(pattern, False, wrap=self.wrapchk.isChecked())
-
-    @pyqtSlot()
-    def searchText(self):
-        self.av.searchText(self.le.text(), icase=self.chk.isChecked(),
-                           wrap=self.wrapchk.isChecked())
-
-    @pyqtSlot()
-    def highlightText(self):
-        self.av.clearHighlightText()
-        self.av.highlightText(self.le.text(), icase=self.chk.isChecked())
+        self._searchbar.setPattern(QRegExp.escape(pattern))
+        self.av.searchText(pattern, False, wrap=self._searchbar.wrapAround())
 
     def wheelEvent(self, event):
         if self.childAt(event.pos()) != self.le:
@@ -495,13 +528,13 @@ class AnnotateDialog(QMainWindow):
     def storeSettings(self):
         s = QSettings()
         s.setValue('annotate/geom', self.saveGeometry())
-        s.setValue('annotate/wrap', self.wrapchk.isChecked())
+        s.setValue('annotate/wrap', self._searchbar.wrapAround())
 
     def restoreSettings(self):
         s = QSettings()
         self.restoreGeometry(s.value('annotate/geom').toByteArray())
         wrap = s.value('annotate/wrap', False).toBool()
-        self.wrapchk.setChecked(wrap)
+        self._searchbar.setWrapAround(wrap)
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
