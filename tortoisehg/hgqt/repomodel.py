@@ -457,7 +457,8 @@ class HgRepoListModel(QAbstractTableModel):
     def getlog(self, ctx, gnode):
         # TODO: add bookmark
         if ctx.rev() is None:
-            return '**  ' + _('Working copy changes') + '  **'
+            # The Unicode symbol is a black star:
+            return u'\u2605 ' + _('Working copy changes') + u' \u2605'
 
         msg = hglib.tounicode(ctx.description())
         if msg:
