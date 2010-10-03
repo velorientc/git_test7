@@ -26,7 +26,6 @@ from PyQt4.Qsci import QsciScintilla, QsciStyle
 class AnnotateView(QsciScintilla):
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
-    closeSelf = pyqtSignal()
 
     revisionHint = pyqtSignal(QString)
     searchAtParent = pyqtSignal(QString)
@@ -167,7 +166,6 @@ class AnnotateView(QsciScintilla):
         except error.LookupError:
             qtlib.ErrorMsgBox(_('Unable to annotate'),
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
-            self.closeSelf.emit()
             return
         self._rev = ctx.rev()
         self.clear()
@@ -358,12 +356,14 @@ class AnnotateThread(QThread):
         self.data = data
         self.done.emit()
 
-class AnnotateDialog(QDialog):
+class AnnotateDialog(QMainWindow):
     def __init__(self, *pats, **opts):
         super(AnnotateDialog,self).__init__(opts.get('parent'), Qt.Window)
 
+        mainwidget = QWidget()
         mainvbox = QVBoxLayout()
-        self.setLayout(mainvbox)
+        mainwidget.setLayout(mainvbox)
+        self.setCentralWidget(mainwidget)
 
         hbox = QHBoxLayout()
         hbox.setMargin(0)
@@ -393,16 +393,15 @@ class AnnotateDialog(QDialog):
         mainvbox.addWidget(av)
         self.av = av
 
-        status = QLabel()
-        mainvbox.addWidget(status)
-        av.revisionHint.connect(status.setText)
+        status = QStatusBar()
+        self.setStatusBar(status)
+        av.revisionHint.connect(status.showMessage)
         av.revSelected.connect(lambda data: self.av.setSource(*data))
         av.editSelected.connect(self.editSelected)
         av.searchAtRev.connect(self.searchAtRev)
         av.searchAtParent.connect(self.searchAtParent)
         av.searchAll.connect(self.searchAll)
         av.searchAnnotation.connect(self.searchAnnotation)
-        av.closeSelf.connect(self.closeSelf)
 
         self.le.textChanged.connect(self.highlightText)
         self.chk.toggled.connect(self.highlightText)
@@ -410,7 +409,6 @@ class AnnotateDialog(QDialog):
         self.av.sourceChanged.connect(
             lambda *args: self.setWindowTitle(_('Annotate %s@%d') % args))
 
-        self.status = status
         self.searchwidget = opts.get('searchwidget')
 
         self.opts = opts
@@ -423,9 +421,9 @@ class AnnotateDialog(QDialog):
 
         self.restoreSettings()
 
-    def closeSelf(self):
-        self.close()
-        QTimer.singleShot(0, self.reject)
+    def closeEvent(self, event):
+        self.storeSettings()
+        super(AnnotateDialog, self).closeEvent(event)
 
     def editSelected(self, args):
         pattern = hglib.fromunicode(self.le.text()) or None
@@ -435,7 +433,7 @@ class AnnotateDialog(QDialog):
             ctx = repo[rev]
             fctx = ctx[wfile]
         except Exception, e:
-            self.status.setText(hglib.tounicode(str(e)))
+            self.statusBar().showMessage(hglib.tounicode(str(e)))
 
         base, _ = visdiff.snapshot(repo, [wfile], repo[rev])
         files = [os.path.join(base, wfile)]
@@ -493,14 +491,6 @@ class AnnotateDialog(QDialog):
             self.av.prevMatch()
         elif event.delta() < 0:
             self.av.nextMatch()
-
-    def accept(self):
-        self.storeSettings()
-        super(AnnotateDialog, self).accept()
-
-    def reject(self):
-        self.storeSettings()
-        super(AnnotateDialog, self).reject()
 
     def storeSettings(self):
         s = QSettings()
