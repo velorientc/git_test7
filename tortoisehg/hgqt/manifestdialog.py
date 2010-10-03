@@ -43,6 +43,13 @@ class ManifestDialog(QMainWindow):
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
 
+        self._searchbar = annotate.SearchToolBar()
+        self._searchbar.conditionChanged.connect(
+            self._manifest_widget.highlightText)
+        self._searchbar.searchRequested.connect(
+            self._manifest_widget.searchText)
+        self.addToolBar(self._searchbar)
+
         self._readsettings()
         self._updatewindowtitle()
 
@@ -136,6 +143,14 @@ class ManifestWidget(QWidget):
     def toolbar(self):
         """Return toolbar for manifest widget"""
         return self._toolbar
+
+    @pyqtSlot(unicode, bool, bool)
+    def searchText(self, pattern, icase=False, wrap=False):
+        self._fileview.searchText(pattern, icase, wrap)
+
+    @pyqtSlot(unicode, bool)
+    def highlightText(self, pattern, icase=False):
+        self._fileview.highlightText(pattern, icase)
 
     def _setupmodel(self):
         self._treemodel = ManifestModel(self._repo, self._rev,
