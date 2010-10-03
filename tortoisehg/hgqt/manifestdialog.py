@@ -23,7 +23,7 @@ from mercurial import util
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from tortoisehg.util import paths
+from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt import qtlib, annotate, status, thgrepo
 from tortoisehg.hgqt.i18n import _
@@ -40,6 +40,7 @@ class ManifestDialog(QMainWindow):
 
         self._manifest_widget = ManifestWidget(ui, repo, rev)
         self._manifest_widget.revchanged.connect(self._updatewindowtitle)
+        self._manifest_widget.grepRequested.connect(self._openSearchWidget)
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
 
@@ -49,6 +50,7 @@ class ManifestDialog(QMainWindow):
         self._searchbar.searchRequested.connect(
             self._manifest_widget.searchText)
         self.addToolBar(self._searchbar)
+        self._manifest_widget.searchRequested.connect(self._searchbar.search)
 
         self.setStatusBar(QStatusBar())
         self._manifest_widget.revisionHint.connect(self.statusBar().showMessage)
@@ -79,6 +81,12 @@ class ManifestDialog(QMainWindow):
         s.setValue('manifest/splitter',
                    self._manifest_widget._splitter.saveState())
 
+    @pyqtSlot(unicode, dict)
+    def _openSearchWidget(self, pattern, opts):
+        opts = dict((str(k), str(v)) for k, v in opts.iteritems())
+        from tortoisehg.hgqt import run
+        run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
+
 class _NullView(QWidget):
     """empty widget for content view"""
     def __init__(self, parent=None):
@@ -94,6 +102,12 @@ class ManifestWidget(QWidget):
 
     revisionHint = pyqtSignal(unicode)
     """Emitted when to show revision summary as a hint"""
+
+    searchRequested = pyqtSignal(unicode)
+    """Emitted (pattern) when user request to search content"""
+
+    grepRequested = pyqtSignal(unicode, dict)
+    """Emitted (pattern, opts) when user request to search changelog"""
 
     def __init__(self, ui, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
@@ -133,7 +147,8 @@ class ManifestWidget(QWidget):
         self._fileview = annotate.AnnotateView(self._repo)
         self._contentview.addWidget(self._fileview)
         self._fileview.revSelected.connect(lambda a: self.setSource(*a[:2]))
-        self._fileview.revisionHint.connect(self.revisionHint)
+        for name in ('revisionHint', 'searchRequested', 'grepRequested'):
+            getattr(self._fileview, name).connect(getattr(self, name))
         self._contentview.currentChanged.connect(
             lambda: self._fileselected(self._treeview.currentIndex()))
 
