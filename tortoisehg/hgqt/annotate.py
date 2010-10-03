@@ -36,7 +36,7 @@ class AnnotateView(QsciScintilla):
     revSelected = pyqtSignal(object)
     editSelected = pyqtSignal(object)
 
-    def __init__(self, parent=None):
+    def __init__(self, repo, parent=None):
         super(AnnotateView, self).__init__(parent)
         self.setReadOnly(True)
         self.setUtf8(True)
@@ -46,6 +46,9 @@ class AnnotateView(QsciScintilla):
         self.setFont(qtlib.getfont('fontlog').font())
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
+
+        self.repo = repo
+
         self._revs = []  # by line
         self._links = []  # by line
         self._revmarkers = {}  # by rev
@@ -140,7 +143,7 @@ class AnnotateView(QsciScintilla):
                 add(name, func)
         menu.exec_(point)
 
-    def annotateFileAtRev(self, repo, ctx, wfile, line=None):
+    def annotateFileAtRev(self, ctx, wfile, line=None):
         if self.thread is not None:
             return
         try:
@@ -152,11 +155,10 @@ class AnnotateView(QsciScintilla):
             return
         self.clear()
         curdate = fctx.date()[0]
-        basedate = repo.filectx(wfile, fileid=0).date()[0]
+        basedate = self.repo.filectx(wfile, fileid=0).date()[0]
         agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
-        self.repo = repo
         self.resumeline = line
         self.annfile = wfile
         self._updatelexer(fctx)
@@ -334,7 +336,11 @@ class AnnotateDialog(QDialog):
         mainvbox.addLayout(hbox)
         self.le, self.chk, self.wrapchk = le, chk, wrapchk
 
-        av = AnnotateView(self)
+        root = opts.get('root') or paths.find_root()
+        repo = thgrepo.repository(ui.ui(), path=root)
+        # TODO: handle repo not found
+
+        av = AnnotateView(repo, self)
         mainvbox.addWidget(av)
         self.av = av
 
@@ -361,8 +367,6 @@ class AnnotateDialog(QDialog):
         if line and isinstance(line, str):
             line = int(line)
         try:
-            root = opts.get('root') or paths.find_root()
-            repo = thgrepo.repository(ui.ui(), path=root)
             ctx = repo[opts.get('rev') or '.']
             fctx = ctx[pats[0]] # just for validation
         except Exception, e:
@@ -370,7 +374,7 @@ class AnnotateDialog(QDialog):
             self.close()
             return
 
-        av.annotateFileAtRev(repo, ctx, pats[0], line)
+        av.annotateFileAtRev(ctx, pats[0], line)
         self.setWindowTitle(_('Annotate %s@%d') % (pats[0], ctx.rev()))
         self.repo = repo
 
@@ -388,7 +392,7 @@ class AnnotateDialog(QDialog):
             fctx = ctx[wfile]
         except Exception, e:
             self.status.setText(hglib.tounicode(str(e)))
-        self.av.annotateFileAtRev(repo, ctx, wfile, line)
+        self.av.annotateFileAtRev(ctx, wfile, line)
         self.setWindowTitle(_('Annotate %s@%d') % (wfile, ctx.rev()))
 
     def editSelected(self, args):
