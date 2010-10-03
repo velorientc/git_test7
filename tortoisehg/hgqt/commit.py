@@ -198,11 +198,15 @@ class CommitWidget(QWidget):
         try:
             from pygments.lexers import guess_lexer_for_filename
             from pygments.token import Token
-            lexer = guess_lexer_for_filename(wfile, contents)
-            for tokentype, value in lexer.get_tokens(contents):
-                if tokentype is Token.Name and len(value) > 4:
-                    tokens.add(value)
-        except (pygments.util.ClassNotFound, ImportError):
+            from pygments.util import ClassNotFound
+            try:
+                lexer = guess_lexer_for_filename(wfile, contents)
+                for tokentype, value in lexer.get_tokens(contents):
+                    if tokentype is Token.Name and len(value) > 4:
+                        tokens.add(value)
+            except ClassNotFound:
+                pass
+        except ImportError:
             pass
         for n in sorted(list(tokens)):
             self._apis.add(n)
