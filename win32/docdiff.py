@@ -19,6 +19,7 @@ import shutil
 import win32con
 import win32api
 import win32process
+import locale
 
 from mercurial import util
 
@@ -40,6 +41,12 @@ scripts = {
     'nb'   : ('diff-nb.vbs',),                   # Mathematica Notebook
 }
 
+def safe_encode(string, encoding):
+    if isinstance(string, unicode):
+        return string.encode(encoding)
+    
+    return string
+        
 def main():
     args = sys.argv[1:]
     if len(args) not in (2, 4):
@@ -88,7 +95,8 @@ def main():
         script = os.path.join(path, use[1])
         cmd = ['wscript', script, output, other, local, base]
 
-    cmd = [util.shellquote(arg) for arg in cmd]
+    encoding = locale.getpreferredencoding(do_setlocale=True)
+    cmd = [util.shellquote(safe_encode(arg, encoding)) for arg in cmd]
     cmdline = util.quotecommand(' '.join(cmd))
     proc = subprocess.Popen(cmdline, shell=True,
                             creationflags=win32con.CREATE_NO_WINDOW,
