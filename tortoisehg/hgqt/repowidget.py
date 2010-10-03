@@ -167,6 +167,7 @@ class RepoWidget(QWidget):
                            w.setrev(filterrev(rev)))
         w.revchanged.connect(self.repoview.goto)
         w.revisionHint.connect(self.showMessage)
+        w.grepRequested.connect(self.grep)
         return w
 
     def createSyncWidget(self):
@@ -361,6 +362,13 @@ class RepoWidget(QWidget):
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         dlg.exec_()
+
+    @pyqtSlot(unicode, dict)
+    def grep(self, pattern='', opts={}):
+        """Open grep task tab"""
+        opts = dict((str(k), str(v)) for k, v in opts.iteritems())
+        self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
+        self.grepDemand.setSearch(pattern, **opts)
 
     def create_models(self):
         self.repomodel = HgRepoListModel(self.repo)
