@@ -360,7 +360,7 @@ class HgFileView(QFrame):
             self.highlightSearchString(self._find_text)
 
         uf = hglib.tounicode(self._filename)
-        self.fileDisplayed.emit(uf, fd.contents)
+        self.fileDisplayed.emit(uf, fd.contents or QString())
         if self._mode != 'file':
             return
 
