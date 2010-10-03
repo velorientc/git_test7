@@ -253,7 +253,9 @@ class AnnotateView(QsciScintilla):
     def prevMatch(self):
         pass # XXX
 
-    def searchText(self, match, icase, wrap):
+    @pyqtSlot(unicode, bool, bool)
+    def searchText(self, match, icase=False, wrap=False):
+        """Search text matching to the givne regexp pattern [unicode]"""
         self.findFirst(match, True, not icase, False, wrap)
 
     @pyqtSlot(unicode, bool)
@@ -439,8 +441,7 @@ class AnnotateDialog(QDialog):
 
     @pyqtSlot()
     def searchText(self):
-        pattern = hglib.fromunicode(self.le.text())
-        self.av.searchText(pattern, icase=self.chk.isChecked(),
+        self.av.searchText(self.le.text(), icase=self.chk.isChecked(),
                            wrap=self.wrapchk.isChecked())
 
     @pyqtSlot()
