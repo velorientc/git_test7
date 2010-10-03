@@ -114,7 +114,8 @@ class _FileTextView(QsciScintilla):
 
 class _FileAnnotateView(annotate.AnnotateView):
     def __init__(self, ui, repo, parent=None):
-        super(_FileAnnotateView, self).__init__(repo, parent)
+        super(_FileAnnotateView, self).__init__(repo, parent,
+                                                annotationEnabled=True)
 
     @pyqtSlot(unicode, object)
     def setsource(self, path, rev):

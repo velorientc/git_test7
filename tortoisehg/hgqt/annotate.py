@@ -39,7 +39,7 @@ class AnnotateView(QsciScintilla):
     sourceChanged = pyqtSignal(unicode, object)
     """Emitted (path, rev) when the content source changed"""
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent=None, **opts):
         super(AnnotateView, self).__init__(parent)
         self.setReadOnly(True)
         self.setUtf8(True)
@@ -52,6 +52,7 @@ class AnnotateView(QsciScintilla):
 
         self.repo = repo
         self._rev = None
+        self._annotation_enabled = bool(opts.get('annotationEnabled', False))
 
         self._revs = []  # by line
         self._links = []  # by line
@@ -79,10 +80,13 @@ class AnnotateView(QsciScintilla):
         line = self.lineAt(event.pos())
         if line < 0:
             return
-        rev = self._revs[line]
-        if rev != self._lastrev:
-            self.revisionHint.emit(self._summaries[rev])
-            self._lastrev = rev
+        try:
+            rev = self._revs[line]
+            if rev != self._lastrev:
+                self.revisionHint.emit(self._summaries[rev])
+                self._lastrev = rev
+        except IndexError:
+            pass
         QsciScintilla.mouseMoveEvent(self, event)
 
     @pyqtSlot(QPoint)
@@ -90,7 +94,7 @@ class AnnotateView(QsciScintilla):
         menu = qtlib.createStandardContextMenuForScintilla(self)
         line = self.lineAt(point)
         point = self.mapToGlobal(point)
-        if line < 0:
+        if line < 0 or not self.isAnnotationEnabled():
             return menu.exec_(point)
 
         fctx, line = self._links[line]
@@ -167,16 +171,23 @@ class AnnotateView(QsciScintilla):
             return
         self._rev = ctx.rev()
         self.clear()
+        self.resumeline = line
+        self.annfile = wfile
+        self.setText(hglib.tounicode(fctx.data()))
+        self._updatelexer(fctx)
+        self._updatemarginwidth()
+        self.sourceChanged.emit(wfile, self._rev)
+        self._updateannotation()
+
+    def _updateannotation(self):
+        if not self.isAnnotationEnabled():
+            return
+        ctx = self.repo[self._rev]
+        fctx = ctx[hglib.fromunicode(self.annfile)]
         curdate = fctx.date()[0]
-        basedate = self.repo.filectx(hglib.fromunicode(wfile), fileid=0).date()[0]
         agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
-        self.resumeline = line
-        self.annfile = wfile
-        self._updatelexer(fctx)
-        self.setText(hglib.tounicode(fctx.data()))
-        self.sourceChanged.emit(wfile, self._rev)
         self.loadBegin.emit()
         self.thread = AnnotateThread(fctx)
         self.thread.done.connect(self.finished)
@@ -212,6 +223,21 @@ class AnnotateView(QsciScintilla):
         super(AnnotateView, self).clear()
         self.clearMarginText()
         self.markerDeleteAll()
+
+    @pyqtSlot(bool)
+    def setAnnotationEnabled(self, enabled):
+        """Enable / disable annotation"""
+        if bool(enabled) == self.isAnnotationEnabled():
+            return
+        self._annotation_enabled = bool(enabled)
+        self._updateannotation()
+        self._updatemarginwidth()
+        if not self.isAnnotationEnabled():
+            self.markerDeleteAll()
+
+    def isAnnotationEnabled(self):
+        """True if annotation enabled"""
+        return self._annotation_enabled
 
     def _updatelexer(self, fctx):
         """Update the lexer according to the given file"""
@@ -262,7 +288,10 @@ class AnnotateView(QsciScintilla):
         def lentext(s):
             return 'M' * (len(str(s)) + 2)  # 2 for margin
         self.setMarginWidth(1, lentext(self.lines()))
-        self.setMarginWidth(2, lentext(max(self._revs + [0])))
+        if self.isAnnotationEnabled() and self._revs:
+            self.setMarginWidth(2, lentext(max(self._revs)))
+        else:
+            self.setMarginWidth(2, 0)
 
     def nextMatch(self):
         self.findNext()
@@ -355,7 +384,7 @@ class AnnotateDialog(QDialog):
         repo = thgrepo.repository(ui.ui(), path=root)
         # TODO: handle repo not found
 
-        av = AnnotateView(repo, self)
+        av = AnnotateView(repo, self, annotationEnabled=True)
         mainvbox.addWidget(av)
         self.av = av
 
