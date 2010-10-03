@@ -81,10 +81,11 @@ class AnnotateView(QsciScintilla):
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
+        menu = qtlib.createStandardContextMenuForScintilla(self)
         line = self.lineAt(point)
         point = self.mapToGlobal(point)
         if line < 0:
-            return
+            return menu.exec_(point)
 
         fctx, line = self._links[line]
         data = [fctx.path(), fctx.linkrev(), line]
@@ -100,7 +101,7 @@ class AnnotateView(QsciScintilla):
                 self.searchAll.emit(selection)
             def sann():
                 self.searchAnnotation.emit(selection)
-            menu = QMenu(self)
+            menu.addSeparator()
             for name, func in [(_('Search in original revision'), sorig),
                                (_('Search in working revision'), sctx),
                                (_('Search in current annotation'), sann),
@@ -115,7 +116,7 @@ class AnnotateView(QsciScintilla):
             self.revSelected.emit(data)
         def editorig():
             self.editSelected.emit(data)
-        menu = QMenu(self)
+        menu.addSeparator()
         for name, func in [(_('Annotate originating revision'), annorig),
                            (_('View originating revision'), editorig)]:
             def add(name, func):
