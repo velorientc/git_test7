@@ -246,6 +246,7 @@ class RepoWidget(QWidget):
             ('qfinish', _('Finish patch'), None, None, None, self.qfinishRevision),
             ('qdelete', _('Delete patch'), None, None, None, self.qdeleteRevision),
             ('strip', _('Strip...'), None, None, None, self.stripRevision),
+            ('qpop-all', _('Pop all patches'), None, None, None, self.qpopAllRevision),
             ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision)
         ]
 
@@ -563,7 +564,7 @@ class RepoWidget(QWidget):
         allactions = [['all',    ['update', 'manifest', 'merge', 'tag', 
                                   'backout', 'email', 'archive', 'copyhash']],
                       ['rebase', ['rebase']],
-                      ['mq',     ['qgoto', 'qimport', 'qfinish', 'qdelete', 'strip']]]
+                      ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish', 'qdelete', 'strip']]]
 
         exs = self.repo.extensions()        
         for ext, actions in allactions:
@@ -577,6 +578,7 @@ class RepoWidget(QWidget):
         workingdir = self.rev is None
         appliedpatch = ctx.thgmqappliedpatch() 
         unappliedpatch = ctx.thgmqunappliedpatch()
+        qparent = 'qparent' in ctx.tags()
         patch = appliedpatch or unappliedpatch
         realrev = not unappliedpatch and not workingdir
         normalrev = not patch and not workingdir
@@ -591,6 +593,7 @@ class RepoWidget(QWidget):
                    'copyhash': realrev,
                    'rebase': normalrev,
                    'qgoto': patch,
+                   'qpop-all': qparent,
                    'qimport': normalrev,
                    'qfinish': appliedpatch,
                    'qdelete': unappliedpatch,
@@ -681,6 +684,12 @@ class RepoWidget(QWidget):
         cmdline = ['qdelete', str(patchname),
                    '--repository', self.repo.root]
         self.runCommand(_('QDelete - TortoiseHg'), cmdline)
+
+    def qpopAllRevision(self):
+        """Unapply all patches"""
+        cmdline = ['qpop', '--all',
+                   '--repository', self.repo.root]
+        self.runCommand(_('QPop All - TortoiseHg'), cmdline)
 
     def qgotoRevision(self):
         """Make REV the top applied patch"""
