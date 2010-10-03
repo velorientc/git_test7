@@ -53,7 +53,6 @@ class AnnotateView(QsciScintilla):
         self._lastrev = None
 
         self.thread = None
-        self.wrap = False
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -254,11 +253,8 @@ class AnnotateView(QsciScintilla):
     def prevMatch(self):
         pass # XXX
 
-    def searchText(self, match, icase):
-        self.findFirst(match, True, not icase, False, self.wrap)
-
-    def setWrap(self, wrap):
-        self.wrap = wrap
+    def searchText(self, match, icase, wrap):
+        self.findFirst(match, True, not icase, False, wrap)
 
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
@@ -302,7 +298,6 @@ class AnnotateDialog(QDialog):
         self.le, self.chk, self.wrapchk = le, chk, wrapchk
 
         av = AnnotateView(self)
-        wrapchk.stateChanged.connect(av.setWrap)
         mainvbox.addWidget(av)
         self.av = av
 
@@ -401,13 +396,14 @@ class AnnotateDialog(QDialog):
 
     def searchAnnotation(self, pattern):
         self.le.setText(QRegExp.escape(pattern))
-        self.av.searchText(pattern, False)
+        self.av.searchText(pattern, False, wrap=self.wrapchk.isChecked())
 
     def searchText(self):
         pattern = hglib.fromunicode(self.le.text())
         if not pattern:
             return
-        self.av.searchText(pattern, icase=self.chk.isChecked())
+        self.av.searchText(pattern, icase=self.chk.isChecked(),
+                           wrap=self.wrapchk.isChecked())
 
     def wheelEvent(self, event):
         if self.childAt(event.pos()) != self.le:
