@@ -244,6 +244,7 @@ class RepoWidget(QWidget):
             ('qimport', _('Import to MQ'), None, None, None,
                 self.qimportRevision),
             ('qfinish', _('Finish patch'), None, None, None, self.qfinishRevision),
+            ('qdelete', _('Delete patch'), None, None, None, self.qdeleteRevision),
             ('strip', _('Strip...'), None, None, None, self.stripRevision),
             ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision)
         ]
@@ -562,7 +563,7 @@ class RepoWidget(QWidget):
         allactions = [['all',    ['update', 'manifest', 'merge', 'tag', 
                                   'backout', 'email', 'archive', 'copyhash']],
                       ['rebase', ['rebase']],
-                      ['mq',     ['qgoto', 'qimport', 'qfinish', 'strip']]]
+                      ['mq',     ['qgoto', 'qimport', 'qfinish', 'qdelete', 'strip']]]
 
         exs = self.repo.extensions()        
         for ext, actions in allactions:
@@ -592,6 +593,7 @@ class RepoWidget(QWidget):
                    'qgoto': patch,
                    'qimport': normalrev,
                    'qfinish': appliedpatch,
+                   'qdelete': unappliedpatch,
                    'strip': normalrev}
         for action, enabled in enabled.iteritems():
             self._actions[action].setEnabled(enabled)
@@ -672,6 +674,13 @@ class RepoWidget(QWidget):
         cmdline = ['qfinish', 'qbase::%s' % self.rev,
                    '--repository', self.repo.root]
         self.runCommand(_('QFinish - TortoiseHg'), cmdline)
+
+    def qdeleteRevision(self):
+        """Delete unapplied patch"""
+        patchname = self.repo.changectx(self.rev).thgmqpatchname()
+        cmdline = ['qdelete', str(patchname),
+                   '--repository', self.repo.root]
+        self.runCommand(_('QDelete - TortoiseHg'), cmdline)
 
     def qgotoRevision(self):
         """Make REV the top applied patch"""
