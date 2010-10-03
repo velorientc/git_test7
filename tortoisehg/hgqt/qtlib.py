@@ -509,6 +509,32 @@ def fileEditor(filename, **opts):
                       hglib.tounicode(e), parent=dialog)
     return ret
 
+def createStandardContextMenuForScintilla(sci):
+    """Create standard context menu for the given QsciScintilla widget
+
+    It's equivalent to QTextEdit.createStandardContextMenu.
+    """
+    menu = QMenu(sci)
+    if not sci.isReadOnly():
+        a = menu.addAction(_('Undo'), sci.undo, QKeySequence.Undo)
+        a.setEnabled(sci.isUndoAvailable())
+        a = menu.addAction(_('Redo'), sci.redo, QKeySequence.Redo)
+        a.setEnabled(sci.isRedoAvailable())
+        menu.addSeparator()
+        a = menu.addAction(_('Cut'), sci.cut, QKeySequence.Cut)
+        a.setEnabled(sci.hasSelectedText())
+    a = menu.addAction(_('Copy'), sci.copy, QKeySequence.Copy)
+    a.setEnabled(sci.hasSelectedText())
+    if not sci.isReadOnly():
+        menu.addAction(_('Paste'), sci.paste, QKeySequence.Paste)
+        a = menu.addAction(_('Delete'), sci.removeSelectedText,
+                           QKeySequence.Delete)
+        a.setEnabled(sci.hasSelectedText())
+    menu.addSeparator()
+    menu.addAction(_('Select All'), sci.selectAll, QKeySequence.SelectAll)
+
+    return menu
+
 class SharedWidget(QWidget):
     """Share a single widget by many parents
 
