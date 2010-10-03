@@ -256,6 +256,41 @@ class AnnotateView(QsciScintilla):
     def searchText(self, match, icase, wrap):
         self.findFirst(match, True, not icase, False, wrap)
 
+    @pyqtSlot(unicode, bool)
+    def highlightText(self, match, icase=False):
+        """Highlight text matching to the given regexp pattern [unicode]"""
+        try:
+            flags = 0
+            if icase:
+                flags |= re.IGNORECASE
+            pat = re.compile(unicode(match), flags)
+        except re.error:
+            return  # it could be partial pattern while user typing
+
+        self.clearHighlightText()
+        self.SendScintilla(self.SCI_SETINDICATORCURRENT,
+                           self._highlightIndicator)
+
+        for m in pat.finditer(unicode(self.text())):
+            self.SendScintilla(self.SCI_INDICATORFILLRANGE,
+                               m.start(), m.end() - m.start())
+
+    @pyqtSlot()
+    def clearHighlightText(self):
+        self.SendScintilla(self.SCI_SETINDICATORCURRENT,
+                           self._highlightIndicator)
+        self.SendScintilla(self.SCI_INDICATORCLEARRANGE, 0, self.length())
+
+    @util.propertycache
+    def _highlightIndicator(self):
+        """Return indicator number for highlight after initializing it"""
+        id = self.INDIC_CONTAINER
+        self.SendScintilla(self.SCI_INDICSETSTYLE, id, self.INDIC_ROUNDBOX)
+        self.SendScintilla(self.SCI_INDICSETFORE, id, 0x00ffff) # 0xbbggrr
+        # document says alpha value is 0 to 255, but it looks 0 to 100
+        self.SendScintilla(self.SCI_INDICSETALPHA, id, 100)
+        return id
+
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
     done = pyqtSignal()
@@ -311,6 +346,9 @@ class AnnotateDialog(QDialog):
         av.searchAll.connect(self.searchAll)
         av.searchAnnotation.connect(self.searchAnnotation)
         av.closeSelf.connect(self.closeSelf)
+
+        self.le.textChanged.connect(self.highlightText)
+        self.chk.toggled.connect(self.highlightText)
 
         self.status = status
         self.searchwidget = opts.get('searchwidget')
@@ -404,6 +442,11 @@ class AnnotateDialog(QDialog):
             return
         self.av.searchText(pattern, icase=self.chk.isChecked(),
                            wrap=self.wrapchk.isChecked())
+
+    @pyqtSlot()
+    def highlightText(self):
+        self.av.clearHighlightText()
+        self.av.highlightText(self.le.text(), icase=self.chk.isChecked())
 
     def wheelEvent(self, event):
         if self.childAt(event.pos()) != self.le:
