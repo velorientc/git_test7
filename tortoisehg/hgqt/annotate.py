@@ -319,8 +319,8 @@ class AnnotateDialog(QDialog):
         le.setText(hglib.tounicode(opts.get('pattern', '')))
         lbl.setBuddy(le)
         lbl.setToolTip(_('Regular expression search pattern'))
-        bt = QPushButton(_('Search'), shortcut=QKeySequence.Find)
-        bt.setDefault(True)
+        bt = QPushButton(_('Search'), enabled=False, default=True,
+                         shortcut=QKeySequence.Find)
         bt.clicked.connect(self.searchText)
         chk = QCheckBox(_('Ignore case'))
         wrapchk = QCheckBox(_('Wrap search'))
@@ -349,6 +349,7 @@ class AnnotateDialog(QDialog):
 
         self.le.textChanged.connect(self.highlightText)
         self.chk.toggled.connect(self.highlightText)
+        self.le.textChanged.connect(lambda s: bt.setEnabled(bool(s)))
 
         self.status = status
         self.searchwidget = opts.get('searchwidget')
@@ -436,10 +437,9 @@ class AnnotateDialog(QDialog):
         self.le.setText(QRegExp.escape(pattern))
         self.av.searchText(pattern, False, wrap=self.wrapchk.isChecked())
 
+    @pyqtSlot()
     def searchText(self):
         pattern = hglib.fromunicode(self.le.text())
-        if not pattern:
-            return
         self.av.searchText(pattern, icase=self.chk.isChecked(),
                            wrap=self.wrapchk.isChecked())
 
