@@ -188,6 +188,7 @@ class CommitWidget(QWidget):
         'Status widget is displaying a new file'
         if not (wfile and contents):
             return
+        wfile = unicode(wfile)
         self._apis = QsciAPIs(self.msgte.lexer())
         tokens = set()
         for wfile in self.stwidget.getChecked():
