@@ -184,10 +184,8 @@ class CommitWidget(QWidget):
         self.msgcombo = msgcombo
 
     @pyqtSlot(QString, QString)
-    def fileDisplayed(self, wfilestr, contents):
+    def fileDisplayed(self, wfile, contents):
         'Status widget is displaying a new file'
-        wfile = hglib.fromunicode(wfilestr)
-        contents = hglib.fromunicode(contents)
         if not (wfile and contents):
             return
         self._apis = QsciAPIs(self.msgte.lexer())
@@ -200,6 +198,7 @@ class CommitWidget(QWidget):
             from pygments.token import Token
             from pygments.util import ClassNotFound
             try:
+                contents = unicode(contents)
                 lexer = guess_lexer_for_filename(wfile, contents)
                 for tokentype, value in lexer.get_tokens(contents):
                     if tokentype is Token.Name and len(value) > 4:
