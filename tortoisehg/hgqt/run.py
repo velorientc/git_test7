@@ -519,6 +519,11 @@ def purge(ui, *pats, **opts):
     from tortoisehg.hgqt.purge import run
     qtrun(run, ui, *pats, **opts)
 
+def qreorder(ui, *pats, **opts):
+    """Reorder unapplied MQ patches"""
+    from tortoisehg.hgqt.qreorder import run
+    qtrun(run, ui, *pats, **opts)
+
 def remove(ui, *pats, **opts):
     """remove selected files"""
     from tortoisehg.hgqt.quickop import run
@@ -924,6 +929,7 @@ table = {
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^purge": (purge, [], _('thg purge')),
+    "^qreorder": (qreorder, [], _('thg qreorder')),
     "^update|checkout|co":
         (update,
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
