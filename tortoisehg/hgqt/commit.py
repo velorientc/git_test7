@@ -926,6 +926,7 @@ class CommitDialog(QDialog):
 
     def __init__(self, pats, opts, parent=None):
         QDialog.__init__(self, parent)
+        self.setWindowFlags(Qt.Window)
         self.pats = pats
         self.opts = opts
 
