@@ -181,6 +181,7 @@ class Workbench(QMainWindow):
         a.setToolTip(_('Refresh only the current task tab'))
 
         self.actionFind = a = QAction(_('Find'), self)
+        a.setToolTip(_('Search file and revision contents for keyword'))
         a.setIcon(geticon('find'))
 
         self.actionQuit = a = QAction(_("E&xit"), self)
@@ -206,6 +207,7 @@ class Workbench(QMainWindow):
 
         self.actionLoadAll = a = QAction(_("Load all"), self)
         a.setEnabled(True)
+        a.setToolTip(_('Load all revisions into graph'))
         icon = QIcon()
         icon.addPixmap(QPixmap(":/icons/loadall.png"), QIcon.Normal, QIcon.Off)
         a.setIcon(icon)
