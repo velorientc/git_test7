@@ -2,7 +2,7 @@ Seznam opomíjených položek
 ==========================
 
 .. module:: ignore.dialog
-	:synopsis: Dialog used to maintain the ignore filter
+    :synopsis: Dialog used to maintain the ignore filter
 
 Dialog Ignorované soubory se používá pro editaci seznamu opomíjených položek v repozitáři, který je uložen v souboru  :file:`.hgignore` v pracovním adresáři projektu. Dialog lze spustit z kontextové nabídky průzkumníka THG nebo z okna Commit či Status jako kontextové menu neznámého souboru.
  

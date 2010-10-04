@@ -1,5 +1,7 @@
-.. TortoiseHg documentation master file
 
+ .. TortoiseHg documentation master file, created by
+    sphinx-quickstart on Tue Jul 21 13:14:26 2009.
+    Poslední editace překladu 30. září 2010   
 
 Vítejte v dokumentaci pro TortoiseHg!
 ======================================
@@ -7,23 +9,24 @@ Vítejte v dokumentaci pro TortoiseHg!
 Obsah:
 
 .. toctree::
-	:maxdepth: 3
-	:numbered:
-   
-	preface
-	intro
-	quick
-	daily
-	settings
-	recovery
-	patches
-	extensions
-	nonhg
-	faq
-	debugging
-   
+    :maxdepth: 3
+    :numbered:
+    
+    preface
+    intro
+    quick
+    daily
+    settings
+    recovery
+    patches
+    extensions
+    nonhg
+    faq
+    debugging
+
+    
 Indices and tables
-==================
+--------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -1,13 +1,36 @@
 Integrace s průzkumníkem Windows
-================================
+=================================
 
 .. module:: explorer
-	:synopsis: Windows explorer integration
+    :synopsis: Windows explorer integration
+
+Kontextové nabídky
+------------------
+
+Příkazy TortoiseHg (okna a dialogy GUI) lze vyhledat pomocí kontextového menu v průzkumníku Windows. Kontextová nabídka TortoiseHg se mění podle aktuálně vybrané složky nebo souboru.
+Toto je kontextové menu pro pracovní adresář:
+
+.. figure:: figures/cmenu-nofiles.png
+	:alt: Context menu
+
+	Kontextové menu v pracovním adresáři
+
+A zde je kontextové menu pro vybrané soubory nebo složky:
+
+.. figure:: figures/cmenu-files.png
+	:alt: Context menu
+
+	Kontextové menu pro soubor nebo složku
+
+TortoiseHg poskytuje dialogy pro většinu běžně používaných příkazů aplikace Mercurial. Méně používané a nově přidané příkazy jsou ve Windows přístupné z příkazového řádku konzoly
+:file:`cmd.exe`.
 
 Překryvné ikonky
 ----------------
 
 TortoiseHg poskytuje vizuální vyjádření stavu souborů pomocí překryvných ikonek v okně Průzkumníka Windows. Stejné řešení lze nalézt i u jiných programů Tortoise, jako je TortoiseCVS a TortoiseSVN.
+
+TortoiseHg sdílí překryvné ikony s TortoiseSVN (verze 1.5.x nebo pozdější) a s jinými "Tortoise" projekty prostřednictvím TortoiseOverlays, což je další projekt vytvořený skupinou TortoiseSVN.
 
 .. figure:: figures/overlayicons.png
 	:alt: Overlay icons
@@ -16,40 +39,43 @@ TortoiseHg poskytuje vizuální vyjádření stavu souborů pomocí překryvnýc
 
 Kontextové menu obsahuje volbu :guilabel:`Aktualizovat ikony` která přinutí aplikaci TortoiseHg oživit ikony v právě rozbaleném repozitáři nebo ve složce s repozitáři. Ikona hlavního panelu zezelená a ikony v adresáři se změní v otazníky ve chvíli, kdy probíhá tato aktualizace.
 
-Ovladač překryvů a kontextové nabídky jsou nastavitelné. V ploše otevřeného adresáře nebo dokonce v ploše obrazovky provedeme pravé klepnutí a vybereme :menuselection:`TortoiseHg --> Nastavení kontextových nabídek`. V otevřeném okně můžeme jednotlivé volby přesouvat ze submenu do hlavního menu a obráceně.
+Konfigurace prostředí
+---------------------
 
-.. figure:: figures/taskbarui.png
+Ovladač překryvů a kontextové nabídky jsou nastavitelné. V ploše otevřeného adresáře nebo dokonce v ploše obrazovky provedeme pravé klepnutí a vybereme :menuselection:`TortoiseHg --> Konfigurace rozhranní TortoiseHg`. 
+
+V otevřeném okně můžeme jednotlivé volby přesouvat ze submenu do hlavního menu a obráceně.
+
+.. figure:: figures/shell-config-cmenu.png
 	:alt: Shell Configuration dialog
 
 	Nastavení kontextových nabídek
 	
-Překryvné ikony lze selektivně znemožnit pro určitý repozitář editací souboru :file:`.hg\\thgstatus` uvnitř repozitáře a nahradit jeho obsah
-řádkem obsahujícím::
+Na záložce "Ikony" lze upravit nastavení překryvných ikon 
 
-	@@noicons
+.. figure:: figures/shell-config-icons.png
+	:alt: Shell Configuration dialog, Icons tab
 
+	Nastavení překryvných ikon	
+	
+:guilabel:`Povolit překryvy:`
+    Umožnit zobrazení překryvných ikon na složkách a souborech v pracovním adresáři                                       repozitáře.
+    
+:guilabel:`Pouze lokální disky:`
+    Zobrazení ikon pouze na lokálních discích. Zobrazení ikon na vzdálených složkách a souborech je náročnější na výkon počítače. 
 
-Kontextové nabídky
-------------------
+:guilabel:`Enabled Overlay Handlers:`
+    Tato uživatelská nastavení poskytují možnost vypnout ovladače překryvných ikon ve sdílených aplikacích Tortoise (např. TortoiseHg, TortoiseSVN). Všechny tyto aplikace používají stejnou sadu ikonových slotů. Celkový počet dostupných slotů ve Windows je poměrně omezený a liší se u různých verzí Windows. Například u Windows 7 je k disposici pouze 8 volných slotů pro ovladače překryvných ikon. V tomto editačním poli lze nepotřebné ovladače ikon vypnout a tím snížit jejich celkovou spotřebu. Zvýší se tím šance, že důležité ovladače jako "Normal" (zelená značka) nebo "Modified" (červený vykřičník) obdrží svůj ikonový slot, i když je v počítači registrováno příliš mnoho ovladačů. Velmi se doporučuje nepovolit nepoužívané ovladače, jako je Locked, Readonly, Ignored, Deleted - pokud víme, že je nepoužívá jiná aplikace Tortoise. Určitě povolíme ovladače pro Added a Unversioned, protože jsou v TortoiseHg používány.
+    
+.. warning::
+    Nastavení v poli "Enabled Overlay Handlers" ovlivňují všechny aplikace Tortoise uživatele. Aby se změny nastavení v tomto poli projevily, je požadován logoff/login.   
 
-Příkazy TortoiseHg (okna a dialogy GUI) lze vyhledat pomocí kontextového menu v průzkumníku Windows. Kontextová nabídka TortoiseHg se mění podle aktuálně vybrané složky nebo souboru.
-Toto je kontextové menu pro pracovní adresář:
+:guilabel:`Hlavní panel:` 
+    Pro zobrazení ikony serveru překryvných ikon v dolní nástrojové liště Windows zatrhneme volbu "Zobrazit ikonu". Volba "Zvýraznit ikonu" způsobí, že tato ikona změní barvu (zezelená), když ikonový server aktualizuje cache soubory (:file:`.hg\dirstate` a :file:`.hg\thgstatus`) v repozitáři.
+    
+Překryvné ikony lze selektivně zakázat pro určitý repozitář v souboru :file:`.hg\thgstatus` zápisem jediného řádku::
 
-.. figure:: figures/cmenu-nofiles.jpg
-	:alt: Context menu
-
-	Kontextové menu v pracovním adresáři
-
-A zde je kontextové menu pro vybrané soubory nebo složky:
-
-.. figure:: figures/cmenu-files.jpg
-	:alt: Context menu
-
-	Kontextové menu pro soubor nebo složku
-
-TortoiseHg poskytuje dialogy pro většinu běžně používaných příkazů aplikace Mercurial. Méně používané a nově přidané příkazy jsou ve Windows přístupné z příkazového řádku konzoly
-:file:`cmd.exe`.
-
+    @@noicons                
 
 Nautilus
 --------

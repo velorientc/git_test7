@@ -1,10 +1,9 @@
 Commit
-======
+=======
 
 .. module:: commit.dialog
-	:synopsis: Dialog used to perform commit
+    :synopsis: Dialog used to perform commit
 
-   
 Commit je jedním ze dvou hlavních nástrojů TortoiseHg, druhým je Průzkumník repozitáře. Oba tyto nástroje dovedou zpřístupnit nebo provést téměř každou funkci, kterou TortoiseHg podporuje.
 
 Nástroj Commit umí nejen předat repozitáři naše změny, ale umí také přezkoušet stav našeho pracovního adresáře a provádět rutinní udržovací úkony (přidat nové soubory, zaznamenat změnu jmen, spravovat filtr "ignorovat", atp).
@@ -15,7 +14,7 @@ Nástroj Commit umí nejen předat repozitáři naše změny, ale umí také př
 	Dialogové okno Commit
 
 Popis prvků
-------------
+-----------
 
 Na horním okraji okna Commit je výběrová lišta, zavedená ve verzi 0.9:
 
@@ -131,7 +130,7 @@ Kdy je tento selektivní výběr nezbytný?
 Máme-li více než jednu souvislou změnu ve svém zdrojovém kódu a chtěli bychom své změny předávat po částech. To lze často zajistit filtrovaním seznamu souborů v každém komitu ale může se stát, že se naše změny vyskytují v téže sadě souborů a potom se tato výběrová možnost stává nepostradatelnou.
 
 Jak se to provádí?
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 Dvojklikem na jednotlivých porcích změn v záložce
 :guilabel:`Výběr porce`. *Prakticky každá akce, která aktivuje řádek porce, umožňuje přepínat výběrový stav. Lze také použít mezerníku*
@@ -140,7 +139,7 @@ Zároveň je aktualizováno záhlaví diffové záložky s informací o stavu v�
 Je-li soubor vybrán pro commit jenom částečně, jeho ikona se změní ze zatržítka na označení předvolby (radio button). Zběžným pohledem na seznam souborů lze tedy poznat, které soubory jsou do komitu zahrnuty zcela, které částečně a které vůbec ne.
 
 Co se děje při akci commit?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Krátká odpověď je taková, že vybrané porce v označených souborech jsou předány do repozitáře a nevybrané změny jsou ponechány v pracovním adresáři pro případný příští commit.
 
@@ -151,7 +150,7 @@ Tato delší odpověď je zajímavá jenom v případě, že se něco nepovede, 
 Jestliže nějaká závada (způsobená třeba kontrolou virů nebo kompilátorem) uzavře soubor uvnitř popsaného procesu, uvidíme chybové hlášení o selhání oprávky. Tyto chyby jsou opravitelné. Smažeme v repozitáři všechny soubory s příponou  :file:`.rej` a zkusíme komit znovu.
  
 Klávesová navigace
--------------------
+------------------
 
 :kbd:`Ctrl-Enter`
 	Spustí komit
@@ -165,7 +164,7 @@ Kód, který kopíruje porce do schránky rozezná záhlaví diffů. Obsah schr�
 
 
 Kontextová menu
-------------------
+---------------
 
 Pravé klepnutí na zvýrazněném souboru v seznamu souborů otevře nabídku dalších příkazů.
 
@@ -189,7 +188,7 @@ Pro zrušení nezdařeného pokusu o sloučení musíme říci aplikaci Mercuria
 Poté, co jsme vrátili náš pracovní adresář do stavu rodičovké revize, můžeme restartovat proces sloučení.
 
 Textové pole průvodní zprávy
------------------------------
+----------------------------
 
 V tomto poli jsou přístupné tyto kontextové nabídky:
 
@@ -249,7 +248,11 @@ Editační okno "Konfigurace repozitáře" umožňuje nastavení řady veličin:
 	Maximální délka řádku s komentářem komitu. Pokud je zadaná, vydá TotroiseHg varování při překročení této hodnoty. Implicitní nastavení je <neurčeno>; hodnota '0' má stejný význam. 
 :menuselection:`Commit -> Délka řádku zprávy`
 	Maximální délka řádku průvodní zprávy pod prázdným řádkem (mezi souhrnným řádkem a vlastní průvodní zprávou musí být jeden řádek prázdný). Varování a implicitní nastavení je stejné jako v předchozím případě.
-	
+:menuselection:`Commit -> Uzavřít po komitu`:
+	Je-li nastaveno True, aplikace Commit se po úspěšném komitu zavře.
+:menuselection:`Implicitní záložka`
+	Otevřená záložka při spuštění nástroje Status a Commit.
+	0 - Text diffu, 1 - Výběr porce, 2 - Náhled komitu
 :menuselection:`Commit -> Push po komitu`:
 	Při hodnotě True se procedura pokusí o provedení 
 	akce 'push' po ukončení akce 'commit'.
@@ -266,10 +269,9 @@ Editační okno "Konfigurace repozitáře" umožňuje nastavení řady veličin:
 :menuselection:`TortoiseHg -> Max velikost diffu`
 	Nastavení limitu pro velikost diffu.
 
-Externí nástroj pro konfiguraci byl odstraněn v 0.9 .
 
 Spuštění příkazu z příkazového řádku
--------------------------------------
+------------------------------------
 
 ::
 

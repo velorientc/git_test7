@@ -3,13 +3,13 @@ Použití s jinými systémy VCS
 ****************************
  
 .. module:: nonhg
-	:synopsis: Describe using TortoiseHg as a front-end to other VCS
+    :synopsis: Describe using TortoiseHg as a front-end to other VCS
 
 
 Tato kapitola popisuje tři nejoblíbenější extenze Mercurialu pro spolupráci s *cizími* systémy VCS. Viz také `Konverze repozitáře <http://mercurial.selenic.com/wiki/RepositoryConversion>`_.
 
 
-Perfarce (Perforce)
+Perfarce (Perforce) 
 ===================
 
 * `Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ home page.
@@ -55,7 +55,7 @@ identity::
 
 pending::
 
-	Nalezne *pending* revize Perforce, které byly příkazem push poslány do naší klientské extenze Perforce ale nebyly ani zapsány do repozitáře, ani staženy zpět. V této situaci se otevře dialog, ve kterém můžeme nepřevzaté (pending) revize převzít nebo odmítnout.
+	Nalezne *nevyřízené* revize Perforce, které byly příkazem push poslány do naší klientské extenze Perforce ale nebyly ani zapsány do repozitáře, ani staženy zpět. V této situaci se otevře dialog, ve kterém můžeme nepřevzaté (pending) revize převzít nebo odmítnout.
 
 *Instalace*
 
@@ -77,7 +77,7 @@ hgsubversion, jak název napovídá, umožňuje použít Mercurial jako klientsk
 
 Instalační programy TotroiseHg pro Window obsahují pojítka python-svn, potřebná pro hgsubversion, takže je možné klonovat repozitář hgsubversion do vlastního počítače::
 
-hg clone http://bitbucket.org/durin42/hgsubversion/ C:\hgsvn
+	hg clone http://bitbucket.org/durin42/hg-git/ C:\hg-git
 
 Potom umožníme extenzi v našem souboru Mercurail.ini uvedením názvu vyhrazené složky::
 
@@ -89,7 +89,7 @@ Funkčnost instalace si ověříme zadáním :command:`hg help hgsubversion`
 Podrobnosti nalezneme na stránkách wiki pro hgsubversion.
 
 .. warning::
-Při klonování serveru Subversion se vřele doporučuje klonovat jenom několik prvních revizí a zbytek přetáhnout (pull). Vyskytne-li se chyba při klonování, bývá smazán celý neúplný klon. Akce pull je mnohem shovívavější. 
+   Při klonování serveru Subversion se vřele doporučuje klonovat jenom několik prvních revizí a zbytek přetáhnout (pull). Vyskytne-li se chyba při klonování, bývá smazán celý neúplný klon. Akce pull je mnohem shovívavější. 
 
 *Integrace TortoiseHg*
 
@@ -118,6 +118,8 @@ Potom umožnit hggit a bookmarks v souboru Mercurial.ini::
 
 Funkčnost instlace si ověříme zadáním :command:`hg help hggit`
 
+Stávající verze TortoiseHg obsahují verzi dulwich 0.6.0. Doporučujeme ji používat spolu s verzí hg-git 0.2.2.
+ 
 Podrobnosti viz dokumentace hggit.
 
 Mějme na vědomí, že příkazy 'příchozí' a 'odchozí' při komunikaci s repozitáři git mají deformované zobrazení. Jsme tedy odkázání na prostá push a pull, což není neobvyklé při propojení s nástroji externího systému revizí.

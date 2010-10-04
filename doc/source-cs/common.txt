@@ -2,14 +2,14 @@ Obecné vlastnosti
 =================
 
 .. module:: common.dialog
-	:synopsis: Common features to all the dialog
+    :synopsis: Common features to all the dialog
 
 Jedním z běžně používaných termínů v této dokumentaci je slovo "diff", což není zkratka slova difference, ale označuje se jím standardizovaný způsob určení a zápisu změn - "unified diff".
 
 Slovo "Visual Diff" (také VDiff) označuje nástroj pro porovnávání změn ve dvou nebo ve třech souborech. Ve druhém případě se hovoří o "třídílném porovnávání".
 
 Klávesnicové zkratky
----------------------
+--------------------
 
 Je nadefinováno několik klávesnicových zkratek, které jsou podporovány všemi nástroji TortoiseHg. 
 
@@ -25,7 +25,10 @@ Je nadefinováno několik klávesnicových zkratek, které jsou podporovány vš
 :kbd:`Ctrl-Enter`
 	aktivace
 
-:kbd:`F5`, :kbd:`Ctrl-R`
+:kbd:`Ctrl-.` a :kbd:`Ctrl-,`
+	vybrat další nebo předchozí soubor v seznamu
+
+:kbd:`F5`, nebo :kbd:`Ctrl-R`
 	obnovit
 
 V `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_ se místo :kbd:`Ctrl` používá jako modifikátor klávesnice "apple".
@@ -40,9 +43,9 @@ Porovnání změn
 	
 V TortoiseHg 1.0 byla struktura Vizuálních diffů přepracována. Nový systém používá popisy v souboru :file:`mergetools.rc` k nalezení nejobvyklejších diffových nástrojů v počítači (včetně KDiff3, který je obsažen v instalačním programu) a k výběru nejvhodnějšího z nich.
 
-Jestliže má uživatel zadaný nástroj pro slučování (:menuslelection: `TortoiseHg --> Nástroj pro sloučení`), je tento nástroj používán pro provádění vizuálních diffů bez výběrového procesu. Uživatel si ovšem může pro vizualizaci diffů vybrat odlišný nástroj (:menuselection: `TortoiseHg --> Nástroj Visual Diff`).
+Jestliže má uživatel vybraný nástroj pro slučování (:menuslelection: `TortoiseHg --> Nástroj pro sloučení`), je tento nástroj používán pro provádění vizuálních diffů bez výběrového procesu. Uživatel si ovšem může pro vizualizaci diffů vybrat odlišný nástroj (:menuselection: `TortoiseHg --> Nástroj Visual Diff`).
 
-Konfigurační soubor :file:`mergetools.rc` obsahuje příkazové řádky pro každý nástroj, takže další konfigurace uživatelem není potřebná. Ten si buď vybere určitý nástroj, nebo přijme implicitní nastavení.
+Konfigurační soubor :file:`mergetools.rc` obsahuje optimální příkazové řádky pro každý nástroj, takže další konfigurace uživatelem není potřebná. Ten si buď vybere určitý nástroj, nebo přijme implicitní nastavení.
 
 Vizuální diffový systém použije libovolnou existující konfiguraci, kterou nalezne. Protože až donedávna extdiff nepodporoval třídílné diffové argumenty, bude patrně nejlepší znemožnit nebo smazat všechny extdiffové konfigurace.
 

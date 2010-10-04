@@ -1,8 +1,9 @@
 Synchronizace
-=============
+===============
 
 .. module:: synchronize.dialog
-	:synopsis: Dialog used to perform synchronization operations
+    :synopsis: Dialog used to perform synchronization operations
+	
 
 .. figure:: figures/synchronize.png
 	:alt: Synchronize dialog

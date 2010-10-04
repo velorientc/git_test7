@@ -1,9 +1,9 @@
-****
+*****
 Úvod
-****
+*****
 
 .. module:: introduction
-	:synopsis: Introduce TortoiseHg and its various parts
+    :synopsis: Introduce TortoiseHg and its various parts
 
 Co je TortoiseHg?
 =================
@@ -36,24 +36,23 @@ Instalace TortoiseHg
 Ve Windows
 ----------
 
-TortoiseHg je poskytován se snadno použitelným instalačním programem - `viz THg <http://tortoisehg.org>`_.
+TortoiseHg je dodáván se snadno použitelným instalačním programem - `viz THg <http://tortoisehg.org>`_.
 Dvojím klepnutím na staženém souboru spustíme instalaci a sledujeme pokyny. 
 
 Během aktualizace nás instalátor požádá, abychon zavřeli všechny aplikace, které si načetly extenze rozhranní TorotiseHg. Pokud tak učiníme, aktualizace nebude požadovat restart počítače. Jsou-li připojeni jiní uživatelé, nebo nelze-li některé aplikace zavřít, bude pro ukončení instalace požadován restart.
 
 .. note::
-	Máme-li nainstalovánu starší verzi, budeme při instalaci TortoiseHe 1.0 požádáni abychom ji odinstalovali. 
-    
+	Máme-li nainstalovánu starší verzi, budeme při instalaci TortoiseHe 1.0 požádáni abychom ji odinstalovali.
+
+.. warning::
+	Starší instalační programy mají tendenci při odinstalování smazat soubor Mercurial.ini. Je dobré si jej zálohovat před odinstalováním starších verzí TortoiseHg. Tento problém se nevyskytuje u novějších paketů MSI.
+
 Všechny starší instalační programy (před verzí 1.0) byly vystaveny s InnoSetup. Balíček TortoiseOverlay instalovaly jako separátní aplikaci, takže v ovládacím panelu *Přidat/Odebrat programy* jsme mohli vidět jak TortoiseHg, tak TortoiseOverlay.
 
 Nové instalační programy pro THg 1.0 obsahují balíčky TortoiseOverlay jako "sloučené moduly", takže se již neobjevují jako separátní aplikace. Mohlo by být vhodné odinstalovat starší aplikaci TortoiseOverlay nástrojem *Přidat/Odebrat programy* poté, co odinstalujeme starší TortoiseHg (<= 0.9.3) - pokud nemáme jiné produkty Tortoise (TortoiseCVS nebo TortoiseBZR), které TortoiseOverlay používají.
 
 .. note::
-	TortoiseOverlay is a shim package that allows multiple Tortoise
-	style shell extension clients to share overlay slots.  This is
-	necessary because even modern Windows platforms only support a
-	limited number of overlay slots (11-14).  TortoiseOverlay
-	packages are created by the TortoiseSVN developers.
+	TortoiseOverlay je *shim* paket, který umožňuje sdílet překryvné sloty více extenzím shellu. To je nezbytnéj, protože i moderní platformy Windows podporují jenom omezený počet překryvných slotů (11-14). Pakety TortoiseOverlay vytvářejí vývojáři TortoiseSVN.
 
 Bezpečné jsou tyto dvě možnosti:
 
@@ -84,7 +83,7 @@ Na souboru vybrané lokalizace provedeme dvojí klepnutí a potvrdíme všechny 
 
 
 V OS Linux a Mac
-----------------
+-----------------
 
 Nejposlednější balíčky ke stažení pro Linux lze nalézt na našich `stránkách
 <http://tortoisehg.bitbucket.org/download/linux.html>`_.
@@ -98,7 +97,7 @@ hgtk a všechny dialogy pomocí instalační metody. Podrobnosti viz
 
 
 Jazykové nastavení v Linuxu
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Nástroje TortoiseHg používají pro lokalizaci svých textů knihovnu
 `gettext <http://docs.python.org/library/gettext.html>`_ Pythonu.

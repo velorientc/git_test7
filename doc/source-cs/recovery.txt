@@ -3,7 +3,7 @@ Opravy
 ******
 
 .. module:: recovery.dialog
-	:synopsis: Dialog used to perform recovery operations
+    :synopsis: Dialog used to perform recovery operations
 
 .. figure:: figures/recover.png
 	:alt: Recovery dialog

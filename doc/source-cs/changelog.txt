@@ -1,15 +1,16 @@
 Changelog
-=========
+==========
 
 .. module:: changelog.dialog
-	:synopsis: Dialog used to view log
+    :synopsis: Dialog used to view log
 
-Nástroj changelog nalezneme v kontextové nabídce pod názvem **Průzkumník repozitáře**. Používá se k zobrazení revizí (changesetů) repozitáře a k jejich správě. Okno procedury obsahuje přehledný graf, v němž lze vidět u každé změny vztah rodič-dítě. U každé revize lze také prohlížet změny u souborů. 
+Operačním prostorem nástroje changelog je pole v horní části okna **Průzkumníka repozitáře**. Používá se k zobrazení verzí (changesetů) a k jejich správě.
+Okno procedury obsahuje přehledný graf, v němž lze vidět u každé změny vztah rodič-dítě. U každé verze lze také prohlížet změny souborů. 
 
 .. figure:: figures/log.png
 	:alt: Changelog
 
-	Prohlížeč repozitáře se skrytou nástrojovou lištou
+	Prohlížeč repozitáře s vypnutou nástrojovou lištou
 
 
 Stručný popis příkazů v liště hlavní nabídky:
@@ -88,6 +89,10 @@ Napravo od přepínače :guilabel:`Po akci pull` je tlačítko :guilabel:`Nastav
 
 Changesety, přidané do repozitáře po otevření průzkumníka repozitáře, jsou v grafu označeny zelenými hvězdičkami. Týká se to posledních komitů, přijmutých changesetů a aplikovaných oprávek. Šipky a hvězdičky z grafu odstraníme použitím volby :guilabel:`Zobrazení -> Obnovit původní značení`.
 
+.. note::
+
+    Ke smazání nových, příchozích a odchozích značek z grafu changesetu použijte :guilabel:`View -> Reset Marks`
+
 Vyhledávací lišta
 -----------------
 
@@ -105,8 +110,7 @@ Vyhledávací lišta umožňuje rychlé nastavení filtrů. Tlačítka zleva dop
 	:guilabel:`Předci`
 		Zobrazit pouze předky aktuálně vybraného changesetu. 
 	:guilabel:`Rodiče`
-		Zobrazit pouze rodičovské revize pracovního adresáře.
- Nebude-li probíhat "sloučení", bude to jenom jedna verze.
+		Zobrazit pouze rodičovské revize pracovního adresáře. Nebude-li probíhat "sloučení", bude to jenom jedna verze.
 	:guilabel:`Čela`
 		Zobrazit jen čela (heads) v repozitáři.
 	:guilabel:`Sloučení`
@@ -115,11 +119,11 @@ Vyhledávací lišta umožňuje rychlé nastavení filtrů. Tlačítka zleva dop
 		Zatržítko pro nezobrazování sloučených changesetů 
 	:guilabel:`Větve...`
 		Výběrový seznam pojmenovaných větví v repozitáři. Jména lze nastavit v *Nastavení repozitáře  -> Průzkumník repozitáře -> Mrtvé větve*.
+	:guilabel:`Výběrové roletky`
+		Na konci lišty je výběrový seznam pěti různých typů filtrů. Po určení typu filtru se do vedlejšího políčka zadá vyhledávací text příslušného typu a klepne se Enter.
 
-Na konci lišty je výběrový seznam pěti různých typů filtrů. Po určení typu filtru se do vedlejšího políčka zadá vyhledávací text příslušného typu a klepne se Enter.
-
-	:guilabel:`Rozsah revizí`
-		Vybrat ze seznamu zadaný rozsah revizí (m:n). Určení rozsahu revizí - viz `hg.1.html#revisions <http://www.selenic.com/mercurial/hg.1.html#revisions>`_ 
+	:guilabel:`Sada revizí`
+		Prozkoumat uživatelský text jako sadu revizí. Určení sady revizí - viz `hg.1.html#revisions <http://www.selenic.com/mercurial/hg.1.html#revsets>`_. 
 	:guilabel:`Vzory souborů`
 		Prohledat seznam pro zadané jméno souboru. Určování vzorů jmen souborů - viz `hg.1.html#patterns <http://www.selenic.com/mercurial/hg.1.html#patterns>`_ 
 	:guilabel:`Klíčová slova`
@@ -153,38 +157,42 @@ Některé nabídky v Průzkumníku repozitáře by se u velkých repozitářů n
 Kontextové nabídky u revizí
 ---------------------------
 
-Pravý klik na zvýrazněném řádku revize otevře kontextovou nabídku:
+Pravý klik na zvýrazněném řádku changesetu otevře kontextovou nabídku:
 
 	:guilabel:`Otevřít VDiff`
-		otevřít changeset v prohlížeči "VDiff" 
+		Otevřít změnu v nástroji "vizuální diff". 
 	:guilabel:`Zobrazit změny`
-		otevřít changeset v diffovém prohlížeči "status"
+		Otevřít changeset v diffovém prohlížeči "status".
 	:guilabel:`VDiff k aktuální`
-		zobrazit změny mezi označenou revizí a aktuálním pracovním adresářem
+		Zobrazit změny mezi označenou revizí a aktuálním pracovním adresářem.
 	:guilabel:`Kopírovat hash`
-		zkopírovat hash označené revize do schránky
-	:guilabel:`Aktualizovat`
-		aktualizovat pracovní adresář k této revizi [#rcm1]_
+		Zkopírovat hash označené revize do schránky.
+	:guilabel:`Poslat sem`
+		Provádí ekvivalent příkazu 'push -r <rev>'. Tato volba je dostupná jen u changesetů, označených jako odchozí.
+	:guilabel:`Poslat tuto větev`
+		Provádí ekvivalent příkazu 'push --new-branch --branch <branch>'. Tato volba je dostupná jen u changesetů, označených jako odchozí.
+	:guilabel:`Aktualizovat...`
+		Aktualizovat pracovní adresář k této revizi. 
 	:guilabel:`Sloučit s ...`
-		sloučit vybranou revizi s aktuální [#rcm2]_
+		Sloučit s vybranou revizí. 
 	:guilabel:`Odvolat`
-		vytvořit rušící changeset pro vybranou revizi
+		Vytvořit rušící changeset pro vybranou revizi.
 	:guilabel:`Revert`
-		vrátit pracovní kopii k obsahu vybrané revize bez aktualizace rodičovské revize pracovního adresáře. Používat opatrně.	
+		Vrátit pracovní kopii k obsahu vybrané revize bez aktualizace rodičovské revize pracovního adresáře. Používat opatrně.
 	:guilabel:`Exportovat`
 		:guilabel:`Export oprávky`
-			generovat soubor (patch file) obsahující změny této revize
+			Generovat oprávkový soubor obsahující změny této revize
 		:guilabel:`Email oprávky`
-			poslat změny této revize emailem [#rcm3]_
+			Poslat změny této revize emailem. 
 		:guilabel:`Svazek revize:tip`
-			vytvořit svazek obsahující revize od označené po "tip" 
-		:guilabel:`Archivovat revizi`
-			otevřít dialog pro archivování vybrané revize, čímž je umožněno vytvořit záložní kopii repozitáře 
+			Vytvořit svazek obsahující revize od označené po "tip". 
+		:guilabel:`Archivovat...`
+			Otevřít dialog pro archivování vybrané revize, čímž je umožněno vytvořit záložní kopii repozitáře. 
 	:guilabel:`Tag`
 		:guilabel:`Přidat/odebrat tag`
-			otevřít dialog pro přidání/odebrání tagu 
+			Otevřít dialog pro přidání/odebrání tagu. 
 		:guilabel:`Přidat/Přemístit/Odebrat záložku`
-			u vybrané revize otevře dialog pro vytvoření záložky
+			U vybrané revize otevře dialog pro vytvoření záložky.
 			*Pro tuto volbu je nutné umožnit extenzi "záložka"*
 		:guilabel:`Přejmenovat záložku`
 			*Pro tuto volbu je nutné umožnit extenzi "záložka"*
@@ -192,7 +200,7 @@ Pravý klik na zvýrazněném řádku revize otevře kontextovou nabídku:
 		:guilabel:`Importovat revizi do MQ`
 			Importovat vybranou revizi do aktuální fronty oprávek (patch queue). Platí jen pro qbase nebo vybranou čelní revizi. *Volba je viditelná jen při umožněné extenzi MQ*
 		:guilabel:`Odtrhnout revizi...`
-			Odebrat z repozitáře vybranou revizi a všechny její potomky [#rcm4]_. *Volba je viditelná jen při umožněné extenzi MQ*
+			Odebrat z repozitáře vybranou revizi a všechny její potomky [#rcm1]_. *Volba je viditelná jen při umožněné extenzi MQ*
 		:guilabel:`Transplant to local`
 			Přenést vybranou revizi do aktuálního pracovního rodiče. *Volba je viditelná jen při umožněné extenzi 'transplant'*
 	:guilabel:`Bisect`
@@ -209,7 +217,7 @@ Klikneme-li pravou myší na jiném než zvýrazněném řádku, dostaneme dalš
 
 	:guilabel:`Diff odsud k vybranému`
 		Otevře okno "status" s kumulovanými změnami zadaného rozsahu changesetů. Prohlížeč umožňuje uložit vybrané porce změn do souboru.
-	:guilabel:`VDiff odsud k vybranému` [#rcm5]_
+	:guilabel:`VDiff odsud k vybranému` 
 		Otevře okno "VDiff" s kumulativními změnami zadaného rozsahu changesetů.
 	:guilabel:`Email odsud k vybranému`
 		Otevře vytvoření emailu pro odeslání zadaného rozsahu changesetů.
@@ -217,7 +225,7 @@ Klikneme-li pravou myší na jiném než zvýrazněném řádku, dostaneme dalš
 		Vytvoří soubor se svazkem zadaného rozsahu changesetů.
 	:guilabel:`Exportovat oprávky odsud k vybranému`
 		Vytvoří oprávkový soubor pro každý chanteset zadaného rozsahu.
-	:guilabel:`Sloučit s ...` [#rcm6]_
+	:guilabel:`Sloučit s ...`
 		Sloučí označenou revizi s další vybranou revizí. *If neither revision is currently checked out, the merge dialog will be forced to update to the first selected revision before starting the merge. This will fail if the working directory is not clean.*
 	:guilabel:`Transplant revision range to local`
 		Přemístí vybraný rozsah changesetů k aktuálnímu pracovnímu rodičovskému adresáři. *Volba je viditelná jen při zpřístupněné extenzi 'transplant'*.
@@ -225,15 +233,10 @@ Klikneme-li pravou myší na jiném než zvýrazněném řádku, dostaneme dalš
 		Přeskupí (rebase) vybraný changeset a předky nad původně vybranou revizi. *Volba je viditelná jen při zpřístupněné extenzi 'transplant'*.
 	:guilabel:`Importovat výběr odsud k vybrané do MQ`
 		Importovat vybraný rozsah revizí do aktuální fronty oprávek. *Volba je viditelná jen při zpřístupněné extenzi 'MQ'*.
-	:guilabel:`Vybrat revizi společného předka`
-		Ukáže společného předka zadaného rozsahu revizí
+	:guilabel:`Vybrat společného předka`
+		Ukáže společného předka dvou vybraných revizí.
 
-.. [#rcm1] Otevře dialog "aktualizovat" pro danou revizi.
-.. [#rcm2] Otevře dialog "slučování" pro danou revizi.
-.. [#rcm3] Otevře vytvoření mailu s danou revizi.
-.. [#rcm4] Příkaz uloží odtržené revize ve svazku do souboru, který může být později použit. Viz `také <http://mercurial.selenic.com/wiki/EditingHistory>`_.
-.. [#rcm5] :menuselection:`Globální nastavení -> TortoiseHg -> Nástroj Visual Diff`
-.. [#rcm6] Jedna z označených revizí musí být rodič aktuálního pracovního adresáře.
+.. [#rcm1] Příkaz uloží odtržené revize ve svazku do souboru, který může být později použit. Viz `také <http://mercurial.selenic.com/wiki/EditingHistory>`_.
 
 Kontextové nabídky u souborů
 ----------------------------
@@ -263,17 +266,18 @@ Pravý klik na souboru v seznamu vlevo dole otevře kontextovou nabídku další
 Prohlížení changesetů
 ---------------------
 
-Prohlížeč changesetů zobrazuje z úsporných důvodů diffy jenom jednoho souboru. Chceme-li vidět diffy všech souborů najednou,
-klepneme na řádek * [Všechny soubory]. 
-Prohlížeč také vypustí zobrazení nadrozměrných diffů - viz 
+Okno Průzkumníka repozitáře je rozděleno do tří polí. V horním poli je tak zvaný 
+changelog se seznamem jednotlivých revizí (verzí, changesetů). Skladbu sloupců s informacemi o jednotlivých verzích lze nastavit.
+
+V levém dolním poli se zobrazují jednotlivé soubory, vybrané revizi.
+
+V pravém dolním poli se zobrazují případné diffy pro označený soubor nebo pro všechny soubory revize, je-li vybrána volba Všechny soubory.
+
+Prohlížeč vypouští zobrazení nadrozměrných diffů - viz 
 :menuselection:`Globální nastavení -> TortoiseHg -> Max velikost diffu`. Limit velikosti lze dočasně vypnout přepnutím volby :menuselection:`Zobrazení -> Ignorovat max velikost diffu`.
 
-* (podivný text:)
-
-The changelog and datamine tools can open the changeset browser to view a single revision or the combined effect of a range of revisions. The changeset browser is very similar to the commit and shelve tools. It has a file list on the left of all files that have been changed, and a diff pane on the right with the changes to each file.
-
-The diff pane is tabbed and allows one to select files and hunks that you wish to extract from the changeset(s) you are browsing and write them to a patch file using the Save as toolbar button. This is a very efficient way to cherry pick changes from a repository. This changeset browser also supports the Ctrl-C keyboard accelerator to copy hightlighted diff hunks to the clipboard.
-*
+Diffový panel je někdy rozdělen na záložky a umožňuje podrobný výběr souborů a porcí pro zápis do oprávkového souboru. 
+Prohlížeč changesetů také podporuje klávesový akcelerátor Ctrl-C pro kopírování označených porcí do schránky.
 
 Bohužel, TortoiseHg dosud nemá dialog pro importování oprávek do repozitáře, takže se to musí dělat přes příkazový řádek příkazem **hg import**.
 
@@ -314,7 +318,7 @@ Automatizovaný binární výběr provádíme z příkazového řádku Mercurial
 
 
 Klávesová navigace
--------------------
+------------------
 
 :kbd:`Ctrl-P`
 	Přesunout zvýraznění řádku na aktuální revizi pracovního adresáře

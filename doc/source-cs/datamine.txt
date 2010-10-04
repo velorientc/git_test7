@@ -1,12 +1,12 @@
 Zkoumání dat
-============
+=============
 
 .. module:: datamine.dialog
-	:synopsis: Dialog used to search repository history
+    :synopsis: Dialog used to search repository history
 
 Aplikace datamine (zkoumání dat) se používá k inspekci historie revizí v repozitáři. Okno má implicitně otevřenou záložku *Hledat* a vyvolatelnou záložku *Anotace*.
 
-Záložka Hledat
+Záložky Hledat
 --------------
 
 .. figure:: figures/search.png

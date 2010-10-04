@@ -3,7 +3,7 @@ Oprávky
 *******
 
 .. module:: patches
-	:synopsis: Describe patch operations
+    :synopsis: Describe patch operations
 
 Definice oprávky
 ================
@@ -11,9 +11,9 @@ Definice oprávky
 Četba těchto odkazů je užitečná pro pochopení historie a povahy oprávek (patches) a jejich použití v Mercurialu.
 
 
-* `Problém správy oprávek <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
-* `Pochopení oprávek <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
-* `Více o oprávkách <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+* `Problém správy oprávek <http://tortoisehg.bitbucket.org/hgbook/1.6/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `Pochopení oprávek <http://tortoisehg.bitbucket.org/hgbook/1.6/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `Více o oprávkách <http://tortoisehg.bitbucket.org/hgbook/1.6/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
 
 Úskalí
 ======
@@ -69,7 +69,7 @@ Konečně lze použít tlačítko :guilabel:`Email` v synchronizační liště P
 	Pro posílání oprávek emailem nutno nastavit
 	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
 
-Vybírání třešniček
+Podrobný výběr
 ------------------
 
 V Průzkumníku repozitáře použijeme již popsaný způsob určení rozsahu a z kontextové nabídky vybereme :menuselection:`Diff odsud k vybranému`. Otevře se prohlížeč 'status' se zobrazenými změnami mezi bázovým a cílovým changesetem.

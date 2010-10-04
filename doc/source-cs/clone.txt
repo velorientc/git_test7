@@ -1,8 +1,8 @@
 Klonování repozitáře
-====================
+=========================
 
 .. module:: clone.dialog
-	:synopsis: Dialog used to clone a repository
+    :synopsis: Dialog used to clone a repository
 
 Pro vytvoření věrné kopie repozitáře použijeme proceduru "clone".
 V kontextové nabídce průzkumníka Windows vybereme :menuselection:`TortoiseHg -> Klonovat repo` nebo zadáme **hgtk clone**.

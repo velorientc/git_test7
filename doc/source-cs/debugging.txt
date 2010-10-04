@@ -1,8 +1,8 @@
 Debugging 
-=========
+==========
 
 .. module:: debugging
-		:synopsis: Debug problems in shell extension or dialogs
+    :synopsis: Debug problems in shell extension or dialogs
 
 Dialogy
 -------
@@ -22,7 +22,7 @@ Windows
 Pro Průzkumník repozitáře lze např. uvnitř pracovního adresáře zadat v okně :command:`cmd.exe`::
 
     set THGDEBUG=1
-    hgtk log
+    hgtk --nofork log
 
 Linux/MacOSX
 ~~~~~~~~~~~~
@@ -30,7 +30,7 @@ Linux/MacOSX
 Totéž::
     
     export THGDEBUG=1
-    hgtk log
+    hgtk --nofork log
 
 
 
@@ -42,41 +42,37 @@ Způsob odladění závisí na platformě.
 Windows
 ~~~~~~~
 
-See also http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
-for some info bits about Running and Testing Shell Extensions on Windows
+Viz také http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
+kde jsou informace o spuštění a testování extenzí shellu ve Windows.
 
-The :command:`DbgView` tool from the SysInternals suite will capture
-debug messages from the shell extension.
+Nástroj :command:`DbgView` ze sady SysInternals odchytí chybovou zprávu
+ z extenze shellu.  Shell ovšem ladící informace neemituje implicitně. Je nutné to povolit editací klíče registru, definovaného v 
+:file:`win32/shellext/DebugShellExt.reg`
+    v repozitáři TortoiseHg. Dvojklikem na souboru můžete načíst klíč do svého registru.
 
-The :command:`ThgTaskbar` application's options dialog has an error
-logging tab.  If you have this dialog open while you are browsing
-folders, you will get info and error level messages from the icon
-overlay refresh process.
+Jinou možností je opustit aplikaci :command:`ThgTaskbar` a spustit ji z příkazového řádku. Ladící informace jsou potom emitovány v otevřené konzole.
 
 Nautilus
 ~~~~~~~~
 
-Debugging is done via the environment variable DEBUG_THG
+Ladění se provádí prostřednictvím proměnné DEBUG_THG
 
-* to test in a separate process::
+* pro testování v odlišném procesu::
 
     DEBUG_THG=Ne TMPDIR=/tmp/anydir/ --no-desktop nautilus [path]
 
-* to test in the main instance:: 
+* pro testování v hlavní instanci:: 
 
     nautilus -q
     DEBUG_THG=NOe nautilus
 
-* permanent debugging, set DEBUG_THG in a file which is read on session
-  start (~/.profile, ~/.xprofile)
+* pro permanentní ladění zadejte DEBUT_THG v souboru, který je načítán při spuštění seance (~/.profile, ~/.xprofile)
 
-Upper case characters in DEBUG_THG specify modules.  Only *O* and *N*
-for *OverlayCache* and *Nautilus*, respectively, are supported module
-names.  Lower case characters imply parts. Only *e* is supported,
-implying *error* messages.
+Velká písmena v DEBUG_THG označují moduly.  Pouze *O* a *N*
+u *OverlayCache* a *Nautilus*, jsou podporované názvy modulů.  Malá písmena označují části. Podporováno je pouze *e*, označující *chybové* zprávy.
 
-To restart nautilus, chose either
+Pro restartování nautilus použijte buď
 
-1) killall nautilus (the session restarts nautilus automatically, stdin and stdout go to ~/.xsession-errors)
+1) killall nautilus (seance restartuje nautilus automaticky, stdin a stdout jdou do ~/.xsession-errors)
 
-2) nautilus -q; nautilus (stdin and stdout are on the console)
+2) nautilus -q; nautilus (stdin a stdout jsou v konzole)

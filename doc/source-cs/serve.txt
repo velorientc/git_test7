@@ -1,8 +1,8 @@
 Serve
-=====
+======
 
 .. module:: serve.dialog
-	:synopsis: Dialog used to start/stop the web server
+    :synopsis: Dialog used to start/stop the web server
 
 .. figure:: figures/serve.png
 	:alt: Web server dialog
@@ -23,8 +23,9 @@ Tlačítka dialogového okna:
 Tlačítko :guilabel:`Nastavit` otevírá dialog pro nastavení aktuálního repozitáře.
 Různé webové konfigurace lze nalézt na wiki stránkách Mercurialu.
 
+
 Více repozitářů
-----------------
+---------------
 
 Pokud bychom chtěli jednou instancí webového serveru obsáhnout více repozitářů, vytvoříme textový soubor :file:`hgwebdir.conf` s následujícím obsahem: ::
 

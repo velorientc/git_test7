@@ -1,8 +1,8 @@
 Vytvoření nového repozitáře
-===========================
+=============================
 
 .. module:: init.dialog
-	:synopsis: Dialog used to create a repository
+    :synopsis: Dialog used to create a repository
 
 Při vytváření nového repozitáře v existujícím adresáři projektu použijeme nástroj "init". V kontextové nabídce průzkumníka Windows vybereme
 :menuselection:`TortoiseHg... -> Vytvořit repozitář`. 
@@ -33,7 +33,7 @@ Vytvoření nového repozitáře znamená vytvoření podadresáře :file:`.hg` 
 	Je nebezpečné editovat soubory ve složce :file:`.hg`, neboť může dojít k poškození repozitáře (s výjimkou konfiguračního souboru :file:`.hg/hgrc`).
 
 Spuštění z příkazového řádku
---------------------
+----------------------------
 
 ::
 

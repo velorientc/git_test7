@@ -1,12 +1,13 @@
-*********
+***********
 Předmluva
-*********
+***********
 
 .. module:: preface
-	:synopsis: About this manual
+    :synopsis: About this manual
+
 
 Cílový čtenář
-=============
+==============
 
 Tato kniha je napsána pro gramotného uživatele počítače, který chce používat
 Mercurial pro správu svých dat a vyhovuje mu, není-li pro komunikaci s 
@@ -17,7 +18,7 @@ Nejaktuálnější verzi této dokumentace lze nalézt na
 `webových <http://tortoisehg.org>`_ stránkách TortoiseHg.
 
 Seznámení s obsahem
-===================
+====================
 
 Předmluva stručně seznamuje s programem, s kolektivem lidí kteří se na jeho tvorbě podílejí a s licenčními podmínkami pro jeho používání a šíření.
 
@@ -59,7 +60,7 @@ Naše Wiki na stránkách Bitbucket je `zde <http://bitbucket.org/tortoisehg/sta
 Poděkování
 ==========
 
-Dík všem, kteřído projektu TortoiseHg přispívají. Pro vybudování skutečně 
+Dík všem, kteří do projektu TortoiseHg přispívají. Pro vybudování skutečně 
 použitelné aplikace je potřebný kolektiv vývojářů, překladatelů a uživatelů.
 Dík patří zejména těm uživatelům, kteří nelenují oznámit chybu nebo se podělit o svůj názor.
 
@@ -107,6 +108,9 @@ Program TortoiseHg lze aktivovat buď jako kontextové menu v Průzkumníku Wind
 Z toho vyplývá, že bez znalosti omezeného množství anglických slov se při používání TortoiseHg neobejdeme. Proto jsem si dovolil některá slova v manuálu i v lokalizaci nepřekládat.
 
 Bez překladu ponechávám slova COMMIT, PULL, PUSH, CHANGESET, HASH, SHELVE, DATAMINE, DIFF A VISUAL DIFF. Slova PATCH a HUNK jsem si dovolil přeložit jako oprávka a porce a SHELF jako almárka.
+
+Pojmy REVIZE a VERZE jsou v tomto textu zaměnitelné, i když je zřejmé, že revize není totéž co verze. Nutno poznamenat, že oba pojmy lze navíc zaměnit za pojem CHANGESET.
+Podobně zaměňovány jsou pojmy CHANGELOG a PRŮZKUMNÍK REPOZITÁŘE. Ve skutečnosti je changelog jedno z polí Průzkumníka repozitáře, když další pole tvoří pole se seznamem souborů a pole diffů, rozdělené záložkami.
 
     
 .. vim: noet ts=4

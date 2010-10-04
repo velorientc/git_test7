@@ -3,12 +3,12 @@ Nastavení parametrů
 *******************
 
 .. module:: settings.dialog
-		:synopsis: Dialog used to set preferences
+    :synopsis: Dialog used to set preferences
 
 .. figure:: figures/settings.png
-		:alt: Settings dialog
+    :alt: Settings dialog
 
-		Okno Konfigurace uživatele
+	Okno Konfigurace uživatele
 
 Dialog nastavení se používá pro konfiguraci jak TortoiseHg, tak DVCS Mercurialu, protože TortoiseHg je vlastně uživatelská obálka programu Mercurial.
 
@@ -20,7 +20,8 @@ Konfigurace Mercurialu ve Windows má tři úrovně.
 2) Nastavení pro uživatele v souboru
    :file:`C:\\Documents and Settings\\username\\mercurial.ini`
    Tento soubor je čten jako druhý a může přepsat parametry nastavení pro počítač.
-3) Nastavení pro repozitář v souboru   :file:`repo-root\\.hg\\hgrc`. Tento soubor je čten jako poslední a má tudíž nejvyšší prioritu.
+3) Nastavení pro repozitář v souboru   :file:`repo-root\\.hg\\hgrc`.
+   Tento soubor je čten jako poslední a má tudíž nejvyšší prioritu.
 
 Nastavení pro počítač může být přepsáno při aktualizaci, takže se doporučuje provádět změny jen v souborech :file:`..username\\mercurial.ini` a/nebo :file:`.hg\\hgrc`.  
 V TortoiseHg je toto doporučení vynuceno tím, že se používají jen dvě úrovně nastavení:
@@ -114,8 +115,8 @@ Commit
 .. module:: changelog.settings
 	:synopsis: Dialog used to set changelog specific preferences
 
-Průzkumník repozitáře
----------------------
+Changelog
+---------
 
 :guilabel:`Zabarvení podle autora:`
 	Zabarvení changesetů podle jména autora. Není-li umožněno, jsou změny zabarveny zeleně pro sloučení, červeně pro netriviální rodiče a černě pro běžné případy. Implicitně je False.
@@ -135,12 +136,6 @@ Průzkumník repozitáře
 :guilabel:`Skrýt tagy:`
 	Seznam mezerami oddělených tagů, které se nebudou zobrazovat. Užitečný příklad: zadejte 'qbase qparent qtip' pro skrytí standardních tagů, vkládaných extenzí MQ. Implicitní nastavení je None.
 	
-:guilabel:`Použít expandér:`
-	Zobrazit detaily changesetu pomocí rozbalovací ikony
-
-:guilabel:`Styl nástrojové lišty`
-	Jsou nabízeny čtyři možnosti: neurčeno (implicitní), small, large a theme.
-
 .. module:: synchronize.settings
 	:synopsis: Dialog used to set synchronize specific preferences
 
@@ -186,7 +181,7 @@ Web
 	Port, kterému má být nasloucháno.
 
 :guilabel:`Push vyžaduje SSL:`
-	Zda požadovat přenos příchozího 'push' přes SSL, aby se zabránilo 'čmuchání po heslu'. 
+	Zda požadovat přenos příchozího 'push' přes SSL, aby se zabránilo 'čenichání po heslu'. 
 
 :guilabel:`Pruhy:`
 	Kolik řádků májí zabírat "pruhy zebry" ve víceřádkovém výstupu. Implicitní nastavení je 1; hodnota 0 volbu znemožní.
@@ -245,8 +240,7 @@ Email
 	CSV seznam skrytých adres příjemců kopie emailu.
 
 :guilabel:`Metoda:`
-	Nepovinné. Použitá metoda při posílání emailových zpráv. Je-li hodnota "smtp" (implicitní hodnota), použije se SMTP (konfigurace viz níže). 
-Jinak se zadaná hodnota použije jako jméno programu, který působí jako 'sendmail' (příjímá volbu :command:`-f` pro odesílatele, seznam příjemců na příkazovém řádku, zprávu v stdin). Normálně pro posílání zpráv postačí nastavení ``sendmail`` nebo ``/usr/sbin/sendmail``.
+	Nepovinné. Použitá metoda při posílání emailových zpráv. Je-li hodnota "smtp" (implicitní hodnota), použije se SMTP (konfigurace viz níže). Jinak se zadaná hodnota použije jako jméno programu, který působí jako 'sendmail' (příjímá volbu :command:`-f` pro odesílatele, seznam příjemců na příkazovém řádku, zprávu v stdin). Normálně pro posílání zpráv postačí nastavení ``sendmail`` nebo ``/usr/sbin/sendmail``.
 
 :guilabel:`Hostitel SMTP:`
 	Jméno hostitele mailového serveru.
@@ -260,7 +254,7 @@ Jinak se zadaná hodnota použije jako jméno programu, který působí jako 'se
 :guilabel:`Uživatel SMTP:`
 	Uživatelské jméno pro ověření u mailového serveru.
 
-	:guilabel:`Heslo pro SMTP:`
+:guilabel:`Heslo pro SMTP:`
 	Heslo pro ověření u mailového serveru.
 
 :guilabel:`Lokální jméno hostitele:`
@@ -299,7 +293,7 @@ Diff
 
 
 Font
-====
+----
 
 :guilabel:`Implicitní fonty motivu`
 	Použít výchozí fonty založené na aktuálním motivu GTK
@@ -309,14 +303,26 @@ Font
 	
 :guilabel:`Uživatelské fonty:`
 	Určit jména fontů a velikostí individuálně pro jednotlivá místa použití.
-	:guilabel:`Komentář komitu:`
-		Font je používán v prohlížeči changesetů a při zápisu komitu. Implicitně: monospace 10.
-	:guilabel:`Text diffu:`
-		Font je používán pro zápis diffů v nástrojích status a commit. Implicitně: monospace 10.
-	:guilabel:`Seznam souborů:`
-		Font je používán v seznamu souborů v nástrojích status a commit. Implicitně: sans 9.
-	:guilabel:`Výstup příkazu:`
-		Font je používán v oknech s výstupem příkazů. Implicitně: monospace 10.
+:guilabel:`Komentář komitu:`
+	Font je používán v prohlížeči changesetů a při zápisu komitu. Implicitně: monospace 10.
+:guilabel:`Text diffu:`
+	Font je používán pro zápis diffů v nástrojích status a commit. Implicitně: monospace 10.
+:guilabel:`Seznam souborů:`
+	Font je používán v seznamu souborů v nástrojích status a commit. Implicitně: sans 9.
+:guilabel:`Výstup příkazu:`
+	Font je používán v oknech s výstupem příkazů. Implicitně: monospace 10.
+
+
+Extension
+---------
+
+Záložka obsahuje seznam volitelných extenzí. Podrobnosti neuvedeny.
+
+
+Sporná témata
+-------------
+
+Popis záložky neuveden
 
 	
 Klávesová navigace

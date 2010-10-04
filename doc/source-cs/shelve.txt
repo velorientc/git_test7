@@ -1,8 +1,8 @@
 Almárka
-=======
+========
 
 .. module:: shelve.dialog
-	:synopsis: Dialog used to perform shelve/unshelve operations
+    :synopsis: Dialog used to perform shelve/unshelve operations
 
 Účelem tohoto nástroje je umožnit uživateli **odložit** (shelve) vybrané změny z pracovního adresáře, uložit je uvnitř repozitáře ve speciálním oprávkovém souboru (patch file) a později je opět **vyjmout** (unshelve). Úložný prostor uvnitř repozitáře je označován jako shelf, neboli almárka.
 
@@ -47,7 +47,7 @@ Diffový panel nástroje Shelve má čtyři záložky:
 Odkládání změn
 --------------
 
-Stejně jako procedura Commit, používá i procedura Shelve vestavěný kód pro výběr porcí u zadaných souborů pro přemístění do almárky. Stiskneme-li tlačítko Shelve, jsou vybrané změny odstraněny z pracovního adresáře a umístěny do oprávkového souboru. Pokud almárka již změny obsahuje, musíme rozhodnout, zda má být soubor přepsán anebo zda mají být změny sloučeny. Obsahuje-li almárka nějaké změny, je aktivní tlačítko "Vyjmout".
+Stejně jako procedura Commit, používá i procedura Shelve vestavěný kód pro výběr porcí u zadaných souborů pro odložení do almárky. Stiskneme-li tlačítko Shelve, jsou vybrané změny odstraněny z pracovního adresáře a umístěny do oprávkového souboru. Pokud almárka již změny obsahuje, musíme rozhodnout, zda má být soubor přepsán anebo zda mají být změny sloučeny. Obsahuje-li almárka nějaké změny, je aktivní tlačítko "Vyjmout".
 
 Vracení odložených změn
 -----------------------

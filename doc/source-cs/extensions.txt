@@ -3,7 +3,7 @@ Extenze
 *******
 
 .. module:: extensions
-		:synopsis: Describe extensions bundled with TortoiseHg binary packages
+    :synopsis: Describe extensions bundled with TortoiseHg binary packages
 
 Tato kapitola popisuje extenze Mercurialu, které jsou pro Windows dodávána s binárními balíčky TortoiseHg. Tato rozšíření jsou připojena pro pohodlí uživatelů, kteří si je mohou zpřístupnit, jakmile je potřebuji.
 
@@ -30,6 +30,9 @@ Můžeme jej zaké zapsat do konfiguračního souboru Mercurial.ini nebo do soub
 
 	[extensions]
 	fold=
+
+Učíníme-li to, můžeme vypustit volbu --config.
+
  
 
 **Varování**
@@ -237,15 +240,18 @@ It adds a number of commands which can be listed with
 
 **Installation**
 
+As this extension is not installed with TortoiseHg, you have to download 
+it from `<http://bitbucket.org/parren/hg-pbranch>`_. Be sure to dowload the right one according to the Mercurial version included with TortoiseHg (see the wiki page on the download site).
+
 To test the use of this plugin, you can specify it on the Mercurial
 command line like this::
 
-	hg --config "extensions.pbranch=" pstatus
+	hg --config "extensions.pbranch=C:\path\to\pbranch.py" pstatus
 
 You may want to add it to your Mercurial.ini or a repository's hgrc like this::
 
 	[extensions]
-	pbranch=
+	pbranch = C:\path\to\pbranch.py
  
 If you do this, you can omit the --config command-line option.
  
