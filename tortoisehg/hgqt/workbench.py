@@ -191,7 +191,6 @@ class Workbench(QMainWindow):
         a.setToolTip(_("Exit"))
 
         self.actionAbout = QAction(_("About"), self)
-        self.actionDisplayAllBranches = QAction("displayAllBranches", self)
 
         self.actionBack = a = QAction(_("Back"), self)
         a.setEnabled(False)
