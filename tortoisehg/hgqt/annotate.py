@@ -499,7 +499,7 @@ class AnnotateDialog(QMainWindow):
             self.searchwidget.raise_()
 
     def wheelEvent(self, event):
-        if self.childAt(event.pos()) != self.le:
+        if self.childAt(event.pos()) != self._searchbar._le:
             event.ignore()
             return
         if event.delta() > 0:
