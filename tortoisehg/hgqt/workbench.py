@@ -118,12 +118,6 @@ class Workbench(QMainWindow):
 
         self.setWindowIcon(geticon('log'))
 
-        self.centralwidget = QWidget(self)
-
-        self.verticalLayout = vl = QVBoxLayout(self.centralwidget)
-        vl.setSpacing(0)
-        vl.setMargin(0)
-
         self.repoTabsWidget = tw = QTabWidget()
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
@@ -135,9 +129,8 @@ class Workbench(QMainWindow):
         tw.setSizePolicy(sp)
         tw.tabCloseRequested.connect(self.repoTabCloseRequested)
         tw.currentChanged.connect(self.repoTabChanged)
-        vl.addWidget(tw)
 
-        self.setCentralWidget(self.centralwidget)
+        self.setCentralWidget(tw)
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
