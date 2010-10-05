@@ -473,7 +473,7 @@ class AnnotateDialog(QMainWindow):
         super(AnnotateDialog, self).closeEvent(event)
 
     def editSelected(self, args):
-        pattern = hglib.fromunicode(self.le.text()) or None
+        pattern = hglib.fromunicode(self._searchbar._le.text()) or None
         repo = self.repo
         wfile, rev, line = args
         try:
