@@ -18,6 +18,7 @@ from PyQt4.QtGui import *
 #  Connect to repoview revisionClicked events
 #  Shift-Click rev range -> revision range X:Y
 #  Ctrl-Click two revs -> DAG range X::Y
+#  QFontMetrics.elidedText for help label
 
 _common = (
     ('user(string)',
