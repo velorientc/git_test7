@@ -29,23 +29,23 @@ class RepoFilterBar(QToolBar):
         self.refresh()
 
     def _initbranchfilter(self):
-        self.branchLabel = QToolButton(
+        self._branchLabel = QToolButton(
             text=_('Branch'), popupMode=QToolButton.InstantPopup,
             statusTip=_('Display graph the named branch only'))
-        self.branch_menu = QMenu(self.branchLabel)
-        self.cbranch_action = self.branch_menu.addAction(
+        self._branchMenu = QMenu(self._branchLabel)
+        self._cbranchAction = self._branchMenu.addAction(
             _('Display closed branches'), self.refresh)
-        self.cbranch_action.setCheckable(True)
-        self.allpar_action = self.branch_menu.addAction(
+        self._cbranchAction.setCheckable(True)
+        self._allparAction = self._branchMenu.addAction(
             _('Include all ancestors'), self._emitBranchChanged)
-        self.allpar_action.setCheckable(True)
-        self.branchLabel.setMenu(self.branch_menu)
+        self._allparAction.setCheckable(True)
+        self._branchLabel.setMenu(self._branchMenu)
 
-        self.branchCombo = QComboBox()
-        self.branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
+        self._branchCombo = QComboBox()
+        self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
 
-        self.addWidget(self.branchLabel)
-        self.addWidget(self.branchCombo)
+        self.addWidget(self._branchLabel)
+        self.addWidget(self._branchCombo)
 
     def _updatebranchfilter(self):
         """Update the list of branches"""
@@ -62,27 +62,27 @@ class RepoFilterBar(QToolBar):
             return sorted(br for br, n in allbranches.iteritems()
                           if n in openbrnodes)
 
-        branches = list(iterbranches(all=self.cbranch_action.isChecked()))
-        self.branchCombo.clear()
-        self.branchCombo.addItems([''] + branches)
-        self.branchLabel.setEnabled(len(branches) > 1)
-        self.branchCombo.setEnabled(len(branches) > 1)
+        branches = list(iterbranches(all=self._cbranchAction.isChecked()))
+        self._branchCombo.clear()
+        self._branchCombo.addItems([''] + branches)
+        self._branchLabel.setEnabled(len(branches) > 1)
+        self._branchCombo.setEnabled(len(branches) > 1)
 
         self.setBranch(curbranch)
 
     @pyqtSlot(unicode)
     def setBranch(self, branch):
         """Change the current branch by name [unicode]"""
-        self.branchCombo.setCurrentIndex(self.branchCombo.findText(branch))
+        self._branchCombo.setCurrentIndex(self._branchCombo.findText(branch))
 
     def branch(self):
         """Return the current branch name [unicode]"""
-        return unicode(self.branchCombo.currentText())
+        return unicode(self._branchCombo.currentText())
 
     @pyqtSlot()
     def _emitBranchChanged(self):
         self.branchChanged.emit(self.branch(),
-                                self.allpar_action.isChecked())
+                                self._allparAction.isChecked())
 
     @pyqtSlot()
     def refresh(self):
