@@ -29,25 +29,23 @@ class RepoFilterBar(QToolBar):
         self.refresh()
 
     def _initbranchfilter(self):
-        self.branchLabel = QToolButton()
-        self.branchLabel.setText(_('Branch'))
-        self.branchLabel.setStatusTip(_('Display graph the named branch only'))
-        self.branchLabel.setPopupMode(QToolButton.InstantPopup)
-        self.branch_menu = QMenu()
-        cbranch_action = self.branch_menu.addAction(_('Display closed branches'))
-        cbranch_action.setCheckable(True)
-        self.cbranch_action = cbranch_action
-        allpar_action = self.branch_menu.addAction(_('Include all ancestors'))
-        allpar_action.setCheckable(True)
-        self.allpar_action = allpar_action
+        self.branchLabel = QToolButton(
+            text=_('Branch'), popupMode=QToolButton.InstantPopup,
+            statusTip=_('Display graph the named branch only'))
+        self.branch_menu = QMenu(self.branchLabel)
+        self.cbranch_action = self.branch_menu.addAction(
+            _('Display closed branches'), self.refresh)
+        self.cbranch_action.setCheckable(True)
+        self.allpar_action = self.branch_menu.addAction(
+            _('Include all ancestors'), self._emitBranchChanged)
+        self.allpar_action.setCheckable(True)
         self.branchLabel.setMenu(self.branch_menu)
+
         self.branchCombo = QComboBox()
         self.branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
-        cbranch_action.toggled.connect(self.refresh)
-        allpar_action.toggled.connect(self._emitBranchChanged)
 
-        self.branchLabelAction = self.addWidget(self.branchLabel)
-        self.branchComboAction = self.addWidget(self.branchCombo)
+        self.addWidget(self.branchLabel)
+        self.addWidget(self.branchCombo)
 
     def _updatebranchfilter(self):
         """Update the list of branches"""
@@ -63,16 +61,10 @@ class RepoFilterBar(QToolBar):
         if self.cbranch_action.isChecked():
             branches = branches + clbranches
 
-        if len(branches) == 1:
-            self.branchLabelAction.setEnabled(False)
-            self.branchComboAction.setEnabled(False)
-            self.branchCombo.clear()
-        else:
-            branches = [''] + branches
-            self.branchesmodel = QStringListModel(branches)
-            self.branchCombo.setModel(self.branchesmodel)
-            self.branchLabelAction.setEnabled(True)
-            self.branchComboAction.setEnabled(True)
+        self.branchCombo.clear()
+        self.branchCombo.addItems([''] + branches)
+        self.branchLabel.setEnabled(len(branches) > 1)
+        self.branchCombo.setEnabled(len(branches) > 1)
 
         self.setBranch(curbranch)
 
