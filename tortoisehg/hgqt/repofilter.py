@@ -9,6 +9,8 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from tortoisehg.hgqt.i18n import _
+
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
 
@@ -28,14 +30,14 @@ class RepoFilterBar(QToolBar):
 
     def _initbranchfilter(self):
         self.branchLabel = QToolButton()
-        self.branchLabel.setText("Branch")
-        self.branchLabel.setStatusTip("Display graph the named branch only")
+        self.branchLabel.setText(_('Branch'))
+        self.branchLabel.setStatusTip(_('Display graph the named branch only'))
         self.branchLabel.setPopupMode(QToolButton.InstantPopup)
         self.branch_menu = QMenu()
-        cbranch_action = self.branch_menu.addAction("Display closed branches")
+        cbranch_action = self.branch_menu.addAction(_('Display closed branches'))
         cbranch_action.setCheckable(True)
         self.cbranch_action = cbranch_action
-        allpar_action = self.branch_menu.addAction("Include all ancestors")
+        allpar_action = self.branch_menu.addAction(_('Include all ancestors'))
         allpar_action.setCheckable(True)
         self.allpar_action = allpar_action
         self.branchLabel.setMenu(self.branch_menu)
