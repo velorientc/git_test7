@@ -116,9 +116,7 @@ class Workbench(QMainWindow):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.8)
 
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/log.svg"), QIcon.Normal, QIcon.Off)
-        self.setWindowIcon(icon)
+        self.setWindowIcon(geticon('log'))
 
         self.centralwidget = QWidget(self)
 
@@ -189,22 +187,16 @@ class Workbench(QMainWindow):
 
         self.actionBack = a = QAction(_("Back"), self)
         a.setEnabled(False)
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/back.svg"), QIcon.Normal, QIcon.Off)
-        a.setIcon(icon)
+        a.setIcon(geticon('back'))
 
         self.actionForward = a = QAction(_("Forward"), self)
         a.setEnabled(False)
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/forward.svg"), QIcon.Normal, QIcon.Off)
-        a.setIcon(icon)
+        a.setIcon(geticon('forward'))
 
         self.actionLoadAll = a = QAction(_("Load all"), self)
         a.setEnabled(True)
         a.setToolTip(_('Load all revisions into graph'))
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/loadall.png"), QIcon.Normal, QIcon.Off)
-        a.setIcon(icon)
+        a.setIcon(geticon('loadall'))
 
         self.actionShowPaths = a = QAction(_("Show Paths"), self)
         a.setCheckable(True)
@@ -231,15 +223,11 @@ class Workbench(QMainWindow):
 
         self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
         a.setCheckable(True)
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/repotree.svg"), QIcon.Normal, QIcon.Off)
-        a.setIcon(icon)
+        a.setIcon(geticon('repotree'))
 
         self.actionShowLog = a = QAction(_("Show Output &Log"), self)
         a.setCheckable(True)
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/showlog.png"), QIcon.Normal, QIcon.Off)
-        a.setIcon(icon)
+        a.setIcon(geticon('showlog'))
         a.setShortcut(QKeySequence("Ctrl+L"))
 
         self.actionServe = QAction(_("Web Server"), self)
@@ -256,16 +244,16 @@ class Workbench(QMainWindow):
         # TODO: Use long names when these have icons
         self.actionIncoming = a = QAction(_('In'), self)
         a.setToolTip(_('Check for incoming changes from default pull target'))
-        a.setIcon(QIcon(":/icons/incoming.svg"))
+        a.setIcon(geticon('incoming'))
         self.actionPull = a = QAction(_('Pull'), self)
         a.setToolTip(_('Pull incoming changes from default pull target'))
-        a.setIcon(QIcon(":/icons/pull.svg"))
+        a.setIcon(geticon('pull'))
         self.actionOutgoing = a = QAction(_('Out'), self)
         a.setToolTip(_('Detect outgoing changes to default push target'))
-        a.setIcon(QIcon(":/icons/outgoing.svg"))
+        a.setIcon(geticon('outgoing'))
         self.actionPush = a = QAction(_('Push'), self)
         a.setToolTip(_('Push outgoing changes to default push target'))
-        a.setIcon(QIcon(":/icons/push.svg"))
+        a.setIcon(geticon('push'))
 
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
