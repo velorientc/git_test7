@@ -51,16 +51,18 @@ class RepoFilterBar(QToolBar):
         """Update the list of branches"""
         curbranch = self.branch()
 
-        allbranches = sorted(self._repo.branchtags().items())
+        def iterbranches(all=False):
+            allbranches = self._repo.branchtags()
+            if all:
+                return sorted(allbranches.keys())
 
-        openbr = []
-        for branch, brnode in allbranches:
-            openbr.extend(self._repo.branchheads(branch, closed=False))
-        clbranches = [br for br, node in allbranches if node not in openbr]
-        branches = [br for br, node in allbranches if node in openbr]
-        if self.cbranch_action.isChecked():
-            branches = branches + clbranches
+            openbrnodes = []
+            for br in allbranches.iterkeys():
+                openbrnodes.extend(self._repo.branchheads(br, closed=False))
+            return sorted(br for br, n in allbranches.iteritems()
+                          if n in openbrnodes)
 
+        branches = list(iterbranches(all=self.cbranch_action.isChecked()))
         self.branchCombo.clear()
         self.branchCombo.addItems([''] + branches)
         self.branchLabel.setEnabled(len(branches) > 1)
