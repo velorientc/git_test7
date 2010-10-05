@@ -40,7 +40,7 @@ class RepoFilterBar(QToolBar):
         self.allpar_action = allpar_action
         self.branchLabel.setMenu(self.branch_menu)
         self.branchCombo = QComboBox()
-        self.branchCombo.activated.connect(self._emitBranchChanged)
+        self.branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         cbranch_action.toggled.connect(self.refresh)
         allpar_action.toggled.connect(self._emitBranchChanged)
 
