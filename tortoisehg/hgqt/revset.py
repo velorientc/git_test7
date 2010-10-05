@@ -41,6 +41,8 @@ _common = (
     ('date(interval)',
      _('Changesets within the interval, see <a href="http://www.selenic.com/'
        'mercurial/hg.1.html#dates">help dates</a>')),
+    ('ancestor(single, single)',
+     _('Greatest common ancestor of the two changesets.')),
 )
 
 _filepatterns = (
@@ -65,6 +67,8 @@ _ancestry = (
      _('Members of a set with no children in set.')),
     ('descendants(set)',
      _('Changesets which are descendants of changesets in set.')),
+    ('ancestors(set)',
+     _('Changesets that are ancestors of a changeset in set.')),
     ('children(set)',
      _('Child changesets of changesets in set.')),
     ('parents(set)',
