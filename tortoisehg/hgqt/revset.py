@@ -108,7 +108,7 @@ class RevisionSetQuery(QDialog):
 
         layout = QVBoxLayout()
         layout.setMargin(0)
-        layout.setContentsMargins(*(0,)*4)
+        layout.setContentsMargins(*(4,)*4)
         self.setLayout(layout)
 
         self.stbar = cmdui.ThgStatusBar(self)
@@ -175,6 +175,14 @@ class RevisionSetQuery(QDialog):
 
         layout.addLayout(hbox)
 
+        txt = _('<a href="http://www.selenic.com/mercurial/hg.1.html#revsets">'
+                'help revsets</a>')
+        helpLabel = QLabel(txt)
+        helpLabel.setOpenExternalLinks(True)
+        self.stbar.addPermanentWidget(helpLabel)
+
+        layout.addWidget(self.stbar)
+
         hbox = QHBoxLayout()
         clear = QPushButton(_('Clear'))
         queryle = QComboBox()
@@ -188,28 +196,5 @@ class RevisionSetQuery(QDialog):
         clear.pressed.connect(queryle.lineEdit().clear)
         layout.addLayout(hbox)
         
-        layout.addWidget(self.stbar)
-
-        txt = _('<a href="http://www.selenic.com/mercurial/hg.1.html#revsets">'
-                'help revsets</a>')
-        helpLabel = QLabel(txt)
-        helpLabel.setOpenExternalLinks(True)
-        self.stbar.addPermanentWidget(helpLabel)
-
-        # dialog buttons
-        BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
-        self.apply_button = bb.button(BB.Apply)
-        bb.accepted.connect(self.accept)
-        bb.rejected.connect(self.reject)
-        bb.button(BB.Ok).setDefault(True)
-        layout.addWidget(bb)
-
-    def accept(self):
-        QDialog.accept(self)
-
-    def reject(self):
-        QDialog.reject(self)
-
 def run(ui, *pats, **opts):
     return RevisionSetQuery()
