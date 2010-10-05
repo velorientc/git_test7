@@ -143,11 +143,6 @@ class Workbench(QMainWindow):
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.filterToolbar = tb = QToolBar(_("Filter Toolbar"), self)
-        tb.setEnabled(True)
-        tb.setObjectName("filterToolbar")
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
         self.actionHelp = a = QAction(_("Help"), self)
         a.setShortcut(QKeySequence.HelpContents)
         a.setIcon(geticon('help'))
@@ -353,30 +348,6 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionPush)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
-        # tree filters toolbar
-        self.branchLabel = QToolButton()
-        self.branchLabel.setText("Branch")
-        self.branchLabel.setStatusTip("Display graph the named branch only")
-        self.branchLabel.setPopupMode(QToolButton.InstantPopup)
-        self.branch_menu = QMenu()
-        cbranch_action = self.branch_menu.addAction("Display closed branches")
-        cbranch_action.setCheckable(True)
-        self.cbranch_action = cbranch_action
-        allpar_action = self.branch_menu.addAction("Include all ancestors")
-        allpar_action.setCheckable(True)
-        self.allpar_action = allpar_action
-        self.branchLabel.setMenu(self.branch_menu)
-        self.branchCombo = QComboBox()
-        self.branchCombo.activated.connect(self.setBranch)
-        cbranch_action.toggled.connect(self.setupBranchCombo)
-        allpar_action.toggled.connect(self.setBranch)
-
-        self.filterToolbar.layout().setSpacing(3)
-
-        self.branchLabelAction = self.filterToolbar.addWidget(self.branchLabel)
-        self.branchComboAction = self.filterToolbar.addWidget(self.branchCombo)
-        self.filterToolbar.addSeparator()
-
     def createActions(self):
         # main window actions (from .ui file)
         self.actionFind.triggered.connect(self.find)
@@ -536,7 +507,6 @@ class Workbench(QMainWindow):
             self.updateMenu()
 
     def repoTabChanged(self, index=0):
-        self.setupBranchCombo()
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.switchedTo()
@@ -566,45 +536,6 @@ class Workbench(QMainWindow):
 
     def showMessage(self, msg):
         self.statusbar.showMessage(msg)
-
-    def setupBranchCombo(self, *args):
-        w = self.repoTabsWidget.currentWidget()
-        if not w:
-            self.branchLabelAction.setEnabled(False)
-            self.branchComboAction.setEnabled(False)
-            self.branchCombo.clear()
-            return
-
-        repo = w.repo
-        allbranches = sorted(repo.branchtags().items())
-
-        openbr = []
-        for branch, brnode in allbranches:
-            openbr.extend(repo.branchheads(branch, closed=False))
-        clbranches = [br for br, node in allbranches if node not in openbr]
-        branches = [br for br, node in allbranches if node in openbr]
-        if self.cbranch_action.isChecked():
-            branches = branches + clbranches
-
-        if len(branches) == 1:
-            self.branchLabelAction.setEnabled(False)
-            self.branchComboAction.setEnabled(False)
-            self.branchCombo.clear()
-        else:
-            branches = [''] + branches
-            self.branchesmodel = QStringListModel(branches)
-            self.branchCombo.setModel(self.branchesmodel)
-            self.branchLabelAction.setEnabled(True)
-            self.branchComboAction.setEnabled(True)
-
-            branch = w.filterbranch()
-            index = -1
-            for i, b in enumerate(branches):
-                if b == branch:
-                    index = i
-                    break
-            self.branchCombo.setCurrentIndex(index)
-
 
     def actionShowPathsToggled(self, show):
         self.reporegistry.showPaths(show)
@@ -706,7 +637,6 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.reload()
-            self.setupBranchCombo()
 
     def reloadTaskTab(self, root):
         rw = self.repoTabsWidget.currentWidget()
@@ -720,7 +650,6 @@ class Workbench(QMainWindow):
     def reloadRepository(self, root):
         for rw in self._findrepowidget(root):
             rw.reload()
-        self.setupBranchCombo()
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
@@ -729,22 +658,6 @@ class Workbench(QMainWindow):
             rw = tw.widget(idx)
             if rw.repo.root == root:
                 yield rw
-
-    #@timeit
-    def setBranch(self, *args, **kw):
-        'Handle new branch choice or allparents toggle'
-        branch = self.branchCombo.currentText()
-        branch = str(branch)
-        allparents = self.allpar_action.isChecked()
-        tw = self.repoTabsWidget
-        w = tw.currentWidget()
-        if w:
-            w.setBranch(branch, allparents)
-            if branch:
-                tabtext = '%s [%s]' % (w.reponame(), branch)
-            else:
-                tabtext = w.reponame()
-            tw.setTabText(tw.currentIndex(), tabtext)
 
     def on_about(self, *args):
         """ Display about dialog """

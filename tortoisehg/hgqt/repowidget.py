@@ -23,6 +23,7 @@ from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo, purge
 
+from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
@@ -71,6 +72,11 @@ class RepoWidget(QWidget):
         self.repotabs_splitter = QSplitter(orientation=Qt.Vertical)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.filterbar = RepoFilterBar(self.repo)
+        self.filterbar.branchChanged.connect(self.setBranch)
+        self.layout().addWidget(self.filterbar)
+
         self.layout().addWidget(self.repotabs_splitter)
 
         self.repoview = view = HgRepoView(self.workbench, self.repo)
@@ -449,6 +455,7 @@ class RepoWidget(QWidget):
         self.repo.thginvalidate()
         self.rebuildGraph()
         self.commitDemand.forward('reload')
+        self.filterbar.refresh()
 
     def rebuildGraph(self):
         self.showMessage('')
@@ -479,6 +486,7 @@ class RepoWidget(QWidget):
         self.repo.thginvalidate()
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
+        self.filterbar.refresh()
 
     def repositoryDestroyed(self):
         'Repository has detected itself to be deleted'
@@ -498,16 +506,15 @@ class RepoWidget(QWidget):
         self.titleChanged.emit(self.title())
         # TODO: emit only if actually changed
 
+    @pyqtSlot(unicode, bool)
+    def setBranch(self, branch, allparents=True):
+        'Change the branch filter'
+        self.repomodel.setBranch(branch=branch, allparents=allparents)
+        self.titleChanged.emit(self.title())
+
     ##
     ## Workbench methods
     ##
-
-    def setBranch(self, branch, allparents=True):
-        'Triggered by workbench on branch selection'
-        self.repomodel.setBranch(branch=branch, allparents=allparents)
-
-    def filterbranch(self):
-        return self.repomodel.branch()
 
     def switchedTo(self):
         'Update back / forward actions'
