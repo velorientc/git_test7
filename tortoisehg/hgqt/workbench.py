@@ -555,8 +555,10 @@ class Workbench(QMainWindow):
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
 
         tw = self.repoTabsWidget
-        index = self.repoTabsWidget.addTab(rw, repo.shortname)
+        index = self.repoTabsWidget.addTab(rw, rw.title())
         tw.setCurrentIndex(index)
+        rw.titleChanged.connect(
+            lambda title: self.repoTabsWidget.setTabText(index, title))
         self.reporegistry.addRepo(repo.root)
 
         self.updateMenu()

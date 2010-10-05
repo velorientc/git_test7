@@ -42,6 +42,9 @@ class RepoWidget(QWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
+    titleChanged = pyqtSignal(unicode)
+    """Emitted when changed the expected title for the RepoWidget tab"""
+
     def __init__(self, repo, workbench):
         QWidget.__init__(self, acceptDrops=True)
 
@@ -121,6 +124,14 @@ class RepoWidget(QWidget):
         tb.showMessage.connect(self.showMessage)
         tb.attachFileView(d.fileview)
         self.layout().addWidget(tb)
+
+    def title(self):
+        """Returns the expected title for this widget [unicode]"""
+        branch = self.repomodel.branch()
+        if branch:
+            return '%s [%s]' % (self.repo.shortname, branch)
+        else:
+            return self.repo.shortname
 
     def find(self):
         self.findToolbar.setVisible(True)
@@ -484,13 +495,8 @@ class RepoWidget(QWidget):
         'Repository is reporting its config files have changed'
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
-        branch = self.repomodel.branch()
-        if branch:
-            tabtext = '%s [%s]' % (self.repo.shortname, branch)
-        else:
-            tabtext = self.repo.shortname
-        idx = self.workbench.repoTabsWidget.indexOf(self)
-        self.workbench.repoTabsWidget.setTabText(idx, tabtext)
+        self.titleChanged.emit(self.title())
+        # TODO: emit only if actually changed
 
     ##
     ## Workbench methods
