@@ -271,12 +271,19 @@ def invalidaterepo(repo):
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
+def enabledextensions():
+    """Return the {name: shortdesc} dict of enabled extensions
+
+    shortdesc is in local encoding.
+    """
+    return extensions.enabled()[0]
+
 def allextensions():
     """Return the {name: shortdesc} dict of known extensions
 
     shortdesc is in local encoding.
     """
-    enabledexts = extensions.enabled()[0]
+    enabledexts = enabledextensions()
     disabledexts = extensions.disabled()[0]
     exts = (disabledexts or {}).copy()
     exts.update(enabledexts)

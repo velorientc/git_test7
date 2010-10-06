@@ -21,12 +21,17 @@ from PyQt4.QtGui import *
 
 # Technical Debt
 #   stacked widget or pages need to be scrollable
-#   add extensions page after THG 1.1 is released
 #   we need a consistent icon set
 #   connect to thgrepo.configChanged signal and refresh
 
 _unspecstr = _('<unspecified>')
 ENTRY_WIDTH = 300
+
+try:
+    from iniparse.config import Undefined
+except ImportError:
+    class Undefined(object):
+        pass
 
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
@@ -191,6 +196,33 @@ class FontEntry(QPushButton):
     def isDirty(self):
         return self.value() != self.curvalue
 
+class SettingsCheckBox(QCheckBox):
+    def __init__(self, parent=None, **opts):
+        QCheckBox.__init__(self, parent)
+        self.opts = opts
+        self.curvalue = None
+        self.setText(opts['label'])
+        self.valfunc = self.opts['valfunc']
+        self.toggled.connect(lambda: self.valfunc(self, self.curvalue))
+
+    def focusInEvent(self, e):
+        self.opts['descwidget'].setHtml(self.opts['tooltip'])
+        QCheckBox.focusInEvent(self, e)
+
+    def setFocus(self):
+        pass
+
+    def setValue(self, curvalue):
+        self.curvalue = curvalue
+        self.setChecked(curvalue)
+
+    def value(self):
+        return self.isChecked()
+
+    def isDirty(self):
+        return self.isChecked() != self.curvalue
+
+
 def genEditCombo(opts, defaults=[]):
     opts['canedit'] = True
     opts['defaults'] = defaults
@@ -232,6 +264,10 @@ def findDiffTools():
 
 def findMergeTools():
     return hglib.mergetools(ui.ui())
+
+def genCheckBox(opts):
+    opts['nohist'] = True
+    return SettingsCheckBox(**opts)
 
 INFO = (
 ({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
@@ -488,6 +524,9 @@ INFO = (
         _('Font used to display changelog data. Default: monospace 10')),
     )),
 
+({'name': 'extensions', 'label': _('Extensions'), 'icon': 'extensions'}, (
+    )),
+
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
     (_('Server'), 'reviewboard.server', genEditCombo,
         _('Path to review board'
@@ -644,6 +683,7 @@ class SettingsForm(QWidget):
         self.pages = {}
         self.stack = stack
         self.pageList = pageList
+        self.extspagewidgets = ()
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
@@ -687,15 +727,21 @@ class SettingsForm(QWidget):
         self.readonly = not (hasattr(self.ini, 'write') and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
         self.fnedit.setText(hglib.tounicode(self.fn))
-        for info, widgets in self.pages.values():
-            for row, (label, cpath, values, tooltip) in enumerate(info):
-                curvalue = self.readCPath(cpath)
-                widgets[row].setValue(curvalue)
+        for name, info, widgets in self.pages.values():
+            if name == 'extensions':
+                enabledexts = hglib.enabledextensions()
+                for row, w in enumerate(widgets):
+                    curvalue = (w.opts['label'] in enabledexts)
+                    w.setValue(curvalue)
+            else:
+                for row, (label, cpath, values, tooltip) in enumerate(info):
+                    curvalue = self.readCPath(cpath)
+                    widgets[row].setValue(curvalue)
 
     def isDirty(self):
         if self.readonly:
             return False
-        for info, widgets in self.pages.values():
+        for name, info, widgets in self.pages.values():
             for w in widgets:
                 if w.isDirty():
                     return True
@@ -717,8 +763,8 @@ class SettingsForm(QWidget):
             for n, (label, cpath, values, tip) in enumerate(info):
                 if cpath == focusfield:
                     self.pageList.setCurrentRow(i)
-                    QTimer.singleShot(0, lambda: \
-                            self.pages[meta['name']][1][n].setFocus())
+                    QTimer.singleShot(0, lambda:
+                            self.pages[meta['name']][2][n].setFocus())
                     return
 
     def fillFrame(self, info):
@@ -744,6 +790,29 @@ class SettingsForm(QWidget):
             widgets.append(w)
         return widgets
 
+    def fillExtensionsFrame(self):
+        widgets = []
+        frame = QFrame()
+        grid = QGridLayout()
+        frame.setLayout(grid)
+        self.stack.addWidget(frame)
+        allexts = hglib.allextensions()
+        allextslist = list(allexts)
+        MAXCOLUMNS = 3
+        maxrows = (len(allextslist) + MAXCOLUMNS - 1) / MAXCOLUMNS
+        i = 0
+        extsinfo = ()
+        for i, name in enumerate(sorted(allexts)):
+            tt = allexts[name]
+            opts = {'label':name, 'cpath':'extensions.' + name, 'tooltip':tt,
+                    'descwidget':self.desctext,
+                    'valfunc':self.validateextensions}
+            w = genCheckBox(opts)
+            row, col = i / maxrows, i % maxrows
+            grid.addWidget(w, col, row)
+            widgets.append(w)
+        return extsinfo, widgets
+
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Enter:
             self.desctext.setHtml(obj.tooltip)
@@ -754,8 +823,13 @@ class SettingsForm(QWidget):
             if name == data[0]['name']:
                 meta, info = data
                 break
-        widgets = self.fillFrame(info)
-        self.pages[name] = info, widgets
+        if name == 'extensions':
+            extsinfo, widgets = self.fillExtensionsFrame()
+            self.pages[name] = name, extsinfo, widgets
+            self.extspagewidgets = self.pages[name]
+        else:
+            widgets = self.fillFrame(info)
+            self.pages[name] = name, info, widgets
 
     def readCPath(self, cpath):
         'Retrieve a value from the parsed config file'
@@ -804,16 +878,77 @@ class SettingsForm(QWidget):
         if self.readonly:
             return
 
-        for info, widgets in self.pages.values():
-            for row, (label, cpath, values, tip) in enumerate(info):
-                newvalue = widgets[row].value()
-                self.recordNewValue(cpath, newvalue)
+        for name, info, widgets in self.pages.values():
+            if name == 'extensions':
+                self.applyChangesForExtensions()
+            else:
+                for row, (label, cpath, values, tip) in enumerate(info):
+                    newvalue = widgets[row].value()
+                    self.recordNewValue(cpath, newvalue)
 
         try:
             wconfig.writefile(self.ini, self.fn)
         except IOError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 str(e), parent=self)
+
+    def applyChangesForExtensions(self):
+        section = 'extensions'
+        enabledexts = hglib.enabledextensions()
+        for chk in self.extspagewidgets[2]:
+            key = chk.opts['label']
+            newvalue = chk.value()
+            if newvalue and (key in enabledexts):
+                continue    # unchanged
+            if newvalue:
+                self.ini.set(section, key, '')
+            else:
+                for cand in (key, 'hgext.%s' % key, 'hgext/%s' % key):
+                    try:
+                        del self.ini[section][cand]
+                    except KeyError:
+                        pass
+
+    def validateextensions(self, widget, curvalue):
+        section = 'extensions'
+        enabledexts = hglib.enabledextensions()
+        selectedexts = ()
+        for chk in self.extspagewidgets[2]:
+            if chk.isChecked():
+                selectedexts += (chk.opts['label'],)
+        invalidexts = hglib.validateextensions(selectedexts)
+
+        def getinival(name):
+            if section not in self.ini:
+                return None
+            for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
+                try:
+                    v = self.ini[section][cand]
+                    if not isinstance(v, Undefined):
+                        return v
+                except KeyError:
+                    pass
+
+        def changable(name):
+            curval = getinival(name)
+            if curval not in ('', None):
+                # enabled or unspecified, official extensions only
+                return False
+            elif name in enabledexts and curval is None:
+                # re-disabling ext is not supported
+                return False
+            elif name in invalidexts and name not in selectedexts:
+                # disallow to enable bad exts, but allow to disable it
+                return False
+            else:
+                return True
+
+        allexts = hglib.allextensions()
+        for chk in self.extspagewidgets[2]:
+            name = chk.opts['label']
+            chk.setEnabled(changable(name))
+            chk.setToolTip(invalidexts.get(name) or hglib.toutf(allexts[name]))
+
 
 def run(ui, *pats, **opts):
     return SettingsDialog(opts.get('alias') == 'repoconfig',

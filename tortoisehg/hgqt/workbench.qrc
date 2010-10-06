@@ -51,5 +51,6 @@
     <file>icons/qpop.svg</file>
     <file>icons/reviewboard.png</file>
     <file>icons/bookmark.png</file>
+    <file>icons/extensions.svg</file>
   </qresource>
 </RCC>
