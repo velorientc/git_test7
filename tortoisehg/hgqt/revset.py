@@ -11,6 +11,7 @@ from tortoisehg.hgqt import qtlib, cmdui
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
+from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerPython
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -174,32 +175,139 @@ class RevisionSetQuery(QDialog):
         # Clicking on one listwidget should clear selection of the others
         listwidgets = (self.clw, self.flw, self.alw, self.llw)
         for w in listwidgets:
+            w.itemClicked.connect(self.itemClicked)
+            #w.itemActivated.connect(self.returnPressed)
             for w2 in listwidgets:
                 if w is not w2:
                     w.itemClicked.connect(w2.clearSelection)
 
-        layout.addLayout(hbox)
+        layout.addLayout(hbox, 1)
+
+        self.entry = RevsetEntry(self)
+        self.entry.returnPressed.connect(self.returnPressed)
+        self.entry.escapePressed.connect(self.reject)
+        self.entry.addCompletions(_logical, _ancestry, _filepatterns, _common)
+        layout.addWidget(self.entry, 0)
 
         txt = _('<a href="http://www.selenic.com/mercurial/hg.1.html#revsets">'
                 'help revsets</a>')
         helpLabel = QLabel(txt)
         helpLabel.setOpenExternalLinks(True)
         self.stbar.addPermanentWidget(helpLabel)
+        layout.addWidget(self.stbar, 0)
 
-        layout.addWidget(self.stbar)
+        s = QSettings()
+        self.restoreGeometry(s.value('revset/geom').toByteArray())
 
-        hbox = QHBoxLayout()
-        clear = QPushButton(_('Clear'))
-        queryle = QComboBox()
-        queryle.setEditable(True)
-        issue = QPushButton(_('Issue'))
-        remember = QPushButton(_('Remember'))
-        hbox.addWidget(clear)
-        hbox.addWidget(queryle, 1)
-        hbox.addWidget(issue)
-        hbox.addWidget(remember)
-        clear.pressed.connect(queryle.lineEdit().clear)
-        layout.addLayout(hbox)
-        
+    def returnPressed(self):
+        text = self.entry.text()
+        if self.entry.hasSelectedText():
+            lineFrom, indexFrom, lineTo, indexTo = self.entry.getSelection()
+            start = self.entry.positionFromLineIndex(lineFrom, indexFrom)
+            end = self.entry.positionFromLineIndex(lineTo, indexTo)
+            sel = self.entry.selectedText()
+            if sel.count('(') and sel.contains(')'):
+                bopen = sel.indexOf('(')
+                bclose = sel.lastIndexOf(')')
+                if bopen < bclose:
+                    self.entry.setSelection(lineFrom, start+bopen+1, 
+                                            lineFrom, start+bclose)
+                    self.entry.setFocus()
+                    return
+            self.entry.setSelection(lineTo, indexTo,
+                                    lineTo, indexTo)
+            self.entry.setFocus()
+        else:
+            print 'issue', self.entry.text()
+            self.queryIssued.emit(self.entry.text())
+
+
+    def itemClicked(self, item):
+        text = self.entry.text()
+        lineFrom, indexFrom, lineTo, indexTo = self.entry.getSelection()
+        start = self.entry.positionFromLineIndex(lineFrom, indexFrom)
+        end = self.entry.positionFromLineIndex(lineTo, indexTo)
+        if self.entry.hasSelectedText():
+            newtext = text[:start] + item.text() + text[end:]
+            self.entry.setText(newtext)
+            self.entry.setSelection(lineFrom, indexFrom,
+                                    lineFrom, indexFrom+len(item.text()))
+        elif text:
+            start = len(text) + 1
+            newtext = text + u' ' + item.text()
+            self.entry.setText(newtext)
+            sline, sindex = self.entry.lineIndexFromPosition(start)
+            eline, eindex = self.entry.lineIndexFromPosition(len(newtext))
+            self.entry.setSelection(sline, sindex, eline, eindex)
+        else:
+            self.entry.setText(item.text())
+            self.entry.setSelection(0, 0, 0, len(item.text()))
+
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
+            self.returnPressed()
+            return
+        super(RevisionSetQuery, self).keyPressEvent(event)
+
+    def accept(self):
+        s = QSettings()
+        s.setValue('revset/geom', self.saveGeometry())
+        super(RevisionSetQuery, self).accept()
+
+    def reject(self):
+        self.accept()
+
+class RevsetEntry(QsciScintilla):
+    returnPressed = pyqtSignal()
+    escapePressed = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super(RevsetEntry, self).__init__(parent)
+        self.setMarginWidth(1, 0)
+        self.setReadOnly(False)
+        self.setUtf8(True)
+        self.setCaretWidth(10)
+        self.setCaretLineBackgroundColor(QColor("#e6fff0"))
+        self.setCaretLineVisible(True)
+        self.setAutoIndent(True)
+        self.setMatchedBraceBackgroundColor(Qt.yellow)
+        self.setIndentationsUseTabs(False)
+        self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+
+        self.setWrapMode(QsciScintilla.WrapWord)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        sp.setHorizontalStretch(1)
+        sp.setVerticalStretch(0)
+        self.setSizePolicy(sp)
+
+        self.setAutoCompletionThreshold(2)
+        self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
+        self.setAutoCompletionFillupsEnabled(True)
+        self.setLexer(QsciLexerPython(self))
+        self.lexer().setFont(qtlib.getfont('fontcomment').font())
+        self.apis = QsciAPIs(self.lexer())
+
+    def addCompletions(self, *lists):
+        for list in lists:
+            for x, y in list:
+                self.apis.add(x)
+        self.apis.prepare()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.escapePressed.emit()
+            return
+        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
+            if not self.isListActive():
+                self.returnPressed.emit()
+                return
+        super(RevsetEntry, self).keyPressEvent(event)
+
+    def sizeHint(self):
+        return QSize(10, self.fontMetrics().height())
+
 def run(ui, *pats, **opts):
     return RevisionSetQuery()
