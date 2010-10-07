@@ -224,24 +224,43 @@ class RevisionSetQuery(QDialog):
 
     def itemClicked(self, item):
         text = self.entry.text()
-        lineFrom, indexFrom, lineTo, indexTo = self.entry.getSelection()
-        start = self.entry.positionFromLineIndex(lineFrom, indexFrom)
-        end = self.entry.positionFromLineIndex(lineTo, indexTo)
+        itext, ilen = item.text(), len(item.text())
         if self.entry.hasSelectedText():
-            newtext = text[:start] + item.text() + text[end:]
+            # replace selection
+            lineFrom, indexFrom, lineTo, indexTo = self.entry.getSelection()
+            start = self.entry.positionFromLineIndex(lineFrom, indexFrom)
+            end = self.entry.positionFromLineIndex(lineTo, indexTo)
+            newtext = text[:start] + itext + text[end:]
             self.entry.setText(newtext)
             self.entry.setSelection(lineFrom, indexFrom,
-                                    lineFrom, indexFrom+len(item.text()))
-        elif text:
-            start = len(text) + 1
-            newtext = text + u' ' + item.text()
-            self.entry.setText(newtext)
-            sline, sindex = self.entry.lineIndexFromPosition(start)
-            eline, eindex = self.entry.lineIndexFromPosition(len(newtext))
-            self.entry.setSelection(sline, sindex, eline, eindex)
+                                    lineFrom, indexFrom+ilen)
         else:
-            self.entry.setText(item.text())
-            self.entry.setSelection(0, 0, 0, len(item.text()))
+            line, index = self.entry.getCursorPosition()
+            pos = self.entry.positionFromLineIndex(line, index)
+            if len(text) <= pos:
+                # cursor at end of text, append
+                if text and text[-1] != u' ':
+                    text = text + u' '
+                newtext = text + itext
+                self.entry.setText(newtext)
+                self.entry.setSelection(line, len(text), line, len(newtext))
+            elif text[pos] == u' ':
+                # cursor is at a space, insert item
+                newtext = text[:pos] + itext + text[pos:]
+                self.entry.setText(newtext)
+                self.entry.setSelection(line, pos, line, pos+ilen)
+            else:
+                # cursor is on text, wrap current word
+                start, end = pos, pos
+                while start and text[start-1] != u' ':
+                    start = start-1
+                while end < len(text) and text[end] != u' ':
+                    end = end+1
+                bopen = itext.indexOf('(')
+                newtext = text[:start] + itext[:bopen+1] + text[start:end] + \
+                          ')' + text[end:] 
+                self.entry.setText(newtext)
+                self.entry.setSelection(line, start, line, end+bopen+2)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Enter, Qt.Key_Return):
