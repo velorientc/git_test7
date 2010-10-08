@@ -75,6 +75,10 @@ class RepoWidget(QWidget):
 
         self.filterbar = RepoFilterBar(self.repo)
         self.filterbar.branchChanged.connect(self.setBranch)
+        self.filterbar.progress.connect(self.progress)
+        self.filterbar.showMessage.connect(self.showMessage)
+        self.filterbar.revisionSet.connect(self.setRevisionSet)
+        self.filterbar.clearSet.connect(self.clearSet)
         self.layout().addWidget(self.filterbar)
 
         self.layout().addWidget(self.repotabs_splitter)
@@ -202,9 +206,17 @@ class RepoWidget(QWidget):
         sw.showMessage.connect(self.showMessage)
         return SharedWidget(sw)
 
-    def setOutgoingNodes(self, nodes):
+    def clearSet(self):
+        self.repomodel.revset = set()
+        self.refresh()
+
+    def setRevisionSet(self, nodes):
         self.repomodel.revset = [self.repo[n].node() for n in nodes]
         self.refresh()
+
+    def setOutgoingNodes(self, nodes):
+        self.filterbar.revsetle.setText('outgoing()')
+        self.setRevisionSet(nodes)
 
     def createGrepWidget(self):
         upats = {}
@@ -549,6 +561,7 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.storeSettings()
         s = QSettings()
         self.commitDemand.forward('storeConfigs', s)
+        self.filterbar.storeConfigs(s)
         return True
 
     def incoming(self):

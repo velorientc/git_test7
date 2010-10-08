@@ -204,9 +204,6 @@ class RevisionSetQuery(QDialog):
         self.stbar.addPermanentWidget(helpLabel)
         layout.addWidget(self.stbar, 0)
 
-        s = QSettings()
-        self.restoreGeometry(s.value('revset/geom').toByteArray())
-
     def runQuery(self):
         text = hglib.fromunicode(self.entry.text())
         self.entry.setEnabled(False)
@@ -306,9 +303,7 @@ class RevisionSetQuery(QDialog):
         super(RevisionSetQuery, self).keyPressEvent(event)
 
     def accept(self):
-        s = QSettings()
-        s.setValue('revset/geom', self.saveGeometry())
-        super(RevisionSetQuery, self).accept()
+        self.hide()
 
     def reject(self):
         self.accept()

@@ -10,9 +10,16 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import revset
 
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
+
+    revisionSet = pyqtSignal(object)
+    clearSet = pyqtSignal()
+
+    showMessage = pyqtSignal(QString)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     branchChanged = pyqtSignal(unicode, bool)
     """Emitted (branch, allparents) when branch selection changed"""
@@ -22,11 +29,72 @@ class RepoFilterBar(QToolBar):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._repo = repo
 
-        self.addWidget(QLineEdit(text='### placeholder for revsets ###',
-                                 enabled=False))
+        self.entrydlg = revset.RevisionSetQuery(repo, self)
+        self.entrydlg.progress.connect(self.progress)
+        self.entrydlg.showMessage.connect(self.showMessage)
+        self.entrydlg.queryIssued.connect(self.dialogQuery)
+        self.entrydlg.hide()
+
+        self.clear = QPushButton(_('clear'))
+        self.addWidget(self.clear)
+
+        self.editor = QPushButton(_('editor'))
+        self.editor.clicked.connect(self.openEditor)
+        self.addWidget(self.editor)
+
+        s = QSettings()
+        self.entrydlg.restoreGeometry(s.value('revset/geom').toByteArray())
+        self.revsethist = list(s.value('revset-queries').toStringList())
+        self.revsetle = le = QLineEdit()
+        le.setCompleter(QCompleter(self.revsethist))
+        le.returnPressed.connect(self.returnPressed)
+        # Requires Qt 4.7 
+        #self.revsetle.setPlaceholderText('### revision set query ###')
+        self.addWidget(le)
+
+        self.clear.clicked.connect(le.clear)
+        self.clear.clicked.connect(self.clearSet)
+
+        self.store = store = QPushButton(_('store'))
+        store.clicked.connect(self.saveQuery)
+        le.textChanged.connect(lambda t: store.setEnabled(False))
+        store.setEnabled(False)
+        self.addWidget(store)
 
         self._initbranchfilter()
         self.refresh()
+
+    def openEditor(self):
+        query = self.revsetle.text().simplified()
+        self.entrydlg.entry.setText(query)
+        self.entrydlg.entry.setCursorPosition(0, len(query))
+        self.entrydlg.entry.setFocus()
+        self.entrydlg.setShown(True)
+
+    def dialogQuery(self, query, revset):
+        self.revsetle.setText(query)
+        self.store.setEnabled(True)
+        self.revisionSet.emit(revset)
+
+    def returnPressed(self):
+        'Return pressed on revset line entry, forward to dialog'
+        query = self.revsetle.text().simplified()
+        if query:
+            self.entrydlg.entry.setText(query)
+            self.entrydlg.runQuery()
+
+    def saveQuery(self):
+        query = self.revsetle.text()
+        if query in self.revsethist:
+            self.revsethist.remove(query)
+        self.revsethist.insert(0, query)
+        self.revsetle.setCompleter(QCompleter(self.revsethist))
+        self.store.setEnabled(False)
+        self.showMessage.emit(_('Revision set query saved'))
+
+    def storeConfigs(self, s):
+        s.setValue('revset/geom', self.entrydlg.saveGeometry())
+        s.setValue('revset-queries', self.revsethist)
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
