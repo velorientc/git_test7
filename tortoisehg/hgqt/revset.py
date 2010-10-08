@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import revset
+from mercurial import revset, error
 
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo
 from tortoisehg.util import hglib, paths
@@ -107,6 +107,7 @@ _logical = (
 class RevisionSetQuery(QDialog):
     # Emit query string and resulting revision set
     queryIssued = pyqtSignal(QString, object)
+    showMessage = pyqtSignal(QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, repo, parent=None):
@@ -125,6 +126,7 @@ class RevisionSetQuery(QDialog):
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
         self.stbar.lbl.setOpenExternalLinks(True)
+        self.showMessage.connect(self.stbar.showMessage)
         self.progress.connect(self.stbar.progress)
 
         hbox = QHBoxLayout()
@@ -208,7 +210,7 @@ class RevisionSetQuery(QDialog):
     def runQuery(self):
         text = hglib.fromunicode(self.entry.text())
         self.entry.setEnabled(False)
-        self.stbar.showMessage(_('Searching...'))
+        self.showMessage.emit(_('Searching...'))
         self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
         try:
             func = revset.match(text)
@@ -217,12 +219,16 @@ class RevisionSetQuery(QDialog):
             for c in func(self.repo, range(len(self.repo))):
                 l.append(c)
             if l:
-                self.stbar.showMessage(_('%d matches found') % len(l))
+                self.showMessage.emit(_('%d matches found') % len(l))
                 self.queryIssued.emit(self.entry.text(), l)
             else:
-                self.stbar.showMessage(_('No matches'))
+                self.showMessage.emit(_('No matches'))
+        except error.ParseError, e:
+            msg, pos = e.args
+            self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
+            self.entry.setCursorPosition(0, pos)
         except Exception, e:
-            self.stbar.showMessage(_('Invalid query: ')+hglib.tounicode(str(e)))
+            self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
         self.entry.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Running')))
 
@@ -243,9 +249,9 @@ class RevisionSetQuery(QDialog):
                     return
             self.entry.setSelection(lineTo, indexTo,
                                     lineTo, indexTo)
-            self.entry.setFocus()
         else:
             self.runQuery()
+        self.entry.setFocus()
 
 
     def itemClicked(self, item):
