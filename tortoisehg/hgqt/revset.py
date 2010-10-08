@@ -7,8 +7,10 @@
 
 import os
 
-from tortoisehg.hgqt import qtlib, cmdui
-from tortoisehg.util import hglib
+from mercurial import revset
+
+from tortoisehg.hgqt import qtlib, cmdui, thgrepo
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerPython
@@ -103,11 +105,14 @@ _logical = (
 )
 
 class RevisionSetQuery(QDialog):
-    queryIssued = pyqtSignal(QString)
+    # Emit query string and resulting revision set
+    queryIssued = pyqtSignal(QString, object)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, parent=None):
+    def __init__(self, repo, parent=None):
         QDialog.__init__(self, parent)
 
+        self.repo = repo
         self.setWindowTitle(_('Revision Set Query'))
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
@@ -120,6 +125,7 @@ class RevisionSetQuery(QDialog):
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
         self.stbar.lbl.setOpenExternalLinks(True)
+        self.progress.connect(self.stbar.progress)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*(0,)*4)
@@ -199,6 +205,27 @@ class RevisionSetQuery(QDialog):
         s = QSettings()
         self.restoreGeometry(s.value('revset/geom').toByteArray())
 
+    def runQuery(self):
+        text = hglib.fromunicode(self.entry.text())
+        self.entry.setEnabled(False)
+        self.stbar.showMessage(_('Searching...'))
+        self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
+        try:
+            func = revset.match(text)
+            func(self.repo, range(0, 1))
+            l = []
+            for c in func(self.repo, range(len(self.repo))):
+                l.append(c)
+            if l:
+                self.stbar.showMessage(_('%d matches found') % len(l))
+                self.queryIssued.emit(self.entry.text(), l)
+            else:
+                self.stbar.showMessage(_('No matches'))
+        except Exception, e:
+            self.stbar.showMessage(_('Invalid query: ')+hglib.tounicode(str(e)))
+        self.entry.setEnabled(True)
+        self.progress.emit(*cmdui.stopProgress(_('Running')))
+
     def returnPressed(self):
         text = self.entry.text()
         if self.entry.hasSelectedText():
@@ -218,8 +245,7 @@ class RevisionSetQuery(QDialog):
                                     lineTo, indexTo)
             self.entry.setFocus()
         else:
-            print 'issue', self.entry.text()
-            self.queryIssued.emit(self.entry.text())
+            self.runQuery()
 
 
     def itemClicked(self, item):
@@ -329,4 +355,5 @@ class RevsetEntry(QsciScintilla):
         return QSize(10, self.fontMetrics().height())
 
 def run(ui, *pats, **opts):
-    return RevisionSetQuery()
+    repo = thgrepo.repository(ui, path=paths.find_root())
+    return RevisionSetQuery(repo)
