@@ -224,9 +224,12 @@ class RevisionSetQuery(QDialog):
             else:
                 self.showMessage.emit(_('No matches'))
         except error.ParseError, e:
-            msg, pos = e.args
+            if len(e.args) == 2:
+                msg, pos = e.args
+                self.entry.setCursorPosition(0, pos)
+            else:
+                msg = e.args[0]
             self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
-            self.entry.setCursorPosition(0, pos)
         except Exception, e:
             self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
         self.entry.setEnabled(True)
