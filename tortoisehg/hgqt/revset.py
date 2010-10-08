@@ -258,6 +258,7 @@ class RevisionSetQuery(QDialog):
 
 
     def itemClicked(self, item):
+        self.entry.beginUndoAction()
         text = self.entry.text()
         itext, ilen = item.text(), len(item.text())
         if self.entry.hasSelectedText():
@@ -296,6 +297,7 @@ class RevisionSetQuery(QDialog):
                           ')' + text[end:] 
                 self.entry.setText(newtext)
                 self.entry.setSelection(line, start, line, end+bopen+2)
+        self.entry.endUndoAction()
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Enter, Qt.Key_Return):
