@@ -32,6 +32,7 @@ class ImportDialog(QDialog):
 
         self.tempfiles = []
         self.repo = repo
+        self.mqloaded = hasattr(self.repo, 'mq')
 
         # base layout box
         box = QVBoxLayout()
@@ -65,9 +66,6 @@ class ImportDialog(QDialog):
         self.p0chk = QCheckBox(_('Do not strip paths (-p0), '
                                  'required for SVN patches'))
         grid.addWidget(self.p0chk, 2, 1, Qt.AlignLeft)
-        grid.addWidget(QLabel(_('Preview:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
-        self.status = QLabel("")
-        grid.addWidget(self.status, 3, 1, Qt.AlignLeft | Qt.AlignTop)
 
         ### patch list
         self.cslist = cslist.ChangesetList()
@@ -75,6 +73,16 @@ class ImportDialog(QDialog):
         self.cslistcol = cslistcol = 1
         grid.addWidget(self.cslist, cslistrow, cslistcol,
                        Qt.AlignLeft | Qt.AlignTop)
+        grid.addWidget(QLabel(_('Preview:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
+        statbox = QHBoxLayout()
+        self.status = QLabel("")
+        statbox.addWidget(self.status)
+        self.patchq = QComboBox()
+        self.patchq.currentIndexChanged.connect(self.updatestatus)
+        self.patchq.addItem('repository')
+        self.patchq.addItem('patches')
+        statbox.addWidget(self.patchq)
+        grid.addItem(statbox, 3, 1)
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -189,12 +197,17 @@ class ImportDialog(QDialog):
         count = items and len(items) or 0
         countstr = qtlib.markup(_("%s patches") % count, weight='bold')
         if count:
-            self.status.setText(_('%s will be imported to the repository') %
-                                countstr)
+            if self.mqloaded:
+                self.patchq.setVisible(True)
+                text = _('%s will be imported to ') % countstr
+            else:
+                self.patchq.setVisible(False)
+                text = _('%s will be imported to the repository') % countstr
         else:
+            self.patchq.setVisible(False)
             text = qtlib.markup(_('Nothing to import'), weight='bold',
                                 fg='red')
-            self.status.setText(text)
+        self.status.setText(text)
 
     def preview(self):
         patches = self.getfilepaths()
@@ -233,7 +246,10 @@ class ImportDialog(QDialog):
             os.pathsep.join(hglib.tounicode(p) for p in paths))
 
     def thgimport(self):
-        hgcmd = 'import'
+        if self.mqloaded and self.patchq.currentText() != 'repository':
+            hgcmd = 'qimport'
+        else:
+            hgcmd = 'import'
         cmdline = [hgcmd, '--repository', self.repo.root]
         if self.p0chk.isChecked():
             cmdline.append('-p0')
