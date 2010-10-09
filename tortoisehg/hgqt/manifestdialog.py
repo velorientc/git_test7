@@ -45,12 +45,8 @@ class ManifestDialog(QMainWindow):
         self.addToolBar(self._manifest_widget.toolbar)
 
         self._searchbar = annotate.SearchToolBar()
-        self._searchbar.conditionChanged.connect(
-            self._manifest_widget.highlightText)
-        self._searchbar.searchRequested.connect(
-            self._manifest_widget.searchText)
+        connectsearchbar(self._manifest_widget, self._searchbar)
         self.addToolBar(self._searchbar)
-        self._manifest_widget.searchRequested.connect(self._searchbar.search)
 
         self.setStatusBar(QStatusBar())
         self._manifest_widget.revisionHint.connect(self.statusBar().showMessage)
@@ -282,6 +278,12 @@ class _StatusFilterButton(QToolButton):
 
     def _setText(self, text):
         super(_StatusFilterButton, self).setText(text)
+
+def connectsearchbar(manifestwidget, searchbar):
+    """Connect searchbar to manifest widget"""
+    searchbar.conditionChanged.connect(manifestwidget.highlightText)
+    searchbar.searchRequested.connect(manifestwidget.searchText)
+    manifestwidget.searchRequested.connect(searchbar.search)
 
 
 def run(ui, *pats, **opts):
