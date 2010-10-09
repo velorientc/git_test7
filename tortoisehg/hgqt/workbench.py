@@ -331,14 +331,14 @@ class Workbench(QMainWindow):
 
     def createActions(self):
         # main window actions (from .ui file)
-        self.actionFind.triggered.connect(self.find)
-        self.actionRefresh.triggered.connect(self.reload)
-        self.actionRefreshTaskTab.triggered.connect(self.reloadTaskTab)
+        self.actionFind.triggered.connect(self._repofwd('find'))
+        self.actionRefresh.triggered.connect(self._repofwd('reload'))
+        self.actionRefreshTaskTab.triggered.connect(self._repofwd('reloadTaskTab'))
         self.actionAbout.triggered.connect(self.on_about)
         self.actionQuit.triggered.connect(self.close)
-        self.actionBack.triggered.connect(self.back)
-        self.actionForward.triggered.connect(self.forward)
-        self.actionImport.triggered.connect(self.thgimport)
+        self.actionBack.triggered.connect(self._repofwd('back'))
+        self.actionForward.triggered.connect(self._repofwd('forward'))
+        self.actionImport.triggered.connect(self._repofwd('thgimport'))
         self.actionLoadAll.triggered.connect(self.loadall)
         self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
         self.actionSelectTaskLog.triggered.connect(self.showRepoTaskLog)
@@ -357,17 +357,17 @@ class Workbench(QMainWindow):
         self.actionSettings.triggered.connect(self.editSettings)
 
         self.actionServe.triggered.connect(self.serve)
-        self.actionVerify.triggered.connect(self.verify)
-        self.actionRecover.triggered.connect(self.recover)
-        self.actionRollback.triggered.connect(self.rollback)
-        self.actionPurge.triggered.connect(self.purge)
+        self.actionVerify.triggered.connect(self._repofwd('verify'))
+        self.actionRecover.triggered.connect(self._repofwd('recover'))
+        self.actionRollback.triggered.connect(self._repofwd('rollback'))
+        self.actionPurge.triggered.connect(self._repofwd('purge'))
         self.actionExplore.triggered.connect(self.explore)
         self.actionTerminal.triggered.connect(self.terminal)
 
-        self.actionIncoming.triggered.connect(self.incoming)
-        self.actionPull.triggered.connect(self.pull)
-        self.actionOutgoing.triggered.connect(self.outgoing)
-        self.actionPush.triggered.connect(self.push)
+        self.actionIncoming.triggered.connect(self._repofwd('incoming'))
+        self.actionPull.triggered.connect(self._repofwd('pull'))
+        self.actionOutgoing.triggered.connect(self._repofwd('outgoing'))
+        self.actionPush.triggered.connect(self._repofwd('push'))
 
         self.actionHelp.triggered.connect(self.on_help)
 
@@ -530,51 +530,19 @@ class Workbench(QMainWindow):
                 w.repoview.model().updateColumns()
                 w.repoview.resizeColumns()
 
+    def _repofwd(self, name):
+        """Return function to forward action to the current repo tab"""
+        def forwarder():
+            w = self.repoTabsWidget.currentWidget()
+            if w:
+                getattr(w, name)()
+        return forwarder
+
     def serve(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
             from tortoisehg.hgqt import run
             run.serve(self.ui, root=w.repo.root)
-
-    def thgimport(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.thgimport()
-
-    def verify(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.verify()
-
-    def recover(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.recover()
-
-    def rollback(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.rollback()
-
-    def purge(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.purge()
-
-    def back(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.back()
-
-    def forward(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.forward()
-
-    def find(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.find()
 
     def loadall(self):
         w = self.repoTabsWidget.currentWidget()
@@ -613,16 +581,6 @@ class Workbench(QMainWindow):
             except RepoError:
                 WarningMsgBox(_('Failed to open repository'),
                         _('%s is not a valid repository') % path)
-
-    def reload(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.reload()
-
-    def reloadTaskTab(self, root):
-        rw = self.repoTabsWidget.currentWidget()
-        if rw:
-            rw.reloadTaskTab()
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):
@@ -709,26 +667,6 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             self.launchTerminal(w.repo)
-
-    def incoming(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.incoming()
-
-    def pull(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.pull()
-
-    def outgoing(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.outgoing()
-
-    def push(self):
-        w = self.repoTabsWidget.currentWidget()
-        if w:
-            w.push()
 
     def launchExplorer(self, root):
         """open Windows Explorer at the repo root"""
