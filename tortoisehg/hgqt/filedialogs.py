@@ -25,6 +25,7 @@ from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
 from mercurial import hg
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.dialogmixin import HgDialogMixin
@@ -88,10 +89,11 @@ class _AbstractFileDialog(QMainWindow, HgDialogMixin):
         if self.repoviewer is None:
             # prevent recursive import
             from workbench import Workbench
-            self.repoviewer = Workbench(self.repo.ui, self.repo)
+            self.repoviewer = Workbench(self.repo.ui)
         self.repoviewer.show()
         self.repoviewer.activateWindow()
         self.repoviewer.raise_()
+        self.repoviewer.showRepo(hglib.tounicode(self.repo.root))
         self.repoviewer.goto(self.repo.root, rev)
 
 class FileLogDialog(_AbstractFileDialog):

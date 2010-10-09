@@ -36,7 +36,7 @@ class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
 
-    def __init__(self, ui, repo=None):
+    def __init__(self, ui):
         self.ui = ui
 
         self._reload_rev = None
@@ -81,23 +81,7 @@ class Workbench(QMainWindow):
         self.setAcceptDrops(True)
 
         for savedroot in self.savedrepos:
-            if repo and repo.root == savedroot:
-                # keep the passed-in repo at the saved position
-                self.addRepoTab(repo)
-                ti = self.repoTabsWidget.currentIndex()
-            else:
-                self._openRepo(path=savedroot)
-        if repo:
-            if repo.root in self.savedrepos:
-                # explicitly give focus to the passed-in repo
-                self.repoTabsWidget.setCurrentIndex(ti)
-                self.repoTabChanged()
-            else:
-                # open the passed-in repo last if it's not in the saved repos,
-                # so it gets focus automatically
-                self.addRepoTab(repo)
-        if not repo and not self.savedrepos:
-            self.reporegistry.setVisible(True)
+            self._openRepo(path=savedroot)
 
     def load_config(self, ui):
         # TODO: connect to font changed signal
@@ -609,8 +593,10 @@ class Workbench(QMainWindow):
 
 
 def run(ui, *pats, **opts):
-    repo = None
+    w = Workbench(ui)
     root = opts.get('root') or paths.find_root()
     if root:
-        repo = thgrepo.repository(ui, path=root)
-    return Workbench(ui, repo)
+        w.showRepo(hglib.tounicode(root))
+    if w.repoTabsWidget.count() <= 0:
+        w.reporegistry.setVisible(True)
+    return w
