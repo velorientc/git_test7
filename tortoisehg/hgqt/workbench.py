@@ -631,10 +631,10 @@ class Workbench(QMainWindow):
         if not self.closeRepoTabs():
             event.ignore()
         else:
-           self.storeSettings()
-           self.reporegistry.close()
-           # mimic QDialog exit
-           self.finished.emit(0)
+            self.storeSettings()
+            self.reporegistry.close()
+            # mimic QDialog exit
+            self.finished.emit(0)
 
     def closeRepoTabs(self):
         '''returns False if close should be aborted'''
