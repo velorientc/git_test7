@@ -64,7 +64,6 @@ class Workbench(QMainWindow):
 
         rr.openRepoSignal.connect(self.openRepo)
 
-        self.createActions()
         self.createToolbars()
 
         self.repoTabChanged()
@@ -135,67 +134,83 @@ class Workbench(QMainWindow):
         self.setStatusBar(self.statusbar)
 
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
+        self.actionNew_repository.triggered.connect(self.newRepository)
         a.setShortcut(QKeySequence.New)
         
         self.actionClone_repository = a = QAction(_("Clone Repository..."), self)
+        self.actionClone_repository.triggered.connect(self.cloneRepository)
         b = QKeySequence.keyBindings(QKeySequence.New)
         a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
 
         self.actionOpen_repository = a = QAction(_("&Open Repository..."), self)
+        self.actionOpen_repository.triggered.connect(self.openRepository)
         a.setShortcut(QKeySequence.Open)
 
         self.actionClose_repository = a = QAction(_("&Close Repository"), self)
+        self.actionClose_repository.triggered.connect(self.closeRepository)
         a.setShortcut(QKeySequence.Close)
 
         self.actionSettings = a = QAction(_('&Settings...'), self)
+        self.actionSettings.triggered.connect(self.editSettings)
         a.setShortcut(QKeySequence.Preferences)
         a.setIcon(geticon('settings_user'))
 
         self.actionRefresh = a = QAction(_("&Refresh"), self)
+        self.actionRefresh.triggered.connect(self._repofwd('reload'))
         a.setIcon(geticon('reload'))
         a.setShortcut(QKeySequence.Refresh)
         a.setToolTip(_('Refresh all for current repository'))
 
         self.actionRefreshTaskTab = a = QAction(_("Refresh &Task Tab"), self)
+        self.actionRefreshTaskTab.triggered.connect(self._repofwd('reloadTaskTab'))
         a.setIcon(geticon('reloadtt'))
         b = QKeySequence.keyBindings(QKeySequence.Refresh)
         a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
         a.setToolTip(_('Refresh only the current task tab'))
 
         self.actionFind = a = QAction(_('Find'), self)
+        self.actionFind.triggered.connect(self._repofwd('find'))
         a.setToolTip(_('Search file and revision contents for keyword'))
         a.setIcon(geticon('find'))
 
         self.actionQuit = a = QAction(_("E&xit"), self)
+        self.actionQuit.triggered.connect(self.close)
         a.setIcon(geticon('quit'))
         a.setShortcut(QKeySequence.Quit)
         a.setIconText(_("Exit"))
         a.setToolTip(_("Exit"))
 
         self.actionAbout = QAction(_("About"), self)
+        self.actionAbout.triggered.connect(self.on_about)
 
         self.actionBack = a = QAction(_("Back"), self)
+        self.actionBack.triggered.connect(self._repofwd('back'))
         a.setEnabled(False)
         a.setIcon(geticon('back'))
 
         self.actionForward = a = QAction(_("Forward"), self)
+        self.actionForward.triggered.connect(self._repofwd('forward'))
         a.setEnabled(False)
         a.setIcon(geticon('forward'))
 
         self.actionLoadAll = a = QAction(_("Load all"), self)
+        self.actionLoadAll.triggered.connect(self.loadall)
         a.setEnabled(True)
         a.setToolTip(_('Load all revisions into graph'))
         a.setIcon(geticon('loadall'))
 
         self.actionShowPaths = a = QAction(_("Show Paths"), self)
+        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
         a.setCheckable(True)
 
         self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
+        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
 
         self.actionSaveRepos = a = QAction(_("Save Open Repositories On Exit"), self)
         a.setCheckable(True)
 
         self.actionGroupTaskView = ag = QActionGroup(self, enabled=False)
+        self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
         def addtaskview(icon, label):
             index = len(self.actionGroupTaskView.actions())
             a = self.actionGroupTaskView.addAction(geticon(icon), label)
@@ -208,36 +223,50 @@ class Workbench(QMainWindow):
         addtaskview('sync', _("S&ynchronize..."))
 
         self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
+        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
         a.setCheckable(True)
         a.setIcon(geticon('repotree'))
 
         self.actionShowLog = a = QAction(_("Show Output &Log"), self)
+        self.actionShowLog.toggled.connect(self.showLog)
         a.setCheckable(True)
         a.setIcon(geticon('showlog'))
         a.setShortcut(QKeySequence("Ctrl+L"))
 
         self.actionServe = QAction(_("Web Server"), self)
+        self.actionServe.triggered.connect(self.serve)
         self.actionImport = QAction(_("Import"), self)
+        self.actionImport.triggered.connect(self._repofwd('thgimport'))
         self.actionVerify = QAction(_("Verify"), self)
+        self.actionVerify.triggered.connect(self._repofwd('verify'))
         self.actionRecover = QAction(_("Recover"), self)
+        self.actionRecover.triggered.connect(self._repofwd('recover'))
         self.actionRollback = QAction(_("Rollback/Undo"), self)
+        self.actionRollback.triggered.connect(self._repofwd('rollback'))
         self.actionPurge = QAction(_("Purge"), self)
+        self.actionPurge.triggered.connect(self._repofwd('purge'))
         self.actionExplore = a = QAction(_("Explore"), self)
+        self.actionExplore.triggered.connect(self.explore)
         a.setShortcut(QKeySequence("Shift+Ctrl+S"))
         self.actionTerminal = a = QAction(_("Terminal"), self)
+        self.actionTerminal.triggered.connect(self.terminal)
         a.setShortcut(QKeySequence("Shift+Ctrl+T"))
 
         # TODO: Use long names when these have icons
         self.actionIncoming = a = QAction(_('In'), self)
+        self.actionIncoming.triggered.connect(self._repofwd('incoming'))
         a.setToolTip(_('Check for incoming changes from default pull target'))
         a.setIcon(geticon('incoming'))
         self.actionPull = a = QAction(_('Pull'), self)
+        self.actionPull.triggered.connect(self._repofwd('pull'))
         a.setToolTip(_('Pull incoming changes from default pull target'))
         a.setIcon(geticon('pull'))
         self.actionOutgoing = a = QAction(_('Out'), self)
+        self.actionOutgoing.triggered.connect(self._repofwd('outgoing'))
         a.setToolTip(_('Detect outgoing changes to default push target'))
         a.setIcon(geticon('outgoing'))
         self.actionPush = a = QAction(_('Push'), self)
+        self.actionPush.triggered.connect(self._repofwd('push'))
         a.setToolTip(_('Push outgoing changes to default push target'))
         a.setIcon(geticon('push'))
 
@@ -320,42 +349,6 @@ class Workbench(QMainWindow):
         tb.addAction(self.actionOutgoing)
         tb.addAction(self.actionPush)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
-    def createActions(self):
-        # main window actions (from .ui file)
-        self.actionFind.triggered.connect(self._repofwd('find'))
-        self.actionRefresh.triggered.connect(self._repofwd('reload'))
-        self.actionRefreshTaskTab.triggered.connect(self._repofwd('reloadTaskTab'))
-        self.actionAbout.triggered.connect(self.on_about)
-        self.actionQuit.triggered.connect(self.close)
-        self.actionBack.triggered.connect(self._repofwd('back'))
-        self.actionForward.triggered.connect(self._repofwd('forward'))
-        self.actionImport.triggered.connect(self._repofwd('thgimport'))
-        self.actionLoadAll.triggered.connect(self.loadall)
-        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
-        self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
-        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
-        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
-        self.actionShowLog.toggled.connect(self.showLog)
-
-        self.actionNew_repository.triggered.connect(self.newRepository)
-        self.actionClone_repository.triggered.connect(self.cloneRepository)
-        self.actionOpen_repository.triggered.connect(self.openRepository)
-        self.actionClose_repository.triggered.connect(self.closeRepository)
-        self.actionSettings.triggered.connect(self.editSettings)
-
-        self.actionServe.triggered.connect(self.serve)
-        self.actionVerify.triggered.connect(self._repofwd('verify'))
-        self.actionRecover.triggered.connect(self._repofwd('recover'))
-        self.actionRollback.triggered.connect(self._repofwd('rollback'))
-        self.actionPurge.triggered.connect(self._repofwd('purge'))
-        self.actionExplore.triggered.connect(self.explore)
-        self.actionTerminal.triggered.connect(self.terminal)
-
-        self.actionIncoming.triggered.connect(self._repofwd('incoming'))
-        self.actionPull.triggered.connect(self._repofwd('pull'))
-        self.actionOutgoing.triggered.connect(self._repofwd('outgoing'))
-        self.actionPush.triggered.connect(self._repofwd('push'))
 
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
