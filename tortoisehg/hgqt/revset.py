@@ -205,30 +205,18 @@ class RevisionSetQuery(QDialog):
         layout.addWidget(self.stbar, 0)
 
     def runQuery(self):
-        text = hglib.fromunicode(self.entry.text())
         self.entry.setEnabled(False)
         self.showMessage.emit(_('Searching...'))
         self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
-        try:
-            func = revset.match(text)
-            func(self.repo, range(0, 1))
-            l = []
-            for c in func(self.repo, range(len(self.repo))):
-                l.append(c)
-            if l:
-                self.showMessage.emit(_('%d matches found') % len(l))
-                self.queryIssued.emit(self.entry.text(), l)
-            else:
-                self.showMessage.emit(_('No matches'))
-        except error.ParseError, e:
-            if len(e.args) == 2:
-                msg, pos = e.args
-                self.entry.setCursorPosition(0, pos)
-            else:
-                msg = e.args[0]
-            self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
-        except Exception, e:
-            self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
+
+        self.refreshing = RevsetThread(self.repo, self.entry.text())
+        self.refreshing.showMessage.connect(self.showMessage)
+        self.refreshing.queryIssued.connect(self.queryIssued)
+        self.refreshing.finished.connect(self.queryFinished)
+        self.refreshing.setCursorPosition.connect(self.entry.setCursorPosition)
+        self.refreshing.start()
+
+    def queryFinished(self):
         self.entry.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Running')))
 
@@ -359,6 +347,44 @@ class RevsetEntry(QsciScintilla):
 
     def sizeHint(self):
         return QSize(10, self.fontMetrics().height())
+
+
+
+class RevsetThread(QThread):
+    queryIssued = pyqtSignal(QString, object)
+    showMessage = pyqtSignal(QString)
+    setCursorPosition = pyqtSignal(int, int)
+    finished = pyqtSignal()
+
+    def __init__(self, repo, query):
+        super(RevsetThread, self).__init__()
+        self.repo = repo
+        self.text = hglib.fromunicode(query)
+        self.query = query
+
+    def run(self):
+        try:
+            func = revset.match(self.text)
+            func(self.repo, range(0, 1))
+            l = []
+            for c in func(self.repo, range(len(self.repo))):
+                l.append(c)
+            if l:
+                self.showMessage.emit(_('%d matches found') % len(l))
+                self.queryIssued.emit(self.query, l)
+            else:
+                self.showMessage.emit(_('No matches'))
+        except error.ParseError, e:
+            if len(e.args) == 2:
+                msg, pos = e.args
+                self.setCursorPosition.emit(0, pos)
+            else:
+                msg = e.args[0]
+            self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
+        except Exception, e:
+            self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
+
+        self.finished.emit()
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
