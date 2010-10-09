@@ -134,10 +134,6 @@ class Workbench(QMainWindow):
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.actionHelp = a = QAction(_("Help"), self)
-        a.setShortcut(QKeySequence.HelpContents)
-        a.setIcon(geticon('help'))
-
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
         a.setShortcut(QKeySequence.New)
         
@@ -289,7 +285,6 @@ class Workbench(QMainWindow):
         m.addAction(self.actionTerminal)
 
         self.menuHelp = m = QMenu(_("&Help"), self.menubar)
-        m.addAction(self.actionHelp)
         m.addAction(self.actionAbout)
 
         self.menubar.addAction(self.menuFile.menuAction())
@@ -368,8 +363,6 @@ class Workbench(QMainWindow):
         self.actionPull.triggered.connect(self._repofwd('pull'))
         self.actionOutgoing.triggered.connect(self._repofwd('outgoing'))
         self.actionPush.triggered.connect(self._repofwd('push'))
-
-        self.actionHelp.triggered.connect(self.on_help)
 
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
@@ -603,9 +596,6 @@ class Workbench(QMainWindow):
         from tortoisehg.hgqt.about import AboutDialog
         ad = AboutDialog()
         ad.exec_()
-
-    def on_help(self, *args):
-        pass
 
     def storeSettings(self):
         s = QSettings()
