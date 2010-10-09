@@ -213,6 +213,15 @@ def getmqpatchtags(repo):
     else:
         return []
 
+def getcurrentqqueue(repo):
+    """Return the name of the current patch queue."""
+    if not hasattr(repo, 'mq'):
+        return None
+    cur = os.path.basename(repo.mq.path)
+    if cur.startswith('patches-'):
+        cur = cur[8:]
+    return cur
+
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'
     if _tabwidth is None:

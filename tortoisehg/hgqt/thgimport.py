@@ -80,7 +80,9 @@ class ImportDialog(QDialog):
         self.patchq = QComboBox()
         self.patchq.currentIndexChanged.connect(self.updatestatus)
         self.patchq.addItem('repository')
-        self.patchq.addItem('patches')
+        cur = hglib.getcurrentqqueue(self.repo)
+        if cur:
+            self.patchq.addItem(cur)
         statbox.addWidget(self.patchq)
         grid.addItem(statbox, 3, 1)
 
