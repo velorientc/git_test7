@@ -195,20 +195,17 @@ class Workbench(QMainWindow):
         self.actionSaveRepos = a = QAction(_("Save Open Repositories On Exit"), self)
         a.setCheckable(True)
 
-        self.actionGroupTaskView = ag = QActionGroup(self)
-        ag.setEnabled(False)
-        self.actionSelectTaskLog = a = QAction(_("Revision &Details"), ag)
-        a.setIcon(geticon('log'))
-        self.actionSelectTaskCommit = a = QAction(_("&Commit..."), ag)
-        a.setIcon(geticon('commit'))
-        self.actionSelectTaskManifest = a = QAction(_("&Manifest..."), ag)
-        a.setIcon(geticon('annotate'))
-        self.actionSelectTaskGrep = a = QAction(_("&Search..."), ag)
-        a.setIcon(geticon('repobrowse'))
-        self.actionSelectTaskSync = a = QAction(_("S&ynchronize..."), ag)
-        a.setIcon(geticon('sync'))
-        for a in ag.actions():
+        self.actionGroupTaskView = ag = QActionGroup(self, enabled=False)
+        def addtaskview(icon, label):
+            index = len(self.actionGroupTaskView.actions())
+            a = self.actionGroupTaskView.addAction(geticon(icon), label)
+            a.setData(index)
             a.setCheckable(True)
+        addtaskview('log', _("Revision &Details"))
+        addtaskview('commit', _("&Commit..."))
+        addtaskview('annotate', _("&Manifest..."))
+        addtaskview('repobrowse', _("&Search..."))
+        addtaskview('sync', _("S&ynchronize..."))
 
         self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
         a.setCheckable(True)
@@ -336,11 +333,7 @@ class Workbench(QMainWindow):
         self.actionImport.triggered.connect(self._repofwd('thgimport'))
         self.actionLoadAll.triggered.connect(self.loadall)
         self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
-        self.actionSelectTaskLog.triggered.connect(self.showRepoTaskLog)
-        self.actionSelectTaskCommit.triggered.connect(self.showRepoTaskCommit)
-        self.actionSelectTaskManifest.triggered.connect(self.showRepoTaskManifest)
-        self.actionSelectTaskGrep.triggered.connect(self.showRepoTaskGrep)
-        self.actionSelectTaskSync.triggered.connect(self.showRepoTaskSync)
+        self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
         self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
         self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
         self.actionShowLog.toggled.connect(self.showLog)
@@ -370,30 +363,12 @@ class Workbench(QMainWindow):
     def showLog(self, show):
         self.log.setVisible(show)
 
-    def showRepoTaskLog(self, show):
+    @pyqtSlot(QAction)
+    def _switchRepoTaskTab(self, action):
         rw = self.repoTabsWidget.currentWidget()
         if not rw: return
-        rw.taskTabsWidget.setCurrentIndex(rw.logTabIndex)
-
-    def showRepoTaskCommit(self, show):
-        rw = self.repoTabsWidget.currentWidget()
-        if not rw: return
-        rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
-
-    def showRepoTaskManifest(self, show):
-        rw = self.repoTabsWidget.currentWidget()
-        if not rw: return
-        rw.taskTabsWidget.setCurrentIndex(rw.manifestTabIndex)
-
-    def showRepoTaskSync(self, show):
-        rw = self.repoTabsWidget.currentWidget()
-        if not rw: return
-        rw.taskTabsWidget.setCurrentIndex(rw.syncTabIndex)
-
-    def showRepoTaskGrep(self, show):
-        rw = self.repoTabsWidget.currentWidget()
-        if not rw: return
-        rw.taskTabsWidget.setCurrentIndex(rw.grepTabIndex)
+        index = action.data().toPyObject()
+        rw.taskTabsWidget.setCurrentIndex(index)
 
     def openRepo(self, repopath):
         """ Open repo by openRepoSignal from reporegistry """
