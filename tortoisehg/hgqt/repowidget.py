@@ -573,6 +573,18 @@ class RepoWidget(QWidget):
     def push(self):
         self.syncDemand.get().push()
 
+    def qpush(self):
+        """QPush a patch from MQ"""
+        cmdline = ['qpush',
+                   '--repository', self.repo.root]
+        self.runCommand(_('QPush - TortoiseHg'), cmdline)
+
+    def qpop(self):
+        """QPop a patch from MQ"""
+        cmdline = ['qpop',
+                   '--repository', self.repo.root]
+        self.runCommand(_('QPop - TortoiseHg'), cmdline)
+
     ##
     ## Repoview context menu
     ##

@@ -47,5 +47,7 @@
     <file>icons/outgoing.svg</file>
     <file>icons/pull.svg</file>
     <file>icons/push.svg</file>
+    <file>icons/qpush.svg</file>
+    <file>icons/qpop.svg</file>
   </qresource>
 </RCC>

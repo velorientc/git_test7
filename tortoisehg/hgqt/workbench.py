@@ -119,9 +119,11 @@ class Workbench(QMainWindow):
         self.addToolBar(self.docktbar)
         self.synctbar = QToolBar(_('Sync Toolbar'), objectName='synctbar')
         self.addToolBar(self.synctbar)
+        self.mqtbar = QToolBar(_("MQ Toolbar"), objectName='mqtbar')
+        self.addToolBar(self.mqtbar)
 
         # availability map of actions; applied by updateMenu()
-        self._actionavails = {'repoopen': []}
+        self._actionavails = {'repoopen': [], 'mq': []}
 
         def keysequence(o):
             """Create QKeySequence from string or QKeySequence"""
@@ -293,6 +295,13 @@ class Workbench(QMainWindow):
                   tooltip=_('Push outgoing changes to default push target'),
                   enabled='repoopen', toolbar='sync')
 
+        newaction(_('QPush'), self._repofwd('qpush'), icon='qpush',
+                   tooltip=_('Apply one patch'),
+                   enabled='mq', toolbar='mq')
+        newaction(_('QPop'), self._repofwd('qpop'), icon='qpop',
+                  tooltip=_('Unapply one patch'),
+                  enabled='mq', toolbar='mq')
+
         self.updateMenu()
 
     @pyqtSlot(QAction)
@@ -352,11 +361,23 @@ class Workbench(QMainWindow):
             event.accept()
 
     def updateMenu(self):
+        """Enable actions when repoTabs are opened or closed or changed"""
+        
+        # Update actions affected by repo open/close
+         
         someRepoOpen = self.repoTabsWidget.count() > 0
         for action in self._actionavails['repoopen']:
             action.setEnabled(someRepoOpen)
 
+        # Update actions affected by repo open/close/change
+
         self.updateTaskViewMenu()
+       
+        w = self.repoTabsWidget.currentWidget()
+        mqEnabled = w and 'mq' in w.repo.extensions() or False       
+        for action in self._actionavails['mq']:
+            action.setEnabled(mqEnabled)
+
 
     def updateTaskViewMenu(self, taskIndex=0):
         # Fetch selected task tab from current repowidget and check corresponding action in menu
@@ -386,7 +407,7 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             w.switchedTo()
-            self.updateTaskViewMenu()
+            self.updateMenu()
         self.log.setRepository(w and w.repo or None)
 
     def addRepoTab(self, repo):
