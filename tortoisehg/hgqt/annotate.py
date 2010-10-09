@@ -396,6 +396,8 @@ class SearchToolBar(QToolBar):
         self._le.textChanged.connect(lambda s: self._bt.setEnabled(bool(s)))
         self.addWidget(self._bt)
 
+        self.setFocusProxy(self._le)
+
     @pyqtSlot()
     def _emitConditionChanged(self):
         self.conditionChanged.emit(self.pattern(), self.caseInsensitive(),
