@@ -275,7 +275,7 @@ class Workbench(QMainWindow):
                   tooltip=_('Load all revisions into graph'))
         newseparator(toolbar='edit')
         newaction(_('Find'), self._repofwd('showSearchBar'), icon='find',
-                  enabled='repoopen', toolbar='edit',
+                  shortcut='Find', enabled='repoopen', toolbar='edit',
                   tooltip=_('Search file and revision contents for keyword'))
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming',

@@ -390,8 +390,7 @@ class SearchToolBar(QToolBar):
         self._wrapchk = QCheckBox(_('Wrap search'))
         self._wrapchk.toggled.connect(self._emitConditionChanged)
         self.addWidget(self._wrapchk)
-        self._bt = QPushButton(_('Search'), enabled=False,
-                               shortcut=QKeySequence.Find)
+        self._bt = QPushButton(_('Search'), enabled=False)
         self._bt.clicked.connect(self._emitSearchRequested)
         self._le.textChanged.connect(lambda s: self._bt.setEnabled(bool(s)))
         self.addWidget(self._bt)
