@@ -27,7 +27,7 @@ from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
-from tortoisehg.hgqt.manifestdialog import ManifestWidget
+from tortoisehg.hgqt.manifestdialog import ManifestTaskWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 
@@ -186,8 +186,8 @@ class RepoWidget(QWidget):
                 return None  # TODO
             else:
                 return rev
-        w = ManifestWidget(self.repo.ui, self.repo, rev=filterrev(self.rev),
-                           parent=self)
+        w = ManifestTaskWidget(self.repo.ui, self.repo, rev=filterrev(self.rev),
+                               parent=self)
         self.repoview.revisionClicked.connect(lambda rev:
                            w.setrev(filterrev(rev)))
         w.revchanged.connect(self.repoview.goto)

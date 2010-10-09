@@ -279,6 +279,22 @@ class _StatusFilterButton(QToolButton):
     def _setText(self, text):
         super(_StatusFilterButton, self).setText(text)
 
+class ManifestTaskWidget(ManifestWidget):
+    """Manifest widget designed for task tab"""
+
+    @pyqtSlot()
+    def showSearchBar(self):
+        self._searchbar.show()
+        self._searchbar.setFocus()
+
+    @util.propertycache
+    def _searchbar(self):
+        searchbar = annotate.SearchToolBar(hidable=True)
+        searchbar.hide()
+        self.layout().addWidget(searchbar)
+        connectsearchbar(self, searchbar)
+        return searchbar
+
 def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
