@@ -363,7 +363,9 @@ class RevsetThread(QThread):
         self.query = query
 
     def run(self):
+        cwd = os.getcwd()
         try:
+            os.chdir(self.repo.root)
             func = revset.match(self.text)
             func(self.repo, range(0, 1))
             l = []
@@ -384,6 +386,7 @@ class RevsetThread(QThread):
         except Exception, e:
             self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
 
+        os.chdir(cwd)
         self.finished.emit()
 
 def run(ui, *pats, **opts):
