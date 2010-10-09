@@ -356,6 +356,15 @@ def _extendrepo(repo):
             'Returns true if `tag` marks an applied MQ patch'
             return tag in self._thgmqpatchnames
 
+        def getcurrentqqueue(self):
+            'Returns the name of the current MQ queue'
+            if 'mq' not in self._exts:
+                return None
+            cur = os.path.basename(self.mq.path)
+            if cur.startswith('patches-'):
+                cur = cur[8:]
+            return cur
+
         def thginvalidate(self):
             'Should be called when mtime of repo store/dirstate are changed'
             self.dirstate.invalidate()
