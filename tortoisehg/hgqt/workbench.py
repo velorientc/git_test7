@@ -45,7 +45,6 @@ class Workbench(QMainWindow):
 
         QMainWindow.__init__(self)
 
-        self.load_config(ui)
         self.setupUi()
 
         self.setWindowTitle('TortoiseHg Workbench')
@@ -75,12 +74,6 @@ class Workbench(QMainWindow):
 
         self.restoreSettings()
         self.setAcceptDrops(True)
-
-    def load_config(self, ui):
-        # TODO: connect to font changed signal
-        self._font = getfont('fontlog').font()
-        self.rowheight = 8
-        self.users, self.aliases = [], []
 
     def accept(self):
         self.close()
