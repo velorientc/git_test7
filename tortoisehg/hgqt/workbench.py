@@ -150,6 +150,9 @@ class Workbench(QMainWindow):
         self.synctbar = QToolBar(_('Sync Toolbar'), objectName='synctbar')
         self.addToolBar(self.synctbar)
 
+        # availability map of actions; applied by updateMenu()
+        self._actionavails = {'repoopen': []}
+
         def keysequence(o):
             """Create QKeySequence from string or QKeySequence"""
             if isinstance(o, (QKeySequence, QKeySequence.StandardKey)):
@@ -165,19 +168,19 @@ class Workbench(QMainWindow):
             return QKeySequence('%s+%s' % (modifier, origseq.toString()))
 
         def newaction(text, slot=None, icon=None, shortcut=None,
-                      checkable=False, tooltip=None, data=None, enabled=True,
+                      checkable=False, tooltip=None, data=None, enabled=None,
                       menu=None, toolbar=None, parent=self):
             """Create new action and register it
 
             :slot: function called if action triggered or toggled.
             :checkable: checkable action. slot will be called on toggled.
             :data: optional data stored on QAction.
+            :enabled: bool or group name to enable/disable action.
             :shortcut: QKeySequence, key sequence or name of standard key.
             :menu: name of menu to add this action.
             :toolbar: name of toolbar to add this action.
             """
-            action = QAction(text, parent, checkable=checkable,
-                             enabled=enabled)
+            action = QAction(text, parent, checkable=checkable)
             if slot:
                 if checkable:
                     action.toggled.connect(slot)
@@ -191,6 +194,10 @@ class Workbench(QMainWindow):
                 action.setToolTip(tooltip)
             if data is not None:
                 action.setData(data)
+            if isinstance(enabled, bool):
+                action.setEnabled(enabled)
+            elif enabled:
+                self._actionavails[enabled].append(action)
             if menu:
                 getattr(self, 'menu%s' % menu.title()).addAction(action)
             if toolbar:
@@ -211,9 +218,8 @@ class Workbench(QMainWindow):
                   menu='file')
         newaction(_("&Open Repository..."), self.openRepository,
                   shortcut='Open', menu='file')
-        self.actionClose_repository = \
         newaction(_("&Close Repository"), self.closeRepository,
-                  shortcut='Close', menu='file')
+                  shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
         newaction(_('&Settings...'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
@@ -240,12 +246,12 @@ class Workbench(QMainWindow):
                   menu='view')
         newseparator(menu='view')
 
-        self.actionGroupTaskView = QActionGroup(self, enabled=False)
+        self.actionGroupTaskView = QActionGroup(self)
         self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
         def addtaskview(icon, label):
             index = len(self.actionGroupTaskView.actions())
             a = newaction(label, icon=icon, checkable=True, data=index,
-                          menu='view')
+                          enabled='repoopen', menu='view')
             self.actionGroupTaskView.addAction(a)
         addtaskview('log', _("Revision &Details"))
         addtaskview('commit', _("&Commit..."))
@@ -254,40 +260,36 @@ class Workbench(QMainWindow):
         addtaskview('sync', _("S&ynchronize..."))
         newseparator(menu='view')
 
-        self.actionRefresh = \
         newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
-                  shortcut='Refresh', menu='view', toolbar='edit',
+                  shortcut='Refresh', enabled='repoopen',
+                  menu='view', toolbar='edit',
                   tooltip=_('Refresh all for current repository'))
-        self.actionRefreshTaskTab = \
         newaction(_("Refresh &Task Tab"), self._repofwd('reloadTaskTab'),
-                  icon='reloadtt',
+                  icon='reloadtt', enabled='repoopen',
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view', toolbar='edit')
 
-        self.actionServe = \
-        newaction(_("Web Server"), self.serve, menu='repository')
+        newaction(_("Web Server"), self.serve, enabled='repoopen',
+                  menu='repository')
         newseparator(menu='repository')
-        self.actionImport = \
-        newaction(_("Import"), self._repofwd('thgimport'), menu='repository')
+        newaction(_("Import"), self._repofwd('thgimport'),
+                  enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        self.actionVerify = \
-        newaction(_("Verify"), self._repofwd('verify'), menu='repository')
-        self.actionRecover = \
-        newaction(_("Recover"), self._repofwd('recover'), menu='repository')
+        newaction(_("Verify"), self._repofwd('verify'), enabled='repoopen',
+                  menu='repository')
+        newaction(_("Recover"), self._repofwd('recover'), enabled='repoopen',
+                  menu='repository')
         newseparator(menu='repository')
-        self.actionRollback = \
         newaction(_("Rollback/Undo"), self._repofwd('rollback'),
+                  enabled='repoopen', menu='repository')
+        newaction(_("Purge"), self._repofwd('purge'), enabled='repoopen',
                   menu='repository')
-        self.actionPurge = \
-        newaction(_("Purge"), self._repofwd('purge'), menu='repository')
         newseparator(menu='repository')
-        self.actionExplore = \
         newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+S',
-                  menu='repository')
-        self.actionTerminal = \
+                  enabled='repoopen', menu='repository')
         newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
-                  menu='repository')
+                  enabled='repoopen', menu='repository')
 
         newaction(_("About"), self.on_about, menu='help')
 
@@ -298,31 +300,26 @@ class Workbench(QMainWindow):
         self.actionForward = \
         newaction(_("Forward"), self._repofwd('forward'), icon='forward',
                   enabled=False, toolbar='edit')
-        self.actionLoadAll = \
-        newaction(_("Load all"), self.loadall, icon='loadall', toolbar='edit',
+        newaction(_("Load all"), self.loadall, icon='loadall',
+                  enabled='repoopen', toolbar='edit',
                   tooltip=_('Load all revisions into graph'))
         newseparator(toolbar='edit')
-        self.actionFind = \
         newaction(_('Find'), self._repofwd('find'), icon='find',
-                  toolbar='edit',
+                  enabled='repoopen', toolbar='edit',
                   tooltip=_('Search file and revision contents for keyword'))
 
-        self.actionIncoming = \
         newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming',
                   tooltip=_('Check for incoming changes from default pull target'),
-                  toolbar='sync')
-        self.actionPull = \
+                  enabled='repoopen', toolbar='sync')
         newaction(_('Pull'), self._repofwd('pull'), icon='pull',
                   tooltip=_('Pull incoming changes from default pull target'),
-                  toolbar='sync')
-        self.actionOutgoing = \
+                  enabled='repoopen', toolbar='sync')
         newaction(_('Outgoing'), self._repofwd('outgoing'), icon='outgoing',
                    tooltip=_('Detect outgoing changes to default push target'),
-                   toolbar='sync')
-        self.actionPush = \
+                   enabled='repoopen', toolbar='sync')
         newaction(_('Push'), self._repofwd('push'), icon='push',
                   tooltip=_('Push outgoing changes to default push target'),
-                  toolbar='sync')
+                  enabled='repoopen', toolbar='sync')
 
         self.updateMenu()
 
@@ -371,28 +368,10 @@ class Workbench(QMainWindow):
 
     def updateMenu(self):
         someRepoOpen = self.repoTabsWidget.count() > 0
-        self.actionGroupTaskView.setEnabled(someRepoOpen)
+        for action in self._actionavails['repoopen']:
+            action.setEnabled(someRepoOpen)
+
         self.updateTaskViewMenu()
-
-        self.actionFind.setEnabled(someRepoOpen)
-        self.actionRefresh.setEnabled(someRepoOpen)
-        self.actionRefreshTaskTab.setEnabled(someRepoOpen)
-        self.actionLoadAll.setEnabled(someRepoOpen)
-
-        self.actionClose_repository.setEnabled(someRepoOpen)
-        self.actionImport.setEnabled(someRepoOpen)
-        self.actionServe.setEnabled(someRepoOpen)
-        self.actionVerify.setEnabled(someRepoOpen)
-        self.actionRecover.setEnabled(someRepoOpen)
-        self.actionRollback.setEnabled(someRepoOpen)
-        self.actionPurge.setEnabled(someRepoOpen)
-        self.actionExplore.setEnabled(someRepoOpen)
-        self.actionTerminal.setEnabled(someRepoOpen)
-
-        self.actionIncoming.setEnabled(someRepoOpen)
-        self.actionPull.setEnabled(someRepoOpen)
-        self.actionOutgoing.setEnabled(someRepoOpen)
-        self.actionPush.setEnabled(someRepoOpen)
 
     def updateTaskViewMenu(self, taskIndex=0):
         # Fetch selected task tab from current repowidget and check corresponding action in menu
