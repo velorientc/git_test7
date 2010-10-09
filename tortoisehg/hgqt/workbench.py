@@ -136,163 +136,143 @@ class Workbench(QMainWindow):
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
 
-        self.menuFile = m = QMenu(_("&File"), self.menubar)
-        self.menubar.addAction(self.menuFile.menuAction())
+        self.menuFile = self.menubar.addMenu(_("&File"))
+        self.menuView = self.menubar.addMenu(_("&View"))
+        self.menuRepository = self.menubar.addMenu(_("&Repository"))
+        self.menuHelp = self.menubar.addMenu(_("&Help"))
 
-        self.actionNew_repository = a = QAction(_("&New Repository..."), self)
-        self.actionNew_repository.triggered.connect(self.newRepository)
-        a.setShortcut(QKeySequence.New)
-        m.addAction(self.actionNew_repository)
+        def keysequence(o):
+            """Create QKeySequence from string or QKeySequence"""
+            if isinstance(o, (QKeySequence, QKeySequence.StandardKey)):
+                return o
+            try:
+                return getattr(QKeySequence, str(o))  # standard key
+            except AttributeError:
+                return QKeySequence(o)
 
-        self.actionClone_repository = a = QAction(_("Clone Repository..."), self)
-        self.actionClone_repository.triggered.connect(self.cloneRepository)
-        b = QKeySequence.keyBindings(QKeySequence.New)
-        a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
-        m.addAction(self.actionClone_repository)
+        def modifiedkeysequence(o, modifier):
+            """Create QKeySequence of modifier key prepended"""
+            origseq = QKeySequence(keysequence(o))
+            return QKeySequence('%s+%s' % (modifier, origseq.toString()))
 
-        self.actionOpen_repository = a = QAction(_("&Open Repository..."), self)
-        self.actionOpen_repository.triggered.connect(self.openRepository)
-        a.setShortcut(QKeySequence.Open)
-        m.addAction(self.actionOpen_repository)
+        def newaction(text, slot=None, icon=None, shortcut=None,
+                      checkable=False, tooltip=None, data=None,
+                      menu=None, parent=self):
+            """Create new action and register it
 
-        self.actionClose_repository = a = QAction(_("&Close Repository"), self)
-        self.actionClose_repository.triggered.connect(self.closeRepository)
-        a.setShortcut(QKeySequence.Close)
-        m.addAction(self.actionClose_repository)
+            :slot: function called if action triggered or toggled.
+            :checkable: checkable action. slot will be called on toggled.
+            :data: optional data stored on QAction.
+            :shortcut: QKeySequence, key sequence or name of standard key.
+            :menu: name of menu to add this action.
+            """
+            action = QAction(text, parent, checkable=checkable)
+            if slot:
+                if checkable:
+                    action.toggled.connect(slot)
+                else:
+                    action.triggered.connect(slot)
+            if icon:
+                action.setIcon(geticon(icon))
+            if shortcut:
+                action.setShortcut(keysequence(shortcut))
+            if tooltip:
+                action.setToolTip(tooltip)
+            if data is not None:
+                action.setData(data)
+            if menu:
+                getattr(self, 'menu%s' % menu.title()).addAction(action)
+            return action
 
-        m.addSeparator()
+        def newseparator(menu=None):
+            """Insert a separator action; returns nothing"""
+            if menu:
+                getattr(self, 'menu%s' % menu.title()).addSeparator()
 
-        self.actionSettings = a = QAction(_('&Settings...'), self)
-        self.actionSettings.triggered.connect(self.editSettings)
-        a.setShortcut(QKeySequence.Preferences)
-        a.setIcon(geticon('settings_user'))
-        m.addAction(self.actionSettings)
+        newaction(_("&New Repository..."), self.newRepository,
+                  shortcut='New', menu='file')
+        newaction(_("Clone Repository..."), self.cloneRepository,
+                  shortcut=modifiedkeysequence('New', modifier='Shift'),
+                  menu='file')
+        newaction(_("&Open Repository..."), self.openRepository,
+                  shortcut='Open', menu='file')
+        self.actionClose_repository = \
+        newaction(_("&Close Repository"), self.closeRepository,
+                  shortcut='Close', menu='file')
+        newseparator(menu='file')
+        newaction(_('&Settings...'), self.editSettings, icon='settings_user',
+                  shortcut='Preferences', menu='file')
+        newseparator(menu='file')
+        newaction(_("E&xit"), self.close, icon='quit',
+                  shortcut='Quit', menu='file')
 
-        m.addSeparator()
+        self.actionShowRepoRegistry = \
+        newaction(_("Show Repository Registry"), self.showRepoRegistry,
+                  icon='repotree', checkable=True, menu='view')
+        self.actionShowPaths = \
+        newaction(_("Show Paths"), self.actionShowPathsToggled,
+                  checkable=True, menu='view')
+        self.actionShowLog = \
+        newaction(_("Show Output &Log"), self.showLog, icon='showlog',
+                  shortcut='Ctrl+L', checkable=True, menu='view')
+        newseparator(menu='view')
+        newaction(_("Choose Log Columns..."), self.setHistoryColumns,
+                  menu='view')
+        self.actionSaveRepos = \
+        newaction(_("Save Open Repositories On Exit"), checkable=True,
+                  menu='view')
+        newseparator(menu='view')
 
-        self.actionQuit = a = QAction(_("E&xit"), self)
-        self.actionQuit.triggered.connect(self.close)
-        a.setIcon(geticon('quit'))
-        a.setShortcut(QKeySequence.Quit)
-        a.setIconText(_("Exit"))
-        a.setToolTip(_("Exit"))
-        m.addAction(self.actionQuit)
-
-        self.menuView = m = QMenu(_("&View"), self.menubar)
-        self.menubar.addAction(self.menuView.menuAction())
-
-        self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
-        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
-        a.setCheckable(True)
-        a.setIcon(geticon('repotree'))
-        m.addAction(self.actionShowRepoRegistry)
-
-        self.actionShowPaths = a = QAction(_("Show Paths"), self)
-        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
-        a.setCheckable(True)
-        m.addAction(self.actionShowPaths)
-
-        self.actionShowLog = a = QAction(_("Show Output &Log"), self)
-        self.actionShowLog.toggled.connect(self.showLog)
-        a.setCheckable(True)
-        a.setIcon(geticon('showlog'))
-        a.setShortcut(QKeySequence("Ctrl+L"))
-        m.addAction(self.actionShowLog)
-
-        m.addSeparator()
-
-        self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
-        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
-        m.addAction(self.actionSelectColumns)
-
-        self.actionSaveRepos = a = QAction(_("Save Open Repositories On Exit"), self)
-        a.setCheckable(True)
-        m.addAction(self.actionSaveRepos)
-
-        m.addSeparator()
-
-        self.actionGroupTaskView = ag = QActionGroup(self, enabled=False)
+        self.actionGroupTaskView = QActionGroup(self, enabled=False)
         self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
         def addtaskview(icon, label):
             index = len(self.actionGroupTaskView.actions())
-            a = self.actionGroupTaskView.addAction(geticon(icon), label)
-            a.setData(index)
-            a.setCheckable(True)
+            a = newaction(label, icon=icon, checkable=True, data=index,
+                          menu='view')
+            self.actionGroupTaskView.addAction(a)
         addtaskview('log', _("Revision &Details"))
         addtaskview('commit', _("&Commit..."))
         addtaskview('annotate', _("&Manifest..."))
         addtaskview('repobrowse', _("&Search..."))
         addtaskview('sync', _("S&ynchronize..."))
-        m.addActions(self.actionGroupTaskView.actions())
+        newseparator(menu='view')
 
-        m.addSeparator()
+        self.actionRefresh = \
+        newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
+                  shortcut='Refresh', menu='view',
+                  tooltip=_('Refresh all for current repository'))
+        self.actionRefreshTaskTab = \
+        newaction(_("Refresh &Task Tab"), self._repofwd('reloadTaskTab'),
+                  icon='reloadtt',
+                  shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
+                  tooltip=_('Refresh only the current task tab'),
+                  menu='view')
 
-        self.actionRefresh = a = QAction(_("&Refresh"), self)
-        self.actionRefresh.triggered.connect(self._repofwd('reload'))
-        a.setIcon(geticon('reload'))
-        a.setShortcut(QKeySequence.Refresh)
-        a.setToolTip(_('Refresh all for current repository'))
-        m.addAction(self.actionRefresh)
+        self.actionServe = \
+        newaction(_("Web Server"), self.serve, menu='repository')
+        newseparator(menu='repository')
+        self.actionImport = \
+        newaction(_("Import"), self._repofwd('thgimport'), menu='repository')
+        newseparator(menu='repository')
+        self.actionVerify = \
+        newaction(_("Verify"), self._repofwd('verify'), menu='repository')
+        self.actionRecover = \
+        newaction(_("Recover"), self._repofwd('recover'), menu='repository')
+        newseparator(menu='repository')
+        self.actionRollback = \
+        newaction(_("Rollback/Undo"), self._repofwd('rollback'),
+                  menu='repository')
+        self.actionPurge = \
+        newaction(_("Purge"), self._repofwd('purge'), menu='repository')
+        newseparator(menu='repository')
+        self.actionExplore = \
+        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+S',
+                  menu='repository')
+        self.actionTerminal = \
+        newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
+                  menu='repository')
 
-        self.actionRefreshTaskTab = a = QAction(_("Refresh &Task Tab"), self)
-        self.actionRefreshTaskTab.triggered.connect(self._repofwd('reloadTaskTab'))
-        a.setIcon(geticon('reloadtt'))
-        b = QKeySequence.keyBindings(QKeySequence.Refresh)
-        a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
-        a.setToolTip(_('Refresh only the current task tab'))
-        m.addAction(self.actionRefreshTaskTab)
-
-        self.menuRepository = m = QMenu(_("&Repository"), self.menubar)
-        self.menubar.addAction(self.menuRepository.menuAction())
-
-        self.actionServe = QAction(_("Web Server"), self)
-        self.actionServe.triggered.connect(self.serve)
-        m.addAction(self.actionServe)
-
-        m.addSeparator()
-
-        self.actionImport = QAction(_("Import"), self)
-        self.actionImport.triggered.connect(self._repofwd('thgimport'))
-        m.addAction(self.actionImport)
-
-        m.addSeparator()
-
-        self.actionVerify = QAction(_("Verify"), self)
-        self.actionVerify.triggered.connect(self._repofwd('verify'))
-        m.addAction(self.actionVerify)
-
-        self.actionRecover = QAction(_("Recover"), self)
-        self.actionRecover.triggered.connect(self._repofwd('recover'))
-        m.addAction(self.actionRecover)
-
-        m.addSeparator()
-
-        self.actionRollback = QAction(_("Rollback/Undo"), self)
-        self.actionRollback.triggered.connect(self._repofwd('rollback'))
-        m.addAction(self.actionRollback)
-
-        self.actionPurge = QAction(_("Purge"), self)
-        self.actionPurge.triggered.connect(self._repofwd('purge'))
-        m.addAction(self.actionPurge)
-
-        m.addSeparator()
-
-        self.actionExplore = a = QAction(_("Explore"), self)
-        self.actionExplore.triggered.connect(self.explore)
-        a.setShortcut(QKeySequence("Shift+Ctrl+S"))
-        m.addAction(self.actionExplore)
-
-        self.actionTerminal = a = QAction(_("Terminal"), self)
-        self.actionTerminal.triggered.connect(self.terminal)
-        a.setShortcut(QKeySequence("Shift+Ctrl+T"))
-        m.addAction(self.actionTerminal)
-
-        self.menuHelp = m = QMenu(_("&Help"), self.menubar)
-        self.menubar.addAction(self.menuHelp.menuAction())
-
-        self.actionAbout = QAction(_("About"), self)
-        self.actionAbout.triggered.connect(self.on_about)
-        m.addAction(self.actionAbout)
+        newaction(_("About"), self.on_about, menu='help')
 
         self.actionFind = a = QAction(_('Find'), self)
         self.actionFind.triggered.connect(self._repofwd('find'))
