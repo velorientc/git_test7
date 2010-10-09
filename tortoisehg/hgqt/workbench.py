@@ -11,17 +11,14 @@ Main Qt4 application for TortoiseHg
 """
 
 import os
-import subprocess
 
 from mercurial.error import RepoError
 
 from tortoisehg.util import paths, hglib
 
-#from tortoisehg.hgqt.decorators import timeit
-
 from tortoisehg.hgqt import repomodel, thgrepo, cmdui
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon, getfont, configstyles
+from tortoisehg.hgqt.qtlib import geticon, getfont
 from tortoisehg.hgqt.qtlib import InfoMsgBox, WarningMsgBox
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
