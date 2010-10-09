@@ -188,19 +188,7 @@ class RepoItem(RepoTreeItem):
         self.model.openrepofunc(self._root)
 
     def showFirstTabOrOpen(self, workbench=None):
-        tw = workbench.repoTabsWidget
-        def getFirstTab():
-            for i in range(tw.count()):
-                tabrootpath = tw.widget(i).repo.root
-                regrootpath = self.data(1, None).toString()
-                if tabrootpath == regrootpath:
-                    return i
-            return -1
-        tab = getFirstTab()
-        if tab == -1:
-            self.open()
-        else:
-            tw.setCurrentIndex(tab)
+        workbench.showRepo(hglib.tounicode(self._root))
 
     def startSettings(self, parent):
         if self._settingsdlg is None:

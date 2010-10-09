@@ -336,6 +336,15 @@ class Workbench(QMainWindow):
             repopath = hglib.fromunicode(repopath)
         self._openRepo(path=repopath)
 
+    @pyqtSlot(unicode)
+    def showRepo(self, path):
+        """Activate the repo tab or open it if not available [unicode]"""
+        for i in xrange(self.repoTabsWidget.count()):
+            w = self.repoTabsWidget.widget(i)
+            if hglib.tounicode(w.repo.root) == path:
+                return self.repoTabsWidget.setCurrentIndex(i)
+        self.openRepo(path)
+
     def find_root(self, url):
         p = hglib.fromunicode(url.toLocalFile())
         return paths.find_root(p)
