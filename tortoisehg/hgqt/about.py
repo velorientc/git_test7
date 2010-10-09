@@ -100,7 +100,6 @@ class AboutDialog(QDialog):
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self._readsettings()
-        self.setModal(True)
 
     def getVersionInfo(self):
         def make_version(tuple):
