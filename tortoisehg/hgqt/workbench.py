@@ -133,45 +133,42 @@ class Workbench(QMainWindow):
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
+        self.menubar = QMenuBar(self)
+        self.setMenuBar(self.menubar)
+
+        self.menuFile = m = QMenu(_("&File"), self.menubar)
+        self.menubar.addAction(self.menuFile.menuAction())
+
         self.actionNew_repository = a = QAction(_("&New Repository..."), self)
         self.actionNew_repository.triggered.connect(self.newRepository)
         a.setShortcut(QKeySequence.New)
-        
+        m.addAction(self.actionNew_repository)
+
         self.actionClone_repository = a = QAction(_("Clone Repository..."), self)
         self.actionClone_repository.triggered.connect(self.cloneRepository)
         b = QKeySequence.keyBindings(QKeySequence.New)
         a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
+        m.addAction(self.actionClone_repository)
 
         self.actionOpen_repository = a = QAction(_("&Open Repository..."), self)
         self.actionOpen_repository.triggered.connect(self.openRepository)
         a.setShortcut(QKeySequence.Open)
+        m.addAction(self.actionOpen_repository)
 
         self.actionClose_repository = a = QAction(_("&Close Repository"), self)
         self.actionClose_repository.triggered.connect(self.closeRepository)
         a.setShortcut(QKeySequence.Close)
+        m.addAction(self.actionClose_repository)
+
+        m.addSeparator()
 
         self.actionSettings = a = QAction(_('&Settings...'), self)
         self.actionSettings.triggered.connect(self.editSettings)
         a.setShortcut(QKeySequence.Preferences)
         a.setIcon(geticon('settings_user'))
+        m.addAction(self.actionSettings)
 
-        self.actionRefresh = a = QAction(_("&Refresh"), self)
-        self.actionRefresh.triggered.connect(self._repofwd('reload'))
-        a.setIcon(geticon('reload'))
-        a.setShortcut(QKeySequence.Refresh)
-        a.setToolTip(_('Refresh all for current repository'))
-
-        self.actionRefreshTaskTab = a = QAction(_("Refresh &Task Tab"), self)
-        self.actionRefreshTaskTab.triggered.connect(self._repofwd('reloadTaskTab'))
-        a.setIcon(geticon('reloadtt'))
-        b = QKeySequence.keyBindings(QKeySequence.Refresh)
-        a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
-        a.setToolTip(_('Refresh only the current task tab'))
-
-        self.actionFind = a = QAction(_('Find'), self)
-        self.actionFind.triggered.connect(self._repofwd('find'))
-        a.setToolTip(_('Search file and revision contents for keyword'))
-        a.setIcon(geticon('find'))
+        m.addSeparator()
 
         self.actionQuit = a = QAction(_("E&xit"), self)
         self.actionQuit.triggered.connect(self.close)
@@ -179,9 +176,128 @@ class Workbench(QMainWindow):
         a.setShortcut(QKeySequence.Quit)
         a.setIconText(_("Exit"))
         a.setToolTip(_("Exit"))
+        m.addAction(self.actionQuit)
+
+        self.menuView = m = QMenu(_("&View"), self.menubar)
+        self.menubar.addAction(self.menuView.menuAction())
+
+        self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
+        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
+        a.setCheckable(True)
+        a.setIcon(geticon('repotree'))
+        m.addAction(self.actionShowRepoRegistry)
+
+        self.actionShowPaths = a = QAction(_("Show Paths"), self)
+        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
+        a.setCheckable(True)
+        m.addAction(self.actionShowPaths)
+
+        self.actionShowLog = a = QAction(_("Show Output &Log"), self)
+        self.actionShowLog.toggled.connect(self.showLog)
+        a.setCheckable(True)
+        a.setIcon(geticon('showlog'))
+        a.setShortcut(QKeySequence("Ctrl+L"))
+        m.addAction(self.actionShowLog)
+
+        m.addSeparator()
+
+        self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
+        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
+        m.addAction(self.actionSelectColumns)
+
+        self.actionSaveRepos = a = QAction(_("Save Open Repositories On Exit"), self)
+        a.setCheckable(True)
+        m.addAction(self.actionSaveRepos)
+
+        m.addSeparator()
+
+        self.actionGroupTaskView = ag = QActionGroup(self, enabled=False)
+        self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
+        def addtaskview(icon, label):
+            index = len(self.actionGroupTaskView.actions())
+            a = self.actionGroupTaskView.addAction(geticon(icon), label)
+            a.setData(index)
+            a.setCheckable(True)
+        addtaskview('log', _("Revision &Details"))
+        addtaskview('commit', _("&Commit..."))
+        addtaskview('annotate', _("&Manifest..."))
+        addtaskview('repobrowse', _("&Search..."))
+        addtaskview('sync', _("S&ynchronize..."))
+        m.addActions(self.actionGroupTaskView.actions())
+
+        m.addSeparator()
+
+        self.actionRefresh = a = QAction(_("&Refresh"), self)
+        self.actionRefresh.triggered.connect(self._repofwd('reload'))
+        a.setIcon(geticon('reload'))
+        a.setShortcut(QKeySequence.Refresh)
+        a.setToolTip(_('Refresh all for current repository'))
+        m.addAction(self.actionRefresh)
+
+        self.actionRefreshTaskTab = a = QAction(_("Refresh &Task Tab"), self)
+        self.actionRefreshTaskTab.triggered.connect(self._repofwd('reloadTaskTab'))
+        a.setIcon(geticon('reloadtt'))
+        b = QKeySequence.keyBindings(QKeySequence.Refresh)
+        a.setShortcut(QKeySequence.fromString(u'Shift+' + b[0].toString()))
+        a.setToolTip(_('Refresh only the current task tab'))
+        m.addAction(self.actionRefreshTaskTab)
+
+        self.menuRepository = m = QMenu(_("&Repository"), self.menubar)
+        self.menubar.addAction(self.menuRepository.menuAction())
+
+        self.actionServe = QAction(_("Web Server"), self)
+        self.actionServe.triggered.connect(self.serve)
+        m.addAction(self.actionServe)
+
+        m.addSeparator()
+
+        self.actionImport = QAction(_("Import"), self)
+        self.actionImport.triggered.connect(self._repofwd('thgimport'))
+        m.addAction(self.actionImport)
+
+        m.addSeparator()
+
+        self.actionVerify = QAction(_("Verify"), self)
+        self.actionVerify.triggered.connect(self._repofwd('verify'))
+        m.addAction(self.actionVerify)
+
+        self.actionRecover = QAction(_("Recover"), self)
+        self.actionRecover.triggered.connect(self._repofwd('recover'))
+        m.addAction(self.actionRecover)
+
+        m.addSeparator()
+
+        self.actionRollback = QAction(_("Rollback/Undo"), self)
+        self.actionRollback.triggered.connect(self._repofwd('rollback'))
+        m.addAction(self.actionRollback)
+
+        self.actionPurge = QAction(_("Purge"), self)
+        self.actionPurge.triggered.connect(self._repofwd('purge'))
+        m.addAction(self.actionPurge)
+
+        m.addSeparator()
+
+        self.actionExplore = a = QAction(_("Explore"), self)
+        self.actionExplore.triggered.connect(self.explore)
+        a.setShortcut(QKeySequence("Shift+Ctrl+S"))
+        m.addAction(self.actionExplore)
+
+        self.actionTerminal = a = QAction(_("Terminal"), self)
+        self.actionTerminal.triggered.connect(self.terminal)
+        a.setShortcut(QKeySequence("Shift+Ctrl+T"))
+        m.addAction(self.actionTerminal)
+
+        self.menuHelp = m = QMenu(_("&Help"), self.menubar)
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.actionAbout = QAction(_("About"), self)
         self.actionAbout.triggered.connect(self.on_about)
+        m.addAction(self.actionAbout)
+
+        self.actionFind = a = QAction(_('Find'), self)
+        self.actionFind.triggered.connect(self._repofwd('find'))
+        a.setToolTip(_('Search file and revision contents for keyword'))
+        a.setIcon(geticon('find'))
 
         self.actionBack = a = QAction(_("Back"), self)
         self.actionBack.triggered.connect(self._repofwd('back'))
@@ -198,59 +314,6 @@ class Workbench(QMainWindow):
         a.setEnabled(True)
         a.setToolTip(_('Load all revisions into graph'))
         a.setIcon(geticon('loadall'))
-
-        self.actionShowPaths = a = QAction(_("Show Paths"), self)
-        self.actionShowPaths.toggled.connect(self.actionShowPathsToggled)
-        a.setCheckable(True)
-
-        self.actionSelectColumns = QAction(_("Choose Log Columns..."), self)
-        self.actionSelectColumns.triggered.connect(self.setHistoryColumns)
-
-        self.actionSaveRepos = a = QAction(_("Save Open Repositories On Exit"), self)
-        a.setCheckable(True)
-
-        self.actionGroupTaskView = ag = QActionGroup(self, enabled=False)
-        self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
-        def addtaskview(icon, label):
-            index = len(self.actionGroupTaskView.actions())
-            a = self.actionGroupTaskView.addAction(geticon(icon), label)
-            a.setData(index)
-            a.setCheckable(True)
-        addtaskview('log', _("Revision &Details"))
-        addtaskview('commit', _("&Commit..."))
-        addtaskview('annotate', _("&Manifest..."))
-        addtaskview('repobrowse', _("&Search..."))
-        addtaskview('sync', _("S&ynchronize..."))
-
-        self.actionShowRepoRegistry = a = QAction(_("Show Repository Registry"), self)
-        self.actionShowRepoRegistry.toggled.connect(self.showRepoRegistry)
-        a.setCheckable(True)
-        a.setIcon(geticon('repotree'))
-
-        self.actionShowLog = a = QAction(_("Show Output &Log"), self)
-        self.actionShowLog.toggled.connect(self.showLog)
-        a.setCheckable(True)
-        a.setIcon(geticon('showlog'))
-        a.setShortcut(QKeySequence("Ctrl+L"))
-
-        self.actionServe = QAction(_("Web Server"), self)
-        self.actionServe.triggered.connect(self.serve)
-        self.actionImport = QAction(_("Import"), self)
-        self.actionImport.triggered.connect(self._repofwd('thgimport'))
-        self.actionVerify = QAction(_("Verify"), self)
-        self.actionVerify.triggered.connect(self._repofwd('verify'))
-        self.actionRecover = QAction(_("Recover"), self)
-        self.actionRecover.triggered.connect(self._repofwd('recover'))
-        self.actionRollback = QAction(_("Rollback/Undo"), self)
-        self.actionRollback.triggered.connect(self._repofwd('rollback'))
-        self.actionPurge = QAction(_("Purge"), self)
-        self.actionPurge.triggered.connect(self._repofwd('purge'))
-        self.actionExplore = a = QAction(_("Explore"), self)
-        self.actionExplore.triggered.connect(self.explore)
-        a.setShortcut(QKeySequence("Shift+Ctrl+S"))
-        self.actionTerminal = a = QAction(_("Terminal"), self)
-        self.actionTerminal.triggered.connect(self.terminal)
-        a.setShortcut(QKeySequence("Shift+Ctrl+T"))
 
         # TODO: Use long names when these have icons
         self.actionIncoming = a = QAction(_('In'), self)
@@ -269,54 +332,6 @@ class Workbench(QMainWindow):
         self.actionPush.triggered.connect(self._repofwd('push'))
         a.setToolTip(_('Push outgoing changes to default push target'))
         a.setIcon(geticon('push'))
-
-        self.menubar = QMenuBar(self)
-        self.setMenuBar(self.menubar)
-
-        self.menuFile = m = QMenu(_("&File"), self.menubar)
-        m.addAction(self.actionNew_repository)
-        m.addAction(self.actionClone_repository)
-        m.addAction(self.actionOpen_repository)
-        m.addAction(self.actionClose_repository)
-        m.addSeparator()
-        m.addAction(self.actionSettings)
-        m.addSeparator()
-        m.addAction(self.actionQuit)
-
-        self.menuView = m = QMenu(_("&View"), self.menubar)
-        m.addAction(self.actionShowRepoRegistry)
-        m.addAction(self.actionShowPaths)
-        m.addAction(self.actionShowLog)
-        m.addSeparator()
-        m.addAction(self.actionSelectColumns)
-        m.addAction(self.actionSaveRepos)
-        m.addSeparator()
-        m.addActions(self.actionGroupTaskView.actions())
-        m.addSeparator()
-        m.addAction(self.actionRefresh)
-        m.addAction(self.actionRefreshTaskTab)
-
-        self.menuRepository = m = QMenu(_("&Repository"), self.menubar)
-        m.addAction(self.actionServe)
-        m.addSeparator()
-        m.addAction(self.actionImport)
-        m.addSeparator()
-        m.addAction(self.actionVerify)
-        m.addAction(self.actionRecover)
-        m.addSeparator()
-        m.addAction(self.actionRollback)
-        m.addAction(self.actionPurge)
-        m.addSeparator()
-        m.addAction(self.actionExplore)
-        m.addAction(self.actionTerminal)
-
-        self.menuHelp = m = QMenu(_("&Help"), self.menubar)
-        m.addAction(self.actionAbout)
-
-        self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menuView.menuAction())
-        self.menubar.addAction(self.menuRepository.menuAction())
-        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.updateMenu()
 
