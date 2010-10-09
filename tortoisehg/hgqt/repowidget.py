@@ -165,7 +165,11 @@ class RepoWidget(QWidget):
         cw.progress.connect(lambda tp, p, i, u, tl:
             self.workbench.statusbar.progress(tp, p, i, u, tl, self.repo.root))
         cw.makeLogVisible.connect(self.workbench.log.setShown)
-        cw.linkActivated.connect(self.workbench.linkActivated)
+
+        def openlink(link):
+            unicode(link).startswith('subrepo:')
+            self.workbench.showRepo(link[8:])
+        cw.linkActivated.connect(openlink)
 
         cw.showMessage.connect(self.showMessage)
         cw.buttonHBox.addWidget(b)
