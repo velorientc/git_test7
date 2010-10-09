@@ -26,18 +26,9 @@ class MergeDialog(QWizard):
         super(MergeDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'no repository found'
-
         self.other = str(other)
         self.local = str(self.repo.parents()[0].rev())
+        self.repo = repo
 
         self.setWindowTitle(_('Merge - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('merge'))
@@ -651,4 +642,5 @@ def run(ui, *pats, **opts):
     rev = opts.get('rev') or None
     if not rev and len(pats):
         rev = pats[0]
-    return MergeDialog(rev)
+    repo = thgrepo.repository(ui, path= paths.find_root())
+    return MergeDialog(rev, repo)
