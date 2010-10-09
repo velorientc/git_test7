@@ -37,7 +37,7 @@ _common = (
     ('tagged()',
      _('Changeset is tagged.')),
     ('head()',
-     _('Changeset is a head.')),
+     _('Changeset is a named branch head.')),
     ('merge()',
      _('Changeset is a merge changeset.')),
     ('closed()',
