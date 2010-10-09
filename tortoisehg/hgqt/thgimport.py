@@ -31,16 +31,7 @@ class ImportDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         self.tempfiles = []
-
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'not repository'
+        self.repo = repo
 
         # base layout box
         box = QVBoxLayout()
@@ -280,6 +271,7 @@ class ImportDialog(QDialog):
         self.cancel_btn.setDisabled(True)
 
 def run(ui, *pats, **opts):
-    dlg = ImportDialog(opts=opts)
+    repo = thgrepo.repository(ui, path= paths.find_root())
+    dlg = ImportDialog(repo, opts=opts)
     dlg.setfilepaths(pats)
     return dlg
