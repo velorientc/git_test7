@@ -167,8 +167,8 @@ class RepoWidget(QWidget):
         cw.makeLogVisible.connect(self.workbench.log.setShown)
 
         def openlink(link):
-            unicode(link).startswith('subrepo:')
-            self.workbench.showRepo(link[8:])
+            if unicode(link).startswith('subrepo:'):
+                self.workbench.showRepo(link[8:])
         cw.linkActivated.connect(openlink)
 
         cw.showMessage.connect(self.showMessage)
