@@ -62,6 +62,8 @@ class Workbench(QMainWindow):
         self.log.progressReceived.connect(self.statusbar.progress)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log)
 
+        self._setupActions()
+
         rr.openRepoSignal.connect(self.openRepo)
 
         self.repoTabChanged()
@@ -131,6 +133,8 @@ class Workbench(QMainWindow):
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
+    def _setupActions(self):
+        """Setup actions, menus and toolbars"""
         self.menubar = QMenuBar(self)
         self.setMenuBar(self.menubar)
 
@@ -218,14 +222,14 @@ class Workbench(QMainWindow):
                   shortcut='Quit', menu='file')
 
         self.actionShowRepoRegistry = \
-        newaction(_("Show Repository Registry"), self.showRepoRegistry,
+        newaction(_("Show Repository Registry"), self.reporegistry.setVisible,
                   icon='repotree', checkable=True, menu='view',
                   toolbar='dock')
         self.actionShowPaths = \
         newaction(_("Show Paths"), self.actionShowPathsToggled,
                   checkable=True, menu='view')
         self.actionShowLog = \
-        newaction(_("Show Output &Log"), self.showLog, icon='showlog',
+        newaction(_("Show Output &Log"), self.log.setVisible, icon='showlog',
                   shortcut='Ctrl+L', checkable=True, menu='view',
                   toolbar='dock')
         newseparator(menu='view')
@@ -321,12 +325,6 @@ class Workbench(QMainWindow):
                   toolbar='sync')
 
         self.updateMenu()
-
-    def showRepoRegistry(self, show):
-        self.reporegistry.setVisible(show)
-
-    def showLog(self, show):
-        self.log.setVisible(show)
 
     @pyqtSlot(QAction)
     def _switchRepoTaskTab(self, action):
