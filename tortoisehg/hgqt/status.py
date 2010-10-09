@@ -619,12 +619,12 @@ statusTypes = {
 
 class StatusDialog(QDialog):
     'Standalone status browser'
-    def __init__(self, pats, opts, parent=None):
+    def __init__(self, pats, opts, root=None, parent=None):
         QDialog.__init__(self, parent)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 6, 0, 0)
         self.setLayout(layout)
-        self.stwidget = StatusWidget(pats, opts, None, self)
+        self.stwidget = StatusWidget(pats, opts, root, self)
         layout.addWidget(self.stwidget, 1)
 
         s = QSettings()

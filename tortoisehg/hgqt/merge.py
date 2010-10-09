@@ -435,7 +435,7 @@ class MergePage(BasePage):
             self.wizard().repo.incrementBusyCount()
             self.runner.run(['qrename', oldpatch, newpatch])
         elif cmd == 'view':
-            dlg = status.StatusDialog([], {}, self)
+            dlg = status.StatusDialog([], {}, self.wizard().repo.root, self)
             dlg.exec_()
         elif cmd == 'skip':
             self.done = True
