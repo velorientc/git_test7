@@ -76,12 +76,8 @@ class Workbench(QMainWindow):
         self.reporegistry.visibilityChanged.connect(gotVisible)
         self.log.visibilityChanged.connect(logVisible)
 
-        self.savedrepos = []
         self.restoreSettings()
         self.setAcceptDrops(True)
-
-        for savedroot in self.savedrepos:
-            self._openRepo(path=savedroot)
 
     def load_config(self, ui):
         # TODO: connect to font changed signal
@@ -527,9 +523,8 @@ class Workbench(QMainWindow):
         self.restoreState(s.value(wb + 'windowState').toByteArray())
         save = s.value(wb + 'saveRepos').toBool()
         self.actionSaveRepos.setChecked(save)
-        sr = str(s.value(wb + 'openrepos').toString())
-        if sr:
-            self.savedrepos = sr.split(',')
+        for path in str(s.value(wb + 'openrepos').toString()).split(','):
+            self._openRepo(path)
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()
         QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
