@@ -134,7 +134,8 @@ class RepoWidget(QWidget):
         else:
             return self.repo.shortname
 
-    def find(self):
+    @pyqtSlot()
+    def showSearchBar(self):
         """Show tasktab-specific search bar if available"""
         curtt = self.taskTabsWidget.currentWidget()
         show = getattr(curtt, 'showSearchBar', None)
