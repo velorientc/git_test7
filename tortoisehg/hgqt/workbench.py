@@ -594,7 +594,8 @@ class Workbench(QMainWindow):
     def on_about(self, *args):
         """ Display about dialog """
         from tortoisehg.hgqt.about import AboutDialog
-        ad = AboutDialog()
+        ad = AboutDialog(self)
+        ad.finished.connect(ad.deleteLater)
         ad.exec_()
 
     def storeSettings(self):
