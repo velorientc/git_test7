@@ -64,8 +64,6 @@ class Workbench(QMainWindow):
 
         rr.openRepoSignal.connect(self.openRepo)
 
-        self.createToolbars()
-
         self.repoTabChanged()
 
         def gotVisible(state):
@@ -141,6 +139,13 @@ class Workbench(QMainWindow):
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
+        self.edittbar = QToolBar(_("Edit Toolbar"), objectName='edittbar')
+        self.addToolBar(self.edittbar)
+        self.docktbar = QToolBar(_("Dock Toolbar"), objectName='docktbar')
+        self.addToolBar(self.docktbar)
+        self.synctbar = QToolBar(_('Sync Toolbar'), objectName='synctbar')
+        self.addToolBar(self.synctbar)
+
         def keysequence(o):
             """Create QKeySequence from string or QKeySequence"""
             if isinstance(o, (QKeySequence, QKeySequence.StandardKey)):
@@ -156,8 +161,8 @@ class Workbench(QMainWindow):
             return QKeySequence('%s+%s' % (modifier, origseq.toString()))
 
         def newaction(text, slot=None, icon=None, shortcut=None,
-                      checkable=False, tooltip=None, data=None,
-                      menu=None, parent=self):
+                      checkable=False, tooltip=None, data=None, enabled=True,
+                      menu=None, toolbar=None, parent=self):
             """Create new action and register it
 
             :slot: function called if action triggered or toggled.
@@ -165,8 +170,10 @@ class Workbench(QMainWindow):
             :data: optional data stored on QAction.
             :shortcut: QKeySequence, key sequence or name of standard key.
             :menu: name of menu to add this action.
+            :toolbar: name of toolbar to add this action.
             """
-            action = QAction(text, parent, checkable=checkable)
+            action = QAction(text, parent, checkable=checkable,
+                             enabled=enabled)
             if slot:
                 if checkable:
                     action.toggled.connect(slot)
@@ -182,12 +189,16 @@ class Workbench(QMainWindow):
                 action.setData(data)
             if menu:
                 getattr(self, 'menu%s' % menu.title()).addAction(action)
+            if toolbar:
+                getattr(self, '%stbar' % toolbar).addAction(action)
             return action
 
-        def newseparator(menu=None):
+        def newseparator(menu=None, toolbar=None):
             """Insert a separator action; returns nothing"""
             if menu:
                 getattr(self, 'menu%s' % menu.title()).addSeparator()
+            if toolbar:
+                getattr(self, '%stbar' % toolbar).addSeparator()
 
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file')
@@ -208,13 +219,15 @@ class Workbench(QMainWindow):
 
         self.actionShowRepoRegistry = \
         newaction(_("Show Repository Registry"), self.showRepoRegistry,
-                  icon='repotree', checkable=True, menu='view')
+                  icon='repotree', checkable=True, menu='view',
+                  toolbar='dock')
         self.actionShowPaths = \
         newaction(_("Show Paths"), self.actionShowPathsToggled,
                   checkable=True, menu='view')
         self.actionShowLog = \
         newaction(_("Show Output &Log"), self.showLog, icon='showlog',
-                  shortcut='Ctrl+L', checkable=True, menu='view')
+                  shortcut='Ctrl+L', checkable=True, menu='view',
+                  toolbar='dock')
         newseparator(menu='view')
         newaction(_("Choose Log Columns..."), self.setHistoryColumns,
                   menu='view')
@@ -239,14 +252,14 @@ class Workbench(QMainWindow):
 
         self.actionRefresh = \
         newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
-                  shortcut='Refresh', menu='view',
+                  shortcut='Refresh', menu='view', toolbar='edit',
                   tooltip=_('Refresh all for current repository'))
         self.actionRefreshTaskTab = \
         newaction(_("Refresh &Task Tab"), self._repofwd('reloadTaskTab'),
                   icon='reloadtt',
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
-                  menu='view')
+                  menu='view', toolbar='edit')
 
         self.actionServe = \
         newaction(_("Web Server"), self.serve, menu='repository')
@@ -274,76 +287,41 @@ class Workbench(QMainWindow):
 
         newaction(_("About"), self.on_about, menu='help')
 
-        self.actionFind = a = QAction(_('Find'), self)
-        self.actionFind.triggered.connect(self._repofwd('find'))
-        a.setToolTip(_('Search file and revision contents for keyword'))
-        a.setIcon(geticon('find'))
-
-        self.actionBack = a = QAction(_("Back"), self)
-        self.actionBack.triggered.connect(self._repofwd('back'))
-        a.setEnabled(False)
-        a.setIcon(geticon('back'))
-
-        self.actionForward = a = QAction(_("Forward"), self)
-        self.actionForward.triggered.connect(self._repofwd('forward'))
-        a.setEnabled(False)
-        a.setIcon(geticon('forward'))
-
-        self.actionLoadAll = a = QAction(_("Load all"), self)
-        self.actionLoadAll.triggered.connect(self.loadall)
-        a.setEnabled(True)
-        a.setToolTip(_('Load all revisions into graph'))
-        a.setIcon(geticon('loadall'))
+        newseparator(toolbar='edit')
+        self.actionBack = \
+        newaction(_("Back"), self._repofwd('back'), icon='back',
+                  enabled=False, toolbar='edit')
+        self.actionForward = \
+        newaction(_("Forward"), self._repofwd('forward'), icon='forward',
+                  enabled=False, toolbar='edit')
+        self.actionLoadAll = \
+        newaction(_("Load all"), self.loadall, icon='loadall', toolbar='edit',
+                  tooltip=_('Load all revisions into graph'))
+        newseparator(toolbar='edit')
+        self.actionFind = \
+        newaction(_('Find'), self._repofwd('find'), icon='find',
+                  toolbar='edit',
+                  tooltip=_('Search file and revision contents for keyword'))
 
         # TODO: Use long names when these have icons
-        self.actionIncoming = a = QAction(_('In'), self)
-        self.actionIncoming.triggered.connect(self._repofwd('incoming'))
-        a.setToolTip(_('Check for incoming changes from default pull target'))
-        a.setIcon(geticon('incoming'))
-        self.actionPull = a = QAction(_('Pull'), self)
-        self.actionPull.triggered.connect(self._repofwd('pull'))
-        a.setToolTip(_('Pull incoming changes from default pull target'))
-        a.setIcon(geticon('pull'))
-        self.actionOutgoing = a = QAction(_('Out'), self)
-        self.actionOutgoing.triggered.connect(self._repofwd('outgoing'))
-        a.setToolTip(_('Detect outgoing changes to default push target'))
-        a.setIcon(geticon('outgoing'))
-        self.actionPush = a = QAction(_('Push'), self)
-        self.actionPush.triggered.connect(self._repofwd('push'))
-        a.setToolTip(_('Push outgoing changes to default push target'))
-        a.setIcon(geticon('push'))
+        self.actionIncoming = \
+        newaction(_('In'), self._repofwd('incoming'), icon='incoming',
+                  tooltip=_('Check for incoming changes from default pull target'),
+                  toolbar='sync')
+        self.actionPull = \
+        newaction(_('Pull'), self._repofwd('pull'), icon='pull',
+                  tooltip=_('Pull incoming changes from default pull target'),
+                  toolbar='sync')
+        self.actionOutgoing = \
+        newaction(_('Out'), self._repofwd('outgoing'), icon='outgoing',
+                   tooltip=_('Detect outgoing changes to default push target'),
+                   toolbar='sync')
+        self.actionPush = \
+        newaction(_('Push'), self._repofwd('push'), icon='push',
+                  tooltip=_('Push outgoing changes to default push target'),
+                  toolbar='sync')
 
         self.updateMenu()
-
-    def createToolbars(self):
-        self.edittbar = tb = QToolBar(_("Edit Toolbar"), self)
-        tb.setEnabled(True)
-        tb.setObjectName("edittbar")
-        tb.addAction(self.actionRefresh)
-        tb.addAction(self.actionRefreshTaskTab)
-        tb.addSeparator()
-        tb.addAction(self.actionBack)
-        tb.addAction(self.actionForward)
-        tb.addAction(self.actionLoadAll)
-        tb.addSeparator()
-        tb.addAction(self.actionFind)
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
-        self.docktbar = tb = QToolBar(_("Dock Toolbar"), self)
-        tb.setEnabled(True)
-        tb.setObjectName("docktbar")
-        tb.addAction(self.actionShowRepoRegistry)
-        tb.addAction(self.actionShowLog)
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
-
-        self.synctbar = tb = QToolBar(_('Sync Toolbar'), self)
-        tb.setEnabled(True)
-        tb.setObjectName('synctbar')
-        tb.addAction(self.actionIncoming)
-        tb.addAction(self.actionPull)
-        tb.addAction(self.actionOutgoing)
-        tb.addAction(self.actionPush)
-        self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), tb)
 
     def showRepoRegistry(self, show):
         self.reporegistry.setVisible(show)
