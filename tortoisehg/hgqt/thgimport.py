@@ -15,7 +15,7 @@ from mercurial import hg, ui, error
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo, commit
 
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
@@ -85,6 +85,10 @@ class ImportDialog(QDialog):
         grid.setColumnStretch(cslistcol, 1)
         box.addWidget(self.cmd)
 
+        self.stlabel = QLabel(_('Checking working directory status...'))
+        box.addWidget(self.stlabel)
+        QTimer.singleShot(0, self.checkStatus)
+
         ## bottom buttons
         buttons = QDialogButtonBox()
         self.cancel_btn = buttons.addButton(QDialogButtonBox.Cancel)
@@ -123,6 +127,27 @@ class ImportDialog(QDialog):
         self.preview()
 
     ### Private Methods ###
+
+    def checkStatus(self):
+        def activated():
+            dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
+            dlg.exec_()
+        self.repo.dirstate.invalidate()
+        wctx = self.repo[None]
+        M, A, R = wctx.status()[:3]
+        if M or A or R:
+            text = _('Working directory is not clean!  '
+                     '<a href="view">View changes...</a>')
+            self.stlabel.setText(text)
+            self.stlabel.linkActivated.connect(activated)
+        else:
+            self.stlabel.clear()
+
+    def keyPressEvent(self, event):
+        if event.matches(QKeySequence.Refresh):
+            self.checkStatus()
+        else:
+            return super(ImportDialog, self).keyPressEvent(event)
 
     def resizeEvent(self, event):
         w = self.grid.cellRect(self.cslistrow, self.cslistcol).width()
