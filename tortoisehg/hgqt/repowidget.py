@@ -19,7 +19,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
-from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo, purge
 
@@ -127,14 +126,6 @@ class RepoWidget(QWidget):
         self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
-        d = self.revDetailsWidget
-        self.findToolbar = tb = FindInGraphlogQuickBar(self)
-        tb.revisionSelected.connect(self.repoview.goto)
-        tb.fileSelected.connect(d.filelist.selectFile)
-        tb.showMessage.connect(self.showMessage)
-        tb.attachFileView(d.fileview)
-        self.layout().addWidget(tb)
-
     def title(self):
         """Returns the expected title for this widget [unicode]"""
         branch = self.repomodel.branch()
@@ -144,7 +135,11 @@ class RepoWidget(QWidget):
             return self.repo.shortname
 
     def find(self):
-        self.findToolbar.setVisible(True)
+        """Show tasktab-specific search bar if available"""
+        curtt = self.taskTabsWidget.currentWidget()
+        show = getattr(curtt, 'showSearchBar', None)
+        if show:
+            show()
 
     def getCommitWidget(self):
         return getattr(self.repo, '_commitwidget', None)  # TODO: ugly
@@ -411,7 +406,6 @@ class RepoWidget(QWidget):
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
-        self.findToolbar.setModel(self.repomodel)
 
     def setupModels(self):
         self.create_models()
