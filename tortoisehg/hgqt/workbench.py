@@ -303,9 +303,8 @@ class Workbench(QMainWindow):
                   toolbar='edit',
                   tooltip=_('Search file and revision contents for keyword'))
 
-        # TODO: Use long names when these have icons
         self.actionIncoming = \
-        newaction(_('In'), self._repofwd('incoming'), icon='incoming',
+        newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming',
                   tooltip=_('Check for incoming changes from default pull target'),
                   toolbar='sync')
         self.actionPull = \
@@ -313,7 +312,7 @@ class Workbench(QMainWindow):
                   tooltip=_('Pull incoming changes from default pull target'),
                   toolbar='sync')
         self.actionOutgoing = \
-        newaction(_('Out'), self._repofwd('outgoing'), icon='outgoing',
+        newaction(_('Outgoing'), self._repofwd('outgoing'), icon='outgoing',
                    tooltip=_('Detect outgoing changes to default push target'),
                    toolbar='sync')
         self.actionPush = \
