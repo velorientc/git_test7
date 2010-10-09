@@ -30,10 +30,8 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super(AboutDialog, self).__init__(parent)
 
-        self.versionInfo = ''
         self.updateInfo = {}
         self.getUpdateInfo()
-        self.getVersionInfo()
 
         self.setWindowIcon(qtlib.geticon('thg_logo'))
         self.setWindowTitle(_('About'))
@@ -56,6 +54,7 @@ class AboutDialog(QDialog):
         self.name_version_libs_lbl.setTextInteractionFlags(
                 Qt.TextSelectableByMouse)
         self.vbox.addWidget(self.name_version_libs_lbl)
+        self.getVersionInfo()
 
         self.copyright_lbl = QLabel()
         self.copyright_lbl.setAlignment(Qt.AlignCenter)
@@ -104,15 +103,23 @@ class AboutDialog(QDialog):
         self.setModal(True)
 
     def getVersionInfo(self):
-        self.vthread = AboutVersionThread()
-        self.vthread.done.connect(self.vFinished)
-        self.vthread.start()
-
-    def vFinished(self):
-        self.vthread.wait()
-        self.versionInfo = self.vthread.data
-        self.vthread = None
-        self.name_version_libs_lbl.setText(self.versionInfo)
+        def make_version(tuple):
+            vers = ".".join([str(x) for x in tuple])
+            return vers
+        thgv = (_('version %s') % version.version())
+        libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') % \
+              (hglib.hgversion, make_version(sys.version_info[0:3]),
+              PYQT_VERSION_STR, QT_VERSION_STR))
+        thgv = hglib.fromunicode(thgv)
+        libv = hglib.fromunicode(libv)
+        par = ('<p style=\" margin-top:0px; margin-bottom:6px;\">'
+                '<span style=\"font-size:%spt; font-weight:600;\">'
+                '%s</span></p>')
+        name = (par % (14, 'TortoiseHg'))
+        thgv = (par % (10, thgv))
+        thgv = hglib.fromunicode(thgv)
+        nvl = _(''.join([name, thgv, libv]))
+        self.name_version_libs_lbl.setText(nvl)
 
     def getUpdateInfo(self):
         self.uthread = AboutUpdateThread()
@@ -147,34 +154,6 @@ class AboutDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('about/geom', self.saveGeometry())
-
-
-class AboutVersionThread(QThread):
-    'Background thread for getting version info'
-    done = pyqtSignal()
-    def __init__(self):
-        super(AboutVersionThread, self).__init__()
-
-    def run(self):
-        self.data = ''
-        def make_version(tuple):
-            vers = ".".join([str(x) for x in tuple])
-            return vers
-        thgv = (_('version %s') % version.version())
-        libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') % \
-              (hglib.hgversion, make_version(sys.version_info[0:3]),
-              PYQT_VERSION_STR, QT_VERSION_STR))
-        thgv = hglib.fromunicode(thgv)
-        libv = hglib.fromunicode(libv)
-        par = ('<p style=\" margin-top:0px; margin-bottom:6px;\">'
-                '<span style=\"font-size:%spt; font-weight:600;\">'
-                '%s</span></p>')
-        name = (par % (14, 'TortoiseHg'))
-        thgv = (par % (10, thgv))
-        thgv = hglib.fromunicode(thgv)
-        nvl = _(''.join([name, thgv, libv]))
-        self.data = nvl
-        self.done.emit()
 
 
 class AboutUpdateThread(QThread):
