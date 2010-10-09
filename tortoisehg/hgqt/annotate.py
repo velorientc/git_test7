@@ -366,9 +366,16 @@ class SearchToolBar(QToolBar):
     searchRequested = pyqtSignal(unicode, bool, bool)
     """Emitted (pattern, icase, wrap) when search button pressed"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, hidable=False):
         super(SearchToolBar, self).__init__(_('Search'), parent,
-                                            objectName='search')
+                                            objectName='search',
+                                            iconSize=QSize(16, 16))
+        if hidable:
+            self._close_button = QToolButton(icon=qtlib.geticon('close'),
+                                             shortcut=Qt.Key_Escape)
+            self._close_button.clicked.connect(self.hide)
+            self.addWidget(self._close_button)
+
         self._lbl = QLabel(_('Regexp:'),
                            toolTip=_('Regular expression search pattern'))
         self.addWidget(self._lbl)
