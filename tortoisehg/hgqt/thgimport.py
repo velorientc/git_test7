@@ -32,7 +32,7 @@ class ImportDialog(QDialog):
 
         self.tempfiles = []
         self.repo = repo
-        self.mqloaded = hasattr(self.repo, 'mq')
+        self.mqloaded = 'mq' in repo.extensions()
 
         # base layout box
         box = QVBoxLayout()
@@ -80,7 +80,7 @@ class ImportDialog(QDialog):
         self.patchq = QComboBox()
         self.patchq.currentIndexChanged.connect(self.updatestatus)
         self.patchq.addItem('repository')
-        cur = hglib.getcurrentqqueue(self.repo)
+        cur = self.repo.getcurrentqqueue()
         if cur:
             self.patchq.addItem(cur)
         statbox.addWidget(self.patchq)
