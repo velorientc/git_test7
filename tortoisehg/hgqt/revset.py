@@ -94,7 +94,7 @@ _logical = (
     ('max(set)',
      _('Changeset with highest revision number in set.')),
     ('limit(set, n)',
-     _('Firt n members of a set.')),
+     _('First n members of a set.')),
     ('sort(set[, [-]key...])',
      _('Sort set by keys.  The default sort order is ascending, specify a '
        'key as "-key" to sort in descending order.')),
