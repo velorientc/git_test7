@@ -232,7 +232,7 @@ class Workbench(QMainWindow):
                   icon='repotree', checkable=True, menu='view',
                   toolbar='dock')
         self.actionShowPaths = \
-        newaction(_("Show Paths"), self.actionShowPathsToggled,
+        newaction(_("Show Paths"), self.reporegistry.showPaths,
                   checkable=True, menu='view')
         self.actionShowLog = \
         newaction(_("Show Output &Log"), self.log.setVisible, icon='showlog',
@@ -427,9 +427,6 @@ class Workbench(QMainWindow):
 
     def showMessage(self, msg):
         self.statusbar.showMessage(msg)
-
-    def actionShowPathsToggled(self, show):
-        self.reporegistry.showPaths(show)
 
     def setHistoryColumns(self, *args):
         """Display the column selection dialog"""
