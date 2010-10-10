@@ -115,8 +115,7 @@ class RevisionSetQuery(QDialog):
 
         self.repo = repo
         self.setWindowTitle(_('Revision Set Query'))
-        self.setWindowFlags(self.windowFlags() & \
-                            ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(Qt.Tool)
 
         layout = QVBoxLayout()
         layout.setMargin(0)
