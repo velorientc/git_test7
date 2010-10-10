@@ -172,7 +172,8 @@ class ManifestWidget(QWidget):
 
     def _setupmodel(self):
         self._treemodel = ManifestModel(self._repo, self._rev,
-                                        statusfilter=self._statusfilter.text)
+                                        statusfilter=self._statusfilter.text,
+                                        parent=self)
         self._treeview.setModel(self._treemodel)
         self._treeview.selectionModel().currentChanged.connect(self._fileselected)
         self._statusfilter.textChanged.connect(self._treemodel.setStatusFilter)

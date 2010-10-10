@@ -215,7 +215,8 @@ class RepoRegistryView(QDockWidget):
         mainframe.setLayout(lay)
         self.setWidget(mainframe)
 
-        self.tmodel = m = RepoTreeModel(self.openrepo, ui, settingsfilename())
+        self.tmodel = m = RepoTreeModel(self.openrepo, ui, settingsfilename(),
+                                        parent=self)
 
         self.tview = tv = RepoTreeView(self, workbench)
         lay.addWidget(tv)

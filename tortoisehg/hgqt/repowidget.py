@@ -403,7 +403,7 @@ class RepoWidget(QWidget):
         self.grepDemand.setSearch(pattern, **opts)
 
     def create_models(self):
-        self.repomodel = HgRepoListModel(self.repo)
+        self.repomodel = HgRepoListModel(self.repo, parent=self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)

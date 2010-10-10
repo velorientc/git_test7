@@ -279,7 +279,7 @@ class RevDetailsWidget(QWidget):
         self.actionNextDiff.setEnabled(filemode and nDiffs)
 
     def create_models(self):
-        self.filelistmodel = HgFileListModel(self.repo)
+        self.filelistmodel = HgFileListModel(self.repo, parent=self)
 
     def setupModels(self, repomodel):
         'Called directly from repowidget to establish repomodel'
