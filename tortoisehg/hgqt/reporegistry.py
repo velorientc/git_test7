@@ -30,8 +30,7 @@ def settingsfilename():
 
 class RepoTreeView(QTreeView):
     def __init__(self, parent, workbench):
-        QTreeView.__init__(self)
-        self.parent = parent
+        QTreeView.__init__(self, parent)
         self.workbench = workbench
         self.selitem = None
         self.msg  = ''
@@ -133,7 +132,7 @@ class RepoTreeView(QTreeView):
     def startSettings(self):
         if not self.selitem:
             return
-        self.selitem.internalPointer().startSettings(self.parent)
+        self.selitem.internalPointer().startSettings(self.parent())
 
     def startRename(self):
         if not self.selitem:
