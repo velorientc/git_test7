@@ -56,13 +56,6 @@ _thgstyles = {
 
 thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
 
-"""app-global stylesheet"""
-appstylesheet = '''
-/* expander-like check box: checkbox.setProperty('expander', True) */
-QCheckBox[expander="true"]::indicator:unchecked { image: url(:/icons/plus.png); }
-QCheckBox[expander="true"]::indicator:checked { image: url(:/icons/minus.png); }
-'''
-
 def configstyles(ui):
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
