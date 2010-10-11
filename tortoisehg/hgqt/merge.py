@@ -12,7 +12,7 @@ from mercurial import hg, ui
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, thgrepo
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, thgrepo, commit
 
 keep = i18n.keepgettext()
 
@@ -280,7 +280,7 @@ class MergePage(BasePage):
         box.addWidget(wd_merged)
 
         text = _('To start merging, you need to '
-                 '<a href="shelve"><b>shelve</b></a> them')
+                 '<a href="commit"><b>commit</b></a> them')
         if 'mq' in repo.extensions():
             text = text + _(', <a href="mq"><b>save</b></a> as MQ patch')
         text = text + (' or <a href="discard"><b>discard</b></a> all.')
@@ -375,9 +375,10 @@ class MergePage(BasePage):
 
     def link_activated(self, cmd):
         cmd = str(cmd)
-        if cmd == 'shelve':
-            # TODO: shelve local changes
-            print 'Not implemented: shelve'
+        if cmd == 'commit':
+            repo = self.wizard().repo
+            dlg = commit.CommitDialog([], dict(root=repo.root), self)
+            dlg.exec_()
         elif cmd == 'mq':
             # TODO: need to check existing patches
             patch = 'patch1'
