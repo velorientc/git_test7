@@ -26,9 +26,9 @@ class MergeDialog(QWizard):
         super(MergeDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
+        self.repo = repo
         self.other = str(other)
         self.local = str(self.repo.parents()[0].rev())
-        self.repo = repo
 
         self.setWindowTitle(_('Merge - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('merge'))
