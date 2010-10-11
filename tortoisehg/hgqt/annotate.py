@@ -351,6 +351,7 @@ class AnnotateView(QsciScintilla):
         """Return indicator number for highlight after initializing it"""
         id = self.INDIC_CONTAINER
         self.SendScintilla(self.SCI_INDICSETSTYLE, id, self.INDIC_ROUNDBOX)
+        self.SendScintilla(self.SCI_INDICSETUNDER, id, True)
         self.SendScintilla(self.SCI_INDICSETFORE, id, 0x00ffff) # 0xbbggrr
         # document says alpha value is 0 to 255, but it looks 0 to 100
         self.SendScintilla(self.SCI_INDICSETALPHA, id, 100)
