@@ -54,6 +54,7 @@ class AnnotateView(QsciScintilla):
 
         self.repo = repo
         self._rev = None
+        self.annfile = None
         self._annotation_enabled = bool(opts.get('annotationEnabled', False))
 
         self._revs = []  # by line
@@ -178,7 +179,7 @@ class AnnotateView(QsciScintilla):
         self._updateannotation()
 
     def _updateannotation(self):
-        if not self.isAnnotationEnabled():
+        if not self.isAnnotationEnabled() or not self.annfile:
             return
         ctx = self.repo[self._rev]
         fctx = ctx[hglib.fromunicode(self.annfile)]
