@@ -379,6 +379,7 @@ class MergePage(BasePage):
             repo = self.wizard().repo
             dlg = commit.CommitDialog([], dict(root=repo.root), self)
             dlg.exec_()
+            self.check_status()
         elif cmd == 'mq':
             # TODO: need to check existing patches
             patch = 'patch1'
