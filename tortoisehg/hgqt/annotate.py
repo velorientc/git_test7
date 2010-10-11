@@ -317,7 +317,7 @@ class AnnotateView(QsciScintilla):
             flags = 0
             if icase:
                 flags |= re.IGNORECASE
-            pat = re.compile(unicode(match), flags)
+            pat = re.compile(unicode(match).encode('utf-8'), flags)
         except re.error:
             return  # it could be partial pattern while user typing
 
@@ -325,7 +325,18 @@ class AnnotateView(QsciScintilla):
         self.SendScintilla(self.SCI_SETINDICATORCURRENT,
                            self._highlightIndicator)
 
-        for m in pat.finditer(unicode(self.text())):
+        # NOTE: pat and target text are *not* unicode because scintilla
+        # requires positions in byte. For accuracy, it should do pattern
+        # match in unicode, then calculating byte length of substring::
+        #
+        #     text = unicode(self.text())
+        #     for m in pat.finditer(text):
+        #         p = len(text[:m.start()].encode('utf-8'))
+        #         self.SendScintilla(self.SCI_INDICATORFILLRANGE,
+        #             p, len(m.group(0).encode('utf-8')))
+        #
+        # but it doesn't to avoid possible performance issue.
+        for m in pat.finditer(unicode(self.text()).encode('utf-8')):
             self.SendScintilla(self.SCI_INDICATORFILLRANGE,
                                m.start(), m.end() - m.start())
 
