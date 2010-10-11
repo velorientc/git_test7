@@ -100,7 +100,7 @@ class HTMLDelegate(QStyledItemDelegate):
         self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter)
 
         # draw text
-        doc = QTextDocument()
+        doc = QTextDocument(defaultFont=option.font)
         painter.save()
         doc.setHtml(text)
         painter.setClipRect(option.rect)
