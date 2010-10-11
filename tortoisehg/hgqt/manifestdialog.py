@@ -1,0 +1,308 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2003-2010 LOGILAB S.A. (Paris, FRANCE).
+# http://www.logilab.fr/ -- mailto:contact@logilab.fr
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+"""
+Qt4 dialogs to display hg revisions of a file
+"""
+
+from mercurial import util
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+from tortoisehg.util import paths, hglib
+
+from tortoisehg.hgqt import qtlib, annotate, status, thgrepo
+from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt.manifestmodel import ManifestModel
+
+class ManifestDialog(QMainWindow):
+    """
+    Qt4 dialog to display all files of a repo at a given revision
+    """
+    def __init__(self, ui, repo, rev=None, parent=None):
+        QMainWindow.__init__(self, parent)
+        self._repo = repo
+        self.resize(400, 300)
+
+        self._manifest_widget = ManifestWidget(ui, repo, rev)
+        self._manifest_widget.revchanged.connect(self._updatewindowtitle)
+        self._manifest_widget.grepRequested.connect(self._openSearchWidget)
+        self.setCentralWidget(self._manifest_widget)
+        self.addToolBar(self._manifest_widget.toolbar)
+
+        self._searchbar = annotate.SearchToolBar()
+        connectsearchbar(self._manifest_widget, self._searchbar)
+        self.addToolBar(self._searchbar)
+
+        self.setStatusBar(QStatusBar())
+        self._manifest_widget.revisionHint.connect(self.statusBar().showMessage)
+
+        self._readsettings()
+        self._updatewindowtitle()
+
+    @pyqtSlot()
+    def _updatewindowtitle(self):
+        self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (
+            self._repo.root, self._manifest_widget.rev))
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(ManifestDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('manifest/geom').toByteArray())
+        # TODO: don't call deeply
+        self._manifest_widget._splitter.restoreState(
+            s.value('manifest/splitter').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('manifest/geom', self.saveGeometry())
+        # TODO: don't call deeply
+        s.setValue('manifest/splitter',
+                   self._manifest_widget._splitter.saveState())
+
+    @pyqtSlot(unicode, dict)
+    def _openSearchWidget(self, pattern, opts):
+        opts = dict((str(k), str(v)) for k, v in opts.iteritems())
+        from tortoisehg.hgqt import run
+        run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
+
+class _NullView(QWidget):
+    """empty widget for content view"""
+    def __init__(self, parent=None):
+        super(_NullView, self).__init__(parent)
+
+    @pyqtSlot(unicode, object)
+    def setSource(self, path, rev):
+        pass
+
+class ManifestWidget(QWidget):
+    """Display file tree and contents at the specified revision"""
+    revchanged = pyqtSignal(object)  # emit when curret revision changed
+
+    revisionHint = pyqtSignal(unicode)
+    """Emitted when to show revision summary as a hint"""
+
+    searchRequested = pyqtSignal(unicode)
+    """Emitted (pattern) when user request to search content"""
+
+    grepRequested = pyqtSignal(unicode, dict)
+    """Emitted (pattern, opts) when user request to search changelog"""
+
+    def __init__(self, ui, repo, rev=None, parent=None):
+        super(ManifestWidget, self).__init__(parent)
+        self._ui = ui
+        self._repo = repo
+        self._rev = rev
+
+        self._initwidget()
+        self._initactions()
+        self._setupmodel()
+        self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
+
+    def _initwidget(self):
+        self.setLayout(QVBoxLayout())
+        self._splitter = QSplitter()
+        self.layout().addWidget(self._splitter)
+        self.layout().setContentsMargins(2, 2, 2, 2)
+
+        navlayout = QVBoxLayout(spacing=0)
+        navlayout.setContentsMargins(0, 0, 0, 0)
+        self._toolbar = QToolBar()
+        self._toolbar.setIconSize(QSize(16,16))
+        self._treeview = QTreeView(self, headerHidden=True, dragEnabled=True)
+        navlayout.addWidget(self._toolbar)
+        navlayout.addWidget(self._treeview)
+        navlayoutw = QWidget()
+        navlayoutw.setLayout(navlayout)
+
+        self._contentview = QStackedWidget()
+        self._splitter.addWidget(navlayoutw)
+        self._splitter.addWidget(self._contentview)
+        self._splitter.setStretchFactor(0, 1)
+        self._splitter.setStretchFactor(1, 3)
+
+        self._nullcontent = _NullView()
+        self._contentview.addWidget(self._nullcontent)
+        self._fileview = annotate.AnnotateView(self._repo)
+        self._contentview.addWidget(self._fileview)
+        self._fileview.revSelected.connect(lambda a: self.setSource(*a[:2]))
+        for name in ('revisionHint', 'searchRequested', 'grepRequested'):
+            getattr(self._fileview, name).connect(getattr(self, name))
+        self._contentview.currentChanged.connect(
+            lambda: self._fileselected(self._treeview.currentIndex()))
+
+    def _initactions(self):
+        self._statusfilter = _StatusFilterButton(text='MAC')
+        self._toolbar.addWidget(self._statusfilter)
+
+        self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
+        self._action_annotate_mode.toggled.connect(
+            self._fileview.setAnnotationEnabled)
+        self._toolbar.addAction(self._action_annotate_mode)
+
+    @property
+    def toolbar(self):
+        """Return toolbar for manifest widget"""
+        return self._toolbar
+
+    @pyqtSlot(unicode, bool, bool)
+    def searchText(self, pattern, icase=False, wrap=False):
+        self._fileview.searchText(pattern, icase, wrap)
+
+    @pyqtSlot(unicode, bool)
+    def highlightText(self, pattern, icase=False):
+        self._fileview.highlightText(pattern, icase)
+
+    def _setupmodel(self):
+        self._treemodel = ManifestModel(self._repo, self._rev,
+                                        statusfilter=self._statusfilter.text,
+                                        parent=self)
+        self._treeview.setModel(self._treemodel)
+        self._treeview.selectionModel().currentChanged.connect(self._fileselected)
+        self._statusfilter.textChanged.connect(self._treemodel.setStatusFilter)
+        self._statusfilter.textChanged.connect(self._autoexpandtree)
+        self._autoexpandtree()
+
+    @pyqtSlot()
+    def _autoexpandtree(self):
+        """expand file tree if the number of the items isn't large"""
+        if 'C' not in self._statusfilter.text:
+            self._treeview.expandAll()
+
+    def reload(self):
+        # TODO
+        pass
+
+    @property
+    def rev(self):
+        """Return current revision"""
+        return self._rev
+
+    @pyqtSlot(object)
+    def setrev(self, rev):
+        """Change revision to show"""
+        self.setSource(self.path, rev)
+
+    @pyqtSlot(unicode, object)
+    def setSource(self, path, rev):
+        """Change path and revision to show at once"""
+        if self._rev != rev:
+            self._rev = rev
+            self._setupmodel()
+            self.revchanged.emit(rev)
+        self.setpath(path)
+
+    @property
+    def path(self):
+        """Return currently selected path"""
+        return self._treemodel.filePath(self._treeview.currentIndex())
+
+    @pyqtSlot(unicode)
+    def setpath(self, path):
+        """Change path to show"""
+        self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
+
+    # disabled due to the issue of PyQt 4.7.4.
+    # see http://thread.gmane.org/gmane.comp.python.pyqt-pykde/19836
+    #@pyqtSlot(QModelIndex)
+    def _fileselected(self, index):
+        path = self._treemodel.filePath(index)
+        if path not in self._repo[self._rev]:
+            self._contentview.setCurrentWidget(self._nullcontent)
+            return
+
+        self._contentview.setCurrentWidget(self._fileview)
+        self._contentview.currentWidget().setSource(path, self._rev)
+
+# TODO: share this menu with status widget?
+class _StatusFilterButton(QToolButton):
+    """Button with drop-down menu for status filter"""
+    textChanged = pyqtSignal(str)
+
+    _TYPES = 'MARC'
+
+    def __init__(self, text=_TYPES, parent=None):
+        super(_StatusFilterButton, self).__init__(
+            parent, popupMode=QToolButton.InstantPopup,
+            icon=qtlib.geticon('status'),
+            toolButtonStyle=Qt.ToolButtonTextBesideIcon)
+
+        self._initactions(text=text)
+        self._setText(self.text)
+
+    def _initactions(self, text):
+        self._actions = {}
+        menu = QMenu(self)
+        for c in self._TYPES:
+            st = status.statusTypes[c]
+            a = menu.addAction('%s %s' % (c, st.name))
+            a.setCheckable(True)
+            a.setChecked(c in text)
+            a.toggled.connect(self._update)
+            self._actions[c] = a
+        self.setMenu(menu)
+
+    @pyqtSlot()
+    def _update(self):
+        self._setText(self.text)
+        self.textChanged.emit(self.text)
+
+    @property
+    def text(self):
+        """Return the text for status filter"""
+        return ''.join(c for c in self._TYPES
+                       if self._actions[c].isChecked())
+
+    @pyqtSlot(str)
+    def setText(self, text):
+        """Set the status text"""
+        assert util.all(c in self._TYPES for c in text)
+        for c in self._TYPES:
+            self._actions[c].setChecked(c in text)
+
+    def _setText(self, text):
+        super(_StatusFilterButton, self).setText(text)
+
+class ManifestTaskWidget(ManifestWidget):
+    """Manifest widget designed for task tab"""
+
+    @pyqtSlot()
+    def showSearchBar(self):
+        self._searchbar.show()
+        self._searchbar.setFocus()
+
+    @util.propertycache
+    def _searchbar(self):
+        searchbar = annotate.SearchToolBar(hidable=True)
+        searchbar.hide()
+        self.layout().addWidget(searchbar)
+        connectsearchbar(self, searchbar)
+        return searchbar
+
+def connectsearchbar(manifestwidget, searchbar):
+    """Connect searchbar to manifest widget"""
+    searchbar.conditionChanged.connect(manifestwidget.highlightText)
+    searchbar.searchRequested.connect(manifestwidget.searchText)
+    manifestwidget.searchRequested.connect(searchbar.search)
+
+
+def run(ui, *pats, **opts):
+    repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
+    return ManifestDialog(ui, repo, opts.get('rev'))
