@@ -199,16 +199,6 @@ class RevDetailsWidget(QWidget):
         self.actionPrevDiff.triggered.connect(self.prevDiff)
         self.actionDiffMode.setChecked(True)
 
-        # Next/Prev file
-        self.actionNextFile = QAction('Next file', self)
-        self.actionNextFile.setShortcut('Right')
-        self.actionNextFile.triggered.connect(self.filelist.nextFile)
-        self.actionPrevFile = QAction('Prev file', self)
-        self.actionPrevFile.setShortcut('Left')
-        self.actionPrevFile.triggered.connect(self.filelist.prevFile)
-        self.addAction(self.actionNextFile)
-        self.addAction(self.actionPrevFile)
-
         # navigate in file viewer
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
