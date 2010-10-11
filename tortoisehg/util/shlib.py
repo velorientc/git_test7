@@ -143,7 +143,10 @@ else:
             os.environ['THG_NOTIFY'] = notify
         if not os.path.isfile(notify):
             return
-        f_notify = open(notify, 'w')
+        try:
+            f_notify = open(notify, 'w')
+        except IOError:
+            return
         try:
             abspaths = [os.path.abspath(path) for path in paths if path]
             f_notify.write('\n'.join(abspaths))
