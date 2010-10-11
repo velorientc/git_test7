@@ -1028,7 +1028,7 @@ class GCommit(GStatus):
             os.chdir(repo.root)
             self.hg_commit(files, finish)
         except Exception, e:
-            gdialog.Prompt(_('Commit failed'), hglib.toutf(e), self).run()
+            gdialog.Prompt(_('Commit failed'), hglib.toutf(str(e)), self).run()
             finish(1)
 
 
