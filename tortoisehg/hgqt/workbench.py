@@ -573,8 +573,14 @@ class Workbench(QMainWindow):
 
 
 def run(ui, *pats, **opts):
-    w = Workbench(ui)
     root = opts.get('root') or paths.find_root()
+    if root and pats:
+        repo = thgrepo.repository(ui, root)
+        pats = hglib.canonpaths(pats)
+        if len(pats) == 1 and os.path.isfile(repo.wjoin(pats[0])):
+            from tortoisehg.hgqt.filedialogs import FileLogDialog
+            return FileLogDialog(repo, pats[0], None)
+    w = Workbench(ui)
     if root:
         w.showRepo(hglib.tounicode(root))
     if w.repoTabsWidget.count() <= 0:
