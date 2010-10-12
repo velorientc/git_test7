@@ -535,16 +535,16 @@ class RepoWidget(QWidget):
     def storeSettings(self):
         self.revDetailsWidget.storeSettings()
         s = QSettings()
-        # TODO: should it be 'repowidget/xxx' ?
-        s.setValue('Workbench/repotabs_splitter',
+        repoid = str(self.repo[0])
+        s.setValue('repowidget/splitter-'+repoid,
                    self.repotabs_splitter.saveState())
 
     def restoreSettings(self):
         self.revDetailsWidget.restoreSettings()
         s = QSettings()
-        # TODO: should it be 'repowidget/xxx' ?
+        repoid = str(self.repo[0])
         self.repotabs_splitter.restoreState(
-            s.value('Workbench/repotabs_splitter').toByteArray())
+            s.value('repowidget/splitter-'+repoid).toByteArray())
 
     def okToContinue(self):
         return self.commitDemand.forward('canExit', default=True) and \
