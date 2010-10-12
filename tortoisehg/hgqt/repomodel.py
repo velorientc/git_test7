@@ -484,6 +484,8 @@ class HgRepoListModel(QAbstractTableModel):
         if msg:
             if ctx.thgwdparent():
                 msg = qtlib.markup(msg, weight='bold')
+            else:
+                msg = qtlib.markup(msg)
         parts.append(hglib.tounicode(msg))
 
         return ' '.join(parts)
