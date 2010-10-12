@@ -286,7 +286,8 @@ class SyncWidget(QWidget):
             if self.curuser:
                 parts.append(self.curuser)
                 if self.curpw:
-                    parts.append(hidepw and ':***' or ':' + self.curpw)
+                    parts.append(':')
+                    parts.append(hidepw and '***' or self.curpw)
                 parts.append('@')
             parts.append(hglib.fromunicode(host))
             if port:
