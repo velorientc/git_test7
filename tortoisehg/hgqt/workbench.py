@@ -315,6 +315,15 @@ class Workbench(QMainWindow):
                 return self.repoTabsWidget.setCurrentIndex(i)
         self.openRepo(path)
 
+    @pyqtSlot(unicode, QString)
+    def setRevsetFilter(self, path, filter):
+        for i in xrange(self.repoTabsWidget.count()):
+            w = self.repoTabsWidget.widget(i)
+            if hglib.tounicode(w.repo.root) == path:
+                w.filterbar.revsetle.setText(filter)
+                w.filterbar.returnPressed()
+                return
+
     def find_root(self, url):
         p = hglib.fromunicode(url.toLocalFile())
         return paths.find_root(p)
@@ -582,7 +591,17 @@ def run(ui, *pats, **opts):
             return FileLogDialog(repo, pats[0], None)
     w = Workbench(ui)
     if root:
-        w.showRepo(hglib.tounicode(root))
+        root = hglib.tounicode(root)
+        w.showRepo(root)
+        if pats:
+            q = []
+            for pat in pats:
+                f = repo.wjoin(pat)
+                if os.path.isdir(f):
+                    q.append('file("%s/*")' % pat)
+                elif os.path.isfile(f):
+                    q.append('file("%s")' % pat)
+            w.setRevsetFilter(root, ' or '.join(q))
     if w.repoTabsWidget.count() <= 0:
         w.reporegistry.setVisible(True)
     return w
