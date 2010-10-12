@@ -16,7 +16,7 @@ from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerMakefile
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, wconfig
 
-from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanel
+from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
@@ -25,7 +25,7 @@ from tortoisehg.hgqt.sync import loadIniFile
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
 
-class MessageEntry(QsciScintilla):
+class MessageEntry(qscilib.Scintilla):
     escapePressed = pyqtSignal()
     refreshPressed = pyqtSignal()
     reflowPressed = pyqtSignal()
@@ -36,7 +36,6 @@ class MessageEntry(QsciScintilla):
         self.setEdgeMode(QsciScintilla.EdgeLine)
         self.setWrapMode(QsciScintilla.WrapNone)
         self.setReadOnly(False)
-        self.setUtf8(True)
         self.setMarginWidth(1, 0)
         self.setFont(qtlib.getfont('fontcomment').font())
         self.setCaretWidth(10)
