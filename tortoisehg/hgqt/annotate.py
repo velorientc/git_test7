@@ -9,7 +9,7 @@ import os, re
 
 from mercurial import ui, error, util
 
-from tortoisehg.hgqt import visdiff, qtlib, wctxactions, thgrepo, lexers
+from tortoisehg.hgqt import visdiff, qtlib, qscilib, wctxactions, thgrepo, lexers
 from tortoisehg.util import paths, hglib, colormap
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.grep import SearchWidget
@@ -23,7 +23,7 @@ from PyQt4.Qsci import QsciScintilla, QsciStyle
 #  forward/backward history buttons
 #  menu options for viewing appropriate changesets
 
-class AnnotateView(QsciScintilla):
+class AnnotateView(qscilib.Scintilla):
     loadBegin = pyqtSignal()
     loadComplete = pyqtSignal()
 
@@ -44,7 +44,6 @@ class AnnotateView(QsciScintilla):
     def __init__(self, repo, parent=None, **opts):
         super(AnnotateView, self).__init__(parent)
         self.setReadOnly(True)
-        self.setUtf8(True)
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
         self.setMouseTracking(True)
