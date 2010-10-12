@@ -93,7 +93,7 @@ class AnnotateView(qscilib.Scintilla):
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
-        menu = qtlib.createStandardContextMenuForScintilla(self)
+        menu = self.createStandardContextMenu()
         line = self.lineAt(point)
         point = self.mapToGlobal(point)
         if line < 0 or not self.isAnnotationEnabled():

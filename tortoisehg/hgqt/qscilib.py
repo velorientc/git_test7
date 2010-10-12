@@ -7,6 +7,8 @@
 
 from mercurial import util
 
+from tortoisehg.hgqt.i18n import _
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
@@ -151,3 +153,26 @@ class Scintilla(QsciScintilla):
         y = self.SendScintilla(QsciScintilla.SCI_POINTYFROMPOSITION, 0, p)
         w = self.SendScintilla(QsciScintilla.SCI_GETCARETWIDTH)
         return QRect(x, y, w, self.textHeight(l))
+
+    def createStandardContextMenu(self):
+        """Create standard context menu"""
+        menu = QMenu(self)
+        if not self.isReadOnly():
+            a = menu.addAction(_('Undo'), self.undo, QKeySequence.Undo)
+            a.setEnabled(self.isUndoAvailable())
+            a = menu.addAction(_('Redo'), self.redo, QKeySequence.Redo)
+            a.setEnabled(self.isRedoAvailable())
+            menu.addSeparator()
+            a = menu.addAction(_('Cut'), self.cut, QKeySequence.Cut)
+            a.setEnabled(self.hasSelectedText())
+        a = menu.addAction(_('Copy'), self.copy, QKeySequence.Copy)
+        a.setEnabled(self.hasSelectedText())
+        if not self.isReadOnly():
+            menu.addAction(_('Paste'), self.paste, QKeySequence.Paste)
+            a = menu.addAction(_('Delete'), self.removeSelectedText,
+                               QKeySequence.Delete)
+            a.setEnabled(self.hasSelectedText())
+        menu.addSeparator()
+        menu.addAction(_('Select All'), self.selectAll, QKeySequence.SelectAll)
+
+        return menu

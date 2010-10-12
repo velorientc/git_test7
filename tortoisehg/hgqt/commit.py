@@ -350,7 +350,7 @@ class CommitWidget(QWidget):
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
             dlg.exec_()
 
-        menu = qtlib.createStandardContextMenuForScintilla(self.msgte)
+        menu = self.msgte.createStandardContextMenu()
         menu.addSeparator()
         for name, func in [(_('Paste &Filenames'), paste),
                            (_('App&ly Format'), apply),
