@@ -7,17 +7,16 @@
 
 import os
 
-from mercurial import hg, ui, cmdutil, util, dispatch, error
-from mercurial.node import short as short_hex
+from mercurial import ui, util, error
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerMakefile
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, shlib, paths, wconfig
+from tortoisehg.util import hglib, shlib, wconfig
 
-from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanel, lexers
+from tortoisehg.hgqt import qtlib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
