@@ -42,7 +42,7 @@ class HgFileListModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         self.repo = repo
         self._datacache = {}
-        self.current_ctx = None
+        self._ctx = None
         self._files = []
         self._filesdict = {}
         self.diffwidth = 100
@@ -76,21 +76,21 @@ class HgFileListModel(QAbstractTableModel):
         return self._filesdict[fn]['flag']
 
     def fileFromIndex(self, index):
-        if not index.isValid() or index.row()>=len(self) or not self.current_ctx:
+        if not index.isValid() or index.row()>=len(self) or not self._ctx:
             return None
         row = index.row()
         return self._files[row]['path']
 
     def revFromIndex(self, index):
-        if self._fulllist and ismerge(self.current_ctx):
-            if not index.isValid() or index.row()>=len(self) or not self.current_ctx:
+        if self._fulllist and ismerge(self._ctx):
+            if not index.isValid() or index.row()>=len(self) or not self._ctx:
                 return None
             row = index.row()
             current_file_desc = self._files[row]
             if current_file_desc['fromside'] == 'right':
-                return self.current_ctx.parents()[1].rev()
+                return self._ctx.parents()[1].rev()
             else:
-                return self.current_ctx.parents()[0].rev()
+                return self._ctx.parents()[0].rev()
         return None
 
     def indexFromFile(self, filename):
@@ -102,11 +102,11 @@ class HgFileListModel(QAbstractTableModel):
     def _filterFile(self, filename, ctxfiles):
         if self._fulllist:
             return True
-        return filename in ctxfiles #self.current_ctx.files()
+        return filename in ctxfiles #self._ctx.files()
 
     def _buildDesc(self, fromside):
         _files = []
-        ctx = self.current_ctx
+        ctx = self._ctx
         ctxfiles = ctx.files()
         whichparent = {'left': 0, 'right': 1}[fromside]
         changes = ctx.changesToParent(whichparent)
@@ -124,21 +124,21 @@ class HgFileListModel(QAbstractTableModel):
         self._files = []
         self._datacache = {}
         self._files = self._buildDesc('left')
-        if ismerge(self.current_ctx):
+        if ismerge(self._ctx):
             _paths = [x['path'] for x in self._files]
             _files = self._buildDesc('right')
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
 
     def setSelectedRev(self, ctx):
-        if ctx != self.current_ctx:
-            self.current_ctx = ctx
+        if ctx != self._ctx:
+            self._ctx = ctx
             self._datacache = {}
             self.loadFiles()
             self.layoutChanged.emit()
 
     def data(self, index, role):
-        if not index.isValid() or index.row()>len(self) or not self.current_ctx:
+        if not index.isValid() or index.row()>len(self) or not self._ctx:
             return nullvariant
         row = index.row()
         column = index.column()
@@ -150,7 +150,7 @@ class HgFileListModel(QAbstractTableModel):
             if role in (Qt.DisplayRole, Qt.ToolTipRole):
                 return QVariant(hglib.tounicode(current_file_desc['desc']))
             elif role == Qt.DecorationRole:
-                if self._fulllist and ismerge(self.current_ctx):
+                if self._fulllist and ismerge(self._ctx):
                     if current_file_desc['infiles']:
                         icn = geticon('leftright')
                     elif current_file_desc['fromside'] == 'left':
@@ -170,7 +170,7 @@ class HgFileListModel(QAbstractTableModel):
         return nullvariant
 
     def headerData(self, section, orientation, role):
-        if ismerge(self.current_ctx):
+        if ismerge(self._ctx):
             if self._fulllist:
                 header = ('File (all)', '')
             else:
