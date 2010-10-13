@@ -99,19 +99,18 @@ class HgFileListModel(QAbstractTableModel):
             return self.index(row, 0)
         return QModelIndex()
 
-    def _filterFile(self, filename, ctxfiles):
-        if self._fulllist:
-            return True
-        return filename in ctxfiles #self._ctx.files()
-
     def _buildDesc(self, fromside):
+        def filterFile(filename):
+            if self._fulllist:
+                return True
+            return filename in ctxfiles
         _files = []
         ctxfiles = self._ctx.files()
         whichparent = {'left': 0, 'right': 1}[fromside]
         changes = self._ctx.changesToParent(whichparent)
         modified, added, removed = changes
         for lst, flag in ((added, '+'), (modified, '='), (removed, '-')):
-            for f in [x for x in lst if self._filterFile(x, ctxfiles)]:
+            for f in [x for x in lst if filterFile(x)]:
                 _files.append({'path': f, 'flag': flag, 'desc': f,
                                'fromside': fromside,
                                'infiles': f in ctxfiles})
