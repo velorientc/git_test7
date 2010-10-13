@@ -19,7 +19,6 @@ import re
 from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.fileview import isbfile
-from tortoisehg.hgqt.graph import ismerge
 from tortoisehg.hgqt.qtlib import geticon
 
 from PyQt4.QtCore import *
@@ -29,6 +28,9 @@ nullvariant = QVariant()
 
 replus = re.compile(r'^[+][^+].*', re.M)
 reminus = re.compile(r'^[-][^-].*', re.M)
+
+def ismerge(ctx):
+    return len(ctx.parents()) > 1
 
 class HgFileListModel(QAbstractTableModel):
     """

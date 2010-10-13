@@ -39,9 +39,6 @@ def getparents(ctx, branch):
     return [x.rev() for x in ctx.parents() if x and x.branch() == branch]
 
 
-def ismerge(ctx):
-    return len(ctx.parents()) > 1
-
 def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
                      follow=False, allparents=True):
     """incremental revision grapher
