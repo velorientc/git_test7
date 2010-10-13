@@ -217,6 +217,8 @@ class SyncWidget(QWidget):
         if 'default' in self.paths:
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
+        else:
+            self.curalias = None
 
     def configChanged(self):
         'Repository is reporting its config files have changed'
