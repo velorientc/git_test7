@@ -111,7 +111,7 @@ class HgFileListModel(QAbstractTableModel):
         modified, added, removed = changes
         for lst, flag in ((added, '+'), (modified, '='), (removed, '-')):
             for f in [x for x in lst if filterFile(x)]:
-                _files.append({'path': f, 'flag': flag, 'desc': f,
+                _files.append({'path': f, 'flag': flag,
                                'fromside': fromside,
                                'infiles': f in ctxfiles})
                 # renamed/copied files are handled by background
@@ -148,7 +148,7 @@ class HgFileListModel(QAbstractTableModel):
         current_file = current_file_desc['path']
 
         if role in (Qt.DisplayRole, Qt.ToolTipRole):
-            return QVariant(hglib.tounicode(current_file_desc['desc']))
+            return QVariant(hglib.tounicode(current_file))
         elif role == Qt.DecorationRole:
             if self._fulllist and ismerge(self._ctx):
                 if current_file_desc['infiles']:
