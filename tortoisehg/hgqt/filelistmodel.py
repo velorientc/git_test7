@@ -72,9 +72,6 @@ class HgFileListModel(QAbstractTableModel):
     def file(self, row):
         return self._files[row]['path']
 
-    def fileflag(self, fn):
-        return self._filesdict[fn]['flag']
-
     def fileFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self._ctx:
             return None
@@ -108,7 +105,7 @@ class HgFileListModel(QAbstractTableModel):
         ctxfiles = self._ctx.files()
         changes = self._ctx.changesToParent(parent)
         modified, added, removed = changes
-        for lst, flag in ((added, '+'), (modified, '='), (removed, '-')):
+        for lst, flag in ((added, 'A'), (modified, 'M'), (removed, 'R')):
             for f in [x for x in lst if filterFile(x)]:
                 _files.append({'path': f, 'flag': flag,
                                'parent': parent,
@@ -157,9 +154,9 @@ class HgFileListModel(QAbstractTableModel):
                 elif current_file_desc['parent'] == 1:
                     icn = geticon('right')
                 return QVariant(icn.pixmap(20,20))
-            elif current_file_desc['flag'] == '+':
+            elif current_file_desc['flag'] == 'A':
                 return QVariant(geticon('fileadd'))
-            elif current_file_desc['flag'] == '-':
+            elif current_file_desc['flag'] == 'R':
                 return QVariant(geticon('filedelete'))
         elif role == Qt.FontRole:
             if self._fulllist and current_file_desc['infiles']:
