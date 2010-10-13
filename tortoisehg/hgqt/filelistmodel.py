@@ -106,10 +106,9 @@ class HgFileListModel(QAbstractTableModel):
 
     def _buildDesc(self, fromside):
         _files = []
-        ctx = self._ctx
-        ctxfiles = ctx.files()
+        ctxfiles = self._ctx.files()
         whichparent = {'left': 0, 'right': 1}[fromside]
-        changes = ctx.changesToParent(whichparent)
+        changes = self._ctx.changesToParent(whichparent)
         modified, added, removed = changes
         for lst, flag in ((added, '+'), (modified, '='), (removed, '-')):
             for f in [x for x in lst if self._filterFile(x, ctxfiles)]:
@@ -140,34 +139,37 @@ class HgFileListModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid() or index.row()>len(self) or not self._ctx:
             return nullvariant
+        if index.column() != 0:
+            return nullvariant
+
         row = index.row()
         column = index.column()
 
         current_file_desc = self._files[row]
         current_file = current_file_desc['path']
 
-        if column == 0:
-            if role in (Qt.DisplayRole, Qt.ToolTipRole):
-                return QVariant(hglib.tounicode(current_file_desc['desc']))
-            elif role == Qt.DecorationRole:
-                if self._fulllist and ismerge(self._ctx):
-                    if current_file_desc['infiles']:
-                        icn = geticon('leftright')
-                    elif current_file_desc['fromside'] == 'left':
-                        icn = geticon('left')
-                    elif current_file_desc['fromside'] == 'right':
-                        icn = geticon('right')
-                    return QVariant(icn.pixmap(20,20))
-                elif current_file_desc['flag'] == '+':
-                    return QVariant(geticon('fileadd'))
-                elif current_file_desc['flag'] == '-':
-                    return QVariant(geticon('filedelete'))
-            elif role == Qt.FontRole:
-                if self._fulllist and current_file_desc['infiles']:
-                    font = QFont()
-                    font.setBold(True)
-                    return QVariant(font)
-        return nullvariant
+        if role in (Qt.DisplayRole, Qt.ToolTipRole):
+            return QVariant(hglib.tounicode(current_file_desc['desc']))
+        elif role == Qt.DecorationRole:
+            if self._fulllist and ismerge(self._ctx):
+                if current_file_desc['infiles']:
+                    icn = geticon('leftright')
+                elif current_file_desc['fromside'] == 'left':
+                    icn = geticon('left')
+                elif current_file_desc['fromside'] == 'right':
+                    icn = geticon('right')
+                return QVariant(icn.pixmap(20,20))
+            elif current_file_desc['flag'] == '+':
+                return QVariant(geticon('fileadd'))
+            elif current_file_desc['flag'] == '-':
+                return QVariant(geticon('filedelete'))
+        elif role == Qt.FontRole:
+            if self._fulllist and current_file_desc['infiles']:
+                font = QFont()
+                font.setBold(True)
+                return QVariant(font)
+        else:
+            return nullvariant
 
     def headerData(self, section, orientation, role):
         if ismerge(self._ctx):
