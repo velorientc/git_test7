@@ -87,7 +87,7 @@ class HgFileListModel(QAbstractTableModel):
                 return None
             row = index.row()
             current_file_desc = self._files[row]
-            if current_file_desc['fromside'] == 'right':
+            if current_file_desc['parent'] == 1:
                 return self._ctx.parents()[1].rev()
             else:
                 return self._ctx.parents()[0].rev()
@@ -99,20 +99,19 @@ class HgFileListModel(QAbstractTableModel):
             return self.index(row, 0)
         return QModelIndex()
 
-    def _buildDesc(self, fromside):
+    def _buildDesc(self, parent):
         def filterFile(filename):
             if self._fulllist:
                 return True
             return filename in ctxfiles
         _files = []
         ctxfiles = self._ctx.files()
-        whichparent = {'left': 0, 'right': 1}[fromside]
-        changes = self._ctx.changesToParent(whichparent)
+        changes = self._ctx.changesToParent(parent)
         modified, added, removed = changes
         for lst, flag in ((added, '+'), (modified, '='), (removed, '-')):
             for f in [x for x in lst if filterFile(x)]:
                 _files.append({'path': f, 'flag': flag,
-                               'fromside': fromside,
+                               'parent': parent,
                                'infiles': f in ctxfiles})
                 # renamed/copied files are handled by background
                 # filling process since it can be a bit long
@@ -121,10 +120,10 @@ class HgFileListModel(QAbstractTableModel):
     def loadFiles(self):
         self._files = []
         self._datacache = {}
-        self._files = self._buildDesc('left')
+        self._files = self._buildDesc(0)
         if ismerge(self._ctx):
             _paths = [x['path'] for x in self._files]
-            _files = self._buildDesc('right')
+            _files = self._buildDesc(1)
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
 
@@ -153,9 +152,9 @@ class HgFileListModel(QAbstractTableModel):
             if self._fulllist and ismerge(self._ctx):
                 if current_file_desc['infiles']:
                     icn = geticon('leftright')
-                elif current_file_desc['fromside'] == 'left':
+                elif current_file_desc['parent'] == 0:
                     icn = geticon('left')
-                elif current_file_desc['fromside'] == 'right':
+                elif current_file_desc['parent'] == 1:
                     icn = geticon('right')
                 return QVariant(icn.pixmap(20,20))
             elif current_file_desc['flag'] == '+':
