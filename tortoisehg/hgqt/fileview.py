@@ -336,6 +336,10 @@ class HgFileView(QFrame):
             self.sci.setText(fd.diff)
             self.sci.setMarginLineNumbers(1, False)
             self.sci.setMarginWidth(1, '')
+        elif fd.contents is None:
+            self.sci.setMarginLineNumbers(1, False)
+            self.sci.setMarginWidth(1, '')
+            return
         else:
             lexer = get_lexer(filename, fd.contents)
             self._cur_lexer = lexer # SJB - holding refcount?
