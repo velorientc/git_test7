@@ -18,7 +18,6 @@ import re
 
 from tortoisehg.util import hglib
 
-from tortoisehg.hgqt.fileview import isbfile
 from tortoisehg.hgqt.qtlib import geticon
 
 from PyQt4.QtCore import *
@@ -119,12 +118,6 @@ class HgFileListModel(QAbstractTableModel):
                                'infiles': f in ctxfiles})
                 # renamed/copied files are handled by background
                 # filling process since it can be a bit long
-        for fdesc in _files:
-            bfile = isbfile(fdesc['path'])
-            fdesc['bfile'] = bfile
-            if bfile:
-                fdesc['desc'] = fdesc['desc'].replace('.hgbfiles'+os.sep, '')
-
         return _files
 
     def loadFiles(self):

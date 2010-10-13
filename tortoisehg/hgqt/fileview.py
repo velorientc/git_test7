@@ -37,12 +37,6 @@ from tortoisehg.hgqt.blockmatcher import BlockList
 qsci = Qsci.QsciScintilla
 chunkhdrre = re.compile('^@@ -(\d+).*@@$')
 
-def isbfile(filename):
-    return filename and filename.startswith('.hgbfiles' + os.sep)
-
-def bfilepath(filename):
-    return filename and filename.replace('.hgbfiles' + os.sep, '')
-
 class Annotator(qsci):
     # we use a QScintilla for the annotater cause it makes
     # it much easier to keep the text area and the annotater sync
@@ -299,13 +293,9 @@ class HgFileView(QFrame):
     def displayFile(self, filename=None, rev=None, status=None):
         if filename is None:
             filename = self._filename
-            
-        self._realfilename = filename
-        if isbfile(filename):
-            self._filename = bfilepath(filename)
         else:
             self._filename = filename
-            
+
         if rev is not None:
             self._p_rev = rev
             self.revForDiffChanged.emit(rev)
@@ -572,8 +562,6 @@ class FileData(object):
             return None
 
         repo = ctx._repo
-        if isbfile(wfile):
-            self.flabel += u'[bfile tracked] '
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
         if type(ctx.rev()) == str:
@@ -666,7 +654,7 @@ class FileData(object):
                 return
 
             oldname, node = renamed
-            fr = hglib.tounicode(bfilepath(oldname))
+            fr = hglib.tounicode(oldname)
             self.flabel += _(' <i>(renamed from %s)</i>') % fr
             olddata = repo.filectx(oldname, fileid=node).data()
         elif status == 'M':
