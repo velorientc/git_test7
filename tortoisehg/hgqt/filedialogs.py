@@ -27,8 +27,7 @@ from PyQt4.Qsci import QsciScintilla
 from mercurial import hg
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon
-from tortoisehg.hgqt.dialogmixin import HgDialogMixin
+from tortoisehg.hgqt.qtlib import geticon, getfont
 from tortoisehg.hgqt.filerevmodel import FileRevModel
 from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
@@ -48,7 +47,7 @@ class HgDialogMixin(object):
     The main class must define a '_ui_file' class attribute.
     """
     def __init__(self, ui):
-        self._font = qtlib.getfont('fontlog').font()
+        self._font = getfont('fontlog').font()
         self.setupUi(self)
 
     def attachQuickBar(self, qbar):
