@@ -13,10 +13,13 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+import os
     
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
+from tortoisehg.hgqt import visdiff
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -168,3 +171,51 @@ class HgFileListView(QTableView):
     def prevFile(self):
         row = self.currentIndex().row()
         self.setCurrentIndex(self.model().index(max(row - 1, 0), 0))
+
+    #
+    ## Mouse drag
+    #
+
+    def selectedRows(self):
+        return self.selectionModel().selectedRows()
+
+    def dragObject(self):
+        ctx = self.model()._ctx
+        if type(ctx.rev()) == str:
+            return
+        paths = []
+        for index in self.selectedRows():
+            paths.append(self.model().fileFromIndex(index))
+        if not paths:
+            return
+        if ctx.rev() is None:
+            base = ctx._repo.root
+        else:
+            base, _ = visdiff.snapshot(ctx._repo, paths, ctx)
+        urls = []
+        for path in paths:
+            u = QUrl()
+            u.setPath('file://' + os.path.join(base, path))
+            urls.append(u)
+        if urls:
+            d = QDrag(self)
+            m = QMimeData()
+            m.setUrls(urls)
+            d.setMimeData(m)
+            d.start(Qt.CopyAction)
+
+    def mousePressEvent(self, event):
+        self.pressPos = event.pos()
+        self.pressTime = QTime.currentTime()
+        return QTableView.mousePressEvent(self, event)
+
+    def mouseMoveEvent(self, event):
+        d = event.pos() - self.pressPos
+        if d.manhattanLength() < QApplication.startDragDistance():
+            return QTableView.mouseMoveEvent(self, event)
+        elapsed = self.pressTime.msecsTo(QTime.currentTime())
+        if elapsed < QApplication.startDragTime():
+            return QTableView.mouseMoveEvent(self, event)
+        self.dragObject()
+        return QTableView.mouseMoveEvent(self, event)
+
