@@ -119,7 +119,6 @@ class AnnotateView(qscilib.Scintilla):
                     action = menu.addAction(name)
                     action.triggered.connect(func)
                 add(name, func)
-            return menu.exec_(point)
 
         def annorig():
             self.revSelected.emit(data)
