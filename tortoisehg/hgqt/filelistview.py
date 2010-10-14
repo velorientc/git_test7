@@ -52,12 +52,22 @@ class HgFileListView(QTableView):
         
     def setModel(self, model):
         QTableView.setModel(self, model)
+        model.layoutChanged.connect(self.layoutChanged)
         self.selectionModel().currentRowChanged.connect(self.fileSelected)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 
     def currentFile(self):
         index = self.currentIndex()
         return self.model().fileFromIndex(index)
+
+    def layoutChanged(self):
+        'file model has new contents'
+        index = self.currentIndex()
+        if index.row() >= len(self.model()):
+            self.selectRow(0)
+        else:
+            self.selectRow(index.row())
+        self.fileSelected()
 
     def fileSelected(self, index=None, *args):
         if index is None:
