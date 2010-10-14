@@ -28,8 +28,7 @@ from mercurial import util, error
 
 from tortoisehg.util.hglib import tounicode
 
-def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
-                     follow=False, allparents=True):
+def revision_grapher(repo, **opts):
     """incremental revision grapher
 
     This generator function walks through the revision history from
@@ -53,13 +52,30 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
     branch heads and all ancestors. If not set, include only the revisions
     on the selected named branch.
     """
+
+    revset = opts.get('revset', None)
+    if revset:
+        revset = sorted([repo[r].rev() for r in revset])
+        start_rev = max(revset)
+        stop_rev = min(revset)
+        branch = None
+        follow = False
+        hidden = lambda rev: rev not in revset
+    else:
+        start_rev = opts.get('start_rev', None)
+        stop_rev = opts.get('stop_rev', 0)
+        branch = opts.get('branch', None)
+        follow = opts.get('follow', False)
+        hidden = lambda rev: False
+
     assert start_rev is None or start_rev >= stop_rev
+
     curr_rev = start_rev
     revs = []
     rev_color = {}
     nextcolor = 0
 
-    if allparents or not branch:
+    if opts.get('allparents') or not branch:
         def getparents(ctx):
             return [x.rev() for x in ctx.parents() if x]
     else:
@@ -68,6 +84,11 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
                     if x and x.branch() == branch]
 
     while curr_rev is None or curr_rev >= stop_rev:
+        if hidden(curr_rev):
+            curr_rev -= 1
+            continue
+
+        # Compute revs and next_revs.
         ctx = repo[curr_rev]
         # Compute revs and next_revs.
         if curr_rev not in revs:
@@ -98,7 +119,7 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = getparents(ctx)
+        parents = [p for p in getparents(ctx) if not hidden(p)]
         try:
             author = ctx.user()
         except error.Abort:
