@@ -156,7 +156,10 @@ class AnnotateView(qscilib.Scintilla):
 
     @pyqtSlot(unicode, object, int)
     def setSource(self, wfile, rev, line=None):
-        """Change the content to the specified file at rev [unicode]"""
+        """Change the content to the specified file at rev [unicode]
+
+        line is counted from 1.
+        """
         if self.thread is not None:
             return
         try:
@@ -168,9 +171,10 @@ class AnnotateView(qscilib.Scintilla):
             return
         self._rev = ctx.rev()
         self.clear()
-        self.resumeline = line
         self.annfile = wfile
         self.setText(hglib.tounicode(fctx.data()))
+        if line:
+            self.setCursorPosition(line - 1, 0)
         self._updatelexer(fctx)
         self._updatemarginwidth()
         self.sourceChanged.emit(wfile, self._rev)
