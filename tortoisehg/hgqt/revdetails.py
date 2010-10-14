@@ -22,7 +22,7 @@ from PyQt4.QtGui import *
 
 class RevDetailsWidget(QWidget):
 
-    showMessageSignal = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
     revisionLinkClicked = pyqtSignal(str)
 
     def __init__(self, repo, repoview):
@@ -30,36 +30,30 @@ class RevDetailsWidget(QWidget):
 
         self.repo = repo
         self.repoview = repoview
-        self.currentMessage = ''
         self.splitternames = []
 
         # these are used to know where to go after a reload
         self._last_rev = None
         self._reload_file = None
 
-        self.load_config()
         self.setupUi()
         self.createActions()
 
-        self.fileview.setFont(self._font)
+        self.fileview.setFont(getfont('fontlog').font())
         self.fileview.showMessage.connect(self.showMessage)
         self.restoreSettings()
 
     def setupUi(self):
-        SP = QSizePolicy
-
         self.hbox = QHBoxLayout(self)
         self.hbox.setSpacing(0)
         self.hbox.setContentsMargins(2, 2, 2, 2)
-
         self.setupRevisionDetailsWidget()
-
         self.hbox.addWidget(self.revisionDetailsWidget)
 
     def setupRevisionDetailsWidget(self):
-        SP = QSizePolicy
-
         self.revisionDetailsWidget = QFrame()
+
+        SP = QSizePolicy
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
@@ -139,10 +133,7 @@ class RevDetailsWidget(QWidget):
         sp.setHeightForWidth(self.message.sizePolicy().hasHeightForWidth())
         self.message.setSizePolicy(sp)
         self.message.setMinimumSize(QSize(0, 0))
-        font = QFont()
-        font.setFamily("Courier")
-        font.setPointSize(9)
-        self.message.setFont(font)
+        self.message.setFont(getfont('fontcomment').font())
 
         self.fileview = HgFileView(self.message_splitter)
         sp = SP(SP.Expanding, SP.Expanding)
@@ -159,22 +150,8 @@ class RevDetailsWidget(QWidget):
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
-    def load_config(self):
-        self._font = getfont('fontlog').font()
-        self.rowheight = 8
-        self.users, self.aliases = [], []
-
     def revisionLinkClicked_(self, rev):
         self.revisionLinkClicked.emit(rev)
-
-    def showMessage(self, msg):
-        self.currentMessage = msg
-        if self.isVisible():
-            self.showMessageSignal.emit(msg)
-
-    def showEvent(self, event):
-        QWidget.showEvent(self, event)
-        self.showMessageSignal.emit(self.currentMessage)
 
     def createActions(self):
         self.actionDiffMode = QAction('Diff mode', self)
@@ -292,9 +269,8 @@ class RevDetailsWidget(QWidget):
         else:
             self.actionDiffMode.setEnabled(True)
         self.fileview.setContext(ctx)
-        self.filelistmodel.setSelectedRev(ctx)
-        if len(self.filelistmodel):
-            self.filelist.selectRow(0)
+        self.filelistmodel.setContext(ctx)
+
         mode = self.getMode()
         self.actionAnnMode.setEnabled(mode != 'diff')
         self.actionNextDiff.setEnabled(mode != 'diff')
@@ -306,7 +282,10 @@ class RevDetailsWidget(QWidget):
 
     def finishReload(self):
         'Finish reload by re-selecting previous file'
-        self.filelist.selectFile(self._reload_file)
+        if self._reload_file:
+            self.filelist.selectFile(self._reload_file)
+        elif not self.filelist.selectedIndexes():
+            self.filelist.selectRow(0)
 
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'

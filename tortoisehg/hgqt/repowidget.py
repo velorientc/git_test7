@@ -59,7 +59,6 @@ class RepoWidget(QWidget):
         self.runner = None
         self.dirty = False
 
-        self.load_config()
         self.setupUi()
         self.createActions()
         self.setupModels()
@@ -224,12 +223,6 @@ class RepoWidget(QWidget):
         gw.setRevision(self.repoview.current_rev)
         gw.showMessage.connect(self.showMessage)
         return gw
-
-    def load_config(self):
-        self._font = getfont('fontlog').font()
-        self.rowheight = 8
-        self.users, self.aliases = [], []
-        self.hidefinddelay = False
 
     def reponame(self):
         return self.repo.shortname

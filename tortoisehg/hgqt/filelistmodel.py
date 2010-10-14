@@ -41,24 +41,15 @@ class HgFileListModel(QAbstractTableModel):
         """
         QAbstractTableModel.__init__(self, parent)
         self.repo = repo
-        self._datacache = {}
         self._ctx = None
         self._files = []
         self._filesdict = {}
-        self.diffwidth = 100
         self._fulllist = False
 
     def toggleFullFileList(self):
         self._fulllist = not self._fulllist
         self.loadFiles()
         self.layoutChanged.emit()
-
-    def setDiffWidth(self, w):
-        if w != self.diffwidth:
-            self.diffwidth = w
-            self._datacache = {}
-            rc = self.rowCount()
-            self.dataChanged.emit(self.index(1, 0), self.index(1, rc))
 
     def __len__(self):
         return len(self._files)
@@ -71,6 +62,12 @@ class HgFileListModel(QAbstractTableModel):
 
     def file(self, row):
         return self._files[row]['path']
+
+    def setContext(self, ctx):
+        if ctx != self._ctx:
+            self._ctx = ctx
+            self.loadFiles()
+            self.layoutChanged.emit()
 
     def fileFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self._ctx:
@@ -101,35 +98,27 @@ class HgFileListModel(QAbstractTableModel):
             if self._fulllist:
                 return True
             return filename in ctxfiles
-        _files = []
+        files = []
         ctxfiles = self._ctx.files()
         changes = self._ctx.changesToParent(parent)
         modified, added, removed = changes
         for lst, flag in ((added, 'A'), (modified, 'M'), (removed, 'R')):
             for f in [x for x in lst if filterFile(x)]:
-                _files.append({'path': f, 'flag': flag,
+                files.append({'path': f, 'flag': flag,
                                'parent': parent,
                                'infiles': f in ctxfiles})
                 # renamed/copied files are handled by background
                 # filling process since it can be a bit long
-        return _files
+        return files
 
     def loadFiles(self):
         self._files = []
-        self._datacache = {}
         self._files = self._buildDesc(0)
         if ismerge(self._ctx):
             _paths = [x['path'] for x in self._files]
             _files = self._buildDesc(1)
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
-
-    def setSelectedRev(self, ctx):
-        if ctx != self._ctx:
-            self._ctx = ctx
-            self._datacache = {}
-            self.loadFiles()
-            self.layoutChanged.emit()
 
     def data(self, index, role):
         if not index.isValid() or index.row()>len(self) or not self._ctx:
@@ -160,7 +149,7 @@ class HgFileListModel(QAbstractTableModel):
                 return QVariant(geticon('filedelete'))
         elif role == Qt.FontRole:
             if self._fulllist and current_file_desc['infiles']:
-                font = QFont()
+                font = self.font()
                 font.setBold(True)
                 return QVariant(font)
         else:

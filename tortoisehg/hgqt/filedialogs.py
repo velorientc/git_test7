@@ -39,6 +39,27 @@ from tortoisehg.hgqt.repoview import HgRepoView
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
+class HgDialogMixin(object):
+    # TODO: get rid of me
+    """
+    Mixin for QDialogs defined from a .ui file, wich automates the
+    setup of the UI from the ui file, and the loading of user
+    preferences.
+    The main class must define a '_ui_file' class attribute.
+    """
+    def __init__(self, ui):
+        self._font = qtlib.getfont('fontlog').font()
+        self.setupUi(self)
+
+    def attachQuickBar(self, qbar):
+        qbar.setParent(self)
+        self.addToolBar(Qt.BottomToolBarArea, qbar)
+
+    def accept(self):
+        self.close()
+    def reject(self):
+        self.close()
+      
 
 class _AbstractFileDialog(QMainWindow, HgDialogMixin):
     def __init__(self, repo, filename, repoviewer=None):

@@ -52,7 +52,6 @@ class HgFileListView(QTableView):
         
     def setModel(self, model):
         QTableView.setModel(self, model)
-        model.layoutChanged.connect(self.fileSelected)
         self.selectionModel().currentRowChanged.connect(self.fileSelected)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 
@@ -71,7 +70,8 @@ class HgFileListView(QTableView):
             self.clearDisplay.emit()
 
     def selectFile(self, filename):
-        self.setCurrentIndex(self.model().indexFromFile(filename))
+        index = self.model().indexFromFile(filename)
+        self.setCurrentIndex(index)
 
     def fileActivated(self, index, alternate=False):
         sel_file = self.model().fileFromIndex(index)
