@@ -384,6 +384,13 @@ class _QtRunner(object):
             dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
                                   self._recoverableexc[etype], opts,
                                   parent=self._mainapp.activeWindow())
+        elif etype is KeyboardInterrupt:
+            if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
+                    _('Close this application?')):
+                QApplication.quit()
+            else:
+                self.errors = []
+                return
         else:
             dlg = BugReport(opts, parent=self._mainapp.activeWindow())
         dlg.exec_()
