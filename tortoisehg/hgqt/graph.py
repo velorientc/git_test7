@@ -28,17 +28,6 @@ from mercurial import util, error
 
 from tortoisehg.util.hglib import tounicode
 
-def getparents(ctx, branch):
-    """
-    Return non-null parents of `rev`. If branch is given, only return
-    parents that belongs to names branch `branch` (beware that this is
-    much slower).
-    """
-    if not branch:
-        return [x.rev() for x in ctx.parents() if x]
-    return [x.rev() for x in ctx.parents() if x and x.branch() == branch]
-
-
 def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
                      follow=False, allparents=True):
     """incremental revision grapher
@@ -69,22 +58,26 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
     revs = []
     rev_color = {}
     nextcolor = 0
-    if allparents:
-        getbranch = None
+
+    if allparents or not branch:
+        def getparents(ctx):
+            return [x.rev() for x in ctx.parents() if x]
     else:
-        getbranch = branch
+        def getparents(ctx):
+            return [x.rev() for x in ctx.parents() \
+                    if x and x.branch() == branch]
+
     while curr_rev is None or curr_rev >= stop_rev:
         ctx = repo[curr_rev]
         # Compute revs and next_revs.
         if curr_rev not in revs:
-            if branch:
-                if ctx.branch() != branch:
-                    if curr_rev is None:
-                        curr_rev = len(repo)
-                    else:
-                        curr_rev -= 1
-                    yield None
-                    continue
+            if branch and ctx.branch() != branch:
+                if curr_rev is None:
+                    curr_rev = len(repo)
+                else:
+                    curr_rev -= 1
+                yield None
+                continue
                     
             # New head.
             if start_rev and follow and curr_rev != start_rev:
@@ -93,19 +86,19 @@ def revision_grapher(repo, start_rev=None, stop_rev=0, branch=None,
             revs.append(curr_rev)
             rev_color[curr_rev] = curcolor = nextcolor
             nextcolor += 1
-            p_revs = getparents(ctx, getbranch)
+            p_revs = getparents(ctx)
             while p_revs:
                 rev0 = p_revs[0]
                 if rev0 < stop_rev or rev0 in rev_color:
                     break
                 rev_color[rev0] = curcolor
-                p_revs = getparents(repo[rev0], getbranch)
+                p_revs = getparents(repo[rev0])
         curcolor = rev_color[curr_rev]
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = getparents(ctx, getbranch)
+        parents = getparents(ctx)
         try:
             author = ctx.user()
         except error.Abort:
