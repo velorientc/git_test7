@@ -465,9 +465,9 @@ class RepoWidget(QWidget):
     def rebuildGraph(self):
         self.showMessage('')
         if self.rev is not None and len(self.repo) >= self.rev:
-            self._reload_rev = '.'
-        else:
             self._reload_rev = self.rev
+        else:
+            self._reload_rev = '.'
         self.setupModels()
         self.revDetailsWidget.record()
 
