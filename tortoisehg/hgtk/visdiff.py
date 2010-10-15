@@ -174,9 +174,8 @@ def visualdiff(ui, repo, pats, opts):
             toollist.add(preferred)
 
     cto = cpy.keys()
-    cfrom = cpy.values()
     for path in MAR:
-        if path in cto or path in cfrom:
+        if path in cto:
             hascopies = True
             break
     else:
