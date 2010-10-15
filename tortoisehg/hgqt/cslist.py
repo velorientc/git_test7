@@ -153,6 +153,11 @@ class ChangesetList(QWidget):
             self.updatestatus()
             return False
 
+        if self.compactchk.isChecked():
+            self.csvbox.setSpacing(0)
+        else:
+            self.csvbox.setSpacing(_SPACING)
+
         # determine the items to show
         if uselimit and self.limit < len(items):
             showitems, lastitem = items[:self.limit - 1], items[-1]
