@@ -610,7 +610,7 @@ class RepoWidget(QWidget):
                    'email': not workingdir,
                    'archive': realrev,
                    'copyhash': realrev,
-                   'rebase': normalrev,
+                   'rebase': not unappliedpatch,
                    'qgoto': patch,
                    'qpop-all': qparent,
                    'qimport': normalrev,
