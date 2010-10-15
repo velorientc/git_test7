@@ -307,7 +307,7 @@ class Graph(object):
             startsec = timer()
 
         stopped = False
-        mcol = [self.max_cols]
+        mcol = set([self.max_cols])
 
         for vnext in self.grapher:
             if vnext is None:
@@ -322,7 +322,8 @@ class Graph(object):
                 gnode.toplines = self.nodes[-1].bottomlines
             self.nodes.append(gnode)
             self.nodesdict[nrev] = gnode
-            mcol.append(gnode.cols)
+            mcol = mcol.union(set([xpos]))
+            mcol = mcol.union(set([max(x[:2]) for x in gnode.bottomlines]))
             if rev is not None and nrev <= rev:
                 rev = None # we reached rev, switching to nnode counter
             if rev is None:
@@ -338,7 +339,7 @@ class Graph(object):
             self.grapher = None
             stopped = True
 
-        self.max_cols = max(mcol)
+        self.max_cols = max(mcol) + 1
         return not stopped
 
     def isfilled(self):
