@@ -119,6 +119,10 @@ class ChangesetList(QWidget):
         style = self.compactchk.isChecked() and self.lstyle or self.pstyle
         info = self.curfactory(item, style=style)
         info.update(item)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        info.setSizePolicy(sizePolicy)
         self.csvbox.addWidget(info, Qt.AlignTop)
 
     def updatestatus(self):
