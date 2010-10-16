@@ -10,7 +10,7 @@ import os, re
 from mercurial import ui, error, util
 
 from tortoisehg.hgqt import visdiff, qtlib, qscilib, wctxactions, thgrepo, lexers
-from tortoisehg.util import paths, hglib, colormap
+from tortoisehg.util import paths, hglib, colormap, thread2
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.grep import SearchWidget
 
@@ -64,7 +64,7 @@ class AnnotateView(qscilib.Scintilla):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self._thread.terminate()
+            self._thread.abort()
             return
         if event.matches(QKeySequence.FindNext):
             self.nextMatch()
@@ -359,13 +359,27 @@ class _AnnotateThread(QThread):
         self._fctx = fctx
         super(_AnnotateThread, self).start()
 
+    @pyqtSlot()
+    def abort(self):
+        try:
+            thread2._async_raise(self._threadid, KeyboardInterrupt)
+            self.wait()
+        except AttributeError:
+            pass
+
     def run(self):
         assert self.currentThread() != qApp.thread()
-        data = []
-        for (fctx, line), _text in self._fctx.annotate(True, True):
-            data.append((fctx, line))
-        self.done.emit(data)
-        del self._fctx
+        self._threadid = self.currentThreadId()
+        try:
+            data = []
+            for (fctx, line), _text in self._fctx.annotate(True, True):
+                data.append((fctx, line))
+            self.done.emit(data)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            del self._threadid
+            del self._fctx
 
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
