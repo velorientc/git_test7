@@ -10,10 +10,12 @@
 
 import os
 import sys
+import shlex
 
 from PyQt4.QtCore import *
 
 from mercurial import hg, patch, util, error, bundlerepo, ui, extensions
+from mercurial import filemerge
 from mercurial.util import propertycache
 
 from tortoisehg.util import hglib
@@ -173,7 +175,7 @@ class ThgRepoWrapper(QObject):
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
-              shortname'''.split()
+              shortname mergetools'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
@@ -339,6 +341,17 @@ def _extendrepo(repo):
             else:
                 name = os.path.basename(self.root)
             return hglib.tounicode(name)
+
+        @propertycache
+        def mergetools(self):
+            seen, installed = [], []
+            for key, value in self.ui.configitems('merge-tools'):
+                t = key.split('.')[0]
+                if t not in seen:
+                    seen.append(t)
+                    if filemerge._findtool(self.ui, t):
+                        installed.append(t)
+            return installed
 
         def shell(self):
             'Returns terminal shell configured for this repo'
