@@ -29,7 +29,8 @@ class AnnotateView(qscilib.Scintilla):
     searchRequested = pyqtSignal(QString)
     """Emitted (pattern) when user request to search content"""
 
-    editSelected = pyqtSignal(object)
+    editSelected = pyqtSignal(unicode, object, int)
+    """Emitted (path, rev, line) when user requests to open editor"""
 
     grepRequested = pyqtSignal(QString, dict)
     """Emitted (pattern, **opts) when user request to search changelog"""
@@ -120,7 +121,7 @@ class AnnotateView(qscilib.Scintilla):
         def annorig():
             self.setSource(*data)
         def editorig():
-            self.editSelected.emit(data)
+            self.editSelected.emit(*data)
         menu.addSeparator()
         for name, func in [(_('Annotate originating revision'), annorig),
                            (_('View originating revision'), editorig)]:
@@ -134,7 +135,7 @@ class AnnotateView(qscilib.Scintilla):
             def annparent(data):
                 self.setSource(*data)
             def editparent(data):
-                self.editSelected.emit(data)
+                self.editSelected.emit(*data)
             for name, func in [(_('Annotate parent revision %d') % pdata[1],
                                   annparent),
                                (_('View parent revision %d') % pdata[1],
@@ -511,10 +512,10 @@ class AnnotateDialog(QMainWindow):
         self.storeSettings()
         super(AnnotateDialog, self).closeEvent(event)
 
-    def editSelected(self, args):
+    def editSelected(self, wfile, rev, line):
         pattern = hglib.fromunicode(self._searchbar._le.text()) or None
+        wfile = hglib.fromunicode(wfile)
         repo = self.repo
-        wfile, rev, line = args
         try:
             ctx = repo[rev]
             fctx = ctx[wfile]
