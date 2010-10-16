@@ -26,6 +26,9 @@ class ManifestDialog(QMainWindow):
     """
     Qt4 dialog to display all files of a repo at a given revision
     """
+
+    finished = pyqtSignal(int)
+
     def __init__(self, ui, repo, rev=None, parent=None):
         QMainWindow.__init__(self, parent)
         self._repo = repo
@@ -59,6 +62,7 @@ class ManifestDialog(QMainWindow):
     def closeEvent(self, event):
         self._writesettings()
         super(ManifestDialog, self).closeEvent(event)
+        self.finished.emit(0)  # mimic QDialog exit
 
     def _readsettings(self):
         s = QSettings()
