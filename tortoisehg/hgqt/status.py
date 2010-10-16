@@ -464,6 +464,11 @@ class WctxModel(QAbstractTableModel):
             for s in wctx.dirtySubrepos:
                 nchecked[s] = checked.get(s, True)
                 rows.append(mkrow(s, 'S'))
+        # include clean unresolved files
+        for f in ms:
+            if ms[f] == 'u' and f not in nchecked:
+                nchecked[f] = checked.get(f, True)
+                rows.append(mkrow(f, 'C'))
         self.headers = ('*', _('Stat'), _('M'), _('Filename'), 
                         _('Type'), _('Size (KB)'))
         self.checked = nchecked
