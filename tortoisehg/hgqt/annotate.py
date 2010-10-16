@@ -24,9 +24,6 @@ from PyQt4.Qsci import QsciScintilla, QsciStyle
 #  menu options for viewing appropriate changesets
 
 class AnnotateView(qscilib.Scintilla):
-    loadBegin = pyqtSignal()
-    loadComplete = pyqtSignal()
-
     revisionHint = pyqtSignal(QString)
 
     searchRequested = pyqtSignal(QString)
@@ -188,12 +185,10 @@ class AnnotateView(qscilib.Scintilla):
         agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
-        self.loadBegin.emit()
         self._thread.start(fctx)
 
     @pyqtSlot(object)
     def fillModel(self, data):
-        self.loadComplete.emit()
         revs, links = [], []
         sums = {}
         for fctx, origline, text in data:
