@@ -118,6 +118,8 @@ class Scintilla(QsciScintilla):
     def __init__(self, parent=None):
         super(Scintilla, self).__init__(parent)
         self.setUtf8(True)
+        self.textChanged.connect(self._resetfindcond)
+        self._resetfindcond()
 
     def inputMethodQuery(self, query):
         if query == Qt.ImMicroFocus:
@@ -176,3 +178,21 @@ class Scintilla(QsciScintilla):
         menu.addAction(_('Select All'), self.selectAll, QKeySequence.SelectAll)
 
         return menu
+
+    @pyqtSlot(unicode, bool, bool, bool)
+    def find(self, exp, icase=True, wrap=False, forward=True):
+        """Find the next/prev occurence; returns True if found
+
+        This method tries to imitate the behavior of QTextEdit.find(),
+        unlike combo of QsciScintilla.findFirst() and findNext().
+        """
+        cond = (exp, True, not icase, False, wrap, forward)
+        if cond == self.__findcond:
+            return self.findNext()
+        else:
+            self.__findcond = cond
+            return self.findFirst(*cond)
+
+    @pyqtSlot()
+    def _resetfindcond(self):
+        self.__findcond = ()
