@@ -499,10 +499,14 @@ class AnnotateDialog(QMainWindow):
         if line and isinstance(line, str):
             line = int(line)
 
-        av.setSource(hglib.tounicode(pats[0]), opts.get('rev') or '.', line)
         self.repo = repo
 
         self.restoreSettings()
+
+        # run heavy operation after the dialog visible
+        path = hglib.tounicode(pats[0])
+        rev = opts.get('rev') or '.'
+        QTimer.singleShot(0, lambda: av.setSource(path, rev, line))
 
     def closeEvent(self, event):
         self.storeSettings()
