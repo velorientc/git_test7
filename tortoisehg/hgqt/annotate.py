@@ -66,12 +66,6 @@ class AnnotateView(qscilib.Scintilla):
         if event.key() == Qt.Key_Escape:
             self._thread.abort()
             return
-        if event.matches(QKeySequence.FindNext):
-            self.nextMatch()
-            return
-        if event.matches(QKeySequence.FindPrevious):
-            self.prevMatch()
-            return
         return super(AnnotateView, self).keyPressEvent(event)
 
     def mouseMoveEvent(self, event):
@@ -293,12 +287,6 @@ class AnnotateView(qscilib.Scintilla):
         else:
             self.setMarginWidth(2, 0)
 
-    def nextMatch(self):
-        self.findNext()
-
-    def prevMatch(self):
-        pass # XXX
-
     @pyqtSlot(unicode, bool)
     def highlightText(self, match, icase=False):
         """Highlight text matching to the given regexp pattern [unicode]
@@ -421,6 +409,24 @@ class SearchToolBar(QToolBar):
 
         self.setFocusProxy(self._le)
 
+    def keyPressEvent(self, event):
+        if event.matches(QKeySequence.FindNext):
+            self._emitSearchRequested(forward=True)
+            return
+        if event.matches(QKeySequence.FindPrevious):
+            self._emitSearchRequested(forward=False)
+            return
+        super(SearchToolBar, self).keyPressEvent(event)
+
+    def wheelEvent(self, event):
+        if event.delta() > 0:
+            self._emitSearchRequested(forward=False)
+            return
+        if event.delta() < 0:
+            self._emitSearchRequested(forward=True)
+            return
+        super(SearchToolBar, self).wheelEvent(event)
+
     @pyqtSlot()
     def _emitConditionChanged(self):
         self.conditionChanged.emit(self.pattern(), self.caseInsensitive(),
@@ -532,15 +538,6 @@ class AnnotateDialog(QMainWindow):
             self.searchwidget.setSearch(pattern, **opts)
             self.searchwidget.show()
             self.searchwidget.raise_()
-
-    def wheelEvent(self, event):
-        if self.childAt(event.pos()) != self._searchbar._le:
-            event.ignore()
-            return
-        if event.delta() > 0:
-            self.av.prevMatch()
-        elif event.delta() < 0:
-            self.av.nextMatch()
 
     def storeSettings(self):
         s = QSettings()
