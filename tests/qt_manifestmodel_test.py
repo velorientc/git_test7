@@ -1,5 +1,5 @@
 from nose.tools import *
-from PyQt4.QtCore import QModelIndex
+from PyQt4.QtCore import QModelIndex, QString
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 from tests import get_fixture_repo, with_encoding
 
@@ -71,6 +71,10 @@ def test_indexfrompath():
     assert_equals(m.index(1, 0), m.indexFromPath('bar'))
     assert_equals(m.index(0, 0), m.indexFromPath('baz'))
     assert_equals(m.index(0, 0, m.index(0, 0)), m.indexFromPath('baz/bax'))
+
+def test_indexfrompath_qstr():
+    m = newmodel()
+    assert_equals(m.index(1, 0), m.indexFromPath(QString('bar')))
 
 @with_encoding('euc-jp')
 def test_indexfrompath_eucjp():

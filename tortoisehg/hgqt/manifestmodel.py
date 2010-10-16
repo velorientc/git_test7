@@ -122,7 +122,7 @@ class ManifestModel(QAbstractItemModel):
             return QModelIndex()
 
         e = self._rootentry
-        paths = path and path.split('/') or []
+        paths = path and unicode(path).split('/') or []
         try:
             for p in paths:
                 e = e[p]
