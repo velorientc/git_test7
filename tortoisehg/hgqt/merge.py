@@ -18,7 +18,6 @@ from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, thgrepo, commit
 keep = i18n.keepgettext()
 
 MERGE_PAGE  = 0
-#RESOLVE_PAGE = 1
 COMMIT_PAGE = 1
 RESULT_PAGE = 2
 
@@ -208,36 +207,11 @@ class MergePage(BasePage):
         other_info.setContentsMargins(5, 0, 0, 0)
         box.addWidget(other_info)
 
-        ## options
-        obox = QHBoxLayout()
-        obox.setContentsMargins(*MARGINS)
-        box.addLayout(obox)
-
-        ### merge tools
-        label = QLabel(_('Merge tools:'))
-        obox.addWidget(label)
-
-        combo = QComboBox()
-        self.registerField('mergetool', combo)
-        obox.addWidget(combo)
-        obox.addSpacing(8)
-
-        prev = False
-        for tool in hglib.mergetools(repo.ui):
-            cur = tool.startswith('internal:')
-            if prev != cur:
-                combo.insertSeparator(combo.count())
-            combo.addItem(hglib.tounicode(tool))
-            prev = cur
-        uimerge = repo.ui.config('ui', 'merge', '')
-        combo.setEditText(hglib.tounicode(uimerge))
-
         ### discard option
         discard_chk = QCheckBox(_('Discard all changes from merge target '
                                   '(other) revision'))
         self.registerField('discard', discard_chk)
-        obox.addWidget(discard_chk)
-        obox.addStretch(0)
+        box.addWidget(discard_chk)
 
         ## current revision
         box.addSpacing(6)
@@ -246,6 +220,11 @@ class MergePage(BasePage):
         local_info = create(self.wizard().local)
         local_info.setContentsMargins(5, 0, 0, 0)
         box.addWidget(local_info)
+        def refreshlocal():
+            repo = self.wizard().repo
+            if len(repo.parents()) == 1:
+                local_info.update(repo['.'])
+        self.completeChanged.connect(refreshlocal)
 
         ## working directory status
         box.addSpacing(6)
@@ -274,9 +253,9 @@ class MergePage(BasePage):
         wdbox.addWidget(wd_detail)
         wdbox.addSpacing(4)
 
-        wd_merged = QLabel(_('The files look like already <b>merged</b>. '
+        wd_merged = QLabel(_('The files look already <b>merged</b>. '
                              '<a href="skip"><b>Commit</b></a> them? or '
-                             '<a href="discard"><b>disard</b></a> all.'))
+                             '<a href="discard"><b>disard</b></a> merge.'))
         wd_merged.setContentsMargins(*MARGINS)
         wd_merged.linkActivated.connect(self.link_activated)
         self.groups.add(wd_merged, 'merged')
@@ -331,16 +310,13 @@ class MergePage(BasePage):
         self.setTitle(_('Merging...'))
         self.setSubTitle(_('Please finish merging with launched merge tool.'))
 
-        cmdline = ['--repository', self.wizard().repo.root]
         if self.field('discard').toBool():
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
-            cmdline.extend(['debugsetparents', '.', self.wizard().other])
+            cmdline = ['debugsetparents', '.', self.wizard().other]
         else:
-            tool = self.field('mergetool').toString()
-            if tool:
-                cmdline.extend(['--config', 'ui.merge=%s' % tool])
-            cmdline.extend(['merge', '--rev', self.wizard().other])
+            cmdline = ['--repository', self.wizard().repo.root,
+                       '--tool=internal:fail']
         self.cmd.run(cmdline)
 
     def cancel(self):
