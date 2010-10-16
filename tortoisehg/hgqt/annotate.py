@@ -75,7 +75,10 @@ class AnnotateView(qscilib.Scintilla):
         return super(AnnotateView, self).keyPressEvent(event)
 
     def mouseMoveEvent(self, event):
-        line = self.lineAt(event.pos())
+        self._emitRevisionHintAtLine(self.lineAt(event.pos()))
+        super(AnnotateView, self).mouseMoveEvent(event)
+
+    def _emitRevisionHintAtLine(self, line):
         if line < 0:
             return
         try:
@@ -85,7 +88,6 @@ class AnnotateView(qscilib.Scintilla):
                 self._lastrev = rev
         except IndexError:
             pass
-        QsciScintilla.mouseMoveEvent(self, event)
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
