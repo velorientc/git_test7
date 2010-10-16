@@ -371,100 +371,6 @@ class _AnnotateThread(QThread):
             del self._threadid
             del self._fctx
 
-class SearchToolBar(QToolBar):
-    conditionChanged = pyqtSignal(unicode, bool, bool)
-    """Emitted (pattern, icase, wrap) when search condition changed"""
-
-    searchRequested = pyqtSignal(unicode, bool, bool, bool)
-    """Emitted (pattern, icase, wrap, forward) when requested"""
-
-    def __init__(self, parent=None, hidable=False):
-        super(SearchToolBar, self).__init__(_('Search'), parent,
-                                            objectName='search',
-                                            iconSize=QSize(16, 16))
-        if hidable:
-            self._close_button = QToolButton(icon=qtlib.geticon('close'),
-                                             shortcut=Qt.Key_Escape)
-            self._close_button.clicked.connect(self.hide)
-            self.addWidget(self._close_button)
-
-        self._lbl = QLabel(_('Regexp:'),
-                           toolTip=_('Regular expression search pattern'))
-        self.addWidget(self._lbl)
-        self._le = QLineEdit()
-        self._le.textChanged.connect(self._emitConditionChanged)
-        self._le.returnPressed.connect(self._emitSearchRequested)
-        self._lbl.setBuddy(self._le)
-        self.addWidget(self._le)
-        self._chk = QCheckBox(_('Ignore case'))
-        self._chk.toggled.connect(self._emitConditionChanged)
-        self.addWidget(self._chk)
-        self._wrapchk = QCheckBox(_('Wrap search'))
-        self._wrapchk.toggled.connect(self._emitConditionChanged)
-        self.addWidget(self._wrapchk)
-        self._bt = QPushButton(_('Search'), enabled=False)
-        self._bt.clicked.connect(self._emitSearchRequested)
-        self._le.textChanged.connect(lambda s: self._bt.setEnabled(bool(s)))
-        self.addWidget(self._bt)
-
-        self.setFocusProxy(self._le)
-
-    def keyPressEvent(self, event):
-        if event.matches(QKeySequence.FindNext):
-            self._emitSearchRequested(forward=True)
-            return
-        if event.matches(QKeySequence.FindPrevious):
-            self._emitSearchRequested(forward=False)
-            return
-        super(SearchToolBar, self).keyPressEvent(event)
-
-    def wheelEvent(self, event):
-        if event.delta() > 0:
-            self._emitSearchRequested(forward=False)
-            return
-        if event.delta() < 0:
-            self._emitSearchRequested(forward=True)
-            return
-        super(SearchToolBar, self).wheelEvent(event)
-
-    @pyqtSlot()
-    def _emitConditionChanged(self):
-        self.conditionChanged.emit(self.pattern(), self.caseInsensitive(),
-                                   self.wrapAround())
-
-    @pyqtSlot()
-    def _emitSearchRequested(self, forward=True):
-        self.searchRequested.emit(self.pattern(), self.caseInsensitive(),
-                                  self.wrapAround(), forward)
-
-    def pattern(self):
-        """Returns the current search pattern [unicode]"""
-        return self._le.text()
-
-    def setPattern(self, text):
-        """Set the search pattern [unicode]"""
-        self._le.setText(text)
-
-    def caseInsensitive(self):
-        """True if case-insensitive search is requested"""
-        return self._chk.isChecked()
-
-    def setCaseInsensitive(self, icase):
-        self._chk.setChecked(icase)
-
-    def wrapAround(self):
-        """True if wrap search is requested"""
-        return self._wrapchk.isChecked()
-
-    def setWrapAround(self, wrap):
-        self._wrapchk.setChecked(wrap)
-
-    @pyqtSlot(unicode)
-    def search(self, text):
-        """Request search with the given pattern"""
-        self.setPattern(text)
-        self._emitSearchRequested()
-
 class AnnotateDialog(QMainWindow):
     def __init__(self, *pats, **opts):
         super(AnnotateDialog,self).__init__(opts.get('parent'), Qt.Window)
@@ -483,7 +389,7 @@ class AnnotateDialog(QMainWindow):
         av.editSelected.connect(self.editSelected)
         av.grepRequested.connect(self._openSearchWidget)
 
-        self._searchbar = SearchToolBar()
+        self._searchbar = qscilib.SearchToolBar()
         self.addToolBar(self._searchbar)
         self._searchbar.setPattern(hglib.tounicode(opts.get('pattern', '')))
         self._searchbar.searchRequested.connect(self.av.find)

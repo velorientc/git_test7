@@ -26,7 +26,8 @@ from PyQt4.QtGui import *
 
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import qtlib, annotate, status, thgrepo, visdiff, wctxactions
+from tortoisehg.hgqt import qtlib, qscilib, annotate, status, thgrepo, \
+                            visdiff, wctxactions
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -46,7 +47,7 @@ class ManifestDialog(QMainWindow):
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
 
-        self._searchbar = annotate.SearchToolBar()
+        self._searchbar = qscilib.SearchToolBar()
         connectsearchbar(self._manifest_widget, self._searchbar)
         self.addToolBar(self._searchbar)
 
@@ -297,7 +298,7 @@ class ManifestTaskWidget(ManifestWidget):
 
     @util.propertycache
     def _searchbar(self):
-        searchbar = annotate.SearchToolBar(hidable=True)
+        searchbar = qscilib.SearchToolBar(hidable=True)
         searchbar.hide()
         self.layout().addWidget(searchbar)
         connectsearchbar(self, searchbar)
