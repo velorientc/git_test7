@@ -33,6 +33,7 @@ class ManifestDialog(QMainWindow):
 
         self._manifest_widget = ManifestWidget(ui, repo, rev)
         self._manifest_widget.revChanged.connect(self._updatewindowtitle)
+        self._manifest_widget.pathChanged.connect(self._updatewindowtitle)
         self._manifest_widget.editSelected.connect(self._openInEditor)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
         self.setCentralWidget(self._manifest_widget)
@@ -50,8 +51,8 @@ class ManifestDialog(QMainWindow):
 
     @pyqtSlot()
     def _updatewindowtitle(self):
-        self.setWindowTitle(_('Hg manifest viewer - %s:%s') % (
-            self._repo.root, self._manifest_widget.rev))
+        self.setWindowTitle(_('Manifest %s@%s') % (
+            self._manifest_widget.path, self._manifest_widget.rev))
 
     def closeEvent(self, event):
         self._writesettings()
@@ -95,6 +96,9 @@ class ManifestWidget(QWidget):
 
     revChanged = pyqtSignal(object)
     """Emitted (rev) when the current revision changed"""
+
+    pathChanged = pyqtSignal(unicode)
+    """Emitted (path) when the current file path changed"""
 
     revisionHint = pyqtSignal(unicode)
     """Emitted when to show revision summary as a hint"""
@@ -177,7 +181,11 @@ class ManifestWidget(QWidget):
                                         statusfilter=self._statusfilter.text,
                                         parent=self)
         self._treeview.setModel(self._treemodel)
-        self._treeview.selectionModel().currentChanged.connect(self._updatecontent)
+
+        selmodel = self._treeview.selectionModel()
+        selmodel.currentChanged.connect(self._updatecontent)
+        selmodel.currentChanged.connect(self._emitPathChanged)
+
         self._statusfilter.textChanged.connect(self._treemodel.setStatusFilter)
         self._statusfilter.textChanged.connect(self._autoexpandtree)
         self._autoexpandtree()
@@ -234,6 +242,10 @@ class ManifestWidget(QWidget):
 
         self._contentview.setCurrentWidget(self._fileview)
         self._fileview.setSource(self.path, self._rev)
+
+    @pyqtSlot()
+    def _emitPathChanged(self):
+        self.pathChanged.emit(self.path)
 
 # TODO: share this menu with status widget?
 class _StatusFilterButton(QToolButton):
