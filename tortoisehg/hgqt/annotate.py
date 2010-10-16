@@ -62,14 +62,13 @@ class AnnotateView(qscilib.Scintilla):
         self._summaries = {}  # by rev
         self._lastrev = None
 
-        self.thread = None
+        self._thread = _AnnotateThread(self)
+        self._thread.done.connect(self.fillModel)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            if self.thread and self.thread.isRunning():
-                self.thread.terminate()
-                self.finished()
-                return
+            self._thread.terminate()
+            return
         if event.matches(QKeySequence.FindNext):
             self.nextMatch()
             return
@@ -160,7 +159,7 @@ class AnnotateView(qscilib.Scintilla):
 
         line is counted from 1.
         """
-        if self.thread is not None:
+        if self._thread.isRunning():
             return
         try:
             ctx = self.repo[rev]
@@ -190,18 +189,11 @@ class AnnotateView(qscilib.Scintilla):
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
         self.loadBegin.emit()
-        self.thread = AnnotateThread(fctx)
-        self.thread.done.connect(self.finished)
-        self.thread.start()
+        self._thread.start(fctx)
 
-    def finished(self):
-        self.thread.wait()
-        self.loadComplete.emit()
-        if hasattr(self.thread, 'data'):
-            self.fillModel(self.thread.data)
-        self.thread = None
-
+    @pyqtSlot(object)
     def fillModel(self, data):
+        self.loadComplete.emit()
         revs, links = [], []
         sums = {}
         for fctx, origline, text in data:
@@ -360,19 +352,25 @@ class AnnotateView(qscilib.Scintilla):
         self.SendScintilla(self.SCI_INDICSETALPHA, id, 100)
         return id
 
-class AnnotateThread(QThread):
+class _AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
-    done = pyqtSignal()
-    def __init__(self, fctx):
-        super(AnnotateThread, self).__init__()
-        self.fctx = fctx
+    done = pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super(_AnnotateThread, self).__init__(parent)
+
+    @pyqtSlot(object)
+    def start(self, fctx):
+        self._fctx = fctx
+        super(_AnnotateThread, self).start()
 
     def run(self):
+        assert self.currentThread() != qApp.thread()
         data = []
-        for (fctx, line), text in self.fctx.annotate(True, True):
-            data.append([fctx, line, text])
-        self.data = data
-        self.done.emit()
+        for (fctx, line), text in self._fctx.annotate(True, True):
+            data.append((fctx, line, text))
+        self.done.emit(data)
+        del self._fctx
 
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
