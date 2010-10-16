@@ -299,11 +299,6 @@ class AnnotateView(qscilib.Scintilla):
     def prevMatch(self):
         pass # XXX
 
-    @pyqtSlot(unicode, bool, bool)
-    def searchText(self, match, icase=False, wrap=False):
-        """Search text matching to the givne regexp pattern [unicode]"""
-        self.findFirst(match, True, not icase, False, wrap)
-
     @pyqtSlot(unicode, bool)
     def highlightText(self, match, icase=False):
         """Highlight text matching to the given regexp pattern [unicode]
@@ -392,8 +387,8 @@ class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
     """Emitted (pattern, icase, wrap) when search condition changed"""
 
-    searchRequested = pyqtSignal(unicode, bool, bool)
-    """Emitted (pattern, icase, wrap) when search button pressed"""
+    searchRequested = pyqtSignal(unicode, bool, bool, bool)
+    """Emitted (pattern, icase, wrap, forward) when requested"""
 
     def __init__(self, parent=None, hidable=False):
         super(SearchToolBar, self).__init__(_('Search'), parent,
@@ -432,9 +427,9 @@ class SearchToolBar(QToolBar):
                                    self.wrapAround())
 
     @pyqtSlot()
-    def _emitSearchRequested(self):
+    def _emitSearchRequested(self, forward=True):
         self.searchRequested.emit(self.pattern(), self.caseInsensitive(),
-                                  self.wrapAround())
+                                  self.wrapAround(), forward)
 
     def pattern(self):
         """Returns the current search pattern [unicode]"""
@@ -485,7 +480,7 @@ class AnnotateDialog(QMainWindow):
         self._searchbar = SearchToolBar()
         self.addToolBar(self._searchbar)
         self._searchbar.setPattern(hglib.tounicode(opts.get('pattern', '')))
-        self._searchbar.searchRequested.connect(self.av.searchText)
+        self._searchbar.searchRequested.connect(self.av.find)
         self._searchbar.conditionChanged.connect(self.av.highlightText)
         av.searchRequested.connect(self._searchbar.search)
 

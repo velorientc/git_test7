@@ -163,9 +163,9 @@ class ManifestWidget(QWidget):
         """Return toolbar for manifest widget"""
         return self._toolbar
 
-    @pyqtSlot(unicode, bool, bool)
-    def searchText(self, pattern, icase=False, wrap=False):
-        self._fileview.searchText(pattern, icase, wrap)
+    @pyqtSlot(unicode, bool, bool, bool)
+    def find(self, pattern, icase=False, wrap=False, forward=True):
+        return self._fileview.find(pattern, icase, wrap, forward)
 
     @pyqtSlot(unicode, bool)
     def highlightText(self, pattern, icase=False):
@@ -312,7 +312,7 @@ class ManifestTaskWidget(ManifestWidget):
 def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
-    searchbar.searchRequested.connect(manifestwidget.searchText)
+    searchbar.searchRequested.connect(manifestwidget.find)
     manifestwidget.searchRequested.connect(searchbar.search)
 
 def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
