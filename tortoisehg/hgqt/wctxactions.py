@@ -289,18 +289,21 @@ def resolve(parent, ui, repo, files):
     ms = merge.mergestate(repo)
     for wfile in files:
         ms.resolve(wfile, wctx, mctx)
+    ms.commit()
     return True
 
 def unmark(parent, ui, repo, files):
     ms = merge.mergestate(repo)
     for wfile in files:
         ms.mark(wfile, 'u')
+    ms.commit()
     return True
 
 def mark(parent, ui, repo, files):
     ms = merge.mergestate(repo)
     for wfile in files:
         ms.mark(wfile, 'r')
+    ms.commit()
     return True
 
 def resolve_with(tool, repo, files):
