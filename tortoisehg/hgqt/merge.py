@@ -253,9 +253,9 @@ class MergePage(BasePage):
         wdbox.addWidget(wd_detail)
         wdbox.addSpacing(4)
 
-        wd_merged = QLabel(_('The files look already <b>merged</b>. '
-                             '<a href="skip"><b>Commit</b></a> them? or '
-                             '<a href="discard"><b>disard</b></a> merge.'))
+        wd_merged = QLabel(_('The workding directory looks already'
+                             ' <b>merged</b>. <a href="skip"><b>Commit</b></a>'
+                             ' or <a href="discard"><b>discard</b></a> merge.'))
         wd_merged.setContentsMargins(*MARGINS)
         wd_merged.linkActivated.connect(self.link_activated)
         self.groups.add(wd_merged, 'merged')
