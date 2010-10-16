@@ -903,8 +903,10 @@ table = {
          _('thg log [OPTIONS] [FILE]')),
     "manifest":
         (manifest,
-         [('r', 'rev', '', _('revision to display'))],
-         _('thg manifest [-r REV]')),
+         [('r', 'rev', '', _('revision to display')),
+          ('n', 'line', '', _('open to line')),
+          ('p', 'pattern', '', _('initial search pattern'))],
+         _('thg manifest [-r REV] [FILE]')),
     "^merge":
         (merge,
          [('r', 'rev', '', _('revision to merge'))],

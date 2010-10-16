@@ -80,6 +80,13 @@ class ManifestDialog(QMainWindow):
         s.setValue('manifest/splitter',
                    self._manifest_widget._splitter.saveState())
 
+    def setSource(self, path, rev, line=None):
+        self._manifest_widget.setSource(path, rev, line)
+
+    def setSearchPattern(self, text):
+        """Set search pattern [unicode]"""
+        self._searchbar.setPattern(text)
+
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
@@ -329,4 +336,17 @@ def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
 
 def run(ui, *pats, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-    return ManifestDialog(ui, repo, opts.get('rev'))
+    dlg = ManifestDialog(ui, repo, opts.get('rev'))
+
+    # set initial state after dialog visible
+    def init():
+        try:
+            path = hglib.canonpaths(pats)[0]
+            line = opts.get('line') and int(opts['line']) or None
+            dlg.setSource(path, opts.get('rev'), line)
+        except IndexError:
+            pass
+        dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
+    QTimer.singleShot(0, init)
+
+    return dlg
