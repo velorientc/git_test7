@@ -132,8 +132,8 @@ class ManifestWidget(QWidget):
         self._nullcontent = QWidget()
         self._contentview.addWidget(self._nullcontent)
         self._fileview = annotate.AnnotateView(self._repo)
+        self._fileview.sourceChanged.connect(self.setSource)
         self._contentview.addWidget(self._fileview)
-        self._fileview.revSelected.connect(lambda a: self.setSource(*a[:3]))
         for name in ('revisionHint', 'searchRequested', 'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
 
@@ -189,16 +189,19 @@ class ManifestWidget(QWidget):
         """Change revision to show"""
         self.setSource(self.path, rev)
 
+    @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
     def setSource(self, path, rev, line=None):
         """Change path and revision to show at once"""
-        if self._rev != rev:
+        revchanged = self._rev != rev
+        if revchanged:
             self._rev = rev
             self._setupmodel()
-            self.revchanged.emit(rev)
         self.setpath(path)
         if self.path in self._repo[rev]:
             self._fileview.setSource(path, rev, line)
+        if revchanged:
+            self.revchanged.emit(rev)
 
     @property
     def path(self):

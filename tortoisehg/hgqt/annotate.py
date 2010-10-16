@@ -29,7 +29,6 @@ class AnnotateView(qscilib.Scintilla):
     searchRequested = pyqtSignal(QString)
     """Emitted (pattern) when user request to search content"""
 
-    revSelected = pyqtSignal(object)
     editSelected = pyqtSignal(object)
 
     grepRequested = pyqtSignal(QString, dict)
@@ -119,7 +118,7 @@ class AnnotateView(qscilib.Scintilla):
                 add(name, func)
 
         def annorig():
-            self.revSelected.emit(data)
+            self.setSource(*data)
         def editorig():
             self.editSelected.emit(data)
         menu.addSeparator()
@@ -132,7 +131,7 @@ class AnnotateView(qscilib.Scintilla):
         for pfctx in fctx.parents():
             pdata = [pfctx.path(), pfctx.changectx().rev(), line]
             def annparent(data):
-                self.revSelected.emit(data)
+                self.setSource(*data)
             def editparent(data):
                 self.editSelected.emit(data)
             for name, func in [(_('Annotate parent revision %d') % pdata[1],
@@ -478,7 +477,6 @@ class AnnotateDialog(QMainWindow):
         status = QStatusBar()
         self.setStatusBar(status)
         av.revisionHint.connect(status.showMessage)
-        av.revSelected.connect(lambda data: self.av.setSource(*data))
         av.editSelected.connect(self.editSelected)
         av.grepRequested.connect(self._openSearchWidget)
 
