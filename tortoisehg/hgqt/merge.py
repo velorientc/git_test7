@@ -8,7 +8,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui
+from mercurial import hg, ui, error
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, paths
@@ -203,9 +203,14 @@ class MergePage(BasePage):
         ## merge target
         other_sep = qtlib.LabeledSeparator(_('Merge from (other revision)'))
         box.addWidget(other_sep)
-        other_info = create(self.wizard().other)
-        other_info.setContentsMargins(5, 0, 0, 0)
-        box.addWidget(other_info)
+        try:
+            other_info = create(self.wizard().other)
+            other_info.setContentsMargins(5, 0, 0, 0)
+            box.addWidget(other_info)
+        except error.RepoLookupError:
+            qtlib.InfoMsgBox(_('Unable to merge'),
+                             _('Merge revision not specified or not found'))
+            QTimer.singleShot(0, self.wizard().close)
 
         ### discard option
         discard_chk = QCheckBox(_('Discard all changes from merge target '
@@ -441,7 +446,7 @@ class MergePage(BasePage):
                 dirty = bool(wctx.dirty()) or unresolved
                 self.completed.emit(dirty, len(wctx.parents()))
         def completed(dirty, parents):
-            self.clean = not dirty
+            self.clean = not dirty or parents == 2
             self.groups.set_visible(False, 'prog')
             self.groups.set_visible(dirty, 'detail')
             if dirty:
