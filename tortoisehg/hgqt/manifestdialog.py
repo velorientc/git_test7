@@ -83,15 +83,6 @@ class ManifestDialog(QMainWindow):
         from tortoisehg.hgqt import run
         run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
 
-class _NullView(QWidget):
-    """empty widget for content view"""
-    def __init__(self, parent=None):
-        super(_NullView, self).__init__(parent)
-
-    @pyqtSlot(unicode, object)
-    def setSource(self, path, rev):
-        pass
-
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
     revchanged = pyqtSignal(object)  # emit when curret revision changed
@@ -138,14 +129,13 @@ class ManifestWidget(QWidget):
         self._splitter.setStretchFactor(0, 1)
         self._splitter.setStretchFactor(1, 3)
 
-        self._nullcontent = _NullView()
+        self._nullcontent = QWidget()
         self._contentview.addWidget(self._nullcontent)
         self._fileview = annotate.AnnotateView(self._repo)
         self._contentview.addWidget(self._fileview)
         self._fileview.revSelected.connect(lambda a: self.setSource(*a[:3]))
         for name in ('revisionHint', 'searchRequested', 'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
-        self._contentview.currentChanged.connect(self._updatecontent)
 
     def _initactions(self):
         self._statusfilter = _StatusFilterButton(text='MAC')
@@ -227,7 +217,7 @@ class ManifestWidget(QWidget):
             return
 
         self._contentview.setCurrentWidget(self._fileview)
-        self._contentview.currentWidget().setSource(self.path, self._rev)
+        self._fileview.setSource(self.path, self._rev)
 
 # TODO: share this menu with status widget?
 class _StatusFilterButton(QToolButton):
