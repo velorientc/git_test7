@@ -158,6 +158,11 @@ class AnnotateView(qscilib.Scintilla):
 
         line is counted from 1.
         """
+        if self.annfile == wfile and self.rev == rev:
+            if line:
+                self.setCursorPosition(line - 1, 0)
+            return
+
         try:
             ctx = self.repo[rev]
             fctx = ctx[hglib.fromunicode(wfile)]
