@@ -9,6 +9,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import hg, ui
+from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
@@ -17,6 +18,7 @@ from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, thgrepo, commit
 keep = i18n.keepgettext()
 
 MERGE_PAGE  = 0
+#RESOLVE_PAGE = 1
 COMMIT_PAGE = 1
 RESULT_PAGE = 2
 
@@ -24,7 +26,8 @@ class MergeDialog(QWizard):
 
     def __init__(self, other, repo=None, parent=None):
         super(MergeDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        f = self.windowFlags()
+        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
         self.other = str(other)
@@ -439,6 +442,7 @@ class MergePage(BasePage):
         elif cmd == 'view':
             dlg = status.StatusDialog([], {}, self.wizard().repo.root, self)
             dlg.exec_()
+            self.check_status()
         elif cmd == 'skip':
             self.done = True
             self.wizard().next()
@@ -452,8 +456,14 @@ class MergePage(BasePage):
         class CheckThread(QThread):
             completed = pyqtSignal(bool, int)
             def run(self):
+                ms = mergemod.mergestate(repo)
+                unresolved = False
+                for path in ms:
+                    if ms[path] == 'u':
+                        unresolved = True
                 wctx = repo[None]
-                self.completed.emit(bool(wctx.dirty()), len(wctx.parents()))
+                dirty = bool(wctx.dirty()) or unresolved
+                self.completed.emit(dirty, len(wctx.parents()))
         def completed(dirty, parents):
             self.clean = not dirty
             self.groups.set_visible(False, 'prog')
@@ -644,5 +654,5 @@ def run(ui, *pats, **opts):
     rev = opts.get('rev') or None
     if not rev and len(pats):
         rev = pats[0]
-    repo = thgrepo.repository(ui, path= paths.find_root())
+    repo = thgrepo.repository(ui, path=paths.find_root())
     return MergeDialog(rev, repo)
