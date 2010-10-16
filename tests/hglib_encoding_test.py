@@ -1,21 +1,7 @@
 """Test for encoding helper functions of tortoisehg.util.hglib"""
 from nose.tools import *
 from tortoisehg.util import hglib
-
-def with_encoding(encoding, fallbackencoding=None):
-    """Change locale encoding temporarily"""
-    orig_encoding = hglib._encoding
-    orig_fallbackencoding = hglib._fallbackencoding
-
-    def setenc():
-        hglib._encoding = encoding
-        hglib._fallbackencoding = fallbackencoding or encoding
-
-    def restoreenc():
-        hglib._encoding = orig_encoding
-        hglib._fallbackencoding = orig_fallbackencoding
-
-    return with_setup(setenc, restoreenc)
+from tests import with_encoding
 
 JAPANESE_KANA_I = u'\u30a4'  # Japanese katakana "i"
 
