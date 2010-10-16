@@ -8,18 +8,25 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+import os
+
 from mercurial import hg, ui, error
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, thgrepo, commit
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, thgrepo
+from tortoisehg.hgqt import commit, wctxactions, visdiff
 
 keep = i18n.keepgettext()
 
+# TODO:
+#  Connect merge page to repositoryChanged signal, refresh if current page
+
 MERGE_PAGE  = 0
-COMMIT_PAGE = 1
-RESULT_PAGE = 2
+RESOLVE_PAGE = 1
+COMMIT_PAGE = 2
+RESULT_PAGE = 3
 
 class MergeDialog(QWizard):
 
@@ -41,6 +48,7 @@ class MergeDialog(QWizard):
 
         # set pages
         self.setPage(MERGE_PAGE, MergePage(self))
+        self.setPage(RESOLVE_PAGE, ResolvePage(self))
         self.setPage(COMMIT_PAGE, CommitPage(self))
         self.setPage(RESULT_PAGE, ResultPage(self))
 
@@ -372,8 +380,6 @@ class MergePage(BasePage):
             def finished(ret):
                 repo.decrementBusyCount()
                 if ret == 0:
-                    repo.incrementBusyCount()
-                    repo.decrementBusyCount()
                     def callback():
                         text = _('Outstanding changes are saved to <b>'
                                  '%(name)s</b> in the patch queue.  <a href'
@@ -384,8 +390,7 @@ class MergePage(BasePage):
             self.runner = cmdui.Runner(_('MQ - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
-            self.runner.run(['qnew', patch],
-                            ['qpop', '--all'])
+            self.runner.run(['qnew', patch], ['qpop', '--all'])
         elif cmd.startswith('discard'):
             if cmd != 'discard:noconfirm':
                 labels = [(QMessageBox.Yes, _('&Discard')),
@@ -448,7 +453,7 @@ class MergePage(BasePage):
                 dirty = bool(wctx.dirty()) or unresolved
                 self.completed.emit(dirty, len(wctx.parents()))
         def completed(dirty, parents):
-            self.clean = not dirty or parents == 2
+            self.clean = not dirty
             self.groups.set_visible(False, 'prog')
             self.groups.set_visible(dirty, 'detail')
             if dirty:
@@ -466,6 +471,266 @@ class MergePage(BasePage):
         self.th = CheckThread()
         self.th.completed.connect(completed)
         self.th.start()
+
+
+class ResolvePage(QWizardPage):
+
+    def __init__(self, parent=None):
+        super(ResolvePage, self).__init__(parent)
+        self.setTitle(_('Resolve conflicts'))
+
+    ### Override Method ###
+
+    def initializePage(self):
+        if self.layout():
+            self.refresh()
+            self.utree.selectAll()
+            return
+
+        box = QVBoxLayout()
+        box.setContentsMargins(*MARGINS)
+        self.setLayout(box)
+
+        unres = qtlib.LabeledSeparator(_('Unresolved conflicts'))
+        box.addWidget(unres)
+        self.utree = PathsTree(self)
+        box.addWidget(self.utree)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(*MARGINS)
+        box.addLayout(hbox)
+        auto = QPushButton(_('Auto'))
+        auto.setToolTip(_('Attempt automatic merge'))
+        auto.clicked.connect(lambda: self.merge('internal:merge'))
+        manual = QPushButton(_('Manual'))
+        manual.setToolTip(_('Merge with selected merge tool'))
+        manual.clicked.connect(self.merge)
+        local = QPushButton(_('Take Local'))
+        local.setToolTip(_('Accept the local file version (yours)'))
+        local.clicked.connect(lambda: self.merge('internal:local'))
+        other = QPushButton(_('Take Other'))
+        other.setToolTip(_('Accept the other file version (theirs)'))
+        other.clicked.connect(lambda: self.merge('internal:other'))
+        res = QPushButton(_('Mark'))
+        res.setToolTip(_('Mark this file as resolved'))
+        res.clicked.connect(self.markresolved)
+        hbox.addWidget(auto)
+        hbox.addWidget(manual)
+        hbox.addWidget(local)
+        hbox.addWidget(other)
+        hbox.addWidget(res)
+        hbox.addStretch(1)
+        self.ubuttons = (auto, manual, local, other, res)
+
+        res = qtlib.LabeledSeparator(_('Resolved conflicts'))
+        box.addWidget(res)
+        self.rtree = PathsTree(self)
+        box.addWidget(self.rtree)
+
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(*MARGINS)
+        box.addLayout(hbox)
+        edit = QPushButton(_('Edit'))
+        edit.setToolTip(_('Edit resolved file'))
+        edit.clicked.connect(self.edit)
+        v3way = QPushButton(_('3Way'))
+        v3way.setToolTip(_('Visual three-way diff'))
+        v3way.clicked.connect(self.v3way)
+        vp0 = QPushButton(_('To Local'))
+        vp0.setToolTip(_('Visual diff between resolved file and first parent'))
+        vp0.clicked.connect(self.vp0)
+        vp1 = QPushButton(_('To Other'))
+        vp1.setToolTip(_('Visual diff between resolved file and second parent'))
+        vp1.clicked.connect(self.vp1)
+        ures = QPushButton(_('Unmark'))
+        ures.setToolTip(_('Mark this file as unresolved'))
+        ures.clicked.connect(self.markunresolved)
+        hbox.addWidget(edit)
+        hbox.addWidget(v3way)
+        hbox.addWidget(vp0)
+        hbox.addWidget(vp1)
+        hbox.addWidget(ures)
+        hbox.addStretch(1)
+        self.rbuttons = (edit, v3way, vp0, vp1, ures)
+
+        out = qtlib.LabeledSeparator(_('Command output'))
+        box.addWidget(out)
+        self.cmd = cmdui.Widget(True, self)
+        self.cmd.commandFinished.connect(self.refresh)
+        self.cmd.show_output(True)
+        box.addWidget(self.cmd)
+
+        self.wizard().setOption(QWizard.HaveHelpButton, False)
+        self.wizard().setOption(QWizard.NoCancelButton, True)
+        self.wizard().setOption(QWizard.HaveCustomButton1, False)
+
+        self.refresh()
+        self.utree.selectAll()
+
+    def merge(self, tool=None):
+        cmdlines = []
+        for idx in self.utree.selectionModel().selectedRows():
+            path = hglib.fromunicode(idx.data().toString())
+            cmd = ['resolve', '--config', 'ui.merge='+tool, path]
+            cmdlines.append(cmd)
+        if cmdlines:
+            self.cmd.run(*cmdlines)
+
+    def markresolved(self):
+        paths = []
+        for idx in self.utree.selectionModel().selectedRows():
+            path = hglib.fromunicode(idx.data().toString())
+            paths.append(path)
+        if paths:
+            self.cmd.run(['resolve', '--mark'] + paths)
+
+    def markunresolved(self):
+        paths = []
+        for idx in self.rtree.selectionModel().selectedRows():
+            path = hglib.fromunicode(idx.data().toString())
+            paths.append(path)
+        if paths:
+            self.cmd.run(['resolve', '--unmark'] + paths)
+
+    def edit(self):
+        repo = self.wizard().repo
+        paths = []
+        for idx in self.rtree.selectionModel().selectedRows():
+            path = hglib.fromunicode(idx.data().toString())
+            paths.append(path)
+        if paths:
+            wctxactions.edit(self, repo.ui, repo, paths)
+
+    def v3way(self):
+        repo = self.wizard().repo
+        paths = []
+        for idx in self.rtree.selectionModel().selectedRows():
+            path = hglib.fromunicode(idx.data().toString())
+            paths.append(path)
+        if paths:
+            visdiff.visualdiff(repo.ui, repo, paths, {'rev':[]})
+
+    def vp0(self):
+        repo = self.wizard().repo
+        paths = []
+        for idx in self.rtree.selectionModel().selectedRows():
+            path = hglib.fromunicode(idx.data().toString())
+            paths.append(path)
+        if paths:
+            pair = [str(repo.parents()[0].rev()), '.']
+            visdiff.visualdiff(repo.ui, repo, paths, {'rev':pair})
+
+    def vp1(self):
+        repo = self.wizard().repo
+        paths = []
+        for idx in self.rtree.selectionModel().selectedRows():
+            path = hglib.fromunicode(idx.data().toString())
+            paths.append(path)
+        if paths:
+            pair = [str(repo.parents()[1].rev()), '.']
+            visdiff.visualdiff(repo.ui, repo, paths, {'rev':pair})
+
+    def refresh(self):
+        repo = self.wizard().repo
+        ms = mergemod.mergestate(repo)
+        u, r = [], []
+        for path in ms:
+            if ms[path] == 'u':
+                u.append(path)
+            else:
+                r.append(path)
+        self.utree.setModel(PathsModel(u, self))
+        self.utree.resizeColumnToContents(0)
+        def uchanged(l):
+            for b in self.ubuttons:
+                b.setEnabled(not l.isEmpty())
+        self.utree.selectionModel().selectionChanged.connect(uchanged)
+        uchanged(QItemSelection())
+        self.rtree.setModel(PathsModel(r, self))
+        self.rtree.resizeColumnToContents(0)
+        def rchanged(l):
+            for b in self.rbuttons:
+                b.setEnabled(not l.isEmpty())
+        self.rtree.selectionModel().selectionChanged.connect(rchanged)
+        rchanged(QItemSelection())
+        self.completeChanged.emit()
+
+    def isComplete(self):
+        model = self.utree.model()
+        if model is None:
+            return False
+        return len(model) == 0
+
+class PathsTree(QTreeView):
+    def __init__(self, repo, parent=None):
+        QTreeView.__init__(self, parent)
+        self.repo = repo
+        self.setSelectionMode(QTreeView.ExtendedSelection)
+
+    def dragObject(self):
+        urls = []
+        for index in self.selectionModel().selectedRows():
+            path = self.model().getRow(index)[COL_PATH]
+            u = QUrl()
+            u.setPath('file://' + os.path.join(self.repo.root, path))
+            urls.append(u)
+        if urls:
+            d = QDrag(self)
+            m = QMimeData()
+            m.setUrls(urls)
+            d.setMimeData(m)
+            d.start(Qt.CopyAction)
+
+    def mousePressEvent(self, event):
+        self.pressPos = event.pos()
+        self.pressTime = QTime.currentTime()
+        return QTreeView.mousePressEvent(self, event)
+
+    def mouseMoveEvent(self, event):
+        d = event.pos() - self.pressPos
+        if d.manhattanLength() < QApplication.startDragDistance():
+            return QTreeView.mouseMoveEvent(self, event)
+        elapsed = self.pressTime.msecsTo(QTime.currentTime())
+        if elapsed < QApplication.startDragTime():
+            return QTreeView.mouseMoveEvent(self, event)
+        self.dragObject()
+        return QTreeView.mouseMoveEvent(self, event)
+
+class PathsModel(QAbstractTableModel):
+    def __init__(self, pathlist, parent=None):
+        QAbstractTableModel.__init__(self, parent)
+        self.headers = (_('Path'), _('Ext'))
+        self.rows = []
+        for path in pathlist:
+            name, ext = os.path.splitext(path)
+            self.rows.append([path, ext])
+
+    def __len__(self):
+        return len(self.rows)
+
+    def rowCount(self, parent):
+        if parent.isValid():
+            return 0 # no child
+        return len(self.rows)
+
+    def columnCount(self, parent):
+        if parent.isValid():
+            return 0 # no child
+        return len(self.headers)
+
+    def data(self, index, role):
+        if not index.isValid():
+            return QVariant()
+        if role == Qt.DisplayRole:
+            data = self.rows[index.row()][index.column()]
+            return QVariant(hglib.tounicode(data))
+        return QVariant()
+
+    def headerData(self, col, orientation, role):
+        if role != Qt.DisplayRole or orientation != Qt.Horizontal:
+            return QVariant()
+        else:
+            return QVariant(self.headers[col])
 
 class CommitPage(BasePage):
 
@@ -632,6 +897,9 @@ class ResultPage(QWizardPage):
         self.wizard().setOption(QWizard.HaveHelpButton, False)
         self.wizard().setOption(QWizard.NoCancelButton, True)
         self.wizard().setOption(QWizard.HaveCustomButton1, False)
+
+    def isFinalPage(self):
+        return True
 
 def run(ui, *pats, **opts):
     rev = opts.get('rev') or None
