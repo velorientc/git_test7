@@ -41,7 +41,7 @@ class ManifestDialog(QMainWindow):
         self.resize(400, 300)
 
         self._manifest_widget = ManifestWidget(ui, repo, rev)
-        self._manifest_widget.revchanged.connect(self._updatewindowtitle)
+        self._manifest_widget.revChanged.connect(self._updatewindowtitle)
         self._manifest_widget.editSelected.connect(self._openInEditor)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
         self.setCentralWidget(self._manifest_widget)
@@ -94,7 +94,9 @@ class ManifestDialog(QMainWindow):
 
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
-    revchanged = pyqtSignal(object)  # emit when curret revision changed
+
+    revChanged = pyqtSignal(object)
+    """Emitted (rev) when the current revision changed"""
 
     revisionHint = pyqtSignal(unicode)
     """Emitted when to show revision summary as a hint"""
@@ -198,7 +200,7 @@ class ManifestWidget(QWidget):
         return self._rev
 
     @pyqtSlot(object)
-    def setrev(self, rev):
+    def setRev(self, rev):
         """Change revision to show"""
         self.setSource(self.path, rev)
 
@@ -210,11 +212,11 @@ class ManifestWidget(QWidget):
         if revchanged:
             self._rev = rev
             self._setupmodel()
-        self.setpath(path)
+        self.setPath(path)
         if self.path in self._repo[rev]:
             self._fileview.setSource(path, rev, line)
         if revchanged:
-            self.revchanged.emit(rev)
+            self.revChanged.emit(rev)
 
     @property
     def path(self):
@@ -222,7 +224,7 @@ class ManifestWidget(QWidget):
         return self._treemodel.filePath(self._treeview.currentIndex())
 
     @pyqtSlot(unicode)
-    def setpath(self, path):
+    def setPath(self, path):
         """Change path to show"""
         self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
 

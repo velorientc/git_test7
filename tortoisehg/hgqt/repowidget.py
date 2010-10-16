@@ -185,8 +185,8 @@ class RepoWidget(QWidget):
         w = ManifestTaskWidget(self.repo.ui, self.repo, rev=filterrev(self.rev),
                                parent=self)
         self.repoview.revisionClicked.connect(lambda rev:
-                           w.setrev(filterrev(rev)))
-        w.revchanged.connect(self.repoview.goto)
+                           w.setRev(filterrev(rev)))
+        w.revChanged.connect(self.repoview.goto)
         w.revisionHint.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
         return w
@@ -444,7 +444,7 @@ class RepoWidget(QWidget):
             # patch ctx
         else:
             self.revDetailsWidget.revision_selected(rev)
-            self.manifestDemand.forward('setrev', rev)
+            self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
 
     def goto(self, rev):
