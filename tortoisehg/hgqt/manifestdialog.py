@@ -145,8 +145,7 @@ class ManifestWidget(QWidget):
         self._fileview.revSelected.connect(lambda a: self.setSource(*a[:2]))
         for name in ('revisionHint', 'searchRequested', 'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
-        self._contentview.currentChanged.connect(
-            lambda: self._fileselected(self._treeview.currentIndex()))
+        self._contentview.currentChanged.connect(self._updatecontent)
 
     def _initactions(self):
         self._statusfilter = _StatusFilterButton(text='MAC')
@@ -175,7 +174,7 @@ class ManifestWidget(QWidget):
                                         statusfilter=self._statusfilter.text,
                                         parent=self)
         self._treeview.setModel(self._treemodel)
-        self._treeview.selectionModel().currentChanged.connect(self._fileselected)
+        self._treeview.selectionModel().currentChanged.connect(self._updatecontent)
         self._statusfilter.textChanged.connect(self._treemodel.setStatusFilter)
         self._statusfilter.textChanged.connect(self._autoexpandtree)
         self._autoexpandtree()
@@ -219,17 +218,14 @@ class ManifestWidget(QWidget):
         """Change path to show"""
         self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
 
-    # disabled due to the issue of PyQt 4.7.4.
-    # see http://thread.gmane.org/gmane.comp.python.pyqt-pykde/19836
-    #@pyqtSlot(QModelIndex)
-    def _fileselected(self, index):
-        path = self._treemodel.filePath(index)
-        if path not in self._repo[self._rev]:
+    @pyqtSlot()
+    def _updatecontent(self):
+        if self.path not in self._repo[self._rev]:
             self._contentview.setCurrentWidget(self._nullcontent)
             return
 
         self._contentview.setCurrentWidget(self._fileview)
-        self._contentview.currentWidget().setSource(path, self._rev)
+        self._contentview.currentWidget().setSource(self.path, self._rev)
 
 # TODO: share this menu with status widget?
 class _StatusFilterButton(QToolButton):
