@@ -212,7 +212,7 @@ class ManifestWidget(QWidget):
 
     @pyqtSlot()
     def _updatecontent(self):
-        if self.path not in self._repo[self._rev]:
+        if hglib.fromunicode(self.path) not in self._repo[self._rev]:
             self._contentview.setCurrentWidget(self._nullcontent)
             return
 

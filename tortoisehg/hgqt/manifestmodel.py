@@ -14,6 +14,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import util
+from tortoisehg.util import hglib
 from tortoisehg.hgqt import qtlib, status, visdiff
 
 class ManifestModel(QAbstractItemModel):
@@ -48,6 +49,7 @@ class ManifestModel(QAbstractItemModel):
             return e.name
 
     def filePath(self, index):
+        """Return path at the given index [unicode]"""
         if not index.isValid():
             return ''
 
@@ -112,7 +114,10 @@ class ManifestModel(QAbstractItemModel):
             return QModelIndex()
 
     def indexFromPath(self, path, column=0):
-        """Return index for the specified path if found; otherwise invalid index"""
+        """Return index for the specified path if found [unicode]
+
+        If not found, returns invalid index.
+        """
         if not path:
             return QModelIndex()
 
@@ -194,7 +199,7 @@ class ManifestModel(QAbstractItemModel):
                 continue
 
             e = roote
-            for p in path.split('/'):
+            for p in hglib.tounicode(path).split('/'):
                 if not p in e:
                     e.addchild(p)
                 e = e[p]

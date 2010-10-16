@@ -1,14 +1,18 @@
 from nose.tools import *
 from PyQt4.QtCore import QModelIndex
 from tortoisehg.hgqt.manifestmodel import ManifestModel
-from tests import get_fixture_repo
+from tests import get_fixture_repo, with_encoding
+
+_aloha_ja = u'\u3042\u308d\u306f\u30fc'
 
 def setup():
-    global _repo
-    _repo = get_fixture_repo('subdirs')
+    global _repos
+    _repos = {}
+    for name in ('subdirs', 'euc-jp-path'):
+        _repos[name] = get_fixture_repo(name)
 
-def newmodel(rev=0):
-    return ManifestModel(_repo, rev=rev)
+def newmodel(name='subdirs', rev=0):
+    return ManifestModel(_repos[name], rev=rev)
 
 def test_data():
     m = newmodel()
@@ -25,6 +29,11 @@ def test_data_inexistent():
     m = newmodel()
     assert_equals(None, m.data(QModelIndex()))
     assert_equals(None, m.data(m.index(0, 0, m.index(1, 0))))
+
+@with_encoding('euc-jp')
+def test_data_eucjp():
+    m = newmodel(name='euc-jp-path')
+    assert_equals(_aloha_ja, m.data(m.index(0, 0)))
 
 def test_isdir():
     m = newmodel()
@@ -51,12 +60,22 @@ def test_pathfromindex():
     assert_equals('baz', m.filePath(m.index(0, 0)))
     assert_equals('baz/bax', m.filePath(m.index(0, 0, m.index(0, 0))))
 
+@with_encoding('euc-jp')
+def test_pathfromindex_eucjp():
+    m = newmodel(name='euc-jp-path')
+    assert_equals(_aloha_ja, m.filePath(m.index(0, 0)))
+
 def test_indexfrompath():
     m = newmodel()
     assert_equals(QModelIndex(), m.indexFromPath(''))
     assert_equals(m.index(1, 0), m.indexFromPath('bar'))
     assert_equals(m.index(0, 0), m.indexFromPath('baz'))
     assert_equals(m.index(0, 0, m.index(0, 0)), m.indexFromPath('baz/bax'))
+
+@with_encoding('euc-jp')
+def test_indexfrompath_eucjp():
+    m = newmodel(name='euc-jp-path')
+    assert_equals(m.index(0, 0), m.indexFromPath(_aloha_ja))
 
 def test_removed_should_be_listed():
     m = newmodel(rev=1)
