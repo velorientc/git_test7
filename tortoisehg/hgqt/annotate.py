@@ -97,7 +97,7 @@ class AnnotateView(qscilib.Scintilla):
             return menu.exec_(point)
 
         fctx, line = self._links[line]
-        data = [fctx.path(), fctx.linkrev(), line]
+        data = [hglib.tounicode(fctx.path()), fctx.linkrev(), line]
 
         if self.hasSelectedText():
             selection = self.selectedText()
@@ -129,7 +129,8 @@ class AnnotateView(qscilib.Scintilla):
                 action.triggered.connect(func)
             add(name, func)
         for pfctx in fctx.parents():
-            pdata = [pfctx.path(), pfctx.changectx().rev(), line]
+            pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
+                     line]
             def annparent(data):
                 self.setSource(*data)
             def editparent(data):
