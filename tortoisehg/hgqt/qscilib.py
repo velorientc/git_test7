@@ -205,7 +205,7 @@ class SearchToolBar(QToolBar):
     searchRequested = pyqtSignal(unicode, bool, bool, bool)
     """Emitted (pattern, icase, wrap, forward) when requested"""
 
-    def __init__(self, parent=None, hidable=False):
+    def __init__(self, parent=None, hidable=False, settings=None):
         super(SearchToolBar, self).__init__(_('Search'), parent,
                                             objectName='search',
                                             iconSize=QSize(16, 16))
@@ -219,15 +219,12 @@ class SearchToolBar(QToolBar):
                            toolTip=_('Regular expression search pattern'))
         self.addWidget(self._lbl)
         self._le = QLineEdit()
-        self._le.textChanged.connect(self._emitConditionChanged)
         self._le.returnPressed.connect(self._emitSearchRequested)
         self._lbl.setBuddy(self._le)
         self.addWidget(self._le)
         self._chk = QCheckBox(_('Ignore case'))
-        self._chk.toggled.connect(self._emitConditionChanged)
         self.addWidget(self._chk)
         self._wrapchk = QCheckBox(_('Wrap search'))
-        self._wrapchk.toggled.connect(self._emitConditionChanged)
         self.addWidget(self._wrapchk)
         self._bt = QPushButton(_('Search'), enabled=False)
         self._bt.clicked.connect(self._emitSearchRequested)
@@ -235,6 +232,18 @@ class SearchToolBar(QToolBar):
         self.addWidget(self._bt)
 
         self.setFocusProxy(self._le)
+
+        def defaultsettings():
+            s = QSettings()
+            s.beginGroup('searchtoolbar')
+            return s
+        self._settings = settings or defaultsettings()
+        self.searchRequested.connect(self._writesettings)
+        self._readsettings()
+
+        self._le.textChanged.connect(self._emitConditionChanged)
+        self._chk.toggled.connect(self._emitConditionChanged)
+        self._wrapchk.toggled.connect(self._emitConditionChanged)
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.FindNext):
@@ -253,6 +262,15 @@ class SearchToolBar(QToolBar):
             self._emitSearchRequested(forward=True)
             return
         super(SearchToolBar, self).wheelEvent(event)
+
+    def _readsettings(self):
+        self.setCaseInsensitive(self._settings.value('icase', False).toBool())
+        self.setWrapAround(self._settings.value('wrap', False).toBool())
+
+    @pyqtSlot()
+    def _writesettings(self):
+        self._settings.setValue('icase', self.caseInsensitive())
+        self._settings.setValue('wrap', self.wrapAround())
 
     @pyqtSlot()
     def _emitConditionChanged(self):

@@ -448,13 +448,10 @@ class AnnotateDialog(QMainWindow):
     def storeSettings(self):
         s = QSettings()
         s.setValue('annotate/geom', self.saveGeometry())
-        s.setValue('annotate/wrap', self._searchbar.wrapAround())
 
     def restoreSettings(self):
         s = QSettings()
         self.restoreGeometry(s.value('annotate/geom').toByteArray())
-        wrap = s.value('annotate/wrap', False).toBool()
-        self._searchbar.setWrapAround(wrap)
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
