@@ -42,6 +42,8 @@ class ManifestDialog(QMainWindow):
         self._searchbar = qscilib.SearchToolBar()
         connectsearchbar(self._manifest_widget, self._searchbar)
         self.addToolBar(self._searchbar)
+        QShortcut(QKeySequence.Find, self,
+            lambda: self._searchbar.setFocus(Qt.OtherFocusReason))
 
         self.setStatusBar(QStatusBar())
         self._manifest_widget.revisionHint.connect(self.statusBar().showMessage)
