@@ -158,8 +158,6 @@ class AnnotateView(qscilib.Scintilla):
 
         line is counted from 1.
         """
-        if self._thread.isRunning():
-            return
         try:
             ctx = self.repo[rev]
             fctx = ctx[hglib.fromunicode(wfile)]
@@ -187,6 +185,7 @@ class AnnotateView(qscilib.Scintilla):
         agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
         self.cm = colormap.AnnotateColorSaturation(agedays)
         self.curdate = curdate
+        self._thread.abort()
         self._thread.start(fctx)
 
     @pyqtSlot(object)
