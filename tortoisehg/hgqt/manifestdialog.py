@@ -17,6 +17,7 @@
 """
 Qt4 dialogs to display hg revisions of a file
 """
+import os
 
 from mercurial import util
 
@@ -25,7 +26,7 @@ from PyQt4.QtGui import *
 
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import qtlib, annotate, status, thgrepo
+from tortoisehg.hgqt import qtlib, annotate, status, thgrepo, visdiff, wctxactions
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -40,6 +41,7 @@ class ManifestDialog(QMainWindow):
 
         self._manifest_widget = ManifestWidget(ui, repo, rev)
         self._manifest_widget.revchanged.connect(self._updatewindowtitle)
+        self._manifest_widget.editSelected.connect(self._openInEditor)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
@@ -83,6 +85,12 @@ class ManifestDialog(QMainWindow):
         from tortoisehg.hgqt import run
         run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
 
+    @pyqtSlot(unicode, object, int)
+    def _openInEditor(self, path, rev, line):
+        """Open editor to show the specified file"""
+        _openineditor(self._repo, path, rev, line,
+                      pattern=self._searchbar.pattern(), parent=self)
+
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
     revchanged = pyqtSignal(object)  # emit when curret revision changed
@@ -92,6 +100,9 @@ class ManifestWidget(QWidget):
 
     searchRequested = pyqtSignal(unicode)
     """Emitted (pattern) when user request to search content"""
+
+    editSelected = pyqtSignal(unicode, object, int)
+    """Emitted (path, rev, line) when user requests to open editor"""
 
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
@@ -134,7 +145,8 @@ class ManifestWidget(QWidget):
         self._fileview = annotate.AnnotateView(self._repo)
         self._fileview.sourceChanged.connect(self.setSource)
         self._contentview.addWidget(self._fileview)
-        for name in ('revisionHint', 'searchRequested', 'grepRequested'):
+        for name in ('revisionHint', 'searchRequested', 'editSelected',
+                     'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
 
     def _initactions(self):
@@ -274,6 +286,10 @@ class _StatusFilterButton(QToolButton):
 class ManifestTaskWidget(ManifestWidget):
     """Manifest widget designed for task tab"""
 
+    def __init__(self, ui, repo, rev=None, parent=None):
+        super(ManifestTaskWidget, self).__init__(ui, repo, rev, parent)
+        self.editSelected.connect(self._openInEditor)
+
     @pyqtSlot()
     def showSearchBar(self):
         self._searchbar.show()
@@ -287,11 +303,25 @@ class ManifestTaskWidget(ManifestWidget):
         connectsearchbar(self, searchbar)
         return searchbar
 
+    @pyqtSlot(unicode, object, int)
+    def _openInEditor(self, path, rev, line):
+        """Open editor to show the specified file"""
+        _openineditor(self._repo, path, rev, line,
+                      pattern=self._searchbar.pattern(), parent=self)
+
 def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
     searchbar.searchRequested.connect(manifestwidget.searchText)
     manifestwidget.searchRequested.connect(searchbar.search)
+
+def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
+    """Open editor to show the specified file [unicode]"""
+    path = hglib.fromunicode(path)
+    pattern = hglib.fromunicode(pattern)
+    base = visdiff.snapshot(repo, [path], repo[rev])[0]
+    files = [os.path.join(base, path)]
+    wctxactions.edit(parent, repo.ui, repo, files, line, pattern)
 
 
 def run(ui, *pats, **opts):
