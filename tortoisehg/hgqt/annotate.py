@@ -191,7 +191,7 @@ class AnnotateView(qscilib.Scintilla):
     def fillModel(self, data):
         revs, links = [], []
         sums = {}
-        for fctx, origline, text in data:
+        for fctx, origline in data:
             rev = fctx.linkrev()
             revs.append(rev)
             links.append([fctx, origline])
@@ -362,8 +362,8 @@ class _AnnotateThread(QThread):
     def run(self):
         assert self.currentThread() != qApp.thread()
         data = []
-        for (fctx, line), text in self._fctx.annotate(True, True):
-            data.append((fctx, line, text))
+        for (fctx, line), _text in self._fctx.annotate(True, True):
+            data.append((fctx, line))
         self.done.emit(data)
         del self._fctx
 
