@@ -571,12 +571,15 @@ class ResolvePage(QWizardPage):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*MARGINS)
-        hbox.setSpacing(0)
+        hbox.setSpacing(4)
         self.layout().addLayout(hbox)
 
         self.tcombo = ToolsCombo(self.wizard().repo)
+        self.stlabel = QLabel()
         hbox.addWidget(QLabel(_('Detected merge/diff tools:')))
         hbox.addWidget(self.tcombo)
+        hbox.addSpacing(12)
+        hbox.addWidget(self.stlabel)
         hbox.addStretch(1)
 
         out = qtlib.LabeledSeparator(_('Command output'))
@@ -589,6 +592,8 @@ class ResolvePage(QWizardPage):
         self.wizard().setOption(QWizard.HaveHelpButton, False)
         self.wizard().setOption(QWizard.NoCancelButton, True)
         self.wizard().setOption(QWizard.HaveCustomButton1, False)
+        btn = QPushButton(_('Next'))
+        self.wizard().setButton(QWizard.NextButton, btn)
 
         self.refresh()
         self.utree.selectAll()
@@ -673,6 +678,11 @@ class ResolvePage(QWizardPage):
                 b.setEnabled(not l.isEmpty())
         self.rtree.selectionModel().selectionChanged.connect(rchanged)
         rchanged(QItemSelection())
+        
+        if u:
+            self.stlabel.setText(_('<b>Conflicts</b> must be resolved'))
+        else:
+            self.stlabel.setText(_('Test merge results, then commit'))
         self.completeChanged.emit()
 
     def isComplete(self):
