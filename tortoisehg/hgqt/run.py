@@ -595,6 +595,11 @@ def archive(ui, *pats, **opts):
     from tortoisehg.hgqt.archive import run
     qtrun(run, ui, *pats, **opts)
 
+def bisect(ui, *pats, **opts):
+    """bisect dialog"""
+    from tortoisehg.hgqt.bisect import run
+    qtrun(run, ui, *pats, **opts)
+
 def annotate(ui, *pats, **opts):
     """annotate dialog"""
     from tortoisehg.hgqt.annotate import run
@@ -859,6 +864,7 @@ table = {
          ('', 'parent', '', _('parent to choose when backing out merge')),
          ('r', 'rev', '', _('revision to backout'))],
         _('thg backout [OPTION]... [[-r] REV]')),
+    "^bisect": (bisect, [], _('thg bisect')),
     "^clone":
         (clone,
          [('U', 'noupdate', None,
