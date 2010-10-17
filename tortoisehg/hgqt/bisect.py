@@ -130,6 +130,11 @@ class BisectDialog(QDialog):
         badrev.clicked.connect(badrevision)
         skiprev.clicked.connect(skiprevision)
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.reject()
+        super(BisectDialog, self).keyPressEvent(event)
+
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
