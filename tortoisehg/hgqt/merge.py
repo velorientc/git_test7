@@ -485,6 +485,7 @@ class ResolvePage(QWizardPage):
         if self.layout():
             self.refresh()
             self.utree.selectAll()
+            self.utree.setFocus()
             return
 
         # created first for isComplete()
@@ -492,12 +493,14 @@ class ResolvePage(QWizardPage):
 
         box = QVBoxLayout()
         box.setContentsMargins(*MARGINS)
+        box.setSpacing(5)
         self.setLayout(box)
 
         unres = qtlib.LabeledSeparator(_('Unresolved conflicts'))
         self.layout().addWidget(unres)
 
         hbox = QHBoxLayout()
+        hbox.setSpacing(0)
         hbox.setContentsMargins(*MARGINS)
         self.layout().addLayout(hbox)
 
@@ -534,6 +537,7 @@ class ResolvePage(QWizardPage):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*MARGINS)
+        hbox.setSpacing(0)
         self.layout().addLayout(hbox)
 
         self.rtree = PathsTree(self)
@@ -567,6 +571,7 @@ class ResolvePage(QWizardPage):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*MARGINS)
+        hbox.setSpacing(0)
         self.layout().addLayout(hbox)
 
         self.tcombo = ToolsCombo(self.wizard().repo)
@@ -587,6 +592,7 @@ class ResolvePage(QWizardPage):
 
         self.refresh()
         self.utree.selectAll()
+        self.utree.setFocus()
 
     def getSelectedPaths(self, tree):
         paths = []
