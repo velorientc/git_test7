@@ -242,6 +242,8 @@ class Workbench(QMainWindow):
 
         newaction(_("Web Server"), self.serve, enabled='repoopen',
                   menu='repository')
+        newaction(_("Bisect"), self._repofwd('bisect'),
+                  enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Import"), self._repofwd('thgimport'),
                   enabled='repoopen', menu='repository')
