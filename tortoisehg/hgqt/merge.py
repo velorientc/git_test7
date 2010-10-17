@@ -329,7 +329,8 @@ class MergePage(BasePage):
             cmdline = ['debugsetparents', '.', self.wizard().other]
         else:
             cmdline = ['--repository', self.wizard().repo.root,
-                       '--config', 'ui.merge=internal:fail', 'merge']
+                       '--config', 'ui.merge=internal:fail', 'merge',
+                       self.wizard().other]
         self.cmd.run(cmdline)
 
     def cancel(self):
