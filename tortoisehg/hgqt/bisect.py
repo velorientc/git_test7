@@ -67,20 +67,26 @@ class BisectDialog(QDialog):
         box.addLayout(hbox)
         lbl = QLabel()
         hbox.addWidget(lbl)
-        hbox.addSpacing(12)
+        hbox.addStretch(1)
+        closeb = QPushButton(_('Close'))
+        hbox.addWidget(closeb)
+        closeb.clicked.connect(self.reject)
 
         self.nextbuttons = (goodrev, badrev, skiprev)
         for b in self.nextbuttons:
             b.setEnabled(False)
+        self.lastrev = None
 
         def cmdFinished(ret):
-            out = self.cmd.core.get_rawoutput()
-            if out.startswith('The first bad revision is:'):
-                lbl.setText(_('Culprit found.'))
-                self.closeb = QPushButton(_('Close'))
-                hbox.addWidget(self.closeb)
-                self.closeb.clicked.connect(self.reject)
+            if ret != 0:
+                lbl.setText(_('Error encountered.'))
                 return
+            repo.dirstate.invalidate()
+            rev = repo['.'].rev()
+            if rev == self.lastrev:
+                lbl.setText(_('Culprit found.'))
+                return
+            self.lastrev = rev
             for b in self.nextbuttons:
                 b.setEnabled(True)
             lbl.setText(_('Test this revision and report findings. '
