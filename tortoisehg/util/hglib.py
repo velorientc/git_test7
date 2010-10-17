@@ -282,9 +282,11 @@ def mergetools(ui, values=None):
     'returns the configured merge tools and the internal ones'
     if values == None:
         values = []
+    seen = values[:]
     for key, value in ui.configitems('merge-tools'):
         t = key.split('.')[0]
-        if t not in values:
+        if t not in seen:
+            seen.append(t)
             # Ensure the tool is installed
             if filemerge._findtool(ui, t):
                 values.append(t)
