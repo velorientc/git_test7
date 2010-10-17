@@ -63,8 +63,11 @@ class BisectDialog(QDialog):
         hbox.addWidget(skiprev)
         box.addLayout(hbox)
 
+        hbox = QHBoxLayout()
+        box.addLayout(hbox)
         lbl = QLabel()
-        box.addWidget(lbl)
+        hbox.addWidget(lbl)
+        hbox.addSpacing(12)
 
         self.nextbuttons = (goodrev, badrev, skiprev)
         for b in self.nextbuttons:
@@ -74,6 +77,9 @@ class BisectDialog(QDialog):
             out = self.cmd.core.get_rawoutput()
             if out.startswith('The first bad revision is:'):
                 lbl.setText(_('Culprit found.'))
+                self.closeb = QPushButton(_('Close'))
+                hbox.addWidget(self.closeb)
+                self.closeb.clicked.connect(self.reject)
                 return
             for b in self.nextbuttons:
                 b.setEnabled(True)
