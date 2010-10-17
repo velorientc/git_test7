@@ -522,6 +522,9 @@ class ResolvePage(QWizardPage):
         hbox.addStretch(1)
         self.ubuttons = (auto, manual, local, other, res)
 
+        self.tcombo = ToolsCombo(self.wizard().repo)
+        hbox.addWidget(self.tcombo)
+
         res = qtlib.LabeledSeparator(_('Resolved conflicts'))
         box.addWidget(res)
         self.rtree = PathsTree(self)
@@ -567,66 +570,59 @@ class ResolvePage(QWizardPage):
         self.refresh()
         self.utree.selectAll()
 
-    def merge(self, tool=None):
-        cmdlines = []
-        for idx in self.utree.selectionModel().selectedRows():
+    def getSelectedPaths(self, tree):
+        paths = []
+        for idx in tree.selectionModel().selectedRows():
             path = hglib.fromunicode(idx.data().toString())
-            cmd = ['resolve', '--config', 'ui.merge='+tool, path]
-            cmdlines.append(cmd)
+            paths.append(path)
+        return paths
+
+    def merge(self, tool=False):
+        if not tool:
+            tool = self.tcombo.readValue()
+        if not tool:
+            cmd = ['resolve']
+        else:
+            cmd = ['resolve', '--config', 'ui.merge='+tool]
+        cmdlines = []
+        for path in self.getSelectedPaths(self.utree):
+            cmdlines.append(cmd + [path])
         if cmdlines:
             self.cmd.run(*cmdlines)
 
     def markresolved(self):
-        paths = []
-        for idx in self.utree.selectionModel().selectedRows():
-            path = hglib.fromunicode(idx.data().toString())
-            paths.append(path)
+        paths = self.getSelectedPaths(self.utree)
         if paths:
             self.cmd.run(['resolve', '--mark'] + paths)
 
     def markunresolved(self):
-        paths = []
-        for idx in self.rtree.selectionModel().selectedRows():
-            path = hglib.fromunicode(idx.data().toString())
-            paths.append(path)
+        paths = self.getSelectedPaths(self.rtree)
         if paths:
             self.cmd.run(['resolve', '--unmark'] + paths)
 
     def edit(self):
-        repo = self.wizard().repo
-        paths = []
-        for idx in self.rtree.selectionModel().selectedRows():
-            path = hglib.fromunicode(idx.data().toString())
-            paths.append(path)
+        paths = self.getSelectedPaths(self.rtree)
         if paths:
+            repo = self.wizard().repo
             wctxactions.edit(self, repo.ui, repo, paths)
 
     def v3way(self):
-        repo = self.wizard().repo
-        paths = []
-        for idx in self.rtree.selectionModel().selectedRows():
-            path = hglib.fromunicode(idx.data().toString())
-            paths.append(path)
+        paths = self.getSelectedPaths(self.rtree)
         if paths:
+            repo = self.wizard().repo
             visdiff.visualdiff(repo.ui, repo, paths, {'rev':[]})
 
     def vp0(self):
-        repo = self.wizard().repo
-        paths = []
-        for idx in self.rtree.selectionModel().selectedRows():
-            path = hglib.fromunicode(idx.data().toString())
-            paths.append(path)
+        paths = self.getSelectedPaths(self.rtree)
         if paths:
+            repo = self.wizard().repo
             pair = [str(repo.parents()[0].rev()), '.']
             visdiff.visualdiff(repo.ui, repo, paths, {'rev':pair})
 
     def vp1(self):
-        repo = self.wizard().repo
-        paths = []
-        for idx in self.rtree.selectionModel().selectedRows():
-            path = hglib.fromunicode(idx.data().toString())
-            paths.append(path)
+        paths = self.getSelectedPaths(self.rtree)
         if paths:
+            repo = self.wizard().repo
             pair = [str(repo.parents()[1].rev()), '.']
             visdiff.visualdiff(repo.ui, repo, paths, {'rev':pair})
 
@@ -731,6 +727,28 @@ class PathsModel(QAbstractTableModel):
             return QVariant()
         else:
             return QVariant(self.headers[col])
+
+class ToolsCombo(QComboBox):
+    def __init__(self, repo, parent=None):
+        QComboBox.__init__(self, parent)
+        self.setEditable(False)
+        self.loaded = False
+        self.setEditText(_('<default>'))
+        self.repo = repo
+
+    def showPopup(self):
+        if not self.loaded:
+            self.loaded = True
+            self.clear()
+            for t in self.repo.mergetools:
+                self.addItem(hglib.tounicode(t))
+        QComboBox.showPopup(self)
+
+    def readValue(self):
+        if self.loaded:
+            return hglib.fromunicode(self.currentText())
+        else:
+            return None
 
 class CommitPage(BasePage):
 
