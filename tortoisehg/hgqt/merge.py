@@ -604,18 +604,18 @@ class ResolvePage(QWizardPage):
 
     def getSelectedPaths(self, tree):
         paths = []
+        repo = self.wizard().repo
         for idx in tree.selectionModel().selectedRows():
             path = hglib.fromunicode(idx.data().toString())
-            paths.append(path)
+            paths.append(repo.wjoin(path))
         return paths
 
     def merge(self, tool=False):
         if not tool:
             tool = self.tcombo.readValue()
-        if not tool:
-            cmd = ['resolve']
-        else:
-            cmd = ['resolve', '--config', 'ui.merge='+tool]
+        cmd = ['resolve', '--repository', self.wizard().repo.root]
+        if tool:
+            cmd += ['--config', 'ui.merge='+tool]
         cmdlines = []
         for path in self.getSelectedPaths(self.utree):
             cmdlines.append(cmd + [path])
@@ -625,12 +625,14 @@ class ResolvePage(QWizardPage):
     def markresolved(self):
         paths = self.getSelectedPaths(self.utree)
         if paths:
-            self.cmd.run(['resolve', '--mark'] + paths)
+            self.cmd.run(['resolve', '--repository', self.wizard().repo.root,
+                          '--mark'] + paths)
 
     def markunresolved(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
-            self.cmd.run(['resolve', '--unmark'] + paths)
+            self.cmd.run(['resolve', '--repository', self.wizard().repo.root,
+                          '--unmark'] + paths)
 
     def edit(self):
         paths = self.getSelectedPaths(self.rtree)
