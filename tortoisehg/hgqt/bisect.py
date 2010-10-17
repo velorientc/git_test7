@@ -63,16 +63,24 @@ class BisectDialog(QDialog):
         hbox.addWidget(skiprev)
         box.addLayout(hbox)
 
+        lbl = QLabel()
+        box.addWidget(lbl)
+
         self.nextbuttons = (goodrev, badrev, skiprev)
         for b in self.nextbuttons:
             b.setEnabled(False)
 
         def cmdFinished(ret):
+            out = self.cmd.core.get_rawoutput()
+            if out.startswith('The first bad revision is:'):
+                lbl.setText(_('Culprit found.'))
+                return
             for b in self.nextbuttons:
                 b.setEnabled(True)
+            lbl.setText(_('Test this revision and report findings.'))
         self.cmd.commandFinished.connect(cmdFinished)
 
-        prefix = ['bisect', '--verbose', '--repository', repo.root]
+        prefix = ['bisect', '--repository', repo.root]
 
         def gverify():
             good = hglib.fromunicode(gle.text().simplified())
