@@ -359,6 +359,8 @@ class MergePage(BasePage):
             repo.decrementBusyCount()
             self.done = True
             self.wizard().next()
+            if ret == 0:
+                self.wizard().next()
         else:
             qtlib.InfoMsgBox(_('Merge failed'), _('Returning to first page'))
             self.link_activated('discard:noconfirm')
