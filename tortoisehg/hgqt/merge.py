@@ -681,6 +681,9 @@ class ResolvePage(QWizardPage):
             return False
         return len(model) == 0
 
+    def need_cleanup(self):
+        return True
+
 class PathsTree(QTreeView):
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
