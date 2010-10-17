@@ -77,7 +77,8 @@ class BisectDialog(QDialog):
                 return
             for b in self.nextbuttons:
                 b.setEnabled(True)
-            lbl.setText(_('Test this revision and report findings.'))
+            lbl.setText(_('Test this revision and report findings. '
+                           '(good/bad/skip)'))
         self.cmd.commandFinished.connect(cmdFinished)
 
         prefix = ['bisect', '--repository', repo.root]
