@@ -344,13 +344,15 @@ def _runcommand(ui, options, cmd, cmdfunc):
     else:
         return checkargs()
 
-class _QtRunner(object):
+class _QtRunner(QObject):
     """Run Qt app and hold its windows
 
     NOTE: This object will be instantiated before QApplication, it means
     there's a limitation on Qt's event handling. See
     http://doc.qt.nokia.com/4.6/threads-qobject.html#per-thread-event-loop
     """
+
+    _exceptionOccured = pyqtSignal(object, object, object)
 
     # {exception class: message}
     # It doesn't check the hierarchy of exception classes for simplicity.
@@ -359,21 +361,35 @@ class _QtRunner(object):
         }
 
     def __init__(self):
+        super(_QtRunner, self).__init__()
         self._mainapp = None
         self._dialogs = []
         self.errors = []
         sys.excepthook = lambda t, v, o: self.ehook(t, v, o)
+
+        # can be emitted by another thread; postpones it until next
+        # eventloop of main (GUI) thread.
+        self._exceptionOccured.connect(self.putexception,
+                                       Qt.QueuedConnection)
 
     def ehook(self, etype, evalue, tracebackobj):
         'Will be called by any thread, on any unhandled exception'
         elist = traceback.format_exception(etype, evalue, tracebackobj)
         if 'THGDEBUG' in os.environ:
             sys.stderr.write(''.join(elist))
+        self._exceptionOccured.emit(etype, evalue, tracebackobj)
+        # not thread-safe to touch self.errors here
+
+    @pyqtSlot(object, object, object)
+    def putexception(self, etype, evalue, tracebackobj):
+        'Enque exception info and display it later; run in main thread'
         if not self.errors:
             QTimer.singleShot(10, self.excepthandler)
         self.errors.append((etype, evalue, tracebackobj))
 
+    @pyqtSlot()
     def excepthandler(self):
+        'Display exception info; run in main (GUI) thread'
         from tortoisehg.hgqt.bugreport import BugReport, ExceptionMsgBox
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
