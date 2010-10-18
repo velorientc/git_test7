@@ -782,6 +782,7 @@ class Runner(QObject):
         if not hasattr(self, 'dlg'):
             self.dlg = QDialog(self.parent)
             self.dlg.setWindowTitle(self.title)
+            self.core.output_text.escapePressed.connect(self.dlg.reject)
             flags = self.dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint
             self.dlg.setWindowFlags(flags)
             box = QVBoxLayout()
