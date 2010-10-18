@@ -288,11 +288,11 @@ class MergePage(BasePage):
         self.groups.add(wd_merged, 'merged')
         box.addWidget(wd_merged)
 
-        text = _('To start merging, you need to '
-                 '<a href="commit"><b>commit</b></a> them')
+        text = _('Before merging, you must '
+                 '<a href="commit"><b>commit</b></a>, ')
         if 'mq' in repo.extensions():
-            text = text + _(', <a href="mq"><b>save</b></a> as MQ patch')
-        text = text + (' or <a href="discard"><b>discard</b></a> all.')
+            text = text + _('<a href="mq"><b>save</b></a> to MQ patch, ')
+        text = text + ('or <a href="discard"><b>discard</b></a> changes.')
         wd_text = QLabel(text)
         wd_text.setContentsMargins(*MARGINS)
         wd_text.linkActivated.connect(self.link_activated)
@@ -395,6 +395,7 @@ class MergePage(BasePage):
         repo = self.wizard().repo
         if cmd == 'commit':
             dlg = commit.CommitDialog([], dict(root=repo.root), self)
+            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.check_status()
         elif cmd == 'mq':
