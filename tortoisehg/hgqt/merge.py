@@ -702,6 +702,7 @@ class ResolvePage(QWizardPage):
                 r.append(path)
         self.utree.setModel(PathsModel(u, self))
         self.utree.resizeColumnToContents(0)
+        self.utree.resizeColumnToContents(1)
         def uchanged(l):
             for b in self.ubuttons:
                 b.setEnabled(not l.isEmpty())
@@ -709,6 +710,7 @@ class ResolvePage(QWizardPage):
         uchanged(QItemSelection())
         self.rtree.setModel(PathsModel(r, self))
         self.rtree.resizeColumnToContents(0)
+        self.rtree.resizeColumnToContents(1)
         def rchanged(l):
             for b in self.rbuttons:
                 b.setEnabled(not l.isEmpty())
