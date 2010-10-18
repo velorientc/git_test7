@@ -133,7 +133,7 @@ class RevisionSetQuery(QDialog):
 
         cgb = QGroupBox(_('Common sets'))
         cgb.setLayout(QVBoxLayout())
-        cgb.layout().setContentsMargins(*(0,)*4)
+        cgb.layout().setContentsMargins(*(2,)*4)
         def setCommonHelp(item):
             self.stbar.showMessage(self.clw._help[self.clw.row(item)])
         self.clw = QListWidget(self)
@@ -145,7 +145,7 @@ class RevisionSetQuery(QDialog):
 
         fgb = QGroupBox(_('File pattern sets'))
         fgb.setLayout(QVBoxLayout())
-        fgb.layout().setContentsMargins(*(0,)*4)
+        fgb.layout().setContentsMargins(*(2,)*4)
         def setFileHelp(item):
             self.stbar.showMessage(self.flw._help[self.flw.row(item)])
         self.flw = QListWidget(self)
@@ -157,7 +157,7 @@ class RevisionSetQuery(QDialog):
 
         agb = QGroupBox(_('Set Ancestry'))
         agb.setLayout(QVBoxLayout())
-        agb.layout().setContentsMargins(*(0,)*4)
+        agb.layout().setContentsMargins(*(2,)*4)
         def setAncHelp(item):
             self.stbar.showMessage(self.alw._help[self.alw.row(item)])
         self.alw = QListWidget(self)
@@ -169,7 +169,7 @@ class RevisionSetQuery(QDialog):
 
         lgb = QGroupBox(_('Set Logic'))
         lgb.setLayout(QVBoxLayout())
-        lgb.layout().setContentsMargins(*(0,)*4)
+        lgb.layout().setContentsMargins(*(2,)*4)
         def setManipHelp(item):
             self.stbar.showMessage(self.llw._help[self.llw.row(item)])
         self.llw = QListWidget(self)
