@@ -37,7 +37,7 @@ class MergeDialog(QWizard):
 
         self.repo = repo
         self.other = str(other)
-        self.local = str(self.repo.parents()[0].rev())
+        self.local = str(self.repo['.'].rev())
 
         self.setWindowTitle(_('Merge - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('merge'))
@@ -51,6 +51,15 @@ class MergeDialog(QWizard):
         self.setPage(RESOLVE_PAGE, ResolvePage(self))
         self.setPage(COMMIT_PAGE, CommitPage(self))
         self.setPage(RESULT_PAGE, ResultPage(self))
+
+        repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.configChanged.connect(self.configChanged)
+
+    def repositoryChanged(self):
+        self.currentPage().repositoryChanged()
+
+    def configChanged(self):
+        self.currentPage().configChanged()
 
     def reject(self):
         page = self.currentPage()
@@ -87,6 +96,14 @@ class BasePage(QWizardPage):
             raise 'unknown pane: %s' % pane
 
     ### Override Method ###
+
+    def repositoryChanged(self):
+        'repository has detected a change to changelog or parents'
+        pass
+
+    def configChanged(self):
+        'repository has detected a change to config files'
+        pass
 
     def initializePage(self):
         if self.layout():
@@ -233,11 +250,7 @@ class MergePage(BasePage):
         local_info = create(self.wizard().local)
         local_info.setContentsMargins(5, 0, 0, 0)
         box.addWidget(local_info)
-        def refreshlocal():
-            repo = self.wizard().repo
-            if len(repo.parents()) == 1:
-                local_info.update(repo['.'])
-        self.completeChanged.connect(refreshlocal)
+        self.local_info = local_info
 
         ## working directory status
         box.addSpacing(6)
@@ -367,6 +380,12 @@ class MergePage(BasePage):
             self.link_activated('discard:noconfirm')
             self.switch_pane(MAIN_PANE)
 
+    def repositoryChanged(self):
+        'repository has detected a change to changelog or parents'
+        pctx = self.wizard().repo['.']
+        self.local_info.update(pctx)
+        self.wizard().local = str(pctx.rev())
+
     def command_canceling(self):
         self.wizard().button(QWizard.CustomButton1).setDisabled(True)
 
@@ -406,7 +425,7 @@ class MergePage(BasePage):
                 repo.decrementBusyCount()
                 if ret == 0:
                     self.check_status()
-            cmdline = ['update', '--clean', '--rev', self.wizard().local]
+            cmdline = ['update', '--clean', '--rev', '.']
             self.runner = cmdui.Runner(_('Discard - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
@@ -660,6 +679,17 @@ class ResolvePage(QWizardPage):
             pair = [str(repo.parents()[1].rev()), '.']
             visdiff.visualdiff(repo.ui, repo, paths, {'rev':pair})
 
+    def repositoryChanged(self):
+        'repository has detected a change to changelog or parents'
+        if len(self.wizard().repo.parents()) == 1:
+            self.wizard().back()
+        else:
+            self.refresh()
+
+    def configChanged(self):
+        'repository has detected a change to config files'
+        self.tcombo.reset()
+
     def refresh(self):
         repo = self.wizard().repo
         ms = mergemod.mergestate(repo)
@@ -775,20 +805,27 @@ class ToolsCombo(QComboBox):
         QComboBox.__init__(self, parent)
         self.setEditable(False)
         self.loaded = False
-        self.setEditText(_('<default>'))
+        self.default = _('<default>')
         self.repo = repo
+
+    def reset(self):
+        self.loaded = False
+        self.clear()
 
     def showPopup(self):
         if not self.loaded:
             self.loaded = True
             self.clear()
+            self.addItem(self.default)
             for t in self.repo.mergetools:
                 self.addItem(hglib.tounicode(t))
         QComboBox.showPopup(self)
 
     def readValue(self):
         if self.loaded:
-            return hglib.fromunicode(self.currentText())
+            text = self.currentText()
+            if text != self.default:
+                return hglib.fromunicode(text)
         else:
             return None
 
@@ -914,6 +951,11 @@ class CommitPage(BasePage):
 
     def cleanupPage(self):
         self.undo()
+
+    def repositoryChanged(self):
+        'repository has detected a change to changelog or parents'
+        if len(self.wizard().repo.parents()) == 1:
+            self.wizard().restart()
 
     ### Private Method ###
 
