@@ -20,9 +20,6 @@ from tortoisehg.hgqt import commit, wctxactions, visdiff
 
 keep = i18n.keepgettext()
 
-# TODO:
-#  Connect merge page to repositoryChanged signal, refresh if current page
-
 MERGE_PAGE  = 0
 RESOLVE_PAGE = 1
 COMMIT_PAGE = 2
@@ -1003,9 +1000,6 @@ class ResultPage(QWizardPage):
         self.wizard().setOption(QWizard.HaveHelpButton, False)
         self.wizard().setOption(QWizard.NoCancelButton, True)
         self.wizard().setOption(QWizard.HaveCustomButton1, False)
-
-    def isFinalPage(self):
-        return True
 
 def run(ui, *pats, **opts):
     rev = opts.get('rev') or None
