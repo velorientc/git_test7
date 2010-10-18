@@ -139,7 +139,7 @@ class Core(QObject):
     progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, useInternal, parent):
-        super(Core, self).__init__()
+        super(Core, self).__init__(parent)
 
         self.thread = None
         self.stbar = None
@@ -574,10 +574,10 @@ class Widget(QWidget):
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, useInternal=True, parent=None):
-        super(Widget, self).__init__()
+        super(Widget, self).__init__(parent)
 
         self.internallog = useInternal
-        self.core = Core(useInternal, parent)
+        self.core = Core(useInternal, self)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
@@ -751,12 +751,14 @@ class Runner(QObject):
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, title=_('TortoiseHg'), useInternal=True, parent=None):
-        super(Runner, self).__init__()
+        super(Runner, self).__init__(parent)
 
         self.internallog = useInternal
         self.title = title
         self.parent = parent
 
+        # XXX: should pass self as parent, but CmdThread requires QWidget
+        # as a parent.
         self.core = Core(useInternal, parent)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)

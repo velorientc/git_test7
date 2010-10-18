@@ -151,7 +151,7 @@ class CmdThread(QThread):
     commandFinished = pyqtSignal(int)
 
     def __init__(self, cmdline, display, parent=None):
-        super(CmdThread, self).__init__()
+        super(CmdThread, self).__init__(parent)
 
         self.cmdline = cmdline
         self.display = display
