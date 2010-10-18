@@ -954,9 +954,6 @@ class CommitPage(BasePage):
     def need_cleanup(self):
         return len(self.wizard().repo.parents()) == 2
 
-    def cleanupPage(self):
-        self.undo()
-
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
         if len(self.wizard().repo.parents()) == 1:
