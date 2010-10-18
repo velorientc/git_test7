@@ -424,7 +424,8 @@ class MergePage(BasePage):
                 repo.decrementBusyCount()
                 if ret == 0:
                     self.check_status()
-            cmdline = ['update', '--clean', '--rev', '.']
+            cmdline = ['update', '--clean', '--repository', repo.root,
+                       '--rev', '.']
             self.runner = cmdui.Runner(_('Discard - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
