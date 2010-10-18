@@ -146,7 +146,6 @@ class Core(QObject):
         self.queue = []
         self.display = None
         self.internallog = useInternal
-        self.parent = parent
         if useInternal:
             self.output_text = LogWidget()
 
@@ -184,7 +183,7 @@ class Core(QObject):
     def run_next(self):
         try:
             cmdline = self.queue.pop(0)
-            self.thread = thread.CmdThread(cmdline, self.display, self.parent)
+            self.thread = thread.CmdThread(cmdline, self.display, self.parent())
         except IndexError:
             return False
 
@@ -755,7 +754,6 @@ class Runner(QObject):
 
         self.internallog = useInternal
         self.title = title
-        self.parent = parent
 
         # XXX: should pass self as parent, but CmdThread requires QWidget
         # as a parent.
@@ -782,7 +780,7 @@ class Runner(QObject):
         if not self.internallog:
             return
         if not hasattr(self, 'dlg'):
-            self.dlg = QDialog(self.parent)
+            self.dlg = QDialog(self.parent())
             self.dlg.setWindowTitle(self.title)
             self.core.output_text.escapePressed.connect(self.dlg.reject)
             flags = self.dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint

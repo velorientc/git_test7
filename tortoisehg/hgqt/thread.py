@@ -155,7 +155,6 @@ class CmdThread(QThread):
 
         self.cmdline = cmdline
         self.display = display
-        self.parent = parent
         self.ret = -1
         self.abortbyuser = False
         self.responseq = Queue.Queue()
@@ -219,7 +218,7 @@ class CmdThread(QThread):
         if choices:
             dlg = QMessageBox(QMessageBox.Question,
                         _('TortoiseHg Prompt'), prompt,
-                        QMessageBox.Yes | QMessageBox.Cancel, self.parent)
+                        QMessageBox.Yes | QMessageBox.Cancel, self.parent())
             dlg.setDefaultButton(QMessageBox.Cancel)
             dlg.setWindowFlags(Qt.Sheet)
             dlg.setWindowModality(Qt.WindowModal)
@@ -238,7 +237,7 @@ class CmdThread(QThread):
         else:
             mode = password and QLineEdit.Password \
                              or QLineEdit.Normal
-            dlg = QInputDialog(self.parent, Qt.Sheet)
+            dlg = QInputDialog(self.parent(), Qt.Sheet)
             dlg.setWindowModality(Qt.WindowModal)
             dlg.setWindowTitle(_('TortoiseHg Prompt'))
             dlg.setLabelText(prompt.title())
