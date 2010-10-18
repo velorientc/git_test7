@@ -503,15 +503,21 @@ class ResolvePage(QWizardPage):
 
     ### Override Method ###
 
+    def setup_buttons(self, pane):
+        btn = QPushButton(_('Next'))
+        self.wizard().setButton(QWizard.NextButton, btn)
+        self.wizard().button(QWizard.NextButton).setShown(True)
+        self.wizard().setOption(QWizard.HaveHelpButton, False)
+        self.wizard().setOption(QWizard.HaveCustomButton1, False)
+        self.wizard().setOption(QWizard.NoCancelButton, True)
+
     def initializePage(self):
+        self.setup_buttons(MAIN_PANE)
         if self.layout():
             self.refresh()
             self.utree.selectAll()
             self.utree.setFocus()
             return
-
-        # created first for isComplete()
-        self.utree = PathsTree(self)
 
         box = QVBoxLayout()
         box.setContentsMargins(*MARGINS)
@@ -526,6 +532,7 @@ class ResolvePage(QWizardPage):
         hbox.setContentsMargins(*MARGINS)
         self.layout().addLayout(hbox)
 
+        self.utree = PathsTree(self)
         hbox.addWidget(self.utree)
 
         vbox = QVBoxLayout()
@@ -610,12 +617,6 @@ class ResolvePage(QWizardPage):
         self.cmd.commandFinished.connect(self.refresh)
         self.cmd.show_output(True)
         self.layout().addWidget(self.cmd)
-
-        self.wizard().setOption(QWizard.HaveHelpButton, False)
-        self.wizard().setOption(QWizard.NoCancelButton, True)
-        self.wizard().setOption(QWizard.HaveCustomButton1, False)
-        btn = QPushButton(_('Next'))
-        self.wizard().setButton(QWizard.NextButton, btn)
 
         self.refresh()
         self.utree.selectAll()
@@ -721,6 +722,8 @@ class ResolvePage(QWizardPage):
         self.completeChanged.emit()
 
     def isComplete(self):
+        if not hasattr(self, 'utree'):
+            return False
         model = self.utree.model()
         if model is None:
             return False
