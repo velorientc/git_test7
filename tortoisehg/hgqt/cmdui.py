@@ -230,6 +230,8 @@ class Core(QObject):
         self.display = None
         if ret == 0 and self.run_next():
             return # run next command
+        else:
+            self.queue = []
 
         self.commandFinished.emit(ret)
 
