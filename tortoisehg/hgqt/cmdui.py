@@ -245,6 +245,8 @@ class Core(QObject):
 
 class LogWidget(QsciScintilla):
     """Output log viewer"""
+    escapePressed = pyqtSignal()
+
     def __init__(self, parent=None):
         super(LogWidget, self).__init__(parent)
         self.setReadOnly(True)
@@ -252,6 +254,11 @@ class LogWidget(QsciScintilla):
         self.setMarginWidth(1, 0)
         self._initfont()
         self._initmarkers()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.escapePressed.emit()
+        super(LogWidget, self).keyPressEvent(event)
 
     def _initfont(self):
         tf = qtlib.getfont('fontlog')
@@ -560,6 +567,8 @@ class Widget(QWidget):
     commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
+    escapePressed = pyqtSignal()
+
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
@@ -582,6 +591,7 @@ class Widget(QWidget):
         vbox.setContentsMargins(*(1,)*4)
 
         # command output area
+        self.core.output_text.escapePressed.connect(self.escapePressed)
         self.core.output_text.setHidden(True)
         vbox.addWidget(self.core.output_text, 1)
 
