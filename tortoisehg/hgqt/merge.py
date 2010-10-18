@@ -806,11 +806,13 @@ class ToolsCombo(QComboBox):
         self.setEditable(False)
         self.loaded = False
         self.default = _('<default>')
+        self.addItem(self.default)
         self.repo = repo
 
     def reset(self):
         self.loaded = False
         self.clear()
+        self.addItem(self.default)
 
     def showPopup(self):
         if not self.loaded:
