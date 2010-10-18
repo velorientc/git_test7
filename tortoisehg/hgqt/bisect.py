@@ -52,6 +52,7 @@ class BisectDialog(QDialog):
         ## command widget
         self.cmd = cmdui.Widget()
         self.cmd.show_output(True)
+        self.cmd.escapePressed.connect(self.reject)
         box.addWidget(self.cmd, 1)
 
         hbox = QHBoxLayout()
