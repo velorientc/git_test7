@@ -247,7 +247,7 @@ class StatusWidget(QWidget):
         for col in (COL_PATH_DISPLAY, COL_EXTENSION, COL_SIZE):
             self.tv.resizeColumnToContents(col)
 
-        self.tv.activated.connect(tm.toggleRow)
+        self.tv.doubleClicked.connect(tm.toggleRow)
         self.tv.pressed.connect(tm.pressedRow)
         self.le.textEdited.connect(tm.setFilter)
         tm.checkToggled.connect(self.updateCheckCount)
