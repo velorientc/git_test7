@@ -945,6 +945,7 @@ class CommitPage(BasePage):
         message = hglib.fromunicode(self.msg_text.toPlainText())
         cmdline = ['commit', '--verbose', '--message', message,
                    '--repository', self.wizard().repo.root]
+        self.wizard().repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
     def isComplete(self):
@@ -955,6 +956,8 @@ class CommitPage(BasePage):
 
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
+        if self.done:
+            return
         if len(self.wizard().repo.parents()) == 1:
             self.wizard().restart()
 
@@ -968,10 +971,9 @@ class CommitPage(BasePage):
 
     def command_finished(self, ret):
         if ret == 0:
-            self.wizard().repo.incrementBusyCount()
-            self.wizard().repo.decrementBusyCount()
             self.done = True
             self.wizard().next()
+        self.wizard().repo.decrementBusyCount()
 
     def command_canceling(self):
         page = self.wizard().page(MERGE_PAGE)
@@ -985,6 +987,10 @@ class ResultPage(QWizardPage):
         self.setTitle(_('Finished'))
 
     ### Override Method ###
+
+    def repositoryChanged(self):
+        'repository has detected a change to changelog or parents'
+        pass
 
     def initializePage(self):
         box = QVBoxLayout()
