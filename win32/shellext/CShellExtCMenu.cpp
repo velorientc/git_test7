@@ -43,9 +43,6 @@ MenuDescription menuDescList[] =
     {"status",      L"View File Status",
                     L"Repository status & changes",
                     "menushowchanged.ico", 0},
-    {"shelve",      L"Shelve Changes",
-                    L"Shelve or unshelve file changes",
-                    "shelve.ico", 0},
     {"add",         L"Add Files...",
                     L"Add files to version control",
                     "menuadd.ico", 0},
@@ -58,8 +55,11 @@ MenuDescription menuDescList[] =
     {"rename",      L"Rename File...",
                     L"Rename file or directory",
                     "general.ico", 0},
-    {"log",         L"Repository Explorer",
-                    L"View change history in repository",
+    {"workbench",   L"Workbench",
+                    L"View change history of repository",
+                    "menulog.ico", 0},
+    {"log",         L"Revision History",
+                    L"View change history of selected files",
                     "menulog.ico", 0},
     {"synch",       L"Synchronize",
                     L"Synchronize with remote repository",
@@ -70,9 +70,6 @@ MenuDescription menuDescList[] =
     {"update",      L"Update...",
                     L"Update working directory",
                     "menucheckout.ico", 0},
-    {"recover",     L"Recovery...",
-                    L"Repair and recovery of repository",
-                    "general.ico", 0},
     {"thgstatus",   L"Update Icons",
                     L"Update icons for this repository",
                     "refresh_overlays.ico", 0},
@@ -85,9 +82,6 @@ MenuDescription menuDescList[] =
     {"about",       L"About TortoiseHg",
                     L"Show About Dialog",
                     "menuabout.ico", 0},
-    {"datamine",    L"Annotate Files",
-                    L"Changeset information per file line",
-                    "menublame.ico", 0},
     {"vdiff",       L"Visual Diff",
                     L"View changes using GUI diff tool",
                     "TortoiseMerge.ico", 0},
@@ -114,11 +108,11 @@ MenuDescription menuDescList[] =
 };
 
 const char* const RepoNoFilesMenu =
-    "commit status shelve vdiff sep"
+    "commit status vdiff sep"
     " add revert rename forget remove sep"
-    " log update grep sep"
+    " workbench update grep sep"
     " synch serve clone init thgstatus sep"
-    " hgignore guess recover sep"
+    " hgignore guess sep"
     " shellconf repoconf userconf sep"
     " about"
 ;
@@ -126,7 +120,7 @@ const char* const RepoNoFilesMenu =
 const char* const RepoFilesMenu =
     "commit status vdiff sep"
     " add revert rename forget remove sep"
-    " log datamine sep"
+    " log sep"
     " about"
 ;
 
@@ -435,7 +429,7 @@ CShellExtCMenu::QueryContextMenu(
     typedef std::vector<std::string> entriesT;
     typedef entriesT::const_iterator entriesIter;
 
-    std::string promoted_string = "commit,log"; // default value if key not found
+    std::string promoted_string = "commit,workbench"; // default value if key not found
     GetRegistryConfig("PromotedItems", promoted_string);
 
     entriesT promoted;
@@ -586,7 +580,7 @@ CShellExtCMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
         if (iter != MenuIdMap.end())
         {
-            DoHgtk(iter->second.name);
+            RunDialog(iter->second.name);
             hr = S_OK;
         }
         else
@@ -785,20 +779,27 @@ CShellExtCMenu::HandleMenuMsg2(
 }
 
 
-void CShellExtCMenu::DoHgtk(const std::string &cmd)
+void CShellExtCMenu::RunDialog(const std::string &cmd)
 {
     std::string dir = GetTHgProgRoot();
     if (dir.empty())
     {
-        TDEBUG_TRACE("DoHgtk: THG root is empty");
+        TDEBUG_TRACE("RunDialog: THG root is empty");
         return;
     }
-    std::string hgcmd = dir + "\\hgtk.exe";
+    std::string hgcmd = dir + "\\thg.exe";
 
     WIN32_FIND_DATAA data;
     HANDLE hfind = FindFirstFileA(hgcmd.c_str(), &data);
     if (hfind == INVALID_HANDLE_VALUE)
-        hgcmd = dir + "\\hgtk.cmd";
+    {
+        hgcmd = dir + "\\hgtk.exe";
+        hfind = FindFirstFileA(hgcmd.c_str(), &data);
+        if (hfind == INVALID_HANDLE_VALUE)
+            hgcmd = dir + "\\thg.cmd";
+        else
+            FindClose(hfind);
+    }
     else
         FindClose(hfind);
 
@@ -815,7 +816,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
     }
     else
     {
-        TDEBUG_TRACE("***** DoHgtk: can't get cwd");
+        TDEBUG_TRACE("***** RunDialog: can't get cwd");
         return;
     }
 
@@ -825,11 +826,11 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
         const std::string tempfile = GetTemporaryFile();
         if (tempfile.empty())
         {
-            TDEBUG_TRACE("***** DoHgtk: error: GetTemporaryFile returned empty string");
+            TDEBUG_TRACE("***** RunDialog: error: GetTemporaryFile returned empty string");
             return;
         }
 
-        TDEBUG_TRACE("DoHgtk: temp file = " << tempfile);
+        TDEBUG_TRACE("RunDialog: temp file = " << tempfile);
         HANDLE tempfileHandle = CreateFileA(
             tempfile.c_str(), GENERIC_WRITE,
             FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
@@ -837,7 +838,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
 
         if (tempfileHandle == INVALID_HANDLE_VALUE)
         {
-            TDEBUG_TRACE("***** DoHgtk: error: failed to create file " << tempfile);
+            TDEBUG_TRACE("***** RunDialog: error: failed to create file " << tempfile);
             return;
         }
 
@@ -845,7 +846,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
         for (ST i = 0; i < myFiles.size(); i++)
         {
             DWORD dwWritten;
-            TDEBUG_TRACE("DoHgtk: temp file adding " << myFiles[i]);
+            TDEBUG_TRACE("RunDialog: temp file adding " << myFiles[i]);
             WriteFile(
                 tempfileHandle, myFiles[i].c_str(),
                 static_cast<DWORD>(myFiles[i].size()), &dwWritten, 0
