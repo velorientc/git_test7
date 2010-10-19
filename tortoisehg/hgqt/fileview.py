@@ -662,6 +662,10 @@ class FileData(object):
             self.flabel += _(' <i>(renamed from %s)</i>') % fr
             olddata = repo.filectx(oldname, fileid=node).data()
         elif status == 'M':
+            if wfile not in ctx2:
+                # merge situation where file was added in other branch
+                self.flabel += _(' <i>(was added)</i>')
+                return
             oldname = wfile
             olddata = ctx2[wfile].data()
         else:
