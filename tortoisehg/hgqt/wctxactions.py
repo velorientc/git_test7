@@ -307,11 +307,10 @@ def mark(parent, ui, repo, files):
     return True
 
 def resolve_with(tool, repo, files):
-    oldmergeenv = os.environ.get('HGMERGE')
-    os.environ['HGMERGE'] = tool
+    if os.environ.get('HGMERGE'):
+        os.environ['HGMERGE'] = ''
+    oldcfg = repo.ui.config('ui', 'merge')
+    repo.ui.setconfig('ui', 'merge', tool)
     resolve(None, None, repo, files)
-    if oldmergeenv:
-        os.environ['HGMERGE'] = oldmergeenv
-    else:
-        del os.environ['HGMERGE']
+    repo.ui.setconfig('ui', 'merge', oldcfg or '')
     return True
