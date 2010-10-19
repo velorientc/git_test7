@@ -858,7 +858,6 @@ class PathsTree(QTreeView):
         self.setSelectionMode(QTreeView.SingleSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
-        self.parent = parent
         self.editable = editable
 
     def keyPressEvent(self, event):
@@ -875,7 +874,7 @@ class PathsTree(QTreeView):
                     parent=self)
             if r:
                 alias = hglib.fromunicode(alias)
-                self.parent.removeAlias(alias)
+                self.parent().removeAlias(alias)
 
     def dragObject(self):
         urls = []
