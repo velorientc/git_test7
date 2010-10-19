@@ -161,6 +161,7 @@ class SyncWidget(QWidget):
 
         self.hgrctv = PathsTree(self, True)
         self.hgrctv.clicked.connect(self.pathSelected)
+        self.hgrctv.removeAlias.connect(self.removeAlias)
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
         pathsbox = QVBoxLayout()
@@ -589,7 +590,9 @@ class SyncWidget(QWidget):
         from tortoisehg.hgqt import run as _run
         _run.email(ui.ui(), root=self.root)
 
+    @pyqtSlot(QString)
     def removeAlias(self, alias):
+        alias = hglib.fromunicode(alias)
         fn = os.path.join(self.root, '.hg', 'hgrc')
         fn, cfg = loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
@@ -853,6 +856,8 @@ class AuthDialog(QDialog):
 
 
 class PathsTree(QTreeView):
+    removeAlias = pyqtSignal(QString)
+
     def __init__(self, parent, editable):
         QTreeView.__init__(self, parent)
         self.setSelectionMode(QTreeView.SingleSelection)
@@ -873,8 +878,7 @@ class PathsTree(QTreeView):
                     _('Delete %s from your repo configuration file?') % alias,
                     parent=self)
             if r:
-                alias = hglib.fromunicode(alias)
-                self.parent().removeAlias(alias)
+                self.removeAlias.emit(alias)
 
     def dragObject(self):
         urls = []
