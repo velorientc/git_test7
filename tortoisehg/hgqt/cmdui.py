@@ -735,7 +735,7 @@ class Dialog(QDialog):
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
 
-class Runner(QObject):
+class Runner(QWidget):
     """A component for running Mercurial command without UI
 
     This command runner doesn't show any UI element unless it gets a warning
@@ -757,9 +757,7 @@ class Runner(QObject):
         self.internallog = useInternal
         self.title = title
 
-        # XXX: should pass self as parent, but CmdThread requires QWidget
-        # as a parent.
-        self.core = Core(useInternal, parent)
+        self.core = Core(useInternal, self)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.command_finished)
         self.core.commandCanceling.connect(self.commandCanceling)
@@ -782,7 +780,7 @@ class Runner(QObject):
         if not self.internallog:
             return
         if not hasattr(self, 'dlg'):
-            self.dlg = QDialog(self.parent())
+            self.dlg = QDialog(self)
             self.dlg.setWindowTitle(self.title)
             self.core.output_text.escapePressed.connect(self.dlg.reject)
             flags = self.dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint
