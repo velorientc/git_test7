@@ -283,15 +283,6 @@ def rename(parent, ui, repo, files):
     # needs rename dialog
     raise NotImplementedError()
 
-def resolve(parent, ui, repo, files):
-    wctx = repo[None]
-    mctx = wctx.parents()[-1]
-    ms = merge.mergestate(repo)
-    for wfile in files:
-        ms.resolve(wfile, wctx, mctx)
-    ms.commit()
-    return True
-
 def unmark(parent, ui, repo, files):
     ms = merge.mergestate(repo)
     for wfile in files:
@@ -306,11 +297,10 @@ def mark(parent, ui, repo, files):
     ms.commit()
     return True
 
+def resolve(parent, ui, repo, files):
+    commands.resolve(ui, repo, *files)
+    return True
+
 def resolve_with(tool, repo, files):
-    if os.environ.get('HGMERGE'):
-        os.environ['HGMERGE'] = ''
-    oldcfg = repo.ui.config('ui', 'merge')
-    repo.ui.setconfig('ui', 'merge', tool)
-    resolve(None, None, repo, files)
-    repo.ui.setconfig('ui', 'merge', oldcfg or '')
+    commands.resolve(repo.ui, repo, *files, tool=tool)
     return True
