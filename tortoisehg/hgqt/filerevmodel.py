@@ -36,7 +36,7 @@ class FileRevModel(HgRepoListModel):
         """
         data is a HgHLRepo instance
         """
-        HgRepoListModel.__init__(self, repo, parent=parent)
+        HgRepoListModel.__init__(self, repo, '', [], False, parent)
         self.setFilename(filename)
 
     def setRepo(self, repo, branch='', fromhead=None, follow=False):

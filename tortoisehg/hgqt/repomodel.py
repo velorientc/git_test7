@@ -85,7 +85,7 @@ class HgRepoListModel(QAbstractTableModel):
     _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Age', 'Tags',)
     _stretchs = {'Log': 1, }
 
-    def __init__(self, repo, branch='', parent=None):
+    def __init__(self, repo, branch, revset, rfilter, parent):
         """
         repo is a hg repo instance
         """
@@ -97,7 +97,8 @@ class HgRepoListModel(QAbstractTableModel):
         self.rowheight = 20
         self.rowcount = 0
         self.repo = repo
-        self.revset = ()
+        self.revset = revset
+        self.filterbyrevset = rfilter
         self.reloadConfig()
         self.updateColumns()
         self.setBranch(branch)
@@ -126,7 +127,7 @@ class HgRepoListModel(QAbstractTableModel):
     def setBranch(self, branch=None, allparents=True):
         self.filterbranch = branch
         self.datacache = {}
-        if self.revset: # TODO: and self.filterbyrevset
+        if self.revset and self.filterbyrevset:
             grapher = revision_grapher(self.repo, revset=self.revset)
             self.graph = Graph(self.repo, grapher, include_mq=False)
         else:

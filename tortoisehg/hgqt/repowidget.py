@@ -54,6 +54,9 @@ class RepoWidget(QWidget):
         repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
         self.workbench = workbench
+        self.revsetfilter = False
+        self.branch = ''
+        self.revset = set()
 
         self._reload_rev = '.' # select working parent at startup
         self.currentMessage = ''
@@ -78,7 +81,10 @@ class RepoWidget(QWidget):
         self.filterbar.showMessage.connect(self.showMessage)
         self.filterbar.revisionSet.connect(self.setRevisionSet)
         self.filterbar.clearSet.connect(self.clearSet)
+        self.filterbar.filterToggled.connect(self.filterToggled)
         self.layout().addWidget(self.filterbar)
+
+        self.revsetfilter = self.filterbar.filtercb.isChecked()
 
         self.layout().addWidget(self.repotabs_splitter)
 
@@ -148,7 +154,7 @@ class RepoWidget(QWidget):
     def createCommitWidget(self):
         cw = self.getCommitWidget()
         if cw:
-            cw.commitComplete.connect(self.reload)
+            cw.commitComplete.connect(self.reload) # todo: redundant?
             return SharedWidget(cw)
 
         pats = {}
@@ -207,12 +213,27 @@ class RepoWidget(QWidget):
         return SharedWidget(sw)
 
     def clearSet(self):
-        self.repomodel.revset = set()
-        self.refresh()
+        self.revset = []
+        if self.revsetfilter:
+            self.reload()
+        else:
+            self.repomodel.revset = []
+            self.refresh()
 
     def setRevisionSet(self, nodes):
-        self.repomodel.revset = [self.repo[n].node() for n in nodes]
-        self.refresh()
+        self.revset = [self.repo[n].node() for n in nodes]
+        if self.revsetfilter:
+            self.reload()
+        else:
+            self.repomodel.revset = self.revset
+            self.refresh()
+
+    @pyqtSlot(bool)
+    def filterToggled(self, checked):
+        self.revsetfilter = checked
+        if self.revset:
+            self.repomodel.filterbyrevset = checked
+            self.reload()
 
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
@@ -312,7 +333,6 @@ class RepoWidget(QWidget):
 
     def thgimport(self, paths=None):
         dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
-        dlg.repoInvalidated.connect(self.reload)
         dlg.finished.connect(dlg.deleteLater)
         if paths:
             dlg.setfilepaths(paths)
@@ -367,11 +387,14 @@ class RepoWidget(QWidget):
                       'by this rollback, leaving uncommitted changes.\n '
                       'Continue?' % rev)):
                     return
-        saved = self.repo.ui.quiet
-        self.repo.ui.quiet = True
-        self.repo.rollback()
-        self.repo.ui.quiet = saved
-        self.reload()
+        self.repo.incrementBusyCount()
+        try:
+            saved = self.repo.ui.quiet
+            self.repo.ui.quiet = True
+            self.repo.rollback()
+            self.repo.ui.quiet = saved
+        finally:
+            self.repo.decrementBusyCount()
         QTimer.singleShot(500, lambda: shlib.shell_notify([self.repo.root]))
 
     def purge(self):
@@ -400,14 +423,12 @@ class RepoWidget(QWidget):
         self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
         self.grepDemand.setSearch(pattern, **opts)
 
-    def create_models(self):
-        self.repomodel = HgRepoListModel(self.repo, parent=self)
+    def setupModels(self):
+        self.repomodel = HgRepoListModel(self.repo, self.branch, self.revset,
+                                         self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
-
-    def setupModels(self):
-        self.create_models()
         self.repoview.setModel(self.repomodel)
         self.revDetailsWidget.setupModels(self.repomodel)
 
@@ -519,6 +540,7 @@ class RepoWidget(QWidget):
     @pyqtSlot(unicode, bool)
     def setBranch(self, branch, allparents=True):
         'Change the branch filter'
+        self.branch = branch
         self.repomodel.setBranch(branch=branch, allparents=allparents)
         self.titleChanged.emit(self.title())
 

@@ -17,6 +17,7 @@ class RepoFilterBar(QToolBar):
 
     revisionSet = pyqtSignal(object)
     clearSet = pyqtSignal()
+    filterToggled = pyqtSignal(bool)
 
     showMessage = pyqtSignal(QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -48,12 +49,17 @@ class RepoFilterBar(QToolBar):
         self.revsetle = le = QLineEdit()
         le.setCompleter(QCompleter(self.revsethist))
         le.returnPressed.connect(self.returnPressed)
-        # Requires Qt 4.7 
-        #self.revsetle.setPlaceholderText('### revision set query ###')
+        if hasattr(self.revsetle, 'setPlaceholderText'): # Qt >= 4.7 
+            self.revsetle.setPlaceholderText('### revision set query ###')
         self.addWidget(le)
 
         self.clear.clicked.connect(le.clear)
         self.clear.clicked.connect(self.clearSet)
+
+        self.filtercb = f = QCheckBox(_('filter'))
+        f.setChecked(s.value('revset-filter').toBool())
+        f.toggled.connect(self.filterToggled)
+        self.addWidget(f)
 
         self.store = store = QPushButton(_('store'))
         store.clicked.connect(self.saveQuery)
@@ -95,6 +101,7 @@ class RepoFilterBar(QToolBar):
     def storeConfigs(self, s):
         s.setValue('revset/geom', self.entrydlg.saveGeometry())
         s.setValue('revset-queries', self.revsethist)
+        s.setValue('revset-filter', self.filtercb.isChecked())
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
