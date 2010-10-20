@@ -302,5 +302,6 @@ def resolve(parent, ui, repo, files):
     return True
 
 def resolve_with(tool, repo, files):
-    commands.resolve(repo.ui, repo, *files, tool=tool)
+    opts = {'tool': tool}
+    commands.resolve(repo.ui, repo, *files, **opts)
     return True
