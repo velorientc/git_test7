@@ -339,8 +339,8 @@ class MergePage(BasePage):
             # pulled a fast one on us and updated from the CLI
             cmdline = ['debugsetparents', '.', self.wizard().other]
         else:
-            cmdline = ['--repository', self.wizard().repo.root,
-                       '--tool=internal:fail', 'merge',
+            cmdline = ['--repository', self.wizard().repo.root, 'merge',
+                       '--tool=internal:fail', 
                        self.wizard().other]
         self.cmd.run(cmdline)
 
