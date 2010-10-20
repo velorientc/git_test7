@@ -340,7 +340,7 @@ class MergePage(BasePage):
             cmdline = ['debugsetparents', '.', self.wizard().other]
         else:
             cmdline = ['--repository', self.wizard().repo.root,
-                       '--config', 'ui.merge=internal:fail', 'merge',
+                       '--tool=internal:fail', 'merge',
                        self.wizard().other]
         self.cmd.run(cmdline)
 
@@ -635,7 +635,7 @@ class ResolvePage(QWizardPage):
             tool = self.tcombo.readValue()
         cmd = ['resolve', '--repository', self.wizard().repo.root]
         if tool:
-            cmd += ['--config', 'ui.merge='+tool]
+            cmd += ['--tool='+tool]
         cmdlines = []
         for path in self.getSelectedPaths(self.utree):
             cmdlines.append(cmd + [path])
