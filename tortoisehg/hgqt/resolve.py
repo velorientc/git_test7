@@ -12,9 +12,9 @@ import os
 
 from mercurial import merge as mergemod
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, thgrepo, wctxactions, visdiff
+from tortoisehg.hgqt import qtlib, cmdui, wctxactions, visdiff
 
 MARGINS = (8, 0, 0, 0)
 
@@ -195,8 +195,7 @@ class ResolveDialog(QDialog):
         self.tcombo.reset()
 
     def refresh(self):
-        repo = self.repo
-        ms = mergemod.mergestate(repo)
+        ms = mergemod.mergestate(self.repo)
         u, r = [], []
         for path in ms:
             if ms[path] == 'u':
@@ -341,5 +340,7 @@ class ToolsCombo(QComboBox):
             return None
 
 def run(ui, *pats, **opts):
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     return ResolveDialog(repo, None)
