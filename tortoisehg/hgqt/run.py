@@ -506,6 +506,11 @@ def email(ui, *pats, **opts):
     from tortoisehg.hgqt.hgemail import run
     qtrun(run, ui, *pats, **opts)
 
+def resolve(ui, *pats, **opts):
+    """resolve dialog"""
+    from tortoisehg.hgqt.resolve import run
+    qtrun(run, ui, *pats, **opts)
+
 def merge(ui, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt.merge import run
@@ -929,6 +934,7 @@ table = {
          [('r', 'rev', '', _('revision to merge'))],
          _('thg merge [[-r] REV]')),
     "remove|rm": (remove, [], _('thg remove [FILE]...')),
+    "resolve": (resolve, [], _('thg resolve [FILE]...')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
     "rename|mv|copy": (rename, [], _('thg rename SOURCE [DEST]...')),
