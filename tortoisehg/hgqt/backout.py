@@ -139,7 +139,7 @@ class BackoutDialog(QDialog):
         # prepare command line
         revhex = self.target_info.get_data('revid')
         cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
-        cmdline += ['--config', 'ui.merge=internal:fail']
+        cmdline += ['--tool=internal:fail']
         if self.merge_chk.isChecked():
             cmdline += ['--merge']
             msg = self.msg_text.toPlainText()
