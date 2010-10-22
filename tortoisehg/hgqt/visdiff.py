@@ -19,8 +19,8 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt import qtlib, thgrepo
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 try:
     import win32con
@@ -79,7 +79,7 @@ def launchtool(cmd, opts, replace, block):
         if block:
             proc.communicate()
     except (OSError, EnvironmentError), e:
-        QtGui.QMessageBox.warning(None,
+        QMessageBox.warning(None,
                 _('Tool launch failure'),
                 _('%s : %s') % (cmd, str(e)))
 
@@ -87,7 +87,7 @@ def filemerge(ui, fname, patchedfname):
     'Launch the preferred visual diff tool for two text files'
     detectedtools = hglib.difftools(ui)
     if not detectedtools:
-        QtGui.QMessageBox.warning(None,
+        QMessageBox.warning(None,
                 _('No diff tool found'),
                 _('No visual diff tools were detected'))
         return None
@@ -134,7 +134,7 @@ def visualdiff(ui, repo, pats, opts):
             if not revs and len(p) > 1:
                 ctx1b = p[1]
     except (error.LookupError, error.RepoError):
-        QtGui.QMessageBox.warning(None,
+        QMessageBox.warning(None,
                        _('Unable to find changeset'),
                        _('You likely need to refresh this application'))
         return None
@@ -152,14 +152,14 @@ def visualdiff(ui, repo, pats, opts):
     MA = mod_a | add_a | mod_b | add_b
     MAR = MA | rem_a | rem_b
     if not MAR:
-        QtGui.QMessageBox.information(None,
+        QMessageBox.information(None,
                 _('No file changes'),
                 _('There are no file changes to view'))
         return None
 
     detectedtools = hglib.difftools(repo.ui)
     if not detectedtools:
-        QtGui.QMessageBox.warning(None,
+        QMessageBox.warning(None,
                 _('No diff tool found'),
                 _('No visual diff tools were detected'))
         return None
@@ -303,11 +303,11 @@ def visualdiff(ui, repo, pats, opts):
         thread.setDaemon(True)
         thread.start()
 
-class FileSelectionDialog(QtGui.QDialog):
+class FileSelectionDialog(QDialog):
     'Dialog for selecting visual diff candidates'
     def __init__(self, repo, pats, ctx1a, sa, ctx1b, sb, ctx2, cpy):
         'Initialize the Dialog'
-        QtGui.QDialog.__init__(self)
+        QDialog.__init__(self)
         self.setWindowTitle(_('Visual Diffs'))
         self.curFile = None
 
@@ -332,14 +332,14 @@ class FileSelectionDialog(QtGui.QDialog):
         self.copies = cpy
         self.ui = repo.ui
 
-        layout = QtGui.QVBoxLayout() 
+        layout = QVBoxLayout() 
         self.setLayout(layout)
 
-        lbl = QtGui.QLabel(_('Temporary files are removed when this dialog'
+        lbl = QLabel(_('Temporary files are removed when this dialog'
             ' is closed'))
         layout.addWidget(lbl)
 
-        list = QtGui.QListWidget()
+        list = QListWidget()
         layout.addWidget(list)
         self.list = list
         list.itemActivated.connect(self.itemActivated)
@@ -350,9 +350,9 @@ class FileSelectionDialog(QtGui.QDialog):
         self.tools = tools
 
         if len(tools) > 1:
-            hbox = QtGui.QHBoxLayout() 
-            combo = QtGui.QComboBox()
-            lbl = QtGui.QLabel(_('Select Tool:'))
+            hbox = QHBoxLayout() 
+            combo = QComboBox()
+            lbl = QLabel(_('Select Tool:'))
             lbl.setBuddy(combo)
             hbox.addWidget(lbl)
             hbox.addWidget(combo, 1)
@@ -370,7 +370,7 @@ class FileSelectionDialog(QtGui.QDialog):
             list.currentRowChanged.connect(callable)
             combo.currentIndexChanged.connect(self.toolSelect)
 
-        BB = QtGui.QDialogButtonBox
+        BB = QDialogButtonBox
         bb = BB()
         layout.addWidget(bb)
 
@@ -392,7 +392,7 @@ class FileSelectionDialog(QtGui.QDialog):
         self.updateDiffButtons(preferred)
 
         callable = lambda: self.fillmodel(repo, sa, sb)
-        QtCore.QTimer.singleShot(0, callable)
+        QTimer.singleShot(0, callable)
 
     def fillmodel(self, repo, sa, sb):
         ctx1a, ctx1b, ctx2 = self.ctxs
@@ -437,7 +437,7 @@ class FileSelectionDialog(QtGui.QDialog):
 
         for f in sorted(mod_a | add_a | rem_a):
             status = get_status(f, mod_a, add_a, rem_a)
-            row = QtCore.QString('%s %s' % (status, hglib.tounicode(f)))
+            row = QString('%s %s' % (status, hglib.tounicode(f)))
             self.list.addItem(row)
 
     def toolSelect(self, tool):
