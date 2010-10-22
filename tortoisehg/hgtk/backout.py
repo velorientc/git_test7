@@ -116,6 +116,7 @@ class BackoutDialog(gdialog.GDialog):
         if returncode == 0:
             self.cmd.set_result(_('Backed out successfully, you must now '
                                   'commit the results'), style='ok')
+            self.buttons['backout'].set_property('visible', False)
         elif useraborted:
             self.cmd.set_result(_('Canceled backout'), style='error')
         else:
