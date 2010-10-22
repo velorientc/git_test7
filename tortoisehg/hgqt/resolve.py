@@ -33,6 +33,9 @@ class ResolveDialog(QDialog):
         box.setSpacing(5)
         self.setLayout(box)
 
+        self.stlabel = QLabel()
+        box.addWidget(self.stlabel)
+
         unres = qtlib.LabeledSeparator(_('Unresolved conflicts'))
         self.layout().addWidget(unres)
 
@@ -113,11 +116,8 @@ class ResolveDialog(QDialog):
         self.layout().addLayout(hbox)
 
         self.tcombo = ToolsCombo(self.repo)
-        self.stlabel = QLabel()
         hbox.addWidget(QLabel(_('Detected merge/diff tools:')))
         hbox.addWidget(self.tcombo)
-        hbox.addSpacing(12)
-        hbox.addWidget(self.stlabel)
         hbox.addStretch(1)
 
         out = qtlib.LabeledSeparator(_('Command output'))
@@ -223,9 +223,12 @@ class ResolveDialog(QDialog):
         rchanged(QItemSelection())
         
         if u:
-            self.stlabel.setText(_('<b>Conflicts</b> must be resolved'))
+            txt = _('There are merge <b>conflicts</b> to be resolved')
+        elif r:
+            txt = _('All conflicts are resolved.')
         else:
-            self.stlabel.setText(_('Test merge results, then commit'))
+            txt = _('There are no conflicting file merges.')
+        self.stlabel.setText(txt)
 
     def reject(self):
         s = QSettings()
