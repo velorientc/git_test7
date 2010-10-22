@@ -152,6 +152,9 @@ class BackoutDialog(gdialog.GDialog):
         self.logview.set_editable(checkbutton.get_active())
 
     def backout(self):
+        # do not auto-close when finished
+        self.set_after_done(False)
+
         # prepare command line
         cmdline = ['hg', 'backout', '--rev', self.rev]
         if self.merge_button.get_active():
