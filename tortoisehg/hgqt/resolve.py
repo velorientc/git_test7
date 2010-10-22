@@ -22,6 +22,7 @@ class ResolveDialog(QDialog):
     def __init__(self, repo, parent=None):
         super(ResolveDialog, self).__init__(parent)
         self.setWindowTitle(_('Resolve conflicts - %s') % repo.displayname)
+        self.setWindowIcon(qtlib.geticon('merge'))
         self.repo = repo
 
         s = QSettings()
