@@ -238,7 +238,7 @@ class ResolveDialog(QDialog):
             txt = _('All conflicts are resolved.')
         else:
             txt = _('There are no conflicting file merges.')
-        self.stlabel.setText(txt)
+        self.stlabel.setText(u'<h2>' + txt + u'</h2>')
 
     def reject(self):
         s = QSettings()
