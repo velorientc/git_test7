@@ -70,6 +70,7 @@ class BackoutDialog(gdialog.GDialog):
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add(self.logview)
         msgvbox.pack_start(scrolledwindow)
+        self.logview.set_editable(False)
 
         ## tooltips
         self.tips = gtklib.Tooltips()
@@ -88,7 +89,8 @@ class BackoutDialog(gdialog.GDialog):
 
         ## merge after backout
         self.merge_button = gtk.CheckButton(
-                _('Merge with old dirstate parent after backout'))
+                _('Commit backout before merging with current working parent'))
+        self.merge_button.connect('toggled', self.merge_toggeled)
         hbox.pack_start(self.merge_button, False, False, 4)
         msgvbox.pack_start(hbox, False, False)
 
@@ -112,7 +114,8 @@ class BackoutDialog(gdialog.GDialog):
 
     def command_done(self, returncode, useraborted, *args):
         if returncode == 0:
-            self.cmd.set_result(_('Backed out successfully'), style='ok')
+            self.cmd.set_result(_('Backed out successfully, you must now '
+                                  'commit the results'), style='ok')
         elif useraborted:
             self.cmd.set_result(_('Canceled backout'), style='error')
         else:
@@ -145,14 +148,17 @@ class BackoutDialog(gdialog.GDialog):
         newmsg = (state and self.msgset['id'] or self.msgset['str'])
         self.buf.set_text(newmsg)
 
+    def merge_toggeled(self, checkbutton):
+        self.logview.set_editable(checkbutton.get_active())
+
     def backout(self):
         # prepare command line
-        start, end = self.buf.get_bounds()
-        msg = self.buf.get_text(start, end)
         cmdline = ['hg', 'backout', '--rev', self.rev]
         if self.merge_button.get_active():
+            start, end = self.buf.get_bounds()
+            msg = self.buf.get_text(start, end)
             cmdline += ['--merge']
-        cmdline += ['--message', hglib.fromutf(msg)]
+            cmdline += ['--message', hglib.fromutf(msg)]
 
         # start backing out
         self.execute_command(cmdline)
