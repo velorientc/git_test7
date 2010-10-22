@@ -21,6 +21,7 @@ MARGINS = (8, 0, 0, 0)
 class ResolveDialog(QDialog):
     def __init__(self, repo, parent=None):
         super(ResolveDialog, self).__init__(parent)
+        self.setWindowFlags(Qt.Window)
         self.setWindowTitle(_('Resolve conflicts - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('merge'))
         self.repo = repo
@@ -245,6 +246,7 @@ class PathsTree(QTreeView):
         QTreeView.__init__(self, parent)
         self.repo = repo
         self.setSelectionMode(QTreeView.ExtendedSelection)
+        self.setSortingEnabled(True)
 
     def dragObject(self):
         urls = []
@@ -278,7 +280,7 @@ class PathsTree(QTreeView):
 class PathsModel(QAbstractTableModel):
     def __init__(self, pathlist, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self.headers = (_('Path'), _('Ext'))
+        self.headers = (_('Path'), _('Extension'))
         self.rows = []
         for path in pathlist:
             name, ext = os.path.splitext(path)
