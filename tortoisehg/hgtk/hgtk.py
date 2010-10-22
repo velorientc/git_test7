@@ -538,6 +538,7 @@ def help_(ui, name=None, with_version=False, **opts):
     Given an extension name, print help for that extension, and the
     commands it provides."""
     option_lists = []
+    textwidth = ui.termwidth() - 2
 
     def addglobalopts(aliases):
         if ui.verbose:
@@ -626,7 +627,7 @@ def help_(ui, name=None, with_version=False, **opts):
                 commands = cmds[f].replace("|",", ")
                 ui.write(" %s:\n      %s\n"%(commands, h[f]))
             else:
-                ui.write('%s\n' % (util.wrap(h[f],
+                ui.write('%s\n' % (util.wrap(h[f], textwidth,
                                              initindent=' %-*s   ' % (m, f),
                                              hangindent=' ' * (m + 4))))
 
@@ -697,7 +698,7 @@ def help_(ui, name=None, with_version=False, **opts):
             if second:
                 initindent = ' %-*s  ' % (opts_len, first)
                 hangindent = ' ' * (opts_len + 3)
-                ui.write('%s\n' % (util.wrap(second,
+                ui.write('%s\n' % (util.wrap(second, textwidth,
                                              initindent=initindent,
                                              hangindent=hangindent)))
             else:
