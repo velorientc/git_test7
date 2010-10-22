@@ -662,7 +662,7 @@ class RepoWidget(QWidget):
         menu.exec_(point)
 
     def updateToRevision(self):
-        dlg = update.UpdateDialog(self.rev, self.repo, self)
+        dlg = update.UpdateDialog(self.repo, self.rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)

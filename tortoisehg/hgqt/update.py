@@ -10,11 +10,11 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import ui, error
+from mercurial import error, merge as mergemod
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, resolve
 
 class UpdateDialog(QDialog):
 
@@ -22,22 +22,13 @@ class UpdateDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, rev=None, repo=None, parent=None, opts={}):
+    def __init__(self, repo, rev=None, parent=None, opts={}):
         super(UpdateDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
         self._finished = False
-
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'not repository'
+        self.repo = repo
 
         # base layout box
         box = QVBoxLayout()
@@ -100,7 +91,8 @@ class UpdateDialog(QDialog):
         grid.addWidget(expander, row, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, row, 1)
 
-        self.discard_chk = QCheckBox(_('Discard local changes, no backup (-C/--clean)'))
+        self.discard_chk = QCheckBox(_('Discard local changes, no backup'
+                                       ' (-C/--clean)'))
         self.merge_chk = QCheckBox(_('Always merge (when possible)'))
         self.showlog_chk = QCheckBox(_('Always show command log'))
         optbox.addWidget(self.discard_chk)
@@ -178,6 +170,7 @@ class UpdateDialog(QDialog):
 
     def update(self):
         cmdline = ['update', '--repository', self.repo.root, '--verbose']
+        cmdline += ['--config', 'ui.merge=internal:fail']
         rev = hglib.fromunicode(self.rev_combo.currentText())
         cmdline.append('--rev')
         cmdline.append(rev)
@@ -281,7 +274,7 @@ class UpdateDialog(QDialog):
 
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
-        if ret is not 0 or self.cmd.is_show_output():
+        if ret not in (0, 1) or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)
@@ -290,13 +283,28 @@ class UpdateDialog(QDialog):
         else:
             self.accept()
 
+    def accept(self):
+        ms = mergemod.mergestate(self.repo)
+        for path in ms:
+            if ms[path] == 'u':
+                qtlib.InfoMsgBox(_('Merge caused file conflicts'),
+                                 _('File conflicts need to be resolved'))
+                dlg = resolve.ResolveDialog(self.repo, self)
+                dlg.finished.connect(dlg.deleteLater)
+                dlg.exec_()
+                break
+        super(UpdateDialog, self).accept()
+
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
 
 def run(ui, *pats, **opts):
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(ui, path=paths.find_root())
     rev = None
     if opts.get('rev'):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return UpdateDialog(rev, opts=opts)
+    return UpdateDialog(repo, rev, None, opts)
