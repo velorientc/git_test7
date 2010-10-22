@@ -100,9 +100,10 @@ def filemerge(ui, fname, patchedfname):
     launchtool(diffcmd, diffopts, replace, True)
 
 
-def besttool(ui, tools):
+def besttool(ui, tools, force=None):
     'Select preferred or highest priority tool from dictionary'
-    preferred = ui.config('tortoisehg', 'vdiff') or ui.config('ui', 'merge')
+    preferred = force or ui.config('tortoisehg', 'vdiff') or \
+                         ui.config('ui', 'merge')
     if preferred and preferred in tools:
         return preferred
     pris = []
@@ -163,7 +164,7 @@ def visualdiff(ui, repo, pats, opts):
                 _('No visual diff tools were detected'))
         return None
 
-    preferred = besttool(repo.ui, detectedtools)
+    preferred = besttool(repo.ui, detectedtools, opts.get('tool'))
 
     # Build tool list based on diff-patterns matches
     toollist = set()
