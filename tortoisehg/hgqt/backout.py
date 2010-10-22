@@ -8,29 +8,22 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui
+from mercurial import merge as mergemod
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, thgrepo
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
 
 keep = i18n.keepgettext()
 
 class BackoutDialog(QDialog):
 
-    def __init__(self, repo=None, rev='tip', parent=None, opts={}):
+    def __init__(self, repo, rev='tip', parent=None, opts={}):
         super(BackoutDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'not repository'
+        f = self.windowFlags()
+        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.repo = repo
+        self.didbackout = False
 
         # main layout box
         box = QVBoxLayout()
@@ -72,9 +65,15 @@ class BackoutDialog(QDialog):
         self.eng_chk.setChecked(engmsg)
 
         obox.addWidget(self.eng_chk)
-        self.merge_chk = QCheckBox(_('Merge with old dirstate parent '
-                                     'after backout'))
+        self.merge_chk = QCheckBox(_('Commit backout before merging with '
+                                     'current working parent'))
+        self.merge_chk.toggled.connect(self.merge_toggled)
+        self.msg_text.setEnabled(False)
         obox.addWidget(self.merge_chk)
+
+        self.reslabel = QLabel()
+        self.reslabel.linkActivated.connect(self.link_activated)
+        box.addWidget(self.reslabel)
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -120,6 +119,9 @@ class BackoutDialog(QDialog):
 
     ### Private Methods ###
 
+    def merge_toggled(self, checked):
+        self.msg_text.setEnabled(checked)
+
     def eng_toggled(self, checked):
         msg = self.msg_text.toPlainText()
         origmsg = (checked and self.msgset['str'] or self.msgset['id'])
@@ -135,14 +137,24 @@ class BackoutDialog(QDialog):
 
     def backout(self):
         # prepare command line
-        msg = self.msg_text.toPlainText()
         revhex = self.target_info.get_data('revid')
         cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
+        cmdline += ['--config', 'ui.merge=internal:fail']
         if self.merge_chk.isChecked():
             cmdline += ['--merge']
-        cmdline += ['--message', hglib.fromunicode(msg)]
+            msg = self.msg_text.toPlainText()
+            cmdline += ['--message', hglib.fromunicode(msg)]
 
         # start backing out
+        self.cmdline = cmdline
+        self.repo.incrementBusyCount()
+        self.cmd.run(cmdline)
+
+    def commit(self):
+        cmdline = ['commit', '--repository', self.repo.root]
+        msg = self.msg_text.toPlainText()
+        cmdline += ['--message', hglib.fromunicode(msg)]
+        self.cmdline = cmdline
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
@@ -160,24 +172,62 @@ class BackoutDialog(QDialog):
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
 
+    def command_canceling(self):
+        self.cancel_btn.setDisabled(True)
+
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
-        if ret is not 0 or self.cmd.is_show_output():
+        self.cancel_btn.setHidden(True)
+        if ret not in (0, 1):
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)
             self.close_btn.setFocus()
-            self.cancel_btn.setHidden(True)
-        else:
+        elif self.cmdline[0] == 'backout':
+            self.didbackout = True
+            self.merge_chk.setEnabled(False)
+            self.msg_text.setEnabled(True)
+            self.backout_btn.setText(_('Commit'))
+            self.backout_btn.clicked.disconnect(self.backout)
+            self.backout_btn.clicked.connect(self.commit)
+            self.checkResolve()
+        elif not self.cmd.is_show_output():
             self.accept()
 
-    def command_canceling(self):
-        self.cancel_btn.setDisabled(True)
+    def checkResolve(self):
+        ms = mergemod.mergestate(self.repo)
+        for path in ms:
+            if ms[path] == 'u':
+                txt = _('Backout generated merge <b>conflicts</b> that must '
+                        'be <a href="resolve"><b>resolved</b></a>')
+                self.backout_btn.setEnabled(False)
+                break
+        else:
+            self.backout_btn.setEnabled(True)
+            txt = _('You may commit the backed out changes after '
+                    '<a href="status"><b>verifying</b></a> them')
+        self.reslabel.setText(txt)
+
+    @pyqtSlot(QString)
+    def link_activated(self, cmd):
+        if cmd == 'resolve':
+            dlg = resolve.ResolveDialog(self.repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.checkResolve()
+        elif cmd == 'status':
+            dlg = status.StatusDialog([], {}, self.repo.root, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.checkResolve()
 
 def run(ui, *pats, **opts):
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(ui, path=paths.find_root())
     kargs = {'opts': opts}
     if opts.get('rev'):
         kargs['rev'] = opts.get('rev')
     elif len(pats) == 1:
         kargs['rev'] = pats[0]
-    return BackoutDialog(**kargs)
+    return BackoutDialog(repo, **kargs)
