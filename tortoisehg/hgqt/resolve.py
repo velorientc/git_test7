@@ -167,28 +167,31 @@ class ResolveDialog(QDialog):
     def edit(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
-            repo = self.repo
-            wctxactions.edit(self, repo.ui, repo, paths)
+            wctxactions.edit(self, self.repo.ui, self.repo, paths)
 
     def v3way(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
-            repo = self.repo
-            visdiff.visualdiff(repo.ui, repo, paths, {'rev':[]})
+            opts = {}
+            opts['rev'] = []
+            opts['tool'] = self.tcombo.readValue()
+            visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
 
     def vp0(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
-            repo = self.repo
-            pair = [str(repo.parents()[0].rev()), '.']
-            visdiff.visualdiff(repo.ui, repo, paths, {'rev':pair})
+            opts = {}
+            opts['rev'] = [str(self.repo.parents()[0].rev()), '.']
+            opts['tool'] = self.tcombo.readValue()
+            visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
 
     def vp1(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
-            repo = self.repo
-            pair = [str(repo.parents()[1].rev()), '.']
-            visdiff.visualdiff(repo.ui, repo, paths, {'rev':pair})
+            opts = {}
+            opts['rev'] = [str(self.repo.parents()[1].rev()), '.']
+            opts['tool'] = self.tcombo.readValue()
+            visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
 
     def configChanged(self):
         'repository has detected a change to config files'
