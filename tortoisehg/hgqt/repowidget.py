@@ -21,7 +21,7 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo, purge
-from tortoisehg.hgqt import bisect
+from tortoisehg.hgqt import bisect, resolve
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -329,6 +329,12 @@ class RepoWidget(QWidget):
 
     def bisect(self, paths=None):
         dlg = bisect.BisectDialog(self.repo, {}, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+
+    def resolve(self, paths=None):
+        dlg = resolve.ResolveDialog(self.repo, self)
+        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def thgimport(self, paths=None):

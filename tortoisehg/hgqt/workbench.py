@@ -255,6 +255,8 @@ class Workbench(QMainWindow):
         newaction(_("Recover"), self._repofwd('recover'), enabled='repoopen',
                   menu='repository')
         newseparator(menu='repository')
+        newaction(_("Resolve"), self._repofwd('resolve'),
+                  enabled='repoopen', menu='repository')
         newaction(_("Rollback/Undo"), self._repofwd('rollback'),
                   enabled='repoopen', menu='repository')
         newaction(_("Purge"), self._repofwd('purge'), enabled='repoopen',
