@@ -78,21 +78,18 @@ class BackoutDialog(gdialog.GDialog):
                 _('Commit message text for new changeset that reverses the'
                 '  effect of the change being backed out.'))
 
-        hbox = gtk.HBox()
-
         ## use English backout message option
         self.eng_msg = gtk.CheckButton(_('Use English backout message'))
         self.eng_msg.connect('toggled', self.eng_msg_toggled)
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
         self.eng_msg.set_active(engmsg)
-        hbox.pack_start(self.eng_msg, False, False)
+        msgvbox.pack_start(self.eng_msg, False, False)
 
         ## merge after backout
         self.merge_button = gtk.CheckButton(
                 _('Commit backout before merging with current working parent'))
         self.merge_button.connect('toggled', self.merge_toggeled)
-        hbox.pack_start(self.merge_button, False, False, 4)
-        msgvbox.pack_start(hbox, False, False)
+        msgvbox.pack_start(self.merge_button, False, False, 4)
 
     def get_buttons(self):
         return [('backout', _('Backout'), gtk.RESPONSE_OK),
