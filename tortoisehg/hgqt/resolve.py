@@ -30,7 +30,6 @@ class ResolveDialog(QDialog):
         self.restoreGeometry(s.value('resolve/geom').toByteArray())
 
         box = QVBoxLayout()
-        box.setContentsMargins(*MARGINS)
         box.setSpacing(5)
         self.setLayout(box)
 
