@@ -108,7 +108,8 @@ class ResolveDialog(QDialog):
         vbox.addWidget(vp1)
         vbox.addWidget(ures)
         vbox.addStretch(1)
-        self.rbuttons = (edit, v3way, vp0, vp1, ures)
+        self.rbuttons = (edit, vp0, ures)
+        self.rmbuttons = (vp1, v3way)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*MARGINS)
@@ -131,6 +132,10 @@ class ResolveDialog(QDialog):
         self.utree.selectAll()
         self.utree.setFocus()
         repo.configChanged.connect(self.configChanged)
+        repo.repositoryChanged.connect(self.repositoryChanged)
+
+    def repositoryChanged(self):
+        self.refresh()
 
     def getSelectedPaths(self, tree):
         paths = []
@@ -209,16 +214,21 @@ class ResolveDialog(QDialog):
         self.utree.resizeColumnToContents(0)
         self.utree.resizeColumnToContents(1)
         def uchanged(l):
+            full = not l.isEmpty()
             for b in self.ubuttons:
-                b.setEnabled(not l.isEmpty())
+                b.setEnabled(full)
         self.utree.selectionModel().selectionChanged.connect(uchanged)
         uchanged(QItemSelection())
         self.rtree.setModel(PathsModel(r, self))
         self.rtree.resizeColumnToContents(0)
         self.rtree.resizeColumnToContents(1)
         def rchanged(l):
+            full = not l.isEmpty()
             for b in self.rbuttons:
-                b.setEnabled(not l.isEmpty())
+                b.setEnabled(full)
+            merge = len(self.repo.parents()) > 1
+            for b in self.rmbuttons:
+                b.setEnabled(full and merge)
         self.rtree.selectionModel().selectionChanged.connect(rchanged)
         rchanged(QItemSelection())
         
