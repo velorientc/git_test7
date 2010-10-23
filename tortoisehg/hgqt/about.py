@@ -31,7 +31,6 @@ class AboutDialog(QDialog):
         super(AboutDialog, self).__init__(parent)
 
         self.updateInfo = {}
-        self.getUpdateInfo()
 
         self.setWindowIcon(qtlib.geticon('thg_logo'))
         self.setWindowTitle(_('About'))
@@ -100,6 +99,9 @@ class AboutDialog(QDialog):
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self._readsettings()
 
+        # Spawn it later, so that the dialog get visible quickly
+        QTimer.singleShot(0, self.getUpdateInfo)
+
     def getVersionInfo(self):
         def make_version(tuple):
             vers = ".".join([str(x) for x in tuple])
@@ -119,6 +121,7 @@ class AboutDialog(QDialog):
         nvl = _(''.join([name, thgv, libv]))
         self.name_version_libs_lbl.setText(nvl)
 
+    @pyqtSlot()
     def getUpdateInfo(self):
         self.uthread = AboutUpdateThread()
         self.uthread.done.connect(self.uFinished)
