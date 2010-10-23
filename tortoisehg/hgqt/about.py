@@ -75,7 +75,6 @@ class AboutDialog(QDialog):
         self.download_url_lbl.setAlignment(Qt.AlignCenter)
         self.download_url_lbl.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
         self.download_url_lbl.linkActivated.connect(self.visitTheSite)
-        self.download_lbl.setVisible(True)
         self.download_lbl.setText(' ')
         self.download_url_lbl.setText(' ')
         self.vbox.addWidget(self.download_lbl)
