@@ -511,6 +511,11 @@ def resolve(ui, *pats, **opts):
     from tortoisehg.hgqt.resolve import run
     qtrun(run, ui, *pats, **opts)
 
+def postreview(ui, *pats, **opts):
+    """post changesets to reviewboard"""
+    from tortoisehg.hgqt.postreview import run
+    qtrun(run, ui, *pats, **opts)
+
 def merge(ui, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt.merge import run

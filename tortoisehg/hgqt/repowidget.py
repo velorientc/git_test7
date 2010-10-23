@@ -291,7 +291,8 @@ class RepoWidget(QWidget):
             ('qdelete', _('Delete patch'), None, None, None, self.qdeleteRevision),
             ('strip', _('Strip...'), None, None, None, self.stripRevision),
             ('qpop-all', _('Pop all patches'), None, None, None, self.qpopAllRevision),
-            ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision)
+            ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision),
+            ('postreview', _('Review Board...'), 'reviewboard', None, None, self.sendToReviewBoard)
         ]
 
         self._actions = {}
@@ -625,10 +626,11 @@ class RepoWidget(QWidget):
         # for unapplied patches.
         menu = QMenu(self)
         
-        allactions = [['all',    ['update', 'manifest', 'merge', 'tag', 
+        allactions = [['all',    ['update', 'manifest', 'merge', 'tag',
                                   'backout', 'email', 'archive', 'copyhash']],
                       ['rebase', ['rebase']],
-                      ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish', 'qdelete', 'strip']]]
+                      ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish', 'qdelete', 'strip']],
+                      ['reviewboard', ['postreview']]]
 
         exs = self.repo.extensions()        
         for ext, actions in allactions:
@@ -661,7 +663,9 @@ class RepoWidget(QWidget):
                    'qimport': normalrev,
                    'qfinish': appliedpatch,
                    'qdelete': unappliedpatch,
-                   'strip': normalrev}
+                   'strip': normalrev,
+                   'postreview': normalrev}
+
         for action, enabled in enabled.iteritems():
             self._actions[action].setEnabled(enabled)
 
@@ -696,6 +700,10 @@ class RepoWidget(QWidget):
         'Strip the selected revision and all descendants'
         dlg = thgstrip.StripDialog(self.repo, rev=str(self.rev), parent=self)
         dlg.exec_()
+
+    def sendToReviewBoard(self):
+        run.postreview(self.repo.ui, rev=self.repoview.selectedRevisions(),
+          repo=self.repo)
 
     def emailRevision(self):
         run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),

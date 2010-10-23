@@ -487,6 +487,23 @@ INFO = (
     (_('Log Font'), 'tortoisehg.fontlog', genFontEdit,
         _('Font used to display changelog data. Default: monospace 10')),
     )),
+
+({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
+    (_('Server'), 'reviewboard.server', genEditCombo,
+        _('Path to review board'
+        ' example "http://demo.reviewboard.org"')),
+    (_('User'), 'reviewboard.user', genEditCombo,
+        _('User name to authenticate with review board')),
+    (_('Password'), 'reviewboard.password', genPasswordEntry,
+        _('Password to authenticate with review board')),
+    (_('Target Groups'), 'reviewboard.target_groups', genEditCombo,
+        _('A comma seperated list of target groups')),
+    (_('Target People'), 'reviewboard.target_people', genEditCombo,
+        _('A comma seperated list of target people')),
+    (_('Browser'), 'reviewboard.browser', genEditCombo,
+        _('The browser to launch new review requests in')),
+    )),
+
 )
 
 CONF_GLOBAL = 0

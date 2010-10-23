@@ -49,5 +49,6 @@
     <file>icons/push.svg</file>
     <file>icons/qpush.svg</file>
     <file>icons/qpop.svg</file>
+    <file>icons/reviewboard.png</file>
   </qresource>
 </RCC>
