@@ -110,7 +110,7 @@ class RepoWidget(QWidget):
         tt.setTabPosition(QTabWidget.East)
         self.repotabs_splitter.addWidget(self.taskTabsWidget)
 
-        self.revDetailsWidget = w = RevDetailsWidget(self.repo, self.repoview)
+        self.revDetailsWidget = w = RevDetailsWidget(self.repo)
         w.revisionLinkClicked.connect(self.goto)
         w.fileview.showDescSignal.connect(self.showMessage)
         self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')

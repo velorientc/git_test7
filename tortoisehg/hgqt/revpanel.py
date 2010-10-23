@@ -15,6 +15,7 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import csinfo, qtlib
 
+from PyQt4.QtCore import *
 
 def label_func(widget, item):
     if item == 'cset':
@@ -128,7 +129,7 @@ def markup_func(widget, item, value):
         return csets
     raise csinfo.UnknownItem(item)
 
-def RevPanelWidget(repo, repoview):
+def RevPanelWidget(repo):
     '''creates a rev panel widget and returns it
     
     repoview is a HgRepoView object'''
@@ -139,11 +140,19 @@ def RevPanelWidget(repo, repoview):
                    'dateage', 'parents', 'children', 'tags', 'transplant',
                    'p4', 'svn'), selectable=True, expandable=True)
     revpanel = csinfo.create(repo, style=style, custom=custom)
-    def activated(url):
-        if url.startsWith('cset://'):
-            rev = url[7:].split(':')[0]
-            repoview.goto(rev)
-    revpanel.linkActivated.connect(activated)
+
+    class RevPanelWidget_(revpanel.__class__):
+        revisionLinkClicked = pyqtSignal(unicode)
+        """Emitted (changesetid) if user clicked link to revision"""
+
+        @pyqtSlot(unicode)
+        def _maplink(self, link):
+            link = unicode(link)
+            if link.startswith('cset://'):
+                self.revisionLinkClicked.emit(link[7:].split(':')[0])
+
+    revpanel.__class__ = RevPanelWidget_
+    revpanel.linkActivated.connect(revpanel._maplink)
 
     return revpanel
 

@@ -25,11 +25,10 @@ class RevDetailsWidget(QWidget):
     showMessage = pyqtSignal(str)
     revisionLinkClicked = pyqtSignal(str)
 
-    def __init__(self, repo, repoview):
+    def __init__(self, repo):
         QWidget.__init__(self)
 
         self.repo = repo
-        self.repoview = repoview
         self.splitternames = []
 
         # these are used to know where to go after a reload
@@ -144,7 +143,8 @@ class RevDetailsWidget(QWidget):
         self.fileview.setSizePolicy(sp)
         self.fileview.setMinimumSize(QSize(0, 0))
 
-        self.revpanel = RevPanelWidget(self.repo, self.repoview)
+        self.revpanel = RevPanelWidget(self.repo)
+        self.revpanel.revisionLinkClicked.connect(self.revisionLinkClicked)
 
         cset_and_file_details_layout.addWidget(self.revpanel)
         cset_and_file_details_layout.addWidget(self.message_splitter)
