@@ -198,7 +198,6 @@ class FileLogDialog(_AbstractFileDialog):
         self.filerevmodel.showMessage.connect(self.statusBar().showMessage)
         self.filerevmodel.filled.connect(self.modelFilled)
         self.textView.setMode('file')
-        self.textView.setModel(self.filerevmodel)
         self.findToolbar.setModel(self.filerevmodel)
         self.findToolbar.setFilterFiles([self.filename])
         self.findToolbar.setMode('file')

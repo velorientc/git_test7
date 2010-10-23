@@ -437,7 +437,6 @@ class RepoWidget(QWidget):
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
         self.repoview.setModel(self.repomodel)
-        self.revDetailsWidget.setupModels(self.repomodel)
 
     def modelFilled(self):
         'initial batch of revisions loaded'

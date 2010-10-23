@@ -197,7 +197,6 @@ class HgFileView(QFrame):
         ll2.addWidget(self.ann)
         self.ann.setVisible(False)
 
-        self._model = None
         self._ctx = None
         self._filename = None
         self._annotate = False
@@ -235,11 +234,6 @@ class HgFileView(QFrame):
 
     def getAnnotate(self):
         return self._annotate
-
-    def setModel(self, model):
-        # XXX we really need only the "Graph" instance
-        self._model = model
-        self.sci.clear()
 
     def setContext(self, ctx):
         self._ctx = ctx

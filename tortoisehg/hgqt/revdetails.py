@@ -38,6 +38,7 @@ class RevDetailsWidget(QWidget):
 
         self.setupUi()
         self.createActions()
+        self.setupModels()
 
         self.fileview.setFont(getfont('fontlog').font())
         self.fileview.showMessage.connect(self.showMessage)
@@ -248,12 +249,9 @@ class RevDetailsWidget(QWidget):
     def create_models(self):
         self.filelistmodel = HgFileListModel(self.repo, parent=self)
 
-    def setupModels(self, repomodel):
-        'Called directly from repowidget to establish repomodel'
-        self.repomodel = repomodel
+    def setupModels(self):
         self.create_models()
         self.filelist.setModel(self.filelistmodel)
-        self.fileview.setModel(repomodel)
         self.filelist.fileRevSelected.connect(self.fileview.displayFile)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
