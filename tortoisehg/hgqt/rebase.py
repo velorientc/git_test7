@@ -16,8 +16,6 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, cmdui, resolve
 
-# TODO: Ask to abort rebase if early exit
-
 BB = QDialogButtonBox
 
 class RebaseDialog(QDialog):
@@ -73,6 +71,7 @@ class RebaseDialog(QDialog):
 
         self.cmd = cmdui.Widget()
         self.cmd.commandFinished.connect(self.commandFinished)
+        self.cmd.escapePressed.connect(self.reject)
         self.layout().addWidget(self.cmd, 2)
 
         bbox = QDialogButtonBox(BB.Cancel|BB.Ok)
@@ -151,6 +150,17 @@ class RebaseDialog(QDialog):
             dlg = resolve.ResolveDialog(self.repo, self)
             dlg.exec_()
         self.checkResolve()
+
+    def reject(self):
+        if os.path.exists(self.repo.join('rebasestate')):
+            main = _('Rebase is incomplete, exiting is not recommended')
+            text = _('Abort is recommended before exit.')
+            labels = ((QMessageBox.Yes, _('&Exit')),
+                      (QMessageBox.No, _('Cancel')))
+            if not qtlib.QuestionMsgBox(_('Confirm Exit'), main, text,
+                                        labels=labels, parent=self):
+                return
+        super(RebaseDialog, self).reject()
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
