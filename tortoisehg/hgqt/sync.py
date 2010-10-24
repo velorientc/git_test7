@@ -18,11 +18,10 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, thgrepo
+from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
 
 # TODO
 # Write keyring help, connect to help button
-# outgoingNodes should go to thgrepo and trigger repo signal
 
 _schemes = ['local', 'ssh', 'http', 'https']
 
