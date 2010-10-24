@@ -167,6 +167,7 @@ class ManifestWidget(QWidget):
         self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
         self._action_annotate_mode.toggled.connect(
             self._fileview.setAnnotationEnabled)
+        self._action_annotate_mode.setEnabled(self.rev is not None)
         self._toolbar.addAction(self._action_annotate_mode)
 
     @property
@@ -228,6 +229,8 @@ class ManifestWidget(QWidget):
         if self.path in self._repo[rev]:
             self._fileview.setSource(path, rev, line)
         if revchanged:
+            # annotate working copy is not supported
+            self._action_annotate_mode.setEnabled(rev is not None)
             self.revChanged.emit(rev)
 
     @property

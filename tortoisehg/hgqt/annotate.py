@@ -225,7 +225,9 @@ class AnnotateView(qscilib.Scintilla):
             self.markerDeleteAll()
 
     def isAnnotationEnabled(self):
-        """True if annotation enabled"""
+        """True if annotation enabled and available"""
+        if self.rev is None:
+            return False  # annotate working copy is not supported
         return self._annotation_enabled
 
     def _updatelexer(self, fctx):
