@@ -14,6 +14,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import hg, ui, url, util, error
+from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
@@ -501,12 +502,25 @@ class SyncWidget(QWidget):
                 self.showMessage.emit(_('Pull completed successfully'))
             else:
                 self.showMessage.emit(_('Pull aborted, ret %d') % ret)
+            # handle file conflicts during rebase
+            if os.path.exists(self.repo.join('rebasestate')):
+                dlg = rebase.RebaseDialog(self.repo, self, **opts)
+                dlg.finished.connect(dlg.deleteLater)
+                dlg.exec_()
+                return
+            # handle file conflicts during update
+            ms = mergemod.mergestate(self.repo)
+            for path in ms:
+                if ms[path] == 'u':
+                    dlg = resolve.ResolveDialog(self.repo, self)
+                    dlg.exec_()
+                    return
         self.finishfunc = finished
         cmdline = ['--repository', self.root, 'pull', '--verbose']
         if self.cachedpp == 'rebase':
-            cmdline.append('--rebase')
+            cmdline += ['--rebase', '--config', 'ui.merge=internal:fail']
         elif self.cachedpp == 'update':
-            cmdline.append('--update')
+            cmdline += ['--update', '--config', 'ui.merge=internal:fail']
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
         self.run(cmdline, ('force', 'branch', 'rev'))
