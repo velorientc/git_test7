@@ -104,11 +104,13 @@ class RepoWidget(QWidget):
 
         self.repotabs_splitter.addWidget(self.repoview)
         self.repotabs_splitter.setCollapsible(0, False)
+        self.repotabs_splitter.setStretchFactor(0, 1)
 
         self.taskTabsWidget = tt = QTabWidget()
         tt.setDocumentMode(True)
         tt.setTabPosition(QTabWidget.East)
         self.repotabs_splitter.addWidget(self.taskTabsWidget)
+        self.repotabs_splitter.setStretchFactor(1, 1)
 
         self.revDetailsWidget = w = RevDetailsWidget(self.repo)
         w.revisionLinkClicked.connect(self.goto)

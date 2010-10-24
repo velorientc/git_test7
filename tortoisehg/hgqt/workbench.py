@@ -56,6 +56,7 @@ class Workbench(QMainWindow):
         self.log = LogDockWidget(self)
         self.log.setObjectName('Log')
         self.log.progressReceived.connect(self.statusbar.progress)
+        self.log.hide()
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log)
 
         self._setupActions()

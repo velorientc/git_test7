@@ -195,6 +195,11 @@ class RepoTreeView(QTreeView):
         m = self.model()
         m.addRepo(self.selitem, '')
 
+    def sizeHint(self):
+        size = super(RepoTreeView, self).sizeHint()
+        size.setWidth(QFontMetrics(self.font()).width('M') * 15)
+        return size
+
 class RepoRegistryView(QDockWidget):
 
     openRepoSignal = pyqtSignal(QString)

@@ -83,7 +83,7 @@ class RevDetailsWidget(QWidget):
 
         self.tbarFileListFrame = QFrame(self.filelist_splitter)
         sp = SP(SP.Preferred, SP.Preferred)
-        sp.setHorizontalStretch(1)
+        sp.setHorizontalStretch(3)
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(
             self.tbarFileListFrame.sizePolicy().hasHeightForWidth())
@@ -98,7 +98,7 @@ class RevDetailsWidget(QWidget):
 
         self.cset_and_file_details_frame = QFrame(self.filelist_splitter)
         sp = SP(SP.Preferred, SP.Preferred)
-        sp.setHorizontalStretch(1)
+        sp.setHorizontalStretch(7)
         sp.setVerticalStretch(0)
         sp.setHeightForWidth(
             self.cset_and_file_details_frame.sizePolicy().hasHeightForWidth())
@@ -129,7 +129,7 @@ class RevDetailsWidget(QWidget):
 
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
-        sp.setVerticalStretch(0)
+        sp.setVerticalStretch(2)
         sp.setHeightForWidth(self.message.sizePolicy().hasHeightForWidth())
         self.message.setSizePolicy(sp)
         self.message.setMinimumSize(QSize(0, 0))
@@ -138,7 +138,7 @@ class RevDetailsWidget(QWidget):
         self.fileview = HgFileView(self.message_splitter)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
-        sp.setVerticalStretch(1)
+        sp.setVerticalStretch(5)
         sp.setHeightForWidth(self.fileview.sizePolicy().hasHeightForWidth())
         self.fileview.setSizePolicy(sp)
         self.fileview.setMinimumSize(QSize(0, 0))
@@ -305,5 +305,5 @@ class RevDetailsWidget(QWidget):
         wb = "RevDetailsWidget/"
         for n in self.splitternames:
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
-        expanded = s.value(wb + 'revpanel.expanded', True).toBool()
+        expanded = s.value(wb + 'revpanel.expanded', False).toBool()
         self.revpanel.set_expanded(expanded)
