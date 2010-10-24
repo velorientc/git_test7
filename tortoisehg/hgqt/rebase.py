@@ -16,6 +16,8 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, cmdui, resolve
 
+# TODO: Ask to abort rebase if early exit
+
 BB = QDialogButtonBox
 
 class RebaseDialog(QDialog):
@@ -83,8 +85,9 @@ class RebaseDialog(QDialog):
         self.bbox = bbox
 
         if self.checkResolve() or not (s or d):
-            for w in (srb, destb, sep, self.keepchk, self.detachchk):
+            for w in (srcb, destb, sep, self.keepchk, self.detachchk):
                 w.setHidden(True)
+                self.cmd.show_output(True)
 
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
