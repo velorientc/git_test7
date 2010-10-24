@@ -21,7 +21,7 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, thgrepo, purge
-from tortoisehg.hgqt import bisect, resolve
+from tortoisehg.hgqt import bisect, rebase, resolve
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -723,17 +723,10 @@ class RepoWidget(QWidget):
 
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
-        srcrev = self.rev
-        dstrev = self.repo['.'].rev()
-        main = _("Confirm Rebase Revision")
-        text = _("Rebase revision %d on top of %d?") % (srcrev, dstrev)
-        labels = ((QMessageBox.Yes, _('&Yes')),
-                  (QMessageBox.No, _('&No')))
-        cmdline = ['rebase', '--source', str(srcrev), '--dest', str(dstrev),
-                   '--repository', self.repo.root]
-        if QuestionMsgBox(_('Confirm Rebase'), main, text, labels=labels,
-                          parent=self):
-            self.runCommand(_('Rebase - TortoiseHg'), cmdline)
+        opts = {'source' : self.rev, 'dest': self.repo['.'].rev()}
+        dlg = rebase.RebaseDialog(self.repo, self, **opts)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
 
     def qimportRevision(self):
         """QImport revision and all descendents to MQ"""

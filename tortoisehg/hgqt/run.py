@@ -649,6 +649,11 @@ def strip(ui, *pats, **opts):
     from tortoisehg.hgqt.thgstrip import run
     qtrun(run, ui, *pats, **opts)
 
+def rebase(ui, *pats, **opts):
+    """rebase dialog"""
+    from tortoisehg.hgqt.rebase import run
+    qtrun(run, ui, *pats, **opts)
+
 def thgimport(ui, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt.thgimport import run
@@ -960,6 +965,15 @@ table = {
          ('n', 'nobackup', None, _('do not back up stripped revisions')),
          ('r', 'rev', '', _('revision to strip')),],
         _('thg strip [-f] [-n] [[-r] REV]')),
+    "^rebase": (rebase,
+        [('', 'keep', False, _('keep original changesets')),
+         ('', 'detach', False, _('force detaching of source from its original '
+                                'branch')),
+         ('s', 'source', '',
+          _('rebase from the specified changeset')),
+         ('d', 'dest', '',
+          _('rebase onto the specified changeset'))],
+        _('thg rebase -s REV -d REV [--keep] [--detach]')),
     "^tag":
         (tag,
          [('f', 'force', None, _('replace existing tag')),
