@@ -140,6 +140,8 @@ class ResolveDialog(QDialog):
     def getSelectedPaths(self, tree):
         paths = []
         repo = self.repo
+        if not tree.selectionModel():
+            return paths
         for idx in tree.selectionModel().selectedRows():
             path = hglib.fromunicode(idx.data().toString())
             paths.append(repo.wjoin(path))
@@ -210,18 +212,37 @@ class ResolveDialog(QDialog):
                 u.append(path)
             else:
                 r.append(path)
+        paths = self.getSelectedPaths(self.utree)
         self.utree.setModel(PathsModel(u, self))
         self.utree.resizeColumnToContents(0)
         self.utree.resizeColumnToContents(1)
+
+        model = self.utree.model()
+        smodel = self.utree.selectionModel()
+        for i, p in enumerate(u):
+            if p in paths:
+                index = model.index(i, 0)
+                smodel.select(index, QItemSelectionModel.Select)
+
         def uchanged(l):
             full = not l.isEmpty()
             for b in self.ubuttons:
                 b.setEnabled(full)
         self.utree.selectionModel().selectionChanged.connect(uchanged)
         uchanged(QItemSelection())
+
+        paths = self.getSelectedPaths(self.rtree)
         self.rtree.setModel(PathsModel(r, self))
         self.rtree.resizeColumnToContents(0)
         self.rtree.resizeColumnToContents(1)
+
+        model = self.rtree.model()
+        smodel = self.rtree.selectionModel()
+        for i, p in enumerate(r):
+            if p in paths:
+                index = model.index(i, 0)
+                smodel.select(index, QItemSelectionModel.Select)
+
         def rchanged(l):
             full = not l.isEmpty()
             for b in self.rbuttons:
