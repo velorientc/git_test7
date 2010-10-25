@@ -30,7 +30,7 @@ def settingsfilename():
 
 class RepoTreeView(QTreeView):
     def __init__(self, parent, workbench):
-        QTreeView.__init__(self, parent)
+        QTreeView.__init__(self, parent, allColumnsShowFocus=True)
         self.workbench = workbench
         self.selitem = None
         self.msg  = ''
