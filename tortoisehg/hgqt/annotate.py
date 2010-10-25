@@ -155,7 +155,7 @@ class AnnotateView(qscilib.Scintilla):
         """
         if self.annfile == wfile and self.rev == rev:
             if line:
-                self.setCursorPosition(line - 1, 0)
+                self.setCursorPosition(int(line) - 1, 0)
             return
 
         try:
@@ -170,7 +170,7 @@ class AnnotateView(qscilib.Scintilla):
         self.annfile = wfile
         self.setText(hglib.tounicode(fctx.data()))
         if line:
-            self.setCursorPosition(line - 1, 0)
+            self.setCursorPosition(int(line) - 1, 0)
         self._updatelexer(fctx)
         self._updatemarginwidth()
         self.sourceChanged.emit(wfile, self._rev)
