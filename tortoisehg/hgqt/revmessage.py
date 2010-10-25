@@ -68,7 +68,6 @@ class RevMessage(QWidget):
         self.ctx = ctx
 
         desc = xml_escape(tounicode(ctx.description()))
-        desc = desc.replace('\n', '<br/>\n')
 
         buf = ''
         pos = 0
@@ -87,7 +86,7 @@ class RevMessage(QWidget):
         if pos < len(desc):
             buf += desc[pos:]
 
-        buf = '<div class="diff_desc"><p>%s</p></div>' % buf
+        buf = '<pre>%s</pre>' % buf
         self._message.setHtml(buf)
 
     def minimumSizeHint(self):
