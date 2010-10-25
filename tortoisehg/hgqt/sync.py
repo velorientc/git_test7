@@ -503,7 +503,7 @@ class SyncWidget(QWidget):
                 self.showMessage.emit(_('Pull aborted, ret %d') % ret)
             # handle file conflicts during rebase
             if os.path.exists(self.repo.join('rebasestate')):
-                dlg = rebase.RebaseDialog(self.repo, self, **opts)
+                dlg = rebase.RebaseDialog(self.repo, self)
                 dlg.finished.connect(dlg.deleteLater)
                 dlg.exec_()
                 return
