@@ -5,7 +5,7 @@
 Name:		tortoisehg
 Version:	hg
 Release:	hg
-Summary:	Mercurial GUI command line tool hgtk
+Summary:	Mercurial GUI command line tool thg
 Group:		Development/Tools
 License:	GPLv2
 # Few files are under the more permissive GPLv2+
@@ -16,11 +16,14 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # subpackage has to be arch-specific (because of lib64)
 # BuildArch:	noarch
 BuildRequires:	python, python-devel, gettext, python-sphinx
-Requires:	python >= 2.4, python-iniparse, mercurial >= 1.3, gnome-python2-gconf
-Requires:	gnome-python2-gtksourceview, pycairo, pygobject2, pygtk2 >= 2.10
+BuildRequires:	PyQt4-devel
+Requires:	python >= 2.4, python-iniparse, mercurial >= 1.6
+# gconf needs at util/shlib.py for browse_url(url).
+Requires:	gnome-python2-gconf
+Requires:	PyQt4 >= 4.6, qscintilla-python
 
 %description
-This package contains the hgtk command line tool which provides a 
+This package contains the thg command line tool which provides a 
 graphical user interface to the Mercurial distributed revision control system. 
 
 %package	nautilus
@@ -63,6 +66,9 @@ install -m 644 -D contrib/_hgtk $RPM_BUILD_ROOT/%{_datadir}/zsh/site-functions/_
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/mercurial/hgrc.d
 install contrib/mergetools.rc $RPM_BUILD_ROOT%{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
+ln -s tortoisehg/icons/svg/thg_logo.svg %{buildroot}%{_datadir}/pixmaps/%{name}_logo.svg
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications contrib/%{name}.desktop
+
 %find_lang %{name}
 
 %clean
@@ -72,10 +78,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %defattr(-,root,root,-)
 %doc COPYING.txt doc/build/html/
-%{_bindir}/hgtk
+%{_bindir}/thg
 %{python_sitelib}/tortoisehg/
 %{python_sitelib}/tortoisehg-*.egg-info
 %{_datadir}/pixmaps/tortoisehg/
+%{_datadir}/pixmaps/%{name}_logo.svg
+%{_datadir}/applications/%{name}.desktop
 
 # /usr/share/zsh/site-functions/ is owned by zsh package which we don't want to
 # require. We also don't want to create a sub-package just for this dependency.
