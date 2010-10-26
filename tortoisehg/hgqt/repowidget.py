@@ -136,9 +136,8 @@ class RepoWidget(QWidget):
 
     def title(self):
         """Returns the expected title for this widget [unicode]"""
-        branch = self.repomodel.branch()
-        if branch:
-            return '%s [%s]' % (self.repo.shortname, branch)
+        if self.branch:
+            return '%s [%s]' % (self.repo.shortname, self.branch)
         else:
             return self.repo.shortname
 
