@@ -62,6 +62,13 @@ class RebaseDialog(QDialog):
         self.detachchk.setChecked(opts.get('detach', True))
         self.layout().addWidget(self.detachchk)
 
+        if 'hgsubversion' in repo.extensions():
+            self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head'
+                                      ' (override source, destination)'))
+            self.layout().addWidget(self.svnchk)
+        else:
+            self.svnchk = None
+
         sep = qtlib.LabeledSeparator(_('Status'))
         self.layout().addWidget(sep)
 
@@ -105,9 +112,12 @@ class RebaseDialog(QDialog):
                 cmdline += ['--keep']
             if self.detachchk.isChecked():
                 cmdline += ['--detach']
-            source = self.opts.get('source')
-            dest = self.opts.get('dest')
-            cmdline += ['--source', str(source), '--dest', str(dest)]
+            if self.svnchk is not None and self.svnchk.isChecked():
+                cmdline += ['--svn']
+            else:
+                source = self.opts.get('source')
+                dest = self.opts.get('dest')
+                cmdline += ['--source', str(source), '--dest', str(dest)]
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
@@ -167,5 +177,6 @@ def run(ui, *pats, **opts):
     from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     if not opts['source'] or not opts['dest']:
-        raise util.Abort('source and dest must be supplied')
+        print _('abort: source and dest must be supplied\n')
+        import sys; sys.exit()
     return RebaseDialog(repo, None, **opts)
