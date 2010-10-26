@@ -122,6 +122,13 @@ class RevisionSetQuery(QDialog):
         layout.setContentsMargins(*(4,)*4)
         self.setLayout(layout)
 
+        if 'hgsubversion' in repo.extensions():
+            global _logical, _ancestry
+            _logical = list(_logical) + [('fromsvn()', 
+                    _('all revisions converted from subversion')),]
+            _ancestry = list(_ancestry) + [('svnrev(rev)',
+                    _('changeset which represents converted svn revision')),]
+
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
         self.stbar.lbl.setOpenExternalLinks(True)
