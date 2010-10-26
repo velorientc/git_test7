@@ -1196,18 +1196,21 @@ class GStatus(gdialog.GWindow):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
                 ms.mark(wfile, "u")
+            ms.commit()
             self.reload_status()
         def mark(menuitem, files):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
                 ms.mark(wfile, "r")
+            ms.commit()
             self.reload_status()
         def resolve(stat, files):
             wctx = self.repo[None]
             mctx = wctx.parents()[-1]
+            ms = merge_.mergestate(self.repo)
             for wfile in files:
-                ms = merge_.mergestate(self.repo)
                 ms.resolve(wfile, wctx, mctx)
+            ms.commit()
             self.reload_status()
         def resolve_with(stat, tool, files):
             if tool:
