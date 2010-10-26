@@ -457,7 +457,10 @@ class MergePage(BasePage):
     def check_status(self, callback=None):
         repo = self.wizard().repo
         class CheckThread(QThread):
-            completed = pyqtSignal(bool, int)
+            def __init__(self, parent):
+                QThread.__init__(self, parent)
+                self.results = (False, 1)
+
             def run(self):
                 ms = mergemod.mergestate(repo)
                 unresolved = False
@@ -466,8 +469,11 @@ class MergePage(BasePage):
                         unresolved = True
                 wctx = repo[None]
                 dirty = bool(wctx.dirty()) or unresolved
-                self.completed.emit(dirty, len(wctx.parents()))
-        def completed(dirty, parents):
+                self.results = (dirty, len(wctx.parents()))
+
+        def completed():
+            self.th.wait()
+            dirty, parents = self.th.results
             self.clean = not dirty
             self.groups.set_visible(False, 'prog')
             self.groups.set_visible(dirty, 'detail')
@@ -483,8 +489,8 @@ class MergePage(BasePage):
             self.completeChanged.emit()
             if callable(callback):
                 callback()
-        self.th = CheckThread()
-        self.th.completed.connect(completed)
+        self.th = CheckThread(self)
+        self.th.finished.connect(completed)
         self.th.start()
 
 
