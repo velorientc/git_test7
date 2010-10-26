@@ -208,7 +208,7 @@ class RevisionSetQuery(QDialog):
         self.showMessage.emit(_('Searching...'))
         self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
 
-        self.refreshing = RevsetThread(self.repo, self.entry.text())
+        self.refreshing = RevsetThread(self.repo, self.entry.text(), self)
         self.refreshing.showMessage.connect(self.showMessage)
         self.refreshing.queryIssued.connect(self.queryIssued)
         self.refreshing.finished.connect(self.queryFinished)
@@ -216,6 +216,7 @@ class RevisionSetQuery(QDialog):
         self.refreshing.start()
 
     def queryFinished(self):
+        self.refreshing.wait()
         self.entry.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Running')))
 
@@ -353,10 +354,9 @@ class RevsetThread(QThread):
     queryIssued = pyqtSignal(QString, object)
     showMessage = pyqtSignal(QString)
     setCursorPosition = pyqtSignal(int, int)
-    finished = pyqtSignal()
 
-    def __init__(self, repo, query):
-        super(RevsetThread, self).__init__()
+    def __init__(self, repo, query, parent):
+        super(RevsetThread, self).__init__(parent)
         self.repo = repo
         self.text = hglib.fromunicode(query)
         self.query = query
@@ -386,7 +386,6 @@ class RevsetThread(QThread):
             self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
 
         os.chdir(cwd)
-        self.finished.emit()
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
