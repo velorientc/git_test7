@@ -19,41 +19,10 @@ from mercurial.error import RepoError
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.quickbar import QuickBar
 from tortoisehg.hgqt import htmllistview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-class GotoQuickBar(QuickBar):
-    gotoSignal = pyqtSignal(unicode)
-
-    def __init__(self, parent):
-        QuickBar.__init__(self, 'Goto', 'Ctrl+Shift+G', 'Goto', parent)
-
-    def createActions(self, openkey, desc):
-        QuickBar.createActions(self, openkey, desc)
-        self._actions['go'] = QAction('Go', self)
-        self._actions['go'].triggered.connect(self.goto)
-
-    def goto(self):
-        self.gotoSignal.emit(unicode(self.entry.text()))
-
-    def createContent(self):
-        QuickBar.createContent(self)
-        self.entry = QLineEdit(self)
-        self.addWidget(self.entry)
-        self.addAction(self._actions['go'])
-        self.entry.returnPressed.connect(self._actions['go'].trigger)
-
-    def setVisible(self, visible=True):
-        QuickBar.setVisible(self, visible)
-        if visible:
-            self.entry.setFocus()
-            self.entry.selectAll()
-
-    def setCompletionKeys(self, keys):
-        self.entry.setCompleter(QCompleter(keys))
 
 class HgRepoView(QTableView):
 
@@ -81,7 +50,6 @@ class HgRepoView(QTableView):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.createToolbars()
         self.doubleClicked.connect(self.revActivated)
         self.clicked.connect(self.revClicked)
 
@@ -97,11 +65,6 @@ class HgRepoView(QTableView):
             self.gotoAncestor(index)
             return
         QTableView.mousePressEvent(self, event)
-
-    def createToolbars(self):
-        self.gototb = tb = GotoQuickBar(self)
-        tb.setObjectName('gototb')
-        tb.gotoSignal.connect(self.goto)
 
     def contextMenuEvent(self, event):
         self.menuRequested.emit(event.globalPos(), self.selectedRevisions())
@@ -121,7 +84,6 @@ class HgRepoView(QTableView):
         self.init_variables()
         QTableView.setModel(self, model)
         self.selectionModel().currentRowChanged.connect(self.revSelected)
-        self.gototb.setCompletionKeys(self.repo.tags().keys())
         self.resetDelegate()
         model.layoutChanged.connect(self.resetDelegate)
 
@@ -225,7 +187,8 @@ class HgRepoView(QTableView):
         if ctx.thgmqunappliedpatch() or ctx2.thgmqunappliedpatch():
             return
         ancestor = ctx.ancestor(ctx2)
-        self.showMessage.emit(_("Goto ancestor of %s and %s")%(ctx.rev(), ctx2.rev()))
+        self.showMessage.emit(_("Goto ancestor of %s and %s") % (
+                                ctx.rev(), ctx2.rev()))
         self.goto(ancestor.rev())
 
     def updateActions(self):
@@ -269,5 +232,4 @@ class HgRepoView(QTableView):
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
-                self.gototb.setVisible(False)
                 self.setCurrentIndex(idx)

@@ -30,9 +30,41 @@ from tortoisehg.hgqt.commit import CommitWidget
 from tortoisehg.hgqt.manifestdialog import ManifestTaskWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
+from tortoisehg.hgqt.quickbar import QuickBar
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+class GotoQuickBar(QuickBar):
+    gotoSignal = pyqtSignal(unicode)
+
+    def __init__(self, parent):
+        QuickBar.__init__(self, 'Goto', 'Ctrl+Shift+G', 'Goto', parent)
+
+    def createActions(self, openkey, desc):
+        QuickBar.createActions(self, openkey, desc)
+        self._actions['go'] = QAction('Go', self)
+        self._actions['go'].triggered.connect(self.goto)
+
+    def goto(self):
+        self.gotoSignal.emit(unicode(self.entry.text()))
+
+    def createContent(self):
+        QuickBar.createContent(self)
+        self.entry = QLineEdit(self)
+        self.addWidget(self.entry)
+        self.addAction(self._actions['go'])
+        self.entry.returnPressed.connect(self._actions['go'].trigger)
+
+    def setVisible(self, visible=True):
+        QuickBar.setVisible(self, visible)
+        if visible:
+            self.entry.setFocus()
+            self.entry.selectAll()
+
+    def setCompletionKeys(self, keys):
+        self.entry.setCompleter(QCompleter(keys))
+
 
 class RepoWidget(QWidget):
 
@@ -74,6 +106,7 @@ class RepoWidget(QWidget):
         self.repotabs_splitter = QSplitter(orientation=Qt.Vertical)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
 
         self.filterbar = RepoFilterBar(self.repo)
         self.filterbar.branchChanged.connect(self.setBranch)
@@ -83,6 +116,11 @@ class RepoWidget(QWidget):
         self.filterbar.clearSet.connect(self.clearSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
         self.layout().addWidget(self.filterbar)
+
+        self.gototb = tb = GotoQuickBar(self)
+        tb.setObjectName('gototb')
+        tb.gotoSignal.connect(self.goto)
+        self.layout().addWidget(tb)
 
         self.revsetfilter = self.filterbar.filtercb.isChecked()
 
@@ -438,6 +476,7 @@ class RepoWidget(QWidget):
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
         self.repoview.setModel(self.repomodel)
+        self.gototb.setCompletionKeys(self.repo.tags().keys())
 
     def modelFilled(self):
         'initial batch of revisions loaded'
