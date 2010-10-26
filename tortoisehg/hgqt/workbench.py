@@ -428,7 +428,7 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.addTab(rw, rw.title())
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(
-            lambda title: self.repoTabsWidget.setTabText(index, title))
+            lambda title: tw.setTabText(tw.indexOf(rw), title))
         self.reporegistry.addRepo(repo.root)
 
         self.updateMenu()
