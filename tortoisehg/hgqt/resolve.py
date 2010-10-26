@@ -128,6 +128,14 @@ class ResolveDialog(QDialog):
         self.cmd.show_output(True)
         self.layout().addWidget(self.cmd)
 
+        BB = QDialogButtonBox
+        bbox = QDialogButtonBox(BB.Ok|BB.Close)
+        bbox.button(BB.Ok).setText('Refresh')
+        bbox.accepted.connect(self.refresh)
+        bbox.rejected.connect(self.reject)
+        self.layout().addWidget(bbox)
+        self.bbox = bbox
+
         self.refresh()
         self.utree.selectAll()
         self.utree.setFocus()
