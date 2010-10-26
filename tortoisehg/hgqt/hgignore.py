@@ -19,7 +19,7 @@ from tortoisehg.util import shlib, hglib, paths
 from tortoisehg.hgqt import qtlib, thgrepo
 
 class HgignoreDialog(QDialog):
-    'Edit a reposiory .hgignore file'
+    'Edit a repository .hgignore file'
 
     ignoreFilterUpdated = pyqtSignal()
 
