@@ -66,6 +66,9 @@ install -m 644 -D contrib/_hgtk $RPM_BUILD_ROOT/%{_datadir}/zsh/site-functions/_
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/mercurial/hgrc.d
 install contrib/mergetools.rc $RPM_BUILD_ROOT%{_sysconfdir}/mercurial/hgrc.d/thgmergetools.rc
 
+ln -s tortoisehg/icons/svg/thg_logo.svg %{buildroot}%{_datadir}/pixmaps/%{name}_logo.svg
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications contrib/%{name}.desktop
+
 %find_lang %{name}
 
 %clean
@@ -79,6 +82,8 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/tortoisehg/
 %{python_sitelib}/tortoisehg-*.egg-info
 %{_datadir}/pixmaps/tortoisehg/
+%{_datadir}/pixmaps/%{name}_logo.svg
+%{_datadir}/applications/%{name}.desktop
 
 # /usr/share/zsh/site-functions/ is owned by zsh package which we don't want to
 # require. We also don't want to create a sub-package just for this dependency.
