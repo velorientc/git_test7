@@ -12,9 +12,9 @@ from PyQt4.QtGui import *
 
 from mercurial import util, error
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, qtlib
 
 class BisectDialog(QDialog):
     def __init__(self, repo, opts, parent=None):
@@ -151,5 +151,7 @@ class BisectDialog(QDialog):
 
 
 def run(ui, *pats, **opts):
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     return BisectDialog(repo, opts)

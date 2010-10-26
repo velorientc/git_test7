@@ -9,8 +9,8 @@ import os
 
 from mercurial import revset, error
 
-from tortoisehg.hgqt import qtlib, cmdui, thgrepo
-from tortoisehg.util import hglib, paths
+from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerPython
@@ -388,5 +388,7 @@ class RevsetThread(QThread):
         os.chdir(cwd)
 
 def run(ui, *pats, **opts):
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     return RevisionSetQuery(repo)
