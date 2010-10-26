@@ -269,6 +269,7 @@ class CmdThread(QThread):
         try:
             for k, v in ui.configitems('defaults'):
                 ui.setconfig('defaults', k, '')
+            self.ret = 255
             self.ret = dispatch._dispatch(ui, self.cmdline) or 0
         except util.Abort, e:
             ui.write_err(local._('abort: ') + str(e) + '\n')
@@ -277,7 +278,7 @@ class CmdThread(QThread):
         except (Exception, OSError, IOError), e:
             ui.write_err(str(e) + '\n')
         except KeyboardInterrupt:
-            pass
+            self.ret = -1
 
         if self.ret == -1:
             if self.abortbyuser:
