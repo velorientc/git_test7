@@ -500,8 +500,6 @@ INFO = (
         _('A comma seperated list of target groups')),
     (_('Target People'), 'reviewboard.target_people', genEditCombo,
         _('A comma seperated list of target people')),
-    (_('Browser'), 'reviewboard.browser', genEditCombo,
-        _('The browser to launch new review requests in')),
     )),
 
 )

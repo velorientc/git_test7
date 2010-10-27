@@ -38,25 +38,33 @@ class LoadReviewDataThread(QThread):
 
     def run(self):
         msg = None
-        try:
-            self._reviewboard = reviewboard.ReviewBoard(self.dialog.server,
-                                                        None, False)
-            self._reviewboard.login(self.dialog.user, self.dialog.password)
-            self.load_combos()
 
-        except reviewboard.ReviewBoardError, e:
-            if self.dialog.server:
+        if self.dialog.server:
+            try:
+                self._reviewboard = reviewboard.ReviewBoard(self.dialog.server,
+                                                            None, False)
+                self._reviewboard.login(self.dialog.user, self.dialog.password)
+                self.load_combos()
+
+            except reviewboard.ReviewBoardError, e:
                 msg = e.message
-            else:
-                msg = _("The review board server is not setup in settings")
+        else:
+            msg = _("The review board server is not setup in settings")
 
         self.dialog._error_message = msg
 
     def load_combos(self):
+        #Get the index of a users previously selected repo id
+        index = 0
+        count = 0
         for r in self._reviewboard.repositories():
+            if r['id'] == self.dialog._repo_id:
+                index = count
             self.dialog._qui.repo_id_combo.addItem(str(r['id']) + ": " + r['name'])
+            count += 1
 
-        self.dialog._qui.repo_id_combo.setCurrentIndex(0)
+        self.dialog._qui.repo_id_combo.setCurrentIndex(index)
+
         for r in self._reviewboard.requests():
             if self.is_valid_request(r):
                 summary = str(r['id']) + ": " + str(r['summary'])[0:100]
@@ -115,7 +123,8 @@ class PostReviewDialog(QDialog):
     @pyqtSlot()
     def error_prompt(self):
         if self._error_message:
-            qtlib.ErrorMsgBox(_('Error'), self._error_message)
+            qtlib.ErrorMsgBox(_('Review Board'),
+                              _('Error'), self._error_message)
 
             # Dispose of the reviewdatathread
             self._review_thread.terminate()
@@ -143,6 +152,8 @@ class PostReviewDialog(QDialog):
         self._qui.summary_edit.addItems(
                 s.value('reviewboard/summary_edit_history').toStringList())
 
+        self._repo_id = s.value('reviewboard/repo_id').toInt()[0]
+
         self.server = self._repo.ui.config('reviewboard', 'server')
         self.user = self._repo.ui.config('reviewboard', 'user')
         self.password = self._repo.ui.config('reviewboard', 'password')
@@ -157,6 +168,7 @@ class PostReviewDialog(QDialog):
                    self._qui.outgoing_changes_check.isChecked())
         s.setValue('reviewboard/update_fields',
                    self._qui.update_fields.isChecked())
+        s.setValue('reviewboard/repo_id', self._getrepoid())
 
         def itercombo(w):
             if w.currentText():
@@ -221,12 +233,17 @@ class PostReviewDialog(QDialog):
             opts['summary'] = str(self._qui.summary_edit.currentText())
 
         if (len(self._selectedrevs) > 1):
-            opts['parent'] = str(self._selectedrevs[0])
+            #Set the parent to the revision below the last one on the list
+            #so all checked revisions are included in the request
+            opts['parent'] = str(self._selectedrevs[0] - 1)
 
         # Always use the upstream repo to determine the parent diff base
         # without the diff uploaded to reviewboard dies
         # TODO: Fix this is a bug in the postreview extension
         opts['outgoing'] = True
+
+        #Finally we want to pass the repo path to the hg extension
+        opts['repository'] = self._repo.root
 
         return opts
 
@@ -271,12 +288,32 @@ class PostReviewDialog(QDialog):
         opts = self._postreviewopts()
 
         revstr = str(self._selectedrevs.pop())
-        cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr], self)
-        cmd.setWindowTitle(_('Posting Review'))
-        cmd.show_output(False)
-        if cmd.exec_():
-            self._writesettings()
-            super(PostReviewDialog, self).accept()
+
+        self._qui.post_review_button.setEnabled(False)
+
+        self._cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr], self, self.on_completion)
+        self._cmd.setWindowTitle(_('Posting Review'))
+        self._cmd.show_output(False)
+
+    @pyqtSlot()
+    def on_completion(self):
+        output = self._cmd.core.get_rawoutput()
+
+        if (output.find('saved:') > 0):
+            url = output.split('saved: ').pop().strip()
+            QDesktopServices.openUrl(QUrl(url))
+
+            qtlib.InfoMsgBox(_('Review Board'), _('Success'),
+                               _('Review posted to %s\n' % url),
+                               parent=self)
+        else:
+            output = output.split('%20').pop()
+            qtlib.ErrorMsgBox(_('Review Board'),
+                              _('Error'),
+                              _(output))
+
+        self._writesettings()
+        super(PostReviewDialog, self).accept()
 
     @pyqtSlot()
     def on_settings_button_clicked(self):
@@ -288,7 +325,7 @@ def run(ui, *pats, **opts):
     revs = opts.get('rev') or None
     if not revs and len(pats):
         revs = pats[0]
-    repo = thgrepo.repository(ui, path=paths.find_root())
+    repo = opts.get('repo') or thgrepo.repository(ui, path=paths.find_root())
 
     try:
         return PostReviewDialog(repo.ui, repo, revs)
