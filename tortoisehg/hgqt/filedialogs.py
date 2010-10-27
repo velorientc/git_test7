@@ -188,8 +188,6 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionNextDiff)
         self.editToolbar.addAction(self.actionPrevDiff)
 
-        self.attachQuickBar(self.repoview.gototb)
-
     def setupModels(self):
         self.filerevmodel = FileRevModel(self.repo)
         self.repoview.setModel(self.filerevmodel)
@@ -397,7 +395,6 @@ class FileDiffDialog(_AbstractFileDialog):
 
             self.viewers[side].verticalScrollBar().valueChanged.connect(
                     lambda value, side=side: self.vbar_changed(value, side))
-            self.attachQuickBar(table.gototb)
 
         self.setTabOrder(table, self.viewers['left'])
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
