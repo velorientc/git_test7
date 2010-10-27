@@ -226,11 +226,12 @@ class FindInGraphlogQuickBar(FindQuickBar):
                 self.setCancelEnabled(False)
 
                 rev, filename = next_find
+                text = ''
                 if rev is not None and filename is not None:
                     self.revisionSelected.emit(rev)
                     text = unicode(self.entry.text())
                     self.fileSelected.emit(filename)
-                if self._fileview:
+                if self._fileview and text:
                     self._findinfile_iter = self._fileview.searchString(text)
                     self.on_findnext()
             return
