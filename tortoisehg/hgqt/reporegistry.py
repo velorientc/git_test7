@@ -205,7 +205,7 @@ class RepoRegistryView(QDockWidget):
     openRepoSignal = pyqtSignal(QString)
     visibilityChanged = pyqtSignal(bool)
 
-    def __init__(self, ui, workbench):
+    def __init__(self, workbench):
         QDockWidget.__init__(self, workbench)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
@@ -219,7 +219,7 @@ class RepoRegistryView(QDockWidget):
         mainframe.setLayout(lay)
         self.setWidget(mainframe)
 
-        self.tmodel = m = RepoTreeModel(self.openrepo, ui, settingsfilename(),
+        self.tmodel = m = RepoTreeModel(self.openrepo, settingsfilename(),
                                         parent=self)
 
         self.tview = tv = RepoTreeView(self, workbench)

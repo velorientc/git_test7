@@ -33,8 +33,8 @@ class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
 
-    def __init__(self, ui):
-        self.ui = ui
+    def __init__(self):
+        QMainWindow.__init__(self)
 
         self._reload_rev = None
         self._reload_file = None
@@ -43,13 +43,11 @@ class Workbench(QMainWindow):
         self._scanForRepoChanges = True
         self._searchWidgets = []
 
-        QMainWindow.__init__(self)
-
         self.setupUi()
 
         self.setWindowTitle('TortoiseHg Workbench')
 
-        self.reporegistry = rr = RepoRegistryView(ui, self)
+        self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
 
@@ -458,7 +456,7 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             from tortoisehg.hgqt import run
-            run.serve(self.ui, root=w.repo.root)
+            run.serve(w.repo.ui, root=w.repo.root)
 
     def loadall(self):
         w = self.repoTabsWidget.currentWidget()
@@ -615,7 +613,7 @@ def run(ui, *pats, **opts):
         if len(pats) == 1 and os.path.isfile(repo.wjoin(pats[0])):
             from tortoisehg.hgqt.filedialogs import FileLogDialog
             return FileLogDialog(repo, pats[0], None)
-    w = Workbench(ui)
+    w = Workbench()
     if root:
         root = hglib.tounicode(root)
         w.showRepo(root)

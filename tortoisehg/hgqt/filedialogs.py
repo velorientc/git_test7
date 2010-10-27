@@ -92,7 +92,7 @@ class _AbstractFileDialog(QMainWindow):
         if self.repoviewer is None:
             # prevent recursive import
             from workbench import Workbench
-            self.repoviewer = Workbench(self.repo.ui)
+            self.repoviewer = Workbench()
         self.repoviewer.show()
         self.repoviewer.activateWindow()
         self.repoviewer.raise_()

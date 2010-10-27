@@ -54,11 +54,10 @@ def readXml(source, rootElementName, model):
 
 
 class RepoTreeModel(QAbstractItemModel):
-    def __init__(self, openrepofunc, ui, filename=None, parent=None):
+    def __init__(self, openrepofunc, filename=None, parent=None):
         QAbstractItemModel.__init__(self, parent)
 
         self.openrepofunc = openrepofunc
-        self.ui = ui
 
         root = None
         all = None
@@ -206,7 +205,8 @@ class RepoTreeModel(QAbstractItemModel):
                     options=FD.ShowDirsOnly | FD.ReadOnly)
             if path:
                 try:
-                    repo = thgrepo.repository(self.ui, path=hglib.fromunicode(path))
+                    lpath = hglib.fromunicode(path)
+                    repo = thgrepo.repository(None, path=lpath)
                     ar = repo.root
                 except error.RepoError:
                     QMessageBox.warning(self, _('Failed to add repository'),
