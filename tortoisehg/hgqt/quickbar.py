@@ -255,3 +255,36 @@ class FindInGraphlogQuickBar(FindQuickBar):
                           'in the repository'))
             else:
                 self.on_findnext()
+
+
+class GotoQuickBar(QuickBar):
+    gotoSignal = pyqtSignal(unicode)
+
+    def __init__(self, parent):
+        QuickBar.__init__(self, 'Goto', 'Ctrl+Shift+G', 'Goto', parent)
+
+    def createActions(self, openkey, desc):
+        QuickBar.createActions(self, openkey, desc)
+        self._actions['go'] = QAction('Go', self)
+        self._actions['go'].triggered.connect(self.goto)
+
+    def goto(self):
+        self.gotoSignal.emit(unicode(self.entry.text()))
+
+    def createContent(self):
+        QuickBar.createContent(self)
+        self.entry = QLineEdit(self)
+        self.addWidget(self.entry)
+        self.addAction(self._actions['go'])
+        self.entry.returnPressed.connect(self._actions['go'].trigger)
+
+    def setVisible(self, visible=True):
+        QuickBar.setVisible(self, visible)
+        if visible:
+            self.entry.setFocus()
+            self.entry.selectAll()
+
+    def setCompletionKeys(self, keys):
+        self.entry.setCompleter(QCompleter(keys))
+
+
