@@ -46,6 +46,7 @@ class RepoTreeView(QTreeView):
         self.setDropIndicatorShown(True)
 
         self.createActions()
+        self.setHeaderHidden(True)
 
     def contextMenuEvent(self, event):
         if not self.selitem:
