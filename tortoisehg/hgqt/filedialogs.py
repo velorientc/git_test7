@@ -38,34 +38,13 @@ from tortoisehg.hgqt.repoview import HgRepoView
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
-class HgDialogMixin(object):
-    # TODO: get rid of me
-    """
-    Mixin for QDialogs defined from a .ui file, wich automates the
-    setup of the UI from the ui file, and the loading of user
-    preferences.
-    The main class must define a '_ui_file' class attribute.
-    """
-    def __init__(self, ui):
+class _AbstractFileDialog(QMainWindow):
+    def __init__(self, repo, filename, repoviewer=None):
+        QMainWindow.__init__(self)
+        self.repo = repo
+
         self._font = getfont('fontlog').font()
         self.setupUi(self)
-
-    def attachQuickBar(self, qbar):
-        qbar.setParent(self)
-        self.addToolBar(Qt.BottomToolBarArea, qbar)
-
-    def accept(self):
-        self.close()
-    def reject(self):
-        self.close()
-      
-
-class _AbstractFileDialog(QMainWindow, HgDialogMixin):
-    def __init__(self, repo, filename, repoviewer=None):
-        self.repo = repo
-        QMainWindow.__init__(self)
-        HgDialogMixin.__init__(self, self.repo.ui)
-
         self.setRepoViewer(repoviewer)
         self._show_rev = None
 
@@ -77,6 +56,10 @@ class _AbstractFileDialog(QMainWindow, HgDialogMixin):
 
         self.setupViews()
         self.setupModels()
+
+    def attachQuickBar(self, qbar):
+        qbar.setParent(self)
+        self.addToolBar(Qt.BottomToolBarArea, qbar)
 
     def setRepoViewer(self, repoviewer=None):
         self.repoviewer = repoviewer
@@ -147,7 +130,6 @@ class FileLogDialog(_AbstractFileDialog):
             s.endGroup()
 
     def setupUi(self, o):
-        # TODO: workaround for HgDialogMixin; this should be done in constructor
         self.editToolbar = QToolBar(self)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
         self.actionClose = QAction(self, shortcut=QKeySequence.Close)
@@ -305,7 +287,6 @@ class FileDiffDialog(_AbstractFileDialog):
             s.endGroup()
 
     def setupUi(self, o):
-        # TODO: workaround for HgDialogMixin; this should be done in constructor
         self.editToolbar = QToolBar(self)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
         self.actionClose = QAction(self, shortcut=QKeySequence.Close)
