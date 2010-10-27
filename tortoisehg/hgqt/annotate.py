@@ -397,6 +397,8 @@ class AnnotateDialog(QMainWindow):
         self._searchbar.searchRequested.connect(self.av.find)
         self._searchbar.conditionChanged.connect(self.av.highlightText)
         av.searchRequested.connect(self._searchbar.search)
+        QShortcut(QKeySequence.Find, self,
+            lambda: self._searchbar.setFocus(Qt.OtherFocusReason))
 
         self.av.sourceChanged.connect(
             lambda *args: self.setWindowTitle(_('Annotate %s@%d') % args))
