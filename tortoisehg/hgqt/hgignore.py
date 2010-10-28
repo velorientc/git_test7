@@ -23,6 +23,8 @@ class HgignoreDialog(QDialog):
 
     ignoreFilterUpdated = pyqtSignal()
 
+    contextmenu = None
+
     def __init__(self, parent=None, root=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
@@ -145,8 +147,11 @@ class HgignoreDialog(QDialog):
         if row < 0:
             return
         local = self.lclunknowns[row]
-        menu = QMenu(self)
-        menu.setTitle(_('Add ignore filter...'))
+        if not self.contextmenu:
+            self.contextmenu = QMenu(self)
+            self.contextmenu.setTitle(_('Add ignore filter...'))
+        else:
+            self.contextmenu.clear()
         filters = [local]
         base, ext = os.path.splitext(local)
         if ext:
@@ -156,11 +161,11 @@ class HgignoreDialog(QDialog):
             filters.append(dirname)
             dirname = os.path.dirname(dirname)
         for f in filters:
-            action = menu.addAction(_('Ignore ') + hglib.tounicode(f))
+            action = self.contextmenu.addAction(_('Ignore ') + hglib.tounicode(f))
             action.args = (f,False)
             action.run = lambda: self.insertFilter(*action.args)
             action.triggered.connect(action.run)
-        menu.exec_(point)
+        self.contextmenu.exec_(point)
 
     def insertFilter(self, pat, isregexp):
         h = isregexp and 'syntax: regexp' or 'syntax: glob'
