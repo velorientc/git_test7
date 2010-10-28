@@ -34,10 +34,9 @@ bodyre = re.compile(regexp)
 revhashprefix = 'rev_hash_'
 
 class RevMessage(QWidget):
-
     revisionLinkClicked = pyqtSignal(str)
 
-    def __init__(self, ui, parent=None):
+    def __init__(self, parent):
         QWidget.__init__(self, parent)
 
         vb = QVBoxLayout()

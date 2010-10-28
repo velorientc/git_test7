@@ -43,6 +43,9 @@ class RevDetailsWidget(QWidget):
         self.fileview.showMessage.connect(self.showMessage)
         self.restoreSettings()
 
+    def setRepo(self, repo):
+        self.repo = repo
+
     def setupUi(self):
         self.hbox = QHBoxLayout(self)
         self.hbox.setSpacing(0)
@@ -124,7 +127,7 @@ class RevDetailsWidget(QWidget):
         self.message_splitter.setMidLineWidth(0)
         self.message_splitter.setOrientation(Qt.Vertical)
         self.message_splitter.setOpaqueResize(True)
-        self.message = RevMessage(self.repo.ui, self.message_splitter)
+        self.message = RevMessage(self.message_splitter)
         self.message.revisionLinkClicked.connect(self.revisionLinkClicked_)
 
         sp = SP(SP.Expanding, SP.Expanding)
@@ -259,7 +262,7 @@ class RevDetailsWidget(QWidget):
         self._last_rev = rev
         ctx = thgrepo.getcontext(self.repo, rev)
         self.revpanel.set_revision(rev)
-        self.revpanel.update()
+        self.revpanel.update(repo = self.repo)
         self.message.displayRevision(ctx)
         if type(ctx.rev()) == str:
             self.actionDiffMode.setChecked(True)
