@@ -26,8 +26,6 @@ from tortoisehg.hgqt.i18n import _
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from tortoisehg.hgqt.thgrepo import PatchContext
-
 nullvariant = QVariant()
 
 # TODO: Remove these two when we adopt GTK author color scheme
