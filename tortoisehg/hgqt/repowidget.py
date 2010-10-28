@@ -19,7 +19,7 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge
-from tortoisehg.hgqt import bisect, rebase, resolve
+from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -35,7 +35,7 @@ from PyQt4.QtGui import *
 
 class RepoWidget(QWidget):
 
-    showMessageSignal = pyqtSignal(str)
+    showMessageSignal = pyqtSignal(QString)
     closeSelfSignal = pyqtSignal(QWidget)
 
     output = pyqtSignal(QString, QString)
@@ -55,6 +55,7 @@ class RepoWidget(QWidget):
         self.workbench = workbench
         self.revsetfilter = False
         self.branch = ''
+        self.bundle = None
         self.revset = set()
 
         self._reload_rev = '.' # select working parent at startup
@@ -64,8 +65,8 @@ class RepoWidget(QWidget):
 
         self.setupUi()
         self.createActions()
-        self.setupModels()
         self.restoreSettings()
+        self.setupModels()
 
     def setupUi(self):
         SP = QSizePolicy
@@ -141,7 +142,9 @@ class RepoWidget(QWidget):
 
     def title(self):
         """Returns the expected title for this widget [unicode]"""
-        if self.branch:
+        if self.bundle:
+            return _('%s <incoming>') % self.repo.shortname
+        elif self.branch:
             return '%s [%s]' % (self.repo.shortname, self.branch)
         else:
             return self.repo.shortname
@@ -160,7 +163,7 @@ class RepoWidget(QWidget):
     def createCommitWidget(self):
         cw = self.getCommitWidget()
         if cw:
-            cw.commitComplete.connect(self.reload) # todo: redundant?
+            cw.commitComplete.connect(self.reload)
             return SharedWidget(cw)
 
         pats = {}
@@ -216,7 +219,17 @@ class RepoWidget(QWidget):
             self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
+        sw.incomingBundle.connect(self.setBundle)
         return SharedWidget(sw)
+
+    @pyqtSlot(QString)
+    def setBundle(self, bfile):
+        self.bundle = unicode(bfile)
+        self.repo = thgrepo.repository(self.repo.ui, self.repo.root,
+                                       bundle=self.bundle)
+        self.repoview.setRepo(self.repo)
+        self.revDetailsWidget.setRepo(self.repo)
+        self.reload()
 
     def clearSet(self):
         self.revset = []

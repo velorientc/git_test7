@@ -27,6 +27,7 @@ _schemes = ['local', 'ssh', 'http', 'https']
 
 class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
+    incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
 
     output = pyqtSignal(QString, QString)
@@ -484,16 +485,34 @@ class SyncWidget(QWidget):
     ##
 
     def inclicked(self):
-        def finished(ret, output):
-            if ret == 0:
-                self.showMessage.emit(_('Incoming changesets found'))
-            elif ret == 1:
-                self.showMessage.emit(_('No incoming changesets'))
-            else:
-                self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
-        self.finishfunc = finished
-        cmdline = ['--repository', self.root, 'incoming']
-        self.run(cmdline, ('force', 'branch', 'rev'))
+        if self.embedded:
+            def finished(ret, output):
+                if ret == 0:
+                    self.showMessage.emit(_('Incoming changesets found'))
+                    self.incomingBundle.emit(bfile)
+                elif ret == 1:
+                    self.showMessage.emit(_('No incoming changesets'))
+                else:
+                    self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
+            bfile = self.currentUrl(True)
+            for badchar in (':', '*', '\\', '?', '#'):
+                bfile = bfile.replace(badchar, '')
+            bfile = bfile.replace('/', '_')
+            bfile = os.path.join(qtlib.gettempdir(), bfile) + '.hg'
+            self.finishfunc = finished
+            cmdline = ['--repository', self.root, 'incoming', '--bundle', bfile]
+            self.run(cmdline, ('force', 'branch', 'rev'))
+        else:
+            def finished(ret, output):
+                if ret == 0:
+                    self.showMessage.emit(_('Incoming changesets found'))
+                elif ret == 1:
+                    self.showMessage.emit(_('No incoming changesets'))
+                else:
+                    self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
+            self.finishfunc = finished
+            cmdline = ['--repository', self.root, 'incoming']
+            self.run(cmdline, ('force', 'branch', 'rev'))
 
     def pullclicked(self):
         def finished(ret, output):
