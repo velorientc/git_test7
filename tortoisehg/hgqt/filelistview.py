@@ -31,6 +31,7 @@ class HgFileListView(QTableView):
 
     fileRevSelected = pyqtSignal(object, object)
     clearDisplay = pyqtSignal()
+    contextmenu = None
 
     def __init__(self, parent=None):
         QTableView.__init__(self, parent)
@@ -143,13 +144,14 @@ class HgFileListView(QTableView):
             self.addAction(act)
 
     def contextMenuEvent(self, event):
-        menu = QMenu(self)
-        for act in ['navigate', 'diffnavigate']:
-            if act:
-                menu.addAction(self._actions[act])
-            else:
-                menu.addSeparator()
-        menu.exec_(event.globalPos())
+        if not self.contextmenu:
+            self.contextmenu = QMenu(self)
+            for act in ['navigate', 'diffnavigate']:
+                if act:
+                    self.contextmenu.addAction(self._actions[act])
+                else:
+                    self.contextmenu.addSeparator()
+        self.contextmenu.exec_(event.globalPos())
 
     def resizeEvent(self, event):
         vp_width = self.viewport().width()
