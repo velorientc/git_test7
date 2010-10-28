@@ -116,6 +116,9 @@ class _SciImSupport(object):
                                 QsciScintilla.INDIC_PLAIN)
 
 class Scintilla(QsciScintilla):
+
+    _stdMenu = None
+
     def __init__(self, parent=None):
         super(Scintilla, self).__init__(parent)
         self.setUtf8(True)
@@ -159,26 +162,30 @@ class Scintilla(QsciScintilla):
 
     def createStandardContextMenu(self):
         """Create standard context menu"""
-        menu = QMenu(self)
+        if not self._stdMenu:
+            self._stdMenu = QMenu(self)
+        else:
+            self._stdMenu.clear()
         if not self.isReadOnly():
-            a = menu.addAction(_('Undo'), self.undo, QKeySequence.Undo)
+            a = self._stdMenu.addAction(_('Undo'), self.undo, QKeySequence.Undo)
             a.setEnabled(self.isUndoAvailable())
-            a = menu.addAction(_('Redo'), self.redo, QKeySequence.Redo)
+            a = self._stdMenu.addAction(_('Redo'), self.redo, QKeySequence.Redo)
             a.setEnabled(self.isRedoAvailable())
-            menu.addSeparator()
-            a = menu.addAction(_('Cut'), self.cut, QKeySequence.Cut)
+            self._stdMenu.addSeparator()
+            a = self._stdMenu.addAction(_('Cut'), self.cut, QKeySequence.Cut)
             a.setEnabled(self.hasSelectedText())
-        a = menu.addAction(_('Copy'), self.copy, QKeySequence.Copy)
+        a = self._stdMenu.addAction(_('Copy'), self.copy, QKeySequence.Copy)
         a.setEnabled(self.hasSelectedText())
         if not self.isReadOnly():
-            menu.addAction(_('Paste'), self.paste, QKeySequence.Paste)
-            a = menu.addAction(_('Delete'), self.removeSelectedText,
+            self._stdMenu.addAction(_('Paste'), self.paste, QKeySequence.Paste)
+            a = self._stdMenu.addAction(_('Delete'), self.removeSelectedText,
                                QKeySequence.Delete)
             a.setEnabled(self.hasSelectedText())
-        menu.addSeparator()
-        menu.addAction(_('Select All'), self.selectAll, QKeySequence.SelectAll)
+        self._stdMenu.addSeparator()
+        self._stdMenu.addAction(_('Select All'),
+                                self.selectAll, QKeySequence.SelectAll)
 
-        return menu
+        return self._stdMenu
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
