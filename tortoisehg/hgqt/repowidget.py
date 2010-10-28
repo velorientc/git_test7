@@ -45,6 +45,8 @@ class RepoWidget(QWidget):
     titleChanged = pyqtSignal(unicode)
     """Emitted when changed the expected title for the RepoWidget tab"""
 
+    contextmenu = None
+
     def __init__(self, repo, workbench):
         QWidget.__init__(self, acceptDrops=True)
 
@@ -707,29 +709,31 @@ class RepoWidget(QWidget):
         # Integers for changelog revisions, None for the working copy,
         # or strings for unapplied patches.
 
-        menu = QMenu(self)
-
         if self.bundle:
             # Special menu for applied bundle
+            menu = QMenu(self) # TODO: save in repowidget
             act = QAction(_('Pull to here'), self)
             act.triggered.connect(self.pullToRev)
             menu.addAction(act)
             menu.exec_(point)
             return
         
-        allactions = [[None,     ['update', 'manifest', 'merge', 'tag',
+        if not self.contextmenu:
+            menu = QMenu(self)
+            allactions = [[None, ['update', 'manifest', 'merge', 'tag',
                                   'backout', 'email', 'archive', 'copyhash']],
                       ['rebase', ['rebase']],
                       ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish',
                                   'qdelete', 'strip']],
                       ['reviewboard', ['postreview']]]
 
-        exs = self.repo.extensions()        
-        for ext, actions in allactions:
-            if ext is None or ext in exs:
-                for act in actions:
-                    menu.addAction(self._actions[act])
-            menu.addSeparator()
+            exs = self.repo.extensions()        
+            for ext, actions in allactions:
+                if ext is None or ext in exs:
+                    for act in actions:
+                        menu.addAction(self._actions[act])
+                menu.addSeparator()
+            self.contextmenu = menu
 
         ctx = self.repo.changectx(self.rev)
 
@@ -761,7 +765,7 @@ class RepoWidget(QWidget):
         for action, enabled in enabled.iteritems():
             self._actions[action].setEnabled(enabled)
 
-        menu.exec_(point)
+        self.contextmenu.exec_(point)
 
     def updateToRevision(self):
         dlg = update.UpdateDialog(self.repo, self.rev, self)
