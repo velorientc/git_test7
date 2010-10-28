@@ -399,6 +399,9 @@ COL_USER     = 3  # Hidden if ctx
 COL_TEXT     = 4
 
 class MatchTree(QTableView):
+    
+    contextmenu = None
+    
     def __init__(self, repo, parent=None):
         QTableView.__init__(self, parent)
         self.repo = repo
@@ -478,13 +481,16 @@ class MatchTree(QTableView):
         if allhistory:
             # need to know files were modified at specified revision
             menus.append((_('Visual Diff'), self.vdiff))
-        menu = QMenu(self)
+        if self.contextmenu:
+            self.contextmenu.clear()
+        else:
+            self.contextmenu = QMenu(self)
         for name, func in menus:
             def add(name, func):
-                action = menu.addAction(name)
+                action = self.contextmenu.addAction(name)
                 action.triggered.connect(lambda: func(selrows))
             add(name, func)
-        menu.exec_(point)
+        self.contextmenu.exec_(point)
 
     def ann(self, rows):
         from tortoisehg.hgqt import annotate
