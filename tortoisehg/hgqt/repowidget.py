@@ -76,6 +76,16 @@ class RepoWidget(QWidget):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(0)
+        self.layout().addLayout(hbox)
+
+        self.gototb = tb = GotoQuickBar(self)
+        tb.setObjectName('gototb')
+        tb.gotoSignal.connect(self.goto)
+        hbox.addWidget(tb)
+
         self.filterbar = RepoFilterBar(self.repo)
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
@@ -83,12 +93,7 @@ class RepoWidget(QWidget):
         self.filterbar.revisionSet.connect(self.setRevisionSet)
         self.filterbar.clearSet.connect(self.clearSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
-        self.layout().addWidget(self.filterbar)
-
-        self.gototb = tb = GotoQuickBar(self)
-        tb.setObjectName('gototb')
-        tb.gotoSignal.connect(self.goto)
-        self.layout().addWidget(tb)
+        hbox.addWidget(self.filterbar)
 
         self.revsetfilter = self.filterbar.filtercb.isChecked()
 
