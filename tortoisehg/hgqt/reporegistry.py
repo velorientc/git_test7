@@ -29,6 +29,9 @@ def settingsfilename():
 
 
 class RepoTreeView(QTreeView):
+
+    contextmenu = None
+
     def __init__(self, parent, workbench):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
         self.workbench = workbench
@@ -53,13 +56,16 @@ class RepoTreeView(QTreeView):
             return
         menulist = self.selitem.internalPointer().menulist()
         if len(menulist) > 0:
-            menu = QMenu(self)
+            if not self.contextmenu:
+                self.contextmenu = QMenu(self)
+            else:
+                self.contextmenu.clear()
             for act in menulist:
                 if act:
-                    menu.addAction(self._actions[act])
+                    self.contextmenu.addAction(self._actions[act])
                 else:
-                    menu.addSeparator()
-            menu.exec_(event.globalPos())
+                    self.contextmenu.addSeparator()
+            self.contextmenu.exec_(event.globalPos())
 
     def mouseMoveEvent(self, event):
         self.msg  = ''
