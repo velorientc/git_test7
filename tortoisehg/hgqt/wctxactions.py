@@ -36,7 +36,12 @@ def wctxactions(parent, point, repo, selrows):
         action.triggered.connect(action.run)
         return action
 
-    menu = QMenu(parent)
+    if hasattr(parent, 'contextmenu'):
+        menu = parent.contextmenu
+        menu.clear()
+    else:
+        menu = QMenu(parent)
+        parent.contextmenu = menu
     make(_('&Visual Diff'), vdiff, frozenset('MAR!'))
     make(_('Edit'), edit, frozenset('MACI?'))
     make(_('View missing'), viewmissing, frozenset('R!'))
