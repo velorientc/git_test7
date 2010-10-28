@@ -57,6 +57,9 @@ class HgRepoView(QTableView):
         self._actions['back'] = workbench.actionBack
         self._actions['forward'] = workbench.actionForward
 
+    def setRepo(self, repo):
+        self.repo = repo
+
     def mousePressEvent(self, event):
         index = self.indexAt(event.pos())
         if not index.isValid():
