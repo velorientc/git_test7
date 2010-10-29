@@ -480,6 +480,13 @@ class SyncWidget(QWidget):
             self.curalias = 'default'
             self.pushclicked()
 
+    def pullBundle(self, bundle):
+        'accept bundle changesets'
+        save = self.currentUrl(False)
+        self.setUrl(bundle)
+        self.pullclicked()
+        self.setUrl(save)
+
     ##
     ## Sync dialog buttons
     ##
