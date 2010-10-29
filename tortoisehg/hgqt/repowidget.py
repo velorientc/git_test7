@@ -270,10 +270,9 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.setRepo(self.repo)
 
     def acceptBundle(self):
-        # TODO: sync widget needs pullFromBundle that respects postpullops
-        cmdline = ['pull', '--repository', self.repo.root, self.bundle]
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+        self.syncDemand.pullBundle(self.bundle)
         self.clearBundle()
-        self.runCommand(_('Pull - TortoiseHg'), cmdline)
 
     def rejectBundle(self):
         self.clearBundle()
