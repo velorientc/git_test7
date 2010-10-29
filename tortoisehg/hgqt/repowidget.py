@@ -86,6 +86,17 @@ class RepoWidget(QWidget):
         tb.gotoSignal.connect(self.goto)
         hbox.addWidget(tb)
 
+        self.bundleAccept = b = QPushButton(_('Accept'))
+        b.setShown(False)
+        b.setToolTip(_('Pull incoming changesets into your repository'))
+        b.clicked.connect(self.acceptBundle)
+        hbox.addWidget(b)
+        self.bundleReject = b = QPushButton(_('Reject'))
+        b.setToolTip(_('Reject incoming changesets'))
+        b.clicked.connect(self.rejectBundle)
+        b.setShown(False)
+        hbox.addWidget(b)
+
         self.filterbar = RepoFilterBar(self.repo)
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
@@ -230,10 +241,42 @@ class RepoWidget(QWidget):
     @pyqtSlot(QString)
     def setBundle(self, bfile):
         self.bundle = unicode(bfile)
+        oldlen = len(self.repo)
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root,
                                        bundle=self.bundle)
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
+        self.bundleAccept.setHidden(False)
+        self.bundleReject.setHidden(False)
+        self.filterbar.revsetle.setText('incoming()')
+        self.filterbar.setEnabled(False)
+        self.titleChanged.emit(self.title())
+        newlen = len(self.repo)
+        self.revset = [self.repo[n].node() for n in range(oldlen, newlen)]
+        self.repomodel.revset = self.revset
+        self.reload()
+
+    def clearBundle(self):
+        self.bundleAccept.setHidden(True)
+        self.bundleReject.setHidden(True)
+        self.filterbar.setEnabled(True)
+        self.filterbar.revsetle.setText('')
+        self.revset = []
+        self.repomodel.revset = self.revset
+        self.bundle = None
+        self.titleChanged.emit(self.title())
+        self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
+        self.repoview.setRepo(self.repo)
+        self.revDetailsWidget.setRepo(self.repo)
+
+    def acceptBundle(self):
+        # TODO: sync widget needs pullFromBundle that respects postpullops
+        cmdline = ['pull', '--repository', self.repo.root, self.bundle]
+        self.clearBundle()
+        self.runCommand(_('Pull - TortoiseHg'), cmdline)
+
+    def rejectBundle(self):
+        self.clearBundle()
         self.reload()
 
     def clearSet(self):
