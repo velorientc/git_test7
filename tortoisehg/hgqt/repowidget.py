@@ -686,10 +686,12 @@ class RepoWidget(QWidget):
 
     def viewMenuRequest(self, point, selection):
         'User requested a context menu in repo view widget'
-        # TODO: selection is ignored at the moment
-        # It is a list of the currently selected revisions.  Integers
-        # for changelog revisions, None for the working copy, or strings
-        # for unapplied patches.
+        if len(selection) == 0:
+            return
+
+        # selection is a list of the currently selected revisions.
+        # Integers for changelog revisions, None for the working copy,
+        # or strings for unapplied patches.
         menu = QMenu(self)
         
         allactions = [['all',    ['update', 'manifest', 'merge', 'tag',
