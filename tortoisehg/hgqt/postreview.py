@@ -299,15 +299,22 @@ class PostReviewDialog(QDialog):
     def on_completion(self):
         output = self._cmd.core.get_rawoutput()
 
-        if (output.find('saved:') > 0):
-            url = output.split('saved: ').pop().strip()
+        saved = output.find('saved:') > 0
+        published = output.find('published:') > 0
+        if (saved or published):
+            if saved:
+                url = output.split('saved: ').pop().strip()
+                msg = _('Review draft posted to %s\n' % url)
+            else:
+                url = output.split('published: ').pop().strip()
+                msg = _('Review published to %s\n' % url)
+
             QDesktopServices.openUrl(QUrl(url))
 
             qtlib.InfoMsgBox(_('Review Board'), _('Success'),
-                               _('Review posted to %s\n' % url),
+                               msg,
                                parent=self)
         else:
-            output = output.split('%20').pop()
             qtlib.ErrorMsgBox(_('Review Board'),
                               _('Error'),
                               _(output))
