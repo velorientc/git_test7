@@ -717,10 +717,11 @@ class RepoWidget(QWidget):
             menu.exec_(point)
             return
         
-        allactions = [[None,    ['update', 'manifest', 'merge', 'tag',
+        allactions = [[None,     ['update', 'manifest', 'merge', 'tag',
                                   'backout', 'email', 'archive', 'copyhash']],
                       ['rebase', ['rebase']],
-                      ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish', 'qdelete', 'strip']],
+                      ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish',
+                                  'qdelete', 'strip']],
                       ['reviewboard', ['postreview']]]
 
         exs = self.repo.extensions()        
