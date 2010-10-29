@@ -271,8 +271,22 @@ class RepoWidget(QWidget):
 
     def acceptBundle(self):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-        self.syncDemand.pullBundle(self.bundle)
+        self.syncDemand.pullBundle(self.bundle, None)
         self.clearBundle()
+
+    def pullToRev(self):
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+        self.syncDemand.pullBundle(self.bundle, self.rev)
+        removed = [self.repo[self.rev]]
+        while removed:
+            ctx = removed.pop()
+            if ctx.node() in self.revset:
+                self.revset.remove(ctx.node())
+                removed.extend(ctx.parents())
+        self.repomodel.revset = self.revset
+        if not self.revset:
+            self.clearBundle()
+        self.refresh()
 
     def rejectBundle(self):
         self.clearBundle()
@@ -692,9 +706,18 @@ class RepoWidget(QWidget):
         # selection is a list of the currently selected revisions.
         # Integers for changelog revisions, None for the working copy,
         # or strings for unapplied patches.
+
         menu = QMenu(self)
+
+        if self.bundle:
+            # Special menu for applied bundle
+            act = QAction(_('Pull to here'), self)
+            act.triggered.connect(self.pullToRev)
+            menu.addAction(act)
+            menu.exec_(point)
+            return
         
-        allactions = [['all',    ['update', 'manifest', 'merge', 'tag',
+        allactions = [[None,    ['update', 'manifest', 'merge', 'tag',
                                   'backout', 'email', 'archive', 'copyhash']],
                       ['rebase', ['rebase']],
                       ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish', 'qdelete', 'strip']],
@@ -702,7 +725,7 @@ class RepoWidget(QWidget):
 
         exs = self.repo.extensions()        
         for ext, actions in allactions:
-            if ext == 'all' or ext in exs:
+            if ext is None or ext in exs:
                 for act in actions:
                     menu.addAction(self._actions[act])
             menu.addSeparator()
