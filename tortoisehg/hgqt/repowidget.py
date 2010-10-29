@@ -702,14 +702,14 @@ class RepoWidget(QWidget):
 
     def viewMenuRequest(self, point, selection):
         'User requested a context menu in repo view widget'
-        if len(selection) == 0:
-            return
 
         # selection is a list of the currently selected revisions.
         # Integers for changelog revisions, None for the working copy,
         # or strings for unapplied patches.
 
-        if self.bundle:
+        if len(selection) == 0:
+            return
+        elif self.bundle:
             # Special menu for applied bundle
             menu = QMenu(self) # TODO: save in repowidget
             act = QAction(_('Pull to here'), self)
@@ -717,7 +717,15 @@ class RepoWidget(QWidget):
             menu.addAction(act)
             menu.exec_(point)
             return
-        
+        elif len(selection) == 1:
+            self.singleSelectionMenu(point, selection)
+        elif len(selection) == 2:
+            self.doubleSelectionMenu(point, selection)
+        else:
+            self.multipleSelectionMenu(point, selection)
+    
+    def singleSelectionMenu(self, point, selection):
+
         if not self.contextmenu:
             menu = QMenu(self)
             allactions = [[None, ['update', 'manifest', 'merge', 'tag',
@@ -766,6 +774,12 @@ class RepoWidget(QWidget):
             self._actions[action].setEnabled(enabled)
 
         self.contextmenu.exec_(point)
+
+    def doubleSelectionMenu(self, point, selection):
+        pass
+
+    def multipleSelectionMenu(self, point, selection):
+        pass
 
     def updateToRevision(self):
         dlg = update.UpdateDialog(self.repo, self.rev, self)
