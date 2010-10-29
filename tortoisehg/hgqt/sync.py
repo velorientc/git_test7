@@ -492,7 +492,8 @@ class SyncWidget(QWidget):
     ##
 
     def inclicked(self):
-        if self.embedded:
+        url = self.currentUrl(True)
+        if self.embedded and not url.startswith('p4://'):
             def finished(ret, output):
                 if ret == 0:
                     self.showMessage.emit(_('Incoming changesets found'))
@@ -501,7 +502,7 @@ class SyncWidget(QWidget):
                     self.showMessage.emit(_('No incoming changesets'))
                 else:
                     self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
-            bfile = self.currentUrl(True)
+            bfile = url
             for badchar in (':', '*', '\\', '?', '#'):
                 bfile = bfile.replace(badchar, '')
             bfile = bfile.replace('/', '_')
