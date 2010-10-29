@@ -96,8 +96,6 @@ class BranchOperationDialog(gtk.Dialog):
             self.closebranchradio.set_active(True)
         else:
             nochanges.set_active(True)
-        if repo[None].branch() == 'default':
-            self.closebranchradio.set_sensitive(False)
 
         self.show_all()
 
