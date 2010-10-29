@@ -480,12 +480,15 @@ class SyncWidget(QWidget):
             self.curalias = 'default'
             self.pushclicked()
 
-    def pullBundle(self, bundle):
+    def pullBundle(self, bundle, rev):
         'accept bundle changesets'
         save = self.currentUrl(False)
+        orev = self.opts.get('rev')
         self.setUrl(bundle)
+        self.opts['rev'] = str(rev)
         self.pullclicked()
         self.setUrl(save)
+        self.opts['rev'] = orev
 
     ##
     ## Sync dialog buttons
