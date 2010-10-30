@@ -29,6 +29,7 @@ from tortoisehg.hgqt.manifestdialog import ManifestTaskWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.quickbar import GotoQuickBar
+from tortoisehg.hgqt.pbranch import PatchBranchWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -159,6 +160,9 @@ class RepoWidget(QWidget):
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
         self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
+        
+        self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
+        self.updatePatchBranchTab()
 
     def title(self):
         """Returns the expected title for this widget [unicode]"""
@@ -329,6 +333,21 @@ class RepoWidget(QWidget):
         gw.setRevision(self.repoview.current_rev)
         gw.showMessage.connect(self.showMessage)
         return gw
+
+    def createPatchBranchWidget(self):
+         return PatchBranchWidget(self.repo, parent=self)
+    
+    def updatePatchBranchTab(self):
+        "Only show pbranch tab when pbranch extension is installed"
+        tt = self.taskTabsWidget
+        w = self.pbranchDemand
+        self.pbranchTabIndex = idx = tt.indexOf(w)
+        if 'pbranch' in self.repo.extensions():
+            if idx == -1:
+                self.pbranchTabIndex = idx = tt.addTab(w, geticon('branch'), '')
+                tt.setTabToolTip(idx, _("Patch Branch"))
+        else:
+            tt.removeTab(idx)
 
     def reponame(self):
         return self.repo.shortname
@@ -588,6 +607,7 @@ class RepoWidget(QWidget):
         'Repository is reporting its config files have changed'
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
+        self.updatePatchBranchTab()
         self.titleChanged.emit(self.title())
         # TODO: emit only if actually changed
 

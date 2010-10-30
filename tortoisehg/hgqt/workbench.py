@@ -224,11 +224,15 @@ class Workbench(QMainWindow):
             a = newaction(label, icon=icon, checkable=True, data=index,
                           enabled='repoopen', menu='view')
             self.actionGroupTaskView.addAction(a)
+            return a
+        # NOTE: Sequence must match that in repowidget.py
         addtaskview('log', _("Revision &Details"))
         addtaskview('commit', _("&Commit..."))
         addtaskview('annotate', _("&Manifest..."))
         addtaskview('repobrowse', _("&Search..."))
         addtaskview('sync', _("S&ynchronize..."))
+        self.actionSelectTaskPbranch = \
+        addtaskview('branch', _("&Patch Branch..."))
         newseparator(menu='view')
 
         newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
@@ -385,8 +389,10 @@ class Workbench(QMainWindow):
         if self.repoTabsWidget.count() == 0:
             for a in self.actionGroupTaskView.actions():
                 a.setChecked(False)
+            self.actionSelectTaskPbranch.setVisible(False)
         else:
             repoWidget = self.repoTabsWidget.currentWidget()
+            self.actionSelectTaskPbranch.setVisible('pbranch' in repoWidget.repo.extensions())
             taskIndex = repoWidget.taskTabsWidget.currentIndex()
             self.actionGroupTaskView.actions()[taskIndex].setChecked(True)
 
