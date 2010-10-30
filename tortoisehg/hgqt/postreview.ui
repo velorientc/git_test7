@@ -134,7 +134,7 @@
         <string>Options</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
+        <item row="0" column="0">
          <widget class="QCheckBox" name="outgoing_changes_check">
           <property name="text">
            <string>Create diff with all outgoing changesets on this branch</string>
@@ -153,6 +153,12 @@
      </item>
      <item>
       <widget class="QGroupBox" name="changesets_box">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
        <property name="title">
         <string>Changesets</string>
        </property>
@@ -168,6 +174,12 @@
           <property name="itemsExpandable">
            <bool>false</bool>
           </property>
+          <attribute name="headerHighlightSections">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerShowSortIndicator" stdset="0">
+           <bool>false</bool>
+          </attribute>
          </widget>
         </item>
        </layout>
@@ -191,14 +203,76 @@
       </widget>
      </item>
      <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progress_bar">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>0</number>
+       </property>
+       <property name="value">
+        <number>-1</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="textVisible">
+        <bool>true</bool>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="invertedAppearance">
+        <bool>false</bool>
+       </property>
+       <property name="textDirection">
+        <enum>QProgressBar::TopToBottom</enum>
+       </property>
+       <property name="format">
+        <string>%p%</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="progress_label">
+       <property name="text">
+        <string>Connecting to Review Board...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>25</width>
-         <height>19</height>
+         <width>0</width>
+         <height>20</height>
         </size>
        </property>
       </spacer>
@@ -226,18 +300,54 @@
   <tabstop>settings_button</tabstop>
  </tabstops>
  <resources/>
-<connections>
-    <connection>
-        <sender>post_review_button</sender>
-        <signal>clicked()</signal>
-        <receiver>PostReviewDialog</receiver>
-        <slot>accept()</slot>
-    </connection>
-    <connection>
-        <sender>outgoing_changes_check</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>PostReviewDialog</receiver>
-        <slot>toggle_outgoing_changesets()</slot>
-    </connection>
-</connections>
+ <connections>
+  <connection>
+   <sender>post_review_button</sender>
+   <signal>clicked()</signal>
+   <receiver>PostReviewDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>outgoing_changes_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>PostReviewDialog</receiver>
+   <slot>toggle_outgoing_changesets()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tab_widget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>PostReviewDialog</receiver>
+   <slot>tab_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

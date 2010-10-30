@@ -57,20 +57,25 @@ class LoadReviewDataThread(QThread):
         #Get the index of a users previously selected repo id
         index = 0
         count = 0
+
+        self.dialog._qui.progress_label.setText("Loading repositories...")
         for r in self._reviewboard.repositories():
             if r['id'] == self.dialog._repo_id:
                 index = count
             self.dialog._qui.repo_id_combo.addItem(str(r['id']) + ": " + r['name'])
             count += 1
 
-        self.dialog._qui.repo_id_combo.setCurrentIndex(index)
+        if self.dialog._qui.repo_id_combo.count():
+            self.dialog._qui.repo_id_combo.setCurrentIndex(index)
 
+        self.dialog._qui.progress_label.setText("Loading existing reviews...")
         for r in self._reviewboard.requests():
             if self.is_valid_request(r):
                 summary = str(r['id']) + ": " + str(r['summary'])[0:100]
                 self.dialog._qui.review_id_combo.addItem(summary)
 
-        self.dialog._qui.review_id_combo.setCurrentIndex(0)
+        if self.dialog._qui.review_id_combo.count():
+            self.dialog._qui.review_id_combo.setCurrentIndex(0)
 
     def is_valid_request(self, request):
         #We only want to include pending requests
@@ -122,19 +127,21 @@ class PostReviewDialog(QDialog):
 
     @pyqtSlot()
     def error_prompt(self):
+        self._qui.progress_bar.hide()
+        self._qui.progress_label.hide()
+
         if self._error_message:
             qtlib.ErrorMsgBox(_('Review Board'),
                               _('Error'), self._error_message)
-
-            # Dispose of the reviewdatathread
-            self._review_thread.terminate()
-            self._review_thread.wait()
-
             self.close()
         elif self._isvalid():
             self._qui.post_review_button.setEnabled(True)
 
     def closeEvent(self, event):
+        # Dispose of the review data thread
+        self._review_thread.terminate()
+        self._review_thread.wait()
+
         self._writesettings()
         super(PostReviewDialog, self).closeEvent(event)
 
@@ -252,7 +259,7 @@ class PostReviewDialog(QDialog):
         if not self._qui.repo_id_combo.currentText():
             return False
 
-        if self._qui.update_review_tab.isActiveWindow():
+        if self._qui.tab_widget.currentIndex() == 1:
             if not self._qui.review_id_combo.currentText():
                 return False
 
@@ -260,6 +267,10 @@ class PostReviewDialog(QDialog):
             return False
 
         return True
+
+    @pyqtSlot()
+    def tab_changed(self):
+        self._qui.post_review_button.setEnabled(self._isvalid())
 
     @pyqtSlot()
     def toggle_outgoing_changesets(self):
@@ -271,6 +282,10 @@ class PostReviewDialog(QDialog):
             self._qui.changesets_view.setEnabled(True)
 
     def accept(self):
+        self._qui.progress_bar.show()
+        self._qui.progress_label.setText("Posting Review...")
+        self._qui.progress_label.show()
+
         def cmdargs(opts):
             args = []
             for k, v in opts.iteritems():
@@ -299,8 +314,8 @@ class PostReviewDialog(QDialog):
     def on_completion(self):
         output = self._cmd.core.get_rawoutput()
 
-        saved = output.find('saved:') > 0
-        published = output.find('published:') > 0
+        saved = 'saved:' in output
+        published = 'published:' in output
         if (saved or published):
             if saved:
                 url = output.split('saved: ').pop().strip()
@@ -312,12 +327,11 @@ class PostReviewDialog(QDialog):
             QDesktopServices.openUrl(QUrl(url))
 
             qtlib.InfoMsgBox(_('Review Board'), _('Success'),
-                               msg,
-                               parent=self)
+                               msg, parent=self)
         else:
+            error = output.split('abort: ').pop().strip()
             qtlib.ErrorMsgBox(_('Review Board'),
-                              _('Error'),
-                              _(output))
+                              _('Error'), error)
 
         self._writesettings()
         super(PostReviewDialog, self).accept()
