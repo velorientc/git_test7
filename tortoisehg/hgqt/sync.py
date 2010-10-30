@@ -442,7 +442,7 @@ class SyncWidget(QWidget):
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
         cmdline.append(url)
         self.repo.incrementBusyCount()
-        self.cmd.run(cmdline, display=display)
+        self.cmd.run(cmdline, display=display, useproc='p4://' in url)
 
     ##
     ## Workbench toolbar buttons
