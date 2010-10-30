@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, glob, shlex
+import os, glob, shlex, time
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -145,6 +145,7 @@ class Core(QObject):
         self.stbar = None
         self.queue = []
         self.display = None
+        self.useproc = False
         self.internallog = useInternal
         if useInternal:
             self.output_text = LogWidget()
@@ -154,6 +155,7 @@ class Core(QObject):
     def run(self, cmdline, *cmdlines, **opts):
         '''Execute or queue Mercurial command'''
         self.display = opts.get('display')
+        self.useproc = opts.get('useproc', False)
         self.queue.append(cmdline)
         if len(cmdlines):
             self.queue.extend(cmdlines)
@@ -180,13 +182,56 @@ class Core(QObject):
 
     ### Private Method ###
 
+    def runproc(self, cmdline):
+        'Run mercurial command in separate process'
+        @pyqtSlot(int)
+        def finished(ret):
+            if ret:
+                msg = _('[command returned code %d %%s]') % int(ret)
+            else:
+                msg = _('[command completed successfully %s]')
+            msg = msg % time.asctime() + '\n'
+            self.output.emit(msg, 'control')
+            self.command_finished(ret)
+
+        self.extproc = proc = QProcess(self)
+        proc.started.connect(self.command_started)
+        proc.finished.connect(finished)
+
+        def handleerror(error):
+            msgmap = {
+                QProcess.FailedToStart: _('failed to run command\n'),
+                QProcess.Crashed: _('crashed\n')}
+            self.output.emit(
+                msgmap.get(error, _('error while running command\n')),
+                'ui.error')
+        proc.error.connect(handleerror)
+
+        def put(bytes, label=''):
+            self.output.emit(hglib.tounicode(bytes.data()), label)
+
+        proc.readyReadStandardOutput.connect(
+            lambda: put(proc.readAllStandardOutput()))
+        proc.readyReadStandardError.connect(
+            lambda: put(proc.readAllStandardError(), 'ui.error'))
+
+        if self.display:
+            cmd = '%% hg %s\n' % self.display
+        else:
+            cmd = '%% hg %s\n' % ' '.join(cmdline)
+        self.output.emit(cmd, 'control')
+        proc.start('hg', cmdline, QIODevice.ReadOnly)
+
     def run_next(self):
-        try:
-            cmdline = self.queue.pop(0)
-            self.thread = thread.CmdThread(cmdline, self.display, self.parent())
-        except IndexError:
+        if not self.queue:
             return False
 
+        cmdline = self.queue.pop(0)
+        if self.useproc:
+            self.runproc(cmdline)
+            return True
+
+        self.thread = thread.CmdThread(cmdline, self.display, self.parent())
         self.thread.started.connect(self.command_started)
         self.thread.commandFinished.connect(self.command_finished)
 
