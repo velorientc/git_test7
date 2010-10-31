@@ -113,6 +113,7 @@ class RepoWidget(QWidget):
         self.revsetfilter = self.filterbar.filtercb.isChecked()
 
         self.layout().addWidget(self.repotabs_splitter)
+        QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
 
         self.repoview = view = HgRepoView(self.workbench, self.repo)
         view.revisionSelected.connect(self.revision_selected)
@@ -562,6 +563,10 @@ class RepoWidget(QWidget):
             self.revDetailsWidget.revision_selected(rev)
             self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
+
+    def gotoParent(self):
+        self.repoview.clearSelection()
+        self.goto('.')
 
     def goto(self, rev):
         if rev is not None:
