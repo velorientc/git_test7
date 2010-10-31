@@ -799,7 +799,8 @@ class RepoWidget(QWidget):
             func = revset.match('%s::%s' % (A, B))
             func(self.repo, range(0, 1))
             l = [c for c in func(self.repo, range(len(self.repo)))]
-            run.email(self.repo.ui, rev=l, repo=self.repo)
+            if l:
+                run.email(self.repo.ui, rev=l, repo=self.repo)
         def bisectNormal():
             opts = {'good':str(revA), 'bad':str(revB)}
             dlg = bisect.BisectDialog(self.repo, opts, self)
