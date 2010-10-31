@@ -767,6 +767,7 @@ class RepoWidget(QWidget):
                    'backout': normalrev,
                    'export': not workingdir,
                    'email': not workingdir,
+                   'pushto': realrev,
                    'archive': realrev,
                    'copyhash': realrev,
                    'rebase': not unappliedpatch,
