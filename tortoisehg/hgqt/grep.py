@@ -323,7 +323,7 @@ class HistorySearchThread(QThread):
                     self.fullmsg = ''
 
             def write_err(self, msg, *args, **opts):
-                msg = htlib.tounicode(msg)
+                msg = hglib.tounicode(msg)
                 self.obj.showMessage.emit(msg)
 
             def label(self, msg, label):
