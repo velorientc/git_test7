@@ -9,7 +9,7 @@
 import binascii
 import os
 
-from mercurial import util
+from mercurial import util, revset
 
 from tortoisehg.util import shlib, hglib
 
@@ -780,6 +780,9 @@ class RepoWidget(QWidget):
         self.singlecmenu.exec_(point)
 
     def doubleSelectionMenu(self, point, selection):
+        if None in selection:
+            # No pair menu if working directoy is selected
+            return
         revA, revB = selection
 
         def exportPair():
@@ -787,9 +790,16 @@ class RepoWidget(QWidget):
         def exportDagRange():
             pass
         def emailPair():
-            pass
+            run.email(self.repo.ui, rev=selection, repo=self.repo)
         def emailDagRange():
-            pass
+            if revA > revB:
+                B, A = selection
+            else:
+                A, B = selection
+            func = revset.match('%s::%s' % (A, B))
+            func(self.repo, range(0, 1))
+            l = [c for c in func(self.repo, range(len(self.repo)))]
+            run.email(self.repo.ui, rev=l, repo=self.repo)
         def bisectNormal():
             opts = {'good':str(revA), 'bad':str(revB)}
             dlg = bisect.BisectDialog(self.repo, opts, self)
