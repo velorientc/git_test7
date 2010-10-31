@@ -846,7 +846,27 @@ class RepoWidget(QWidget):
         self.paircmenu.exec_(point)
 
     def multipleSelectionMenu(self, point, selection):
-        pass
+        if None in selection:
+            # No multi menu if working directory is selected
+            return
+        def exportSel():
+            epath = os.path.join(self.repo.root,
+                    self.repo.shortname + '_%r.patch')
+            commands.export(self.repo.ui, self.repo,
+                            *[str(a) for a in selection], output=epath)
+        def emailSel():
+            run.email(self.repo.ui, rev=selection, repo=self.repo)
+        if not self.multicmenu:
+            menu = QMenu(self)
+            for name, cb in (
+                    ('Export Selected', exportSel),
+                    ('Email Selected', emailSel),
+                    ):
+                a = QAction(name, self)
+                a.triggered.connect(cb)
+                menu.addAction(a)
+            self.multicmenu = menu
+        self.multicmenu.exec_(point)
 
     def updateToRevision(self):
         dlg = update.UpdateDialog(self.repo, self.rev, self)
