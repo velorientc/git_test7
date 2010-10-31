@@ -9,7 +9,7 @@
 import binascii
 import os
 
-from mercurial import util, revset, commands
+from mercurial import util, revset
 
 from tortoisehg.util import shlib, hglib
 
@@ -365,7 +365,7 @@ class RepoWidget(QWidget):
             ('merge', _('Merge with...'), 'merge', None, None, self.mergeWithRevision),
             ('tag', _('Tag...'), 'tag', None, None, self.tagToRevision),
             ('backout', _('Backout...'), None, None, None, self.backoutToRevision),
-            ('export', _('Export patch...'), None, None, None, self.exportRevision),
+            ('export', _('Export patch...'), None, None, None, self.exportRevisions),
             ('email', _('Email patch...'), None, None, None, self.emailRevision),
             ('archive', _('Archive...'), None, None, None, self.archiveRevision),
             ('copyhash', _('Copy hash'), None, None, None, self.copyHash),
@@ -782,12 +782,20 @@ class RepoWidget(QWidget):
 
         self.singlecmenu.exec_(point)
 
+    def exportRevisions(self, revisions):
+        if not revisions:
+            revisions = [self.rev]
+        epath = os.path.join(self.repo.root, self.repo.shortname + '_%r.patch')
+        cmdline = ['export', '--repository', self.repo.root, '--output', epath]
+        for rev in revisions:
+            cmdline.extend(['--rev', str(rev)])
+        self.runCommand(_('Export - TortoiseHg'), cmdline)
+
     def doubleSelectionMenu(self, point, selection):
         for r in selection:
             # No pair menu if working directory or unapplied patch
             if type(r) is not int:
                 return
-        revA, revB = selection
         def dagrange():
             if revA > revB:
                 B, A = selection
@@ -798,18 +806,13 @@ class RepoWidget(QWidget):
             return [c for c in func(self.repo, range(len(self.repo)))]
 
         def exportPair():
-            epath = os.path.join(self.repo.root,
-                    self.repo.shortname + '_%r.patch')
-            commands.export(self.repo.ui, self.repo, str(revA), str(revB),
-                            output=epath)
+            self.exportRevisions(selection)
         def exportDagRange():
-            l = [str(r) for r in dagrange()]
+            l = dagrange()
             if l:
-                epath = os.path.join(self.repo.root,
-                        self.repo.shortname + '_%r.patch')
-                commands.export(self.repo.ui, self.repo, *l,
-                                output=epath)
+                self.exportRevisions(l)
         def diffPair():
+            revA, revB = selection
             visdiff.visualdiff(self.repo.ui, self.repo, [],
                     {'rev':'%s:%s' % (revA, revB)})
         def emailPair():
@@ -819,11 +822,13 @@ class RepoWidget(QWidget):
             if l:
                 run.email(self.repo.ui, rev=l, repo=self.repo)
         def bisectNormal():
+            revA, revB = selection
             opts = {'good':str(revA), 'bad':str(revB)}
             dlg = bisect.BisectDialog(self.repo, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def bisectReverse():
+            revA, revB = selection
             opts = {'good':str(revB), 'bad':str(revA)}
             dlg = bisect.BisectDialog(self.repo, opts, self)
             dlg.finished.connect(dlg.deleteLater)
@@ -852,10 +857,7 @@ class RepoWidget(QWidget):
             if type(r) is not int:
                 return
         def exportSel():
-            epath = os.path.join(self.repo.root,
-                    self.repo.shortname + '_%r.patch')
-            commands.export(self.repo.ui, self.repo,
-                            *[str(a) for a in selection], output=epath)
+            self.exportRevisions(selection)
         def emailSel():
             run.email(self.repo.ui, rev=selection, repo=self.repo)
         if not self.multicmenu:
@@ -903,10 +905,6 @@ class RepoWidget(QWidget):
     def sendToReviewBoard(self):
         run.postreview(self.repo.ui, rev=self.repoview.selectedRevisions(),
           repo=self.repo)
-
-    def exportRevision(self):
-        epath = os.path.join(self.repo.root, self.repo.shortname + '_%r.patch')
-        commands.export(self.repo.ui, self.repo, str(self.rev), output=epath)
 
     def emailRevision(self):
         run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
