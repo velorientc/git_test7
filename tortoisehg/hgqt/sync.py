@@ -490,6 +490,13 @@ class SyncWidget(QWidget):
         self.setUrl(save)
         self.opts['rev'] = orev
 
+    def pushToRevision(self, rev):
+        'accept bundle changesets'
+        orev = self.opts.get('rev')
+        self.opts['rev'] = str(rev)
+        self.pushclicked()
+        self.opts['rev'] = orev
+
     ##
     ## Sync dialog buttons
     ##
