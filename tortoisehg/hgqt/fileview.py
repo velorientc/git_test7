@@ -280,6 +280,7 @@ class HgFileView(QFrame):
     def clearDisplay(self):
         self.sci.clear()
         self.ann.clear()
+        self.blk.clear()
         # Setting the label to ' ' rather than clear() keeps the label
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
