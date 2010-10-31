@@ -365,6 +365,7 @@ class RepoWidget(QWidget):
             ('merge', _('Merge with...'), 'merge', None, None, self.mergeWithRevision),
             ('tag', _('Tag...'), 'tag', None, None, self.tagToRevision),
             ('backout', _('Backout...'), None, None, None, self.backoutToRevision),
+            ('pushto', _('Push to here...'), None, None, None, self.pushToRevision),
             ('export', _('Export patch...'), None, None, None, self.exportRevisions),
             ('email', _('Email patch...'), None, None, None, self.emailRevision),
             ('archive', _('Archive...'), None, None, None, self.archiveRevision),
@@ -734,8 +735,8 @@ class RepoWidget(QWidget):
         if not self.singlecmenu:
             menu = QMenu(self)
             allactions = [[None, ['update', 'manifest', 'merge', 'tag',
-                                  'backout', 'export', 'email', 'archive',
-                                  'copyhash']],
+                                  'backout', 'pushto', 'export',
+                                  'email', 'archive', 'copyhash']],
                       ['rebase', ['rebase']],
                       ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish',
                                   'qdelete', 'strip']],
@@ -892,6 +893,10 @@ class RepoWidget(QWidget):
         dlg.localTagChanged.connect(self.refresh)
         dlg.showMessage.connect(self.showMessage)
         dlg.exec_()
+
+    def pushToRevision(self):
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+        self.syncDemand.pushToRevision(self.rev)
 
     def backoutToRevision(self):
         dlg = backout.BackoutDialog(self.repo, str(self.rev), self)
