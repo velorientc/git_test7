@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, re
+import os
 
 from mercurial import ui, error, util
 
@@ -288,56 +288,6 @@ class AnnotateView(qscilib.Scintilla):
             self.setMarginWidth(2, lentext(max(self._revs)))
         else:
             self.setMarginWidth(2, 0)
-
-    @pyqtSlot(unicode, bool)
-    def highlightText(self, match, icase=False):
-        """Highlight text matching to the given regexp pattern [unicode]
-
-        The previous highlight is cleared automatically.
-        """
-        try:
-            flags = 0
-            if icase:
-                flags |= re.IGNORECASE
-            pat = re.compile(unicode(match).encode('utf-8'), flags)
-        except re.error:
-            return  # it could be partial pattern while user typing
-
-        self.clearHighlightText()
-        self.SendScintilla(self.SCI_SETINDICATORCURRENT,
-                           self._highlightIndicator)
-
-        # NOTE: pat and target text are *not* unicode because scintilla
-        # requires positions in byte. For accuracy, it should do pattern
-        # match in unicode, then calculating byte length of substring::
-        #
-        #     text = unicode(self.text())
-        #     for m in pat.finditer(text):
-        #         p = len(text[:m.start()].encode('utf-8'))
-        #         self.SendScintilla(self.SCI_INDICATORFILLRANGE,
-        #             p, len(m.group(0).encode('utf-8')))
-        #
-        # but it doesn't to avoid possible performance issue.
-        for m in pat.finditer(unicode(self.text()).encode('utf-8')):
-            self.SendScintilla(self.SCI_INDICATORFILLRANGE,
-                               m.start(), m.end() - m.start())
-
-    @pyqtSlot()
-    def clearHighlightText(self):
-        self.SendScintilla(self.SCI_SETINDICATORCURRENT,
-                           self._highlightIndicator)
-        self.SendScintilla(self.SCI_INDICATORCLEARRANGE, 0, self.length())
-
-    @util.propertycache
-    def _highlightIndicator(self):
-        """Return indicator number for highlight after initializing it"""
-        id = self.INDIC_CONTAINER
-        self.SendScintilla(self.SCI_INDICSETSTYLE, id, self.INDIC_ROUNDBOX)
-        self.SendScintilla(self.SCI_INDICSETUNDER, id, True)
-        self.SendScintilla(self.SCI_INDICSETFORE, id, 0x00ffff) # 0xbbggrr
-        # document says alpha value is 0 to 255, but it looks 0 to 100
-        self.SendScintilla(self.SCI_INDICSETALPHA, id, 100)
-        return id
 
 class _AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
