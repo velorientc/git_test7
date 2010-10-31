@@ -783,9 +783,10 @@ class RepoWidget(QWidget):
         self.singlecmenu.exec_(point)
 
     def doubleSelectionMenu(self, point, selection):
-        if None in selection:
-            # No pair menu if working directory is selected
-            return
+        for r in selection:
+            # No pair menu if working directory or unapplied patch
+            if type(r) is not int:
+                return
         revA, revB = selection
         def dagrange():
             if revA > revB:
@@ -846,9 +847,10 @@ class RepoWidget(QWidget):
         self.paircmenu.exec_(point)
 
     def multipleSelectionMenu(self, point, selection):
-        if None in selection:
-            # No multi menu if working directory is selected
-            return
+        for r in selection:
+            # No multi menu if working directory or unapplied patch
+            if type(r) is not int:
+                return
         def exportSel():
             epath = os.path.join(self.repo.root,
                     self.repo.shortname + '_%r.patch')
