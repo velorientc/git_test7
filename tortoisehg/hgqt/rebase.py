@@ -176,7 +176,9 @@ def run(ui, *pats, **opts):
     from tortoisehg.util import paths
     from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
-    if not opts['source'] or not opts['dest']:
-        print _('abort: source and dest must be supplied\n')
+    if os.path.exists(repo.join('rebasestate')):
+        print _('resuming rebase already in progress')
+    elif not opts['source'] or not opts['dest']:
+        print _('abort: source and dest must be supplied')
         import sys; sys.exit()
     return RebaseDialog(repo, None, **opts)
