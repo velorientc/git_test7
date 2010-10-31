@@ -23,8 +23,6 @@ _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
 class ImportDialog(QDialog):
     """Dialog to import patches"""
 
-    repoInvalidated = pyqtSignal()
-
     def __init__(self, repo=None, rev=None, parent=None, opts={}):
         super(ImportDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() &
@@ -258,6 +256,7 @@ class ImportDialog(QDialog):
         cmdline.extend(['--verbose', '--'])
         cmdline.extend(self.cslist.curitems)
 
+        self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
     def writetempfile(self, text):
@@ -300,6 +299,7 @@ class ImportDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, ret):
+        self.repo.decrementBusyCount()
         if ret is not 0 or self.cmd.is_show_output():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
@@ -307,7 +307,6 @@ class ImportDialog(QDialog):
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
         else:
-            self.repoInvalidated.emit()
             self.accept()
 
     def command_canceling(self):
