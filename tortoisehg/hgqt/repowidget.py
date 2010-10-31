@@ -9,7 +9,7 @@
 import binascii
 import os
 
-from mercurial import util, revset
+from mercurial import util, revset, commands
 
 from tortoisehg.util import shlib, hglib
 
@@ -365,6 +365,7 @@ class RepoWidget(QWidget):
             ('merge', _('Merge with...'), 'merge', None, None, self.mergeWithRevision),
             ('tag', _('Tag...'), 'tag', None, None, self.tagToRevision),
             ('backout', _('Backout...'), None, None, None, self.backoutToRevision),
+            ('export', _('Export patch...'), None, None, None, self.exportRevision),
             ('email', _('Email patch...'), None, None, None, self.emailRevision),
             ('archive', _('Archive...'), None, None, None, self.archiveRevision),
             ('copyhash', _('Copy hash'), None, None, None, self.copyHash),
@@ -733,7 +734,8 @@ class RepoWidget(QWidget):
         if not self.singlecmenu:
             menu = QMenu(self)
             allactions = [[None, ['update', 'manifest', 'merge', 'tag',
-                                  'backout', 'email', 'archive', 'copyhash']],
+                                  'backout', 'export', 'email', 'archive',
+                                  'copyhash']],
                       ['rebase', ['rebase']],
                       ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish',
                                   'qdelete', 'strip']],
@@ -762,6 +764,7 @@ class RepoWidget(QWidget):
                    'merge': normalrev,
                    'tag': normalrev,
                    'backout': normalrev,
+                   'export': not workingdir,
                    'email': not workingdir,
                    'archive': realrev,
                    'copyhash': realrev,
@@ -784,24 +787,34 @@ class RepoWidget(QWidget):
             # No pair menu if working directoy is selected
             return
         revA, revB = selection
-
-        def exportPair():
-            pass
-        def exportDagRange():
-            pass
-        def diffPair():
-            visdiff.visualdiff(self.repo.ui, self.repo, [],
-                    {'rev':'%s:%s' % (revA, revB)})
-        def emailPair():
-            run.email(self.repo.ui, rev=selection, repo=self.repo)
-        def emailDagRange():
+        def dagrange():
             if revA > revB:
                 B, A = selection
             else:
                 A, B = selection
             func = revset.match('%s::%s' % (A, B))
             func(self.repo, range(0, 1))
-            l = [c for c in func(self.repo, range(len(self.repo)))]
+            return [c for c in func(self.repo, range(len(self.repo)))]
+
+        def exportPair():
+            epath = os.path.join(self.repo.root,
+                    self.repo.shortname + '_%r.patch')
+            commands.export(self.repo.ui, self.repo, str(revA), str(revB),
+                            output=epath)
+        def exportDagRange():
+            l = [str(r) for r in dagrange()]
+            if l:
+                epath = os.path.join(self.repo.root,
+                        self.repo.shortname + '_%r.patch')
+                commands.export(self.repo.ui, self.repo, *l,
+                                output=epath)
+        def diffPair():
+            visdiff.visualdiff(self.repo.ui, self.repo, [],
+                    {'rev':'%s:%s' % (revA, revB)})
+        def emailPair():
+            run.email(self.repo.ui, rev=selection, repo=self.repo)
+        def emailDagRange():
+            l = dagrange()
             if l:
                 run.email(self.repo.ui, rev=l, repo=self.repo)
         def bisectNormal():
@@ -868,6 +881,10 @@ class RepoWidget(QWidget):
     def sendToReviewBoard(self):
         run.postreview(self.repo.ui, rev=self.repoview.selectedRevisions(),
           repo=self.repo)
+
+    def exportRevision(self):
+        epath = os.path.join(self.repo.root, self.repo.shortname + '_%r.patch')
+        commands.export(self.repo.ui, self.repo, str(self.rev), output=epath)
 
     def emailRevision(self):
         run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
