@@ -59,6 +59,7 @@ class SearchWidget(QWidget):
         revision = QRadioButton(_('Revision'))
         history = QRadioButton(_('All History'))
         singlematch = QCheckBox(_('Report only the first match per file'))
+        follow = QCheckBox(_('Follow copies and renames'))
         revle = QLineEdit()
         grid = QGridLayout()
         grid.addWidget(working, 0, 0)
@@ -66,6 +67,7 @@ class SearchWidget(QWidget):
         grid.addWidget(revision, 2, 0)
         grid.addWidget(revle, 2, 1)
         grid.addWidget(singlematch, 0, 3)
+        grid.addWidget(follow, 0, 4)
         ilabel = QLabel(_('Includes:'))
         ilabel.setToolTip(_('Comma separated list of inclusion patterns.'
                 ' By default, the entire repository is searched.'))
@@ -75,9 +77,9 @@ class SearchWidget(QWidget):
                 ' Exclusion patterns are applied after inclusion patterns.'))
         elabel.setBuddy(excle)
         grid.addWidget(ilabel, 1, 2)
-        grid.addWidget(incle, 1, 3)
+        grid.addWidget(incle, 1, 3, 1, 2)
         grid.addWidget(elabel, 2, 2)
-        grid.addWidget(excle, 2, 3)
+        grid.addWidget(excle, 2, 3, 1, 2)
         grid.setColumnStretch(3, 1)
         grid.setColumnStretch(1, 0)
         frame = QFrame()
@@ -96,6 +98,16 @@ class SearchWidget(QWidget):
         bt.clicked.connect(self.searchActivated)
         working.setChecked(True)
 
+        def updatefollow():
+            slowpath = bool(incle.text() or excle.text())
+            follow.setEnabled(history.isChecked() and not slowpath)
+            if slowpath:
+                follow.setChecked(False)
+        history.toggled.connect(updatefollow)
+        incle.textChanged.connect(updatefollow)
+        excle.textChanged.connect(updatefollow)
+        updatefollow()
+
         mainvbox.addLayout(hbox)
         frame.setLayout(grid)
         mainvbox.addWidget(frame)
@@ -112,7 +124,7 @@ class SearchWidget(QWidget):
         self.tv, self.regexple, self.chk = tv, le, chk
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
-        self.singlematch, self.eframe = singlematch, frame
+        self.singlematch, self.follow, self.eframe = singlematch, follow, frame
         self.regexple.setFocus()
 
         if 'rev' in opts or 'all' in opts:
@@ -246,7 +258,8 @@ class SearchWidget(QWidget):
             self.tv.setColumnHidden(COL_REVISION, False)
             self.tv.setColumnHidden(COL_USER, False)
             self.thread = HistorySearchThread(self.repo, pattern, icase,
-                                              inc, exc)
+                                              inc, exc,
+                                              follow=self.follow.isChecked())
 
         self.regexple.setEnabled(False)
         self.thread.finished.connect(self.finished)
@@ -283,13 +296,14 @@ class HistorySearchThread(QThread):
     showMessage = pyqtSignal(unicode)
     finished = pyqtSignal()
 
-    def __init__(self, repo, pattern, icase, inc, exc):
+    def __init__(self, repo, pattern, icase, inc, exc, follow):
         super(HistorySearchThread, self).__init__()
         self.repo = repo
         self.pattern = pattern
         self.icase = icase
         self.inc = inc
         self.exc = exc
+        self.follow = follow
 
     def run(self):
         # special purpose - not for general use
@@ -334,7 +348,7 @@ class HistorySearchThread(QThread):
                 return '<span style="%s">%s</span>' % (style, msg)
 
         # hg grep [-i] -afn regexp
-        opts = {'all':True, 'user':True, 'follow':True, 'rev':[],
+        opts = {'all':True, 'user':True, 'follow':self.follow, 'rev':[],
                 'line_number':True, 'print0':True,
                 'ignore_case':self.icase, 'include':self.inc,
                 'exclude':self.exc,
