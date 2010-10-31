@@ -54,6 +54,17 @@ class RevDetailsWidget(QWidget):
         sp.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(sp)
 
+        # + revisiondetails_layout -----------------------------------------+
+        # |+ filelist_splitter ........                                     |
+        # | + tbarFileListFrame (vbox)| + cset_and_file_details_frame (vbox)|
+        # |  + diffToolbar            |  + revpanel                         |
+        # +---------------------------+-------------------------------------+
+        # |  + filelist               |  + message_splitter                 |
+        # |                           |  :+ message                         |
+        # |                           |  :----------------------------------+
+        # |                           |   + fileview                        |
+        # +---------------------------+-------------------------------------+
+
         revisiondetails_layout = QVBoxLayout(self)
         revisiondetails_layout.setSpacing(0)
         revisiondetails_layout.setMargin(0)
