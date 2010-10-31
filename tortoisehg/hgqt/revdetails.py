@@ -47,29 +47,19 @@ class RevDetailsWidget(QWidget):
         self.repo = repo
 
     def setupUi(self):
-        self.hbox = QHBoxLayout(self)
-        self.hbox.setSpacing(0)
-        self.hbox.setContentsMargins(2, 2, 2, 2)
-        self.setupRevisionDetailsWidget()
-        self.hbox.addWidget(self.revisionDetailsWidget)
-
-    def setupRevisionDetailsWidget(self):
-        self.revisionDetailsWidget = QFrame()
-
         SP = QSizePolicy
         sp = SP(SP.Preferred, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(0)
-        sp.setHeightForWidth(self.revisionDetailsWidget.sizePolicy().hasHeightForWidth())
-        self.revisionDetailsWidget.setSizePolicy(sp)
-        self.revisionDetailsWidget.setFrameShape(QFrame.NoFrame)
-        self.revisionDetailsWidget.setFrameShadow(QFrame.Plain)
+        sp.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
+        self.setSizePolicy(sp)
 
-        revisiondetails_layout = QVBoxLayout(self.revisionDetailsWidget)
+        revisiondetails_layout = QVBoxLayout(self)
         revisiondetails_layout.setSpacing(0)
         revisiondetails_layout.setMargin(0)
+        revisiondetails_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.filelist_splitter = QSplitter(self.revisionDetailsWidget)
+        self.filelist_splitter = QSplitter(self)
         self.splitternames.append('filelist_splitter')
 
         sp = SP(SP.Expanding, SP.Expanding)
