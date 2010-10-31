@@ -784,7 +784,7 @@ class RepoWidget(QWidget):
 
     def doubleSelectionMenu(self, point, selection):
         if None in selection:
-            # No pair menu if working directoy is selected
+            # No pair menu if working directory is selected
             return
         revA, revB = selection
         def dagrange():
