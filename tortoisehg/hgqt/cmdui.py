@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, glob, shlex, time
+import os, glob, shlex, sys, time
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -13,7 +13,7 @@ from PyQt4.Qsci import QsciScintilla
 
 from mercurial import util
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _, localgettext
 from tortoisehg.hgqt import qtlib, thread
 
@@ -220,7 +220,14 @@ class Core(QObject):
         else:
             cmd = '%% hg %s\n' % ' '.join(cmdline)
         self.output.emit(cmd, 'control')
-        proc.start('hg', cmdline, QIODevice.ReadOnly)
+
+        exepath = 'hg'
+        if hasattr(sys, 'frozen'):
+            progdir = paths.get_prog_root()
+            exe = os.path.join(progdir, 'hg.exe')
+            if os.path.exists(exe):
+                exepath = exe
+        proc.start(exepath, cmdline, QIODevice.ReadOnly)
 
     def run_next(self):
         if not self.queue:
