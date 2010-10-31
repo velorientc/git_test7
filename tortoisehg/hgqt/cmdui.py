@@ -69,10 +69,13 @@ class ProgressMonitor(QWidget):
 
 
 class ThgStatusBar(QStatusBar):
+    linkActivated = pyqtSignal(QString)
+
     def __init__(self, parent=None):
         QStatusBar.__init__(self, parent=parent)
         self.topics = {}
         self.lbl = QLabel()
+        self.lbl.linkActivated.connect(self.linkActivated)
         self.addWidget(self.lbl)
 
     @pyqtSlot(unicode)
