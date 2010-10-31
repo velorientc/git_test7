@@ -140,6 +140,7 @@ class ImportDialog(QDialog):
         def activated():
             dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
             dlg.exec_()
+            self.checkStatus()
         self.repo.dirstate.invalidate()
         wctx = self.repo[None]
         M, A, R = wctx.status()[:3]
