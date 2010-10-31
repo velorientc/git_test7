@@ -45,7 +45,7 @@ class RepoWidget(QWidget):
     titleChanged = pyqtSignal(unicode)
     """Emitted when changed the expected title for the RepoWidget tab"""
 
-    contextmenu = None
+    singlecmenu = None
 
     def __init__(self, repo, workbench):
         QWidget.__init__(self, acceptDrops=True)
@@ -728,7 +728,7 @@ class RepoWidget(QWidget):
     
     def singleSelectionMenu(self, point, selection):
 
-        if not self.contextmenu:
+        if not self.singlecmenu:
             menu = QMenu(self)
             allactions = [[None, ['update', 'manifest', 'merge', 'tag',
                                   'backout', 'email', 'archive', 'copyhash']],
@@ -743,7 +743,7 @@ class RepoWidget(QWidget):
                     for act in actions:
                         menu.addAction(self._actions[act])
                 menu.addSeparator()
-            self.contextmenu = menu
+            self.singlecmenu = menu
 
         ctx = self.repo.changectx(self.rev)
 
@@ -775,7 +775,7 @@ class RepoWidget(QWidget):
         for action, enabled in enabled.iteritems():
             self._actions[action].setEnabled(enabled)
 
-        self.contextmenu.exec_(point)
+        self.singlecmenu.exec_(point)
 
     def doubleSelectionMenu(self, point, selection):
         pass
