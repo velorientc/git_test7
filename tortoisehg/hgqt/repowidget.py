@@ -46,6 +46,8 @@ class RepoWidget(QWidget):
     """Emitted when changed the expected title for the RepoWidget tab"""
 
     singlecmenu = None
+    paircmenu = None
+    multicmenu = None
 
     def __init__(self, repo, workbench):
         QWidget.__init__(self, acceptDrops=True)
@@ -737,7 +739,7 @@ class RepoWidget(QWidget):
                                   'qdelete', 'strip']],
                       ['reviewboard', ['postreview']]]
 
-            exs = self.repo.extensions()        
+            exs = self.repo.extensions()
             for ext, actions in allactions:
                 if ext is None or ext in exs:
                     for act in actions:
@@ -778,7 +780,42 @@ class RepoWidget(QWidget):
         self.singlecmenu.exec_(point)
 
     def doubleSelectionMenu(self, point, selection):
-        pass
+        revA, revB = selection
+
+        def exportPair():
+            pass
+        def exportDagRange():
+            pass
+        def emailPair():
+            pass
+        def emailDagRange():
+            pass
+        def bisectNormal():
+            opts = {'good':str(revA), 'bad':str(revB)}
+            dlg = bisect.BisectDialog(self.repo, opts, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+        def bisectReverse():
+            opts = {'good':str(revB), 'bad':str(revA)}
+            dlg = bisect.BisectDialog(self.repo, opts, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+
+        if not self.paircmenu:
+            menu = QMenu(self)
+            for name, cb in (
+                    ('Export Pair', exportPair),
+                    ('Email Pair', emailPair),
+                    ('Export DAG Range', exportDagRange),
+                    ('Email DAG Range', emailDagRange),
+                    ('Bisect - Good, Bad', bisectNormal),
+                    ('Bisect - Bad, Good', bisectReverse),
+                    ):
+                a = QAction(name, self)
+                a.triggered.connect(cb)
+                menu.addAction(a)
+            self.paircmenu = menu
+        self.paircmenu.exec_(point)
 
     def multipleSelectionMenu(self, point, selection):
         pass
