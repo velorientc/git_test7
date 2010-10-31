@@ -15,7 +15,7 @@ from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
 from tortoisehg.hgqt.revmessage import RevMessage
-from tortoisehg.hgqt import thgrepo
+from tortoisehg.hgqt import thgrepo, qscilib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -64,6 +64,8 @@ class RevDetailsWidget(QWidget):
         # |                           |  :----------------------------------+
         # |                           |   + fileview                        |
         # +---------------------------+-------------------------------------+
+        # |+ searchbar                                                      |
+        # +-----------------------------------------------------------------+
 
         revisiondetails_layout = QVBoxLayout(self)
         revisiondetails_layout.setSpacing(0)
@@ -155,6 +157,13 @@ class RevDetailsWidget(QWidget):
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
+        self.searchbar = qscilib.SearchToolBar(hidable=True)
+        self.searchbar.hide()
+        self.searchbar.searchRequested.connect(self.fileview.find)
+        self.searchbar.conditionChanged.connect(self.fileview.highlightText)
+        revisiondetails_layout.addWidget(self.searchbar)
+        self.fileview.filled.connect(self._updateHighlightText)
+
     def revisionLinkClicked_(self, rev):
         self.revisionLinkClicked.emit(rev)
 
@@ -236,6 +245,18 @@ class RevDetailsWidget(QWidget):
     def getAnnotate(self):
         return self.fileview.getAnnotate()
 
+    @pyqtSlot()
+    def showSearchBar(self):
+        self.searchbar.show()
+        self.searchbar.setFocus()
+
+    @pyqtSlot()
+    def _updateHighlightText(self):
+        if not self.searchbar.isVisible():
+            return
+        self.fileview.highlightText(self.searchbar.pattern(),
+                                    self.searchbar.caseInsensitive())
+
     def nextDiff(self):
         notlast = self.fileview.nextDiff()
         filemode = self.fileview.fileMode()
@@ -256,8 +277,13 @@ class RevDetailsWidget(QWidget):
     def setupModels(self):
         self.create_models()
         self.filelist.setModel(self.filelistmodel)
-        self.filelist.fileRevSelected.connect(self.fileview.displayFile)
+        self.filelist.fileRevSelected.connect(self._displayFile)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
+
+    @pyqtSlot(object, object)
+    def _displayFile(self, file, rev):
+        self.fileview.displayFile(file, rev)
+        self._updateHighlightText()
 
     def revision_selected(self, rev):
         self._last_rev = rev

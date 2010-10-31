@@ -33,6 +33,7 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.lexers import get_lexer, get_diff_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList
+from tortoisehg.hgqt import qscilib
 
 qsci = Qsci.QsciScintilla
 chunkhdrre = re.compile('^@@ -(\d+).*@@$')
@@ -82,7 +83,7 @@ class Annotator(qsci):
             idx = uniqrevs.index(rev)
             self.markerAdd(i, self.markers[idx % len(self.markers)])
 
-class FileDisplay(qsci):
+class FileDisplay(qscilib.Scintilla):
     escapePressed = pyqtSignal()
     refreshPressed = pyqtSignal()
 
@@ -464,6 +465,14 @@ class HgFileView(QFrame):
         self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 9)
         self.sci.SendScintilla(qsci.SCI_INDICATORCLEARRANGE, 0, pos)
         self.sci.SendScintilla(qsci.SCI_INDICATORFILLRANGE, pos, len(text))
+
+    @pyqtSlot(unicode, bool, bool, bool)
+    def find(self, exp, icase=True, wrap=False, forward=True):
+        self.sci.find(exp, icase, wrap, forward)
+
+    @pyqtSlot(unicode, bool)
+    def highlightText(self, match, icase=False):
+        self.sci.highlightText(match, icase)
 
     def verticalScrollBar(self):
         return self.sci.verticalScrollBar()
