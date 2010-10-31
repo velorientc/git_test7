@@ -513,6 +513,8 @@ class RepoWidget(QWidget):
         self.grepDemand.setSearch(pattern, **opts)
 
     def setupModels(self):
+        # Filter revision set in case revisions were removed
+        self.revset = [r for r in self.revset if r in self.repo]
         self.repomodel = HgRepoListModel(self.repo, self.branch, self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
