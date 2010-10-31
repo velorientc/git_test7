@@ -93,7 +93,7 @@ class RebaseDialog(QDialog):
         if self.checkResolve() or not (s or d):
             for w in (srcb, destb, sep, self.keepchk, self.detachchk):
                 w.setHidden(True)
-                self.cmd.show_output(True)
+            self.cmd.show_output(True)
 
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
