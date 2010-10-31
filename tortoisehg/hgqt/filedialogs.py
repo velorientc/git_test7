@@ -79,7 +79,7 @@ class _AbstractFileDialog(QMainWindow):
             data = f.read(head)
         else:
             data = '' # too big
-        lexer = get_lexer(self.filename, data)
+        lexer = get_lexer(self.filename, data, self)
         if lexer:
             lexer.setDefaultFont(self._font)
             lexer.setFont(self._font)

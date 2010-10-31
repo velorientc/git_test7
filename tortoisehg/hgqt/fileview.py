@@ -325,8 +325,7 @@ class HgFileView(QFrame):
             return
 
         if self._mode == 'diff' and fd.diff:
-            lexer = get_diff_lexer()
-            self._cur_lexer = lexer # SJB - holding refcount?
+            lexer = get_diff_lexer(self)
             self.sci.setLexer(lexer)
             self.sci.setText(fd.diff)
             self.sci.setMarginLineNumbers(1, False)
@@ -336,8 +335,7 @@ class HgFileView(QFrame):
             self.sci.setMarginWidth(1, '')
             return
         else:
-            lexer = get_lexer(filename, fd.contents)
-            self._cur_lexer = lexer # SJB - holding refcount?
+            lexer = get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
             nlines = fd.contents.count('\n')
             # margin 1 is used for line numbers

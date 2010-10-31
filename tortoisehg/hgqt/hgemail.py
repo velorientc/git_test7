@@ -255,7 +255,7 @@ class EmailDialog(QDialog):
             w.setUtf8(True)
             w.setReadOnly(True)
             w.setMarginWidth(1, 0)  # hide area for line numbers
-            lex = lexers.get_diff_lexer()
+            lex = lexers.get_diff_lexer(self)
             fh = qtlib.getfont('fontdiff')
             fh.changed.connect(lambda f: lex.setFont(f))
             # TODO: why cannot we connect directly, without lambda?

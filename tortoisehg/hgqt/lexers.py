@@ -17,11 +17,11 @@ class _LexerSelector(object):
     def match(self, filename, filedata):
         return False
 
-    def lexer(self):
+    def lexer(self, parent):
         """
         Return a configured instance of the lexer
         """
-        return self.cfg_lexer(self._lexer())
+        return self.cfg_lexer(self._lexer(parent))
 
     def cfg_lexer(self, lexer):
         font = qtlib.getfont('fontlog').font()
@@ -151,11 +151,11 @@ for clsname, cls in globals().items():
         #print clsname
         lexers.append(cls())
 
-def get_diff_lexer():
-    return DiffLexerSelector().lexer()
+def get_diff_lexer(parent):
+    return DiffLexerSelector().lexer(parent)
 
-def get_lexer(filename, filedata):
+def get_lexer(filename, filedata, parent):
     for lselector in lexers:
         if lselector.match(filename, filedata):
-            return lselector.lexer()
+            return lselector.lexer(parent)
     return None
