@@ -199,7 +199,7 @@ class RebaseDialog(QDialog):
             dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
-            self.destcsinfo.update(self.repo[None])
+            self.destcsinfo.update(self.repo['.'])
             self.checkStatus()
         elif cmd == 'discard':
             labels = [(QMessageBox.Yes, _('&Discard')),
