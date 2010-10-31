@@ -120,11 +120,13 @@ class CommitWidget(QWidget):
 
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(0)
         layout.addWidget(self.stwidget)
         self.setLayout(layout)
 
         vbox = QVBoxLayout()
         vbox.setMargin(0)
+        vbox.setSpacing(0)
         vbox.setContentsMargins(*(0,)*4)
 
         hbox = QHBoxLayout()
