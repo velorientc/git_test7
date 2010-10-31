@@ -831,13 +831,13 @@ class RepoWidget(QWidget):
         if not self.paircmenu:
             menu = QMenu(self)
             for name, cb in (
-                    ('Visual Diff', diffPair),
-                    ('Export Pair', exportPair),
-                    ('Email Pair', emailPair),
-                    ('Export DAG Range', exportDagRange),
-                    ('Email DAG Range', emailDagRange),
-                    ('Bisect - Good, Bad', bisectNormal),
-                    ('Bisect - Bad, Good', bisectReverse),
+                    (_('Visual Diff'), diffPair),
+                    (_('Export Pair'), exportPair),
+                    (_('Email Pair'), emailPair),
+                    (_('Export DAG Range'), exportDagRange),
+                    (_('Email DAG Range'), emailDagRange),
+                    (_('Bisect - Good, Bad'), bisectNormal),
+                    (_('Bisect - Bad, Good'), bisectReverse),
                     ):
                 a = QAction(name, self)
                 a.triggered.connect(cb)
@@ -859,8 +859,8 @@ class RepoWidget(QWidget):
         if not self.multicmenu:
             menu = QMenu(self)
             for name, cb in (
-                    ('Export Selected', exportSel),
-                    ('Email Selected', emailSel),
+                    (_('Export Selected'), exportSel),
+                    (_('Email Selected'), emailSel),
                     ):
                 a = QAction(name, self)
                 a.triggered.connect(cb)
