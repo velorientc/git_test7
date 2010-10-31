@@ -789,6 +789,9 @@ class RepoWidget(QWidget):
             pass
         def exportDagRange():
             pass
+        def diffPair():
+            visdiff.visualdiff(self.repo.ui, self.repo, [],
+                    {'rev':'%s:%s' % (revA, revB)})
         def emailPair():
             run.email(self.repo.ui, rev=selection, repo=self.repo)
         def emailDagRange():
@@ -815,6 +818,7 @@ class RepoWidget(QWidget):
         if not self.paircmenu:
             menu = QMenu(self)
             for name, cb in (
+                    ('Visual Diff', diffPair),
                     ('Export Pair', exportPair),
                     ('Email Pair', emailPair),
                     ('Export DAG Range', exportDagRange),
