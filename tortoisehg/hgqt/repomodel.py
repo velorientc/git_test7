@@ -463,9 +463,7 @@ class HgRepoListModel(QAbstractTableModel):
             # The Unicode symbol is a black star:
             return u'\u2605 ' + _('Working copy changes') + u' \u2605'
 
-        msg = hglib.tounicode(ctx.description())
-        if msg:
-            msg = msg.splitlines()[0]
+        msg = ctx.longsummary()
 
         if ctx.thgmqunappliedpatch():
             effects = qtlib.geteffect('log.unapplied_patch')
