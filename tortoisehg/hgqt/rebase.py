@@ -78,12 +78,15 @@ class RebaseDialog(QDialog):
         self.cmd.stbar.linkActivated.connect(self.linkActivated)
         self.layout().addWidget(self.cmd, 2)
 
-        bbox = QDialogButtonBox(BB.Cancel|BB.Ok)
-        bbox.button(BB.Ok).setText('Rebase')
-        bbox.button(BB.Cancel).setText('Abort')
-        bbox.button(BB.Cancel).setEnabled(False)
-        bbox.accepted.connect(self.rebase)
-        bbox.rejected.connect(self.abort)
+        bbox = QDialogButtonBox()
+        self.cancel_btn = bbox.addButton(QDialogButtonBox.Cancel)
+        self.cancel_btn.clicked.connect(self.reject)
+        self.rebase_btn = bbox.addButton(_('Rebase'),
+                                            QDialogButtonBox.ActionRole)
+        self.rebase_btn.clicked.connect(self.rebase)
+        self.abort_btn = bbox.addButton(_('Abort'),
+                                            QDialogButtonBox.ActionRole)
+        self.abort_btn.clicked.connect(self.abort)
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
@@ -123,12 +126,12 @@ class RebaseDialog(QDialog):
         def completed():
             self.th.wait()
             if self.th.dirty:
-                self.bbox.button(BB.Ok).setEnabled(False)
+                self.rebase_btn.setEnabled(False)
                 txt = _('Before rebase, you must <a href="commit">'
                         '<b>commit</b></a> or <a href="discard">'
                         '<b>discard</b></a> changes.')
             else:
-                self.bbox.button(BB.Ok).setEnabled(True)
+                self.rebase_btn.setEnabled(True)
                 txt = _('You may continue the rebase')
             self.showMessage.emit(txt)
         self.th = CheckThread(self)
@@ -165,9 +168,9 @@ class RebaseDialog(QDialog):
         self.repo.decrementBusyCount()
         if self.checkResolve() is False:
             self.showMessage.emit(_('Rebase is complete'))
-            self.bbox.button(BB.Ok).setText(_('Close'))
-            self.bbox.accepted.disconnect(self.rebase)
-            self.bbox.accepted.connect(self.accept)
+            self.rebase_btn.setText(_('Close'))
+            self.rebase_btn.clicked.disconnect(self.rebase)
+            self.rebase_btn.clicked.connect(self.accept)
 
     def checkResolve(self):
         ms = mergemod.mergestate(self.repo)
@@ -175,19 +178,19 @@ class RebaseDialog(QDialog):
             if ms[path] == 'u':
                 txt = _('Rebase generated merge <b>conflicts</b> that must '
                         'be <a href="resolve"><b>resolved</b></a>')
-                self.bbox.button(BB.Ok).setEnabled(False)
+                self.rebase_btn.setEnabled(False)
                 break
         else:
-            self.bbox.button(BB.Ok).setEnabled(True)
+            self.rebase_btn.setEnabled(True)
             txt = _('You may continue the rebase')
         self.showMessage.emit(txt)
 
         if os.path.exists(self.repo.join('rebasestate')):
-            self.bbox.button(BB.Cancel).setEnabled(True)
-            self.bbox.button(BB.Ok).setText('Continue')
+            self.abort_btn.setEnabled(True)
+            self.rebase_btn.setText('Continue')
             return True
         else:
-            self.bbox.button(BB.Cancel).setEnabled(False)
+            self.abort_btn.setEnabled(False)
             return False
 
     def linkActivated(self, cmd):
