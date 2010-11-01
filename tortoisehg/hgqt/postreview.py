@@ -312,6 +312,9 @@ class PostReviewDialog(QDialog):
 
     @pyqtSlot()
     def on_completion(self):
+        self._qui.progress_bar.hide()
+        self._qui.progress_label.hide()
+
         output = self._cmd.core.get_rawoutput()
 
         saved = 'saved:' in output

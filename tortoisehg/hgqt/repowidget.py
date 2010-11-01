@@ -379,7 +379,7 @@ class RepoWidget(QWidget):
             ('strip', _('Strip...'), None, None, None, self.stripRevision),
             ('qpop-all', _('Pop all patches'), None, None, None, self.qpopAllRevision),
             ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision),
-            ('postreview', _('Review Board...'), 'reviewboard', None, None, self.sendToReviewBoard)
+            ('postreview', _('Post to Review Board...'), 'reviewboard', None, None, self.sendToReviewBoard)
         ]
 
         self._actions = {}
@@ -851,6 +851,7 @@ class RepoWidget(QWidget):
                     (_('Email DAG Range'), emailDagRange),
                     (_('Bisect - Good, Bad'), bisectNormal),
                     (_('Bisect - Bad, Good'), bisectReverse),
+                    (_('Post Pair to Review Board'), self.sendToReviewBoard),
                     ):
                 a = QAction(name, self)
                 a.triggered.connect(cb)
@@ -872,6 +873,7 @@ class RepoWidget(QWidget):
             for name, cb in (
                     (_('Export Selected'), exportSel),
                     (_('Email Selected'), emailSel),
+                    (_('Post Selected to Review Board'), self.sendToReviewBoard),
                     ):
                 a = QAction(name, self)
                 a.triggered.connect(cb)
