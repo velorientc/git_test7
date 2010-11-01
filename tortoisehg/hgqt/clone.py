@@ -48,10 +48,9 @@ class CloneDialog(QDialog):
         self.src_combo = QComboBox()
         self.src_combo.setEditable(True)
         self.src_combo.setMinimumWidth(310)
-        self.src_combo.setEditText(src)
         self.src_btn = QPushButton(_('Browse...'))
         self.src_btn.setAutoDefault(False)
-        self.src_btnclicked.connect(self.browse_src)
+        self.src_btn.clicked.connect(self.browse_src)
         grid.addWidget(QLabel(_('Source:')), 0, 0)
         grid.addWidget(self.src_combo, 0, 1)
         grid.addWidget(self.src_btn, 0, 2)
@@ -60,13 +59,23 @@ class CloneDialog(QDialog):
         self.dest_combo = QComboBox()
         self.dest_combo.setEditable(True)
         self.dest_combo.setMinimumWidth(310)
-        self.dest_combo.setEditText(dest)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
         self.dest_btn.clicked.connect(self.browse_dest)
         grid.addWidget(QLabel(_('Destination:')), 1, 0)
         grid.addWidget(self.dest_combo, 1, 1)
         grid.addWidget(self.dest_btn, 1, 2)
+
+        s = QSettings()
+        self.shist = s.value('clone/source').toStringList()
+        for path in self.shist:
+            if path: self.src_combo.addItem(path)
+        self.src_combo.setEditText(src)
+
+        self.dhist = s.value('clone/dest').toStringList()
+        for path in self.dhist:
+            if path: self.dest_combo.addItem(path)
+        self.dest_combo.setEditText(dest)
 
         ### options
         expander = qtlib.ExpanderLabel(_('Options'), False)
@@ -175,10 +184,31 @@ class CloneDialog(QDialog):
 
     def clone(self):
         # prepare user input
-        src = hglib.fromunicode(self.src_combo.currentText()).strip()
-        dest = hglib.fromunicode(self.dest_combo.currentText()).strip()
+        src = self.src_combo.currentText().simplified()
+        dest = self.dest_combo.currentText().simplified()
         if not dest:
             dest = os.path.basename(src)
+
+        if src:
+            src = QString(src)
+            l = list(self.shist)
+            if src in l:
+                l.remove(src)
+            l.insert(0, src)
+            self.shist = l[:10]
+        if dest:
+            dest = QString(dest)
+            l = list(self.dhist)
+            if dest in l:
+                l.remove(dest)
+            l.insert(0, dest)
+            self.dhist = l[:10]
+        s = QSettings()
+        s.setValue('clone/source', self.shist)
+        s.setValue('clone/dest', self.dhist)
+
+        src = hglib.fromunicode(src)
+        dest = hglib.fromunicode(dest)
         remotecmd = hglib.fromunicode(self.remote_text.text()).strip()
         rev = hglib.fromunicode(self.rev_text.text()).strip() or None
 
