@@ -308,6 +308,7 @@ class LogWidget(QsciScintilla):
         self.setReadOnly(True)
         self.setUtf8(True)
         self.setMarginWidth(1, 0)
+        self.setWrapMode(QsciScintilla.WrapCharacter)
         self._initfont()
         self._initmarkers()
 

@@ -89,6 +89,7 @@ class FileDisplay(qscilib.Scintilla):
 
     def __init__(self, parent=None):
         super(FileDisplay, self).__init__(parent)
+        self.setWrapMode(qsci.WrapCharacter)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:

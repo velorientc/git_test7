@@ -54,6 +54,7 @@ class MessageEntry(qscilib.Scintilla):
         #self.setFolding(QsciScintilla.BoxedFoldStyle)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.setWrapMode(QsciScintilla.WrapCharacter)
 
     def refresh(self, repo):
         self.setEdgeColumn(repo.summarylen)
