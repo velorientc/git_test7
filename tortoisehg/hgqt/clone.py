@@ -184,8 +184,8 @@ class CloneDialog(QDialog):
 
     def clone(self):
         # prepare user input
-        src = self.src_combo.currentText().simplified()
-        dest = self.dest_combo.currentText().simplified()
+        src = self.src_combo.currentText().trimmed()
+        dest = self.dest_combo.currentText().trimmed()
         if not dest:
             dest = os.path.basename(src)
 
