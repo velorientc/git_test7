@@ -485,7 +485,8 @@ class SyncWidget(QWidget):
         save = self.currentUrl(False)
         orev = self.opts.get('rev')
         self.setUrl(bundle)
-        self.opts['rev'] = str(rev)
+        if rev is not None:
+            self.opts['rev'] = str(rev)
         self.pullclicked()
         self.setUrl(save)
         self.opts['rev'] = orev
