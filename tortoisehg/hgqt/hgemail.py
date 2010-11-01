@@ -182,6 +182,10 @@ class EmailDialog(QDialog):
             opts['desc'] = writetempfile(hglib.fromunicode(self._qui.body_edit.toPlainText()))
             # TODO: change patchbomb not to use temporary file
 
+        # Include the repo in the command so it can be found when thg is not
+        # run from within a hg path
+        opts['repository'] = self._repo.root
+
         return opts
 
     def _isvalid(self):
