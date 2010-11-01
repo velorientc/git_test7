@@ -24,7 +24,8 @@ class CloneDialog(QDialog):
 
     def __init__(self, args=None, opts={}, parent=None):
         super(CloneDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        f = self.windowFlags()
+        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.ui = ui.ui()
 
         dest = src = cwd = hglib.tounicode(os.getcwd())
@@ -50,7 +51,7 @@ class CloneDialog(QDialog):
         self.src_combo.setEditText(src)
         self.src_btn = QPushButton(_('Browse...'))
         self.src_btn.setAutoDefault(False)
-        self.connect(self.src_btn, SIGNAL("clicked()"), self.browse_src)
+        self.src_btnclicked.connect(self.browse_src)
         grid.addWidget(QLabel(_('Source:')), 0, 0)
         grid.addWidget(self.src_combo, 0, 1)
         grid.addWidget(self.src_btn, 0, 2)
@@ -62,7 +63,7 @@ class CloneDialog(QDialog):
         self.dest_combo.setEditText(dest)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
-        self.connect(self.dest_btn, SIGNAL("clicked()"), self.browse_dest)
+        self.dest_btn.clicked.connect(self.browse_dest)
         grid.addWidget(QLabel(_('Destination:')), 1, 0)
         grid.addWidget(self.dest_combo, 1, 1)
         grid.addWidget(self.dest_btn, 1, 2)
