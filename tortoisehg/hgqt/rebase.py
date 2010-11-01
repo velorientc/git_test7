@@ -139,6 +139,7 @@ class RebaseDialog(QDialog):
         self.th.start()
 
     def rebase(self):
+        self.cancelbtn.setShown(False)
         self.keepchk.setEnabled(False)
         self.detachchk.setEnabled(False)
         cmdline = ['rebase', '--repository', self.repo.root]
