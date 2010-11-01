@@ -793,7 +793,8 @@ class RepoWidget(QWidget):
         if not revisions:
             revisions = [self.rev]
         epath = os.path.join(self.repo.root, self.repo.shortname + '_%r.patch')
-        cmdline = ['export', '--repository', self.repo.root, '--output', epath]
+        cmdline = ['export', '--repository', self.repo.root, '--verbose',
+                   '--output', epath]
         for rev in revisions:
             cmdline.extend(['--rev', str(rev)])
         self.runCommand(_('Export - TortoiseHg'), cmdline)
