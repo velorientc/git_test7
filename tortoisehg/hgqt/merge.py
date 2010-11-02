@@ -653,8 +653,10 @@ class CommitPage(BasePage):
     def command_finished(self, ret):
         if ret == 0:
             self.done = True
+            self.wizard().repo.decrementBusyCount()
             self.wizard().next()
-        self.wizard().repo.decrementBusyCount()
+        else:
+            self.wizard().repo.decrementBusyCount()
 
     def command_canceling(self):
         page = self.wizard().page(MERGE_PAGE)
