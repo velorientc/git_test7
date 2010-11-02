@@ -526,11 +526,8 @@ class RepoWidget(QWidget):
         self.goto('.')
 
     def goto(self, rev):
-        if rev is not None:
-            rev = str(rev)
         self._reload_rev = rev
-        if len(self.repoview.model().graph):
-            self.repoview.goto(rev)
+        self.repoview.goto(rev)
 
     def revision_activated(self, rev=None):
         rev = rev or self.rev
@@ -547,7 +544,7 @@ class RepoWidget(QWidget):
 
     def rebuildGraph(self):
         self.showMessage('')
-        if self.rev is not None and len(self.repo) >= self.rev:
+        if self.rev is None or len(self.repo) > self.rev:
             self._reload_rev = self.rev
         else:
             self._reload_rev = '.'

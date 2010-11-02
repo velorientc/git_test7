@@ -226,8 +226,8 @@ class HgRepoView(QTableView):
         """
         Select revision 'rev' (can be anything understood by repo.changectx())
         """
-        if rev is not None:
-            rev = str(rev) # might be a QString
+        if type(rev) is QString:
+            rev = str(rev)
         try:
             rev = self.repo.changectx(rev).rev()
         except RepoError:
