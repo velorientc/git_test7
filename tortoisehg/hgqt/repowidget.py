@@ -359,42 +359,6 @@ class RepoWidget(QWidget):
         self.actionActivateRev.triggered.connect(self.revision_activated)
         self.addAction(self.actionActivateRev)
 
-        allactions = [
-            ('manifest', _('Browse at rev...'), None,
-                _('Show the manifest at selected revision'), None, self.manifestRevision),
-            ('update', _('Update...'), 'update', None, None, self.updateToRevision),
-            ('merge', _('Merge with...'), 'merge', None, None, self.mergeWithRevision),
-            ('tag', _('Tag...'), 'tag', None, None, self.tagToRevision),
-            ('backout', _('Backout...'), None, None, None, self.backoutToRevision),
-            ('pushto', _('Push to here'), None, None, None, self.pushToRevision),
-            ('export', _('Export patch'), None, None, None, self.exportRevisions),
-            ('email', _('Email patch...'), None, None, None, self.emailRevision),
-            ('archive', _('Archive...'), None, None, None, self.archiveRevision),
-            ('copyhash', _('Copy hash'), None, None, None, self.copyHash),
-            ('rebase', _('Rebase...'), None, None, None, self.rebaseRevision),
-            ('qimport', _('Import to MQ'), None, None, None,
-                self.qimportRevision),
-            ('qfinish', _('Finish patch'), None, None, None, self.qfinishRevision),
-            ('qdelete', _('Delete patch'), None, None, None, self.qdeleteRevision),
-            ('strip', _('Strip...'), None, None, None, self.stripRevision),
-            ('qpop-all', _('Pop all patches'), None, None, None, self.qpopAllRevision),
-            ('qgoto', _('Goto patch'), None, None, None, self.qgotoRevision),
-            ('postreview', _('Post to Review Board...'), 'reviewboard', None, None, self.sendToReviewBoard)
-        ]
-
-        self._actions = {}
-        for name, desc, icon, tip, key, cb in allactions:
-            self._actions[name] = act = QAction(desc, self)
-            if icon:
-                act.setIcon(geticon(icon))
-            if tip:
-                act.setStatusTip(tip)
-            if key:
-                act.setShortcut(key)
-            if cb:
-                act.triggered.connect(cb)
-            self.addAction(act)
-
     def dragEnterEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
         if util.any(os.path.isfile(p) for p in paths):
@@ -736,56 +700,73 @@ class RepoWidget(QWidget):
             self.multipleSelectionMenu(point, selection)
     
     def singleSelectionMenu(self, point, selection):
-
         if not self.singlecmenu:
-            menu = QMenu(self)
-            allactions = [[None, ['update', 'manifest', 'merge', 'tag',
-                                  'backout', 'pushto', 'export',
-                                  'email', 'archive', 'copyhash']],
-                      ['rebase', ['rebase']],
-                      ['mq',     ['qgoto', 'qpop-all', 'qimport', 'qfinish',
-                                  'qdelete', 'strip']],
-                      ['reviewboard', ['postreview']]]
+            items = []
+
+            # isrev = the changeset has an integer revision number
+            # isctx = changectx or workingctx, not PatchContext
+            # fixed = the changeset is considered permanent
+            # patch = any patch applied or not
+            # qpar  = patch queue parent
+            isrev   = lambda ap, up, qp, wd: not (up or wd)
+            isctx   = lambda ap, up, qp, wd: not up
+            fixed   = lambda ap, up, qp, wd: not (ap or up or wd)
+            patch   = lambda ap, up, qp, wd: ap or up
+            qpar    = lambda ap, up, qp, wd: qp
+            applied = lambda ap, up, qp, wd: ap
+            unapp   = lambda ap, up, qp, wd: up
 
             exs = self.repo.extensions()
-            for ext, actions in allactions:
-                if ext is None or ext in exs:
-                    for act in actions:
-                        menu.addAction(self._actions[act])
-                menu.addSeparator()
+            menu = QMenu(self)
+            for ext, func, desc, icon, cb in (
+                (None, ctx, _('Browse at rev...'), None,
+                    self.manifestRevision),
+                (None, isrev, _('Update...'), 'update',
+                    self.updateToRevision),
+                (None, fixed, _('Merge with...'), 'merge',
+                    self.mergeWithRevision),
+                (None, fixed, _('Tag...'), 'tag', self.tagToRevision),
+                (None, fixed, _('Backout...'), None, self.backoutToRevision),
+                (None, fixed, _('Push to here'), None, self.pushToRevision),
+                (None, isrev, _('Export patch'), None, self.exportRevisions),
+                (None, isrev, _('Email patch...'), None, self.emailRevision),
+                (None, isrev, _('Archive...'), None, self.archiveRevision),
+                (None, isrev, _('Copy hash'), None, self.copyHash),
+                ('rebase', None, None, None, None),
+                ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
+                ('mq', None, None, None, None),
+                ('mq', fixed, _('Import to MQ'), None, self.qimportRevision),
+                ('mq', applied, _('Finish patch'), None, self.qfinishRevision),
+                ('mq', unapp, _('Delete patch'), None, self.qdeleteRevision),
+                ('mq', qpar, _('Pop all patches'), None, self.qpopAllRevision),
+                ('mq', patch, _('Goto patch'), None, self.qgotoRevision),
+                ('mq', fixed, _('Strip...'), None, self.stripRevision),
+                ('reviewboard', fixed, _('Post to Review Board...'),
+                    'reviewboard', self.sendToReviewBoard)):
+                if ext and ext not in exs:
+                    continue
+                if desc is None:
+                    menu.addSeparator()
+                else:
+                    act = QAction(desc, self)
+                    act.triggered.connect(cb)
+                    if icon:
+                        act.setIcon(geticon(icon))
+                    act.enableFunc = func
+                    menu.addAction(act)
+                    items.append(act)
             self.singlecmenu = menu
+            self.singlecmenuitems = items
 
         ctx = self.repo.changectx(self.rev)
-
-        workingdir = self.rev is None
-        appliedpatch = ctx.thgmqappliedpatch() 
-        unappliedpatch = ctx.thgmqunappliedpatch()
+        applied = ctx.thgmqappliedpatch() 
+        unapp = ctx.thgmqunappliedpatch()
         qparent = 'qparent' in ctx.tags()
-        patch = appliedpatch or unappliedpatch
-        realrev = not unappliedpatch and not workingdir
-        normalrev = not patch and not workingdir
+        working = self.rev is None
 
-        enabled = {'update': not unappliedpatch,
-                   'manifest': not unappliedpatch,
-                   'merge': normalrev,
-                   'tag': normalrev,
-                   'backout': normalrev,
-                   'export': not workingdir,
-                   'email': not workingdir,
-                   'pushto': realrev,
-                   'archive': realrev,
-                   'copyhash': realrev,
-                   'rebase': not unappliedpatch,
-                   'qgoto': patch,
-                   'qpop-all': qparent,
-                   'qimport': normalrev,
-                   'qfinish': appliedpatch,
-                   'qdelete': unappliedpatch,
-                   'strip': normalrev,
-                   'postreview': normalrev}
-
-        for action, enabled in enabled.iteritems():
-            self._actions[action].setEnabled(enabled)
+        for item in self.singlecmenuitems:
+            enabled = item.enableFunc(applied, unapp, qparent, working)
+            item.setEnabled(enabled)
 
         self.singlecmenu.exec_(point)
 
