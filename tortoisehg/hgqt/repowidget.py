@@ -851,11 +851,14 @@ class RepoWidget(QWidget):
                     (_('Export DAG Range'), exportDagRange),
                     (_('Email DAG Range'), emailDagRange),
                     (_('Bisect - Good, Bad'), bisectNormal),
-                    (_('Bisect - Bad, Good'), bisectReverse),
-                    (_('Post Pair to Review Board'), self.sendToReviewBoard),
+                    (_('Bisect - Bad, Good'), bisectReverse)
                     ):
                 a = QAction(name, self)
                 a.triggered.connect(cb)
+                menu.addAction(a)
+            if 'reviewboard' in self.repo.extensions():
+                a = QAction(_('Post Pair to Review Board'), self)
+                a.triggered.connect(self.sendToReviewBoard)
                 menu.addAction(a)
             self.paircmenu = menu
         self.paircmenu.exec_(point)
@@ -874,10 +877,13 @@ class RepoWidget(QWidget):
             for name, cb in (
                     (_('Export Selected'), exportSel),
                     (_('Email Selected'), emailSel),
-                    (_('Post Selected to Review Board'), self.sendToReviewBoard),
                     ):
                 a = QAction(name, self)
                 a.triggered.connect(cb)
+                menu.addAction(a)
+            if 'reviewboard' in self.repo.extensions():
+                a = QAction(_('Post Selected to Review Board'), self)
+                a.triggered.connect(self.sendToReviewBoard)
                 menu.addAction(a)
             self.multicmenu = menu
         self.multicmenu.exec_(point)
