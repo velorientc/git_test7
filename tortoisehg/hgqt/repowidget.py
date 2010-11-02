@@ -113,7 +113,6 @@ class RepoWidget(QWidget):
         self.revsetfilter = self.filterbar.filtercb.isChecked()
 
         self.layout().addWidget(self.repotabs_splitter)
-        QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
 
         self.repoview = view = HgRepoView(self.workbench, self.repo)
         view.revisionSelected.connect(self.revision_selected)
@@ -358,6 +357,7 @@ class RepoWidget(QWidget):
                                              Qt.SHIFT+Qt.Key_Enter])
         self.actionActivateRev.triggered.connect(self.revision_activated)
         self.addAction(self.actionActivateRev)
+        QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
 
     def dragEnterEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
