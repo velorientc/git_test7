@@ -445,15 +445,8 @@ class RepoWidget(QWidget):
                       'by this rollback, leaving uncommitted changes.\n '
                       'Continue?' % rev)):
                     return
-        self.repo.incrementBusyCount()
-        try:
-            saved = self.repo.ui.quiet
-            self.repo.ui.quiet = True
-            self.repo.rollback()
-            self.repo.ui.quiet = saved
-        finally:
-            self.repo.decrementBusyCount()
-        QTimer.singleShot(500, lambda: shlib.shell_notify([self.repo.root]))
+        cmdline = ['rollback', '--repository', self.repo.root, '--verbose']
+        self.runCommand(_('Rollback - TortoiseHg'), cmdline)
 
     def purge(self):
         try:
