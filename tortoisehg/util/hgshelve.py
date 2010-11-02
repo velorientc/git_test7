@@ -23,8 +23,6 @@ from mercurial import util, fancyopts
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 
-from tortoisehg.hgtk import gtklib
-
 lines_re = re.compile(r'@@ -(\d+),(\d+) \+(\d+),(\d+) @@\s*(.*)')
 
 def internalpatch(patchobj, ui, strip, cwd, files={}):
@@ -137,7 +135,7 @@ class header(object):
                     if selected(i):
                         shunks += 1
                         slines += h.added + h.removed
-                str += '<span foreground="%s">' % gtklib.DBLUE
+                str += '<span foreground="blue">'
                 str += _('total: %d hunks (%d changed lines); '
                         'selected: %d hunks (%d changed lines)') % (hunks,
                                 lines, shunks, slines)
