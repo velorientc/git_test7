@@ -709,7 +709,7 @@ class RepoWidget(QWidget):
             exs = self.repo.extensions()
             menu = QMenu(self)
             for ext, func, desc, icon, cb in (
-                (None, ctx, _('Browse at rev...'), None,
+                (None, isctx, _('Browse at rev...'), None,
                     self.manifestRevision),
                 (None, isrev, _('Update...'), 'update',
                     self.updateToRevision),
