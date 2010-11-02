@@ -126,6 +126,7 @@ const char* const RepoFilesMenu =
 
 const char* const NoRepoMenu =
     "clone init shellconf userconf thgstatus sep"
+    " workbench sep"
     " about"
 ;
 
