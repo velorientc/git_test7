@@ -94,7 +94,7 @@ Getting Acquainted
 ==================
 
 Mercurial supports many different
-`collaboration models <http://tortoisehg.bitbucket.org/hgbook/1.6/collaborating-with-other-people.html>`_.
+`collaboration models <http://tortoisehg.bitbucket.org/hgbook/1.7/collaborating-with-other-people.html>`_.
 This chapter describes just one of those models: a single central repository.
 The central repository model does not scale as well as other models, but
 it is the most familiar to those coming from other revision tools and

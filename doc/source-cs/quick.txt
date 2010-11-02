@@ -64,7 +64,7 @@ Nastavené změny potvrdíme a okno zavřeme tlačítkem :guilabel:`OK`.
 První seznámení
 ===============
 
-Mercurial podporuje mnoho různých `modelů spolupráce <http://tortoisehg.bitbucket.org/hgbook/1.6/collaborating-with-other-people.html>`_. Tato kapitola popisuje pouze jeden z nich: model s centrálním repozitářem. Model s centrálním repozitářem je nejvíce známý těm, kteří přecházejí z jiných verzovacích systémů a je tedy nejvhodnější začít právě s ním.
+Mercurial podporuje mnoho různých `modelů spolupráce <http://tortoisehg.bitbucket.org/hgbook/1.7/collaborating-with-other-people.html>`_. Tato kapitola popisuje pouze jeden z nich: model s centrálním repozitářem. Model s centrálním repozitářem je nejvíce známý těm, kteří přecházejí z jiných verzovacích systémů a je tedy nejvhodnější začít právě s ním.
 
 Potřebujeme tedy vytvořit centrální repozitář. Bylo by možné přeměnit `nemercuriálový repozitář <http://mercurial.selenic.com/wiki/RepositoryConversion>`_ v repozitář Mercurialu ale v našem příkladu začneme úplně od začátku. 
 

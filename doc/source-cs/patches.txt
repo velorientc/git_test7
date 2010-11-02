@@ -11,9 +11,9 @@ Definice oprávky
 Četba těchto odkazů je užitečná pro pochopení historie a povahy oprávek (patches) a jejich použití v Mercurialu.
 
 
-* `Problém správy oprávek <http://tortoisehg.bitbucket.org/hgbook/1.6/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
-* `Pochopení oprávek <http://tortoisehg.bitbucket.org/hgbook/1.6/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
-* `Více o oprávkách <http://tortoisehg.bitbucket.org/hgbook/1.6/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+* `Problém správy oprávek <http://tortoisehg.bitbucket.org/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `Pochopení oprávek <http://tortoisehg.bitbucket.org/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `Více o oprávkách <http://tortoisehg.bitbucket.org/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
 
 Úskalí
 ======
