@@ -15,7 +15,7 @@ from mercurial import util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _, localgettext
-from tortoisehg.hgqt import qtlib, thread
+from tortoisehg.hgqt import qtlib, qscilib, thread
 
 local = localgettext()
 
@@ -152,6 +152,8 @@ class Core(QObject):
         self.internallog = useInternal
         if useInternal:
             self.output_text = LogWidget()
+            self.output_text.installEventFilter(
+                qscilib.KeyPressInterceptor(self))
 
     ### Public Methods ###
 
@@ -310,12 +312,6 @@ class LogWidget(QsciScintilla):
         self.setWrapMode(QsciScintilla.WrapCharacter)
         self._initfont()
         self._initmarkers()
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            event.ignore()
-            return
-        super(LogWidget, self).keyPressEvent(event)
 
     def _initfont(self):
         tf = qtlib.getfont('fontlog')

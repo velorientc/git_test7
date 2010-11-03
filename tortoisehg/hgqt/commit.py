@@ -66,12 +66,6 @@ class MessageEntry(qscilib.Scintilla):
             self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            event.ignore()
-            return
-        if event.matches(QKeySequence.Refresh):
-            event.ignore()
-            return
         if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
             self.reflowPressed.emit()
         super(MessageEntry, self).keyPressEvent(event)
@@ -151,6 +145,7 @@ class CommitWidget(QWidget):
         msgte.reflowPressed.connect(self.reflowPressed)
         msgte.setContextMenuPolicy(Qt.CustomContextMenu)
         msgte.customContextMenuRequested.connect(self.menuRequested)
+        msgte.installEventFilter(qscilib.KeyPressInterceptor(self))
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
 

@@ -83,20 +83,6 @@ class Annotator(qsci):
             idx = uniqrevs.index(rev)
             self.markerAdd(i, self.markers[idx % len(self.markers)])
 
-class FileDisplay(qscilib.Scintilla):
-    def __init__(self, parent=None):
-        super(FileDisplay, self).__init__(parent)
-        self.setWrapMode(qsci.WrapCharacter)
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            event.ignore()
-            return
-        if event.matches(QKeySequence.Refresh):
-            event.ignore()
-            return
-        super(FileDisplay, self).keyPressEvent(event)
-
 class HgFileView(QFrame):
     """file diff and content viewer"""
 
@@ -135,12 +121,14 @@ class HgFileView(QFrame):
         framelayout.addLayout(self.topLayout)
         framelayout.addLayout(l, 1)
 
-        self.sci = FileDisplay(self)
+        self.sci = qscilib.Scintilla(self)
         self.sci.setFrameStyle(0)
         l.addWidget(self.sci, 1)
         #self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
+        self.sci.setWrapMode(qsci.WrapCharacter)
+        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
 
         self.sci.SendScintilla(qsci.SCI_SETCARETSTYLE, 0)
 

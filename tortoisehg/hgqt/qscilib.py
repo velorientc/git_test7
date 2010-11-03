@@ -368,3 +368,36 @@ class SearchToolBar(QToolBar):
         """Request search with the given pattern"""
         self.setPattern(text)
         self._emitSearchRequested()
+
+class KeyPressInterceptor(QObject):
+    """Grab key press events important for dialogs
+
+    Usage::
+        sci = qscilib.Scintilla(self)
+        sci.installEventFilter(KeyPressInterceptor(self))
+    """
+
+    def __init__(self, parent=None, keys=None, keyseqs=None):
+        super(KeyPressInterceptor, self).__init__(parent)
+        self._keys = set((Qt.Key_Escape,))
+        self._keyseqs = set((QKeySequence.Refresh,))
+        if keys:
+            self._keys.update(keys)
+        if keyseqs:
+            self._keyseqs.update(keyseqs)
+
+    def eventFilter(self, watched, event):
+        if event.type() != QEvent.KeyPress:
+            return super(KeyPressInterceptor, self).eventFilter(
+                watched, event)
+        if self._isinterceptable(event):
+            event.ignore()
+            return True
+        return False
+
+    def _isinterceptable(self, event):
+        if event.key() in self._keys:
+            return True
+        if util.any(event.matches(e) for e in self._keyseqs):
+            return True
+        return False
