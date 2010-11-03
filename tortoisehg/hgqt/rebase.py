@@ -73,7 +73,6 @@ class RebaseDialog(QDialog):
 
         self.cmd = cmdui.Widget()
         self.cmd.commandFinished.connect(self.commandFinished)
-        self.cmd.escapePressed.connect(self.reject)
         self.showMessage.connect(self.cmd.stbar.showMessage)
         self.cmd.stbar.linkActivated.connect(self.linkActivated)
         self.layout().addWidget(self.cmd, 2)

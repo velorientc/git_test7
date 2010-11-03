@@ -301,7 +301,6 @@ class Core(QObject):
 
 class LogWidget(QsciScintilla):
     """Output log viewer"""
-    escapePressed = pyqtSignal()
 
     def __init__(self, parent=None):
         super(LogWidget, self).__init__(parent)
@@ -314,7 +313,8 @@ class LogWidget(QsciScintilla):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.escapePressed.emit()
+            event.ignore()
+            return
         super(LogWidget, self).keyPressEvent(event)
 
     def _initfont(self):
@@ -624,8 +624,6 @@ class Widget(QWidget):
     commandFinished = pyqtSignal(int)
     commandCanceling = pyqtSignal()
 
-    escapePressed = pyqtSignal()
-
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
@@ -648,7 +646,6 @@ class Widget(QWidget):
         vbox.setContentsMargins(*(1,)*4)
 
         # command output area
-        self.core.output_text.escapePressed.connect(self.escapePressed)
         self.core.output_text.setHidden(True)
         vbox.addWidget(self.core.output_text, 1)
 
@@ -838,7 +835,6 @@ class Runner(QWidget):
         if not hasattr(self, 'dlg'):
             self.dlg = QDialog(self)
             self.dlg.setWindowTitle(self.title)
-            self.core.output_text.escapePressed.connect(self.dlg.reject)
             flags = self.dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint
             self.dlg.setWindowFlags(flags)
             box = QVBoxLayout()
