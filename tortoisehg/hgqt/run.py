@@ -358,6 +358,8 @@ class _QtRunner(QObject):
     # It doesn't check the hierarchy of exception classes for simplicity.
     _recoverableexc = {
         error.RepoLookupError: _('Try refreshing your repository.'),
+        error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
+                            '<a href="#edit:%(arg1)s">edit</a> your config'),
         }
 
     def __init__(self):
@@ -397,6 +399,7 @@ class _QtRunner(QObject):
                                 for args in self.errors)
         etype, evalue = self.errors[0][:2]
         if len(self.errors) == 1 and etype in self._recoverableexc:
+            opts['values'] = evalue
             dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
                                   self._recoverableexc[etype], opts,
                                   parent=self._mainapp.activeWindow())

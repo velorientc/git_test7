@@ -11,7 +11,7 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import extensions
+from mercurial import extensions, ui
 from tortoisehg.util import hglib, version
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
@@ -119,15 +119,25 @@ class ExceptionMsgBox(QDialog):
         labelflags = Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse
 
         self.setLayout(QVBoxLayout())
-        self._mainlabel = QLabel('<b>%s</b>' % Qt.escape(main),
-                                 textInteractionFlags=labelflags)
-        self.layout().addWidget(self._mainlabel)
 
-        self._textlabel = QLabel(
-            text + "<br><br>" +
-            _('If you still have trouble, '
-              '<a href="#bugreport">please file a bug report</a>.'),
-            wordWrap=True, textInteractionFlags=labelflags)
+        if '%(arg' in text:
+            values = opts.get('values', [])
+            msgopts = {}
+            for i, val in enumerate(values):
+                msgopts['arg' + str(i)] = Qt.escape(val)
+            try:
+                text = text % msgopts
+            except Exception, e:
+                print e, msgopts
+        else:
+            self._mainlabel = QLabel('<b>%s</b>' % Qt.escape(main),
+                                     textInteractionFlags=labelflags)
+            self.layout().addWidget(self._mainlabel)
+
+        text = text + "<br><br>" + _('If you still have trouble, '
+              '<a href="#bugreport">please file a bug report</a>.')
+        self._textlabel = QLabel(text, wordWrap=True,
+                                 textInteractionFlags=labelflags)
         self._textlabel.linkActivated.connect(self._openlink)
         self.layout().addWidget(self._textlabel)
 
@@ -135,11 +145,17 @@ class ExceptionMsgBox(QDialog):
         bb.rejected.connect(self.reject)
         self.layout().addWidget(bb)
 
-    @pyqtSlot(str)
+    @pyqtSlot(QString)
     def _openlink(self, ref):
+        ref = str(ref)
         if ref == '#bugreport':
             return BugReport(self._opts, self).exec_()
-        QDesktopServices.openUrl(QUrl(ref))
+        if ref.startswith('#edit:'):
+            from tortoisehg.hgqt import wctxactions
+            fname, lineno = ref[6:].rsplit(':', 1)
+            # A chicken-egg problem here, we need a ui to get your
+            # editor in order to repair your ui config file.
+            wctxactions.edit(self, ui.ui(), None, [fname], lineno, None)
 
 def run(ui, *pats, **opts):
     return BugReport(opts)
