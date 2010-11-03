@@ -198,8 +198,6 @@ class RevisionSetQuery(QDialog):
         layout.addLayout(hbox, 1)
 
         self.entry = RevsetEntry(self)
-        self.entry.returnPressed.connect(self.returnPressed)
-        self.entry.escapePressed.connect(self.reject)
         self.entry.addCompletions(_logical, _ancestry, _filepatterns, _common)
         layout.addWidget(self.entry, 0)
 
@@ -304,9 +302,6 @@ class RevisionSetQuery(QDialog):
         self.accept()
 
 class RevsetEntry(QsciScintilla):
-    returnPressed = pyqtSignal()
-    escapePressed = pyqtSignal()
-
     def __init__(self, parent=None):
         super(RevsetEntry, self).__init__(parent)
         self.setMarginWidth(1, 0)
@@ -344,11 +339,11 @@ class RevsetEntry(QsciScintilla):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.escapePressed.emit()
+            event.ignore()
             return
         if event.key() in (Qt.Key_Enter, Qt.Key_Return):
             if not self.isListActive():
-                self.returnPressed.emit()
+                event.ignore()
                 return
         super(RevsetEntry, self).keyPressEvent(event)
 
