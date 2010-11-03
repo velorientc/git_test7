@@ -99,8 +99,6 @@ class CommitWidget(QWidget):
         self.stwidget.showMessage.connect(self.showMessage)
         self.stwidget.progress.connect(self.progress)
         self.stwidget.linkActivated.connect(self.linkActivated)
-        self.stwidget.escapePressed.connect(self.escapePressed)
-        self.stwidget.refreshPressed.connect(self.refreshPressed)
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
         self.qref = False

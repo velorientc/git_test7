@@ -50,8 +50,6 @@ class StatusWidget(QWidget):
     titleTextChanged = pyqtSignal(QString)
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
-    escapePressed = pyqtSignal()
-    refreshPressed = pyqtSignal()
     fileDisplayed = pyqtSignal(QString, QString)
 
     def __init__(self, pats, opts, root=None, parent=None):
@@ -172,8 +170,6 @@ class StatusWidget(QWidget):
         self.fileview = fileview.HgFileView(self)
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)
-        self.fileview.escapePressed.connect(self.escapePressed)
-        self.fileview.refreshPressed.connect(self.refreshPressed)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
         self.fileview.setMode('diff')
         vbox.addWidget(self.fileview, 1)
@@ -641,7 +637,6 @@ class StatusDialog(QDialog):
         self.stwidget.showMessage.connect(self.statusbar.showMessage)
         self.stwidget.progress.connect(self.statusbar.progress)
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
-        self.stwidget.escapePressed.connect(self.reject)
         self.setWindowTitle(self.stwidget.getTitle())
 
         QTimer.singleShot(0, self.stwidget.refreshWctx)
