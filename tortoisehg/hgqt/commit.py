@@ -26,8 +26,6 @@ from tortoisehg.hgqt.sync import loadIniFile
 #  in-memory patching / committing chunk selected files
 
 class MessageEntry(qscilib.Scintilla):
-    escapePressed = pyqtSignal()
-    refreshPressed = pyqtSignal()
     reflowPressed = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -69,10 +67,10 @@ class MessageEntry(qscilib.Scintilla):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.escapePressed.emit()
+            event.ignore()
             return
         if event.matches(QKeySequence.Refresh):
-            self.refreshPressed.emit()
+            event.ignore()
             return
         if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
             self.reflowPressed.emit()
@@ -84,8 +82,6 @@ class CommitWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     commitComplete = pyqtSignal()
-    escapePressed = pyqtSignal()
-    refreshPressed = pyqtSignal()
 
     progress = pyqtSignal(QString, object, QString, QString, object)
     output = pyqtSignal(QString, QString)
@@ -152,8 +148,6 @@ class CommitWidget(QWidget):
         vbox.addWidget(self.pcsinfo, 0)
 
         msgte = MessageEntry(self)
-        msgte.escapePressed.connect(self.escapePressed)
-        msgte.refreshPressed.connect(self.refreshPressed)
         msgte.reflowPressed.connect(self.reflowPressed)
         msgte.setContextMenuPolicy(Qt.CustomContextMenu)
         msgte.customContextMenuRequested.connect(self.menuRequested)
@@ -942,8 +936,6 @@ class CommitDialog(QDialog):
         commit.showMessage.connect(self.statusbar.showMessage)
         commit.progress.connect(self.statusbar.progress)
         commit.linkActivated.connect(self.linkActivated)
-        commit.escapePressed.connect(self.reject)
-        commit.refreshPressed.connect(self.refresh)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
