@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import sys
 import shlex
 import time
@@ -32,7 +33,6 @@ _fallbackencoding = encoding.fallbackencoding
 _extensions_blacklist = ('color', 'pager', 'progress')
 
 from tortoisehg.util import paths
-from tortoisehg.util.i18n import _
 from tortoisehg.util.hgversion import hgversion
 
 def tounicode(s):
@@ -42,6 +42,8 @@ def tounicode(s):
     Based on mercurial.util.tolocal().
     Return 'unicode' type string.
     """
+    if s is None:
+        return None
     if isinstance(s, unicode):
         return s
     for e in ('utf-8', _encoding):
@@ -51,12 +53,34 @@ def tounicode(s):
             pass
     return s.decode(_fallbackencoding, 'replace')
 
+def fromunicode(s, errors='strict'):
+    """
+    Convert the encoding of string from Unicode to MBCS.
+
+    Return 'str' type string.
+
+    If you don't want an exception for conversion failure,
+    specify errors='replace'.
+    """
+    if s is None:
+        return None
+    s = unicode(s)  # s can be QtCore.QString
+    for enc in (_encoding, _fallbackencoding):
+        try:
+            return s.encode(enc)
+        except UnicodeEncodeError:
+            pass
+
+    return s.encode(_encoding, errors)  # last ditch
+
 def toutf(s):
     """
     Convert the encoding of string from MBCS to UTF-8.
 
     Return 'str' type string.
     """
+    if s is None:
+        return None
     return tounicode(s).encode('utf-8').replace('\0','')
 
 def fromutf(s):
@@ -65,6 +89,8 @@ def fromutf(s):
 
     Return 'str' type string.
     """
+    if s is None:
+        return None
     try:
         return s.decode('utf-8').encode(_encoding)
     except (UnicodeDecodeError, UnicodeEncodeError):
@@ -160,6 +186,42 @@ def getfilteredtags(repo):
             filtered.append(tag)
     return filtered
 
+def getrawctxtags(changectx): 
+    '''Returns the tags for changectx, converted to UTF-8 but 
+    unfiltered for hidden tags'''
+    value = [toutf(tag) for tag in changectx.tags()]
+    if len(value) == 0:
+        return None
+    return value
+
+def getctxtags(changectx): 
+    '''Returns all unhidden tags for changectx, converted to UTF-8'''
+    value = getrawctxtags(changectx)
+    if value:
+        htlist = gethidetags(changectx._repo.ui)
+        tags = [tag for tag in value if tag not in htlist]
+        if len(tags) == 0:
+            return None
+        return tags
+    return None
+
+def getmqpatchtags(repo):
+    '''Returns all tag names used by MQ patches, or []'''
+    if hasattr(repo, 'mq'):
+        repo.mq.parse_series()
+        return repo.mq.series[:]
+    else:
+        return []
+
+def getcurrentqqueue(repo):
+    """Return the name of the current patch queue."""
+    if not hasattr(repo, 'mq'):
+        return None
+    cur = os.path.basename(repo.mq.path)
+    if cur.startswith('patches-'):
+        cur = cur[8:]
+    return cur
+
 def diffexpand(line):
     'Expand tabs in a line of diff/patch text'
     if _tabwidth is None:
@@ -208,6 +270,12 @@ def invalidaterepo(repo):
             setattr(repo, cachedAttr, None)
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
+
+def reloadui(root = None):
+    u = ui.ui()
+    if root:
+        u.readconfig(os.path.join(root, '.hg', 'hgrc'))
+    return u
 
 def loadextension(ui, name):
     # Between Mercurial revisions 1.2 and 1.3, extensions.load() stopped
@@ -350,6 +418,21 @@ def difftools(ui):
     return tools
 
 
+_funcre = re.compile('\w')
+def getchunkfunction(data, linenum):
+    """Return the function containing the chunk at linenum.
+
+    Stolen from mercurial/mdiff.py.
+    """
+    # Walk backwards starting from the line before the chunk
+    # to find a line starting with an alphanumeric char.
+    for x in xrange(int(linenum) - 2, -1, -1):
+        t = data[x].rstrip()
+        if _funcre.match(t):
+            return ' ' + t[:40]
+    return None
+
+
 def hgcmd_toq(q, label, args):
     '''
     Run an hg command in a background thread, pipe all output to a Queue
@@ -404,6 +487,20 @@ def username(user):
     if not author:
         author = util.shortuser(user)
     return author
+
+def get_revision_desc(fctx, curpath=None):
+    """return the revision description as a string"""
+    author = tounicode(username(fctx.user()))
+    rev = fctx.linkrev()
+    # If the source path matches the current path, don't bother including it.
+    if curpath and curpath == fctx.path():
+        source = ''
+    else:
+        source = '(%s)' % fctx.path()
+    date = age(fctx.date())
+    l = tounicode(fctx.description()).replace('\0', '').splitlines()
+    summary = l and l[0] or ''
+    return '%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
 
 def validate_synch_path(path, repo):
     '''

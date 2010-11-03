@@ -203,11 +203,16 @@ def getrepos(batch):
     for path in batch:
         r = paths.find_root(path)
         if r is None:
-            for n in os.listdir(path):
-                r = paths.find_root(os.path.join(path, n))
-                if (r is not None):
-                    roots.add(r)
-                    notifypaths.add(r)
+          try:
+              for n in os.listdir(path):
+                  r = paths.find_root(os.path.join(path, n))
+                  if (r is not None):
+                      roots.add(r)
+                      notifypaths.add(r)
+          except Exception, e:
+              # This exception raises in case of fixutf8 extension enabled
+              # and folder name contains '0x5c'(backslash).
+              logger.msg('Failed listdir %s (%s)' % (path, str(e)))
         else:
             roots.add(r);
             notifypaths.add(path)
