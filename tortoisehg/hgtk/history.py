@@ -697,6 +697,7 @@ class GLog(gdialog.GWindow):
         column('utc', _('UTC Date'))
         column('age', _('Age'))
         column('tag', _('Tags'))
+        column('svn', _('Subversion'))
 
         model = gtk.ListStore(
             gobject.TYPE_BOOLEAN,

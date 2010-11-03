@@ -27,7 +27,7 @@ from tortoisehg.hgtk.logview import treemodel
 from tortoisehg.hgtk.logview.graphcell import CellRendererGraph
 from tortoisehg.hgtk.logview.revgraph import *
 
-COLS = 'graph rev id revhex branch changes msg user date utc age tag'
+COLS = 'graph rev id revhex branch changes msg user date utc age tag svn'
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -100,6 +100,11 @@ class TreeView(gtk.ScrolledWindow):
         'tag-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Tags',
                                  'Show tag column',
+                                 False,
+                                 gobject.PARAM_READWRITE),
+        'svn-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Subversion',
+                                 'Show Subversion column',
                                  False,
                                  gobject.PARAM_READWRITE),
         'branch-color': (gobject.TYPE_BOOLEAN,
@@ -558,6 +563,18 @@ class TreeView(gtk.ScrolledWindow):
         col.set_fixed_width(cell.get_size(self.treeview)[2])
         col.pack_start(cell, expand=True)
         col.add_attribute(cell, "text", treemodel.TAGS)
+        col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 10)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        col = self.tvcolumns['svn']  = gtk.TreeViewColumn(_('Subversion'))
+        col.set_visible(False)
+        col.set_resizable(True)
+        col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        col.set_fixed_width(cell.get_size(self.treeview)[2])
+        col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "text", treemodel.SVNREV)
         col.add_attribute(cell, "foreground", treemodel.FGCOLOR)
 
         self.columns = COLS.split()

@@ -41,6 +41,7 @@ TAGS = 12
 FGCOLOR = 13
 AGE = 14
 CHANGES = 15
+SVNREV = 16
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -114,6 +115,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == FGCOLOR: return str
         if index == AGE: return str
         if index == CHANGES: return str
+        if index == SVNREV: return str
 
     def on_get_iter(self, path):
         return path[0]
@@ -167,6 +169,16 @@ class TreeModel(gtk.GenericTreeModel):
         if column == TAGS:
             tags = self.repo.nodetags(ctx.node())
             cache[TAGS] = hglib.toutf(', '.join(tags))
+
+        elif column == SVNREV:
+            extra = ctx.extra()
+            cvt = extra.get('convert_revision', '')
+            if cvt.startswith('svn:'):
+                rev = cvt.split('/', 1)[-1]
+                rev = rev.split('@', 1)[-1]
+            else:
+                rev = None
+            cache[SVNREV] = rev and hglib.toutf('r%s' % rev) or ''
 
         elif column == AGE:
             cache[AGE] = hglib.age(ctx.date())
