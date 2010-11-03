@@ -278,7 +278,7 @@ class DetectRenameDialog(gtk.Window):
             except:
                 good = False
             status = self.repo.dirstate[abs]
-            if (not good or not util.lexists(target)
+            if (not good or not os.path.lexists(target)
                 or (os.path.isdir(target) and not os.path.islink(target))):
                 srcs.append(abs)
             elif copy and status == 'n':
