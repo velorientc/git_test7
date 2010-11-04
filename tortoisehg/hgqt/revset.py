@@ -368,7 +368,6 @@ class RevsetThread(QThread):
         try:
             os.chdir(self.repo.root)
             func = revset.match(self.text)
-            func(self.repo, range(0, 1))
             l = []
             for c in func(self.repo, range(len(self.repo))):
                 l.append(c)
