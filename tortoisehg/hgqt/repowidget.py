@@ -19,7 +19,7 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge
-from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo
+from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -812,6 +812,21 @@ class RepoWidget(QWidget):
             dlg = bisect.BisectDialog(self.repo, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
+        def compressDlg():
+            ctxa = self.repo[selection[0]]
+            ctxb = self.repo[selection[1]]
+            if ctxa.ancestor(ctxb) == ctxb:
+                pass
+            elif ctxa.ancestor(ctxb) == ctxa:
+                selection.reverse()
+            else:
+                InfoMsgBox(_('Unable to compress history'),
+                           _('Selected changeset pair not related'))
+                return
+            dlg = compress.CompressDialog(self.repo, selection, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+
 
         if not self.paircmenu:
             menu = QMenu(self)
@@ -822,7 +837,8 @@ class RepoWidget(QWidget):
                     (_('Export DAG Range'), exportDagRange),
                     (_('Email DAG Range...'), emailDagRange),
                     (_('Bisect - Good, Bad...'), bisectNormal),
-                    (_('Bisect - Bad, Good...'), bisectReverse)
+                    (_('Bisect - Bad, Good...'), bisectReverse),
+                    (_('Compress History...'), compressDlg)
                     ):
                 a = QAction(name, self)
                 a.triggered.connect(cb)
