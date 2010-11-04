@@ -781,7 +781,6 @@ class RepoWidget(QWidget):
             else:
                 A, B = selection
             func = revset.match('%s::%s' % (A, B))
-            func(self.repo, range(0, 1))
             return [c for c in func(self.repo, range(len(self.repo)))]
 
         def exportPair():
