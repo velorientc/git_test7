@@ -10,7 +10,7 @@ from PyQt4.QtGui import *
 
 import os
 
-from mercurial import merge as mergemod
+from mercurial import revset, merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -126,8 +126,13 @@ class CompressDialog(QDialog):
         self.compressbtn.clicked.connect(self.commit)
 
     def commit(self):
-        # TODO:
-        #   self.repo.opener('last-message.txt', 'w').write(msg)
+        tip, base = self.revs
+        func = revset.match('%s::%s' % (base, tip))
+        revcount = len(self.repo)
+        revs = [c for c in func(self.repo, range(revcount)) if c != base]
+        descs = [self.repo[c].description() for c in revs]
+        self.repo.opener('last-message.txt', 'w').write('\n* * *\n'.join(descs))
+
         dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
