@@ -815,14 +815,15 @@ class RepoWidget(QWidget):
             ctxa = self.repo[selection[0]]
             ctxb = self.repo[selection[1]]
             if ctxa.ancestor(ctxb) == ctxb:
-                pass
+                revs = selection[:]
             elif ctxa.ancestor(ctxb) == ctxa:
-                selection.reverse()
+                revs = selection[:]
+                revs.reverse()
             else:
                 InfoMsgBox(_('Unable to compress history'),
                            _('Selected changeset pair not related'))
                 return
-            dlg = compress.CompressDialog(self.repo, selection, self)
+            dlg = compress.CompressDialog(self.repo, revs, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
 
