@@ -438,7 +438,7 @@ class CommitWidget(QWidget):
         self.userhist = s.value('commit/userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
         try:
-            curmsg = self.repo.opener('cur-message.txt').read()
+            curmsg = self.repo.opener('last-message.txt').read()
             self.setMessage(hglib.tounicode(curmsg))
         except EnvironmentError:
             pass
@@ -456,7 +456,7 @@ class CommitWidget(QWidget):
             else:
                 # current message is stored in local encoding
                 msg = self.getMessage()
-            self.repo.opener('cur-message.txt', 'w').write(msg)
+            self.repo.opener('last-message.txt', 'w').write(msg)
         except EnvironmentError:
             pass
 
