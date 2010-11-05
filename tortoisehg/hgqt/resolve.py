@@ -44,7 +44,7 @@ class ResolveDialog(QDialog):
         hbox.setContentsMargins(*MARGINS)
         self.layout().addLayout(hbox)
 
-        self.utree = PathsTree(self)
+        self.utree = PathsTree(self.repo, self)
         hbox.addWidget(self.utree)
 
         vbox = QVBoxLayout()
@@ -81,7 +81,7 @@ class ResolveDialog(QDialog):
         hbox.setSpacing(0)
         self.layout().addLayout(hbox)
 
-        self.rtree = PathsTree(self)
+        self.rtree = PathsTree(self.repo, self)
         hbox.addWidget(self.rtree)
 
         vbox = QVBoxLayout()
@@ -116,7 +116,7 @@ class ResolveDialog(QDialog):
         hbox.setSpacing(4)
         self.layout().addLayout(hbox)
 
-        self.tcombo = ToolsCombo(self.repo)
+        self.tcombo = ToolsCombo(self.repo, self)
         hbox.addWidget(QLabel(_('Detected merge/diff tools:')))
         hbox.addWidget(self.tcombo)
         hbox.addStretch(1)
@@ -295,7 +295,7 @@ class ResolveDialog(QDialog):
         super(ResolveDialog, self).reject()
 
 class PathsTree(QTreeView):
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent):
         QTreeView.__init__(self, parent)
         self.repo = repo
         self.setSelectionMode(QTreeView.ExtendedSelection)
@@ -331,7 +331,7 @@ class PathsTree(QTreeView):
         return QTreeView.mouseMoveEvent(self, event)
 
 class PathsModel(QAbstractTableModel):
-    def __init__(self, pathlist, parent=None):
+    def __init__(self, pathlist, parent):
         QAbstractTableModel.__init__(self, parent)
         self.headers = (_('Path'), _('Extension'))
         self.rows = []
@@ -367,7 +367,7 @@ class PathsModel(QAbstractTableModel):
             return QVariant(self.headers[col])
 
 class ToolsCombo(QComboBox):
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent):
         QComboBox.__init__(self, parent)
         self.setEditable(False)
         self.loaded = False
