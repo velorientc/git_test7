@@ -358,7 +358,7 @@ class RenameSearchThread(QThread):
 
     def run(self):
         class ProgUi(ui.ui, QObject):
-            psig = pyqtSignal(object)
+            psig = pyqtSignal(QString, object, QString, QString, object)
             def __init__(self, src=None):
                 super(ProgUi, self).__init__(src)
                 QObject.__init__(self)
