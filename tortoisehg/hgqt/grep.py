@@ -21,15 +21,8 @@ from PyQt4.QtGui import *
 # provide search features
 
 class SearchWidget(QWidget):
-    '''Working copy and repository search widget
-       SIGNALS:
-       loadBegin()                  - for progress bar
-       loadComplete()               - for progress bar
-       showMessage(unicode)         - for status bar
-    '''
-    loadBegin = pyqtSignal()
-    loadComplete = pyqtSignal()
-    showMessage = pyqtSignal(unicode)
+    '''Working copy and repository search widget'''
+    showMessage = pyqtSignal(QString)
 
     def __init__(self, upats, repo=None, parent=None, **opts):
         QWidget.__init__(self, parent)
@@ -266,7 +259,6 @@ class SearchWidget(QWidget):
         self.thread.showMessage.connect(self.showMessage)
         self.thread.matchedRow.connect(
                      lambda wrapper: model.appendRow(*wrapper.data))
-        self.loadBegin.emit()
         self.thread.start()
 
     def reload(self):
@@ -284,7 +276,6 @@ class SearchWidget(QWidget):
             self.tv.setSortingEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
-        self.loadComplete.emit()
 
 class DataWrapper(object):
     def __init__(self, data):
