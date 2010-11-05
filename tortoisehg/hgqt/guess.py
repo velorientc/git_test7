@@ -37,7 +37,7 @@ class DetectRenameDialog(QDialog):
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(*(0,)*4)
+        layout.setContentsMargins(*(2,)*4)
         self.setLayout(layout)
 
         # vsplit for top & diff
@@ -46,8 +46,10 @@ class DetectRenameDialog(QDialog):
         matchframe = QFrame(vsplit)
 
         utvbox = QVBoxLayout()
+        utvbox.setContentsMargins(*(2,)*4)
         utframe.setLayout(utvbox)
         matchvbox = QVBoxLayout()
+        matchvbox.setContentsMargins(*(2,)*4)
         matchframe.setLayout(matchvbox)
 
         hsplit = QSplitter(Qt.Vertical)
@@ -124,6 +126,7 @@ class DetectRenameDialog(QDialog):
 
         diffframe = QFrame(hsplit)
         diffvbox = QVBoxLayout()
+        diffvbox.setContentsMargins(*(2,)*4)
         diffframe.setLayout(diffvbox)
 
         difflabel = QLabel(_('<b>Differences from Source to Dest</b>'))
@@ -210,14 +213,11 @@ class DetectRenameDialog(QDialog):
                       'destination file:\n%s. Aborting!') % dest)
                 return
             remdests[dest] = src
-        self.repo.incrementBusyCount()
         for dest, src in remdests.iteritems():
             if not os.path.exists(self.repo.wjoin(src)):
                 wctx.remove([src]) # !->R
             wctx.copy(src, dest)
-            shlib.shell_notify([self.repo.wjoin(src), self.repo.wjoin(dest)])
             self.matchtv.model().remove(dest)
-        self.repo.decrementBusyCount() # triggers invalidation
         self.matchAccepted.emit()
         self.refresh()
 
