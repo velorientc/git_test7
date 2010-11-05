@@ -23,6 +23,8 @@ class PurgeDialog(QDialog):
 
     def __init__(self, repo, unknown, ignored, parent):
         QDialog.__init__(self, parent)
+        f = self.windowFlags()
+        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(QVBoxLayout())
         if unknown:
             cb = QCheckBox(_('Delete %d unknown files') % len(unknown))
