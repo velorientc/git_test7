@@ -285,7 +285,6 @@ class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
     matchedRow = pyqtSignal(DataWrapper)
     showMessage = pyqtSignal(unicode)
-    finished = pyqtSignal()
 
     def __init__(self, repo, pattern, icase, inc, exc, follow):
         super(HistorySearchThread, self).__init__()
@@ -347,13 +346,11 @@ class HistorySearchThread(QThread):
         u = incrui()
         u.obj = self
         commands.grep(u, self.repo, self.pattern, **opts)
-        self.finished.emit()
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
     matchedRow = pyqtSignal(object)
     showMessage = pyqtSignal(unicode)
-    finished = pyqtSignal()
 
     def __init__(self, repo, regexp, ctx, inc, exc, once):
         super(CtxSearchThread, self).__init__()
@@ -394,7 +391,6 @@ class CtxSearchThread(QThread):
                     self.matchedRow.emit(w)
                     if self.once:
                         break
-        self.finished.emit()
 
 
 COL_PATH     = 0
