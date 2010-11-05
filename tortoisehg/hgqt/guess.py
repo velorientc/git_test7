@@ -9,10 +9,10 @@ import os
 
 from mercurial import hg, ui, mdiff, similar, patch
 
-from tortoisehg.util import hglib, shlib, paths
+from tortoisehg.util import hglib, shlib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, htmlui, cmdui, thgrepo
+from tortoisehg.hgqt import qtlib, htmlui, cmdui
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -23,21 +23,21 @@ from PyQt4.QtGui import *
 
 class DetectRenameDialog(QDialog):
     'Detect renames after they occur'
-
     matchAccepted = pyqtSignal()
 
-    def __init__(self, parent=None, root=None, *pats):
+    def __init__(self, repo, parent, *pats):
         QDialog.__init__(self, parent)
 
-        repo = thgrepo.repository(ui.ui(), path=paths.find_root(root))
         self.repo = repo
         self.pats = pats
         self.thread = None
 
         self.setWindowTitle(_('Detect Copies/Renames in %s') % repo.displayname)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        f = self.windowFlags()
+        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(*(0,)*4)
         self.setLayout(layout)
 
         # vsplit for top & diff
@@ -186,7 +186,7 @@ class DetectRenameDialog(QDialog):
         self.thread.match.connect(self.rowReceived)
         self.thread.progress.connect(self.stbar.progress)
         self.thread.showMessage.connect(self.stbar.showMessage)
-        self.thread.searchComplete.connect(self.finished)
+        self.thread.finished.connect(self.finished)
         self.thread.start()
 
     def finished(self):
@@ -344,42 +344,25 @@ class MatchModel(QAbstractTableModel):
 
 class RenameSearchThread(QThread):
     '''Background thread for searching repository history'''
-    searchComplete = pyqtSignal()
     match = pyqtSignal(object)
     progress = pyqtSignal(QString, object, QString, QString, object)
     showMessage = pyqtSignal(unicode)
 
     def __init__(self, repo, ufiles, minpct, copies):
         super(RenameSearchThread, self).__init__()
-        self.repo = repo
+        self.repo = hg.repository(ui.ui(), repo.root)
         self.ufiles = ufiles
         self.minpct = minpct
         self.copies = copies
 
     def run(self):
-        class ProgUi(ui.ui, QObject):
-            psig = pyqtSignal(QString, object, QString, QString, object)
-            def __init__(self, src=None):
-                super(ProgUi, self).__init__(src)
-                QObject.__init__(self)
-                self.setconfig('ui', 'interactive', 'off')
-                self.setconfig('progress', 'disable', 'True')
-                os.environ['TERM'] = 'dumb'
-                if src:
-                    src.psig.connect(self.psig)
-            def progress(self, topic, pos, item='', unit='', total=None):
-                self.psig.emit(topic, pos, item, unit, total)
-        progui = ProgUi()
-        progui.psig.connect(self.progress)
-        storeui = self.repo.ui
-        self.progui = progui
-        self.repo.ui = progui
+        def emit(topic, pos, item='', unit='', total=None):
+            self.progress.emit(topic, pos, item, unit, total)
+        self.repo.ui.progress = emit
         try:
             self.search(self.repo)
         except Exception, e:
             self.showMessage.emit(hglib.tounicode(str(e)))
-        self.repo.ui = storeui
-        self.searchComplete.emit()
 
     def search(self, repo):
         wctx = repo[None]
@@ -410,4 +393,7 @@ class RenameSearchThread(QThread):
             self.match.emit([old, new, sim])
 
 def run(ui, *pats, **opts):
-    return DetectRenameDialog(None, None, *pats)
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(None, path=paths.find_root())
+    return DetectRenameDialog(repo, None, *pats)

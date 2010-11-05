@@ -244,7 +244,7 @@ def add(parent, ui, repo, files):
 
 def guessRename(parent, ui, repo, files):
     from tortoisehg.hgqt.guess import DetectRenameDialog
-    dlg = DetectRenameDialog(parent, repo.root, *files)
+    dlg = DetectRenameDialog(repo, parent, *files)
     def matched():
         ret = True
     ret = False
