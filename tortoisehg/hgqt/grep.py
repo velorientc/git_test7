@@ -24,7 +24,7 @@ class SearchWidget(QWidget):
     '''Working copy and repository search widget'''
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, upats, repo=None, parent=None, **opts):
+    def __init__(self, upats, repo, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         self.thread = None
@@ -137,9 +137,9 @@ class SearchWidget(QWidget):
         self.regexple.setCompleter(QCompleter(self.searchhistory, self))
         self.incle.setCompleter(QCompleter(self.pathshistory, self))
         self.excle.setCompleter(QCompleter(self.pathshistory, self))
+        mainvbox.setContentsMargins(2, 2, 2, 2)
 
         if parent:
-            mainvbox.setContentsMargins(2, 2, 2, 2)
             self.closeonesc = False
         else:
             self.setWindowTitle(_('TortoiseHg Search'))
@@ -296,56 +296,39 @@ class HistorySearchThread(QThread):
         self.follow = follow
 
     def run(self):
-        # special purpose - not for general use
+        def emitrow(row):
+            w = DataWrapper(row)
+            self.matchedRow.emit(w)
         class incrui(ui.ui):
-            def __init__(self, src=None):
-                super(incrui, self).__init__(src)
-                self.setconfig('ui', 'interactive', 'off')
-                self.setconfig('progress', 'disable', 'True')
-                os.environ['TERM'] = 'dumb'
-                self.fullmsg = ''
-
-            def plain(self):
-                return True
-
+            fullmsg = ''
             def write(self, msg, *args, **opts):
-                if opts.get('label'):
-                    self.fullmsg += self.label(msg, opts['label'])
-                else:
-                    self.fullmsg += msg
+                self.fullmsg += msg
                 if self.fullmsg.endswith('\0'):
                     try:
                         fname, line, rev, addremove, user, text = \
                                 self.fullmsg.split('\0', 5)
+                        text = hglib.tounicode(text)
+                        text = Qt.escape(text)
                         text = '<b>%s</b> <span>%s</span>' % (
                                 addremove, text[:-1])
                         row = [fname, rev, line, user, text]
-                        w = DataWrapper(row)
-                        self.obj.matchedRow.emit(w)
+                        emitrow(row)
                     except ValueError:
                         pass
                     self.fullmsg = ''
-
-            def write_err(self, msg, *args, **opts):
-                msg = hglib.tounicode(msg)
-                self.obj.showMessage.emit(msg)
-
-            def label(self, msg, label):
-                msg = hglib.tounicode(msg)
-                msg = Qt.escape(msg)
-                msg = msg.replace('\n', '<br />')
-                style = qtlib.geteffect(label)
-                return '<span style="%s">%s</span>' % (style, msg)
-
-        # hg grep [-i] -afn regexp
-        opts = {'all':True, 'user':True, 'follow':self.follow, 'rev':[],
-                'line_number':True, 'print0':True,
-                'ignore_case':self.icase, 'include':self.inc,
-                'exclude':self.exc,
-                }
-        u = incrui()
-        u.obj = self
-        commands.grep(u, self.repo, self.pattern, **opts)
+        cwd = os.getcwd()
+        os.chdir(self.repo.root)
+        try:
+            # hg grep [-i] -afn regexp
+            opts = {'all':True, 'user':True, 'follow':self.follow,
+                    'rev':[], 'line_number':True, 'print0':True,
+                    'ignore_case':self.icase, 'include':self.inc,
+                    'exclude':self.exc}
+            u = incrui()
+            commands.grep(u, self.repo, self.pattern, **opts)
+        except Exception, e:
+            self.showMessage.emit(str(e))
+        os.chdir(cwd)
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
@@ -400,10 +383,9 @@ COL_USER     = 3  # Hidden if ctx
 COL_TEXT     = 4
 
 class MatchTree(QTableView):
-    
     contextmenu = None
-    
-    def __init__(self, repo, parent=None):
+
+    def __init__(self, repo, parent):
         QTableView.__init__(self, parent)
         self.repo = repo
         self.delegate = htmllistview.HTMLDelegate(self)
@@ -551,7 +533,7 @@ class MatchTree(QTableView):
 
 
 class MatchModel(QAbstractTableModel):
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         QAbstractTableModel.__init__(self, parent)
         self.rows = []
         self.headers = (_('File'), _('Line'), _('Rev'), _('User'),
