@@ -147,6 +147,7 @@ class Core(QObject):
         self.thread = None
         self.stbar = None
         self.queue = []
+        self.rawoutput = []
         self.display = None
         self.useproc = False
         self.internallog = useInternal
@@ -164,7 +165,9 @@ class Core(QObject):
         self.queue.append(cmdline)
         if len(cmdlines):
             self.queue.extend(cmdlines)
-        if not self.is_running():
+        if self.useproc:
+            self.runproc()
+        elif not self.is_running():
             self.run_next()
 
     def cancel(self):
@@ -180,15 +183,29 @@ class Core(QObject):
         return bool(self.thread and self.thread.isRunning())
 
     def get_rawoutput(self):
-        if self.thread:
-            return hglib.fromunicode(self.thread.rawoutput.join(''))
-        else:
-            return ''
+        return ''.join(self.rawoutput)
 
     ### Private Method ###
 
-    def runproc(self, cmdline):
+    def runproc(self):
         'Run mercurial command in separate process'
+
+        exepath = 'hg'
+        if hasattr(sys, 'frozen'):
+            progdir = paths.get_prog_root()
+            exe = os.path.join(progdir, 'hg.exe')
+            if os.path.exists(exe):
+                exepath = exe
+
+        def start(cmdline, display):
+            self.rawoutput = []
+            if display:
+                cmd = '%% hg %s\n' % display
+            else:
+                cmd = '%% hg %s\n' % ' '.join(cmdline)
+            self.output.emit(cmd, 'control')
+            proc.start(exepath, cmdline, QIODevice.ReadOnly)
+
         @pyqtSlot(int)
         def finished(ret):
             if ret:
@@ -197,51 +214,43 @@ class Core(QObject):
                 msg = _('[command completed successfully %s]')
             msg = msg % time.asctime() + '\n'
             self.output.emit(msg, 'control')
-            self.command_finished(ret)
+            if ret == 0 and self.queue:
+                start(self.queue.pop(0), '')
+            else:
+                self.queue = []
+                self.commandFinished.emit(ret)
+
+        def handleerror(error):
+            msgmap = {
+                QProcess.FailedToStart: _('failed to start command\n'),
+                QProcess.Crashed: _('returned error\n')}
+            self.output.emit(
+                msgmap.get(error, _('error while running command\n')),
+                'ui.error')
+
+        def stdout():
+            data = proc.readAllStandardOutput().data()
+            self.rawoutput.append(data)
+            self.output.emit(hglib.tounicode(data), '')
+
+        def stderr():
+            data = proc.readAllStandardError().data()
+            self.output.emit(hglib.tounicode(data), 'ui.error')
 
         self.extproc = proc = QProcess(self)
         proc.started.connect(self.command_started)
         proc.finished.connect(finished)
-
-        def handleerror(error):
-            msgmap = {
-                QProcess.FailedToStart: _('failed to run command\n'),
-                QProcess.Crashed: _('crashed\n')}
-            self.output.emit(
-                msgmap.get(error, _('error while running command\n')),
-                'ui.error')
+        proc.readyReadStandardOutput.connect(stdout)
+        proc.readyReadStandardError.connect(stderr)
         proc.error.connect(handleerror)
+        start(self.queue.pop(0), self.display)
 
-        def put(bytes, label=''):
-            self.output.emit(hglib.tounicode(bytes.data()), label)
-
-        proc.readyReadStandardOutput.connect(
-            lambda: put(proc.readAllStandardOutput()))
-        proc.readyReadStandardError.connect(
-            lambda: put(proc.readAllStandardError(), 'ui.error'))
-
-        if self.display:
-            cmd = '%% hg %s\n' % self.display
-        else:
-            cmd = '%% hg %s\n' % ' '.join(cmdline)
-        self.output.emit(cmd, 'control')
-
-        exepath = 'hg'
-        if hasattr(sys, 'frozen'):
-            progdir = paths.get_prog_root()
-            exe = os.path.join(progdir, 'hg.exe')
-            if os.path.exists(exe):
-                exepath = exe
-        proc.start(exepath, cmdline, QIODevice.ReadOnly)
 
     def run_next(self):
         if not self.queue:
             return False
 
         cmdline = self.queue.pop(0)
-        if self.useproc:
-            self.runproc(cmdline)
-            return True
 
         self.thread = thread.CmdThread(cmdline, self.display, self.parent())
         self.thread.started.connect(self.command_started)
@@ -289,6 +298,7 @@ class Core(QObject):
             return # run next command
         else:
             self.queue = []
+            self.rawoutput = [hglib.fromunicode(self.thread.rawoutput.join(''))]
 
         self.commandFinished.emit(ret)
 
