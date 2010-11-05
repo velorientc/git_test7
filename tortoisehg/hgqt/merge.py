@@ -575,6 +575,14 @@ class CommitPage(BasePage):
         msg_text.textChanged.connect(lambda: self.completeChanged.emit())
         self.msg_text = msg_text
         box.addWidget(msg_text)
+
+        def tryperform():
+            if self.isComplete():
+                self.perform()
+        actionEnter = QAction('alt-enter', self)
+        actionEnter.setShortcuts([Qt.CTRL+Qt.Key_Return, Qt.CTRL+Qt.Key_Enter])
+        actionEnter.triggered.connect(tryperform)
+        self.addAction(actionEnter)
         return box
 
     def link_activated(self, cmd):
