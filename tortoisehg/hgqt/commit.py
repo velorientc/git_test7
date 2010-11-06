@@ -494,7 +494,7 @@ class CommitWidget(QWidget):
         from tortoisehg.hgqt.settings import SettingsDialog
         dlg = SettingsDialog(False, focus='ui.username')
         dlg.exec_()
-        self.repo.ui.invalidateui()
+        self.repo.invalidateui()
         try:
             return self.repo.ui.username()
         except error.Abort:
