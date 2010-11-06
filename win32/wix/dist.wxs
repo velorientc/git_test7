@@ -14,12 +14,10 @@
         <File Name="mercurial.mpatch.pyd" />
         <File Name="mercurial.osutil.pyd" />
         <File Name="mercurial.parsers.pyd" />
-        <File Name="mingwm10.dll" />
         <File Name="pyexpat.pyd" />
         <File Name="PyQt4.Qsci.pyd" />
         <File Name="PyQt4.QtCore.pyd" />
         <File Name="PyQt4.QtGui.pyd" />
-        <File Name="libgcc_s_dw2-1.dll" />
         <File Name="python26.dll" />
         <File Name="pythoncom26.dll" />
         <File Name="pywintypes26.dll" />
