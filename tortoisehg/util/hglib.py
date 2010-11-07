@@ -220,6 +220,22 @@ def allextensions():
     exts.update(enabledexts)
     return exts
 
+def validateextensions(enabledexts):
+    """Report extensions which should be disabled
+
+    Returns the dict {name: message} of extensions expected to be disabled.
+    message is 'utf-8'-encoded string.
+    """
+    from tortoisehg.util.i18n import _  # avoid cyclic dependency
+    exts = {}
+    if os.name != 'posix':
+        exts['inotify'] = _('inotify is not supported on this platform')
+    if 'win32text' in enabledexts:
+        exts['eol'] = _('eol is incompatible with win32text')
+    if 'eol' in enabledexts:
+        exts['win32text'] = _('win32text is incompatible with eol')
+    return exts
+
 def loadextension(ui, name):
     # Between Mercurial revisions 1.2 and 1.3, extensions.load() stopped
     # calling uisetup() after loading an extension.  This could do

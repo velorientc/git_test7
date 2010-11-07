@@ -1210,11 +1210,11 @@ class ConfigDialog(gtk.Dialog):
             shortdesc = allexts[name]
             ck = gtk.CheckButton(name, use_underline=False)
             ck.connect('toggled', self.dirty_event)
+            ck.connect('toggled', self._validateextensions)
             ck.connect('focus-in-event', self.set_help,
                        hglib.toutf(shortdesc))
             col, row = i / maxrows, i % maxrows
             extstable.attach(ck, col, col + 1, row, row + 1)
-            self.tooltips.set_tip(ck, hglib.toutf(shortdesc))
             self.extensionschecks[name] = ck
 
     def _enabledextensions(self):
@@ -1238,6 +1238,18 @@ class ConfigDialog(gtk.Dialog):
 
     def refresh_extensions_frame(self):
         enabledexts = self._enabledextensions()
+        for name, ck in self.extensionschecks.iteritems():
+            ck.set_active(name in enabledexts)
+
+        self._validateextensions()
+
+    def _validateextensions(self, *args):
+        enabledexts = self._enabledextensions()
+        selectedexts = set(name for name, ck
+                           in self.extensionschecks.iteritems()
+                           if ck.get_active())
+        invalidexts = hglib.validateextensions(selectedexts)
+
         def getinival(name):
             if 'extensions' not in self.ini:
                 return None
@@ -1257,12 +1269,17 @@ class ConfigDialog(gtk.Dialog):
             elif name in enabledexts and curval is None:
                 # re-disabling ext is not supported
                 return False
+            elif name in invalidexts and name not in selectedexts:
+                # disallow to enable bad exts, but allow to disable it
+                return False
             else:
                 return True
 
+        allexts = hglib.allextensions()
         for name, ck in self.extensionschecks.iteritems():
-            ck.set_active(name in enabledexts)
             ck.set_sensitive(changable(name))
+            self.tooltips.set_tip(ck, invalidexts.get(name)
+                                  or hglib.toutf(allexts[name]))
 
     def apply_extensions_changes(self):
         enabledexts = self._enabledextensions()
