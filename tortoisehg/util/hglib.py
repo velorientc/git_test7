@@ -209,6 +209,17 @@ def invalidaterepo(repo):
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
+def allextensions():
+    """Return the {name: shortdesc} dict of known extensions
+
+    shortdesc is in local encoding.
+    """
+    enabledexts = extensions.enabled()[0]
+    disabledexts = extensions.disabled()[0]
+    exts = (disabledexts or {}).copy()
+    exts.update(enabledexts)
+    return exts
+
 def loadextension(ui, name):
     # Between Mercurial revisions 1.2 and 1.3, extensions.load() stopped
     # calling uisetup() after loading an extension.  This could do
