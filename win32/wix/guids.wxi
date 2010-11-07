@@ -33,7 +33,7 @@
   <?define templates.static.guid = {ECF8D1EF-910D-4586-9508-86A6236B4FD5} ?>
 
   <!-- dist.wxs -->
-  <?define dist.guid = {2AE187A2-638D-42D5-8F7E-D5B9722F3296} ?>
+  <?define dist.guid = {A9CAD8C1-4966-45E6-8311-DE9FE555D6D1} ?>
   <?define imageformats.guid = {056DFB00-3EB1-4ACA-A43B-55CD5004DED1} ?>
 
   <!-- cmenu-i18n.wxs -->
