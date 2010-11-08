@@ -250,7 +250,7 @@ class ChangeSet(gdialog.GWindow):
                         hunks.extend([l.rstrip('\r\n') for l in values.hunk])
                     else:
                         raise _('unknown hunk type: %s') % state
-            except patch.NoHunks:
+            except patch.PatchError:
                 pass
         finally:
             pf.close()
