@@ -288,7 +288,7 @@ class HistorySearchThread(QThread):
 
     def __init__(self, repo, pattern, icase, inc, exc, follow):
         super(HistorySearchThread, self).__init__()
-        self.repo = repo
+        self.repo = hg.repository(repo.ui, repo.root)
         self.pattern = pattern
         self.icase = icase
         self.inc = inc
@@ -337,7 +337,7 @@ class CtxSearchThread(QThread):
 
     def __init__(self, repo, regexp, ctx, inc, exc, once):
         super(CtxSearchThread, self).__init__()
-        self.repo = repo
+        self.repo = hg.repository(repo.ui, repo.root)
         self.regexp = regexp
         self.ctx = ctx
         self.inc = inc
