@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import sys
 import subprocess
 import stat
 import shutil
@@ -571,4 +572,7 @@ def run(ui, *pats, **opts):
     if opts.get('canonpats'):
         pats = list(pats) + opts['canonpats']
 
-    return visualdiff(ui, repo, pats, opts)
+    dlg = visualdiff(ui, repo, pats, opts)
+    if not dlg:
+        sys.exit()
+    return dlg
