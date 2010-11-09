@@ -6,7 +6,6 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import traceback
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -265,7 +264,6 @@ class TagDialog(QDialog):
             self.close_btn.setFocus()
         except:
             self.set_status(_('Error in tagging'), False)
-            print traceback.format_exc()
 
     def remove_tag(self):
         local = self.local_chk.isChecked()
@@ -300,7 +298,6 @@ class TagDialog(QDialog):
             self.close_btn.setFocus()
         except:
             self.set_status(_('Error in tagging'), False)
-            print traceback.format_exc()
 
     ### Signal Handlers ###
 
