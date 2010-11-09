@@ -11,12 +11,11 @@ import traceback
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, error
+from mercurial import error
 
-from tortoisehg.util import hglib, paths, i18n
-from tortoisehg.hgqt.qtlib import getpixmap
+from tortoisehg.util import hglib, i18n
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.hgqt import qtlib
 
 keep = i18n.keepgettext()
 
@@ -26,23 +25,15 @@ class TagDialog(QDialog):
     localTagChanged = pyqtSignal()
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, repo=None, tag='', rev='tip', parent=None, opts={}):
+    def __init__(self, repo, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'no repository found'
+        self.repo = repo
 
         if not tag and rev and rev != 'tip':
-            bmarks = hglib.get_repo_bookmarks(self.repo)
-            for t in self.repo.nodetags(self.repo[rev].node()):
+            bmarks = hglib.get_repo_bookmarks(repo)
+            for t in repo.nodetags(repo[rev].node()):
                 if t != 'tip' \
                         and ((not bmarks) or (bmarks and t not in bmarks)):
                     tag = t
@@ -105,7 +96,7 @@ class TagDialog(QDialog):
         optbox.addWidget(self.replace_chk)
 
         self.eng_chk = QCheckBox(_('Use English commit message'))
-        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+        engmsg = repo.ui.configbool('tortoisehg', 'engmsg', False)
         self.eng_chk.setChecked(engmsg)
         optbox.addWidget(self.eng_chk)
 
@@ -142,7 +133,7 @@ class TagDialog(QDialog):
         # dialog setting
         self.setLayout(base)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
-        self.setWindowTitle(_('Tag - %s') % self.repo.displayname)
+        self.setWindowTitle(_('Tag - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('tag'))
 
         # prepare to show
@@ -336,4 +327,7 @@ def run(ui, *pats, **opts):
     rev = opts.get('rev')
     if rev:
         kargs['rev'] = rev
-    return TagDialog(opts=opts, **kargs)
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(ui, path=paths.find_root())
+    return TagDialog(repo, opts=opts, **kargs)
