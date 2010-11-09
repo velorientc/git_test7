@@ -20,7 +20,6 @@ keep = i18n.keepgettext()
 
 class TagDialog(QDialog):
 
-    tagChanged = pyqtSignal()
     localTagChanged = pyqtSignal()
     showMessage = pyqtSignal(unicode)
 
