@@ -279,8 +279,8 @@ INFO = (
     (_('Capture stderr'), 'tortoisehg.stderrcapt', genBoolCombo,
         _('Redirect stderr to a buffer which is parsed at the end of'
         ' the process for runtime errors. Default: True')),
-    (_('Fork hgtk'), 'tortoisehg.hgtkfork', genBoolCombo,
-        _('When running hgtk from the command line, fork a background'
+    (_('Fork GUI'), 'tortoisehg.guifork', genBoolCombo,
+        _('When running from the command line, fork a background'
         ' process to run graphical dialogs.  Default: True')),
     (_('Full Path Title'), 'tortoisehg.fullpath', genBoolCombo,
         _('Show a full directory path of the repository in the dialog title'

@@ -73,8 +73,8 @@ def portable_fork(ui, opts):
         not opts.get('fork') and opts.get('nofork')):
         os.environ['THG_GUI_SPAWN'] = '1'
         return
-    elif ui.configbool('tortoisehg', 'hgtkfork', None) is not None:
-        if not ui.configbool('tortoisehg', 'hgtkfork'):
+    elif ui.configbool('tortoisehg', 'guifork', None) is not None:
+        if not ui.configbool('tortoisehg', 'guifork'):
             return
     elif config_nofork:
         return
