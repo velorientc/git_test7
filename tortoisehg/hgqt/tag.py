@@ -16,6 +16,8 @@ from tortoisehg.util import hglib, i18n
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 
+# TODO: Use cmdui.Runner, emit output statements for dock log widget
+
 keep = i18n.keepgettext()
 
 class TagDialog(QDialog):
