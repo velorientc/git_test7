@@ -161,11 +161,9 @@ class ResolveDialog(QDialog):
         cmd = ['resolve', '--repository', self.repo.root]
         if tool:
             cmd += ['--tool='+tool]
-        cmdlines = []
-        for path in self.getSelectedPaths(self.utree):
-            cmdlines.append(cmd + [path])
-        if cmdlines:
-            self.cmd.run(*cmdlines)
+        paths = self.getSelectedPaths(self.utree)
+        if paths:
+            self.cmd.run(cmd + paths)
 
     def markresolved(self):
         paths = self.getSelectedPaths(self.utree)
