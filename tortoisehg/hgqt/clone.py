@@ -116,6 +116,16 @@ class CloneDialog(QDialog):
         self.remote_text = QLineEdit()
         optbox.addWidget(self.remote_chk)
         optbox.addWidget(self.remote_text)
+        
+        if ('perfarce' in repo.extensions()) or \
+           ('hgsubversion' in repo.extensions()):
+            # allow to specify start revision for p4 & svn repos.
+            self.startrev_chk = QCheckBox(_('Start revision:'))
+            self.startrev_chk.toggled.connect(
+                lambda e: self.toggle_enabled(e, self.startrev_text))
+            self.startrev_text = QLineEdit()
+            optbox.addWidget(self.startrev_chk)
+            optbox.addWidget(self.startrev_text)
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -155,7 +165,11 @@ class CloneDialog(QDialog):
         self.show_options(False)
         self.rev_text.setDisabled(True)
         self.remote_text.setDisabled(True)
-
+        if hasattr(self, 'startrev_chk'):
+            self.startrev_chk.setDisabled(True)
+        if hasattr(self, 'startrev_text'):
+            self.startrev_text.setDisabled(True)
+        
         rev = opts.get('rev')
         if rev:
             self.rev_chk.setChecked(True)
@@ -181,6 +195,10 @@ class CloneDialog(QDialog):
         self.proxy_chk.setVisible(visible)
         self.remote_chk.setVisible(visible)
         self.remote_text.setVisible(visible)
+        if hasattr(self, 'startrev_chk'):
+            self.startrev_chk.setVisible(visible)
+        if hasattr(self, 'startrev_text'):
+            self.startrev_text.setVisible(visible)
 
     def clone(self):
         # prepare user input
@@ -211,6 +229,9 @@ class CloneDialog(QDialog):
         dest = hglib.fromunicode(dest)
         remotecmd = hglib.fromunicode(self.remote_text.text()).strip()
         rev = hglib.fromunicode(self.rev_text.text()).strip() or None
+        startrev = None
+        if hasattr(self, 'startrev_text'):
+            startrev = hglib.fromunicode(self.startrev_text.text()).strip()
 
         # verify input
         if src == '':
@@ -256,6 +277,9 @@ class CloneDialog(QDialog):
         if rev:
             cmdline.append('--rev')
             cmdline.append(rev)
+        if self.startrev:
+            cmdline.append('--startrev')
+            cmdline.append(self.startrev)
 
         cmdline.append('--verbose')
         cmdline.append(src)
