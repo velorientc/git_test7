@@ -129,7 +129,7 @@ class CloneDialog(gdialog.GDialog):
         table.add_row(self.optrev, self.reventry)
 
         self.exs = [name for name, module in extensions.extensions()]
-        if ('perfarce' in self.exs) or ('hgsubversion' in in self.exs):
+        if ('perfarce' in self.exs) or ('hgsubversion' in self.exs):
             self.startreventry = gtk.Entry()
             self.startreventry.set_sensitive(False)
             self.optstartrev = gtk.CheckButton(_('Starting Revision:'))
