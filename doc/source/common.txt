@@ -2,7 +2,7 @@ Common Features
 ===============
 
 .. module:: common.dialog
-	:synopsis: Common features to all the dialog
+	:synopsis: Features common to many dialogs
 
 These features are common to many TortoiseHg tools, so we document them
 here just once.
