@@ -812,7 +812,7 @@ class RepoWidget(QWidget):
         def diffPair():
             revA, revB = selection
             visdiff.visualdiff(self.repo.ui, self.repo, [],
-                    {'rev':'%s:%s' % (revA, revB)})
+                    {'rev':(str(revA), str(revB))})
         def emailPair():
             run.email(self.repo.ui, rev=selection, repo=self.repo)
         def emailDagRange():
