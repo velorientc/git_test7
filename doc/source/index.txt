@@ -14,6 +14,7 @@ Contents:
    
 	preface
 	intro
+	whatsnew
 	quick
 	daily
 	settings

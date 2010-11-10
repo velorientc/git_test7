@@ -1,0 +1,31 @@
+Whats New
+=========
+
+.. module:: whatsnew.dialog
+	:synopsis: New features in this release
+
+Philosophy
+----------
+
+Workbench
+---------
+
+Use of Mercurial command lines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Resolve tool, incremental merge, rebase, etc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Shelve Dropped, MQ Improved
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Technology
+----------
+
+Polling of repository state and config
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Immediate bug report dialogs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. vim: noet ts=4
