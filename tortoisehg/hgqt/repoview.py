@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from mercurial.error import RepoError
+from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.qtlib import geticon
@@ -230,8 +230,10 @@ class HgRepoView(QTableView):
             rev = str(rev)
         try:
             rev = self.repo.changectx(rev).rev()
-        except RepoError:
+        except error.RepoError:
             self.showMessage.emit(_("Can't find revision '%s'") % rev)
+        except LookupError, e:
+            self.showMessage.emit(hglib.fromunicode(str(e)))
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
