@@ -43,12 +43,12 @@ class InitDialog(QDialog):
         # options checkboxes
         self.add_files_chk = QCheckBox(
                 _('Add special files (.hgignore, ...)'))
-        self.make_old_chk = QCheckBox(
-                _('Make repo compatible with Mercurial 1.0'))
+        self.make_pre_1_7_chk = QCheckBox(
+                _('Make repo compatible with Mercurial <1.7'))
         self.run_wb_chk = QCheckBox(
                 _('Show in Workbench after init'))
         self.grid.addWidget(self.add_files_chk, 1, 1)
-        self.grid.addWidget(self.make_old_chk, 2, 1)
+        self.grid.addWidget(self.make_pre_1_7_chk, 2, 1)
         if not self.parent():
             self.grid.addWidget(self.run_wb_chk, 3, 1)
 
@@ -78,7 +78,7 @@ class InitDialog(QDialog):
             path = os.path.dirname(path)
         self.dest_edit.setText(path)
         self.add_files_chk.setChecked(True)
-        self.make_old_chk.setChecked(False)
+        self.make_pre_1_7_chk.setChecked(False)
         self.compose_command()
 
         # dialog settings
@@ -95,7 +95,7 @@ class InitDialog(QDialog):
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.init_btn.clicked.connect(self.init)
         self.close_btn.clicked.connect(self.close)
-        self.make_old_chk.toggled.connect(self.compose_command)
+        self.make_pre_1_7_chk.toggled.connect(self.compose_command)
 
     def browse_clicked(self):
         """Select the destination directory"""
@@ -113,8 +113,8 @@ class InitDialog(QDialog):
     def compose_command(self):
         # just a stub for extension with extra options (--mq, --ssh, ...)
         self.cmdline = ['init']
-        if self.make_old_chk.isChecked():
-            self.cmdline.append('--config format.usefncache=False')
+        if self.make_pre_1_7_chk.isChecked():
+            self.cmdline.append('--config format.dotencode=False')
         self.cmdline.append(self.getPath())
         self.hgcmd_txt.setText('hg ' + ' '.join(self.cmdline))
 
@@ -162,9 +162,9 @@ class InitDialog(QDialog):
 
         _ui = ui.ui()
 
-        # fncache is the new default repo format in Mercurial 1.1
-        if self.make_old_chk.isChecked():
-            _ui.setconfig('format', 'usefncache', 'False')
+        # dotencode is the new default repo format in Mercurial 1.7
+        if self.make_pre_1_7_chk.isChecked():
+            _ui.setconfig('format', 'dotencode', 'False')
 
         try:
             # create the new repo
