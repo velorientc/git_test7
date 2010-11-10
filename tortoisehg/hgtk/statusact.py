@@ -73,7 +73,7 @@ class statusact(object):
             return
 
         # Create new opts, so nothing unintented gets through
-        moveopts = self.stat.merge_opts(commands.table['rename|mv'][1],
+        moveopts = self.stat.merge_opts(commands.table['rename|move|mv'][1],
                 ('include', 'exclude'))
         def dohgmove():
             #moveopts['force'] = True
