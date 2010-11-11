@@ -186,15 +186,15 @@ def getfilteredtags(repo):
             filtered.append(tag)
     return filtered
 
-def getrawctxtags(changectx): 
-    '''Returns the tags for changectx, converted to UTF-8 but 
+def getrawctxtags(changectx):
+    '''Returns the tags for changectx, converted to UTF-8 but
     unfiltered for hidden tags'''
     value = [toutf(tag) for tag in changectx.tags()]
     if len(value) == 0:
         return None
     return value
 
-def getctxtags(changectx): 
+def getctxtags(changectx):
     '''Returns all unhidden tags for changectx, converted to UTF-8'''
     value = getrawctxtags(changectx)
     if value:
@@ -540,11 +540,11 @@ def get_repo_bookmarks(repo, values=False):
     """
     Will return the bookmarks for the given repo if the
     bookmarks extension is loaded.
-    
+
     By default, returns a list of bookmark names; if
-    values is True, returns a dict mapping names to 
+    values is True, returns a dict mapping names to
     nodes.
-    
+
     If the extension is not loaded, returns an empty
     list/dict.
     """
@@ -562,18 +562,18 @@ def get_repo_bookmarks(repo, values=False):
             marks = {}
     else:
         marks = {}
-            
+
     if values:
         return marks
     else:
         return marks.keys()
-    
+
 def get_repo_bookmarkcurrent(repo):
     """
     Will return the current bookmark for the given repo
     if the bookmarks extension is loaded, and the
     track.current option is on.
-    
+
     If the extension is not loaded, or track.current
     is not set, returns None
     """
@@ -593,17 +593,17 @@ def is_rev_current(repo, rev):
     '''
     Returns True if the revision indicated by 'rev' is the current
     working directory parent.
-    
+
     If rev is '' or None, it is assumed to mean 'tip'.
     '''
     if rev in ('', None):
         rev = 'tip'
     rev = repo.lookup(rev)
     parents = repo.parents()
-    
+
     if len(parents) > 1:
         return False
-    
+
     return rev == parents[0].node()
 
 def is_descriptor(obj, attr):
@@ -619,15 +619,15 @@ def is_descriptor(obj, attr):
         if attr in cls.__dict__:
             return hasattr(cls.__dict__[attr], '__get__')
     return None
-    
+
 def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
            opts=None):
     '''
     export changesets as hg patches.
-    
+
     Mercurial moved patch.export to cmdutil.export after version 1.5
     (change e764f24a45ee in mercurial).
-    '''   
+    '''
 
     try:
         return cmdutil.export(repo, revs, template, fp, switch_parent, opts)

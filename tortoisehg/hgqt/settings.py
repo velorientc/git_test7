@@ -235,7 +235,7 @@ def findMergeTools():
 
 INFO = (
 ({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
-    (_('Three-way Merge Tool'), 'ui.merge', 
+    (_('Three-way Merge Tool'), 'ui.merge',
         (genDeferredCombo, findMergeTools),
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
@@ -243,7 +243,7 @@ INFO = (
         ' markers in place.  Chose internal:merge to force conflict markers,'
         ' internal:prompt to always select local or other, or internal:dump'
         ' to leave files in the working directory for manual merging')),
-    (_('Visual Diff Tool'), 'tortoisehg.vdiff', 
+    (_('Visual Diff Tool'), 'tortoisehg.vdiff',
         (genDeferredCombo, findDiffTools),
         _('Specify visual diff tool, as described in the [merge-tools]'
           ' section of your Mercurial configuration files.  If left'
@@ -315,7 +315,7 @@ INFO = (
     (_('Hide Tags'), 'tortoisehg.hidetags', genEditCombo,
         _('Space separated list of tags that will not be shown.'
         ' Useful example: Specify "qbase qparent qtip" to hide the'
-        ' standard tags inserted by the Mercurial Queues Extension.' 
+        ' standard tags inserted by the Mercurial Queues Extension.'
         ' Default: None')),
     (_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
         ['none', 'update', 'fetch', 'rebase']),
@@ -366,7 +366,7 @@ INFO = (
     (_('Style'), 'web.style', (genDefaultCombo,
         ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old']),
         _('Which template map style to use')),
-    (_('Archive Formats'), 'web.allow_archive', 
+    (_('Archive Formats'), 'web.allow_archive',
         (genEditCombo, ['bz2', 'gz', 'zip']),
         _('Comma separated list of archive formats allowed for'
         ' downloading')),
