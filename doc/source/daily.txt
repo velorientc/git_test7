@@ -7,11 +7,11 @@ TortoiseHg in daily use
 	
 	common
 	explorer
+	workbench
 	init
 	clone
 	commit
 	shelve
-	changelog
 	datamine
 	synchronize
 	serve
