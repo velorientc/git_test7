@@ -11,7 +11,6 @@ TortoiseHg in daily use
 	init
 	clone
 	commit
-	shelve
 	datamine
 	synchronize
 	serve
