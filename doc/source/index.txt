@@ -18,7 +18,6 @@ Contents:
 	quick
 	daily
 	settings
-	recovery
 	patches
 	extensions
 	nonhg
