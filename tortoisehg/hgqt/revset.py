@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import revset, error
+from mercurial import revset, hg, error
 
 from tortoisehg.hgqt import qtlib, cmdui
 from tortoisehg.util import hglib
@@ -359,7 +359,7 @@ class RevsetThread(QThread):
 
     def __init__(self, repo, query, parent):
         super(RevsetThread, self).__init__(parent)
-        self.repo = repo
+        self.repo = hg.repository(repo.ui, repo.root)
         self.text = hglib.fromunicode(query)
         self.query = query
 
