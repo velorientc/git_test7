@@ -602,9 +602,12 @@ class FileData(object):
         # TODO: elif check if a subdirectory (for manifest tool)
 
         if status in ('R', '!'):
-            newdata = ctx.p1()[wfile].data()
-            self.contents = hglib.tounicode(newdata)
-            self.flabel += _(' <i>(was deleted)</i>')
+            if wfile in ctx.p1():
+                newdata = ctx.p1()[wfile].data()
+                self.contents = hglib.tounicode(newdata)
+                self.flabel += _(' <i>(was deleted)</i>')
+            else:
+                self.flabel += _(' <i>(was added, now missing)</i>')
             return
 
         if status in ('I', '?'):
