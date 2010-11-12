@@ -729,12 +729,12 @@ class RepoWidget(QWidget):
             exs = self.repo.extensions()
             menu = QMenu(self)
             for ext, func, desc, icon, cb in (
-                (None, isctx, _('Browse at rev...'), None,
-                    self.manifestRevision),
                 (None, isrev, _('Update...'), 'update',
                     self.updateToRevision),
                 (None, fixed, _('Merge with...'), 'merge',
                     self.mergeWithRevision),
+                (None, isctx, _('Browse at rev...'), None,
+                    self.manifestRevision),
                 (None, fixed, _('Tag...'), 'tag', self.tagToRevision),
                 (None, fixed, _('Backout...'), None, self.backoutToRevision),
                 (None, fixed, _('Push to here'), None, self.pushToRevision),
