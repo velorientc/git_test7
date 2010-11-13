@@ -26,6 +26,7 @@ class ChangeSet(gdialog.GWindow):
     def __init__(self, ui, repo, cwd, pats, opts, stbar=None):
         gdialog.GWindow.__init__(self, ui, repo, cwd, pats, opts)
         self.stbar = stbar
+        self.changes = [], [], []
         self.glog_parent = None
         self.bfile = None
         self.colorstyle = repo.ui.config('tortoisehg', 'diffcolorstyle')
@@ -169,9 +170,10 @@ class ChangeSet(gdialog.GWindow):
         self._filelist.clear()
         self._filelist.append(('*', _('[All Files]'), ''))
         try:
-            modified, added, removed = self.repo.status(parent, ctx.node())[:3]
+            self.changes = self.repo.status(parent, ctx.node())[:3]
         except error.LookupError, error.RevlogError:
-            modified, added, removed = [], [], []
+            self.changes = [], [], []
+        modified, added, removed = self.changes
         selrow = None
         for f in modified:
             if f in pats:
@@ -359,9 +361,10 @@ class ChangeSet(gdialog.GWindow):
             m = cmdutil.matchfiles(self.repo, [wfile])
             opts = mdiff.diffopts(git=True, nodates=True)
             try:
-                for s in patch.diff(self.repo, n1, n2, match=m, opts=opts):
+                for s in patch.diff(self.repo, n1, n2, changes=self.changes,
+                                    match=m, opts=opts):
                     lines.extend(s.splitlines())
-            except (error.RepoLookupError, error.RepoError, error.LookupError), e:
+            except (error.RepoError, error.LookupError), e:
                 err = _('Repository Error:  %s, refresh suggested') % str(e)
                 lines = ['diff', '', err]
         tags, lines = self.prepare_diff(lines, offset, wfile)
