@@ -416,12 +416,12 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def verify(self):
-        cmdline = ['--repository', self.repo.root, 'verify']
+        cmdline = ['--repository', self.repo.root, 'verify', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
         dlg.exec_()
 
     def recover(self):
-        cmdline = ['--repository', self.repo.root, 'recover']
+        cmdline = ['--repository', self.repo.root, 'recover', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
         dlg.exec_()
 
