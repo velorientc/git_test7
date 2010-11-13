@@ -179,9 +179,9 @@ class CommitWidget(QWidget):
         wfile = unicode(wfile)
         self._apis = QsciAPIs(self.msgte.lexer())
         tokens = set()
-        for wfile in self.stwidget.getChecked():
-            tokens.add(wfile)
-            tokens.add(os.path.basename(wfile))
+        for e in self.stwidget.getChecked():
+            tokens.add(e)
+            tokens.add(os.path.basename(e))
         try:
             from pygments.lexers import guess_lexer_for_filename
             from pygments.token import Token
