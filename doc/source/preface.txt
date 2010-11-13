@@ -37,7 +37,7 @@ components of TortoiseHg.
 :doc:`recovery` describes the recovery operations one can perform on a
 project.
 
-:doc:`nonhg` describes how to use TortoiseHg as a client to
+:doc:`nonhg` describes how to use TortoiseHg as a client for
 non-Mercurial servers.
 
 :doc:`faq` has a list of common questions and their answers.
@@ -58,21 +58,27 @@ Community
 Mailing Lists:
 
 * `Users <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - Announcements, user Q&A, and feature discussions.
-* `Developers <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Patches, bug reports, development discussions.
+* `Developers <thg-dev@googlegroups.com>`_ - Patches, bug reports, development discussions.
 * `Issues <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Notifications from the issue tracker.
 
-And our `wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ on Bitbucket.
+And our `wiki <http://bitbucket.org/tortoisehg/thg/wiki/Home>`_ on Bitbucket.
 
-Acknowledgement
-===============
+Acknowledgements
+================
 
 Thanks to the many people who contribute to the TortoiseHg project.  It
 takes a community of developers, translators, and users to build a
-truly useful tool.  Especially users who care enough to report bugs and
-file feature requests.
+truly useful tool (especially users who care enough to report bugs and
+file feature requests).
 
 The TortoiseHg installer for Windows includes the TortoiseOverlays handler,
 as provided by the `TortoiseSVN <http://tortoisesvn.net>`_ project.
+
+The history viewer of TortoiseHg is based on hgview
+`hgview <http://www.logilab.org/project/hgview>`_, a tool developped by
+`David Douard <david.douard@logilab.fr>`_ and others, with the financial
+support of `Logilab <http://www.logilab.fr>`_.
+
 
 Conventions used in this manual
 ===============================

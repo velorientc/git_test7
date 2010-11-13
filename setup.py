@@ -10,17 +10,30 @@
 import time
 import sys
 import os
+import shutil
 import subprocess
-from distutils.core import setup
-from distutils.command.build import build
+from fnmatch import fnmatch
+from distutils import log
+from distutils.core import setup, Command
+from distutils.command.build import build as _build_orig
+from distutils.command.clean import clean as _clean_orig
+from distutils.dep_util import newer
 from distutils.spawn import spawn, find_executable
+from os.path import isdir, exists, join, walk, splitext
 
 thgcopyright = 'Copyright (C) 2010 Steve Borho and others'
 hgcopyright = 'Copyright (C) 2005-2010 Matt Mackall and others'
 
-class build_mo(build):
+class build_mo(Command):
 
     description = "build translations (.mo files)"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
 
     def run(self):
         if not find_executable('msgfmt'):
@@ -47,17 +60,136 @@ class build_mo(build):
             self.mkpath(modir)
             self.make_file([pofile], mofile, spawn, (cmd,))
 
-build.sub_commands.append(('build_mo', None))
+class build_qt(Command):
+    description = "build PyQt GUIs (.ui) and resources (.qrc)"
+    user_options = [('force', 'f', 'forcibly compile everything'
+                     ' (ignore file timestamps)')]
+    boolean_options = ('force',)
+
+    def initialize_options(self):
+        self.force = None
+
+    def finalize_options(self):
+        self.set_undefined_options('build', ('force', 'force'))
+
+    def compile_ui(self, ui_file, py_file=None):
+        # Search for pyuic4 in python bin dir, then in the $Path.
+        if py_file is None:
+            py_file = splitext(ui_file)[0] + "_ui.py"
+        if not(self.force or newer(ui_file, py_file)):
+            return
+        try:
+            from PyQt4 import uic
+            fp = open(py_file, 'w')
+            uic.compileUi(ui_file, fp)
+            fp.close()
+            log.info('compiled %s into %s' % (ui_file, py_file))
+        except Exception, e:
+            self.warn('Unable to compile user interface %s' % e)
+            return
+
+    def compile_rc(self, qrc_file, py_file=None):
+        # Search for pyuic4 in python bin dir, then in the $Path.
+        if py_file is None:
+            py_file = splitext(qrc_file)[0] + "_rc.py"
+        if not(self.force or newer(qrc_file, py_file)):
+            return
+        if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
+            self.warn("Unable to generate python module for resource file %s"
+                      % qrc_file)
+        else:
+            log.info('compiled %s into %s' % (qrc_file, py_file))
+
+    def run(self):
+        self._wrapuic()
+        basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
+        for dirpath, _, filenames in os.walk(basepath):
+            for filename in filenames:
+                if filename.endswith('.ui'):
+                    self.compile_ui(join(dirpath, filename))
+                elif filename.endswith('.qrc'):
+                    self.compile_rc(join(dirpath, filename))
+
+    _wrappeduic = False
+    @classmethod
+    def _wrapuic(cls):
+        """wrap uic to use gettext's _() in place of tr()"""
+        if cls._wrappeduic:
+            return
+
+        from PyQt4.uic.Compiler import compiler, qtproxies, indenter
+
+        class _UICompiler(compiler.UICompiler):
+            def createToplevelWidget(self, classname, widgetname):
+                o = indenter.getIndenter()
+                o.level = 0
+                o.write('from tortoisehg.hgqt.i18n import _')
+                return super(_UICompiler, self).createToplevelWidget(classname, widgetname)
+        compiler.UICompiler = _UICompiler
+
+        class _i18n_string(qtproxies.i18n_string):
+            def __str__(self):
+                return "_('%s')" % self.string.encode('string-escape')
+        qtproxies.i18n_string = _i18n_string
+
+        cls._wrappeduic = True
+
+class clean_local(Command):
+    pats = ['*.py[co]', '*_ui.py', '*_rc.py', '*.orig', '*.rej']
+    excludedirs = ['.hg', 'build', 'dist']
+    description = 'clean up generated files (%s)' % ', '.join(pats)
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        for e in self._walkpaths('.'):
+            log.info("removing '%s'" % e)
+            os.remove(e)
+
+    def _walkpaths(self, path):
+        for root, _dirs, files in os.walk(path):
+            if any(root == join(path, e) or root.startswith(join(path, e, ''))
+                   for e in self.excludedirs):
+                continue
+            for e in files:
+                fpath = join(root, e)
+                if any(fnmatch(fpath, p) for p in self.pats):
+                    yield fpath
+
+class build(_build_orig):
+    sub_commands = [
+        ('build_qt', None),
+        ('build_mo', None),
+        ] + _build_orig.sub_commands
+
+class clean(_clean_orig):
+    sub_commands = [
+        ('clean_local', None),
+        ] + _clean_orig.sub_commands
+
+    def run(self):
+        _clean_orig.run(self)
+        for e in self.get_sub_commands():
+            self.run_command(e)
 
 cmdclass = {
-        'build_mo': build_mo}
+        'build': build,
+        'build_qt': build_qt ,
+        'build_mo': build_mo ,
+        'clean': clean,
+        'clean_local': clean_local,
+    }
 
 def setup_windows(version):
     # Specific definitios for Windows NT-alike installations
     _scripts = []
     _data_files = []
-    _packages = ['tortoisehg.hgtk', 'tortoisehg.hgtk.logview',
-                 'tortoisehg.util', 'tortoisehg']
+    _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg']
     extra = {}
     hgextmods = []
 
@@ -91,8 +223,15 @@ def setup_windows(version):
         _data_files = [(root, [os.path.join(root, file_) for file_ in files])
                             for root, dirs, files in os.walk('icons')]
 
-    # add library files to support PyGtk-based dialogs/windows
-    includes = ['dbhash', 'pango', 'atk', 'pangocairo', 'cairo', 'gobject']
+    # for PyQt, see http://www.py2exe.org/index.cgi/Py2exeAndPyQt
+    includes = ['sip']
+
+    # Qt4 plugins, see http://stackoverflow.com/questions/2206406/
+    def qt4_plugins(subdir, *dlls):
+        import PyQt4
+        pluginsdir = join(os.path.dirname(PyQt4.__file__), 'plugins')
+        return (subdir, [join(pluginsdir, subdir, e) for e in dlls])
+    _data_files.append(qt4_plugins('imageformats', 'qico4.dll', 'qsvg4.dll'))
 
     # Manually include other modules py2exe can't find by itself.
     if 'hgext.highlight' in hgextmods:
@@ -106,28 +245,35 @@ def setup_windows(version):
            "skip_archive" : 0,
 
            # Don't pull in all this MFC stuff used by the makepy UI.
-           "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list",
+           "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list"
+                        ",setup,distutils",  # required only for in-place use
            "includes" : includes,
            "optimize" : 1
        }
     }
+    shutil.copyfile('thg', 'thgw')
     extra['console'] = [
+            {'script':'thg',
+             'icon_resources':[(0,'icons/thg_logo.ico')],
+             'description':'TortoiseHg GUI tools for Mercurial SCM',
+             'copyright':thgcopyright,
+             'product_version':version},
             {'script':'contrib/hg', 
              'icon_resources':[(0,'icons/hg.ico')],
              'description':'Mercurial Distributed SCM',
              'copyright':hgcopyright,
              'product_version':version},
-            {'script':'hgtk',
-             'icon_resources':[(0,'icons/thg_logo.ico')],
-             'description':'TortoiseHg GUI tools for Mercurial SCM',
-             'copyright':thgcopyright,
-             'product_version':version},
-            {'script':'contrib/docdiff.py',
+            {'script':'win32/docdiff.py',
              'icon_resources':[(0,'icons/TortoiseMerge.ico')],
              'copyright':thgcopyright,
              'product_version':version}
             ]
     extra['windows'] = [
+            {'script':'thgw',
+             'icon_resources':[(0,'icons/thg_logo.ico')],
+             'description':'TortoiseHg GUI tools for Mercurial SCM',
+             'copyright':thgcopyright,
+             'product_version':version},
             {'script':'TortoiseHgOverlayServer.py',
              'icon_resources':[(0,'icons/thg_logo.ico')],
              'description':'TortoiseHg Overlay Icon Server',
@@ -141,9 +287,8 @@ def setup_windows(version):
 def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
-    _scripts = ['hgtk']
-    _packages = ['tortoisehg', 'tortoisehg.hgtk', 
-                 'tortoisehg.hgtk.logview', 'tortoisehg.util']
+    _scripts = ['thg']
+    _packages = ['tortoisehg', 'tortoisehg.hgqt', 'tortoisehg.util']
     _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
         [os.path.join(root, file_) for file_ in files])
         for root, dirs, files in os.walk('icons')]
@@ -180,59 +325,60 @@ def runcmd(cmd, env):
         return ''
     return out
 
-version = ''
+if __name__ == '__main__':
+    version = ''
 
-if os.path.isdir('.hg'):
-    from tortoisehg.util import version as _version
-    branch, version = _version.liveversion()
-    if version.endswith('+'):
-        version += time.strftime('%Y%m%d')
-elif os.path.exists('.hg_archival.txt'):
-    kw = dict([t.strip() for t in l.split(':', 1)]
-              for l in open('.hg_archival.txt'))
-    if 'tag' in kw:
-        version =  kw['tag']
-    elif 'latesttag' in kw:
-        version = '%(latesttag)s+%(latesttagdistance)s-%(node).12s' % kw
+    if os.path.isdir('.hg'):
+        from tortoisehg.util import version as _version
+        branch, version = _version.liveversion()
+        if version.endswith('+'):
+            version += time.strftime('%Y%m%d')
+    elif os.path.exists('.hg_archival.txt'):
+        kw = dict([t.strip() for t in l.split(':', 1)]
+                  for l in open('.hg_archival.txt'))
+        if 'tag' in kw:
+            version =  kw['tag']
+        elif 'latesttag' in kw:
+            version = '%(latesttag)s+%(latesttagdistance)s-%(node).12s' % kw
+        else:
+            version = kw.get('node', '')[:12]
+
+    if version:
+        f = open("tortoisehg/util/__version__.py", "w")
+        f.write('# this file is autogenerated by setup.py\n')
+        f.write('version = "%s"\n' % version)
+        f.close()
+
+    try:
+        import tortoisehg.util.__version__
+        version = tortoisehg.util.__version__.version
+    except ImportError:
+        version = 'unknown'
+
+    if os.name == "nt":
+        (scripts, packages, data_files, extra) = setup_windows(version)
+        desc = 'Windows shell extension for Mercurial VCS'
+        # Windows binary file versions for exe/dll files must have the
+        # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
+        from tortoisehg.util.version import package_version
+        setupversion = package_version()
+        productname = 'TortoiseHg'
     else:
-        version = kw.get('node', '')[:12]
+        (scripts, packages, data_files, extra) = setup_posix()
+        desc = 'TortoiseHg dialogs for Mercurial VCS'
+        setupversion = version
+        productname = 'tortoisehg'
 
-if version:
-    f = open("tortoisehg/util/__version__.py", "w")
-    f.write('# this file is autogenerated by setup.py\n')
-    f.write('version = "%s"\n' % version)
-    f.close()
-
-try:
-    import tortoisehg.util.__version__
-    version = tortoisehg.util.__version__.version
-except ImportError:
-    version = 'unknown'
-
-if os.name == "nt":
-    (scripts, packages, data_files, extra) = setup_windows(version)
-    desc = 'Windows shell extension for Mercurial VCS'
-    # Windows binary file versions for exe/dll files must have the
-    # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
-    from tortoisehg.util.version import package_version
-    setupversion = package_version()
-    productname = 'TortoiseHg'
-else:
-    (scripts, packages, data_files, extra) = setup_posix()
-    desc = 'TortoiseHg dialogs for Mercurial VCS'
-    setupversion = version
-    productname = 'tortoisehg'
-
-setup(name=productname,
-        version=setupversion,
-        author='Steve Borho',
-        author_email='steve@borho.org',
-        url='http://tortoisehg.org',
-        description=desc,
-        license='GNU GPL2',
-        scripts=scripts,
-        packages=packages,
-        data_files=data_files,
-        cmdclass=cmdclass,
-        **extra
-    )
+    setup(name=productname,
+            version=setupversion,
+            author='Steve Borho',
+            author_email='steve@borho.org',
+            url='http://tortoisehg.org',
+            description=desc,
+            license='GNU GPL2',
+            scripts=scripts,
+            packages=packages,
+            data_files=data_files,
+            cmdclass=cmdclass,
+            **extra
+        )
