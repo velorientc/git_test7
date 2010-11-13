@@ -190,7 +190,7 @@ class CommitWidget(QWidget):
                 contents = unicode(contents)
                 lexer = guess_lexer_for_filename(wfile, contents)
                 for tokentype, value in lexer.get_tokens(contents):
-                    if tokentype is Token.Name and len(value) > 4:
+                    if tokentype in Token.Name and len(value) > 4:
                         tokens.add(value)
             except ClassNotFound:
                 pass
