@@ -210,7 +210,7 @@ class RepoWidget(QWidget):
         cw.buttonHBox.addWidget(b)
         cw.commitButtonName.connect(lambda n: b.setText(n))
         cw.loadConfigs(QSettings())
-        cw.reload()
+        QTimer.singleShot(0, cw.reload)
         b.clicked.connect(cw.commit)
         self.repo._commitwidget = cw
         return SharedWidget(cw)

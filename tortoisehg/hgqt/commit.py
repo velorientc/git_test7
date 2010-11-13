@@ -224,6 +224,7 @@ class CommitWidget(QWidget):
         'Repository is reporting its config files have changed'
         self.refresh()
 
+    @pyqtSlot()
     def reload(self):
         'User has requested a reload'
         self.repo.thginvalidate()
