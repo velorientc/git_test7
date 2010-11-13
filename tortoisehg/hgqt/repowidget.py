@@ -160,7 +160,7 @@ class RepoWidget(QWidget):
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
         self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
-        
+
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
         self.updatePatchBranchTab()
 
@@ -336,7 +336,7 @@ class RepoWidget(QWidget):
 
     def createPatchBranchWidget(self):
          return PatchBranchWidget(self.repo, parent=self)
-    
+
     def updatePatchBranchTab(self):
         "Only show pbranch tab when pbranch extension is installed"
         tt = self.taskTabsWidget
@@ -708,7 +708,7 @@ class RepoWidget(QWidget):
             self.doubleSelectionMenu(point, selection)
         else:
             self.multipleSelectionMenu(point, selection)
-    
+
     def singleSelectionMenu(self, point, selection):
         if not self.singlecmenu:
             items = []
@@ -771,7 +771,7 @@ class RepoWidget(QWidget):
             self.singlecmenuitems = items
 
         ctx = self.repo.changectx(self.rev)
-        applied = ctx.thgmqappliedpatch() 
+        applied = ctx.thgmqappliedpatch()
         unapp = ctx.thgmqunappliedpatch()
         qparent = 'qparent' in ctx.tags()
         working = self.rev is None
