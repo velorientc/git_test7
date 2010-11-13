@@ -18,7 +18,7 @@ from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
-from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge
+from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
@@ -736,6 +736,7 @@ class RepoWidget(QWidget):
                 (None, isctx, _('Browse at rev...'), None,
                     self.manifestRevision),
                 (None, fixed, _('Tag...'), 'tag', self.tagToRevision),
+                (None, fixed, _('Bookmark...'), 'bookmark', self.bookmarkRevision),
                 (None, fixed, _('Backout...'), None, self.backoutToRevision),
                 (None, fixed, _('Push to here'), None, self.pushToRevision),
                 (None, isrev, _('Export patch'), None, self.exportRevisions),
@@ -913,6 +914,12 @@ class RepoWidget(QWidget):
     def tagToRevision(self):
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
         dlg.localTagChanged.connect(self.refresh)
+        dlg.showMessage.connect(self.showMessage)
+        dlg.exec_()
+
+    def bookmarkRevision(self):
+        dlg = bookmark.BookmarkDialog(self.repo, rev=str(self.rev), parent=self)
+        dlg.localBookmarkChanged.connect(self.refresh)
         dlg.showMessage.connect(self.showMessage)
         dlg.exec_()
 
