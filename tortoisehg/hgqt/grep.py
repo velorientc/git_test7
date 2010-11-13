@@ -30,6 +30,7 @@ class SearchWidget(QWidget):
         self.thread = None
 
         mainvbox = QVBoxLayout()
+        mainvbox.setSpacing(6)
         self.setLayout(mainvbox)
 
         hbox = QHBoxLayout()
