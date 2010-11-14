@@ -790,7 +790,7 @@ class SettingsForm(QWidget):
                 w = func(opts)
             lbl = QLabel(label)
             lbl.installEventFilter(self)
-            lbl.tooltip = tooltip
+            lbl.setToolTip(tooltip)
             form.addRow(lbl, w)
             widgets.append(w)
         return widgets
@@ -820,7 +820,9 @@ class SettingsForm(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Enter:
-            self.desctext.setHtml(obj.tooltip)
+            self.desctext.setHtml(obj.toolTip())
+        if event.type() == QEvent.ToolTip:
+            return True  # tooltip is shown in self.desctext
         return False
 
     def addPage(self, name):
