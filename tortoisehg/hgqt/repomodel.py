@@ -332,7 +332,7 @@ class HgRepoListModel(QAbstractTableModel):
         fillcolor = gnode.rev is None and white or dotcolor
 
         pen = QPen(pencolor)
-        pen.setWidthF(1.5)                
+        pen.setWidthF(1.5)
         painter.setPen(pen)
 
         radius = self.dotradius
@@ -343,8 +343,8 @@ class HgRepoListModel(QAbstractTableModel):
             rect = QRectF(centre_x - r,
                           centre_y - r,
                           2 * r, 2 * r)
-            painter.drawEllipse(rect)                    
-            
+            painter.drawEllipse(rect)
+
         def diamond(r):
             poly = QPolygonF([QPointF(centre_x - r, centre_y),
                               QPointF(centre_x, centre_y - r),
@@ -450,7 +450,7 @@ class HgRepoListModel(QAbstractTableModel):
         tags = ctx.tags()
         tags = [t for t in tags if t not in mqtags]
         return hglib.tounicode(",".join(tags))
-    
+
     def getauthor(self, ctx, gnode):
         try:
             return hglib.username(ctx.user())
@@ -476,8 +476,12 @@ class HgRepoListModel(QAbstractTableModel):
             text = qtlib.applyeffects(' %s ' % ctx.branch(), effects)
             parts.append(hglib.tounicode(text))
 
+        bookmarks = hglib.get_repo_bookmarks(self.repo)
+        curbookmark = hglib.get_repo_bookmarkcurrent(self.repo)
         for tag in ctx.thgtags():
-            style = self.repo.thgmqtag(tag) and 'log.patch' or 'log.tag'
+            style = (self.repo.thgmqtag(tag) and 'log.patch'
+                        or (tag == curbookmark and 'log.curbookmark'
+                            or (tag in bookmarks and 'log.bookmark' or 'log.tag')))
             effects = qtlib.geteffect(style)
             text = qtlib.applyeffects(' %s ' % tag, effects)
             parts.append(hglib.tounicode(text))
