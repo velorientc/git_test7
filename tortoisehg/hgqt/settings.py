@@ -24,12 +24,6 @@ from PyQt4.QtGui import *
 _unspecstr = _('<unspecified>')
 ENTRY_WIDTH = 300
 
-try:
-    from iniparse.config import Undefined
-except ImportError:
-    class Undefined(object):
-        pass
-
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
         QComboBox.__init__(self, parent)
@@ -938,9 +932,7 @@ class SettingsForm(QWidget):
                 return None
             for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
                 try:
-                    v = self.ini[section][cand]
-                    if not isinstance(v, Undefined):
-                        return v
+                    return self.ini[section][cand]
                 except KeyError:
                     pass
 
