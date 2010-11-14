@@ -554,10 +554,12 @@ class SyncWidget(QWidget):
                     return
         self.finishfunc = finished
         cmdline = ['--repository', self.root, 'pull', '--verbose']
+        uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve') \
+            and 'ui.merge=internal:merge' or 'ui.merge=internal:fail'
         if self.cachedpp == 'rebase':
-            cmdline += ['--rebase', '--config', 'ui.merge=internal:fail']
+            cmdline += ['--rebase', '--config', uimerge]
         elif self.cachedpp == 'update':
-            cmdline += ['--update', '--config', 'ui.merge=internal:fail']
+            cmdline += ['--update', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
         self.run(cmdline, ('force', 'branch', 'rev'))
@@ -709,6 +711,12 @@ class PostPullDialog(QDialog):
         cfglabel.linkActivated.connect(self.linkactivated)
         layout.addWidget(cfglabel)
 
+        self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
+                                           'where possible'))
+        self.autoresolve_chk.setChecked(
+            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+        layout.addWidget(self.autoresolve_chk)
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -746,6 +754,8 @@ class PostPullDialog(QDialog):
         self.repo.incrementBusyCount()
         try:
             cfg.set('tortoisehg', 'postpull', self.getValue())
+            cfg.set('tortoisehg', 'autoresolve',
+                    self.autoresolve_chk.isChecked())
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
