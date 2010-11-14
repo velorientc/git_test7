@@ -71,6 +71,12 @@ class BackoutDialog(QDialog):
         self.msg_text.setEnabled(False)
         obox.addWidget(self.merge_chk)
 
+        self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
+                                           'where possible'))
+        self.autoresolve_chk.setChecked(
+            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+        obox.addWidget(self.autoresolve_chk)
+
         self.reslabel = QLabel()
         self.reslabel.linkActivated.connect(self.link_activated)
         box.addWidget(self.reslabel)
@@ -139,7 +145,8 @@ class BackoutDialog(QDialog):
         # prepare command line
         revhex = self.target_info.get_data('revid')
         cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
-        cmdline += ['--tool=internal:fail']
+        cmdline += ['--tool=internal:' +
+                    (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         if self.merge_chk.isChecked():
             cmdline += ['--merge']
             msg = self.msg_text.toPlainText()
