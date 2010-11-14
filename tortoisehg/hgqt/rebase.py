@@ -64,6 +64,12 @@ class RebaseDialog(QDialog):
         self.detachchk.setChecked(opts.get('detach', True))
         self.layout().addWidget(self.detachchk)
 
+        self.autoresolvechk = QCheckBox(_('Automatically resolve merge conflicts '
+                                           'where possible'))
+        self.autoresolvechk.setChecked(
+            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+        self.layout().addWidget(self.autoresolvechk)
+
         if 'hgsubversion' in repo.extensions():
             self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head'
                                       ' (override source, destination)'))
@@ -142,7 +148,8 @@ class RebaseDialog(QDialog):
         self.keepchk.setEnabled(False)
         self.detachchk.setEnabled(False)
         cmdline = ['rebase', '--repository', self.repo.root]
-        cmdline += ['--config', 'ui.merge=internal:fail']
+        cmdline += ['--config', 'ui.merge=internal:' +
+                    (self.autoresolvechk.isChecked() and 'merge' or 'fail')]
         if os.path.exists(self.repo.join('rebasestate')):
             cmdline += ['--continue']
         else:
