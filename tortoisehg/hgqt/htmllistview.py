@@ -108,6 +108,7 @@ class HTMLDelegate(QStyledItemDelegate):
             option.rect.left(),
             option.rect.top() + (option.rect.height() - doc.size().height()) / 2))
         ctx = QAbstractTextDocumentLayout.PaintContext()
+        ctx.palette = option.palette
         if option.state & QStyle.State_Selected:
             if option.state & QStyle.State_Active:
                 ctx.palette.setCurrentColorGroup(QPalette.Active)
