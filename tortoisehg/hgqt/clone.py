@@ -267,13 +267,13 @@ class CloneDialog(QDialog):
         if self.ui.config('http_proxy', 'host'):
             if not self.proxy_chk.isChecked():
                 cmdline += ['--config', 'http_proxy.host=']
-        if remotecmd:
+        if self.remote_chk.isChecked() and remotecmd:
             cmdline.append('--remotecmd')
             cmdline.append(remotecmd)
-        if rev:
+        if self.rev_chk.isChecked() and rev:
             cmdline.append('--rev')
             cmdline.append(rev)
-        if startrev:
+        if self.startrev_chk.isChecked() and startrev:
             cmdline.append('--startrev')
             cmdline.append(startrev)
 
