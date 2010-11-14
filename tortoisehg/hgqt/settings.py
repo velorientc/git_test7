@@ -813,6 +813,7 @@ class SettingsForm(QWidget):
                     'descwidget':self.desctext,
                     'valfunc':self.validateextensions}
             w = genCheckBox(opts)
+            w.installEventFilter(self)
             row, col = i / maxrows, i % maxrows
             grid.addWidget(w, col, row)
             widgets.append(w)
