@@ -86,16 +86,22 @@ class CloneDialog(QDialog):
         optbox.setSpacing(6)
         grid.addLayout(optbox, 2, 1, 1, 2)
 
-        hbox = QHBoxLayout()
-        hbox.setSpacing(0)
-        optbox.addLayout(hbox)
-        self.rev_chk = QCheckBox(_('Clone to revision:'))
-        self.rev_chk.toggled.connect(
-             lambda e: self.toggle_enabled(e, self.rev_text))
-        self.rev_text = QLineEdit()
-        hbox.addWidget(self.rev_chk)
-        hbox.addWidget(self.rev_text)
-        hbox.addStretch(40)
+        def chktext(chklabel, stretch=None):
+            hbox = QHBoxLayout()
+            hbox.setSpacing(0)
+            optbox.addLayout(hbox)
+            chk = QCheckBox(chklabel)
+            text = QLineEdit()
+            chk.toggled.connect(
+                 lambda e: self.toggle_enabled(e, text))
+            hbox.addWidget(chk)
+            hbox.addWidget(text)
+            if stretch is not None:
+                hbox.addStretch(stretch)
+            return chk, text
+
+        self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
+                                              stretch=40)
 
         self.noupdate_chk = QCheckBox(_('Do not update the new working directory'))
         self.pproto_chk = QCheckBox(_('Use pull protocol to copy metadata'))
@@ -110,20 +116,11 @@ class CloneDialog(QDialog):
         self.proxy_chk.setEnabled(useproxy)
         self.proxy_chk.setChecked(useproxy)
 
-        self.remote_chk = QCheckBox(_('Remote command:'))
-        self.remote_chk.toggled.connect(
-             lambda e: self.toggle_enabled(e, self.remote_text))
-        self.remote_text = QLineEdit()
-        optbox.addWidget(self.remote_chk)
-        optbox.addWidget(self.remote_text)
+        self.remote_chk, self.remote_text = chktext(_('Remote command:'))
 
         # allow to specify start revision for p4 & svn repos.
-        self.startrev_chk = QCheckBox(_('Start revision:'))
-        self.startrev_chk.toggled.connect(
-            lambda e: self.toggle_enabled(e, self.startrev_text))
-        self.startrev_text = QLineEdit()
-        optbox.addWidget(self.startrev_chk)
-        optbox.addWidget(self.startrev_text)
+        self.startrev_chk, self.startrev_text = chktext(_('Start revision:'),
+                                                        stretch=40)
 
         ## command widget
         self.cmd = cmdui.Widget()
