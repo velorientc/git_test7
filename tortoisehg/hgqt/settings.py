@@ -26,7 +26,7 @@ ENTRY_WIDTH = 300
 
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
-        QComboBox.__init__(self, parent)
+        QComboBox.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.setEditable(opts.get('canedit', False))
         self.setValidator(opts.get('validator', None))
@@ -82,10 +82,6 @@ class SettingsCombo(QComboBox):
             self.resetList()
         QComboBox.showPopup(self)
 
-    def focusInEvent(self, e):
-        self.opts['descwidget'].setHtml(self.opts['tooltip'])
-        QComboBox.focusInEvent(self, e)
-
     ## common APIs for all edit widgets
 
     def setValue(self, curvalue):
@@ -110,15 +106,11 @@ class SettingsCombo(QComboBox):
 
 class PasswordEntry(QLineEdit):
     def __init__(self, parent=None, **opts):
-        QLineEdit.__init__(self, parent)
+        QLineEdit.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
         self.setFixedWidth(ENTRY_WIDTH)
-
-    def focusInEvent(self, e):
-        self.opts['descwidget'].setHtml(self.opts['tooltip'])
-        QLineEdit.focusInEvent(self, e)
 
     ## common APIs for all edit widgets
 
@@ -138,7 +130,7 @@ class PasswordEntry(QLineEdit):
 
 class FontEntry(QPushButton):
     def __init__(self, parent=None, **opts):
-        QPushButton.__init__(self, parent)
+        QPushButton.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
         self.clicked.connect(self.on_clicked)
@@ -146,10 +138,6 @@ class FontEntry(QPushButton):
         assert cpath.startswith('tortoisehg.')
         self.fname = cpath[11:]
         self.setFixedWidth(ENTRY_WIDTH)
-
-    def focusInEvent(self, e):
-        self.opts['descwidget'].setHtml(self.opts['tooltip'])
-        QPushButton.focusInEvent(self, e)
 
     def on_clicked(self, checked):
         thgf = qtlib.getfont(self.fname)
@@ -189,16 +177,12 @@ class FontEntry(QPushButton):
 
 class SettingsCheckBox(QCheckBox):
     def __init__(self, parent=None, **opts):
-        QCheckBox.__init__(self, parent)
+        QCheckBox.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
         self.setText(opts['label'])
         self.valfunc = self.opts['valfunc']
         self.toggled.connect(lambda: self.valfunc(self, self.curvalue))
-
-    def focusInEvent(self, e):
-        self.opts['descwidget'].setHtml(self.opts['tooltip'])
-        QCheckBox.focusInEvent(self, e)
 
     def setFocus(self):
         pass
@@ -781,13 +765,14 @@ class SettingsForm(QWidget):
 
         for row, (label, cpath, values, tooltip) in enumerate(info):
             opts = {'label':label, 'cpath':cpath, 'tooltip':tooltip,
-                    'descwidget':self.desctext, 'settings':self.settings}
+                    'settings':self.settings}
             if isinstance(values, tuple):
                 func = values[0]
                 w = func(opts, values[1])
             else:
                 func = values
                 w = func(opts)
+            w.installEventFilter(self)
             lbl = QLabel(label)
             lbl.installEventFilter(self)
             lbl.setToolTip(tooltip)
@@ -810,7 +795,6 @@ class SettingsForm(QWidget):
         for i, name in enumerate(sorted(allexts)):
             tt = hglib.tounicode(allexts[name])
             opts = {'label':name, 'cpath':'extensions.' + name, 'tooltip':tt,
-                    'descwidget':self.desctext,
                     'valfunc':self.validateextensions}
             w = genCheckBox(opts)
             w.installEventFilter(self)
@@ -820,7 +804,7 @@ class SettingsForm(QWidget):
         return extsinfo, widgets
 
     def eventFilter(self, obj, event):
-        if event.type() == QEvent.Enter:
+        if event.type() in (QEvent.Enter, QEvent.FocusIn):
             self.desctext.setHtml(obj.toolTip())
         if event.type() == QEvent.ToolTip:
             return True  # tooltip is shown in self.desctext
