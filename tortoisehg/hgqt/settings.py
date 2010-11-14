@@ -220,7 +220,7 @@ class SettingsCheckBox(QCheckBox):
         return self.isChecked()
 
     def isDirty(self):
-        return self.isChecked() != self.curvalue
+        return self.value() != self.curvalue
 
 
 def genEditCombo(opts, defaults=[]):
@@ -571,9 +571,11 @@ class SettingsDialog(QDialog):
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
-        self.conftabs.addTab(SettingsForm(rcpath=util.user_rcpath(), focus=focus),
-                             qtlib.geticon('settings_user'),
+        utab = SettingsForm(rcpath=util.user_rcpath(), focus=focus)
+        self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
+        utab.extensionsChanged.connect(self.markExtensionsChanged)
+
         try:
             if root is None:
                 root = paths.find_root()
@@ -589,9 +591,10 @@ class SettingsDialog(QDialog):
 
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
-            self.conftabs.addTab(SettingsForm(rcpath=reporcpath, focus=focus),
-                                 qtlib.geticon('settings_repo'),
+            rtab = SettingsForm(rcpath=reporcpath, focus=focus)
+            self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
                                  _('%s repository settings') % repo.displayname)
+            rtab.extensionsChanged.connect(self.markExtensionsChanged)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -600,15 +603,24 @@ class SettingsDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
+        self.changesInExtensions = False
+
         self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
 
     def isDirty(self):
         return util.any(self.conftabs.widget(i).isDirty()
                         for i in xrange(self.conftabs.count()))
 
+    def markExtensionsChanged(self):
+        self.changesInExtensions = True
+
     def applyChanges(self):
         for i in xrange(self.conftabs.count()):
             self.conftabs.widget(i).applyChanges()
+        if self.changesInExtensions:
+            qtlib.InfoMsgBox(_('Settings - Extensions'),
+                _('Restart all TortoiseHg applications'
+                  ' for changes to extensions to take effect.'))
 
     def canExit(self):
         if self.isDirty():
@@ -640,6 +652,8 @@ class SettingsDialog(QDialog):
 
 class SettingsForm(QWidget):
     """Widget for each settings file"""
+
+    extensionsChanged = pyqtSignal()
 
     def __init__(self, rcpath, focus=None, parent=None):
         super(SettingsForm, self).__init__(parent)
@@ -683,7 +697,7 @@ class SettingsForm(QWidget):
         self.pages = {}
         self.stack = stack
         self.pageList = pageList
-        self.extspagewidgets = ()
+        self.extspagewidgets = []
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
@@ -826,7 +840,7 @@ class SettingsForm(QWidget):
         if name == 'extensions':
             extsinfo, widgets = self.fillExtensionsFrame()
             self.pages[name] = name, extsinfo, widgets
-            self.extspagewidgets = self.pages[name]
+            self.extspagewidgets = self.pages[name][2]
         else:
             widgets = self.fillFrame(info)
             self.pages[name] = name, info, widgets
@@ -893,9 +907,13 @@ class SettingsForm(QWidget):
                                 str(e), parent=self)
 
     def applyChangesForExtensions(self):
+        emitChanged = False
         section = 'extensions'
         enabledexts = hglib.enabledextensions()
-        for chk in self.extspagewidgets[2]:
+        for chk in self.extspagewidgets:
+            if (not emitChanged) and chk.isDirty():
+                self.extensionsChanged.emit()
+                emitChanged = True
             key = chk.opts['label']
             newvalue = chk.value()
             if newvalue and (key in enabledexts):
@@ -913,7 +931,7 @@ class SettingsForm(QWidget):
         section = 'extensions'
         enabledexts = hglib.enabledextensions()
         selectedexts = ()
-        for chk in self.extspagewidgets[2]:
+        for chk in self.extspagewidgets:
             if chk.isChecked():
                 selectedexts += (chk.opts['label'],)
         invalidexts = hglib.validateextensions(selectedexts)
@@ -944,7 +962,7 @@ class SettingsForm(QWidget):
                 return True
 
         allexts = hglib.allextensions()
-        for chk in self.extspagewidgets[2]:
+        for chk in self.extspagewidgets:
             name = chk.opts['label']
             chk.setEnabled(changable(name))
             chk.setToolTip(invalidexts.get(name) or hglib.toutf(allexts[name]))
