@@ -808,7 +808,7 @@ class SettingsForm(QWidget):
         i = 0
         extsinfo = ()
         for i, name in enumerate(sorted(allexts)):
-            tt = allexts[name]
+            tt = hglib.tounicode(allexts[name])
             opts = {'label':name, 'cpath':'extensions.' + name, 'tooltip':tt,
                     'descwidget':self.desctext,
                     'valfunc':self.validateextensions}
@@ -954,7 +954,10 @@ class SettingsForm(QWidget):
         for chk in self.extspagewidgets:
             name = chk.opts['label']
             chk.setEnabled(changable(name))
-            chk.setToolTip(invalidexts.get(name) or hglib.toutf(allexts[name]))
+            invalmsg = invalidexts.get(name)
+            if invalmsg:
+                invalmsg = invalmsg.decode('utf-8')
+            chk.setToolTip(invalmsg or hglib.tounicode(allexts[name]))
 
 
 def run(ui, *pats, **opts):
