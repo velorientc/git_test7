@@ -91,7 +91,7 @@ class CloneDialog(QDialog):
             hbox.setSpacing(0)
             optbox.addLayout(hbox)
             chk = QCheckBox(chklabel)
-            text = QLineEdit()
+            text = QLineEdit(enabled=False)
             chk.toggled.connect(
                  lambda e: self.toggle_enabled(e, text))
             hbox.addWidget(chk)
@@ -158,9 +158,6 @@ class CloneDialog(QDialog):
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
         self.show_options(False)
-        self.rev_text.setDisabled(True)
-        self.remote_text.setDisabled(True)
-        self.startrev_text.setDisabled(True)
 
         rev = opts.get('rev')
         if rev:
