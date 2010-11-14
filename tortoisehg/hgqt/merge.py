@@ -235,6 +235,14 @@ class MergePage(BasePage):
         self.registerField('discard', discard_chk)
         box.addWidget(discard_chk)
 
+        ## auto-resolve
+        autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
+                                      'where possible'))
+        autoresolve_chk.setChecked(
+            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+        self.registerField('autoresolve', autoresolve_chk)
+        box.addWidget(autoresolve_chk)
+
         ## current revision
         box.addSpacing(6)
         local_sep = qtlib.LabeledSeparator(_('Merge to (working directory)'))
@@ -334,8 +342,9 @@ class MergePage(BasePage):
             # pulled a fast one on us and updated from the CLI
             cmdline = ['debugsetparents', '.', self.wizard().other]
         else:
+            tool = self.field('autoresolve') and 'merge' or 'fail'
             cmdline = ['--repository', self.wizard().repo.root, 'merge',
-                       '--tool=internal:fail', 
+                       '--tool=internal:' + tool, 
                        self.wizard().other]
         self.cmd.run(cmdline)
 

@@ -296,6 +296,14 @@ INFO = (
     (_('Full Path Title'), 'tortoisehg.fullpath', genBoolCombo,
         _('Show a full directory path of the repository in the dialog title'
         ' instead of just the root directory name.  Default: False')),
+    (_('Auto-resolve merges'), 'tortoisehg.autoresolve', genBoolCombo,
+        _('Indicates whether TortoiseHg should attempt to automatically resolve'
+          ' changes from both sides to the same file, and only report merge'
+          ' conflicts when this is not possible. When False, all files with'
+          ' changes on both sides of the merge will report as conflicting, even'
+          ' if the edits are to different parts of the file. In either case,'
+          ' when conflicts occur, the user will be invited to review and'
+          ' resolve changes manually. Default: False.')),
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
