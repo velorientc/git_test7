@@ -94,12 +94,17 @@ class UpdateDialog(QDialog):
         self.discard_chk = QCheckBox(_('Discard local changes, no backup'
                                        ' (-C/--clean)'))
         self.merge_chk = QCheckBox(_('Always merge (when possible)'))
+        self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
+                                           'where possible'))
         self.showlog_chk = QCheckBox(_('Always show command log'))
         optbox.addWidget(self.discard_chk)
         optbox.addWidget(self.merge_chk)
+        optbox.addWidget(self.autoresolve_chk)
         optbox.addWidget(self.showlog_chk)
 
         self.discard_chk.setChecked(bool(opts.get('clean')))
+        self.autoresolve_chk.setChecked(
+            repo.ui.configbool('tortoisehg', 'autoresolve', False))
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -144,6 +149,7 @@ class UpdateDialog(QDialog):
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
         self.merge_chk.setHidden(True)
+        self.autoresolve_chk.setHidden(True)
         self.showlog_chk.setHidden(True)
         self.update_info()
 
@@ -170,7 +176,8 @@ class UpdateDialog(QDialog):
 
     def update(self):
         cmdline = ['update', '--repository', self.repo.root, '--verbose']
-        cmdline += ['--config', 'ui.merge=internal:fail']
+        cmdline += ['--config', 'ui.merge=internal:' +
+                    (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         rev = hglib.fromunicode(self.rev_combo.currentText())
         cmdline.append('--rev')
         cmdline.append(rev)
@@ -261,6 +268,7 @@ class UpdateDialog(QDialog):
 
     def show_options(self, visible):
         self.merge_chk.setShown(visible)
+        self.autoresolve_chk.setShown(visible)
         self.showlog_chk.setShown(visible)
 
     def command_started(self):
