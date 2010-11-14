@@ -102,7 +102,7 @@ class PatchBranchWidget(QWidget):
     
     def commandFinished(self, wrapper):
         pass
-    def configChanged(self, wrapper):
+    def configChanged(self):
         pass
     def repositoryChanged(self):
         pass
