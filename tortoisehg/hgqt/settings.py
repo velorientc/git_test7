@@ -6,11 +6,8 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import sys
-import re
-import urlparse
 
-from mercurial import hg, ui, util, url, filemerge, error, extensions
+from mercurial import ui, util, error
 
 from tortoisehg.util import hglib, settings, paths, wconfig
 from tortoisehg.hgqt.i18n import _
