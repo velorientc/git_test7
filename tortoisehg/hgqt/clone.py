@@ -12,7 +12,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import ui
+from mercurial import ui, extensions
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -117,8 +117,8 @@ class CloneDialog(QDialog):
         optbox.addWidget(self.remote_chk)
         optbox.addWidget(self.remote_text)
         
-        if ('perfarce' in repo.extensions()) or \
-           ('hgsubversion' in repo.extensions()):
+        exs = [name for name, module in extensions.extensions()]
+        if 'perfarce' in exs or 'hgsubversion' in exs:
             # allow to specify start revision for p4 & svn repos.
             self.startrev_chk = QCheckBox(_('Start revision:'))
             self.startrev_chk.toggled.connect(
