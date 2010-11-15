@@ -22,7 +22,7 @@ keep = i18n.keepgettext()
 class BookmarkDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, bookmark='', rev=None, parent=None, opts={}):
+    def __init__(self, repo, rev, parent):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
@@ -47,7 +47,7 @@ class BookmarkDialog(QDialog):
         self.bookmark_combo = QComboBox()
         self.bookmark_combo.setEditable(True)
         self.bookmark_combo.setMinimumWidth(180)
-        self.bookmark_combo.setEditText(bookmark)
+        self.bookmark_combo.setEditText('')
         grid.addWidget(QLabel(_('Bookmark:')), 0, 0)
         grid.addWidget(self.bookmark_combo, 0, 1)
 
@@ -61,13 +61,10 @@ class BookmarkDialog(QDialog):
         self.enable_new_name(False)
 
         ### revision input
-        if rev is None:
-            self.initial_rev = repo['.'].rev()
-        else:
-            self.initial_rev = rev
+        self.initial_rev = str(rev)
         self.rev_text = QLineEdit()
         self.rev_text.setMaximumWidth(100)
-        self.rev_text.setText(str(rev))
+        self.rev_text.setText(rev)
         self.rev_text.setReadOnly(True)
         #self.rev_text.textEdited.connect(self.update_sensitives)
         grid.addWidget(QLabel(_('Revision:')), 2, 0)
@@ -239,16 +236,3 @@ class BookmarkDialog(QDialog):
     @pyqtSlot(QString)
     def new_bookmark_changed(self, value):
         self.rename_btn.setDisabled(not value)
-
-def run(ui, *pats, **opts):
-    kargs = {}
-    bookmark = len(pats) > 0 and pats[0] or None
-    if bookmark:
-        kargs['bookmark'] = bookmark
-    rev = opts.get('rev')
-    if rev:
-        kargs['rev'] = rev
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return BookmarkDialog(repo, opts=opts, **kargs)
