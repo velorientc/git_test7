@@ -458,7 +458,6 @@ class HgRepoListModel(QAbstractTableModel):
             return _('Mercurial User')
 
     def getlog(self, ctx, gnode):
-        # TODO: add bookmark
         if ctx.rev() is None:
             # The Unicode symbol is a black star:
             return u'\u2605 ' + _('Working copy changes') + u' \u2605'
@@ -477,8 +476,8 @@ class HgRepoListModel(QAbstractTableModel):
             text = qtlib.applyeffects(' %s ' % ctx.branch(), effects)
             parts.append(hglib.tounicode(text))
 
-        bookmarks = hglib.get_repo_bookmarks(self.repo)
-        curbookmark = hglib.get_repo_bookmarkcurrent(self.repo)
+        bookmarks = self.repo.bookmarks.keys()
+        curbookmark = self.repo.bookmarkcurrent
         for tag in ctx.thgtags():
             style = (self.repo.thgmqtag(tag) and 'log.patch'
                         or (tag == curbookmark and 'log.curbookmark'
