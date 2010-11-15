@@ -12,7 +12,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import ui, extensions
+from mercurial import ui, cmdutil, commands
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -86,16 +86,22 @@ class CloneDialog(QDialog):
         optbox.setSpacing(6)
         grid.addLayout(optbox, 2, 1, 1, 2)
 
-        hbox = QHBoxLayout()
-        hbox.setSpacing(0)
-        optbox.addLayout(hbox)
-        self.rev_chk = QCheckBox(_('Clone to revision:'))
-        self.rev_chk.toggled.connect(
-             lambda e: self.toggle_enabled(e, self.rev_text))
-        self.rev_text = QLineEdit()
-        hbox.addWidget(self.rev_chk)
-        hbox.addWidget(self.rev_text)
-        hbox.addStretch(40)
+        def chktext(chklabel, stretch=None):
+            hbox = QHBoxLayout()
+            hbox.setSpacing(0)
+            optbox.addLayout(hbox)
+            chk = QCheckBox(chklabel)
+            text = QLineEdit(enabled=False)
+            chk.toggled.connect(
+                 lambda e: self.toggle_enabled(e, text))
+            hbox.addWidget(chk)
+            hbox.addWidget(text)
+            if stretch is not None:
+                hbox.addStretch(stretch)
+            return chk, text
+
+        self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
+                                              stretch=40)
 
         self.noupdate_chk = QCheckBox(_('Do not update the new working directory'))
         self.pproto_chk = QCheckBox(_('Use pull protocol to copy metadata'))
@@ -110,22 +116,11 @@ class CloneDialog(QDialog):
         self.proxy_chk.setEnabled(useproxy)
         self.proxy_chk.setChecked(useproxy)
 
-        self.remote_chk = QCheckBox(_('Remote command:'))
-        self.remote_chk.toggled.connect(
-             lambda e: self.toggle_enabled(e, self.remote_text))
-        self.remote_text = QLineEdit()
-        optbox.addWidget(self.remote_chk)
-        optbox.addWidget(self.remote_text)
-        
-        exs = [name for name, module in extensions.extensions()]
-        if 'perfarce' in exs or 'hgsubversion' in exs:
-            # allow to specify start revision for p4 & svn repos.
-            self.startrev_chk = QCheckBox(_('Start revision:'))
-            self.startrev_chk.toggled.connect(
-                lambda e: self.toggle_enabled(e, self.startrev_text))
-            self.startrev_text = QLineEdit()
-            optbox.addWidget(self.startrev_chk)
-            optbox.addWidget(self.startrev_text)
+        self.remote_chk, self.remote_text = chktext(_('Remote command:'))
+
+        # allow to specify start revision for p4 & svn repos.
+        self.startrev_chk, self.startrev_text = chktext(_('Start revision:'),
+                                                        stretch=40)
 
         ## command widget
         self.cmd = cmdui.Widget()
@@ -163,13 +158,7 @@ class CloneDialog(QDialog):
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
         self.show_options(False)
-        self.rev_text.setDisabled(True)
-        self.remote_text.setDisabled(True)
-        if hasattr(self, 'startrev_chk'):
-            self.startrev_chk.setDisabled(True)
-        if hasattr(self, 'startrev_text'):
-            self.startrev_text.setDisabled(True)
-        
+
         rev = opts.get('rev')
         if rev:
             self.rev_chk.setChecked(True)
@@ -195,10 +184,13 @@ class CloneDialog(QDialog):
         self.proxy_chk.setVisible(visible)
         self.remote_chk.setVisible(visible)
         self.remote_text.setVisible(visible)
-        if hasattr(self, 'startrev_chk'):
-            self.startrev_chk.setVisible(visible)
-        if hasattr(self, 'startrev_text'):
-            self.startrev_text.setVisible(visible)
+        self.startrev_chk.setVisible(visible and self.startrev_available())
+        self.startrev_text.setVisible(visible and self.startrev_available())
+
+    def startrev_available(self):
+        entry = cmdutil.findcmd('clone', commands.table)[1]
+        longopts = set(e[1] for e in entry[1])
+        return 'startrev' in longopts
 
     def clone(self):
         # prepare user input
@@ -229,9 +221,7 @@ class CloneDialog(QDialog):
         dest = hglib.fromunicode(dest)
         remotecmd = hglib.fromunicode(self.remote_text.text()).strip()
         rev = hglib.fromunicode(self.rev_text.text()).strip() or None
-        startrev = None
-        if hasattr(self, 'startrev_text'):
-            startrev = hglib.fromunicode(self.startrev_text.text()).strip()
+        startrev = hglib.fromunicode(self.startrev_text.text()).strip()
 
         # verify input
         if src == '':
@@ -271,15 +261,15 @@ class CloneDialog(QDialog):
         if self.ui.config('http_proxy', 'host'):
             if not self.proxy_chk.isChecked():
                 cmdline += ['--config', 'http_proxy.host=']
-        if remotecmd:
+        if self.remote_chk.isChecked() and remotecmd:
             cmdline.append('--remotecmd')
             cmdline.append(remotecmd)
-        if rev:
+        if self.rev_chk.isChecked() and rev:
             cmdline.append('--rev')
             cmdline.append(rev)
-        if self.startrev:
+        if self.startrev_chk.isChecked() and startrev:
             cmdline.append('--startrev')
-            cmdline.append(self.startrev)
+            cmdline.append(startrev)
 
         cmdline.append('--verbose')
         cmdline.append(src)
