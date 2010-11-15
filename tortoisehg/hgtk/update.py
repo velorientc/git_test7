@@ -290,5 +290,5 @@ class UpdateDialog(gdialog.GDialog):
 def run(ui, *pats, **opts):
     rev = None
     if opts.get('rev'):
-        rev = opts.get('rev')
+        rev = opts.get('rev')[0]
     return UpdateDialog(rev)
