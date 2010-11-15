@@ -801,7 +801,7 @@ table = {
          ('',  'all', None, _('udpate all repos in current dir')) ],
         _('hgtk thgstatus [OPTION]')),
     "^update|checkout|co": (update,
-        [('r', 'rev', None, _('revision to update'))],
+        [('r', 'rev', [], _('revision to update'))],
         ('hgtk update')),
     "^vdiff": (vdiff,
         [('c', 'change', '', _('changeset to view in diff tool')),

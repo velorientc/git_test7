@@ -288,4 +288,7 @@ class UpdateDialog(gdialog.GDialog):
         self.execute_command(cmdline)
 
 def run(ui, *pats, **opts):
-    return UpdateDialog(opts.get('rev'))
+    rev = None
+    if opts.get('rev'):
+        rev = opts.get('rev')
+    return UpdateDialog(rev)
