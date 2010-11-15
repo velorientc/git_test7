@@ -916,11 +916,13 @@ class RepoWidget(QWidget):
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
         dlg.localTagChanged.connect(self.refresh)
         dlg.showMessage.connect(self.showMessage)
+        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def bookmarkRevision(self):
         dlg = bookmark.BookmarkDialog(self.repo, str(self.rev), self)
         dlg.showMessage.connect(self.showMessage)
+        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def pushToRevision(self):
@@ -929,6 +931,7 @@ class RepoWidget(QWidget):
 
     def backoutToRevision(self):
         dlg = backout.BackoutDialog(self.repo, str(self.rev), self)
+        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def stripRevision(self):
