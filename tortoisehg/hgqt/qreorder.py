@@ -127,9 +127,8 @@ class QReorderDialog(QDialog):
 
     def showSummary(self, item):
         patchname = hglib.fromunicode(item.text())
-        q = self.repo.mq
-        txt = hglib.toutf('\n'.join(mq.patchheader(q.join(patchname)).message))
-        self.summ.setText(txt)
+        txt = '\n'.join(mq.patchheader(self.repo.mq.join(patchname)).message)
+        self.summ.setText(hglib.tounicode(txt))
 
     def accept(self):
         lines = []
