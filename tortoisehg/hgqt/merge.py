@@ -404,7 +404,8 @@ class MergePage(BasePage):
             self.runner = cmdui.Runner(_('MQ - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
-            self.runner.run(['qnew', patch], ['qpop', '--all'])
+            self.runner.run(['qnew', '--repository', repo.root, patch],
+                            ['qpop', '--repository', repo.root, '--all'])
         elif cmd.startswith('discard'):
             if cmd != 'discard:noconfirm':
                 labels = [(QMessageBox.Yes, _('&Discard')),
@@ -441,7 +442,8 @@ class MergePage(BasePage):
             self.runner = cmdui.Runner(_('Rename - TortoiseHg'), True, self)
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
-            self.runner.run(['qrename', oldpatch, newpatch])
+            self.runner.run(['qrename', '--repository', repo.root,
+                              oldpatch, newpatch])
         elif cmd == 'view':
             dlg = status.StatusDialog([], {}, repo.root, self)
             dlg.exec_()
