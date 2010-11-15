@@ -22,7 +22,7 @@ keep = i18n.keepgettext()
 class BookmarkDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, bookmark='', rev='tip', parent=None, opts={}):
+    def __init__(self, repo, bookmark='', rev=None, parent=None, opts={}):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
@@ -61,11 +61,15 @@ class BookmarkDialog(QDialog):
         self.enable_new_name(False)
 
         ### revision input
-        self.initial_rev = rev
+        if rev is None:
+            self.initial_rev = repo['.'].rev()
+        else:
+            self.initial_rev = rev
         self.rev_text = QLineEdit()
         self.rev_text.setMaximumWidth(100)
-        self.rev_text.setText(rev)
-        self.rev_text.textEdited.connect(self.update_sensitives)
+        self.rev_text.setText(str(rev))
+        self.rev_text.setReadOnly(True)
+        #self.rev_text.textEdited.connect(self.update_sensitives)
         grid.addWidget(QLabel(_('Revision:')), 2, 0)
         grid.addWidget(self.rev_text, 2, 1)
 
