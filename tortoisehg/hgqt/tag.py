@@ -71,7 +71,7 @@ class TagDialog(QDialog):
         self.rev_text = QLineEdit()
         self.rev_text.setMaximumWidth(100)
         self.rev_text.setText(rev)
-        self.rev_text.textEdited.connect(lambda s: self.update_sensitives())
+        self.rev_text.textEdited.connect(self.update_sensitives)
         grid.addWidget(QLabel(_('Revision:')), 1, 0)
         grid.addWidget(self.rev_text, 1, 1)
 
@@ -91,7 +91,7 @@ class TagDialog(QDialog):
         self.local_chk = QCheckBox(_('Local tag'))
         self.local_chk.toggled.connect(self.local_toggled)
         self.replace_chk = QCheckBox(_('Replace existing tag (-f/--force)'))
-        self.replace_chk.toggled.connect(lambda b: self.update_sensitives())
+        self.replace_chk.toggled.connect(self.update_sensitives)
         optbox.addWidget(self.local_chk)
         optbox.addWidget(self.replace_chk)
 
@@ -171,6 +171,7 @@ class TagDialog(QDialog):
         if not clear and tag_name:
             self.tag_combo.setEditText(tag_name)
 
+    @pyqtSlot()
     def update_sensitives(self, affectlocal=False):
         """ update bottom button sensitives based on rev and tag """
         tag = self.tag_combo.currentText()
