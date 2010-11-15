@@ -920,7 +920,6 @@ class RepoWidget(QWidget):
 
     def bookmarkRevision(self):
         dlg = bookmark.BookmarkDialog(self.repo, rev=str(self.rev), parent=self)
-        dlg.localBookmarkChanged.connect(self.refresh)
         dlg.showMessage.connect(self.showMessage)
         dlg.exec_()
 
