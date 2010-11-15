@@ -32,7 +32,7 @@ class TagDialog(QDialog):
         self.repo = repo
 
         if not tag and rev and rev != 'tip':
-            bmarks = hglib.get_repo_bookmarks(repo)
+            bmarks = repo.bookmarks.keys()
             for t in repo.nodetags(repo[rev].node()):
                 if t != 'tip' \
                         and ((not bmarks) or (bmarks and t not in bmarks)):
