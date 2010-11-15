@@ -6,39 +6,26 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import traceback
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, error
+from mercurial import error
 
-from tortoisehg.util import hglib, paths, i18n
+from tortoisehg.util import hglib, i18n
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.hgqt import qtlib
 from hgext import bookmarks
 
 keep = i18n.keepgettext()
 
 class BookmarkDialog(QDialog):
+    showMessage = pyqtSignal(QString)
 
-    bookmarkChanged = pyqtSignal()
-    localBookmarkChanged = pyqtSignal()
-    showMessage = pyqtSignal(unicode)
-
-    def __init__(self, repo=None, bookmark='', rev='tip', parent=None, opts={}):
+    def __init__(self, repo, bookmark='', rev='tip', parent=None, opts={}):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
-        self.ui = ui.ui()
-        if repo:
-            self.repo = repo
-        else:
-            root = paths.find_root()
-            if root:
-                self.repo = thgrepo.repository(self.ui, path=root)
-            else:
-                raise 'no repository found'
+        self.repo = repo
 
         # base layout box
         base = QVBoxLayout()
@@ -67,7 +54,7 @@ class BookmarkDialog(QDialog):
         ### Rename input
         self.new_name_text = QLineEdit()
         self.new_name_text.setMaximumWidth(100)
-        self.new_name_text.textEdited.connect(lambda s: self.new_bookmark_changed())
+        self.new_name_text.textEdited.connect(self.new_bookmark_changed)
         self.new_name_label = QLabel(_('New name:'))
         grid.addWidget(self.new_name_label, 1, 0)
         grid.addWidget(self.new_name_text, 1, 1)
@@ -78,7 +65,7 @@ class BookmarkDialog(QDialog):
         self.rev_text = QLineEdit()
         self.rev_text.setMaximumWidth(100)
         self.rev_text.setText(rev)
-        self.rev_text.textEdited.connect(lambda s: self.update_sensitives())
+        self.rev_text.textEdited.connect(self.update_sensitives)
         grid.addWidget(QLabel(_('Revision:')), 2, 0)
         grid.addWidget(self.rev_text, 2, 1)
 
@@ -138,7 +125,7 @@ class BookmarkDialog(QDialog):
         self.bookmark_combo.clear()
 
         # add bookmarks to drop-down list
-        bookmarks = list(hglib.get_repo_bookmarks(self.repo))
+        bookmarks = self.repo.bookmarks.keys()[:]
         bookmarks.sort()
         bookmarks.reverse()
         for bookmark in bookmarks:
@@ -152,19 +139,20 @@ class BookmarkDialog(QDialog):
             self.bookmark_combo.setEditText(bookmark_name)
 
     def toggle_new_bookmark(self):
-        bookmark = self.bookmark_combo.currentText()
-        is_new = bookmark not in hglib.get_repo_bookmarks(self.repo)
+        bookmark = hglib.fromunicode(self.bookmark_combo.currentText())
+        is_new = bookmark not in self.repo.bookmarks
         self.add_btn.setVisible(is_new)
         self.add_btn.setDisabled(not is_new)
         self.remove_btn.setVisible(not is_new)
         self.rename_btn.setVisible(not is_new)
         self.enable_new_name(not is_new)
 
+    @pyqtSlot()
     def update_sensitives(self):
         """ update bottom button sensitives based on rev and bookmark """
         self.toggle_new_bookmark()
 
-        bookmark = self.bookmark_combo.currentText()
+        bookmark = hglib.fromunicode(self.bookmark_combo.currentText())
         rev = self.rev_text.text()
         if not rev or not bookmark:
             self.add_btn.setDisabled(True)
@@ -177,7 +165,6 @@ class BookmarkDialog(QDialog):
             self.add_btn.setDisabled(True)
             self.remove_btn.setDisabled(True)
             self.rename_btn.setDisabled(True)
-            return
 
     def set_status(self, text, icon=None):
         self.status.setShown(True)
@@ -190,13 +177,13 @@ class BookmarkDialog(QDialog):
         self.sep.setHidden(True)
 
     def add_bookmark(self):
-        name = str(self.bookmark_combo.currentText())
-        if name in hglib.get_repo_bookmarks(self.repo):
+        name = hglib.fromunicode(self.bookmark_combo.currentText())
+        if name in self.repo.bookmarks:
             self.set_status(_('A bookmark named "%s" already exists') % name,
                             False)
             return
 
-        bookmarks.bookmark(ui=self.ui,
+        bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
                            rev=self.initial_rev,
                            mark=name)
@@ -207,12 +194,12 @@ class BookmarkDialog(QDialog):
         self.bookmark_combo.clearEditText()
 
     def remove_bookmark(self):
-        name = str(self.bookmark_combo.currentText())
-        if not name in hglib.get_repo_bookmarks(self.repo):
+        name = hglib.fromunicode(self.bookmark_combo.currentText())
+        if not name in self.repo.bookmarks:
             self.set_status(_("Bookmark '%s' does not exist") % name, False)
             return
 
-        bookmarks.bookmark(ui=self.ui,
+        bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
                            mark=name,
                            delete=True)
@@ -223,18 +210,18 @@ class BookmarkDialog(QDialog):
         self.update_sensitives()
 
     def rename_bookmark(self):
-        name = str(self.bookmark_combo.currentText())
-        new_name = str(self.new_name_text.text())
-        if not name in hglib.get_repo_bookmarks(self.repo):
+        name = hglib.fromunicode(self.bookmark_combo.currentText())
+        new_name = hglib.fromunicode(self.new_name_text.text())
+        if not name in self.repo.bookmarks:
             self.set_status(_("Bookmark '%s' does not exist") % name, False)
             return
 
-        if new_name in hglib.get_repo_bookmarks(self.repo):
+        if new_name in self.repo.bookmarks:
             self.set_status(_('A bookmark named "%s" already exists') % new_name,
                             False)
             return
 
-        bookmarks.bookmark(ui=self.ui,
+        bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
                            mark=new_name,
                            rename=name)
@@ -245,8 +232,9 @@ class BookmarkDialog(QDialog):
         self.set_status(_("Bookmark '%s' has been renamed to '%s'") %
                         (name, new_name), True)
 
-    def new_bookmark_changed(self):
-        self.rename_btn.setDisabled(not self.new_name_text.text())
+    @pyqtSlot(QString)
+    def new_bookmark_changed(self, value):
+        self.rename_btn.setDisabled(not value)
 
 def run(ui, *pats, **opts):
     kargs = {}
@@ -256,4 +244,7 @@ def run(ui, *pats, **opts):
     rev = opts.get('rev')
     if rev:
         kargs['rev'] = rev
-    return BookmarkDialog(opts=opts, **kargs)
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(ui, path=paths.find_root())
+    return BookmarkDialog(repo, opts=opts, **kargs)
