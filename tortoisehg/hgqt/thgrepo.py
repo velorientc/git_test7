@@ -182,7 +182,7 @@ class ThgRepoWrapper(QObject):
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
-              shortname mergetools'''.split()
+              shortname mergetools bookmarks bookmarkcurrent'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
@@ -359,6 +359,20 @@ def _extendrepo(repo):
                     if filemerge._findtool(self.ui, t):
                         installed.append(t)
             return installed
+
+        @propertycache
+        def bookmarks(self):
+            if 'bookmarks' in self._exts:
+                return self._bookmarks
+            else:
+                return {}
+
+        @propertycache
+        def bookmarkcurrent(self):
+            if 'bookmarks' in self._exts:
+                return self._bookmarkcurrent
+            else:
+                return None
 
         def shell(self):
             'Returns terminal shell configured for this repo'
