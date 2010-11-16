@@ -49,14 +49,8 @@ class AnnotateView(qscilib.Scintilla):
         self.customContextMenuRequested.connect(self.menuRequest)
 
         self.repo = repo
-        self.setIndentationWidth(repo.tabwidth)
-        self.setTabWidth(repo.tabwidth)
-        if repo.wsvisible == 'Visible':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
-        elif repo.wsvisible == 'VisibleAfterIndent':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
-        else:
-            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
+        self.repo.configChanged.connect(self.configChanged)
+        self.configChanged()
         self._rev = None
         self.annfile = None
         self._annotation_enabled = bool(opts.get('annotationEnabled', False))
@@ -69,6 +63,16 @@ class AnnotateView(qscilib.Scintilla):
 
         self._thread = _AnnotateThread(self)
         self._thread.done.connect(self.fillModel)
+
+    def configChanged(self):
+        self.setIndentationWidth(self.repo.tabwidth)
+        self.setTabWidth(self.repo.tabwidth)
+        if self.repo.wsvisible == 'Visible':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
+        elif self.repo.wsvisible == 'VisibleAfterIndent':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
+        else:
+            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
