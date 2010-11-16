@@ -358,11 +358,16 @@ class ChangeSet(gdialog.GWindow):
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
             lines = []
-            m = cmdutil.matchfiles(self.repo, [wfile])
+            M, A, R = self.changes
+            if wfile in M:
+                changes = [wfile], [], []
+            elif wfile in A:
+                changes = [], [wfile], []
+            else:
+                changes = [], [], [wfile]
             opts = mdiff.diffopts(git=True, nodates=True)
             try:
-                for s in patch.diff(self.repo, n1, n2, changes=self.changes,
-                                    match=m, opts=opts):
+                for s in patch.diff(self.repo, n1, n2, changes=changes, opts=opts):
                     lines.extend(s.splitlines())
             except (error.RepoError, error.LookupError), e:
                 err = _('Repository Error:  %s, refresh suggested') % str(e)
