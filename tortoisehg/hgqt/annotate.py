@@ -49,6 +49,14 @@ class AnnotateView(qscilib.Scintilla):
         self.customContextMenuRequested.connect(self.menuRequest)
 
         self.repo = repo
+        self.setIndentationWidth(repo.tabwidth)
+        self.setTabWidth(repo.tabwidth)
+        if repo.wsvisible == 'Visible':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
+        elif repo.wsvisible == 'VisibleAfterIndent':
+            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
+        else:
+            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
         self._rev = None
         self.annfile = None
         self._annotation_enabled = bool(opts.get('annotationEnabled', False))
