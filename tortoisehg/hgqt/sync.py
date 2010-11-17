@@ -707,15 +707,15 @@ class PostPullDialog(QDialog):
         elif repo.postpull == 'rebase':
             self.rebase.setChecked(True)
 
-        cfglabel = QLabel(_('<a href="config">Launch settings tool...</a>'))
-        cfglabel.linkActivated.connect(self.linkactivated)
-        layout.addWidget(cfglabel)
-
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
         self.autoresolve_chk.setChecked(
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
         layout.addWidget(self.autoresolve_chk)
+
+        cfglabel = QLabel(_('<a href="config">Launch settings tool...</a>'))
+        cfglabel.linkActivated.connect(self.linkactivated)
+        layout.addWidget(cfglabel)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
