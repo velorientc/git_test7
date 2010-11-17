@@ -212,13 +212,15 @@ class StatusWidget(QWidget):
         self.refreshing.showMessage.connect(self.showMessage)
         self.refreshing.start()
 
-    def reloadComplete(self, wctx, patchecked):
+    def reloadComplete(self):
+        self.refreshing.wait()
+        if self.refreshing.wctx is None:
+            return
         self.ms = merge.mergestate(self.repo)
-        self.wctx = wctx
-        self.patchecked = patchecked.copy()
+        self.wctx = self.refreshing.wctx
+        self.patchecked = self.refreshing.patchecked
         self.updateModel()
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
-        self.refreshing.wait()
         self.refreshing = None
 
     def updateModel(self):
@@ -302,14 +304,15 @@ class StatusWidget(QWidget):
 class StatusThread(QThread):
     '''Background thread for generating a workingctx'''
 
-    finished = pyqtSignal(object, object)
-    showMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(QString)
 
     def __init__(self, repo, pats, opts, parent=None):
         super(StatusThread, self).__init__()
         self.repo = repo
         self.pats = pats
         self.opts = opts
+        self.wctx = None
+        self.patchecked = None
 
     def run(self):
         self.repo.dirstate.invalidate()
@@ -342,7 +345,8 @@ class StatusThread(QThread):
         except (OSError, IOError, util.Abort,
                 error.RepoLookupError, error.ConfigError), e:
             self.showMessage.emit(hglib.tounicode(str(e)))
-        self.finished.emit(wctx, patchecked)
+        self.wctx = wctx
+        self.patchecked = patchecked
 
 
 class WctxFileTree(QTreeView):
