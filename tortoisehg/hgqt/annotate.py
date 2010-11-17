@@ -62,7 +62,7 @@ class AnnotateView(qscilib.Scintilla):
         self._lastrev = None
 
         self._thread = _AnnotateThread(self)
-        self._thread.done.connect(self.fillModel)
+        self._thread.finished.connect(self.fillModel)
 
     def configChanged(self):
         self.setIndentationWidth(self.repo.tabwidth)
@@ -200,11 +200,14 @@ class AnnotateView(qscilib.Scintilla):
         self._thread.abort()
         self._thread.start(fctx)
 
-    @pyqtSlot(object)
-    def fillModel(self, data):
+    @pyqtSlot()
+    def fillModel(self):
+        self._thread.wait()
+        if self._thread.data is None:
+            return
         revs, links = [], []
         sums = {}
-        for fctx, origline in data:
+        for fctx, origline in self._thread.data:
             rev = fctx.linkrev()
             revs.append(rev)
             links.append([fctx, origline])
@@ -303,8 +306,6 @@ class AnnotateView(qscilib.Scintilla):
 
 class _AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
-    done = pyqtSignal(object)
-
     def __init__(self, parent=None):
         super(_AnnotateThread, self).__init__(parent)
 
@@ -312,6 +313,7 @@ class _AnnotateThread(QThread):
     def start(self, fctx):
         self._fctx = fctx
         super(_AnnotateThread, self).start()
+        self.data = None
 
     @pyqtSlot()
     def abort(self):
@@ -328,7 +330,7 @@ class _AnnotateThread(QThread):
             data = []
             for (fctx, line), _text in self._fctx.annotate(True, True):
                 data.append((fctx, line))
-            self.done.emit(data)
+            self.data = data
         except KeyboardInterrupt:
             pass
         finally:
