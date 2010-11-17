@@ -342,7 +342,7 @@ class MergePage(BasePage):
             # pulled a fast one on us and updated from the CLI
             cmdline = ['debugsetparents', '.', self.wizard().other]
         else:
-            tool = self.field('autoresolve') and 'merge' or 'fail'
+            tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
             cmdline = ['--repository', self.wizard().repo.root, 'merge',
                        '--tool=internal:' + tool, 
                        self.wizard().other]
