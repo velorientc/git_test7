@@ -35,16 +35,12 @@ class PatchBranchWidget(QWidget):
         self.pbranch = extensions.find('pbranch') # Unfortunately global instead of repo-specific
         self.show_internal_branches = False
 
-        self.runner = cmdui.Runner(_('Patch Branch'), self, logwidget)
-        self.runner.commandStarted.connect(repo.incrementBusyCount)
-        self.runner.commandFinished.connect(self.commandFinished)
-
         repo.configChanged.connect(self.configChanged)
         repo.repositoryChanged.connect(self.repositoryChanged)
         repo.workingBranchChanged.connect(self.workingBranchChanged)
 
         # Build child widgets
-        
+
         vbox = QVBoxLayout()
         vbox.setContentsMargins(0, 0, 0, 0)
         self.setLayout(vbox)
@@ -86,7 +82,7 @@ class PatchBranchWidget(QWidget):
         #self.actionEditPGraph.triggered.connect(self.pbackout_clicked)
 
         vbox.addWidget(self.toolBar_patchbranch, 1)
-        
+
         # Patch list
         self.patchlistmodel = PatchBranchModel(self.compute_model(),
                                                self.repo.changectx('.').branch() )
@@ -97,11 +93,12 @@ class PatchBranchWidget(QWidget):
         self.patchlist.horizontalHeader().setHighlightSections(False)
         self.patchlist.setSelectionBehavior(QAbstractItemView.SelectRows)
         vbox.addWidget(self.patchlist, 1)
-        
+
         # Command output
-        self.runner = cmdui.Runner(_('Patch Branch'), parent=self)
+        # TODO: connect output, makeVisible signals to self, then workbench
+        self.runner = cmdui.Runner(_('Patch Branch'), True, parent=self)
         self.runner.commandFinished.connect(self.commandFinished)
-        
+
     def refresh(self):
         """
         Refresh the list of patches.
@@ -140,12 +137,11 @@ class PatchBranchWidget(QWidget):
     #
     # Data functions
     #
-    
+
     def compute_model(self):
         """
         Compute content of table, including patch graph and other columns
         """
-        
 
         # compute model data
         model = []
@@ -175,7 +171,7 @@ class PatchBranchWidget(QWidget):
             node_color = patch_status[name] and '#ff0000' or 0
             node_status = (name == cur_branch) and 4 or 0
             node = PatchGraphNodeAttributes(node_column, node_color, node_status)
-            
+
             # Find next dependency list
             my_deps = []
             for p in parents:
@@ -183,7 +179,7 @@ class PatchBranchWidget(QWidget):
                     my_deps.append(p)
             next_dep_list = dep_list[:]
             next_dep_list[node_column:node_column+1] = my_deps
-            
+
             # Dependency lines
             shift = len(parents) - 1
             out_lines = []
@@ -203,7 +199,7 @@ class PatchBranchWidget(QWidget):
                     dep = dep_list[line.end_column]
                     dep_column = next_dep_list.index(dep)
                     out_lines.append(GraphLine(line.end_column, dep_column, line.color, line.style))
-                    
+
             stat = patch_status[name] and 'M' or 'C' # patch status
             patchname = name
             msg = self.pmessage(name) # summary
@@ -216,18 +212,18 @@ class PatchBranchWidget(QWidget):
             # Loop
             in_lines = out_lines
             dep_list = next_dep_list
-            
+
         return model
 
 
     #
     # pbranch extension functions
     #
-    
+
     def pgraph(self):
         """
         [pbranch] Execute 'pgraph' command.
-        
+
         :returns: A list of patches and dependencies
         """
         if self.pbranch is None:
@@ -239,7 +235,7 @@ class PatchBranchWidget(QWidget):
     def pstatus(self, patch_name):
         """
         [pbranch] Execute 'pstatus' command.
-        
+
         :param patch_name: Name of patch-branch
         :retv: list of status messages. If empty there is no pending merges
         """
@@ -279,9 +275,9 @@ class PatchBranchWidget(QWidget):
             return None
 
 
-   
+
     ### internal functions ###
- 
+
     def update_sensitivity(self):
         """ Update the sensitivity of entire UI """
         in_pbranch = True #TODO
@@ -295,7 +291,7 @@ class PatchBranchWidget(QWidget):
 
 
     # Signal handlers
-    
+
     def commandFinished(self):
         pass
 
@@ -345,7 +341,7 @@ class PatchGraphNodeAttributes(object):
         self.column = column
         self.color = color
         self.status = status
-        
+
 class GraphLine(object):
     """
     Simple class to encapsulate attributes about a line in the patch branch graph.
@@ -356,7 +352,7 @@ class GraphLine(object):
         self.end_column = end_column
         self.color = color
         self.style = style
-        
+
 class PatchBranchContext(object):
     """
     Similar to patchctx in thgrepo, this class simulates a changeset
@@ -385,7 +381,7 @@ class PatchBranchModel(QAbstractTableModel):
         self.rowheight = 20
 
     # virtual functions required to subclass QAbstractTableModel
-    
+
     def rowCount(self, parent=None):
         return len(self.model)
 
@@ -416,7 +412,7 @@ class PatchBranchModel(QAbstractTableModel):
             if column == 'Graph':
                 return self.graphctx(ctx, gnode)
         return nullvariant
-    
+
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
@@ -426,7 +422,7 @@ class PatchBranchModel(QAbstractTableModel):
         return nullvariant
 
     # end of functions required to subclass QAbstractTableModel
-    
+
 
 
 
@@ -442,10 +438,10 @@ class PatchBranchModel(QAbstractTableModel):
     def graphctx(self, ctx, gnode):
         """
         Return a QPixmap for the patch graph for the current row
-        
+
         :ctx: Data for current row = branch
         :gnode: Node in patch branch graph
-        
+
         :returns: QPixmap of pgraph for ctx
         """
         w = self.col2x(gnode.cols) + 10
@@ -466,7 +462,7 @@ class PatchBranchModel(QAbstractTableModel):
         lpen = QPen(pen)
         lpen.setColor(Qt.black)
         painter.setPen(lpen)
-        
+
         # Draw lines
         for y1, y4, lines in ((dot_y, dot_y + h, gnode.bottomlines),
                               (dot_y - h, dot_y, gnode.toplines)):
@@ -502,7 +498,7 @@ class PatchBranchModel(QAbstractTableModel):
         fillcolor = dotcolor #gnode.rev is None and white or dotcolor
 
         pen = QPen(pencolor)
-        pen.setWidthF(1.5)                
+        pen.setWidthF(1.5)
         painter.setPen(pen)
 
         radius = self.dotradius
@@ -513,8 +509,8 @@ class PatchBranchModel(QAbstractTableModel):
             rect = QRectF(centre_x - r,
                           centre_y - r,
                           2 * r, 2 * r)
-            painter.drawEllipse(rect)                    
-            
+            painter.drawEllipse(rect)
+
         def diamond(r):
             poly = QPolygonF([QPointF(centre_x - r, centre_y),
                               QPointF(centre_x, centre_y - r),
