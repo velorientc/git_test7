@@ -77,7 +77,7 @@ class QuickOpDialog(QDialog):
         stwidget.showMessage.connect(self.statusbar.showMessage)
         stwidget.progress.connect(self.progress)
 
-        self.cmd = cmd = cmdui.Runner()
+        self.cmd = cmd = cmdui.Runner(parent=self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.commandCanceling.connect(self.commandCanceled)
