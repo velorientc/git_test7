@@ -124,7 +124,7 @@ class AboutDialog(QDialog):
     @pyqtSlot()
     def getUpdateInfo(self):
         self.uthread = AboutUpdateThread()
-        self.uthread.done.connect(self.uFinished)
+        self.uthread.finished.connect(self.uFinished)
         self.uthread.start()
 
     def uFinished(self):
@@ -159,7 +159,6 @@ class AboutDialog(QDialog):
 
 class AboutUpdateThread(QThread):
     'Background thread for getting update info'
-    done = pyqtSignal()
     def __init__(self):
         super(AboutUpdateThread, self).__init__()
 
@@ -207,7 +206,6 @@ class AboutUpdateThread(QThread):
         self.data['lbl-vis'] = (dl_lbl != '')
         self.data['val'] = dlurltxt
         self.data['siteurl'] = url
-        self.done.emit()
 
 
 def run(ui, *pats, **opts):
