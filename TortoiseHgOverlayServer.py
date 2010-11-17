@@ -2,32 +2,7 @@
 # messages printed. Takes an optional logfile as first command
 # line parameter
 
-import gc
-import os
 import sys
-import time
-import threading
-import cStringIO
-import Queue
-import traceback
-
-from win32api import *
-from win32gui import *
-
-import win32pipe
-import win32con
-import win32event
-import win32file
-import winerror
-import pywintypes
-import win32security
-
-from mercurial import demandimport
-demandimport.ignore.append('win32com.shell')
-demandimport.enable()
-from mercurial import ui, error
-from tortoisehg.util.i18n import agettext as _
-from tortoisehg.util import thread2, paths, shlib
 
 if hasattr(sys, "frozen"):
     class BlackHole(object):
@@ -41,6 +16,35 @@ if hasattr(sys, "frozen"):
             pass
     sys.stdout = BlackHole()
     sys.stderr = BlackHole()
+
+import os
+import time
+import threading
+import cStringIO
+import Queue
+import traceback
+import gc
+
+try:
+    from win32api import *
+    from win32gui import *
+    import win32pipe
+    import win32con
+    import win32event
+    import win32file
+    import winerror
+    import pywintypes
+    import win32security
+except ImportError, e:
+    print 'Fatal error at startup', e
+    sys.exit(1)
+
+from mercurial import demandimport
+demandimport.ignore.append('win32com.shell')
+demandimport.enable()
+from mercurial import ui, error
+from tortoisehg.util.i18n import agettext as _
+from tortoisehg.util import thread2, paths, shlib
 
 APP_TITLE = _('TortoiseHg Overlay Icon Server')
 
