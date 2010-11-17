@@ -112,8 +112,8 @@ class PostReviewDialog(QDialog):
         self._readsettings()
 
         self._review_thread = LoadReviewDataThread(self)
-        self._review_thread.start()
         self._review_thread.finished.connect(self.error_prompt)
+        self._review_thread.start()
 
     def keyPressEvent(self, event):
     # don't post review by just hitting enter
