@@ -678,7 +678,7 @@ class patchctx(object):
         self._files = []
         self._changesToParent = [modified, added, removed]
         self.curphunks = {}
-        
+
         pf = open(self._path)
         try:
             try:
