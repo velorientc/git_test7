@@ -9,9 +9,7 @@ import os
 import sys
 
 from mercurial import hg, cmdutil, util, ui, node, merge, error
-import paths
-import debugthg
-import hglib
+from tortoisehg.util import paths, debugthg, hglib
 
 debugging = False
 enabled = True
