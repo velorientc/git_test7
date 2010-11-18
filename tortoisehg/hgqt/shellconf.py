@@ -86,25 +86,23 @@ class ShellConfigWindow(QDialog):
         grid.addWidget(w, 0, 0)
         self.topmenulist = w = QListWidget()
         grid.addWidget(w, 1, 0, 4, 1)
-        self.connect(w, SIGNAL("itemClicked(QListWidgetItem*)"), 
-            self.listItemClicked)
+        w.itemClicked.connect(self.listItemClicked)
 
         w = QLabel(_("Sub menu items:"))
         grid.addWidget(w, 0, 2)
         self.submenulist = w = QListWidget()
         grid.addWidget(w, 1, 2, 4, 1)
-        self.connect(w, SIGNAL("itemClicked(QListWidgetItem*)"),
-            self.listItemClicked)
+        w.itemClicked.connect(self.listItemClicked)
 
         style = QApplication.style()
         icon = style.standardIcon(QStyle.SP_ArrowLeft)
         self.top_button = w = QPushButton(icon, '')
         grid.addWidget(w, 2, 1)
-        self.connect(w, SIGNAL("clicked()"), self.top_clicked)
+        w.clicked.connect(self.top_clicked)
         icon = style.standardIcon(QStyle.SP_ArrowRight)
         self.sub_button = w = QPushButton(icon, '')
         grid.addWidget(w, 3, 1)
-        self.connect(w, SIGNAL("clicked()"), self.sub_clicked)
+        w.clicked.connect(self.sub_clicked)
 
         grid.setRowStretch(1, 10)
         grid.setRowStretch(4, 10)
@@ -117,7 +115,7 @@ class ShellConfigWindow(QDialog):
 
         def checkbox(label):
             cb = QCheckBox(label)
-            self.connect(cb, SIGNAL("stateChanged(int)"), self.stateChanged)
+            cb.stateChanged.connect(self.stateChanged)
             return cb
 
         # Overlays group
@@ -171,9 +169,9 @@ class ShellConfigWindow(QDialog):
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Apply)
         self.apply_button = bb.button(BB.Apply)
-        self.connect(bb, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(bb, SIGNAL("rejected()"), self, SLOT("reject()"))
-        self.connect(bb.button(BB.Apply), SIGNAL("clicked()"), self.apply)
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
+        bb.button(BB.Apply).clicked.connect(self.apply)
         bb.button(BB.Ok).setDefault(True)
         layout.addWidget(bb)
 
