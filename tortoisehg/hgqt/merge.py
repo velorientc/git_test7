@@ -340,7 +340,8 @@ class MergePage(BasePage):
         if self.field('discard').toBool():
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
-            cmdline = ['debugsetparents', '.', self.wizard().other]
+            cmdline = ['--repository', self.wizard().repo.root,
+                       'debugsetparents', '.', self.wizard().other]
         else:
             tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
             cmdline = ['--repository', self.wizard().repo.root, 'merge',
