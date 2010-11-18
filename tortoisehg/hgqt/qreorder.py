@@ -18,7 +18,6 @@ from PyQt4.QtGui import *
 
 # TODO:
 #  This approach will nuke any user configured guards
-#  It would be nice to show changeset summaries (status bar?)
 #  Support qrename within this dialog
 #  Explicit refresh
 
