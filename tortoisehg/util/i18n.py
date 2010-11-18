@@ -7,7 +7,7 @@
 
 import gettext, sys
 from gettext import gettext as _
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import paths
 
 gettext.bindtextdomain("tortoisehg", paths.get_locale_path())
 gettext.textdomain("tortoisehg")
@@ -20,6 +20,7 @@ def agettext(message):
     to command-line interface (ie: Windows Command Prompt).
     """
     try:
+        from tortoisehg.util import hglib
         u = _(message)
         return hglib.fromutf(u)
     except (LookupError, UnicodeEncodeError):
