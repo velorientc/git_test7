@@ -349,11 +349,15 @@ class ChangeSet(gdialog.GWindow):
         eob = buf.get_end_iter()
         offset = eob.get_offset()
 
+        size = 0
         try:
-            fctx = self.repo[rev].filectx(wfile)
+            ctx = self.repo[rev]
+            if wfile in ctx:
+                fctx = ctx.filectx(wfile)
+                size = fctx._filelog.rawsize(fctx.filerev())
         except error.LookupError:
-            fctx = None
-        if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
+            pass
+        if size > hglib.getmaxdiffsize(self.repo.ui):
             lines = ['diff',
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
