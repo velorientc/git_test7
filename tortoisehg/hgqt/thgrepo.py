@@ -89,13 +89,19 @@ class ThgRepoWrapper(QObject):
             dbgoutput('no poll, busy', self.busycount)
 
     def pollStatus(self):
-        if not os.path.exists(self.repo.path):
+        if not os.path.exists(self.repo.path) or self.locked():
             return
-        if os.path.exists(self.repo.join('wlock')):
+        if self._checkdirstate():
             return
         self._checkrepotime()
-        self._checkdirstate()
         self._checkuimtime()
+
+    def locked(self):
+        if os.path.exists(self.repo.join('wlock')):
+            return True
+        if os.path.exists(self.repo.sjoin('lock')):
+            return True
+        return False
 
     def recordState(self):
         try:
@@ -131,6 +137,9 @@ class ThgRepoWrapper(QObject):
         'Check for new changelog entries, or MQ status changes'
         if self._repomtime < self._getrepomtime():
             dbgoutput('detected repository change')
+            if self.locked():
+                dbgoutput('lock still held - ignoring for now')
+                return
             self.recordState()
             self.repo.thginvalidate()
             self.repositoryChanged.emit()
@@ -140,33 +149,41 @@ class ThgRepoWrapper(QObject):
         try:
             mtime = os.path.getmtime(self.repo.join('dirstate'))
         except EnvironmentError:
-            return
+            return False
         if mtime <= self._dirstatemtime:
-            return
+            return False
         self._dirstatemtime = mtime
         nodes = self._getrawparents()
         if nodes != self._parentnodes:
             dbgoutput('dirstate change found')
+            if self.locked():
+                dbgoutput('lock still held - ignoring for now')
+                return True
             self.recordState()
-            self.repo.dirstate.invalidate()
+            self.repo.thginvalidate()
             self.repositoryChanged.emit()
-            return
+            return True
         try:
             mtime = os.path.getmtime(self.repo.join('branch'))
         except EnvironmentError:
-            return
+            return False
         if mtime <= self._branchmtime:
-            return
+            return False
         self._branchmtime = mtime
         try:
             newbranch = self.repo.opener('branch').read()
         except EnvironmentError:
-            return
+            return False
         if newbranch != self._rawbranch:
             dbgoutput('branch time change')
+            if self.locked():
+                dbgoutput('lock still held - ignoring for now')
+                return True
             self._rawbranch = newbranch
-            self.repo.dirstate.invalidate()
+            self.repo.thginvalidate()
             self.workingBranchChanged.emit()
+            return True
+        return False
 
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
