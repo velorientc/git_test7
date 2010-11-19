@@ -92,7 +92,7 @@ class CommitWidget(QWidget):
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
         self.qref = False
-
+        self.opts['patchName'] = None
         self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(_('Commit'), not embedded, self)
         self.runner.output.connect(self.output)
@@ -211,7 +211,7 @@ class CommitWidget(QWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
-
+            self.refresh()
     def workingBranchChanged(self):
         'Repository has detected a change in .hg/branch'
         self.refresh()
@@ -230,20 +230,20 @@ class CommitWidget(QWidget):
         self.repo.thginvalidate()
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
-
     def refresh(self):
         # Update qrefresh mode
-        if self.repo.changectx('.').thgmqappliedpatch():
-            self.commitButtonName.emit(_('QRefresh'))
-            if not self.qref:
-                self.initQRefreshMode()
+        if self.opts['patchName']:
+            self.commitButtonName.emit(_('QNew'))
         else:
-            self.commitButtonName.emit(_('Commit'))
-            if self.qref:
-                self.endQRefreshMode()
-
+            if self.repo.changectx('.').thgmqappliedpatch():
+                self.commitButtonName.emit(_('QRefresh'))
+                if not self.qref:
+                    self.initQRefreshMode()
+            else:
+                self.commitButtonName.emit(_('Commit'))
+                if self.qref:
+                    self.endQRefreshMode()
         self.msgte.refresh(self.repo)
-
         # Update message list
         self.msgcombo.reset(self.msghistory)
 
@@ -596,12 +596,18 @@ class CommitWidget(QWidget):
         except error.Abort, e:
             self.showMessage.emit(hglib.tounicode(str(e)))
             dcmd = []
+        if self.opts['patchName']:
+            cmdline = ['qnew', '--repository', repo.root,
+                       '--verbose', '--user', user, '--message', msg,
+                       self.opts['patchName']
+                       ]
+        else:
+            cmdline = ['commit', '--repository', repo.root,
+                       '--verbose', '--user', user, '--message', msg]
+            if self.qref:
+                cmdline[0] = 'qrefresh'
+                files = []
 
-        cmdline = ['commit', '--repository', repo.root,
-                   '--verbose', '--user', user, '--message', msg]
-        if self.qref:
-            cmdline[0] = 'qrefresh'
-            files = []
         cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
         for fname in self.opts.get('autoinc', '').split(','):
             fname = fname.strip()
@@ -625,8 +631,10 @@ class CommitWidget(QWidget):
                 self.msgte.clear()
             self.msgte.setModified(False)
             self.commitComplete.emit()
+            if self.opts['patchName']:
+                self.opts['patchName'] = None
+                self.refresh()
         self.stwidget.refreshWctx()
-
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
             if event.modifiers() == Qt.ControlModifier:
@@ -767,24 +775,27 @@ class DetailsDialog(QDialog):
         hbox.addWidget(self.autoincle)
         hbox.addWidget(autoincsave)
         layout.addLayout(hbox)
-
         hbox = QHBoxLayout()
         #  qnew/shelve-patch creation dialog (in another file)
-        lbl = QLabel(_('New patch (QNew)'))
+
+        self.patchcb = QCheckBox(_('New patch (QNew):'))
+
         self.patchle = QLineEdit()
-        self.patchle.returnPressed.connect(self.newPatch)
-        createpatch = QPushButton(_('Create'))
-        createpatch.clicked.connect(self.newPatch)
-        def changed(text):
-            createpatch.setEnabled(bool(text))
-        self.patchle.textChanged.connect(changed)
-        createpatch.setEnabled(False)
-        hbox.addWidget(lbl)
+        self.patchcb.toggled.connect(self.patchle.setEnabled)
+
+        patchName = opts.get('patchName')
+        if patchName:
+            self.patchcb.setChecked(True)
+            self.patchle.setText(hglib.tounicode(patchName))
+            self.patchle.setEnabled(True)
+        else:
+            self.patchcb.setChecked(False)
+            self.patchle.setEnabled(False)
+
+        hbox.addWidget(self.patchcb)
         hbox.addWidget(self.patchle)
-        hbox.addWidget(createpatch)
         layout.addStretch(10)
         layout.addLayout(hbox)
-
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -795,8 +806,7 @@ class DetailsDialog(QDialog):
         self.setWindowTitle('%s - commit details' % self.repo.displayname)
 
     def newPatch(self):
-        name = hglib.fromunicode(self.patchle.text())
-        # TODO
+        self.patchName = hglib.fromunicode(self.patchle.text())
 
     def saveInRepo(self):
         fn = os.path.join(self.repo.root, '.hg', 'hgrc')
@@ -905,6 +915,11 @@ class DetailsDialog(QDialog):
             outopts['pushafter'] = remote
         else:
             outopts['pushafter'] = ''
+        outopts['patchName'] = None
+        if self.patchcb.isChecked():
+            patchName = self.patchle.text()
+            if patchName:
+                outopts['patchName'] = hglib.fromunicode(patchName)
 
         self.outopts = outopts
         QDialog.accept(self)
