@@ -182,6 +182,7 @@ class HgFileView(QFrame):
 
         self._ctx = None
         self._filename = None
+        self._status = None
         self._annotate = False
         self._find_text = None
         self._mode = "diff" # can be 'diff' or 'file'
@@ -270,9 +271,9 @@ class HgFileView(QFrame):
 
     def displayFile(self, filename=None, rev=None, status=None):
         if filename is None:
-            filename = self._filename
+            filename, status = self._filename, self._status
         else:
-            self._filename = filename
+            self._filename, self._status = filename, status
 
         if rev is not None:
             self._p_rev = rev
