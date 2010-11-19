@@ -212,6 +212,7 @@ class CommitWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
             self.refresh()
+
     def workingBranchChanged(self):
         'Repository has detected a change in .hg/branch'
         self.refresh()
@@ -635,6 +636,7 @@ class CommitWidget(QWidget):
                 self.opts['patchName'] = None
                 self.refresh()
         self.stwidget.refreshWctx()
+
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
             if event.modifiers() == Qt.ControlModifier:
