@@ -280,9 +280,9 @@ class RevDetailsWidget(QWidget):
         self.filelist.fileRevSelected.connect(self._displayFile)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
-    @pyqtSlot(object, object)
-    def _displayFile(self, file, rev):
-        self.fileview.displayFile(file, rev)
+    @pyqtSlot(object, object, object)
+    def _displayFile(self, file, rev, status):
+        self.fileview.displayFile(file, rev, status)
         self._updateHighlightText()
 
     def revision_selected(self, rev):

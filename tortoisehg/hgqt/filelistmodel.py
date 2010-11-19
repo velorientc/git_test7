@@ -69,6 +69,12 @@ class HgFileListModel(QAbstractTableModel):
             self.loadFiles()
             self.layoutChanged.emit()
 
+    def flagFromIndex(self, index):
+        if not index.isValid() or index.row()>=len(self) or not self._ctx:
+            return None
+        row = index.row()
+        return self._files[row]['flag']
+
     def fileFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self._ctx:
             return None
