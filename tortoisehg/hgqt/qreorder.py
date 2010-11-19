@@ -52,20 +52,19 @@ class QReorderDialog(QDialog):
         layout.addWidget(hl)
 
         class PatchListWidget(QListWidget):
-            def __init__(self, parent=None, dialog=None):
+            def __init__(self, parent):
                 QListWidget.__init__(self, parent)
-                self.dlg=dialog
                 self.setCurrentRow(0)
             def focusInEvent(self, e):
                 i = self.item(self.currentRow())
                 if i:
-                    self.dlg.showSummary(i)
+                    self.parent().showSummary(i)
                 QListWidget.focusInEvent(self, e)
 
         ugb = QGroupBox(_('Unapplied Patches - drag to reorder'))
         ugb.setLayout(QVBoxLayout())
         ugb.layout().setContentsMargins(*(0,)*4)
-        self.ulw = PatchListWidget(dialog=self)
+        self.ulw = PatchListWidget(self)
         self.ulw.setDragDropMode(QListView.InternalMove)
         ugb.layout().addWidget(self.ulw)
         self.ulw.currentItemChanged.connect(lambda:
@@ -75,7 +74,7 @@ class QReorderDialog(QDialog):
         agb = QGroupBox(_('Applied Patches'))
         agb.setLayout(QVBoxLayout())
         agb.layout().setContentsMargins(*(0,)*4)
-        self.alw = PatchListWidget(dialog=self)
+        self.alw = PatchListWidget(self)
         agb.layout().addWidget(self.alw)
         self.alw.currentItemChanged.connect(lambda:
                 self.showSummary(self.alw.item(self.alw.currentRow())))
