@@ -517,7 +517,13 @@ class FileData(object):
         p = _('File or diffs not displayed: ')
         try:
             fctx = ctx.filectx(wfile)
-            size = fctx.size()
+            if ctx.rev() is None:
+                size = fctx.size()
+            else:
+                # fctx.size() can read all data into memory in rename cases so
+                # we read the size directly from the filelog, this is deeper
+                # under the API than I prefer to go, but seems necessary
+                size = fctx._filelog.rawsize(fctx.filerev())
         except (EnvironmentError, error.LookupError), e:
             self.error = p + hglib.tounicode(str(e))
             return None
