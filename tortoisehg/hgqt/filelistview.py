@@ -15,7 +15,7 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 import os
-    
+
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
@@ -53,7 +53,7 @@ class HgFileListView(QTableView):
         self.doubleClicked.connect(self.fileActivated)
         self._diff_dialogs = {}
         self._nav_dialogs = {}
-        
+
     def setModel(self, model):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
@@ -112,7 +112,6 @@ class HgFileListView(QTableView):
                 dlg = dlgclass(model.repo, filename,
                                repoviewer=self.window())
                 dlgdict[filename] = dlg
-                
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % filename)
             dlg = dlgdict[filename] 
             dlg.goto(model._ctx.rev())
