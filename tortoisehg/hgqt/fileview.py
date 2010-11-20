@@ -559,6 +559,13 @@ class FileData(object):
         repo = ctx._repo
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
+        absfile = repo.wjoin(wfile)
+        if os.path.islink(absfile):
+            data = os.readlink(absfile)
+            self.contents = hglib.tounicode(data)
+            self.flabel += _(' <i>(is a symlink)</i>')
+            return
+
         if type(ctx.rev()) == str:
             chunks = ctx.thgmqpatchchunks(wfile)
             self.diff = '\n'.join(chunks)
