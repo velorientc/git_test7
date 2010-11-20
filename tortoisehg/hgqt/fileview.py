@@ -23,7 +23,7 @@ import re
 
 from mercurial import hg, error, match, patch, subrepo, commands
 from mercurial import ui as uimod
-    
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import Qsci
@@ -46,7 +46,7 @@ class Annotator(qsci):
     # would have been nice to directly go to the annotated revision...
     def __init__(self, textarea, parent=None):
         qsci.__init__(self, parent)
-        
+
         self.setFrameStyle(0)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -57,10 +57,10 @@ class Annotator(qsci):
         self.setFont(textarea.font())
         self.setMarginWidth(0, '')
         self.setMarginWidth(1, '')
-        
+
         self.SendScintilla(qsci.SCI_SETCURSOR, 2)
         self.SendScintilla(qsci.SCI_SETCARETSTYLE, 0)
-        
+
         # used to set a background color for every annotating rev
         N = 32
         self.markers = []
@@ -72,7 +72,7 @@ class Annotator(qsci):
 
         textarea.verticalScrollBar().valueChanged.connect(
                 self.verticalScrollBar().setValue)
-        
+
     def setFilectx(self, fctx):
         self.fctx = fctx
         self.fctxann = [f for f, line in fctx.annotate(follow=True)]
@@ -102,7 +102,7 @@ class HgFileView(QFrame):
         l = QHBoxLayout()
         l.setContentsMargins(0,0,0,0)
         l.setSpacing(0)
-        
+
         self.topLayout = QVBoxLayout()
 
         self.filenamelabel = w = QLabel()
@@ -396,7 +396,7 @@ class HgFileView(QFrame):
     def prevCol(self):
         x, y = self.sci.getCursorPosition()
         self.sci.setCursorPosition(x, y-1)
-        
+
     def nDiffs(self):
         return len(self._diffs)
 
@@ -416,7 +416,7 @@ class HgFileView(QFrame):
                         self.highlightCurrentSearchString(pos, self._find_text)
                         yield self._ctx.rev(), self._filename, pos
             return finditer(self, findpos)
-    
+
     def clearHighlights(self):
         n = self.sci.length()
         # highlight
