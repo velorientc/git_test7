@@ -92,7 +92,6 @@ class CommitWidget(QWidget):
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
         self.qref = False
-        self.opts['patchName'] = None
         self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(_('Commit'), not embedded, self)
         self.runner.output.connect(self.output)
@@ -231,9 +230,10 @@ class CommitWidget(QWidget):
         self.repo.thginvalidate()
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
+
     def refresh(self):
         # Update qrefresh mode
-        if self.opts['patchName']:
+        if self.opts.get('patchName'):
             self.commitButtonName.emit(_('QNew'))
         else:
             if self.repo.changectx('.').thgmqappliedpatch():
@@ -597,7 +597,7 @@ class CommitWidget(QWidget):
         except error.Abort, e:
             self.showMessage.emit(hglib.tounicode(str(e)))
             dcmd = []
-        if self.opts['patchName']:
+        if self.opts.get('patchName'):
             cmdline = ['qnew', '--repository', repo.root,
                        '--verbose', '--user', user, '--message', msg,
                        self.opts['patchName']
@@ -632,7 +632,7 @@ class CommitWidget(QWidget):
                 self.msgte.clear()
             self.msgte.setModified(False)
             self.commitComplete.emit()
-            if self.opts['patchName']:
+            if self.opts.get('patchName'):
                 self.opts['patchName'] = None
                 self.refresh()
         self.stwidget.refreshWctx()
@@ -777,27 +777,26 @@ class DetailsDialog(QDialog):
         hbox.addWidget(self.autoincle)
         hbox.addWidget(autoincsave)
         layout.addLayout(hbox)
-        hbox = QHBoxLayout()
-        #  qnew/shelve-patch creation dialog (in another file)
 
-        self.patchcb = QCheckBox(_('New patch (QNew):'))
+        if 'mq' in self.repo.extensions():
+            hbox = QHBoxLayout()
+            self.patchcb = QCheckBox(_('New patch (QNew):'))
+            self.patchle = QLineEdit()
+            self.patchcb.toggled.connect(self.patchle.setEnabled)
 
-        self.patchle = QLineEdit()
-        self.patchcb.toggled.connect(self.patchle.setEnabled)
+            patchName = opts.get('patchName')
+            if patchName:
+                self.patchcb.setChecked(True)
+                self.patchle.setText(hglib.tounicode(patchName))
+                self.patchle.setEnabled(True)
+            else:
+                self.patchcb.setChecked(False)
+                self.patchle.setEnabled(False)
+            hbox.addWidget(self.patchcb)
+            hbox.addWidget(self.patchle)
+            layout.addStretch(10)
+            layout.addLayout(hbox)
 
-        patchName = opts.get('patchName')
-        if patchName:
-            self.patchcb.setChecked(True)
-            self.patchle.setText(hglib.tounicode(patchName))
-            self.patchle.setEnabled(True)
-        else:
-            self.patchcb.setChecked(False)
-            self.patchle.setEnabled(False)
-
-        hbox.addWidget(self.patchcb)
-        hbox.addWidget(self.patchle)
-        layout.addStretch(10)
-        layout.addLayout(hbox)
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -806,9 +805,6 @@ class DetailsDialog(QDialog):
         layout.addWidget(bb)
 
         self.setWindowTitle('%s - commit details' % self.repo.displayname)
-
-    def newPatch(self):
-        self.patchName = hglib.fromunicode(self.patchle.text())
 
     def saveInRepo(self):
         fn = os.path.join(self.repo.root, '.hg', 'hgrc')
@@ -918,8 +914,8 @@ class DetailsDialog(QDialog):
         else:
             outopts['pushafter'] = ''
         outopts['patchName'] = None
-        if self.patchcb.isChecked():
-            patchName = self.patchle.text()
+        if 'mq' in self.repo.extensions() and self.patchcb.isChecked():
+            patchName = self.patchle.text().simplified()
             if patchName:
                 outopts['patchName'] = hglib.fromunicode(patchName)
 
