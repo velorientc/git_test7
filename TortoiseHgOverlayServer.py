@@ -2,24 +2,42 @@
 # messages printed. Takes an optional logfile as first command
 # line parameter
 
-import gc
-import os
 import sys
+
+if hasattr(sys, "frozen"):
+    class BlackHole(object):
+        closed = True
+        softspace = 0
+        def write(self, data):
+            pass
+        def close(self):
+            pass
+        def flush(self):
+            pass
+    sys.stdout = BlackHole()
+    sys.stderr = BlackHole()
+
+import os
 import time
 import threading
 import cStringIO
 import Queue
+import traceback
+import gc
 
-from win32api import *
-from win32gui import *
-
-import win32pipe
-import win32con
-import win32event
-import win32file
-import winerror
-import pywintypes
-import win32security
+try:
+    from win32api import *
+    from win32gui import *
+    import win32pipe
+    import win32con
+    import win32event
+    import win32file
+    import winerror
+    import pywintypes
+    import win32security
+except ImportError, e:
+    print 'Fatal error at startup', e
+    sys.exit(1)
 
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
@@ -27,11 +45,6 @@ demandimport.enable()
 from mercurial import ui, error
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import thread2, paths, shlib
-
-if hasattr(sys, "frozen"):
-    # Give stdout/stderr closed attributes to prevent ui.py errors
-    sys.stdout.closed = True
-    sys.stderr.closed = True
 
 APP_TITLE = _('TortoiseHg Overlay Icon Server')
 
@@ -203,11 +216,16 @@ def getrepos(batch):
     for path in batch:
         r = paths.find_root(path)
         if r is None:
-            for n in os.listdir(path):
-                r = paths.find_root(os.path.join(path, n))
-                if (r is not None):
-                    roots.add(r)
-                    notifypaths.add(r)
+          try:
+              for n in os.listdir(path):
+                  r = paths.find_root(os.path.join(path, n))
+                  if (r is not None):
+                      roots.add(r)
+                      notifypaths.add(r)
+          except Exception, e:
+              # This exception raises in case of fixutf8 extension enabled
+              # and folder name contains '0x5c'(backslash).
+              logger.msg('Failed listdir %s (%s)' % (path, str(e)))
         else:
             roots.add(r);
             notifypaths.add(path)
@@ -425,14 +443,17 @@ class PipeServer:
                 except SystemExit:
                     raise SystemExit # interrupted by thread2.terminate()
                 except:
-                    import traceback
                     print "WARNING: something went wrong in requests.put"
-                    print traceback.format_exc()
+                    logger.msg(traceback.format_exc())
                     status = "ERROR" 
         # Clean up when we exit
         self.SvcStop()
 
 RUNMUTEXNAME = 'thgtaskbar-' + GetUserName()
+
+def ehook(etype, values, tracebackobj):
+    elist = traceback.format_exception(etype, values, tracebackobj)
+    logger.msg(''.join(elist))
 
 def main():
     args = sys.argv[1:]
@@ -451,6 +472,20 @@ def main():
             logfilename = arg
     if logfilename:
         logger.setfile(logfilename)
+    elif hasattr(sys, "frozen"):
+        try:
+            from win32com.shell import shell, shellcon
+            appdir = shell.SHGetSpecialFolderPath(0, shellcon.CSIDL_APPDATA)
+        except pywintypes.com_error:
+            appdir = os.environ['APPDATA']
+        logfilename = os.path.join(appdir, 'TortoiseHg', 'OverlayServerLog.txt')
+        try:
+            os.makedirs(os.path.dirname(logfilename))
+        except EnvironmentError:
+            pass
+        logger.setfile(logfilename)
+
+    sys.excepthook = ehook
 
     w=MainWindow()
     PumpMessages()
