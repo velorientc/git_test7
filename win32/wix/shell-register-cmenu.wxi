@@ -39,6 +39,10 @@
     Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
   />
   <RegistryValue
+    Root='HKCR' Key='LibraryFolder\Background\shellex\ContextMenuHandlers\TortoiseHgCMenu'
+    Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
+  />
+  <RegistryValue
     Root='HKCR' Key='*\shellex\ContextMenuHandlers\TortoiseHgCMenu'
     Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
   />
