@@ -168,7 +168,7 @@ class MainWindow:
             except:
                 pass
             cnt += 1
-            
+
         if self.pipethread.isAlive():
             print "WARNING: unable to stop server after %d trys." % max_try
             return False
@@ -368,12 +368,12 @@ class PipeServer:
         # Create an event which we will use to wait on.
         # The "service stop" request will set this event.
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
-        
+
         # We need to use overlapped IO for this, so we dont block when
         # waiting for a client to connect.  This is the only effective way
         # to handle either a client connection, or a service stop request.
         self.overlapped = pywintypes.OVERLAPPED()
-        
+
         # And create an event to be used in the OVERLAPPED object.
         self.overlapped.hEvent = win32event.CreateEvent(None,0,0,None)
 
