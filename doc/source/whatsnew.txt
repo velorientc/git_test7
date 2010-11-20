@@ -99,6 +99,22 @@ UI framework and Riverbank Computing's fine
 `PyQt <http://www.riverbankcomputing.co.uk/software/pyqt/intro>`_ Python
 bindings.
 
+QScintilla2
+~~~~~~~~~~~
+
+TortoiseHg uses the `QScintilla2
+<http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/index.html>`_
+editing component extensively to:
+
+* display file contents and diffs with syntax highlighting
+* display annotations with syntax highlighting
+* edit commit messages with auto-completion of filenames and source symbols
+* edit revision set strings with brace matching and auto-completion
+
+One can configure the Qscintilla2 tab stops and white space visibility
+parameters using the settings tool.
+
+
 Polling of repository state and config
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -139,4 +155,4 @@ can force TortoiseHg to load all revisions in the graph via the 'Load
 All' toolbar button or jump directly to the earliest revision you wish
 to view (SHIFT-CTRL-G).
 
-.. vim: noet ts=4
+.. vim: noet ts=4 syntax=rest
