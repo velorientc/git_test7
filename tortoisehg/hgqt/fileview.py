@@ -560,8 +560,12 @@ class FileData(object):
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
         absfile = repo.wjoin(wfile)
-        if os.path.islink(absfile):
-            data = os.readlink(absfile)
+        if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
+           os.path.islink(absfile):
+            if wfile in ctx:
+                data = ctx[wfile].data()
+            else:
+                data = os.readlink(absfile)
             self.contents = hglib.tounicode(data)
             self.flabel += _(' <i>(is a symlink)</i>')
             return
