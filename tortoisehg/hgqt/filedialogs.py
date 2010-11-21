@@ -438,10 +438,10 @@ class FileDiffDialog(_AbstractFileDialog):
         index = self.filerevmodel.indexFromRev(rev)
         if index is not None:
             if index.row() == 0:
-                index = self.filerevmodel.index(1, 0)                
+                index = self.filerevmodel.index(1, 0)
             self.tableView_revisions_left.setCurrentIndex(index)
-            index = self.filerevmodel.index(0, 0)                
-            self.tableView_revisions_right.setCurrentIndex(index)            
+            index = self.filerevmodel.index(0, 0)
+            self.tableView_revisions_right.setCurrentIndex(index)
         else:
             self._show_rev = rev
 
