@@ -610,6 +610,15 @@ class patchctx(object):
             except (error.LookupError, error.RepoLookupError, error.RepoError):
                 self._parents.append(p)
 
+    def __contains__(self, key):
+        if self._files is None:
+            self._load_patch_details()
+        return key in self._files
+
+    def flags(self, key):
+        # TODO: We could remember git data
+        return ''
+
     def __str__(self):
         node = self.node()
         if node:
