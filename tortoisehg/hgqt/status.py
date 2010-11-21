@@ -359,6 +359,12 @@ class WctxFileTree(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
 
+    def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
+        # don't update horizontal position by selection change
+        orighoriz = self.horizontalScrollBar().value()
+        super(WctxFileTree, self).scrollTo(index, hint)
+        self.horizontalScrollBar().setValue(orighoriz)
+
     def keyPressEvent(self, event):
         if event.key() == 32:
             for index in self.selectedRows():
