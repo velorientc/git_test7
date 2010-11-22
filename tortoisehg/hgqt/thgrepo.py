@@ -611,8 +611,7 @@ class patchctx(object):
                 self._parents.append(p)
 
     def __contains__(self, key):
-        if self._files is None:
-            self._load_patch_details()
+        self._load_patch_details()
         return key in self._files
 
     def flags(self, key):
@@ -648,17 +647,17 @@ class patchctx(object):
     def thgmqappliedpatch(self): return False
     def thgmqpatchname(self): return self._patchname
     def thgmqpatchchunks(self, wfile):
-        if self._files is None:
-            self._load_patch_details()
+        self._load_patch_details()
         if wfile in self.curphunks:
             return self.curphunks[wfile]
         return []
     def thgbranchhead(self): return False
     def thgmqunappliedpatch(self): return True
+
     def changesToParent(self, whichparent):
-        if self._files is None:
-            self._load_patch_details()
+        self._load_patch_details()
         return self._changesToParent
+
     def longsummary(self):
         summary = hglib.tounicode(self.description())
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
@@ -677,12 +676,13 @@ class patchctx(object):
         return summary
 
     def files(self):
-        if self._files is None:
-            self._load_patch_details()
-
+        self._load_patch_details()
         return self._files
 
     def _load_patch_details(self):
+        if self._files is not None:
+            return
+
         # taken from hgtk/changeset.py
         def get_path(a, b):
             type = (a == '/dev/null') and 'A' or 'M'
@@ -693,7 +693,6 @@ class patchctx(object):
             return type, rawpath.split('/', 1)[-1]
 
         hunks = []
-        files = []
         modified = []
         added = []
         removed = []
