@@ -270,7 +270,8 @@ INFO = (
     (_('Immediate Operations'), 'tortoisehg.immediate', genEditCombo,
         _('Space separated list of shell operations you would like '
           'to be performed immediately, without user interaction. '
-          'Commands are "add remove revert forget" Default: None')),
+          'Commands are "add remove revert forget". '
+          'Default: None (leave blank)')),
     (_('Poll Frequency'), 'tortoisehg.pollfreq', genIntEditCombo,
         _('The period (in milliseconds) between modification time polling of '
           'key repository files, looking for changes.  Values under '
@@ -323,19 +324,19 @@ INFO = (
     (_('Dead Branches'), 'tortoisehg.deadbranch', genEditCombo,
         _('Comma separated list of branch names that should be ignored'
         ' when building a list of branch names for a repository.'
-        ' Default: None')),
+        ' Default: None (leave blank)')),
     (_('Branch Colors'), 'tortoisehg.branchcolors', genEditCombo,
         _('Space separated list of branch names and colors of the form'
         ' branch:#XXXXXX. Spaces and colons in the branch name must be'
         ' escaped using a backslash (\\). Likewise some other characters'
         ' can be escaped in this way, e.g. \\u0040 will be decoded to the'
         ' @ character, and \\n to a linefeed.'
-        ' Default: None')),
+        ' Default: None (leave blank)')),
     (_('Hide Tags'), 'tortoisehg.hidetags', genEditCombo,
         _('Space separated list of tags that will not be shown.'
         ' Useful example: Specify "qbase qparent qtip" to hide the'
         ' standard tags inserted by the Mercurial Queues Extension.'
-        ' Default: None')),
+        ' Default: None (leave blank)')),
     (_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
         ['none', 'update', 'fetch', 'rebase']),
         _('Operation which is performed directly after a successful pull.'
@@ -360,11 +361,11 @@ INFO = (
     (_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,
        _('Comma separated list of files that are automatically included'
          ' in every commit.  Intended for use only as a repository setting.'
-         '  Default: None')),
+         '  Default: None (leave blank)')),
     (_('Auto Exclude List'), 'tortoisehg.ciexclude', genEditCombo,
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, and commit dialogs are opened.'
-         '  Default: None')),
+         '  Default: None (leave blank)')),
     (_('English Messages'), 'tortoisehg.engmsg', genBoolCombo,
        _('Generate English commit messages even if LANGUAGE or LANG'
          ' environment variables are set to a non-English language.'
