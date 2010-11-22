@@ -104,11 +104,11 @@ INFO = (
     (_('Auto Commit List'), 'tortoisehg.autoinc', [],
        _('Comma separated list of files that are automatically included'
          ' in every commit.  Intended for use only as a repository setting.'
-         '  Default: None')),
+         '  Default: None (leave blank)')),
     (_('Auto Exclude List'), 'tortoisehg.ciexclude', [],
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, commit, and shelve dialogs are opened.'
-         '  Default: None')),
+         '  Default: None (leave blank)')),
     (_('English Messages'), 'tortoisehg.engmsg', ['False', 'True'],
        _('Generate English commit messages even if LANGUAGE or LANG'
          ' environment variables are set to a non-English language.'
@@ -138,19 +138,19 @@ INFO = (
     (_('Dead Branches'), 'tortoisehg.deadbranch', [],
         _('Comma separated list of branch names that should be ignored'
         ' when building a list of branch names for a repository.'
-        ' Default: None')),
+        ' Default: None (leave blank)')),
     (_('Branch Colors'), 'tortoisehg.branchcolors', [],
         _('Space separated list of branch names and colors of the form'
         ' branch:#XXXXXX. Spaces and colons in the branch name must be'
         ' escaped using a backslash (\\). Likewise some other characters'
         ' can be escaped in this way, e.g. \\u0040 will be decoded to the'
         ' @ character, and \\n to a linefeed.'
-        ' Default: None')),
+        ' Default: None (leave blank)')),
     (_('Hide Tags'), 'tortoisehg.hidetags', [],
         _('Space separated list of tags that will not be shown.'
         ' Useful example: Specify "qbase qparent qtip" to hide the'
         ' standard tags inserted by the Mercurial Queues Extension.' 
-        ' Default: None')),
+        ' Default: None (leave blank)')),
     (_('Use Expander'), 'tortoisehg.changeset-expander', ['False', 'True'],
         _('Show changeset details with an expander')),
     (_('Toolbar Style'), 'tortoisehg.logtbarstyle',
