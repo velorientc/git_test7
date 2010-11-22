@@ -358,6 +358,7 @@ class WctxFileTree(QTreeView):
         self.setSelectionMode(QTreeView.ExtendedSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
+        self.setTextElideMode(Qt.ElideLeft)
 
     def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
         # don't update horizontal position by selection change
