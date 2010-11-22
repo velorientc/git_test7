@@ -738,7 +738,7 @@ class GCommit(GStatus):
         for part in parts:
             if len(new_sentence[-1]) + len(part) + 1 > line_width:
                 new_sentence.append('')
-                
+
             new_sentence[-1] += '%s ' % part
 
         sentence = u'\n'.join([x.strip() for x in new_sentence]).encode('utf-8')
@@ -1090,13 +1090,13 @@ class GCommit(GStatus):
         if linkmandatory:
             issueregex = self.repo.ui.config('tortoisehg', 'issue.regex')
             if issueregex:
-                commitmessage = buf.get_text(buf.get_start_iter(), 
+                commitmessage = buf.get_text(buf.get_start_iter(),
                         buf.get_end_iter())
 
                 m = re.search(issueregex, commitmessage)
                 if not m:
                     gdialog.Prompt(_('Nothing Commited'),
-                           _('No issue link found in the commit message.' 
+                           _('No issue link found in the commit message.'
                              'The commit message should contain an issue link. Configure this '
                              'in the \'Issue\' section in the settings'), self).run()
                     self.text.grab_focus()
@@ -1332,7 +1332,7 @@ class GCommit(GStatus):
         fnames = [ file[FM_PATH_UTF8] for file in self.filemodel
                    if file[FM_CHECKED] ]
         buf.delete_selection(True, True)
-        buf.insert_at_cursor('\n'.join(fnames))    
+        buf.insert_at_cursor('\n'.join(fnames))
 
     def msg_word_wrap(self, sender):
         sumlen, maxlen = self.get_lengths()
@@ -1348,7 +1348,7 @@ class GCommit(GStatus):
                              buf.get_end_iter()).splitlines()
         if not lines:
             return
-        
+
         if sumlen and len(lines[0].rstrip()) > sumlen:
             gdialog.Prompt(_('Warning'),
                    _('The summary line length of %i is greater than %i') %
@@ -1360,7 +1360,7 @@ class GCommit(GStatus):
                    self).run()
         if not maxlen:
             return
-        
+
         lnum = int(sumlen > 0)
         while lnum < len(lines):
             lines[lnum] = lines[lnum].rstrip() + ' '
@@ -1376,7 +1376,7 @@ class GCommit(GStatus):
                                         + lines[lnum+1]
                     lines[lnum] = lines[lnum][0:ind].rstrip()
             lnum += 1
-        buf.set_text('\n'.join(lines))                       
+        buf.set_text('\n'.join(lines))
 
     def msg_config(self, sender):
         dlg = thgconfig.ConfigDialog(True, focus='tortoisehg.summarylen')
