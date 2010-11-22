@@ -40,6 +40,7 @@ demandimport.ignore.append('tortoisehg.util.config')
 demandimport.ignore.append('workbench_rc')
 demandimport.enable()
 from mercurial import ui, util
+from tortoisehg.util.hgversion import hgversion, checkhgversion
 import cStringIO
 import traceback
 
@@ -57,6 +58,11 @@ capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
 
 errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError',
           'NotImplementedError')
+
+err = checkhgversion(hgversion)
+if err:
+    _ui.warn('abort: %s\n' % err)
+    sys.exit(1)
 
 if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
     sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
