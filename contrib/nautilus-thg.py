@@ -12,6 +12,13 @@ import gnomevfs
 import os
 import sys
 
+if gtk.gtk_version < (2, 14, 0):
+    # at least on 2.12.12, gtk widgets can be confused by control
+    # char markups (like "&#x1;"), so use cgi.escape instead
+    from cgi import escape as markup_escape_text
+else:
+    from gobject import markup_escape_text
+
 try:
     from mercurial import demandimport
 except ImportError:
@@ -41,7 +48,6 @@ def _thg_path():
 _thg_path()
 
 from tortoisehg.util import paths, debugthg, cachethg
-from tortoisehg.hgtk import gtklib
 
 if debugthg.debug('N'):
     debugf = debugthg.debugf
@@ -308,7 +314,7 @@ class HgExtensionDefault:
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()
-        user = gtklib.markup_escape_text(user)
+        user = markup_escape_text(user)
         tags = ', '.join(ctx.tags())
         branch = ctx.branch()
 
