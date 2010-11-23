@@ -392,6 +392,17 @@ class _QtRunner(QObject):
     @pyqtSlot()
     def excepthandler(self):
         'Display exception info; run in main (GUI) thread'
+        try:
+            self._showexceptiondialog()
+        except:
+            # make sure to quit mainloop first, so that it never leave
+            # zombie process.
+            self._mainapp.exit(1)
+            self._printexception()
+        finally:
+            self.errors = []
+
+    def _showexceptiondialog(self):
         from tortoisehg.hgqt.bugreport import BugReport, ExceptionMsgBox
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
@@ -413,7 +424,10 @@ class _QtRunner(QObject):
         else:
             dlg = BugReport(opts, parent=self._mainapp.activeWindow())
         dlg.exec_()
-        self.errors = []
+
+    def _printexception(self):
+        for args in self.errors:
+            traceback.print_exception(*args)
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         portable_fork(ui, opts)
