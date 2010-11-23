@@ -11,7 +11,7 @@ from mercurial import ui, util, error
 
 from tortoisehg.util import hglib, settings, paths, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.hgqt import qtlib, qscilib, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -716,7 +716,7 @@ class SettingsForm(QWidget):
                 self.applyChanges()
             elif ret == 2:
                 return
-        if qtlib.fileEditor(self.fn, foldable=True) == QDialog.Accepted:
+        if qscilib.fileEditor(self.fn, foldable=True) == QDialog.Accepted:
             self.refresh()
 
     def refresh(self, *args):

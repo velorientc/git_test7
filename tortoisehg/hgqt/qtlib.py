@@ -12,11 +12,9 @@ import tempfile
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.Qsci import *
-from mercurial import extensions, util
+from mercurial import extensions
 
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
 tmproot = None
@@ -462,47 +460,6 @@ class WidgetGroups(object):
 
     def set_enable(self, *args, **kargs):
         self.set_prop('setEnabled', *args, **kargs)
-
-def fileEditor(filename, **opts):
-    'Open a simple modal file editing dialog'
-    dialog = QDialog()
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-    vbox = QVBoxLayout()
-    dialog.setLayout(vbox)
-    editor = QsciScintilla()
-    editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-    editor.setMarginLineNumbers(1, True)
-    editor.setMarginWidth(1, '000')
-    if opts.get('foldable'):
-        editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
-    vbox.addWidget(editor)
-    BB = QDialogButtonBox
-    bb = QDialogButtonBox(BB.Save|BB.Cancel)
-    bb.accepted.connect(dialog.accept)
-    bb.rejected.connect(dialog.reject)
-    vbox.addWidget(bb)
-    lexer = QsciLexerProperties()
-    editor.setLexer(lexer)
-    s = QSettings()
-    ret = QDialog.Rejected
-    try:
-        contents = open(filename, 'rb').read()
-        dialog.setWindowTitle(filename)
-        geomname = 'editor-geom'
-        editor.setText(contents)
-        editor.setUtf8(True)
-        editor.setModified(False)
-        dialog.restoreGeometry(s.value(geomname).toByteArray())
-        ret = dialog.exec_()
-        if ret == QDialog.Accepted:
-            f = util.atomictempfile(filename, 'wb', createmode=None)
-            f.write(hglib.fromunicode(editor.text()))
-            f.rename()
-        s.setValue(geomname, dialog.saveGeometry())
-    except EnvironmentError, e:
-        WarningMsgBox(_('Unable to read/write config file'),
-                      hglib.tounicode(e), parent=dialog)
-    return ret
 
 class SharedWidget(QWidget):
     """Share a single widget by many parents

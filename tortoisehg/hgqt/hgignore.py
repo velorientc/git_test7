@@ -16,7 +16,7 @@ from mercurial import hg, ui, match, util, error
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import shlib, hglib, paths
 
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.hgqt import qtlib, qscilib, thgrepo
 
 class HgignoreDialog(QDialog):
     'Edit a repository .hgignore file'
@@ -194,7 +194,7 @@ class HgignoreDialog(QDialog):
         self.refresh()
 
     def editClicked(self):
-        if qtlib.fileEditor(self.ignorefile) == QDialog.Accepted:
+        if qscilib.fileEditor(self.ignorefile) == QDialog.Accepted:
             self.refresh()
 
     def addEntry(self):

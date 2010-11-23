@@ -1,5 +1,6 @@
 # qscilib.py - Utility codes for QsciScintilla
 #
+# Copyright 2010 Steve Borho <steve@borho.org>
 # Copyright 2010 Yuya Nishihara <yuya@tcha.org>
 #
 # This software may be used and distributed according to the terms of the
@@ -9,12 +10,13 @@ import re
 
 from mercurial import util
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciScintilla
+from PyQt4.Qsci import *
 
 class _SciImSupport(object):
     """Patch for QsciScintilla to implement improved input method support
@@ -403,3 +405,44 @@ class KeyPressInterceptor(QObject):
         if util.any(event.matches(e) for e in self._keyseqs):
             return True
         return False
+
+def fileEditor(filename, **opts):
+    'Open a simple modal file editing dialog'
+    dialog = QDialog()
+    dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+    vbox = QVBoxLayout()
+    dialog.setLayout(vbox)
+    editor = QsciScintilla()
+    editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+    editor.setMarginLineNumbers(1, True)
+    editor.setMarginWidth(1, '000')
+    if opts.get('foldable'):
+        editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
+    vbox.addWidget(editor)
+    BB = QDialogButtonBox
+    bb = QDialogButtonBox(BB.Save|BB.Cancel)
+    bb.accepted.connect(dialog.accept)
+    bb.rejected.connect(dialog.reject)
+    vbox.addWidget(bb)
+    lexer = QsciLexerProperties()
+    editor.setLexer(lexer)
+    s = QSettings()
+    ret = QDialog.Rejected
+    try:
+        contents = open(filename, 'rb').read()
+        dialog.setWindowTitle(filename)
+        geomname = 'editor-geom'
+        editor.setText(contents)
+        editor.setUtf8(True)
+        editor.setModified(False)
+        dialog.restoreGeometry(s.value(geomname).toByteArray())
+        ret = dialog.exec_()
+        if ret == QDialog.Accepted:
+            f = util.atomictempfile(filename, 'wb', createmode=None)
+            f.write(hglib.fromunicode(editor.text()))
+            f.rename()
+        s.setValue(geomname, dialog.saveGeometry())
+    except EnvironmentError, e:
+        qtlib.WarningMsgBox(_('Unable to read/write config file'),
+                            hglib.tounicode(e), parent=dialog)
+    return ret
