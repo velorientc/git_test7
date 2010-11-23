@@ -311,6 +311,8 @@ class SearchToolBar(QToolBar):
         if event.matches(QKeySequence.FindPrevious):
             self._emitSearchRequested(forward=False)
             return
+        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
+            return  # handled by returnPressed
         super(SearchToolBar, self).keyPressEvent(event)
 
     def wheelEvent(self, event):
