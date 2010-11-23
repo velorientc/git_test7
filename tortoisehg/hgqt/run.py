@@ -65,7 +65,7 @@ def dispatch(args):
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = error
         opts['nofork'] = True
-        qtrun(bugrun, u, **opts)
+        return qtrun(bugrun, u, **opts)
 
 origwdir = os.getcwd()
 def portable_fork(ui, opts):
@@ -446,8 +446,10 @@ class _QtRunner(QObject):
                 raise
             QTimer.singleShot(0, reraise)
 
-        self._mainapp.exec_()
-        self._mainapp = None
+        try:
+            return self._mainapp.exec_()
+        finally:
+            self._mainapp = None
 
     def _opendialog(self, dlgfunc, ui, *args, **opts):
         dlg = dlgfunc(ui, *args, **opts)
@@ -472,12 +474,12 @@ qtrun = _QtRunner()
 def add(ui, *pats, **opts):
     """add files"""
     from tortoisehg.hgqt.quickop import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def backout(ui, *pats, **opts):
     """backout tool"""
     from tortoisehg.hgqt.backout import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
@@ -487,147 +489,147 @@ def thgstatus(ui, *pats, **opts):
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
     from tortoisehg.hgqt.settings import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def repoconfig(ui, *pats, **opts):
     """repository configuration editor"""
     from tortoisehg.hgqt.settings import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt.clone import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def commit(ui, *pats, **opts):
     """commit tool"""
     from tortoisehg.hgqt.commit import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def email(ui, *pats, **opts):
     """send changesets by email"""
     from tortoisehg.hgqt.hgemail import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def resolve(ui, *pats, **opts):
     """resolve dialog"""
     from tortoisehg.hgqt.resolve import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def postreview(ui, *pats, **opts):
     """post changesets to reviewboard"""
     from tortoisehg.hgqt.postreview import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def merge(ui, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt.merge import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def manifest(ui, *pats, **opts):
     """display the current or given revision of the project manifest"""
     from tortoisehg.hgqt.manifestdialog import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def guess(ui, *pats, **opts):
     """guess previous renames or copies"""
     from tortoisehg.hgqt.guess import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def status(ui, *pats, **opts):
     """browse working copy status"""
     from tortoisehg.hgqt.status import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def tag(ui, *pats, **opts):
     """tag tool"""
     from tortoisehg.hgqt.tag import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def test(ui, *pats, **opts):
     """test arbitrary widgets"""
     from tortoisehg.hgqt.revset import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def purge(ui, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
     from tortoisehg.hgqt.purge import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def qreorder(ui, *pats, **opts):
     """Reorder unapplied MQ patches"""
     from tortoisehg.hgqt.qreorder import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def remove(ui, *pats, **opts):
     """remove selected files"""
     from tortoisehg.hgqt.quickop import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def revert(ui, *pats, **opts):
     """revert selected files"""
     from tortoisehg.hgqt.quickop import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def forget(ui, *pats, **opts):
     """forget selected files"""
     from tortoisehg.hgqt.quickop import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def hgignore(ui, *pats, **opts):
     """ignore filter editor"""
     from tortoisehg.hgqt.hgignore import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def serve(ui, *pats, **opts):
     """start stand-alone webserver"""
     from tortoisehg.hgqt.serve import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def sync(ui, *pats, **opts):
     """Synchronize with other repositories"""
     from tortoisehg.hgqt.sync import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def shellconfig(ui, *pats, **opts):
     """explorer extension configuration editor"""
     from tortoisehg.hgqt.shellconf import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def update(ui, *pats, **opts):
     """update/checkout tool"""
     from tortoisehg.hgqt.update import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def log(ui, *pats, **opts):
     """workbench application"""
     from tortoisehg.hgqt.workbench import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def vdiff(ui, *pats, **opts):
     """launch configured visual diff tool"""
     from tortoisehg.hgqt.visdiff import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def about(ui, *pats, **opts):
     """about dialog"""
     from tortoisehg.hgqt.about import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def grep(ui, *pats, **opts):
     """grep/search dialog"""
     from tortoisehg.hgqt.grep import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def archive(ui, *pats, **opts):
     """archive dialog"""
     from tortoisehg.hgqt.archive import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def bisect(ui, *pats, **opts):
     """bisect dialog"""
     from tortoisehg.hgqt.bisect import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def annotate(ui, *pats, **opts):
     """annotate dialog"""
@@ -635,32 +637,32 @@ def annotate(ui, *pats, **opts):
     if len(pats) != 1:
         ui.warn(_('annotate requires a single filename\n'))
         return
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def init(ui, *pats, **opts):
     """init dialog"""
     from tortoisehg.hgqt.hginit import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def rename(ui, *pats, **opts):
     """rename dialog"""
     from tortoisehg.hgqt.rename import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def strip(ui, *pats, **opts):
     """strip dialog"""
     from tortoisehg.hgqt.thgstrip import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def rebase(ui, *pats, **opts):
     """rebase dialog"""
     from tortoisehg.hgqt.rebase import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 def thgimport(ui, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt.thgimport import run
-    qtrun(run, ui, *pats, **opts)
+    return qtrun(run, ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
 def help_(ui, name=None, with_version=False, **opts):
