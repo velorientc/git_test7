@@ -412,7 +412,7 @@ def fileEditor(filename, **opts):
     dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
     vbox = QVBoxLayout()
     dialog.setLayout(vbox)
-    editor = QsciScintilla()
+    editor = Scintilla()
     editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
     editor.setMarginLineNumbers(1, True)
     editor.setMarginWidth(1, '000')
@@ -433,7 +433,6 @@ def fileEditor(filename, **opts):
         dialog.setWindowTitle(filename)
         geomname = 'editor-geom'
         editor.setText(contents)
-        editor.setUtf8(True)
         editor.setModified(False)
         dialog.restoreGeometry(s.value(geomname).toByteArray())
         ret = dialog.exec_()
