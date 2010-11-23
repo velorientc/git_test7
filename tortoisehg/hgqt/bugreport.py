@@ -14,7 +14,6 @@ from PyQt4.QtGui import *
 from mercurial import extensions, ui
 from tortoisehg.util import hglib, version
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
 
 class BugReport(QDialog):
 
@@ -26,8 +25,7 @@ class BugReport(QDialog):
         layout = QVBoxLayout()
 
         tb = QTextBrowser()
-        tb.document().setDefaultStyleSheet(qtlib.thgstylesheet)
-        tb.setHtml('<span>' + Qt.escape(self.text) + '</span>')
+        tb.setHtml('<pre>' + Qt.escape(self.text) + '</pre>')
         tb.setWordWrapMode(QTextOption.NoWrap)
         layout.addWidget(tb)
 
