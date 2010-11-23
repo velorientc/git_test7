@@ -419,6 +419,17 @@ def fileEditor(filename, **opts):
     if opts.get('foldable'):
         editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
     vbox.addWidget(editor)
+
+    searchbar = SearchToolBar(dialog, hidable=True)
+    searchbar.searchRequested.connect(editor.find)
+    searchbar.conditionChanged.connect(editor.highlightText)
+    searchbar.hide()
+    def showsearchbar():
+        searchbar.show()
+        searchbar.setFocus(Qt.OtherFocusReason)
+    QShortcut(QKeySequence.Find, dialog, showsearchbar)
+    vbox.addWidget(searchbar)
+
     BB = QDialogButtonBox
     bb = QDialogButtonBox(BB.Save|BB.Cancel)
     bb.accepted.connect(dialog.accept)
