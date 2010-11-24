@@ -146,7 +146,7 @@ class HgFileListView(QTableView):
     def createActions(self):
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
-            ('navigate', _('File history'), None, 'Shift+Enter',
+            ('navigate', _('File history'), None, 'Shift+Return',
               _('Show the history of the selected file'), self.navigate),
             ('diffnavigate', _('Compare file revisions'), None, None,
               _('Compare revisions of the selected file'), self.diffNavigate),
