@@ -116,6 +116,17 @@ class HgFileListView(QTableView):
         if dlg:
             dlg.exec_()
 
+    def vdifflocal(self):
+        filename = self.currentFile()
+        if filename is None:
+            return
+        model = self.model()
+        pats = [hglib.fromunicode(filename)]
+        opts = {'rev':[str(model._ctx.rev())]}
+        dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
+        if dlg:
+            dlg.exec_()
+
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self.currentFile()
@@ -139,8 +150,11 @@ class HgFileListView(QTableView):
               _('Show the history of the selected file'), self.navigate),
             ('diffnavigate', _('Compare file revisions'), None, None,
               _('Compare revisions of the selected file'), self.diffNavigate),
-            ('diff', _('Visual Diff'), None, 'CTRL+D',
+            ('diff', _('Visual Diff'), None, 'Ctrl+D',
               _('View file changes in external diff tool'), self.vdiff),
+            ('ldiff', _('Visual Diff to Local'), None, 'Shift+Ctrl+D',
+              _('View changes to current in external diff tool'),
+              self.vdifflocal),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -157,7 +171,7 @@ class HgFileListView(QTableView):
     def contextMenuEvent(self, event):
         if not self.contextmenu:
             self.contextmenu = QMenu(self)
-            for act in ['diff', 'navigate', 'diffnavigate']:
+            for act in ['diff', 'ldiff', 'navigate', 'diffnavigate']:
                 if act:
                     self.contextmenu.addAction(self._actions[act])
                 else:
