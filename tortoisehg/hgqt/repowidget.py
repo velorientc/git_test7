@@ -547,7 +547,9 @@ class RepoWidget(QWidget):
         rev = rev or self.rev
         if isinstance(rev, basestring):  # unapplied patch
             return
-        visdiff.visualdiff(self.repo.ui, self.repo, [], {'change':rev})
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], {'change':rev})
+        if dlg:
+            dlg.exec_()
 
     def reload(self):
         'Initiate a refresh of the repo model, rebuild graph'
@@ -810,8 +812,10 @@ class RepoWidget(QWidget):
                 self.exportRevisions(l)
         def diffPair():
             revA, revB = selection
-            visdiff.visualdiff(self.repo.ui, self.repo, [],
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, [],
                     {'rev':(str(revA), str(revB))})
+            if dlg:
+                dlg.exec_()
         def emailPair():
             run.email(self.repo.ui, rev=selection, repo=self.repo)
         def emailDagRange():
