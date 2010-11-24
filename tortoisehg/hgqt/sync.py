@@ -449,18 +449,27 @@ class SyncWidget(QWidget):
     ##
 
     def incoming(self):
+        if self.cmd.core.is_running():
+            self.output.emit(_('sync command already running'), 'control')
+            return
         if 'default' in self.paths:
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
             self.inclicked()
 
     def pull(self):
+        if self.cmd.core.is_running():
+            self.output.emit(_('sync command already running'), 'control')
+            return
         if 'default' in self.paths:
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
             self.pullclicked()
 
     def outgoing(self):
+        if self.cmd.core.is_running():
+            self.output.emit(_('sync command already running'), 'control')
+            return
         if 'default-push' in self.paths:
             self.setUrl(self.paths['default-push'])
             self.curalias = 'default-push'
@@ -471,6 +480,9 @@ class SyncWidget(QWidget):
             self.outclicked()
 
     def push(self):
+        if self.cmd.core.is_running():
+            self.output.emit(_('sync command already running'), 'control')
+            return
         if 'default-push' in self.paths:
             self.setUrl(self.paths['default-push'])
             self.curalias = 'default-push'
@@ -482,6 +494,9 @@ class SyncWidget(QWidget):
 
     def pullBundle(self, bundle, rev):
         'accept bundle changesets'
+        if self.cmd.core.is_running():
+            self.output.emit(_('sync command already running'), 'control')
+            return
         save = self.currentUrl(False)
         orev = self.opts.get('rev')
         self.setUrl(bundle)
@@ -492,7 +507,10 @@ class SyncWidget(QWidget):
         self.opts['rev'] = orev
 
     def pushToRevision(self, rev):
-        'accept bundle changesets'
+        'push to specified revision'
+        if self.cmd.core.is_running():
+            self.output.emit(_('sync command already running'), 'control')
+            return
         orev = self.opts.get('rev')
         self.opts['rev'] = str(rev)
         self.pushclicked()
