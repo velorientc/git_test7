@@ -586,6 +586,7 @@ class SyncWidget(QWidget):
             self.run(cmdline, ('force', 'branch', 'rev'))
 
     def p4pending(self):
+        p4url = self.currentUrl(False)
         def finished(ret, output):
             pending = {}
             if ret == 0:
@@ -615,7 +616,7 @@ class SyncWidget(QWidget):
             self.showMessage.emit(text)
             if pending:
                 from tortoisehg.hgqt.p4pending import PerforcePending
-                dlg = PerforcePending(self.repo, pending, self)
+                dlg = PerforcePending(self.repo, pending, p4url, self)
                 dlg.showMessage.connect(self.showMessage)
                 dlg.output.connect(self.output)
                 dlg.makeLogVisible.connect(self.makeLogVisible)

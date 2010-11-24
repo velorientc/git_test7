@@ -24,9 +24,10 @@ class PerforcePending(QDialog):
     makeLogVisible = pyqtSignal(bool)
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, repo, pending, parent):
+    def __init__(self, repo, pending, url, parent):
         QDialog.__init__(self, parent)
         self.repo = repo
+        self.url = url
         self.pending = pending # dict of changelist -> hash tuple
 
         layout = QVBoxLayout()
@@ -83,6 +84,7 @@ class PerforcePending(QDialog):
 
     def submit(self):
         assert(self.curcl.endswith('(pending)'))
+        # use self.url
         cmdline = ['p4submit', '--verbose', '--repository',
                 self.repo.root, self.curcl[:-10]]
         self.repo.incrementBusyCount()
@@ -93,6 +95,7 @@ class PerforcePending(QDialog):
 
     def revert(self):
         assert(self.curcl.endswith('(pending)'))
+        # use self.url
         cmdline = ['p4revert', '--verbose', '--repository',
                 self.repo.root, self.curcl[:-10]]
         self.repo.incrementBusyCount()
