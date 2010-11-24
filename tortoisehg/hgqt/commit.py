@@ -440,8 +440,14 @@ class CommitWidget(QWidget):
         self.userhist = s.value('commit/userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
         try:
-            curmsg = self.repo.opener('last-message.txt').read()
+            curmsg = self.repo.opener('cur-message.txt').read()
             self.setMessage(hglib.tounicode(curmsg))
+        except EnvironmentError:
+            pass
+        try:
+            curmsg = self.repo.opener('last-message.txt').read()
+            if curmsg:
+                self.addMessageToHistory(hglib.tounicode(curmsg))
         except EnvironmentError:
             pass
 
@@ -458,14 +464,11 @@ class CommitWidget(QWidget):
             else:
                 # current message is stored in local encoding
                 msg = self.getMessage()
-            self.repo.opener('last-message.txt', 'w').write(msg)
+            self.repo.opener('cur-message.txt', 'w').write(msg)
         except EnvironmentError:
             pass
 
-    def addMessageToHistory(self):
-        umsg = self.msgte.text()
-        if not umsg:
-            return
+    def addMessageToHistory(self, umsg):
         if umsg in self.msghistory:
             self.msghistory.remove(umsg)
         self.msghistory.insert(0, umsg)
@@ -627,7 +630,9 @@ class CommitWidget(QWidget):
     def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         if ret == 0:
-            self.addMessageToHistory()
+            umsg = self.msgte.text()
+            if umsg:
+                self.addMessageToHistory(umsg)
             if not self.qref:
                 self.msgte.clear()
             self.msgte.setModified(False)

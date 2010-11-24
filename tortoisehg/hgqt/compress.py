@@ -131,7 +131,7 @@ class CompressDialog(QDialog):
         revcount = len(self.repo)
         revs = [c for c in func(self.repo, range(revcount)) if c != base]
         descs = [self.repo[c].description() for c in revs]
-        self.repo.opener('last-message.txt', 'w').write('\n* * *\n'.join(descs))
+        self.repo.opener('cur-message.txt', 'w').write('\n* * *\n'.join(descs))
 
         dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
         dlg.finished.connect(dlg.deleteLater)
