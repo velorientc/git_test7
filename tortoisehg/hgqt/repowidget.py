@@ -744,6 +744,8 @@ class RepoWidget(QWidget):
                 (None, isrev, _('Email patch...'), None, self.emailRevision),
                 (None, isrev, _('Archive...'), None, self.archiveRevision),
                 (None, isrev, _('Copy hash'), None, self.copyHash),
+                ('transplant', fixed, _('Transplant to local'), None,
+                    self.transplantRevision),
                 ('rebase', None, None, None, None),
                 ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
                 ('mq', None, None, None, None),
@@ -924,6 +926,10 @@ class RepoWidget(QWidget):
         dlg.showMessage.connect(self.showMessage)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
+
+    def transplantRevision(self):
+        cmdline = ['transplant', '--repository', self.repo.root, str(self.rev)]
+        self.runCommand(_('Transplant - TortoiseHg'), cmdline)
 
     def pushToRevision(self):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
