@@ -525,7 +525,9 @@ class MatchTree(QTableView):
                 else:
                     defer.append([rev, path, line])
             if crev is not None:
-                visdiff.visualdiff(ui, repo, list(files), {'change':crev})
+                dlg = visdiff.visualdiff(ui, repo, list(files), {'change':crev})
+                if dlg:
+                    dlg.exec_()
             rows = defer
 
     def selectedRows(self):

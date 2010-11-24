@@ -374,7 +374,9 @@ class WctxFileTree(QTreeView):
             selfiles = []
             for index in self.selectedRows():
                 selfiles.append(self.model().getRow(index)[COL_PATH])
-            visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
+            if dlg:
+                dlf.exec_()
         else:
             return super(WctxFileTree, self).keyPressEvent(event)
 

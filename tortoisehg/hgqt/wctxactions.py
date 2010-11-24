@@ -126,7 +126,9 @@ def renamefromto(repo, deleted, unknown):
     repo.copy(deleted, unknown)
 
 def vdiff(parent, ui, repo, files):
-    visdiff.visualdiff(ui, repo, files, {})
+    dlg = visdiff.visualdiff(ui, repo, files, {})
+    if dlg:
+        dlg.exec_()
 
 def edit(parent, ui, repo, files, lineno=None, search=None):
     files = [util.shellquote(util.localpath(f)) for f in files]

@@ -188,7 +188,9 @@ class ResolveDialog(QDialog):
             opts = {}
             opts['rev'] = []
             opts['tool'] = self.tcombo.readValue()
-            visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            if dlg:
+                dlg.exec_()
 
     def vp0(self):
         paths = self.getSelectedPaths(self.rtree)
@@ -196,7 +198,9 @@ class ResolveDialog(QDialog):
             opts = {}
             opts['rev'] = [str(self.repo.parents()[0].rev()), '.']
             opts['tool'] = self.tcombo.readValue()
-            visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            if dlg:
+                dlg.exec_()
 
     def vp1(self):
         paths = self.getSelectedPaths(self.rtree)
@@ -204,7 +208,9 @@ class ResolveDialog(QDialog):
             opts = {}
             opts['rev'] = [str(self.repo.parents()[1].rev()), '.']
             opts['tool'] = self.tcombo.readValue()
-            visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+            if dlg:
+                dlg.exec_()
 
     def configChanged(self):
         'repository has detected a change to config files'
