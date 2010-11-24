@@ -200,7 +200,8 @@ class ThgRepoWrapper(QObject):
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools bookmarks bookmarkcurrent'''.split()
-_thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
+_thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
+                   _branchheads'''.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
@@ -391,6 +392,10 @@ def _extendrepo(repo):
             else:
                 return None
 
+        @propertycache
+        def _branchheads(self):
+            return [self.changectx(x) for x in self.branchmap()]
+
         def shell(self):
             'Returns terminal shell configured for this repo'
             return self._shell
@@ -515,7 +520,7 @@ def _extendchangectx(changectx):
 
         def thgbranchhead(self):
             '''True if self is a branch head'''
-            return self in [self._repo[x] for x in self._repo.branchmap()]
+            return self in self._repo._branchheads
 
         def changesToParent(self, whichparent):
             parent = self.parents()[whichparent]
