@@ -371,11 +371,6 @@ class RepoWidget(QWidget):
             self.dirty = False
 
     def createActions(self):
-        self.actionActivateRev = QAction('Activate rev.', self)
-        self.actionActivateRev.setShortcuts([Qt.SHIFT+Qt.Key_Return,
-                                             Qt.SHIFT+Qt.Key_Enter])
-        self.actionActivateRev.triggered.connect(self.revision_activated)
-        self.addAction(self.actionActivateRev)
         QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
 
     def dragEnterEvent(self, event):

@@ -16,6 +16,7 @@
 
 import os
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
@@ -104,6 +105,17 @@ class HgFileListView(QTableView):
     def diffNavigate(self, filename=None):
         self._navigate(filename, FileDiffDialog, self._diff_dialogs)
 
+    def vdiff(self):
+        filename = self.currentFile()
+        if filename is None:
+            return
+        model = self.model()
+        pats = [hglib.fromunicode(filename)]
+        opts = {'change':str(model._ctx.rev())}
+        dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
+        if dlg:
+            dlg.exec_()
+
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self.currentFile()
@@ -120,24 +132,23 @@ class HgFileListView(QTableView):
             dlg.raise_()
             dlg.activateWindow()
 
-    def _action_defs(self):
-        a = [('navigate', _('File history'), None, _('Show the history of '
-              'the selected file'), None, self.navigate),
-             ('diffnavigate', _('Compare file revisions'), None, _('Compare '
-              'revisions of the selected file'), None, self.diffNavigate),
-             ]
-        return a
-
     def createActions(self):
         self._actions = {}
-        for name, desc, icon, tip, key, cb in self._action_defs():
+        for name, desc, icon, key, tip, cb in [
+            ('navigate', _('File history'), None, 'Shift+Enter',
+              _('Show the history of the selected file'), self.navigate),
+            ('diffnavigate', _('Compare file revisions'), None, None,
+              _('Compare revisions of the selected file'), self.diffNavigate),
+            ('diff', _('Visual Diff'), None, 'CTRL+D',
+              _('View file changes in external diff tool'), self.vdiff),
+            ]:
             act = QAction(desc, self)
             if icon:
                 act.setIcon(geticon(icon))
-            if tip:
-                act.setStatusTip(tip)
             if key:
                 act.setShortcut(key)
+            if tip:
+                act.setStatusTip(tip)
             if cb:
                 act.triggered.connect(cb)
             self._actions[name] = act
@@ -146,7 +157,7 @@ class HgFileListView(QTableView):
     def contextMenuEvent(self, event):
         if not self.contextmenu:
             self.contextmenu = QMenu(self)
-            for act in ['navigate', 'diffnavigate']:
+            for act in ['diff', 'navigate', 'diffnavigate']:
                 if act:
                     self.contextmenu.addAction(self._actions[act])
                 else:
