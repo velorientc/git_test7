@@ -270,7 +270,7 @@ class ResolveDialog(QDialog):
                 b.setEnabled(full and merge)
         self.rtree.selectionModel().selectionChanged.connect(rchanged)
         rchanged(smodel.selection())
-        
+
         if u:
             txt = _('There are merge <b>conflicts</b> to be resolved')
         elif r:
