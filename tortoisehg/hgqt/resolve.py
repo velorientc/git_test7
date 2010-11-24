@@ -242,12 +242,13 @@ class ResolveDialog(QDialog):
                 smodel.select(model.index(i, 0), sflags)
                 smodel.select(model.index(i, 1), sflags)
 
-        def uchanged(l):
-            full = not l.isEmpty()
+        @pyqtSlot(QItemSelection, QItemSelection)
+        def uchanged(selected, deselected):
+            enable = self.utree.selectionModel().hasSelection()
             for b in self.ubuttons:
-                b.setEnabled(full)
-        self.utree.selectionModel().selectionChanged.connect(uchanged)
-        uchanged(smodel.selection())
+                b.setEnabled(enable)
+        smodel.selectionChanged.connect(uchanged)
+        uchanged(None, None)
 
         paths = selpaths(self.rtree)
         self.rtree.setModel(PathsModel(r, self))
@@ -261,15 +262,16 @@ class ResolveDialog(QDialog):
                 smodel.select(model.index(i, 0), sflags)
                 smodel.select(model.index(i, 1), sflags)
 
-        def rchanged(l):
-            full = not l.isEmpty()
+        @pyqtSlot(QItemSelection, QItemSelection)
+        def rchanged(selected, deselected):
+            enable = self.rtree.selectionModel().hasSelection()
             for b in self.rbuttons:
-                b.setEnabled(full)
+                b.setEnabled(enable)
             merge = len(self.repo.parents()) > 1
             for b in self.rmbuttons:
-                b.setEnabled(full and merge)
-        self.rtree.selectionModel().selectionChanged.connect(rchanged)
-        rchanged(smodel.selection())
+                b.setEnabled(enable and merge)
+        smodel.selectionChanged.connect(rchanged)
+        rchanged(None, None)
 
         if u:
             txt = _('There are merge <b>conflicts</b> to be resolved')
