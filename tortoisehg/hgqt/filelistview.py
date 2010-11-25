@@ -143,6 +143,15 @@ class HgFileListView(QTableView):
             files = [os.path.join(base, path)]
             wctxactions.edit(self, repo.ui, repo, files)
 
+    def editlocal(self):
+        filename = self.currentFile()
+        if filename is None:
+            return
+        model = self.model()
+        repo = model.repo
+        path = repo.wjoin(hglib.fromunicode(filename))
+        wctxactions.edit(self, repo.ui, repo, [path])
+
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self.currentFile()
@@ -173,6 +182,8 @@ class HgFileListView(QTableView):
               self.vdifflocal),
             ('edit', _('View at Revision'), None, 'Shift+Ctrl+E',
               _('View file as it appeared at this revision'), self.editfile),
+            ('ledit', _('Edit Local'), None, 'Alt+Ctrl+E',
+              _('Edit current file in working copy'), self.editlocal),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -189,7 +200,8 @@ class HgFileListView(QTableView):
     def contextMenuEvent(self, event):
         if not self.contextmenu:
             self.contextmenu = QMenu(self)
-            for act in ['diff', 'ldiff', 'navigate', 'diffnavigate']:
+            for act in ['diff', 'ldiff', 'edit', 'ledit',
+                        'navigate', 'diffnavigate']:
                 if act:
                     self.contextmenu.addAction(self._actions[act])
                 else:
