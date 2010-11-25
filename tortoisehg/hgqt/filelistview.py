@@ -20,7 +20,7 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
-from tortoisehg.hgqt import visdiff
+from tortoisehg.hgqt import visdiff, wctxactions
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -127,6 +127,22 @@ class HgFileListView(QTableView):
         if dlg:
             dlg.exec_()
 
+    def editfile(self):
+        filename = self.currentFile()
+        if filename is None:
+            return
+        model = self.model()
+        repo = model.repo
+        rev = model._ctx.rev()
+        path = hglib.fromunicode(filename)
+        if rev is None:
+            files = [repo.wjoin(path)]
+            wctxactions.edit(self, repo.ui, repo, files)
+        else:
+            base, _ = visdiff.snapshot(repo, [path], repo[rev])
+            files = [os.path.join(base, path)]
+            wctxactions.edit(self, repo.ui, repo, files)
+
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self.currentFile()
@@ -155,6 +171,8 @@ class HgFileListView(QTableView):
             ('ldiff', _('Visual Diff to Local'), None, 'Shift+Ctrl+D',
               _('View changes to current in external diff tool'),
               self.vdifflocal),
+            ('edit', _('View at Revision'), None, 'Shift+Ctrl+E',
+              _('View file as it appeared at this revision'), self.editfile),
             ]:
             act = QAction(desc, self)
             if icon:
