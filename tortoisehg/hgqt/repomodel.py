@@ -113,7 +113,7 @@ class HgRepoListModel(QAbstractTableModel):
             self.graph = Graph(self.repo, grapher, include_mq=True)
         self.rowcount = 0
         self.layoutChanged.emit()
-        self.ensureBuilt(row=self.fill_step)
+        self.ensureBuilt(row=0)
         self.showMessage.emit('')
         QTimer.singleShot(0, lambda: self.filled.emit())
 
