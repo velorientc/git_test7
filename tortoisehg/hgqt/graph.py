@@ -46,7 +46,7 @@ def revision_grapher(repo, **opts):
 
     If follow is True, only generated the subtree from the start_rev head.
 
-    If branch is set, only generated the subtree for the given named branch. 
+    If branch is set, only generated the subtree for the given named branch.
 
     If allparents is set, include the branch heads for the selected named
     branch heads and all ancestors. If not set, include only the revisions
@@ -99,7 +99,7 @@ def revision_grapher(repo, **opts):
                     curr_rev -= 1
                 yield None
                 continue
-                    
+
             # New head.
             if start_rev and follow and curr_rev != start_rev:
                 curr_rev -= 1
