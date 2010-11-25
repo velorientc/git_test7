@@ -175,9 +175,13 @@ class InitDialog(QDialog):
                     hglib.tounicode(str(inst)))
             return False
         except util.Abort, inst:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
             qtlib.ErrorMsgBox(_('Error executing init'),
-                    _('Error when creating repository'),
-                    hglib.tounicode(str(inst)))
+                    _('Error when creating repository'), err)
             return False
         except:
             import traceback

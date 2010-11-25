@@ -107,8 +107,15 @@ class BisectDialog(QDialog):
                 bb.setEnabled(True)
                 ble.setEnabled(True)
                 ble.setFocus()
-            except (util.Abort, error.RepoLookupError), e:
+            except error.RepoLookupError, e:
                 self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
+            except util.Abort, e:
+                if e.hint:
+                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                                hglib.tounicode(e.hint))
+                else:
+                    err = hglib.tounicode(str(e))
+                self.cmd.core.stbar.showMessage(err)
         def bverify():
             bad = hglib.fromunicode(ble.text().simplified())
             try:
@@ -121,8 +128,15 @@ class BisectDialog(QDialog):
                 cmds.append(prefix + ['--good', str(self.goodrev)])
                 cmds.append(prefix + ['--bad', str(self.badrev)])
                 self.cmd.run(*cmds)
-            except (util.Abort, error.RepoLookupError), e:
+            except error.RepoLookupError, e:
                 self.cmd.core.stbar.showMessage(hglib.tounicode(str(e)))
+            except util.Abort, e:
+                if e.hint:
+                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                                hglib.tounicode(e.hint))
+                else:
+                    err = hglib.tounicode(str(e))
+                self.cmd.core.stbar.showMessage(err)
 
         gb.pressed.connect(gverify)
         bb.pressed.connect(bverify)

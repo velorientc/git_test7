@@ -110,10 +110,19 @@ def run(func, parent, files, repo):
             elif notify:
                 wfiles = [repo.wjoin(x) for x in files]
                 shlib.shell_notify(wfiles)
-        except (util.Abort, IOError, OSError), e:
-            QMessageBox.critical(parent, name + _(' Aborted'), str(e))
+        except (IOError, OSError), e:
+            err = hglib.tounicode(str(e))
+            QMessageBox.critical(parent, name + _(' Aborted'), err)
+        except util.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            QMessageBox.critical(parent, name + _(' Aborted'), err)
         except (error.LookupError), e:
-            QMessageBox.critical(parent, name + _(' Aborted'), str(e))
+            err = hglib.tounicode(str(e))
+            QMessageBox.critical(parent, name + _(' Aborted'), err)
         except NotImplementedError:
             QMessageBox.critical(parent, name + _(' not implemented'), 
                     'Please add it :)')

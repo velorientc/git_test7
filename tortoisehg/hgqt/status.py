@@ -335,16 +335,29 @@ class StatusThread(QThread):
             else:
                 wctx = self.repo[None]
                 wctx.status(**stopts)
-        except (OSError, IOError, util.Abort), e:
+        except (OSError, IOError), e:
             self.showMessage.emit(hglib.tounicode(str(e)))
+        except util.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            self.showMessage.emit(err)
         try:
             wctx.dirtySubrepos = []
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
                     wctx.dirtySubrepos.append(s)
-        except (OSError, IOError, util.Abort,
-                error.RepoLookupError, error.ConfigError), e:
+        except (OSError, IOError, error.RepoLookupError, error.ConfigError), e:
             self.showMessage.emit(hglib.tounicode(str(e)))
+        except util.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            self.showMessage.emit(err)
         self.wctx = wctx
         self.patchecked = patchecked
 

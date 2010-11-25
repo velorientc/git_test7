@@ -598,7 +598,12 @@ class CommitWidget(QWidget):
             else:
                 dcmd = []
         except error.Abort, e:
-            self.showMessage.emit(hglib.tounicode(str(e)))
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            self.showMessage.emit(err)
             dcmd = []
         if self.opts.get('patchName'):
             cmdline = ['qnew', '--repository', repo.root,
@@ -893,8 +898,12 @@ class DetailsDialog(QDialog):
             try:
                 util.parsedate(date)
             except error.Abort, e:
-                qtlib.WarningMsgBox(_('Invalid date format'),
-                                    hglib.tounicode(e), parent=self)
+                if e.hint:
+                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                                hglib.tounicode(e.hint))
+                else:
+                    err = hglib.tounicode(str(e))
+                qtlib.WarningMsgBox(_('Invalid date format'), err, parent=self)
                 return
             outopts['date'] = date
         else:
@@ -909,8 +918,13 @@ class DetailsDialog(QDialog):
             try:
                 self.repo.ui.username()
             except util.Abort, e:
+                if e.hint:
+                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                                hglib.tounicode(e.hint))
+                else:
+                    err = hglib.tounicode(str(e))
                 qtlib.WarningMsgBox(_('No username configured'),
-                                    hglib.tounicode(e), parent=self)
+                                    err, parent=self)
                 return
 
         if self.pushaftercb.isChecked():
