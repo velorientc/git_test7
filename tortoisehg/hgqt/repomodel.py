@@ -15,6 +15,7 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 from mercurial import util, error
+from mercurial.util import propertycache
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.graph import Graph
@@ -50,28 +51,6 @@ def get_color(n, ignore=()):
         colors = COLORS
     return colors[n % len(colors)]
 
-def datacached(meth):
-    """
-    decorator used to cache 'data' method of Qt models. It will *not*
-    cache nullvariant return values (so costly non-null values
-    can be computed and filled as a background process)
-    """
-    def data(self, index, role):
-        if not index.isValid():
-            return nullvariant
-        row = index.row()
-        col = index.column()
-        if (row, col, role) in self.datacache:
-            return self.datacache[(row, col, role)]
-        try:
-            result = meth(self, index, role)
-        except util.Abort:
-            result = nullvariant
-        if result is not nullvariant:
-            self.datacache[(row, col, role)] = result
-        return result
-    return data
-
 class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
@@ -88,7 +67,7 @@ class HgRepoListModel(QAbstractTableModel):
         repo is a hg repo instance
         """
         QAbstractTableModel.__init__(self, parent)
-        self.datacache = {}
+        self._cache = []
         self.graph = None
         self.timerHandle = None
         self.dotradius = 8
@@ -124,7 +103,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     def setBranch(self, branch=None, allparents=True):
         self.filterbranch = branch
-        self.datacache = {}
+        self.invalidateCache()
         if self.revset and self.filterbyrevset:
             grapher = revision_grapher(self.repo, revset=self.revset)
             self.graph = Graph(self.repo, grapher, include_mq=False)
@@ -151,17 +130,12 @@ class HgRepoListModel(QAbstractTableModel):
         validcols = [col for col in cols if col in ALLCOLUMNS]
         if validcols:
             self._columns = tuple(validcols)
-            self.datacache = {}
+            self.invalidateCache()
             self.layoutChanged.emit()
-
-    @property
-    def columns(self):
-        """Return names of visible columns"""
-        return self._columns
 
     def invalidate(self):
         self.reloadConfig()
-        self.datacache = {}
+        self.invalidateCache()
         self.layoutChanged.emit()
 
     def branch(self):
@@ -374,13 +348,56 @@ class HgRepoListModel(QAbstractTableModel):
         painter.end()
         return QVariant(pix)
 
-    @datacached
+    def invalidateCache(self):
+        self._cache = []
+        for a in ('_roleoffsets',):
+            if hasattr(self, a):
+                delattr(self, a)
+
+    @propertycache
+    def _roleoffsets(self):
+        return {Qt.DisplayRole : 0,
+                Qt.ForegroundRole : len(self._columns),
+                Qt.DecorationRole : len(self._columns) * 2}
+
     def data(self, index, role):
         if not index.isValid():
             return nullvariant
+        if role in self._roleoffsets:
+            offset = self._roleoffsets[role]
+        else:
+            return nullvariant
         row = index.row()
         self.ensureBuilt(row=row)
+        graphlen = len(self.graph)
+        cachelen = len(self._cache)
+        if graphlen > cachelen:
+            self._cache.extend([None,] * (graphlen-cachelen))
+        data = self._cache[row]
+        if data is None:
+            data = [None,] * (self._roleoffsets[Qt.DecorationRole]+1)
         column = self._columns[index.column()]
+        if role == Qt.DecorationRole:
+            if column != 'Graph':
+                return nullvariant
+            if data[offset] is None:
+                gnode = self.graph[row]
+                ctx = self.repo.changectx(gnode.rev)
+                data[offset] = self.graphctx(ctx, gnode)
+                self._cache[row] = data
+            return data[offset]
+        else:
+            idx = index.column() + offset
+            if data[idx] is None:
+                try:
+                    result = self.rawdata(row, column, role)
+                except util.Abort:
+                    result = nullvariant
+                data[idx] = result
+                self._cache[row] = data
+            return data[idx]
+
+    def rawdata(self, row, column, role):
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 
@@ -398,9 +415,6 @@ class HgRepoListModel(QAbstractTableModel):
                 return nullvariant
             if column == 'Branch':
                 return QVariant(QColor(self.namedbranch_color(ctx.branch())))
-        elif role == Qt.DecorationRole:
-            if column == 'Graph':
-                return self.graphctx(ctx, gnode)
         return nullvariant
 
     def flags(self, index):
