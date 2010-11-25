@@ -152,6 +152,13 @@ class HgFileListView(QTableView):
         path = repo.wjoin(hglib.fromunicode(filename))
         wctxactions.edit(self, repo.ui, repo, [path])
 
+    def revertfile(self):
+        filename = self.currentFile()
+        if filename is None:
+            return
+        model = self.model()
+        # TODO - make a dialog to verify revert, offer to revert all
+
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self.currentFile()
@@ -184,6 +191,9 @@ class HgFileListView(QTableView):
               _('View file as it appeared at this revision'), self.editfile),
             ('ledit', _('Edit Local'), None, 'Alt+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
+            ('revert', _('Revert to Revision'), None, 'Alt+Ctrl+T',
+              _('Revert file(s) to contents at this revision'),
+              self.revertfile),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -200,7 +210,7 @@ class HgFileListView(QTableView):
     def contextMenuEvent(self, event):
         if not self.contextmenu:
             self.contextmenu = QMenu(self)
-            for act in ['diff', 'ldiff', 'edit', 'ledit',
+            for act in ['diff', 'ldiff', 'edit', 'ledit', 'revert',
                         'navigate', 'diffnavigate']:
                 if act:
                     self.contextmenu.addAction(self._actions[act])
