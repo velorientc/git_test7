@@ -23,7 +23,7 @@ import time, datetime
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import error, util, cmdutil
+from mercurial import error, extensions, cmdutil
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo
@@ -38,7 +38,8 @@ class LoadReviewDataThread(QThread):
 
     def run(self):
         msg = None
-
+        reviewboard = extensions.find('reviewboard')       
+        
         if self.dialog.server:
             try:
                 self._reviewboard = reviewboard.ReviewBoard(self.dialog.server,
