@@ -33,6 +33,50 @@ _regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|ch
 
 _nonexistant = _('[non-existant]')
 
+def snapshotset(repo, ctxs, sa, sb, copies, tmproot, copyworkingdir = False):
+    '''snapshot files from parent-child set of revisions'''
+    ctx1a, ctx1b, ctx2 = ctxs
+    mod_a, add_a, rem_a = sa
+    mod_b, add_b, rem_b = sb
+    if copies:
+        sources = set(copies.values())
+    else:
+        sources = set()
+
+    # Always make a copy of ctx1a
+    files1a = sources | mod_a | rem_a | ((mod_b | add_b) - add_a)
+    dir1a, fns_mtime1a = snapshot(repo, files1a, ctx1a, tmproot)
+    label1a = '@%d' % ctx1a.rev()
+
+    # Make a copy of ctx1b if relevant
+    if ctx1b:
+        files1b = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
+        dir1b, fns_mtime1b = snapshot(repo, files1b, ctx1b, tmproot)
+        label1b = '@%d' % ctx1b.rev()
+    else:
+        dir1b = None
+        fns_mtime1b = []
+        label1b = ''
+
+    # Either make a copy of ctx2, or use working dir directly if relevant.
+    files2 = mod_a | add_a | mod_b | add_b
+    if ctx2.rev() is None:
+        if copyworkingdir:
+            dir2, fns_mtime2 = snapshot(repo, files2, ctx2, tmproot)
+        else:
+            dir2 = repo.root
+            fns_mtime2 = []
+        # If ctx2 is working copy, use empty label.
+        label2 = ''
+    else:
+        dir2, fns_mtime2 = snapshot(repo, files2, ctx2, tmproot)
+        label2 = '@%d' % ctx2.rev()
+
+    dirs = [dir1a, dir1b, dir2]
+    labels = [label1a, label1b, label2]
+    fns_and_mtimes = [fns_mtime1a, fns_mtime1b, fns_mtime2]
+    return dirs, labels, fns_and_mtimes
+
 def snapshot(repo, files, ctx, tmproot):
     '''snapshot files as of some revision'''
     dirname = os.path.basename(repo.root) or 'root'
@@ -181,7 +225,7 @@ def visualdiff(ui, repo, pats, opts):
     else:
         hascopies = False
     force = repo.ui.configbool('tortoisehg', 'forcevdiffwin')
-    if len(toollist) > 1 or hascopies or force:
+    if len(toollist) > 1 or (hascopies and len(MAR) > 1) or force:
         usewin = True
     else:
         preferred = toollist.pop()
@@ -217,32 +261,22 @@ def visualdiff(ui, repo, pats, opts):
         args = diffopts
 
     def dodiff(tmproot):
-        fns_and_mtime = []
+        assert not (hascopies and len(MAR) > 1), \
+                'dodiff cannot handle copies when diffing dirs'
 
-        # Always make a copy of ctx1a (and ctx1b, if applicable)
-        files = mod_a | rem_a | ((mod_b | add_b) - add_a)
-        dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
-        label1a = '@%d' % ctx1a.rev()
-        if do3way:
-            files = mod_b | rem_b | ((mod_a | add_a) - add_b)
-            dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
-            label1b = '@%d' % ctx1b.rev()
-        else:
-            dir1b =  None
-            label1b = ''
+        sa = [mod_a, add_a, rem_a]
+        sb = [mod_b, add_b, rem_b]
+        ctxs = [ctx1a, ctx1b, ctx2]
 
-        if ctx2.rev() is not None:
-            # If ctx2 is not the working copy, create a snapshot for it
-            dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
-            label2 = '@%d' % ctx2.rev()
-        elif len(MAR) == 1:
-            # This lets the diff tool open the changed file directly
-            label2 = ''
-            dir2 = repo.root
-        else:
-            # Create a snapshot, record mtime to detect mods made by
-            # diff tool
-            dir2, fns_and_mtime = snapshot(repo, MA, ctx2, tmproot)
+        # If more than one file, diff on working dir copy.
+        copyworkingdir = len(MAR) > 1
+        dirs, labels, fns_and_mtimes = snapshotset(repo, ctxs, sa, sb, cpy, 
+                                                   tmproot, copyworkingdir)
+        dir1a, dir1b, dir2 = dirs
+        label1a, label1b, label2 = labels
+        fns_and_mtime = fns_and_mtimes[2]
+
+        if len(MAR) > 1 and label2 == '':
             label2 = 'working files'
 
         def getfile(fname, dir, label):
@@ -257,11 +291,15 @@ def visualdiff(ui, repo, pats, opts):
         # If only one change, diff the files instead of the directories
         # Handle bogus modifies correctly by checking if the files exist
         if len(MAR) == 1:
-            lfile = util.localpath(MAR.pop())
-            label1a, dir1a = getfile(lfile, dir1a, label1a)
+            file2 = util.localpath(MAR.pop())
+            if file2 in cto:
+                file1 = util.localpath(cpy[file2])
+            else:
+                file1 = file2
+            label1a, dir1a = getfile(file1, dir1a, label1a)
             if do3way:
-                label1b, dir1b = getfile(lfile, dir1b, label1b)
-            label2, dir2 = getfile(lfile, dir2, label2)
+                label1b, dir1b = getfile(file1, dir1b, label1b)
+            label2, dir2 = getfile(file2, dir2, label2)
         if do3way:
             label1a += '[local]'
             label1b += '[other]'
@@ -418,39 +456,9 @@ class FileSelectionDialog(gtk.Dialog):
         gobject.idle_add(self.fillmodel, repo, model, sa, sb)
 
     def fillmodel(self, repo, model, sa, sb):
-        ctx1a, ctx1b, ctx2 = self.ctxs
-        mod_a, add_a, rem_a = sa
-        mod_b, add_b, rem_b = sb
-        sources = set(self.copies.values())
-
-        MA = mod_a | add_a | mod_b | add_b
-        MAR = MA | rem_a | rem_b | sources
-
         tmproot = tempfile.mkdtemp(prefix='visualdiff.')
         self.tmproot = tmproot
-
-        # Always make a copy of node1a (and node1b, if applicable)
-        files = sources | mod_a | rem_a | ((mod_b | add_b) - add_a)
-        dir1a = snapshot(repo, files, ctx1a, tmproot)[0]
-        rev1a = '@%d' % ctx1a.rev()
-        if ctx1b:
-            files = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
-            dir1b = snapshot(repo, files, ctx1b, tmproot)[0]
-            rev1b = '@%d' % ctx1b.rev()
-        else:
-            dir1b = None
-            rev1b = ''
-
-        # If ctx2 is the working copy, use it directly
-        if ctx2.rev() is None:
-            dir2 = repo.root
-            rev2 = ''
-        else:
-            dir2 = snapshot(repo, MA, ctx2, tmproot)[0]
-            rev2 = '@%d' % ctx2.rev()
-
-        self.dirs = (dir1a, dir1b, dir2)
-        self.revs = (rev1a, rev1b, rev2)
+        self.dirs, self.revs = snapshotset(repo, self.ctxs, sa, sb, self.copies, tmproot)[:2]
 
         def get_status(file, mod, add, rem):
             if file in mod:
@@ -461,6 +469,7 @@ class FileSelectionDialog(gtk.Dialog):
                 return 'R'
             return ' '
 
+        mod_a, add_a, rem_a = sa
         for f in sorted(mod_a | add_a | rem_a):
             model.append([get_status(f, mod_a, add_a, rem_a), hglib.toutf(f)])
 
