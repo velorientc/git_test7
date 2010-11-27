@@ -520,9 +520,9 @@ INFO = (
     (_('Password'), 'reviewboard.password', genPasswordEntry,
         _('Password to authenticate with review board')),
     (_('Target Groups'), 'reviewboard.target_groups', genEditCombo,
-        _('A comma seperated list of target groups')),
+        _('A comma separated list of target groups')),
     (_('Target People'), 'reviewboard.target_people', genEditCombo,
-        _('A comma seperated list of target people')),
+        _('A comma separated list of target people')),
     )),
 
 )
