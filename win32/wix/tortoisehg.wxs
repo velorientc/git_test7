@@ -125,34 +125,6 @@
             />
           </Component>
 
-          <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
-            <File Id='thgshellx86dll' Name='ThgShellx86.dll' KeyPath='yes'
-                  Source='win32\ThgShellx86.dll'
-            />
-            <RegistryValue
-              Root='HKLM' Key='$(var.ProgramRegKey)'
-              Type='string' Value='[INSTALLDIR]'
-            />
-            <RegistryValue
-              Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
-              Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
-            />
-            <?foreach CLSID in $(var.OverlayCLSIDList) ?>
-              <RegistryValue
-                Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
-                Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
-              />
-            <?endforeach?>
-          </Component>         
-          <Component Id='CmenuShellRegistrationX86' 
-                     Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
-            <?include shell-register-cmenu.wxi ?>
-          </Component>
-          <Component Id='OverlaysShellRegistrationX86' 
-                     Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
-            <?include shell-register-overlays.wxi ?>
-          </Component>
-
           <?if $(var.Platform) = "x64" ?>
             <Component Id='thgshellx64dll' Guid='$(var.thgshellx64dll.guid)' Win64='yes'>
               <File Id='thgshellx64dll' Name='ThgShellx64.dll' KeyPath='yes'
@@ -175,6 +147,34 @@
             </Component>
             <Component Id='OverlaysShellRegistrationX64' Win64='yes'
                        Guid='$(var.OverlaysShellRegistrationX64.guid)'>
+              <?include shell-register-overlays.wxi ?>
+            </Component>
+          <?else?>
+            <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
+              <File Id='thgshellx86dll' Name='ThgShellx86.dll' KeyPath='yes'
+                    Source='win32\ThgShellx86.dll'
+              />
+              <RegistryValue
+                Root='HKLM' Key='$(var.ProgramRegKey)'
+                Type='string' Value='[INSTALLDIR]'
+              />
+              <RegistryValue
+                Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+                Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
+              />
+              <?foreach CLSID in $(var.OverlayCLSIDList) ?>
+                <RegistryValue
+                  Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
+                  Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
+                />
+              <?endforeach?>
+            </Component>         
+            <Component Id='CmenuShellRegistrationX86' 
+                      Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
+              <?include shell-register-cmenu.wxi ?>
+            </Component>
+            <Component Id='OverlaysShellRegistrationX86' 
+                      Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
               <?include shell-register-overlays.wxi ?>
             </Component>
           <?endif?>
@@ -286,6 +286,40 @@
           </Component>
         </Directory>
       </Directory>
+
+      <?if $(var.Platform) = "x64" ?>
+        <Directory Id="ProgramFilesFolder" Name="Programsx86">
+          <Directory Id='INSTALLDIRx86' Name='TortoiseHg'>
+            <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
+              <File Id='thgshellx86dll' Name='ThgShellx86.dll' KeyPath='yes'
+                    Source='win32\ThgShellx86.dll'
+              />
+              <RegistryValue
+                Root='HKLM' Key='$(var.ProgramRegKey)'
+                Type='string' Value='[INSTALLDIRx86]'
+              />
+              <RegistryValue
+                Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+                Type='string' Value='[INSTALLDIRx86]ThgShellx86.dll'
+              />
+              <?foreach CLSID in $(var.OverlayCLSIDList) ?>
+                <RegistryValue
+                  Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
+                  Type='string' Value='[INSTALLDIRx86]ThgShellx86.dll'
+                />
+              <?endforeach?>
+            </Component>         
+            <Component Id='CmenuShellRegistrationX86' 
+                      Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
+              <?include shell-register-cmenu.wxi ?>
+            </Component>
+            <Component Id='OverlaysShellRegistrationX86' 
+                      Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
+              <?include shell-register-overlays.wxi ?>
+            </Component>
+          </Directory>
+        </Directory>
+      <?endif?>
 
       <?if $(var.Platform) = "x86" ?>
         <Merge Id='VCRedist' DiskId='1' Language='1033'

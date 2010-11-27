@@ -2,7 +2,7 @@
 setlocal
 
 if not exist %hhc_compiler%. (
-	set hhc_compiler="%ProgramFiles%\HTML Help Workshop\hhc.exe"
+	set hhc_compiler=hhc.exe
 )
 set PDFLATEX=PdfLatex
 set SPHINXBUILD=sphinx-build
