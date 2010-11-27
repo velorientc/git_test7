@@ -243,7 +243,7 @@ class CmdThread(QThread):
             dlg.setLabelText(prompt.title())
             dlg.setTextEchoMode(mode)
             if dlg.exec_():
-                text = dlg.textValue()
+                text = hglib.fromunicode(dlg.textValue())
             else:
                 text = None
             self.responseq.put(text)
