@@ -272,14 +272,10 @@ class CmdThread(QThread):
             self.ret = 255
             self.ret = dispatch._dispatch(ui, self.cmdline) or 0
         except util.Abort, e:
-            import traceback
-            traceback.print_exc()
             ui.write_err(local._('abort: ') + str(e) + '\n')
             if e.hint:
                 ui.write_err(local._('hint: ') + str(e.hint) + '\n')
         except (error.RepoError, urllib2.HTTPError), e:
-            import traceback
-            traceback.print_exc()
             ui.write_err(str(e) + '\n')
         except (Exception, OSError, IOError), e:
             import traceback
