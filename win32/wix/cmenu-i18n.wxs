@@ -2,6 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <?include guids.wxi ?>
+  <?include defines.wxi ?>
 
   <?define thgcmenulangs = 
     cs;da;de;en_GB;en_US;es;fa;fr;he;hr;it;ja;ko;nl;nn;pl;pt;pt_BR;ru;tr;uk;zh_CN;zh_TW
@@ -11,7 +12,7 @@
   <Fragment>
     <DirectoryRef Id="i18ndir">
       <Directory Id="cmenuI18n" Name="cmenu" FileSource="$(var.SourceDir)">
-        <Component Id="cmenuI18n" Guid="$(var.cmenuI18n.guid)">
+        <Component Id="cmenuI18n" Guid="$(var.cmenuI18n.guid)" Win64='$(var.IsX64)'>
           <File Name="thg-cmenu-ca.reg" KeyPath="yes"/>
           <?foreach LANG in $(var.thgcmenulangs) ?>
             <File Name="thg-cmenu-$(var.LANG).reg" />

@@ -7,11 +7,12 @@
   GNU General Public License version 2 or any later version. -->
 
   <?include guids.wxi ?>
+  <?include defines.wxi ?>
 
   <?if $(var.Platform) = "x64" ?>
-    <?define IsX64 = yes ?>
+    <?define PFolder = ProgramFiles64Folder ?>
   <?else?>
-    <?define IsX64 = no ?>
+    <?define PFolder = ProgramFilesFolder ?>
   <?endif?>
 
   <?define ProgramRegKey = Software\TortoiseHg ?>
@@ -85,9 +86,9 @@
     <Property Id='LicenseAccepted'>1</Property>
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
-      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+      <Directory Id='$(var.PFolder)' Name='PFiles'>
         <Directory Id='INSTALLDIR' Name='TortoiseHg'>
-          <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)'>
+          <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)' Win64='$(var.IsX64)'>
             <File Id='thgEXE' Name='thg.exe' KeyPath='yes'
                   Source='dist\thg.exe'
             />
@@ -95,20 +96,20 @@
                          Permanent="no" Value="[INSTALLDIR]bin" Action="set"
             />
           </Component>
-          <Component Id='WinExecutable' Guid='$(var.ComponentWinExecutableGUID)'>
+          <Component Id='WinExecutable' Guid='$(var.ComponentWinExecutableGUID)' Win64='$(var.IsX64)'>
             <File Id='thgwEXE' Name='thgw.exe' Source='dist\thgw.exe' />
             <Shortcut Id="thgStartMenu" Directory="ProgramMenuDir"
                       Name="TortoiseHg Workbench"
                       Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
             />
           </Component>
-          <Component Id='ExtensionVersions' Guid='$(var.ExtensionVersions.guid)'>
+          <Component Id='ExtensionVersions' Guid='$(var.ExtensionVersions.guid)' Win64='$(var.IsX64)'>
             <File Id='ExtensionVersions' Name='extension-versions.txt'
                   KeyPath='yes'
                   Source='..\extension-versions.txt'
             />
           </Component>
-          <Component Id='OverlayServerEXE' Guid='$(var.OverlayServerEXE.guid)'>
+          <Component Id='OverlayServerEXE' Guid='$(var.OverlayServerEXE.guid)' Win64='$(var.IsX64)'>
             <File Id='OverlayServerEXE' Name='TortoiseHgOverlayServer.exe'
                   KeyPath='yes'
                   Source='dist\TortoiseHgOverlayServer.exe' >
@@ -123,7 +124,8 @@
               Type='string' Value='[INSTALLDIR]TortoiseHgOverlayServer.exe'
             />
           </Component>
-          <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)'>
+
+          <Component Id='thgshellx86dll' Guid='$(var.thgshellx86dll.guid)' Win64='no'>
             <File Id='thgshellx86dll' Name='ThgShellx86.dll' KeyPath='yes'
                   Source='win32\ThgShellx86.dll'
             />
@@ -143,33 +145,58 @@
             <?endforeach?>
           </Component>         
           <Component Id='CmenuShellRegistrationX86' 
-                     Guid='$(var.CmenuShellRegistrationX86.guid)'
-          >
+                     Guid='$(var.CmenuShellRegistrationX86.guid)' Win64='no'>
             <?include shell-register-cmenu.wxi ?>
           </Component>
           <Component Id='OverlaysShellRegistrationX86' 
-                     Guid='$(var.OverlaysShellRegistrationX86.guid)'
-          >
+                     Guid='$(var.OverlaysShellRegistrationX86.guid)' Win64='no'>
             <?include shell-register-overlays.wxi ?>
           </Component>
-          <Component Id='COPYING' Guid='$(var.COPYING.guid)'>
+
+          <?if $(var.Platform) = "x64" ?>
+            <Component Id='thgshellx64dll' Guid='$(var.thgshellx64dll.guid)' Win64='yes'>
+              <File Id='thgshellx64dll' Name='ThgShellx64.dll' KeyPath='yes'
+                    Source='win32\ThgShellx64.dll'/>
+              <RegistryValue
+                  Root='HKLM' Key='$(var.ProgramRegKey)'
+                  Type='string' Value='[INSTALLDIR]'/>
+              <RegistryValue
+                  Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+                  Type='string' Value='[INSTALLDIR]ThgShellx64.dll'/>
+              <?foreach CLSID in $(var.OverlayCLSIDList) ?>
+                <RegistryValue
+                  Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
+                  Type='string' Value='[INSTALLDIR]ThgShellx64.dll'/>
+              <?endforeach?>
+            </Component>
+            <Component Id='CmenuShellRegistrationX64' Win64='yes'
+                       Guid='$(var.CmenuShellRegistrationX64.guid)'>
+              <?include shell-register-cmenu.wxi ?>
+            </Component>
+            <Component Id='OverlaysShellRegistrationX64' Win64='yes'
+                       Guid='$(var.OverlaysShellRegistrationX64.guid)'>
+              <?include shell-register-overlays.wxi ?>
+            </Component>
+          <?endif?>
+
+          <Component Id='COPYING' Guid='$(var.COPYING.guid)' Win64='$(var.IsX64)'>
             <File Id='COPYING' Name='COPYING.txt'
                   Source='COPYING.txt'
             />
           </Component>
-          <Component Id='docdiffEXE' Guid='$(var.docdiffEXE.guid)'>
+          <Component Id='docdiffEXE' Guid='$(var.docdiffEXE.guid)' Win64='$(var.IsX64)'>
             <File Id='docdiffEXE' Name='docdiff.exe' KeyPath='yes'
                   Source='dist\docdiff.exe'
             />
           </Component>
-          <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)'>
+          <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
             <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
                   Source='..\contrib\kdiff3.exe'
             />
           </Component>
 
           <Directory Id='docFolder' Name='doc'>
-            <Component Id='chmFile' Guid='$(var.chmFile.guid)'>
+            <Component Id='chmFile' Guid='$(var.chmFile.guid)' Win64='$(var.IsX64)'>
               <File Id='chmFile' Name='TortoiseHg.chm' KeyPath='yes'
                     Source='doc\build\chm\TortoiseHg.chm' >
                   <Shortcut Id="chmStartMenu" Directory="ProgramMenuDir"
@@ -178,7 +205,7 @@
                   />
               </File>
             </Component>
-            <Component Id='pdfFile' Guid='$(var.pdfFile.guid)'>
+            <Component Id='pdfFile' Guid='$(var.pdfFile.guid)' Win64='$(var.IsX64)'>
               <File Id='pdfFile' Name='TortoiseHg.pdf' KeyPath='yes'
                     Source='doc\build\pdf\TortoiseHg.pdf'>
                   <Shortcut Id="pdfStartMenu" Directory="ProgramMenuDir"
@@ -187,7 +214,7 @@
                   />
               </File>
             </Component>
-            <Component Id='hgbook' Guid='$(var.hgbook.guid)'>
+            <Component Id='hgbook' Guid='$(var.hgbook.guid)' Win64='$(var.IsX64)'>
               <File Id='hgbook' Name='hgbook.pdf' KeyPath='yes'
                     Source='..\misc\hgbook.pdf'>
                   <Shortcut Id="hgbookStartMenu" Directory="ProgramMenuDir"
@@ -199,22 +226,22 @@
           </Directory>
 
           <Directory Id='binFolder' Name='bin'>
-            <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)'>
+            <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
               <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
                     Source='..\contrib\TortoisePlink.exe'
               />
             </Component>
-            <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)'>
+            <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)' Win64='$(var.IsX64)'>
               <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
                     Source='..\contrib\Pageant.exe'
               />
             </Component>
-            <Component Id='ThgCmd' Guid='$(var.thgcmd.guid)'>
+            <Component Id='ThgCmd' Guid='$(var.thgcmd.guid)' Win64='$(var.IsX64)'>
               <File Id='Thg.Cmd' Name='thg.cmd' KeyPath='yes'
                     Source='win32\thg.cmd'
               />
             </Component>
-            <Component Id='HgCmd' Guid='$(var.hgcmd.guid)'>
+            <Component Id='HgCmd' Guid='$(var.hgcmd.guid)' Win64='$(var.IsX64)'>
               <File Id='Hg.Cmd' Name='hg.cmd' KeyPath='yes'
                     Source='win32\hg.cmd'
               />
@@ -222,17 +249,17 @@
           </Directory>
 
           <Directory Id='HGRCD' Name='hgrc.d'>
-            <Component Id='mercurial.rc' Guid='$(var.mercurial.rc.guid)'>
+            <Component Id='mercurial.rc' Guid='$(var.mercurial.rc.guid)' Win64='$(var.IsX64)'>
               <File Id='mercurial.rc' Name='Mercurial.rc' ReadOnly='yes'
                     Source='win32\mercurial.rc'
               />
             </Component>
-            <Component Id='mergetools.rc' Guid='$(var.mergetools.rc.guid)'>
+            <Component Id='mergetools.rc' Guid='$(var.mergetools.rc.guid)' Win64='$(var.IsX64)'>
               <File Id='mergetools.rc' Name='MergeTools.rc' ReadOnly='yes'
                     Source='contrib\mergetools.rc'
               />
             </Component>
-            <Component Id="mergepatterns.rc" Guid='$(var.mergepatterns.rc.guid)'>
+            <Component Id="mergepatterns.rc" Guid='$(var.mergepatterns.rc.guid)' Win64='$(var.IsX64)'>
               <File Id='mergepatterns.rc' Name='MergePatterns.rc'
                     ReadOnly='yes' KeyPath='yes'
                     Source='win32\mergepatterns.rc'
@@ -260,54 +287,23 @@
         </Directory>
       </Directory>
 
-      <Merge Id='VCRedist' DiskId='1' Language='1033'
-             SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x86_msm.msm'
-      />
-      <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
-             SourceFile='$(var.VCRedistSrcDir)\policy.x.xx.microsoft.vcxx.crt.x86_msm.msm'
-      />
-      <Merge Id='TortoiseOverlaysMergeX86' Language='0' DiskId='1' 
-             SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX86)'
-      />
-      <?if $(var.Platform) = "x64" ?>
+      <?if $(var.Platform) = "x86" ?>
+        <Merge Id='VCRedist' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x86_msm.msm'/>
+        <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\policy.x.xx.microsoft.vcxx.crt.x86_msm.msm'/>
+      <?else?>
+        <Merge Id='VCRedist' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x64_msm.msm'/>
+        <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\policy.x.xx.microsoft.vcxx.crt.x64_msm.msm'/>
         <Merge Id='TortoiseOverlaysMergeX64' Language='0' DiskId='1' 
-               SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX64)'
-        />
-        <Directory Id="CommonFiles64Folder" Name="Programs64" >
-          <Directory Id="Common64" Name="TortoiseHg" >
-            <Component Id='thgshellx64dll' Guid='$(var.thgshellx64dll.guid)' Win64='yes'>
-              <File Id='thgshellx64dll' Name='ThgShellx64.dll' KeyPath='yes'
-                    Source='win32\ThgShellx64.dll'
-              />
-              <RegistryValue
-                  Root='HKLM' Key='$(var.ProgramRegKey)'
-                  Type='string' Value='[INSTALLDIR]'
-              />
-              <RegistryValue
-                  Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
-                  Type='string' Value='[Common64]ThgShellx64.dll'
-              />
-              <?foreach CLSID in $(var.OverlayCLSIDList) ?>
-                <RegistryValue
-                  Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
-                  Type='string' Value='[Common64]ThgShellx64.dll'
-                />
-              <?endforeach?>
-            </Component>
-            <Component Id='CmenuShellRegistrationX64' Win64='yes'
-                       Guid='$(var.CmenuShellRegistrationX64.guid)'
-            >
-              <?include shell-register-cmenu.wxi ?>
-            </Component>
-            <Component Id='OverlaysShellRegistrationX64' Win64='yes'
-                       Guid='$(var.OverlaysShellRegistrationX64.guid)'
-            >
-              <?include shell-register-overlays.wxi ?>
-            </Component>
-
-          </Directory>
-        </Directory>
+               SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX64)'/>
       <?endif?>
+
+      <Merge Id='TortoiseOverlaysMergeX86' Language='0' DiskId='1' 
+             SourceFile='$(var.TOverlaysSrcDir)\$(var.TOverlaysSrcFilenameX86)'/>
+
     </Directory>
 
     <Feature Id='Complete' Title='TortoiseHg'
@@ -367,8 +363,7 @@
         <ComponentRef Id='CmenuShellRegistrationX86' />
         <Feature Id='OverlaysX86' Title='Overlay Icons'
                  Level='1' AllowAdvertise='no'
-                 Description='Overlay icons for 32-bit processes'
-        >
+                 Description='Overlay icons for 32-bit processes'>
           <ComponentRef Id='OverlayServerEXE' />
           <MergeRef Id='TortoiseOverlaysMergeX86' />
           <ComponentRef Id='OverlaysShellRegistrationX86' />

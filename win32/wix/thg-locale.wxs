@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+  <?include defines.wxi ?>
+
   <?define thglocales = 
     ca;cs;da;de;en_GB;es;fa;fr;he;hr;hu;it;ja;nl;nn;pl;pt;pt_BR;ru;sv;tr;uk;zh_CN;zh_TW
   ?>
@@ -18,7 +20,7 @@
       <DirectoryRef Id="localedir" FileSource="$(var.SourceDir)">
         <Directory Id="thg.locale.$(var.LOC)" Name="$(var.LOC)">
           <Directory Id="thg.locale.$(var.LOC).LC_MESSAGES" Name="LC_MESSAGES">
-            <Component Id="thg.locale.$(var.LOC)" Guid="*">
+            <Component Id="thg.locale.$(var.LOC)" Guid="*" Win64='$(var.IsX64)'>
               <File Id="tortoisehg.mo.$(var.LOC)" Name="tortoisehg.mo" KeyPath="yes" />
             </Component>
           </Directory>

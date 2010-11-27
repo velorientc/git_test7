@@ -2,10 +2,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <?include guids.wxi ?>
+  <?include defines.wxi ?>
 
   <Fragment>
     <DirectoryRef Id="INSTALLDIR" FileSource="$(var.SourceDir)">
-      <Component Id="distOutput" Guid="$(var.dist.guid)">
+      <Component Id="distOutput" Guid="$(var.dist.guid)" Win64='$(var.IsX64)'>
         <File Name="library.zip" KeyPath="yes" />
         <File Name="hg.exe" />
         <File Name="mercurial.base85.pyd" />
@@ -33,7 +34,6 @@
         <File Name="win32api.pyd" />
         <File Name="win32com.shell.shell.pyd" />
         <File Name="win32console.pyd" />
-        <File Name="win32cred.pyd" />
         <File Name="win32event.pyd" />
         <File Name="win32file.pyd" />
         <File Name="win32gui.pyd" />
@@ -56,7 +56,7 @@
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
       <Directory Id="imgFmtDir" Name="imageformats" FileSource="$(var.SourceDir)/imageformats">
-        <Component Id="imageFormats" Guid="$(var.imageformats.guid)">
+        <Component Id="imageFormats" Guid="$(var.imageformats.guid)" Win64='$(var.IsX64)'>
           <File Name="qico4.dll" KeyPath="yes" />
           <File Name="qsvg4.dll" />
         </Component>

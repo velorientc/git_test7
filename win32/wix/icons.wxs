@@ -2,13 +2,14 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <?include guids.wxi ?>
+  <?include defines.wxi ?>
 
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
 
       <Directory Id="IconsDirectory" Name="icons" FileSource="$(var.SourceDir)">
 
-        <Component Id='Icons' Guid='$(var.Icons.guid)'>
+        <Component Id='Icons' Guid='$(var.Icons.guid)' Win64='$(var.IsX64)'>
           <File Name="branch.ico" KeyPath="yes" />
           <File Name="detect_rename.ico" />
           <File Name="fileadd.ico" />
