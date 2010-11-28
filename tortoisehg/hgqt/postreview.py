@@ -38,19 +38,27 @@ class LoadReviewDataThread(QThread):
 
     def run(self):
         msg = None
-        reviewboard = extensions.find('reviewboard')       
-        
-        if self.dialog.server:
-            try:
-                self._reviewboard = reviewboard.ReviewBoard(self.dialog.server,
-                                                            None, False)
-                self._reviewboard.login(self.dialog.user, self.dialog.password)
-                self.load_combos()
+        reviewboard = extensions.find('reviewboard')
 
-            except reviewboard.ReviewBoardError, e:
-                msg = e.message
+        server = self.dialog.server
+        user = self.dialog.user
+        password = self.dialog.password
+        
+        if server:
+            if user and password:
+                try:
+                    self._reviewboard = reviewboard.ReviewBoard(server, None,
+                                                                False)
+                    self._reviewboard.login(user, password)
+                    self.load_combos()
+
+                except reviewboard.ReviewBoardError, e:
+                    msg = e.message
+            else:
+                msg = _("Invalid Settings - Please provide your ReviewBoard " +
+                        "username and password")
         else:
-            msg = _("The review board server is not setup in settings")
+            msg = _("Invalid Settings - The ReviewBoard server is not setup")
 
         self.dialog._error_message = msg
 
@@ -307,7 +315,8 @@ class PostReviewDialog(QDialog):
 
         self._qui.post_review_button.setEnabled(False)
 
-        self._cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr], self, self.on_completion)
+        self._cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr],
+                                 self, self.on_completion)
         self._cmd.setWindowTitle(_('Posting Review'))
         self._cmd.show_output(False)
 
