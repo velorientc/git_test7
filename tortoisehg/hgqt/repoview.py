@@ -97,7 +97,7 @@ class HgRepoView(QTableView):
             return
         model = self.model()
 
-        for c in range(model.columnCount()):
+        for c in range(model.columnCount(QModelIndex())):
             if model._columns[c] in ['Log', 'Changes']:
                 self.setItemDelegateForColumn(c, self.htmlDelegate)
             else:
@@ -119,7 +119,7 @@ class HgRepoView(QTableView):
         col1_width = self.viewport().width()
         fontm = QFontMetrics(self.font())
         tot_stretch = 0.0
-        for c in range(model.columnCount()):
+        for c in range(model.columnCount(QModelIndex())):
             if model._columns[c] in model._stretchs:
                 tot_stretch += model._stretchs[model._columns[c]]
                 continue
@@ -134,7 +134,7 @@ class HgRepoView(QTableView):
                 self.setColumnWidth(c, w)
             col1_width -= self.columnWidth(c)
         col1_width = max(col1_width, 100)
-        for c in range(model.columnCount()):
+        for c in range(model.columnCount(QModelIndex())):
             if model._columns[c] in model._stretchs:
                 w = model._stretchs[model._columns[c]] / tot_stretch
                 self.setColumnWidth(c, col1_width * w)

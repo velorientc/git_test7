@@ -205,10 +205,14 @@ class HgRepoListModel(QAbstractTableModel):
             self.rowcount = newlen
             self.endInsertRows()
 
-    def rowCount(self, parent=None):
+    def rowCount(self, parent):
+        if parent.isValid():
+            return 0
         return self.rowcount
 
-    def columnCount(self, parent=None):
+    def columnCount(self, parent):
+        if parent.isValid():
+            return 0
         return len(self._columns)
 
     def maxWidthValueForColumn(self, col):
