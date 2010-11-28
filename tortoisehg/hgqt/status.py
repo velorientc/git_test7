@@ -519,6 +519,8 @@ class WctxModel(QAbstractTableModel):
                     return Qt.Checked
                 else:
                     return Qt.Unchecked
+            elif role == Qt.DisplayRole:
+                return QVariant("")
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
         elif role == Qt.TextColorRole:
