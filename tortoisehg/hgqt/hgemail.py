@@ -152,11 +152,15 @@ class EmailDialog(QDialog):
 
     def _patchbombopts(self, **opts):
         """Generate opts for patchbomb by form values"""
-        opts['to'] = [hglib.fromunicode(self._qui.to_edit.currentText())]
-        opts['cc'] = [hglib.fromunicode(self._qui.cc_edit.currentText())]
-        opts['from'] = hglib.fromunicode(self._qui.from_edit.currentText())
-        opts['in_reply_to'] = hglib.fromunicode(self._qui.inreplyto_edit.text())
-        opts['flag'] = [hglib.fromunicode(self._qui.flag_edit.currentText())]
+        def headertext(s):
+            # QLineEdit may contain newline character
+            return re.sub(r'\s', ' ', hglib.fromunicode(s))
+
+        opts['to'] = [headertext(self._qui.to_edit.currentText())]
+        opts['cc'] = [headertext(self._qui.cc_edit.currentText())]
+        opts['from'] = headertext(self._qui.from_edit.currentText())
+        opts['in_reply_to'] = headertext(self._qui.inreplyto_edit.text())
+        opts['flag'] = [headertext(self._qui.flag_edit.currentText())]
 
         def diffformat():
             n = self.getdiffformat()
@@ -178,7 +182,7 @@ class EmailDialog(QDialog):
 
         opts['intro'] = self._qui.writeintro_check.isChecked()
         if opts['intro']:
-            opts['subject'] = hglib.fromunicode(self._qui.subject_edit.text())
+            opts['subject'] = headertext(self._qui.subject_edit.text())
             opts['desc'] = writetempfile(hglib.fromunicode(self._qui.body_edit.toPlainText()))
             # TODO: change patchbomb not to use temporary file
 
