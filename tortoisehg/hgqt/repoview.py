@@ -32,7 +32,7 @@ class HgRepoView(QTableView):
     menuRequested = pyqtSignal(QPoint, object)
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, workbench, repo, parent=None):
+    def __init__(self, repo, parent=None):
         QTableView.__init__(self, parent)
         self.repo = repo
         self.init_variables()
@@ -52,10 +52,6 @@ class HgRepoView(QTableView):
 
         self.doubleClicked.connect(self.revActivated)
         self.clicked.connect(self.revClicked)
-
-        self._actions = {}
-        self._actions['back'] = workbench.actionBack
-        self._actions['forward'] = workbench.actionForward
 
     def setRepo(self, repo):
         self.repo = repo
@@ -174,7 +170,6 @@ class HgRepoView(QTableView):
         self.current_rev = rev
 
         self.revisionSelected.emit(rev)
-        self.updateActions()
 
     def selectedRevisions(self):
         """Return the list of selected revisions"""
@@ -194,33 +189,28 @@ class HgRepoView(QTableView):
                                 ctx.rev(), ctx2.rev()))
         self.goto(ancestor.rev())
 
-    def updateActions(self):
-        if len(self._rev_history) > 0:
-            back = self._rev_pos > 0
-            forw = self._rev_pos < len(self._rev_history)-1
-        else:
-            back = False
-            forw = False
-        self._actions['back'].setEnabled(back)
-        self._actions['forward'].setEnabled(forw)
+    def canGoBack(self):
+        return bool(self._rev_history and self._rev_pos > 0)
+
+    def canGoForward(self):
+        return bool(self._rev_history
+                    and self._rev_pos < len(self._rev_history) - 1)
 
     def back(self):
-        if self._rev_history and self._rev_pos>0:
+        if self.canGoBack():
             self._rev_pos -= 1
             idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
             if idx is not None:
                 self._in_history = True
                 self.setCurrentIndex(idx)
-        self.updateActions()
 
     def forward(self):
-        if self._rev_history and self._rev_pos<(len(self._rev_history)-1):
+        if self.canGoForward():
             self._rev_pos += 1
             idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
             if idx is not None:
                 self._in_history = True
                 self.setCurrentIndex(idx)
-        self.updateActions()
 
     def goto(self, rev):
         """

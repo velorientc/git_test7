@@ -115,8 +115,9 @@ class RepoWidget(QWidget):
 
         self.layout().addWidget(self.repotabs_splitter)
 
-        self.repoview = view = HgRepoView(self.workbench, self.repo)
+        self.repoview = view = HgRepoView(self.repo, self)
         view.revisionSelected.connect(self.revision_selected)
+        view.revisionSelected.connect(self.updateHistoryActions)
         view.revisionClicked.connect(self.revision_clicked)
         view.revisionActivated.connect(self.revision_activated)
         view.showMessage.connect(self.showMessage)
@@ -619,9 +620,11 @@ class RepoWidget(QWidget):
     ## Workbench methods
     ##
 
-    def switchedTo(self):
+    @pyqtSlot()
+    def updateHistoryActions(self):
         'Update back / forward actions'
-        self.repoview.updateActions()
+        self.workbench.actionBack.setEnabled(self.repoview.canGoBack())
+        self.workbench.actionForward.setEnabled(self.repoview.canGoForward())
 
     def storeSettings(self):
         self.revDetailsWidget.storeSettings()

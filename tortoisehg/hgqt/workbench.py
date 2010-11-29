@@ -413,7 +413,7 @@ class Workbench(QMainWindow):
     def repoTabChanged(self, index=0):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            w.switchedTo()
+            w.updateHistoryActions()
             self.updateMenu()
         self.log.setRepository(w and w.repo or None)
 

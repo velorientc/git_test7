@@ -137,15 +137,9 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionReload)
         self.addAction(self.actionClose)
 
-        # TODO: workaround for HgRepoView
-        self.actionBack = QAction(_('Back'), self, enabled=False,
-                                  icon=geticon('back'))
-        self.actionForward = QAction(_('Forward'), self, enabled=False,
-                                     icon=geticon('forward'))
-
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
-        self.repoview = HgRepoView(self, self.repo)
+        self.repoview = HgRepoView(self.repo, self)
         self.textView = HgFileView(self)
         self.splitter.addWidget(self.repoview)
         self.splitter.addWidget(self.textView)
@@ -162,8 +156,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.attachQuickBar(self.findToolbar)
 
         self.editToolbar.addSeparator()
-        self.editToolbar.addAction(self.repoview._actions['back'])
-        self.editToolbar.addAction(self.repoview._actions['forward'])
+        self.editToolbar.addAction(self.actionBack)
+        self.editToolbar.addAction(self.actionForward)
         self.editToolbar.addSeparator()
         self.editToolbar.addAction(self.actionDiffMode)
         self.editToolbar.addAction(self.actionAnnMode)
@@ -188,6 +182,12 @@ class FileLogDialog(_AbstractFileDialog):
         self.actionReload.triggered.connect(self.reload)
         self.actionReload.setIcon(geticon('reload'))
 
+        self.actionBack = QAction(_('Back'), self, enabled=False,
+                                  icon=geticon('back'))
+        self.actionForward = QAction(_('Forward'), self, enabled=False,
+                                     icon=geticon('forward'))
+        self.repoview.revisionSelected.connect(self._updateHistoryActions)
+
         self.actionDiffMode = QAction('Diff mode', self)
         self.actionDiffMode.setCheckable(True)
         self.actionDiffMode.toggled.connect(self.setMode)
@@ -205,6 +205,11 @@ class FileLogDialog(_AbstractFileDialog):
 
         self.actionBack.triggered.connect(self.repoview.back)
         self.actionForward.triggered.connect(self.repoview.forward)
+
+    @pyqtSlot()
+    def _updateHistoryActions(self):
+        self.actionBack.setEnabled(self.repoview.canGoBack())
+        self.actionForward.setEnabled(self.repoview.canGoForward())
 
     def modelFilled(self):
         self.repoview.resizeColumns()
@@ -294,11 +299,6 @@ class FileDiffDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionReload)
         self.addAction(self.actionClose)
 
-        # TODO: workaround for HgRepoView
-        self.actionBack = QAction(self)
-        self.actionForward = QAction(self)
-        self.actionDiffMode = QAction(self)
-
         def layouttowidget(layout):
             w = QWidget()
             w.setLayout(layout)
@@ -307,8 +307,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         self.horizontalLayout = QHBoxLayout()
-        self.tableView_revisions_left = HgRepoView(self, self.repo)
-        self.tableView_revisions_right = HgRepoView(self, self.repo)
+        self.tableView_revisions_left = HgRepoView(self.repo, self)
+        self.tableView_revisions_right = HgRepoView(self.repo, self)
         self.horizontalLayout.addWidget(self.tableView_revisions_left)
         self.horizontalLayout.addWidget(self.tableView_revisions_right)
         self.frame = QFrame()
@@ -316,7 +316,6 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter.addWidget(self.frame)
 
     def setupViews(self):
-        self.repoview = self.tableView_revisions_left
         self.tableViews = {'left': self.tableView_revisions_left,
                            'right': self.tableView_revisions_right}
         # viewers are Scintilla editors
