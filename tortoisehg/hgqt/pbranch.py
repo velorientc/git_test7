@@ -73,7 +73,7 @@ class PatchBranchWidget(QWidget):
         a.setIcon(QIcon(QPixmap(":/icons/fileadd.ico"))) #STOCK_NEW
         a.setToolTip(_('Start a new patch branch'))
         tb.addAction(self.actionPNew)
-        #self.actionPNew.triggered.connect(self.pbackout_clicked)
+        self.actionPNew.triggered.connect(self.pnew_clicked)
 
         self.actionEditPGraph = a = QWidgetAction(self)
         a.setIcon(QIcon(QPixmap(":/icons/log.svg"))) #STOCK_EDIT
@@ -274,7 +274,33 @@ class PatchBranchWidget(QWidget):
         except:
             return None
 
-
+    def pnew_ui(self):
+        """
+        Create new patch.
+        Propmt user for new patch name. Patch is created
+        on current branch.
+        """
+        parent =  None
+        title = _('TortoiseHg Prompt')
+        label = _('New Patch Name')
+        new_name, ok = QInputDialog.getText(self, title, label)
+        if not ok:
+            return False
+        self.pnew(str(new_name))
+        return True
+        
+    def pnew(self, patch_name):
+        """
+        [pbranch] Execute 'pnew' command.
+        
+        :param patch_name: Name of new patch-branch
+        """
+        if self.pbranch is None:
+            return False
+        self.repo.incrementBusyCount()
+        self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
+        self.repo.decrementBusyCount()
+        return True
 
     ### internal functions ###
 
@@ -303,6 +329,9 @@ class PatchBranchWidget(QWidget):
 
     def workingBranchChanged(self):
         self.refresh()
+
+    def pnew_clicked(self, toolbutton):
+        self.pnew_ui()
 
 class PatchGraphNode(object):
     """
