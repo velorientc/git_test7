@@ -130,10 +130,7 @@ def markup_func(widget, item, value):
     raise csinfo.UnknownItem(item)
 
 def RevPanelWidget(repo):
-    '''creates a rev panel widget and returns it
-    
-    repoview is a HgRepoView object'''
-
+    '''creates a rev panel widget and returns it'''
     custom = csinfo.custom(data=data_func, label=label_func,
                            markup=markup_func)
     style = csinfo.panelstyle(contents=('cset', 'branch', 'user',
