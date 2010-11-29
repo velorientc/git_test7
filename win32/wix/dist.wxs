@@ -28,12 +28,15 @@
         <File Name="QtXml4.dll" />
         <File Name="qscintilla2.dll" />
         <File Name="bz2.pyd" />
+        <File Name="dulwich._objects.pyd" />
+        <File Name="dulwich._pack.pyd" />
         <File Name="select.pyd" />
         <File Name="sip.pyd" />
         <File Name="unicodedata.pyd" />
         <File Name="win32api.pyd" />
         <File Name="win32com.shell.shell.pyd" />
         <File Name="win32console.pyd" />
+        <File Name="win32_crypto.pyd" />
         <File Name="win32cred.pyd" />
         <File Name="win32event.pyd" />
         <File Name="win32file.pyd" />
