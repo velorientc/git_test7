@@ -15,6 +15,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 import sys
 
+def _days(ctx, now):
+    return (now - ctx.date()[0]) / (24 * 60 * 60)
+
 class AnnotateColorMap:
 
     really_old_color = "#0046FF"
@@ -46,14 +49,11 @@ class AnnotateColorMap:
         self._span = span
         self._scale = span / max(self.colors.keys())
 
-    def _days(self, ctx, now):
-        return (now - ctx.date()[0]) / (24 * 60 * 60)
-
     def get_color(self, ctx, now):
         color = self.really_old_color
         days = self.colors.keys()
         days.sort()
-        days_old = self._days(ctx, now)
+        days_old = _days(ctx, now)
         for day in days:
             if (days_old <= day * self._scale):
                 color = self.colors[day]
@@ -61,9 +61,8 @@ class AnnotateColorMap:
 
         return color
 
-class AnnotateColorSaturation(AnnotateColorMap):
+class AnnotateColorSaturation(object):
     def __init__(self, span=340.):
-        AnnotateColorMap.__init__(self, span)
         self.current_angle = 0
 
     def hue(self, angle):
@@ -93,7 +92,7 @@ class AnnotateColorSaturation(AnnotateColorMap):
         return float(abs(hash(committer))) / sys.maxint * 360.0
 
     def get_color(self, ctx, now):
-        days = self._days(ctx, now)
+        days = _days(ctx, now)
         saturation = 255/((days/50) + 1)
         #saturation = 255/((days/self._scale) + 1)
         hue = self.hue(self.committer_angle(ctx.user()))
