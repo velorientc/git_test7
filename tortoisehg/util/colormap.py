@@ -94,3 +94,21 @@ class AnnotateColorSaturation(object):
         hue = self.hue(self.committer_angle(ctx.user()))
         color = tuple([self.saturate_v(saturation, h) for h in hue])
         return "#%x%x%x" % color
+
+def makeannotatepalette(fctxs, now, maxcolors):
+    """Assign limited number of colors for annotation
+
+    :fctxs: list of filecontexts by lines
+    :now: latest time which will have most significat color
+    :maxcolors: max number of colors
+
+    This yields each pair of (color, fctxs).
+    """
+    cm = AnnotateColorSaturation()
+
+    # assign from the latest for maximum discrimination
+    sortedfctxs = sorted(set(fctxs), key=lambda fctx: -fctx.date()[0])
+    for i, fctx in enumerate(sortedfctxs):
+        if i >= maxcolors:
+            return
+        yield cm.get_color(fctx, now), [fctx]

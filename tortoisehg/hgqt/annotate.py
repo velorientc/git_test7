@@ -252,19 +252,16 @@ class AnnotateView(qscilib.Scintilla):
     def _redefinemarkers(self):
         """Redefine line markers according to the current revs"""
         curdate = self.repo[self._rev].date()[0]
-        cm = colormap.AnnotateColorSaturation()
 
         self._revmarkers.clear()
-        # assign from the latest for maximum discrimination
-        filectxs = sorted(set(fctx for fctx, _origline in self._links),
-                          key=lambda fctx: -fctx.date()[0])
-        for i, fctx in enumerate(filectxs):
-            if i >= 32:
-                return  # no marker left
-            color = cm.get_color(fctx, curdate)
+        filectxs = iter(fctx for fctx, _origline in self._links)
+        palette = colormap.makeannotatepalette(filectxs, curdate,
+                                               maxcolors=32)
+        for i, (color, fctxs) in enumerate(palette):
             self.markerDefine(QsciScintilla.Background, i)
             self.setMarkerBackgroundColor(QColor(color), i)
-            self._revmarkers[fctx.rev()] = i
+            for fctx in fctxs:
+                self._revmarkers[fctx.rev()] = i
 
     @util.propertycache
     def _margin_style(self):

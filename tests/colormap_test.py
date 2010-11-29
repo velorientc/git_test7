@@ -46,3 +46,15 @@ def test_age_calc():
     age = 50 * SECS_PER_DAY
     for d in (0, SECS_PER_DAY, 365 * SECS_PER_DAY):
         assert_equals('#ffd4d4', cm.get_color(fakectx(0, d), d + age))
+
+def test_makeannotatepalette_latest_wins():
+    userstep = sys.maxint / 16
+    filectxs = [fakectx(0 * userstep, 0), fakectx(1 * userstep, 1),
+                fakectx(2 * userstep, 2), fakectx(3 * userstep, 3),
+                fakectx(4 * userstep, 4)]
+
+    palette = colormap.makeannotatepalette(filectxs, now=4, maxcolors=4)
+    palfctxs = set()
+    for _color, fctxs in palette:
+        palfctxs.update(fctxs)
+    assert_equals(set(filectxs[1:]), palfctxs)
