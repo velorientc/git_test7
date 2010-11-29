@@ -786,11 +786,7 @@ class DataMineDialog(gdialog.GWindow):
         # date of selected revision
         ctx = self.repo[long(rev)]
         curdate = ctx.date()[0]
-        # date of initial revision
-        fctx = self.repo.filectx(path, fileid=0)
-        basedate = fctx.date()[0]
-        agedays = (curdate - basedate) / (24 * 60 * 60)
-        colormap = AnnotateColorSaturation(agedays)
+        colormap = AnnotateColorSaturation()
 
         model, rows = treeview.get_selection().get_selected_rows()
         model.clear()

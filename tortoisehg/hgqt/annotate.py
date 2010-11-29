@@ -193,10 +193,6 @@ class AnnotateView(qscilib.Scintilla):
             return
         ctx = self.repo[self._rev]
         fctx = ctx[hglib.fromunicode(self.annfile)]
-        curdate = fctx.date()[0]
-        agedays = (curdate - fctx.date()[0]) / (24 * 60 * 60)
-        self.cm = colormap.AnnotateColorSaturation(agedays)
-        self.curdate = curdate
         self._thread.abort()
         self._thread.start(fctx)
 
@@ -255,6 +251,9 @@ class AnnotateView(qscilib.Scintilla):
 
     def _redefinemarkers(self):
         """Redefine line markers according to the current revs"""
+        curdate = self.repo[self._rev].date()[0]
+        cm = colormap.AnnotateColorSaturation()
+
         self._revmarkers.clear()
         # assign from the latest for maximum discrimination
         filectxs = sorted(set(fctx for fctx, _origline in self._links),
@@ -262,7 +261,7 @@ class AnnotateView(qscilib.Scintilla):
         for i, fctx in enumerate(filectxs):
             if i >= 32:
                 return  # no marker left
-            color = self.cm.get_color(fctx, self.curdate)
+            color = cm.get_color(fctx, curdate)
             self.markerDefine(QsciScintilla.Background, i)
             self.setMarkerBackgroundColor(QColor(color), i)
             self._revmarkers[fctx.rev()] = i
