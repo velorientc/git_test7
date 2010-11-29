@@ -57,7 +57,6 @@ class AnnotateView(qscilib.Scintilla):
 
         self._links = []  # by line
         self._revmarkers = {}  # by rev
-        self._summaries = {}  # by rev
         self._lastrev = None
 
         self._thread = _AnnotateThread(self)
@@ -87,10 +86,12 @@ class AnnotateView(qscilib.Scintilla):
         if line < 0:
             return
         try:
-            rev = self._links[line][0].rev()
-            if rev != self._lastrev:
-                self.revisionHint.emit(self._summaries[rev])
-                self._lastrev = rev
+            fctx = self._links[line][0]
+            if fctx.rev() != self._lastrev:
+                s = hglib.get_revision_desc(fctx,
+                                            hglib.fromunicode(self.annfile))
+                self.revisionHint.emit(s)
+                self._lastrev = fctx.rev()
         except IndexError:
             pass
 
@@ -204,14 +205,7 @@ class AnnotateView(qscilib.Scintilla):
         self._thread.wait()
         if self._thread.data is None:
             return
-        sums = {}
-        for fctx, origline in self._thread.data:
-            rev = fctx.rev()
-            if rev not in sums:
-                sums[rev] = hglib.get_revision_desc(
-                    fctx, hglib.fromunicode(self.annfile))
 
-        self._summaries = sums
         self._links = list(self._thread.data)
 
         self._updaterevmargin()
