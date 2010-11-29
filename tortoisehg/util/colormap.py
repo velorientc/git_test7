@@ -102,13 +102,19 @@ def makeannotatepalette(fctxs, now, maxcolors):
     :now: latest time which will have most significat color
     :maxcolors: max number of colors
 
-    This yields each pair of (color, fctxs).
+    This returns dict of {color: fctxs, ...}.
     """
     cm = AnnotateColorSaturation()
+    palette = {}
 
     # assign from the latest for maximum discrimination
     sortedfctxs = sorted(set(fctxs), key=lambda fctx: -fctx.date()[0])
-    for i, fctx in enumerate(sortedfctxs):
-        if i >= maxcolors:
-            return
-        yield cm.get_color(fctx, now), [fctx]
+    for fctx in sortedfctxs:
+        color = cm.get_color(fctx, now)
+        if color not in palette:
+            if len(palette) >= maxcolors:
+                break
+            palette[color] = []
+        palette[color].append(fctx)
+
+    return palette

@@ -55,6 +55,6 @@ def test_makeannotatepalette_latest_wins():
 
     palette = colormap.makeannotatepalette(filectxs, now=4, maxcolors=4)
     palfctxs = set()
-    for _color, fctxs in palette:
+    for _color, fctxs in palette.iteritems():
         palfctxs.update(fctxs)
     assert_equals(set(filectxs[1:]), palfctxs)

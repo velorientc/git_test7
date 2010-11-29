@@ -257,7 +257,7 @@ class AnnotateView(qscilib.Scintilla):
         filectxs = iter(fctx for fctx, _origline in self._links)
         palette = colormap.makeannotatepalette(filectxs, curdate,
                                                maxcolors=32)
-        for i, (color, fctxs) in enumerate(palette):
+        for i, (color, fctxs) in enumerate(palette.iteritems()):
             self.markerDefine(QsciScintilla.Background, i)
             self.setMarkerBackgroundColor(QColor(color), i)
             for fctx in fctxs:
