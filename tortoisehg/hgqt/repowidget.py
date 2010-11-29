@@ -556,8 +556,9 @@ class RepoWidget(QWidget):
         'Initiate a refresh of the repo model, rebuild graph'
         self.repo.thginvalidate()
         self.rebuildGraph()
-        self.commitDemand.forward('reload')
         self.filterbar.refresh()
+        if self.taskTabsWidget.currentIndex() == self.commitTabIndex:
+            self.commitDemand.forward('reload')
 
     def rebuildGraph(self):
         self.showMessage('')
