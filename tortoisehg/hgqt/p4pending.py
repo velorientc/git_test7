@@ -90,7 +90,7 @@ class PerforcePending(QDialog):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Submitting p4 changelist...'))
-        self.cmd.run(cmdline)
+        self.cmd.run(cmdline, useproc=True)
 
     def revert(self):
         assert(self.curcl.endswith('(pending)'))
@@ -100,7 +100,7 @@ class PerforcePending(QDialog):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Reverting p4 changelist...'))
-        self.cmd.run(cmdline)
+        self.cmd.run(cmdline, useproc=True)
 
     def commandFinished(self, ret):
         self.showMessage.emit('')
