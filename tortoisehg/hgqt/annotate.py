@@ -55,7 +55,6 @@ class AnnotateView(qscilib.Scintilla):
         self.annfile = None
         self._annotation_enabled = bool(opts.get('annotationEnabled', False))
 
-        self._revs = []  # by line
         self._links = []  # by line
         self._revmarkers = {}  # by rev
         self._summaries = {}  # by rev
@@ -88,7 +87,7 @@ class AnnotateView(qscilib.Scintilla):
         if line < 0:
             return
         try:
-            rev = self._revs[line]
+            rev = self._links[line][0].rev()
             if rev != self._lastrev:
                 self.revisionHint.emit(self._summaries[rev])
                 self._lastrev = rev
@@ -205,19 +204,15 @@ class AnnotateView(qscilib.Scintilla):
         self._thread.wait()
         if self._thread.data is None:
             return
-        revs, links = [], []
         sums = {}
         for fctx, origline in self._thread.data:
             rev = fctx.rev()
-            revs.append(rev)
-            links.append([fctx, origline])
             if rev not in sums:
                 sums[rev] = hglib.get_revision_desc(
                     fctx, hglib.fromunicode(self.annfile))
 
-        self._revs = revs
         self._summaries = sums
-        self._links = links
+        self._links = list(self._thread.data)
 
         self._updaterevmargin()
         self._updatemarkers()
@@ -253,22 +248,23 @@ class AnnotateView(qscilib.Scintilla):
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
-        for i, e in enumerate(self._revs):
-            self.setMarginText(i, str(e), self._margin_style)
+        for i, (fctx, _origline) in enumerate(self._links):
+            self.setMarginText(i, str(fctx.rev()), self._margin_style)
 
     def _updatemarkers(self):
         """Update markers which colorizes each line"""
         self._redefinemarkers()
-        for i, rev in enumerate(self._revs):
-            m = self._revmarkers.get(rev)
+        for i, (fctx, _origline) in enumerate(self._links):
+            m = self._revmarkers.get(fctx.rev())
             if m is not None:
                 self.markerAdd(i, m)
 
     def _redefinemarkers(self):
         """Redefine line markers according to the current revs"""
         self._revmarkers.clear()
+        revs = set(fctx.rev() for fctx, _origline in self._links)
         # assign from the latest rev for maximum discrimination
-        for i, rev in enumerate(reversed(sorted(set(self._revs)))):
+        for i, rev in enumerate(reversed(sorted(revs))):
             if i >= 32:
                 return  # no marker left
             color = self.cm.get_color(self.repo[rev], self.curdate)
@@ -299,8 +295,9 @@ class AnnotateView(qscilib.Scintilla):
         def lentext(s):
             return 'M' * (len(str(s)) + 2)  # 2 for margin
         self.setMarginWidth(1, lentext(self.lines()))
-        if self.isAnnotationEnabled() and self._revs:
-            self.setMarginWidth(2, lentext(max(self._revs)))
+        if self.isAnnotationEnabled() and self._links:
+            maxrev = max(fctx.rev() for fctx, _origline in self._links)
+            self.setMarginWidth(2, lentext(maxrev))
         else:
             self.setMarginWidth(2, 0)
 
