@@ -13,13 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-import sys
+import sys, math
 
 def _days(ctx, now):
     return (now - ctx.date()[0]) / (24 * 60 * 60)
 
 def _rescale(val, step):
     return float(step) * int(val / step)
+
+def _rescaleceil(val, step):
+    return float(step) * math.ceil(float(val) / step)
 
 class AnnotateColorMap:
 
@@ -65,8 +68,9 @@ class AnnotateColorMap:
         return color
 
 class AnnotateColorSaturation(object):
-    def __init__(self, maxhues=None):
+    def __init__(self, maxhues=None, maxsaturations=None):
         self._maxhues = maxhues
+        self._maxsaturations = maxsaturations
 
     def hue(self, angle):
         return tuple([self.v(angle, r) for r in (0, 120, 240)])
@@ -100,21 +104,26 @@ class AnnotateColorSaturation(object):
     def get_color(self, ctx, now):
         days = _days(ctx, now)
         saturation = 255/((days/50) + 1)
+        if self._maxsaturations:
+            saturation = _rescaleceil(saturation, 255. / self._maxsaturations)
         hue = self.hue(self.committer_angle(ctx.user()))
         color = tuple([self.saturate_v(saturation, h) for h in hue])
         return "#%x%x%x" % color
 
-def makeannotatepalette(fctxs, now, maxcolors, maxhues=None):
+def makeannotatepalette(fctxs, now, maxcolors, maxhues=None,
+                        maxsaturations=None):
     """Assign limited number of colors for annotation
 
     :fctxs: list of filecontexts by lines
     :now: latest time which will have most significat color
     :maxcolors: max number of colors
     :maxhues: max number of committer angles (hues)
+    :maxsaturations: max number of saturations by age
 
     This returns dict of {color: fctxs, ...}.
     """
-    cm = AnnotateColorSaturation(maxhues=maxhues)
+    cm = AnnotateColorSaturation(maxhues=maxhues,
+                                 maxsaturations=maxsaturations)
     palette = {}
 
     # assign from the latest for maximum discrimination

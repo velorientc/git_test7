@@ -50,6 +50,15 @@ def test_age_saturation():
     for i, c in sorted(samples.iteritems(), key=lambda a: a[0]):
         assert_equals(c, cm.get_color(fakectx(0, 0), float(i * SECS_PER_DAY)))
 
+def test_age_saturation_limit():
+    cm = colormap.AnnotateColorSaturation(maxsaturations=16)
+
+    samples = {0: '#ffaaaa', 3: '#ffaaaa', 4: '#ffafaf', 7: '#ffafaf',
+               8: '#ffb4b4', 11: '#ffb4b4', 12: '#ffb9b9', 16: '#ffb9b9',
+               17: '#ffbfbf', 22: '#ffbfbf', 23: '#ffc4c4', 29: '#ffc4c4'}
+    for i, c in sorted(samples.iteritems(), key=lambda a: a[0]):
+        assert_equals(c, cm.get_color(fakectx(0, 0), float(i * SECS_PER_DAY)))
+
 def test_age_calc():
     """Color shouldn't depend on the date but the age"""
     cm = colormap.AnnotateColorSaturation()
