@@ -104,7 +104,7 @@ class AnnotateView(qscilib.Scintilla):
             return menu.exec_(point)
 
         fctx, line = self._links[line]
-        data = [hglib.tounicode(fctx.path()), fctx.linkrev(), line]
+        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
 
         if self.hasSelectedText():
             selection = self.selectedText()
@@ -114,7 +114,7 @@ class AnnotateView(qscilib.Scintilla):
                 self.searchRequested.emit(selection)
             menu.addSeparator()
             for name, func in [(_('Search in original revision'),
-                                sreq(rev=fctx.linkrev())),
+                                sreq(rev=fctx.rev())),
                                (_('Search in working revision'),
                                 sreq(rev='.')),
                                (_('Search in current annotation'), sann),
@@ -208,7 +208,7 @@ class AnnotateView(qscilib.Scintilla):
         revs, links = [], []
         sums = {}
         for fctx, origline in self._thread.data:
-            rev = fctx.linkrev()
+            rev = fctx.rev()
             revs.append(rev)
             links.append([fctx, origline])
             if rev not in sums:
