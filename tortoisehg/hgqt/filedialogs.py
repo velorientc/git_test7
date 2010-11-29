@@ -171,7 +171,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionPrevDiff)
 
     def setupModels(self):
-        self.filerevmodel = FileRevModel(self.repo)
+        self.filerevmodel = FileRevModel(self.repo, parent=self)
         self.repoview.setModel(self.filerevmodel)
         self.repoview.revisionSelected.connect(self.revisionSelected)
         self.repoview.revisionActivated.connect(self.revisionActivated)
@@ -388,7 +388,8 @@ class FileDiffDialog(_AbstractFileDialog):
     def setupModels(self):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
-        self.filerevmodel = FileRevModel(self.repo, self.filename)
+        self.filerevmodel = FileRevModel(self.repo, self.filename,
+                                         parent=self)
         self.filerevmodel.filled.connect(self.modelFilled)
         self.tableView_revisions_left.setModel(self.filerevmodel)
         self.tableView_revisions_right.setModel(self.filerevmodel)
