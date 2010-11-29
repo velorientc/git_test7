@@ -18,6 +18,9 @@ import sys
 def _days(ctx, now):
     return (now - ctx.date()[0]) / (24 * 60 * 60)
 
+def _rescale(val, step):
+    return float(step) * int(val / step)
+
 class AnnotateColorMap:
 
     really_old_color = "#0046FF"
@@ -62,6 +65,9 @@ class AnnotateColorMap:
         return color
 
 class AnnotateColorSaturation(object):
+    def __init__(self, maxhues=None):
+        self._maxhues = maxhues
+
     def hue(self, angle):
         return tuple([self.v(angle, r) for r in (0, 120, 240)])
 
@@ -86,7 +92,10 @@ class AnnotateColorSaturation(object):
         return int(255 - (saturation/3*(1-hv)))
     
     def committer_angle(self, committer):
-        return float(abs(hash(committer))) / sys.maxint * 360.0
+        angle = float(abs(hash(committer))) / sys.maxint * 360.0
+        if self._maxhues is None:
+            return angle
+        return _rescale(angle, 360.0 / self._maxhues)
 
     def get_color(self, ctx, now):
         days = _days(ctx, now)
@@ -95,16 +104,17 @@ class AnnotateColorSaturation(object):
         color = tuple([self.saturate_v(saturation, h) for h in hue])
         return "#%x%x%x" % color
 
-def makeannotatepalette(fctxs, now, maxcolors):
+def makeannotatepalette(fctxs, now, maxcolors, maxhues=None):
     """Assign limited number of colors for annotation
 
     :fctxs: list of filecontexts by lines
     :now: latest time which will have most significat color
     :maxcolors: max number of colors
+    :maxhues: max number of committer angles (hues)
 
     This returns dict of {color: fctxs, ...}.
     """
-    cm = AnnotateColorSaturation()
+    cm = AnnotateColorSaturation(maxhues=maxhues)
     palette = {}
 
     # assign from the latest for maximum discrimination

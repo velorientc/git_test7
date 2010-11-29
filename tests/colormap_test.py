@@ -28,6 +28,16 @@ def test_user_hue():
     for i, c in sorted(samples.iteritems(), key=lambda a: a[0]):
         assert_equals(c, cm.get_color(fakectx(sys.maxint / 16 * i, 0), 0))
 
+def test_user_hue_limit():
+    cm = colormap.AnnotateColorSaturation(maxhues=8)
+
+    samples = {0x0: '#ffaaaa', 0x1: '#ffaaaa', 0x2: '#ffaae9', 0x3: '#ffaae9',
+               0x4: '#d4aaff', 0x5: '#d4aaff', 0x6: '#aabfff', 0x7: '#aabfff',
+               0x8: '#aaffff', 0x9: '#aaffff', 0xa: '#aaffbf', 0xb: '#aaffbf',
+               0xc: '#d4ffaa', 0xd: '#d4ffaa', 0xe: '#ffe9aa', 0xf: '#ffe9aa'}
+    for i, c in sorted(samples.iteritems(), key=lambda a: a[0]):
+        assert_equals(c, cm.get_color(fakectx(sys.maxint / 16 * i, 0), 0))
+
 SECS_PER_DAY = 24 * 60 * 60
 
 def test_age_saturation():
@@ -58,3 +68,15 @@ def test_makeannotatepalette_latest_wins():
     for _color, fctxs in palette.iteritems():
         palfctxs.update(fctxs)
     assert_equals(set(filectxs[1:]), palfctxs)
+
+def test_makeannotatepalette_fold_same_color():
+    userstep = sys.maxint / 16
+    filectxs = [fakectx(0 * userstep, 0), fakectx(1 * userstep, 0),
+                fakectx(2 * userstep, 0), fakectx(3 * userstep, 0),
+                fakectx(4 * userstep, 0)]
+    palette = colormap.makeannotatepalette(filectxs, now=0,
+                                           maxcolors=4, maxhues=8)
+    assert_equals(3, len(palette))
+    assert_equals(set([filectxs[0], filectxs[1]]), set(palette['#ffaaaa']))
+    assert_equals(set([filectxs[2], filectxs[3]]), set(palette['#ffaae9']))
+    assert_equals(set([filectxs[4]]), set(palette['#d4aaff']))
