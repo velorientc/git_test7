@@ -89,3 +89,31 @@ def test_makeannotatepalette_fold_same_color():
     assert_equals(set([filectxs[0], filectxs[1]]), set(palette['#ffaaaa']))
     assert_equals(set([filectxs[2], filectxs[3]]), set(palette['#ffaae9']))
     assert_equals(set([filectxs[4]]), set(palette['#d4aaff']))
+
+def test_makeannotatepalette_mindate_included():
+    agestep = 10 * SECS_PER_DAY
+    filectxs = [fakectx(0, 0 * agestep), fakectx(0, 1 * agestep),
+                fakectx(0, 2 * agestep), fakectx(0, 3 * agestep),
+                fakectx(0, 4 * agestep), fakectx(0, 5 * agestep),
+                fakectx(0, 6 * agestep), fakectx(0, 7 * agestep)]
+    palette = colormap.makeannotatepalette(filectxs, now=7 * agestep,
+                                           maxcolors=4, maxhues=4,
+                                           maxsaturations=255,
+                                           mindate=2 * agestep)
+    palfctxs = set()
+    for _color, fctxs in palette.iteritems():
+        palfctxs.update(fctxs)
+    for fctx in filectxs[2:]:
+        assert fctx in palfctxs
+
+def test_makeannotatepalette_mindate_earlier_than_rev0():
+    agestep = 50 * SECS_PER_DAY
+    filectxs = [fakectx(0, 1 * agestep), fakectx(0, 2 * agestep)]
+    palette = colormap.makeannotatepalette(filectxs, now=2 * agestep,
+                                           maxcolors=1, maxhues=1,
+                                           maxsaturations=255, mindate=0)
+    palfctxs = set()
+    for _color, fctxs in palette.iteritems():
+        palfctxs.update(fctxs)
+    for fctx in filectxs:
+        assert fctx in palfctxs

@@ -111,7 +111,7 @@ class AnnotateColorSaturation(object):
         return "#%x%x%x" % color
 
 def makeannotatepalette(fctxs, now, maxcolors, maxhues=None,
-                        maxsaturations=None):
+                        maxsaturations=None, mindate=None):
     """Assign limited number of colors for annotation
 
     :fctxs: list of filecontexts by lines
@@ -119,21 +119,37 @@ def makeannotatepalette(fctxs, now, maxcolors, maxhues=None,
     :maxcolors: max number of colors
     :maxhues: max number of committer angles (hues)
     :maxsaturations: max number of saturations by age
+    :mindate: reassign palette until it includes fctx of mindate
+              (requires maxsaturations)
 
     This returns dict of {color: fctxs, ...}.
     """
+    if mindate is not None and maxsaturations is None:
+        raise ValueError('mindate must be specified with maxsaturations')
+
+    sortedfctxs = list(sorted(set(fctxs), key=lambda fctx: -fctx.date()[0]))
+    return _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
+                                maxsaturations, mindate)[0]
+
+def _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
+                         maxsaturations, mindate):
     cm = AnnotateColorSaturation(maxhues=maxhues,
                                  maxsaturations=maxsaturations)
     palette = {}
 
+    def reassignifneeded(fctx):
+        if mindate is None or fctx.date()[0] <= mindate or maxsaturations <= 1:
+            return palette, cm
+        return _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
+                                    maxsaturations - 1, mindate)
+
     # assign from the latest for maximum discrimination
-    sortedfctxs = sorted(set(fctxs), key=lambda fctx: -fctx.date()[0])
     for fctx in sortedfctxs:
         color = cm.get_color(fctx, now)
         if color not in palette:
             if len(palette) >= maxcolors:
-                break
+                return reassignifneeded(fctx)
             palette[color] = []
         palette[color].append(fctx)
 
-    return palette
+    return palette, cm  # return cm for debbugging

@@ -253,11 +253,15 @@ class AnnotateView(qscilib.Scintilla):
         """Redefine line markers according to the current revs"""
         curdate = self.repo[self._rev].date()[0]
 
+        # make sure to colorize at least 1 year
+        mindate = curdate - 365 * 24 * 60 * 60
+
         self._revmarkers.clear()
         filectxs = iter(fctx for fctx, _origline in self._links)
         palette = colormap.makeannotatepalette(filectxs, curdate,
                                                maxcolors=32, maxhues=8,
-                                               maxsaturations=16)
+                                               maxsaturations=16,
+                                               mindate=mindate)
         for i, (color, fctxs) in enumerate(palette.iteritems()):
             self.markerDefine(QsciScintilla.Background, i)
             self.setMarkerBackgroundColor(QColor(color), i)
