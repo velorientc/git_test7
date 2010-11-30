@@ -178,6 +178,8 @@ class SyncWidget(QWidget):
         self.reltv = PathsTree(self, False)
         self.reltv.clicked.connect(self.pathSelected)
         self.reltv.menuRequest.connect(self.menuRequest)
+        self.reltv.clicked.connect(self.hgrctv.clearSelection)
+        self.hgrctv.clicked.connect(self.reltv.clearSelection)
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
         pathsbox = QVBoxLayout()
