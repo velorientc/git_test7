@@ -336,7 +336,7 @@ class RepoWidget(QWidget):
         return gw
 
     def createPatchBranchWidget(self):
-         return PatchBranchWidget(self.repo, parent=self)
+        return PatchBranchWidget(self.repo, parent=self)
 
     def updatePatchBranchTab(self):
         "Only show pbranch tab when pbranch extension is installed"
