@@ -286,7 +286,7 @@ class PatchBranchWidget(QWidget):
         new_name, ok = QInputDialog.getText(self, title, label)
         if not ok:
             return False
-        self.pnew(str(new_name))
+        self.pnew(hglib.fromunicode(new_name))
         return True
         
     def pnew(self, patch_name):
