@@ -287,12 +287,10 @@ class StatusWidget(QWidget):
         else:
             return []
 
-    @pyqtSlot(QModelIndex, QModelIndex)
-    def currentChanged(self, new, old):
-        self.rowSelected(new)
-
-    def rowSelected(self, index):
-        'Connected to treeview "clicked" signal'
+    # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QModelIndex, QModelIndex)
+    def currentChanged(self, index, old):
+        'Connected to treeview "currentChanged" signal'
         row = index.model().getRow(index)
         if row is None:
             return
