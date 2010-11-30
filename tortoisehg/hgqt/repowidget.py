@@ -801,6 +801,7 @@ class RepoWidget(QWidget):
             if type(r) is not int:
                 return
         def dagrange():
+            revA, revB = selection
             if revA > revB:
                 B, A = selection
             else:
