@@ -62,7 +62,7 @@ class MergeDialog(gdialog.GDialog):
                 gtklib.idle_add_single_call(self.hide)
                 return False
             self.repo.ui.quiet = True
-            commands.update(self.repo.ui, self.repo, rev=rev0, check=True)
+            commands.update(self.repo.ui, self.repo, rev=str(rev0), check=True)
             self.repo.ui.quiet = False
 
         # changeset info
