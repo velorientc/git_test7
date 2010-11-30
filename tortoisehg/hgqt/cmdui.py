@@ -596,7 +596,7 @@ class ConsoleWidget(QWidget):
     @_cmdtable
     def _cmd_hg(self, args):
         if self._repo:
-            args = ['-R', self._repo.root] + args
+            args = ['--cwd', self._repo.root] + args
         self._cmdcore.run(args)
 
     @_cmdtable
