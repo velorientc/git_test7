@@ -49,6 +49,7 @@ class SyncWidget(QWidget):
         self.curpw = None
         self.updateInProgress = False
         self.opts = {}
+        self.cmenu = None
 
         self.repo.configChanged.connect(self.configChanged)
 
@@ -163,6 +164,7 @@ class SyncWidget(QWidget):
         self.hgrctv = PathsTree(self, True)
         self.hgrctv.clicked.connect(self.pathSelected)
         self.hgrctv.removeAlias.connect(self.removeAlias)
+        self.hgrctv.menuRequest.connect(self.menuRequest)
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
         pathsbox = QVBoxLayout()
@@ -175,6 +177,7 @@ class SyncWidget(QWidget):
 
         self.reltv = PathsTree(self, False)
         self.reltv.clicked.connect(self.pathSelected)
+        self.reltv.menuRequest.connect(self.menuRequest)
         pathsframe = QFrame()
         pathsframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
         pathsbox = QVBoxLayout()
@@ -364,6 +367,59 @@ class SyncWidget(QWidget):
 
     def canExit(self):
         return not self.cmd.core.is_running()
+
+    @pyqtSlot(QPoint, QString, QString, bool)
+    def menuRequest(self, point, url, alias, editable):
+        'menu event emitted by one of the two URL lists'
+        if not self.cmenu:
+            acts = []
+            menu = QMenu(self)
+            for text, cb in ((_('Explore'), self.exploreurl),
+                             (_('Terminal'), self.terminalurl),
+                             (_('Remove'), self.removeurl)):
+                act = QAction(text, self)
+                act.triggered.connect(cb)
+                acts.append(act)
+                menu.addAction(act)
+            self.cmenu = menu
+            self.acts = acts
+
+        self.menuurl = url
+        self.menualias = alias
+        self.acts[-1].setEnabled(editable)
+        self.cmenu.exec_(point)
+
+    def exploreurl(self):
+        url = hglib.fromunicode(self.menuurl)
+        u, h, p, folder, pw, scheme = self.urlparse(url)
+        if scheme == 'local':
+            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+        else:
+            QDesktopServices.openUrl(QUrl(url))
+
+    def terminalurl(self):
+        url = hglib.fromunicode(self.menuurl)
+        u, h, p, folder, pw, scheme = self.urlparse(url)
+        if scheme != 'local':
+            qtlib.InfoMsgBox(_('Repository not local'),
+                        _('A terminal shell cannot be opened for remote'))
+            return
+        shell = self.repo.shell()
+        if shell:
+            cwd = os.getcwd()
+            try:
+                os.chdir(folder)
+                QProcess.startDetached(shell)
+            finally:
+                os.chdir(cwd)
+        else:
+            qtlib.InfoMsgBox(_('No shell configured'),
+                        _('A terminal shell must be configured'))
+    def removeurl(self):
+        if qtlib.QuestionMsgBox(_('Confirm path delete'),
+            _('Delete %s from your repo configuration file?') % self.menualias,
+            parent=self):
+            self.removeAlias(self.menualias)
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
@@ -691,7 +747,8 @@ class PostPullDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
         self.setWindowTitle(_('Post Pull Behavior'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() &
+                            ~Qt.WindowContextHelpButtonHint)
 
         lbl = QLabel(_('Select post-pull operation for this repository'))
         layout.addWidget(lbl)
@@ -813,7 +870,8 @@ class SaveDialog(QDialog):
         layout.addWidget(bb)
         self.aliasentry.selectAll()
         self.setWindowTitle(_('Save Peer Path'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() &
+                            ~Qt.WindowContextHelpButtonHint)
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
     def accept(self):
@@ -937,13 +995,19 @@ class AuthDialog(QDialog):
 
 class PathsTree(QTreeView):
     removeAlias = pyqtSignal(QString)
+    menuRequest = pyqtSignal(QPoint, QString, QString, bool)
 
     def __init__(self, parent, editable):
         QTreeView.__init__(self, parent)
         self.setSelectionMode(QTreeView.SingleSelection)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.menuRequest)
         self.editable = editable
+
+    def contextMenuEvent(self, event):
+        for index in self.selectedRows():
+            alias = index.data(Qt.DisplayRole).toString()
+            url = index.sibling(index.row(), 1).data(Qt.DisplayRole).toString()
+            self.menuRequest.emit(event.globalPos(), url, alias, self.editable)
+            return
 
     def keyPressEvent(self, event):
         if self.editable and event.matches(QKeySequence.Delete):
@@ -960,10 +1024,13 @@ class PathsTree(QTreeView):
             if r:
                 self.removeAlias.emit(alias)
 
+    def selectedUrls(self):
+        for index in self.selectedRows():
+            yield index.sibling(index.row(), 1).data(Qt.DisplayRole).toString()
+
     def dragObject(self):
         urls = []
-        for index in self.selectedRows():
-            url = index.sibling(index.row(), 1).data(Qt.DisplayRole).toString()
+        for url in self.selectedUrls():
             u = QUrl()
             u.setPath(url)
             urls.append(u)
@@ -988,10 +1055,6 @@ class PathsTree(QTreeView):
             return super(PathsTree, self).mouseMoveEvent(event)
         self.dragObject()
         return super(PathsTree, self).mouseMoveEvent(event)
-
-    def menuRequest(self, point):
-        point = self.mapToGlobal(point)
-        pass
 
     def selectedRows(self):
         return self.selectionModel().selectedRows()
