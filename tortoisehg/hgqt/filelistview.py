@@ -20,7 +20,7 @@ from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
-from tortoisehg.hgqt import visdiff, wctxactions
+from tortoisehg.hgqt import visdiff, wctxactions, revert
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -157,7 +157,10 @@ class HgFileListView(QTableView):
         if filename is None:
             return
         model = self.model()
-        # TODO - make a dialog to verify revert, offer to revert all
+        repo = model.repo
+        rev = model._ctx.rev()
+        dlg = revert.RevertDialog(repo, filename, rev, self)
+        dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
