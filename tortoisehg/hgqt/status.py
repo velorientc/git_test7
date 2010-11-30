@@ -195,9 +195,13 @@ class StatusWidget(QWidget):
 
         # store selected paths or current path
         model = self.tv.model()
-        if model:
+        if model and model.rowCount(QModelIndex()):
             smodel = self.tv.selectionModel()
-            curpath = model.getRow(smodel.currentIndex())[COL_PATH]
+            curidx = smodel.currentIndex()
+            if curidx.isValid():
+                curpath = model.getRow(curidx)[COL_PATH]
+            else:
+                curpath = None
             spaths = [model.getRow(i)[COL_PATH] for i in smodel.selectedRows()]
             self.reselection = spaths, curpath
         else:
