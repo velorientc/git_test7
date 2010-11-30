@@ -995,7 +995,7 @@ class RepoWidget(QWidget):
     def qdeleteRevision(self):
         """Delete unapplied patch"""
         patchname = self.repo.changectx(self.rev).thgmqpatchname()
-        cmdline = ['qdelete', str(patchname),
+        cmdline = ['qdelete', str(patchname), '--keep',
                    '--repository', self.repo.root]
         self.runCommand(_('QDelete - TortoiseHg'), cmdline)
 
