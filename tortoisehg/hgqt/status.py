@@ -124,7 +124,6 @@ class StatusWidget(QWidget):
         hcbox.addSpacing(6)
         hcbox.addWidget(self.countlbl)
 
-        tv.clicked.connect(self.rowSelected)
         tv.menuAction.connect(self.refreshWctx)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
@@ -197,14 +196,12 @@ class StatusWidget(QWidget):
         # store selected paths or current path
         model = self.tv.model()
         if model:
-            sp = [model.getRow(i)[COL_PATH] for i in self.tv.selectedRows()]
-            if not sp:
-                index = self.tv.selectionModel().currentIndex()
-                if index.isValid():
-                    sp = [model.getRow(index)[COL_PATH]]
+            smodel = self.tv.selectionModel()
+            curpath = model.getRow(smodel.currentIndex())[COL_PATH]
+            spaths = [model.getRow(i)[COL_PATH] for i in smodel.selectedRows()]
+            self.reselection = spaths, curpath
         else:
-            sp = None
-        self.sp = sp
+            self.reselection = None
 
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
@@ -245,27 +242,27 @@ class StatusWidget(QWidget):
         for col in (COL_PATH_DISPLAY, COL_EXTENSION, COL_SIZE):
             self.tv.resizeColumnToContents(col)
 
-        self.tv.doubleClicked.connect(tm.toggleRow)
-        self.tv.pressed.connect(tm.pressedRow)
+        self.tv.clicked.connect(tm.clickedRow)
         self.le.textEdited.connect(tm.setFilter)
         tm.checkToggled.connect(self.updateCheckCount)
         self.updateCheckCount()
 
         # reset selection, or select first row
+        curidx = tm.index(0, 0)
         selmodel = self.tv.selectionModel()
         flags = QItemSelectionModel.Select | QItemSelectionModel.Rows
-        if self.sp:
-            first = None
+        if self.reselection:
+            selected, current = self.reselection
             for i, row in enumerate(tm.getAllRows()):
-                if row[COL_PATH] in self.sp:
-                    index = tm.index(i, 0)
-                    selmodel.select(index, flags)
-                    if not first: first = index
+                if row[COL_PATH] in selected:
+                    selmodel.select(tm.index(i, 0), flags)
+                if row[COL_PATH] == current:
+                    curidx = tm.index(i, 0)
         else:
-            first = tm.index(0, 0)
-            selmodel.select(first, flags)
-        if first and first.isValid():
-            self.rowSelected(first)
+            selmodel.select(curidx, flags)
+        selmodel.currentChanged.connect(self.currentChanged)
+        if curidx and curidx.isValid():
+            selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
 
     def updateCheckCount(self):
         text = _('Checkmarked file count: %d') % len(self.getChecked())
@@ -289,6 +286,10 @@ class StatusWidget(QWidget):
                 return files
         else:
             return []
+
+    @pyqtSlot(QModelIndex, QModelIndex)
+    def currentChanged(self, new, old):
+        self.rowSelected(new)
 
     def rowSelected(self, index):
         'Connected to treeview "clicked" signal'
@@ -580,7 +581,7 @@ class WctxModel(QAbstractTableModel):
         self.layoutChanged.emit()
         self.checkToggled.emit()
 
-    def pressedRow(self, index):
+    def clickedRow(self, index):
         'Connected to "pressed" signal, emitted by mouse clicks'
         assert index.isValid()
         if index.column() == COL_PATH:
