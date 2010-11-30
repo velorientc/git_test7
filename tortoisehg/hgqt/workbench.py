@@ -1,5 +1,3 @@
-# -*- coding: iso-8859-1 -*-
-#!/usr/bin/env python
 # workbench.py - main TortoiseHg Window
 #
 # Copyright (C) 2007-2010 Logilab. All rights reserved.
