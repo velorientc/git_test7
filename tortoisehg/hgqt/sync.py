@@ -625,7 +625,10 @@ class SyncWidget(QWidget):
             ms = mergemod.mergestate(self.repo)
             for path in ms:
                 if ms[path] == 'u':
+                    qtlib.InfoMsgBox(_('Merge caused file conflicts'),
+                                    _('File conflicts need to be resolved'))
                     dlg = resolve.ResolveDialog(self.repo, self)
+                    dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
         self.finishfunc = finished
