@@ -724,6 +724,8 @@ class RepoWidget(QWidget):
     def unnapliedPatchMenu(self, point, selection):
         def qdeleteact():
             """Delete unapplied patch(es)"""
+            patches = [self.repo.changectx(r).thgmqpatchname() \
+                       for r in self.menuselection]
             dlg = qdelete.QDeleteDialog(self.repo, patches, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.output.connect(self.output)
@@ -735,7 +737,6 @@ class RepoWidget(QWidget):
             dlg.exec_()
 
         # Special menu for unapplied patches
-        patches = [self.repo.changectx(r).thgmqpatchname() for r in selection]
         if not self.unappcmenu:
             menu = QMenu(self)
             acts = []
@@ -749,7 +750,8 @@ class RepoWidget(QWidget):
                 menu.addAction(act)
             self.unappcmenu = menu
             self.unappacts = acts
-        self.unappacts[0].setEnabled(len(patches) == 1)
+        self.menuselection = selection
+        self.unappacts[0].setEnabled(len(selection) == 1)
         self.unappcmenu.exec_(point)
 
     def singleSelectionMenu(self, point, selection):
@@ -842,51 +844,51 @@ class RepoWidget(QWidget):
             if type(r) is not int:
                 return
         def dagrange():
-            revA, revB = selection
+            revA, revB = self.menuselection
             if revA > revB:
-                B, A = selection
+                B, A = self.menuselection
             else:
-                A, B = selection
+                A, B = self.menuselection
             func = revset.match('%s::%s' % (A, B))
             return [c for c in func(self.repo, range(len(self.repo)))]
 
         def exportPair():
-            self.exportRevisions(selection)
+            self.exportRevisions(self.menuselection)
         def exportDagRange():
             l = dagrange()
             if l:
                 self.exportRevisions(l)
         def diffPair():
-            revA, revB = selection
+            revA, revB = self.menuselection
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, [],
                     {'rev':(str(revA), str(revB))})
             if dlg:
                 dlg.exec_()
         def emailPair():
-            run.email(self.repo.ui, rev=selection, repo=self.repo)
+            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
         def emailDagRange():
             l = dagrange()
             if l:
                 run.email(self.repo.ui, rev=l, repo=self.repo)
         def bisectNormal():
-            revA, revB = selection
+            revA, revB = self.menuselection
             opts = {'good':str(revA), 'bad':str(revB)}
             dlg = bisect.BisectDialog(self.repo, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def bisectReverse():
-            revA, revB = selection
+            revA, revB = self.menuselection
             opts = {'good':str(revB), 'bad':str(revA)}
             dlg = bisect.BisectDialog(self.repo, opts, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def compressDlg():
-            ctxa = self.repo[selection[0]]
-            ctxb = self.repo[selection[1]]
+            ctxa = self.repo[self.menuselection[0]]
+            ctxb = self.repo[self.menuselection[1]]
             if ctxa.ancestor(ctxb) == ctxb:
-                revs = selection[:]
+                revs = self.menuselection[:]
             elif ctxa.ancestor(ctxb) == ctxa:
-                revs = selection[:]
+                revs = self.menuselection[:]
                 revs.reverse()
             else:
                 InfoMsgBox(_('Unable to compress history'),
@@ -917,6 +919,7 @@ class RepoWidget(QWidget):
                 a.triggered.connect(self.sendToReviewBoard)
                 menu.addAction(a)
             self.paircmenu = menu
+        self.menuselection = selection
         self.paircmenu.exec_(point)
 
     def multipleSelectionMenu(self, point, selection):
@@ -925,9 +928,9 @@ class RepoWidget(QWidget):
             if type(r) is not int:
                 return
         def exportSel():
-            self.exportRevisions(selection)
+            self.exportRevisions(self.menuselection)
         def emailSel():
-            run.email(self.repo.ui, rev=selection, repo=self.repo)
+            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
         if not self.multicmenu:
             menu = QMenu(self)
             for name, cb in (
@@ -942,6 +945,7 @@ class RepoWidget(QWidget):
                 a.triggered.connect(self.sendToReviewBoard)
                 menu.addAction(a)
             self.multicmenu = menu
+        self.menuselection = selection
         self.multicmenu.exec_(point)
 
     def updateToRevision(self):
