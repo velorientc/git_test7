@@ -190,12 +190,14 @@ class Core(QObject):
     def runproc(self):
         'Run mercurial command in separate process'
 
-        exepath = 'hg'
+        exepath = None
         if hasattr(sys, 'frozen'):
             progdir = paths.get_prog_root()
             exe = os.path.join(progdir, 'hg.exe')
             if os.path.exists(exe):
                 exepath = exe
+        if not exepath:
+            exepath = paths.find_in_path('hg')
 
         def start(cmdline, display):
             self.rawoutput = []
