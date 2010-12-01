@@ -19,7 +19,8 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
-from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, qdelete
+from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
+from tortoisehg.hgqt import qdelete, qreorder
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -47,6 +48,7 @@ class RepoWidget(QWidget):
     """Emitted when changed the expected title for the RepoWidget tab"""
 
     singlecmenu = None
+    unappcmenu = None
     paircmenu = None
     multicmenu = None
 
@@ -727,15 +729,28 @@ class RepoWidget(QWidget):
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
             dlg.exec_()
+        def qreorderact():
+            dlg = qreorder.QReorderDialog(self.repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
 
         # Special menu for unapplied patches
         patches = [self.repo.changectx(r).thgmqpatchname() for r in selection]
-        menu = QMenu(self) # TODO: save in repowidget
-        act = QAction(_('Delete patches'), self)
-        act.triggered.connect(qdeleteact)
-        menu.addAction(act)
-        menu.exec_(point)
-        return
+        if not self.unappcmenu:
+            menu = QMenu(self)
+            acts = []
+            for name, cb in (
+                (_('Goto patch'), self.qgotoRevision),
+                (_('Delete patches'), qdeleteact),
+                (_('Reorder patches'), qreorderact)):
+                act = QAction(name, self)
+                act.triggered.connect(cb)
+                acts.append(act)
+                menu.addAction(act)
+            self.unappcmenu = menu
+            self.unappacts = acts
+        self.unappacts[0].setEnabled(len(patches) == 1)
+        self.unappcmenu.exec_(point)
 
     def singleSelectionMenu(self, point, selection):
         if not self.singlecmenu:
