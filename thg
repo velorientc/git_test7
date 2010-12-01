@@ -15,6 +15,11 @@ if hasattr(sys, "frozen"):
     if sys.frozen == 'windows_exe' and 'THGDEBUG' in os.environ:
         import win32traceutil
         print 'starting'
+    # os.Popen() needs this, and Mercurial still uses os.Popen
+    if 'COMSPEC' not in os.environ:
+        comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
+                               'system32', 'cmd.exe')
+        os.environ['COMSPEC'] = comspec
 else:
     thgpath = os.path.dirname(os.path.realpath(__file__))
     testpath = os.path.join(thgpath, 'tortoisehg')
