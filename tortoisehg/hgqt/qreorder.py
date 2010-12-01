@@ -58,7 +58,7 @@ class QReorderDialog(QDialog):
             def focusInEvent(self, e):
                 i = self.item(self.currentRow())
                 if i:
-                    self.parent().showSummary(i)
+                    self.parent().parent().showSummary(i)
                 QListWidget.focusInEvent(self, e)
 
         ugb = QGroupBox(_('Unapplied Patches - drag to reorder'))
