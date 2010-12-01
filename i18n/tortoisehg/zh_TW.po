@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-10-29 21:51+0000\n"
-"PO-Revision-Date: 2010-11-05 16:49+0000\n"
-"Last-Translator: Levi <Unknown>\n"
+"PO-Revision-Date: 2010-11-23 06:43+0000\n"
+"Last-Translator: zivalin <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-11-06 04:57+0000\n"
+"X-Launchpad-Export-Date: 2010-11-24 05:11+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: TortoiseHgOverlayServer.py:36
 msgid "TortoiseHg Overlay Icon Server"
-msgstr ""
+msgstr "TortoiseHg Overlay Icon Server"
 
 #: TortoiseHgOverlayServer.py:117
 msgid "Exit"
@@ -134,11 +134,11 @@ msgstr "Zip 壓縮封存"
 #: tortoisehg\hgtk\archive.py:195 tortoisehg\hgtk\clone.py:107
 #: tortoisehg\hgtk\hginit.py:95
 msgid "Select Destination Folder"
-msgstr "選擇目的端資料夾"
+msgstr "選擇目的資料夾"
 
 #: tortoisehg\hgtk\archive.py:201
 msgid "Select Destination File"
-msgstr "選擇目的端檔案"
+msgstr "選擇目的檔案"
 
 #: tortoisehg\hgtk\archive.py:203
 msgid "All Files (*.*)"
@@ -210,11 +210,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\backout.py:118
 msgid "Canceled backout"
-msgstr ""
+msgstr "取消撤銷"
 
 #: tortoisehg\hgtk\backout.py:120
 msgid "Failed to backout"
-msgstr ""
+msgstr "撤銷失敗"
 
 #: tortoisehg\hgtk\backout.py:139 tortoisehg\hgtk\commit.py:583
 msgid "Confirm Discard Message"
@@ -255,7 +255,7 @@ msgstr "設為當前"
 #: tortoisehg\hgtk\bookmark.py:56 tortoisehg\hgtk\bookmark.py:182
 #: tortoisehg\hgtk\merge.py:178
 msgid "unexpected type: %s"
-msgstr ""
+msgstr "未知型態: %s"
 
 #: tortoisehg\hgtk\bookmark.py:69
 msgid "Old name:"
@@ -277,7 +277,7 @@ msgstr "新名稱:"
 
 #: tortoisehg\hgtk\bookmark.py:92
 msgid "Make new/moved bookmark current"
-msgstr ""
+msgstr "在當前位置建立/移動書籤"
 
 #: tortoisehg\hgtk\bookmark.py:167 tortoisehg\hgtk\gdialog.py:918
 #: tortoisehg\hgtk\hginit.py:87 tortoisehg\hgtk\tagadd.py:203
@@ -350,7 +350,7 @@ msgstr "書籤名稱( \"%s\")己存在"
 
 #: tortoisehg\hgtk\bookmark.py:355 tortoisehg\hgtk\bookmark.py:382
 msgid "No bookmark named \"%s\" exists"
-msgstr ""
+msgstr "該書籤名稱(\"%s\")不存在"
 
 #: tortoisehg\hgtk\bookmark.py:364
 msgid "Bookmark '%s' does not exist"
@@ -405,7 +405,7 @@ msgstr "%s 變更集 "
 
 #: tortoisehg\hgtk\changeset.py:170 tortoisehg\hgtk\changeset.py:213
 msgid "[All Files]"
-msgstr "[全部的檔案]"
+msgstr "[全部檔案]"
 
 #: tortoisehg\hgtk\changeset.py:252
 msgid "unknown hunk type: %s"
@@ -450,7 +450,7 @@ msgstr "註釋文件(_A)"
 
 #: tortoisehg\hgtk\changeset.py:478
 msgid "_Revert File Contents"
-msgstr ""
+msgstr "回復檔案內容(_R)"
 
 #: tortoisehg\hgtk\changeset.py:567
 msgid "Changeset:"
@@ -510,11 +510,11 @@ msgstr "TortoiseHg Clone"
 
 #: tortoisehg\hgtk\clone.py:75
 msgid "Bundle..."
-msgstr ""
+msgstr "包裝..."
 
 #: tortoisehg\hgtk\clone.py:77
 msgid "Select a Mercurial Bundle"
-msgstr ""
+msgstr "選取一個水銀包"
 
 #: tortoisehg\hgtk\clone.py:90
 msgid "Source path:"
@@ -522,7 +522,7 @@ msgstr "來源路徑："
 
 #: tortoisehg\hgtk\clone.py:91
 msgid "Select Source Folder"
-msgstr "選擇來源端資料夾"
+msgstr "選擇來源目錄"
 
 #: tortoisehg\hgtk\clone.py:117 tortoisehg\hgtk\tagadd.py:69
 msgid "Advanced options"
@@ -563,27 +563,27 @@ msgstr "複製"
 
 #: tortoisehg\hgtk\clone.py:191
 msgid "Cloned successfully"
-msgstr ""
+msgstr "克隆完成"
 
 #: tortoisehg\hgtk\clone.py:193 tortoisehg\hgtk\update.py:154
 msgid "Canceled updating"
-msgstr ""
+msgstr "取消更新作業"
 
 #: tortoisehg\hgtk\clone.py:195
 msgid "Failed to clone"
-msgstr ""
+msgstr "克隆失敗"
 
 #: tortoisehg\hgtk\clone.py:226
 msgid "Mercurial bundles"
-msgstr ""
+msgstr "水銀包"
 
 #: tortoisehg\hgtk\clone.py:288
 msgid "Source path is empty"
-msgstr "來源端路徑是空的"
+msgstr "來源路徑是空的"
 
 #: tortoisehg\hgtk\clone.py:289
 msgid "Please enter a valid source path"
-msgstr "請輸入有效的來源端路徑"
+msgstr "請輸入合法的來源路徑"
 
 #: tortoisehg\hgtk\clone.py:294
 msgid "Source and destination are the same"
@@ -595,7 +595,7 @@ msgstr "請指定不同的路徑"
 
 #: tortoisehg\hgtk\commit.py:38
 msgid "Branch Operations"
-msgstr "Branch 操作"
+msgstr "分支操作"
 
 #: tortoisehg\hgtk\commit.py:48
 msgid "Select branch of merge commit"
@@ -611,33 +611,33 @@ msgstr "開啟一個新的命名分支 (named branch)"
 
 #: tortoisehg\hgtk\commit.py:70
 msgid "Close current named branch"
-msgstr "關閉目前的 named branch"
+msgstr "關閉目前的命名分支 (named branch)"
 
 #: tortoisehg\hgtk\commit.py:77
 msgid "Changes take effect on next commit"
-msgstr "變更將於下次 commit 時發生效用"
+msgstr "變更將於下次提交時發生效用"
 
 #: tortoisehg\hgtk\commit.py:176
 msgid "merging "
-msgstr ""
+msgstr "合併 "
 
 #: tortoisehg\hgtk\commit.py:182
 msgid " - qnew"
-msgstr ""
+msgstr " - q新"
 
 #: tortoisehg\hgtk\commit.py:185
 msgid " - qrefresh "
-msgstr ""
+msgstr " - q刷新 "
 
 #: tortoisehg\hgtk\commit.py:186
 msgid " - commit"
-msgstr ""
+msgstr " - 提交"
 
 #: tortoisehg\hgtk\commit.py:229 tortoisehg\hgtk\commit.py:311
 #: tortoisehg\hgtk\history.py:258 tortoisehg\hgtk\history.py:368
 #: tortoisehg\hgtk\thgimport.py:111
 msgid "Patch Queue"
-msgstr ""
+msgstr "補丁序列"
 
 #: tortoisehg\hgtk\commit.py:234 tortoisehg\hgtk\history.py:391
 msgid "_View"
@@ -663,11 +663,11 @@ msgstr "重新整理"
 
 #: tortoisehg\hgtk\commit.py:245 tortoisehg\hgtk\history.py:418
 msgid "Ignore Max Diff Size"
-msgstr ""
+msgstr "忽略最大不同尺寸"
 
 #: tortoisehg\hgtk\commit.py:247 tortoisehg\hgtk\history.py:420
 msgid "Always Show Output"
-msgstr ""
+msgstr "隨時顯示輸出"
 
 #: tortoisehg\hgtk\commit.py:250
 msgid "_Operations"
@@ -716,7 +716,7 @@ msgstr "提交"
 
 #: tortoisehg\hgtk\commit.py:312 tortoisehg\hgtk\history.py:260
 msgid "Show/Hide Patch Queue"
-msgstr ""
+msgstr "顯示/隱藏補丁序列"
 
 #: tortoisehg\hgtk\commit.py:325 tortoisehg\hgtk\merge.py:190
 #: tortoisehg\hgtk\thgconfig.py:841
@@ -765,7 +765,7 @@ msgstr "最近的提交訊息..."
 
 #: tortoisehg\hgtk\commit.py:505
 msgid "Parent: %(rev)s"
-msgstr ""
+msgstr "上層: %(修訂)s"
 
 #: tortoisehg\hgtk\commit.py:513
 msgid "Not at head"
@@ -808,11 +808,11 @@ msgstr "重新整理最上層的 MQ patch"
 
 #: tortoisehg\hgtk\commit.py:666
 msgid "_Commit (+1 head)"
-msgstr ""
+msgstr "提交(_C) (+1 head)"
 
 #: tortoisehg\hgtk\commit.py:666
 msgid "_Commit (-1 head)"
-msgstr ""
+msgstr "提交(_C) (-1 head)"
 
 #: tortoisehg\hgtk\commit.py:672
 msgid "commit to merge one head"
@@ -1018,7 +1018,7 @@ msgstr ""
 #: tortoisehg\hgtk\history.py:2711 tortoisehg\hgtk\history.py:2742
 #: tortoisehg\hgtk\recovery.py:178 tortoisehg\hgtk\synch.py:549
 msgid "Cannot run now"
-msgstr ""
+msgstr "現在無法執行"
 
 #: tortoisehg\hgtk\commit.py:1269
 msgid "Please try again after the running operation is completed"
@@ -1034,7 +1034,7 @@ msgstr "套用格式(_l)"
 
 #: tortoisehg\hgtk\commit.py:1297
 msgid "C_onfigure Format..."
-msgstr ""
+msgstr "配置格式(_O)"
 
 #: tortoisehg\hgtk\commit.py:1342
 msgid "Info Required"
@@ -1086,7 +1086,7 @@ msgstr "分支:"
 
 #: tortoisehg\hgtk\csinfo.py:215 tortoisehg\hgtk\csinfo.py:216
 msgid "Tags:"
-msgstr ""
+msgstr "標籤:"
 
 #: tortoisehg\hgtk\csinfo.py:216
 msgid "Transplant:"
@@ -1110,7 +1110,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\cslist.py:384
 msgid "No items to display"
-msgstr ""
+msgstr "沒有項次可以顯示"
 
 #: tortoisehg\hgtk\cslist.py:397
 msgid "Updating..."
@@ -1168,7 +1168,7 @@ msgstr "使用者"
 #: tortoisehg\hgtk\datamine.py:150 tortoisehg\hgtk\datamine.py:163
 #: tortoisehg\hgtk\history.py:1269
 msgid "Di_splay Change"
-msgstr ""
+msgstr "顯示變更(_S)"
 
 #: tortoisehg\hgtk\datamine.py:154 tortoisehg\hgtk\datamine.py:180
 msgid "_View File at Revision"
@@ -1236,20 +1236,20 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:330
 msgid "Ignore case"
-msgstr ""
+msgstr "忽略大小寫"
 
 #: tortoisehg\hgtk\datamine.py:331
 msgid "Show line numbers"
-msgstr ""
+msgstr "顯示行數"
 
 #: tortoisehg\hgtk\datamine.py:332
 msgid "Show all matching revisions"
-msgstr ""
+msgstr "顯示全部符合的版次"
 
 #: tortoisehg\hgtk\datamine.py:363 tortoisehg\hgtk\datamine.py:653
 #: tortoisehg\hgtk\logview\treeview.py:436
 msgid "Rev"
-msgstr ""
+msgstr "修訂"
 
 #: tortoisehg\hgtk\datamine.py:364 tortoisehg\hgtk\datamine.py:654
 msgid "File"
@@ -1261,7 +1261,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:387
 msgid "Search %d"
-msgstr ""
+msgstr "搜尋 %d"
 
 #: tortoisehg\hgtk\datamine.py:430
 msgid "No regular expression given"
@@ -1269,11 +1269,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\datamine.py:431
 msgid "You must provide a search expression"
-msgstr ""
+msgstr "你必須要提供一個搜尋表達式"
 
 #: tortoisehg\hgtk\datamine.py:437
 msgid "Invalid regular expression"
-msgstr ""
+msgstr "不合法的正則表示式"
 
 #: tortoisehg\hgtk\datamine.py:438 tortoisehg\hgtk\thgshelve.py:220
 #: tortoisehg\hgtk\thgshelve.py:233
@@ -1290,11 +1290,11 @@ msgstr "搜尋\"%s\""
 
 #: tortoisehg\hgtk\datamine.py:598
 msgid "File is unrevisioned"
-msgstr ""
+msgstr "檔案未進行版本管理"
 
 #: tortoisehg\hgtk\datamine.py:599
 msgid "Unable to annotate "
-msgstr ""
+msgstr "不是解注檔 "
 
 #: tortoisehg\hgtk\datamine.py:652
 msgid "Line"
@@ -1319,7 +1319,7 @@ msgstr "工具(_T)"
 #: tortoisehg\hgtk\gdialog.py:483 tortoisehg\hgtk\history.py:230
 #: tortoisehg\hgtk\thgconfig.py:123
 msgid "Repository Explorer"
-msgstr ""
+msgstr "版本庫總管"
 
 #: tortoisehg\hgtk\gdialog.py:487 tortoisehg\hgtk\history.py:282
 msgid "Datamine"
@@ -1327,7 +1327,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\gdialog.py:489 tortoisehg\hgtk\history.py:285
 msgid "Recovery"
-msgstr ""
+msgstr "恢復"
 
 #: tortoisehg\hgtk\gdialog.py:491 tortoisehg\hgtk\history.py:288
 msgid "Serve"
@@ -1343,7 +1343,7 @@ msgstr ""
 #: tortoisehg\hgtk\gdialog.py:495 tortoisehg\hgtk\thgconfig.py:165
 #: tortoisehg\util\menuthg.py:52
 msgid "Synchronize"
-msgstr ""
+msgstr "同步"
 
 #: tortoisehg\hgtk\gdialog.py:497
 msgid "Settings"
@@ -1387,11 +1387,11 @@ msgstr "編輯失敗"
 
 #: tortoisehg\hgtk\gdialog.py:682 tortoisehg\hgtk\gtklib.py:397
 msgid "No visual editor configured"
-msgstr ""
+msgstr "沒有視覺化編輯器的配置"
 
 #: tortoisehg\hgtk\gdialog.py:683 tortoisehg\hgtk\gtklib.py:398
 msgid "Please configure a visual editor."
-msgstr ""
+msgstr "請配置一個視覺化編輯器"
 
 #: tortoisehg\hgtk\gdialog.py:823
 msgid "unknown mode name: %s"
@@ -1419,11 +1419,11 @@ msgstr "選擇修定版本"
 
 #: tortoisehg\hgtk\gorev.py:44
 msgid "revision number, changeset ID, branch or tag"
-msgstr ""
+msgstr "修訂版次, 變更代碼, 包裹或者標籤"
 
 #: tortoisehg\hgtk\gorev.py:59
 msgid "Ambiguous Revision"
-msgstr ""
+msgstr "不明確的版次"
 
 #: tortoisehg\hgtk\gorev.py:63
 msgid "Invalid Revision"
@@ -1461,10 +1461,17 @@ msgid ""
 "\n"
 "examples: en, en_GB, en_US"
 msgstr ""
+"選擇語言來進行拼字檢查.\n"
+"\n"
+"預設語言中沒有字典.\n"
+"When all text is highlited, the dictionary\n"
+"is probably not installed.\n"
+"\n"
+"例如: en, en_GB, en_US"
 
 #: tortoisehg\hgtk\gtklib.py:1092
 msgid "Lang \"%s\" can not be set.\n"
-msgstr ""
+msgstr "語系 \"%s\" 無法設定\n"
 
 #: tortoisehg\hgtk\gtklib.py:1105 tortoisehg\hgtk\thgconfig.py:80
 msgid "Spell Check Language"
@@ -1480,7 +1487,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\guess.py:77
 msgid "Unrevisioned Files"
-msgstr ""
+msgstr "未版本控管檔案"
 
 #: tortoisehg\hgtk\guess.py:108
 msgid "Find Renames"
@@ -1532,7 +1539,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgcmd.py:347
 msgid "Stop transaction"
-msgstr ""
+msgstr "停止交易"
 
 #: tortoisehg\hgtk\hgcmd.py:349
 msgid "Close this"
@@ -1548,7 +1555,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgcmd.py:676
 msgid "Command Log"
-msgstr ""
+msgstr "指令日誌"
 
 #: tortoisehg\hgtk\hgemail.py:36
 msgid "Send"
@@ -1733,7 +1740,7 @@ msgstr "忽略過濾器 - %s"
 
 #: tortoisehg\hgtk\hgignore.py:52
 msgid "Glob:"
-msgstr ""
+msgstr "全域:"
 
 #: tortoisehg\hgtk\hgignore.py:77 tortoisehg\hgtk\thgconfig.py:671
 msgid "Edit File"
@@ -1745,11 +1752,11 @@ msgstr "套用到:"
 
 #: tortoisehg\hgtk\hgignore.py:88
 msgid "Filters"
-msgstr ""
+msgstr "過濾器"
 
 #: tortoisehg\hgtk\hgignore.py:104
 msgid "Patterns"
-msgstr ""
+msgstr "樣式"
 
 #: tortoisehg\hgtk\hgignore.py:112
 msgid "Remove Selected"
@@ -1765,11 +1772,11 @@ msgstr "檔案"
 
 #: tortoisehg\hgtk\hgignore.py:197
 msgid "Invalid glob expression"
-msgstr ""
+msgstr "錯誤的全域表達式"
 
 #: tortoisehg\hgtk\hgignore.py:213
 msgid "Invalid regexp expression"
-msgstr ""
+msgstr "錯誤的正則表逹式"
 
 #: tortoisehg\hgtk\hgignore.py:256
 msgid "Unable to write .hgignore file"
@@ -1785,7 +1792,7 @@ msgstr "建立"
 
 #: tortoisehg\hgtk\hginit.py:58
 msgid "Destination:"
-msgstr ""
+msgstr "目的地:"
 
 #: tortoisehg\hgtk\hginit.py:62
 msgid "Add special files (.hgignore, ...)"
@@ -1805,11 +1812,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\hginit.py:107
 msgid "Please enter the directory path"
-msgstr ""
+msgstr "請輸入目錄路徑"
 
 #: tortoisehg\hgtk\hginit.py:121
 msgid "Unable to create new repository"
-msgstr ""
+msgstr "不能建立新的版本庫"
 
 #: tortoisehg\hgtk\hginit.py:125 tortoisehg\hgtk\hginit.py:130
 msgid "Error when creating repository"
@@ -1866,7 +1873,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgtk.py:219
 msgid "abort: %s!\n"
-msgstr ""
+msgstr "中止: %s!\n"
 
 #: tortoisehg\hgtk\hgtk.py:266 tortoisehg\hgtk\hgtk.py:465
 msgid "There is no Mercurial repository here (.hg not found)"
@@ -1904,11 +1911,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgtk.py:518 tortoisehg\hgtk\hgtk.py:525
 msgid "%s does not exist\n"
-msgstr ""
+msgstr "%s 不存在\n"
 
 #: tortoisehg\hgtk\hgtk.py:545
 msgid "global options:"
-msgstr ""
+msgstr "全域選項:"
 
 #: tortoisehg\hgtk\hgtk.py:547
 msgid "use \"hgtk help\" for the full list of commands"
@@ -1932,16 +1939,20 @@ msgid ""
 "list of commands:\n"
 "\n"
 msgstr ""
+"列出所有指令:\n"
+"\n"
 
 #: tortoisehg\hgtk\hgtk.py:577
 msgid ""
 "\n"
 "aliases: %s\n"
 msgstr ""
+"\n"
+"別名: %s\n"
 
 #: tortoisehg\hgtk\hgtk.py:582 tortoisehg\hgtk\hgtk.py:647
 msgid "(No help text available)"
-msgstr ""
+msgstr "(沒有說明)"
 
 #: tortoisehg\hgtk\hgtk.py:590
 msgid "options:\n"
@@ -1949,11 +1960,11 @@ msgstr "選項:\n"
 
 #: tortoisehg\hgtk\hgtk.py:614
 msgid "(no help text available)"
-msgstr ""
+msgstr "(沒有說明)"
 
 #: tortoisehg\hgtk\hgtk.py:619
 msgid "no commands defined\n"
-msgstr ""
+msgstr "沒有定義指令\n"
 
 #: tortoisehg\hgtk\hgtk.py:671
 msgid "Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
@@ -1964,10 +1975,12 @@ msgid ""
 "basic commands:\n"
 "\n"
 msgstr ""
+"基本指令:\n"
+"\n"
 
 #: tortoisehg\hgtk\hgtk.py:692
 msgid " (default: %s)"
-msgstr ""
+msgstr " (預設: %s)"
 
 #: tortoisehg\hgtk\hgtk.py:709
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
@@ -1987,7 +2000,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgtk.py:746
 msgid "display help and exit"
-msgstr ""
+msgstr "顯示幫助並離開"
 
 #: tortoisehg\hgtk\hgtk.py:747
 msgid "start debugger"
@@ -2349,7 +2362,7 @@ msgstr "分支"
 #: tortoisehg\hgtk\history.py:355 tortoisehg\hgtk\history.py:699
 #: tortoisehg\hgtk\logview\treeview.py:554
 msgid "Tags"
-msgstr ""
+msgstr "標籤"
 
 #: tortoisehg\hgtk\history.py:363
 msgid "Sync Bar"
@@ -2401,11 +2414,11 @@ msgstr "導航(_N)"
 
 #: tortoisehg\hgtk\history.py:426
 msgid "Tip"
-msgstr ""
+msgstr "頂點"
 
 #: tortoisehg\hgtk\history.py:428
 msgid "Working Parent"
-msgstr ""
+msgstr "工作上層"
 
 #: tortoisehg\hgtk\history.py:430
 msgid "Previously Selected"
@@ -2440,15 +2453,15 @@ msgstr "推出"
 
 #: tortoisehg\hgtk\history.py:446
 msgid "Email..."
-msgstr "電子信箱l..."
+msgstr "電子信箱..."
 
 #: tortoisehg\hgtk\history.py:451
 msgid "Accept Bundle"
-msgstr ""
+msgstr "接受包"
 
 #: tortoisehg\hgtk\history.py:454
 msgid "Reject Bundle"
-msgstr ""
+msgstr "拒絕包"
 
 #: tortoisehg\hgtk\history.py:458
 msgid "Import..."
@@ -2456,11 +2469,11 @@ msgstr "匯入..."
 
 #: tortoisehg\hgtk\history.py:460
 msgid "Add Bundle..."
-msgstr ""
+msgstr "加入包"
 
 #: tortoisehg\hgtk\history.py:464
 msgid "Configure Paths..."
-msgstr ""
+msgstr "配置路徑..."
 
 #: tortoisehg\hgtk\history.py:469 tortoisehg\hgtk\synch.py:174
 msgid "Force pull or push"
@@ -2644,11 +2657,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:1196
 msgid "merges"
-msgstr ""
+msgstr "合併"
 
 #: tortoisehg\hgtk\history.py:1199
 msgid "only Merges"
-msgstr ""
+msgstr "只能合併"
 
 #: tortoisehg\hgtk\history.py:1201
 msgid "revision ancestry"
@@ -2676,11 +2689,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:1230
 msgid "no Merges"
-msgstr ""
+msgstr "沒有合併"
 
 #: tortoisehg\hgtk\history.py:1249
 msgid "Current patch: %s,  "
-msgstr ""
+msgstr "當前補丁: %s,  "
 
 #: tortoisehg\hgtk\history.py:1251
 msgid "%(count)d of %(total)d applied patches"
@@ -2955,7 +2968,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:1885
 msgid "Accept"
-msgstr ""
+msgstr "接受"
 
 #: tortoisehg\hgtk\history.py:1890
 msgid "Reject incoming previewed changesets"
@@ -2963,7 +2976,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\history.py:1891
 msgid "Reject"
-msgstr ""
+msgstr "拒絕"
 
 #: tortoisehg\hgtk\history.py:1933
 msgid "Bundle Preview"
@@ -3536,7 +3549,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\serve.py:69
 msgid "Browse"
-msgstr ""
+msgstr "瀏覽"
 
 #: tortoisehg\hgtk\serve.py:71
 msgid "Launch browser to view repository"
@@ -3574,7 +3587,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\serve.py:228
 msgid "Abort: %s\n"
-msgstr ""
+msgstr "中止: %s\n"
 
 #: tortoisehg\hgtk\serve.py:236
 msgid "Invalid port 2048..65535"
@@ -3586,7 +3599,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\serve.py:321
 msgid "cannot start server: "
-msgstr ""
+msgstr "無法啟動伺服器: "
 
 #: tortoisehg\hgtk\serve.py:332
 msgid "listening at http://%s%s/%s (%s:%d)\n"
@@ -3598,7 +3611,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\serve.py:358
 msgid "run server in background"
-msgstr ""
+msgstr "伺服器運行在背景"
 
 #: tortoisehg\hgtk\serve.py:359
 msgid "used internally by daemon mode"
@@ -3662,7 +3675,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\shellconf.py:27
 msgid "OK"
-msgstr ""
+msgstr "確定"
 
 #: tortoisehg\hgtk\shellconf.py:28 tortoisehg\hgtk\thgshelve.py:163
 msgid "Cancel"
@@ -3670,7 +3683,7 @@ msgstr "取消"
 
 #: tortoisehg\hgtk\shellconf.py:29
 msgid "Apply"
-msgstr ""
+msgstr "套用"
 
 #: tortoisehg\hgtk\shellconf.py:42
 msgid "Context Menu"
@@ -3750,11 +3763,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\shellconf.py:182
 msgid "Taskbar"
-msgstr ""
+msgstr "工作列"
 
 #: tortoisehg\hgtk\shellconf.py:189
 msgid "Show Icon"
-msgstr ""
+msgstr "顯示圖示"
 
 #: tortoisehg\hgtk\shellconf.py:191
 msgid "Highlight Icon"
@@ -3782,7 +3795,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:111
 msgid "Save As"
-msgstr ""
+msgstr "另存新檔"
 
 #: tortoisehg\hgtk\status.py:112
 msgid "Save selected changes"
@@ -3826,7 +3839,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:307
 msgid "View"
-msgstr ""
+msgstr "檢視"
 
 #: tortoisehg\hgtk\status.py:330
 msgid "Remove filter, show root"
@@ -3858,27 +3871,27 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:492
 msgid "M: modified"
-msgstr ""
+msgstr "M: 修改"
 
 #: tortoisehg\hgtk\status.py:493
 msgid "I: ignored"
-msgstr ""
+msgstr "I: 略過"
 
 #: tortoisehg\hgtk\status.py:494
 msgid "A: added"
-msgstr ""
+msgstr "A: 加入"
 
 #: tortoisehg\hgtk\status.py:495
 msgid "C: clean"
-msgstr ""
+msgstr "C: 清除"
 
 #: tortoisehg\hgtk\status.py:496
 msgid "R: removed"
-msgstr ""
+msgstr "R: 移除"
 
 #: tortoisehg\hgtk\status.py:497
 msgid "!: deleted"
-msgstr ""
+msgstr "!: 刪除"
 
 #: tortoisehg\hgtk\status.py:498
 msgid "S: subrepo"
@@ -3886,7 +3899,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:783
 msgid "View '%s'"
-msgstr ""
+msgstr "查看 '%s'"
 
 #: tortoisehg\hgtk\status.py:879 tortoisehg\hgtk\status.py:951
 msgid "===== Diff to first parent %d:%s =====\n"
@@ -3972,7 +3985,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:1248 tortoisehg\util\menuthg.py:49
 msgid "File History"
-msgstr ""
+msgstr "檔案歷史"
 
 #: tortoisehg\hgtk\status.py:1249
 msgid "Annotate"
@@ -3984,27 +3997,27 @@ msgstr ""
 
 #: tortoisehg\hgtk\status.py:1254
 msgid "_Ignore"
-msgstr ""
+msgstr "忽略(_I)"
 
 #: tortoisehg\hgtk\status.py:1255
 msgid "Remove versioned"
-msgstr ""
+msgstr "移除版本"
 
 #: tortoisehg\hgtk\status.py:1256
 msgid "_Delete unversioned"
-msgstr ""
+msgstr "刪除未修訂版本(_D)"
 
 #: tortoisehg\hgtk\status.py:1259
 msgid "_Copy..."
-msgstr ""
+msgstr "複製(_C)..."
 
 #: tortoisehg\hgtk\status.py:1260
 msgid "Rename..."
-msgstr ""
+msgstr "重新命名..."
 
 #: tortoisehg\hgtk\status.py:1262
 msgid "Restart Merge..."
-msgstr ""
+msgstr "重新合併..."
 
 #: tortoisehg\hgtk\status.py:1263
 msgid "Mark unresolved"
@@ -4034,11 +4047,11 @@ msgstr "重新整理&R"
 
 #: tortoisehg\hgtk\statusact.py:30
 msgid "Rename file to:"
-msgstr ""
+msgstr "檔案更名到:"
 
 #: tortoisehg\hgtk\statusact.py:40
 msgid "Copy file to"
-msgstr ""
+msgstr "複製檔案到"
 
 #: tortoisehg\hgtk\statusact.py:54
 msgid "Remove is not enabled when multiple revisions are specified."
@@ -4070,11 +4083,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\statusact.py:127
 msgid "&Local"
-msgstr ""
+msgstr "本地(&L)"
 
 #: tortoisehg\hgtk\statusact.py:127
 msgid "&Other"
-msgstr ""
+msgstr "其它(&O)"
 
 #: tortoisehg\hgtk\statusact.py:140
 msgid "Revert files to revision %s?"
@@ -4098,7 +4111,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\statusact.py:178
 msgid "Confirm Delete Unrevisioned"
-msgstr ""
+msgstr "確認刪除未修訂版本"
 
 #: tortoisehg\hgtk\statusact.py:179
 msgid "Delete the following unrevisioned files?"
@@ -4110,7 +4123,7 @@ msgstr "刪除錯誤"
 
 #: tortoisehg\hgtk\statusbar.py:39
 msgid "Running..."
-msgstr ""
+msgstr "執行中..."
 
 #: tortoisehg\hgtk\statusbar.py:67
 msgid "unknown field name: %s"
@@ -4126,7 +4139,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:45
 msgid "%s - synchronize"
-msgstr ""
+msgstr "%s - 同步"
 
 #: tortoisehg\hgtk\synch.py:59
 msgid "Display changes that can be pulled from selected repository"
@@ -4134,11 +4147,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:62
 msgid "   Pull   "
-msgstr ""
+msgstr "   拉取   "
 
 #: tortoisehg\hgtk\synch.py:64
 msgid "Pull changes from selected repository"
-msgstr ""
+msgstr "從所選的版本庫中拉取變更部份"
 
 #: tortoisehg\hgtk\synch.py:70
 msgid "Display local changes that will be  pushed to selected repository"
@@ -4150,11 +4163,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:78 tortoisehg\hgtk\thgconfig.py:233
 msgid "Email"
-msgstr ""
+msgstr "電子信箱"
 
 #: tortoisehg\hgtk\synch.py:80
 msgid "Email local outgoing changes to one or more recipients"
-msgstr ""
+msgstr "將變更部份發出電子信件通知一個或多個受文者"
 
 #: tortoisehg\hgtk\synch.py:85
 msgid "Shelve uncommited changes"
@@ -4166,11 +4179,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:107
 msgid "Repo:"
-msgstr ""
+msgstr "修訂:"
 
 #: tortoisehg\hgtk\synch.py:112
 msgid "Bundle:"
-msgstr ""
+msgstr "包裹:"
 
 #: tortoisehg\hgtk\synch.py:157
 msgid "Post Pull: "
@@ -4178,7 +4191,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:167
 msgid "Advanced Options"
-msgstr ""
+msgstr "進階選項"
 
 #: tortoisehg\hgtk\synch.py:175
 msgid "Run even when remote repository is unrelated."
@@ -4206,7 +4219,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:218
 msgid "Show patches"
-msgstr ""
+msgstr "顯示補丁集"
 
 #: tortoisehg\hgtk\synch.py:219
 msgid "Show newest first"
@@ -4214,19 +4227,19 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:220
 msgid "Show no merges"
-msgstr ""
+msgstr "顯示未合併"
 
 #: tortoisehg\hgtk\synch.py:266
 msgid "Update to branch tip"
-msgstr ""
+msgstr "更新到該分支的tip版次"
 
 #: tortoisehg\hgtk\synch.py:372
 msgid "unknown sort key '%s'"
-msgstr ""
+msgstr "未知的排序鍵值 '%s'"
 
 #: tortoisehg\hgtk\synch.py:382
 msgid "Select Repository"
-msgstr ""
+msgstr "選擇版本庫"
 
 #: tortoisehg\hgtk\synch.py:389
 msgid "Select Bundle"
@@ -4234,11 +4247,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\synch.py:391
 msgid "Bundle (*.hg)"
-msgstr ""
+msgstr "打包 (*.hg)"
 
 #: tortoisehg\hgtk\synch.py:392
 msgid "Bundle (*)"
-msgstr ""
+msgstr "打包 (*)"
 
 #: tortoisehg\hgtk\synch.py:689
 msgid "Toggle _Wordwrap"
@@ -4246,15 +4259,15 @@ msgstr "Toggle _Wordwrap"
 
 #: tortoisehg\hgtk\tagadd.py:31
 msgid "Tag - %s"
-msgstr ""
+msgstr "標籤 - %s"
 
 #: tortoisehg\hgtk\tagadd.py:57
 msgid "Tag:"
-msgstr ""
+msgstr "標籤:"
 
 #: tortoisehg\hgtk\tagadd.py:77
 msgid "Tag is local"
-msgstr ""
+msgstr "本地標籤"
 
 #: tortoisehg\hgtk\tagadd.py:79
 msgid "Replace existing tag"
@@ -4364,7 +4377,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:52
 msgid "Visual Editor"
-msgstr ""
+msgstr "視覺編輯器"
 
 #: tortoisehg\hgtk\thgconfig.py:53
 msgid "Specify the visual editor used to view files, etc"
@@ -4372,7 +4385,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:54
 msgid "CLI Editor"
-msgstr ""
+msgstr "命令行編輯器"
 
 #: tortoisehg\hgtk\thgconfig.py:55
 msgid ""
@@ -4450,7 +4463,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:85
 msgid "Username"
-msgstr ""
+msgstr "使用者名稱"
 
 #: tortoisehg\hgtk\thgconfig.py:86
 msgid "Name associated with commits"
@@ -4458,7 +4471,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:87
 msgid "Summary Line Length"
-msgstr ""
+msgstr "摘要行數"
 
 #: tortoisehg\hgtk\thgconfig.py:88
 msgid ""
@@ -4469,7 +4482,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:92
 msgid "Message Line Length"
-msgstr ""
+msgstr "訊息行數"
 
 #: tortoisehg\hgtk\thgconfig.py:93
 msgid ""
@@ -4498,7 +4511,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:104
 msgid "Auto Commit List"
-msgstr ""
+msgstr "自動提交清單"
 
 #: tortoisehg\hgtk\thgconfig.py:105
 msgid ""
@@ -4539,7 +4552,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:125
 msgid "Author Coloring"
-msgstr ""
+msgstr "作者色彩"
 
 #: tortoisehg\hgtk\thgconfig.py:126
 msgid ""
@@ -4611,7 +4624,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:156
 msgid "Toolbar Style"
-msgstr ""
+msgstr "工具列樣式"
 
 #: tortoisehg\hgtk\thgconfig.py:158
 msgid ""
@@ -4636,7 +4649,7 @@ msgstr "網頁伺服器"
 
 #: tortoisehg\hgtk\thgconfig.py:175 tortoisehg\hgtk\thgpbranch.py:210
 msgid "Name"
-msgstr ""
+msgstr "名稱"
 
 #: tortoisehg\hgtk\thgconfig.py:176
 msgid ""
@@ -4646,7 +4659,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:178 tortoisehg\hgtk\thgconfig.py:740
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: tortoisehg\hgtk\thgconfig.py:179
 msgid "Textual description of the repository's purpose or contents."
@@ -4654,7 +4667,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:181
 msgid "Contact"
-msgstr ""
+msgstr "聯繫"
 
 #: tortoisehg\hgtk\thgconfig.py:182
 msgid "Name or email address of the person in charge of the repository."
@@ -4662,7 +4675,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:184
 msgid "Style"
-msgstr ""
+msgstr "樣式"
 
 #: tortoisehg\hgtk\thgconfig.py:186
 msgid "Which template map style to use"
@@ -4670,7 +4683,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:187
 msgid "Archive Formats"
-msgstr ""
+msgstr "封存格式"
 
 #: tortoisehg\hgtk\thgconfig.py:188
 msgid "Comma separated list of archive formats allowed for downloading"
@@ -4682,7 +4695,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:190 tortoisehg\hgtk\thgconfig.py:363
 msgid "Port"
-msgstr ""
+msgstr "通訊埠"
 
 #: tortoisehg\hgtk\thgconfig.py:191
 msgid "Push Requires SSL"
@@ -4706,7 +4719,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:197
 msgid "Max Files"
-msgstr ""
+msgstr "最大檔案"
 
 #: tortoisehg\hgtk\thgconfig.py:198
 msgid "Maximum number of files to list per changeset."
@@ -4714,7 +4727,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:199
 msgid "Max Changes"
-msgstr ""
+msgstr "最大變更記錄"
 
 #: tortoisehg\hgtk\thgconfig.py:200
 msgid "Maximum number of changes to list on the changelog."
@@ -4749,7 +4762,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:216
 msgid "Encoding"
-msgstr ""
+msgstr "編碼"
 
 #: tortoisehg\hgtk\thgconfig.py:217
 msgid "Character encoding name"
@@ -4757,11 +4770,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:220
 msgid "Proxy"
-msgstr ""
+msgstr "代理主機"
 
 #: tortoisehg\hgtk\thgconfig.py:221 tortoisehg\hgtk\thgconfig.py:364
 msgid "Host"
-msgstr ""
+msgstr "主機"
 
 #: tortoisehg\hgtk\thgconfig.py:222
 msgid ""
@@ -4783,7 +4796,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:229 tortoisehg\hgtk\thgconfig.py:365
 msgid "Password"
-msgstr ""
+msgstr "密碼"
 
 #: tortoisehg\hgtk\thgconfig.py:230
 msgid "Optional. Password to authenticate with at the proxy server"
@@ -4799,7 +4812,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:237
 msgid "To"
-msgstr ""
+msgstr "收件者"
 
 #: tortoisehg\hgtk\thgconfig.py:238
 msgid "Comma-separated list of recipient email addresses"
@@ -4807,7 +4820,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:239
 msgid "Cc"
-msgstr ""
+msgstr "副本"
 
 #: tortoisehg\hgtk\thgconfig.py:240
 msgid "Comma-separated list of carbon copy recipient email addresses"
@@ -4815,7 +4828,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:241
 msgid "Bcc"
-msgstr ""
+msgstr "密件"
 
 #: tortoisehg\hgtk\thgconfig.py:242
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
@@ -4841,11 +4854,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:251
 msgid "SMTP Host"
-msgstr ""
+msgstr "SMTP 主機"
 
 #: tortoisehg\hgtk\thgconfig.py:252
 msgid "SMTP Port"
-msgstr ""
+msgstr "SMTP 通訊埠"
 
 #: tortoisehg\hgtk\thgconfig.py:253
 msgid "Port to connect to on mail server. Default: 25"
@@ -4861,7 +4874,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:258
 msgid "SMTP Username"
-msgstr ""
+msgstr "SMTP 使用者"
 
 #: tortoisehg\hgtk\thgconfig.py:259
 msgid "Username to authenticate to mail server with"
@@ -4869,7 +4882,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:260
 msgid "SMTP Password"
-msgstr ""
+msgstr "SMTP 密碼"
 
 #: tortoisehg\hgtk\thgconfig.py:261
 msgid "Password to authenticate to mail server with"
@@ -4877,7 +4890,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:262
 msgid "Local Hostname"
-msgstr ""
+msgstr "本機主機名稱"
 
 #: tortoisehg\hgtk\thgconfig.py:263
 msgid "Hostname the sender can use to identify itself to the mail server."
@@ -4908,7 +4921,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:276
 msgid "No Dates"
-msgstr ""
+msgstr "沒有細節"
 
 #: tortoisehg\hgtk\thgconfig.py:277
 msgid "Do not include modification dates in diff headers. Default: False"
@@ -4958,11 +4971,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:297
 msgid "Font"
-msgstr ""
+msgstr "字型"
 
 #: tortoisehg\hgtk\thgconfig.py:299
 msgid "Commit Message"
-msgstr ""
+msgstr "提交訊息"
 
 #: tortoisehg\hgtk\thgconfig.py:300
 msgid ""
@@ -4979,7 +4992,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:305
 msgid "File List"
-msgstr ""
+msgstr "檔案清單"
 
 #: tortoisehg\hgtk\thgconfig.py:306
 msgid "Font used in file lists in status and commit tools. Default: sans 9"
@@ -5039,19 +5052,19 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:345
 msgid "http"
-msgstr ""
+msgstr "http"
 
 #: tortoisehg\hgtk\thgconfig.py:345
 msgid "ssh"
-msgstr ""
+msgstr "ssh"
 
 #: tortoisehg\hgtk\thgconfig.py:346
 msgid "https"
-msgstr ""
+msgstr "https"
 
 #: tortoisehg\hgtk\thgconfig.py:346
 msgid "local"
-msgstr ""
+msgstr "木機"
 
 #: tortoisehg\hgtk\thgconfig.py:355
 msgid "Edit remote repository path"
@@ -5063,11 +5076,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:364
 msgid "Folder"
-msgstr ""
+msgstr "目錄"
 
 #: tortoisehg\hgtk\thgconfig.py:366 tortoisehg\hgtk\thgconfig.py:949
 msgid "Alias"
-msgstr ""
+msgstr "別名"
 
 #: tortoisehg\hgtk\thgconfig.py:398
 msgid "URL Details"
@@ -5079,15 +5092,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:539
 msgid "Select Local Folder"
-msgstr ""
+msgstr "選擇本地資料夾"
 
 #: tortoisehg\hgtk\thgconfig.py:564
 msgid "Alias name is empty"
-msgstr ""
+msgstr "別名為空"
 
 #: tortoisehg\hgtk\thgconfig.py:565
 msgid "Please enter alias name"
-msgstr ""
+msgstr "請輸入別名"
 
 #: tortoisehg\hgtk\thgconfig.py:570 tortoisehg\hgtk\thgconfig.py:1073
 msgid "Overwrite existing '%s' path?"
@@ -5115,11 +5128,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgconfig.py:666
 msgid "%s repository settings"
-msgstr ""
+msgstr "%s 版本庫設置"
 
 #: tortoisehg\hgtk\thgconfig.py:675
 msgid "Reload"
-msgstr ""
+msgstr "重新載入"
 
 #: tortoisehg\hgtk\thgconfig.py:768
 msgid "Confirm Switch"
@@ -5135,11 +5148,11 @@ msgstr "儲存(&S)"
 
 #: tortoisehg\hgtk\thgconfig.py:770 tortoisehg\hgtk\update.py:233
 msgid "&Discard"
-msgstr ""
+msgstr "丟棄(&D)"
 
 #: tortoisehg\hgtk\thgconfig.py:788
 msgid "TortoiseHg Configure Repository - "
-msgstr ""
+msgstr "TortoiseHg 配置版本庫 - "
 
 #: tortoisehg\hgtk\thgconfig.py:793
 msgid "TortoiseHg Configure User-Global Settings"
@@ -5257,7 +5270,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgimport.py:44
 msgid "Import - %s"
-msgstr ""
+msgstr "匯入 - %s"
 
 #: tortoisehg\hgtk\thgimport.py:76
 msgid "Browse Directory..."
@@ -5281,11 +5294,11 @@ msgstr "檢視:"
 
 #: tortoisehg\hgtk\thgimport.py:110
 msgid "Repository"
-msgstr ""
+msgstr "版本庫"
 
 #: tortoisehg\hgtk\thgimport.py:164
 msgid "Import"
-msgstr ""
+msgstr "匯入"
 
 #: tortoisehg\hgtk\thgimport.py:184
 msgid "Imported successfully"
@@ -5297,7 +5310,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgimport.py:192
 msgid "Confirm Close"
-msgstr ""
+msgstr "確認克隆"
 
 #: tortoisehg\hgtk\thgimport.py:193
 msgid "Do you want to close?"
@@ -5305,7 +5318,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgimport.py:203
 msgid "Select Patches"
-msgstr ""
+msgstr "選擇補丁"
 
 #: tortoisehg\hgtk\thgimport.py:214
 msgid "Select Directory contains patches:"
@@ -5313,7 +5326,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgimport.py:281
 msgid "%s patches"
-msgstr ""
+msgstr "%s 補丁"
 
 #: tortoisehg\hgtk\thgimport.py:283
 msgid "%s will be imported to the"
@@ -5349,15 +5362,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgmq.py:212
 msgid "#"
-msgstr ""
+msgstr "#"
 
 #: tortoisehg\hgtk\thgmq.py:214
 msgid "Patch"
-msgstr ""
+msgstr "補綴"
 
 #: tortoisehg\hgtk\thgmq.py:369
 msgid "Yes (&keep)"
-msgstr ""
+msgstr "是 (保持(&K))"
 
 #: tortoisehg\hgtk\thgmq.py:372 tortoisehg\hgtk\thgmq.py:376
 #: tortoisehg\hgtk\thgshelve.py:224
@@ -5398,19 +5411,19 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgmq.py:771
 msgid "Top"
-msgstr ""
+msgstr "最上層"
 
 #: tortoisehg\hgtk\thgmq.py:773
 msgid "Up"
-msgstr ""
+msgstr "上"
 
 #: tortoisehg\hgtk\thgmq.py:775
 msgid "Down"
-msgstr ""
+msgstr "下"
 
 #: tortoisehg\hgtk\thgmq.py:777
 msgid "Bottom"
-msgstr ""
+msgstr "最下層"
 
 #: tortoisehg\hgtk\thgmq.py:798
 msgid "_Goto"
@@ -5422,7 +5435,7 @@ msgstr "重新命名(_R)"
 
 #: tortoisehg\hgtk\thgmq.py:802
 msgid "_Finish Applied"
-msgstr ""
+msgstr "完成應用(_F)"
 
 #: tortoisehg\hgtk\thgmq.py:805 tortoisehg\hgtk\thgmq.py:835
 msgid "_Delete"
@@ -5430,7 +5443,7 @@ msgstr "刪除(__D)"
 
 #: tortoisehg\hgtk\thgmq.py:807 tortoisehg\hgtk\thgmq.py:838
 msgid "F_old"
-msgstr ""
+msgstr "折疊(_O)"
 
 #: tortoisehg\hgtk\thgmq.py:810 tortoisehg\hgtk\thgmq.py:842
 msgid "Reorder"
@@ -5645,7 +5658,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgshelve.py:162
 msgid "Append"
-msgstr ""
+msgstr "加入"
 
 #: tortoisehg\hgtk\thgshelve.py:216
 msgid "Unshelve Abort"
@@ -5681,7 +5694,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgstrip.py:111
 msgid "Backup all (default)"
-msgstr ""
+msgstr "備份全部(預設)"
 
 #: tortoisehg\hgtk\thgstrip.py:112
 msgid "Backup unrelated changesets (-b/--backup)"
@@ -5709,7 +5722,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\thgstrip.py:176
 msgid "Unknown revision!"
-msgstr ""
+msgstr "未知的修定版本!"
 
 #: tortoisehg\hgtk\thgstrip.py:179
 msgid "%s changesets"
@@ -5866,7 +5879,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\visdiff.py:151
 msgid "No file changes"
-msgstr ""
+msgstr "沒有檔案被變更"
 
 #: tortoisehg\hgtk\visdiff.py:152
 msgid "There are no file changes to view"
@@ -5902,7 +5915,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\visdiff.py:321
 msgid " filtered"
-msgstr ""
+msgstr " 過濾器"
 
 #: tortoisehg\hgtk\visdiff.py:332
 msgid "Temporary files are removed when this dialog is closed"
@@ -5934,15 +5947,15 @@ msgstr ""
 
 #: tortoisehg\hgtk\visdiff.py:523
 msgid "&Quit"
-msgstr ""
+msgstr "離開(&Q)"
 
 #: tortoisehg\hgtk\visdiff.py:523
 msgid "Try &Again"
-msgstr ""
+msgstr "再試一次(&A)"
 
 #: tortoisehg\hgtk\visdiff.py:622
 msgid "No repository found here"
-msgstr ""
+msgstr "在這沒有版本庫"
 
 #: tortoisehg\util\hgshelve.py:48
 msgid "Unsupported line endings type: %s"
@@ -5958,7 +5971,7 @@ msgstr ""
 
 #: tortoisehg\util\hgshelve.py:128 tortoisehg\util\hgshelve.py:155
 msgid "this is a binary file\n"
-msgstr ""
+msgstr "這是一個二進位檔案\n"
 
 #: tortoisehg\util\hgshelve.py:139
 msgid ""
@@ -5979,7 +5992,7 @@ msgstr ""
 
 #: tortoisehg\util\hgshelve.py:346
 msgid "user quit"
-msgstr ""
+msgstr "使用者退出"
 
 #: tortoisehg\util\hgshelve.py:360
 msgid "shelve changes to %s?"
@@ -5987,7 +6000,7 @@ msgstr ""
 
 #: tortoisehg\util\hgshelve.py:361
 msgid " and "
-msgstr ""
+msgstr " 和 "
 
 #: tortoisehg\util\hgshelve.py:371
 msgid "shelve this change to %r?"
@@ -5995,7 +6008,7 @@ msgstr ""
 
 #: tortoisehg\util\hgshelve.py:410
 msgid "backup %r as %r\n"
-msgstr ""
+msgstr "備份 %r 從 %r\n"
 
 #: tortoisehg\util\hgshelve.py:414
 msgid "file copy of %s failed\n"
@@ -6027,7 +6040,7 @@ msgstr ""
 
 #: tortoisehg\util\hgshelve.py:539
 msgid "applying patch\n"
-msgstr ""
+msgstr "套用補丁\n"
 
 #: tortoisehg\util\hgshelve.py:546
 msgid "saving patch to shelve\n"
@@ -6115,35 +6128,35 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:19
 msgid "Commit..."
-msgstr ""
+msgstr "提交..."
 
 #: tortoisehg\util\menuthg.py:20
 msgid "Commit changes in repository"
-msgstr ""
+msgstr "提交版本庫變更"
 
 #: tortoisehg\util\menuthg.py:22
 msgid "Create Repository Here"
-msgstr ""
+msgstr "在這建立版本庫"
 
 #: tortoisehg\util\menuthg.py:23
 msgid "Create a new repository"
-msgstr ""
+msgstr "建立一個版本庫"
 
 #: tortoisehg\util\menuthg.py:25
 msgid "Clone..."
-msgstr ""
+msgstr "克隆..."
 
 #: tortoisehg\util\menuthg.py:26
 msgid "Create clone here from source"
-msgstr ""
+msgstr "從來源在這建立克隆"
 
 #: tortoisehg\util\menuthg.py:28
 msgid "File Status"
-msgstr ""
+msgstr "檔案狀態"
 
 #: tortoisehg\util\menuthg.py:29
 msgid "Repository status & changes"
-msgstr ""
+msgstr "版本庫狀態及變更"
 
 #: tortoisehg\util\menuthg.py:31
 msgid "Shelve Changes"
@@ -6155,11 +6168,11 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:31
 msgid "Add Files..."
-msgstr ""
+msgstr "加入檔案..."
 
 #: tortoisehg\util\menuthg.py:32
 msgid "Add files to version control"
-msgstr ""
+msgstr "加入檔案到版本控制"
 
 #: tortoisehg\util\menuthg.py:34
 msgid "Revert Files..."
@@ -6179,39 +6192,39 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:40
 msgid "Remove Files..."
-msgstr ""
+msgstr "移除檔案..."
 
 #: tortoisehg\util\menuthg.py:43
 msgid "Rename File"
-msgstr ""
+msgstr "檔案更名"
 
 #: tortoisehg\util\menuthg.py:44
 msgid "Rename file or directory"
-msgstr ""
+msgstr "檔案或目錄更名"
 
 #: tortoisehg\util\menuthg.py:47
 msgid "View change history in repository"
-msgstr ""
+msgstr "檢視該版本庫的變更歷史"
 
 #: tortoisehg\util\menuthg.py:50
 msgid "View change history of selected files"
-msgstr ""
+msgstr "檢視所選檔案的版本變更歷史"
 
 #: tortoisehg\util\menuthg.py:53
 msgid "Synchronize with remote repository"
-msgstr ""
+msgstr "同步遠端版本庫"
 
 #: tortoisehg\util\menuthg.py:56
 msgid "Start web server for this repository"
-msgstr ""
+msgstr "開始運行這個版本庫的網頁伺服器"
 
 #: tortoisehg\util\menuthg.py:58
 msgid "Update..."
-msgstr ""
+msgstr "更新..."
 
 #: tortoisehg\util\menuthg.py:59
 msgid "Update working directory"
-msgstr ""
+msgstr "更新工作目錄"
 
 #: tortoisehg\util\menuthg.py:64
 msgid "Recovery..."
@@ -6243,7 +6256,7 @@ msgstr "儲藏庫設定"
 
 #: tortoisehg\util\menuthg.py:68
 msgid "Configure repository settings"
-msgstr ""
+msgstr "配置版本庫設定"
 
 #: tortoisehg\util\menuthg.py:70
 msgid "Explorer Extension Settings"
@@ -6255,7 +6268,7 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:73
 msgid "About TortoiseHg"
-msgstr ""
+msgstr "關於 TortoiseHg"
 
 #: tortoisehg\util\menuthg.py:74
 msgid "Show About Dialog"
@@ -6279,11 +6292,11 @@ msgstr "使用圖型化比較工具檢視變更"
 
 #: tortoisehg\util\menuthg.py:79
 msgid "Edit Ignore Filter"
-msgstr ""
+msgstr "編輯忽略過濾清單"
 
 #: tortoisehg\util\menuthg.py:80
 msgid "Edit repository ignore filter"
-msgstr ""
+msgstr "編輯版本庫中忽略過濾清單"
 
 #: tortoisehg\util\menuthg.py:82
 msgid "Guess Renames"
@@ -6295,7 +6308,7 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:85
 msgid "Search History"
-msgstr ""
+msgstr "搜尋歷史"
 
 #: tortoisehg\util\menuthg.py:86
 msgid "Search file revisions for patterns"
@@ -6372,7 +6385,7 @@ msgstr ""
 
 #: tortoisehg\util\version.py:17
 msgid "repository %s not found"
-msgstr ""
+msgstr "找不到版本庫 %s"
 
 #~ msgid "Stat"
 #~ msgstr "狀態"
@@ -6473,3 +6486,47 @@ msgstr ""
 
 #~ msgid "_view file at revision"
 #~ msgstr "查看文件(_v)"
+
+#~ msgid "Confirm Override Branch"
+#~ msgstr "確認覆蓋分支"
+
+#~ msgid ""
+#~ "A branch named \"%s\" already exists,\n"
+#~ "override?"
+#~ msgstr "一個名為\"%s\"的分支已經存在，覆蓋它？"
+
+#~ msgid "Cannot annotate directory: %s"
+#~ msgstr "不能註釋目錄：%s"
+
+#~ msgid "No parent file"
+#~ msgstr "沒有上層文件"
+
+#~ msgid "Unable to annotate"
+#~ msgstr "不能註釋"
+
+#~ msgid "file history: "
+#~ msgstr "檔案歷史: "
+
+#~ msgid "Options..."
+#~ msgstr "選項..."
+
+#~ msgid "_annotate file"
+#~ msgstr "註釋文件"
+
+#~ msgid "TortoiseHg RPC server"
+#~ msgstr "TortoiseHg RPC 服務器"
+
+#~ msgid "di_splay change"
+#~ msgstr "顯示改變(_s)"
+
+#~ msgid "_zoom to change"
+#~ msgstr "聚焦改變(_z)"
+
+#~ msgid "_annotate parent"
+#~ msgstr "註釋上層(_a)"
+
+#~ msgid "Backed out successfully"
+#~ msgstr "撤銷成功"
+
+#~ msgid "L_og"
+#~ msgstr "記錄(_O)"
