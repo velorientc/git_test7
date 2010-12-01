@@ -129,17 +129,21 @@ class QReorderDialog(QDialog):
         self.summ.setText(hglib.tounicode(txt))
 
     def accept(self):
-        lines = []
-        for i in xrange(self.alw.count()-1, -1, -1):
-            item = self.alw.item(i)
-            lines.append(hglib.fromunicode(item.text()))
-        for i in xrange(self.ulw.count()-1, -1, -1):
-            item = self.ulw.item(i)
-            lines.append(hglib.fromunicode(item.text()))
-        if lines:
-            fp = self.repo.opener('patches/series', 'wb')
-            fp.write('\n'.join(lines))
-            fp.close()
+        try:
+            self.repo.incrementBusyCount()
+            lines = []
+            for i in xrange(self.alw.count()-1, -1, -1):
+                item = self.alw.item(i)
+                lines.append(hglib.fromunicode(item.text()))
+            for i in xrange(self.ulw.count()-1, -1, -1):
+                item = self.ulw.item(i)
+                lines.append(hglib.fromunicode(item.text()))
+            if lines:
+                fp = self.repo.opener('patches/series', 'wb')
+                fp.write('\n'.join(lines))
+                fp.close()
+        finally:
+            self.repo.decrementBusyCount()
         QDialog.accept(self)
 
     def reject(self):
