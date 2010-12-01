@@ -205,7 +205,7 @@ def getfont(name):
     assert name in _fontdefaults
     return _fontcache[name]
 
-def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Close,
+def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Ok,
                  labels=[], parent=None, defaultbutton=None):
     msg = QMessageBox(parent)
     msg.setIcon(icon)
