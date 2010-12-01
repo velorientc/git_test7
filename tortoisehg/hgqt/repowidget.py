@@ -19,7 +19,7 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
-from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
+from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, qdelete
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -695,7 +695,14 @@ class RepoWidget(QWidget):
 
         if len(selection) == 0:
             return
-        elif self.bundle:
+        allunapp = False
+        if 'mq' in self.repo.extensions():
+            for rev in selection:
+                if not self.repo.changectx(rev).thgmqunappliedpatch():
+                    break
+            else:
+                allunapp = True
+        if self.bundle:
             # Special menu for applied bundle
             menu = QMenu(self) # TODO: save in repowidget
             act = QAction(_('Pull to here'), self)
@@ -703,12 +710,32 @@ class RepoWidget(QWidget):
             menu.addAction(act)
             menu.exec_(point)
             return
+        elif allunapp:
+            self.unnapliedPatchMenu(point, selection)
         elif len(selection) == 1:
             self.singleSelectionMenu(point, selection)
         elif len(selection) == 2:
             self.doubleSelectionMenu(point, selection)
         else:
             self.multipleSelectionMenu(point, selection)
+
+    def unnapliedPatchMenu(self, point, selection):
+        def qdeleteact():
+            """Delete unapplied patch(es)"""
+            dlg = qdelete.QDeleteDialog(self.repo, patches, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.output.connect(self.output)
+            dlg.makeLogVisible.connect(self.makeLogVisible)
+            dlg.exec_()
+
+        # Special menu for unapplied patches
+        patches = [self.repo.changectx(r).thgmqpatchname() for r in selection]
+        menu = QMenu(self) # TODO: save in repowidget
+        act = QAction(_('Delete patches'), self)
+        act.triggered.connect(qdeleteact)
+        menu.addAction(act)
+        menu.exec_(point)
+        return
 
     def singleSelectionMenu(self, point, selection):
         if not self.singlecmenu:
@@ -752,7 +779,6 @@ class RepoWidget(QWidget):
                 ('mq', None, None, None, None),
                 ('mq', fixed, _('Import to MQ'), None, self.qimportRevision),
                 ('mq', applied, _('Finish patch'), None, self.qfinishRevision),
-                ('mq', unapp, _('Delete patch'), None, self.qdeleteRevision),
                 ('mq', qpar, _('Pop all patches'), None, self.qpopAllRevision),
                 ('mq', patch, _('Goto patch'), None, self.qgotoRevision),
                 ('mq', fixed, _('Strip...'), None, self.stripRevision),
@@ -991,13 +1017,6 @@ class RepoWidget(QWidget):
         cmdline = ['qfinish', 'qbase::%s' % self.rev,
                    '--repository', self.repo.root]
         self.runCommand(_('QFinish - TortoiseHg'), cmdline)
-
-    def qdeleteRevision(self):
-        """Delete unapplied patch"""
-        patchname = self.repo.changectx(self.rev).thgmqpatchname()
-        cmdline = ['qdelete', str(patchname), '--keep',
-                   '--repository', self.repo.root]
-        self.runCommand(_('QDelete - TortoiseHg'), cmdline)
 
     def qpopAllRevision(self):
         """Unapply all patches"""
