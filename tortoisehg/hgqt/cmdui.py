@@ -227,6 +227,7 @@ class Core(QObject):
             self.output.emit(
                 msgmap.get(error, _('error while running command\n')),
                 'ui.error')
+            finished(-1)
 
         def stdout():
             data = proc.readAllStandardOutput().data()
