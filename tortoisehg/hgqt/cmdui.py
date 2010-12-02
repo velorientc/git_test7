@@ -223,14 +223,13 @@ class Core(QObject):
                 self.commandFinished.emit(ret)
 
         def handleerror(error):
-            msgmap = {
-                QProcess.FailedToStart: _('failed to start command\n'),
-                QProcess.Crashed: _('returned error\n')}
-            self.output.emit(
-                msgmap.get(error, _('error while running command\n')),
-                'ui.error')
             if error == QProcess.FailedToStart:
+                self.output.emit(_('failed to start command\n'),
+                                 'ui.error')
                 finished(-1)
+            elif error != QProcess.Crashed:
+                self.output.emit(_('error while running command\n'),
+                                 'ui.error')
 
         def stdout():
             data = proc.readAllStandardOutput().data()
