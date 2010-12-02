@@ -583,6 +583,8 @@ class RepoWidget(QWidget):
             ttw = self.syncDemand.get()
         elif tti == self.grepTabIndex:
             ttw = self.grepDemand.get()
+        elif tti == self.pbranchTabIndex:
+            ttw = self.pbranchDemand.get()
         if ttw:
             ttw.reload()
 

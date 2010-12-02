@@ -99,6 +99,11 @@ class PatchBranchWidget(QWidget):
         self.runner = cmdui.Runner(_('Patch Branch'), True, parent=self)
         self.runner.commandFinished.connect(self.commandFinished)
 
+    def reload(self):
+        'User has requested a reload'
+        self.repo.thginvalidate()
+        self.refresh()
+
     def refresh(self):
         """
         Refresh the list of patches.
