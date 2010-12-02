@@ -34,9 +34,6 @@ components of TortoiseHg.
 
 :doc:`settings` describes how to configure TortoiseHg.
 
-:doc:`recovery` describes the recovery operations one can perform on a
-project.
-
 :doc:`nonhg` describes how to use TortoiseHg as a client for
 non-Mercurial servers.
 
