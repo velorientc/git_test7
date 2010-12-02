@@ -76,7 +76,7 @@ class InitDialog(QDialog):
         path = os.path.abspath(destdir and destdir[0] or self.cwd)
         if os.path.isfile(path):
             path = os.path.dirname(path)
-        self.dest_edit.setText(path)
+        self.dest_edit.setText(hglib.tounicode(path))
         self.add_files_chk.setChecked(True)
         self.make_pre_1_7_chk.setChecked(False)
         self.compose_command()
@@ -201,8 +201,6 @@ class InitDialog(QDialog):
                     open(hgignore, 'wb')
                 except:
                     pass
-
-        shlib.shell_notify([dest])
 
         if self.run_wb_chk.isChecked():
             from tortoisehg.hgqt import run
