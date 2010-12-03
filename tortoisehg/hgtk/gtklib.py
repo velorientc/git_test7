@@ -199,20 +199,15 @@ LINE_COLORS = [
     ( 1.0, 0.0, 1.0 ),
     ]
 
-def get_gtk_colors():
-    color_scheme = gtk.settings_get_default().get_property('gtk-color-scheme')
-    colors = {}
-    for color in color_scheme.split('\n'):
-        color = color.strip()
-        if color:
-            name, color = color.split(':')
-            colors[name.strip()] = gtk.gdk.color_parse(color.strip())
-    return colors
+def get_gtk_text_color():
+    w = gtk.Window()
+    w.realize()
+    style = w.get_style()
+    return style.text[gtk.STATE_NORMAL].to_string()
 
 def is_dark_theme():
     global NORMAL, MAINLINE_COLOR
-    gtk_colors = get_gtk_colors()
-    normal = gtk_colors.get('fg_color', gtk.gdk.color_parse('black'))
+    normal = gtk.gdk.color_parse(get_gtk_text_color())
     NORMAL = str(normal)
     MAINLINE_COLOR = (
             normal.red / 65535.0,
@@ -249,7 +244,7 @@ def _init_colors():
         DLIME, PLIME = PLIME, DLIME
         DBROWN, PBROWN = PBROWN, DBROWN
         DVIOLET, PVIOLET = PVIOLET, DVIOLET
-        black, WHITE = WHITE, BLACK
+        BLACK, WHITE = WHITE, BLACK
 
         CHANGE_HEADER = '#404040'
 
