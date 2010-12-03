@@ -1210,12 +1210,8 @@ class GCommit(GStatus):
         if self.qnew:
             cmdline[1] = 'qnew'
             cmdline.append('--force')
-            if not files:
-                cmdline += ['-X', self.repo.root]
         elif self.qheader is not None:
             cmdline[1] = 'qrefresh'
-            if not files:
-                cmdline += ['-X', self.repo.root]
         elif self.opts['addremove']:
             cmdline += ['--addremove']
         if self.opts['user'] or user:
@@ -1223,11 +1219,14 @@ class GCommit(GStatus):
         if self.opts['date']:
             cmdline.extend(['--date', self.opts['date']])
         files += self.opts['include']
+        if not files and not self.is_merge():
+            cmdline += ['-X', self.repo.root]
         cmdline += ['--message', hglib.fromutf(self.opts['message'])]
         if self.qnew:
             cmdline += [hglib.fromutf(self.get_qnew_name())]
-        cmdline.append('--')
-        cmdline += files
+        if files:
+            cmdline.append('--')
+            cmdline += files
         if autopush:
             cmdline = (cmdline, ['hg', 'push'])
         def done(return_code, *args):
