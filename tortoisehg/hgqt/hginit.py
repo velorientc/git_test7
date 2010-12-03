@@ -112,11 +112,11 @@ class InitDialog(QDialog):
 
     def compose_command(self):
         # just a stub for extension with extra options (--mq, --ssh, ...)
-        self.cmdline = ['init']
+        cmd = ['hg', 'init']
         if self.make_pre_1_7_chk.isChecked():
-            self.cmdline.append('--config format.dotencode=False')
-        self.cmdline.append(self.getPath())
-        self.hgcmd_txt.setText('hg ' + ' '.join(self.cmdline))
+            cmd.append('--config format.dotencode=False')
+        cmd.append(self.getPath())
+        self.hgcmd_txt.setText(hglib.tounicode(' '.join(cmd)))
 
     def getPath(self):
         return hglib.fromunicode(self.dest_edit.text()).strip()
@@ -132,7 +132,8 @@ class InitDialog(QDialog):
             return False
 
         dest = os.path.normpath(dest)
-        self.dest_edit.setText(dest)
+        self.dest_edit.setText(hglib.tounicode(dest))
+        udest = self.dest_edit.text()
 
         if not os.path.exists(dest):
             p = dest
@@ -147,7 +148,7 @@ class InitDialog(QDialog):
                         _('Are you sure about adding the new repository'
                           ' %d extra levels deep?') % l,
                         _('Path exists up to:\n%s\nand you asked for:\n%s')
-                            % (p, dest),
+                            % (p, udest),
                         defaultbutton=QMessageBox.No)
                 if not res:
                     self.dest_edit.setFocus()
@@ -157,7 +158,7 @@ class InitDialog(QDialog):
                 os.makedirs(dest)
             except:
                 qtlib.ErrorMsgBox(_('Error executing init'),
-                        _('Cannot create folder %s' % dest))
+                        _('Cannot create folder %s' % udest))
                 return False
 
         _ui = ui.ui()
@@ -214,7 +215,7 @@ class InitDialog(QDialog):
         else:
             if not self.parent():
                 qtlib.InfoMsgBox(_('Init'),
-                _('<p>Repository successfully created at</p><p>%s</p>') % dest)
+                _('<p>Repository successfully created at</p><p>%s</p>') % udest)
 
         self.accept()
 
