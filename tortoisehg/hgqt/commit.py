@@ -617,6 +617,8 @@ class CommitWidget(QWidget):
                 cmdline[0] = 'qrefresh'
                 files = []
 
+        if len(repo.parents()) == 1 and not self.qref and not files:
+            cmdline += ['-X', repo.root]
         cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
         for fname in self.opts.get('autoinc', '').split(','):
             fname = fname.strip()
