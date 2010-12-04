@@ -1,0 +1,101 @@
+#!/usr/bin/env python
+#
+# thg - front-end script for TortoiseHg dialogs
+#
+# Copyright (C) 2008-2010 Steve Borho <steve@borho.org>
+# Copyright (C) 2008 TK Soh <teekaysoh@gmail.com>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
+
+import os
+import sys
+
+if hasattr(sys, "frozen"):
+    if sys.frozen == 'windows_exe' and 'THGDEBUG' in os.environ:
+        import win32traceutil
+        print 'starting'
+    # os.Popen() needs this, and Mercurial still uses os.Popen
+    if 'COMSPEC' not in os.environ:
+        comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
+                               'system32', 'cmd.exe')
+        os.environ['COMSPEC'] = comspec
+else:
+    thgpath = os.path.dirname(os.path.realpath(__file__))
+    testpath = os.path.join(thgpath, 'tortoisehg')
+    if os.path.isdir(testpath) and thgpath not in sys.path:
+        sys.path.insert(0, thgpath)
+
+    # compile .ui and .qrc for in-place use
+    fpath = os.path.realpath(__file__)
+    if os.path.exists(os.path.join(os.path.dirname(fpath), 'setup.py')):
+        from distutils.dist import Distribution
+        from setup import build_qt
+        build_qt(Distribution()).run()
+
+    if 'HGPATH' in os.environ:
+        hgpath = os.environ['HGPATH']
+        testpath = os.path.join(hgpath, 'mercurial')
+        if os.path.isdir(testpath) and hgpath not in sys.path:
+            sys.path.insert(0, hgpath)
+
+from mercurial import demandimport
+demandimport.ignore.append('win32com.shell')
+demandimport.ignore.append('tortoisehg.util.config')
+demandimport.ignore.append('workbench_rc')
+demandimport.enable()
+from mercurial import ui, util
+from tortoisehg.util.hgversion import hgversion, checkhgversion
+import cStringIO
+import traceback
+
+try:
+    import tortoisehg.hgqt.run
+except ImportError, e:
+    sys.stderr.write(str(e)+'\n')
+    sys.stderr.write("abort: couldn't find tortoisehg libraries in [%s]\n" %
+                     os.pathsep.join(sys.path))
+    sys.stderr.write("(check your install and PYTHONPATH)\n")
+    sys.exit(-1)
+
+_ui = ui.ui()
+capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
+
+errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError',
+          'NotImplementedError')
+
+err = checkhgversion(hgversion)
+if err:
+    _ui.warn('abort: %s\n' % err)
+    sys.exit(1)
+
+if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
+    sys.exit(tortoisehg.hgqt.run.dispatch(sys.argv[1:]))
+else:
+    mystderr = cStringIO.StringIO()
+    origstderr = sys.stderr
+    sys.stderr = mystderr
+    ret = 0
+    try:
+        ret = tortoisehg.hgqt.run.dispatch(sys.argv[1:])
+        sys.stderr = origstderr
+        mystderr.seek(0)
+        for l in mystderr.readlines():
+            if l.startswith(errors):
+                from tortoisehg.hgqt.bugreport import run
+                from tortoisehg.hgqt.run import qtrun
+                error = 'Recoverable runtime error (stderr):\n'
+                error += mystderr.getvalue()
+                opts = {}
+                opts['cmd'] = ' '.join(sys.argv[1:])
+                opts['error'] = error
+                opts['nofork'] = True
+                qtrun(run, _ui, **opts)
+                break
+        sys.exit(ret)
+    except:
+        if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
+            sys.stderr = origstderr
+            traceback.print_exc()
+        else:
+            raise SystemExit(ret)
