@@ -338,7 +338,12 @@ class RepoWidget(QWidget):
         return gw
 
     def createPatchBranchWidget(self):
-        return PatchBranchWidget(self.repo, parent=self)
+        pbw = PatchBranchWidget(self.repo, parent=self)
+        pbw.output.connect(self.workbench.log.output)
+        pbw.progress.connect(lambda tp, p, i, u, tl:
+            self.workbench.statusbar.progress(tp, p, i, u, tl, self.repo.root))
+        pbw.makeLogVisible.connect(self.workbench.log.setShown)
+        return pbw
 
     def updatePatchBranchTab(self):
         "Only show pbranch tab when pbranch extension is installed"

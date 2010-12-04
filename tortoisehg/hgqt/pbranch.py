@@ -24,7 +24,9 @@ class PatchBranchWidget(QWidget):
     A widget that show the patch graph and provide actions 
     for the pbranch extension
     '''
-    visibilityChanged = pyqtSignal(bool)
+    output = pyqtSignal(QString, QString)
+    progress = pyqtSignal(QString, object, QString, QString, object)
+    makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, repo, parent=None, logwidget=None):
         QWidget.__init__(self, parent)
@@ -55,7 +57,7 @@ class PatchBranchWidget(QWidget):
         a.setIcon(QIcon(QPixmap(":/icons/merge.svg")))
         a.setToolTip(_('Merge all pending dependencies'))
         tb.addAction(self.actionPMerge)
-        #self.actionPMerge.triggered.connect(self.pmerge_clicked)
+        self.actionPMerge.triggered.connect(self.pmerge_clicked)
 
         self.actionBackport = a = QWidgetAction(self)
         a.setIcon(QIcon(QPixmap(":/icons/back.svg")))
@@ -95,8 +97,10 @@ class PatchBranchWidget(QWidget):
         vbox.addWidget(self.patchlist, 1)
 
         # Command output
-        # TODO: connect output, makeVisible signals to self, then workbench
         self.runner = cmdui.Runner(_('Patch Branch'), True, parent=self)
+        self.runner.output.connect(self.output)
+        self.runner.progress.connect(self.progress)
+        self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.commandFinished)
 
     def reload(self):
@@ -306,7 +310,32 @@ class PatchBranchWidget(QWidget):
         self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
         self.repo.decrementBusyCount()
         return True
+   
+    def pmerge(self, patch_name=None):
+        """
+        [pbranch] Execute 'pmerge' command.
 
+        :param patch_name: Merge to this patch-branch
+        """
+        if not self.has_patch():
+            return
+        cmd = ['pmerge', '--cwd', self.repo.root]
+        if patch_name:
+            cmd += [patch_name]
+        else:
+            cmd += ['--all']
+        self.repo.incrementBusyCount()
+        self.runner.run(cmd)
+
+    def has_pbranch(self):
+        """ return True if pbranch extension can be used """
+        return self.pbranch is not None
+
+    def has_patch(self):
+        """ return True if pbranch extension is in use on repo """
+        return self.has_pbranch() and self.pgraph() != []
+
+        
     ### internal functions ###
 
     def update_sensitivity(self):
@@ -323,8 +352,9 @@ class PatchBranchWidget(QWidget):
 
     # Signal handlers
 
-    def commandFinished(self):
-        pass
+    def commandFinished(self, ret):
+        self.repo.decrementBusyCount()
+        self.refresh()
 
     def configChanged(self):
         pass
@@ -337,6 +367,9 @@ class PatchBranchWidget(QWidget):
 
     def pnew_clicked(self, toolbutton):
         self.pnew_ui()
+
+    def pmerge_clicked(self):
+        self.pmerge()
 
 class PatchGraphNode(object):
     """
