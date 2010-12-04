@@ -480,12 +480,13 @@ class HgFileView(QFrame):
                     self.sci.markerAdd(i, self.markertriangle)
 
             elif tag == 'delete':
+                # You cannot effectively show deleted lines in a single
+                # pane display.  They do not exist.
                 pass
-                # self.block['left'].addBlock('-', alo, ahi)
-                # self.diffblock.addBlock('-', alo, ahi, blo, bhi)
-                # w = self.viewers['left']
+                # self._diffs.append([blo, bhi])
+                # self.blk.addBlock('-', blo, bhi)
                 # for i in range(alo, ahi):
-                #     w.markerAdd(i, self.markerminus)
+                #      self.sci.markerAdd(i, self.markerminus)
 
             elif tag == 'insert':
                 self._diffs.append([blo, bhi])
