@@ -20,7 +20,8 @@ class ColumnSelectDialog(QDialog):
         QDialog.__init__(self, parent)
 
         self.setWindowTitle(_('Workbench Log Columns'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
         self.setMinimumSize(250, 265)
 
         self.curcolumns = curcolumns
