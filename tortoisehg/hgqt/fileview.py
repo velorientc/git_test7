@@ -75,6 +75,12 @@ class Annotator(qsci):
 
     def setFilectx(self, fctx):
         self.fctx = fctx
+        if fctx.rev() is None:
+            # the working context does not support annotate yet.  I need to
+            # add that to Mercurial at some point.
+            self.setText('')
+            self.fctxann = []
+            return
         self.fctxann = [f for f, line in fctx.annotate(follow=True)]
         revlist = [str(f.rev()) for f in self.fctxann]
         self.setText('\n'.join(revlist))
@@ -241,7 +247,7 @@ class HgFileView(QFrame):
             self.displayFile(rev=rev)
 
     def mouseMoveEvent(self, event):
-        if self._mode == 'file' and self._annotate:
+        if self._mode == 'file' and self._annotate and self.ann.fctxann:
             # Calculate row index from the scroll offset and mouse position
             scroll_offset = self.sci.verticalScrollBar().value()
             idx = scroll_offset + event.pos().y() / self.sci.textHeight(0)
