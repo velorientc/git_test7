@@ -24,7 +24,8 @@ class BookmarkDialog(QDialog):
 
     def __init__(self, repo, rev, parent):
         super(BookmarkDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
 
         # base layout box
@@ -140,8 +141,9 @@ class BookmarkDialog(QDialog):
             self.bookmark_combo.setEditText(bookmark_name)
 
     def toggle_new_bookmark(self):
-        bookmark = hglib.fromunicode(self.bookmark_combo.currentText())
-        is_new = bookmark not in self.repo.bookmarks
+        bookmark = self.bookmark_combo.currentText()
+        bookmarkutf = unicode(bookmark).encode('utf-8')
+        is_new = bookmarkutf not in self.repo.bookmarks
         self.add_btn.setVisible(is_new)
         self.add_btn.setDisabled(not is_new)
         self.remove_btn.setVisible(not is_new)
@@ -152,16 +154,14 @@ class BookmarkDialog(QDialog):
     def update_sensitives(self):
         """ update bottom button sensitives based on rev and bookmark """
         self.toggle_new_bookmark()
-
-        bookmark = hglib.fromunicode(self.bookmark_combo.currentText())
-        rev = self.rev_text.text()
-        if not rev or not bookmark:
+        revstr = self.rev_text.text()
+        if not revstr or not self.bookmark_combo.currentText():
             self.add_btn.setDisabled(True)
             return
 
-        # check if valid revision
         try:
-            self.repo[hglib.fromunicode(rev)]
+            # check if valid revision, tag, or branch
+            self.repo[unicode(revstr, 'utf-8')]
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             self.add_btn.setDisabled(True)
             self.remove_btn.setDisabled(True)
@@ -178,60 +178,65 @@ class BookmarkDialog(QDialog):
         self.sep.setHidden(True)
 
     def add_bookmark(self):
-        name = hglib.fromunicode(self.bookmark_combo.currentText())
-        if name in self.repo.bookmarks:
-            self.set_status(_('A bookmark named "%s" already exists') % name,
-                            False)
+        bookmark = self.bookmark_combo.currentText()
+        bookmarkutf = unicode(bookmark).encode('utf-8')
+        if bookmarkutf in self.repo.bookmarks:
+            self.set_status(_('A bookmark named "%s" already exists') %
+                            bookmark, False)
             return
 
         bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
                            rev=self.initial_rev,
-                           mark=name)
+                           mark=bookmarkutf)
 
-        self.bookmark_combo.addItem(hglib.tounicode(name))
-        self.set_status(_("Bookmark '%s' has been added") % name, True)
+        self.bookmark_combo.addItem(bookmark)
+        self.set_status(_("Bookmark '%s' has been added") % bookmark, True)
         self.toggle_new_bookmark()
         self.bookmark_combo.clearEditText()
 
     def remove_bookmark(self):
-        name = hglib.fromunicode(self.bookmark_combo.currentText())
-        if not name in self.repo.bookmarks:
-            self.set_status(_("Bookmark '%s' does not exist") % name, False)
+        bookmark = self.bookmark_combo.currentText()
+        bookmarkutf = unicode(bookmark).encode('utf-8')
+        if not bookmarkutf in self.repo.bookmarks:
+            self.set_status(_("Bookmark '%s' does not exist") % bookmark, False)
             return
 
         bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
-                           mark=name,
+                           mark=bookmarkutf,
                            delete=True)
 
         self.bookmark_combo.removeItem(self.bookmark_combo.currentIndex())
         self.new_name_text.setText("")
-        self.set_status(_("Bookmark '%s' has been removed") % name, True)
+        self.set_status(_("Bookmark '%s' has been removed") % bookmark, True)
         self.update_sensitives()
 
     def rename_bookmark(self):
-        name = hglib.fromunicode(self.bookmark_combo.currentText())
-        new_name = hglib.fromunicode(self.new_name_text.text())
-        if not name in self.repo.bookmarks:
+        name = self.bookmark_combo.currentText()
+        nameutf = unicode(name).encode('utf-8')
+
+        newname = self.new_name_text.text()
+        newnameutf = unicode(newname).encode('utf-8')
+        if not nameutf in self.repo.bookmarks:
             self.set_status(_("Bookmark '%s' does not exist") % name, False)
             return
 
-        if new_name in self.repo.bookmarks:
-            self.set_status(_('A bookmark named "%s" already exists') % new_name,
-                            False)
+        if newnameutf in self.repo.bookmarks:
+            self.set_status(_('A bookmark named "%s" already exists') %
+                            newname, False)
             return
 
         bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
-                           mark=new_name,
-                           rename=name)
+                           mark=newnameutf,
+                           rename=nameutf)
 
         self.bookmark_combo.removeItem(self.bookmark_combo.currentIndex())
-        self.bookmark_combo.addItem(new_name)
+        self.bookmark_combo.addItem(newname)
         self.new_name_text.setText("")
         self.set_status(_("Bookmark '%s' has been renamed to '%s'") %
-                        (name, new_name), True)
+                        (name, newname), True)
 
     @pyqtSlot(QString)
     def new_bookmark_changed(self, value):
