@@ -134,8 +134,9 @@ class RepoFilterBar(QToolBar):
             openbrnodes = []
             for br in allbranches.iterkeys():
                 openbrnodes.extend(self._repo.branchheads(br, closed=False))
+            dead = self._repo.deadbranches
             return sorted(br for br, n in allbranches.iteritems()
-                          if n in openbrnodes)
+                          if n in openbrnodes and br not in dead)
 
         branches = list(iterbranches(all=self._cbranchAction.isChecked()))
         self._branchCombo.clear()
