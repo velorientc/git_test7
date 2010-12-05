@@ -65,7 +65,10 @@ class RepoWidget(QWidget):
         self.bundle = None
         self.revset = set()
 
-        self._reload_rev = '.' # select working parent at startup
+        if repo.parents()[0].rev() == -1:
+            self._reload_rev = 'tip'
+        else:
+            self._reload_rev = '.'
         self.currentMessage = ''
         self.runner = None
         self.dirty = False
@@ -572,7 +575,7 @@ class RepoWidget(QWidget):
         if self.rev is None or len(self.repo) > self.rev:
             self._reload_rev = self.rev
         else:
-            self._reload_rev = '.'
+            self._reload_rev = 'tip'
         self.setupModels()
         self.revDetailsWidget.record()
 
