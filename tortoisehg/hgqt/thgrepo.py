@@ -227,9 +227,9 @@ def _extendrepo(repo):
 
         @propertycache
         def _thghiddentags(self):
-            t = self.ui.config('tortoisehg', 'hidetags', '')
-            hiddentags_opt = hglib.tounicode(t)
-            return [t.strip() for t in hiddentags_opt.split()]
+            # Assume Mercurial.ini file is in local encoding, need UTF-8
+            ht = self.ui.config('tortoisehg', 'hidetags', '')
+            return [hglib.toutf(t).strip() for t in ht.split()]
 
         @propertycache
         def thgmqunappliedpatches(self):
@@ -343,9 +343,9 @@ def _extendrepo(repo):
 
         @propertycache
         def deadbranches(self):
-            db = hglib.toutf(self.ui.config('tortoisehg', 'deadbranch', ''))
-            dblist = [b.strip() for b in db.split(',')]
-            return dblist
+            # Assume Mercurial.ini file is in local encoding, need UTF-8
+            db = self.ui.config('tortoisehg', 'deadbranch', '')
+            return [hglib.toutf(b).strip() for b in db.split(',')]
 
         @propertycache
         def displayname(self):
@@ -481,21 +481,13 @@ def getcontext(repo, target):
 
 def _extendchangectx(changectx):
     class thgchangectx(changectx.__class__):
-        def _thgrawtags(self):
-            '''Returns the tags for self, converted to UTF-8 but
-            unfiltered for hidden tags'''
-            return [hglib.toutf(tag) for tag in self.tags()]
-
         def thgtags(self):
-            '''Returns all unhidden tags for self, converted to UTF-8'''
-            value = self._thgrawtags()
+            '''Returns all unhidden tags for self in UTF-8'''
             htlist = self._repo._thghiddentags
-            return [tag for tag in value if tag not in htlist]
+            return [tag for tag in self.tags() if tag not in htlist]
 
         def thgwdparent(self):
             '''True if self is a parent of the working directory'''
-            # FIXME doesn't handle error.Abort apparently raiseable by self._repo.parents()
-            # see old __init__ for repomodel
             return self.rev() in [ctx.rev() for ctx in self._repo.parents()]
 
         def _thgmqpatchtags(self):
@@ -510,7 +502,8 @@ def _extendchangectx(changectx):
             '''True if self is an MQ applied patch'''
             return self.rev() is not None and bool(self._thgmqpatchtags())
 
-        def thgmqunappliedpatch(self): return False
+        def thgmqunappliedpatch(self):
+            return False
 
         def thgmqpatchname(self):
             '''Return self's MQ patch name. AssertionError if self not an MQ patch'''

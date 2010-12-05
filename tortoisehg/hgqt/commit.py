@@ -21,7 +21,6 @@ from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
-#  Need a unicode-to-UTF8 function
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
 
@@ -249,11 +248,11 @@ class CommitWidget(QWidget):
         self.msgcombo.reset(self.msghistory)
 
         # Update branch operation button
-        cur = hglib.tounicode(self.repo[None].branch())
+        branchu = unicode(self.repo[None].branch(), 'utf-8')
         if self.branchop is None:
-            title = _('Branch: ') + cur
+            title = _('Branch: ') + branchu
         elif self.branchop == False:
-            title = _('Close Branch: ') + cur
+            title = _('Close Branch: ') + branchu
         else:
             title = _('New Branch: ') + self.branchop
         self.branchbutton.setText(title)
@@ -520,30 +519,31 @@ class CommitWidget(QWidget):
             brcmd = ['--close-branch']
         else:
             brcmd = []
-            # TODO: Need a unicode-to-UTF8 function
-            newbranch = hglib.fromunicode(self.branchop)
-            if newbranch in repo.branchtags():
+            # self.branchop - new branch name in QString (unicode)
+            # branchutf     - new branch name in UTF8
+            branchutf = unicode(self.branchop).encode('utf-8')
+            if branchutf in repo.branchtags():
                 # response: 0=Yes, 1=No, 2=Cancel
-                if newbranch in [p.branch() for p in repo.parents()]:
+                if branchutf in [p.branch() for p in repo.parents()]:
                     resp = 0
                 else:
-                    rev = repo[newbranch].rev()
+                    rev = repo[branchutf].rev()
                     resp = qtlib.CustomPrompt(_('Confirm Branch Change'),
                         _('Named branch "%s" already exists, '
                           'last used in revision %d\n'
                           'Yes\t- Make commit restarting this named branch\n'
                           'No\t- Make commit without changing branch\n'
-                          'Cancel\t- Cancel this commit') % (newbranch, rev),
+                          'Cancel\t- Cancel this commit') % (self.branchop, rev),
                           self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
             else:
                 resp = qtlib.CustomPrompt(_('Confirm New Branch'),
                     _('Create new named branch "%s" with this commit?\n'
                       'Yes\t- Start new branch with this commit\n'
                       'No\t- Make commit without branch change\n'
-                      'Cancel\t- Cancel this commit') % newbranch,
+                      'Cancel\t- Cancel this commit') % self.branchop,
                     self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
             if resp == 0:
-                repo.dirstate.setbranch(newbranch)
+                repo.dirstate.setbranch(branchutf)
             elif resp == 2:
                 return
         files = self.stwidget.getChecked('MAR?!S')

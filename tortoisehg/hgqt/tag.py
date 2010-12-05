@@ -235,7 +235,7 @@ class TagDialog(QDialog):
     def add_tag(self):
         local = self.local_chk.isChecked()
         name = self.tag_combo.currentText()
-        lname = hglib.fromunicode(name)
+        nameutf = unicode(name).encode('utf-8')
         rev = hglib.fromunicode(self.rev_text.text())
         force = self.replace_chk.isChecked()
         english = self.eng_chk.isChecked()
@@ -243,7 +243,7 @@ class TagDialog(QDialog):
 
         try:
             # tagging
-            if lname in self.repo.tags() and not force:
+            if nameutf in self.repo.tags() and not force:
                 raise util.Abort(_("Tag '%s' already exist") % name)
             ctx = self.repo[rev]
             node = ctx.node()
@@ -255,7 +255,7 @@ class TagDialog(QDialog):
                 message = hglib.fromunicode(message)
 
             self.repo.incrementBusyCount()
-            self.repo.tag(lname, node, message, local, None, None)
+            self.repo.tag(nameutf, node, message, local, None, None)
             self.repo.decrementBusyCount()
             if local:
                 self.localTagChanged.emit()
@@ -270,26 +270,26 @@ class TagDialog(QDialog):
     def remove_tag(self):
         local = self.local_chk.isChecked()
         name = self.tag_combo.currentText()
-        lname = hglib.fromunicode(name)
+        nameutf = unicode(name).encode('utf-8')
         english = self.eng_chk.isChecked()
         message = hglib.fromunicode(self.custom_text.text())
 
         try:
             # tagging
-            tagtype = self.repo.tagtype(lname)
+            tagtype = self.repo.tagtype(nameutf)
             if local:
                 if tagtype != 'local':
-                    raise util.Abort(_('tag \'%s\' is not a local tag') % lname)
+                    raise util.Abort(_('tag \'%s\' is not a local tag') % name)
             else:
                 if tagtype != 'global':
-                    raise util.Abort(_('tag \'%s\' is not a global tag') % lname)
+                    raise util.Abort(_('tag \'%s\' is not a global tag') % name)
             if not message:
                 msgset = keep._('Removed tag %s')
                 message = (english and msgset['id'] or msgset['str']) % name
 
             self.repo.incrementBusyCount()
             node = self.repo[-1].node()
-            self.repo.tag(lname, node, message, local, None, None)
+            self.repo.tag(nameutf, node, message, local, None, None)
             self.repo.decrementBusyCount()
             if local:
                 self.localTagChanged.emit()

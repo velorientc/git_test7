@@ -61,6 +61,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Age', 'Tags',)
     _stretchs = {'Log': 1, }
+    _mqtags = ('qbase', 'qtip', 'qparent')
 
     def __init__(self, repo, branch, revset, rfilter, parent):
         """
@@ -92,7 +93,7 @@ class HgRepoListModel(QAbstractTableModel):
             'Log':      self.getlog,
             'Author':   self.getauthor,
             'Tags':     self.gettags,
-            'Branch':   lambda ctx, gnode: ctx.branch(),
+            'Branch':   self.getbranch,
             'Filename': lambda ctx, gnode: gnode.extra[0],
             'Age':      lambda ctx, gnode: hglib.age(ctx.date()),
             'LocalTime':lambda ctx, gnode: hglib.displaytime(ctx.date()),
@@ -461,13 +462,14 @@ class HgRepoListModel(QAbstractTableModel):
         self.datacache = {}
         self.layoutChanged.emit()
 
+    def getbranch(self, ctx, gnode):
+        return unicode(ctx.branch(), 'utf-8')
+
     def gettags(self, ctx, gnode):
         if ctx.rev() is None:
-            return ""
-        mqtags = ['qbase', 'qtip', 'qparent']
-        tags = ctx.tags()
-        tags = [t for t in tags if t not in mqtags]
-        return hglib.tounicode(",".join(tags))
+            return ''
+        tags = [t for t in ctx.tags() if t not in self._mqtags]
+        return unicode(','.join(tags), 'utf-8')
 
     def getauthor(self, ctx, gnode):
         try:
@@ -485,31 +487,39 @@ class HgRepoListModel(QAbstractTableModel):
         if ctx.thgmqunappliedpatch():
             effects = qtlib.geteffect('log.unapplied_patch')
             text = qtlib.applyeffects(' %s ' % ctx._patchname, effects)
-            #return text + " " + qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)
-            return text + " " + msg
+            # qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)
+            return hglib.tounicode(text + ' ' + msg)
 
         parts = []
         if ctx.thgbranchhead():
+            branchu = unicode(ctx.branch(), 'utf-8')
             effects = qtlib.geteffect('log.branch')
-            text = qtlib.applyeffects(' %s ' % ctx.branch(), effects)
-            parts.append(hglib.tounicode(text))
+            parts.append(qtlib.applyeffects(u' %s ' % branchu, effects))
 
+        # in the near future, I expect bookmarks to be available from the
+        # repository via a separate API, making this logic more efficient.
         bookmarks = self.repo.bookmarks.keys()
         curbookmark = self.repo.bookmarkcurrent
         for tag in ctx.thgtags():
-            style = (self.repo.thgmqtag(tag) and 'log.patch'
-                        or (tag == curbookmark and 'log.curbookmark'
-                            or (tag in bookmarks and 'log.bookmark' or 'log.tag')))
+            if self.repo.thgmqtag(tag):
+                style = 'log.patch'
+            elif tag == curbookmark:
+                style = 'log.curbookmark'
+            elif tag in bookmarks:
+                style = 'log.bookmark'
+            else:
+                style = 'log.tag'
+            # tag is in UTF-8, we need it in unicode with style effects
+            tagu = unicode(tag, 'utf-8')
             effects = qtlib.geteffect(style)
-            text = qtlib.applyeffects(' %s ' % tag, effects)
-            parts.append(hglib.tounicode(text))
+            parts.append(qtlib.applyeffects(u' %s ' % tagu, effects))
 
         if msg:
             if ctx.thgwdparent():
                 msg = qtlib.markup(msg, weight='bold')
             else:
                 msg = qtlib.markup(msg)
-        parts.append(hglib.tounicode(msg))
+            parts.append(hglib.tounicode(msg))
 
         return ' '.join(parts)
 

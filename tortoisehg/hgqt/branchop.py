@@ -62,6 +62,7 @@ class BranchOpDialog(QDialog):
             elif oldbranchop == False:
                 closebranch.setChecked(True)
             else:
+                assert type(oldbranchop) == QString
                 bc = branchCombo
                 names = [bc.itemText(i) for i in xrange(bc.count())]
                 if oldbranchop in names:
@@ -96,7 +97,7 @@ class BranchOpDialog(QDialog):
         '''Branch operation is one of:
             None  - leave wctx branch name untouched
             False - close current branch
-            str   - open new named branch
+            QString - open new named branch
         '''
         if self.branchCombo.isEnabled():
             self.branchop = self.branchCombo.currentText()
