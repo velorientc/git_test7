@@ -78,7 +78,9 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.savebutton)
         hbox.addWidget(QLabel(_('URL:')))
         self.urllabel = QLabel()
+        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
         hbox.addWidget(self.urllabel)
+        hbox.addStretch(1)
         urlvbox.addLayout(hbox)
 
         hbox = QHBoxLayout()
