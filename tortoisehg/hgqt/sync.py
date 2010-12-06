@@ -77,9 +77,8 @@ class SyncWidget(QWidget):
         self.savebutton = QPushButton(_('Save'))
         hbox.addWidget(self.savebutton)
         hbox.addWidget(QLabel(_('URL:')))
-        self.urlentry = QLineEdit()
-        self.urlentry.setReadOnly(True)
-        hbox.addWidget(self.urlentry)
+        self.urllabel = QLabel()
+        hbox.addWidget(self.urllabel)
         urlvbox.addLayout(hbox)
 
         hbox = QHBoxLayout()
@@ -277,7 +276,7 @@ class SyncWidget(QWidget):
         'User has changed schema/host/port/path'
         if self.updateInProgress:
             return
-        self.urlentry.setText(self.currentUrl(True))
+        self.urllabel.setText(self.currentUrl(True))
         notlocal = (self.schemecombo.currentIndex() != 0)
         self.hostentry.setEnabled(notlocal)
         self.portentry.setEnabled(notlocal)
@@ -441,7 +440,7 @@ class SyncWidget(QWidget):
             alias = 'default'
         else:
             alias = 'new'
-        url = hglib.fromunicode(self.urlentry.text())
+        url = hglib.fromunicode(self.urllabel.text())
         dlg = SaveDialog(self.repo, alias, url, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
