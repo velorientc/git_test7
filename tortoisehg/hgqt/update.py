@@ -156,7 +156,7 @@ class UpdateDialog(QDialog):
     ### Private Methods ###
 
     def update_info(self):
-        self.p1_info.update(self.ctxs[0])
+        self.p1_info.update(self.ctxs[0].node())
         merge = len(self.ctxs) == 2
         if merge:
             self.p2_info.update(self.ctxs[1])
