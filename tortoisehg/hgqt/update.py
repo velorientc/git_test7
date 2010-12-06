@@ -161,6 +161,9 @@ class UpdateDialog(QDialog):
         if merge:
             self.p2_info.update(self.ctxs[1])
         new_rev = hglib.fromunicode(self.rev_combo.currentText())
+        if new_rev.lower() == 'null':
+            self.update_btn.setEnabled(True)
+            return
         try:
             new_ctx = self.repo[new_rev]
             if not merge and new_ctx.rev() == self.ctxs[0].rev():
