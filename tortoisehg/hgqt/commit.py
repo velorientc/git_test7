@@ -205,6 +205,7 @@ class CommitWidget(QWidget):
 
     def details(self):
         dlg = DetailsDialog(self.opts, self.userhist, self)
+        dlg.finished.connect(dlg.deleteLater)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
