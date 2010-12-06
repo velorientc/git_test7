@@ -188,7 +188,8 @@ class SettingsCheckBox(QCheckBox):
         pass
 
     def setValue(self, curvalue):
-        self.curvalue = curvalue
+        if self.curvalue == None:
+            self.curvalue = curvalue
         self.setChecked(curvalue)
 
     def value(self):
@@ -727,9 +728,14 @@ class SettingsForm(QWidget):
         self.fnedit.setText(hglib.tounicode(self.fn))
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
-                enabledexts = hglib.enabledextensions()
                 for row, w in enumerate(widgets):
-                    curvalue = (w.opts['label'] in enabledexts)
+                    val = self.readCPath('extensions.' + w.opts['label'])
+                    if val == None:
+                        curvalue = False
+                    elif len(val) and val[0] == '!':
+                        curvalue = False
+                    else:
+                        curvalue = True
                     w.setValue(curvalue)
             else:
                 for row, (label, cpath, values, tooltip) in enumerate(info):
