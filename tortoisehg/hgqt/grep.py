@@ -34,7 +34,7 @@ class SearchWidget(QWidget):
         self.setLayout(mainvbox)
 
         hbox = QHBoxLayout()
-        hbox.setMargin(0)
+        hbox.setMargin(2)
         lbl = QLabel(_('Regexp:'))
         le = QLineEdit()
         lbl.setBuddy(le)
