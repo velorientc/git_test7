@@ -126,7 +126,7 @@ class SearchWidget(QWidget):
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
         self.singlematch, self.follow, self.eframe = singlematch, follow, frame
-        self.cancelbutton = cbt
+        self.searchbutton, self.cancelbutton = bt, cbt
         self.regexple.setFocus()
 
         if 'rev' in opts or 'all' in opts:
@@ -270,6 +270,7 @@ class SearchWidget(QWidget):
 
         self.showMessage.emit('')
         self.regexple.setEnabled(False)
+        self.searchbutton.setEnabled(False)
         self.cancelbutton.setEnabled(True)
         self.thread.finished.connect(self.searchfinished)
         self.thread.showMessage.connect(self.showMessage)
@@ -292,6 +293,7 @@ class SearchWidget(QWidget):
                 self.tv.resizeColumnToContents(col)
             self.tv.setSortingEnabled(True)
         self.cancelbutton.setEnabled(False)
+        self.searchbutton.setEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
 
