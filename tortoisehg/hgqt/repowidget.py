@@ -338,6 +338,7 @@ class RepoWidget(QWidget):
         gw = SearchWidget(upats, self.repo, self)
         gw.setRevision(self.repoview.current_rev)
         gw.showMessage.connect(self.showMessage)
+        gw.progress.connect(self.progress)
         return gw
 
     def createPatchBranchWidget(self):

@@ -10,8 +10,8 @@ import re
 
 from mercurial import ui, hg, error, commands, match, util
 
-from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview, thgrepo
-from tortoisehg.util import paths, hglib
+from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview, thgrepo, cmdui
+from tortoisehg.util import paths, hglib, thread2
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
@@ -23,6 +23,7 @@ from PyQt4.QtGui import *
 class SearchWidget(QWidget):
     '''Working copy and repository search widget'''
     showMessage = pyqtSignal(QString)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, upats, repo, parent=None, **opts):
         QWidget.__init__(self, parent)
@@ -37,15 +38,21 @@ class SearchWidget(QWidget):
         hbox.setMargin(2)
         lbl = QLabel(_('Regexp:'))
         le = QLineEdit()
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+            le.setPlaceholderText('### regular expression search pattern ###')
         lbl.setBuddy(le)
         lbl.setToolTip(_('Regular expression search pattern'))
+        chk = QCheckBox(_('Ignore case'))
         bt = QPushButton(_('Search'))
         bt.setDefault(True)
-        chk = QCheckBox(_('Ignore case'))
+        cbt = QPushButton(_('Stop'))
+        cbt.setEnabled(False)
+        cbt.clicked.connect(self.stopClicked)
         hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
         hbox.addWidget(chk)
         hbox.addWidget(bt)
+        hbox.addWidget(cbt)
 
         incle = QLineEdit()
         excle = QLineEdit()
@@ -119,6 +126,7 @@ class SearchWidget(QWidget):
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
         self.singlematch, self.follow, self.eframe = singlematch, follow, frame
+        self.cancelbutton = cbt
         self.regexple.setFocus()
 
         if 'rev' in opts or 'all' in opts:
@@ -146,9 +154,10 @@ class SearchWidget(QWidget):
             self.setWindowTitle(_('TortoiseHg Search'))
             self.resize(800, 550)
             self.closeonesc = True
-            self.stbar = QStatusBar()
+            self.stbar = cmdui.ThgStatusBar()
             mainvbox.addWidget(self.stbar)
             self.showMessage.connect(self.stbar.showMessage)
+            self.progress.connect(self.stbar.progress)
 
     def addHistory(self, search, incpaths, excpaths):
         if search:
@@ -182,14 +191,18 @@ class SearchWidget(QWidget):
             self.ctxradio.setChecked(True)
             self.revle.setText(opts['rev'])
 
+    def stopClicked(self):
+        if self.thread and self.thread.isRunning():
+            self.thread.cancel()
+            if not self.thread.wait( 2000 ):
+                # thread is stuck.. oh noes
+                self.thread = None
+                self.searchfinished()
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             if self.thread and self.thread.isRunning():
-                self.thread.terminate()
-                # This can lockup, so stop waiting after 2sec
-                self.thread.wait( 2000 )
-                self.finished()
-                self.thread = None
+                self.stopClicked()
             elif self.closeonesc:
                 self.close()
         else:
@@ -255,9 +268,12 @@ class SearchWidget(QWidget):
                                               inc, exc,
                                               follow=self.follow.isChecked())
 
+        self.showMessage.emit('')
         self.regexple.setEnabled(False)
-        self.thread.finished.connect(self.finished)
+        self.cancelbutton.setEnabled(True)
+        self.thread.finished.connect(self.searchfinished)
         self.thread.showMessage.connect(self.showMessage)
+        self.thread.progress.connect(self.progress)
         self.thread.matchedRow.connect(
                      lambda wrapper: model.appendRow(*wrapper.data))
         self.thread.start()
@@ -266,7 +282,7 @@ class SearchWidget(QWidget):
         # TODO
         pass
 
-    def finished(self):
+    def searchfinished(self):
         count = self.tv.model().rowCount(None)
         if not count:
             self.showMessage.emit(_('No matches found'))
@@ -275,6 +291,7 @@ class SearchWidget(QWidget):
             for col in xrange(COL_TEXT):
                 self.tv.resizeColumnToContents(col)
             self.tv.setSortingEnabled(True)
+        self.cancelbutton.setEnabled(False)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
 
@@ -286,6 +303,7 @@ class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
     matchedRow = pyqtSignal(DataWrapper)
     showMessage = pyqtSignal(unicode)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, repo, pattern, icase, inc, exc, follow):
         super(HistorySearchThread, self).__init__()
@@ -296,10 +314,18 @@ class HistorySearchThread(QThread):
         self.exc = exc
         self.follow = follow
 
+    def cancel(self):
+        if self.isRunning() and hasattr(self, 'thread_id'):
+            thread2._async_raise(self.thread_id, KeyboardInterrupt)
+
     def run(self):
+        self.thread_id = int(QThread.currentThreadId())
+
         def emitrow(row):
             w = DataWrapper(row)
             self.matchedRow.emit(w)
+        def emitprog(topic, pos, item, unit, total):
+            self.progress.emit(topic, pos, item, unit, total)
         class incrui(ui.ui):
             fullmsg = ''
             def write(self, msg, *args, **opts):
@@ -317,8 +343,11 @@ class HistorySearchThread(QThread):
                     except ValueError:
                         pass
                     self.fullmsg = ''
+            def progress(topic, pos, item='', unit='', total=None):
+                emitprog(topic, pos, item, unit, total)
         cwd = os.getcwd()
         os.chdir(self.repo.root)
+        self.progress.emit(*cmdui.startProgress(_('Searching'), _('history')))
         try:
             # hg grep [-i] -afn regexp
             opts = {'all':True, 'user':True, 'follow':self.follow,
@@ -329,12 +358,16 @@ class HistorySearchThread(QThread):
             commands.grep(u, self.repo, self.pattern, **opts)
         except Exception, e:
             self.showMessage.emit(str(e))
+        except KeyboardInterrupt:
+            self.showMessage.emit(_('Interrupted'))
+        self.progress.emit(*cmdui.stopProgress(_('Searching')))
         os.chdir(cwd)
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
     matchedRow = pyqtSignal(object)
     showMessage = pyqtSignal(unicode)
+    progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, repo, regexp, ctx, inc, exc, once):
         super(CtxSearchThread, self).__init__()
@@ -344,6 +377,10 @@ class CtxSearchThread(QThread):
         self.inc = inc
         self.exc = exc
         self.once = once
+        self.canceled = False
+
+    def cancel(self):
+        self.canceled = True
 
     def run(self):
         hu = htmlui.htmlui()
@@ -355,8 +392,15 @@ class CtxSearchThread(QThread):
             self.showMessage.emit(e)
         matchfn.bad = badfn
 
-        # searching len(ctx.manifest()) files
+        topic = _('Searching')
+        unit = _('files')
+        total = len(self.ctx.manifest())
+        count = 0
         for wfile in self.ctx:                # walk manifest
+            if self.canceled:
+                break
+            self.progress.emit(topic, count, wfile, unit, total)
+            count += 1
             if not matchfn(wfile):
                 continue
             data = self.ctx[wfile].data()     # load file data
@@ -375,6 +419,7 @@ class CtxSearchThread(QThread):
                     self.matchedRow.emit(w)
                     if self.once:
                         break
+        self.progress.emit(topic, None, '', '', None)
 
 
 COL_PATH     = 0
