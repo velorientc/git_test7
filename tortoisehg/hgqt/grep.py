@@ -194,10 +194,8 @@ class SearchWidget(QWidget):
     def stopClicked(self):
         if self.thread and self.thread.isRunning():
             self.thread.cancel()
-            if not self.thread.wait( 2000 ):
-                # thread is stuck.. oh noes
+            if self.thread.wait( 2000 ):
                 self.thread = None
-                self.searchfinished()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
