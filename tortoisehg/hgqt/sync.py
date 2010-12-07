@@ -38,7 +38,8 @@ class SyncWidget(QWidget):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
-        layout.setSpacing(4)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
@@ -59,18 +60,6 @@ class SyncWidget(QWidget):
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
 
-        toph = QHBoxLayout()
-        toph.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(toph)
-
-        urlframe = QFrame()
-        urlframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
-        urlvbox = QVBoxLayout()
-        urlvbox.setContentsMargins(0, 0, 0, 0)
-        urlvbox.setSpacing(4)
-        urlframe.setLayout(urlvbox)
-        toph.addWidget(urlframe, 1)
-
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         hbox.setSpacing(4)
@@ -82,7 +71,36 @@ class SyncWidget(QWidget):
         self.urllabel.setAcceptDrops(False)
         hbox.addWidget(self.urllabel)
         hbox.addStretch(1)
-        urlvbox.addLayout(hbox)
+        self.detailsbutton = QPushButton(_('Details'))
+        hbox.addWidget(self.detailsbutton)
+        self.postpullbutton = QPushButton()
+        hbox.addWidget(self.postpullbutton)
+        if 'perfarce' in self.repo.extensions():
+            self.p4pbutton = QPushButton(_('p4pending'))
+            self.p4pbutton.clicked.connect(self.p4pending)
+            hbox.addWidget(self.p4pbutton)
+        else:
+            self.p4pbutton = None
+        tb = QToolBar(self)
+        for tip, icon, cb in (
+            (_('Preview incoming changesets from specified URL'),
+             'incoming', self.inclicked),
+            (_('Pull incoming changesets from specified URL'),
+             'pull', self.pullclicked),
+            (_('Filter outgoing changesets to specified URL'),
+             'outgoing', self.outclicked),
+            (_('Push outgoing changesets to specified URL'),
+             'push', self.pushclicked),
+            (_('Email outgoing changesets for specified URL'),
+             'forward', self.emailclicked)): # TODO: need an email svg
+            a = QAction(self)
+            a.setToolTip(tip)
+            a.setIcon(qtlib.geticon(icon))
+            a.triggered.connect(cb)
+            tb.addAction(a)
+        tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
+        hbox.addWidget(tb)
+        self.layout().addLayout(hbox)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -104,11 +122,6 @@ class SyncWidget(QWidget):
         self.portentry.setFixedWidth(8 * fontm.width('9'))
         self.portentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.portentry)
-        urlvbox.addLayout(hbox)
-
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
-        hbox.setSpacing(4)
         hbox.addWidget(QLabel(_('Path:')))
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
@@ -116,56 +129,10 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.pathentry, 1)
         self.authbutton = QPushButton(_('Authentication'))
         hbox.addWidget(self.authbutton)
-        urlvbox.addLayout(hbox)
-
-        buttonframe = QFrame()
-        buttonframe.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
-        buttonvbox = QVBoxLayout()
-        buttonvbox.setContentsMargins(0, 0, 0, 0)
-        buttonvbox.setSpacing(4)
-        buttonframe.setLayout(buttonvbox)
-        toph.addWidget(buttonframe)
+        self.layout().addLayout(hbox)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        hbox.setSpacing(4)
-        self.inbutton = QPushButton(_('Incoming'))
-        hbox.addWidget(self.inbutton)
-        self.pullbutton = QPushButton(_('Pull'))
-        hbox.addWidget(self.pullbutton)
-        buttonvbox.addLayout(hbox)
-
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
-        hbox.setSpacing(4)
-        self.postpullbutton = QPushButton()
-        hbox.addWidget(self.postpullbutton)
-        self.detailsbutton = QPushButton(_('Details'))
-        hbox.addWidget(self.detailsbutton)
-        buttonvbox.addLayout(hbox)
-
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
-        hbox.setSpacing(4)
-        self.outbutton = QPushButton(_('Outgoing'))
-        hbox.addWidget(self.outbutton)
-        self.pushbutton = QPushButton(_('Push'))
-        hbox.addWidget(self.pushbutton)
-        self.emailbutton = QPushButton(_('Email'))
-        hbox.addWidget(self.emailbutton)
-        buttonvbox.addLayout(hbox)
-
-        if 'perfarce' in self.repo.extensions():
-            self.p4pbutton = QPushButton(_('p4pending'))
-            self.p4pbutton.clicked.connect(self.p4pending)
-            hbox.addWidget(self.p4pbutton)
-        else:
-            self.p4pbutton = None
-
-
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
-
         self.hgrctv = PathsTree(self, True)
         self.hgrctv.clicked.connect(self.pathSelected)
         self.hgrctv.removeAlias.connect(self.removeAlias)
@@ -195,21 +162,14 @@ class SyncWidget(QWidget):
         pathsbox.addWidget(self.reltv)
         hbox.addWidget(pathsframe)
 
-        layout.addLayout(hbox, 1)
+        self.layout().addLayout(hbox, 1)
 
         self.savebutton.clicked.connect(self.saveclicked)
         self.authbutton.clicked.connect(self.authclicked)
-        self.inbutton.clicked.connect(self.inclicked)
-        self.pullbutton.clicked.connect(self.pullclicked)
-        self.outbutton.clicked.connect(self.outclicked)
-        self.pushbutton.clicked.connect(self.pushclicked)
-        self.emailbutton.clicked.connect(self.emailclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.detailsbutton.pressed.connect(self.details)
 
-        self.opbuttons = (self.inbutton, self.pullbutton,
-                          self.outbutton, self.pushbutton,
-                          self.emailbutton, self.p4pbutton)
+        self.opbuttons = (tb, self.p4pbutton)
 
         cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
