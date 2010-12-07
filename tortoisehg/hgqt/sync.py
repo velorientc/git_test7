@@ -730,7 +730,7 @@ class PostPullDialog(QDialog):
 
         if 'fetch' in repo.extensions() or repo.postpull == 'fetch':
             if 'fetch' in repo.extensions():
-                btntxt = _('Fetch - use fetch extension')
+                btntxt = _('Fetch - use fetch (auto merge pulled changes)')
             else:
                 btntxt = _('Fetch - use fetch extension (fetch is not active!)')
             self.fetch = QRadioButton(btntxt)
@@ -739,7 +739,7 @@ class PostPullDialog(QDialog):
             self.fetch = None
         if 'rebase' in repo.extensions() or repo.postpull == 'rebase':
             if 'rebase' in repo.extensions():
-                btntxt = _('Rebase - use rebase extension')
+                btntxt = _('Rebase - rebase local commits above pulled changes')
             else:
                 btntxt = _('Rebase - use rebase extension (rebase is not active!)')
             self.rebase = QRadioButton(btntxt)
