@@ -243,10 +243,10 @@ class SyncWidget(QWidget):
         if self.updateInProgress:
             return
         self.urllabel.setText(self.currentUrl(True))
-        notlocal = (self.schemecombo.currentIndex() != 0)
-        self.hostentry.setEnabled(notlocal)
-        self.portentry.setEnabled(notlocal)
-        self.authbutton.setEnabled(notlocal)
+        schemeIndex = self.schemecombo.currentIndex()
+        self.hostentry.setEnabled(schemeIndex != 0)
+        self.portentry.setEnabled(schemeIndex != 0)
+        self.authbutton.setEnabled(schemeIndex > 1)
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
