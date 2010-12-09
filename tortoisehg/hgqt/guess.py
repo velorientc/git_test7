@@ -249,11 +249,9 @@ class DetectRenameDialog(QDialog):
 
     def reject(self):
         if self.thread and self.thread.isRunning():
-            self.thread.terminate()
-            # This can lockup, so stop waiting after 2sec
-            self.thread.wait( 2000 )
-            self.finished()
-            self.thread = None
+            self.thread.cancel()
+            if self.thread.wait(2000):
+                self.thread = None
         else:
             s = QSettings()
             s.setValue('guess/geom', self.saveGeometry())
@@ -354,6 +352,7 @@ class RenameSearchThread(QThread):
         self.ufiles = ufiles
         self.minpct = minpct
         self.copies = copies
+        self.stopped = False
 
     def run(self):
         def emit(topic, pos, item='', unit='', total=None):
@@ -363,6 +362,9 @@ class RenameSearchThread(QThread):
             self.search(self.repo)
         except Exception, e:
             self.showMessage.emit(hglib.tounicode(str(e)))
+
+    def cancel(self):
+        self.stopped = True
 
     def search(self, repo):
         wctx = repo[None]
@@ -381,6 +383,8 @@ class RenameSearchThread(QThread):
         exacts = []
         gen = similar._findexactmatches(repo, added, removed)
         for o, n in gen:
+            if self.stopped:
+                return
             old, new = o.path(), n.path()
             exacts.append(old)
             self.match.emit([old, new, '100%'])
@@ -389,6 +393,8 @@ class RenameSearchThread(QThread):
         removed = [r for r in removed if r.path() not in exacts]
         gen = similar._findsimilarmatches(repo, added, removed, self.minpct)
         for o, n, s in gen:
+            if self.stopped:
+                return
             old, new, sim = o.path(), n.path(), '%d%%' % (s*100)
             self.match.emit([old, new, sim])
 
