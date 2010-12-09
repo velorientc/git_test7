@@ -11,12 +11,12 @@ import re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, match, util, error
+from mercurial import match, util, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import shlib, hglib, paths
+from tortoisehg.util import shlib, hglib
 
-from tortoisehg.hgqt import qtlib, qscilib, thgrepo
+from tortoisehg.hgqt import qtlib, qscilib
 
 class HgignoreDialog(QDialog):
     'Edit a repository .hgignore file'
@@ -25,16 +25,11 @@ class HgignoreDialog(QDialog):
 
     contextmenu = None
 
-    def __init__(self, parent=None, root=None, *pats):
+    def __init__(self, repo, parent=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
-        try:
-            repo = thgrepo.repository(ui.ui(), path=paths.find_root(root))
-        except error.RepoError:
-            QDialog.reject(self)
-            return
+        self.setWindowFlags(self.windowFlags() & 
+                            ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
         self.pats = pats
@@ -286,6 +281,9 @@ class HgignoreDialog(QDialog):
         QDialog.reject(self)
 
 def run(_ui, *pats, **opts):
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(_ui, path=paths.find_root())
     if pats and pats[0].endswith('.hgignore'):
         pats = []
-    return HgignoreDialog(None, None, *pats)
+    return HgignoreDialog(repo, None, *pats)

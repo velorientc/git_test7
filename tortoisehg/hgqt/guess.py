@@ -189,10 +189,10 @@ class DetectRenameDialog(QDialog):
         self.thread.match.connect(self.rowReceived)
         self.thread.progress.connect(self.stbar.progress)
         self.thread.showMessage.connect(self.stbar.showMessage)
-        self.thread.finished.connect(self.finished)
+        self.thread.finished.connect(self.searchfinished)
         self.thread.start()
 
-    def finished(self):
+    def searchfinished(self):
         self.stbar.clear()
         for col in xrange(3):
             self.matchtv.resizeColumnToContents(col)
