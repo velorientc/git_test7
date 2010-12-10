@@ -85,7 +85,9 @@ class build_qt(Command):
             fp.close()
             log.info('compiled %s into %s' % (ui_file, py_file))
         except Exception, e:
-            self.warn('Unable to compile user interface %s' % e)
+            self.warn('Unable to compile user interface %s: %s' % (py_file, e))
+            if not exists(py_file) or not file(py_file).read():
+                raise SystemExit(1)
             return
 
     def compile_rc(self, qrc_file, py_file=None):
@@ -95,8 +97,10 @@ class build_qt(Command):
         if not(self.force or newer(qrc_file, py_file)):
             return
         if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
-            self.warn("Unable to generate python module for resource file %s"
-                      % qrc_file)
+            self.warn("Unable to generate python module %s for resource file %s"
+                      % (py_file, qrc_file))
+            if not exists(py_file) or not file(py_file).read():
+                raise SystemExit(1)
         else:
             log.info('compiled %s into %s' % (qrc_file, py_file))
 
