@@ -695,8 +695,8 @@ class patchctx(object):
         modified = []
         added = []
         removed = []
-        map = {'MODIFY': modified, 
-               'ADD': added, 
+        map = {'MODIFY': modified,
+               'ADD': added,
                'DELETE': removed,
                'COPY': added}
 
@@ -712,7 +712,7 @@ class patchctx(object):
                         for m in values:
                             f = m.path
                             self._files.append(f)
-                            if m.op == 'RENAME': 
+                            if m.op == 'RENAME':
                                 added.append(f)
                                 self._files.append(m.oldpath)
                                 removed.append(m.oldpath)
