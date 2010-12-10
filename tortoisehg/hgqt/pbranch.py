@@ -102,6 +102,8 @@ class PatchBranchWidget(QWidget):
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.commandFinished)
+        self.runner.hide()
+        vbox.addWidget(self.runner)
 
     def reload(self):
         'User has requested a reload'
