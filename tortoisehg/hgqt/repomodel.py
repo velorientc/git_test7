@@ -463,13 +463,13 @@ class HgRepoListModel(QAbstractTableModel):
         self.layoutChanged.emit()
 
     def getbranch(self, ctx, gnode):
-        return unicode(ctx.branch(), 'utf-8')
+        return hglib.tounicode(ctx.branch())
 
     def gettags(self, ctx, gnode):
         if ctx.rev() is None:
             return ''
         tags = [t for t in ctx.tags() if t not in self._mqtags]
-        return unicode(','.join(tags), 'utf-8')
+        return hglib.tounicode(','.join(tags))
 
     def getauthor(self, ctx, gnode):
         try:
@@ -492,7 +492,7 @@ class HgRepoListModel(QAbstractTableModel):
 
         parts = []
         if ctx.thgbranchhead():
-            branchu = unicode(ctx.branch(), 'utf-8')
+            branchu = hglib.tounicode(ctx.branch())
             effects = qtlib.geteffect('log.branch')
             parts.append(qtlib.applyeffects(u' %s ' % branchu, effects))
 
@@ -509,8 +509,7 @@ class HgRepoListModel(QAbstractTableModel):
                 style = 'log.bookmark'
             else:
                 style = 'log.tag'
-            # tag is in UTF-8, we need it in unicode with style effects
-            tagu = unicode(tag, 'utf-8')
+            tagu = hglib.tounicode(tag)
             effects = qtlib.geteffect(style)
             parts.append(qtlib.applyeffects(u' %s ' % tagu, effects))
 

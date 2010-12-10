@@ -249,7 +249,7 @@ class CommitWidget(QWidget):
         self.msgcombo.reset(self.msghistory)
 
         # Update branch operation button
-        branchu = unicode(self.repo[None].branch(), 'utf-8')
+        branchu = hglib.tounicode(self.repo[None].branch())
         if self.branchop is None:
             title = _('Branch: ') + branchu
         elif self.branchop == False:
@@ -520,15 +520,13 @@ class CommitWidget(QWidget):
             brcmd = ['--close-branch']
         else:
             brcmd = []
-            # self.branchop - new branch name in QString (unicode)
-            # branchutf     - new branch name in UTF8
-            branchutf = unicode(self.branchop).encode('utf-8')
-            if branchutf in repo.branchtags():
+            branch = hglib.fromunicode(self.branchop)
+            if branch in repo.branchtags():
                 # response: 0=Yes, 1=No, 2=Cancel
-                if branchutf in [p.branch() for p in repo.parents()]:
+                if branch in [p.branch() for p in repo.parents()]:
                     resp = 0
                 else:
-                    rev = repo[branchutf].rev()
+                    rev = repo[branch].rev()
                     resp = qtlib.CustomPrompt(_('Confirm Branch Change'),
                         _('Named branch "%s" already exists, '
                           'last used in revision %d\n'
@@ -544,7 +542,7 @@ class CommitWidget(QWidget):
                       'Cancel\t- Cancel this commit') % self.branchop,
                     self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
             if resp == 0:
-                repo.dirstate.setbranch(branchutf)
+                repo.dirstate.setbranch(branch)
             elif resp == 2:
                 return
         files = self.stwidget.getChecked('MAR?!S')

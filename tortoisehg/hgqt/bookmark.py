@@ -142,8 +142,8 @@ class BookmarkDialog(QDialog):
 
     def toggle_new_bookmark(self):
         bookmark = self.bookmark_combo.currentText()
-        bookmarkutf = unicode(bookmark).encode('utf-8')
-        is_new = bookmarkutf not in self.repo.bookmarks
+        bookmarklocal = hglib.fromunicode(bookmark)
+        is_new = bookmarklocal not in self.repo.bookmarks
         self.add_btn.setVisible(is_new)
         self.add_btn.setDisabled(not is_new)
         self.remove_btn.setVisible(not is_new)
@@ -161,7 +161,7 @@ class BookmarkDialog(QDialog):
 
         try:
             # check if valid revision, tag, or branch
-            self.repo[unicode(revstr, 'utf-8')]
+            self.repo[hglib.fromunicode(revstr)]
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             self.add_btn.setDisabled(True)
             self.remove_btn.setDisabled(True)
@@ -179,8 +179,8 @@ class BookmarkDialog(QDialog):
 
     def add_bookmark(self):
         bookmark = self.bookmark_combo.currentText()
-        bookmarkutf = unicode(bookmark).encode('utf-8')
-        if bookmarkutf in self.repo.bookmarks:
+        bookmarklocal = hglib.fromunicode(bookmark)
+        if bookmarklocal in self.repo.bookmarks:
             self.set_status(_('A bookmark named "%s" already exists') %
                             bookmark, False)
             return
@@ -188,7 +188,7 @@ class BookmarkDialog(QDialog):
         bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
                            rev=self.initial_rev,
-                           mark=bookmarkutf)
+                           mark=bookmarklocal)
 
         self.bookmark_combo.addItem(bookmark)
         self.set_status(_("Bookmark '%s' has been added") % bookmark, True)
@@ -197,14 +197,14 @@ class BookmarkDialog(QDialog):
 
     def remove_bookmark(self):
         bookmark = self.bookmark_combo.currentText()
-        bookmarkutf = unicode(bookmark).encode('utf-8')
-        if not bookmarkutf in self.repo.bookmarks:
+        bookmarklocal = hglib.fromunicode(bookmark)
+        if not bookmarklocal in self.repo.bookmarks:
             self.set_status(_("Bookmark '%s' does not exist") % bookmark, False)
             return
 
         bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
-                           mark=bookmarkutf,
+                           mark=bookmarklocal,
                            delete=True)
 
         self.bookmark_combo.removeItem(self.bookmark_combo.currentIndex())
@@ -214,23 +214,23 @@ class BookmarkDialog(QDialog):
 
     def rename_bookmark(self):
         name = self.bookmark_combo.currentText()
-        nameutf = unicode(name).encode('utf-8')
+        bookmarklocal = hglib.fromunicode(bookmark)
 
         newname = self.new_name_text.text()
-        newnameutf = unicode(newname).encode('utf-8')
-        if not nameutf in self.repo.bookmarks:
+        newnamelocal = hglib.fromunicode(newname)
+        if not bookmarklocal in self.repo.bookmarks:
             self.set_status(_("Bookmark '%s' does not exist") % name, False)
             return
 
-        if newnameutf in self.repo.bookmarks:
+        if newnamelocal in self.repo.bookmarks:
             self.set_status(_('A bookmark named "%s" already exists') %
                             newname, False)
             return
 
         bookmarks.bookmark(ui=self.repo.ui,
                            repo=self.repo,
-                           mark=newnameutf,
-                           rename=nameutf)
+                           mark=newnamelocal,
+                           rename=namelocal)
 
         self.bookmark_combo.removeItem(self.bookmark_combo.currentIndex())
         self.bookmark_combo.addItem(newname)

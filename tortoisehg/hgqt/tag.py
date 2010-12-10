@@ -27,7 +27,8 @@ class TagDialog(QDialog):
 
     def __init__(self, repo, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
 
@@ -235,7 +236,7 @@ class TagDialog(QDialog):
     def add_tag(self):
         local = self.local_chk.isChecked()
         name = self.tag_combo.currentText()
-        nameutf = unicode(name).encode('utf-8')
+        namelocal = hglib.fromunicode(name)
         rev = hglib.fromunicode(self.rev_text.text())
         force = self.replace_chk.isChecked()
         english = self.eng_chk.isChecked()
@@ -243,19 +244,19 @@ class TagDialog(QDialog):
 
         try:
             # tagging
-            if nameutf in self.repo.tags() and not force:
+            if namelocal in self.repo.tags() and not force:
                 raise util.Abort(_("Tag '%s' already exist") % name)
             ctx = self.repo[rev]
             node = ctx.node()
             if not message:
                 msgset = keep._('Added tag %s for changeset %s')
                 message = (english and msgset['id'] or msgset['str']) \
-                            % (name, str(ctx))
+                            % (namelocal, str(ctx))
             if not isinstance(message, str):
                 message = hglib.fromunicode(message)
 
             self.repo.incrementBusyCount()
-            self.repo.tag(nameutf, node, message, local, None, None)
+            self.repo.tag(namelocal, node, message, local, None, None)
             self.repo.decrementBusyCount()
             if local:
                 self.localTagChanged.emit()
@@ -270,13 +271,13 @@ class TagDialog(QDialog):
     def remove_tag(self):
         local = self.local_chk.isChecked()
         name = self.tag_combo.currentText()
-        nameutf = unicode(name).encode('utf-8')
+        namelocal = hglib.fromunicode(name)
         english = self.eng_chk.isChecked()
         message = hglib.fromunicode(self.custom_text.text())
 
         try:
             # tagging
-            tagtype = self.repo.tagtype(nameutf)
+            tagtype = self.repo.tagtype(namelocal)
             if local:
                 if tagtype != 'local':
                     raise util.Abort(_('tag \'%s\' is not a local tag') % name)
@@ -285,11 +286,11 @@ class TagDialog(QDialog):
                     raise util.Abort(_('tag \'%s\' is not a global tag') % name)
             if not message:
                 msgset = keep._('Removed tag %s')
-                message = (english and msgset['id'] or msgset['str']) % name
+                message = (english and msgset['id'] or msgset['str']) % namelocal
 
             self.repo.incrementBusyCount()
             node = self.repo[-1].node()
-            self.repo.tag(nameutf, node, message, local, None, None)
+            self.repo.tag(namelocal, node, message, local, None, None)
             self.repo.decrementBusyCount()
             if local:
                 self.localTagChanged.emit()

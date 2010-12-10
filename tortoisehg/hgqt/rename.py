@@ -53,9 +53,9 @@ class RenameDialog(QDialog):
         os.chdir(self.root)
         fname = util.normpath(fname)
         if target:
-            target = hglib.toutf(util.normpath(target))
+            target = hglib.tounicode(util.normpath(target))
         else:
-            target = hglib.toutf(fname)
+            target = hglib.tounicode(fname)
         return (fname, target)
 
     def init_view(self, src, dest):

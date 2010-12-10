@@ -228,9 +228,8 @@ def _extendrepo(repo):
 
         @propertycache
         def _thghiddentags(self):
-            # Assume Mercurial.ini file is in local encoding, need UTF-8
             ht = self.ui.config('tortoisehg', 'hidetags', '')
-            return [hglib.toutf(t).strip() for t in ht.split()]
+            return [t.strip() for t in ht.split()]
 
         @propertycache
         def thgmqunappliedpatches(self):
@@ -344,9 +343,8 @@ def _extendrepo(repo):
 
         @propertycache
         def deadbranches(self):
-            # Assume Mercurial.ini file is in local encoding, need UTF-8
             db = self.ui.config('tortoisehg', 'deadbranch', '')
-            return [hglib.toutf(b).strip() for b in db.split(',')]
+            return [b.strip() for b in db.split(',')]
 
         @propertycache
         def displayname(self):
@@ -483,7 +481,7 @@ def getcontext(repo, target):
 def _extendchangectx(changectx):
     class thgchangectx(changectx.__class__):
         def thgtags(self):
-            '''Returns all unhidden tags for self in UTF-8'''
+            '''Returns all unhidden tags for self'''
             htlist = self._repo._thghiddentags
             return [tag for tag in self.tags() if tag not in htlist]
 
@@ -595,10 +593,10 @@ class patchctx(object):
             if msg:
                 msg = '\n'.join(msg)
         self._node = node
-        self._user = user and hglib.tounicode(user) or ''
+        self._user = user or ''
         self._date = date and util.parsedate(date) or util.makedate()
-        self._desc = msg and msg or ''
-        self._branch = branch and hglib.tounicode(branch) or ''
+        self._desc = msg or ''
+        self._branch = branch or ''
         self._parents = []
         self._rev = rev
         for p in (p1, p2):
