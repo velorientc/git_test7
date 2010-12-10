@@ -82,7 +82,8 @@ class ThgRepoWrapper(QObject):
             dbgoutput('Repository destroyed', self.repo.root)
             self.repositoryDestroyed.emit()
             self.killTimer(self._timerevent)
-            del _repocache[self.repo.root]
+            if self.repo.root in _repocache:
+                del _repocache[self.repo.root]
         elif self.busycount == 0:
             self.pollStatus()
         else:
