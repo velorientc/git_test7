@@ -246,7 +246,7 @@ class PostReviewDialog(QDialog):
             opts['summary'] = self._getsummary()
         else:
             opts['repoid'] = self._getrepoid()
-            opts['summary'] = str(self._qui.summary_edit.currentText())
+            opts['summary'] = hglib.fromunicode(self._qui.summary_edit.currentText())
 
         if (len(self._selectedrevs) > 1):
             #Set the parent to the revision below the last one on the list
