@@ -620,8 +620,8 @@ class FileData(object):
                 self.flabel += _(' <i>(is a dirty sub-repository)</i>')
                 lbl = u' <a href="subrepo:%s">%s...</a>'
                 self.flabel += lbl % (hglib.tounicode(sroot), _('open'))
-            except error.RepoError:
-                self.error = _('Not an hg subrepo, not previewable')
+            except (error.RepoError, util.Abort), e:
+                self.error = _('Not a Mercurial subrepo, not previewable')
             return
 
         # TODO: elif check if a subdirectory (for manifest tool)
