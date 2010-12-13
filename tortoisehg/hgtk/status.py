@@ -698,7 +698,9 @@ class GStatus(gdialog.GWindow):
                 for s in wctx.substate:
                     if matcher(s) and wctx.sub(s).dirty():
                         self.subrepos.append(s)
-            except (OSError, IOError, error.ConfigError, error.RepoError), e:
+            except (error.ConfigError, error.RepoError), e:
+                self.status_error = str(e)
+            except (OSError, IOError, util.Abort), e:
                 self.status_error = str(e)
 
         def status_wait(thread):
