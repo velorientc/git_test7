@@ -544,6 +544,7 @@ class SyncWidget(QWidget):
     ##
 
     def inclicked(self):
+        self.showMessage.emit(_('Incoming...'))
         url = self.currentUrl(True)
         if self.embedded and not url.startswith('p4://'):
             def finished(ret, output):
@@ -597,6 +598,7 @@ class SyncWidget(QWidget):
                     dlg.exec_()
                     return
         self.finishfunc = finished
+        self.showMessage.emit(_('Pulling...'))
         cmdline = ['--repository', self.root, 'pull', '--verbose']
         uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve') \
             and 'ui.merge=internal:merge' or 'ui.merge=internal:fail'
@@ -609,6 +611,7 @@ class SyncWidget(QWidget):
         self.run(cmdline, ('force', 'branch', 'rev'))
 
     def outclicked(self):
+        self.showMessage.emit(_('Outgoing...'))
         if self.embedded:
             def outputnodes(ret, data):
                 if ret == 0:
@@ -666,9 +669,11 @@ class SyncWidget(QWidget):
                 dlg.makeLogVisible.connect(self.makeLogVisible)
                 dlg.exec_()
         self.finishfunc = finished
+        self.showMessage.emit(_('Perforce pending...'))
         self.run(['--repository', self.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self):
+        self.showMessage.emit(_('Pushing...'))
         def finished(ret, output):
             if ret == 0:
                 self.showMessage.emit(_('Push completed successfully'))
