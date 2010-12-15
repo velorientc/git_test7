@@ -79,6 +79,9 @@ class RepoFilterBar(QToolBar):
         self._initbranchfilter()
         self.refresh()
 
+    def showEvent(self, event):
+        self.revsetle.setFocus()
+
     def openEditor(self):
         query = self.revsetle.text().simplified()
         self.entrydlg.entry.setText(query)
