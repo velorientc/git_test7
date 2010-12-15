@@ -198,7 +198,11 @@ class RepoWidget(QWidget):
 
         pats = {}
         opts = {}
-        b = QPushButton('Commit')
+        b = QPushButton(_('Commit'))
+        b.setAutoDefault(True)
+        f = b.font()
+        f.setWeight(QFont.Bold)
+        b.setFont(f)
         cw = CommitWidget(pats, opts, self.repo.root, True, self)
 
         # Shared widgets must be connected directly to workbench
