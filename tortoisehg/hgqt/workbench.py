@@ -47,6 +47,7 @@ class Workbench(QMainWindow):
 
         self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
+        rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
 
         self.log = LogDockWidget(self)
