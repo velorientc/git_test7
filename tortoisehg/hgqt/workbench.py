@@ -116,6 +116,8 @@ class Workbench(QMainWindow):
         self.addToolBar(self.docktbar)
         self.synctbar = QToolBar(_('Sync Toolbar'), objectName='synctbar')
         self.addToolBar(self.synctbar)
+        self.tasktbar = QToolBar(_('Task Toolbar'), objectName='taskbar')
+        self.addToolBar(self.tasktbar)
         self.mqtbar = QToolBar(_("MQ Toolbar"), objectName='mqtbar')
         self.addToolBar(self.mqtbar)
 
@@ -222,6 +224,7 @@ class Workbench(QMainWindow):
             a = newaction(label, icon=icon, checkable=True, data=index,
                           enabled='repoopen', menu='view')
             self.actionGroupTaskView.addAction(a)
+            self.tasktbar.addAction(a)
             return a
         # NOTE: Sequence must match that in repowidget.py
         addtaskview('log', _("Revision &Details"))
