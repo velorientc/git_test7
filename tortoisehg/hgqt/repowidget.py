@@ -107,7 +107,7 @@ class RepoWidget(QWidget):
         b.setShown(False)
         hbox.addWidget(b)
 
-        self.filterbar = RepoFilterBar(self.repo)
+        self.filterbar = RepoFilterBar(self.repo, self)
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
@@ -115,6 +115,12 @@ class RepoWidget(QWidget):
         self.filterbar.clearSet.connect(self.clearSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
         hbox.addWidget(self.filterbar)
+
+        openact = QAction('Open', self)
+        openact.setShortcut('Ctrl+S')
+        openact.triggered.connect(self.filterbar.show)
+        self.addAction(openact)
+        self.filterbar.hide()
 
         self.revsetfilter = self.filterbar.filtercb.isChecked()
 
@@ -277,6 +283,7 @@ class RepoWidget(QWidget):
         self.bundleReject.setHidden(False)
         self.filterbar.revsetle.setText('incoming()')
         self.filterbar.setEnabled(False)
+        self.filterbar.show()
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
         self.revset = [self.repo[n].node() for n in range(oldlen, newlen)]
@@ -344,6 +351,7 @@ class RepoWidget(QWidget):
 
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
+        self.filterbar.show()
         self.setRevisionSet(nodes)
 
     def createGrepWidget(self):

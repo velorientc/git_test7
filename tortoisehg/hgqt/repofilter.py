@@ -10,7 +10,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import revset
+from tortoisehg.hgqt import revset, qtlib
 
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
@@ -25,10 +25,19 @@ class RepoFilterBar(QToolBar):
     branchChanged = pyqtSignal(unicode, bool)
     """Emitted (branch, allparents) when branch selection changed"""
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent):
         super(RepoFilterBar, self).__init__(parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
+        self.setIconSize(QSize(16,16))
+        self.setFloatable(False)
+        self.setMovable(False)
         self._repo = repo
+
+        closeact = QAction('Close', self)
+        closeact.setIcon(qtlib.geticon('close'))
+        closeact.setShortcut(Qt.Key_Escape)
+        closeact.triggered.connect(self.hide)
+        self.addAction(closeact)
 
         self.entrydlg = revset.RevisionSetQuery(repo, self)
         self.entrydlg.progress.connect(self.progress)
