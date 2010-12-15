@@ -139,33 +139,42 @@ class RepoWidget(QWidget):
         self.repotabs_splitter.setCollapsible(0, False)
         self.repotabs_splitter.setStretchFactor(0, 1)
 
-        self.taskTabsWidget = tt = QTabWidget()
-        tt.setDocumentMode(True)
-        tt.setTabPosition(QTabWidget.East)
+        if self.repo.ui.configbool('tortoisehg', 'tasktabs'):
+            tt = QTabWidget()
+            tt.setDocumentMode(True)
+            tt.setTabPosition(QTabWidget.East)
+            tt.thgPageAdd = tt.addTab
+            tt.thgToolTip = tt.setTabToolTip
+        else:
+            tt = QStackedWidget()
+            tt.thgPageAdd = lambda w, ico, _: tt.addWidget(w)
+            tt.thgToolTip = lambda idx, t: None
+
+        self.taskTabsWidget = tt
         self.repotabs_splitter.addWidget(self.taskTabsWidget)
         self.repotabs_splitter.setStretchFactor(1, 1)
 
         self.revDetailsWidget = w = RevDetailsWidget(self.repo)
         w.revisionLinkClicked.connect(self.goto)
         w.fileview.showDescSignal.connect(self.showMessage)
-        self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
-        tt.setTabToolTip(idx, _("Revision details"))
+        self.logTabIndex = idx = tt.thgPageAdd(w, geticon('log'), '')
+        tt.thgToolTip(idx, _("Revision details"))
 
         self.commitDemand = w = DemandWidget(self.createCommitWidget)
-        self.commitTabIndex = idx = tt.addTab(w, geticon('commit'), '')
-        tt.setTabToolTip(idx, _("Commit"))
+        self.commitTabIndex = idx = tt.thgPageAdd(w, geticon('commit'), '')
+        tt.thgToolTip(idx, _("Commit"))
 
         self.manifestDemand = w = DemandWidget(self.createManifestWidget)
-        self.manifestTabIndex = idx = tt.addTab(w, geticon('annotate'), '')
-        tt.setTabToolTip(idx, _('Manifest'))
+        self.manifestTabIndex = idx = tt.thgPageAdd(w, geticon('annotate'), '')
+        tt.thgToolTip(idx, _('Manifest'))
 
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
-        self.grepTabIndex = idx = tt.addTab(w, geticon('repobrowse'), '')
-        tt.setTabToolTip(idx, _("Search"))
+        self.grepTabIndex = idx = tt.thgPageAdd(w, geticon('repobrowse'), '')
+        tt.thgToolTip(idx, _("Search"))
 
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
-        self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
-        tt.setTabToolTip(idx, _("Synchronize"))
+        self.syncTabIndex = idx = tt.thgPageAdd(w, geticon('sync'), '')
+        tt.thgToolTip(idx, _("Synchronize"))
 
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
         self.updatePatchBranchTab()
@@ -360,10 +369,8 @@ class RepoWidget(QWidget):
         self.pbranchTabIndex = idx = tt.indexOf(w)
         if 'pbranch' in self.repo.extensions():
             if idx == -1:
-                self.pbranchTabIndex = idx = tt.addTab(w, geticon('branch'), '')
-                tt.setTabToolTip(idx, _("Patch Branch"))
-        else:
-            tt.removeTab(idx)
+                self.pbranchTabIndex = idx = tt.thgPageAdd(w, geticon('branch'), '')
+                tt.thgToolTip(idx, _("Patch Branch"))
 
     def reponame(self):
         return self.repo.shortname

@@ -314,6 +314,12 @@ INFO = (
         ' the changes are colored green for merge, red for'
         ' non-trivial parents, black for normal.'
         ' Default: False')),
+    (_('Task Tabs'), 'tortoisehg.tasktabs', genBoolCombo,
+        _('Show tabs along the right side of the bottom half of each repo'
+        ' widget allowing one to switch task tabs without using the toolbar.'
+        ' Changes to this parameter do not take effect until the Workbench is'
+        ' restarted, or a new repository tab is opened.'
+        ' Default: False')),
     (_('Long Summary'), 'tortoisehg.longsummary', genBoolCombo,
         _('If true, concatenate multiple lines of changeset summary'
         ' until they reach 80 characters.'
