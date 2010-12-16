@@ -497,6 +497,8 @@ class RepoWidget(QWidget):
         dlg = purge.PurgeDialog(self.repo, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
+        dlg.showMessage.connect(self.showMessage)
+        dlg.progress.connect(self.progress)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 

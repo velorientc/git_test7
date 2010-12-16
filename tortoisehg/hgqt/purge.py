@@ -88,7 +88,7 @@ class PurgeDialog(QDialog):
             if self.th.error:
                 self.showMessage.emit(hglib.tounicode(self.th.error))
             else:
-                self.showMessage.emit('Ready to purge.')
+                self.showMessage.emit(_('Ready to purge.'))
                 U, I = self.files
                 if U:
                     self.ucb.setText(_('Delete %d unknown files') % len(U))
@@ -128,6 +128,7 @@ class PurgeDialog(QDialog):
         directories = []
         failures = []
 
+        self.showMessage.emit('')
         match = cmdutil.match(repo, [], {})
         match.dir = directories.append
         status = repo.status(match=match, ignored=ignored, unknown=unknown)
@@ -158,6 +159,7 @@ class PurgeDialog(QDialog):
             remove(removefile, f)
         data = ('deleting', None, '', '', len(files))
         self.progress.emit(*data)
+        self.showMessage.emit(_('Deleted %d files') % len(files))
 
         if delfolders:
             for i, f in enumerate(sorted(directories, reverse=True)):
@@ -167,6 +169,7 @@ class PurgeDialog(QDialog):
                     remove(os.rmdir, f)
             data = ('rmdir', None, f, '', len(directories))
             self.progress.emit(*data)
+            self.showMessage.emit(_('Deleted %d folders') % len(directories))
         return failures
 
 def run(ui, *pats, **opts):
