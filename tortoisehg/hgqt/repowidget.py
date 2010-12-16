@@ -494,22 +494,10 @@ class RepoWidget(QWidget):
         self.runCommand(_('Rollback - TortoiseHg'), cmdline)
 
     def purge(self):
-        try:
-            wctx = self.repo[None]
-            wctx.status(ignored=True, unknown=True)
-        except Exception, e:
-            InfoMsgBox(_('Repository Error'),
-                       _('Unable to query unrevisioned files\n') +
-                       hglib.tounicode(str(e)))
-            return
-        U, I = wctx.unknown(), wctx.ignored()
-        if not U and not I:
-            InfoMsgBox(_('No unrevisioned files'),
-                       _('There are no purgable unrevisioned files'))
-            return
-        dlg = purge.PurgeDialog(self.repo, U, I, self)
+        dlg = purge.PurgeDialog(self.repo, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
+        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     @pyqtSlot(unicode, dict)

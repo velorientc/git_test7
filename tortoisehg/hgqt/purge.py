@@ -20,34 +20,34 @@ from PyQt4.QtGui import *
 class PurgeDialog(QDialog):
 
     progress = pyqtSignal(QString, object, QString, QString, object)
+    showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, unknown, ignored, parent):
+    def __init__(self, repo, parent):
         QDialog.__init__(self, parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(QVBoxLayout())
-        if unknown:
-            cb = QCheckBox(_('Delete %d unknown files') % len(unknown))
-            cb.setChecked(True)
-            self.layout().addWidget(cb)
-            self.ucb = cb
-        if ignored:
-            cb = QCheckBox(_('Delete %d ignored files') % len(ignored))
-            cb.setChecked(True)
-            self.layout().addWidget(cb)
-            self.icb = cb
+        cb = QCheckBox(_('No unknown files found'))
+        cb.setChecked(False)
+        cb.setEnabled(False)
+        self.layout().addWidget(cb)
+        self.ucb = cb
+        cb = QCheckBox(_('No ignored files found'))
+        cb.setChecked(False)
+        cb.setEnabled(False)
+        self.layout().addWidget(cb)
+        self.icb = cb
         self.foldercb = QCheckBox(_('Delete empty folders'))
         self.foldercb.setChecked(True)
         self.layout().addWidget(self.foldercb)
         self.hgfilecb = QCheckBox(_('Preserve files beginning with .hg'))
         self.hgfilecb.setChecked(True)
         self.layout().addWidget(self.hgfilecb)
-        self.files = (unknown, ignored)
 
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
-        self.stbar.setVisible(False)
         self.progress.connect(self.stbar.progress)
+        self.showMessage.connect(self.stbar.showMessage)
         self.layout().addWidget(self.stbar)
 
         BB = QDialogButtonBox
@@ -60,10 +60,53 @@ class PurgeDialog(QDialog):
         self.setWindowTitle('%s - purge' % repo.displayname)
         self.repo = repo
 
+        self.bb.setEnabled(False)
+        self.progress.emit(*cmdui.startProgress(_('Checking'), '...'))
+        QTimer.singleShot(0, self.checkStatus)
+
+    def checkStatus(self):
+        repo = self.repo
+        class CheckThread(QThread):
+            def __init__(self, parent):
+                QThread.__init__(self, parent)
+                self.files = (None, None)
+                self.error = None
+
+            def run(self):
+                try:
+                    wctx = repo[None]
+                    wctx.status(ignored=True, unknown=True)
+                    self.files = wctx.unknown(), wctx.ignored()
+                except Exception, e:
+                    self.error = str(e)
+
+        def completed():
+            self.th.wait()
+            self.files = self.th.files
+            self.bb.setEnabled(True)
+            self.progress.emit(*cmdui.stopProgress(_('Checking')))
+            if self.th.error:
+                self.showMessage.emit(hglib.tounicode(self.th.error))
+            else:
+                self.showMessage.emit('Ready to purge.')
+                U, I = self.files
+                if U:
+                    self.ucb.setText(_('Delete %d unknown files') % len(U))
+                    self.ucb.setChecked(True)
+                    self.ucb.setEnabled(True)
+                if I:
+                    self.icb.setText(_('Delete %d ignored files') % len(I))
+                    self.icb.setChecked(True)
+                    self.icb.setEnabled(True)
+
+        self.th = CheckThread(self)
+        self.th.finished.connect(completed)
+        self.th.start()
+
     def accept(self):
         U, I = self.files
-        unknown = len(U) and self.ucb.isChecked()
-        ignored = len(I) and self.icb.isChecked()
+        unknown = self.ucb.isChecked()
+        ignored = self.icb.isChecked()
         delf = self.foldercb.isChecked()
         keep = self.hgfilecb.isChecked()
 
@@ -85,7 +128,6 @@ class PurgeDialog(QDialog):
         directories = []
         failures = []
 
-        self.stbar.setVisible(True)
         match = cmdutil.match(repo, [], {})
         match.dir = directories.append
         status = repo.status(match=match, ignored=ignored, unknown=unknown)
@@ -130,18 +172,5 @@ class PurgeDialog(QDialog):
 def run(ui, *pats, **opts):
     from tortoisehg.hgqt import thgrepo
     from tortoisehg.util import paths
-    try:
-        repo = thgrepo.repository(ui, path=paths.find_root())
-        wctx = repo[None]
-        wctx.status(ignored=True, unknown=True)
-    except Exception, e:
-        qtlib.InfoMsgBox(_('Repository Error'),
-                         _('Unable to query unrevisioned files\n') +
-                         hglib.tounicode(str(e)))
-        return None
-    U, I = wctx.unknown(), wctx.ignored()
-    if not U and not I:
-        qtlib.InfoMsgBox(_('No unrevisioned files'),
-                         _('There are no purgable unrevisioned files'))
-        return None
-    return PurgeDialog(repo, U, I, None)
+    repo = thgrepo.repository(ui, path=paths.find_root())
+    return PurgeDialog(repo, None)
