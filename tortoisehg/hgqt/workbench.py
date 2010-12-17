@@ -369,9 +369,9 @@ class Workbench(QMainWindow):
 
     def updateMenu(self):
         """Enable actions when repoTabs are opened or closed or changed"""
-        
+
         # Update actions affected by repo open/close
-         
+
         someRepoOpen = self.repoTabsWidget.count() > 0
         for action in self._actionavails['repoopen']:
             action.setEnabled(someRepoOpen)
@@ -379,9 +379,9 @@ class Workbench(QMainWindow):
         # Update actions affected by repo open/close/change
 
         self.updateTaskViewMenu()
-       
+
         w = self.repoTabsWidget.currentWidget()
-        mqEnabled = w and 'mq' in w.repo.extensions() or False       
+        mqEnabled = w and 'mq' in w.repo.extensions() or False
         for action in self._actionavails['mq']:
             action.setEnabled(mqEnabled)
 
