@@ -10,7 +10,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error
+from mercurial import error, util
 
 from tortoisehg.util import hglib, i18n
 from tortoisehg.hgqt.i18n import _
@@ -246,6 +246,14 @@ class TagDialog(QDialog):
             # tagging
             if namelocal in self.repo.tags() and not force:
                 raise util.Abort(_("Tag '%s' already exist") % name)
+            if not local:
+                parents = self.repo.parents()
+                if len(parents) > 1:
+                    raise util.Abort(_('uncommitted merge'))
+                bheads = self.repo.branchheads()
+                p1 = parents[0].node()
+                if not force and bheads and p1 not in bheads:
+                    raise util.Abort(_('not at a branch head (use force)'))
             ctx = self.repo[rev]
             node = ctx.node()
             if not message:
@@ -265,8 +273,10 @@ class TagDialog(QDialog):
             self.set_status(_("Tag '%s' has been added") % name, True)
             self.update_tagcombo()
             self.close_btn.setFocus()
-        except:
-            self.set_status(_('Error in tagging'), False)
+        except util.Abort, e:
+            self.set_status(_('Abort: ') + hglib.tounicode(str(e)), False)
+        except Exception, e:
+            self.set_status(_('Error: ') + hglib.tounicode(str(e)), False)
 
     def remove_tag(self):
         local = self.local_chk.isChecked()
