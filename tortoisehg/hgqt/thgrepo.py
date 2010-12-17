@@ -195,7 +195,7 @@ class ThgRepoWrapper(QObject):
                 dbgoutput('config change detected')
                 self.repo.invalidateui()
                 self.configChanged.emit()
-        except EnvironmentError, ValueError:
+        except (EnvironmentError, ValueError):
             pass
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible maxdiff
