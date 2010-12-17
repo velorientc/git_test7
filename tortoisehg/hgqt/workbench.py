@@ -43,7 +43,7 @@ class Workbench(QMainWindow):
 
         self.setupUi()
 
-        self.setWindowTitle('TortoiseHg Workbench')
+        self.setWindowTitle(_('TortoiseHg Workbench'))
 
         self.reporegistry = rr = RepoRegistryView(self)
         rr.setObjectName('RepoRegistryView')
@@ -89,6 +89,7 @@ class Workbench(QMainWindow):
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
         tw.setMovable(True)
+        tw.tabBar().hide()
         sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(1)
@@ -380,10 +381,22 @@ class Workbench(QMainWindow):
 
         self.updateTaskViewMenu()
 
-        w = self.repoTabsWidget.currentWidget()
+        tw = self.repoTabsWidget
+        w = tw.currentWidget()
         mqEnabled = w and 'mq' in w.repo.extensions() or False
         for action in self._actionavails['mq']:
             action.setEnabled(mqEnabled)
+
+        if tw.count() > 1:
+            tw.tabBar().show()
+            self.setWindowTitle(_('TortoiseHg Workbench'))
+        elif tw.count() == 1:
+            tw.tabBar().hide()
+            self.setWindowTitle(_('TortoiseHg Workbench - %s') %
+                                w.repo.displayname)
+        else:
+            tw.tabBar().hide()
+            self.setWindowTitle(_('TortoiseHg Workbench'))
 
 
     def updateTaskViewMenu(self, taskIndex=0):
