@@ -245,15 +245,15 @@ class TagDialog(QDialog):
         try:
             # tagging
             if namelocal in self.repo.tags() and not force:
-                raise util.Abort(_("Tag '%s' already exist") % name)
+                raise util.Abort(keep._("Tag '%s' already exist") % namelocal)
             if not local:
                 parents = self.repo.parents()
                 if len(parents) > 1:
-                    raise util.Abort(_('uncommitted merge'))
+                    raise util.Abort(keep._('uncommitted merge'))
                 bheads = self.repo.branchheads()
                 p1 = parents[0].node()
                 if not force and bheads and p1 not in bheads:
-                    raise util.Abort(_('not at a branch head (use force)'))
+                    raise util.Abort(keep._('not at a branch head (use force)'))
             ctx = self.repo[rev]
             node = ctx.node()
             if not message:
@@ -290,10 +290,19 @@ class TagDialog(QDialog):
             tagtype = self.repo.tagtype(namelocal)
             if local:
                 if tagtype != 'local':
-                    raise util.Abort(_('tag \'%s\' is not a local tag') % name)
+                    raise util.Abort(keep._('tag \'%s\' is not a local tag') %
+                                     namelocal)
             else:
                 if tagtype != 'global':
-                    raise util.Abort(_('tag \'%s\' is not a global tag') % name)
+                    raise util.Abort(keep._('tag \'%s\' is not a global tag') %
+                                     namelocal)
+                parents = self.repo.parents()
+                if len(parents) > 1:
+                    raise util.Abort(keep._('uncommitted merge'))
+                bheads = self.repo.branchheads()
+                p1 = parents[0].node()
+                if not force and bheads and p1 not in bheads:
+                    raise util.Abort(keep._('not at a branch head (use force)'))
             if not message:
                 msgset = keep._('Removed tag %s')
                 message = (english and msgset['id'] or msgset['str']) % namelocal
@@ -309,8 +318,10 @@ class TagDialog(QDialog):
             self.set_status(_("Tag '%s' has been removed") % name, True)
             self.update_tagcombo()
             self.close_btn.setFocus()
-        except:
-            self.set_status(_('Error in tagging'), False)
+        except util.Abort, e:
+            self.set_status(_('Abort: ') + hglib.tounicode(str(e)), False)
+        except Exception, e:
+            self.set_status(_('Error: ') + hglib.tounicode(str(e)), False)
 
     ### Signal Handlers ###
 
