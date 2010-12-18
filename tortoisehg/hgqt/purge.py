@@ -117,12 +117,36 @@ class PurgeDialog(QDialog):
             _('Are you sure you want to delete these files and/or folders?')):
             return
 
-        failures = self.purge(self.repo, ignored, unknown, delf, keep)
-        if failures:
-            qtlib.InfoMsgBox(_('Deletion failures'),
-                _('Unable to delete %d files or folders') % len(failures),
-                parent=self)
-        QDialog.accept(self)
+        def completed():
+            self.th.wait()
+            if self.th.failures:
+                qtlib.InfoMsgBox(_('Deletion failures'),
+                    _('Unable to delete %d files or folders') %
+                                 len(failures), parent=self)
+            QDialog.accept(self)
+
+        self.th = PurgeThread(self.repo, ignored, unknown, delf, keep, self)
+        self.th.progress.connect(self.progress)
+        self.th.showMessage.connect(self.showMessage)
+        self.th.finished.connect(completed)
+        self.th.start()
+
+class PurgeThread(QThread):
+    progress = pyqtSignal(QString, object, QString, QString, object)
+    showMessage = pyqtSignal(QString)
+
+    def __init__(self, repo, ignored, unknown, delfolders, keephg, parent):
+        super(PurgeThread, self).__init__(parent)
+        self.failures = 0
+        self.repo = repo
+        self.ignored = ignored
+        self.unknown = unknown
+        self.delfolders = delfolders
+        self.keephg = keephg
+
+    def run(self):
+        self.failures = self.purge(self.repo, self.ignored, self.unknown,
+                                   self.delfolders, self.keephg)
 
     def purge(self, repo, ignored, unknown, delfolders, keephg):
         directories = []
@@ -169,7 +193,8 @@ class PurgeDialog(QDialog):
                     remove(os.rmdir, f)
             data = ('rmdir', None, f, '', len(directories))
             self.progress.emit(*data)
-            self.showMessage.emit(_('Deleted %d folders') % len(directories))
+            self.showMessage.emit(_('Deleted %d files and %d folders') % (
+                                  len(files), len(directories)))
         return failures
 
 def run(ui, *pats, **opts):
