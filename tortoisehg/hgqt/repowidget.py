@@ -768,6 +768,7 @@ class RepoWidget(QWidget):
             self.unappacts = acts
         self.menuselection = selection
         self.unappacts[0].setEnabled(len(selection) == 1)
+        self.unappacts[1].setEnabled(len(selection) == 1)
         self.unappcmenu.exec_(point)
 
     def singleSelectionMenu(self, point, selection):
