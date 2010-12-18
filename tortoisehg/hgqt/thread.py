@@ -170,7 +170,10 @@ class CmdThread(QThread):
     def abort(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
             self.abortbyuser = True
-            thread2._async_raise(self.thread_id, KeyboardInterrupt)
+            try:
+                thread2._async_raise(self.thread_id, KeyboardInterrupt)
+            except ValueError:
+                pass
 
     def thread_finished(self):
         self.timer.stop()
