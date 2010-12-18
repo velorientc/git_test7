@@ -8,6 +8,7 @@
 import os
 import atexit
 import shutil
+import stat
 import tempfile
 
 from PyQt4.QtCore import *
@@ -21,8 +22,14 @@ tmproot = None
 def gettempdir():
     global tmproot
     def cleanup():
-        try: shutil.rmtree(tmproot)
-        except: pass
+        def writeable(arg, dirname, fnames):
+            for fname in fnames:
+                os.chmod(os.path.join(dirname, fname), stat.S_IWUSR)
+        try:
+            os.path.walk(tmproot, writeable, None)
+            shutil.rmtree(tmproot)
+        except:
+            pass
     if not tmproot:
         tmproot = tempfile.mkdtemp(prefix='thg.')
         atexit.register(cleanup)
