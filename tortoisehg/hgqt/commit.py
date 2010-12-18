@@ -607,7 +607,7 @@ class CommitWidget(QWidget):
             dcmd = []
         if self.opts.get('patchName'):
             cmdline = ['qnew', '--repository', repo.root,
-                       '--verbose', '--user', user, '--message', msg,
+                       '--verbose', '--user', user, '--message', msg.strip(),
                        self.opts['patchName']
                        ]
         else:
