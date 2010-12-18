@@ -249,9 +249,6 @@ class CmdThread(QThread):
             self.responseq.put(text)
 
     def run(self):
-        # save thread id in order to terminate by KeyboardInterrupt
-        self.thread_id = int(QThread.currentThreadId())
-
         ui = QtUi(responseq=self.responseq)
         ui.sig.writeSignal.connect(self.output_handler,
                 Qt.QueuedConnection)
@@ -267,6 +264,9 @@ class CmdThread(QThread):
         ui.write(cmd, label='control')
 
         try:
+            # save thread id in order to terminate by KeyboardInterrupt
+            self.thread_id = int(QThread.currentThreadId())
+
             for k, v in ui.configitems('defaults'):
                 ui.setconfig('defaults', k, '')
             self.ret = 255
