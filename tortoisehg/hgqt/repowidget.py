@@ -20,7 +20,7 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
-from tortoisehg.hgqt import qdelete, qreorder, qrename
+from tortoisehg.hgqt import qdelete, qreorder, qrename, qfold
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -757,6 +757,14 @@ class RepoWidget(QWidget):
             dlg = qreorder.QReorderDialog(self.repo, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
+        def qfoldact():
+            patches = [self.repo.changectx(r).thgmqpatchname() \
+                       for r in self.menuselection]
+            dlg = qfold.QFoldDialog(self.repo, patches, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.output.connect(self.output)
+            dlg.makeLogVisible.connect(self.makeLogVisible)
+            dlg.exec_()
 
         # Special menu for unapplied patches
         if not self.unappcmenu:
@@ -765,6 +773,7 @@ class RepoWidget(QWidget):
             for name, cb in (
                 (_('Goto patch'), self.qgotoRevision),
                 (_('Rename patch'), self.qrenameRevision),
+                (_('Fold patches'), qfoldact),
                 (_('Delete patches'), qdeleteact),
                 (_('Reorder patches'), qreorderact)):
                 act = QAction(name, self)
@@ -776,6 +785,7 @@ class RepoWidget(QWidget):
         self.menuselection = selection
         self.unappacts[0].setEnabled(len(selection) == 1)
         self.unappacts[1].setEnabled(len(selection) == 1)
+        self.unappacts[2].setEnabled('qtip' in self.repo.tags().keys())
         self.unappcmenu.exec_(point)
 
     def singleSelectionMenu(self, point, selection):
