@@ -92,7 +92,7 @@ class SyncWidget(QWidget):
             (_('Push outgoing changesets to specified URL'),
              'push', self.pushclicked),
             (_('Email outgoing changesets for specified URL'),
-             'forward', self.emailclicked)): # TODO: need an email svg
+             'mail-forward', self.emailclicked)):
             a = QAction(self)
             a.setToolTip(tip)
             a.setIcon(qtlib.geticon(icon))

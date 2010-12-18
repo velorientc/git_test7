@@ -52,5 +52,6 @@
     <file>icons/reviewboard.png</file>
     <file>icons/bookmark.png</file>
     <file>icons/extensions.svg</file>
+    <file>icons/mail-forward.svg</file>
   </qresource>
 </RCC>
