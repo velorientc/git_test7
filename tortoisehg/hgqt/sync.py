@@ -98,6 +98,11 @@ class SyncWidget(QWidget):
             a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
             tb.addAction(a)
+        self.stopAction = a = QAction(self)
+        a.setToolTip(_('Stop current operation'))
+        a.setIcon(qtlib.geticon(process-stop))
+        a.triggered.connect(self.stopclicked)
+        tb.addAction(a)
         tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
         hbox.addWidget(tb)
         self.layout().addLayout(hbox)
@@ -174,7 +179,6 @@ class SyncWidget(QWidget):
         cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
-        cmd.commandCanceling.connect(self.commandCanceled)
 
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.output.connect(self.output)
@@ -399,6 +403,10 @@ class SyncWidget(QWidget):
         else:
             return super(SyncWidget, self).keyPressEvent(event)
 
+    def stopclicked(self):
+        if self.cmd.core.is_running():
+            self.cmd.cancel()
+
     def saveclicked(self):
         if self.curalias:
             alias = self.curalias
@@ -426,6 +434,7 @@ class SyncWidget(QWidget):
     def commandStarted(self):
         for b in self.opbuttons:
             if b: b.setEnabled(False)
+        self.stopAction.setEnabled(True)
         if not self.embedded:
             self.cmd.show_output(True)
             self.cmd.setVisible(True)
@@ -434,13 +443,10 @@ class SyncWidget(QWidget):
         self.repo.decrementBusyCount()
         for b in self.opbuttons:
             if b: b.setEnabled(True)
+        self.stopAction.setEnabled(False)
         if self.finishfunc:
             output = self.cmd.core.get_rawoutput()
             self.finishfunc(ret, output)
-
-    def commandCanceled(self):
-        for b in self.opbuttons:
-            if b: b.setEnabled(True)
 
     def run(self, cmdline, details):
         if self.cmd.core.is_running():

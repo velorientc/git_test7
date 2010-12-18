@@ -53,5 +53,6 @@
     <file>icons/bookmark.png</file>
     <file>icons/extensions.svg</file>
     <file>icons/mail-forward.svg</file>
+    <file>icons/process-stop.svg</file>
   </qresource>
 </RCC>
