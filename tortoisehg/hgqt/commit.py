@@ -126,7 +126,7 @@ class CommitWidget(QWidget):
         self.branchop = None
         hbox.addWidget(branchbutton)
 
-        self.detailsbutton = QPushButton(_('Details'))
+        self.detailsbutton = QPushButton(_('More Options'))
         self.detailsbutton.pressed.connect(self.details)
         hbox.addWidget(self.detailsbutton)
 
@@ -680,6 +680,7 @@ class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
     def __init__(self, opts, userhistory, parent):
         QDialog.__init__(self, parent)
+        self.setWindowTitle('%s - commit options' % parent.repo.displayname)
         self.repo = parent.repo
 
         layout = QVBoxLayout()
@@ -815,8 +816,6 @@ class DetailsDialog(QDialog):
         bb.rejected.connect(self.reject)
         self.bb = bb
         layout.addWidget(bb)
-
-        self.setWindowTitle('%s - commit details' % self.repo.displayname)
 
     def saveInRepo(self):
         fn = os.path.join(self.repo.root, '.hg', 'hgrc')

@@ -71,7 +71,7 @@ class SyncWidget(QWidget):
         self.urllabel.setAcceptDrops(False)
         hbox.addWidget(self.urllabel)
         hbox.addStretch(1)
-        self.detailsbutton = QPushButton(_('Details'))
+        self.detailsbutton = QPushButton(_('More Options'))
         hbox.addWidget(self.detailsbutton)
         self.postpullbutton = QPushButton()
         hbox.addWidget(self.postpullbutton)
@@ -1114,6 +1114,7 @@ class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
     def __init__(self, opts, parent):
         QDialog.__init__(self, parent)
+        self.setWindowTitle('%s - sync options' % parent.repo.displayname)
         self.repo = parent.repo
 
         layout = QFormLayout()
@@ -1151,8 +1152,6 @@ class DetailsDialog(QDialog):
         bb.rejected.connect(self.reject)
         self.bb = bb
         layout.addWidget(bb)
-
-        self.setWindowTitle('%s - sync details' % self.repo.displayname)
 
     def accept(self):
         outopts = {}
