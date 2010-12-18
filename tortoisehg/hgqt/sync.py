@@ -698,7 +698,7 @@ class SyncWidget(QWidget):
         dlg.exec_()
 
     def emailclicked(self):
-        self.showMessage.emit(_('Determining outgoing changeset to email...'))
+        self.showMessage.emit(_('Determining outgoing changesets to email...'))
         def outputnodes(ret, data):
             if ret == 0:
                 nodes = data.splitlines()
