@@ -313,7 +313,7 @@ class _AnnotateThread(QThread):
         try:
             thread2._async_raise(self._threadid, KeyboardInterrupt)
             self.wait()
-        except AttributeError:
+        except AttributeError, ValueError:
             pass
 
     def run(self):

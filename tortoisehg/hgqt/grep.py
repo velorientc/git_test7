@@ -316,7 +316,10 @@ class HistorySearchThread(QThread):
 
     def cancel(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
-            thread2._async_raise(self.thread_id, KeyboardInterrupt)
+            try:
+                thread2._async_raise(self.thread_id, KeyboardInterrupt)
+            except ValueError:
+                pass
 
     def run(self):
         self.thread_id = int(QThread.currentThreadId())
