@@ -690,8 +690,22 @@ class SyncWidget(QWidget):
         dlg.exec_()
 
     def emailclicked(self):
-        from tortoisehg.hgqt import run as _run
-        _run.email(ui.ui(), root=self.root)
+        self.showMessage.emit(_('Determening outgoing changeset to email...'))
+        def outputnodes(ret, data):
+            if ret == 0:
+                nodes = data.splitlines()
+                self.showMessage.emit(_('%d outgoing changesets') %
+                                        len(nodes))
+                from tortoisehg.hgqt import run as _run
+                _run.email(ui.ui(), root=self.root, rev=nodes)
+            elif ret == 1:
+                self.showMessage.emit(_('No outgoing changesets'))
+            else:
+                self.showMessage.emit(_('Outgoing aborted, ret %d') % ret)
+        self.finishfunc = outputnodes
+        cmdline = ['--repository', self.root, 'outgoing', '--quiet',
+                    '--template', '{node}\n']
+        self.run(cmdline, ('force', 'branch', 'rev'))
 
     @pyqtSlot(QString)
     def removeAlias(self, alias):
