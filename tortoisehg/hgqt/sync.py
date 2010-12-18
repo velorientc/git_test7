@@ -82,6 +82,7 @@ class SyncWidget(QWidget):
         else:
             self.p4pbutton = None
         tb = QToolBar(self)
+        sactions = []
         for tip, icon, cb in (
             (_('Preview incoming changesets from specified URL'),
              'incoming', self.inclicked),
@@ -97,10 +98,11 @@ class SyncWidget(QWidget):
             a.setToolTip(tip)
             a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
+            sactions.append(a)
             tb.addAction(a)
         self.stopAction = a = QAction(self)
         a.setToolTip(_('Stop current operation'))
-        a.setIcon(qtlib.geticon(process-stop))
+        a.setIcon(qtlib.geticon('process-stop'))
         a.triggered.connect(self.stopclicked)
         tb.addAction(a)
         tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
@@ -174,7 +176,7 @@ class SyncWidget(QWidget):
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.detailsbutton.pressed.connect(self.details)
 
-        self.opbuttons = (tb, self.p4pbutton)
+        self.opbuttons = sactions + [self.p4pbutton]
 
         cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
