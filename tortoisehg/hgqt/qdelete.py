@@ -40,7 +40,6 @@ class QDeleteDialog(QDialog):
         self.cmd = cmdui.Runner()
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.commandFinished.connect(self.reject)
 
         BB = QDialogButtonBox
         bbox = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -50,8 +49,13 @@ class QDeleteDialog(QDialog):
         self.bbox = bbox
 
     def accept(self):
+        def finished(ret):
+            self.repo.decrementBusyCount()
+            self.reject()
         cmdline = ['qdelete', '--repository', self.repo.root]
         if self.keepchk.isChecked():
             cmdline += ['--keep']
         cmdline += self.patches
+        self.repo.incrementBusyCount()
+        self.cmd.commandFinished.connect(finished)
         self.cmd.run(cmdline)
