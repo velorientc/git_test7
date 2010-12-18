@@ -20,7 +20,7 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
-from tortoisehg.hgqt import qdelete, qreorder
+from tortoisehg.hgqt import qdelete, qreorder, qrename
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -757,6 +757,7 @@ class RepoWidget(QWidget):
             acts = []
             for name, cb in (
                 (_('Goto patch'), self.qgotoRevision),
+                (_('Rename patch'), self.qrenameRevision),
                 (_('Delete patches'), qdeleteact),
                 (_('Reorder patches'), qreorderact)):
                 act = QAction(name, self)
@@ -813,6 +814,7 @@ class RepoWidget(QWidget):
                 ('mq', applied, _('Finish patch'), None, self.qfinishRevision),
                 ('mq', qpar, _('Pop all patches'), None, self.qpopAllRevision),
                 ('mq', patch, _('Goto patch'), None, self.qgotoRevision),
+                ('mq', patch, _('Rename patch'), None, self.qrenameRevision),
                 ('mq', fixed, _('Strip...'), None, self.stripRevision),
                 ('reviewboard', fixed, _('Post to Review Board...'),
                     'reviewboard', self.sendToReviewBoard)):
@@ -1064,6 +1066,15 @@ class RepoWidget(QWidget):
         cmdline = ['qgoto', str(patchname),  # FIXME force option
                    '--repository', self.repo.root]
         self.runCommand(_('QGoto - TortoiseHg'), cmdline)
+
+    def qrenameRevision(self):
+        """Rename the selected MQ patch"""
+        patchname = self.repo.changectx(self.rev).thgmqpatchname()
+        dlg = qrename.QRenameDialog(self.repo, patchname, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.exec_()
 
     def runCommand(self, title, cmdline):
         if self.runner:
