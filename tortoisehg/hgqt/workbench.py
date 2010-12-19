@@ -271,7 +271,7 @@ class Workbench(QMainWindow):
         newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
                   enabled='repoopen', menu='repository')
 
-        newaction(_("About"), self.on_about, menu='help')
+        newaction(_("About"), self.on_about, menu='help', icon='help-browser')
 
         newseparator(toolbar='edit')
         self.actionBack = \
@@ -284,8 +284,17 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='edit',
                   tooltip=_('Load all revisions into graph'))
         newseparator(toolbar='edit', menu='View')
-        newaction(_('Find'), self._repofwd('showSearchBar'), icon='find',
-                  shortcut='Find', enabled='repoopen', toolbar='edit', menu='View',
+        newaction(_('Filter Toolbar'), self._repofwd('toggleFilterBar'),
+                  icon='find', shortcut='Ctrl+S', enabled='repoopen',
+                  toolbar='edit', menu='View', checkable=True,
+                  tooltip=_('Filter graph with revision sets or branches'))
+        newaction(_('Goto Toolbar'), self._repofwd('toggleGotoBar'),
+                  icon='go-jump', shortcut='Ctrl+T', enabled='repoopen',
+                  toolbar='edit', menu='View', checkable=True,
+                  tooltip=_('Jump to a specific revision'))
+        newaction(_('Find in File'), self._repofwd('toggleSearchBar'),
+                  icon='edit-find', shortcut='Find', enabled='repoopen',
+                  toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Search file and revision contents for keyword'))
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming',

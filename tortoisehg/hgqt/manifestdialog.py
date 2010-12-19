@@ -313,9 +313,13 @@ class ManifestTaskWidget(ManifestWidget):
         self.editSelected.connect(self._openInEditor)
 
     @pyqtSlot()
-    def showSearchBar(self):
-        self._searchbar.show()
-        self._searchbar.setFocus()
+    def toggleSearchBar(self):
+        vis = self.searchbar.isVisible()
+        if vis:
+            self.searchbar.hide()
+        else:
+            self.searchbar.show()
+            self.searchbar.setFocus()
 
     @util.propertycache
     def _searchbar(self):

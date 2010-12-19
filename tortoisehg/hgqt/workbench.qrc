@@ -54,5 +54,8 @@
     <file>icons/extensions.svg</file>
     <file>icons/mail-forward.svg</file>
     <file>icons/process-stop.svg</file>
+    <file>icons/edit-find.svg</file>
+    <file>icons/go-jump.svg</file>
+    <file>icons/help-browser.svg</file>
   </qresource>
 </RCC>

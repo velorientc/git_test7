@@ -246,9 +246,13 @@ class RevDetailsWidget(QWidget):
         return self.fileview.getAnnotate()
 
     @pyqtSlot()
-    def showSearchBar(self):
-        self.searchbar.show()
-        self.searchbar.setFocus()
+    def toggleSearchBar(self):
+        vis = self.searchbar.isVisible()
+        if vis:
+            self.searchbar.hide()
+        else:
+            self.searchbar.show()
+            self.searchbar.setFocus()
 
     @pyqtSlot()
     def _updateHighlightText(self):

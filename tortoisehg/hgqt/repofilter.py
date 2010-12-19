@@ -33,12 +33,6 @@ class RepoFilterBar(QToolBar):
         self.setMovable(False)
         self._repo = repo
 
-        closeact = QAction('Close', self)
-        closeact.setIcon(qtlib.geticon('close'))
-        closeact.setShortcut(Qt.Key_Escape)
-        closeact.triggered.connect(self.hide)
-        self.addAction(closeact)
-
         self.entrydlg = revset.RevisionSetQuery(repo, self)
         self.entrydlg.progress.connect(self.progress)
         self.entrydlg.showMessage.connect(self.showMessage)

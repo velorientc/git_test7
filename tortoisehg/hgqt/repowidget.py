@@ -116,10 +116,6 @@ class RepoWidget(QWidget):
         self.filterbar.filterToggled.connect(self.filterToggled)
         hbox.addWidget(self.filterbar)
 
-        openact = QAction('Open', self)
-        openact.setShortcut('Ctrl+S')
-        openact.triggered.connect(self.filterbar.show)
-        self.addAction(openact)
         self.filterbar.hide()
 
         self.revsetfilter = self.filterbar.filtercb.isChecked()
@@ -190,12 +186,24 @@ class RepoWidget(QWidget):
             return self.repo.shortname
 
     @pyqtSlot()
-    def showSearchBar(self):
-        """Show tasktab-specific search bar if available"""
+    def toggleSearchBar(self):
+        """Toggle display of tasktab-specific search bar if available"""
         curtt = self.taskTabsWidget.currentWidget()
-        show = getattr(curtt, 'showSearchBar', None)
+        show = getattr(curtt, 'toggleSearchBar', None)
         if show:
             show()
+
+    @pyqtSlot()
+    def toggleFilterBar(self):
+        """Toggle display repowidget filter bar"""
+        vis = self.filterbar.isVisible()
+        self.filterbar.setVisible(not vis)
+
+    @pyqtSlot()
+    def toggleGotoBar(self):
+        """Toggle display repowidget goto bar"""
+        vis = self.gototb.isVisible()
+        self.gototb.setVisible(not vis)
 
     def getCommitWidget(self):
         return getattr(self.repo, '_commitwidget', None)  # TODO: ugly
