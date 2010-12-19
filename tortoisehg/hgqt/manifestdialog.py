@@ -314,12 +314,12 @@ class ManifestTaskWidget(ManifestWidget):
 
     @pyqtSlot()
     def toggleSearchBar(self):
-        vis = self.searchbar.isVisible()
+        vis = self._searchbar.isVisible()
         if vis:
-            self.searchbar.hide()
+            self._searchbar.hide()
         else:
-            self.searchbar.show()
-            self.searchbar.setFocus()
+            self._searchbar.show()
+            self._searchbar.setFocus()
 
     @util.propertycache
     def _searchbar(self):
