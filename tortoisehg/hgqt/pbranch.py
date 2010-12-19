@@ -87,7 +87,8 @@ class PatchBranchWidget(QWidget):
 
         # Patch list
         self.patchlistmodel = PatchBranchModel(self.compute_model(),
-                                               self.repo.changectx('.').branch() )
+                                               self.repo.changectx('.').branch(),
+                                               self)
         self.patchlist = QTableView(self)
         self.patchlist.setModel(self.patchlistmodel)
         self.patchlist.setShowGrid(False)
@@ -435,8 +436,8 @@ class PatchBranchModel(QAbstractTableModel):
     """
     _columns = ('Graph', 'Name', 'Status', 'Title', 'Message',)
 
-    def __init__(self, model, wd_branch=""):
-        QAbstractTableModel.__init__(self)
+    def __init__(self, model, wd_branch="", parent=None):
+        QAbstractTableModel.__init__(self, parent)
         self.rowcount = 0
         self._columnmap = {'Graph':    lambda ctx, gnode: "",
                            'Name':     lambda ctx, gnode: gnode.patchname,
