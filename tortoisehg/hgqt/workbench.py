@@ -193,6 +193,7 @@ class Workbench(QMainWindow):
 
         a = self.reporegistry.toggleViewAction()
         a.setToolTip(_('Show Repository Registry'))
+        a.setShortcut('Ctrl+Shift+O')
         a.setIcon(geticon('repotree'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
