@@ -595,7 +595,7 @@ class patchctx(object):
         self._node = node
         self._user = user or ''
         self._date = date and util.parsedate(date) or util.makedate()
-        self._desc = msg or ''
+        self._desc = msg and msg.strip() or ''
         self._branch = branch or ''
         self._parents = []
         self._rev = rev
