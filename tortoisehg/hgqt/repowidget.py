@@ -47,6 +47,9 @@ class RepoWidget(QWidget):
     titleChanged = pyqtSignal(unicode)
     """Emitted when changed the expected title for the RepoWidget tab"""
 
+    repoLinkClicked = pyqtSignal(unicode)
+    """Emitted when clicked a link to open repository"""
+
     singlecmenu = None
     unappcmenu = None
     paircmenu = None
@@ -231,7 +234,7 @@ class RepoWidget(QWidget):
 
         def openlink(link):
             if unicode(link).startswith('subrepo:'):
-                self.workbench.showRepo(link[8:])
+                self.repoLinkClicked.emit(link[8:])
         cw.linkActivated.connect(openlink)
 
         cw.showMessage.connect(self.showMessage)

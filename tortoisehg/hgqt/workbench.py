@@ -448,6 +448,7 @@ class Workbench(QMainWindow):
             self.statusbar.progress(tp, p, i, u, tl, repo.root))
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
+        rw.repoLinkClicked.connect(self.showRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
 
         tw = self.repoTabsWidget
