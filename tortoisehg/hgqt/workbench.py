@@ -61,15 +61,6 @@ class Workbench(QMainWindow):
         rr.openRepoSignal.connect(self.openRepo)
 
         self.repoTabChanged()
-
-        def gotVisible(state):
-            self.actionShowRepoRegistry.setChecked(self.reporegistry.isVisible())
-        def logVisible(state):
-            self.actionShowLog.setChecked(self.log.isVisible())
-
-        self.reporegistry.visibilityChanged.connect(gotVisible)
-        self.log.visibilityChanged.connect(logVisible)
-
         self.restoreSettings()
         self.setAcceptDrops(True)
 
@@ -200,17 +191,23 @@ class Workbench(QMainWindow):
         newaction(_("E&xit"), self.close, icon='quit',
                   shortcut='Quit', menu='file')
 
-        self.actionShowRepoRegistry = \
-        newaction(_("Show Repository Registry"), self.reporegistry.setVisible,
-                  icon='repotree', checkable=True, menu='view',
-                  toolbar='dock')
+        a = self.reporegistry.toggleViewAction()
+        a.setToolTip(_('Show Repository Registry'))
+        a.setIcon(geticon('repotree'))
+        self.docktbar.addAction(a)
+        self.menuView.addAction(a)
+
         self.actionShowPaths = \
         newaction(_("Show Paths"), self.reporegistry.showPaths,
                   checkable=True, menu='view')
-        self.actionShowLog = \
-        newaction(_("Show Output &Log"), self.log.setVisible, icon='showlog',
-                  shortcut='Ctrl+L', checkable=True, menu='view',
-                  toolbar='dock')
+
+        a = self.log.toggleViewAction()
+        a.setToolTip(_('Show Output &Log'))
+        a.setShortcut('Ctrl+L')
+        a.setIcon(geticon('showlog'))
+        self.docktbar.addAction(a)
+        self.menuView.addAction(a)
+
         newseparator(menu='view')
         newaction(_("Choose Log Columns..."), self.setHistoryColumns,
                   menu='view')
