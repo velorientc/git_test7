@@ -294,7 +294,7 @@ class Workbench(QMainWindow):
                   tooltip=_('Jump to a specific revision'))
         newaction(_('Find in File'), self._repofwd('toggleSearchBar'),
                   icon='edit-find', shortcut='Find', enabled='repoopen',
-                  toolbar='edit', menu='View', checkable=True,
+                  toolbar='edit', menu='View', checkable=False,
                   tooltip=_('Search file and revision contents for keyword'))
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming',
