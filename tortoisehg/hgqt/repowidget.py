@@ -57,14 +57,13 @@ class RepoWidget(QWidget):
     paircmenu = None
     multicmenu = None
 
-    def __init__(self, repo, workbench):
-        QWidget.__init__(self, acceptDrops=True)
+    def __init__(self, repo, parent=None):
+        QWidget.__init__(self, parent, acceptDrops=True)
 
         self.repo = repo
         repo.repositoryChanged.connect(self.repositoryChanged)
         repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
-        self.workbench = workbench
         self.revsetfilter = False
         self.branch = ''
         self.bundle = None
@@ -227,11 +226,9 @@ class RepoWidget(QWidget):
         b.setFont(f)
         cw = CommitWidget(pats, opts, self.repo.root, True, self)
 
-        # Shared widgets must be connected directly to workbench
-        cw.output.connect(self.workbench.log.output)
-        cw.progress.connect(lambda tp, p, i, u, tl:
-            self.workbench.statusbar.progress(tp, p, i, u, tl, self.repo.root))
-        cw.makeLogVisible.connect(self.workbench.log.setShown)
+        cw.output.connect(self.output)
+        cw.progress.connect(self.progress)
+        cw.makeLogVisible.connect(self.makeLogVisible)
 
         def openlink(link):
             if unicode(link).startswith('subrepo:'):
@@ -266,12 +263,9 @@ class RepoWidget(QWidget):
         sw = getattr(self.repo, '_syncwidget', None)  # TODO: ugly
         if not sw:
             sw = SyncWidget(self.repo.root, True, self)
-            # Shared widgets must be connected directly to workbench
-            sw.output.connect(self.workbench.log.output)
-            sw.progress.connect(lambda tp, p, i, u, tl:
-                self.workbench.statusbar.progress(tp, p, i, u, tl,
-                                                  self.repo.root))
-            sw.makeLogVisible.connect(self.workbench.log.setShown)
+            sw.output.connect(self.output)
+            sw.progress.connect(self.progress)
+            sw.makeLogVisible.connect(self.makeLogVisible)
             self.repo._syncwidget = sw
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
@@ -371,10 +365,9 @@ class RepoWidget(QWidget):
 
     def createPatchBranchWidget(self):
         pbw = PatchBranchWidget(self.repo, parent=self)
-        pbw.output.connect(self.workbench.log.output)
-        pbw.progress.connect(lambda tp, p, i, u, tl:
-            self.workbench.statusbar.progress(tp, p, i, u, tl, self.repo.root))
-        pbw.makeLogVisible.connect(self.workbench.log.setShown)
+        pbw.output.connect(self.output)
+        pbw.progress.connect(self.progress)
+        pbw.makeLogVisible.connect(self.makeLogVisible)
         return pbw
 
     def updatePatchBranchTab(self):
