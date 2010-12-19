@@ -138,7 +138,8 @@ def _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
     palette = {}
 
     def reassignifneeded(fctx):
-        if mindate is None or fctx.date()[0] <= mindate or maxsaturations <= 1:
+        # fctx is the latest fctx which is NOT included in the palette
+        if mindate is None or fctx.date()[0] < mindate or maxsaturations <= 1:
             return palette, cm
         return _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
                                     maxsaturations - 1, mindate)
