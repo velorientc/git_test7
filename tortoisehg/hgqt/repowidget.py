@@ -44,6 +44,8 @@ class RepoWidget(QWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
+    revisionSelected = pyqtSignal(object)
+
     titleChanged = pyqtSignal(unicode)
     """Emitted when changed the expected title for the RepoWidget tab"""
 
@@ -127,7 +129,6 @@ class RepoWidget(QWidget):
 
         self.repoview = view = HgRepoView(self.repo, self)
         view.revisionSelected.connect(self.revision_selected)
-        view.revisionSelected.connect(self.updateHistoryActions)
         view.revisionClicked.connect(self.revision_clicked)
         view.revisionActivated.connect(self.revision_activated)
         view.showMessage.connect(self.showMessage)
@@ -562,6 +563,8 @@ class RepoWidget(QWidget):
             self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
 
+        self.revisionSelected.emit(rev)
+
     def gotoParent(self):
         self.repoview.clearSelection()
         self.goto('.')
@@ -649,11 +652,11 @@ class RepoWidget(QWidget):
     ## Workbench methods
     ##
 
-    @pyqtSlot()
-    def updateHistoryActions(self):
-        'Update back / forward actions'
-        self.workbench.actionBack.setEnabled(self.repoview.canGoBack())
-        self.workbench.actionForward.setEnabled(self.repoview.canGoForward())
+    def canGoBack(self):
+        return self.repoview.canGoBack()
+
+    def canGoForward(self):
+        return self.repoview.canGoForward()
 
     def storeSettings(self):
         self.revDetailsWidget.storeSettings()

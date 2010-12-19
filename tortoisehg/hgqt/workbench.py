@@ -418,6 +418,15 @@ class Workbench(QMainWindow):
             taskIndex = repoWidget.taskTabsWidget.currentIndex()
             self.actionGroupTaskView.actions()[taskIndex].setChecked(True)
 
+    @pyqtSlot()
+    def updateHistoryActions(self):
+        'Update back / forward actions'
+        rw = self.repoTabsWidget.currentWidget()
+        if not rw:
+            return
+        self.actionBack.setEnabled(rw.canGoBack())
+        self.actionForward.setEnabled(rw.canGoForward())
+
     def repoTabCloseSelf(self, widget):
         self.repoTabsWidget.setCurrentWidget(widget)
         index = self.repoTabsWidget.currentIndex()
@@ -435,7 +444,7 @@ class Workbench(QMainWindow):
     def repoTabChanged(self, index=0):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            w.updateHistoryActions()
+            self.updateHistoryActions()
             self.updateMenu()
         self.log.setRepository(w and w.repo or None)
 
@@ -448,6 +457,7 @@ class Workbench(QMainWindow):
             self.statusbar.progress(tp, p, i, u, tl, repo.root))
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
+        rw.revisionSelected.connect(self.updateHistoryActions)
         rw.repoLinkClicked.connect(self.showRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
 
