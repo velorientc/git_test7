@@ -44,15 +44,9 @@ class QuickBar(QToolBar):
         openact.setShortcut(QKeySequence(openkey))
         openact.triggered.connect(self.show)
 
-        closeact = QAction('Close', self)
-        closeact.setIcon(geticon('close'))
-        closeact.setShortcut(Qt.Key_Escape)
-        closeact.triggered.connect(self.hide)
-
-        self._actions = {'open': openact, 'close': closeact}
+        self._actions = {'open': openact}
 
     def createContent(self):
-        self.addAction(self._actions['close'])
         self.parent().addAction(self._actions['open'])
 
     def hide(self):
