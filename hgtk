@@ -48,7 +48,13 @@ capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
 
 err = checkhgversion(hgversion)
 if err:
-    _ui.warn('abort: %s\n' % err)
+    from tortoisehg.hgtk.bugreport import run
+    from tortoisehg.hgtk.hgtk import gtkrun
+    opts = {}
+    opts['cmd'] = ' '.join(sys.argv[1:])
+    opts['error'] = err
+    opts['nofork'] = True
+    gtkrun(run, _ui, **opts)
     sys.exit(1)
 
 if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
