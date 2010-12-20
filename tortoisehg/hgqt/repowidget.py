@@ -746,9 +746,7 @@ class RepoWidget(QWidget):
     def unnapliedPatchMenu(self, point, selection):
         def qdeleteact():
             """Delete unapplied patch(es)"""
-            patches = [self.repo.changectx(r).thgmqpatchname() \
-                       for r in self.menuselection]
-            dlg = qdelete.QDeleteDialog(self.repo, patches, self)
+            dlg = qdelete.QDeleteDialog(self.repo, self.menuselection, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
@@ -758,9 +756,7 @@ class RepoWidget(QWidget):
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def qfoldact():
-            patches = [self.repo.changectx(r).thgmqpatchname() \
-                       for r in self.menuselection]
-            dlg = qfold.QFoldDialog(self.repo, patches, self)
+            dlg = qfold.QFoldDialog(self.repo, self.menuselection, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
@@ -785,7 +781,7 @@ class RepoWidget(QWidget):
         self.menuselection = selection
         self.unappacts[0].setEnabled(len(selection) == 1)
         self.unappacts[1].setEnabled(len(selection) == 1)
-        self.unappacts[2].setEnabled('qtip' in self.repo.tags().keys())
+        self.unappacts[2].setEnabled('qtip' in self.repo.tags())
         self.unappcmenu.exec_(point)
 
     def singleSelectionMenu(self, point, selection):
