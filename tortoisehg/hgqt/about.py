@@ -31,6 +31,7 @@ class AboutDialog(QDialog):
         super(AboutDialog, self).__init__(parent)
 
         self.updateInfo = {}
+        self.uthread = None
 
         self.setWindowIcon(qtlib.geticon('thg_logo'))
         self.setWindowTitle(_('About'))
@@ -145,6 +146,8 @@ class AboutDialog(QDialog):
         ld.show()
 
     def closeEvent(self, event):
+        if self.uthread:
+            self.uthread.wait()
         self._writesettings()
         super(AboutDialog, self).closeEvent(event)
 
