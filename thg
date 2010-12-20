@@ -44,7 +44,7 @@ demandimport.ignore.append('win32com.shell')
 demandimport.ignore.append('tortoisehg.util.config')
 demandimport.ignore.append('workbench_rc')
 demandimport.enable()
-from mercurial import ui, util
+from mercurial import ui as uimod, util
 from tortoisehg.util.hgversion import hgversion, checkhgversion
 import cStringIO
 import traceback
@@ -58,15 +58,21 @@ except ImportError, e:
     sys.stderr.write("(check your install and PYTHONPATH)\n")
     sys.exit(-1)
 
-_ui = ui.ui()
-capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
+ui = uimod.ui()
+capt = ui.configbool('tortoisehg', 'stderrcapt', True)
 
 errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError',
           'NotImplementedError')
 
 err = checkhgversion(hgversion)
 if err:
-    _ui.warn('abort: %s\n' % err)
+    from tortoisehg.hgqt.bugreport import run
+    from tortoisehg.hgqt.run import qtrun
+    opts = {}
+    opts['cmd'] = ' '.join(sys.argv[1:])
+    opts['error'] = '\n' + err + '\n'
+    opts['nofork'] = True
+    qtrun(run, ui, **opts)
     sys.exit(1)
 
 if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
@@ -90,7 +96,7 @@ else:
                 opts['cmd'] = ' '.join(sys.argv[1:])
                 opts['error'] = error
                 opts['nofork'] = True
-                qtrun(run, _ui, **opts)
+                qtrun(run, ui, **opts)
                 break
         sys.exit(ret)
     except:
