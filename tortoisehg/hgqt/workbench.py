@@ -192,7 +192,7 @@ class Workbench(QMainWindow):
                   shortcut='Quit', menu='file')
 
         a = self.reporegistry.toggleViewAction()
-        a.setToolTip(_('Show Repository Registry'))
+        a.setText(_('Show Repository Registry'))
         a.setShortcut('Ctrl+Shift+O')
         a.setIcon(geticon('repotree'))
         self.docktbar.addAction(a)
@@ -203,7 +203,7 @@ class Workbench(QMainWindow):
                   checkable=True, menu='view')
 
         a = self.log.toggleViewAction()
-        a.setToolTip(_('Show Output &Log'))
+        a.setText(_('Show Output &Log'))
         a.setShortcut('Ctrl+L')
         a.setIcon(geticon('showlog'))
         self.docktbar.addAction(a)
