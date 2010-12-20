@@ -281,8 +281,9 @@ class CmdThread(QThread):
         except (error.RepoError, urllib2.HTTPError), e:
             ui.write_err(str(e) + '\n')
         except (Exception, OSError, IOError), e:
-            import traceback
-            traceback.print_exc()
+            if 'THGDEBUG' in os.environ:
+                import traceback
+                traceback.print_exc()
             ui.write_err(str(e) + '\n')
         except KeyboardInterrupt:
             self.ret = -1
