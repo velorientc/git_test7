@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import sys
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -22,20 +23,19 @@ LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
 
 class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
-    def __init__(self, command, pats, parent=None):
+    def __init__(self, repo, command, pats, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
         self.pats = pats
+        self.repo = repo
+        os.chdir(repo.root)
 
         # Handle rm alias
         if command == 'rm':
             command = 'remove'
         self.command = command
 
-        repo = thgrepo.repository(path=paths.find_root())
-        assert repo
-        os.chdir(repo.root)
         self.setWindowTitle('%s - hg %s' % (repo.displayname, command))
 
         layout = QVBoxLayout()
@@ -75,7 +75,6 @@ class QuickOpDialog(QDialog):
         self.statusbar = cmdui.ThgStatusBar(self)
         self.statusbar.setSizeGripEnabled(False)
         stwidget.showMessage.connect(self.statusbar.showMessage)
-        stwidget.progress.connect(self.progress)
 
         self.cmd = cmd = cmdui.Runner(parent=self)
         cmd.commandStarted.connect(self.commandStarted)
@@ -104,16 +103,6 @@ class QuickOpDialog(QDialog):
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
-
-    @pyqtSlot(QString, object, QString, QString, object)
-    def progress(self, topic, pos, item, unit, total):
-        if pos is None:
-            repo = self.stwidget.repo
-            imm = repo.ui.config('tortoisehg', 'immediate', '')
-            if self.command in imm.lower():
-                # Only do this trick once
-                QTimer.singleShot(0, self.accept)
-                self.stwidget.progress.disconnect(self.progress)
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
@@ -161,8 +150,35 @@ class QuickOpDialog(QDialog):
             s.setValue('quickop/geom', self.saveGeometry())
             QDialog.reject(self)
 
+
+instance = None
+class HeadlessQuickop(QWidget):
+    def __init__(self, repo, cmdline):
+        QWidget.__init__(self)
+        self.cmd = cmdui.Runner(parent=self)
+        self.cmd.commandFinished.connect(self.commandFinished)
+        self.cmd.run(cmdline)
+        self.hide()
+
+    def commandFinished(self, ret):
+        if ret == 0:
+            sys.exit(0)
+
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
     if opts.get('canonpats'):
         pats = list(pats) + opts['canonpats']
-    return QuickOpDialog(opts.get('alias'), pats)
+
+    from tortoisehg.util import paths
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(ui, path=paths.find_root())
+
+    command = opts['alias']
+    imm = repo.ui.config('tortoisehg', 'immediate', '')
+    if command in imm.lower():
+        cmdline = [command] + pats
+        global instance
+        instance = HeadlessQuickop(repo, cmdline)
+        return None
+    else:
+        return QuickOpDialog(command, pats)
