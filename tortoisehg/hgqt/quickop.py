@@ -12,9 +12,9 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, shlib, paths
+from tortoisehg.util import hglib, shlib
 
-from tortoisehg.hgqt import qtlib, status, cmdui, thgrepo
+from tortoisehg.hgqt import qtlib, status, cmdui
 
 LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
            'forget': (_('Checkmark files to forget'), _('Forget')),
@@ -79,7 +79,6 @@ class QuickOpDialog(QDialog):
         self.cmd = cmd = cmdui.Runner(parent=self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
-        cmd.commandCanceling.connect(self.commandCanceled)
         cmd.progress.connect(self.statusbar.progress)
 
         BB = QDialogButtonBox
@@ -121,11 +120,9 @@ class QuickOpDialog(QDialog):
 
     def commandFinished(self, ret):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
-        if ret is 0:
+        if ret == 0:
+            shlib.shell_notify(self.files)
             self.reject()
-
-    def commandCanceled(self):
-        self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
 
     def accept(self):
         cmdline = [self.command]
@@ -139,6 +136,7 @@ class QuickOpDialog(QDialog):
                                 _('No operation to perform'),
                                 parent=self)
             return
+        self.files = files
         self.cmd.run(cmdline)
 
     def reject(self):
@@ -155,6 +153,7 @@ instance = None
 class HeadlessQuickop(QWidget):
     def __init__(self, repo, cmdline):
         QWidget.__init__(self)
+        self.files = cmdline[1:]
         self.cmd = cmdui.Runner(parent=self)
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.run(cmdline)
@@ -162,6 +161,7 @@ class HeadlessQuickop(QWidget):
 
     def commandFinished(self, ret):
         if ret == 0:
+            shlib.shell_notify(self.files)
             sys.exit(0)
 
 def run(ui, *pats, **opts):
