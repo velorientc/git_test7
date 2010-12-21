@@ -696,6 +696,7 @@ class DetailsDialog(QDialog):
         usercombo.setEditable(True)
         usercombo.setEnabled(False)
         self.usercb.toggled.connect(usercombo.setEnabled)
+        self.usercb.toggled.connect(lambda s: s and usercombo.setFocus())
 
         l = []
         if opts.get('user'):
@@ -738,6 +739,7 @@ class DetailsDialog(QDialog):
         curdate = QPushButton(_('Update'))
         curdate.setEnabled(False)
         self.datecb.toggled.connect(curdate.setEnabled)
+        self.datecb.toggled.connect(lambda s: s and curdate.setFocus())
         curdate.clicked.connect( lambda: self.datele.setText(
                 hglib.tounicode(hglib.displaytime(util.makedate()))))
         if opts.get('date'):
@@ -757,6 +759,8 @@ class DetailsDialog(QDialog):
         self.pushafterle = QLineEdit()
         self.pushafterle.setEnabled(False)
         self.pushaftercb.toggled.connect(self.pushafterle.setEnabled)
+        self.pushaftercb.toggled.connect(lambda s:
+                s and self.pushafterle.setFocus())
 
         pushaftersave = QPushButton(_('Save in Repo'))
         pushaftersave.clicked.connect(self.savePushAfter)
@@ -778,6 +782,8 @@ class DetailsDialog(QDialog):
         self.autoincle = QLineEdit()
         self.autoincle.setEnabled(False)
         self.autoinccb.toggled.connect(self.autoincle.setEnabled)
+        self.autoinccb.toggled.connect(lambda s:
+                s and self.autoincle.setFocus())
 
         autoincsave = QPushButton(_('Save in Repo'))
         autoincsave.clicked.connect(self.saveAutoInc)
@@ -799,6 +805,8 @@ class DetailsDialog(QDialog):
             self.patchcb = QCheckBox(_('New patch (QNew):'))
             self.patchle = QLineEdit()
             self.patchcb.toggled.connect(self.patchle.setEnabled)
+            self.patchcb.toggled.connect(lambda s:
+                    s and self.patchle.setFocus())
 
             patchName = opts.get('patchName')
             if patchName:
