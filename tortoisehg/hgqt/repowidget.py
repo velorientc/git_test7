@@ -631,8 +631,10 @@ class RepoWidget(QWidget):
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
         self.updatePatchBranchTab()
-        self.titleChanged.emit(self.title())
         # TODO: emit only if actually changed
+        self.titleChanged.emit(self.title())
+        vis = self.repo.ui.configbool('tortoisehg', 'tasktabs')
+        self.taskTabsWidget.tabBar().setShown(vis)
 
     @pyqtSlot(unicode, bool)
     def setBranch(self, branch, allparents=True):
