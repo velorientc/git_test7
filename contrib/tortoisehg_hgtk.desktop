@@ -1,0 +1,117 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin,inode/directory,all/allfiles
+X-KDE-Submenu=Mercurial (hgtk)
+Actions=Log;Status;Shelve;Diff;Commit;Add;Revert;Rename;Forget;Remove;Update;Search;Synch;Serve;Clone;Init;Ignore;Guess;Recovery;Repoconfig;Userconfig;Aboutthg;
+
+# TODO: X-KDE-GetActionMenu support
+
+[Desktop Action Log]
+Name=Repository Explorer
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/repobrowse.svg
+Exec=hgtk -R "$(hg root --cwd %f)" --nofork log
+
+[Desktop Action Status]
+Name=View File Status
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/status.svg
+Exec=hgtk -R "$(hg root --cwd %f)" --nofork status
+
+[Desktop Action Shelve]
+Name=Shelve Changes
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/shelve.svg
+Exec=hgtk -R "$(hg root --cwd %f)" --nofork shelve
+
+[Desktop Action Diff]
+Name=Visual Diff
+Icon=/usr/share/pixmaps/tortoisehg/icons/menudiff.ico
+Exec=hgtk -R "$(hg root --cwd %f)" --nofork vdiff
+
+[Desktop Action Commit]
+Name=Commit
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/commit.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork commit
+
+[Desktop Action Add]
+Name=Add Files...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/add.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork add %f
+
+[Desktop Action Revert]
+Name=Revert Files...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/revert.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork revert %f
+
+[Desktop Action Rename]
+Name=Rename Files...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/recovery.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork rename %f
+
+[Desktop Action Forget]
+Name=Forget Files...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/remove.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork forget %f
+
+[Desktop Action Remove]
+Name=Remove Files...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/remove.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork remove %f
+
+[Desktop Action Update]
+Name=Update...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/checkout.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork update
+
+[Desktop Action Search]
+Name=Search History
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/repobrowse.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork datamine
+
+[Desktop Action Synch]
+Name=Synchronize
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/sync.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork synch
+
+[Desktop Action Serve]
+Name=Web Server
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/proxy.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork serve
+
+[Desktop Action Clone]
+Name=Clone...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/clone.svg
+Exec=/usr/bin/hgtk --nofork clone %f
+
+[Desktop Action Init]
+Name=Create Repository Here
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/init.svg
+Exec=/usr/bin/hgtk --nofork init %f
+
+[Desktop Action Ignore]
+Name=Edit Ignore Filter
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/ignore.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork hgignore %f
+
+[Desktop Action Guess]
+Name=Guess Renames
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/detect_rename.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork guess %f
+
+[Desktop Action Recovery]
+Name=Recovery...
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/recovery.svg
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork recovery %f
+
+[Desktop Action Repoconfig]
+Name=Repository settings
+Icon=/usr/share/pixmaps/tortoisehg/icons/settings_repo.ico
+Exec=/usr/bin/hgtk -R "$(hg root --cwd %f)" --nofork repoconfig
+
+[Desktop Action Userconfig]
+Name=Global Settings
+Icon=/usr/share/pixmaps/tortoisehg/icons/settings_user.ico
+Exec=/usr/bin/hgtk --nofork userconfig
+
+[Desktop Action Aboutthg]
+Name=About TortoiseHg
+Icon=/usr/share/pixmaps/tortoisehg/icons/svg/thg_logo.svg
+Exec=/usr/bin/hgtk --nofork about
