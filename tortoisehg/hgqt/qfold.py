@@ -137,6 +137,7 @@ class QFoldDialog(QDialog):
 
     def accept(self):
         self._writesettings()
+        self.bbox.setDisabled(True)
         cmdline = ['qfold', '--repository', self.repo.root]
         if self.keepchk.isChecked():
             cmdline += ['--keep']
@@ -145,10 +146,10 @@ class QFoldDialog(QDialog):
         cmdline += self.ulw.getPatchList()
         def finished():
             self.repo.decrementBusyCount()
+            QDialog.accept(self)
         self.repo.incrementBusyCount()
         self.cmd.commandFinished.connect(finished)
         self.cmd.run(cmdline)
-        QDialog.accept(self)
 
     def reflowPressed(self):
         'User pressed Control-E, reflow current paragraph'
