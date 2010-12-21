@@ -23,7 +23,7 @@ LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
 
 class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
-    def __init__(self, repo, command, pats, parent=None):
+    def __init__(self, repo, command, pats, parent):
         QDialog.__init__(self, parent)
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
@@ -181,4 +181,4 @@ def run(ui, *pats, **opts):
         instance = HeadlessQuickop(repo, cmdline)
         return None
     else:
-        return QuickOpDialog(command, pats)
+        return QuickOpDialog(repo, command, pats, None)
