@@ -109,6 +109,7 @@ class SyncWidget(QWidget):
 
         hbox.addStretch(1)
         self.urllabel = QLabel()
+        self.urllabel.setMargin(4)
         self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.urllabel.setAcceptDrops(False)
         hbox.addWidget(self.urllabel)
