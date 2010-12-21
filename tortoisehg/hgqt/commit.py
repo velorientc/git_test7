@@ -515,6 +515,9 @@ class CommitWidget(QWidget):
                                 parent=self)
             self.msgte.setFocus()
             return
+
+        commandlines = []
+
         if self.branchop is None:
             brcmd = []
         elif self.branchop == False:
@@ -543,7 +546,8 @@ class CommitWidget(QWidget):
                       'Cancel\t- Cancel this commit') % self.branchop,
                     self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
             if resp == 0:
-                repo.dirstate.setbranch(branch)
+                commandlines.append(['branch', '--repository', repo.root,
+                                     '--force', branch])
             elif resp == 2:
                 return
         files = self.stwidget.getChecked('MAR?!S')
@@ -561,8 +565,6 @@ class CommitWidget(QWidget):
         if not user:
             return
         self.addUsernameToHistory(user)
-
-        commandlines = []
 
         checkedUnknowns = self.stwidget.getChecked('?I')
         if checkedUnknowns:
