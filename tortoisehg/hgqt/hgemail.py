@@ -220,6 +220,9 @@ class EmailDialog(QDialog):
         for e in ('to_edit', 'from_edit'):
             getattr(self._qui, e).editTextChanged.connect(self._updateforms)
 
+    def close(self):
+        super(EmailDialog, self).accept()
+        
     def accept(self):
         # TODO: want to pass patchbombopts directly
         def cmdargs(opts):

@@ -352,9 +352,9 @@
         <string extracomment="Configure email settings"/>
        </property>
        <property name="text">
-        <string>Settings</string>
+        <string>&amp;Settings</string>
        </property>
-       <property name="autoDefault">
+       <property name="default">
         <bool>false</bool>
        </property>
       </widget>
@@ -378,7 +378,20 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Send</string>
+        <string>Send &amp;Email</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="close_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>&amp;Close</string>
        </property>
        <property name="default">
         <bool>true</bool>
@@ -441,6 +454,22 @@
    <signal>clicked()</signal>
    <receiver>EmailDialog</receiver>
    <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>641</x>
+     <y>501</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>528</x>
+     <y>506</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>close_button</sender>
+   <signal>clicked()</signal>
+   <receiver>EmailDialog</receiver>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>641</x>
