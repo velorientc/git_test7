@@ -26,6 +26,7 @@ class QRenameDialog(QDialog):
 
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.setMinimumWidth(400)
         self.repo = repo
         self.oldpatchname = patchname
         self.newpatchname = ''

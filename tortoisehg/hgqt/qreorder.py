@@ -9,7 +9,7 @@ import os
 
 from hgext import mq
 
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.hgqt import qtlib, thgrepo, qrename
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 
@@ -18,7 +18,6 @@ from PyQt4.QtGui import *
 
 # TODO:
 #  This approach will nuke any user configured guards
-#  Support qrename within this dialog
 #  Explicit refresh
 
 class QReorderDialog(QDialog):
@@ -52,9 +51,13 @@ class QReorderDialog(QDialog):
         layout.addWidget(hl)
 
         class PatchListWidget(QListWidget):
+            menuRequested = pyqtSignal(QPoint, object)
             def __init__(self, parent):
                 QListWidget.__init__(self, parent)
                 self.setCurrentRow(0)
+            def contextMenuEvent(self, event):
+                self.menuRequested.emit(event.globalPos(),
+                    hglib.fromunicode(self.item(self.currentRow()).text()))
             def focusInEvent(self, e):
                 i = self.item(self.currentRow())
                 if i:
@@ -69,6 +72,7 @@ class QReorderDialog(QDialog):
         ugb.layout().addWidget(self.ulw)
         self.ulw.currentItemChanged.connect(lambda:
                 self.showSummary(self.ulw.item(self.ulw.currentRow())))
+        self.ulw.menuRequested.connect(self.patchlistMenuRequest)
         layout.addWidget(ugb)
 
         agb = QGroupBox(_('Applied Patches'))
@@ -78,6 +82,7 @@ class QReorderDialog(QDialog):
         agb.layout().addWidget(self.alw)
         self.alw.currentItemChanged.connect(lambda:
                 self.showSummary(self.alw.item(self.alw.currentRow())))
+        self.alw.menuRequested.connect(self.patchlistMenuRequest)
         layout.addWidget(agb)
 
         slbl = QLabel(_('Summary:'))
@@ -101,7 +106,25 @@ class QReorderDialog(QDialog):
         bb.button(BB.Ok).setDefault(True)
         layout.addWidget(bb)
 
+        self.alw.setCurrentRow(0)
+        self.ulw.setCurrentRow(0)
         self.ulw.setFocus()
+
+    def patchlistMenuRequest(self, point, selection):
+        self.menuselection = selection
+        menu = QMenu(self)
+        act = QAction(_('Rename patch'), self)
+        act.triggered.connect(self.qrenamePatch)
+        menu.addAction(act)
+        menu.exec_(point)
+
+    def qrenamePatch(self):
+        patchname = self.menuselection
+        dlg = qrename.QRenameDialog(self.repo, patchname, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.output.connect(self.parent().output)
+        dlg.makeLogVisible.connect(self.parent().makeLogVisible)
+        dlg.exec_()
 
     def refresh(self):
         patchnames = self.repo.mq.series[:]
@@ -110,6 +133,17 @@ class QReorderDialog(QDialog):
             return
 
         alw, ulw = self.alw, self.ulw
+        if self.cached:
+            if applied != self.cached[1]:
+                cw = alw
+            else:
+                cw = ulw
+        else:
+            cw = ulw
+        ar = alw.currentRow()
+        ur = ulw.currentRow()
+        ulw.clear()
+        alw.clear()
         for p in reversed(patchnames):
             item = QListWidgetItem(hglib.tounicode(p))
             if p in applied:
@@ -122,11 +156,22 @@ class QReorderDialog(QDialog):
                               Qt.ItemIsDragEnabled)
                 ulw.addItem(item)
         self.cached = patchnames, applied
+        if cw == ulw:
+            alw.setCurrentRow(ar)
+            ulw.setCurrentRow(ur)
+            self.ulw.setFocus()
+        else:
+            ulw.setCurrentRow(ur)
+            alw.setCurrentRow(ar)
+            self.alw.setFocus()
 
     def showSummary(self, item):
-        patchname = hglib.fromunicode(item.text())
-        txt = '\n'.join(mq.patchheader(self.repo.mq.join(patchname)).message)
-        self.summ.setText(hglib.tounicode(txt))
+        try:
+            patchname = hglib.fromunicode(item.text())
+            txt = '\n'.join(mq.patchheader(self.repo.mq.join(patchname)).message)
+            self.summ.setText(hglib.tounicode(txt))
+        except:
+            pass
 
     def accept(self):
         try:
