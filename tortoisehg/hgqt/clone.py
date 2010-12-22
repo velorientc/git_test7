@@ -194,34 +194,33 @@ class CloneDialog(QDialog):
 
     def clone(self):
         # prepare user input
-        src = self.src_combo.currentText().trimmed()
-        dest = self.dest_combo.currentText().trimmed()
+        srcQ = self.src_combo.currentText().trimmed()
+        src = hglib.fromunicode(srcQ)
+        destQ = self.dest_combo.currentText().trimmed()
+        dest = hglib.fromunicode(destQ)
         if not dest:
             dest = os.path.basename(src)
+            destQ = QString(hglib.tounicode(dest))
 
-        if src:
-            src = QString(src)
+        if srcQ:
             l = list(self.shist)
-            if src in l:
-                l.remove(src)
-            l.insert(0, src)
+            if srcQ in l:
+                l.remove(srcQ)
+            l.insert(0, srcQ)
             self.shist = l[:10]
-        if dest:
-            dest = QString(dest)
+        if destQ:
             l = list(self.dhist)
-            if dest in l:
-                l.remove(dest)
-            l.insert(0, dest)
+            if destQ in l:
+                l.remove(destQ)
+            l.insert(0, destQ)
             self.dhist = l[:10]
         s = QSettings()
         s.setValue('clone/source', self.shist)
         s.setValue('clone/dest', self.dhist)
 
-        src = hglib.fromunicode(src)
-        dest = hglib.fromunicode(dest)
-        remotecmd = hglib.fromunicode(self.remote_text.text()).strip()
-        rev = hglib.fromunicode(self.rev_text.text()).strip() or None
-        startrev = hglib.fromunicode(self.startrev_text.text()).strip()
+        remotecmd = hglib.fromunicode(self.remote_text.text().trimmed())
+        rev = hglib.fromunicode(self.rev_text.text().trimmed())
+        startrev = hglib.fromunicode(self.startrev_text.text().trimmed())
 
         # verify input
         if src == '':
