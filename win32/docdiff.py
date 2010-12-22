@@ -44,9 +44,9 @@ scripts = {
 def safe_encode(string, encoding):
     if isinstance(string, unicode):
         return string.encode(encoding)
-    
+
     return string
-        
+
 def main():
     args = sys.argv[1:]
     if len(args) not in (2, 4):
