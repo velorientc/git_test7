@@ -34,7 +34,7 @@ class SyncWidget(QWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, root, embedded=False, parent=None, **opts):
+    def __init__(self, repo, embedded=False, parent=None, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -43,8 +43,8 @@ class SyncWidget(QWidget):
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
-        self.root = root
-        self.repo = thgrepo.repository(ui.ui(), root)
+        self.root = repo.root
+        self.repo = repo
         self.finishfunc = None
         self.curuser = None
         self.curpw = None
@@ -1212,4 +1212,6 @@ class DetailsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    return SyncWidget(paths.find_root(), **opts)
+    from tortoisehg.hgqt import thgrepo
+    repo = thgrepo.repository(ui, path=paths.find_root())
+    return SyncWidget(repo, **opts)
