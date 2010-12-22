@@ -735,7 +735,7 @@ class SyncWidget(QWidget):
                 self.showMessage.emit(_('%d outgoing changesets') %
                                         len(nodes))
                 from tortoisehg.hgqt import run as _run
-                _run.email(ui.ui(), root=self.root, rev=nodes)
+                _run.email(ui.ui(), repo=self.repo, rev=nodes)
             elif ret == 1:
                 self.showMessage.emit(_('No outgoing changesets'))
             else:
