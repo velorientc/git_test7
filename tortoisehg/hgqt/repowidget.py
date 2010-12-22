@@ -270,6 +270,8 @@ class RepoWidget(QWidget):
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.incomingBundle.connect(self.setBundle)
+        ctx = self.repo.changectx(self.rev)
+        sw.refreshBookmarks(ctx.node())
         return SharedWidget(sw)
 
     @pyqtSlot(QString)
@@ -545,16 +547,16 @@ class RepoWidget(QWidget):
         'View selection changed, could be a reload'
         if self.repomodel.graph is None:
             return
-        if type(rev) == str: # unapplied patch
+        if type(rev) != str: # unapplied patch
             # FIXME remove unapplied patch branch when
             # patches fully handled downstream
-            self.revDetailsWidget.revision_selected(rev)
-            # grep and manifest are unlikely to ever be able to use a
-            # patch ctx
-        else:
-            self.revDetailsWidget.revision_selected(rev)
             self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
+
+        self.revDetailsWidget.revision_selected(rev)
+
+        ctx = self.repo.changectx(rev)
+        self.syncDemand.forward('refreshBookmarks', ctx.node())
 
         self.revisionSelected.emit(rev)
 

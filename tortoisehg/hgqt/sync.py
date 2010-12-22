@@ -81,6 +81,11 @@ class SyncWidget(QWidget):
             hbox.addWidget(self.p4pbutton)
         else:
             self.p4pbutton = None
+
+        self.bookmarkcombo = QComboBox()
+        hbox.addWidget(QLabel(_('Bookmark:')))
+        hbox.addWidget(self.bookmarkcombo)
+
         tb = QToolBar(self)
         sactions = []
         for tip, icon, cb in (
@@ -198,6 +203,26 @@ class SyncWidget(QWidget):
         else:
             self.curalias = None
 
+    def loadBookmarks(self):
+        self.bookmarkcombo.clear()
+        self.bookmarkcombo.addItem(_("<all>"), _("all"))
+        for name, node in self.repo.bookmarks.items():
+            self.bookmarkcombo.addItem(name, node)
+
+    def refreshBookmarks(self, node):
+        # Reload the bookmarks before selecting the revision
+        self.loadBookmarks()
+        index = self.bookmarkcombo.findData(node)
+        if index < 0:
+            index = 0
+        self.bookmarkcombo.setCurrentIndex(index)
+
+    def applyBookmarkOption(self, cmdline):
+        bookmark = str(self.bookmarkcombo.currentText())
+        if bookmark != '<all>':
+            cmdline += ['--rev', bookmark]
+        return cmdline
+
     def configChanged(self):
         'Repository is reporting its config files have changed'
         self.reload()
@@ -243,6 +268,7 @@ class SyncWidget(QWidget):
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
+        self.loadBookmarks()
 
     def refreshUrl(self):
         'User has changed schema/host/port/path'
@@ -463,6 +489,10 @@ class SyncWidget(QWidget):
             elif val:
                 cmdline.append('--' + name)
                 cmdline.append(val)
+
+        if 'rev' in details and '--rev' not in cmdline:
+            cmdline = self.applyBookmarkOption(cmdline)
+
         url = self.currentUrl(False)
         if not url:
             qtlib.InfoMsgBox(_('No URL selected'),
