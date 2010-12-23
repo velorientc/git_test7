@@ -303,6 +303,10 @@ def validateextensions(enabledexts):
         exts['eol'] = _('eol is incompatible with win32text')
     if 'eol' in enabledexts:
         exts['win32text'] = _('win32text is incompatible with eol')
+    if 'perfarce' in enabledexts:
+        exts['hgsubversion'] = _('hgsubversion is incompatible with perfarce')
+    if 'hgsubversion' in enabledexts:
+        exts['perfarce'] = _('perfarce is incompatible with hgsubversion')
     return exts
 
 def loadextension(ui, name):
