@@ -19,7 +19,7 @@ from mercurial import error
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import htmllistview
+from tortoisehg.hgqt import htmldelegate
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -45,7 +45,7 @@ class HgRepoView(QTableView):
         self.horizontalHeader().setHighlightSections(False)
 
         self.standardDelegate = self.itemDelegate()
-        self.htmlDelegate = htmllistview.HTMLDelegate(self)
+        self.htmlDelegate = htmldelegate.HTMLDelegate(self)
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)

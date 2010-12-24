@@ -10,7 +10,7 @@ import re
 
 from mercurial import ui, hg, error, commands, match, util
 
-from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmllistview, thgrepo, cmdui
+from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui
 from tortoisehg.util import paths, hglib, thread2
 from tortoisehg.hgqt.i18n import _
 
@@ -437,7 +437,7 @@ class MatchTree(QTableView):
     def __init__(self, repo, parent):
         QTableView.__init__(self, parent)
         self.repo = repo
-        self.delegate = htmllistview.HTMLDelegate(self)
+        self.delegate = htmldelegate.HTMLDelegate(self)
         self.setItemDelegateForColumn(COL_TEXT, self.delegate)
         self.setSelectionMode(QTableView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
