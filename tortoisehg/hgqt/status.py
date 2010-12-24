@@ -97,10 +97,13 @@ class StatusWidget(QWidget):
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
         hbox.setContentsMargins (5, 0, 0, 0)
-        lbl = QLabel(_('Filter:'))
         le = QLineEdit()
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+            le.setPlaceholderText('### filter text ###')
+        else:
+            lbl = QLabel(_('Filter:'))
+            hbox.addWidget(lbl)
         pb = QPushButton(_('MAR!?IC')) # needs a better label
-        hbox.addWidget(lbl)
         hbox.addWidget(le)
         hbox.addWidget(pb)
         tv = WctxFileTree(self.repo)
