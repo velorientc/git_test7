@@ -155,17 +155,3 @@ class HgFileListModel(QAbstractTableModel):
                 return QVariant(font)
         else:
             return nullvariant
-
-    def headerData(self, section, orientation, role):
-        if ismerge(self._ctx):
-            if self._fulllist:
-                header = ('File (all)', '')
-            else:
-                header = ('File (merged only)', '')
-        else:
-            header = ('File','')
-
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(header[section])
-
-        return nullvariant
