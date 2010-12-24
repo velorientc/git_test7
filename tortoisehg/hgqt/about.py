@@ -20,10 +20,6 @@ from tortoisehg.util import version, hglib, shlib, paths
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-# Technical debt:
-#   Make the dialog a fixed size, so it doesn't flikker
-#   when the data are updated from the threads.
-
 class AboutDialog(QDialog):
     """Dialog for showing info about TortoiseHg"""
 
@@ -67,18 +63,18 @@ class AboutDialog(QDialog):
               _('Several icons are courtesy of the TortoiseSVN project' + '\n'))
         self.vbox.addWidget(self.courtesy_lbl)
 
-        self.download_lbl = QLabel()
-        self.download_lbl.setAlignment(Qt.AlignCenter)
         self.download_url_lbl = QLabel()
         self.download_url_lbl.setAlignment(Qt.AlignCenter)
         self.download_url_lbl.setMouseTracking(True)
         self.download_url_lbl.setAlignment(Qt.AlignCenter)
         self.download_url_lbl.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
         self.download_url_lbl.setOpenExternalLinks(True)
-        self.download_lbl.setText(' ')
         self.download_url_lbl.setText(' ')
-        self.vbox.addWidget(self.download_lbl)
         self.vbox.addWidget(self.download_url_lbl)
+
+        # Let's have some space between the url and the buttons.
+        self.blancline_lbl = QLabel()
+        self.vbox.addWidget(self.blancline_lbl)
 
         self.hbox = QHBoxLayout()
         self.license_btn = QPushButton()
@@ -132,9 +128,6 @@ class AboutDialog(QDialog):
         self.uthread.wait()
         self.updateInfo = self.uthread.data
         self.uthread = None
-        self.download_lbl.setVisible(self.updateInfo['lbl-vis'])
-        if self.download_lbl.isVisible():
-            self.download_lbl.setText(self.updateInfo['lbl'])
         self.download_url_lbl.setText(self.updateInfo['val'])
 
     def showLicense(self):
@@ -194,17 +187,14 @@ class AboutUpdateThread(QThread):
         dlurl = ('<p style=\" margin-top:0px; margin-bottom:0px;\">'
                 '<a href=%s>'
                 '<span style=\" text-decoration: underline; color:#0000ff;\">'
-                '%s</span></a></p><p> </p>')
+                '%s</span></a></p>')
         if newver > curver:
-            dl_lbl = _('A new version of TortoiseHg is ready for download!')
+            url_lbl = _('A new version of TortoiseHg is ready for download!')
             url = upgradeurl
         else:
-            dl_lbl = ''
+            url_lbl = _('You can visit our site here')
             url = site_url
-        dlurltxt = (dlurl % (url, url))
-        self.data['lbl'] = dl_lbl
-        self.data['lbl-vis'] = (dl_lbl != '')
-        self.data['val'] = dlurltxt
+        self.data['val'] = (dlurl % (url, url_lbl))
         self.data['siteurl'] = url
 
 
