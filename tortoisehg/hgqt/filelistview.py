@@ -44,11 +44,6 @@ class HgFileListView(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setTextElideMode(Qt.ElideLeft)
 
-        hh = self.horizontalHeader()
-        hh.setToolTip(_('Double click to toggle merge mode'))
-        hh.sectionDoubleClicked.connect(self.toggleFullFileList)
-        hh.sectionResized.connect(self.sectionResized)
-
         self.createActions()
 
         self.doubleClicked.connect(self.fileActivated)
@@ -95,9 +90,6 @@ class HgFileListView(QTableView):
             self.navigate(sel_file)
         else:
             self.diffNavigate(sel_file)
-
-    def toggleFullFileList(self, *args):
-        self.model().toggleFullFileList()
 
     def navigate(self, filename=None):
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
@@ -229,10 +221,6 @@ class HgFileListView(QTableView):
         col_width = max(col_width, 50)
         self.setColumnWidth(0, col_width)
         QTableView.resizeEvent(self, event)
-
-    def sectionResized(self, idx, oldsize, newsize):
-        if idx == 1:
-            self.model().setDiffWidth(newsize)
 
     def nextFile(self):
         row = self.currentIndex().row()
