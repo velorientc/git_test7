@@ -74,7 +74,7 @@ class AboutDialog(QDialog):
         self.download_url_lbl.setMouseTracking(True)
         self.download_url_lbl.setAlignment(Qt.AlignCenter)
         self.download_url_lbl.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
-        self.download_url_lbl.linkActivated.connect(self.visitTheSite)
+        self.download_url_lbl.setOpenExternalLinks(True)
         self.download_lbl.setText(' ')
         self.download_url_lbl.setText(' ')
         self.vbox.addWidget(self.download_lbl)
@@ -136,9 +136,6 @@ class AboutDialog(QDialog):
         if self.download_lbl.isVisible():
             self.download_lbl.setText(self.updateInfo['lbl'])
         self.download_url_lbl.setText(self.updateInfo['val'])
-
-    def visitTheSite(self):
-        shlib.browse_url(self.updateInfo['siteurl'])
 
     def showLicense(self):
         from tortoisehg.hgqt import license
