@@ -11,11 +11,12 @@
 import os
 import sys
 import shlex
+import binascii
 
 from PyQt4.QtCore import *
 
 from mercurial import hg, patch, util, error, bundlerepo, ui, extensions
-from mercurial import filemerge
+from mercurial import filemerge, node
 from mercurial.util import propertycache
 
 from tortoisehg.util import hglib
@@ -578,7 +579,7 @@ class patchctx(object):
             pf = open(patchpath)
         try:
             data = patch.extract(self._repo.ui, pf)
-            tmpfile, msg, user, date, branch, node, p1, p2 = data
+            tmpfile, msg, user, date, branch, nodea, p1, p2 = data
             if tmpfile:
                 os.unlink(tmpfile)
         finally:
@@ -592,7 +593,10 @@ class patchctx(object):
             msg = mq.patchheader(repo.mq.join(self._patchname)).message
             if msg:
                 msg = '\n'.join(msg)
-        self._node = node
+        try:
+            self._node = binascii.unhexlify(nodea)
+        except TypeError:
+            self._node = node.nullid
         self._user = user or ''
         self._date = date and util.parsedate(date) or util.makedate()
         self._desc = msg and msg.strip() or ''
@@ -611,26 +615,17 @@ class patchctx(object):
         self._load_patch_details()
         return key in self._files
 
-    def flags(self, key):
-        # TODO: We could remember git data
-        return ''
-
     def __str__(self):
-        node = self.node()
-        if node:
-            return node[:12]
-        return ''
+        return node.short(self.node())
 
     def __int__(self):
         return self.rev()
 
+    def flags(self, key): return ''
     def node(self): return self._node
     def rev(self): return self._rev
     def hex(self):
-        node = self.node()
-        if node:
-            return hex(node)
-        return ''
+        return node.hex(self.node())
     def user(self): return self._user
     def date(self): return self._date
     def description(self): return self._desc
@@ -653,9 +648,13 @@ class patchctx(object):
 
     def changesToParent(self, whichparent):
         self._load_patch_details()
-        return self._changesToParent
+        if whichparent == 0:
+            return self._status
+        else:
+            return [], [], []
 
     def longsummary(self):
+        self._load_patch_details()
         summary = hglib.tounicode(self.description())
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
             limit = 80
@@ -699,7 +698,7 @@ class patchctx(object):
                'COPY': added}
 
         self._files = []
-        self._changesToParent = [modified, added, removed]
+        self._status = [modified, added, removed]
         self.curphunks = {}
 
         pf = open(self._path)
