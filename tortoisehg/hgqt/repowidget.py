@@ -213,19 +213,26 @@ class RepoWidget(QWidget):
 
     def createCommitWidget(self):
         cw = self.getCommitWidget()
-        if cw:
-            cw.commitComplete.connect(self.reload)
-            return SharedWidget(cw)
+        if not cw:
+            pats = {}
+            opts = {}
+            b = QPushButton(_('Commit'))
+            b.setAutoDefault(True)
+            f = b.font()
+            f.setWeight(QFont.Bold)
+            b.setFont(f)
+            cw = CommitWidget(pats, opts, self.repo.root, True, self)
+            cw.buttonHBox.addWidget(b)
+            cw.commitButtonName.connect(lambda n: b.setText(n))
+            b.clicked.connect(cw.commit)
+            cw.loadConfigs(QSettings())
+            QTimer.singleShot(0, cw.reload)
+            self.repo._commitwidget = cw
 
-        pats = {}
-        opts = {}
-        b = QPushButton(_('Commit'))
-        b.setAutoDefault(True)
-        f = b.font()
-        f.setWeight(QFont.Bold)
-        b.setFont(f)
-        cw = CommitWidget(pats, opts, self.repo.root, True, self)
+        # connect directly in order to reload all related RepoWidgets
+        cw.commitComplete.connect(self.reload)
 
+        cw = SharedWidget(cw)
         cw.output.connect(self.output)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
@@ -236,13 +243,7 @@ class RepoWidget(QWidget):
         cw.linkActivated.connect(openlink)
 
         cw.showMessage.connect(self.showMessage)
-        cw.buttonHBox.addWidget(b)
-        cw.commitButtonName.connect(lambda n: b.setText(n))
-        cw.loadConfigs(QSettings())
-        QTimer.singleShot(0, cw.reload)
-        b.clicked.connect(cw.commit)
-        self.repo._commitwidget = cw
-        return SharedWidget(cw)
+        return cw
 
     def createManifestWidget(self):
         def filterrev(rev):
@@ -263,16 +264,17 @@ class RepoWidget(QWidget):
         sw = getattr(self.repo, '_syncwidget', None)  # TODO: ugly
         if not sw:
             sw = SyncWidget(self.repo, True, self)
-            sw.output.connect(self.output)
-            sw.progress.connect(self.progress)
-            sw.makeLogVisible.connect(self.makeLogVisible)
             self.repo._syncwidget = sw
+        sw = SharedWidget(sw)
+        sw.output.connect(self.output)
+        sw.progress.connect(self.progress)
+        sw.makeLogVisible.connect(self.makeLogVisible)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.incomingBundle.connect(self.setBundle)
         ctx = self.repo.changectx(self.rev)
         sw.refreshBookmarks(ctx.node())
-        return SharedWidget(sw)
+        return sw
 
     @pyqtSlot(QString)
     def setBundle(self, bfile):
