@@ -139,7 +139,7 @@ class QReorderDialog(QDialog):
                 item = self.ulw.item(i)
                 lines.append(hglib.fromunicode(item.text()))
             if lines:
-                fp = self.repo.opener('patches/series', 'wb')
+                fp = self.repo.mq.opener('series', 'wb')
                 fp.write('\n'.join(lines))
                 fp.close()
         finally:
