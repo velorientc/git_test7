@@ -14,8 +14,6 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-import re
-
 from tortoisehg.util import hglib
 
 from tortoisehg.hgqt.qtlib import geticon
@@ -24,9 +22,6 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 nullvariant = QVariant()
-
-replus = re.compile(r'^[+][^+].*', re.M)
-reminus = re.compile(r'^[-][^-].*', re.M)
 
 def ismerge(ctx):
     return len(ctx.parents()) > 1
