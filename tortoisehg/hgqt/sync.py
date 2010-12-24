@@ -63,28 +63,6 @@ class SyncWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         hbox.setSpacing(4)
-        self.savebutton = QPushButton(_('Save'))
-        hbox.addWidget(self.savebutton)
-        hbox.addWidget(QLabel(_('URL:')))
-        self.urllabel = QLabel()
-        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.urllabel.setAcceptDrops(False)
-        hbox.addWidget(self.urllabel)
-        hbox.addStretch(1)
-        self.detailsbutton = QPushButton(_('More Options'))
-        hbox.addWidget(self.detailsbutton)
-        self.postpullbutton = QPushButton()
-        hbox.addWidget(self.postpullbutton)
-        if 'perfarce' in self.repo.extensions():
-            self.p4pbutton = QPushButton(_('p4pending'))
-            self.p4pbutton.clicked.connect(self.p4pending)
-            hbox.addWidget(self.p4pbutton)
-        else:
-            self.p4pbutton = None
-
-        self.bookmarkcombo = QComboBox()
-        hbox.addWidget(QLabel(_('Bookmark:')))
-        hbox.addWidget(self.bookmarkcombo)
 
         tb = QToolBar(self)
         sactions = []
@@ -110,9 +88,30 @@ class SyncWidget(QWidget):
         a.setIcon(qtlib.geticon('process-stop'))
         a.triggered.connect(self.stopclicked)
         tb.addAction(a)
-        tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
         hbox.addWidget(tb)
         self.layout().addLayout(hbox)
+
+        self.detailsbutton = QPushButton(_('More Options'))
+        hbox.addWidget(self.detailsbutton)
+        self.postpullbutton = QPushButton()
+        hbox.addWidget(self.postpullbutton)
+        tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
+        if 'perfarce' in self.repo.extensions():
+            self.p4pbutton = QPushButton(_('p4pending'))
+            self.p4pbutton.clicked.connect(self.p4pending)
+            hbox.addWidget(self.p4pbutton)
+        else:
+            self.p4pbutton = None
+
+        self.bookmarkcombo = QComboBox()
+        hbox.addWidget(QLabel(_('Bookmark:')))
+        hbox.addWidget(self.bookmarkcombo)
+
+        hbox.addStretch(1)
+        self.urllabel = QLabel()
+        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.urllabel.setAcceptDrops(False)
+        hbox.addWidget(self.urllabel)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -141,6 +140,8 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.pathentry, 1)
         self.authbutton = QPushButton(_('Authentication'))
         hbox.addWidget(self.authbutton)
+        self.savebutton = QPushButton(_('Save'))
+        hbox.addWidget(self.savebutton)
         self.layout().addLayout(hbox)
 
         hbox = QHBoxLayout()
