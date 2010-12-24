@@ -189,11 +189,18 @@
                   Source='dist\docdiff.exe'
             />
           </Component>
-          <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
-            <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
-                  Source='..\contrib\kdiff3.exe'
-            />
-          </Component>
+
+          <?if $(var.Platform) = "x64" ?>
+            <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
+              <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
+                    Source='..\contrib\kdiff3x64.exe'/>
+            </Component>
+          <?else?>
+            <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
+              <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
+                    Source='..\contrib\kdiff3.exe'/>
+            </Component>
+          <?endif?>
 
           <Directory Id='docFolder' Name='doc'>
             <Component Id='chmFile' Guid='$(var.chmFile.guid)' Win64='$(var.IsX64)'>
