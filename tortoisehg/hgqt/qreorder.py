@@ -95,6 +95,8 @@ class QReorderDialog(QDialog):
         self.summ.setFocusPolicy(Qt.NoFocus)
         layout.addWidget(self.summ)
 
+        self._readsettings()
+
         self.refresh()
 
         # dialog buttons
@@ -174,6 +176,7 @@ class QReorderDialog(QDialog):
             pass
 
     def accept(self):
+        self._writesettings()
         try:
             self.repo.incrementBusyCount()
             lines = []
@@ -193,6 +196,18 @@ class QReorderDialog(QDialog):
 
     def reject(self):
         QDialog.reject(self)
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(QReorderDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('qreorder/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('qreorder/geom', self.saveGeometry())
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(None, paths.find_root())
