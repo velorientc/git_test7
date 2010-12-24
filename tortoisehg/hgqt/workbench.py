@@ -286,11 +286,11 @@ class Workbench(QMainWindow):
         newseparator(toolbar='edit', menu='View')
         newaction(_('Filter Toolbar'), self._repofwd('toggleFilterBar'),
                   icon='find', shortcut='Ctrl+S', enabled='repoopen',
-                  toolbar='edit', menu='View', checkable=True,
+                  toolbar='edit', menu='View',
                   tooltip=_('Filter graph with revision sets or branches'))
         newaction(_('Goto Toolbar'), self._repofwd('toggleGotoBar'),
                   icon='go-jump', shortcut='Ctrl+T', enabled='repoopen',
-                  toolbar='edit', menu='View', checkable=True,
+                  toolbar='edit', menu='View',
                   tooltip=_('Jump to a specific revision'))
         newaction(_('Find in File'), self._repofwd('toggleSearchBar'),
                   icon='edit-find', shortcut='Find', enabled='repoopen',
