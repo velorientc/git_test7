@@ -120,6 +120,11 @@ class CommitWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.setMargin(0)
         hbox.setContentsMargins(*(0,)*4)
+
+        msgcombo = MessageHistoryCombo()
+        msgcombo.activated.connect(self.msgSelected)
+        hbox.addWidget(msgcombo, 1)
+
         branchbutton = QPushButton(_('Branch: '))
         branchbutton.pressed.connect(self.branchOp)
         self.branchbutton = branchbutton
@@ -130,10 +135,6 @@ class CommitWidget(QWidget):
         self.detailsbutton.pressed.connect(self.details)
         hbox.addWidget(self.detailsbutton)
 
-        msgcombo = MessageHistoryCombo()
-        msgcombo.activated.connect(self.msgSelected)
-        hbox.addWidget(msgcombo, 1)
-        hbox.addSpacing(2)
         vbox.addLayout(hbox, 0)
         self.buttonHBox = hbox
 
