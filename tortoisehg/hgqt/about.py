@@ -195,7 +195,7 @@ class AboutUpdateThread(QThread):
         except Exception, e:
             curver = (0,0,0)
         dlurl = ('<p style=\" margin-top:0px; margin-bottom:0px;\">'
-                '<a href=\"site-url--or--download-url\">'
+                '<a href=%s>'
                 '<span style=\" text-decoration: underline; color:#0000ff;\">'
                 '%s</span></a></p><p> </p>')
         if newver > curver:
@@ -204,7 +204,7 @@ class AboutUpdateThread(QThread):
         else:
             dl_lbl = ''
             url = site_url
-        dlurltxt = (dlurl % url)
+        dlurltxt = (dlurl % (url, url))
         self.data['lbl'] = dl_lbl
         self.data['lbl-vis'] = (dl_lbl != '')
         self.data['val'] = dlurltxt
