@@ -103,7 +103,7 @@ class StatusWidget(QWidget):
         else:
             lbl = QLabel(_('Filter:'))
             hbox.addWidget(lbl)
-        pb = QPushButton(_('MAR!?IC')) # needs a better label
+        pb = QPushButton(_('Status'))
         hbox.addWidget(le)
         hbox.addWidget(pb)
         tv = WctxFileTree(self.repo)
