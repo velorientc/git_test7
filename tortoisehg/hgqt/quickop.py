@@ -154,6 +154,7 @@ class HeadlessQuickop(QWidget):
     def __init__(self, repo, cmdline):
         QWidget.__init__(self)
         self.files = cmdline[1:]
+        os.chdir(repo.root)
         self.cmd = cmdui.Runner(parent=self)
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.run(cmdline)
