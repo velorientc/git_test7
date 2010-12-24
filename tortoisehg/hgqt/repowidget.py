@@ -689,19 +689,19 @@ class RepoWidget(QWidget):
         return True
 
     def incoming(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncwidget)
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.get().incoming()
 
     def pull(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncwidget)
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.get().pull()
 
     def outgoing(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncwidget)
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.get().outgoing()
 
     def push(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncwidget)
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.get().push()
 
     def qpush(self):
