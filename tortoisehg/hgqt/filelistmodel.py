@@ -97,8 +97,7 @@ class HgFileListModel(QAbstractTableModel):
     def _buildDesc(self, parent):
         files = []
         ctxfiles = self._ctx.files()
-        changes = self._ctx.changesToParent(parent)
-        modified, added, removed = changes
+        modified, added, removed = self._ctx.changesToParent(parent)
         if self._fulllist:
             func = lambda x: True
         else:
