@@ -132,19 +132,11 @@ class StatusWidget(QWidget):
         tv.setRootIsDecorated(False)
         tv.sortByColumn(COL_PATH_DISPLAY)
 
-        def setButtonText():
-            text = ''
-            for stat in StatusType.preferredOrder:
-                name = statusTypes[stat].name
-                if self.opts[name]:
-                    text += stat
-            pb.setText(text)
         def statusTypeTrigger(isChecked):
             txt = hglib.fromunicode(self.sender().text())
             self.opts[txt[2:]] = isChecked
             self.refreshWctx()
-            setButtonText()
-        menu = QMenu()
+        menu = QMenu(self)
         for stat in StatusType.preferredOrder:
             val = statusTypes[stat]
             a = menu.addAction('%s %s' % (stat, val.name))
@@ -152,8 +144,6 @@ class StatusWidget(QWidget):
             a.setChecked(self.opts[val.name])
             a.triggered.connect(statusTypeTrigger)
         pb.setMenu(menu)
-        setButtonText()
-        pb.storeref = menu
         self.tv = tv
         self.le = le
 
