@@ -478,7 +478,6 @@ class SharedWidget(QWidget):
     NOTE: This doesn't reconnect signals when the parent changed.
     So it's up to you if you want to emit signals only to the active parent.
     """
-    parentChanged = pyqtSignal()
 
     def __init__(self, widget, parent=None):
         super(SharedWidget, self).__init__(parent)
@@ -491,7 +490,6 @@ class SharedWidget(QWidget):
         """Change the parent of the stored widget if necessary"""
         if self._widget.parent() != self:
             self.layout().addWidget(self._widget)
-            self.parentChanged.emit()
         super(SharedWidget, self).showEvent(event)
 
     def get(self):
