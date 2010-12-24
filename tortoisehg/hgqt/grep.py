@@ -36,19 +36,19 @@ class SearchWidget(QWidget):
 
         hbox = QHBoxLayout()
         hbox.setMargin(2)
-        lbl = QLabel(_('Regexp:'))
         le = QLineEdit()
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
             le.setPlaceholderText('### regular expression search pattern ###')
-        lbl.setBuddy(le)
-        lbl.setToolTip(_('Regular expression search pattern'))
+        else:
+            lbl = QLabel(_('Regexp:'))
+            lbl.setBuddy(le)
+            hbox.addWidget(lbl)
         chk = QCheckBox(_('Ignore case'))
         bt = QPushButton(_('Search'))
         bt.setDefault(True)
         cbt = QPushButton(_('Stop'))
         cbt.setEnabled(False)
         cbt.clicked.connect(self.stopClicked)
-        hbox.addWidget(lbl)
         hbox.addWidget(le, 1)
         hbox.addWidget(chk)
         hbox.addWidget(bt)
