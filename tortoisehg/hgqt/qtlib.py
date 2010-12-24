@@ -475,13 +475,14 @@ class SharedWidget(QWidget):
     the widget (showEvent occured), it reparents the stored widget to the
     latest active widget.
 
-    NOTE: This doesn't reconnect signals when the parent changed.
-    So it's up to you if you want to emit signals only to the active parent.
+    Any signals connected via SharedWidget are disconnected/connected
+    automatically when owner changes.
     """
 
     def __init__(self, widget, parent=None):
         super(SharedWidget, self).__init__(parent)
         self._widget = widget
+        self._fakesignals = {}
         vbox = QVBoxLayout()
         vbox.setContentsMargins(*(0,)*4)
         self.setLayout(vbox)
@@ -489,6 +490,7 @@ class SharedWidget(QWidget):
     def showEvent(self, event):
         """Change the parent of the stored widget if necessary"""
         if self._widget.parent() != self:
+            self._reconnectfakesignals(self._widget.parent())
             self.layout().addWidget(self._widget)
         super(SharedWidget, self).showEvent(event)
 
@@ -497,8 +499,51 @@ class SharedWidget(QWidget):
         return self._widget
 
     def __getattr__(self, name):
+        try:
+            if isinstance(getattr(self._widget.__class__, name), pyqtSignal):
+                return self._fakesignal(name)
+        except AttributeError:
+            pass
         return getattr(self._widget, name)
 
+    class _FakeSignal(object):
+        """Imitate pyqtSignal object to hook signal connection"""
+        def __init__(self):
+            self._connections = []
+
+        def connect(self, slot):
+            self._connections.append(slot)
+            return True
+
+        def disconnect(self, slot):
+            try:
+                self._connections.remove(slot)
+                return True
+            except ValueError:
+                return False
+
+    def _fakesignal(self, name):
+        if name not in self._fakesignals:
+            self._fakesignals[name] = self._FakeSignal()
+        return self._fakesignals[name]
+
+    def _iterfakeconnections(self):
+        for name, fakesig in self._fakesignals.iteritems():
+            for slot in fakesig._connections:
+                yield name, slot
+
+    def _connectfakesignals(self):
+        for name, slot in self._iterfakeconnections():
+            getattr(self._widget, name).connect(slot)
+
+    def _disconnectfakesignals(self):
+        for name, slot in self._iterfakeconnections():
+            getattr(self._widget, name).disconnect(slot)
+
+    def _reconnectfakesignals(self, curowner):
+        if isinstance(curowner, self.__class__):
+            curowner._disconnectfakesignals()
+        self._connectfakesignals()
 
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'
