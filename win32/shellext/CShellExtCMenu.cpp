@@ -861,7 +861,7 @@ void CShellExtCMenu::DoHgtk(const std::string &cmd)
         if (Thgstatus::remove(cwd) != 0)
         {
             std::string p = dir + "\\TortoiseHgOverlayServer.exe";
-            LaunchCommand(Quote(p), cwd);
+            LaunchCommand(Quote(p), dir);
         }
         InitStatus::check();
         return;
