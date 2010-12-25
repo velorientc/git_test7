@@ -11,9 +11,14 @@ import sys
 
 if hasattr(sys, "frozen"):
     from tortoisehg.util import paths
-    import win32api
     gtkpath = os.path.join(paths.bin_path, 'gtk')
-    win32api.SetDllDirectory(gtkpath)
+    try:
+        # may fail on Windows XP without SP1
+        import win32api
+        win32api.SetDllDirectory(gtkpath)
+    except:
+        # fallback to prepending gtk/ folder at start of %PATH%
+        os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
 else:
     # if hgtk is a symlink, insert symlink target directory in sys.path
     thgpath = os.path.dirname(os.path.realpath(__file__))
