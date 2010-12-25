@@ -264,13 +264,14 @@ class _StatusFilterButton(QToolButton):
     _TYPES = 'MARC'
 
     def __init__(self, statustext=_TYPES, parent=None, **kwargs):
+        if 'text' not in kwargs:
+            kwargs['text'] = _('Status')
         super(_StatusFilterButton, self).__init__(
             parent, popupMode=QToolButton.InstantPopup,
             icon=qtlib.geticon('status'),
             toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
 
         self._initactions(statustext)
-        self._setText(self.status())
 
     def _initactions(self, text):
         self._actions = {}
@@ -286,7 +287,6 @@ class _StatusFilterButton(QToolButton):
 
     @pyqtSlot()
     def _update(self):
-        self._setText(self.status())
         self.statusChanged.emit(self.status())
 
     def status(self):
@@ -300,9 +300,6 @@ class _StatusFilterButton(QToolButton):
         assert util.all(c in self._TYPES for c in text)
         for c in self._TYPES:
             self._actions[c].setChecked(c in text)
-
-    def _setText(self, text):
-        super(_StatusFilterButton, self).setText(text)
 
 class ManifestTaskWidget(ManifestWidget):
     """Manifest widget designed for task tab"""
