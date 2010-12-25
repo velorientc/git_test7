@@ -161,7 +161,7 @@ class ManifestWidget(QWidget):
             getattr(self._fileview, name).connect(getattr(self, name))
 
     def _initactions(self):
-        self._statusfilter = _StatusFilterButton(text='MAC')
+        self._statusfilter = _StatusFilterButton(statustext='MAC')
         self._toolbar.addWidget(self._statusfilter)
 
         self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
@@ -185,7 +185,7 @@ class ManifestWidget(QWidget):
 
     def _setupmodel(self):
         self._treemodel = ManifestModel(self._repo, self._rev,
-                                        statusfilter=self._statusfilter.text,
+                                        statusfilter=self._statusfilter.status(),
                                         parent=self)
         self._treeview.setModel(self._treemodel)
 
@@ -193,14 +193,14 @@ class ManifestWidget(QWidget):
         selmodel.currentChanged.connect(self._updatecontent)
         selmodel.currentChanged.connect(self._emitPathChanged)
 
-        self._statusfilter.textChanged.connect(self._treemodel.setStatusFilter)
-        self._statusfilter.textChanged.connect(self._autoexpandtree)
+        self._statusfilter.statusChanged.connect(self._treemodel.setStatusFilter)
+        self._statusfilter.statusChanged.connect(self._autoexpandtree)
         self._autoexpandtree()
 
     @pyqtSlot()
     def _autoexpandtree(self):
         """expand file tree if the number of the items isn't large"""
-        if 'C' not in self._statusfilter.text:
+        if 'C' not in self._statusfilter.status():
             self._treeview.expandAll()
 
     def reload(self):
@@ -259,18 +259,18 @@ class ManifestWidget(QWidget):
 # TODO: share this menu with status widget?
 class _StatusFilterButton(QToolButton):
     """Button with drop-down menu for status filter"""
-    textChanged = pyqtSignal(str)
+    statusChanged = pyqtSignal(str)
 
     _TYPES = 'MARC'
 
-    def __init__(self, text=_TYPES, parent=None):
+    def __init__(self, statustext=_TYPES, parent=None, **kwargs):
         super(_StatusFilterButton, self).__init__(
             parent, popupMode=QToolButton.InstantPopup,
             icon=qtlib.geticon('status'),
-            toolButtonStyle=Qt.ToolButtonTextBesideIcon)
+            toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
 
-        self._initactions(text=text)
-        self._setText(self.text)
+        self._initactions(statustext)
+        self._setText(self.status())
 
     def _initactions(self, text):
         self._actions = {}
@@ -286,17 +286,16 @@ class _StatusFilterButton(QToolButton):
 
     @pyqtSlot()
     def _update(self):
-        self._setText(self.text)
-        self.textChanged.emit(self.text)
+        self._setText(self.status())
+        self.statusChanged.emit(self.status())
 
-    @property
-    def text(self):
+    def status(self):
         """Return the text for status filter"""
         return ''.join(c for c in self._TYPES
                        if self._actions[c].isChecked())
 
     @pyqtSlot(str)
-    def setText(self, text):
+    def setStatus(self, text):
         """Set the status text"""
         assert util.all(c in self._TYPES for c in text)
         for c in self._TYPES:
