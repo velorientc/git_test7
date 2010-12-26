@@ -480,7 +480,7 @@ class HgRepoListModel(QAbstractTableModel):
     def getlog(self, ctx, gnode):
         if ctx.rev() is None:
             # The Unicode symbol is a black star:
-            return u'\u2605 ' + _('Working copy changes') + u' \u2605'
+            return u'\u2605 ' + _('Working Directory') + u' \u2605'
 
         msg = ctx.longsummary()
 
