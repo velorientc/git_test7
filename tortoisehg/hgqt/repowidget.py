@@ -762,9 +762,22 @@ class RepoWidget(QWidget):
             dlg.makeLogVisible.connect(self.makeLogVisible)
             dlg.exec_()
         def qreorderact():
-            dlg = qreorder.QReorderDialog(self.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
+            def checkGuardsOrComments():
+                cont = True
+                for p in self.repo.mq.full_series:
+                    if '#' in p:
+                        cont = QuestionMsgBox('Confirm qreorder',
+                                _('<p>ATTENTION!<br>'
+                                  'Guard or comment found.<br>'
+                                  'Reordering patches will destroy them.<br>'
+                                  '<br>Continue?</p>'), parent=self,
+                                  defaultbutton=QMessageBox.No)
+                        break
+                return cont
+            if checkGuardsOrComments():
+                dlg = qreorder.QReorderDialog(self.repo, self)
+                dlg.finished.connect(dlg.deleteLater)
+                dlg.exec_()
         def qfoldact():
             dlg = qfold.QFoldDialog(self.repo, self.menuselection, self)
             dlg.finished.connect(dlg.deleteLater)
