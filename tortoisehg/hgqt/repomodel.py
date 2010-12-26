@@ -128,6 +128,9 @@ class HgRepoListModel(QAbstractTableModel):
         s = QSettings()
         cols = s.value('workbench/columns').toStringList()
         cols = [str(col) for col in cols]
+        if 'Log' in cols:
+            cols[cols.index('Log')] = 'Description'
+            s.setValue('workbench/columns', cols)
         validcols = [col for col in cols if col in ALLCOLUMNS]
         if validcols:
             self._columns = tuple(validcols)
