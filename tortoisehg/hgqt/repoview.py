@@ -94,13 +94,13 @@ class HgRepoView(QTableView):
         model = self.model()
 
         for c in range(model.columnCount(QModelIndex())):
-            if model._columns[c] in ['Log', 'Changes']:
+            if model._columns[c] in ['Description', 'Changes']:
                 self.setItemDelegateForColumn(c, self.htmlDelegate)
             else:
                 self.setItemDelegateForColumn(c, self.standardDelegate)
 
     def resizeColumns(self, *args):
-        # resize columns the smart way: the column holding Log
+        # resize columns the smart way: the column holding Description
         # is resized according to the total widget size.
         if not self.model():
             return

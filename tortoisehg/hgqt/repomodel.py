@@ -35,7 +35,7 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
-ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Tags', 'Node',
+ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Description', 'Author', 'Tags', 'Node',
               'Age', 'LocalTime', 'UTCTime', 'Changes')
 
 UNAPPLIED_PATCH_COLOR = '#999999'
@@ -59,8 +59,8 @@ class HgRepoListModel(QAbstractTableModel):
     filled = pyqtSignal()
     loaded = pyqtSignal()
 
-    _columns = ('Graph', 'ID', 'Branch', 'Log', 'Author', 'Age', 'Tags',)
-    _stretchs = {'Log': 1, }
+    _columns = ('Graph', 'ID', 'Branch', 'Description', 'Author', 'Age', 'Tags',)
+    _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
     def __init__(self, repo, branch, revset, rfilter, parent):
@@ -90,7 +90,7 @@ class HgRepoListModel(QAbstractTableModel):
                                            str(ctx.rev()) or "",
             'Node':     lambda ctx, gnode: str(ctx),
             'Graph':    lambda ctx, gnode: "",
-            'Log':      self.getlog,
+            'Description': self.getlog,
             'Author':   self.getauthor,
             'Tags':     self.gettags,
             'Branch':   self.getbranch,
@@ -243,7 +243,7 @@ class HgRepoListModel(QAbstractTableModel):
             return min(res, 150)
         if column == 'Changes':
             return 'Changes'
-        # Fall through for Log
+        # Fall through for Description
         return None
 
     def user_color(self, user):
