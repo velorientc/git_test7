@@ -239,9 +239,7 @@ class CommitWidget(QWidget):
             self.commitButtonName.emit(_('QNew'))
         else:
             if self.repo.changectx('.').thgmqappliedpatch():
-                self.commitButtonName.emit(_('QRefresh'))
-                if not self.qref:
-                    self.initQRefreshMode()
+                self.initQRefreshMode()
             else:
                 self.commitButtonName.emit(_('Commit'))
                 if self.qref:
@@ -271,6 +269,7 @@ class CommitWidget(QWidget):
             self.showMessage.emit(_('Cannot refresh non-tip patch'))
             self.commitButtonName.emit(_('N/A'))
             return
+        self.commitButtonName.emit(_('QRefresh'))
         self.opts['user'] = qtip.user()
         self.opts['date'] = hglib.displaytime(qtip.date())
         self.setMessage(hglib.tounicode(qtip.description()))
