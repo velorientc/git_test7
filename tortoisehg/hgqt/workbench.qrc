@@ -58,5 +58,6 @@
     <file>icons/go-jump.svg</file>
     <file>icons/help-browser.svg</file>
     <file>icons/view-refresh.svg</file>
+    <file>icons/Checkmark.svg</file>
   </qresource>
 </RCC>

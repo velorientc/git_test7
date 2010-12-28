@@ -161,7 +161,7 @@ class RepoWidget(QWidget):
         tt.setTabToolTip(idx, _("Revision details"))
 
         self.commitDemand = w = DemandWidget(self.createCommitWidget)
-        self.commitTabIndex = idx = tt.addTab(w, geticon('commit'), '')
+        self.commitTabIndex = idx = tt.addTab(w, geticon('Checkmark'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
         self.manifestDemand = w = DemandWidget(self.createManifestWidget)

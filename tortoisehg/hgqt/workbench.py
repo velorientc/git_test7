@@ -228,7 +228,7 @@ class Workbench(QMainWindow):
             return a
         # NOTE: Sequence must match that in repowidget.py
         addtaskview('log', _("Revision &Details"))
-        addtaskview('commit', _("&Commit..."))
+        addtaskview('Checkmark', _("&Commit..."))
         addtaskview('annotate', _("&Manifest..."))
         addtaskview('repobrowse', _("&Search..."))
         addtaskview('view-refresh', _("S&ynchronize..."))
