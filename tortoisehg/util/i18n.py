@@ -29,6 +29,14 @@ def setlanguage(lang=None):
                             fallback=True, **opts)
 setlanguage()
 
+def availablelanguages():
+    """List up language code of which message catalog is available"""
+    basedir = paths.get_locale_path()
+    def mopath(lang):
+        return os.path.join(basedir, lang, 'LC_MESSAGES', 'tortoisehg.mo')
+    return tuple(sorted(e for e in os.listdir(basedir)
+                        if os.path.exists(mopath(e))))
+
 def _(message):
     return t.gettext(message)
 
