@@ -688,7 +688,6 @@ class SettingsForm(QWidget):
         self.pages = {}
         self.stack = stack
         self.pageList = pageList
-        self.extspagewidgets = []
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
@@ -839,7 +838,6 @@ class SettingsForm(QWidget):
         if name == 'extensions':
             extsinfo, widgets = self.fillExtensionsFrame()
             self.pages[name] = name, extsinfo, widgets
-            self.extspagewidgets = self.pages[name][2]
         else:
             widgets = self.fillFrame(info)
             self.pages[name] = name, info, widgets
@@ -909,7 +907,7 @@ class SettingsForm(QWidget):
         emitChanged = False
         section = 'extensions'
         enabledexts = hglib.enabledextensions()
-        for chk in self.extspagewidgets:
+        for chk in self.pages['extensions'][2]:
             if (not emitChanged) and chk.isDirty():
                 self.extensionsChanged.emit()
                 emitChanged = True
@@ -930,7 +928,7 @@ class SettingsForm(QWidget):
         section = 'extensions'
         enabledexts = hglib.enabledextensions()
         selectedexts = ()
-        for chk in self.extspagewidgets:
+        for chk in self.pages['extensions'][2]:
             if chk.isChecked():
                 selectedexts += (chk.opts['label'],)
         invalidexts = hglib.validateextensions(selectedexts)
@@ -959,7 +957,7 @@ class SettingsForm(QWidget):
                 return True
 
         allexts = hglib.allextensions()
-        for chk in self.extspagewidgets:
+        for chk in self.pages['extensions'][2]:
             name = chk.opts['label']
             chk.setEnabled(changable(name))
             invalmsg = invalidexts.get(name)
