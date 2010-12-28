@@ -201,9 +201,9 @@ class _wconfig(object):
 
     def _replaylogs(self, ini):
         def getsection(ini, section):
-            try:
+            if section in ini:
                 return ini[section]
-            except KeyError:
+            else:
                 newns = getattr(ini, '_new_namespace',
                                 getattr(ini, 'new_namespace'))
                 return newns(section)
