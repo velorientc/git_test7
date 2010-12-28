@@ -730,15 +730,22 @@ class SettingsForm(QWidget):
         self.fnedit.setText(hglib.tounicode(self.fn))
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
+                extsmentioned = False
                 for row, w in enumerate(widgets):
                     val = self.readCPath('extensions.' + w.opts['label'])
                     if val == None:
                         curvalue = False
                     elif len(val) and val[0] == '!':
                         curvalue = False
+                        extsmentioned = True
                     else:
                         curvalue = True
+                        extsmentioned = True
                     w.setValue(curvalue)
+                if not extsmentioned:
+                    # make sure widgets are shown properly,
+                    # even when no extensions mentioned in the config file
+                    self.validateextensions()
             else:
                 for row, (label, cpath, values, tooltip) in enumerate(info):
                     curvalue = self.readCPath(cpath)
