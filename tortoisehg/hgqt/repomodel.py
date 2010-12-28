@@ -35,7 +35,7 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
-ALLCOLUMNS = ('Graph', 'ID', 'Branch', 'Description', 'Author', 'Tags', 'Node',
+ALLCOLUMNS = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Tags', 'Node',
               'Age', 'LocalTime', 'UTCTime', 'Changes')
 
 UNAPPLIED_PATCH_COLOR = '#999999'
@@ -59,7 +59,7 @@ class HgRepoListModel(QAbstractTableModel):
     filled = pyqtSignal()
     loaded = pyqtSignal()
 
-    _columns = ('Graph', 'ID', 'Branch', 'Description', 'Author', 'Age', 'Tags',)
+    _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Tags',)
     _stretchs = {'Description': 1, }
     _mqtags = ('qbase', 'qtip', 'qparent')
 
@@ -86,7 +86,7 @@ class HgRepoListModel(QAbstractTableModel):
         self._branch_colors = {}
 
         self._columnmap = {
-            'ID':       lambda ctx, gnode: ctx.rev() is not None and \
+            'Rev':      lambda ctx, gnode: ctx.rev() is not None and \
                                            str(ctx.rev()) or "",
             'Node':     lambda ctx, gnode: str(ctx),
             'Graph':    lambda ctx, gnode: "",
@@ -128,8 +128,12 @@ class HgRepoListModel(QAbstractTableModel):
         s = QSettings()
         cols = s.value('workbench/columns').toStringList()
         cols = [str(col) for col in cols]
+        # Fixup older names for columns
         if 'Log' in cols:
             cols[cols.index('Log')] = 'Description'
+            s.setValue('workbench/columns', cols)
+        if 'ID' in cols:
+            cols[cols.index('ID')] = 'Rev'
             s.setValue('workbench/columns', cols)
         validcols = [col for col in cols if col in ALLCOLUMNS]
         if validcols:
@@ -221,7 +225,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     def maxWidthValueForColumn(self, col):
         column = self._columns[col]
-        if column == 'ID':
+        if column == 'Rev':
             return str(len(self.repo))
         if column == 'Node':
             return str(self.repo['.'])
