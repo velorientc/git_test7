@@ -70,13 +70,21 @@ class SearchWidget(QWidget):
         grid.addWidget(singlematch, 0, 3)
         grid.addWidget(follow, 0, 4)
         ilabel = QLabel(_('Includes:'))
-        ilabel.setToolTip(_('Comma separated list of inclusion patterns.'
-                ' By default, the entire repository is searched.'))
         ilabel.setBuddy(incle)
         elabel = QLabel(_('Excludes:'))
-        elabel.setToolTip(_('Comma separated list of exclusion patterns.'
-                ' Exclusion patterns are applied after inclusion patterns.'))
         elabel.setBuddy(excle)
+        ehelpstr = _('Comma separated list of exclusion patterns. '
+                     'Exclusion patterns are applied after inclusion patterns.')
+        ihelpstr = _('Comma separated list of inclusion patterns. '
+                     'By default, the entire repository is searched.')
+        if hasattr(incle, 'setPlaceholderText'): # Qt >= 4.7 
+            incle.setPlaceholderText(u' '.join([u'###', ihelpstr, u'###']))
+        else:
+            incle.setToolTip(ihelpstr)
+        if hasattr(excle, 'setPlaceholderText'): # Qt >= 4.7 
+            excle.setPlaceholderText(u' '.join([u'###', ehelpstr, u'###']))
+        else:
+            excle.setToolTip(ehelpstr)
         grid.addWidget(ilabel, 1, 2)
         grid.addWidget(incle, 1, 3, 1, 2)
         grid.addWidget(elabel, 2, 2)
