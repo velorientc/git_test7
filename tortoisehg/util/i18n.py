@@ -6,11 +6,20 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import gettext, sys
-from gettext import gettext as _
 from tortoisehg.util import paths
 
-gettext.bindtextdomain("tortoisehg", paths.get_locale_path())
-gettext.textdomain("tortoisehg")
+def setlanguage(lang=None):
+    """Change translation catalog to the specified language"""
+    global t
+    opts = {}
+    if lang:
+        opts['languages'] = (lang,)
+    t = gettext.translation('tortoisehg', paths.get_locale_path(),
+                            fallback=True, **opts)
+setlanguage()
+
+def _(message):
+    return t.gettext(message)
 
 def agettext(message):
     """Translate message and convert to local encoding
