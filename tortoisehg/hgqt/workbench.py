@@ -231,7 +231,7 @@ class Workbench(QMainWindow):
         addtaskview('commit', _("&Commit..."))
         addtaskview('annotate', _("&Manifest..."))
         addtaskview('repobrowse', _("&Search..."))
-        addtaskview('sync', _("S&ynchronize..."))
+        addtaskview('view-refresh', _("S&ynchronize..."))
         self.actionSelectTaskPbranch = \
         addtaskview('branch', _("&Patch Branch..."))
         newseparator(menu='view')

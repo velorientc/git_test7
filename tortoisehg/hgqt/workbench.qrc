@@ -57,5 +57,6 @@
     <file>icons/edit-find.svg</file>
     <file>icons/go-jump.svg</file>
     <file>icons/help-browser.svg</file>
+    <file>icons/view-refresh.svg</file>
   </qresource>
 </RCC>
