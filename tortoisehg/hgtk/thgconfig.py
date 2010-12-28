@@ -14,7 +14,7 @@ import urlparse
 from mercurial import hg, ui, util, url, filemerge, error, extensions
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, settings, paths
+from tortoisehg.util import hglib, settings, paths, i18n
 
 from tortoisehg.hgtk import dialog, gdialog, gtklib, hgcmd
 
@@ -35,8 +35,13 @@ _unspeclocalstr = hglib.fromutf(_unspecstr)
 
 _pwfields = ('http_proxy.passwd', 'smtp.password')
 
+# options available only on global settings
+_norepofields = ('tortoisehg.ui.language',)
+
 INFO = (
 ({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo.ico'}, (
+    (_('UI Language'), 'tortoisehg.ui.language', i18n.availablelanguages(),
+        _('Specify your preferred user interface language (restart needed)')),
     (_('Three-way Merge Tool'), 'ui.merge', [],
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
@@ -1444,6 +1449,10 @@ class ConfigDialog(gtk.Dialog):
                 elif cpath == 'ui.merge':
                     # Special case, add [merge-tools] to possible values
                     hglib.mergetools(self.ui, values)
+
+                if cpath in _norepofields:
+                    combo.set_sensitive(
+                        self.confcombo.get_active() != CONF_REPO)
 
                 currow = None
                 if not ispw:
