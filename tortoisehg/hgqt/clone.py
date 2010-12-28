@@ -48,6 +48,7 @@ class CloneDialog(QDialog):
         self.src_combo = QComboBox()
         self.src_combo.setEditable(True)
         self.src_combo.setMinimumWidth(310)
+        self.src_combo.activated.connect(self.clone)
         self.src_btn = QPushButton(_('Browse...'))
         self.src_btn.setAutoDefault(False)
         self.src_btn.clicked.connect(self.browse_src)
@@ -59,6 +60,7 @@ class CloneDialog(QDialog):
         self.dest_combo = QComboBox()
         self.dest_combo.setEditable(True)
         self.dest_combo.setMinimumWidth(310)
+        self.dest_combo.activated.connect(self.clone)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
         self.dest_btn.clicked.connect(self.browse_dest)
@@ -193,6 +195,8 @@ class CloneDialog(QDialog):
         return 'startrev' in longopts
 
     def clone(self):
+        if self.cmd.core.is_running():
+            return
         # prepare user input
         srcQ = self.src_combo.currentText().trimmed()
         src = hglib.fromunicode(srcQ)
