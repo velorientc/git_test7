@@ -182,7 +182,7 @@ class SettingsCheckBox(QCheckBox):
         self.curvalue = None
         self.setText(opts['label'])
         self.valfunc = self.opts['valfunc']
-        self.toggled.connect(lambda: self.valfunc(self, self.curvalue))
+        self.toggled.connect(lambda: self.valfunc())
 
     def setValue(self, curvalue):
         if self.curvalue == None:
@@ -921,7 +921,7 @@ class SettingsForm(QWidget):
                     except KeyError:
                         pass
 
-    def validateextensions(self, widget, curvalue):
+    def validateextensions(self):
         section = 'extensions'
         enabledexts = hglib.enabledextensions()
         selectedexts = (chk.opts['label']
