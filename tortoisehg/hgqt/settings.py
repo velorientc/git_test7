@@ -184,9 +184,6 @@ class SettingsCheckBox(QCheckBox):
         self.valfunc = self.opts['valfunc']
         self.toggled.connect(lambda: self.valfunc(self, self.curvalue))
 
-    def setFocus(self):
-        pass
-
     def setValue(self, curvalue):
         if self.curvalue == None:
             self.curvalue = curvalue
