@@ -212,7 +212,9 @@ def _extendrepo(repo):
             '''Extends Mercurial's standard changectx() method to
             a) return a thgchangectx with additional methods
             b) return a PatchContext if changeid is the name of an MQ
-            unapplied patch'''
+            unapplied patch
+            c) return a PatchContext if changeid is an absolute patch path
+            '''
 
             # Mercurial's standard changectx() (rather, lookup())
             # implies that tags and branch names live in the same namespace.
@@ -222,6 +224,9 @@ def _extendrepo(repo):
             if changeid in self.thgmqunappliedpatches:
                 q = self.mq # must have mq to pass the previous if
                 return PatchContext(self, q.join(changeid), rev=changeid)
+            elif type(changeid) is str and os.path.isabs(changeid) and \
+                    os.path.isfile(changeid):
+                return PatchContext(repo, changeid)
 
             changectx = super(thgrepository, self).changectx(changeid)
             changectx.__class__ = _extendchangectx(changectx)
@@ -458,25 +463,6 @@ def _extendrepo(repo):
                 self.thginvalidate()
 
     return thgrepository
-
-
-def getcontext(repo, target):
-    """Return a context, either from the repo or for a patch.
-
-    patch target must be specified in full-path.
-    """
-    if target is None:
-        if repo is None:
-            return None
-        else:
-            return repo.changectx(target)
-    if type(target) is int:
-        return repo.changectx(target)
-    ctx = PatchContext(repo, target)
-    # XXX: ambiguos if target is like a path but a tag name
-    if ctx is None:
-        ctx = repo.changectx(target)
-    return ctx
 
 
 def _extendchangectx(changectx):

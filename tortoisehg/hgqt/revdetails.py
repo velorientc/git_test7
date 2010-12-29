@@ -291,7 +291,7 @@ class RevDetailsWidget(QWidget):
 
     def revision_selected(self, rev):
         self._last_rev = rev
-        ctx = thgrepo.getcontext(self.repo, rev)
+        ctx = self.repo.changectx(rev)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
         self.message.displayRevision(ctx)

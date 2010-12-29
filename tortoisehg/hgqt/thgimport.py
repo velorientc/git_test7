@@ -218,7 +218,6 @@ class ImportDialog(QDialog):
         else:
             self.cslist.update(self.repo,
                                [os.path.abspath(p) for p in patches])
-            # thgrepo.getcontext() requires files in full paths
             self.import_btn.setEnabled(True)
         self.updatestatus()
 
