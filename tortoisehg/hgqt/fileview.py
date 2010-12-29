@@ -283,6 +283,8 @@ class HgFileView(QFrame):
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
+        self.sci.setMarginLineNumbers(1, False)
+        self.sci.setMarginWidth(1, '')
 
     def displayFile(self, filename=None, rev=None, status=None):
         if filename is None:
@@ -319,19 +321,13 @@ class HgFileView(QFrame):
         if not fd.isValid():
             self.ann.setVisible(False)
             self.sci.setText(fd.error)
-            self.sci.setMarginLineNumbers(1, False)
-            self.sci.setMarginWidth(1, '')
             return
 
         if self._mode == 'diff' and fd.diff:
             lexer = get_diff_lexer(self)
             self.sci.setLexer(lexer)
             self.sci.setText(fd.diff)
-            self.sci.setMarginLineNumbers(1, False)
-            self.sci.setMarginWidth(1, '')
         elif fd.contents is None:
-            self.sci.setMarginLineNumbers(1, False)
-            self.sci.setMarginWidth(1, '')
             return
         else:
             lexer = get_lexer(filename, fd.contents, self)
