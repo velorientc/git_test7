@@ -136,14 +136,22 @@ class HgFileView(QFrame):
         self.sci.setWrapMode(qsci.WrapCharacter)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
 
-        self.sci.SendScintilla(qsci.SCI_SETCARETSTYLE, 0)
+        self.sci.setCaretLineVisible(False)
 
-        self.sci.SendScintilla(qsci.SCI_INDICSETSTYLE, 8, qsci.INDIC_ROUNDBOX)
-        self.sci.SendScintilla(qsci.SCI_INDICSETUNDER, 8, True)
-        self.sci.SendScintilla(qsci.SCI_INDICSETFORE, 8, 0xBBFFFF)
-        self.sci.SendScintilla(qsci.SCI_INDICSETSTYLE, 9, qsci.INDIC_ROUNDBOX)
-        self.sci.SendScintilla(qsci.SCI_INDICSETUNDER, 9, True)
-        self.sci.SendScintilla(qsci.SCI_INDICSETFORE, 9, 0x58A8FF)
+        if hasattr(self.sci, 'indicatorDefine'):
+            self.sci.indicatorDefine(qsci.RoundBoxIndicator, 8)
+            self.sci.setIndicatorDrawUnder(8)
+            self.sci.setIndicatorForegroundColor(QColor('#BBFFFF'), 8)
+            self.sci.indicatorDefine(qsci.RoundBoxIndicator, 9)
+            self.sci.setIndicatorDrawUnder(9)
+            self.sci.setIndicatorForegroundColor(QColor('#58A8FF'), 9)
+        else:
+            self.sci.SendScintilla(qsci.SCI_INDICSETSTYLE, 8, qsci.INDIC_ROUNDBOX)
+            self.sci.SendScintilla(qsci.SCI_INDICSETUNDER, 8, True)
+            self.sci.SendScintilla(qsci.SCI_INDICSETFORE, 8, 0xBBFFFF)
+            self.sci.SendScintilla(qsci.SCI_INDICSETSTYLE, 9, qsci.INDIC_ROUNDBOX)
+            self.sci.SendScintilla(qsci.SCI_INDICSETUNDER, 9, True)
+            self.sci.SendScintilla(qsci.SCI_INDICSETFORE, 9, 0x58A8FF)
 
         # hide margin 0 (markers)
         self.sci.SendScintilla(qsci.SCI_SETMARGINTYPEN, 0, 0)
