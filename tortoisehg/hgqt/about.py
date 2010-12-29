@@ -20,11 +20,6 @@ from tortoisehg.util import version, hglib, shlib, paths
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-_urlpar = ('<p style=\" margin-top:0px; margin-bottom:0px;\">'
-        '<a href=%s>'
-        '<span style=\" text-decoration: underline; color:#0000ff;\">'
-        '%s</span></a></p>')
-
 class AboutDialog(QDialog):
     """Dialog for showing info about TortoiseHg"""
 
@@ -74,7 +69,7 @@ class AboutDialog(QDialog):
         self.download_url_lbl.setAlignment(Qt.AlignCenter)
         self.download_url_lbl.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
         self.download_url_lbl.setOpenExternalLinks(True)
-        self.download_url_lbl.setText(_urlpar %
+        self.download_url_lbl.setText('<a href=%s>%s</a>' %
                 ('http://tortoisehg.org', _('You can visit our site here')))
         self.vbox.addWidget(self.download_url_lbl)
 
@@ -192,7 +187,7 @@ class AboutUpdateThread(QThread):
             curver = (0,0,0)
         if newver > curver:
             url_lbl = _('A new version of TortoiseHg is ready for download!')
-            self.urldata = (_urlpar % (upgradeurl, url_lbl))
+            self.urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
 
 
 def run(ui, *pats, **opts):
