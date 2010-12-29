@@ -527,21 +527,15 @@ def _extendchangectx(changectx):
 
 
 _pctxcache = {}
-
 def PatchContext(repo, patchpath, rev=None):
-    # check path
-    if not os.path.isabs(patchpath) or not os.path.isfile(patchpath):
-        return None
-    # check cache
     global _pctxcache
     mtime = os.path.getmtime(patchpath)
-    key = repo.root + patchpath
-    holder = _pctxcache.get(key, None)
+    holder = _pctxcache.get(patchpath, None)
     if holder is not None and mtime == holder[0]:
         return holder[1]
     # create a new context object
     ctx = patchctx(patchpath, repo, rev=rev)
-    _pctxcache[key] = (mtime, ctx)
+    _pctxcache[patchpath] = (mtime, ctx)
     return ctx
 
 
