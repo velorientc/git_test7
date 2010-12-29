@@ -211,9 +211,9 @@ def _extendrepo(repo):
         def changectx(self, changeid):
             '''Extends Mercurial's standard changectx() method to
             a) return a thgchangectx with additional methods
-            b) return a PatchContext if changeid is the name of an MQ
+            b) return a patchctx if changeid is the name of an MQ
             unapplied patch
-            c) return a PatchContext if changeid is an absolute patch path
+            c) return a patchctx if changeid is an absolute patch path
             '''
 
             # Mercurial's standard changectx() (rather, lookup())
@@ -223,10 +223,10 @@ def _extendrepo(repo):
             # seems safe.
             if changeid in self.thgmqunappliedpatches:
                 q = self.mq # must have mq to pass the previous if
-                return PatchContext(self, q.join(changeid), rev=changeid)
+                return genPatchContext(self, q.join(changeid), rev=changeid)
             elif type(changeid) is str and os.path.isabs(changeid) and \
                     os.path.isfile(changeid):
-                return PatchContext(repo, changeid)
+                return genPatchContext(repo, changeid)
 
             changectx = super(thgrepository, self).changectx(changeid)
             changectx.__class__ = _extendchangectx(changectx)
@@ -527,7 +527,7 @@ def _extendchangectx(changectx):
 
 
 _pctxcache = {}
-def PatchContext(repo, patchpath, rev=None):
+def genPatchContext(repo, patchpath, rev=None):
     global _pctxcache
     mtime = os.path.getmtime(patchpath)
     holder = _pctxcache.get(patchpath, None)
