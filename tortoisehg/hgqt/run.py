@@ -562,7 +562,7 @@ def tag(ui, *pats, **opts):
 
 def test(ui, *pats, **opts):
     """test arbitrary widgets"""
-    from tortoisehg.hgqt.revset import run
+    from tortoisehg.hgqt.chunks import run
     return qtrun(run, ui, *pats, **opts)
 
 def purge(ui, *pats, **opts):
