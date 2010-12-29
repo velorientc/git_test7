@@ -5,22 +5,18 @@
 # A dialog to allow users to post a review to reviewboard
 # http:///www.reviewboard.org
 #
-# This dialog requires the reviewboard mercurial plugin which can be
+# This dialog requires a fork of the reviewboard mercurial plugin which can be
 # downloaded from:
 #
 # http://bitbucket.org/michaeldewildt/mercurial-reviewboard
 #
-# It is a fork of mdelagra's plugin with some small changes to make it
-# play nicer with the thg ui. Mdelagra's reviewboard extension is a fork
-# of the original extension found on the Mercurial website.
+# I hope to get my changes merged into the original extension blow, but 
+# until then, the fork above must be used.
 #
-# Original: http://mercurial.selenic.com/wiki/ReviewboardExtension
-# Mdelagra's Fork: http://bitbucket.org/mdelagra/mercurial-reviewboard/overview/
+# http://mercurial.selenic.com/wiki/ReviewboardExtension
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
-import time, datetime
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import error, extensions, cmdutil
@@ -29,7 +25,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo
 from tortoisehg.hgqt.postreview_ui import Ui_PostReviewDialog
 from tortoisehg.hgqt.hgemail import _ChangesetsModel
-from hgext import reviewboard
 
 class LoadReviewDataThread(QThread):
     def __init__ (self, dialog):
@@ -47,13 +42,13 @@ class LoadReviewDataThread(QThread):
         if server:
             if user and password:
                 try:
-                    self._reviewboard = reviewboard.ReviewBoard(server, None,
-                                                                False)
-                    self._reviewboard.login(user, password)
+                    self._reviewboard = reviewboard.make_rbclient(server,
+                                                                  user,
+                                                                  password)
                     self.load_combos()
 
                 except reviewboard.ReviewBoardError, e:
-                    msg = e.message
+                    msg = e.msg
             else:
                 msg = _("Invalid Settings - Please provide your ReviewBoard " +
                         "username and password")
@@ -69,9 +64,9 @@ class LoadReviewDataThread(QThread):
 
         self.dialog._qui.progress_label.setText("Loading repositories...")
         for r in self._reviewboard.repositories():
-            if r['id'] == self.dialog._repo_id:
+            if r.id == self.dialog._repo_id:
                 index = count
-            self.dialog._qui.repo_id_combo.addItem(str(r['id']) + ": " + r['name'])
+            self.dialog._qui.repo_id_combo.addItem(str(r.id) + ": " + r.name)
             count += 1
 
         if self.dialog._qui.repo_id_combo.count():
@@ -79,31 +74,11 @@ class LoadReviewDataThread(QThread):
 
         self.dialog._qui.progress_label.setText("Loading existing reviews...")
         for r in self._reviewboard.requests():
-            if self.is_valid_request(r):
-                summary = str(r['id']) + ": " + str(r['summary'])[0:100]
-                self.dialog._qui.review_id_combo.addItem(summary)
+            summary = str(r.id) + ": " + r.summary[0:100]
+            self.dialog._qui.review_id_combo.addItem(summary)
 
         if self.dialog._qui.review_id_combo.count():
             self.dialog._qui.review_id_combo.setCurrentIndex(0)
-
-    def is_valid_request(self, request):
-        #We only want to include pending requests
-        if request['status'] != 'pending':
-            return False
-        #And requests for the current user
-        if request['submitter']['username'] != self.dialog.user:
-            return False
-
-        #And only requests within the last week
-        delta = datetime.timedelta(days=7)
-        today = datetime.datetime.today()
-        sevenDaysAgo = today - delta
-        dateToCompare = datetime.datetime.strptime(request["last_updated"],
-                                                   "%Y-%m-%d %H:%M:%S")
-        if (dateToCompare < sevenDaysAgo):
-            return False
-
-        return True
 
 class PostReviewDialog(QDialog):
     """Dialog for sending patches to reviewboard"""
@@ -161,8 +136,10 @@ class PostReviewDialog(QDialog):
 
         self._qui.publish_immediately_check.setChecked(
                 s.value('reviewboard/publish_immediately_check').toBool())
-        self._qui.outgoing_changes_check.setChecked(
-                s.value('reviewboard/outgoing_changes_check').toBool())
+        self._qui.longdiff_check.setChecked(
+                s.value('reviewboard/longdiff_check').toBool())
+#        self._qui.outgoing_check.setChecked(
+#                s.value('reviewboard/outgoing_check').toBool())
         self._qui.update_fields.setChecked(
                 s.value('reviewboard/update_fields').toBool())
         self._qui.summary_edit.addItems(
@@ -180,8 +157,10 @@ class PostReviewDialog(QDialog):
         s.setValue('reviewboard/geom', self.saveGeometry())
         s.setValue('reviewboard/publish_immediately_check',
                    self._qui.publish_immediately_check.isChecked())
-        s.setValue('reviewboard/outgoing_changes_check',
-                   self._qui.outgoing_changes_check.isChecked())
+#        s.setValue('reviewboard/outgoing_check',
+#                   self._qui.outgoing_check.isChecked())
+        s.setValue('reviewboard/longdiff_check',
+                   self._qui.longdiff_check.isChecked())
         s.setValue('reviewboard/update_fields',
                    self._qui.update_fields.isChecked())
         s.setValue('reviewboard/repo_id', self._getrepoid())
@@ -237,7 +216,7 @@ class PostReviewDialog(QDialog):
 
     def _postreviewopts(self, **opts):
         """Generate opts for reviewboard by form values"""
-        opts['outgoingchanges'] = self._qui.outgoing_changes_check.isChecked()
+        opts['longdiff'] = self._qui.longdiff_check.isChecked()
         opts['publish'] = self._qui.publish_immediately_check.isChecked()
 
         if self._qui.tab_widget.currentIndex() == 1:
@@ -254,8 +233,7 @@ class PostReviewDialog(QDialog):
             opts['parent'] = str(self._selectedrevs[0] - 1)
 
         # Always use the upstream repo to determine the parent diff base
-        # without the diff uploaded to reviewboard dies
-        # TODO: Fix this is a bug in the postreview extension
+        # without the diff uploaded to review board dies        
         opts['outgoing'] = True
 
         #Finally we want to pass the repo path to the hg extension
@@ -290,6 +268,9 @@ class PostReviewDialog(QDialog):
             self._initchangesets(self._allrevs, self._allrevs)
             self._qui.changesets_view.setEnabled(True)
 
+    def close(self):
+        super(PostReviewDialog, self).accept()
+
     def accept(self):
         self._qui.progress_bar.show()
         self._qui.progress_label.setText("Posting Review...")
@@ -314,6 +295,7 @@ class PostReviewDialog(QDialog):
         revstr = str(self._selectedrevs.pop())
 
         self._qui.post_review_button.setEnabled(False)
+        self._qui.close_button.setEnabled(False)
 
         self._cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr],
                                  self, self.on_completion)

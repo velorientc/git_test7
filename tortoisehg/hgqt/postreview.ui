@@ -135,13 +135,13 @@
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QCheckBox" name="outgoing_changes_check">
+         <widget class="QCheckBox" name="longdiff_check">
           <property name="text">
-           <string>Create diff with all outgoing changesets on this branch</string>
+           <string>Create diff with all changes since last upstream sync</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="2" column="0">
          <widget class="QCheckBox" name="publish_immediately_check">
           <property name="text">
            <string>Publish request immediately</string>
@@ -195,9 +195,9 @@
         <string extracomment="Configure email settings"/>
        </property>
        <property name="text">
-        <string>Settings</string>
+        <string>&amp;Settings</string>
        </property>
-       <property name="autoDefault">
+       <property name="default">
         <bool>false</bool>
        </property>
       </widget>
@@ -283,7 +283,20 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Post Review</string>
+        <string>Post &amp;Review</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="close_button">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>&amp;Close</string>
        </property>
        <property name="default">
         <bool>true</bool>
@@ -318,7 +331,23 @@
    </hints>
   </connection>
   <connection>
-   <sender>outgoing_changes_check</sender>
+   <sender>close_button</sender>
+   <signal>clicked()</signal>
+   <receiver>PostReviewDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>longdiff_check</sender>
    <signal>toggled(bool)</signal>
    <receiver>PostReviewDialog</receiver>
    <slot>toggle_outgoing_changesets()</slot>
