@@ -655,7 +655,7 @@ class SyncWidget(QWidget):
         if self.embedded:
             def outputnodes(ret, data):
                 if ret == 0:
-                    nodes = data.splitlines()
+                    nodes = [n for n in data.splitlines() if len(n) == 40]
                     self.outgoingNodes.emit(nodes)
                     self.showMessage.emit(_('%d outgoing changesets') %
                                           len(nodes))
@@ -733,7 +733,7 @@ class SyncWidget(QWidget):
         self.showMessage.emit(_('Determining outgoing changesets to email...'))
         def outputnodes(ret, data):
             if ret == 0:
-                nodes = data.splitlines()
+                nodes = [n for n in data.splitlines() if len(n) == 40]
                 self.showMessage.emit(_('%d outgoing changesets') %
                                         len(nodes))
                 from tortoisehg.hgqt import run as _run
