@@ -20,6 +20,11 @@ from tortoisehg.util import version, hglib, shlib, paths
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+_urlpar = ('<p style=\" margin-top:0px; margin-bottom:0px;\">'
+        '<a href=%s>'
+        '<span style=\" text-decoration: underline; color:#0000ff;\">'
+        '%s</span></a></p>')
+
 class AboutDialog(QDialog):
     """Dialog for showing info about TortoiseHg"""
 
@@ -69,7 +74,8 @@ class AboutDialog(QDialog):
         self.download_url_lbl.setAlignment(Qt.AlignCenter)
         self.download_url_lbl.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
         self.download_url_lbl.setOpenExternalLinks(True)
-        self.download_url_lbl.setText(' ')
+        self.download_url_lbl.setText(_urlpar %
+                ('http://tortoisehg.org', _('You can visit our site here')))
         self.vbox.addWidget(self.download_url_lbl)
 
         # Let's have some space between the url and the buttons.
@@ -96,7 +102,7 @@ class AboutDialog(QDialog):
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self._readsettings()
 
-        # Spawn it later, so that the dialog get visible quickly
+        # Spawn it later, so that the dialog gets visible quickly.
         QTimer.singleShot(0, self.getUpdateInfo)
 
     def getVersionInfo(self):
@@ -126,9 +132,10 @@ class AboutDialog(QDialog):
 
     def uFinished(self):
         self.uthread.wait()
-        self.updateInfo = self.uthread.data
+        urldata = self.uthread.urldata
         self.uthread = None
-        self.download_url_lbl.setText(self.updateInfo['val'])
+        if urldata:
+            self.download_url_lbl.setText(urldata)
 
     def showLicense(self):
         from tortoisehg.hgqt import license
@@ -155,12 +162,11 @@ class AboutUpdateThread(QThread):
     def __init__(self):
         super(AboutUpdateThread, self).__init__()
 
+    urldata = ''
+
     def run(self):
-        self.data = {}
         verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
         newver = (0,0,0)
-        site_url = 'http://tortoisehg.org'
-        upgradeurl = site_url
         try:
             f = urllib2.urlopen(verurl).read().splitlines()
             newver = tuple([int(p) for p in f[0].split('.')])
@@ -184,18 +190,9 @@ class AboutUpdateThread(QThread):
             curver = tuple([int(p) for p in thgv.split('.')])
         except Exception, e:
             curver = (0,0,0)
-        dlurl = ('<p style=\" margin-top:0px; margin-bottom:0px;\">'
-                '<a href=%s>'
-                '<span style=\" text-decoration: underline; color:#0000ff;\">'
-                '%s</span></a></p>')
         if newver > curver:
             url_lbl = _('A new version of TortoiseHg is ready for download!')
-            url = upgradeurl
-        else:
-            url_lbl = _('You can visit our site here')
-            url = site_url
-        self.data['val'] = (dlurl % (url, url_lbl))
-        self.data['siteurl'] = url
+            self.urldata = (_urlpar % (upgradeurl, url_lbl))
 
 
 def run(ui, *pats, **opts):
