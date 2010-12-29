@@ -263,8 +263,9 @@ class HgFileView(QFrame):
         qsci.mouseMoveEvent(self.sci, event)
 
     def leaveEvent(self, event):
-        self.lastrev = None
-        self.showDescSignal.emit('')
+        if self._mode == 'file' and self._annotate:
+            self.lastrev = None
+            self.showDescSignal.emit('')
 
     def clearDisplay(self):
         self.sci.clear()
