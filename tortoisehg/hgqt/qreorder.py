@@ -211,4 +211,8 @@ class QReorderDialog(QDialog):
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(None, paths.find_root())
-    return QReorderDialog(repo)
+    if hasattr(repo, 'mq'):
+        return QReorderDialog(repo)
+    else:
+        qtlib.ErrorMsgBox(_('TortoiseHg Error'),
+            _('Please enable the MQ extension first.'))
