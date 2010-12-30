@@ -326,7 +326,8 @@ class HgFileView(QFrame):
         if self._mode == 'diff' and fd.diff:
             lexer = get_diff_lexer(self)
             self.sci.setLexer(lexer)
-            self.sci.setText(fd.diff)
+            utext = [hglib.tounicode(l) for l in fd.diff[2:]]
+            self.sci.setText(u'\n'.join(utext))
         elif fd.contents is None:
             return
         else:
@@ -584,7 +585,7 @@ class FileData(object):
 
         if type(ctx.rev()) == str:  # unapplied patch
             chunks = ctx.thgmqpatchchunks(wfile)
-            self.diff = '\n'.join(chunks)
+            self.diff = '\n'.join(chunks).splitlines()
             return
 
         if status is None:
@@ -705,5 +706,4 @@ class FileData(object):
         else:
             for chunkline in gen:
                 data.append(chunkline)
-        data = [hglib.tounicode(l) for l in data]
-        self.diff = u'\n'.join(data[2:])
+        self.diff = data

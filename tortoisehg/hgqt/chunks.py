@@ -166,7 +166,8 @@ class DiffBrowser(QFrame):
             self.sci.setLexer(lexer)
             # TODO: do patch chunking here using record.parsepatch()
             # TODO: use indicators to represent current and selection state
-            self.sci.setText(fd.diff)
+            utext = [hglib.tounicode(l) for l in fd.diff[2:]]
+            self.sci.setText(u'\n'.join(utext))
 
 def run(ui, *pats, **opts):
     'for testing purposes only'
