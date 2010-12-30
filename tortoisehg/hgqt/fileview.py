@@ -584,8 +584,7 @@ class FileData(object):
             return
 
         if type(ctx.rev()) == str:  # unapplied patch
-            chunks = ctx.thgmqpatchchunks(wfile)
-            self.diff = '\n'.join(chunks).splitlines()
+            self.diff = ctx.thgmqpatchdata(wfile)
             return
 
         if status is None:
