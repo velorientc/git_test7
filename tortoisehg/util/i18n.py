@@ -13,9 +13,20 @@ _localeenvs = ('LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG')
 def _defaultlanguage():
     if os.name != 'nt' or util.any(e in os.environ for e in _localeenvs):
         return  # honor posix-style env var
-    # On Windows, system locale is provided by getdefaultlocale(), but
-    # gettext doesn't take it into account.
-    return locale.getdefaultlocale()[0]
+
+    # On Windows, UI language can be determined by GetUserDefaultUILanguage(),
+    # but gettext doesn't take it into account.
+    # Note that locale.getdefaultlocale() uses GetLocaleInfo(), which may be
+    # different from UI language.
+    #
+    # For details, please read "User Interface Language Management":
+    # http://msdn.microsoft.com/en-us/library/dd374098(v=VS.85).aspx
+    try:
+        from ctypes import windll  # requires Python>=2.5
+        langid = windll.kernel32.GetUserDefaultUILanguage()
+        return locale.windows_locale[langid]
+    except (ImportError, AttributeError, KeyError):
+        pass
 
 def setlanguage(lang=None):
     """Change translation catalog to the specified language"""
