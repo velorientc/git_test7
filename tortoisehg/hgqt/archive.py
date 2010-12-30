@@ -321,6 +321,10 @@ class ArchiveDialog(QDialog):
         # prepare command line
         cmdline = self.compose_command(dest, type)
 
+        if self.files_in_rev_chk.isChecked():
+            self.savedcwd = os.getcwd()
+            os.chdir(self.repo.root)
+
         # start archiving
         self.cmd.run(cmdline)
 
@@ -337,6 +341,7 @@ class ArchiveDialog(QDialog):
         self.dest_edit.setEnabled(False)
         self.rev_combo.setEnabled(False)
         self.dest_btn.setEnabled(False)
+        self.files_in_rev_chk.setEnabled(False)
         self.filesradio.setEnabled(False)
         self.tarradio.setEnabled(False)
         self.tbz2radio.setEnabled(False)
@@ -350,6 +355,8 @@ class ArchiveDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, ret):
+        if self.files_in_rev_chk.isChecked():
+            os.chdir(self.savedcwd)
         if ret is not 0 or self.cmd.is_show_output()\
                 or self.keep_open_chk.isChecked():
             if not self.cmd.is_show_output():
