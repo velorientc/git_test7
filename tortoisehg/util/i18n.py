@@ -45,8 +45,9 @@ def availablelanguages():
     basedir = paths.get_locale_path()
     def mopath(lang):
         return os.path.join(basedir, lang, 'LC_MESSAGES', 'tortoisehg.mo')
-    return tuple(sorted(e for e in os.listdir(basedir)
-                        if os.path.exists(mopath(e))))
+    langs = [e for e in os.listdir(basedir) if os.path.exists(mopath(e))]
+    langs.append('en')  # means null translation
+    return sorted(langs)
 
 def _(message):
     return t.gettext(message)
