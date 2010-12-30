@@ -127,7 +127,7 @@ class ThgRepoWrapper(QObject):
         watchedfiles = [self.repo.sjoin('00changelog.i')]
         if hasattr(self.repo, 'mq'):
             watchedfiles.append(self.repo.mq.join('series'))
-            watchedfiles.append(self.repo.join('patches/queue'))
+            watchedfiles.append(self.repo.join('patches.queue'))
         try:
             mtime = [os.path.getmtime(wf) for wf in watchedfiles \
                      if os.path.isfile(wf)]
