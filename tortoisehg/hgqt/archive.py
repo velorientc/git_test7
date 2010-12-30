@@ -6,9 +6,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-# TODO:
-# - Make what is typed into the lineedit of the rev_combo change dest_edit (and hgcmd_txt)
-
 import os
 
 from PyQt4.QtCore import *
