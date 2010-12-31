@@ -12,12 +12,14 @@ import os
 import sys
 import shlex
 import binascii
+import cStringIO
 
 from PyQt4.QtCore import *
 
 from mercurial import hg, patch, util, error, bundlerepo, ui, extensions
 from mercurial import filemerge, node
 from mercurial.util import propertycache
+from hgext import mq, record
 
 from tortoisehg.util import hglib
 
@@ -541,7 +543,7 @@ def genPatchContext(repo, patchpath, rev=None):
 
 class patchctx(object):
 
-    def __init__(self, patchpath, repo, patchHandle=None, rev=None):
+    def __init__(self, patchpath, repo, pf=None, rev=None):
         """ Read patch context from file
         :param patchHandle: If set, then the patch is a temporary.
             The provided handle is used to read the patch and
@@ -551,85 +553,51 @@ class patchctx(object):
         self._path = patchpath
         self._patchname = os.path.basename(patchpath)
         self._repo = repo
-        self._files = None
-        if patchHandle:
-            pf = patchHandle
-            pf_start_pos = pf.tell()
-        else:
-            pf = open(patchpath)
+        self._rev = rev
+        self._status = [[], [], []]
+
+        ph = mq.patchheader(self._path)
+        self._ph = ph
         try:
-            data = patch.extract(self._repo.ui, pf)
-            tmpfile, msg, user, date, branch, nodea, p1, p2 = data
-            if tmpfile:
-                os.unlink(tmpfile)
-        finally:
-            if patchHandle:
-                pf.seek(pf_start_pos)
-            else:
-                pf.close()
-        if not msg and hasattr(repo, 'mq'):
-            # attempt to get commit message
-            from hgext import mq
-            msg = mq.patchheader(repo.mq.join(self._patchname)).message
-            if msg:
-                msg = '\n'.join(msg)
-        try:
-            self._node = binascii.unhexlify(nodea)
+            self._branch = ph.branch or ''
+            self._node = binascii.unhexlify(ph.nodeid)
         except TypeError:
             self._node = node.nullid
-        self._user = user or ''
-        self._date = date and util.parsedate(date) or util.makedate()
-        self._desc = msg and msg.strip() or ''
-        self._branch = branch or ''
-        self._parents = []
-        self._rev = rev
-        for p in (p1, p2):
-            if not p:
-                continue
-            try:
-                self._parents.append(repo[p])
-            except (error.LookupError, error.RepoLookupError, error.RepoError):
-                self._parents.append(p)
+        except AttributeError:
+            # hacks to try to deal with older versions of mq.py
+            self._node = node.nullid
+            self._branch = ''
+            ph.diffstartline = len(ph.comments)+1
+        self._user = ph.user or ''
+        self._date = ph.date and util.parsedate(ph.date) or util.makedate()
+        self._desc = ph.message and '\n'.join(ph.message).strip() or ''
 
     def __contains__(self, key):
-        self._load_patch_details()
         return key in self._files
 
-    def __str__(self):
-        return node.short(self.node())
+    def __str__(self):      return node.short(self.node())
+    def node(self):         return self._node
+    def files(self):        return self._files.keys()
+    def flags(self, key):   return ''
+    def rev(self):          return self._rev
+    def hex(self):          return node.hex(self.node())
+    def user(self):         return self._user
+    def date(self):         return self._date
+    def description(self):  return self._desc
+    def branch(self):       return self._branch
+    def parents(self):      return ()
+    def tags(self):         return ()
+    def children(self):     return ()
+    def extra(self):        return {}
 
-    def __int__(self):
-        return self.rev()
-
-    def flags(self, key): return ''
-    def node(self): return self._node
-    def rev(self): return self._rev
-    def hex(self):
-        return node.hex(self.node())
-    def user(self): return self._user
-    def date(self): return self._date
-    def description(self): return self._desc
-    def branch(self): return self._branch
-    def tags(self): return ()
-    def parents(self): return self._parents
-    def children(self): return ()
-    def extra(self): return {}
-    def thgtags(self): return []
-    def thgwdparent(self): return False
-    def thgmqappliedpatch(self): return False
-    def thgmqpatchname(self): return self._patchname
-    def thgbranchhead(self): return False
-    def thgmqunappliedpatch(self): return True
-
-    def changesToParent(self, whichparent):
-        self._load_patch_details()
-        if whichparent == 0:
-            return self._status
-        else:
-            return [], [], []
+    def thgtags(self):              return []
+    def thgwdparent(self):          return False
+    def thgmqappliedpatch(self):    return False
+    def thgmqpatchname(self):       return self._patchname
+    def thgbranchhead(self):        return False
+    def thgmqunappliedpatch(self):  return True
 
     def longsummary(self):
-        self._load_patch_details()
         summary = hglib.tounicode(self.description())
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
             limit = 80
@@ -646,73 +614,55 @@ class patchctx(object):
             summary = lines and lines[0] or ''
         return summary
 
-    def files(self):
-        self._load_patch_details()
-        return self._files
+    def changesToParent(self, whichparent):
+        if whichparent == 0 and self._files:
+            return self._status
+        else:
+            return [], [], []
 
     def thgmqpatchdata(self, wfile):
-        self._load_patch_details()
-        if wfile in self.curphunks:
-            return [line.rstrip('\r\n') for line in self.curphunks[wfile]]
+        # return file diffs as string list without line ends
+        if wfile in self._files:
+            buf = cStringIO.StringIO()
+            for chunk in self._files[wfile]:
+                chunk.write(buf)
+            # prune 'diff -r' line
+            return buf.getvalue().splitlines(False)[1:]
         return []
 
-    def _load_patch_details(self):
-        if self._files is not None:
-            return
+    @propertycache
+    def _files(self):
+        if not self._ph.haspatch:
+            return {}
 
-        # taken from hgtk/changeset.py
+        M, A, R = 0, 1, 2
         def get_path(a, b):
-            type = (a == '/dev/null') and 'A' or 'M'
-            type = (b == '/dev/null') and 'R' or type
+            type = (a == '/dev/null') and A or M
+            type = (b == '/dev/null') and R or type
             rawpath = (b != '/dev/null') and b or a
             if not (rawpath.startswith('a/') or rawpath.startswith('b/')):
                 return type, rawpath
             return type, rawpath.split('/', 1)[-1]
 
-        hunks = []
-        modified = []
-        added = []
-        removed = []
-        map = {'MODIFY': modified,
-               'ADD': added,
-               'DELETE': removed,
-               'COPY': added}
-
-        self._files = set()
-        self._status = [modified, added, removed]
-        self.curphunks = {}
-
+        files = {}
         pf = open(self._path)
         try:
             try:
-                for state, values in patch.iterhunks(self._repo.ui, pf):
-                    if state == 'git':
-                        for m in values:
-                            f = m.path
-                            self._files.add(f)
-                            if m.op == 'RENAME':
-                                added.append(f)
-                                removed.append(m.oldpath)
-                                self._files.add(m.oldpath)
-                            else:
-                                map[m.op].append(f)
-                    elif state == 'file':
-                        type, path = get_path(values[0], values[1])
-                        hunks = ['--- ' + values[0][2:], '+++ ' + values[1][2:]]
-                        self.curphunks[path] = hunks
-                        if path not in self._files:
-                            self._files.add(path)
-                            if type == 'M':
-                                modified.append(path)
-                            elif type == 'R':
-                                removed.append(path)
-                            else:
-                                added.append(path)
-                    elif state == 'hunk':
-                        hunks.extend(values.hunk)
+                # consume comments and headers
+                for i in range(self._ph.diffstartline):
+                    pf.readline()
+                for chunk in record.parsepatch(pf):
+                    if isinstance(chunk, record.header):
+                        top = patch.parsefilename(chunk.header[-2])
+                        bot = patch.parsefilename(chunk.header[-1])
+                        type, path = get_path(top, bot)
+                        if path not in files:
+                            self._status[type].append(path)
+                            files[path] = [chunk]
                     else:
-                        raise _('unknown hunk type: %s') % state
+                        files[path].append(chunk)
             except patch.PatchError:
                 pass
         finally:
             pf.close()
+        return files
