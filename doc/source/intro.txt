@@ -15,20 +15,27 @@ system.
 On Windows,
 	TortoiseHg consists of a shell extension, which provides overlay
 	icons and context menus in your file explorer, and a command line
-	program named :file:`hgtk.exe` which can launch the TortoiseHg tools.
+	program named :file:`thg.exe` which can launch the TortoiseHg tools.
 	Binary packages of TortoiseHg for Windows come with Mercurial and a
 	merge tool and are thus completely ready for use "Out of the Box".
 
 On Linux,
-	TortoiseHg consists of a command line hgtk script and a Nautilus
+	TortoiseHg consists of a command line thg script and a Nautilus
 	extension which provides overlays and context menus in your file
 	explorer.  You must have Mercurial installed separately in order to
 	run TortoiseHg on Linux.  TortoiseHg binary packages list Mercurial
 	as a dependency, so it is usually installed for you automatically.
 
-TortoiseHg is primarily written in Python and PyGtk (the Windows shell
-extension being the notable exception).  The hgtk script and TortoiseHg
-dialogs can be used on any platform that supports PyGtk, including Mac
+.. note::
+	On Windows, TortoiseHg includes both thg.exe and thgw.exe.  The
+	latter is intended to be launched from desktop shortcuts or menu
+	entries as it will refuse to open a command console.  thg.exe is for
+	use on the console, and can provide command line help.  The thg.cmd
+	batch file that our installer adds into your PATH runs thg.exe.
+
+TortoiseHg is primarily written in Python and PyQt (the Windows shell
+extension being the notable exception).  The thg script and TortoiseHg
+dialogs can be used on any platform that supports PyQt, including Mac
 OS X.
 
 
@@ -41,7 +48,7 @@ On Windows
 TortoiseHg comes with an easy to use MSI installer.  You can always find
 the most up to date release on our `website
 <http://tortoisehg.bitbucket.org/download/windows.html>`_.
-Double click on the installer file and follow the instructions.
+Simply double click on the installer file and follow its instructions.
 
 After a first time install, a re-login is usually required to start the
 icon overlays.
@@ -59,7 +66,7 @@ complete the install.
 	initiated from the control panel or the start menu.
 
 .. warning::
-	The legacy uninstallers have a tendency to delete your user
+	Legacy uninstallers (<=0.9.3) have a tendency to delete your user
 	Mercurial.ini file, so backup your file before uninstalling the
 	older TortoiseHg versions.  This is not a problem with the newer MSI
 	packages.
@@ -71,12 +78,12 @@ two applications in the *Add/Remove Programs* control panel program.
 (On X64 platforms, there were two TortoiseOverlays, one for x86
 processes and one of x64 processes).
 
-The new MSI installers for TortoiseHg 1.0 include the TortoiseOverlay
-packages as "merge modules" so they do not appear as separate
-applications anymore.  It should be safe to uninstall the older
+The new MSI installers for TortoiseHg 1.0 and later include the
+TortoiseOverlay packages as "merge modules" so they do not appear as
+separate applications anymore.  It should be safe to uninstall the older
 TortoiseOverlay applications from *Add/Remove Programs* after you
 uninstall the legacy (<=0.9.3) TortoiseHg installer, unless you have
-other Tortoise products that also used the separate TortoiseOverlay MSI
+other Tortoise products that still use the separate TortoiseOverlay MSI
 approach (TortoiseCVS or TortoiseBZR).
 
 .. note::
@@ -93,6 +100,12 @@ To be completely safe, there are two approaches you can take:
 2) Uninstall all the old TortoiseOverlay packages, then re-install all
    of your Tortoise products until they are all functional.
 
+Finally, if you have problems with the shell extension even after
+re-logging in, we recommend you re-run the installer and select the
+*Repair* option.  There were problems with a few versions of
+TortoiseOverlays that cause upgrades to subtly fail until the *Repair*
+process is run.
+
 
 
 Language settings
@@ -104,13 +117,6 @@ installed. Look in :file:`C:\\Program Files\\TortoiseHg\\locale` for the
 available languages. To enable a language just set the environment
 variable ``LANGUAGE`` to the desidered language, e.g. for italian
 ``set LANGUAGE=it``.
-
-.. note::
-	After setting LANGUAGE, if standard GUI elements like :guilabel:`OK`
-	and :guilabel:`Apply` still appear in English, it means the
-	TortoiseHg installer did not include translations of GTK+ for your
-	locale.  This usually means the translation of TortoiseHg for your
-	locale was incomplete at release time.
 
 The Windows shell extension context menus get their translations from
 the Windows registry.  Translations for many locales were installed
@@ -124,9 +130,9 @@ On Linux and Mac
 The most recent Linux packages can be found on our `download
 <http://tortoisehg.bitbucket.org/download/linux.html>`_ page.
 
-For Mac OS X, no packages are available but you can run hgtk and all the
+For Mac OS X, no packages are available but you can run thg and all the
 dialogs via the source install method. For details, see
-`Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
+`Mac OS X <http://bitbucket.org/tortoisehg/thg/wiki/Home>`_.
 
 .. note::
 	If you install TortoiseHg from source, you need to add our
