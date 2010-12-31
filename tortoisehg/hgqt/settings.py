@@ -484,6 +484,12 @@ INFO = (
     (_('Git Format'), 'diff.git', genBoolCombo,
         _('Use git extended diff header format.'
         ' Default: False')),
+    (_('MQ Git Format'), 'mq.git', (genDefaultCombo,
+        ['auto', 'keep', 'yes', 'no']),
+     _("If set to 'keep', mq will obey the [diff] section configuration while"
+       " preserving existing git patches upon qrefresh. If set to 'yes' or"
+       " 'no', mq will override the [diff] section and always generate git or"
+       " regular patches, possibly losing data in the second case.")),
     (_('No Dates'), 'diff.nodates', genBoolCombo,
         _('Do not include modification dates in diff headers.'
         ' Default: False')),
