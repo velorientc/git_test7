@@ -1,0 +1,9 @@
+# HG changeset patch
+# User test
+# Date 0 0
+# Node ID b124d3c17d0d93e83d26c00d7a176c02c42d73d1
+# Parent  0000000000000000000000000000000000000000
+add aloha
+
+diff --git a/あろはー b/あろはー
+new file mode 100644

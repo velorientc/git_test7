@@ -13,7 +13,7 @@ class CShellExtCMenu: public IContextMenu3, IShellExtInit
     std::vector<std::string> myFiles;
     std::string myFolder;
 
-    void DoHgtk(const std::string&);
+    void RunDialog(const std::string&);
 
 public:
     explicit CShellExtCMenu(char dummy);
