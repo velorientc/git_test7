@@ -226,12 +226,12 @@
                     Source='contrib\win32\mergepatterns.rc'
               />
             </Component>
-            <Component Id='paths.rc' Guid='$(var.paths.rc.guid)' Win64='$(var.IsX64)'>
+            <Component Id='paths.rc' Guid='$(var.paths.rc.guid)'>
               <CreateFolder/>
               <IniFile Id="ini0" Action="createLine" Directory="HGRCD" Name="Paths.rc"
                 Section="web" Key="cacerts" Value="[INSTALLDIR]hgrc.d\cacert.pem" />
             </Component>
-            <Component Id='cacert.pem' Guid='$(var.cacert.pem.guid)' Win64='$(var.IsX64)'>
+            <Component Id='cacert.pem' Guid='$(var.cacert.pem.guid)'>
               <File Id='cacert.pem' Name='cacert.pem' Source='..\misc\cacert.pem'
                     ReadOnly='yes' KeyPath='yes'/>
             </Component>
