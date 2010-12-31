@@ -72,6 +72,8 @@
   <?define mercurial.rc.guid = {28ACE5D7-FFCE-488E-A94A-8F13A21DD25D} ?>
   <?define mergetools.rc.guid = {30CC047C-48B4-4D91-B8EC-79975327A9C7} ?>
   <?define mergepatterns.rc.guid = {05860DA7-8391-43A4-A4E7-6E9E084D11C6} ?>
+  <?define paths.rc.guid = {3872C21C-3DB7-4A63-B088-785CBDBA47BD} ?>
+  <?define cacert.pem.guid = {6E5ED0E2-DD8C-4CD7-B065-A686357D0330} ?>
 
   <?define ProgramMenuDir.guid = {D5A63320-1238-489B-B68B-CF053E9577CA} ?>
   <?define ThgAppData.guid = {94B8FBB5-4AE3-4960-B3D8-94BEFC6366E9} ?>
