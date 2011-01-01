@@ -572,6 +572,17 @@ class FileData(object):
         repo = ctx._repo
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
+        if type(ctx.rev()) == str:  # unapplied patch
+            self.diff = ctx.thgmqpatchdata(wfile)
+            flags = ctx.flags(wfile)
+            if flags in ('x', '-'):
+                lbl = _("exec mode has been <font color='red'>%s</font>")
+                change = (flags == 'x') and _('set') or _('unset')
+                self.elabel = lbl % change
+            elif flags == 'l':
+                self.flabel += _(' <i>(is a symlink)</i>')
+            return
+
         absfile = repo.wjoin(wfile)
         if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
            os.path.islink(absfile):
@@ -581,10 +592,6 @@ class FileData(object):
                 data = os.readlink(absfile)
             self.contents = hglib.tounicode(data)
             self.flabel += _(' <i>(is a symlink)</i>')
-            return
-
-        if type(ctx.rev()) == str:  # unapplied patch
-            self.diff = ctx.thgmqpatchdata(wfile)
             return
 
         if status is None:
@@ -661,9 +668,9 @@ class FileData(object):
             change = None
             for pfctx in fctx.parents():
                 if 'x' in fctx.flags() and 'x' not in pfctx.flags():
-                    change = 'set'
+                    change = _('set')
                 elif 'x' not in fctx.flags() and 'x' in pfctx.flags():
-                    change = 'unset'
+                    change = _('unset')
             if change:
                 lbl = _("exec mode has been <font color='red'>%s</font>")
                 self.elabel = lbl % change

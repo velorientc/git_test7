@@ -578,7 +578,6 @@ class patchctx(object):
     def __str__(self):      return node.short(self.node())
     def node(self):         return self._node
     def files(self):        return self._files.keys()
-    def flags(self, key):   return ''
     def rev(self):          return self._rev
     def hex(self):          return node.hex(self.node())
     def user(self):         return self._user
@@ -620,6 +619,22 @@ class patchctx(object):
         else:
             return [], [], []
 
+    def flags(self, wfile):
+        if wfile in self._files:
+            for gp in patch.readgitpatch(self._files[wfile][0].header):
+                if gp.mode:
+                    islink, isexec = gp.mode
+                    if islink:
+                        return 'l'
+                    elif isexec:
+                        return 'x'
+                    else:
+                        # techincally, this case could mean the file has had its
+                        # exec bit cleared OR its symlink state removed
+                        # TODO: change readgitpatch() to differentiate
+                        return '-'
+        return ''
+
     def thgmqpatchdata(self, wfile):
         # return file diffs as string list without line ends
         if wfile in self._files:
@@ -656,6 +671,8 @@ class patchctx(object):
                         top = patch.parsefilename(chunk.header[-2])
                         bot = patch.parsefilename(chunk.header[-1])
                         type, path = get_path(top, bot)
+                        if path not in chunk.files():
+                            type, path = 0, chunk.files()[-1]
                         if path not in files:
                             self._status[type].append(path)
                             files[path] = [chunk]
