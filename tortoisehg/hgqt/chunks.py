@@ -5,6 +5,11 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
+import cStringIO
+
+from hgext import record
+
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers
 from tortoisehg.hgqt import filelistmodel, filelistview, fileview
@@ -132,6 +137,9 @@ class DiffBrowser(QFrame):
         self.sci.setMarginWidth(1, '')
         self.layout().addWidget(self.sci, 1)
 
+        lexer = lexers.get_diff_lexer(self)
+        self.sci.setLexer(lexer)
+
     def setContext(self, ctx):
         self._ctx = ctx
         self.sci.setTabWidth(ctx._repo.tabwidth)
@@ -161,13 +169,23 @@ class DiffBrowser(QFrame):
 
         if not fd.isValid() or not fd.diff:
             self.sci.setText(fd.error or '')
+            return
+        elif type(self._ctx.rev()) is str:
+            chunks = self._ctx._files[filename]
         else:
-            lexer = lexers.get_diff_lexer(self)
-            self.sci.setLexer(lexer)
-            # TODO: do patch chunking here using record.parsepatch()
-            # TODO: use indicators to represent current and selection state
-            utext = [hglib.tounicode(l) for l in fd.diff[2:]]
-            self.sci.setText(u'\n'.join(utext))
+            buf = cStringIO.StringIO()
+            buf.write('diff -r XX %s\n' % filename)
+            buf.write('\n'.join(fd.diff))
+            buf.seek(0)
+            chunks = record.parsepatch(buf)
+
+        # TODO: use indicators to represent current and selection state
+        outbuf = cStringIO.StringIO()
+        for chunk in chunks:
+            chunk.write(outbuf)
+        lines = outbuf.getvalue().splitlines()[3:]
+        utext = [hglib.tounicode(l) for l in lines]
+        self.sci.setText(u'\n'.join(utext))
 
 def run(ui, *pats, **opts):
     'for testing purposes only'
