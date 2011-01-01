@@ -10,6 +10,7 @@ import cStringIO
 from hgext import record
 
 from tortoisehg.util import hglib
+from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers
 from tortoisehg.hgqt import filelistmodel, filelistview, fileview
@@ -90,7 +91,7 @@ class ChunksWidget(QWidget):
     def refresh(self):
         f = self.filelist.currentFile()
         ctx = self.filelistmodel._ctx
-        if isintance(ctx, thgrepo.patchctx):
+        if isintance(ctx, patchctx):
             # if patch mtime has not changed, it could return the same ctx
             ctx = self.repo.changectx(ctx.path)
         else:

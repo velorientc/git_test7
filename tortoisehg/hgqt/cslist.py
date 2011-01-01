@@ -14,6 +14,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from tortoisehg.hgqt import csinfo, qtlib, thgrepo
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.patchctx import patchctx
 
 _SPACING = 6
 
@@ -72,7 +73,7 @@ class ChangesetList(QWidget):
         # csetinfo
         def datafunc(widget, item, ctx):
             if item in ('item', 'item_l'):
-                if not isinstance(ctx, thgrepo.patchctx):
+                if not isinstance(ctx, patchctx):
                     return True
                 revid = widget.get_data('revid')
                 if not revid:
@@ -82,13 +83,13 @@ class ChangesetList(QWidget):
             raise csinfo.UnknownItem(item)
         def labelfunc(widget, item):
             if item in ('item', 'item_l'):
-                if not isinstance(widget.ctx, thgrepo.patchctx):
+                if not isinstance(widget.ctx, patchctx):
                     return _('Revision:')
                 return _('Patch:')
             raise csinfo.UnknownItem(item)
         def markupfunc(widget, item, value):
             if item in ('item', 'item_l'):
-                if not isinstance(widget.ctx, thgrepo.patchctx):
+                if not isinstance(widget.ctx, patchctx):
                     if item == 'item':
                         return widget.get_markup('rev')
                     return widget.get_markup('revnum')

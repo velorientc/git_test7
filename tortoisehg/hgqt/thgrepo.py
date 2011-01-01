@@ -10,18 +10,15 @@
 
 import os
 import sys
-import shlex
-import binascii
-import cStringIO
 
 from PyQt4.QtCore import *
 
-from mercurial import hg, patch, util, error, bundlerepo, ui, extensions
-from mercurial import filemerge, node
+from mercurial import hg, util, error, bundlerepo, extensions, filemerge, node
+from mercurial import ui as uimod
 from mercurial.util import propertycache
-from hgext import mq, record
 
 from tortoisehg.util import hglib
+from tortoisehg.util.patchctx import patchctx
 
 _repocache = {}
 
@@ -38,14 +35,14 @@ def repository(_ui=None, path='', create=False, bundle=None):
     is obtained using mercurial.hg.repository()'''
     if bundle:
         if _ui is None:
-            _ui = ui.ui()
+            _ui = uimod.ui()
         repo = bundlerepo.bundlerepository(_ui, path, bundle)
         repo._pyqtobj = ThgRepoWrapper(repo)
         repo.__class__ = _extendrepo(repo)
         return repo
     if create or path not in _repocache:
         if _ui is None:
-            _ui = ui.ui()
+            _ui = uimod.ui()
         repo = hg.repository(_ui, path, create)
         repo._pyqtobj = ThgRepoWrapper(repo)
         repo.__class__ = _extendrepo(repo)
@@ -539,149 +536,3 @@ def genPatchContext(repo, patchpath, rev=None):
     ctx = patchctx(patchpath, repo, rev=rev)
     _pctxcache[patchpath] = (mtime, ctx)
     return ctx
-
-
-class patchctx(object):
-
-    def __init__(self, patchpath, repo, pf=None, rev=None):
-        """ Read patch context from file
-        :param patchHandle: If set, then the patch is a temporary.
-            The provided handle is used to read the patch and
-            the patchpath contains the name of the patch.
-            The handle is NOT closed.
-        """
-        self._path = patchpath
-        self._patchname = os.path.basename(patchpath)
-        self._repo = repo
-        self._rev = rev
-        self._status = [[], [], []]
-
-        ph = mq.patchheader(self._path)
-        self._ph = ph
-        try:
-            self._branch = ph.branch or ''
-            self._node = binascii.unhexlify(ph.nodeid)
-        except TypeError:
-            self._node = node.nullid
-        except AttributeError:
-            # hacks to try to deal with older versions of mq.py
-            self._node = node.nullid
-            self._branch = ''
-            ph.diffstartline = len(ph.comments)
-            if ph.message:
-                ph.diffstartline += 1
-        self._user = ph.user or ''
-        self._date = ph.date and util.parsedate(ph.date) or util.makedate()
-        self._desc = ph.message and '\n'.join(ph.message).strip() or ''
-
-    def __contains__(self, key):
-        return key in self._files
-
-    def __str__(self):      return node.short(self.node())
-    def node(self):         return self._node
-    def files(self):        return self._files.keys()
-    def rev(self):          return self._rev
-    def hex(self):          return node.hex(self.node())
-    def user(self):         return self._user
-    def date(self):         return self._date
-    def description(self):  return self._desc
-    def branch(self):       return self._branch
-    def parents(self):      return ()
-    def tags(self):         return ()
-    def children(self):     return ()
-    def extra(self):        return {}
-
-    def thgtags(self):              return []
-    def thgwdparent(self):          return False
-    def thgmqappliedpatch(self):    return False
-    def thgmqpatchname(self):       return self._patchname
-    def thgbranchhead(self):        return False
-    def thgmqunappliedpatch(self):  return True
-
-    def longsummary(self):
-        summary = hglib.tounicode(self.description())
-        if self._repo.ui.configbool('tortoisehg', 'longsummary'):
-            limit = 80
-            lines = summary.splitlines()
-            if lines:
-                summary = lines.pop(0)
-                while len(summary) < limit and lines:
-                    summary += u'  ' + lines.pop(0)
-                summary = summary[0:limit]
-            else:
-                summary = ''
-        else:
-            lines = summary.splitlines()
-            summary = lines and lines[0] or ''
-        return summary
-
-    def changesToParent(self, whichparent):
-        if whichparent == 0 and self._files:
-            return self._status
-        else:
-            return [], [], []
-
-    def flags(self, wfile):
-        if wfile in self._files:
-            for gp in patch.readgitpatch(self._files[wfile][0].header):
-                if gp.mode:
-                    islink, isexec = gp.mode
-                    if islink:
-                        return 'l'
-                    elif isexec:
-                        return 'x'
-                    else:
-                        # techincally, this case could mean the file has had its
-                        # exec bit cleared OR its symlink state removed
-                        # TODO: change readgitpatch() to differentiate
-                        return '-'
-        return ''
-
-    def thgmqpatchdata(self, wfile):
-        # return file diffs as string list without line ends
-        if wfile in self._files:
-            buf = cStringIO.StringIO()
-            for chunk in self._files[wfile]:
-                chunk.write(buf)
-            # prune 'diff -r' line
-            return buf.getvalue().splitlines(False)[1:]
-        return []
-
-    @propertycache
-    def _files(self):
-        if not self._ph.haspatch:
-            return {}
-
-        M, A, R = 0, 1, 2
-        def get_path(a, b):
-            type = (a == '/dev/null') and A or M
-            type = (b == '/dev/null') and R or type
-            rawpath = (b != '/dev/null') and b or a
-            if not (rawpath.startswith('a/') or rawpath.startswith('b/')):
-                return type, rawpath
-            return type, rawpath.split('/', 1)[-1]
-
-        files = {}
-        pf = open(self._path)
-        try:
-            try:
-                # consume comments and headers
-                for i in range(self._ph.diffstartline):
-                    pf.readline()
-                for chunk in record.parsepatch(pf):
-                    if isinstance(chunk, record.header):
-                        top = patch.parsefilename(chunk.header[-2])
-                        bot = patch.parsefilename(chunk.header[-1])
-                        type, path = get_path(top, bot)
-                        if path not in chunk.files():
-                            type, path = 0, chunk.files()[-1]
-                        if path not in files:
-                            self._status[type].append(path)
-                            files[path] = [chunk]
-                    else:
-                        files[path].append(chunk)
-            except patch.PatchError:
-                pass
-        finally:
-            pf.close()
-        return files
