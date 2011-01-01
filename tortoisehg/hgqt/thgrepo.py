@@ -567,7 +567,9 @@ class patchctx(object):
             # hacks to try to deal with older versions of mq.py
             self._node = node.nullid
             self._branch = ''
-            ph.diffstartline = len(ph.comments)+1
+            ph.diffstartline = len(ph.comments)
+            if ph.message:
+                ph.diffstartline += 1
         self._user = ph.user or ''
         self._date = ph.date and util.parsedate(ph.date) or util.makedate()
         self._desc = ph.message and '\n'.join(ph.message).strip() or ''
