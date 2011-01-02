@@ -94,17 +94,30 @@ class DiffBrowser(QFrame):
 
     def __init__(self, parent):
         QFrame.__init__(self, parent)
-        self._ctx = None
-        framelayout = QVBoxLayout(self)
-        framelayout.setContentsMargins(0,0,0,0)
-        framelayout.setSpacing(0)
 
+        self.curchunks = []
+        self.countselected = 0
+        self._ctx = None
+
+        vbox = QVBoxLayout()
+        vbox.setContentsMargins(0,0,0,0)
+        vbox.setSpacing(0)
+        self.setLayout(vbox)
+
+        self.labelhbox = hbox = QHBoxLayout()
+        hbox.setContentsMargins(0,0,0,0)
+        hbox.setSpacing(0)
+        self.layout().addLayout(hbox)
         self.filenamelabel = w = QLabel()
+        hbox.addWidget(w)
         w.setWordWrap(True)
         f = w.textInteractionFlags()
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
-        self.layout().addWidget(w)
+
+        self.sumlabel = QLabel()
+        hbox.addStretch(1)
+        hbox.addWidget(self.sumlabel)
 
         self.extralabel = w = QLabel()
         w.setWordWrap(True)
@@ -140,6 +153,10 @@ class DiffBrowser(QFrame):
         self.sci.setLexer(lexer)
         self.clearDisplay()
 
+    def updateSummary(self):
+        self.sumlabel.setText(_('Chunks selected: %d / %d') % (
+            self.countselected, len(self.curchunks[1:])))
+
     @pyqtSlot(int, int, Qt.KeyboardModifiers)
     def marginClicked(self, margin, line, modifiers):
         for chunk in self.curchunks[1:]:
@@ -148,13 +165,16 @@ class DiffBrowser(QFrame):
                 if chunk.selected:
                     self.sci.markerAdd(chunk.mline, self.unselected)
                     chunk.selected = False
+                    self.countselected -= 1
                     for i in xrange(*chunk.lrange):
                         self.sci.markerDelete(i, self.selcolor)
                 else:
                     self.sci.markerAdd(chunk.mline, self.selected)
                     chunk.selected = True
+                    self.countselected += 1
                     for i in xrange(*chunk.lrange):
                         self.sci.markerAdd(i, self.selcolor)
+                self.updateSummary()
                 return
 
     def setContext(self, ctx):
@@ -172,6 +192,8 @@ class DiffBrowser(QFrame):
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
         self.curchunks = []
+        self.countselected = 0
+        self.updateSummary()
 
     def displayFile(self, filename, status):
         self.clearDisplay()
@@ -218,6 +240,8 @@ class DiffBrowser(QFrame):
                     self.sci.markerAdd(start+i, self.vertical)
             start += len(chunk.lines)
         self.curchunks = chunks
+        self.countselected = 0
+        self.updateSummary()
 
 def run(ui, *pats, **opts):
     'for testing purposes only'
