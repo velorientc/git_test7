@@ -76,10 +76,6 @@ class ChunksWidget(QWidget):
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.setContext(ctx or repo.changectx(None))
 
-        if not self.parent():
-            desktopgeom = qApp.desktop().availableGeometry()
-            self.resize(desktopgeom.size() * 0.8)
-
     @pyqtSlot(object, object, object)
     def displayFile(self, file, rev, status):
         self.diffbrowse.displayFile(file, status)
@@ -181,7 +177,7 @@ class DiffBrowser(QFrame):
         self.sci.clear()
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
-        self.chunks = []
+        self.curchunks = []
 
     def displayFile(self, filename, status):
         self.clearDisplay()
@@ -233,4 +229,7 @@ def run(ui, *pats, **opts):
     'for testing purposes only'
     from tortoisehg.util import paths
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return ChunksWidget(repo, None)
+    dlg = ChunksWidget(repo, None)
+    desktopgeom = qApp.desktop().availableGeometry()
+    dlg.resize(desktopgeom.size() * 0.8)
+    return dlg
