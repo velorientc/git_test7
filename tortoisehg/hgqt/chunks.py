@@ -47,22 +47,12 @@ class ChunksWidget(QWidget):
         self.splitter = QSplitter(self)
         self.layout().addWidget(self.splitter)
 
-        sp = SP(SP.Expanding, SP.Expanding)
-        sp.setHorizontalStretch(0)
-        sp.setVerticalStretch(0)
-        sp.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
-        self.splitter.setSizePolicy(sp)
         self.splitter.setOrientation(Qt.Vertical)
         self.splitter.setChildrenCollapsible(False)
 
         self.filelist = filelistview.HgFileListView(self)
 
         self.fileListFrame = QFrame(self.splitter)
-        sp = SP(SP.Preferred, SP.Preferred)
-        sp.setHorizontalStretch(3)
-        sp.setVerticalStretch(0)
-        sp.setHeightForWidth(self.fileListFrame.sizePolicy().hasHeightForWidth())
-        self.fileListFrame.setSizePolicy(sp)
         self.fileListFrame.setFrameShape(QFrame.NoFrame)
         vbox = QVBoxLayout()
         vbox.setSpacing(0)
@@ -74,6 +64,9 @@ class ChunksWidget(QWidget):
         self.diffbrowse.setFont(qtlib.getfont('fontlog').font())
         self.diffbrowse.showMessage.connect(self.showMessage)
         self.diffbrowse.linkActivated.connect(self.linkActivated)
+
+        self.splitter.setStretchFactor(0, 0)
+        self.splitter.setStretchFactor(1, 3)
         self.setContext(ctx or repo.changectx(None))
 
     @pyqtSlot(object, object, object)
