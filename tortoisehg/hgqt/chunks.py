@@ -155,7 +155,16 @@ class DiffBrowser(QFrame):
 
     @pyqtSlot(int, int, Qt.KeyboardModifiers)
     def marginClicked(self, margin, line, modifiers):
-        print margin, line, modifiers
+        for chunk in self.curchunks[1:]:
+            if line >= chunk.lrange[0] and line <= chunk.lrange[1]:
+                self.sci.markerDelete(chunk.mline, -1)
+                if chunk.selected:
+                    self.sci.markerAdd(chunk.mline, self.unselected)
+                    chunk.selected = False
+                else:
+                    self.sci.markerAdd(chunk.mline, self.selected)
+                    chunk.selected = True
+                return
 
     def setContext(self, ctx):
         self._ctx = ctx
@@ -208,6 +217,7 @@ class DiffBrowser(QFrame):
         start = 0
         self.sci.markerDeleteAll(-1)
         for chunk in chunks[1:]:
+            chunk.lrange = (start, start+len(chunk.lines)-1)
             chunk.mline = start + len(chunk.lines)/2
             for i in xrange(1,len(chunk.lines)-1):
                 if start + i == chunk.mline:
@@ -215,6 +225,7 @@ class DiffBrowser(QFrame):
                 else:
                     self.sci.markerAdd(start+i, self.vertical)
             start += len(chunk.lines)
+        self.curchunks = chunks
 
 def run(ui, *pats, **opts):
     'for testing purposes only'
