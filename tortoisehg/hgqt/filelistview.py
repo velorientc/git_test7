@@ -214,12 +214,13 @@ class HgFileListView(QTableView):
         self.contextmenu.exec_(event.globalPos())
 
     def resizeEvent(self, event):
-        vp_width = self.viewport().width()
-        col_widths = [self.columnWidth(i) \
-                      for i in range(1, self.model().columnCount())]
-        col_width = vp_width - sum(col_widths)
-        col_width = max(col_width, 50)
-        self.setColumnWidth(0, col_width)
+        if self.model():
+            vp_width = self.viewport().width()
+            col_widths = [self.columnWidth(i) \
+                        for i in range(1, self.model().columnCount())]
+            col_width = vp_width - sum(col_widths)
+            col_width = max(col_width, 50)
+            self.setColumnWidth(0, col_width)
         QTableView.resizeEvent(self, event)
 
     def nextFile(self):
