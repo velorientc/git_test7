@@ -36,6 +36,15 @@ class ShelveDialog(QMainWindow):
         self.browseb.linkActivated.connect(self.linkActivated)
         self.browseb.showMessage.connect(self.showMessage)
 
+        self.rbar = QToolBar(_('Refresh Toolbar'), objectName='rbar')
+        self.addToolBar(self.rbar)
+        self.refresh = a = QAction(_('Refresh'), self)
+        a.setIcon(qtlib.geticon('reload'))
+        a.setShortcut(QKeySequence.Refresh)
+        a.triggered.connect(self.browsea.refresh)
+        a.triggered.connect(self.browseb.refresh)
+        self.rbar.addAction(self.refresh)
+
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
         self.addToolBar(self.lefttbar)
         self.allright = a = QAction(_('Move all files right'), self)
