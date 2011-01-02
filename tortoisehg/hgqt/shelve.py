@@ -107,12 +107,17 @@ class ShelveDialog(QMainWindow):
         wb = "shelve/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
+        s.setValue(wb + 'filesplitter', self.browsea.splitter.saveState())
 
     def restoreSettings(self):
         s = QSettings()
         wb = "shelve/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
+        self.browsea.splitter.restoreState(
+                          s.value(wb + 'filesplitter').toByteArray())
+        self.browseb.splitter.restoreState(
+                          s.value(wb + 'filesplitter').toByteArray())
 
     def safeToExit(self):
         return True
