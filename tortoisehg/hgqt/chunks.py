@@ -84,7 +84,7 @@ class ChunksWidget(QWidget):
     def refresh(self):
         f = self.filelist.currentFile()
         ctx = self.filelistmodel._ctx
-        if isintance(ctx, patchctx):
+        if isinstance(ctx, patchctx):
             # if patch mtime has not changed, it could return the same ctx
             ctx = self.repo.changectx(ctx.path)
         else:
