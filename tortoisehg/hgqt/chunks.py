@@ -152,6 +152,7 @@ class DiffBrowser(QFrame):
 
         lexer = lexers.get_diff_lexer(self)
         self.sci.setLexer(lexer)
+        self.clearDisplay()
 
     @pyqtSlot(int, int, Qt.KeyboardModifiers)
     def marginClicked(self, margin, line, modifiers):
@@ -180,6 +181,7 @@ class DiffBrowser(QFrame):
         self.sci.clear()
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
+        self.chunks = []
 
     def displayFile(self, filename, status):
         self.clearDisplay()
