@@ -127,16 +127,21 @@ class DiffBrowser(QFrame):
         self.sci.setWrapMode(qsci.WrapCharacter)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.sci.setCaretLineVisible(False)
+
+        self.sci.setMarginType(1, qsci.SymbolMargin)
         self.sci.setMarginLineNumbers(1, False)
         self.sci.setMarginWidth(1, QFontMetrics(self.font()).width('XX'))
         self.sci.setMarginSensitivity(1, True)
         self.sci.marginClicked.connect(self.marginClicked)
-        self.sci.setMarginType(1, qsci.SymbolMargin)
         self.selected = self.sci.markerDefine(qsci.Plus, -1)
         self.unselected = self.sci.markerDefine(qsci.Minus, -1)
         self.vertical = self.sci.markerDefine(qsci.VerticalLine, -1)
-        mask = (1<<self.selected) | (1<<self.unselected) | (1<<self.vertical)
+        self.selcolor = self.sci.markerDefine(qsci.Background, -1)
+        self.sci.setMarkerBackgroundColor(QColor('#BBFFFF'), self.selcolor)
+        mask = (1 << self.selected) | (1 << self.unselected) | \
+               (1 << self.vertical) | (1 << self.selcolor)
         self.sci.setMarginMarkerMask(1, mask)
+
         self.layout().addWidget(self.sci, 1)
 
         lexer = lexers.get_diff_lexer(self)
@@ -146,14 +151,18 @@ class DiffBrowser(QFrame):
     @pyqtSlot(int, int, Qt.KeyboardModifiers)
     def marginClicked(self, margin, line, modifiers):
         for chunk in self.curchunks[1:]:
-            if line >= chunk.lrange[0] and line <= chunk.lrange[1]:
+            if line >= chunk.lrange[0] and line < chunk.lrange[1]:
                 self.sci.markerDelete(chunk.mline, -1)
                 if chunk.selected:
                     self.sci.markerAdd(chunk.mline, self.unselected)
                     chunk.selected = False
+                    for i in xrange(*chunk.lrange):
+                        self.sci.markerDelete(i, self.selcolor)
                 else:
                     self.sci.markerAdd(chunk.mline, self.selected)
                     chunk.selected = True
+                    for i in xrange(*chunk.lrange):
+                        self.sci.markerAdd(i, self.selcolor)
                 return
 
     def setContext(self, ctx):
@@ -208,7 +217,7 @@ class DiffBrowser(QFrame):
         start = 0
         self.sci.markerDeleteAll(-1)
         for chunk in chunks[1:]:
-            chunk.lrange = (start, start+len(chunk.lines)-1)
+            chunk.lrange = (start, start+len(chunk.lines))
             chunk.mline = start + len(chunk.lines)/2
             for i in xrange(1,len(chunk.lines)-1):
                 if start + i == chunk.mline:
