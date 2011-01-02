@@ -28,7 +28,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, patchctx
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.lexers import get_lexer, get_diff_lexer
@@ -572,7 +572,7 @@ class FileData(object):
         repo = ctx._repo
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
-        if type(ctx.rev()) == str:  # unapplied patch
+        if isinstance(ctx, patchctx.patchctx):
             self.diff = ctx.thgmqpatchdata(wfile)
             flags = ctx.flags(wfile)
             if flags in ('x', '-'):
