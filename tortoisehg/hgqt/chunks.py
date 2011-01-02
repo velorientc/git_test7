@@ -25,8 +25,9 @@ class ChunksWidget(QWidget):
 
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(QString)
+    chunksSelected = pyqtSignal(bool)
 
-    def __init__(self, repo, ctx, parent):
+    def __init__(self, repo, parent):
         QWidget.__init__(self, parent)
 
         self.repo = repo
@@ -56,10 +57,10 @@ class ChunksWidget(QWidget):
         self.diffbrowse.setFont(qtlib.getfont('fontlog').font())
         self.diffbrowse.showMessage.connect(self.showMessage)
         self.diffbrowse.linkActivated.connect(self.linkActivated)
+        self.diffbrowse.chunksSelected.connect(self.chunksSelected)
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 3)
-        self.setContext(ctx or repo.changectx(None))
 
     @pyqtSlot(object, object, object)
     def displayFile(self, file, rev, status):
@@ -91,6 +92,7 @@ class DiffBrowser(QFrame):
 
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(QString)
+    chunksSelected = pyqtSignal(bool)
 
     def __init__(self, parent):
         QFrame.__init__(self, parent)
@@ -156,6 +158,7 @@ class DiffBrowser(QFrame):
     def updateSummary(self):
         self.sumlabel.setText(_('Chunks selected: %d / %d') % (
             self.countselected, len(self.curchunks[1:])))
+        self.chunksSelected.emit(self.countselected > 0)
 
     @pyqtSlot(int, int, Qt.KeyboardModifiers)
     def marginClicked(self, margin, line, modifiers):
@@ -247,7 +250,8 @@ def run(ui, *pats, **opts):
     'for testing purposes only'
     from tortoisehg.util import paths
     repo = thgrepo.repository(ui, path=paths.find_root())
-    dlg = ChunksWidget(repo, None, None)
+    dlg = ChunksWidget(repo, None)
     desktopgeom = qApp.desktop().availableGeometry()
     dlg.resize(desktopgeom.size() * 0.8)
+    dlg.setContext(repo.changectx(None))
     return dlg

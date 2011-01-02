@@ -26,11 +26,11 @@ class ShelveDialog(QMainWindow):
         self.splitter.setChildrenCollapsible(False)
         self.setCentralWidget(self.splitter)
 
-        self.browsea = chunks.ChunksWidget(repo, ctxa, self.splitter)
+        self.browsea = chunks.ChunksWidget(repo, self.splitter)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
         self.browsea.linkActivated.connect(self.linkActivated)
         self.browsea.showMessage.connect(self.showMessage)
-        self.browseb = chunks.ChunksWidget(repo, ctxb, self.splitter)
+        self.browseb = chunks.ChunksWidget(repo, self.splitter)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
         self.browseb.linkActivated.connect(self.linkActivated)
         self.browseb.showMessage.connect(self.showMessage)
@@ -63,8 +63,16 @@ class ShelveDialog(QMainWindow):
         a.setIcon(qtlib.geticon('media-seek-backward'))
         self.xfertbar.addAction(self.allleft)
 
+        self.browsea.chunksSelected.connect(self.chunksright.setEnabled)
+        self.browsea.chunksSelected.connect(self.deletea.setEnabled)
+        self.browseb.chunksSelected.connect(self.chunksleft.setEnabled)
+        self.browseb.chunksSelected.connect(self.deleteb.setEnabled)
+
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
+
+        self.browsea.setContext(ctxa or repo.changectx(None))
+        self.browseb.setContext(ctxb or repo.changectx(None))
 
         self.restoreSettings()
 
