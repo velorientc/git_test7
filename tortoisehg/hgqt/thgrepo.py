@@ -438,7 +438,7 @@ def _extendrepo(repo):
 
         def invalidateui(self):
             'Should be called when mtime of ui files are changed'
-            self.ui = ui.ui()
+            self.ui = uimod.ui()
             self.ui.readconfig(self.join('hgrc'))
             for a in _uiprops:
                 if a in self.__dict__:
