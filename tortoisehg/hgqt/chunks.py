@@ -76,6 +76,10 @@ class ChunksWidget(QWidget):
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.setContext(ctx or repo.changectx(None))
 
+        if not self.parent():
+            desktopgeom = qApp.desktop().availableGeometry()
+            self.resize(desktopgeom.size() * 0.8)
+
     @pyqtSlot(object, object, object)
     def displayFile(self, file, rev, status):
         self.diffbrowse.displayFile(file, status)
@@ -135,11 +139,23 @@ class DiffBrowser(QFrame):
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.sci.setCaretLineVisible(False)
         self.sci.setMarginLineNumbers(1, False)
-        self.sci.setMarginWidth(1, '')
+        self.sci.setMarginWidth(1, QFontMetrics(self.font()).width('XX'))
+        self.sci.setMarginSensitivity(1, True)
+        self.sci.marginClicked.connect(self.marginClicked)
+        self.sci.setMarginType(1, qsci.SymbolMargin)
+        self.selected = self.sci.markerDefine(qsci.Plus, -1)
+        self.unselected = self.sci.markerDefine(qsci.Minus, -1)
+        self.vertical = self.sci.markerDefine(qsci.VerticalLine, -1)
+        mask = (1<<self.selected) | (1<<self.unselected) | (1<<self.vertical)
+        self.sci.setMarginMarkerMask(1, mask)
         self.layout().addWidget(self.sci, 1)
 
         lexer = lexers.get_diff_lexer(self)
         self.sci.setLexer(lexer)
+
+    @pyqtSlot(int, int, Qt.KeyboardModifiers)
+    def marginClicked(self, margin, line, modifiers):
+        print margin, line, modifiers
 
     def setContext(self, ctx):
         self._ctx = ctx
@@ -180,13 +196,25 @@ class DiffBrowser(QFrame):
             buf.seek(0)
             chunks = record.parsepatch(buf)
 
-        # TODO: use indicators to represent current and selection state
-        outbuf = cStringIO.StringIO()
-        for chunk in chunks:
-            chunk.write(outbuf)
-        lines = outbuf.getvalue().splitlines()[3:]
-        utext = [hglib.tounicode(l) for l in lines]
+        utext = []
+        for chunk in chunks[1:]:
+            buf = cStringIO.StringIO()
+            chunk.selected = False
+            chunk.write(buf)
+            chunk.lines = buf.getvalue().splitlines()
+            utext += [hglib.tounicode(l) for l in chunk.lines]
         self.sci.setText(u'\n'.join(utext))
+
+        start = 0
+        self.sci.markerDeleteAll(-1)
+        for chunk in chunks[1:]:
+            chunk.mline = start + len(chunk.lines)/2
+            for i in xrange(1,len(chunk.lines)-1):
+                if start + i == chunk.mline:
+                    self.sci.markerAdd(chunk.mline, self.unselected)
+                else:
+                    self.sci.markerAdd(start+i, self.vertical)
+            start += len(chunk.lines)
 
 def run(ui, *pats, **opts):
     'for testing purposes only'
