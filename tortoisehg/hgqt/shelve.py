@@ -28,11 +28,19 @@ class ShelveDialog(QMainWindow):
 
         self.browsea = chunks.ChunksWidget(repo, ctxa, self.splitter)
         self.browseb = chunks.ChunksWidget(repo, ctxb, self.splitter)
+        self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
+        self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
         self.restoreSettings()
+
+    def linkSplitters(self, pos, index):
+        if self.browsea.splitter.sizes()[0] != pos:
+            self.browsea.splitter.moveSplitter(pos, index)
+        if self.browseb.splitter.sizes()[0] != pos:
+            self.browseb.splitter.moveSplitter(pos, index)
 
     def linkActivated(self, linktext):
         pass
@@ -51,6 +59,9 @@ class ShelveDialog(QMainWindow):
         wb = "shelve/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
+
+    def safeToExit(self):
+        return True
 
     def closeEvent(self, event):
         if not self.safeToExit():
