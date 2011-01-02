@@ -555,6 +555,11 @@ def status(ui, *pats, **opts):
     from tortoisehg.hgqt.status import run
     return qtrun(run, ui, *pats, **opts)
 
+def shelve(ui, *pats, **opts):
+    """browse working copy status"""
+    from tortoisehg.hgqt.shelve import run
+    return qtrun(run, ui, *pats, **opts)
+
 def tag(ui, *pats, **opts):
     """tag tool"""
     from tortoisehg.hgqt.tag import run
@@ -1001,6 +1006,7 @@ table = {
           ('', 'remove', None, _('remove a tag')),
           ('m', 'message', '', _('use <text> as commit message')),],
          _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
+    "shelve": (shelve, [], _('thg shelve')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^purge": (purge, [], _('thg purge')),
