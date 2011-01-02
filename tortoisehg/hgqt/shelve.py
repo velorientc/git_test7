@@ -88,6 +88,7 @@ class ShelveDialog(QMainWindow):
         self.browsea.setContext(ctxa or repo.changectx(None))
         self.browseb.setContext(ctxb or repo.changectx(None))
 
+        self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
 
     def linkSplitters(self, pos, index):
