@@ -130,16 +130,25 @@ class ShelveDialog(QMainWindow):
         self.setStatusBar(self.statusbar)
 
         self.refreshCombos()
+        repo.repositoryChanged.connect(self.repositoryChanged)
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
 
+    def repositoryChanged(self):
+        # TODO: preserve selection through refresh
+        self.refreshCombos()
+
     def refreshCombos(self):
         self.comboa.clear()
         self.combob.clear()
-        # TODO: scan for unapplied patches and shelves
-        self.comboa.addItems([_('Working Directory')])
-        self.combob.addItems([_('Working Directory')])
+        patches = self.repo.thgmqunappliedpatches[:]
+        patches = [hglib.tounicode(self.repo.mq.join(p)) for p in patches]
+        # TODO: scan for shelves
+        self.comboa.addItems([self.wdir] + patches)
+        self.combob.addItems(patches)
+        if not patches:
+            self.deleteShelfB.setEnabled(False)
 
     @pyqtSlot(int)
     def comboAChanged(self, index):
@@ -149,17 +158,15 @@ class ShelveDialog(QMainWindow):
         else:
             self.deleteShelfA.setEnabled(True)
             rev = hglib.fromunicode(self.comboa.itemText(index))
+            # TODO: disable this patch/shelve in comboB
         self.browsea.setContext(self.repo.changectx(rev))
 
     @pyqtSlot(int)
     def comboBChanged(self, index):
-        if index == 0:
-            rev = None
-            self.deleteShelfB.setEnabled(False)
-        else:
-            self.deleteShelfB.setEnabled(True)
-            rev = hglib.fromunicode(self.combob.itemText(index))
+        self.deleteShelfB.setEnabled(True)
+        rev = hglib.fromunicode(self.combob.itemText(index))
         self.browseb.setContext(self.repo.changectx(rev))
+        # TODO: disable this patch/shelve in comboA
 
     def refresh(self):
         self.browsea.refresh()
