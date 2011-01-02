@@ -59,5 +59,9 @@
     <file>icons/help-browser.svg</file>
     <file>icons/view-refresh.svg</file>
     <file>icons/Checkmark.svg</file>
+    <file>icons/media-seek-forward.svg</file>
+    <file>icons/media-seek-backward.svg</file>
+    <file>icons/media-playback-start.svg</file>
+    <file>icons/edit-cut.svg</file>
   </qresource>
 </RCC>
