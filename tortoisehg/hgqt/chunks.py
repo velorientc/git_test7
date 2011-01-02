@@ -26,6 +26,7 @@ class ChunksWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(QString)
     chunksSelected = pyqtSignal(bool)
+    fileSelected = pyqtSignal(bool)
 
     def __init__(self, repo, parent):
         QWidget.__init__(self, parent)
@@ -64,9 +65,15 @@ class ChunksWidget(QWidget):
 
     @pyqtSlot(object, object, object)
     def displayFile(self, file, rev, status):
-        self.diffbrowse.displayFile(file, status)
+        if file:
+            self.diffbrowse.displayFile(file, status)
+            self.fileSelected.emit(True)
+        else:
+            self.diffbrowse.clearDisplay()
+            self.fileSelected.emit(False)
 
     def setContext(self, ctx):
+        self.fileSelected.emit(False)
         self.filelistmodel = filelistmodel.HgFileListModel(self.repo, self)
         self.filelist.setModel(self.filelistmodel)
         self.filelist.fileRevSelected.connect(self.displayFile)
