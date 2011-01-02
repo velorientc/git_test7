@@ -26,8 +26,8 @@ class ChunksWidget(QWidget):
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, ctx):
-        QWidget.__init__(self)
+    def __init__(self, repo, ctx, parent):
+        QWidget.__init__(self, parent)
 
         self.repo = repo
 
@@ -247,7 +247,7 @@ def run(ui, *pats, **opts):
     'for testing purposes only'
     from tortoisehg.util import paths
     repo = thgrepo.repository(ui, path=paths.find_root())
-    dlg = ChunksWidget(repo, None)
+    dlg = ChunksWidget(repo, None, None)
     desktopgeom = qApp.desktop().availableGeometry()
     dlg.resize(desktopgeom.size() * 0.8)
     return dlg
