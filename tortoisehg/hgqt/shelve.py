@@ -27,9 +27,13 @@ class ShelveDialog(QMainWindow):
         self.setCentralWidget(self.splitter)
 
         self.browsea = chunks.ChunksWidget(repo, ctxa, self.splitter)
-        self.browseb = chunks.ChunksWidget(repo, ctxb, self.splitter)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
+        self.browsea.linkActivated.connect(self.linkActivated)
+        self.browsea.showMessage.connect(self.showMessage)
+        self.browseb = chunks.ChunksWidget(repo, ctxb, self.splitter)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
+        self.browseb.linkActivated.connect(self.linkActivated)
+        self.browseb.showMessage.connect(self.showMessage)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
