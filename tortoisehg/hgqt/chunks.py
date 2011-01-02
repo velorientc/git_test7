@@ -139,7 +139,10 @@ class DiffBrowser(QFrame):
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.setWrapMode(qsci.WrapCharacter)
-        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
+
+        i = qscilib.KeyPressInterceptor(self, None, [QKeySequence.SelectAll,
+                                                     QKeySequence.New])
+        self.sci.installEventFilter(i)
         self.sci.setCaretLineVisible(False)
 
         self.sci.setMarginType(1, qsci.SymbolMargin)
@@ -158,6 +161,13 @@ class DiffBrowser(QFrame):
 
         self.layout().addWidget(self.sci, 1)
 
+        self.selall = QShortcut(QKeySequence.SelectAll, self)
+        self.selall.activated.connect(self.selectAll)
+        self.selall.activatedAmbiguously.connect(self.selectAll)
+        self.selnone = QShortcut(QKeySequence.New, self)
+        self.selnone.activated.connect(self.selectNone)
+        self.selnone.activatedAmbiguously.connect(self.selectNone)
+
         lexer = lexers.get_diff_lexer(self)
         self.sci.setLexer(lexer)
         self.clearDisplay()
@@ -166,6 +176,30 @@ class DiffBrowser(QFrame):
         self.sumlabel.setText(_('Chunks selected: %d / %d') % (
             self.countselected, len(self.curchunks[1:])))
         self.chunksSelected.emit(self.countselected > 0)
+
+    @pyqtSlot()
+    def selectAll(self):
+        for chunk in self.curchunks[1:]:
+            if not chunk.selected:
+                self.sci.markerDelete(chunk.mline, -1)
+                self.sci.markerAdd(chunk.mline, self.selected)
+                chunk.selected = True
+                self.countselected += 1
+                for i in xrange(*chunk.lrange):
+                    self.sci.markerAdd(i, self.selcolor)
+        self.updateSummary()
+
+    @pyqtSlot()
+    def selectNone(self):
+        for chunk in self.curchunks[1:]:
+            if chunk.selected:
+                self.sci.markerDelete(chunk.mline, -1)
+                self.sci.markerAdd(chunk.mline, self.unselected)
+                chunk.selected = False
+                self.countselected -= 1
+                for i in xrange(*chunk.lrange):
+                    self.sci.markerDelete(i, self.selcolor)
+        self.updateSummary()
 
     @pyqtSlot(int, int, Qt.KeyboardModifiers)
     def marginClicked(self, margin, line, modifiers):
