@@ -13,10 +13,14 @@ from tortoisehg.hgqt import qtlib, cmdui, chunks
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+
 class ShelveDialog(QMainWindow):
+
     finished = pyqtSignal(int)
 
-    def __init__(self, repo, ctxa, ctxb):
+    wdir = _('Working Directory')
+
+    def __init__(self, repo):
         QMainWindow.__init__(self)
 
         self.repo = repo
@@ -27,23 +31,63 @@ class ShelveDialog(QMainWindow):
         self.splitter.setObjectName('splitter')
         self.setCentralWidget(self.splitter)
 
-        self.browsea = chunks.ChunksWidget(repo, self.splitter)
+        aframe = QFrame(self.splitter)
+        avbox = QVBoxLayout()
+        avbox.setSpacing(2)
+        avbox.setMargin(2)
+        avbox.setContentsMargins(2, 2, 2, 2)
+        aframe.setLayout(avbox)
+        ahbox = QHBoxLayout()
+        ahbox.setSpacing(2)
+        ahbox.setMargin(2)
+        ahbox.setContentsMargins(2, 2, 2, 2)
+        avbox.addLayout(ahbox)
+        self.comboa = QComboBox(self)
+        self.comboa.currentIndexChanged.connect(self.comboAChanged)
+        self.newShelfA = QPushButton(_('New Shelf'))
+        self.deleteShelfA = QPushButton(_('Delete Shelf'))
+        ahbox.addWidget(self.comboa, 1)
+        ahbox.addWidget(self.newShelfA)
+        ahbox.addWidget(self.deleteShelfA)
+
+        self.browsea = chunks.ChunksWidget(repo, self)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
         self.browsea.linkActivated.connect(self.linkActivated)
         self.browsea.showMessage.connect(self.showMessage)
-        self.browseb = chunks.ChunksWidget(repo, self.splitter)
+        avbox.addWidget(self.browsea)
+
+        bframe = QFrame(self.splitter)
+        bvbox = QVBoxLayout()
+        bvbox.setSpacing(2)
+        bvbox.setMargin(2)
+        bvbox.setContentsMargins(2, 2, 2, 2)
+        bframe.setLayout(bvbox)
+        bhbox = QHBoxLayout()
+        bhbox.setSpacing(2)
+        bhbox.setMargin(2)
+        bhbox.setContentsMargins(2, 2, 2, 2)
+        bvbox.addLayout(bhbox)
+        self.combob = QComboBox(self)
+        self.combob.currentIndexChanged.connect(self.comboBChanged)
+        self.newShelfB = QPushButton(_('New Shelf'))
+        self.deleteShelfB = QPushButton(_('Delete Shelf'))
+        bhbox.addWidget(self.combob, 1)
+        bhbox.addWidget(self.newShelfB)
+        bhbox.addWidget(self.deleteShelfB)
+
+        self.browseb = chunks.ChunksWidget(repo, self)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
         self.browseb.linkActivated.connect(self.linkActivated)
         self.browseb.showMessage.connect(self.showMessage)
+        bvbox.addWidget(self.browseb)
 
         self.rbar = QToolBar(_('Refresh Toolbar'), objectName='rbar')
         self.addToolBar(self.rbar)
-        self.refresh = a = QAction(_('Refresh'), self)
+        self.refreshAction = a = QAction(_('Refresh'), self)
         a.setIcon(qtlib.geticon('reload'))
         a.setShortcut(QKeySequence.Refresh)
-        a.triggered.connect(self.browsea.refresh)
-        a.triggered.connect(self.browseb.refresh)
-        self.rbar.addAction(self.refresh)
+        a.triggered.connect(self.refresh)
+        self.rbar.addAction(self.refreshAction)
 
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
         self.addToolBar(self.lefttbar)
@@ -85,11 +129,42 @@ class ShelveDialog(QMainWindow):
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
 
-        self.browsea.setContext(ctxa or repo.changectx(None))
-        self.browseb.setContext(ctxb or repo.changectx(None))
+        self.refreshCombos()
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
+
+    def refreshCombos(self):
+        self.comboa.clear()
+        self.combob.clear()
+        # TODO: scan for unapplied patches and shelves
+        self.comboa.addItems([_('Working Directory')])
+        self.combob.addItems([_('Working Directory')])
+
+    @pyqtSlot(int)
+    def comboAChanged(self, index):
+        if index == 0:
+            rev = None
+            self.deleteShelfA.setEnabled(False)
+        else:
+            self.deleteShelfA.setEnabled(True)
+            rev = hglib.fromunicode(self.comboa.itemText(index))
+        self.browsea.setContext(self.repo.changectx(rev))
+
+    @pyqtSlot(int)
+    def comboBChanged(self, index):
+        if index == 0:
+            rev = None
+            self.deleteShelfB.setEnabled(False)
+        else:
+            self.deleteShelfB.setEnabled(True)
+            rev = hglib.fromunicode(self.combob.itemText(index))
+        self.browseb.setContext(self.repo.changectx(rev))
+
+    def refresh(self):
+        self.browsea.refresh()
+        self.browseb.refresh()
+        self.refreshCombos()
 
     def linkSplitters(self, pos, index):
         if self.browsea.splitter.sizes()[0] != pos:
@@ -135,4 +210,4 @@ def run(ui, *pats, **opts):
     from tortoisehg.util import paths
     from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return ShelveDialog(repo, None, None)
+    return ShelveDialog(repo)
