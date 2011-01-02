@@ -31,13 +31,6 @@ class ChunksWidget(QWidget):
 
         self.repo = repo
 
-        SP = QSizePolicy
-        sp = SP(SP.Preferred, SP.Expanding)
-        sp.setHorizontalStretch(0)
-        sp.setVerticalStretch(0)
-        sp.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
-        self.setSizePolicy(sp)
-
         layout = QVBoxLayout(self)
         layout.setSpacing(0)
         layout.setMargin(0)
@@ -45,10 +38,9 @@ class ChunksWidget(QWidget):
         self.setLayout(layout)
 
         self.splitter = QSplitter(self)
-        self.layout().addWidget(self.splitter)
-
         self.splitter.setOrientation(Qt.Vertical)
         self.splitter.setChildrenCollapsible(False)
+        self.layout().addWidget(self.splitter)
 
         self.filelist = filelistview.HgFileListView(self)
 
