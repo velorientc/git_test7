@@ -171,16 +171,14 @@ class ShelveDialog(QMainWindow):
             self.deleteShelfA.setEnabled(False)
         else:
             self.deleteShelfA.setEnabled(True)
-            rev = hglib.fromunicode(self.comboa.itemText(index))
-            # TODO: disable this patch/shelve in comboB
+            rev = hglib.fromunicode(self.comboa.currentText())
         self.browsea.setContext(self.repo.changectx(rev))
 
     @pyqtSlot(int)
     def comboBChanged(self, index):
         self.deleteShelfB.setEnabled(True)
-        rev = hglib.fromunicode(self.combob.itemText(index))
+        rev = hglib.fromunicode(self.combob.currentText())
         self.browseb.setContext(self.repo.changectx(rev))
-        # TODO: disable this patch/shelve in comboA
 
     def refresh(self):
         self.browsea.refresh()
