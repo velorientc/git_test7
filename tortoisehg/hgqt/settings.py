@@ -568,7 +568,7 @@ class SettingsDialog(QDialog):
         utab = SettingsForm(rcpath=util.user_rcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
-        utab.extensionsChanged.connect(self.markExtensionsChanged)
+        utab.restartRequested.connect(self._pushRestartRequest)
 
         try:
             if root is None:
@@ -588,7 +588,7 @@ class SettingsDialog(QDialog):
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
                                  _('%s repository settings') % repo.displayname)
-            rtab.extensionsChanged.connect(self.markExtensionsChanged)
+            rtab.restartRequested.connect(self._pushRestartRequest)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -597,7 +597,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
-        self.changesInExtensions = False
+        self._restartreqs = set()
 
         self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
 
@@ -605,16 +605,19 @@ class SettingsDialog(QDialog):
         return util.any(self.conftabs.widget(i).isDirty()
                         for i in xrange(self.conftabs.count()))
 
-    def markExtensionsChanged(self):
-        self.changesInExtensions = True
+    @pyqtSlot(unicode)
+    def _pushRestartRequest(self, key):
+        self._restartreqs.add(unicode(key))
 
     def applyChanges(self):
         for i in xrange(self.conftabs.count()):
             self.conftabs.widget(i).applyChanges()
-        if self.changesInExtensions:
-            qtlib.InfoMsgBox(_('Settings - Extensions'),
-                _('Restart all TortoiseHg applications'
-                  ' for changes to extensions to take effect.'))
+        if self._restartreqs:
+            qtlib.InfoMsgBox(_('Settings'),
+                             _('Restart all TortoiseHg applications'
+                               ' for the following changes to take effect:'),
+                             ', '.join(sorted(self._restartreqs)))
+            self._restartreqs.clear()
 
     def canExit(self):
         if self.isDirty():
@@ -647,7 +650,7 @@ class SettingsDialog(QDialog):
 class SettingsForm(QWidget):
     """Widget for each settings file"""
 
-    extensionsChanged = pyqtSignal()
+    restartRequested = pyqtSignal(unicode)
 
     def __init__(self, rcpath, focus=None, parent=None):
         super(SettingsForm, self).__init__(parent)
@@ -919,7 +922,7 @@ class SettingsForm(QWidget):
         enabledexts = hglib.enabledextensions()
         for chk in self.pages['extensions'][2]:
             if (not emitChanged) and chk.isDirty():
-                self.extensionsChanged.emit()
+                self.restartRequested.emit(_('Extensions'))
                 emitChanged = True
             key = chk.opts['label']
             newvalue = chk.value()
