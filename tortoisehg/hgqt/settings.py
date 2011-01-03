@@ -9,7 +9,7 @@ import os
 
 from mercurial import ui, util, error
 
-from tortoisehg.util import hglib, settings, paths, wconfig
+from tortoisehg.util import hglib, settings, paths, wconfig, i18n
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo
 
@@ -244,16 +244,24 @@ def genCheckBox(opts):
 
 class _fi(object):
     """Information of each field"""
-    __slots__ = ('label', 'cpath', 'values', 'tooltip')
+    __slots__ = ('label', 'cpath', 'values', 'tooltip',
+                 'restartneeded', 'globalonly')
 
-    def __init__(self, label, cpath, values, tooltip):
+    def __init__(self, label, cpath, values, tooltip,
+                 restartneeded=False, globalonly=False):
         self.label = label
         self.cpath = cpath
         self.values = values
         self.tooltip = tooltip
+        self.restartneeded = restartneeded
+        self.globalonly = globalonly
 
 INFO = (
 ({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
+    _fi(_('UI Language'), 'tortoisehg.ui.language',
+        (genDeferredCombo, i18n.availablelanguages),
+        _('Specify your preferred user interface language (restart needed)'),
+        restartneeded=True, globalonly=True),
     _fi(_('Three-way Merge Tool'), 'ui.merge',
         (genDeferredCombo, findMergeTools),
         _('Graphical merge program for resolving merge conflicts.  If left'
@@ -816,6 +824,8 @@ class SettingsForm(QWidget):
                 func = e.values
                 w = func(opts)
             w.installEventFilter(self)
+            if e.globalonly:
+                w.setEnabled(self.rcpath == util.user_rcpath())
             lbl = QLabel(e.label)
             lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)
@@ -896,10 +906,11 @@ class SettingsForm(QWidget):
         return wconfig.readfile(self.fn)
 
     def recordNewValue(self, cpath, newvalue):
+        """Set the given value to ini; returns True if changed"""
         # 'newvalue' is in local encoding
         section, key = cpath.split('.', 1)
         if newvalue == self.ini.get(section, key):
-            return
+            return False
         if newvalue == None:
             try:
                 del self.ini[section][key]
@@ -907,6 +918,7 @@ class SettingsForm(QWidget):
                 pass
         else:
             self.ini.set(section, key, newvalue)
+        return True
 
     def applyChanges(self):
         if self.readonly:
@@ -918,7 +930,9 @@ class SettingsForm(QWidget):
             else:
                 for row, e in enumerate(info):
                     newvalue = widgets[row].value()
-                    self.recordNewValue(e.cpath, newvalue)
+                    changed = self.recordNewValue(e.cpath, newvalue)
+                    if changed and e.restartneeded:
+                        self.restartRequested.emit(e.label)
 
         try:
             wconfig.writefile(self.ini, self.fn)

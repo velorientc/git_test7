@@ -25,7 +25,7 @@ import mercurial.ui as _ui
 from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.hgqt.i18n import agettext as _
-from tortoisehg.util import hglib, paths, shlib
+from tortoisehg.util import hglib, paths, shlib, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.bugreport import run as bugrun
@@ -247,6 +247,7 @@ def runcommand(ui, args):
     cmd, func, args, options, cmdoptions, alias = _parse(ui, args)
     cmdoptions['alias'] = alias
     ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
+    i18n.setlanguage(ui.config('tortoisehg', 'ui.language'))
 
     if options['help']:
         return help_(ui, cmd)
