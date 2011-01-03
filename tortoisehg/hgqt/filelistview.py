@@ -214,7 +214,7 @@ class HgFileListView(QTableView):
         self.contextmenu.exec_(event.globalPos())
 
     def resizeEvent(self, event):
-        if self.model():
+        if self.model() is not None:
             vp_width = self.viewport().width()
             col_widths = [self.columnWidth(i) \
                         for i in range(1, self.model().columnCount())]
