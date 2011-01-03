@@ -32,17 +32,25 @@ class patchctx(object):
         self._repo = repo
         self._rev = rev
         self._status = [[], [], []]
+        self._user = ''
+        self._date = ''
+        self._desc = ''
+        self._branch = ''
+        self._node = node.nullid
 
-        ph = mq.patchheader(self._path)
-        self._ph = ph
+        try:
+            ph = mq.patchheader(self._path)
+            self._ph = ph
+        except EnvironmentError:
+            return
+
         try:
             self._branch = ph.branch or ''
             self._node = binascii.unhexlify(ph.nodeid)
         except TypeError:
-            self._node = node.nullid
+            pass
         except AttributeError:
             # hacks to try to deal with older versions of mq.py
-            self._node = node.nullid
             self._branch = ''
             ph.diffstartline = len(ph.comments)
             if ph.message:
@@ -127,7 +135,7 @@ class patchctx(object):
 
     @propertycache
     def _files(self):
-        if not self._ph.haspatch:
+        if not hasattr(self, '_ph') or not self._ph.haspatch:
             return {}
 
         M, A, R = 0, 1, 2
