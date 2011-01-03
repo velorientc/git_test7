@@ -45,7 +45,10 @@ def availablelanguages():
     basedir = paths.get_locale_path()
     def mopath(lang):
         return os.path.join(basedir, lang, 'LC_MESSAGES', 'tortoisehg.mo')
-    langs = [e for e in os.listdir(basedir) if os.path.exists(mopath(e))]
+    if os.path.exists(basedir): # locale/ is an install option
+        langs = [e for e in os.listdir(basedir) if os.path.exists(mopath(e))]
+    else:
+        langs = []
     langs.append('en')  # means null translation
     return sorted(langs)
 
