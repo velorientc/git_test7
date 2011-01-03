@@ -242,9 +242,19 @@ def genCheckBox(opts):
     opts['nohist'] = True
     return SettingsCheckBox(**opts)
 
+class _fi(object):
+    """Information of each field"""
+    __slots__ = ('label', 'cpath', 'values', 'tooltip')
+
+    def __init__(self, label, cpath, values, tooltip):
+        self.label = label
+        self.cpath = cpath
+        self.values = values
+        self.tooltip = tooltip
+
 INFO = (
 ({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
-    (_('Three-way Merge Tool'), 'ui.merge',
+    _fi(_('Three-way Merge Tool'), 'ui.merge',
         (genDeferredCombo, findMergeTools),
         _('Graphical merge program for resolving merge conflicts.  If left'
         ' unspecified, Mercurial will use the first applicable tool it finds'
@@ -252,50 +262,50 @@ INFO = (
         ' markers in place.  Chose internal:merge to force conflict markers,'
         ' internal:prompt to always select local or other, or internal:dump'
         ' to leave files in the working directory for manual merging')),
-    (_('Visual Diff Tool'), 'tortoisehg.vdiff',
+    _fi(_('Visual Diff Tool'), 'tortoisehg.vdiff',
         (genDeferredCombo, findDiffTools),
         _('Specify visual diff tool, as described in the [merge-tools]'
           ' section of your Mercurial configuration files.  If left'
           ' unspecified, TortoiseHg will use the selected merge tool.'
           ' Failing that it uses the first applicable tool it finds.')),
-    (_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
+    _fi(_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
         _('Specify the visual editor used to view files.  Format:<br>'
           'myeditor -flags [$FILE --num=$LINENUM][--search $SEARCH]<br><br>'
           'See <a href="%s">OpenAtLine</a>'
           % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
-    (_('Shell'), 'tortoisehg.shell', genEditCombo,
+    _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
         _('Specify your preferred terminal shell application')),
-    (_('Immediate Operations'), 'tortoisehg.immediate', genEditCombo,
+    _fi(_('Immediate Operations'), 'tortoisehg.immediate', genEditCombo,
         _('Space separated list of shell operations you would like '
           'to be performed immediately, without user interaction. '
           'Commands are "add remove revert forget". '
           'Default: None (leave blank)')),
-    (_('Poll Frequency'), 'tortoisehg.pollfreq', genIntEditCombo,
+    _fi(_('Poll Frequency'), 'tortoisehg.pollfreq', genIntEditCombo,
         _('The period (in milliseconds) between modification time polling of '
           'key repository files, looking for changes.  Values under '
           '100ms are ignored.  Default: 500')),
-    (_('Visible Whitespace'), 'tortoisehg.wsvisible', (genDefaultCombo,
+    _fi(_('Visible Whitespace'), 'tortoisehg.wsvisible', (genDefaultCombo,
         ['Visible', 'Invisible', 'VisibleAfterIndent']),
         _('Make whitespace visible in file and diff previews.'
           ' Default: Invisible')),
-    (_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
+    _fi(_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
         _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHg windows.'
         ' Default: 0, Not expanded')),
-    (_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
+    _fi(_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
         _('The maximum size file (in KB) that TortoiseHg will '
         'show changes for in the changelog, status, and commit windows.'
         ' A value of zero implies no limit.  Default: 1024 (1MB)')),
-    (_('Capture stderr'), 'tortoisehg.stderrcapt', genBoolCombo,
+    _fi(_('Capture stderr'), 'tortoisehg.stderrcapt', genBoolCombo,
         _('Redirect stderr to a buffer which is parsed at the end of'
         ' the process for runtime errors. Default: True')),
-    (_('Fork GUI'), 'tortoisehg.guifork', genBoolCombo,
+    _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolCombo,
         _('When running from the command line, fork a background'
         ' process to run graphical dialogs.  Default: True')),
-    (_('Full Path Title'), 'tortoisehg.fullpath', genBoolCombo,
+    _fi(_('Full Path Title'), 'tortoisehg.fullpath', genBoolCombo,
         _('Show a full directory path of the repository in the dialog title'
         ' instead of just the root directory name.  Default: False')),
-    (_('Auto-resolve merges'), 'tortoisehg.autoresolve', genBoolCombo,
+    _fi(_('Auto-resolve merges'), 'tortoisehg.autoresolve', genBoolCombo,
         _('Indicates whether TortoiseHg should attempt to automatically resolve'
           ' changes from both sides to the same file, and only report merge'
           ' conflicts when this is not possible. When False, all files with'
@@ -306,42 +316,42 @@ INFO = (
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
-    (_('Author Coloring'), 'tortoisehg.authorcolor', genBoolCombo,
+    _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolCombo,
         _('Color changesets by author name.  If not enabled,'
         ' the changes are colored green for merge, red for'
         ' non-trivial parents, black for normal.'
         ' Default: False')),
-    (_('Task Tabs'), 'tortoisehg.tasktabs', genBoolCombo,
+    _fi(_('Task Tabs'), 'tortoisehg.tasktabs', genBoolCombo,
         _('Show tabs along the right side of the bottom half of each repo'
         ' widget allowing one to switch task tabs without using the toolbar.'
         ' Changes to this parameter do not take effect until the Workbench is'
         ' restarted, or a new repository tab is opened.'
         ' Default: False')),
-    (_('Long Summary'), 'tortoisehg.longsummary', genBoolCombo,
+    _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolCombo,
         _('If true, concatenate multiple lines of changeset summary'
         ' until they reach 80 characters.'
         ' Default: False')),
-    (_('Log Batch Size'), 'tortoisehg.graphlimit', genIntEditCombo,
+    _fi(_('Log Batch Size'), 'tortoisehg.graphlimit', genIntEditCombo,
         _('The number of revisions to read and display in the'
         ' changelog viewer in a single batch.'
         ' Default: 500')),
-    (_('Dead Branches'), 'tortoisehg.deadbranch', genEditCombo,
+    _fi(_('Dead Branches'), 'tortoisehg.deadbranch', genEditCombo,
         _('Comma separated list of branch names that should be ignored'
         ' when building a list of branch names for a repository.'
         ' Default: None (leave blank)')),
-    (_('Branch Colors'), 'tortoisehg.branchcolors', genEditCombo,
+    _fi(_('Branch Colors'), 'tortoisehg.branchcolors', genEditCombo,
         _('Space separated list of branch names and colors of the form'
         ' branch:#XXXXXX. Spaces and colons in the branch name must be'
         ' escaped using a backslash (\\). Likewise some other characters'
         ' can be escaped in this way, e.g. \\u0040 will be decoded to the'
         ' @ character, and \\n to a linefeed.'
         ' Default: None (leave blank)')),
-    (_('Hide Tags'), 'tortoisehg.hidetags', genEditCombo,
+    _fi(_('Hide Tags'), 'tortoisehg.hidetags', genEditCombo,
         _('Space separated list of tags that will not be shown.'
         ' Useful example: Specify "qbase qparent qtip" to hide the'
         ' standard tags inserted by the Mercurial Queues Extension.'
         ' Default: None (leave blank)')),
-    (_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
+    _fi(_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
         ['none', 'update', 'fetch', 'rebase']),
         _('Operation which is performed directly after a successful pull.'
         ' update equates to pull --update, fetch equates to the fetch'
@@ -349,28 +359,28 @@ INFO = (
     )),
 
 ({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit'}, (
-    (_('Username'), 'ui.username', genEditCombo,
+    _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is<br>'
           '"Full Name &lt;email@example.com&gt;"')),
-    (_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
+    _fi(_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
        _('Suggested length of commit message lines. A red vertical'
          ' line will mark this length.  CTRL-E will reflow the current'
          ' paragraph to the specified line length. Default: 80')),
-    (_('Close After Commit'), 'tortoisehg.closeci', genBoolCombo,
+    _fi(_('Close After Commit'), 'tortoisehg.closeci', genBoolCombo,
         _('Close the commit tool after every successful'
           ' commit.  Default: False')),
-    (_('Push After Commit'), 'tortoisehg.cipushafter', genEditCombo,
+    _fi(_('Push After Commit'), 'tortoisehg.cipushafter', genEditCombo,
         _('Attempt to push to specified URL or alias after each successful'
           ' commit.  Default: No push')),
-    (_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,
+    _fi(_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,
        _('Comma separated list of files that are automatically included'
          ' in every commit.  Intended for use only as a repository setting.'
          '  Default: None (leave blank)')),
-    (_('Auto Exclude List'), 'tortoisehg.ciexclude', genEditCombo,
+    _fi(_('Auto Exclude List'), 'tortoisehg.ciexclude', genEditCombo,
        _('Comma separated list of files that are automatically unchecked'
          ' when the status, and commit dialogs are opened.'
          '  Default: None (leave blank)')),
-    (_('English Messages'), 'tortoisehg.engmsg', genBoolCombo,
+    _fi(_('English Messages'), 'tortoisehg.engmsg', genBoolCombo,
        _('Generate English commit messages even if LANGUAGE or LANG'
          ' environment variables are set to a non-English language.'
          ' This setting is used by the Merge, Tag and Backout dialogs.'
@@ -378,35 +388,35 @@ INFO = (
     )),
 
 ({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy'}, (
-    (_('Name'), 'web.name', genEditCombo,
+    _fi(_('Name'), 'web.name', genEditCombo,
         _('Repository name to use in the web interface, and by TortoiseHg '
         ' as a shorthand name.  Default is the working directory.')),
-    (_('Description'), 'web.description', genEditCombo,
+    _fi(_('Description'), 'web.description', genEditCombo,
         _("Textual description of the repository's purpose or"
         ' contents.')),
-    (_('Contact'), 'web.contact', genEditCombo,
+    _fi(_('Contact'), 'web.contact', genEditCombo,
         _('Name or email address of the person in charge of the'
         ' repository.')),
-    (_('Style'), 'web.style', (genDefaultCombo,
+    _fi(_('Style'), 'web.style', (genDefaultCombo,
         ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old']),
         _('Which template map style to use')),
-    (_('Archive Formats'), 'web.allow_archive',
+    _fi(_('Archive Formats'), 'web.allow_archive',
         (genEditCombo, ['bz2', 'gz', 'zip']),
         _('Comma separated list of archive formats allowed for'
         ' downloading')),
-    (_('Port'), 'web.port', genIntEditCombo, _('Port to listen on')),
-    (_('Push Requires SSL'), 'web.push_ssl', genBoolCombo,
+    _fi(_('Port'), 'web.port', genIntEditCombo, _('Port to listen on')),
+    _fi(_('Push Requires SSL'), 'web.push_ssl', genBoolCombo,
         _('Whether to require that inbound pushes be transported'
         ' over SSL to prevent password sniffing.')),
-    (_('Stripes'), 'web.stripes', genIntEditCombo,
+    _fi(_('Stripes'), 'web.stripes', genIntEditCombo,
         _('How many lines a "zebra stripe" should span in multiline output.'
         ' Default is 1; set to 0 to disable.')),
-    (_('Max Files'), 'web.maxfiles', genIntEditCombo,
+    _fi(_('Max Files'), 'web.maxfiles', genIntEditCombo,
         _('Maximum number of files to list per changeset. Default: 10')),
-    (_('Max Changes'), 'web.maxchanges', genIntEditCombo,
+    _fi(_('Max Changes'), 'web.maxchanges', genIntEditCombo,
         _('Maximum number of changes to list on the changelog. '
           'Default: 10')),
-    (_('Allow Push'), 'web.allow_push', (genEditCombo, ['*']),
+    _fi(_('Allow Push'), 'web.allow_push', (genEditCombo, ['*']),
         _('Whether to allow pushing to the repository. If empty or not'
         ' set, push is not allowed. If the special value "*", any remote'
         ' user can push, including unauthenticated users. Otherwise, the'
@@ -414,107 +424,107 @@ INFO = (
         ' user name must be present in this list (separated by whitespace'
         ' or ","). The contents of the allow_push list are examined after'
         ' the deny_push list.')),
-    (_('Deny Push'), 'web.deny_push', (genEditCombo, ['*']),
+    _fi(_('Deny Push'), 'web.deny_push', (genEditCombo, ['*']),
         _('Whether to deny pushing to the repository. If empty or not set,'
         ' push is not denied. If the special value "*", all remote users'
         ' are denied push. Otherwise, unauthenticated users are all'
         ' denied, and any authenticated user name present in this list'
         ' (separated by whitespace or ",") is also denied. The contents'
         ' of the deny_push list are examined before the allow_push list.')),
-    (_('Encoding'), 'web.encoding', (genEditCombo, ['UTF-8']),
+    _fi(_('Encoding'), 'web.encoding', (genEditCombo, ['UTF-8']),
         _('Character encoding name')),
     )),
 
 ({'name': 'proxy', 'label': _('Proxy'), 'icon': QStyle.SP_DriveNetIcon}, (
-    (_('Host'), 'http_proxy.host', genEditCombo,
+    _fi(_('Host'), 'http_proxy.host', genEditCombo,
         _('Host name and (optional) port of proxy server, for'
         ' example "myproxy:8000"')),
-    (_('Bypass List'), 'http_proxy.no', genEditCombo,
+    _fi(_('Bypass List'), 'http_proxy.no', genEditCombo,
         _('Optional. Comma-separated list of host names that'
         ' should bypass the proxy')),
-    (_('User'), 'http_proxy.user', genEditCombo,
+    _fi(_('User'), 'http_proxy.user', genEditCombo,
         _('Optional. User name to authenticate with at the proxy server')),
-    (_('Password'), 'http_proxy.passwd', genPasswordEntry,
+    _fi(_('Password'), 'http_proxy.passwd', genPasswordEntry,
         _('Optional. Password to authenticate with at the proxy server')),
     )),
 
 ({'name': 'email', 'label': _('Email'), 'icon': QStyle.SP_ArrowForward}, (
-    (_('From'), 'email.from', genEditCombo,
+    _fi(_('From'), 'email.from', genEditCombo,
         _('Email address to use in the "From" header and for'
         ' the SMTP envelope')),
-    (_('To'), 'email.to', genEditCombo,
+    _fi(_('To'), 'email.to', genEditCombo,
         _('Comma-separated list of recipient email addresses')),
-    (_('Cc'), 'email.cc', genEditCombo,
+    _fi(_('Cc'), 'email.cc', genEditCombo,
         _('Comma-separated list of carbon copy recipient email addresses')),
-    (_('Bcc'), 'email.bcc', genEditCombo,
+    _fi(_('Bcc'), 'email.bcc', genEditCombo,
         _('Comma-separated list of blind carbon copy recipient'
         ' email addresses')),
-    (_('method'), 'email.method', (genEditCombo, ['smtp']),
+    _fi(_('method'), 'email.method', (genEditCombo, ['smtp']),
         _('Optional. Method to use to send email messages. If value is'
         ' "smtp" (default), use SMTP (configured below).  Otherwise, use as'
         ' name of program to run that acts like sendmail (takes "-f" option'
         ' for sender, list of recipients on command line, message on stdin).'
         ' Normally, setting this to "sendmail" or "/usr/sbin/sendmail"'
         ' is enough to use sendmail to send messages.')),
-    (_('SMTP Host'), 'smtp.host', genEditCombo,
+    _fi(_('SMTP Host'), 'smtp.host', genEditCombo,
         _('Host name of mail server')),
-    (_('SMTP Port'), 'smtp.port', genIntEditCombo,
+    _fi(_('SMTP Port'), 'smtp.port', genIntEditCombo,
         _('Port to connect to on mail server.'
         ' Default: 25')),
-    (_('SMTP TLS'), 'smtp.tls', genBoolCombo,
+    _fi(_('SMTP TLS'), 'smtp.tls', genBoolCombo,
         _('Connect to mail server using TLS.'
         ' Default: False')),
-    (_('SMTP Username'), 'smtp.username', genEditCombo,
+    _fi(_('SMTP Username'), 'smtp.username', genEditCombo,
         _('Username to authenticate to mail server with')),
-    (_('SMTP Password'), 'smtp.password', genPasswordEntry,
+    _fi(_('SMTP Password'), 'smtp.password', genPasswordEntry,
         _('Password to authenticate to mail server with')),
-    (_('Local Hostname'), 'smtp.local_hostname', genEditCombo,
+    _fi(_('Local Hostname'), 'smtp.local_hostname', genEditCombo,
         _('Hostname the sender can use to identify itself to the'
         ' mail server.')),
     )),
 
 ({'name': 'diff', 'label': _('Diff'),
   'icon': QStyle.SP_FileDialogContentsView}, (
-    (_('Patch EOL'), 'patch.eol', (genDefaultCombo,
+    _fi(_('Patch EOL'), 'patch.eol', (genDefaultCombo,
         ['auto', 'strict', 'crlf', 'lf']),
         _('Normalize file line endings during and after patch to lf or'
         ' crlf.  Strict does no normalization.  Auto does per-file'
         ' detection, and is the recommended setting.'
         ' Default: strict')),
-    (_('Git Format'), 'diff.git', genBoolCombo,
+    _fi(_('Git Format'), 'diff.git', genBoolCombo,
         _('Use git extended diff header format.'
         ' Default: False')),
-    (_('MQ Git Format'), 'mq.git', (genDefaultCombo,
+    _fi(_('MQ Git Format'), 'mq.git', (genDefaultCombo,
         ['auto', 'keep', 'yes', 'no']),
      _("If set to 'keep', mq will obey the [diff] section configuration while"
        " preserving existing git patches upon qrefresh. If set to 'yes' or"
        " 'no', mq will override the [diff] section and always generate git or"
        " regular patches, possibly losing data in the second case.")),
-    (_('No Dates'), 'diff.nodates', genBoolCombo,
+    _fi(_('No Dates'), 'diff.nodates', genBoolCombo,
         _('Do not include modification dates in diff headers.'
         ' Default: False')),
-    (_('Show Function'), 'diff.showfunc', genBoolCombo,
+    _fi(_('Show Function'), 'diff.showfunc', genBoolCombo,
         _('Show which function each change is in.'
         ' Default: False')),
-    (_('Ignore White Space'), 'diff.ignorews', genBoolCombo,
+    _fi(_('Ignore White Space'), 'diff.ignorews', genBoolCombo,
         _('Ignore white space when comparing lines.'
         ' Default: False')),
-    (_('Ignore WS Amount'), 'diff.ignorewsamount', genBoolCombo,
+    _fi(_('Ignore WS Amount'), 'diff.ignorewsamount', genBoolCombo,
         _('Ignore changes in the amount of white space.'
         ' Default: False')),
-    (_('Ignore Blank Lines'), 'diff.ignoreblanklines', genBoolCombo,
+    _fi(_('Ignore Blank Lines'), 'diff.ignoreblanklines', genBoolCombo,
         _('Ignore changes whose lines are all blank.'
         ' Default: False')),
     )),
 
 ({'name': 'fonts', 'label': _('Fonts'), 'icon': 'fonts'}, (
-    (_('Message Font'), 'tortoisehg.fontcomment', genFontEdit,
+    _fi(_('Message Font'), 'tortoisehg.fontcomment', genFontEdit,
         _('Font used to display commit messages. Default: monospace 10')),
-    (_('Diff Font'), 'tortoisehg.fontdiff', genFontEdit,
+    _fi(_('Diff Font'), 'tortoisehg.fontdiff', genFontEdit,
         _('Font used to display text differences. Default: monospace 10')),
-    (_('List Font'), 'tortoisehg.fontlist', genFontEdit,
+    _fi(_('List Font'), 'tortoisehg.fontlist', genFontEdit,
         _('Font used to display file lists. Default: sans 9')),
-    (_('Log Font'), 'tortoisehg.fontlog', genFontEdit,
+    _fi(_('Log Font'), 'tortoisehg.fontlog', genFontEdit,
         _('Font used to display changelog data. Default: monospace 10')),
     )),
 
@@ -522,16 +532,16 @@ INFO = (
     )),
 
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
-    (_('Server'), 'reviewboard.server', genEditCombo,
+    _fi(_('Server'), 'reviewboard.server', genEditCombo,
         _('Path to review board'
         ' example "http://demo.reviewboard.org"')),
-    (_('User'), 'reviewboard.user', genEditCombo,
+    _fi(_('User'), 'reviewboard.user', genEditCombo,
         _('User name to authenticate with review board')),
-    (_('Password'), 'reviewboard.password', genPasswordEntry,
+    _fi(_('Password'), 'reviewboard.password', genPasswordEntry,
         _('Password to authenticate with review board')),
-    (_('Target Groups'), 'reviewboard.target_groups', genEditCombo,
+    _fi(_('Target Groups'), 'reviewboard.target_groups', genEditCombo,
         _('A comma separated list of target groups')),
-    (_('Target People'), 'reviewboard.target_people', genEditCombo,
+    _fi(_('Target People'), 'reviewboard.target_people', genEditCombo,
         _('A comma separated list of target people')),
     )),
 
@@ -756,8 +766,8 @@ class SettingsForm(QWidget):
                     # even when no extensions mentioned in the config file
                     self.validateextensions()
             else:
-                for row, (label, cpath, values, tooltip) in enumerate(info):
-                    curvalue = self.readCPath(cpath)
+                for row, e in enumerate(info):
+                    curvalue = self.readCPath(e.cpath)
                     widgets[row].setValue(curvalue)
 
     def isDirty(self):
@@ -782,8 +792,8 @@ class SettingsForm(QWidget):
     def focusField(self, focusfield):
         'Set page and focus to requested datum'
         for i, (meta, info) in enumerate(INFO):
-            for n, (label, cpath, values, tip) in enumerate(info):
-                if cpath == focusfield:
+            for n, e in enumerate(info):
+                if e.cpath == focusfield:
                     self.pageList.setCurrentRow(i)
                     QTimer.singleShot(0, lambda:
                             self.pages[meta['name']][2][n].setFocus())
@@ -796,19 +806,19 @@ class SettingsForm(QWidget):
         frame.setLayout(form)
         self.stack.addWidget(frame)
 
-        for row, (label, cpath, values, tooltip) in enumerate(info):
-            opts = {'label':label, 'cpath':cpath, 'tooltip':tooltip,
+        for e in info:
+            opts = {'label': e.label, 'cpath': e.cpath, 'tooltip': e.tooltip,
                     'settings':self.settings}
-            if isinstance(values, tuple):
-                func = values[0]
-                w = func(opts, values[1])
+            if isinstance(e.values, tuple):
+                func = e.values[0]
+                w = func(opts, e.values[1])
             else:
-                func = values
+                func = e.values
                 w = func(opts)
             w.installEventFilter(self)
-            lbl = QLabel(label)
+            lbl = QLabel(e.label)
             lbl.installEventFilter(self)
-            lbl.setToolTip(tooltip)
+            lbl.setToolTip(e.tooltip)
             form.addRow(lbl, w)
             widgets.append(w)
         return widgets
@@ -906,9 +916,9 @@ class SettingsForm(QWidget):
             if name == 'extensions':
                 self.applyChangesForExtensions()
             else:
-                for row, (label, cpath, values, tip) in enumerate(info):
+                for row, e in enumerate(info):
                     newvalue = widgets[row].value()
-                    self.recordNewValue(cpath, newvalue)
+                    self.recordNewValue(e.cpath, newvalue)
 
         try:
             wconfig.writefile(self.ini, self.fn)
