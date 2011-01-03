@@ -432,13 +432,15 @@ class HgRepoListModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return 0
+        if not self.revset:
+            return Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
         row = index.row()
         self.ensureBuilt(row=row)
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 
-        if self.revset and ctx.node() not in self.revset:
+        if ctx.node() not in self.revset:
             return Qt.ItemFlags(0)
         return Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
