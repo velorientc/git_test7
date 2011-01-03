@@ -4,7 +4,9 @@
 #
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
-#
+
+import os
+
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
@@ -12,7 +14,6 @@ from tortoisehg.hgqt import qtlib, cmdui, chunks
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
 
 class ShelveDialog(QMainWindow):
 
@@ -151,7 +152,11 @@ class ShelveDialog(QMainWindow):
         self.combob.clear()
         patches = self.repo.thgmqunappliedpatches[:]
         patches = [hglib.tounicode(self.repo.mq.join(p)) for p in patches]
-        # TODO: scan for shelves
+        sdir = self.repo.join('shelves')
+        if os.path.isdir(sdir):
+            shelves = os.listdir(sdir)
+            shelves = [hglib.tounicode(os.path.join(sdir, s)) for s in shelves]
+            patches = shelves + patches
         self.comboa.addItems([self.wdir] + patches)
         self.combob.addItems(patches)
         if not patches:
