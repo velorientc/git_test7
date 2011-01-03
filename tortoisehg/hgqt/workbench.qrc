@@ -64,5 +64,11 @@
     <file>icons/media-playback-start.svg</file>
     <file>icons/edit-cut.svg</file>
     <file>icons/document-new.svg</file>
+    <file>icons/file2left.svg</file>
+    <file>icons/file2right.svg</file>
+    <file>icons/chunk2left.svg</file>
+    <file>icons/chunk2right.svg</file>
+    <file>icons/delfilesleft.svg</file>
+    <file>icons/delfilesright.svg</file>
   </qresource>
 </RCC>
