@@ -63,5 +63,6 @@
     <file>icons/media-seek-backward.svg</file>
     <file>icons/media-playback-start.svg</file>
     <file>icons/edit-cut.svg</file>
+    <file>icons/document-new.svg</file>
   </qresource>
 </RCC>

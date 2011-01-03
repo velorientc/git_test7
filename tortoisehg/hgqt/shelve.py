@@ -44,12 +44,9 @@ class ShelveDialog(QMainWindow):
         avbox.addLayout(ahbox)
         self.comboa = QComboBox(self)
         self.comboa.currentIndexChanged.connect(self.comboAChanged)
-        self.newShelfA = QPushButton(_('New'))
-        self.newShelfA.setToolTip(_('Create a new shelf file'))
         self.deleteShelfA = QPushButton(_('Delete'))
         self.deleteShelfA.setToolTip(_('Delete the current shelf file'))
         ahbox.addWidget(self.comboa, 1)
-        ahbox.addWidget(self.newShelfA)
         ahbox.addWidget(self.deleteShelfA)
 
         self.browsea = chunks.ChunksWidget(repo, self)
@@ -71,12 +68,9 @@ class ShelveDialog(QMainWindow):
         bvbox.addLayout(bhbox)
         self.combob = QComboBox(self)
         self.combob.currentIndexChanged.connect(self.comboBChanged)
-        self.newShelfB = QPushButton(_('New'))
-        self.newShelfB.setToolTip(_('Create a new shelf file'))
         self.deleteShelfB = QPushButton(_('Delete'))
         self.deleteShelfB.setToolTip(_('Delete the current shelf file'))
         bhbox.addWidget(self.combob, 1)
-        bhbox.addWidget(self.newShelfB)
         bhbox.addWidget(self.deleteShelfB)
 
         self.browseb = chunks.ChunksWidget(repo, self)
@@ -92,6 +86,10 @@ class ShelveDialog(QMainWindow):
         a.setShortcut(QKeySequence.Refresh)
         a.triggered.connect(self.refresh)
         self.rbar.addAction(self.refreshAction)
+        self.actionNew = a = QAction(_('New Shelf'), self)
+        a.setIcon(qtlib.geticon('document-new'))
+        a.triggered.connect(self.newShelf)
+        self.rbar.addAction(self.actionNew)
 
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
         self.addToolBar(self.lefttbar)
@@ -139,6 +137,11 @@ class ShelveDialog(QMainWindow):
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
 
+    @pyqtSlot()
+    def newShelf(self):
+        pass
+
+    @pyqtSlot()
     def repositoryChanged(self):
         # TODO: preserve selection through refresh
         self.refreshCombos()
@@ -153,6 +156,8 @@ class ShelveDialog(QMainWindow):
         self.combob.addItems(patches)
         if not patches:
             self.deleteShelfB.setEnabled(False)
+            self.browseb.fileSelected.emit(False)
+            self.browseb.chunksSelected.emit(False)
 
     @pyqtSlot(int)
     def comboAChanged(self, index):
