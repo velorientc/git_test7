@@ -527,13 +527,17 @@ INFO = (
 
 ({'name': 'fonts', 'label': _('Fonts'), 'icon': 'fonts'}, (
     _fi(_('Message Font'), 'tortoisehg.fontcomment', genFontEdit,
-        _('Font used to display commit messages. Default: monospace 10')),
+        _('Font used to display commit messages. Default: monospace 10'),
+       globalonly=True),
     _fi(_('Diff Font'), 'tortoisehg.fontdiff', genFontEdit,
-        _('Font used to display text differences. Default: monospace 10')),
+        _('Font used to display text differences. Default: monospace 10'),
+       globalonly=True),
     _fi(_('List Font'), 'tortoisehg.fontlist', genFontEdit,
-        _('Font used to display file lists. Default: sans 9')),
+        _('Font used to display file lists. Default: sans 9'),
+       globalonly=True),
     _fi(_('Log Font'), 'tortoisehg.fontlog', genFontEdit,
-        _('Font used to display changelog data. Default: monospace 10')),
+        _('Font used to display changelog data. Default: monospace 10'),
+       globalonly=True),
     )),
 
 ({'name': 'extensions', 'label': _('Extensions'), 'icon': 'extensions'}, (
