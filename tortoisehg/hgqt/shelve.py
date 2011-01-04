@@ -48,6 +48,7 @@ class ShelveDialog(QMainWindow):
         self.comboa.currentIndexChanged.connect(self.comboAChanged)
         self.delShelfButtonA = QPushButton(_('Delete'))
         self.delShelfButtonA.setToolTip(_('Delete the current shelf file'))
+        self.delShelfButtonA.clicked.connect(self.deleteShelfA)
         ahbox.addWidget(self.comboa, 1)
         ahbox.addWidget(self.delShelfButtonA)
 
@@ -164,7 +165,8 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def deleteShelfA(self):
-        shelf = hglib.fromunicode(self.combob.currentText())
+        # TODO: Are you sure?
+        shelf = hglib.fromunicode(self.comboa.currentText())
         try:
             os.unlink(shelf)
             self.showMessage(_('Shelf deleted'))
@@ -174,6 +176,7 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def deleteShelfB(self):
+        # TODO: Are you sure?
         shelf = hglib.fromunicode(self.combob.currentText())
         try:
             os.unlink(shelf)
