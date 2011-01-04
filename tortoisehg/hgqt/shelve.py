@@ -6,6 +6,7 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 import os
+import time
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
@@ -45,10 +46,10 @@ class ShelveDialog(QMainWindow):
         avbox.addLayout(ahbox)
         self.comboa = QComboBox(self)
         self.comboa.currentIndexChanged.connect(self.comboAChanged)
-        self.deleteShelfA = QPushButton(_('Delete'))
-        self.deleteShelfA.setToolTip(_('Delete the current shelf file'))
+        self.delShelfButtonA = QPushButton(_('Delete'))
+        self.delShelfButtonA.setToolTip(_('Delete the current shelf file'))
         ahbox.addWidget(self.comboa, 1)
-        ahbox.addWidget(self.deleteShelfA)
+        ahbox.addWidget(self.delShelfButtonA)
 
         self.browsea = chunks.ChunksWidget(repo, self)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
@@ -69,10 +70,11 @@ class ShelveDialog(QMainWindow):
         bvbox.addLayout(bhbox)
         self.combob = QComboBox(self)
         self.combob.currentIndexChanged.connect(self.comboBChanged)
-        self.deleteShelfB = QPushButton(_('Delete'))
-        self.deleteShelfB.setToolTip(_('Delete the current shelf file'))
+        self.delShelfButtonB = QPushButton(_('Delete'))
+        self.delShelfButtonB.setToolTip(_('Delete the current shelf file'))
+        self.delShelfButtonB.clicked.connect(self.deleteShelfB)
         bhbox.addWidget(self.combob, 1)
-        bhbox.addWidget(self.deleteShelfB)
+        bhbox.addWidget(self.delShelfButtonB)
 
         self.browseb = chunks.ChunksWidget(repo, self)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
@@ -133,34 +135,66 @@ class ShelveDialog(QMainWindow):
         self.setStatusBar(self.statusbar)
 
         self.refreshCombos()
-        repo.repositoryChanged.connect(self.repositoryChanged)
+        repo.repositoryChanged.connect(self.refreshCombos)
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
 
     @pyqtSlot()
     def newShelf(self):
-        pass
-
-    @pyqtSlot()
-    def repositoryChanged(self):
-        # TODO: preserve selection through refresh
+        dlg = QInputDialog(self, Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        dlg.setWindowTitle(_('TortoiseHg New Shelf Name'))
+        dlg.setLabelText(_('Specify name of new shelf'))
+        dlg.setTextValue(time.strftime('%Y-%m-%d_%H:%M:%S'))
+        if not dlg.exec_():
+            return
+        shelve = hglib.fromunicode(dlg.textValue())
+        try:
+            fn = self.repo.join('shelves/'+shelve)
+            if os.path.exists(fn):
+                qtlib.ErrorMsgBox(_('File already exists'),
+                                  _('A shelf file of that name already exists'))
+                return
+            else:
+                open(fn, 'wb').write('')
+        except EnvironmentError, e:
+            self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
 
+    @pyqtSlot()
+    def deleteShelfA(self):
+        shelf = hglib.fromunicode(self.combob.currentText())
+        try:
+            os.unlink(shelf)
+            self.showMessage(_('Shelf deleted'))
+        except EnvironmentError, e:
+            self.showMessage(hglib.tounicode(str(e)))
+        self.refreshCombos()
+
+    @pyqtSlot()
+    def deleteShelfB(self):
+        shelf = hglib.fromunicode(self.combob.currentText())
+        try:
+            os.unlink(shelf)
+            self.showMessage(_('Shelf deleted'))
+        except EnvironmentError, e:
+            self.showMessage(hglib.tounicode(str(e)))
+        self.refreshCombos()
+
+    @pyqtSlot()
     def refreshCombos(self):
+        # TODO: preserve selection through refresh
         self.comboa.clear()
         self.combob.clear()
+        shelves = [hglib.tounicode(s) for s in self.repo.thgshelves()]
         patches = self.repo.thgmqunappliedpatches[:]
         patches = [hglib.tounicode(self.repo.mq.join(p)) for p in patches]
-        sdir = self.repo.join('shelves')
-        if os.path.isdir(sdir):
-            shelves = os.listdir(sdir)
-            shelves = [hglib.tounicode(os.path.join(sdir, s)) for s in shelves]
-            patches = shelves + patches
+        patches = shelves + patches
         self.comboa.addItems([self.wdir] + patches)
         self.combob.addItems(patches)
         if not patches:
-            self.deleteShelfB.setEnabled(False)
+            self.delShelfButtonB.setEnabled(False)
             self.browseb.fileSelected.emit(False)
             self.browseb.chunksSelected.emit(False)
 
@@ -168,16 +202,16 @@ class ShelveDialog(QMainWindow):
     def comboAChanged(self, index):
         if index == 0:
             rev = None
-            self.deleteShelfA.setEnabled(False)
+            self.delShelfButtonA.setEnabled(False)
         else:
-            self.deleteShelfA.setEnabled(True)
             rev = hglib.fromunicode(self.comboa.currentText())
+            self.delShelfButtonA.setEnabled(rev.startswith(self.repo.shelfdir))
         self.browsea.setContext(self.repo.changectx(rev))
 
     @pyqtSlot(int)
     def comboBChanged(self, index):
-        self.deleteShelfB.setEnabled(True)
         rev = hglib.fromunicode(self.combob.currentText())
+        self.delShelfButtonB.setEnabled(rev.startswith(self.repo.shelfdir))
         self.browseb.setContext(self.repo.changectx(rev))
 
     def refresh(self):
@@ -195,7 +229,7 @@ class ShelveDialog(QMainWindow):
         pass
 
     def showMessage(self, message):
-        self.stbar.showMessage(message)
+        self.statusbar.showMessage(message)
 
     def storeSettings(self):
         s = QSettings()
