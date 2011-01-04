@@ -158,6 +158,7 @@ class ShelveDialog(QMainWindow):
                 return
             else:
                 open(fn, 'wb').write('')
+                self.showMessage(_('New shelf created'))
         except EnvironmentError, e:
             self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
@@ -195,8 +196,7 @@ class ShelveDialog(QMainWindow):
         self.combob.addItems(patches)
         if not patches:
             self.delShelfButtonB.setEnabled(False)
-            self.browseb.fileSelected.emit(False)
-            self.browseb.chunksSelected.emit(False)
+            self.browseb.setContext(patchctx('', self.repo, None))
 
     @pyqtSlot(int)
     def comboAChanged(self, index):
