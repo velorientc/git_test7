@@ -131,8 +131,8 @@ def run(func, parent, files, repo):
     return notify
 
 def renamefromto(repo, deleted, unknown):
-    repo.remove([deleted]) # !->R
-    repo.copy(deleted, unknown)
+    repo[None].copy(deleted, unknown)
+    repo[None].remove([deleted], unlink=False) # !->R
 
 def vdiff(parent, ui, repo, files):
     dlg = visdiff.visualdiff(ui, repo, files, {})
