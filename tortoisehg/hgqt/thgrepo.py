@@ -425,6 +425,12 @@ def _extendrepo(repo):
                 cur = cur[8:]
             return cur
 
+        def thgshelves(self):
+            self.shelfdir = sdir = self.join('shelves')
+            if os.path.isdir(sdir):
+                return [os.path.join(sdir, s) for s in os.listdir(sdir)]
+            return []
+
         def thginvalidate(self):
             'Should be called when mtime of repo store/dirstate are changed'
             self.dirstate.invalidate()
