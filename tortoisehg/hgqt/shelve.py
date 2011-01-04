@@ -146,19 +146,18 @@ class ShelveDialog(QMainWindow):
         dlg.setWindowModality(Qt.WindowModal)
         dlg.setWindowTitle(_('TortoiseHg New Shelf Name'))
         dlg.setLabelText(_('Specify name of new shelf'))
-        dlg.setTextValue(time.strftime('%Y-%m-%d_%H:%M:%S'))
+        dlg.setTextValue(time.strftime('%Y-%m-%d_%H-%M-%S'))
         if not dlg.exec_():
             return
         shelve = hglib.fromunicode(dlg.textValue())
         try:
-            fn = self.repo.join('shelves/'+shelve)
-            if os.path.exists(fn):
+            fn = os.path.join('shelves', shelve)
+            if os.path.exists(self.repo.join(fn)):
                 qtlib.ErrorMsgBox(_('File already exists'),
                                   _('A shelf file of that name already exists'))
                 return
-            else:
-                open(fn, 'wb').write('')
-                self.showMessage(_('New shelf created'))
+            self.repo.opener(fn, 'wb').write('')
+            self.showMessage(_('New shelf created'))
         except EnvironmentError, e:
             self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
