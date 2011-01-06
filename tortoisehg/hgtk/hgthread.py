@@ -187,5 +187,19 @@ class HgThread(thread2.Thread):
             self.ui.write_err(_('abort: ') + str(e) + '\n')
         except (error.RepoError, urllib2.HTTPError), e:
             self.ui.write_err(str(e) + '\n')
+        except urllib2.URLError, e:
+            import ssl
+            err = str(e)
+            if isinstance(e.args[0], ssl.SSLError):
+                parts = e.args[0].strerror.split(':')
+                if len(parts) == 7:
+                    file, line, level, errno, lib, func, reason = parts
+                    if func == 'SSL3_GET_SERVER_CERTIFICATE':
+                        err = local._('SSL: Server certificate verify failed')
+                    elif errno == '00000000':
+                        err = local._('SSL: unknown error %s:%s') % (file, line)
+                    else:
+                        err = local._('SSL error: %s') % reason
+            self.ui.write_err(err + '\n')
         except (Exception, OSError, IOError), e:
             self.ui.write_err(str(e) + '\n')
