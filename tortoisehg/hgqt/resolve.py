@@ -196,7 +196,7 @@ class ResolveDialog(QDialog):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
             opts = {}
-            opts['rev'] = [str(self.repo.parents()[0].rev()), '.']
+            opts['rev'] = ["p1()"]
             opts['tool'] = self.tcombo.readValue()
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
@@ -206,7 +206,7 @@ class ResolveDialog(QDialog):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
             opts = {}
-            opts['rev'] = [str(self.repo.parents()[1].rev()), '.']
+            opts['rev'] = ["p2()"]
             opts['tool'] = self.tcombo.readValue()
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
