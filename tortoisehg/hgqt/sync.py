@@ -230,7 +230,7 @@ class SyncWidget(QWidget):
         self.reload()
 
     def details(self):
-        dlg = DetailsDialog(self.opts, self)
+        dlg = OptionsDialog(self.opts, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
@@ -566,7 +566,8 @@ class SyncWidget(QWidget):
     def inclicked(self):
         self.showMessage.emit(_('Incoming...'))
         url = self.currentUrl(True)
-        if self.embedded and not url.startswith('p4://'):
+        if self.embedded and not url.startswith('p4://') and \
+           not self.opts.get('subrepos'):
             def finished(ret, output):
                 if ret == 0:
                     self.showMessage.emit(_('Incoming changesets found'))
@@ -593,7 +594,7 @@ class SyncWidget(QWidget):
                     self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
             self.finishfunc = finished
             cmdline = ['--repository', self.root, 'incoming']
-            self.run(cmdline, ('force', 'branch', 'rev'))
+            self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def pullclicked(self):
         def finished(ret, output):
@@ -632,7 +633,7 @@ class SyncWidget(QWidget):
 
     def outclicked(self):
         self.showMessage.emit(_('Outgoing...'))
-        if self.embedded:
+        if self.embedded and not self.opts.get('subrepos'):
             def outputnodes(ret, data):
                 if ret == 0:
                     nodes = [n for n in data.splitlines() if len(n) == 40]
@@ -650,7 +651,7 @@ class SyncWidget(QWidget):
         else:
             self.finishfunc = None
             cmdline = ['--repository', self.root, 'outgoing']
-            self.run(cmdline, ('force', 'branch', 'rev'))
+            self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def p4pending(self):
         p4url = self.currentUrl(False)
@@ -1130,8 +1131,8 @@ def loadIniFile(rcpath, parent):
     return fn, wconfig.readfile(fn)
 
 
-class DetailsDialog(QDialog):
-    'Utility dialog for configuring uncommon settings'
+class OptionsDialog(QDialog):
+    'Utility dialog for configuring uncommon options'
     def __init__(self, opts, parent):
         QDialog.__init__(self, parent)
         self.setWindowTitle('%s - sync options' % parent.repo.displayname)
@@ -1147,6 +1148,10 @@ class DetailsDialog(QDialog):
                                    ' checks)'))
         self.forcecb.setChecked(opts.get('force', False))
         layout.addRow(self.forcecb, None)
+
+        self.subrepocb = QCheckBox(_('Recurse into subrepositories'))
+        self.subrepocb.setChecked(opts.get('subrepos', False))
+        layout.addRow(self.subrepocb, None)
 
         lbl = QLabel(_('Specify branch for push/pull:'))
         self.branchle = QLineEdit()
@@ -1185,6 +1190,7 @@ class DetailsDialog(QDialog):
                                 parent=self)
             return
 
+        outopts['subrepos'] = self.subrepocb.isChecked()
         outopts['force'] = self.forcecb.isChecked()
         outopts['new-branch'] = self.newbranchcb.isChecked()
 
