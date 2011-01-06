@@ -235,9 +235,11 @@ class ShelveDialog(QMainWindow):
         if self.browseb.splitter.sizes()[0] != pos:
             self.browseb.splitter.moveSplitter(pos, index)
 
+    @pyqtSlot(QString)
     def linkActivated(self, linktext):
         pass
 
+    @pyqtSlot(QString)
     def showMessage(self, message):
         self.statusbar.showMessage(message)
 
