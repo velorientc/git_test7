@@ -513,52 +513,32 @@ class SyncWidget(QWidget):
 
     def incoming(self):
         if self.cmd.core.is_running():
-            self.output.emit(_('sync command already running'), 'control')
-            return
-        if 'default' in self.paths:
-            self.setUrl(self.paths['default'])
-            self.curalias = 'default'
+            self.showMessage.emit(_('sync command already running'))
+        else:
             self.inclicked()
 
     def pull(self):
         if self.cmd.core.is_running():
-            self.output.emit(_('sync command already running'), 'control')
-            return
-        if 'default' in self.paths:
-            self.setUrl(self.paths['default'])
-            self.curalias = 'default'
+            self.showMessage.emit(_('sync command already running'))
+        else:
             self.pullclicked()
 
     def outgoing(self):
         if self.cmd.core.is_running():
-            self.output.emit(_('sync command already running'), 'control')
-            return
-        if 'default-push' in self.paths:
-            self.setUrl(self.paths['default-push'])
-            self.curalias = 'default-push'
-            self.outclicked()
-        elif 'default' in self.paths:
-            self.setUrl(self.paths['default'])
-            self.curalias = 'default'
+            self.showMessage.emit(_('sync command already running'))
+        else:
             self.outclicked()
 
     def push(self):
         if self.cmd.core.is_running():
-            self.output.emit(_('sync command already running'), 'control')
-            return
-        if 'default-push' in self.paths:
-            self.setUrl(self.paths['default-push'])
-            self.curalias = 'default-push'
-            self.pushclicked()
-        elif 'default' in self.paths:
-            self.setUrl(self.paths['default'])
-            self.curalias = 'default'
+            self.showMessage.emit(_('sync command already running'))
+        else:
             self.pushclicked()
 
     def pullBundle(self, bundle, rev):
         'accept bundle changesets'
         if self.cmd.core.is_running():
-            self.output.emit(_('sync command already running'), 'control')
+            self.showMessage.emit(_('sync command already running'))
             return
         save = self.currentUrl(False)
         orev = self.opts.get('rev')
@@ -572,7 +552,7 @@ class SyncWidget(QWidget):
     def pushToRevision(self, rev):
         'push to specified revision'
         if self.cmd.core.is_running():
-            self.output.emit(_('sync command already running'), 'control')
+            self.showMessage.emit(_('sync command already running'))
             return
         orev = self.opts.get('rev')
         self.opts['rev'] = str(rev)
