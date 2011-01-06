@@ -280,6 +280,20 @@ class CmdThread(QThread):
                 ui.write_err(local._('hint: ') + str(e.hint) + '\n')
         except (error.RepoError, urllib2.HTTPError), e:
             ui.write_err(str(e) + '\n')
+        except urllib2.URLError, e:
+            import ssl
+            err = str(e)
+            if isinstance(e.args[0], ssl.SSLError):
+                parts = e.args[0].strerror.split(':')
+                if len(parts) == 7:
+                    file, line, level, errno, lib, func, reason = parts
+                    if func == 'SSL3_GET_SERVER_CERTIFICATE':
+                        err = local._('SSL: Server certificate verify failed')
+                    elif errno == '00000000':
+                        err = local._('SSL: unknown error %s:%s') % (file, line)
+                    else:
+                        err = local._('SSL error: %s') % reason
+            ui.write_err(err + '\n')
         except (Exception, OSError, IOError), e:
             if 'THGDEBUG' in os.environ:
                 import traceback
