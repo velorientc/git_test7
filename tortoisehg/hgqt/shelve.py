@@ -165,8 +165,11 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def deleteShelfA(self):
-        # TODO: Are you sure?
-        shelf = hglib.fromunicode(self.comboa.currentText())
+        ushelf = self.comboa.currentText()
+        if not qtlib.QuestionMsgBox(_('Are you sure?'),
+                                    _('Delete shelf file %s?') % ushelf):
+            return
+        shelf = hglib.fromunicode(ushelf)
         try:
             os.unlink(shelf)
             self.showMessage(_('Shelf deleted'))
@@ -176,8 +179,11 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def deleteShelfB(self):
-        # TODO: Are you sure?
-        shelf = hglib.fromunicode(self.combob.currentText())
+        ushelf = self.combob.currentText()
+        if not qtlib.QuestionMsgBox(_('Are you sure?'),
+                                    _('Delete shelf file %s?') % ushelf):
+            return
+        shelf = hglib.fromunicode(ushelf)
         try:
             os.unlink(shelf)
             self.showMessage(_('Shelf deleted'))
