@@ -122,9 +122,17 @@ class StatusWidget(QWidget):
             cpb.clicked.connect(clearPattern)
 
         self.countlbl = QLabel()
+        self.allbutton = QPushButton(_('All'))
+        self.allbutton.setToolTip(_('Check all files'))
+        self.allbutton.clicked.connect(self.checkAll)
+        self.nonebutton = QPushButton(_('None'))
+        self.nonebutton.setToolTip(_('Uncheck all files'))
+        self.nonebutton.clicked.connect(self.checkNone)
         hcbox = QHBoxLayout()
         vbox.addLayout(hcbox)
-        hcbox.addSpacing(6)
+        hcbox.addWidget(self.allbutton)
+        hcbox.addWidget(self.nonebutton)
+        hcbox.addStretch(1)
         hcbox.addWidget(self.countlbl)
 
         tv.menuAction.connect(self.refreshWctx)
@@ -200,6 +208,8 @@ class StatusWidget(QWidget):
         else:
             self.reselection = None
 
+        self.allbutton.setEnabled(False)
+        self.nonebutton.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.refreshing.finished.connect(self.reloadComplete)
@@ -208,6 +218,8 @@ class StatusWidget(QWidget):
 
     def reloadComplete(self):
         self.refreshing.wait()
+        self.allbutton.setEnabled(True)
+        self.nonebutton.setEnabled(True)
         if self.refreshing.wctx is None:
             return
         self.ms = merge.mergestate(self.repo)
@@ -262,8 +274,14 @@ class StatusWidget(QWidget):
             selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
 
     def updateCheckCount(self):
-        text = _('Checkmarked file count: %d') % len(self.getChecked())
+        text = _('Checked count: %d') % len(self.getChecked())
         self.countlbl.setText(text)
+
+    def checkAll(self):
+        self.tv.model().checkAll(True)
+
+    def checkNone(self):
+        self.tv.model().checkAll(False)
 
     def isMerge(self):
         return bool(self.wctx.p2())
@@ -497,6 +515,12 @@ class WctxModel(QAbstractTableModel):
         if parent.isValid():
             return 0 # no child
         return len(self.rows)
+
+    def checkAll(self, state):
+        for wfile in self.checked:
+            self.checked[wfile] = state
+        self.layoutChanged.emit()
+        self.checkToggled.emit()
 
     def columnCount(self, parent):
         if parent.isValid():
