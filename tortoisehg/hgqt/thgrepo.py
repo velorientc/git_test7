@@ -384,14 +384,14 @@ def _extendrepo(repo):
 
         @propertycache
         def bookmarks(self):
-            if 'bookmarks' in self._exts:
+            if 'bookmarks' in self._exts and hasattr(self, '_bookmarks'):
                 return self._bookmarks
             else:
                 return {}
 
         @propertycache
         def bookmarkcurrent(self):
-            if 'bookmarks' in self._exts:
+            if 'bookmarks' in self._exts and hasattr(self, '_bookmarkcurrent'):
                 return self._bookmarkcurrent
             else:
                 return None
