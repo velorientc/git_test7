@@ -88,7 +88,7 @@ class ShelveDialog(QMainWindow):
         self.refreshAction = a = QAction(_('Refresh'), self)
         a.setIcon(qtlib.geticon('reload'))
         a.setShortcut(QKeySequence.Refresh)
-        a.triggered.connect(self.refresh)
+        a.triggered.connect(self.refreshCombos)
         self.rbar.addAction(self.refreshAction)
         self.actionNew = a = QAction(_('New Shelf'), self)
         a.setIcon(qtlib.geticon('document-new'))
@@ -193,7 +193,8 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def refreshCombos(self):
-        # TODO: preserve selection through refresh
+        ushelvea = self.comboa.currentText()
+        ushelveb = self.combob.currentText()
         self.comboa.clear()
         self.combob.clear()
         shelves = [hglib.tounicode(s) for s in self.repo.thgshelves()]
@@ -202,6 +203,12 @@ class ShelveDialog(QMainWindow):
         patches = shelves + patches
         self.comboa.addItems([self.wdir] + patches)
         self.combob.addItems(patches)
+        if ushelvea == self.wdir:
+            self.comboa.setCurrentIndex(0)
+        elif ushelvea in patches:
+            self.comboa.setCurrentIndex(1 + patches.index(ushelvea))
+        if ushelveb in patches:
+            self.combob.setCurrentIndex(patches.index(ushelveb))
         if not patches:
             self.delShelfButtonB.setEnabled(False)
             self.browseb.setContext(patchctx('', self.repo, None))
@@ -221,11 +228,6 @@ class ShelveDialog(QMainWindow):
         rev = hglib.fromunicode(self.combob.currentText())
         self.delShelfButtonB.setEnabled(rev.startswith(self.repo.shelfdir))
         self.browseb.setContext(self.repo.changectx(rev))
-
-    def refresh(self):
-        self.browsea.refresh()
-        self.browseb.refresh()
-        self.refreshCombos()
 
     def linkSplitters(self, pos, index):
         if self.browsea.splitter.sizes()[0] != pos:
