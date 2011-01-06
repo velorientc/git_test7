@@ -569,7 +569,7 @@ class SyncWidget(QWidget):
         if self.embedded and not url.startswith('p4://') and \
            not self.opts.get('subrepos'):
             def finished(ret, output):
-                if ret == 0:
+                if ret == 0 and os.path.exists(bfile):
                     self.showMessage.emit(_('Incoming changesets found'))
                     self.incomingBundle.emit(bfile)
                 elif ret == 1:
@@ -581,6 +581,8 @@ class SyncWidget(QWidget):
                 bfile = bfile.replace(badchar, '')
             bfile = bfile.replace('/', '_')
             bfile = os.path.join(qtlib.gettempdir(), bfile) + '.hg'
+            if os.path.exists(bfile):
+                os.unlink(bfile)
             self.finishfunc = finished
             cmdline = ['--repository', self.root, 'incoming', '--bundle', bfile]
             self.run(cmdline, ('force', 'branch', 'rev'))
