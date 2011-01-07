@@ -122,7 +122,7 @@ class PurgeDialog(QDialog):
             if self.th.failures:
                 qtlib.InfoMsgBox(_('Deletion failures'),
                     _('Unable to delete %d files or folders') %
-                                 len(failures), parent=self)
+                                 len(self.th.failures), parent=self)
             QDialog.accept(self)
 
         self.th = PurgeThread(self.repo, ignored, unknown, delf, keep, self)
