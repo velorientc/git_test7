@@ -128,6 +128,7 @@ class RepoWidget(QWidget):
 
         self.repoview = view = HgRepoView(self.repo, self)
         view.revisionSelected.connect(self.revision_selected)
+        view.revisionClicked.connect(self.revision_clicked)
         view.revisionActivated.connect(self.revision_activated)
         view.showMessage.connect(self.showMessage)
         view.menuRequested.connect(self.viewMenuRequest)
@@ -518,6 +519,19 @@ class RepoWidget(QWidget):
         'all revisions loaded (graph generator completed)'
         # Perhaps we can update a GUI element later, to indicate full load
         pass
+
+    def revision_clicked(self, rev):
+        'User clicked on a repoview row'
+        tw = self.taskTabsWidget
+        if type(rev) == str:
+            # Clicking on a patch switches to revdetails tab
+            tw.setCurrentIndex(self.logTabIndex)
+        elif rev is None:
+            # Clicking on working copy switches to commit tab
+            tw.setCurrentIndex(self.commitTabIndex)
+        elif tw.currentWidget() == self.commitDemand:
+            # Clicking on a normal revision switches from commit tab
+            tw.setCurrentIndex(self.logTabIndex)
 
     def revision_selected(self, rev):
         'View selection changed, could be a reload'
