@@ -343,10 +343,12 @@ class MergePage(BasePage):
             cmdline = ['--repository', self.wizard().repo.root,
                        'debugsetparents', '.', self.wizard().other]
         else:
+            cmdline = ['--repository', self.wizard().repo.root, 'merge']
+            if self.field('force').toBool():
+                cmdline.append('--force')
             tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
-            cmdline = ['--repository', self.wizard().repo.root, 'merge',
-                       '--tool=internal:' + tool, 
-                       self.wizard().other]
+            cmdline += ['--tool=internal:' + tool]
+            cmdline.append(self.wizard().other)
         self.cmd.run(cmdline)
 
     def cancel(self):
@@ -364,7 +366,7 @@ class MergePage(BasePage):
     def isComplete(self):
         if self.clean:
             return True
-        return self.wizard().field('force').toBool()
+        return self.field('force').toBool()
 
     ### Signal Handlers ###
 
