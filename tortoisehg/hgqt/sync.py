@@ -105,8 +105,9 @@ class SyncWidget(QWidget):
             self.p4pbutton = None
 
         self.targetcombo = QComboBox()
+        self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
-        self.targetcheckbox.stateChanged.connect(self.toggleTargetCheckBox)
+        self.targetcheckbox.stateChanged.connect(self.targetcombo.setEnabled)
         hbox.addWidget(self.targetcheckbox)
         hbox.addWidget(self.targetcombo)
 
@@ -214,33 +215,27 @@ class SyncWidget(QWidget):
 
     def loadTargets(self, rev):
         self.targetcombo.clear()
-        self.targetcombo.addItem("rev: " + str(rev), str(rev))
+        self.targetcombo.addItem(_('rev: ') + str(rev), str(rev))
 
         for name in self.repo.namedbranches:
-            if name != "default":
-                #We need to convert the branch name to hex because it may
-                #contain special chars like '-' that QComboBox::findData does
-                #not like
-                self.targetcombo.addItem("branch: " + name, hexlify(name))
-
+            uname = hglib.tounicode(name)
+            self.targetcombo.addItem(_('branch: ') + uname, hexlify(name))
         for name, node in self.repo.bookmarks.items():
-            self.targetcombo.addItem("bookmark: " + name, node)
+            uname = hglib.tounicode(name)
+            self.targetcombo.addItem(_('bookmark: ') + uname, node)
 
     def refreshTargets(self, rev):
-        if rev is None:
-            rev = "tip"
-        # Reload the bookmarks before selecting the revision
+        if type(rev) is not int:
+            return
         self.loadTargets(rev)
         ctx = self.repo.changectx(rev)
 
-        if rev == "tip":
-            target = "tip"
-        else:
-            target = ctx.branch()
-            if target == "default":
+        target = str(rev)
+        if ctx.thgbranchhead():
+            target = hexlify(ctx.branch())
+        for tag in ctx.thgtags():
+            if tag in self.repo.bookmarks.keys():
                 target = ctx.node()
-            else:
-                target = hexlify(target)
 
         index = self.targetcombo.findData(target)
         if index < 0:
@@ -248,10 +243,15 @@ class SyncWidget(QWidget):
         self.targetcombo.setCurrentIndex(index)
 
     def applyTargetOption(self, cmdline):
-        if not self.targetcheckbox.isChecked():
-            revtext = str(self.targetcombo.currentText())
-            rev = revtext.split(': ').pop().strip()
-            cmdline += ['--rev', rev]
+        if self.targetcheckbox.isChecked():
+            revtext = hglib.fromunicode(self.targetcombo.currentText())
+            args = revtext.split(': ')
+            if args[0] == 'rev':
+                cmdline += ['--rev', args[1]]
+            elif args[0] == 'branch':
+                cmdline += ['--branch', args[1]]
+            elif args[0] == 'bookmark':
+                cmdline += ['--bookmark', args[1]]
         return cmdline
 
     def configChanged(self):
