@@ -19,6 +19,7 @@ from mercurial import merge as mergemod
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
+from binascii import hexlify
 
 # TODO
 # Write keyring help, connect to help button
@@ -103,9 +104,11 @@ class SyncWidget(QWidget):
         else:
             self.p4pbutton = None
 
-        self.bookmarkcombo = QComboBox()
-        hbox.addWidget(QLabel(_('Bookmark:')))
-        hbox.addWidget(self.bookmarkcombo)
+        self.targetcombo = QComboBox()
+        self.targetcheckbox = QCheckBox(_('Target:'))
+        self.targetcheckbox.stateChanged.connect(self.toggleTargetCheckBox)
+        hbox.addWidget(self.targetcheckbox)
+        hbox.addWidget(self.targetcombo)
 
         hbox.addStretch(1)
         self.urllabel = QLabel()
@@ -205,24 +208,50 @@ class SyncWidget(QWidget):
         else:
             self.curalias = None
 
-    def loadBookmarks(self):
-        self.bookmarkcombo.clear()
-        self.bookmarkcombo.addItem(_("<all>"), _("all"))
-        for name, node in self.repo.bookmarks.items():
-            self.bookmarkcombo.addItem(name, node)
+    def toggleTargetCheckBox(self):
+        state = not self.targetcombo.isEnabled()
+        self.targetcombo.setEnabled(state)
 
-    def refreshBookmarks(self, node):
+    def loadTargets(self, rev):
+        self.targetcombo.clear()
+        self.targetcombo.addItem("rev: " + str(rev), str(rev))
+
+        for name in self.repo.namedbranches:
+            if name != "default":
+                #We need to convert the branch name to hex because it may
+                #contain special chars like '-' that QComboBox::findData does
+                #not like
+                self.targetcombo.addItem("branch: " + name, hexlify(name))
+
+        for name, node in self.repo.bookmarks.items():
+            self.targetcombo.addItem("bookmark: " + name, node)
+
+    def refreshTargets(self, rev):
+        if rev is None:
+            rev = "tip"
         # Reload the bookmarks before selecting the revision
-        self.loadBookmarks()
-        index = self.bookmarkcombo.findData(node)
+        self.loadTargets(rev)
+        ctx = self.repo.changectx(rev)
+
+        if rev == "tip":
+            target = "tip"
+        else:
+            target = ctx.branch()
+            if target == "default":
+                target = ctx.node()
+            else:
+                target = hexlify(target)
+
+        index = self.targetcombo.findData(target)
         if index < 0:
             index = 0
-        self.bookmarkcombo.setCurrentIndex(index)
+        self.targetcombo.setCurrentIndex(index)
 
-    def applyBookmarkOption(self, cmdline):
-        bookmark = str(self.bookmarkcombo.currentText())
-        if bookmark != '<all>':
-            cmdline += ['--rev', bookmark]
+    def applyTargetOption(self, cmdline):
+        if not self.targetcheckbox.isChecked():
+            revtext = str(self.targetcombo.currentText())
+            rev = revtext.split(': ').pop().strip()
+            cmdline += ['--rev', rev]
         return cmdline
 
     def configChanged(self):
@@ -270,7 +299,6 @@ class SyncWidget(QWidget):
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
-        self.loadBookmarks()
 
     def refreshUrl(self):
         'User has changed schema/host/port/path'
@@ -493,7 +521,7 @@ class SyncWidget(QWidget):
                 cmdline.append(val)
 
         if 'rev' in details and '--rev' not in cmdline:
-            cmdline = self.applyBookmarkOption(cmdline)
+            cmdline = self.applyTargetOption(cmdline)
 
         url = self.currentUrl(False)
         if not url:
@@ -534,30 +562,6 @@ class SyncWidget(QWidget):
             self.showMessage.emit(_('sync command already running'))
         else:
             self.pushclicked()
-
-    def pullBundle(self, bundle, rev):
-        'accept bundle changesets'
-        if self.cmd.core.is_running():
-            self.showMessage.emit(_('sync command already running'))
-            return
-        save = self.currentUrl(False)
-        orev = self.opts.get('rev')
-        self.setUrl(bundle)
-        if rev is not None:
-            self.opts['rev'] = str(rev)
-        self.pullclicked()
-        self.setUrl(save)
-        self.opts['rev'] = orev
-
-    def pushToRevision(self, rev):
-        'push to specified revision'
-        if self.cmd.core.is_running():
-            self.showMessage.emit(_('sync command already running'))
-            return
-        orev = self.opts.get('rev')
-        self.opts['rev'] = str(rev)
-        self.pushclicked()
-        self.opts['rev'] = orev
 
     ##
     ## Sync dialog buttons
@@ -1154,18 +1158,6 @@ class OptionsDialog(QDialog):
         self.subrepocb = QCheckBox(_('Recurse into subrepositories'))
         self.subrepocb.setChecked(opts.get('subrepos', False))
         layout.addRow(self.subrepocb, None)
-
-        lbl = QLabel(_('Specify branch for push/pull:'))
-        self.branchle = QLineEdit()
-        if opts.get('branch'):
-            self.branchle.setText(hglib.tounicode(opts['branch']))
-        layout.addRow(lbl, self.branchle)
-
-        lbl = QLabel(_('Specify revision for push/pull:'))
-        self.revle = QLineEdit()
-        if opts.get('rev'):
-            self.revle.setText(hglib.tounicode(opts['rev']))
-        layout.addRow(lbl, self.revle)
 
         lbl = QLabel(_('Remote command:'))
         self.remotele = QLineEdit()

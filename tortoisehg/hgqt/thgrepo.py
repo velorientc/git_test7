@@ -383,6 +383,16 @@ def _extendrepo(repo):
             return installed
 
         @propertycache
+        def namedbranches(self):
+            allbranches = self.branchtags()
+            openbrnodes = []
+            for br in allbranches.iterkeys():
+                openbrnodes.extend(self.branchheads(br, closed=False))
+            dead = self.deadbranches
+            return sorted(br for br, n in allbranches.iteritems()
+                          if n in openbrnodes and br not in dead)
+
+        @propertycache
         def bookmarks(self):
             if 'bookmarks' in self._exts and hasattr(self, '_bookmarks'):
                 return self._bookmarks

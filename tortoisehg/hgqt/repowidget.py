@@ -128,7 +128,6 @@ class RepoWidget(QWidget):
 
         self.repoview = view = HgRepoView(self.repo, self)
         view.revisionSelected.connect(self.revision_selected)
-        view.revisionClicked.connect(self.revision_clicked)
         view.revisionActivated.connect(self.revision_activated)
         view.showMessage.connect(self.showMessage)
         view.menuRequested.connect(self.viewMenuRequest)
@@ -272,8 +271,7 @@ class RepoWidget(QWidget):
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.incomingBundle.connect(self.setBundle)
-        ctx = self.repo.changectx(self.rev)
-        sw.refreshBookmarks(ctx.node())
+        sw.refreshTargets(self.rev)
         return sw
 
     @pyqtSlot(QString)
@@ -312,20 +310,6 @@ class RepoWidget(QWidget):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.pullBundle(self.bundle, None)
         self.clearBundle()
-
-    def pullToRev(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-        self.syncDemand.pullBundle(self.bundle, self.rev)
-        removed = [self.repo[self.rev]]
-        while removed:
-            ctx = removed.pop()
-            if ctx.node() in self.revset:
-                self.revset.remove(ctx.node())
-                removed.extend(ctx.parents())
-        self.repomodel.revset = self.revset
-        if not self.revset:
-            self.clearBundle()
-        self.refresh()
 
     def rejectBundle(self):
         self.clearBundle()
@@ -535,16 +519,6 @@ class RepoWidget(QWidget):
         # Perhaps we can update a GUI element later, to indicate full load
         pass
 
-    def revision_clicked(self, rev):
-        'User clicked on a repoview row'
-        tw = self.taskTabsWidget
-        if type(rev) == str: # unapplied patch
-            tw.setCurrentIndex(self.logTabIndex)
-        elif rev is None:
-            tw.setCurrentIndex(self.commitTabIndex)
-        elif tw.currentWidget() in (self.commitDemand, self.syncDemand):
-            tw.setCurrentIndex(self.logTabIndex)
-
     def revision_selected(self, rev):
         'View selection changed, could be a reload'
         if self.repomodel.graph is None:
@@ -556,9 +530,7 @@ class RepoWidget(QWidget):
             self.grepDemand.forward('setRevision', rev)
 
         self.revDetailsWidget.revision_selected(rev)
-
-        ctx = self.repo.changectx(rev)
-        self.syncDemand.forward('refreshBookmarks', ctx.node())
+        self.syncDemand.forward('refreshTargets', rev)
 
         self.revisionSelected.emit(rev)
 
@@ -736,15 +708,7 @@ class RepoWidget(QWidget):
                     break
             else:
                 allunapp = True
-        if self.bundle:
-            # Special menu for applied bundle
-            menu = QMenu(self) # TODO: save in repowidget
-            act = QAction(_('Pull to here'), self)
-            act.triggered.connect(self.pullToRev)
-            menu.addAction(act)
-            menu.exec_(point)
-            return
-        elif allunapp:
+        if allunapp:
             self.unnapliedPatchMenu(point, selection)
         elif len(selection) == 1:
             self.singleSelectionMenu(point, selection)
@@ -837,7 +801,6 @@ class RepoWidget(QWidget):
                 ('bookmarks', fixed, _('Bookmark...'), 'bookmark',
                     self.bookmarkRevision),
                 (None, fixed, _('Backout...'), None, self.backoutToRevision),
-                (None, fixed, _('Push to here'), None, self.pushToRevision),
                 (None, isrev, _('Export patch'), None, self.exportRevisions),
                 (None, isrev, _('Email patch...'), None, self.emailRevision),
                 (None, isrev, _('Archive...'), None, self.archiveRevision),
@@ -1033,10 +996,6 @@ class RepoWidget(QWidget):
     def transplantRevision(self):
         cmdline = ['transplant', '--repository', self.repo.root, str(self.rev)]
         self.runCommand(_('Transplant - TortoiseHg'), cmdline)
-
-    def pushToRevision(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-        self.syncDemand.pushToRevision(self.rev)
 
     def backoutToRevision(self):
         dlg = backout.BackoutDialog(self.repo, str(self.rev), self)
