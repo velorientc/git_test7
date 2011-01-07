@@ -98,9 +98,9 @@ class ThgRepoWrapper(QObject):
         self._checkuimtime()
 
     def locked(self):
-        if os.path.exists(self.repo.join('wlock')):
+        if os.path.lexists(self.repo.join('wlock')):
             return True
-        if os.path.exists(self.repo.sjoin('lock')):
+        if os.path.lexists(self.repo.sjoin('lock')):
             return True
         return False
 
