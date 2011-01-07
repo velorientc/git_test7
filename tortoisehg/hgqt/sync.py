@@ -107,7 +107,7 @@ class SyncWidget(QWidget):
         self.targetcombo = QComboBox()
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
-        self.targetcheckbox.stateChanged.connect(self.targetcombo.setEnabled)
+        self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
         hbox.addWidget(self.targetcheckbox)
         hbox.addWidget(self.targetcombo)
 
