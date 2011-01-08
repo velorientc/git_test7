@@ -514,7 +514,13 @@ class Workbench(QMainWindow):
     def cloneRepository(self):
         """ Run clone dialog """
         from tortoisehg.hgqt.clone import CloneDialog
-        clonedlg = CloneDialog(args=[], parent=self)
+        repoWidget = self.repoTabsWidget.currentWidget()
+        if repoWidget:
+            root = repoWidget.repo.root
+            args = [root, os.path.dirname(root)]
+        else:
+            args = []
+        clonedlg = CloneDialog(args, parent=self)
         if clonedlg.exec_():
             path = clonedlg.getDest()
             self.openRepo(path)
