@@ -240,6 +240,7 @@ class ShelveDialog(QMainWindow):
         self.delShelfButtonB.setEnabled(rev.startswith(self.repo.shelfdir))
         self.browseb.setContext(self.repo.changectx(rev))
 
+    @pyqtSlot(int, int)
     def linkSplitters(self, pos, index):
         if self.browsea.splitter.sizes()[0] != pos:
             self.browsea.splitter.moveSplitter(pos, index)
