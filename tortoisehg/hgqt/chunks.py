@@ -138,7 +138,7 @@ class DiffBrowser(QFrame):
 
         self.labelhbox = hbox = QHBoxLayout()
         hbox.setContentsMargins(0,0,0,0)
-        hbox.setSpacing(0)
+        hbox.setSpacing(2)
         self.layout().addLayout(hbox)
         self.filenamelabel = w = QLabel()
         hbox.addWidget(w)
@@ -148,8 +148,18 @@ class DiffBrowser(QFrame):
         w.linkActivated.connect(self.linkActivated)
 
         self.sumlabel = QLabel()
+        self.allbutton = QToolButton()
+        self.allbutton.setText(_('All'))
+        self.allbutton.setShortcut(QKeySequence.SelectAll)
+        self.allbutton.clicked.connect(self.selectAll)
+        self.nonebutton = QToolButton()
+        self.nonebutton.setText(_('None'))
+        self.nonebutton.setShortcut(QKeySequence.New)
+        self.nonebutton.clicked.connect(self.selectNone)
         hbox.addStretch(1)
         hbox.addWidget(self.sumlabel)
+        hbox.addWidget(self.allbutton)
+        hbox.addWidget(self.nonebutton)
 
         self.extralabel = w = QLabel()
         w.setWordWrap(True)
@@ -183,13 +193,6 @@ class DiffBrowser(QFrame):
         self.sci.setMarginMarkerMask(1, mask)
 
         self.layout().addWidget(self.sci, 1)
-
-        self.selall = QShortcut(QKeySequence.SelectAll, self)
-        self.selall.activated.connect(self.selectAll)
-        self.selall.activatedAmbiguously.connect(self.selectAll)
-        self.selnone = QShortcut(QKeySequence.New, self)
-        self.selnone.activated.connect(self.selectNone)
-        self.selnone.activatedAmbiguously.connect(self.selectNone)
 
         lexer = lexers.get_diff_lexer(self)
         self.sci.setLexer(lexer)
