@@ -124,8 +124,10 @@ class ThgRepoWrapper(QObject):
 
     def _getrepomtime(self):
         'Return the last modification time for the repo'
-        watchedfiles = [self.repo.sjoin('00changelog.i'),
-                        self.repo.join('patches/series')]
+        watchedfiles = [self.repo.sjoin('00changelog.i')]
+        if hasattr(self.repo, 'mq'):
+            watchedfiles.append(self.repo.mq.join('series'))
+            watchedfiles.append(self.repo.join('patches/queue'))
         try:
             mtime = [os.path.getmtime(wf) for wf in watchedfiles \
                      if os.path.isfile(wf)]
