@@ -12,7 +12,7 @@ from hgext import record
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers
+from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, wctxactions
 from tortoisehg.hgqt import filelistmodel, filelistview, fileview
 
 from PyQt4.QtCore import *
@@ -32,6 +32,7 @@ class ChunksWidget(QWidget):
         QWidget.__init__(self, parent)
 
         self.repo = repo
+        self.currentFile = None
 
         layout = QVBoxLayout(self)
         layout.setSpacing(0)
@@ -63,12 +64,34 @@ class ChunksWidget(QWidget):
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 3)
 
+    def editCurrentFile(self):
+        ctx = self.filelistmodel._ctx
+        if isinstance(ctx, patchctx):
+            path = ctx._path
+        else:
+            path = self.repo.wjoin(self.currentFile)
+        wctxactions.edit(self, self.repo.ui, self.repo, [path])
+
+    def deleteSelectedChunks(self):
+        pass
+
+    def addFile(self, wfile, chunks):
+        pass
+
+    def removeFile(self, wfile):
+        pass
+
+    def getChunksForFile(self, wfile):
+        pass
+
     @pyqtSlot(object, object, object)
     def displayFile(self, file, rev, status):
         if file:
+            self.currentFile = file
             self.diffbrowse.displayFile(file, status)
             self.fileSelected.emit(True)
         else:
+            self.currentFile = None
             self.diffbrowse.clearDisplay()
             self.fileSelected.emit(False)
 
