@@ -546,12 +546,11 @@ def _extendchangectx(changectx):
 _pctxcache = {}
 def genPatchContext(repo, patchpath, rev=None):
     global _pctxcache
-    holder = _pctxcache.get(patchpath, None)
-    if os.path.exists(patchpath):
-        mtime = os.path.getmtime(patchpath)
-        if holder is not None and mtime == holder[0]:
-            return holder[1]
+    if os.path.exists(patchpath) and patchpath in _pctxcache:
+        cachedctx = _pctxcache[patchpath]
+        if cachedctx._mtime == os.path.getmtime(patchpath):
+            return cachedctx
     # create a new context object
     ctx = patchctx(patchpath, repo, rev=rev)
-    _pctxcache[patchpath] = (mtime, ctx)
+    _pctxcache[patchpath] = ctx
     return ctx

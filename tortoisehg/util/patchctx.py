@@ -37,10 +37,12 @@ class patchctx(object):
         self._desc = ''
         self._branch = ''
         self._node = node.nullid
+        self._mtime = None
 
         try:
             ph = mq.patchheader(self._path)
             self._ph = ph
+            self._mtime = os.path.getmtime(patchpath)
         except EnvironmentError:
             return
 
