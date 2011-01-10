@@ -698,7 +698,7 @@ class FileData(object):
         self.olddata = olddata
         olddata = olddata.splitlines()
         newdata = newdata.splitlines()
-        gen = difflib.unified_diff(olddata, newdata, oldname, wfile,
+        gen = difflib.unified_diff(olddata, newdata, 'a/'+oldname, 'b/'+wfile,
                                    lineterm='')
         data = []
         if repo.ui.config('diff', 'showfunc'):
