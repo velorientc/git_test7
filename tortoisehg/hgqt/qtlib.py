@@ -10,6 +10,7 @@ import atexit
 import shutil
 import stat
 import tempfile
+import re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -144,6 +145,60 @@ def markup(msg, **styles):
     msg = Qt.escape(msg)
     msg = msg.replace('\n', '<br />')
     return '<span style="%s">%s</span>' % (style, msg)
+
+def descriptionhtmlizer():
+    """Return a function to mark up ctx.description() as an HTML
+
+    >>> htmlize = descriptionhtmlizer()
+    >>> htmlize('foo <bar> \\n& <baz>')
+    u'foo &lt;bar&gt; \\n&amp; &lt;baz&gt;'
+
+    changeset hash link:
+    >>> htmlize('foo af50a62e9c20 bar')
+    u'foo <a href="rev_hash_af50a62e9c20">af50a62e9c20</a> bar'
+    >>> htmlize('af50a62e9c2040dcdaf61ba6a6400bb45ab56410') # doctest: +ELLIPSIS
+    u'<a href="rev_hash_af...10">af...10</a>'
+
+    http/https links:
+    >>> s = htmlize('foo http://example.com:8000/foo?bar=baz&bax#blah')
+    >>> (s[:63], s[63:]) # doctest: +NORMALIZE_WHITESPACE
+    (u'foo <a href="http://example.com:8000/foo?bar=baz&amp;bax#blah">',
+     u'http://example.com:8000/foo?bar=baz&amp;bax#blah</a>')
+    >>> htmlize('https://example/')
+    u'<a href="https://example/">https://example/</a>'
+    """
+    # TODO: support tortoisehg.issue.regex and issue.link
+    csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
+    httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
+    regexp = r'%s|%s' % (csmatch, httpmatch)
+    bodyre = re.compile(regexp)
+
+    revhashprefix = 'rev_hash_'
+
+    def htmlize(desc):
+        """Mark up ctx.description() [localstr] as an HTML [unicode]"""
+        desc = unicode(Qt.escape(hglib.tounicode(desc)))
+
+        buf = ''
+        pos = 0
+        for m in bodyre.finditer(desc):
+            a, b = m.span()
+            if a >= pos:
+                buf += desc[pos:a]
+                pos = b
+            groups = m.groups()
+            if groups[0]:
+                cslink = groups[0]
+                buf += '<a href="%s%s">%s</a>' % (revhashprefix, cslink, cslink)
+            if groups[1]:
+                urllink = groups[1]
+                buf += '<a href="%s">%s</a>' % (urllink, urllink)
+        if pos < len(desc):
+            buf += desc[pos:]
+
+        return buf
+
+    return htmlize
 
 _iconcache = {}
 

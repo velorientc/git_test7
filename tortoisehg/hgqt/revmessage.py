@@ -14,22 +14,10 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-import re
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from tortoisehg.util.util import xml_escape
-from tortoisehg.util.hglib import tounicode
-
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-
-# initialize changeset and url link regex
-csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
-httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
-regexp = r'%s|%s' % (csmatch, httpmatch)
-bodyre = re.compile(regexp)
 
 revhashprefix = 'rev_hash_'
 
@@ -53,6 +41,8 @@ class RevMessage(QWidget):
 
         self.setLayout(vb)
 
+        self._htmlize = qtlib.descriptionhtmlizer()
+
         self._message.anchorClicked.connect(self.anchorClicked)
 
     def anchorClicked(self, qurl):
@@ -65,28 +55,8 @@ class RevMessage(QWidget):
 
     def displayRevision(self, ctx):
         self.ctx = ctx
-
-        desc = xml_escape(tounicode(ctx.description()))
-
-        buf = ''
-        pos = 0
-        for m in bodyre.finditer(desc):
-            a, b = m.span()
-            if a >= pos:
-                buf += desc[pos:a]
-                pos = b
-            groups = m.groups()
-            if groups[0]:
-                cslink = groups[0]
-                buf += '<a href="%s%s">%s</a>' % (revhashprefix, cslink, cslink)
-            if groups[1]:
-                urllink = groups[1]
-                buf += '<a href="%s">%s</a>' % (urllink, urllink)
-        if pos < len(desc):
-            buf += desc[pos:]
-
-        buf = '<pre>%s</pre>' % buf
-        self._message.setHtml(buf)
+        self._message.setHtml('<pre>%s</pre>'
+                              % self._htmlize(ctx.description()))
 
     def minimumSizeHint(self):
         return QSize(0, 25)
