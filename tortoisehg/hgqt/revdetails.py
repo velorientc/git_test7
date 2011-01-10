@@ -39,7 +39,7 @@ class RevDetailsWidget(QWidget):
         self.createActions()
         self.setupModels()
 
-        self.fileview.setFont(getfont('fontlog').font())
+        self.fileview.setFont(getfont('fontdiff').font())
         self.fileview.showMessage.connect(self.showMessage)
         self.restoreSettings()
 

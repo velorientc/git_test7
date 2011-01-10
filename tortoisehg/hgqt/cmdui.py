@@ -327,7 +327,7 @@ class LogWidget(QsciScintilla):
         self._initmarkers()
 
     def _initfont(self):
-        tf = qtlib.getfont('fontlog')
+        tf = qtlib.getfont('fontoutputlog')
         tf.changed.connect(lambda f: self.setFont(f))
         self.setFont(tf.font())
 

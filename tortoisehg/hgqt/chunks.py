@@ -59,7 +59,7 @@ class ChunksWidget(QWidget):
         self.fileListFrame.setLayout(vbox)
 
         self.diffbrowse = DiffBrowser(self.splitter)
-        self.diffbrowse.setFont(qtlib.getfont('fontlog').font())
+        self.diffbrowse.setFont(qtlib.getfont('fontdiff').font())
         self.diffbrowse.showMessage.connect(self.showMessage)
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.diffbrowse.chunksSelected.connect(self.chunksSelected)

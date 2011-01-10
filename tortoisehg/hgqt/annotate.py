@@ -44,7 +44,7 @@ class AnnotateView(qscilib.Scintilla):
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
         self.setMouseTracking(True)
-        self.setFont(qtlib.getfont('fontlog').font())
+        self.setFont(qtlib.getfont('fontdiff').font())
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
 

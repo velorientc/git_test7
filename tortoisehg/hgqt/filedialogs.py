@@ -42,7 +42,7 @@ class _AbstractFileDialog(QMainWindow):
         QMainWindow.__init__(self)
         self.repo = repo
 
-        self._font = getfont('fontlog').font()
+        self._font = getfont('fontdiff').font()
         self.setupUi(self)
         self.setRepoViewer(repoviewer)
         self._show_rev = None

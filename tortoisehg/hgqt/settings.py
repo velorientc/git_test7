@@ -535,8 +535,11 @@ INFO = (
     _fi(_('List Font'), 'tortoisehg.fontlist', genFontEdit,
         _('Font used to display file lists. Default: sans 9'),
        globalonly=True),
-    _fi(_('Log Font'), 'tortoisehg.fontlog', genFontEdit,
+    _fi(_('ChangeLog Font'), 'tortoisehg.fontlog', genFontEdit,
         _('Font used to display changelog data. Default: monospace 10'),
+       globalonly=True),
+    _fi(_('Output Font'), 'tortoisehg.fontoutputlog', genFontEdit,
+        _('Font used to display output messages. Default: sans 8'),
        globalonly=True),
     )),
 

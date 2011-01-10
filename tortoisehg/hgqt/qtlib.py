@@ -300,7 +300,8 @@ _fontdefaults = {
     'fontcomment': 'monospace,10',
     'fontdiff': 'monospace,10',
     'fontlist': 'sans,9',
-    'fontlog': 'monospace,10'
+    'fontlog': 'monospace,10',
+    'fontoutputlog': 'sans,8'
 }
 _fontcache = {}
 
