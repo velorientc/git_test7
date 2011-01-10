@@ -206,6 +206,16 @@ class CloneDialog(QDialog):
             dest = os.path.basename(src)
             destQ = QString(hglib.tounicode(dest))
 
+        if not dest.startswith('ssh://'):
+            if not os.path.exists(dest):
+                try:
+                    os.mkdir(dest)
+                except EnvironmentError:
+                    qtlib.ErrorMsgBox(_('TortoiseHg Clone'),
+                    _('Error creating destination folder'),
+                    _('Please specify a different path.'))
+                    return False
+
         if srcQ:
             l = list(self.shist)
             if srcQ in l:
