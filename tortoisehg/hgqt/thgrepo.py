@@ -440,7 +440,7 @@ def _extendrepo(repo):
         def thgshelves(self):
             self.shelfdir = sdir = self.join('shelves')
             if os.path.isdir(sdir):
-                return [os.path.join(sdir, s) for s in os.listdir(sdir)]
+                return os.listdir(sdir)
             return []
 
         def thginvalidate(self):
