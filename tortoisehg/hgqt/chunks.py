@@ -8,6 +8,7 @@
 import cStringIO
 import os
 
+from mercurial import hg, util, patch
 from hgext import record
 
 from tortoisehg.util import hglib
@@ -28,6 +29,7 @@ class ChunksWidget(QWidget):
     showMessage = pyqtSignal(QString)
     chunksSelected = pyqtSignal(bool)
     fileSelected = pyqtSignal(bool)
+    fileModified = pyqtSignal()
 
     def __init__(self, repo, parent):
         QWidget.__init__(self, parent)
@@ -94,7 +96,44 @@ class ChunksWidget(QWidget):
         wctxactions.edit(self, self.repo.ui, self.repo, [path])
 
     def deleteSelectedChunks(self):
-        pass
+        'delete currently selected chunks'
+        repo = self.repo
+        chunks = self.diffbrowse.curchunks
+        dchunks = [c for c in chunks[1:] if c.selected]
+        if not dchunks:
+            self.showMessage.emit(_('No deletable chunks'))
+            return
+        kchunks = [c for c in chunks[1:] if not c.selected]
+        revertall = False
+        if not kchunks and qtlib.QuestionMsgBox(_('No chunks remain'),
+                                                _('Remove all file changes?')):
+            revertall = True
+        ctx = self.filelistmodel._ctx
+        if isinstance(ctx, patchctx):
+            raise 'unimplemented'
+        else:
+            path = repo.wjoin(self.currentFile)
+            if not os.path.exists(path):
+                self.showMessage.emit(_('file hsa been deleted, refresh'))
+                return
+            if self.mtime != os.path.getmtime(path):
+                self.showMessage.emit(_('file hsa been modified, refresh'))
+                return
+            if revertall:
+                hg.revert(repo, repo.dirstate.parents()[0],
+                          lambda a: a == self.currentFile)
+            else:
+                repo.wopener(self.currentFile, 'wb').write(
+                    self.diffbrowse.origcontents)
+                fp = cStringIO.StringIO()
+                chunks[0].write(fp)
+                for c in kchunks:
+                    c.write(fp)
+                fp.seek(0)
+                pfiles = {}
+                patch.internalpatch(fp, repo.ui, 1, repo.root, files=pfiles,
+                                    eolmode=None)
+            self.fileModified.emit()
 
     def addFile(self, wfile, chunks):
         pass
@@ -118,6 +157,10 @@ class ChunksWidget(QWidget):
             self.fileSelected.emit(False)
 
     def setContext(self, ctx):
+        if self.filelist.model() is not None:
+            f = self.filelist.currentFile()
+        else:
+            f = None
         self.fileSelected.emit(False)
         self.filelistmodel = filelistmodel.HgFileListModel(self.repo, self)
         self.filelist.setModel(self.filelistmodel)
@@ -125,6 +168,8 @@ class ChunksWidget(QWidget):
         self.filelist.clearDisplay.connect(self.diffbrowse.clearDisplay)
         self.diffbrowse.setContext(ctx)
         self.filelistmodel.setContext(ctx)
+        if f and f in ctx:
+            self.filelist.selectFile(f)
 
     def refresh(self):
         f = self.filelist.currentFile()
@@ -331,6 +376,7 @@ class DiffBrowser(QFrame):
                 else:
                     self.sci.markerAdd(start+i, self.vertical)
             start += len(chunk.lines)
+        self.origcontents = fd.olddata
         self.curchunks = chunks
         self.countselected = 0
         self.updateSummary()

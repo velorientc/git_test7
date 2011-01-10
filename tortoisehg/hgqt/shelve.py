@@ -100,6 +100,7 @@ class ShelveDialog(QMainWindow):
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
         self.addToolBar(self.lefttbar)
         self.deletea = a = QAction(_('Deleted selected chunks'), self)
+        self.deletea.triggered.connect(self.browsea.deleteSelectedChunks)
         a.setIcon(qtlib.geticon('delfilesleft'))
         self.lefttbar.addAction(self.deletea)
         self.allright = a = QAction(_('Move all files right'), self)
@@ -130,6 +131,7 @@ class ShelveDialog(QMainWindow):
         a.setIcon(qtlib.geticon('media-seek-backward'))
         self.righttbar.addAction(self.allleft)
         self.deleteb = a = QAction(_('Deleted selected chunks'), self)
+        self.deleteb.triggered.connect(self.browseb.deleteSelectedChunks)
         a.setIcon(qtlib.geticon('delfilesright'))
         self.righttbar.addAction(self.deleteb)
 
@@ -140,10 +142,12 @@ class ShelveDialog(QMainWindow):
         self.browsea.chunksSelected.connect(self.deletea.setEnabled)
         self.browsea.fileSelected.connect(self.fileright.setEnabled)
         self.browsea.fileSelected.connect(self.editfilea.setEnabled)
+        self.browsea.fileModified.connect(self.refreshCombos)
         self.browseb.chunksSelected.connect(self.chunksleft.setEnabled)
         self.browseb.chunksSelected.connect(self.deleteb.setEnabled)
         self.browseb.fileSelected.connect(self.fileleft.setEnabled)
         self.browseb.fileSelected.connect(self.editfileb.setEnabled)
+        self.browseb.fileModified.connect(self.refreshCombos)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)
