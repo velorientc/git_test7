@@ -130,7 +130,7 @@ class RevDetailsWidget(QWidget):
         self.message_splitter.setMidLineWidth(0)
         self.message_splitter.setOrientation(Qt.Vertical)
         self.message_splitter.setOpaqueResize(True)
-        self.message = RevMessage(self.message_splitter)
+        self.message = RevMessage(self.repo.ui, self.message_splitter)
         self.message.linkActivated.connect(self.linkActivated)
 
         sp = SP(SP.Expanding, SP.Expanding)

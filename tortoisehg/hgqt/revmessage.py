@@ -22,7 +22,7 @@ from tortoisehg.hgqt import qtlib
 class RevMessage(QWidget):
     linkActivated = pyqtSignal(unicode)
 
-    def __init__(self, parent):
+    def __init__(self, ui, parent):
         QWidget.__init__(self, parent)
 
         vb = QVBoxLayout()
@@ -39,7 +39,7 @@ class RevMessage(QWidget):
 
         self.setLayout(vb)
 
-        self._htmlize = qtlib.descriptionhtmlizer()
+        self._htmlize = qtlib.descriptionhtmlizer(ui)
 
         self._message.anchorClicked.connect(
             lambda url: self.linkActivated.emit(url.toString()))

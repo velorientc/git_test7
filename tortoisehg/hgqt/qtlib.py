@@ -146,10 +146,12 @@ def markup(msg, **styles):
     msg = msg.replace('\n', '<br />')
     return '<span style="%s">%s</span>' % (style, msg)
 
-def descriptionhtmlizer():
+def descriptionhtmlizer(ui):
     """Return a function to mark up ctx.description() as an HTML
 
-    >>> htmlize = descriptionhtmlizer()
+    >>> from mercurial import ui
+    >>> u = ui.ui()
+    >>> htmlize = descriptionhtmlizer(u)
     >>> htmlize('foo <bar> \\n& <baz>')
     u'foo &lt;bar&gt; \\n&amp; &lt;baz&gt;'
 
@@ -166,12 +168,47 @@ def descriptionhtmlizer():
      u'http://example.com:8000/foo?bar=baz&amp;bax#blah</a>')
     >>> htmlize('https://example/')
     u'<a href="https://example/">https://example/</a>'
+
+    issue links:
+    >>> u.setconfig('tortoisehg', 'issue.regex', r'#(\\d+)\\b')
+    >>> u.setconfig('tortoisehg', 'issue.link', 'http://example/issue/{1}/')
+    >>> htmlize = descriptionhtmlizer(u)
+    >>> htmlize('foo #123')
+    u'foo <a href="http://example/issue/123/">#123</a>'
+
+    missing issue.link setting:
+    >>> u.setconfig('tortoisehg', 'issue.link', '')
+    >>> htmlize = descriptionhtmlizer(u)
+    >>> htmlize('foo #123')
+    u'foo #123'
+
+    too many replacements in issue.link:
+    >>> u.setconfig('tortoisehg', 'issue.link', 'http://example/issue/{1}/{2}')
+    >>> htmlize = descriptionhtmlizer(u)
+    >>> htmlize('foo #123')
+    u'foo #123'
+
+    invalid regexp in issue.regex:
+    >>> u.setconfig('tortoisehg', 'issue.regex', '(')
+    >>> htmlize = descriptionhtmlizer(u)
+    >>> htmlize('foo #123')
+    u'foo #123'
+    >>> htmlize('http://example/')
+    u'<a href="http://example/">http://example/</a>'
     """
-    # TODO: support tortoisehg.issue.regex and issue.link
     csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
     httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
     regexp = r'%s|%s' % (csmatch, httpmatch)
     bodyre = re.compile(regexp)
+
+    issuematch = ui.config('tortoisehg', 'issue.regex')
+    issuerepl = ui.config('tortoisehg', 'issue.link')
+    if issuematch and issuerepl:
+        regexp += '|(%s)' % issuematch
+        try:
+            bodyre = re.compile(regexp)
+        except re.error:
+            pass
 
     def htmlize(desc):
         """Mark up ctx.description() [localstr] as an HTML [unicode]"""
@@ -191,6 +228,17 @@ def descriptionhtmlizer():
             if groups[1]:
                 urllink = groups[1]
                 buf += '<a href="%s">%s</a>' % (urllink, urllink)
+            if len(groups) > 4 and groups[4]:
+                issue = groups[4]
+                issueparams = groups[4:]
+                try:
+                    link = re.sub(r'\{(\d+)\}',
+                                  lambda m: issueparams[int(m.group(1))],
+                                  issuerepl)
+                    buf += '<a href="%s">%s</a>' % (link, issue)
+                except IndexError:
+                    buf += issue
+
         if pos < len(desc):
             buf += desc[pos:]
 
