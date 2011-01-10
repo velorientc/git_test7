@@ -155,9 +155,9 @@ def descriptionhtmlizer():
 
     changeset hash link:
     >>> htmlize('foo af50a62e9c20 bar')
-    u'foo <a href="rev_hash_af50a62e9c20">af50a62e9c20</a> bar'
+    u'foo <a href="cset:af50a62e9c20">af50a62e9c20</a> bar'
     >>> htmlize('af50a62e9c2040dcdaf61ba6a6400bb45ab56410') # doctest: +ELLIPSIS
-    u'<a href="rev_hash_af...10">af...10</a>'
+    u'<a href="cset:af...10">af...10</a>'
 
     http/https links:
     >>> s = htmlize('foo http://example.com:8000/foo?bar=baz&bax#blah')
@@ -173,8 +173,6 @@ def descriptionhtmlizer():
     regexp = r'%s|%s' % (csmatch, httpmatch)
     bodyre = re.compile(regexp)
 
-    revhashprefix = 'rev_hash_'
-
     def htmlize(desc):
         """Mark up ctx.description() [localstr] as an HTML [unicode]"""
         desc = unicode(Qt.escape(hglib.tounicode(desc)))
@@ -189,7 +187,7 @@ def descriptionhtmlizer():
             groups = m.groups()
             if groups[0]:
                 cslink = groups[0]
-                buf += '<a href="%s%s">%s</a>' % (revhashprefix, cslink, cslink)
+                buf += '<a href="cset:%s">%s</a>' % (cslink, cslink)
             if groups[1]:
                 urllink = groups[1]
                 buf += '<a href="%s">%s</a>' % (urllink, urllink)

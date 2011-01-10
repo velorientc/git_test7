@@ -19,8 +19,6 @@ from PyQt4.QtGui import *
 
 from tortoisehg.hgqt import qtlib
 
-revhashprefix = 'rev_hash_'
-
 class RevMessage(QWidget):
     revisionLinkClicked = pyqtSignal(str)
 
@@ -47,8 +45,8 @@ class RevMessage(QWidget):
 
     def anchorClicked(self, qurl):
         link = str(qurl.toString())
-        if link.startswith(revhashprefix):
-            rev = link[len(revhashprefix):]
+        if link.startswith('cset:'):
+            rev = link[len('cset:'):]
             self.revisionLinkClicked.emit(rev)
         else:
             QDesktopServices.openUrl(qurl)

@@ -94,7 +94,7 @@ def markup_func(widget, item, value):
         mrevid = revid_markup('%s (%s)' % (revnum, revid))
         if not enable:
             return mrevid
-        link = 'cset://%s:%s' % (revnum, revid)
+        link = 'cset:%s' % revid
         return '<a href="%s">%s</a>' % (link, mrevid)
     def revline_markup(revnum, revid, summary, highlight=None,
                        branch=None, link=True):
@@ -145,8 +145,8 @@ def RevPanelWidget(repo):
         @pyqtSlot(unicode)
         def _maplink(self, link):
             link = unicode(link)
-            if link.startswith('cset://'):
-                self.revisionLinkClicked.emit(link[7:].split(':')[0])
+            if link.startswith('cset:'):
+                self.revisionLinkClicked.emit(link[5:])
 
     revpanel.__class__ = RevPanelWidget_
     revpanel.linkActivated.connect(revpanel._maplink)
