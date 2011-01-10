@@ -20,7 +20,7 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt import qtlib
 
 class RevMessage(QWidget):
-    revisionLinkClicked = pyqtSignal(str)
+    linkActivated = pyqtSignal(unicode)
 
     def __init__(self, parent):
         QWidget.__init__(self, parent)
@@ -41,15 +41,8 @@ class RevMessage(QWidget):
 
         self._htmlize = qtlib.descriptionhtmlizer()
 
-        self._message.anchorClicked.connect(self.anchorClicked)
-
-    def anchorClicked(self, qurl):
-        link = str(qurl.toString())
-        if link.startswith('cset:'):
-            rev = link[len('cset:'):]
-            self.revisionLinkClicked.emit(rev)
-        else:
-            QDesktopServices.openUrl(qurl)
+        self._message.anchorClicked.connect(
+            lambda url: self.linkActivated.emit(url.toString()))
 
     def displayRevision(self, ctx):
         self.ctx = ctx

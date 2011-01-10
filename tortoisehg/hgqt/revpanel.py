@@ -136,22 +136,7 @@ def RevPanelWidget(repo):
     style = csinfo.panelstyle(contents=('cset', 'branch', 'user',
                    'dateage', 'parents', 'children', 'tags', 'transplant',
                    'p4', 'svn'), selectable=True, expandable=True)
-    revpanel = csinfo.create(repo, style=style, custom=custom)
-
-    class RevPanelWidget_(revpanel.__class__):
-        revisionLinkClicked = pyqtSignal(unicode)
-        """Emitted (changesetid) if user clicked link to revision"""
-
-        @pyqtSlot(unicode)
-        def _maplink(self, link):
-            link = unicode(link)
-            if link.startswith('cset:'):
-                self.revisionLinkClicked.emit(link[5:])
-
-    revpanel.__class__ = RevPanelWidget_
-    revpanel.linkActivated.connect(revpanel._maplink)
-
-    return revpanel
+    return csinfo.create(repo, style=style, custom=custom)
 
 
 def nomarkup(widget, item, value):

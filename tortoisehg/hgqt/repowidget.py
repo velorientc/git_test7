@@ -155,7 +155,7 @@ class RepoWidget(QWidget):
         self.repotabs_splitter.setStretchFactor(1, 1)
 
         self.revDetailsWidget = w = RevDetailsWidget(self.repo)
-        w.revisionLinkClicked.connect(self.goto)
+        w.linkActivated.connect(self._openLink)
         w.fileview.showDescSignal.connect(self.showMessage)
         self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
@@ -208,6 +208,19 @@ class RepoWidget(QWidget):
         vis = self.gototb.isVisible()
         self.gototb.setVisible(not vis)
 
+    @pyqtSlot(unicode)
+    def _openLink(self, link):
+        link = unicode(link)
+        handlers = {'cset': self.goto,
+                    'subrepo': self.repoLinkClicked.emit}
+        if ':' in link:
+            scheme, param = link.split(':')
+            hdr = handlers.get(scheme)
+            if hdr:
+                return hdr(param)
+
+        QDesktopServices.openUrl(QUrl(link))
+
     def getCommitWidget(self):
         return getattr(self.repo, '_commitwidget', None)  # TODO: ugly
 
@@ -236,11 +249,7 @@ class RepoWidget(QWidget):
         cw.output.connect(self.output)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
-
-        def openlink(link):
-            if unicode(link).startswith('subrepo:'):
-                self.repoLinkClicked.emit(link[8:])
-        cw.linkActivated.connect(openlink)
+        cw.linkActivated.connect(self._openLink)
 
         cw.showMessage.connect(self.showMessage)
         return cw

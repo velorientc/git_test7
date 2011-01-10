@@ -23,7 +23,7 @@ from PyQt4.QtGui import *
 class RevDetailsWidget(QWidget):
 
     showMessage = pyqtSignal(str)
-    revisionLinkClicked = pyqtSignal(str)
+    linkActivated = pyqtSignal(unicode)
 
     def __init__(self, repo):
         QWidget.__init__(self)
@@ -131,7 +131,7 @@ class RevDetailsWidget(QWidget):
         self.message_splitter.setOrientation(Qt.Vertical)
         self.message_splitter.setOpaqueResize(True)
         self.message = RevMessage(self.message_splitter)
-        self.message.revisionLinkClicked.connect(self.revisionLinkClicked_)
+        self.message.linkActivated.connect(self.linkActivated)
 
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
@@ -150,7 +150,7 @@ class RevDetailsWidget(QWidget):
         self.fileview.setMinimumSize(QSize(0, 0))
 
         self.revpanel = RevPanelWidget(self.repo)
-        self.revpanel.revisionLinkClicked.connect(self.revisionLinkClicked)
+        self.revpanel.linkActivated.connect(self.linkActivated)
 
         cset_and_file_details_layout.addWidget(self.revpanel)
         cset_and_file_details_layout.addWidget(self.message_splitter)
@@ -163,9 +163,6 @@ class RevDetailsWidget(QWidget):
         self.searchbar.conditionChanged.connect(self.fileview.highlightText)
         revisiondetails_layout.addWidget(self.searchbar)
         self.fileview.filled.connect(self._updateHighlightText)
-
-    def revisionLinkClicked_(self, rev):
-        self.revisionLinkClicked.emit(rev)
 
     def createActions(self):
         self.actionDiffMode = QAction('Diff mode', self)
