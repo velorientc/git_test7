@@ -6,6 +6,7 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 import cStringIO
+import os
 
 from hgext import record
 
@@ -63,6 +64,26 @@ class ChunksWidget(QWidget):
 
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 3)
+        self.timerevent = self.startTimer(500)
+
+    def timerEvent(self, event):
+        'Periodic poll of currently displayed patch or working file'
+        ctx = self.filelistmodel._ctx
+        if ctx is None:
+            return
+        if isinstance(ctx, patchctx):
+            path = ctx._path
+            mtime = ctx._mtime
+        elif self.currentFile:
+            path = self.repo.wjoin(self.currentFile)
+            mtime = self.mtime
+        else:
+            return
+        if os.path.exists(path):
+            newmtime = os.path.getmtime(path)
+            if mtime != newmtime:
+                self.mtime = newmtime
+                self.refresh()
 
     def editCurrentFile(self):
         ctx = self.filelistmodel._ctx
@@ -88,6 +109,7 @@ class ChunksWidget(QWidget):
     def displayFile(self, file, rev, status):
         if file:
             self.currentFile = file
+            self.mtime = os.path.getmtime(self.repo.wjoin(file))
             self.diffbrowse.displayFile(file, status)
             self.fileSelected.emit(True)
         else:
