@@ -35,6 +35,7 @@ class HgRepoView(QTableView):
     def __init__(self, repo, parent=None):
         QTableView.__init__(self, parent)
         self.repo = repo
+        self.current_rev = -1
         self.init_variables()
         self.setShowGrid(False)
 
@@ -69,8 +70,6 @@ class HgRepoView(QTableView):
         self.menuRequested.emit(event.globalPos(), self.selectedRevisions())
 
     def init_variables(self):
-        # member variables
-        self.current_rev = -1
         # rev navigation history (manage 'back' action)
         self._rev_history = []
         self._rev_pos = -1
