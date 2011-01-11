@@ -1,0 +1,31 @@
+# HG changeset patch
+# User test
+# Date 0 0
+# Node ID 5b65a3d842610f25b192d26e3dc9161ff53208d0
+# Parent  0000000000000000000000000000000000000000
+foobar
+
+diff --git a/bar b/bar
+new file mode 100644
+diff --git a/baz/bax b/baz/bax
+new file mode 100644
+diff --git a/baz/box b/baz/box
+new file mode 100644
+diff --git a/foo b/foo
+new file mode 100644
+# HG changeset patch
+# User test
+# Date 0 0
+# Node ID 8651fa2fe75d6fdaec4a477fb29a88f7dc97a7e2
+# Parent  5b65a3d842610f25b192d26e3dc9161ff53208d0
+remove baz/box, add zzz, modify bar
+
+diff --git a/bar b/bar
+--- a/bar
++++ b/bar
+@@ -0,0 +1,1 @@
++hello
+diff --git a/baz/box b/baz/box
+deleted file mode 100644
+diff --git a/zzz b/zzz
+new file mode 100644
