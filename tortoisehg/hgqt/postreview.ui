@@ -135,9 +135,16 @@
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QCheckBox" name="longdiff_check">
+         <widget class="QCheckBox" name="outgoing_changes_check">
           <property name="text">
-           <string>Create diff with all changes since last upstream sync</string>
+           <string>Create diff with all outgoing changes</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QCheckBox" name="branch_check">
+          <property name="text">
+           <string>Create diff with all changes on this branch</string>
           </property>
          </widget>
         </item>
@@ -347,10 +354,26 @@
    </hints>
   </connection>
   <connection>
-   <sender>longdiff_check</sender>
+   <sender>outgoing_changes_check</sender>
    <signal>toggled(bool)</signal>
    <receiver>PostReviewDialog</receiver>
-   <slot>toggle_outgoing_changesets()</slot>
+   <slot>outgoingChangesCheckToggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>branch_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>PostReviewDialog</receiver>
+   <slot>branchCheckToggle()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>20</x>
@@ -366,7 +389,7 @@
    <sender>tab_widget</sender>
    <signal>currentChanged(int)</signal>
    <receiver>PostReviewDialog</receiver>
-   <slot>tab_changed()</slot>
+   <slot>tabChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>20</x>
