@@ -199,6 +199,16 @@ LINE_COLORS = [
     ( 1.0, 0.0, 1.0 ),
     ]
 
+def get_gtk_colors():
+    color_scheme = gtk.settings_get_default().get_property('gtk-color-scheme')
+    colors = {}
+    for color in color_scheme.split('\n'):
+        color = color.strip()
+        if color:
+            name, color = color.split(':')
+            colors[name.strip()] = gtk.gdk.color_parse(color.strip())
+    return colors
+
 def get_gtk_text_color():
     w = gtk.Window()
     w.realize()
@@ -207,7 +217,11 @@ def get_gtk_text_color():
 
 def is_dark_theme():
     global NORMAL, MAINLINE_COLOR
-    normal = gtk.gdk.color_parse(get_gtk_text_color())
+    if gtk.pygtk_version < (2, 12, 0):
+        gtk_colors = get_gtk_colors()
+        normal = gtk_colors.get('fg_color', gtk.gdk.color_parse('black'))
+    else:
+        normal = gtk.gdk.color_parse(get_gtk_text_color())
     NORMAL = str(normal)
     MAINLINE_COLOR = (
             normal.red / 65535.0,
