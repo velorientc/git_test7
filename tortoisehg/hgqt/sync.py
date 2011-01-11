@@ -1174,8 +1174,7 @@ class OptionsDialog(QDialog):
 
     def accept(self):
         outopts = {}
-        for name, le in (('branch', self.branchle), ('rev', self.revle),
-                         ('remotecmd', self.remotele)):
+        for name, le in (('remotecmd', self.remotele),):
             outopts[name] = hglib.fromunicode(le.text()).strip()
 
         if outopts.get('branch') and outopts.get('rev'):
