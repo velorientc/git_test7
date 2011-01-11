@@ -140,12 +140,16 @@ class FontEntry(QPushButton):
         self.setFixedWidth(ENTRY_WIDTH)
 
     def on_clicked(self, checked):
+        def newFont(font):
+            self.setText(font.toString())
+            thgf.setFont(font)
         thgf = qtlib.getfont(self.fname)
+        origfont = self.currentFont() or thgf.font()
         dlg = QFontDialog(self)
-        dlg.setCurrentFont(self.currentFont() or thgf.font())
-        if dlg.exec_() == QDialog.Accepted:
-            thgf.setFont(dlg.selectedFont())
-            self.setText(thgf.font().toString())
+        dlg.currentFontChanged.connect(newFont)
+        font, isok = dlg.getFont(origfont, self)
+        self.setText(font.toString())
+        thgf.setFont(font)
 
     def currentFont(self):
         """currently selected QFont if specified"""
