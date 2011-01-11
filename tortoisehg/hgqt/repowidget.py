@@ -243,7 +243,7 @@ class RepoWidget(QWidget):
             self.repo._commitwidget = cw
 
         # connect directly in order to reload all related RepoWidgets
-        cw.commitComplete.connect(self.reload)
+        #cw.commitComplete.connect(self.reload)
 
         cw = SharedWidget(cw)
         cw.output.connect(self.output)
