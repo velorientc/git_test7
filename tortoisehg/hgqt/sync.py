@@ -329,7 +329,7 @@ class SyncWidget(QWidget):
 
     def pathSelected(self, index):
         path = index.model().realUrl(index)
-        self.setUrl(hglib.fromunicode(path))
+        self.setUrl(path)
         aliasindex = index.sibling(index.row(), 0)
         alias = aliasindex.data(Qt.DisplayRole).toString()
         self.curalias = hglib.fromunicode(alias)
@@ -1078,7 +1078,9 @@ class PathsModel(QAbstractTableModel):
         self.rows = []
         for alias, path in pathlist:
             safepath = url.hidepassword(path)
-            self.rows.append([alias, safepath, path])
+            ualias = hglib.tounicode(alias)
+            usafepath = hglib.tounicode(safepath)
+            self.rows.append([ualias, usafepath, path])
 
     def rowCount(self, parent):
         if parent.isValid():
