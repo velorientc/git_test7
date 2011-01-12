@@ -209,10 +209,6 @@ class SyncWidget(QWidget):
         else:
             self.curalias = None
 
-    def toggleTargetCheckBox(self):
-        state = not self.targetcombo.isEnabled()
-        self.targetcombo.setEnabled(state)
-
     def loadTargets(self, rev):
         self.targetcombo.clear()
         self.targetcombo.addItem(_('rev: ') + str(rev), str(rev))
