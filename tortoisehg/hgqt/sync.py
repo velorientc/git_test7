@@ -335,7 +335,7 @@ class SyncWidget(QWidget):
         self.curalias = hglib.fromunicode(alias)
 
     def setUrl(self, newurl):
-        'User has selected a new URL'
+        'User has selected a new URL: newurl is expected in local encoding'
         try:
             user, host, port, folder, passwd, scheme = self.urlparse(newurl)
         except TypeError:
@@ -345,9 +345,9 @@ class SyncWidget(QWidget):
             if scheme == val:
                 self.schemecombo.setCurrentIndex(i)
                 break
-        self.hostentry.setText(host or '')
-        self.portentry.setText(port or '')
-        self.pathentry.setText(folder or '')
+        self.hostentry.setText(hglib.tounicode(host or ''))
+        self.portentry.setText(hglib.tounicode(port or ''))
+        self.pathentry.setText(hglib.tounicode(folder or ''))
         self.curuser = user
         self.curpw = passwd
         self.updateInProgress = False
