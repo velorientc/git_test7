@@ -440,7 +440,7 @@ def fileEditor(filename, **opts):
     s = QSettings()
     ret = QDialog.Rejected
     try:
-        contents = open(filename, 'rb').read()
+        contents = hglib.tounicode(open(filename, 'rb').read())
         dialog.setWindowTitle(filename)
         geomname = 'editor-geom'
         editor.setText(contents)
