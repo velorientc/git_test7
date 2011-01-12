@@ -551,10 +551,9 @@ class RepoWidget(QWidget):
             # patches fully handled downstream
             self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
+            self.syncDemand.forward('refreshTargets', rev)
 
         self.revDetailsWidget.revision_selected(rev)
-        self.syncDemand.forward('refreshTargets', rev)
-
         self.revisionSelected.emit(rev)
 
     def gotoParent(self):
