@@ -92,10 +92,10 @@ class SyncWidget(QWidget):
         hbox.addWidget(tb)
         self.layout().addLayout(hbox)
 
-        self.detailsbutton = QPushButton(_('More Options'))
-        hbox.addWidget(self.detailsbutton)
+        self.detailsbutton = QPushButton(_('Options'))
         self.postpullbutton = QPushButton()
         hbox.addWidget(self.postpullbutton)
+        hbox.addWidget(self.detailsbutton)
         tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
         if 'perfarce' in self.repo.extensions():
             self.p4pbutton = QPushButton(_('p4pending'))

@@ -131,7 +131,7 @@ class CommitWidget(QWidget):
         self.branchop = None
         hbox.addWidget(branchbutton)
 
-        self.detailsbutton = QPushButton(_('More Options'))
+        self.detailsbutton = QPushButton(_('Options'))
         self.detailsbutton.pressed.connect(self.details)
         hbox.addWidget(self.detailsbutton)
 
