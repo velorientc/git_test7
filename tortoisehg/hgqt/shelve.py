@@ -236,6 +236,8 @@ class ShelveDialog(QMainWindow):
     @pyqtSlot()
     def refreshCombos(self):
         shelvea, shelveb = self.currentPatchA(), self.currentPatchB()
+        oldidxa = self.comboa.currentIndex()
+        oldidxb = self.comboa.currentIndex()
 
         shelves = self.repo.thgshelves()
         disp = [_('Shelf: %s') % hglib.tounicode(s) for s in shelves]
@@ -254,17 +256,26 @@ class ShelveDialog(QMainWindow):
 
         # attempt to restore selection
         if shelvea == self.wdir:
-            self.comboa.setCurrentIndex(0)
+            idx = 0
         elif shelvea in self.shelves:
-            self.comboa.setCurrentIndex(1 + self.shelves.index(shelvea))
+            idx = self.shelves.index(shelvea) + 1
         elif shelvea in self.patches:
-            self.comboa.setCurrentIndex(1 + len(self.shelves) +
-                                        self.patches.index(shelvea))
+            idx = len(self.shelves) + self.patches.index(shelvea) + 1
+        else:
+            idx = 0
+        self.comboa.setCurrentIndex(idx)
+        if idx == oldidxa:
+            self.comboAChanged(idx)
+
         if shelveb in self.shelves:
-            self.combob.setCurrentIndex(self.shelves.index(shelveb))
-        if shelveb in self.shelves:
-            self.combob.setCurrentIndex(len(self.shelves) +
-                                        self.patches.index(shelveb))
+            idx = self.shelves.index(shelveb)
+        elif shelveb in self.patches:
+            idx = len(self.shelves) + self.patches.index(shelveb)
+        else:
+            idx = 0
+        self.combob.setCurrentIndex(idx)
+        if idx == oldidxb:
+            self.comboBChanged(idx)
         if not patches and not shelves:
             self.delShelfButtonB.setEnabled(False)
             self.browseb.setContext(patchctx('', self.repo, None))

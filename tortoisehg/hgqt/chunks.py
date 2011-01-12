@@ -110,7 +110,27 @@ class ChunksWidget(QWidget):
             revertall = True
         ctx = self.filelistmodel._ctx
         if isinstance(ctx, patchctx):
-            raise 'unimplemented'
+            try:
+                fp = util.atomictempfile(ctx._path, 'wb')
+                if ctx._ph.comments:
+                    fp.write('\n'.join(ctx._ph.comments))
+                    fp.write('\n\n')
+                for wfile in ctx._fileorder:
+                    if wfile == self.currentFile:
+                        if revertall:
+                            continue
+                        chunks[0].write(fp)
+                        for chunk in kchunks:
+                            chunk.write(fp)
+                        if not chunks[-1].selected:
+                            fp.write('\n')
+                    else:
+                        for chunk in ctx._files[wfile]:
+                            chunk.write(fp)
+                fp.rename()
+            finally:
+                del fp
+            self.fileModified.emit()
         else:
             path = repo.wjoin(self.currentFile)
             if not os.path.exists(path):
@@ -148,7 +168,9 @@ class ChunksWidget(QWidget):
     def displayFile(self, file, rev, status):
         if file:
             self.currentFile = file
-            self.mtime = os.path.getmtime(self.repo.wjoin(file))
+            path = self.repo.wjoin(file)
+            if os.path.exists(path):
+                self.mtime = os.path.getmtime(path)
             self.diffbrowse.displayFile(file, status)
             self.fileSelected.emit(True)
         else:
@@ -351,7 +373,7 @@ class DiffBrowser(QFrame):
             chunks = self._ctx._files[filename]
         else:
             buf = cStringIO.StringIO()
-            buf.write('diff -r XX %s\n' % filename)
+            buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % filename)
             buf.write('\n'.join(fd.diff))
             buf.seek(0)
             chunks = record.parsepatch(buf)

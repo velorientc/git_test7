@@ -32,6 +32,7 @@ class patchctx(object):
         self._repo = repo
         self._rev = rev
         self._status = [[], [], []]
+        self._fileorder = []
         self._user = ''
         self._date = ''
         self._desc = ''
@@ -166,6 +167,7 @@ class patchctx(object):
                         if path not in files:
                             self._status[type].append(path)
                             files[path] = [chunk]
+                            self._fileorder.append(path)
                     else:
                         files[path].append(chunk)
             except patch.PatchError:
