@@ -84,8 +84,10 @@ class PerforcePending(QDialog):
 
     def submit(self):
         assert(self.curcl.endswith('(pending)'))
-        cmdline = ['p4submit', '--verbose', '--repository',
-                self.url, self.curcl[:-10]]
+        cmdline = ['p4submit', '--verbose',
+                   '--config', 'extensions.perfarce=',
+                   '--repository', self.url,
+                   self.curcl[:-10]]
         self.repo.incrementBusyCount()
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
@@ -94,8 +96,10 @@ class PerforcePending(QDialog):
 
     def revert(self):
         assert(self.curcl.endswith('(pending)'))
-        cmdline = ['p4revert', '--verbose', '--repository',
-                self.url, self.curcl[:-10]]
+        cmdline = ['p4revert', '--verbose',
+                   '--config', 'extensions.perfarce=',
+                   '--repository', self.url,
+                   self.curcl[:-10]]
         self.repo.incrementBusyCount()
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
