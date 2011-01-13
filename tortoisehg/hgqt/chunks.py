@@ -111,6 +111,7 @@ class ChunksWidget(QWidget):
         ctx = self.filelistmodel._ctx
         if isinstance(ctx, patchctx):
             try:
+                repo.thgbackup(ctx._path)
                 fp = util.atomictempfile(ctx._path, 'wb')
                 if ctx._ph.comments:
                     fp.write('\n'.join(ctx._ph.comments))
@@ -139,6 +140,7 @@ class ChunksWidget(QWidget):
             if self.mtime != os.path.getmtime(path):
                 self.showMessage.emit(_('file hsa been modified, refresh'))
                 return
+            repo.thgbackup(repo.wjoin(self.currentFile))
             if revertall:
                 hg.revert(repo, repo.dirstate.parents()[0],
                           lambda a: a == self.currentFile)
