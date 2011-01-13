@@ -215,7 +215,7 @@ class RepoWidget(QWidget):
         handlers = {'cset': self.goto,
                     'subrepo': self.repoLinkClicked.emit}
         if ':' in link:
-            scheme, param = link.split(':')
+            scheme, param = link.split(':', 1)
             hdr = handlers.get(scheme)
             if hdr:
                 return hdr(param)
