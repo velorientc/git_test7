@@ -127,8 +127,9 @@ class RepoWidget(QWidget):
         self.layout().addWidget(self.repotabs_splitter)
 
         self.repoview = view = HgRepoView(self.repo, self)
-        view.revisionSelected.connect(self.revision_selected)
-        view.revisionClicked.connect(self.revision_clicked)
+        view.revisionClicked.connect(self.revisionClicked)
+        view.revisionSelected.connect(self.on_revisionSelected)
+        view.revisionAltClicked.connect(self.on_revisionSelected)
         view.revisionActivated.connect(self.revision_activated)
         view.showMessage.connect(self.showMessage)
         view.menuRequested.connect(self.viewMenuRequest)
@@ -529,30 +530,24 @@ class RepoWidget(QWidget):
         # Perhaps we can update a GUI element later, to indicate full load
         pass
 
-    def revision_clicked(self, rev):
+    def revisionClicked(self, rev):
         'User clicked on a repoview row'
         tw = self.taskTabsWidget
-        if type(rev) == str:
-            # Clicking on a patch switches to revdetails tab
-            tw.setCurrentIndex(self.logTabIndex)
-        elif rev is None:
+        if rev is None:
             # Clicking on working copy switches to commit tab
             tw.setCurrentIndex(self.commitTabIndex)
-        elif tw.currentWidget() == self.commitDemand:
+        else:
             # Clicking on a normal revision switches from commit tab
             tw.setCurrentIndex(self.logTabIndex)
 
-    def revision_selected(self, rev):
+    def on_revisionSelected(self, rev):
         'View selection changed, could be a reload'
         if self.repomodel.graph is None:
             return
         if type(rev) != str: # unapplied patch
-            # FIXME remove unapplied patch branch when
-            # patches fully handled downstream
             self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
             self.syncDemand.forward('refreshTargets', rev)
-
         self.revDetailsWidget.revision_selected(rev)
         self.revisionSelected.emit(rev)
 
