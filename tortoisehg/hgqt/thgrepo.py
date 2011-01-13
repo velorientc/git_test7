@@ -10,6 +10,8 @@
 
 import os
 import sys
+import shutil
+import tempfile
 
 from PyQt4.QtCore import *
 
@@ -478,6 +480,16 @@ def _extendrepo(repo):
                 # emitted till later, but we at least invalidate cached
                 # data in the repository
                 self.thginvalidate()
+
+        def thgbackup(self, path):
+            'Make a backup of the given file in the repository "trashcan"'
+            trashcan = self.join('Trashcan')
+            if not os.path.isdir(trashcan):
+                os.mkdir(trashcan)
+            name = os.path.basename(path)
+            root, ext = os.path.splitext(name)
+            dest = tempfile.mktemp(ext, root, trashcan)
+            shutil.copyfile(path, dest)
 
     return thgrepository
 
