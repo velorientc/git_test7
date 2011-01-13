@@ -27,6 +27,7 @@ from PyQt4.QtGui import *
 class HgRepoView(QTableView):
 
     revisionClicked = pyqtSignal(object)
+    revisionAltClicked = pyqtSignal(object)
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
     menuRequested = pyqtSignal(QPoint, object)
@@ -148,7 +149,10 @@ class HgRepoView(QTableView):
 
     def revClicked(self, index):
         rev = self.revFromindex(index)
-        self.revisionClicked.emit(rev)
+        if QApplication.keyboardModifiers() & Qt.AltModifier:
+            self.revisionAltClicked.emit(rev)
+        else:
+            self.revisionClicked.emit(rev)
 
     def revActivated(self, index):
         rev = self.revFromindex(index)
