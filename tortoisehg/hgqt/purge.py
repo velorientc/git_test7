@@ -7,6 +7,7 @@
 
 import os
 import stat
+import shutil
 
 from mercurial import cmdutil
 
@@ -27,16 +28,25 @@ class PurgeDialog(QDialog):
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(QVBoxLayout())
+
         cb = QCheckBox(_('No unknown files found'))
         cb.setChecked(False)
         cb.setEnabled(False)
         self.layout().addWidget(cb)
         self.ucb = cb
+
         cb = QCheckBox(_('No ignored files found'))
         cb.setChecked(False)
         cb.setEnabled(False)
         self.layout().addWidget(cb)
         self.icb = cb
+
+        cb = QCheckBox(_('No trash files found'))
+        cb.setChecked(False)
+        cb.setEnabled(False)
+        self.layout().addWidget(cb)
+        self.tcb = cb
+
         self.foldercb = QCheckBox(_('Delete empty folders'))
         self.foldercb.setChecked(True)
         self.layout().addWidget(self.foldercb)
@@ -76,7 +86,12 @@ class PurgeDialog(QDialog):
                 try:
                     wctx = repo[None]
                     wctx.status(ignored=True, unknown=True)
-                    self.files = wctx.unknown(), wctx.ignored()
+                    trashcan = repo.join('Trashcan')
+                    if os.path.isdir(trashcan):
+                        trash = os.listdir(trashcan)
+                    else:
+                        trash = []
+                    self.files = wctx.unknown(), wctx.ignored(), trash
                 except Exception, e:
                     self.error = str(e)
 
@@ -89,7 +104,7 @@ class PurgeDialog(QDialog):
                 self.showMessage.emit(hglib.tounicode(self.th.error))
             else:
                 self.showMessage.emit(_('Ready to purge.'))
-                U, I = self.files
+                U, I, T = self.files
                 if U:
                     self.ucb.setText(_('Delete %d unknown files') % len(U))
                     self.ucb.setChecked(True)
@@ -98,19 +113,24 @@ class PurgeDialog(QDialog):
                     self.icb.setText(_('Delete %d ignored files') % len(I))
                     self.icb.setChecked(True)
                     self.icb.setEnabled(True)
+                if T:
+                    self.tcb.setText(_('Delete %d files in .hg/Trashcan') %
+                                     len(T))
+                    self.tcb.setChecked(True)
+                    self.tcb.setEnabled(True)
 
         self.th = CheckThread(self)
         self.th.finished.connect(completed)
         self.th.start()
 
     def accept(self):
-        U, I = self.files
         unknown = self.ucb.isChecked()
         ignored = self.icb.isChecked()
+        trash = self.tcb.isChecked()
         delf = self.foldercb.isChecked()
         keep = self.hgfilecb.isChecked()
 
-        if not (unknown or ignored or delf):
+        if not (unknown or ignored or trash or delf):
             QDialog.accept(self)
             return
         if not qtlib.QuestionMsgBox(_('Confirm file deletions'),
@@ -125,7 +145,7 @@ class PurgeDialog(QDialog):
                                  len(self.th.failures), parent=self)
             QDialog.accept(self)
 
-        self.th = PurgeThread(self.repo, ignored, unknown, delf, keep, self)
+        self.th = PurgeThread(self.repo, ignored, unknown, trash, delf, keep, self)
         self.th.progress.connect(self.progress)
         self.th.showMessage.connect(self.showMessage)
         self.th.finished.connect(completed)
@@ -135,22 +155,31 @@ class PurgeThread(QThread):
     progress = pyqtSignal(QString, object, QString, QString, object)
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, ignored, unknown, delfolders, keephg, parent):
+    def __init__(self, repo, ignored, unknown, trash, delf, keephg, parent):
         super(PurgeThread, self).__init__(parent)
         self.failures = 0
         self.repo = repo
         self.ignored = ignored
         self.unknown = unknown
-        self.delfolders = delfolders
+        self.trash = trash
+        self.delfolders = delf
         self.keephg = keephg
 
     def run(self):
         self.failures = self.purge(self.repo, self.ignored, self.unknown,
-                                   self.delfolders, self.keephg)
+                                   self.trash, self.delfolders, self.keephg)
 
-    def purge(self, repo, ignored, unknown, delfolders, keephg):
+    def purge(self, repo, ignored, unknown, trash, delfolders, keephg):
         directories = []
         failures = []
+
+        if trash:
+            self.showMessage.emit(_('Deleting trash folder...'))
+            trashcan = self.repo.join('Trashcan')
+            try:
+                shutil.rmtree(trashcan)
+            except EnvironmentError:
+                failures.append(trashcan)
 
         self.showMessage.emit('')
         match = cmdutil.match(repo, [], {})
