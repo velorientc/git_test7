@@ -300,7 +300,7 @@ class SyncWidget(QWidget):
         'User has changed schema/host/port/path'
         if self.updateInProgress:
             return
-        self.urllabel.setText(self.currentUrl(True))
+        self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
         self.hostentry.setEnabled(schemeIndex != 0)
         self.portentry.setEnabled(schemeIndex != 0)
