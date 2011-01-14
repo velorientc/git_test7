@@ -77,9 +77,6 @@ class HgRepoListModel(QAbstractTableModel):
         self.repo = repo
         self.revset = revset
         self.filterbyrevset = rfilter
-        self.reloadConfig()
-        self.updateColumns()
-        self.setBranch(branch)
 
         # To be deleted
         self._user_colors = {}
@@ -101,6 +98,10 @@ class HgRepoListModel(QAbstractTableModel):
             'Changes':  self.getchanges,
         }
 
+        if repo:
+            self.reloadConfig()
+            self.updateColumns()
+            self.setBranch(branch)
 
     def setBranch(self, branch=None, allparents=True):
         self.filterbranch = branch
@@ -224,6 +225,8 @@ class HgRepoListModel(QAbstractTableModel):
         return len(self._columns)
 
     def maxWidthValueForColumn(self, col):
+        if self.graph is None:
+            return 'XXXX'
         column = self._columns[col]
         if column == 'Rev':
             return str(len(self.repo))
@@ -459,6 +462,8 @@ class HgRepoListModel(QAbstractTableModel):
         return row
 
     def indexFromRev(self, rev):
+        if self.graph is None:
+            return None
         self.ensureBuilt(rev=rev)
         row = self.rowFromRev(rev)
         if row is not None:
