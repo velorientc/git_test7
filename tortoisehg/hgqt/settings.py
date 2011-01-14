@@ -558,6 +558,8 @@ INFO = (
         _('User name to authenticate with review board')),
     _fi(_('Password'), 'reviewboard.password', genPasswordEntry,
         _('Password to authenticate with review board')),
+    _fi(_('Server Repository ID'), 'reviewboard.repoid', genEditCombo,
+        _('The default repository id for this repo on the review board server')),
     _fi(_('Target Groups'), 'reviewboard.target_groups', genEditCombo,
         _('A comma separated list of target groups')),
     _fi(_('Target People'), 'reviewboard.target_people', genEditCombo,

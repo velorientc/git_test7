@@ -155,12 +155,18 @@ class PostReviewDialog(QDialog):
         self.qui.summary_edit.addItems(
                 s.value('reviewboard/summary_edit_history').toStringList())
 
-        self.repo_id = s.value('reviewboard/repo_id').toInt()[0]
+        try:
+            self.repo_id = int(self.repo.ui.config('reviewboard', 'repoid'))
+        except Exception:
+            self.repo_id = None
+            
+        if not self.repo_id: 
+            self.repo_id = s.value('reviewboard/repo_id').toInt()[0]
 
         self.server = self.repo.ui.config('reviewboard', 'server')
         self.user = self.repo.ui.config('reviewboard', 'user')
         self.password = self.repo.ui.config('reviewboard', 'password')
-        self.browser = self.repo.ui.config('reviewboard', 'browser')
+        self.browser = self.repo.ui.config('reviewboard', 'browser')        
 
     def writeSettings(self):
         s = QSettings()
@@ -298,7 +304,7 @@ class PostReviewDialog(QDialog):
             self.qui.changesets_view.setEnabled(True)
 
     def close(self):        
-        super(PostReviewDialog, self).accept()
+        super(PostReviewDialog, self).close()
 
     def accept(self):
         if not self.password and not self.passwordPrompt():
