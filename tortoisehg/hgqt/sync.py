@@ -223,6 +223,10 @@ class SyncWidget(QWidget):
     def refreshTargets(self, rev):
         if type(rev) is not int:
             return
+                
+        if rev >= len(self.repo):
+            return
+
         self.loadTargets(rev)
         ctx = self.repo.changectx(rev)
 
@@ -558,6 +562,20 @@ class SyncWidget(QWidget):
             self.showMessage.emit(_('sync command already running'))
         else:
             self.pushclicked()
+
+    def pullBundle(self, bundle, rev):
+        'accept bundle changesets'
+        if self.cmd.core.is_running():
+            self.output.emit(_('sync command already running'), 'control')
+            return
+        save = self.currentUrl(False)
+        orev = self.opts.get('rev')
+        self.setUrl(bundle)
+        if rev is not None:
+            self.opts['rev'] = str(rev)
+        self.pullclicked()
+        self.setUrl(save)
+        self.opts['rev'] = orev
 
     ##
     ## Sync dialog buttons
