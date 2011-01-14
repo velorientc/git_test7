@@ -9,7 +9,7 @@
 import binascii
 import os
 
-from mercurial import util, revset
+from mercurial import util, revset, error
 
 from tortoisehg.util import shlib, hglib
 
@@ -615,7 +615,12 @@ class RepoWidget(QWidget):
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         if self.isVisible():
-            self.rebuildGraph()
+            try:
+                self.rebuildGraph()
+            except (error.RevlogError, error.RepoError), e:
+                self.showMessage(hglib.tounicode(str(e)))
+                self.repomodel = HgRepoListModel(None, None, None, False, self)
+                self.repoview.setModel(self.repomodel)
         else:
             self.dirty = True
 
