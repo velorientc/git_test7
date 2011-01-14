@@ -110,6 +110,9 @@ class SyncWidget(QWidget):
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
         hbox.addWidget(self.targetcheckbox)
         hbox.addWidget(self.targetcombo)
+        if not embedded:
+            self.targetcombo.setHidden(True)
+            self.targetcheckbox.setHidden(True)
 
         hbox.addStretch(1)
         self.urllabel = QLabel()
