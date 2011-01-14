@@ -561,7 +561,10 @@ class PBranchWidget(gtk.VBox):
 
     def has_patch(self):
         """ return True if pbranch extension is in use on repo """
-        return self.has_pbranch() and self.pgraph() != []
+        if not self.has_pbranch():
+            return False
+        g = self.pgraph()
+        return len(self.pbranch.patchonlygraph(g.mgr, g)._nodes) > 0
 
     def is_patch(self, branch_name):
         """ return True if branch is a patch. This excludes root branches

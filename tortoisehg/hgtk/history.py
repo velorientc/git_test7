@@ -1664,6 +1664,31 @@ class GLog(gdialog.GWindow):
         midpane.pack_start(self.graphview)
         midpane.show_all()
 
+        def addoptionpane(widget, name):
+            def wrapframe(widget):
+                frame = gtk.Frame()
+                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+                frame.add(widget)
+                return frame
+            paned = gtk.HPaned()
+            paned.add1(wrapframe(widget))
+            paned.add2(wrapframe(midpane))
+
+            # register signal handler
+            tbname = name + 'tb'
+            def notify(paned, gparam):
+                if not hasattr(self, tbname):
+                    return
+                pos = paned.get_position()
+                if self.cmd_get_active(name):
+                    if pos < 140:
+                        paned.set_position(140)
+                else:
+                    if pos != 0:
+                        paned.set_position(0)
+            paned.connect('notify::position', notify)
+            return paned
+
         # pbranch widget
         if 'pbranch' in self.exs:
             # create PBranchWidget
@@ -1671,17 +1696,8 @@ class GLog(gdialog.GWindow):
                 self, self.repo, self.stbar, accelgroup, self.tooltips)
             self.pbranchwidget.connect('patch-selected', self.pbranch_selected)
             self.pbranchwidget.connect('repo-invalidated', self.repo_invalidated)
-
-            def wrapframe(widget):
-                frame = gtk.Frame()
-                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-                frame.add(widget)
-                return frame
-            self.pbranchpaned = gtk.HPaned()
-            self.pbranchpaned.add1(wrapframe(self.pbranchwidget))
-            self.pbranchpaned.add2(wrapframe(midpane))
-
-            midpane = self.pbranchpaned
+            midpane = addoptionpane(self.pbranchwidget, 'pbranch')
+            self.pbranchpaned = midpane
 
         # MQ widget
         if 'mq' in self.exs:
@@ -1692,30 +1708,8 @@ class GLog(gdialog.GWindow):
             self.mqwidget.connect('repo-invalidated', self.repo_invalidated)
             self.mqwidget.connect('files-dropped', self.files_dropped)
             self.mqwidget.connect('close-mq', lambda *a: self.enable_mqpanel(False))
-
-            def wrapframe(widget):
-                frame = gtk.Frame()
-                frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-                frame.add(widget)
-                return frame
-            self.mqpaned = gtk.HPaned()
-            self.mqpaned.add1(wrapframe(self.mqwidget))
-            self.mqpaned.add2(wrapframe(midpane))
-
-            # register signal handler
-            def notify(paned, gparam):
-                if not hasattr(self, 'mqtb'):
-                    return
-                pos = paned.get_position()
-                if self.cmd_get_active('mq'):
-                    if pos < 140:
-                        paned.set_position(140)
-                else:
-                    if pos != 0:
-                        paned.set_position(0)
-            self.mqpaned.connect('notify::position', notify)
-
-            midpane = self.mqpaned
+            midpane = addoptionpane(self.mqwidget, 'mq')
+            self.mqpaned = midpane
 
         # Add ChangeSet instance to bottom half of vpane
         self.changeview.graphview = self.graphview
@@ -2859,17 +2853,18 @@ class GLog(gdialog.GWindow):
             return
         if enable is None:
             enable = self.setting_pbranchvis and self.pbranchwidget.has_patch()
+
+        # set the state of PBranch toolbutton
+        self.cmd_handler_block_by_func('pbranch', self.pbranch_clicked)
+        self.cmd_set_active('pbranch', enable)
+        self.cmd_handler_unblock_by_func('pbranch', self.pbranch_clicked)
+        self.cmd_set_sensitive('pbranch', self.pbranchwidget.has_pbranch())
+
+        # show/hide pbranch pane
         oldpos = self.pbranchpaned.get_position()
         self.pbranchpaned.set_position(enable and self.setting_pbranchhpos or 0)
         if not enable and oldpos:
             self.setting_pbranchhpos = oldpos
-
-        # set the state of PBranch toolbutton
-        if hasattr(self, 'pbranchtb'):
-            self.pbranchtb.handler_block_by_func(self.pbranch_clicked)
-            self.cmd_set_active('pbranch', enable)
-            self.pbranchtb.handler_unblock_by_func(self.pbranch_clicked)
-            self.cmd_set_sensitive('pbranch', self.pbranchwidget.has_pbranch())
 
     def pbranch_clicked(self, widget, data=None):
         self.enable_pbranchpanel(widget.get_active())
