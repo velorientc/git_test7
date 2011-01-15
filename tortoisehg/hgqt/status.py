@@ -12,7 +12,6 @@ from mercurial import context, merge, commands, subrepo
 from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff
 from tortoisehg.hgqt import thgrepo, cmdui, fileview
 from tortoisehg.util import paths, hglib
-from tortoisehg.util.util import xml_escape
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
