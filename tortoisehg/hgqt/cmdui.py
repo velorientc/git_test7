@@ -194,6 +194,7 @@ class Core(QObject):
                 return False
         elif self.thread:
             return self.thread.isRunning()
+        return False
 
     def get_rawoutput(self):
         return ''.join(self.rawoutput)
