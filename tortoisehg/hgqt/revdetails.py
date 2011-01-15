@@ -29,6 +29,7 @@ class RevDetailsWidget(QWidget):
         self.splitternames = []
 
         self._deschtmlize = descriptionhtmlizer(repo.ui)
+        repo.configChanged.connect(self._updatedeschtmlizer)
 
         # these are used to know where to go after a reload
         self._last_rev = None
@@ -310,6 +311,11 @@ class RevDetailsWidget(QWidget):
         self.actionAnnMode.setEnabled(mode != 'diff')
         self.actionNextDiff.setEnabled(mode != 'diff')
         self.actionPrevDiff.setEnabled(mode != 'diff')
+
+    @pyqtSlot()
+    def _updatedeschtmlizer(self):
+        self._deschtmlize = descriptionhtmlizer(self.repo.ui)
+        self.revision_selected(self._last_rev)  # regenerate desc html
 
     def record(self):
         'Repo widget is reloading, record current file'
