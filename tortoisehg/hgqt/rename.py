@@ -94,10 +94,10 @@ class RenameDialog(QDialog):
 
         # bottom buttons
         self.rename_btn = QPushButton('')
-        self.rename_btn.setAutoDefault(False)
+        self.rename_btn.setDefault(True)
+        self.rename_btn.setFocus(True)
         self.close_btn = QPushButton(_('&Close'))
-        self.close_btn.setDefault(True)
-        self.close_btn.setFocus()
+        self.close_btn.setAutoDefault(False)
         self.detail_btn = QPushButton(_('&Detail'))
         self.detail_btn.setAutoDefault(False)
         self.detail_btn.setHidden(True)
