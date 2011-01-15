@@ -300,6 +300,8 @@ def _extendrepo(repo):
             allexts = [n for n,m in extensions.extensions()]
             for name, path in self.ui.configitems('extensions'):
                 if name in allexts:
+                    if name.startswith('hgext.'):
+                        name = name[6:]
                     lclexts.append(name)
             return lclexts
 
