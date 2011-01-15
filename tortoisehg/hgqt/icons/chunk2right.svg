@@ -67,16 +67,15 @@
          id="stop5079" />
     </linearGradient>
     <linearGradient
-       id="linearGradient2691"
-       inkscape:collect="always">
+       id="linearGradient2691">
       <stop
          id="stop2693"
          offset="0"
-         style="stop-color:#ffffff;stop-opacity:1" />
+         style="stop-color:#a7bed6;stop-opacity:1;" />
       <stop
          id="stop2695"
          offset="1"
-         style="stop-color:#d3d7cf" />
+         style="stop-color:#729fcf;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
        id="linearGradient3340">
@@ -128,9 +127,9 @@
      borderopacity="0.19607843"
      inkscape:pageopacity="0.0000000"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="18.372487"
-     inkscape:cy="26.526236"
+     inkscape:zoom="8.875"
+     inkscape:cx="24"
+     inkscape:cy="24"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:grid-bbox="true"
@@ -142,9 +141,9 @@
      guidetolerance="1px"
      stroke="#555753"
      inkscape:window-width="872"
-     inkscape:window-height="688"
-     inkscape:window-x="52"
-     inkscape:window-y="33"
+     inkscape:window-height="687"
+     inkscape:window-x="282"
+     inkscape:window-y="16"
      showborder="true"
      inkscape:showpageshadow="false"
      inkscape:window-maximized="0">

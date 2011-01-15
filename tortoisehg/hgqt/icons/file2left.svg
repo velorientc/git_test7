@@ -64,16 +64,15 @@
          id="stop5079" />
     </linearGradient>
     <linearGradient
-       id="linearGradient2691"
-       inkscape:collect="always">
+       id="linearGradient2691">
       <stop
          id="stop2693"
          offset="0"
-         style="stop-color:#ffffff;stop-opacity:1" />
+         style="stop-color:#a7bed6;stop-opacity:1;" />
       <stop
          id="stop2695"
          offset="1"
-         style="stop-color:#d3d7cf" />
+         style="stop-color:#729fcf;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
        id="linearGradient3340">
@@ -125,9 +124,9 @@
      borderopacity="0.19607843"
      inkscape:pageopacity="0.0000000"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="-117.42449"
-     inkscape:cy="12.980288"
+     inkscape:zoom="5.2916667"
+     inkscape:cx="24"
+     inkscape:cy="24"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:grid-bbox="true"
@@ -138,13 +137,13 @@
      inkscape:guide-bbox="true"
      guidetolerance="1px"
      stroke="#555753"
-     inkscape:window-width="872"
-     inkscape:window-height="688"
-     inkscape:window-x="374"
-     inkscape:window-y="67"
+     inkscape:window-width="733"
+     inkscape:window-height="484"
+     inkscape:window-x="35"
+     inkscape:window-y="93"
      showborder="true"
      inkscape:showpageshadow="false"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="0">
     <sodipodi:guide
        orientation="horizontal"
        position="38.996647"

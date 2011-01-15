@@ -15,7 +15,7 @@
    id="svg1307"
    sodipodi:version="0.32"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="chunk2right.svg"
+   sodipodi:docname="chunk2left.svg"
    inkscape:export-filename="/home/lapo/Desktop/Grafica/Icone/media-actions-outlines.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
@@ -67,16 +67,15 @@
          id="stop5079" />
     </linearGradient>
     <linearGradient
-       id="linearGradient2691"
-       inkscape:collect="always">
+       id="linearGradient2691">
       <stop
          id="stop2693"
          offset="0"
-         style="stop-color:#ffffff;stop-opacity:1" />
+         style="stop-color:#a7bed6;stop-opacity:1;" />
       <stop
          id="stop2695"
          offset="1"
-         style="stop-color:#d3d7cf" />
+         style="stop-color:#729fcf;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
        id="linearGradient3340">
@@ -191,7 +190,7 @@
      inkscape:pageopacity="0.0000000"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
-     inkscape:cx="18.372487"
+     inkscape:cx="22.643587"
      inkscape:cy="26.526236"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -347,7 +346,7 @@
     <path
        inkscape:r_cy="true"
        inkscape:r_cx="true"
-       style="color:#000000;fill:url(#radialGradient3776);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.00000036;marker:none;visibility:visible;display:inline;overflow:visible"
+       style="color:#000000;fill:url(#radialGradient3776);fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-width:1.00000036000000000;marker:none;visibility:visible;display:inline;overflow:visible"
        d="m 37.57052,37.81149 0,-8.43649 -9.875,-5.25 9.875,-5.875 0,-8.249995 L 13.467233,23.905748 37.57052,37.81149 z"
        id="inner-fill"
        sodipodi:nodetypes="ccccccc" />

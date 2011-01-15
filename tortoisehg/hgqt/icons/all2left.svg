@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,13 +14,13 @@
    height="48px"
    id="svg1307"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docbase="/home/jimmac/src/cvs/tango-icon-theme/scalable/actions"
-   sodipodi:docname="media-seek-backward.svg"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="all2left.svg"
    inkscape:export-filename="/home/lapo/Desktop/Grafica/Icone/media-actions-outlines.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.1">
   <defs
      id="defs1309">
     <inkscape:perspective
@@ -63,16 +64,15 @@
          id="stop5079" />
     </linearGradient>
     <linearGradient
-       id="linearGradient2679"
-       inkscape:collect="always">
+       id="linearGradient2679">
       <stop
          id="stop2681"
          offset="0"
-         style="stop-color:#ffffff;stop-opacity:1" />
+         style="stop-color:#a7bed6;stop-opacity:1;" />
       <stop
          id="stop2683"
          offset="1"
-         style="stop-color:#d3d7cf" />
+         style="stop-color:#729fcf;stop-opacity:1;" />
     </linearGradient>
     <linearGradient
        id="linearGradient2591">
@@ -167,8 +167,8 @@
      borderopacity="0.15294118"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="44.949418"
+     inkscape:zoom="7.6272401"
+     inkscape:cx="22.267557"
      inkscape:cy="17.655272"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -181,12 +181,13 @@
      guidetolerance="1px"
      stroke="#729fcf"
      inkscape:window-width="1144"
-     inkscape:window-height="808"
-     inkscape:window-x="290"
-     inkscape:window-y="34"
+     inkscape:window-height="742"
+     inkscape:window-x="68"
+     inkscape:window-y="0"
      showborder="true"
      inkscape:showpageshadow="false"
-     borderlayer="top">
+     borderlayer="top"
+     inkscape:window-maximized="0">
     <sodipodi:guide
        orientation="horizontal"
        position="38.996647"
