@@ -6,13 +6,12 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
-from tortoisehg.hgqt.qtlib import getfont, geticon
+from tortoisehg.hgqt.qtlib import getfont, geticon, descriptionhtmlizer
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.filelistmodel import HgFileListModel
 from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
-from tortoisehg.hgqt.revmessage import RevMessage
 from tortoisehg.hgqt import thgrepo, qscilib
 
 from PyQt4.QtCore import *
@@ -336,3 +335,36 @@ class RevDetailsWidget(QWidget):
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
         expanded = s.value(wb + 'revpanel.expanded', False).toBool()
         self.revpanel.set_expanded(expanded)
+
+class RevMessage(QWidget):
+    linkActivated = pyqtSignal(unicode)
+
+    def __init__(self, ui, parent):
+        QWidget.__init__(self, parent)
+
+        vb = QVBoxLayout()
+        vb.setMargin(0)
+
+        self._message = w = QTextBrowser()
+        w.setLineWrapMode(QTextEdit.NoWrap)
+        #w.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        f = getfont('fontcomment')
+        f.changed.connect(lambda newfont: w.setFont(newfont))
+        w.setFont(f.font())
+        w.setOpenLinks(False)
+        vb.addWidget(w)
+
+        self.setLayout(vb)
+
+        self._htmlize = descriptionhtmlizer(ui)
+
+        self._message.anchorClicked.connect(
+            lambda url: self.linkActivated.emit(url.toString()))
+
+    def displayRevision(self, ctx):
+        self.ctx = ctx
+        self._message.setHtml('<pre>%s</pre>'
+                              % self._htmlize(ctx.description()))
+
+    def minimumSizeHint(self):
+        return QSize(0, 25)
