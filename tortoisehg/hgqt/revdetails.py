@@ -28,6 +28,8 @@ class RevDetailsWidget(QWidget):
         self.repo = repo
         self.splitternames = []
 
+        self._deschtmlize = descriptionhtmlizer(repo.ui)
+
         # these are used to know where to go after a reload
         self._last_rev = None
         self._reload_file = None
@@ -127,8 +129,12 @@ class RevDetailsWidget(QWidget):
         self.message_splitter.setMidLineWidth(0)
         self.message_splitter.setOrientation(Qt.Vertical)
         self.message_splitter.setOpaqueResize(True)
-        self.message = RevMessage(self.repo.ui, self.message_splitter)
-        self.message.linkActivated.connect(self.linkActivated)
+        self.message = QTextBrowser(self.message_splitter,
+                                    lineWrapMode=QTextEdit.NoWrap,
+                                    openLinks=False)
+        self.message.minimumSizeHint = lambda: QSize(0, 25)
+        self.message.anchorClicked.connect(
+            lambda url: self.linkActivated.emit(url.toString()))
 
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
@@ -136,7 +142,9 @@ class RevDetailsWidget(QWidget):
         sp.setHeightForWidth(self.message.sizePolicy().hasHeightForWidth())
         self.message.setSizePolicy(sp)
         self.message.setMinimumSize(QSize(0, 0))
-        self.message.setFont(getfont('fontcomment').font())
+        f = getfont('fontcomment')
+        self.message.setFont(f.font())
+        f.changed.connect(lambda font: self.message.setFont(font))
 
         self.fileview = HgFileView(self.message_splitter)
         sp = SP(SP.Expanding, SP.Expanding)
@@ -288,7 +296,8 @@ class RevDetailsWidget(QWidget):
         ctx = self.repo.changectx(rev)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
-        self.message.displayRevision(ctx)
+        self.message.setHtml('<pre>%s</pre>'
+                             % self._deschtmlize(ctx.description()))
         if type(ctx.rev()) == str:
             self.actionDiffMode.setChecked(True)
             self.actionDiffMode.setEnabled(False)
@@ -335,36 +344,3 @@ class RevDetailsWidget(QWidget):
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
         expanded = s.value(wb + 'revpanel.expanded', False).toBool()
         self.revpanel.set_expanded(expanded)
-
-class RevMessage(QWidget):
-    linkActivated = pyqtSignal(unicode)
-
-    def __init__(self, ui, parent):
-        QWidget.__init__(self, parent)
-
-        vb = QVBoxLayout()
-        vb.setMargin(0)
-
-        self._message = w = QTextBrowser()
-        w.setLineWrapMode(QTextEdit.NoWrap)
-        #w.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        f = getfont('fontcomment')
-        f.changed.connect(lambda newfont: w.setFont(newfont))
-        w.setFont(f.font())
-        w.setOpenLinks(False)
-        vb.addWidget(w)
-
-        self.setLayout(vb)
-
-        self._htmlize = descriptionhtmlizer(ui)
-
-        self._message.anchorClicked.connect(
-            lambda url: self.linkActivated.emit(url.toString()))
-
-    def displayRevision(self, ctx):
-        self.ctx = ctx
-        self._message.setHtml('<pre>%s</pre>'
-                              % self._htmlize(ctx.description()))
-
-    def minimumSizeHint(self):
-        return QSize(0, 25)
