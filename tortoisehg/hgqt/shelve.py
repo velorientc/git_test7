@@ -104,30 +104,36 @@ class ShelveDialog(QMainWindow):
         a.setIcon(qtlib.geticon('delfilesleft'))
         self.lefttbar.addAction(self.deletea)
         self.allright = a = QAction(_('Move all files right'), self)
+        self.allright.triggered.connect(self.moveFilesRight)
         a.setIcon(qtlib.geticon('all2right'))
         self.lefttbar.addAction(self.allright)
         self.fileright = a = QAction(_('Move selected file right'), self)
+        self.fileright.triggered.connect(self.moveFileRight)
         a.setIcon(qtlib.geticon('file2right'))
         self.lefttbar.addAction(self.fileright)
         self.editfilea = a = QAction(_('Edit file'), self)
         a.setIcon(qtlib.geticon('edit-find'))
         self.lefttbar.addAction(self.editfilea)
         self.chunksright = a = QAction(_('Move selected chunks right'), self)
+        self.chunksright.triggered.connect(self.moveChunksRight)
         a.setIcon(qtlib.geticon('chunk2right'))
         self.lefttbar.addAction(self.chunksright)
 
         self.righttbar = QToolBar(_('Right Toolbar'), objectName='righttbar')
         self.addToolBar(self.righttbar)
         self.chunksleft = a = QAction(_('Move selected chunks left'), self)
+        self.chunksleft.triggered.connect(self.moveChunksLeft)
         a.setIcon(qtlib.geticon('chunk2left'))
         self.righttbar.addAction(self.chunksleft)
         self.editfileb = a = QAction(_('Edit file'), self)
         a.setIcon(qtlib.geticon('edit-find'))
         self.righttbar.addAction(self.editfileb)
         self.fileleft = a = QAction(_('Move selected file left'), self)
+        self.fileleft.triggered.connect(self.moveFileLeft)
         a.setIcon(qtlib.geticon('file2left'))
         self.righttbar.addAction(self.fileleft)
         self.allleft = a = QAction(_('Move all files left'), self)
+        self.allleft.triggered.connect(self.moveFilesLeft)
         a.setIcon(qtlib.geticon('all2left'))
         self.righttbar.addAction(self.allleft)
         self.deleteb = a = QAction(_('Deleted selected chunks'), self)
@@ -159,6 +165,46 @@ class ShelveDialog(QMainWindow):
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
+
+    @pyqtSlot()
+    def moveFileRight(self):
+        file, _ = self.browsea.getSelectedFileAndChunks()
+        chunks = self.browsea.getChunksForFile(file)
+        if self.browseb.mergeChunks(file, chunks):
+            self.browsea.removeFile(file)
+
+    @pyqtSlot()
+    def moveFileLeft(self):
+        file, _ = self.browseb.getSelectedFileAndChunks()
+        chunks = self.browseb.getChunksForFile(file)
+        if self.browsea.mergeChunks(file, chunks):
+            self.browseb.removeFile(file)
+
+    @pyqtSlot()
+    def moveFilesRight(self):
+        for file in self.browsea.getFileList():
+            chunks = self.browsea.getChunksForFile(file)
+            if self.browseb.mergeChunks(file, chunks):
+                self.browsea.removeFile(file)
+
+    @pyqtSlot()
+    def moveFilesLeft(self):
+        for file in self.browseb.getFileList():
+            chunks = self.browseb.getChunksForFile(file)
+            if self.browsea.mergeChunks(file, chunks):
+                self.browseb.removeFile(file)
+
+    @pyqtSlot()
+    def moveChunksRight(self):
+        file, chunks = self.browsea.getSelectedFileAndChunks()
+        if self.browseb.mergeChunks(file, chunks):
+            self.browsea.deleteSelectedChunks()
+
+    @pyqtSlot()
+    def moveChunksLeft(self):
+        file, chunks = self.browseb.getSelectedFileAndChunks()
+        if self.browsea.mergeChunks(file, chunks):
+            self.browseb.deleteSelectedChunks()
 
     @pyqtSlot()
     def newShelf(self):
