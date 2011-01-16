@@ -143,11 +143,13 @@ class ShelveDialog(QMainWindow):
         self.browsea.fileSelected.connect(self.fileright.setEnabled)
         self.browsea.fileSelected.connect(self.editfilea.setEnabled)
         self.browsea.fileModified.connect(self.refreshCombos)
+        self.browsea.fileModelEmpty.connect(self.allright.setDisabled)
         self.browseb.chunksSelected.connect(self.chunksleft.setEnabled)
         self.browseb.chunksSelected.connect(self.deleteb.setEnabled)
         self.browseb.fileSelected.connect(self.fileleft.setEnabled)
         self.browseb.fileSelected.connect(self.editfileb.setEnabled)
         self.browseb.fileModified.connect(self.refreshCombos)
+        self.browseb.fileModelEmpty.connect(self.allleft.setDisabled)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         self.setStatusBar(self.statusbar)

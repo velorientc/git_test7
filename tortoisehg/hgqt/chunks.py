@@ -29,6 +29,7 @@ class ChunksWidget(QWidget):
     showMessage = pyqtSignal(QString)
     chunksSelected = pyqtSignal(bool)
     fileSelected = pyqtSignal(bool)
+    fileModelEmpty = pyqtSignal(bool)
     fileModified = pyqtSignal()
 
     def __init__(self, repo, parent):
@@ -192,6 +193,7 @@ class ChunksWidget(QWidget):
         self.filelist.clearDisplay.connect(self.diffbrowse.clearDisplay)
         self.diffbrowse.setContext(ctx)
         self.filelistmodel.setContext(ctx)
+        self.fileModelEmpty.emit(len(ctx.files()) == 0)
         if f and f in ctx:
             self.filelist.selectFile(f)
 
