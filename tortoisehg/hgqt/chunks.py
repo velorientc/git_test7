@@ -9,6 +9,7 @@ import cStringIO
 import os
 
 from mercurial import hg, util, patch
+from mercurial import match as matchmod
 from hgext import record
 
 from tortoisehg.util import hglib
@@ -111,9 +112,9 @@ class ChunksWidget(QWidget):
             revertall = True
         ctx = self.filelistmodel._ctx
         if isinstance(ctx, patchctx):
+            repo.thgbackup(ctx._path)
+            fp = util.atomictempfile(ctx._path, 'wb')
             try:
-                repo.thgbackup(ctx._path)
-                fp = util.atomictempfile(ctx._path, 'wb')
                 if ctx._ph.comments:
                     fp.write('\n'.join(ctx._ph.comments))
                     fp.write('\n\n')
@@ -142,30 +143,147 @@ class ChunksWidget(QWidget):
                 self.showMessage.emit(_('file hsa been modified, refresh'))
                 return
             repo.thgbackup(repo.wjoin(self.currentFile))
-            if revertall:
-                hg.revert(repo, repo.dirstate.parents()[0],
-                          lambda a: a == self.currentFile)
-            else:
-                repo.wopener(self.currentFile, 'wb').write(
-                    self.diffbrowse.origcontents)
-                fp = cStringIO.StringIO()
-                chunks[0].write(fp)
-                for c in kchunks:
-                    c.write(fp)
-                fp.seek(0)
-                pfiles = {}
-                patch.internalpatch(fp, repo.ui, 1, repo.root, files=pfiles,
-                                    eolmode=None)
+            wlock = repo.wlock()
+            try:
+                if revertall:
+                    hg.revert(repo, repo.dirstate.parents()[0],
+                            lambda a: a == self.currentFile)
+                else:
+                    repo.wopener(self.currentFile, 'wb').write(
+                        self.diffbrowse.origcontents)
+                    fp = cStringIO.StringIO()
+                    chunks[0].write(fp)
+                    for c in kchunks:
+                        c.write(fp)
+                    fp.seek(0)
+                    pfiles = {}
+                    patch.internalpatch(fp, repo.ui, 1, repo.root, files=pfiles,
+                                        eolmode=None)
+            finally:
+                wlock.release()
             self.fileModified.emit()
 
-    def addFile(self, wfile, chunks):
-        pass
+    def mergeChunks(self, wfile, chunks):
+        def isAorR(header):
+            for line in header:
+                if line.startswith('--- /dev/null'):
+                    return True
+                if line.startswith('+++ /dev/null'):
+                    return True
+            return False
+        repo = self.repo
+        ctx = self.filelistmodel._ctx
+        if isinstance(ctx, patchctx):
+            if wfile in ctx._files:
+                patchchunks = ctx._files[wfile]
+                if isAorR(chunks[0].header) or isAorR(patchchunks[0].header):
+                    qtlib.InfoMsgBox(_('Unable to merge chunks'),
+                                    _('Add or remove patches must be merged'
+                                     ' in the working directory'))
+                    return False
+                # merge new chunks into existing chunks, sorting on start line
+                newchunks = chunks[0]
+                pidx = nidx = 1
+                while pidx < len(patchchunks) and nidx < len(chunks):
+                    if pidx == len(patchchunks):
+                        newchunks.append(chunks[nidx])
+                        nidx += 1
+                    elif nidx == len(chunks):
+                        newchunks.append(patchchunks[pidx])
+                        pidx += 1
+                    elif chunks[nidx].toline < patchchunks[pidx].toline:
+                        newchunks.append(chunks[nidx])
+                        nidx += 1
+                    else:
+                        newchunks.append(patchchunks[pidx])
+                        pidx += 1
+                ctx._files[wfile] = newchunks
+            else:
+                # add file to patch
+                ctx._files[wfile] = chunks
+                ctx._fileorder.append(wfile)
+            repo.thgbackup(ctx._path)
+            fp = util.atomictempfile(ctx._path, 'wb')
+            try:
+                if ctx._ph.comments:
+                    fp.write('\n'.join(ctx._ph.comments))
+                    fp.write('\n\n')
+                for file in ctx._fileorder:
+                    for chunk in ctx._files[wfile]:
+                        chunk.write(fp)
+                fp.rename()
+                self.fileModified.emit()
+                return True
+            finally:
+                del fp
+            return False
+        else:
+            # Apply chunks to wfile
+            repo.thgbackup(repo.wjoin(wfile))
+            fp = cStringIO.StringIO()
+            for c in chunks:
+                c.write(fp)
+            fp.seek(0)
+            wlock = repo.wlock()
+            try:
+                try:
+                    pfiles = {}
+                    patch.internalpatch(fp, repo.ui, 1, repo.root, files=pfiles,
+                                        eolmode=None)
+                    hglib.updatedir(repo.ui, repo, pfiles)
+                    # TODO: detect patch rejects, offer to open editor
+                    return True
+                except patch.PatchError, err:
+                    self.showMessage.emit(hglib.tounicode(str(err)))
+            finally:
+                wlock.release()
+            return False
 
     def removeFile(self, wfile):
-        pass
+        repo = self.repo
+        ctx = self.filelistmodel._ctx
+        if isinstance(ctx, patchctx):
+            repo.thgbackup(ctx._path)
+            fp = util.atomictempfile(ctx._path, 'wb')
+            try:
+                if ctx._ph.comments:
+                    fp.write('\n'.join(ctx._ph.comments))
+                    fp.write('\n\n')
+                for file in ctx._fileorder:
+                    if file == wfile:
+                        continue
+                    for chunk in ctx._files[wfile]:
+                        chunk.write(fp)
+                fp.rename()
+            finally:
+                del fp
+        else:
+            repo.thgbackup(repo.wjoin(wfile))
+            try:
+                wlock = repo.wlock()
+                hg.revert(repo, repo.dirstate.parents()[0],
+                          lambda a: a == wfile)
+            finally:
+                wlock.release()
+        self.fileModified.emit()
 
     def getChunksForFile(self, wfile):
-        pass
+        repo = self.repo
+        ctx = self.filelistmodel._ctx
+        if isinstance(ctx, patchctx):
+            if wfile in ctx._files:
+                return ctx._files[wfile]
+            else:
+                return []
+        else:
+            buf = cStringIO.StringIO()
+            diffopts = patch.diffopts(repo.ui, {'git':True})
+            m = matchmod.exact(repo.root, repo.root, [wfile])
+            for p in patch.diff(repo, ctx.p1().node(), None, match=m,
+                                opts=diffopts):
+                buf.write(p)
+            buf.seek(0)
+            return record.parsepatch(buf)
 
     @pyqtSlot(object, object, object)
     def displayFile(self, file, rev, status):
