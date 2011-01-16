@@ -105,7 +105,7 @@ class ChunksWidget(QWidget):
     def getSelectedFileAndChunks(self):
         chunks = self.diffbrowse.curchunks
         dchunks = [c for c in chunks[1:] if c.selected]
-        return self.currentFile, dchunks
+        return self.currentFile, [chunks[0]] + dchunks
 
     def deleteSelectedChunks(self):
         'delete currently selected chunks'
@@ -210,10 +210,7 @@ class ChunksWidget(QWidget):
                 ctx._files[wfile] = newchunks
             else:
                 # add file to patch
-                lines = ['diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % wfile]
-                lines.append('--- a/%s\n' % wfile)
-                lines.append('+++ b/%s\n' % wfile)
-                ctx._files[wfile] = [record.header(lines)] + chunks
+                ctx._files[wfile] = chunks
                 ctx._fileorder.append(wfile)
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
