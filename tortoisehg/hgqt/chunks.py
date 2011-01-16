@@ -260,7 +260,7 @@ class ChunksWidget(QWidget):
                 for file in ctx._fileorder:
                     if file == wfile:
                         continue
-                    for chunk in ctx._files[wfile]:
+                    for chunk in ctx._files[file]:
                         chunk.write(fp)
                 fp.rename()
             finally:
