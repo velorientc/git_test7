@@ -66,12 +66,17 @@ class ChunksWidget(QWidget):
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.diffbrowse.chunksSelected.connect(self.chunksSelected)
 
+        self.filelist.fileRevSelected.connect(self.displayFile)
+        self.filelist.clearDisplay.connect(self.diffbrowse.clearDisplay)
+
         self.splitter.setStretchFactor(0, 0)
         self.splitter.setStretchFactor(1, 3)
         self.timerevent = self.startTimer(500)
 
     def timerEvent(self, event):
         'Periodic poll of currently displayed patch or working file'
+        if not hasattr(self, 'filelistmodel'):
+            return
         ctx = self.filelistmodel._ctx
         if ctx is None:
             return
@@ -205,7 +210,10 @@ class ChunksWidget(QWidget):
                 ctx._files[wfile] = newchunks
             else:
                 # add file to patch
-                ctx._files[wfile] = chunks
+                lines = ['diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % wfile]
+                lines.append('--- a/%s\n' % wfile)
+                lines.append('+++ b/%s\n' % wfile)
+                ctx._files[wfile] = [record.header(lines)] + chunks
                 ctx._fileorder.append(wfile)
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
@@ -305,6 +313,7 @@ class ChunksWidget(QWidget):
         else:
             self.currentFile = None
             self.diffbrowse.clearDisplay()
+            self.diffbrowse.clearChunks()
             self.fileSelected.emit(False)
 
     def setContext(self, ctx):
@@ -315,16 +324,15 @@ class ChunksWidget(QWidget):
         self.fileSelected.emit(False)
         self.filelistmodel = filelistmodel.HgFileListModel(self.repo, self)
         self.filelist.setModel(self.filelistmodel)
-        self.filelist.fileRevSelected.connect(self.displayFile)
-        self.filelist.clearDisplay.connect(self.diffbrowse.clearDisplay)
         self.diffbrowse.setContext(ctx)
         self.filelistmodel.setContext(ctx)
         self.fileModelEmpty.emit(len(ctx.files()) == 0)
         if f and f in ctx:
             self.filelist.selectFile(f)
+        else:
+            self.diffbrowse.clearChunks()
 
     def refresh(self):
-        f = self.filelist.currentFile()
         ctx = self.filelistmodel._ctx
         if isinstance(ctx, patchctx):
             # if patch mtime has not changed, it could return the same ctx
@@ -332,9 +340,7 @@ class ChunksWidget(QWidget):
         else:
             self.repo.thginvalidate()
             ctx = self.repo.changectx(ctx.node())
-        self.filelistmodel.setContext(ctx)
-        if f in ctx:
-            self.filelist.selectFile(f)
+        self.setContext(ctx)
 
 class DiffBrowser(QFrame):
     """diff browser"""
@@ -349,6 +355,7 @@ class DiffBrowser(QFrame):
         self.curchunks = []
         self.countselected = 0
         self._ctx = None
+        self._lastfile = None
 
         vbox = QVBoxLayout()
         vbox.setContentsMargins(0,0,0,0)
@@ -450,21 +457,24 @@ class DiffBrowser(QFrame):
     def marginClicked(self, margin, line, modifiers):
         for chunk in self.curchunks[1:]:
             if line >= chunk.lrange[0] and line < chunk.lrange[1]:
-                self.sci.markerDelete(chunk.mline, -1)
-                if chunk.selected:
-                    self.sci.markerAdd(chunk.mline, self.unselected)
-                    chunk.selected = False
-                    self.countselected -= 1
-                    for i in xrange(*chunk.lrange):
-                        self.sci.markerDelete(i, self.selcolor)
-                else:
-                    self.sci.markerAdd(chunk.mline, self.selected)
-                    chunk.selected = True
-                    self.countselected += 1
-                    for i in xrange(*chunk.lrange):
-                        self.sci.markerAdd(i, self.selcolor)
+                self.toggleChunk(chunk)
                 self.updateSummary()
                 return
+
+    def toggleChunk(self, chunk):
+        self.sci.markerDelete(chunk.mline, -1)
+        if chunk.selected:
+            self.sci.markerAdd(chunk.mline, self.unselected)
+            chunk.selected = False
+            self.countselected -= 1
+            for i in xrange(*chunk.lrange):
+                self.sci.markerDelete(i, self.selcolor)
+        else:
+            self.sci.markerAdd(chunk.mline, self.selected)
+            chunk.selected = True
+            self.countselected += 1
+            for i in xrange(*chunk.lrange):
+                self.sci.markerAdd(i, self.selcolor)
 
     def setContext(self, ctx):
         self._ctx = ctx
@@ -480,12 +490,20 @@ class DiffBrowser(QFrame):
         self.sci.clear()
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
+
+    def clearChunks(self):
         self.curchunks = []
         self.countselected = 0
         self.updateSummary()
 
     def displayFile(self, filename, status):
         self.clearDisplay()
+        if filename == self._lastfile:
+            reenable = [c.fromline for c in self.curchunks[1:] if c.selected]
+        else:
+            reenable = []
+        self._lastfile = filename
+        self.clearChunks()
 
         fd = fileview.FileData(self._ctx, None, filename, status)
 
@@ -529,8 +547,11 @@ class DiffBrowser(QFrame):
                     self.sci.markerAdd(start+i, self.vertical)
             start += len(chunk.lines)
         self.origcontents = fd.olddata
-        self.curchunks = chunks
         self.countselected = 0
+        self.curchunks = chunks
+        for c in chunks[1:]:
+            if c.fromline in reenable:
+                self.toggleChunk(c)
         self.updateSummary()
 
 def run(ui, *pats, **opts):
