@@ -488,6 +488,8 @@ def _extendrepo(repo):
             trashcan = self.join('Trashcan')
             if not os.path.isdir(trashcan):
                 os.mkdir(trashcan)
+            if not os.path.exists(path):
+                return
             name = os.path.basename(path)
             root, ext = os.path.splitext(name)
             dest = tempfile.mktemp(ext, root, trashcan)
