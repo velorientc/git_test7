@@ -97,6 +97,11 @@ class ChunksWidget(QWidget):
             path = self.repo.wjoin(self.currentFile)
         wctxactions.edit(self, self.repo.ui, self.repo, [path])
 
+    def getSelectedFileAndChunks(self):
+        chunks = self.diffbrowse.curchunks
+        dchunks = [c for c in chunks[1:] if c.selected]
+        return self.currentFile, dchunks
+
     def deleteSelectedChunks(self):
         'delete currently selected chunks'
         repo = self.repo
@@ -238,6 +243,9 @@ class ChunksWidget(QWidget):
             finally:
                 wlock.release()
             return False
+
+    def getFileList(self):
+        return self.filelistmodel._ctx.files()
 
     def removeFile(self, wfile):
         repo = self.repo
