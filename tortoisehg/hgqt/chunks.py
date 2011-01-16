@@ -192,16 +192,16 @@ class ChunksWidget(QWidget):
                                      ' in the working directory'))
                     return False
                 # merge new chunks into existing chunks, sorting on start line
-                newchunks = chunks[0]
+                newchunks = [chunks[0]]
                 pidx = nidx = 1
-                while pidx < len(patchchunks) and nidx < len(chunks):
+                while pidx < len(patchchunks) or nidx < len(chunks):
                     if pidx == len(patchchunks):
                         newchunks.append(chunks[nidx])
                         nidx += 1
                     elif nidx == len(chunks):
                         newchunks.append(patchchunks[pidx])
                         pidx += 1
-                    elif chunks[nidx].toline < patchchunks[pidx].toline:
+                    elif chunks[nidx].fromline < patchchunks[pidx].fromline:
                         newchunks.append(chunks[nidx])
                         nidx += 1
                     else:
