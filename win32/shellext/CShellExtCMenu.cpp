@@ -462,6 +462,16 @@ CShellExtCMenu::QueryContextMenu(
         }
     }
 
+    if ((uFlags & CMF_EXTENDEDVERBS) == 0)
+    {
+        /* shift key is not down */
+        if (!isHgrepo)
+        {
+            /* We are not inside a repo -> don't show thg menu entries */
+            return S_OK;
+        }
+    }
+
     TDEBUG_TRACE(
         "CShellExtCMenu::QueryContextMenu: isHgrepo = " 
         << isHgrepo << ", fileMenu = " << fileMenu
