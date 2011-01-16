@@ -218,15 +218,18 @@ class ShelveDialog(QMainWindow):
         shelve = hglib.fromunicode(dlg.textValue())
         try:
             fn = os.path.join('shelves', shelve)
-            if os.path.exists(self.repo.join(fn)):
+            shelfpath = self.repo.join(fn)
+            if os.path.exists(shelfpath):
                 qtlib.ErrorMsgBox(_('File already exists'),
                                   _('A shelf file of that name already exists'))
                 return
             self.repo.opener(fn, 'wb').write('')
             self.showMessage(_('New shelf created'))
+            self.refreshCombos()
+            if shelfpath in self.shelves:
+                self.combob.setCurrentIndex(self.shelves.index(shelfpath))
         except EnvironmentError, e:
             self.showMessage(hglib.tounicode(str(e)))
-        self.refreshCombos()
 
     @pyqtSlot()
     def deleteShelfA(self):
