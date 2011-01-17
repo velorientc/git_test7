@@ -62,6 +62,10 @@ class patchctx(object):
         self._date = ph.date and util.parsedate(ph.date) or util.makedate()
         self._desc = ph.message and '\n'.join(ph.message).strip() or ''
 
+    def invalidate(self):
+        # ensure the patch contents are re-read
+        self._mtime = 0
+
     def __contains__(self, key):
         return key in self._files
 
