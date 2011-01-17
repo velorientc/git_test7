@@ -169,6 +169,8 @@ class RevDetailsWidget(QWidget):
         self.searchbar.conditionChanged.connect(self.fileview.highlightText)
         revisiondetails_layout.addWidget(self.searchbar)
         self.fileview.filled.connect(self._updateHighlightText)
+        self.filelist.fileRevSelected.connect(self._displayFile)
+        self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def createActions(self):
         self.actionDiffMode = QAction('Diff mode', self)
@@ -284,8 +286,6 @@ class RevDetailsWidget(QWidget):
     def setupModels(self):
         self.create_models()
         self.filelist.setModel(self.filelistmodel)
-        self.filelist.fileRevSelected.connect(self._displayFile)
-        self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     @pyqtSlot(object, object, object)
     def _displayFile(self, file, rev, status):
