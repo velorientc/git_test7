@@ -40,6 +40,9 @@ MenuDescription menuDescList[] =
     {"clone",       L"Clone...",
                     L"Create clone here from source",
                     "menuclone.ico", 0},
+    {"shelve",      L"Shelve Changes",
+                    L"Shelve or unshelve file changes",
+                    "shelve.ico", 0},
     {"status",      L"View File Status",
                     L"Repository status & changes",
                     "menushowchanged.ico", 0},
@@ -108,7 +111,7 @@ MenuDescription menuDescList[] =
 };
 
 const char* const RepoNoFilesMenu =
-    "commit status vdiff sep"
+    "commit status shelve vdiff sep"
     " add revert rename forget remove sep"
     " workbench update grep sep"
     " synch serve clone init thgstatus sep"
