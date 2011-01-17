@@ -124,6 +124,7 @@ class RepoFilterBar(QToolBar):
 
         self._branchCombo = QComboBox()
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
+        self._branchReloading = False
 
         self.addWidget(self._branchLabel)
         self.addWidget(self._branchCombo)
@@ -137,10 +138,12 @@ class RepoFilterBar(QToolBar):
         else:
             branches = self._repo.namedbranches
 
+        self._branchReloading = True
         self._branchCombo.clear()
         self._branchCombo.addItems([''] + branches)
         self._branchLabel.setEnabled(len(branches) > 1)
         self._branchCombo.setEnabled(len(branches) > 1)
+        self._branchReloading = False
 
         self.setBranch(curbranch)
 
@@ -155,8 +158,9 @@ class RepoFilterBar(QToolBar):
 
     @pyqtSlot()
     def _emitBranchChanged(self):
-        self.branchChanged.emit(self.branch(),
-                                self._allparAction.isChecked())
+        if not self._branchReloading:
+            self.branchChanged.emit(self.branch(),
+                                    self._allparAction.isChecked())
 
     @pyqtSlot()
     def refresh(self):
