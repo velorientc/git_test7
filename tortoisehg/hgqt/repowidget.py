@@ -20,7 +20,7 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
-from tortoisehg.hgqt import qdelete, qreorder, qrename, qfold
+from tortoisehg.hgqt import qdelete, qreorder, qrename, qfold, shelve
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -417,18 +417,20 @@ class RepoWidget(QWidget):
             event.setDropAction(Qt.CopyAction)
             event.accept()
 
+    ## Begin Workbench event forwards
+
     def back(self):
         self.repoview.back()
 
     def forward(self):
         self.repoview.forward()
 
-    def bisect(self, paths=None):
+    def bisect(self):
         dlg = bisect.BisectDialog(self.repo, {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
-    def resolve(self, paths=None):
+    def resolve(self):
         dlg = resolve.ResolveDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
@@ -439,6 +441,9 @@ class RepoWidget(QWidget):
         if paths:
             dlg.setfilepaths(paths)
         dlg.exec_()
+
+    def shelve(self):
+        run.shelve(self.repo.ui, repo=self.repo)
 
     def verify(self):
         cmdline = ['--repository', self.repo.root, 'verify', '--verbose']
@@ -500,6 +505,8 @@ class RepoWidget(QWidget):
         dlg.progress.connect(self.progress)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
+
+    ## End workbench event forwards
 
     @pyqtSlot(unicode, dict)
     def grep(self, pattern='', opts={}):
