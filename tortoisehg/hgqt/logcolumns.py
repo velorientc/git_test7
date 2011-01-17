@@ -61,6 +61,8 @@ class ColumnSelectDialog(QDialog):
         layout.addWidget(list)
         self.list = list
 
+        layout.addWidget(QLabel(_('Drag to change order')))
+
         # dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
