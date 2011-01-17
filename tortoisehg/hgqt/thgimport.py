@@ -6,7 +6,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, tempfile
+import os
+import shutil
+import tempfile
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -30,7 +32,6 @@ class ImportDialog(QDialog):
 
         self.tempfiles = []
         self.repo = repo
-        self.mqloaded = 'mq' in repo.extensions()
 
         # base layout box
         box = QVBoxLayout()
@@ -75,13 +76,15 @@ class ImportDialog(QDialog):
         statbox = QHBoxLayout()
         self.status = QLabel("")
         statbox.addWidget(self.status)
-        self.patchq = QComboBox()
-        self.patchq.currentIndexChanged.connect(self.updatestatus)
-        self.patchq.addItem('repository')
+        self.targetcombo = QComboBox()
+        self.targetcombo.currentIndexChanged.connect(self.updatestatus)
+        self.targetcombo.addItem(_('Repository'))
+        self.targetcombo.addItem(_('Shelf'))
+        self.targetcombo.addItem(_('Working Directory'))
         cur = self.repo.getcurrentqqueue()
         if cur:
-            self.patchq.addItem(cur)
-        statbox.addWidget(self.patchq)
+            self.targetcombo.addItem(hglib.tounicode(cur))
+        statbox.addWidget(self.targetcombo)
         grid.addItem(statbox, 3, 1)
 
         ## command widget
@@ -198,14 +201,10 @@ class ImportDialog(QDialog):
         count = items and len(items) or 0
         countstr = qtlib.markup(_("%s patches") % count, weight='bold')
         if count:
-            if self.mqloaded:
-                self.patchq.setVisible(True)
-                text = _('%s will be imported to ') % countstr
-            else:
-                self.patchq.setVisible(False)
-                text = _('%s will be imported to the repository') % countstr
+            self.targetcombo.setVisible(True)
+            text = _('%s will be imported to ') % countstr
         else:
-            self.patchq.setVisible(False)
+            self.targetcombo.setVisible(False)
             text = qtlib.markup(_('Nothing to import'), weight='bold',
                                 fg='red')
         self.status.setText(text)
@@ -246,11 +245,17 @@ class ImportDialog(QDialog):
             os.pathsep.join(hglib.tounicode(p) for p in paths))
 
     def thgimport(self):
-        if self.mqloaded and self.patchq.currentText() != 'repository':
-            hgcmd = 'qimport'
-        else:
-            hgcmd = 'import'
-        cmdline = [hgcmd, '--repository', self.repo.root]
+        idx = self.targetcombo.currentIndex()
+        if idx == 1:
+            # import to shelf
+            existing = self.repo.thgshelves()
+            if not os.path.exists(self.repo.shelfdir):
+                os.mkdir(self.repo.shelfdir)
+            for file in self.cslist.curitems:
+                shutil.copy(file, self.repo.shelfdir)
+            return
+        hgcmd = ('import', 'copy', 'import --no-commit', 'qimport')[idx]
+        cmdline = hgcmd.split(' ') + ['--repository', self.repo.root]
         if self.p0chk.isChecked():
             cmdline.append('-p0')
         cmdline.extend(['--verbose', '--'])
