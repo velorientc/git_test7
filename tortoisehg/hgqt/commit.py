@@ -1013,6 +1013,10 @@ class CommitDialog(QDialog):
         if link.startswith('subrepo:'):
             from tortoisehg.hgqt.run import qtrun
             qtrun(run, ui.ui(), root=link[8:])
+        if link.startswith('shelve:'):
+            from tortoisehg.hgqt import run
+            repo = self.commit.repo
+            run.shelve(repo.ui, repo=repo)
 
     def setButtonName(self, name):
         self.bb.button(QDialogButtonBox.Ok).setText(name)
