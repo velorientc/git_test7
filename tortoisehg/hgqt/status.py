@@ -175,6 +175,12 @@ class StatusWidget(QWidget):
         self.fileview.setMode('diff')
         vbox.addWidget(self.fileview, 1)
 
+        lbltext = u'<a href="shelve:">' + _('shelve tool') + u'</a>'
+        self.shelflabel = QLabel(lbltext)
+        self.shelflabel.linkActivated.connect(self.linkActivated)
+        self.fileview.labelhbox.addStretch(1)
+        self.fileview.labelhbox.addWidget(self.shelflabel)
+
         self.split = split
         self.diffvbox = vbox
 
@@ -685,10 +691,19 @@ class StatusDialog(QDialog):
         layout.addWidget(self.statusbar)
         self.stwidget.showMessage.connect(self.statusbar.showMessage)
         self.stwidget.progress.connect(self.statusbar.progress)
+        self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
         self.setWindowTitle(self.stwidget.getTitle())
 
         QTimer.singleShot(0, self.stwidget.refreshWctx)
+
+    @pyqtSlot(QString)
+    def linkActivated(self, link):
+        link = unicode(link)
+        repo = self.stwidget.repo
+        if link.startswith('shelve:'):
+            from tortoisehg.hgqt import run
+            run.shelve(repo.ui, repo=repo)
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
