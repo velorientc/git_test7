@@ -168,6 +168,7 @@ class ChunksWidget(QWidget):
                 fp.rename()
             finally:
                 del fp
+            ctx.invalidate()
             self.fileModified.emit()
         else:
             path = repo.wjoin(self.currentFile)
@@ -245,6 +246,7 @@ class ChunksWidget(QWidget):
                     for chunk in ctx._files[wfile]:
                         chunk.write(fp)
                 fp.rename()
+                ctx.invalidate()
                 self.fileModified.emit()
                 return True
             finally:
@@ -285,6 +287,7 @@ class ChunksWidget(QWidget):
                 fp.rename()
             finally:
                 del fp
+            ctx.invalidate()
         else:
             repo.thgbackup(repo.wjoin(wfile))
             try:
