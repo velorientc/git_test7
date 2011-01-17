@@ -83,7 +83,7 @@ class HgRepoListModel(QAbstractTableModel):
         self._branch_colors = {}
 
         self._columnmap = {
-            'Rev':      lambda ctx, gnode: ctx.rev() is not None and \
+            'Rev':      lambda ctx, gnode: type(ctx.rev()) is int and \
                                            str(ctx.rev()) or "",
             'Node':     lambda ctx, gnode: str(ctx),
             'Graph':    lambda ctx, gnode: "",
