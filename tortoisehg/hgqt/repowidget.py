@@ -211,9 +211,13 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(unicode)
     def _openLink(self, link):
+        def launchShelve(param):
+            run.shelve(self.repo.ui, repo=self.repo)
+
         link = unicode(link)
         handlers = {'cset': self.goto,
-                    'subrepo': self.repoLinkClicked.emit}
+                    'subrepo': self.repoLinkClicked.emit,
+                    'shelve' : launchShelve}
         if ':' in link:
             scheme, param = link.split(':', 1)
             hdr = handlers.get(scheme)
