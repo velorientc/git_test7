@@ -288,11 +288,9 @@ class MergePage(BasePage):
         self.groups.add(wd_merged, 'merged')
         box.addWidget(wd_merged)
 
-        text = _('Before merging, you must '
-                 '<a href="commit"><b>commit</b></a>, ')
-        if 'mq' in repo.extensions():
-            text = text + _('<a href="mq"><b>save</b></a> to MQ patch, ')
-        text = text + ('or <a href="discard"><b>discard</b></a> changes.')
+        text = _('Before merging, you must <a href="commit"><b>commit</b></a>,'
+                 ' <a href="shelve"><b>shelve</b></a> to patch,'
+                 ' or <a href="discard"><b>discard</b></a> changes.')
         wd_text = QLabel(text)
         wd_text.setContentsMargins(*MARGINS)
         wd_text.linkActivated.connect(self.link_activated)
@@ -400,24 +398,21 @@ class MergePage(BasePage):
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.check_status()
-        elif cmd == 'mq':
-            # TODO: need to check existing patches
-            patch = 'patch1'
-            def finished(ret):
-                repo.decrementBusyCount()
-                if ret == 0:
-                    def callback():
-                        text = _('Outstanding changes are saved to <b>'
-                                 '%(name)s</b> in the patch queue.  <a href'
-                                 '="rename:%(name)s"><b>Rename</b></a> it?')
-                        self.wd_text.setText(text % dict(name=patch))
-                        self.wd_text.setShown(True)
-                    self.check_status(callback)
-            self.runner = cmdui.Runner(_('MQ - TortoiseHg'), True, self)
-            self.runner.commandFinished.connect(finished)
-            repo.incrementBusyCount()
-            self.runner.run(['qnew', '--repository', repo.root, patch],
-                            ['qpop', '--repository', repo.root, '--all'])
+        elif cmd == 'shelve':
+            def finished():
+                self.wizard().setWindowModality(Qt.ApplicationModal)
+                self.wizard().setEnabled(True)
+                self.shelvedlg.setWindowModality(Qt.NonModal)
+                self.shelvedlg.hide()
+                self.check_status()
+            self.wizard().setWindowModality(Qt.NonModal)
+            self.wizard().setEnabled(False)
+            from tortoisehg.hgqt import shelve
+            self.shelvedlg = dlg = shelve.ShelveDialog(repo)
+            dlg.finished.connect(finished)
+            dlg.show()
+            dlg.raise_()
+            dlg.setWindowModality(Qt.ApplicationModal)
         elif cmd.startswith('discard'):
             if cmd != 'discard:noconfirm':
                 labels = [(QMessageBox.Yes, _('&Discard')),
