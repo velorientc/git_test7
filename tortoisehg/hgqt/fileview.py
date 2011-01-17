@@ -111,12 +111,16 @@ class HgFileView(QFrame):
 
         self.topLayout = QVBoxLayout()
 
+        self.labelhbox = hbox = QHBoxLayout()
+        hbox.setContentsMargins(0,0,0,0)
+        hbox.setSpacing(2)
+        self.topLayout.addLayout(hbox)
         self.filenamelabel = w = QLabel()
         w.setWordWrap(True)
         f = w.textInteractionFlags()
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
-        self.topLayout.addWidget(w)
+        hbox.addWidget(w)
 
         self.extralabel = w = QLabel()
         w.setWordWrap(True)
