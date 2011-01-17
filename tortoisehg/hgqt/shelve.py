@@ -394,7 +394,10 @@ class ShelveDialog(QMainWindow):
             self.finished.emit(0)
 
 def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
+    if 'repo' in opts:
+        repo = opts['repo']
+    else:
+        from tortoisehg.util import paths
+        from tortoisehg.hgqt import thgrepo
+        repo = thgrepo.repository(ui, path=paths.find_root())
     return ShelveDialog(repo)
