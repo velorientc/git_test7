@@ -172,10 +172,10 @@ class ChunksWidget(QWidget):
         else:
             path = repo.wjoin(self.currentFile)
             if not os.path.exists(path):
-                self.showMessage.emit(_('file hsa been deleted, refresh'))
+                self.showMessage.emit(_('file has been deleted, refresh'))
                 return
             if self.mtime != os.path.getmtime(path):
-                self.showMessage.emit(_('file hsa been modified, refresh'))
+                self.showMessage.emit(_('file has been modified, refresh'))
                 return
             repo.thgbackup(repo.wjoin(self.currentFile))
             wlock = repo.wlock()
