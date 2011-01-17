@@ -9,7 +9,7 @@ import cStringIO
 import os
 
 from mercurial import hg, util, patch
-from mercurial import match as matchmod
+from mercurial import match as matchmod, ui as uimod
 from hgext import record
 
 from tortoisehg.util import hglib
@@ -94,6 +94,31 @@ class ChunksWidget(QWidget):
                 self.mtime = newmtime
                 self.refresh()
 
+    def runPatcher(self, fp, wfile, updatestate):
+        class warncapt(uimod.ui):
+            def warn(self, msg, *args, **opts):
+                self.write(msg)
+        repo = self.repo
+        ui = warncapt()
+        ui.pushbuffer()
+        strip, pfiles = 1, {}
+        ok = True
+        try:
+            patch.internalpatch(fp, ui, strip, repo.root, files=pfiles,
+                                eolmode=None)
+        except patch.PatchError, err:
+            ok = False
+            self.showMessage.emit(hglib.tounicode(str(err)))
+        for line in ui.popbuffer().splitlines():
+            if line.endswith(wfile + '.rej'):
+                print 'reject file created for', wfile
+                # TODO: ask user if they want to edit file + .rej
+                # TODO: ask user if it is ok to remove chunks from source
+        if updatestate and ok:
+            # Apply operations specified in git diff headers
+            hglib.updatedir(repo.ui, repo, pfiles)
+        return ok
+
     def editCurrentFile(self):
         ctx = self.filelistmodel._ctx
         if isinstance(ctx, patchctx):
@@ -166,9 +191,7 @@ class ChunksWidget(QWidget):
                     for c in kchunks:
                         c.write(fp)
                     fp.seek(0)
-                    pfiles = {}
-                    patch.internalpatch(fp, repo.ui, 1, repo.root, files=pfiles,
-                                        eolmode=None)
+                    self.runPatcher(fp, self.currentFile, False)
             finally:
                 wlock.release()
             self.fileModified.emit()
@@ -236,15 +259,7 @@ class ChunksWidget(QWidget):
             fp.seek(0)
             wlock = repo.wlock()
             try:
-                try:
-                    pfiles = {}
-                    patch.internalpatch(fp, repo.ui, 1, repo.root, files=pfiles,
-                                        eolmode=None)
-                    hglib.updatedir(repo.ui, repo, pfiles)
-                    # TODO: detect patch rejects, offer to open editor
-                    return True
-                except patch.PatchError, err:
-                    self.showMessage.emit(hglib.tounicode(str(err)))
+                return self.runPatcher(fp, wfile, True)
             finally:
                 wlock.release()
             return False
