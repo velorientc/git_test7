@@ -218,14 +218,14 @@ class UpdateDialog(QDialog):
                         'Please select to continue:\n\n')
                 data = {'discard': (_('&Discard'),
                                     _('Discard - discard local changes, no backup')),
-                        'patch': (_('&Patch'),
-                                  _('Patch - move local changes to MQ patch')),
+                        'shelve': (_('&Shelve'),
+                                  _('Shelve - move local changes to a patch')),
                         'merge': (_('&Merge'),
                                   _('Merge - allow to merge with local changes')),}
 
                 opts = [data['discard']]
                 if not ismergedchange():
-                    opts.append(data['patch'])
+                    opts.append(data['shelve'])
                 if islocalmerge(cur, node, clean):
                     opts.append(data['merge'])
 
@@ -233,7 +233,7 @@ class UpdateDialog(QDialog):
                 dlg = QMessageBox(QMessageBox.Question, _('Confirm Update'),
                                   msg, QMessageBox.Cancel, self)
                 buttons = {}
-                for name in ('discard', 'patch', 'merge'):
+                for name in ('discard', 'shelve', 'merge'):
                     label, desc = data[name]
                     buttons[name] = dlg.addButton(label, QMessageBox.ActionRole)
                 dlg.exec_()
@@ -249,8 +249,20 @@ class UpdateDialog(QDialog):
                 buttons, clicked = confirmupdate(clean)
                 if buttons['discard'] == clicked:
                     cmdline.append('--clean')
-                elif buttons['patch'] == clicked:
-                    return # TODO: not implemented yet
+                elif buttons['shelve'] == clicked:
+                    def finished():
+                        self.setWindowModality(Qt.ApplicationModal)
+                        self.shelvedlg.setWindowModality(Qt.NonModal)
+                        self.shelvedlg.hide()
+                        self.update()
+                    from tortoisehg.hgqt import shelve
+                    self.shelvedlg = dlg = shelve.ShelveDialog(self.repo)
+                    dlg.finished.connect(finished)
+                    dlg.show()
+                    dlg.raise_()
+                    dlg.setWindowModality(Qt.ApplicationModal)
+                    self.setWindowModality(Qt.NonModal)
+                    return
                 elif buttons['merge'] == clicked:
                     pass # no args
                 else:
