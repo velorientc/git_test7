@@ -120,7 +120,7 @@ class HgFileView(QFrame):
         f = w.textInteractionFlags()
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
-        hbox.addWidget(w)
+        hbox.addWidget(w, 1)
 
         self.extralabel = w = QLabel()
         w.setWordWrap(True)
