@@ -94,7 +94,7 @@ class ShelveDialog(QMainWindow):
         self.rbar.addAction(self.refreshAction)
         self.actionNew = a = QAction(_('New Shelf'), self)
         a.setIcon(qtlib.geticon('document-new'))
-        a.triggered.connect(self.newShelf)
+        a.triggered.connect(self.newShelfPressed)
         self.rbar.addAction(self.actionNew)
 
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
@@ -168,6 +168,8 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def moveFileRight(self):
+        if self.combob.currentIndex() == -1:
+            self.newShelf(False)
         file, _ = self.browsea.getSelectedFileAndChunks()
         chunks = self.browsea.getChunksForFile(file)
         if self.browseb.mergeChunks(file, chunks):
@@ -182,6 +184,8 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def moveFilesRight(self):
+        if self.combob.currentIndex() == -1:
+            self.newShelf(False)
         for file in self.browsea.getFileList():
             chunks = self.browsea.getChunksForFile(file)
             if self.browseb.mergeChunks(file, chunks):
@@ -196,6 +200,8 @@ class ShelveDialog(QMainWindow):
 
     @pyqtSlot()
     def moveChunksRight(self):
+        if self.combob.currentIndex() == -1:
+            self.newShelf(False)
         file, chunks = self.browsea.getSelectedFileAndChunks()
         if self.browseb.mergeChunks(file, chunks):
             self.browsea.deleteSelectedChunks()
@@ -207,15 +213,20 @@ class ShelveDialog(QMainWindow):
             self.browseb.deleteSelectedChunks()
 
     @pyqtSlot()
-    def newShelf(self):
-        dlg = QInputDialog(self, Qt.Sheet)
-        dlg.setWindowModality(Qt.WindowModal)
-        dlg.setWindowTitle(_('TortoiseHg New Shelf Name'))
-        dlg.setLabelText(_('Specify name of new shelf'))
-        dlg.setTextValue(time.strftime('%Y-%m-%d_%H-%M-%S'))
-        if not dlg.exec_():
-            return
-        shelve = hglib.fromunicode(dlg.textValue())
+    def newShelfPressed(self):
+        self.newShelf(True)
+
+    def newShelf(self, interactive):
+        shelve = time.strftime('%Y-%m-%d_%H-%M-%S')
+        if interactive:
+            dlg = QInputDialog(self, Qt.Sheet)
+            dlg.setWindowModality(Qt.WindowModal)
+            dlg.setWindowTitle(_('TortoiseHg New Shelf Name'))
+            dlg.setLabelText(_('Specify name of new shelf'))
+            dlg.setTextValue(shelve)
+            if not dlg.exec_():
+                return
+            shelve = hglib.fromunicode(dlg.textValue())
         try:
             fn = os.path.join('shelves', shelve)
             shelfpath = self.repo.join(fn)
