@@ -426,7 +426,7 @@ class DiffBrowser(QFrame):
         self.sci.setFrameStyle(0)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
-        self.sci.setWrapMode(qsci.WrapCharacter)
+        #self.sci.setWrapMode(qsci.WrapCharacter)
 
         i = qscilib.KeyPressInterceptor(self, None, [QKeySequence.SelectAll,
                                                      QKeySequence.New])
