@@ -22,6 +22,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
+# TODO
+# Add support for tools like TortoiseMerge that help resolve rejected chunks
+# qpush and import could benefit from patch reject fallbacks as well
+
 qsci = Qsci.QsciScintilla
 
 class ChunksWidget(QWidget):
@@ -111,9 +115,19 @@ class ChunksWidget(QWidget):
             self.showMessage.emit(hglib.tounicode(str(err)))
         for line in ui.popbuffer().splitlines():
             if line.endswith(wfile + '.rej'):
-                print 'reject file created for', wfile
-                # TODO: ask user if they want to edit file + .rej
-                # TODO: ask user if it is ok to remove chunks from source
+                if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
+                                        unicode(line) + u'<br><br>' +
+                                        _('Edit patched file and rejects?'),
+                                       parent=self):
+                    wctxactions.edit(self, repo.ui, repo, [wfile, wfile+'.rej'])
+                else:
+                    return False
+                if qtlib.QuestionMsgBox(_('Were the rejected chunks resolved?'),
+                                    _('Remove these chunks from their source?'),
+                                    parent=self):
+                    ok = True
+                else:
+                    break
         if updatestate and ok:
             # Apply operations specified in git diff headers
             hglib.updatedir(repo.ui, repo, pfiles)
