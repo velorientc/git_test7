@@ -143,8 +143,12 @@ class ChunksWidget(QWidget):
 
     def getSelectedFileAndChunks(self):
         chunks = self.diffbrowse.curchunks
-        dchunks = [c for c in chunks[1:] if c.selected]
-        return self.currentFile, [chunks[0]] + dchunks
+        if chunks:
+            dchunks = [c for c in chunks[1:] if c.selected]
+            return self.currentFile, [chunks[0]] + dchunks
+        else:
+            # TODO: Generate git diff for A, R files
+            return self.currentFile, []
 
     def deleteSelectedChunks(self):
         'delete currently selected chunks'
