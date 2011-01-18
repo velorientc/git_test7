@@ -103,7 +103,7 @@ class HgFileListView(QTableView):
         if filename is None:
             return
         model = self.model()
-        pats = [hglib.fromunicode(filename)]
+        pats = [filename]
         opts = {'change':str(model._ctx.rev())}
         dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
         if dlg:
@@ -114,7 +114,7 @@ class HgFileListView(QTableView):
         if filename is None:
             return
         model = self.model()
-        pats = [hglib.fromunicode(filename)]
+        pats = [filename]
         opts = {'rev':[str(model._ctx.rev())]}
         dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
         if dlg:
@@ -127,13 +127,12 @@ class HgFileListView(QTableView):
         model = self.model()
         repo = model.repo
         rev = model._ctx.rev()
-        path = hglib.fromunicode(filename)
         if rev is None:
-            files = [repo.wjoin(path)]
+            files = [repo.wjoin(filename)]
             wctxactions.edit(self, repo.ui, repo, files)
         else:
-            base, _ = visdiff.snapshot(repo, [path], repo[rev])
-            files = [os.path.join(base, path)]
+            base, _ = visdiff.snapshot(repo, [filename], repo[rev])
+            files = [os.path.join(base, filename)]
             wctxactions.edit(self, repo.ui, repo, files)
 
     def editlocal(self):
@@ -142,7 +141,7 @@ class HgFileListView(QTableView):
             return
         model = self.model()
         repo = model.repo
-        path = repo.wjoin(hglib.fromunicode(filename))
+        path = repo.wjoin(filename)
         wctxactions.edit(self, repo.ui, repo, [path])
 
     def revertfile(self):
@@ -165,7 +164,7 @@ class HgFileListView(QTableView):
                                repoviewer=self.window())
                 dlgdict[filename] = dlg
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % filename)
-            dlg = dlgdict[filename] 
+            dlg = dlgdict[filename]
             dlg.goto(model._ctx.rev())
             dlg.show()
             dlg.raise_()
