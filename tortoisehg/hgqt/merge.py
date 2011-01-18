@@ -399,20 +399,11 @@ class MergePage(BasePage):
             dlg.exec_()
             self.check_status()
         elif cmd == 'shelve':
-            def finished():
-                self.wizard().setWindowModality(Qt.ApplicationModal)
-                self.wizard().setEnabled(True)
-                self.shelvedlg.setWindowModality(Qt.NonModal)
-                self.shelvedlg.hide()
-                self.check_status()
-            self.wizard().setWindowModality(Qt.NonModal)
-            self.wizard().setEnabled(False)
             from tortoisehg.hgqt import shelve
-            self.shelvedlg = dlg = shelve.ShelveDialog(repo)
-            dlg.finished.connect(finished)
-            dlg.show()
-            dlg.raise_()
-            dlg.setWindowModality(Qt.ApplicationModal)
+            dlg = shelve.ShelveDialog(repo, self.wizard())
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.check_status()
         elif cmd.startswith('discard'):
             if cmd != 'discard:noconfirm':
                 labels = [(QMessageBox.Yes, _('&Discard')),

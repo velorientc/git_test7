@@ -16,24 +16,33 @@ from tortoisehg.hgqt import qtlib, cmdui, chunks
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class ShelveDialog(QMainWindow):
+class ShelveDialog(QDialog):
 
     finished = pyqtSignal(int)
-
     wdir = _('Working Directory')
 
-    def __init__(self, repo):
-        QMainWindow.__init__(self)
+    def __init__(self, repo, parent):
+        QDialog.__init__(self, parent)
 
         self.repo = repo
         self.shelves = []
         self.patches = []
 
+        layout = QVBoxLayout()
+        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setSpacing(0)
+        self.setLayout(layout)
+
+        self.tbarhbox = hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(0)
+        self.layout().addLayout(self.tbarhbox)
+
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Horizontal)
         self.splitter.setChildrenCollapsible(False)
         self.splitter.setObjectName('splitter')
-        self.setCentralWidget(self.splitter)
+        self.layout().addWidget(self.splitter, 1)
 
         aframe = QFrame(self.splitter)
         avbox = QVBoxLayout()
@@ -86,7 +95,7 @@ class ShelveDialog(QMainWindow):
         bvbox.addWidget(self.browseb)
 
         self.rbar = QToolBar(_('Refresh Toolbar'), objectName='rbar')
-        self.addToolBar(self.rbar)
+        self.tbarhbox.addWidget(self.rbar)
         self.refreshAction = a = QAction(_('Refresh'), self)
         a.setIcon(qtlib.geticon('reload'))
         a.setShortcut(QKeySequence.Refresh)
@@ -98,7 +107,7 @@ class ShelveDialog(QMainWindow):
         self.rbar.addAction(self.actionNew)
 
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
-        self.addToolBar(self.lefttbar)
+        self.tbarhbox.addWidget(self.lefttbar)
         self.deletea = a = QAction(_('Deleted selected chunks'), self)
         self.deletea.triggered.connect(self.browsea.deleteSelectedChunks)
         a.setIcon(qtlib.geticon('delfilesleft'))
@@ -120,7 +129,8 @@ class ShelveDialog(QMainWindow):
         self.lefttbar.addAction(self.chunksright)
 
         self.righttbar = QToolBar(_('Right Toolbar'), objectName='righttbar')
-        self.addToolBar(self.righttbar)
+        self.tbarhbox.addStretch(1)
+        self.tbarhbox.addWidget(self.righttbar)
         self.chunksleft = a = QAction(_('Move selected chunks left'), self)
         self.chunksleft.triggered.connect(self.moveChunksLeft)
         a.setIcon(qtlib.geticon('chunk2left'))
@@ -158,7 +168,7 @@ class ShelveDialog(QMainWindow):
         self.browseb.fileModelEmpty.connect(self.allleft.setDisabled)
 
         self.statusbar = cmdui.ThgStatusBar(self)
-        self.setStatusBar(self.statusbar)
+        self.layout().addWidget(self.statusbar)
 
         self.refreshCombos()
         repo.repositoryChanged.connect(self.refreshCombos)
@@ -380,29 +390,20 @@ class ShelveDialog(QMainWindow):
         s = QSettings()
         wb = "shelve/"
         s.setValue(wb + 'geometry', self.saveGeometry())
-        s.setValue(wb + 'windowState', self.saveState())
         s.setValue(wb + 'filesplitter', self.browsea.splitter.saveState())
 
     def restoreSettings(self):
         s = QSettings()
         wb = "shelve/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
-        self.restoreState(s.value(wb + 'windowState').toByteArray())
         self.browsea.splitter.restoreState(
                           s.value(wb + 'filesplitter').toByteArray())
         self.browseb.splitter.restoreState(
                           s.value(wb + 'filesplitter').toByteArray())
 
-    def safeToExit(self):
-        return True
-
     def closeEvent(self, event):
-        if not self.safeToExit():
-            event.ignore()
-        else:
-            self.storeSettings()
-            # mimic QDialog exit
-            self.finished.emit(0)
+        self.storeSettings()
+        super(ShelveDialog, self).closeEvent(event)
 
 def run(ui, *pats, **opts):
     if 'repo' in opts:
@@ -411,4 +412,4 @@ def run(ui, *pats, **opts):
         from tortoisehg.util import paths
         from tortoisehg.hgqt import thgrepo
         repo = thgrepo.repository(ui, path=paths.find_root())
-    return ShelveDialog(repo)
+    return ShelveDialog(repo, None)

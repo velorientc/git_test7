@@ -1014,9 +1014,12 @@ class CommitDialog(QDialog):
             from tortoisehg.hgqt.run import qtrun
             qtrun(run, ui.ui(), root=link[8:])
         if link.startswith('shelve:'):
-            from tortoisehg.hgqt import run
             repo = self.commit.repo
-            run.shelve(repo.ui, repo=repo)
+            from tortoisehg.hgqt import shelve
+            dlg = shelve.ShelveDialog(repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.refresh()
 
     def setButtonName(self, name):
         self.bb.button(QDialogButtonBox.Ok).setText(name)

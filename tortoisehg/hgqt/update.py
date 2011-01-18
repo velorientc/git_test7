@@ -250,18 +250,10 @@ class UpdateDialog(QDialog):
                 if buttons['discard'] == clicked:
                     cmdline.append('--clean')
                 elif buttons['shelve'] == clicked:
-                    def finished():
-                        self.setWindowModality(Qt.ApplicationModal)
-                        self.shelvedlg.setWindowModality(Qt.NonModal)
-                        self.shelvedlg.hide()
-                        self.update()
                     from tortoisehg.hgqt import shelve
-                    self.shelvedlg = dlg = shelve.ShelveDialog(self.repo)
-                    dlg.finished.connect(finished)
-                    dlg.show()
-                    dlg.raise_()
-                    dlg.setWindowModality(Qt.ApplicationModal)
-                    self.setWindowModality(Qt.NonModal)
+                    dlg = shelve.ShelveDialog(self.repo, self)
+                    dlg.finished.connect(dlg.deleteLater)
+                    dlg.exec_()
                     return
                 elif buttons['merge'] == clicked:
                     pass # no args

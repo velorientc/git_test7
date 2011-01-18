@@ -702,8 +702,11 @@ class StatusDialog(QDialog):
         link = unicode(link)
         repo = self.stwidget.repo
         if link.startswith('shelve:'):
-            from tortoisehg.hgqt import run
-            run.shelve(repo.ui, repo=repo)
+            from tortoisehg.hgqt import shelve
+            dlg = shelve.ShelveDialog(self.stwidget.repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.stwidget.refreshWctx()
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
