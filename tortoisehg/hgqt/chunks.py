@@ -371,6 +371,25 @@ class ChunksWidget(QWidget):
             ctx = self.repo.changectx(ctx.node())
         self.setContext(ctx)
 
+# DO NOT USE.  Sadly, this does not work.
+class ElideLabel(QLabel):
+    def __init__(self, text='', parent=None):
+        QLabel.__init__(self, text, parent)
+
+    def sizeHint(self):
+        return super(ElideLabel, self).sizeHint()
+
+    def paintEvent(self, event):
+        p = QPainter()
+        fm = QFontMetrics(self.font())
+        if fm.width(self.text()): # > self.contentsRect().width():
+            elided = fm.elidedText(self.text(), Qt.ElideLeft,
+                                   self.rect().width(), 0)
+            p.drawText(self.rect(), Qt.AlignTop | Qt.AlignRight |
+                       Qt.TextSingleLine, elided)
+        else:
+            super(ElideLabel, self).paintEvent(event)
+
 class DiffBrowser(QFrame):
     """diff browser"""
 
@@ -396,6 +415,7 @@ class DiffBrowser(QFrame):
         hbox.setSpacing(2)
         self.layout().addLayout(hbox)
         self.filenamelabel = w = QLabel()
+        self.filenamelabel.hide()
         hbox.addWidget(w)
         w.setWordWrap(True)
         f = w.textInteractionFlags()
