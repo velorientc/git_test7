@@ -53,8 +53,19 @@ class HgFileListView(QTableView):
     def setModel(self, model):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
+        model.contextChanged.connect(self.contextChanged)
         self.selectionModel().currentRowChanged.connect(self.fileSelected)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
+        if model._ctx is not None:
+            self.contextChanged(model._ctx)
+
+    def contextChanged(self, ctx):
+        real = type(ctx.rev()) is int
+        wd = ctx.rev() is None
+        for act in ['ldiff', 'edit']:
+            self._actions[act].setEnabled(real)
+        for act in ['diff', 'revert']:
+            self._actions[act].setEnabled(real or wd)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -104,7 +115,8 @@ class HgFileListView(QTableView):
             return
         model = self.model()
         pats = [filename]
-        opts = {'change':str(model._ctx.rev())}
+        rev = model._ctx.rev()
+        opts = {'change':model._ctx.rev()}
         dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
         if dlg:
             dlg.exec_()
@@ -115,7 +127,8 @@ class HgFileListView(QTableView):
             return
         model = self.model()
         pats = [filename]
-        opts = {'rev':[str(model._ctx.rev())]}
+        assert type(model._ctx.rev()) is int
+        opts = {'rev':['rev(%d)' % (model._ctx.rev())]}
         dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
         if dlg:
             dlg.exec_()
@@ -151,6 +164,8 @@ class HgFileListView(QTableView):
         model = self.model()
         repo = model.repo
         rev = model._ctx.rev()
+        if rev is None:
+            rev = model._ctx.p1().rev()
         dlg = revert.RevertDialog(repo, filename, rev, self)
         dlg.exec_()
 
