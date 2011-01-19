@@ -8,7 +8,7 @@
 import cStringIO
 import os
 
-from mercurial import hg, util, patch
+from mercurial import hg, util, patch, commands
 from mercurial import match as matchmod, ui as uimod
 from hgext import record
 
@@ -196,13 +196,12 @@ class ChunksWidget(QWidget):
             if self.mtime != os.path.getmtime(path):
                 self.showMessage.emit(_('file has been modified, refresh'))
                 return
-            repo.thgbackup(repo.wjoin(self.currentFile))
-            wlock = repo.wlock()
-            try:
-                if revertall:
-                    hg.revert(repo, repo.dirstate.parents()[0],
-                            lambda a: a == self.currentFile)
-                else:
+            repo.thgbackup(path)
+            if revertall:
+                commands.revert(repo.ui, repo, path)
+            else:
+                wlock = repo.wlock()
+                try:
                     repo.wopener(self.currentFile, 'wb').write(
                         self.diffbrowse.origcontents)
                     fp = cStringIO.StringIO()
@@ -211,8 +210,8 @@ class ChunksWidget(QWidget):
                         c.write(fp)
                     fp.seek(0)
                     self.runPatcher(fp, self.currentFile, False)
-            finally:
-                wlock.release()
+                finally:
+                    wlock.release()
             self.fileModified.emit()
 
     def mergeChunks(self, wfile, chunks):
@@ -308,12 +307,7 @@ class ChunksWidget(QWidget):
             ctx.invalidate()
         else:
             repo.thgbackup(repo.wjoin(wfile))
-            try:
-                wlock = repo.wlock()
-                hg.revert(repo, repo.dirstate.parents()[0],
-                          lambda a: a == wfile)
-            finally:
-                wlock.release()
+            commands.revert(repo.ui, repo, repo.wjoin(wfile))
         self.fileModified.emit()
 
     def getChunksForFile(self, wfile):
