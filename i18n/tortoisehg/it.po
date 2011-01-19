@@ -3142,11 +3142,11 @@ msgstr "Scrivi bundle in"
 
 #: tortoisehg\hgtk\history.py:2410
 msgid "Bundling from %(base)s to %(rev)s..."
-msgstr "Creazione bundle da %(base) a %(rev) in corso..."
+msgstr "Creazione bundle da %(base)s a %(rev)s in corso..."
 
 #: tortoisehg\hgtk\history.py:2412
 msgid "Bundling from %(base)s to tip..."
-msgstr "Creazione bundle da %(base) al tip in corso..."
+msgstr "Creazione bundle da %(base)s al tip in corso..."
 
 #: tortoisehg\hgtk\history.py:2418
 msgid "Finish bundling"
