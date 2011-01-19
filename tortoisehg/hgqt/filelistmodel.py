@@ -30,6 +30,9 @@ class HgFileListModel(QAbstractTableModel):
     """
     Model used for listing (modified) files of a given Hg revision
     """
+
+    contextChanged = pyqtSignal(object)
+
     def __init__(self, repo, parent=None):
         """
         data is a HgHLRepo instance
@@ -63,6 +66,7 @@ class HgFileListModel(QAbstractTableModel):
             self._ctx = ctx
             self.loadFiles()
             self.layoutChanged.emit()
+        self.contextChanged.emit(ctx)
 
     def flagFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self._ctx:
