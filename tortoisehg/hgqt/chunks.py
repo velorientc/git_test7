@@ -261,7 +261,7 @@ class ChunksWidget(QWidget):
                     fp.write('\n'.join(ctx._ph.comments))
                     fp.write('\n\n')
                 for file in ctx._fileorder:
-                    for chunk in ctx._files[wfile]:
+                    for chunk in ctx._files[file]:
                         chunk.write(fp)
                 fp.rename()
                 ctx.invalidate()
