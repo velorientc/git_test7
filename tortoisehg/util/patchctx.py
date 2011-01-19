@@ -90,6 +90,9 @@ class patchctx(object):
                     islink, isexec = gp.mode
                     if islink:
                         return 'l'
+                    elif wfile in self._status[1]:
+                        # Do not report exec mode change if file is added
+                        return ''
                     elif isexec:
                         return 'x'
                     else:
