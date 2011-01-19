@@ -30,7 +30,7 @@ class patchctx(object):
         self._path = patchpath
         self._patchname = os.path.basename(patchpath)
         self._repo = repo
-        self._rev = rev
+        self._rev = rev or 'patch'
         self._status = [[], [], []]
         self._fileorder = []
         self._user = ''
