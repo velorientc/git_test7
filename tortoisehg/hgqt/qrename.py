@@ -36,7 +36,7 @@ class QRenameDialog(QDialog):
         lbl = QLabel(_('Rename patch <b>%s</b> to:') % (self.oldpatchname))
         self.layout().addWidget(lbl)
 
-        self.le = QLineEdit('')
+        self.le = QLineEdit(hglib.tounicode(self.oldpatchname))
         self.layout().addWidget(self.le)
 
         self.cmd = cmdui.Runner()
@@ -57,4 +57,10 @@ class QRenameDialog(QDialog):
         self.newpatchname = hglib.fromunicode(self.le.text())
         cmdline = ['qrename', '--repository', self.repo.root, '--',
                     self.oldpatchname, self.newpatchname]
-        self.cmd.run(cmdline)
+        if self.newpatchname != self.oldpatchname:
+            cmdline = ['qrename', '--repository', self.repo.root, '--',
+                       self.oldpatchname, self.newpatchname]
+            self.cmd.run(cmdline)
+        else:
+            self.close()
+
