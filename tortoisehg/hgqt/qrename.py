@@ -55,8 +55,6 @@ class QRenameDialog(QDialog):
 
     def accept(self):
         self.newpatchname = hglib.fromunicode(self.le.text())
-        cmdline = ['qrename', '--repository', self.repo.root, '--',
-                    self.oldpatchname, self.newpatchname]
         if self.newpatchname != self.oldpatchname:
             cmdline = ['qrename', '--repository', self.repo.root, '--',
                        self.oldpatchname, self.newpatchname]
