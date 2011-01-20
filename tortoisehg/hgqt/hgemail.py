@@ -21,7 +21,6 @@ class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
     def __init__(self, ui, repo, revs, parent=None):
         super(EmailDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self._ui = ui
         self._repo = repo
 
