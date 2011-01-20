@@ -124,10 +124,14 @@ class RevisionSetQuery(QDialog):
 
         if 'hgsubversion' in repo.extensions():
             global _logical, _ancestry
-            _logical = list(_logical) + [('fromsvn()', 
+            _logical = list(_logical) + [('fromsvn()',
                     _('all revisions converted from subversion')),]
             _ancestry = list(_ancestry) + [('svnrev(rev)',
                     _('changeset which represents converted svn revision')),]
+        if 'bookmarks' in repo.extensions():
+            global _common
+            _common = list(_common) + [('bookmark([name])',
+                    _('The named bookmark or all bookmarks.')),]
 
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
