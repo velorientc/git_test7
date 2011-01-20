@@ -445,6 +445,10 @@ def fileEditor(filename, **opts):
         geomname = 'editor-geom'
         editor.setText(contents)
         editor.setModified(False)
+        if '\r\n' in contents:
+            editor.setEolMode(QsciScintilla.EolWindows)
+        else:
+            editor.setEolMode(QsciScintilla.EolUnix)
         dialog.restoreGeometry(s.value(geomname).toByteArray())
         ret = dialog.exec_()
         if ret == QDialog.Accepted:
@@ -454,5 +458,5 @@ def fileEditor(filename, **opts):
         s.setValue(geomname, dialog.saveGeometry())
     except EnvironmentError, e:
         qtlib.WarningMsgBox(_('Unable to read/write config file'),
-                            hglib.tounicode(e), parent=dialog)
+                            hglib.tounicode(str(e)), parent=dialog)
     return ret
