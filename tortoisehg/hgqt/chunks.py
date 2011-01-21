@@ -600,13 +600,3 @@ class DiffBrowser(QFrame):
             if c.fromline in reenable:
                 self.toggleChunk(c)
         self.updateSummary()
-
-def run(ui, *pats, **opts):
-    'for testing purposes only'
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    dlg = ChunksWidget(repo, None)
-    desktopgeom = qApp.desktop().availableGeometry()
-    dlg.resize(desktopgeom.size() * 0.8)
-    dlg.setContext(repo.changectx(None))
-    return dlg
