@@ -686,7 +686,7 @@ class Widget(QWidget):
         if self.internallog:
             self.core.output_text.setShown(visible)
 
-    def is_show_output(self):
+    def outputShown(self):
         if self.internallog:
             return self.core.output_text.isVisible()
         else:

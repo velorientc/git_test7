@@ -289,7 +289,7 @@ class UpdateDialog(QDialog):
 
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
-        if ret not in (0, 1) or self.cmd.is_show_output():
+        if ret not in (0, 1) or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)

@@ -198,7 +198,7 @@ class BackoutDialog(QDialog):
             self.backout_btn.clicked.disconnect(self.backout)
             self.backout_btn.clicked.connect(self.commit)
             self.checkResolve()
-        elif not self.cmd.is_show_output():
+        elif not self.cmd.outputShown():
             self.accept()
 
     def checkResolve(self):

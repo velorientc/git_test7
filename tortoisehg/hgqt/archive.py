@@ -326,7 +326,7 @@ class ArchiveDialog(QDialog):
         self.cmd.run(cmdline)
 
     def detail_clicked(self):
-        if self.cmd.is_show_output():
+        if self.cmd.outputShown():
             self.cmd.setShowOutput(False)
         else:
             self.cmd.setShowOutput(True)
@@ -354,9 +354,9 @@ class ArchiveDialog(QDialog):
     def command_finished(self, ret):
         if self.files_in_rev_chk.isChecked():
             os.chdir(self.savedcwd)
-        if ret is not 0 or self.cmd.is_show_output()\
+        if ret is not 0 or self.cmd.outputShown()\
                 or self.keep_open_chk.isChecked():
-            if not self.cmd.is_show_output():
+            if not self.cmd.outputShown():
                 self.detail_btn.click()
             self.cancel_btn.setHidden(True)
             self.close_btn.setShown(True)

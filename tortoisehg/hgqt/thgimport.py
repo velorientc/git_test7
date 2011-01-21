@@ -305,7 +305,7 @@ class ImportDialog(QDialog):
 
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
-        if ret is not 0 or self.cmd.is_show_output():
+        if ret is not 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)

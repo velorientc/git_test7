@@ -331,7 +331,7 @@ class CloneDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, ret):
-        if ret is not 0 or self.cmd.is_show_output():
+        if ret is not 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.clone_btn.setShown(True)
             self.close_btn.setShown(True)
