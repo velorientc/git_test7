@@ -682,9 +682,12 @@ class SyncWidget(QWidget):
             pending = {}
             if ret == 0:
                 for line in output.splitlines():
+                    if line.startswith('ignoring hg revision'):
+                        continue
                     try:
                         hashes = line.split(' ')
                         changelist = hashes.pop(0)
+                        clnum = int(changelist)
                         if len(hashes)>1 and len(hashes[0])==1:
                            state = hashes.pop(0)
                            if state == 's':
