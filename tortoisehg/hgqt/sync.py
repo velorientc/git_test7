@@ -506,7 +506,7 @@ class SyncWidget(QWidget):
             if b: b.setEnabled(True)
         self.stopAction.setEnabled(False)
         if self.finishfunc:
-            output = self.cmd.core.get_rawoutput()
+            output = self.cmd.core.rawoutput()
             self.finishfunc(ret, output)
 
     def run(self, cmdline, details):

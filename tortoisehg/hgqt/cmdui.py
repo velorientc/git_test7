@@ -148,7 +148,7 @@ class Core(QObject):
         self.extproc = None
         self.stbar = None
         self.queue = []
-        self.rawoutput = []
+        self.rawoutlines = []
         self.display = None
         self.useproc = False
         self.internallog = useInternal
@@ -196,8 +196,8 @@ class Core(QObject):
             pass
         return False
 
-    def get_rawoutput(self):
-        return ''.join(self.rawoutput)
+    def rawoutput(self):
+        return ''.join(self.rawoutlines)
 
     ### Private Method ###
 
@@ -214,7 +214,7 @@ class Core(QObject):
             exepath = paths.find_in_path('hg')
 
         def start(cmdline, display):
-            self.rawoutput = []
+            self.rawoutlines = []
             if display:
                 cmd = '%% hg %s\n' % display
             else:
@@ -248,7 +248,7 @@ class Core(QObject):
 
         def stdout():
             data = proc.readAllStandardOutput().data()
-            self.rawoutput.append(data)
+            self.rawoutlines.append(data)
             self.output.emit(hglib.tounicode(data), '')
 
         def stderr():
@@ -316,7 +316,7 @@ class Core(QObject):
             return # run next command
         else:
             self.queue = []
-            self.rawoutput = [hglib.fromunicode(self.thread.rawoutput.join(''))]
+            self.rawoutlines = [hglib.fromunicode(self.thread.rawoutput.join(''))]
 
         self.commandFinished.emit(ret)
 

@@ -345,7 +345,7 @@ class PostReviewDialog(QDialog):
         self.qui.progress_bar.hide()
         self.qui.progress_label.hide()
 
-        output = self.cmd.core.get_rawoutput()
+        output = self.cmd.core.rawoutput()
 
         saved = 'saved:' in output
         published = 'published:' in output
