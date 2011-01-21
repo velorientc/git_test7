@@ -26,7 +26,7 @@ def is_true(x): return x in ('1', 'True')
 def nonzero(x): return x != 0
 
 # writing functions
-def one_str(x): 
+def one_str(x):
     if x: return '1'
     return '0'
 def one_int(x):
@@ -36,13 +36,13 @@ def one_int(x):
 def noop(x): return x
 
 vars = {
-    # name: 
+    # name:
     #   default, regkey, regtype, evalfunc, wrfunc, checkbuttonattribute
-    'EnableOverlays':       
+    'EnableOverlays':
         [True,     THGKEY, REG_SZ, is_true, one_str, 'ovenable'],
     'LocalDisksOnly':
         [False,    THGKEY, REG_SZ, is_true, one_str, 'localonly'],
-    'ShowTaskbarIcon':      
+    'ShowTaskbarIcon':
         [True,     THGKEY, REG_SZ, is_true, one_str, 'show_taskbaricon'],
     'HighlightTaskbarIcon':
         [True,     THGKEY, REG_SZ, is_true, one_str, 'highlight_taskbaricon'],
@@ -59,7 +59,7 @@ vars = {
     'ShowDeletedOverlay':
         [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableDeletedHandler'],
     'ShowAddedOverlay':
-        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableAddedHandler'] 
+        [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableAddedHandler']
 }
 
 
@@ -180,7 +180,7 @@ class ShellConfigWindow(QDialog):
 
         self.load_shell_configs()
 
-    def load_shell_configs(self):        
+    def load_shell_configs(self):
         for name, info in vars.iteritems():
             default, regkey, regtype, evalfunc, wrfunc, cbattr = info
             try:
@@ -219,7 +219,7 @@ class ShellConfigWindow(QDialog):
         promoted = []
         list = self.topmenulist
         for row in range(list.count()):
-            label = str(list.item(row).text())
+            label = unicode(list.item(row).text())
             cmd = self.menu_cmds[label]
             promoted.append(cmd)
 
