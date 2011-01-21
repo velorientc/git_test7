@@ -169,7 +169,7 @@ class Core(QObject):
         if self.useproc:
             self.runproc()
         elif not self.is_running():
-            self.run_next()
+            self.runNext()
 
     def cancel(self):
         '''Cancel running Mercurial command'''
@@ -183,7 +183,7 @@ class Core(QObject):
                 pass
             self.commandCanceling.emit()
 
-    def set_stbar(self, stbar):
+    def setStbar(self, stbar):
         self.stbar = stbar
 
     def is_running(self):
@@ -256,7 +256,7 @@ class Core(QObject):
             self.output.emit(hglib.tounicode(data), 'ui.error')
 
         self.extproc = proc = QProcess(self)
-        proc.started.connect(self.command_started)
+        proc.started.connect(self.onCommandStarted)
         proc.finished.connect(finished)
         proc.readyReadStandardOutput.connect(stdout)
         proc.readyReadStandardError.connect(stderr)
@@ -264,14 +264,14 @@ class Core(QObject):
         start(self.queue.pop(0), self.display)
 
 
-    def run_next(self):
+    def runNext(self):
         if not self.queue:
             return False
 
         cmdline = self.queue.pop(0)
 
         self.thread = thread.CmdThread(cmdline, self.display, self.parent())
-        self.thread.started.connect(self.command_started)
+        self.thread.started.connect(self.onCommandStarted)
         self.thread.commandFinished.connect(self.threadFinished)
 
         self.thread.outputReceived.connect(self.output)
@@ -285,14 +285,14 @@ class Core(QObject):
         self.thread.start()
         return True
 
-    def clear_output(self):
+    def clearOutput(self):
         if self.internallog:
             self.output_text.clear()
 
     ### Signal Handlers ###
 
     @pyqtSlot()
-    def command_started(self):
+    def onCommandStarted(self):
         if self.stbar:
             self.stbar.showMessage(_('Running...'))
 
@@ -312,7 +312,7 @@ class Core(QObject):
             self.stbar.showMessage(status)
 
         self.display = None
-        if ret == 0 and self.run_next():
+        if ret == 0 and self.runNext():
             return # run next command
         else:
             self.queue = []
@@ -668,7 +668,7 @@ class Widget(QWidget):
         ## status and progress labels
         self.stbar = ThgStatusBar()
         self.stbar.setSizeGripEnabled(False)
-        self.core.set_stbar(self.stbar)
+        self.core.setStbar(self.stbar)
         vbox.addWidget(self.stbar)
 
         # widget setting
@@ -721,7 +721,7 @@ class Dialog(QDialog):
         ## status and progress labels
         self.stbar = ThgStatusBar()
         self.stbar.setSizeGripEnabled(False)
-        self.core.set_stbar(self.stbar)
+        self.core.setStbar(self.stbar)
         vbox.addWidget(self.stbar)
 
         # bottom buttons

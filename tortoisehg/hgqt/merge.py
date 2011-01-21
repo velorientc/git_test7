@@ -82,7 +82,7 @@ class BasePage(QWizardPage):
         if pane == MAIN_PANE:
             self.ready()
         elif pane == PERFORM_PANE:
-            self.cmd.core.clear_output()
+            self.cmd.core.clearOutput()
             self.perform()
         else:
             raise 'unknown pane: %s' % pane
