@@ -221,7 +221,7 @@ class EmailDialog(QDialog):
 
     def close(self):
         super(EmailDialog, self).accept()
-        
+
     def accept(self):
         # TODO: want to pass patchbombopts directly
         def cmdargs(opts):
