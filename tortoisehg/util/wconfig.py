@@ -233,7 +233,7 @@ def readfile(path):
 
 def writefile(config, path):
     """Write the given config obj to the specified file"""
-    f = util.atomictempfile(os.path.realpath(path))
+    f = util.atomictempfile(os.path.realpath(path), 'w')
     try:
         config.write(f)
         f.rename()
