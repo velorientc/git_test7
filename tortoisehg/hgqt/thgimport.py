@@ -294,7 +294,7 @@ class ImportDialog(QDialog):
         self.reject()
 
     def detail_toggled(self, checked):
-        self.cmd.show_output(checked)
+        self.cmd.setShowOutput(checked)
 
     def command_started(self):
         self.cmd.setShown(True)

@@ -125,7 +125,7 @@ class ResolveDialog(QDialog):
         self.layout().addWidget(out)
         self.cmd = cmdui.Widget(True, self)
         self.cmd.commandFinished.connect(self.refresh)
-        self.cmd.show_output(True)
+        self.cmd.setShowOutput(True)
         self.layout().addWidget(self.cmd)
 
         BB = QDialogButtonBox

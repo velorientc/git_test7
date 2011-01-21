@@ -52,7 +52,7 @@ class CompressDialog(QDialog):
 
         self.cmd = cmdui.Widget()
         self.cmd.commandFinished.connect(self.commandFinished)
-        self.cmd.show_output(True)
+        self.cmd.setShowOutput(True)
         self.showMessage.connect(self.cmd.stbar.showMessage)
         self.cmd.stbar.linkActivated.connect(self.linkActivated)
         self.layout().addWidget(self.cmd, 2)

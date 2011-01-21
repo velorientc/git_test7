@@ -98,7 +98,7 @@ class RebaseDialog(QDialog):
         if self.checkResolve() or not (s or d):
             for w in (srcb, destb, sep, self.keepchk, self.detachchk):
                 w.setHidden(True)
-            self.cmd.show_output(True)
+            self.cmd.setShowOutput(True)
         else:
             self.showMessage.emit(_('Checking...'))
             QTimer.singleShot(0, self.checkStatus)

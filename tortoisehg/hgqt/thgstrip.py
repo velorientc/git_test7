@@ -223,7 +223,7 @@ class StripDialog(QDialog):
         self.reject()
 
     def detail_toggled(self, checked):
-        self.cmd.show_output(checked)
+        self.cmd.setShowOutput(checked)
 
     def show_options(self, visible):
         self.nobackup_chk.setShown(visible)

@@ -305,7 +305,7 @@ class CloneDialog(QDialog):
         self.reject()
 
     def detail_toggled(self, checked):
-        self.cmd.show_output(checked)
+        self.cmd.setShowOutput(checked)
 
     def browse_src(self):
         FD = QFileDialog

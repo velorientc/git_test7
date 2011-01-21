@@ -338,7 +338,7 @@ class PostReviewDialog(QDialog):
         self.cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr],
                                  self, self.onCompletion)
         self.cmd.setWindowTitle(_('Posting Review'))
-        self.cmd.show_output(False)
+        self.cmd.setShowOutput(False)
 
     @pyqtSlot()
     def onCompletion(self):

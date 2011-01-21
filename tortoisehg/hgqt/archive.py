@@ -327,9 +327,9 @@ class ArchiveDialog(QDialog):
 
     def detail_clicked(self):
         if self.cmd.is_show_output():
-            self.cmd.show_output(False)
+            self.cmd.setShowOutput(False)
         else:
-            self.cmd.show_output(True)
+            self.cmd.setShowOutput(True)
 
     def cancel_clicked():
         self.cmd.cancel()

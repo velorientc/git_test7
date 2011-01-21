@@ -497,7 +497,7 @@ class SyncWidget(QWidget):
             if b: b.setEnabled(False)
         self.stopAction.setEnabled(True)
         if not self.embedded:
-            self.cmd.show_output(True)
+            self.cmd.setShowOutput(True)
             self.cmd.setVisible(True)
 
     def commandFinished(self, ret):

@@ -243,7 +243,7 @@ class EmailDialog(QDialog):
             cmd = cmdui.Dialog(['email'] + cmdargs(opts) + list(map(str, self._revs)),
                                parent=self)
             cmd.setWindowTitle(_('Sending Email'))
-            cmd.show_output(False)
+            cmd.setShowOutput(False)
             if cmd.exec_():
                 self._writehistory()
                 super(EmailDialog, self).accept()

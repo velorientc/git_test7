@@ -682,7 +682,7 @@ class Widget(QWidget):
     def cancel(self):
         self.core.cancel()
 
-    def show_output(self, visible):
+    def setShowOutput(self, visible):
         if self.internallog:
             self.core.output_text.setShown(visible)
 
@@ -698,7 +698,7 @@ class Widget(QWidget):
     def onCommandFinished(self, ret):
         if ret == -1:
             self.makeLogVisible.emit(True)
-            self.show_output(True)
+            self.setShowOutput(True)
         self.commandFinished.emit(ret)
 
 class Dialog(QDialog):
@@ -739,7 +739,7 @@ class Dialog(QDialog):
         self.detailBtn.setAutoDefault(False)
         self.detailBtn.setCheckable(True)
         self.detailBtn.setChecked(True)
-        self.detailBtn.toggled.connect(self.show_output)
+        self.detailBtn.toggled.connect(self.setShowOutput)
         vbox.addWidget(buttons)
 
         self.setLayout(vbox)
@@ -749,7 +749,7 @@ class Dialog(QDialog):
         # start command
         self.core.run(cmdline)
 
-    def show_output(self, visible):
+    def setShowOutput(self, visible):
         """show/hide command output"""
         self.core.output_text.setVisible(visible)
         self.detailBtn.setChecked(visible)
@@ -830,7 +830,7 @@ class Runner(QWidget):
     def cancel(self):
         self.core.cancel()
 
-    def show_output(self, visible=True):
+    def setShowOutput(self, visible=True):
         if not self.internallog:
             return
         if not hasattr(self, 'dlg'):
@@ -850,5 +850,5 @@ class Runner(QWidget):
     def onCommandFinished(self, ret):
         if ret != 0:
             self.makeLogVisible.emit(True)
-            self.show_output()
+            self.setShowOutput(True)
         self.commandFinished.emit(ret)

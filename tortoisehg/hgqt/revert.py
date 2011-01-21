@@ -37,7 +37,7 @@ class RevertDialog(QDialog):
         self.layout().addWidget(self.allchk)
 
         self.cmd = cmdui.Widget()
-        self.cmd.show_output(False)
+        self.cmd.setShowOutput(False)
         self.cmd.stbar.setVisible(False)
         self.cmd.commandFinished.connect(self.finished)
         self.layout().addWidget(self.cmd, 1)
@@ -62,7 +62,7 @@ class RevertDialog(QDialog):
         else:
             cmdline = ['revert', '--repository', self.repo.root, self.wfile]
         cmdline += ['--rev', self.rev]
-        self.cmd.show_output(True)
+        self.cmd.setShowOutput(True)
         self.cmd.stbar.setVisible(True)
         self.cmd.run(cmdline)
 

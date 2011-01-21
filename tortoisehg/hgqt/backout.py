@@ -171,7 +171,7 @@ class BackoutDialog(QDialog):
         self.cmd.cancel()
 
     def detail_toggled(self, checked):
-        self.cmd.show_output(checked)
+        self.cmd.setShowOutput(checked)
 
     def command_started(self):
         self.cmd.setShown(True)
