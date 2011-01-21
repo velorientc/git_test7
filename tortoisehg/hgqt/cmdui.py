@@ -769,12 +769,11 @@ class Dialog(QDialog):
                         QMessageBox.No)
             if ret == QMessageBox.Yes:
                 self.core.cancel()
-
             # don't close dialog
             return
 
         # close dialog
-        if self.core.thread.ret == 0:
+        if self.returnCode == 0:
             self.accept()  # means command successfully finished
         else:
             super(Dialog, self).reject()
@@ -785,6 +784,7 @@ class Dialog(QDialog):
 
     @pyqtSlot(int)
     def commandFinished(self, ret):
+        self.returnCode = ret
         self.cancelBtn.setHidden(True)
         self.closeBtn.setShown(True)
         self.closeBtn.setFocus()
