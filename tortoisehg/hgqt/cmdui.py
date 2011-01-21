@@ -174,26 +174,26 @@ class Core(QObject):
     def cancel(self):
         '''Cancel running Mercurial command'''
         if self.is_running():
-            if self.extproc:
-                try:
+            try:
+                if self.extproc:
                     self.extproc.close()
-                except AttributeError:
-                    pass
-            elif self.thread:
-                self.thread.abort()
+                elif self.thread:
+                    self.thread.abort()
+            except AttributeError:
+                pass
             self.commandCanceling.emit()
 
     def set_stbar(self, stbar):
         self.stbar = stbar
 
     def is_running(self):
-        if self.extproc:
-            try:
+        try:
+            if self.extproc:
                 return self.extproc.state() != QProcess.NotRunning
-            except AttributeError:
-                return False
-        elif self.thread:
-            return self.thread.isRunning()
+            elif self.thread:
+                return self.thread.isRunning()
+        except AttributeError:
+            pass
         return False
 
     def get_rawoutput(self):
