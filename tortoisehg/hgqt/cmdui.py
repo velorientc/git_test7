@@ -650,7 +650,7 @@ class Widget(QWidget):
         self.internallog = useInternal
         self.core = Core(useInternal, self)
         self.core.commandStarted.connect(self.commandStarted)
-        self.core.commandFinished.connect(self.command_finished)
+        self.core.commandFinished.connect(self.onCommandFinished)
         self.core.commandCanceling.connect(self.commandCanceling)
         self.core.output.connect(self.output)
         self.core.progress.connect(self.progress)
@@ -695,7 +695,7 @@ class Widget(QWidget):
     ### Signal Handler ###
 
     @pyqtSlot(int)
-    def command_finished(self, ret):
+    def onCommandFinished(self, ret):
         if ret == -1:
             self.makeLogVisible.emit(True)
             self.show_output(True)
@@ -813,7 +813,7 @@ class Runner(QWidget):
 
         self.core = Core(useInternal, self)
         self.core.commandStarted.connect(self.commandStarted)
-        self.core.commandFinished.connect(self.command_finished)
+        self.core.commandFinished.connect(self.onCommandFinished)
         self.core.commandCanceling.connect(self.commandCanceling)
 
         self.core.output.connect(self.output)
@@ -847,7 +847,7 @@ class Runner(QWidget):
     ### Signal Handler ###
 
     @pyqtSlot(int)
-    def command_finished(self, ret):
+    def onCommandFinished(self, ret):
         if ret != 0:
             self.makeLogVisible.emit(True)
             self.show_output()
