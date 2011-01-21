@@ -168,12 +168,12 @@ class Core(QObject):
             self.queue.extend(cmdlines)
         if self.useproc:
             self.runproc()
-        elif not self.is_running():
+        elif not self.running():
             self.runNext()
 
     def cancel(self):
         '''Cancel running Mercurial command'''
-        if self.is_running():
+        if self.running():
             try:
                 if self.extproc:
                     self.extproc.close()
@@ -186,7 +186,7 @@ class Core(QObject):
     def setStbar(self, stbar):
         self.stbar = stbar
 
-    def is_running(self):
+    def running(self):
         try:
             if self.extproc:
                 return self.extproc.state() != QProcess.NotRunning
@@ -762,7 +762,7 @@ class Dialog(QDialog):
     ### Private Method ###
 
     def reject(self):
-        if self.core.is_running():
+        if self.core.running():
             ret = QMessageBox.question(self, _('Confirm Exit'), _('Mercurial'
                         ' command is still running.\nAre you sure you want'
                         ' to terminate?'), QMessageBox.Yes | QMessageBox.No,

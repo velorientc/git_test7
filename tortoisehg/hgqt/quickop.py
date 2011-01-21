@@ -140,7 +140,7 @@ class QuickOpDialog(QDialog):
         self.cmd.run(cmdline)
 
     def reject(self):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             self.cmd.core.cancel()
         else:
             s = QSettings()

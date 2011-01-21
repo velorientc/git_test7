@@ -195,7 +195,7 @@ class CloneDialog(QDialog):
         return 'startrev' in longopts
 
     def clone(self):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             return
         # prepare user input
         srcQ = self.src_combo.currentText().trimmed()

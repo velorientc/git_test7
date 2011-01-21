@@ -398,7 +398,7 @@ class SyncWidget(QWidget):
         return user, host, port, folder, passwd, scheme
 
     def canExit(self):
-        return not self.cmd.core.is_running()
+        return not self.cmd.core.running()
 
     @pyqtSlot(QPoint, QString, QString, bool)
     def menuRequest(self, point, url, alias, editable):
@@ -457,7 +457,7 @@ class SyncWidget(QWidget):
         if event.matches(QKeySequence.Refresh):
             self.reload()
         elif event.key() == Qt.Key_Escape:
-            if self.cmd.core.is_running():
+            if self.cmd.core.running():
                 self.cmd.cancel()
             elif not self.embedded:
                 self.close()
@@ -465,7 +465,7 @@ class SyncWidget(QWidget):
             return super(SyncWidget, self).keyPressEvent(event)
 
     def stopclicked(self):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             self.cmd.cancel()
 
     def saveclicked(self):
@@ -510,7 +510,7 @@ class SyncWidget(QWidget):
             self.finishfunc(ret, output)
 
     def run(self, cmdline, details):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             return
         for name in list(details) + ['remotecmd']:
             val = self.opts.get(name)
@@ -543,32 +543,32 @@ class SyncWidget(QWidget):
     ##
 
     def incoming(self):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             self.showMessage.emit(_('sync command already running'))
         else:
             self.inclicked()
 
     def pull(self):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             self.showMessage.emit(_('sync command already running'))
         else:
             self.pullclicked()
 
     def outgoing(self):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             self.showMessage.emit(_('sync command already running'))
         else:
             self.outclicked()
 
     def push(self):
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             self.showMessage.emit(_('sync command already running'))
         else:
             self.pushclicked()
 
     def pullBundle(self, bundle, rev):
         'accept bundle changesets'
-        if self.cmd.core.is_running():
+        if self.cmd.core.running():
             self.output.emit(_('sync command already running'), 'control')
             return
         save = self.currentUrl(False)

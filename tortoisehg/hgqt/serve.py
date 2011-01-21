@@ -148,7 +148,7 @@ class ServeDialog(QDialog):
 
     def isstarted(self):
         """Is the web server running?"""
-        return self._cmd.core.is_running()
+        return self._cmd.core.running()
 
     @property
     def rooturl(self):
