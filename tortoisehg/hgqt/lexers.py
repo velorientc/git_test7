@@ -54,9 +54,9 @@ class _ScriptLexerSelector(_FilenameLexerSelector):
                 if len(line)<1000 and self.regex.match(line):
                     return True
         return False
-        
+
 class PythonLexerSelector(_ScriptLexerSelector):
-    extensions = ('.py', '.pyw')    
+    extensions = ('.py', '.pyw')
     _lexer = Qsci.QsciLexerPython
     regex = re.compile(r'^#[!].*python')
 
