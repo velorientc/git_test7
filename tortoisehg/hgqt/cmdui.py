@@ -726,26 +726,25 @@ class Dialog(QDialog):
 
         # bottom buttons
         buttons = QDialogButtonBox()
-        self.cancel_btn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancel_btn.clicked.connect(self.core.cancel)
+        self.cancelBtn = buttons.addButton(QDialogButtonBox.Cancel)
+        self.cancelBtn.clicked.connect(self.core.cancel)
         self.core.commandCanceling.connect(self.commandCanceling)
 
-        self.close_btn = buttons.addButton(QDialogButtonBox.Close)
-        self.close_btn.clicked.connect(self.reject)
-        self.detail_btn = buttons.addButton(_('Detail'),
+        self.closeBtn = buttons.addButton(QDialogButtonBox.Close)
+        self.closeBtn.setHidden(True)
+        self.closeBtn.clicked.connect(self.reject)
+
+        self.detailBtn = buttons.addButton(_('Detail'),
                                             QDialogButtonBox.ResetRole)
-        self.detail_btn.setAutoDefault(False)
-        self.detail_btn.setCheckable(True)
-        self.detail_btn.setChecked(True)
-        self.detail_btn.toggled.connect(self.show_output)
+        self.detailBtn.setAutoDefault(False)
+        self.detailBtn.setCheckable(True)
+        self.detailBtn.setChecked(True)
+        self.detailBtn.toggled.connect(self.show_output)
         vbox.addWidget(buttons)
 
         self.setLayout(vbox)
         self.setWindowTitle(_('TortoiseHg Command Dialog'))
         self.resize(540, 420)
-
-        # prepare to show
-        self.close_btn.setHidden(True)
 
         # start command
         self.core.run(cmdline)
@@ -753,7 +752,7 @@ class Dialog(QDialog):
     def show_output(self, visible):
         """show/hide command output"""
         self.core.output_text.setVisible(visible)
-        self.detail_btn.setChecked(visible)
+        self.detailBtn.setChecked(visible)
 
         # workaround to adjust only window height
         self.setMinimumWidth(self.width())
@@ -782,13 +781,13 @@ class Dialog(QDialog):
 
     @pyqtSlot()
     def commandCanceling(self):
-        self.cancel_btn.setDisabled(True)
+        self.cancelBtn.setDisabled(True)
 
     @pyqtSlot(int)
     def commandFinished(self, ret):
-        self.cancel_btn.setHidden(True)
-        self.close_btn.setShown(True)
-        self.close_btn.setFocus()
+        self.cancelBtn.setHidden(True)
+        self.closeBtn.setShown(True)
+        self.closeBtn.setFocus()
 
 class Runner(QWidget):
     """A component for running Mercurial command without UI
