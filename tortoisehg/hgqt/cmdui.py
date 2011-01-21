@@ -704,20 +704,12 @@ class Widget(QWidget):
 class Dialog(QDialog):
     """A dialog for running random Mercurial command"""
 
-    commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(int)
-    commandCanceling = pyqtSignal()
-
-    def __init__(self, cmdline, parent=None, finishfunc=None):
+    def __init__(self, cmdline, parent=None):
         super(Dialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
-        self.finishfunc = finishfunc
-
         self.core = Core(True, self)
-        self.core.commandStarted.connect(self.commandStarted)
-        self.core.commandFinished.connect(self.command_finished)
-        self.core.commandCanceling.connect(self.commandCanceling)
+        self.core.commandFinished.connect(self.commandFinished)
 
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
@@ -735,7 +727,9 @@ class Dialog(QDialog):
         # bottom buttons
         buttons = QDialogButtonBox()
         self.cancel_btn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancel_btn.clicked.connect(self.cancel_clicked)
+        self.cancel_btn.clicked.connect(self.core.cancel)
+        self.core.commandCanceling.connect(self.commandCanceling)
+
         self.close_btn = buttons.addButton(QDialogButtonBox.Close)
         self.close_btn.clicked.connect(self.reject)
         self.detail_btn = buttons.addButton(_('Detail'),
@@ -775,7 +769,7 @@ class Dialog(QDialog):
                         ' to terminate?'), QMessageBox.Yes | QMessageBox.No,
                         QMessageBox.No)
             if ret == QMessageBox.Yes:
-                self.cancel_clicked()
+                self.core.cancel()
 
             # don't close dialog
             return
@@ -786,23 +780,15 @@ class Dialog(QDialog):
         else:
             super(Dialog, self).reject()
 
-    ### Signal Handlers ###
-
     @pyqtSlot()
-    def cancel_clicked(self):
-        self.core.cancel()
+    def commandCanceling(self):
+        self.cancel_btn.setDisabled(True)
 
     @pyqtSlot(int)
-    def command_finished(self, ret):
+    def commandFinished(self, ret):
         self.cancel_btn.setHidden(True)
         self.close_btn.setShown(True)
         self.close_btn.setFocus()
-        if self.finishfunc:
-            self.finishfunc()
-
-    @pyqtSlot()
-    def command_canceling(self):
-        self.cancel_btn.setDisabled(True)
 
 class Runner(QWidget):
     """A component for running Mercurial command without UI
