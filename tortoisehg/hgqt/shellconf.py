@@ -9,7 +9,7 @@
 import sys
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import menuthg
+from tortoisehg.util import menuthg, hglib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -208,9 +208,9 @@ class ShellConfigWindow(QDialog):
             label = info['label']['str']
             self.menu_cmds[label] = cmd
             if cmd in promoted:
-                self.topmenulist.addItem(label)
+                self.topmenulist.addItem(hglib.tounicode(label))
             else:
-                self.submenulist.addItem(label)
+                self.submenulist.addItem(hglib.tounicode(label))
 
     def store_shell_configs(self):
         if not  self.dirty:
@@ -219,7 +219,7 @@ class ShellConfigWindow(QDialog):
         promoted = []
         list = self.topmenulist
         for row in range(list.count()):
-            label = unicode(list.item(row).text())
+            label = hglib.fromunicode(list.item(row).text())
             cmd = self.menu_cmds[label]
             promoted.append(cmd)
 
