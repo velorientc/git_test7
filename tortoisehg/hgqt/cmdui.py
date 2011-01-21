@@ -272,7 +272,7 @@ class Core(QObject):
 
         self.thread = thread.CmdThread(cmdline, self.display, self.parent())
         self.thread.started.connect(self.onCommandStarted)
-        self.thread.commandFinished.connect(self.threadFinished)
+        self.thread.commandFinished.connect(self.onThreadFinished)
 
         self.thread.outputReceived.connect(self.output)
         self.thread.progressReceived.connect(self.progress)
@@ -299,7 +299,7 @@ class Core(QObject):
         self.commandStarted.emit()
 
     @pyqtSlot(int)
-    def threadFinished(self, ret):
+    def onThreadFinished(self, ret):
         if self.stbar:
             if ret is None:
                 self.stbar.clear()
@@ -709,7 +709,7 @@ class Dialog(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         self.core = Core(True, self)
-        self.core.commandFinished.connect(self.commandFinished)
+        self.core.commandFinished.connect(self.onCommandFinished)
 
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
@@ -783,7 +783,7 @@ class Dialog(QDialog):
         self.cancelBtn.setDisabled(True)
 
     @pyqtSlot(int)
-    def commandFinished(self, ret):
+    def onCommandFinished(self, ret):
         self.returnCode = ret
         self.cancelBtn.setHidden(True)
         self.closeBtn.setShown(True)
