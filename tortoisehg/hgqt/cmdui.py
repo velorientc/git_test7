@@ -272,7 +272,7 @@ class Core(QObject):
 
         self.thread = thread.CmdThread(cmdline, self.display, self.parent())
         self.thread.started.connect(self.command_started)
-        self.thread.commandFinished.connect(self.command_finished)
+        self.thread.commandFinished.connect(self.threadFinished)
 
         self.thread.outputReceived.connect(self.output)
         self.thread.progressReceived.connect(self.progress)
@@ -299,7 +299,7 @@ class Core(QObject):
         self.commandStarted.emit()
 
     @pyqtSlot(int)
-    def command_finished(self, ret):
+    def threadFinished(self, ret):
         if self.stbar:
             if ret is None:
                 self.stbar.clear()
@@ -319,14 +319,6 @@ class Core(QObject):
             self.rawoutput = [hglib.fromunicode(self.thread.rawoutput.join(''))]
 
         self.commandFinished.emit(ret)
-
-    @pyqtSlot()
-    def command_canceling(self):
-        if self.stbar:
-            self.stbar.showMessage(_('Canceling...'))
-            self.stbar.clear()
-
-        self.commandCanceling.emit()
 
 
 class LogWidget(QsciScintilla):
