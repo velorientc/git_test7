@@ -25,6 +25,9 @@ qsci = Qsci.QsciScintilla
 class RejectsDialog(QDialog):
     def __init__(self, path, parent):
         super(RejectsDialog, self).__init__(parent)
+        self.setWindowTitle(_('Merge rejected patch chunks into %s') %
+                            hglib.tounicode(path))
+        self.path = path
 
         self.setLayout(QVBoxLayout())
         editor = qscilib.Scintilla()
@@ -80,32 +83,36 @@ class RejectsDialog(QDialog):
         bb.rejected.connect(self.reject)
         self.layout().addWidget(bb)
         self.saveButton = bb.button(BB.Save)
-        self.saveButton.setEnabled(False)
 
         s = QSettings()
         self.restoreGeometry(s.value('rejects/geometry').toByteArray())
 
-        contents = hglib.tounicode(open(path, 'rb').read())
-        self.setWindowTitle(_('Merge rejected patch chunks into %s') %
-                            hglib.tounicode(path))
-        editor.setText(contents)
+        f = QFile(path)
+        f.open(QIODevice.ReadOnly)
+        editor.read(f)
         editor.setModified(False)
-        lexer = lexers.get_lexer(path, contents, self)
+        lexer = lexers.get_lexer(path, f.readData(1024), self)
         editor.setLexer(lexer)
-        if '\r\n' in contents:
-            editor.setEolMode(qsci.EolWindows)
-        else:
-            editor.setEolMode(qsci.EolUnix)
         self.editor = editor
 
         buf = cStringIO.StringIO()
-        buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % path)
-        buf.write(open(path + '.rej', 'r').read())
-        buf.seek(0)
-        self.chunks = record.parsepatch(buf)[1:]
+        try:
+            buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % path)
+            buf.write(open(path + '.rej', 'r').read())
+            buf.seek(0)
+        except IOError, e:
+            pass
+        try:
+            self.chunks = record.parsepatch(buf)[1:]
+        except patch.PatchError, e:
+            self.chunks = []
+
         for chunk in self.chunks:
             chunk.resolved = False
         self.updateChunkList()
+        self.saveButton.setDisabled(len(self.chunks))
+        self.resolved.setDisabled(True)
+        self.unresolved.setDisabled(True)
         QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
 
     def updateChunkList(self):
@@ -154,14 +161,20 @@ class RejectsDialog(QDialog):
         self.resolved.setEnabled(not chunk.resolved)
         self.unresolved.setEnabled(chunk.resolved)
 
-    def accept(self):
-        f = util.atomictempfile(filename, 'wb', createmode=None)
-        f.write(hglib.fromunicode(self.editor.text()))
-        f.rename()
-
-    def closeEvent(self, event):
+    def saveSettings(self):
         s = QSettings()
         s.setValue('rejects/geometry', self.saveGeometry())
+
+    def accept(self):
+        f = QFile(self.path)
+        f.open(QIODevice.WriteOnly)
+        self.editor.write(f)
+        self.saveSettings()
+        super(RejectsDialog, self).accept()
+
+    def reject(self):
+        self.saveSettings()
+        super(RejectsDialog, self).reject()
 
 class RejectBrowser(qscilib.Scintilla):
     'Display a rejected diff hunk in an easily copy/pasted format'
@@ -216,6 +229,4 @@ def run(ui, *pats, **opts):
     from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     dlg = RejectsDialog(pats[0], None)
-    desktopgeom = qApp.desktop().availableGeometry()
-    dlg.resize(desktopgeom.size() * 0.8)
     return dlg
