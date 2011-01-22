@@ -329,8 +329,11 @@ class EmailDialog(QDialog):
     @pyqtSlot()
     def on_settings_button_clicked(self):
         from tortoisehg.hgqt import settings
-        settings.SettingsDialog(parent=self, focus='email.from').exec_()
-        # TODO: update form values and ui appropriately
+        if settings.SettingsDialog(parent=self, focus='email.from').exec_():
+            # not use repo.configChanged because it can clobber user input
+            # accidentally.
+            self._repo.invalidateui()  # force reloading config immediately
+            self._filldefaults()
 
 class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewer?
     _COLUMNS = [('rev', lambda ctx: '%d:%s' % (ctx.rev(), ctx)),
