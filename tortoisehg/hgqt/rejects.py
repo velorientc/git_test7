@@ -23,7 +23,6 @@ from PyQt4 import Qsci
 qsci = Qsci.QsciScintilla
 
 # TODO
-# improve scrolling of qsci, often cursor is not visible
 # pass ui to patchctx.longsummary() so patchctx does not need a repository
 
 class RejectsDialog(QDialog):
@@ -110,7 +109,7 @@ class RejectsDialog(QDialog):
         for chunk in self.chunks:
             chunk.resolved = False
         self.updateChunkList()
-        self.chunklist.setCurrentRow(0)
+        QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
 
     def updateChunkList(self):
         self.updating = True
@@ -152,6 +151,7 @@ class RejectsDialog(QDialog):
         chunk.write(buf)
         self.rejectbrowser.showChunk(buf.getvalue().splitlines()[1:])
         self.editor.setCursorPosition(chunk.fromline-1, 0)
+        self.editor.ensureLineVisible(chunk.fromline-1)
         self.editor.markerDeleteAll(-1)
         self.editor.markerAdd(chunk.fromline-1, self.baseLineColor)
         self.resolved.setEnabled(not chunk.resolved)
