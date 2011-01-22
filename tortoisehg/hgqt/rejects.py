@@ -23,6 +23,7 @@ from PyQt4 import Qsci
 qsci = Qsci.QsciScintilla
 
 # TODO
+# improve scrolling of qsci, often cursor is not visible
 # pass ui to patchctx.longsummary() so patchctx does not need a repository
 
 class RejectsDialog(QDialog):
@@ -51,10 +52,28 @@ class RejectsDialog(QDialog):
         self.layout().addWidget(searchbar)
 
         hbox = QHBoxLayout()
-        self.layout().addLayout(hbox)
+        hbox.setContentsMargins(2, 2, 2, 2)
+        self.layout().addLayout(hbox, 1)
         self.chunklist = QListWidget(self)
+        self.updating = True
         self.chunklist.currentRowChanged.connect(self.showChunk)
         hbox.addWidget(self.chunklist, 1)
+
+        bvbox = QVBoxLayout()
+        bvbox.setContentsMargins(2, 2, 2, 2)
+        self.resolved = tb = QToolButton()
+        tb.setIcon(qtlib.geticon('success'))
+        tb.setToolTip(_('Mark this chunk as resolved, goto next unresolved'))
+        tb.pressed.connect(self.resolveCurrentChunk)
+        self.unresolved = tb = QToolButton()
+        tb.setIcon(qtlib.geticon('warning'))
+        tb.setToolTip(_('Mark this chunk as unresolved'))
+        tb.pressed.connect(self.unresolveCurrentChunk)
+        bvbox.addStretch(1)
+        bvbox.addWidget(self.resolved, 0)
+        bvbox.addWidget(self.unresolved, 0)
+        bvbox.addStretch(1)
+        hbox.addLayout(bvbox, 0)
 
         self.rejectbrowser = RejectBrowser(self)
         hbox.addWidget(self.rejectbrowser, 5)
@@ -64,6 +83,8 @@ class RejectsDialog(QDialog):
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         self.layout().addWidget(bb)
+        self.saveButton = bb.button(BB.Save)
+        self.saveButton.setEnabled(False)
 
         s = QSettings()
         self.restoreGeometry(s.value('rejects/geometry').toByteArray())
@@ -87,11 +108,44 @@ class RejectsDialog(QDialog):
         buf.seek(0)
         self.chunks = record.parsepatch(buf)[1:]
         for chunk in self.chunks:
-            self.chunklist.addItem('@@ %d' % chunk.fromline)
+            chunk.resolved = False
+        self.updateChunkList()
+        self.chunklist.setCurrentRow(0)
+
+    def updateChunkList(self):
+        self.updating = True
+        self.chunklist.clear()
+        for chunk in self.chunks:
+            self.chunklist.addItem('@@ %d %s' % (chunk.fromline,
+                            chunk.resolved and '(resolved)' or '(unresolved)'))
+        self.updating = False
+
+    @pyqtSlot()
+    def resolveCurrentChunk(self):
+        row = self.chunklist.currentRow()
+        chunk = self.chunks[row]
+        chunk.resolved = True
+        self.updateChunkList()
+        for i, chunk in enumerate(self.chunks):
+            if not chunk.resolved:
+                self.chunklist.setCurrentRow(i)
+                return
+        else:
+            self.chunklist.setCurrentRow(row)
+            self.saveButton.setEnabled(True)
+
+    @pyqtSlot()
+    def unresolveCurrentChunk(self):
+        row = self.chunklist.currentRow()
+        chunk = self.chunks[row]
+        chunk.resolved = False
+        self.updateChunkList()
+        self.chunklist.setCurrentRow(row)
+        self.saveButton.setEnabled(False)
 
     @pyqtSlot(int)
     def showChunk(self, row):
-        if row == -1:
+        if row == -1 or self.updating:
             return
         buf = cStringIO.StringIO()
         chunk = self.chunks[row]
@@ -100,6 +154,8 @@ class RejectsDialog(QDialog):
         self.editor.setCursorPosition(chunk.fromline-1, 0)
         self.editor.markerDeleteAll(-1)
         self.editor.markerAdd(chunk.fromline-1, self.baseLineColor)
+        self.resolved.setEnabled(not chunk.resolved)
+        self.unresolved.setEnabled(chunk.resolved)
 
     def accept(self):
         f = util.atomictempfile(filename, 'wb', createmode=None)
