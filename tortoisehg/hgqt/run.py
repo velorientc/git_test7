@@ -183,6 +183,9 @@ def _parse(ui, args):
 
     if args:
         alias, args = args[0], args[1:]
+    elif options['help']:
+        help_(ui, None)
+        sys.exit()
     else:
         alias, args = 'workbench', []
     aliases, i = cmdutil.findcmd(alias, table, ui.config("ui", "strict"))
