@@ -60,7 +60,7 @@ class RepoFilterBar(QToolBar):
         self.clear.clicked.connect(self.clearSet)
 
         self.filtercb = f = QCheckBox(_('filter'))
-        f.setChecked(s.value('revset-filter').toBool())
+        f.setChecked(s.value('revset-filter', True).toBool())
         f.toggled.connect(self.filterToggled)
         self.addWidget(f)
 
