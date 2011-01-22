@@ -27,6 +27,7 @@ if "%1" == "help" (
 	echo.  html      to make standalone HTML files
 	echo.  htmlhelp  to make HTML files and a HTML help project
 	echo.  chm       to make CHM file
+	echo.  qthelp    to make HTML files and a qthelp project
 	echo.  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter
 	echo.  pdf       to make PDF file, you can set PAPER=a4 or PAPER=letter
 	echo.
@@ -63,6 +64,17 @@ if "%1" == "chm" (
 	%hhc_compiler% %OUTPUTDIR%/chm/TortoiseHg.hhp
 	echo.
 	echo.Build finished. The CHM file is in %OUTPUTDIR%/chm.
+	goto end
+)
+
+if "%1" == "qthelp" (
+	%SPHINXBUILD% -b qthelp %ALLSPHINXOPTS% %OUTPUTDIR%/qthelp
+	echo.
+	echo.Build finished; now you can run "qcollectiongenerator" with the ^
+.qhcp project file in %OUTPUTDIR%/qthelp, like this:
+	echo.^> qcollectiongenerator %OUTPUTDIR%\qthelp\foo.qhcp
+	echo.To view the help file:
+	echo.^> assistant -collectionFile %OUTPUTDIR%\qthelp\foo.ghc
 	goto end
 )
 
