@@ -440,6 +440,8 @@ def fileEditor(filename, **opts):
 
     s = QSettings()
     geomname = 'editor-geom'
+    desktopgeom = qApp.desktop().availableGeometry()
+    dialog.resize(desktopgeom.size() * 0.5)
     dialog.restoreGeometry(s.value(geomname).toByteArray())
 
     ret = QDialog.Rejected
