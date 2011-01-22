@@ -42,7 +42,7 @@ except ImportError:
     openflags = 0
 
 nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
-about help version thgstatus serve log'''
+about help version thgstatus serve rejects log'''
 
 def dispatch(args):
     """run the command specified in args"""
