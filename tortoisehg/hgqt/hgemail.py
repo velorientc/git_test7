@@ -19,9 +19,8 @@ from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
-    def __init__(self, ui, repo, revs, parent=None):
+    def __init__(self, repo, revs, parent=None):
         super(EmailDialog, self).__init__(parent)
-        self._ui = ui
         self._repo = repo
 
         self._qui = Ui_EmailDialog()
@@ -95,6 +94,10 @@ class EmailDialog(QDialog):
                                             parent=self)
         self._changesets.dataChanged.connect(self._updateforms)
         self._qui.changesets_view.setModel(self._changesets)
+
+    @property
+    def _ui(self):
+        return self._repo.ui
 
     @property
     def _revs(self):
@@ -416,7 +419,7 @@ def run(ui, *revs, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
 
     try:
-        return EmailDialog(repo.ui, repo, revs)
+        return EmailDialog(repo, revs)
     except error.RepoLookupError, e:
         qtlib.ErrorMsgBox(_('Failed to open Email dialog'),
                           hglib.tounicode(e.message))
