@@ -22,9 +22,6 @@ from PyQt4 import Qsci
 
 qsci = Qsci.QsciScintilla
 
-# TODO
-# pass ui to patchctx.longsummary() so patchctx does not need a repository
-
 class RejectsDialog(QDialog):
     def __init__(self, path, parent):
         super(RejectsDialog, self).__init__(parent)
