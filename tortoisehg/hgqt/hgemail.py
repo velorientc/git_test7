@@ -163,6 +163,7 @@ class EmailDialog(QDialog):
         opts['from'] = headertext(self._qui.from_edit.currentText())
         opts['in_reply_to'] = headertext(self._qui.inreplyto_edit.text())
         opts['flag'] = [headertext(self._qui.flag_edit.currentText())]
+        opts['rev'] = map(str, self._revs)
 
         def diffformat():
             n = self.getdiffformat()
@@ -243,8 +244,7 @@ class EmailDialog(QDialog):
 
         opts = self._patchbombopts()
         try:
-            cmd = cmdui.Dialog(['email'] + cmdargs(opts) + list(map(str, self._revs)),
-                               parent=self)
+            cmd = cmdui.Dialog(['email'] + cmdargs(opts), parent=self)
             cmd.setWindowTitle(_('Sending Email'))
             cmd.setShowOutput(False)
             if cmd.exec_():
@@ -315,8 +315,7 @@ class EmailDialog(QDialog):
             if 'PAGER' in os.environ:
                 del os.environ['PAGER']
 
-            loadpatchbomb().patchbomb(ui, self._repo, *map(str, self._revs),
-                                      **opts)
+            loadpatchbomb().patchbomb(ui, self._repo, **opts)
             return stripheadmsg(hglib.tounicode(buf.getvalue()))
         finally:
             if 'desc' in opts:
