@@ -72,6 +72,10 @@ class PurgeDialog(QDialog):
 
         self.bb.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Checking'), '...'))
+        s = QSettings()
+        desktopgeom = qApp.desktop().availableGeometry()
+        self.resize(desktopgeom.size() * 0.25)
+        self.restoreGeometry(s.value('purge/geom').toByteArray())
         QTimer.singleShot(0, self.checkStatus)
 
     def checkStatus(self):
@@ -123,6 +127,11 @@ class PurgeDialog(QDialog):
         self.th.finished.connect(completed)
         self.th.start()
 
+    def reject(self):
+        s = QSettings()
+        s.setValue('purge/geom', self.saveGeometry())
+        super(PurgeDialog, self).reject()
+
     def accept(self):
         unknown = self.ucb.isChecked()
         ignored = self.icb.isChecked()
@@ -143,7 +152,7 @@ class PurgeDialog(QDialog):
                 qtlib.InfoMsgBox(_('Deletion failures'),
                     _('Unable to delete %d files or folders') %
                                  len(self.th.failures), parent=self)
-            QDialog.accept(self)
+            self.reject()
 
         self.th = PurgeThread(self.repo, ignored, unknown, trash, delf, keep, self)
         self.th.progress.connect(self.progress)
