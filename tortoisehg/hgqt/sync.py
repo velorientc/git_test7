@@ -226,7 +226,7 @@ class SyncWidget(QWidget):
     def refreshTargets(self, rev):
         if type(rev) is not int:
             return
-                
+
         if rev >= len(self.repo):
             return
 
