@@ -410,15 +410,17 @@ def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
     dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-    vbox = QVBoxLayout()
-    dialog.setLayout(vbox)
+    dialog.setWindowTitle(filename)
+    dialog.setLayout(QVBoxLayout())
     editor = Scintilla()
     editor.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+    editor.installEventFilter(KeyPressInterceptor(dialog))
     editor.setMarginLineNumbers(1, True)
     editor.setMarginWidth(1, '000')
+    editor.setLexer(QsciLexerProperties())
     if opts.get('foldable'):
         editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
-    vbox.addWidget(editor)
+    dialog.layout().addWidget(editor)
 
     searchbar = SearchToolBar(dialog, hidable=True)
     searchbar.searchRequested.connect(editor.find)
@@ -428,33 +430,29 @@ def fileEditor(filename, **opts):
         searchbar.show()
         searchbar.setFocus(Qt.OtherFocusReason)
     QShortcut(QKeySequence.Find, dialog, showsearchbar)
-    vbox.addWidget(searchbar)
+    dialog.layout().addWidget(searchbar)
 
     BB = QDialogButtonBox
     bb = QDialogButtonBox(BB.Save|BB.Cancel)
     bb.accepted.connect(dialog.accept)
     bb.rejected.connect(dialog.reject)
-    vbox.addWidget(bb)
-    lexer = QsciLexerProperties()
-    editor.setLexer(lexer)
+    dialog.layout().addWidget(bb)
+
     s = QSettings()
+    geomname = 'editor-geom'
+    dialog.restoreGeometry(s.value(geomname).toByteArray())
+
     ret = QDialog.Rejected
     try:
-        contents = hglib.tounicode(open(filename, 'rb').read())
-        dialog.setWindowTitle(filename)
-        geomname = 'editor-geom'
-        editor.setText(contents)
+        f = QFile(filename)
+        f.open(QIODevice.ReadOnly)
+        editor.read(f)
         editor.setModified(False)
-        if '\r\n' in contents:
-            editor.setEolMode(QsciScintilla.EolWindows)
-        else:
-            editor.setEolMode(QsciScintilla.EolUnix)
-        dialog.restoreGeometry(s.value(geomname).toByteArray())
         ret = dialog.exec_()
         if ret == QDialog.Accepted:
-            f = util.atomictempfile(filename, 'wb', createmode=None)
-            f.write(hglib.fromunicode(editor.text()))
-            f.rename()
+            f = QFile(filename)
+            f.open(QIODevice.WriteOnly)
+            editor.write(f)
         s.setValue(geomname, dialog.saveGeometry())
     except EnvironmentError, e:
         qtlib.WarningMsgBox(_('Unable to read/write config file'),
