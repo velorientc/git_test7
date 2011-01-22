@@ -87,7 +87,7 @@ class RejectsDialog(QDialog):
         buf.seek(0)
         self.chunks = record.parsepatch(buf)[1:]
         for chunk in self.chunks:
-            self.chunklist.addItem(str(chunk.fromline))
+            self.chunklist.addItem('@@ %d' % chunk.fromline)
 
     @pyqtSlot(int)
     def showChunk(self, row):
@@ -97,9 +97,9 @@ class RejectsDialog(QDialog):
         chunk = self.chunks[row]
         chunk.write(buf)
         self.rejectbrowser.showChunk(buf.getvalue().splitlines()[1:])
-        self.editor.setCursorPosition(chunk.fromline, 0)
+        self.editor.setCursorPosition(chunk.fromline-1, 0)
         self.editor.markerDeleteAll(-1)
-        self.editor.markerAdd(chunk.fromline, self.baseLineColor)
+        self.editor.markerAdd(chunk.fromline-1, self.baseLineColor)
 
     def accept(self):
         f = util.atomictempfile(filename, 'wb', createmode=None)
