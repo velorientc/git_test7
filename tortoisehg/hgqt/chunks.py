@@ -144,7 +144,6 @@ class ChunksWidget(QWidget):
             dchunks = [c for c in chunks[1:] if c.selected]
             return self.currentFile, [chunks[0]] + dchunks
         else:
-            # TODO: Generate git diff for A, R files
             return self.currentFile, []
 
     def deleteSelectedChunks(self):
