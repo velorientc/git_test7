@@ -119,14 +119,11 @@ class ChunksWidget(QWidget):
                                         unicode(line) + u'<br><br>' +
                                         _('Edit patched file and rejects?'),
                                        parent=self):
-                    wctxactions.edit(self, repo.ui, repo, [wfile, wfile+'.rej'])
-                else:
-                    return False
-                if qtlib.QuestionMsgBox(_('Were the rejected chunks resolved?'),
-                                    _('Remove these chunks from their source?'),
-                                    parent=self):
-                    ok = True
-                else:
+                    #wctxactions.edit(self, repo.ui, repo, [wfile, wfile+'.rej'])
+                    from tortoisehg.hgqt import rejects
+                    dlg = rejects.RejectsDialog(repo.wjoin(wfile), self)
+                    if dlg.exec_() == QDialog.Accepted:
+                        ok = True
                     break
         if updatestate and ok:
             # Apply operations specified in git diff headers
