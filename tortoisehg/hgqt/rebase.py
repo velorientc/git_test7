@@ -245,8 +245,10 @@ def run(ui, *pats, **opts):
     from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     if os.path.exists(repo.join('rebasestate')):
-        print _('resuming rebase already in progress')
+        qtlib.InfoMsgBox(_('Rebase already in progress'),
+                          _('Resuming rebase already in progress'))
     elif not opts['source'] or not opts['dest']:
-        print _('abort: source and dest must be supplied')
+        qtlib.ErrorMsgBox(_('Abort'),
+                          _('You must provide source and dest arguments'))
         import sys; sys.exit()
     return RebaseDialog(repo, None, **opts)
