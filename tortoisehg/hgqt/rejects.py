@@ -224,9 +224,12 @@ class RejectBrowser(qscilib.Scintilla):
             self.markerAdd(i, self.removedColor)
 
 def run(ui, *pats, **opts):
-    'for testing purposes only'
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    dlg = RejectsDialog(pats[0], None)
+    if len(pats) != 1:
+        qtlib.ErrorMsgBox(_('Filename required'),
+                          _('You must provide the path to a file'))
+        import sys; sys.exit()
+    path = pats[0]
+    if path.endswith('.rej'):
+        path = path[:-4]
+    dlg = RejectsDialog(path, None)
     return dlg

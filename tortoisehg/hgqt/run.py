@@ -557,8 +557,13 @@ def status(ui, *pats, **opts):
     return qtrun(run, ui, *pats, **opts)
 
 def shelve(ui, *pats, **opts):
-    """browse working copy status"""
+    """Move changes between working directory and patches"""
     from tortoisehg.hgqt.shelve import run
+    return qtrun(run, ui, *pats, **opts)
+
+def rejects(ui, *pats, **opts):
+    """Manually resolve rejected patch chunks"""
+    from tortoisehg.hgqt.rejects import run
     return qtrun(run, ui, *pats, **opts)
 
 def tag(ui, *pats, **opts):
@@ -1007,7 +1012,8 @@ table = {
           ('', 'remove', None, _('remove a tag')),
           ('m', 'message', '', _('use <text> as commit message')),],
          _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
-    "shelve": (shelve, [], _('thg shelve')),
+    "shelve|unshelve": (shelve, [], _('thg shelve')),
+    "rejects": (rejects, [], _('thg rejects [FILE]')),
     "test": (test, [], _('thg test')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^purge": (purge, [], _('thg purge')),
