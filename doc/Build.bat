@@ -4,6 +4,9 @@ setlocal
 if not exist %hhc_compiler%. (
 	set hhc_compiler=hhc.exe
 )
+if not exist %qcollectiongenerator%. (
+	set qcollectiongenerator=qcollectiongenerator.exe
+)
 set PDFLATEX=PdfLatex
 set SPHINXBUILD=sphinx-build
 set OUTPUTDIRSUFFIX=
@@ -28,6 +31,7 @@ if "%1" == "help" (
 	echo.  htmlhelp  to make HTML files and a HTML help project
 	echo.  chm       to make CHM file
 	echo.  qthelp    to make HTML files and a qthelp project
+	echo.  qhc       to make QHC file
 	echo.  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter
 	echo.  pdf       to make PDF file, you can set PAPER=a4 or PAPER=letter
 	echo.
@@ -75,6 +79,14 @@ if "%1" == "qthelp" (
 	echo.^> qcollectiongenerator %OUTPUTDIR%\qthelp\foo.qhcp
 	echo.To view the help file:
 	echo.^> assistant -collectionFile %OUTPUTDIR%\qthelp\foo.ghc
+	goto end
+)
+
+if "%1" == "qhc" (
+	%SPHINXBUILD% -b qthelp %ALLSPHINXOPTS% %OUTPUTDIR%/qthelp
+	%qcollectiongenerator% %OUTPUTDIR%/qthelp/TortoiseHg.qhcp
+	echo.
+	echo.Build finished. The QHC file is in %OUTPUTDIR%/qthelp.
 	goto end
 )
 
