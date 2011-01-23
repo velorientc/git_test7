@@ -154,6 +154,9 @@ class MQWidget(QWidget):
         self.optionsBtn.pressed.connect(self.launchOptionsDialog)
         self.revisionOrCommitBtn.pressed.connect(self.qinitOrCommit)
         self.msgHistoryCombo.activated.connect(self.onMessageSelected)
+        self.queueListWidget.currentRowChanged.connect(self.onPatchSelected)
+        self.queueListWidget.itemActivated.connect(self.onGotoPatch)
+        self.queueListWidget.itemChanged.connect(self.onRenamePatch)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
@@ -193,6 +196,32 @@ class MQWidget(QWidget):
         if ret is not 0:
             pass # TODO: look for reject notifications
         self.reload()
+
+    @pyqtSlot(QListWidgetItem)
+    def onGotoPatch(self, item):
+        'Patch has been activated (return), issue qgoto'
+        print 'qgoto', item._thgpatch
+
+    @pyqtSlot(QListWidgetItem)
+    def onRenamePatch(self, item):
+        'Patch has been renamed, issue qrename'
+        print 'qrename', item._thgpatch, item.text()
+
+    @pyqtSlot(int)
+    def onPatchSelected(self, row):
+        'Patch has been selected, update buttons'
+        if self.refreshing:
+            return
+        if row >= 0:
+            patch = self.queueListWidget.item(row)._thgpatch
+            applied = set([p.name for p in self.repo.mq.applied])
+            self.qdeleteBtn.setEnabled(True)
+            self.qpushMoveBtn.setEnabled(patch not in applied)
+            self.setGuardsBtn.setEnabled(True)
+        else:
+            self.qdeleteBtn.setEnabled(False)
+            self.qpushMoveBtn.setEnabled(False)
+            self.setGuardsBtn.setEnabled(False)
 
     @pyqtSlot(int)
     def onMessageSelected(self, row):
@@ -271,20 +300,31 @@ class MQWidget(QWidget):
 
         # TODO: maintain current selection
         applied = set([p.name for p in repo.mq.applied])
+        self.allguards = set()
         items = []
         for idx, patch in enumerate(repo.mq.series):
             item = QListWidgetItem(hglib.tounicode(patch))
-            if patch in applied:
+            if patch in applied: # applied
                 f = item.font()
                 f.setWeight(QFont.Bold)
                 item.setFont(f)
+            elif not repo.mq.pushable(idx)[0]: # guarded
+                f = item.font()
+                f.setWeight(QFont.Italics)
+                item.setFont(f)
             patchguards = repo.mq.series_guards[idx]
             if patchguards:
-                uguards = hglib.tounicode(patchguards)
+                for guard in patchguards:
+                    self.allguards.add(guard[1:])
+                uguards = hglib.tounicode(', '.join(patchguards))
             else:
                 uguards = _('no guards')
             uname = hglib.tounicode(patch)
+            item._thgpatch = patch
             item.setToolTip(u'%s: %s' % (uname, uguards))
+            item.setFlags(Qt.ItemIsSelectable |
+                          Qt.ItemIsEditable |
+                          Qt.ItemIsEnabled)
             items.append(item)
         for item in reversed(items):
             self.queueListWidget.addItem(item)
@@ -301,17 +341,21 @@ class MQWidget(QWidget):
             self.revisionOrCommitBtn.setText(_('Commit Queue'))
         else:
             self.revisionOrCommitBtn.setText(_('Revision Queue'))
+        self.refreshSelectedGuards()
+
+        self.qpushAllBtn.setEnabled(bool(repo.thgmqunappliedpatches))
+        self.qpushBtn.setEnabled(bool(repo.thgmqunappliedpatches))
+        self.qpushMoveBtn.setEnabled(False)
+        self.qdeleteBtn.setEnabled(False)
+        self.setGuardsBtn.setEnabled(False)
+        self.qpopBtn.setEnabled(bool(applied))
+        self.qpopAllBtn.setEnabled(bool(applied))
 
         # refresh self.messageEditor with qtip description, if not new
         # set self.patchNameLE to qtip patch name, if not new
         # refresh self.qnewOrRefreshBtn
         # refresh self.fileListWidget
 
-        self.refreshSelectedGuards()
-        self.refreshTbarStates()
-
-    def refreshTbarStates(self):
-        pass
 
     def refreshSelectedGuards(self):
         count, total = 0, 0
