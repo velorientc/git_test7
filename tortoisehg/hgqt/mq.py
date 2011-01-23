@@ -104,7 +104,7 @@ class MQWidget(QWidget):
         self.guardSelBtn = QPushButton()
         layout.addWidget(self.guardSelBtn, 0)
 
-        self.revisionOrCommitBtn = QPushButton(_('Revision Queue'))
+        self.revisionOrCommitBtn = QPushButton()
         layout.addWidget(self.revisionOrCommitBtn, 0)
 
         # Message Frame
@@ -148,9 +148,11 @@ class MQWidget(QWidget):
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
         self.cmd.progress.connect(self.progress)
+        self.cmd.commandFinished.connect(self.onCommandFinished)
 
         self.shelveBtn.pressed.connect(self.launchShelveTool)
         self.optionsBtn.pressed.connect(self.launchOptionsDialog)
+        self.revisionOrCommitBtn.pressed.connect(self.qinitOrCommit)
         self.msgHistoryCombo.activated.connect(self.onMessageSelected)
 
         self.repo.configChanged.connect(self.onConfigChanged)
@@ -186,6 +188,13 @@ class MQWidget(QWidget):
         self.reload()
 
     @pyqtSlot(int)
+    def onCommandFinished(self, ret):
+        self.repo.decrementBusyCount()
+        if ret is not 0:
+            pass # TODO: look for reject notifications
+        self.reload()
+
+    @pyqtSlot(int)
     def onMessageSelected(self, row):
         if self.messageEditor.text() and self.messageEditor.isModified():
             d = QMessageBox.question(self, _('Confirm Discard Message'),
@@ -204,6 +213,17 @@ class MQWidget(QWidget):
             hs.setSliderPosition(0)
         self.messageEditor.setModified(False)
         self.messageEditor.setFocus()
+
+    @pyqtSlot()
+    def qinitOrCommit(self):
+        if os.path.isdir(self.repo.mq.join('.hg')):
+            dlg = commit.CommitDialog([], dict(root=self.repo.mq.path), self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.reload()
+        else:
+            self.repo.incrementBusyCount()
+            self.cmd.run(['qinit', '-c', '-R', self.repo.root])
 
     @pyqtSlot()
     def launchShelveTool(self):
@@ -277,14 +297,21 @@ class MQWidget(QWidget):
                 self.messages.append((patch, msg))
         self.msgHistoryCombo.reset(self.messages)
 
-        # update enabled states of qtbarhbox buttons
-        # refresh self.revisionOrCommitBtn
+        if os.path.isdir(self.repo.mq.join('.hg')):
+            self.revisionOrCommitBtn.setText(_('Commit Queue'))
+        else:
+            self.revisionOrCommitBtn.setText(_('Revision Queue'))
 
         # refresh self.messageEditor with qtip description, if not new
         # set self.patchNameLE to qtip patch name, if not new
         # refresh self.qnewOrRefreshBtn
         # refresh self.fileListWidget
+
         self.refreshSelectedGuards()
+        self.refreshTbarStates()
+
+    def refreshTbarStates(self):
+        pass
 
     def refreshSelectedGuards(self):
         count, total = 0, 0
