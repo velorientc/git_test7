@@ -192,13 +192,6 @@ class MQWidget(QWidget):
             self.showMessage.emit(hglib.tounicode(str(e)))
         self.refreshing = False
 
-    def details(self):
-        dlg = OptionsDialog(self)
-        dlg.setWindowFlags(Qt.Sheet)
-        dlg.setWindowModality(Qt.WindowModal)
-        if dlg.exec_() == QDialog.Accepted:
-            self.opts.update(dlg.outopts)
-
     # Capture drop events, try to import into current patch queue
 
     def dragEnterEvent(self, event):
