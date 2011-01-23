@@ -23,8 +23,9 @@ connect = QObject.connect
 
 
 def settingsfilename():
+    """Return path to thg-reporegistry.xml as unicode"""
     s = QSettings()
-    dir = os.path.dirname(str(s.fileName()))
+    dir = os.path.dirname(unicode(s.fileName()))
     return dir + '/' + 'thg-reporegistry.xml'
 
 
