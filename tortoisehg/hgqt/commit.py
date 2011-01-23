@@ -1002,6 +1002,7 @@ class CommitDialog(QDialog):
         self.commit.reload()
         self.updateUndo()
         self.commit.msgte.setFocus()
+        QShortcut(QKeySequence.Refresh, self, self.refresh)
 
     def linkActivated(self, link):
         link = hglib.fromunicode(link)
@@ -1028,14 +1029,6 @@ class CommitDialog(QDialog):
         else:
             self.bb.button(BB.Discard).setEnabled(False)
             self.bb.button(BB.Discard).setToolTip('')
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.reject()
-            return
-        elif event.matches(QKeySequence.Refresh):
-            self.refresh()
-        return super(CommitDialog, self).keyPressEvent(event)
 
     def refresh(self):
         self.updateUndo()
