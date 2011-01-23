@@ -195,7 +195,7 @@ class MQWidget(QWidget):
         self.repo.decrementBusyCount()
         if ret is not 0:
             pass # TODO: look for reject notifications
-        self.reload()
+        self.reload() # TODO: probably redundant
 
     @pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
@@ -362,11 +362,31 @@ class MQWidget(QWidget):
         # refresh self.qnewOrRefreshBtn
         # refresh self.fileListWidget
 
-
     def refreshSelectedGuards(self):
         total = len(self.allguards)
         count = len(self.repo.mq.active_guards)
+        oldmenu = self.guardSelBtn.menu()
+        if oldmenu:
+            oldmenu.setParent(None)
+        menu = QMenu(self)
+        for guard in self.allguards:
+            a = menu.addAction(hglib.tounicode(guard))
+            a.setCheckable(True)
+            a.setChecked(guard in self.repo.mq.active_guards)
+            a.triggered.connect(self.onGuardSelectionChange)
+        self.guardSelBtn.setMenu(menu)
         self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
+
+    def onGuardSelectionChange(self, isChecked):
+        guard = hglib.fromunicode(self.sender().text())
+        newguards = self.repo.mq.active_guards[:]
+        if isChecked:
+            newguards.append(guard)
+        elif guard in newguards:
+            newguards.remove(guard)
+        cmdline = ['qselect', '-R', self.repo.root]
+        cmdline += newguards or ['--none']
+        self.cmd.run(cmdline)
 
     # Capture drop events, try to import into current patch queue
 
