@@ -6,6 +6,7 @@
 # GNU General Public License version 2 or any later version.
 
 import os
+import cStringIO
 from mercurial import util, config as config_mod
 
 try:
@@ -235,7 +236,11 @@ def writefile(config, path):
     """Write the given config obj to the specified file"""
     f = util.atomictempfile(os.path.realpath(path), 'w')
     try:
-        config.write(f)
+        buf = cStringIO.StringIO()
+        config.write(buf)
+        # normalize line endings
+        for line in buf.getvalue().splitlines():
+            f.write(line + '\n')
         f.rename()
     finally:
         del f  # unlink temp file
