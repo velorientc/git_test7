@@ -452,8 +452,10 @@ def _extendrepo(repo):
             self.dirstate.invalidate()
             if not isinstance(repo, bundlerepo.bundlerepository):
                 self.invalidate()
-            if hasattr(self, 'mq'):
-                self.mq.invalidate()
+            # mq.queue.invalidate does not handle queue changes, so force
+            # the queue object to be rebuilt
+            if 'mq' in self.__dict__:
+                delattr(self, 'mq')
             for a in _thgrepoprops + _uiprops:
                 if a in self.__dict__:
                     delattr(self, a)
@@ -465,7 +467,6 @@ def _extendrepo(repo):
             for a in _uiprops:
                 if a in self.__dict__:
                     delattr(self, a)
-            # todo: extensions.loadall(self.ui)
 
         def incrementBusyCount(self):
             'A GUI widget is starting a transaction'
