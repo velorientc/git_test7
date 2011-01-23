@@ -13,6 +13,7 @@ from PyQt4.QtGui import *
 
 from mercurial import hg, ui, url, util, error
 from mercurial import merge as mergemod
+from hgext import mq as mqmod
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
@@ -205,11 +206,33 @@ class MQWidget(QWidget):
             self.refreshing = False
 
     def _reload(self):
+        ui, repo = self.repo.ui, self.repo
+
         self.queueCombo.clear()
         self.msgHistoryCombo.clear()
         self.queueListWidget.clear()
         self.fileListWidget.clear()
-        # refresh self.queueCombo
+
+        ui.pushbuffer()
+        mqmod.qqueue(ui, repo, list=True)
+        out = ui.popbuffer()
+        activestr = ' (active)' # TODO: not locale safe
+        for i, qname in enumerate(out.splitlines()):
+            if qname.endswith(activestr):
+                current = i
+                qname = qname[:-len(activestr)]
+            self.queueCombo.addItem(hglib.tounicode(qname))
+        self.queueCombo.setCurrentIndex(current)
+
+        applied = set([p.name for p in repo.mq.applied])
+        for patch in repo.mq.series:
+            item = QListWidgetItem(hglib.tounicode(patch))
+            if patch in applied:
+                f = item.font()
+                f.setWeight(QFont.Bold)
+                item.setFont(f)
+            self.queueListWidget.addItem(item)
+
         # refresh self.queueListWidget
         # refresh self.msgHistoryCombo
         # update enabled states of qtbarhbox buttons
