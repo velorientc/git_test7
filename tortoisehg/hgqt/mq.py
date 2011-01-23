@@ -54,8 +54,8 @@ class MQWidget(QWidget):
         splitter.setObjectName('splitter')
 
         self.queueFrame = QFrame(splitter)
-        self.fileListFrame = QFrame(splitter)
         self.messageFrame = QFrame(splitter)
+        self.fileListFrame = QFrame(splitter)
 
         # Patch Queue Frame
         layout = QVBoxLayout()
@@ -102,14 +102,6 @@ class MQWidget(QWidget):
         self.revisionOrCommitBtn = QPushButton(_('Revision Queue'))
         layout.addWidget(self.revisionOrCommitBtn, 0)
 
-        # File List Frame
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.fileListFrame.setLayout(layout)
-
-        self.fileListWidget = QListWidget(self)
-        layout.addWidget(self.fileListWidget, 0)
-
         # Message Frame
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -137,6 +129,15 @@ class MQWidget(QWidget):
         qrefhbox.addWidget(self.shelveBtn)
         qrefhbox.addWidget(self.qnewOrRefreshBtn)
 
+        # File List Frame
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.fileListFrame.setLayout(layout)
+
+        self.fileListWidget = QListWidget(self)
+        layout.addWidget(self.fileListWidget, 0)
+
+        # Command runner and connections...
         self.cmd = cmdui.Runner(_('Patch Queue'), parent != None, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
