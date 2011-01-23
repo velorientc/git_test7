@@ -320,7 +320,6 @@ class CommitWidget(QWidget):
         self.opts['date'] = ''
         self.qref = False
 
-
     def menuRequested(self, point):
         line = self.msgte.lineAt(point)
         point = self.msgte.mapToGlobal(point)
