@@ -150,13 +150,17 @@ class MQWidget(QWidget):
         self.cmd.progress.connect(self.progress)
         self.cmd.commandFinished.connect(self.onCommandFinished)
 
-        self.shelveBtn.pressed.connect(self.launchShelveTool)
-        self.optionsBtn.pressed.connect(self.launchOptionsDialog)
-        self.revisionOrCommitBtn.pressed.connect(self.qinitOrCommit)
+        self.shelveBtn.clicked.connect(self.launchShelveTool)
+        self.optionsBtn.clicked.connect(self.launchOptionsDialog)
+        self.revisionOrCommitBtn.clicked.connect(self.qinitOrCommit)
         self.msgHistoryCombo.activated.connect(self.onMessageSelected)
         self.queueListWidget.currentRowChanged.connect(self.onPatchSelected)
         self.queueListWidget.itemActivated.connect(self.onGotoPatch)
         self.queueListWidget.itemChanged.connect(self.onRenamePatch)
+        self.qpushAllBtn.clicked.connect(self.onPushAll)
+        self.qpushBtn.clicked.connect(self.onPush)
+        self.qpopAllBtn.clicked.connect(self.onPopAll)
+        self.qpopBtn.clicked.connect(self.onPop)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
@@ -196,6 +200,26 @@ class MQWidget(QWidget):
         if ret is not 0:
             pass # TODO: look for reject notifications
         self.reload() # TODO: probably redundant
+
+    @pyqtSlot()
+    def onPushAll(self):
+        self.repo.incrementBusyCount()
+        self.cmd.run(['qpush', '-R', self.repo.root, '--all'])
+
+    @pyqtSlot()
+    def onPush(self):
+        self.repo.incrementBusyCount()
+        self.cmd.run(['qpush', '-R', self.repo.root])
+
+    @pyqtSlot()
+    def onPopAll(self):
+        self.repo.incrementBusyCount()
+        self.cmd.run(['qpop', '-R', self.repo.root, '--all'])
+
+    @pyqtSlot()
+    def onPop(self):
+        self.repo.incrementBusyCount()
+        self.cmd.run(['qpop', '-R', self.repo.root])
 
     @pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
