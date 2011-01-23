@@ -309,11 +309,11 @@ class MQWidget(QWidget):
             item = QListWidgetItem(hglib.tounicode(patch))
             if patch in applied: # applied
                 f = item.font()
-                f.setWeight(QFont.Bold)
+                f.setBold(True)
                 item.setFont(f)
             elif not repo.mq.pushable(idx)[0]: # guarded
                 f = item.font()
-                f.setWeight(QFont.Italics)
+                f.setItalic(True)
                 item.setFont(f)
             patchguards = repo.mq.series_guards[idx]
             if patchguards:
@@ -332,6 +332,10 @@ class MQWidget(QWidget):
         for item in reversed(items):
             self.queueListWidget.addItem(item)
 
+        for guard in repo.mq.active_guards:
+            self.allguards.add(guard)
+        self.refreshSelectedGuards()
+
         self.messages = []
         for patch in repo.mq.series:
             ctx = repo.changectx(patch)
@@ -344,7 +348,6 @@ class MQWidget(QWidget):
             self.revisionOrCommitBtn.setText(_('Commit Queue'))
         else:
             self.revisionOrCommitBtn.setText(_('Revision Queue'))
-        self.refreshSelectedGuards()
 
         self.qpushAllBtn.setEnabled(bool(repo.thgmqunappliedpatches))
         self.qpushBtn.setEnabled(bool(repo.thgmqunappliedpatches))
@@ -361,7 +364,8 @@ class MQWidget(QWidget):
 
 
     def refreshSelectedGuards(self):
-        count, total = 0, 0
+        total = len(self.allguards)
+        count = len(self.repo.mq.active_guards)
         self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
 
     # Capture drop events, try to import into current patch queue
