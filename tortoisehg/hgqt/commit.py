@@ -423,7 +423,7 @@ class CommitWidget(QWidget):
         # Usually safe to exit, since we're saving messages implicitly
         # We'll ask the user for confirmation later, if they have any
         # files partially selected.
-        return True
+        return not self.runner.core.running()
 
     def loadConfigs(self, s):
         'Load history, etc, from QSettings instance'
