@@ -1199,12 +1199,6 @@ class OptionsDialog(QDialog):
         for name, le in (('remotecmd', self.remotele),):
             outopts[name] = hglib.fromunicode(le.text()).strip()
 
-        if outopts.get('branch') and outopts.get('rev'):
-            qtlib.WarningMsgBox(_('Configuration Error'),
-                                _('You cannot specify a branch and revision'),
-                                parent=self)
-            return
-
         outopts['subrepos'] = self.subrepocb.isChecked()
         outopts['force'] = self.forcecb.isChecked()
         outopts['new-branch'] = self.newbranchcb.isChecked()
