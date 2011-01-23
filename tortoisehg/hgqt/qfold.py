@@ -36,7 +36,6 @@ class QFoldDialog(QDialog):
         mlbl = QLabel(_('New patch message:'))
         self.layout().addWidget(mlbl)
         self.msgte = MessageEntry()
-        self.msgte.reflowPressed.connect(self.reflowPressed)
         self.msgte.setContextMenuPolicy(Qt.CustomContextMenu)
         self.msgte.customContextMenuRequested.connect(self.menuRequested)
         self.msgte.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -151,50 +150,6 @@ class QFoldDialog(QDialog):
         self.cmd.commandFinished.connect(finished)
         self.cmd.run(cmdline)
 
-    def reflowPressed(self):
-        'User pressed Control-E, reflow current paragraph'
-        line, col = self.msgte.getCursorPosition()
-        self.reflowBlock(line)
-
-    def reflowBlock(self, line):
-        lines = self.msgte.text().split('\n', QString.KeepEmptyParts)
-        if line >= len(lines):
-            return None
-        if not len(lines[line]) > 1:
-            return line+1
-
-        # find boundaries (empty lines or bounds)
-        b = line
-        while b and len(lines[b-1]) > 1:
-            b = b - 1
-        e = line
-        while e+1 < len(lines) and len(lines[e+1]) > 1:
-            e = e + 1
-        group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
-        sentence = group.join(' ')
-        parts = sentence.split(' ', QString.SkipEmptyParts)
-
-        outlines = QStringList()
-        line = QStringList()
-        partslen = 0
-        for part in parts:
-            if partslen + len(line) + len(part) + 1 > self.repo.summarylen:
-                if line:
-                    outlines.append(line.join(' '))
-                line, partslen = QStringList(), 0
-            line.append(part)
-            partslen += len(part)
-        if line:
-            outlines.append(line.join(' '))
-
-        self.msgte.beginUndoAction()
-        self.msgte.setSelection(b, 0, e+1, 0)
-        self.msgte.removeSelectedText()
-        self.msgte.insertAt(outlines.join('\n')+'\n', b, 0)
-        self.msgte.endUndoAction()
-        self.msgte.setCursorPosition(b, 0)
-        return b + len(outlines) + 1
-
     def menuRequested(self, point):
         line = self.msgte.lineAt(point)
         point = self.msgte.mapToGlobal(point)
@@ -202,7 +157,7 @@ class QFoldDialog(QDialog):
         def apply():
             line = 0
             while True:
-                line = self.reflowBlock(line)
+                line = self.mste.reflowBlock(line)
                 if line is None:
                     break;
         def settings():

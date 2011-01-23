@@ -113,6 +113,7 @@ class MQWidget(QWidget):
         mtbarhbox.addWidget(self.patchNameLE, 1)
 
         self.messageEditor = commit.MessageEntry(self)
+        self.messageEditor.refresh(repo)
         layout.addWidget(self.messageEditor, 1)
 
         qrefhbox = QHBoxLayout()
@@ -146,6 +147,8 @@ class MQWidget(QWidget):
             self.setWindowTitle(_('TortoiseHg Patch Queue'))
             self.resize(850, 550)
 
+        QTimer.singleShot(0, self.reload)
+
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
         self.reload()
@@ -170,6 +173,7 @@ class MQWidget(QWidget):
 
     def reload(self):
         self.refreshing = True
+        self.messageEditor.refresh(self.repo)
         # refresh self.queueCombo
         # refresh self.msgHistoryCombo
         # set self.patchNameLE to qtip patch name

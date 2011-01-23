@@ -25,7 +25,6 @@ from tortoisehg.hgqt.sync import loadIniFile
 #  in-memory patching / committing chunk selected files
 
 class MessageEntry(qscilib.Scintilla):
-    reflowPressed = pyqtSignal()
 
     def __init__(self, parent=None):
         super(MessageEntry, self).__init__(parent)
@@ -58,6 +57,7 @@ class MessageEntry(qscilib.Scintilla):
         self.setEdgeColumn(repo.summarylen)
         self.setIndentationWidth(repo.tabwidth)
         self.setTabWidth(repo.tabwidth)
+        self.summarylen = repo.summarylen
         if repo.wsvisible == 'Visible':
             self.setWhitespaceVisibility(QsciScintilla.WsVisible)
         elif repo.wsvisible == 'VisibleAfterIndent':
@@ -65,9 +65,49 @@ class MessageEntry(qscilib.Scintilla):
         else:
             self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
 
+    def reflowBlock(self, line):
+        lines = self.text().split('\n', QString.KeepEmptyParts)
+        if line >= len(lines):
+            return None
+        if not len(lines[line]) > 1:
+            return line+1
+
+        # find boundaries (empty lines or bounds)
+        b = line
+        while b and len(lines[b-1]) > 1:
+            b = b - 1
+        e = line
+        while e+1 < len(lines) and len(lines[e+1]) > 1:
+            e = e + 1
+        group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
+        sentence = group.join(' ')
+        parts = sentence.split(' ', QString.SkipEmptyParts)
+
+        outlines = QStringList()
+        line = QStringList()
+        partslen = 0
+        for part in parts:
+            if partslen + len(line) + len(part) + 1 > self.summarylen:
+                if line:
+                    outlines.append(line.join(' '))
+                line, partslen = QStringList(), 0
+            line.append(part)
+            partslen += len(part)
+        if line:
+            outlines.append(line.join(' '))
+
+        self.beginUndoAction()
+        self.setSelection(b, 0, e+1, 0)
+        self.removeSelectedText()
+        self.insertAt(outlines.join('\n')+'\n', b, 0)
+        self.endUndoAction()
+        self.setCursorPosition(b, 0)
+        return b + len(outlines) + 1
+
     def keyPressEvent(self, event):
         if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
-            self.reflowPressed.emit()
+            line, col = self.getCursorPosition()
+            self.reflowBlock(line)
         super(MessageEntry, self).keyPressEvent(event)
 
 class CommitWidget(QWidget):
@@ -142,7 +182,6 @@ class CommitWidget(QWidget):
         vbox.addWidget(self.pcsinfo, 0)
 
         msgte = MessageEntry(self)
-        msgte.reflowPressed.connect(self.reflowPressed)
         msgte.setContextMenuPolicy(Qt.CustomContextMenu)
         msgte.customContextMenuRequested.connect(self.menuRequested)
         msgte.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -281,49 +320,6 @@ class CommitWidget(QWidget):
         self.opts['date'] = ''
         self.qref = False
 
-    def reflowPressed(self):
-        'User pressed Control-E, reflow current paragraph'
-        line, col = self.msgte.getCursorPosition()
-        self.reflowBlock(line)
-
-    def reflowBlock(self, line):
-        lines = self.msgte.text().split('\n', QString.KeepEmptyParts)
-        if line >= len(lines):
-            return None
-        if not len(lines[line]) > 1:
-            return line+1
-
-        # find boundaries (empty lines or bounds)
-        b = line
-        while b and len(lines[b-1]) > 1:
-            b = b - 1
-        e = line
-        while e+1 < len(lines) and len(lines[e+1]) > 1:
-            e = e + 1
-        group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
-        sentence = group.join(' ')
-        parts = sentence.split(' ', QString.SkipEmptyParts)
-
-        outlines = QStringList()
-        line = QStringList()
-        partslen = 0
-        for part in parts:
-            if partslen + len(line) + len(part) + 1 > self.repo.summarylen:
-                if line:
-                    outlines.append(line.join(' '))
-                line, partslen = QStringList(), 0
-            line.append(part)
-            partslen += len(part)
-        if line:
-            outlines.append(line.join(' '))
-
-        self.msgte.beginUndoAction()
-        self.msgte.setSelection(b, 0, e+1, 0)
-        self.msgte.removeSelectedText()
-        self.msgte.insertAt(outlines.join('\n')+'\n', b, 0)
-        self.msgte.endUndoAction()
-        self.msgte.setCursorPosition(b, 0)
-        return b + len(outlines) + 1
 
     def menuRequested(self, point):
         line = self.msgte.lineAt(point)
@@ -332,7 +328,7 @@ class CommitWidget(QWidget):
         def apply():
             line = 0
             while True:
-                line = self.reflowBlock(line)
+                line = self.msgte.reflowBlock(line)
                 if line is None:
                     break;
         def paste():
