@@ -155,7 +155,7 @@ class MQWidget(QWidget):
 
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
-        self.reload()
+        self.messageEditor.refresh(self.repo)
 
     def onRepositoryChanged(self):
         'Repository is reporting its changelog has changed'
@@ -178,7 +178,6 @@ class MQWidget(QWidget):
     def reload(self):
         self.refreshing = True
         try:
-            self.messageEditor.refresh(self.repo)
             # refresh self.queueCombo
             # refresh self.msgHistoryCombo
             # set self.patchNameLE to qtip patch name
