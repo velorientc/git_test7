@@ -47,7 +47,7 @@ class MQWidget(QWidget):
         tbarhbox.addWidget(self.msgHistoryCombo, 1)
 
         # main area consists of a three-way horizontal splitter
-        splitter = QSplitter()
+        self.splitter = splitter = QSplitter()
         self.layout().addWidget(splitter, 1)
         splitter.setOrientation(Qt.Horizontal)
         splitter.setChildrenCollapsible(True)
@@ -165,6 +165,7 @@ class MQWidget(QWidget):
             QShortcut(QKeySequence.Refresh, self, self.reload)
             self.resize(850, 550)
 
+        self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
     def onConfigChanged(self):
@@ -245,16 +246,31 @@ class MQWidget(QWidget):
 
     # End drop events
 
+    def loadConfigs(self):
+        'Load history, etc, from QSettings instance'
+        s = QSettings()
+        self.splitter.restoreState(s.value('mq/splitter').toByteArray())
+        userhist = s.value('commit/userhist').toStringList()
+        self.opts['userhist'] = [hglib.fromunicode(u) for u in userhist if u]
+        if not self.parent():
+            self.restoreGeometry(s.value('mq/geom').toByteArray())
+
+    def storeConfigs(self):
+        'Save history, etc, in QSettings instance'
+        s = QSettings()
+        s.setValue('mq/splitter', self.splitter.saveState())
+        if not self.parent():
+            s.setValue('mq/geom', self.saveGeometry())
+
     def canExit(self):
+        self.storeConfigs()
         return not self.cmd.core.running()
 
     def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Refresh):
-            self.reload()
-        elif event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key_Escape:
             if self.cmd.core.running():
                 self.cmd.cancel()
-            elif not self.parent():
+            elif not self.parent() and self.canExit():
                 self.close()
         else:
             return super(MQWidget, self).keyPressEvent(event)
