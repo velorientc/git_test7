@@ -17,7 +17,7 @@ from hgext import mq as mqmod
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, shelve
+from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, shelve, qscilib
 
 class MQWidget(QWidget):
     showMessage = pyqtSignal(unicode)
@@ -122,6 +122,7 @@ class MQWidget(QWidget):
         mtbarhbox.addWidget(self.patchNameLE, 1)
 
         self.messageEditor = commit.MessageEntry(self)
+        self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.messageEditor.refresh(repo)
         layout.addWidget(self.messageEditor, 1)
 
@@ -250,12 +251,22 @@ class MQWidget(QWidget):
 
         # TODO: maintain current selection
         applied = set([p.name for p in repo.mq.applied])
-        for patch in repo.mq.series:
+        items = []
+        for idx, patch in enumerate(repo.mq.series):
             item = QListWidgetItem(hglib.tounicode(patch))
             if patch in applied:
                 f = item.font()
                 f.setWeight(QFont.Bold)
                 item.setFont(f)
+            patchguards = repo.mq.series_guards[idx]
+            if patchguards:
+                uguards = hglib.tounicode(patchguards)
+            else:
+                uguards = _('no guards')
+            uname = hglib.tounicode(patch)
+            item.setToolTip(u'%s: %s' % (uname, uguards))
+            items.append(item)
+        for item in reversed(items):
             self.queueListWidget.addItem(item)
 
         self.messages = []
