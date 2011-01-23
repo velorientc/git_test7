@@ -130,6 +130,7 @@ class MQWidget(QWidget):
         self.cmd.progress.connect(self.progress)
 
         self.shelveBtn.pressed.connect(self.launchShelveTool)
+        self.optionsBtn.pressed.connect(self.launchOptionsDialog)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
@@ -158,6 +159,14 @@ class MQWidget(QWidget):
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.reload()
+
+    def launchOptionsDialog(self):
+        dlg = OptionsDialog(self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_() == QDialog.Accepted:
+            self.opts.update(dlg.outopts)
 
     def reload(self):
         self.refreshing = True
@@ -225,33 +234,46 @@ class OptionsDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowTitle('MQ options')
 
-        layout = QVBoxLayout()
+        layout = QFormLayout()
         self.setLayout(layout)
 
         self.gitcb = QCheckBox(_('Use git extended diff format'))
-        self.gitcb.setChecked(parent.opts.get('git', False))
         layout.addRow(self.gitcb, None)
 
         self.forcecb = QCheckBox(_('Force push or pop'))
-        self.forcecb.setChecked(parent.opts.get('force', False))
         layout.addRow(self.forcecb, None)
 
         self.exactcb = QCheckBox(_('Apply patch to its recorded parent'))
-        self.exactcb.setChecked(parent.opts.get('exact', False))
         layout.addRow(self.exactcb, None)
 
         self.currentdatecb = QCheckBox(_('Update date field with current date'))
-        self.currentdatecb.setChecked(parent.opts.get('currentdate', False))
         layout.addRow(self.currentdatecb, None)
 
+        self.datele = QLineEdit()
+        layout.addRow(QLabel(_('Specify an explicit date:')), self.datele)
+
         self.currentusercb = QCheckBox(_('Update author field with current user'))
-        self.currentusercb.setChecked(parent.opts.get('currentuser', False))
         layout.addRow(self.currentusercb, None)
+
+        self.userle = QLineEdit()
+        layout.addRow(QLabel(_('Specify an explicit author:')), self.userle)
+
+        self.currentdatecb.toggled.connect(self.datele.setDisabled)
+        self.currentusercb.toggled.connect(self.userle.setDisabled)
+
+        self.gitcb.setChecked(parent.opts.get('git', False))
+        self.forcecb.setChecked(parent.opts.get('force', False))
+        self.exactcb.setChecked(parent.opts.get('exact', False))
+        self.currentdatecb.setChecked(parent.opts.get('currentdate', False))
+        self.currentusercb.setChecked(parent.opts.get('currentuser', False))
+        self.datele.setText(hglib.tounicode(parent.opts.get('date', '')))
+        self.userle.setText(hglib.tounicode(parent.opts.get('user', '')))
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
+        self.bb = bb
         layout.addWidget(bb)
 
     def accept(self):
@@ -261,9 +283,17 @@ class OptionsDialog(QDialog):
         outopts['exact'] = self.exactcb.isChecked()
         outopts['currentdate'] = self.currentdatecb.isChecked()
         outopts['currentuser'] = self.currentusercb.isChecked()
+        if self.currentdatecb.isChecked():
+            outopts['date'] = ''
+        else:
+            outopts['date'] = hglib.fromunicode(self.datele.text())
+        if self.currentusercb.isChecked():
+            outopts['user'] = ''
+        else:
+            outopts['user'] = hglib.fromunicode(self.userle.text())
+
         self.outopts = outopts
         QDialog.accept(self)
-
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
