@@ -66,12 +66,24 @@ class MQWidget(QWidget):
         qtbarhbox.setSpacing(2)
         layout.addLayout(qtbarhbox, 0)
         qtbarhbox.setContentsMargins(0, 0, 0, 0)
-        self.qpushAllBtn = QToolButton()
-        self.qpushBtn = QToolButton()
-        self.qpushMoveBtn = QToolButton()
-        self.qdeleteBtn = QToolButton()
-        self.qpopBtn = QToolButton()
-        self.qpopAllBtn = QToolButton()
+        self.qpushAllBtn = tb = QToolButton()
+        #tb.setIcon(qtlib.geticon('qpush'))
+        tb.setToolTip(_('Apply all patches'))
+        self.qpushBtn = tb = QToolButton()
+        tb.setIcon(qtlib.geticon('qpush'))
+        tb.setToolTip(_('Apply one patch'))
+        self.qpushMoveBtn = tb = QToolButton()
+        #tb.setIcon(qtlib.geticon('qpush'))
+        tb.setToolTip(_('Apply selected patch next (change queue order)'))
+        self.qdeleteBtn = tb = QToolButton()
+        tb.setIcon(qtlib.geticon('filedelete'))
+        tb.setToolTip(_('Delete selected patches'))
+        self.qpopBtn = tb = QToolButton()
+        tb.setIcon(qtlib.geticon('qpop'))
+        tb.setToolTip(_('Unapply one patch'))
+        self.qpopAllBtn = tb = QToolButton()
+        #tb.setIcon(qtlib.geticon('qpop'))
+        tb.setToolTip(_('Unapply all patches'))
         qtbarhbox.addWidget(self.qpushAllBtn)
         qtbarhbox.addWidget(self.qpushBtn)
         qtbarhbox.addStretch(1)
@@ -178,6 +190,7 @@ class MQWidget(QWidget):
     def reload(self):
         self.refreshing = True
         try:
+            pass
             # refresh self.queueCombo
             # refresh self.msgHistoryCombo
             # set self.patchNameLE to qtip patch name
