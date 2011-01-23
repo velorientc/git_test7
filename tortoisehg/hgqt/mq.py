@@ -161,6 +161,7 @@ class MQWidget(QWidget):
         self.qpushBtn.clicked.connect(self.onPush)
         self.qpopAllBtn.clicked.connect(self.onPopAll)
         self.qpopBtn.clicked.connect(self.onPop)
+        self.qdeleteBtn.clicked.connect(self.onDelete)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
@@ -221,6 +222,15 @@ class MQWidget(QWidget):
         self.repo.incrementBusyCount()
         self.cmd.run(['qpop', '-R', self.repo.root])
 
+    @pyqtSlot()
+    def onDelete(self):
+        from tortoisehg.hgqt import qdelete
+        patch = self.queueListWidget.currentItem()._thgpatch
+        dlg = qdelete.QDeleteDialog(self.repo, [patch], self)
+        dlg.finished.connect(dlg.deleteLater)
+        if dlg.exec_() == QDialog.Accepted:
+            self.reload()
+
     @pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
         'Patch has been activated (return), issue qgoto'
@@ -242,7 +252,7 @@ class MQWidget(QWidget):
         if row >= 0:
             patch = self.queueListWidget.item(row)._thgpatch
             applied = set([p.name for p in self.repo.mq.applied])
-            self.qdeleteBtn.setEnabled(True)
+            self.qdeleteBtn.setEnabled(patch not in applied)
             self.qpushMoveBtn.setEnabled(patch not in applied)
             self.setGuardsBtn.setEnabled(True)
         else:
