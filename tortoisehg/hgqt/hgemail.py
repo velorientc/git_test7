@@ -19,17 +19,28 @@ from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
-    def __init__(self, repo, revs, parent=None):
+    def __init__(self, repo, revs, parent=None, outgoing=False,
+                 outgoingrevs=None):
+        """Create EmailDialog for the given repo and revs
+
+        :revs: List of revisions to be sent.
+        :outgoing: Enable outgoing bundle support. You also need to set
+                   outgoing revisions to `revs`.
+        :outgoingrevs: Target revision of outgoing bundle.
+                       (Passed as `hg email --bundle --rev {rev}`)
+        """
         super(EmailDialog, self).__init__(parent)
         self._repo = repo
+        self._outgoing = outgoing
+        self._outgoingrevs = outgoingrevs or []
 
         self._qui = Ui_EmailDialog()
         self._qui.setupUi(self)
-        self._qui.bundle_radio.setEnabled(False)  # TODO: bundle support
 
         self._initchangesets(revs)
         self._initpreviewtab()
         self._initenvelopebox()
+        self._qui.bundle_radio.toggled.connect(self._updateforms)
         self._initintrobox()
         self._readhistory()
         self._filldefaults()
@@ -163,7 +174,13 @@ class EmailDialog(QDialog):
         opts['from'] = headertext(self._qui.from_edit.currentText())
         opts['in_reply_to'] = headertext(self._qui.inreplyto_edit.text())
         opts['flag'] = [headertext(self._qui.flag_edit.currentText())]
-        opts['rev'] = map(str, self._revs)
+
+        if self._qui.bundle_radio.isChecked():
+            assert self._outgoing  # only outgoing bundle is supported
+            opts['rev'] = map(str, self._outgoingrevs)
+            opts['bundle'] = True
+        else:
+            opts['rev'] = map(str, self._revs)
 
         def diffformat():
             n = self.getdiffformat()
@@ -216,6 +233,15 @@ class EmailDialog(QDialog):
         self._qui.send_button.setEnabled(valid)
         self._qui.main_tabs.setTabEnabled(self._previewtabindex(), valid)
         self._qui.writeintro_check.setEnabled(not self._introrequired())
+
+        self._qui.bundle_radio.setEnabled(
+            self._outgoing and self._changesets.isselectedall())
+        self._changesets.setReadOnly(self._qui.bundle_radio.isChecked())
+        if self._qui.bundle_radio.isChecked():
+            # workaround to disable preview for outgoing bundle because it
+            # may freeze main thread
+            self._qui.main_tabs.setTabEnabled(self._previewtabindex(), False)
+
         if self._introrequired():
             self._qui.writeintro_check.setChecked(True)
 
@@ -261,7 +287,7 @@ class EmailDialog(QDialog):
 
     def _introrequired(self):
         """Is intro message required?"""
-        return len(self._revs) > 1
+        return len(self._revs) > 1 or self._qui.bundle_radio.isChecked()
 
     def _initpreviewtab(self):
         def initqsci(w):
@@ -345,6 +371,7 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
         self._repo = repo
         self._revs = list(reversed(sorted(revs)))
         self._selectedrevs = set(selectedrevs)
+        self._readonly = False
 
     @property
     def revs(self):
@@ -354,6 +381,9 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
     def selectedrevs(self):
         """Return the list of selected revisions"""
         return list(sorted(self._selectedrevs))
+
+    def isselectedall(self):
+        return len(self._revs) == len(self._selectedrevs)
 
     def data(self, index, role):
         if not index.isValid():
@@ -369,7 +399,7 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
         return QVariant()
 
     def setData(self, index, value, role=Qt.EditRole):
-        if not index.isValid():
+        if not index.isValid() or self._readonly:
             return False
 
         rev = self._revs[index.row()]
@@ -387,9 +417,12 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
 
         return False
 
+    def setReadOnly(self, readonly):
+        self._readonly = readonly
+
     def flags(self, index):
         v = super(_ChangesetsModel, self).flags(index)
-        if index.column() == 0:
+        if index.column() == 0 and not self._readonly:
             return Qt.ItemIsUserCheckable | v
         else:
             return v
@@ -421,7 +454,8 @@ def run(ui, *revs, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
 
     try:
-        return EmailDialog(repo, revs)
+        return EmailDialog(repo, revs, outgoing=opts.get('outgoing', False),
+                           outgoingrevs=opts.get('outgoingrevs', None))
     except error.RepoLookupError, e:
         qtlib.ErrorMsgBox(_('Failed to open Email dialog'),
                           hglib.tounicode(e.message))

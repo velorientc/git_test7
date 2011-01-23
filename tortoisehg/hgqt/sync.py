@@ -743,8 +743,13 @@ class SyncWidget(QWidget):
                 nodes = [n for n in data.splitlines() if len(n) == 40]
                 self.showMessage.emit(_('%d outgoing changesets') %
                                         len(nodes))
+                try:
+                    outgoingrevs = [cmdline[cmdline.index('--rev') + 1]]
+                except ValueError:
+                    outgoingrevs = None
                 from tortoisehg.hgqt import run as _run
-                _run.email(ui.ui(), repo=self.repo, rev=nodes)
+                _run.email(ui.ui(), repo=self.repo, rev=nodes,
+                           outgoing=True, outgoingrevs=outgoingrevs)
             elif ret == 1:
                 self.showMessage.emit(_('No outgoing changesets'))
             else:
