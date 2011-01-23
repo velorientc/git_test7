@@ -200,12 +200,15 @@ class MQWidget(QWidget):
     @pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
         'Patch has been activated (return), issue qgoto'
-        print 'qgoto', item._thgpatch
+        self.repo.incrementBusyCount()
+        self.cmd.run(['qgoto', '-R', self.repo.root, item._thgpatch])
 
     @pyqtSlot(QListWidgetItem)
     def onRenamePatch(self, item):
         'Patch has been renamed, issue qrename'
-        print 'qrename', item._thgpatch, item.text()
+        self.repo.incrementBusyCount()
+        self.cmd.run(['qrename', '-R', self.repo.root, item._thgpatch,
+                      hglib.fromunicode(item.text())])
 
     @pyqtSlot(int)
     def onPatchSelected(self, row):
