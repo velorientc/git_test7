@@ -141,10 +141,14 @@ class MQWidget(QWidget):
             self.patchNameLE.setPlaceholderText('### patch name ###')
 
         if parent:
-            layout.setContentsMargins(2, 2, 2, 2)
+            self.layout().setContentsMargins(2, 2, 2, 2)
         else:
-            layout.setContentsMargins(0, 0, 0, 0)
+            self.layout().setContentsMargins(0, 0, 0, 0)
             self.setWindowTitle(_('TortoiseHg Patch Queue'))
+            self.statusbar = cmdui.ThgStatusBar(self)
+            self.layout().addWidget(self.statusbar)
+            self.progress.connect(self.statusbar.progress)
+            self.showMessage.connect(self.statusbar.showMessage)
             self.resize(850, 550)
 
         QTimer.singleShot(0, self.reload)
@@ -173,17 +177,20 @@ class MQWidget(QWidget):
 
     def reload(self):
         self.refreshing = True
-        self.messageEditor.refresh(self.repo)
-        # refresh self.queueCombo
-        # refresh self.msgHistoryCombo
-        # set self.patchNameLE to qtip patch name
-        # update enabled states of qtbarhbox buttons
-        # refresh self.queueListWidget
-        # refresh self.guardSelBtn
-        # refresh self.revisionOrCommitBtn
-        # refresh self.messageEditor with qtip description, if not in new mode
-        # refresh self.qnewOrRefreshBtn
-        # refresh self.fileListWidget
+        try:
+            self.messageEditor.refresh(self.repo)
+            # refresh self.queueCombo
+            # refresh self.msgHistoryCombo
+            # set self.patchNameLE to qtip patch name
+            # update enabled states of qtbarhbox buttons
+            # refresh self.queueListWidget
+            # refresh self.guardSelBtn
+            # refresh self.revisionOrCommitBtn
+            # refresh self.messageEditor with qtip description, if not new
+            # refresh self.qnewOrRefreshBtn
+            # refresh self.fileListWidget
+        except Exception, e:
+            self.showMessage.emit(hglib.tounicode(str(e)))
         self.refreshing = False
 
     def details(self):
