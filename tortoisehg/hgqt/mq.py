@@ -96,7 +96,7 @@ class MQWidget(QWidget):
         self.queueListWidget = QListWidget(self)
         layout.addWidget(self.queueListWidget, 1)
 
-        self.guardSelBtn = QPushButton(_('Guards: 0/0'))
+        self.guardSelBtn = QPushButton()
         layout.addWidget(self.guardSelBtn, 0)
 
         self.revisionOrCommitBtn = QPushButton(_('Revision Queue'))
@@ -162,6 +162,7 @@ class MQWidget(QWidget):
             self.layout().addWidget(self.statusbar)
             self.progress.connect(self.statusbar.progress)
             self.showMessage.connect(self.statusbar.showMessage)
+            QShortcut(QKeySequence.Refresh, self, self.reload)
             self.resize(850, 550)
 
         QTimer.singleShot(0, self.reload)
@@ -191,20 +192,33 @@ class MQWidget(QWidget):
     def reload(self):
         self.refreshing = True
         try:
-            pass
-            # refresh self.queueCombo
-            # refresh self.msgHistoryCombo
-            # set self.patchNameLE to qtip patch name
-            # update enabled states of qtbarhbox buttons
-            # refresh self.queueListWidget
-            # refresh self.guardSelBtn
-            # refresh self.revisionOrCommitBtn
-            # refresh self.messageEditor with qtip description, if not new
-            # refresh self.qnewOrRefreshBtn
-            # refresh self.fileListWidget
-        except Exception, e:
-            self.showMessage.emit(hglib.tounicode(str(e)))
-        self.refreshing = False
+            try:
+                self._reload()
+            except Exception, e:
+                self.showMessage.emit(hglib.tounicode(str(e)))
+        finally:
+            self.refreshing = False
+
+    def _reload(self):
+        self.queueCombo.clear()
+        self.msgHistoryCombo.clear()
+        self.queueListWidget.clear()
+        self.fileListWidget.clear()
+        # refresh self.queueCombo
+        # refresh self.queueListWidget
+        # refresh self.msgHistoryCombo
+        # update enabled states of qtbarhbox buttons
+        # refresh self.revisionOrCommitBtn
+
+        # refresh self.messageEditor with qtip description, if not new
+        # set self.patchNameLE to qtip patch name, if not new
+        # refresh self.qnewOrRefreshBtn
+        # refresh self.fileListWidget
+        self.refreshSelectedGuards()
+
+    def refreshSelectedGuards(self):
+        count, total = 0, 0
+        self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
 
     # Capture drop events, try to import into current patch queue
 
