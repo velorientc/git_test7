@@ -42,7 +42,7 @@ class MQWidget(QWidget):
         self.layout().addLayout(tbarhbox, 0)
         self.queueCombo = QComboBox()
         self.optionsBtn = QPushButton(_('Options'))
-        self.msgHistoryCombo = QComboBox()
+        self.msgHistoryCombo = PatchMessageCombo(self)
         tbarhbox.addWidget(self.queueCombo)
         tbarhbox.addWidget(self.optionsBtn)
         tbarhbox.addWidget(self.msgHistoryCombo, 1)
@@ -150,6 +150,7 @@ class MQWidget(QWidget):
 
         self.shelveBtn.pressed.connect(self.launchShelveTool)
         self.optionsBtn.pressed.connect(self.launchOptionsDialog)
+        self.msgHistoryCombo.activated.connect(self.onMessageSelected)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
@@ -173,20 +174,44 @@ class MQWidget(QWidget):
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
+    @pyqtSlot()
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
         self.messageEditor.refresh(self.repo)
 
+    @pyqtSlot()
     def onRepositoryChanged(self):
         'Repository is reporting its changelog has changed'
         self.reload()
 
+    @pyqtSlot(int)
+    def onMessageSelected(self, row):
+        if self.messageEditor.text() and self.messageEditor.isModified():
+            d = QMessageBox.question(self, _('Confirm Discard Message'),
+                        _('Discard current commit message?'),
+                        QMessageBox.Ok | QMessageBox.Cancel)
+            if d != QMessageBox.Ok:
+                return
+        self.messageEditor.setText(self.messages[row][1])
+        lines = self.messageEditor.lines()
+        if lines:
+            lines -= 1
+            pos = self.messageEditor.lineLength(lines)
+            self.messageEditor.setCursorPosition(lines, pos)
+            self.messageEditor.ensureLineVisible(lines)
+            hs = self.messageEditor.horizontalScrollBar()
+            hs.setSliderPosition(0)
+        self.messageEditor.setModified(False)
+        self.messageEditor.setFocus()
+
+    @pyqtSlot()
     def launchShelveTool(self):
         dlg = shelve.ShelveDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.reload()
 
+    @pyqtSlot()
     def launchOptionsDialog(self):
         dlg = OptionsDialog(self)
         dlg.finished.connect(dlg.deleteLater)
@@ -209,7 +234,6 @@ class MQWidget(QWidget):
         ui, repo = self.repo.ui, self.repo
 
         self.queueCombo.clear()
-        self.msgHistoryCombo.clear()
         self.queueListWidget.clear()
         self.fileListWidget.clear()
 
@@ -224,6 +248,7 @@ class MQWidget(QWidget):
             self.queueCombo.addItem(hglib.tounicode(qname))
         self.queueCombo.setCurrentIndex(current)
 
+        # TODO: maintain current selection
         applied = set([p.name for p in repo.mq.applied])
         for patch in repo.mq.series:
             item = QListWidgetItem(hglib.tounicode(patch))
@@ -233,8 +258,14 @@ class MQWidget(QWidget):
                 item.setFont(f)
             self.queueListWidget.addItem(item)
 
-        # refresh self.queueListWidget
-        # refresh self.msgHistoryCombo
+        self.messages = []
+        for patch in repo.mq.series:
+            ctx = repo.changectx(patch)
+            msg = ctx.description()
+            if msg:
+                self.messages.append((patch, msg))
+        self.msgHistoryCombo.reset(self.messages)
+
         # update enabled states of qtbarhbox buttons
         # refresh self.revisionOrCommitBtn
 
@@ -301,6 +332,31 @@ class MQWidget(QWidget):
                 self.close()
         else:
             return super(MQWidget, self).keyPressEvent(event)
+
+
+
+class PatchMessageCombo(QComboBox):
+    def __init__(self, parent):
+        super(PatchMessageCombo, self).__init__(parent)
+        self.reset([])
+
+    def reset(self, msglist):
+        self.clear()
+        self.addItem(_('Patch commit messages...'))
+        self.loaded = False
+        self.msglist = msglist
+
+    def showPopup(self):
+        if not self.loaded and self.msglist:
+            self.clear()
+            for patch, message in self.msglist:
+                sum = message.split('\n', 1)[0][:70]
+                self.addItem(hglib.tounicode('%s: %s' % (patch, sum)))
+            self.loaded = True
+        if self.loaded:
+            super(PatchMessageCombo, self).showPopup()
+
+
 
 class OptionsDialog(QDialog):
     'Utility dialog for configuring uncommon options'
