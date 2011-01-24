@@ -108,9 +108,11 @@ class CloneDialog(QDialog):
         self.noupdate_chk = QCheckBox(_('Do not update the new working directory'))
         self.pproto_chk = QCheckBox(_('Use pull protocol to copy metadata'))
         self.uncomp_chk = QCheckBox(_('Use uncompressed transfer'))
+        self.qclone_chk = QCheckBox(_('Include patch queue'))
         optbox.addWidget(self.noupdate_chk)
         optbox.addWidget(self.pproto_chk)
         optbox.addWidget(self.uncomp_chk)
+        optbox.addWidget(self.qclone_chk)
 
         self.proxy_chk = QCheckBox(_('Use proxy server'))
         optbox.addWidget(self.proxy_chk)
@@ -184,6 +186,7 @@ class CloneDialog(QDialog):
         self.pproto_chk.setVisible(visible)
         self.uncomp_chk.setVisible(visible)
         self.proxy_chk.setVisible(visible)
+        self.qclone_chk.setVisible(visible)
         self.remote_chk.setVisible(visible)
         self.remote_text.setVisible(visible)
         self.startrev_chk.setVisible(visible and self.startrev_available())
@@ -264,7 +267,10 @@ class CloneDialog(QDialog):
                 dest = os.path.join(os.path.dirname(dirabs), dest)
 
         # prepare command line
-        cmdline = ['clone']
+        if self.qclone_chk.isChecked():
+            cmdline = ['qclone']
+        else:
+            cmdline = ['clone']
         if self.noupdate_chk.isChecked():
             cmdline.append('--noupdate')
         if self.uncomp_chk.isChecked():
