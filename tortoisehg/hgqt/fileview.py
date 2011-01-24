@@ -21,7 +21,7 @@ import os
 import difflib
 import re
 
-from mercurial import hg, error, match, patch, subrepo, commands
+from mercurial import hg, error, match, patch, subrepo, commands, util
 from mercurial import ui as uimod
 
 from PyQt4.QtCore import *
