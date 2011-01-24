@@ -164,6 +164,7 @@ class MQWidget(QWidget):
         self.qpopBtn.clicked.connect(self.onPop)
         self.qdeleteBtn.clicked.connect(self.onDelete)
         self.newCheckBox.toggled.connect(self.onNewModeToggled)
+        self.qnewOrRefreshBtn.clicked.connect(self.onQNewOrQRefresh)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
@@ -290,6 +291,33 @@ class MQWidget(QWidget):
             hs = self.messageEditor.horizontalScrollBar()
             hs.setSliderPosition(0)
         self.messageEditor.setModified(False)
+
+    @pyqtSlot()
+    def onQNewOrQRefresh(self):
+        if self.newCheckBox.isChecked():
+            name = hglib.fromunicode(self.patchNameLE.text())
+            if not name:
+                qtlib.ErrorMsgBox(_('Patch Name Required'),
+                                  _('You must enter a patch name'))
+                self.patchNameLE.setFocus()
+                return
+            cmdline = ['qnew', '--repository', self.repo.root, name]
+        else:
+            cmdline = ['qrefresh', '--repository', self.repo.root]
+        message = self.messageEditor.text()
+        if message:
+            cmdline += ['--message', hglib.fromunicode(message)]
+        files = ['--']
+        for row in xrange(self.fileListWidget.count()):
+            item = self.fileListWidget.item(row)
+            if item.checkState() == Qt.Checked:
+                files.append(hglib.fromunicode(item.text()[2:]))
+        if len(files) > 1:
+            cmdline += files
+        else:
+            cmdline += ['--exclude', self.repo.root]
+        self.repo.incrementBusyCount()
+        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def qinitOrCommit(self):
@@ -465,7 +493,7 @@ class MQWidget(QWidget):
             self.refreshing = False
 
     def refreshFileListWidget(self):
-        # TODO: maintain selection
+        # TODO: maintain selection, check state
         self.fileListWidget.clear()
         M, A, R = self.repo[None].status()[:3]
         pctx = self.repo.changectx('.')
