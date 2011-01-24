@@ -335,8 +335,8 @@ class PostReviewDialog(QDialog):
         self.qui.post_review_button.setEnabled(False)
         self.qui.close_button.setEnabled(False)
 
-        self.cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr],
-                                 self, self.onCompletion)
+        self.cmd = cmdui.Dialog(['postreview'] + cmdargs(opts) + [revstr], self)
+        self.cmd.core.commandFinished.connect(self.onCompletion)
         self.cmd.setWindowTitle(_('Posting Review'))
         self.cmd.setShowOutput(False)
 
