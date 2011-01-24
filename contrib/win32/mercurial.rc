@@ -69,7 +69,7 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;fold =
 ;hgcr-gui =
 ;perfarce =
-;hgeol =
+;eol =
 ;mercurial_keyring =
 
 ; fixfrozenexts is enabled by default.  It allows extension help
