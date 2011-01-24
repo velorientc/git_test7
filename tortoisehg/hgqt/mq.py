@@ -159,6 +159,7 @@ class MQWidget(QWidget):
         self.queueListWidget.itemChanged.connect(self.onRenamePatch)
         self.qpushAllBtn.clicked.connect(self.onPushAll)
         self.qpushBtn.clicked.connect(self.onPush)
+        self.qpushMoveBtn.clicked.connect(self.onPushMove)
         self.qpopAllBtn.clicked.connect(self.onPopAll)
         self.qpopBtn.clicked.connect(self.onPop)
         self.qdeleteBtn.clicked.connect(self.onDelete)
@@ -221,6 +222,12 @@ class MQWidget(QWidget):
     def onPop(self):
         self.repo.incrementBusyCount()
         self.cmd.run(['qpop', '-R', self.repo.root])
+
+    @pyqtSlot()
+    def onPushMove(self):
+        patch = self.queueListWidget.currentItem()._thgpatch
+        self.repo.incrementBusyCount()
+        self.cmd.run(['qpush', '-R', self.repo.root, '--move', patch])
 
     @pyqtSlot()
     def onDelete(self):
