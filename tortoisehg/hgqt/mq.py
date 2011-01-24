@@ -495,14 +495,15 @@ class MQWidget(QWidget):
     def refreshFileListWidget(self):
         # TODO: maintain selection, check state
         self.fileListWidget.clear()
-        M, A, R = self.repo[None].status()[:3]
         pctx = self.repo.changectx('.')
-        if 'qtip' in pctx.tags():
+        newmode = self.newCheckBox.isChecked()
+        M, A, R = self.repo[None].status()[:3]
+        if not newmode and 'qtip' in pctx.tags():
             pm, pa, pr = self.repo.status(pctx.p1().node(), pctx.node())[:3]
-            M = pm + M
-            A = pa + A
-            R = pr + R
-        elif not self.newCheckBox.isChecked():
+            M = set(pm) or set(M)
+            A = set(pa) or set(A)
+            R = set(pr) or set(R)
+        elif not newmode:
             return
         flags = Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
         for file in M:
