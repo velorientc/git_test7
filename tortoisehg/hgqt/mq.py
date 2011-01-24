@@ -56,15 +56,15 @@ class MQWidget(QWidget):
 
         self.queueFrame = QFrame(splitter)
         self.messageFrame = QFrame(splitter)
-        self.fileListFrame = QFrame(splitter)
 
         # Patch Queue Frame
         layout = QVBoxLayout()
+        layout.setSpacing(5)
         layout.setContentsMargins(0, 0, 0, 0)
         self.queueFrame.setLayout(layout)
 
         qtbarhbox = QHBoxLayout()
-        qtbarhbox.setSpacing(2)
+        qtbarhbox.setSpacing(5)
         layout.addLayout(qtbarhbox, 0)
         qtbarhbox.setContentsMargins(0, 0, 0, 0)
         self.qpushAllBtn = tb = QToolButton()
@@ -109,11 +109,12 @@ class MQWidget(QWidget):
 
         # Message Frame
         layout = QVBoxLayout()
+        layout.setSpacing(5)
         layout.setContentsMargins(0, 0, 0, 0)
         self.messageFrame.setLayout(layout)
 
         mtbarhbox = QHBoxLayout()
-        mtbarhbox.setSpacing(5)
+        mtbarhbox.setSpacing(8)
         layout.addLayout(mtbarhbox, 0)
         mtbarhbox.setContentsMargins(0, 0, 0, 0)
         self.newCheckBox = QCheckBox(_('New Patch'))
@@ -126,6 +127,9 @@ class MQWidget(QWidget):
         self.messageEditor.refresh(repo)
         layout.addWidget(self.messageEditor, 1)
 
+        self.fileListWidget = QListWidget(self)
+        layout.addWidget(self.fileListWidget, 2)
+
         qrefhbox = QHBoxLayout()
         layout.addLayout(qrefhbox, 0)
         qrefhbox.setContentsMargins(0, 0, 0, 0)
@@ -134,14 +138,6 @@ class MQWidget(QWidget):
         qrefhbox.addStretch(1)
         qrefhbox.addWidget(self.shelveBtn)
         qrefhbox.addWidget(self.qnewOrRefreshBtn)
-
-        # File List Frame
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.fileListFrame.setLayout(layout)
-
-        self.fileListWidget = QListWidget(self)
-        layout.addWidget(self.fileListWidget, 0)
 
         # Command runner and connections...
         self.cmd = cmdui.Runner(_('Patch Queue'), parent != None, self)
