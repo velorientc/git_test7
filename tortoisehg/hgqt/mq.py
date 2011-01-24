@@ -188,6 +188,21 @@ class MQWidget(QWidget):
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
+    def getUserOptions(self, *optionlist):
+        out = []
+        for opt in optionlist:
+            if opt not in self.opts:
+                continue
+            val = self['opts']
+            if val is False:
+                continue
+            elif val is True:
+                out.append('--' + opt)
+            else:
+                out.append('--' + opt)
+                out.append(val)
+        return out
+
     @pyqtSlot()
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
@@ -208,28 +223,39 @@ class MQWidget(QWidget):
     @pyqtSlot()
     def onPushAll(self):
         self.repo.incrementBusyCount()
-        self.cmd.run(['qpush', '-R', self.repo.root, '--all'])
+        cmdline = ['qpush', '-R', self.repo.root, '--all']
+        cmdline += self.getUserOptions('force', 'exact')
+        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def onPush(self):
         self.repo.incrementBusyCount()
-        self.cmd.run(['qpush', '-R', self.repo.root])
+        cmdline = ['qpush', '-R', self.repo.root]
+        cmdline += self.getUserOptions('force', 'exact')
+        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def onPopAll(self):
         self.repo.incrementBusyCount()
-        self.cmd.run(['qpop', '-R', self.repo.root, '--all'])
+        cmdline = ['qpop', '-R', self.repo.root, '--all']
+        cmdline += self.getUserOptions('force')
+        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def onPop(self):
         self.repo.incrementBusyCount()
-        self.cmd.run(['qpop', '-R', self.repo.root])
+        cmdline = ['qpop', '-R', self.repo.root]
+        cmdline += self.getUserOptions('force')
+        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def onPushMove(self):
         patch = self.queueListWidget.currentItem()._thgpatch
+        cmdline = ['qpop', '-R', self.repo.root]
+        cmdline += self.getUserOptions('force')
+        cmdline += ['--move', '--', patch]
         self.repo.incrementBusyCount()
-        self.cmd.run(['qpush', '-R', self.repo.root, '--move', patch])
+        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def onDelete(self):
@@ -243,15 +269,18 @@ class MQWidget(QWidget):
     @pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
         'Patch has been activated (return), issue qgoto'
+        cmdline = ['qgoto', '-R', self.repo.root]
+        cmdline += self.getUserOptions('force')
+        cmdline += ['--', item._thgpatch]
         self.repo.incrementBusyCount()
-        self.cmd.run(['qgoto', '-R', self.repo.root, item._thgpatch])
+        self.cmd.run(cmdline)
 
     @pyqtSlot(QListWidgetItem)
     def onRenamePatch(self, item):
         'Patch has been renamed, issue qrename'
         self.repo.incrementBusyCount()
-        self.cmd.run(['qrename', '-R', self.repo.root, item._thgpatch,
-                      hglib.fromunicode(item.text())])
+        self.cmd.run(['qrename', '-R', self.repo.root, '--',
+                      item._thgpatch, hglib.fromunicode(item.text())])
 
     @pyqtSlot(int)
     def onPatchSelected(self, row):
@@ -307,6 +336,8 @@ class MQWidget(QWidget):
         message = self.messageEditor.text()
         if message:
             cmdline += ['--message', hglib.fromunicode(message)]
+        cmdline += self.getUserOptions('user', 'currentuser', 'git',
+                                       'date', 'currentdate')
         files = ['--']
         for row in xrange(self.fileListWidget.count()):
             item = self.fileListWidget.item(row)
@@ -630,7 +661,7 @@ class OptionsDialog(QDialog):
         layout = QFormLayout()
         self.setLayout(layout)
 
-        self.gitcb = QCheckBox(_('Use git extended diff format'))
+        self.gitcb = QCheckBox(_('Force use of git extended diff format'))
         layout.addRow(self.gitcb, None)
 
         self.forcecb = QCheckBox(_('Force push or pop'))
