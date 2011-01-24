@@ -494,6 +494,12 @@ class MQWidget(QWidget):
 
     def refreshFileListWidget(self):
         # TODO: maintain selection, check state
+        def addfiles(mode, files):
+            for file in files:
+                item = QListWidgetItem(u'%s %s' % (mode, hglib.tounicode(file)))
+                item.setFlags(flags)
+                item.setCheckState(Qt.Checked)
+                self.fileListWidget.addItem(item)
         self.fileListWidget.clear()
         pctx = self.repo.changectx('.')
         newmode = self.newCheckBox.isChecked()
@@ -506,21 +512,9 @@ class MQWidget(QWidget):
         elif not newmode:
             return
         flags = Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
-        for file in M:
-            item = QListWidgetItem(u'M ' + hglib.tounicode(file))
-            item.setFlags(flags)
-            item.setCheckState(Qt.Checked)
-            self.fileListWidget.addItem(item)
-        for file in A:
-            item = QListWidgetItem(u'A ' + hglib.tounicode(file))
-            item.setFlags(flags)
-            item.setCheckState(Qt.Checked)
-            self.fileListWidget.addItem(item)
-        for file in R:
-            item = QListWidgetItem(u'R ' + hglib.tounicode(file))
-            item.setFlags(flags)
-            item.setCheckState(Qt.Checked)
-            self.fileListWidget.addItem(item)
+        addfiles(u'M', M)
+        addfiles(u'A', A)
+        addfiles(u'R', R)
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
