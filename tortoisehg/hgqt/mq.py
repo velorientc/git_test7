@@ -158,6 +158,7 @@ class MQWidget(QWidget):
         self.qpushMoveBtn.clicked.connect(self.onPushMove)
         self.qpopAllBtn.clicked.connect(self.onPopAll)
         self.qpopBtn.clicked.connect(self.onPop)
+        self.setGuardsBtn.clicked.connect(self.onGuardConfigure)
         self.qdeleteBtn.clicked.connect(self.onDelete)
         self.newCheckBox.toggled.connect(self.onNewModeToggled)
         self.qnewOrRefreshBtn.clicked.connect(self.onQNewOrQRefresh)
@@ -250,6 +251,37 @@ class MQWidget(QWidget):
         cmdline = ['qpop', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
         cmdline += ['--move', '--', patch]
+        self.repo.incrementBusyCount()
+        self.cmd.run(cmdline)
+
+    @pyqtSlot()
+    def onGuardConfigure(self):
+        item = self.queueListWidget.currentItem()
+        patch = item._thgpatch
+        if item._thgguards:
+            uguards = hglib.tounicode(' '.join(item._thgguards))
+        else:
+            uguards = ''
+        new, ok = QInputDialog.getText(self,
+                      _('Configure guards'),
+                      _('Input new guards for %s:') % hglib.tounicode(patch),
+                      text=uguards, flags=Qt.Sheet)
+        if not ok or new == uguards:
+            return
+        guards = []
+        for guard in hglib.fromunicode(new).split(' '):
+            guard = guard.strip()
+            if not guard:
+                continue
+            if not (guard[0] == '+' or guard[0] == '-'):
+                self.showMessage.emit(_('Guards must begin with "+" or "-"'))
+                continue
+            guards.append(guard)
+        cmdline = ['qguard', '-R', self.repo.root, '--', patch]
+        if guards:
+            cmdline += guards
+        else:
+            cmdline.insert(3, '--none')
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
@@ -426,6 +458,7 @@ class MQWidget(QWidget):
                 uguards = _('no guards')
             uname = hglib.tounicode(patch)
             item._thgpatch = patch
+            item._thgguards = patchguards
             item.setToolTip(u'%s: %s' % (uname, uguards))
             item.setFlags(Qt.ItemIsSelectable |
                           Qt.ItemIsEditable |
