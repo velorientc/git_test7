@@ -49,6 +49,9 @@
     <file>icons/push.svg</file>
     <file>icons/qpush.svg</file>
     <file>icons/qpop.svg</file>
+    <file>icons/qpopall.svg</file>
+    <file>icons/qpushall.svg</file>
+    <file>icons/qreorder.svg</file>
     <file>icons/reviewboard.png</file>
     <file>icons/bookmark.png</file>
     <file>icons/extensions.svg</file>
