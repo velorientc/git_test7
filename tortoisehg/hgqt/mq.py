@@ -410,7 +410,6 @@ class MQWidget(QWidget):
         # TODO: maintain current selection
         applied = set([p.name for p in repo.mq.applied])
         self.allguards = set()
-        self.activeguards = repo.mq.active_guards or []
         items = []
         for idx, patch in enumerate(repo.mq.series):
             item = QListWidgetItem(hglib.tounicode(patch))
@@ -439,7 +438,7 @@ class MQWidget(QWidget):
         for item in reversed(items):
             self.queueListWidget.addItem(item)
 
-        for guard in self.activeguards:
+        for guard in repo.mq.active():
             self.allguards.add(guard)
         self.refreshSelectedGuards()
 
@@ -550,7 +549,7 @@ class MQWidget(QWidget):
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
-        count = len(self.activeguards)
+        count = len(self.repo.mq.active())
         oldmenu = self.guardSelBtn.menu()
         if oldmenu:
             oldmenu.setParent(None)
@@ -558,14 +557,14 @@ class MQWidget(QWidget):
         for guard in self.allguards:
             a = menu.addAction(hglib.tounicode(guard))
             a.setCheckable(True)
-            a.setChecked(guard in self.activeguards)
+            a.setChecked(guard in self.repo.mq.active())
             a.triggered.connect(self.onGuardSelectionChange)
         self.guardSelBtn.setMenu(menu)
         self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
 
     def onGuardSelectionChange(self, isChecked):
         guard = hglib.fromunicode(self.sender().text())
-        newguards = self.activeguards[:]
+        newguards = self.repo.mq.active()[:]
         if isChecked:
             newguards.append(guard)
         elif guard in newguards:
