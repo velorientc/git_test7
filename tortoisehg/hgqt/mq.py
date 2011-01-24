@@ -42,10 +42,10 @@ class MQWidget(QWidget):
         self.layout().addLayout(tbarhbox, 0)
         self.queueCombo = QComboBox()
         self.optionsBtn = QPushButton(_('Options'))
-        self.msgHistoryCombo = PatchMessageCombo(self)
+        self.msgSelectCombo = PatchMessageCombo(self)
         tbarhbox.addWidget(self.queueCombo)
         tbarhbox.addWidget(self.optionsBtn)
-        tbarhbox.addWidget(self.msgHistoryCombo, 1)
+        tbarhbox.addWidget(self.msgSelectCombo, 1)
 
         # main area consists of a three-way horizontal splitter
         self.splitter = splitter = QSplitter()
@@ -153,7 +153,7 @@ class MQWidget(QWidget):
         self.shelveBtn.clicked.connect(self.launchShelveTool)
         self.optionsBtn.clicked.connect(self.launchOptionsDialog)
         self.revisionOrCommitBtn.clicked.connect(self.qinitOrCommit)
-        self.msgHistoryCombo.activated.connect(self.onMessageSelected)
+        self.msgSelectCombo.activated.connect(self.onMessageSelected)
         self.queueListWidget.currentRowChanged.connect(self.onPatchSelected)
         self.queueListWidget.itemActivated.connect(self.onGotoPatch)
         self.queueListWidget.itemChanged.connect(self.onRenamePatch)
@@ -163,6 +163,7 @@ class MQWidget(QWidget):
         self.qpopAllBtn.clicked.connect(self.onPopAll)
         self.qpopBtn.clicked.connect(self.onPop)
         self.qdeleteBtn.clicked.connect(self.onDelete)
+        self.newCheckBox.toggled.connect(self.onNewModeToggled)
 
         self.repo.configChanged.connect(self.onConfigChanged)
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
@@ -275,7 +276,11 @@ class MQWidget(QWidget):
                         QMessageBox.Ok | QMessageBox.Cancel)
             if d != QMessageBox.Ok:
                 return
-        self.messageEditor.setText(self.messages[row][1])
+        self.setMessage(self.messages[row][1])
+        self.messageEditor.setFocus()
+
+    def setMessage(self, message):
+        self.messageEditor.setText(message)
         lines = self.messageEditor.lines()
         if lines:
             lines -= 1
@@ -285,7 +290,6 @@ class MQWidget(QWidget):
             hs = self.messageEditor.horizontalScrollBar()
             hs.setSliderPosition(0)
         self.messageEditor.setModified(False)
-        self.messageEditor.setFocus()
 
     @pyqtSlot()
     def qinitOrCommit(self):
@@ -321,6 +325,8 @@ class MQWidget(QWidget):
                 self._reload()
             except Exception, e:
                 self.showMessage.emit(hglib.tounicode(str(e)))
+                import traceback
+                traceback.print_exc()
         finally:
             self.refreshing = False
 
@@ -329,7 +335,6 @@ class MQWidget(QWidget):
 
         self.queueCombo.clear()
         self.queueListWidget.clear()
-        self.fileListWidget.clear()
 
         ui.pushbuffer()
         mqmod.qqueue(ui, repo, list=True)
@@ -345,6 +350,7 @@ class MQWidget(QWidget):
         # TODO: maintain current selection
         applied = set([p.name for p in repo.mq.applied])
         self.allguards = set()
+        self.activeguards = repo.mq.active_guards or []
         items = []
         for idx, patch in enumerate(repo.mq.series):
             item = QListWidgetItem(hglib.tounicode(patch))
@@ -373,7 +379,7 @@ class MQWidget(QWidget):
         for item in reversed(items):
             self.queueListWidget.addItem(item)
 
-        for guard in repo.mq.active_guards:
+        for guard in self.activeguards:
             self.allguards.add(guard)
         self.refreshSelectedGuards()
 
@@ -383,9 +389,9 @@ class MQWidget(QWidget):
             msg = ctx.description()
             if msg:
                 self.messages.append((patch, msg))
-        self.msgHistoryCombo.reset(self.messages)
+        self.msgSelectCombo.reset(self.messages)
 
-        if os.path.isdir(self.repo.mq.join('.hg')):
+        if os.path.isdir(repo.mq.join('.hg')):
             self.revisionOrCommitBtn.setText(_('Commit Queue'))
         else:
             self.revisionOrCommitBtn.setText(_('Revision Queue'))
@@ -398,14 +404,98 @@ class MQWidget(QWidget):
         self.qpopBtn.setEnabled(bool(applied))
         self.qpopAllBtn.setEnabled(bool(applied))
 
-        # refresh self.messageEditor with qtip description, if not new
-        # set self.patchNameLE to qtip patch name, if not new
-        # refresh self.qnewOrRefreshBtn
-        # refresh self.fileListWidget
+        pctx = repo.changectx('.')
+        newmode = self.newCheckBox.isChecked()
+        if 'qtip' in pctx.tags():
+            self.fileListWidget.setEnabled(True)
+            self.messageEditor.setEnabled(True)
+            self.msgSelectCombo.setEnabled(True)
+            self.qnewOrRefreshBtn.setEnabled(True)
+            if not newmode:
+                self.setMessage(pctx.description())
+                name = repo.mq.applied[-1].name
+                self.patchNameLE.setText(hglib.tounicode(name))
+        else:
+            self.fileListWidget.setEnabled(newmode)
+            self.messageEditor.setEnabled(newmode)
+            self.msgSelectCombo.setEnabled(newmode)
+            self.qnewOrRefreshBtn.setEnabled(newmode)
+            if not newmode:
+                self.setMessage('')
+                self.patchNameLE.setText('')
+        self.patchNameLE.setEnabled(newmode)
+        self.refreshFileListWidget()
+
+    def onNewModeToggled(self, isChecked):
+        if isChecked:
+            self.fileListWidget.setEnabled(True)
+            self.qnewOrRefreshBtn.setText(_('QNew'))
+            self.qnewOrRefreshBtn.setEnabled(True)
+            self.messageEditor.setEnabled(True)
+            self.patchNameLE.setEnabled(True)
+            self.patchNameLE.selectAll()
+            self.patchNameLE.setFocus()
+            self.setMessage('')
+        else:
+            self.qnewOrRefreshBtn.setText(_('QRefresh'))
+            pctx = self.repo.changectx('.')
+            if 'qtip' in pctx.tags():
+                self.messageEditor.setEnabled(True)
+                self.setMessage(pctx.description())
+                name = self.repo.mq.applied[-1].name
+                self.patchNameLE.setText(hglib.tounicode(name))
+                self.qnewOrRefreshBtn.setEnabled(True)
+                self.fileListWidget.setEnabled(True)
+            else:
+                self.messageEditor.setEnabled(False)
+                self.qnewOrRefreshBtn.setEnabled(False)
+                self.fileListWidget.setEnabled(False)
+                self.patchNameLE.setText('')
+                self.setMessage('')
+            self.patchNameLE.setEnabled(False)
+        self.refreshing = True
+        try:
+            try:
+                self.refreshFileListWidget()
+            except Exception, e:
+                self.showMessage.emit(hglib.tounicode(str(e)))
+                import traceback
+                traceback.print_exc()
+        finally:
+            self.refreshing = False
+
+    def refreshFileListWidget(self):
+        # TODO: maintain selection
+        self.fileListWidget.clear()
+        M, A, R = self.repo[None].status()[:3]
+        pctx = self.repo.changectx('.')
+        if 'qtip' in pctx.tags():
+            pm, pa, pr = self.repo.status(pctx.p1().node(), pctx.node())[:3]
+            M = pm + M
+            A = pa + A
+            R = pr + R
+        elif not self.newCheckBox.isChecked():
+            return
+        flags = Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
+        for file in M:
+            item = QListWidgetItem(u'M ' + hglib.tounicode(file))
+            item.setFlags(flags)
+            item.setCheckState(Qt.Checked)
+            self.fileListWidget.addItem(item)
+        for file in A:
+            item = QListWidgetItem(u'A ' + hglib.tounicode(file))
+            item.setFlags(flags)
+            item.setCheckState(Qt.Checked)
+            self.fileListWidget.addItem(item)
+        for file in R:
+            item = QListWidgetItem(u'R ' + hglib.tounicode(file))
+            item.setFlags(flags)
+            item.setCheckState(Qt.Checked)
+            self.fileListWidget.addItem(item)
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
-        count = len(self.repo.mq.active_guards)
+        count = len(self.activeguards)
         oldmenu = self.guardSelBtn.menu()
         if oldmenu:
             oldmenu.setParent(None)
@@ -413,14 +503,14 @@ class MQWidget(QWidget):
         for guard in self.allguards:
             a = menu.addAction(hglib.tounicode(guard))
             a.setCheckable(True)
-            a.setChecked(guard in self.repo.mq.active_guards)
+            a.setChecked(guard in self.activeguards)
             a.triggered.connect(self.onGuardSelectionChange)
         self.guardSelBtn.setMenu(menu)
         self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
 
     def onGuardSelectionChange(self, isChecked):
         guard = hglib.fromunicode(self.sender().text())
-        newguards = self.repo.mq.active_guards[:]
+        newguards = self.activeguards[:]
         if isChecked:
             newguards.append(guard)
         elif guard in newguards:
