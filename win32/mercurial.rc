@@ -43,6 +43,7 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;color =
 ;convert =
 ;extdiff =
+;eol =
 ;fetch =
 ;gpg =
 ;graphlog = 
@@ -67,9 +68,7 @@ ssh = "TortoisePlink.exe" -ssh -2
 ;zeroconf =
 ; Extra extensions bundled with TortoiseHg
 ;fold =
-;hgcr-gui =
 ;perfarce =
-;hgeol =
 ;mercurial_keyring =
 
 ; fixfrozenexts is enabled by default.  It allows extension help
