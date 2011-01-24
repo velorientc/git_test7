@@ -405,6 +405,7 @@ class MQWidget(QWidget):
                 qname = qname[:-len(activestr)]
             self.queueCombo.addItem(hglib.tounicode(qname))
         self.queueCombo.setCurrentIndex(current)
+        self.queueCombo.setEnabled(self.queueCombo.count() > 1)
 
         # TODO: maintain current selection
         applied = set([p.name for p in repo.mq.applied])
