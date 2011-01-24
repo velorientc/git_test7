@@ -574,6 +574,11 @@ def tag(ui, *pats, **opts):
     from tortoisehg.hgqt.tag import run
     return qtrun(run, ui, *pats, **opts)
 
+def mq(ui, *pats, **opts):
+    """Mercurial Queue tool"""
+    from tortoisehg.hgqt.mq import run
+    return qtrun(run, ui, *pats, **opts)
+
 def test(ui, *pats, **opts):
     """test arbitrary widgets"""
     from tortoisehg.hgqt.mq import run
@@ -977,7 +982,8 @@ table = {
          [('r', 'rev', '', _('revision to merge'))],
          _('thg merge [[-r] REV]')),
     "remove|rm": (remove, [], _('thg remove [FILE]...')),
-    "resolve": (resolve, [], _('thg resolve [FILE]...')),
+    "mq": (mq, [], _('thg mq')),
+    "resolve": (resolve, [], _('thg resolve')),
     "revert": (revert, [], _('thg revert [FILE]...')),
     "forget": (forget, [], _('thg forget [FILE]...')),
     "rename|mv|copy": (rename, [], _('thg rename SOURCE [DEST]...')),
