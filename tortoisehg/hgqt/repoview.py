@@ -82,7 +82,7 @@ class HgRepoView(QTableView):
     def setModel(self, model):
         self.init_variables()
         QTableView.setModel(self, model)
-        self.selectionModel().currentRowChanged.connect(self.revSelected)
+        self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.resetDelegate()
         model.layoutChanged.connect(self.resetDelegate)
 
@@ -159,7 +159,7 @@ class HgRepoView(QTableView):
         if rev is not None:
             self.revisionActivated.emit(rev)
 
-    def revSelected(self, index, index_from):
+    def onRowChange(self, index, index_from):
         rev = self.revFromindex(index)
         if self.current_rev != rev and not self._in_history:
             del self._rev_history[self._rev_pos+1:]
