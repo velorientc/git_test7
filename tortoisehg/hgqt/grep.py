@@ -24,6 +24,7 @@ class SearchWidget(QWidget):
     '''Working copy and repository search widget'''
     showMessage = pyqtSignal(QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
+    revisionSelected = pyqtSignal(int)
 
     def __init__(self, upats, repo, parent=None, **opts):
         QWidget.__init__(self, parent)
@@ -124,6 +125,7 @@ class SearchWidget(QWidget):
         tv = MatchTree(repo, self)
         tm = MatchModel(self)
         tv.setModel(tm)
+        tv.revisionSelected.connect(self.revisionSelected)
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
         mainvbox.addWidget(tv)
@@ -440,6 +442,7 @@ COL_USER     = 3  # Hidden if ctx
 COL_TEXT     = 4
 
 class MatchTree(QTableView):
+    revisionSelected = pyqtSignal(int)
     contextmenu = None
 
     def __init__(self, repo, parent):
@@ -451,6 +454,7 @@ class MatchTree(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.setShowGrid(False)
+        self.embedded = parent.parent() is not None
         vh = self.verticalHeader()
         vh.hide()
         vh.setDefaultSectionSize(20)
@@ -516,7 +520,7 @@ class MatchTree(QTableView):
             return
         point = self.mapToGlobal(point)
         menus = [(_('View file'), self.view), (_('Annotate file'), self.ann)]
-        if not wctxonly:
+        if not wctxonly and self.embedded:
             menus.append((_('View Changeset'), self.ctx))
         if allhistory:
             # need to know files were modified at specified revision
@@ -549,7 +553,9 @@ class MatchTree(QTableView):
             dlg.show()
 
     def ctx(self, rows):
-        raise NotImplementedError()
+        for rev, path, line in rows:
+            self.revisionSelected.emit(int(rev))
+            return
 
     def view(self, rows):
         from tortoisehg.hgqt import wctxactions

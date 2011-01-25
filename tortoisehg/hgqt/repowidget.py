@@ -361,6 +361,7 @@ class RepoWidget(QWidget):
         gw.setRevision(self.repoview.current_rev)
         gw.showMessage.connect(self.showMessage)
         gw.progress.connect(self.progress)
+        gw.revisionSelected.connect(self.goto)
         return gw
 
     def createPatchBranchWidget(self):
