@@ -190,7 +190,7 @@ class MQWidget(QWidget):
         for opt in optionlist:
             if opt not in self.opts:
                 continue
-            val = self['opts']
+            val = self.opts[opt]
             if val is False:
                 continue
             elif val is True:
