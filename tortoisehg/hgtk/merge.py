@@ -81,15 +81,22 @@ class MergeDialog(gdialog.GDialog):
         self.otherframe = info
         self.otherrev = str(info.get_data('revnum'))
 
-        discard = gtk.CheckButton(_('Discard all changes from merge target '
-                                    '(other) revision'))
-        self.discard = discard
-        self.vbox.pack_start(discard, False, False)
-
         info = factory(rev0, style={'label': _('Current revision (local)')})
         self.vbox.pack_start(info, False, False)
         self.localframe = info
         self.localrev = str(info.get_data('revnum'))
+
+        # expander for advanced options
+        expander = gtk.Expander(_('Advanced options'))
+        self.vbox.pack_start(expander, False, False)
+
+        # layout table for advanced options
+        table = gtklib.LayoutTable()
+        expander.add(table)
+        discard = gtk.CheckButton(_('Discard all changes from merge target '
+                                    '(other) revision'))
+        self.discard = discard
+        table.add_row(discard)
 
         vlist = gtk.ListStore(str,  # tool name
                               bool) # separator
@@ -206,6 +213,13 @@ class MergeDialog(gdialog.GDialog):
                 return
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
+            ret = gdialog.Confirm(_('Confirm Discard Changes'), [], self,
+                _('The changes from revision %s and all unmerged parents'
+                  ' will be discarded.\n\n'
+                  'Are you sure this is what you want to do?')
+                      % (self.otherframe.get_data('revid'))).run()
+            if ret != gtk.RESPONSE_YES:
+                return
             cmdline = ['hg', 'debugsetparents', '.', self.otherrev]
         else:
             tool = hglib.fromutf(self.mergetool.child.get_text())
