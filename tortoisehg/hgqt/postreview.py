@@ -85,6 +85,7 @@ class PostReviewDialog(QDialog):
         self.ui = ui
         self.repo = repo
         self.error_message = None
+        self.cmd = None
 
         self.qui = Ui_PostReviewDialog()
         self.qui.setupUi(self)
@@ -132,6 +133,10 @@ class PostReviewDialog(QDialog):
             self.qui.post_review_button.setEnabled(True)
 
     def closeEvent(self, event):
+        if self.cmd and self.cmd.core.running():
+            self.cmd.commandFinished.disconnect(self.onCompletion)
+            self.cmd.cancel()
+            
         # Dispose of the review data thread
         self.review_thread.terminate()
         self.review_thread.wait()
@@ -304,7 +309,6 @@ class PostReviewDialog(QDialog):
             self.qui.changesets_view.setEnabled(True)
 
     def close(self):        
-        self.cmd.cancel()
         super(PostReviewDialog, self).close()
 
     def accept(self):
