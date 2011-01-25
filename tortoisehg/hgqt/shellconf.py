@@ -205,12 +205,14 @@ class ShellConfigWindow(QDialog):
             list.setSortingEnabled(True)
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         for cmd, info in menuthg.thgcmenu.items():
-            label = info['label']['str']
-            self.menu_cmds[label] = cmd
+            label = info['label']
+            item = QListWidgetItem(hglib.tounicode(label['str']))
+            item._id = label['id']
             if cmd in promoted:
-                self.topmenulist.addItem(hglib.tounicode(label))
+                self.topmenulist.addItem(item)
             else:
-                self.submenulist.addItem(hglib.tounicode(label))
+                self.submenulist.addItem(item)
+            self.menu_cmds[item._id] = cmd
 
     def store_shell_configs(self):
         if not  self.dirty:
@@ -219,8 +221,7 @@ class ShellConfigWindow(QDialog):
         promoted = []
         list = self.topmenulist
         for row in range(list.count()):
-            label = hglib.fromunicode(list.item(row).text())
-            cmd = self.menu_cmds[label]
+            cmd = self.menu_cmds[list.item(row)._id]
             promoted.append(cmd)
 
         hkey = CreateKey(HKEY_CURRENT_USER, "Software\\" + THGKEY)
