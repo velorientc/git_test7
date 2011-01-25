@@ -127,9 +127,9 @@ class RepoWidget(QWidget):
         self.layout().addWidget(self.repotabs_splitter)
 
         self.repoview = view = HgRepoView(self.repo, self)
-        view.revisionClicked.connect(self.revisionClicked)
-        view.revisionSelected.connect(self.on_revisionSelected)
-        view.revisionAltClicked.connect(self.on_revisionSelected)
+        view.revisionClicked.connect(self.onRevisionClicked)
+        view.revisionSelected.connect(self.onRevisionSelected)
+        view.revisionAltClicked.connect(self.onRevisionSelected)
         view.revisionActivated.connect(self.revision_activated)
         view.showMessage.connect(self.showMessage)
         view.menuRequested.connect(self.viewMenuRequest)
@@ -540,7 +540,7 @@ class RepoWidget(QWidget):
         # Perhaps we can update a GUI element later, to indicate full load
         pass
 
-    def revisionClicked(self, rev):
+    def onRevisionClicked(self, rev):
         'User clicked on a repoview row'
         tw = self.taskTabsWidget
         if rev is None:
@@ -550,7 +550,7 @@ class RepoWidget(QWidget):
             # Clicking on a normal revision switches from commit tab
             tw.setCurrentIndex(self.logTabIndex)
 
-    def on_revisionSelected(self, rev):
+    def onRevisionSelected(self, rev):
         'View selection changed, could be a reload'
         if self.repomodel.graph is None:
             return
