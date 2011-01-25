@@ -140,7 +140,7 @@ class MQWidget(QWidget):
         qrefhbox.addWidget(self.qnewOrRefreshBtn)
 
         # Command runner and connections...
-        self.cmd = cmdui.Runner(_('Patch Queue'), parent != None, self)
+        self.cmd = cmdui.Runner(_('Patch Queue'), parent == None, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
         self.cmd.progress.connect(self.progress)
