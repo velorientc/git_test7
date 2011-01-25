@@ -480,7 +480,7 @@ class MQWidget(QWidget):
         self.msgSelectCombo.reset(self.messages)
 
         if os.path.isdir(repo.mq.join('.hg')):
-            self.revisionOrCommitBtn.setText(_('Commit Queue'))
+            self.revisionOrCommitBtn.setText(_('QCommit'))
         else:
             self.revisionOrCommitBtn.setText(_('Revision Queue'))
 
