@@ -161,17 +161,12 @@ class HgRepoView(QTableView):
 
     def revSelected(self, index, index_from):
         rev = self.revFromindex(index)
-        if self.current_rev == rev:
-            return
-
-        if not self._in_history:
+        if self.current_rev != rev and not self._in_history:
             del self._rev_history[self._rev_pos+1:]
             self._rev_history.append(rev)
             self._rev_pos = len(self._rev_history)-1
-
         self._in_history = False
         self.current_rev = rev
-
         self.revisionSelected.emit(rev)
 
     def selectedRevisions(self):
