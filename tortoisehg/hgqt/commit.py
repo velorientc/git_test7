@@ -609,7 +609,7 @@ class CommitWidget(QWidget):
                        ]
         else:
             cmdline = ['commit', '--repository', repo.root,
-                       '--verbose', '--user', user, '--message', msg]
+                       '--verbose', '--user', user, '--message='+msg]
             if self.qref:
                 cmdline[0] = 'qrefresh'
                 files = []
