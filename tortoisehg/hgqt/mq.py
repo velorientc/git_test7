@@ -299,7 +299,7 @@ class MQWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.reload()
 
-    @pyqtSlot(QListWidgetItem)
+    #@pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
         'Patch has been activated (return), issue qgoto'
         cmdline = ['qgoto', '-R', self.repo.root]
@@ -308,7 +308,7 @@ class MQWidget(QWidget):
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
-    @pyqtSlot(QListWidgetItem)
+    #@pyqtSlot(QListWidgetItem)
     def onRenamePatch(self, item):
         'Patch has been renamed, issue qrename'
         self.repo.incrementBusyCount()
