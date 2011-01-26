@@ -43,6 +43,7 @@ class MessageEntry(qscilib.Scintilla):
         self.setAutoCompletionFillupsEnabled(True)
         self.setLexer(QsciLexerMakefile(self))
         self.lexer().setFont(qtlib.getfont('fontcomment').font())
+        self.lexer().setColor(QColor(Qt.red), QsciLexerMakefile.Error)
         self.setMatchedBraceBackgroundColor(Qt.yellow)
         self.setIndentationsUseTabs(False)
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
