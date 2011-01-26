@@ -8,12 +8,12 @@
 import os
 import sys
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
 from mercurial import extensions, ui
 from tortoisehg.util import hglib, version
 from tortoisehg.hgqt.i18n import _
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 class BugReport(QDialog):
 
@@ -57,6 +57,7 @@ class BugReport(QDialog):
         text += '** Python version: %s\n' % sys.version.replace('\n', '')
         if os.name == 'nt':
             text += self.getarch()
+        text += '** Qt-%s PyQt-%s\n' % (QT_VERSION_STR, PYQT_VERSION_STR)
         text += hglib.tounicode(opts.get('error', 'N/A'))
         text += '\n}}}'
         return text
