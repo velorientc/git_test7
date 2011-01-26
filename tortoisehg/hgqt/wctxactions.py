@@ -67,10 +67,10 @@ def wctxactions(parent, point, repo, selrows):
         if t & frozenset('?') and wctx.deleted():
             rmenu = QMenu(_('Was renamed from'))
             for d in wctx.deleted()[:15]:
-                action = rmenu.addAction(hglib.tounicode(d))
-                action.args = (repo, d, path)
-                action.run = lambda: renamefromto(*action.args)
-                action.triggered.connect(action.run)
+                def mkaction(deleted):
+                    a = rmenu.addAction(hglib.tounicode(deleted))
+                    a.triggered.connect(lambda: renamefromto(repo, deleted, path))
+                mkaction(d)
             menu.addMenu(rmenu)
         else:
             make(_('&Copy...'), copy, frozenset('MC'))
@@ -83,10 +83,10 @@ def wctxactions(parent, point, repo, selrows):
         files = [f for t, f in selrows if 'u' in t]
         rmenu = QMenu(_('Restart merge with'))
         for tool in hglib.mergetools(repo.ui):
-            action = rmenu.addAction(tool)
-            action.args = (tool, repo, files)
-            action.run = lambda: resolve_with(*action.args)
-            action.triggered.connect(action.run)
+            def mkaction(rtool):
+                a = rmenu.addAction(hglib.tounicode(rtool))
+                a.triggered.connect(lambda: resolve_with(rtool, repo, files))
+            mkaction(tool)
         menu.addMenu(rmenu)
     return menu.exec_(point)
 
