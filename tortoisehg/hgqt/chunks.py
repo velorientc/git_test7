@@ -566,10 +566,7 @@ class DiffBrowser(QFrame):
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]
         else:
-            buf = cStringIO.StringIO()
-            buf.write(fd.diff)
-            buf.seek(0)
-            chunks = record.parsepatch(buf)
+            chunks = record.parsepatch(cStringIO.StringIO(fd.diff))
 
         utext = []
         for chunk in chunks[1:]:
