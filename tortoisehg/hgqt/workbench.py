@@ -9,7 +9,6 @@ Main Qt4 application for TortoiseHg
 """
 
 import os
-import sys
 
 from mercurial.error import RepoError
 
@@ -64,8 +63,8 @@ class Workbench(QMainWindow):
         self.repoTabChanged()
         self.restoreSettings()
         self.setAcceptDrops(True)
-        if sys.platform != 'darwin':
-            # Allow CTRL+Q to close Workbench on Windows and Linux
+        if os.name == 'nt':
+            # Allow CTRL+Q to close Workbench on Windows
             QShortcut(QKeySequence('CTRL+Q'), self, self.close)
 
     def accept(self):
