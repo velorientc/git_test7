@@ -18,6 +18,7 @@ from hgext import mq as mqmod
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, shelve, qscilib
+from tortoisehg.hgqt import qqueue
 
 class MQWidget(QWidget):
     showMessage = pyqtSignal(unicode)
@@ -133,8 +134,11 @@ class MQWidget(QWidget):
         qrefhbox = QHBoxLayout()
         layout.addLayout(qrefhbox, 0)
         qrefhbox.setContentsMargins(0, 0, 0, 0)
+        self.qqueueBtn = QPushButton(_('Manage queues'))
+        self.qqueueBtn.setMinimumWidth(150)
         self.shelveBtn = QPushButton(_('Shelve'))
         self.qnewOrRefreshBtn = QPushButton(_('QRefresh'))
+        qrefhbox.addWidget(self.qqueueBtn)
         qrefhbox.addStretch(1)
         qrefhbox.addWidget(self.shelveBtn)
         qrefhbox.addWidget(self.qnewOrRefreshBtn)
@@ -146,6 +150,7 @@ class MQWidget(QWidget):
         self.cmd.progress.connect(self.progress)
         self.cmd.commandFinished.connect(self.onCommandFinished)
 
+        self.qqueueBtn.clicked.connect(self.launchQQueueTool)
         self.shelveBtn.clicked.connect(self.launchShelveTool)
         self.optionsBtn.clicked.connect(self.launchOptionsDialog)
         self.revisionOrCommitBtn.clicked.connect(self.qinitOrCommit)
@@ -167,7 +172,7 @@ class MQWidget(QWidget):
         self.repo.repositoryChanged.connect(self.onRepositoryChanged)
         self.setAcceptDrops(True)
 
-        if hasattr(self.patchNameLE, 'setPlaceholderText'): # Qt >= 4.7 
+        if hasattr(self.patchNameLE, 'setPlaceholderText'): # Qt >= 4.7
             self.patchNameLE.setPlaceholderText('### patch name ###')
 
         if parent:
@@ -388,6 +393,13 @@ class MQWidget(QWidget):
         else:
             self.repo.incrementBusyCount()
             self.cmd.run(['qinit', '-c', '-R', self.repo.root])
+
+    @pyqtSlot()
+    def launchQQueueTool(self):
+        dlg = qqueue.QQueueDialog(self.repo, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+        self.reload()
 
     @pyqtSlot()
     def launchShelveTool(self):
