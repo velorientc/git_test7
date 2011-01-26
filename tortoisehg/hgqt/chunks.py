@@ -24,7 +24,6 @@ from PyQt4 import Qsci
 
 # TODO
 # Add support for tools like TortoiseMerge that help resolve rejected chunks
-# qpush and import could benefit from patch reject fallbacks as well
 
 qsci = Qsci.QsciScintilla
 
