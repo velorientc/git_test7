@@ -493,7 +493,7 @@ def _extendrepo(repo):
                 return
             name = os.path.basename(path)
             root, ext = os.path.splitext(name)
-            dest = tempfile.mktemp(ext, root, trashcan)
+            dest = tempfile.mktemp(ext, root+'_', trashcan)
             shutil.copyfile(path, dest)
 
     return thgrepository
