@@ -567,8 +567,7 @@ class DiffBrowser(QFrame):
             chunks = self._ctx._files[filename]
         else:
             buf = cStringIO.StringIO()
-            buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % filename)
-            buf.write('\n'.join(fd.diff))
+            buf.write(fd.diff)
             buf.seek(0)
             chunks = record.parsepatch(buf)
 

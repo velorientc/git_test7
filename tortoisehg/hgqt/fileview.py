@@ -22,7 +22,7 @@ import difflib
 import re
 
 from mercurial import hg, error, match, patch, subrepo, commands, util
-from mercurial import ui as uimod
+from mercurial import ui as uimod, mdiff
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -330,8 +330,12 @@ class HgFileView(QFrame):
         if self._mode == 'diff' and fd.diff:
             lexer = get_diff_lexer(self)
             self.sci.setLexer(lexer)
-            utext = [hglib.tounicode(l) for l in fd.diff[2:]]
-            self.sci.setText(u'\n'.join(utext))
+            # trim first three lines, for example:
+            # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
+            # --- a/tortoisehg/hgqt/thgrepo.py
+            # +++ b/tortoisehg/hgqt/thgrepo.py
+            noheader = fd.diff.split('\n', 3)[3]
+            self.sci.setText(hglib.tounicode(noheader))
         elif fd.contents is None:
             return
         else:
@@ -700,20 +704,10 @@ class FileData(object):
             return
 
         self.olddata = olddata
-        olddata = olddata.splitlines()
-        newdata = newdata.splitlines()
-        gen = difflib.unified_diff(olddata, newdata, 'a/'+oldname, 'b/'+wfile,
-                                   lineterm='')
-        data = []
-        if repo.ui.config('diff', 'showfunc'):
-            for chunkline in gen:
-                chunkhdr = chunkhdrre.match(chunkline)
-                if chunkhdr:
-                    func = hglib.getchunkfunction(olddata, chunkhdr.group(1))
-                    if func:
-                        chunkline += func
-                data.append(chunkline)
-        else:
-            for chunkline in gen:
-                data.append(chunkline)
-        self.diff = data
+        newdate = util.datestr(ctx.date())
+        olddate = util.datestr(ctx2.date())
+        revs = [str(ctx), str(ctx2)]
+        diffopts = patch.diffopts(repo.ui, {})
+        diffopts.git = False
+        self.diff = mdiff.unidiff(olddata, olddate, newdata, newdate,
+                                  oldname, wfile, revs, diffopts)
