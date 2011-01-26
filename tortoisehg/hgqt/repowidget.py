@@ -20,7 +20,7 @@ from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
-from tortoisehg.hgqt import qdelete, qreorder, qrename, qfold, shelve
+from tortoisehg.hgqt import qdelete, qreorder, qrename, qfold, shelve, qqueue
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -791,7 +791,8 @@ class RepoWidget(QWidget):
                 (_('Rename patch'), self.qrenameRevision),
                 (_('Fold patches'), qfoldact),
                 (_('Delete patches'), qdeleteact),
-                (_('Reorder patches'), qreorderact)):
+                (_('Reorder patches'), qreorderact),
+                (_('Manage patch queues'), self.qqueueManage)):
                 act = QAction(name, self)
                 act.triggered.connect(cb)
                 acts.append(act)
@@ -820,6 +821,7 @@ class RepoWidget(QWidget):
             qpar    = lambda ap, up, qp, wd: qp
             applied = lambda ap, up, qp, wd: ap
             unapp   = lambda ap, up, qp, wd: up
+            allctx  = lambda ap, up, qp, wd: True
 
             exs = self.repo.extensions()
             menu = QMenu(self)
@@ -849,6 +851,8 @@ class RepoWidget(QWidget):
                 ('mq', patch, _('Goto patch'), None, self.qgotoRevision),
                 ('mq', patch, _('Rename patch'), None, self.qrenameRevision),
                 ('mq', fixed, _('Strip...'), None, self.stripRevision),
+                ('mq', allctx, _('Manage patch queues'), None,
+                        self.qqueueManage),
                 ('reviewboard', fixed, _('Post to Review Board...'),
                     'reviewboard', self.sendToReviewBoard)):
                 if ext and ext not in exs:
@@ -1100,6 +1104,13 @@ class RepoWidget(QWidget):
         """Rename the selected MQ patch"""
         patchname = self.repo.changectx(self.rev).thgmqpatchname()
         dlg = qrename.QRenameDialog(self.repo, patchname, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.exec_()
+
+    def qqueueManage(self):
+        dlg = qqueue.QQueueDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)

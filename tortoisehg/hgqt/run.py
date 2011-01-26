@@ -594,6 +594,11 @@ def qreorder(ui, *pats, **opts):
     from tortoisehg.hgqt.qreorder import run
     return qtrun(run, ui, *pats, **opts)
 
+def qqueue(ui, *pats, **opts):
+    """manage multiple MQ patch queues"""
+    from tortoisehg.hgqt.qqueue import run
+    return qtrun(run, ui, *pats, **opts)
+
 def remove(ui, *pats, **opts):
     """remove selected files"""
     from tortoisehg.hgqt.quickop import run
@@ -1027,6 +1032,7 @@ table = {
     "help": (help_, [], _('thg help [COMMAND]')),
     "^purge": (purge, [], _('thg purge')),
     "^qreorder": (qreorder, [], _('thg qreorder')),
+    "^qqueue": (qqueue, [], _('thg qqueue')),
     "^update|checkout|co":
         (update,
          [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
