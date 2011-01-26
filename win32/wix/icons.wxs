@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include guids.wxi ?>
+  <?include defines.wxi ?>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+
+      <Directory Id="IconsDirectory" Name="icons" FileSource="$(var.SourceDir)">
+
+        <Component Id='Icons' Guid='$(var.Icons.guid)' Win64='$(var.IsX64)'>
+          <File Name="branch.ico" KeyPath="yes" />
+          <File Name="detect_rename.ico" />
+          <File Name="fileadd.ico" />
+          <File Name="filedelete.ico" />
+          <File Name="filemodify.ico" />
+          <File Name="general.ico" />
+          <File Name="hg.ico" />
+          <File Name="hg_60.ico" />
+          <File Name="hgB.ico" />
+          <File Name="ignore.ico" />
+          <File Name="menuabout.ico" />
+          <File Name="menuadd.ico" />
+          <File Name="menublame.ico" />
+          <File Name="menucheckout.ico" />
+          <File Name="menuclone.ico" />
+          <File Name="menucommit.ico" />
+          <File Name="menucreaterepos.ico" />
+          <File Name="menudelete.ico" />
+          <File Name="menudiff.ico" />
+          <File Name="menuhelp.ico" />
+          <File Name="menuimport.ico" />
+          <File Name="menulog.ico" />
+          <File Name="menumerge.ico" />
+          <File Name="menupatch.ico" />
+          <File Name="menurelocate.ico" />
+          <File Name="menurepobrowse.ico" />
+          <File Name="menurevert.ico" />
+          <File Name="menurevisiongraph.ico" />
+          <File Name="menusettings.ico" />
+          <File Name="menushowchanged.ico" />
+          <File Name="menusynch.ico" />
+          <File Name="menuunmerge.ico" />
+          <File Name="proxy.ico" />
+          <File Name="python.ico" />
+          <File Name="README.txt" />
+          <File Name="refresh_overlays.ico" />
+          <File Name="settings_repo.ico" />
+          <File Name="settings_user.ico" />
+          <File Name="shelve.ico" />
+          <File Name="thg_logo.ico" />
+          <File Name="thg_logo_92x50.png" />
+          <File Name="TortoiseMerge.ico" />
+
+          <File Name="archive.svg" />
+          <File Name="back.svg" />
+          <File Name="clean.svg" />
+          <File Name="clone.svg" />
+          <File Name="close.png" />
+          <File Name="commit.svg" />
+          <File Name="down.svg" />
+          <File Name="error.svg" />
+          <File Name="fallback.svg" />
+          <File Name="find.svg" />
+          <File Name="fonts.svg" />
+          <File Name="forward.svg" />
+          <File Name="goto.svg" />
+          <File Name="help.svg" />
+          <File Name="left.svg" />
+          <File Name="leftright.svg" />
+          <File Name="loadall.svg" />
+          <File Name="loadall.png" />
+          <File Name="log.svg" />
+          <File Name="merge.svg" />
+          <File Name="minus.png" />
+          <File Name="modified.svg" />
+          <File Name="mqdiff.svg" />
+          <File Name="mqpatch.svg" />
+          <File Name="plus.png" />
+          <File Name="quit.svg" />
+          <File Name="reload.svg" />
+          <File Name="reloadtt.svg" />
+          <File Name="rename.svg" />
+          <File Name="repotree.svg" />
+          <File Name="right.svg" />
+          <File Name="showlog.svg" />
+          <File Name="showlog.png" />
+          <File Name="success.svg" />
+          <File Name="sync.svg" />
+          <File Name="tag.svg" />
+          <File Name="up.svg" />
+          <File Name="update.svg" />
+          <File Name="warning.svg" />
+        </Component>
+      </Directory>
+
+    </DirectoryRef>
+  </Fragment>
+
+</Wix>

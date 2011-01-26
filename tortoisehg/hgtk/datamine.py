@@ -18,8 +18,8 @@ from mercurial import util, error
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, thread2
 
-from tortoisehg.hgtk.logview.colormap import AnnotateColorMap
-from tortoisehg.hgtk.logview.colormap import AnnotateColorSaturation
+from tortoisehg.util.colormap import AnnotateColorMap
+from tortoisehg.util.colormap import AnnotateColorSaturation
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 from tortoisehg.hgtk.logview import treemodel as LogTreeModelModule
 from tortoisehg.hgtk import gtklib, gdialog, changeset, statusbar, csinfo
@@ -786,11 +786,7 @@ class DataMineDialog(gdialog.GWindow):
         # date of selected revision
         ctx = self.repo[long(rev)]
         curdate = ctx.date()[0]
-        # date of initial revision
-        fctx = self.repo.filectx(path, fileid=0)
-        basedate = fctx.date()[0]
-        agedays = (curdate - basedate) / (24 * 60 * 60)
-        colormap = AnnotateColorSaturation(agedays)
+        colormap = AnnotateColorSaturation()
 
         model, rows = treeview.get_selection().get_selected_rows()
         model.clear()
