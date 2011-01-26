@@ -139,8 +139,7 @@ class patchctx(object):
             buf = cStringIO.StringIO()
             for chunk in self._files[wfile]:
                 chunk.write(buf)
-            # prune 'diff -r' line
-            return buf.getvalue().splitlines(False)[1:]
+            return buf.getvalue()
         return []
 
     @propertycache
