@@ -166,6 +166,7 @@ class ChunksWidget(QWidget):
                 if ctx._ph.comments:
                     fp.write('\n'.join(ctx._ph.comments))
                     fp.write('\n\n')
+                needsnewline = False
                 for wfile in ctx._fileorder:
                     if wfile == self.currentFile:
                         if revertall:
@@ -174,8 +175,11 @@ class ChunksWidget(QWidget):
                         for chunk in kchunks:
                             chunk.write(fp)
                         if not chunks[-1].selected:
-                            fp.write('\n')
+                            needsnewline = True
                     else:
+                        if needsnewline:
+                            fp.write('\n')
+                            needsnewline = False
                         for chunk in ctx._files[wfile]:
                             chunk.write(fp)
                 fp.rename()
