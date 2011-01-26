@@ -1221,10 +1221,7 @@ class GCommit(GStatus):
         files += self.opts['include']
         if not files and not self.is_merge():
             cmdline += ['-X', self.repo.root]
-        message = hglib.fromutf(self.opts['message'])
-        if message.startswith('-'):
-            message = ' ' + message
-        cmdline += ['--message', message]
+        cmdline += ['--message', hglib.fromutf(self.opts['message'])]
         if self.qnew:
             cmdline += [hglib.fromutf(self.get_qnew_name())]
         if files:
