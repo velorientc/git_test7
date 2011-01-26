@@ -39,6 +39,7 @@ class patchctx(object):
         self._branch = ''
         self._node = node.nullid
         self._mtime = None
+        self._parseerror = None
 
         try:
             ph = mq.patchheader(self._path)
@@ -164,20 +165,22 @@ class patchctx(object):
                 for i in range(self._ph.diffstartline):
                     pf.readline()
                 for chunk in record.parsepatch(pf):
-                    if isinstance(chunk, record.header):
-                        top = patch.parsefilename(chunk.header[-2])
-                        bot = patch.parsefilename(chunk.header[-1])
-                        type, path = get_path(top, bot)
-                        if path not in chunk.files():
-                            type, path = 0, chunk.files()[-1]
-                        if path not in files:
-                            self._status[type].append(path)
-                            files[path] = [chunk]
-                            self._fileorder.append(path)
-                    else:
-                        files[path].append(chunk)
-            except patch.PatchError:
-                pass
+                    if not isinstance(chunk, record.header):
+                        continue
+                    top = patch.parsefilename(chunk.header[-2])
+                    bot = patch.parsefilename(chunk.header[-1])
+                    type, path = get_path(top, bot)
+                    if path not in chunk.files():
+                        type, path = 0, chunk.files()[-1]
+                    if path not in files:
+                        self._status[type].append(path)
+                        files[path] = [chunk]
+                        self._fileorder.append(path)
+                    files[path].extend(chunk.hunks)
+            except patch.PatchError, e:
+                self._parseerror = e
+                if 'THGDEBUG' in os.environ:
+                    print e
         finally:
             pf.close()
         return files
