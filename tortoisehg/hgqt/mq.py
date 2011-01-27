@@ -399,7 +399,8 @@ class MQWidget(QWidget):
         for row in xrange(self.fileListWidget.count()):
             item = self.fileListWidget.item(row)
             if item.checkState() == Qt.Checked:
-                files.append(hglib.fromunicode(item.text()[2:]))
+                wfile = hglib.fromunicode(item.text()[2:])
+                files.append(self.repo.wjoin(wfile))
         if len(files) > 1:
             cmdline += files
         else:
