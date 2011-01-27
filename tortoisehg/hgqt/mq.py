@@ -600,18 +600,31 @@ class MQWidget(QWidget):
         self.fileListWidget.clear()
         pctx = self.repo.changectx('.')
         newmode = self.newCheckBox.isChecked()
-        M, A, R = self.repo[None].status()[:3]
+        # Get patch file lists
         if not newmode and 'qtip' in pctx.tags():
-            pm, pa, pr = self.repo.status(pctx.p1().node(), pctx.node())[:3]
-            M = set(pm) or set(M)
-            A = set(pa) or set(A)
-            R = set(pr) or set(R)
-        elif not newmode:
+            M, A, R = self.repo.status(pctx.p1().node(), pctx.node())[:3]
+            pm, pa, pr = set(M), set(A), set(R)
+        elif newmode:
+            pm, pa, pr = set(), set(), set()
+        else:
             return
+        # Get working directory file lists
+        M, A, R = self.repo[None].status()[:3]
+        for file in M:
+            if file not in pa and file not in pr:
+                pm.add(file)
+        for file in A:
+            pr.discard(file)
+            pm.discard(file)
+            pa.add(file)
+        for file in R:
+            pa.discard(file)
+            pm.discard(file)
+            pr.add(file)
         flags = Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
-        addfiles(u'M', M)
-        addfiles(u'A', A)
-        addfiles(u'R', R)
+        addfiles(u'M', pm)
+        addfiles(u'A', pa)
+        addfiles(u'R', pr)
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
