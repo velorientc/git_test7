@@ -19,8 +19,8 @@ from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
-from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress
-from tortoisehg.hgqt import qdelete, qreorder, qrename, qfold, shelve, qqueue
+from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
+from tortoisehg.hgqt import qdelete, qreorder, qrename, qfold, shelve
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
@@ -68,6 +68,7 @@ class RepoWidget(QWidget):
         self.branch = ''
         self.bundle = None
         self.revset = set()
+        self.namedTabs = {}
 
         if repo.parents()[0].rev() == -1:
             self._reload_rev = 'tip'
@@ -177,8 +178,22 @@ class RepoWidget(QWidget):
         self.syncTabIndex = idx = tt.addTab(w, geticon('view-refresh'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
+        self.mqDemand = w = DemandWidget(self.createMQWidget)
+        if 'mq' in self.repo.extensions():
+            self.mqTabIndex = idx = tt.addTab(w, geticon('reorder'), '')
+            tt.setTabToolTip(idx, _("Patch Queue"))
+            self.namedTabs['mq'] = idx
+
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
-        self.updatePatchBranchTab()
+        if 'pbranch' in self.repo.extensions():
+            self.pbranchTabIndex = idx = tt.addTab(w, geticon('branch'), '')
+            tt.setTabToolTip(idx, _("Patch Branch"))
+            self.namedTabs['pbranch'] = idx
+
+    def switchToNamedTaskTab(self, tabname):
+        if tabname in self.namedTabs:
+            idx = self.namedTabs[tabname]
+            self.taskTabsWidget.setCurrentIndex(idx)
 
     def title(self):
         """Returns the expected title for this widget [unicode]"""
@@ -364,22 +379,20 @@ class RepoWidget(QWidget):
         gw.revisionSelected.connect(self.goto)
         return gw
 
+    def createMQWidget(self):
+        mqw = mq.MQWidget(self.repo, self)
+        mqw.output.connect(self.output)
+        mqw.progress.connect(self.progress)
+        mqw.makeLogVisible.connect(self.makeLogVisible)
+        mqw.showMessage.connect(self.showMessage)
+        return mqw
+
     def createPatchBranchWidget(self):
         pbw = PatchBranchWidget(self.repo, parent=self)
         pbw.output.connect(self.output)
         pbw.progress.connect(self.progress)
         pbw.makeLogVisible.connect(self.makeLogVisible)
         return pbw
-
-    def updatePatchBranchTab(self):
-        "Only show pbranch tab when pbranch extension is installed"
-        tt = self.taskTabsWidget
-        w = self.pbranchDemand
-        self.pbranchTabIndex = idx = tt.indexOf(w)
-        if 'pbranch' in self.repo.extensions():
-            if idx == -1:
-                self.pbranchTabIndex = idx = tt.addTab(w, geticon('branch'), '')
-                tt.setTabToolTip(idx, _("Patch Branch"))
 
     def reponame(self):
         return self.repo.shortname
@@ -609,6 +622,8 @@ class RepoWidget(QWidget):
             ttw = self.grepDemand.get()
         elif tti == self.pbranchTabIndex:
             ttw = self.pbranchDemand.get()
+        elif tti == self.mqTabIndex:
+            ttw = self.mqDemand.get()
         if ttw:
             ttw.reload()
 
@@ -639,8 +654,6 @@ class RepoWidget(QWidget):
         'Repository is reporting its config files have changed'
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
-        self.updatePatchBranchTab()
-        # TODO: emit only if actually changed
         self.titleChanged.emit(self.title())
         vis = self.repo.ui.configbool('tortoisehg', 'tasktabs')
         self.taskTabsWidget.tabBar().setShown(vis)
@@ -791,8 +804,7 @@ class RepoWidget(QWidget):
                 (_('Rename patch'), self.qrenameRevision),
                 (_('Fold patches'), qfoldact),
                 (_('Delete patches'), qdeleteact),
-                (_('Reorder patches'), qreorderact),
-                (_('Manage patch queues'), self.qqueueManage)):
+                (_('Reorder patches'), qreorderact)):
                 act = QAction(name, self)
                 act.triggered.connect(cb)
                 acts.append(act)
@@ -821,7 +833,6 @@ class RepoWidget(QWidget):
             qpar    = lambda ap, up, qp, wd: qp
             applied = lambda ap, up, qp, wd: ap
             unapp   = lambda ap, up, qp, wd: up
-            allctx  = lambda ap, up, qp, wd: True
 
             exs = self.repo.extensions()
             menu = QMenu(self)
@@ -851,8 +862,6 @@ class RepoWidget(QWidget):
                 ('mq', patch, _('Goto patch'), None, self.qgotoRevision),
                 ('mq', patch, _('Rename patch'), None, self.qrenameRevision),
                 ('mq', fixed, _('Strip...'), None, self.stripRevision),
-                ('mq', allctx, _('Manage patch queues'), None,
-                        self.qqueueManage),
                 ('reviewboard', fixed, _('Post to Review Board...'),
                     'reviewboard', self.sendToReviewBoard)):
                 if ext and ext not in exs:
@@ -1104,13 +1113,6 @@ class RepoWidget(QWidget):
         """Rename the selected MQ patch"""
         patchname = self.repo.changectx(self.rev).thgmqpatchname()
         dlg = qrename.QRenameDialog(self.repo, patchname, self)
-        dlg.finished.connect(dlg.deleteLater)
-        dlg.output.connect(self.output)
-        dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.exec_()
-
-    def qqueueManage(self):
-        dlg = qqueue.QQueueDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)

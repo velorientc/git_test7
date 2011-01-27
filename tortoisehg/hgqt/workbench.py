@@ -221,10 +221,11 @@ class Workbench(QMainWindow):
         newseparator(menu='view')
 
         self.actionGroupTaskView = QActionGroup(self)
-        self.actionGroupTaskView.triggered.connect(self._switchRepoTaskTab)
-        def addtaskview(icon, label):
-            index = len(self.actionGroupTaskView.actions())
-            a = newaction(label, icon=icon, checkable=True, data=index,
+        self.actionGroupTaskView.triggered.connect(self.onSwitchRepoTaskTab)
+        def addtaskview(icon, label, data=None):
+            if data is None:
+                data = len(self.actionGroupTaskView.actions())
+            a = newaction(label, icon=icon, checkable=True, data=data,
                           enabled='repoopen', menu='view')
             self.actionGroupTaskView.addAction(a)
             self.tasktbar.addAction(a)
@@ -235,8 +236,10 @@ class Workbench(QMainWindow):
         addtaskview('annotate', _("&Manifest..."))
         addtaskview('repobrowse', _("&Search..."))
         addtaskview('view-refresh', _("S&ynchronize..."))
+        self.actionSelectTaskMQ = \
+                addtaskview('qreorder', _("Patch &Queue..."), 'mq')
         self.actionSelectTaskPbranch = \
-        addtaskview('branch', _("&Patch Branch..."))
+                addtaskview('branch', _("&Patch Branch..."), 'pbranch')
         newseparator(menu='view')
 
         newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
@@ -325,11 +328,14 @@ class Workbench(QMainWindow):
         self.updateMenu()
 
     @pyqtSlot(QAction)
-    def _switchRepoTaskTab(self, action):
+    def onSwitchRepoTaskTab(self, action):
         rw = self.repoTabsWidget.currentWidget()
         if not rw: return
-        index = action.data().toPyObject()
-        rw.taskTabsWidget.setCurrentIndex(index)
+        index, wasint = action.data().toInt()
+        if wasint:
+            rw.taskTabsWidget.setCurrentIndex(index)
+        else:
+            rw.switchToNamedTaskTab(str(action.data().toString()))
 
     def openRepo(self, repopath):
         """ Open repo by openRepoSignal from reporegistry """
@@ -412,16 +418,24 @@ class Workbench(QMainWindow):
 
 
     def updateTaskViewMenu(self, taskIndex=0):
-        # Fetch selected task tab from current repowidget and check corresponding action in menu
+        'Update task tab menu for current repository'
         if self.repoTabsWidget.count() == 0:
             for a in self.actionGroupTaskView.actions():
                 a.setChecked(False)
+            self.actionSelectTaskMQ.setVisible(False)
             self.actionSelectTaskPbranch.setVisible(False)
         else:
             repoWidget = self.repoTabsWidget.currentWidget()
-            self.actionSelectTaskPbranch.setVisible('pbranch' in repoWidget.repo.extensions())
+            exts = repoWidget.repo.extensions()
+            self.actionSelectTaskMQ.setVisible('mq' in exts)
+            self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
             taskIndex = repoWidget.taskTabsWidget.currentIndex()
-            self.actionGroupTaskView.actions()[taskIndex].setChecked(True)
+            if taskIndex <= 4: # count of standard task tabs
+                self.actionGroupTaskView.actions()[taskIndex].setChecked(True)
+            elif taskIndex == repoWidget.namedTabs.get('mq', None):
+                self.actionSelectTaskMQ.setChecked(True)
+            elif taskIndex == repoWidget.namedTabs.get('pbranch', None):
+                self.actionSelectTaskPbranch.setChecked(True)
 
     @pyqtSlot()
     def updateHistoryActions(self):
