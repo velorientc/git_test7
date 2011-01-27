@@ -403,10 +403,12 @@ class AnnotateDialog(QMainWindow):
     def storeSettings(self):
         s = QSettings()
         s.setValue('annotate/geom', self.saveGeometry())
+        self.av.saveSettings(s, 'annotate/av')
 
     def restoreSettings(self):
         s = QSettings()
         self.restoreGeometry(s.value('annotate/geom').toByteArray())
+        self.av.loadSettings(s, 'annotate/av')
 
 def run(ui, *pats, **opts):
     pats = hglib.canonpaths(pats)
