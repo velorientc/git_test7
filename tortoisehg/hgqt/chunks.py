@@ -369,6 +369,13 @@ class ChunksWidget(QWidget):
             ctx = self.repo.changectx(ctx.node())
         self.setContext(ctx)
 
+    def loadSettings(self, qs, prefix):
+        self.diffbrowse.loadSettings(qs, prefix)
+
+    def saveSettings(self, qs, prefix):
+        self.diffbrowse.saveSettings(qs, prefix)
+
+
 # DO NOT USE.  Sadly, this does not work.
 class ElideLabel(QLabel):
     def __init__(self, text='', parent=None):
@@ -444,11 +451,9 @@ class DiffBrowser(QFrame):
         self.sci.setFrameStyle(0)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
-        #self.sci.setWrapMode(qsci.WrapCharacter)
-
-        i = qscilib.KeyPressInterceptor(self, None, [QKeySequence.SelectAll,
-                                                     QKeySequence.New])
-        self.sci.installEventFilter(i)
+        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
+        self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.sci.customContextMenuRequested.connect(self.menuRequested)
         self.sci.setCaretLineVisible(False)
 
         self.sci.setMarginType(1, qsci.SymbolMargin)
@@ -470,6 +475,16 @@ class DiffBrowser(QFrame):
         lexer = lexers.get_diff_lexer(self)
         self.sci.setLexer(lexer)
         self.clearDisplay()
+
+    def menuRequested(self, point):
+        point = self.sci.mapToGlobal(point)
+        return self.sci.createStandardContextMenu().exec_(point)
+
+    def loadSettings(self, qs, prefix):
+        self.sci.loadSettings(qs, prefix)
+
+    def saveSettings(self, qs, prefix):
+        self.sci.saveSettings(qs, prefix)
 
     def updateSummary(self):
         self.sumlabel.setText(_('Chunks selected: %d / %d') % (

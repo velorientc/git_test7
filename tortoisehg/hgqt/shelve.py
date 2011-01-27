@@ -392,6 +392,8 @@ class ShelveDialog(QDialog):
         wb = "shelve/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'filesplitter', self.browsea.splitter.saveState())
+        self.browsea.saveSettings(s, wb + 'fileviewa')
+        self.browseb.saveSettings(s, wb + 'fileviewb')
 
     def restoreSettings(self):
         s = QSettings()
@@ -401,6 +403,8 @@ class ShelveDialog(QDialog):
                           s.value(wb + 'filesplitter').toByteArray())
         self.browseb.splitter.restoreState(
                           s.value(wb + 'filesplitter').toByteArray())
+        self.browsea.loadSettings(s, wb + 'fileviewa')
+        self.browseb.loadSettings(s, wb + 'fileviewb')
 
     def closeEvent(self, event):
         self.storeSettings()
