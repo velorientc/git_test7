@@ -105,7 +105,7 @@ class MessageEntry(qscilib.Scintilla):
 
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
-    commitButtonName = pyqtSignal(QString)
+    commitButtonEnable = pyqtSignal(bool)
     linkActivated = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
     commitComplete = pyqtSignal()
@@ -124,7 +124,6 @@ class CommitWidget(QWidget):
         self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
-        self.qref = False
         self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(_('Commit'), not embedded, self)
         self.runner.output.connect(self.output)
@@ -266,17 +265,10 @@ class CommitWidget(QWidget):
         self.stwidget.refreshWctx() # Trigger reload of working context
 
     def refresh(self):
-        # Update qrefresh mode
-        if self.opts.get('patchName'):
-            self.commitButtonName.emit(_('QNew'))
-        else:
-            if self.repo.changectx('.').thgmqappliedpatch():
-                self.initQRefreshMode()
-            else:
-                self.commitButtonName.emit(_('Commit'))
-                if self.qref:
-                    self.endQRefreshMode()
+        ispatch = self.repo.changectx('.').thgmqappliedpatch()
+        self.commitButtonEnable.emit(not ispatch)
         self.msgte.refresh(self.repo)
+
         # Update message list
         self.msgcombo.reset(self.msghistory)
 
@@ -293,25 +285,6 @@ class CommitWidget(QWidget):
         # Update parent csinfo widget
         self.pcsinfo.set_revision(None)
         self.pcsinfo.update()
-
-    def initQRefreshMode(self):
-        'Working parent is a patch.  Is it refreshable?'
-        qtip = self.repo['qtip']
-        if qtip != self.repo['.']:
-            self.showMessage.emit(_('Cannot refresh non-tip patch'))
-            self.commitButtonName.emit(_('N/A'))
-            return
-        self.commitButtonName.emit(_('QRefresh'))
-        self.opts['user'] = qtip.user()
-        self.opts['date'] = hglib.displaytime(qtip.date())
-        self.setMessage(hglib.tounicode(qtip.description()))
-        self.qref = True
-
-    def endQRefreshMode(self):
-        self.setMessage('')
-        self.opts['user'] = ''
-        self.opts['date'] = ''
-        self.qref = False
 
     def menuRequested(self, point):
         line = self.msgte.lineAt(point)
@@ -445,12 +418,7 @@ class CommitWidget(QWidget):
         self.msgte.saveSettings(s, 'commit/msgte')
         self.stwidget.saveSettings(s, 'commit/status')
         try:
-            if self.qref:
-                # don't store patch summary as current working comment
-                msg = ''
-            else:
-                # current message is stored in local encoding
-                msg = self.getMessage()
+            msg = self.getMessage()
             self.repo.opener('cur-message.txt', 'w').write(msg)
         except EnvironmentError:
             pass
@@ -537,8 +505,7 @@ class CommitWidget(QWidget):
             elif resp == 2:
                 return
         files = self.stwidget.getChecked('MAR?!S')
-        if not (files or brcmd or repo[None].branch() != repo['.'].branch() \
-                or self.qref):
+        if not (files or brcmd or repo[None].branch() != repo['.'].branch()):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
@@ -593,20 +560,8 @@ class CommitWidget(QWidget):
                 err = hglib.tounicode(str(e))
             self.showMessage.emit(err)
             dcmd = []
-        if self.opts.get('patchName'):
-            cmdline = ['qnew', '--repository', repo.root,
-                       '--verbose', '--user', user, '--message', msg.strip(),
-                       self.opts['patchName']
-                       ]
-        else:
-            cmdline = ['commit', '--repository', repo.root,
-                       '--verbose', '--user', user, '--message='+msg]
-            if self.qref:
-                cmdline[0] = 'qrefresh'
-                files = []
-
-        if len(repo.parents()) == 1 and not self.qref and not files:
-            cmdline += ['-X', repo.root]
+        cmdline = ['commit', '--repository', repo.root, '--verbose',
+                   '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
         for fname in self.opts.get('autoinc', '').split(','):
             fname = fname.strip()
@@ -628,13 +583,9 @@ class CommitWidget(QWidget):
             umsg = self.msgte.text()
             if umsg:
                 self.addMessageToHistory(umsg)
-            if not self.qref:
-                self.msgte.clear()
+            self.msgte.clear()
             self.msgte.setModified(False)
             self.commitComplete.emit()
-            if self.opts.get('patchName'):
-                self.opts['patchName'] = None
-                self.refresh()
         self.stwidget.refreshWctx()
 
     def keyPressEvent(self, event):
@@ -785,27 +736,6 @@ class DetailsDialog(QDialog):
         hbox.addWidget(autoincsave)
         layout.addLayout(hbox)
 
-        if 'mq' in self.repo.extensions():
-            hbox = QHBoxLayout()
-            self.patchcb = QCheckBox(_('New patch (QNew):'))
-            self.patchle = QLineEdit()
-            self.patchcb.toggled.connect(self.patchle.setEnabled)
-            self.patchcb.toggled.connect(lambda s:
-                    s and self.patchle.setFocus())
-
-            patchName = opts.get('patchName')
-            if patchName:
-                self.patchcb.setChecked(True)
-                self.patchle.setText(hglib.tounicode(patchName))
-                self.patchle.setEnabled(True)
-            else:
-                self.patchcb.setChecked(False)
-                self.patchle.setEnabled(False)
-            hbox.addWidget(self.patchcb)
-            hbox.addWidget(self.patchle)
-            layout.addStretch(10)
-            layout.addLayout(hbox)
-
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -929,11 +859,6 @@ class DetailsDialog(QDialog):
             outopts['pushafter'] = remote
         else:
             outopts['pushafter'] = ''
-        outopts['patchName'] = None
-        if 'mq' in self.repo.extensions() and self.patchcb.isChecked():
-            patchName = self.patchle.text().simplified()
-            if patchName:
-                outopts['patchName'] = hglib.fromunicode(patchName)
 
         self.outopts = outopts
         QDialog.accept(self)
@@ -971,6 +896,7 @@ class CommitDialog(QDialog):
         bb.button(BB.Cancel).setDefault(False)
         bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Ok).setDefault(True)
+        self.commitButton = bb.button(BB.Ok)
         self.bb = bb
 
         hbox = QHBoxLayout()
@@ -985,7 +911,7 @@ class CommitDialog(QDialog):
         commit.loadSettings(s)
         commit.repo.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
-        commit.commitButtonName.connect(self.setButtonName)
+        commit.commitButtonEnable.connect(self.commitButton.setEnabled)
 
         self.setWindowTitle('%s - commit' % commit.repo.displayname)
         self.commit = commit
@@ -1006,9 +932,6 @@ class CommitDialog(QDialog):
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.refresh()
-
-    def setButtonName(self, name):
-        self.bb.button(QDialogButtonBox.Ok).setText(name)
 
     def updateUndo(self):
         BB = QDialogButtonBox

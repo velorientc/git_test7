@@ -249,14 +249,11 @@ class RepoWidget(QWidget):
             b.setFont(f)
             cw = CommitWidget(pats, opts, self.repo.root, True, self)
             cw.buttonHBox.addWidget(b)
-            cw.commitButtonName.connect(lambda n: b.setText(n))
+            cw.commitButtonEnable.connect(b.setEnabled)
             b.clicked.connect(cw.commit)
             cw.loadSettings(QSettings())
             QTimer.singleShot(0, cw.reload)
             self.repo._commitwidget = cw
-
-        # connect directly in order to reload all related RepoWidgets
-        #cw.commitComplete.connect(self.reload)
 
         cw = SharedWidget(cw)
         cw.output.connect(self.output)
