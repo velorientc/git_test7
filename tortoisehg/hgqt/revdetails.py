@@ -342,6 +342,7 @@ class RevDetailsWidget(QWidget):
         for n in self.splitternames:
             s.setValue(wb + n, getattr(self, n).saveState())
         s.setValue(wb + 'revpanel.expanded', self.revpanel.is_expanded())
+        self.fileview.saveSettings(s, 'revpanel/fileview')
 
     def restoreSettings(self):
         s = QSettings()
@@ -350,3 +351,4 @@ class RevDetailsWidget(QWidget):
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
         expanded = s.value(wb + 'revpanel.expanded', False).toBool()
         self.revpanel.set_expanded(expanded)
+        self.fileview.loadSettings(s, 'revpanel/fileview')
