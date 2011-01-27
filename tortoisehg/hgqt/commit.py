@@ -20,6 +20,7 @@ from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
 from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
+#  disable commit button while no message is entered or no files are selected
 #  qtlib decode failure dialog (ask for retry locale, suggest HGENCODING)
 #  spell check / tab completion
 #  in-memory patching / committing chunk selected files
