@@ -179,12 +179,16 @@ class RepoWidget(QWidget):
             self.mqTabIndex = idx = tt.addTab(w, geticon('qreorder'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
             self.namedTabs['mq'] = idx
+        else:
+            self.mqTabIndex = -1
 
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
         if 'pbranch' in self.repo.extensions():
             self.pbranchTabIndex = idx = tt.addTab(w, geticon('branch'), '')
             tt.setTabToolTip(idx, _("Patch Branch"))
             self.namedTabs['pbranch'] = idx
+        else:
+            self.pbranchTabIndex = -1
 
     def switchToNamedTaskTab(self, tabname):
         if tabname in self.namedTabs:
