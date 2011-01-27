@@ -264,7 +264,7 @@ class QQueueDialog(QDialog):
     def qqueueAdd(self):
         title = _('TortoiseHg Prompt')
         # this is the only way I found to make that dialog wide enough :(
-        label = QString(_('New patch queue name') + (' ' * 30))
+        label = _('New patch queue name') + (u' ' * 30)
         # WindowContextHelpButton still there :( after this ?
         dlg = QInputDialog(self, Qt.WindowFlags()
                               & ~Qt.WindowContextHelpButtonHint)
@@ -280,7 +280,7 @@ class QQueueDialog(QDialog):
             return
         title = _('TortoiseHg Prompt')
         # this is the only way I found to make that dialog wide enough :(
-        label = QString(_('Rename patch queue \'%s\' to' % q) + (' ' * 30))
+        label = _('Rename patch queue \'%s\' to' % q) + (u' ' * 30)
         # WindowContextHelpButton still there :( after this ?
         dlg = QInputDialog(self, Qt.WindowFlags()
                               & ~Qt.WindowContextHelpButtonHint)
