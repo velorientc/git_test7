@@ -725,15 +725,13 @@ class RepoWidget(QWidget):
 
     def qpush(self):
         """QPush a patch from MQ"""
-        cmdline = ['qpush',
-                   '--repository', self.repo.root]
-        self.runCommand(_('QPush - TortoiseHg'), cmdline)
+        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
+        self.mqDemand.get().onPush()
 
     def qpop(self):
         """QPop a patch from MQ"""
-        cmdline = ['qpop',
-                   '--repository', self.repo.root]
-        self.runCommand(_('QPop - TortoiseHg'), cmdline)
+        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
+        self.mqDemand.get().onPop()
 
     ##
     ## Repoview context menu
@@ -1099,9 +1097,8 @@ class RepoWidget(QWidget):
 
     def qpopAllRevision(self):
         """Unapply all patches"""
-        cmdline = ['qpop', '--all',
-                   '--repository', self.repo.root]
-        self.runCommand(_('QPop All - TortoiseHg'), cmdline)
+        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
+        self.mqDemand.get().onPopAll()
 
     def qgotoRevision(self):
         """Make REV the top applied patch"""
