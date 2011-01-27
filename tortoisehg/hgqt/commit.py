@@ -30,7 +30,6 @@ class MessageEntry(qscilib.Scintilla):
         super(MessageEntry, self).__init__(parent)
         self.setEdgeColor(QColor('LightSalmon'))
         self.setEdgeMode(QsciScintilla.EdgeLine)
-        self.setWrapMode(QsciScintilla.WrapNone)
         self.setReadOnly(False)
         self.setMarginWidth(1, 0)
         self.setFont(qtlib.getfont('fontcomment').font())
@@ -52,19 +51,12 @@ class MessageEntry(qscilib.Scintilla):
         # http://www.riverbankcomputing.com/pipermail/qscintilla/2009-February/000461.html
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.setWrapMode(QsciScintilla.WrapCharacter)
 
     def refresh(self, repo):
         self.setEdgeColumn(repo.summarylen)
         self.setIndentationWidth(repo.tabwidth)
         self.setTabWidth(repo.tabwidth)
         self.summarylen = repo.summarylen
-        if repo.wsvisible == 'Visible':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
-        elif repo.wsvisible == 'VisibleAfterIndent':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
-        else:
-            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
 
     def reflowBlock(self, line):
         lines = self.text().split('\n', QString.KeepEmptyParts)
@@ -436,6 +428,7 @@ class CommitWidget(QWidget):
         self.msgcombo.reset(self.msghistory)
         self.userhist = s.value('commit/userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
+        self.msgte.loadSettings(s, 'commit/msgte')
         try:
             curmsg = self.repo.opener('cur-message.txt').read()
             self.setMessage(hglib.tounicode(curmsg))
@@ -454,6 +447,7 @@ class CommitWidget(QWidget):
         s.setValue('commit/history-'+repoid, self.msghistory)
         s.setValue('commit/split', self.split.saveState())
         s.setValue('commit/userhist', self.userhist)
+        self.msgte.saveSettings(s, 'commit/msgte')
         try:
             if self.qref:
                 # don't store patch summary as current working comment
