@@ -20,6 +20,8 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, shelve, qscilib
 from tortoisehg.hgqt import qqueue
 
+# TODO: Disable MQ toolbar while cmdui.Runner is busy
+
 class MQWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     output = pyqtSignal(QString, QString)
@@ -230,6 +232,8 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def onPushAll(self):
+        if self.cmd.running():
+            return
         self.repo.incrementBusyCount()
         cmdline = ['qpush', '-R', self.repo.root, '--all']
         cmdline += self.getUserOptions('force', 'exact')
@@ -237,6 +241,8 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def onPush(self):
+        if self.cmd.running():
+            return
         self.repo.incrementBusyCount()
         cmdline = ['qpush', '-R', self.repo.root]
         cmdline += self.getUserOptions('force', 'exact')
@@ -244,6 +250,8 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def onPopAll(self):
+        if self.cmd.running():
+            return
         self.repo.incrementBusyCount()
         cmdline = ['qpop', '-R', self.repo.root, '--all']
         cmdline += self.getUserOptions('force')
@@ -251,6 +259,8 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def onPop(self):
+        if self.cmd.running():
+            return
         self.repo.incrementBusyCount()
         cmdline = ['qpop', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
@@ -258,6 +268,8 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def onPushMove(self):
+        if self.cmd.running():
+            return
         patch = self.queueListWidget.currentItem()._thgpatch
         cmdline = ['qpop', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
@@ -293,6 +305,8 @@ class MQWidget(QWidget):
             cmdline += guards
         else:
             cmdline.insert(3, '--none')
+        if self.cmd.running():
+            return
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
@@ -308,6 +322,8 @@ class MQWidget(QWidget):
     #@pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
         'Patch has been activated (return), issue qgoto'
+        if self.cmd.running():
+            return
         cmdline = ['qgoto', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
         cmdline += ['--', item._thgpatch]
@@ -317,6 +333,8 @@ class MQWidget(QWidget):
     #@pyqtSlot(QListWidgetItem)
     def onRenamePatch(self, item):
         'Patch has been renamed, issue qrename'
+        if self.cmd.running():
+            return
         self.repo.incrementBusyCount()
         self.cmd.run(['qrename', '-R', self.repo.root, '--',
                       item._thgpatch, hglib.fromunicode(item.text())])
