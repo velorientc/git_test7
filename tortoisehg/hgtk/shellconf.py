@@ -108,6 +108,18 @@ class ShellConfigWindow(gtk.Window):
         subbutton.connect('clicked', self.sub_clicked)
         mbbox.add(subbutton)
 
+        # menu behavior group
+        mbframe = gtk.Frame(_('Menu Behavior'))
+        mbframe.set_border_width(2)
+        cmenuvbox.pack_start(mbframe, True, True, 2)
+
+        mbbox = gtk.VBox()
+        mbframe.add(mbbox)
+        hbox = gtk.HBox()
+        mbbox.pack_start(hbox, False, False, 2)
+        self.hide_context_menu = gtk.CheckButton(_('Hide context menu outside repositories'))
+        hbox.pack_start(self.hide_context_menu, False, False, 2)
+
         # Icons page
         iconsframe = self.add_page(notebook, _('Icons'))
         iconsvbox = gtk.VBox()
@@ -194,6 +206,9 @@ class ShellConfigWindow(gtk.Window):
         # Tooltips
         tips = gtklib.Tooltips()
 
+        tooltip = _('Do not show menu items on unversioned folders' 
+                    ' (use shift + click to override)')
+        tips.set_tip(self.hide_context_menu, tooltip)
         tooltip = _('Show overlay icons in Mercurial repositories')
         tips.set_tip(self.ovenable, tooltip)
         self.ovenable.connect('toggled', self.ovenable_toggled)
@@ -258,6 +273,7 @@ class ShellConfigWindow(gtk.Window):
         return frame
 
     def load_shell_configs(self):
+        hide_context_menu = False
         overlayenable = True
         localdisks = False
         promoteditems = 'commit'
@@ -273,6 +289,8 @@ class ShellConfigWindow(gtk.Window):
             from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
             hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
             t = ('1', 'True')
+            try: hide_context_menu = QueryValueEx(hkey, 'HideMenuOutsideRepo')[0] in t
+            except EnvironmentError: pass
             try: overlayenable = QueryValueEx(hkey, 'EnableOverlays')[0] in t
             except EnvironmentError: pass
             try: localdisks = QueryValueEx(hkey, 'LocalDisksOnly')[0] in t
@@ -300,6 +318,7 @@ class ShellConfigWindow(gtk.Window):
         except (ImportError, WindowsError):
             pass
 
+        self.hide_context_menu.set_active(hide_context_menu)
         self.ovenable.set_active(overlayenable)
         self.lclonly.set_active(localdisks)
         self.lclonly.set_sensitive(overlayenable)
@@ -325,6 +344,7 @@ class ShellConfigWindow(gtk.Window):
         self.topmmodel.set_sort_column_id(1, gtk.SORT_ASCENDING)
 
     def store_shell_configs(self):
+        hide_context_menu = self.hide_context_menu.get_active() and '1' or '0'
         overlayenable = self.ovenable.get_active() and '1' or '0'
         localdisks = self.lclonly.get_active() and '1' or '0'
         show_taskbaricon = self.show_taskbaricon.get_active() and '1' or '0'
@@ -341,6 +361,7 @@ class ShellConfigWindow(gtk.Window):
         try:
             from _winreg import HKEY_CURRENT_USER, CreateKey, SetValueEx, REG_SZ, REG_DWORD
             hkey = CreateKey(HKEY_CURRENT_USER, r"Software\TortoiseHg")
+            SetValueEx(hkey, 'HideMenuOutsideRepo', 0, REG_SZ, hide_context_menu)
             SetValueEx(hkey, 'EnableOverlays', 0, REG_SZ, overlayenable)
             SetValueEx(hkey, 'LocalDisksOnly', 0, REG_SZ, localdisks)
             SetValueEx(hkey, 'ShowTaskbarIcon', 0, REG_SZ, show_taskbaricon)

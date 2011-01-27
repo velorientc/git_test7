@@ -472,8 +472,12 @@ CShellExtCMenu::QueryContextMenu(
         /* shift key is not down */
         if (!isHgrepo)
         {
-            /* We are not inside a repo -> don't show thg menu entries */
-            return S_OK;
+            std::string cval;
+            if (GetRegistryConfig("HideMenuOutsideRepo", cval) != 0 && cval == "1")
+            {
+                /* We are not inside a repo -> don't show thg menu entries */
+                return S_OK;
+            }
         }
     }
 
