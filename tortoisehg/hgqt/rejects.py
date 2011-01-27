@@ -36,6 +36,8 @@ class RejectsDialog(QDialog):
         editor.setMarginWidth(1, '000')
         editor.setFolding(qsci.BoxedTreeFoldStyle)
         editor.installEventFilter(qscilib.KeyPressInterceptor(self))
+        editor.setContextMenuPolicy(Qt.CustomContextMenu)
+        editor.customContextMenuRequested.connect(self.menuRequested)
         self.baseLineColor = editor.markerDefine(qsci.Background, -1)
         editor.setMarkerBackgroundColor(QColor('lightblue'), self.baseLineColor)
         self.layout().addWidget(editor, 3)
@@ -74,6 +76,7 @@ class RejectsDialog(QDialog):
         bvbox.addStretch(1)
         hbox.addLayout(bvbox, 0)
 
+        self.editor = editor
         self.rejectbrowser = RejectBrowser(self)
         hbox.addWidget(self.rejectbrowser, 5)
 
@@ -86,6 +89,8 @@ class RejectsDialog(QDialog):
 
         s = QSettings()
         self.restoreGeometry(s.value('rejects/geometry').toByteArray())
+        self.editor.loadSettings(s, 'rejects/editor')
+        self.rejectbrowser.loadSettings(s, 'rejects/rejbrowse')
 
         f = QFile(path)
         f.open(QIODevice.ReadOnly)
@@ -93,7 +98,6 @@ class RejectsDialog(QDialog):
         editor.setModified(False)
         lexer = lexers.get_lexer(path, f.readData(1024), self)
         editor.setLexer(lexer)
-        self.editor = editor
 
         buf = cStringIO.StringIO()
         try:
@@ -105,7 +109,7 @@ class RejectsDialog(QDialog):
         try:
             header = record.parsepatch(buf)[0]
             self.chunks = header.hunks
-        except patch.PatchError, e:
+        except (patch.PatchError, IndexError), e:
             self.chunks = []
 
         for chunk in self.chunks:
@@ -115,6 +119,10 @@ class RejectsDialog(QDialog):
         self.resolved.setDisabled(True)
         self.unresolved.setDisabled(True)
         QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
+
+    def menuRequested(self, point):
+        point = self.editor.mapToGlobal(point)
+        return self.editor.createStandardContextMenu().exec_(point)
 
     def updateChunkList(self):
         self.updating = True
@@ -165,6 +173,8 @@ class RejectsDialog(QDialog):
     def saveSettings(self):
         s = QSettings()
         s.setValue('rejects/geometry', self.saveGeometry())
+        self.editor.saveSettings(s, 'rejects/editor')
+        self.rejectbrowser.saveSettings(s, 'rejects/rejbrowse')
 
     def accept(self):
         f = QFile(self.path)
@@ -187,6 +197,8 @@ class RejectBrowser(qscilib.Scintilla):
         self.setUtf8(True)
 
         self.installEventFilter(qscilib.KeyPressInterceptor(self))
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menuRequested)
         self.setCaretLineVisible(False)
 
         self.setMarginType(1, qsci.SymbolMargin)
@@ -204,6 +216,10 @@ class RejectBrowser(qscilib.Scintilla):
         self.setMarginMarkerMask(1, mask)
         lexer = lexers.get_diff_lexer(self)
         self.setLexer(lexer)
+
+    def menuRequested(self, point):
+        point = self.mapToGlobal(point)
+        return self.createStandardContextMenu().exec_(point)
 
     def showChunk(self, lines):
         utext = []
