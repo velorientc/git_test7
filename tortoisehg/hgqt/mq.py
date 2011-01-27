@@ -392,7 +392,7 @@ class MQWidget(QWidget):
             cmdline = ['qrefresh', '--repository', self.repo.root]
         message = self.messageEditor.text()
         if message:
-            cmdline += ['--message', hglib.fromunicode(message)]
+            cmdline += ['--message=' + hglib.fromunicode(message)]
         cmdline += self.getUserOptions('user', 'currentuser', 'git',
                                        'date', 'currentdate')
         files = ['--']
