@@ -125,6 +125,8 @@ class MQWidget(QWidget):
 
         self.messageEditor = commit.MessageEntry(self)
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
+        self.messageEditor.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.messageEditor.customContextMenuRequested.connect(self.menuRequested)
         self.messageEditor.refresh(repo)
         layout.addWidget(self.messageEditor, 1)
 
@@ -189,6 +191,10 @@ class MQWidget(QWidget):
 
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
+
+    def menuRequested(self, point):
+        point = self.messageEditor.mapToGlobal(point)
+        return self.messageEditor.createStandardContextMenu().exec_(point)
 
     def getUserOptions(self, *optionlist):
         out = []
@@ -645,6 +651,7 @@ class MQWidget(QWidget):
         self.splitter.restoreState(s.value('mq/splitter').toByteArray())
         userhist = s.value('commit/userhist').toStringList()
         self.opts['userhist'] = [hglib.fromunicode(u) for u in userhist if u]
+        self.messageEditor.loadSettings(s, 'mq/editor')
         if not self.parent():
             self.restoreGeometry(s.value('mq/geom').toByteArray())
 
@@ -652,6 +659,7 @@ class MQWidget(QWidget):
         'Save history, etc, in QSettings instance'
         s = QSettings()
         s.setValue('mq/splitter', self.splitter.saveState())
+        self.messageEditor.saveSettings(s, 'mq/editor')
         if not self.parent():
             s.setValue('mq/geom', self.saveGeometry())
 
