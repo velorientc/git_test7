@@ -827,6 +827,9 @@ class Runner(QWidget):
     def run(self, cmdline, *args, **opts):
         self.core.run(cmdline, *args, **opts)
 
+    def running(self):
+        return self.core.running()
+
     def cancel(self):
         self.core.cancel()
 
