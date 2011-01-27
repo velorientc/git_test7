@@ -342,12 +342,6 @@ class CommitWidget(QWidget):
             add(name, func)
         return menu.exec_(point)
 
-    def restoreState(self, data):
-        return self.stwidget.restoreState(data)
-
-    def saveState(self):
-        return self.stwidget.saveState()
-
     def branchOp(self):
         d = branchop.BranchOpDialog(self.repo, self.branchop, self)
         d.setWindowFlags(Qt.Sheet)
@@ -418,7 +412,7 @@ class CommitWidget(QWidget):
         # files partially selected.
         return not self.runner.core.running()
 
-    def loadConfigs(self, s):
+    def loadSettings(self, s):
         'Load history, etc, from QSettings instance'
         repoid = str(self.repo[0])
         # message history is stored in unicode
@@ -429,6 +423,7 @@ class CommitWidget(QWidget):
         self.userhist = s.value('commit/userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
         self.msgte.loadSettings(s, 'commit/msgte')
+        self.stwidget.loadSettings(s, 'commit/status')
         try:
             curmsg = self.repo.opener('cur-message.txt').read()
             self.setMessage(hglib.tounicode(curmsg))
@@ -441,13 +436,14 @@ class CommitWidget(QWidget):
         except EnvironmentError:
             pass
 
-    def storeConfigs(self, s):
+    def saveSettings(self, s):
         'Save history, etc, in QSettings instance'
         repoid = str(self.repo[0])
         s.setValue('commit/history-'+repoid, self.msghistory)
         s.setValue('commit/split', self.split.saveState())
         s.setValue('commit/userhist', self.userhist)
         self.msgte.saveSettings(s, 'commit/msgte')
+        self.stwidget.saveSettings(s, 'commit/status')
         try:
             if self.qref:
                 # don't store patch summary as current working comment
@@ -985,9 +981,8 @@ class CommitDialog(QDialog):
         layout.addLayout(hbox)
 
         s = QSettings()
-        commit.restoreState(s.value('commit/state').toByteArray())
         self.restoreGeometry(s.value('commit/geom').toByteArray())
-        commit.loadConfigs(s)
+        commit.loadSettings(s)
         commit.repo.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonName.connect(self.setButtonName)
@@ -1041,9 +1036,8 @@ class CommitDialog(QDialog):
     def reject(self):
         if self.commit.canExit():
             s = QSettings()
-            s.setValue('commit/state', self.commit.saveState())
             s.setValue('commit/geom', self.saveGeometry())
-            self.commit.storeConfigs(s)
+            self.commit.saveSettings(s)
             QDialog.reject(self)
 
 def run(ui, *pats, **opts):

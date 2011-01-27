@@ -190,11 +190,13 @@ class StatusWidget(QWidget):
         else:
             return _('%s - status') % self.repo.displayname
 
-    def restoreState(self, data):
-        return self.split.restoreState(data)
+    def loadSettings(self, qs, prefix):
+        self.fileview.loadSettings(qs, prefix+'/fileview')
+        self.split.restoreState(qs.value(prefix+'/state').toByteArray())
 
-    def saveState(self):
-        return self.split.saveState()
+    def saveSettings(self, qs, prefix):
+        self.fileview.saveSettings(qs, prefix+'/fileview')
+        qs.setValue(prefix+'/state', self.split.saveState())
 
     def refreshWctx(self):
         if self.refreshing:
@@ -684,7 +686,7 @@ class StatusDialog(QDialog):
         layout.addWidget(self.stwidget, 1)
 
         s = QSettings()
-        self.stwidget.restoreState(s.value('status/state').toByteArray())
+        self.stwidget.loadSettings(s, 'status')
         self.restoreGeometry(s.value('status/geom').toByteArray())
 
         self.statusbar = cmdui.ThgStatusBar(self)
@@ -716,13 +718,13 @@ class StatusDialog(QDialog):
 
     def accept(self):
         s = QSettings()
-        s.setValue('status/state', self.stwidget.saveState())
+        self.stwidget.saveSettings(s, 'status')
         s.setValue('status/geom', self.saveGeometry())
         QDialog.accept(self)
 
     def reject(self):
         s = QSettings()
-        s.setValue('status/state', self.stwidget.saveState())
+        self.stwidget.saveSettings(s, 'status')
         s.setValue('status/geom', self.saveGeometry())
         QDialog.reject(self)
 
