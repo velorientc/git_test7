@@ -137,9 +137,9 @@ class HgFileView(QFrame):
         #self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
-        self.sci.setWrapMode(qsci.WrapCharacter)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
-
+        self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.sci.customContextMenuRequested.connect(self.menuRequested)
         self.sci.setCaretLineVisible(False)
 
         if hasattr(self.sci, 'indicatorDefine'):
@@ -209,6 +209,16 @@ class HgFileView(QFrame):
         self.timer.setSingleShot(False)
         self.timer.timeout.connect(self.idle_fill_files)
 
+    def menuRequested(self, point):
+        point = self.sci.mapToGlobal(point)
+        return self.sci.createStandardContextMenu().exec_(point)
+
+    def loadSettings(self, qs, prefix):
+        self.sci.loadSettings(qs, prefix)
+
+    def saveSettings(self, qs, prefix):
+        self.sci.saveSettings(qs, prefix)
+
     def resizeEvent(self, event):
         QFrame.resizeEvent(self, event)
         h = self.sci.horizontalScrollBar().height()
@@ -241,12 +251,6 @@ class HgFileView(QFrame):
         self._ctx = ctx
         self._p_rev = None
         self.sci.setTabWidth(ctx._repo.tabwidth)
-        if ctx._repo.wsvisible == 'Visible':
-            self.sci.setWhitespaceVisibility(qsci.WsVisible)
-        elif ctx._repo.wsvisible == 'VisibleAfterIndent':
-            self.sci.setWhitespaceVisibility(qsci.WsVisibleAfterIndent)
-        else:
-            self.sci.setWhitespaceVisibility(qsci.WsInvisible)
 
     def rev(self):
         return self._ctx.rev()
