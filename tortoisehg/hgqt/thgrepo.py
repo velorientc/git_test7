@@ -202,7 +202,7 @@ class ThgRepoWrapper(QObject):
         except (EnvironmentError, ValueError):
             pass
 
-_uiprops = '''_uifiles _uimtime _shell postpull tabwidth wsvisible maxdiff
+_uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools bookmarks bookmarkcurrent'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
@@ -321,14 +321,6 @@ def _extendrepo(repo):
                 return max(tw, 2)
             except (ValueError, TypeError):
                 return 8
-
-        @propertycache
-        def wsvisible(self):
-            val = self.ui.config('tortoisehg', 'wsvisible')
-            if val in ('Visible', 'VisibleAfterIndent'):
-                return val
-            else:
-                return 'Invisible'
 
         @propertycache
         def maxdiff(self):

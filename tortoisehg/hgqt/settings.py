@@ -296,10 +296,6 @@ INFO = (
         _('The period (in milliseconds) between modification time polling of '
           'key repository files, looking for changes.  Values under '
           '100ms are ignored.  Default: 500')),
-    _fi(_('Visible Whitespace'), 'tortoisehg.wsvisible', (genDefaultCombo,
-        ['Visible', 'Invisible', 'VisibleAfterIndent']),
-        _('Make whitespace visible in file and diff previews.'
-          ' Default: Invisible')),
     _fi(_('Tab Width'), 'tortoisehg.tabwidth', genIntEditCombo,
         _('Specify the number of spaces that tabs expand to in various'
         ' TortoiseHg windows.'
