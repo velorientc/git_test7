@@ -255,7 +255,7 @@ class RepoWidget(QWidget):
             cw.buttonHBox.addWidget(b)
             cw.commitButtonName.connect(lambda n: b.setText(n))
             b.clicked.connect(cw.commit)
-            cw.loadConfigs(QSettings())
+            cw.loadSettings(QSettings())
             QTimer.singleShot(0, cw.reload)
             self.repo._commitwidget = cw
 
@@ -702,7 +702,7 @@ class RepoWidget(QWidget):
             self.storeSettings()
         self.revDetailsWidget.storeSettings()
         s = QSettings()
-        self.commitDemand.forward('storeConfigs', s)
+        self.commitDemand.forward('saveSettings', s)
         self.filterbar.storeConfigs(s)
         return True
 
