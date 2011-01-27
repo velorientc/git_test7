@@ -146,15 +146,11 @@ class RepoWidget(QWidget):
         self.repotabs_splitter.setCollapsible(0, False)
         self.repotabs_splitter.setStretchFactor(0, 1)
 
-        tt = QTabWidget()
-        tt.setDocumentMode(True)
-        tt.setTabPosition(QTabWidget.East)
-        if not self.repo.ui.configbool('tortoisehg', 'tasktabs'):
-            tt.tabBar().hide()
-
-        self.taskTabsWidget = tt
+        self.taskTabsWidget = tt = QTabWidget()
         self.repotabs_splitter.addWidget(self.taskTabsWidget)
         self.repotabs_splitter.setStretchFactor(1, 1)
+        tt.setDocumentMode(True)
+        self.updateTaskTabs()
 
         self.revDetailsWidget = w = RevDetailsWidget(self.repo)
         w.linkActivated.connect(self._openLink)
@@ -180,7 +176,7 @@ class RepoWidget(QWidget):
 
         self.mqDemand = w = DemandWidget(self.createMQWidget)
         if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, geticon('reorder'), '')
+            self.mqTabIndex = idx = tt.addTab(w, geticon('qreorder'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
             self.namedTabs['mq'] = idx
 
@@ -655,8 +651,16 @@ class RepoWidget(QWidget):
         self.repomodel.invalidate()
         self.revDetailsWidget.reload()
         self.titleChanged.emit(self.title())
-        vis = self.repo.ui.configbool('tortoisehg', 'tasktabs')
-        self.taskTabsWidget.tabBar().setShown(vis)
+        self.updateTaskTabs()
+
+    def updateTaskTabs(self):
+        val = self.repo.ui.config('tortoisehg', 'tasktabs', 'off').lower()
+        if val == 'east':
+            self.taskTabsWidget.setTabPosition(QTabWidget.East)
+        elif val == 'west':
+            self.taskTabsWidget.setTabPosition(QTabWidget.West)
+        else:
+            self.taskTabsWidget.tabBar().hide()
 
     @pyqtSlot(unicode, bool)
     def setBranch(self, branch, allparents=True):
