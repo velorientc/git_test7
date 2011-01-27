@@ -65,12 +65,6 @@ class AnnotateView(qscilib.Scintilla):
     def configChanged(self):
         self.setIndentationWidth(self.repo.tabwidth)
         self.setTabWidth(self.repo.tabwidth)
-        if self.repo.wsvisible == 'Visible':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisible)
-        elif self.repo.wsvisible == 'VisibleAfterIndent':
-            self.setWhitespaceVisibility(QsciScintilla.WsVisibleAfterIndent)
-        else:
-            self.setWhitespaceVisibility(QsciScintilla.WsInvisible)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
