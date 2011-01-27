@@ -188,8 +188,35 @@ class Scintilla(QsciScintilla):
         self._stdMenu.addSeparator()
         self._stdMenu.addAction(_('Select All'),
                                 self.selectAll, QKeySequence.SelectAll)
-
+        self._stdMenu.addSeparator()
+        qsci = QsciScintilla
+        wrapmenu = QMenu(_('Wrap'), self)
+        for name, mode in ((_('None'), qsci.WrapNone),
+                           (_('Word'), qsci.WrapWord),
+                           (_('Character'), qsci.WrapCharacter)):
+            def mkaction(n, m):
+                a = wrapmenu.addAction(n)
+                a.triggered.connect(lambda: self.setWrapMode(m))
+            mkaction(name, mode)
+        wsmenu = QMenu(_('Whitespace'), self)
+        for name, mode in ((_('Visible'), qsci.WsVisible),
+                           (_('Invisible'), qsci.WsInvisible),
+                           (_('AfterIndent'), qsci.WsVisibleAfterIndent)):
+            def mkaction(n, m):
+                a = wsmenu.addAction(n)
+                a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
+            mkaction(name, mode)
+        self._stdMenu.addMenu(wrapmenu)
+        self._stdMenu.addMenu(wsmenu)
         return self._stdMenu
+
+    def saveSettings(self, qs, prefix):
+        qs.setValue(prefix+'/wrap', self.wrapMode())
+        qs.setValue(prefix+'/whitespace', self.whitespaceVisibility())
+
+    def loadSettings(self, qs, prefix):
+        self.setWrapMode(qs.value(prefix+'/wrap').toInt()[0])
+        self.setWhitespaceVisibility(qs.value(prefix+'/whitespace').toInt()[0])
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
