@@ -541,12 +541,6 @@ class DiffBrowser(QFrame):
     def setContext(self, ctx):
         self._ctx = ctx
         self.sci.setTabWidth(ctx._repo.tabwidth)
-        if ctx._repo.wsvisible == 'Visible':
-            self.sci.setWhitespaceVisibility(qsci.WsVisible)
-        elif ctx._repo.wsvisible == 'VisibleAfterIndent':
-            self.sci.setWhitespaceVisibility(qsci.WsVisibleAfterIndent)
-        else:
-            self.sci.setWhitespaceVisibility(qsci.WsInvisible)
 
     def clearDisplay(self):
         self.sci.clear()
