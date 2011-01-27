@@ -178,13 +178,11 @@ class QQueueDialog(QDialog):
     @pyqtSlot()
     def reload(self):
         def reloadFinished():
-            self.repo.decrementBusyCount()
             output = self.cmdlist.core.rawoutput()
             self.showQueues(output)
             self.updateUI()
         cmdline = ['qqueue', '--repository', self.repo.root, '--list']
         self.cmdlist.commandFinished.connect(reloadFinished)
-        self.repo.incrementBusyCount()
         self.cmdlist.run(cmdline)
 
     # This seems to return the cached data as it was just before the last
@@ -208,8 +206,7 @@ class QQueueDialog(QDialog):
         row_activeq = 0
         for i, q in enumerate(queues):
             item = QListWidgetItem(q)
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled
-                          | Qt.ItemIsDragEnabled)
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.ql.addItem(item)
             if self.itemfont == None:
                 self.itemfont = item.font()
