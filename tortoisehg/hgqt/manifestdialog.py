@@ -29,12 +29,12 @@ class ManifestDialog(QMainWindow):
 
     finished = pyqtSignal(int)
 
-    def __init__(self, ui, repo, rev=None, parent=None):
+    def __init__(self, repo, rev=None, parent=None):
         QMainWindow.__init__(self, parent)
         self._repo = repo
         self.resize(400, 300)
 
-        self._manifest_widget = ManifestWidget(ui, repo, rev)
+        self._manifest_widget = ManifestWidget(repo, rev)
         self._manifest_widget.revChanged.connect(self._updatewindowtitle)
         self._manifest_widget.pathChanged.connect(self._updatewindowtitle)
         self._manifest_widget.editSelected.connect(self._openInEditor)
@@ -67,16 +67,12 @@ class ManifestDialog(QMainWindow):
     def _readsettings(self):
         s = QSettings()
         self.restoreGeometry(s.value('manifest/geom').toByteArray())
-        # TODO: don't call deeply
-        self._manifest_widget._splitter.restoreState(
-            s.value('manifest/splitter').toByteArray())
+        self._manifest_widget.loadSettings(s, 'manifest')
 
     def _writesettings(self):
         s = QSettings()
         s.setValue('manifest/geom', self.saveGeometry())
-        # TODO: don't call deeply
-        s.setValue('manifest/splitter',
-                   self._manifest_widget._splitter.saveState())
+        self._manifest_widget.saveSettings(s, 'manifest')
 
     def setSource(self, path, rev, line=None):
         self._manifest_widget.setSource(path, rev, line)
@@ -118,9 +114,8 @@ class ManifestWidget(QWidget):
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
-    def __init__(self, ui, repo, rev=None, parent=None):
+    def __init__(self, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
-        self._ui = ui
         self._repo = repo
         self._rev = rev
 
@@ -159,6 +154,16 @@ class ManifestWidget(QWidget):
         for name in ('revisionHint', 'searchRequested', 'editSelected',
                      'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
+
+    def loadSettings(self, qs, prefix):
+        prefix += '/manifest'
+        self._fileview.loadSettings(qs, prefix+'/fileview')
+        self._splitter.restoreState(qs.value(prefix+'/splitter').toByteArray())
+
+    def saveSettings(self, qs, prefix):
+        prefix += '/manifest'
+        self._fileview.saveSettings(qs, prefix+'/fileview')
+        s.setValue(prefix+'/splitter', self._splitter.saveState())
 
     def _initactions(self):
         self._statusfilter = _StatusFilterButton(statustext='MAC')
@@ -304,8 +309,8 @@ class _StatusFilterButton(QToolButton):
 class ManifestTaskWidget(ManifestWidget):
     """Manifest widget designed for task tab"""
 
-    def __init__(self, ui, repo, rev=None, parent=None):
-        super(ManifestTaskWidget, self).__init__(ui, repo, rev, parent)
+    def __init__(self, repo, rev=None, parent=None):
+        super(ManifestTaskWidget, self).__init__(repo, rev, parent)
         self.editSelected.connect(self._openInEditor)
 
     @pyqtSlot()
@@ -348,7 +353,7 @@ def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
 
 def run(ui, *pats, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-    dlg = ManifestDialog(ui, repo, opts.get('rev'))
+    dlg = ManifestDialog(repo, opts.get('rev'))
 
     # set initial state after dialog visible
     def init():

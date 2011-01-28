@@ -269,15 +269,12 @@ class RepoWidget(QWidget):
         return cw
 
     def createManifestWidget(self):
-        def filterrev(rev):
-            if isinstance(rev, basestring):  # unapplied patch
-                return None  # TODO
-            else:
-                return rev
-        w = ManifestTaskWidget(self.repo.ui, self.repo, rev=filterrev(self.rev),
-                               parent=self)
-        self.repoview.revisionClicked.connect(lambda rev:
-                           w.setRev(filterrev(rev)))
+        if isinstance(self.rev, basestring):
+            rev = None
+        else:
+            rev = self.rev
+        w = ManifestTaskWidget(self.repo, rev, self)
+        w.loadSettings(QSettings(), 'workbench')
         w.revChanged.connect(self.repoview.goto)
         w.revisionHint.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
@@ -708,6 +705,7 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.storeSettings()
         s = QSettings()
         self.commitDemand.forward('saveSettings', s)
+        self.manifestDemand.forward('saveSettings', s, 'workbench')
         self.filterbar.storeConfigs(s)
         return True
 
