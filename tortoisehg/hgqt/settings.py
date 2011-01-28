@@ -973,8 +973,9 @@ class SettingsForm(QWidget):
     def validateextensions(self):
         section = 'extensions'
         enabledexts = hglib.enabledextensions()
-        selectedexts = (chk.opts['label']
-                for chk in self.pages['extensions'][2] if chk.isChecked())
+        selectedexts = set(chk.opts['label']
+                           for chk in self.pages['extensions'][2]
+                           if chk.isChecked())
         invalidexts = hglib.validateextensions(selectedexts)
 
         def getinival(name):
