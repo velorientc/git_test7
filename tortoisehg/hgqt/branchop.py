@@ -55,8 +55,6 @@ class BranchOpDialog(QDialog):
 
             newbranch.toggled.connect(branchCombo.setEnabled)
             branchCombo.setEnabled(False)
-            if wctx.branch() == 'default':
-                closebranch.setEnabled(False)
             if oldbranchop is None:
                 nochange.setChecked(True)
             elif oldbranchop == False:
