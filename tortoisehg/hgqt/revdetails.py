@@ -173,13 +173,18 @@ class RevDetailsWidget(QWidget):
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def createActions(self):
-        self.actionDiffMode = QAction('Diff mode', self)
+        self.actionDiffMode = QAction('Diff', self)
         self.actionDiffMode.setCheckable(True)
-        self.actionDiffMode.toggled.connect(self.setMode)
-
-        self.actionAnnMode = QAction('Annotate', self)
+        self.actionFileMode = QAction('File', self)
+        self.actionFileMode.setCheckable(True)
+        self.actionAnnMode = QAction('Ann', self)
         self.actionAnnMode.setCheckable(True)
-        self.actionAnnMode.toggled.connect(self.setAnnotate)
+
+        self.modeToggleGroup = QActionGroup(self)
+        self.modeToggleGroup.addAction(self.actionDiffMode)
+        self.modeToggleGroup.addAction(self.actionFileMode)
+        self.modeToggleGroup.addAction(self.actionAnnMode)
+        self.modeToggleGroup.triggered.connect(self.setMode)
 
         # Next/Prev diff (in full file mode)
         self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
@@ -225,30 +230,22 @@ class RevDetailsWidget(QWidget):
         # toolbar
         tb = self.diffToolbar
         tb.addAction(self.actionDiffMode)
+        tb.addAction(self.actionFileMode)
+        tb.addAction(self.actionAnnMode)
+        tb.addSeparator()
         tb.addAction(self.actionNextDiff)
         tb.addAction(self.actionPrevDiff)
-        tb.addSeparator()
-        tb.addAction(self.actionAnnMode)
 
-    def setMode(self, mode):
-        self.fileview.setMode(mode)
-        if mode:
-            self.actionAnnMode.setEnabled(False)
-            self.actionAnnMode.setChecked(False)
-            self.actionNextDiff.setEnabled(False)
-            self.actionPrevDiff.setEnabled(False)
-        else:
-            self.actionAnnMode.setEnabled(True)
-            # next/prev actions are enabled via signals
+    @pyqtSlot(QAction)
+    def setMode(self, action):
+        diffmode = action.text() == 'Diff'
+        self.fileview.setMode(diffmode)
+        self.fileview.setAnnotate(action.text() == 'Ann')
+        self.actionNextDiff.setDisabled(diffmode)
+        self.actionPrevDiff.setDisabled(diffmode)
 
     def getMode(self):
         return self.fileview.getMode()
-
-    def setAnnotate(self, ann):
-        self.fileview.setAnnotate(ann)
-
-    def getAnnotate(self):
-        return self.fileview.getAnnotate()
 
     @pyqtSlot()
     def toggleSearchBar(self):
@@ -302,13 +299,16 @@ class RevDetailsWidget(QWidget):
         if type(ctx.rev()) == str:
             self.actionDiffMode.setChecked(True)
             self.actionDiffMode.setEnabled(False)
+            self.actionFileMode.setEnabled(False)
+            self.actionAnnMode.setEnabled(False)
         else:
             self.actionDiffMode.setEnabled(True)
+            self.actionFileMode.setEnabled(True)
+            self.actionAnnMode.setEnabled(True)
         self.fileview.setContext(ctx)
         self.filelistmodel.setContext(ctx)
 
         mode = self.getMode()
-        self.actionAnnMode.setEnabled(mode != 'diff')
         self.actionNextDiff.setEnabled(mode != 'diff')
         self.actionPrevDiff.setEnabled(mode != 'diff')
 
