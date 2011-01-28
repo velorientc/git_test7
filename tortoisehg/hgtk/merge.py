@@ -93,22 +93,16 @@ class MergeDialog(gdialog.GDialog):
         # layout table for advanced options
         table = gtklib.LayoutTable()
         expander.add(table)
-        discard = gtk.CheckButton(_('Discard all changes from merge target '
-                                    '(other) revision'))
-        self.discard = discard
-        table.add_row(discard)
-
+        
         vlist = gtk.ListStore(str,  # tool name
                               bool) # separator
         combo = gtk.ComboBoxEntry(vlist, 0)
         self.mergetool = combo
         combo.set_row_separator_func(lambda model, path: model[path][1])
-        combo.child.set_width_chars(8)
-        lbl = gtk.Label(_('Merge tools:'))
-        lbl.set_alignment(1, 0.5)
-        self.mergelabel = lbl
-        self.action_area.add(lbl)
-        self.action_area.add(combo)
+        combo.child.set_width_chars(16)
+        chtool = gtk.RadioButton(None, _('Use merge tool:'))
+        self.mergelabel = chtool
+        table.add_row(chtool, combo)
         prev = False
         for tool in hglib.mergetools(self.repo.ui):
             cur = tool.startswith('internal:')
@@ -119,6 +113,11 @@ class MergeDialog(gdialog.GDialog):
             combo.child.set_text(hglib.toutf(mtool))
         else:
             combo.child.set_text('')
+
+        discard = gtk.RadioButton(chtool,
+            _('Discard all changes from merge target (other) revision'))
+        self.discard = discard
+        table.add_row(discard)
 
         # prepare to show
         if len(self.repo.parents()) == 2:

@@ -108,7 +108,7 @@ class BugTraq:
         errormessage = bugtr.OnCommitFinished(0, commonroot, pathlist,
                 logmessage, 0)
         return errormessage
-        
+
     def show_options_dialog(self, options):
         if not self.has_options():
             return ""
@@ -116,7 +116,7 @@ class BugTraq:
         bugtr = self._get_bugtraq_object()
         options = bugtr.ShowOptionsDialog(0, options)
         return options
-    
+
     def has_options(self):
         if not self.supports_bugtraq2_interface():
             return False
@@ -145,10 +145,12 @@ def get_issue_plugins():
     ret = []
     enumerator = cm.EnumClassesOfCategories((CATID_BugTraqProvider,),())
     while 1:
-        clsid = enumerator.Next();
-        if clsid == ():
-            break;
-
+        try:
+            clsid = enumerator.Next()
+            if clsid == ():
+                break
+        except pythoncom.com_error:
+            break
         ret.extend(clsid)
     return ret
 
@@ -165,5 +167,3 @@ def get_issue_plugins_with_names():
     pluginclsids = get_issue_plugins()
     keyandnames = [(key, get_plugin_name(key)) for key in pluginclsids]
     return [kn for kn in keyandnames if kn[1] is not None]
-
-
