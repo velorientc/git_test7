@@ -13,7 +13,9 @@
    width="100%"
    version="1.0"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="qpush.svg">
+   sodipodi:docname="mq.svg">
+  <title
+     id="title2823">MQ Icon</title>
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -23,19 +25,17 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="642"
-     inkscape:window-height="485"
+     inkscape:window-width="1385"
+     inkscape:window-height="875"
      id="namedview17"
      showgrid="false"
      inkscape:zoom="7.375"
-     inkscape:cx="16"
-     inkscape:cy="15.728814"
+     inkscape:cx="-25.016949"
+     inkscape:cy="15.457628"
      inkscape:window-x="55"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
-  <title
-     id="title3066">QPush</title>
   <defs
      id="defs4">
     <inkscape:perspective
@@ -85,16 +85,21 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>QPush</dc:title>
-        <dc:date>2010-10-17</dc:date>
+        <dc:title>MQ Icon</dc:title>
+        <dc:date>2011-01-28</dc:date>
         <dc:creator>
           <cc:Agent>
-            <dc:title>Peer Sommerlund</dc:title>
+            <dc:title>Patrice LACOUTURE</dc:title>
           </cc:Agent>
         </dc:creator>
-        <dc:description>QPush icon for TortoiseHg</dc:description>
+        <dc:description>MQ icon for TortoiseHg - derived from QPush icon by Peer Sommerlund.</dc:description>
         <cc:license
            rdf:resource="http://creativecommons.org/licenses/by-sa/3.0/" />
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>Peer Sommerlund, Patrice LACOUTURE</dc:title>
+          </cc:Agent>
+        </dc:contributor>
       </cc:Work>
       <cc:License
          rdf:about="http://creativecommons.org/licenses/by-sa/3.0/">
