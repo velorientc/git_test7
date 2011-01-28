@@ -46,6 +46,8 @@ vars = {
         [True,     THGKEY, REG_SZ, is_true, one_str, 'show_taskbaricon'],
     'HighlightTaskbarIcon':
         [True,     THGKEY, REG_SZ, is_true, one_str, 'highlight_taskbaricon'],
+    'HideMenuOutsideRepo':
+        [False,    THGKEY, REG_SZ, is_true, one_str, 'hidecmenu'],
     PROMOTEDITEMS:
         ['commit', THGKEY, REG_SZ, noop, noop, None],
     'ShowUnversionedOverlay':
@@ -107,16 +109,24 @@ class ShellConfigWindow(QDialog):
         grid.setRowStretch(1, 10)
         grid.setRowStretch(4, 10)
 
+        def checkbox(label):
+            cb = QCheckBox(label)
+            cb.stateChanged.connect(self.stateChanged)
+            return cb
+
+        hidebox = QGroupBox(_('Menu Behavior'))
+        grid.addWidget(hidebox, 5, 0, 5, 3)
+        self.hidecmenu = checkbox(_('Hide context menu outside repositories'))
+        self.hidecmenu.setToolTip(_('Do not show menu items on unversioned '
+                                    'folders (use shift + click to override)'))
+        hidebox.setLayout(QVBoxLayout())
+        hidebox.layout().addWidget(self.hidecmenu)
+
         # Icons tab
         iconswidget = QWidget()
         iconslayout = QVBoxLayout()
         iconswidget.setLayout(iconslayout)
         tw.addTab(iconswidget, _("Icons"))
-
-        def checkbox(label):
-            cb = QCheckBox(label)
-            cb.stateChanged.connect(self.stateChanged)
-            return cb
 
         # Overlays group
         gbox = QGroupBox(_("Overlays"))
