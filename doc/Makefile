@@ -6,12 +6,14 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 
+QCOLLECTIONGENERATOR = qcollectiongenerator
+
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 
-.PHONY: help clean html web pickle htmlhelp latex changes linkcheck
+.PHONY: help clean html web pickle htmlhelp qthelp qhc latex changes linkcheck
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -19,6 +21,8 @@ help:
 	@echo "  pickle    to make pickle files"
 	@echo "  json      to make JSON files"
 	@echo "  htmlhelp  to make HTML files and a HTML help project"
+	@echo "  qthelp    to make HTML files and a qthelp project"
+	@echo "  qhc       to make QHC file"
 	@echo "  latex     to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  changes   to make an overview over all changed/added/deprecated items"
 	@echo "  linkcheck to check all external links for integrity"
@@ -55,6 +59,21 @@ htmlhelp:
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
 	      ".hhp project file in build/htmlhelp."
+
+qthelp:
+	mkdir -p build/qthelp build/doctrees
+	$(SPHINXBUILD) -b qthelp $(ALLSPHINXOPTS) build/qthelp
+	@echo
+	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
+	      ".qhcp project file in build/qthelp, like this:"
+	@echo "# qcollectiongenerator build/qthelp/foo.qhcp"
+	@echo "To view the help file:"
+	@echo "# assistant -collectionFile build/qthelp/foo.qhc"
+
+qhc: qthelp
+	$(QCOLLECTIONGENERATOR) build/qthelp/TortoiseHg.qhcp
+	@echo "Build finished. To view the help file:"
+	@echo "# assistant -collectionFile build/qthelp/TortoiseHg.qhc"
 
 latex:
 	mkdir -p build/latex build/doctrees

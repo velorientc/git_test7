@@ -18,7 +18,6 @@
    inkscape:export-filename="E:\src\mercurial\thg\thg-init-icon\icons\tortoise\init-32.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   sodipodi:docbase="E:\src\thg\thg-icons\icons\tortoise"
    sodipodi:docname="init.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    style="display:inline">
@@ -163,22 +162,6 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Original Bitmap"
-     style="display:none"
-     sodipodi:insensitive="true">
-    <image
-       style="display:inline"
-       y="0"
-       x="0"
-       id="image4474"
-       height="32"
-       width="32"
-       sodipodi:absref="E:\src\mercurial\thg\thg-init-icon\icons\tortoise\menucreaterepos.ico"
-       xlink:href="E:\src\mercurial\thg\thg-init-icon\icons\tortoise\menucreaterepos.ico" />
-  </g>
   <g
      inkscape:label="Cylinder"
      inkscape:groupmode="layer"

@@ -10,7 +10,7 @@ try:
 except ImportError:
     icon_path, bin_path, license_path, locale_path = None, None, None, None
 
-import os
+import os, sys
 
 def find_root(path=None):
     p = path or os.getcwd()
@@ -25,14 +25,16 @@ def find_root(path=None):
 
 def get_tortoise_icon(icon):
     "Find a tortoisehg icon"
-    global icon_path
-    path = icon_path or os.path.join(get_prog_root(), 'icons')
-    icopath = os.path.join(path, icon)
+    icopath = os.path.join(get_icon_path(), icon)
     if os.path.isfile(icopath):
         return icopath
     else:
         print 'icon not found', icon
         return None
+
+def get_icon_path():
+    global icon_path
+    return icon_path or os.path.join(get_prog_root(), 'icons')
 
 def get_license_path():
     global license_path
@@ -62,11 +64,13 @@ if os.name == 'nt':
         return None
 
     def get_prog_root():
-        try:
-            return _winreg.QueryValue(_winreg.HKEY_LOCAL_MACHINE,
-                    r"Software\TortoiseHg")
-        except:
-            return os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        if getattr(sys, 'frozen', False):
+            try:
+                return _winreg.QueryValue(_winreg.HKEY_LOCAL_MACHINE,
+                                          r"Software\TortoiseHg")
+            except:
+                pass
+        return os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
     def netdrive_status(drive):
         """

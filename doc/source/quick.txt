@@ -10,7 +10,7 @@ Explorer shell extension and a set of graphical applications that serve
 as a friendly front-end to the Mercurial distributed version control
 system (DVCS).   All TortoiseHg functionality is reachable from Explorer
 context menus as well as from a command line application named
-:command:`hgtk`.  Mercurial commands are also available from the
+:command:`thg`.  Mercurial commands are also available from the
 standard :command:`hg` command line application.
 
 
@@ -29,7 +29,7 @@ Right click on the desktop background and select
 
 This opens the TortoiseHg settings dialog, editing your global (user)
 configuration.  If you are using the command line, the global settings
-dialog can be opened by :command:`hgtk userconfig`.
+dialog can be opened by :command:`thg userconfig`.
 
 .. figure:: figures/settings.png
 	:alt: Settings Dialog
@@ -87,8 +87,9 @@ Click the :guilabel:`Ok` button to save the changes you have made and
 close the settings dialog.
 
 .. note::
-	Most TortoiseHg tools require a restart to pick up changes made in the
-	settings dialog.
+	Most TortoiseHg settings changes are noticed immediately, but
+	loading or unloading extensions usually requires restarting all open
+	applications for the changes to take effect.
 
 Getting Acquainted
 ==================
@@ -110,7 +111,7 @@ Initialize the repository
 
 Create the initial repository on your local machine by using the
 :guilabel:`Create Repository Here` shell menu option, or in a command
-shell within the folder, type :command:`hgtk init`.  You only need to do
+shell within the folder, type :command:`thg init`.  You only need to do
 this in once in the root folder of your project.
 
 .. figure:: figures/init.png
@@ -142,13 +143,13 @@ Add files
 Now it's time to tell Mercurial which files must be tracked and which
 files must be ignored. There are a lot of way to do this:
 
-1. To add files, select them in explorer and then right click and select
+1. To add files, select them in Explorer and then right click and select
    :menuselection:`TortoiseHg --> Add Files...` in the context menu. A
    dialog will open for you to double check the selected files and
    accept the add operation.
  
 2. Or open the status tool (:menuselection:`TortoiseHg --> View File Status`
-   or :command:`hgtk status` from the command line). Check the files you
+   or :command:`thg status` from the command line). Check the files you
    want to add and then press the :guilabel:`Add` button. From the
    status tool you can launch the ignore filter tool from the context
    menu of a unknown file (the menu option is named :guilabel:`ignore`)
@@ -161,7 +162,7 @@ files must be ignored. There are a lot of way to do this:
    
 4. To ignore files, open the ignore filter dialog:
    :menuselection:`TortoiseHg --> Edit Ignore Filter` or from command
-   line :command:`hgtk hgignore`. Choose a file from the list or
+   line :command:`thg hgignore`. Choose a file from the list or
    manually type in a *Glob* or *Regular expression* filter and then
    press :guilabel:`Add`. Changes to the ignore filter take effect
    immediately.
@@ -182,7 +183,7 @@ Commit
    
 Commit your local repository by right-clicking anywhere in the folder,
 or on the folder itself, and then selecting :guilabel:`Hg Commit ...`,
-or from command line type :command:`hgtk commit`.  Write a commit
+or from command line type :command:`thg commit`.  Write a commit
 message, select the files you wish to commit, then press
 :guilabel:`Commit`. If, after the commit, you realize that something was
 wrong with the message or the selected files, you can cancel the last
@@ -207,7 +208,7 @@ your repository in a public location that everyone in your group can
 read. Mercurial calls this copy operation *cloning your repository*. To
 clone your repository to a shared drive, open the clone tool
 :menuselection:`TortoiseHg --> Clone a Repository`, or
-:command:`hgtk clone` from command line.  Then enter the destination
+:command:`thg clone` from command line.  Then enter the destination
 path.
 
 .. figure:: figures/share.png
@@ -236,7 +237,7 @@ you want to make a copy of the repository located at x on your local
 machine.  Mercurial calls this cloning and TortiseHg has a dialog
 for it. Right click in the directory where you want your copy and select
 :menuselection:`TortoiseHg --> Clone a Repository`, or
-:command:`hgtk clone` from command line.
+:command:`thg clone` from command line.
 
 .. figure:: figures/clone.png
 	:alt: Clone dialog
@@ -263,7 +264,7 @@ quicker way is to use the commit tool:
 	Overlay Icons on Vista
 
 The commit tool gives you a way to see differences or you can use your
-visual difference tool (kdiff). Mercurial allows you to commit many
+visual difference tool (kdiff3). Mercurial allows you to commit many
 changes before you decide to synchronize (share changes) with the group
 repository.
 
@@ -272,23 +273,22 @@ When you're ready to publish your changes, you
 
 1. Commit your changes to your local repository (see above).
 2. Pull changes from the group repository into your repository,
-   :menuselection:`TortoiseHg --> Repository Browser` or
-   :command:`hgtk log`, choose the path to the group repository
+   :menuselection:`TortoiseHg --> Workbench` or
+   :command:`thg log`, choose the path to the group repository
    in the syncbar and then :guilabel:`Pull`.
 3. If some changesets were pulled, merge those changes with your local
    changes and then commit the merge into your local repository. From
-   the changelog viewer (:menuselection:`TortoiseHg --> Repository Browser`
-   or :command:`hgtk log`) open the context menu over the changeset
+   the changelog viewer (:menuselection:`TortoiseHg --> Workbench`
+   or :command:`thg log`) open the context menu over the changeset
    which you want to merge and select :guilabel:`merge with`.
    Finally, in the merge dialog, press :guilabel:`Merge` and then
    :guilabel:`Commit`.
 4. Ensure your merged work still builds and passes your extensive test suite.
 5. Push your changes to the group repository,
-   :menuselection:`TortoiseHg --> Repository Browser` or :command:`hgtk log`,
-   choose the path to group repository and then :guilabel:`Push`.
+   :menuselection:`TortoiseHg --> Workbench` or :command:`thg log`,
+   select the path to group repository and then :guilabel:`Push`.
 
-Which may sound complicated, but most of the time it is just pushing the
-buttons in the commit and changelog tools.
+Which may sound complicated, but is easier than it sounds.
 
 .. note::
 	Merges can be safely restarted if necessary.
