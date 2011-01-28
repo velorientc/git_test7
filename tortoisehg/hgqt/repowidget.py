@@ -176,7 +176,7 @@ class RepoWidget(QWidget):
 
         self.mqDemand = w = DemandWidget(self.createMQWidget)
         if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, geticon('qreorder'), '')
+            self.mqTabIndex = idx = tt.addTab(w, geticon('mq'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
             self.namedTabs['mq'] = idx
         else:
