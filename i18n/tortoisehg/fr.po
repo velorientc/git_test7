@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-12-28 20:44+0000\n"
-"PO-Revision-Date: 2010-10-02 09:37+0000\n"
-"Last-Translator: André Sintzoff <Unknown>\n"
+"PO-Revision-Date: 2011-01-15 21:03+0000\n"
+"Last-Translator: Jason Vaillancourt <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-29 05:04+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-01-16 05:10+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: TortoiseHgOverlayServer.py:36
 msgid "TortoiseHg Overlay Icon Server"
@@ -60,7 +60,7 @@ msgstr "Révision de l'archive :"
 
 #: tortoisehg\hgtk\archive.py:62
 msgid "Only files modified/created in this revision"
-msgstr ""
+msgstr "Seulement les fichiers modifiés/créés dans cette version"
 
 #: tortoisehg\hgtk\archive.py:69 tortoisehg\hgtk\clone.py:70
 #: tortoisehg\hgtk\hginit.py:55 tortoisehg\hgtk\thgconfig.py:394
@@ -498,7 +498,7 @@ msgstr "Autoriser la _Césure"
 
 #: tortoisehg\hgtk\chunks.py:73
 msgid "File is larger than the specified max size.\n"
-msgstr ""
+msgstr "Le fichier est plus grand que la limite maximale spécifiée.\n"
 
 #: tortoisehg\hgtk\chunks.py:74 tortoisehg\hgtk\chunks.py:86
 msgid "Hunk selection is disabled for this file.\n"

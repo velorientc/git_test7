@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-12-28 20:44+0000\n"
-"PO-Revision-Date: 2010-12-28 21:28+0000\n"
+"PO-Revision-Date: 2011-01-21 20:56+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-29 05:07+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-01-22 05:05+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: TortoiseHgOverlayServer.py:36
 msgid "TortoiseHg Overlay Icon Server"
@@ -1137,19 +1137,19 @@ msgstr "Atualizando..."
 
 #: tortoisehg\hgtk\cslist.py:400
 msgid "Selecting %(sel)d of %(total)d, displaying all items"
-msgstr "Selecionando %(sel)d de %(total)d, mostrando todos os ítens"
+msgstr "Selecionando %(sel)d de %(total)d, mostrando todos os itens"
 
 #: tortoisehg\hgtk\cslist.py:403
 msgid "Selecting %(sel)d, displaying %(count)d of %(total)d items"
-msgstr "Selecionando %(sel)d, mostrando %(count)d de %(total)d ítens"
+msgstr "Selecionando %(sel)d, mostrando %(count)d de %(total)d itens"
 
 #: tortoisehg\hgtk\cslist.py:407
 msgid "Displaying all items"
-msgstr "Mostrando todos os ítens"
+msgstr "Mostrando todos os itens"
 
 #: tortoisehg\hgtk\cslist.py:409
 msgid "Displaying %(count)d of %(total)d items"
-msgstr "Mostrando %(count)d de %(total)d ítens"
+msgstr "Mostrando %(count)d de %(total)d itens"
 
 #: tortoisehg\hgtk\datamine.py:45
 msgid "%s - datamine"
