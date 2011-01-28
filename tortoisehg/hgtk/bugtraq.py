@@ -145,10 +145,12 @@ def get_issue_plugins():
     ret = []
     enumerator = cm.EnumClassesOfCategories((CATID_BugTraqProvider,),())
     while 1:
-        clsid = enumerator.Next()
-        if clsid == ():
+        try:
+            clsid = enumerator.Next()
+            if clsid == ():
+                break
+        except pythoncom.com_error:
             break
-
         ret.extend(clsid)
     return ret
 
