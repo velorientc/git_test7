@@ -898,6 +898,7 @@ class CommitDialog(QDialog):
         bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Ok).setDefault(True)
         self.commitButton = bb.button(BB.Ok)
+        self.commitButton.setText(_('Commit'))
         self.bb = bb
 
         hbox = QHBoxLayout()
