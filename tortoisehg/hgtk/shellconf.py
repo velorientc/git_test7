@@ -177,6 +177,7 @@ class ShellConfigWindow(gtk.Window):
 
         def connect_apply(checkbutton):
             checkbutton.connect('toggled', lambda x: self.apply.set_sensitive(True))
+        connect_apply(self.hide_context_menu)
         connect_apply(self.enableAddedHandler)
         connect_apply(self.enableUnversionedHandler)
         connect_apply(self.enableIgnoredHandler)
