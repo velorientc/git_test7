@@ -237,7 +237,7 @@ class Workbench(QMainWindow):
         addtaskview('repobrowse', _("&Search..."))
         addtaskview('view-refresh', _("S&ynchronize..."))
         self.actionSelectTaskMQ = \
-                addtaskview('qreorder', _("Patch &Queue..."), 'mq')
+                addtaskview('mq', _("Patch &Queue..."), 'mq')
         self.actionSelectTaskPbranch = \
                 addtaskview('branch', _("&Patch Branch..."), 'pbranch')
         newseparator(menu='view')

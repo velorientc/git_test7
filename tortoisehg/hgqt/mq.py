@@ -77,7 +77,7 @@ class MQWidget(QWidget):
         tb.setIcon(qtlib.geticon('qpush'))
         tb.setToolTip(_('Apply one patch'))
         self.setGuardsBtn = tb = QToolButton()
-        #tb.setIcon(qtlib.geticon('qpush'))
+        tb.setIcon(qtlib.geticon('qguards'))
         tb.setToolTip(_('Configure guards for selected patch'))
         self.qpushMoveBtn = tb = QToolButton()
         tb.setIcon(qtlib.geticon('qreorder'))
