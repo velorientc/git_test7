@@ -98,7 +98,7 @@ class QuickOpDialog(QDialog):
         layout.addLayout(hbox)
 
         s = QSettings()
-        stwidget.restoreState(s.value('quickop/state').toByteArray())
+        stwidget.loadSettings(s, 'quickop')
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
@@ -144,7 +144,7 @@ class QuickOpDialog(QDialog):
             self.cmd.core.cancel()
         else:
             s = QSettings()
-            s.setValue('quickop/state', self.stwidget.saveState())
+            self.stwidget.saveSettings(s, 'quickop')
             s.setValue('quickop/geom', self.saveGeometry())
             QDialog.reject(self)
 
