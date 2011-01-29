@@ -163,7 +163,7 @@ class ManifestWidget(QWidget):
     def saveSettings(self, qs, prefix):
         prefix += '/manifest'
         self._fileview.saveSettings(qs, prefix+'/fileview')
-        s.setValue(prefix+'/splitter', self._splitter.saveState())
+        qs.setValue(prefix+'/splitter', self._splitter.saveState())
 
     def _initactions(self):
         self._statusfilter = _StatusFilterButton(statustext='MAC')
