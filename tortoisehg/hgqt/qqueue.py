@@ -240,8 +240,11 @@ class QQueueDialog(QDialog):
                 sf = '/.hg/patches-%s/series' % q
             sf = self.repo.root + sf
             if os.path.exists(sf):
-                with open(sf, 'r') as f:
+                f = open(sf, 'r')
+                try:
                     patches = f.read().splitlines()
+                finally:
+                    f.close()
         for p in patches:
             item = QListWidgetItem(hglib.tounicode(p))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
