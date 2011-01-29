@@ -312,7 +312,7 @@
               />
               <RegistryValue
                 Root='HKLM' Key='$(var.ProgramRegKey)'
-                Type='string' Value='[INSTALLDIRx86]'
+                Type='string' Value='[INSTALLDIR]'
               />
               <RegistryValue
                 Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
