@@ -260,7 +260,7 @@ class GotoQuickBar(QuickBar):
 
     def createActions(self, openkey, desc):
         QuickBar.createActions(self, openkey, desc)
-        self._actions['go'] = QAction('Go', self)
+        self._actions['go'] = QAction(geticon('go-jump'), _('Go'), self)
         self._actions['go'].triggered.connect(self.goto)
 
     def goto(self):
