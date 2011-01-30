@@ -30,60 +30,9 @@ from PyQt4 import Qsci
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, lexers
+from tortoisehg.hgqt import annotate, qscilib, qtlib, blockmatcher, lexers
 
 qsci = Qsci.QsciScintilla
-
-class Annotator(qsci):
-    # we use a QScintilla for the annotater cause it makes
-    # it much easier to keep the text area and the annotater sync
-    # (same font rendering etc). However, it have the drawback of making much
-    # more difficult to implement things like QTextBrowser.anchorClicked, which
-    # would have been nice to directly go to the annotated revision...
-    def __init__(self, textarea, parent=None):
-        qsci.__init__(self, parent)
-
-        self.setFrameStyle(0)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setReadOnly(True)
-        self.sizePolicy().setControlType(QSizePolicy.Slider)
-        self.setMinimumWidth(20)
-        self.setMaximumWidth(40) # XXX TODO make this computed
-        self.setFont(textarea.font())
-        self.setMarginWidth(0, '')
-        self.setMarginWidth(1, '')
-
-        self.SendScintilla(qsci.SCI_SETCURSOR, 2)
-        self.SendScintilla(qsci.SCI_SETCARETSTYLE, 0)
-
-        # used to set a background color for every annotating rev
-        N = 32
-        self.markers = []
-        for i in range(N):
-            marker = self.markerDefine(qsci.Background)
-            color = 0x7FFF00 + (i-N/2)*256/N*256*256 - i*256/N*256 + i*256/N
-            self.SendScintilla(qsci.SCI_MARKERSETBACK, marker, color)
-            self.markers.append(marker)
-
-        textarea.verticalScrollBar().valueChanged.connect(
-                self.verticalScrollBar().setValue)
-
-    def setFilectx(self, fctx):
-        self.fctx = fctx
-        if fctx.rev() is None:
-            # the working context does not support annotate yet.  I need to
-            # add that to Mercurial at some point.
-            self.setText('')
-            self.fctxann = []
-            return
-        self.fctxann = [f for f, line in fctx.annotate(follow=True)]
-        revlist = [str(f.rev()) for f in self.fctxann]
-        self.setText('\n'.join(revlist))
-        uniqrevs = list(sorted(set(revlist)))
-        for i, rev in enumerate(revlist):
-            idx = uniqrevs.index(rev)
-            self.markerAdd(i, self.markers[idx % len(self.markers)])
 
 class HgFileView(QFrame):
     """file diff and content viewer"""
@@ -95,7 +44,16 @@ class HgFileView(QFrame):
     revForDiffChanged = pyqtSignal(int)
     filled = pyqtSignal()
 
-    def __init__(self, parent=None):
+    searchRequested = pyqtSignal(unicode)
+    """Emitted (pattern) when user request to search content"""
+
+    editSelected = pyqtSignal(unicode, object, int)
+    """Emitted (path, rev, line) when user requests to open editor"""
+
+    grepRequested = pyqtSignal(unicode, dict)
+    """Emitted (pattern, opts) when user request to search changelog"""
+
+    def __init__(self, repo, parent):
         QFrame.__init__(self, parent)
         framelayout = QVBoxLayout(self)
         framelayout.setContentsMargins(0,0,0,0)
@@ -132,10 +90,13 @@ class HgFileView(QFrame):
         framelayout.addLayout(self.topLayout)
         framelayout.addLayout(l, 1)
 
+        self._stacked = QStackedWidget()
+        l.addWidget(self._stacked, 1)
+
         self.sci = qscilib.Scintilla(self)
+        self._stacked.addWidget(self.sci)
+
         self.sci.setFrameStyle(0)
-        l.addWidget(self.sci, 1)
-        #self.sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -172,8 +133,14 @@ class HgFileView(QFrame):
         self.markertriangle = self.sci.markerDefine(qsci.Background)
         self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markertriangle,
                                0xFFA0A0)
-        self.lastrev = None
-        self.sci.mouseMoveEvent = self.mouseMoveEvent
+
+        self._annotate = annotate.AnnotateView(repo, self)
+        for name in ('searchRequested', 'editSelected', 'grepRequested'):
+            getattr(self._annotate, name).connect(getattr(self, name))
+        self._annotate.revisionHint.connect(self.showMessage)
+        self._annotate.setAnnotationEnabled(True)
+        self._stacked.addWidget(self._annotate)
+        # self._annotate.sourceChanged.connect( ?? )
 
         ll = QVBoxLayout()
         ll.setContentsMargins(0, 0, 0, 0)
@@ -185,19 +152,10 @@ class HgFileView(QFrame):
         ll2.setSpacing(0)
         ll.addLayout(ll2)
 
-        # used to fill height of the horizontal scroll bar
-        w = QWidget(self)
-        ll.addWidget(w)
-        self._spacer = w
-
         self.blk = blockmatcher.BlockList(self)
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         ll2.addWidget(self.blk)
         self.blk.setVisible(False)
-
-        self.ann = Annotator(self.sci, self)
-        ll2.addWidget(self.ann)
-        self.ann.setVisible(False)
 
         self._ctx = None
         self._filename = None
@@ -268,12 +226,6 @@ class HgFileView(QFrame):
     def saveSettings(self, qs, prefix):
         self.sci.saveSettings(qs, prefix)
 
-    def resizeEvent(self, event):
-        QFrame.resizeEvent(self, event)
-        h = self.sci.horizontalScrollBar().height()
-        self._spacer.setMinimumHeight(h)
-        self._spacer.setMaximumHeight(h)
-
     @pyqtSlot(QAction)
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
@@ -281,7 +233,10 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(mode != 'diff')
         self.actionPrevDiff.setEnabled(False)
         self.blk.setVisible(mode != 'diff')
-        self.ann.setVisible(mode == 'ann')
+        if mode == 'ann':
+            self._stacked.setCurrentWidget(self._annotate)
+        else:
+            self._stacked.setCurrentWidget(self.sci)
         if mode != self._mode:
             self._mode = mode
             if not self._lostMode:
@@ -303,7 +258,7 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(False)
         self.actionPrevDiff.setEnabled(False)
         self.blk.setVisible(mode == 'file')
-        self.ann.setVisible(False)
+        self._stacked.setCurrentWidget(self.sci)
 
     def setContext(self, ctx):
         self._ctx = ctx
@@ -315,30 +270,8 @@ class HgFileView(QFrame):
         if rev != self._p_rev:
             self.displayFile(rev=rev)
 
-    def mouseMoveEvent(self, event):
-        if self._mode == 'ann' and self.ann.fctxann:
-            # Calculate row index from the scroll offset and mouse position
-            scroll_offset = self.sci.verticalScrollBar().value()
-            idx = scroll_offset + event.pos().y() / self.sci.textHeight(0)
-            # It's possible to scroll below the bottom line
-            if idx >= len(self.ann.fctxann):
-                idx = len(self.ann.fctxann) - 1
-            ctx = self.ann.fctxann[idx]
-            rev = ctx.rev()
-            desc = hglib.get_revision_desc(ctx, self._filename)
-            if rev != self.lastrev:
-                self.showDescSignal.emit(desc)
-                self.lastrev = rev
-        qsci.mouseMoveEvent(self.sci, event)
-
-    def leaveEvent(self, event):
-        if self._mode == 'ann':
-            self.lastrev = None
-            self.showDescSignal.emit('')
-
     def clearDisplay(self):
         self.sci.clear()
-        self.ann.clear()
         self.blk.clear()
         # Setting the label to ' ' rather than clear() keeps the label
         # from disappearing during refresh, and tool layouts bouncing
@@ -400,7 +333,9 @@ class HgFileView(QFrame):
                     self.actionAnnMode.trigger()
                 self._lostMode = None
 
-        if self._mode == 'diff':
+        if self._mode == 'ann':
+            self._annotate.setSource(filename, ctx.rev())
+        elif self._mode == 'diff':
             lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
             # trim first three lines, for example:
@@ -425,18 +360,9 @@ class HgFileView(QFrame):
 
         uf = hglib.tounicode(self._filename)
         self.fileDisplayed.emit(uf, fd.contents or QString())
-        if self._mode == 'diff':
-            return
 
-        if self._mode == 'ann':
-            if lexer is not None:
-                self.ann.setFont(lexer.font(0))
-            else:
-                self.ann.setFont(self.sci.font())
-            self.ann.setFilectx(self._ctx[filename])
-
-        # Update diff margin
-        if fd.contents and fd.olddata:
+        if self._mode == 'file' and fd.contents and fd.olddata:
+            # Update diff margin
             if self.timer.isActive():
                 self.timer.stop()
 

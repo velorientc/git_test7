@@ -147,7 +147,7 @@ class RevDetailsWidget(QWidget):
         self.message.setFont(f.font())
         f.changed.connect(lambda font: self.message.setFont(font))
 
-        self.fileview = HgFileView(self.message_splitter)
+        self.fileview = HgFileView(self.repo, self.message_splitter)
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
         sp.setVerticalStretch(5)

@@ -59,7 +59,7 @@ class MQWidget(QWidget):
 
         self.queueFrame = QFrame(splitter)
         self.messageFrame = QFrame(splitter)
-        self.fileview = fileview.HgFileView(splitter)
+        self.fileview = fileview.HgFileView(repo, splitter)
 
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.setContext(repo[None])

@@ -139,7 +139,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         self.repoview = HgRepoView(self.repo, self)
-        self.textView = HgFileView(self)
+        self.textView = HgFileView(self.repo, self)
         self.splitter.addWidget(self.repoview)
         self.splitter.addWidget(self.textView)
 
