@@ -10,6 +10,7 @@ import os
 import re
 import tempfile
 import urlparse
+import ssl
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -944,10 +945,17 @@ class SaveDialog(QDialog):
 class AuthDialog(QDialog):
     def __init__(self, repo, host, user, pw, parent):
         super(AuthDialog, self).__init__(parent)
+        uhost = hglib.tounicode(host)
+        self.setWindowTitle(_('Authentication: ') + uhost)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
         self.setLayout(QVBoxLayout())
 
+        authbox = QGroupBox(_('User Authentication'))
+        self.layout().addWidget(authbox)
         form = QFormLayout()
+        authbox.setLayout(form)
         self.aliasentry = QLineEdit(host.split('.', 1)[0])
         form.addRow(_('Site Alias'), self.aliasentry)
 
@@ -979,30 +987,47 @@ _('''Optional. Password to authenticate with. If not given, and the remote
 site requires basic or digest authentication, the user will be prompted for
 it.'''))
         form.addRow(_('Password'), self.pwentry)
-        self.layout().addLayout(form)
 
-        self.keyentry = QLineEdit(user)
+        self.keyentry = QLineEdit()
         self.keyentry.setToolTip(
 _('''Optional. PEM encoded client certificate key file. Environment variables
 are expanded in the filename.'''))
         form.addRow(_('User Certificate Key File'), self.keyentry)
 
-        self.chainentry = QLineEdit(user)
+        self.chainentry = QLineEdit()
         self.chainentry.setToolTip(
 _('''Optional. PEM encoded client certificate chain file. Environment variables
 are expanded in the filename.'''))
         form.addRow(_('User Certificate Chain File'), self.chainentry)
 
-        self.globalcb = QCheckBox(_('Save this configuration globally'))
-        self.globalcb.setChecked(True)
-        self.layout().addWidget(self.globalcb)
-
-        txt = _('Auth section %smanual page%s') % (
+        txt = _('Authentication section %smanual page%s') % (
             '<a href="http://www.selenic.com/mercurial/hgrc.5.html#auth">',
             '</a>')
         self.lbl = QLabel(txt)
         self.lbl.setOpenExternalLinks(True)
-        self.layout().addWidget(self.lbl)
+        form.addRow(self.lbl, None)
+
+        def genfingerprint():
+            pem = ssl.get_server_certificate( (host, 443) )
+            der = ssl.PEM_cert_to_DER_cert(pem)
+            hash = util.sha1(der).hexdigest()
+            pretty = ":".join([hash[x:x + 2] for x in xrange(0, len(hash), 2)])
+            le.setText(pretty)
+
+        hostbox = QGroupBox(_('%s host certificate fingerprint') % uhost)
+        self.layout().addWidget(hostbox)
+        hbox = QHBoxLayout()
+        hostbox.setLayout(hbox)
+        self.host = host
+        cur = self.repo.ui.config('hostfingerprints', host, '')
+        self.fingerprintentry = le = QLineEdit(cur)
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+            le.setPlaceholderText('### host certificate fingerprint ###')
+        hbox.addWidget(le)
+        qb = QPushButton(_('Query'))
+        qb.clicked.connect(genfingerprint)
+        hbox.addWidget(qb)
+
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Help|BB.Save|BB.Cancel)
@@ -1012,9 +1037,6 @@ are expanded in the filename.'''))
         self.bb = bb
         self.layout().addWidget(bb)
 
-        self.setWindowTitle(_('Authentication: ') + host)
-        self.setWindowFlags(self.windowFlags() & \
-                            ~Qt.WindowContextHelpButtonHint)
         self.userentry.selectAll()
         QTimer.singleShot(0, lambda:self.userentry.setFocus())
 
@@ -1022,11 +1044,7 @@ are expanded in the filename.'''))
         pass
 
     def accept(self):
-        if self.globalcb:
-            path = util.user_rcpath()
-        else:
-            path = [self.repo.join('hgrc')]
-
+        path = util.user_rcpath()
         fn, cfg = loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
@@ -1047,8 +1065,10 @@ are expanded in the filename.'''))
                                           'exists, replace?') % alias):
                 return
         cfg.set('auth', alias+'.schemes', schemes)
-        cfg.set('auth', alias+'.username', username)
-        cfg.set('auth', alias+'.prefix', prefix)
+        if username:
+            cfg.set('auth', alias+'.username', username)
+        if prefix:
+            cfg.set('auth', alias+'.prefix', prefix)
         def setorclear(item, value):
             item = '.'.join([alias, item])
             if value:
@@ -1058,6 +1078,10 @@ are expanded in the filename.'''))
         setorclear('password', password)
         setorclear('key', key)
         setorclear('cert', chain)
+
+        fprint = hglib.fromunicode(self.fingerprintentry.text())
+        if fprint:
+            cfg.set('hostfingerprints', self.host, fprint)
 
         self.repo.incrementBusyCount()
         try:
