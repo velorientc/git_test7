@@ -10,7 +10,6 @@ import os
 import re
 import tempfile
 import urlparse
-import ssl
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -1024,10 +1023,13 @@ are expanded in the filename.'''))
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
             le.setPlaceholderText('### host certificate fingerprint ###')
         hbox.addWidget(le)
-        qb = QPushButton(_('Query'))
-        qb.clicked.connect(genfingerprint)
-        hbox.addWidget(qb)
-
+        try:
+            import ssl # Python 2.6 or backport for 2.5
+            qb = QPushButton(_('Query'))
+            qb.clicked.connect(genfingerprint)
+            hbox.addWidget(qb)
+        except ImportError:
+            pass
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Help|BB.Save|BB.Cancel)
