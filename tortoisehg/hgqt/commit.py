@@ -386,18 +386,20 @@ class CommitWidget(QWidget):
         # files partially selected.
         return not self.runner.core.running()
 
-    def loadSettings(self, s):
+    def loadSettings(self, s, prefix):
         'Load history, etc, from QSettings instance'
         repoid = str(self.repo[0])
+        lpref = prefix + '/commit/' # local settings (splitter, etc)
+        gpref = 'commit/'           # global settings (history, etc)
         # message history is stored in unicode
-        self.split.restoreState(s.value('commit/split').toByteArray())
-        self.msghistory = list(s.value('commit/history-'+repoid).toStringList())
+        self.split.restoreState(s.value(lpref+'split').toByteArray())
+        self.msgte.loadSettings(s, lpref+'msgte')
+        self.stwidget.loadSettings(s, lpref+'status')
+        self.msghistory = list(s.value(gpref+'history-'+repoid).toStringList())
         self.msghistory = [m for m in self.msghistory if m]
         self.msgcombo.reset(self.msghistory)
-        self.userhist = s.value('commit/userhist').toStringList()
+        self.userhist = s.value(gpref+'userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
-        self.msgte.loadSettings(s, 'commit/msgte')
-        self.stwidget.loadSettings(s, 'commit/status')
         try:
             curmsg = self.repo.opener('cur-message.txt').read()
             self.setMessage(hglib.tounicode(curmsg))
@@ -410,14 +412,16 @@ class CommitWidget(QWidget):
         except EnvironmentError:
             pass
 
-    def saveSettings(self, s):
+    def saveSettings(self, s, prefix):
         'Save history, etc, in QSettings instance'
         repoid = str(self.repo[0])
-        s.setValue('commit/history-'+repoid, self.msghistory)
-        s.setValue('commit/split', self.split.saveState())
-        s.setValue('commit/userhist', self.userhist)
-        self.msgte.saveSettings(s, 'commit/msgte')
-        self.stwidget.saveSettings(s, 'commit/status')
+        lpref = prefix + '/commit/'
+        gpref = 'commit/'
+        s.setValue(lpref+'split', self.split.saveState())
+        self.msgte.saveSettings(s, lpref+'msgte')
+        self.stwidget.saveSettings(s, lpref+'status')
+        s.setValue(gpref+'history-'+repoid, self.msghistory)
+        s.setValue(gpref+'userhist', self.userhist)
         try:
             msg = self.getMessage()
             self.repo.opener('cur-message.txt', 'w').write(msg)
@@ -910,7 +914,7 @@ class CommitDialog(QDialog):
 
         s = QSettings()
         self.restoreGeometry(s.value('commit/geom').toByteArray())
-        commit.loadSettings(s)
+        commit.loadSettings(s, 'committool')
         commit.repo.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonEnable.connect(self.commitButton.setEnabled)
@@ -962,7 +966,7 @@ class CommitDialog(QDialog):
         if self.commit.canExit():
             s = QSettings()
             s.setValue('commit/geom', self.saveGeometry())
-            self.commit.saveSettings(s)
+            self.commit.saveSettings(s, 'committool')
             QDialog.reject(self)
 
 def run(ui, *pats, **opts):
