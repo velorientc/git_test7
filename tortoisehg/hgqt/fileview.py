@@ -21,7 +21,7 @@ import os
 import difflib
 import re
 
-from mercurial import hg, error, match, patch, subrepo, commands, util
+from mercurial import hg, error, match, patch, util
 from mercurial import ui as uimod, mdiff
 
 from PyQt4.QtCore import *
@@ -29,11 +29,8 @@ from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
 from tortoisehg.util import hglib, patchctx
-
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.lexers import get_lexer, get_diff_lexer
-from tortoisehg.hgqt.blockmatcher import BlockList
-from tortoisehg.hgqt import qscilib, qtlib
+from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, lexers
 
 qsci = Qsci.QsciScintilla
 
@@ -193,7 +190,7 @@ class HgFileView(QFrame):
         ll.addWidget(w)
         self._spacer = w
 
-        self.blk = BlockList(self)
+        self.blk = blockmatcher.BlockList(self)
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         ll2.addWidget(self.blk)
         self.blk.setVisible(False)
@@ -403,7 +400,7 @@ class HgFileView(QFrame):
                 self._lostMode = None
 
         if self._mode == 'diff':
-            lexer = get_diff_lexer(self)
+            lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
             # trim first three lines, for example:
             # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
@@ -414,7 +411,7 @@ class HgFileView(QFrame):
         elif fd.contents is None:
             return
         else:
-            lexer = get_lexer(filename, fd.contents, self)
+            lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
             nlines = fd.contents.count('\n')
             # margin 1 is used for line numbers
@@ -684,6 +681,7 @@ class FileData(object):
 
         if status == 'S':
             try:
+                from mercurial import subrepo, commands
                 assert(ctx.rev() is None)
                 out = []
                 _ui = uimod.ui()
