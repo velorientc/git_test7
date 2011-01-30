@@ -92,10 +92,10 @@ class SyncWidget(QWidget):
         hbox.addWidget(tb)
         self.layout().addLayout(hbox)
 
-        self.detailsbutton = QPushButton(_('Options'))
+        self.optionsbutton = QPushButton(_('Options'))
         self.postpullbutton = QPushButton()
         hbox.addWidget(self.postpullbutton)
-        hbox.addWidget(self.detailsbutton)
+        hbox.addWidget(self.optionsbutton)
         tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
         if 'perfarce' in self.repo.extensions():
             self.p4pbutton = QPushButton(_('p4pending'))
@@ -188,7 +188,7 @@ class SyncWidget(QWidget):
         self.savebutton.clicked.connect(self.saveclicked)
         self.authbutton.clicked.connect(self.authclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
-        self.detailsbutton.pressed.connect(self.details)
+        self.optionsbutton.pressed.connect(self.editOptions)
 
         self.opbuttons = sactions + [self.p4pbutton]
 
@@ -261,7 +261,7 @@ class SyncWidget(QWidget):
         'Repository is reporting its config files have changed'
         self.reload()
 
-    def details(self):
+    def editOptions(self):
         dlg = OptionsDialog(self.opts, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
