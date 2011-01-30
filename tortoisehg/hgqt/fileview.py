@@ -284,7 +284,8 @@ class HgFileView(QFrame):
         self.ann.setVisible(mode == 'ann')
         if mode != self._mode:
             self._mode = mode
-            self.displayFile()
+            if not self._lostMode:
+                self.displayFile()
 
     def forceMode(self, mode):
         'Force into file or diff mode, based on content constaints'
