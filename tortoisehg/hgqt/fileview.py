@@ -33,7 +33,7 @@ from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.lexers import get_lexer, get_diff_lexer
 from tortoisehg.hgqt.blockmatcher import BlockList
-from tortoisehg.hgqt import qscilib
+from tortoisehg.hgqt import qscilib, qtlib
 
 qsci = Qsci.QsciScintilla
 chunkhdrre = re.compile('^@@ -(\d+).*@@$')
@@ -115,6 +115,11 @@ class HgFileView(QFrame):
         hbox.setContentsMargins(0,0,0,0)
         hbox.setSpacing(2)
         self.topLayout.addLayout(hbox)
+
+        self.diffToolbar = QToolBar(_('Diff Toolbar'))
+        self.diffToolbar.setIconSize(QSize(16,16))
+        hbox.addWidget(self.diffToolbar)
+
         self.filenamelabel = w = QLabel()
         w.setWordWrap(True)
         f = w.textInteractionFlags()
@@ -201,9 +206,38 @@ class HgFileView(QFrame):
         self._ctx = None
         self._filename = None
         self._status = None
-        self._annotate = False
         self._find_text = None
-        self._mode = "diff" # can be 'diff' or 'file'
+
+        self.actionDiffMode = QAction('Diff', self)
+        self.actionDiffMode.setCheckable(True)
+        self.actionFileMode = QAction('File', self)
+        self.actionFileMode.setCheckable(True)
+        self.actionAnnMode = QAction('Ann', self)
+        self.actionAnnMode.setCheckable(True)
+
+        self.modeToggleGroup = QActionGroup(self)
+        self.modeToggleGroup.addAction(self.actionDiffMode)
+        self.modeToggleGroup.addAction(self.actionFileMode)
+        self.modeToggleGroup.addAction(self.actionAnnMode)
+        self.modeToggleGroup.triggered.connect(self.setMode)
+
+        # Next/Prev diff (in full file mode)
+        self.actionNextDiff = QAction(qtlib.geticon('down'), 'Next diff', self)
+        self.actionNextDiff.setShortcut('Alt+Down')
+        self.actionNextDiff.triggered.connect(self.nextDiff)
+        self.actionPrevDiff = QAction(qtlib.geticon('up'), 'Previous diff', self)
+        self.actionPrevDiff.setShortcut('Alt+Up')
+        self.actionPrevDiff.triggered.connect(self.prevDiff)
+
+        self.forceMode('diff')
+
+        tb = self.diffToolbar
+        tb.addAction(self.actionDiffMode)
+        tb.addAction(self.actionFileMode)
+        tb.addAction(self.actionAnnMode)
+        tb.addSeparator()
+        tb.addAction(self.actionNextDiff)
+        tb.addAction(self.actionPrevDiff)
 
         self.timer = QTimer()
         self.timer.setSingleShot(False)
@@ -225,32 +259,39 @@ class HgFileView(QFrame):
         self._spacer.setMinimumHeight(h)
         self._spacer.setMaximumHeight(h)
 
-    def setMode(self, mode):
-        if isinstance(mode, bool):
-            mode = ['file', 'diff'][mode]
-        assert mode in ('diff', 'file')
+    @pyqtSlot(QAction)
+    def setMode(self, action):
+        'One of the mode toolbar buttons has been toggled'
+        mode = {'Diff':'diff', 'File':'file', 'Ann':'ann'}[str(action.text())]
+        self.actionNextDiff.setEnabled(mode != 'diff')
+        self.actionPrevDiff.setEnabled(False)
+        self.blk.setVisible(mode != 'diff')
+        self.ann.setVisible(mode == 'ann')
         if mode != self._mode:
             self._mode = mode
-            self.blk.setVisible(self._mode == 'file')
-            self.ann.setVisible(self._mode == 'file' and self._annotate)
             self.displayFile()
 
-    def getMode(self):
-        return self._mode
-
-    def setAnnotate(self, ann):
-        self._annotate = ann
-        self.blk.setVisible(self._mode == 'file')
-        self.ann.setVisible(self._mode == 'file' and self._annotate)
-        self.displayFile()
-
-    def getAnnotate(self):
-        return self._annotate
+    def forceMode(self, mode):
+        'Force into file or diff mode, based on content constaints'
+        assert mode in ('diff', 'file')
+        self._mode = mode
+        if mode == 'diff':
+            self.actionDiffMode.setChecked(True)
+        else:
+            self.actionFileMode.setChecked(True)
+        self.actionDiffMode.setEnabled(False)
+        self.actionFileMode.setEnabled(False)
+        self.actionAnnMode.setEnabled(False)
+        self.actionNextDiff.setEnabled(False)
+        self.actionPrevDiff.setEnabled(False)
+        self.blk.setVisible(mode == 'file')
+        self.ann.setVisible(False)
 
     def setContext(self, ctx):
         self._ctx = ctx
         self._p_rev = None
         self.sci.setTabWidth(ctx._repo.tabwidth)
+        self.actionAnnMode.setVisible(ctx.rev() != None)
 
     def rev(self):
         return self._ctx.rev()
@@ -263,7 +304,7 @@ class HgFileView(QFrame):
             self.displayFile(rev=rev)
 
     def mouseMoveEvent(self, event):
-        if self._mode == 'file' and self._annotate and self.ann.fctxann:
+        if self._mode == 'ann' and self.ann.fctxann:
             # Calculate row index from the scroll offset and mouse position
             scroll_offset = self.sci.verticalScrollBar().value()
             idx = scroll_offset + event.pos().y() / self.sci.textHeight(0)
@@ -279,7 +320,7 @@ class HgFileView(QFrame):
         qsci.mouseMoveEvent(self.sci, event)
 
     def leaveEvent(self, event):
-        if self._mode == 'file' and self._annotate:
+        if self._mode == 'ann':
             self.lastrev = None
             self.showDescSignal.emit('')
 
@@ -306,8 +347,7 @@ class HgFileView(QFrame):
 
         self.clearDisplay()
         if filename is None:
-            self.sci.setMarginLineNumbers(1, False)
-            self.sci.setMarginWidth(1, '')
+            self.forceMode('file')
             return
 
         ctx = self._ctx
@@ -327,11 +367,20 @@ class HgFileView(QFrame):
         self.filenamelabel.setText(fd.flabel)
 
         if not fd.isValid():
-            self.ann.setVisible(False)
             self.sci.setText(fd.error)
+            self.forceMode('file')
             return
 
-        if self._mode == 'diff' and fd.diff:
+        if fd.diff and not fd.contents:
+            self.forceMode('diff')
+        elif fd.contents and not fd.diff:
+            self.forceMode('file')
+        else:
+            self.actionDiffMode.setEnabled(True)
+            self.actionFileMode.setEnabled(True)
+            self.actionAnnMode.setEnabled(True)
+
+        if self._mode == 'diff':
             lexer = get_diff_lexer(self)
             self.sci.setLexer(lexer)
             # trim first three lines, for example:
@@ -356,11 +405,10 @@ class HgFileView(QFrame):
 
         uf = hglib.tounicode(self._filename)
         self.fileDisplayed.emit(uf, fd.contents or QString())
-        if self._mode != 'file':
+        if self._mode == 'diff':
             return
 
-        if self._annotate:
-            self.ann.setVisible(self._annotate)
+        if self._mode == 'ann':
             if lexer is not None:
                 self.ann.setFont(lexer.font(0))
             else:
@@ -380,30 +428,34 @@ class HgFileView(QFrame):
             self.timer.start()
 
     def nextDiff(self):
-        if self._mode == 'file':
-            row, column = self.sci.getCursorPosition()
-            for i, (lo, hi) in enumerate(self._diffs):
-                if lo > row:
-                    last = (i == (len(self._diffs)-1))
-                    break
-            else:
-                return False
-            self.sci.setCursorPosition(lo, 0)
-            self.sci.verticalScrollBar().setValue(lo)
-            return not last
+        if self._mode == 'diff' or not self._diffs:
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
+            return
+        row, column = self.sci.getCursorPosition()
+        for i, (lo, hi) in enumerate(self._diffs):
+            if lo > row:
+                last = (i == (len(self._diffs)-1))
+                self.sci.setCursorPosition(lo, 0)
+                self.sci.verticalScrollBar().setValue(lo)
+                break
+        self.actionNextDiff.setEnabled(not last)
+        self.actionPrevDiff.setEnabled(True)
 
     def prevDiff(self):
-        if self._mode == 'file':
-            row, column = self.sci.getCursorPosition()
-            for i, (lo, hi) in enumerate(reversed(self._diffs)):
-                if hi < row:
-                    first = (i == (len(self._diffs)-1))
-                    break
-            else:
-                return False
-            self.sci.setCursorPosition(lo, 0)
-            self.sci.verticalScrollBar().setValue(lo)
-            return not first
+        if self._mode == 'diff' or not self._diffs:
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
+            return
+        row, column = self.sci.getCursorPosition()
+        for i, (lo, hi) in enumerate(reversed(self._diffs)):
+            if hi < row:
+                first = (i == (len(self._diffs)-1))
+                self.sci.setCursorPosition(lo, 0)
+                self.sci.verticalScrollBar().setValue(lo)
+                break
+        self.actionNextDiff.setEnabled(True)
+        self.actionPrevDiff.setEnabled(not first)
 
     def nextLine(self):
         x, y = self.sci.getCursorPosition()
@@ -491,6 +543,8 @@ class HgFileView(QFrame):
         self.blk.setUpdatesEnabled(False)
         for n in range(30): # burst pool
             if self._diff is None or not self._diff.get_opcodes():
+                self.actionNextDiff.setEnabled(bool(self._diffs))
+                self.actionPrevDiff.setEnabled(False)
                 self._diff = None
                 self.timer.stop()
                 self.filled.emit()

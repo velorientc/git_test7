@@ -83,8 +83,8 @@ class RevDetailsWidget(QWidget):
         self.filelist_splitter.setOrientation(Qt.Horizontal)
         self.filelist_splitter.setChildrenCollapsible(False)
 
-        self.diffToolbar = QToolBar(_('Diff Toolbar'))
-        self.diffToolbar.setIconSize(QSize(16,16))
+        self.mergeToolBar = QToolBar(_('Merge Toolbar'))
+        self.mergeToolBar.setIconSize(QSize(16,16))
         self.filelist = HgFileListView()
 
         self.tbarFileListFrame = QFrame(self.filelist_splitter)
@@ -98,7 +98,7 @@ class RevDetailsWidget(QWidget):
         vbox = QVBoxLayout()
         vbox.setSpacing(0)
         vbox.setMargin(0)
-        vbox.addWidget(self.diffToolbar)
+        vbox.addWidget(self.mergeToolBar)
         vbox.addWidget(self.filelist)
         self.tbarFileListFrame.setLayout(vbox)
 
@@ -173,33 +173,6 @@ class RevDetailsWidget(QWidget):
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def createActions(self):
-        self.actionDiffMode = QAction('Diff', self)
-        self.actionDiffMode.setCheckable(True)
-        self.actionFileMode = QAction('File', self)
-        self.actionFileMode.setCheckable(True)
-        self.actionAnnMode = QAction('Ann', self)
-        self.actionAnnMode.setCheckable(True)
-
-        self.modeToggleGroup = QActionGroup(self)
-        self.modeToggleGroup.addAction(self.actionDiffMode)
-        self.modeToggleGroup.addAction(self.actionFileMode)
-        self.modeToggleGroup.addAction(self.actionAnnMode)
-        self.modeToggleGroup.triggered.connect(self.setMode)
-
-        # Next/Prev diff (in full file mode)
-        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
-        self.actionNextDiff.setShortcut('Alt+Down')
-        self.actionNextDiff.triggered.connect(self.nextDiff)
-        def filled():
-            self.actionNextDiff.setEnabled(
-                self.fileview.fileMode() and self.fileview.nDiffs())
-        self.fileview.filled.connect(filled)
-
-        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
-        self.actionPrevDiff.setShortcut('Alt+Up')
-        self.actionPrevDiff.triggered.connect(self.prevDiff)
-        self.actionDiffMode.setChecked(True)
-
         # navigate in file viewer
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
@@ -227,25 +200,6 @@ class RevDetailsWidget(QWidget):
                 lambda self=self:
                 self.filelist.fileActivated(self.filelist.currentIndex(),
                                                       alternate=True))
-        # toolbar
-        tb = self.diffToolbar
-        tb.addAction(self.actionDiffMode)
-        tb.addAction(self.actionFileMode)
-        tb.addAction(self.actionAnnMode)
-        tb.addSeparator()
-        tb.addAction(self.actionNextDiff)
-        tb.addAction(self.actionPrevDiff)
-
-    @pyqtSlot(QAction)
-    def setMode(self, action):
-        diffmode = action.text() == 'Diff'
-        self.fileview.setMode(diffmode)
-        self.fileview.setAnnotate(action.text() == 'Ann')
-        self.actionNextDiff.setDisabled(diffmode)
-        self.actionPrevDiff.setDisabled(diffmode)
-
-    def getMode(self):
-        return self.fileview.getMode()
 
     @pyqtSlot()
     def toggleSearchBar(self):
@@ -262,20 +216,6 @@ class RevDetailsWidget(QWidget):
             return
         self.fileview.highlightText(self.searchbar.pattern(),
                                     self.searchbar.caseInsensitive())
-
-    def nextDiff(self):
-        notlast = self.fileview.nextDiff()
-        filemode = self.fileview.fileMode()
-        nDiffs = self.fileview.nDiffs()
-        self.actionNextDiff.setEnabled(filemode and notlast and nDiffs)
-        self.actionPrevDiff.setEnabled(filemode and nDiffs)
-
-    def prevDiff(self):
-        notfirst = self.fileview.prevDiff()
-        filemode = self.fileview.fileMode()
-        nDiffs = self.fileview.nDiffs()
-        self.actionPrevDiff.setEnabled(filemode and notfirst and nDiffs)
-        self.actionNextDiff.setEnabled(filemode and nDiffs)
 
     def create_models(self):
         self.filelistmodel = HgFileListModel(self.repo, parent=self)
@@ -296,21 +236,8 @@ class RevDetailsWidget(QWidget):
         self.revpanel.update(repo = self.repo)
         self.message.setHtml('<pre>%s</pre>'
                              % self._deschtmlize(ctx.description()))
-        if type(ctx.rev()) == str:
-            self.actionDiffMode.setChecked(True)
-            self.actionDiffMode.setEnabled(False)
-            self.actionFileMode.setEnabled(False)
-            self.actionAnnMode.setEnabled(False)
-        else:
-            self.actionDiffMode.setEnabled(True)
-            self.actionFileMode.setEnabled(True)
-            self.actionAnnMode.setEnabled(True)
         self.fileview.setContext(ctx)
         self.filelistmodel.setContext(ctx)
-
-        mode = self.getMode()
-        self.actionNextDiff.setEnabled(mode != 'diff')
-        self.actionPrevDiff.setEnabled(mode != 'diff')
 
     @pyqtSlot()
     def _updatedeschtmlizer(self):

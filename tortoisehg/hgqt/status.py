@@ -172,7 +172,7 @@ class StatusWidget(QWidget):
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
-        self.fileview.setMode('diff')
+        self.fileview.setContext(self.repo[None])
         vbox.addWidget(self.fileview, 1)
 
         lbltext = u'<a href="shelve:">' + _('shelve tool') + u'</a>'

@@ -157,11 +157,6 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addSeparator()
         self.editToolbar.addAction(self.actionBack)
         self.editToolbar.addAction(self.actionForward)
-        self.editToolbar.addSeparator()
-        self.editToolbar.addAction(self.actionDiffMode)
-        self.editToolbar.addAction(self.actionAnnMode)
-        self.editToolbar.addAction(self.actionNextDiff)
-        self.editToolbar.addAction(self.actionPrevDiff)
 
     def setupModels(self):
         self.filerevmodel = FileRevModel(self.repo, parent=self)
@@ -170,7 +165,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.repoview.revisionActivated.connect(self.revisionActivated)
         self.filerevmodel.showMessage.connect(self.statusBar().showMessage)
         self.filerevmodel.filled.connect(self.modelFilled)
-        self.textView.setMode('file')
+        self.textView.forceMode('file')
         self.findToolbar.setModel(self.filerevmodel)
         self.findToolbar.setFilterFiles([self.filename])
         self.findToolbar.setMode('file')
@@ -186,22 +181,6 @@ class FileLogDialog(_AbstractFileDialog):
         self.actionForward = QAction(_('Forward'), self, enabled=False,
                                      icon=geticon('forward'))
         self.repoview.revisionSelected.connect(self._updateHistoryActions)
-
-        self.actionDiffMode = QAction('Diff mode', self)
-        self.actionDiffMode.setCheckable(True)
-        self.actionDiffMode.toggled.connect(self.setMode)
-
-        self.actionAnnMode = QAction('Annotate', self)
-        self.actionAnnMode.setCheckable(True)
-        self.actionAnnMode.toggled.connect(self.textView.setAnnotate)
-
-        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
-        self.actionNextDiff.setShortcut('Alt+Down')
-        self.actionNextDiff.triggered.connect(self.nextDiff)
-        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
-        self.actionPrevDiff.setShortcut('Alt+Up')
-        self.actionPrevDiff.triggered.connect(self.prevDiff)
-
         self.actionBack.triggered.connect(self.repoview.back)
         self.actionForward.triggered.connect(self.repoview.forward)
 
@@ -226,11 +205,6 @@ class FileLogDialog(_AbstractFileDialog):
         self.textView.setContext(ctx)
         self.textView.displayFile(self.filerevmodel.graph.filename(rev))
         self.textView.verticalScrollBar().setValue(pos)
-        self.actionPrevDiff.setEnabled(False)
-        def textfilled():
-            enabled = self.textView.fileMode() and self.textView.nDiffs()
-            self.actionNextDiff.setEnabled(enabled)
-        self.textView.filled.connect(textfilled)
 
     def goto(self, rev):
         index = self.filerevmodel.indexFromRev(rev)
@@ -239,25 +213,6 @@ class FileLogDialog(_AbstractFileDialog):
         else:
             self._show_rev = rev
 
-    def setMode(self, mode):
-        self.textView.setMode(mode)
-        self.actionAnnMode.setEnabled(not mode)
-        self.actionNextDiff.setEnabled(not mode)
-        self.actionPrevDiff.setEnabled(not mode)
-
-    def nextDiff(self):
-        notlast = self.textView.nextDiff()
-        mode = self.textView.fileMode()
-        ndiffs = self.textView.nDiffs()
-        self.actionNextDiff.setEnabled(mode and notlast and ndiffs)
-        self.actionPrevDiff.setEnabled(mode and ndiffs)
-
-    def prevDiff(self):
-        notfirst = self.textView.prevDiff()
-        mode = self.textView.fileMode()
-        ndiffs = self.textView.nDiffs()
-        self.actionPrevDiff.setEnabled(mode and notfirst and ndiffs)
-        self.actionNextDiff.setEnabled(mode and ndiffs)
 
 
 class FileDiffDialog(_AbstractFileDialog):
