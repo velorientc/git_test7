@@ -35,14 +35,14 @@ class BackoutDialog(QDialog):
         box.addWidget(target_sep)
 
         style = csinfo.panelstyle(selectable=True)
-        self.target_info = csinfo.create(self.repo, rev, style, withupdate=True)
-        box.addWidget(self.target_info)
+        self.targetinfo = csinfo.create(self.repo, rev, style, withupdate=True)
+        box.addWidget(self.targetinfo)
 
         ## backout message
         msg_sep = qtlib.LabeledSeparator(_('Backout commit message'))
         box.addWidget(msg_sep)
 
-        revhex = self.target_info.get_data('revid')
+        revhex = self.targetinfo.get_data('revid')
         self.msgset = keep._('Backed out changeset: ')
         self.msgset['id'] += revhex
         self.msgset['str'] += revhex
@@ -143,7 +143,7 @@ class BackoutDialog(QDialog):
 
     def backout(self):
         # prepare command line
-        revhex = self.target_info.get_data('revid')
+        revhex = self.targetinfo.get_data('revid')
         cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
         cmdline += ['--tool=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
