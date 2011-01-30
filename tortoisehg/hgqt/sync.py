@@ -44,7 +44,6 @@ class SyncWidget(QWidget):
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
-        self.root = repo.root
         self.repo = repo
         self.finishfunc = None
         self.curuser = None
@@ -271,7 +270,7 @@ class SyncWidget(QWidget):
     def reload(self):
         # Refresh configured paths
         self.paths = {}
-        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn = self.repo.join('hgrc')
         fn, cfg = loadIniFile([fn], self)
         if 'paths' in cfg:
             for alias in cfg['paths']:
@@ -605,7 +604,8 @@ class SyncWidget(QWidget):
             if os.path.exists(bfile):
                 os.unlink(bfile)
             self.finishfunc = finished
-            cmdline = ['--repository', self.root, 'incoming', '--bundle', bfile]
+            cmdline = ['--repository', self.repo.root, 'incoming',
+                       '--bundle', bfile]
             self.run(cmdline, ('force', 'branch', 'rev'))
         else:
             def finished(ret, output):
@@ -616,7 +616,7 @@ class SyncWidget(QWidget):
                 else:
                     self.showMessage.emit(_('Incoming aborted, ret %d') % ret)
             self.finishfunc = finished
-            cmdline = ['--repository', self.root, 'incoming']
+            cmdline = ['--repository', self.repo.root, 'incoming']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def pullclicked(self):
@@ -643,7 +643,7 @@ class SyncWidget(QWidget):
                     return
         self.finishfunc = finished
         self.showMessage.emit(_('Pulling...'))
-        cmdline = ['--repository', self.root, 'pull', '--verbose']
+        cmdline = ['--repository', self.repo.root, 'pull', '--verbose']
         uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve') \
             and 'ui.merge=internal:merge' or 'ui.merge=internal:fail'
         if self.cachedpp == 'rebase':
@@ -668,12 +668,12 @@ class SyncWidget(QWidget):
                 else:
                     self.showMessage.emit(_('Outgoing aborted, ret %d') % ret)
             self.finishfunc = outputnodes
-            cmdline = ['--repository', self.root, 'outgoing', '--quiet',
+            cmdline = ['--repository', self.repo.root, 'outgoing', '--quiet',
                        '--template', '{node}\n']
             self.run(cmdline, ('force', 'branch', 'rev'))
         else:
             self.finishfunc = None
-            cmdline = ['--repository', self.root, 'outgoing']
+            cmdline = ['--repository', self.repo.root, 'outgoing']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def p4pending(self):
@@ -717,7 +717,7 @@ class SyncWidget(QWidget):
                 dlg.exec_()
         self.finishfunc = finished
         self.showMessage.emit(_('Perforce pending...'))
-        self.run(['--repository', self.root, 'p4pending', '--verbose'], ())
+        self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self):
         self.showMessage.emit(_('Pushing...'))
@@ -727,7 +727,7 @@ class SyncWidget(QWidget):
             else:
                 self.showMessage.emit(_('Push aborted, ret %d') % ret)
         self.finishfunc = finished
-        cmdline = ['--repository', self.root, 'push']
+        cmdline = ['--repository', self.repo.root, 'push']
         self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
 
     def postpullclicked(self):
@@ -755,14 +755,14 @@ class SyncWidget(QWidget):
             else:
                 self.showMessage.emit(_('Outgoing aborted, ret %d') % ret)
         self.finishfunc = outputnodes
-        cmdline = ['--repository', self.root, 'outgoing', '--quiet',
+        cmdline = ['--repository', self.repo.root, 'outgoing', '--quiet',
                     '--template', '{node}\n']
         self.run(cmdline, ('force', 'branch', 'rev'))
 
     @pyqtSlot(QString)
     def removeAlias(self, alias):
         alias = hglib.fromunicode(alias)
-        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn = self.repo.join('hgrc')
         fn, cfg = loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to remove URL'),
@@ -860,7 +860,7 @@ class PostPullDialog(QDialog):
             return 'rebase'
 
     def accept(self):
-        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        path = self.repo.join('hgrc')
         fn, cfg = loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save post pull operation'),
@@ -887,7 +887,6 @@ class SaveDialog(QDialog):
     def __init__(self, repo, alias, url, parent):
         super(SaveDialog, self).__init__(parent)
         self.repo = repo
-        self.root = repo.root
         layout = QVBoxLayout()
         self.setLayout(layout)
         hbox = QHBoxLayout()
@@ -916,7 +915,7 @@ class SaveDialog(QDialog):
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
     def accept(self):
-        fn = os.path.join(self.root, '.hg', 'hgrc')
+        fn = self.repo.join('hgrc')
         fn, cfg = loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save an URL'),
@@ -947,7 +946,6 @@ class AuthDialog(QDialog):
     def __init__(self, repo, host, user, pw, parent):
         super(AuthDialog, self).__init__(parent)
         self.repo = repo
-        self.root = repo.root
         self.setLayout(QVBoxLayout())
 
         form = QFormLayout()
@@ -994,7 +992,7 @@ class AuthDialog(QDialog):
         if self.globalcb:
             path = util.user_rcpath()
         else:
-            path = [os.path.join(self.root, '.hg', 'hgrc')]
+            path = [self.repo.join('hgrc')]
 
         fn, cfg = loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
