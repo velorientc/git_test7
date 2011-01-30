@@ -68,6 +68,7 @@ class BackoutDialog(QDialog):
         self.merge_chk = QCheckBox(_('Commit backout before merging with '
                                      'current working parent'))
         self.merge_chk.toggled.connect(self.merge_toggled)
+        self.merge_chk.setChecked(bool(opts.get('merge')))
         self.msg_text.setEnabled(False)
         obox.addWidget(self.merge_chk)
 
@@ -76,6 +77,15 @@ class BackoutDialog(QDialog):
         self.autoresolve_chk.setChecked(
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
         obox.addWidget(self.autoresolve_chk)
+
+        if repo[revhex] == repo.parents()[0]:
+            # backing out the working parent is a one-step process
+            self.msg_text.setEnabled(True)
+            self.merge_chk.setVisible(False)
+            self.autoresolve_chk.setVisible(False)
+            self.backoutParent = True
+        else:
+            self.backoutParent = False
 
         self.reslabel = QLabel()
         self.reslabel.linkActivated.connect(self.link_activated)
@@ -112,8 +122,6 @@ class BackoutDialog(QDialog):
         self.setWindowTitle(_("Backout '%s' - %s") % (revhex,
                             self.repo.displayname))
 
-        self.merge_chk.setChecked(bool(opts.get('merge')))
-
         # prepare to show
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
@@ -147,7 +155,10 @@ class BackoutDialog(QDialog):
         cmdline = ['backout', '--rev', revhex, '--repository', self.repo.root]
         cmdline += ['--tool=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
-        if self.merge_chk.isChecked():
+        if self.backoutParent:
+            msg = self.msg_text.toPlainText()
+            cmdline += ['--message', hglib.fromunicode(msg)]
+        elif self.merge_chk.isChecked():
             cmdline += ['--merge']
             msg = self.msg_text.toPlainText()
             cmdline += ['--message', hglib.fromunicode(msg)]
@@ -175,6 +186,7 @@ class BackoutDialog(QDialog):
 
     def command_started(self):
         self.cmd.setShown(True)
+        self.merge_chk.setVisible(False)
         self.close_btn.setHidden(True)
         self.cancel_btn.setShown(True)
         self.detail_btn.setShown(True)
@@ -190,9 +202,10 @@ class BackoutDialog(QDialog):
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)
             self.close_btn.setFocus()
+        elif self.backoutParent:
+            self.accept()
         elif self.cmdline[0] == 'backout':
             self.didbackout = True
-            self.merge_chk.setEnabled(False)
             self.msg_text.setEnabled(True)
             self.backout_btn.setText(_('Commit'))
             self.backout_btn.clicked.disconnect(self.backout)
