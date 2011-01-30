@@ -36,7 +36,6 @@ from tortoisehg.hgqt.blockmatcher import BlockList
 from tortoisehg.hgqt import qscilib, qtlib
 
 qsci = Qsci.QsciScintilla
-chunkhdrre = re.compile('^@@ -(\d+).*@@$')
 
 class Annotator(qsci):
     # we use a QScintilla for the annotater cause it makes
