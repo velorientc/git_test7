@@ -693,7 +693,8 @@ class RepoWidget(QWidget):
 
     def okToContinue(self):
         return self.commitDemand.forward('canExit', default=True) and \
-               self.syncDemand.forward('canExit', default=True)
+               self.syncDemand.forward('canExit', default=True) and \
+               self.mqDemand.forward('canExit', default=True)
 
     def closeRepoWidget(self):
         '''returns False if close should be aborted'''
