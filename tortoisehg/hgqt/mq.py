@@ -18,7 +18,7 @@ from hgext import mq as mqmod
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, shelve, qscilib
-from tortoisehg.hgqt import qqueue
+from tortoisehg.hgqt import qqueue, fileview
 
 # TODO: Disable MQ toolbar while cmdui.Runner is busy
 
@@ -59,6 +59,10 @@ class MQWidget(QWidget):
 
         self.queueFrame = QFrame(splitter)
         self.messageFrame = QFrame(splitter)
+        self.fileview = fileview.HgFileView(splitter)
+
+        self.fileview.showMessage.connect(self.showMessage)
+        self.fileview.setContext(repo[None])
 
         # Patch Queue Frame
         layout = QVBoxLayout()
@@ -133,6 +137,7 @@ class MQWidget(QWidget):
         layout.addWidget(self.messageEditor, 1)
 
         self.fileListWidget = QListWidget(self)
+        self.fileListWidget.currentRowChanged.connect(self.onFileSelected)
         layout.addWidget(self.fileListWidget, 2)
 
         qrefhbox = QHBoxLayout()
@@ -217,6 +222,7 @@ class MQWidget(QWidget):
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
         self.messageEditor.refresh(self.repo)
+        self.fileview.setContext(self.repo[None])
 
     @pyqtSlot()
     def onRepositoryChanged(self):
@@ -354,6 +360,19 @@ class MQWidget(QWidget):
             self.qdeleteBtn.setEnabled(False)
             self.qpushMoveBtn.setEnabled(False)
             self.setGuardsBtn.setEnabled(False)
+
+    @pyqtSlot(int)
+    def onFileSelected(self, row):
+        if self.refreshing or row == -1:
+            return
+        text = hglib.fromunicode(self.fileListWidget.item(row).text())
+        status = text[0]
+        filename = text[2:]
+        if self.newCheckBox.isChecked():
+            rev = self.repo['.'].rev()
+        else:
+            rev = self.repo['qtip'].p1().rev()
+        self.fileview.displayFile(filename, rev, status)
 
     @pyqtSlot(int)
     def onMessageSelected(self, row):
@@ -599,6 +618,7 @@ class MQWidget(QWidget):
                 item.setCheckState(Qt.Checked)
                 self.fileListWidget.addItem(item)
         self.fileListWidget.clear()
+        self.fileview.clearDisplay()
         pctx = self.repo.changectx('.')
         newmode = self.newCheckBox.isChecked()
         # Get patch file lists
@@ -685,6 +705,7 @@ class MQWidget(QWidget):
         userhist = s.value('commit/userhist').toStringList()
         self.opts['userhist'] = [hglib.fromunicode(u) for u in userhist if u]
         self.messageEditor.loadSettings(s, 'mq/editor')
+        self.fileview.loadSettings(s, 'mq/fileview')
         if not self.parent():
             self.restoreGeometry(s.value('mq/geom').toByteArray())
 
@@ -693,6 +714,7 @@ class MQWidget(QWidget):
         s = QSettings()
         s.setValue('mq/splitter', self.splitter.saveState())
         self.messageEditor.saveSettings(s, 'mq/editor')
+        self.fileview.saveSettings(s, 'mq/fileview')
         if not self.parent():
             s.setValue('mq/geom', self.saveGeometry())
 
