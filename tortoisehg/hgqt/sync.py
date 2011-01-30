@@ -956,19 +956,53 @@ class AuthDialog(QDialog):
         form.addRow(_('Schemes'), self.schemes)
 
         self.prefixentry = QLineEdit(host)
+        self.prefixentry.setToolTip(
+_('''Either * or a URI prefix with or without the scheme part. The
+authentication entry with the longest matching prefix is used (where * matches
+ everything and counts as a match of length 1). If the prefix doesn't include
+ a scheme, the match is performed against the URI with its scheme stripped as
+ well, and the schemes argument, q.v., is then subsequently consulted.'''))
         form.addRow(_('Prefix'), self.prefixentry)
 
         self.userentry = QLineEdit(user)
+        self.userentry.setToolTip(
+_('''Optional. Username to authenticate with. If not given, and the remote
+site requires basic or digest authentication, the user will be prompted for
+it. Environment variables are expanded in the username letting you do
+foo.username = $USER.'''))
         form.addRow(_('Username'), self.userentry)
 
         self.pwentry = QLineEdit(pw)
         self.pwentry.setEchoMode(QLineEdit.Password)
+        self.pwentry.setToolTip(
+_('''Optional. Password to authenticate with. If not given, and the remote
+site requires basic or digest authentication, the user will be prompted for
+it.'''))
         form.addRow(_('Password'), self.pwentry)
         self.layout().addLayout(form)
+
+        self.keyentry = QLineEdit(user)
+        self.keyentry.setToolTip(
+_('''Optional. PEM encoded client certificate key file. Environment variables
+are expanded in the filename.'''))
+        form.addRow(_('User Certificate Key File'), self.keyentry)
+
+        self.chainentry = QLineEdit(user)
+        self.chainentry.setToolTip(
+_('''Optional. PEM encoded client certificate chain file. Environment variables
+are expanded in the filename.'''))
+        form.addRow(_('User Certificate Chain File'), self.chainentry)
 
         self.globalcb = QCheckBox(_('Save this configuration globally'))
         self.globalcb.setChecked(True)
         self.layout().addWidget(self.globalcb)
+
+        txt = _('Auth section %smanual page%s') % (
+            '<a href="http://www.selenic.com/mercurial/hgrc.5.html#auth">',
+            '</a>')
+        self.lbl = QLabel(txt)
+        self.lbl.setOpenExternalLinks(True)
+        self.layout().addWidget(self.lbl)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Help|BB.Save|BB.Cancel)
@@ -1004,6 +1038,8 @@ class AuthDialog(QDialog):
         prefix = hglib.fromunicode(self.prefixentry.text())
         username = hglib.fromunicode(self.userentry.text())
         password = hglib.fromunicode(self.pwentry.text())
+        key = hglib.fromunicode(self.keyentry.text())
+        chain = hglib.fromunicode(self.chainentry.text())
         alias = hglib.fromunicode(self.aliasentry.text())
         if alias+'.prefix' in cfg['auth']:
             if not qtlib.QuestionMsgBox(_('Confirm authentication replace'),
@@ -1013,11 +1049,16 @@ class AuthDialog(QDialog):
         cfg.set('auth', alias+'.schemes', schemes)
         cfg.set('auth', alias+'.username', username)
         cfg.set('auth', alias+'.prefix', prefix)
-        key = alias+'.password'
-        if password:
-            cfg.set('auth', key, password)
-        elif not password and key in cfg['auth']:
-            del cfg['auth'][key]
+        def setorclear(item, value):
+            item = '.'.join([alias, item])
+            if value:
+                cfg.set('auth', item, value)
+            elif not value and item in cfg['auth']:
+                del cfg['auth'][item]
+        setorclear('password', password)
+        setorclear('key', key)
+        setorclear('cert', chain)
+
         self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
