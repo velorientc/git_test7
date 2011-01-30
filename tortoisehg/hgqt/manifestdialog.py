@@ -17,9 +17,10 @@ from PyQt4.QtGui import *
 
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import qtlib, qscilib, annotate, status, thgrepo, \
-                            visdiff, wctxactions
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib, qscilib, annotate, status, thgrepo
+from tortoisehg.hgqt import visdiff, wctxactions, revert
+from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
 class ManifestDialog(QMainWindow):
@@ -114,10 +115,14 @@ class ManifestWidget(QWidget):
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
+    contextmenu = None
+
     def __init__(self, repo, rev=None, parent=None):
         super(ManifestWidget, self).__init__(parent)
         self._repo = repo
         self._rev = rev
+        self._diff_dialogs = {}
+        self._nav_dialogs = {}
 
         self._initwidget()
         self._initactions()
@@ -135,6 +140,8 @@ class ManifestWidget(QWidget):
         self._toolbar = QToolBar()
         self._toolbar.setIconSize(QSize(16,16))
         self._treeview = QTreeView(self, headerHidden=True, dragEnabled=True)
+        self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._treeview.customContextMenuRequested.connect(self.menuRequest)
         navlayout.addWidget(self._toolbar)
         navlayout.addWidget(self._treeview)
         navlayoutw = QWidget()
@@ -174,6 +181,115 @@ class ManifestWidget(QWidget):
             self._fileview.setAnnotationEnabled)
         self._action_annotate_mode.setEnabled(self.rev is not None)
         self._toolbar.addAction(self._action_annotate_mode)
+
+        self._actions = {}
+        for name, desc, icon, key, tip, cb in [
+            ('navigate', _('File history'), None, 'Shift+Return',
+              _('Show the history of the selected file'), self.navigate),
+            ('diffnavigate', _('Compare file revisions'), None, None,
+              _('Compare revisions of the selected file'), self.diffNavigate),
+            ('diff', _('Visual Diff'), None, 'Ctrl+D',
+              _('View file changes in external diff tool'), self.vdiff),
+            ('ldiff', _('Visual Diff to Local'), None, 'Shift+Ctrl+D',
+              _('View changes to current in external diff tool'),
+              self.vdifflocal),
+            ('edit', _('View at Revision'), None, 'Alt+Ctrl+E',
+              _('View file as it appeared at this revision'), self.editfile),
+            ('ledit', _('Edit Local'), None, 'Shift+Ctrl+E',
+              _('Edit current file in working copy'), self.editlocal),
+            ('revert', _('Revert to Revision'), None, 'Alt+Ctrl+T',
+              _('Revert file(s) to contents at this revision'),
+              self.revertfile),
+            ]:
+            act = QAction(desc, self)
+            if icon:
+                act.setIcon(geticon(icon))
+            if key:
+                act.setShortcut(key)
+            if tip:
+                act.setStatusTip(tip)
+            if cb:
+                act.triggered.connect(cb)
+            self._actions[name] = act
+            self.addAction(act)
+
+    def navigate(self, filename=None):
+        self._navigate(filename, FileLogDialog, self._nav_dialogs)
+
+    def diffNavigate(self, filename=None):
+        self._navigate(filename, FileDiffDialog, self._diff_dialogs)
+
+    def vdiff(self):
+        if self.path is None:
+            return
+        pats = [self.path]
+        opts = {'change':self.rev}
+        dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
+        if dlg:
+            dlg.exec_()
+
+    def vdifflocal(self):
+        if self.path is None:
+            return
+        pats = [self.path]
+        assert type(self.rev) is int
+        opts = {'rev':['rev(%d)' % self.rev]}
+        dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
+        if dlg:
+            dlg.exec_()
+
+    def editfile(self):
+        if self.path is None:
+            return
+        if self.rev is None:
+            files = [repo.wjoin(self.path)]
+            wctxactions.edit(self, self._repo.ui, self._repo, files)
+        else:
+            base, _ = visdiff.snapshot(self._repo, [self.path],
+                                       self._repo[self.rev])
+            files = [os.path.join(base, self.path)]
+            wctxactions.edit(self, self._repo.ui, self._repo, files)
+
+    def editlocal(self):
+        if self.path is None:
+            return
+        path = self._repo.wjoin(self.path)
+        wctxactions.edit(self, self._repo.ui, self._repo, [path])
+
+    def revertfile(self):
+        if self.path is None:
+            return
+        if self.rev is None:
+            rev = self._repo['.'].rev()
+        dlg = revert.RevertDialog(self._repo, self.path, self.rev, self)
+        dlg.exec_()
+
+    def _navigate(self, filename, dlgclass, dlgdict):
+        if not filename:
+            filename = self.path
+        if filename not in dlgdict:
+            dlg = dlgclass(self._repo, filename,
+                            repoviewer=self.window())
+            dlgdict[filename] = dlg
+            ufname = hglib.tounicode(filename)
+            dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
+        dlg = dlgdict[filename]
+        dlg.goto(self.rev)
+        dlg.show()
+        dlg.raise_()
+        dlg.activateWindow()
+
+    def menuRequest(self, point):
+        point = self.mapToGlobal(point)
+        if not self.contextmenu:
+            self.contextmenu = QMenu(self)
+            for act in ['diff', 'ldiff', 'edit', 'ledit', 'revert',
+                        'navigate', 'diffnavigate']:
+                if act:
+                    self.contextmenu.addAction(self._actions[act])
+                else:
+                    self.contextmenu.addSeparator()
+        self.contextmenu.exec_(point)
 
     @property
     def toolbar(self):
@@ -221,6 +337,11 @@ class ManifestWidget(QWidget):
     def setRev(self, rev):
         """Change revision to show"""
         self.setSource(self.path, rev)
+        real = type(rev) is int
+        for act in ['ldiff', 'edit']:
+            self._actions[act].setEnabled(real)
+        for act in ['diff', 'revert']:
+            self._actions[act].setEnabled(real or rev is None)
 
     @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
