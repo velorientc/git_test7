@@ -380,6 +380,27 @@ class CustomPrompt(QMessageBox):
 def setup_font_substitutions():
     QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
 
+def fix_application_font():
+    if os.name != 'nt':
+        return
+    try:
+        import win32gui, win32con
+    except ImportError:
+        return
+
+    # On Windows, the font for main window seems to be determined by "icon"
+    # font, but Qt chooses uncustomizable system font.
+    lf = win32gui.SystemParametersInfo(win32con.SPI_GETICONTITLELOGFONT)
+    f = QFont(hglib.tounicode(lf.lfFaceName))
+    f.setItalic(lf.lfItalic)
+    if lf.lfWeight != win32con.FW_DONTCARE:
+        weights = [(0, QFont.Light), (400, QFont.Normal), (600, QFont.DemiBold),
+                   (700, QFont.Bold), (800, QFont.Black)]
+        n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
+        f.setWeight(w)
+    f.setPixelSize(abs(lf.lfHeight))
+    QApplication.setFont(f, 'QMainWindow')
+
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
 
