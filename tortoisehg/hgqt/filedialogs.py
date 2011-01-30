@@ -341,8 +341,7 @@ class FileDiffDialog(_AbstractFileDialog):
     def setupModels(self):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
-        self.filerevmodel = FileRevModel(self.repo, self.filename,
-                                         parent=self)
+        self.filerevmodel = FileRevModel(self.repo, self.filename, parent=self)
         self.filerevmodel.filled.connect(self.modelFilled)
         self.tableView_revisions_left.setModel(self.filerevmodel)
         self.tableView_revisions_right.setModel(self.filerevmodel)

@@ -314,12 +314,6 @@ class HgFileView(QFrame):
         self.sci.setTabWidth(ctx._repo.tabwidth)
         self.actionAnnMode.setVisible(ctx.rev() != None)
 
-    def rev(self):
-        return self._ctx.rev()
-
-    def filename(self):
-        return self._filename
-
     def displayDiff(self, rev):
         if rev != self._p_rev:
             self.displayFile(rev=rev)
@@ -334,7 +328,7 @@ class HgFileView(QFrame):
                 idx = len(self.ann.fctxann) - 1
             ctx = self.ann.fctxann[idx]
             rev = ctx.rev()
-            desc = hglib.get_revision_desc(ctx, self.filename())
+            desc = hglib.get_revision_desc(ctx, self._filename)
             if rev != self.lastrev:
                 self.showDescSignal.emit(desc)
                 self.lastrev = rev
