@@ -234,7 +234,6 @@ class MQWidget(QWidget):
         self.repo.decrementBusyCount()
         if ret is not 0:
             pass # TODO: look for reject notifications
-        self.reload() # TODO: probably redundant
 
     @pyqtSlot()
     def onPushAll(self):
@@ -658,6 +657,7 @@ class MQWidget(QWidget):
             newguards.remove(guard)
         cmdline = ['qselect', '-R', self.repo.root]
         cmdline += newguards or ['--none']
+        self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
 
     # Capture drop events, try to import into current patch queue
