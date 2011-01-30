@@ -207,6 +207,8 @@ class HgFileView(QFrame):
         self._filename = None
         self._status = None
         self._find_text = None
+        self._mode = None
+        self._lostMode = None
 
         self.actionDiffMode = QAction('Diff', self)
         self.actionDiffMode.setCheckable(True)
@@ -274,6 +276,8 @@ class HgFileView(QFrame):
     def forceMode(self, mode):
         'Force into file or diff mode, based on content constaints'
         assert mode in ('diff', 'file')
+        if self._lostMode is None:
+            self._lostMode = self._mode
         self._mode = mode
         if mode == 'diff':
             self.actionDiffMode.setChecked(True)
@@ -379,6 +383,14 @@ class HgFileView(QFrame):
             self.actionDiffMode.setEnabled(True)
             self.actionFileMode.setEnabled(True)
             self.actionAnnMode.setEnabled(True)
+            if self._lostMode:
+                if self._lostMode == 'diff':
+                    self.actionDiffMode.trigger()
+                elif self._lostMode == 'file':
+                    self.actionFileMode.trigger()
+                elif self._lostMode == 'ann':
+                    self.actionAnnMode.trigger()
+                self._lostMode = None
 
         if self._mode == 'diff':
             lexer = get_diff_lexer(self)
