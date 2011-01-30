@@ -505,11 +505,6 @@ class HgFileView(QFrame):
     def nDiffs(self):
         return len(self._diffs)
 
-    def diffMode(self):
-        return self._mode == 'diff'
-    def fileMode(self):
-        return self._mode == 'file'
-
     def searchString(self, text):
         self._find_text = text
         self.clearHighlights()
