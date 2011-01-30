@@ -47,9 +47,9 @@ class BackoutDialog(QDialog):
         self.msgset['id'] += revhex
         self.msgset['str'] += revhex
 
-        self.msg_text = QTextEdit()
-        self.msg_text.setText(self.msgset['str'])
-        box.addWidget(self.msg_text, 1)
+        self.msgTextEdit = QTextEdit()
+        self.msgTextEdit.setText(self.msgset['str'])
+        box.addWidget(self.msgTextEdit, 1)
 
         ## options
         opt_sep = qtlib.LabeledSeparator(_('Options'))
@@ -59,18 +59,18 @@ class BackoutDialog(QDialog):
         obox.setSpacing(3)
         box.addLayout(obox)
 
-        self.eng_chk = QCheckBox(_('Use English backout message'))
-        self.eng_chk.toggled.connect(self.eng_toggled)
+        self.engChk = QCheckBox(_('Use English backout message'))
+        self.engChk.toggled.connect(self.eng_toggled)
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
-        self.eng_chk.setChecked(engmsg)
+        self.engChk.setChecked(engmsg)
 
-        obox.addWidget(self.eng_chk)
-        self.merge_chk = QCheckBox(_('Commit backout before merging with '
+        obox.addWidget(self.engChk)
+        self.mergeChk = QCheckBox(_('Commit backout before merging with '
                                      'current working parent'))
-        self.merge_chk.toggled.connect(self.merge_toggled)
-        self.merge_chk.setChecked(bool(opts.get('merge')))
-        self.msg_text.setEnabled(False)
-        obox.addWidget(self.merge_chk)
+        self.mergeChk.toggled.connect(self.merge_toggled)
+        self.mergeChk.setChecked(bool(opts.get('merge')))
+        self.msgTextEdit.setEnabled(False)
+        obox.addWidget(self.mergeChk)
 
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
@@ -80,8 +80,8 @@ class BackoutDialog(QDialog):
 
         if repo[revhex] == repo.parents()[0]:
             # backing out the working parent is a one-step process
-            self.msg_text.setEnabled(True)
-            self.merge_chk.setVisible(False)
+            self.msgTextEdit.setEnabled(True)
+            self.mergeChk.setVisible(False)
             self.autoresolve_chk.setVisible(False)
             self.backoutParent = True
         else:
@@ -100,18 +100,18 @@ class BackoutDialog(QDialog):
 
         ## bottom buttons
         buttons = QDialogButtonBox()
-        self.cancel_btn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancel_btn.clicked.connect(self.cancel_clicked)
-        self.close_btn = buttons.addButton(QDialogButtonBox.Close)
-        self.close_btn.clicked.connect(self.reject)
-        self.backout_btn = buttons.addButton(_('&Backout'),
+        self.cancelBtn = buttons.addButton(QDialogButtonBox.Cancel)
+        self.cancelBtn.clicked.connect(self.cancel_clicked)
+        self.closeBtn = buttons.addButton(QDialogButtonBox.Close)
+        self.closeBtn.clicked.connect(self.reject)
+        self.backoutBtn = buttons.addButton(_('&Backout'),
                                              QDialogButtonBox.ActionRole)
-        self.backout_btn.clicked.connect(self.backout)
-        self.detail_btn = buttons.addButton(_('Detail'),
+        self.backoutBtn.clicked.connect(self.backout)
+        self.detailBtn = buttons.addButton(_('Detail'),
                                             QDialogButtonBox.ResetRole)
-        self.detail_btn.setAutoDefault(False)
-        self.detail_btn.setCheckable(True)
-        self.detail_btn.toggled.connect(self.detail_toggled)
+        self.detailBtn.setAutoDefault(False)
+        self.detailBtn.setCheckable(True)
+        self.detailBtn.toggled.connect(self.detail_toggled)
         box.addWidget(buttons)
 
         # dialog setting
@@ -124,30 +124,30 @@ class BackoutDialog(QDialog):
 
         # prepare to show
         self.cmd.setHidden(True)
-        self.cancel_btn.setHidden(True)
-        self.detail_btn.setHidden(True)
-        self.msg_text.setFocus()
-        cursor = self.msg_text.textCursor()
+        self.cancelBtn.setHidden(True)
+        self.detailBtn.setHidden(True)
+        self.msgTextEdit.setFocus()
+        cursor = self.msgTextEdit.textCursor()
         cursor.movePosition(QTextCursor.EndOfBlock)
-        self.msg_text.setTextCursor(cursor)
+        self.msgTextEdit.setTextCursor(cursor)
 
     ### Private Methods ###
 
     def merge_toggled(self, checked):
-        self.msg_text.setEnabled(checked)
+        self.msgTextEdit.setEnabled(checked)
 
     def eng_toggled(self, checked):
-        msg = self.msg_text.toPlainText()
+        msg = self.msgTextEdit.toPlainText()
         origmsg = (checked and self.msgset['str'] or self.msgset['id'])
         if msg != origmsg:
             if not qtlib.QuestionMsgBox(_('Confirm Discard Message'),
                          _('Discard current backout message?'), parent=self):
-                self.eng_chk.blockSignals(True)
-                self.eng_chk.setChecked(not checked)
-                self.eng_chk.blockSignals(False)
+                self.engChk.blockSignals(True)
+                self.engChk.setChecked(not checked)
+                self.engChk.blockSignals(False)
                 return
         newmsg = (checked and self.msgset['id'] or self.msgset['str'])
-        self.msg_text.setText(newmsg)
+        self.msgTextEdit.setText(newmsg)
 
     def backout(self):
         # prepare command line
@@ -156,11 +156,11 @@ class BackoutDialog(QDialog):
         cmdline += ['--tool=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         if self.backoutParent:
-            msg = self.msg_text.toPlainText()
+            msg = self.msgTextEdit.toPlainText()
             cmdline += ['--message', hglib.fromunicode(msg)]
-        elif self.merge_chk.isChecked():
+        elif self.mergeChk.isChecked():
             cmdline += ['--merge']
-            msg = self.msg_text.toPlainText()
+            msg = self.msgTextEdit.toPlainText()
             cmdline += ['--message', hglib.fromunicode(msg)]
 
         # start backing out
@@ -170,7 +170,7 @@ class BackoutDialog(QDialog):
 
     def commit(self):
         cmdline = ['commit', '--repository', self.repo.root]
-        msg = self.msg_text.toPlainText()
+        msg = self.msgTextEdit.toPlainText()
         cmdline += ['--message', hglib.fromunicode(msg)]
         self.cmdline = cmdline
         self.repo.incrementBusyCount()
@@ -186,30 +186,30 @@ class BackoutDialog(QDialog):
 
     def command_started(self):
         self.cmd.setShown(True)
-        self.merge_chk.setVisible(False)
-        self.close_btn.setHidden(True)
-        self.cancel_btn.setShown(True)
-        self.detail_btn.setShown(True)
+        self.mergeChk.setVisible(False)
+        self.closeBtn.setHidden(True)
+        self.cancelBtn.setShown(True)
+        self.detailBtn.setShown(True)
 
     def command_canceling(self):
-        self.cancel_btn.setDisabled(True)
+        self.cancelBtn.setDisabled(True)
 
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
-        self.cancel_btn.setHidden(True)
+        self.cancelBtn.setHidden(True)
         if ret not in (0, 1):
-            self.detail_btn.setChecked(True)
-            self.close_btn.setShown(True)
-            self.close_btn.setAutoDefault(True)
-            self.close_btn.setFocus()
+            self.detailBtn.setChecked(True)
+            self.closeBtn.setShown(True)
+            self.closeBtn.setAutoDefault(True)
+            self.closeBtn.setFocus()
         elif self.backoutParent:
             self.accept()
         elif self.cmdline[0] == 'backout':
             self.didbackout = True
-            self.msg_text.setEnabled(True)
-            self.backout_btn.setText(_('Commit'))
-            self.backout_btn.clicked.disconnect(self.backout)
-            self.backout_btn.clicked.connect(self.commit)
+            self.msgTextEdit.setEnabled(True)
+            self.backoutBtn.setText(_('Commit'))
+            self.backoutBtn.clicked.disconnect(self.backout)
+            self.backoutBtn.clicked.connect(self.commit)
             self.checkResolve()
         elif not self.cmd.outputShown():
             self.accept()
@@ -220,10 +220,10 @@ class BackoutDialog(QDialog):
             if ms[path] == 'u':
                 txt = _('Backout generated merge <b>conflicts</b> that must '
                         'be <a href="resolve"><b>resolved</b></a>')
-                self.backout_btn.setEnabled(False)
+                self.backoutBtn.setEnabled(False)
                 break
         else:
-            self.backout_btn.setEnabled(True)
+            self.backoutBtn.setEnabled(True)
             txt = _('You may commit the backed out changes after '
                     '<a href="status"><b>verifying</b></a> them')
         self.reslabel.setText(txt)
