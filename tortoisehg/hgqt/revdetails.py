@@ -173,24 +173,6 @@ class RevDetailsWidget(QWidget):
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def createActions(self):
-        # navigate in file viewer
-        self.actionNextLine = QAction('Next line', self)
-        self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
-        self.actionNextLine.triggered.connect(self.fileview.nextLine)
-        self.addAction(self.actionNextLine)
-        self.actionPrevLine = QAction('Prev line', self)
-        self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
-        self.actionPrevLine.triggered.connect(self.fileview.prevLine)
-        self.addAction(self.actionPrevLine)
-        self.actionNextCol = QAction('Next column', self)
-        self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
-        self.actionNextCol.triggered.connect(self.fileview.nextCol)
-        self.addAction(self.actionNextCol)
-        self.actionPrevCol = QAction('Prev column', self)
-        self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
-        self.actionPrevCol.triggered.connect(self.fileview.prevCol)
-        self.addAction(self.actionPrevCol)
-
         # Activate file (file diff navigator)
         self.actionActivateFile = QAction('Activate file', self)
         self.actionActivateFileAlt = QAction('Activate alt. file', self)
