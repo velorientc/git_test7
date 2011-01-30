@@ -386,7 +386,7 @@ class HgFileView(QFrame):
                 self.sci.verticalScrollBar().setValue(lo)
                 break
         else:
-            last = False
+            last = True
         self.actionNextDiff.setEnabled(not last)
         self.actionPrevDiff.setEnabled(True)
 
@@ -403,7 +403,7 @@ class HgFileView(QFrame):
                 self.sci.verticalScrollBar().setValue(lo)
                 break
         else:
-            first = False
+            first = True
         self.actionNextDiff.setEnabled(True)
         self.actionPrevDiff.setEnabled(not first)
 
