@@ -8,6 +8,7 @@
 
 import os
 import re
+import tempfile
 import urlparse
 
 from PyQt4.QtCore import *
@@ -600,9 +601,7 @@ class SyncWidget(QWidget):
             for badchar in (':', '*', '\\', '?', '#'):
                 bfile = bfile.replace(badchar, '')
             bfile = bfile.replace('/', '_')
-            bfile = os.path.join(qtlib.gettempdir(), bfile) + '.hg'
-            if os.path.exists(bfile):
-                os.unlink(bfile)
+            bfile = tempfile.mktemp('.hg', bfile+'_', qtlib.gettempdir())
             self.finishfunc = finished
             cmdline = ['--repository', self.repo.root, 'incoming',
                        '--bundle', bfile]
