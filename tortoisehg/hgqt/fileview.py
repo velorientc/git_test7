@@ -31,6 +31,7 @@ from PyQt4 import Qsci
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import annotate, qscilib, qtlib, blockmatcher, lexers
+from tortoisehg.hgqt import visdiff, wctxactions
 
 qsci = Qsci.QsciScintilla
 
@@ -45,9 +46,6 @@ class HgFileView(QFrame):
 
     searchRequested = pyqtSignal(unicode)
     """Emitted (pattern) when user request to search content"""
-
-    editSelected = pyqtSignal(unicode, object, int)
-    """Emitted (path, rev, line) when user requests to open editor"""
 
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
@@ -428,6 +426,15 @@ class HgFileView(QFrame):
     @pyqtSlot(unicode, object, int)
     def sourceChanged(self, path, rev, line=None):
         self.revForDiffChanged.emit(rev)
+
+    @pyqtSlot(unicode, object, int)
+    def editSelected(self, path, rev, line):
+        """Open editor to show the specified file"""
+        repo = self._ctx._repo
+        path = hglib.fromunicode(path)
+        base = visdiff.snapshot(repo, [path], repo[rev])[0]
+        files = [os.path.join(base, path)]
+        wctxactions.edit(self, repo.ui, repo, files, line, self._find_text)
 
     def searchString(self, text):
         self._find_text = text
