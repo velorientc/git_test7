@@ -33,19 +33,22 @@ class HgFileListModel(QAbstractTableModel):
 
     contextChanged = pyqtSignal(object)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent):
         """
         data is a HgHLRepo instance
         """
         QAbstractTableModel.__init__(self, parent)
         self.repo = repo
+        self._boldfont = parent.font()
+        self._boldfont.setBold(True)
         self._ctx = None
         self._files = []
         self._filesdict = {}
         self._fulllist = False
 
-    def toggleFullFileList(self):
-        self._fulllist = not self._fulllist
+    @pyqtSlot(bool)
+    def toggleFullFileList(self, value):
+        self._fulllist = value
         self.loadFiles()
         self.layoutChanged.emit()
 
@@ -153,8 +156,6 @@ class HgFileListModel(QAbstractTableModel):
                 return QVariant(geticon('filedelete'))
         elif role == Qt.FontRole:
             if self._fulllist and current_file_desc['infiles']:
-                font = self.font()
-                font.setBold(True)
-                return QVariant(font)
+                return QVariant(self._boldfont)
         else:
             return nullvariant

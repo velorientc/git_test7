@@ -56,6 +56,8 @@ class HgFileListView(QTableView):
         model.contextChanged.connect(self.contextChanged)
         self.selectionModel().currentRowChanged.connect(self.fileSelected)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
+        self.actionShowAllMerge.setChecked(False)
+        self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
         if model._ctx is not None:
             self.contextChanged(model._ctx)
 
@@ -66,6 +68,7 @@ class HgFileListView(QTableView):
             self._actions[act].setEnabled(real)
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
+        self.actionShowAllMerge.setVisible(len(ctx.parents()) == 2)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -187,6 +190,11 @@ class HgFileListView(QTableView):
             dlg.activateWindow()
 
     def createActions(self):
+        self.actionShowAllMerge = QAction('Show All', self)
+        self.actionShowAllMerge.setCheckable(True)
+        self.actionShowAllMerge.setChecked(False)
+        self.actionShowAllMerge.setVisible(False)
+
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
             ('navigate', _('File history'), None, 'Shift+Return',
@@ -285,4 +293,3 @@ class HgFileListView(QTableView):
             return QTableView.mouseMoveEvent(self, event)
         self.dragObject()
         return QTableView.mouseMoveEvent(self, event)
-

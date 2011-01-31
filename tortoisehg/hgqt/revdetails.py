@@ -177,15 +177,14 @@ class RevDetailsWidget(QWidget):
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def createActions(self):
-        # Activate file (file diff navigator)
-        self.actionActivateFile = QAction('Activate file', self)
+        def fileActivated():
+            idx = self.filelist.currentIndex()
+            self.filelist.fileActivated(idx, alternate=True)
         self.actionActivateFileAlt = QAction('Activate alt. file', self)
         self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return,
                                                  Qt.ALT+Qt.Key_Enter])
-        self.actionActivateFileAlt.triggered.connect(
-                lambda self=self:
-                self.filelist.fileActivated(self.filelist.currentIndex(),
-                                                      alternate=True))
+        self.actionActivateFileAlt.triggered.connect(fileActivated)
+        self.mergeToolBar.addAction(self.filelist.actionShowAllMerge)
 
     @pyqtSlot()
     def toggleSearchBar(self):
@@ -204,7 +203,7 @@ class RevDetailsWidget(QWidget):
                                     self.searchbar.caseInsensitive())
 
     def create_models(self):
-        self.filelistmodel = HgFileListModel(self.repo, parent=self)
+        self.filelistmodel = HgFileListModel(self.repo, self)
 
     def setupModels(self):
         self.create_models()
