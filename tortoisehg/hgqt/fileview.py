@@ -87,17 +87,17 @@ class HgFileView(QFrame):
         framelayout.addLayout(self.topLayout)
         framelayout.addLayout(l, 1)
 
-        ll2 = QHBoxLayout()
-        ll2.setContentsMargins(0, 0, 0, 0)
-        ll2.setSpacing(0)
-        l.addLayout(ll2)
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        hbox.setSpacing(0)
+        l.addLayout(hbox)
 
         self.blk = blockmatcher.BlockList(self)
-        ll2.addWidget(self.blk)
+        hbox.addWidget(self.blk)
         self.blk.setVisible(False)
 
         self._stacked = QStackedWidget()
-        ll2.addWidget(self._stacked, 1)
+        hbox.addWidget(self._stacked, 1)
 
         self.sci = qscilib.Scintilla(self)
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
