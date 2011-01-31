@@ -87,10 +87,20 @@ class HgFileView(QFrame):
         framelayout.addLayout(self.topLayout)
         framelayout.addLayout(l, 1)
 
+        ll2 = QHBoxLayout()
+        ll2.setContentsMargins(0, 0, 0, 0)
+        ll2.setSpacing(0)
+        l.addLayout(ll2)
+
+        self.blk = blockmatcher.BlockList(self)
+        ll2.addWidget(self.blk)
+        self.blk.setVisible(False)
+
         self._stacked = QStackedWidget()
-        l.addWidget(self._stacked, 1)
+        ll2.addWidget(self._stacked, 1)
 
         self.sci = qscilib.Scintilla(self)
+        self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self._stacked.addWidget(self.sci)
 
         self.sci.setFrameStyle(0)
@@ -135,21 +145,6 @@ class HgFileView(QFrame):
         self._annotate.sourceChanged.connect(self.sourceChanged)
         self._annotate.setAnnotationEnabled(True)
         self._stacked.addWidget(self._annotate)
-
-        ll = QVBoxLayout()
-        ll.setContentsMargins(0, 0, 0, 0)
-        ll.setSpacing(0)
-        l.insertLayout(0, ll)
-
-        ll2 = QHBoxLayout()
-        ll2.setContentsMargins(0, 0, 0, 0)
-        ll2.setSpacing(0)
-        ll.addLayout(ll2)
-
-        self.blk = blockmatcher.BlockList(self)
-        self.blk.linkScrollBar(self.sci.verticalScrollBar())
-        ll2.addWidget(self.blk)
-        self.blk.setVisible(False)
 
         self._ctx = None
         self._filename = None
