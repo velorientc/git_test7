@@ -100,6 +100,8 @@ class QuickOpDialog(QDialog):
         s = QSettings()
         stwidget.loadSettings(s, 'quickop')
         self.restoreGeometry(s.value('quickop/geom').toByteArray())
+        if hasattr(self, 'chk'):
+            self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
 
@@ -146,6 +148,8 @@ class QuickOpDialog(QDialog):
             s = QSettings()
             self.stwidget.saveSettings(s, 'quickop')
             s.setValue('quickop/geom', self.saveGeometry())
+            if hasattr(self, 'chk'):
+                s.setValue('quickop/nobackup', self.chk.isChecked())
             QDialog.reject(self)
 
 
