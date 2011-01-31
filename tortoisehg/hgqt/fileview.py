@@ -37,10 +37,9 @@ qsci = Qsci.QsciScintilla
 class HgFileView(QFrame):
     """file diff and content viewer"""
 
-    showDescSignal = pyqtSignal(QString)
     linkActivated = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(QString, QString)
-    showMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(QString)
     revForDiffChanged = pyqtSignal(int)
     filled = pyqtSignal()
 
@@ -138,9 +137,9 @@ class HgFileView(QFrame):
         for name in ('searchRequested', 'editSelected', 'grepRequested'):
             getattr(self._annotate, name).connect(getattr(self, name))
         self._annotate.revisionHint.connect(self.showMessage)
+        self._annotate.sourceChanged.connect(self.sourceChanged)
         self._annotate.setAnnotationEnabled(True)
         self._stacked.addWidget(self._annotate)
-        # self._annotate.sourceChanged.connect( ?? )
 
         ll = QVBoxLayout()
         ll.setContentsMargins(0, 0, 0, 0)
@@ -230,9 +229,9 @@ class HgFileView(QFrame):
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
         mode = {'Diff':'diff', 'File':'file', 'Ann':'ann'}[str(action.text())]
-        self.actionNextDiff.setEnabled(mode != 'diff')
+        self.actionNextDiff.setEnabled(mode == 'file')
         self.actionPrevDiff.setEnabled(False)
-        self.blk.setVisible(mode != 'diff')
+        self.blk.setVisible(mode == 'file')
         if mode == 'ann':
             self._stacked.setCurrentWidget(self._annotate)
         else:
@@ -279,6 +278,7 @@ class HgFileView(QFrame):
         self.extralabel.hide()
         self.sci.setMarginLineNumbers(1, False)
         self.sci.setMarginWidth(1, '')
+        self._diffs = []
 
     def displayFile(self, filename=None, rev=None, status=None):
         if filename is None:
@@ -369,7 +369,6 @@ class HgFileView(QFrame):
             olddata = fd.olddata.splitlines()
             newdata = fd.contents.splitlines()
             self._diff = difflib.SequenceMatcher(None, olddata, newdata)
-            self._diffs = []
             self.blk.syncPageStep()
             self.timer.start()
 
@@ -425,6 +424,10 @@ class HgFileView(QFrame):
 
     def nDiffs(self):
         return len(self._diffs)
+
+    @pyqtSlot(unicode, object, int)
+    def sourceChanged(self, path, rev, line=None):
+        self.revForDiffChanged.emit(rev)
 
     def searchString(self, text):
         self._find_text = text

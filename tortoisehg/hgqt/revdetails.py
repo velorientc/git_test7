@@ -21,6 +21,8 @@ class RevDetailsWidget(QWidget):
 
     showMessage = pyqtSignal(str)
     linkActivated = pyqtSignal(unicode)
+    grepRequested = pyqtSignal(unicode, dict)
+    revForDiffChanged = pyqtSignal(int)
 
     def __init__(self, repo):
         QWidget.__init__(self)
@@ -41,6 +43,8 @@ class RevDetailsWidget(QWidget):
 
         self.fileview.setFont(getfont('fontdiff').font())
         self.fileview.showMessage.connect(self.showMessage)
+        self.fileview.grepRequested.connect(self.grepRequested)
+        self.fileview.revForDiffChanged.connect(self.revForDiffChanged)
         self.restoreSettings()
 
     def setRepo(self, repo):
