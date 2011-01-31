@@ -415,6 +415,7 @@ class HgFileView(QFrame):
     def nDiffs(self):
         return len(self._diffs)
 
+    @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
     def sourceChanged(self, path, rev, line=None):
         self.revForDiffChanged.emit(rev)
