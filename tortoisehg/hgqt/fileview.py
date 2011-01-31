@@ -167,10 +167,12 @@ class HgFileView(QFrame):
         self.modeToggleGroup.triggered.connect(self.setMode)
 
         # Next/Prev diff (in full file mode)
-        self.actionNextDiff = QAction(qtlib.geticon('down'), 'Next diff', self)
+        self.actionNextDiff = QAction(qtlib.geticon('down'),
+                                      'Next diff (alt+down)', self)
         self.actionNextDiff.setShortcut('Alt+Down')
         self.actionNextDiff.triggered.connect(self.nextDiff)
-        self.actionPrevDiff = QAction(qtlib.geticon('up'), 'Previous diff', self)
+        self.actionPrevDiff = QAction(qtlib.geticon('up'),
+                                      'Previous diff (alt+up)', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
 
