@@ -19,7 +19,7 @@ from PyQt4.QtGui import *
 
 class RevDetailsWidget(QWidget):
 
-    showMessage = pyqtSignal(str)
+    showMessage = pyqtSignal(QString)
     linkActivated = pyqtSignal(unicode)
     grepRequested = pyqtSignal(unicode, dict)
     revForDiffChanged = pyqtSignal(int)
