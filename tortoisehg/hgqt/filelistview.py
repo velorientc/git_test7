@@ -239,14 +239,6 @@ class HgFileListView(QTableView):
             self.setColumnWidth(0, col_width)
         QTableView.resizeEvent(self, event)
 
-    def nextFile(self):
-        row = self.currentIndex().row()
-        self.setCurrentIndex(self.model().index(min(row+1,
-                             self.model().rowCount() - 1), 0))
-    def prevFile(self):
-        row = self.currentIndex().row()
-        self.setCurrentIndex(self.model().index(max(row - 1, 0), 0))
-
     #
     ## Mouse drag
     #
