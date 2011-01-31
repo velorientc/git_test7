@@ -101,6 +101,18 @@ class HgFileView(QFrame):
         self.sci.customContextMenuRequested.connect(self.menuRequested)
         self.sci.setCaretLineVisible(False)
 
+        # define markers for colorize zones of diff
+        self.markerplus = self.sci.markerDefine(qsci.Background)
+        self.markerminus = self.sci.markerDefine(qsci.Background)
+        self.markertriangle = self.sci.markerDefine(qsci.Background)
+        self.sci.setMarkerBackgroundColor(QColor('#B0FFA0'), self.markerplus)
+        self.sci.setMarkerBackgroundColor(QColor('#A0A0FF'), self.markerminus)
+        self.sci.setMarkerBackgroundColor(QColor('#FFA0A0'), self.markertriangle)
+
+        # hide margin 0 (markers)
+        self.sci.setMarginType(0, qsci.SymbolMargin)
+        self.sci.setMarginWidth(0, 0)
+
         if hasattr(self.sci, 'indicatorDefine'):
             self.sci.indicatorDefine(qsci.RoundBoxIndicator, 8)
             self.sci.setIndicatorDrawUnder(8)
@@ -115,21 +127,6 @@ class HgFileView(QFrame):
             self.sci.SendScintilla(qsci.SCI_INDICSETSTYLE, 9, qsci.INDIC_ROUNDBOX)
             self.sci.SendScintilla(qsci.SCI_INDICSETUNDER, 9, True)
             self.sci.SendScintilla(qsci.SCI_INDICSETFORE, 9, 0x58A8FF)
-
-        # hide margin 0 (markers)
-        self.sci.SendScintilla(qsci.SCI_SETMARGINTYPEN, 0, 0)
-        self.sci.SendScintilla(qsci.SCI_SETMARGINWIDTHN, 0, 0)
-
-        # define markers for colorize zones of diff
-        self.markerplus = self.sci.markerDefine(qsci.Background)
-        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markerplus,
-                               0xB0FFA0)
-        self.markerminus = self.sci.markerDefine(qsci.Background)
-        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markerminus,
-                               0xA0A0FF)
-        self.markertriangle = self.sci.markerDefine(qsci.Background)
-        self.sci.SendScintilla(qsci.SCI_MARKERSETBACK, self.markertriangle,
-                               0xFFA0A0)
 
         self._annotate = annotate.AnnotateView(repo, self)
         for name in ('searchRequested', 'editSelected', 'grepRequested'):
