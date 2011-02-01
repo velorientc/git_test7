@@ -24,7 +24,6 @@ from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
-from tortoisehg.hgqt import fileview
 
 class QuickBar(QToolBar):
     def __init__(self, name, key, desc=None, parent=None):
