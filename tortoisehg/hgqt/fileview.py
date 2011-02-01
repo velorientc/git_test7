@@ -42,7 +42,6 @@ class HgFileView(QFrame):
     fileDisplayed = pyqtSignal(QString, QString)
     showMessage = pyqtSignal(QString)
     revForDiffChanged = pyqtSignal(int)
-    filled = pyqtSignal()
 
     searchRequested = pyqtSignal(unicode)
     """Emitted (pattern) when user request to search content"""
@@ -455,7 +454,6 @@ class HgFileView(QFrame):
                 self.actionPrevDiff.setEnabled(False)
                 self._diff = None
                 self.timer.stop()
-                self.filled.emit()
                 break
 
             tag, alo, ahi, blo, bhi = self._diff.get_opcodes().pop(0)
