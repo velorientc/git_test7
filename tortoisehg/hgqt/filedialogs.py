@@ -55,10 +55,6 @@ class _AbstractFileDialog(QMainWindow):
         self.setupViews()
         self.setupModels()
 
-    def attachQuickBar(self, qbar):
-        qbar.setParent(self)
-        self.addToolBar(Qt.BottomToolBarArea, qbar)
-
     def setRepoViewer(self, repoviewer=None):
         self.repoviewer = repoviewer
         if repoviewer:
