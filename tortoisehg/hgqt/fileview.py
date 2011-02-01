@@ -146,6 +146,12 @@ class HgFileView(QFrame):
         self._annotate.setAnnotationEnabled(True)
         self._stacked.addWidget(self._annotate)
 
+        self.searchbar = qscilib.SearchToolBar(hidable=True)
+        self.searchbar.hide()
+        self.searchbar.searchRequested.connect(self.find)
+        self.searchbar.conditionChanged.connect(self.highlightText)
+        self.layout().addWidget(self.searchbar)
+
         self._ctx = None
         self._filename = None
         self._status = None
@@ -178,6 +184,10 @@ class HgFileView(QFrame):
 
         self.forceMode('diff')
 
+        self.actionFind = self.searchbar.toggleViewAction()
+        self.actionFind.setIcon(qtlib.geticon('edit-find'))
+        self.actionFind.setShortcut(QKeySequence.Find)
+
         tb = self.diffToolbar
         tb.addAction(self.actionDiffMode)
         tb.addAction(self.actionFileMode)
@@ -185,6 +195,8 @@ class HgFileView(QFrame):
         tb.addSeparator()
         tb.addAction(self.actionNextDiff)
         tb.addAction(self.actionPrevDiff)
+        tb.addSeparator()
+        tb.addAction(self.actionFind)
 
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
