@@ -428,11 +428,17 @@ class HgFileView(QFrame):
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
         self._find_text = hglib.fromunicode(exp)
-        self.sci.find(exp, icase, wrap, forward)
+        if self._mode == 'ann':
+            self._annotate.find(exp, icase, wrap, forward)
+        else:
+            self.sci.find(exp, icase, wrap, forward)
 
     @pyqtSlot(unicode, bool)
     def highlightText(self, match, icase=False):
-        self.sci.highlightText(match, icase)
+        if self._mode == 'ann':
+            self._annotate.highlightText(match, icase)
+        else:
+            self.sci.highlightText(match, icase)
 
     def verticalScrollBar(self):
         return self.sci.verticalScrollBar()
