@@ -227,8 +227,7 @@ class AnnotateView(qscilib.Scintilla):
     def _updatelexer(self, fctx):
         """Update the lexer according to the given file"""
         lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()), self)
-        if lex:
-            self.setLexer(lex)
+        self.setLexer(lex)
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
