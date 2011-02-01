@@ -92,15 +92,18 @@ class HgFileView(QFrame):
         l.addLayout(hbox)
 
         self.blk = blockmatcher.BlockList(self)
+        self.sci = annotate.AnnotateView(repo, self)
         hbox.addWidget(self.blk)
-        self.blk.setVisible(False)
+        hbox.addWidget(self.sci, 1)
 
-        self._stacked = QStackedWidget()
-        hbox.addWidget(self._stacked, 1)
+        for name in ('searchRequested', 'editSelected', 'grepRequested'):
+            getattr(self.sci, name).connect(getattr(self, name))
+        self.sci.revisionHint.connect(self.showMessage)
+        self.sci.sourceChanged.connect(self.sourceChanged)
+        self.sci.setAnnotationEnabled(False)
 
-        self.sci = qscilib.Scintilla(self)
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
-        self._stacked.addWidget(self.sci)
+        self.blk.setVisible(False)
 
         self.sci.setFrameStyle(0)
         self.sci.setReadOnly(True)
@@ -121,14 +124,6 @@ class HgFileView(QFrame):
         # hide margin 0 (markers)
         self.sci.setMarginType(0, qsci.SymbolMargin)
         self.sci.setMarginWidth(0, 0)
-
-        self._annotate = annotate.AnnotateView(repo, self)
-        for name in ('searchRequested', 'editSelected', 'grepRequested'):
-            getattr(self._annotate, name).connect(getattr(self, name))
-        self._annotate.revisionHint.connect(self.showMessage)
-        self._annotate.sourceChanged.connect(self.sourceChanged)
-        self._annotate.setAnnotationEnabled(True)
-        self._stacked.addWidget(self._annotate)
 
         self.searchbar = qscilib.SearchToolBar(hidable=True)
         self.searchbar.hide()
@@ -220,10 +215,7 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(mode == 'file')
         self.actionPrevDiff.setEnabled(False)
         self.blk.setVisible(mode == 'file')
-        if mode == 'ann':
-            self._stacked.setCurrentWidget(self._annotate)
-        else:
-            self._stacked.setCurrentWidget(self.sci)
+        self.sci.setAnnotationEnabled(mode == 'ann')
         if mode != self._mode:
             self._mode = mode
             if not self._lostMode:
@@ -245,7 +237,7 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(False)
         self.actionPrevDiff.setEnabled(False)
         self.blk.setVisible(mode == 'file')
-        self._stacked.setCurrentWidget(self.sci)
+        self.sci.setAnnotationEnabled(False)
 
     def setContext(self, ctx):
         self._ctx = ctx
@@ -264,8 +256,6 @@ class HgFileView(QFrame):
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
-        self.sci.setMarginLineNumbers(1, False)
-        self.sci.setMarginWidth(1, '')
         self._diffs = []
 
     def displayFile(self, filename=None, rev=None, status=None):
@@ -320,9 +310,8 @@ class HgFileView(QFrame):
                     self.actionAnnMode.trigger()
                 self._lostMode = None
 
-        if self._mode == 'ann':
-            self._annotate.setSource(filename, ctx.rev())
-        elif self._mode == 'diff':
+        if self._mode == 'diff':
+            self.sci.setMarginWidth(1, 0)
             lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
             # trim first three lines, for example:
@@ -333,14 +322,13 @@ class HgFileView(QFrame):
             self.sci.setText(hglib.tounicode(noheader))
         elif fd.contents is None:
             return
+        elif self._mode == 'ann':
+            self.sci.setSource(filename, ctx.rev())
         else:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
-            nlines = fd.contents.count('\n')
-            # margin 1 is used for line numbers
-            self.sci.setMarginLineNumbers(1, True)
-            self.sci.setMarginWidth(1, str(nlines)+'0')
             self.sci.setText(fd.contents)
+            self.sci._updatemarginwidth()
 
         self.highlightText(*self._lastSearch)
         uf = hglib.tounicode(self._filename)
@@ -427,18 +415,12 @@ class HgFileView(QFrame):
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
-        if self._mode == 'ann':
-            self._annotate.find(exp, icase, wrap, forward)
-        else:
-            self.sci.find(exp, icase, wrap, forward)
+        self.sci.find(exp, icase, wrap, forward)
 
     @pyqtSlot(unicode, bool)
     def highlightText(self, match, icase=False):
         self._lastSearch = match, icase
-        if self._mode == 'ann':
-            self._annotate.highlightText(match, icase)
-        else:
-            self.sci.highlightText(match, icase)
+        self.sci.highlightText(match, icase)
 
     def verticalScrollBar(self):
         return self.sci.verticalScrollBar()

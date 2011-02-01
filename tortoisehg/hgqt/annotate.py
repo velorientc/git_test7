@@ -210,12 +210,15 @@ class AnnotateView(qscilib.Scintilla):
     @pyqtSlot(bool)
     def setAnnotationEnabled(self, enabled):
         """Enable / disable annotation"""
-        if bool(enabled) == self.isAnnotationEnabled():
+        enable = bool(enabled)
+        if enabled == self.isAnnotationEnabled():
             return
-        self._annotation_enabled = bool(enabled)
+        self._annotation_enabled = enabled
         self._updateannotation()
         self._updatemarginwidth()
+        self.setMouseTracking(enabled)
         if not self.isAnnotationEnabled():
+            self.annfile = None
             self.markerDeleteAll()
 
     def isAnnotationEnabled(self):
@@ -231,8 +234,9 @@ class AnnotateView(qscilib.Scintilla):
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
+        style = self._margin_style()
         for i, (fctx, _origline) in enumerate(self._links):
-            self.setMarginText(i, str(fctx.rev()), self._margin_style)
+            self.setMarginText(i, str(fctx.rev()), style)
 
     def _updatemarkers(self):
         """Update markers which colorizes each line"""
@@ -261,7 +265,6 @@ class AnnotateView(qscilib.Scintilla):
             for fctx in fctxs:
                 self._revmarkers[fctx.rev()] = i
 
-    @util.propertycache
     def _margin_style(self):
         """Style for margin area"""
         s = QsciStyle()
@@ -281,6 +284,7 @@ class AnnotateView(qscilib.Scintilla):
 
     @pyqtSlot()
     def _updatemarginwidth(self):
+        self.setMarginsFont(self.font())
         def lentext(s):
             return 'M' * (len(str(s)) + 2)  # 2 for margin
         self.setMarginWidth(1, lentext(self.lines()))
