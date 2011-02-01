@@ -206,6 +206,7 @@ class AnnotateView(qscilib.Scintilla):
         super(AnnotateView, self).clear()
         self.clearMarginText()
         self.markerDeleteAll()
+        self.annfile = None
 
     @pyqtSlot(bool)
     def setAnnotationEnabled(self, enabled):
