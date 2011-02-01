@@ -139,9 +139,9 @@ class HgFileView(QFrame):
         self._ctx = None
         self._filename = None
         self._status = None
-        self._find_text = None
         self._mode = None
         self._lostMode = None
+        self._lastSearch = u'', False
 
         self.actionDiffMode = QAction('Diff', self)
         self.actionDiffMode.setCheckable(True)
@@ -343,6 +343,7 @@ class HgFileView(QFrame):
             self.sci.setMarginWidth(1, str(nlines)+'0')
             self.sci.setText(fd.contents)
 
+        self.highlightText(*self._lastSearch)
         uf = hglib.tounicode(self._filename)
         self.fileDisplayed.emit(uf, fd.contents or QString())
 
@@ -422,11 +423,11 @@ class HgFileView(QFrame):
         path = hglib.fromunicode(path)
         base = visdiff.snapshot(repo, [path], repo[rev])[0]
         files = [os.path.join(base, path)]
-        wctxactions.edit(self, repo.ui, repo, files, line, self._find_text)
+        pattern = hglib.fromunicode(self._lastSearch[0])
+        wctxactions.edit(self, repo.ui, repo, files, line, pattern)
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
-        self._find_text = hglib.fromunicode(exp)
         if self._mode == 'ann':
             self._annotate.find(exp, icase, wrap, forward)
         else:
@@ -434,6 +435,7 @@ class HgFileView(QFrame):
 
     @pyqtSlot(unicode, bool)
     def highlightText(self, match, icase=False):
+        self._lastSearch = match, icase
         if self._mode == 'ann':
             self._annotate.highlightText(match, icase)
         else:
