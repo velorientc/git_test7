@@ -146,8 +146,8 @@ class SyncWidget(QWidget):
         self.pathentry.setAcceptDrops(False)
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
-        self.authbutton = QPushButton(_('Authentication'))
-        hbox.addWidget(self.authbutton)
+        self.securebutton = QPushButton(_('Security'))
+        hbox.addWidget(self.securebutton)
         self.savebutton = QPushButton(_('Save'))
         hbox.addWidget(self.savebutton)
         self.layout().addLayout(hbox)
@@ -186,7 +186,7 @@ class SyncWidget(QWidget):
         self.layout().addLayout(hbox, 1)
 
         self.savebutton.clicked.connect(self.saveclicked)
-        self.authbutton.clicked.connect(self.authclicked)
+        self.securebutton.clicked.connect(self.secureclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
 
@@ -311,7 +311,7 @@ class SyncWidget(QWidget):
         schemeIndex = self.schemecombo.currentIndex()
         self.hostentry.setEnabled(schemeIndex != 0)
         self.portentry.setEnabled(schemeIndex != 0)
-        self.authbutton.setEnabled(schemeIndex > 1)
+        self.securebutton.setEnabled(schemeIndex > 1)
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
@@ -482,11 +482,11 @@ class SyncWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
 
-    def authclicked(self):
+    def secureclicked(self):
         host = hglib.fromunicode(self.hostentry.text())
         user = self.curuser or ''
         pw = self.curpw or ''
-        dlg = AuthDialog(self.repo, host, user, pw, self)
+        dlg = SecureDialog(self.repo, host, user, pw, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
@@ -941,70 +941,9 @@ class SaveDialog(QDialog):
     def reject(self):
         super(SaveDialog, self).reject()
 
-class AuthDialog(QDialog):
+class SecureDialog(QDialog):
     def __init__(self, repo, host, user, pw, parent):
-        super(AuthDialog, self).__init__(parent)
-        uhost = hglib.tounicode(host)
-        self.setWindowTitle(_('Authentication: ') + uhost)
-        self.setWindowFlags(self.windowFlags() & \
-                            ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
-        self.setLayout(QVBoxLayout())
-
-        authbox = QGroupBox(_('User Authentication'))
-        self.layout().addWidget(authbox)
-        form = QFormLayout()
-        authbox.setLayout(form)
-        self.aliasentry = QLineEdit(host.split('.', 1)[0])
-        form.addRow(_('Site Alias'), self.aliasentry)
-
-        self.schemes = QComboBox()
-        self.schemes.addItems(('http https', 'http', 'https'))
-        form.addRow(_('Schemes'), self.schemes)
-
-        self.prefixentry = QLineEdit(host)
-        self.prefixentry.setToolTip(
-_('''Either * or a URI prefix with or without the scheme part. The
-authentication entry with the longest matching prefix is used (where * matches
- everything and counts as a match of length 1). If the prefix doesn't include
- a scheme, the match is performed against the URI with its scheme stripped as
- well, and the schemes argument, q.v., is then subsequently consulted.'''))
-        form.addRow(_('Prefix'), self.prefixentry)
-
-        self.userentry = QLineEdit(user)
-        self.userentry.setToolTip(
-_('''Optional. Username to authenticate with. If not given, and the remote
-site requires basic or digest authentication, the user will be prompted for
-it. Environment variables are expanded in the username letting you do
-foo.username = $USER.'''))
-        form.addRow(_('Username'), self.userentry)
-
-        self.pwentry = QLineEdit(pw)
-        self.pwentry.setEchoMode(QLineEdit.Password)
-        self.pwentry.setToolTip(
-_('''Optional. Password to authenticate with. If not given, and the remote
-site requires basic or digest authentication, the user will be prompted for
-it.'''))
-        form.addRow(_('Password'), self.pwentry)
-
-        self.keyentry = QLineEdit()
-        self.keyentry.setToolTip(
-_('''Optional. PEM encoded client certificate key file. Environment variables
-are expanded in the filename.'''))
-        form.addRow(_('User Certificate Key File'), self.keyentry)
-
-        self.chainentry = QLineEdit()
-        self.chainentry.setToolTip(
-_('''Optional. PEM encoded client certificate chain file. Environment variables
-are expanded in the filename.'''))
-        form.addRow(_('User Certificate Chain File'), self.chainentry)
-
-        txt = _('Authentication section %smanual page%s') % (
-            '<a href="http://www.selenic.com/mercurial/hgrc.5.html#auth">',
-            '</a>')
-        self.lbl = QLabel(txt)
-        self.lbl.setOpenExternalLinks(True)
-        form.addRow(self.lbl, None)
+        super(SecureDialog, self).__init__(parent)
 
         def genfingerprint():
             pem = ssl.get_server_certificate( (host, 443) )
@@ -1013,13 +952,32 @@ are expanded in the filename.'''))
             pretty = ":".join([hash[x:x + 2] for x in xrange(0, len(hash), 2)])
             le.setText(pretty)
 
-        hostbox = QGroupBox(_('%s host certificate fingerprint') % uhost)
-        self.layout().addWidget(hostbox)
-        hbox = QHBoxLayout()
-        hostbox.setLayout(hbox)
+        uhost = hglib.tounicode(host)
+        self.setWindowTitle(_('Security: ') + uhost)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
+        self.repo = repo
         self.host = host
-        cur = self.repo.ui.config('hostfingerprints', host, '')
-        self.fingerprintentry = le = QLineEdit(cur)
+        self.alias = host.replace('.', '')
+        self.setLayout(QVBoxLayout())
+
+        securebox = QGroupBox(_('Secure HTTPS Connection'))
+        self.layout().addWidget(securebox)
+        vbox = QVBoxLayout()
+        securebox.setLayout(vbox)
+        self.layout().addWidget(securebox)
+
+        self.cacertradio = QRadioButton(
+            _('Verify with Certificate Authority certificates (best)'))
+        self.fprintradio = QRadioButton(
+            _('Verify with stored host fingerprint (good)'))
+        self.insecureradio = QRadioButton(
+            _('No host validation, but still encrypted (bad)'))
+        hbox = QHBoxLayout()
+        fprint = repo.ui.config('hostfingerprints', host, '')
+        self.fprintentry = le = QLineEdit(fprint)
+        self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
+        self.fprintentry.setEnabled(False)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
             le.setPlaceholderText('### host certificate fingerprint ###')
         hbox.addWidget(le)
@@ -1027,9 +985,65 @@ are expanded in the filename.'''))
             import ssl # Python 2.6 or backport for 2.5
             qb = QPushButton(_('Query'))
             qb.clicked.connect(genfingerprint)
+            qb.setEnabled(False)
+            self.fprintradio.toggled.connect(qb.setEnabled)
             hbox.addWidget(qb)
         except ImportError:
             pass
+        vbox.addWidget(self.cacertradio)
+        vbox.addWidget(self.fprintradio)
+        vbox.addLayout(hbox)
+        vbox.addWidget(self.insecureradio)
+
+        self.cacertradio.setEnabled(bool(repo.ui.config('web', 'cacerts')))
+        self.cacertradio.setChecked(True) # default
+        if fprint:
+            self.fprintradio.setChecked(True)
+        elif repo.ui.config('insecurehosts', host):
+            self.insecureradio.setChecked(True)
+
+        authbox = QGroupBox(_('User Authentication'))
+        form = QFormLayout()
+        authbox.setLayout(form)
+        self.layout().addWidget(authbox)
+
+        cfg = repo.ui.config('auth', self.alias+'.username', '')
+        self.userentry = QLineEdit(user or cfg)
+        self.userentry.setToolTip(
+_('''Optional. Username to authenticate with. If not given, and the remote
+site requires basic or digest authentication, the user will be prompted for
+it. Environment variables are expanded in the username letting you do
+foo.username = $USER.'''))
+        form.addRow(_('Username'), self.userentry)
+
+        cfg = repo.ui.config('auth', self.alias+'.password', '')
+        self.pwentry = QLineEdit(pw or cfg)
+        self.pwentry.setEchoMode(QLineEdit.Password)
+        self.pwentry.setToolTip(
+_('''Optional. Password to authenticate with. If not given, and the remote
+site requires basic or digest authentication, the user will be prompted for
+it.'''))
+        form.addRow(_('Password'), self.pwentry)
+        if 'mercurial_keyring' in repo.extensions():
+            self.pwentry.clear()
+            self.pwentry.setEnabled(False)
+            self.pwentry.setToolTip(_('Mercurial keyring extension is enabled. '
+                 'Passwords will be stored in platform native '
+                 'cryptographically secure method.'))
+
+        cfg = repo.ui.config('auth', self.alias+'.key', '')
+        self.keyentry = QLineEdit(cfg)
+        self.keyentry.setToolTip(
+_('''Optional. PEM encoded client certificate key file. Environment variables
+are expanded in the filename.'''))
+        form.addRow(_('User Certificate Key File'), self.keyentry)
+
+        cfg = repo.ui.config('auth', self.alias+'.cert', '')
+        self.chainentry = QLineEdit(cfg)
+        self.chainentry.setToolTip(
+_('''Optional. PEM encoded client certificate chain file. Environment variables
+are expanded in the filename.'''))
+        form.addRow(_('User Certificate Chain File'), self.chainentry)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Help|BB.Save|BB.Cancel)
@@ -1054,36 +1068,35 @@ are expanded in the filename.'''))
             return
         if fn is None:
             return
-        schemes = hglib.fromunicode(self.schemes.currentText())
-        prefix = hglib.fromunicode(self.prefixentry.text())
+
+        def setorclear(section, item, value):
+            if value:
+                cfg.set(section, item, value)
+            elif not value and item in cfg[section]:
+                del cfg[section][item]
+
+        if self.cacertradio.isChecked():
+            fprint = None
+            insecure = None
+        elif self.fprintradio.isChecked():
+            fprint = hglib.fromunicode(self.fprintentry.text())
+            insecure = None
+        else:
+            fprint = None
+            insecure = '1'
+        setorclear('hostfingerprints', self.host, fprint)
+        setorclear('insecurehosts', self.host, insecure)
+
         username = hglib.fromunicode(self.userentry.text())
         password = hglib.fromunicode(self.pwentry.text())
         key = hglib.fromunicode(self.keyentry.text())
         chain = hglib.fromunicode(self.chainentry.text())
-        alias = hglib.fromunicode(self.aliasentry.text())
-        if alias+'.prefix' in cfg['auth']:
-            if not qtlib.QuestionMsgBox(_('Confirm authentication replace'),
-                                        _('Authentication info for %s already '
-                                          'exists, replace?') % alias):
-                return
-        cfg.set('auth', alias+'.schemes', schemes)
-        if username:
-            cfg.set('auth', alias+'.username', username)
-        if prefix:
-            cfg.set('auth', alias+'.prefix', prefix)
-        def setorclear(item, value):
-            item = '.'.join([alias, item])
-            if value:
-                cfg.set('auth', item, value)
-            elif not value and item in cfg['auth']:
-                del cfg['auth'][item]
-        setorclear('password', password)
-        setorclear('key', key)
-        setorclear('cert', chain)
 
-        fprint = hglib.fromunicode(self.fingerprintentry.text())
-        if fprint:
-            cfg.set('hostfingerprints', self.host, fprint)
+        cfg.set('auth', self.alias+'.prefix', self.host)
+        setorclear('auth', self.alias+'.username', username)
+        setorclear('auth', self.alias+'.password', password)
+        setorclear('auth', self.alias+'.key', key)
+        setorclear('auth', self.alias+'.cert', chain)
 
         self.repo.incrementBusyCount()
         try:
@@ -1092,10 +1105,10 @@ are expanded in the filename.'''))
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
         self.repo.decrementBusyCount()
-        super(AuthDialog, self).accept()
+        super(SecureDialog, self).accept()
 
     def reject(self):
-        super(AuthDialog, self).reject()
+        super(SecureDialog, self).reject()
 
 
 class PathsTree(QTreeView):
