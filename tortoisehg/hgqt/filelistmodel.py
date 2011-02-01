@@ -66,6 +66,7 @@ class HgFileListModel(QAbstractTableModel):
 
     def setContext(self, ctx):
         if ctx != self._ctx:
+            self._fulllist = False
             self._ctx = ctx
             self.loadFiles()
             self.layoutChanged.emit()

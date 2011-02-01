@@ -41,7 +41,7 @@ class HgFileView(QFrame):
     linkActivated = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(QString, QString)
     showMessage = pyqtSignal(QString)
-    revForDiffChanged = pyqtSignal(int)
+    revisionSelected = pyqtSignal(int)
 
     searchRequested = pyqtSignal(unicode)
     """Emitted (pattern) when user request to search content"""
@@ -276,7 +276,6 @@ class HgFileView(QFrame):
 
         if rev is not None:
             self._p_rev = rev
-            self.revForDiffChanged.emit(rev)
 
         self.clearDisplay()
         if filename is None:
@@ -414,7 +413,7 @@ class HgFileView(QFrame):
     @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
     def sourceChanged(self, path, rev, line=None):
-        self.revForDiffChanged.emit(rev)
+        self.revisionSelected.emit(rev)
 
     @pyqtSlot(unicode, object, int)
     def editSelected(self, path, rev, line):
