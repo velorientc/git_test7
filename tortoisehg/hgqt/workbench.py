@@ -333,11 +333,11 @@ class Workbench(QMainWindow):
         else:
             rw.switchToNamedTaskTab(str(action.data().toString()))
 
-    def openRepo(self, repopath):
+    def openRepo(self, repopath, reuse=False):
         """ Open repo by openRepoSignal from reporegistry """
         if isinstance(repopath, (unicode, QString)):  # as Qt slot
             repopath = hglib.fromunicode(repopath)
-        self._openRepo(path=repopath)
+        self._openRepo(path=repopath, reuse=reuse)
 
     @pyqtSlot(unicode)
     def showRepo(self, path):
@@ -548,8 +548,11 @@ class Workbench(QMainWindow):
             options=FD.ShowDirsOnly | FD.ReadOnly)
         self._openRepo(path=hglib.fromunicode(path))
 
-    def _openRepo(self, path):
+    def _openRepo(self, path, reuse=False):
         if path:
+            if reuse:
+                for rw in self._findrepowidget(path):
+                    return
             try:
                 repo = thgrepo.repository(path=path)
                 self.addRepoTab(repo)

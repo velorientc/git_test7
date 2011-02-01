@@ -121,7 +121,10 @@ class RepoTreeItem(object):
         self.dump(xw)
         xw.writeEndElement()
 
-    def open(self):
+    def open(self, reuse=False):
+        pass
+
+    def openAll(self):
         pass
 
     def showFirstTabOrOpen(self, workbench=None):
@@ -184,8 +187,8 @@ class RepoItem(RepoTreeItem):
         self._root = hglib.fromunicode(a.value('', 'root').toString())
         RepoTreeItem.undump(self, xr)
 
-    def open(self):
-        self.model.openrepofunc(self._root)
+    def open(self, reuse=False):
+        self.model.openrepofunc(self._root, reuse)
 
     def showFirstTabOrOpen(self, workbench=None):
         workbench.showRepo(hglib.tounicode(self._root))
@@ -232,11 +235,15 @@ class RepoGroupItem(RepoTreeItem):
         return False
 
     def menulist(self):
-        return ['add', None, 'newGroup', None, 'rename', 'remove']
+        return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove']
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
             | Qt.ItemIsEditable)
+
+    def openAll(self):
+        for c in self.childs:
+            c.open(reuse=True)
 
     def dump(self, xw):
         xw.writeAttribute('name', self.name)

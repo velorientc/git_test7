@@ -95,6 +95,8 @@ class RepoTreeView(QTreeView):
     def _action_defs(self):
         a = [("open", _("Open"), None,
                 _("Open the repository in a new tab"), None, self.open),
+             ("openAll", _("Open All"), None,
+                _("Open all repositories in new tabs"), None, self.openAll),
              ("newGroup", _("New Group"), None,
                 _("Create a new group"), None, self.newGroup),
              ("rename", _("Rename"), None,
@@ -151,6 +153,11 @@ class RepoTreeView(QTreeView):
         if not self.selitem:
             return
         self.selitem.internalPointer().open()
+
+    def openAll(self):
+        if not self.selitem:
+            return
+        self.selitem.internalPointer().openAll()
 
     def showFirstTabOrOpen(self):
         if not self.selitem:
@@ -210,7 +217,7 @@ class RepoTreeView(QTreeView):
 
 class RepoRegistryView(QDockWidget):
 
-    openRepoSignal = pyqtSignal(QString)
+    openRepoSignal = pyqtSignal(QString, bool)
     visibilityChanged = pyqtSignal(bool)
 
     def __init__(self, workbench):
@@ -248,8 +255,8 @@ class RepoRegistryView(QDockWidget):
         if m.getRepoItem(reporoot) == None:
             m.addRepo(None, reporoot)
 
-    def openrepo(self, path):
-        self.openRepoSignal.emit(hglib.tounicode(path))
+    def openrepo(self, path, reuse=False):
+        self.openRepoSignal.emit(hglib.tounicode(path), reuse)
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
