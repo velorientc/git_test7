@@ -32,8 +32,7 @@ class SettingsCombo(QComboBox):
         self.setValidator(opts.get('validator', None))
         self.defaults = opts.get('defaults', [])
         if self.defaults and self.isEditable():
-            comp = QCompleter(self.defaults)
-            self.setCompleter(comp)
+            self.setCompleter(QCompleter(self.defaults, self))
         self.curvalue = None
         self.loaded = False
         if 'nohist' in opts:
