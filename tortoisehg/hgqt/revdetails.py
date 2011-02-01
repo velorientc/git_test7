@@ -165,7 +165,7 @@ class RevDetailsWidget(QWidget):
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
-        self.filelist.fileRevSelected.connect(self._displayFile)
+        self.filelist.fileRevSelected.connect(self.onFileRevSelected)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def createActions(self):
@@ -186,7 +186,7 @@ class RevDetailsWidget(QWidget):
         self.filelist.setModel(self.filelistmodel)
 
     @pyqtSlot(object, object, object)
-    def _displayFile(self, file, rev, status):
+    def onFileRevSelected(self, file, rev, status):
         self.fileview.displayFile(file, rev, status)
 
     def revision_selected(self, rev):
