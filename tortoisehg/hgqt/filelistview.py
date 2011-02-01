@@ -68,7 +68,11 @@ class HgFileListView(QTableView):
             self._actions[act].setEnabled(real)
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
-        self.actionShowAllMerge.setVisible(len(ctx.parents()) == 2)
+        if len(ctx.parents()) == 2:
+            self.actionShowAllMerge.setVisible(True)
+        else:
+            self.actionShowAllMerge.setVisible(False)
+            self.actionShowAllMerge.setChecked(False)
 
     def currentFile(self):
         index = self.currentIndex()
