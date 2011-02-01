@@ -8,6 +8,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from mercurial import error
 from tortoisehg.hgqt import qtlib
 
 class HTMLDelegate(QStyledItemDelegate):
@@ -18,7 +19,11 @@ class HTMLDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
         if self.cols and index.column() not in self.cols:
             return QStyledItemDelegate.paint(self, painter, option, index)
-        text = index.model().data(index, Qt.DisplayRole).toString()
+        try:
+            text = index.model().data(index, Qt.DisplayRole).toString()
+        except error.RevlogError, e:
+            # this can happen if revlog is being truncated while we read it
+            text = _('?? Error: %s ??') % hglib.tounicode(str(e))
 
         # draw selection
         option = QStyleOptionViewItemV4(option)
@@ -47,7 +52,10 @@ class HTMLDelegate(QStyledItemDelegate):
         painter.restore()
 
     def sizeHint(self, option, index):
-        text = index.model().data(index, Qt.DisplayRole).toString()
+        try:
+            text = index.model().data(index, Qt.DisplayRole).toString()
+        except error.RevlogError, e:
+            text = _('?? Error: %s ??') % hglib.tounicode(str(e))
         doc = QTextDocument()
         doc.setDefaultStyleSheet(qtlib.thgstylesheet)
         doc.setDefaultFont(option.font)
