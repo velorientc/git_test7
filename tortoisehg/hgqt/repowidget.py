@@ -207,14 +207,6 @@ class RepoWidget(QWidget):
             return self.repo.shortname
 
     @pyqtSlot()
-    def toggleSearchBar(self):
-        """Toggle display of tasktab-specific search bar if available"""
-        curtt = self.taskTabsWidget.currentWidget()
-        show = getattr(curtt, 'toggleSearchBar', None)
-        if show:
-            show()
-
-    @pyqtSlot()
     def toggleFilterBar(self):
         """Toggle display repowidget filter bar"""
         vis = self.filterbar.isVisible()
