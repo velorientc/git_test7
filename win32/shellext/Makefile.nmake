@@ -55,7 +55,7 @@ ThgVersion:
 $(THGSHELL_TARGET): ThgVersion $(OBJECTS_THGSGELL)
     cl /EP ThgCLSIDs-template.wxi > ThgCLSIDs.wxi
     rc /dTHG_SHELL_FNAME="$@" $(THG_EXTRA_RCFLAGS) shellext.rc
-    link /OUT:$@ $(LDFLAGS_THGSHELL) $** shellext.res
+    link /OUT:$@ $(LDFLAGS_THGSHELL) $(OBJECTS_THGSGELL) shellext.res
     mt -nologo -manifest $@.manifest -outputresource:"$@;#2"
 
 dirstate.exe: dirstate.obj $(OBJECTS_DIRSTATE)
