@@ -30,7 +30,6 @@ from tortoisehg.hgqt.qtlib import geticon, getfont
 from tortoisehg.hgqt.filerevmodel import FileRevModel
 from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
-from tortoisehg.hgqt.quickbar import FindInGraphlogQuickBar
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
 
@@ -140,6 +139,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.setCentralWidget(self.splitter)
         self.repoview = HgRepoView(self.repo, self)
         self.textView = HgFileView(self.repo, self)
+        self.textView.forceMode('file')
         self.splitter.addWidget(self.repoview)
         self.splitter.addWidget(self.textView)
 
@@ -148,12 +148,6 @@ class FileLogDialog(_AbstractFileDialog):
         self.textView.showMessage.connect(self.statusBar().showMessage)
 
     def setupToolbars(self):
-        self.findToolbar = FindInGraphlogQuickBar(self)
-        self.findToolbar.attachFileView(self.textView)
-        self.findToolbar.revisionSelected.connect(self.repoview.goto)
-        self.findToolbar.showMessage.connect(self.statusBar().showMessage)
-        self.attachQuickBar(self.findToolbar)
-
         self.editToolbar.addSeparator()
         self.editToolbar.addAction(self.actionBack)
         self.editToolbar.addAction(self.actionForward)
@@ -165,10 +159,6 @@ class FileLogDialog(_AbstractFileDialog):
         self.repoview.revisionActivated.connect(self.revisionActivated)
         self.filerevmodel.showMessage.connect(self.statusBar().showMessage)
         self.filerevmodel.filled.connect(self.modelFilled)
-        self.textView.forceMode('file')
-        self.findToolbar.setModel(self.filerevmodel)
-        self.findToolbar.setFilterFiles([self.filename])
-        self.findToolbar.setMode('file')
         self.filerevmodel.setFilename(self.filename)
 
     def createActions(self):
