@@ -50,7 +50,7 @@ class RepoFilterBar(QToolBar):
         self.entrydlg.restoreGeometry(s.value('revset/geom').toByteArray())
         self.revsethist = list(s.value('revset-queries').toStringList())
         self.revsetle = le = QLineEdit()
-        le.setCompleter(QCompleter(self.revsethist))
+        le.setCompleter(QCompleter(self.revsethist, self))
         le.returnPressed.connect(self.returnPressed)
         if hasattr(self.revsetle, 'setPlaceholderText'): # Qt >= 4.7 
             self.revsetle.setPlaceholderText('### revision set query ###')
@@ -100,7 +100,7 @@ class RepoFilterBar(QToolBar):
         if query in self.revsethist:
             self.revsethist.remove(query)
         self.revsethist.insert(0, query)
-        self.revsetle.setCompleter(QCompleter(self.revsethist))
+        self.revsetle.setCompleter(QCompleter(self.revsethist, self))
         self.store.setEnabled(False)
         self.showMessage.emit(_('Revision set query saved'))
 
