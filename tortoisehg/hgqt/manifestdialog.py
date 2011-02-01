@@ -182,6 +182,12 @@ class ManifestWidget(QWidget):
         self._action_annotate_mode.setEnabled(self.rev is not None)
         self._toolbar.addAction(self._action_annotate_mode)
 
+        if hasattr(self, '_searchbar'):
+            self._action_find = self._searchbar.toggleViewAction()
+            self._action_find.setIcon(qtlib.geticon('edit-find'))
+            self._action_find.setShortcut(QKeySequence.Find)
+            self._toolbar.addAction(self._action_find)
+
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
             ('navigate', _('File history'), None, 'Shift+Return',
@@ -433,15 +439,6 @@ class ManifestTaskWidget(ManifestWidget):
     def __init__(self, repo, rev=None, parent=None):
         super(ManifestTaskWidget, self).__init__(repo, rev, parent)
         self.editSelected.connect(self._openInEditor)
-
-    @pyqtSlot()
-    def toggleSearchBar(self):
-        vis = self._searchbar.isVisible()
-        if vis:
-            self._searchbar.hide()
-        else:
-            self._searchbar.show()
-            self._searchbar.setFocus()
 
     @util.propertycache
     def _searchbar(self):
