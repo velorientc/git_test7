@@ -210,7 +210,7 @@ class AnnotateView(qscilib.Scintilla):
     @pyqtSlot(bool)
     def setAnnotationEnabled(self, enabled):
         """Enable / disable annotation"""
-        enable = bool(enabled)
+        enabled = bool(enabled)
         if enabled == self.isAnnotationEnabled():
             return
         self._annotation_enabled = enabled
