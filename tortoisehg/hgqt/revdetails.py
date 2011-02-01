@@ -61,15 +61,13 @@ class RevDetailsWidget(QWidget):
         # + revisiondetails_layout -----------------------------------------+
         # |+ filelist_splitter ........                                     |
         # | + tbarFileListFrame (vbox)| + cset_and_file_details_frame (vbox)|
-        # |  + diffToolbar            |  + revpanel                         |
+        # |  + mergeToolbar           |  + revpanel                         |
         # +---------------------------+-------------------------------------+
         # |  + filelist               |  + message_splitter                 |
         # |                           |  :+ message                         |
         # |                           |  :----------------------------------+
         # |                           |   + fileview                        |
         # +---------------------------+-------------------------------------+
-        # |+ searchbar                                                      |
-        # +-----------------------------------------------------------------+
 
         revisiondetails_layout = QVBoxLayout(self)
         revisiondetails_layout.setSpacing(0)
@@ -167,12 +165,6 @@ class RevDetailsWidget(QWidget):
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
-        self.searchbar = qscilib.SearchToolBar(hidable=True)
-        self.searchbar.hide()
-        self.searchbar.searchRequested.connect(self.fileview.find)
-        self.searchbar.conditionChanged.connect(self.fileview.highlightText)
-        revisiondetails_layout.addWidget(self.searchbar)
-        self.fileview.filled.connect(self._updateHighlightText)
         self.filelist.fileRevSelected.connect(self._displayFile)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
@@ -186,22 +178,6 @@ class RevDetailsWidget(QWidget):
         self.actionActivateFileAlt.triggered.connect(fileActivated)
         self.mergeToolBar.addAction(self.filelist.actionShowAllMerge)
 
-    @pyqtSlot()
-    def toggleSearchBar(self):
-        vis = self.searchbar.isVisible()
-        if vis:
-            self.searchbar.hide()
-        else:
-            self.searchbar.show()
-            self.searchbar.setFocus()
-
-    @pyqtSlot()
-    def _updateHighlightText(self):
-        if not self.searchbar.isVisible():
-            return
-        self.fileview.highlightText(self.searchbar.pattern(),
-                                    self.searchbar.caseInsensitive())
-
     def create_models(self):
         self.filelistmodel = HgFileListModel(self.repo, self)
 
@@ -212,7 +188,6 @@ class RevDetailsWidget(QWidget):
     @pyqtSlot(object, object, object)
     def _displayFile(self, file, rev, status):
         self.fileview.displayFile(file, rev, status)
-        self._updateHighlightText()
 
     def revision_selected(self, rev):
         self._last_rev = rev
