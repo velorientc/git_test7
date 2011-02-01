@@ -123,21 +123,6 @@ class HgFileView(QFrame):
         self.sci.setMarginType(0, qsci.SymbolMargin)
         self.sci.setMarginWidth(0, 0)
 
-        if hasattr(self.sci, 'indicatorDefine'):
-            self.sci.indicatorDefine(qsci.RoundBoxIndicator, 8)
-            self.sci.setIndicatorDrawUnder(8)
-            self.sci.setIndicatorForegroundColor(QColor('#BBFFFF'), 8)
-            self.sci.indicatorDefine(qsci.RoundBoxIndicator, 9)
-            self.sci.setIndicatorDrawUnder(9)
-            self.sci.setIndicatorForegroundColor(QColor('#58A8FF'), 9)
-        else:
-            self.sci.SendScintilla(qsci.SCI_INDICSETSTYLE, 8, qsci.INDIC_ROUNDBOX)
-            self.sci.SendScintilla(qsci.SCI_INDICSETUNDER, 8, True)
-            self.sci.SendScintilla(qsci.SCI_INDICSETFORE, 8, 0xBBFFFF)
-            self.sci.SendScintilla(qsci.SCI_INDICSETSTYLE, 9, qsci.INDIC_ROUNDBOX)
-            self.sci.SendScintilla(qsci.SCI_INDICSETUNDER, 9, True)
-            self.sci.SendScintilla(qsci.SCI_INDICSETFORE, 9, 0x58A8FF)
-
         self._annotate = annotate.AnnotateView(repo, self)
         for name in ('searchRequested', 'editSelected', 'grepRequested'):
             getattr(self._annotate, name).connect(getattr(self, name))
@@ -359,9 +344,6 @@ class HgFileView(QFrame):
             self.sci.setMarginWidth(1, str(nlines)+'0')
             self.sci.setText(fd.contents)
 
-        if self._find_text:
-            self.highlightSearchString(self._find_text)
-
         uf = hglib.tounicode(self._filename)
         self.fileDisplayed.emit(uf, fd.contents or QString())
 
@@ -443,51 +425,9 @@ class HgFileView(QFrame):
         files = [os.path.join(base, path)]
         wctxactions.edit(self, repo.ui, repo, files, line, self._find_text)
 
-    def searchString(self, text):
-        self._find_text = text
-        self.clearHighlights()
-        findpos = self.highlightSearchString(self._find_text)
-        if findpos:
-            def finditer(self, findpos):
-                if self._find_text:
-                    for pos in findpos:
-                        self.highlightCurrentSearchString(pos, self._find_text)
-                        yield self._ctx.rev(), self._filename, pos
-            return finditer(self, findpos)
-
-    def clearHighlights(self):
-        n = self.sci.length()
-        # highlight
-        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 8)
-        self.sci.SendScintilla(qsci.SCI_INDICATORCLEARRANGE, 0, n)
-        # current found occurrence
-        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 9)
-        self.sci.SendScintilla(qsci.SCI_INDICATORCLEARRANGE, 0, n)
-
-    def highlightSearchString(self, text):
-        data = unicode(self.sci.text())
-        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 8)
-        pos = [data.find(text)]
-        n = len(text)
-        while pos[-1] > -1:
-            self.sci.SendScintilla(qsci.SCI_INDICATORFILLRANGE, pos[-1], n)
-            pos.append(data.find(text, pos[-1]+1))
-        pos = [x for x in pos if x > -1]
-        self.showMessage.emit(
-             _("Found %d occurrences of '%s' in current file or diff") % (
-                 len(pos), text))
-        return pos
-
-    def highlightCurrentSearchString(self, pos, text):
-        line = self.sci.SendScintilla(qsci.SCI_LINEFROMPOSITION, pos)
-        #line, idx = w.lineIndexFromPosition(nextpos)
-        self.sci.ensureLineVisible(line)
-        self.sci.SendScintilla(qsci.SCI_SETINDICATORCURRENT, 9)
-        self.sci.SendScintilla(qsci.SCI_INDICATORCLEARRANGE, 0, pos)
-        self.sci.SendScintilla(qsci.SCI_INDICATORFILLRANGE, pos, len(text))
-
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
+        self._find_text = hglib.fromunicode(exp)
         self.sci.find(exp, icase, wrap, forward)
 
     @pyqtSlot(unicode, bool)
