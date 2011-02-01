@@ -353,6 +353,12 @@ class SearchToolBar(QToolBar):
             return
         super(SearchToolBar, self).wheelEvent(event)
 
+    def setVisible(self, visible=True):
+        super(SearchToolBar, self).setVisible(visible)
+        if visible:
+            self._le.setFocus()
+            self._le.selectAll()
+
     def _readsettings(self):
         self.setCaseInsensitive(self._settings.value('icase', False).toBool())
         self.setWrapAround(self._settings.value('wrap', False).toBool())
