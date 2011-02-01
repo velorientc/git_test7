@@ -276,7 +276,7 @@ class MQWidget(QWidget):
         if self.cmd.running():
             return
         patch = self.queueListWidget.currentItem()._thgpatch
-        cmdline = ['qpop', '-R', self.repo.root]
+        cmdline = ['qpush', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
         cmdline += ['--move', '--', patch]
         self.repo.incrementBusyCount()
