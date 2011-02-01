@@ -17,71 +17,37 @@
 Qt4 QToolBar-based class for quick bars XXX
 """
 
-from mercurial import util
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.qtlib import geticon
 
-class QuickBar(QToolBar):
-    def __init__(self, name, key, desc=None, parent=None):
-        QToolBar.__init__(self, name, parent)
+class GotoQuickBar(QToolBar):
+    gotoSignal = pyqtSignal(QString)
+
+    def __init__(self, parent):
+        QToolBar.__init__(self, _('Goto'), parent)
         self.setIconSize(QSize(16,16))
         self.setFloatable(False)
         self.setMovable(False)
         self.setAllowedAreas(Qt.BottomToolBarArea)
-        self.createActions(key, desc)
-        self.createContent()
         self.setVisible(False)
-
-    def createActions(self, openkey, desc):
-        openact = QAction(desc or 'Open', self)
-        openact.setCheckable(True)
-        openact.setChecked(False)
-        openact.setShortcut(QKeySequence(openkey))
-        openact.triggered.connect(self.show)
-
-        self._actions = {'open': openact}
-
-    def createContent(self):
-        self.parent().addAction(self._actions['open'])
-
-    def hide(self):
-        self.setVisible(False)
-
-    def cancel(self):
-        self.hide()
-
-class GotoQuickBar(QuickBar):
-    gotoSignal = pyqtSignal(unicode)
-
-    def __init__(self, parent):
-        QuickBar.__init__(self, 'Goto', None, 'Goto', parent)
-
-    def createActions(self, openkey, desc):
-        QuickBar.createActions(self, openkey, desc)
-        self._actions['go'] = QAction(geticon('go-jump'), _('Go'), self)
-        self._actions['go'].triggered.connect(self.goto)
+        self.goAction = QAction(geticon('go-jump'), _('Go'), self)
+        self.goAction.triggered.connect(self.goto)
+        self.entry = QLineEdit(self)
+        self.entry.returnPressed.connect(self.goAction.trigger)
+        self.addWidget(self.entry)
+        self.addAction(self.goAction)
 
     def goto(self):
-        self.gotoSignal.emit(unicode(self.entry.text()))
-
-    def createContent(self):
-        QuickBar.createContent(self)
-        self.entry = QLineEdit(self)
-        self.addWidget(self.entry)
-        self.addAction(self._actions['go'])
-        self.entry.returnPressed.connect(self._actions['go'].trigger)
+        self.gotoSignal.emit(self.entry.text())
 
     def setVisible(self, visible=True):
-        QuickBar.setVisible(self, visible)
+        super(GotoQuickBar, self).setVisible(visible)
         if visible:
             self.entry.setFocus()
             self.entry.selectAll()
 
     def setCompletionKeys(self, keys):
-        self.entry.setCompleter(QCompleter(keys))
-
-
+        self.entry.setCompleter(QCompleter(keys, self))
