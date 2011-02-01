@@ -198,7 +198,7 @@ void InitMenuMaps()
         {
             MenuDescription md = menuDescList[i];
 
-            if (md.name.size() == 0)
+            if (md.name.empty())
             {
                 TDEBUG_TRACE("**** InitMenuMaps: ignoring entry with empty name");
                 break;
@@ -207,7 +207,7 @@ void InitMenuMaps()
             TDEBUG_TRACE("InitMenuMaps: adding " << md.name);
 
             // Look for translation of menu and help text
-            if (lang.size())
+            if (!lang.empty())
                 GetCMenuTranslation(lang, md.name, md.menuText, md.helpText);
 
             MenuDescMap[md.name] = md;
@@ -442,14 +442,14 @@ CShellExtCMenu::QueryContextMenu(
     Tokenize(promoted_string, promoted, ",");
 
     // Select menu to show
-    bool fileMenu = myFiles.size() > 0;
+    bool fileMenu = !myFiles.empty();
     bool isHgrepo = false;
     std::string cwd;
     if (!myFolder.empty())
     {
         cwd = myFolder;
     }
-    else if (!myFiles.empty())
+    else if (fileMenu)
     {
         cwd = IsDirectory(myFiles[0])? myFiles[0] : DirName(myFiles[0]);
     }
