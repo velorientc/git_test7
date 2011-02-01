@@ -910,6 +910,19 @@ STDMETHODIMP CShellExtCMenu::Initialize(
     TDEBUG_TRACE("MSI msires: " << msires);
     TDEBUG_TRACE("MSI installed product id: " << &product_id[0]);
 
+    DWORD busize = 300;
+    std::vector<char> buf(busize, 0);
+    msires = ::MsiGetProductInfoA(
+        &product_id[0], INSTALLPROPERTY_INSTALLLOCATION, &buf[0], &busize);
+    if (msires == ERROR_SUCCESS)
+    {
+        TDEBUG_TRACE("MSI install location: " << &buf[0]);
+    }
+    else
+    {
+        TDEBUG_TRACE("MSI install location: error " << msires);
+    }
+
     TDEBUG_TRACEW(
         L"---- TortoiseHg shell extension version " 
         << ThgVersion::get() << L"----"
