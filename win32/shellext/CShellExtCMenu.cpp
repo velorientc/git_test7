@@ -900,9 +900,9 @@ STDMETHODIMP CShellExtCMenu::Initialize(
 
     // get installed MSI product id (for debugging purposes for now)
 #ifdef _M_X64
-    const char* shellexid = "{59FD2A49-BA62-40CC-B155-D11DB11EE611}";
+    const char* shellexid = "{D5D1E532-CDAD-4FFD-9695-757B8A29B4BA}";
 #else
-    const char* shellexid = "{1126CF42-3994-428B-A746-464E1BC680F3}";
+    const char* shellexid = "{728E8840-5878-4EA7-918F-281C2697ABB1}";
 #endif
     std::vector<char> product_id(50, 0);
     UINT msires = ::MsiGetProductCodeA(shellexid, &product_id[0]);
