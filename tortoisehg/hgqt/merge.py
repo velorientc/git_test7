@@ -370,8 +370,7 @@ class MergePage(BasePage):
 
     def command_finished(self, ret):
         repo = self.wizard().repo
-        repo.dirstate.invalidate()
-        if len(repo.parents()) == 2 and ret in (0, 1):
+        if ret in (0, 1):
             repo.incrementBusyCount()
             repo.decrementBusyCount()
             self.done = True
