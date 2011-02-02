@@ -297,6 +297,8 @@ class HgFileView(QFrame):
             self.forceMode('diff')
         elif fd.contents and not fd.diff:
             self.forceMode('file')
+        elif not fd.contents and not fd.diff:
+            self.forceMode('file')
         else:
             self.actionDiffMode.setEnabled(True)
             self.actionFileMode.setEnabled(True)
