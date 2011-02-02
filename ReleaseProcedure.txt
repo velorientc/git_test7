@@ -1,5 +1,6 @@
 Steps for making a release:
 
+* hg status -ar --rev 1.6:tip  # find new files that WiX needs to know about
 * Pull latest translations from Launchpad
 * set revision number in tortoisehg/hgtk/gdialog.py (major release only)
 * set revision number in doc/source/conf.py

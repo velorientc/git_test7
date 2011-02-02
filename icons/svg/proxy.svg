@@ -20,7 +20,6 @@
    inkscape:export-filename="C:\src\thg\new-icons\icons\tortoise\commit-32.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   sodipodi:docbase="E:\src\thg\thg-icons\icons\tortoise"
    style="display:inline">
   <defs
      id="defs4">
@@ -247,20 +246,6 @@
       </cc:License>
     </rdf:RDF>
   </metadata>
-  <g
-     inkscape:groupmode="layer"
-     id="layer-bitmap"
-     inkscape:label="Bitmap"
-     style="display:none">
-    <image
-       y="0"
-       x="0"
-       id="image2833"
-       height="32"
-       width="32"
-       sodipodi:absref="C:\src\thg\new-icons\icons\tortoise\proxy.ico"
-       xlink:href="proxy.ico" />
-  </g>
   <g
      inkscape:groupmode="layer"
      id="layer5"

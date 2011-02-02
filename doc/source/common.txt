@@ -2,41 +2,10 @@ Common Features
 ===============
 
 .. module:: common.dialog
-	:synopsis: Common features to all the dialog
+	:synopsis: Features common to many dialogs
 
 These features are common to many TortoiseHg tools, so we document them
 here just once.
-
-Keyboard Accelerators
----------------------
-
-We define a few keyboard accelerators that all of the TortoiseHg tools support.
-
-:kbd:`Ctrl-Q`
-	quit the application, including all open windows
-
-:kbd:`Ctrl-W`
-	close the current window (same as :kbd:`Ctrl-Q` if only one window is open)
-
-:kbd:`Ctrl-D`
-	visual diff of currently selected file or changeset
-
-:kbd:`Ctrl-Enter`
-	activation
-
-:kbd:`Ctrl-.` and :kbd:`Ctrl-,`
-	select next or previous file in a file list
-
-:kbd:`Ctrl-[` and :kbd:`Ctrl-]`
-	page up or down a text pane
-
-:kbd:`F5`, :kbd:`Ctrl-R`
-	refresh
-
-On `Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_, the
-apple (command) key is used as the modifier instead of :kbd:`Ctrl`.
-However some keyboard accelerators are internal to GTK+ so you must use
-the control key to access cut-paste functionality, for instance.
 
 Visual Diffs
 ------------
@@ -163,47 +132,5 @@ In order to support file extension based tool selection, TortoiseHg has
 added support for a **[diff-patterns]** section equivalent to Mercurial's
 `merge-patterns <http://www.selenic.com/mercurial/hgrc.5.html#merge-patterns>`_
 section.
-
-
-Treeview searches
------------------
-
-Many TortoiseHg dialogs use treeviews to present lists of data to the
-user. The file lists in the status, commit, shelve, and changelog tools
-are treeviews. The changelog graph pane is a treeview. And even the
-annotate pane in the datamine tool is a treeview.
-
-Most of the TortoiseHg treeviews are configured for live searches.
-Ensure that the treeview has focus (by clicking on a row), and begin
-typing a search phrase. A small entry window will appear containing the
-text you have typed, and the treeview will immediately jump to the first
-row that matches the text you have entered thus far. As you enter more
-characters, the search is refined. (Do not hit return to 'complete' the
-search, before using the keys mentioned below, or the entry window will
-disappear, ending the search instead.)
-
-* :kbd:`Ctrl-F` opens the search window explicitly
-* :kbd:`Ctrl-G` advances the search to the next match
-* :kbd:`Shift-Ctrl-G` searches backwards
-* The mouse scroll wheel will advance forwards and backwards through
-  matching lines 
-
-Hg command dialog
------------------
-
-Many TortoiseHg tools use the *hgcmd* dialog to execute Mercurial
-commands that could potentially be interactive.  
-
-.. figure:: figures/hgcmd.jpg
-	:alt: Mercurial command dialog
-
-	Interactive Mercurial Command Dialog
-
-.. note::
-	Error messages are given a dark red color for contrast
-
-When the Mercurial command has completed, the dialog gives focus to its
-:guilabel:`Close` button.  So pressing :kbd:`Enter` is all that is
-required to close the window.
 
 .. vim: noet ts=4
