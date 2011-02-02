@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2010-12-28 20:44+0000\n"
+"POT-Creation-Date: 2011-01-28 22:51+0000\n"
 "PO-Revision-Date: 2010-12-13 08:22+0000\n"
 "Last-Translator: gyo <Unknown>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-12-29 05:05+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-01-29 05:06+0000\n"
+"X-Generator: Launchpad (build 12177)\n"
 
 #: TortoiseHgOverlayServer.py:36
 msgid "TortoiseHg Overlay Icon Server"
@@ -145,7 +145,7 @@ msgid "All Files (*.*)"
 msgstr "全てのファイル (*.*)"
 
 #: tortoisehg\hgtk\archive.py:213 tortoisehg\hgtk\archive.py:219
-#: tortoisehg\hgtk\gtklib.py:580 tortoisehg\hgtk\thgconfig.py:574
+#: tortoisehg\hgtk\gtklib.py:594 tortoisehg\hgtk\thgconfig.py:574
 #: tortoisehg\hgtk\thgconfig.py:1077
 msgid "Confirm Overwrite"
 msgstr "上書きの確認"
@@ -253,7 +253,7 @@ msgid "Set Current"
 msgstr "現在のブックマークに設定"
 
 #: tortoisehg\hgtk\bookmark.py:56 tortoisehg\hgtk\bookmark.py:182
-#: tortoisehg\hgtk\merge.py:178
+#: tortoisehg\hgtk\merge.py:184
 msgid "unexpected type: %s"
 msgstr "予期しないタイプ: %s"
 
@@ -389,13 +389,10 @@ msgstr "閉じる"
 
 #: tortoisehg\hgtk\bugreport.py:57
 msgid ""
-"** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues "
-"or tortoisehg-discuss@lists.sourceforge.net\n"
+"** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues\n"
 msgstr ""
-"** このバグを http://bitbucket.org/tortoisehg/stable/issues または tortoisehg-"
-"discuss@lists.sourceforge.net に報告してください\n"
 
-#: tortoisehg\hgtk\bugreport.py:88
+#: tortoisehg\hgtk\bugreport.py:87
 msgid "Save error report to"
 msgstr "バグ報告の保存"
 
@@ -524,7 +521,8 @@ msgstr "クローン元:"
 msgid "Select Source Folder"
 msgstr "クローン元"
 
-#: tortoisehg\hgtk\clone.py:117 tortoisehg\hgtk\tagadd.py:69
+#: tortoisehg\hgtk\clone.py:117 tortoisehg\hgtk\merge.py:90
+#: tortoisehg\hgtk\tagadd.py:69
 msgid "Advanced options"
 msgstr "詳細設定"
 
@@ -718,7 +716,7 @@ msgstr "コミットする"
 msgid "Show/Hide Patch Queue"
 msgstr "MQ パネルの表示/非表示"
 
-#: tortoisehg\hgtk\commit.py:323 tortoisehg\hgtk\merge.py:190
+#: tortoisehg\hgtk\commit.py:323 tortoisehg\hgtk\merge.py:196
 #: tortoisehg\hgtk\thgconfig.py:846
 msgid "Confirm Exit"
 msgstr "終了"
@@ -729,7 +727,7 @@ msgstr "終了時にコミットメッセージを保存しますか？"
 
 #: tortoisehg\hgtk\commit.py:325 tortoisehg\hgtk\commit.py:1193
 #: tortoisehg\hgtk\commit.py:1200 tortoisehg\hgtk\history.py:220
-#: tortoisehg\hgtk\history.py:2652 tortoisehg\hgtk\status.py:1320
+#: tortoisehg\hgtk\history.py:2646 tortoisehg\hgtk\status.py:1320
 #: tortoisehg\hgtk\statusact.py:127 tortoisehg\hgtk\statusact.py:148
 #: tortoisehg\hgtk\thgconfig.py:775 tortoisehg\hgtk\thgconfig.py:849
 #: tortoisehg\hgtk\thgmq.py:369 tortoisehg\hgtk\update.py:239
@@ -786,7 +784,7 @@ msgstr "現在のコミットメッセージを破棄してもよろしいです
 #: tortoisehg\hgtk\commit.py:654 tortoisehg\hgtk\commit.py:951
 #: tortoisehg\hgtk\commit.py:1015 tortoisehg\hgtk\commit.py:1264
 #: tortoisehg\hgtk\gdialog.py:485 tortoisehg\hgtk\history.py:279
-#: tortoisehg\hgtk\merge.py:130 tortoisehg\hgtk\thgconfig.py:89
+#: tortoisehg\hgtk\merge.py:136 tortoisehg\hgtk\thgconfig.py:89
 msgid "Commit"
 msgstr "コミット"
 
@@ -1027,11 +1025,11 @@ msgid "Committing changes..."
 msgstr "変更点をコミット中..."
 
 #: tortoisehg\hgtk\commit.py:1265 tortoisehg\hgtk\history.py:613
-#: tortoisehg\hgtk\history.py:638 tortoisehg\hgtk\history.py:1786
-#: tortoisehg\hgtk\history.py:1868 tortoisehg\hgtk\history.py:1998
-#: tortoisehg\hgtk\history.py:2041 tortoisehg\hgtk\history.py:2081
-#: tortoisehg\hgtk\history.py:2425 tortoisehg\hgtk\history.py:2455
-#: tortoisehg\hgtk\history.py:2712 tortoisehg\hgtk\history.py:2743
+#: tortoisehg\hgtk\history.py:638 tortoisehg\hgtk\history.py:1780
+#: tortoisehg\hgtk\history.py:1862 tortoisehg\hgtk\history.py:1992
+#: tortoisehg\hgtk\history.py:2035 tortoisehg\hgtk\history.py:2075
+#: tortoisehg\hgtk\history.py:2419 tortoisehg\hgtk\history.py:2449
+#: tortoisehg\hgtk\history.py:2706 tortoisehg\hgtk\history.py:2737
 #: tortoisehg\hgtk\recovery.py:178 tortoisehg\hgtk\synch.py:549
 msgid "Cannot run now"
 msgstr "実行できません"
@@ -1401,11 +1399,11 @@ msgstr "%d 個のファイルのスナップショットをリビジョン %s �
 msgid "edit failed"
 msgstr "編集に失敗しました"
 
-#: tortoisehg\hgtk\gdialog.py:682 tortoisehg\hgtk\gtklib.py:392
+#: tortoisehg\hgtk\gdialog.py:682 tortoisehg\hgtk\gtklib.py:406
 msgid "No visual editor configured"
 msgstr "GUI エディタが設定されていません"
 
-#: tortoisehg\hgtk\gdialog.py:683 tortoisehg\hgtk\gtklib.py:393
+#: tortoisehg\hgtk\gdialog.py:683 tortoisehg\hgtk\gtklib.py:407
 msgid "Please configure a visual editor."
 msgstr "GUI エディタを設定してください"
 
@@ -1445,15 +1443,15 @@ msgstr "あいまいなリビジョン"
 msgid "Invalid Revision"
 msgstr "無効なリビジョン"
 
-#: tortoisehg\hgtk\gtklib.py:467
+#: tortoisehg\hgtk\gtklib.py:481
 msgid "Save File"
 msgstr "ファイルに保存"
 
-#: tortoisehg\hgtk\gtklib.py:468
+#: tortoisehg\hgtk\gtklib.py:482
 msgid "All files"
 msgstr "全てのファイル"
 
-#: tortoisehg\hgtk\gtklib.py:581
+#: tortoisehg\hgtk\gtklib.py:595
 msgid ""
 "The file \"%s\" already exists!\n"
 "\n"
@@ -1463,11 +1461,11 @@ msgstr ""
 "\n"
 "このファイルを上書きしますか？"
 
-#: tortoisehg\hgtk\gtklib.py:592
+#: tortoisehg\hgtk\gtklib.py:606
 msgid "Select Folder"
 msgstr "フォルダの選択"
 
-#: tortoisehg\hgtk\gtklib.py:1081
+#: tortoisehg\hgtk\gtklib.py:1095
 msgid ""
 "Select language for spell checking.\n"
 "\n"
@@ -1485,11 +1483,11 @@ msgstr ""
 "\n"
 "例: en, en_GB, en_US"
 
-#: tortoisehg\hgtk\gtklib.py:1087
+#: tortoisehg\hgtk\gtklib.py:1101
 msgid "Lang \"%s\" can not be set.\n"
 msgstr "言語 \"%s\" は設定できません。\n"
 
-#: tortoisehg\hgtk\gtklib.py:1100 tortoisehg\hgtk\thgconfig.py:85
+#: tortoisehg\hgtk\gtklib.py:1114 tortoisehg\hgtk\thgconfig.py:85
 msgid "Spell Check Language"
 msgstr "スペルチェック言語"
 
@@ -1873,6 +1871,18 @@ msgstr "[コマンド正常終了 "
 #: tortoisehg\hgtk\hgthread.py:187
 msgid "abort: "
 msgstr "中止: "
+
+#: tortoisehg\hgtk\hgthread.py:198
+msgid "SSL: Server certificate verify failed"
+msgstr ""
+
+#: tortoisehg\hgtk\hgthread.py:200
+msgid "SSL: unknown error %s:%s"
+msgstr ""
+
+#: tortoisehg\hgtk\hgthread.py:202
+msgid "SSL error: %s"
+msgstr ""
 
 #: tortoisehg\hgtk\hgtk.py:78
 msgid ""
@@ -2471,21 +2481,21 @@ msgstr "リビジョン指定..."
 msgid "_Synchronize"
 msgstr "同期(_S)"
 
-#: tortoisehg\hgtk\history.py:438 tortoisehg\hgtk\history.py:1867
+#: tortoisehg\hgtk\history.py:438 tortoisehg\hgtk\history.py:1861
 #: tortoisehg\hgtk\synch.py:57
 msgid "Incoming"
 msgstr "受信"
 
-#: tortoisehg\hgtk\history.py:440 tortoisehg\hgtk\history.py:1997
+#: tortoisehg\hgtk\history.py:440 tortoisehg\hgtk\history.py:1991
 msgid "Pull"
 msgstr "プル"
 
-#: tortoisehg\hgtk\history.py:442 tortoisehg\hgtk\history.py:2040
+#: tortoisehg\hgtk\history.py:442 tortoisehg\hgtk\history.py:2034
 #: tortoisehg\hgtk\synch.py:68
 msgid "Outgoing"
 msgstr "送信"
 
-#: tortoisehg\hgtk\history.py:444 tortoisehg\hgtk\history.py:2080
+#: tortoisehg\hgtk\history.py:444 tortoisehg\hgtk\history.py:2074
 #: tortoisehg\hgtk\synch.py:73
 msgid "Push"
 msgstr "プッシュ"
@@ -2579,11 +2589,11 @@ msgid "Pending Perforce changelists"
 msgstr "保留中の Perforce 変更リスト"
 
 #: tortoisehg\hgtk\history.py:614 tortoisehg\hgtk\history.py:639
-#: tortoisehg\hgtk\history.py:1787 tortoisehg\hgtk\history.py:1869
-#: tortoisehg\hgtk\history.py:1999 tortoisehg\hgtk\history.py:2042
-#: tortoisehg\hgtk\history.py:2082 tortoisehg\hgtk\history.py:2426
-#: tortoisehg\hgtk\history.py:2456 tortoisehg\hgtk\history.py:2713
-#: tortoisehg\hgtk\history.py:2744 tortoisehg\hgtk\recovery.py:179
+#: tortoisehg\hgtk\history.py:1781 tortoisehg\hgtk\history.py:1863
+#: tortoisehg\hgtk\history.py:1993 tortoisehg\hgtk\history.py:2036
+#: tortoisehg\hgtk\history.py:2076 tortoisehg\hgtk\history.py:2420
+#: tortoisehg\hgtk\history.py:2450 tortoisehg\hgtk\history.py:2707
+#: tortoisehg\hgtk\history.py:2738 tortoisehg\hgtk\recovery.py:179
 #: tortoisehg\hgtk\synch.py:550
 msgid "Please try again after the previous command has completed"
 msgstr ""
@@ -2971,137 +2981,137 @@ msgstr "リベース"
 msgid "Configure aliases and after pull behavior"
 msgstr "パスの編集とプル後の動作を設定する"
 
-#: tortoisehg\hgtk\history.py:1784
+#: tortoisehg\hgtk\history.py:1778
 msgid "Applying bundle..."
 msgstr "バンドルを適用中..."
 
-#: tortoisehg\hgtk\history.py:1785
+#: tortoisehg\hgtk\history.py:1779
 msgid "Applying bundle"
 msgstr "バンドルを適用中"
 
-#: tortoisehg\hgtk\history.py:1830 tortoisehg\hgtk\history.py:1972
-#: tortoisehg\hgtk\history.py:2005 tortoisehg\hgtk\history.py:2619
+#: tortoisehg\hgtk\history.py:1824 tortoisehg\hgtk\history.py:1966
+#: tortoisehg\hgtk\history.py:1999 tortoisehg\hgtk\history.py:2613
 msgid "No remote path specified"
 msgstr "リモートパスがありません"
 
-#: tortoisehg\hgtk\history.py:1831 tortoisehg\hgtk\history.py:1973
-#: tortoisehg\hgtk\history.py:2006 tortoisehg\hgtk\history.py:2620
+#: tortoisehg\hgtk\history.py:1825 tortoisehg\hgtk\history.py:1967
+#: tortoisehg\hgtk\history.py:2000 tortoisehg\hgtk\history.py:2614
 msgid "Please enter or select a remote path"
 msgstr "同期対象のパスを入力するか選択してください"
 
-#: tortoisehg\hgtk\history.py:1858
+#: tortoisehg\hgtk\history.py:1852
 msgid "%d incoming changesets"
 msgstr "%d 件の受信チェンジセット"
 
-#: tortoisehg\hgtk\history.py:1860
+#: tortoisehg\hgtk\history.py:1854
 msgid "Aborted incoming"
 msgstr "受信中断"
 
-#: tortoisehg\hgtk\history.py:1862
+#: tortoisehg\hgtk\history.py:1856
 msgid "No incoming changesets"
 msgstr "受信チェンジセットはありません"
 
-#: tortoisehg\hgtk\history.py:1866
+#: tortoisehg\hgtk\history.py:1860
 msgid "Checking incoming changesets..."
 msgstr "受信チェンジセットのチェック中..."
 
-#: tortoisehg\hgtk\history.py:1885
+#: tortoisehg\hgtk\history.py:1879
 msgid "Accept incoming previewed changesets"
 msgstr "受信したチェンジセットを取り込む"
 
-#: tortoisehg\hgtk\history.py:1886
+#: tortoisehg\hgtk\history.py:1880
 msgid "Accept"
 msgstr "取り込む"
 
-#: tortoisehg\hgtk\history.py:1891
+#: tortoisehg\hgtk\history.py:1885
 msgid "Reject incoming previewed changesets"
 msgstr "受信したチェンジセットを破棄する"
 
-#: tortoisehg\hgtk\history.py:1892
+#: tortoisehg\hgtk\history.py:1886
 msgid "Reject"
 msgstr "破棄する"
 
-#: tortoisehg\hgtk\history.py:1934
+#: tortoisehg\hgtk\history.py:1928
 msgid "Bundle Preview"
 msgstr "バンドルプレビュー"
 
-#: tortoisehg\hgtk\history.py:1939
+#: tortoisehg\hgtk\history.py:1933
 msgid "Failed to preview, a bundle file unrelated to this repository"
 msgstr "バンドルプレビューに失敗しました (このリポジトリとは無関係)"
 
-#: tortoisehg\hgtk\history.py:1944
+#: tortoisehg\hgtk\history.py:1938
 msgid "Failed to preview, not a Mercurial bundle file"
 msgstr "バンドルプレビューに失敗しました (無効な Mercurial バンドルファイル)"
 
-#: tortoisehg\hgtk\history.py:1948
+#: tortoisehg\hgtk\history.py:1942
 msgid "Open Bundle"
 msgstr "バンドルを開く"
 
-#: tortoisehg\hgtk\history.py:1986
+#: tortoisehg\hgtk\history.py:1980
 msgid "Finished pull with rebase"
 msgstr "プル完了 (リベース済)"
 
-#: tortoisehg\hgtk\history.py:1989
+#: tortoisehg\hgtk\history.py:1983
 msgid "Finished pull"
 msgstr "プル完了"
 
-#: tortoisehg\hgtk\history.py:1991
+#: tortoisehg\hgtk\history.py:1985
 msgid "No changesets to pull"
 msgstr "プルするチェンジセットがありません"
 
-#: tortoisehg\hgtk\history.py:1993 tortoisehg\hgtk\history.py:2738
+#: tortoisehg\hgtk\history.py:1987 tortoisehg\hgtk\history.py:2732
 msgid "Aborted pull"
 msgstr "プル中断"
 
-#: tortoisehg\hgtk\history.py:1996
+#: tortoisehg\hgtk\history.py:1990
 msgid "Pulling changesets..."
 msgstr "チェンジセットをプル中..."
 
-#: tortoisehg\hgtk\history.py:2032
+#: tortoisehg\hgtk\history.py:2026
 msgid "%d outgoing changesets"
 msgstr "%d 件の送信チェンジセット"
 
-#: tortoisehg\hgtk\history.py:2034
+#: tortoisehg\hgtk\history.py:2028
 msgid "Aborted outgoing"
 msgstr "送信中断"
 
-#: tortoisehg\hgtk\history.py:2036
+#: tortoisehg\hgtk\history.py:2030
 msgid "No outgoing changesets"
 msgstr "送信チェンジセットがありません"
 
-#: tortoisehg\hgtk\history.py:2039
+#: tortoisehg\hgtk\history.py:2033
 msgid "Checking outgoing changesets..."
 msgstr "送信チェンジセットのチェック中..."
 
-#: tortoisehg\hgtk\history.py:2048 tortoisehg\hgtk\synch.py:504
+#: tortoisehg\hgtk\history.py:2042 tortoisehg\hgtk\synch.py:504
 msgid "No repository selected"
 msgstr "リポジトリが選択されていません"
 
-#: tortoisehg\hgtk\history.py:2049 tortoisehg\hgtk\synch.py:505
+#: tortoisehg\hgtk\history.py:2043 tortoisehg\hgtk\synch.py:505
 msgid "Select a peer repository to compare with"
 msgstr "比較対象の2つのリポジトリを選択"
 
-#: tortoisehg\hgtk\history.py:2074
+#: tortoisehg\hgtk\history.py:2068
 msgid "Finished push"
 msgstr "プッシュ完了"
 
-#: tortoisehg\hgtk\history.py:2076 tortoisehg\hgtk\history.py:2704
+#: tortoisehg\hgtk\history.py:2070 tortoisehg\hgtk\history.py:2698
 msgid "Aborted push"
 msgstr "プッシュ中断"
 
-#: tortoisehg\hgtk\history.py:2079
+#: tortoisehg\hgtk\history.py:2073
 msgid "Pushing changesets..."
 msgstr "チェンジセットのプッシュ中..."
 
-#: tortoisehg\hgtk\history.py:2191
+#: tortoisehg\hgtk\history.py:2185
 msgid "unknown dnd dest: %s"
 msgstr "不明なドラッグ&ドロップ先: %s"
 
-#: tortoisehg\hgtk\history.py:2310
+#: tortoisehg\hgtk\history.py:2304
 msgid "Confirm Revert All Files"
 msgstr "全ファイルの復帰"
 
-#: tortoisehg\hgtk\history.py:2311
+#: tortoisehg\hgtk\history.py:2305
 msgid ""
 "Revert all files to revision %d?\n"
 "This will overwrite your local changes"
@@ -3109,71 +3119,71 @@ msgstr ""
 "全てのファイルをリビジョン %d に戻しますか？\n"
 "この操作は作業ディレクトリの内容を上書きします。"
 
-#: tortoisehg\hgtk\history.py:2361
+#: tortoisehg\hgtk\history.py:2355
 msgid "Save patches to"
 msgstr "パッチの保存"
 
-#: tortoisehg\hgtk\history.py:2397
+#: tortoisehg\hgtk\history.py:2391
 msgid "Write bundle to"
 msgstr "バンドルの保存"
 
-#: tortoisehg\hgtk\history.py:2410
+#: tortoisehg\hgtk\history.py:2404
 msgid "Bundling from %(base)s to %(rev)s..."
 msgstr "%(base)s から %(rev)s をバンドル中..."
 
-#: tortoisehg\hgtk\history.py:2412
+#: tortoisehg\hgtk\history.py:2406
 msgid "Bundling from %(base)s to tip..."
 msgstr "%(base)s から tip までバンドル中..."
 
-#: tortoisehg\hgtk\history.py:2418
+#: tortoisehg\hgtk\history.py:2412
 msgid "Finish bundling"
 msgstr "バンドル完了"
 
-#: tortoisehg\hgtk\history.py:2420
+#: tortoisehg\hgtk\history.py:2414
 msgid "Aborted bundling"
 msgstr "バンドル中断"
 
-#: tortoisehg\hgtk\history.py:2422
+#: tortoisehg\hgtk\history.py:2416
 msgid "Failed to bundle"
 msgstr "バンドル失敗"
 
-#: tortoisehg\hgtk\history.py:2424
+#: tortoisehg\hgtk\history.py:2418
 msgid "Bundling"
 msgstr "バンドル中"
 
-#: tortoisehg\hgtk\history.py:2447
+#: tortoisehg\hgtk\history.py:2441
 msgid "Finish importing"
 msgstr "インポート完了"
 
-#: tortoisehg\hgtk\history.py:2449
+#: tortoisehg\hgtk\history.py:2443
 msgid "Aborted importing"
 msgstr "インポート中断"
 
-#: tortoisehg\hgtk\history.py:2451 tortoisehg\hgtk\thgimport.py:188
+#: tortoisehg\hgtk\history.py:2445 tortoisehg\hgtk\thgimport.py:188
 msgid "Failed to import"
 msgstr "インポート失敗"
 
-#: tortoisehg\hgtk\history.py:2453
+#: tortoisehg\hgtk\history.py:2447
 msgid "Importing"
 msgstr "インポート中"
 
-#: tortoisehg\hgtk\history.py:2454
+#: tortoisehg\hgtk\history.py:2448
 msgid "Importing to Patch Queue..."
 msgstr "MQ にインポート中..."
 
-#: tortoisehg\hgtk\history.py:2462
+#: tortoisehg\hgtk\history.py:2456
 msgid "Confirm Rebase Revision"
 msgstr "リベースの確認"
 
-#: tortoisehg\hgtk\history.py:2463
+#: tortoisehg\hgtk\history.py:2457
 msgid "Rebase revision %d on top of %d?"
 msgstr "リビジョン %d を リビジョン %d の上にリベースしますか？"
 
-#: tortoisehg\hgtk\history.py:2628
+#: tortoisehg\hgtk\history.py:2622
 msgid "Confirm Forced Push to Remote Repository"
 msgstr "強制的なプッシュの確認"
 
-#: tortoisehg\hgtk\history.py:2629
+#: tortoisehg\hgtk\history.py:2623
 msgid ""
 "Forced push to remote repository\n"
 "%s\n"
@@ -3183,30 +3193,30 @@ msgstr ""
 "%s\n"
 "(必要に応じてリモートリポジトリに新しく HEAD が作成されます)"
 
-#: tortoisehg\hgtk\history.py:2631 tortoisehg\hgtk\history.py:2647
+#: tortoisehg\hgtk\history.py:2625 tortoisehg\hgtk\history.py:2641
 msgid "Forced &Push"
 msgstr "強制的にプッシュ(&P)"
 
-#: tortoisehg\hgtk\history.py:2633
+#: tortoisehg\hgtk\history.py:2627
 msgid "Confirm Push of New Branches to Remote Repository"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:2634
+#: tortoisehg\hgtk\history.py:2628
 msgid ""
 "Push to remote repository\n"
 "%s\n"
 "(creating new branches in remote if needed)?"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:2636 tortoisehg\hgtk\history.py:2641
+#: tortoisehg\hgtk\history.py:2630 tortoisehg\hgtk\history.py:2635
 msgid "&Push"
 msgstr "プッシュ(&P)"
 
-#: tortoisehg\hgtk\history.py:2639
+#: tortoisehg\hgtk\history.py:2633
 msgid "Confirm Push to remote Repository"
 msgstr "プッシュの確認"
 
-#: tortoisehg\hgtk\history.py:2640
+#: tortoisehg\hgtk\history.py:2634
 msgid ""
 "Push to remote repository\n"
 "%s\n"
@@ -3215,11 +3225,11 @@ msgstr ""
 "リモートリポジトリへプッシュしてもよろしいですか？\n"
 "%s"
 
-#: tortoisehg\hgtk\history.py:2644
+#: tortoisehg\hgtk\history.py:2638
 msgid "Confirm Forced Push"
 msgstr "強制的なプッシュの確認"
 
-#: tortoisehg\hgtk\history.py:2645
+#: tortoisehg\hgtk\history.py:2639
 msgid ""
 "Forced push to repository\n"
 "%s\n"
@@ -3229,43 +3239,43 @@ msgstr ""
 "%s\n"
 "(必要に応じて新しく HEAD が作成されます)"
 
-#: tortoisehg\hgtk\history.py:2682
+#: tortoisehg\hgtk\history.py:2676
 msgid "Finished push to revision %s"
 msgstr "リビジョン %s までプッシュ完了"
 
-#: tortoisehg\hgtk\history.py:2690
+#: tortoisehg\hgtk\history.py:2684
 msgid "Finished pushing branch %s"
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:2707
+#: tortoisehg\hgtk\history.py:2701
 msgid "Pushing branch %s..."
 msgstr ""
 
-#: tortoisehg\hgtk\history.py:2709
+#: tortoisehg\hgtk\history.py:2703
 msgid "Pushing changesets to revision %s..."
 msgstr "リビジョン %s までチェンジセットをプッシュ中..."
 
-#: tortoisehg\hgtk\history.py:2711
+#: tortoisehg\hgtk\history.py:2705
 msgid "Push to %s"
 msgstr "%s までプッシュ"
 
-#: tortoisehg\hgtk\history.py:2736
+#: tortoisehg\hgtk\history.py:2730
 msgid "Finished pull to revision %s"
 msgstr "リビジョン %s までプル完了"
 
-#: tortoisehg\hgtk\history.py:2741
+#: tortoisehg\hgtk\history.py:2735
 msgid "Pulling changesets to revision %s..."
 msgstr "リビジョン %s までチェンジセットをプル中..."
 
-#: tortoisehg\hgtk\history.py:2742
+#: tortoisehg\hgtk\history.py:2736
 msgid "Pull to %s"
 msgstr "%s までプル"
 
-#: tortoisehg\hgtk\history.py:2755 tortoisehg\hgtk\status.py:999
+#: tortoisehg\hgtk\history.py:2749 tortoisehg\hgtk\status.py:999
 msgid "Save patch to"
 msgstr "パッチの保存"
 
-#: tortoisehg\hgtk\history.py:2905 tortoisehg\hgtk\history.py:2915
+#: tortoisehg\hgtk\history.py:2900 tortoisehg\hgtk\history.py:2910
 msgid "Refresh required"
 msgstr ""
 
@@ -3322,50 +3332,50 @@ msgid "Merge target (other)"
 msgstr "マージ対象 (他のリビジョン)"
 
 #: tortoisehg\hgtk\merge.py:84
-msgid "Discard all changes from merge target (other) revision"
-msgstr "全ての変更点をマージ対象(other)のリビジョンから破棄する"
-
-#: tortoisehg\hgtk\merge.py:89
 msgid "Current revision (local)"
 msgstr "現在のリビジョン (ローカル)"
 
-#: tortoisehg\hgtk\merge.py:100
-msgid "Merge tools:"
-msgstr "マージツール:"
+#: tortoisehg\hgtk\merge.py:103
+msgid "Use merge tool:"
+msgstr ""
 
-#: tortoisehg\hgtk\merge.py:129
+#: tortoisehg\hgtk\merge.py:118
+msgid "Discard all changes from merge target (other) revision"
+msgstr "全ての変更点をマージ対象(other)のリビジョンから破棄する"
+
+#: tortoisehg\hgtk\merge.py:135
 msgid "Merge"
 msgstr "マージ"
 
-#: tortoisehg\hgtk\merge.py:131
+#: tortoisehg\hgtk\merge.py:137
 msgid "Undo"
 msgstr "取り消し"
 
-#: tortoisehg\hgtk\merge.py:159
+#: tortoisehg\hgtk\merge.py:165
 msgid "Merged successfully"
 msgstr "正常にマージされました"
 
-#: tortoisehg\hgtk\merge.py:161
+#: tortoisehg\hgtk\merge.py:167
 msgid "Canceled merging"
 msgstr "マージが中止されました"
 
-#: tortoisehg\hgtk\merge.py:163
+#: tortoisehg\hgtk\merge.py:169
 msgid "Failed to merge"
 msgstr "マージに失敗しました"
 
-#: tortoisehg\hgtk\merge.py:170
+#: tortoisehg\hgtk\merge.py:176
 msgid "Undo successfully"
 msgstr "正常に取り消されました"
 
-#: tortoisehg\hgtk\merge.py:172
+#: tortoisehg\hgtk\merge.py:178
 msgid "Canceled undo"
 msgstr "取り消しが中止されました"
 
-#: tortoisehg\hgtk\merge.py:174
+#: tortoisehg\hgtk\merge.py:180
 msgid "Failed to undo"
 msgstr "取り消しに失敗しました"
 
-#: tortoisehg\hgtk\merge.py:191
+#: tortoisehg\hgtk\merge.py:197
 msgid ""
 "To complete merging, you need to commit merged files in working directory.\n"
 "\n"
@@ -3374,19 +3384,30 @@ msgstr ""
 "マージ作業はマージ結果をコミットするまで完了しません。\n"
 "コミットせずに閉じてもよろしいですか？"
 
-#: tortoisehg\hgtk\merge.py:204
+#: tortoisehg\hgtk\merge.py:210
 msgid "Cannot merge"
 msgstr "マージできません"
 
-#: tortoisehg\hgtk\merge.py:205
+#: tortoisehg\hgtk\merge.py:211
 msgid "Uncommitted local changes"
 msgstr "未コミットの作業ディレクトリでの変更"
 
-#: tortoisehg\hgtk\merge.py:240
+#: tortoisehg\hgtk\merge.py:215
+msgid "Confirm Discard Changes"
+msgstr ""
+
+#: tortoisehg\hgtk\merge.py:216
+msgid ""
+"The changes from revision %s and all unmerged parents will be discarded.\n"
+"\n"
+"Are you sure this is what you want to do?"
+msgstr ""
+
+#: tortoisehg\hgtk\merge.py:253
 msgid "Confirm undo merge"
 msgstr "マージの取り消し"
 
-#: tortoisehg\hgtk\merge.py:241
+#: tortoisehg\hgtk\merge.py:254
 msgid "Clean checkout of original revision?"
 msgstr "元のリビジョンを完全な形でチェックアウトしますか？"
 
@@ -3411,12 +3432,12 @@ msgid "Finished"
 msgstr "完了"
 
 #: tortoisehg\hgtk\p4pending.py:103 tortoisehg\hgtk\quickop.py:213
-#: tortoisehg\hgtk\thgmq.py:898 tortoisehg\hgtk\thgpbranch.py:746
+#: tortoisehg\hgtk\thgmq.py:898 tortoisehg\hgtk\thgpbranch.py:749
 msgid "Canceled"
 msgstr "中止"
 
 #: tortoisehg\hgtk\p4pending.py:105 tortoisehg\hgtk\quickop.py:215
-#: tortoisehg\hgtk\thgmq.py:900 tortoisehg\hgtk\thgpbranch.py:748
+#: tortoisehg\hgtk\thgmq.py:900 tortoisehg\hgtk\thgpbranch.py:751
 msgid "Failed"
 msgstr "失敗"
 
@@ -3767,82 +3788,95 @@ msgid "Sub ->"
 msgstr "サブへ →"
 
 #: tortoisehg\hgtk\shellconf.py:112
+msgid "Menu Behavior"
+msgstr ""
+
+#: tortoisehg\hgtk\shellconf.py:120
+msgid "Hide context menu outside repositories"
+msgstr ""
+
+#: tortoisehg\hgtk\shellconf.py:124
 msgid "Icons"
 msgstr "アイコン"
 
-#: tortoisehg\hgtk\shellconf.py:117
+#: tortoisehg\hgtk\shellconf.py:129
 msgid "Overlays"
 msgstr "アイコンオーバーレイ"
 
-#: tortoisehg\hgtk\shellconf.py:124
+#: tortoisehg\hgtk\shellconf.py:136
 msgid "Enable overlays"
 msgstr "使用する"
 
-#: tortoisehg\hgtk\shellconf.py:126
+#: tortoisehg\hgtk\shellconf.py:138
 msgid "Local disks only"
 msgstr "ローカルのみ"
 
-#: tortoisehg\hgtk\shellconf.py:130
+#: tortoisehg\hgtk\shellconf.py:142
 msgid "Enabled Overlay Handlers"
 msgstr ""
 
-#: tortoisehg\hgtk\shellconf.py:139
+#: tortoisehg\hgtk\shellconf.py:151
 msgid "Warning: affects all Tortoises, logoff required after change"
 msgstr ""
 
-#: tortoisehg\hgtk\shellconf.py:147
+#: tortoisehg\hgtk\shellconf.py:159
 msgid "Added"
 msgstr "追加済み"
 
-#: tortoisehg\hgtk\shellconf.py:149
+#: tortoisehg\hgtk\shellconf.py:161
 msgid "Unversioned"
 msgstr "バージョン管理外"
 
-#: tortoisehg\hgtk\shellconf.py:154
+#: tortoisehg\hgtk\shellconf.py:166
 msgid "Locked*"
 msgstr ""
 
-#: tortoisehg\hgtk\shellconf.py:156
+#: tortoisehg\hgtk\shellconf.py:168
 msgid "Readonly*"
 msgstr "読み取り専用*"
 
-#: tortoisehg\hgtk\shellconf.py:161
+#: tortoisehg\hgtk\shellconf.py:173
 msgid "Ignored*"
 msgstr "無視*"
 
-#: tortoisehg\hgtk\shellconf.py:163
+#: tortoisehg\hgtk\shellconf.py:175
 msgid "Deleted*"
 msgstr "削除済み*"
 
-#: tortoisehg\hgtk\shellconf.py:178
+#: tortoisehg\hgtk\shellconf.py:191
 msgid "*: not used by TortoiseHg"
 msgstr ""
 
-#: tortoisehg\hgtk\shellconf.py:182
+#: tortoisehg\hgtk\shellconf.py:195
 msgid "Taskbar"
 msgstr "タスクバー"
 
-#: tortoisehg\hgtk\shellconf.py:189
+#: tortoisehg\hgtk\shellconf.py:202
 msgid "Show Icon"
 msgstr "トレイアイコンの表示"
 
-#: tortoisehg\hgtk\shellconf.py:191
+#: tortoisehg\hgtk\shellconf.py:204
 msgid "Highlight Icon"
 msgstr "トレイアイコンの点滅"
 
-#: tortoisehg\hgtk\shellconf.py:197
+#: tortoisehg\hgtk\shellconf.py:210
+msgid ""
+"Do not show menu items on unversioned folders (use shift + click to override)"
+msgstr ""
+
+#: tortoisehg\hgtk\shellconf.py:213
 msgid "Show overlay icons in Mercurial repositories"
 msgstr ""
 
-#: tortoisehg\hgtk\shellconf.py:200
+#: tortoisehg\hgtk\shellconf.py:216
 msgid "Show overlays on local disks only"
 msgstr ""
 
-#: tortoisehg\hgtk\shellconf.py:204
+#: tortoisehg\hgtk\shellconf.py:220
 msgid "Show the taskbar icon (restart needed)"
 msgstr "トレイアイコンを表示する (再起動が必要)"
 
-#: tortoisehg\hgtk\shellconf.py:207
+#: tortoisehg\hgtk\shellconf.py:223
 msgid "Highlight the taskbar icon during activity"
 msgstr "処理中にトレイアイコンの色を変化させる"
 
@@ -5563,7 +5597,7 @@ msgstr "並べ替え"
 msgid "Status"
 msgstr "状態"
 
-#: tortoisehg\hgtk\thgmq.py:869 tortoisehg\hgtk\thgpbranch.py:703
+#: tortoisehg\hgtk\thgmq.py:869 tortoisehg\hgtk\thgpbranch.py:706
 msgid "Enable editable cells"
 msgstr "セルを編集可能にする"
 
@@ -5575,7 +5609,7 @@ msgstr "'qparent' を表示する"
 msgid "Force"
 msgstr ""
 
-#: tortoisehg\hgtk\thgmq.py:896 tortoisehg\hgtk\thgpbranch.py:744
+#: tortoisehg\hgtk\thgmq.py:896 tortoisehg\hgtk\thgpbranch.py:747
 msgid "Succeed"
 msgstr "成功"
 
@@ -5674,51 +5708,51 @@ msgstr ""
 msgid "Patch branch finished"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:650
+#: tortoisehg\hgtk\thgpbranch.py:653
 msgid "_new"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:652
+#: tortoisehg\hgtk\thgpbranch.py:655
 msgid "_goto (update workdir)"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:654
+#: tortoisehg\hgtk\thgpbranch.py:657
 msgid "_edit message"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:655
+#: tortoisehg\hgtk\thgpbranch.py:658
 msgid "_rename"
 msgstr "名前変更"
 
-#: tortoisehg\hgtk\thgpbranch.py:656
+#: tortoisehg\hgtk\thgpbranch.py:659
 msgid "_delete"
 msgstr "削除(_D)"
 
-#: tortoisehg\hgtk\thgpbranch.py:657
+#: tortoisehg\hgtk\thgpbranch.py:660
 msgid "_finish"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:693
+#: tortoisehg\hgtk\thgpbranch.py:696
 msgid "Show graph"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:694
+#: tortoisehg\hgtk\thgpbranch.py:697
 msgid "Show status"
 msgstr "ステータスの表示"
 
-#: tortoisehg\hgtk\thgpbranch.py:695
+#: tortoisehg\hgtk\thgpbranch.py:698
 msgid "Show name"
 msgstr "パッチ名の表示"
 
-#: tortoisehg\hgtk\thgpbranch.py:696
+#: tortoisehg\hgtk\thgpbranch.py:699
 msgid "Show title"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:697
+#: tortoisehg\hgtk\thgpbranch.py:700
 msgid "Show message"
 msgstr ""
 
-#: tortoisehg\hgtk\thgpbranch.py:706
+#: tortoisehg\hgtk\thgpbranch.py:709
 msgid "Show internal branches"
 msgstr ""
 
@@ -7394,6 +7428,13 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "Please install iniparse package"
 #~ msgstr "iniparse パッケージをインストールしてください"
 
+#~ msgid ""
+#~ "** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues "
+#~ "or tortoisehg-discuss@lists.sourceforge.net\n"
+#~ msgstr ""
+#~ "** このバグを http://bitbucket.org/tortoisehg/stable/issues または tortoisehg-"
+#~ "discuss@lists.sourceforge.net に報告してください\n"
+
 #~ msgid "transplant:"
 #~ msgstr "トランスプラント:"
 
@@ -7447,6 +7488,9 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "_Copy hash"
 #~ msgstr "ハッシュ値のコピー(_C)"
+
+#~ msgid "Merge tools:"
+#~ msgstr "マージツール:"
 
 #~ msgid "<span weight=\"bold\">%s changesets</span> will be stripped"
 #~ msgstr "<span weight=\"bold\">%s チェンジセット</span> が削除されます"
