@@ -32,6 +32,7 @@ from tortoisehg.hgqt.blockmatcher import BlockList, BlockMatch
 from tortoisehg.hgqt.lexers import get_lexer
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.repoview import HgRepoView
+from tortoisehg.hgqt.revpanel import RevPanelWidget
 
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
@@ -109,8 +110,10 @@ class FileLogDialog(_AbstractFileDialog):
         s = QSettings()
         s.beginGroup('filelog')
         try:
+            self.textView.loadSettings(s, 'fileview')
             self.restoreGeometry(s.value('geom').toByteArray())
             self.splitter.restoreState(s.value('splitter').toByteArray())
+            self.revpanel.set_expanded(s.value('revpanel.expanded').toBool())
         finally:
             s.endGroup()
 
@@ -118,6 +121,8 @@ class FileLogDialog(_AbstractFileDialog):
         s = QSettings()
         s.beginGroup('filelog')
         try:
+            self.textView.saveSettings(s, 'fileview')
+            s.setValue('revpanel.expanded', self.revpanel.is_expanded())
             s.setValue('geom', self.saveGeometry())
             s.setValue('splitter', self.splitter.saveState())
         finally:
@@ -133,11 +138,31 @@ class FileLogDialog(_AbstractFileDialog):
 
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
-        self.repoview = HgRepoView(self.repo, self)
+        self.repoview = HgRepoView(self.repo, self.splitter)
+        self.contentframe = QFrame(self.splitter)
+
+        vbox = QVBoxLayout()
+        vbox.setSpacing(0)
+        vbox.setMargin(0)
+        self.contentframe.setLayout(vbox)
+
+        self.revpanel = RevPanelWidget(self.repo)
+        self.revpanel.linkActivated.connect(self.linkActivated)
+        vbox.addWidget(self.revpanel, 0)
+
         self.textView = HgFileView(self.repo, self)
         self.textView.forceMode('file')
-        self.splitter.addWidget(self.repoview)
-        self.splitter.addWidget(self.textView)
+        vbox.addWidget(self.textView, 1)
+
+    @pyqtSlot(unicode)
+    def linkActivated(self, link):
+        link = unicode(link)
+        if ':' in link:
+            scheme, param = link.split(':', 1)
+            if scheme == 'cset':
+                rev = self.repo[param].rev()
+                return self.goto(rev)
+        QDesktopServices.openUrl(QUrl(link))
 
     def setupViews(self):
         self.textView.setFont(self._font)
@@ -191,6 +216,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.textView.setContext(ctx)
         self.textView.displayFile(self.filerevmodel.graph.filename(rev))
         self.textView.verticalScrollBar().setValue(pos)
+        self.revpanel.set_revision(rev)
+        self.revpanel.update(repo = self.repo)
 
     def goto(self, rev):
         index = self.filerevmodel.indexFromRev(rev)
