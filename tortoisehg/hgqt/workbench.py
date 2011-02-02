@@ -686,7 +686,7 @@ def run(ui, *pats, **opts):
             for pat in pats:
                 f = repo.wjoin(pat)
                 if os.path.isdir(f):
-                    q.append('file("%s/*")' % pat)
+                    q.append('file("%s/**")' % pat)
                 elif os.path.isfile(f):
                     q.append('file("%s")' % pat)
             w.setRevsetFilter(root, ' or '.join(q))
