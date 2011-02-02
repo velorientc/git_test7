@@ -131,6 +131,14 @@ class BasePage(QWizardPage):
             self.switch_pane(MAIN_PANE)
 
     def validatePage(self):
+        #When the user first clicks on the "Next" button ("Merge"/"Commit")
+        #After any validation via overloading validatePage(),
+        #we switch to the perform pane
+        if self.layout().currentIndex() == MAIN_PANE:
+            self.switch_pane(PERFORM_PANE)
+            return False
+
+        #When the perform pane is done, it'll call this again
         return self.can_continue()
 
     ### Method to be overridden ###
@@ -147,8 +155,6 @@ class BasePage(QWizardPage):
             if label:
                 btn = QPushButton(label)
                 self.wizard().setButton(QWizard.NextButton, btn)
-                self.wizard().button(QWizard.NextButton).clicked.connect(
-                              self.perform_clicked)
                 self.wizard().button(QWizard.NextButton).setShown(True)
             self.wizard().setOption(QWizard.HaveHelpButton, False)
             self.wizard().setOption(QWizard.HaveCustomButton1, False)
@@ -178,9 +184,6 @@ class BasePage(QWizardPage):
         return False
 
     ### Signal Handlers ###
-
-    def perform_clicked(self):
-        self.switch_pane(PERFORM_PANE)
 
     def cancel_clicked(self):
         self.cancel()
@@ -577,7 +580,7 @@ class CommitPage(BasePage):
 
         def tryperform():
             if self.isComplete():
-                self.perform()
+                self.wizard().next()
         actionEnter = QAction('alt-enter', self)
         actionEnter.setShortcuts([Qt.CTRL+Qt.Key_Return, Qt.CTRL+Qt.Key_Enter])
         actionEnter.triggered.connect(tryperform)
