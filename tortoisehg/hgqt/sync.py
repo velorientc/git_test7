@@ -532,6 +532,12 @@ class SyncWidget(QWidget):
                     _('An URL must be selected for this operation.'),
                     parent=self)
             return
+
+        user, host, port, folder, passwd, scheme = self.urlparse(url)
+        if scheme == 'https':
+            if self.repo.ui.configbool('insecurehosts', host):
+                cmdline.append('--insecure')
+
         safeurl = self.currentUrl(True)
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
         cmdline.append(url)
