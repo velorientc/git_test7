@@ -477,12 +477,13 @@ class CommitWidget(QWidget):
 
         commandlines = []
 
+        brcmd = []
+        newbranch = False
         if self.branchop is None:
-            brcmd = []
+            newbranch = repo[None].branch() != repo['.'].branch()
         elif self.branchop == False:
             brcmd = ['--close-branch']
         else:
-            brcmd = []
             branch = hglib.fromunicode(self.branchop)
             if branch in repo.branchtags():
                 # response: 0=Yes, 1=No, 2=Cancel
@@ -505,12 +506,13 @@ class CommitWidget(QWidget):
                       'Cancel\t- Cancel this commit') % self.branchop,
                     self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
             if resp == 0:
+                newbranch = True
                 commandlines.append(['branch', '--repository', repo.root,
                                      '--force', branch])
             elif resp == 2:
                 return
         files = self.stwidget.getChecked('MAR?!S')
-        if not (files or brcmd or repo[None].branch() != repo['.'].branch()):
+        if not (files or brcmd or newbranch):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
