@@ -39,6 +39,7 @@ class RepoWidget(QWidget):
 
     showMessageSignal = pyqtSignal(QString)
     closeSelfSignal = pyqtSignal(QWidget)
+    toolbarVisibilityChanged = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -206,17 +207,20 @@ class RepoWidget(QWidget):
         else:
             return self.repo.shortname
 
-    @pyqtSlot()
-    def toggleFilterBar(self):
-        """Toggle display repowidget filter bar"""
-        vis = self.filterbar.isVisible()
-        self.filterbar.setVisible(not vis)
+    def filterBarVisible(self):
+        return self.filterbar.isVisible()
+    def gotoBarVisible(self):
+        return self.gototb.isVisible()
 
-    @pyqtSlot()
-    def toggleGotoBar(self):
+    @pyqtSlot(bool)
+    def toggleFilterBar(self, checked):
+        """Toggle display repowidget filter bar"""
+        self.filterbar.setVisible(checked)
+
+    @pyqtSlot(bool)
+    def toggleGotoBar(self, checked):
         """Toggle display repowidget goto bar"""
-        vis = self.gototb.isVisible()
-        self.gototb.setVisible(not vis)
+        self.gototb.setVisible(checked)
 
     @pyqtSlot(unicode)
     def _openLink(self, link):
@@ -302,6 +306,7 @@ class RepoWidget(QWidget):
         self.filterbar.revsetle.setText('incoming()')
         self.filterbar.setEnabled(False)
         self.filterbar.show()
+        self.toolbarVisibilityChanged.emit()
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
         self.revset = [self.repo[n].node() for n in range(oldlen, newlen)]
@@ -356,6 +361,7 @@ class RepoWidget(QWidget):
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
         self.filterbar.show()
+        self.toolbarVisibilityChanged.emit()
         self.setRevisionSet(nodes)
 
     def createGrepWidget(self):

@@ -292,13 +292,17 @@ class Workbench(QMainWindow):
                   enabled='repoopen', toolbar='edit',
                   tooltip=_('Load all revisions into graph'))
         newseparator(toolbar='edit', menu='View')
-        newaction(_('Filter Toolbar'), self._repofwd('toggleFilterBar'),
+
+        self.filtertbaction = \
+        newaction(_('Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
                   icon='find', shortcut='Ctrl+S', enabled='repoopen',
-                  toolbar='edit', menu='View',
+                  toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Filter graph with revision sets or branches'))
-        newaction(_('Goto Toolbar'), self._repofwd('toggleGotoBar'),
+
+        self.gototbaction = \
+        newaction(_('Goto Toolbar'), self._repotogglefwd('toggleGotoBar'),
                   icon='go-jump', shortcut='Ctrl+T', enabled='repoopen',
-                  toolbar='edit', menu='View',
+                  toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Jump to a specific revision'))
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming',
@@ -386,15 +390,13 @@ class Workbench(QMainWindow):
         """Enable actions when repoTabs are opened or closed or changed"""
 
         # Update actions affected by repo open/close
-
         someRepoOpen = self.repoTabsWidget.count() > 0
         for action in self._actionavails['repoopen']:
             action.setEnabled(someRepoOpen)
 
         # Update actions affected by repo open/close/change
-
         self.updateTaskViewMenu()
-
+        self.updateToolBarActions()
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         mqEnabled = w and 'mq' in w.repo.extensions() or False
@@ -412,6 +414,11 @@ class Workbench(QMainWindow):
             tw.tabBar().hide()
             self.setWindowTitle(_('TortoiseHg Workbench'))
 
+    def updateToolBarActions(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            self.filtertbaction.setChecked(w.filterBarVisible())
+            self.gototbaction.setChecked(w.gotoBarVisible())
 
     def updateTaskViewMenu(self, taskIndex=0):
         'Update task tab menu for current repository'
@@ -475,6 +482,7 @@ class Workbench(QMainWindow):
         rw.revisionSelected.connect(self.updateHistoryActions)
         rw.repoLinkClicked.connect(self.showRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
+        rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
 
         tw = self.repoTabsWidget
         index = self.repoTabsWidget.addTab(rw, rw.title())
@@ -498,6 +506,14 @@ class Workbench(QMainWindow):
             if w:
                 w.repoview.model().updateColumns()
                 w.repoview.resizeColumns()
+
+    def _repotogglefwd(self, name):
+        """Return function to forward action to the current repo tab"""
+        def forwarder(checked):
+            w = self.repoTabsWidget.currentWidget()
+            if w:
+                getattr(w, name)(checked)
+        return forwarder
 
     def _repofwd(self, name):
         """Return function to forward action to the current repo tab"""
