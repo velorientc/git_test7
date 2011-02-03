@@ -168,3 +168,14 @@ tkdiff.priority=-5
 tkdiff.diffargs=-L '$plabel1' $parent -L '$clabel' $child
 tkdiff.diff3args=
 tkdiff.dirdiff=False
+
+
+; Telelogic Rhapsody DiffMerge Tool
+rhapsody_diffmerge.regkey=Software\Telelogic\Rhapsody\DiffMerge\
+rhapsody_diffmerge.regname=Install Path
+rhapsody_diffmerge.priority=-110
+rhapsody_diffmerge.args=-xmerge $other $local -base $base -out $output
+rhapsody_diffmerge.checkchanged=True
+rhapsody_diffmerge.gui=True
+rhapsody_diffmerge.diffargs=-xcompare $parent $child
+rhapsody_diffmerge.diff3args=

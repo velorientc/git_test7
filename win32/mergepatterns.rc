@@ -6,6 +6,11 @@
 **.odt = docdiff
 **.sxw = docdiff
 
+# If you have Telelogic Rhapsody DifMerge, enable these
+#**.sbs = rhapsody_diffmerge
+#**.rpy = rhapsody_diffmerge
+#**.cmp = rhapsody_diffmerge
+
 [diff-patterns]
 **.doc = docdiff
 **.docx = docdiff
@@ -22,3 +27,8 @@
 **.odt = docdiff
 **.sxw = docdiff
 **.nb = docdiff
+
+# If you have Telelogic Rhapsody DifMerge, enable these
+#*.sbs = rhapsody_diffmerge
+#*.rpy = rhapsody_diffmerge
+#*.cmp = rhapsody_diffmerge
