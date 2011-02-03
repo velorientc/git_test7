@@ -92,17 +92,17 @@ class SyncWidget(QWidget):
         hbox.addWidget(tb)
         self.layout().addLayout(hbox)
 
-        self.optionsbutton = QPushButton(_('Options'))
-        self.postpullbutton = QPushButton()
-        hbox.addWidget(self.postpullbutton)
-        hbox.addWidget(self.optionsbutton)
-        tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
         if 'perfarce' in self.repo.extensions():
             self.p4pbutton = QPushButton(_('p4pending'))
             self.p4pbutton.clicked.connect(self.p4pending)
             hbox.addWidget(self.p4pbutton)
         else:
             self.p4pbutton = None
+        self.optionsbutton = QPushButton(_('Options'))
+        self.postpullbutton = QPushButton()
+        tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
+        hbox.addWidget(self.postpullbutton)
+        hbox.addWidget(self.optionsbutton)
 
         self.targetcombo = QComboBox()
         self.targetcombo.setEnabled(False)
