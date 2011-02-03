@@ -35,9 +35,7 @@ class QFoldDialog(QDialog):
 
         mlbl = QLabel(_('New patch message:'))
         self.layout().addWidget(mlbl)
-        self.msgte = MessageEntry()
-        self.msgte.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.msgte.customContextMenuRequested.connect(self.menuRequested)
+        self.msgte = MessageEntry(self)
         self.msgte.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.layout().addWidget(self.msgte)
 

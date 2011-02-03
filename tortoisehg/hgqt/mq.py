@@ -131,8 +131,6 @@ class MQWidget(QWidget):
 
         self.messageEditor = commit.MessageEntry(self)
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.messageEditor.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.messageEditor.customContextMenuRequested.connect(self.menuRequested)
         self.messageEditor.refresh(repo)
         layout.addWidget(self.messageEditor, 1)
 

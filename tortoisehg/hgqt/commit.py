@@ -27,7 +27,7 @@ from tortoisehg.hgqt.sync import loadIniFile
 
 class MessageEntry(qscilib.Scintilla):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent, getCheckedFunc=None):
         super(MessageEntry, self).__init__(parent)
         self.setEdgeColor(QColor('LightSalmon'))
         self.setEdgeMode(QsciScintilla.EdgeLine)
@@ -52,6 +52,41 @@ class MessageEntry(qscilib.Scintilla):
         # http://www.riverbankcomputing.com/pipermail/qscintilla/2009-February/000461.html
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        self.getChecked = getCheckedFunc
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menuRequested)
+
+    def menuRequested(self, point):
+        line = self.lineAt(point)
+        point = self.mapToGlobal(point)
+
+        def apply():
+            line = 0
+            while True:
+                line = self.reflowBlock(line)
+                if line is None:
+                    break;
+        def paste():
+            files = self.getChecked()
+            self.insert(', '.join(files))
+        def settings():
+            from tortoisehg.hgqt.settings import SettingsDialog
+            dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
+            dlg.exec_()
+
+        menu = self.createStandardContextMenu()
+        menu.addSeparator()
+        if self.getChecked:
+            action = menu.addAction(_('Paste &Filenames'))
+            action.triggered.connect(paste)
+        for name, func in [(_('App&ly Format'), apply),
+                           (_('C&onfigure Format'), settings)]:
+            def add(name, func):
+                action = menu.addAction(name)
+                action.triggered.connect(func)
+            add(name, func)
+        return menu.exec_(point)
 
     def refresh(self, repo):
         self.setEdgeColumn(repo.summarylen)
@@ -174,9 +209,7 @@ class CommitWidget(QWidget):
         self.pcsinfo = revpanel.ParentWidget(repo)
         vbox.addWidget(self.pcsinfo, 0)
 
-        msgte = MessageEntry(self)
-        msgte.setContextMenuPolicy(Qt.CustomContextMenu)
-        msgte.customContextMenuRequested.connect(self.menuRequested)
+        msgte = MessageEntry(self, self.stwidget.getChecked)
         msgte.installEventFilter(qscilib.KeyPressInterceptor(self))
         vbox.addWidget(msgte, 1)
         upperframe = QFrame()
@@ -286,35 +319,6 @@ class CommitWidget(QWidget):
         # Update parent csinfo widget
         self.pcsinfo.set_revision(None)
         self.pcsinfo.update()
-
-    def menuRequested(self, point):
-        line = self.msgte.lineAt(point)
-        point = self.msgte.mapToGlobal(point)
-
-        def apply():
-            line = 0
-            while True:
-                line = self.msgte.reflowBlock(line)
-                if line is None:
-                    break;
-        def paste():
-            files = self.stwidget.getChecked()
-            self.msgte.insert(', '.join(files))
-        def settings():
-            from tortoisehg.hgqt.settings import SettingsDialog
-            dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
-            dlg.exec_()
-
-        menu = self.msgte.createStandardContextMenu()
-        menu.addSeparator()
-        for name, func in [(_('Paste &Filenames'), paste),
-                           (_('App&ly Format'), apply),
-                           (_('C&onfigure Format'), settings)]:
-            def add(name, func):
-                action = menu.addAction(name)
-                action.triggered.connect(lambda: func())
-            add(name, func)
-        return menu.exec_(point)
 
     def branchOp(self):
         d = branchop.BranchOpDialog(self.repo, self.branchop, self)
