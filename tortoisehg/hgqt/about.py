@@ -116,7 +116,7 @@ class AboutDialog(QDialog):
         name = (par % (14, 'TortoiseHg'))
         thgv = (par % (10, thgv))
         thgv = hglib.fromunicode(thgv)
-        nvl = _(''.join([name, thgv, libv]))
+        nvl = ''.join([name, thgv, libv])
         self.name_version_libs_lbl.setText(nvl)
 
     @pyqtSlot()
