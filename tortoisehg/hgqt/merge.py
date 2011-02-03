@@ -14,6 +14,7 @@ from mercurial import merge as mergemod
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, commit, resolve
+from tortoisehg.hgqt import qscilib
 
 keep = i18n.keepgettext()
 
@@ -606,11 +607,14 @@ class CommitPage(BasePage):
         # commit message area
         msg_sep = qtlib.LabeledSeparator(_('Commit message'))
         box.addWidget(msg_sep)
-        msg_text = QTextEdit()
+        msg_text = commit.MessageEntry(self)
+        msg_text.installEventFilter(qscilib.KeyPressInterceptor(self))
+        msg_text.refresh(repo)
+        msg_text.loadSettings(QSettings(), 'merge/message')
         engmsg = repo.ui.configbool('tortoisehg', 'engmsg', False)
         msgset = keep._('Merge ')
         msg_text.setText(engmsg and msgset['id'] or msgset['str'])
-        msg_text.textChanged.connect(lambda: self.completeChanged.emit())
+        msg_text.textChanged.connect(self.completeChanged)
         self.msg_text = msg_text
         box.addWidget(msg_text)
 
@@ -648,19 +652,19 @@ class CommitPage(BasePage):
 
     def ready(self):
         self.setTitle(_('Commit merged files'))
-
         # move cursor to end of commit message
-        self.msg_text.setFocus()
-        cursor = self.msg_text.textCursor()
-        cursor.movePosition(QTextCursor.EndOfBlock)
-        self.msg_text.setTextCursor(cursor)
+        lines = self.msg_text.lines()
+        if lines:
+            lines -= 1
+            pos = self.msg_text.lineLength(lines)
+            self.msg_text.setCursorPosition(lines, pos)
 
     def perform(self):
         self.setTitle(_('Committing...'))
         self.setSubTitle(_('Please wait while committing merged files.'))
 
         # merges must be committed without specifying file list
-        message = hglib.fromunicode(self.msg_text.toPlainText())
+        message = hglib.fromunicode(self.msg_text.text())
         cmdline = ['commit', '--verbose', '--message', message,
                    '--repository', self.wizard().repo.root]
         self.wizard().repo.incrementBusyCount()
@@ -676,7 +680,7 @@ class CommitPage(BasePage):
                 return False
         else:
             self.reslabel.setText(_('No merge conflicts, ready to commit'))
-        return len(self.msg_text.toPlainText()) > 0
+        return len(self.msg_text.text()) > 0
 
     def need_cleanup(self):
         return len(self.wizard().repo.parents()) == 2
@@ -700,6 +704,7 @@ class CommitPage(BasePage):
         if ret == 0:
             self.done = True
             self.wizard().repo.decrementBusyCount()
+            self.msg_text.saveSettings(QSettings(), 'merge/message')
             self.wizard().next()
         else:
             self.wizard().repo.decrementBusyCount()
