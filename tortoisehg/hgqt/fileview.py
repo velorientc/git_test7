@@ -198,6 +198,9 @@ class HgFileView(QFrame):
         self.timer.setSingleShot(False)
         self.timer.timeout.connect(self.idle_fill_files)
 
+    def setFont(self, font):
+        self.sci.setFont(font)
+
     def menuRequested(self, point):
         point = self.sci.mapToGlobal(point)
         return self.sci.createStandardContextMenu().exec_(point)
