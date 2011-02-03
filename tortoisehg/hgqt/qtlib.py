@@ -451,6 +451,14 @@ class ExpanderLabel(QWidget):
     def pm_clicked(self):
         self.expanded.emit(self.button.is_expanded())
 
+    def set_expanded(self, state=True):
+        if not self.button.is_expanded() == state:
+            self.button.set_expanded(state)
+            self.expanded.emit(state)
+
+    def is_expanded(self):
+        return self.button.is_expanded()
+
 class StatusLabel(QWidget):
 
     def __init__(self, parent=None):

@@ -34,7 +34,7 @@ class MergeDialog(QWizard):
 
         self.setWindowTitle(_('Merge - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('merge'))
-        self.setMinimumSize(600, 512)
+        self.setMinimumSize(600, 528)
         self.setOption(QWizard.DisabledBackButtonOnLastPage, True)
         self.setOption(QWizard.HelpButtonOnRight, False)
         self.setDefaultProperty('QComboBox', 'currentText', 'editTextChanged()')
@@ -227,24 +227,11 @@ class MergePage(BasePage):
             other_info = create(self.wizard().other)
             other_info.setContentsMargins(5, 0, 0, 0)
             box.addWidget(other_info)
+            self.other_info = other_info
         except error.RepoLookupError:
             qtlib.InfoMsgBox(_('Unable to merge'),
                              _('Merge revision not specified or not found'))
             QTimer.singleShot(0, self.wizard().close)
-
-        ### discard option
-        discard_chk = QCheckBox(_('Discard all changes from merge target '
-                                  '(other) revision'))
-        self.registerField('discard', discard_chk)
-        box.addWidget(discard_chk)
-
-        ## auto-resolve
-        autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
-                                      'where possible'))
-        autoresolve_chk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', False))
-        self.registerField('autoresolve', autoresolve_chk)
-        box.addWidget(autoresolve_chk)
 
         ## current revision
         box.addSpacing(6)
@@ -315,6 +302,34 @@ class MergePage(BasePage):
         wdbox.addWidget(force_chk)
         wdbox.addStretch(0)
 
+        box.addSpacing(6)
+
+        ### options
+        expander = qtlib.ExpanderLabel(_('Options'), False)
+        expander.expanded.connect(self.show_options)
+        box.addWidget(expander)
+        self.expander = expander
+
+        optbox = QVBoxLayout()
+        optbox.setSpacing(6)
+        box.addLayout(optbox)
+
+        ### discard option
+        discard_chk = QCheckBox(_('Discard all changes from merge target '
+                                  '(other) revision'))
+        self.registerField('discard', discard_chk)
+        optbox.addWidget(discard_chk)
+        self.discard_chk = discard_chk
+
+        ## auto-resolve
+        autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
+                                      'where possible'))
+        autoresolve_chk.setChecked(
+            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+        self.registerField('autoresolve', autoresolve_chk)
+        optbox.addWidget(autoresolve_chk)
+        self.autoresolve_chk = autoresolve_chk
+
         box.addStretch(0)
 
         return box
@@ -328,11 +343,28 @@ class MergePage(BasePage):
         self.groups.set_visible(False, 'dirty')
         self.groups.set_visible(False, 'merged')
         self.groups.set_visible(False, 'detail')
+        self.show_options(self.expander.is_expanded())
         self.check_status()
 
         if self.undo:
             self.link_activated('discard:noconfirm')
             self.undo = False
+
+    def validatePage(self):
+        #If we haven't already done the action, pop up a confirmation for
+        #dummy merge.
+        if not self.done and self.field('discard').toBool():
+            labels = [(QMessageBox.Yes, _('&Discard')),
+                      (QMessageBox.No, _('Cancel'))]
+            if not qtlib.QuestionMsgBox(_('Confirm Discard Changes'),
+                _('The changes from revision %s and all unmerged parents'
+                  ' will be discarded.\n\n'
+                  'Are you sure this is what you want to do?')
+                      % (self.other_info.get_data('revid')),
+                         labels=labels, parent=self):
+                return False
+
+        return super(MergePage, self).validatePage();
 
     def perform(self):
         self.setTitle(_('Merging...'))
@@ -388,6 +420,10 @@ class MergePage(BasePage):
         pctx = self.wizard().repo['.']
         self.local_info.update(pctx)
         self.wizard().local = str(pctx.rev())
+
+    def show_options(self, visible):
+        self.discard_chk.setShown(visible)
+        self.autoresolve_chk.setShown(visible)
 
     def command_canceling(self):
         self.wizard().button(QWizard.CustomButton1).setDisabled(True)
