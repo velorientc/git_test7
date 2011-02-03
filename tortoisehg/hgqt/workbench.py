@@ -35,6 +35,9 @@ class Workbench(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
 
+        if sys.platform == 'darwin':
+            self.setUnifiedTitleAndToolBarOnMac(True)
+
         self._reload_rev = None
         self._reload_file = None
 
