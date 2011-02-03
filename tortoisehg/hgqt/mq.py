@@ -197,10 +197,6 @@ class MQWidget(QWidget):
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
-    def menuRequested(self, point):
-        point = self.messageEditor.mapToGlobal(point)
-        return self.messageEditor.createStandardContextMenu().exec_(point)
-
     def getUserOptions(self, *optionlist):
         out = []
         for opt in optionlist:

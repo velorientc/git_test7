@@ -148,31 +148,6 @@ class QFoldDialog(QDialog):
         self.cmd.commandFinished.connect(finished)
         self.cmd.run(cmdline)
 
-    def menuRequested(self, point):
-        line = self.msgte.lineAt(point)
-        point = self.msgte.mapToGlobal(point)
-
-        def apply():
-            line = 0
-            while True:
-                line = self.mste.reflowBlock(line)
-                if line is None:
-                    break;
-        def settings():
-            from tortoisehg.hgqt.settings import SettingsDialog
-            dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
-            dlg.exec_()
-
-        menu = self.msgte.createStandardContextMenu()
-        menu.addSeparator()
-        for name, func in [(_('App&ly Format'), apply),
-                           (_('C&onfigure Format'), settings)]:
-            def add(name, func):
-                action = menu.addAction(name)
-                action.triggered.connect(lambda: func())
-            add(name, func)
-        return menu.exec_(point)
-
     def closeEvent(self, event):
         self._writesettings()
         super(QFoldDialog, self).closeEvent(event)
