@@ -60,6 +60,58 @@ class build_mo(Command):
             self.mkpath(modir)
             self.make_file([pofile], mofile, spawn, (cmd,))
 
+class update_pot(Command):
+
+    description = "extract translatable strings to tortoisehg.pot"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        if not find_executable('xgettext'):
+            self.warn("could not find xgettext executable, tortoisehg.pot"
+                      "won't be built")
+            return
+
+        dirlist = [
+            '.',
+            'contrib',
+            'contrib/win32',
+            'tortoisehg',
+            'tortoisehg/hgqt',
+            'tortoisehg/hgtk',
+            'tortoisehg/hgtk/logview',
+            'tortoisehg/util',
+            'tortoisehg/thgutil/iniparse',
+            ]
+
+        filelist = []
+        for pathname in dirlist:
+            if not os.path.exists(pathname):
+                continue
+            for filename in os.listdir(pathname):
+                if filename.endswith('.py'):
+                    filelist.append(os.path.join(pathname, filename))
+
+        potfile = 'tortoisehg.pot'
+
+        cmd = [
+            'xgettext',
+            '--package-name', 'TortoiseHg',
+            '--msgid-bugs-address', '<thg-devel@googlegroups.com>',
+            '--copyright-holder', thgcopyright,
+            '--from-code', 'ISO-8859-1',
+            '--add-comments=i18n:',
+            '-d', '.',
+            '-o', potfile,
+            ]
+        cmd += filelist
+        self.make_file(filelist, potfile, spawn, (cmd,))
+
 class build_qt(Command):
     description = "build PyQt GUIs (.ui) and resources (.qrc)"
     user_options = [('force', 'f', 'forcibly compile everything'
@@ -187,6 +239,7 @@ cmdclass = {
         'build_mo': build_mo ,
         'clean': clean,
         'clean_local': clean_local,
+        'update_pot': update_pot ,
     }
 
 def setup_windows(version):
