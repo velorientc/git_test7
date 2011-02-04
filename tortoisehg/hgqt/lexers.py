@@ -88,8 +88,12 @@ class CSSLexerSelector(_FilenameLexerSelector):
     extensions = ('.css',)
     _lexer = Qsci.QsciLexerCSS
 
+class XMLLexerSelector(_FilenameLexerSelector):
+    extensions = ('.xhtml', '.xml')
+    _lexer = Qsci.QsciLexerXML
+
 class HTMLLexerSelector(_FilenameLexerSelector):
-    extensions = ('.htm', '.html', '.xhtml', '.xml')
+    extensions = ('.htm', '.html')
     _lexer = Qsci.QsciLexerHTML
 
 class VerilogLexerSelector(_FilenameLexerSelector):
