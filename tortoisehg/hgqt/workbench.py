@@ -249,6 +249,9 @@ class Workbench(QMainWindow):
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view', toolbar='edit')
+        newaction(_("Load all"), self.loadall, icon='loadall',
+                  enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
+                  tooltip=_('Load all revisions into graph'))
 
         newaction(_("Web Server"), self.serve, enabled='repoopen',
                   menu='repository')
@@ -286,9 +289,6 @@ class Workbench(QMainWindow):
         self.actionForward = \
         newaction(_("Forward"), self._repofwd('forward'), icon='forward',
                   enabled=False, toolbar='edit')
-        newaction(_("Load all"), self.loadall, icon='loadall',
-                  enabled='repoopen', toolbar='edit',
-                  tooltip=_('Load all revisions into graph'))
         newseparator(toolbar='edit', menu='View')
 
         self.filtertbaction = \
