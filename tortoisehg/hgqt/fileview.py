@@ -24,14 +24,14 @@ import re
 from mercurial import hg, error, match, patch, util
 from mercurial import ui as uimod, mdiff
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import Qsci
-
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import annotate, qscilib, qtlib, blockmatcher, lexers
 from tortoisehg.hgqt import visdiff, wctxactions
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4 import Qsci
 
 qsci = Qsci.QsciScintilla
 
