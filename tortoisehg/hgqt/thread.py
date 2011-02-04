@@ -282,7 +282,7 @@ class CmdThread(QThread):
             ui.write_err(str(e) + '\n')
         except urllib2.URLError, e:
             import ssl
-            err = str(e)
+            err = local._('URLError: %s') % str(e.reason)
             if isinstance(e.args[0], ssl.SSLError):
                 parts = e.args[0].strerror.split(':')
                 if len(parts) == 7:
