@@ -278,8 +278,11 @@ class CmdThread(QThread):
             ui.write_err(local._('abort: ') + str(e) + '\n')
             if e.hint:
                 ui.write_err(local._('hint: ') + str(e.hint) + '\n')
-        except (error.RepoError, urllib2.HTTPError), e:
+        except error.RepoError, e:
             ui.write_err(str(e) + '\n')
+        except urllib2.HTTPError, e:
+            err = local._('HTTP Error: %d (%s)') % (e.code, e.msg)
+            ui.write_err(err + '\n')
         except urllib2.URLError, e:
             import ssl
             err = local._('URLError: %s') % str(e.reason)
