@@ -526,8 +526,8 @@ class WctxModel(QAbstractTableModel):
         return len(self.rows)
 
     def checkAll(self, state):
-        for wfile in self.checked:
-            self.checked[wfile] = state
+        for data in self.rows:
+            self.checked[data[0]] = state
         self.layoutChanged.emit()
         self.checkToggled.emit()
 
