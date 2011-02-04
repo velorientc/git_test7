@@ -16,9 +16,9 @@ value to disable the stderr buffering.
 
 If you have a bit of Python knowledge, you can also use::
 
-    hgtk --debugger <command>
+    thg --debugger <command>
 
-To disable the forking behavior of hgtk, you can either set an
+To disable the forking behavior of thg, you can either set an
 environment variable **THG_HGTK_SPAWN**, or add the command line
 parameter '--nofork'.
 
@@ -30,7 +30,7 @@ To debug the changelog viewer, for instance, enter these commands
 into a :command:`cmd.exe` window, while inside the repository::
 
     set THGDEBUG=1
-    hgtk --nofork log
+    thg --nofork log
 
 Linux/MacOSX
 ~~~~~~~~~~~~
@@ -39,7 +39,7 @@ To debug the changelog viewer, for instance, enter these commands
 into your shell window, while inside the repository::
     
     export THGDEBUG=1
-    hgtk --nofork log
+    thg --nofork log
 
 
 

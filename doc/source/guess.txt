@@ -50,10 +50,10 @@ From command line
 
 The guess tool can be started from command line::
 
-	hgtk guess
+	thg guess
 
 	guess previous renames or copies
 
-	use "hgtk -v help guess" to show global options
+	use "thg -v help guess" to show global options
 
 .. vim: noet ts=4

@@ -43,7 +43,7 @@ of the web server and the second path describes here the repositories
 can be found on your computer.  Multiple entries are possible.
 
 To use this file you must launch the TortoiseHg serve dialog from the
-command line via: :command:`hgtk serve --webdir-conf=hgwebdir.conf`.
+command line via: :command:`thg serve --webdir-conf=hgwebdir.conf`.
 
 
 From command line
@@ -51,7 +51,7 @@ From command line
 
 The server tool can be started from command line ::
 
-	hgtk serve [OPTION]...
+	thg serve [OPTION]...
 
 	web server
 
@@ -59,6 +59,6 @@ The server tool can be started from command line ::
 
 		--webdir-conf  name of the webdir config file
 
-	use "hgtk -v help serve" to show global options
+	use "thg -v help serve" to show global options
 
 .. vim: noet ts=4
