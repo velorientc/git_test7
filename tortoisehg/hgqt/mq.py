@@ -36,7 +36,7 @@ class MQWidget(QWidget):
         self.refreshing = False
 
         layout = QVBoxLayout()
-        layout.setSpacing(0)
+        layout.setSpacing(4)
         self.setLayout(layout)
 
         # top toolbar

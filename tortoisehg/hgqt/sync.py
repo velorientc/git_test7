@@ -41,7 +41,7 @@ class SyncWidget(QWidget):
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setSpacing(4)
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
