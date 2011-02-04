@@ -164,5 +164,5 @@ def nomarkup(widget, item, value):
 def ParentWidget(repo):
     'creates a parent rev widget and returns it'
     custom = csinfo.custom(data=data_func, label=label_func, markup=nomarkup)
-    style = csinfo.panelstyle(contents=('parents','ishead'))
+    style = csinfo.panelstyle(contents=('parents','ishead'), selectable=True)
     return csinfo.create(repo, style=style, custom=custom)
