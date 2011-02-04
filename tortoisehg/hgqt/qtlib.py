@@ -58,6 +58,7 @@ _thgstyles = {
    'log.modified': 'black #ffddaa_background',
    'log.added': 'black #aaffaa_background',
    'log.removed': 'black #ffcccc_background',
+   'status.deleted': 'red bold',
    'ui.error': 'red bold #ffcccc_background',
    'control': 'black bold #dddddd_background',
 }
