@@ -9,6 +9,7 @@ Main Qt4 application for TortoiseHg
 """
 
 import os
+import sys
 
 from mercurial.error import RepoError
 
@@ -66,6 +67,15 @@ class Workbench(QMainWindow):
         if os.name == 'nt':
             # Allow CTRL+Q to close Workbench on Windows
             QShortcut(QKeySequence('CTRL+Q'), self, self.close)
+        if sys.platform == 'darwin':
+            self.dockMenu = QMenu(self)
+            self.dockMenu.addAction(_('New Repository...'),
+                                    self.newRepository)
+            self.dockMenu.addAction(_('Clone Repository...'),
+                                    self.cloneRepository)
+            self.dockMenu.addAction(_('Open Repository...'),
+                                    self.openRepository)
+            qt_mac_set_dock_menu(self.dockMenu)
 
     def accept(self):
         self.close()
