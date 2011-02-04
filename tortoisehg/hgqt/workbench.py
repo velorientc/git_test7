@@ -114,11 +114,9 @@ class Workbench(QMainWindow):
         self.addToolBar(self.synctbar)
         self.tasktbar = QToolBar(_('Task Toolbar'), objectName='taskbar')
         self.addToolBar(self.tasktbar)
-        self.mqtbar = QToolBar(_("MQ Toolbar"), objectName='mqtbar')
-        self.addToolBar(self.mqtbar)
 
         # availability map of actions; applied by updateMenu()
-        self._actionavails = {'repoopen': [], 'mq': []}
+        self._actionavails = {'repoopen': []}
 
         def keysequence(o):
             """Create QKeySequence from string or QKeySequence"""
@@ -318,13 +316,6 @@ class Workbench(QMainWindow):
                   tooltip=_('Push outgoing changes to default push target'),
                   enabled='repoopen', toolbar='sync')
 
-        newaction(_('QPush'), self._repofwd('qpush'), icon='qpush',
-                   tooltip=_('Apply one patch'),
-                   enabled='mq', toolbar='mq')
-        newaction(_('QPop'), self._repofwd('qpop'), icon='qpop',
-                  tooltip=_('Unapply one patch'),
-                  enabled='mq', toolbar='mq')
-
         self.updateMenu()
 
     @pyqtSlot(QAction)
@@ -399,9 +390,6 @@ class Workbench(QMainWindow):
         self.updateToolBarActions()
         tw = self.repoTabsWidget
         w = tw.currentWidget()
-        mqEnabled = w and 'mq' in w.repo.extensions() or False
-        for action in self._actionavails['mq']:
-            action.setEnabled(mqEnabled)
 
         if tw.count() > 1:
             tw.tabBar().show()

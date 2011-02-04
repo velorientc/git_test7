@@ -726,16 +726,6 @@ class RepoWidget(QWidget):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.get().push()
 
-    def qpush(self):
-        """QPush a patch from MQ"""
-        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
-        self.mqDemand.get().onPush()
-
-    def qpop(self):
-        """QPop a patch from MQ"""
-        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
-        self.mqDemand.get().onPop()
-
     ##
     ## Repoview context menu
     ##
