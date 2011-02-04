@@ -887,13 +887,13 @@ class CommitDialog(QDialog):
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
         layout.setMargin(0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         commit = CommitWidget(pats, opts, opts.get('root'), False, self)
         layout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
-        self.statusbar.setSizeGripEnabled(False)
         commit.showMessage.connect(self.statusbar.showMessage)
         commit.progress.connect(self.statusbar.progress)
         commit.linkActivated.connect(self.linkActivated)
@@ -911,12 +911,8 @@ class CommitDialog(QDialog):
         self.commitButton.setText(_('Commit'))
         self.bb = bb
 
-        hbox = QHBoxLayout()
-        hbox.setMargin(0)
-        hbox.setContentsMargins(*(0,)*4)
-        hbox.addWidget(self.statusbar)
-        hbox.addWidget(self.bb)
-        layout.addLayout(hbox)
+        layout.addWidget(self.bb)
+        layout.addWidget(self.statusbar)
 
         s = QSettings()
         self.restoreGeometry(s.value('commit/geom').toByteArray())
