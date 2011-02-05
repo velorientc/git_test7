@@ -108,23 +108,27 @@ class RepoWidget(QWidget):
         b.setShown(False)
         hbox.addWidget(b)
 
-        self.filterbar = RepoFilterBar(self.repo, self)
+        self.bar_splitter = QSplitter(self)
+        self.bar_splitter.setChildrenCollapsible(False)
+        hbox.addWidget(self.bar_splitter, 1)
+
+        self.filterbar = RepoFilterBar(self.repo, self.bar_splitter)
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
         self.filterbar.revisionSet.connect(self.setRevisionSet)
         self.filterbar.clearSet.connect(self.clearSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
-        hbox.addWidget(self.filterbar)
+        self.bar_splitter.addWidget(self.filterbar)
 
         self.filterbar.hide()
 
         self.revsetfilter = self.filterbar.filtercb.isChecked()
 
-        self.gototb = tb = GotoQuickBar(self)
+        self.gototb = tb = GotoQuickBar(self.bar_splitter)
         tb.setObjectName('gototb')
         tb.gotoSignal.connect(self.goto)
-        hbox.addWidget(tb)
+        self.bar_splitter.addWidget(tb)
 
         self.layout().addWidget(self.repotabs_splitter)
 
