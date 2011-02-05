@@ -97,11 +97,6 @@ class RepoWidget(QWidget):
         hbox.setSpacing(0)
         self.layout().addLayout(hbox)
 
-        self.gototb = tb = GotoQuickBar(self)
-        tb.setObjectName('gototb')
-        tb.gotoSignal.connect(self.goto)
-        hbox.addWidget(tb)
-
         self.bundleAccept = b = QPushButton(_('Accept'))
         b.setShown(False)
         b.setToolTip(_('Pull incoming changesets into your repository'))
@@ -125,6 +120,11 @@ class RepoWidget(QWidget):
         self.filterbar.hide()
 
         self.revsetfilter = self.filterbar.filtercb.isChecked()
+
+        self.gototb = tb = GotoQuickBar(self)
+        tb.setObjectName('gototb')
+        tb.gotoSignal.connect(self.goto)
+        hbox.addWidget(tb)
 
         self.layout().addWidget(self.repotabs_splitter)
 
