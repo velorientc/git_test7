@@ -75,6 +75,7 @@ class RepoFilterBar(QToolBar):
 
         self.filtercb = f = QCheckBox(_('filter'))
         f.toggled.connect(self.filterToggled)
+        f.setToolTip(_('Toggle filtering of non-matched changesets'))
         self.addWidget(f)
 
         self._initbranchfilter()
