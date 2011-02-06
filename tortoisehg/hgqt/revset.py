@@ -365,6 +365,8 @@ class RevsetThread(QThread):
         super(RevsetThread, self).__init__(parent)
         self.repo = hg.repository(repo.ui, repo.root)
         self.text = hglib.fromunicode(query)
+        if '(' not in self.text:
+            self.text = 'keyword("%s")' % self.text
         self.query = query
 
     def run(self):
