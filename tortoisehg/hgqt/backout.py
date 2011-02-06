@@ -13,6 +13,7 @@ from mercurial import merge as mergemod
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
+from tortoisehg.hgqt import commit, qscilib
 
 keep = i18n.keepgettext()
 
@@ -47,7 +48,10 @@ class BackoutDialog(QDialog):
         self.msgset['id'] += revhex
         self.msgset['str'] += revhex
 
-        self.msgTextEdit = QTextEdit()
+        self.msgTextEdit = commit.MessageEntry(self)
+        self.msgTextEdit.installEventFilter(qscilib.KeyPressInterceptor(self))
+        self.msgTextEdit.refresh(repo)
+        self.msgTextEdit.loadSettings(QSettings(), 'backout/message')
         self.msgTextEdit.setText(self.msgset['str'])
         box.addWidget(self.msgTextEdit, 1)
 
@@ -127,9 +131,7 @@ class BackoutDialog(QDialog):
         self.cancelBtn.setHidden(True)
         self.detailBtn.setHidden(True)
         self.msgTextEdit.setFocus()
-        cursor = self.msgTextEdit.textCursor()
-        cursor.movePosition(QTextCursor.EndOfBlock)
-        self.msgTextEdit.setTextCursor(cursor)
+        self.msgTextEdit.moveCursorToEnd()
 
     ### Private Methods ###
 
@@ -137,7 +139,7 @@ class BackoutDialog(QDialog):
         self.msgTextEdit.setEnabled(checked)
 
     def eng_toggled(self, checked):
-        msg = self.msgTextEdit.toPlainText()
+        msg = self.msgTextEdit.text()
         origmsg = (checked and self.msgset['str'] or self.msgset['id'])
         if msg != origmsg:
             if not qtlib.QuestionMsgBox(_('Confirm Discard Message'),
@@ -156,11 +158,11 @@ class BackoutDialog(QDialog):
         cmdline += ['--tool=internal:' +
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         if self.backoutParent:
-            msg = self.msgTextEdit.toPlainText()
+            msg = self.msgTextEdit.text()
             cmdline += ['--message', hglib.fromunicode(msg)]
         elif self.mergeChk.isChecked():
             cmdline += ['--merge']
-            msg = self.msgTextEdit.toPlainText()
+            msg = self.msgTextEdit.text()
             cmdline += ['--message', hglib.fromunicode(msg)]
 
         # start backing out
@@ -170,7 +172,7 @@ class BackoutDialog(QDialog):
 
     def commit(self):
         cmdline = ['commit', '--repository', self.repo.root]
-        msg = self.msgTextEdit.toPlainText()
+        msg = self.msgTextEdit.text()
         cmdline += ['--message', hglib.fromunicode(msg)]
         self.cmdline = cmdline
         self.repo.incrementBusyCount()
@@ -240,6 +242,10 @@ class BackoutDialog(QDialog):
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.checkResolve()
+
+    def accept(self):
+        self.msgTextEdit.saveSettings(QSettings(), 'backout/message')
+        super(BackoutDialog, self).accept()
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
