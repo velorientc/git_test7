@@ -81,7 +81,7 @@ class RepoWidget(QWidget):
 
         self.setupUi()
         self.createActions()
-        self.restoreSettings()
+        self.loadSettings()
         self.setupModels()
 
     def setupUi(self):
@@ -116,8 +116,8 @@ class RepoWidget(QWidget):
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
-        self.filterbar.revisionSet.connect(self.setRevisionSet)
-        self.filterbar.clearSet.connect(self.clearSet)
+        self.filterbar.setRevisionSet.connect(self.setRevisionSet)
+        self.filterbar.clearRevisionSet.connect(self.clearRevisionSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
         self.bar_splitter.addWidget(self.filterbar)
 
@@ -339,7 +339,7 @@ class RepoWidget(QWidget):
         self.clearBundle()
         self.reload()
 
-    def clearSet(self):
+    def clearRevisionSet(self):
         self.revset = []
         if self.revsetfilter:
             self.reload()
@@ -681,37 +681,39 @@ class RepoWidget(QWidget):
     def canGoForward(self):
         return self.repoview.canGoForward()
 
-    def storeSettings(self):
-        self.revDetailsWidget.storeSettings()
+    def loadSettings(self):
         s = QSettings()
         repoid = str(self.repo[0])
-        s.setValue('repowidget/splitter-'+repoid,
-                   self.repotabs_splitter.saveState())
-
-    def restoreSettings(self):
-        self.revDetailsWidget.restoreSettings()
-        s = QSettings()
-        repoid = str(self.repo[0])
+        self.revDetailsWidget.loadSettings(s)
+        self.filterbar.loadSettings(s)
         self.repotabs_splitter.restoreState(
             s.value('repowidget/splitter-'+repoid).toByteArray())
 
     def okToContinue(self):
-        return self.commitDemand.forward('canExit', default=True) and \
-               self.syncDemand.forward('canExit', default=True) and \
-               self.mqDemand.forward('canExit', default=True)
+        if not self.commitDemand.forward('canExit', default=True):
+            self.showMessage.emit(_('Commit tab cannot exit'))
+            return False
+        if not self.syncDemand.forward('canExit', default=True):
+            self.showMessage.emit(_('Sync tab cannot exit'))
+            return False
+        if not self.mqDemand.forward('canExit', default=True):
+            self.showMessage.emit(_('MQ tab cannot exit'))
+            return False
+        return True
 
     def closeRepoWidget(self):
         '''returns False if close should be aborted'''
         if not self.okToContinue():
             return False
-        if self.isVisible():
-            # assuming here that there is at most one RepoWidget visible
-            self.storeSettings()
-        self.revDetailsWidget.storeSettings()
         s = QSettings()
+        if self.isVisible():
+            repoid = str(self.repo[0])
+            s.setValue('repowidget/splitter-'+repoid,
+                       self.repotabs_splitter.saveState())
+        self.revDetailsWidget.saveSettings(s)
         self.commitDemand.forward('saveSettings', s, 'workbench')
         self.manifestDemand.forward('saveSettings', s, 'workbench')
-        self.filterbar.storeConfigs(s)
+        self.filterbar.saveSettings(s)
         return True
 
     def incoming(self):

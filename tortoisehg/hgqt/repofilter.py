@@ -12,11 +12,13 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import revset, qtlib
 
+_permanent_queries = ('head()', 'merge()', 'tagged()')
+
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
 
-    revisionSet = pyqtSignal(object)
-    clearSet = pyqtSignal()
+    setRevisionSet = pyqtSignal(object)
+    clearRevisionSet = pyqtSignal()
     filterToggled = pyqtSignal(bool)
 
     showMessage = pyqtSignal(QString)
@@ -36,39 +38,44 @@ class RepoFilterBar(QToolBar):
         self.entrydlg = revset.RevisionSetQuery(repo, self)
         self.entrydlg.progress.connect(self.progress)
         self.entrydlg.showMessage.connect(self.showMessage)
-        self.entrydlg.queryIssued.connect(self.dialogQuery)
+        self.entrydlg.queryIssued.connect(self.queryIssued)
         self.entrydlg.hide()
 
-        self.clear = QPushButton(_('clear'))
-        self.addWidget(self.clear)
-
-        self.editor = QPushButton(_('editor'))
-        self.editor.clicked.connect(self.openEditor)
-        self.addWidget(self.editor)
-
-        s = QSettings()
-        self.entrydlg.restoreGeometry(s.value('revset/geom').toByteArray())
-        self.revsethist = list(s.value('revset-queries').toStringList())
-        self.revsetle = le = QLineEdit()
-        le.setCompleter(QCompleter(self.revsethist, self))
+        self.revsetcombo = combo = QComboBox()
+        combo.setEditable(True)
+        combo.setMinimumContentsLength(50)
+        le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
-        if hasattr(self.revsetle, 'setPlaceholderText'): # Qt >= 4.7 
-            self.revsetle.setPlaceholderText('### revision set query ###')
-        self.addWidget(le)
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+            le.setPlaceholderText('### revision set query ###')
+        self.addWidget(combo)
+        self.revsetle = le
 
-        self.clear.clicked.connect(le.clear)
-        self.clear.clicked.connect(self.clearSet)
+        icon = QIcon()
+        style = QApplication.style()
+        icon.addPixmap(style.standardPixmap(QStyle.SP_DialogDiscardButton))
+        self.clearBtn = QToolButton(self)
+        self.clearBtn.setIcon(icon)
+        self.clearBtn.setToolTip(_('Discard or clear current query'))
+        self.clearBtn.clicked.connect(le.clear)
+        self.clearBtn.clicked.connect(self.clearRevisionSet)
+        self.addWidget(self.clearBtn)
+
+        self.searchBtn = QToolButton(self)
+        self.searchBtn.setText(_('Search'))
+        self.searchBtn.setToolTip(_('Trigger search'))
+        self.searchBtn.clicked.connect(self.returnPressed)
+        self.addWidget(self.searchBtn)
+
+        self.editorBtn = QToolButton()
+        self.editorBtn.setText('...')
+        self.editorBtn.setToolTip(_('Open advanced query editor'))
+        self.editorBtn.clicked.connect(self.openEditor)
+        self.addWidget(self.editorBtn)
 
         self.filtercb = f = QCheckBox(_('filter'))
-        f.setChecked(s.value('revset-filter', True).toBool())
         f.toggled.connect(self.filterToggled)
         self.addWidget(f)
-
-        self.store = store = QPushButton(_('store'))
-        store.clicked.connect(self.saveQuery)
-        le.textChanged.connect(lambda t: store.setEnabled(False))
-        store.setEnabled(False)
-        self.addWidget(store)
 
         self._initbranchfilter()
         self.refresh()
@@ -83,10 +90,10 @@ class RepoFilterBar(QToolBar):
         self.entrydlg.entry.setFocus()
         self.entrydlg.setShown(True)
 
-    def dialogQuery(self, query, revset):
+    def queryIssued(self, query, revset):
         self.revsetle.setText(query)
-        self.store.setEnabled(True)
-        self.revisionSet.emit(revset)
+        self.setRevisionSet.emit(revset)
+        self.saveQuery()
 
     def returnPressed(self):
         'Return pressed on revset line entry, forward to dialog'
@@ -94,17 +101,33 @@ class RepoFilterBar(QToolBar):
         if query:
             self.entrydlg.entry.setText(query)
             self.entrydlg.runQuery()
+        else:
+            self.clearRevisionSet.emit()
 
     def saveQuery(self):
         query = self.revsetle.text()
         if query in self.revsethist:
             self.revsethist.remove(query)
-        self.revsethist.insert(0, query)
-        self.revsetle.setCompleter(QCompleter(self.revsethist, self))
-        self.store.setEnabled(False)
-        self.showMessage.emit(_('Revision set query saved'))
+        if query not in _permanent_queries:
+            self.revsethist.insert(0, query)
+            self.revsethist = self.revsethist[:20]
+        full = self.revsethist + list(_permanent_queries)
+        self.revsetcombo.clear()
+        self.revsetcombo.addItems(full)
+        #self.revsetle.setCompleter(QCompleter(full, self))
+        self.revsetle.setText(query)
 
-    def storeConfigs(self, s):
+    def loadSettings(self, s):
+        self.entrydlg.restoreGeometry(s.value('revset/geom').toByteArray())
+        self.revsethist = list(s.value('revset-queries').toStringList())
+        self.filtercb.setChecked(s.value('revset-filter', True).toBool())
+        full = self.revsethist + list(_permanent_queries)
+        self.revsetcombo.clear()
+        self.revsetcombo.addItems(full)
+        self.revsetcombo.setCurrentIndex(-1)
+        #self.revsetle.setCompleter(QCompleter(full, self))
+
+    def saveSettings(self, s):
         s.setValue('revset/geom', self.entrydlg.saveGeometry())
         s.setValue('revset-queries', self.revsethist)
         s.setValue('revset-filter', self.filtercb.isChecked())

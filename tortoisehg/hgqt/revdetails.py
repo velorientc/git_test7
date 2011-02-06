@@ -45,7 +45,6 @@ class RevDetailsWidget(QWidget):
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.grepRequested.connect(self.grepRequested)
         self.fileview.revisionSelected.connect(self.revisionSelected)
-        self.restoreSettings()
 
     def setRepo(self, repo):
         self.repo = repo
@@ -223,16 +222,14 @@ class RevDetailsWidget(QWidget):
         self.revision_selected(self._last_rev)
         self.filelist.selectFile(f)
 
-    def storeSettings(self):
-        s = QSettings()
+    def saveSettings(self, s):
         wb = "RevDetailsWidget/"
         for n in self.splitternames:
             s.setValue(wb + n, getattr(self, n).saveState())
         s.setValue(wb + 'revpanel.expanded', self.revpanel.is_expanded())
         self.fileview.saveSettings(s, 'revpanel/fileview')
 
-    def restoreSettings(self):
-        s = QSettings()
+    def loadSettings(self, s):
         wb = "RevDetailsWidget/"
         for n in self.splitternames:
             getattr(self, n).restoreState(s.value(wb + n).toByteArray())
