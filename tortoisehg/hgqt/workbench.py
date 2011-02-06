@@ -240,14 +240,14 @@ class Workbench(QMainWindow):
             return a
         # NOTE: Sequence must match that in repowidget.py
         addtaskview('log', _("Revision &Details"))
-        addtaskview('Checkmark', _("&Commit..."))
-        addtaskview('annotate', _("&Manifest..."))
-        addtaskview('repobrowse', _("&Search..."))
-        addtaskview('sync', _("S&ynchronize..."))
+        addtaskview('Checkmark', _('&Commit'))
+        addtaskview('annotate', _('&Manifest'))
+        addtaskview('repobrowse', _('&Search'))
+        addtaskview('sync', _('S&ynchronize'))
         self.actionSelectTaskMQ = \
-                addtaskview('mq', _("Patch &Queue..."), 'mq')
+                addtaskview('mq', _('Patch &Queue'), 'mq')
         self.actionSelectTaskPbranch = \
-                addtaskview('branch', _("&Patch Branch..."), 'pbranch')
+                addtaskview('branch', _('&Patch Branch'), 'pbranch')
         newseparator(menu='view')
 
         newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
