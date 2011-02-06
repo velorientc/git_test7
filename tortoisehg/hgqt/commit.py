@@ -133,6 +133,15 @@ class MessageEntry(qscilib.Scintilla):
         self.setCursorPosition(b, 0)
         return b + len(outlines) + 1
 
+    def moveCursorToEnd(self):
+        lines = self.lines()
+        if lines:
+            lines -= 1
+            pos = self.lineLength(lines)
+            self.setCursorPosition(lines, pos)
+            self.ensureLineVisible(lines)
+            self.horizontalScrollBar().setSliderPosition(0)
+
     def keyPressEvent(self, event):
         if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
             line, col = self.getCursorPosition()
@@ -374,14 +383,7 @@ class CommitWidget(QWidget):
 
     def setMessage(self, msg):
         self.msgte.setText(msg)
-        lines = self.msgte.lines()
-        if lines:
-            lines -= 1
-            pos = self.msgte.lineLength(lines)
-            self.msgte.setCursorPosition(lines, pos)
-            self.msgte.ensureLineVisible(lines)
-            hs = self.msgte.horizontalScrollBar()
-            hs.setSliderPosition(0)
+        self.msgte.moveCursorToEnd()
         self.msgte.setModified(False)
 
     def canExit(self):
