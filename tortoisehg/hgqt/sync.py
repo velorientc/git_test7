@@ -61,12 +61,9 @@ class SyncWidget(QWidget):
             self.setWindowTitle(_('TortoiseHg Sync'))
             self.resize(850, 550)
 
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
-        hbox.setSpacing(4)
-
         tb = QToolBar(self)
-        sactions = []
+        self.layout().addWidget(tb)
+        self.opbuttons = []
         for tip, icon, cb in (
             (_('Preview incoming changesets from specified URL'),
              'incoming', self.inclicked),
@@ -82,48 +79,53 @@ class SyncWidget(QWidget):
             a.setToolTip(tip)
             a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
-            sactions.append(a)
+            self.opbuttons.append(a)
             tb.addAction(a)
+        if 'perfarce' in self.repo.extensions():
+            a = QAction(self)
+            a.setToolTip(_('Manage pending perforce changelists'))
+            a.setText('P4')
+            a.triggered.connect(self.p4pending)
+            self.opbuttons.append(a)
+            tb.addAction(a)
+        tb.addSeparator()
         self.stopAction = a = QAction(self)
         a.setToolTip(_('Stop current operation'))
         a.setIcon(qtlib.geticon('process-stop'))
         a.triggered.connect(self.stopclicked)
+        a.setEnabled(False)
         tb.addAction(a)
-        hbox.addWidget(tb)
-        self.layout().addLayout(hbox)
 
-        if 'perfarce' in self.repo.extensions():
-            self.p4pbutton = QPushButton(_('p4pending'))
-            self.p4pbutton.clicked.connect(self.p4pending)
-            hbox.addWidget(self.p4pbutton)
-        else:
-            self.p4pbutton = None
+        tb.addSeparator()
         self.optionsbutton = QPushButton(_('Options'))
         self.postpullbutton = QPushButton()
-        tb.setMaximumHeight(self.postpullbutton.sizeHint().height())
-        hbox.addWidget(self.postpullbutton)
-        hbox.addWidget(self.optionsbutton)
+        tb.addWidget(self.postpullbutton)
+        tb.addWidget(self.optionsbutton)
 
         self.targetcombo = QComboBox()
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
-        hbox.addWidget(self.targetcheckbox)
-        hbox.addWidget(self.targetcombo)
+        tb.addSeparator()
+        tb.addWidget(self.targetcheckbox)
+        tb.addWidget(self.targetcombo)
         if not embedded:
             self.targetcombo.setHidden(True)
             self.targetcheckbox.setHidden(True)
 
-        hbox.addStretch(1)
         self.urllabel = QLabel()
         self.urllabel.setMargin(4)
         self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.urllabel.setAcceptDrops(False)
-        hbox.addWidget(self.urllabel)
+        tb.addSeparator()
+        tb.addWidget(self.urllabel)
 
+        urlbox = QGroupBox(_('URL'))
+        self.layout().addWidget(urlbox)
         hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
+        urlbox.setLayout(hbox)
         hbox.setSpacing(4)
+
         self.schemecombo = QComboBox()
         for s in _schemes:
             self.schemecombo.addItem(s)
@@ -150,7 +152,6 @@ class SyncWidget(QWidget):
         hbox.addWidget(self.securebutton)
         self.savebutton = QPushButton(_('Save'))
         hbox.addWidget(self.savebutton)
-        self.layout().addLayout(hbox)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -189,8 +190,6 @@ class SyncWidget(QWidget):
         self.securebutton.clicked.connect(self.secureclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
-
-        self.opbuttons = sactions + [self.p4pbutton]
 
         cmd = cmdui.Widget(not embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
@@ -494,7 +493,7 @@ class SyncWidget(QWidget):
 
     def commandStarted(self):
         for b in self.opbuttons:
-            if b: b.setEnabled(False)
+            b.setEnabled(False)
         self.stopAction.setEnabled(True)
         if not self.embedded:
             self.cmd.setShowOutput(True)
@@ -503,7 +502,7 @@ class SyncWidget(QWidget):
     def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         for b in self.opbuttons:
-            if b: b.setEnabled(True)
+            b.setEnabled(True)
         self.stopAction.setEnabled(False)
         if self.finishfunc:
             output = self.cmd.core.rawoutput()
