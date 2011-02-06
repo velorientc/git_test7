@@ -1256,15 +1256,17 @@ class OptionsDialog(QDialog):
         layout = QFormLayout()
         self.setLayout(layout)
 
-        self.newbranchcb = QCheckBox(_('Allow push of a new branch'))
+        self.newbranchcb = QCheckBox(
+            _('Allow push of a new branch (--new-branch)'))
         self.newbranchcb.setChecked(opts.get('new-branch', False))
         layout.addRow(self.newbranchcb, None)
-        self.forcecb = QCheckBox(_('Force push or pull (override safety'
-                                   ' checks)'))
+        self.forcecb = QCheckBox(
+            _('Force push or pull (override safety checks, --force)'))
         self.forcecb.setChecked(opts.get('force', False))
         layout.addRow(self.forcecb, None)
 
-        self.subrepocb = QCheckBox(_('Recurse into subrepositories'))
+        self.subrepocb = QCheckBox(
+            _('Recurse into subrepositories (--subrepos)'))
         self.subrepocb.setChecked(opts.get('subrepos', False))
         layout.addRow(self.subrepocb, None)
 
