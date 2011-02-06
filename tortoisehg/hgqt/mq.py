@@ -746,22 +746,27 @@ class OptionsDialog(QDialog):
         layout = QFormLayout()
         self.setLayout(layout)
 
-        self.gitcb = QCheckBox(_('Force use of git extended diff format'))
+        self.gitcb = QCheckBox(
+            _('Force use of git extended diff format (--git)'))
         layout.addRow(self.gitcb, None)
 
-        self.forcecb = QCheckBox(_('Force push or pop'))
+        self.forcecb = QCheckBox(
+            _('Force push or pop (--force)'))
         layout.addRow(self.forcecb, None)
 
-        self.exactcb = QCheckBox(_('Apply patch to its recorded parent'))
+        self.exactcb = QCheckBox(
+            _('Apply patch to its recorded parent (--exact)'))
         layout.addRow(self.exactcb, None)
 
-        self.currentdatecb = QCheckBox(_('Update date field with current date'))
+        self.currentdatecb = QCheckBox(
+            _('Update date field with current date (--currentdate)'))
         layout.addRow(self.currentdatecb, None)
 
         self.datele = QLineEdit()
         layout.addRow(QLabel(_('Specify an explicit date:')), self.datele)
 
-        self.currentusercb = QCheckBox(_('Update author field with current user'))
+        self.currentusercb = QCheckBox(
+            _('Update author field with current user (--currentuser)'))
         layout.addRow(self.currentusercb, None)
 
         self.userle = QLineEdit()
