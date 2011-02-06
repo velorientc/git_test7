@@ -196,6 +196,8 @@ class Scintilla(QsciScintilla):
                            (_('Character'), qsci.WrapCharacter)):
             def mkaction(n, m):
                 a = wrapmenu.addAction(n)
+                a.setCheckable(True)
+                a.setChecked(self.wrapMode() == m)
                 a.triggered.connect(lambda: self.setWrapMode(m))
             mkaction(name, mode)
         wsmenu = QMenu(_('Whitespace'), self)
@@ -204,6 +206,8 @@ class Scintilla(QsciScintilla):
                            (_('AfterIndent'), qsci.WsVisibleAfterIndent)):
             def mkaction(n, m):
                 a = wsmenu.addAction(n)
+                a.setCheckable(True)
+                a.setChecked(self.whitespaceVisibility() == m)
                 a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
             mkaction(name, mode)
         self._stdMenu.addMenu(wrapmenu)
