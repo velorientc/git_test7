@@ -112,9 +112,6 @@ class QQueueDialog(QDialog):
         botsep = qtlib.LabeledSeparator('')
         layout.addWidget(botsep)
 
-        cmdlist = cmdui.Runner()
-        cmdlist.output.connect(self.output)
-        cmdlist.makeLogVisible.connect(self.makeLogVisible)
         cmd = cmdui.Runner()
         cmd.output.connect(self.output)
         cmd.makeLogVisible.connect(self.makeLogVisible)
@@ -134,7 +131,6 @@ class QQueueDialog(QDialog):
         self.btdel = btdel
         self.btpur = btpur
         self.bb = bb
-        self.cmdlist = cmdlist
         self.cmd = cmd
 
         self.itemfont = None
@@ -177,27 +173,16 @@ class QQueueDialog(QDialog):
 
     @pyqtSlot()
     def reload(self):
-        def reloadFinished():
-            output = self.cmdlist.core.rawoutput()
-            self.showQueues(output)
-            self.updateUI()
-        cmdline = ['qqueue', '--repository', self.repo.root, '--list']
-        self.cmdlist.commandFinished.connect(reloadFinished)
-        self.cmdlist.run(cmdline)
-
-    # This seems to return the cached data as it was just before the last
-    # issued command. So I used the threaded method again.
-    # def reload(self):
-        # _ui = uimod.ui()
-        # _ui.pushbuffer()
-        # try:
-            # opts = {'list': True}
-            # mq.qqueue(_ui, self.repo, None, **opts)
-        # except (util.Abort, EnvironmentError), e:
-            # print e
-        # output = _ui.popbuffer()
-        # qtlib.InfoMsgBox('test', '<p>reload - output = %s</p>' % output)
-        # self.showQueues(output)
+        _ui = uimod.ui()
+        _ui.pushbuffer()
+        try:
+            opts = {'list': True}
+            mq.qqueue(_ui, self.repo, None, **opts)
+        except (util.Abort, EnvironmentError), e:
+            print e
+        output = _ui.popbuffer()
+        self.showQueues(output)
+        self.updateUI()
 
     def showQueues(self, output):
         queues = output.rstrip('\n').split('\n')
