@@ -43,7 +43,7 @@ class RepoFilterBar(QToolBar):
 
         self.revsetcombo = combo = QComboBox()
         combo.setEditable(True)
-        combo.setMinimumContentsLength(50)
+        combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
