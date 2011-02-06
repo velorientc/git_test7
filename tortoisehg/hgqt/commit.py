@@ -146,7 +146,12 @@ class MessageEntry(qscilib.Scintilla):
         if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
             line, col = self.getCursorPosition()
             self.reflowBlock(line)
-        super(MessageEntry, self).keyPressEvent(event)
+        elif event.key() == Qt.Key_Backtab:
+            event.ignore()
+            newev = QKeyEvent(event.type(), Qt.Key_Tab, Qt.ShiftModifier)
+            super(MessageEntry, self).keyPressEvent(newev)
+        else:
+            super(MessageEntry, self).keyPressEvent(event)
 
 class CommitWidget(QWidget):
     'A widget that encompasses a StatusWidget and commit extras'
