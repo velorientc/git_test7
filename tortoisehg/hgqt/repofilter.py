@@ -48,7 +48,6 @@ class RepoFilterBar(QToolBar):
         le.returnPressed.connect(self.returnPressed)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
             le.setPlaceholderText('### revision set query ###')
-        self.addWidget(combo)
         self.revsetle = le
 
         icon = QIcon()
@@ -60,6 +59,7 @@ class RepoFilterBar(QToolBar):
         self.clearBtn.clicked.connect(le.clear)
         self.clearBtn.clicked.connect(self.clearRevisionSet)
         self.addWidget(self.clearBtn)
+        self.addWidget(combo)
 
         self.searchBtn = QToolButton(self)
         self.searchBtn.setText(_('Search'))
