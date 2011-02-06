@@ -46,8 +46,10 @@ class RepoFilterBar(QToolBar):
         combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
+        le.selectionChanged.connect(self.selectionChanged)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
             le.setPlaceholderText(_('### revision set query ###'))
+        combo.activated.connect(le.selectAll)
         self.revsetle = le
 
         icon = QIcon()
@@ -73,32 +75,57 @@ class RepoFilterBar(QToolBar):
         self.editorBtn.clicked.connect(self.openEditor)
         self.addWidget(self.editorBtn)
 
+        icon = QIcon()
+        icon.addPixmap(style.standardPixmap(QStyle.SP_TrashIcon))
+        self.deleteBtn = QToolButton()
+        self.deleteBtn.setIcon(icon)
+        self.deleteBtn.setToolTip(_('Delete selected query from history'))
+        self.deleteBtn.clicked.connect(self.deleteFromHistory)
+        self.deleteBtn.setEnabled(False)
+        self.addWidget(self.deleteBtn)
+        self.addSeparator()
+
         self.filtercb = f = QCheckBox(_('filter'))
         f.toggled.connect(self.filterToggled)
         f.setToolTip(_('Toggle filtering of non-matched changesets'))
         self.addWidget(f)
+        self.addSeparator()
 
         self._initbranchfilter()
         self.refresh()
 
+    def selectionChanged(self):
+        selection = self.revsetcombo.lineEdit().selectedText()
+        self.deleteBtn.setEnabled(selection in self.revsethist)
+
+    def deleteFromHistory(self):
+        selection = self.revsetcombo.lineEdit().selectedText()
+        if selection not in self.revsethist:
+            return
+        self.revsethist.remove(selection)
+        full = self.revsethist + list(_permanent_queries)
+        self.revsetcombo.clear()
+        self.revsetcombo.addItems(full)
+        self.revsetcombo.setCurrentIndex(-1)
+
     def showEvent(self, event):
-        self.revsetle.setFocus()
+        self.revsetcombo.lineEdit().setFocus()
 
     def openEditor(self):
-        query = self.revsetle.text().simplified()
+        query = self.revsetcombo.lineEdit().text().simplified()
         self.entrydlg.entry.setText(query)
         self.entrydlg.entry.setCursorPosition(0, len(query))
         self.entrydlg.entry.setFocus()
         self.entrydlg.setShown(True)
 
     def queryIssued(self, query, revset):
-        self.revsetle.setText(query)
+        self.revsetcombo.lineEdit().setText(query)
         self.setRevisionSet.emit(revset)
         self.saveQuery()
 
     def returnPressed(self):
         'Return pressed on revset line entry, forward to dialog'
-        query = self.revsetle.text().simplified()
+        query = self.revsetcombo.lineEdit().text().simplified()
         if query:
             self.entrydlg.entry.setText(query)
             self.entrydlg.runQuery()
@@ -106,7 +133,7 @@ class RepoFilterBar(QToolBar):
             self.clearRevisionSet.emit()
 
     def saveQuery(self):
-        query = self.revsetle.text()
+        query = self.revsetcombo.lineEdit().text()
         if query in self.revsethist:
             self.revsethist.remove(query)
         if query not in _permanent_queries:
@@ -115,8 +142,7 @@ class RepoFilterBar(QToolBar):
         full = self.revsethist + list(_permanent_queries)
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
-        #self.revsetle.setCompleter(QCompleter(full, self))
-        self.revsetle.setText(query)
+        self.revsetcombo.lineEdit().setText(query)
 
     def loadSettings(self, s):
         self.entrydlg.restoreGeometry(s.value('revset/geom').toByteArray())
@@ -126,7 +152,6 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
-        #self.revsetle.setCompleter(QCompleter(full, self))
 
     def saveSettings(self, s):
         s.setValue('revset/geom', self.entrydlg.saveGeometry())
@@ -164,7 +189,9 @@ class RepoFilterBar(QToolBar):
 
         self._branchReloading = True
         self._branchCombo.clear()
-        self._branchCombo.addItems([''] + branches)
+        self._branchCombo.addItem('')
+        for branch in branches:
+            self._branchCombo.addItem(branch)
         self._branchLabel.setEnabled(len(branches) > 1)
         self._branchCombo.setEnabled(len(branches) > 1)
         self._branchReloading = False
