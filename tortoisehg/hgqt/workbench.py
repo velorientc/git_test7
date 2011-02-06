@@ -243,7 +243,7 @@ class Workbench(QMainWindow):
         addtaskview('Checkmark', _("&Commit..."))
         addtaskview('annotate', _("&Manifest..."))
         addtaskview('repobrowse', _("&Search..."))
-        addtaskview('view-refresh', _("S&ynchronize..."))
+        addtaskview('sync', _("S&ynchronize..."))
         self.actionSelectTaskMQ = \
                 addtaskview('mq', _("Patch &Queue..."), 'mq')
         self.actionSelectTaskPbranch = \
