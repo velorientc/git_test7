@@ -212,9 +212,10 @@ class QQueueDialog(QDialog):
                 self.itemfont = item.font()
                 self.itemfontbold = self.itemfont
                 self.itemfontbold.setBold(True)
-            if 'active' in q:
+            activestr = _(' (active)')  # locale safe ? (see also mq.py)
+            if q.endswith(activestr):
                 row_activeq = i
-                self.activequeue = q[:-9]
+                self.activequeue = q[:-len(activestr)]
                 item.setText(self.activequeue)
                 item.setFont(self.itemfontbold)
         self.ql.setCurrentRow(row_activeq)
