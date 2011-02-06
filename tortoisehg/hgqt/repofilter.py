@@ -47,7 +47,7 @@ class RepoFilterBar(QToolBar):
         le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
-            le.setPlaceholderText('### revision set query ###')
+            le.setPlaceholderText(_('### revision set query ###'))
         self.revsetle = le
 
         icon = QIcon()
