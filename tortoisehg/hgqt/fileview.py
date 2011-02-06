@@ -165,6 +165,7 @@ class HgFileView(QFrame):
 
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
+        self.actionFind.setToolTip(_('Toggle display of text search bar'))
         self.actionFind.setShortcut(QKeySequence.Find)
 
         tb = self.diffToolbar
