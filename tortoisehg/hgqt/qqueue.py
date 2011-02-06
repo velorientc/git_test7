@@ -251,11 +251,12 @@ class QQueueDialog(QDialog):
 
     @pyqtSlot()
     def qqueueActivate(self):
-        q = hglib.fromunicode(self.ql.item(self.ql.currentRow()).text())
+        uq = self.ql.item(self.ql.currentRow()).text()
+        q = hglib.fromunicode(uq)
         if q == self.activequeue:
             return
         if qtlib.QuestionMsgBox(_('Confirm patch queue switch'),
-                _('Do you really want to activate patch queue \'%s\' ?' % q),
+                _("Do you really want to activate patch queue '%s' ?") % uq,
                 parent=self, defaultbutton=QMessageBox.No):
             opts = [q]
             self.qqueueCommand(opts)
@@ -269,18 +270,20 @@ class QQueueDialog(QDialog):
         dlg = QInputDialog(self, Qt.WindowFlags()
                               & ~Qt.WindowContextHelpButtonHint)
         qname, ok = dlg.getText(self, title, label)
+        qname = hglib.fromunicode(qname)
         if qname and ok:
-            opts = ['--create', hglib.fromunicode(qname)]
+            opts = ['--create', qname]
             self.qqueueCommand(opts)
 
     @pyqtSlot()
     def qqueueRename(self):
-        q = hglib.fromunicode(self.ql.item(self.ql.currentRow()).text())
+        uq = self.ql.item(self.ql.currentRow()).text()
+        q = hglib.fromunicode(uq)
         if q == 'patches':
             return
         title = _('TortoiseHg Prompt')
         # this is the only way I found to make that dialog wide enough :(
-        label = _('Rename patch queue \'%s\' to' % q) + (u' ' * 30)
+        label = (_("Rename patch queue '%s' to") % uq) + (u' ' * 30)
         # WindowContextHelpButton still there :( after this ?
         dlg = QInputDialog(self, Qt.WindowFlags()
                               & ~Qt.WindowContextHelpButtonHint)
@@ -293,24 +296,26 @@ class QQueueDialog(QDialog):
 
     @pyqtSlot()
     def qqueueDelete(self):
-        q = hglib.fromunicode(self.ql.item(self.ql.currentRow()).text())
+        uq = self.ql.item(self.ql.currentRow()).text()
+        q = hglib.fromunicode(uq)
         if q == 'patches':
             return
         if qtlib.QuestionMsgBox(_('Confirm patch queue delete'),
-              _('Do you really want to delete patch queue \'%s\' ?'
-              % q), parent=self, defaultbutton=QMessageBox.No):
+              _("Do you really want to delete patch queue '%s' ?") % uq,
+              parent=self, defaultbutton=QMessageBox.No):
             opts = ['--delete', q]
             self.qqueueCommand(opts)
 
     @pyqtSlot()
     def qqueuePurge(self):
-        q = hglib.fromunicode(self.ql.item(self.ql.currentRow()).text())
+        uq = self.ql.item(self.ql.currentRow()).text()
+        q = hglib.fromunicode(uq)
         if q == 'patches':
             return
         if qtlib.QuestionMsgBox(_('Confirm patch queue purge'),
-              _('<p>This will also erase de patchfiles on disk!</p>'
-                '<p>Do you really want to purge patch queue \'%s\' ?</p>'
-                % q), parent=self, defaultbutton=QMessageBox.No):
+              _("<p>This will also erase de patchfiles on disk!</p>"
+                "<p>Do you really want to purge patch queue '%s' ?</p>") % uq,
+                parent=self, defaultbutton=QMessageBox.No):
             opts = ['--purge', q]
             self.qqueueCommand(opts)
 
