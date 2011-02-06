@@ -691,13 +691,13 @@ class RepoWidget(QWidget):
 
     def okToContinue(self):
         if not self.commitDemand.forward('canExit', default=True):
-            self.showMessage.emit(_('Commit tab cannot exit'))
+            self.showMessage(_('Commit tab cannot exit'))
             return False
         if not self.syncDemand.forward('canExit', default=True):
-            self.showMessage.emit(_('Sync tab cannot exit'))
+            self.showMessage(_('Sync tab cannot exit'))
             return False
         if not self.mqDemand.forward('canExit', default=True):
-            self.showMessage.emit(_('MQ tab cannot exit'))
+            self.showMessage(_('MQ tab cannot exit'))
             return False
         return True
 
