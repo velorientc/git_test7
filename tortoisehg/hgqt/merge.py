@@ -652,12 +652,7 @@ class CommitPage(BasePage):
 
     def ready(self):
         self.setTitle(_('Commit merged files'))
-        # move cursor to end of commit message
-        lines = self.msg_text.lines()
-        if lines:
-            lines -= 1
-            pos = self.msg_text.lineLength(lines)
-            self.msg_text.setCursorPosition(lines, pos)
+        self.msg_text.moveCursorToEnd()
 
     def perform(self):
         self.setTitle(_('Committing...'))
