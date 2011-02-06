@@ -52,6 +52,8 @@ class MessageEntry(qscilib.Scintilla):
         # http://www.riverbankcomputing.com/pipermail/qscintilla/2009-February/000461.html
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        # default message entry widgets to word wrap, user may override
+        self.setWrapMode(QsciScintilla.WrapWord)
 
         self.getChecked = getCheckedFunc
         self.setContextMenuPolicy(Qt.CustomContextMenu)
