@@ -187,13 +187,13 @@ class Workbench(QMainWindow):
                 getattr(self, '%stbar' % toolbar).addSeparator()
 
         newaction(_("&New Repository..."), self.newRepository,
-                  shortcut='New', menu='file')
+                  shortcut='New', menu='file', icon='init')
         newaction(_("Clone Repository..."), self.cloneRepository,
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
-                  menu='file')
+                  menu='file', icon='clone')
         newaction(_("&Open Repository..."), self.openRepository,
-                  shortcut='Open', menu='file')
-        newaction(_("&Close Repository"), self.closeRepository,
+                  shortcut='Open', menu='file', icon='plus')
+        newaction(_("&Close Repository"), self.closeRepository, icon='close',
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
         newaction(_('&Settings...'), self.editSettings, icon='settings_user',
@@ -264,11 +264,11 @@ class Workbench(QMainWindow):
                   tooltip=_('Load all revisions into graph'))
 
         newaction(_("Web Server"), self.serve, enabled='repoopen',
-                  menu='repository')
+                  menu='repository', icon='proxy')
         newaction(_("Bisect"), self._repofwd('bisect'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Shelve"), self._repofwd('shelve'),
+        newaction(_("Shelve"), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
         newaction(_("Import"), self._repofwd('thgimport'),
                   enabled='repoopen', menu='repository')
@@ -278,7 +278,7 @@ class Workbench(QMainWindow):
         newaction(_("Recover"), self._repofwd('recover'), enabled='repoopen',
                   menu='repository')
         newseparator(menu='repository')
-        newaction(_("Resolve"), self._repofwd('resolve'),
+        newaction(_("Resolve"), self._repofwd('resolve'), icon='merge',
                   enabled='repoopen', menu='repository')
         newaction(_("Rollback/Undo"), self._repofwd('rollback'),
                   enabled='repoopen', menu='repository')
