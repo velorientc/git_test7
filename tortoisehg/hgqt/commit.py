@@ -149,7 +149,7 @@ class MessageEntry(qscilib.Scintilla):
             line, col = self.getCursorPosition()
             self.reflowBlock(line)
         elif event.key() == Qt.Key_Backtab:
-            event.ignore()
+            event.accept()
             newev = QKeyEvent(event.type(), Qt.Key_Tab, Qt.ShiftModifier)
             super(MessageEntry, self).keyPressEvent(newev)
         else:
