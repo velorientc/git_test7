@@ -340,6 +340,8 @@ class RepoWidget(QWidget):
         self.reload()
 
     def clearRevisionSet(self):
+        if not self.revset:
+            return
         self.revset = []
         if self.revsetfilter:
             self.reload()
