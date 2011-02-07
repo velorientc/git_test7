@@ -14,6 +14,7 @@ class CShellExtCMenu: public IContextMenu3, IShellExtInit
     std::string myFolder;
 
     void DoHgtk(const std::string&);
+    void TweakMenuForVista(HMENU menu);
 
 public:
     explicit CShellExtCMenu(char dummy);

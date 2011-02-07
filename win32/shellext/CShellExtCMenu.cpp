@@ -398,6 +398,20 @@ int HasTortoiseMenu(HMENU hMenu, bool& hasmenu)
     return 0;
 }
 
+void
+CShellExtCMenu::TweakMenuForVista(HMENU hMenu)
+{
+    if (!SysInfo::Instance().IsVistaOrLater())
+        return;
+
+    MENUINFO MenuInfo = {};
+    MenuInfo.cbSize  = sizeof(MenuInfo);
+    MenuInfo.fMask   = MIM_STYLE | MIM_APPLYTOSUBMENUS;
+    MenuInfo.dwStyle = MNS_CHECKORBMP;
+
+    SetMenuInfo(hMenu, &MenuInfo);
+}
+
 #define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
 // IContextMenu
@@ -548,18 +562,8 @@ CShellExtCMenu::QueryContextMenu(
         if (isSeparator && indexSubMenu > 0)
             RemoveMenu(hSubMenu, indexSubMenu - 1, MF_BYPOSITION);
 
-        if (SysInfo::Instance().IsVistaOrLater())
-        {
-            MENUINFO MenuInfo;
-            
-            memset(&MenuInfo, 0, sizeof(MenuInfo));
+        TweakMenuForVista(hSubMenu);
 
-            MenuInfo.cbSize  = sizeof(MenuInfo);
-            MenuInfo.fMask   = MIM_STYLE | MIM_APPLYTOSUBMENUS;
-            MenuInfo.dwStyle = MNS_CHECKORBMP;
-            
-            SetMenuInfo(hSubMenu, &MenuInfo);
-        }
     }
 
     TDEBUG_TRACE("  CShellExtCMenu::QueryContextMenu: adding main THG menu");
@@ -570,18 +574,7 @@ CShellExtCMenu::QueryContextMenu(
 
     InitStatus::check();
 
-    if (SysInfo::Instance().IsVistaOrLater())
-    {
-        MENUINFO MenuInfo;
-
-        memset(&MenuInfo, 0, sizeof(MenuInfo));
-
-        MenuInfo.cbSize  = sizeof(MenuInfo);
-        MenuInfo.fMask   = MIM_STYLE | MIM_APPLYTOSUBMENUS;
-        MenuInfo.dwStyle = MNS_CHECKORBMP;
-
-        SetMenuInfo(hMenu, &MenuInfo);
-    }
+    TweakMenuForVista(hMenu);
 
     return ResultFromShort(idCmd - idCmdFirst);
 }
