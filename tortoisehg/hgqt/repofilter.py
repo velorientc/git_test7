@@ -52,12 +52,9 @@ class RepoFilterBar(QToolBar):
         combo.activated.connect(le.selectAll)
         self.revsetle = le
 
-        icon = QIcon()
-        style = QApplication.style()
-        icon.addPixmap(style.standardPixmap(QStyle.SP_DialogDiscardButton))
         self.clearBtn = QToolButton(self)
-        self.clearBtn.setIcon(icon)
-        self.clearBtn.setToolTip(_('Discard or clear current query'))
+        self.clearBtn.setIcon(qtlib.geticon('filedelete'))
+        self.clearBtn.setToolTip(_('Clear current query and query text'))
         self.clearBtn.clicked.connect(le.clear)
         self.clearBtn.clicked.connect(self.clearRevisionSet)
         self.addWidget(self.clearBtn)
@@ -76,7 +73,7 @@ class RepoFilterBar(QToolBar):
         self.addWidget(self.editorBtn)
 
         icon = QIcon()
-        icon.addPixmap(style.standardPixmap(QStyle.SP_TrashIcon))
+        icon.addPixmap(QApplication.style().standardPixmap(QStyle.SP_TrashIcon))
         self.deleteBtn = QToolButton()
         self.deleteBtn.setIcon(icon)
         self.deleteBtn.setToolTip(_('Delete selected query from history'))
