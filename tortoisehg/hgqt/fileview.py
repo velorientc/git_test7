@@ -253,7 +253,13 @@ class HgFileView(QFrame):
         if rev != self._p_rev:
             self.displayFile(rev=rev)
 
+    @pyqtSlot()
     def clearDisplay(self):
+        self._filename = None
+        self.forceMode('diff')
+        self.clearMarkup()
+
+    def clearMarkup(self):
         self.sci.clear()
         self.blk.clear()
         # Setting the label to ' ' rather than clear() keeps the label
@@ -271,7 +277,7 @@ class HgFileView(QFrame):
         if rev is not None:
             self._p_rev = rev
 
-        self.clearDisplay()
+        self.clearMarkup()
         if filename is None:
             self.forceMode('file')
             return
