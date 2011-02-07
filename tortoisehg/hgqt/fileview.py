@@ -197,7 +197,7 @@ class HgFileView(QFrame):
 
         self.timer = QTimer()
         self.timer.setSingleShot(False)
-        self.timer.timeout.connect(self.idle_fill_files)
+        self.timer.timeout.connect(self.timerBuildDiffMarkers)
 
     def setFont(self, font):
         self.sci.setFont(font)
@@ -266,7 +266,6 @@ class HgFileView(QFrame):
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
-        self._diffs = []
 
     def displayFile(self, filename=None, rev=None, status=None):
         if filename is None:
@@ -347,15 +346,99 @@ class HgFileView(QFrame):
         self.fileDisplayed.emit(uf, fd.contents or QString())
 
         if self._mode == 'file' and fd.contents and fd.olddata:
-            # Update diff margin
+            # Update blk margin
             if self.timer.isActive():
                 self.timer.stop()
 
-            olddata = fd.olddata.splitlines()
-            newdata = fd.contents.splitlines()
-            self._diff = difflib.SequenceMatcher(None, olddata, newdata)
+            self._fd = fd
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
             self.blk.syncPageStep()
             self.timer.start()
+
+    def nextLine(self):
+        x, y = self.sci.getCursorPosition()
+        self.sci.setCursorPosition(x+1, y)
+
+    def prevLine(self):
+        x, y = self.sci.getCursorPosition()
+        self.sci.setCursorPosition(x-1, y)
+
+    def nextCol(self):
+        x, y = self.sci.getCursorPosition()
+        self.sci.setCursorPosition(x, y+1)
+
+    def prevCol(self):
+        x, y = self.sci.getCursorPosition()
+        self.sci.setCursorPosition(x, y-1)
+
+    @pyqtSlot(unicode, object)
+    @pyqtSlot(unicode, object, int)
+    def sourceChanged(self, path, rev, line=None):
+        self.revisionSelected.emit(rev)
+
+    @pyqtSlot(unicode, object, int)
+    def editSelected(self, path, rev, line):
+        """Open editor to show the specified file"""
+        repo = self._ctx._repo
+        path = hglib.fromunicode(path)
+        base = visdiff.snapshot(repo, [path], repo[rev])[0]
+        files = [os.path.join(base, path)]
+        pattern = hglib.fromunicode(self._lastSearch[0])
+        wctxactions.edit(self, repo.ui, repo, files, line, pattern)
+
+    @pyqtSlot(unicode, bool, bool, bool)
+    def find(self, exp, icase=True, wrap=False, forward=True):
+        self.sci.find(exp, icase, wrap, forward)
+
+    @pyqtSlot(unicode, bool)
+    def highlightText(self, match, icase=False):
+        self._lastSearch = match, icase
+        self.sci.highlightText(match, icase)
+
+    def verticalScrollBar(self):
+        return self.sci.verticalScrollBar()
+
+    #
+    # file mode diff markers
+    #
+    def timerBuildDiffMarkers(self):
+        'show modified and added lines in the self.blk margin'
+        self.sci.setUpdatesEnabled(False)
+        self.blk.setUpdatesEnabled(False)
+
+        if self._fd:
+            olddata = self._fd.olddata.splitlines()
+            newdata = self._fd.contents.splitlines()
+            diff = difflib.SequenceMatcher(None, olddata, newdata)
+            self._opcodes = diff.get_opcodes()
+            self._fd = None
+            self._diffs = []
+
+        for tag, alo, ahi, blo, bhi in self._opcodes[:30]:
+            if tag == 'replace':
+                self._diffs.append([blo, bhi])
+                self.blk.addBlock('x', blo, bhi)
+                for i in range(blo, bhi):
+                    self.sci.markerAdd(i, self.markertriangle)
+            elif tag == 'insert':
+                self._diffs.append([blo, bhi])
+                self.blk.addBlock('+', blo, bhi)
+                for i in range(blo, bhi):
+                    self.sci.markerAdd(i, self.markerplus)
+            elif tag in ('equal', 'delete'):
+                pass
+            else:
+                raise ValueError, 'unknown tag %r' % (tag,)
+
+        self._opcodes = self._opcodes[30:]
+        if not self._opcodes:
+            self.actionNextDiff.setEnabled(bool(self._diffs))
+            self.actionPrevDiff.setEnabled(False)
+            self.timer.stop()
+
+        self.sci.setUpdatesEnabled(True)
+        self.blk.setUpdatesEnabled(True)
 
     def nextDiff(self):
         if self._mode == 'diff' or not self._diffs:
@@ -391,97 +474,8 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(True)
         self.actionPrevDiff.setEnabled(not first)
 
-    def nextLine(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x+1, y)
-
-    def prevLine(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x-1, y)
-
-    def nextCol(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x, y+1)
-
-    def prevCol(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x, y-1)
-
     def nDiffs(self):
         return len(self._diffs)
-
-    @pyqtSlot(unicode, object)
-    @pyqtSlot(unicode, object, int)
-    def sourceChanged(self, path, rev, line=None):
-        self.revisionSelected.emit(rev)
-
-    @pyqtSlot(unicode, object, int)
-    def editSelected(self, path, rev, line):
-        """Open editor to show the specified file"""
-        repo = self._ctx._repo
-        path = hglib.fromunicode(path)
-        base = visdiff.snapshot(repo, [path], repo[rev])[0]
-        files = [os.path.join(base, path)]
-        pattern = hglib.fromunicode(self._lastSearch[0])
-        wctxactions.edit(self, repo.ui, repo, files, line, pattern)
-
-    @pyqtSlot(unicode, bool, bool, bool)
-    def find(self, exp, icase=True, wrap=False, forward=True):
-        self.sci.find(exp, icase, wrap, forward)
-
-    @pyqtSlot(unicode, bool)
-    def highlightText(self, match, icase=False):
-        self._lastSearch = match, icase
-        self.sci.highlightText(match, icase)
-
-    def verticalScrollBar(self):
-        return self.sci.verticalScrollBar()
-
-    def idle_fill_files(self):
-        # we make a burst of diff-lines computed at once, but we
-        # disable GUI updates for efficiency reasons, then only
-        # refresh GUI at the end of the burst
-        self.sci.setUpdatesEnabled(False)
-        self.blk.setUpdatesEnabled(False)
-        for n in range(30): # burst pool
-            if self._diff is None or not self._diff.get_opcodes():
-                self.actionNextDiff.setEnabled(bool(self._diffs))
-                self.actionPrevDiff.setEnabled(False)
-                self._diff = None
-                self.timer.stop()
-                break
-
-            tag, alo, ahi, blo, bhi = self._diff.get_opcodes().pop(0)
-            if tag == 'replace':
-                self._diffs.append([blo, bhi])
-                self.blk.addBlock('x', blo, bhi)
-                for i in range(blo, bhi):
-                    self.sci.markerAdd(i, self.markertriangle)
-
-            elif tag == 'delete':
-                # You cannot effectively show deleted lines in a single
-                # pane display.  They do not exist.
-                pass
-                # self._diffs.append([blo, bhi])
-                # self.blk.addBlock('-', blo, bhi)
-                # for i in range(alo, ahi):
-                #      self.sci.markerAdd(i, self.markerminus)
-
-            elif tag == 'insert':
-                self._diffs.append([blo, bhi])
-                self.blk.addBlock('+', blo, bhi)
-                for i in range(blo, bhi):
-                    self.sci.markerAdd(i, self.markerplus)
-
-            elif tag == 'equal':
-                pass
-
-            else:
-                raise ValueError, 'unknown tag %r' % (tag,)
-
-        # ok, enable GUI refresh for code viewers and diff-block displayers
-        self.sci.setUpdatesEnabled(True)
-        self.blk.setUpdatesEnabled(True)
 
 
 class FileData(object):
