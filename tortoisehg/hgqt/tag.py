@@ -141,7 +141,6 @@ class TagDialog(QDialog):
         self.custom_text.setDisabled(True)
         self.clear_statue()
         self.update_tagcombo(clear=False)
-        self.update_sensitives(affectlocal=True)
         self.show_options(False)
         self.tag_combo.setFocus()
 
@@ -150,6 +149,8 @@ class TagDialog(QDialog):
         if not opts.get('local') and opts.get('message'):
             self.custom_chk.setChecked(True)
             self.custom_text.setText(opts.get('message', ''))
+
+        self.update_sensitives(affectlocal=True)
 
     ### Private Methods ###
 
