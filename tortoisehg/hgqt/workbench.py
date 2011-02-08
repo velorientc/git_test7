@@ -72,12 +72,6 @@ class Workbench(QMainWindow):
                                     self.openRepository)
             qt_mac_set_dock_menu(self.dockMenu)
 
-    def accept(self):
-        self.close()
-
-    def reject(self):
-        self.close()
-
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.8)
@@ -307,7 +301,7 @@ class Workbench(QMainWindow):
                   icon='go-jump', shortcut='Ctrl+T', enabled='repoopen',
                   toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Jump to a specific revision'))
-        newseparator(toolbar='edit', menu='View')
+        newseparator(menu='View')
 
         menu = QMenu(_('Workbench Toolbars'), self)
         menu.addAction(self.edittbar.toggleViewAction())
