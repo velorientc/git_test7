@@ -538,7 +538,12 @@ class Workbench(QMainWindow):
     def newRepository(self):
         """ Run init dialog """
         from tortoisehg.hgqt.hginit import InitDialog
-        initdlg = InitDialog(parent=self)
+        repoWidget = self.repoTabsWidget.currentWidget()
+        if repoWidget:
+            path = os.path.dirname(repoWidget.repo.root)
+        else:
+            path = os.getcwd()
+        initdlg = InitDialog([path], parent=self)
         if initdlg.exec_():
             path = initdlg.getPath()
             self.openRepo(path)
