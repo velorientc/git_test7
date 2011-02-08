@@ -17,7 +17,7 @@ from hgext import mq as mqmod
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, shelve, qscilib
+from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
 from tortoisehg.hgqt import qqueue, fileview
 
 # TODO: Disable MQ toolbar while cmdui.Runner is busy
@@ -63,6 +63,7 @@ class MQWidget(QWidget):
 
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.setContext(repo[None])
+        self.fileview.shelveToolExited.connect(self.reload)
 
         # Patch Queue Frame
         layout = QVBoxLayout()
@@ -143,11 +144,9 @@ class MQWidget(QWidget):
         qrefhbox.setContentsMargins(0, 0, 0, 0)
         self.qqueueBtn = QPushButton(_('Manage queues'))
         self.qqueueBtn.setMinimumWidth(150)
-        self.shelveBtn = QPushButton(_('Shelve'))
         self.qnewOrRefreshBtn = QPushButton(_('QRefresh'))
         qrefhbox.addWidget(self.qqueueBtn)
         qrefhbox.addStretch(1)
-        qrefhbox.addWidget(self.shelveBtn)
         qrefhbox.addWidget(self.qnewOrRefreshBtn)
 
         # Command runner and connections...
@@ -158,7 +157,6 @@ class MQWidget(QWidget):
         self.cmd.commandFinished.connect(self.onCommandFinished)
 
         self.qqueueBtn.clicked.connect(self.launchQQueueTool)
-        self.shelveBtn.clicked.connect(self.launchShelveTool)
         self.optionsBtn.clicked.connect(self.launchOptionsDialog)
         self.revisionOrCommitBtn.clicked.connect(self.qinitOrCommit)
         self.msgSelectCombo.activated.connect(self.onMessageSelected)
@@ -434,13 +432,6 @@ class MQWidget(QWidget):
     @pyqtSlot()
     def launchQQueueTool(self):
         dlg = qqueue.QQueueDialog(self.repo, self)
-        dlg.finished.connect(dlg.deleteLater)
-        dlg.exec_()
-        self.reload()
-
-    @pyqtSlot()
-    def launchShelveTool(self):
-        dlg = shelve.ShelveDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.reload()

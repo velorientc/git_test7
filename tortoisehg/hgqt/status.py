@@ -178,14 +178,9 @@ class StatusWidget(QWidget):
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
+        self.fileview.shelveToolExited.connect(self.refreshWctx)
         self.fileview.setContext(self.repo[None])
         vbox.addWidget(self.fileview, 1)
-
-        lbltext = u'<a href="shelve:">' + _('shelve tool') + u'</a>'
-        self.shelflabel = QLabel(lbltext)
-        self.shelflabel.linkActivated.connect(self.linkActivated)
-        self.fileview.labelhbox.addStretch(1)
-        self.fileview.labelhbox.addWidget(self.shelflabel)
 
         self.split = split
         self.diffvbox = vbox
@@ -701,22 +696,10 @@ class StatusDialog(QDialog):
         layout.addWidget(self.statusbar)
         self.stwidget.showMessage.connect(self.statusbar.showMessage)
         self.stwidget.progress.connect(self.statusbar.progress)
-        self.stwidget.linkActivated.connect(self.linkActivated)
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
         self.setWindowTitle(self.stwidget.getTitle())
 
         QTimer.singleShot(0, self.stwidget.refreshWctx)
-
-    @pyqtSlot(QString)
-    def linkActivated(self, link):
-        link = unicode(link)
-        repo = self.stwidget.repo
-        if link.startswith('shelve:'):
-            from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(self.stwidget.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.stwidget.refreshWctx()
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):

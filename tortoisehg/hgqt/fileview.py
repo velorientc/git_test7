@@ -42,6 +42,7 @@ class HgFileView(QFrame):
     fileDisplayed = pyqtSignal(QString, QString)
     showMessage = pyqtSignal(QString)
     revisionSelected = pyqtSignal(int)
+    shelveToolExited = pyqtSignal()
 
     searchRequested = pyqtSignal(unicode)
     """Emitted (pattern) when user request to search content"""
@@ -59,6 +60,7 @@ class HgFileView(QFrame):
         l.setContentsMargins(0,0,0,0)
         l.setSpacing(0)
 
+        self.repo = repo
         self.topLayout = QVBoxLayout()
 
         self.labelhbox = hbox = QHBoxLayout()
@@ -168,6 +170,11 @@ class HgFileView(QFrame):
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
         self.actionFind.setShortcut(QKeySequence.Find)
 
+        self.actionShelf = QAction('Shelve', self)
+        self.actionShelf.setIcon(qtlib.geticon('shelve'))
+        self.actionShelf.setToolTip(_('Open shelve tool'))
+        self.actionShelf.triggered.connect(self.launchShelve)
+
         tb = self.diffToolbar
         tb.addAction(self.actionDiffMode)
         tb.addAction(self.actionFileMode)
@@ -177,6 +184,7 @@ class HgFileView(QFrame):
         tb.addAction(self.actionPrevDiff)
         tb.addSeparator()
         tb.addAction(self.actionFind)
+        tb.addAction(self.actionShelf)
 
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
@@ -198,6 +206,14 @@ class HgFileView(QFrame):
         self.timer = QTimer()
         self.timer.setSingleShot(False)
         self.timer.timeout.connect(self.timerBuildDiffMarkers)
+
+    def launchShelve(self):
+        from tortoisehg.hgqt import shelve
+        # TODO: pass self._filename
+        dlg = shelve.ShelveDialog(self.repo, self)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+        self.shelveToolExited.emit()
 
     def setFont(self, font):
         self.sci.setFont(font)
@@ -248,6 +264,7 @@ class HgFileView(QFrame):
         self._p_rev = None
         self.sci.setTabWidth(ctx._repo.tabwidth)
         self.actionAnnMode.setVisible(ctx.rev() != None)
+        self.actionShelf.setVisible(ctx.rev() == None)
 
     def displayDiff(self, rev):
         if rev != self._p_rev:
@@ -281,14 +298,12 @@ class HgFileView(QFrame):
             self.forceMode('file')
             return
 
-        ctx = self._ctx
-        repo = ctx._repo
         if self._p_rev is not None:
-            ctx2 = repo[self._p_rev]
+            ctx2 = self.repo[self._p_rev]
         else:
             ctx2 = None
 
-        fd = FileData(ctx, ctx2, filename, status)
+        fd = FileData(self._ctx, ctx2, filename, status)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -380,12 +395,11 @@ class HgFileView(QFrame):
     @pyqtSlot(unicode, object, int)
     def editSelected(self, path, rev, line):
         """Open editor to show the specified file"""
-        repo = self._ctx._repo
         path = hglib.fromunicode(path)
-        base = visdiff.snapshot(repo, [path], repo[rev])[0]
+        base = visdiff.snapshot(self.repo, [path], self.repo[rev])[0]
         files = [os.path.join(base, path)]
         pattern = hglib.fromunicode(self._lastSearch[0])
-        wctxactions.edit(self, repo.ui, repo, files, line, pattern)
+        wctxactions.edit(self, self.repo.ui, self.repo, files, line, pattern)
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
