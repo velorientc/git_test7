@@ -253,7 +253,7 @@ class Workbench(QMainWindow):
         newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
                   shortcut='Refresh', enabled='repoopen',
                   menu='view', toolbar='edit',
-                  tooltip=_('Refresh all for current repository'))
+                  tooltip=_('Refresh current repository'))
         newaction(_("Refresh &Task Tab"), self._repofwd('reloadTaskTab'),
                   icon='reloadtt', enabled='repoopen',
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
