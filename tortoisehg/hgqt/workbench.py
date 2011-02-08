@@ -312,6 +312,14 @@ class Workbench(QMainWindow):
                   icon='go-jump', shortcut='Ctrl+T', enabled='repoopen',
                   toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Jump to a specific revision'))
+        newseparator(toolbar='edit', menu='View')
+
+        menu = QMenu(_('Workbench Toolbars'), self)
+        menu.addAction(self.edittbar.toggleViewAction())
+        menu.addAction(self.docktbar.toggleViewAction())
+        menu.addAction(self.synctbar.toggleViewAction())
+        menu.addAction(self.tasktbar.toggleViewAction())
+        self.menuView.addMenu(menu)
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming',
                   tooltip=_('Check for incoming changes from default pull target'),
