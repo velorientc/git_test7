@@ -83,8 +83,7 @@ class HgRepoListModel(QAbstractTableModel):
         self._branch_colors = {}
 
         self._columnmap = {
-            'Rev':      lambda ctx, gnode: type(ctx.rev()) is int and \
-                                           str(ctx.rev()) or "",
+            'Rev':      self.getrev,
             'Node':     lambda ctx, gnode: str(ctx),
             'Graph':    lambda ctx, gnode: "",
             'Description': self.getlog,
@@ -229,7 +228,7 @@ class HgRepoListModel(QAbstractTableModel):
             return 'XXXX'
         column = self._columns[col]
         if column == 'Rev':
-            return str(len(self.repo))
+            return str(len(self.repo))+'X+'
         if column == 'Node':
             return str(self.repo['.'])
         if column in ('Age', 'LocalTime', 'UTCTime'):
@@ -484,6 +483,15 @@ class HgRepoListModel(QAbstractTableModel):
             return ''
         tags = [t for t in ctx.tags() if t not in self._mqtags]
         return hglib.tounicode(','.join(tags))
+
+    def getrev(self, ctx, gnode):
+        rev = ctx.rev()
+        if type(rev) is int:
+            return str(rev)
+        elif rev is None:
+            return u'%d+' % ctx.p1().rev()
+        else:
+            return ''
 
     def getauthor(self, ctx, gnode):
         try:
