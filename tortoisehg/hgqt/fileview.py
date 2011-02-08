@@ -616,8 +616,11 @@ class FileData(object):
 
         if status in ('R', '!'):
             if wfile in ctx.p1():
-                newdata = ctx.p1()[wfile].data()
-                self.contents = hglib.tounicode(newdata)
+                olddata = ctx.p1()[wfile].data()
+                if '\0' in olddata:
+                    self.error = 'binary file'
+                else:
+                    self.contents = hglib.tounicode(olddata)
                 self.flabel += _(' <i>(was deleted)</i>')
             else:
                 self.flabel += _(' <i>(was added, now missing)</i>')
