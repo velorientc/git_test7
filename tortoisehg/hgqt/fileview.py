@@ -349,7 +349,7 @@ class HgFileView(QFrame):
         elif fd.contents is None:
             return
         elif self._mode == 'ann':
-            self.sci.setSource(filename, ctx.rev())
+            self.sci.setSource(filename, self._ctx.rev())
         else:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
