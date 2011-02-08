@@ -152,6 +152,7 @@ class FileLogDialog(_AbstractFileDialog):
 
         self.textView = HgFileView(self.repo, self)
         self.textView.forceMode('file')
+        self.textView.revisionSelected.connect(self.goto)
         vbox.addWidget(self.textView, 1)
 
     @pyqtSlot(unicode)
