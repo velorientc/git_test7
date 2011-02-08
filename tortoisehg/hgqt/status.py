@@ -95,7 +95,12 @@ class StatusWidget(QWidget):
         frame.setSizePolicy(sp)
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
+        hbox.setMargin(4)
         hbox.setContentsMargins (5, 0, 0, 0)
+        self.refreshBtn = tb = QToolButton()
+        tb.setToolTip(_('Refresh file list'))
+        tb.setIcon(qtlib.geticon('reload'))
+        tb.clicked.connect(self.refreshWctx)
         le = QLineEdit()
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
             le.setPlaceholderText('### filter text ###')
@@ -105,6 +110,7 @@ class StatusWidget(QWidget):
         pb = QPushButton(_('Status'))
         hbox.addWidget(le)
         hbox.addWidget(pb)
+        hbox.addWidget(tb)
         tv = WctxFileTree(self.repo)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
@@ -219,6 +225,7 @@ class StatusWidget(QWidget):
 
         self.allbutton.setEnabled(False)
         self.nonebutton.setEnabled(False)
+        self.refreshBtn.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refreshing = StatusThread(self.repo, self.pats, self.opts)
         self.refreshing.finished.connect(self.reloadComplete)
@@ -229,6 +236,7 @@ class StatusWidget(QWidget):
         self.refreshing.wait()
         self.allbutton.setEnabled(True)
         self.nonebutton.setEnabled(True)
+        self.refreshBtn.setEnabled(True)
         if self.refreshing.wctx is None:
             return
         self.ms = merge.mergestate(self.repo)
