@@ -115,7 +115,7 @@ class StatusWidget(QWidget):
                 self.pats = []
                 self.refreshWctx()
                 cpb.setVisible(False)
-                self.titleTextChanged.emit(QString(self.getTitle()))
+                self.titleTextChanged.emit(self.getTitle())
             cpb = QPushButton(_('Remove filter, show root'))
             vbox.addWidget(cpb)
             cpb.clicked.connect(clearPattern)
