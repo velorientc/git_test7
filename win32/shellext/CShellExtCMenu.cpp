@@ -12,24 +12,12 @@
 
 #include "Msi.h"
 
-#include <map>
-
 #include "CShellExtCMenu.h"
-
-
-struct MenuDescription
-{
-    std::string name;
-    std::wstring menuText;
-    std::wstring helpText;
-    std::string iconName;
-    UINT idCmd;
-};
 
 // According to http://msdn.microsoft.com/en-us/library/bb776094%28VS.85%29.aspx
 // the help texts for the commands should be reasonably short (under 40 characters)
 
-MenuDescription menuDescList[] =
+static MenuDescription CMenuMenuDescList[] =
 {
     {"commit",      L"Commit...",
                     L"Commit changes in repository",
@@ -110,7 +98,7 @@ MenuDescription menuDescList[] =
     //{"", L"", L"", ".ico", 0},
 };
 
-const char* const RepoNoFilesMenu =
+static const char* const RepoNoFilesMenu =
     "commit status shelve vdiff sep"
     " add revert rename forget remove sep"
     " workbench update grep sep"
@@ -120,31 +108,29 @@ const char* const RepoNoFilesMenu =
     " about"
 ;
 
-const char* const RepoFilesMenu =
+static const char* const RepoFilesMenu =
     "commit status vdiff sep"
     " add revert rename forget remove sep"
     " log sep"
     " about"
 ;
 
-const char* const NoRepoMenu =
+static const char* const NoRepoMenu =
     "clone init shellconf userconf thgstatus sep"
     " workbench sep"
     " about"
 ;
 
 
-typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
 typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
 
-MenuDescriptionMap MenuDescMap;
-MenuIdCmdMap MenuIdMap;
+static MenuDescriptionMap CMenuMenuDescMap;
+static MenuIdCmdMap MenuIdMap;
 
-
-void AddMenuList(UINT idCmd, const std::string& name)
+void AddMenuList(UINT idCmd, const std::string& name, MenuDescriptionMap& menuDescMap)
 {
     TDEBUG_TRACE("AddMenuList: idCmd = " << idCmd << " name = " << name);
-    MenuIdMap[idCmd] = MenuDescMap[name];
+    MenuIdMap[idCmd] = menuDescMap[name];
 }
 
 
@@ -183,18 +169,22 @@ void GetCMenuTranslation(
         RegCloseKey(hkey);
 }
 
-
-void InitMenuMaps()
+MenuDescriptionMap& CShellExtCMenu::GetMenuDescriptionMap()
 {
-    if (MenuDescMap.empty())
+    return CMenuMenuDescMap;
+}
+
+void CShellExtCMenu::InitMenuMaps(MenuDescription *menuDescs, std::size_t sz)
+{
+    MenuDescriptionMap& menuDescMap = GetMenuDescriptionMap();
+    if (menuDescMap.empty())
     {
         std::string lang;
         GetRegistryConfig("CMenuLang", lang);
 
-        std::size_t sz = sizeof(menuDescList) / sizeof(MenuDescription);
         for (std::size_t i = 0; i < sz; i++)
         {
-            MenuDescription md = menuDescList[i];
+            MenuDescription md = menuDescs[i];
 
             if (md.name.empty())
             {
@@ -208,8 +198,9 @@ void InitMenuMaps()
             if (!lang.empty())
                 GetCMenuTranslation(lang, md.name, md.menuText, md.helpText);
 
-            MenuDescMap[md.name] = md;
+            menuDescMap[md.name] = md;
         }
+        
     }
 
     MenuIdMap.clear();
@@ -314,19 +305,23 @@ void InsertSubMenuItemWithIcon2(
 }
 
 
-void InsertMenuItemByName(
+void CShellExtCMenu::InsertMenuItemByName(
     HMENU hMenu, const std::string& name, UINT indexMenu,
     UINT idCmd, UINT idCmdFirst, const std::wstring& prefix)
 {
-    MenuDescriptionMap::iterator iter = MenuDescMap.find(name);
-    if (iter == MenuDescMap.end())
+
+    MenuDescriptionMap& menuDescMap = GetMenuDescriptionMap();
+
+    MenuDescriptionMap::iterator iter = menuDescMap.find(name);
+    if (iter == menuDescMap.end())
     {
         TDEBUG_TRACE("***** InsertMenuItemByName: can't find menu info for " << name);
         return;
     }
 
+
     MenuDescription md = iter->second;
-    AddMenuList(idCmd - idCmdFirst, name);
+    AddMenuList(idCmd - idCmdFirst, name, menuDescMap);
     InsertMenuItemWithIcon1(
         hMenu, indexMenu, idCmd, prefix + md.menuText, md.iconName);
 }
@@ -442,7 +437,7 @@ CShellExtCMenu::QueryContextMenu(
         return S_OK;
     }
 
-    InitMenuMaps();
+    InitMenuMaps(CMenuMenuDescList, sizeof(CMenuMenuDescList) / sizeof(MenuDescription));
 
     typedef std::vector<std::string> entriesT;
     typedef entriesT::const_iterator entriesIter;
@@ -883,12 +878,8 @@ void CShellExtCMenu::RunDialog(const std::string &cmd)
     InitStatus::check();
 }
 
-
-STDMETHODIMP CShellExtCMenu::Initialize(
-    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
+void CShellExtCMenu::PrintDebugHeader(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj)
 {
-    TCHAR name[MAX_PATH+1];
-
     TDEBUG_TRACE("CShellExtCMenu::Initialize");
 
     // get installed MSI product id (for debugging purposes for now)
@@ -923,6 +914,14 @@ STDMETHODIMP CShellExtCMenu::Initialize(
 
     TDEBUG_TRACE("  pIDFolder: " << pIDFolder);
     TDEBUG_TRACE("  pDataObj: " << pDataObj);
+}
+
+STDMETHODIMP CShellExtCMenu::Initialize(
+    LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
+{
+    TCHAR name[MAX_PATH+1];
+
+    PrintDebugHeader(pIDFolder, pDataObj);
 
     myFolder.clear();
     myFiles.clear();
@@ -984,8 +983,7 @@ STDMETHODIMP CShellExtCMenu::Initialize(
 }
 
 
-CShellExtCMenu::CShellExtCMenu(char dummy) :
-    m_ppszFileUserClickedOn(0)
+CShellExtCMenu::CShellExtCMenu(const char dummy)
 {
     m_cRef = 0L;
     CShellExt::IncDllRef();    
