@@ -565,9 +565,15 @@ class Workbench(QMainWindow):
     def openRepository(self):
         """ Open repo from File menu """
         caption = _('Select repository directory to open')
+        repoWidget = self.repoTabsWidget.currentWidget()
+        if repoWidget:
+            cwd = os.path.dirname(repoWidget.repo.root)
+        else:
+            cwd = os.getcwd()
+        cwd = hglib.tounicode(cwd)
         FD = QFileDialog
-        path = FD.getExistingDirectory(parent=self, caption=caption,
-            options=FD.ShowDirsOnly | FD.ReadOnly)
+        path = FD.getExistingDirectory(self, caption, cwd,
+                                       FD.ShowDirsOnly | FD.ReadOnly)
         self._openRepo(path=hglib.fromunicode(path))
 
     def _openRepo(self, path, reuse=False):
