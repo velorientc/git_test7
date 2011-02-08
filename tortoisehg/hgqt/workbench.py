@@ -38,15 +38,7 @@ class Workbench(QMainWindow):
         if sys.platform == 'darwin':
             self.setUnifiedTitleAndToolBarOnMac(True)
 
-        self._reload_rev = None
-        self._reload_file = None
-
-        self._loading = True
-        self._scanForRepoChanges = True
-        self._searchWidgets = []
-
         self.setupUi()
-
         self.setWindowTitle(_('TortoiseHg Workbench'))
 
         self.reporegistry = rr = RepoRegistryView(self)
