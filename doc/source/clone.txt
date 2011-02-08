@@ -6,7 +6,7 @@ Clone a repository
 
 To clone a repository you have to run the clone dialog.
 From the explorer context menu select :menuselection:`TortoiseHg... --> Clone a repository`
-or type :command:`hgtk clone`. 
+or type :command:`thg clone`. 
 
 .. figure:: figures/clone.png
 	:alt: Clone dialog
@@ -48,11 +48,11 @@ From command line
 
 The clone tool can be started from command line ::
 
-	hgtk clone
+	thg clone
 
 The syntax is ::
 
-	hgtk clone [SOURCE] [DEST]
+	thg clone [SOURCE] [DEST]
 
 where [SOURCE] and [DEST] are, the paths of source repository and destination folder.
 

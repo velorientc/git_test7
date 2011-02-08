@@ -12,6 +12,9 @@ import gnomevfs
 import os
 import sys
 
+thg_main     = 'thg'
+idstr_prefix = 'HgNautilus2'
+
 if gtk.gtk_version < (2, 14, 0):
     # at least on 2.12.12, gtk widgets can be confused by control
     # char markups (like "&#x1;"), so use cgi.escape instead
@@ -65,7 +68,7 @@ class HgExtensionDefault:
         self.inv_dirs = set()
 
         from tortoisehg.util import menuthg
-        self.hgtk = paths.find_in_path('hgtk')
+        self.hgtk = paths.find_in_path(thg_main)
         self.menu = menuthg.menuThg()
         self.notify = os.path.expanduser('~/.tortoisehg/notify')
         try:
@@ -171,7 +174,7 @@ class HgExtensionDefault:
         else: #bg
             passcwd = self.cwd
         for menu_info in menus:
-            idstr = 'HgNautilus::%02d%s' % (self.pos, menu_info.hgcmd)
+            idstr = '%s::%02d%s' % (idstr_prefix ,self.pos, menu_info.hgcmd)
             self.pos += 1
             if menu_info.isSep():
                 # can not insert a separator till now
@@ -212,7 +215,7 @@ class HgExtensionDefault:
             return self.buildMenu(vfs_files, False)
 
     def get_columns(self):
-        return nautilus.Column("HgNautilus::80hg_status",
+        return nautilus.Column(idstr_prefix + "::80hg_status",
                                "hg_status",
                                "Hg Status",
                                "Version control status"),

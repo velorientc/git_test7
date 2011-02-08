@@ -1,0 +1,7 @@
+The history viewer of TortoiseHg is based on hgview
+<http://www.logilab.org/project/hgview>, a tool developped by David
+Douard <david.douard@logilab.fr> and others, with the financial
+support of Logilab <http://www.logilab.fr>
+
+TortoiseHg Windows installers include TortoiseOverlays handlers, as
+provided by the TortoiseSVN project <http://tortoisesvn.net/>

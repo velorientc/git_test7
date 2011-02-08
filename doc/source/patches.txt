@@ -46,12 +46,9 @@ of the hgrc documentation.
 Applying a patch is not a foolproof operation.  If the source file has
 diverged from the file that was used to create the patch, there may be
 conflicts during the patch application.  These are written to a file
-with an .rej extension.  TortoiseHg 1.0 includes an experimental
-:command:`hgtk mpatch` command that can try *harder* to apply the
-rejected patch hunks.  This command is based on Chris Mason's `mpatch
-<http://oss.oracle.com/~mason/mpatch/>`_ utility.  If mpatch cannot
-apply the rejected hunks, your only remaining choice is to apply them by
-hand.
+with an .rej extension.  TortoiseHg 2.0 includes an experimental
+:command:`thg rejects` command that can aid in the merging of the
+rejected chunks into the source file.
 
 
 Export Patches
@@ -132,13 +129,11 @@ Import Patches
 	Import dialog of Repository Explorer
 
 The import dialog can be opened from the sync bar or menu of the
-Repository Explorer, or via :command:`hgtk import`.  The dialog supports
-file and directory drag and drop.  The drop down menu in the upper right
-corner next to the :guilabel:`Browse` button has the options:
-:guilabel:`Browse Directory..` and :guilabel:`Import from Clipboard`.
+Repository Explorer, or via :command:`thg import`.  The dialog supports
+file and directory drag and drop.  
 
-You have the choice of importing directly into the repository, or
-importing into your patch queue.
+You have the choice of importing directly into the repository, the
+working folder, or your patch queue.
 
 .. note::
 	Importing a patch requires a clean working directory state.  You

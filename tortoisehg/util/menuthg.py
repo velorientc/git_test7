@@ -28,9 +28,6 @@ thgcmenu = {
     'status':     { 'label': _('File Status'),
                     'help':  _('Repository status & changes'),
                     'icon':  'menushowchanged.ico'},
-    'shelve':     { 'label': _('Shelve Changes'),
-                    'help':  _('Shelve or unshelve file changes'),
-                    'icon':  'shelve.ico'},
     'add':        { 'label': _('Add Files...'),
                     'help':  _('Add files to version control'),
                     'icon':  'menuadd.ico'},
@@ -46,10 +43,10 @@ thgcmenu = {
     'rename':     { 'label': _('Rename File'),
                     'help':  _('Rename file or directory'),
                     'icon':  'general.ico'},
-    'log':        { 'label': _('Repository Explorer'),
+    'workbench':  { 'label': _('Workbench'),
                     'help':  _('View change history in repository'),
                     'icon':  'menulog.ico'},
-    'history':    { 'label': _('File History'),
+    'log':        { 'label': _('File History'),
                     'help':  _('View change history of selected files'),
                     'icon':  'menulog.ico'},
     'synch':      { 'label': _('Synchronize'),
@@ -61,9 +58,6 @@ thgcmenu = {
     'update':     { 'label': _('Update...'),
                     'help':  _('Update working directory'),
                     'icon':  'menucheckout.ico'},
-    'recover':    { 'label': _('Recovery...'),
-                    'help':  _('Repair and recovery of repository'),
-                    'icon':  'general.ico'},
     'thgstatus':  { 'label': _('Update Icons'),
                     'help':  _('Update icons for this repository'),
                     'icon':  'refresh_overlays.ico'},
@@ -79,9 +73,6 @@ thgcmenu = {
     'about':      { 'label': _('About TortoiseHg'),
                     'help':  _('Show About Dialog'),
                     'icon':  'menuabout.ico'},
-    'datamine':   { 'label': _('Annotate Files'),
-                    'help':  _('Changeset information per file line'),
-                    'icon':  'menublame.ico'},
     'vdiff':      { 'label': _('Visual Diff'),
                     'help':  _('View changes using GUI diff tool'),
                     'icon':  'TortoiseMerge.ico'},
@@ -298,8 +289,6 @@ class menuThg:
             menu.add_menu('hgignore')
         if changed or cachethg.UNKNOWN in states:
             menu.add_menu('status')
-        if modified:
-            menu.add_menu('shelve')
 
         # Visual Diff (any extdiff command)
         has_vdiff = repo.ui.config('tortoisehg', 'vdiff', 'vdiff') != ''
@@ -318,21 +307,16 @@ class menuThg:
         if files and changed:
             menu.add_menu('revert')
 
-        # we can only annotate file but not directories
-        if onlyfiles and tracked:
-            menu.add_menu('datamine')
-
         menu.add_sep()
 
         if tracked:
-            menu.add_menu(files and 'history' or 'log')
+            menu.add_menu(files and 'log' or 'workbench')
 
         if len(files) == 0:
             menu.add_sep()
             menu.add_menu('grep')
             menu.add_sep()
             menu.add_menu('synch')
-            menu.add_menu('recover')
             menu.add_menu('serve')
             menu.add_sep()
             menu.add_menu('clone')
