@@ -1,11 +1,19 @@
 <Include>
-  <!-- cmenu COM component -->
+  <!-- cmenu COM components -->
   <RegistryValue
     Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)'
     Type='string' Value='TortoiseHg'
   />
   <RegistryValue
     Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+    Type='string' Name='ThreadingModel' Value='Apartment'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgDropHandler)'
+    Type='string' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgDropHandler)\InProcServer32'
     Type='string' Name='ThreadingModel' Value='Apartment'
   />
 
@@ -47,10 +55,20 @@
     Type='string' Value='$(var.CLSID_TortoiseHgCmenu)'
   />
 
+  <!-- Drag and Drop Handler -->
+  <RegistryValue
+    Root='HKCR' Key='Directory\shellex\DragDropHandlers\TortoiseHg'
+    Type='string' Value='$(var.CLSID_TortoiseHgDropHandler)'
+  />
+
   <!-- Mark all as approved -->
   <RegistryValue
     Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
     Type='string' Name='$(var.CLSID_TortoiseHgCmenu)' Value='TortoiseHg'
+  />
+  <RegistryValue
+    Root='HKLM' Key='Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved'
+    Type='string' Name='$(var.CLSID_TortoiseHgDropHandler)' Value='TortoiseHg'
   />
 
 </Include>
