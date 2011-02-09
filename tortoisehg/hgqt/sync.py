@@ -475,7 +475,7 @@ class SyncWidget(QWidget):
             alias = 'default'
         else:
             alias = 'new'
-        url = hglib.fromunicode(self.urllabel.text())
+        url = self.currentUrl(False)
         dlg = SaveDialog(self.repo, alias, url, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
