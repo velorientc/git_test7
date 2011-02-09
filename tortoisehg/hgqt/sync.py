@@ -187,7 +187,7 @@ class SyncWidget(QWidget):
         pathsbox = QVBoxLayout()
         pathsbox.setContentsMargins(0, 0, 0, 0)
         pathsframe.setLayout(pathsbox)
-        lbl = QLabel(_('<b>Configured Paths</b>'))
+        lbl = QLabel(_('<b>Saved Paths</b>'))
         pathsbox.addWidget(lbl)
         pathsbox.addWidget(self.hgrctv)
         hbox.addWidget(pathsframe)
