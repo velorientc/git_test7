@@ -53,11 +53,6 @@ class RepoWidget(QWidget):
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
 
-    singlecmenu = None
-    unappcmenu = None
-    paircmenu = None
-    multicmenu = None
-
     def __init__(self, repo, parent=None):
         QWidget.__init__(self, parent, acceptDrops=True)
 
@@ -417,6 +412,10 @@ class RepoWidget(QWidget):
 
     def createActions(self):
         QShortcut(QKeySequence('CTRL+P'), self, self.gotoParent)
+        self.generateSingleMenu()
+        self.generatePairMenu()
+        self.generateUnappliedPatchMenu()
+        self.generateMultipleSelectionMenu()
 
     def dragEnterEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
@@ -762,122 +761,7 @@ class RepoWidget(QWidget):
         else:
             self.multipleSelectionMenu(point, selection)
 
-    def unnapliedPatchMenu(self, point, selection):
-        def qdeleteact():
-            """Delete unapplied patch(es)"""
-            dlg = qdelete.QDeleteDialog(self.repo, self.menuselection, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.output.connect(self.output)
-            dlg.makeLogVisible.connect(self.makeLogVisible)
-            dlg.exec_()
-        def qreorderact():
-            def checkGuardsOrComments():
-                cont = True
-                for p in self.repo.mq.full_series:
-                    if '#' in p:
-                        cont = QuestionMsgBox('Confirm qreorder',
-                                _('<p>ATTENTION!<br>'
-                                  'Guard or comment found.<br>'
-                                  'Reordering patches will destroy them.<br>'
-                                  '<br>Continue?</p>'), parent=self,
-                                  defaultbutton=QMessageBox.No)
-                        break
-                return cont
-            if checkGuardsOrComments():
-                dlg = qreorder.QReorderDialog(self.repo, self)
-                dlg.finished.connect(dlg.deleteLater)
-                dlg.exec_()
-        def qfoldact():
-            dlg = qfold.QFoldDialog(self.repo, self.menuselection, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.output.connect(self.output)
-            dlg.makeLogVisible.connect(self.makeLogVisible)
-            dlg.exec_()
-
-        # Special menu for unapplied patches
-        if not self.unappcmenu:
-            menu = QMenu(self)
-            acts = []
-            for name, cb in (
-                (_('Goto patch'), self.qgotoRevision),
-                (_('Rename patch'), self.qrenameRevision),
-                (_('Fold patches'), qfoldact),
-                (_('Delete patches'), qdeleteact),
-                (_('Reorder patches'), qreorderact)):
-                act = QAction(name, self)
-                act.triggered.connect(cb)
-                acts.append(act)
-                menu.addAction(act)
-            self.unappcmenu = menu
-            self.unappacts = acts
-        self.menuselection = selection
-        self.unappacts[0].setEnabled(len(selection) == 1)
-        self.unappacts[1].setEnabled(len(selection) == 1)
-        self.unappacts[2].setEnabled('qtip' in self.repo.tags())
-        self.unappcmenu.exec_(point)
-
     def singleSelectionMenu(self, point, selection):
-        if not self.singlecmenu:
-            items = []
-
-            # isrev = the changeset has an integer revision number
-            # isctx = changectx or workingctx, not PatchContext
-            # fixed = the changeset is considered permanent
-            # patch = any patch applied or not
-            # qpar  = patch queue parent
-            isrev   = lambda ap, up, qp, wd: not (up or wd)
-            isctx   = lambda ap, up, qp, wd: not up
-            fixed   = lambda ap, up, qp, wd: not (ap or up or wd)
-            patch   = lambda ap, up, qp, wd: ap or up
-            qpar    = lambda ap, up, qp, wd: qp
-            applied = lambda ap, up, qp, wd: ap
-            unapp   = lambda ap, up, qp, wd: up
-
-            exs = self.repo.extensions()
-            menu = QMenu(self)
-            for ext, func, desc, icon, cb in (
-                (None, isrev, _('Update...'), 'update',
-                    self.updateToRevision),
-                (None, fixed, _('Merge with...'), 'merge',
-                    self.mergeWithRevision),
-                (None, isctx, _('Browse at rev...'), None,
-                    self.manifestRevision),
-                (None, fixed, _('Tag...'), 'tag', self.tagToRevision),
-                ('bookmarks', fixed, _('Bookmark...'), 'bookmark',
-                    self.bookmarkRevision),
-                (None, fixed, _('Backout...'), None, self.backoutToRevision),
-                (None, isrev, _('Export patch'), None, self.exportRevisions),
-                (None, isrev, _('Email patch...'), None, self.emailRevision),
-                (None, isrev, _('Archive...'), None, self.archiveRevision),
-                (None, isrev, _('Copy hash'), None, self.copyHash),
-                ('transplant', fixed, _('Transplant to local'), None,
-                    self.transplantRevision),
-                ('rebase', None, None, None, None),
-                ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
-                ('mq', None, None, None, None),
-                ('mq', fixed, _('Import to MQ'), None, self.qimportRevision),
-                ('mq', applied, _('Finish patch'), None, self.qfinishRevision),
-                ('mq', qpar, _('Pop all patches'), None, self.qpopAllRevision),
-                ('mq', patch, _('Goto patch'), None, self.qgotoRevision),
-                ('mq', patch, _('Rename patch'), None, self.qrenameRevision),
-                ('mq', fixed, _('Strip...'), None, self.stripRevision),
-                ('reviewboard', fixed, _('Post to Review Board...'),
-                    'reviewboard', self.sendToReviewBoard)):
-                if ext and ext not in exs:
-                    continue
-                if desc is None:
-                    menu.addSeparator()
-                else:
-                    act = QAction(desc, self)
-                    act.triggered.connect(cb)
-                    if icon:
-                        act.setIcon(geticon(icon))
-                    act.enableFunc = func
-                    menu.addAction(act)
-                    items.append(act)
-            self.singlecmenu = menu
-            self.singlecmenuitems = items
-
         ctx = self.repo.changectx(self.rev)
         applied = ctx.thgmqappliedpatch()
         unapp = ctx.thgmqunappliedpatch()
@@ -890,21 +774,88 @@ class RepoWidget(QWidget):
 
         self.singlecmenu.exec_(point)
 
-    def exportRevisions(self, revisions):
-        if not revisions:
-            revisions = [self.rev]
-        epath = os.path.join(self.repo.root, self.repo.shortname + '_%r.patch')
-        cmdline = ['export', '--repository', self.repo.root, '--verbose',
-                   '--output', epath]
-        for rev in revisions:
-            cmdline.extend(['--rev', str(rev)])
-        self.runCommand(_('Export - TortoiseHg'), cmdline)
-
     def doubleSelectionMenu(self, point, selection):
         for r in selection:
             # No pair menu if working directory or unapplied patch
             if type(r) is not int:
                 return
+        self.menuselection = selection
+        self.paircmenu.exec_(point)
+
+    def multipleSelectionMenu(self, point, selection):
+        for r in selection:
+            # No multi menu if working directory or unapplied patch
+            if type(r) is not int:
+                return
+        self.menuselection = selection
+        self.multicmenu.exec_(point)
+
+    def unnapliedPatchMenu(self, point, selection):
+        self.menuselection = selection
+        self.unappacts[0].setEnabled(len(selection) == 1)
+        self.unappacts[1].setEnabled(len(selection) == 1)
+        self.unappacts[2].setEnabled('qtip' in self.repo.tags())
+        self.unappcmenu.exec_(point)
+
+    def generateSingleMenu(self):
+        items = []
+
+        # isrev = the changeset has an integer revision number
+        # isctx = changectx or workingctx, not PatchContext
+        # fixed = the changeset is considered permanent
+        # patch = any patch applied or not
+        # qpar  = patch queue parent
+        isrev   = lambda ap, up, qp, wd: not (up or wd)
+        isctx   = lambda ap, up, qp, wd: not up
+        fixed   = lambda ap, up, qp, wd: not (ap or up or wd)
+        patch   = lambda ap, up, qp, wd: ap or up
+        qpar    = lambda ap, up, qp, wd: qp
+        applied = lambda ap, up, qp, wd: ap
+        unapp   = lambda ap, up, qp, wd: up
+
+        exs = self.repo.extensions()
+        menu = QMenu(self)
+        for ext, func, desc, icon, cb in (
+            (None, isrev, _('Update...'), 'update',
+                self.updateToRevision),
+            (None, fixed, _('Merge with...'), 'merge',
+                self.mergeWithRevision),
+            (None, isctx, _('Browse at rev...'), None,
+                self.manifestRevision),
+            (None, fixed, _('Tag...'), 'tag', self.tagToRevision),
+            ('bookmarks', fixed, _('Bookmark...'), 'bookmark',
+                self.bookmarkRevision),
+            (None, fixed, _('Backout...'), None, self.backoutToRevision),
+            (None, isrev, _('Export patch'), None, self.exportRevisions),
+            (None, isrev, _('Email patch...'), None, self.emailRevision),
+            (None, isrev, _('Archive...'), None, self.archiveRevision),
+            (None, isrev, _('Copy hash'), None, self.copyHash),
+            ('transplant', fixed, _('Transplant to local'), None,
+                self.transplantRevision),
+            ('rebase', None, None, None, None),
+            ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
+            ('mq', None, None, None, None),
+            ('mq', fixed, _('Import to MQ'), None, self.qimportRevision),
+            ('mq', applied, _('Finish patch'), None, self.qfinishRevision),
+            ('mq', fixed, _('Strip...'), None, self.stripRevision),
+            ('reviewboard', fixed, _('Post to Review Board...'),
+                'reviewboard', self.sendToReviewBoard)):
+            if ext and ext not in exs:
+                continue
+            if desc is None:
+                menu.addSeparator()
+            else:
+                act = QAction(desc, self)
+                act.triggered.connect(cb)
+                if icon:
+                    act.setIcon(geticon(icon))
+                act.enableFunc = func
+                menu.addAction(act)
+                items.append(act)
+        self.singlecmenu = menu
+        self.singlecmenuitems = items
+
+    def generatePairMenu(self):
         def dagrange():
             revA, revB = self.menuselection
             if revA > revB:
@@ -960,55 +911,99 @@ class RepoWidget(QWidget):
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
 
+        menu = QMenu(self)
+        for name, cb in (
+                (_('Visual Diff...'), diffPair),
+                (_('Export Pair'), exportPair),
+                (_('Email Pair...'), emailPair),
+                (_('Export DAG Range'), exportDagRange),
+                (_('Email DAG Range...'), emailDagRange),
+                (_('Bisect - Good, Bad...'), bisectNormal),
+                (_('Bisect - Bad, Good...'), bisectReverse),
+                (_('Compress History...'), compressDlg)
+                ):
+            a = QAction(name, self)
+            a.triggered.connect(cb)
+            menu.addAction(a)
+        if 'reviewboard' in self.repo.extensions():
+            a = QAction(_('Post Pair to Review Board...'), self)
+            a.triggered.connect(self.sendToReviewBoard)
+            menu.addAction(a)
+        self.paircmenu = menu
 
-        if not self.paircmenu:
-            menu = QMenu(self)
-            for name, cb in (
-                    (_('Visual Diff...'), diffPair),
-                    (_('Export Pair'), exportPair),
-                    (_('Email Pair...'), emailPair),
-                    (_('Export DAG Range'), exportDagRange),
-                    (_('Email DAG Range...'), emailDagRange),
-                    (_('Bisect - Good, Bad...'), bisectNormal),
-                    (_('Bisect - Bad, Good...'), bisectReverse),
-                    (_('Compress History...'), compressDlg)
-                    ):
-                a = QAction(name, self)
-                a.triggered.connect(cb)
-                menu.addAction(a)
-            if 'reviewboard' in self.repo.extensions():
-                a = QAction(_('Post Pair to Review Board...'), self)
-                a.triggered.connect(self.sendToReviewBoard)
-                menu.addAction(a)
-            self.paircmenu = menu
-        self.menuselection = selection
-        self.paircmenu.exec_(point)
+    def generateUnappliedPatchMenu(self):
+        def qdeleteact():
+            """Delete unapplied patch(es)"""
+            dlg = qdelete.QDeleteDialog(self.repo, self.menuselection, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.output.connect(self.output)
+            dlg.makeLogVisible.connect(self.makeLogVisible)
+            dlg.exec_()
+        def qreorderact():
+            def checkGuardsOrComments():
+                cont = True
+                for p in self.repo.mq.full_series:
+                    if '#' in p:
+                        cont = QuestionMsgBox('Confirm qreorder',
+                                _('<p>ATTENTION!<br>'
+                                  'Guard or comment found.<br>'
+                                  'Reordering patches will destroy them.<br>'
+                                  '<br>Continue?</p>'), parent=self,
+                                  defaultbutton=QMessageBox.No)
+                        break
+                return cont
+            if checkGuardsOrComments():
+                dlg = qreorder.QReorderDialog(self.repo, self)
+                dlg.finished.connect(dlg.deleteLater)
+                dlg.exec_()
+        def qfoldact():
+            dlg = qfold.QFoldDialog(self.repo, self.menuselection, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.output.connect(self.output)
+            dlg.makeLogVisible.connect(self.makeLogVisible)
+            dlg.exec_()
 
-    def multipleSelectionMenu(self, point, selection):
-        for r in selection:
-            # No multi menu if working directory or unapplied patch
-            if type(r) is not int:
-                return
+        menu = QMenu(self)
+        acts = []
+        for name, cb in (
+            (_('Fold patches'), qfoldact),
+            (_('Delete patches'), qdeleteact),
+            (_('Reorder patches'), qreorderact)):
+            act = QAction(name, self)
+            act.triggered.connect(cb)
+            acts.append(act)
+            menu.addAction(act)
+        self.unappcmenu = menu
+        self.unappacts = acts
+
+    def generateMultipleSelectionMenu(self):
         def exportSel():
             self.exportRevisions(self.menuselection)
         def emailSel():
             run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
-        if not self.multicmenu:
-            menu = QMenu(self)
-            for name, cb in (
-                    (_('Export Selected'), exportSel),
-                    (_('Email Selected...'), emailSel),
-                    ):
-                a = QAction(name, self)
-                a.triggered.connect(cb)
-                menu.addAction(a)
-            if 'reviewboard' in self.repo.extensions():
-                a = QAction(_('Post Selected to Review Board...'), self)
-                a.triggered.connect(self.sendToReviewBoard)
-                menu.addAction(a)
-            self.multicmenu = menu
-        self.menuselection = selection
-        self.multicmenu.exec_(point)
+        menu = QMenu(self)
+        for name, cb in (
+                (_('Export Selected'), exportSel),
+                (_('Email Selected...'), emailSel),
+                ):
+            a = QAction(name, self)
+            a.triggered.connect(cb)
+            menu.addAction(a)
+        if 'reviewboard' in self.repo.extensions():
+            a = QAction(_('Post Selected to Review Board...'), self)
+            a.triggered.connect(self.sendToReviewBoard)
+            menu.addAction(a)
+        self.multicmenu = menu
+
+    def exportRevisions(self, revisions):
+        if not revisions:
+            revisions = [self.rev]
+        epath = os.path.join(self.repo.root, self.repo.shortname + '_%r.patch')
+        cmdline = ['export', '--repository', self.repo.root, '--verbose',
+                   '--output', epath]
+        for rev in revisions:
+            cmdline.extend(['--rev', str(rev)])
+        self.runCommand(_('Export - TortoiseHg'), cmdline)
 
     def updateToRevision(self):
         dlg = update.UpdateDialog(self.repo, self.rev, self)
@@ -1095,26 +1090,15 @@ class RepoWidget(QWidget):
                    '--repository', self.repo.root]
         self.runCommand(_('QFinish - TortoiseHg'), cmdline)
 
-    def qpopAllRevision(self):
-        """Unapply all patches"""
-        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
-        self.mqDemand.get().onPopAll()
-
     def qgotoRevision(self):
         """Make REV the top applied patch"""
-        patchname = self.repo.changectx(self.rev).thgmqpatchname()
-        cmdline = ['qgoto', str(patchname),  # FIXME force option
-                   '--repository', self.repo.root]
+        ctx = self.repo.changectx(self.rev)
+        if 'qparent' in ctx.tags():
+            cmdline = ['qpop', '--all', '--repository', self.repo.root]
+        else:
+            patchname = self.repo.changectx(self.rev).thgmqpatchname()
+            cmdline = ['qgoto', str(patchname), '--repository', self.repo.root]
         self.runCommand(_('QGoto - TortoiseHg'), cmdline)
-
-    def qrenameRevision(self):
-        """Rename the selected MQ patch"""
-        patchname = self.repo.changectx(self.rev).thgmqpatchname()
-        dlg = qrename.QRenameDialog(self.repo, patchname, self)
-        dlg.finished.connect(dlg.deleteLater)
-        dlg.output.connect(self.output)
-        dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.exec_()
 
     def runCommand(self, title, cmdline):
         if self.runner:
