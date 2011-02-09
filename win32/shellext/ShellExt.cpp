@@ -5,6 +5,7 @@
 #include "InitStatus.h"
 #include "ThgClassFactory.h"
 #include "CShellExtCMenu.h"
+#include "CShellExtDnd.h"
 #include "CShellExtOverlay.h"
 #include "ThgCLSIDs.h"
 
@@ -13,6 +14,7 @@
 #define TOLSTR2(x)  TOLSTR(x)
 
 #define CLSID_TortoiseHgCmenu  TOLSTR2(THG_CLSID_TortoiseHgCmenu)
+#define CLSID_TortoiseHgDropHandler  TOLSTR2(THG_CLSID_TortoiseHgDropHandler)
 #define CLSID_TortoiseHgNormal       TOLSTR2(THG_CLSID_TortoiseHgNormal)
 #define CLSID_TortoiseHgAdded        TOLSTR2(THG_CLSID_TortoiseHgAdded)
 #define CLSID_TortoiseHgModified     TOLSTR2(THG_CLSID_TortoiseHgModified)
@@ -88,11 +90,18 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 
     typedef ThgClassFactory<CShellExtOverlay> FactOvl;
     typedef ThgClassFactory<CShellExtCMenu>   FactCmenu;
+    typedef ThgClassFactory<CShellExtDnd>     FactDnd;
 
     if (clsid == CLSID_TortoiseHgCmenu)
     {
         FactCmenu *pcf = new FactCmenu(0);
         TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgCmenu");
+        return pcf->QueryInterface(riid, ppvOut);
+    }
+    else if (clsid == CLSID_TortoiseHgDropHandler)
+    {
+        FactDnd *pcf = new FactDnd(0);
+        TDEBUG_TRACE("DllGetClassObject clsname = " << "CLSID_TortoiseHgDropHandler");
         return pcf->QueryInterface(riid, ppvOut);
     }
     else if (clsid == CLSID_TortoiseHgNormal)
