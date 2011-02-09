@@ -1001,6 +1001,8 @@ class SecureDialog(QDialog):
         self.alias = host.replace('.', '')
         self.setLayout(QVBoxLayout())
 
+        self.layout().addWidget(QLabel(_('<b>Host:</b> %s') % uhost))
+
         securebox = QGroupBox(_('Secure HTTPS Connection'))
         self.layout().addWidget(securebox)
         vbox = QVBoxLayout()
