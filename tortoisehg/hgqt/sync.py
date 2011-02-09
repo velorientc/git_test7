@@ -141,20 +141,37 @@ class SyncWidget(QWidget):
 
         urlbox = QGroupBox(_('Current URL'))
         self.layout().addWidget(urlbox)
+        vbox = QVBoxLayout()
+        vbox.setSpacing(4)
+        urlbox.setLayout(vbox)
+
         hbox = QHBoxLayout()
-        urlbox.setLayout(hbox)
         hbox.setSpacing(4)
+        vbox.addLayout(hbox)
 
         self.schemecombo = QComboBox()
         for s in _schemes:
             self.schemecombo.addItem(s)
         self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
         hbox.addWidget(self.schemecombo)
+        self.securebutton = QPushButton(_('Security'))
+        self.securebutton.setToolTip(
+            _('Manage HTTPS connection security and user authentication'))
+        hbox.addWidget(self.securebutton)
+        self.savebutton = QPushButton(_('Save'))
+        self.savebutton.setToolTip(
+            _('Save current URL under an alias'))
+        hbox.addStretch(1)
+        hbox.addWidget(self.savebutton)
+
+        hbox = QHBoxLayout()
+        hbox.setSpacing(4)
+        vbox.addLayout(hbox)
         hbox.addWidget(QLabel(_('Hostname:')))
         self.hostentry = QLineEdit()
         self.hostentry.setAcceptDrops(False)
         self.hostentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.hostentry)
+        hbox.addWidget(self.hostentry, 1)
         hbox.addWidget(QLabel(_('Port:')))
         self.portentry = QLineEdit()
         self.portentry.setAcceptDrops(False)
@@ -167,14 +184,6 @@ class SyncWidget(QWidget):
         self.pathentry.setAcceptDrops(False)
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
-        self.securebutton = QPushButton(_('Security'))
-        self.securebutton.setToolTip(
-            _('Manage HTTPS connection security and user authentication'))
-        hbox.addWidget(self.securebutton)
-        self.savebutton = QPushButton(_('Save'))
-        self.savebutton.setToolTip(
-            _('Save current URL under an alias'))
-        hbox.addWidget(self.savebutton)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
