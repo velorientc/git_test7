@@ -13,6 +13,8 @@ TortoiseHg About dialog - PyQt4 version
 
 import os, sys, urllib2
 
+from mercurial import ui, url
+
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import version, hglib, shlib, paths
@@ -162,8 +164,9 @@ class AboutUpdateThread(QThread):
     def run(self):
         verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
         newver = (0,0,0)
+        opener = url.opener(ui.ui())
         try:
-            f = urllib2.urlopen(verurl).read().splitlines()
+            f = opener.open(verurl).read().splitlines()
             newver = tuple([int(p) for p in f[0].split('.')])
             upgradeurl = f[1] # generic download URL
             platform = sys.platform
@@ -172,9 +175,9 @@ class AboutUpdateThread(QThread):
                 platform = IsX64() and 'x64' or 'x86'
             # linux2 for Linux, darwin for OSX
             for line in f[2:]:
-                p, url = line.split(':')
+                p, _url = line.split(':')
                 if platform == p:
-                    upgradeurl = url.strip()
+                    upgradeurl = _url.strip()
                     break
         except:
             pass
