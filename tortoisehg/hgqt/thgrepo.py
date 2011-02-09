@@ -45,11 +45,14 @@ def repository(_ui=None, path='', create=False, bundle=None):
     if create or path not in _repocache:
         if _ui is None:
             _ui = uimod.ui()
-        repo = hg.repository(_ui, path, create)
-        repo._pyqtobj = ThgRepoWrapper(repo)
-        repo.__class__ = _extendrepo(repo)
-        _repocache[path] = repo
-        return repo
+        try:
+            repo = hg.repository(_ui, path, create)
+            repo._pyqtobj = ThgRepoWrapper(repo)
+            repo.__class__ = _extendrepo(repo)
+            _repocache[path] = repo
+            return repo
+        except EnvironmentError:
+            raise error.RepoError('Cannot open repository at %s' % path)
     if not os.path.exists(os.path.join(path, '.hg/')):
         del _repocache[path]
         # this error must be in local encoding
