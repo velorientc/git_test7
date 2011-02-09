@@ -27,6 +27,27 @@ from binascii import hexlify
 
 _schemes = ['local', 'ssh', 'http', 'https']
 
+def parseurl(path):
+    m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
+    if m:
+        user = m.group(2)
+        host = m.group(3)
+        port = m.group(5)
+        folder = m.group(7) or '.'
+        passwd = ''
+        scheme = 'ssh'
+    elif path.startswith('http://') or path.startswith('https://'):
+        snpaqf = urlparse.urlparse(path)
+        scheme, netloc, folder, params, query, fragment = snpaqf
+        host, port, user, passwd = url.netlocsplit(netloc)
+        if folder.startswith('/'):
+            folder = folder[1:]
+    else:
+        user, host, port, passwd = [''] * 4
+        folder = path
+        scheme = 'local'
+    return user, host, port, folder, passwd, scheme
+
 class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
     incomingBundle = pyqtSignal(QString)
@@ -343,7 +364,7 @@ class SyncWidget(QWidget):
     def setUrl(self, newurl):
         'User has selected a new URL: newurl is expected in local encoding'
         try:
-            user, host, port, folder, passwd, scheme = self.urlparse(newurl)
+            user, host, port, folder, passwd, scheme = parseurl(newurl)
         except TypeError:
             return
         self.updateInProgress = True
@@ -376,26 +397,6 @@ class SyncWidget(QWidget):
             self.setUrl(hglib.fromunicode(text))
             event.accept()
 
-    def urlparse(self, path):
-        m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
-        if m:
-            user = m.group(2)
-            host = m.group(3)
-            port = m.group(5)
-            folder = m.group(7) or '.'
-            passwd = ''
-            scheme = 'ssh'
-        elif path.startswith('http://') or path.startswith('https://'):
-            snpaqf = urlparse.urlparse(path)
-            scheme, netloc, folder, params, query, fragment = snpaqf
-            host, port, user, passwd = url.netlocsplit(netloc)
-            if folder.startswith('/'): folder = folder[1:]
-        else:
-            user, host, port, passwd = [''] * 4
-            folder = path
-            scheme = 'local'
-        return user, host, port, folder, passwd, scheme
-
     def canExit(self):
         return not self.cmd.core.running()
 
@@ -422,7 +423,7 @@ class SyncWidget(QWidget):
 
     def exploreurl(self):
         url = hglib.fromunicode(self.menuurl)
-        u, h, p, folder, pw, scheme = self.urlparse(url)
+        u, h, p, folder, pw, scheme = parseurl(url)
         if scheme == 'local':
             QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
         else:
@@ -430,7 +431,7 @@ class SyncWidget(QWidget):
 
     def terminalurl(self):
         url = hglib.fromunicode(self.menuurl)
-        u, h, p, folder, pw, scheme = self.urlparse(url)
+        u, h, p, folder, pw, scheme = parseurl(url)
         if scheme != 'local':
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
@@ -532,7 +533,7 @@ class SyncWidget(QWidget):
                     parent=self)
             return
 
-        user, host, port, folder, passwd, scheme = self.urlparse(url)
+        user, host, port, folder, passwd, scheme = parseurl(url)
         if scheme == 'https':
             if self.repo.ui.configbool('insecurehosts', host):
                 cmdline.append('--insecure')
