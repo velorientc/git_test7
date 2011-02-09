@@ -476,7 +476,8 @@ class SyncWidget(QWidget):
         else:
             alias = 'new'
         url = self.currentUrl(False)
-        dlg = SaveDialog(self.repo, alias, url, self)
+        safeurl = self.currentUrl(True)
+        dlg = SaveDialog(self.repo, alias, url, safeurl, self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
@@ -889,34 +890,53 @@ class PostPullDialog(QDialog):
         super(PostPullDialog, self).reject()
 
 class SaveDialog(QDialog):
-    def __init__(self, repo, alias, url, parent):
+    def __init__(self, repo, alias, url, safeurl, parent):
         super(SaveDialog, self).__init__(parent)
+
+        self.setWindowTitle(_('Save Peer Path'))
+        self.setWindowFlags(self.windowFlags() &
+                            ~Qt.WindowContextHelpButtonHint)
+
         self.repo = repo
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(_('Alias')))
-        self.aliasentry = QLineEdit(alias)
-        hbox.addWidget(self.aliasentry, 1)
-        layout.addLayout(hbox)
-        hbox = QHBoxLayout()
-        hbox.addWidget(QLabel(_('URL')))
-        self.urlentry = QLineEdit(url)
-        fontm = QFontMetrics(self.font())
-        self.urlentry.setFixedWidth(fontm.width(url)+5)
-        hbox.addWidget(self.urlentry, 1)
-        layout.addLayout(hbox)
+        self.origurl = url
+        self.setLayout(QFormLayout(fieldGrowthPolicy=QFormLayout.ExpandingFieldsGrow))
+
+        self.aliasentry = QLineEdit(hglib.tounicode(alias))
+        self.aliasentry.selectAll()
+        self.layout().addRow(_('Alias'), self.aliasentry)
+
+        self.urllabel = QLabel(hglib.tounicode(safeurl))
+        self.layout().addRow(_('URL'), self.urllabel)
+
+        user, host, port, folder, passwd, scheme = parseurl(url)
+        if user or passwd:
+            cleanurl = '://'.join([scheme, host])
+            if port:
+                cleanurl = ':'.join([cleanurl, port])
+            if folder:
+                cleanurl = '/'.join([cleanurl, folder])
+            def showurl(showclean):
+                newurl = showclean and cleanurl or safeurl
+                self.urllabel.setText(hglib.tounicode(newurl))
+            self.cleanurl = cleanurl
+            self.clearcb = QCheckBox(_('Remove authentication data from URL'))
+            self.clearcb.setToolTip(
+                _('User authentication data should be associated with the '
+                  'hostname using the security dialog.'))
+            self.clearcb.toggled.connect(showurl)
+            self.clearcb.setChecked(True)
+            self.layout().addRow(self.clearcb)
+        else:
+            self.clearcb = None
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         bb.button(BB.Save).setAutoDefault(True)
         self.bb = bb
-        layout.addWidget(bb)
-        self.aliasentry.selectAll()
-        self.setWindowTitle(_('Save Peer Path'))
-        self.setWindowFlags(self.windowFlags() &
-                            ~Qt.WindowContextHelpButtonHint)
+        self.layout().addRow(None, bb)
+
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
     def accept(self):
@@ -929,7 +949,10 @@ class SaveDialog(QDialog):
         if fn is None:
             return
         alias = hglib.fromunicode(self.aliasentry.text())
-        path = hglib.fromunicode(self.urlentry.text())
+        if self.clearcb and self.clearcb.isChecked():
+            path = self.cleanurl
+        else:
+            path = self.origurl
         if alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
                     _('%s already exists, replace URL?') % alias):
