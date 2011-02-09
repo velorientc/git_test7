@@ -280,7 +280,7 @@ class RepoWidget(QWidget):
     def createSyncWidget(self):
         sw = getattr(self.repo, '_syncwidget', None)  # TODO: ugly
         if not sw:
-            sw = SyncWidget(self.repo, True, self)
+            sw = SyncWidget(self.repo, self)
             self.repo._syncwidget = sw
         sw = SharedWidget(sw)
         sw.output.connect(self.output)

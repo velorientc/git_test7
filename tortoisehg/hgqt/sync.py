@@ -57,7 +57,7 @@ class SyncWidget(QWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, embedded=False, parent=None, **opts):
+    def __init__(self, repo, parent, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -76,7 +76,7 @@ class SyncWidget(QWidget):
 
         self.repo.configChanged.connect(self.configChanged)
 
-        if embedded:
+        if parent:
             layout.setContentsMargins(2, 2, 2, 2)
         else:
             self.setWindowTitle(_('TortoiseHg Sync'))
@@ -127,12 +127,10 @@ class SyncWidget(QWidget):
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
-        tb.addSeparator()
-        tb.addWidget(self.targetcheckbox)
-        tb.addWidget(self.targetcombo)
-        if not embedded:
-            self.targetcombo.setHidden(True)
-            self.targetcheckbox.setHidden(True)
+        if parent:
+            tb.addSeparator()
+            tb.addWidget(self.targetcheckbox)
+            tb.addWidget(self.targetcombo)
 
         self.urllabel = QLabel()
         self.urllabel.setMargin(4)
@@ -212,7 +210,7 @@ class SyncWidget(QWidget):
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
 
-        cmd = cmdui.Widget(not embedded, self)
+        cmd = cmdui.Widget(not parent, self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
 
@@ -223,7 +221,7 @@ class SyncWidget(QWidget):
         layout.addWidget(cmd)
         cmd.setVisible(False)
         self.cmd = cmd
-        self.embedded = embedded
+        self.embedded = bool(parent)
 
         self.reload()
         if 'default' in self.paths:
@@ -1324,4 +1322,4 @@ def run(ui, *pats, **opts):
     from tortoisehg.util import paths
     from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return SyncWidget(repo, **opts)
+    return SyncWidget(repo, None, **opts)
