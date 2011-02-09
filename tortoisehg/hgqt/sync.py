@@ -139,7 +139,7 @@ class SyncWidget(QWidget):
         tb.addSeparator()
         tb.addWidget(self.urllabel)
 
-        urlbox = QGroupBox(_('URL'))
+        urlbox = QGroupBox(_('Current URL'))
         self.layout().addWidget(urlbox)
         hbox = QHBoxLayout()
         urlbox.setLayout(hbox)
@@ -168,8 +168,12 @@ class SyncWidget(QWidget):
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 1)
         self.securebutton = QPushButton(_('Security'))
+        self.securebutton.setToolTip(
+            _('Manage HTTPS connection security and user authentication'))
         hbox.addWidget(self.securebutton)
         self.savebutton = QPushButton(_('Save'))
+        self.savebutton.setToolTip(
+            _('Save current URL under an alias'))
         hbox.addWidget(self.savebutton)
 
         hbox = QHBoxLayout()
