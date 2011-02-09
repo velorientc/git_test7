@@ -186,23 +186,6 @@ class HgFileView(QFrame):
         tb.addAction(self.actionFind)
         tb.addAction(self.actionShelf)
 
-        self.actionNextLine = QAction('Next line', self)
-        self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
-        self.actionNextLine.triggered.connect(self.nextLine)
-        self.addAction(self.actionNextLine)
-        self.actionPrevLine = QAction('Prev line', self)
-        self.actionPrevLine.setShortcut(Qt.SHIFT + Qt.Key_Up)
-        self.actionPrevLine.triggered.connect(self.prevLine)
-        self.addAction(self.actionPrevLine)
-        self.actionNextCol = QAction('Next column', self)
-        self.actionNextCol.setShortcut(Qt.SHIFT + Qt.Key_Right)
-        self.actionNextCol.triggered.connect(self.nextCol)
-        self.addAction(self.actionNextCol)
-        self.actionPrevCol = QAction('Prev column', self)
-        self.actionPrevCol.setShortcut(Qt.SHIFT + Qt.Key_Left)
-        self.actionPrevCol.triggered.connect(self.prevCol)
-        self.addAction(self.actionPrevCol)
-
         self.timer = QTimer()
         self.timer.setSingleShot(False)
         self.timer.timeout.connect(self.timerBuildDiffMarkers)
@@ -371,6 +354,9 @@ class HgFileView(QFrame):
             self.blk.syncPageStep()
             self.timer.start()
 
+    #
+    # These four functions are used by Shift+Cursor actions in revdetails
+    #
     def nextLine(self):
         x, y = self.sci.getCursorPosition()
         self.sci.setCursorPosition(x+1, y)
