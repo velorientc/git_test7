@@ -333,7 +333,7 @@ class SyncWidget(QWidget):
         schemeIndex = self.schemecombo.currentIndex()
         self.hostentry.setEnabled(schemeIndex != 0)
         self.portentry.setEnabled(schemeIndex != 0)
-        self.securebutton.setEnabled(schemeIndex > 1)
+        self.securebutton.setEnabled(schemeIndex == 3)
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
