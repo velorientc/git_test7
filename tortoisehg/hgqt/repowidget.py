@@ -131,7 +131,7 @@ class RepoWidget(QWidget):
         view.revisionClicked.connect(self.onRevisionClicked)
         view.revisionSelected.connect(self.onRevisionSelected)
         view.revisionAltClicked.connect(self.onRevisionSelected)
-        view.revisionActivated.connect(self.revision_activated)
+        view.revisionActivated.connect(self.onRevisionActivated)
         view.showMessage.connect(self.showMessage)
         view.menuRequested.connect(self.viewMenuRequest)
 
@@ -582,13 +582,23 @@ class RepoWidget(QWidget):
         self._reload_rev = rev
         self.repoview.goto(rev)
 
-    def revision_activated(self, rev=None):
-        rev = rev or self.rev
-        if isinstance(rev, basestring):  # unapplied patch
-            return
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], {'change':rev})
-        if dlg:
-            dlg.exec_()
+    def onRevisionActivated(self, rev):
+        qgoto = False
+        if isinstance(rev, basestring):
+            qgoto = True
+        else:
+            ctx = self.repo.changectx(rev)
+            if 'qparent' in ctx.tags() or ctx.thgmqappliedpatch():
+                qgoto = True
+            if 'qtip' in ctx.tags():
+                qgoto = False
+        if qgoto:
+            self.qgotoRevision()
+        else:
+            opts = dict(change=rev)
+            dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
+            if dlg:
+                dlg.exec_()
 
     def reload(self):
         'Initiate a refresh of the repo model, rebuild graph'
