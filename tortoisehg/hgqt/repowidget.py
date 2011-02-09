@@ -595,10 +595,7 @@ class RepoWidget(QWidget):
         if qgoto:
             self.qgotoRevision()
         else:
-            opts = dict(change=rev)
-            dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
-            if dlg:
-                dlg.exec_()
+            self.visualDiffRevision()
 
     def reload(self):
         'Initiate a refresh of the repo model, rebuild graph'
@@ -826,12 +823,11 @@ class RepoWidget(QWidget):
         exs = self.repo.extensions()
         menu = QMenu(self)
         for ext, func, desc, icon, cb in (
-            (None, isrev, _('Update...'), 'update',
-                self.updateToRevision),
-            (None, fixed, _('Merge with...'), 'merge',
-                self.mergeWithRevision),
-            (None, isctx, _('Browse at rev...'), None,
-                self.manifestRevision),
+            (None, isrev, _('Update...'), 'update', self.updateToRevision),
+            (None, isctx, _('Visual diff...'), None, self.visualDiffRevision),
+            (None, isrev, _('Diff to local...'), None, self.visualDiffToLocal),
+            (None, fixed, _('Merge with...'), 'merge', self.mergeWithRevision),
+            (None, isctx, _('Browse at rev...'), None, self.manifestRevision),
             (None, fixed, _('Tag...'), 'tag', self.tagToRevision),
             ('bookmarks', fixed, _('Bookmark...'), 'bookmark',
                 self.bookmarkRevision),
@@ -1014,6 +1010,19 @@ class RepoWidget(QWidget):
         for rev in revisions:
             cmdline.extend(['--rev', str(rev)])
         self.runCommand(_('Export - TortoiseHg'), cmdline)
+
+    def visualDiffRevision(self):
+        opts = dict(change=self.rev)
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
+        if dlg:
+            dlg.exec_()
+
+    def visualDiffToLocal(self):
+        assert type(self.rev) is int
+        opts = dict(rev=['rev(%d)' % self.rev])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
+        if dlg:
+            dlg.exec_()
 
     def updateToRevision(self):
         dlg = update.UpdateDialog(self.repo, self.rev, self)
