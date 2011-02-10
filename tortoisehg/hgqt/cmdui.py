@@ -830,6 +830,12 @@ class Runner(QWidget):
     def cancel(self):
         self.core.cancel()
 
+    def outputShown(self):
+        if hasattr(self, 'dlg'):
+            return self.dlg.isVisible()
+        else:
+            return False
+
     def setShowOutput(self, visible=True):
         if not self.internallog:
             return
