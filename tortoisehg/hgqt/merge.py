@@ -392,7 +392,7 @@ class MergePage(BasePage):
                   (QMessageBox.No, _('Cancel')))
         if qtlib.QuestionMsgBox(_('Confirm Clean Up'), main, text,
                                 labels=labels, parent=self):
-            o = self.cmd.output_text
+            o = self.cmd.outputLog
             o.appendLog(_('Canceling merge...\n'), 'control')
             o.appendLog(_('(Please close any running merge tool)\n'), 'control')
             self.cmd.cancel()

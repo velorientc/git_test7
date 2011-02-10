@@ -153,9 +153,8 @@ class Core(QObject):
         self.useproc = False
         self.internallog = useInternal
         if useInternal:
-            self.output_text = LogWidget()
-            self.output_text.installEventFilter(
-                qscilib.KeyPressInterceptor(self))
+            self.outputLog = LogWidget()
+            self.outputLog.installEventFilter(qscilib.KeyPressInterceptor(self))
 
     ### Public Methods ###
 
@@ -278,7 +277,7 @@ class Core(QObject):
         self.thread.progressReceived.connect(self.progress)
 
         if self.internallog:
-            self.thread.outputReceived.connect(self.output_text.appendLog)
+            self.thread.outputReceived.connect(self.outputLog.appendLog)
         if self.stbar:
             self.thread.progressReceived.connect(self.stbar.progress)
 
@@ -287,7 +286,7 @@ class Core(QObject):
 
     def clearOutput(self):
         if self.internallog:
-            self.output_text.clear()
+            self.outputLog.clear()
 
     ### Signal Handlers ###
 
@@ -662,8 +661,8 @@ class Widget(QWidget):
         vbox.setContentsMargins(*(1,)*4)
 
         # command output area
-        self.core.output_text.setHidden(True)
-        vbox.addWidget(self.core.output_text, 1)
+        self.core.outputLog.setHidden(True)
+        vbox.addWidget(self.core.outputLog, 1)
 
         ## status and progress labels
         self.stbar = ThgStatusBar()
@@ -684,11 +683,11 @@ class Widget(QWidget):
 
     def setShowOutput(self, visible):
         if self.internallog:
-            self.core.output_text.setShown(visible)
+            self.core.outputLog.setShown(visible)
 
     def outputShown(self):
         if self.internallog:
-            return self.core.output_text.isVisible()
+            return self.core.outputLog.isVisible()
         else:
             return False
 
@@ -716,7 +715,7 @@ class Dialog(QDialog):
         vbox.setContentsMargins(*(1,)*4)
 
         # command output area
-        vbox.addWidget(self.core.output_text, 1)
+        vbox.addWidget(self.core.outputLog, 1)
 
         ## status and progress labels
         self.stbar = ThgStatusBar()
@@ -751,7 +750,7 @@ class Dialog(QDialog):
 
     def setShowOutput(self, visible):
         """show/hide command output"""
-        self.core.output_text.setVisible(visible)
+        self.core.outputLog.setVisible(visible)
         self.detailBtn.setChecked(visible)
 
         # workaround to adjust only window height
@@ -820,7 +819,7 @@ class Runner(QWidget):
         self.core.progress.connect(self.progress)
 
         if useInternal:
-            self.core.output_text.setMinimumSize(460, 320)
+            self.core.outputLog.setMinimumSize(460, 320)
 
     ### Public Methods ###
 
@@ -843,7 +842,7 @@ class Runner(QWidget):
             self.dlg.setWindowFlags(flags)
             box = QVBoxLayout()
             box.setContentsMargins(*(0,)*4)
-            box.addWidget(self.core.output_text)
+            box.addWidget(self.core.outputLog)
             self.dlg.setLayout(box)
         self.dlg.setVisible(visible)
 
