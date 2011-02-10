@@ -107,14 +107,17 @@ class UpdateDialog(QDialog):
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
 
         ## command widget
-        self.cmd = cmdui.Widget()
+        if self.parent:
+            self.cmd = cmdui.Runner(_('TortoiseHg Update'), False, self)
+        else:
+            self.cmd = cmdui.Widget(True, self)
+            box.addWidget(self.cmd)
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
         self.cmd.progress.connect(self.progress)
-        box.addWidget(self.cmd)
 
         ## bottom buttons
         buttons = QDialogButtonBox()
@@ -285,7 +288,7 @@ class UpdateDialog(QDialog):
         self.update_btn.setHidden(True)
         self.close_btn.setHidden(True)
         self.cancel_btn.setShown(True)
-        self.detail_btn.setShown(True)
+        self.detail_btn.setShown(not self.parent())
 
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
