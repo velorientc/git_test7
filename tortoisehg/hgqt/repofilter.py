@@ -34,6 +34,7 @@ class RepoFilterBar(QToolBar):
         self.setFloatable(False)
         self.setMovable(False)
         self._repo = repo
+        self.filterEnabled = True
 
         self.entrydlg = revset.RevisionSetQuery(repo, self)
         self.entrydlg.progress.connect(self.progress)
@@ -90,6 +91,17 @@ class RepoFilterBar(QToolBar):
 
         self._initbranchfilter()
         self.refresh()
+
+    def setEnableFilter(self, enabled):
+        'Enable/disable the changing of the current filter'
+        self.revsetcombo.setEnabled(enabled)
+        self.clearBtn.setEnabled(enabled)
+        self.searchBtn.setEnabled(enabled)
+        self.editorBtn.setEnabled(enabled)
+        self.deleteBtn.setEnabled(enabled)
+        self._branchCombo.setEnabled(enabled)
+        self._branchLabel.setEnabled(enabled)
+        self.filterEnabled = enabled
 
     def selectionChanged(self):
         selection = self.revsetcombo.lineEdit().selectedText()
@@ -189,8 +201,8 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.addItem('')
         for branch in branches:
             self._branchCombo.addItem(branch)
-        self._branchLabel.setEnabled(len(branches) > 1)
-        self._branchCombo.setEnabled(len(branches) > 1)
+        self._branchLabel.setEnabled(self.filterEnabled and len(branches) > 1)
+        self._branchCombo.setEnabled(self.filterEnabled and len(branches) > 1)
         self._branchReloading = False
 
         self.setBranch(curbranch)
