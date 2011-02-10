@@ -307,18 +307,18 @@ class Workbench(QMainWindow):
         menu.addAction(self.tasktbar.toggleViewAction())
         self.menuView.addMenu(menu)
 
-        newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming-24x24',
-                  tooltip=_('Check for incoming changes from default pull target'),
-                  enabled='repoopen', toolbar='sync')
         newaction(_('Pull'), self._repofwd('pull'), icon='pull-24x24',
                   tooltip=_('Pull incoming changes from default pull target'),
+                  enabled='repoopen', toolbar='sync')
+        newaction(_('Push'), self._repofwd('push'), icon='push-24x24',
+                  tooltip=_('Push outgoing changes to default push target'),
+                  enabled='repoopen', toolbar='sync')
+        newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming-24x24',
+                  tooltip=_('Check for incoming changes from default pull target'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Outgoing'), self._repofwd('outgoing'), icon='outgoing-24x24',
                    tooltip=_('Detect outgoing changes to default push target'),
                    enabled='repoopen', toolbar='sync')
-        newaction(_('Push'), self._repofwd('push'), icon='push-24x24',
-                  tooltip=_('Push outgoing changes to default push target'),
-                  enabled='repoopen', toolbar='sync')
 
         self.updateMenu()
 
