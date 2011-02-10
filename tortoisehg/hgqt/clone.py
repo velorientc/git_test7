@@ -27,6 +27,7 @@ class CloneDialog(QDialog):
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.ui = ui.ui()
+        self.ret = None
 
         dest = src = cwd = hglib.tounicode(os.getcwd())
         if len(args) > 1:
@@ -137,9 +138,9 @@ class CloneDialog(QDialog):
         ## bottom buttons
         buttons = QDialogButtonBox()
         self.cancel_btn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancel_btn.clicked.connect(self.cancel_clicked)
+        self.cancel_btn.clicked.connect(self.cmd.cancel)
         self.close_btn = buttons.addButton(QDialogButtonBox.Close)
-        self.close_btn.clicked.connect(self.reject)
+        self.close_btn.clicked.connect(self.onCloseClicked)
         self.close_btn.setAutoDefault(False)
         self.clone_btn = buttons.addButton(_('&Clone'),
                                            QDialogButtonBox.ActionRole)
@@ -306,10 +307,6 @@ class CloneDialog(QDialog):
         if checked:
             target.setFocus()
 
-    def cancel_clicked(self):
-        self.cmd.cancel()
-        self.reject()
-
     def detail_toggled(self, checked):
         self.cmd.setShowOutput(checked)
 
@@ -337,6 +334,7 @@ class CloneDialog(QDialog):
         self.detail_btn.setShown(True)
 
     def command_finished(self, ret):
+        self.ret = ret
         if ret is not 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.clone_btn.setShown(True)
@@ -346,6 +344,12 @@ class CloneDialog(QDialog):
             self.cancel_btn.setHidden(True)
         else:
             self.accept()
+
+    def onCloseClicked(self):
+        if self.ret is 0:
+            self.accept()
+        else:
+            self.reject()
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
