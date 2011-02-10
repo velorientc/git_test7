@@ -294,6 +294,8 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(QString)
     def setBundle(self, bfile):
+        if self.bundle:
+            self.clearBundle()
         self.bundle = unicode(bfile)
         oldlen = len(self.repo)
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root,
@@ -303,7 +305,7 @@ class RepoWidget(QWidget):
         self.bundleAccept.setHidden(False)
         self.bundleReject.setHidden(False)
         self.filterbar.revsetle.setText('incoming()')
-        self.filterbar.setEnabled(False)
+        self.filterbar.setEnableFilter(False)
         self.filterbar.show()
         self.toolbarVisibilityChanged.emit()
         self.titleChanged.emit(self.title())
@@ -315,7 +317,7 @@ class RepoWidget(QWidget):
     def clearBundle(self):
         self.bundleAccept.setHidden(True)
         self.bundleReject.setHidden(True)
-        self.filterbar.setEnabled(True)
+        self.filterbar.setEnableFilter(True)
         self.filterbar.revsetle.setText('')
         self.revset = []
         self.repomodel.revset = self.revset
