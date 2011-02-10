@@ -47,6 +47,10 @@
     <file>icons/outgoing.svg</file>
     <file>icons/pull.svg</file>
     <file>icons/push.svg</file>
+    <file>icons/incoming-24x24.png</file>
+    <file>icons/outgoing-24x24.png</file>
+    <file>icons/pull-24x24.png</file>
+    <file>icons/push-24x24.png</file>
     <file>icons/qpush.svg</file>
     <file>icons/qpop.svg</file>
     <file>icons/qpopall.svg</file>
