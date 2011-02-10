@@ -330,6 +330,20 @@ class RepoWidget(QWidget):
         self.syncDemand.pullBundle(self.bundle, None)
         self.clearBundle()
 
+    def pullBundleToRev(self):
+        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+        self.syncDemand.pullBundle(self.bundle, self.rev)
+        removed = [self.repo[self.rev]]
+        while removed:
+            ctx = removed.pop()
+            if ctx.node() in self.revset:
+                self.revset.remove(ctx.node())
+                removed.extend(ctx.parents())
+        self.repomodel.revset = self.revset
+        if not self.revset:
+            self.clearBundle()
+        self.refresh()
+
     def rejectBundle(self):
         self.clearBundle()
         self.reload()
@@ -416,6 +430,7 @@ class RepoWidget(QWidget):
         self.generatePairMenu()
         self.generateUnappliedPatchMenu()
         self.generateMultipleSelectionMenu()
+        self.generateBundleMenu()
 
     def dragEnterEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
@@ -752,6 +767,12 @@ class RepoWidget(QWidget):
 
         if len(selection) == 0:
             return
+
+        if self.bundle:
+            if len(selection) == 1:
+                self.bundlemenu.exec_(point)
+            return
+
         allunapp = False
         if 'mq' in self.repo.extensions():
             for rev in selection:
@@ -1000,6 +1021,17 @@ class RepoWidget(QWidget):
             a.triggered.connect(self.sendToReviewBoard)
             menu.addAction(a)
         self.multicmenu = menu
+
+    def generateBundleMenu(self):
+        menu = QMenu(self)
+        for name, cb in (
+                (_('Pull to here...'), self.pullBundleToRev),
+                (_('Visual diff...'), self.visualDiffRevision),
+                ):
+            a = QAction(name, self)
+            a.triggered.connect(cb)
+            menu.addAction(a)
+        self.bundlemenu = menu
 
     def exportRevisions(self, revisions):
         if not revisions:
