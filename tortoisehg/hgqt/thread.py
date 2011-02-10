@@ -297,11 +297,65 @@ class CmdThread(QThread):
                     else:
                         err = local._('SSL error: %s') % reason
             ui.write_err(err + '\n')
-        except (Exception, OSError, IOError), e:
+        except error.AmbiguousCommand, inst:
+            ui.warn(local._("hg: command '%s' is ambiguous:\n    %s\n") %
+                    (inst.args[0], " ".join(inst.args[1])))
+        except error.ParseError, inst:
+            if len(inst.args) > 1:
+                ui.warn(local._("hg: parse error at %s: %s\n") %
+                                (inst.args[1], inst.args[0]))
+            else:
+                ui.warn(local._("hg: parse error: %s\n") % inst.args[0])
+        except error.LockHeld, inst:
+            if inst.errno == errno.ETIMEDOUT:
+                reason = local._('timed out waiting for lock held by %s') % inst.locker
+            else:
+                reason = local._('lock held by %s') % inst.locker
+            ui.warn(local._("abort: %s: %s\n") % (inst.desc or inst.filename, reason))
+        except error.LockUnavailable, inst:
+            ui.warn(local._("abort: could not lock %s: %s\n") %
+                (inst.desc or inst.filename, inst.strerror))
+        except error.RepoError, inst:
+            ui.warn(local._("abort: %s!\n") % inst)
+        except error.ResponseError, inst:
+            ui.warn(local._("abort: %s") % inst.args[0])
+            if not isinstance(inst.args[1], basestring):
+                ui.warn(" %r\n" % (inst.args[1],))
+            elif not inst.args[1]:
+                ui.warn(local._(" empty string\n"))
+            else:
+                ui.warn("\n%r\n" % util.ellipsis(inst.args[1]))
+        except error.RevlogError, inst:
+            ui.warn(local._("abort: %s!\n") % inst)
+        except IOError, inst:
+            if hasattr(inst, "code"):
+                ui.warn(local._("abort: %s\n") % inst)
+            elif hasattr(inst, "reason"):
+                try: # usually it is in the form (errno, strerror)
+                    reason = inst.reason.args[1]
+                except: # it might be anything, for example a string
+                    reason = inst.reason
+                ui.warn(local._("abort: error: %s\n") % reason)
+            elif hasattr(inst, "args") and inst.args[0] == errno.EPIPE:
+                if ui.debugflag:
+                    ui.warn(local._("broken pipe\n"))
+            elif getattr(inst, "strerror", None):
+                if getattr(inst, "filename", None):
+                    ui.warn(local._("abort: %s: %s\n") % (inst.strerror, inst.filename))
+                else:
+                    ui.warn(local._("abort: %s\n") % inst.strerror)
+            else:
+                raise
+        except OSError, inst:
+            if getattr(inst, "filename", None):
+                ui.warn(local._("abort: %s: %s\n") % (inst.strerror, inst.filename))
+            else:
+                ui.warn(local._("abort: %s\n") % inst.strerror)
+        except Exception, inst:
             if 'THGDEBUG' in os.environ:
                 import traceback
                 traceback.print_exc()
-            ui.write_err(str(e) + '\n')
+            ui.write_err(str(inst) + '\n')
         except KeyboardInterrupt:
             self.ret = -1
 
