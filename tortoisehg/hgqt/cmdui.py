@@ -155,6 +155,7 @@ class Core(QObject):
         if useInternal:
             self.outputLog = LogWidget()
             self.outputLog.installEventFilter(qscilib.KeyPressInterceptor(self))
+            self.output.connect(self.outputLog.appendLog)
 
     ### Public Methods ###
 
@@ -275,9 +276,6 @@ class Core(QObject):
 
         self.thread.outputReceived.connect(self.output)
         self.thread.progressReceived.connect(self.progress)
-
-        if self.internallog:
-            self.thread.outputReceived.connect(self.outputLog.appendLog)
         if self.stbar:
             self.thread.progressReceived.connect(self.stbar.progress)
 
