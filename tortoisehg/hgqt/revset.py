@@ -34,6 +34,10 @@ _common = (
     ('outgoing([path])',
      _('Changesets not found in the specified destination repository,'
        ' or the default push location.')),
+    ('bookmark([name])',
+       _('The named bookmark or all bookmarks.')),
+    ('tag([name])',
+       _('The named tag or all tags.')),
     ('tagged()',
      _('Changeset is tagged.')),
     ('head()',
@@ -128,10 +132,6 @@ class RevisionSetQuery(QDialog):
                     _('all revisions converted from subversion')),]
             _ancestry = list(_ancestry) + [('svnrev(rev)',
                     _('changeset which represents converted svn revision')),]
-        if 'bookmarks' in repo.extensions():
-            global _common
-            _common = list(_common) + [('bookmark([name])',
-                    _('The named bookmark or all bookmarks.')),]
 
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
