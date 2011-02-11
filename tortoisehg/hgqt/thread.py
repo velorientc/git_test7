@@ -10,6 +10,7 @@ import os
 import Queue
 import time
 import urllib2
+import errno
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -289,10 +290,10 @@ class CmdThread(QThread):
             if isinstance(e.args[0], ssl.SSLError):
                 parts = e.args[0].strerror.split(':')
                 if len(parts) == 7:
-                    file, line, level, errno, lib, func, reason = parts
+                    file, line, level, _errno, lib, func, reason = parts
                     if func == 'SSL3_GET_SERVER_CERTIFICATE':
                         err = local._('SSL: Server certificate verify failed')
-                    elif errno == '00000000':
+                    elif _errno == '00000000':
                         err = local._('SSL: unknown error %s:%s') % (file, line)
                     else:
                         err = local._('SSL error: %s') % reason
