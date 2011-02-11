@@ -737,6 +737,14 @@ class SyncWidget(QWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self):
+        if not hg.islocal(self.currentUrl(False)):
+            r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
+                                     _('Push to remote repository\n%s\n?')
+                                     % self.currentUrl(True))
+            if not r:
+                self.showMessage.emit(_('Push aborted.'))
+                return
+
         self.showMessage.emit(_('Pushing...'))
         def finished(ret, output):
             if ret == 0:
