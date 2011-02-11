@@ -210,35 +210,6 @@ Changelog
 	standard tags inserted by the Mercurial Queues Extension.
 	Default: None.
 
-.. module:: synchronize.settings
-	:synopsis: Dialog used to set synchronize specific preferences
-
-Sync
-----
-
-The :guilabel:`Sync` tab is where you can store URLs (paths) to related
-repositories. It is rare to store paths in the site-wide or user
-configuration files, most of the time you will only store these in a
-repository configuration file. Mercurial has two special path names that
-can be used as default targets for some operations.
-
-* *default*	- the default URL to pull from, usually clone source
-* *default-push* - the default push target when using the command line
-
-:guilabel:`After Pull Operation:`
-	Operation which is performed directly after a successful pull.
-	:guilabel:`update` equates to :command:`pull --update`, :guilabel:`fetch`
-	equates to the fetch extension, :guilabel:`rebase` equates to
-	:command:`pull --rebase`.  Default: none.
-
-:guilabel:`Remote repository paths`
-	In this pane you can configure aliases for repositories that you
-	frequently synchronize with.  Mercurial will add a *default* alias
-	to the clone source automatically.  All configured path aliases will
-	be listed in the Synchronize tool path drop-down box, and they can
-	be used as short-cuts on the command line.
-
-
 .. module:: web.settings
 	:synopsis: Dialog used to set web server specific preferences
 
