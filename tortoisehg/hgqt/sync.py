@@ -250,7 +250,7 @@ class SyncWidget(QWidget):
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('branch: ') + uname, hexlify(name))
-        for name, node in self.repo.bookmarks.items():
+        for name, node in self.repo._bookmarks.items():
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('bookmark: ') + uname, node)
 
@@ -268,7 +268,7 @@ class SyncWidget(QWidget):
         if ctx.thgbranchhead():
             target = hexlify(ctx.branch())
         for tag in ctx.thgtags():
-            if tag in self.repo.bookmarks.keys():
+            if tag in self.repo._bookmarks.keys():
                 target = ctx.node()
 
         index = self.targetcombo.findData(target)

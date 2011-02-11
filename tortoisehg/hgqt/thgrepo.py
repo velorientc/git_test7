@@ -208,7 +208,7 @@ class ThgRepoWrapper(QObject):
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
-              shortname mergetools bookmarks bookmarkcurrent'''.split()
+              shortname mergetools'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
                    _branchheads'''.split()
 
@@ -393,20 +393,6 @@ def _extendrepo(repo):
             dead = self.deadbranches
             return sorted(br for br, n in allbranches.iteritems()
                           if n in openbrnodes and br not in dead)
-
-        @propertycache
-        def bookmarks(self):
-            if 'bookmarks' in self._exts and hasattr(self, '_bookmarks'):
-                return self._bookmarks
-            else:
-                return {}
-
-        @propertycache
-        def bookmarkcurrent(self):
-            if 'bookmarks' in self._exts and hasattr(self, '_bookmarkcurrent'):
-                return self._bookmarkcurrent
-            else:
-                return None
 
         @propertycache
         def _branchheads(self):

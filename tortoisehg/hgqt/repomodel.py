@@ -518,16 +518,12 @@ class HgRepoListModel(QAbstractTableModel):
             effects = qtlib.geteffect('log.branch')
             parts.append(qtlib.applyeffects(u' %s ' % branchu, effects))
 
-        # in the near future, I expect bookmarks to be available from the
-        # repository via a separate API, making this logic more efficient.
-        bookmarks = self.repo.bookmarks.keys()
-        curbookmark = self.repo.bookmarkcurrent
         for tag in ctx.thgtags():
             if self.repo.thgmqtag(tag):
                 style = 'log.patch'
-            elif tag == curbookmark:
+            elif tag == self.repo._bookmarkcurrent:
                 style = 'log.curbookmark'
-            elif tag in bookmarks:
+            elif tag in self.repo._bookmarks:
                 style = 'log.bookmark'
             else:
                 style = 'log.tag'

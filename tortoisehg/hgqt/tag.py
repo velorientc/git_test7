@@ -33,10 +33,8 @@ class TagDialog(QDialog):
         self.repo = repo
 
         if not tag and rev and rev != 'tip':
-            bmarks = repo.bookmarks.keys()
             for t in repo.nodetags(repo[rev].node()):
-                if t != 'tip' \
-                        and ((not bmarks) or (bmarks and t not in bmarks)):
+                if t != 'tip' and t not in repo._bookmarks:
                     tag = t
                     break
             else:
