@@ -111,8 +111,6 @@ class HgFileView(QFrame):
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.sci.customContextMenuRequested.connect(self.menuRequested)
         self.sci.setCaretLineVisible(False)
 
         # define markers for colorize zones of diff
@@ -200,10 +198,6 @@ class HgFileView(QFrame):
 
     def setFont(self, font):
         self.sci.setFont(font)
-
-    def menuRequested(self, point):
-        point = self.sci.mapToGlobal(point)
-        return self.sci.createStandardContextMenu().exec_(point)
 
     def loadSettings(self, qs, prefix):
         self.sci.loadSettings(qs, prefix)
