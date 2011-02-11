@@ -9,6 +9,12 @@ Synchronize
 
 	Synchronize dialog
 
+TODO: describe drag & drop
+TODO: describe stored vs related paths
+TODO: describe behavior differences in and out of Workbench
+TODO: describe perfarce integration
+TODO: describe URL context menu and shortcuts
+
 The synchronize tool is used to transmit changesets between repositories
 or to email recipients.
 
