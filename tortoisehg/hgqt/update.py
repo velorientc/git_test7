@@ -107,7 +107,7 @@ class UpdateDialog(QDialog):
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
 
         ## command widget
-        self.cmd = cmdui.Widget()
+        self.cmd = cmdui.Widget(True, self)
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)
