@@ -183,7 +183,7 @@ class SyncWidget(QWidget):
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
         self.pathentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.pathentry, 1)
+        hbox.addWidget(self.pathentry, 4)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
