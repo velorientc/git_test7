@@ -775,6 +775,7 @@ class RepoWidget(QWidget):
                 self.bundlemenu.exec_(point)
             return
 
+        self.menuselection = selection
         allunapp = False
         if 'mq' in self.repo.extensions():
             for rev in selection:
@@ -809,7 +810,6 @@ class RepoWidget(QWidget):
             # No pair menu if working directory or unapplied patch
             if type(r) is not int:
                 return
-        self.menuselection = selection
         self.paircmenu.exec_(point)
 
     def multipleSelectionMenu(self, point, selection):
@@ -817,11 +817,9 @@ class RepoWidget(QWidget):
             # No multi menu if working directory or unapplied patch
             if type(r) is not int:
                 return
-        self.menuselection = selection
         self.multicmenu.exec_(point)
 
     def unappliedPatchMenu(self, point, selection):
-        self.menuselection = selection
         self.unappacts[0].setEnabled('qtip' in self.repo.tags())
         self.unappacts[1].setEnabled(True)
         self.unappacts[2].setEnabled(len(selection) > 1)
