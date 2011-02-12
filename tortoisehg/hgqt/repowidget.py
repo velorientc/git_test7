@@ -820,9 +820,16 @@ class RepoWidget(QWidget):
         self.multicmenu.exec_(point)
 
     def unappliedPatchMenu(self, point, selection):
+        q = self.repo.mq
+        start = q.series_end()
+        unapplied = 0
+        for i in xrange(start, len(q.series)):
+            pushable, reason = q.pushable(i)
+            if pushable:
+                unapplied += 1
         self.unappacts[0].setEnabled('qtip' in self.repo.tags())
         self.unappacts[1].setEnabled(True)
-        self.unappacts[2].setEnabled(len(selection) > 1)
+        self.unappacts[2].setEnabled(unapplied > 1)
         self.unappcmenu.exec_(point)
 
     def generateSingleMenu(self):
