@@ -862,6 +862,7 @@ class RepoWidget(QWidget):
             (None, isrev, _('Export patch'), None, self.exportRevisions),
             (None, isrev, _('Email patch...'), None, self.emailRevision),
             (None, isrev, _('Archive...'), None, self.archiveRevision),
+            (None, isctx, _('Copy patch'), None, self.copyPatch),
             (None, isrev, _('Copy hash'), None, self.copyHash),
             ('transplant', fixed, _('Transplant to local'), None,
                 self.transplantRevision),
@@ -1122,6 +1123,25 @@ class RepoWidget(QWidget):
         dlg.output.connect(self.output)
         dlg.progress.connect(self.progress)
         dlg.exec_()
+
+    def copyPatch(self):
+        from mercurial import commands, ui
+        _ui = self.repo.ui
+        _ui.pushbuffer()
+        try:
+            if self.rev:
+                commands.export(_ui, self.repo, self.rev, output=_ui)
+            else:
+                commands.diff(_ui, self.repo)
+        except Exception, e:
+            _ui.popbuffer()
+            self.showMessage(hglib.tounicode(str(e)))
+            if 'THGDEBUG' in os.environ:
+                import traceback
+                traceback.print_exc()
+            return
+        output = _ui.popbuffer()
+        QApplication.clipboard().setText(output)
 
     def copyHash(self):
         clip = QApplication.clipboard()
