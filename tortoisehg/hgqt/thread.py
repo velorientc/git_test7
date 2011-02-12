@@ -285,18 +285,21 @@ class CmdThread(QThread):
             err = local._('HTTP Error: %d (%s)') % (e.code, e.msg)
             ui.write_err(err + '\n')
         except urllib2.URLError, e:
-            import ssl
             err = local._('URLError: %s') % str(e.reason)
-            if isinstance(e.args[0], ssl.SSLError):
-                parts = e.args[0].strerror.split(':')
-                if len(parts) == 7:
-                    file, line, level, _errno, lib, func, reason = parts
-                    if func == 'SSL3_GET_SERVER_CERTIFICATE':
-                        err = local._('SSL: Server certificate verify failed')
-                    elif _errno == '00000000':
-                        err = local._('SSL: unknown error %s:%s') % (file, line)
-                    else:
-                        err = local._('SSL error: %s') % reason
+            try:
+                import ssl # Python 2.6 or backport for 2.5
+                if isinstance(e.args[0], ssl.SSLError):
+                    parts = e.args[0].strerror.split(':')
+                    if len(parts) == 7:
+                        file, line, level, _errno, lib, func, reason = parts
+                        if func == 'SSL3_GET_SERVER_CERTIFICATE':
+                            err = local._('SSL: Server certificate verify failed')
+                        elif _errno == '00000000':
+                            err = local._('SSL: unknown error %s:%s') % (file, line)
+                        else:
+                            err = local._('SSL error: %s') % reason
+            except ImportError:
+                pass
             ui.write_err(err + '\n')
         except error.AmbiguousCommand, inst:
             ui.warn(local._("hg: command '%s' is ambiguous:\n    %s\n") %
