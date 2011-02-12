@@ -66,32 +66,36 @@ clone::
 	creates the destination repository and pulls all changes from
 	the p4 depot into it.
 
+The **perfarce.tags** configuration option determines whether perfarce
+tries to import Perforce labels as Mercurial tags.
+
 *TortoiseHg Integration*
 
 When the perfarce extension is enabled, it adds a :guilabel:`start revision`
-configurable option to the clone tool, and a :guilabel:`Perforce` menu
-to the Repository Explorer.  The menu has two items:
+configurable option to the clone tool, and a :guilabel:`P4` toolbar
+button to the sync tool.
 
-identity::
-
-	Finds the tip Perforce changelist in your local repository and
-	selects it in the changelog window.
-
-pending::
-
-	Detects pending Perforce changelists that have been "push"ed to your
-	Perforce client but have not been submitted, or have not been pulled
-	back.  This opens the pending changelist dialog so that you can view
-	these pending changelists and either submit or revert them.
+The toolbar button performs the p4pending operation.  It detects pending
+Perforce changelists that have been "push"ed to your Perforce client but
+have not been submitted, or have not been pulled back.  This opens the
+pending changelist dialog so that you can view these pending changelists
+and either submit or revert them.  If Perforce fails the submit because
+your files are out of date, you must revert the changelist, pull from
+Perforce, merge, then push again.
 
 *Installation*
 
-Perfarce comes bundled with TortoiseHg 1.0 Windows installers, so you
+Perfarce comes bundled with TortoiseHg Windows installers, so you
 enable perfarce by simply adding it to your Mercurial.ini or a
 repository's hgrc like this::
 
 	[extensions]
 	perfarce=
+
+.. note::
+	The perfarce extension has been known to not work together with
+	hgsubversion, so if you plan to use both extensions they should be
+	enabled locally on the repositories that require them.
  
 hgsubversion (SVN)
 ==================
@@ -123,10 +127,10 @@ You can verify that worked by typing :command:`hg help hgsubversion`
 See the hgsubversion wiki for details of use.
 
 .. warning::
-	When doing a clone of a Subversion server, it is highly recommended
-	to clone only the first few revisions, then pull the rest.  Clone's
-	failure behavior is to delete the entire incomplete cloned
-	repository.  Pull is much more forgiving.
+	When cloning a Subversion server, it is highly recommended
+	to clone only the first few revisions then pull the rest.  The
+	failure behavior of the clone command is to delete the incomplete
+	clone, while pull is much more forgiving.
 
 *TortoiseHg Integration*
 

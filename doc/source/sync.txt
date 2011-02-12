@@ -9,12 +9,6 @@ Synchronize
 
 	Synchronize dialog
 
-TODO: describe drag & drop
-TODO: describe stored vs related paths
-TODO: describe behavior differences in and out of Workbench
-TODO: describe perfarce integration
-TODO: describe URL context menu and shortcuts
-
 The synchronize tool is used to transmit changesets between repositories
 or to email recipients.
 
@@ -35,11 +29,10 @@ or to email recipients.
 	:guilabel:`Stop`
 		stop current operation
 
-The :guilabel:`Post Pull Operation` frame contains radio buttons for
-selecting the operation which is performed after a pull.  This behavior
-is configurable via the :guilabel:`Configure` button.  You can select a
-default behavior for your user account and override that selection on a
-per-repository basis.
+The :guilabel:`Post Pull` dialog contains radio buttons for selecting
+the operation which is performed after a pull.  If you open the
+configuration tool, you can select a default behavior for your user
+account and override that selection on a per-repository basis.
 
 	:guilabel:`None`
 		No operations are performed after a pull.  You will be allowed to
@@ -64,16 +57,8 @@ per-repository basis.
 		merge conflicts without user interaction.  If not checked, all
 		merges will be interactive.
 
-All operations which require authentication will pop up dialog boxes to
-get the required information from the user.  TortoiseHg uses the
-TortoisePlink tool (borrowed from the TortoiseSVN distribution) to
-handle *ssh:* connections and authentication.  See the FAQ_ for help if
-you have trouble connecting to ssh servers.
-
-.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
-
-Under the :guilabel:`Options` fold-up panel are a number of
-configurables that are valid for most push/pull operations.
+The :guilabel:`Options` dialog provides checkboxes for selecting
+infrequently used command options.
 
 	:guilabel:`Allow push of a new branch`
 		allow a new named branch to be pushed
@@ -82,36 +67,48 @@ configurables that are valid for most push/pull operations.
 	:guilabel:`Recurse into subdirectories`
 		incoming or outgoing commands can recurse into subdirectories
 		and provide a full report
+	:guilabel:`Temporarily disable configured proxy`
+		only sensitive when a web proxy is configured for the given
+		repository.  While checked it will disable that proxy.
 	:guilabel:`Remote Command`
-		provides --removecmd argument
+		provides a --remotecmd argument
 
+When the sync tool is opened within the Workbench, the toolbar has a
+:guilabel:`Target` checkbox.  While checked, the target dropdown box is
+sensitive and the selected target revision, bookmark, or branch will be
+added to every synchronization command.  When the sync tool is opened
+outside of the Workbench, the target checkbox and dropdown box is
+hidden.
 
-Email
------
+At the very right of the toolbar is the currently selected URL.  All
+synchronization commands will use this URL.  The general effect of the
+toolbar is that it can be read as a Mercurial command line.  The tool
+buttons select the command, the :guilabel:`Post Pull` and
+:guilabel:`Options` dialog specify options, the target dropdown box can
+specify revisions, and finally the URL completes the command.
 
-.. figure:: figures//email.png
-	:alt: Email dialog
+Adding an URL
+-------------
 
-	Email dialog
- 
-The email dialog can be launched from two TortoiseHg tools.
+By far the easiest way to add a new URL to your respository is to drag
+and drop the URL from another application, then press the save button
+and provide the URL an alias.
 
-1) The Workbench, in which case the user intends to email a selection
-   of revisions.
+The two list panes display URLs that are stored in the current
+repository's configuration file (:guilabel:`Stored Paths`) and URLs that are
+stored in other related repositories that are listed in the Workbench
+repository registry (:guilabel:`Related Paths`).  When the sync tool is opened
+outside of the Workbench, the :guilabel:`Related Paths` list will be empty.
 
-2) The synchronize tool, in which case the user intends to email all
-   outgoing changes to the current target repository.
+.. note::
+	Being related means two repositories share at least a common root
+	changeset.  Cloned are obviously related.  Push and pull operations
+	require that repositories to be related, or that you use --force to
+	override the relationship check.
 
-The :guilabel:`Send` button is obvious, and the :guilabel:`Configure`
-dialog predictably opens the TortoiseHg Settings dialog to the email tab
-where you can configure your SMTP settings and set default
-:guilabel:`To:` and :guilabel:`From:` addresses.
-
-:guilabel:`In-Reply-To:` is used to make your patches properly threaded
-in mailing lists.
-
-Please consult the Mercurial documentation for the differences between
-plain patches, Hg patches, Git patches, and bundles.
+The URL lists have a context menu that allows you to browse, open a
+terminal, or delete an URL from your local configuration file.  The
+platform standard delete key sequence will also remove an URL.
 
 Security
 --------
@@ -225,6 +222,37 @@ Pageant key agent.
 It is a known issue that TortoisePlink does not use compression in many
 scenarios, and thus is up to four times slower than openssh and other
 clients.  TortoiseHg recommends the use of HTTPS for Windows clients.
+
+See the FAQ_ for help if you have trouble connecting to ssh servers.
+
+.. _FAQ: http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq
+
+Email
+-----
+
+.. figure:: figures//email.png
+	:alt: Email dialog
+
+	Email dialog
+ 
+The email dialog can be launched from two TortoiseHg tools.
+
+1) The Workbench, in which case the user intends to email a selection
+   of revisions.
+
+2) The synchronize tool, in which case the user intends to email all
+   outgoing changes to the current target repository.
+
+The :guilabel:`Send` button is obvious, and the :guilabel:`Configure`
+dialog predictably opens the TortoiseHg Settings dialog to the email tab
+where you can configure your SMTP settings and set default
+:guilabel:`To:` and :guilabel:`From:` addresses.
+
+:guilabel:`In-Reply-To:` is used to make your patches properly threaded
+in mailing lists.
+
+Please consult the Mercurial documentation for the differences between
+plain patches, Hg patches, Git patches, and bundles.
 
 From command line
 -----------------
