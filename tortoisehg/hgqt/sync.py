@@ -537,6 +537,8 @@ class SyncWidget(QWidget):
 
         if 'rev' in details and '--rev' not in cmdline:
             cmdline = self.applyTargetOption(cmdline)
+        if self.opts.get('noproxy'):
+            cmdline += ['--config', 'http_proxy.host=']
 
         url = self.currentUrl(False)
         if not url:
@@ -1315,6 +1317,13 @@ class OptionsDialog(QDialog):
         self.subrepocb.setChecked(opts.get('subrepos', False))
         layout.addRow(self.subrepocb, None)
 
+        self.noproxycb = QCheckBox(
+            _('Temporarily disable configured HTTP proxy'))
+        self.noproxycb.setChecked(opts.get('noproxy', False))
+        layout.addRow(self.noproxycb, None)
+        proxy = self.repo.ui.config('http_proxy', 'host')
+        self.noproxycb.setEnabled(bool(proxy))
+
         lbl = QLabel(_('Remote command:'))
         self.remotele = QLineEdit()
         if opts.get('remotecmd'):
@@ -1336,6 +1345,7 @@ class OptionsDialog(QDialog):
         outopts['subrepos'] = self.subrepocb.isChecked()
         outopts['force'] = self.forcecb.isChecked()
         outopts['new-branch'] = self.newbranchcb.isChecked()
+        outopts['noproxy'] = self.noproxycb.isChecked()
 
         self.outopts = outopts
         QDialog.accept(self)
