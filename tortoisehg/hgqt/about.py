@@ -62,7 +62,7 @@ class AboutDialog(QDialog):
         self.courtesy_lbl = QLabel()
         self.courtesy_lbl.setAlignment(Qt.AlignCenter)
         self.courtesy_lbl.setText(
-              _('Several icons are courtesy of the TortoiseSVN project' + '\n'))
+              _('Several icons are courtesy of the TortoiseSVN project') + '\n')
         self.vbox.addWidget(self.courtesy_lbl)
 
         self.download_url_lbl = QLabel()
