@@ -377,11 +377,8 @@ class RevsetThread(QThread):
             l = []
             for c in func(self.repo, range(len(self.repo))):
                 l.append(c)
-            if l:
-                self.showMessage.emit(_('%d matches found') % len(l))
-                self.queryIssued.emit(self.query, l)
-            else:
-                self.showMessage.emit(_('No matches'))
+            self.showMessage.emit(_('%d matches found') % len(l))
+            self.queryIssued.emit(self.query, l)
         except error.ParseError, e:
             if len(e.args) == 2:
                 msg, pos = e.args

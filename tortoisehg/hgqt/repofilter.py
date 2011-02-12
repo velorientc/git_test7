@@ -136,7 +136,10 @@ class RepoFilterBar(QToolBar):
 
     def queryIssued(self, query, revset):
         self.revsetcombo.lineEdit().setText(query)
-        self.setRevisionSet.emit(revset)
+        if revset:
+            self.setRevisionSet.emit(revset)
+        else:
+            self.clearRevisionSet.emit()
         self.saveQuery()
         self.revsetcombo.lineEdit().selectAll()
 
