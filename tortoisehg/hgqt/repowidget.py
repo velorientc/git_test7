@@ -783,7 +783,7 @@ class RepoWidget(QWidget):
             else:
                 allunapp = True
         if allunapp:
-            self.unnapliedPatchMenu(point, selection)
+            self.unappliedPatchMenu(point, selection)
         elif len(selection) == 1:
             self.singleSelectionMenu(point, selection)
         elif len(selection) == 2:
@@ -820,7 +820,7 @@ class RepoWidget(QWidget):
         self.menuselection = selection
         self.multicmenu.exec_(point)
 
-    def unnapliedPatchMenu(self, point, selection):
+    def unappliedPatchMenu(self, point, selection):
         self.menuselection = selection
         self.unappacts[0].setEnabled(len(selection) == 1)
         self.unappacts[1].setEnabled(len(selection) == 1)
