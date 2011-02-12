@@ -78,7 +78,9 @@ When the sync tool is opened within the Workbench, the toolbar has a
 sensitive and the selected target revision, bookmark, or branch will be
 added to every synchronization command.  When the sync tool is opened
 outside of the Workbench, the target checkbox and dropdown box is
-hidden.
+hidden.  Clicking on a revision in the graph will update the values in
+the dropdown box.  Holding :kbd:`Alt` while clicking on a revision will
+select the revision without switching away from the sync tool tab.
 
 At the very right of the toolbar is the currently selected URL.  All
 synchronization commands will use this URL.  The general effect of the
