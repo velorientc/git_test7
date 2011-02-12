@@ -822,9 +822,9 @@ class RepoWidget(QWidget):
 
     def unappliedPatchMenu(self, point, selection):
         self.menuselection = selection
-        self.unappacts[0].setEnabled(len(selection) == 1)
-        self.unappacts[1].setEnabled(len(selection) == 1)
-        self.unappacts[2].setEnabled('qtip' in self.repo.tags())
+        self.unappacts[0].setEnabled('qtip' in self.repo.tags())
+        self.unappacts[1].setEnabled(True)
+        self.unappacts[2].setEnabled(len(selection) > 1)
         self.unappcmenu.exec_(point)
 
     def generateSingleMenu(self):
