@@ -999,9 +999,9 @@ class RepoWidget(QWidget):
         menu = QMenu(self)
         acts = []
         for name, cb in (
-            (_('Fold patches'), qfoldact),
-            (_('Delete patches'), qdeleteact),
-            (_('Reorder patches'), qreorderact)):
+            (_('Fold patches...'), qfoldact),
+            (_('Delete patches...'), qdeleteact),
+            (_('Reorder patches...'), qreorderact)):
             act = QAction(name, self)
             act.triggered.connect(cb)
             acts.append(act)
