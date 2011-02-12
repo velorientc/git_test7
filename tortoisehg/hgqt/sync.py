@@ -930,7 +930,7 @@ class SaveDialog(QDialog):
         self.layout().addRow(_('URL'), self.urllabel)
 
         user, host, port, folder, passwd, scheme = parseurl(url)
-        if user or passwd:
+        if user or passwd and scheme in ('http', 'https'):
             cleanurl = '://'.join([scheme, host])
             if port:
                 cleanurl = ':'.join([cleanurl, port])
