@@ -123,8 +123,6 @@ class SearchWidget(QWidget):
         mainvbox.addWidget(frame)
 
         tv = MatchTree(repo, self)
-        tm = MatchModel(self)
-        tv.setModel(tm)
         tv.revisionSelected.connect(self.revisionSelected)
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
@@ -447,27 +445,44 @@ class MatchTree(QTableView):
 
     def __init__(self, repo, parent):
         QTableView.__init__(self, parent)
+
         self.repo = repo
+        self.pattern = None
+        self.embedded = parent.parent() is not None
+
         self.delegate = htmldelegate.HTMLDelegate(self)
         self.setItemDelegateForColumn(COL_TEXT, self.delegate)
         self.setSelectionMode(QTableView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.setShowGrid(False)
-        self.embedded = parent.parent() is not None
         vh = self.verticalHeader()
         vh.hide()
         vh.setDefaultSectionSize(20)
-
         self.horizontalHeader().setStretchLastSection(True)
 
+        self.actions = {}
+        self.contextmenu = QMenu(self)
+        for key, name, func, shortcut in (
+            ('edit',  _('View file'),      self.onViewFile,      'CTRL+E'),
+            ('ctx',   _('View Changeset'), self.onViewChangeset, 'CTRL+V'),
+            ('vdiff', _('Visual Diff'),    self.onVisualDiff,    'CTRL+D'),
+            ('ann',   _('Annotate file'),  self.onAnnotateFile,  'CTRL+F')):
+            action = QAction(name, self)
+            action.triggered.connect(func)
+            action.setShortcut(QKeySequence(shortcut))
+            self.actions[key] = action
+            self.addAction(action)
+            self.contextmenu.addAction(action)
+        self.activated.connect(self.onRowActivated)
         self.customContextMenuRequested.connect(self.menuRequest)
-        self.pattern = None
-        self.searchwidget = parent
+
+        self.setModel(MatchModel(self))
+        self.selectionModel().selectionChanged.connect(self.onSelectionChanged)
 
     def dragObject(self):
         snapshots = {}
-        for index in self.selectedRows():
+        for index in self.selectionModel().selectedRows():
             path, line, rev, user, text = self.model().getRow(index)
             if rev not in snapshots:
                 snapshots[rev] = [path]
@@ -506,41 +521,38 @@ class MatchTree(QTableView):
         return QTableView.mouseMoveEvent(self, event)
 
     def menuRequest(self, point):
+        if not self.selectionModel().selectedRows():
+            return
+        point = self.mapToGlobal(point)
+        self.contextmenu.exec_(point)
+
+    def onSelectionChanged(self, selected, deselected):
         selrows = []
         wctxonly = True
         allhistory = False
-        for index in self.selectedRows():
+        for index in self.selectionModel().selectedRows():
             path, line, rev, user, text = self.model().getRow(index)
             if rev is not None:
                 wctxonly = False
             if user is not None:
                 allhistory = True
             selrows.append((rev, path, line))
-        if not selrows:
-            return
-        point = self.mapToGlobal(point)
-        menus = [(_('View file'), self.view), (_('Annotate file'), self.ann)]
-        if not wctxonly and self.embedded:
-            menus.append((_('View Changeset'), self.ctx))
-        if allhistory:
-            # need to know files were modified at specified revision
-            menus.append((_('Visual Diff'), self.vdiff))
-        if self.contextmenu:
-            self.contextmenu.clear()
-        else:
-            self.contextmenu = QMenu(self)
-        for name, func in menus:
-            def add(name, func):
-                action = self.contextmenu.addAction(name)
-                action.triggered.connect(lambda: func(selrows))
-            add(name, func)
-        self.contextmenu.exec_(point)
+        self.selectedRows = selrows
+        self.actions['ctx'].setEnabled(not wctxonly and self.embedded)
+        self.actions['vdiff'].setEnabled(allhistory)
 
-    def ann(self, rows):
+    def onRowActivated(self, index):
+        saved = self.selectedRows
+        path, line, rev, user, text = self.model().getRow(index)
+        self.selectedRows = [(rev, path, line)]
+        self.onAnnotateFile()
+        self.selectedRows = saved
+
+    def onAnnotateFile(self):
         from tortoisehg.hgqt import annotate
         repo, ui, pattern = self.repo, self.repo.ui, self.pattern
         seen = set()
-        for rev, path, line in rows:
+        for rev, path, line in self.selectedRows:
             # Only open one annotate instance per file
             if path in seen:
                 continue
@@ -548,20 +560,20 @@ class MatchTree(QTableView):
                 seen.add(path)
             dlg = annotate.AnnotateDialog(path, rev=rev, line=line,
                                           pattern=pattern, parent=self,
-                                          searchwidget=self.searchwidget,
+                                          searchwidget=self.parent(),
                                           root=repo.root)
             dlg.show()
 
-    def ctx(self, rows):
-        for rev, path, line in rows:
+    def onViewChangeset(self):
+        for rev, path, line in self.selectedRows:
             self.revisionSelected.emit(int(rev))
             return
 
-    def view(self, rows):
+    def onViewFile(self):
         from tortoisehg.hgqt import wctxactions
         repo, ui, pattern = self.repo, self.repo.ui, self.pattern
         seen = set()
-        for rev, path, line in rows:
+        for rev, path, line in self.selectedRows:
             # Only open one editor instance per file
             if path in seen:
                 continue
@@ -575,7 +587,8 @@ class MatchTree(QTableView):
                 files = [os.path.join(base, path)]
                 wctxactions.edit(self, ui, repo, files, line, pattern)
 
-    def vdiff(self, rows):
+    def onVisualDiff(self):
+        rows = self.selectedRows[:]
         repo, ui = self.repo, self.repo.ui
         while rows:
             defer = []
@@ -591,10 +604,6 @@ class MatchTree(QTableView):
                 if dlg:
                     dlg.exec_()
             rows = defer
-
-    def selectedRows(self):
-        return self.selectionModel().selectedRows()
-
 
 
 class MatchModel(QAbstractTableModel):
