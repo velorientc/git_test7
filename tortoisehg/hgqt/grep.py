@@ -151,11 +151,9 @@ class SearchWidget(QWidget):
         ph = list(s.value('grep/paths-'+repoid).toStringList())
         self.pathshistory = [p for p in ph if p]
         self.searchhistory = [s for s in sh if s]
-        self.regexple.setCompleter(QCompleter(self.searchhistory, self))
-        self.incle.setCompleter(QCompleter(self.pathshistory, self))
-        self.excle.setCompleter(QCompleter(self.pathshistory, self))
-        mainvbox.setContentsMargins(2, 2, 2, 2)
+        self.setCompleters()
 
+        mainvbox.setContentsMargins(2, 2, 2, 2)
         if parent:
             self.closeonesc = False
         else:
@@ -166,6 +164,34 @@ class SearchWidget(QWidget):
             mainvbox.addWidget(self.stbar)
             self.showMessage.connect(self.stbar.showMessage)
             self.progress.connect(self.stbar.progress)
+
+    def setCompleters(self):
+        comp = QCompleter(self.searchhistory, self)
+        QShortcut(QKeySequence('CTRL+D'), comp.popup(),
+                  self.onSearchCompleterDelete)
+        self.regexple.setCompleter(comp)
+
+        comp = QCompleter(self.pathshistory, self)
+        QShortcut(QKeySequence('CTRL+D'), comp.popup(),
+                  self.onPathCompleterDelete)
+        self.incle.setCompleter(comp)
+        self.excle.setCompleter(comp)
+
+    def onSearchCompleterDelete(self):
+        'CTRL+D pressed in search completer popup window'
+        text = self.regexple.completer().currentCompletion()
+        if text and text in self.searchhistory:
+            self.searchhistory.remove(text)
+            self.setCompleters()
+            self.showMessage.emit(_('"%s" removed from search history') % text)
+
+    def onPathCompleterDelete(self):
+        'CTRL+D pressed in path completer popup window'
+        text = self.incle.completer().currentCompletion()
+        if text and text in self.pathshistory:
+            self.pathshistory.remove(text)
+            self.setCompleters()
+            self.showMessage.emit(_('"%s" removed from path history') % text)
 
     def addHistory(self, search, incpaths, excpaths):
         if search:
@@ -178,9 +204,7 @@ class SearchWidget(QWidget):
             if up in self.pathshistory:
                 self.pathshistory.remove(up)
             self.pathshistory = [up] + self.pathshistory[:9]
-        self.regexple.setCompleter(QCompleter(self.searchhistory, self))
-        self.incle.setCompleter(QCompleter(self.pathshistory, self))
-        self.excle.setCompleter(QCompleter(self.pathshistory, self))
+        self.setCompleters()
 
     def setRevision(self, rev):
         if isinstance(rev, basestring):  # unapplied patch
@@ -449,6 +473,7 @@ class MatchTree(QTableView):
         self.repo = repo
         self.pattern = None
         self.embedded = parent.parent() is not None
+        self.selectedRows = ()
 
         self.delegate = htmldelegate.HTMLDelegate(self)
         self.setItemDelegateForColumn(COL_TEXT, self.delegate)
