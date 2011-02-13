@@ -74,9 +74,9 @@ class SearchWidget(QWidget):
         ilabel.setBuddy(incle)
         elabel = QLabel(_('Excludes:'))
         elabel.setBuddy(excle)
-        ehelpstr = _('Comma separated list of exclusion patterns. '
+        ehelpstr = _('Comma separated list of exclusion file patterns. '
                      'Exclusion patterns are applied after inclusion patterns.')
-        ihelpstr = _('Comma separated list of inclusion patterns. '
+        ihelpstr = _('Comma separated list of inclusion file patterns. '
                      'By default, the entire repository is searched.')
         if hasattr(incle, 'setPlaceholderText'): # Qt >= 4.7 
             incle.setPlaceholderText(u' '.join([u'###', ihelpstr, u'###']))
