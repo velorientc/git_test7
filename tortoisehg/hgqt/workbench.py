@@ -179,13 +179,13 @@ class Workbench(QMainWindow):
                   menu='file', icon='clone')
         newaction(_("&Open Repository..."), self.openRepository,
                   shortcut='Open', menu='file', icon='plus')
-        newaction(_("&Close Repository"), self.closeRepository, icon='close',
+        newaction(_("&Close Repository"), self.closeRepository, icon='window-close',
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
         newaction(_('&Settings...'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
         newseparator(menu='file')
-        newaction(_("E&xit"), self.close, icon='quit',
+        newaction(_("E&xit"), self.close, icon='application-exit',
                   shortcut='Quit', menu='file')
 
         a = self.reporegistry.toggleViewAction()
@@ -236,12 +236,12 @@ class Workbench(QMainWindow):
                 addtaskview('branch', _('&Patch Branch'), 'pbranch')
         newseparator(menu='view')
 
-        newaction(_("&Refresh"), self._repofwd('reload'), icon='reload',
+        newaction(_("&Refresh"), self._repofwd('reload'), icon='view-refresh',
                   shortcut='Refresh', enabled='repoopen',
                   menu='view', toolbar='edit',
                   tooltip=_('Refresh current repository'))
         newaction(_("Refresh &Task Tab"), self._repofwd('reloadTaskTab'),
-                  icon='reloadtt', enabled='repoopen',
+                  icon='tasktab-refresh', enabled='repoopen',
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view')
@@ -280,16 +280,16 @@ class Workbench(QMainWindow):
 
         newseparator(toolbar='edit')
         self.actionBack = \
-        newaction(_("Back"), self._repofwd('back'), icon='back',
+        newaction(_("Back"), self._repofwd('back'), icon='go-previous',
                   enabled=False, toolbar='edit')
         self.actionForward = \
-        newaction(_("Forward"), self._repofwd('forward'), icon='forward',
+        newaction(_("Forward"), self._repofwd('forward'), icon='go-next',
                   enabled=False, toolbar='edit')
         newseparator(toolbar='edit', menu='View')
 
         self.filtertbaction = \
         newaction(_('Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
-                  icon='find', shortcut='Ctrl+S', enabled='repoopen',
+                  icon='view-filter', shortcut='Ctrl+S', enabled='repoopen',
                   toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Filter graph with revision sets or branches'))
 

@@ -62,7 +62,7 @@ class RepoFilterBar(QToolBar):
         self.addWidget(combo)
 
         self.searchBtn = QToolButton(self)
-        self.searchBtn.setIcon(qtlib.geticon('find'))
+        self.searchBtn.setIcon(qtlib.geticon('view-filter'))
         self.searchBtn.setToolTip(_('Trigger revision set query'))
         self.searchBtn.clicked.connect(self.returnPressed)
         self.addWidget(self.searchBtn)

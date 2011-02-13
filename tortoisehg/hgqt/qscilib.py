@@ -302,7 +302,7 @@ class SearchToolBar(QToolBar):
                                             objectName='search',
                                             iconSize=QSize(16, 16))
         if hidable:
-            self._close_button = QToolButton(icon=qtlib.geticon('close'),
+            self._close_button = QToolButton(icon=qtlib.geticon('window-close'),
                                              shortcut=Qt.Key_Escape)
             self._close_button.clicked.connect(self.hide)
             self.addWidget(self._close_button)

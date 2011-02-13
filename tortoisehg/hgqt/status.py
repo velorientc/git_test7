@@ -99,7 +99,7 @@ class StatusWidget(QWidget):
         hbox.setContentsMargins (5, 0, 0, 0)
         self.refreshBtn = tb = QToolButton()
         tb.setToolTip(_('Refresh file list'))
-        tb.setIcon(qtlib.geticon('reload'))
+        tb.setIcon(qtlib.geticon('view-refresh'))
         tb.clicked.connect(self.refreshWctx)
         le = QLineEdit()
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 

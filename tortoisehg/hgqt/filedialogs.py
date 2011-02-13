@@ -186,12 +186,12 @@ class FileLogDialog(_AbstractFileDialog):
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
         self.actionReload.triggered.connect(self.reload)
-        self.actionReload.setIcon(geticon('reload'))
+        self.actionReload.setIcon(geticon('view-refresh'))
 
         self.actionBack = QAction(_('Back'), self, enabled=False,
-                                  icon=geticon('back'))
+                                  icon=geticon('go-previous'))
         self.actionForward = QAction(_('Forward'), self, enabled=False,
-                                     icon=geticon('forward'))
+                                     icon=geticon('go-next'))
         self.repoview.revisionSelected.connect(self._updateHistoryActions)
         self.actionBack.triggered.connect(self.repoview.back)
         self.actionForward.triggered.connect(self.repoview.forward)
@@ -363,13 +363,13 @@ class FileDiffDialog(_AbstractFileDialog):
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
         self.actionReload.triggered.connect(self.reload)
-        self.actionReload.setIcon(geticon('reload'))
+        self.actionReload.setIcon(geticon('view-refresh'))
 
-        self.actionNextDiff = QAction(geticon('down'), 'Next diff', self)
+        self.actionNextDiff = QAction(geticon('go-down'), 'Next diff', self)
         self.actionNextDiff.setShortcut('Alt+Down')
         self.actionNextDiff.triggered.connect(self.nextDiff)
 
-        self.actionPrevDiff = QAction(geticon('up'), 'Previous diff', self)
+        self.actionPrevDiff = QAction(geticon('go-up'), 'Previous diff', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
 
