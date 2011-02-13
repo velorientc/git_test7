@@ -495,14 +495,10 @@ class SyncWidget(QWidget):
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
 
     def secureclicked(self):
-        host = hglib.fromunicode(self.hostentry.text())
-        user = self.curuser or ''
-        pw = self.curpw or ''
-        dlg = SecureDialog(self.repo, host, user, pw, self)
+        dlg = SecureDialog(self.repo, self.currentUrl(False), self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
-        if dlg.exec_() == QDialog.Accepted:
-            self.curuser, self.curpw = '', ''
+        dlg.exec_()
 
     def commandStarted(self):
         for b in self.opbuttons:
@@ -988,7 +984,7 @@ class SaveDialog(QDialog):
         super(SaveDialog, self).reject()
 
 class SecureDialog(QDialog):
-    def __init__(self, repo, host, user, pw, parent):
+    def __init__(self, repo, origurl, parent):
         super(SecureDialog, self).__init__(parent)
 
         def genfingerprint():
@@ -998,15 +994,22 @@ class SecureDialog(QDialog):
             pretty = ":".join([hash[x:x + 2] for x in xrange(0, len(hash), 2)])
             le.setText(pretty)
 
+        user, host, port, folder, passwd, scheme = parseurl(origurl)
         uhost = hglib.tounicode(host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
+
+        # if the already user has an [auth] configuration for this URL, use it
+        res = url.readauthforuri(repo.ui, origurl)
+        if res:
+            self.alias, auth = res
+        else:
+            self.alias = host, {}
         self.repo = repo
         self.host = host
-        self.alias = host.replace('.', '')
-        self.setLayout(QVBoxLayout())
 
+        self.setLayout(QVBoxLayout())
         self.layout().addWidget(QLabel(_('<b>Host:</b> %s') % uhost))
 
         securebox = QGroupBox(_('Secure HTTPS Connection'))
@@ -1055,8 +1058,7 @@ class SecureDialog(QDialog):
         authbox.setLayout(form)
         self.layout().addWidget(authbox)
 
-        cfg = repo.ui.config('auth', self.alias+'.username', '')
-        self.userentry = QLineEdit(user or cfg)
+        self.userentry = QLineEdit(user or auth.get('username', ''))
         self.userentry.setToolTip(
 _('''Optional. Username to authenticate with. If not given, and the remote
 site requires basic or digest authentication, the user will be prompted for
@@ -1064,8 +1066,7 @@ it. Environment variables are expanded in the username letting you do
 foo.username = $USER.'''))
         form.addRow(_('Username'), self.userentry)
 
-        cfg = repo.ui.config('auth', self.alias+'.password', '')
-        self.pwentry = QLineEdit(pw or cfg)
+        self.pwentry = QLineEdit(passwd or auth.get('password', ''))
         self.pwentry.setEchoMode(QLineEdit.Password)
         self.pwentry.setToolTip(
 _('''Optional. Password to authenticate with. If not given, and the remote
@@ -1079,15 +1080,13 @@ it.'''))
                  'Passwords will be stored in platform native '
                  'cryptographically secure method.'))
 
-        cfg = repo.ui.config('auth', self.alias+'.key', '')
-        self.keyentry = QLineEdit(cfg)
+        self.keyentry = QLineEdit(auth.get('key', ''))
         self.keyentry.setToolTip(
 _('''Optional. PEM encoded client certificate key file. Environment variables
 are expanded in the filename.'''))
         form.addRow(_('User Certificate Key File'), self.keyentry)
 
-        cfg = repo.ui.config('auth', self.alias+'.cert', '')
-        self.chainentry = QLineEdit(cfg)
+        self.chainentry = QLineEdit(auth.get('cert', ''))
         self.chainentry.setToolTip(
 _('''Optional. PEM encoded client certificate chain file. Environment variables
 are expanded in the filename.'''))
