@@ -697,7 +697,9 @@ class StatusDialog(QDialog):
         self.stwidget.showMessage.connect(self.statusbar.showMessage)
         self.stwidget.progress.connect(self.statusbar.progress)
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
+
         self.setWindowTitle(self.stwidget.getTitle())
+        self.setWindowFlags(Qt.Window)
 
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
