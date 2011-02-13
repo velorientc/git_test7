@@ -12,12 +12,13 @@ import sys
 import os
 import shutil
 import subprocess
+import cgi
 from fnmatch import fnmatch
 from distutils import log
 from distutils.core import setup, Command
 from distutils.command.build import build as _build_orig
 from distutils.command.clean import clean as _clean_orig
-from distutils.dep_util import newer
+from distutils.dep_util import newer, newer_group
 from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
 
@@ -156,9 +157,42 @@ class build_qt(Command):
         else:
             log.info('compiled %s into %s' % (qrc_file, py_file))
 
+    def _generate_qrc(self, qrc_file, srcfiles, prefix):
+        basedir = os.path.dirname(qrc_file)
+        f = open(qrc_file, 'w')
+        try:
+            f.write('<!DOCTYPE RCC><RCC version="1.0">\n')
+            f.write('  <qresource prefix="%s">\n' % cgi.escape(prefix))
+            for e in srcfiles:
+                relpath = e[len(basedir) + 1:]
+                f.write('    <file>%s</file>\n'
+                        % cgi.escape(relpath.replace(os.path.sep, '/')))
+            f.write('  </qresource>\n')
+            f.write('</RCC>\n')
+        finally:
+            f.close()
+
+    def build_rc(self, py_file, basedir, prefix='/'):
+        """Generate compiled resource including any files under basedir"""
+        # For details, see http://doc.qt.nokia.com/latest/resources.html
+        qrc_file = os.path.join(basedir, '%s.qrc' % os.path.basename(basedir))
+        srcfiles = [os.path.join(root, e)
+                    for root, _dirs, files in os.walk(basedir) for e in files]
+        # NOTE: Here we cannot detect deleted files. In such case, we need
+        # to remove .qrc manually.
+        if not (self.force or newer_group(srcfiles, py_file)):
+            return
+        try:
+            self._generate_qrc(qrc_file, srcfiles, prefix)
+            self.compile_rc(qrc_file, py_file)
+        finally:
+            os.unlink(qrc_file)
+
     def run(self):
         self._wrapuic()
         basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
+        self.build_rc(os.path.join(basepath, 'workbench_rc.py'),
+                      os.path.join(basepath, 'icons'), '/icons')
         for dirpath, _, filenames in os.walk(basepath):
             for filename in filenames:
                 if filename.endswith('.ui'):
