@@ -249,6 +249,17 @@ def descriptionhtmlizer(ui):
 
 _iconcache = {}
 
+def _findicon(name):
+    # TODO: icons should be placed at single location before release
+    for pfx in (':/icons', os.path.join(paths.get_icon_path(), 'svg'),
+                paths.get_icon_path()):
+        for ext in ('svg', 'png', 'ico'):
+            path = '%s/%s.%s' % (pfx, name, ext)
+            if QFile.exists(path):
+                return QIcon(path)
+
+    return None
+
 def geticon(name):
     """
     Return a QIcon for the specified name. (the given 'name' parameter
@@ -260,21 +271,10 @@ def geticon(name):
     if QIcon.hasThemeIcon(name):
         return QIcon.fromTheme(name)
 
-    # TODO: icons should be placed at single location before release
-    def findicon(name):
-        for pfx in (':/icons', os.path.join(paths.get_icon_path(), 'svg'),
-                    paths.get_icon_path()):
-            for ext in ('svg', 'png', 'ico'):
-                path = '%s/%s.%s' % (pfx, name, ext)
-                if QFile.exists(path):
-                    return QIcon(path)
-
-        return QIcon(':/icons/fallback.svg')
-
     try:
         return _iconcache[name]
     except KeyError:
-        _iconcache[name] = findicon(name)
+        _iconcache[name] = _findicon(name) or QIcon(':/icons/fallback.svg')
         return _iconcache[name]
 
 _pixmapcache = {}
