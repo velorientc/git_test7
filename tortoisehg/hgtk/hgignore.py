@@ -224,7 +224,12 @@ class HgIgnoreDialog(gtk.Window):
     def refresh(self):
         hglib.invalidaterepo(self.repo)
         matcher = match.always(self.repo.root, self.repo.root)
-        unknown = self.repo.status(match=matcher, unknown=True)[4]
+        try:
+            unknown = self.repo.status(match=matcher, unknown=True)[4]
+        except (EnvironmentError, util.Abort), inst:
+            gdialog.Prompt(_('Error while reading status'),
+                           hglib.toutf(str(inst)), self).run()
+            return
         self.unkmodel.clear()
         for u in unknown:
             self.unkmodel.append([hglib.toutf(u), u])
