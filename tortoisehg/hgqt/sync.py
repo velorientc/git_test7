@@ -87,13 +87,13 @@ class SyncWidget(QWidget):
         self.opbuttons = []
         for tip, icon, cb in (
             (_('Preview incoming changesets from specified URL'),
-             'incoming', self.inclicked),
+             'hg-incoming', self.inclicked),
             (_('Pull incoming changesets from specified URL'),
-             'pull', self.pullclicked),
+             'hg-pull', self.pullclicked),
             (_('Filter outgoing changesets to specified URL'),
-             'outgoing', self.outclicked),
+             'hg-outgoing', self.outclicked),
             (_('Push outgoing changesets to specified URL'),
-             'push', self.pushclicked),
+             'hg-push', self.pushclicked),
             (_('Email outgoing changesets for specified URL'),
              'mail-forward', self.emailclicked)):
             a = QAction(self)

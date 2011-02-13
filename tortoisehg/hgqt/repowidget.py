@@ -173,7 +173,7 @@ class RepoWidget(QWidget):
         tt.setTabToolTip(idx, _("Search"))
 
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
-        self.syncTabIndex = idx = tt.addTab(w, geticon('sync'), '')
+        self.syncTabIndex = idx = tt.addTab(w, geticon('thg-sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
         self.mqDemand = w = DemandWidget(self.createMQWidget)

@@ -229,7 +229,7 @@ class Workbench(QMainWindow):
         addtaskview('Checkmark', _('&Commit'))
         addtaskview('annotate', _('&Manifest'))
         addtaskview('repobrowse', _('&Search'))
-        addtaskview('sync', _('S&ynchronize'))
+        addtaskview('thg-sync', _('S&ynchronize'))
         self.actionSelectTaskMQ = \
                 addtaskview('mq', _('Patch &Queue'), 'mq')
         self.actionSelectTaskPbranch = \
@@ -307,16 +307,16 @@ class Workbench(QMainWindow):
         menu.addAction(self.tasktbar.toggleViewAction())
         self.menuView.addMenu(menu)
 
-        newaction(_('Pull'), self._repofwd('pull'), icon='pull-24x24',
+        newaction(_('Pull'), self._repofwd('pull'), icon='hg-pull',
                   tooltip=_('Pull incoming changes from default pull target'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Push'), self._repofwd('push'), icon='push-24x24',
+        newaction(_('Push'), self._repofwd('push'), icon='hg-push',
                   tooltip=_('Push outgoing changes to default push target'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Incoming'), self._repofwd('incoming'), icon='incoming-24x24',
+        newaction(_('Incoming'), self._repofwd('incoming'), icon='hg-incoming',
                   tooltip=_('Check for incoming changes from default pull target'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Outgoing'), self._repofwd('outgoing'), icon='outgoing-24x24',
+        newaction(_('Outgoing'), self._repofwd('outgoing'), icon='hg-outgoing',
                    tooltip=_('Detect outgoing changes to default push target'),
                    enabled='repoopen', toolbar='sync')
 
