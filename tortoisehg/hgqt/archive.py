@@ -162,7 +162,7 @@ class ArchiveDialog(QDialog):
 
         # dialog setting
         self.setWindowTitle(_('Archive - %s') % self.repo.displayname)
-        self.setWindowIcon(qtlib.geticon('archive'))
+        self.setWindowIcon(qtlib.geticon('hg-archive'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)

@@ -156,7 +156,7 @@ class CloneDialog(QDialog):
         self.setLayout(box)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.setWindowTitle(_('Clone - %s') % cwd)
-        self.setWindowIcon(qtlib.geticon('clone'))
+        self.setWindowIcon(qtlib.geticon('hg-clone'))
 
         # prepare to show
         self.cmd.setHidden(True)

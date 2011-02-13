@@ -400,7 +400,7 @@ class _StatusFilterButton(QToolButton):
             kwargs['text'] = _('Status')
         super(_StatusFilterButton, self).__init__(
             parent, popupMode=QToolButton.InstantPopup,
-            icon=qtlib.geticon('status'),
+            icon=qtlib.geticon('hg-status'),
             toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
 
         self._initactions(statustext)

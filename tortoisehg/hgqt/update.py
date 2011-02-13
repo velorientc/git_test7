@@ -141,7 +141,7 @@ class UpdateDialog(QDialog):
         self.setLayout(box)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.setWindowTitle(_('Update - %s') % self.repo.displayname)
-        self.setWindowIcon(qtlib.geticon('update'))
+        self.setWindowIcon(qtlib.geticon('hg-update'))
 
         # prepare to show
         self.rev_combo.lineEdit().selectAll()

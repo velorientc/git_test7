@@ -142,7 +142,7 @@ class RenameDialog(QDialog):
         self.vbox.addLayout(self.hbox)
 
         # dialog setting
-        self.setWindowIcon(qtlib.geticon('rename'))
+        self.setWindowIcon(qtlib.geticon('hg-rename'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.copy_chk.setChecked(self.iscopy)
         self.setLayout(self.vbox)

@@ -157,19 +157,19 @@ class RepoWidget(QWidget):
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)
         w.showMessage.connect(self.showMessage)
-        self.logTabIndex = idx = tt.addTab(w, geticon('log'), '')
+        self.logTabIndex = idx = tt.addTab(w, geticon('hg-log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
         self.commitDemand = w = DemandWidget(self.createCommitWidget)
-        self.commitTabIndex = idx = tt.addTab(w, geticon('Checkmark'), '')
+        self.commitTabIndex = idx = tt.addTab(w, geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
         self.manifestDemand = w = DemandWidget(self.createManifestWidget)
-        self.manifestTabIndex = idx = tt.addTab(w, geticon('annotate'), '')
+        self.manifestTabIndex = idx = tt.addTab(w, geticon('hg-annotate'), '')
         tt.setTabToolTip(idx, _('Manifest'))
 
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
-        self.grepTabIndex = idx = tt.addTab(w, geticon('repobrowse'), '')
+        self.grepTabIndex = idx = tt.addTab(w, geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
 
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
@@ -178,7 +178,7 @@ class RepoWidget(QWidget):
 
         self.mqDemand = w = DemandWidget(self.createMQWidget)
         if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, geticon('mq'), '')
+            self.mqTabIndex = idx = tt.addTab(w, geticon('thg-mq'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
             self.namedTabs['mq'] = idx
         else:
@@ -851,12 +851,12 @@ class RepoWidget(QWidget):
         exs = self.repo.extensions()
         menu = QMenu(self)
         for ext, func, desc, icon, cb in (
-            (None, isrev, _('Update...'), 'update', self.updateToRevision),
+            (None, isrev, _('Update...'), 'hg-update', self.updateToRevision),
             (None, isctx, _('Visual diff...'), None, self.visualDiffRevision),
             (None, isrev, _('Diff to local...'), None, self.visualDiffToLocal),
-            (None, fixed, _('Merge with...'), 'merge', self.mergeWithRevision),
+            (None, fixed, _('Merge with...'), 'hg-merge', self.mergeWithRevision),
             (None, isctx, _('Browse at rev...'), None, self.manifestRevision),
-            (None, fixed, _('Tag...'), 'tag', self.tagToRevision),
+            (None, fixed, _('Tag...'), 'hg-tag', self.tagToRevision),
             (None, fixed, _('Bookmark...'), 'bookmark', self.bookmarkRevision),
             (None, fixed, _('Backout...'), None, self.backoutToRevision),
             (None, isrev, _('Export patch'), None, self.exportRevisions),

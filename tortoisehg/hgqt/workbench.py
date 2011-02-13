@@ -73,7 +73,7 @@ class Workbench(QMainWindow):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.8)
 
-        self.setWindowIcon(geticon('log'))
+        self.setWindowIcon(geticon('hg-log'))
 
         self.repoTabsWidget = tw = QTabWidget()
         tw.setDocumentMode(True)
@@ -176,7 +176,7 @@ class Workbench(QMainWindow):
                   shortcut='New', menu='file', icon='init')
         newaction(_("Clone Repository..."), self.cloneRepository,
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
-                  menu='file', icon='clone')
+                  menu='file', icon='hg-clone')
         newaction(_("&Open Repository..."), self.openRepository,
                   shortcut='Open', menu='file', icon='plus')
         newaction(_("&Close Repository"), self.closeRepository, icon='window-close',
@@ -191,7 +191,7 @@ class Workbench(QMainWindow):
         a = self.reporegistry.toggleViewAction()
         a.setText(_('Show Repository Registry'))
         a.setShortcut('Ctrl+Shift+O')
-        a.setIcon(geticon('repotree'))
+        a.setIcon(geticon('thg-reporegistry'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
@@ -202,7 +202,7 @@ class Workbench(QMainWindow):
         a = self.log.toggleViewAction()
         a.setText(_('Show Output &Log'))
         a.setShortcut('Ctrl+L')
-        a.setIcon(geticon('showlog'))
+        a.setIcon(geticon('thg-console'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
@@ -226,12 +226,12 @@ class Workbench(QMainWindow):
             return a
         # NOTE: Sequence must match that in repowidget.py
         addtaskview('log', _("Revision &Details"))
-        addtaskview('Checkmark', _('&Commit'))
-        addtaskview('annotate', _('&Manifest'))
-        addtaskview('repobrowse', _('&Search'))
+        addtaskview('hg-commit', _('&Commit'))
+        addtaskview('hg-annotate', _('&Manifest'))
+        addtaskview('hg-grep', _('&Search'))
         addtaskview('thg-sync', _('S&ynchronize'))
         self.actionSelectTaskMQ = \
-                addtaskview('mq', _('Patch &Queue'), 'mq')
+                addtaskview('thg-mq', _('Patch &Queue'), 'mq')
         self.actionSelectTaskPbranch = \
                 addtaskview('branch', _('&Patch Branch'), 'pbranch')
         newseparator(menu='view')
@@ -245,7 +245,7 @@ class Workbench(QMainWindow):
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view')
-        newaction(_("Load all"), self.loadall, icon='loadall',
+        newaction(_("Load all"), self.loadall, icon='thg-log-load-all',
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
 
@@ -264,7 +264,7 @@ class Workbench(QMainWindow):
         newaction(_("Recover"), self._repofwd('recover'), enabled='repoopen',
                   menu='repository')
         newseparator(menu='repository')
-        newaction(_("Resolve"), self._repofwd('resolve'), icon='merge',
+        newaction(_("Resolve"), self._repofwd('resolve'), icon='hg-merge',
                   enabled='repoopen', menu='repository')
         newaction(_("Rollback/Undo"), self._repofwd('rollback'),
                   enabled='repoopen', menu='repository')
