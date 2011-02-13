@@ -464,10 +464,12 @@ class DiffBrowser(QFrame):
         self.selected = self.sci.markerDefine(qsci.Plus, -1)
         self.unselected = self.sci.markerDefine(qsci.Minus, -1)
         self.vertical = self.sci.markerDefine(qsci.VerticalLine, -1)
+        self.divider = self.sci.markerDefine(qsci.Background, -1)
         self.selcolor = self.sci.markerDefine(qsci.Background, -1)
         self.sci.setMarkerBackgroundColor(QColor('#BBFFFF'), self.selcolor)
+        self.sci.setMarkerBackgroundColor(QColor('#AAAAAA'), self.divider)
         mask = (1 << self.selected) | (1 << self.unselected) | \
-               (1 << self.vertical) | (1 << self.selcolor)
+               (1 << self.vertical) | (1 << self.selcolor) | (1 << self.divider)
         self.sci.setMarginMarkerMask(1, mask)
 
         self.layout().addWidget(self.sci, 1)
@@ -586,6 +588,7 @@ class DiffBrowser(QFrame):
             chunk.write(buf)
             chunk.lines = buf.getvalue().splitlines()
             utext += [hglib.tounicode(l) for l in chunk.lines]
+            utext.append('')
         self.sci.setText(u'\n'.join(utext))
 
         start = 0
@@ -593,12 +596,14 @@ class DiffBrowser(QFrame):
         for chunk in chunks[1:]:
             chunk.lrange = (start, start+len(chunk.lines))
             chunk.mline = start + len(chunk.lines)/2
+            if start:
+                self.sci.markerAdd(start-1, self.divider)
             for i in xrange(1,len(chunk.lines)-1):
                 if start + i == chunk.mline:
                     self.sci.markerAdd(chunk.mline, self.unselected)
                 else:
                     self.sci.markerAdd(start+i, self.vertical)
-            start += len(chunk.lines)
+            start += len(chunk.lines) + 1
         self.origcontents = fd.olddata
         self.countselected = 0
         self.curchunks = chunks
