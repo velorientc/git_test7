@@ -229,7 +229,8 @@ class ShelveDialog(QDialog):
         self.newShelf(True)
 
     def newShelf(self, interactive):
-        shelve = time.strftime('%Y-%m-%d_%H-%M-%S')
+        shelve = time.strftime('%Y-%m-%d_%H-%M-%S') + \
+                 '_parent_rev_%d' % self.repo['.'].rev()
         if interactive:
             dlg = QInputDialog(self, Qt.Sheet)
             dlg.setWindowModality(Qt.WindowModal)
