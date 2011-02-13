@@ -193,6 +193,9 @@ class build_qt(Command):
         basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
         self.build_rc(os.path.join(basepath, 'workbench_rc.py'),
                       os.path.join(basepath, 'icons'), '/icons')
+        self.build_rc(os.path.join(basepath, 'icons_rc.py'),
+                      os.path.join(os.path.dirname(__file__), 'icons'),
+                      '/icons')
         for dirpath, _, filenames in os.walk(basepath):
             for filename in filenames:
                 if filename.endswith('.ui'):
