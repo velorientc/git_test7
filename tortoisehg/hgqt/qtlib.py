@@ -260,6 +260,21 @@ def _findicon(name):
 
     return None
 
+# http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+_SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
+                        (QSize(22, 22), '22x22/actions', '.png'),
+                        (QSize(24, 24), '24x24/actions', '.png')]
+
+def _findscalableicon(name):
+    """Find icon from qrc by using freedesktop-like icon lookup"""
+    o = QIcon()
+    for size, subdir, sfx in _SCALABLE_ICON_PATHS:
+        path = ':/icons/%s/%s%s' % (subdir, name, sfx)
+        if QFile.exists(path):
+            o.addFile(path, size)
+    if not o.isNull():
+        return o
+
 def geticon(name):
     """
     Return a QIcon for the specified name. (the given 'name' parameter
@@ -274,7 +289,8 @@ def geticon(name):
     try:
         return _iconcache[name]
     except KeyError:
-        _iconcache[name] = _findicon(name) or QIcon(':/icons/fallback.svg')
+        _iconcache[name] = (_findscalableicon(name) or _findicon(name)
+                            or QIcon(':/icons/fallback.svg'))
         return _iconcache[name]
 
 _pixmapcache = {}
