@@ -911,7 +911,7 @@ class PostPullDialog(QDialog):
         super(PostPullDialog, self).reject()
 
 class SaveDialog(QDialog):
-    def __init__(self, repo, alias, url, safeurl, parent):
+    def __init__(self, repo, alias, origurl, safeurl, parent):
         super(SaveDialog, self).__init__(parent)
 
         self.setWindowTitle(_('Save Peer Path'))
@@ -919,7 +919,7 @@ class SaveDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
-        self.origurl = url
+        self.origurl = origurl
         self.setLayout(QFormLayout(fieldGrowthPolicy=QFormLayout.ExpandingFieldsGrow))
 
         self.aliasentry = QLineEdit(hglib.tounicode(alias))
@@ -929,13 +929,9 @@ class SaveDialog(QDialog):
         self.urllabel = QLabel(hglib.tounicode(safeurl))
         self.layout().addRow(_('URL'), self.urllabel)
 
-        user, host, port, folder, passwd, scheme = parseurl(url)
+        user, host, port, folder, passwd, scheme = parseurl(origurl)
         if user or passwd and scheme in ('http', 'https'):
-            cleanurl = '://'.join([scheme, host])
-            if port:
-                cleanurl = ':'.join([cleanurl, port])
-            if folder:
-                cleanurl = '/'.join([cleanurl, folder])
+            cleanurl = url.removeauth(origurl)
             def showurl(showclean):
                 newurl = showclean and cleanurl or safeurl
                 self.urllabel.setText(hglib.tounicode(newurl))
