@@ -119,7 +119,7 @@ class RevisionSetQuery(QDialog):
 
         self.repo = repo
         self.setWindowTitle(_('Revision Set Query'))
-        self.setWindowFlags(Qt.Tool)
+        self.setWindowFlags(Qt.Window)
 
         layout = QVBoxLayout()
         layout.setMargin(0)
