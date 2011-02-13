@@ -23,6 +23,7 @@ class ShelveDialog(QDialog):
 
     def __init__(self, repo, parent):
         QDialog.__init__(self, parent)
+        self.setWindowFlags(Qt.Window)
 
         self.repo = repo
         self.shelves = []
