@@ -254,9 +254,12 @@ def geticon(name):
     Return a QIcon for the specified name. (the given 'name' parameter
     must *not* provide the extension).
 
-    This searches for the icon from Qt resource or icons directory,
+    This searches for the icon from theme, Qt resource or icons directory,
     named as 'name.(svg|png|ico)'.
     """
+    if QIcon.hasThemeIcon(name):
+        return QIcon.fromTheme(name)
+
     # TODO: icons should be placed at single location before release
     def findicon(name):
         for pfx in (':/icons', os.path.join(paths.get_icon_path(), 'svg'),
