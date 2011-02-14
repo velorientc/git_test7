@@ -225,7 +225,7 @@ class Workbench(QMainWindow):
             self.tasktbar.addAction(a)
             return a
         # NOTE: Sequence must match that in repowidget.py
-        addtaskview('log', _("Revision &Details"))
+        addtaskview('hg-log', _("Revision &Details"))
         addtaskview('hg-commit', _('&Commit'))
         addtaskview('hg-annotate', _('&Manifest'))
         addtaskview('hg-grep', _('&Search'))
