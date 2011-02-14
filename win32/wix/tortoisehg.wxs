@@ -135,6 +135,9 @@
               <RegistryValue
                   Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
                   Type='string' Value='[INSTALLDIR]ThgShellx64.dll'/>
+              <RegistryValue
+                  Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgDropHandler)\InProcServer32'
+                  Type='string' Value='[INSTALLDIR]ThgShellx64.dll'/>
               <?foreach CLSID in $(var.OverlayCLSIDList) ?>
                 <RegistryValue
                   Root='HKCR' Key='CLSID\$(var.CLSID)\InProcServer32'
@@ -160,6 +163,10 @@
               />
               <RegistryValue
                 Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+                Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
+              />
+              <RegistryValue
+                Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgDropHandler)\InProcServer32'
                 Type='string' Value='[INSTALLDIR]ThgShellx86.dll'
               />
               <?foreach CLSID in $(var.OverlayCLSIDList) ?>
@@ -316,6 +323,10 @@
               />
               <RegistryValue
                 Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgCmenu)\InProcServer32'
+                Type='string' Value='[INSTALLDIRx86]ThgShellx86.dll'
+              />
+              <RegistryValue
+                Root='HKCR' Key='CLSID\$(var.CLSID_TortoiseHgDropHandler)\InProcServer32'
                 Type='string' Value='[INSTALLDIRx86]ThgShellx86.dll'
               />
               <?foreach CLSID in $(var.OverlayCLSIDList) ?>

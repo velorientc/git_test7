@@ -3,21 +3,39 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
+struct MenuDescription
+{
+    std::string name;
+    std::wstring menuText;
+    std::wstring helpText;
+    std::string iconName;
+    UINT idCmd;
+};
+
+typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
 
 class CShellExtCMenu: public IContextMenu3, IShellExtInit
 {
-    ULONG m_cRef;
 
-    LPTSTR* m_ppszFileUserClickedOn; // [MAX_PATH]
+protected:
+    ULONG m_cRef;
     std::vector<std::string> myFiles;
     std::string myFolder;
 
-    void RunDialog(const std::string&);
+    virtual void RunDialog(const std::string&);
+    virtual MenuDescriptionMap& GetMenuDescriptionMap();
+
     void TweakMenuForVista(HMENU menu);
+    void PrintDebugHeader(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj);
+    void InitMenuMaps(MenuDescription *menuDescs, std::size_t sz);
+    void InsertMenuItemByName(
+	    HMENU hMenu, const std::string& name, UINT indexMenu,
+	    UINT idCmd, UINT idCmdFirst, const std::wstring& prefix);
 
 public:
-    explicit CShellExtCMenu(char dummy);
+    explicit CShellExtCMenu(const char dummy);
     ~CShellExtCMenu();
 
     // IUnknown
