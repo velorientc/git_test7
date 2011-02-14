@@ -83,7 +83,7 @@ class InitDialog(QDialog):
 
         # dialog settings
         self.setWindowTitle(_('Init'))
-        self.setWindowIcon(qtlib.geticon('init'))
+        self.setWindowIcon(qtlib.geticon('hg-init'))
         self.setWindowFlags(
                 self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setLayout(self.vbox)

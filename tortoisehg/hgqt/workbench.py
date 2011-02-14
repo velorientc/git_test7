@@ -173,7 +173,7 @@ class Workbench(QMainWindow):
                 getattr(self, '%stbar' % toolbar).addSeparator()
 
         newaction(_("&New Repository..."), self.newRepository,
-                  shortcut='New', menu='file', icon='init')
+                  shortcut='New', menu='file', icon='hg-init')
         newaction(_("Clone Repository..."), self.cloneRepository,
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
                   menu='file', icon='hg-clone')
