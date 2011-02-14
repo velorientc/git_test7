@@ -536,23 +536,37 @@ class SyncWidget(QWidget):
         if self.opts.get('noproxy'):
             cmdline += ['--config', 'http_proxy.host=']
 
-        url = self.currentUrl(False)
-        if not url:
+        cururl = self.currentUrl(False)
+        if not cururl:
             qtlib.InfoMsgBox(_('No URL selected'),
                     _('An URL must be selected for this operation.'),
                     parent=self)
             return
 
-        user, host, port, folder, passwd, scheme = parseurl(url)
+        user, host, port, folder, passwd, scheme = parseurl(cururl)
         if scheme == 'https':
             if self.repo.ui.configbool('insecurehosts', host):
                 cmdline.append('--insecure')
+            if user:
+                cleanurl = url.removeauth(cururl)
+                res = url.readauthforuri(self.repo.ui, cleanurl)
+                if res:
+                    group, auth = res
+                    if auth.get('username'):
+                        if qtlib.QuestionMsgBox(
+                            _('Redundant authentication info'),
+                            _('You have authentication info configured for '
+                              'this host and inside this URL.  Remove '
+                              'authentication info from this URL?'),
+                            parent=self):
+                            self.setUrl(cleanurl)
+                            self.saveclicked()
 
         safeurl = self.currentUrl(True)
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
-        cmdline.append(url)
+        cmdline.append(cururl)
         self.repo.incrementBusyCount()
-        self.cmd.run(cmdline, display=display, useproc='p4://' in url)
+        self.cmd.run(cmdline, display=display, useproc='p4://' in cururl)
 
     ##
     ## Workbench toolbar buttons
@@ -1001,7 +1015,8 @@ class SecureDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         # if the already user has an [auth] configuration for this URL, use it
-        res = url.readauthforuri(repo.ui, origurl)
+        cleanurl = url.removeauth(origurl)
+        res = url.readauthforuri(repo.ui, cleanurl)
         if res:
             self.alias, auth = res
         else:
