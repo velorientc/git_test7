@@ -683,8 +683,10 @@ class RepoWidget(QWidget):
         val = self.repo.ui.config('tortoisehg', 'tasktabs', 'off').lower()
         if val == 'east':
             self.taskTabsWidget.setTabPosition(QTabWidget.East)
+            self.taskTabsWidget.tabBar().show()
         elif val == 'west':
             self.taskTabsWidget.setTabPosition(QTabWidget.West)
+            self.taskTabsWidget.tabBar().show()
         else:
             self.taskTabsWidget.tabBar().hide()
 
