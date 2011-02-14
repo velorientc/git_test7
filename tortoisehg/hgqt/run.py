@@ -698,6 +698,16 @@ def rebase(ui, *pats, **opts):
     from tortoisehg.hgqt.rebase import run
     return qtrun(run, ui, *pats, **opts)
 
+def drag_move(ui, *pats, **opts):
+    """Move the selected files to the desired directory"""
+    from tortoisehg.hgqt.dnd import run_move
+    return qtrun(run_move, ui, *pats, **opts)
+
+def drag_copy(ui, *pats, **opts):
+    """Copy the selected files to the desired directory"""
+    from tortoisehg.hgqt.dnd import run_copy
+    return qtrun(run_copy, ui, *pats, **opts)
+
 def thgimport(ui, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt.thgimport import run
@@ -959,6 +969,8 @@ table = {
         [('u', 'user', '', _('record user as committer')),
          ('d', 'date', '', _('record datecode as commit date'))],
         _('thg commit [OPTIONS] [FILE]...')),
+    "drag_move": (drag_move, [], _('thg drag_move SOURCE... DEST')),
+    "drag_copy": (drag_copy, [], _('thg drag_copy SOURCE... DEST')),
     "^grep|search": (grep,
         [('i', 'ignorecase', False, _('ignore case during search')),],
         _('thg grep')),
