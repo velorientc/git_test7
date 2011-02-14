@@ -523,7 +523,7 @@ class MQWidget(QWidget):
         if os.path.isdir(repo.mq.join('.hg')):
             self.revisionOrCommitBtn.setText(_('QCommit'))
         else:
-            self.revisionOrCommitBtn.setText(_('Revision Queue'))
+            self.revisionOrCommitBtn.setText(_('Create MQ repo'))
 
         self.qpushAllBtn.setEnabled(bool(repo.thgmqunappliedpatches))
         self.qpushBtn.setEnabled(bool(repo.thgmqunappliedpatches))
