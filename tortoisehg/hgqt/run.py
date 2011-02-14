@@ -453,7 +453,7 @@ class _QtRunner(QObject):
             qtlib.fix_application_font()
             qtlib.configstyles(ui)
             qtlib.initfontcache(ui)
-            self._mainapp.setWindowIcon(qtlib.geticon('thg_logo'))
+            self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
             dlg = dlgfunc(ui, *args, **opts)
             if dlg:
                 dlg.show()
