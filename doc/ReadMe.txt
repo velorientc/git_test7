@@ -51,7 +51,7 @@ Please follow this rules when hacking the doc source files.
 
   :guilabel:`Commit`
 
-- To indicate a menu choise use :menuselection: and -->, for example:
+- To indicate a menu choice use :menuselection: and -->, for example:
 
   :menuselection:`TortoiseHg... --> About`
   
