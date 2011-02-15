@@ -695,7 +695,12 @@ def run(ui, *pats, **opts):
         pats = hglib.canonpaths(pats)
         if len(pats) == 1 and os.path.isfile(repo.wjoin(pats[0])):
             from tortoisehg.hgqt.filedialogs import FileLogDialog
-            return FileLogDialog(repo, pats[0], None)
+            fname = pats[0]
+            ufname = hglib.tounicode(fname)
+            dlg = FileLogDialog(repo, fname, None)
+            dlg.setWindowTitle(_('Hg file log viewer [%s] - %s') % (
+                repo.displayname, ufname))
+            return dlg
     w = Workbench()
     if root:
         root = hglib.tounicode(root)
