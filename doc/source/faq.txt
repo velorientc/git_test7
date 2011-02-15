@@ -56,15 +56,16 @@ Frequently Asked Questions
 *How is TortoiseHg configured?*
 
 	TortoiseHg gets configuration settings from two systems.
-
+    
 	1. The Mercurial configuration system, which is three-tiered
-		1. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
-		2. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
-		3. Per-Repository :file:`Mercurial.ini` in :file:`{repo-root}\\.hg\\hgrc`
-	2. :file:`%APPDATA%\\Tortoisehg` settings for application state
-	   (window positions, etc)
+		a. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
+		b. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
+		c. Per-Repository :file:`hgrc` in :file:`{repo-root}\\.hg`
+	2. The folder :file:`%APPDATA%\\TortoiseHg`:
+		a. File :file:`thg-reporegistry.xml` holds the content of the RepoRegistry.
+		b. File :file:`TortoiseHgQt.ini` contains the settings for application state (window positions, etc).
 
-	These are some of the configurables that are stored the Mercurial
+	These are some of the configurables that are stored in the Mercurial
 	configuration system. ::
 	
 		[tortoisehg]
