@@ -286,9 +286,12 @@ class ShelveDialog(QDialog):
                                         _('Revert all working copy changes?')):
                 return
             try:
+                self.repo.ui.quiet = True
                 commands.revert(self.repo.ui, self.repo, all=True)
+                self.repo.ui.quiet = False
             except (EnvironmentError, error.Abort), e:
                 self.showMessage(hglib.tounicode(str(e)))
+                self.refreshCombos()
             return
         shelf = self.currentPatchA()
         ushelf = hglib.tounicode(os.path.basename(shelf))
