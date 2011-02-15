@@ -21,10 +21,15 @@ the folder, type :command:`thg init`.
 :guilabel:`Add special files (.hgignore, ...)`
 	If selected TortoiseHg creates an empty :file:`.hgignore` file
 	in the working directory.
-:guilabel:`Make repo compatible with Mercurial 1.0`
+:guilabel:`Make repo compatible with Mercurial <1.7`
 	If selected TortoiseHg creates an older format Mercurial repository.
 	Do not check unless you have a strong reason to do, and you know
 	what you are doing.
+:guilabel:`Show in Workbench after init`
+    When the repository was successfully created, it is added to the RepoRegistry,
+    and opened in a new tab the Workbench.
+:guilabel:`Hg command`
+    This field displays the command that will be executed by the dialog.
 
 Creating a new repository means create a subdirectory called :file:`.hg`.
 In this subdirectory Mercurial keeps all its versioning information.
