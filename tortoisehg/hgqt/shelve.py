@@ -8,6 +8,8 @@
 import os
 import time
 
+from mercurial import commands, error
+
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
@@ -58,10 +60,14 @@ class ShelveDialog(QDialog):
         avbox.addLayout(ahbox)
         self.comboa = QComboBox(self)
         self.comboa.currentIndexChanged.connect(self.comboAChanged)
+        self.clearShelfButtonA = QPushButton(_('Clear'))
+        self.clearShelfButtonA.setToolTip(_('Clear the current shelf file'))
+        self.clearShelfButtonA.clicked.connect(self.clearShelfA)
         self.delShelfButtonA = QPushButton(_('Delete'))
         self.delShelfButtonA.setToolTip(_('Delete the current shelf file'))
         self.delShelfButtonA.clicked.connect(self.deleteShelfA)
         ahbox.addWidget(self.comboa, 1)
+        ahbox.addWidget(self.clearShelfButtonA)
         ahbox.addWidget(self.delShelfButtonA)
 
         self.browsea = chunks.ChunksWidget(repo, self)
@@ -83,10 +89,14 @@ class ShelveDialog(QDialog):
         bvbox.addLayout(bhbox)
         self.combob = QComboBox(self)
         self.combob.currentIndexChanged.connect(self.comboBChanged)
+        self.clearShelfButtonB = QPushButton(_('Clear'))
+        self.clearShelfButtonB.setToolTip(_('Clear the current shelf file'))
+        self.clearShelfButtonB.clicked.connect(self.clearShelfB)
         self.delShelfButtonB = QPushButton(_('Delete'))
         self.delShelfButtonB.setToolTip(_('Delete the current shelf file'))
         self.delShelfButtonB.clicked.connect(self.deleteShelfB)
         bhbox.addWidget(self.combob, 1)
+        bhbox.addWidget(self.clearShelfButtonB)
         bhbox.addWidget(self.delShelfButtonB)
 
         self.browseb = chunks.ChunksWidget(repo, self)
@@ -270,6 +280,30 @@ class ShelveDialog(QDialog):
         self.refreshCombos()
 
     @pyqtSlot()
+    def clearShelfA(self):
+        if self.comboa.currentIndex() == 0:
+            if not qtlib.QuestionMsgBox(_('Are you sure?'),
+                                        _('Revert all working copy changes?')):
+                return
+            try:
+                commands.revert(self.repo.ui, self.repo, all=True)
+            except (EnvironmentError, error.Abort), e:
+                self.showMessage(hglib.tounicode(str(e)))
+            return
+        shelf = self.currentPatchA()
+        ushelf = hglib.tounicode(os.path.basename(shelf))
+        if not qtlib.QuestionMsgBox(_('Are you sure?'),
+                                _('Clear contents of shelf file %s?') % ushelf):
+            return
+        try:
+            f = open(shelf, "w")
+            f.close()
+            self.showMessage(_('Shelf cleared'))
+        except EnvironmentError, e:
+            self.showMessage(hglib.tounicode(str(e)))
+        self.refreshCombos()
+
+    @pyqtSlot()
     def deleteShelfB(self):
         shelf = self.currentPatchB()
         ushelf = hglib.tounicode(os.path.basename(shelf))
@@ -279,6 +313,21 @@ class ShelveDialog(QDialog):
         try:
             os.unlink(shelf)
             self.showMessage(_('Shelf deleted'))
+        except EnvironmentError, e:
+            self.showMessage(hglib.tounicode(str(e)))
+        self.refreshCombos()
+
+    @pyqtSlot()
+    def clearShelfB(self):
+        shelf = self.currentPatchB()
+        ushelf = hglib.tounicode(os.path.basename(shelf))
+        if not qtlib.QuestionMsgBox(_('Are you sure?'),
+                                _('Clear contents of shelf file %s?') % ushelf):
+            return
+        try:
+            f = open(shelf, "w")
+            f.close()
+            self.showMessage(_('Shelf cleared'))
         except EnvironmentError, e:
             self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
@@ -352,6 +401,7 @@ class ShelveDialog(QDialog):
         self.comboBChanged(idxb)
         if not patches and not shelves:
             self.delShelfButtonB.setEnabled(False)
+            self.clearShelfButtonB.setEnabled(False)
             self.browseb.setContext(patchctx('', self.repo, None))
 
     @pyqtSlot(int)
@@ -361,9 +411,11 @@ class ShelveDialog(QDialog):
         if index == 0:
             rev = None
             self.delShelfButtonA.setEnabled(False)
+            self.clearShelfButtonA.setEnabled(True)
         else:
             rev = self.currentPatchA()
             self.delShelfButtonA.setEnabled(index <= len(self.shelves))
+            self.clearShelfButtonA.setEnabled(index <= len(self.shelves))
         self.browsea.setContext(self.repo.changectx(rev))
 
     @pyqtSlot(int)
@@ -372,6 +424,7 @@ class ShelveDialog(QDialog):
             return
         rev = self.currentPatchB()
         self.delShelfButtonB.setEnabled(index < len(self.shelves))
+        self.clearShelfButtonB.setEnabled(index < len(self.shelves))
         self.browseb.setContext(self.repo.changectx(rev))
 
     @pyqtSlot(int, int)
