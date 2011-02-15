@@ -81,6 +81,7 @@ class patchctx(object):
     def branch(self):       return self._branch
     def parents(self):      return ()
     def tags(self):         return ()
+    def bookmarks(self):    return ()
     def children(self):     return ()
     def extra(self):        return {}
 
