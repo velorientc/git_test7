@@ -521,7 +521,7 @@ class HgRepoListModel(QAbstractTableModel):
         for mark in ctx.bookmarks():
             if mark == self.repo._bookmarkcurrent:
                 style = 'log.curbookmark'
-            elif mark in self.repo._bookmarks:
+            else:
                 style = 'log.bookmark'
             marku = hglib.tounicode(mark)
             effects = qtlib.geteffect(style)
