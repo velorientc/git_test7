@@ -103,11 +103,11 @@ class RepoTreeView(QTreeView):
                 _("Rename the entry"), None, self.startRename),
              ("settings", _("Settings..."), 'settings_user',
                 _("View the repository's settings"), None, self.startSettings),
-             ("remove", _("Remove from registry"), 'remove',
+             ("remove", _("Remove from registry"), 'menudelete',
                 _("Remove the node and all its subnodes."
                   " Repositories are not deleted from disk."),
                   None, self.removeSelected),
-             ("clone", _("Clone..."), 'clone',
+             ("clone", _("Clone..."), 'hg-clone',
                 _("Clone Repository"), None, self.cloneRepo),
              ("explore", _("Explore"), 'system-file-manager',
                 _("Open the repository in Windows Explorer"), None, self.explore),
@@ -127,7 +127,6 @@ class RepoTreeView(QTreeView):
     def configureActions(self):
         for name, desc, icon, tip, key, cb in self._action_defs():
             act = self._actions[name]
-            
             if icon:
                 act.setIcon(qtlib.geticon(icon))
             if tip:
