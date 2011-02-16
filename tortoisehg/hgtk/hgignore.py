@@ -257,7 +257,7 @@ class HgIgnoreDialog(gtk.Window):
                                     createmode=None)
             f.writelines(out)
             f.rename()
-        except IOError, e:
+        except EnvironmentError, e:
             dialog.error_dialog(self, _('Unable to write .hgignore file'),
                                 hglib.tounicode(str(e)))
         shlib.shell_notify([self.ignorefile])
