@@ -109,11 +109,15 @@ class MQWidget(QWidget):
         self.queueListWidget = QListWidget(self)
         layout.addWidget(self.queueListWidget, 1)
 
+        bbarhbox = QHBoxLayout()
+        bbarhbox.setSpacing(5)
+        layout.addLayout(bbarhbox)
         self.guardSelBtn = QPushButton()
-        layout.addWidget(self.guardSelBtn, 0)
+        bbarhbox.addWidget(self.guardSelBtn)
 
         self.revisionOrCommitBtn = QPushButton()
-        layout.addWidget(self.revisionOrCommitBtn, 0)
+        bbarhbox.addWidget(self.revisionOrCommitBtn)
+        bbarhbox.addStretch(1)
 
         # Message Frame
         layout = QVBoxLayout()
