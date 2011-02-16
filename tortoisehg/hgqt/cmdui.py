@@ -313,7 +313,8 @@ class Core(QObject):
             return # run next command
         else:
             self.queue = []
-            self.rawoutlines = [hglib.fromunicode(self.thread.rawoutput.join(''))]
+            text = self.thread.rawoutput.join('')
+            self.rawoutlines = [hglib.fromunicode(text, 'replace')]
 
         self.commandFinished.emit(ret)
 
