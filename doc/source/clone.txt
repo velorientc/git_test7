@@ -13,35 +13,37 @@ or type :command:`thg clone`.
 
 	Clone Dialog
 	
-:guilabel:`Source Path`
+:guilabel:`Source`
 	It is the path (or URL) of the repository that will be cloned. Use
 	the :guilabel:`Browse...` to choose a local folder.
-:guilabel:`Destination Path`
+:guilabel:`Destination`
 	It is the path of destination directory, a folder with the same name
 	of source repository will be created within this directory.
 
-Under the :guilabel:`Advanced options` expander you will find:
+Under the :guilabel:`Options` expander you will find:
 
 :guilabel:`Clone To Revision`
 	You can limit the clone up to this revision. Even the tags created
 	after this revision will not be imported.
-:guilabel:`do not update the new working directory`
+:guilabel:`Do not update the new working directory`
 	If checked, after the clone the working directory will be empty. It
 	is useful when you have to clone a repository with the purpose of
 	central repository, or backup, where you have only, in the future,
 	to *push* and *pull*.
-:guilabel:`use pull protocol to copy metadata`
+:guilabel:`Use pull protocol to copy metadata`
 	When the source and destination are on the same filesystem,
 	Mercurial tries to use hardlinks. Some filesystems, such as AFS
 	implement hardlink incorrectly, but do not report errors. Use this
 	option to avoid hardlinks.
-:guilabel:`use uncompressed transfer`
+:guilabel:`Use uncompressed transfer`
 	To use uncompressed transfer (fast over LAN).
-:guilabel:`use proxy server`
+:guilabel:`Include patch queue`
+	To also clone an MQ patch repository along with the main repository.
+:guilabel:`Use proxy server`
 	To use the proxy server configured in :menuselection:`TortoiseHg... --> Global Settings --> Proxy`.
 	This is enabled only if a proxy is configured.
-:guilabel:`Remote Cmd`
-	Specify a Mercurial command to run  on the remote side.
+:guilabel:`Remote command`
+	Specify a Mercurial command to run on the remote side.
 
 From command line
 -----------------
