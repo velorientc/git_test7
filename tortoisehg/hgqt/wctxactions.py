@@ -303,8 +303,12 @@ def copy(parent, ui, repo, files):
     return True
 
 def rename(parent, ui, repo, files):
-    # needs rename dialog
-    raise NotImplementedError()
+    from tortoisehg.hgqt.rename import RenameDialog
+    assert len(files) == 1
+    dlg = RenameDialog(repo, files, parent)
+    dlg.finished.connect(dlg.deleteLater)
+    dlg.exec_()
+    return True
 
 def unmark(parent, ui, repo, files):
     ms = merge.mergestate(repo)
