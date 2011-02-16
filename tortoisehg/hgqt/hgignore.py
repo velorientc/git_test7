@@ -266,7 +266,7 @@ class HgignoreDialog(QDialog):
             f.rename()
             shlib.shell_notify([self.ignorefile])
             self.ignoreFilterUpdated.emit()
-        except IOError, e:
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write .hgignore file'),
                                 hglib.tounicode(str(e)), parent=self)
 
