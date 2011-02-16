@@ -214,7 +214,7 @@ class HgFileListView(QTableView):
               _('View file as it appeared at this revision'), self.editfile),
             ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
-            ('revert', _('Revert to Revision'), 'revert', 'Alt+Ctrl+T',
+            ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
             ]:

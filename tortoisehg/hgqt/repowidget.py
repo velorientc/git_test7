@@ -860,7 +860,7 @@ class RepoWidget(QWidget):
             (None, isctx, _('Browse at rev...'), None, self.manifestRevision),
             (None, fixed, _('Tag...'), 'hg-tag', self.tagToRevision),
             (None, fixed, _('Bookmark...'), 'bookmark', self.bookmarkRevision),
-            (None, fixed, _('Backout...'), 'revert', self.backoutToRevision),
+            (None, fixed, _('Backout...'), 'hg-revert', self.backoutToRevision),
             (None, isrev, _('Export patch'), None, self.exportRevisions),
             (None, isrev, _('Email patch...'), 'mail-forward', self.emailRevision),
             (None, isrev, _('Archive...'), 'hg-archive', self.archiveRevision),
