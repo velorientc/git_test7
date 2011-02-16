@@ -82,6 +82,9 @@ class HgRepoView(QTableView):
     def setModel(self, model):
         self.init_variables()
         QTableView.setModel(self, model)
+        #Check if the font contains the glyph needed by the model
+        if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
+             model.unicodestar = False
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.resetDelegate()
         model.layoutChanged.connect(self.resetDelegate)

@@ -77,6 +77,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.repo = repo
         self.revset = revset
         self.filterbyrevset = rfilter
+        self.unicodestar = True
 
         # To be deleted
         self._user_colors = {}
@@ -501,8 +502,11 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getlog(self, ctx, gnode):
         if ctx.rev() is None:
-            # The Unicode symbol is a black star:
-            return u'\u2605 ' + _('Working Directory') + u' \u2605'
+            if self.unicodestar:
+                # The Unicode symbol is a black star:
+                return u'\u2605 ' + _('Working Directory') + u' \u2605'
+            else:
+                return '*** ' + _('Working Directory') + ' ***'
 
         msg = ctx.longsummary()
 
