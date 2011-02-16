@@ -138,11 +138,18 @@ class HgFileView(QFrame):
         self._lostMode = None
         self._lastSearch = u'', False
 
-        self.actionDiffMode = QAction(qtlib.geticon('view-diff'), _('View change as Unix diff output'), self)
+        self.actionDiffMode = QAction(qtlib.geticon('view-diff'),
+                                      _('View change as unified diff output'),
+                                      self)
         self.actionDiffMode.setCheckable(True)
-        self.actionFileMode = QAction(qtlib.geticon('view-file'), _('View change in context of file'), self)
+        self.actionFileMode = QAction(qtlib.geticon('view-file'),
+                                      _('View change in context of file'),
+                                      self)
         self.actionFileMode.setCheckable(True)
-        self.actionAnnMode = QAction(qtlib.geticon('view-annotate'), _('View change in context, annotate with revision number'), self)
+        self.actionAnnMode = QAction(qtlib.geticon('view-annotate'),
+                                     _('View change in context, annotate with '
+                                       'revision number'),
+                                     self)
         self.actionAnnMode.setCheckable(True)
 
         self.modeToggleGroup = QActionGroup(self)
