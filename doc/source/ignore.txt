@@ -8,7 +8,8 @@ The ignore dialog is used to maintain your Mercurial repository's ignore
 filter, which can be found in an :file:`.hgignore` file in the
 repository root.  The dialog can be launched from the shell context
 menu, or from the status or commit tools via the context menu of an
-unknown file.
+unknown file.  The :guilabel:`Glob` combo allows to switch between glob
+or regexp patterns.
 
 .. figure:: figures/ignore.jpg
 	:alt: Ignore filter dialog
