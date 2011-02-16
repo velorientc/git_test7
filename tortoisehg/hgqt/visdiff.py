@@ -34,11 +34,19 @@ _regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|ch
 
 _nonexistant = _('[non-existant]')
 
+# This global counter is incremented for each visual diff done in a session
+# It ensures that the names for snapshots created do not collide.
+_diffCount = 0
+
 def snapshotset(repo, ctxs, sa, sb, copies, copyworkingdir = False):
     '''snapshot files from parent-child set of revisions'''
     ctx1a, ctx1b, ctx2 = ctxs
     mod_a, add_a, rem_a = sa
     mod_b, add_b, rem_b = sb
+
+    global _diffCount
+    _diffCount += 1
+
     if copies:
         sources = set(copies.values())
     else:
@@ -82,7 +90,7 @@ def snapshot(repo, files, ctx):
     '''snapshot files as of some revision'''
     dirname = os.path.basename(repo.root) or 'root'
     if ctx.rev() is not None:
-        dirname = '%s.%s' % (dirname, str(ctx))
+        dirname = '%s.%d.%d' % (dirname, _diffCount, ctx.rev())
     base = os.path.join(qtlib.gettempdir(), dirname)
     fns_and_mtime = []
     if not os.path.exists(base):
