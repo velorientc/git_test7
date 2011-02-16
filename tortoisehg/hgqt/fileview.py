@@ -138,11 +138,11 @@ class HgFileView(QFrame):
         self._lostMode = None
         self._lastSearch = u'', False
 
-        self.actionDiffMode = QAction('Diff', self)
+        self.actionDiffMode = QAction(qtlib.geticon('view-diff'), _('View change as Unix diff output'), self)
         self.actionDiffMode.setCheckable(True)
-        self.actionFileMode = QAction('File', self)
+        self.actionFileMode = QAction(qtlib.geticon('view-file'), _('View change in context of file'), self)
         self.actionFileMode.setCheckable(True)
-        self.actionAnnMode = QAction('Ann', self)
+        self.actionAnnMode = QAction(qtlib.geticon('view-annotate'), _('View change in context, annotate with revision number'), self)
         self.actionAnnMode.setCheckable(True)
 
         self.modeToggleGroup = QActionGroup(self)
@@ -208,7 +208,10 @@ class HgFileView(QFrame):
     @pyqtSlot(QAction)
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
-        mode = {'Diff':'diff', 'File':'file', 'Ann':'ann'}[str(action.text())]
+        
+        mode = {self.actionDiffMode.text():'diff',
+                self.actionFileMode.text():'file', 
+                self.actionAnnMode.text() :'ann'}[action.text()]
         self.actionNextDiff.setEnabled(mode == 'file')
         self.actionPrevDiff.setEnabled(False)
         self.blk.setVisible(mode == 'file')
