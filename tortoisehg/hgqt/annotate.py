@@ -235,9 +235,18 @@ class AnnotateView(qscilib.Scintilla):
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
-        style = self._margin_style()
+        s = self._margin_style
+        # Workaround to set style of the current sci widget.
+        # QsciStyle sends style data only to the first sci widget.
+        # See qscintilla2/Qt4/qscistyle.cpp
+        self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
+                           s.style(), s.paper())
+        self.SendScintilla(QsciScintilla.SCI_STYLESETFONT,
+                           s.style(), s.font().family().toAscii().data())
+        self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE,
+                           s.style(), s.font().pointSize())
         for i, (fctx, _origline) in enumerate(self._links):
-            self.setMarginText(i, str(fctx.rev()), style)
+            self.setMarginText(i, str(fctx.rev()), s)
 
     def _updatemarkers(self):
         """Update markers which colorizes each line"""
@@ -266,21 +275,12 @@ class AnnotateView(qscilib.Scintilla):
             for fctx in fctxs:
                 self._revmarkers[fctx.rev()] = i
 
+    @util.propertycache
     def _margin_style(self):
         """Style for margin area"""
         s = QsciStyle()
         s.setPaper(QApplication.palette().color(QPalette.Window))
         s.setFont(self.font())
-
-        # Workaround to set style of the current sci widget.
-        # QsciStyle sends style data only to the first sci widget.
-        # See qscintilla2/Qt4/qscistyle.cpp
-        self.SendScintilla(QsciScintilla.SCI_STYLESETBACK,
-                           s.style(), s.paper())
-        self.SendScintilla(QsciScintilla.SCI_STYLESETFONT,
-                           s.style(), s.font().family().toAscii().data())
-        self.SendScintilla(QsciScintilla.SCI_STYLESETSIZE,
-                           s.style(), s.font().pointSize())
         return s
 
     @pyqtSlot()
