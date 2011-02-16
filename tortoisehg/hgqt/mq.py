@@ -636,6 +636,7 @@ class MQWidget(QWidget):
             a.triggered.connect(self.onGuardSelectionChange)
         self.guardSelBtn.setMenu(menu)
         self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
+        self.guardSelBtn.setEnabled(bool(total))
 
     def onGuardSelectionChange(self, isChecked):
         guard = hglib.fromunicode(self.sender().text())
