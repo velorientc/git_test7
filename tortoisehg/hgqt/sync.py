@@ -1094,8 +1094,8 @@ it.'''))
             self.pwentry.clear()
             self.pwentry.setEnabled(False)
             self.pwentry.setToolTip(_('Mercurial keyring extension is enabled. '
-                 'Passwords will be stored in platform native '
-                 'cryptographically secure method.'))
+                 'Passwords will be stored in a platform-native '
+                 'secure method.'))
 
         self.keyentry = QLineEdit(auth.get('key', ''))
         self.keyentry.setToolTip(
