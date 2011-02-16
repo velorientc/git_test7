@@ -201,20 +201,20 @@ class HgFileListView(QTableView):
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
-            ('navigate', _('File history'), None, 'Shift+Return',
+            ('navigate', _('File history'), 'hg-log', 'Shift+Return',
               _('Show the history of the selected file'), self.navigate),
-            ('diffnavigate', _('Compare file revisions'), None, None,
+            ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
               _('Compare revisions of the selected file'), self.diffNavigate),
-            ('diff', _('Visual Diff'), None, 'Ctrl+D',
+            ('diff', _('Visual Diff'), 'visualdiff', 'Ctrl+D',
               _('View file changes in external diff tool'), self.vdiff),
-            ('ldiff', _('Visual Diff to Local'), None, 'Shift+Ctrl+D',
+            ('ldiff', _('Visual Diff to Local'), 'ldiff', 'Shift+Ctrl+D',
               _('View changes to current in external diff tool'),
               self.vdifflocal),
-            ('edit', _('View at Revision'), None, 'Alt+Ctrl+E',
+            ('edit', _('View at Revision'), 'view-at-revision', 'Alt+Ctrl+E',
               _('View file as it appeared at this revision'), self.editfile),
-            ('ledit', _('Edit Local'), None, 'Shift+Ctrl+E',
+            ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
-            ('revert', _('Revert to Revision'), None, 'Alt+Ctrl+T',
+            ('revert', _('Revert to Revision'), 'revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
             ]:

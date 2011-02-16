@@ -272,9 +272,11 @@ class Workbench(QMainWindow):
                   menu='repository')
         newseparator(menu='repository')
         newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+S',
-                  enabled='repoopen', menu='repository')
+                  icon='system-file-manager', enabled='repoopen',
+                  menu='repository')
         newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
-                  enabled='repoopen', menu='repository')
+                  icon='utilities-terminal', enabled='repoopen',
+                  menu='repository')
 
         newaction(_("About"), self.on_about, menu='help', icon='help-browser')
 

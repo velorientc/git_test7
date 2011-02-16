@@ -93,27 +93,27 @@ class RepoTreeView(QTreeView):
             self.selitem = selection[0]
 
     def _action_defs(self):
-        a = [("open", _("Open"), None,
+        a = [("open", _("Open"), 'open',
                 _("Open the repository in a new tab"), None, self.open),
-             ("openAll", _("Open All"), None,
+             ("openAll", _("Open All"), 'open',
                 _("Open all repositories in new tabs"), None, self.openAll),
-             ("newGroup", _("New Group"), None,
+             ("newGroup", _("New Group"), 'new-group',
                 _("Create a new group"), None, self.newGroup),
              ("rename", _("Rename"), None,
                 _("Rename the entry"), None, self.startRename),
-             ("settings", _("Settings..."), None,
+             ("settings", _("Settings..."), 'settings_user',
                 _("View the repository's settings"), None, self.startSettings),
-             ("remove", _("Remove from registry"), None,
+             ("remove", _("Remove from registry"), 'remove',
                 _("Remove the node and all its subnodes."
                   " Repositories are not deleted from disk."),
                   None, self.removeSelected),
-             ("clone", _("Clone..."), None,
+             ("clone", _("Clone..."), 'clone',
                 _("Clone Repository"), None, self.cloneRepo),
-             ("explore", _("Explore"), None,
+             ("explore", _("Explore"), 'system-file-manager',
                 _("Open the repository in Windows Explorer"), None, self.explore),
-             ("terminal", _("Terminal"), None,
+             ("terminal", _("Terminal"), 'utilities-terminal',
                 _("Open a shell terminal in repository root"), None, self.terminal),
-             ("add", _("Add repository..."), None,
+             ("add", _("Add repository..."), 'hg',
                 _("Add a repository to this group"), None, self.addRepo),
              ]
         return a
@@ -127,10 +127,9 @@ class RepoTreeView(QTreeView):
     def configureActions(self):
         for name, desc, icon, tip, key, cb in self._action_defs():
             act = self._actions[name]
-            '''
+            
             if icon:
                 act.setIcon(qtlib.geticon(icon))
-            '''
             if tip:
                 act.setStatusTip(tip)
             if key:

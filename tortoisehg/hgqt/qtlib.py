@@ -262,6 +262,7 @@ def _findicon(name):
 
 # http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
 _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
+                        (QSize(), 'scalable/apps', '.svg'),
                         (QSize(22, 22), '22x22/actions', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]
 

@@ -417,10 +417,12 @@ class SyncWidget(QWidget):
         if not self.cmenu:
             acts = []
             menu = QMenu(self)
-            for text, cb in ((_('Explore'), self.exploreurl),
-                             (_('Terminal'), self.terminalurl),
-                             (_('Remove'), self.removeurl)):
+            for text, cb, icon in (
+                (_('Explore'), self.exploreurl, 'system-file-manager'),
+                (_('Terminal'), self.terminalurl, 'utilities-terminal'),
+                (_('Remove'), self.removeurl, 'menudelete')):
                 act = QAction(text, self)
+                act.setIcon(qtlib.geticon(icon))
                 act.triggered.connect(cb)
                 acts.append(act)
                 menu.addAction(act)
