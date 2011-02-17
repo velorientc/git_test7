@@ -623,7 +623,7 @@ class RepoWidget(QWidget):
 
     def rebuildGraph(self):
         self.showMessage('')
-        if self.rev is None or len(self.repo) > self.rev:
+        if type(self.rev) is not int or len(self.repo) > self.rev:
             self._reload_rev = self.rev
         else:
             self._reload_rev = 'tip'

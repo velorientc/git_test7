@@ -234,8 +234,8 @@ class RevDetailsWidget(QWidget):
 
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
-        if len(self.repo) <= self._last_rev:
-            self._last_rev = '.'
+        if type(self._last_rev) is int and len(self.repo) <= self._last_rev:
+            self._last_rev = 'tip'
         f = self.filelist.currentFile()
         self.revision_selected(self._last_rev)
         self.filelist.selectFile(f)
