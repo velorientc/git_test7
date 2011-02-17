@@ -229,8 +229,26 @@ class MQWidget(QWidget):
         self.qtbar.setEnabled(True)
         self.repo.decrementBusyCount()
         if self.finishfunc:
-            self.finishfunc(ret, self.cmd.core.rawoutput())
+            self.finishfunc(ret)
             self.finishfunc = None
+
+    def checkForRejects(self, ret):
+        if ret is 0:
+            self.refreshFileListWidget()
+            return
+        rejre = re.compile('saving rejects to file (.*).rej')
+        for m in rejre.finditer(self.cmd.core.rawoutput()):
+            wfile = m.groups()[0]
+            if not os.path.exists(self.repo.wjoin(wfile)):
+                continue
+            ufile = hglib.tounicode(wfile)
+            if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
+                                    _('%s had rejected chunks, edit patched '
+                                      'file together with rejects?') % ufile,
+                                    parent=self):
+                dlg = rejects.RejectsDialog(self.repo.wjoin(wfile), self)
+                dlg.exec_()
+        self.refreshFileListWidget()
 
     @pyqtSlot()
     def onPushAll(self):
@@ -240,6 +258,7 @@ class MQWidget(QWidget):
         cmdline = ['qpush', '-R', self.repo.root, '--all']
         cmdline += self.getUserOptions('force', 'exact')
         self.qtbar.setEnabled(False)
+        self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -250,6 +269,7 @@ class MQWidget(QWidget):
         cmdline = ['qpush', '-R', self.repo.root]
         cmdline += self.getUserOptions('force', 'exact')
         self.qtbar.setEnabled(False)
+        self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -282,6 +302,7 @@ class MQWidget(QWidget):
         cmdline += ['--move', '--', patch]
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
+        self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -403,7 +424,7 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def onQNewOrQRefresh(self):
-        def finished(ret, output):
+        def finished(ret):
             self.newCheckBox.setChecked(False)
         if self.newCheckBox.isChecked():
             name = hglib.fromunicode(self.patchNameLE.text())
