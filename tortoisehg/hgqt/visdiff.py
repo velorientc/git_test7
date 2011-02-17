@@ -365,9 +365,10 @@ class FileSelectionDialog(QDialog):
         if ctx2.rev() is None:
             title = _('working changes')
         elif ctx1a == ctx2.parents()[0]:
-            title = _('changeset ') + str(ctx2.rev())
+            title = _('changeset %d:%s') % (ctx2.rev(), ctx2)
         else:
-            title = _('revisions %d to %d') % (ctx1a.rev(), ctx2.rev())
+            title = _('revisions %d:%s to %d:%s') \
+                % (ctx1a.rev(), ctx1a, ctx2.rev(), ctx2)
         title = _('Visual Diffs - ') + title
         if pats:
             title += _(' filtered')
