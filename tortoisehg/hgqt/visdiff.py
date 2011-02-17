@@ -55,13 +55,13 @@ def snapshotset(repo, ctxs, sa, sb, copies, copyworkingdir = False):
     # Always make a copy of ctx1a
     files1a = sources | mod_a | rem_a | ((mod_b | add_b) - add_a)
     dir1a, fns_mtime1a = snapshot(repo, files1a, ctx1a)
-    label1a = '@%d' % ctx1a.rev()
+    label1a = '@%d:%s' % (ctx1a.rev(), ctx1a)
 
     # Make a copy of ctx1b if relevant
     if ctx1b:
         files1b = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
         dir1b, fns_mtime1b = snapshot(repo, files1b, ctx1b)
-        label1b = '@%d' % ctx1b.rev()
+        label1b = '@%d:%s' % (ctx1b.rev(), ctx1b)
     else:
         dir1b = None
         fns_mtime1b = []
@@ -79,7 +79,7 @@ def snapshotset(repo, ctxs, sa, sb, copies, copyworkingdir = False):
         label2 = ''
     else:
         dir2, fns_mtime2 = snapshot(repo, files2, ctx2)
-        label2 = '@%d' % ctx2.rev()
+        label2 = '@%d:%s' % (ctx2.rev(), ctx2)
 
     dirs = [dir1a, dir1b, dir2]
     labels = [label1a, label1b, label2]
