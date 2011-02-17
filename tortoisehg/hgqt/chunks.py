@@ -306,7 +306,10 @@ class ChunksWidget(QWidget):
             ctx.invalidate()
         else:
             repo.thgbackup(repo.wjoin(wfile))
+            wasadded = wfile in repo[None].added()
             commands.revert(repo.ui, repo, repo.wjoin(wfile))
+            if wasadded:
+                os.unlink(repo.wjoin(wfile))
         self.fileModified.emit()
 
     def getChunksForFile(self, wfile):
