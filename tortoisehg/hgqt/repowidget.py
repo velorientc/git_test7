@@ -717,15 +717,19 @@ class RepoWidget(QWidget):
 
     def okToContinue(self):
         if not self.commitDemand.forward('canExit', default=True):
+            self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
             self.showMessage(_('Commit tab cannot exit'))
             return False
         if not self.syncDemand.forward('canExit', default=True):
+            self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.showMessage(_('Sync tab cannot exit'))
             return False
         if not self.mqDemand.forward('canExit', default=True):
+            self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
             self.showMessage(_('MQ tab cannot exit'))
             return False
         if not self.grepDemand.forward('canExit', default=True):
+            self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
             self.showMessage(_('Search tab cannot exit'))
             return False
         return True
