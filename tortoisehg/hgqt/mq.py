@@ -20,8 +20,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
 from tortoisehg.hgqt import qqueue, fileview
 
-# TODO: Disable MQ toolbar while cmdui.Runner is busy
-
 class MQWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     output = pyqtSignal(QString, QString)
@@ -71,7 +69,7 @@ class MQWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.queueFrame.setLayout(layout)
 
-        qtbarhbox = QHBoxLayout()
+        self.qtbar = qtbarhbox = QHBoxLayout()
         qtbarhbox.setSpacing(5)
         layout.addLayout(qtbarhbox, 0)
         qtbarhbox.setContentsMargins(0, 0, 0, 0)
@@ -227,6 +225,7 @@ class MQWidget(QWidget):
 
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
+        self.qtbar.setEnabled(True)
         self.repo.decrementBusyCount()
         if ret is not 0:
             pass # TODO: look for reject notifications
@@ -238,6 +237,7 @@ class MQWidget(QWidget):
         self.repo.incrementBusyCount()
         cmdline = ['qpush', '-R', self.repo.root, '--all']
         cmdline += self.getUserOptions('force', 'exact')
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -247,6 +247,7 @@ class MQWidget(QWidget):
         self.repo.incrementBusyCount()
         cmdline = ['qpush', '-R', self.repo.root]
         cmdline += self.getUserOptions('force', 'exact')
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -256,6 +257,7 @@ class MQWidget(QWidget):
         self.repo.incrementBusyCount()
         cmdline = ['qpop', '-R', self.repo.root, '--all']
         cmdline += self.getUserOptions('force')
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -265,6 +267,7 @@ class MQWidget(QWidget):
         self.repo.incrementBusyCount()
         cmdline = ['qpop', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -276,6 +279,7 @@ class MQWidget(QWidget):
         cmdline += self.getUserOptions('force')
         cmdline += ['--move', '--', patch]
         self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -309,6 +313,7 @@ class MQWidget(QWidget):
         if self.cmd.running():
             return
         self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -329,6 +334,7 @@ class MQWidget(QWidget):
         cmdline += self.getUserOptions('force')
         cmdline += ['--', item._thgpatch]
         self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     #@pyqtSlot(QListWidgetItem)
@@ -337,6 +343,7 @@ class MQWidget(QWidget):
         if self.cmd.running():
             return
         self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
         self.cmd.run(['qrename', '-R', self.repo.root, '--',
                       item._thgpatch, hglib.fromunicode(item.text())])
 
@@ -420,6 +427,7 @@ class MQWidget(QWidget):
         else:
             cmdline += ['--exclude', self.repo.root]
         self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     @pyqtSlot()
@@ -431,6 +439,7 @@ class MQWidget(QWidget):
             self.reload()
         else:
             self.repo.incrementBusyCount()
+            self.qtbar.setEnabled(False)
             self.cmd.run(['qinit', '-c', '-R', self.repo.root])
 
     @pyqtSlot()
@@ -648,6 +657,7 @@ class MQWidget(QWidget):
         cmdline = ['qselect', '-R', self.repo.root]
         cmdline += newguards or ['--none']
         self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
         self.cmd.run(cmdline)
 
     # Capture drop events, try to import into current patch queue
