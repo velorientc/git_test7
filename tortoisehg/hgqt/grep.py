@@ -238,11 +238,19 @@ class SearchWidget(QWidget):
         else:
             return super(SearchWidget, self).keyPressEvent(event)
 
-    def closeEvent(self, event):
+    def canExit(self):
+        'Repowidget is closing, can we quit?'
+        if self.thread and self.thread.isRunning():
+            return False
+        return True
+
+    def saveSettings(self, s):
         repoid = str(self.repo[0])
-        s = QSettings()
         s.setValue('grep/search-'+repoid, self.searchhistory)
         s.setValue('grep/paths-'+repoid, self.pathshistory)
+
+    def closeEvent(self, event):
+        self.saveSettings(QSettings())
 
     def searchActivated(self):
         'User pressed [Return] in QLineEdit'

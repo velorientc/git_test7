@@ -725,6 +725,9 @@ class RepoWidget(QWidget):
         if not self.mqDemand.forward('canExit', default=True):
             self.showMessage(_('MQ tab cannot exit'))
             return False
+        if not self.grepDemand.forward('canExit', default=True):
+            self.showMessage(_('Search tab cannot exit'))
+            return False
         return True
 
     def closeRepoWidget(self):
@@ -739,6 +742,7 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.saveSettings(s)
         self.commitDemand.forward('saveSettings', s, 'workbench')
         self.manifestDemand.forward('saveSettings', s, 'workbench')
+        self.grepDemand.forward('saveSettings', s)
         self.filterbar.saveSettings(s)
         return True
 
