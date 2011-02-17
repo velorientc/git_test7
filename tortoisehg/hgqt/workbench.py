@@ -649,6 +649,7 @@ class Workbench(QMainWindow):
         for idx in range(tw.count()):
             rw = tw.widget(idx)
             if not rw.closeRepoWidget():
+                tw.setCurrentWidget(rw)
                 return False
         return True
 
