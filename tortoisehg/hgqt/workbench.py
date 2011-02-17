@@ -403,9 +403,12 @@ class Workbench(QMainWindow):
             tw.tabBar().show()
         if tw.count() == 0:
             self.setWindowTitle(_('TortoiseHg Workbench'))
-        else:
+        elif w.repo.shortname != w.repo.displayname:
             self.setWindowTitle(_('%s - TortoiseHg Workbench - %s') %
                                 (w.repo.shortname, w.repo.displayname))
+        else:
+            self.setWindowTitle(_('%s - TortoiseHg Workbench') %
+                                w.repo.shortname)
 
     def updateToolBarActions(self):
         w = self.repoTabsWidget.currentWidget()
