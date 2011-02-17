@@ -26,15 +26,19 @@ class ResolveDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('hg-merge'))
         self.repo = repo
 
-        s = QSettings()
-        self.restoreGeometry(s.value('resolve/geom').toByteArray())
+        self.setLayout(QVBoxLayout())
+        self.layout().setSpacing(5)
 
-        box = QVBoxLayout()
-        box.setSpacing(5)
-        self.setLayout(box)
+        hbox = QHBoxLayout()
+        self.layout().addLayout(hbox)
 
+        self.refreshButton = tb = QToolButton(self)
+        tb.setIcon(qtlib.geticon('view-refresh'))
+        tb.setShortcut(QKeySequence.Refresh)
+        tb.clicked.connect(self.refresh)
         self.stlabel = QLabel()
-        box.addWidget(self.stlabel)
+        hbox.addWidget(tb)
+        hbox.addWidget(self.stlabel)
 
         unres = qtlib.LabeledSeparator(_('Unresolved conflicts'))
         self.layout().addWidget(unres)
@@ -129,12 +133,13 @@ class ResolveDialog(QDialog):
         self.layout().addWidget(self.cmd)
 
         BB = QDialogButtonBox
-        bbox = QDialogButtonBox(BB.Ok|BB.Close)
-        bbox.button(BB.Ok).setText('Refresh')
-        bbox.accepted.connect(self.refresh)
+        bbox = QDialogButtonBox(BB.Close)
         bbox.rejected.connect(self.reject)
         self.layout().addWidget(bbox)
         self.bbox = bbox
+
+        s = QSettings()
+        self.restoreGeometry(s.value('resolve/geom').toByteArray())
 
         self.refresh()
         self.utree.selectAll()
