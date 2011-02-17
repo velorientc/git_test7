@@ -361,8 +361,7 @@ class FileSelectionDialog(QDialog):
         self.curFile = None
 
         # TODO: Connect CTRL-D to row activation
-        #qtlib.set_tortoise_icon(self, 'menushowchanged.ico')
-        #qtlib.set_tortoise_keys(self)
+        self.setWindowIcon(qtlib.geticon('visualdiff'))
 
         if ctx2.rev() is None:
             title = _('working changes')
