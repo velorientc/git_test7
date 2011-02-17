@@ -146,21 +146,6 @@
   </metadata>
   <g
      inkscape:groupmode="layer"
-     id="layer4"
-     inkscape:label="Bitmap"
-     style="display:none"
-     sodipodi:insensitive="true">
-    <image
-       y="0"
-       x="0"
-       id="image3642"
-       height="32"
-       width="32"
-       sodipodi:absref="E:\src\mercurial\thg\thg-icons\icons\tortoise\menurevert.ico"
-       xlink:href="menurevert.ico" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Vector"
      style="display:inline">
