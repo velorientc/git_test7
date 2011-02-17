@@ -358,7 +358,6 @@ class FileSelectionDialog(QDialog):
     def __init__(self, repo, pats, ctx1a, sa, ctx1b, sb, ctx2, cpy):
         'Initialize the Dialog'
         QDialog.__init__(self)
-        self.setWindowTitle(_('Visual Diffs'))
         self.curFile = None
 
         # TODO: Connect CTRL-D to row activation
@@ -374,6 +373,7 @@ class FileSelectionDialog(QDialog):
         title = _('Visual Diffs - ') + title
         if pats:
             title += _(' filtered')
+        self.setWindowTitle(title)
 
         self.resize(400, 250)
         self.reponame = hglib.fromunicode(repo.displayname)
