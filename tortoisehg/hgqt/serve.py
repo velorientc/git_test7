@@ -82,7 +82,7 @@ class ServeDialog(QDialog):
 
     def _cmdargs(self):
         """Build command args to run server"""
-        a = ['serve', '--port', str(self.port)]
+        a = ['serve', '--port', str(self.port), '--debug']
         if self._singlerepo:
             a += ['-R', self._singlerepo]
         else:
