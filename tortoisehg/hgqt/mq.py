@@ -222,6 +222,7 @@ class MQWidget(QWidget):
     @pyqtSlot()
     def onRepositoryChanged(self):
         'Repository is reporting its changelog has changed'
+        self.fileview.setContext(self.repo[None])
         self.reload()
 
     @pyqtSlot(int)
