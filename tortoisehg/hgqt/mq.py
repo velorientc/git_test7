@@ -32,6 +32,7 @@ class MQWidget(QWidget):
         self.repo = repo
         self.opts = opts
         self.refreshing = False
+        self.finishfunc = None
 
         layout = QVBoxLayout()
         layout.setSpacing(4)
@@ -227,8 +228,9 @@ class MQWidget(QWidget):
     def onCommandFinished(self, ret):
         self.qtbar.setEnabled(True)
         self.repo.decrementBusyCount()
-        if ret is not 0:
-            pass # TODO: look for reject notifications
+        if self.finishfunc:
+            self.finishfunc(ret, self.cmd.core.rawoutput())
+            self.finishfunc = None
 
     @pyqtSlot()
     def onPushAll(self):
@@ -401,6 +403,8 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def onQNewOrQRefresh(self):
+        def finished(ret, output):
+            self.newCheckBox.setChecked(False)
         if self.newCheckBox.isChecked():
             name = hglib.fromunicode(self.patchNameLE.text())
             if not name:
@@ -409,6 +413,7 @@ class MQWidget(QWidget):
                 self.patchNameLE.setFocus()
                 return
             cmdline = ['qnew', '--repository', self.repo.root, name]
+            self.finishfunc = finished
         else:
             cmdline = ['qrefresh', '--repository', self.repo.root]
         message = self.messageEditor.text()
