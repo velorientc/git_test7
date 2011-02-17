@@ -360,7 +360,6 @@ class FileSelectionDialog(QDialog):
         QDialog.__init__(self)
         self.curFile = None
 
-        # TODO: Connect CTRL-D to row activation
         self.setWindowIcon(qtlib.geticon('visualdiff'))
 
         if ctx2.rev() is None:
@@ -441,6 +440,7 @@ class FileSelectionDialog(QDialog):
         self.updateDiffButtons(preferred)
 
         callable = lambda: self.fillmodel(repo, sa, sb)
+        QShortcut(QKeySequence('CTRL+D'), self.list, self.activateCurrent)
         QTimer.singleShot(0, callable)
 
     def fillmodel(self, repo, sa, sb):
@@ -496,6 +496,12 @@ class FileSelectionDialog(QDialog):
         for i, name in enumerate(self.tools.iterkeys()):
             if name == selected:
                 combo.setCurrentIndex(i)
+
+    def activateCurrent(self):
+        'CTRL+D has been pressed'
+        row = self.list.currentRow()
+        if row >= 0:
+            self.launch(self.list.item(row).text()[2:])
 
     def itemActivated(self, item):
         'A QListWidgetItem has been activated'
