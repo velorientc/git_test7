@@ -443,18 +443,26 @@ class MQWidget(QWidget):
         cmdline += self.getUserOptions('user', 'currentuser', 'git',
                                        'date', 'currentdate')
         files = ['--']
+        addrem = []
         for row in xrange(self.fileListWidget.count()):
             item = self.fileListWidget.item(row)
             if item.checkState() == Qt.Checked:
-                wfile = hglib.fromunicode(item.text()[2:])
-                files.append(self.repo.wjoin(wfile))
+                text = hglib.fromunicode(item.text())
+                wfile = self.repo.wjoin(text[2:])
+                files.append(wfile)
+                if text[0] in ('!', '?'):
+                    addrem.append(wfile)
         if len(files) > 1:
             cmdline += files
         else:
             cmdline += ['--exclude', self.repo.root]
+        if addrem:
+            cmdlines = [ ['addremove', '-R', self.repo.root] + addrem, cmdline]
+        else:
+            cmdlines = [cmdline]
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
-        self.cmd.run(cmdline)
+        self.cmd.run(*cmdlines)
 
     @pyqtSlot()
     def qinitOrCommit(self):
@@ -634,11 +642,11 @@ class MQWidget(QWidget):
 
     def refreshFileListWidget(self):
         # TODO: maintain selection, check state
-        def addfiles(mode, files):
+        def addfiles(mode, files, initial):
             for file in files:
                 item = QListWidgetItem(u'%s %s' % (mode, hglib.tounicode(file)))
                 item.setFlags(flags)
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(initial)
                 self.fileListWidget.addItem(item)
         self.fileListWidget.clear()
         self.fileview.clearDisplay()
@@ -646,16 +654,19 @@ class MQWidget(QWidget):
         newmode = self.newCheckBox.isChecked()
         if not newmode and 'qtip' in pctx.tags():
             # Show qrefresh (qdiff) diffs
-            M, A, R = self.repo.status(pctx.p1().node(), None)[:3]
+            st = self.repo.status(pctx.p1().node(), None, unknown=True)[:5]
+            M, A, R, D, U = st
         elif newmode:
             # Show qnew (working) diffs
-            M, A, R = self.repo[None].status()[:3]
+            M, A, R, D, U = self.repo[None].status(unknown=True)[:5]
         else:
             return
         flags = Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
-        addfiles(u'A', A)
-        addfiles(u'M', M)
-        addfiles(u'R', R)
+        addfiles(u'A', A, Qt.Checked)
+        addfiles(u'M', M, Qt.Checked)
+        addfiles(u'R', R, Qt.Checked)
+        addfiles(u'!', D, Qt.Unchecked)
+        addfiles(u'?', U, Qt.Unchecked)
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
