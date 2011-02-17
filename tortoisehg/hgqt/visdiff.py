@@ -374,7 +374,7 @@ class FileSelectionDialog(QDialog):
             title += _(' filtered')
         self.setWindowTitle(title)
 
-        self.resize(400, 250)
+        self.resize(650, 250)
         self.reponame = hglib.fromunicode(repo.displayname)
 
         self.ctxs = (ctx1a, ctx1b, ctx2)
