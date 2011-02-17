@@ -356,7 +356,7 @@ def _extendrepo(repo):
         @propertycache
         def displayname(self):
             'Display name is for window titles and similar'
-            if self.ui.config('tortoisehg', 'fullpath', False):
+            if self.ui.configbool('tortoisehg', 'fullpath'):
                 name = self.root
             elif self.ui.config('web', 'name', False):
                 name = self.ui.config('web', 'name')
