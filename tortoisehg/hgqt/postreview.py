@@ -43,7 +43,7 @@ class LoadReviewDataThread(QThread):
                 #later
                 if not pwd:
                     pwd = "None"
-                    
+
                 self.reviewboard = rb.make_rbclient(self.dialog.server,
                                                     self.dialog.user,
                                                     pwd)
@@ -94,18 +94,9 @@ class PostReviewDialog(QDialog):
         self.readSettings()
 
         self.review_thread = LoadReviewDataThread(self)
-        self.review_thread.finished.connect(self.errorPrompt)              
+        self.review_thread.finished.connect(self.errorPrompt)
         self.review_thread.start()
-
-    def keyPressEvent(self, event):
-        # don't post review by just hitting enter
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            if event.modifiers() == Qt.ControlModifier and self.isValid():
-                self.accept()  # Ctrl+Enter
-
-            return
-
-        super(PostReviewDialog, self).keyPressEvent(event)
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
 
     @pyqtSlot()
     def passwordPrompt(self):
@@ -136,7 +127,7 @@ class PostReviewDialog(QDialog):
         if self.cmd and self.cmd.core.running():
             self.cmd.commandFinished.disconnect(self.onCompletion)
             self.cmd.cancel()
-            
+
         # Dispose of the review data thread
         self.review_thread.terminate()
         self.review_thread.wait()
@@ -164,14 +155,14 @@ class PostReviewDialog(QDialog):
             self.repo_id = int(self.repo.ui.config('reviewboard', 'repoid'))
         except Exception:
             self.repo_id = None
-            
-        if not self.repo_id: 
+
+        if not self.repo_id:
             self.repo_id = s.value('reviewboard/repo_id').toInt()[0]
 
         self.server = self.repo.ui.config('reviewboard', 'server')
         self.user = self.repo.ui.config('reviewboard', 'user')
         self.password = self.repo.ui.config('reviewboard', 'password')
-        self.browser = self.repo.ui.config('reviewboard', 'browser')        
+        self.browser = self.repo.ui.config('reviewboard', 'browser')
 
     def writeSettings(self):
         s = QSettings()
@@ -236,7 +227,7 @@ class PostReviewDialog(QDialog):
         return str(comboText[1])
 
     def postReviewOpts(self, **opts):
-        """Generate opts for reviewboard by form values"""        
+        """Generate opts for reviewboard by form values"""
         opts['outgoingchanges'] = self.qui.outgoing_changes_check.isChecked()
         opts['branch'] = self.qui.branch_check.isChecked()
         opts['publish'] = self.qui.publish_immediately_check.isChecked()
@@ -308,10 +299,12 @@ class PostReviewDialog(QDialog):
             self.initChangesets(self.allRevs, self.allRevs)
             self.qui.changesets_view.setEnabled(True)
 
-    def close(self):        
+    def close(self):
         super(PostReviewDialog, self).close()
 
     def accept(self):
+        if not self.isValid():
+            return
         if not self.password and not self.passwordPrompt():
             return
 
