@@ -831,16 +831,22 @@ class RepoWidget(QWidget):
 
     def unappliedPatchMenu(self, point, selection):
         q = self.repo.mq
-        start = q.series_end()
+        ispushable = False
         unapplied = 0
-        for i in xrange(start, len(q.series)):
+        for i in xrange(q.series_end(), len(q.series)):
             pushable, reason = q.pushable(i)
             if pushable:
+                if unapplied == 0:
+                    qnext = q.series[i]
+                if self.rev == q.series[i]:
+                    ispushable = True
                 unapplied += 1
-        self.unappacts[0].setEnabled(len(selection) == 1)
-        self.unappacts[1].setEnabled('qtip' in self.repo.tags())
-        self.unappacts[2].setEnabled(True)
-        self.unappacts[3].setEnabled(unapplied > 1)
+        self.unappacts[0].setEnabled(ispushable and len(selection) == 1)
+        self.unappacts[1].setEnabled(ispushable and len(selection) == 1 and \
+                                     self.rev != qnext)
+        self.unappacts[2].setEnabled('qtip' in self.repo.tags())
+        self.unappacts[3].setEnabled(True)
+        self.unappacts[4].setEnabled(unapplied > 1)
         self.unappcmenu.exec_(point)
 
     def generateSingleMenu(self):
@@ -1017,6 +1023,7 @@ class RepoWidget(QWidget):
         acts = []
         for name, cb in (
             (_('QGoto'), self.qgotoRevision),
+            (_('QPush --move'), self.qpushMoveRevision),
             (_('Fold patches...'), qfoldact),
             (_('Delete patches...'), qdeleteact),
             (_('Reorder patches...'), qreorderact)):
@@ -1198,6 +1205,14 @@ class RepoWidget(QWidget):
             patchname = self.repo.changectx(self.rev).thgmqpatchname()
             cmdline = ['qgoto', str(patchname), '--repository', self.repo.root]
         self.runCommand(_('QGoto - TortoiseHg'), cmdline)
+
+    def qpushMoveRevision(self):
+        """Make REV the top applied patch"""
+        ctx = self.repo.changectx(self.rev)
+        patchname = self.repo.changectx(self.rev).thgmqpatchname()
+        cmdline = ['qpush', '--move', str(patchname),
+                   '--repository', self.repo.root]
+        self.runCommand(_('QPush --move - TortoiseHg'), cmdline)
 
     def runCommand(self, title, cmdline):
         if self.runner:
