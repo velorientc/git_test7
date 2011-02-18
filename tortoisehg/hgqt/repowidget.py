@@ -14,6 +14,7 @@ from mercurial import util, revset, error
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
@@ -865,16 +866,16 @@ class RepoWidget(QWidget):
             (None, isctx, _('Visual diff...'), 'visualdiff', self.visualDiffRevision),
             (None, isrev, _('Diff to local...'), 'ldiff', self.visualDiffToLocal),
             (None, fixed, _('Merge with...'), 'hg-merge', self.mergeWithRevision),
-            (None, isctx, _('Browse at rev...'), None, self.manifestRevision),
+            (None, isctx, _('Browse at rev...'), 'hg-annotate', self.manifestRevision),
             (None, fixed, _('Tag...'), 'hg-tag', self.tagToRevision),
             (None, fixed, _('Bookmark...'), 'bookmark', self.bookmarkRevision),
             (None, fixed, _('Backout...'), 'hg-revert', self.backoutToRevision),
-            (None, isrev, _('Export patch'), None, self.exportRevisions),
+            (None, isrev, _('Export patch'), 'hg-export', self.exportRevisions),
             (None, isrev, _('Email patch...'), 'mail-forward', self.emailRevision),
             (None, isrev, _('Archive...'), 'hg-archive', self.archiveRevision),
             (None, isctx, _('Copy patch'), 'copy-patch', self.copyPatch),
             (None, isrev, _('Copy hash'), 'copy-hash', self.copyHash),
-            ('transplant', fixed, _('Transplant to local'), None,
+            ('transplant', fixed, _('Transplant to local'), 'hg-transplant',
                 self.transplantRevision),
             ('rebase', None, None, None, None),
             ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
@@ -956,17 +957,19 @@ class RepoWidget(QWidget):
             dlg.exec_()
 
         menu = QMenu(self)
-        for name, cb in (
-                (_('Visual Diff...'), diffPair),
-                (_('Export Pair'), exportPair),
-                (_('Email Pair...'), emailPair),
-                (_('Export DAG Range'), exportDagRange),
-                (_('Email DAG Range...'), emailDagRange),
-                (_('Bisect - Good, Bad...'), bisectNormal),
-                (_('Bisect - Bad, Good...'), bisectReverse),
-                (_('Compress History...'), compressDlg)
+        for name, cb, icon in (
+                (_('Visual Diff...'), diffPair, 'visualdiff'),
+                (_('Export Pair'), exportPair, 'hg-export'),
+                (_('Email Pair...'), emailPair, 'mail-forward'),
+                (_('Export DAG Range'), exportDagRange, 'hg-export'),
+                (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
+                (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
+                (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
+                (_('Compress History...'), compressDlg, 'hg-compress')
                 ):
             a = QAction(name, self)
+            if icon:
+                a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
         if 'reviewboard' in self.repo.extensions():
@@ -1026,11 +1029,13 @@ class RepoWidget(QWidget):
         def emailSel():
             run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
         menu = QMenu(self)
-        for name, cb in (
-                (_('Export Selected'), exportSel),
-                (_('Email Selected...'), emailSel),
+        for name, cb, icon in (
+                (_('Export Selected'), exportSel, 'hg-export'),
+                (_('Email Selected...'), emailSel, 'mail-forward'),
                 ):
             a = QAction(name, self)
+            if icon:
+                a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
         if 'reviewboard' in self.repo.extensions():

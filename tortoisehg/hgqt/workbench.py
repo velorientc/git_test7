@@ -251,25 +251,25 @@ class Workbench(QMainWindow):
 
         newaction(_("Web Server"), self.serve, enabled='repoopen',
                   menu='repository', icon='proxy')
-        newaction(_("Bisect"), self._repofwd('bisect'),
+        newaction(_("Bisect"), self._repofwd('bisect'), icon='hg-bisect',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Shelve"), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
-        newaction(_("Import"), self._repofwd('thgimport'),
+        newaction(_("Import"), self._repofwd('thgimport'), icon='hg-import',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Verify"), self._repofwd('verify'), enabled='repoopen',
-                  menu='repository')
-        newaction(_("Recover"), self._repofwd('recover'), enabled='repoopen',
-                  menu='repository')
+                  icon='hg-verify', menu='repository')
+        newaction(_("Recover"), self._repofwd('recover'), icon='hg-recover',
+                  enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Resolve"), self._repofwd('resolve'), icon='hg-merge',
                   enabled='repoopen', menu='repository')
         newaction(_("Rollback/Undo"), self._repofwd('rollback'),
-                  enabled='repoopen', menu='repository')
+                  icon='hg-undo', enabled='repoopen', menu='repository')
         newaction(_("Purge"), self._repofwd('purge'), enabled='repoopen',
-                  menu='repository')
+                  icon='hg-purge', menu='repository')
         newseparator(menu='repository')
         newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+S',
                   icon='system-file-manager', enabled='repoopen',
