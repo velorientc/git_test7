@@ -838,9 +838,10 @@ class RepoWidget(QWidget):
             pushable, reason = q.pushable(i)
             if pushable:
                 unapplied += 1
-        self.unappacts[0].setEnabled('qtip' in self.repo.tags())
-        self.unappacts[1].setEnabled(True)
-        self.unappacts[2].setEnabled(unapplied > 1)
+        self.unappacts[0].setEnabled(len(selection) == 1)
+        self.unappacts[1].setEnabled('qtip' in self.repo.tags())
+        self.unappacts[2].setEnabled(True)
+        self.unappacts[3].setEnabled(unapplied > 1)
         self.unappcmenu.exec_(point)
 
     def generateSingleMenu(self):
@@ -858,6 +859,7 @@ class RepoWidget(QWidget):
         qpar    = lambda ap, up, qp, wd: qp
         applied = lambda ap, up, qp, wd: ap
         unapp   = lambda ap, up, qp, wd: up
+        qgoto   = lambda ap, up, qp, wd: qp or ap or up
 
         exs = self.repo.extensions()
         menu = QMenu(self)
@@ -880,6 +882,7 @@ class RepoWidget(QWidget):
             ('rebase', None, None, None, None),
             ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
             ('mq', None, None, None, None),
+            ('mq', qgoto, _('QGoto'), None, self.qgotoRevision),
             ('mq', fixed, _('Import to MQ'), 'qimport', self.qimportRevision),
             ('mq', applied, _('Finish patch'), 'qfinish', self.qfinishRevision),
             ('mq', fixed, _('Strip...'), 'menudelete', self.stripRevision),
@@ -1013,6 +1016,7 @@ class RepoWidget(QWidget):
         menu = QMenu(self)
         acts = []
         for name, cb in (
+            (_('QGoto'), self.qgotoRevision),
             (_('Fold patches...'), qfoldact),
             (_('Delete patches...'), qdeleteact),
             (_('Reorder patches...'), qreorderact)):
