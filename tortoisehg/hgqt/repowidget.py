@@ -806,12 +806,11 @@ class RepoWidget(QWidget):
     def singleSelectionMenu(self, point, selection):
         ctx = self.repo.changectx(self.rev)
         applied = ctx.thgmqappliedpatch()
-        unapp = ctx.thgmqunappliedpatch()
         qparent = 'qparent' in ctx.tags()
         working = self.rev is None
 
         for item in self.singlecmenuitems:
-            enabled = item.enableFunc(applied, unapp, qparent, working)
+            enabled = item.enableFunc(applied, qparent, working)
             item.setEnabled(enabled)
 
         self.singlecmenu.exec_(point)
@@ -847,19 +846,19 @@ class RepoWidget(QWidget):
     def generateSingleMenu(self):
         items = []
 
+        # This menu will never be opened for an unapplied patch, they
+        # have their own menu.
+        #
         # isrev = the changeset has an integer revision number
-        # isctx = changectx or workingctx, not PatchContext
+        # isctx = changectx or workingctx
         # fixed = the changeset is considered permanent
-        # patch = any patch applied or not
-        # qpar  = patch queue parent
-        isrev   = lambda ap, up, qp, wd: not (up or wd)
-        isctx   = lambda ap, up, qp, wd: not up
-        fixed   = lambda ap, up, qp, wd: not (ap or up or wd)
-        patch   = lambda ap, up, qp, wd: ap or up
-        qpar    = lambda ap, up, qp, wd: qp
-        applied = lambda ap, up, qp, wd: ap
-        unapp   = lambda ap, up, qp, wd: up
-        qgoto   = lambda ap, up, qp, wd: qp or ap or up
+        # applid = an applied patch
+        # qgoto = applied patch or qparent
+        isrev   = lambda ap, qp, wd: not wd
+        isctx   = lambda ap, qp, wd: True
+        fixed   = lambda ap, qp, wd: not (ap or wd)
+        applied = lambda ap, qp, wd: ap
+        qgoto   = lambda ap, qp, wd: qp or ap
 
         exs = self.repo.extensions()
         menu = QMenu(self)
