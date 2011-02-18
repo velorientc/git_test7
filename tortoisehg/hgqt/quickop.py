@@ -104,18 +104,9 @@ class QuickOpDialog(QDialog):
             self.chk.setChecked(s.value('quickop/nobackup', True).toBool())
         self.stwidget = stwidget
         self.stwidget.refreshWctx()
-
-    def keyPressEvent(self, event):
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            if event.modifiers() == Qt.ControlModifier:
-                self.accept()  # Ctrl+Enter
-            return
-        elif event.matches(QKeySequence.Refresh):
-            self.stwidget.refreshWctx()
-        elif event.key() == Qt.Key_Escape:
-            self.reject()
-            return
-        return super(QDialog, self).keyPressEvent(event)
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
+        QShortcut(QKeySequence.Refresh, self, self.stwidget.refreshWctx)
+        QShortcut(QKeySequence('Escape'), self, self.reject)
 
     def commandStarted(self):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
