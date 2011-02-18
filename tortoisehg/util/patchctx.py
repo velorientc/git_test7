@@ -38,6 +38,7 @@ class patchctx(object):
         self._desc = ''
         self._branch = ''
         self._node = node.nullid
+        self._identity = node.nullid
         self._mtime = None
         self._parseerror = None
 
@@ -45,6 +46,9 @@ class patchctx(object):
             ph = mq.patchheader(self._path)
             self._ph = ph
             self._mtime = os.path.getmtime(patchpath)
+            hash = util.sha1(self._path)
+            hash.update(str(self._mtime))
+            self._identity = hash.digest()
         except EnvironmentError:
             return
 
@@ -111,6 +115,7 @@ class patchctx(object):
     def thgmqpatchname(self):       return self._patchname
     def thgbranchhead(self):        return False
     def thgmqunappliedpatch(self):  return True
+    def thgid(self):                return self._identity
 
     def longsummary(self):
         summary = hglib.tounicode(self.description())

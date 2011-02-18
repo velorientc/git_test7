@@ -507,6 +507,9 @@ def _extendchangectx(changectx):
         def thgmqunappliedpatch(self):
             return False
 
+        def thgid(self):
+            return self._node
+
         def thgmqpatchname(self):
             '''Return self's MQ patch name. AssertionError if self not an MQ patch'''
             patchtags = self._thgmqpatchtags()
