@@ -264,7 +264,6 @@ class EmailDialog(QDialog):
             cmd.finished.connect(cmd.deleteLater)
             if cmd.exec_():
                 self._writehistory()
-                super(EmailDialog, self).accept()
         finally:
             if 'desc' in opts:
                 os.unlink(opts['desc'])  # TODO: don't use tempfile
