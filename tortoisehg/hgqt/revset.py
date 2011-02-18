@@ -211,6 +211,7 @@ class RevisionSetQuery(QDialog):
         helpLabel.setOpenExternalLinks(True)
         self.stbar.addPermanentWidget(helpLabel)
         layout.addWidget(self.stbar, 0)
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.returnPressed)
 
     def runQuery(self):
         self.entry.setEnabled(False)
@@ -292,12 +293,6 @@ class RevisionSetQuery(QDialog):
                 self.entry.setText(newtext)
                 self.entry.setSelection(line, start, line, end+bopen+2)
         self.entry.endUndoAction()
-
-    def keyPressEvent(self, event):
-        if event.key() in (Qt.Key_Enter, Qt.Key_Return):
-            self.returnPressed()
-            return
-        super(RevisionSetQuery, self).keyPressEvent(event)
 
     def accept(self):
         self.hide()
