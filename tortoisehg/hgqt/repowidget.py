@@ -806,11 +806,11 @@ class RepoWidget(QWidget):
     def singleSelectionMenu(self, point, selection):
         ctx = self.repo.changectx(self.rev)
         applied = ctx.thgmqappliedpatch()
-        qparent = 'qparent' in ctx.tags()
         working = self.rev is None
+        tags = ctx.tags()
 
         for item in self.singlecmenuitems:
-            enabled = item.enableFunc(applied, qparent, working)
+            enabled = item.enableFunc(applied, working, tags)
             item.setEnabled(enabled)
 
         self.singlecmenu.exec_(point)
@@ -854,11 +854,12 @@ class RepoWidget(QWidget):
         # fixed = the changeset is considered permanent
         # applid = an applied patch
         # qgoto = applied patch or qparent
-        isrev   = lambda ap, qp, wd: not wd
-        isctx   = lambda ap, qp, wd: True
-        fixed   = lambda ap, qp, wd: not (ap or wd)
-        applied = lambda ap, qp, wd: ap
-        qgoto   = lambda ap, qp, wd: qp or ap
+        isrev   = lambda ap, wd, tags: not wd
+        isctx   = lambda ap, wd, tags: True
+        fixed   = lambda ap, wd, tags: not (ap or wd)
+        applied = lambda ap, wd, tags: ap
+        qgoto   = lambda ap, wd, tags: ('qparent' in tags) or \
+                                       (ap and ('qtip' not in tags))
 
         exs = self.repo.extensions()
         menu = QMenu(self)
