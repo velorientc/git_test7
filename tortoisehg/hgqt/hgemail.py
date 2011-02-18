@@ -46,16 +46,7 @@ class EmailDialog(QDialog):
         self._filldefaults()
         self._updateforms()
         self._readsettings()
-
-    def keyPressEvent(self, event):
-        # don't send email by just hitting enter
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            if event.modifiers() == Qt.ControlModifier:
-                self.accept()  # Ctrl+Enter
-
-            return
-
-        super(EmailDialog, self).keyPressEvent(event)
+        QShortcut(QKeySequence('CTRL+Return'), self, self.accept)
 
     def closeEvent(self, event):
         self._writesettings()
