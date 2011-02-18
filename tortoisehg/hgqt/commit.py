@@ -264,6 +264,8 @@ class CommitWidget(QWidget):
         for e in self.stwidget.getChecked():
             tokens.add(e)
             tokens.add(os.path.basename(e))
+        tokens.add(wfile)
+        tokens.add(os.path.basename(wfile))
         try:
             from pygments.lexers import guess_lexer_for_filename
             from pygments.token import Token
