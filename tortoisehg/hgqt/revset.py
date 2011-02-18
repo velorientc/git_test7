@@ -212,6 +212,7 @@ class RevisionSetQuery(QDialog):
         self.stbar.addPermanentWidget(helpLabel)
         layout.addWidget(self.stbar, 0)
         QShortcut(QKeySequence('Ctrl+Return'), self, self.returnPressed)
+        QShortcut(QKeySequence('Escape'), self, self.reject)
 
     def runQuery(self):
         self.entry.setEnabled(False)
