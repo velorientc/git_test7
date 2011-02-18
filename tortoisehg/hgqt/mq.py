@@ -130,8 +130,12 @@ class MQWidget(QWidget):
         mtbarhbox.setContentsMargins(0, 0, 0, 0)
         self.newCheckBox = QCheckBox(_('New Patch'))
         self.patchNameLE = QLineEdit()
+        self.refreshtb = QToolButton(self)
+        self.refreshtb.clicked.connect(self.refreshFileListWidget)
+        self.refreshtb.setIcon(qtlib.geticon('view-refresh'))
         mtbarhbox.addWidget(self.newCheckBox)
         mtbarhbox.addWidget(self.patchNameLE, 1)
+        mtbarhbox.addWidget(self.refreshtb)
 
         self.messageEditor = commit.MessageEntry(self)
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -852,6 +856,8 @@ class OptionsDialog(QDialog):
 
         self.outopts = outopts
         QDialog.accept(self)
+
+
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
