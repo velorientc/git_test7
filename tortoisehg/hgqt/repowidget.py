@@ -1058,7 +1058,7 @@ class RepoWidget(QWidget):
     def generateBundleMenu(self):
         menu = QMenu(self)
         for name, cb, icon in (
-                (_('Pull to here...'), self.pullBundleToRev, 'hg-pull'),
+                (_('Pull to here...'), self.pullBundleToRev, 'hg-pull-to-here'),
                 (_('Visual diff...'), self.visualDiffRevision, 'visualdiff'),
                 ):
             a = QAction(name, self)
