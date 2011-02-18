@@ -79,17 +79,8 @@ class BranchOpDialog(QDialog):
         layout.addWidget(bb)
         self.bb = bb
         self.branchCombo = branchCombo
-
-    def keyPressEvent(self, event):
-        # todo - is this necessary for a derivation of QDialog?
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            if event.modifiers() == Qt.ControlModifier:
-                self.accept()  # Ctrl+Enter
-            return
-        elif event.key() == Qt.Key_Escape:
-            self.reject()
-            return
-        return super(QDialog, self).keyPressEvent(event)
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
+        QShortcut(QKeySequence('Escape'), self, self.reject)
 
     def accept(self):
         '''Branch operation is one of:
