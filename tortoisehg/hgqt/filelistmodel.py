@@ -66,7 +66,7 @@ class HgFileListModel(QAbstractTableModel):
 
     def setContext(self, ctx):
         self.contextChanged.emit(ctx)
-        if not self._ctx or ctx.node() != self._ctx.node():
+        if not self._ctx or ctx.thgid() != self._ctx.thgid():
             self._ctx = ctx
             self.loadFiles()
             self.layoutChanged.emit()
