@@ -240,9 +240,6 @@ class EmailDialog(QDialog):
         for e in ('to_edit', 'from_edit'):
             getattr(self._qui, e).editTextChanged.connect(self._updateforms)
 
-    def close(self):
-        super(EmailDialog, self).accept()
-
     def accept(self):
         # TODO: want to pass patchbombopts directly
         def cmdargs(opts):
@@ -264,6 +261,7 @@ class EmailDialog(QDialog):
             cmd = cmdui.Dialog(['email'] + cmdargs(opts), parent=self)
             cmd.setWindowTitle(_('Sending Email'))
             cmd.setShowOutput(False)
+            cmd.finished.connect(cmd.deleteLater)
             if cmd.exec_():
                 self._writehistory()
                 super(EmailDialog, self).accept()
