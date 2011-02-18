@@ -251,6 +251,7 @@ class CommitWidget(QWidget):
         self.stwidget.split.addWidget(self.split)
         self.msgte = msgte
         self.msgcombo = msgcombo
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.commit)
 
     @pyqtSlot(QString, QString)
     def fileDisplayed(self, wfile, contents):
@@ -607,13 +608,6 @@ class CommitWidget(QWidget):
             self.msgte.setModified(False)
             self.commitComplete.emit()
         self.stwidget.refreshWctx()
-
-    def keyPressEvent(self, event):
-        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
-            if event.modifiers() == Qt.ControlModifier:
-                self.commit()
-            return
-        return super(CommitWidget, self).keyPressEvent(event)
 
 class MessageHistoryCombo(QComboBox):
     def __init__(self, parent=None):
