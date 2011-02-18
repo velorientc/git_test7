@@ -1057,12 +1057,14 @@ class RepoWidget(QWidget):
 
     def generateBundleMenu(self):
         menu = QMenu(self)
-        for name, cb in (
-                (_('Pull to here...'), self.pullBundleToRev),
-                (_('Visual diff...'), self.visualDiffRevision),
+        for name, cb, icon in (
+                (_('Pull to here...'), self.pullBundleToRev, 'hg-pull'),
+                (_('Visual diff...'), self.visualDiffRevision, 'visualdiff'),
                 ):
             a = QAction(name, self)
             a.triggered.connect(cb)
+            if icon:
+                a.setIcon(geticon(icon))
             menu.addAction(a)
         self.bundlemenu = menu
 
