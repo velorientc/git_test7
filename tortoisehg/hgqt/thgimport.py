@@ -29,6 +29,7 @@ class ImportDialog(QDialog):
         super(ImportDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
+        self.setWindowIcon(qtlib.geticon('hg-import'))
 
         self.tempfiles = []
         self.repo = repo

@@ -20,7 +20,7 @@ class BisectDialog(QDialog):
     def __init__(self, repo, opts, parent=None):
         super(BisectDialog, self).__init__(parent)
         self.setWindowTitle(_('Bisect - %s') % repo.displayname)
-        #self.setWindowIcon(qtlib.geticon('bisect'))
+        self.setWindowIcon(qtlib.geticon('hg-bisect'))
 
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)

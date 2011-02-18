@@ -33,6 +33,7 @@ class ManifestDialog(QMainWindow):
     def __init__(self, repo, rev=None, parent=None):
         QMainWindow.__init__(self, parent)
         self._repo = repo
+        self.setWindowIcon(qtlib.geticon('hg-annotate'))
         self.resize(400, 300)
 
         self._manifest_widget = ManifestWidget(repo, rev)

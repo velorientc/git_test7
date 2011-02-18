@@ -21,7 +21,9 @@ class StripDialog(QDialog):
     def __init__(self, repo=None, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
+        
+        self.setWindowIcon(qtlib.geticon('menudelete'))
+        
         self.ui = ui.ui()
         if repo:
             self.repo = repo

@@ -23,6 +23,7 @@ class BackoutDialog(QDialog):
         super(BackoutDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowIcon(qtlib.geticon('hg-revert'))
         self.repo = repo
         self.didbackout = False
 
