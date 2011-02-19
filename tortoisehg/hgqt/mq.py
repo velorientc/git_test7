@@ -485,6 +485,8 @@ class MQWidget(QWidget):
     def launchQQueueTool(self):
         dlg = qqueue.QQueueDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.exec_()
         self.reload()
 
