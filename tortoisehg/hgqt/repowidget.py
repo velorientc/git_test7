@@ -873,42 +873,59 @@ class RepoWidget(QWidget):
 
         exs = self.repo.extensions()
         menu = QMenu(self)
-        for ext, func, desc, icon, cb in (
-            (None, isrev, _('Update...'), 'hg-update', self.updateToRevision),
-            (None, isctx, _('Visual diff...'), 'visualdiff', self.visualDiffRevision),
-            (None, isrev, _('Diff to local...'), 'ldiff', self.visualDiffToLocal),
-            (None, fixed, _('Merge with...'), 'hg-merge', self.mergeWithRevision),
-            (None, isctx, _('Browse at rev...'), 'hg-annotate', self.manifestRevision),
-            (None, fixed, _('Tag...'), 'hg-tag', self.tagToRevision),
-            (None, fixed, _('Bookmark...'), 'bookmark', self.bookmarkRevision),
-            (None, fixed, _('Backout...'), 'hg-revert', self.backoutToRevision),
-            (None, isrev, _('Export patch'), 'hg-export', self.exportRevisions),
-            (None, isrev, _('Email patch...'), 'mail-forward', self.emailRevision),
-            (None, isrev, _('Archive...'), 'hg-archive', self.archiveRevision),
-            (None, isctx, _('Copy patch'), 'copy-patch', self.copyPatch),
-            (None, isrev, _('Copy hash'), 'copy-hash', self.copyHash),
-            ('transplant', fixed, _('Transplant to local'), 'hg-transplant',
+        submenu = None
+        for type, ext, func, desc, icon, cb in (
+            (0, None, isrev, _('Update...'), 'hg-update', self.updateToRevision),
+            (0, None, None, None, None, None),
+            (0, None, isctx, _('Visual diff...'), 'visualdiff', self.visualDiffRevision),
+            (0, None, isrev, _('Diff to local...'), 'ldiff', self.visualDiffToLocal),
+            (0, None, isctx, _('Browse at rev...'), 'hg-annotate', self.manifestRevision),
+            (0, None, None, None, None, None),
+            (0, None, fixed, _('Merge with...'), 'hg-merge', self.mergeWithRevision),
+            (0, None, None, None, None, None),
+            (0, None, fixed, _('Tag...'), 'hg-tag', self.tagToRevision),
+            (0, None, fixed, _('Bookmark...'), 'bookmark', self.bookmarkRevision),
+            (0, None, None, None, None, None),
+            (0, None, fixed, _('Backout...'), 'hg-revert', self.backoutToRevision),
+            (0, None, None, None, None, None),
+            (1, None, None, _("Export"), None, None),
+              (2, None, isrev, _('Export patch'), 'hg-export', self.exportRevisions),
+              (2, None, isrev, _('Email patch...'), 'mail-forward', self.emailRevision),
+              (2, None, isrev, _('Archive...'), 'hg-archive', self.archiveRevision),
+              (2, None, isctx, _('Copy patch'), 'copy-patch', self.copyPatch),
+            (0, None, None, None, None, None),
+            (0, None, isrev, _('Copy hash'), 'copy-hash', self.copyHash),
+            (0, None, None, None, None, None),
+            (0, 'rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
+            (0, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
                 self.transplantRevision),
-            ('rebase', None, None, None, None),
-            ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
-            ('mq', None, None, None, None),
-            ('mq', qgoto, _('QGoto'), 'hg-qgoto', self.qgotoRevision),
-            ('mq', fixed, _('Import to MQ'), 'qimport', self.qimportRevision),
-            ('mq', applied, _('Finish patch'), 'qfinish', self.qfinishRevision),
-            ('mq', fixed, _('Strip...'), 'menudelete', self.stripRevision),
-            ('reviewboard', fixed, _('Post to Review Board...'),
+            (1, 'mq', None, _('Patch Queue'), None, None),
+              (2, 'mq', qgoto, _('QGoto'), 'hg-qgoto', self.qgotoRevision),
+              (2, 'mq', fixed, _('Import to MQ'), 'qimport', self.qimportRevision),
+              (2, 'mq', applied, _('Finish patch'), 'qfinish', self.qfinishRevision),
+              (2, 'mq', fixed, _('Strip...'), 'menudelete', self.stripRevision),
+            (0, 'reviewboard', fixed, _('Post to Review Board...'),
                 'reviewboard', self.sendToReviewBoard)):
             if ext and ext not in exs:
                 continue
+            if type == 1:  # start submenu
+                if icon:
+                    submenu = menu.addMenu(icon, desc)
+                else:
+                    submenu = menu.addMenu(desc)                    
+                continue
+            m = menu
+            if type == 2:  # submenu entry
+                m = submenu
             if desc is None:
-                menu.addSeparator()
+                m.addSeparator()
             else:
                 act = QAction(desc, self)
                 act.triggered.connect(cb)
                 if icon:
                     act.setIcon(geticon(icon))
                 act.enableFunc = func
-                menu.addAction(act)
+                m.addAction(act)
                 items.append(act)
         self.singlecmenu = menu
         self.singlecmenuitems = items
