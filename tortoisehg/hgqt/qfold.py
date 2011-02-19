@@ -27,6 +27,7 @@ class QFoldDialog(QDialog):
     def __init__(self, repo, patches, parent):
         super(QFoldDialog, self).__init__(parent)
         self.setWindowTitle(_('Patch fold - %s') % repo.displayname)
+        self.setWindowIcon(qtlib.geticon('hg-qfold'))
 
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
