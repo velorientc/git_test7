@@ -25,7 +25,7 @@ ICONS = { 'add': 'add',
            'forget': 'remove',
            'revert': 'hg-revert',
            'remove': 'remove',}
-           
+
 class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
     def __init__(self, repo, command, pats, parent):
@@ -43,7 +43,7 @@ class QuickOpDialog(QDialog):
 
         self.setWindowTitle('%s - hg %s' % (repo.displayname, command))
         self.setWindowIcon(qtlib.geticon(ICONS[command]))
-        
+
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
         layout.setMargin(0)
