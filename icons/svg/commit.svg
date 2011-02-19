@@ -127,20 +127,6 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Bitmap"
-     style="display:none">
-    <image
-       y="0"
-       x="0"
-       id="image3804"
-       height="32"
-       width="32"
-       sodipodi:absref="C:\src\thg\new-icons\icons\tortoise\menucommit.ico"
-       xlink:href="menucommit.ico" />
-  </g>
-  <g
      inkscape:label="Vector"
      inkscape:groupmode="layer"
      id="layer1"

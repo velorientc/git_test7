@@ -228,21 +228,6 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Original Bitmap"
-     style="display:none"
-     sodipodi:insensitive="true">
-    <image
-       y="3.9935177e-15"
-       x="0"
-       id="image3112"
-       height="32"
-       width="32"
-       sodipodi:absref="C:\src\thg\new-icons\icons\tortoise\menucheckout.ico"
-       xlink:href="menucheckout.ico" />
-  </g>
-  <g
      inkscape:label="New Vector"
      inkscape:groupmode="layer"
      id="layer1"

@@ -128,22 +128,6 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Bitmap"
-     style="display:none"
-     sodipodi:insensitive="true">
-    <image
-       transform="translate(-49.142857,-92.933609)"
-       y="92.933609"
-       x="49.142857"
-       id="image2894"
-       height="32"
-       width="32"
-       sodipodi:absref="C:\src\thg\new-icons\icons\tortoise\menusynch.ico"
-       xlink:href="menusynch.ico" />
-  </g>
-  <g
      inkscape:label="Vector"
      inkscape:groupmode="layer"
      id="layer1"

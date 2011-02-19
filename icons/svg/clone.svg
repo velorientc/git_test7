@@ -155,23 +155,6 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Original Bitmap"
-     sodipodi:insensitive="true"
-     style="display:none">
-    <image
-       transform="translate(-123.42857,-334.07648)"
-       y="334.07648"
-       x="123.42857"
-       id="image2263"
-       height="32"
-       width="32"
-       sodipodi:absref="E:\src\thg\borho\icons\tortoise\menuclone.ico"
-       xlink:href="E:\src\thg\borho\icons\tortoise\menuclone.ico"
-       style="opacity:1" />
-  </g>
-  <g
      inkscape:label="New Vector"
      inkscape:groupmode="layer"
      id="layer1"

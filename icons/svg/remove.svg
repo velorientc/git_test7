@@ -164,21 +164,6 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Bitmap"
-     style="display:none"
-     sodipodi:insensitive="true">
-    <image
-       y="0"
-       x="0"
-       id="image3994"
-       height="32"
-       width="32"
-       sodipodi:absref="C:\src\thg\new-icons\icons\tortoise\menudelete.ico"
-       xlink:href="menudelete.ico" />
-  </g>
-  <g
      inkscape:label="Vector"
      inkscape:groupmode="layer"
      id="layer1"

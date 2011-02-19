@@ -247,21 +247,6 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Original Bitmap"
-     style="display:none"
-     sodipodi:insensitive="true">
-    <image
-       y="0"
-       x="0"
-       id="image3523"
-       height="32"
-       width="32"
-       sodipodi:absref="E:\src\mercurial\thg\thg-icons\icons\tortoise\menurepobrowse.ico"
-       xlink:href="menurepobrowse.ico" />
-  </g>
-  <g
      inkscape:label="New Vector"
      inkscape:groupmode="layer"
      id="layer1"
