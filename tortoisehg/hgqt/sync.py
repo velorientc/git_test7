@@ -80,6 +80,7 @@ class SyncWidget(QWidget):
             layout.setContentsMargins(2, 2, 2, 2)
         else:
             self.setWindowTitle(_('TortoiseHg Sync'))
+            self.setWindowIcon(qtlib.geticon('sync'))
             self.resize(850, 550)
 
         tb = QToolBar(self)

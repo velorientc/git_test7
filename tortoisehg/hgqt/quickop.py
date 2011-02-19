@@ -21,6 +21,11 @@ LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
            'revert': (_('Checkmark files to revert'), _('Revert')),
            'remove': (_('Checkmark files to remove'), _('Remove')),}
 
+ICONS = { 'add': 'add',
+           'forget': 'remove',
+           'revert': 'hg-revert',
+           'remove': 'remove',}
+           
 class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
     def __init__(self, repo, command, pats, parent):
@@ -37,7 +42,8 @@ class QuickOpDialog(QDialog):
         self.command = command
 
         self.setWindowTitle('%s - hg %s' % (repo.displayname, command))
-
+        self.setWindowIcon(qtlib.geticon(ICONS[command]))
+        
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
         layout.setMargin(0)

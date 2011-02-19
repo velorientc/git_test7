@@ -571,6 +571,7 @@ class SettingsDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('TortoiseHg Settings'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowIcon(qtlib.geticon('settings_repo'))
 
         if not hasattr(wconfig.config(), 'write'):
             qtlib.ErrorMsgBox(_('Iniparse package not found'),

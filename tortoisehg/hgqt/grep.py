@@ -30,7 +30,8 @@ class SearchWidget(QWidget):
         QWidget.__init__(self, parent)
 
         self.thread = None
-
+        self.setWindowIcon(qtlib.geticon('view-filter'))
+        
         mainvbox = QVBoxLayout()
         mainvbox.setSpacing(6)
         self.setLayout(mainvbox)

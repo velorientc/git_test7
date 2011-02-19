@@ -33,6 +33,7 @@ class DetectRenameDialog(QDialog):
         self.thread = None
 
         self.setWindowTitle(_('Detect Copies/Renames in %s') % repo.displayname)
+        self.setWindowIcon(qtlib.geticon('detect_rename'))
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 

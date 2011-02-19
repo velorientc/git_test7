@@ -23,6 +23,7 @@ class ShellConfigWindow(gtk.Window):
 
         self.set_default_size(400, -1)
         self.set_title(_('TortoiseHg Shell Configuration'))
+        self.setWindowIcon(qtlib.geticon('detect_rename'))
 
         okay = gtk.Button(_('OK'))
         cancel = gtk.Button(_('Cancel'))

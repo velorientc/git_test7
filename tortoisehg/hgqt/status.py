@@ -682,6 +682,7 @@ class StatusDialog(QDialog):
     'Standalone status browser'
     def __init__(self, pats, opts, root=None, parent=None):
         QDialog.__init__(self, parent)
+        self.setWindowIcon(qtlib.geticon('hg-status'))
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 6, 0, 0)
         self.setLayout(layout)

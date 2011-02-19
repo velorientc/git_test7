@@ -8,6 +8,7 @@
 
 import sys
 
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import menuthg, hglib
 
@@ -187,6 +188,7 @@ class ShellConfigWindow(QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle(_("TortoiseHg Shell Configuration"))
+        self.setWindowIcon(qtlib.geticon('settings_repo'))
 
         self.load_shell_configs()
 
