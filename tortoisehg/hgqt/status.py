@@ -61,7 +61,6 @@ class StatusWidget(QWidget):
                          unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
         self.pats = pats
-        self.patchecked = {}
         self.refreshing = None
 
         # determine the user configured status colors
@@ -231,18 +230,17 @@ class StatusWidget(QWidget):
         self.nonebutton.setEnabled(True)
         self.refreshBtn.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
-        self.patchecked = self.refreshing.patchecked
         if self.refreshing.wctx is not None:
-            self.updateModel(self.refreshing.wctx)
+            self.updateModel(self.refreshing.wctx, self.refreshing.patchecked)
         self.refreshing = None
 
-    def updateModel(self, wctx):
+    def updateModel(self, wctx, patchecked):
         self.tv.setSortingEnabled(False)
         if self.tv.model():
             checked = self.tv.model().getChecked()
         else:
-            checked = self.patchecked
-            if self.pats and not self.patchecked:
+            checked = patchecked
+            if self.pats and not checked:
                 qtlib.WarningMsgBox(_('No appropriate files'),
                                     _('No files found for this operation'),
                                     parent=self)
