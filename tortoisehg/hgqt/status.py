@@ -323,7 +323,7 @@ class StatusWidget(QWidget):
             return
         path, status, mst, upath, ext, sz = row
         wfile = util.pconvert(path)
-        self.fileview.setContext(self.wctx)
+        self.fileview.setContext(self.repo[None])
         self.fileview.displayFile(wfile, status=status)
 
 
@@ -334,11 +334,11 @@ class StatusThread(QThread):
 
     def __init__(self, repo, pats, opts, parent=None):
         super(StatusThread, self).__init__()
-        self.repo = repo
+        self.repo = hg.repository(repo.ui, repo.root)
         self.pats = pats
         self.opts = opts
         self.wctx = None
-        self.patchecked = None
+        self.patchecked = {}
 
     def run(self):
         self.repo.dirstate.invalidate()
@@ -358,24 +358,19 @@ class StatusThread(QThread):
                         d = dict([(fn, True) for fn in status[i]])
                         patchecked.update(d)
                 wctx = context.workingctx(self.repo, changes=status)
+                self.patchecked = patchecked
             else:
                 wctx = self.repo[None]
                 wctx.status(**stopts)
-        except (OSError, IOError), e:
-            self.showMessage.emit(hglib.tounicode(str(e)))
-        except util.Abort, e:
-            if e.hint:
-                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                            hglib.tounicode(e.hint))
-            else:
-                err = hglib.tounicode(str(e))
-            self.showMessage.emit(err)
-        try:
+            self.wctx = wctx
+
             wctx.dirtySubrepos = []
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
                     wctx.dirtySubrepos.append(s)
-        except (OSError, IOError, error.RepoLookupError, error.ConfigError), e:
+        except EnvironmentError, e:
+            self.showMessage.emit(hglib.tounicode(str(e)))
+        except (error.RepoLookupError, error.ConfigError), e:
             self.showMessage.emit(hglib.tounicode(str(e)))
         except util.Abort, e:
             if e.hint:
@@ -384,8 +379,6 @@ class StatusThread(QThread):
             else:
                 err = hglib.tounicode(str(e))
             self.showMessage.emit(err)
-        self.wctx = wctx
-        self.patchecked = patchecked
 
 
 class WctxFileTree(QTreeView):
