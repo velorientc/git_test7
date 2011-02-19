@@ -61,7 +61,7 @@ class StatusWidget(QWidget):
                          unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
         self.pats = pats
-        self.refreshing = None
+        self.refthread = None
 
         # determine the user configured status colors
         # (in the future, we could support full rich-text tags)
@@ -197,7 +197,7 @@ class StatusWidget(QWidget):
         qs.setValue(prefix+'/state', self.split.saveState())
 
     def refreshWctx(self):
-        if self.refreshing:
+        if self.refthread:
             return
         self.fileview.clearDisplay()
 
@@ -219,20 +219,23 @@ class StatusWidget(QWidget):
         self.nonebutton.setEnabled(False)
         self.refreshBtn.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
-        self.refreshing = StatusThread(self.repo, self.pats, self.opts)
-        self.refreshing.finished.connect(self.reloadComplete)
-        self.refreshing.showMessage.connect(self.showMessage)
-        self.refreshing.start()
+        self.refthread = StatusThread(self.repo, self.pats, self.opts)
+        self.refthread.finished.connect(self.reloadComplete)
+        self.refthread.showMessage.connect(self.showMessage)
+        self.refthread.start()
 
     def reloadComplete(self):
-        self.refreshing.wait()
+        self.refthread.wait()
         self.allbutton.setEnabled(True)
         self.nonebutton.setEnabled(True)
         self.refreshBtn.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
-        if self.refreshing.wctx is not None:
-            self.updateModel(self.refreshing.wctx, self.refreshing.patchecked)
-        self.refreshing = None
+        if self.refthread.wctx is not None:
+            self.updateModel(self.refthread.wctx, self.refthread.patchecked)
+        self.refthread = None
+
+    def canExit(self):
+        return not self.refthread
 
     def updateModel(self, wctx, patchecked):
         self.tv.setSortingEnabled(False)
