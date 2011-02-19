@@ -1021,14 +1021,16 @@ class RepoWidget(QWidget):
 
         menu = QMenu(self)
         acts = []
-        for name, cb in (
-            (_('QGoto'), self.qgotoRevision),
-            (_('QPush --move'), self.qpushMoveRevision),
-            (_('Fold patches...'), qfoldact),
-            (_('Delete patches...'), qdeleteact),
-            (_('Reorder patches...'), qreorderact)):
+        for name, cb, icon in (
+            (_('QGoto'), self.qgotoRevision, 'hg-qgoto'),
+            (_('QPush --move'), self.qpushMoveRevision, 'hg-qpush'),
+            (_('Fold patches...'), qfoldact, 'hg-qfold'),
+            (_('Delete patches...'), qdeleteact, 'menudelete'),
+            (_('Reorder patches...'), qreorderact, 'hg-qreorder')):
             act = QAction(name, self)
             act.triggered.connect(cb)
+            if icon:
+                act.setIcon(qtlib.geticon(icon))
             acts.append(act)
             menu.addAction(act)
         self.unappcmenu = menu
