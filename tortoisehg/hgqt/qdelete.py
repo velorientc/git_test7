@@ -11,6 +11,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.util import hglib
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui
 
@@ -21,7 +22,7 @@ class QDeleteDialog(QDialog):
     def __init__(self, repo, patches, parent):
         super(QDeleteDialog, self).__init__(parent)
         self.setWindowTitle(_('Patch remove - %s') % repo.displayname)
-
+        self.setWindowIcon(qtlib.geticon('remove'))
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
