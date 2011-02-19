@@ -886,6 +886,7 @@ class CommitDialog(QDialog):
     def __init__(self, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
+        self.setWindowIcon(qtlib.geticon('hg-commit'))
         self.pats = pats
         self.opts = opts
 
