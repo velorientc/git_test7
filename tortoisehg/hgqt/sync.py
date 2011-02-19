@@ -243,9 +243,9 @@ class SyncWidget(QWidget):
         else:
             self.curalias = None
 
-    def loadTargets(self, ctx):
+    def loadTargets(self, rev):
         self.targetcombo.clear()
-        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)), str(ctx.rev()))
+        self.targetcombo.addItem(_('rev: ') + str(rev), str(rev))
 
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
@@ -261,8 +261,8 @@ class SyncWidget(QWidget):
         if rev >= len(self.repo):
             return
 
+        self.loadTargets(rev)
         ctx = self.repo.changectx(rev)
-        self.loadTargets(ctx)
 
         target = str(rev)
         if ctx.thgbranchhead():
