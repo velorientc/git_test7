@@ -26,6 +26,8 @@ class RepoFilterBar(QToolBar):
 
     branchChanged = pyqtSignal(unicode, bool)
     """Emitted (branch, allparents) when branch selection changed"""
+    
+    _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
     def __init__(self, repo, parent):
         super(RepoFilterBar, self).__init__(parent)
@@ -209,13 +211,15 @@ class RepoFilterBar(QToolBar):
 
         self._branchReloading = True
         self._branchCombo.clear()
-        self._branchCombo.addItem('')
+        self._branchCombo.addItem(self._allBranchesLabel)
         for branch in branches:
             self._branchCombo.addItem(branch)
         self._branchLabel.setEnabled(self.filterEnabled and len(branches) > 1)
         self._branchCombo.setEnabled(self.filterEnabled and len(branches) > 1)
         self._branchReloading = False
 
+        if not curbranch:
+            curbranch = self._allBranchesLabel
         self.setBranch(curbranch)
 
     @pyqtSlot(unicode)
@@ -225,7 +229,11 @@ class RepoFilterBar(QToolBar):
 
     def branch(self):
         """Return the current branch name [unicode]"""
-        return unicode(self._branchCombo.currentText())
+        curbranch = self._branchCombo.currentText()
+        if curbranch == self._allBranchesLabel:
+            curbranch = ''
+        
+        return unicode(curbranch)
 
     @pyqtSlot()
     def _emitBranchChanged(self):
