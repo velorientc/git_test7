@@ -176,6 +176,7 @@ class RevDetailsWidget(QWidget):
                                                  Qt.ALT+Qt.Key_Enter])
         self.actionActivateFileAlt.triggered.connect(fileActivated)
         self.mergeToolBar.addAction(self.filelist.actionShowAllMerge)
+        self.mergeToolBar.addAction(self.filelist.actionSecondParent)
 
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)

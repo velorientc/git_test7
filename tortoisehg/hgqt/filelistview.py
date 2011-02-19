@@ -58,6 +58,8 @@ class HgFileListView(QTableView):
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
+        self.actionSecondParent.setChecked(False)
+        self.actionSecondParent.toggled.connect(model.toggleSecondParent)
         if model._ctx is not None:
             self.contextChanged(model._ctx)
 
@@ -70,8 +72,10 @@ class HgFileListView(QTableView):
             self._actions[act].setEnabled(real or wd)
         if len(ctx.parents()) == 2:
             self.actionShowAllMerge.setVisible(True)
+            self.actionSecondParent.setVisible(True)
         else:
             self.actionShowAllMerge.setVisible(False)
+            self.actionSecondParent.setVisible(False)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -89,13 +93,14 @@ class HgFileListView(QTableView):
     def fileSelected(self, index=None, *args):
         if index is None:
             index = self.currentIndex()
-        sel_file = self.model().fileFromIndex(index)
-        from_rev = self.model().revFromIndex(index)
-        status = self.model().flagFromIndex(index)
-        if sel_file:
-            self.fileRevSelected.emit(sel_file, from_rev, status)
+        data = self.model().dataFromIndex(index)
+        if data:
+            fromRev = self.model().revFromIndex(index)
+            self.fileRevSelected.emit(data['path'], fromRev, data['status'])
+            self.actionSecondParent.setEnabled(data['wasmerged'])
         else:
             self.clearDisplay.emit()
+            self.actionSecondParent.setEnabled(False)
 
     def selectFile(self, filename):
         index = self.model().indexFromFile(filename)
@@ -103,11 +108,11 @@ class HgFileListView(QTableView):
         self.fileSelected(index)
 
     def fileActivated(self, index, alternate=False):
-        sel_file = self.model().fileFromIndex(index)
+        selFile = self.model().fileFromIndex(index)
         if alternate:
-            self.navigate(sel_file)
+            self.navigate(selFile)
         else:
-            self.diffNavigate(sel_file)
+            self.diffNavigate(selFile)
 
     def navigate(self, filename=None):
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
@@ -194,10 +199,15 @@ class HgFileListView(QTableView):
             dlg.activateWindow()
 
     def createActions(self):
-        self.actionShowAllMerge = QAction('Show All', self)
+        self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setCheckable(True)
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.setVisible(False)
+        self.actionSecondParent = QAction(_('Other'), self)
+        self.actionSecondParent.setCheckable(True)
+        self.actionSecondParent.setChecked(False)
+        self.actionSecondParent.setVisible(False)
+        self.actionSecondParent.setEnabled(False)
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [

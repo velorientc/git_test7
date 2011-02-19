@@ -42,11 +42,17 @@ class HgFileListModel(QAbstractTableModel):
         self._files = []
         self._filesdict = {}
         self._fulllist = False
+        self._secondParent = False
 
     @pyqtSlot(bool)
     def toggleFullFileList(self, value):
         self._fulllist = value
         self.loadFiles()
+        self.layoutChanged.emit()
+
+    @pyqtSlot(bool)
+    def toggleSecondParent(self, value):
+        self._secondParent = value
         self.layoutChanged.emit()
 
     def __len__(self):
@@ -68,12 +74,6 @@ class HgFileListModel(QAbstractTableModel):
             self.loadFiles()
             self.layoutChanged.emit()
 
-    def flagFromIndex(self, index):
-        if not index.isValid() or index.row()>=len(self) or not self._ctx:
-            return None
-        row = index.row()
-        return self._files[row]['flag']
-
     def fileFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self._ctx:
             return None
@@ -81,16 +81,22 @@ class HgFileListModel(QAbstractTableModel):
         return self._files[row]['path']
 
     def revFromIndex(self, index):
-        if self.showingFullList():
-            if not index.isValid() or index.row()>=len(self) or not self._ctx:
-                return None
-            row = index.row()
-            current_file_desc = self._files[row]
-            if current_file_desc['parent'] == 1:
-                return self._ctx.parents()[1].rev()
-            else:
-                return self._ctx.parents()[0].rev()
-        return None
+        'return revision for index. index is guarunteed to be valid'
+        if not bool(self._ctx.p2()):
+            return self._ctx.p1().rev()
+        row = index.row()
+        data = self._files[row]
+        if (data['wasmerged'] and self._secondParent) or \
+           (data['parent'] == 1 and self._fulllist):
+            return self._ctx.p2().rev()
+        else:
+            return self._ctx.p1().rev()
+
+    def dataFromIndex(self, index):
+        if not index.isValid() or index.row()>=len(self) or not self._ctx:
+            return None
+        row = index.row()
+        return self._files[row]
 
     def indexFromFile(self, filename):
         if filename in self._filesdict:
@@ -102,17 +108,16 @@ class HgFileListModel(QAbstractTableModel):
         files = []
         ctxfiles = self._ctx.files()
         modified, added, removed = self._ctx.changesToParent(parent)
-        if self.showingFullList():
+        ismerge = bool(self._ctx.p2())
+        if self._fulllist and ismerge:
             func = lambda x: True
         else:
             func = lambda x: x in ctxfiles
         for lst, flag in ((added, 'A'), (modified, 'M'), (removed, 'R')):
             for f in filter(func, lst):
-                files.append({'path': f, 'flag': flag,
-                               'parent': parent,
-                               'infiles': f in ctxfiles})
-                # renamed/copied files are handled by background
-                # filling process since it can be a bit long
+                wasmerged = ismerge and f in ctxfiles
+                files.append({'path': f, 'status': flag, 'parent': parent,
+                              'wasmerged': wasmerged})
         return files
 
     def loadFiles(self):
@@ -123,9 +128,6 @@ class HgFileListModel(QAbstractTableModel):
             _files = self._buildDesc(1)
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
-
-    def showingFullList(self):
-        return self._fulllist and bool(self._ctx.p2())
 
     def data(self, index, role):
         if not index.isValid() or index.row()>len(self) or not self._ctx:
@@ -142,20 +144,22 @@ class HgFileListModel(QAbstractTableModel):
         if role in (Qt.DisplayRole, Qt.ToolTipRole):
             return QVariant(hglib.tounicode(current_file))
         elif role == Qt.DecorationRole:
-            if self.showingFullList():
-                if current_file_desc['infiles']:
+            if self._fulllist and bool(self._ctx.p2()):
+                if current_file_desc['wasmerged']:
                     icn = geticon('leftright')
                 elif current_file_desc['parent'] == 0:
                     icn = geticon('left')
                 elif current_file_desc['parent'] == 1:
                     icn = geticon('right')
                 return QVariant(icn.pixmap(20,20))
-            elif current_file_desc['flag'] == 'A':
+            elif current_file_desc['status'] == 'A':
                 return QVariant(geticon('fileadd'))
-            elif current_file_desc['flag'] == 'R':
+            elif current_file_desc['status'] == 'R':
                 return QVariant(geticon('filedelete'))
+            #else:
+            #    return QVariant(geticon('view-diff'))
         elif role == Qt.FontRole:
-            if current_file_desc['infiles'] and self.showingFullList():
+            if current_file_desc['wasmerged']:
                 return QVariant(self._boldfont)
         else:
             return nullvariant
