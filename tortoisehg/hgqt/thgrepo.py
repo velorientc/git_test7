@@ -265,6 +265,17 @@ def _extendrepo(repo):
             self.mq.parse_series()
             return self.mq.series[:]
 
+        @property
+        def thgactivemqname(self):
+            '''Currenty-active qqueue name (see hgext/mq.py:qqueue)'''
+            if not hasattr(self, 'mq'):
+                return
+            n = os.path.basename(self.mq.path)
+            if n.startswith('patches-'):
+                return n[8:]
+            else:
+                return n
+
         @propertycache
         def _shell(self):
             s = self.ui.config('tortoisehg', 'shell')
