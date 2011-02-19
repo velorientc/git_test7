@@ -141,6 +141,8 @@ class QuickOpDialog(QDialog):
     def reject(self):
         if self.cmd.core.running():
             self.cmd.core.cancel()
+        elif not self.stwidget.canExit():
+            return
         else:
             s = QSettings()
             self.stwidget.saveSettings(s, 'quickop')
