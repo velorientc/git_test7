@@ -888,7 +888,7 @@ class RepoWidget(QWidget):
             ('rebase', None, None, None, None),
             ('rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
             ('mq', None, None, None, None),
-            ('mq', qgoto, _('QGoto'), None, self.qgotoRevision),
+            ('mq', qgoto, _('QGoto'), 'hg-qgoto', self.qgotoRevision),
             ('mq', fixed, _('Import to MQ'), 'qimport', self.qimportRevision),
             ('mq', applied, _('Finish patch'), 'qfinish', self.qfinishRevision),
             ('mq', fixed, _('Strip...'), 'menudelete', self.stripRevision),
