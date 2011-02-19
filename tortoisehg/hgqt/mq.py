@@ -511,19 +511,18 @@ class MQWidget(QWidget):
             self.refreshing = False
 
     def _reload(self):
-        ui, repo = self.repo.ui, self.repo
+        ui, repo = self.repo.ui.copy(), self.repo
 
         self.queueCombo.clear()
         self.queueListWidget.clear()
 
+        ui.quiet = True  # don't append "(active)"
         ui.pushbuffer()
         mqmod.qqueue(ui, repo, list=True)
         out = ui.popbuffer()
-        activestr = ' (active)' # TODO: not locale safe
         for i, qname in enumerate(out.splitlines()):
-            if qname.endswith(activestr):
+            if qname == repo.thgactivemqname:
                 current = i
-                qname = qname[:-len(activestr)]
             self.queueCombo.addItem(hglib.tounicode(qname))
         self.queueCombo.setCurrentIndex(current)
         self.queueCombo.setEnabled(self.queueCombo.count() > 1)
