@@ -30,7 +30,7 @@ class QQueueDialog(QDialog):
     def __init__(self, repo, parent=None):
         super(QQueueDialog, self).__init__(parent)
 
-        self.setWindowIcon(qtlib.geticon('thg_logo'))
+        self.setWindowIcon(qtlib.geticon('thg-mq'))
         self.setWindowTitle(_('Manage MQ patch queues'))
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint)
