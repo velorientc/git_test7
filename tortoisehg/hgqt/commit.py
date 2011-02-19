@@ -397,9 +397,8 @@ class CommitWidget(QWidget):
         self.msgte.setModified(False)
 
     def canExit(self):
-        # Usually safe to exit, since we're saving messages implicitly
-        # We'll ask the user for confirmation later, if they have any
-        # files partially selected.
+        if not self.stwidget.canExit():
+            return False
         return not self.runner.core.running()
 
     def loadSettings(self, s, prefix):
