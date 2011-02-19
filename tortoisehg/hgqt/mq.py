@@ -43,6 +43,7 @@ class MQWidget(QWidget):
         tbarhbox.setSpacing(5)
         self.layout().addLayout(tbarhbox, 0)
         self.queueCombo = QComboBox()
+        self.queueCombo.activated['QString'].connect(self.qqueueActivate)
         self.optionsBtn = QPushButton(_('Options'))
         self.msgSelectCombo = PatchMessageCombo(self)
         tbarhbox.addWidget(self.queueCombo)
@@ -254,6 +255,15 @@ class MQWidget(QWidget):
                 dlg = rejects.RejectsDialog(self.repo.wjoin(wfile), self)
                 dlg.exec_()
         self.refreshFileListWidget()
+
+    @pyqtSlot(QString)
+    def qqueueActivate(self, queue):
+        if self.refreshing:
+            return
+        self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
+        cmdline = ['qqueue', '-R', self.repo.root, hglib.fromunicode(queue)]
+        self.cmd.run(cmdline)
 
     @pyqtSlot()
     def onPushAll(self):
