@@ -57,12 +57,10 @@ class StatusWidget(QWidget):
         root = paths.find_root(root)
         assert(root)
         self.repo = thgrepo.repository(ui.ui(), path=root)
-        self.wctx = self.repo[None]
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
                          unknown=True, clean=False, ignored=False, subrepo=True)
         self.opts.update(opts)
         self.pats = pats
-        self.ms = {}
         self.patchecked = {}
         self.refreshing = None
 
@@ -232,16 +230,13 @@ class StatusWidget(QWidget):
         self.allbutton.setEnabled(True)
         self.nonebutton.setEnabled(True)
         self.refreshBtn.setEnabled(True)
-        if self.refreshing.wctx is None:
-            return
-        self.ms = merge.mergestate(self.repo)
-        self.wctx = self.refreshing.wctx
-        self.patchecked = self.refreshing.patchecked
-        self.updateModel()
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
+        self.patchecked = self.refreshing.patchecked
+        if self.refreshing.wctx is not None:
+            self.updateModel(self.refreshing.wctx)
         self.refreshing = None
 
-    def updateModel(self):
+    def updateModel(self, wctx):
         self.tv.setSortingEnabled(False)
         if self.tv.model():
             checked = self.tv.model().getChecked()
@@ -251,10 +246,11 @@ class StatusWidget(QWidget):
                 qtlib.WarningMsgBox(_('No appropriate files'),
                                     _('No files found for this operation'),
                                     parent=self)
-        tm = WctxModel(self.wctx, self.ms, self.opts, checked, self)
+        ms = merge.mergestate(self.repo)
+        tm = WctxModel(wctx, ms, self.opts, checked, self)
         self.tv.setModel(tm)
         self.tv.setSortingEnabled(True)
-        self.tv.setColumnHidden(COL_PATH, self.isMerge())
+        self.tv.setColumnHidden(COL_PATH, bool(wctx.p2()))
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
 
         for col in (COL_PATH, COL_STATUS, COL_MERGE_STATE):
@@ -294,9 +290,6 @@ class StatusWidget(QWidget):
 
     def checkNone(self):
         self.tv.model().checkAll(False)
-
-    def isMerge(self):
-        return bool(self.wctx.p2())
 
     def getChecked(self, types=None):
         model = self.tv.model()
