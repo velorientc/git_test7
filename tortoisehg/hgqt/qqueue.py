@@ -35,7 +35,6 @@ class QQueueDialog(QDialog):
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint)
 
-        self.activequeue = ''
         self.repo = repo
         repo.repositoryChanged.connect(self.reload)
 
@@ -143,8 +142,9 @@ class QQueueDialog(QDialog):
         if state:
             if self.ql.currentRow() != -1:
                 q = hglib.fromunicode(self.ql.item(self.ql.currentRow()).text())
-                self.btact.setEnabled(q != self.activequeue)
-                self.btren.setEnabled(q == self.activequeue and q != 'patches')
+                self.btact.setEnabled(q != self.repo.thgactivemqname)
+                self.btren.setEnabled(q == self.repo.thgactivemqname
+                                      and q != 'patches')
                 self.btdel.setEnabled(q != 'patches')
                 self.btpur.setEnabled(q != 'patches')
             else:
@@ -174,6 +174,7 @@ class QQueueDialog(QDialog):
     @pyqtSlot()
     def reload(self):
         _ui = uimod.ui()
+        _ui.quiet = True  # don't append "(active)"
         _ui.pushbuffer()
         try:
             opts = {'list': True}
@@ -197,11 +198,8 @@ class QQueueDialog(QDialog):
                 self.itemfont = item.font()
                 self.itemfontbold = self.itemfont
                 self.itemfontbold.setBold(True)
-            activestr = _(' (active)')  # locale safe ? (see also mq.py)
-            if q.endswith(activestr):
+            if q == self.repo.thgactivemqname:
                 row_activeq = i
-                self.activequeue = q[:-len(activestr)]
-                item.setText(self.activequeue)
                 item.setFont(self.itemfontbold)
         self.ql.setCurrentRow(row_activeq)
 
@@ -214,7 +212,7 @@ class QQueueDialog(QDialog):
         q = hglib.fromunicode(self.ql.item(currow).text())
         self.pl.clear()
         patches = []
-        if q == self.activequeue:
+        if q == self.repo.thgactivemqname:
             patches = self.repo.mq.full_series
         else:
             if q == 'patches':
@@ -238,7 +236,7 @@ class QQueueDialog(QDialog):
     def qqueueActivate(self):
         uq = self.ql.item(self.ql.currentRow()).text()
         q = hglib.fromunicode(uq)
-        if q == self.activequeue:
+        if q == self.repo.thgactivemqname:
             return
         if qtlib.QuestionMsgBox(_('Confirm patch queue switch'),
                 _("Do you really want to activate patch queue '%s' ?") % uq,
