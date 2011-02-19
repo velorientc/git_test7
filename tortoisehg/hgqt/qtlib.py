@@ -272,7 +272,8 @@ def _findscalableicon(name):
     for size, subdir, sfx in _SCALABLE_ICON_PATHS:
         path = ':/icons/%s/%s%s' % (subdir, name, sfx)
         if QFile.exists(path):
-            o.addFile(path, size)
+            for mode in (QIcon.Normal, QIcon.Active):
+                o.addFile(path, size, mode)
     if not o.isNull():
         return o
 
