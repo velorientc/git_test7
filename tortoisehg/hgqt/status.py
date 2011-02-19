@@ -251,7 +251,7 @@ class StatusWidget(QWidget):
                 qtlib.WarningMsgBox(_('No appropriate files'),
                                     _('No files found for this operation'),
                                     parent=self)
-        tm = WctxModel(self.wctx, self.ms, self.opts, checked)
+        tm = WctxModel(self.wctx, self.ms, self.opts, checked, self)
         self.tv.setModel(tm)
         self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, self.isMerge())
@@ -464,7 +464,7 @@ class WctxFileTree(QTreeView):
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
 
-    def __init__(self, wctx, ms, opts, checked, parent=None):
+    def __init__(self, wctx, ms, opts, checked, parent):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         nchecked = {}
