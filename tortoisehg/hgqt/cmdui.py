@@ -806,6 +806,12 @@ class Runner(QWidget):
     def __init__(self, title=_('TortoiseHg'), useInternal=True, parent=None):
         super(Runner, self).__init__(parent)
 
+        # XXX: workaround not to eat mouse-click around left-top corner of
+        # the parent widget. Runner shouldn't be a QWidget, but for now
+        # it's a QWidget in order to become a parent of self.core.thread
+        # and self.dlg.
+        self.resize(0, 0)
+
         self.internallog = useInternal
         self.title = title
 
