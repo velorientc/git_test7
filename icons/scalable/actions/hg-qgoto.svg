@@ -14,7 +14,7 @@
    width="100%"
    version="1.0"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="hg-qreorder.svg">
+   sodipodi:docname="hg-qgoto.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -24,16 +24,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1280"
-     inkscape:window-height="738"
+     inkscape:window-width="1082"
+     inkscape:window-height="722"
      id="namedview17"
      showgrid="false"
      inkscape:zoom="14.75"
-     inkscape:cx="14.263008"
+     inkscape:cx="3.6867368"
      inkscape:cy="14.662255"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-x="50"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <title
      id="title3066">QPushAll icon</title>
@@ -220,24 +220,24 @@
     </rdf:RDF>
   </metadata>
   <path
-     style="color:#000000;fill:#b1cae4;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     style="color:#000000;fill:#729fcf;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      inkscape:connector-curvature="0"
      d="m 1.2731172,26.666401 15.0704228,0 4.018378,-5.3328 -15.0689157,0 -4.0198851,5.3328 z"
      id="path3375-7" />
   <path
-     style="color:#000000;fill:#b1cae4;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     style="color:#000000;fill:#729fcf;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      inkscape:connector-curvature="0"
      d="m 1.2731171,22.317051 15.0704239,0 4.018378,-5.3328 -15.0689169,0 -4.019885,5.3328 z"
      id="path3375" />
   <path
-     style="color:#000000;fill:#b1cae4;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     style="color:#000000;fill:#729fcf;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      inkscape:connector-curvature="0"
      d="m 1.2731171,18.045865 15.0704239,0 4.018378,-5.3328 -15.0689169,0 -4.019885,5.3328 z"
      id="path3378" />
   <g
      id="patch-added"
      transform="matrix(0.75352121,0,0,1,-1.7391598,-5.4237288)"
-     style="color:#000000;fill:#eeeeec;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate">
+     style="color:#000000;fill:#eeeeec;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;opacity:0.75">
     <path
        id="path2865"
        d="m 3.9976,19.335 20,0 5.3328,-5.3328 -19.998,0 -5.3348,5.3328 z"
@@ -247,7 +247,7 @@
   <g
      id="patch-added-2"
      transform="matrix(0.75352121,0,0,1,-1.7391597,-9.4821594)"
-     style="color:#000000;fill:#eeeeec;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate">
+     style="color:#000000;fill:#eeeeec;fill-opacity:1;fill-rule:nonzero;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;opacity:0.75">
     <path
        id="path2865-1"
        d="m 3.9976,19.335 20,0 5.3328,-5.3328 -19.998,0 -5.3348,5.3328 z"

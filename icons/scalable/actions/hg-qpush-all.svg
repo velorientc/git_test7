@@ -12,8 +12,8 @@
    height="100%"
    width="100%"
    version="1.0"
-   inkscape:version="0.47 r22583"
-   sodipodi:docname="qpushall.svg">
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="hg-qpush-all.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -23,15 +23,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1385"
-     inkscape:window-height="875"
+     inkscape:window-width="1280"
+     inkscape:window-height="738"
      id="namedview17"
      showgrid="false"
-     inkscape:zoom="7.375"
-     inkscape:cx="-25.016949"
-     inkscape:cy="15.728814"
-     inkscape:window-x="55"
-     inkscape:window-y="0"
+     inkscape:zoom="14.75"
+     inkscape:cx="-10.293758"
+     inkscape:cy="14.428363"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <title
@@ -128,31 +128,21 @@
       </cc:License>
     </rdf:RDF>
   </metadata>
-  <g
-     id="stack"
-     stroke-linejoin="miter"
-     stroke="#2e3436"
-     stroke-linecap="butt"
-     stroke-width="1px"
-     fill="#eeeeec">
-    <path
-       id="path3375"
-       d="m3.9976,27.334,20,0,5.3328-5.3328-19.998,0-5.3348,5.3328z" />
-    <path
-       id="path3378"
-       d="m3.9976,23.334,20,0,5.3328-5.3328-19.998,0-5.3348,5.3328z" />
-  </g>
-  <g
-     id="patch-added">
-    <path
-       id="path2865"
-       stroke-linejoin="miter"
-       d="m3.9976,19.335,20,0,5.3328-5.3328-19.998,0-5.3348,5.3328z"
-       stroke="#2e3436"
-       stroke-linecap="butt"
-       stroke-width="1px"
-       fill="#b1cae4" />
-  </g>
+  <path
+     style="fill:#729fcf;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;fill-opacity:1"
+     inkscape:connector-curvature="0"
+     d="m 3.9976,27.334 20,0 5.3328,-5.3328 -19.998,0 -5.3348,5.3328 z"
+     id="path3375" />
+  <path
+     style="fill:#729fcf;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;fill-opacity:1"
+     inkscape:connector-curvature="0"
+     d="m 3.9976,23.334 20,0 5.3328,-5.3328 -19.998,0 -5.3348,5.3328 z"
+     id="path3378" />
+  <path
+     style="fill:#eeeeec;stroke:#2e3436;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;fill-opacity:1;opacity:0.75"
+     inkscape:connector-curvature="0"
+     d="m 3.9976,19.335 20,0 5.3328,-5.3328 -19.998,0 -5.3348,5.3328 z"
+     id="path2865" />
   <g
      id="arrow-down"
      transform="translate(-3.9322034,0)"
