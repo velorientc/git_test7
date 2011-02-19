@@ -187,6 +187,7 @@ class HgFileListView(QTableView):
                 dlgdict[filename] = dlg
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
+                dlg.setWindowIcon(geticon('hg-log'))
             dlg = dlgdict[filename]
             dlg.goto(model._ctx.rev())
             dlg.show()
