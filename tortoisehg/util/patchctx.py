@@ -88,6 +88,8 @@ class patchctx(object):
     def bookmarks(self):    return ()
     def children(self):     return ()
     def extra(self):        return {}
+    def p1(self):           return None
+    def p2(self):           return None
 
     def flags(self, wfile):
         if wfile in self._files:

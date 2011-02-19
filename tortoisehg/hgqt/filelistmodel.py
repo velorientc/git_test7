@@ -82,8 +82,8 @@ class HgFileListModel(QAbstractTableModel):
 
     def revFromIndex(self, index):
         'return revision for index. index is guarunteed to be valid'
-        if not bool(self._ctx.p2()):
-            return self._ctx.p1().rev()
+        if len(self._ctx.parents()) < 2:
+            return None
         row = index.row()
         data = self._files[row]
         if (data['wasmerged'] and self._secondParent) or \
