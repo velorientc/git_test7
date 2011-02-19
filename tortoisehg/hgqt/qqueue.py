@@ -114,6 +114,7 @@ class QQueueDialog(QDialog):
         cmd = cmdui.Runner()
         cmd.output.connect(self.output)
         cmd.makeLogVisible.connect(self.makeLogVisible)
+        cmd.commandFinished.connect(self.qqcmdFinished)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Close)
@@ -302,17 +303,11 @@ class QQueueDialog(QDialog):
             opts = ['--purge', q]
             self.qqueueCommand(opts)
 
+    def qqcmdFinished(self):
+        self.repo.decrementBusyCount()
+
     def qqueueCommand(self, opts):
         self.setButtonState(False)
-        def qqcmdFinished():
-            self.repo.decrementBusyCount()
-            # This seems to cause excessive refreshes ?!
-            # See when using 'thgdbg qqueue' from the commandline.
-            # But when not used, the data are not reshown after a command.
-            # Is it ok to have 2 cmd threads in the same dialog ?
-            self.reload()
-            # self.updateUI()
-        self.cmd.commandFinished.connect(qqcmdFinished)
         cmdline = ['qqueue', '--repository', self.repo.root] + opts
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
