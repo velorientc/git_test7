@@ -19,6 +19,7 @@ from hgext import mq, record
 from tortoisehg.util import hglib
 
 class patchctx(object):
+    _parseErrorFileName = '*ParseError*'
 
     def __init__(self, patchpath, repo, pf=None, rev=None):
         """ Read patch context from file
@@ -92,6 +93,8 @@ class patchctx(object):
     def p2(self):           return None
 
     def flags(self, wfile):
+        if wfile == self._parseErrorFileName:
+            return ''
         if wfile in self._files:
             for gp in patch.readgitpatch(self._files[wfile][0].header):
                 if gp.mode:
@@ -137,19 +140,22 @@ class patchctx(object):
         return summary
 
     def changesToParent(self, whichparent):
+        'called by filelistmodel to get list of files'
         if whichparent == 0 and self._files:
             return self._status
         else:
             return [], [], []
 
     def thgmqpatchdata(self, wfile):
-        # return file diffs as string list without line ends
+        'called by fileview to get diff data'
+        if wfile == self._parseErrorFileName:
+            return '\n\n\nErrors while parsing patch:\n'+str(self._parseerror)
         if wfile in self._files:
             buf = cStringIO.StringIO()
             for chunk in self._files[wfile]:
                 chunk.write(buf)
             return buf.getvalue()
-        return []
+        return ''
 
     @propertycache
     def _files(self):
@@ -186,6 +192,8 @@ class patchctx(object):
                         self._fileorder.append(path)
                     files[path].extend(chunk.hunks)
             except patch.PatchError, e:
+                self._status[2].append(self._parseErrorFileName)
+                files[self._parseErrorFileName] = []
                 self._parseerror = e
                 if 'THGDEBUG' in os.environ:
                     print e
