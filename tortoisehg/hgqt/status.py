@@ -676,10 +676,6 @@ class StatusDialog(QDialog):
         self.stwidget = StatusWidget(pats, opts, root, self)
         layout.addWidget(self.stwidget, 1)
 
-        s = QSettings()
-        self.stwidget.loadSettings(s, 'status')
-        self.restoreGeometry(s.value('status/geom').toByteArray())
-
         self.statusbar = cmdui.ThgStatusBar(self)
         layout.addWidget(self.statusbar)
         self.stwidget.showMessage.connect(self.statusbar.showMessage)
@@ -688,25 +684,31 @@ class StatusDialog(QDialog):
 
         self.setWindowTitle(self.stwidget.getTitle())
         self.setWindowFlags(Qt.Window)
+        self.loadSettings()
 
+        QShortcut(QKeySequence.Refresh, self, self.stwidget.refreshWctx)
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
-    def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Refresh):
-            self.stwidget.refreshWctx()
-        else:
-            return super(StatusDialog, self).keyPressEvent(event)
+    def loadSettings(self):
+        s = QSettings()
+        self.stwidget.loadSettings(s, 'status')
+        self.restoreGeometry(s.value('status/geom').toByteArray())
 
-    def accept(self):
+    def saveSettings(self):
         s = QSettings()
         self.stwidget.saveSettings(s, 'status')
         s.setValue('status/geom', self.saveGeometry())
+
+    def accept(self):
+        if not self.stwidget.canExit():
+            return
+        self.saveSettings()
         QDialog.accept(self)
 
     def reject(self):
-        s = QSettings()
-        self.stwidget.saveSettings(s, 'status')
-        s.setValue('status/geom', self.saveGeometry())
+        if not self.stwidget.canExit():
+            return
+        self.saveSettings()
         QDialog.reject(self)
 
 def run(ui, *pats, **opts):
