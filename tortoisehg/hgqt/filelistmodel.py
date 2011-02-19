@@ -23,9 +23,6 @@ from PyQt4.QtGui import *
 
 nullvariant = QVariant()
 
-def ismerge(ctx):
-    return len(ctx.parents()) > 1
-
 class HgFileListModel(QAbstractTableModel):
     """
     Model used for listing (modified) files of a given Hg revision
@@ -84,7 +81,7 @@ class HgFileListModel(QAbstractTableModel):
         return self._files[row]['path']
 
     def revFromIndex(self, index):
-        if self._fulllist and ismerge(self._ctx):
+        if self.showingFullList():
             if not index.isValid() or index.row()>=len(self) or not self._ctx:
                 return None
             row = index.row()
@@ -105,7 +102,7 @@ class HgFileListModel(QAbstractTableModel):
         files = []
         ctxfiles = self._ctx.files()
         modified, added, removed = self._ctx.changesToParent(parent)
-        if self._fulllist:
+        if self.showingFullList():
             func = lambda x: True
         else:
             func = lambda x: x in ctxfiles
@@ -121,11 +118,14 @@ class HgFileListModel(QAbstractTableModel):
     def loadFiles(self):
         self._files = []
         self._files = self._buildDesc(0)
-        if ismerge(self._ctx):
+        if bool(self._ctx.p2()):
             _paths = [x['path'] for x in self._files]
             _files = self._buildDesc(1)
             self._files += [x for x in _files if x['path'] not in _paths]
         self._filesdict = dict([(f['path'], f) for f in self._files])
+
+    def showingFullList(self):
+        return self._fulllist and bool(self._ctx.p2())
 
     def data(self, index, role):
         if not index.isValid() or index.row()>len(self) or not self._ctx:
@@ -142,7 +142,7 @@ class HgFileListModel(QAbstractTableModel):
         if role in (Qt.DisplayRole, Qt.ToolTipRole):
             return QVariant(hglib.tounicode(current_file))
         elif role == Qt.DecorationRole:
-            if self._fulllist and ismerge(self._ctx):
+            if self.showingFullList():
                 if current_file_desc['infiles']:
                     icn = geticon('leftright')
                 elif current_file_desc['parent'] == 0:
@@ -155,7 +155,7 @@ class HgFileListModel(QAbstractTableModel):
             elif current_file_desc['flag'] == 'R':
                 return QVariant(geticon('filedelete'))
         elif role == Qt.FontRole:
-            if self._fulllist and current_file_desc['infiles']:
+            if current_file_desc['infiles'] and self.showingFullList():
                 return QVariant(self._boldfont)
         else:
             return nullvariant

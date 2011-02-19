@@ -72,7 +72,6 @@ class HgFileListView(QTableView):
             self.actionShowAllMerge.setVisible(True)
         else:
             self.actionShowAllMerge.setVisible(False)
-            self.actionShowAllMerge.setChecked(False)
 
     def currentFile(self):
         index = self.currentIndex()
