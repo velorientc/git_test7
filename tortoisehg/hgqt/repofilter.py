@@ -26,7 +26,7 @@ class RepoFilterBar(QToolBar):
 
     branchChanged = pyqtSignal(unicode, bool)
     """Emitted (branch, allparents) when branch selection changed"""
-    
+
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
     def __init__(self, repo, parent):
@@ -37,6 +37,10 @@ class RepoFilterBar(QToolBar):
         self.setMovable(False)
         self._repo = repo
         self.filterEnabled = True
+
+        #Check if the font contains the glyph needed by the model
+        if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
+             self._allBranchesLabel = u'*** %s ***' % _('Show all')
 
         self.entrydlg = revset.RevisionSetQuery(repo, self)
         self.entrydlg.progress.connect(self.progress)
@@ -50,7 +54,7 @@ class RepoFilterBar(QToolBar):
         le = combo.lineEdit()
         le.returnPressed.connect(self.returnPressed)
         le.selectionChanged.connect(self.selectionChanged)
-        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText(_('### revision set query ###'))
         combo.activated.connect(self.comboSelectionActivated)
         self.revsetle = le
@@ -232,7 +236,6 @@ class RepoFilterBar(QToolBar):
         curbranch = self._branchCombo.currentText()
         if curbranch == self._allBranchesLabel:
             curbranch = ''
-        
         return unicode(curbranch)
 
     @pyqtSlot()
