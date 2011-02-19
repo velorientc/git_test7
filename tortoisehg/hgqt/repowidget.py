@@ -482,11 +482,15 @@ class RepoWidget(QWidget):
     def verify(self):
         cmdline = ['--repository', self.repo.root, 'verify', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
+        dlg.setWindowIcon(qtlib.geticon('hg-verify'))
+        dlg.setWindowTitle(_('%s - verify repository') % self.repo.shortname)
         dlg.exec_()
 
     def recover(self):
         cmdline = ['--repository', self.repo.root, 'recover', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
+        dlg.setWindowIcon(qtlib.geticon('hg-recover'))
+        dlg.setWindowTitle(_('%s - recover repository') % self.repo.shortname)
         dlg.exec_()
 
     def rollback(self):
