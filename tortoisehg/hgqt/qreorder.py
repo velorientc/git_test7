@@ -27,6 +27,7 @@ class QReorderDialog(QDialog):
         self.setWindowTitle(_('Reorder Unapplied Patches'))
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
+        self.setWindowIcon(qtlib.geticon('hg-qreorder'))
 
         self.repo = repo
         self.cached = None
