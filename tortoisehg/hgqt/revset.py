@@ -369,6 +369,7 @@ class RevsetThread(QThread):
                 node = self.repo.lookup(self.text)
                 self.showMessage.emit(_('found revision'))
                 self.queryIssued.emit(self.query, [node])
+                return
             except (error.RepoLookupError, error.Abort):
                 self.text = 'keyword("%s")' % self.text
         cwd = os.getcwd()
