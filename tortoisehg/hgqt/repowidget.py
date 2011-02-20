@@ -1046,7 +1046,7 @@ class RepoWidget(QWidget):
             (_('QGoto'), self.qgotoRevision, 'hg-qgoto'),
             (_('QPush --move'), self.qpushMoveRevision, 'hg-qpush'),
             (_('Fold patches...'), qfoldact, 'hg-qfold'),
-            (_('Delete patches...'), qdeleteact, 'menudelete'),
+            (_('Delete patches...'), qdeleteact, 'hg-qdelete'),
             (_('Reorder patches...'), qreorderact, 'hg-qreorder')):
             act = QAction(name, self)
             act.triggered.connect(cb)

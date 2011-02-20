@@ -22,7 +22,7 @@ class QDeleteDialog(QDialog):
     def __init__(self, repo, patches, parent):
         super(QDeleteDialog, self).__init__(parent)
         self.setWindowTitle(_('Patch remove - %s') % repo.displayname)
-        self.setWindowIcon(qtlib.geticon('remove'))
+        self.setWindowIcon(qtlib.geticon('hg-qdelete'))
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
