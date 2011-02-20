@@ -437,8 +437,8 @@ class PMButton(QPushButton):
         self.setFlat(True)
         self.setAutoDefault(False)
 
-        self.plus = geticon('plus')
-        self.minus = geticon('minus')
+        self.plus = geticon('expander-open')
+        self.minus = geticon('expander-close')
         icon = expanded and self.minus or self.plus
         self.setIcon(icon)
 
