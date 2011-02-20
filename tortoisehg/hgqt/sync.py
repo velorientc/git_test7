@@ -711,7 +711,7 @@ class SyncWidget(QWidget):
                 if ret == 0:
                     nodes = [n for n in data.splitlines() if len(n) == 40]
                     self.outgoingNodes.emit(nodes)
-                    self.showMessage.emit(_('%d outgoing changesets to %url') %
+                    self.showMessage.emit(_('%d outgoing changesets to %s') %
                                           (len(nodes), url))
                 elif ret == 1:
                     self.showMessage.emit(_('No outgoing changesets to %s') % url)
