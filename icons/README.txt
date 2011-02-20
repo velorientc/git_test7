@@ -5,6 +5,9 @@ licensed under the GPLv2.
 This software may be used and distributed according to the terms of the
 GNU General Public License version 2, incorporated herein by reference.
 
+Some of the icons used here are from the Tango Icon Theme. Some of them
+have been modified.
+
 reviewboard.png originated from the Review Board project, which is under
 the MIT license.
 
