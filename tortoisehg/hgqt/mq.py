@@ -88,7 +88,7 @@ class MQWidget(QWidget):
         tb.setIcon(qtlib.geticon('thg-qreorder'))
         tb.setToolTip(_('Apply selected patch next (change queue order)'))
         self.qdeleteBtn = tb = QToolButton()
-        tb.setIcon(qtlib.geticon('filedelete'))
+        tb.setIcon(qtlib.geticon('hg-qdelete'))
         tb.setToolTip(_('Delete selected patches'))
         self.qpopBtn = tb = QToolButton()
         tb.setIcon(qtlib.geticon('hg-qpop'))
