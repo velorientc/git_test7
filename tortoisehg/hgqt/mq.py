@@ -363,6 +363,17 @@ class MQWidget(QWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.reload()
 
+    def qgotoRevision(self, rev):
+        if self.cmd.running():
+            return
+        cmdline = ['qgoto', '-R', self.repo.root]
+        cmdline += self.getUserOptions('force')
+        cmdline += ['--', rev]
+        self.repo.incrementBusyCount()
+        self.qtbar.setEnabled(False)
+        self.finishfunc = self.checkForRejects
+        self.cmd.run(cmdline)
+
     #@pyqtSlot(QListWidgetItem)
     def onGotoPatch(self, item):
         'Patch has been activated (return), issue qgoto'
@@ -373,6 +384,7 @@ class MQWidget(QWidget):
         cmdline += ['--', item._thgpatch]
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
+        self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
 
     #@pyqtSlot(QListWidgetItem)
