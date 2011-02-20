@@ -884,7 +884,7 @@ class RepoWidget(QWidget):
             (0, None, fixed, _('Merge with...'), 'hg-merge', self.mergeWithRevision),
             (0, None, None, None, None, None),
             (0, None, fixed, _('Tag...'), 'hg-tag', self.tagToRevision),
-            (0, None, fixed, _('Bookmark...'), 'bookmark', self.bookmarkRevision),
+            (0, None, fixed, _('Bookmark...'), 'hg-bookmarks', self.bookmarkRevision),
             (0, None, None, None, None, None),
             (0, None, fixed, _('Backout...'), 'hg-revert', self.backoutToRevision),
             (0, None, None, None, None, None),

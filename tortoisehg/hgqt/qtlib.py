@@ -266,6 +266,7 @@ _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(), 'scalable/status', '.svg'),
                         (QSize(16, 16), '16x16/apps', '.png'),
                         (QSize(22, 22), '22x22/actions', '.png'),
+                        (QSize(32, 32), '32x32/actions', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]
 
 def _findscalableicon(name):

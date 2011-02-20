@@ -107,7 +107,7 @@ class BookmarkDialog(QDialog):
         self.setLayout(base)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.setWindowTitle(_('Bookmark - %s') % self.repo.displayname)
-        self.setWindowIcon(qtlib.geticon('bookmark'))
+        self.setWindowIcon(qtlib.geticon('hg-bookmarks'))
 
         self.cmd = cmdui.Widget(True, self)
         self.cmd.output.connect(self.output)
