@@ -178,7 +178,7 @@ class Workbench(QMainWindow):
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
                   menu='file', icon='hg-clone')
         newaction(_("&Open Repository..."), self.openRepository,
-                  shortcut='Open', menu='file', icon='plus')
+                  shortcut='Open', menu='file', icon='thg-repository-open')
         newaction(_("&Close Repository"), self.closeRepository, icon='window-close',
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
