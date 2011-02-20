@@ -150,7 +150,6 @@ class RepoItem(RepoTreeItem):
         self._repo = repo
         self._root = repo and repo.root or ''  # local str
         self._shortname = repo and repo.shortname or ''  # unicode
-        self._settingsdlg = None
 
     def rootpath(self):
         return self._root
@@ -203,12 +202,11 @@ class RepoItem(RepoTreeItem):
         workbench.showRepo(hglib.tounicode(self._root))
 
     def startSettings(self, parent):
-        if self._settingsdlg is None:
-            self._settingsdlg = SettingsDialog(
-                configrepo=True, focus='web.name', parent=parent,
-                root=self._root)
+        dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
+                             root=self._root)
         self.ensureRepoLoaded()
-        self._settingsdlg.show()
+        dlg.exec_()
+        dlg.deleteLater()
 
     def ensureRepoLoaded(self):
         """load repo object if necessary
