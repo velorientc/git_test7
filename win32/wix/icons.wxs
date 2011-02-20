@@ -17,7 +17,6 @@
           <File Name="filemodify.ico" />
           <File Name="general.ico" />
           <File Name="hg.ico" />
-          <File Name="hg_60.ico" />
           <File Name="hgB.ico" />
           <File Name="ignore.ico" />
           <File Name="menuabout.ico" />
@@ -43,7 +42,6 @@
           <File Name="menusynch.ico" />
           <File Name="menuunmerge.ico" />
           <File Name="proxy.ico" />
-          <File Name="python.ico" />
           <File Name="README.txt" />
           <File Name="refresh_overlays.ico" />
           <File Name="settings_repo.ico" />
