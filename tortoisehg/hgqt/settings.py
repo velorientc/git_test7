@@ -523,7 +523,7 @@ INFO = (
         ' Default: False')),
     )),
 
-({'name': 'fonts', 'label': _('Fonts'), 'icon': 'fonts'}, (
+({'name': 'fonts', 'label': _('Fonts'), 'icon': 'preferences-desktop-font'}, (
     _fi(_('Message Font'), 'tortoisehg.fontcomment', genFontEdit,
         _('Font used to display commit messages. Default: monospace 10'),
        globalonly=True),
@@ -541,7 +541,7 @@ INFO = (
        globalonly=True),
     )),
 
-({'name': 'extensions', 'label': _('Extensions'), 'icon': 'extensions'}, (
+({'name': 'extensions', 'label': _('Extensions'), 'icon': 'hg-extensions'}, (
     )),
 
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
