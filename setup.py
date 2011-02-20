@@ -191,8 +191,6 @@ class build_qt(Command):
     def run(self):
         self._wrapuic()
         basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
-        self.build_rc(os.path.join(basepath, 'workbench_rc.py'),
-                      os.path.join(basepath, 'icons'), '/icons')
         self.build_rc(os.path.join(basepath, 'icons_rc.py'),
                       os.path.join(os.path.dirname(__file__), 'icons'),
                       '/icons')
