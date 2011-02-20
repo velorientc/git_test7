@@ -5,6 +5,9 @@ licensed under the GPLv2.
 This software may be used and distributed according to the terms of the
 GNU General Public License version 2, incorporated herein by reference.
 
+reviewboard.png originated from the Review Board project, which is under
+the MIT license.
+
 Directory Structure
 -------------------
 
