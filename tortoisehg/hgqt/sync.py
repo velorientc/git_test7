@@ -86,23 +86,31 @@ class SyncWidget(QWidget):
         tb = QToolBar(self)
         self.layout().addWidget(tb)
         self.opbuttons = []
-        for tip, icon, cb in (
-            (_('Preview incoming changesets from specified URL'),
-             'hg-incoming', self.inclicked),
-            (_('Pull incoming changesets from specified URL'),
-             'hg-pull', self.pullclicked),
-            (_('Filter outgoing changesets to specified URL'),
-             'hg-outgoing', self.outclicked),
-            (_('Push outgoing changesets to specified URL'),
-             'hg-push', self.pushclicked),
-            (_('Email outgoing changesets for specified URL'),
-             'mail-forward', self.emailclicked)):
+
+        def newaction(tip, icon, cb):
             a = QAction(self)
             a.setToolTip(tip)
             a.setIcon(qtlib.geticon(icon))
             a.triggered.connect(cb)
             self.opbuttons.append(a)
             tb.addAction(a)
+            return a
+
+        self.incomingAction = \
+        newaction(_('Preview incoming changesets from specified URL'),
+             'hg-incoming', self.inclicked)
+        self.pullAction = \
+        newaction(_('Pull incoming changesets from specified URL'),
+             'hg-pull', self.pullclicked)
+        self.outgoingAction = \
+        newaction(_('Filter outgoing changesets to specified URL'),
+             'hg-outgoing', self.outclicked)
+        self.pushAction = \
+        newaction(_('Push outgoing changesets to specified URL'),
+             'hg-push', self.pushclicked)
+        newaction(_('Email outgoing changesets for specified URL'),
+             'mail-forward', self.emailclicked)
+
         if 'perfarce' in self.repo.extensions():
             a = QAction(self)
             a.setToolTip(_('Manage pending perforce changelists'))
@@ -243,6 +251,13 @@ class SyncWidget(QWidget):
             self.curalias = 'default'
         else:
             self.curalias = None
+
+    def refreshStatusTips(self):
+        url = self.currentUrl(True)
+        self.incomingAction.setStatusTip(_('Preview incoming changesets from %s') % url)
+        self.pullAction.setStatusTip(_('Pull incoming changesets from %s') % url)
+        self.outgoingAction.setStatusTip(_('Filter outgoing changesets to %s') % url)
+        self.pushAction.setStatusTip(_('Push outgoing changesets to %s') % url)
 
     def loadTargets(self, rev):
         self.targetcombo.clear()
@@ -391,6 +406,7 @@ class SyncWidget(QWidget):
         self.curpw = passwd
         self.updateInProgress = False
         self.refreshUrl()
+        self.refreshStatusTips()
 
     def dragEnterEvent(self, event):
         event.acceptProposedAction()
