@@ -12,6 +12,7 @@ from mercurial import extensions, ui
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
@@ -54,31 +55,31 @@ class PatchBranchWidget(QWidget):
         tb.setFloatable(False)
 
         self.actionPMerge = a = QWidgetAction(self)
-        a.setIcon(QIcon(QPixmap(":/icons/merge.svg")))
+        a.setIcon(geticon("merge"))
         a.setToolTip(_('Merge all pending dependencies'))
         tb.addAction(self.actionPMerge)
         self.actionPMerge.triggered.connect(self.pmerge_clicked)
 
         self.actionBackport = a = QWidgetAction(self)
-        a.setIcon(QIcon(QPixmap(":/icons/back.svg")))
+        a.setIcon(geticon("go-previous"))
         a.setToolTip(_('Backout current patch branch'))
         tb.addAction(self.actionBackport)
         #self.actionBackport.triggered.connect(self.pbackout_clicked)
 
         self.actionReapply = a = QWidgetAction(self)
-        a.setIcon(QIcon(QPixmap(":/icons/forward.svg")))
+        a.setIcon(geticon("go-next"))
         a.setToolTip(_('Backport part of a changeset to a dependency'))
         tb.addAction(self.actionReapply)
         #self.actionReapply.triggered.connect(self.reapply_clicked)
 
        	self.actionPNew = a = QWidgetAction(self)
-        a.setIcon(QIcon(QPixmap(":/icons/fileadd.ico"))) #STOCK_NEW
+        a.setIcon(geticon("fileadd")) #STOCK_NEW
         a.setToolTip(_('Start a new patch branch'))
         tb.addAction(self.actionPNew)
         self.actionPNew.triggered.connect(self.pnew_clicked)
 
         self.actionEditPGraph = a = QWidgetAction(self)
-        a.setIcon(QIcon(QPixmap(":/icons/log.svg"))) #STOCK_EDIT
+        a.setIcon(geticon("log")) #STOCK_EDIT
         a.setToolTip(_('Edit patch dependency graph'))
         tb.addAction(self.actionEditPGraph)
         #self.actionEditPGraph.triggered.connect(self.pbackout_clicked)
