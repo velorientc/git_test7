@@ -541,17 +541,13 @@ class StatusLabel(QWidget):
             self.clear_icon()
         else:
             if isinstance(icon, bool):
-                pixmap = icon and getpixmap('success') or getpixmap('error')
+                icon = geticon(icon and 'success' or 'error')
             elif isinstance(icon, basestring):
-                pixmap = getpixmap(icon)
-            elif isinstance(icon, QIcon):
-                pixmap = icon.pixmap(16, 16)
-            elif isinstance(icon, QPixmap):
-                pixmap = icon
-            else:
-                raise TypeError, '%s: bool, str, QIcon or QPixmap' % type(icon)
+                icon = geticon(icon)
+            elif not isinstance(icon, QIcon):
+                raise TypeError, '%s: bool, str or QIcon' % type(icon)
             self.status_icon.setShown(True)
-            self.status_icon.setPixmap(pixmap)
+            self.status_icon.setPixmap(icon.pixmap(16, 16))
 
     def clear_icon(self):
         self.status_icon.setHidden(True)
