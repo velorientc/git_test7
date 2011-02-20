@@ -263,6 +263,7 @@ def _findicon(name):
 # http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
 _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(), 'scalable/apps', '.svg'),
+                        (QSize(), 'scalable/status', '.svg'),
                         (QSize(22, 22), '22x22/actions', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]
 
@@ -541,7 +542,7 @@ class StatusLabel(QWidget):
             self.clear_icon()
         else:
             if isinstance(icon, bool):
-                icon = geticon(icon and 'success' or 'error')
+                icon = geticon(icon and 'thg-success' or 'thg-error')
             elif isinstance(icon, basestring):
                 icon = geticon(icon)
             elif not isinstance(icon, QIcon):

@@ -520,7 +520,7 @@ class MergePage(BasePage):
                 self.groups.set_visible(parents == 2, 'merged')
                 self.groups.set_visible(parents == 1, 'dirty')
                 self.wd_status.set_status(_('<b>Uncommitted local changes '
-                                            'are detected</b>'), 'warning')
+                                            'are detected</b>'), 'thg-warning')
             else:
                 self.groups.set_visible(False, 'dirty')
                 self.groups.set_visible(False, 'merged')
