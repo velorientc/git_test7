@@ -200,10 +200,14 @@ class HgFileListView(QTableView):
 
     def createActions(self):
         self.actionShowAllMerge = QAction(_('Show All'), self)
+        self.actionShowAllMerge.setToolTip(
+            _('Toggle display of all files and the direction they were merged'))
         self.actionShowAllMerge.setCheckable(True)
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.setVisible(False)
         self.actionSecondParent = QAction(_('Other'), self)
+        self.actionSecondParent.setToolTip(
+            _('Toggle display of diffs to second (other) parent'))
         self.actionSecondParent.setCheckable(True)
         self.actionSecondParent.setChecked(False)
         self.actionSecondParent.setVisible(False)
