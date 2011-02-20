@@ -361,11 +361,16 @@ class RevsetThread(QThread):
         super(RevsetThread, self).__init__(parent)
         self.repo = hg.repository(repo.ui, repo.root)
         self.text = hglib.fromunicode(query)
-        if '(' not in self.text:
-            self.text = 'keyword("%s")' % self.text
         self.query = query
 
     def run(self):
+        if '(' not in self.text:
+            try:
+                node = self.repo.lookup(self.text)
+                self.showMessage.emit(_('found revision'))
+                self.queryIssued.emit(self.query, [node])
+            except (error.RepoLookupError, error.Abort):
+                self.text = 'keyword("%s")' % self.text
         cwd = os.getcwd()
         try:
             os.chdir(self.repo.root)
