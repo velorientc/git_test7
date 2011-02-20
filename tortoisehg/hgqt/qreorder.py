@@ -147,7 +147,20 @@ class QReorderDialog(QDialog):
         ulw.clear()
         alw.clear()
         for p in reversed(patchnames):
-            item = QListWidgetItem(hglib.tounicode(p))
+            # Each row in the patch list has the
+            # format [patchname] patchdescription
+            # The patch description is the first line of the patch message
+            # If the message has more than one line, we add "..." to the first
+            # line to create the patch description
+            patchmessage = mq.patchheader(self.repo.mq.join(p)).message
+            patchdesc = patchmessage[0]
+            if len(patchmessage) > 1:
+                patchdesc = patchdesc + '...'
+            item = QListWidgetItem('[%s]\t%s' % (hglib.tounicode(p), hglib.tounicode(patchdesc)))
+            # Save the patchname with the item so that we can easily
+            # retrieve it later
+            item.patchname = p
+
             if p in applied:
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 item.setForeground(QColor(111,111,111)) # gray, like disabled
@@ -169,8 +182,9 @@ class QReorderDialog(QDialog):
 
     def showSummary(self, item):
         try:
-            patchname = hglib.fromunicode(item.text())
-            txt = '\n'.join(mq.patchheader(self.repo.mq.join(patchname)).message)
+            # Note that item.patchname uses the local encoding and hence does
+            # not need to be converted from unicode
+            txt = '\n'.join(mq.patchheader(self.repo.mq.join(item.patchname)).message)
             self.summ.setText(hglib.tounicode(txt))
         except:
             pass
@@ -182,10 +196,10 @@ class QReorderDialog(QDialog):
             lines = []
             for i in xrange(self.alw.count()-1, -1, -1):
                 item = self.alw.item(i)
-                lines.append(hglib.fromunicode(item.text()))
+                lines.append(item.patchname)
             for i in xrange(self.ulw.count()-1, -1, -1):
                 item = self.ulw.item(i)
-                lines.append(hglib.fromunicode(item.text()))
+                lines.append(item.patchname)
             if lines:
                 fp = self.repo.mq.opener('series', 'wb')
                 fp.write('\n'.join(lines))
