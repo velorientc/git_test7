@@ -156,8 +156,8 @@ class HgFileListModel(QAbstractTableModel):
                 return QVariant(geticon('fileadd'))
             elif current_file_desc['status'] == 'R':
                 return QVariant(geticon('filedelete'))
-            #else:
-            #    return QVariant(geticon('view-diff'))
+            else:
+                return QVariant(geticon('filemodify'))
         elif role == Qt.FontRole:
             if current_file_desc['wasmerged']:
                 return QVariant(self._boldfont)
