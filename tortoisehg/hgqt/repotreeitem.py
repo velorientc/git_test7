@@ -145,9 +145,9 @@ class RepoTreeItem(object):
 
 
 class RepoItem(RepoTreeItem):
-    def __init__(self, model, rootpath='', parent=None):
+    def __init__(self, model, repo=None, parent=None):
         RepoTreeItem.__init__(self, model, parent)
-        self._root = rootpath
+        self._root = repo and repo.root or ''
         self._settingsdlg = None
 
     def rootpath(self):

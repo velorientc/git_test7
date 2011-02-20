@@ -206,7 +206,7 @@ class RepoTreeView(QTreeView):
         if not self.selitem:
             return
         m = self.model()
-        m.addRepo(self.selitem, '')
+        m.addRepo(self.selitem, None)
 
     def sizeHint(self):
         size = super(RepoTreeView, self).sizeHint()
@@ -248,10 +248,10 @@ class RepoRegistryView(QDockWidget):
     def expand(self):
         self.tview.expandToDepth(0)
 
-    def addRepo(self, reporoot):
+    def addRepo(self, repo):
         m = self.tmodel
-        if m.getRepoItem(reporoot) == None:
-            m.addRepo(None, reporoot)
+        if m.getRepoItem(repo.root) == None:
+            m.addRepo(None, repo)
 
     def openrepo(self, path, reuse=False):
         self.openRepoSignal.emit(hglib.tounicode(path), reuse)
