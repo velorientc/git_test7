@@ -1226,10 +1226,10 @@ class RepoWidget(QWidget):
         ctx = self.repo.changectx(self.rev)
         if 'qparent' in ctx.tags():
             cmdline = ['qpop', '--all', '--repository', self.repo.root]
+            self.runCommand(_('QGoto - TortoiseHg'), cmdline)
         else:
-            patchname = self.repo.changectx(self.rev).thgmqpatchname()
-            cmdline = ['qgoto', str(patchname), '--repository', self.repo.root]
-        self.runCommand(_('QGoto - TortoiseHg'), cmdline)
+            self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
+            self.mqDemand.forward('qgotoRevision', self.rev)
 
     def qpushMoveRevision(self):
         """Make REV the top applied patch"""
