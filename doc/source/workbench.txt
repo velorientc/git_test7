@@ -5,41 +5,181 @@ Workbench
 	:synopsis: Dialog used to view log
 
 The Workbench is used to visualize the revision history of your
-repositories and to perform any maintenence tasks that involve
+repositories and to perform any maintenance tasks that involve
 changesets. It presents a graph of the revision history, showing the
 parent/child relationship of each change. At each revision you can view
 the files that were modified and the contents of those changes.
 
-.. figure:: figures/log.png
-	:alt: Changelog
+.. figure:: figures/workbench.png
+	:alt: Workbench
 
-	Changelog viewer dialog with main toolbar hidden
+	Workbench dialog.
+
+Workbench Menus
+---------------
 
 The changelog tool has a menu bar for accessing tool functions and for
 launching other tools.
 
-	:guilabel:`Tools`
-		Launch other TortoiseHg tools as separate processes
-	:guilabel:`View`
-		Toggle the visibility of various features, or refresh views
-	:guilabel:`Navigate`
-		Select specific changesets in your repository history
-	:guilabel:`Synchronize`
-		Access synchronization functions, more below
-	:guilabel:`Help`
-		Help contents shows this web page.  About shows TortoiseHg
-		version info
+	:guilabel:`File`
+		Handle repositories and settings.
 
-The toolbar buttons from left to right:
+		.. figure:: figures/file-menu.png
+			:alt: File menu
+
+	:guilabel:`View`
+		Manage the visibility of various parts of the Workbench.
+
+		.. figure:: figures/view-menu.png
+			:alt: View menu
+
+	:guilabel:`Repository`
+		Perform special actions on the active repository.
+
+		.. figure:: figures/repository-menu.png
+			:alt: Repository menu
+
+	:guilabel:`Help`
+		About shows TortoiseHg version info.
+
+Edit Toolbar
+------------
+
+.. figure:: figures/edit-toolbar.png
+	:alt: Edit Toolbar
+
+	Moving around in the changelog.
 
 	:guilabel:`Refresh`
 		Reload the revision history (if you commit in another window, etc)
+		for all open repositories.
+	:guilabel:`Back`
+		Go back to the previous view.
+	:guilabel:`Forward`
+		Go forward to the next view.
+	:guilabel:`Filter toolbar`
+		Show and activate the Filter Toolbar at the top of the changelog.
+	:guilabel:`Goto toolbar`
+		Show and activatethe Goto Toolbar at the top of the changelog.
+
+Dock Toolbar
+------------
+
+.. figure:: figures/dock-toolbar.png
+	:alt: Dock Toolbar
+
+	Show or hide some main widgets in the Workbench.
+
+	:guilabel:`Show Repository Registry`
+		Show/hide the Repository Registry widget.
+	:guilabel:`Show Output Log`
+		Show/hide the Output Log widget.
+
+Sync Toolbar
+------------
+
+.. figure:: figures/sync-toolbar.png
+	:alt: Sync Toolbar
+
+	Synchronize your repository with other repositories.
+
+	:guilabel:`Incoming`
+		Download incoming changesets from the remote repository, store then in
+		a temporary bundle file, then enter bundle preview mode with the
+		incoming changes applied.  Incoming changesets will be shown as normal,
+		while others will be shown grayed in the revision graph.
+		The buttons :guilabel:`Accept` and :guilabel:`Reject` are then
+		shown at the top of the changelog.
+
+		:guilabel:`Accept`
+			Accept (pull) the changesets from the previewed bundle.  This
+			button is only visible when previewing a changeset bundle.
+			The after-pull effect is respected after pulling from a bundle.
+
+		:guilabel:`Reject`
+			Reject the changesets from the previewed bundle and exit preview
+			mode.  This button is only visible when previewing a changeset
+			bundle.
+
+	:guilabel:`Pull`
+		Pull incoming changesets from the remote repository, then apply
+		after-pull effect (update, fetch, or rebase).
+	:guilabel:`Outgoing`
+		Determine outgoing changesets that would be pushed to the
+		remote repository.  Outgoing changesets will be shown as normal, while
+		others will be shown grayed in the revision graph.
+	:guilabel:`Push`
+		Push outgoing changesets to the remote repository.
+
+Task Toolbar
+------------
+
+.. figure:: figures/task-toolbar.png
+	:alt: Task Toolbar
+
+..
+
+	Work with the various tasktabs.
+
+	:guilabel:`Revision Details`
+		Shows information about the current revision : files added, removed,
+		renamed, or modified, file contents, changelog info.
+
+		TODO: screenshot
+..        .. figure:: figures/revdetails-tasktab.png
+			:alt: Revision Details TaskTab
+
+..
+
 	:guilabel:`Commit`
-		Launch the commit tool in a separate process
-	:guilabel:`Web Server`
-		Launch the web server dialog in a separate process
-	:guilabel:`Shelve`
-		Launch the shelve tool in a separate process
+		Here you can add new files, and do your commits.
+
+		TODO: screenshot
+..		.. figure:: figures/commit-tasktab.png
+			:alt: Commit TaskTab
+
+..
+
+	:guilabel:`Manifest`
+		Shows information about the complete content of the repository as it
+		was for the current revision. Here you can view the raw content of
+		files or an Annotate view.  There is a context menu on the filelist
+		to do further digging into the history data.  You can even compare a
+		file between different revision from there.
+
+		TODO: screenshot
+..		.. figure:: figures/manifest-tasktab.png
+			:alt: Manifest TaskTab
+
+..
+
+	:guilabel:`Search`
+		For performing text searches through file content.
+
+		TODO: screenshot
+..		.. figure:: figures/search-tasktab.png
+			:alt: Search Tasktab
+
+..
+
+	:guilabel:`Synchronize`
+		Gives you full control about how you let your repositories
+		communicate with any other repository.
+
+		TODO: screenshot
+..		.. figure:: figures/sync-tasktab.png
+			:alt: Synchronise Tasktab
+
+..
+
+	:guilabel:`Patch Queue`
+		This widget implements the MQ extension functionality.
+
+		TODO: screenshot
+..		.. figure:: figures/mq-tasktab.png
+			:alt: Patch Queue TaskTab
+
+..
 
 Sync Bar
 ---------
