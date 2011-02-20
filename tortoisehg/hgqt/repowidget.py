@@ -311,9 +311,11 @@ class RepoWidget(QWidget):
         self.toolbarVisibilityChanged.emit()
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
-        self.revset = [self.repo[n].node() for n in range(oldlen, newlen)]
+        self.revset = range(oldlen, newlen)
         self.repomodel.revset = self.revset
         self.reload()
+        self.repoview.resetBrowseHistory(self.revset)
+        self._reload_rev = self.revset[0]
 
     def clearBundle(self):
         self.bundleAccept.setHidden(True)
