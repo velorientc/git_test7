@@ -146,11 +146,11 @@ class HgFileListModel(QAbstractTableModel):
         elif role == Qt.DecorationRole:
             if self._fulllist and bool(self._ctx.p2()):
                 if current_file_desc['wasmerged']:
-                    icn = geticon('leftright')
+                    icn = geticon('thg-file-merged')
                 elif current_file_desc['parent'] == 0:
-                    icn = geticon('left')
+                    icn = geticon('thg-file-p0')
                 elif current_file_desc['parent'] == 1:
-                    icn = geticon('right')
+                    icn = geticon('thg-file-p1')
                 return QVariant(icn.pixmap(20,20))
             elif current_file_desc['status'] == 'A':
                 return QVariant(geticon('fileadd'))
