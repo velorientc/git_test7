@@ -292,7 +292,7 @@ class AllRepoGroupItem(RepoTreeItem):
                 return QVariant(ico)
             return QVariant()
         if column == 0:
-            return QVariant(_('all'))
+            return QVariant(_('default'))
         return QVariant()
 
     def setData(self, column, value):
