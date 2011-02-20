@@ -366,9 +366,9 @@ class RevsetThread(QThread):
     def run(self):
         if '(' not in self.text:
             try:
-                node = self.repo.lookup(self.text)
+                ctx = self.repo[self.text]
                 self.showMessage.emit(_('found revision'))
-                self.queryIssued.emit(self.query, [node])
+                self.queryIssued.emit(self.query, [ctx.rev()])
                 return
             except (error.RepoLookupError, error.Abort):
                 self.text = 'keyword("%s")' % self.text

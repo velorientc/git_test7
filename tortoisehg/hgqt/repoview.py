@@ -37,7 +37,6 @@ class HgRepoView(QTableView):
         QTableView.__init__(self, parent)
         self.repo = repo
         self.current_rev = -1
-        self.init_variables()
         self.setShowGrid(False)
 
         vh = self.verticalHeader()
@@ -70,24 +69,22 @@ class HgRepoView(QTableView):
     def contextMenuEvent(self, event):
         self.menuRequested.emit(event.globalPos(), self.selectedRevisions())
 
-    def init_variables(self):
-        # rev navigation history (manage 'back' action)
-        self._rev_history = []
-        self._rev_pos = -1
-        self._in_history = False # flag set when we are "in" the
-        # history. It is required cause we cannot known, in
-        # "revision_selected", if we are crating a new branch in the
-        # history navigation or if we are navigating the history
-
     def setModel(self, model):
-        self.init_variables()
         QTableView.setModel(self, model)
         #Check if the font contains the glyph needed by the model
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
              model.unicodestar = False
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.resetDelegate()
+        self._rev_history = []
+        self._rev_pos = -1
+        self._in_history = False
         model.layoutChanged.connect(self.resetDelegate)
+
+    def resetBrowseHistory(self, revs):
+        self._rev_history = revs[:]
+        self._rev_pos = -1
+        self.forward()
 
     def resetDelegate(self):
         # Model column layout has changed so we need to move

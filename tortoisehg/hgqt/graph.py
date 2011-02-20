@@ -55,7 +55,6 @@ def revision_grapher(repo, **opts):
 
     revset = opts.get('revset', None)
     if revset:
-        revset = sorted([repo[r].rev() for r in revset])
         start_rev = max(revset)
         stop_rev = min(revset)
         branch = None

@@ -443,7 +443,7 @@ class HgRepoListModel(QAbstractTableModel):
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 
-        if ctx.node() not in self.revset:
+        if ctx.rev() not in self.revset:
             return Qt.ItemFlags(0)
         return Qt.ItemIsSelectable | Qt.ItemIsEnabled
 

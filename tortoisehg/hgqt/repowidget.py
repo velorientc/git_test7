@@ -361,13 +361,16 @@ class RepoWidget(QWidget):
             self.repomodel.revset = []
             self.refresh()
 
-    def setRevisionSet(self, nodes):
-        self.revset = [self.repo[n].node() for n in nodes]
+    def setRevisionSet(self, revisions):
+        revs = revisions[:]
+        revs.sort(reverse=True)
+        self.revset = revs
         if self.revsetfilter:
             self.reload()
         else:
             self.repomodel.revset = self.revset
             self.refresh()
+        self.repoview.resetBrowseHistory(self.revset)
 
     @pyqtSlot(bool)
     def filterToggled(self, checked):
@@ -375,12 +378,14 @@ class RepoWidget(QWidget):
         if self.revset:
             self.repomodel.filterbyrevset = checked
             self.reload()
+            self.repoview.resetBrowseHistory(self.revset)
+            self._reload_rev = self.revset[0]
 
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
         self.filterbar.show()
         self.toolbarVisibilityChanged.emit()
-        self.setRevisionSet(nodes)
+        self.setRevisionSet([self.repo[n].rev() for n in nodes])
 
     def createGrepWidget(self):
         upats = {}
@@ -555,7 +560,7 @@ class RepoWidget(QWidget):
 
     def setupModels(self):
         # Filter revision set in case revisions were removed
-        self.revset = [r for r in self.revset if r in self.repo]
+        self.revset = [r for r in self.revset if r < len(self.repo)]
         self.repomodel = HgRepoListModel(self.repo, self.branch, self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
@@ -912,7 +917,7 @@ class RepoWidget(QWidget):
                 if icon:
                     submenu = menu.addMenu(icon, desc)
                 else:
-                    submenu = menu.addMenu(desc)                    
+                    submenu = menu.addMenu(desc)
                 continue
             m = menu
             if type == 2:  # submenu entry
