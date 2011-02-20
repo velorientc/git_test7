@@ -371,6 +371,7 @@ class RepoWidget(QWidget):
             self.repomodel.revset = self.revset
             self.refresh()
         self.repoview.resetBrowseHistory(self.revset)
+        self._reload_rev = self.revset[0]
 
     @pyqtSlot(bool)
     def filterToggled(self, checked):
