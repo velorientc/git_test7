@@ -250,8 +250,11 @@ class RepoRegistryView(QDockWidget):
 
     def addRepo(self, repo):
         m = self.tmodel
-        if m.getRepoItem(repo.root) == None:
+        it = m.getRepoItem(repo.root)
+        if it == None:
             m.addRepo(None, repo)
+        else:
+            it.ensureRepoLoaded()
 
     def openrepo(self, path, reuse=False):
         self.openRepoSignal.emit(hglib.tounicode(path), reuse)

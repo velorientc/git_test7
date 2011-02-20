@@ -147,11 +147,21 @@ class RepoTreeItem(object):
 class RepoItem(RepoTreeItem):
     def __init__(self, model, repo=None, parent=None):
         RepoTreeItem.__init__(self, model, parent)
-        self._root = repo and repo.root or ''
+        self._repo = repo
+        self._root = repo and repo.root or ''  # local str
+        self._shortname = repo and repo.shortname or ''  # unicode
         self._settingsdlg = None
 
     def rootpath(self):
         return self._root
+
+    def shortname(self):
+        if self._repo:
+            return self._repo.shortname
+        elif self._shortname:
+            return self._shortname
+        else:
+            return hglib.tounicode(os.path.basename(self._root))
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -160,10 +170,7 @@ class RepoItem(RepoTreeItem):
                 return QVariant(ico)
             return QVariant()
         if column == 0:
-            try:
-                return QVariant(thgrepo.repository(path=self._root).shortname)
-            except error.RepoError:
-                return QVariant(hglib.tounicode(os.path.basename(self._root)))
+            return QVariant(self.shortname())
         elif column == 1:
             return QVariant(hglib.tounicode(self._root))
         return QVariant()
@@ -180,11 +187,13 @@ class RepoItem(RepoTreeItem):
 
     def dump(self, xw):
         xw.writeAttribute('root', hglib.tounicode(self._root))
+        xw.writeAttribute('shortname', self.shortname())
         RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
         a = xr.attributes()
         self._root = hglib.fromunicode(a.value('', 'root').toString())
+        self._shortname = unicode(a.value('', 'shortname').toString())
         RepoTreeItem.undump(self, xr)
 
     def open(self, reuse=False):
@@ -198,7 +207,17 @@ class RepoItem(RepoTreeItem):
             self._settingsdlg = SettingsDialog(
                 configrepo=True, focus='web.name', parent=parent,
                 root=self._root)
+        self.ensureRepoLoaded()
         self._settingsdlg.show()
+
+    def ensureRepoLoaded(self):
+        """load repo object if necessary
+
+        Until repo loaded, it uses cached shortname for less overhead.
+        """
+        if self._repo:
+            return
+        self._repo = thgrepo.repository(path=self._root)
 
     def details(self):
         return _('Local Repository %s') % hglib.tounicode(self._root)
