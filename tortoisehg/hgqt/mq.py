@@ -368,7 +368,7 @@ class MQWidget(QWidget):
             return
         cmdline = ['qgoto', '-R', self.repo.root]
         cmdline += self.getUserOptions('force')
-        cmdline += ['--', rev]
+        cmdline += ['--', str(rev)]
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
         self.finishfunc = self.checkForRejects
