@@ -54,7 +54,7 @@ class BackoutDialog(QDialog):
         self.msgTextEdit.refresh(repo)
         self.msgTextEdit.loadSettings(QSettings(), 'backout/message')
         self.msgTextEdit.setText(self.msgset['str'])
-        box.addWidget(self.msgTextEdit, 1)
+        box.addWidget(self.msgTextEdit, 2)
 
         ## options
         opt_sep = qtlib.LabeledSeparator(_('Options'))
@@ -101,7 +101,7 @@ class BackoutDialog(QDialog):
         self.cmd.commandStarted.connect(self.command_started)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)
-        box.addWidget(self.cmd, 2)
+        box.addWidget(self.cmd, 1)
 
         ## bottom buttons
         buttons = QDialogButtonBox()
