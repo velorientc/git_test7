@@ -5,11 +5,13 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+from mercurial import error
+
+from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-from mercurial import error
-from tortoisehg.hgqt import qtlib
 
 class HTMLDelegate(QStyledItemDelegate):
     def __init__(self, parent=0, cols=None):
