@@ -211,7 +211,7 @@ class RevisionSetQuery(QDialog):
         helpLabel.setOpenExternalLinks(True)
         self.stbar.addPermanentWidget(helpLabel)
         layout.addWidget(self.stbar, 0)
-        QShortcut(QKeySequence('Ctrl+Return'), self, self.returnPressed)
+        QShortcut(QKeySequence('Return'), self, self.returnPressed)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
     def runQuery(self):
