@@ -1050,7 +1050,7 @@ class SecureDialog(QDialog):
         if res:
             self.alias, auth = res
         else:
-            self.alias = host, {}
+            self.alias, auth = host, {}
         self.repo = repo
         self.host = host
 
