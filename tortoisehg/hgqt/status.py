@@ -143,6 +143,8 @@ class StatusWidget(QWidget):
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
         tv.sortByColumn(COL_PATH_DISPLAY)
+        tv.clicked.connect(self.onRowClicked)
+        le.textEdited.connect(self.setFilter)
 
         def statusTypeTrigger(isChecked):
             txt = hglib.fromunicode(self.sender().text())
@@ -249,6 +251,9 @@ class StatusWidget(QWidget):
                                     parent=self)
         ms = merge.mergestate(self.repo)
         tm = WctxModel(wctx, ms, self.opts, checked, self)
+        tm.checkToggled.connect(self.updateCheckCount)
+
+        self.updateCheckCount()
         self.tv.setModel(tm)
         self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, bool(wctx.p2()))
@@ -259,11 +264,6 @@ class StatusWidget(QWidget):
             self.tv.setColumnWidth(col, w)
         for col in (COL_PATH_DISPLAY, COL_EXTENSION, COL_SIZE):
             self.tv.resizeColumnToContents(col)
-
-        self.tv.clicked.connect(tm.clickedRow)
-        self.le.textEdited.connect(tm.setFilter)
-        tm.checkToggled.connect(self.updateCheckCount)
-        self.updateCheckCount()
 
         # reset selection, or select first row
         curidx = tm.index(0, 0)
@@ -281,6 +281,16 @@ class StatusWidget(QWidget):
         selmodel.currentChanged.connect(self.currentChanged)
         if curidx and curidx.isValid():
             selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
+
+    @pyqtSlot(QModelIndex)
+    def onRowClicked(self, index):
+        'tree view emitted a clicked signal, index guarunteed valid'
+        if index.column() == COL_PATH:
+            self.tv.model().toggleRow(index)
+
+    @pyqtSlot(QString)
+    def setFilter(self, match):
+        self.tv.model().setFilter(match)
 
     def updateCheckCount(self):
         text = _('Checked count: %d') % len(self.getChecked())
@@ -598,12 +608,6 @@ class WctxModel(QAbstractTableModel):
         self.checked[fname] = not self.checked[fname]
         self.layoutChanged.emit()
         self.checkToggled.emit()
-
-    def clickedRow(self, index):
-        'Connected to "pressed" signal, emitted by mouse clicks'
-        assert index.isValid()
-        if index.column() == COL_PATH:
-            self.toggleRow(index)
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()
