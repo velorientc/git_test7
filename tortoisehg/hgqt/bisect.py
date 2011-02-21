@@ -22,8 +22,7 @@ class BisectDialog(QDialog):
         self.setWindowTitle(_('Bisect - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-bisect'))
 
-        f = self.windowFlags()
-        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(Qt.Window)
         self.repo = repo
 
         # base layout box
@@ -91,8 +90,8 @@ class BisectDialog(QDialog):
             self.lastrev = rev
             for b in self.nextbuttons:
                 b.setEnabled(True)
-            lbl.setText(_('Test this revision and report findings. '
-                           '(good/bad/skip)'))
+            lbl.setText('%s: %d (%s) -> %s' % (_('Revision'), rev.id(), rev.hash(), _('Test this revision and report findings. '
+                           '(good/bad/skip)')))
         self.cmd.commandFinished.connect(cmdFinished)
 
         prefix = ['bisect', '--repository', repo.root]
