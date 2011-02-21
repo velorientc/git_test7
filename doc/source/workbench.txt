@@ -15,6 +15,37 @@ the files that were modified and the contents of those changes.
 
 	Workbench dialog.
 
+Workbench Main Widgets are:
+
+	:guilabel:`Changelog View`
+		A tabbed widget to view multiple repositories at once. The different
+		columns show general information about each changeset in the graphlog.
+		You can configure the columns to show from the menu via
+		:guilabel:`View -> Choose Log Columns...`, and there you can reorder
+		the columns too. This is the main or central widget of the 	Workbench
+		application.
+
+	:guilabel:`Repository Registry`
+		This widget, by default shown on the left, allows to manage multiple
+		repositories from the Workbench. You can show/hide it via
+		:guilabel:`View -> Show Repo Registry` or with the corresponding button
+		in the Dock Toolbar. It's also a dockable widget.
+		The :guilabel:`View -> Show Paths` menu option allows to not only view
+		the names of the repositories but also their path in a second column.
+	
+	:guilabel:`Output Log`
+		This dockable widget, which can be shown/hidden with
+		:guilabel:`View -> Show Output Log`, gives the user information about
+		the Mercurial commands that were executed during the current session.
+		You can also use it as a commandline by typing Mercurial commands at its
+		prompt 	directly. It shows any error messages when appropriate. Content
+		is wiped when the Workbench is closed.
+
+	:guilabel:`Task Tabs`
+		The lower right part of the Workbench is occupied by a stack of widget
+		where you can perform various frequent task. It is a tabbed widget.
+		See further for more detail about each one.
+
 Workbench Menus
 ---------------
 
@@ -48,7 +79,7 @@ Edit Toolbar
 .. figure:: figures/edit-toolbar.png
 	:alt: Edit Toolbar
 
-	Moving around in the changelog.
+Moving around in the changelog. All the buttons work on the current	repository.
 
 	:guilabel:`Refresh`
 		Reload the revision history (if you commit in another window, etc)
@@ -59,8 +90,6 @@ Edit Toolbar
 		Go forward to the next view.
 	:guilabel:`Filter toolbar`
 		Show and activate the Filter Toolbar at the top of the changelog.
-	:guilabel:`Goto toolbar`
-		Show and activatethe Goto Toolbar at the top of the changelog.
 
 Dock Toolbar
 ------------
@@ -68,7 +97,7 @@ Dock Toolbar
 .. figure:: figures/dock-toolbar.png
 	:alt: Dock Toolbar
 
-	Show or hide some main widgets in the Workbench.
+Show or hide some main widgets in the Workbench.
 
 	:guilabel:`Show Repository Registry`
 		Show/hide the Repository Registry widget.
@@ -81,7 +110,7 @@ Sync Toolbar
 .. figure:: figures/sync-toolbar.png
 	:alt: Sync Toolbar
 
-	Synchronize your repository with other repositories.
+Synchronize your repository with other repositories.
 
 	:guilabel:`Incoming`
 		Download incoming changesets from the remote repository, store then in
@@ -117,15 +146,13 @@ Task Toolbar
 .. figure:: figures/task-toolbar.png
 	:alt: Task Toolbar
 
-..
-
-	Work with the various tasktabs.
+Work with the various tasktabs.
 
 	:guilabel:`Revision Details`
 		Shows information about the current revision : files added, removed,
 		renamed, or modified, file contents, changelog info.
+		See _`Revision Details` for more detail.
 
-		TODO: screenshot
 ..        .. figure:: figures/revdetails-tasktab.png
 			:alt: Revision Details TaskTab
 
@@ -133,8 +160,8 @@ Task Toolbar
 
 	:guilabel:`Commit`
 		Here you can add new files, and do your commits.
+		See _`Commit` for more detail.
 
-		TODO: screenshot
 ..		.. figure:: figures/commit-tasktab.png
 			:alt: Commit TaskTab
 
@@ -146,8 +173,8 @@ Task Toolbar
 		files or an Annotate view.  There is a context menu on the filelist
 		to do further digging into the history data.  You can even compare a
 		file between different revision from there.
+		See _`Manifest` for more detail.
 
-		TODO: screenshot
 ..		.. figure:: figures/manifest-tasktab.png
 			:alt: Manifest TaskTab
 
@@ -155,8 +182,8 @@ Task Toolbar
 
 	:guilabel:`Search`
 		For performing text searches through file content.
+		See _`Search` for more detail.
 
-		TODO: screenshot
 ..		.. figure:: figures/search-tasktab.png
 			:alt: Search Tasktab
 
@@ -165,8 +192,8 @@ Task Toolbar
 	:guilabel:`Synchronize`
 		Gives you full control about how you let your repositories
 		communicate with any other repository.
+		See _`Synchronize` for more detail.
 
-		TODO: screenshot
 ..		.. figure:: figures/sync-tasktab.png
 			:alt: Synchronise Tasktab
 
@@ -174,142 +201,52 @@ Task Toolbar
 
 	:guilabel:`Patch Queue`
 		This widget implements the MQ extension functionality.
+		See _`Patch Queue` for more detail.
 
-		TODO: screenshot
 ..		.. figure:: figures/mq-tasktab.png
 			:alt: Patch Queue TaskTab
 
 ..
 
-Sync Bar
----------
+Filter Toolbar
+--------------
 
-.. figure:: figures/syncbar.png
-	:alt: Changelog
+.. figure:: figures/filter-toolbar.png
+	:alt: Filter Toolbar
 
-	Synchronization features in changelog tool
+	Filter features for the changelog tool.
 
-From left to right...
+The filter bar allows one to quickly filter the changesets panel. It is based
+on the Revision Sets feature of Mercurial.
+See `hg.1.html#revsets <http://www.selenic.com/mercurial/hg.1.html#revsets>`_ 
+for details on how to specify revision sets.
+The toolbar can be toggled with :kbd:`Ctrl-S`. Parts from left to right:
 
-	:guilabel:`Incoming`
-		Download incoming changesets from the remote repository, store
-		them in a temporary bundle file, then enter bundle preview mode
-		with the incoming changes applied.  Incoming changesets will
-		have a 'down' arrow in the revision graph.
-	:guilabel:`Accept`
-		Accept (pull) the changesets from the previewed bundle.  This
-		button is only sensitive when previewing a changeset bundle.
-		The after-pull effect is respected after pulling from a bundle.
-	:guilabel:`Reject`
-		Reject the changesets from the previewed bundle and exit preview
-		mode.  This button is only sensitive when previewing a changeset
-		bundle.
-	:guilabel:`Pull`
-		Pull incoming changesets from the remote repository, then apply
-		after-pull effect (update, fetch, or rebase).
-	:guilabel:`Import`
-		Open the import dialog to import one or more patches
-	:guilabel:`Outgoing`
-		Determine outgoing changesets that would be pushed to the
-		remote repository.  Outgoing changesets are marked with an 'up'
-		arrow.
-	:guilabel:`Push`
-		Push outgoing changesets to the remote repository.
-	:guilabel:`Email`
-		Email outgoing changesets to the remote repository.
-	:guilabel:`Stop`
-		Stop current transaction.  The button is only sensitive during
-		outgoing commands.
-
-To the right of the :guilabel:`Stop` button is a combo box containing
-all of the configured peer repository paths for the current repository.
-The default path is selected at startup, if it has been configured.
-See `hg.1.html#urls <http://www.selenic.com/mercurial/hg.1.html#urls>`_  for
-details on specifying remote repository URLs.
-
-To the right of the path combo box is the :guilabel:`After Pull` combo
-that selects the operation which is performed after every pull operation
-triggered by the sync bar.  The user must have the rebase extension
-enabled in order for that option to be available in the after pull
-combo.  The same is true of the fetch extension and it's post pull
-operation.
-
-To the right of the :guilabel:`After Pull` combo is the
-:guilabel:`Settings` button.  It opens the repository settings tool on
-the :guilabel:`Sync` tab where the after pull configurable and peer
-repository paths can be configured.
-
-Changesets which are added to the repository after the changelog tool
-was opened are marked with green stars in the graph.  This includes
-recent commits, pulled changesets, and applied patches.
-
-.. note::
-	To clear the new, incoming, and outgoing marks from the changeset
-	graph, use :guilabel:`View -> Reset Marks`
-
-Search Bar
-----------
-
-.. figure:: figures/searchbar.png
-	:alt: Changelog
-
-	Filter features in changelog tool
-
-The search bar allows one to quickly filter the changesets panel.
-Buttons from right to left...
-
-	:guilabel:`All`
-		Show all changesets in the respository.  Essentially removes all
-		filters.
-	:guilabel:`Tagged`
-		Show only changesets with tags.
-	:guilabel:`Ancestry`
-		Show only changesets that are ancestors of the currently
-		selected changeset.  This option is only sensitive when a
-		revision is selected.
-	:guilabel:`Parents`
-		Show only the working directory parent revisions.  Unless a
-		merge is in progress, this will be only one revision.
-	:guilabel:`Heads`
-		Show only repository heads (changesets without any child
-		revisions).
-	:guilabel:`Merges`
-		Show only merge changesets (changesets with two parents)
-	:guilabel:`Hide Merges`
-		A toggle button, not a radio like the other buttons in the
-		search bar, which toggles the display of merge changesets.
-	:guilabel:`Branches`
-		A combo box with the list of named branches in your repository.
+	:guilabel:`Clear`
+		Clears the search lineedit.  Essentially disables all filters.
+	:guilabel:`Filter entry`
+		Here you can type a filtering condition. The widget is a combobox,
+		holding a history of previous filtering conditions.
+	:guilabel:`Trigger`
+		Applies the condition set by the filter.
+	:guilabel:`Open`
+		Opens the RevSet dialog. There you can select and/or enter your
+		condition in a combined way via point-and-click and by typing.
+	:guilabel:`Delete`
+		Deletes the selected query.
+	:guilabel:`Toggle filter`
+		Applies the filter condition by sowing changesets that don't conform
+		to it in a color suggesting insensitiveness, so the selected ones
+		stand out more.
+	:guilabel:`Branch options`
+		A few options for showing branches.
 		See :guilabel:`Repo Settings -> Changelog -> Dead Branches` for
 		a method to prune names from this combo box.
+	:guilabel:`Branches combo`
+		A combo box with the list of named branches in your repository.
 	:guilabel:`Custom Filter Combo`
 		Finally there is a combo box that selects among the various
 		filter types that can be manually specified.
-
-To specify a custom filter, the user selects the filter type, enters
-the search text of that type, and then hits return in the text entry.
-
-	:guilabel:`Revision Set`
-		Parse the user text as a revision set.  See
-		`hg.1.html#revisions <http://www.selenic.com/mercurial/hg.1.html#revsets>`_ 
-		for details on how to specify revision sets.
-	:guilabel:`File Patterns`
-		Parse the user text as a file pattern glob, unless the user text
-		is prefixed with a pattern type like *regexp:*.  See
-		`hg.1.html#patterns <http://www.selenic.com/mercurial/hg.1.html#patterns>`_ 
-		for details on how to specify file patterns.
-	:guilabel:`Keywords`
-		Parse the user text as a keyword pattern that should be matched
-		against changeset meta data like comitter, message, etc.
-	:guilabel:`Date`
-		Parse the user text as a date range.  See
-		`hg.1.html#dates <http://www.selenic.com/mercurial/hg.1.html#dates>`_ 
-		for details on how to specify date ranges.
-	:guilabel:`User`
-		Parse the user text as a user / comitter name.
-
-The filter entry has a combo box which stores the history of searches.
-Selecting an item from the drop down list will apply that filter.
 
 Revision Graph Details
 ----------------------
