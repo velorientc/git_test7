@@ -875,7 +875,7 @@ class RepoWidget(QWidget):
             act.enableFunc = func
             menu.addAction(act)
             items.append(act)
-            
+
         menu = QMenu(self)
 
         entry(menu, None, isrev, _('Update...'), 'hg-update',
@@ -901,7 +901,7 @@ class RepoWidget(QWidget):
         entry(menu)
 
         submenu = menu.addMenu(_('Export'))
-        entry(submenu, None, isrev, _('Export patch'), 'hg-export', 
+        entry(submenu, None, isrev, _('Export patch'), 'hg-export',
               self.exportRevisions)
         entry(submenu, None, isrev, _('Email patch...'), 'mail-forward',
               self.emailRevision)
@@ -927,7 +927,7 @@ class RepoWidget(QWidget):
             entry(submenu, 'mq', applied, _('Finish patch'), 'qfinish',
                   self.qfinishRevision)
             entry(submenu, 'mq')
-            entry(submenu, 'rebase', fixed, _('Rebase...'), None, 
+            entry(submenu, 'rebase', fixed, _('Rebase...'), None,
                   self.rebaseRevision)
             entry(submenu, 'rebase')
             entry(submenu, 'mq', fixed, _('Strip...'), 'menudelete',
