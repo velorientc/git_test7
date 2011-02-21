@@ -30,7 +30,6 @@ from tortoisehg.hgqt.commit import CommitWidget
 from tortoisehg.hgqt.manifestdialog import ManifestTaskWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
-from tortoisehg.hgqt.quickbar import GotoQuickBar
 from tortoisehg.hgqt.pbranch import PatchBranchWidget
 
 from PyQt4.QtCore import *
@@ -104,27 +103,17 @@ class RepoWidget(QWidget):
         b.setShown(False)
         hbox.addWidget(b)
 
-        self.bar_splitter = QSplitter(self)
-        self.bar_splitter.setChildrenCollapsible(False)
-        hbox.addWidget(self.bar_splitter, 1)
+        self.filterbar = RepoFilterBar(self.repo, self)
+        hbox.addWidget(self.filterbar)
 
-        self.filterbar = RepoFilterBar(self.repo, self.bar_splitter)
         self.filterbar.branchChanged.connect(self.setBranch)
         self.filterbar.progress.connect(self.progress)
         self.filterbar.showMessage.connect(self.showMessage)
         self.filterbar.setRevisionSet.connect(self.setRevisionSet)
         self.filterbar.clearRevisionSet.connect(self.clearRevisionSet)
         self.filterbar.filterToggled.connect(self.filterToggled)
-        self.bar_splitter.addWidget(self.filterbar)
-
         self.filterbar.hide()
-
         self.revsetfilter = self.filterbar.filtercb.isChecked()
-
-        self.gototb = tb = GotoQuickBar(self.bar_splitter)
-        tb.setObjectName('gototb')
-        tb.gotoSignal.connect(self.goto)
-        self.bar_splitter.addWidget(tb)
 
         self.layout().addWidget(self.repotabs_splitter)
 
@@ -209,18 +198,11 @@ class RepoWidget(QWidget):
 
     def filterBarVisible(self):
         return self.filterbar.isVisible()
-    def gotoBarVisible(self):
-        return self.gototb.isVisible()
 
     @pyqtSlot(bool)
     def toggleFilterBar(self, checked):
         """Toggle display repowidget filter bar"""
         self.filterbar.setVisible(checked)
-
-    @pyqtSlot(bool)
-    def toggleGotoBar(self, checked):
-        """Toggle display repowidget goto bar"""
-        self.gototb.setVisible(checked)
 
     @pyqtSlot(unicode)
     def _openLink(self, link):
@@ -570,7 +552,6 @@ class RepoWidget(QWidget):
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
         self.repoview.setModel(self.repomodel)
-        self.gototb.setCompletionKeys(self.repo.tags().keys())
 
     def modelFilled(self):
         'initial batch of revisions loaded'

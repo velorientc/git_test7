@@ -295,13 +295,6 @@ class Workbench(QMainWindow):
                   toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Filter graph with revision sets or branches'))
 
-        self.gototbaction = \
-        newaction(_('Goto Toolbar'), self._repotogglefwd('toggleGotoBar'),
-                  icon='go-jump', shortcut='Ctrl+T', enabled='repoopen',
-                  toolbar='edit', menu='View', checkable=True,
-                  tooltip=_('Jump to a specific revision'))
-        newseparator(menu='View')
-
         menu = QMenu(_('Workbench Toolbars'), self)
         menu.addAction(self.edittbar.toggleViewAction())
         menu.addAction(self.docktbar.toggleViewAction())
@@ -414,7 +407,6 @@ class Workbench(QMainWindow):
         w = self.repoTabsWidget.currentWidget()
         if w:
             self.filtertbaction.setChecked(w.filterBarVisible())
-            self.gototbaction.setChecked(w.gotoBarVisible())
 
     def updateTaskViewMenu(self, taskIndex=0):
         'Update task tab menu for current repository'
