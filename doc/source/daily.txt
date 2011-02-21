@@ -15,5 +15,6 @@ TortoiseHg in daily use
 	serve
 	guess
 	ignore
+	archive
 
 .. vim: noet ts=4
