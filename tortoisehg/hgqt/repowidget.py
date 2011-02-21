@@ -885,27 +885,43 @@ class RepoWidget(QWidget):
             (0, None, None, None, None, None),
             (0, None, isrev, _('Copy hash'), 'copy-hash', self.copyHash),
             (0, None, None, None, None, None),
-            (0, 'rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
             (0, 'transplant', fixed, _('Transplant to local'), 'hg-transplant',
                 self.transplantRevision),
-            (1, 'mq', None, _('Patch Queue'), None, None),
+            (1, 'mq,rebase', None, _('Modify history'), None, None),
               (2, 'mq', qgoto, _('QGoto'), 'hg-qgoto', self.qgotoRevision),
               (2, 'mq', fixed, _('Import to MQ'), 'qimport', self.qimportRevision),
               (2, 'mq', applied, _('Finish patch'), 'qfinish', self.qfinishRevision),
+              (2, None, None, None, None, None),
+              (2, 'rebase', fixed, _('Rebase...'), None, self.rebaseRevision),
+              (2, None, None, None, None, None),
               (2, 'mq', fixed, _('Strip...'), 'menudelete', self.stripRevision),
             (0, 'reviewboard', fixed, _('Post to Review Board...'),
                 'reviewboard', self.sendToReviewBoard)):
-            if ext and ext not in exs:
-                continue
-            if type == 1:  # start submenu
+
+            if ext:
+                enable = False
+                for e in ext.split(','):
+                    if e in exs:
+                        enable = True
+                        break
+                if not enable:
+                    continue
+
+            if type == 0:    # normal entry
+                m = menu
+                submenu = None
+            elif type == 1:  # start submenu
+                m = menu
                 if icon:
                     submenu = menu.addMenu(icon, desc)
                 else:
                     submenu = menu.addMenu(desc)
                 continue
-            m = menu
-            if type == 2:  # submenu entry
+            elif type == 2:  # submenu entry
+                if submenu is None:
+                    continue
                 m = submenu
+
             if desc is None:
                 m.addSeparator()
             else:
@@ -916,6 +932,7 @@ class RepoWidget(QWidget):
                 act.enableFunc = func
                 m.addAction(act)
                 items.append(act)
+
         self.singlecmenu = menu
         self.singlecmenuitems = items
 
