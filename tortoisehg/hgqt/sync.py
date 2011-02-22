@@ -20,7 +20,6 @@ from mercurial import merge as mergemod
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
-from binascii import hexlify
 
 # TODO
 # Write keyring help, connect to help button
@@ -269,16 +268,28 @@ class SyncWidget(QWidget):
         self.outgoingAction.setStatusTip(_('Filter outgoing changesets to %s') % url)
         self.pushAction.setStatusTip(_('Push outgoing changesets to %s') % url)
 
-    def loadTargets(self, rev):
+    def loadTargets(self, ctx):
         self.targetcombo.clear()
-        self.targetcombo.addItem(_('rev: ') + str(rev), str(rev))
+        #The parallel targetargs record is the argument list to pass to hg
+        self.targetargs = []
+        selIndex = 0;
+        self.targetcombo.addItem(_('rev: ') + str(ctx.rev()))
+        self.targetargs.append(['--rev', str(ctx.rev())])
 
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('branch: ') + uname, hexlify(name))
-        for name, node in self.repo._bookmarks.items():
+            self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetargs.append(['--branch', name])
+            if ctx.thgbranchhead() and name == ctx.branch():
+                selIndex = self.targetcombo.count() - 1
+        for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('bookmark: ') + uname, node)
+            self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetargs.append(['--bookmark', name])
+            if name in ctx.bookmarks():
+                selIndex = self.targetcombo.count() - 1
+
+        return selIndex
 
     def refreshTargets(self, rev):
         if type(rev) is not int:
@@ -287,31 +298,16 @@ class SyncWidget(QWidget):
         if rev >= len(self.repo):
             return
 
-        self.loadTargets(rev)
         ctx = self.repo.changectx(rev)
+        index = self.loadTargets(ctx)
 
-        target = str(rev)
-        if ctx.thgbranchhead():
-            target = hexlify(ctx.branch())
-        for tag in ctx.bookmarks():
-            if tag in self.repo._bookmarks.keys():
-                target = ctx.node()
-
-        index = self.targetcombo.findData(target)
         if index < 0:
             index = 0
         self.targetcombo.setCurrentIndex(index)
 
     def applyTargetOption(self, cmdline):
         if self.embedded and self.targetcheckbox.isChecked():
-            revtext = hglib.fromunicode(self.targetcombo.currentText())
-            args = revtext.split(': ')
-            if args[0] == 'rev':
-                cmdline += ['--rev', args[1]]
-            elif args[0] == 'branch':
-                cmdline += ['--branch', args[1]]
-            elif args[0] == 'bookmark':
-                cmdline += ['--bookmark', args[1]]
+            cmdline += self.targetargs[self.targetcombo.currentIndex()]
         return cmdline
 
     def configChanged(self):
