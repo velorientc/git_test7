@@ -20,6 +20,11 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
 from tortoisehg.hgqt import qqueue, fileview
 
+# TODO
+# keep original file name in file list item
+# maintain check state through refresh
+# more wctx functions
+
 class MQWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     output = pyqtSignal(QString, QString)
@@ -523,6 +528,7 @@ class MQWidget(QWidget):
 
     def reload(self):
         self.refreshing = True
+        self.reselectPatchItem = None
         try:
             try:
                 self._reload()
@@ -533,12 +539,14 @@ class MQWidget(QWidget):
                     traceback.print_exc()
         finally:
             self.refreshing = False
+        if self.reselectPatchItem:
+            self.queueListWidget.setCurrentItem(self.reselectPatchItem)
+        self.refreshFileListWidget()
 
     def _reload(self):
         ui, repo = self.repo.ui.copy(), self.repo
 
         self.queueCombo.clear()
-        self.queueListWidget.clear()
 
         ui.quiet = True  # don't append "(active)"
         ui.pushbuffer()
@@ -551,7 +559,13 @@ class MQWidget(QWidget):
         self.queueCombo.setCurrentIndex(current)
         self.queueCombo.setEnabled(self.queueCombo.count() > 1)
 
-        # TODO: maintain current selection
+        item = self.queueListWidget.currentItem()
+        if item:
+            wasselected = item._thgpatch
+        else:
+            wasselected = None
+        self.queueListWidget.clear()
+
         applied = set([p.name for p in repo.mq.applied])
         self.allguards = set()
         items = []
@@ -580,8 +594,11 @@ class MQWidget(QWidget):
                           Qt.ItemIsEditable |
                           Qt.ItemIsEnabled)
             items.append(item)
+
         for item in reversed(items):
             self.queueListWidget.addItem(item)
+            if item._thgpatch == wasselected:
+                self.reselectPatchItem = item
 
         for guard in repo.mq.active():
             self.allguards.add(guard)
@@ -628,7 +645,6 @@ class MQWidget(QWidget):
                 self.setMessage('')
                 self.patchNameLE.setText('')
         self.patchNameLE.setEnabled(newmode)
-        self.refreshFileListWidget()
 
     def onNewModeToggled(self, isChecked):
         if isChecked:
@@ -657,25 +673,36 @@ class MQWidget(QWidget):
                 self.patchNameLE.setText('')
                 self.setMessage('')
             self.patchNameLE.setEnabled(False)
+
+    def refreshFileListWidget(self):
         self.refreshing = True
+        self.reselectFileItem = None
         try:
             try:
-                self.refreshFileListWidget()
+                self._refreshFileListWidget()
             except Exception, e:
                 self.showMessage.emit(hglib.tounicode(str(e)))
                 import traceback
                 traceback.print_exc()
         finally:
             self.refreshing = False
+        if self.reselectFileItem:
+            self.fileListWidget.setCurrentItem(self.reselectFileItem)
 
-    def refreshFileListWidget(self):
-        # TODO: maintain selection, check state
+    def _refreshFileListWidget(self):
         def addfiles(mode, files, initial):
             for file in files:
                 item = QListWidgetItem(u'%s %s' % (mode, hglib.tounicode(file)))
                 item.setFlags(flags)
                 item.setCheckState(initial)
                 self.fileListWidget.addItem(item)
+                if selfile == file:
+                    self.reselectFileItem = item
+        item = self.fileListWidget.currentItem()
+        if item:
+            selfile = hglib.fromunicode(item.text())[2:]
+        else:
+            selfile = None
         self.fileListWidget.clear()
         self.fileview.clearDisplay()
         pctx = self.repo.changectx('.')
