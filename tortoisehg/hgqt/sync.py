@@ -77,10 +77,11 @@ class SyncWidget(QWidget):
         self.updateInProgress = False
         self.opts = {}
         self.cmenu = None
+        self.embedded = bool(parent)
 
         self.repo.configChanged.connect(self.configChanged)
 
-        if parent:
+        if self.embedded:
             layout.setContentsMargins(2, 2, 2, 2)
         else:
             self.setWindowTitle(_('TortoiseHg Sync'))
@@ -140,7 +141,7 @@ class SyncWidget(QWidget):
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
-        if parent:
+        if self.embedded:
             tb.addSeparator()
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
@@ -242,7 +243,7 @@ class SyncWidget(QWidget):
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
 
-        cmd = cmdui.Widget(not parent, self)
+        cmd = cmdui.Widget(not self.embedded, self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
 
@@ -253,7 +254,6 @@ class SyncWidget(QWidget):
         layout.addWidget(cmd)
         cmd.setVisible(False)
         self.cmd = cmd
-        self.embedded = bool(parent)
 
         self.reload()
         if 'default' in self.paths:
@@ -303,7 +303,7 @@ class SyncWidget(QWidget):
         self.targetcombo.setCurrentIndex(index)
 
     def applyTargetOption(self, cmdline):
-        if self.targetcheckbox.isChecked():
+        if self.embedded and self.targetcheckbox.isChecked():
             revtext = hglib.fromunicode(self.targetcombo.currentText())
             args = revtext.split(': ')
             if args[0] == 'rev':
