@@ -998,8 +998,8 @@ class RepoWidget(QWidget):
         menu = QMenu(self)
         for name, cb, icon in (
                 (_('Visual Diff...'), diffPair, 'visualdiff'),
-                (_('Export Pair'), exportPair, 'hg-export'),
-                (_('Email Pair...'), emailPair, 'mail-forward'),
+                (_('Export Selected'), exportPair, 'hg-export'),
+                (_('Email Selected...'), emailPair, 'mail-forward'),
                 (_('Export DAG Range'), exportDagRange, 'hg-export'),
                 (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
                 (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
