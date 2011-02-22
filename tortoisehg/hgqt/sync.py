@@ -289,7 +289,7 @@ class SyncWidget(QWidget):
         target = str(rev)
         if ctx.thgbranchhead():
             target = hexlify(ctx.branch())
-        for tag in ctx.thgtags():
+        for tag in ctx.bookmarks():
             if tag in self.repo._bookmarks.keys():
                 target = ctx.node()
 
