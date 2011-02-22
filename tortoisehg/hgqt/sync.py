@@ -273,7 +273,7 @@ class SyncWidget(QWidget):
         #The parallel targetargs record is the argument list to pass to hg
         self.targetargs = []
         selIndex = 0;
-        self.targetcombo.addItem(_('rev: ') + str(ctx.rev()))
+        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)))
         self.targetargs.append(['--rev', str(ctx.rev())])
 
         for name in self.repo.namedbranches:
