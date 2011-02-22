@@ -282,7 +282,8 @@ class StatusWidget(QWidget):
         if curidx and curidx.isValid():
             selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
 
-    @pyqtSlot(QModelIndex)
+    # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QModelIndex)
     def onRowClicked(self, index):
         'tree view emitted a clicked signal, index guarunteed valid'
         if index.column() == COL_PATH:
