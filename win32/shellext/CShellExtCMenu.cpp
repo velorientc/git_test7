@@ -826,6 +826,16 @@ void CShellExtCMenu::RunDialog(const std::string &cmd)
         return;
     }
 
+    if (cmd == "thgstatus")
+    {
+        if (Thgstatus::remove(cwd) != 0)
+        {
+            std::string p = dir + "\\TortoiseHgOverlayServer.exe";
+            LaunchCommand(Quote(p), dir);
+        }
+        InitStatus::check();
+        return;
+    }
 
     if (!myFiles.empty())
     {
@@ -861,17 +871,6 @@ void CShellExtCMenu::RunDialog(const std::string &cmd)
         }
         CloseHandle(tempfileHandle);
         hgcmd += " --listfile " + Quote(tempfile);
-    }
-
-    if (cmd == "thgstatus")
-    {
-        if (Thgstatus::remove(cwd) != 0)
-        {
-            std::string p = dir + "\\TortoiseHgOverlayServer.exe";
-            LaunchCommand(Quote(p), dir);
-        }
-        InitStatus::check();
-        return;
     }
 
     LaunchCommand(hgcmd, cwd);
