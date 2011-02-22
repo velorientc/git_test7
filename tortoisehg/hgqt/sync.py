@@ -148,6 +148,8 @@ class SyncWidget(QWidget):
         tb.addSeparator()
         tb.addWidget(self.urllabel)
 
+        style = QApplication.style()
+
         urlbox = QGroupBox(_('Current URL'))
         self.layout().addWidget(urlbox)
         vbox = QVBoxLayout()
@@ -157,6 +159,18 @@ class SyncWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.setSpacing(4)
         vbox.addLayout(hbox)
+
+        self.schemecombo = QComboBox()
+        for s in _schemes:
+            self.schemecombo.addItem(s)
+        self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
+        hbox.addWidget(self.schemecombo)
+
+        self.securebutton = QPushButton(style.standardIcon(QStyle.SP_MessageBoxWarning), '')
+        self.securebutton.setToolTip(
+            _('Manage HTTPS connection security and user authentication'))
+        hbox.addWidget(self.securebutton)
+
         self.hostentry = QLineEdit()
         self.hostentry.setToolTip(_('Hostname'))
         self.hostentry.setAcceptDrops(False)
@@ -183,23 +197,8 @@ class SyncWidget(QWidget):
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 4)
 
-        hbox = QHBoxLayout()
-        hbox.setSpacing(4)
-        vbox.addLayout(hbox)
-
-        self.schemecombo = QComboBox()
-        for s in _schemes:
-            self.schemecombo.addItem(s)
-        self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.schemecombo)
-        self.securebutton = QPushButton(_('Security'))
-        self.securebutton.setToolTip(
-            _('Manage HTTPS connection security and user authentication'))
-        hbox.addWidget(self.securebutton)
-        self.savebutton = QPushButton(_('Save'))
-        self.savebutton.setToolTip(
-            _('Save current URL under an alias'))
-        hbox.addStretch(1)
+        self.savebutton = QPushButton(style.standardIcon(QStyle.SP_DialogSaveButton), '')
+        self.savebutton.setToolTip(_('Save current URL under an alias'))
         hbox.addWidget(self.savebutton)
 
         hbox = QHBoxLayout()
@@ -366,7 +365,7 @@ class SyncWidget(QWidget):
         schemeIndex = self.schemecombo.currentIndex()
         for w in self.HostAndPortWidgets:
             w.setHidden(schemeIndex == 0)
-        self.securebutton.setEnabled(schemeIndex == 3)
+        self.securebutton.setHidden(schemeIndex != 3)
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
