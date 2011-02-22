@@ -276,7 +276,8 @@ class HgFileView(QFrame):
             filename, status = self._filename, self._status
         else:
             self._filename, self._status = filename, status
-
+        if isinstance(filename, (unicode, QString)):
+            filename = hglib.fromunicode(filename)
         if rev is not None:
             self._p_rev = rev
 
