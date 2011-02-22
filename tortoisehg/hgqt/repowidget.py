@@ -919,7 +919,7 @@ class RepoWidget(QWidget):
               self.transplantRevision)
 
         if 'mq' in exs or 'rebase' in exs:
-            submenu = menu.addMenu(_('Modify history'))
+            submenu = menu.addMenu(qtlib.geticon('dialog-warning'), _('Modify history'))
             entry(submenu, 'mq', qgoto, _('QGoto'), 'hg-qgoto',
                   self.qgotoRevision)
             entry(submenu, 'mq', fixed, _('Import to MQ'), 'qimport',
