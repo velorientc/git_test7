@@ -28,14 +28,18 @@ from binascii import hexlify
 _schemes = ['local', 'ssh', 'http', 'https']
 
 def parseurl(path):
-    m = re.match(r'^ssh://(([^@]+)@)?([^:/]+)(:(\d+))?(/(.*))?$', path)
-    if m:
-        user = m.group(2)
-        host = m.group(3)
-        port = m.group(5)
-        folder = m.group(7) or '.'
-        passwd = ''
+    if path.startswith('ssh://'):
         scheme = 'ssh'
+        p = path[len('ssh://'):]
+        user, passwd = None, None
+        if p.find('@') != -1:
+            user, p = tuple(p.split('@'))
+            if user.find(':') != -1:
+                user, passwd = tuple(user.split(':'))
+        m = re.match(r'([^:/]+)(:(\d+))?(/(.*))?$', p)
+        host = m.group(1)
+        port = m.group(3)
+        folder = m.group(5) or '.'
     elif path.startswith('http://') or path.startswith('https://'):
         snpaqf = urlparse.urlparse(path)
         scheme, netloc, folder, params, query, fragment = snpaqf
