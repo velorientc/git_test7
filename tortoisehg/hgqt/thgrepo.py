@@ -550,6 +550,10 @@ def _extendchangectx(changectx):
             else:
                 lines = summary.splitlines()
                 summary = lines and lines[0] or ''
+
+                if summary and len(lines) > 1:
+                    summary += '...'
+
             return summary
 
     return thgchangectx

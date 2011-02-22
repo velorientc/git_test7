@@ -137,6 +137,10 @@ class patchctx(object):
         else:
             lines = summary.splitlines()
             summary = lines and lines[0] or ''
+
+            if summary and len(lines) > 1:
+                summary += '...'
+
         return summary
 
     def changesToParent(self, whichparent):
