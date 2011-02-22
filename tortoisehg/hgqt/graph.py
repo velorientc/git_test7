@@ -26,8 +26,6 @@ import itertools
 
 from mercurial import util, error
 
-from tortoisehg.util.hglib import tounicode
-
 def revision_grapher(repo, **opts):
     """incremental revision grapher
 
