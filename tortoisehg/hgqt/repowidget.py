@@ -927,7 +927,7 @@ class RepoWidget(QWidget):
             entry(submenu, 'mq', applied, _('Finish patch'), 'qfinish',
                   self.qfinishRevision)
             entry(submenu, 'mq')
-            entry(submenu, 'rebase', fixed, _('Rebase...'), None,
+            entry(submenu, 'rebase', fixed, _('Rebase...'), 'hg-rebase',
                   self.rebaseRevision)
             entry(submenu, 'rebase')
             entry(submenu, 'mq', fixed, _('Strip...'), 'menudelete',

@@ -23,6 +23,7 @@ class RebaseDialog(QDialog):
 
     def __init__(self, repo, parent, **opts):
         super(RebaseDialog, self).__init__(parent)
+        self.setWindowIcon(qtlib.geticon('hg-rebase'))
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
