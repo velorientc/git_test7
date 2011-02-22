@@ -141,13 +141,6 @@ class SyncWidget(QWidget):
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
 
-        self.urllabel = QLabel()
-        self.urllabel.setMargin(4)
-        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.urllabel.setAcceptDrops(False)
-        tb.addSeparator()
-        tb.addWidget(self.urllabel)
-
         style = QApplication.style()
 
         urlbox = QGroupBox(_('Current URL'))
@@ -200,6 +193,12 @@ class SyncWidget(QWidget):
         self.savebutton = QPushButton(style.standardIcon(QStyle.SP_DialogSaveButton), '')
         self.savebutton.setToolTip(_('Save current URL under an alias'))
         hbox.addWidget(self.savebutton)
+
+        self.urllabel = QLabel()
+        self.urllabel.setMargin(4)
+        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.urllabel.setAcceptDrops(False)
+        vbox.addWidget(self.urllabel)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
