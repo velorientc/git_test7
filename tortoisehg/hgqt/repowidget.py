@@ -552,6 +552,8 @@ class RepoWidget(QWidget):
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
         self.repoview.setModel(self.repomodel)
+        if 'mq' in self.repo.extensions():
+            self._last_series = self.repo.mq.series[:]
 
     def modelFilled(self):
         'initial batch of revisions loaded'
@@ -617,9 +619,19 @@ class RepoWidget(QWidget):
 
     def rebuildGraph(self):
         self.showMessage('')
-        if type(self.rev) is not int or len(self.repo) > self.rev:
-            self._reload_rev = self.rev
-        else:
+        self._reload_rev = self.rev
+        if type(self.rev) is str:
+            try:
+                if self.rev not in self.repo.mq.series:
+                    # patch is no longer in the series, find a neighbor
+                    idx = self._last_series.index(self._reload_rev) - 1
+                    self._reload_rev = self._last_series[idx]
+                    while self._reload_rev not in self.repo.mq.series and idx:
+                        idx -= 1
+                        self._reload_rev = self._last_series[idx]
+            except Exception, e:
+                self._reload_rev = 'tip'
+        elif self.rev is not None and len(self.repo) > self.rev:
             self._reload_rev = 'tip'
         self.setupModels()
         self.revDetailsWidget.record()
