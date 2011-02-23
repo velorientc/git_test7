@@ -47,6 +47,8 @@ class _AbstractFileDialog(QMainWindow):
         self.setRepoViewer(repoviewer)
         self._show_rev = None
 
+        if isinstance(filename, (unicode, QString)):
+            filename = hglib.fromunicode(filename)
         self.filename = filename
         self.findLexer()
 
