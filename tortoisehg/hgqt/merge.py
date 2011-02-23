@@ -24,7 +24,7 @@ RESULT_PAGE = 2
 
 class MergeDialog(QWizard):
 
-    def __init__(self, other, repo=None, parent=None):
+    def __init__(self, other, repo, parent):
         super(MergeDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
@@ -743,4 +743,4 @@ def run(ui, *pats, **opts):
     if not rev and len(pats):
         rev = pats[0]
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return MergeDialog(rev, repo)
+    return MergeDialog(rev, repo, None)
