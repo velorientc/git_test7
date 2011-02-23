@@ -11,7 +11,7 @@ import time
 from mercurial import extensions, ui
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.hgqt import qtlib, cmdui, update
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.util import hglib
 
@@ -314,7 +314,7 @@ class PatchBranchWidget(QWidget):
         self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
         self.repo.decrementBusyCount()
         return True
-   
+    
     def pmerge(self, patch_name=None):
         """
         [pbranch] Execute 'pmerge' command.
@@ -348,7 +348,7 @@ class PatchBranchWidget(QWidget):
     def cur_branch(self):
         """ Return branch that workdir belongs to. """
         return self.repo.dirstate.branch()
-        
+   
     ### internal functions ###
 
     def update_sensitivity(self):
@@ -360,7 +360,7 @@ class PatchBranchWidget(QWidget):
         self.actionReapply.setEnabled(True)
         self.actionPNew.setEnabled(not is_merge)
         self.actionEditPGraph.setEnabled(True)
-
+        
     def selected_patch(self):
         C_NAME = PatchBranchModel._columns.index('Name')
         indexes = self.patchlist.selectedIndexes()
@@ -434,8 +434,9 @@ class PatchBranchWidget(QWidget):
 
     def goto_activated(self):
         branch = self.selected_patch()
-        rev = cmdutil.revrange(self.repo, [branch])
-        dlg = update.UpdateDialog(self.repo, rev, self)
+        # TODO: Fetch list of heads of branch
+        # - use a list of revs if more than one found 
+        dlg = update.UpdateDialog(self.repo, branch, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
