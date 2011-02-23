@@ -15,7 +15,7 @@ from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QAction, QMenu, QMessageBox, QFileDialog, QDialog
+from PyQt4.QtGui import *
 
 def wctxactions(parent, point, repo, selrows):
     if not selrows:
@@ -43,6 +43,7 @@ def wctxactions(parent, point, repo, selrows):
         menu = QMenu(parent)
         parent.contextmenu = menu
     make(_('&Visual Diff'), vdiff, frozenset('MAR!'))
+    make(_('Copy patch'), copyPatch, frozenset('MAR!'))
     make(_('Edit'), edit, frozenset('MACI?'))
     make(_('View missing'), viewmissing, frozenset('R!'))
     if len(repo.parents()) > 1:
@@ -133,6 +134,19 @@ def run(func, parent, files, repo):
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
     repo[None].remove([deleted], unlink=False) # !->R
+
+def copyPatch(parent, ui, repo, files):
+    ui.pushbuffer()
+    try:
+        commands.diff(ui, repo, *files)
+    except Exception, e:
+        ui.popbuffer()
+        if 'THGDEBUG' in os.environ:
+            import traceback
+            traceback.print_exc()
+        return
+    output = ui.popbuffer()
+    QApplication.clipboard().setText(output)
 
 def vdiff(parent, ui, repo, files):
     dlg = visdiff.visualdiff(ui, repo, files, {})
