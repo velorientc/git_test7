@@ -11,7 +11,7 @@ import time
 from mercurial import extensions, ui
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.hgqt import qtlib, cmdui, update
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.util import hglib
 
@@ -122,7 +122,7 @@ class PatchBranchWidget(QWidget):
 
         # store selected patch name
         selname = None
-        patchnamecol = 1 # Column used to store patch name
+        patchnamecol = PatchBranchModel._columns.index('Name') # Column used to store patch name
         selinxs = self.patchlist.selectedIndexes()
         if len(selinxs) > 0:
             selrow = selinxs[0].row()
@@ -314,7 +314,7 @@ class PatchBranchWidget(QWidget):
         self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
         self.repo.decrementBusyCount()
         return True
-   
+    
     def pmerge(self, patch_name=None):
         """
         [pbranch] Execute 'pmerge' command.
@@ -339,7 +339,16 @@ class PatchBranchWidget(QWidget):
         """ return True if pbranch extension is in use on repo """
         return self.has_pbranch() and self.pgraph() != []
 
-        
+    def is_patch(self, branch_name):
+        """ return True if branch is a patch. This excludes root branches
+        and internal diff base branches (for patches with multiple 
+        dependencies. """
+        return self.has_pbranch() and self.pgraph().ispatch(branch_name)
+
+    def cur_branch(self):
+        """ Return branch that workdir belongs to. """
+        return self.repo.dirstate.branch()
+   
     ### internal functions ###
 
     def update_sensitivity(self):
@@ -351,11 +360,50 @@ class PatchBranchWidget(QWidget):
         self.actionReapply.setEnabled(True)
         self.actionPNew.setEnabled(not is_merge)
         self.actionEditPGraph.setEnabled(True)
+        
+    def selected_patch(self):
+        C_NAME = PatchBranchModel._columns.index('Name')
+        indexes = self.patchlist.selectedIndexes()
+        if len(indexes) == 0:
+            return None
+        index = indexes[0]
+        return str(index.sibling(index.row(), C_NAME).data().toString())
 
+    def show_patch_cmenu(self, pos):
+        """Context menu for selected patch"""
+        patchname = self.selected_patch()
+        if not patchname:
+            return
+        
+        menu = QMenu(self)
+        def append(label, handler):
+            menu.addAction(label).triggered.connect(handler)
 
+        has_pbranch = self.has_pbranch()
+        is_current = self.has_patch() and self.cur_branch() == patchname
+        is_patch = self.is_patch(patchname)
+        is_internal = self.pbranch.isinternal(patchname)
+        is_merge = len(self.repo.branchheads(patchname)) > 1
+
+        #if has_pbranch and not is_merge and not is_internal:
+        #    append(_('&New'), self.pnew_activated)
+        if not is_current:
+            append(_('&Goto (update workdir)'), self.goto_activated)
+        #if is_patch:
+        #    append(_('&Edit message'), self.edit_message_activated)
+        #    append(_('&Rename'), self.rename_activated)
+        #    append(_('&Delete'), self.delete_activated)
+        #    append(_('&Finish'), self.finish_activated)
+
+        if len(menu.actions()) > 0:
+            menu.exec_(pos)
 
     # Signal handlers
 
+    def contextMenuEvent(self, event):
+        if self.patchlist.geometry().contains(event.pos()):
+            self.show_patch_cmenu(event.globalPos())
+   
     def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         self.refresh()
@@ -369,11 +417,40 @@ class PatchBranchWidget(QWidget):
     def workingBranchChanged(self):
         self.refresh()
 
+    def pmerge_clicked(self):
+        self.pmerge()
+
     def pnew_clicked(self, toolbutton):
         self.pnew_ui()
 
-    def pmerge_clicked(self):
-        self.pmerge()
+    ### context menu signal handlers ###
+
+    def pnew_activated(self):
+        """Insert new patch after this row"""
+        assert False
+
+    def edit_message_activated(self):
+        assert False
+
+    def goto_activated(self):
+        branch = self.selected_patch()
+        # TODO: Fetch list of heads of branch
+        # - use a list of revs if more than one found 
+        dlg = update.UpdateDialog(self.repo, branch, self)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
+        dlg.progress.connect(self.progress)
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+
+    def delete_activated(self):
+        assert False
+
+    def rename_activated(self):
+        assert False
+
+    def finish_activated(self):
+        assert False
 
 class PatchGraphNode(object):
     """
