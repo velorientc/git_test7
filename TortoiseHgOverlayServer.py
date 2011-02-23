@@ -270,6 +270,7 @@ requests = Queue.Queue(0)
 def get_config():
     show_taskbaricon = True
     hgighlight_taskbaricon = True
+    version2cmenu = False
     try:
         from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
         hkey = OpenKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
@@ -278,6 +279,24 @@ def get_config():
         except EnvironmentError: pass
         try: hgighlight_taskbaricon = QueryValueEx(hkey, 'HighlightTaskbarIcon')[0] in t
         except EnvironmentError: pass
+
+        # Upgrade user's context menu, once per major release
+        try: version2cmenu = QueryValueEx(hkey, 'ContextMenuVersion')[0] == '2'
+        except EnvironmentError: pass
+        try:
+            if not version2cmenu:
+                from _winreg import CreateKey, SetValueEx, REG_SZ
+                try: promoted = QueryValueEx(hkey, 'PromotedItems')[0]
+                except EnvironmentError: promoted = ''
+                plist = [i.strip() for i in promoted.split(',')]
+                hkey = CreateKey(HKEY_CURRENT_USER, r'Software\TortoiseHg')
+                if u'log' in plist:
+                    idx = plist.index(u'log')
+                    plist[idx] = u'workbench'
+                    SetValueEx(hkey, 'PromotedItems', 0, REG_SZ, ','.join(plist))
+                SetValueEx(hkey, 'ContextMenuVersion', 0, REG_SZ, '2')
+        except EnvironmentError:
+            pass
     except (ImportError, WindowsError):
         pass
     return (show_taskbaricon, hgighlight_taskbaricon)
