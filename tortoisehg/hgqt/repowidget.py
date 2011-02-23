@@ -1202,7 +1202,10 @@ class RepoWidget(QWidget):
         _ui.pushbuffer()
         try:
             if self.rev:
-                commands.export(_ui, self.repo, self.rev, output=_ui)
+                class Writable(object):
+                    def write(self, *args, **opts): _ui.write(*args, **opts)
+                    def close(self): pass
+                commands.export(_ui, self.repo, self.rev, output=Writable())
             else:
                 commands.diff(_ui, self.repo)
         except Exception, e:
