@@ -48,6 +48,7 @@ class RevDetailsWidget(QWidget):
 
     def setRepo(self, repo):
         self.repo = repo
+        self.fileview.setRepo(repo)
 
     def setupUi(self):
         SP = QSizePolicy

@@ -212,12 +212,15 @@ class HgFileView(QFrame):
     def saveSettings(self, qs, prefix):
         self.sci.saveSettings(qs, prefix)
 
+    def setRepo(self, repo):
+        self.repo = repo
+
     @pyqtSlot(QAction)
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
-        
+
         mode = {self.actionDiffMode.text():'diff',
-                self.actionFileMode.text():'file', 
+                self.actionFileMode.text():'file',
                 self.actionAnnMode.text() :'ann'}[action.text()]
         self.actionNextDiff.setEnabled(mode == 'file')
         self.actionPrevDiff.setEnabled(False)
