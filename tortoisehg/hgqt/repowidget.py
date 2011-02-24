@@ -552,8 +552,10 @@ class RepoWidget(QWidget):
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
         self.repoview.setModel(self.repomodel)
-        if 'mq' in self.repo.extensions():
+        try:
             self._last_series = self.repo.mq.series[:]
+        except AttributeError:
+            self._last_series = []
 
     def modelFilled(self):
         'initial batch of revisions loaded'
@@ -629,7 +631,7 @@ class RepoWidget(QWidget):
                     while self._reload_rev not in self.repo.mq.series and idx:
                         idx -= 1
                         self._reload_rev = self._last_series[idx]
-            except Exception, e:
+            except (AttributeError, IndexError):
                 self._reload_rev = 'tip'
         elif self.rev is not None and len(self.repo) > self.rev:
             self._reload_rev = 'tip'
