@@ -44,7 +44,7 @@ demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui, error
 from tortoisehg.util.i18n import agettext as _
-from tortoisehg.util import thread2, paths, shlib
+from tortoisehg.util import thread2, paths, shlib, version
 
 APP_TITLE = _('TortoiseHg Overlay Icon Server')
 
@@ -65,6 +65,7 @@ class Logger():
         except:
             pass
         self.file = open(name, 'wb')
+        self.msg('%s, Version %s' % (APP_TITLE, version.version()))
         self.msg('Logging to file started')
 
     def msg(self, msg):
