@@ -31,7 +31,7 @@ class SearchWidget(QWidget):
 
         self.thread = None
         self.setWindowIcon(qtlib.geticon('view-filter'))
-        
+
         mainvbox = QVBoxLayout()
         mainvbox.setSpacing(6)
         self.setLayout(mainvbox)
@@ -39,7 +39,7 @@ class SearchWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.setMargin(2)
         le = QLineEdit()
-        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText('### regular expression search pattern ###')
         else:
             lbl = QLabel(_('Regexp:'))
@@ -79,11 +79,11 @@ class SearchWidget(QWidget):
                      'Exclusion patterns are applied after inclusion patterns.')
         ihelpstr = _('Comma separated list of inclusion file patterns. '
                      'By default, the entire repository is searched.')
-        if hasattr(incle, 'setPlaceholderText'): # Qt >= 4.7 
+        if hasattr(incle, 'setPlaceholderText'): # Qt >= 4.7
             incle.setPlaceholderText(u' '.join([u'###', ihelpstr, u'###']))
         else:
             incle.setToolTip(ihelpstr)
-        if hasattr(excle, 'setPlaceholderText'): # Qt >= 4.7 
+        if hasattr(excle, 'setPlaceholderText'): # Qt >= 4.7
             excle.setPlaceholderText(u' '.join([u'###', ehelpstr, u'###']))
         else:
             excle.setToolTip(ehelpstr)
