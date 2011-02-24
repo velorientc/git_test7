@@ -215,7 +215,7 @@ class SyncWidget(QWidget):
         pathsbox = QVBoxLayout()
         pathsbox.setContentsMargins(0, 0, 0, 0)
         pathsframe.setLayout(pathsbox)
-        lbl = QLabel(_('<b>Saved Paths</b>'))
+        lbl = QLabel(_('<b>Paths in Repository Settings</b>'))
         pathsbox.addWidget(lbl)
         pathsbox.addWidget(self.hgrctv)
         hbox.addWidget(pathsframe)
