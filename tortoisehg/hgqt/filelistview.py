@@ -66,7 +66,7 @@ class HgFileListView(QTableView):
     def contextChanged(self, ctx):
         real = type(ctx.rev()) is int
         wd = ctx.rev() is None
-        for act in ['ldiff', 'edit']:
+        for act in ['navigate', 'diffnavigate', 'ldiff', 'edit']:
             self._actions[act].setEnabled(real)
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
