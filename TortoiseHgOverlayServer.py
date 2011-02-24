@@ -141,9 +141,11 @@ class MainWindow:
         self.start_pipe_server()
 
     def OnRestart(self, hwnd, msg, wparam, lparam):
+        logger.msg("MainWindow.OnRestart")
         self._DoCreateIcons()
 
     def OnDestroy(self, hwnd, msg, wparam, lparam):
+        logger.msg("MainWindow.OnDestroy")
         nid = (self.hwnd, 0)
         try:
             Shell_NotifyIcon(NIM_DELETE, nid)
@@ -174,12 +176,13 @@ class MainWindow:
             print "Unknown command -", id
 
     def exit_application(self):
+        logger.msg("MainWindow.exit_application")
         if self.stop_pipe_server():
             DestroyWindow(self.hwnd)
         logger.msg("Goodbye")
 
     def stop_pipe_server(self):
-        logger.msg("Stopping pipe server...")
+        logger.msg("MainWindow.stop_pipe_server")
         if not self.pipethread.isAlive():
             logger.msg("pipethread is not alive")
             return True
@@ -407,11 +410,12 @@ class PipeServer:
         self.overlapped.hEvent = win32event.CreateEvent(None,0,0,None)
 
     def SvcStop(self):
-        logger.msg('PipeServer thread terminating')
+        logger.msg("PipeServer.SvcStop")
         win32event.SetEvent(self.hWaitStop)
         requests.put('terminate|')
 
     def SvcDoRun(self):
+        logger.msg("PipeServer.SvcDoRun")
         # We create our named pipe.
         pipeName = PIPENAME
         openMode = win32pipe.PIPE_ACCESS_DUPLEX | win32file.FILE_FLAG_OVERLAPPED
