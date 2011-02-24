@@ -147,7 +147,7 @@ class SyncWidget(QWidget):
 
         style = QApplication.style()
 
-        urlbox = QGroupBox(_('Current URL'))
+        urlbox = QGroupBox(_('Remote Repository'))
         self.layout().addWidget(urlbox)
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
