@@ -43,6 +43,7 @@ from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui, error
+from mercurial.windows import posixfile, unlink, rename
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import thread2, paths, shlib, version
 
@@ -57,14 +58,10 @@ class Logger():
     def setfile(self, name):
         oname = name + '.old'
         try:
-            os.unlink(oname)
+            rename(name, oname)
         except:
             pass
-        try:
-            os.rename(name, oname)
-        except:
-            pass
-        self.file = open(name, 'wb')
+        self.file = posixfile(name, 'wb')
         self.msg('%s, Version %s' % (APP_TITLE, version.version()))
         self.msg('Logging to file started')
 
@@ -353,13 +350,13 @@ def remove(args):
         for r in sorted(roots):
             tfn = os.path.join(r, '.hg', 'thgstatus')
             try:
-                f = open(tfn, 'rb')
+                f = posixfile(tfn, 'rb')
                 e = f.readline()
                 f.close()
                 if not e.startswith('@@noicons'):
-                    os.remove(tfn)
-            except (IOError, OSError):
-                print "IOError or OSError while trying to remove %s" % tfn
+                    unlink(tfn)
+            except (IOError, OSError), e:
+                logger.msg("Error while trying to remove %s (%s)" % (tfn, e))
                 pass
         if notifypaths:
             shlib.shell_notify(list(notifypaths))
