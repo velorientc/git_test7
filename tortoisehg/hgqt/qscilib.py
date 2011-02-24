@@ -307,12 +307,15 @@ class SearchToolBar(QToolBar):
             self._close_button.clicked.connect(self.hide)
             self.addWidget(self._close_button)
 
-        self._lbl = QLabel(_('Regexp:'),
-                           toolTip=_('Regular expression search pattern'))
-        self.addWidget(self._lbl)
         self._le = QLineEdit()
+        if hasattr(self._le, 'setPlaceholderText'): # Qt >= 4.7
+            self._le.setPlaceholderText(_('### regular expression ###'))
+        else:
+            self._lbl = QLabel(_('Regexp:'),
+                               toolTip=_('Regular expression search pattern'))
+            self.addWidget(self._lbl)
+            self._lbl.setBuddy(self._le)
         self._le.returnPressed.connect(self._emitSearchRequested)
-        self._lbl.setBuddy(self._le)
         self.addWidget(self._le)
         self._chk = QCheckBox(_('Ignore case'))
         self.addWidget(self._chk)
