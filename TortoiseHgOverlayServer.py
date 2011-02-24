@@ -409,7 +409,7 @@ class PipeServer:
     def SvcStop(self):
         logger.msg('PipeServer thread terminating')
         win32event.SetEvent(self.hWaitStop)
-        requests.put('terminate')
+        requests.put('terminate|')
 
     def SvcDoRun(self):
         # We create our named pipe.
