@@ -93,9 +93,9 @@ class RepoTreeView(QTreeView):
             self.selitem = selection[0]
 
     def _action_defs(self):
-        a = [("open", _("Open"), 'open',
+        a = [("open", _("Open"), 'thg-repository-open',
                 _("Open the repository in a new tab"), None, self.open),
-             ("openAll", _("Open All"), 'open',
+             ("openAll", _("Open All"), 'thg-repository-open',
                 _("Open all repositories in new tabs"), None, self.openAll),
              ("newGroup", _("New Group"), 'new-group',
                 _("Create a new group"), None, self.newGroup),
