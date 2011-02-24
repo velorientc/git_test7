@@ -82,12 +82,12 @@ hidden.  Clicking on a revision in the graph will update the values in
 the dropdown box.  Holding :kbd:`Alt` while clicking on a revision will
 select the revision without switching away from the sync tool tab.
 
-At the very right of the toolbar is the currently selected URL.  All
-synchronization commands will use this URL.  The general effect of the
-toolbar is that it can be read as a Mercurial command line.  The tool
-buttons select the command, the :guilabel:`Post Pull` and
-:guilabel:`Options` dialog specify options, the target dropdown box can
-specify revisions, and finally the URL completes the command.
+Below the toolbar is the currently selected URL.  All synchronization
+commands will use this URL.  The general effect of the toolbar is that
+it can be read as a Mercurial command line.  The tool buttons select the
+command, the :guilabel:`Post Pull` and :guilabel:`Options` dialog
+specify options, the target dropdown box can specify revisions, and
+finally the URL completes the command.
 
 Adding an URL
 -------------
