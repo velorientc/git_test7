@@ -303,8 +303,10 @@ class QQueueDialog(QDialog):
             opts = ['--purge', q]
             self.qqueueCommand(opts)
 
-    def qqcmdFinished(self):
+    def qqcmdFinished(self, ret):
         self.repo.decrementBusyCount()
+        if ret:
+            self.reload()
 
     def qqueueCommand(self, opts):
         self.setButtonState(False)
