@@ -902,7 +902,7 @@ class RepoWidget(QWidget):
         entry(menu, None, isctx, _('Browse at rev...'), 'hg-annotate',
               self.manifestRevision)
         entry(menu)
-        entry(menu, None, fixed, _('Merge with...'), 'hg-merge',
+        entry(menu, None, fixed, _('Merge with local...'), 'hg-merge',
               self.mergeWithRevision)
         entry(menu)
         entry(menu, None, fixed, _('Tag...'), 'hg-tag',
