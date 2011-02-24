@@ -407,7 +407,10 @@ def _extendrepo(repo):
 
         @propertycache
         def _branchheads(self):
-            return [self.changectx(x) for x in self.branchmap()]
+            heads = []
+            for branchname, nodes in self.branchmap().iteritems():
+                heads.extend(nodes)
+            return heads
 
         def shell(self):
             'Returns terminal shell configured for this repo'
@@ -529,7 +532,7 @@ def _extendchangectx(changectx):
 
         def thgbranchhead(self):
             '''True if self is a branch head'''
-            return self in self._repo._branchheads
+            return self.node() in self._repo._branchheads
 
         def changesToParent(self, whichparent):
             parent = self.parents()[whichparent]
