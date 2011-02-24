@@ -32,8 +32,6 @@ class RejectsDialog(QDialog):
         self.setLayout(QVBoxLayout())
         editor = qscilib.Scintilla()
         editor.setBraceMatching(qsci.SloppyBraceMatch)
-        editor.setMarginLineNumbers(1, True)
-        editor.setMarginWidth(1, '000')
         editor.setFolding(qsci.BoxedTreeFoldStyle)
         editor.installEventFilter(qscilib.KeyPressInterceptor(self))
         editor.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -98,6 +96,8 @@ class RejectsDialog(QDialog):
         editor.setModified(False)
         lexer = lexers.get_lexer(path, f.readData(1024), self)
         editor.setLexer(lexer)
+        editor.setMarginLineNumbers(1, True)
+        editor.setMarginWidth(1, str(editor.lines())+'X')
 
         buf = cStringIO.StringIO()
         try:
