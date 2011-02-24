@@ -7,6 +7,7 @@
 
 import os
 import re
+import time
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -653,8 +654,10 @@ class MQWidget(QWidget):
             self.qnewOrRefreshBtn.setEnabled(True)
             self.messageEditor.setEnabled(True)
             self.patchNameLE.setEnabled(True)
-            self.patchNameLE.selectAll()
             self.patchNameLE.setFocus()
+            self.patchNameLE.setText(time.strftime('%Y-%m-%d_%H-%M-%S') + \
+                 '_r%d+.diff' % self.repo['.'].rev())
+            self.patchNameLE.selectAll()
             self.setMessage('')
         else:
             self.qnewOrRefreshBtn.setText(_('QRefresh'))
