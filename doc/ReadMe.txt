@@ -4,9 +4,9 @@ To build this documentation you need sphinx installed.  On Ubuntu this
 is the python-sphinx package.   On Windows your best bet is
 easy_install.  To build without warnings, you need sphinx 0.6 or later.
 
-To build PDF files you need latex packages.  On Ubuntu this is
-texlive-latex-extra and all of it's dependencies.  On Windows the best
-choice is miktex.
+To build PDF files you need latex packages.  On Ubuntu these are
+texlive-latex-extra, texlive-fonts-recommended and all of their
+dependencies.  On Windows the best choice is miktex.
 
 Once all of the prerequisites are in place, you can use the makefile to
 build targets: html htmlhelp latex
