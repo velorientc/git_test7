@@ -27,6 +27,7 @@ class RejectsDialog(QDialog):
         super(RejectsDialog, self).__init__(parent)
         self.setWindowTitle(_('Merge rejected patch chunks into %s') %
                             hglib.tounicode(path))
+        self.setWindowFlags(Qt.Window)
         self.path = path
 
         self.setLayout(QVBoxLayout())
