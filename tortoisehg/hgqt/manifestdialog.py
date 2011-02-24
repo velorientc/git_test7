@@ -130,6 +130,8 @@ class ManifestWidget(QWidget):
         self._setupmodel()
         self._treeview.setCurrentIndex(self._treemodel.index(0, 0))
 
+        self.setRev(self._rev)
+
     def _initwidget(self):
         self.setLayout(QVBoxLayout())
         self._splitter = QSplitter()
@@ -249,7 +251,7 @@ class ManifestWidget(QWidget):
         if self.path is None:
             return
         if self.rev is None:
-            files = [repo.wjoin(self.path)]
+            files = [self._repo.wjoin(self.path)]
             wctxactions.edit(self, self._repo.ui, self._repo, files)
         else:
             base, _ = visdiff.snapshot(self._repo, [self.path],
@@ -345,10 +347,10 @@ class ManifestWidget(QWidget):
         """Change revision to show"""
         self.setSource(self.path, rev)
         real = type(rev) is int
-        for act in ['ldiff', 'edit']:
-            self._actions[act].setEnabled(real)
-        for act in ['diff', 'revert']:
+        self._actions['ldiff'].setEnabled(real)
+        for act in ['diff', 'edit']:
             self._actions[act].setEnabled(real or rev is None)
+        self._actions['revert'].setEnabled(real)
 
     @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
