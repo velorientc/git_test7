@@ -63,13 +63,13 @@ class PatchBranchWidget(QWidget):
         self.actionBackport = a = QWidgetAction(self)
         a.setIcon(geticon("go-previous"))
         a.setToolTip(_('Backout current patch branch'))
-        tb.addAction(self.actionBackport)
+        #tb.addAction(self.actionBackport)
         #self.actionBackport.triggered.connect(self.pbackout_clicked)
 
         self.actionReapply = a = QWidgetAction(self)
         a.setIcon(geticon("go-next"))
         a.setToolTip(_('Backport part of a changeset to a dependency'))
-        tb.addAction(self.actionReapply)
+        #tb.addAction(self.actionReapply)
         #self.actionReapply.triggered.connect(self.reapply_clicked)
 
        	self.actionPNew = a = QWidgetAction(self)
@@ -81,7 +81,7 @@ class PatchBranchWidget(QWidget):
         self.actionEditPGraph = a = QWidgetAction(self)
         a.setIcon(geticon("log")) #STOCK_EDIT
         a.setToolTip(_('Edit patch dependency graph'))
-        tb.addAction(self.actionEditPGraph)
+        #tb.addAction(self.actionEditPGraph)
         #self.actionEditPGraph.triggered.connect(self.pbackout_clicked)
 
         vbox.addWidget(self.toolBar_patchbranch, 1)
