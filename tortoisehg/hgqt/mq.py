@@ -510,7 +510,7 @@ class MQWidget(QWidget):
 
     @pyqtSlot()
     def launchQQueueTool(self):
-        dlg = qqueue.QQueueDialog(self.repo, self)
+        dlg = qqueue.QQueueDialog(self.repo, True, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)

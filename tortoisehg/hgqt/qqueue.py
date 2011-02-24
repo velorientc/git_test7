@@ -27,7 +27,7 @@ class QQueueDialog(QDialog):
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, embedded=False, parent=None):
         super(QQueueDialog, self).__init__(parent)
 
         self.setWindowIcon(qtlib.geticon('thg-mq'))
@@ -111,7 +111,7 @@ class QQueueDialog(QDialog):
         botsep = qtlib.LabeledSeparator('')
         layout.addWidget(botsep)
 
-        cmd = cmdui.Runner()
+        cmd = cmdui.Runner(_('QQueue'), not embedded, self)
         cmd.output.connect(self.output)
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.commandFinished.connect(self.qqcmdFinished)
