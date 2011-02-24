@@ -109,6 +109,7 @@ def SetIcon(hwnd, name, add=False):
 
 class MainWindow:
     def __init__(self):
+        self.pipethread = None
         msg_TaskbarRestart = RegisterWindowMessage("TaskbarCreated");
         message_map = {
                 msg_TaskbarRestart: self.OnRestart,
@@ -210,6 +211,9 @@ class MainWindow:
             return True
 
     def start_pipe_server(self):
+        if self.pipethread is not None:
+            return
+
         def servepipe():
             self.svc = PipeServer(self.hwnd)
             self.svc.SvcDoRun()
