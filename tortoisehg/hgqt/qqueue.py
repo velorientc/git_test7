@@ -37,6 +37,7 @@ class QQueueDialog(QDialog):
 
         self.repo = repo
         repo.repositoryChanged.connect(self.reload)
+        self.needsRefresh = False
 
         layout = QVBoxLayout()
         layout.setMargin(4)
@@ -289,6 +290,7 @@ class QQueueDialog(QDialog):
               _("Do you really want to delete patch queue '%s' ?") % uq,
               parent=self, defaultbutton=QMessageBox.No):
             opts = ['--delete', q]
+            self.needsRefresh = True
             self.qqueueCommand(opts)
 
     @pyqtSlot()
@@ -302,12 +304,14 @@ class QQueueDialog(QDialog):
                 "<p>Do you really want to purge patch queue '%s' ?</p>") % uq,
                 parent=self, defaultbutton=QMessageBox.No):
             opts = ['--purge', q]
+            self.needsRefresh = True
             self.qqueueCommand(opts)
 
     def qqcmdFinished(self, ret):
         self.repo.decrementBusyCount()
-        if ret:
+        if ret or self.needsRefresh:
             self.reload()
+            self.needsRefresh = False
 
     def qqueueCommand(self, opts):
         self.setButtonState(False)
