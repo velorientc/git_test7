@@ -977,8 +977,7 @@ table = {
     "^guess": (guess, [], _('thg guess')),
     "^hgignore|ignore|filter": (hgignore, [], _('thg hgignore [FILE]')),
     "import": (thgimport,
-        [('', 'repo', False, _('import to the repository')),
-         ('', 'mq', False, _('import to the patch queue (MQ)'))],
+        [('', 'mq', False, _('import to the patch queue (MQ)'))],
         _('thg import [OPTION] [SOURCE]...')),
     "^init": (init, [], _('thg init [DEST]')),
     "^email":

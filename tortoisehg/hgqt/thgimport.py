@@ -22,7 +22,7 @@ from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo, commit
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
 
-# TODO: handle --repo and --mq options from command line or MQ widget
+# TODO: handle --mq options from command line or MQ widget
 
 class ImportDialog(QDialog):
     """Dialog to import patches"""
