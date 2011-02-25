@@ -567,7 +567,7 @@ class RepoWidget(QWidget):
     def modelFilled(self):
         'initial batch of revisions loaded'
         self.repoview.resizeColumns()
-        self.repoview.goto(self._reload_rev) # emits revision_selected
+        self.repoview.goto(self._reload_rev) # emits revisionSelected
         self.revDetailsWidget.finishReload()
 
     def modelLoaded(self):
@@ -593,7 +593,7 @@ class RepoWidget(QWidget):
             self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
             self.syncDemand.forward('refreshTargets', rev)
-        self.revDetailsWidget.revision_selected(rev)
+        self.revDetailsWidget.onRevisionSelected(rev)
         self.revisionSelected.emit(rev)
 
     def gotoParent(self):

@@ -207,7 +207,8 @@ class RevDetailsWidget(QWidget):
     def onFileRevSelected(self, file, rev, status):
         self.fileview.displayFile(file, rev, status)
 
-    def revision_selected(self, rev):
+    def onRevisionSelected(self, rev):
+        'called by repowidget when repoview changes revisions'
         self._last_rev = rev
         ctx = self.repo.changectx(rev)
         self.revpanel.set_revision(rev)
@@ -220,7 +221,7 @@ class RevDetailsWidget(QWidget):
     @pyqtSlot()
     def _updatedeschtmlizer(self):
         self._deschtmlize = descriptionhtmlizer(self.repo.ui)
-        self.revision_selected(self._last_rev)  # regenerate desc html
+        self.onRevisionSelected(self._last_rev)  # regenerate desc html
 
     def record(self):
         'Repo widget is reloading, record current file'
@@ -238,7 +239,7 @@ class RevDetailsWidget(QWidget):
         if type(self._last_rev) is int and len(self.repo) <= self._last_rev:
             self._last_rev = 'tip'
         f = self.filelist.currentFile()
-        self.revision_selected(self._last_rev)
+        self.onRevisionSelected(self._last_rev)
         self.filelist.selectFile(f)
 
     def saveSettings(self, s):
