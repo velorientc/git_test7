@@ -232,6 +232,7 @@ class RepoWidget(QWidget):
             pats = {}
             opts = {}
             b = QPushButton(_('Commit'))
+            b.setIcon(qtlib.geticon('hg-commit'))
             b.setAutoDefault(True)
             f = b.font()
             f.setWeight(QFont.Bold)

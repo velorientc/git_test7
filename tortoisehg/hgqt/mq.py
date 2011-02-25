@@ -158,7 +158,14 @@ class MQWidget(QWidget):
         qrefhbox.setContentsMargins(0, 0, 0, 0)
         self.qqueueBtn = QPushButton(_('Manage queues'))
         self.qqueueBtn.setMinimumWidth(150)
-        self.qnewOrRefreshBtn = QPushButton(_('QRefresh'))
+
+        b = QPushButton(_('QRefresh'))
+        f = b.font()
+        f.setWeight(QFont.Bold)
+        b.setFont(f)
+        b.setIcon(qtlib.geticon('hg-commit'))
+        self.qnewOrRefreshBtn = b
+
         qrefhbox.addWidget(self.qqueueBtn)
         qrefhbox.addStretch(1)
         qrefhbox.addWidget(self.qnewOrRefreshBtn)
