@@ -325,7 +325,7 @@ class CloneDialog(QDialog):
         caption = _("Select source repository")
         path = FD.getExistingDirectory(self, caption)
         if path:
-            self.src_combo.setEditText(path)
+            self.src_combo.setEditText(QDir.toNativeSeparators(path))
             self.src_combo.setFocus()
 
     def browse_dest(self):
@@ -333,7 +333,7 @@ class CloneDialog(QDialog):
         caption = _("Select destination repository")
         path = FD.getExistingDirectory(self, caption)
         if path:
-            self.dest_combo.setEditText(path)
+            self.dest_combo.setEditText(QDir.toNativeSeparators(path))
             self.dest_combo.setFocus()
 
     def command_started(self):
