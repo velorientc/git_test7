@@ -59,9 +59,9 @@ class RevertDialog(QDialog):
         else:
             cmdline = ['revert', '--repository', self.repo.root, self.wfile]
         cmdline += ['--rev', self.rev]
+        self.bbox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.cmd.run(cmdline)
 
     def finished(self, ret):
         if ret == 0:
-            self.bbox.button(QDialogButtonBox.Ok).setVisible(False)
-            self.bbox.button(QDialogButtonBox.Cancel).setText(_('Close'))
+            self.reject()
