@@ -147,15 +147,19 @@ class SyncWidget(QWidget):
 
         style = QApplication.style()
 
-        urlbox = QGroupBox(_('Remote Repository'))
-        self.layout().addWidget(urlbox)
-        vbox = QVBoxLayout()
-        vbox.setSpacing(4)
-        urlbox.setLayout(vbox)
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(hbox)
+        hbox.addWidget(QLabel(_('<b>Remote Repository:</b>')))
+        self.urllabel = QLabel()
+        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.urllabel.setAcceptDrops(False)
+        hbox.addWidget(self.urllabel)
+        hbox.addStretch()
 
         hbox = QHBoxLayout()
-        hbox.setSpacing(4)
-        vbox.addLayout(hbox)
+        hbox.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(hbox)
 
         self.schemecombo = QComboBox()
         for s in _schemes:
@@ -198,12 +202,6 @@ class SyncWidget(QWidget):
         self.savebutton.setToolTip(_('Save current URL under an alias'))
         hbox.addWidget(self.savebutton)
 
-        self.urllabel = QLabel()
-        self.urllabel.setMargin(4)
-        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.urllabel.setAcceptDrops(False)
-        vbox.addWidget(self.urllabel)
-
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         self.hgrctv = PathsTree(self, True)
@@ -215,7 +213,7 @@ class SyncWidget(QWidget):
         pathsbox = QVBoxLayout()
         pathsbox.setContentsMargins(0, 0, 0, 0)
         pathsframe.setLayout(pathsbox)
-        lbl = QLabel(_('<b>Paths in Repository Settings</b>'))
+        lbl = QLabel(_('Paths in Repository Settings:'))
         pathsbox.addWidget(lbl)
         pathsbox.addWidget(self.hgrctv)
         hbox.addWidget(pathsframe)
@@ -230,7 +228,7 @@ class SyncWidget(QWidget):
         pathsbox = QVBoxLayout()
         pathsbox.setContentsMargins(0, 0, 0, 0)
         pathsframe.setLayout(pathsbox)
-        lbl = QLabel(_('<b>Related Paths</b>'))
+        lbl = QLabel(_('Related Paths:'))
         pathsbox.addWidget(lbl)
         pathsbox.addWidget(self.reltv)
         hbox.addWidget(pathsframe)
