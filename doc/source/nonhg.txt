@@ -9,6 +9,8 @@ This chapter describes the three most popular Mercurial extensions for
 interoperating with *foreign* VCS systems.  See also `Repository
 Conversion <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
 
+.. _perfarce-perforce:
+
 Perfarce (Perforce)
 ===================
 

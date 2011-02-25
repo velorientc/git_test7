@@ -56,7 +56,8 @@ Perfarce
 `Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ home
 page.
 
-This extension is documented `elsewhere <nonhg.html#perfarce>`_.
+This extension is documented in :ref:`perfarce-perforce` section of
+:doc:`nonhg` chapter.
  
 HGEOL
 =====
