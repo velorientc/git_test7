@@ -109,12 +109,11 @@ class BookmarkDialog(QDialog):
         self.setWindowTitle(_('Bookmark - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-bookmarks'))
 
-        self.cmd = cmdui.Widget(True, self)
+        self.cmd = cmdui.Runner(False, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
         self.cmd.progress.connect(self.progress)
         self.cmd.commandFinished.connect(self.commandFinished)
-        box.addWidget(self.cmd)
 
         # prepare to show
         self.clear_status()
