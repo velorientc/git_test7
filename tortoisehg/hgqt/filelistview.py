@@ -103,9 +103,13 @@ class HgFileListView(QTableView):
             self.actionSecondParent.setEnabled(False)
 
     def selectFile(self, filename):
+        'Select given file, if found, else the first file'
         index = self.model().indexFromFile(filename)
-        self.setCurrentIndex(index)
-        self.fileSelected(index)
+        if index:
+            self.setCurrentIndex(index)
+            self.fileSelected(index)
+        elif self.model().count():
+            self.selectRow(0)
 
     def fileActivated(self, index, alternate=False):
         selFile = self.model().fileFromIndex(index)
