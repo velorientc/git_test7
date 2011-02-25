@@ -26,6 +26,7 @@ _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
 
 class ImportDialog(QDialog):
     """Dialog to import patches"""
+    patchImported = pyqtSignal()
 
     def __init__(self, repo, parent, **opts):
         super(ImportDialog, self).__init__(parent)
@@ -308,6 +309,8 @@ class ImportDialog(QDialog):
 
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
+        if ret == 0:
+            self.patchImported.emit()
         if ret is not 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
