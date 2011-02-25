@@ -282,7 +282,8 @@ class MQWidget(QWidget):
         def finished(ret):
             if ret:
                 for i in xrange(self.queueCombo.count()):
-                    if self.queueCombo.itemText(i) == self.repo.thgactivemqname:
+                    if (hglib.fromunicode(self.queueCombo.itemText(i))
+                            == self.repo.thgactivemqname):
                         self.queueCombo.setCurrentIndex(i)
                         break
         self.finishfunc = finished
