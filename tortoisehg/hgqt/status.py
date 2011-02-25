@@ -99,7 +99,7 @@ class StatusWidget(QWidget):
         tb.setIcon(qtlib.geticon('view-refresh'))
         tb.clicked.connect(self.refreshWctx)
         le = QLineEdit()
-        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText('### filter text ###')
         else:
             lbl = QLabel(_('Filter:'))
@@ -515,7 +515,7 @@ class WctxModel(QAbstractTableModel):
             if ms[f] == 'u' and f not in nchecked:
                 nchecked[f] = checked.get(f, True)
                 rows.append(mkrow(f, 'C'))
-        self.headers = ('*', _('Stat'), _('M'), _('Filename'), 
+        self.headers = ('*', _('Stat'), _('M'), _('Filename'),
                         _('Type'), _('Size (KB)'))
         self.checked = nchecked
         self.unfiltered = rows
@@ -686,6 +686,7 @@ class StatusDialog(QDialog):
         self.stwidget.showMessage.connect(self.statusbar.showMessage)
         self.stwidget.progress.connect(self.statusbar.progress)
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
+        self.stwidget.linkActivated.connect(self.linkActivated)
 
         self.setWindowTitle(self.stwidget.getTitle())
         self.setWindowFlags(Qt.Window)
@@ -693,6 +694,20 @@ class StatusDialog(QDialog):
 
         QShortcut(QKeySequence.Refresh, self, self.stwidget.refreshWctx)
         QTimer.singleShot(0, self.stwidget.refreshWctx)
+
+    def linkActivated(self, link):
+        link = hglib.fromunicode(link)
+        if link.startswith('subrepo:'):
+            from tortoisehg.hgqt.run import qtrun
+            from tortoisehg.hgqt import commit
+            qtrun(commit.run, ui.ui(), root=link[8:])
+        if link.startswith('shelve:'):
+            repo = self.commit.repo
+            from tortoisehg.hgqt import shelve
+            dlg = shelve.ShelveDialog(repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+            self.refresh()
 
     def loadSettings(self):
         s = QSettings()
