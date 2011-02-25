@@ -147,16 +147,9 @@ class QReorderDialog(QDialog):
         ulw.clear()
         alw.clear()
         for p in reversed(patchnames):
-            # Each row in the patch list has the
-            # format [patchname] patchdescription
-            # The patch description is the first line of the patch message
-            # If the message has more than one line, we add "..." to the first
-            # line to create the patch description
-            patchmessage = mq.patchheader(self.repo.mq.join(p)).message
-            patchdesc = patchmessage[0]
-            if len(patchmessage) > 1:
-                patchdesc = patchdesc + '...'
-            item = QListWidgetItem('[%s]\t%s' % (hglib.tounicode(p), hglib.tounicode(patchdesc)))
+            ctx = self.repo.changectx(p)
+            desc = ctx.longsummary()
+            item = QListWidgetItem('[%s]\t%s' % (hglib.tounicode(p), desc))
             # Save the patchname with the item so that we can easily
             # retrieve it later
             item.patchname = p
@@ -181,13 +174,8 @@ class QReorderDialog(QDialog):
             self.alw.setFocus()
 
     def showSummary(self, item):
-        try:
-            # Note that item.patchname uses the local encoding and hence does
-            # not need to be converted from unicode
-            txt = '\n'.join(mq.patchheader(self.repo.mq.join(item.patchname)).message)
-            self.summ.setText(hglib.tounicode(txt))
-        except:
-            pass
+        ctx = self.repo.changectx(item.patchname)
+        self.summ.setText(hglib.tounicode(ctx.description()))
 
     def accept(self):
         self._writesettings()
