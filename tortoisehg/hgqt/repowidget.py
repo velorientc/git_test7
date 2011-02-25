@@ -466,6 +466,7 @@ class RepoWidget(QWidget):
     def thgimport(self, paths=None):
         dlg = thgimport.ImportDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
+        dlg.patchImported.connect(self.gotoTip)
         if paths:
             dlg.setfilepaths(paths)
         dlg.exec_()
@@ -598,6 +599,10 @@ class RepoWidget(QWidget):
     def gotoParent(self):
         self.repoview.clearSelection()
         self.goto('.')
+
+    def gotoTip(self):
+        self.repoview.clearSelection()
+        self.goto('tip')
 
     def goto(self, rev):
         self._reload_rev = rev
