@@ -951,7 +951,7 @@ class SaveDialog(QDialog):
     def __init__(self, repo, alias, origurl, safeurl, parent):
         super(SaveDialog, self).__init__(parent)
 
-        self.setWindowTitle(_('Save Peer Path'))
+        self.setWindowTitle(_('Save Path'))
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 
