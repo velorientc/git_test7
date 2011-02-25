@@ -159,6 +159,10 @@ class RepoWidget(QWidget):
         self.commitTabIndex = idx = tt.addTab(w, geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
+        self.syncDemand = w = DemandWidget(self.createSyncWidget)
+        self.syncTabIndex = idx = tt.addTab(w, geticon('thg-sync'), '')
+        tt.setTabToolTip(idx, _("Synchronize"))
+
         self.manifestDemand = w = DemandWidget(self.createManifestWidget)
         self.manifestTabIndex = idx = tt.addTab(w, geticon('hg-annotate'), '')
         tt.setTabToolTip(idx, _('Manifest'))
@@ -166,10 +170,6 @@ class RepoWidget(QWidget):
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
         self.grepTabIndex = idx = tt.addTab(w, geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
-
-        self.syncDemand = w = DemandWidget(self.createSyncWidget)
-        self.syncTabIndex = idx = tt.addTab(w, geticon('thg-sync'), '')
-        tt.setTabToolTip(idx, _("Synchronize"))
 
         self.mqDemand = w = DemandWidget(self.createMQWidget)
         if 'mq' in self.repo.extensions():
