@@ -803,7 +803,7 @@ class Runner(QWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, title=_('TortoiseHg'), useInternal=True, parent=None):
+    def __init__(self, useInternal, parent):
         super(Runner, self).__init__(parent)
 
         # XXX: workaround not to eat mouse-click around left-top corner of
@@ -813,7 +813,7 @@ class Runner(QWidget):
         self.resize(0, 0)
 
         self.internallog = useInternal
-        self.title = title
+        self.title = _('TortoiseHg')
 
         self.core = Core(useInternal, self)
         self.core.commandStarted.connect(self.commandStarted)
@@ -827,6 +827,9 @@ class Runner(QWidget):
             self.core.outputLog.setMinimumSize(460, 320)
 
     ### Public Methods ###
+
+    def setTitle(self, title):
+        self.title = title
 
     def run(self, cmdline, *args, **opts):
         self.core.run(cmdline, *args, **opts)
@@ -847,14 +850,11 @@ class Runner(QWidget):
         if not self.internallog:
             return
         if not hasattr(self, 'dlg'):
-            self.dlg = QDialog(self)
-            self.dlg.setWindowTitle(self.title)
-            flags = self.dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint
-            self.dlg.setWindowFlags(flags)
-            box = QVBoxLayout()
-            box.setContentsMargins(*(0,)*4)
-            box.addWidget(self.core.outputLog)
-            self.dlg.setLayout(box)
+            self.dlg = dlg = QDialog(self)
+            dlg.setWindowTitle(self.title)
+            dlg.setWindowFlags(Qt.Dialog)
+            dlg.setLayout(QVBoxLayout())
+            dlg.layout().addWidget(self.core.outputLog)
         self.dlg.setVisible(visible)
 
     ### Signal Handler ###

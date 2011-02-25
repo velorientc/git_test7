@@ -82,7 +82,7 @@ class QuickOpDialog(QDialog):
         self.statusbar.setSizeGripEnabled(False)
         stwidget.showMessage.connect(self.statusbar.showMessage)
 
-        self.cmd = cmd = cmdui.Runner(parent=self)
+        self.cmd = cmd = cmdui.Runner(True, self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.progress.connect(self.statusbar.progress)
@@ -158,7 +158,7 @@ class HeadlessQuickop(QWidget):
         QWidget.__init__(self)
         self.files = cmdline[1:]
         os.chdir(repo.root)
-        self.cmd = cmdui.Runner(parent=self)
+        self.cmd = cmdui.Runner(True, self)
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.run(cmdline)
         self.hide()

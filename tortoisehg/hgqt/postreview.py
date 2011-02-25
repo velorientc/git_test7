@@ -333,7 +333,8 @@ class PostReviewDialog(QDialog):
         self.qui.post_review_button.setEnabled(False)
         self.qui.close_button.setEnabled(False)
 
-        self.cmd = cmdui.Runner(_('Review Board'), False, self)
+        self.cmd = cmdui.Runner(False, self)
+        self.cmd.setTitle(_('Review Board'))
         self.cmd.commandFinished.connect(self.onCompletion)
         self.cmd.run(['postreview'] + cmdargs(opts) + [revstr])
 

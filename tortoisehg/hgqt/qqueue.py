@@ -111,7 +111,8 @@ class QQueueDialog(QDialog):
         botsep = qtlib.LabeledSeparator('')
         layout.addWidget(botsep)
 
-        cmd = cmdui.Runner(_('QQueue'), not embedded, self)
+        cmd = cmdui.Runner(not embedded, self)
+        cmd.setTitle(_('QQueue'))
         cmd.output.connect(self.output)
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.commandFinished.connect(self.qqcmdFinished)

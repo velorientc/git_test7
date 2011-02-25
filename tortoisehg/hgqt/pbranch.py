@@ -99,7 +99,7 @@ class PatchBranchWidget(QWidget):
         vbox.addWidget(self.patchlist, 1)
 
         # Command output
-        self.runner = cmdui.Runner(_('Patch Branch'), True, parent=self)
+        self.runner = cmdui.Runner(False, self)
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)

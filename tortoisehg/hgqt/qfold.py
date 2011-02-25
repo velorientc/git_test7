@@ -92,7 +92,7 @@ class QFoldDialog(QDialog):
         self.summ.setFocusPolicy(Qt.NoFocus)
         self.layout().addWidget(self.summ)
 
-        self.cmd = cmdui.Runner()
+        self.cmd = cmdui.Runner(False, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
 

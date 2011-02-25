@@ -71,13 +71,18 @@ class RepoWidget(QWidget):
         else:
             self._reload_rev = '.'
         self.currentMessage = ''
-        self.runner = None
         self.dirty = False
 
         self.setupUi()
         self.createActions()
         self.loadSettings()
         self.setupModels()
+
+        self.runner = cmdui.Runner(False, self)
+        self.runner.output.connect(self.output)
+        self.runner.progress.connect(self.progress)
+        self.runner.makeLogVisible.connect(self.makeLogVisible)
+        self.runner.commandFinished.connect(self.onCommandFinished)
 
     def setupUi(self):
         SP = QSizePolicy
@@ -523,7 +528,7 @@ class RepoWidget(QWidget):
                       'Continue?' % rev)):
                     return
         cmdline = ['rollback', '--repository', self.repo.root, '--verbose']
-        self.runCommand(_('Rollback - TortoiseHg'), cmdline)
+        self.runCommand(cmdline)
 
     def purge(self):
         dlg = purge.PurgeDialog(self.repo, self)
@@ -739,6 +744,9 @@ class RepoWidget(QWidget):
         if not self.grepDemand.forward('canExit', default=True):
             self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
             self.showMessage(_('Search tab cannot exit'))
+            return False
+        if self.runner.core.running():
+            self.showMessage(_('Repository command still running'))
             return False
         return True
 
@@ -1122,7 +1130,7 @@ class RepoWidget(QWidget):
                    '--output', epath]
         for rev in revisions:
             cmdline.extend(['--rev', str(rev)])
-        self.runCommand(_('Export - TortoiseHg'), cmdline)
+        self.runCommand(cmdline)
 
     def visualDiffRevision(self):
         opts = dict(change=self.rev)
@@ -1170,7 +1178,7 @@ class RepoWidget(QWidget):
 
     def transplantRevision(self):
         cmdline = ['transplant', '--repository', self.repo.root, str(self.rev)]
-        self.runCommand(_('Transplant - TortoiseHg'), cmdline)
+        self.runCommand(cmdline)
 
     def backoutToRevision(self):
         dlg = backout.BackoutDialog(self.repo, str(self.rev), self)
@@ -1239,20 +1247,20 @@ class RepoWidget(QWidget):
             endrev = ''
         cmdline = ['qimport', '--rev', '%s::%s' % (self.rev, endrev),
                    '--repository', self.repo.root]
-        self.runCommand(_('QImport - TortoiseHg'), cmdline)
+        self.runCommand(cmdline)
 
     def qfinishRevision(self):
         """Finish applied patches up to and including selected revision"""
         cmdline = ['qfinish', 'qbase::%s' % self.rev,
                    '--repository', self.repo.root]
-        self.runCommand(_('QFinish - TortoiseHg'), cmdline)
+        self.runCommand(cmdline)
 
     def qgotoRevision(self):
         """Make REV the top applied patch"""
         ctx = self.repo.changectx(self.rev)
         if 'qparent' in ctx.tags():
             cmdline = ['qpop', '--all', '--repository', self.repo.root]
-            self.runCommand(_('QGoto - TortoiseHg'), cmdline)
+            self.runCommand(cmdline)
         else:
             patchname = self.repo.changectx(self.rev).thgmqpatchname()
             self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
@@ -1264,20 +1272,15 @@ class RepoWidget(QWidget):
         patchname = self.repo.changectx(self.rev).thgmqpatchname()
         cmdline = ['qpush', '--move', str(patchname),
                    '--repository', self.repo.root]
-        self.runCommand(_('QPush --move - TortoiseHg'), cmdline)
+        self.runCommand(cmdline)
 
-    def runCommand(self, title, cmdline):
-        if self.runner:
+    def onCommandFinished(self, ret):
+        self.repo.decrementBusyCount()
+
+    def runCommand(self, cmdline):
+        if self.runner.core.running():
             InfoMsgBox(_('Unable to start'),
                        _('Previous command is still running'))
             return
-        def finished(ret):
-            self.repo.decrementBusyCount()
-            self.runner = None
-        self.runner = cmdui.Runner(title, False, self)
-        self.runner.output.connect(self.output)
-        self.runner.progress.connect(self.progress)
-        self.runner.makeLogVisible.connect(self.makeLogVisible)
-        self.runner.commandFinished.connect(finished)
         self.repo.incrementBusyCount()
         self.runner.run(cmdline)

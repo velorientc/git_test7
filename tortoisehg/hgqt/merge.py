@@ -457,7 +457,7 @@ class MergePage(BasePage):
                     self.check_status()
             cmdline = ['update', '--clean', '--repository', repo.root,
                        '--rev', '.']
-            self.runner = cmdui.Runner(_('Discard - TortoiseHg'), True, self)
+            self.runner = cmdui.Runner(True, self)
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
             self.runner.run(cmdline)
@@ -476,7 +476,7 @@ class MergePage(BasePage):
                              '%(new)s</b>.  <a href="rename:%(new)s"><b>'
                              'Rename</b></a> again?')
                     self.wd_text.setText(text % dict(old=patch, new=name))
-            self.runner = cmdui.Runner(_('Rename - TortoiseHg'), True, self)
+            self.runner = cmdui.Runner(True, self)
             self.runner.commandFinished.connect(finished)
             repo.incrementBusyCount()
             self.runner.run(['qrename', '--repository', repo.root,

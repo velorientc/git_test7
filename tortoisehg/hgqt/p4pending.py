@@ -39,7 +39,7 @@ class PerforcePending(QDialog):
         self.cslist = cslist.ChangesetList()
         layout.addWidget(self.cslist)
 
-        self.cmd = cmdui.Runner(parent=self)
+        self.cmd = cmdui.Runner(False, self)
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)

@@ -39,7 +39,7 @@ class QRenameDialog(QDialog):
         self.le = QLineEdit(hglib.tounicode(self.oldpatchname))
         self.layout().addWidget(self.le)
 
-        self.cmd = cmdui.Runner()
+        self.cmd = cmdui.Runner(True, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
         self.cmd.commandFinished.connect(self.reject)

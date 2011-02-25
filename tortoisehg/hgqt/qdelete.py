@@ -38,7 +38,7 @@ class QDeleteDialog(QDialog):
         self.keepchk.setChecked(True)
         self.layout().addWidget(self.keepchk)
 
-        self.cmd = cmdui.Runner()
+        self.cmd = cmdui.Runner(False, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
 

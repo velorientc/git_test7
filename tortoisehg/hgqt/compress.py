@@ -160,7 +160,7 @@ class CompressDialog(QDialog):
                     self.checkStatus()
             cmdline = ['update', '--clean', '--repository', self.repo.root,
                        '--rev', '.']
-            self.runner = cmdui.Runner(_('Discard - TortoiseHg'), True, self)
+            self.runner = cmdui.Runner(False, self)
             self.runner.commandFinished.connect(finished)
             self.repo.incrementBusyCount()
             self.runner.run(cmdline)

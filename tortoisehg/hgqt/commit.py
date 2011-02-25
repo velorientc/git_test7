@@ -177,7 +177,8 @@ class CommitWidget(QWidget):
         self.stwidget.fileDisplayed.connect(self.fileDisplayed)
         self.msghistory = []
         self.repo = repo = self.stwidget.repo
-        self.runner = cmdui.Runner(_('Commit'), not embedded, self)
+        self.runner = cmdui.Runner(not embedded, self)
+        self.runner.setTitle(_('Commit'))
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
