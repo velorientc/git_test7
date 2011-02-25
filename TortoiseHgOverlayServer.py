@@ -2,40 +2,81 @@
 # messages printed. Takes an optional logfile as first command
 # line parameter
 
-import gc
-import os
 import sys
+
+if hasattr(sys, "frozen"):
+    class BlackHole(object):
+        closed = True
+        softspace = 0
+        def write(self, data):
+            pass
+        def close(self):
+            pass
+        def flush(self):
+            pass
+    sys.stdout = BlackHole()
+    sys.stderr = BlackHole()
+
+import os
 import time
 import threading
 import cStringIO
 import Queue
+import traceback
+import gc
 
-from win32api import *
-from win32gui import *
-
-import win32pipe
-import win32con
-import win32event
-import win32file
-import winerror
-import pywintypes
-import win32security
+try:
+    from win32api import *
+    from win32gui import *
+    import win32pipe
+    import win32con
+    import win32event
+    import win32file
+    import winerror
+    import pywintypes
+    import win32security
+except ImportError, e:
+    print 'Fatal error at startup', e
+    sys.exit(1)
 
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
 demandimport.enable()
 from mercurial import ui, error
+from mercurial.windows import posixfile, unlink, rename
 from tortoisehg.util.i18n import agettext as _
-from tortoisehg.util import thread2, paths, shlib
-
-if hasattr(sys, "frozen"):
-    # Give stdout/stderr closed attributes to prevent ui.py errors
-    sys.stdout.closed = True
-    sys.stderr.closed = True
+from tortoisehg.util import thread2, paths, shlib, version
 
 APP_TITLE = _('TortoiseHg Overlay Icon Server')
 
 EXIT_CMD = 1025
+
+class Logger():
+    def __init__(self):
+        self.file = None
+
+    def setfile(self, name):
+        oname = name + '.old'
+        try:
+            rename(name, oname)
+        except:
+            pass
+        self.file = posixfile(name, 'wb')
+        self.msg('%s, Version %s' % (APP_TITLE, version.version()))
+        self.msg('Logging to file started')
+
+    def msg(self, msg):
+        ts = '[%s] ' % time.strftime('%c')
+        f = self.file
+        if f:
+            f.write(ts + msg + '\n')
+            f.flush()
+            os.fsync(f.fileno())
+            print 'L' + ts + msg
+        else:
+            print ts + msg
+
+logger = Logger()
 
 def SetIcon(hwnd, name, add=False):
     # Try and find a custom icon
@@ -68,6 +109,7 @@ def SetIcon(hwnd, name, add=False):
 
 class MainWindow:
     def __init__(self):
+        self.pipethread = None
         msg_TaskbarRestart = RegisterWindowMessage("TaskbarCreated");
         message_map = {
                 msg_TaskbarRestart: self.OnRestart,
@@ -100,9 +142,11 @@ class MainWindow:
         self.start_pipe_server()
 
     def OnRestart(self, hwnd, msg, wparam, lparam):
+        logger.msg("MainWindow.OnRestart")
         self._DoCreateIcons()
 
     def OnDestroy(self, hwnd, msg, wparam, lparam):
+        logger.msg("MainWindow.OnDestroy")
         nid = (self.hwnd, 0)
         try:
             Shell_NotifyIcon(NIM_DELETE, nid)
@@ -133,13 +177,15 @@ class MainWindow:
             print "Unknown command -", id
 
     def exit_application(self):
+        logger.msg("MainWindow.exit_application")
         if self.stop_pipe_server():
             DestroyWindow(self.hwnd)
-        print "Goodbye"
+        logger.msg("Goodbye")
 
     def stop_pipe_server(self):
-        print "Stopping pipe server..."
+        logger.msg("MainWindow.stop_pipe_server")
         if not self.pipethread.isAlive():
+            logger.msg("pipethread is not alive")
             return True
 
         # Try the nice way first
@@ -153,16 +199,21 @@ class MainWindow:
                 self.pipethread.terminate()
                 win32pipe.CallNamedPipe(PIPENAME, '', PIPEBUFSIZE, 0)
             except:
+                logger.msg(traceback.format_exc())
                 pass
             cnt += 1
-            
+
         if self.pipethread.isAlive():
-            print "WARNING: unable to stop server after %d trys." % max_try
+            msg = "WARNING: unable to stop server after %d trys." % max_try
+            logger.msg(msg)
             return False
         else:
             return True
 
     def start_pipe_server(self):
+        if self.pipethread is not None:
+            return
+
         def servepipe():
             self.svc = PipeServer(self.hwnd)
             self.svc.SvcDoRun()
@@ -176,38 +227,22 @@ PIPENAME += GetUserName()
 
 PIPEBUFSIZE = 4096
 
-class Logger():
-    def __init__(self):
-        self.file = None
-
-    def setfile(self, name):
-        self.file = open(name, 'wb')
-        self.msg('Logging to file started')
-
-    def msg(self, msg):
-        ts = '[%s] ' % time.strftime('%c')
-        f = self.file
-        if f:
-            f.write(ts + msg + '\n')
-            f.flush()
-            os.fsync(f.fileno())
-            print 'L' + ts + msg
-        else:
-            print ts + msg
-
-logger = Logger()
-
 def getrepos(batch):
     roots = set()
     notifypaths = set()
     for path in batch:
         r = paths.find_root(path)
         if r is None:
-            for n in os.listdir(path):
-                r = paths.find_root(os.path.join(path, n))
-                if (r is not None):
-                    roots.add(r)
-                    notifypaths.add(r)
+          try:
+              for n in os.listdir(path):
+                  r = paths.find_root(os.path.join(path, n))
+                  if (r is not None):
+                      roots.add(r)
+                      notifypaths.add(r)
+          except Exception, e:
+              # This exception raises in case of fixutf8 extension enabled
+              # and folder name contains '0x5c'(backslash).
+              logger.msg('Failed listdir %s (%s)' % (path, str(e)))
         else:
             roots.add(r);
             notifypaths.add(path)
@@ -303,13 +338,13 @@ def remove(args):
         for r in sorted(roots):
             tfn = os.path.join(r, '.hg', 'thgstatus')
             try:
-                f = open(tfn, 'rb')
+                f = posixfile(tfn, 'rb')
                 e = f.readline()
                 f.close()
                 if not e.startswith('@@noicons'):
-                    os.remove(tfn)
-            except (IOError, OSError):
-                print "IOError or OSError while trying to remove %s" % tfn
+                    unlink(tfn)
+            except (IOError, OSError), e:
+                logger.msg("Error while trying to remove %s (%s)" % (tfn, e))
                 pass
         if notifypaths:
             shlib.shell_notify(list(notifypaths))
@@ -350,21 +385,22 @@ class PipeServer:
         # Create an event which we will use to wait on.
         # The "service stop" request will set this event.
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
-        
+
         # We need to use overlapped IO for this, so we dont block when
         # waiting for a client to connect.  This is the only effective way
         # to handle either a client connection, or a service stop request.
         self.overlapped = pywintypes.OVERLAPPED()
-        
+
         # And create an event to be used in the OVERLAPPED object.
         self.overlapped.hEvent = win32event.CreateEvent(None,0,0,None)
 
     def SvcStop(self):
-        print 'PipeServer thread terminating'
+        logger.msg("PipeServer.SvcStop")
         win32event.SetEvent(self.hWaitStop)
-        requests.put('terminate')
+        requests.put('terminate|')
 
     def SvcDoRun(self):
+        logger.msg("PipeServer.SvcDoRun")
         # We create our named pipe.
         pipeName = PIPENAME
         openMode = win32pipe.PIPE_ACCESS_DUPLEX | win32file.FILE_FLAG_OVERLAPPED
@@ -388,7 +424,7 @@ class PipeServer:
             try:
                 hr = win32pipe.ConnectNamedPipe(pipeHandle, self.overlapped)
             except pywintypes.error, inst:
-                print "Error connecting pipe: ", inst
+                logger.msg("Error connecting pipe: %s" % inst)
                 pipeHandle.Close()
                 break
 
@@ -418,21 +454,23 @@ class PipeServer:
                 try:
                     requests.put(data)
                     if data == 'terminate|':
-                        print 'PipeServer received terminate from pipe'
-                        print 'posting EXIT_CMD to gui thread...'
+                        logger.msg('PipeServer received terminate from pipe')
                         PostMessage(self.hwnd, win32con.WM_COMMAND, EXIT_CMD, 0)
                         break
                 except SystemExit:
                     raise SystemExit # interrupted by thread2.terminate()
                 except:
-                    import traceback
-                    print "WARNING: something went wrong in requests.put"
-                    print traceback.format_exc()
+                    logger.msg("WARNING: something went wrong in requests.put")
+                    logger.msg(traceback.format_exc())
                     status = "ERROR" 
         # Clean up when we exit
         self.SvcStop()
 
 RUNMUTEXNAME = 'thgtaskbar-' + GetUserName()
+
+def ehook(etype, values, tracebackobj):
+    elist = traceback.format_exception(etype, values, tracebackobj)
+    logger.msg(''.join(elist))
 
 def main():
     args = sys.argv[1:]
@@ -451,6 +489,20 @@ def main():
             logfilename = arg
     if logfilename:
         logger.setfile(logfilename)
+    else:
+        try:
+            from win32com.shell import shell, shellcon
+            appdir = shell.SHGetSpecialFolderPath(0, shellcon.CSIDL_APPDATA)
+        except pywintypes.com_error:
+            appdir = os.environ['APPDATA']
+        logfilename = os.path.join(appdir, 'TortoiseHg', 'OverlayServerLog.txt')
+        try:
+            os.makedirs(os.path.dirname(logfilename))
+        except EnvironmentError:
+            pass
+        logger.setfile(logfilename)
+
+    sys.excepthook = ehook
 
     w=MainWindow()
     PumpMessages()
