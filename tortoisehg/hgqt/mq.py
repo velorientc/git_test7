@@ -772,8 +772,7 @@ class MQWidget(QWidget):
         else:
             super(MQWidget, self).dropEvent(event)
             return
-        dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
-        # TODO: send flag to dialog indicating this is a qimport (alias?)
+        dlg = thgimport.ImportDialog(self.repo, self, mq=True)
         dlg.finished.connect(dlg.deleteLater)
         dlg.setfilepaths(filepaths)
         dlg.exec_()

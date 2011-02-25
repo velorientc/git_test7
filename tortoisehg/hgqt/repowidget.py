@@ -463,7 +463,7 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def thgimport(self, paths=None):
-        dlg = thgimport.ImportDialog(repo=self.repo, parent=self)
+        dlg = thgimport.ImportDialog(self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
         if paths:
             dlg.setfilepaths(paths)

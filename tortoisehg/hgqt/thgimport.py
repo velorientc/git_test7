@@ -22,10 +22,12 @@ from tortoisehg.hgqt import cmdui, cslist, qtlib, thgrepo, commit
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
 
+# TODO: handle --repo and --mq options from command line or MQ widget
+
 class ImportDialog(QDialog):
     """Dialog to import patches"""
 
-    def __init__(self, repo=None, rev=None, parent=None, opts={}):
+    def __init__(self, repo, parent, **opts):
         super(ImportDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
@@ -319,7 +321,7 @@ class ImportDialog(QDialog):
         self.cancel_btn.setDisabled(True)
 
 def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path= paths.find_root())
-    dlg = ImportDialog(repo, opts=opts)
+    repo = thgrepo.repository(ui, path=paths.find_root())
+    dlg = ImportDialog(repo, None, **opts)
     dlg.setfilepaths(pats)
     return dlg
