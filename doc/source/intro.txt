@@ -75,7 +75,7 @@ All legacy TortoiseHg installers (before version 1.0) were built with
 InnoSetup.  They installed a TortoiseOverlay package as a separate
 application, so you always saw both TortoiseHg and TortoiseOverlay as
 two applications in the *Add/Remove Programs* control panel program.
-(On X64 platforms, there were two TortoiseOverlays, one for x86
+(On x64 platforms, there were two TortoiseOverlays, one for x86
 processes and one of x64 processes).
 
 The new MSI installers for TortoiseHg 1.0 and later include the
@@ -103,7 +103,7 @@ To be completely safe, there are two approaches you can take:
 Finally, if you have problems with the shell extension even after
 re-logging in, we recommend you re-run the installer and select the
 *Repair* option.  There were problems with a few versions of
-TortoiseOverlays that cause upgrades to subtly fail until the *Repair*
+TortoiseOverlay that cause upgrades to subtly fail until the *Repair*
 process is run.
 
 

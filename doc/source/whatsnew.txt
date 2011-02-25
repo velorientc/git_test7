@@ -1,5 +1,5 @@
-Whats New
-=========
+What's New
+==========
 
 .. module:: whatsnew.dialog
 	:synopsis: New features in this release
@@ -11,7 +11,7 @@ Philosophy
 ----------
 
 The following philosophical changes were made between TortoiseHg 1.0 and
-TortoieHg 2.0
+TortoiseHg 2.0.
 
 Workbench
 ~~~~~~~~~
@@ -81,7 +81,7 @@ for finding and specifying revisions in your repository.
 
 The Workbench also includes a revision set editor which both teaches the
 user the available keywords and their arguments, and offers brace
-matching, auto-completions, and other editing ameneties.
+matching, auto-completions, and other editing amenities.
 
 In TortoiseHg 2.0, incoming and outgoing changesets are visualized as
 revisions sets.  In previous versions they were represented by graph
@@ -146,7 +146,7 @@ the tracebacks.
 Demand loaded graph
 ~~~~~~~~~~~~~~~~~~~
 
-To keep refreshes as effecient as possible, the graphing algorithm will
+To keep refreshes as efficient as possible, the graphing algorithm will
 only load a couple hundred revisions initially during a refresh, and
 then load further revisions only when those revisions are required to be
 displayed.  You will notice scrolling through the graph is jerky, these
