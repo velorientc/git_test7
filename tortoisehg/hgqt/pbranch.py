@@ -438,9 +438,8 @@ class PatchBranchWidget(QWidget):
                 os.environ.get("EDITOR","editor-not-configured") 
                 == "editor-not-configured")
             if no_editor_configured:
-                qtlib.ErrorMsgBox(
-                    _('No editor found'),
-                    _('Mercurial was unable to find an editor.\nPlease configure Mercurial to use an editor installed on your system.'))
+                qtlib.ErrorMsgBox(_('No editor found'),
+                    _('Mercurial was unable to find an editor. Please configure Mercurial to use an editor installed on your system.'))
             else:
                 raise
         os.chdir(olddir)
