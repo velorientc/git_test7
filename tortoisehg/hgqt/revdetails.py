@@ -196,7 +196,6 @@ class RevDetailsWidget(QWidget):
         self.actionPrevCol.triggered.connect(self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
-
     def create_models(self):
         self.filelistmodel = HgFileListModel(self.repo, self)
 
