@@ -129,7 +129,7 @@ class HgRepoView(QTableView):
                 w = self.sizeHintForColumn(c)
                 self.setColumnWidth(c, w)
             col1_width -= self.columnWidth(c)
-        col1_width = max(col1_width, 100)
+        col1_width = max(col1_width, 600)
         for c in range(model.columnCount(QModelIndex())):
             if model._columns[c] in model._stretchs:
                 w = model._stretchs[model._columns[c]] / tot_stretch
