@@ -787,7 +787,7 @@ class Dialog(QDialog):
         self.closeBtn.setShown(True)
         self.closeBtn.setFocus()
 
-class Runner(QWidget):
+class Runner(QObject):
     """A component for running Mercurial command without UI
 
     This command runner doesn't show any UI element unless it gets a warning
@@ -805,17 +805,10 @@ class Runner(QWidget):
 
     def __init__(self, useInternal, parent):
         super(Runner, self).__init__(parent)
-
-        # XXX: workaround not to eat mouse-click around left-top corner of
-        # the parent widget. Runner shouldn't be a QWidget, but for now
-        # it's a QWidget in order to become a parent of self.core.thread
-        # and self.dlg.
-        self.resize(0, 0)
-
         self.internallog = useInternal
         self.title = _('TortoiseHg')
 
-        self.core = Core(useInternal, self)
+        self.core = Core(useInternal, parent)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.onCommandFinished)
         self.core.commandCanceling.connect(self.commandCanceling)
@@ -850,7 +843,7 @@ class Runner(QWidget):
         if not self.internallog:
             return
         if not hasattr(self, 'dlg'):
-            self.dlg = dlg = QDialog(self)
+            self.dlg = dlg = QDialog(self.parent())
             dlg.setWindowTitle(self.title)
             dlg.setWindowFlags(Qt.Dialog)
             dlg.setLayout(QVBoxLayout())
