@@ -686,6 +686,7 @@ class MQWidget(QWidget):
                 self.patchNameLE.setText('')
                 self.setMessage('')
             self.patchNameLE.setEnabled(False)
+        self.refreshFileListWidget()
 
     def refreshFileListWidget(self):
         self.refreshing = True
@@ -701,13 +702,15 @@ class MQWidget(QWidget):
             self.refreshing = False
         if self.reselectFileItem:
             self.fileListWidget.setCurrentItem(self.reselectFileItem)
+        elif self.fileListWidget.count():
+            self.fileListWidget.setCurrentRow(0)
 
     def _refreshFileListWidget(self):
-        def addfiles(mode, files, initial):
+        def addfiles(mode, files, func):
             for file in files:
                 item = QListWidgetItem(u'%s %s' % (mode, hglib.tounicode(file)))
                 item.setFlags(flags)
-                item.setCheckState(initial)
+                item.setCheckState(func(mode, file))
                 self.fileListWidget.addItem(item)
                 if selfile == file:
                     self.reselectFileItem = item
@@ -724,17 +727,21 @@ class MQWidget(QWidget):
             # Show qrefresh (qdiff) diffs
             st = self.repo.status(pctx.p1().node(), None, unknown=True)[:5]
             M, A, R, D, U = st
+            checkfunc = lambda stat, file: file in pctx.files() and \
+                                           Qt.Checked or Qt.Unchecked
         elif newmode:
             # Show qnew (working) diffs
             M, A, R, D, U = self.repo[None].status(unknown=True)[:5]
+            checkfunc = lambda stat, file: stat in 'MAR' \
+                                           and Qt.Checked or Qt.Unchecked
         else:
             return
         flags = Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
-        addfiles(u'A', A, Qt.Checked)
-        addfiles(u'M', M, Qt.Checked)
-        addfiles(u'R', R, Qt.Checked)
-        addfiles(u'!', D, Qt.Unchecked)
-        addfiles(u'?', U, Qt.Unchecked)
+        addfiles(u'A', A, checkfunc)
+        addfiles(u'M', M, checkfunc)
+        addfiles(u'R', R, checkfunc)
+        addfiles(u'!', D, checkfunc)
+        addfiles(u'?', U, checkfunc)
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
