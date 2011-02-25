@@ -628,7 +628,9 @@ class RepoWidget(QWidget):
     def rebuildGraph(self):
         self.showMessage('')
         self._reload_rev = self.rev
-        if type(self.rev) is str:
+        if self.rev is None:
+            pass
+        elif type(self.rev) is str:
             try:
                 if self.rev not in self.repo.mq.series:
                     # patch is no longer in the series, find a neighbor
@@ -639,7 +641,7 @@ class RepoWidget(QWidget):
                         self._reload_rev = self._last_series[idx]
             except (AttributeError, IndexError):
                 self._reload_rev = 'tip'
-        elif self.rev is not None and len(self.repo) > self.rev:
+        elif len(self.repo) <= self.rev:
             self._reload_rev = 'tip'
         self.setupModels()
         self.revDetailsWidget.record()
