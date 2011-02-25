@@ -42,25 +42,25 @@ def wctxactions(parent, point, repo, selrows):
     else:
         menu = QMenu(parent)
         parent.contextmenu = menu
-    make(_('&Visual Diff'), vdiff, frozenset('MAR!'))
-    make(_('Copy patch'), copyPatch, frozenset('MAR!'))
-    make(_('Edit'), edit, frozenset('MACI?'))
+    make(_('&Visual Diff'), vdiff, frozenset('MAR!'), qtlib.geticon('visualdiff'))
+    make(_('Copy patch'), copyPatch, frozenset('MAR!'), qtlib.geticon('copy-patch'))
+    make(_('Edit'), edit, frozenset('MACI?'), qtlib.geticon('edit-file'))
     make(_('View missing'), viewmissing, frozenset('R!'))
     if len(repo.parents()) > 1:
         make(_('View other'), viewother, frozenset('MA'))
     menu.addSeparator()
-    make(_('&Revert'), revert, frozenset('MAR!'))
-    make(_('&Add'), add, frozenset('R'))
+    make(_('&Revert'), revert, frozenset('MAR!'), qtlib.geticon('hg-revert'))
+    make(_('&Add'), add, frozenset('R'), qtlib.geticon('add'))
     menu.addSeparator()
-    make(_('File History'), log, frozenset('MARC!'))
-    make(_('&Annotate'), annotate, frozenset('MARC!'))
+    make(_('File History'), log, frozenset('MARC!'), qtlib.geticon('hg-log'))
+    make(_('&Annotate'), annotate, frozenset('MARC!'), qtlib.geticon('hg-annotate'))
     menu.addSeparator()
-    make(_('&Forget'), forget, frozenset('MAC!'))
-    make(_('&Add'), add, frozenset('I?'))
-    make(_('&Detect Renames...'), guessRename, frozenset('A?!'))
-    make(_('&Ignore'), ignore, frozenset('?'))
-    make(_('Remove versioned'), remove, frozenset('C'))
-    make(_('&Delete unversioned'), delete, frozenset('?I'))
+    make(_('&Forget'), forget, frozenset('MAC!'), qtlib.geticon('remove'))
+    make(_('&Add'), add, frozenset('I?'), qtlib.geticon('add'))
+    make(_('&Detect Renames...'), guessRename, frozenset('A?!'), qtlib.geticon('detect_rename'))
+    make(_('&Ignore'), ignore, frozenset('?'), qtlib.geticon('ignore'))
+    make(_('Remove versioned'), remove, frozenset('C'), qtlib.geticon('remove'))
+    make(_('&Delete unversioned'), delete, frozenset('?I'), qtlib.geticon('hg-purge'))
     if len(selrows) == 1:
         menu.addSeparator()
         t, path = selrows[0]
@@ -74,8 +74,8 @@ def wctxactions(parent, point, repo, selrows):
                 mkaction(d)
             menu.addMenu(rmenu)
         else:
-            make(_('&Copy...'), copy, frozenset('MC'))
-            make(_('Rename...'), rename, frozenset('MC'))
+            make(_('&Copy...'), copy, frozenset('MC'), qtlib.geticon('edit-copy'))
+            make(_('Rename...'), rename, frozenset('MC'), qtlib.geticon('hg-rename'))
     menu.addSeparator()
     make(_('Mark unresolved'), unmark, frozenset('r'))
     make(_('Mark resolved'), mark, frozenset('u'))
@@ -125,7 +125,7 @@ def run(func, parent, files, repo):
             err = hglib.tounicode(str(e))
             QMessageBox.critical(parent, name + _(' Aborted'), err)
         except NotImplementedError:
-            QMessageBox.critical(parent, name + _(' not implemented'), 
+            QMessageBox.critical(parent, name + _(' not implemented'),
                     'Please add it :)')
     finally:
         os.chdir(cwd)
