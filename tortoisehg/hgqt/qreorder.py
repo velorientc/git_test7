@@ -174,8 +174,11 @@ class QReorderDialog(QDialog):
             self.alw.setFocus()
 
     def showSummary(self, item):
-        ctx = self.repo.changectx(item.patchname)
-        self.summ.setText(hglib.tounicode(ctx.description()))
+        if item is None:
+            self.summ.clear()
+        else:
+            ctx = self.repo.changectx(item.patchname)
+            self.summ.setText(hglib.tounicode(ctx.description()))
 
     def accept(self):
         self._writesettings()
