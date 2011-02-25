@@ -263,12 +263,15 @@ class MQWidget(QWidget):
         self.refreshFileListWidget()
 
     @pyqtSlot(QString)
-    def qqueueActivate(self, queue):
+    def qqueueActivate(self, uqueue):
         if self.refreshing:
+            return
+        queue = hglib.fromunicode(uqueue)
+        if queue == self.repo.thgactivemqname:
             return
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
-        cmdline = ['qqueue', '-R', self.repo.root, hglib.fromunicode(queue)]
+        cmdline = ['qqueue', '-R', self.repo.root, queue]
         def finished(ret):
             if ret:
                 for i in xrange(self.queueCombo.count()):
