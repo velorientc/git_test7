@@ -594,6 +594,7 @@ class RepoWidget(QWidget):
             self.grepDemand.forward('setRevision', rev)
             self.syncDemand.forward('refreshTargets', rev)
         self.revDetailsWidget.onRevisionSelected(rev)
+        self.revDetailsWidget.record()
         self.revisionSelected.emit(rev)
 
     def gotoParent(self):
@@ -607,7 +608,6 @@ class RepoWidget(QWidget):
     def goto(self, rev):
         self._reload_rev = rev
         self.repoview.goto(rev)
-        self.revDetailsWidget.finishReload()
 
     def onRevisionActivated(self, rev):
         qgoto = False
