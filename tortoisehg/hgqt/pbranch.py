@@ -8,7 +8,7 @@
 import os
 import time
 
-from mercurial import extensions, ui
+from mercurial import extensions, ui, error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, update
@@ -81,8 +81,8 @@ class PatchBranchWidget(QWidget):
         self.actionEditPGraph = a = QWidgetAction(self)
         a.setIcon(geticon("log")) #STOCK_EDIT
         a.setToolTip(_('Edit patch dependency graph'))
-        #tb.addAction(self.actionEditPGraph)
-        #self.actionEditPGraph.triggered.connect(self.pbackout_clicked)
+        tb.addAction(self.actionEditPGraph)
+        self.actionEditPGraph.triggered.connect(self.edit_pgraph_clicked)
 
         vbox.addWidget(self.toolBar_patchbranch, 1)
 
@@ -104,8 +104,6 @@ class PatchBranchWidget(QWidget):
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
         self.runner.commandFinished.connect(self.commandFinished)
-        self.runner.hide()
-        vbox.addWidget(self.runner)
 
     def reload(self):
         'User has requested a reload'
@@ -422,6 +420,32 @@ class PatchBranchWidget(QWidget):
 
     def pnew_clicked(self, toolbutton):
         self.pnew_ui()
+
+    def edit_pgraph_clicked(self):
+        opts = {} # TODO: How to find user ID
+        mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
+        oldtext = mgr.graphdesc()
+        # run editor in the repository root
+        olddir = os.getcwd()
+        os.chdir(self.repo.root)
+        try:
+            newtext = None
+            newtext = self.repo.ui.edit(oldtext, opts.get('user'))
+        except error.Abort:
+            no_editor_configured =(os.environ.get("HGEDITOR") or
+                self.repo.ui.config("ui", "editor") or
+                os.environ.get("VISUAL") or
+                os.environ.get("EDITOR","editor-not-configured") 
+                == "editor-not-configured")
+            if no_editor_configured:
+                qtlib.ErrorMsgBox(
+                    _('No editor found'),
+                    _('Mercurial was unable to find an editor.\nPlease configure Mercurial to use an editor installed on your system.'))
+            else:
+                raise
+        os.chdir(olddir)
+        if newtext is not None:
+            mgr.updategraphdesc(newtext)
 
     ### context menu signal handlers ###
 
