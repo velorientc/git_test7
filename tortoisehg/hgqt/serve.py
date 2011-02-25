@@ -34,7 +34,7 @@ class ServeDialog(QDialog):
         self._updateform()
 
     def _initcmd(self):
-        self._cmd = cmdui.Widget()
+        self._cmd = cmdui.Widget(True, False, self)
         # TODO: forget old logs?
         self._log_edit = self._cmd.core.outputLog
         self._qui.details_tabs.addTab(self._log_edit, _('Log'))

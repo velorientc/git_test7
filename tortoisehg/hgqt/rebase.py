@@ -78,7 +78,7 @@ class RebaseDialog(QDialog):
         else:
             self.svnchk = None
 
-        self.cmd = cmdui.Widget()
+        self.cmd = cmdui.Widget(True, False, self)
         self.cmd.commandFinished.connect(self.commandFinished)
         self.showMessage.connect(self.cmd.stbar.showMessage)
         self.cmd.stbar.linkActivated.connect(self.linkActivated)

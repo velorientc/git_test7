@@ -118,7 +118,7 @@ class BasePage(QWizardPage):
         # perform pane
         ppane = QVBoxLayout()
         ppane.addSpacing(4)
-        self.cmd = cmdui.Widget()
+        self.cmd = cmdui.Widget(True, True, self)
         self.cmd.setShowOutput(True)
         self.cmd.commandFinished.connect(self.command_finished)
         self.cmd.commandCanceling.connect(self.command_canceling)

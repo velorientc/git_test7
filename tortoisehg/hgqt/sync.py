@@ -242,10 +242,9 @@ class SyncWidget(QWidget):
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
 
-        cmd = cmdui.Widget(not self.embedded, self)
+        cmd = cmdui.Widget(not self.embedded, True, self)
         cmd.commandStarted.connect(self.commandStarted)
         cmd.commandFinished.connect(self.commandFinished)
-
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.output.connect(self.output)
         cmd.progress.connect(self.progress)

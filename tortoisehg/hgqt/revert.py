@@ -36,11 +36,8 @@ class RevertDialog(QDialog):
         self.allchk = QCheckBox(_('Revert all files to this revision'))
         self.layout().addWidget(self.allchk)
 
-        self.cmd = cmdui.Widget()
-        self.cmd.setShowOutput(False)
-        self.cmd.stbar.setVisible(False)
+        self.cmd = cmdui.Runner(True, self)
         self.cmd.commandFinished.connect(self.finished)
-        self.layout().addWidget(self.cmd, 1)
 
         BB = QDialogButtonBox
         bbox = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -62,8 +59,6 @@ class RevertDialog(QDialog):
         else:
             cmdline = ['revert', '--repository', self.repo.root, self.wfile]
         cmdline += ['--rev', self.rev]
-        self.cmd.setShowOutput(True)
-        self.cmd.stbar.setVisible(True)
         self.cmd.run(cmdline)
 
     def finished(self, ret):

@@ -141,7 +141,7 @@ class Core(QObject):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, useInternal, parent):
+    def __init__(self, logWindow, parent):
         super(Core, self).__init__(parent)
 
         self.thread = None
@@ -151,8 +151,7 @@ class Core(QObject):
         self.rawoutlines = []
         self.display = None
         self.useproc = False
-        self.internallog = useInternal
-        if useInternal:
+        if logWindow:
             self.outputLog = LogWidget()
             self.outputLog.installEventFilter(qscilib.KeyPressInterceptor(self))
             self.output.connect(self.outputLog.appendLog)
@@ -283,7 +282,7 @@ class Core(QObject):
         return True
 
     def clearOutput(self):
-        if self.internallog:
+        if hasattr(self, 'outputLog'):
             self.outputLog.clear()
 
     ### Signal Handlers ###
@@ -501,7 +500,7 @@ class ConsoleWidget(QWidget):
 
     @util.propertycache
     def _cmdcore(self):
-        cmdcore = Core(useInternal=False, parent=self)
+        cmdcore = Core(False, self)
         cmdcore.output.connect(self._logwidget.appendLog)
         cmdcore.commandStarted.connect(self.closePrompt)
         cmdcore.commandFinished.connect(self.openPrompt)
@@ -642,35 +641,33 @@ class Widget(QWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, useInternal=True, parent=None):
+    def __init__(self, logWindow, statusBar, parent):
         super(Widget, self).__init__(parent)
 
-        self.internallog = useInternal
-        self.core = Core(useInternal, self)
+        self.core = Core(logWindow, self)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.onCommandFinished)
         self.core.commandCanceling.connect(self.commandCanceling)
         self.core.output.connect(self.output)
         self.core.progress.connect(self.progress)
-        if not useInternal:
+        if not logWindow:
             return
 
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
         vbox.setContentsMargins(*(1,)*4)
+        self.setLayout(vbox)
 
         # command output area
         self.core.outputLog.setHidden(True)
-        vbox.addWidget(self.core.outputLog, 1)
+        self.layout().addWidget(self.core.outputLog, 1)
 
-        ## status and progress labels
-        self.stbar = ThgStatusBar()
-        self.stbar.setSizeGripEnabled(False)
-        self.core.setStbar(self.stbar)
-        vbox.addWidget(self.stbar)
-
-        # widget setting
-        self.setLayout(vbox)
+        if statusBar:
+            ## status and progress labels
+            self.stbar = ThgStatusBar()
+            self.stbar.setSizeGripEnabled(False)
+            self.core.setStbar(self.stbar)
+            self.layout().addWidget(self.stbar)
 
     ### Public Methods ###
 
@@ -681,11 +678,11 @@ class Widget(QWidget):
         self.core.cancel()
 
     def setShowOutput(self, visible):
-        if self.internallog:
+        if hasattr(self.core, 'outputLog'):
             self.core.outputLog.setShown(visible)
 
     def outputShown(self):
-        if self.internallog:
+        if hasattr(self.core, 'outputLog'):
             return self.core.outputLog.isVisible()
         else:
             return False
@@ -803,21 +800,15 @@ class Runner(QObject):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, useInternal, parent):
+    def __init__(self, logWindow, parent):
         super(Runner, self).__init__(parent)
-        self.internallog = useInternal
         self.title = _('TortoiseHg')
-
-        self.core = Core(useInternal, parent)
+        self.core = Core(logWindow, parent)
         self.core.commandStarted.connect(self.commandStarted)
         self.core.commandFinished.connect(self.onCommandFinished)
         self.core.commandCanceling.connect(self.commandCanceling)
-
         self.core.output.connect(self.output)
         self.core.progress.connect(self.progress)
-
-        if useInternal:
-            self.core.outputLog.setMinimumSize(460, 320)
 
     ### Public Methods ###
 
@@ -840,7 +831,7 @@ class Runner(QObject):
             return False
 
     def setShowOutput(self, visible=True):
-        if not self.internallog:
+        if not hasattr(self.core, 'outputLog'):
             return
         if not hasattr(self, 'dlg'):
             self.dlg = dlg = QDialog(self.parent())
@@ -848,6 +839,7 @@ class Runner(QObject):
             dlg.setWindowFlags(Qt.Dialog)
             dlg.setLayout(QVBoxLayout())
             dlg.layout().addWidget(self.core.outputLog)
+            self.core.outputLog.setMinimumSize(460, 320)
         self.dlg.setVisible(visible)
 
     ### Signal Handler ###

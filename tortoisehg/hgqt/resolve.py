@@ -127,7 +127,7 @@ class ResolveDialog(QDialog):
 
         out = qtlib.LabeledSeparator(_('Command output'))
         self.layout().addWidget(out)
-        self.cmd = cmdui.Widget(True, self)
+        self.cmd = cmdui.Widget(True, False, self)
         self.cmd.commandFinished.connect(self.refresh)
         self.cmd.setShowOutput(True)
         self.layout().addWidget(self.cmd)
