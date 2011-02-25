@@ -6,8 +6,6 @@
 Welcome to TortoiseHg's documentation!
 ======================================
 
-Contents:
-
 .. toctree::
 	:maxdepth: 3
 	:numbered:
