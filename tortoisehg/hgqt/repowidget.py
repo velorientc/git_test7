@@ -607,6 +607,7 @@ class RepoWidget(QWidget):
     def goto(self, rev):
         self._reload_rev = rev
         self.repoview.goto(rev)
+        self.revDetailsWidget.finishReload()
 
     def onRevisionActivated(self, rev):
         qgoto = False
