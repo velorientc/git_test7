@@ -269,6 +269,13 @@ class MQWidget(QWidget):
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
         cmdline = ['qqueue', '-R', self.repo.root, hglib.fromunicode(queue)]
+        def finished(ret):
+            if ret:
+                for i in xrange(self.queueCombo.count()):
+                    if self.queueCombo.itemText(i) == self.repo.thgactivemqname:
+                        self.queueCombo.setCurrentIndex(i)
+                        break
+        self.finishfunc = finished
         self.cmd.run(cmdline)
 
     @pyqtSlot()
