@@ -101,18 +101,18 @@ class SyncWidget(QWidget):
             return a
 
         self.incomingAction = \
-        newaction(_('Preview incoming changesets from specified URL'),
+        newaction(_('Preview incoming changesets from remote repository'),
              'hg-incoming', self.inclicked)
         self.pullAction = \
-        newaction(_('Pull incoming changesets from specified URL'),
+        newaction(_('Pull incoming changesets from remote repository'),
              'hg-pull', self.pullclicked)
         self.outgoingAction = \
-        newaction(_('Filter outgoing changesets to specified URL'),
+        newaction(_('Filter outgoing changesets to remote repository'),
              'hg-outgoing', self.outclicked)
         self.pushAction = \
-        newaction(_('Push outgoing changesets to specified URL'),
+        newaction(_('Push outgoing changesets to remote repository'),
              'hg-push', self.pushclicked)
-        newaction(_('Email outgoing changesets for specified URL'),
+        newaction(_('Email outgoing changesets for remote repository'),
              'mail-forward', self.emailclicked)
 
         if 'perfarce' in self.repo.extensions():
