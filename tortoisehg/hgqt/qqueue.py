@@ -147,9 +147,11 @@ class QQueueDialog(QDialog):
                 q = hglib.fromunicode(self.ql.item(self.ql.currentRow()).text())
                 self.btact.setEnabled(q != self.repo.thgactivemqname)
                 self.btren.setEnabled(q == self.repo.thgactivemqname
-                                      and q != 'patches')
-                self.btdel.setEnabled(q != 'patches')
-                self.btpur.setEnabled(q != 'patches')
+                                        and q != 'patches')
+                self.btdel.setEnabled(q != 'patches'
+                                        and q != self.repo.thgactivemqname)
+                self.btpur.setEnabled(q != 'patches'
+                                        and q != self.repo.thgactivemqname)
             else:
                 self.btact.setEnabled(False)
                 self.btren.setEnabled(False)
