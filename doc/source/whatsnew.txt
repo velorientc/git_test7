@@ -25,7 +25,7 @@ The Workbench can support multiple repositories open at a time via "Repo
 Tabs" across the top of the main window.
 
 Each repository tab supports multiple "Task Tabs" beneath its graph
-splitter.  These task tabs are switchable via icons on the right side of
+splitter.  These task tabs are switchable via icons on the side of
 the Workbench or via application menus.  Available task tabs include a
 changeset browser, a commit tool, a manifest browser, a history search
 widget, and a sync widget.
@@ -152,7 +152,6 @@ then load further revisions only when those revisions are required to be
 displayed.  You will notice scrolling through the graph is jerky, these
 are bulk loads of revisions into the graph.  To avoid this jerkiness you
 can force TortoiseHg to load all revisions in the graph via the 'Load
-All' toolbar button or jump directly to the earliest revision you wish
-to view (SHIFT-CTRL-G).
+All' toolbar button.
 
 .. vim: noet ts=4 syntax=rest
