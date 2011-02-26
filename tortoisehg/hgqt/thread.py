@@ -85,9 +85,9 @@ class UiSignal(QObject):
         return self.responseq.get(True)
 
     def progress(self, topic, pos, item, unit, total):
-        topic = hglib.tounicode(topic)
-        item = hglib.tounicode(item)
-        unit = hglib.tounicode(unit)
+        topic = hglib.tounicode(topic or '')
+        item = hglib.tounicode(item or '')
+        unit = hglib.tounicode(unit or '')
         self.progressSignal.emit(topic, pos, item, unit, total)
 
 class QtUi(uimod.ui):
