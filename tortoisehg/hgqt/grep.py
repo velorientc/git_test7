@@ -48,7 +48,6 @@ class SearchWidget(QWidget):
         chk = QCheckBox(_('Ignore case'))
         bt = QPushButton(_('Search'))
         bt.setDefault(True)
-        bt.setIcon(qtlib.geticon('hg-grep'))
         f = bt.font()
         f.setWeight(QFont.Bold)
         bt.setFont(f)

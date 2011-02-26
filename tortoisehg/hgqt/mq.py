@@ -163,7 +163,6 @@ class MQWidget(QWidget):
         f = b.font()
         f.setWeight(QFont.Bold)
         b.setFont(f)
-        b.setIcon(qtlib.geticon('hg-commit'))
         self.qnewOrRefreshBtn = b
 
         qrefhbox.addWidget(self.qqueueBtn)
