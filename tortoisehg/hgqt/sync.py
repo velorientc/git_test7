@@ -684,9 +684,8 @@ class SyncWidget(QWidget):
                 dlg.exec_()
                 return
             # handle file conflicts during update
-            ms = mergemod.mergestate(self.repo)
-            for path in ms:
-                if ms[path] == 'u':
+            for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
+                if status == 'u':
                     qtlib.InfoMsgBox(_('Merge caused file conflicts'),
                                     _('File conflicts need to be resolved'))
                     dlg = resolve.ResolveDialog(self.repo, self)
@@ -1388,6 +1387,5 @@ class OptionsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     return SyncWidget(repo, None, **opts)

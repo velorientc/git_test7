@@ -14,7 +14,7 @@ from mercurial import util, merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, cmdui, resolve, commit
+from tortoisehg.hgqt import qtlib, csinfo, cmdui, resolve, commit, thgrepo
 
 BB = QDialogButtonBox
 
@@ -123,10 +123,8 @@ class RebaseDialog(QDialog):
                 elif wctx.dirty():
                     self.dirty = True
                 else:
-                    ms = mergemod.mergestate(repo)
-                    unresolved = False
-                    for path in ms:
-                        if ms[path] == 'u':
+                    for r, p, status in thgrepo.recursiveMergeStatus(repo):
+                        if status == 'u':
                             self.dirty = True
                             break
         def completed():
@@ -181,9 +179,8 @@ class RebaseDialog(QDialog):
             self.rebasebtn.clicked.connect(self.accept)
 
     def checkResolve(self):
-        ms = mergemod.mergestate(self.repo)
-        for path in ms:
-            if ms[path] == 'u':
+        for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
+            if status == 'u':
                 txt = _('Rebase generated merge <b>conflicts</b> that must '
                         'be <a href="resolve"><b>resolved</b></a>')
                 self.rebasebtn.setEnabled(False)
@@ -243,7 +240,6 @@ class RebaseDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     if os.path.exists(repo.join('rebasestate')):
         qtlib.InfoMsgBox(_('Rebase already in progress'),

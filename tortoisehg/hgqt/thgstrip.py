@@ -58,8 +58,8 @@ class StripDialog(QDialog):
             rev = str(rev)
         combo.addItem(hglib.tounicode(rev))
         combo.setCurrentIndex(0)
-        for name in hglib.getlivebranch(self.repo):
-            combo.addItem(hglib.tounicode(name))
+        for name in self.repo.livebranches:
+            combo.addItem(name)
 
         tags = list(self.repo.tags())
         tags.sort()

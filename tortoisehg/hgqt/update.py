@@ -51,12 +51,12 @@ class UpdateDialog(QDialog):
             rev = str(rev)
         combo.addItem(hglib.tounicode(rev))
         combo.setCurrentIndex(0)
-        for name in hglib.getlivebranch(self.repo):
-            combo.addItem(hglib.tounicode(name))
+
+        for name in repo.livebranches:
+            combo.addItem(name)
 
         tags = list(self.repo.tags())
-        tags.sort()
-        tags.reverse()
+        tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))
 
@@ -299,9 +299,8 @@ class UpdateDialog(QDialog):
             self.accept()
 
     def accept(self):
-        ms = mergemod.mergestate(self.repo)
-        for path in ms:
-            if ms[path] == 'u':
+        for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
+            if status == 'u':
                 qtlib.InfoMsgBox(_('Merge caused file conflicts'),
                                  _('File conflicts need to be resolved'))
                 dlg = resolve.ResolveDialog(self.repo, self)
@@ -315,7 +314,6 @@ class UpdateDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     rev = None
     if opts.get('rev'):

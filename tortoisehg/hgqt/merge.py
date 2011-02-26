@@ -14,7 +14,7 @@ from mercurial import merge as mergemod
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, commit, resolve
-from tortoisehg.hgqt import qscilib
+from tortoisehg.hgqt import qscilib, thgrepo
 
 keep = i18n.keepgettext()
 
@@ -501,11 +501,11 @@ class MergePage(BasePage):
                 self.results = (False, 1)
 
             def run(self):
-                ms = mergemod.mergestate(repo)
                 unresolved = False
-                for path in ms:
-                    if ms[path] == 'u':
+                for root, path, status in thgrepo.recursiveMergeStatus(repo):
+                    if status == 'u':
                         unresolved = True
+                        break
                 wctx = repo[None]
                 dirty = bool(wctx.dirty()) or unresolved
                 self.results = (dirty, len(wctx.parents()))
@@ -666,9 +666,9 @@ class CommitPage(BasePage):
         self.cmd.run(cmdline)
 
     def isComplete(self):
-        ms = mergemod.mergestate(self.wizard().repo)
-        for path in ms:
-            if ms[path] == 'u':
+        repo = self.wizard().repo
+        for root, path, status in thgrepo.recursiveMergeStatus(repo):
+            if status == 'u':
                 self.reslabel.setText(_('There were <b>merge conflicts</b> '
                                         'that must be <a href="resolve">'
                                         '<b>resolved</b></a>'))
@@ -738,7 +738,6 @@ class ResultPage(QWizardPage):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     rev = opts.get('rev') or None
     if not rev and len(pats):
         rev = pats[0]

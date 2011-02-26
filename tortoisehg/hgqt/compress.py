@@ -14,7 +14,7 @@ from mercurial import revset, merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, cmdui, commit
+from tortoisehg.hgqt import qtlib, csinfo, cmdui, commit, thgrepo
 
 BB = QDialogButtonBox
 
@@ -88,10 +88,8 @@ class CompressDialog(QDialog):
                 elif wctx.dirty():
                     self.dirty = True
                 else:
-                    ms = mergemod.mergestate(repo)
-                    unresolved = False
-                    for path in ms:
-                        if ms[path] == 'u':
+                    for root, path, status in thgrepo.recursiveMergeStatus(repo):
+                        if status == 'u':
                             self.dirty = True
                             break
         def completed():
