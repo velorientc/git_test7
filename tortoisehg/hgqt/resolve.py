@@ -14,7 +14,7 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, wctxactions, visdiff
+from tortoisehg.hgqt import qtlib, cmdui, wctxactions, visdiff, thgrepo
 
 MARGINS = (8, 0, 0, 0)
 
@@ -156,40 +156,49 @@ class ResolveDialog(QDialog):
         if not tree.selectionModel():
             return paths
         for idx in tree.selectionModel().selectedRows():
-            path = hglib.fromunicode(idx.data().toString())
-            paths.append(repo.wjoin(path))
+            root, wfile = tree.model().getPathForIndex(idx)
+            paths.append((root, wfile))
         return paths
+
+    def runCommand(self, tree, cmdline):
+        cmdlines = []
+        selected = self.getSelectedPaths(tree)
+        while selected:
+            curroot = selected[0][0]
+            cmd = cmdline + ['--repository', curroot, '--']
+            for root, wfile in selected:
+                if root == curroot:
+                    cmd.append(os.path.join(root, wfile))
+            cmdlines.append(cmd)
+            selected = [(r, w) for r, w in selected if r != curroot]
+        if cmdlines:
+            self.cmd.run(*cmdlines)
 
     def merge(self, tool=False):
         if not tool:
             tool = self.tcombo.readValue()
-        cmd = ['resolve', '--repository', self.repo.root]
+        cmd = ['resolve']
         if tool:
             cmd += ['--tool='+tool]
-        paths = self.getSelectedPaths(self.utree)
-        if paths:
-            self.cmd.run(cmd + paths)
+        self.runCommand(self.utree, cmd)
 
     def markresolved(self):
-        paths = self.getSelectedPaths(self.utree)
-        if paths:
-            self.cmd.run(['resolve', '--repository', self.repo.root,
-                          '--mark'] + paths)
+        self.runCommand(self.utree, ['resolve', '--mark'])
 
     def markunresolved(self):
-        paths = self.getSelectedPaths(self.rtree)
-        if paths:
-            self.cmd.run(['resolve', '--repository', self.repo.root,
-                          '--unmark'] + paths)
+        self.runCommand(self.rtree, ['resolve', '--unmark'])
 
     def edit(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
-            wctxactions.edit(self, self.repo.ui, self.repo, paths)
+            abspaths = [os.path.join(r,w) for r,w in paths]
+            wctxactions.edit(self, self.repo.ui, self.repo, abspaths)
 
     def v3way(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
+            paths = [w for r,w in paths]
+            # TODO: will not work for subrepos
             opts = {}
             opts['rev'] = []
             opts['tool'] = self.tcombo.readValue()
@@ -200,6 +209,8 @@ class ResolveDialog(QDialog):
     def vp0(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
+            paths = [w for r,w in paths]
+            # TODO: will not work for subrepos
             opts = {}
             opts['rev'] = ['p1()']
             opts['tool'] = self.tcombo.readValue()
@@ -210,6 +221,8 @@ class ResolveDialog(QDialog):
     def vp1(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
+            paths = [w for r,w in paths]
+            # TODO: will not work for subrepos
             opts = {}
             opts['rev'] = ['p2()']
             opts['tool'] = self.tcombo.readValue()
@@ -224,23 +237,13 @@ class ResolveDialog(QDialog):
     def refresh(self):
         repo = self.repo
 
-        def selpaths(tree):
-            paths = []
-            if not tree.selectionModel():
-                return paths
-            for idx in tree.selectionModel().selectedRows():
-                path = hglib.fromunicode(idx.data().toString())
-                paths.append(path)
-            return paths
-
-        ms = mergemod.mergestate(self.repo)
         u, r = [], []
-        for path in ms:
-            if ms[path] == 'u':
-                u.append(path)
+        for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
+            if status == 'u':
+                u.append((root, path))
             else:
-                r.append(path)
-        paths = selpaths(self.utree)
+                r.append((root, path))
+        paths = self.getSelectedPaths(self.utree)
         self.utree.setModel(PathsModel(u, self))
         self.utree.resizeColumnToContents(0)
         self.utree.resizeColumnToContents(1)
@@ -248,10 +251,11 @@ class ResolveDialog(QDialog):
         model = self.utree.model()
         smodel = self.utree.selectionModel()
         sflags = QItemSelectionModel.Select | QItemSelectionModel.Columns
-        for i, p in enumerate(u):
-            if p in paths:
+        for i, path in enumerate(u):
+            if path in paths:
                 smodel.select(model.index(i, 0), sflags)
                 smodel.select(model.index(i, 1), sflags)
+                smodel.select(model.index(i, 2), sflags)
 
         @pyqtSlot(QItemSelection, QItemSelection)
         def uchanged(selected, deselected):
@@ -261,17 +265,18 @@ class ResolveDialog(QDialog):
         smodel.selectionChanged.connect(uchanged)
         uchanged(None, None)
 
-        paths = selpaths(self.rtree)
+        paths = self.getSelectedPaths(self.rtree)
         self.rtree.setModel(PathsModel(r, self))
         self.rtree.resizeColumnToContents(0)
         self.rtree.resizeColumnToContents(1)
 
         model = self.rtree.model()
         smodel = self.rtree.selectionModel()
-        for i, p in enumerate(r):
-            if p in paths:
+        for i, path in enumerate(r):
+            if path in paths:
                 smodel.select(model.index(i, 0), sflags)
                 smodel.select(model.index(i, 1), sflags)
+                smodel.select(model.index(i, 2), sflags)
 
         @pyqtSlot(QItemSelection, QItemSelection)
         def rchanged(selected, deselected):
@@ -345,11 +350,11 @@ class PathsTree(QTreeView):
 class PathsModel(QAbstractTableModel):
     def __init__(self, pathlist, parent):
         QAbstractTableModel.__init__(self, parent)
-        self.headers = (_('Path'), _('Extension'))
+        self.headers = (_('Path'), _('Ext'), _('Repository'))
         self.rows = []
-        for path in pathlist:
+        for root, path in pathlist:
             name, ext = os.path.splitext(path)
-            self.rows.append([path, ext])
+            self.rows.append([path, ext, root])
 
     def __len__(self):
         return len(self.rows)
@@ -377,6 +382,11 @@ class PathsModel(QAbstractTableModel):
             return QVariant()
         else:
             return QVariant(self.headers[col])
+
+    def getPathForIndex(self, index):
+        'return root, wfile for the given row'
+        row = index.row()
+        return self.rows[row][2], self.rows[row][0]
 
 class ToolsCombo(QComboBox):
     def __init__(self, repo, parent):
@@ -411,6 +421,5 @@ class ToolsCombo(QComboBox):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     return ResolveDialog(repo, None)
