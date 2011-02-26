@@ -209,7 +209,7 @@ class ThgRepoWrapper(QObject):
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
-              shortname mergetools livebranches'''.split()
+              shortname mergetools livebranches namedbranches'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
                    _branchheads'''.split()
 
