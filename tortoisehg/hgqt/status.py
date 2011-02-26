@@ -253,11 +253,11 @@ class StatusWidget(QWidget):
         tm = WctxModel(wctx, ms, self.opts, checked, self)
         tm.checkToggled.connect(self.updateCheckCount)
 
-        self.updateCheckCount()
         self.tv.setModel(tm)
         self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, bool(wctx.p2()))
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
+        self.updateCheckCount()
 
         for col in (COL_PATH, COL_STATUS, COL_MERGE_STATE):
             w = self.tv.sizeHintForColumn(col)
