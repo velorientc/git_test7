@@ -16,6 +16,7 @@ import tempfile
 from PyQt4.QtCore import *
 
 from mercurial import hg, util, error, bundlerepo, extensions, filemerge, node
+from mercurial import merge, subrepo
 from mercurial import ui as uimod
 from mercurial.util import propertycache
 
@@ -574,3 +575,17 @@ def genPatchContext(repo, patchpath, rev=None):
     ctx = patchctx(patchpath, repo, rev=rev)
     _pctxcache[patchpath] = ctx
     return ctx
+
+def recursiveMergeStatus(repo):
+    ms = merge.mergestate(repo)
+    for wfile in ms:
+        yield repo.root, wfile, ms[wfile]
+    try:
+        wctx = repo[None]
+        for s in wctx.substate:
+            sub = wctx.sub(s)
+            if isinstance(sub, subrepo.hgsubrepo):
+                for root, file, status in recursiveMergeStatus(sub._repo):
+                    yield root, file, status
+    except (EnvironmentError, error.Abort, error.RepoError):
+        pass
