@@ -442,7 +442,7 @@ class SyncWidget(QWidget):
                 (_('Terminal'), self.terminalurl, 'utilities-terminal'),
                 (_('Remove'), self.removeurl, 'menudelete')):
                 act = QAction(text, self)
-                act.setIcon(qtlib.geticon(icon))
+                act.setIcon(qtlib.getmenuicon(icon))
                 act.triggered.connect(cb)
                 acts.append(act)
                 menu.addAction(act)

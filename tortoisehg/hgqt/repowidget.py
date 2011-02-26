@@ -15,7 +15,7 @@ from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.qtlib import geticon, getfont, QuestionMsgBox, InfoMsgBox
+from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox
 from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
@@ -152,28 +152,28 @@ class RepoWidget(QWidget):
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)
         w.showMessage.connect(self.showMessage)
-        self.logTabIndex = idx = tt.addTab(w, geticon('hg-log'), '')
+        self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
         self.commitDemand = w = DemandWidget(self.createCommitWidget)
-        self.commitTabIndex = idx = tt.addTab(w, geticon('hg-commit'), '')
+        self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
-        self.syncTabIndex = idx = tt.addTab(w, geticon('thg-sync'), '')
+        self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
         self.manifestDemand = w = DemandWidget(self.createManifestWidget)
-        self.manifestTabIndex = idx = tt.addTab(w, geticon('hg-annotate'), '')
+        self.manifestTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-annotate'), '')
         tt.setTabToolTip(idx, _('Manifest'))
 
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
-        self.grepTabIndex = idx = tt.addTab(w, geticon('hg-grep'), '')
+        self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
 
         self.mqDemand = w = DemandWidget(self.createMQWidget)
         if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, geticon('thg-mq'), '')
+            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
             self.namedTabs['mq'] = idx
         else:
@@ -181,7 +181,7 @@ class RepoWidget(QWidget):
 
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
         if 'pbranch' in self.repo.extensions():
-            self.pbranchTabIndex = idx = tt.addTab(w, geticon('branch'), '')
+            self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
             tt.setTabToolTip(idx, _("Patch Branch"))
             self.namedTabs['pbranch'] = idx
         else:
@@ -901,7 +901,7 @@ class RepoWidget(QWidget):
             act = QAction(desc, self)
             act.triggered.connect(cb)
             if icon:
-                act.setIcon(geticon(icon))
+                act.setIcon(qtlib.getmenuicon(icon))
             act.enableFunc = func
             menu.addAction(act)
             items.append(act)
@@ -1038,7 +1038,7 @@ class RepoWidget(QWidget):
                 ):
             a = QAction(name, self)
             if icon:
-                a.setIcon(qtlib.geticon(icon))
+                a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
         if 'reviewboard' in self.repo.extensions():
@@ -1090,7 +1090,7 @@ class RepoWidget(QWidget):
             act = QAction(name, self)
             act.triggered.connect(cb)
             if icon:
-                act.setIcon(qtlib.geticon(icon))
+                act.setIcon(qtlib.getmenuicon(icon))
             acts.append(act)
             menu.addAction(act)
         self.unappcmenu = menu
@@ -1108,7 +1108,7 @@ class RepoWidget(QWidget):
                 ):
             a = QAction(name, self)
             if icon:
-                a.setIcon(qtlib.geticon(icon))
+                a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
         if 'reviewboard' in self.repo.extensions():
@@ -1126,7 +1126,7 @@ class RepoWidget(QWidget):
             a = QAction(name, self)
             a.triggered.connect(cb)
             if icon:
-                a.setIcon(geticon(icon))
+                a.setIcon(qtlib.getmenuicon(icon))
             menu.addAction(a)
         self.bundlemenu = menu
 

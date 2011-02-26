@@ -18,7 +18,7 @@ import os
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 from tortoisehg.hgqt import visdiff, wctxactions, revert
 
@@ -195,7 +195,7 @@ class HgFileListView(QTableView):
                 dlgdict[filename] = dlg
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
-                dlg.setWindowIcon(geticon('hg-log'))
+                dlg.setWindowIcon(qtlib.geticon('hg-log'))
             dlg = dlgdict[filename]
             dlg.goto(model._ctx.rev())
             dlg.show()
@@ -238,7 +238,7 @@ class HgFileListView(QTableView):
             ]:
             act = QAction(desc, self)
             if icon:
-                act.setIcon(geticon(icon))
+                act.setIcon(qtlib.getmenuicon(icon))
             if key:
                 act.setShortcut(key)
             if tip:
