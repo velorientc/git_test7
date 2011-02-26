@@ -6,6 +6,7 @@
 # GNU General Public License version 2 or any later version.
 
 import os
+import sys
 import atexit
 import shutil
 import stat
@@ -297,6 +298,11 @@ def geticon(name):
         _iconcache[name] = (_findscalableicon(name) or _findicon(name)
                             or QIcon(':/icons/fallback.svg'))
         return _iconcache[name]
+
+def getmenuicon(name):
+    if sys.platform == 'darwin':
+        return QIcon()
+    return geticon(name)
 
 _pixmapcache = {}
 
