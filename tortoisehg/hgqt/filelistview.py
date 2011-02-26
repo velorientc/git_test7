@@ -84,11 +84,20 @@ class HgFileListView(QTableView):
     def layoutChanged(self):
         'file model has new contents'
         index = self.currentIndex()
-        if index.row() >= len(self.model()) or index.row() == -1:
+        count = len(self.model())
+        if index.row() == -1:
+            # index is changing, fileSelected() called for us
             self.selectRow(0)
+        elif index.row() >= count:
+            if count:
+                # index is changing, fileSelected() called for us
+                self.selectRow(count-1)
+            else:
+                self.clearDisplay.emit()
+                self.actionSecondParent.setEnabled(False)
         else:
-            self.selectRow(index.row())
-        self.fileSelected()
+            # redisplay previous row
+            self.fileSelected()
 
     def fileSelected(self, index=None, *args):
         if index is None:
