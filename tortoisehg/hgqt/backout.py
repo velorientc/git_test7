@@ -13,7 +13,7 @@ from mercurial import merge as mergemod
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
-from tortoisehg.hgqt import commit, qscilib
+from tortoisehg.hgqt import commit, qscilib, thgrepo
 
 keep = i18n.keepgettext()
 
@@ -218,9 +218,8 @@ class BackoutDialog(QDialog):
             self.accept()
 
     def checkResolve(self):
-        ms = mergemod.mergestate(self.repo)
-        for path in ms:
-            if ms[path] == 'u':
+        for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
+            if status == 'u':
                 txt = _('Backout generated merge <b>conflicts</b> that must '
                         'be <a href="resolve"><b>resolved</b></a>')
                 self.backoutBtn.setEnabled(False)
@@ -250,7 +249,6 @@ class BackoutDialog(QDialog):
 
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
     repo = thgrepo.repository(ui, path=paths.find_root())
     kargs = {'opts': opts}
     if opts.get('rev'):
