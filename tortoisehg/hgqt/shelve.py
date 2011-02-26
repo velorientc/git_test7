@@ -451,6 +451,7 @@ class ShelveDialog(QDialog):
         s = QSettings()
         wb = "shelve/"
         s.setValue(wb + 'geometry', self.saveGeometry())
+        s.setValue(wb + 'panesplitter', self.splitter.saveState())
         s.setValue(wb + 'filesplitter', self.browsea.splitter.saveState())
         self.browsea.saveSettings(s, wb + 'fileviewa')
         self.browseb.saveSettings(s, wb + 'fileviewb')
@@ -459,6 +460,7 @@ class ShelveDialog(QDialog):
         s = QSettings()
         wb = "shelve/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
+        self.splitter.restoreState(s.value(wb + 'panesplitter').toByteArray())
         self.browsea.splitter.restoreState(
                           s.value(wb + 'filesplitter').toByteArray())
         self.browseb.splitter.restoreState(
@@ -466,9 +468,9 @@ class ShelveDialog(QDialog):
         self.browsea.loadSettings(s, wb + 'fileviewa')
         self.browseb.loadSettings(s, wb + 'fileviewb')
 
-    def closeEvent(self, event):
+    def reject(self):
         self.storeSettings()
-        super(ShelveDialog, self).closeEvent(event)
+        super(ShelveDialog, self).reject()
 
 def run(ui, *pats, **opts):
     if 'repo' in opts:
