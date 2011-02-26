@@ -104,6 +104,7 @@ Show or hide some main widgets in the Workbench.
 	:guilabel:`Show Output Log`
 		Show/hide the Output Log widget.
 
+
 Sync Toolbar
 ------------
 
@@ -182,7 +183,9 @@ Work with the various tasktabs.
 
 	:guilabel:`Search`
 		For performing text searches through file content.
-		See _`Search` for more detail.
+..		See _`Search` for more detail.
+
+..
 
 ..		.. figure:: figures/search-tasktab.png
 			:alt: Search Tasktab
@@ -260,136 +263,112 @@ cases from breaking the viewer, but can be resized after refreshes.
 Performance Implications
 ------------------------
 
-There are some Repository Explorer features that should probably be
-avoided in large repositories.
+There are some Workbench features that could have performance implications in
+large repositories.
 
-* :menuselection:`View -> Color By Branch` 
-	This option requires the log viewer to query the branch name of
-	every revision in order to draw the graph.  It can cause refreshes
+* :menuselection:`View -> Choose Log columns...` 
+	Enabling the :guilabel:`Changes` column can be expensive to calculate on
+	repositories with large working copies, causing both refreshes and scrolling
 	to be slow.
 
-* :menuselection:`View -> Compact Graph` 
-	This option can cause refresh to be slower than the default setting.
-	Also be aware that enabling this feature makes the graph lines less
-	accurate.  The feature trades merge parent accuracy for horizontal
-	screen space.
-
-* Column :guilabel:`Changes` 
-	This column can be expensive to calculate on repositories with large
-	working copies, causing both refreshes and scrolling to be slow.
-
+* :menuselection:`View -> Load all`
+	Normally, when the user scrolls through the history, chunks of changesets
+	are read as you scroll. This menu choice allows you to have the Workbench
+	read all the changesets from the repository, probably allowing smoother
+	moving through the history.
 
 Revision Context Menus
 ----------------------
 
-Right-clicking on a revision in the (top) graph pane will bring up the
+Right-clicking on revisions in the graph pane brings up a different context menu
+when one, two, or more revisions are selected. Context menuse can also differ
+according to the type of revision(s) (working dir, regular revision,
+(un)applied mq patch). Here we give a list of all existing context menu entries.
+
+Right-clicking on a selection of revisions in the (top) graph pane will bring up the
 revision context menu.
 
-	:guilabel:`Visualize Change`
-		Open this change in your visual diff tool
-	:guilabel:`Display Change`
-		Open this changeset in the changeset browser (more below)
-	:guilabel:`Diff to Local`
-		Display changes (visual diff) between this revision and your
-		current working directory
-	:guilabel:`Copy Hash`
-		Copy current revision's full hash to the clipboard
-	:guilabel:`Push to Here`
-		Performs the equivalent of 'push -r <rev>'.  This option is only
-		available on changesets marked as outgoing.
-	:guilabel:`Push this Branch`
-		Performs the equivalent of 'push --new-branch --branch <branch>'.
-		This option is only available on changesets marked as outgoing.
+With only one revision selected:
 	:guilabel:`Update...`
 		Update your working directory to this revision. Opens the
 		TortoiseHg update dialog with this revision selected.
-	:guilabel:`Merge With...`
-		Merge with this revision. Opens the TortoiseHg merge dialog with
-		this revision selected.
-	:guilabel:`Backout...`
+	:guilabel:`Visual diff...`
+		Open this change in your visual diff tool
+	:guilabel:`Diff to local...`
+		Display changes (visual diff) between this revision and your
+		current working directory
+	:guilabel:`Browse at rev...`
+		Brings up the Manifest window with the content of all files in the repo
+		at the selected revision.
+	:guilabel:`Merge with local...`
+		Merge the selected changeset with the Working Dir.  Opens the TortoiseHg
+		merge dialog with this revision selected.
+	:guilabel:`Tag`
+		Allows to manage tags to the selected revision.
+	:guilabel:`Bookmark`
+		Allows to manage bookmarks for the selected revision.
+		*This option requires the boomarks extension to be enabled*
+	:guilabel:`Backout`
 		Create a backout changeset for selected revision
-	:guilabel:`Revert`
-		Revert working copy to this revision's contents, without
-		updating working directory parent revision. Use with care.
 	:guilabel:`Export`
-		:guilabel:`Export Patch`
+		:guilabel:`Export patch`
 			Generate a patch file containing this revision's changes
-		:guilabel:`Email Patch`
+		:guilabel:`Email patch...`
 			Send this revision's changes to email recipient.  Opens the
 			TortoiseHg email dialog with this revision selected.
-		:guilabel:`Bundle rev:tip`
-			Create a bundle with all revs from selected to tip
 		:guilabel:`Archive...`
 			Open the archive dialog for this revision, allowing user to
 			generate a backup copy of the repository at that revision.
-	:guilabel:`Tag`
-		:guilabel:`Add/Remove Tag`
-			Open the TortoiseHg tag dialog with this revision selected
-		:guilabel:`Add/Move/Remove Bookmark`
-			Open the TortoiseHg bookmark dialog with this revision selected
-			*This option requires the boomarks extension to be enabled*
-		:guilabel:`Rename Bookmark`
-			Open the TortoiseHg bookmark rename dialog
-			*This option requires the boomarks extension to be enabled*
-	:guilabel:`Mercurial Queues`
-		:guilabel:`Import revision to MQ`
+		:guilabel:`Copy patch`
+			todo
+			*Only visible when MQ is enabled*
+	
+	:guilabel:`Copy hash`
+			Copy current revision's full hash to the clipboard
+	:guilabel:`Modify history`
+		:guilabel:`QGoto`
+			Push/pop patches upto this one
+			*Only visible when MQ is enabled*
+		:guilabel:`Import to MQ`
 			Import selected revision into the current patch queue.  Only
 			valid for qbase or checked out head revision.  *Only visible
 			when MQ is enabled*
-		:guilabel:`Strip Revision...`
+		:guilabel:`Finish patch`
+			Transforms the MQ patch into a regular changeset.
+			*Only visible when MQ is enabled*
+		:guilabel:`Rebase...`
+			todo
+		:guilabel:`Strip...`
 			Remove the selected revision and all of it's descendants from the
 			repository [#rcm1]_ *Only visible when MQ is enabled*
-	:guilabel:`Transplant to local`
-		Transplant selected revision onto the current working parent.
-		*Only visible when the transplant extension is enabled*
-	:guilabel:`Bisect`
-		:guilabel:`Reset`
-			Reset bisect state. See `bisect <#id10>`_ section below.
-		:guilabel:`Mark as Good`
-			Mark changeset as good
-		:guilabel:`Mark as Bad`
-			Mark changeset as bad
-		:guilabel:`Skip Testing`
-			Skip testing this changeset
+			*Only visible when MQ is enabled*
 
-If you right-click on a row other than the one that was currently
-selected, you get a secondary context menu which defines commands that
-operation on revision ranges.
-
-	:guilabel:`Diff with selected`
-		Opens status viewer with cumulative changes of the range of
-		changesets.  The status viewer allows cherry picked changes to
-		be saved to a file.
-	:guilabel:`Visual Diff with selected`
-		Opens visual diff window with cumulative changes of the range
-		of changesets.  See also menuselection:`Global Settings -->
-		TortoiseHg --> Visual Diff Tool`
-	:guilabel:`Email from here to selected`
-		Opens email dialog with range of changesets.
-	:guilabel:`Bundle from here to selected`
-		Creates a bundle file with range of changesets.
-	:guilabel:`Export patches from here to selected`
+With two revisions selected:
+	:guilabel:`Visual diff...`
+		Open this change in your visual diff tool
+	:guilabel:`Export selected`
 		Creates a patch file for each changeset in selected range.
-	:guilabel:`Merge with ...`
-		Merges this revision with the other selected revision.  If
-		neither revision is currently checked out, the merge dialog will
-		be forced to update to the first selected revision before
-		starting the merge.  This will fail if the working directory is
-		not clean.
-	:guilabel:`Transplant revision range to local`
-		Transplant selected range of changesets on to current working
-		parent revision. *Only visible when the transplant extension is
-		enabled*
-	:guilabel:`Rebase on top of selected`
-		Rebase selected changeset and ancestors on top of original
-		selected revision.  *Only visible when the rebase extension is
-		enabled*
-	:guilabel:`Import from here to selected to MQ`
-		Import selected revision range into the current patch queue.
-		*Only visible when MQ is enabled*
-	:guilabel:`Select common ancestor`
-		Selects (highlights) the common ancestor of the two selected
-		revisions.  Helpful, when reviewing merges.
+	:guilabel:`Email selected...`
+		Opens email dialog with range of changesets.
+	:guilabel:`Export DAG range`
+		Creates a patch file for each changeset in selected range.
+	:guilabel:`Email DAG range...`
+		Opens email dialog with range of changesets.
+	:guilabel:`Bisect - Good, Bad...`
+		todo
+		See `bisect <#id10>`_ section below.
+	:guilabel:`Bisect - Bad, Good...`
+		todo
+		See `bisect <#id10>`_ section below.
+	:guilabel:`Compress history...`
+		Brings up a dialog where you can compress the youngest changeset into
+		the older one.
+
+With more than two revisions selected:
+	:guilabel:`Export selected`
+		Creates a patch file for each changeset in selected range.
+	:guilabel:`Email selected...`
+		Opens email dialog with range of changesets.
 
 .. [#rcm1] The strip command will store the stripped revisions in a bundle file
 		that can later be reapplied.
@@ -398,30 +377,44 @@ operation on revision ranges.
 File Context Menus
 ------------------
 
-Right-clicking on filenames in the file list (bottom left) pane will
-bring up a context menu for the selected file:
+Right-clicking on filenames in the file list pane (bottom left of the RevDetails
+and Manifest TaskTabs) will bring up a context menu for the selected file:
 
 	:guilabel:`Visual Diff`
-		Open this revision of the file in your visual diff tool
-	:guilabel:`Diff to Local`
+		Open this revision of the file in your visual diff tool.
+	:guilabel:`Visual Diff to Local`
 		Visualize differences between this revision and your checked
-		out version
+		out version.
 	:guilabel:`View at Revision`
-		Open this revision of the file in your visual editor [#flcm1]_
-	:guilabel:`Save at Revision`
-		Write this revision of the file to specified location
+		Open this revision of the file in your visual editor [#flcm1]_.
+	:guilabel:`Edit Local`
+		Open the checked out version of the file in your visual editor [#flcm1]_.
+	:guilabel:`Revert to Revision`
+		Checkout this specific revision of this file [#flcm3]_.
 	:guilabel:`File History`
-		Show revisions that modified this file [#flcm2]_
-	:guilabel:`Annotate File`
-		Open this file in the datamine app, annotated at this revision
-	:guilabel:`Revert File Contents`
-		Checkout this specific revision of this file [#flcm3]_
+		Show revisions that modified this file [#flcm2]_.
+	:guilabel:`Compare file revisions`
+		Brings up a new dialog where you can compare any revision of the file
+		with any other revision in the history.
  
 .. [#flcm1] :menuselection:`Global Settings --> TortoiseHg --> Visual Editor`
 .. [#flcm2] Does not show revisions where a file was deleted, as this is only a
             manifest change, it does not modify the file's history.
 .. [#flcm3] The new contents will appear as local changes and must be committed.
 
+Right-clicking on filenames in the file list pane of the Commit TaskTab will
+bring up a different context menu for the selected file:
+
+	:guilabel:`Edit`
+		Open this revision of the file in your visual diff tool.
+	:guilabel:`Add`
+		Add this file to the repository for versioning.
+	:guilabel:`Detect Renames...`
+		Brings up a dialog where you can try to detect renamed files.
+	:guilabel:`Ignore`
+		Adds the selected file to the .hgignore content.
+	:guilabel:`Delete unversioned`
+		Deletes unversioned files from disk.
 
 Message Parsing
 ---------------
@@ -471,9 +464,9 @@ Keyboard navigation
 	Display visual diffs for selected changeset or file
 :kbd:`Ctrl-S`
 	Toggle revision set / filter toolbar
-:kbd:`Ctrl-T`
-	Toggle the goto revision toolbar
 
+See also `KeySequences <https://bitbucket.org/tortoisehg/thg/wiki/KeySequences>`_
+on the wiki pages.
 
 Configurables
 -------------
@@ -526,10 +519,6 @@ The Workbench can be started from command line ::
 	aliases: history
 
 	changelog viewer
-
-	options:
-
-	 -l --limit  limit number of changes displayed
 
 	use "thg -v help workbench" to show global options
 
