@@ -72,7 +72,7 @@ class DetectRenameDialog(QDialog):
         slider.setPageStep(10)
         slider.setTickPosition(QSlider.TicksBelow)
         slider.changefunc = lambda v: lbl.setText(
-                            _('Min Simularity: %d%%') % v)
+                            _('Min Similarity: %d%%') % v)
         slider.valueChanged.connect(slider.changefunc)
         self.simslider = slider
         lbl.setBuddy(slider)
