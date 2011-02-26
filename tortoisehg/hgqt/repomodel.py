@@ -334,6 +334,10 @@ class HgRepoListModel(QAbstractTableModel):
                           2 * r, 2 * r)
             painter.drawEllipse(rect)
 
+        def closesymbol(s):
+            rect_ = QRectF(centre_x - 1.5 * s, centre_y - 0.5 * s, 3 * s, s)
+            painter.drawRect(rect_)
+
         def diamond(r):
             poly = QPolygonF([QPointF(centre_x - r, centre_y),
                               QPointF(centre_x, centre_y - r),
@@ -353,6 +357,9 @@ class HgRepoListModel(QAbstractTableModel):
             painter.setBrush(patchcolor)
             painter.setPen(patchcolor)
             diamond(radius / 1.5)
+        elif ctx.extra().get('close'):
+            painter.setBrush(fillcolor)
+            closesymbol(0.5 * radius)
         else:  # circles for normal revisions
             if ctx.thgwdparent():
                 painter.setBrush(white)
