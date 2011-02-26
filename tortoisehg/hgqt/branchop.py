@@ -43,11 +43,14 @@ class BranchOpDialog(QDialog):
             closebranch = QRadioButton(_('Close current branch'))
             branchCombo = QComboBox()
             branchCombo.setEditable(True)
-            for name in hglib.getlivebranch(repo):
-                if name == wctx.branch():
+
+            wbu = hglib.tounicode(wctx.branch())
+            for name in repo.livebranches:
+                if name == wbu:
                     continue
-                branchCombo.addItem(hglib.tounicode(name))
+                branchCombo.addItem(name)
             branchCombo.activated.connect(self.accept)
+
             grid.addWidget(nochange, 0, 0)
             grid.addWidget(newbranch, 1, 0)
             grid.addWidget(branchCombo, 1, 1)

@@ -51,12 +51,12 @@ class UpdateDialog(QDialog):
             rev = str(rev)
         combo.addItem(hglib.tounicode(rev))
         combo.setCurrentIndex(0)
-        for name in hglib.getlivebranch(self.repo):
-            combo.addItem(hglib.tounicode(name))
+
+        for name in repo.livebranches:
+            combo.addItem(name)
 
         tags = list(self.repo.tags())
-        tags.sort()
-        tags.reverse()
+        tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))
 
