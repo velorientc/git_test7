@@ -349,10 +349,11 @@ class ChunksWidget(QWidget):
             self.fileSelected.emit(False)
 
     def setContext(self, ctx):
-        self.fileSelected.emit(False)
         self.diffbrowse.setContext(ctx)
         self.filelistmodel.setContext(ctx)
-        self.fileModelEmpty.emit(len(ctx.files()) == 0)
+        empty = len(ctx.files()) == 0
+        self.fileModelEmpty.emit(empty)
+        self.fileSelected.emit(not empty)
 
     def refresh(self):
         ctx = self.filelistmodel._ctx
