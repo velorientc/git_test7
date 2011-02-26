@@ -441,7 +441,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     def flags(self, index):
         if not index.isValid():
-            return 0
+            return Qt.ItemFlags(0)
         if not self.revset:
             return Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
