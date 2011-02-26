@@ -85,6 +85,10 @@ def data_func(widget, item, ctx):
             ctx = ctx.p1()
         childbranches = [cctx.branch() for cctx in ctx.children()]
         return ctx.branch() not in childbranches
+    elif item == 'isclose':
+        if ctx.rev() is None:
+            ctx = ctx.p1()
+        return ctx.extra().get('close') is not None
     raise csinfo.UnknownItem(item)
 
 def markup_func(widget, item, value):
@@ -152,6 +156,11 @@ def nomarkup(widget, item, value):
             text = _('Not a head revision!')
             return qtlib.markup(text, fg='red', weight='bold')
         raise csinfo.UnknownItem(item)
+    elif item == 'isclose':
+        if value is True:
+            text = _('Head is closed!')
+            return qtlib.markup(text, fg='red', weight='bold')
+        raise csinfo.UnknownItem(item)
     for cset in value:
         if isinstance(cset, basestring):
             csets.append(revid_markup(cset))
@@ -162,5 +171,6 @@ def nomarkup(widget, item, value):
 def ParentWidget(repo):
     'creates a parent rev widget and returns it'
     custom = csinfo.custom(data=data_func, label=label_func, markup=nomarkup)
-    style = csinfo.panelstyle(contents=('parents','ishead'), selectable=True)
+    style = csinfo.panelstyle(contents=('parents', 'ishead', 'isclose'),
+                             selectable=True)
     return csinfo.create(repo, style=style, custom=custom)
