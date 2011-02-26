@@ -40,7 +40,7 @@ class BranchOpDialog(QDialog):
             grid = QGridLayout()
             nochange = QRadioButton(_('No branch changes'))
             newbranch = QRadioButton(_('Open a new named branch'))
-            closebranch = QRadioButton(_('Close current named branch'))
+            closebranch = QRadioButton(_('Close current branch'))
             branchCombo = QComboBox()
             branchCombo.setEditable(True)
             for name in hglib.getlivebranch(repo):
