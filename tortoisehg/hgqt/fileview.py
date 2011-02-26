@@ -572,12 +572,16 @@ class FileData(object):
             try:
                 from mercurial import subrepo, commands
                 assert(ctx.rev() is None)
+                srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
+                sub = ctx.sub(wfile)
+                if isinstance(sub, subrepo.hgsubrepo):
+                    srepo = sub._repo
+                    sactual = srepo['.'].hex()
+                else:
+                    self.error = _('Not a Mercurial subrepo, not previewable')
+                    return
                 out = []
                 _ui = uimod.ui()
-                sroot = repo.wjoin(wfile)
-                srepo = hg.repository(_ui, path=sroot)
-                srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
-                sactual = srepo['.'].hex()
                 _ui.pushbuffer()
                 commands.status(_ui, srepo)
                 data = _ui.popbuffer()
@@ -601,9 +605,10 @@ class FileData(object):
                 self.contents = u''.join(out)
                 self.flabel += _(' <i>(is a dirty sub-repository)</i>')
                 lbl = u' <a href="subrepo:%s">%s...</a>'
-                self.flabel += lbl % (hglib.tounicode(sroot), _('open'))
-            except (error.RepoError, util.Abort), e:
-                self.error = _('Not a Mercurial subrepo, not previewable')
+                self.flabel += lbl % (hglib.tounicode(srepo.root), _('open'))
+            except (EnvironmentError, error.RepoError, util.Abort), e:
+                self.error = _('Error previewing subrepo: %s') % \
+                        hglib.tounicode(str(e))
             return
 
         # TODO: elif check if a subdirectory (for manifest tool)
