@@ -586,18 +586,18 @@ class FileData(object):
                 commands.status(_ui, srepo)
                 data = _ui.popbuffer()
                 if data:
-                    out.append(_('File Status:\n'))
-                    out.append(data)
-                    out.append('\n')
+                    out.append(_('File Status:') + u'\n')
+                    out.append(hglib.tounicode(data))
+                    out.append(u'\n')
                 if srev == '':
-                    out.append(_('New subrepository\n\n'))
+                    out.append(_('New subrepository') + u'\n\n')
                 elif srev != sactual:
-                    out.append(_('Revision has changed from:\n\n'))
+                    out.append(_('Revision has changed from:') + u'\n\n')
                     opts = {'date':None, 'user':None, 'rev':[srev]}
                     _ui.pushbuffer()
                     commands.log(_ui, srepo, **opts)
                     out.append(hglib.tounicode(_ui.popbuffer()))
-                    out.append(_('To:\n'))
+                    out.append(_('To:') + u'\n')
                     opts['rev'] = [sactual]
                     _ui.pushbuffer()
                     commands.log(_ui, srepo, **opts)
