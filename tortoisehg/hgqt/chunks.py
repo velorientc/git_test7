@@ -54,6 +54,8 @@ class ChunksWidget(QWidget):
         self.layout().addWidget(self.splitter)
 
         self.filelist = filelistview.HgFileListView(self)
+        self.filelistmodel = filelistmodel.HgFileListModel(self.repo, self)
+        self.filelist.setModel(self.filelistmodel)
 
         self.fileListFrame = QFrame(self.splitter)
         self.fileListFrame.setFrameShape(QFrame.NoFrame)
@@ -347,20 +349,10 @@ class ChunksWidget(QWidget):
             self.fileSelected.emit(False)
 
     def setContext(self, ctx):
-        if self.filelist.model() is not None:
-            f = self.filelist.currentFile()
-        else:
-            f = None
         self.fileSelected.emit(False)
-        self.filelistmodel = filelistmodel.HgFileListModel(self.repo, self)
-        self.filelist.setModel(self.filelistmodel)
         self.diffbrowse.setContext(ctx)
         self.filelistmodel.setContext(ctx)
         self.fileModelEmpty.emit(len(ctx.files()) == 0)
-        if f and f in ctx:
-            self.filelist.selectFile(f)
-        else:
-            self.diffbrowse.clearChunks()
 
     def refresh(self):
         ctx = self.filelistmodel._ctx
@@ -371,6 +363,8 @@ class ChunksWidget(QWidget):
             self.repo.thginvalidate()
             ctx = self.repo.changectx(ctx.node())
         self.setContext(ctx)
+        if self.currentFile:
+            self.filelist.selectFile(self.currentFile)
 
     def loadSettings(self, qs, prefix):
         self.diffbrowse.loadSettings(qs, prefix)
