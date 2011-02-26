@@ -58,7 +58,7 @@ class StripDialog(QDialog):
             rev = str(rev)
         combo.addItem(hglib.tounicode(rev))
         combo.setCurrentIndex(0)
-        for name in self.repo.livebranches:
+        for name in self.repo.namedbranches:
             combo.addItem(name)
 
         tags = list(self.repo.tags())

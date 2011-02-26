@@ -52,7 +52,7 @@ class UpdateDialog(QDialog):
         combo.addItem(hglib.tounicode(rev))
         combo.setCurrentIndex(0)
 
-        for name in repo.livebranches:
+        for name in repo.namedbranches:
             combo.addItem(name)
 
         tags = list(self.repo.tags())

@@ -45,7 +45,7 @@ class BranchOpDialog(QDialog):
             branchCombo.setEditable(True)
 
             wbu = hglib.tounicode(wctx.branch())
-            for name in repo.livebranches:
+            for name in repo.namedbranches:
                 if name == wbu:
                     continue
                 branchCombo.addItem(name)

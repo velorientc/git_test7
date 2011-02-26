@@ -209,7 +209,7 @@ class ThgRepoWrapper(QObject):
 
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
-              shortname mergetools livebranches namedbranches'''.split()
+              shortname mergetools namedbranches'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
                    _branchheads'''.split()
 
@@ -239,22 +239,6 @@ def _extendrepo(repo):
             changectx = super(thgrepository, self).changectx(changeid)
             changectx.__class__ = _extendchangectx(changectx)
             return changectx
-
-        @propertycache
-        def livebranches(self):
-            '''return a list of live branch names in unicode'''
-            lives = []
-            cl = self.changelog
-            for branch, heads in self.branchmap().iteritems():
-                if branch in self.deadbranches:
-                    continue
-                bheads = [h for h in heads if ('close' not in cl.read(h)[5])]
-                if not bheads:
-                    # ignore branches with all heads closed
-                    continue
-                lives.append(hglib.tounicode(branch))
-            lives.sort()
-            return lives
 
         @propertycache
         def _thghiddentags(self):
