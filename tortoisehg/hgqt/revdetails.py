@@ -223,17 +223,6 @@ class RevDetailsWidget(QWidget):
         self._deschtmlize = descriptionhtmlizer(self.repo.ui)
         self.onRevisionSelected(self._last_rev)  # regenerate desc html
 
-    def record(self):
-        'Repo widget is reloading, record current file'
-        self._reload_file = self.filelist.currentFile()
-
-    def finishReload(self):
-        'Finish reload by re-selecting previous file'
-        if self._reload_file:
-            self.filelist.selectFile(self._reload_file)
-        elif not self.filelist.selectedIndexes():
-            self.filelist.selectRow(0)
-
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
         if type(self._last_rev) is int and len(self.repo) <= self._last_rev:

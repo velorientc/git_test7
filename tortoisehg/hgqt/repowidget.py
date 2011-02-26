@@ -567,7 +567,6 @@ class RepoWidget(QWidget):
         'initial batch of revisions loaded'
         self.repoview.resizeColumns()
         self.repoview.goto(self._reload_rev) # emits revisionSelected
-        self.revDetailsWidget.finishReload()
 
     def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
@@ -593,7 +592,6 @@ class RepoWidget(QWidget):
             self.grepDemand.forward('setRevision', rev)
             self.syncDemand.forward('refreshTargets', rev)
         self.revDetailsWidget.onRevisionSelected(rev)
-        self.revDetailsWidget.record()
         self.revisionSelected.emit(rev)
 
     def gotoParent(self):
@@ -649,7 +647,6 @@ class RepoWidget(QWidget):
         elif len(self.repo) <= self.rev:
             self._reload_rev = 'tip'
         self.setupModels()
-        self.revDetailsWidget.record()
 
     def reloadTaskTab(self):
         tti = self.taskTabsWidget.currentIndex()
