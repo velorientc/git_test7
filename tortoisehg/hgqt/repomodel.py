@@ -484,10 +484,10 @@ class HgRepoListModel(QAbstractTableModel):
         self.layoutChanged.emit()
 
     def getbranch(self, ctx, gnode):
-        b = ctx.branch()
+        b = hglib.tounicode(ctx.branch())
         if ctx.extra().get('close'):
-            b += ' (close)'
-        return hglib.tounicode(b)
+            b += u' \u2327'
+        return b
 
     def gettags(self, ctx, gnode):
         if ctx.rev() is None:
