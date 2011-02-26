@@ -22,7 +22,7 @@ to TortoiseHg.  You do this by opening the global settings dialog.
 Right click on the desktop background and select
 :menuselection:`TortoiseHg --> Global Settings`.
 
-.. figure:: figures/cmenu-global-settings.jpg
+.. figure:: figures/cmenu-global-settings.png
 	:alt: Desktop Context Menu
 
 	Open "Global Settings" from the desktop
