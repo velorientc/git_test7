@@ -18,8 +18,8 @@ from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo
 
-PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'tags',
-                 'transplant', 'p4', 'svn')
+PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'close',
+                 'tags', 'transplant', 'p4', 'svn')
 
 def create(repo, target=None, style=None, custom=None, **kargs):
     return Factory(repo, custom, style, target, **kargs)()
@@ -106,6 +106,7 @@ class SummaryInfo(object):
               'revid': _('Revision:'), 'summary': _('Summary:'),
               'user': _('User:'), 'date': _('Date:'),'age': _('Age:'),
               'dateage': _('Date:'), 'branch': _('Branch:'),
+              'close': _('Close:'),
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
               'rawtags': _('Tags:'), 'transplant': _('Transplant:'),
               'p4': _('Perforce:'), 'svn': _('Subversion:'),
@@ -168,6 +169,8 @@ class SummaryInfo(object):
                         return None
                     return value
                 return None
+            elif item == 'close':
+                return ctx.extra().get('close')
             elif item == 'rawtags':
                 return hglib.getrawctxtags(ctx)
             elif item == 'tags':
@@ -243,7 +246,7 @@ class SummaryInfo(object):
                 return '%s' % revid
             elif item in ('revid', 'transplant'):
                 return qtlib.markup(value, **mono)
-            elif item in ('revnum', 'p4', 'svn'):
+            elif item in ('revnum', 'p4', 'svn', 'close'):
                 return str(value)
             elif item in ('rawbranch', 'branch'):
                 opts = dict(fg='black', bg='#aaffaa')
