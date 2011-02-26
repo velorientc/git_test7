@@ -612,9 +612,35 @@ class WctxModel(QAbstractTableModel):
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()
+
+        def getStatusRank(value):
+            """Helper function used to sort items according to their hg status
+
+            Statuses are ranked in the following order:
+                'S','M','A','R','!','?','C','I'
+            """
+            sortList = ('S','M','A','R','!','?','C','I')
+
+            try:
+                rank = sortList.index(value)
+            except IndexError, e:
+                rank = len(shortList)
+
+            return rank
+
         if col == COL_PATH:
             c = self.checked
             self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
+        elif col == COL_STATUS:
+            # We want to sort the list by status, and then, for files which have
+            # the same status, we want them to be sorted alphabetically (without
+            # taking into account the case)
+            # Since since Python 2.3 the sort function is guaranteed to be
+            # stable, we can do that by sorting in two passes (first sort by
+            # path and then by status)
+            self.rows.sort(lambda x, y: \
+                cmp(x[COL_PATH].lower(), y[COL_PATH].lower()))
+            self.rows.sort(key=lambda x: getStatusRank(x[col]))
         else:
             self.rows.sort(lambda x, y: cmp(x[col], y[col]))
         if order == Qt.DescendingOrder:
