@@ -138,7 +138,7 @@ class RepoWidget(QWidget):
         view.setFrameShape(QFrame.StyledPanel)
 
         self.repotabs_splitter.addWidget(self.repoview)
-        self.repotabs_splitter.setCollapsible(0, False)
+        self.repotabs_splitter.setCollapsible(0, True)
         self.repotabs_splitter.setStretchFactor(0, 1)
 
         self.taskTabsWidget = tt = QTabWidget()
