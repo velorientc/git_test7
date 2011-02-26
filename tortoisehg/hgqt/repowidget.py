@@ -591,6 +591,8 @@ class RepoWidget(QWidget):
             self.manifestDemand.forward('setRev', rev)
             self.grepDemand.forward('setRevision', rev)
             self.syncDemand.forward('refreshTargets', rev)
+        else:
+            self.manifestDemand.forward('setRev', None)
         self.revDetailsWidget.onRevisionSelected(rev)
         self.revisionSelected.emit(rev)
 
