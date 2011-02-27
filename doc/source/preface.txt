@@ -71,7 +71,7 @@ file feature requests).
 The TortoiseHg installer for Windows includes the TortoiseOverlays handler,
 as provided by the `TortoiseSVN <http://tortoisesvn.net>`_ project.
 
-The history viewer of TortoiseHg is based on hgview
+The history viewer of TortoiseHg is based on 
 `hgview <http://www.logilab.org/project/hgview>`_, a tool developed by
 `David Douard <david.douard@logilab.fr>`_ and others, with the financial
 support of `Logilab <http://www.logilab.fr>`_.
