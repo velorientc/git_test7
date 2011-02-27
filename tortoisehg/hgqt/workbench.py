@@ -245,7 +245,7 @@ class Workbench(QMainWindow):
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view')
-        newaction(_("Load all"), self.loadall,
+        newaction(_("Load all revisions"), self.loadall,
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
 
