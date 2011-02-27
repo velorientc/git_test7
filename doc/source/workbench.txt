@@ -21,21 +21,21 @@ Workbench Main Widgets are:
 		A tabbed widget to view multiple repositories at once. The different
 		columns show general information about each changeset in the graphlog.
 		You can configure the columns to show from the menu via
-		:guilabel:`View -> Choose Log Columns...`, and there you can reorder
+		:menuselection:`View --> Choose Log Columns...`, and there you can reorder
 		the columns too. This is the main or central widget of the 	Workbench
 		application.
 
 	:guilabel:`Repository Registry`
 		This widget, by default shown on the left, allows to manage multiple
 		repositories from the Workbench. You can show/hide it via
-		:guilabel:`View -> Show Repo Registry` or with the corresponding button
+		:menuselection:`View --> Show Repo Registry` or with the corresponding button
 		in the Dock Toolbar. It's also a dockable widget.
-		The :guilabel:`View -> Show Paths` menu option allows to not only view
+		The :menuselection:`View --> Show Paths` menu option allows to not only view
 		the names of the repositories but also their path in a second column.
 	
 	:guilabel:`Output Log`
 		This dockable widget, which can be shown/hidden with
-		:guilabel:`View -> Show Output Log`, gives the user information about
+		:menuselection:`View --> Show Output Log`, gives the user information about
 		the Mercurial commands that were executed during the current session.
 		You can also use it as a commandline by typing Mercurial commands at its
 		prompt 	directly. It shows any error messages when appropriate. Content
@@ -183,6 +183,7 @@ Work with the various tasktabs.
 
 	:guilabel:`Search`
 		For performing text searches through file content.
+		
 ..		See _`Search` for more detail.
 
 ..
@@ -243,7 +244,7 @@ The toolbar can be toggled with :kbd:`Ctrl-S`. Parts from left to right:
 		stand out more.
 	:guilabel:`Branch options`
 		A few options for showing branches.
-		See :guilabel:`Repo Settings -> Changelog -> Dead Branches` for
+		See :menuselection:`Repo Settings --> Changelog --> Dead Branches` for
 		a method to prune names from this combo box.
 	:guilabel:`Branches combo`
 		A combo box with the list of named branches in your repository.
@@ -266,12 +267,12 @@ Performance Implications
 There are some Workbench features that could have performance implications in
 large repositories.
 
-* :menuselection:`View -> Choose Log columns...` 
+* :menuselection:`View --> Choose Log columns...` 
 	Enabling the :guilabel:`Changes` column can be expensive to calculate on
 	repositories with large working copies, causing both refreshes and scrolling
 	to be slow.
 
-* :menuselection:`View -> Load all`
+* :menuselection:`View --> Load all`
 	Normally, when the user scrolls through the history, chunks of changesets
 	are read as you scroll. This menu choice allows you to have the Workbench
 	read all the changesets from the repository, probably allowing smoother
