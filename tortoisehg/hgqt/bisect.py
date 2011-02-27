@@ -83,15 +83,16 @@ class BisectDialog(QDialog):
                 lbl.setText(_('Error encountered.'))
                 return
             repo.dirstate.invalidate()
-            rev = repo['.'].rev()
-            if rev == self.lastrev:
+            ctx = repo['.']
+            if ctx.rev() == self.lastrev:
                 lbl.setText(_('Culprit found.'))
                 return
-            self.lastrev = rev
+            self.lastrev = ctx.rev()
             for b in self.nextbuttons:
                 b.setEnabled(True)
-            lbl.setText('%s: %d (%s) -> %s' % (_('Revision'), rev.id(), rev.hash(), _('Test this revision and report findings. '
-                           '(good/bad/skip)')))
+            lbl.setText('%s: %d (%s) -> %s' % (_('Revision'), ctx.rev(), ctx,
+                        _('Test this revision and report findings. '
+                          '(good/bad/skip)')))
         self.cmd.commandFinished.connect(cmdFinished)
 
         prefix = ['bisect', '--repository', repo.root]
