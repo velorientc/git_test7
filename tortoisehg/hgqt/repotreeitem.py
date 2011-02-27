@@ -8,7 +8,7 @@
 import sys
 import os
 
-from mercurial import hg, url, error
+from mercurial import hg, url, error, node
 
 from tortoisehg.util import hglib
 
@@ -150,6 +150,7 @@ class RepoItem(RepoTreeItem):
         self._repo = repo
         self._root = repo and repo.root or ''  # local str
         self._shortname = repo and repo.shortname or ''  # unicode
+        self._basenode = repo and repo[0].node() or node.nullid
 
     def rootpath(self):
         return self._root
@@ -161,6 +162,13 @@ class RepoItem(RepoTreeItem):
             return self._shortname
         else:
             return hglib.tounicode(os.path.basename(self._root))
+
+    def basenode(self):
+        """Return node id of revision 0"""
+        if self._repo:
+            return self._repo[0].node()
+        else:
+            return self._basenode or node.nullid
 
     def data(self, column, role):
         if role == Qt.DecorationRole:
@@ -187,12 +195,14 @@ class RepoItem(RepoTreeItem):
     def dump(self, xw):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
+        xw.writeAttribute('basenode', node.hex(self.basenode()))
         RepoTreeItem.dump(self, xw)
 
     def undump(self, xr):
         a = xr.attributes()
         self._root = hglib.fromunicode(a.value('', 'root').toString())
         self._shortname = unicode(a.value('', 'shortname').toString())
+        self._basenode = node.bin(str(a.value('', 'basenode').toString()))
         RepoTreeItem.undump(self, xr)
 
     def open(self, reuse=False):
