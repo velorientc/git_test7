@@ -61,14 +61,12 @@ merge files automatically, deferring their resolution until the resolve
 dialog can be launched.  This is true for merges, update commands that
 require content merges, rebases, and backouts.
 
-Shelve dropped, MQ improved
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Shelve Improved
+~~~~~~~~~~~~~~~
 
-TortoiseHg 2.0 does not include a shelve tool as 1.0 did.  Instead, we
-have elevated MQ usability to cover the use cases where shelving was
-necessary (still a work in progress).  This approach avoids a number of
-shelve issues, for instance its inability to shelve added or removed
-files.
+TortoiseHg 2.0 includes a new shelve tool which is capable of moving
+changes between your working directory, a shelf file, or an unapplied MQ
+patch.
 
 Revision Sets
 ~~~~~~~~~~~~~
@@ -151,7 +149,7 @@ only load a couple hundred revisions initially during a refresh, and
 then load further revisions only when those revisions are required to be
 displayed.  You will notice scrolling through the graph is jerky, these
 are bulk loads of revisions into the graph.  To avoid this jerkiness you
-can force TortoiseHg to load all revisions in the graph via the 'Load
-All' toolbar button.
+can force TortoiseHg to load all revisions in the graph via the
+:guilabel:`Load All` option from the :guilabel:`View` menu.
 
 .. vim: noet ts=4 syntax=rest
