@@ -16,7 +16,7 @@ tasks.  Nearly every Mercurial feature is accessible from the Workbench.
 
 Workbench Main Widgets are:
 
-	:guilabel:`Changelog View`
+	:guilabel:`Revision History View`
 		A tabbed widget to view multiple repositories at once. The different
 		columns show general information about each changeset in the graphlog.
 		You can configure the columns to show from the menu via
@@ -86,7 +86,7 @@ Edit Toolbar
 	
 	Edit toolbar
 
-Moving around in the changelog. All the buttons work on the current	repository.
+Moving around in the revision history. All the buttons work on the current repository.
 
 	:guilabel:`Refresh`
 		Reload the revision history of the current repository.
@@ -96,7 +96,8 @@ Moving around in the changelog. All the buttons work on the current	repository.
 		Go forward to the next revision in your selection history or
 		most recent revision set query.
 	:guilabel:`Filter toolbar`
-		Show and activate the Filter Toolbar at the top of the changelog.
+		Show and activate the Filter Toolbar at the top of the revision
+		graph.
 
 Dock Toolbar
 ------------
@@ -130,7 +131,7 @@ Synchronize your repository with other repositories.
 		incoming changes applied.  Incoming changesets will be shown as normal,
 		while others will be shown grayed in the revision graph.
 		The buttons :guilabel:`Accept` and :guilabel:`Reject` are then
-		shown at the top of the changelog.
+		shown at the top of the revision graph.
 	:guilabel:`Pull`
 		Pull incoming changesets from the remote repository, then apply
 		after-pull effect (update, fetch, or rebase).
@@ -153,7 +154,7 @@ Work with the various task tabs.
 
 	:guilabel:`Revision Details`
 		Shows information about the current revision : files added, removed,
-		renamed, or modified, file contents, changelog info.
+		renamed, or modified, file contents, changeset info.
 		See _`Revision Details` for more detail.
 
 ..        .. figure:: figures/revdetails-tasktab.png
@@ -245,7 +246,7 @@ Filter Toolbar
 .. figure:: figures/filter-toolbar.png
 	:alt: Filter Toolbar
 
-	Filter features for the changelog tool.
+	Filter features for the Workbench.
 
 The filter bar allows one to quickly filter the changesets panel. It is based
 on the Revision Sets feature of Mercurial.
@@ -271,7 +272,7 @@ The toolbar can be toggled with :kbd:`Ctrl-S`. Parts from left to right:
 		stand out more.
 	:guilabel:`Branch options`
 		A few options for showing branches.
-		See :menuselection:`Repo Settings --> Changelog --> Dead Branches` for
+		See :menuselection:`Repo Settings --> Workbench --> Dead Branches` for
 		a method to prune names from this combo box.
 	:guilabel:`Branches combo`
 		A combo box with the list of named branches in your repository.
@@ -512,8 +513,8 @@ on the wiki pages.
 Configurables
 -------------
 
-The changelog browser has a few configurable options that can be set in
-the TortoiseHg Settings dialog on the Changelog tab.
+The Workbench has a few configurable options that can be set in
+the TortoiseHg Settings dialog on the Workbench tab.
 
 	:guilabel:`Author coloring`
 		If true, each author's changeset will be given a unique color
@@ -541,7 +542,7 @@ lines like these to your :file:`Mercurial.ini` file: ::
 	[tortoisehg]
 	authorcolor.USERNAME = color
 
-The changelog browser also respects the following settings on the
+The Workbench also respects the following settings on the
 TortoiseHg tab:
 
 	:guilabel:`Tab Width`
@@ -557,10 +558,10 @@ The Workbench can be started from command line ::
 
 	thg log [OPTIONS] [FILE]
 
-	aliases: history
+	aliases: history, explorer, workbench
 
-	changelog viewer
+	workbench application
 
-	use "thg -v help workbench" to show global options
+	use "thg -v help log" to show global options
 
 .. vim: noet ts=4
