@@ -212,6 +212,19 @@ Work with the various tasktabs.
 
 ..
 
+There is some relation between the revision or patch selected in the graph pane,
+and the tasktabs.
+
+* Selecting the Working Directory automatically switches to the Commit tasktab.
+
+* Selecting any other revision than the Working Directory switches to the
+  Revision Details tasktab.
+
+You can overrule this standard behaviour by doing an :kbd:`ALT-Click` for making
+your selection. This preserves the current tasktab, no matter what revision or
+patch you select.
+
+
 Filter Toolbar
 --------------
 
