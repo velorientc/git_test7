@@ -419,17 +419,6 @@ The group which contains drop-down combo entries under
 	Font used in command output window.
         Default: monospace 10.
 
-Removed this release
-====================
-
-:guilabel:`Copy Hash:`
-	Allow the changelog viewer to copy the changeset hash
-	of the currently selected changeset into the clipboard.
-	Default: False.
-
-To copy the hash of a changeset to the clipboard, use the 'Copy Hash'
-context menu option.
-
 Keyboard navigation
 ===================
 
