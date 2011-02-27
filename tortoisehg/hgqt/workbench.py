@@ -185,8 +185,7 @@ class Workbench(QMainWindow):
         newaction(_('&Settings...'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
         newseparator(menu='file')
-        newaction(_("E&xit"), self.close, icon='application-exit',
-                  shortcut='Quit', menu='file')
+        newaction(_("E&xit"), self.close, shortcut='Quit', menu='file')
 
         a = self.reporegistry.toggleViewAction()
         a.setText(_('Show Repository Registry'))
