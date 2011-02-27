@@ -64,8 +64,8 @@ applications which cannot be shutdown, a reboot will be required to
 complete the install.
 
 .. note::
-	If you have a legacy version of TortoiseHg installed, the 1.0
-	installer will ask that you to remove it.  The uninstall can be
+	If you have a legacy version of TortoiseHg installed, the
+	installer will require that you to remove it.  The uninstall can be
 	initiated from the control panel or the start menu.
 
 .. warning::
@@ -74,18 +74,18 @@ complete the install.
 	older TortoiseHg versions.  This is not a problem with the newer MSI
 	packages.
 
-All legacy TortoiseHg installers (before version 1.0) were built with
+Legacy TortoiseHg installers (prior to version 1.0) were built with
 InnoSetup.  They installed a TortoiseOverlay package as a separate
 application, so you always saw both TortoiseHg and TortoiseOverlay as
 two applications in the *Add/Remove Programs* control panel program.
 (On x64 platforms, there were two TortoiseOverlays, one for x86
 processes and one of x64 processes).
 
-The new MSI installers for TortoiseHg 1.0 and later include the
-TortoiseOverlay packages as "merge modules" so they do not appear as
-separate applications anymore.  It should be safe to uninstall the older
+The new MSI installers for TortoiseHg include the TortoiseOverlay
+packages as "merge modules" so they do not appear as separate
+applications anymore.  It should be safe to uninstall the older
 TortoiseOverlay applications from *Add/Remove Programs* after you
-uninstall the legacy (<=0.9.3) TortoiseHg installer, unless you have
+uninstalled the legacy (<=0.9.3) TortoiseHg installer, unless you have
 other Tortoise products that still use the separate TortoiseOverlay MSI
 approach (TortoiseCVS or TortoiseBZR).
 
@@ -116,10 +116,8 @@ Language settings
 
 The TortoiseHg user interface has been translated into many languages.
 Language packs are not required since all available languages are
-installed. Look in :file:`C:\\Program Files\\TortoiseHg\\locale` for the
-available languages. To enable a language just set the environment
-variable ``LANGUAGE`` to the desidered language, e.g. for italian
-``set LANGUAGE=it``.
+installed by default.  You can select your preferred :guilabel:`UI
+Language` in the global settings tool.
 
 The Windows shell extension context menus get their translations from
 the Windows registry.  Translations for many locales were installed
@@ -135,19 +133,11 @@ The most recent Linux packages can be found on our `download
 
 For Mac OS X, no packages are available but you can run thg and all the
 dialogs via the source install method. For details, see
-`Mac OS X <http://bitbucket.org/tortoisehg/thg/wiki/Home>`_.
+`Mac OS X <http://bitbucket.org/tortoisehg/thg/wiki/developers/MacOSX>`_.
 
 .. note::
 	If you install TortoiseHg from source, you need to add our
 	contrib/mergetools.rc file to your HGRC path in some way.  One
 	approach is to %include it from your ~/.hgrc file.
-
-Language settings
-^^^^^^^^^^^^^^^^^
-
-The TortoiseHg tools use Python's
-`gettext <http://docs.python.org/library/gettext.html>`_ library to
-localize their text.  To get localized dialogs, it is recommended that
-you set the LANGUAGE environment variable to your locale of choice.
 
 .. vim: noet ts=4
