@@ -251,8 +251,6 @@ class Workbench(QMainWindow):
 
         newaction(_("Web Server"), self.serve, enabled='repoopen',
                   menu='repository', icon='proxy')
-        newaction(_("Bisect"), self._repofwd('bisect'), icon='hg-bisect',
-                  enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Shelve"), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
@@ -272,6 +270,9 @@ class Workbench(QMainWindow):
         newseparator(menu='repository')
         newaction(_("Purge"), self._repofwd('purge'), enabled='repoopen',
                   icon='hg-purge', menu='repository')
+        newseparator(menu='repository')
+        newaction(_("Bisect..."), self._repofwd('bisect'),
+                  enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+S',
                   icon='system-file-manager', enabled='repoopen',
