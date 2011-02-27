@@ -250,7 +250,7 @@ class Workbench(QMainWindow):
                   tooltip=_('Load all revisions into graph'))
 
         newaction(_("Web Server"), self.serve, enabled='repoopen',
-                  menu='repository', icon='proxy')
+                  menu='repository')
         newseparator(menu='repository')
         newaction(_("Shelve"), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
@@ -258,7 +258,7 @@ class Workbench(QMainWindow):
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Verify"), self._repofwd('verify'), enabled='repoopen',
-                  icon='hg-verify', menu='repository')
+                  menu='repository')
         newaction(_("Recover"), self._repofwd('recover'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
