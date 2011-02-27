@@ -19,7 +19,8 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
+from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, \
+                            reporegistry, repotreemodel
 
 # TODO
 # Write keyring help, connect to help button
@@ -339,16 +340,25 @@ class SyncWidget(QWidget):
         known.add(self.repo.root)
         related = {}
         repoid = self.repo[0].node()
-        for repo in thgrepo._repocache.values():
-            if repo[0].node() != repoid:
-                continue
-            if repo.root not in known:
-                related[repo.root] = repo.shortname
-                known.add(repo.root)
-            for alias, path in repo.ui.configitems('paths'):
-                if path not in known:
-                    related[path] = alias
-                    known.add(path)
+        f = QFile(reporegistry.settingsfilename())
+        f.open(QIODevice.ReadOnly)
+        try:
+            for e in repotreemodel.iterRepoItemFromXml(f):
+                if e.basenode() != repoid:
+                    continue
+                try:
+                    repo = thgrepo.repository(path=e.rootpath())
+                except error.RepoError:
+                    continue
+                if repo.root not in known:
+                    related[repo.root] = repo.shortname
+                    known.add(repo.root)
+                for alias, path in repo.ui.configitems('paths'):
+                    if path not in known:
+                        related[path] = alias
+                        known.add(path)
+        finally:
+            f.close()
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
