@@ -52,6 +52,12 @@ def readXml(source, rootElementName, model):
         print str(xr.errorString())
     return itemread
 
+def iterRepoItemFromXml(source, model=None):
+    xr = QXmlStreamReader(source)
+    while not xr.atEnd():
+        t = xr.readNext()
+        if t == QXmlStreamReader.StartElement and xr.name() == 'repo':
+            yield undumpObject(xr, model)
 
 class RepoTreeModel(QAbstractItemModel):
     def __init__(self, openrepofunc, filename=None, parent=None):

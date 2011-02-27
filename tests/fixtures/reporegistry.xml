@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reporegistry>
+  <treeitem>
+    <allgroup>
+      <repo root="/thg" shortname="thg" basenode="bac32db38e52fd49acb62b94730a55f4f4b0cdee"/>
+      <repo root="/mercurial" shortname="hg" basenode="9117c6561b0bd7792fa13b50d28239d51b78e51f"/>
+    </allgroup>
+    <group name="bar">
+      <repo root="/python-vcs" shortname="python-vcs" basenode="b986218ba1c9b0d6a259fac9b050b1724ed8e545"/>
+    </group>
+  </treeitem>
+</reporegistry>
