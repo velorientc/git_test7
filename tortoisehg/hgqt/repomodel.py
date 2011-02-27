@@ -486,7 +486,7 @@ class HgRepoListModel(QAbstractTableModel):
     def getbranch(self, ctx, gnode):
         b = hglib.tounicode(ctx.branch())
         if ctx.extra().get('close'):
-            b += u' \u2327'
+            b += u'--'
         return b
 
     def gettags(self, ctx, gnode):
