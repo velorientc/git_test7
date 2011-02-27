@@ -628,21 +628,38 @@ class WctxModel(QAbstractTableModel):
 
             return rank
 
-        if col == COL_PATH:
-            c = self.checked
-            self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
-        elif col == COL_STATUS:
-            # We want to sort the list by status, and then, for files which have
-            # the same status, we want them to be sorted alphabetically (without
-            # taking into account the case)
-            # Since since Python 2.3 the sort function is guaranteed to be
-            # stable, we can do that by sorting in two passes (first sort by
-            # path and then by status)
-            self.rows.sort(lambda x, y: \
+        # We want to sort the list by one of the columns (checked state,
+        # mercurial status, file path, file extension, etc)
+        # However, for files which have the same status or extension, etc,
+        # we want them to be sorted alphabetically (without taking into account
+        # the case)
+        # Since Python 2.3 the sort function is guaranteed to be stable.
+        # Thus we can perform the sort in two passes:
+        # 1.- Perform a secondary sort by path
+        # 2.- Perform a primary sort by the actual column that we are sorting on
+
+        # Secondary sort:
+        self.rows.sort(lambda x, y: \
                 cmp(x[COL_PATH].lower(), y[COL_PATH].lower()))
-            self.rows.sort(key=lambda x: getStatusRank(x[col]))
+
+        if col == COL_PATH_DISPLAY:
+            # Already sorted!
+            pass
         else:
-            self.rows.sort(lambda x, y: cmp(x[col], y[col]))
+            if order == Qt.DescendingOrder:
+                # We want the secondary sort to be by _ascending_ path,
+                # even when the primary sort is in descending order
+                self.rows.reverse()
+
+            # Now we can perform the primary sort
+            if col == COL_PATH:
+                c = self.checked
+                self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
+            elif col == COL_STATUS:
+                self.rows.sort(key=lambda x: getStatusRank(x[col]))
+            else:
+                self.rows.sort(lambda x, y: cmp(x[col], y[col]))
+
         if order == Qt.DescendingOrder:
             self.rows.reverse()
         self.layoutChanged.emit()
