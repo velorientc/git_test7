@@ -265,8 +265,10 @@ class Workbench(QMainWindow):
         newseparator(menu='repository')
         newaction(_("Resolve"), self._repofwd('resolve'), icon='hg-merge',
                   enabled='repoopen', menu='repository')
-        newaction(_("Rollback/Undo"), self._repofwd('rollback'),
-                  icon='hg-undo', enabled='repoopen', menu='repository')
+        newseparator(menu='repository')
+        newaction(_("Rollback/Undo..."), self._repofwd('rollback'),
+                  enabled='repoopen', menu='repository')
+        newseparator(menu='repository')
         newaction(_("Purge"), self._repofwd('purge'), enabled='repoopen',
                   icon='hg-purge', menu='repository')
         newseparator(menu='repository')
