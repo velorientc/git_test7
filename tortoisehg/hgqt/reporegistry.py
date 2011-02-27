@@ -7,20 +7,14 @@
 
 import os
 
-from mercurial import url
-
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import qtlib, thgrepo
 from tortoisehg.hgqt.repotreemodel import RepoTreeModel
-from tortoisehg.hgqt.pathedit import PathEditDialog
 from tortoisehg.hgqt.clone import CloneDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-connect = QObject.connect
-
 
 def settingsfilename():
     """Return path to thg-reporegistry.xml as unicode"""

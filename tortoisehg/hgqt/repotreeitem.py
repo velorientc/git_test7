@@ -5,16 +5,13 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import sys
-import os
+import sys, os
 
-from mercurial import hg, url, error, node
+from mercurial import node
 
 from tortoisehg.util import hglib
-
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo
-
 from tortoisehg.hgqt.settings import SettingsDialog
 
 from PyQt4.QtCore import *
