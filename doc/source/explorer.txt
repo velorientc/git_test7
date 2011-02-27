@@ -124,7 +124,7 @@ Windows).
 
 One can selectively disable overlay icons in a specific repository by
 editing the :file:`.hg\\thgstatus` file inside the repository and
-replacing it's contents with a single line containing::
+replacing its contents with a single line containing::
 
 	@@noicons
 
@@ -137,7 +137,7 @@ distribution package, the odds are that this extension is already
 configured.  If not, please consult our Wiki for instructions on how to
 enable this feature.
 
-While the nautilus extension does not have it's own GUI for managing the
+While the nautilus extension does not have its own GUI for managing the
 overlays and context menus, it does support command promotion into the
 top menu.  It requires you to edit your :file:`~/.hgrc` file and add
 lines like these::
