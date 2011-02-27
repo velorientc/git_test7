@@ -260,7 +260,7 @@ class Workbench(QMainWindow):
         newseparator(menu='repository')
         newaction(_("Verify"), self._repofwd('verify'), enabled='repoopen',
                   icon='hg-verify', menu='repository')
-        newaction(_("Recover"), self._repofwd('recover'), icon='hg-recover',
+        newaction(_("Recover"), self._repofwd('recover'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("Resolve"), self._repofwd('resolve'), icon='hg-merge',
