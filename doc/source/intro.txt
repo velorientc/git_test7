@@ -12,6 +12,9 @@ TortoiseHg is a set of graphical tools and a shell extension for the
 `Mercurial <http://mercurial.selenic.com/wiki/>`_ distributed revision control
 system.
 
+.. note::
+	hg is the symbol for the chemical element `Mercury <http://en.wikipedia.org/wiki/Mercury_%28element%29>`_
+
 On Windows,
 	TortoiseHg consists of a shell extension, which provides overlay
 	icons and context menus in your file explorer, and a command line
