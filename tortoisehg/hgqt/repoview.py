@@ -115,6 +115,9 @@ class HgRepoView(QTableView):
         for c, w in enumerate(self._columnWidthHints()):
             self.setColumnWidth(c, w)
 
+    def sizeHintForColumn(self, column):
+        return self._columnWidthHints()[column]
+
     def _columnWidthHints(self):
         """Return list of recommended widths of all columns"""
         model = self.model()
@@ -133,7 +136,7 @@ class HgRepoView(QTableView):
                 w = fontm.width(hglib.tounicode(str(w)) + 'w')
                 widths[c] = w
             else:
-                w = self.sizeHintForColumn(c)
+                w = super(HgRepoView, self).sizeHintForColumn(c)
                 widths[c] = w
             col1_width -= widths[c]
         col1_width = max(col1_width, 600)
