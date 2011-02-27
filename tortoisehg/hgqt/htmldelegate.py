@@ -22,20 +22,14 @@ class HTMLDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
         if self.cols and index.column() not in self.cols:
             return QStyledItemDelegate.paint(self, painter, option, index)
-        try:
-            text = index.model().data(index, Qt.DisplayRole).toString()
-        except error.RevlogError, e:
-            # this can happen if revlog is being truncated while we read it
-            text = _('?? Error: %s ??') % hglib.tounicode(str(e))
 
         # draw selection
         option = QStyleOptionViewItemV4(option)
         self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter)
 
         # draw text
-        doc = QTextDocument(defaultFont=option.font)
+        doc = self._builddoc(option, index)
         painter.save()
-        doc.setHtml(text)
         painter.setClipRect(option.rect)
         painter.translate(QPointF(
             option.rect.left(),
@@ -55,13 +49,17 @@ class HTMLDelegate(QStyledItemDelegate):
         painter.restore()
 
     def sizeHint(self, option, index):
+        doc = self._builddoc(option, index)
+        doc.setTextWidth(option.rect.width())
+        return QSize(doc.idealWidth() + 5, doc.size().height())
+
+    def _builddoc(self, option, index):
         try:
             text = index.model().data(index, Qt.DisplayRole).toString()
         except error.RevlogError, e:
+            # this can happen if revlog is being truncated while we read it
             text = _('?? Error: %s ??') % hglib.tounicode(str(e))
-        doc = QTextDocument()
-        doc.setDefaultStyleSheet(qtlib.thgstylesheet)
-        doc.setDefaultFont(option.font)
+
+        doc = QTextDocument(defaultFont=option.font)
         doc.setHtml(text)
-        doc.setTextWidth(option.rect.width())
-        return QSize(doc.idealWidth() + 5, doc.size().height())
+        return doc
