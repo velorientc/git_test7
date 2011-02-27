@@ -221,23 +221,21 @@ class CmdThread(QThread):
         prompt = hglib.tounicode(prompt)
         if choices:
             dlg = QMessageBox(QMessageBox.Question,
-                        _('TortoiseHg Prompt'), prompt,
-                        QMessageBox.Yes | QMessageBox.Cancel, self.parent())
-            dlg.setDefaultButton(QMessageBox.Cancel)
+                        _('TortoiseHg Prompt'), prompt, parent=self.parent())
             dlg.setWindowFlags(Qt.Sheet)
             dlg.setWindowModality(Qt.WindowModal)
-            rmap = {}
             for index, choice in enumerate(choices):
                 button = dlg.addButton(hglib.tounicode(choice),
                                        QMessageBox.ActionRole)
-                rmap[id(button)] = index
+                button.response = index
+                if index == default:
+                    dlg.setDefaultButton(button)
             dlg.exec_()
             button = dlg.clickedButton()
             if button is 0:
-                result = default
+                self.responseq.put(None)
             else:
-                result = rmap[id(button)]
-            self.responseq.put(result)
+                self.responseq.put(button.response)
         else:
             mode = password and QLineEdit.Password \
                              or QLineEdit.Normal
