@@ -38,7 +38,7 @@ class RepoFilterBar(QToolBar):
         self._repo = repo
         self.filterEnabled = True
 
-        #Check if the font contains the glyph needed by the model
+        #Check if the font contains the glyph needed by the branch combo
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
              self._allBranchesLabel = u'*** %s ***' % _('Show all')
 
