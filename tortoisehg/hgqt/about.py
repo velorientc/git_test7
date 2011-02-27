@@ -110,14 +110,11 @@ class AboutDialog(QDialog):
         libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') % \
               (hglib.hgversion, make_version(sys.version_info[0:3]),
               PYQT_VERSION_STR, QT_VERSION_STR))
-        thgv = hglib.fromunicode(thgv)
-        libv = hglib.fromunicode(libv)
         par = ('<p style=\" margin-top:0px; margin-bottom:6px;\">'
                 '<span style=\"font-size:%spt; font-weight:600;\">'
                 '%s</span></p>')
         name = (par % (14, 'TortoiseHg'))
         thgv = (par % (10, thgv))
-        thgv = hglib.fromunicode(thgv)
         nvl = ''.join([name, thgv, libv])
         self.name_version_libs_lbl.setText(nvl)
 
