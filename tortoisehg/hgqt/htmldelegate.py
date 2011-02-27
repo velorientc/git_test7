@@ -50,7 +50,6 @@ class HTMLDelegate(QStyledItemDelegate):
 
     def sizeHint(self, option, index):
         doc = self._builddoc(option, index)
-        doc.setTextWidth(option.rect.width())
         return QSize(doc.idealWidth() + 5, doc.size().height())
 
     def _builddoc(self, option, index):
