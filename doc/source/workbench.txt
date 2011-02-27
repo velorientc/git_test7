@@ -57,18 +57,24 @@ launching other tools.
 
 		.. figure:: figures/file-menu.png
 			:alt: File menu
+			
+			File Menu
 
 	:guilabel:`View`
 		Manage the visibility of various parts of the Workbench.
 
 		.. figure:: figures/view-menu.png
 			:alt: View menu
+			
+			View menu
 
 	:guilabel:`Repository`
 		Perform special actions on the active repository.
 
 		.. figure:: figures/repository-menu.png
 			:alt: Repository menu
+			
+			Repository menu
 
 	:guilabel:`Help`
 		About shows TortoiseHg version info.
@@ -78,6 +84,8 @@ Edit Toolbar
 
 .. figure:: figures/edit-toolbar.png
 	:alt: Edit Toolbar
+	
+	Edit toolbar
 
 Moving around in the changelog. All the buttons work on the current	repository.
 
@@ -96,6 +104,8 @@ Dock Toolbar
 
 .. figure:: figures/dock-toolbar.png
 	:alt: Dock Toolbar
+	
+	Dock toolbar
 
 Show or hide some main widgets in the Workbench.
 
@@ -110,6 +120,8 @@ Sync Toolbar
 
 .. figure:: figures/sync-toolbar.png
 	:alt: Sync Toolbar
+	
+	Sync toolbar
 
 Synchronize your repository with other repositories.
 
@@ -146,6 +158,8 @@ Task Toolbar
 
 .. figure:: figures/task-toolbar.png
 	:alt: Task Toolbar
+	
+	Task toolbar
 
 Work with the various tasktabs.
 
@@ -156,6 +170,8 @@ Work with the various tasktabs.
 
 ..        .. figure:: figures/revdetails-tasktab.png
 			:alt: Revision Details TaskTab
+			
+			Revision Details tasktab
 
 ..
 
@@ -165,6 +181,20 @@ Work with the various tasktabs.
 
 ..		.. figure:: figures/commit-tasktab.png
 			:alt: Commit TaskTab
+			
+			Commit tasktab
+
+..
+
+	:guilabel:`Synchronize`
+		Gives you full control about how you let your repositories
+		communicate with any other repository.
+		See _`Synchronize` for more detail.
+
+..		.. figure:: figures/sync-tasktab.png
+			:alt: Synchronise Tasktab
+			
+			Sync tasktab
 
 ..
 
@@ -178,6 +208,8 @@ Work with the various tasktabs.
 
 ..		.. figure:: figures/manifest-tasktab.png
 			:alt: Manifest TaskTab
+			
+			Manifest tasktab
 
 ..
 
@@ -190,16 +222,8 @@ Work with the various tasktabs.
 
 ..		.. figure:: figures/search-tasktab.png
 			:alt: Search Tasktab
-
-..
-
-	:guilabel:`Synchronize`
-		Gives you full control about how you let your repositories
-		communicate with any other repository.
-		See _`Synchronize` for more detail.
-
-..		.. figure:: figures/sync-tasktab.png
-			:alt: Synchronise Tasktab
+			
+			Search tasktab
 
 ..
 
@@ -209,6 +233,8 @@ Work with the various tasktabs.
 
 ..		.. figure:: figures/mq-tasktab.png
 			:alt: Patch Queue TaskTab
+			
+			Patch Queue tasktab
 
 ..
 
