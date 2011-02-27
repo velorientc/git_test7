@@ -16,11 +16,12 @@ system.
 	hg is the symbol for the chemical element `Mercury <http://en.wikipedia.org/wiki/Mercury_%28element%29>`_
 
 On Windows,
-	TortoiseHg consists of a shell extension, which provides overlay
-	icons and context menus in your file explorer, and a command line
-	program named :file:`thg.exe` which can launch the TortoiseHg tools.
-	Binary packages of TortoiseHg for Windows come with Mercurial and a
-	merge tool and are thus completely ready for use "Out of the Box".
+	TortoiseHg consists of the Workbench graphical application, a shell
+	extension which provides overlay icons and context menus in your file
+	explorer, and a command line program named :file:`thg.exe` which can launch
+	the TortoiseHg tools.  Binary packages of TortoiseHg for Windows come with
+	Mercurial and a merge tool and are thus completely ready for use
+	"Out of the Box".
 
 On Linux,
 	TortoiseHg consists of a command line thg script and a Nautilus
