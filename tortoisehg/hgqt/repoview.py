@@ -74,7 +74,7 @@ class HgRepoView(QTableView):
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
             model.unicodestar = False
         if not QFontMetrics(self.font()).inFont(QString(u'\u2327').at(0)):
-            model.unicodeclosed = False
+            model.unicodexinabox = False
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.resetDelegate()
         self._rev_history = []
