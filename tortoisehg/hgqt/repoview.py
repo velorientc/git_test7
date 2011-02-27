@@ -112,29 +112,36 @@ class HgRepoView(QTableView):
 
     def _resizeColumns(self):
         # _resizeColumns misbehaves if called with last section streched
+        for c, w in enumerate(self._columnWidthHints()):
+            self.setColumnWidth(c, w)
+
+    def _columnWidthHints(self):
+        """Return list of recommended widths of all columns"""
         model = self.model()
         col1_width = self.viewport().width()
         fontm = QFontMetrics(self.font())
         tot_stretch = 0.0
+        widths = [-1 for _i in xrange(model.columnCount(QModelIndex()))]
         for c in range(model.columnCount(QModelIndex())):
             if model._columns[c] in model._stretchs:
                 tot_stretch += model._stretchs[model._columns[c]]
                 continue
             w = model.maxWidthValueForColumn(c)
             if isinstance(w, int):
-                self.setColumnWidth(c, w)
+                widths[c] = w
             elif w is not None:
                 w = fontm.width(hglib.tounicode(str(w)) + 'w')
-                self.setColumnWidth(c, w)
+                widths[c] = w
             else:
                 w = self.sizeHintForColumn(c)
-                self.setColumnWidth(c, w)
-            col1_width -= self.columnWidth(c)
+                widths[c] = w
+            col1_width -= widths[c]
         col1_width = max(col1_width, 600)
         for c in range(model.columnCount(QModelIndex())):
             if model._columns[c] in model._stretchs:
                 w = model._stretchs[model._columns[c]] / tot_stretch
-                self.setColumnWidth(c, col1_width * w)
+                widths[c] = col1_width * w
+        return widths
 
     def revFromindex(self, index):
         if not index.isValid():
