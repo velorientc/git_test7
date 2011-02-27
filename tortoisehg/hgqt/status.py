@@ -142,7 +142,7 @@ class StatusWidget(QWidget):
         tv.menuAction.connect(self.refreshWctx)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
-        tv.sortByColumn(COL_PATH_DISPLAY)
+        tv.sortByColumn(COL_STATUS, Qt.AscendingOrder)
         tv.clicked.connect(self.onRowClicked)
         le.textEdited.connect(self.setFilter)
 
