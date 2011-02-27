@@ -280,16 +280,16 @@ Performance Implications
 There are some Workbench features that could have performance implications in
 large repositories.
 
-* :menuselection:`View --> Choose Log columns...` 
-	Enabling the :guilabel:`Changes` column can be expensive to calculate on
-	repositories with large working copies, causing both refreshes and scrolling
-	to be slow.
+	:menuselection:`View --> Choose Log columns...` 
+		Enabling the :guilabel:`Changes` column can be expensive to calculate
+		on repositories with large working copies, causing both refreshes and
+		scrolling to be slow.
 
-* :menuselection:`View --> Load all`
-	Normally, when the user scrolls through the history, chunks of changesets
-	are read as you scroll. This menu choice allows you to have the Workbench
-	read all the changesets from the repository, probably allowing smoother
-	moving through the history.
+	:menuselection:`View --> Load all`
+		Normally, when the user scrolls through the history, chunks of changesets
+		are read as you scroll. This menu choice allows you to have the Workbench
+		read all the changesets from the repository, probably allowing smoother
+		moving through the history.
 
 Revision Context Menus
 ----------------------
@@ -299,8 +299,8 @@ when one, two, or more revisions are selected. Context menuse can also differ
 according to the type of revision(s) (working dir, regular revision,
 (un)applied mq patch). Here we give a list of all existing context menu entries.
 
-Right-clicking on a selection of revisions in the (top) graph pane will bring up the
-revision context menu.
+Right-clicking on a selection of revisions in the (top) graph pane will bring up
+the revision context menu.
 
 With only one revision selected:
 	:guilabel:`Update...`
