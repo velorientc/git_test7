@@ -194,11 +194,25 @@ class ResolveDialog(QDialog):
             abspaths = [os.path.join(r,w) for r,w in paths]
             wctxactions.edit(self, self.repo.ui, self.repo, abspaths)
 
-    def v3way(self):
+    def getVdiffFiles(self, tree):
         paths = self.getSelectedPaths(self.rtree)
+        if not paths:
+            return []
+        files, sub = [], False
+        for root, wfile in paths:
+            if root == self.repo.root:
+                files.append(wfile)
+            else:
+                sub = True
+        if sub:
+            qtlib.InfoMsgBox(_('Unable to show subrepository files'),
+                    _('Visual diffs are not supported for files in '
+                      'subrepositories. They will not be shown.'))
+        return files
+
+    def v3way(self):
+        paths = self.getVdiffFiles(self.rtree)
         if paths:
-            paths = [w for r,w in paths]
-            # TODO: will not work for subrepos
             opts = {}
             opts['rev'] = []
             opts['tool'] = self.tcombo.readValue()
@@ -207,10 +221,8 @@ class ResolveDialog(QDialog):
                 dlg.exec_()
 
     def vp0(self):
-        paths = self.getSelectedPaths(self.rtree)
+        paths = self.getVdiffFiles(self.rtree)
         if paths:
-            paths = [w for r,w in paths]
-            # TODO: will not work for subrepos
             opts = {}
             opts['rev'] = ['p1()']
             opts['tool'] = self.tcombo.readValue()
@@ -219,10 +231,8 @@ class ResolveDialog(QDialog):
                 dlg.exec_()
 
     def vp1(self):
-        paths = self.getSelectedPaths(self.rtree)
+        paths = self.getVdiffFiles(self.rtree)
         if paths:
-            paths = [w for r,w in paths]
-            # TODO: will not work for subrepos
             opts = {}
             opts['rev'] = ['p2()']
             opts['tool'] = self.tcombo.readValue()
