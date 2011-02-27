@@ -7,7 +7,7 @@
 
 from mercurial import error
 
-from tortoisehg.hgqt import thgrepo
+from tortoisehg.hgqt import thgrepo, qtlib
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 
@@ -213,7 +213,11 @@ class RepoTreeModel(QAbstractItemModel):
                     lpath = hglib.fromunicode(path)
                     repo = thgrepo.repository(None, path=lpath)
                 except error.RepoError:
-                    QMessageBox.warning(self, _('Failed to add repository'),
+                    # NOTE: here we cannot pass parent=self because self
+                    # isn't a QWidget. Codes under `if not repo:` should
+                    # be handled by a widget, not by a model.
+                    qtlib.WarningMsgBox(
+                        _('Failed to add repository'),
                         _('%s is not a valid repository') % path)
                     return
             else:
