@@ -30,7 +30,7 @@ def wctxactions(parent, point, repo, selrows):
             return None
         action = menu.addAction(text)
         if icon:
-            action.setIcon(icon)
+            action.setIcon(qtlib.getmenuicon(icon))
         action.args = (func, parent, files, repo)
         action.run = lambda: run(*action.args)
         action.triggered.connect(action.run)
@@ -42,25 +42,25 @@ def wctxactions(parent, point, repo, selrows):
     else:
         menu = QMenu(parent)
         parent.contextmenu = menu
-    make(_('&Visual Diff'), vdiff, frozenset('MAR!'), qtlib.getmenuicon('visualdiff'))
-    make(_('Copy patch'), copyPatch, frozenset('MAR!'), qtlib.getmenuicon('copy-patch'))
-    make(_('Edit'), edit, frozenset('MACI?'), qtlib.getmenuicon('edit-file'))
+    make(_('&Visual Diff'), vdiff, frozenset('MAR!'), 'visualdiff')
+    make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
+    make(_('Edit'), edit, frozenset('MACI?'), 'edit-file')
     make(_('View missing'), viewmissing, frozenset('R!'))
     if len(repo.parents()) > 1:
         make(_('View other'), viewother, frozenset('MA'))
     menu.addSeparator()
-    make(_('&Revert'), revert, frozenset('MAR!'), qtlib.getmenuicon('hg-revert'))
-    make(_('&Add'), add, frozenset('R'), qtlib.getmenuicon('add'))
+    make(_('&Revert'), revert, frozenset('MAR!'), 'hg-revert')
+    make(_('&Add'), add, frozenset('R'), 'add')
     menu.addSeparator()
-    make(_('File History'), log, frozenset('MARC!'), qtlib.getmenuicon('hg-log'))
-    make(_('&Annotate'), annotate, frozenset('MARC!'), qtlib.getmenuicon('hg-annotate'))
+    make(_('File History'), log, frozenset('MARC!'), 'hg-log')
+    make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
     menu.addSeparator()
-    make(_('&Forget'), forget, frozenset('MAC!'), qtlib.getmenuicon('remove'))
-    make(_('&Add'), add, frozenset('I?'), qtlib.getmenuicon('add'))
-    make(_('&Detect Renames...'), guessRename, frozenset('A?!'), qtlib.getmenuicon('detect_rename'))
-    make(_('&Ignore'), ignore, frozenset('?'), qtlib.getmenuicon('ignore'))
-    make(_('Remove versioned'), remove, frozenset('C'), qtlib.getmenuicon('remove'))
-    make(_('&Delete unversioned'), delete, frozenset('?I'), qtlib.getmenuicon('hg-purge'))
+    make(_('&Forget'), forget, frozenset('MAC!'), 'remove')
+    make(_('&Add'), add, frozenset('I?'), 'add')
+    make(_('&Detect Renames...'), guessRename, frozenset('A?!'), 'detect_rename')
+    make(_('&Ignore'), ignore, frozenset('?'), 'ignore')
+    make(_('Remove versioned'), remove, frozenset('C'), 'remove')
+    make(_('&Delete unversioned'), delete, frozenset('?I'), 'hg-purge')
     if len(selrows) == 1:
         menu.addSeparator()
         t, path = selrows[0]
@@ -74,8 +74,8 @@ def wctxactions(parent, point, repo, selrows):
                 mkaction(d)
             menu.addMenu(rmenu)
         else:
-            make(_('&Copy...'), copy, frozenset('MC'), qtlib.getmenuicon('edit-copy'))
-            make(_('Rename...'), rename, frozenset('MC'), qtlib.getmenuicon('hg-rename'))
+            make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
+            make(_('Rename...'), rename, frozenset('MC'), 'hg-rename')
     menu.addSeparator()
     make(_('Mark unresolved'), unmark, frozenset('r'))
     make(_('Mark resolved'), mark, frozenset('u'))
