@@ -4,10 +4,10 @@ Commit
 .. module:: commit.dialog
 	:synopsis: Dialog used to perform commit
 
-The commit tool is second most commonly used application (behind the
-Workbech).  Not only can the commit tool commit your changes, but it can
+The commit tool is second most commonly used application after the
+Workbech.  Not only can the commit tool commit your changes, but it can
 also examine the state of your working directory and perform most
-routine maintenance tasks (add new files, record renames, manage the
+routine maintenance tasks (add new files, detect renames, manage the
 ignore filter, etc).
 
 .. figure:: figures/commit.png
@@ -58,15 +58,14 @@ The file list has four columns:
 	file pattern and give you an unfiltered view of the entire working
 	directory.
 
-Below the file list, inside an expander, are checkboxes that toggle the
-display of the various classes of files {modified, added, removed,
-deleted, unknown, clean, ignored}.  These check boxes will be disabled
-if the commit tool was started with a file pattern or selection.
+The :guilabel:`Status` button has a menu with checkable options that
+toggle the display of the various classes of files {modified, added,
+removed, deleted, unknown, clean, ignored}.
 
 *Removed* means a revisioned file has been marked as removed. *Deleted*
 means a revisioned file is missing but Mercurial has not been told to
 quit tracking that file. For instance, if you rename a revisioned file
-in the explorer, the original filename will show up as deleted and the
+in Explorer, the original filename will show up as deleted and the
 new filename will show up as unknown. By right-clicking on the new
 filename you can bring up the rename guessing dialog which can discover
 the rename by comparing file contents and mark the old file as removed
@@ -93,7 +92,7 @@ Keyboard navigation
 	Trigger the commit
 :kbd:`Ctrl-E`
 	Reflow the paragraph currently under the cursor.  You must configure
-	a message format policy for this key combination to work.
+	a message format policy for this shortcut to work.
 
 File Context Menus
 ------------------
@@ -112,11 +111,8 @@ Merging
 -------
 
 The commit tool has a special mode when it is opened in a repository
-that is in a merged state (technically, this means the current working
-directory has two parent revisions). The file list has no checkboxes and
-the hunk selection tabs are hidden. The commit 'manifest' is essentially
-immutable, since you must commit the entire working directory after a
-merge.
+that is in a merged state (either a merge is in progress, or an update
+was performed that caused a conflict).
 
 The merge state *ms* column is especially useful in this mode.  Files
 that are marked with *R* are files where Mercurial and/or the user have
@@ -139,12 +135,10 @@ started the merge and *other* is the revision you merged with.
 To undo a failed merge attempt, you must tell Mercurial to remove the
 second parent from your working directory.  This usually means
 performing a clean update of the first parent.  The merge tool has an
-:guilabel:`Undo` button which does exactly that.  The recovery tool also
-has a :guilabel:`Clean` button that does the same thing.
+:guilabel:`Undo` button which does exactly that.
 
 Once you have your working directory back at one parent revision, you
 may restart the merge process.
-
 
 Commit Message Pane
 -------------------
@@ -179,7 +173,7 @@ other VCS) repositories, and to include the state of those external
 repositories in the main repository's history.
 
 TortoiseHg 1.0 introduced rudimentary support for subrepositories, and
-only in the commit / status tool.  When Mercurial considers a subrepo as
+only in the commit / status tool.  When Mercurial considers a subrepo
 dirty, it will appear in the commit tool as a special entry in the file
 list with a status of *S*.  If a subrepo is included in the file list of
 a commit, the subrepo is committed along with the other changes,

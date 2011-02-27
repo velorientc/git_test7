@@ -379,11 +379,12 @@ With only one revision selected:
 			Transforms the MQ patch into a regular changeset.
 			*Only visible when MQ is enabled*
 		:guilabel:`Rebase...`
-			todo
+			Move the selected revision and all of its descendants onto the
+			current working parent revision.
+			*Only visible when rebase is enabled*
 		:guilabel:`Strip...`
-			Remove the selected revision and all of it's descendants from the
+			Remove the selected revision and all of its descendants from the
 			repository [#rcm1]_ *Only visible when MQ is enabled*
-			*Only visible when MQ is enabled*
 
 With two revisions selected:
 	:guilabel:`Visual diff...`
