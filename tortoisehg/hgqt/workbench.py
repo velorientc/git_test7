@@ -241,11 +241,11 @@ class Workbench(QMainWindow):
                   menu='view', toolbar='edit',
                   tooltip=_('Refresh current repository'))
         newaction(_("Refresh &Task Tab"), self._repofwd('reloadTaskTab'),
-                  icon='tasktab-refresh', enabled='repoopen',
+                  enabled='repoopen',
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view')
-        newaction(_("Load all"), self.loadall, icon='thg-log-load-all',
+        newaction(_("Load all"), self.loadall,
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
 
