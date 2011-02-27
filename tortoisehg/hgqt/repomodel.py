@@ -78,6 +78,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.revset = revset
         self.filterbyrevset = rfilter
         self.unicodestar = True
+        self.unicodexinabox = True
 
         # To be deleted
         self._user_colors = {}
@@ -486,7 +487,10 @@ class HgRepoListModel(QAbstractTableModel):
     def getbranch(self, ctx, gnode):
         b = hglib.tounicode(ctx.branch())
         if ctx.extra().get('close'):
-            b += u'--'
+            if self.unicodexinabox:
+                b += u' \u2327'
+            else:
+                b += u'--'
         return b
 
     def gettags(self, ctx, gnode):

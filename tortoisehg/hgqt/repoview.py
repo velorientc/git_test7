@@ -73,6 +73,8 @@ class HgRepoView(QTableView):
         #Check if the font contains the glyph needed by the model
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
             model.unicodestar = False
+        if not QFontMetrics(self.font()).inFont(QString(u'\u2327').at(0)):
+            model.unicodeclosed = False
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.resetDelegate()
         self._rev_history = []
