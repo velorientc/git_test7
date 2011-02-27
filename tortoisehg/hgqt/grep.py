@@ -211,12 +211,8 @@ class SearchWidget(QWidget):
         self.setCompleters()
 
     def setRevision(self, rev):
-        if isinstance(rev, basestring):  # unapplied patch
-            return
-        elif rev is None:
-            self.wctxradio.setChecked(True)
-        else:
-            self.ctxradio.setChecked(True)
+        'Repowidget is forwarding a selected revision'
+        if isinstance(rev, int):
             self.revle.setText(str(rev))
 
     def setSearch(self, upattern, **opts):
