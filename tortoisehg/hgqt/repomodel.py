@@ -230,9 +230,9 @@ class HgRepoListModel(QAbstractTableModel):
             return 'XXXX'
         column = self._columns[col]
         if column == 'Rev':
-            return str(len(self.repo))+'X+'
+            return '8' * len(str(len(self.repo))) + '+'
         if column == 'Node':
-            return str(self.repo['.'])
+            return '8' * 12 + '+'
         if column in ('Age', 'LocalTime', 'UTCTime'):
             return hglib.displaytime(util.makedate())
         if column == 'Tags':
