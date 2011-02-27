@@ -124,7 +124,6 @@ class HgRepoListModel(QAbstractTableModel):
         _ui = self.repo.ui
         self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
         self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
-        self.maxauthor = 'author name'
 
     def updateColumns(self):
         s = QSettings()
@@ -206,10 +205,6 @@ class HgRepoListModel(QAbstractTableModel):
         currentlen = self.rowcount
         newlen = len(self.graph)
 
-        sauthors = [hglib.username(user) for user in list(self.graph.authors)]
-        sauthors.append(self.maxauthor)
-        self.maxauthor = sorted(sauthors, key=lambda x: len(x))[-1]
-
         if newlen > self.rowcount:
             self.beginInsertRows(QModelIndex(), currentlen, newlen-1)
             self.rowcount = newlen
@@ -233,7 +228,7 @@ class HgRepoListModel(QAbstractTableModel):
             return '8' * len(str(len(self.repo))) + '+'
         if column == 'Node':
             return '8' * 12 + '+'
-        if column in ('Age', 'LocalTime', 'UTCTime'):
+        if column in ('LocalTime', 'UTCTime'):
             return hglib.displaytime(util.makedate())
         if column == 'Tags':
             try:
@@ -245,8 +240,6 @@ class HgRepoListModel(QAbstractTableModel):
                 return sorted(self.repo.branchtags().keys(), key=lambda x: len(x))[-1]
             except IndexError:
                 pass
-        if column == 'Author':
-            return self.maxauthor
         if column == 'Filename':
             return self.filename
         if column == 'Graph':
