@@ -454,7 +454,7 @@ INFO = (
         _('Optional. Password to authenticate with at the proxy server')),
     )),
 
-({'name': 'email', 'label': _('Email'), 'icon': QStyle.SP_ArrowForward}, (
+({'name': 'email', 'label': _('Email'), 'icon': 'mail-forward'}, (
     _fi(_('From'), 'email.from', genEditCombo,
         _('Email address to use in the "From" header and for'
         ' the SMTP envelope')),
