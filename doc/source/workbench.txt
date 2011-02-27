@@ -1,14 +1,13 @@
 Workbench
 =========
 
-.. module:: changelog.dialog
-	:synopsis: Dialog used to view log
+.. module:: workbench.dialog
+	:synopsis: Primary TortoiseHg application
 
-The Workbench is used to visualize the revision history of your
-repositories and to perform any maintenance tasks that involve
-changesets. It presents a graph of the revision history, showing the
-parent/child relationship of each change. At each revision you can view
-the files that were modified and the contents of those changes.
+The Workbench is the primary TortoiseHg application.  It allows you
+to browse your local repositories, make commits, perform searches,
+synchronize with other repositories, and perform various maintenance
+tasks.  Nearly every Mercurial feature is accessible from the Workbench.
 
 .. figure:: figures/workbench.png
 	:alt: Workbench
@@ -43,13 +42,13 @@ Workbench Main Widgets are:
 
 	:guilabel:`Task Tabs`
 		The lower right part of the Workbench is occupied by a stack of widget
-		where you can perform various frequent task. It is a tabbed widget.
+		where you can perform various frequent tasks. It is a tabbed widget.
 		See further for more detail about each one.
 
 Workbench Menus
 ---------------
 
-The changelog tool has a menu bar for accessing tool functions and for
+The Workbench has a menu bar for accessing tool functions and for
 launching other tools.
 
 	:guilabel:`File`
@@ -90,12 +89,12 @@ Edit Toolbar
 Moving around in the changelog. All the buttons work on the current	repository.
 
 	:guilabel:`Refresh`
-		Reload the revision history (if you commit in another window, etc)
-		for all open repositories.
+		Reload the revision history of the current repository.
 	:guilabel:`Back`
-		Go back to the previous view.
+		Go back to the previously selected revision.
 	:guilabel:`Forward`
-		Go forward to the next view.
+		Go forward to the next revision in your selection history or
+		most recent revision set query.
 	:guilabel:`Filter toolbar`
 		Show and activate the Filter Toolbar at the top of the changelog.
 
@@ -132,17 +131,6 @@ Synchronize your repository with other repositories.
 		while others will be shown grayed in the revision graph.
 		The buttons :guilabel:`Accept` and :guilabel:`Reject` are then
 		shown at the top of the changelog.
-
-		:guilabel:`Accept`
-			Accept (pull) the changesets from the previewed bundle.  This
-			button is only visible when previewing a changeset bundle.
-			The after-pull effect is respected after pulling from a bundle.
-
-		:guilabel:`Reject`
-			Reject the changesets from the previewed bundle and exit preview
-			mode.  This button is only visible when previewing a changeset
-			bundle.
-
 	:guilabel:`Pull`
 		Pull incoming changesets from the remote repository, then apply
 		after-pull effect (update, fetch, or rebase).
@@ -161,7 +149,7 @@ Task Toolbar
 	
 	Task toolbar
 
-Work with the various tasktabs.
+Work with the various task tabs.
 
 	:guilabel:`Revision Details`
 		Shows information about the current revision : files added, removed,
@@ -169,9 +157,9 @@ Work with the various tasktabs.
 		See _`Revision Details` for more detail.
 
 ..        .. figure:: figures/revdetails-tasktab.png
-			:alt: Revision Details TaskTab
+			:alt: Revision Details Task Tab
 			
-			Revision Details tasktab
+			Revision Details Task Tab
 
 ..
 
@@ -180,9 +168,9 @@ Work with the various tasktabs.
 		See _`Commit` for more detail.
 
 ..		.. figure:: figures/commit-tasktab.png
-			:alt: Commit TaskTab
+			:alt: Commit Task Tab
 			
-			Commit tasktab
+			Commit Task Tab
 
 ..
 
@@ -192,9 +180,9 @@ Work with the various tasktabs.
 		See _`Synchronize` for more detail.
 
 ..		.. figure:: figures/sync-tasktab.png
-			:alt: Synchronise Tasktab
+			:alt: Synchronise Task Tab
 			
-			Sync tasktab
+			Sync Task Tab
 
 ..
 
@@ -207,9 +195,9 @@ Work with the various tasktabs.
 		See _`Manifest` for more detail.
 
 ..		.. figure:: figures/manifest-tasktab.png
-			:alt: Manifest TaskTab
+			:alt: Manifest Task Tab
 			
-			Manifest tasktab
+			Manifest Task Tab
 
 ..
 
@@ -221,9 +209,9 @@ Work with the various tasktabs.
 ..
 
 ..		.. figure:: figures/search-tasktab.png
-			:alt: Search Tasktab
+			:alt: Search Task Tab
 			
-			Search tasktab
+			Search Task Tab
 
 ..
 
@@ -232,23 +220,23 @@ Work with the various tasktabs.
 		See _`Patch Queue` for more detail.
 
 ..		.. figure:: figures/mq-tasktab.png
-			:alt: Patch Queue TaskTab
+			:alt: Patch Queue Task Tab
 			
-			Patch Queue tasktab
+			Patch Queue Task Tab
 
 ..
 
 There is some relation between the revision or patch selected in the graph pane,
-and the tasktabs.
+and the task tabs.
 
-* Selecting the Working Directory automatically switches to the Commit tasktab.
+* Clicking on the Working Directory automatically switches to the Commit task tab.
 
-* Selecting any other revision than the Working Directory switches to the
-  Revision Details tasktab.
+* Clicking on any revision other than the Working Directory switches to the
+  Revision Details task tab.
 
 You can overrule this standard behaviour by doing an :kbd:`ALT-Click` for making
-your selection. This preserves the current tasktab, no matter what revision or
-patch you select.
+your selection. This preserves the current task tab, no matter what revision or
+patch you select.  Cursor selection movements also do not switch task tabs.
 
 
 Filter Toolbar
@@ -290,6 +278,19 @@ The toolbar can be toggled with :kbd:`Ctrl-S`. Parts from left to right:
 	:guilabel:`Custom Filter Combo`
 		Finally there is a combo box that selects among the various
 		filter types that can be manually specified.
+
+If the repository tab is previewing incoming changesets, a pair of
+buttons are prepended to the start of the filter bar:
+
+	:guilabel:`Accept`
+		Accept (pull) the changesets from the previewed bundle.  This
+		button is only visible when previewing a changeset bundle.
+		The after-pull effect is respected after pulling from a bundle.
+
+	:guilabel:`Reject`
+		Reject the changesets from the previewed bundle and exit preview
+		mode.  This button is only visible when previewing a changeset
+		bundle.
 
 Revision Graph Details
 ----------------------
@@ -418,7 +419,7 @@ File Context Menus
 ------------------
 
 Right-clicking on filenames in the file list pane (bottom left of the RevDetails
-and Manifest TaskTabs) will bring up a context menu for the selected file:
+and Manifest task tabs) will bring up a context menu for the selected file:
 
 	:guilabel:`Visual Diff`
 		Open this revision of the file in your visual diff tool.
@@ -442,7 +443,7 @@ and Manifest TaskTabs) will bring up a context menu for the selected file:
             manifest change, it does not modify the file's history.
 .. [#flcm3] The new contents will appear as local changes and must be committed.
 
-Right-clicking on filenames in the file list pane of the Commit TaskTab will
+Right-clicking on filenames in the file list pane of the Commit task tab will
 bring up a different context menu for the selected file:
 
 	:guilabel:`Edit`
