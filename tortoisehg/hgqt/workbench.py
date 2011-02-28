@@ -15,10 +15,8 @@ from mercurial.error import RepoError
 
 from tortoisehg.util import paths, hglib
 
-from tortoisehg.hgqt import repomodel, thgrepo, cmdui
+from tortoisehg.hgqt import repomodel, thgrepo, cmdui, qtlib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt.qtlib import geticon, getfont
-from tortoisehg.hgqt.qtlib import InfoMsgBox, WarningMsgBox
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
@@ -73,7 +71,7 @@ class Workbench(QMainWindow):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.8)
 
-        self.setWindowIcon(geticon('hg-log'))
+        self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.repoTabsWidget = tw = QTabWidget()
         tw.setDocumentMode(True)
@@ -148,7 +146,10 @@ class Workbench(QMainWindow):
                 else:
                     action.triggered.connect(slot)
             if icon:
-                action.setIcon(geticon(icon))
+                if toolbar:
+                    action.setIcon(qtlib.geticon(icon))
+                else:
+                    action.setIcon(qtlib.getmenuicon(icon))
             if shortcut:
                 action.setShortcut(keysequence(shortcut))
             if tooltip:
@@ -191,7 +192,7 @@ class Workbench(QMainWindow):
         a = self.reporegistry.toggleViewAction()
         a.setText(_('Show Repository Registry'))
         a.setShortcut('Ctrl+Shift+O')
-        a.setIcon(geticon('thg-reporegistry'))
+        a.setIcon(qtlib.geticon('thg-reporegistry'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
@@ -202,7 +203,7 @@ class Workbench(QMainWindow):
         a = self.log.toggleViewAction()
         a.setText(_('Show Output &Log'))
         a.setShortcut('Ctrl+L')
-        a.setIcon(geticon('thg-console'))
+        a.setIcon(qtlib.geticon('thg-console'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
@@ -219,8 +220,9 @@ class Workbench(QMainWindow):
         def addtaskview(icon, label, data=None):
             if data is None:
                 data = len(self.actionGroupTaskView.actions())
-            a = newaction(label, icon=icon, checkable=True, data=data,
+            a = newaction(label, icon=None, checkable=True, data=data,
                           enabled='repoopen', menu='view')
+            a.setIcon(qtlib.geticon(icon))
             self.actionGroupTaskView.addAction(a)
             self.tasktbar.addAction(a)
             return a
@@ -575,7 +577,7 @@ class Workbench(QMainWindow):
                 repo = thgrepo.repository(path=path)
                 self.addRepoTab(repo)
             except RepoError:
-                WarningMsgBox(_('Failed to open repository'),
+                qtlib.WarningMsgBox(_('Failed to open repository'),
                         _('%s is not a valid repository') % path)
 
     def goto(self, root, rev):
@@ -676,7 +678,7 @@ class Workbench(QMainWindow):
             finally:
                 os.chdir(cwd)
         else:
-            InfoMsgBox(_('No shell configured'),
+            qtlib.InfoMsgBox(_('No shell configured'),
                        _('A terminal shell must be configured'))
 
     def editSettings(self):
