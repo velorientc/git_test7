@@ -7124,7 +7124,7 @@ msgstr "確認回復檔案至舊的版次"
 #: tortoisehg/hgtk/changeset.py:1041
 #, python-format
 msgid "Revert %s to contents at revision %d?"
-msgstr "復原 %s 至 %s 版次的內容"
+msgstr "復原 %s 至 %d 版次的內容"
 
 #: tortoisehg/hgtk/changeset.py:1054
 msgid "Enable _Wordwrap"
@@ -7304,7 +7304,7 @@ msgstr "提交後推送"
 #: tortoisehg/hgtk/commit.py:503
 #, python-format
 msgid "Parent: %(rev)s"
-msgstr "上層: %(修訂)s"
+msgstr "上層: %(rev)s"
 
 #: tortoisehg/hgtk/commit.py:511
 msgid "Not at head"
