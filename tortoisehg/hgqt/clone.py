@@ -69,6 +69,13 @@ class CloneDialog(QDialog):
         grid.addWidget(self.dest_combo, 1, 1)
         grid.addWidget(self.dest_btn, 1, 2)
 
+        # workaround for QComboBox to test edited text case-sensitively
+        # see src/gui/widgets/qcombobox.cpp:
+        # QComboBoxPrivate::_q_editingFinished() and matchFlags()
+        for name in ('src_combo', 'dest_combo'):
+            w = getattr(self, name).lineEdit()
+            w.completer().setCaseSensitivity(Qt.CaseSensitive)
+
         s = QSettings()
         self.shist = s.value('clone/source').toStringList()
         for path in self.shist:
