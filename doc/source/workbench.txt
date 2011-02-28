@@ -500,6 +500,31 @@ Examples::
 	issue.regex = \bissue\d+\b
 	issue.link = http://mercurial.selenic.com/bts/
 
+Output Log Console
+------------------
+
+The console built into the Workbench Output Log dock widget can run
+Mercurial (hg) commands, TortoiseHg (thg) commands, a couple special
+commands, and limited shell commands.  Commands are always executed in
+the root of the current repository.  The prompt is updated to keep you
+aware of the context.
+
+If the command line begins with 'hg', the Mercurial command is run in
+TortoiseHg's execution environment; meaning output is sent to the log
+widget and input requests are handled by dialog windows.
+
+If the command line begins with 'thg', the requested command is run in a
+new window but in the same process.  For instance 'thg ci' will open a
+new commit tool window for the current repository.
+
+It the command is 'clear' (or 'cls'), the output log contents are
+erased.
+
+If the command is 'exit', the output log window is closed.
+
+Otherwise, the command line is forwarded to your platform's default
+command shell with a limited execution context.  There is no stdin while
+stdout and stderr are piped to the output log.
 
 Keyboard navigation
 -------------------
