@@ -10537,7 +10537,7 @@ msgstr "%s bude importován do"
 #: tortoisehg/hgtk/thgimport.py:285
 #, python-format
 msgid "%s will be imported to the repository"
-msgstr "%z bude importován do repozitáře"
+msgstr "%s bude importován do repozitáře"
 
 #: tortoisehg/hgtk/thgimport.py:345
 #, python-format
