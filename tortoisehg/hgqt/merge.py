@@ -74,7 +74,7 @@ class BasePage(QWizardPage):
 
     def __init__(self, parent=None):
         super(BasePage, self).__init__(parent)
-
+        self.nextEnabled = True
         self.done = False
 
     def switch_pane(self, pane):
@@ -154,9 +154,10 @@ class BasePage(QWizardPage):
         if pane == MAIN_PANE:
             label = self.get_perform_label()
             if label:
-                btn = QPushButton(label)
-                self.wizard().setButton(QWizard.NextButton, btn)
-                self.wizard().button(QWizard.NextButton).setShown(True)
+                self.wizard().setButtonText(QWizard.NextButton, label);
+                self.nextEnabled = True
+            else:
+                self.nextEnabled = False
             self.wizard().setOption(QWizard.HaveHelpButton, False)
             self.wizard().setOption(QWizard.HaveCustomButton1, False)
             self.wizard().setOption(QWizard.NoCancelButton, False)
@@ -165,7 +166,7 @@ class BasePage(QWizardPage):
             self.wizard().setButton(QWizard.CustomButton1, button)
             self.wizard().setOption(QWizard.HaveCustomButton1, True)
             button.clicked.connect(self.cancel_clicked)
-            self.wizard().button(QWizard.NextButton).setHidden(True)
+            self.nextEnabled = False
             self.wizard().setOption(QWizard.NoCancelButton, True)
         else:
             raise 'unknown pane: %s' % pane
@@ -399,6 +400,8 @@ class MergePage(BasePage):
             self.cmd.cancel()
 
     def isComplete(self):
+        if not self.nextEnabled:
+            return False
         if self.clean:
             return True
         return self.field('force').toBool()
@@ -538,7 +541,6 @@ class CommitPage(BasePage):
 
     def __init__(self, parent=None):
         super(CommitPage, self).__init__(parent)
-        self.done = False
 
     ### Override Methods ###
 
@@ -667,6 +669,8 @@ class CommitPage(BasePage):
         self.cmd.run(cmdline)
 
     def isComplete(self):
+        if not self.nextEnabled:
+            return False
         repo = self.wizard().repo
         for root, path, status in thgrepo.recursiveMergeStatus(repo):
             if status == 'u':
