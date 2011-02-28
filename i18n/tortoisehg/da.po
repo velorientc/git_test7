@@ -7131,7 +7131,7 @@ msgstr "Venligst indtast nyt bogmærke navn"
 #: tortoisehg/hgtk/bookmark.py:307
 #, python-format
 msgid "Bookmark \"%s\" has been renamed to \"%s\""
-msgstr "Bogmærke \"%s\" er blevet omdøbt til"
+msgstr "Bogmærke \"%s\" er blevet omdøbt til \"%s\""
 
 #: tortoisehg/hgtk/bookmark.py:333
 #, python-format
@@ -10644,7 +10644,7 @@ msgid ""
 "'%(qtip)s'?"
 msgstr ""
 "Ønsker du at folde følgende ikke-anvendte lapper ind i nuværende lap "
-"'%(qtips)s'?"
+"'%(qtip)s'?"
 
 #: tortoisehg/hgtk/thgmq.py:530
 #, python-format
