@@ -65,6 +65,7 @@ class MergeDialog(QWizard):
             if not qtlib.QuestionMsgBox(_('Confirm Exit'), main, text,
                                         labels=labels, parent=self):
                 return
+        page.reject()
         super(MergeDialog, self).reject()
 
 MAIN_PANE    = 0
@@ -96,6 +97,9 @@ class BasePage(QWizardPage):
 
     def configChanged(self):
         'repository has detected a change to config files'
+        pass
+
+    def reject(self):
         pass
 
     def initializePage(self):
@@ -206,6 +210,7 @@ class MergePage(BasePage):
 
         self.clean = None
         self.undo = False
+        self.th = None
 
     ### Override Methods ###
 
@@ -423,6 +428,11 @@ class MergePage(BasePage):
         self.local_info.update(pctx)
         self.wizard().local = str(pctx.rev())
 
+    def reject(self):
+        if self.th is not None and not self.th.isFinished():
+            self.th.cancel()
+            self.th.wait()
+
     def show_options(self, visible):
         self.discard_chk.setShown(visible)
         self.autoresolve_chk.setShown(visible)
@@ -500,10 +510,13 @@ class MergePage(BasePage):
             def __init__(self, parent):
                 QThread.__init__(self, parent)
                 self.results = (False, 1)
+                self.canceled = False
 
             def run(self):
                 unresolved = False
                 for root, path, status in thgrepo.recursiveMergeStatus(repo):
+                    if self.canceled:
+                        return
                     if status == 'u':
                         unresolved = True
                         break
@@ -511,7 +524,12 @@ class MergePage(BasePage):
                 dirty = bool(wctx.dirty()) or unresolved
                 self.results = (dirty, len(wctx.parents()))
 
+            def cancel(self):
+                self.canceled = True
+
         def completed():
+            if self.th.canceled:
+                return
             self.th.wait()
             dirty, parents = self.th.results
             self.clean = not dirty
