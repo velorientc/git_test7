@@ -330,10 +330,9 @@ class PathsTree(QTreeView):
     def dragObject(self):
         urls = []
         for index in self.selectionModel().selectedRows():
-            index = index.sibling(index.row(), COL_PATH)
-            path = index.data(Qt.DisplayRole).toString()
+            root, path = self.model().getPathForIndex(index)
             u = QUrl()
-            u.setPath('file://' + os.path.join(self.repo.root, path))
+            u.setPath('file://' + os.path.join(root, path))
             urls.append(u)
         if urls:
             d = QDrag(self)
