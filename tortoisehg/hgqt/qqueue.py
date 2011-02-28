@@ -302,7 +302,7 @@ class QQueueDialog(QDialog):
         if q == 'patches':
             return
         if qtlib.QuestionMsgBox(_('Confirm patch queue purge'),
-              _("<p>This will also erase de patchfiles on disk!</p>"
+              _("<p>This will also erase the patchfiles on disk!</p>"
                 "<p>Do you really want to purge patch queue '%s' ?</p>") % uq,
                 parent=self, defaultbutton=QMessageBox.No):
             opts = ['--purge', q]
