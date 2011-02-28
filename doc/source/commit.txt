@@ -5,7 +5,7 @@ Commit
 	:synopsis: Dialog used to perform commit
 
 The commit tool is second most commonly used application after the
-Workbech.  Not only can the commit tool commit your changes, but it can
+Workbench.  Not only can the commit tool commit your changes, but it can
 also examine the state of your working directory and perform most
 routine maintenance tasks (add new files, detect renames, manage the
 ignore filter, etc).
