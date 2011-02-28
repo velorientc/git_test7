@@ -268,7 +268,7 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"Файл \"%d\" уже существует!\n"
+"Файл \"%s\" уже существует!\n"
 "\n"
 "Записать поверх него?"
 
@@ -3843,7 +3843,7 @@ msgid ""
 "aliases: %s\n"
 msgstr ""
 "\n"
-"псевдонимы:\n"
+"псевдонимы: %s\n"
 
 #: tortoisehg/hgqt/run.py:768 tortoisehg/hgqt/run.py:833
 #: tortoisehg/hgtk/hgtk.py:583 tortoisehg/hgtk/hgtk.py:648
