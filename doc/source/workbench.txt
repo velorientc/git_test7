@@ -331,6 +331,9 @@ Right-clicking on a selection of revisions in the (top) graph pane will bring up
 the revision context menu.
 
 With only one revision selected:
+	.. figure:: figures/single-revision-cmenu.png
+		:alt: Single revision context menu
+
 	:guilabel:`Update...`
 		Update your working directory to this revision. Opens the
 		TortoiseHg update dialog with this revision selected.
