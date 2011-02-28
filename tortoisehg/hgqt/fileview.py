@@ -335,8 +335,12 @@ class HgFileView(QFrame):
             # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
             # --- a/tortoisehg/hgqt/thgrepo.py
             # +++ b/tortoisehg/hgqt/thgrepo.py
-            noheader = fd.diff.split('\n', 3)[3]
-            self.sci.setText(hglib.tounicode(noheader))
+            out = fd.diff.split('\n', 3)
+            if len(out) == 4:
+                self.sci.setText(hglib.tounicode(out[3]))
+            else:
+                # there was an error or rename without diffs
+                self.sci.setText(hglib.tounicode(fd.diff))
         elif fd.contents is None:
             return
         elif self._mode == 'ann':
