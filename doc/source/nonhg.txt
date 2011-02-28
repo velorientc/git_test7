@@ -165,14 +165,14 @@ Then enable hggit in your Mercurial.ini file::
 
 You can verify that worked by typing :command:`hg help hggit`
 
-Current versions of TortoiseHg include dulwich version 0.6.1.  We
-recommend to use hg-git version 0.2.4 with this version of dulwich.
+Current versions of TortoiseHg include dulwich version 0.7.0.  We
+recommend to use hg-git version 0.2.5 with this version of dulwich.
 
 See the hggit documentation for details of use.
 
 Beware the 'incoming' command appears broken when speaking with git
 repositories, and 'outgoing' does not show much useful info. So you are
-restricted to simple push and pull commands (not uncommon for extensions
-that speak with external revision control tools).
+restricted to simple push and pull commands, which is common with
+Mercurial extensions that speak to external revision control tools.
 
 .. vim: noet ts=4
