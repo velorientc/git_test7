@@ -354,6 +354,7 @@ class ChunksWidget(QWidget):
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
+        self.diffbrowse.updateSummary()
 
     def refresh(self):
         ctx = self.filelistmodel._ctx
