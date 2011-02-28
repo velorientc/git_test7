@@ -117,7 +117,7 @@ class ChunksWidget(QWidget):
         for line in ui.popbuffer().splitlines():
             if line.endswith(wfile + '.rej'):
                 if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
-                                        unicode(line) + u'<br><br>' +
+                                        hglib.tounicode(line) + u'<br><br>' +
                                         _('Edit patched file and rejects?'),
                                        parent=self):
                     #wctxactions.edit(self, repo.ui, repo, [wfile, wfile+'.rej'])
