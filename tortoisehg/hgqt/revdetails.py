@@ -1,4 +1,4 @@
-# repowidget.py - TortoiseHg repository widget
+# revdetails.py - TortoiseHg revision details widget
 #
 # Copyright (C) 2007-2010 Logilab. All rights reserved.
 # Copyright (C) 2010 Adrian Buehlmann <adrian@cadifra.com>
