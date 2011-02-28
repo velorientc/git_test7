@@ -159,13 +159,14 @@ class BasePage(QWizardPage):
                 self.wizard().button(QWizard.NextButton).setShown(True)
             self.wizard().setOption(QWizard.HaveHelpButton, False)
             self.wizard().setOption(QWizard.HaveCustomButton1, False)
+            self.wizard().setOption(QWizard.NoCancelButton, False)
         elif pane == PERFORM_PANE:
             button = QPushButton(_('Cancel'))
             self.wizard().setButton(QWizard.CustomButton1, button)
             self.wizard().setOption(QWizard.HaveCustomButton1, True)
             button.clicked.connect(self.cancel_clicked)
             self.wizard().button(QWizard.NextButton).setHidden(True)
-            self.wizard().button(QWizard.CancelButton).setHidden(True)
+            self.wizard().setOption(QWizard.NoCancelButton, True)
         else:
             raise 'unknown pane: %s' % pane
 
