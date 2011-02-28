@@ -20,3 +20,7 @@ PyQt: 4.6
 
 TortoiseHg needs to run on Python 2.4, to stay consistent with Mercurial
 itself.
+
+Mercurial on Windows requires ctypes, which is included with Python 2.5
+and later releases.  If you are using Python 2.4 on Windows, you must
+install the ctypes back port.
