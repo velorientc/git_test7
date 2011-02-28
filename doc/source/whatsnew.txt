@@ -82,7 +82,7 @@ user the available keywords and their arguments, and offers brace
 matching, auto-completions, and other editing amenities.
 
 In TortoiseHg 2.0, incoming and outgoing changesets are visualized as
-revisions sets.  In previous versions they were represented by graph
+revision sets.  In previous versions they were represented by graph
 annotations.
 
 Technology
@@ -151,6 +151,6 @@ then load further revisions only when those revisions are required to be
 displayed.  You will notice scrolling through the graph is jerky, these
 are bulk loads of revisions into the graph.  To avoid this jerkiness you
 can force TortoiseHg to load all revisions in the graph via the
-:guilabel:`Load All` option from the :guilabel:`View` menu.
+:guilabel:`Load all revisions` option from the :guilabel:`View` menu.
 
 .. vim: noet ts=4 syntax=rest
