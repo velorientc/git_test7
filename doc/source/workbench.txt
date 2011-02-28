@@ -323,7 +323,7 @@ Revision Context Menus
 ----------------------
 
 Right-clicking on revisions in the graph pane brings up a different context menu
-when one, two, or more revisions are selected. Context menuse can also differ
+when one, two, or more revisions are selected. Context menus can also differ
 according to the type of revision(s) (working dir, regular revision,
 (un)applied mq patch). Here we give a list of all existing context menu entries.
 
