@@ -6149,7 +6149,7 @@ msgstr "%s changesets"
 #: tortoisehg/hgqt/thgstrip.py:174 tortoisehg/hgtk/thgstrip.py:180
 #, python-format
 msgid "%s will be stripped"
-msgstr "&s serão ignoradas"
+msgstr "%s serão ignoradas"
 
 #: tortoisehg/hgqt/thgstrip.py:179 tortoisehg/hgtk/thgstrip.py:176
 msgid "Unknown revision!"
@@ -9188,7 +9188,7 @@ msgstr ""
 #: tortoisehg/hgtk/history.py:2703
 #, python-format
 msgid "Pushing changesets to revision %s..."
-msgstr "A enviar changesets para a revisão..."
+msgstr "A enviar changesets para a revisão %s..."
 
 #: tortoisehg/hgtk/history.py:2705
 #, python-format
@@ -11323,7 +11323,7 @@ msgstr "o patch binário tem %d bytes, não %d"
 #: tortoisehg/util/prej.py:591
 #, python-format
 msgid "unable to strip away %d dirs from %s"
-msgstr "não é possível descartar %s dirs de %s"
+msgstr "não é possível descartar %d dirs de %s"
 
 #: tortoisehg/util/prej.py:613
 #, python-format
