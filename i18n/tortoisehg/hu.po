@@ -7322,7 +7322,7 @@ msgstr "Push a kommit után"
 #: tortoisehg/hgtk/commit.py:503
 #, python-format
 msgid "Parent: %(rev)s"
-msgstr "Szülő: %(res)-k"
+msgstr "Szülő: %(rev)s"
 
 #: tortoisehg/hgtk/commit.py:511
 msgid "Not at head"
@@ -7671,7 +7671,7 @@ msgstr "Találatok"
 #: tortoisehg/hgtk/datamine.py:387
 #, python-format
 msgid "Search %d"
-msgstr "Keresés %s"
+msgstr "Keresés %d"
 
 #: tortoisehg/hgtk/datamine.py:430
 msgid "No regular expression given"
@@ -8047,7 +8047,7 @@ msgid ""
 "hgtk: command '%s' is ambiguous:\n"
 "    %s\n"
 msgstr ""
-"hgtk: parancs '%s' nem egyedi: %s\n"
+"hgtk: parancs '%s' nem egyedi:\n"
 "    %s\n"
 
 #: tortoisehg/hgtk/hgtk.py:216
@@ -8074,7 +8074,7 @@ msgstr "mpatch *rej argumentumot vár\n"
 #: tortoisehg/hgtk/hgtk.py:519 tortoisehg/hgtk/hgtk.py:526
 #, python-format
 msgid "%s does not exist\n"
-msgstr "% nem létezik\n"
+msgstr "%s nem létezik\n"
 
 #: tortoisehg/hgtk/hgtk.py:548
 msgid "use \"hgtk help\" for the full list of commands"
