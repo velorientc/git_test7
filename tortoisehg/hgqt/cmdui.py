@@ -624,6 +624,11 @@ class ConsoleWidget(QWidget):
         self.openPrompt()
 
     @_cmdtable
+    def _cmd_cls(self, args):
+        self.clear()
+        self.openPrompt()
+
+    @_cmdtable
     def _cmd_exit(self, args):
         self.clear()
         self.openPrompt()
