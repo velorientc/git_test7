@@ -7705,7 +7705,7 @@ msgstr "該当箇所"
 #: tortoisehg/hgtk/datamine.py:387
 #, python-format
 msgid "Search %d"
-msgstr "検索 %s"
+msgstr "検索 %d"
 
 #: tortoisehg/hgtk/datamine.py:430
 msgid "No regular expression given"
