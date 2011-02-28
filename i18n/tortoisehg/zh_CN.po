@@ -10465,7 +10465,7 @@ msgstr "确认折叠"
 msgid ""
 "Do you want to fold un-applied patch '%(target)s' into current patch "
 "'%(qtip)s'?"
-msgstr "确认要折叠未应用的补丁'%s(target)s'到当前的补丁'%(qtip)s'吗"
+msgstr "确认要折叠未应用的补丁'%(target)s'到当前的补丁'%(qtip)s'吗"
 
 #: tortoisehg/hgtk/thgmq.py:473
 #, python-format
