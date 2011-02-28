@@ -168,7 +168,7 @@ class SyncWidget(QWidget):
         self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
         hbox.addWidget(self.schemecombo)
 
-        self.securebutton = QPushButton(qtlib.geticon('password'), '')
+        self.securebutton = QPushButton(qtlib.geticon('thg-password'), '')
         self.securebutton.setToolTip(
             _('Manage HTTPS connection security and user authentication'))
         hbox.addWidget(self.securebutton)
