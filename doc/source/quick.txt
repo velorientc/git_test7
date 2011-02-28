@@ -100,8 +100,8 @@ own tool.
 
 .. note::
 	If you installed TortoiseHg from source, you need to add our
-	contrib/mergetools.ini file to your HGRC path in some way.  One
-	approach is to %include it from your ~/.hgrc file.
+	:file:`contrib/mergetools.ini` file to your HGRC path in some way.  One
+	approach is to *%include* it from your :file:`~/.hgrc` file.
 
 Feel free to configure other global settings while you have the dialog
 open.  You will have the chance later to override these global settings

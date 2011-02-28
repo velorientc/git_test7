@@ -137,7 +137,7 @@ dialogs via the source install method. For details, see
 
 .. note::
 	If you install TortoiseHg from source, you need to add our
-	contrib/mergetools.rc file to your HGRC path in some way.  One
-	approach is to %include it from your ~/.hgrc file.
+	:file:`contrib/mergetools.rc` file to your HGRC path in some way.  One
+	approach is to *%include* it from your :file:`~/.hgrc file`.
 
 .. vim: noet ts=4
