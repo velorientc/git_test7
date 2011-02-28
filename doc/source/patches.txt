@@ -38,7 +38,7 @@ source files and patches.  The **patch.eol** setting was introduced in
 	[patch]
 	eol = auto #strict, lf, or crlf
 
-.. note:
+.. note::
 	When eol is set to *auto*, the patching engine will preserve the line
 	endings of the patched file regardless of the line endings in the
 	patch itself.  You almost always want eol to be configured to *auto*.
