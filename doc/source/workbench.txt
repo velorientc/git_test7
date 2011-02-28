@@ -338,26 +338,26 @@ With only one revision selected:
 		Update your working directory to this revision. Opens the
 		TortoiseHg update dialog with this revision selected.
 	:guilabel:`Visual diff...`
-		Open this change in your visual diff tool
+		Open this change in your visual diff tool.
 	:guilabel:`Diff to local...`
 		Display changes (visual diff) between this revision and your
-		current working directory
+		current working directory.
 	:guilabel:`Browse at rev...`
 		Brings up the Manifest window with the content of all files in the repo
 		at the selected revision.
 	:guilabel:`Merge with local...`
 		Merge the selected changeset with the Working Dir.  Opens the TortoiseHg
 		merge dialog with this revision selected.
-	:guilabel:`Tag`
+	:guilabel:`Tag...`
 		Allows to manage tags to the selected revision.
-	:guilabel:`Bookmark`
+	:guilabel:`Bookmark...`
 		Allows to manage bookmarks for the selected revision.
-		*This option requires the boomarks extension to be enabled*
-	:guilabel:`Backout`
-		Create a backout changeset for selected revision
+		*This option requires the boomarks extension to be enabled.*
+	:guilabel:`Backout...`
+		Create a backout changeset for selected revision.
 	:guilabel:`Export`
 		:guilabel:`Export patch`
-			Generate a patch file containing this revision's changes
+			Generate a patch file containing this revision's changes.
 		:guilabel:`Email patch...`
 			Send this revision's changes to email recipient.  Opens the
 			TortoiseHg email dialog with this revision selected.
@@ -366,10 +366,10 @@ With only one revision selected:
 			generate a backup copy of the repository at that revision.
 		:guilabel:`Copy patch`
 			todo
-			*Only visible when MQ is enabled*
+			*Only visible when MQ is enabled.*
 	
 	:guilabel:`Copy hash`
-			Copy current revision's full hash to the clipboard
+			Copy current revision's full hash to the clipboard.
 	:guilabel:`Modify history`
 		:guilabel:`QGoto`
 			Push/pop patches upto this one
@@ -391,7 +391,7 @@ With only one revision selected:
 
 With two revisions selected:
 	:guilabel:`Visual diff...`
-		Open this change in your visual diff tool
+		Open this change in your visual diff tool.
 	:guilabel:`Export selected`
 		Creates a patch file for each changeset in selected range.
 	:guilabel:`Email selected...`
