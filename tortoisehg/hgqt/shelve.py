@@ -109,7 +109,7 @@ class ShelveDialog(QDialog):
 
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
         self.tbarhbox.addWidget(self.lefttbar)
-        self.deletea = a = QAction(_('Deleted selected chunks'), self)
+        self.deletea = a = QAction(_('Delete selected chunks'), self)
         self.deletea.triggered.connect(self.browsea.deleteSelectedChunks)
         a.setIcon(qtlib.geticon('thg-shelve-delete-left'))
         self.lefttbar.addAction(self.deletea)
@@ -160,7 +160,7 @@ class ShelveDialog(QDialog):
         self.allleft.triggered.connect(self.moveFilesLeft)
         a.setIcon(qtlib.geticon('thg-shelve-move-left-all'))
         self.righttbar.addAction(self.allleft)
-        self.deleteb = a = QAction(_('Deleted selected chunks'), self)
+        self.deleteb = a = QAction(_('Delete selected chunks'), self)
         self.deleteb.triggered.connect(self.browseb.deleteSelectedChunks)
         a.setIcon(qtlib.geticon('thg-shelve-delete-right'))
         self.righttbar.addAction(self.deleteb)
