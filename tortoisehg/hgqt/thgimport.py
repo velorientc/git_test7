@@ -173,6 +173,7 @@ class ImportDialog(QDialog):
     def browsefiles(self):
         caption = _("Select patches")
         filelist = QFileDialog.getOpenFileNames(parent=self, caption=caption,
+                                                directory=self.repo.root,
                                                 filter=_FILE_FILTER)
         if filelist:
             # Qt file browser uses '/' in paths, even on Windows.
@@ -183,7 +184,9 @@ class ImportDialog(QDialog):
 
     def browsedir(self):
         caption = _("Select Directory containing patches")
-        path = QFileDialog.getExistingDirectory(parent=self, caption=caption)
+        path = QFileDialog.getExistingDirectory(parent=self,
+                                                directory=self.repo.root,
+                                                caption=caption)
         if path:
             response = str(path.replace('/', os.sep))
             self.src_combo.setEditText(response)
