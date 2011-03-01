@@ -146,6 +146,7 @@ class Msgfmt:
 
                 self.add(msgctxt, msgid, msgstr, fuzzy)
                 section = None
+                msgctxt = ''
                 fuzzy = 0
                 # If we only want the header we stop after the first message
                 if header_only:
