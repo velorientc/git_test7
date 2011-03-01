@@ -566,8 +566,8 @@ class RepoWidget(QWidget):
 
     def modelFilled(self):
         'initial batch of revisions loaded'
-        self.repoview.resizeColumns()
         self.repoview.goto(self._reload_rev) # emits revisionSelected
+        self.repoview.resizeColumns()
 
     def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
