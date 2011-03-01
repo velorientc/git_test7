@@ -191,7 +191,7 @@ class Scintilla(QsciScintilla):
         self._stdMenu.addSeparator()
         qsci = QsciScintilla
         wrapmenu = QMenu(_('Wrap'), self)
-        for name, mode in ((_('None'), qsci.WrapNone),
+        for name, mode in ((_('None', 'wrap mode'), qsci.WrapNone),
                            (_('Word'), qsci.WrapWord),
                            (_('Character'), qsci.WrapCharacter)):
             def mkaction(n, m):

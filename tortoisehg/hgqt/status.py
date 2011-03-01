@@ -129,7 +129,7 @@ class StatusWidget(QWidget):
         self.allbutton.setToolTip(_('Check all files'))
         self.allbutton.clicked.connect(self.checkAll)
         self.nonebutton = QToolButton()
-        self.nonebutton.setText(_('None'))
+        self.nonebutton.setText(_('None', 'files'))
         self.nonebutton.setToolTip(_('Uncheck all files'))
         self.nonebutton.clicked.connect(self.checkNone)
         hcbox = QHBoxLayout()

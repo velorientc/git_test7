@@ -432,7 +432,7 @@ class DiffBrowser(QFrame):
         self.allbutton.setShortcut(QKeySequence.SelectAll)
         self.allbutton.clicked.connect(self.selectAll)
         self.nonebutton = QToolButton()
-        self.nonebutton.setText(_('None'))
+        self.nonebutton.setText(_('None', 'files'))
         self.nonebutton.setShortcut(QKeySequence.New)
         self.nonebutton.clicked.connect(self.selectNone)
         hbox.addStretch(1)
