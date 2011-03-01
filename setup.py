@@ -21,6 +21,7 @@ from distutils.command.clean import clean as _clean_orig
 from distutils.dep_util import newer, newer_group
 from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
+from i18n.msgfmt import Msgfmt
 
 thgcopyright = 'Copyright (C) 2010 Steve Borho and others'
 hgcopyright = 'Copyright (C) 2005-2010 Matt Mackall and others'
@@ -37,11 +38,6 @@ class build_mo(Command):
         pass
 
     def run(self):
-        if not find_executable('msgfmt'):
-            self.warn("could not find msgfmt executable, no translations "
-                     "will be built")
-            return
-
         podir = 'i18n/tortoisehg'
         if not os.path.isdir(podir):
             self.warn("could not find %s/ directory" % podir)
@@ -54,12 +50,9 @@ class build_mo(Command):
             pofile = join(podir, po)
             modir = join('locale', po[:-3], 'LC_MESSAGES')
             mofile = join(modir, 'tortoisehg.mo')
-            cmd = ['msgfmt', '-v', '-o', mofile, pofile]
-            if sys.platform != 'sunos5':
-                # msgfmt on Solaris does not know about -c
-                cmd.append('-c')
+            modata = Msgfmt(pofile).get()
             self.mkpath(modir)
-            self.make_file([pofile], mofile, spawn, (cmd,))
+            open(mofile, "wb").write(modata)
 
 class update_pot(Command):
 
