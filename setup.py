@@ -106,6 +106,7 @@ class update_pot(Command):
             '--msgid-bugs-address', '<thg-devel@googlegroups.com>',
             '--copyright-holder', thgcopyright,
             '--from-code', 'ISO-8859-1',
+            '--keyword=_:1,2c,2t',
             '--add-comments=i18n:',
             '-d', '.',
             '-o', potfile,

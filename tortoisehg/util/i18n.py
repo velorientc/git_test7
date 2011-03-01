@@ -52,10 +52,14 @@ def availablelanguages():
     langs.append('en')  # means null translation
     return sorted(langs)
 
-def _(message):
+def _(message, context=''):
+    if context:
+        tmsg = t.gettext(context + '\004' + message)
+        if '\004' not in tmsg:
+            return tmsg
     return t.gettext(message)
 
-def agettext(message):
+def agettext(message, context=''):
     """Translate message and convert to local encoding
     such as 'ascii' before being returned.
 
@@ -64,11 +68,11 @@ def agettext(message):
     """
     try:
         from tortoisehg.util import hglib
-        u = _(message)
+        u = _(message, context)
         return hglib.fromutf(u)
     except (LookupError, UnicodeEncodeError):
         return message
 
 class keepgettext(object):
-    def _(self, message):
-        return {'id': message, 'str': _(message)}
+    def _(self, message, context=''):
+        return {'id': message, 'str': _(message, context)}

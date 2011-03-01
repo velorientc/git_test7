@@ -8,13 +8,13 @@
 from tortoisehg.util.i18n import _ as _gettext
 from tortoisehg.util.i18n import agettext
 
-def _(message):
-    return unicode(_gettext(message), 'utf-8')
+def _(message, context=''):
+    return unicode(_gettext(message, context), 'utf-8')
 
 class localgettext(object):
-    def _(self, message):
-        return agettext(message)
+    def _(self, message, context=''):
+        return agettext(message, context='')
 
 class keepgettext(object):
-    def _(self, message):
-        return {'id': message, 'str': _(message)}
+    def _(self, message, context=''):
+        return {'id': message, 'str': _(message, context)}
