@@ -122,10 +122,9 @@ HTTPS
 ~~~~~
 
 There are two asymmetrical parts to a secure HTTPS connection.  The
-first is authenticating yourself (the client) to the server, either via
-a username and passphrase or a certificate key.  The second part of the
-secure connection is authenticating to yourself the identification of
-the server.
+first part of the secure connection is authenticating the identification
+of the server.  The second is authenticating yourself (the client) to
+the server, either via a username and passphrase or a certificate key.  
 
 Host Authentication
 +++++++++++++++++++
