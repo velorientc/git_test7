@@ -619,7 +619,7 @@ class WctxModel(QAbstractTableModel):
             Statuses are ranked in the following order:
                 'S','M','A','R','!','?','C','I'
             """
-            sortList = ('S','M','A','R','!','?','C','I')
+            sortList = ['S','M','A','R','!','?','C','I']
 
             try:
                 rank = sortList.index(value)
