@@ -1,4 +1,3 @@
-*******
 Patches
 *******
 
@@ -45,9 +44,7 @@ source files and patches.  The **patch.eol** setting was introduced in
 	The only downside is that you cannot make a patch that changes the
 	line endings of a source file.
 
-The work on the hgeol extension is also improving this area.  Perhaps it
-will be resolved by hg-1.5.  See also the
-`patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
+See also the `patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
 of the hgrc documentation.
 
 Applying a patch is not a foolproof operation.  If the source file has
@@ -104,46 +101,31 @@ repository.
 	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
 	to send patches via email
 
-Cherry Picking
---------------
-
-Use the changeset range selection feature of the Repository Explorer and
-select :menuselection:`Diff with selected`.  This opens up a status
-viewer showing you the accumulated changes between your base and target
-changesets.
-
-From the status viewer, you can select files and diff hunks just as you
-can in the commit tool, and preview the final result in the
-:guilabel:`Save Preview` tab.  Pressing :guilabel:`Save As` will save
-the selected changes to a patch file.
-
-For even finer cherry-picking, you can highlight a number of diff-hunks
-in the hunk selection pane and hit CTRL-C.  This will copy the
-highlighted (mouse selected, not toggled) hunks to the clipboard.
-
-.. note::
-	Reversing the order of your changeset selection reverses the effect
-	of the patch.
-
-
 Import Patches
 ==============
 
 .. figure:: figures/import.png
 	:alt: Import tool
 
-	Import dialog of Repository Explorer
+	Import dialog of the WorkBench
 
-The import dialog can be opened from the sync bar or menu of the
-Repository Explorer, or via :command:`thg import`.  The dialog supports
-file and directory drag and drop.
+The import dialog can be opened from the :guilabel:`Repository` menu of
+the Workbench, or via :command:`thg import`.  The dialog supports file
+and directory drag and drop.
 
 You have the choice of importing directly into the repository, the
-working folder, or your patch queue.
+working folder, a shelf file, or your patch queue.
 
 .. note::
 	Importing a patch requires a clean working directory state.  You
 	must commit, revert, or shelve changes before importing a patch.
+
+.. note::
+	If a patch does not import itself cleanly into the repository, the
+	recommended recourse is to import the patch into your patch queue
+	(qimport) and then qpush the patch.  This uses TortoiseHg patch
+	rejection dialog and preserves the meta-data in the patch header.
+	Do not forget to qrefresh after resolving the rejected chunks.
 
 .. warning::
 	If the patch you are importing does not have a commit
@@ -156,14 +138,67 @@ Patch Queues
 ============
 
 .. figure:: figures/patchqueue.png
-	:alt: Patch Queue
+	:alt: Patch Queue in Workbench
 
-	Patch Queue panel in the Repository Explorer
+	A patch queue in the repository graph
 
-Both the Repository Explorer and Commit Tool have an optional Patch
-Queue panel that is only available when the user has enabled the MQ
-extension.  It allows the user to perform most patch queue operations
-including push, pop, rename, and finish.  It's recommended to learn the
-MQ extension before using the Patch Queue panel.
+When MQ is enabled, several Workbench features are exposed. Context menu
+options are exposed in the changeset menus, your patch queue is graphed
+together with your repository's history, and a Patch Queue task tab is
+activated.
+
+.. figure:: figures/mqtasktab.png
+	:alt: Patch Queue Task Tab
+
+	MQ tool or task tab
+
+The :guilabel:`Patch Queue` task tab is also available as :command:`thg
+mq` from the command line.  Most MQ features are available from the
+Patch Queue task tab, though a few features (qimport -r/qfinish) are
+only supported via revision graph context menus.  Much functionality is
+supported in both places.
+
+Double clicking on an unapplied patch, an applied patch other than the
+current qtip, or the qparent triggers a qgoto command; making the double
+clicked revision the current patch.  Double clicking on any other
+revision will trigger a visual diff of that revision.
+
+.. note::
+	The Workbench must be restarted after enabling or disabling the MQ
+	extension in a repository.  This is true of most extensions.
+
+.. note::
+	It is recommended to learn the MQ extension before using the MQ
+	features of the Workbench.
+
+Patch Rejects
+=============
+
+As explained previously, patches are not guarunteed to apply cleanly to
+their intended source files.  Prior to TortoiseHg 2.0, the only recourse
+available when patch chunks were rejected was to open the source file
+and the rejects file in an editor and manually fixup the rejected
+chunks.
+
+TortoiseHg 2.0 introduces a dialog that makes this a little bit easier.
+If the shelve tool detects chunk rejections, it offers to open the
+rejected chunks in the rejects editor.  The MQ tool also does this for
+qpush commands.
+
+.. figure:: figures/rejects.png
+	:alt: Patch Rejects Editor
+
+	Resolve rejected patch chunks
+
+The rejects editor is very basic.  Your source file is opened in a
+Qscintilla2 window for edit.  Below the source file is the list of
+chunks that failed to apply to this file.  When you click on a chunk in
+the list the editor jumps to the line where the chunk context was
+supposed to match.  It is up to you to figure out why the chunk did not
+apply and to resolve it (perhaps even by ignoring the chunk).  The
+resolved/unresolved states are for your own book keeping, so you know
+when all of the chunks have been dealt with.  Once you have marked all
+of the chunks resolved, the :guilabel:`Save` button will become
+sensitive.
 
 .. vim: noet ts=4
