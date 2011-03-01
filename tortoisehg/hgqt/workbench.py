@@ -283,7 +283,8 @@ class Workbench(QMainWindow):
                   icon='utilities-terminal', enabled='repoopen',
                   menu='repository')
 
-        newaction(_("About"), self.on_about, menu='help', icon='help-browser')
+        newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
+        newaction(_("About"), self.onAbout, menu='help', icon='thg-logo')
 
         newseparator(toolbar='edit')
         self.actionBack = \
@@ -596,12 +597,16 @@ class Workbench(QMainWindow):
             if rw.repo.root == root:
                 yield rw
 
-    def on_about(self, *args):
+    def onAbout(self, *args):
         """ Display about dialog """
         from tortoisehg.hgqt.about import AboutDialog
         ad = AboutDialog(self)
         ad.finished.connect(ad.deleteLater)
         ad.exec_()
+
+    def onHelp(self, *args):
+        """ Display online help """
+        qtlib.openhelpcontents('workbench.html')
 
     def storeSettings(self):
         s = QSettings()
