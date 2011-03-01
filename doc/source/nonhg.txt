@@ -126,7 +126,8 @@ hgsubversion folder inside the cloned repository::
 
 You can verify that worked by typing :command:`hg help hgsubversion`
 
-See the hgsubversion wiki for details of use.
+See the hgsubversion wiki for details of use.  We recommend an
+hgsubversion version of at least 1.2.1 with Mercurial 1.8.
 
 .. warning::
 	When cloning a Subversion server, it is highly recommended
