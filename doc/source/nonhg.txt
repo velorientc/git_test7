@@ -167,7 +167,8 @@ Then enable hggit in your Mercurial.ini file::
 You can verify that worked by typing :command:`hg help hggit`
 
 Current versions of TortoiseHg include dulwich version 0.7.0.  We
-recommend to use hg-git version 0.2.5 with this version of dulwich.
+recommend to use hg-git version 0.2.6 with this version of dulwich
+and Mercurial 1.8.
 
 See the hggit documentation for details of use.
 
