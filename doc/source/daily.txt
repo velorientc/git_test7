@@ -12,6 +12,7 @@ TortoiseHg in daily use
 	init
 	clone
 	commit
+	shelve
 	sync
 	serve
 	guess
