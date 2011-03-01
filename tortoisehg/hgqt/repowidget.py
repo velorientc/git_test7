@@ -586,6 +586,7 @@ class RepoWidget(QWidget):
 
     def onRevisionSelected(self, rev):
         'View selection changed, could be a reload'
+        self.showMessage('')
         if self.repomodel.graph is None:
             return
         if type(rev) != str: # unapplied patch
