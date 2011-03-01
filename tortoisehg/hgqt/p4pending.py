@@ -65,6 +65,8 @@ class PerforcePending(QDialog):
 
         self.setWindowTitle(_('Pending Perforce Changelists - %s') %
                             repo.displayname)
+        self.setWindowFlags(self.windowFlags() &
+                            ~Qt.WindowContextHelpButtonHint)
 
     @pyqtSlot(QString)
     def p4clActivated(self, curcl):
