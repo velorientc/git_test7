@@ -37,6 +37,19 @@ def gettempdir():
         atexit.register(cleanup)
     return tmproot
 
+def openhelpcontents(url):
+    'Open online help, use local CHM file if available'
+    if not url.startswith('http'):
+        fullurl = 'http://tortoisehg.org/manual/2.0/' + url
+        # Use local CHM file if it can be found
+        if os.name == 'nt' and paths.bin_path:
+            chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
+            if os.path.exists(chm):
+                fullurl = (r'mk:@MSITStore:%s::/' % chm) + url
+                QDesktopServices.openUrl(QUrl.fromLocalFile(fullurl))
+                return
+        QDesktopServices.openUrl(QUrl(fullurl))
+
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
 # set of _effects, since we convert color effect names to font style

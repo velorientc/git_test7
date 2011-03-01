@@ -4,6 +4,7 @@ Steps for making a release:
 * Pull latest translations from Launchpad
 * set revision number in doc/source/conf.py
 * tag stable branch of repository, push
+* update url in qtlib.openhelpcontents()            (major release only)
 * build pdf hgbook, check into thg-winbuild         (major release only)
 * build release installer
 * commit extension versions, tag, push thg-winbuild
