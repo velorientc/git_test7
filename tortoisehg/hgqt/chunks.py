@@ -428,7 +428,7 @@ class DiffBrowser(QFrame):
 
         self.sumlabel = QLabel()
         self.allbutton = QToolButton()
-        self.allbutton.setText(_('All'))
+        self.allbutton.setText(_('All', 'files'))
         self.allbutton.setShortcut(QKeySequence.SelectAll)
         self.allbutton.clicked.connect(self.selectAll)
         self.nonebutton = QToolButton()

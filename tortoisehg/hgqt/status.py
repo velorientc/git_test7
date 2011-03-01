@@ -125,7 +125,7 @@ class StatusWidget(QWidget):
 
         self.countlbl = QLabel()
         self.allbutton = QToolButton()
-        self.allbutton.setText(_('All'))
+        self.allbutton.setText(_('All', 'files'))
         self.allbutton.setToolTip(_('Check all files'))
         self.allbutton.clicked.connect(self.checkAll)
         self.nonebutton = QToolButton()
