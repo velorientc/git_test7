@@ -22,9 +22,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, \
                             reporegistry, repotreemodel
 
-# TODO
-# Write keyring help, connect to help button
-
 _schemes = ['local', 'ssh', 'http', 'https']
 
 def parseurl(path):
@@ -1153,7 +1150,7 @@ are expanded in the filename.'''))
         QTimer.singleShot(0, lambda:self.userentry.setFocus())
 
     def keyringHelp(self):
-        pass
+        qtlib.openhelpcontents('sync.html#security')
 
     def accept(self):
         path = util.user_rcpath()
