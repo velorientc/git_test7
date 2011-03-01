@@ -54,8 +54,9 @@ def availablelanguages():
 
 def _(message, context=''):
     if context:
-        tmsg = t.gettext(context + '\004' + message)
-        if '\004' not in tmsg:
+        sep = '\004'
+        tmsg = t.gettext(context + sep + message)
+        if sep not in tmsg:
             return tmsg
     return t.gettext(message)
 
