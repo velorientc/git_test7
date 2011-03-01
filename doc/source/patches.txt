@@ -180,7 +180,7 @@ Workbench, Patch Queue task tab, and the shelve tool.
 Patch Rejects
 =============
 
-As explained previously, patches are not guarunteed to apply cleanly to
+As explained previously, patches are not guaranteed to apply cleanly to
 their intended source files.  Prior to TortoiseHg 2.0, the only recourse
 available when patch chunks were rejected was to open the source file
 and the rejects file in an editor and manually fixup the rejected
@@ -197,7 +197,7 @@ qpush commands.
 	Resolve rejected patch chunks
 
 The rejects editor is very basic.  Your source file is opened in a
-Qscintilla2 window for edit.  Below the source file is the list of
+QScintilla2 window for edit.  Below the source file is the list of
 chunks that failed to apply to this file.  When you click on a chunk in
 the list the editor jumps to the line where the chunk context was
 supposed to match.  It is up to you to figure out why the chunk did not

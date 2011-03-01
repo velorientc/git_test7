@@ -109,7 +109,7 @@ editing component extensively to:
 * edit commit messages with auto-completion of filenames and source symbols
 * edit revision set strings with brace matching and auto-completion
 
-One can configure the Qscintilla2 tab stop parameter using the settings
+One can configure the QScintilla2 tab stop parameter using the settings
 tool, while white space visibility and wrap are controlled by context
 menus.
 
