@@ -204,6 +204,14 @@ It adds a number of commands which can be listed with
  pstatus        - print status of current (or given) patch branch
  reapply        - reverts the working copy of all files touched by REV to REV
 
+TortoiseHg will provide a new task tab that shows the patch dependency graph.
+
+ .. figure:: figures/pbranch.png
+	:alt: Pbranch task tab
+
+	Pbranch task tab
+ 
+
 **Installation**
 
 As this extension is not installed with TortoiseHg, you have to download 
