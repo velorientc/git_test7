@@ -163,6 +163,12 @@ current qtip, or the qparent triggers a qgoto command; making the double
 clicked revision the current patch.  Double clicking on any other
 revision will trigger a visual diff of that revision.
 
+In previous releases, the commit tool was a central feature in MQ use.
+In TortoiseHg 2.0, the commit tool is almost completely unaware of MQ.
+It only knows to not allow commits if the current working parent is an
+applied patch.  Instead, MQ functionality has been focused into the
+Workbench, Patch Queue task tab, and the shelve tool.
+
 .. note::
 	The Workbench must be restarted after enabling or disabling the MQ
 	extension in a repository.  This is true of most extensions.
