@@ -50,7 +50,7 @@ class FilterBar(gtklib.SlimToolbar):
         self.buttons = {}
         self.handlers = {}
 
-        self.all = gtk.RadioButton(None, _('All'))
+        self.all = gtk.RadioButton(None, _('All', 'changesets'))
         self.all.set_active(True)
         self.append_widget(self.all, padding=0)
         self.buttons['all'] = self.all
@@ -472,7 +472,7 @@ class GLog(gdialog.GWindow):
             ]),
 
         dict(text=_('_Filter'), subitems=[
-            dict(text=_('All'), name='all', asradio=True,
+            dict(text=_('All', 'changesets'), name='all', asradio=True,
                 func=self.filter_handler, args=['all'], check=True),
             dict(text=_('Tagged'), name='tagged', asradio=True,
                 func=self.filter_handler, args=['tagged'], rg='all'),
