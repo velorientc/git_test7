@@ -194,15 +194,11 @@ Configurables
 And three other features for *advanced* users.
 
 :menuselection:`Commit --> Push After Commit`:
-	When set to True, the commit tool will check the *push after
-	commit* toggle button on startup.
+	If configured, the commit tool will try to push to the configured
+	URL or alias after each commit.
 :menuselection:`Commit --> Auto Commit List`:
 	Comma separated list of files that are automatically included in
 	every commit.  Intended for use only as a repository setting.
-:menuselection:`Commit --> Auto Exclude List`:
-	Comma separated list of files that are automatically unchecked
-	when the status, commit, and shelve tools are opened.
-
 :menuselection:`TortoiseHg --> Max Diff Size`
 	Configures the diff size limit
 
