@@ -147,7 +147,7 @@ options are exposed in the changeset menus, your patch queue is graphed
 together with your repository's history, and a Patch Queue task tab is
 activated.
 
-.. figure:: figures/mqtasktab.png
+.. figure:: figures/mq-tasktab.png
 	:alt: Patch Queue Task Tab
 
 	MQ tool or task tab
