@@ -483,6 +483,7 @@ def _extendrepo(repo):
 
         def thgbackup(self, path):
             'Make a backup of the given file in the repository "trashcan"'
+            # The backup name will be the same as the orginal file plus '.bak'
             trashcan = self.join('Trashcan')
             if not os.path.isdir(trashcan):
                 os.mkdir(trashcan)
@@ -490,7 +491,7 @@ def _extendrepo(repo):
                 return
             name = os.path.basename(path)
             root, ext = os.path.splitext(name)
-            dest = tempfile.mktemp(ext, root+'_', trashcan)
+            dest = tempfile.mktemp(ext+'.bak', root+'_', trashcan)
             shutil.copyfile(path, dest)
 
     return thgrepository
