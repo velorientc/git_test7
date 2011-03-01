@@ -65,6 +65,7 @@ class RepoWidget(QWidget):
         self.bundle = None
         self.revset = set()
         self.namedTabs = {}
+        self.repolen = len(repo)
 
         if repo.parents()[0].rev() == -1:
             self._reload_rev = 'tip'
@@ -627,11 +628,25 @@ class RepoWidget(QWidget):
         'Initiate a refresh of the repo model, rebuild graph'
         self.repo.thginvalidate()
         self.rebuildGraph()
-        self.filterbar.refresh()
         self.reloadTaskTab()
 
     def rebuildGraph(self):
+        'Called by repositoryChanged signals, and during reload'
         self.showMessage('')
+
+        if len(self.repo) < self.repolen:
+            # repo has been stripped, invalidate active revision sets
+            if self.bundle:
+                self.clearBundle()
+                self.showMessage(_('Repository stripped, incoming preview '
+                                   ' cleared'))
+            elif self.revset:
+                self.revset = []
+                self.filterbar.revsetle.setText('')
+                self.showMessage(_('Repository stripped, revision set cleared'))
+        if not self.bundle:
+            self.repolen = len(self.repo)
+
         self._reload_rev = self.rev
         if self.rev is None:
             pass
@@ -648,7 +663,9 @@ class RepoWidget(QWidget):
                 self._reload_rev = 'tip'
         elif len(self.repo) <= self.rev:
             self._reload_rev = 'tip'
+
         self.setupModels()
+        self.filterbar.refresh()
 
     def reloadTaskTab(self):
         tti = self.taskTabsWidget.currentIndex()
