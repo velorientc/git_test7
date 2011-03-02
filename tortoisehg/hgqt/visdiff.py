@@ -417,7 +417,7 @@ class FileSelectionDialog(QDialog):
             callable = lambda row: self.fileSelect(row, repo, combo,
                                                    patterns, preferred)
             list.currentRowChanged.connect(callable)
-            combo.currentIndexChanged.connect(self.toolSelect)
+            combo.currentIndexChanged['QString'].connect(self.toolSelect)
 
         BB = QDialogButtonBox
         bb = BB()
@@ -462,6 +462,7 @@ class FileSelectionDialog(QDialog):
             row = QString('%s %s' % (status, hglib.tounicode(f)))
             self.list.addItem(row)
 
+    @pyqtSlot(QString)
     def toolSelect(self, tool):
         'user selected a tool from the tool combo'
         tool = hglib.fromunicode(tool)
