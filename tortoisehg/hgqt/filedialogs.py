@@ -533,7 +533,7 @@ class FileDiffDialog(_AbstractFileDialog):
         is changed, so we can update the position of the other file
         viewer.
         """
-        if self._invbarchanged:
+        if self._invbarchanged or not hasattr(self, '_diffmatch'):
             # prevent loops in changes (left -> right -> left ...)
             return
         self._invbarchanged = True
