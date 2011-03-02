@@ -15,9 +15,7 @@ from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerMakefile
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib, wconfig
-
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
-from tortoisehg.hgqt.sync import loadIniFile
 
 # Technical Debt for CommitWidget
 #  disable commit button while no message is entered or no files are selected
@@ -767,7 +765,7 @@ class DetailsDialog(QDialog):
         self.saveToPath(util.user_rcpath())
 
     def saveToPath(self, path):
-        fn, cfg = loadIniFile(path, self)
+        fn, cfg = qtlib.loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save username'),
                    _('Iniparse must be installed.'), parent=self)
@@ -790,7 +788,7 @@ class DetailsDialog(QDialog):
 
     def savePushAfter(self):
         path = os.path.join(self.repo.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile([path], self)
+        fn, cfg = qtlib.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save after commit push'),
                    _('Iniparse must be installed.'), parent=self)
@@ -813,7 +811,7 @@ class DetailsDialog(QDialog):
 
     def saveAutoInc(self):
         path = os.path.join(self.repo.root, '.hg', 'hgrc')
-        fn, cfg = loadIniFile([path], self)
+        fn, cfg = qtlib.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save auto include list'),
                    _('Iniparse must be installed.'), parent=self)
