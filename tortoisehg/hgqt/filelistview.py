@@ -139,7 +139,6 @@ class HgFileListView(QTableView):
             return
         model = self.model()
         pats = [filename]
-        rev = model._ctx.rev()
         opts = {'change':model._ctx.rev()}
         dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
         if dlg:
