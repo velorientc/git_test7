@@ -7,7 +7,7 @@ Archiving
 You can choose from quite a lot of formats to make an archive of a repository.
 There are the usual compressed formats. But it's also possible to make a plain
 folder of files in another place than the Working Directory (it's like a clone,
-but without the .hg folder). Can be useful for doing builds f.i. (think
+but without the .hg folder). Can be useful for doing builds for example (think
 'svn export'). One can make an archive with only the files of the selected rev.
 Some people seem to use this to send changes to external people that do not have
 access to the repository.
