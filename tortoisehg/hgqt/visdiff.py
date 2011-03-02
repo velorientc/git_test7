@@ -554,7 +554,7 @@ class FileSelectionDialog(QDialog):
         args = ctx1b and self.mergeopts or self.diffopts
         launchtool(self.diffpath, args, replace, False)
 
-    def p1dirdiff(self, button):
+    def p1dirdiff(self):
         dir1a, dir1b, dir2 = self.dirs
         rev1a, rev1b, rev2 = self.revs
         ctx1a, ctx1b, ctx2 = self.ctxs
@@ -565,7 +565,7 @@ class FileSelectionDialog(QDialog):
                        parent2='', plabel2='', clabel=rev2, child=dir2)
         launchtool(self.diffpath, self.diffopts, replace, False)
 
-    def p2dirdiff(self, button):
+    def p2dirdiff(self):
         dir1a, dir1b, dir2 = self.dirs
         rev1a, rev1b, rev2 = self.revs
         ctx1a, ctx1b, ctx2 = self.ctxs
@@ -576,7 +576,7 @@ class FileSelectionDialog(QDialog):
                        parent2='', plabel2='', clabel=rev2, child=dir2)
         launchtool(self.diffpath, self.diffopts, replace, False)
 
-    def threewaydirdiff(self, button):
+    def threewaydirdiff(self):
         dir1a, dir1b, dir2 = self.dirs
         rev1a, rev1b, rev2 = self.revs
         ctx1a, ctx1b, ctx2 = self.ctxs
