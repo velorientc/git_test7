@@ -536,9 +536,10 @@ class Workbench(QMainWindow):
             path = os.path.dirname(repoWidget.repo.root)
         else:
             path = os.getcwd()
-        initdlg = InitDialog([path], parent=self)
-        if initdlg.exec_():
-            path = initdlg.getPath()
+        dlg = InitDialog([path], parent=self)
+        dlg.finished.connect(dlg.deleteLater)
+        if dlg.exec_():
+            path = dlg.getPath()
             self.openRepo(path)
 
     def cloneRepository(self):
@@ -550,9 +551,10 @@ class Workbench(QMainWindow):
             args = [root, os.path.dirname(root)]
         else:
             args = []
-        clonedlg = CloneDialog(args, parent=self)
-        if clonedlg.exec_():
-            path = clonedlg.getDest()
+        dlg = CloneDialog(args, parent=self)
+        dlg.finished.connect(dlg.deleteLater)
+        if dlg.exec_():
+            path = dlg.getDest()
             self.openRepo(path)
 
     def openRepository(self):
