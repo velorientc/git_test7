@@ -171,7 +171,7 @@ def besttool(ui, tools, force=None):
 
 
 def visualdiff(ui, repo, pats, opts):
-    revs = opts.get('rev')
+    revs = opts.get('rev', [])
     change = opts.get('change')
 
     try:
