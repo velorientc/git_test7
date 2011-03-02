@@ -440,7 +440,7 @@ class CustomPrompt(QMessageBox):
     def keyPressEvent(self, event):
         for k, btn in self.hotkeys.iteritems():
             if event.text() == k:
-                btn.clicked.emit()
+                btn.clicked.emit(False)
         super(CustomPrompt, self).keyPressEvent(event)
 
 def setup_font_substitutions():
