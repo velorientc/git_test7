@@ -291,6 +291,7 @@ class RepoWidget(QWidget):
                                        bundle=self.bundle)
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
+        self.manifestDemand.forward('setRepo', self.repo)
         self.bundleAccept.setHidden(False)
         self.bundleReject.setHidden(False)
         self.filterbar.revsetle.setText('incoming()')
@@ -317,6 +318,7 @@ class RepoWidget(QWidget):
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
+        self.manifestDemand.forward('setRepo', self.repo)
 
     def acceptBundle(self):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)

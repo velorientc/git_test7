@@ -337,6 +337,14 @@ class ManifestWidget(QWidget):
         # TODO
         pass
 
+    def setRepo(self, repo):
+        self._repo = repo
+        #self._fileview.setRepo(repo)
+        self._fileview.repo = repo
+        if len(repo) <= self._rev:
+            self._rev = len(repo)-1
+        self._setupmodel()
+
     @property
     def rev(self):
         """Return current revision"""
@@ -439,7 +447,7 @@ class _StatusFilterButton(QToolButton):
 class ManifestTaskWidget(ManifestWidget):
     """Manifest widget designed for task tab"""
 
-    def __init__(self, repo, rev=None, parent=None):
+    def __init__(self, repo, rev, parent):
         super(ManifestTaskWidget, self).__init__(repo, rev, parent)
         self.editSelected.connect(self._openInEditor)
 
