@@ -55,7 +55,7 @@ class PatchBranchWidget(QWidget):
         tb.setFloatable(False)
 
         self.actionPMerge = a = QWidgetAction(self)
-        a.setIcon(geticon("merge"))
+        a.setIcon(geticon("hg-merge"))
         a.setToolTip(_('Merge all pending dependencies'))
         tb.addAction(self.actionPMerge)
         self.actionPMerge.triggered.connect(self.pmerge_clicked)
@@ -79,7 +79,7 @@ class PatchBranchWidget(QWidget):
         self.actionPNew.triggered.connect(self.pnew_clicked)
 
         self.actionEditPGraph = a = QWidgetAction(self)
-        a.setIcon(geticon("log")) #STOCK_EDIT
+        a.setIcon(geticon("edit-file")) #STOCK_EDIT
         a.setToolTip(_('Edit patch dependency graph'))
         tb.addAction(self.actionEditPGraph)
         self.actionEditPGraph.triggered.connect(self.edit_pgraph_clicked)
