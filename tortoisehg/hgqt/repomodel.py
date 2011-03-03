@@ -530,10 +530,11 @@ class HgRepoListModel(QAbstractTableModel):
             parts.append(qtlib.applyeffects(u' %s ' % branchu, effects))
 
         for mark in ctx.bookmarks():
+            style = 'log.bookmark'
             if mark == self.repo._bookmarkcurrent:
-                style = 'log.curbookmark'
-            else:
-                style = 'log.bookmark'
+                bn = self.repo._bookmarks[self.repo._bookmarkcurrent]
+                if bn in self.repo.dirstate.parents():
+                    style = 'log.curbookmark'
             marku = hglib.tounicode(mark)
             effects = qtlib.geteffect(style)
             parts.append(qtlib.applyeffects(u' %s ' % marku, effects))
