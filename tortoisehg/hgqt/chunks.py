@@ -340,6 +340,8 @@ class ChunksWidget(QWidget):
             path = self.repo.wjoin(file)
             if os.path.exists(path):
                 self.mtime = os.path.getmtime(path)
+            else:
+                self.mtime = None
             self.diffbrowse.displayFile(file, status)
             self.fileSelected.emit(True)
         else:
