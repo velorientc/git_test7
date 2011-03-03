@@ -617,14 +617,29 @@ class WctxModel(QAbstractTableModel):
             """Helper function used to sort items according to their hg status
 
             Statuses are ranked in the following order:
-                'S','M','A','R','!','?','C','I'
+                'S','M','A','R','!','?','C','I',''
             """
-            sortList = ['S','M','A','R','!','?','C','I']
+            sortList = ['S','M','A','R','!','?','C','I','']
 
             try:
                 rank = sortList.index(value)
-            except IndexError, e:
-                rank = len(shortList)
+            except (IndexError, ValueError):
+                rank = len(shortList) # Set the lowest rank by default
+
+            return rank
+
+        def getMergeStatusRank(value):
+            """Helper function used to sort according to item merge status
+
+            Merge statuses are ranked in the following order:
+                'S','U','R',''
+            """
+            sortList = ['S','U','R','']
+
+            try:
+                rank = sortList.index(value)
+            except (IndexError, ValueError):
+                rank = len(shortList) # Set the lowest rank by default
 
             return rank
 
@@ -657,6 +672,8 @@ class WctxModel(QAbstractTableModel):
                 self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
             elif col == COL_STATUS:
                 self.rows.sort(key=lambda x: getStatusRank(x[col]))
+            elif col == COL_MERGE_STATE:
+                self.rows.sort(key=lambda x: getMergeStatusRank(x[col]))
             else:
                 self.rows.sort(lambda x, y: cmp(x[col], y[col]))
 
