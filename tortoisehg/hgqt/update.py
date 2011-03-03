@@ -55,7 +55,7 @@ class UpdateDialog(QDialog):
         for name in repo.namedbranches:
             combo.addItem(name)
 
-        tags = list(self.repo.tags())
+        tags = list(self.repo.tags()) + repo._bookmarks.keys()
         tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))
