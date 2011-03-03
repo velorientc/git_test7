@@ -20,7 +20,7 @@ def liveversion():
     repo = hg.repository(u, path=thgpath)
 
     u.pushbuffer()
-    commands.identify(u, repo, id=True, tags=True)
+    commands.identify(u, repo, id=True, tags=True, rev='.')
     l = u.popbuffer().split()
     while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
         l.pop()

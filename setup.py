@@ -220,7 +220,7 @@ class build_qt(Command):
         cls._wrappeduic = True
 
 class clean_local(Command):
-    pats = ['*.py[co]', '*_ui.py', '*_rc.py', '*.orig', '*.rej']
+    pats = ['*.py[co]', '*_ui.py', '*_rc.py', '*.mo', '*.orig', '*.rej']
     excludedirs = ['.hg', 'build', 'dist']
     description = 'clean up generated files (%s)' % ', '.join(pats)
     user_options = []

@@ -4,6 +4,7 @@ include contrib/nautilus-thg.py
 include contrib/mergetools.rc
 include contrib/tortoisehg.desktop
 include COPYING.txt
-recursive-include i18n *.po
+include tortoisehg/hgqt/*.ui
+recursive-include i18n *.po *.py
 recursive-include doc *
 recursive-exclude doc/build *
