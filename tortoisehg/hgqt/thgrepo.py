@@ -212,6 +212,10 @@ class ThgRepoWrapper(QObject):
 _uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools namedbranches'''.split()
+
+# _bookmarkcurrent is a Mercurial property, we include it here to work
+# around a bug in hg-1.8.  It should be removed when we drop support for
+# Mercurial 1.8
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
                    _branchheads _bookmarkcurrent'''.split()
 
