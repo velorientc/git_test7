@@ -131,6 +131,8 @@ class ThgRepoWrapper(QObject):
     def _getrepomtime(self):
         'Return the last modification time for the repo'
         watchedfiles = [self.repo.sjoin('00changelog.i')]
+        watchedfiles.append(self.repo.join('bookmarks'))
+        watchedfiles.append(self.repo.join('bookmarks.current'))
         if hasattr(self.repo, 'mq'):
             watchedfiles.append(self.repo.mq.join('series'))
             watchedfiles.append(self.repo.mq.join('guards'))
@@ -211,7 +213,7 @@ _uiprops = '''_uifiles _uimtime _shell postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags displayname summarylen
               shortname mergetools namedbranches'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
-                   _branchheads'''.split()
+                   _branchheads _bookmarkcurrent'''.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
