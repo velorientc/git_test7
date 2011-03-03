@@ -23,7 +23,7 @@ except ImportError:
 demandimport.enable()
 
 from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
-from mercurial import dispatch, encoding, templatefilters, filemerge
+from mercurial import dispatch, encoding, templatefilters, filemerge, error
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
@@ -519,6 +519,22 @@ def username(user):
     if not author:
         author = util.shortuser(user)
     return author
+
+def user(ctx):
+    '''
+    Get the username of the change context. Does not abort and just returns
+    an empty string if ctx is a working context and no username has been set
+    in mercurial's config.
+    '''
+    try:
+        user = ctx.user()
+    except error.Abort:
+        if ctx._rev is not None:
+            raise
+        # ctx is a working context and probably no username has
+        # been configured in mercurial's config
+        user = ''
+    return user
 
 def get_revision_desc(fctx, curpath=None):
     """return the revision description as a string"""
