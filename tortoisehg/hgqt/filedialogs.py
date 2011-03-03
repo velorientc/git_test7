@@ -400,7 +400,8 @@ class FileDiffDialog(_AbstractFileDialog):
             side = 'left'
         path = self.filerevmodel.graph.nodesdict[rev].extra[0]
         fc = self.repo.changectx(rev).filectx(path)
-        self.filedata[side] = fc.data().splitlines()
+        data = hglib.tounicode(fc.data())
+        self.filedata[side] = data.splitlines()
         self.update_diff(keeppos=otherside[side])
 
     def goto(self, rev):
@@ -523,7 +524,7 @@ class FileDiffDialog(_AbstractFileDialog):
             self._diffmatch = {'left': [x[1:3] for x in blocks],
                                'right': [x[3:5] for x in blocks]}
             for side in sides:
-                self.viewers[side].setText('\n'.join(self.filedata[side]))
+                self.viewers[side].setText(u'\n'.join(self.filedata[side]))
             self.update_page_steps(keeppos)
             self.timer.start()
 
