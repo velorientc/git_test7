@@ -310,6 +310,7 @@ class FileDiffDialog(_AbstractFileDialog):
                 sci.setLexer(self.lexer)
 
             sci.setReadOnly(True)
+            sci.setUtf8(True)
             lay.addWidget(sci)
 
             # hide margin 0 (markers)
