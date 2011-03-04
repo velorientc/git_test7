@@ -181,6 +181,7 @@ class RevDetailsWidget(QWidget):
         self.actionUpdate = a = self.filelistToolbar.addAction(
             geticon('hg-update'), _('Update to this revision'))
         a.triggered.connect(lambda: self.updateToRevision.emit(self._last_rev))
+        self.filelistToolbar.addSeparator()
         self.filelistToolbar.addAction(self.filelist.actionShowAllMerge)
         self.filelistToolbar.addAction(self.filelist.actionSecondParent)
 
