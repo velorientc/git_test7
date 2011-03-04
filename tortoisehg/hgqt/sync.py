@@ -303,7 +303,9 @@ class SyncWidget(QWidget):
 
     def applyTargetOption(self, cmdline):
         if self.embedded and self.targetcheckbox.isChecked():
-            cmdline += self.targetargs[self.targetcombo.currentIndex()]
+            idx = self.targetcombo.currentIndex()
+            if idx != -1 and idx < len(self.targetargs):
+                cmdline += self.targetargs[idx]
         return cmdline
 
     def configChanged(self):
