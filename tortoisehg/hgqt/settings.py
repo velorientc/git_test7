@@ -766,7 +766,7 @@ class SettingsForm(QWidget):
         'Open internal editor in stacked widget'
         if self.isDirty():
             ret = qtlib.CustomPrompt(_('Confirm Save'),
-                    _('Save changes before edit?'), self,
+                    _('Save changes before editing?'), self,
                     (_('&Save'), _('&Discard'), _('Cancel')),
                     default=2, esc=2).run()
             if ret == 0:
