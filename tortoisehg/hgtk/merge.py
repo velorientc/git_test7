@@ -194,8 +194,8 @@ class MergeDialog(gdialog.GDialog):
     def before_close(self):
         if len(self.repo.parents()) == 2:
             ret = gdialog.Confirm(_('Confirm Exit'), [], self,
-                    _('To complete merging, you need to commit'
-                      ' merged files in working directory.\n\n'
+                    _('To complete merging, you need to commit '
+                      'merged files in working directory.\n\n'
                       'Do you want to exit?')).run()
             if ret != gtk.RESPONSE_YES:
                 return False
@@ -213,8 +213,8 @@ class MergeDialog(gdialog.GDialog):
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
             ret = gdialog.Confirm(_('Confirm Discard Changes'), [], self,
-                _('The changes from revision %s and all unmerged parents'
-                  ' will be discarded.\n\n'
+                _('The changes from revision %s and all unmerged parents '
+                  'will be discarded.\n\n'
                   'Are you sure this is what you want to do?')
                       % (self.otherframe.get_data('revid'))).run()
             if ret != gtk.RESPONSE_YES:

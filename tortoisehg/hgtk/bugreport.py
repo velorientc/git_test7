@@ -54,8 +54,8 @@ class BugReport(gdialog.GWindow):
     def get_error_text(self):
         if self.__error_text__ == None:
             text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
-            text += _('** Please report this bug to'
-                      ' http://bitbucket.org/tortoisehg/stable/issues\n')
+            text += _('** Please report this bug to '
+                      'http://bitbucket.org/tortoisehg/stable/issues\n')
             text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                     hglib.hgversion, version.version())
             text += '** Command: %s\n' % (self.opts['cmd'])

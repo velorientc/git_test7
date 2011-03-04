@@ -148,7 +148,7 @@ class ShellConfigWindow(gtk.Window):
         hbox = gtk.HBox()
         tvbox.pack_start(hbox, False, False, 2)
         hbox.pack_start(gtk.Label(
-            _('Warning: affects all Tortoises, logoff required after change')), 
+            _('Warning: affects all Tortoises, logoff required after change')),
             False, False, 2)
 
         hbox = gtk.HBox()
@@ -188,7 +188,7 @@ class ShellConfigWindow(gtk.Window):
         hbox = gtk.HBox()
         tvbox.pack_start(hbox, False, False, 2)
         hbox.pack_start(gtk.Label(
-            _('*: not used by TortoiseHg')), 
+            _('*: not used by TortoiseHg')),
             False, False, 2)
 
         ## Taskbar group
@@ -207,8 +207,8 @@ class ShellConfigWindow(gtk.Window):
         # Tooltips
         tips = gtklib.Tooltips()
 
-        tooltip = _('Do not show menu items on unversioned folders' 
-                    ' (use shift + click to override)')
+        tooltip = _('Do not show menu items on unversioned folders '
+                    '(use shift + click to override)')
         tips.set_tip(self.hide_context_menu, tooltip)
         tooltip = _('Show overlay icons in Mercurial repositories')
         tips.set_tip(self.ovenable, tooltip)

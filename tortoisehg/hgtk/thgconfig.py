@@ -43,192 +43,192 @@ INFO = (
     (_('UI Language'), 'tortoisehg.ui.language', i18n.availablelanguages(),
         _('Specify your preferred user interface language (restart needed)')),
     (_('Three-way Merge Tool'), 'ui.merge', [],
-        _('Graphical merge program for resolving merge conflicts.  If left'
-        ' unspecified, Mercurial will use the first applicable tool it finds'
-        ' on your system or use its internal merge tool that leaves conflict'
-        ' markers in place.  Chose internal:merge to force conflict markers,'
-        ' internal:prompt to always select local or other, or internal:dump'
-        ' to leave files in the working directory for manual merging')),
+        _('Graphical merge program for resolving merge conflicts.  If left '
+          'unspecified, Mercurial will use the first applicable tool it finds '
+          'on your system or use its internal merge tool that leaves conflict '
+          'markers in place.  Chose internal:merge to force conflict markers, '
+          'internal:prompt to always select local or other, or internal:dump '
+          'to leave files in the working directory for manual merging')),
     (_('Visual Diff Tool'), 'tortoisehg.vdiff', [],
-        _('Specify visual diff tool, as described in the [merge-tools]'
-          ' section of your Mercurial configuration files.  If left'
-          ' unspecified, TortoiseHg will use the selected merge tool.'
-          ' Failing that it uses the first applicable tool it finds.')),
+        _('Specify visual diff tool, as described in the [merge-tools] '
+          'section of your Mercurial configuration files.  If left '
+          'unspecified, TortoiseHg will use the selected merge tool. '
+          'Failing that it uses the first applicable tool it finds.')),
     (_('Visual Editor'), 'tortoisehg.editor', [],
         _('Specify the visual editor used to view files, etc')),
     (_('CLI Editor'), 'ui.editor', [],
-        _('The editor to use during a commit and other instances where'
-        ' Mercurial needs multiline input from the user.  Used by'
-        ' command line commands, including patch import.')),
+        _('The editor to use during a commit and other instances where '
+          'Mercurial needs multiline input from the user.  Used by '
+          'command line commands, including patch import.')),
     (_('Tab Width'), 'tortoisehg.tabwidth', [],
-        _('Specify the number of spaces that tabs expand to in various'
-        ' TortoiseHg windows.'
-        ' Default: Not expanded')),
+        _('Specify the number of spaces that tabs expand to in various '
+          'TortoiseHg windows. '
+          'Default: Not expanded')),
     (_('Max Diff Size'), 'tortoisehg.maxdiff', ['1024', '0'],
         _('The maximum size file (in KB) that TortoiseHg will '
-        'show changes for in the changelog, status, and commit windows.'
-        ' A value of zero implies no limit.  Default: 1024 (1MB)')),
+          'show changes for in the changelog, status, and commit windows. '
+          'A value of zero implies no limit. Default: 1024 (1MB)')),
     (_('Bottom Diffs'), 'gtools.diffbottom', ['False', 'True'],
-        _('Show the diff panel below the file list in status, shelve, and'
-        ' commit dialogs.'
-        ' Default: False (show diffs to right of file list)')),
+        _('Show the diff panel below the file list in status, shelve, and '
+          'commit dialogs. '
+          'Default: False (show diffs to right of file list)')),
     (_('Capture stderr'), 'tortoisehg.stderrcapt', ['True', 'False'],
-        _('Redirect stderr to a buffer which is parsed at the end of'
-        ' the process for runtime errors. Default: True')),
+        _('Redirect stderr to a buffer which is parsed at the end of '
+          'the process for runtime errors. Default: True')),
     (_('Fork hgtk'), 'tortoisehg.hgtkfork', ['True', 'False'],
-        _('When running hgtk from the command line, fork a background'
-        ' process to run graphical dialogs.  Default: True')),
+        _('When running hgtk from the command line, fork a background '
+          'process to run graphical dialogs. Default: True')),
     (_('Full Path Title'), 'tortoisehg.fullpath', ['False', 'True'],
-        _('Show a full directory path of the repository in the dialog title'
-        ' instead of just the root directory name.  Default: False')),
+        _('Show a full directory path of the repository in the dialog title '
+          'instead of just the root directory name. Default: False')),
     ) + (gtklib.hasspellcheck() and
     ((_('Spell Check Language'), 'tortoisehg.spellcheck', [],
-        _('Default language for spell check. System language is'
-        ' used if not specified. Examples: en, en_GB, en_US')),) or ())),
+        _('Default language for spell check. System language is '
+          'used if not specified. Examples: en, en_GB, en_US')),) or ())),
 
 ({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit.ico'}, (
     (_('Username'), 'ui.username', [],
         _('Name associated with commits')),
     (_('Summary Line Length'), 'tortoisehg.summarylen', ['0', '70'],
-       _('Maximum length of the commit message summary line.'
-         ' If set, TortoiseHg will issue a warning if the'
-         ' summary line is too long or not separated by a'
-         ' blank line. Default: 0 (unenforced)')),
+       _('Maximum length of the commit message summary line. '
+         'If set, TortoiseHg will issue a warning if the '
+         'summary line is too long or not separated by a '
+         'blank line. Default: 0 (unenforced)')),
     (_('Message Line Length'), 'tortoisehg.messagewrap', ['0', '80'],
-       _('Word wrap length of the commit message.  If'
-         ' set, the popup menu can be used to format'
-         ' the message and a warning will be issued'
-         ' if any lines are too long at commit.'
-         '  Default: 0 (unenforced)')),
+       _('Word wrap length of the commit message.  If '
+         'set, the popup menu can be used to format '
+         'the message and a warning will be issued '
+         'if any lines are too long at commit. '
+         'Default: 0 (unenforced)')),
     (_('Close After Commit'), 'tortoisehg.closeci', ['False', 'True'],
-        _('Close the commit tool after every successful'
-          ' commit.  Default: False')),
+        _('Close the commit tool after every successful '
+          'commit. Default: False')),
     (_('Push After Commit'), 'tortoisehg.pushafterci', ['False', 'True'],
-        _('Attempt to push to default push target after every successful'
-          ' commit.  Default: False')),
+        _('Attempt to push to default push target after every successful '
+          'commit. Default: False')),
     (_('Auto Commit List'), 'tortoisehg.autoinc', [],
-       _('Comma separated list of files that are automatically included'
-         ' in every commit.  Intended for use only as a repository setting.'
-         '  Default: None (leave blank)')),
+       _('Comma separated list of files that are automatically included '
+         'in every commit.  Intended for use only as a repository setting. '
+         'Default: None (leave blank)')),
     (_('Auto Exclude List'), 'tortoisehg.ciexclude', [],
-       _('Comma separated list of files that are automatically unchecked'
-         ' when the status, commit, and shelve dialogs are opened.'
-         '  Default: None (leave blank)')),
+       _('Comma separated list of files that are automatically unchecked '
+         'when the status, commit, and shelve dialogs are opened. '
+         'Default: None (leave blank)')),
     (_('English Messages'), 'tortoisehg.engmsg', ['False', 'True'],
-       _('Generate English commit messages even if LANGUAGE or LANG'
-         ' environment variables are set to a non-English language.'
-         ' This setting is used by the Merge, Tag and Backout dialogs.'
-         '  Default: False')),
+       _('Generate English commit messages even if LANGUAGE or LANG '
+         'environment variables are set to a non-English language. '
+         'This setting is used by the Merge, Tag and Backout dialogs. '
+         'Default: False')),
     (_('Default Tab'), 'tortoisehg.statustab', ['0', '1', '2'],
-        _('The tab on which the status and commit tools will open.'
-          ' 0 - TextDiff, 1 - Hunk Selection, 2 - Commit Preview.'
-          '  Default: 0')),
+        _('The tab on which the status and commit tools will open. '
+          '0 - TextDiff, 1 - Hunk Selection, 2 - Commit Preview. '
+          'Default: 0')),
     )),
 
 ({'name': 'log', 'label': _('Repository Explorer'),
   'icon': 'menulog.ico'}, (
     (_('Author Coloring'), 'tortoisehg.authorcolor', ['False', 'True'],
-        _('Color changesets by author name.  If not enabled,'
-        ' the changes are colored green for merge, red for'
-        ' non-trivial parents, black for normal.'
-        ' Default: False')),
+        _('Color changesets by author name.  If not enabled, '
+          'the changes are colored green for merge, red for '
+          'non-trivial parents, black for normal. '
+          'Default: False')),
     (_('Long Summary'), 'tortoisehg.longsummary', ['False', 'True'],
-        _('If true, concatenate multiple lines of changeset summary'
-        ' until they reach 80 characters.'
-        ' Default: False')),
+        _('If true, concatenate multiple lines of changeset summary '
+          'until they reach 80 characters. '
+          'Default: False')),
     (_('Log Batch Size'), 'tortoisehg.graphlimit', ['500'],
-        _('The number of revisions to read and display in the'
-        ' changelog viewer in a single batch.'
-        ' Default: 500')),
+        _('The number of revisions to read and display in the '
+          'changelog viewer in a single batch. '
+          'Default: 500')),
     (_('Dead Branches'), 'tortoisehg.deadbranch', [],
-        _('Comma separated list of branch names that should be ignored'
-        ' when building a list of branch names for a repository.'
-        ' Default: None (leave blank)')),
+        _('Comma separated list of branch names that should be ignored '
+          'when building a list of branch names for a repository. '
+          'Default: None (leave blank)')),
     (_('Branch Colors'), 'tortoisehg.branchcolors', [],
-        _('Space separated list of branch names and colors of the form'
-        ' branch:#XXXXXX. Spaces and colons in the branch name must be'
-        ' escaped using a backslash (\\). Likewise some other characters'
-        ' can be escaped in this way, e.g. \\u0040 will be decoded to the'
-        ' @ character, and \\n to a linefeed.'
-        ' Default: None (leave blank)')),
+        _('Space separated list of branch names and colors of the form '
+          'branch:#XXXXXX. Spaces and colons in the branch name must be'
+          'escaped using a backslash (\\). Likewise some other characters '
+          'can be escaped in this way, e.g. \\u0040 will be decoded to the '
+          '@ character, and \\n to a linefeed. '
+          'Default: None (leave blank)')),
     (_('Hide Tags'), 'tortoisehg.hidetags', [],
-        _('Space separated list of tags that will not be shown.'
-        ' Useful example: Specify "qbase qparent qtip" to hide the'
-        ' standard tags inserted by the Mercurial Queues Extension.' 
-        ' Default: None (leave blank)')),
+        _('Space separated list of tags that will not be shown. '
+          'Useful example: Specify "qbase qparent qtip" to hide the '
+          'standard tags inserted by the Mercurial Queues Extension. '
+          'Default: None (leave blank)')),
     (_('Use Expander'), 'tortoisehg.changeset-expander', ['False', 'True'],
         _('Show changeset details with an expander')),
     (_('Toolbar Style'), 'tortoisehg.logtbarstyle',
         ['small', 'large', 'theme'],
-        _('Adjust the display of the main toolbar in the Repository'
-        ' Explorer.  Values: small, large, or theme.  Default: theme')),
+        _('Adjust the display of the main toolbar in the Repository '
+          'Explorer.  Values: small, large, or theme. Default: theme')),
 #    (_('F/S Encodings'), 'tortoisehg.fsencodings', [],
-#        _('Comma separated list of encodings used for filenames'
-#          ' on this computer. Default: none')),
+#        _('Comma separated list of encodings used for filenames '
+#          'on this computer. Default: none')),
     )),
 
 ({'name': 'sync', 'label': _('Synchronize'), 'icon': 'menusynch.ico',
   'extra': True}, (
     (_('After Pull Operation'), 'tortoisehg.postpull',
         ['none', 'update', 'fetch', 'rebase'],
-        _('Operation which is performed directly after a successful pull.'
-        ' update equates to pull --update, fetch equates to the fetch'
-        ' extension, rebase equates to pull --rebase.  Default: none')),
+        _('Operation which is performed directly after a successful pull. '
+          'update equates to pull --update, fetch equates to the fetch '
+          'extension, rebase equates to pull --rebase. Default: none')),
     )),
 
 ({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy.ico'}, (
     (_('Name'), 'web.name', ['unknown'],
-        _('Repository name to use in the web interface.'
-        ' Default is the working directory.')),
+        _('Repository name to use in the web interface. '
+          'Default is the working directory.')),
     (_('Description'), 'web.description', ['unknown'],
-        _("Textual description of the repository's purpose or"
-        ' contents.')),
+        _("Textual description of the repository's purpose or "
+          'contents.')),
     (_('Contact'), 'web.contact', ['unknown'],
-        _('Name or email address of the person in charge of the'
-        ' repository.')),
+        _('Name or email address of the person in charge of the '
+          'repository.')),
     (_('Style'), 'web.style',
         ['paper', 'monoblue', 'coal', 'spartan', 'gitweb', 'old'],
         _('Which template map style to use')),
     (_('Archive Formats'), 'web.allow_archive', ['bz2', 'gz', 'zip'],
-        _('Comma separated list of archive formats allowed for'
-        ' downloading')),
+        _('Comma separated list of archive formats allowed for '
+          'downloading')),
     (_('Port'), 'web.port', ['8000'], _('Port to listen on')),
     (_('Push Requires SSL'), 'web.push_ssl', ['True', 'False'],
-        _('Whether to require that inbound pushes be transported'
-        ' over SSL to prevent password sniffing.')),
+        _('Whether to require that inbound pushes be transported '
+          'over SSL to prevent password sniffing.')),
     (_('Stripes'), 'web.stripes', ['1', '0'],
-        _('How many lines a "zebra stripe" should span in multiline output.'
-        ' Default is 1; set to 0 to disable.')),
+        _('How many lines a "zebra stripe" should span in multiline output. '
+          'Default is 1; set to 0 to disable.')),
     (_('Max Files'), 'web.maxfiles', ['10'],
         _('Maximum number of files to list per changeset.')),
     (_('Max Changes'), 'web.maxchanges', ['10'],
         _('Maximum number of changes to list on the changelog.')),
     (_('Allow Push'), 'web.allow_push', ['*'],
-        _('Whether to allow pushing to the repository. If empty or not'
-        ' set, push is not allowed. If the special value "*", any remote'
-        ' user can push, including unauthenticated users. Otherwise, the'
-        ' remote user must have been authenticated, and the authenticated'
-        ' user name must be present in this list (separated by whitespace'
-        ' or ","). The contents of the allow_push list are examined after'
-        ' the deny_push list.')),
+        _('Whether to allow pushing to the repository. If empty or not '
+          'set, push is not allowed. If the special value "*", any remote '
+          'user can push, including unauthenticated users. Otherwise, the '
+          'remote user must have been authenticated, and the authenticated '
+          'user name must be present in this list (separated by whitespace '
+          'or ","). The contents of the allow_push list are examined after '
+          'the deny_push list.')),
     (_('Deny Push'), 'web.deny_push', ['*'],
-        _('Whether to deny pushing to the repository. If empty or not set,'
-        ' push is not denied. If the special value "*", all remote users'
-        ' are denied push. Otherwise, unauthenticated users are all'
-        ' denied, and any authenticated user name present in this list'
-        ' (separated by whitespace or ",") is also denied. The contents'
-        ' of the deny_push list are examined before the allow_push list.')),
+        _('Whether to deny pushing to the repository. If empty or not set, '
+          'push is not denied. If the special value "*", all remote users '
+          'are denied push. Otherwise, unauthenticated users are all '
+          'denied, and any authenticated user name present in this list '
+          '(separated by whitespace or ",") is also denied. The contents '
+          'of the deny_push list are examined before the allow_push list.')),
     (_('Encoding'), 'web.encoding', ['UTF-8'],
         _('Character encoding name')),
     )),
 
 ({'name': 'proxy', 'label': _('Proxy'), 'icon': 'general.ico'}, (
     (_('Host'), 'http_proxy.host', [],
-        _('Host name and (optional) port of proxy server, for'
-        ' example "myproxy:8000"')),
+        _('Host name and (optional) port of proxy server, for '
+          'example "myproxy:8000"')),
     (_('Bypass List'), 'http_proxy.no', [],
-        _('Optional. Comma-separated list of host names that'
-        ' should bypass the proxy')),
+        _('Optional. Comma-separated list of host names that '
+          'should bypass the proxy')),
     (_('User'), 'http_proxy.user', [],
         _('Optional. User name to authenticate with at the proxy server')),
     (_('Password'), 'http_proxy.passwd', [],
@@ -237,82 +237,82 @@ INFO = (
 
 ({'name': 'email', 'label': _('Email'), 'icon': gtk.STOCK_GOTO_LAST}, (
     (_('From'), 'email.from', [],
-        _('Email address to use in the "From" header and for'
-        ' the SMTP envelope')),
+        _('Email address to use in the "From" header and for '
+          'the SMTP envelope')),
     (_('To'), 'email.to', [],
         _('Comma-separated list of recipient email addresses')),
     (_('Cc'), 'email.cc', [],
         _('Comma-separated list of carbon copy recipient email addresses')),
     (_('Bcc'), 'email.bcc', [],
-        _('Comma-separated list of blind carbon copy recipient'
-        ' email addresses')),
+        _('Comma-separated list of blind carbon copy recipient '
+          'email addresses')),
     (_('method'), 'email.method', ['smtp'],
-        _('Optional. Method to use to send email messages. If value is'
-        ' "smtp" (default), use SMTP (configured below).  Otherwise, use as'
-        ' name of program to run that acts like sendmail (takes "-f" option'
-        ' for sender, list of recipients on command line, message on stdin).'
-        ' Normally, setting this to "sendmail" or "/usr/sbin/sendmail"'
-        ' is enough to use sendmail to send messages.')),
+        _('Optional. Method to use to send email messages. If value is '
+          '"smtp" (default), use SMTP (configured below).  Otherwise, use as '
+          'name of program to run that acts like sendmail (takes "-f" option '
+          'for sender, list of recipients on command line, message on stdin). '
+          'Normally, setting this to "sendmail" or "/usr/sbin/sendmail" '
+          'is enough to use sendmail to send messages.')),
     (_('SMTP Host'), 'smtp.host', [], _('Host name of mail server')),
     (_('SMTP Port'), 'smtp.port', ['25'],
-        _('Port to connect to on mail server.'
-        ' Default: 25')),
+        _('Port to connect to on mail server. '
+          'Default: 25')),
     (_('SMTP TLS'), 'smtp.tls', ['False', 'True'],
-        _('Connect to mail server using TLS.'
-        ' Default: False')),
+        _('Connect to mail server using TLS. '
+          'Default: False')),
     (_('SMTP Username'), 'smtp.username', [],
         _('Username to authenticate to mail server with')),
     (_('SMTP Password'), 'smtp.password', [],
         _('Password to authenticate to mail server with')),
     (_('Local Hostname'), 'smtp.local_hostname', [],
-        _('Hostname the sender can use to identify itself to the'
-        ' mail server.')),
+        _('Hostname the sender can use to identify itself to the '
+          'mail server.')),
     )),
 
 ({'name': 'diff', 'label': _('Diff'), 'icon': gtk.STOCK_JUSTIFY_FILL}, (
     (_('Patch EOL'), 'patch.eol', ['auto', 'strict', 'crlf', 'lf'],
-        _('Normalize file line endings during and after patch to lf or'
-        ' crlf.  Strict does no normalization.  Auto does per-file'
-        ' detection, and is the recommended setting.'
-        ' Default: strict')),
+        _('Normalize file line endings during and after patch to lf or '
+          'crlf.  Strict does no normalization.  Auto does per-file '
+          'detection, and is the recommended setting. '
+          'Default: strict')),
     (_('Git Format'), 'diff.git', ['False', 'True'],
-        _('Use git extended diff header format.'
-        ' Default: False')),
+        _('Use git extended diff header format. '
+          'Default: False')),
     (_('No Dates'), 'diff.nodates', ['False', 'True'],
-        _('Do not include modification dates in diff headers.'
-        ' Default: False')),
+        _('Do not include modification dates in diff headers. '
+          'Default: False')),
     (_('Show Function'), 'diff.showfunc', ['False', 'True'],
-        _('Show which function each change is in.'
-        ' Default: False')),
+        _('Show which function each change is in. '
+          'Default: False')),
     (_('Ignore White Space'), 'diff.ignorews', ['False', 'True'],
-        _('Ignore white space when comparing lines.'
-        ' Default: False')),
+        _('Ignore white space when comparing lines. '
+          'Default: False')),
     (_('Ignore WS Amount'), 'diff.ignorewsamount', ['False', 'True'],
-        _('Ignore changes in the amount of white space.'
-        ' Default: False')),
+        _('Ignore changes in the amount of white space. '
+          'Default: False')),
     (_('Ignore Blank Lines'), 'diff.ignoreblanklines', ['False', 'True'],
-        _('Ignore changes whose lines are all blank.'
-        ' Default: False')),
+        _('Ignore changes whose lines are all blank. '
+          'Default: False')),
     (_('Coloring Style'), 'tortoisehg.diffcolorstyle',
         ['none', 'foreground', 'background'],
-        _('Adjust the coloring style of diff lines in the changeset'
-        ' viewer. Default: foreground')),
+        _('Adjust the coloring style of diff lines in the changeset '
+          'viewer. Default: foreground')),
     )),
 
 ({'name': 'font', 'label': _('Font'), 'icon': gtk.STOCK_SELECT_FONT,
   'extra': True, 'width': 16}, (
     (_('Commit Message'), 'gtools.fontcomment', [],
-        _('Font used in changeset viewer and commit log text.'
-        ' Default: monospace 10')),
+        _('Font used in changeset viewer and commit log text. '
+          'Default: monospace 10')),
     (_('Diff Text'), 'gtools.fontdiff', [],
-        _('Font used for diffs in status and commit tools.'
-        ' Default: monospace 10')),
+        _('Font used for diffs in status and commit tools. '
+          'Default: monospace 10')),
     (_('File List'), 'gtools.fontlist', [],
-        _('Font used in file lists in status and commit tools.'
-        ' Default: sans 9')),
+        _('Font used in file lists in status and commit tools. '
+          'Default: sans 9')),
     (_('Command Output'), 'gtools.fontlog', [],
-        _('Font used in command output window.'
-        ' Default: monospace 10')),
+        _('Font used in command output window. '
+          'Default: monospace 10')),
     )),
 
 ({'name': 'extensions', 'label': _('Extensions'), 'icon': gtk.STOCK_EXECUTE,

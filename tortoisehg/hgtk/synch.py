@@ -56,29 +56,29 @@ class SynchDialog(gtk.Window):
                 self.toolbutton(gtk.STOCK_GO_DOWN,
                                  _('Incoming'),
                                  self.incoming_clicked,
-                                 tip=_('Display changes that can be pulled'
-                                 ' from selected repository')),
+                                 tip=_('Display changes that can be pulled '
+                                       'from selected repository')),
                 self.toolbutton(gtk.STOCK_GOTO_BOTTOM,
                                  _('   Pull   '),
                                  self.pull_clicked,
-                                 tip=_('Pull changes from selected'
-                                 ' repository')),
+                                 tip=_('Pull changes from selected '
+                                       'repository')),
                 gtk.SeparatorToolItem(),
                 self.toolbutton(gtk.STOCK_GO_UP,
                                  _('Outgoing'),
                                  self.outgoing_clicked,
                                  tip=_('Display local changes that will be '
-                                 ' pushed to selected repository')),
+                                       'pushed to selected repository')),
                 self.toolbutton(gtk.STOCK_GOTO_TOP,
                                  _('Push'),
                                  self.push_clicked,
-                                 tip=_('Push local changes to selected'
-                                 ' repository')),
+                                 tip=_('Push local changes to selected '
+                                       'repository')),
                 self.toolbutton(gtk.STOCK_GOTO_LAST,
                                  _('Email'),
                                  self.email_clicked,
-                                 tip=_('Email local outgoing changes to'
-                                 ' one or more recipients')),
+                                 tip=_('Email local outgoing changes to '
+                                       'one or more recipients')),
                 self.toolbutton(gtk.STOCK_UNDO,
                                  _('Shelve'),
                                  self.shelve_clicked,
@@ -172,8 +172,8 @@ class SynchDialog(gtk.Window):
         ## checkbox options
         chkopthbox = gtk.HBox()
         self.force = gtk.CheckButton(_('Force pull or push'))
-        self.tips.set_tip(self.force, _('Run even when remote repository'
-                ' is unrelated.'))
+        self.tips.set_tip(self.force,
+                          _('Run even when remote repository is unrelated.'))
         self.newbranch = gtk.CheckButton(_('Push new branch'))
         self.tips.set_tip(self.newbranch, _('Allow pushing a new branch'))
         self.use_proxy = gtk.CheckButton(_('Use proxy server'))
@@ -192,8 +192,9 @@ class SynchDialog(gtk.Window):
         revhbox.pack_start(self.reventry, True, True, 2)
         reveventbox = gtk.EventBox()
         reveventbox.add(revhbox)
-        self.tips.set_tip(reveventbox, _('A specific revision up to which you'
-                ' would like to push or pull.'))
+        self.tips.set_tip(reveventbox,
+                          _('A specific revision up to which you '
+                            'would like to push or pull.'))
 
         ## remote command option
         cmdhbox = gtk.HBox()
@@ -202,8 +203,8 @@ class SynchDialog(gtk.Window):
         cmdhbox.pack_start(self.cmdentry, True, True, 2)
         cmdeventbox = gtk.EventBox()
         cmdeventbox.add(cmdhbox)
-        self.tips.set_tip(cmdeventbox, _('Name of hg executable on remote'
-                ' machine.'))
+        self.tips.set_tip(cmdeventbox,
+                          _('Name of hg executable on remote machine.'))
 
         revvbox = gtk.VBox()
         revvbox.pack_start(chkopthbox, False, False, 8)

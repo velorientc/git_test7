@@ -75,8 +75,8 @@ class BackoutDialog(gdialog.GDialog):
         ## tooltips
         self.tips = gtklib.Tooltips()
         self.tips.set_tip(frame,
-                _('Commit message text for new changeset that reverses the'
-                '  effect of the change being backed out.'))
+                _('Commit message text for new changeset that reverses the '
+                  'effect of the change being backed out.'))
 
         ## use English backout message option
         self.eng_msg = gtk.CheckButton(_('Use English backout message'))
