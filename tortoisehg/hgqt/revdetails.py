@@ -23,6 +23,7 @@ class RevDetailsWidget(QWidget):
     linkActivated = pyqtSignal(unicode)
     grepRequested = pyqtSignal(unicode, dict)
     revisionSelected = pyqtSignal(int)
+    updateToRevision = pyqtSignal(int)
 
     def __init__(self, repo):
         QWidget.__init__(self)
@@ -176,6 +177,10 @@ class RevDetailsWidget(QWidget):
         self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return,
                                                  Qt.ALT+Qt.Key_Enter])
         self.actionActivateFileAlt.triggered.connect(fileActivated)
+
+        self.actionUpdate = a = self.filelistToolbar.addAction(
+            geticon('hg-update'), _('Update to this revision'))
+        a.triggered.connect(lambda: self.updateToRevision.emit(self._last_rev))
         self.filelistToolbar.addAction(self.filelist.actionShowAllMerge)
         self.filelistToolbar.addAction(self.filelist.actionSecondParent)
 

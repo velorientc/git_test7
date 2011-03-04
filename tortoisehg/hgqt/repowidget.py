@@ -153,6 +153,7 @@ class RepoWidget(QWidget):
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)
         w.showMessage.connect(self.showMessage)
+        w.updateToRevision.connect(lambda rev: self.updateToRevision())
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
