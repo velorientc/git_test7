@@ -261,6 +261,7 @@ class CommitWidget(QWidget):
         self._apis = QsciAPIs(self.msgte.lexer())
         tokens = set()
         for e in self.stwidget.getChecked():
+            e = hglib.tounicode(e)
             tokens.add(e)
             tokens.add(os.path.basename(e))
         tokens.add(wfile)
