@@ -229,8 +229,8 @@ class RebaseDialog(QDialog):
 
     def reject(self):
         if os.path.exists(self.repo.join('rebasestate')):
-            main = _('Rebase is incomplete, exiting is not recommended')
-            text = _('Abort is recommended before exit.')
+            main = _('Exiting with an unfinished rebase is not recommended.')
+            text = _('Consider aborting the rebase first.')
             labels = ((QMessageBox.Yes, _('&Exit')),
                       (QMessageBox.No, _('Cancel')))
             if not qtlib.QuestionMsgBox(_('Confirm Exit'), main, text,
