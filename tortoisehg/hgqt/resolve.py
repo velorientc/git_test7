@@ -311,9 +311,9 @@ class ResolveDialog(QDialog):
         s = QSettings()
         s.setValue('resolve/geom', self.saveGeometry())
         if len(self.utree.model()):
-            main = _('Quit without finishing resolve?')
+            main = _('Exit without finishing resolve?')
             text = _('Unresolved conflicts remain. Are you sure?')
-            labels = ((QMessageBox.Yes, _('&Quit')),
+            labels = ((QMessageBox.Yes, _('E&xit')),
                       (QMessageBox.No, _('Cancel')))
             if not qtlib.QuestionMsgBox(_('Confirm Exit'), main, text,
                                 labels=labels, parent=self):
