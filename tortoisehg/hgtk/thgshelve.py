@@ -158,7 +158,7 @@ class GShelve(GStatus):
             dialog = gtklib.MessageDialog(flags=gtk.DIALOG_MODAL)
             dialog.set_title(_('Shelve'))
             dialog.set_markup(_('<b>Shelve file exists!</b>'))
-            dialog.add_buttons(_('Overwrite'), 1,
+            dialog.add_buttons(_('Replace'), 1,
                                _('Append'), 2,
                                _('Cancel'), -1)
             dialog.set_transient_for(self)
