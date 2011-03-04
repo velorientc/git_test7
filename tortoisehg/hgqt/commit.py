@@ -518,17 +518,19 @@ class CommitWidget(QWidget):
                     resp = qtlib.CustomPrompt(_('Confirm Branch Change'),
                         _('Named branch "%s" already exists, '
                           'last used in revision %d\n'
-                          'Yes\t- Make commit restarting this named branch\n'
-                          'No\t- Make commit without changing branch\n'
-                          'Cancel\t- Cancel this commit') % (self.branchop, rev),
-                          self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
+                          ) % (self.branchop, rev),
+                        self,
+                        (_('Restart &Branch'),
+                         _('&Commit to current branch'),
+                         _('Cancel')), 2, 2).run()
             else:
                 resp = qtlib.CustomPrompt(_('Confirm New Branch'),
                     _('Create new named branch "%s" with this commit?\n'
-                      'Yes\t- Start new branch with this commit\n'
-                      'No\t- Make commit without branch change\n'
-                      'Cancel\t- Cancel this commit') % self.branchop,
-                    self, (_('&Yes'), _('&No'), _('Cancel')), 2, 2).run()
+                      ) % self.branchop,
+                    self,
+                    (_('Create &Branch'),
+                     _('&Commit to current branch'),
+                     _('Cancel')), 2, 2).run()
             if resp == 0:
                 newbranch = True
                 commandlines.append(['branch', '--repository', repo.root,
