@@ -58,8 +58,8 @@ class MergeDialog(QWizard):
         page = self.currentPage()
         if hasattr(page, 'need_cleanup') and page.need_cleanup():
             main = _('Do you want to exit?')
-            text = _('To complete merging, you need to commit merged files '
-                     'in working directory.')
+            text = _('To finish merging, you need to commit '
+                     'the working directory.')
             labels = ((QMessageBox.Yes, _('&Exit')),
                       (QMessageBox.No, _('Cancel')))
             if not qtlib.QuestionMsgBox(_('Confirm Exit'), main, text,
