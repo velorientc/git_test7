@@ -295,8 +295,8 @@ def remove(parent, ui, repo, files):
 
 def delete(parent, ui, repo, files):
     res = qtlib.CustomPrompt(
-            _('Confirm Delete Unrevisioned'),
-            _('Delete the following unrevisioned files?'),
+            _('Confirm Delete Unversioned'),
+            _('Delete the following unversioned files?'),
             parent, (_('&Delete'), _('Cancel')), 1, 1, files).run()
     if res == 1:
         return
