@@ -75,6 +75,7 @@ class SyncWidget(QWidget):
         self.opts = {}
         self.cmenu = None
         self.embedded = bool(parent)
+        self.targetargs = []
 
         self.repo.configChanged.connect(self.configChanged)
 
