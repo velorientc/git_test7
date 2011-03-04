@@ -391,7 +391,8 @@ class MergePage(BasePage):
 
     def cancel(self):
         main = _('Cancel merge and discard changes?')
-        text = _('Discard unfinished local changes and restart merge?')
+        # Does this restart "resolved" files too?
+        text = _('Discard local changes and restart merge?')
         labels = ((QMessageBox.Yes, _('&Discard')),
                   (QMessageBox.No, _('Cancel')))
         if qtlib.QuestionMsgBox(_('Confirm Clean Up'), main, text,
