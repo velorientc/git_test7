@@ -31,5 +31,5 @@ def checkhgversion(v):
     if vers == nextver:
         return
     return (('This version of TortoiseHg requires Mercurial '
-                       'version %s.n to %s.n, but finds %s') %
+                       'version %s.n to %s.n, but found %s') %
                        ('.'.join(reqver), '.'.join(nextver), v))
