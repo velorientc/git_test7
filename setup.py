@@ -143,6 +143,9 @@ class build_qt(Command):
             py_file = splitext(qrc_file)[0] + "_rc.py"
         if not(self.force or newer(qrc_file, py_file)):
             return
+        import PyQt4
+        path = os.getenv('PATH')
+        os.putenv('PATH', path + ';' + os.path.dirname(PyQt4.__file__) + '\\bin')
         if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
             self.warn("Unable to generate python module %s for resource file %s"
                       % (py_file, qrc_file))
@@ -150,6 +153,7 @@ class build_qt(Command):
                 raise SystemExit(1)
         else:
             log.info('compiled %s into %s' % (qrc_file, py_file))
+        os.putenv('PATH', path)
 
     def _generate_qrc(self, qrc_file, srcfiles, prefix):
         basedir = os.path.dirname(qrc_file)
