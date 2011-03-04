@@ -535,7 +535,7 @@ class PatchBranchModel(QAbstractTableModel):
     Model used to list patch branches
     TODO: Should be extended to list all branches
     """
-    _columns = ('Graph', 'Name', 'Status', 'Title', 'Message',)
+    _columns = ['Graph', 'Name', 'Status', 'Title', 'Message',]
 
     def __init__(self, model, wd_branch="", parent=None):
         QAbstractTableModel.__init__(self, parent)
