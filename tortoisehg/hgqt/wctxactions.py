@@ -240,8 +240,8 @@ def revert(parent, ui, repo, files):
     else:
         res = qtlib.CustomPrompt(
                  _('Confirm Revert'),
-                 _('Revert changes to files?'), parent,
-                 (_('&Yes (backup changes)'), _('Yes (&discard changes)'),
+                 _('Revert local file changes?'), parent,
+                 (_('&Revert with backup'), _('&Discard changes'),
                   _('Cancel')), 2, 2, files).run()
         if res == 2:
             return False
