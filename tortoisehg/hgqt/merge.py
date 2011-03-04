@@ -459,7 +459,7 @@ class MergePage(BasePage):
                 labels = [(QMessageBox.Yes, _('&Discard')),
                           (QMessageBox.No, _('Cancel'))]
                 if not qtlib.QuestionMsgBox(_('Confirm Discard'), _('Discard'
-                         ' outstanding changes in working directory?'),
+                         ' outstanding changes to working directory?'),
                          labels=labels, parent=self):
                     return
             def finished(ret):
