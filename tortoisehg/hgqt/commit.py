@@ -556,8 +556,8 @@ class CommitWidget(QWidget):
         if checkedUnknowns:
             res = qtlib.CustomPrompt(
                     _('Confirm Add'),
-                    _('Add checked untracked files?'), self,
-                    (_('&OK'), _('Cancel')), 0, 1,
+                    _('Add selected untracked files?'), self,
+                    (_('&Add'), _('Cancel')), 0, 1,
                     checkedUnknowns).run()
             if res == 0:
                 cmd = ['add', '--repository', repo.root] + \
@@ -569,8 +569,8 @@ class CommitWidget(QWidget):
         if checkedMissing:
             res = qtlib.CustomPrompt(
                     _('Confirm Remove'),
-                    _('Remove checked deleted files?'), self,
-                    (_('&OK'), _('Cancel')), 0, 1,
+                    _('Remove selected deleted files?'), self,
+                    (_('&Remove'), _('Cancel')), 0, 1,
                     checkedMissing).run()
             if res == 0:
                 cmd = ['remove', '--repository', repo.root] + \
