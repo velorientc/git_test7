@@ -587,7 +587,13 @@ class SettingsDialog(QDialog):
         self.restoreGeometry(s.value('settings/geom').toByteArray())
 
         def username():
-            return util.username() or os.environ.get('USERNAME') or _('User')
+            name = util.username()
+            if name:
+                return hglib.tounicode(name)
+            name = os.environ.get('USERNAME')
+            if name:
+                return hglib.tounicode(name)
+            return _('User')
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
