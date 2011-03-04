@@ -30,6 +30,8 @@ class EmailDialog(QDialog):
                        (Passed as `hg email --bundle --rev {rev}`)
         """
         super(EmailDialog, self).__init__(parent)
+        self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
+                            & ~Qt.WindowContextHelpButtonHint)
         self._repo = repo
         self._outgoing = outgoing
         self._outgoingrevs = outgoingrevs or []
