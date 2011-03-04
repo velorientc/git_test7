@@ -230,8 +230,8 @@ class ChunksWidget(QWidget):
                 patchchunks = ctx._files[wfile]
                 if isAorR(chunks[0].header) or isAorR(patchchunks[0].header):
                     qtlib.InfoMsgBox(_('Unable to merge chunks'),
-                                    _('Add or remove patches must be merged'
-                                     ' in the working directory'))
+                                    _('Add or remove patches must be merged '
+                                      'in the working directory'))
                     return False
                 # merge new chunks into existing chunks, sorting on start line
                 newchunks = [chunks[0]]

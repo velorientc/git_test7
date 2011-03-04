@@ -32,8 +32,8 @@ _common = (
     ('grep(regex)',
      _('Like "keyword(string)" but accepts a regex.')),
     ('outgoing([path])',
-     _('Changesets not found in the specified destination repository,'
-       ' or the default push location.')),
+     _('Changesets not found in the specified destination repository, '
+       'or the default push location.')),
     ('bookmark([name])',
        _('The named bookmark or all bookmarks.')),
     ('tag([name])',

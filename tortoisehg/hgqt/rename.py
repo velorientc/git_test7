@@ -42,8 +42,8 @@ class RenameDialog(QDialog):
             self.repo = thgrepo.repository(ui, path=self.root)
         except (error.RepoError):
             qtlib.ErrorMsgBox(_('Error'),
-                    _('Could not find or initialize the repository'
-                      ' from folder<p>%s</p>' % cwd))
+                    _('Could not find or initialize the repository '
+                      'from folder<p>%s</p>' % cwd))
             return ('', '')
         try:
             fname = util.canonpath(self.root, cwd, pats[0])

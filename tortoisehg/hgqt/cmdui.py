@@ -763,9 +763,10 @@ class Dialog(QDialog):
 
     def reject(self):
         if self.core.running():
-            ret = QMessageBox.question(self, _('Confirm Exit'), _('Mercurial'
-                        ' command is still running.\nAre you sure you want'
-                        ' to terminate?'), QMessageBox.Yes | QMessageBox.No,
+            ret = QMessageBox.question(self, _('Confirm Exit'),
+                        _('Mercurial command is still running.\n'
+                          'Are you sure you want to terminate?'),
+                        QMessageBox.Yes | QMessageBox.No,
                         QMessageBox.No)
             if ret == QMessageBox.Yes:
                 self.core.cancel()

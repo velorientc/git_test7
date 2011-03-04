@@ -385,8 +385,8 @@ class FileSelectionDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        lbl = QLabel(_('Temporary files are removed when this dialog'
-            ' is closed'))
+        lbl = QLabel(_('Temporary files are removed when this dialog '
+                       'is closed'))
         layout.addWidget(lbl)
 
         list = QListWidget()

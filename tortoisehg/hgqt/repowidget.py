@@ -646,7 +646,7 @@ class RepoWidget(QWidget):
             if self.bundle:
                 self.clearBundle()
                 self.showMessage(_('Repository stripped, incoming preview '
-                                   ' cleared'))
+                                   'cleared'))
             elif self.revset:
                 self.revset = []
                 self.filterbar.revsetle.setText('')

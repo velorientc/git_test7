@@ -91,8 +91,8 @@ class UpdateDialog(QDialog):
         grid.addWidget(expander, row, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, row, 1)
 
-        self.discard_chk = QCheckBox(_('Discard local changes, no backup'
-                                       ' (-C/--clean)'))
+        self.discard_chk = QCheckBox(_('Discard local changes, no backup '
+                                       '(-C/--clean)'))
         self.merge_chk = QCheckBox(_('Always merge (when possible)'))
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))

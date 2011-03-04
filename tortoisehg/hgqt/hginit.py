@@ -145,8 +145,8 @@ class InitDialog(QDialog):
                     break  # already root path
             if l > 1:
                 res = qtlib.QuestionMsgBox(_('Init'),
-                        _('Are you sure about adding the new repository'
-                          ' %d extra levels deep?') % l,
+                        _('Are you sure about adding the new repository '
+                          '%d extra levels deep?') % l,
                         _('Path exists up to:\n%s\nand you asked for:\n%s')
                             % (p, udest),
                         defaultbutton=QMessageBox.No)

@@ -283,9 +283,9 @@ class MergePage(BasePage):
         self.groups.add(wd_merged, 'merged')
         box.addWidget(wd_merged)
 
-        text = _('Before merging, you must <a href="commit"><b>commit</b></a>,'
-                 ' <a href="shelve"><b>shelve</b></a> to patch,'
-                 ' or <a href="discard"><b>discard</b></a> changes.')
+        text = _('Before merging, you must <a href="commit"><b>commit</b></a>, '
+                 '<a href="shelve"><b>shelve</b></a> to patch, '
+                 'or <a href="discard"><b>discard</b></a> changes.')
         wd_text = QLabel(text)
         wd_text.setContentsMargins(*MARGINS)
         wd_text.linkActivated.connect(self.link_activated)
@@ -362,8 +362,8 @@ class MergePage(BasePage):
             labels = [(QMessageBox.Yes, _('&Discard')),
                       (QMessageBox.No, _('Cancel'))]
             if not qtlib.QuestionMsgBox(_('Confirm Discard Changes'),
-                _('The changes from revision %s and all unmerged parents'
-                  ' will be discarded.\n\n'
+                _('The changes from revision %s and all unmerged parents '
+                  'will be discarded.\n\n'
                   'Are you sure this is what you want to do?')
                       % (self.other_info.get_data('revid')),
                          labels=labels, parent=self):
@@ -459,8 +459,8 @@ class MergePage(BasePage):
             if cmd != 'discard:noconfirm':
                 labels = [(QMessageBox.Yes, _('&Discard')),
                           (QMessageBox.No, _('Cancel'))]
-                if not qtlib.QuestionMsgBox(_('Confirm Discard'), _('Discard'
-                         ' outstanding changes to working directory?'),
+                if not qtlib.QuestionMsgBox(_('Confirm Discard'),
+                         _('Discard outstanding changes to working directory?'),
                          labels=labels, parent=self):
                     return
             def finished(ret):

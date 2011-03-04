@@ -72,8 +72,8 @@ class RebaseDialog(QDialog):
         self.layout().addWidget(self.autoresolvechk)
 
         if 'hgsubversion' in repo.extensions():
-            self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head'
-                                      ' (override source, destination)'))
+            self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head '
+                                      '(override source, destination)'))
             self.layout().addWidget(self.svnchk)
         else:
             self.svnchk = None
@@ -212,8 +212,8 @@ class RebaseDialog(QDialog):
         elif cmd == 'discard':
             labels = [(QMessageBox.Yes, _('&Discard')),
                       (QMessageBox.No, _('Cancel'))]
-            if not qtlib.QuestionMsgBox(_('Confirm Discard'), _('Discard'
-                     ' outstanding changes to working directory?'),
+            if not qtlib.QuestionMsgBox(_('Confirm Discard'),
+                     _('Discard outstanding changes to working directory?'),
                      labels=labels, parent=self):
                 return
             def finished(ret):

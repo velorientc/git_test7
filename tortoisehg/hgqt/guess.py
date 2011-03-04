@@ -82,8 +82,8 @@ class DetectRenameDialog(QDialog):
         buthbox = QHBoxLayout()
         utvbox.addLayout(buthbox)
         copycheck = QCheckBox(_('Only consider deleted files'))
-        copycheck.setToolTip(_('Uncheck to consider all revisioned files'
-                               ' for copy sources'))
+        copycheck.setToolTip(_('Uncheck to consider all revisioned files '
+                               'for copy sources'))
         copycheck.setChecked(True)
         findrenames = QPushButton(_('Find Rename'))
         findrenames.setToolTip(_('Find copy and/or rename sources'))
