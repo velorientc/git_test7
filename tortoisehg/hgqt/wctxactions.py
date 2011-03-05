@@ -146,7 +146,7 @@ def copyPatch(parent, ui, repo, files):
             traceback.print_exc()
         return
     output = ui.popbuffer()
-    QApplication.clipboard().setText(output)
+    QApplication.clipboard().setText(hglib.tounicode(output))
 
 def vdiff(parent, ui, repo, files):
     dlg = visdiff.visualdiff(ui, repo, files, {})
