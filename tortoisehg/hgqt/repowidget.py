@@ -286,7 +286,7 @@ class RepoWidget(QWidget):
     def setBundle(self, bfile):
         if self.bundle:
             self.clearBundle()
-        self.bundle = unicode(bfile)
+        self.bundle = hglib.fromunicode(bfile)
         oldlen = len(self.repo)
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root,
                                        bundle=self.bundle)
