@@ -635,6 +635,8 @@ class DetailsDialog(QDialog):
         usercombo = QComboBox()
         usercombo.setEditable(True)
         usercombo.setEnabled(False)
+        SP = QSizePolicy
+        usercombo.setSizePolicy(SP(SP.Expanding, SP.Minimum))
         self.usercb.toggled.connect(usercombo.setEnabled)
         self.usercb.toggled.connect(lambda s: s and usercombo.setFocus())
 
