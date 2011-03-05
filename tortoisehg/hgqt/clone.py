@@ -29,12 +29,15 @@ class CloneDialog(QDialog):
         self.ui = ui.ui()
         self.ret = None
 
-        dest = src = cwd = hglib.tounicode(os.getcwd())
+        dest = src = cwd = os.getcwd()
         if len(args) > 1:
             src = args[0]
             dest = args[1]
         elif len(args):
             src = args[0]
+        udest = hglib.tounicode(dest)
+        usrc = hglib.tounicode(src)
+        ucwd = hglib.tounicode(cwd)
 
         # base layout box
         box = QVBoxLayout()
@@ -80,12 +83,12 @@ class CloneDialog(QDialog):
         self.shist = s.value('clone/source').toStringList()
         for path in self.shist:
             if path: self.src_combo.addItem(path)
-        self.src_combo.setEditText(src)
+        self.src_combo.setEditText(usrc)
 
         self.dhist = s.value('clone/dest').toStringList()
         for path in self.dhist:
             if path: self.dest_combo.addItem(path)
-        self.dest_combo.setEditText(dest)
+        self.dest_combo.setEditText(udest)
 
         ### options
         expander = qtlib.ExpanderLabel(_('Options'), False)
@@ -162,7 +165,7 @@ class CloneDialog(QDialog):
         # dialog setting
         self.setLayout(box)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
-        self.setWindowTitle(_('Clone - %s') % cwd)
+        self.setWindowTitle(_('Clone - %s') % ucwd)
         self.setWindowIcon(qtlib.geticon('hg-clone'))
 
         # prepare to show
