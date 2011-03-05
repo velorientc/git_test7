@@ -592,14 +592,17 @@ class RepoWidget(QWidget):
         self.showMessage('')
         if self.repomodel.graph is None:
             return
-        if type(rev) != str: # unapplied patch
-            self.manifestDemand.forward('setRev', rev)
-            self.grepDemand.forward('setRevision', rev)
-            self.syncDemand.forward('refreshTargets', rev)
-        else:
-            self.manifestDemand.forward('setRev', None)
-        self.revDetailsWidget.onRevisionSelected(rev)
-        self.revisionSelected.emit(rev)
+        try:
+            self.revDetailsWidget.onRevisionSelected(rev)
+            self.revisionSelected.emit(rev)
+            if type(rev) != str: # unapplied patch
+                self.manifestDemand.forward('setRev', rev)
+                self.grepDemand.forward('setRevision', rev)
+                self.syncDemand.forward('refreshTargets', rev)
+            else:
+                self.manifestDemand.forward('setRev', None)
+        except (IndexError, error.RevlogError, error.Abort), e:
+            self.showMessage(hglib.tounicode(str(e)))
 
     def gotoParent(self):
         self.repoview.clearSelection()
