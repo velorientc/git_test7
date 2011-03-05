@@ -203,20 +203,23 @@ class CommitWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.setMargin(0)
         hbox.setContentsMargins(*(0,)*4)
+        tbar = QToolBar(_("Commit Dialog Toolbar"), self)
+        hbox.addWidget(tbar)
 
-        msgcombo = MessageHistoryCombo()
-        msgcombo.activated.connect(self.msgSelected)
-        hbox.addWidget(msgcombo, 1)
+        self.recentMessagesButton = QToolButton(
+            text=_('Copy message'), 
+            popupMode=QToolButton.InstantPopup,
+            statusTip=_('Copy one of the recent commit messages'))
+        tbar.addWidget(self.recentMessagesButton)
+        self.updateRecentMessages()
 
-        branchbutton = QPushButton(_('Branch: '))
-        branchbutton.pressed.connect(self.branchOp)
-        self.branchbutton = branchbutton
+        self.branchbutton = tbar.addAction(_('Branch: '))
+        self.branchbutton.triggered.connect(self.branchOp)
         self.branchop = None
-        hbox.addWidget(branchbutton)
 
-        self.detailsbutton = QPushButton(_('Options'))
-        self.detailsbutton.pressed.connect(self.details)
-        hbox.addWidget(self.detailsbutton)
+        tbar.addAction(_('Options')).triggered.connect(self.details)
+        
+        hbox.addStretch(1)
 
         vbox.addLayout(hbox, 0)
         self.buttonHBox = hbox
@@ -249,7 +252,6 @@ class CommitWidget(QWidget):
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
         self.msgte = msgte
-        self.msgcombo = msgcombo
         QShortcut(QKeySequence('Ctrl+Return'), self, self.commit)
 
     @pyqtSlot(QString, QString)
@@ -322,9 +324,6 @@ class CommitWidget(QWidget):
         self.commitButtonEnable.emit(not ispatch)
         self.msgte.refresh(self.repo)
 
-        # Update message list
-        self.msgcombo.reset(self.msghistory)
-
         # Update branch operation button
         branchu = hglib.tounicode(self.repo[None].branch())
         if self.branchop is None:
@@ -373,6 +372,15 @@ class CommitWidget(QWidget):
         self.reload()
         QTimer.singleShot(500, lambda: shlib.shell_notify([self.repo.root]))
 
+    def updateRecentMessages(self):
+        # Define a menu that lists recent messages
+        m = QMenu()
+        for s in self.msghistory:
+            title = s.split('\n', 1)[0][:70]
+            def overwriteMsg(newMsg): return lambda: self.msgSelected(newMsg) 
+            m.addAction(title).triggered.connect(overwriteMsg(s))
+        self.recentMessagesButton.setMenu(m)
+         
     def getMessage(self):
         text = self.msgte.text()
         try:
@@ -381,14 +389,14 @@ class CommitWidget(QWidget):
             pass # TODO
         return text
 
-    def msgSelected(self, index):
+    def msgSelected(self, message):
         if self.msgte.text() and self.msgte.isModified():
             d = QMessageBox.question(self, _('Confirm Discard Message'),
                         _('Discard current commit message?'),
                         QMessageBox.Ok | QMessageBox.Cancel)
             if d != QMessageBox.Ok:
                 return
-        self.setMessage(self.msghistory[index])
+        self.setMessage(message)
         self.msgte.setFocus()
 
     def setMessage(self, msg):
@@ -412,7 +420,7 @@ class CommitWidget(QWidget):
         self.stwidget.loadSettings(s, lpref+'status')
         self.msghistory = list(s.value(gpref+'history-'+repoid).toStringList())
         self.msghistory = [m for m in self.msghistory if m]
-        self.msgcombo.reset(self.msghistory)
+        self.updateRecentMessages()
         self.userhist = s.value(gpref+'userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
         try:
@@ -448,6 +456,7 @@ class CommitWidget(QWidget):
             self.msghistory.remove(umsg)
         self.msghistory.insert(0, umsg)
         self.msghistory = self.msghistory[:10]
+        self.updateRecentMessages()
 
     def addUsernameToHistory(self, user):
         if user in self.userhist:
@@ -609,26 +618,6 @@ class CommitWidget(QWidget):
             self.msgte.setModified(False)
             self.commitComplete.emit()
         self.stwidget.refreshWctx()
-
-class MessageHistoryCombo(QComboBox):
-    def __init__(self, parent=None):
-        QComboBox.__init__(self, parent)
-        self.reset([])
-
-    def reset(self, msgs):
-        self.clear()
-        self.addItem(_('Recent commit messages...'))
-        self.loaded = False
-        self.msgs = msgs
-
-    def showPopup(self):
-        if not self.loaded:
-            self.clear()
-            for s in self.msgs:
-                self.addItem(s.split('\n', 1)[0][:70])
-            self.loaded = True
-        QComboBox.showPopup(self)
-
 
 class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
