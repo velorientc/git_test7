@@ -737,6 +737,9 @@ class ResultPage(QWizardPage):
 
     ### Override Method ###
 
+    def reject(self):
+        pass
+
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
         pass
