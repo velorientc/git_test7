@@ -461,7 +461,7 @@ class MQWidget(QWidget):
         self.messageEditor.setFocus()
 
     def setMessage(self, message):
-        self.messageEditor.setText(message)
+        self.messageEditor.setText(message)  # message: unicode
         lines = self.messageEditor.lines()
         if lines:
             lines -= 1
@@ -625,7 +625,7 @@ class MQWidget(QWidget):
         self.messages = []
         for patch in repo.mq.series:
             ctx = repo.changectx(patch)
-            msg = ctx.description()
+            msg = hglib.tounicode(ctx.description())
             if msg:
                 self.messages.append((patch, msg))
         self.msgSelectCombo.reset(self.messages)
@@ -651,7 +651,7 @@ class MQWidget(QWidget):
             self.msgSelectCombo.setEnabled(True)
             self.qnewOrRefreshBtn.setEnabled(True)
             if not newmode:
-                self.setMessage(pctx.description())
+                self.setMessage(hglib.tounicode(pctx.description()))
                 name = repo.mq.applied[-1].name
                 self.patchNameLE.setText(hglib.tounicode(name))
         else:
@@ -681,7 +681,7 @@ class MQWidget(QWidget):
             pctx = self.repo.changectx('.')
             if 'qtip' in pctx.tags():
                 self.messageEditor.setEnabled(True)
-                self.setMessage(pctx.description())
+                self.setMessage(hglib.tounicode(pctx.description()))
                 name = self.repo.mq.applied[-1].name
                 self.patchNameLE.setText(hglib.tounicode(name))
                 self.qnewOrRefreshBtn.setEnabled(True)
