@@ -19,9 +19,19 @@ beyondcompare2.gui=True
 beyondcompare2.diffargs=/lro /title1='$plabel1' /title2='$clabel' $parent $child
 beyondcompare2.dirdiff=True
 
+; The Araxis Merge tool is configured to work with newer versions of Araxis Merge
+; if you are using Araxis Merge 2008 or later, create a [merge-tools] section
+; in your mercurial.ini file, and add one of the two following "araxis.executable"
+; lines, depending on whether you have installed a 32 or a 64 bit version 
+; of Araxis Merge and whether you are on a 32 or 64 bit version of windows
+;
+;araxis.executable=${ProgramFiles}/Araxis/Araxis Merge/ConsoleCompare.exe
+;araxis.executable=${ProgramFiles(x86)}/Araxis/Araxis Merge/ConsoleCompare.exe
+;
+; Please remember to remove the leading ";" to uncomment the line
+;
 araxis.regkey=SOFTWARE\Classes\TypeLib\{46799e0a-7bd1-4330-911c-9660bb964ea2}\7.0\HELPDIR
 araxis.regappend=\ConsoleCompare.exe
-;araxis.executable=${ProgramFiles}/Araxis/Araxis Merge/ConsoleCompare.exe
 araxis.priority=-2
 araxis.args=/3 /a2 /wait /merge /title1:"Parent 1" /title2:"Merge Result: "$output /title3:"Parent 2" $local $base $other $output
 araxis.premerge=False
