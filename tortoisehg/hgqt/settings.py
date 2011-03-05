@@ -544,6 +544,19 @@ INFO = (
 ({'name': 'extensions', 'label': _('Extensions'), 'icon': 'hg-extensions'}, (
     )),
 
+({'name': 'issue', 'label': _('Issue Tracking'), 'icon': 'edit-file'}, (
+    _fi(_('Issue Regex'), 'tortoisehg.issue.regex', genEditCombo,
+        _('Defines the regex to match when picking up issue numbers.')),
+    _fi(_('Issue Link'), 'tortoisehg.issue.link', genEditCombo,
+        _('Defines the command to run when an issue number is recognized. '
+          'You may include groups in issue.regex, and corresponding {n} '
+          'tokens in issue.link (where n is a non-negative integer). '
+          '{0} refers to the entire string matched by issue.regex, '
+          'while {1} refers to the first group and so on. If no {n} tokens'
+          'are found in issue.link, the entire matched string is appended '
+          'instead.')),
+    )),
+
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
     _fi(_('Server'), 'reviewboard.server', genEditCombo,
         _('Path to review board'
