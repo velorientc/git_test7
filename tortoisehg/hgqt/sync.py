@@ -263,10 +263,11 @@ class SyncWidget(QWidget):
 
     def refreshStatusTips(self):
         url = self.currentUrl(True)
-        self.incomingAction.setStatusTip(_('Preview incoming changesets from %s') % url)
-        self.pullAction.setStatusTip(_('Pull incoming changesets from %s') % url)
-        self.outgoingAction.setStatusTip(_('Filter outgoing changesets to %s') % url)
-        self.pushAction.setStatusTip(_('Push outgoing changesets to %s') % url)
+        urlu = hglib.tounicode(url)
+        self.incomingAction.setStatusTip(_('Preview incoming changesets from %s') % urlu)
+        self.pullAction.setStatusTip(_('Pull incoming changesets from %s') % urlu)
+        self.outgoingAction.setStatusTip(_('Filter outgoing changesets to %s') % urlu)
+        self.pushAction.setStatusTip(_('Push outgoing changesets to %s') % urlu)
 
     def loadTargets(self, ctx):
         self.targetcombo.clear()
