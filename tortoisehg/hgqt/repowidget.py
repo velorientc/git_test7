@@ -1257,7 +1257,7 @@ class RepoWidget(QWidget):
                 traceback.print_exc()
             return
         output = _ui.popbuffer()
-        QApplication.clipboard().setText(output)
+        QApplication.clipboard().setText(hglib.tounicode(output))
 
     def copyHash(self):
         clip = QApplication.clipboard()
