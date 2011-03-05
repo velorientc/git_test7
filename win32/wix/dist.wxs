@@ -49,6 +49,10 @@
         <File Name="libsvn_subr-1.dll" />
         <File Name="libsvn_wc-1.dll" />
         <File Name="libsvn_swig_py-1.dll" />
+        <?if $(var.Platform) = "x86" ?>
+          <File Name="intl3_svn.dll" />
+          <File Name="libdb44.dll" />
+        <?endif?>
         <File Name="select.pyd" />
         <File Name="sip.pyd" />
         <File Name="unicodedata.pyd" />

@@ -23,6 +23,7 @@ class RevDetailsWidget(QWidget):
     linkActivated = pyqtSignal(unicode)
     grepRequested = pyqtSignal(unicode, dict)
     revisionSelected = pyqtSignal(int)
+    updateToRevision = pyqtSignal(int)
 
     def __init__(self, repo):
         QWidget.__init__(self)
@@ -61,7 +62,7 @@ class RevDetailsWidget(QWidget):
         # + revisiondetails_layout -----------------------------------------+
         # |+ filelist_splitter ........                                     |
         # | + tbarFileListFrame (vbox)| + cset_and_file_details_frame (vbox)|
-        # |  + mergeToolbar           |  + revpanel                         |
+        # |  + filelistToolbar        |  + revpanel                         |
         # +---------------------------+-------------------------------------+
         # |  + filelist               |  + message_splitter                 |
         # |                           |  :+ message                         |
@@ -85,8 +86,8 @@ class RevDetailsWidget(QWidget):
         self.filelist_splitter.setOrientation(Qt.Horizontal)
         self.filelist_splitter.setChildrenCollapsible(False)
 
-        self.mergeToolBar = QToolBar(_('Merge Toolbar'))
-        self.mergeToolBar.setIconSize(QSize(16,16))
+        self.filelistToolbar = QToolBar(_('File List Toolbar'))
+        self.filelistToolbar.setIconSize(QSize(16,16))
         self.filelist = HgFileListView()
 
         self.tbarFileListFrame = QFrame(self.filelist_splitter)
@@ -100,7 +101,7 @@ class RevDetailsWidget(QWidget):
         vbox = QVBoxLayout()
         vbox.setSpacing(0)
         vbox.setMargin(0)
-        vbox.addWidget(self.mergeToolBar)
+        vbox.addWidget(self.filelistToolbar)
         vbox.addWidget(self.filelist)
         self.tbarFileListFrame.setLayout(vbox)
 
@@ -176,8 +177,13 @@ class RevDetailsWidget(QWidget):
         self.actionActivateFileAlt.setShortcuts([Qt.ALT+Qt.Key_Return,
                                                  Qt.ALT+Qt.Key_Enter])
         self.actionActivateFileAlt.triggered.connect(fileActivated)
-        self.mergeToolBar.addAction(self.filelist.actionShowAllMerge)
-        self.mergeToolBar.addAction(self.filelist.actionSecondParent)
+
+        self.actionUpdate = a = self.filelistToolbar.addAction(
+            geticon('hg-update'), _('Update to this revision'))
+        a.triggered.connect(lambda: self.updateToRevision.emit(self._last_rev))
+        self.filelistToolbar.addSeparator()
+        self.filelistToolbar.addAction(self.filelist.actionShowAllMerge)
+        self.filelistToolbar.addAction(self.filelist.actionSecondParent)
 
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)

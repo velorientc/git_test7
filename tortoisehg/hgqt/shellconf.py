@@ -50,7 +50,7 @@ vars = {
     'HideMenuOutsideRepo':
         [False,    THGKEY, REG_SZ, is_true, one_str, 'hidecmenu'],
     PROMOTEDITEMS:
-        ['commit', THGKEY, REG_SZ, noop, noop, None],
+        ['commit,workbench', THGKEY, REG_SZ, noop, noop, None],
     'ShowUnversionedOverlay':
         [True, OVLKEY, REG_DWORD, nonzero, one_int, 'enableUnversionedHandler'],
     'ShowIgnoredOverlay':

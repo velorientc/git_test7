@@ -793,7 +793,7 @@ void CShellExtCMenu::RunDialog(const std::string &cmd)
         TDEBUG_TRACE("RunDialog: THG root is empty");
         return;
     }
-    std::string hgcmd = dir + "\\thg.exe";
+    std::string hgcmd = dir + "\\thgw.exe";
 
     WIN32_FIND_DATAA data;
     HANDLE hfind = FindFirstFileA(hgcmd.c_str(), &data);

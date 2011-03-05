@@ -139,7 +139,7 @@ class patchctx(object):
             summary = lines and lines[0] or ''
 
             if summary and len(lines) > 1:
-                summary += '...'
+                summary += u' \u2026' # ellipsis ...
 
         return summary
 

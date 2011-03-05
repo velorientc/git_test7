@@ -22,7 +22,7 @@ nullvariant = QVariant()
 
 class PatchBranchWidget(QWidget):
     '''
-    A widget that show the patch graph and provide actions 
+    A widget that show the patch graph and provide actions
     for the pbranch extension
     '''
     output = pyqtSignal(QString, QString)
@@ -129,7 +129,7 @@ class PatchBranchWidget(QWidget):
 
         # compute model data
         self.patchlistmodel.setModel(
-            self.compute_model(), 
+            self.compute_model(),
             self.repo.changectx('.').branch() )
 
         # restore patch selection
@@ -137,7 +137,7 @@ class PatchBranchWidget(QWidget):
             selinxs = self.patchlistmodel.match(
                 self.patchlistmodel.index(0, patchnamecol),
                 Qt.DisplayRole,
-                selname, 
+                selname,
                 flags = Qt.MatchExactly)
             if len(selinxs) > 0:
                 self.patchlist.setCurrentIndex(selinxs[0])
@@ -175,7 +175,7 @@ class PatchBranchWidget(QWidget):
             parents = graph.deps(name)
 
             # Node properties
-            if name in dep_list: 
+            if name in dep_list:
                 node_column = dep_list.index(name)
             else:
                 node_column = len(dep_list)
@@ -299,11 +299,11 @@ class PatchBranchWidget(QWidget):
             return False
         self.pnew(hglib.fromunicode(new_name))
         return True
-        
+
     def pnew(self, patch_name):
         """
         [pbranch] Execute 'pnew' command.
-        
+
         :param patch_name: Name of new patch-branch
         """
         if self.pbranch is None:
@@ -312,7 +312,7 @@ class PatchBranchWidget(QWidget):
         self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
         self.repo.decrementBusyCount()
         return True
-    
+
     def pmerge(self, patch_name=None):
         """
         [pbranch] Execute 'pmerge' command.
@@ -339,14 +339,14 @@ class PatchBranchWidget(QWidget):
 
     def is_patch(self, branch_name):
         """ return True if branch is a patch. This excludes root branches
-        and internal diff base branches (for patches with multiple 
+        and internal diff base branches (for patches with multiple
         dependencies. """
         return self.has_pbranch() and self.pgraph().ispatch(branch_name)
 
     def cur_branch(self):
         """ Return branch that workdir belongs to. """
         return self.repo.dirstate.branch()
-   
+
     ### internal functions ###
 
     def update_sensitivity(self):
@@ -358,7 +358,7 @@ class PatchBranchWidget(QWidget):
         self.actionReapply.setEnabled(True)
         self.actionPNew.setEnabled(not is_merge)
         self.actionEditPGraph.setEnabled(True)
-        
+
     def selected_patch(self):
         C_NAME = PatchBranchModel._columns.index('Name')
         indexes = self.patchlist.selectedIndexes()
@@ -372,7 +372,7 @@ class PatchBranchWidget(QWidget):
         patchname = self.selected_patch()
         if not patchname:
             return
-        
+
         menu = QMenu(self)
         def append(label, handler):
             menu.addAction(label).triggered.connect(handler)
@@ -401,7 +401,7 @@ class PatchBranchWidget(QWidget):
     def contextMenuEvent(self, event):
         if self.patchlist.geometry().contains(event.pos()):
             self.show_patch_cmenu(event.globalPos())
-   
+
     def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         self.refresh()
@@ -435,7 +435,7 @@ class PatchBranchWidget(QWidget):
             no_editor_configured =(os.environ.get("HGEDITOR") or
                 self.repo.ui.config("ui", "editor") or
                 os.environ.get("VISUAL") or
-                os.environ.get("EDITOR","editor-not-configured") 
+                os.environ.get("EDITOR","editor-not-configured")
                 == "editor-not-configured")
             if no_editor_configured:
                 qtlib.ErrorMsgBox(_('No editor found'),
@@ -458,7 +458,7 @@ class PatchBranchWidget(QWidget):
     def goto_activated(self):
         branch = self.selected_patch()
         # TODO: Fetch list of heads of branch
-        # - use a list of revs if more than one found 
+        # - use a list of revs if more than one found
         dlg = update.UpdateDialog(self.repo, branch, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
@@ -535,7 +535,7 @@ class PatchBranchModel(QAbstractTableModel):
     Model used to list patch branches
     TODO: Should be extended to list all branches
     """
-    _columns = ('Graph', 'Name', 'Status', 'Title', 'Message',)
+    _columns = ['Graph', 'Name', 'Status', 'Title', 'Message',]
 
     def __init__(self, model, wd_branch="", parent=None):
         QAbstractTableModel.__init__(self, parent)

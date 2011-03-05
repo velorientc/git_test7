@@ -622,7 +622,7 @@ class Workbench(QMainWindow):
             tw = self.repoTabsWidget
             for idx in range(tw.count()):
                 rw = tw.widget(idx)
-                repostosave.append(rw.repo.root)
+                repostosave.append(hglib.tounicode(rw.repo.root))
         s.setValue(wb + 'openrepos', (',').join(repostosave))
 
     def restoreSettings(self):
@@ -632,7 +632,7 @@ class Workbench(QMainWindow):
         self.restoreState(s.value(wb + 'windowState').toByteArray())
         save = s.value(wb + 'saveRepos').toBool()
         self.actionSaveRepos.setChecked(save)
-        for path in str(s.value(wb + 'openrepos').toString()).split(','):
+        for path in hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(','):
             self._openRepo(path)
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()

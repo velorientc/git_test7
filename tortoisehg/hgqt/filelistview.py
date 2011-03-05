@@ -71,11 +71,11 @@ class HgFileListView(QTableView):
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
         if len(ctx.parents()) == 2:
-            self.actionShowAllMerge.setVisible(True)
-            self.actionSecondParent.setVisible(True)
+            self.actionShowAllMerge.setEnabled(True)
+            self.actionSecondParent.setEnabled(True)
         else:
-            self.actionShowAllMerge.setVisible(False)
-            self.actionSecondParent.setVisible(False)
+            self.actionShowAllMerge.setEnabled(False)
+            self.actionSecondParent.setEnabled(False)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -216,13 +216,11 @@ class HgFileListView(QTableView):
             _('Toggle display of all files and the direction they were merged'))
         self.actionShowAllMerge.setCheckable(True)
         self.actionShowAllMerge.setChecked(False)
-        self.actionShowAllMerge.setVisible(False)
         self.actionSecondParent = QAction(_('Other'), self)
         self.actionSecondParent.setToolTip(
             _('Toggle display of diffs to second (other) parent'))
         self.actionSecondParent.setCheckable(True)
         self.actionSecondParent.setChecked(False)
-        self.actionSecondParent.setVisible(False)
         self.actionSecondParent.setEnabled(False)
 
         self._actions = {}
