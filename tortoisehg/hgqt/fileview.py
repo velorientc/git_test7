@@ -677,7 +677,7 @@ class FileData(object):
         else:
             return
 
-        self.olddata = olddata
+        self.olddata = hglib.tounicode(olddata)
         newdate = util.datestr(ctx.date())
         olddate = util.datestr(ctx2.date())
         revs = [str(ctx), str(ctx2)]
