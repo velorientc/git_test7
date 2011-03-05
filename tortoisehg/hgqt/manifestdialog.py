@@ -317,7 +317,13 @@ class ManifestWidget(QWidget):
         self._treemodel = ManifestModel(self._repo, self._rev,
                                         statusfilter=self._statusfilter.status(),
                                         parent=self)
+        oldmodel = self._treeview.model()
+        oldselmodel = self._treeview.selectionModel()
         self._treeview.setModel(self._treemodel)
+        if oldmodel:
+            oldmodel.deleteLater()
+        if oldselmodel:
+            oldselmodel.deleteLater()
 
         selmodel = self._treeview.selectionModel()
         selmodel.currentChanged.connect(self._updatecontent)
