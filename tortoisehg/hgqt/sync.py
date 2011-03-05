@@ -34,9 +34,13 @@ def parseurl(path):
             if user.find(':') != -1:
                 user, passwd = tuple(user.split(':'))
         m = re.match(r'([^:/]+)(:(\d+))?(/(.*))?$', p)
-        host = m.group(1)
-        port = m.group(3)
-        folder = m.group(5) or '.'
+        if m:
+            host = m.group(1)
+            port = m.group(3)
+            folder = m.group(5) or '.'
+        else:
+            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
+            host, port, folder = '', '', ''
     elif path.startswith('http://') or path.startswith('https://'):
         snpaqf = urlparse.urlparse(path)
         scheme, netloc, folder, params, query, fragment = snpaqf
