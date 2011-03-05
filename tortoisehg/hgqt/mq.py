@@ -198,7 +198,7 @@ class MQWidget(QWidget):
         self.setAcceptDrops(True)
 
         if hasattr(self.patchNameLE, 'setPlaceholderText'): # Qt >= 4.7
-            self.patchNameLE.setPlaceholderText('### patch name ###')
+            self.patchNameLE.setPlaceholderText(_('### patch name ###'))
 
         if parent:
             self.layout().setContentsMargins(2, 2, 2, 2)
