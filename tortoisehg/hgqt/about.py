@@ -172,7 +172,7 @@ class AboutUpdateThread(QThread):
                 platform = IsX64() and 'x64' or 'x86'
             # linux2 for Linux, darwin for OSX
             for line in f[2:]:
-                p, _url = line.split(':')
+                p, _url = line.split(':', 1)
                 if platform == p:
                     upgradeurl = _url.strip()
                     break
