@@ -172,7 +172,7 @@ class ManifestModel(QAbstractItemModel):
     def _rootentry(self):
         try:
             return self.__rootentry
-        except AttributeError:
+        except (AttributeError, TypeError):
             self._buildrootentry()
             return self.__rootentry
 
