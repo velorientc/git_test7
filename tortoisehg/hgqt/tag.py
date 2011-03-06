@@ -7,22 +7,22 @@
 
 import os
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
 from mercurial import error, util
 
 from tortoisehg.util import hglib, i18n
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, cmdui
 
-# TODO: Use cmdui.Runner, emit output statements for dock log widget
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 keep = i18n.keepgettext()
 
 class TagDialog(QDialog):
 
-    showMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(QString)
+    output = pyqtSignal(QString, QString)
+    makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, repo, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
@@ -30,92 +30,81 @@ class TagDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
-
-        if not tag and rev and rev != 'tip':
-            for t in repo.nodetags(repo[rev].node()):
-                if t != 'tip' and t not in repo._bookmarks:
-                    tag = t
-                    break
-            else:
-                tag = ''
+        self.setWindowTitle(_('Tag - %s') % repo.displayname)
+        self.setWindowIcon(qtlib.geticon('hg-tag'))
 
         # base layout box
         base = QVBoxLayout()
         base.setSpacing(0)
         base.setContentsMargins(*(0,)*4)
+        base.setSizeConstraint(QLayout.SetFixedSize)
+        self.setLayout(base)
 
         # main layout box
         box = QVBoxLayout()
-        box.setSpacing(6)
-        box.setContentsMargins(*(6,)*4)
-        base.addLayout(box)
+        box.setSpacing(8)
+        box.setContentsMargins(*(8,)*4)
+        self.layout().addLayout(box)
 
-        ## main layout grid
-        grid = QGridLayout()
-        grid.setSpacing(6)
-        box.addLayout(grid)
+        form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
+        box.addLayout(form)
+
+        ctx = repo[rev]
+        form.addRow(_('Revision:'), QLabel('%d (%s)' % (ctx.rev(), ctx)))
+        self.rev = ctx.rev()
 
         ### tag combo
-        self.tag_combo = QComboBox()
-        self.tag_combo.setEditable(True)
-        self.tag_combo.setMinimumWidth(180)
-        self.tag_combo.setEditText(tag)
-        self.tag_combo.editTextChanged.connect(self.tag_changed)
-        grid.addWidget(QLabel(_('Tag:')), 0, 0)
-        grid.addWidget(self.tag_combo, 0, 1)
+        self.tagCombo = QComboBox()
+        self.tagCombo.setEditable(True)
+        self.tagCombo.setEditText(hglib.tounicode(tag))
+        self.tagCombo.currentIndexChanged.connect(self.updateStates)
+        self.tagCombo.editTextChanged.connect(self.updateStates)
+        form.addRow(_('Tag:'), self.tagCombo)
 
-        ### revision input
-        self.initial_rev = rev
-        self.rev_text = QLineEdit()
-        self.rev_text.setMaximumWidth(100)
-        self.rev_text.setText(rev)
-        self.rev_text.textEdited.connect(self.update_sensitives)
-        grid.addWidget(QLabel(_('Revision:')), 1, 0)
-        grid.addWidget(self.rev_text, 1, 1)
+        self.tagRevLabel = QLabel('')
+        form.addRow(_('Tagged:'), self.tagRevLabel)
 
         ### options
         expander = qtlib.ExpanderLabel(_('Options'), False)
         expander.expanded.connect(self.show_options)
-        grid.addWidget(expander, 2, 0, 1, 2, Qt.AlignLeft | Qt.AlignTop)
+        box.addWidget(expander)
 
         optbox = QVBoxLayout()
         optbox.setSpacing(6)
-        grid.addLayout(optbox, 3, 0, 1, 2)
+        box.addLayout(optbox)
 
         hbox = QHBoxLayout()
         hbox.setSpacing(0)
         optbox.addLayout(hbox)
 
-        self.local_chk = QCheckBox(_('Local tag'))
-        self.local_chk.toggled.connect(self.local_toggled)
-        self.replace_chk = QCheckBox(_('Replace existing tag (-f/--force)'))
-        self.replace_chk.toggled.connect(self.update_sensitives)
-        optbox.addWidget(self.local_chk)
-        optbox.addWidget(self.replace_chk)
+        self.localCheckBox = QCheckBox(_('Local tag'))
+        self.localCheckBox.toggled.connect(self.updateStates)
+        self.replaceCheckBox = QCheckBox(_('Replace existing tag (-f/--force)'))
+        self.replaceCheckBox.toggled.connect(self.updateStates)
+        optbox.addWidget(self.localCheckBox)
+        optbox.addWidget(self.replaceCheckBox)
 
-        self.eng_chk = QCheckBox(_('Use English commit message'))
+        self.englishCheckBox = QCheckBox(_('Use English commit message'))
         engmsg = repo.ui.configbool('tortoisehg', 'engmsg', False)
-        self.eng_chk.setChecked(engmsg)
-        optbox.addWidget(self.eng_chk)
+        self.englishCheckBox.setChecked(engmsg)
+        optbox.addWidget(self.englishCheckBox)
 
-        self.custom_chk = QCheckBox(_('Use custom commit message:'))
-        self.custom_chk.toggled.connect(
-             lambda e: self.toggle_enabled(e, self.custom_text))
-        self.custom_text = QLineEdit()
-        optbox.addWidget(self.custom_chk)
-        optbox.addWidget(self.custom_text)
+        self.customCheckBox = QCheckBox(_('Use custom commit message:'))
+        self.customCheckBox.toggled.connect(self.customMessageToggle)
+        self.customTextLineEdit = QLineEdit()
+        optbox.addWidget(self.customCheckBox)
+        optbox.addWidget(self.customTextLineEdit)
 
         ## bottom buttons
-        buttons = QDialogButtonBox()
-        self.close_btn = buttons.addButton(QDialogButtonBox.Close)
-        self.close_btn.clicked.connect(self.reject)
-        self.add_btn = buttons.addButton(_('&Add'),
-                                         QDialogButtonBox.ActionRole)
-        self.add_btn.clicked.connect(self.add_tag)
-        self.remove_btn = buttons.addButton(_('&Remove'),
-                                            QDialogButtonBox.ActionRole)
-        self.remove_btn.clicked.connect(self.remove_tag)
-        box.addWidget(buttons)
+        BB = QDialogButtonBox
+        bbox = QDialogButtonBox(BB.Close)
+        bbox.rejected.connect(self.reject)
+        self.addBtn = bbox.addButton(_('&Add'), BB.ActionRole)
+        self.removeBtn = bbox.addButton(_('&Remove'), BB.ActionRole)
+        box.addWidget(bbox)
+
+        self.addBtn.clicked.connect(self.onAddTag)
+        self.removeBtn.clicked.connect(self.onRemoveTag)
 
         ## horizontal separator
         self.sep = QFrame()
@@ -128,100 +117,103 @@ class TagDialog(QDialog):
         self.status.setContentsMargins(4, 2, 4, 4)
         base.addWidget(self.status)
 
-        # dialog setting
-        self.setLayout(base)
-        self.layout().setSizeConstraint(QLayout.SetFixedSize)
-        self.setWindowTitle(_('Tag - %s') % repo.displayname)
-        self.setWindowIcon(qtlib.geticon('hg-tag'))
+        self.cmd = cmdui.Runner(False, self)
+        self.cmd.output.connect(self.output)
+        self.cmd.makeLogVisible.connect(self.makeLogVisible)
+        self.cmd.commandFinished.connect(self.onCommandFinished)
 
-        # prepare to show
-        self.custom_text.setDisabled(True)
-        self.clear_statue()
-        self.update_tagcombo(clear=False)
-        self.show_options(False)
-        self.tag_combo.setFocus()
-
-        self.replace_chk.setChecked(bool(opts.get('force')))
-        self.local_chk.setChecked(bool(opts.get('local')))
+        repo.repositoryChanged.connect(self.refresh)
+        self.customTextLineEdit.setDisabled(True)
+        self.replaceCheckBox.setChecked(bool(opts.get('force')))
+        self.localCheckBox.setChecked(bool(opts.get('local')))
         if not opts.get('local') and opts.get('message'):
-            self.custom_chk.setChecked(True)
-            self.custom_text.setText(opts.get('message', ''))
-
-        self.update_sensitives(affectlocal=True)
-
-    ### Private Methods ###
-
-    def update_tagcombo(self, clear=True):
-        """ update display on dialog with recent repo data """
-        tag_name = self.tag_combo.currentText()
-        self.tag_combo.clear()
-
-        # add tags to drop-down list
-        tags = list(self.repo.tags())
-        tags.sort()
-        tags.reverse()
-        for tag in tags:
-            if tag == 'tip':
-                continue
-            self.tag_combo.addItem(hglib.tounicode(tag))
-        self.tag_combo.clearEditText()
-
-        # restore tag name 
-        if not clear and tag_name:
-            self.tag_combo.setEditText(tag_name)
+            msg = hglib.tounicode(opts['message'])
+            self.customCheckBox.setChecked(True)
+            self.customTextLineEdit.setText(msg)
+        self.clear_statue()
+        self.show_options(False)
+        self.tagCombo.setFocus()
+        self.refresh()
 
     @pyqtSlot()
-    def update_sensitives(self, affectlocal=False):
-        """ update bottom button sensitives based on rev and tag """
-        tag = self.tag_combo.currentText()
-        rev = self.rev_text.text()
-        if not rev or not tag:
-            self.add_btn.setDisabled(True)
-            self.remove_btn.setDisabled(True)
-            return
+    def refresh(self):
+        """ update display on dialog with recent repo data """
+        cur = self.tagCombo.currentText()
 
-        # check if valid revision
-        try:
-            self.repo[hglib.fromunicode(rev)]
-        except (error.LookupError, error.RepoLookupError, error.RepoError):
-            self.add_btn.setDisabled(True)
-            self.remove_btn.setDisabled(True)
-            return
+        tags = list(self.repo.tags())
+        tags.sort(reverse=True)
+        self.tagCombo.clear()
+        for tag in tags:
+            if tag in ('tip', 'qbase', 'qtip', 'qparent'):
+                continue
+            self.tagCombo.addItem(hglib.tounicode(tag))
+        if cur:
+            self.tagCombo.setEditText(cur)
+        else:
+            self.tagCombo.clearEditText()
+            self.updateStates()
+
+    @pyqtSlot()
+    def updateStates(self):
+        """ update bottom button sensitives based on rev and tag """
+        tagu = self.tagCombo.currentText()
+        tag = hglib.fromunicode(tagu)
 
         # check tag existence
-        force = self.replace_chk.isChecked()
-        is_exist = hglib.fromunicode(tag) in self.repo.tags()
-        self.add_btn.setEnabled(not is_exist or force)
-        self.remove_btn.setEnabled(is_exist)
+        if tag:
+            exists = tag in self.repo.tags()
+            if exists:
+                tagtype = self.repo.tagtype(tag)
+                islocal = 'local' == tagtype
+                try:
+                    ctx = self.repo[self.repo.tags()[tag]]
+                    trev = ctx.rev()
+                    thash = str(ctx)
+                except:
+                    trev, thash, local = 0, '????????', ''
+                self.localCheckBox.setChecked(islocal)
+                self.localCheckBox.setEnabled(False)
+                local = islocal and _('local') or ''
+                self.tagRevLabel.setText('%d (%s) %s' % (trev, thash, local))
+                samerev = trev == self.rev
+            else:
+                islocal = self.localCheckBox.isChecked()
+                self.localCheckBox.setEnabled(True)
+                self.tagRevLabel.clear()
 
-        # check if local
-        is_local = self.repo.tagtype(hglib.fromunicode(tag))
-        if affectlocal and is_local is not None:
-            self.local_chk.setChecked(is_local == 'local')
-        self.update_revision()
+            force = self.replaceCheckBox.isChecked()
+            custom = self.customCheckBox.isChecked()
+            self.addBtn.setEnabled(not exists or (force and not samerev))
+            if exists and not samerev:
+                self.addBtn.setText(_('Move'))
+            else:
+                self.addBtn.setText(_('Add'))
+            self.removeBtn.setEnabled(exists)
+            self.englishCheckBox.setEnabled(not islocal)
+            self.customCheckBox.setEnabled(not islocal)
+            self.customTextLineEdit.setEnabled(not islocal and custom)
+        else:
+            self.addBtn.setEnabled(False)
+            self.removeBtn.setEnabled(False)
+            self.localCheckBox.setEnabled(False)
+            self.englishCheckBox.setEnabled(False)
+            self.customCheckBox.setEnabled(False)
+            self.customTextLineEdit.setEnabled(False)
+            self.tagRevLabel.clear()
 
-    def update_revision(self):
-        """ update revision entry based on tag """
-        tagmap = self.repo.tags()
-        tag = self.tag_combo.currentText()
-        replace = self.replace_chk.isChecked()
-        if not tag or hglib.fromunicode(tag) not in tagmap or replace:
-            if self.initial_rev:
-                self.rev_text.setText(self.initial_rev)
-            return
-
-        node = tagmap[hglib.fromunicode(tag)]
-        ctx = self.repo[node]
-        self.rev_text.setText(unicode(ctx.rev()))
+    def customMessageToggle(self, checked):
+        self.customTextLineEdit.setEnabled(checked)
+        if checked:
+            self.customTextLineEdit.setFocus()
 
     def show_options(self, visible):
-        self.local_chk.setVisible(visible)
-        self.replace_chk.setVisible(visible)
-        self.eng_chk.setVisible(visible)
-        self.custom_chk.setVisible(visible)
-        self.custom_text.setVisible(visible)
+        self.localCheckBox.setVisible(visible)
+        self.replaceCheckBox.setVisible(visible)
+        self.englishCheckBox.setVisible(visible)
+        self.customCheckBox.setVisible(visible)
+        self.customTextLineEdit.setVisible(visible)
 
-    def set_status(self, text, icon=None):
+    def set_status(self, text, icon):
         self.status.setShown(True)
         self.sep.setShown(True)
         self.status.set_status(text, icon)
@@ -231,108 +223,104 @@ class TagDialog(QDialog):
         self.status.setHidden(True)
         self.sep.setHidden(True)
 
-    def add_tag(self):
-        local = self.local_chk.isChecked()
-        name = self.tag_combo.currentText()
-        namelocal = hglib.fromunicode(name)
-        rev = hglib.fromunicode(self.rev_text.text())
-        force = self.replace_chk.isChecked()
-        english = self.eng_chk.isChecked()
-        message = self.custom_text.text()
+    def onCommandFinished(self, ret):
+        if ret == 0:
+            self.finishfunc()
 
-        try:
-            # tagging
-            if namelocal in self.repo.tags() and not force:
-                raise util.Abort(keep._("Tag '%s' already exist") % namelocal)
-            if not local:
-                parents = self.repo.parents()
-                if len(parents) > 1:
-                    raise util.Abort(keep._('uncommitted merge'))
-                bheads = self.repo.branchheads()
-                p1 = parents[0].node()
-                if not force and bheads and p1 not in bheads:
-                    raise util.Abort(keep._('not at a branch head (use force)'))
-            ctx = self.repo[rev]
-            node = ctx.node()
+    def onAddTag(self):
+        tagu = self.tagCombo.currentText()
+        tag = hglib.fromunicode(tagu)
+        local = self.localCheckBox.isChecked()
+        force = self.replaceCheckBox.isChecked()
+        english = self.englishCheckBox.isChecked()
+        if self.customCheckBox.isChecked():
+            message = self.customTextLineEdit.text()
+        else:
+            message = None
+
+        exists = tag in self.repo.tags()
+        if exists and not force:
+            self.set_status(_("Tag '%s' already exists") % tagu, False)
+            return
+        if not local:
+            parents = self.repo.parents()
+            if len(parents) > 1:
+                self.set_status(_('uncommitted merge'), False)
+                return
+            p1 = parents[0]
+            if not force and p1.node() not in self.repo._branchheads:
+                self.set_status(_('not at a branch head (use force)'), False)
+                return
             if not message:
+                ctx = self.repo[self.rev]
                 msgset = keep._('Added tag %s for changeset %s')
                 message = (english and msgset['id'] or msgset['str']) \
-                            % (namelocal, str(ctx))
+                           % (tag, str(ctx))
             if not isinstance(message, str):
                 message = hglib.fromunicode(message)
 
-            self.repo.incrementBusyCount()
-            self.repo.tag(namelocal, node, message, local, None, None)
-            self.repo.decrementBusyCount()
-
-            # update UI
-            self.set_status(_("Tag '%s' has been added") % name, True)
-            self.update_tagcombo()
-            self.close_btn.setFocus()
-        except util.Abort, e:
-            self.set_status(_('Abort: ') + hglib.tounicode(str(e)), False)
-        except Exception, e:
-            self.set_status(_('Error: ') + hglib.tounicode(str(e)), False)
-
-    def remove_tag(self):
-        local = self.local_chk.isChecked()
-        name = self.tag_combo.currentText()
-        namelocal = hglib.fromunicode(name)
-        english = self.eng_chk.isChecked()
-        message = hglib.fromunicode(self.custom_text.text())
-
-        try:
-            # tagging
-            tagtype = self.repo.tagtype(namelocal)
-            if local:
-                if tagtype != 'local':
-                    raise util.Abort(keep._('tag \'%s\' is not a local tag') %
-                                     namelocal)
+        def finished():
+            if exists:
+                self.set_status(_("Tag '%s' has been moved") % tagu, True)
             else:
-                if tagtype != 'global':
-                    raise util.Abort(keep._('tag \'%s\' is not a global tag') %
-                                     namelocal)
-                parents = self.repo.parents()
-                if len(parents) > 1:
-                    raise util.Abort(keep._('uncommitted merge'))
-                bheads = self.repo.branchheads()
-                p1 = parents[0].node()
-                if not force and bheads and p1 not in bheads:
-                    raise util.Abort(keep._('not at a branch head (use force)'))
+                self.set_status(_("Tag '%s' has been added") % tagu, True)
+
+        cmd = ['tag', '--repository', self.repo.root, '--rev', str(self.rev)]
+        if local:
+            cmd.append('--local')
+        else:
+            cmd.append('--message=%s' % message)
+        if force:
+            cmd.append('--force')
+        cmd.append(tag)
+        self.finishfunc = finished
+        self.cmd.run(cmd)
+
+    def onRemoveTag(self):
+        tagu = self.tagCombo.currentText()
+        tag = hglib.fromunicode(tagu)
+        local = self.localCheckBox.isChecked()
+        force = self.replaceCheckBox.isChecked()
+        english = self.englishCheckBox.isChecked()
+        if self.customCheckBox.isChecked():
+            message = self.customTextLineEdit.text()
+        else:
+            message = None
+
+        tagtype = self.repo.tagtype(tag)
+        if local:
+            if tagtype != 'local':
+                self.set_status(_("tag '%s' is not a local tag") % tagu)
+                return
+        else:
+            if tagtype != 'global':
+                self.set_status(_("tag '%s' is not a global tag") % tagu)
+                return
+            parents = self.repo.parents()
+            if len(parents) > 1:
+                self.set_status(_('uncommitted merge'), False)
+                return
+            p1 = parents[0]
+            if not force and p1.node() not in self.repo._branchheads:
+                self.set_status(_('not at a branch head (use force)'), False)
+                return
             if not message:
                 msgset = keep._('Removed tag %s')
-                message = (english and msgset['id'] or msgset['str']) % namelocal
+                message = (english and msgset['id'] or msgset['str']) % tag
+            if not isinstance(message, str):
+                message = hglib.fromunicode(message)
 
-            self.repo.incrementBusyCount()
-            node = self.repo[-1].node()
-            self.repo.tag(namelocal, node, message, local, None, None)
-            self.repo.decrementBusyCount()
+        def finished():
+            self.set_status(_("Tag '%s' has been removed") % tagu, True)
 
-            # update UI
-            self.set_status(_("Tag '%s' has been removed") % name, True)
-            self.update_tagcombo()
-            self.close_btn.setFocus()
-        except util.Abort, e:
-            self.set_status(_('Abort: ') + hglib.tounicode(str(e)), False)
-        except Exception, e:
-            self.set_status(_('Error: ') + hglib.tounicode(str(e)), False)
-
-    ### Signal Handlers ###
-
-    def local_toggled(self, checked):
-        self.eng_chk.setEnabled(not checked)
-        self.custom_chk.setEnabled(not checked)
-        custom = self.custom_chk.isChecked()
-        self.custom_text.setEnabled(not checked and custom)
-
-    def tag_changed(self, combo):
-        self.update_revision()
-        self.update_sensitives(True)
-
-    def toggle_enabled(self, checked, target):
-        target.setEnabled(checked)
-        if checked:
-            target.setFocus()
+        cmd = ['tag', '--repository', self.repo.root, '--remove']
+        if local:
+            cmd.append('--local')
+        else:
+            cmd.append('--message=%s' % message)
+        cmd.append(tag)
+        self.finishfunc = finished
+        self.cmd.run(cmd)
 
 def run(ui, *pats, **opts):
     kargs = {}
