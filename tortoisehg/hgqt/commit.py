@@ -207,7 +207,7 @@ class CommitWidget(QWidget):
         hbox.addWidget(tbar)
 
         self.recentMessagesButton = QToolButton(
-            text=_('Copy message'), 
+            text=_('Copy message'),
             popupMode=QToolButton.InstantPopup,
             statusTip=_('Copy one of the recent commit messages'))
         tbar.addWidget(self.recentMessagesButton)
@@ -218,7 +218,7 @@ class CommitWidget(QWidget):
         self.branchop = None
 
         tbar.addAction(_('Options')).triggered.connect(self.details)
-        
+
         hbox.addStretch(1)
 
         vbox.addLayout(hbox, 0)
@@ -377,10 +377,10 @@ class CommitWidget(QWidget):
         m = QMenu()
         for s in self.msghistory:
             title = s.split('\n', 1)[0][:70]
-            def overwriteMsg(newMsg): return lambda: self.msgSelected(newMsg) 
+            def overwriteMsg(newMsg): return lambda: self.msgSelected(newMsg)
             m.addAction(title).triggered.connect(overwriteMsg(s))
         self.recentMessagesButton.setMenu(m)
-         
+
     def getMessage(self):
         text = self.msgte.text()
         try:
