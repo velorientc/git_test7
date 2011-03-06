@@ -21,7 +21,6 @@ keep = i18n.keepgettext()
 class BookmarkDialog(QDialog):
     showMessage = pyqtSignal(QString)
     output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
     def __init__(self, repo, rev, parent):
@@ -96,7 +95,6 @@ class BookmarkDialog(QDialog):
         self.cmd = cmdui.Runner(False, self)
         self.cmd.output.connect(self.output)
         self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.progress.connect(self.progress)
         self.cmd.commandFinished.connect(self.commandFinished)
 
         # prepare to show

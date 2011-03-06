@@ -1202,7 +1202,6 @@ class RepoWidget(QWidget):
         dlg.showMessage.connect(self.showMessage)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.progress.connect(self.progress)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
