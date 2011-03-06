@@ -122,7 +122,7 @@ class RepoTreeView(QTreeView):
         for name, desc, icon, tip, key, cb in self._action_defs():
             act = self._actions[name]
             if icon:
-                act.setIcon(qtlib.geticon(icon))
+                act.setIcon(qtlib.getmenuicon(icon))
             if tip:
                 act.setStatusTip(tip)
             if key:
