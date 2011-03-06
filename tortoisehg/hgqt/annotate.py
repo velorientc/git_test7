@@ -304,6 +304,7 @@ class _AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
     def __init__(self, parent=None):
         super(_AnnotateThread, self).__init__(parent)
+        self._threadid = None
 
     @pyqtSlot(object)
     def start(self, fctx):
@@ -313,10 +314,12 @@ class _AnnotateThread(QThread):
 
     @pyqtSlot()
     def abort(self):
+        if self._threadid is None:
+            return
         try:
             thread2._async_raise(self._threadid, KeyboardInterrupt)
             self.wait()
-        except (AttributeError, ValueError):
+        except ValueError:
             pass
 
     def run(self):
@@ -330,7 +333,7 @@ class _AnnotateThread(QThread):
         except KeyboardInterrupt:
             pass
         finally:
-            del self._threadid
+            self._threadid = None
             del self._fctx
 
 class AnnotateDialog(QMainWindow):
