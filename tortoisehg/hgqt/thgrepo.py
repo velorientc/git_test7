@@ -597,3 +597,15 @@ def recursiveMergeStatus(repo):
                     yield root, file, status
     except (EnvironmentError, error.Abort, error.RepoError):
         pass
+
+def relatedRepositories(repoid):
+    'Yields root paths for local related repositories'
+    from tortoisehg.hgqt import reporegistry, repotreemodel
+    f = QFile(reporegistry.settingsfilename())
+    f.open(QIODevice.ReadOnly)
+    try:
+        for e in repotreemodel.iterRepoItemFromXml(f):
+            if e.basenode() == repoid:
+                yield e.rootpath(), e.shortname()
+    finally:
+        f.close()
