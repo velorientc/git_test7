@@ -265,7 +265,6 @@ def runcommand(ui, args):
                 path, bundle = s
             cmdoptions['bundle'] = os.path.abspath(bundle)
         path = ui.expandpath(path)
-        cmdoptions['repository'] = path
         os.chdir(path)
     if options['fork']:
         cmdoptions['fork'] = True
@@ -273,6 +272,7 @@ def runcommand(ui, args):
         cmdoptions['nofork'] = True
     path = paths.find_root(os.getcwd())
     if path:
+        cmdoptions['repository'] = path
         try:
             lui = ui.copy()
             lui.readconfig(os.path.join(path, ".hg", "hgrc"))
@@ -289,11 +289,9 @@ def runcommand(ui, args):
     if options['quiet']:
         ui.quiet = True
 
-    if cmd not in nonrepo_commands.split():
-        if not path:
-            raise error.RepoError(_("There is no Mercurial repository here"
-                                    " (.hg not found)"))
-        options['root'] = path
+    if cmd not in nonrepo_commands.split() and not path:
+        error.RepoError(_("There is no Mercurial repository here"
+                          " (.hg not found)"))
 
     cmdoptions['mainapp'] = True
     d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
@@ -457,13 +455,13 @@ class _QtRunner(QObject):
             qtlib.initfontcache(ui)
             self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
-            if 'root' in opts:
+            if 'repository' in opts:
                 try:
                     # Ensure we can open the repository before opening any
                     # dialog windows.  Since thgrepo instances are cached, this
                     # is not wasted.
                     from tortoisehg.hgqt import thgrepo
-                    repo = thgrepo.repository(lui, opts['root'])
+                    repo = thgrepo.repository(ui, opts['repository'])
                 except error.RepoError, e:
                     qtlib.WarningMsgBox(_('Repository Error'),
                                         hglib.tounicode(str(e)))
