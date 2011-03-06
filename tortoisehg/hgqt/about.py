@@ -176,14 +176,14 @@ class AboutUpdateThread(QThread):
                 if platform == p:
                     upgradeurl = _url.strip()
                     break
-        except:
+        except (OSError, IndexError, ImportError):
             pass
         try:
             thgv = version.version()
             if '+' in thgv:
                 thgv = thgv[:thgv.index('+')]
             curver = tuple([int(p) for p in thgv.split('.')])
-        except Exception:
+        except ValueError:
             curver = (0,0,0)
         if newver > curver:
             url_lbl = _('A new version of TortoiseHg is ready for download!')
