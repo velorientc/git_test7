@@ -171,27 +171,27 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.lineEdit().setText(query)
 
     def loadSettings(self, s):
-        self.entrydlg.restoreGeometry(s.value('revset/geom').toByteArray())
-        self.revsethist = list(s.value('revset-queries').toStringList())
-        self.filtercb.setChecked(s.value('revset-filter', True).toBool())
+        repoid = str(self._repo[0])
+        self.entrydlg.restoreGeometry(s.value('revset/' + repoid + '/geom').toByteArray())
+        self.revsethist = list(s.value('revset/' + repoid + '/queries').toStringList())
+        self.filtercb.setChecked(s.value('revset/' + repoid + '/filter', True).toBool())
         full = self.revsethist + list(_permanent_queries)
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
 
         # Show the filter bar if necessary
-        repoid = str(self._repo[0])
-        if s.value('revset-showrepofilterbar-'+repoid).toBool():
+        if s.value('revset/' + repoid + '/showrepofilterbar').toBool():
             self.show()
         else:
             self.hide()
 
     def saveSettings(self, s):
-        s.setValue('revset/geom', self.entrydlg.saveGeometry())
-        s.setValue('revset-queries', self.revsethist)
-        s.setValue('revset-filter', self.filtercb.isChecked())
         repoid = str(self._repo[0])
-        s.setValue('revset-showrepofilterbar-'+repoid, not self.isHidden())
+        s.setValue('revset/' + repoid + '/geom', self.entrydlg.saveGeometry())
+        s.setValue('revset/' + repoid + '/queries', self.revsethist)
+        s.setValue('revset/' + repoid + '/filter', self.filtercb.isChecked())
+        s.setValue('revset/' + repoid + '/showrepofilterbar', not self.isHidden())
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
