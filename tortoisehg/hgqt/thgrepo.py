@@ -131,6 +131,7 @@ class ThgRepoWrapper(QObject):
     def _getrepomtime(self):
         'Return the last modification time for the repo'
         watchedfiles = [self.repo.sjoin('00changelog.i')]
+        watchedfiles.append(self.repo.join('localtags'))
         watchedfiles.append(self.repo.join('bookmarks'))
         watchedfiles.append(self.repo.join('bookmarks.current'))
         if hasattr(self.repo, 'mq'):
