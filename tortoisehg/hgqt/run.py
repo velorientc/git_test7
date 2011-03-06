@@ -293,15 +293,7 @@ def runcommand(ui, args):
         if not path:
             raise error.RepoError(_("There is no Mercurial repository here"
                                     " (.hg not found)"))
-        try:
-            # Ensure we can open the repository before opening any dialog
-            # windows.  Since thgrepo instances are cached, this is not wasted.
-            from tortoisehg.hgqt import thgrepo
-            repo = thgrepo.repository(lui, path)
-        except error.RepoError, e:
-            qtlib.WarningMsgBox(_('Repository Error'),
-                                hglib.tounicode(str(e)))
-            raise
+        options['root'] = path
 
     cmdoptions['mainapp'] = True
     d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
@@ -464,6 +456,18 @@ class _QtRunner(QObject):
             qtlib.configstyles(ui)
             qtlib.initfontcache(ui)
             self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
+
+            if 'root' in opts:
+                try:
+                    # Ensure we can open the repository before opening any
+                    # dialog windows.  Since thgrepo instances are cached, this
+                    # is not wasted.
+                    from tortoisehg.hgqt import thgrepo
+                    repo = thgrepo.repository(lui, opts['root'])
+                except error.RepoError, e:
+                    qtlib.WarningMsgBox(_('Repository Error'),
+                                        hglib.tounicode(str(e)))
+                    return
             dlg = dlgfunc(ui, *args, **opts)
             if dlg:
                 dlg.show()
