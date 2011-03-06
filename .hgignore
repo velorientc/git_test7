@@ -40,3 +40,4 @@ tortoisehg/util/__version__.py
 *.wixobj
 tortoisehg/hgqt/*_rc.py
 tortoisehg/hgqt/*_ui.py
+thgw
