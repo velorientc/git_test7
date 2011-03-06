@@ -62,7 +62,7 @@ copy if it has been selected on the right.
 
 
 Patch Panes
-===========
+-----------
 
 The right and the left patch panes are identical save for the working
 copy changes are only available on the left.  Selectable chunks are only
@@ -92,7 +92,7 @@ menu of commands.
 		working copy files.
 
 Trashcan
-========
+--------
 
 The shelve tool is very conservative with your source and patch files.
 Before it modifies any file it makes a backup under
