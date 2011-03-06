@@ -100,6 +100,7 @@ class AboutDialog(QDialog):
 
         # Spawn it later, so that the dialog gets visible quickly.
         QTimer.singleShot(0, self.getUpdateInfo)
+        self._newverreply = None
 
     def getVersionInfo(self):
         def make_version(tuple):
@@ -119,58 +120,15 @@ class AboutDialog(QDialog):
 
     @pyqtSlot()
     def getUpdateInfo(self):
-        self.uthread = AboutUpdateThread(self)
-        self.uthread.finished.connect(self.uFinished)
-        self.uthread.start()
-
-    def uFinished(self):
-        urldata = self.uthread.urldata
-        if urldata:
-            self.download_url_lbl.setText(urldata)
-
-    def showLicense(self):
-        from tortoisehg.hgqt import license
-        ld = license.LicenseDialog(self)
-        ld.show()
-
-    def closeEvent(self, event):
-        if self.uthread:
-            self.uthread.abort()
-        self._writesettings()
-        super(AboutDialog, self).closeEvent(event)
-
-    def _readsettings(self):
-        s = QSettings()
-        self.restoreGeometry(s.value('about/geom').toByteArray())
-
-    def _writesettings(self):
-        s = QSettings()
-        s.setValue('about/geom', self.saveGeometry())
-
-
-class AboutUpdateThread(QObject):
-    'Background thread for getting update info'
-    finished = pyqtSignal()
-
-    def __init__(self, parent=None):
-        super(AboutUpdateThread, self).__init__(parent)
+        verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
         # If we use QNetworkAcessManager elsewhere, it should be shared
         # through the application.
         self._netmanager = QNetworkAccessManager(self)
-
-    urldata = ''
-
-    def start(self):
-        verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
         self._newverreply = self._netmanager.get(QNetworkRequest(QUrl(verurl)))
-        self._newverreply.finished.connect(self._handlenewverreply)
-
-    def abort(self):
-        if self._newverreply:
-            self._newverreply.abort()
+        self._newverreply.finished.connect(self.uFinished)
 
     @pyqtSlot()
-    def _handlenewverreply(self):
+    def uFinished(self):
         newver = (0,0,0)
         try:
             f = self._newverreply.readAll().data().splitlines()
@@ -199,9 +157,27 @@ class AboutUpdateThread(QObject):
             curver = (0,0,0)
         if newver > curver:
             url_lbl = _('A new version of TortoiseHg is ready for download!')
-            self.urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
-        self.finished.emit()
+            urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
+            self.download_url_lbl.setText(urldata)
 
+    def showLicense(self):
+        from tortoisehg.hgqt import license
+        ld = license.LicenseDialog(self)
+        ld.show()
+
+    def closeEvent(self, event):
+        if self._newverreply:
+            self._newverreply.abort()
+        self._writesettings()
+        super(AboutDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('about/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('about/geom', self.saveGeometry())
 
 def run(ui, *pats, **opts):
     return AboutDialog()
