@@ -48,7 +48,7 @@ class BookmarkDialog(QDialog):
         form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
         box.addLayout(form)
 
-        form.addRow(_('Revision:'), QLabel(str(rev)))
+        form.addRow(_('Revision:'), QLabel('%d (%s)' % (rev, repo[rev])))
 
         ### bookmark combo
         self.bookmarkCombo = QComboBox()
