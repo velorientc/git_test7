@@ -13,14 +13,13 @@ TortoiseHg About dialog - PyQt4 version
 
 import sys
 
-from mercurial import ui, url
-
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import version, hglib, paths
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 
 class AboutDialog(QDialog):
     """Dialog for showing info about TortoiseHg"""
@@ -120,14 +119,12 @@ class AboutDialog(QDialog):
 
     @pyqtSlot()
     def getUpdateInfo(self):
-        self.uthread = AboutUpdateThread()
+        self.uthread = AboutUpdateThread(self)
         self.uthread.finished.connect(self.uFinished)
         self.uthread.start()
 
     def uFinished(self):
-        self.uthread.wait()
         urldata = self.uthread.urldata
-        self.uthread = None
         if urldata:
             self.download_url_lbl.setText(urldata)
 
@@ -138,7 +135,7 @@ class AboutDialog(QDialog):
 
     def closeEvent(self, event):
         if self.uthread:
-            self.uthread.wait()
+            self.uthread.abort()
         self._writesettings()
         super(AboutDialog, self).closeEvent(event)
 
@@ -151,19 +148,34 @@ class AboutDialog(QDialog):
         s.setValue('about/geom', self.saveGeometry())
 
 
-class AboutUpdateThread(QThread):
+class AboutUpdateThread(QObject):
     'Background thread for getting update info'
-    def __init__(self):
-        super(AboutUpdateThread, self).__init__()
+    finished = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super(AboutUpdateThread, self).__init__(parent)
+        # If we use QNetworkAcessManager elsewhere, it should be shared
+        # through the application.
+        self._netmanager = QNetworkAccessManager(self)
 
     urldata = ''
 
-    def run(self):
+    def start(self):
         verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
+        self._newverreply = self._netmanager.get(QNetworkRequest(QUrl(verurl)))
+        self._newverreply.finished.connect(self._handlenewverreply)
+
+    def abort(self):
+        if self._newverreply:
+            self._newverreply.abort()
+
+    @pyqtSlot()
+    def _handlenewverreply(self):
         newver = (0,0,0)
-        opener = url.opener(ui.ui())
         try:
-            f = opener.open(verurl).read().splitlines()
+            f = self._newverreply.readAll().data().splitlines()
+            self._newverreply.close()
+            self._newverreply = None
             newver = tuple([int(p) for p in f[0].split('.')])
             upgradeurl = f[1] # generic download URL
             platform = sys.platform
@@ -176,7 +188,7 @@ class AboutUpdateThread(QThread):
                 if platform == p:
                     upgradeurl = _url.strip()
                     break
-        except (OSError, IndexError, ImportError):
+        except (IndexError, ImportError):
             pass
         try:
             thgv = version.version()
@@ -188,6 +200,7 @@ class AboutUpdateThread(QThread):
         if newver > curver:
             url_lbl = _('A new version of TortoiseHg is ready for download!')
             self.urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
+        self.finished.emit()
 
 
 def run(ui, *pats, **opts):
