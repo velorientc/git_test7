@@ -179,10 +179,19 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
 
+        # Show the filter bar if necessary
+        repoid = str(self._repo[0])
+        if s.value('revset-showrepofilterbar-'+repoid).toBool():
+            self.show()
+        else:
+            self.hide()
+
     def saveSettings(self, s):
         s.setValue('revset/geom', self.entrydlg.saveGeometry())
         s.setValue('revset-queries', self.revsethist)
         s.setValue('revset-filter', self.filtercb.isChecked())
+        repoid = str(self._repo[0])
+        s.setValue('revset-showrepofilterbar-'+repoid, not self.isHidden())
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
