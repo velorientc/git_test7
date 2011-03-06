@@ -421,15 +421,13 @@ class WctxFileTree(QTreeView):
         urls = []
         for index in self.selectedRows():
             path = self.model().getRow(index)[COL_PATH]
-            u = QUrl()
-            u.setPath('file://' + os.path.join(self.repo.root, path))
-            urls.append(u)
+            urls.append(QUrl.fromLocalFile(self.repo.wjoin(path)))
         if urls:
-            d = QDrag(self)
-            m = QMimeData()
-            m.setUrls(urls)
-            d.setMimeData(m)
-            d.start(Qt.CopyAction)
+            drag = QDrag(self)
+            data = QMimeData()
+            data.setUrls(urls)
+            drag.setMimeData(data)
+            drag.start(Qt.CopyAction)
 
     def mousePressEvent(self, event):
         self.pressPos = event.pos()
