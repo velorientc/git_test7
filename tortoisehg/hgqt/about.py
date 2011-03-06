@@ -11,13 +11,13 @@
 TortoiseHg About dialog - PyQt4 version
 """
 
-import os, sys, urllib2
+import sys
 
 from mercurial import ui, url
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.util import version, hglib, shlib, paths
+from tortoisehg.util import version, hglib, paths
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -183,7 +183,7 @@ class AboutUpdateThread(QThread):
             if '+' in thgv:
                 thgv = thgv[:thgv.index('+')]
             curver = tuple([int(p) for p in thgv.split('.')])
-        except Exception, e:
+        except Exception:
             curver = (0,0,0)
         if newver > curver:
             url_lbl = _('A new version of TortoiseHg is ready for download!')
