@@ -118,7 +118,9 @@ class RevisionSetQuery(QDialog):
         QDialog.__init__(self, parent)
 
         self.repo = repo
-        self.setWindowTitle(_('Revision Set Query'))
+        # Since the revset dialot belongs to a repository, we display
+        # the repository name in the dialog title
+        self.setWindowTitle(_('Revision Set Query') + ' - ' + repo.displayname)
         self.setWindowFlags(Qt.Window)
 
         layout = QVBoxLayout()
@@ -242,7 +244,7 @@ class RevisionSetQuery(QDialog):
                 bopen = sel.indexOf('(')
                 bclose = sel.lastIndexOf(')')
                 if bopen < bclose:
-                    self.entry.setSelection(lineFrom, start+bopen+1, 
+                    self.entry.setSelection(lineFrom, start+bopen+1,
                                             lineFrom, start+bclose)
                     self.entry.setFocus()
                     return
@@ -290,7 +292,7 @@ class RevisionSetQuery(QDialog):
                     end = end+1
                 bopen = itext.indexOf('(')
                 newtext = text[:start] + itext[:bopen+1] + text[start:end] + \
-                          ')' + text[end:] 
+                          ')' + text[end:]
                 self.entry.setText(newtext)
                 self.entry.setSelection(line, start, line, end+bopen+2)
         self.entry.endUndoAction()
