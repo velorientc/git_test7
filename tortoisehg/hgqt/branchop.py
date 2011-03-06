@@ -29,8 +29,13 @@ class BranchOpDialog(QDialog):
             lbl = QLabel('<b>'+_('Select branch of merge commit')+'</b>')
             layout.addWidget(lbl)
             branchCombo = QComboBox()
-            for p in wctx.parents():
-                branchCombo.addItem(hglib.tounicode(p.branch()))
+            # If both parents belong to the same branch, do not duplicate the
+            # branch name in the branch select combo
+            branchlist = [p.branch() for p in wctx.parents()]
+            if branchlist[0] == branchlist[1]:
+                branchlist = [branchlist[0]]
+            for b in branchlist:
+                branchCombo.addItem(hglib.tounicode(b))
             layout.addWidget(branchCombo)
         else:
             text = '<b>'+_('Changes take effect on next commit')+'</b>'
