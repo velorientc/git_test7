@@ -22,7 +22,6 @@ keep = i18n.keepgettext()
 
 class TagDialog(QDialog):
 
-    localTagChanged = pyqtSignal()
     showMessage = pyqtSignal(unicode)
 
     def __init__(self, repo, tag='', rev='tip', parent=None, opts={}):
@@ -265,8 +264,6 @@ class TagDialog(QDialog):
             self.repo.incrementBusyCount()
             self.repo.tag(namelocal, node, message, local, None, None)
             self.repo.decrementBusyCount()
-            if local:
-                self.localTagChanged.emit()
 
             # update UI
             self.set_status(_("Tag '%s' has been added") % name, True)
@@ -310,8 +307,6 @@ class TagDialog(QDialog):
             node = self.repo[-1].node()
             self.repo.tag(namelocal, node, message, local, None, None)
             self.repo.decrementBusyCount()
-            if local:
-                self.localTagChanged.emit()
 
             # update UI
             self.set_status(_("Tag '%s' has been removed") % name, True)

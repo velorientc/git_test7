@@ -1193,7 +1193,6 @@ class RepoWidget(QWidget):
 
     def tagToRevision(self):
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
-        dlg.localTagChanged.connect(self.refresh)
         dlg.showMessage.connect(self.showMessage)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
