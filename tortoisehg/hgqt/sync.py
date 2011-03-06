@@ -19,8 +19,7 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, \
-                            reporegistry, repotreemodel
+from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
 
 _schemes = ['local', 'ssh', 'http', 'https']
 
@@ -344,26 +343,23 @@ class SyncWidget(QWidget):
         known = set(self.paths.values())
         known.add(self.repo.root)
         related = {}
-        repoid = self.repo[0].node()
-        f = QFile(reporegistry.settingsfilename())
-        f.open(QIODevice.ReadOnly)
-        try:
-            for e in repotreemodel.iterRepoItemFromXml(f):
-                if e.basenode() != repoid:
-                    continue
-                try:
-                    repo = thgrepo.repository(path=e.rootpath())
-                except error.RepoError:
-                    continue
-                if repo.root not in known:
-                    related[repo.root] = repo.shortname
-                    known.add(repo.root)
-                for alias, path in repo.ui.configitems('paths'):
-                    if path not in known:
-                        related[path] = alias
-                        known.add(path)
-        finally:
-            f.close()
+        for root, shortname in thgrepo.relatedRepositories(self.repo[0].node()):
+            if root not in known:
+                related[root] = shortname
+                known.add(root)
+            if root in thgrepo._repocache:
+                # repositories already opened keep their ui instances in sync
+                repo = thgrepo._repocache[root]
+                ui = repo.ui
+            else:
+                # directly read the repository's configuration file
+                tempui = self.repo.ui.copy()
+                tempui.readconfig(os.path.join(root, '.hg', 'hgrc'))
+                ui = tempui
+            for alias, path in ui.configitems('paths'):
+                if path not in known:
+                    related[path] = alias
+                    known.add(path)
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
