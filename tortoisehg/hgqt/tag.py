@@ -5,10 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
-from mercurial import error, util
-
 from tortoisehg.util import hglib, i18n
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui
