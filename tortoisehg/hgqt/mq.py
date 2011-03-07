@@ -354,7 +354,7 @@ class MQWidget(QWidget):
         new, ok = QInputDialog.getText(self,
                       _('Configure guards'),
                       _('Input new guards for %s:') % hglib.tounicode(patch),
-                      text=uguards, flags=Qt.Sheet)
+                      text=uguards)
         if not ok or new == uguards:
             return
         guards = []
