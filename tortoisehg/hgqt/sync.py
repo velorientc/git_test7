@@ -1041,8 +1041,13 @@ class SecureDialog(QDialog):
         super(SecureDialog, self).__init__(parent)
 
         def genfingerprint():
-            pem = ssl.get_server_certificate( (host, 443) )
-            der = ssl.PEM_cert_to_DER_cert(pem)
+            try:
+                pem = ssl.get_server_certificate( (host, 443) )
+                der = ssl.PEM_cert_to_DER_cert(pem)
+            except Exception, e:
+                qtlib.WarningMsgBox(_('Certificate Query Error'),
+                                    hglib.tounicode(str(e)), parent=self)
+                return
             hash = util.sha1(der).hexdigest()
             pretty = ":".join([hash[x:x + 2] for x in xrange(0, len(hash), 2)])
             le.setText(pretty)
