@@ -954,7 +954,7 @@ class RepoWidget(QWidget):
         entry(menu)
 
         submenu = menu.addMenu(_('Export'))
-        entry(submenu, None, isrev, _('Export patch'), 'hg-export',
+        entry(submenu, None, isrev, _('Export patch...'), 'hg-export',
               self.exportRevisions)
         entry(submenu, None, isrev, _('Email patch...'), 'mail-forward',
               self.emailRevision)
@@ -1051,9 +1051,9 @@ class RepoWidget(QWidget):
         menu = QMenu(self)
         for name, cb, icon in (
                 (_('Visual Diff...'), diffPair, 'visualdiff'),
-                (_('Export Selected'), exportPair, 'hg-export'),
+                (_('Export Selected...'), exportPair, 'hg-export'),
                 (_('Email Selected...'), emailPair, 'mail-forward'),
-                (_('Export DAG Range'), exportDagRange, 'hg-export'),
+                (_('Export DAG Range...'), exportDagRange, 'hg-export'),
                 (_('Email DAG Range...'), emailDagRange, 'mail-forward'),
                 (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad'),
                 (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good'),
@@ -1126,7 +1126,7 @@ class RepoWidget(QWidget):
             run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
         menu = QMenu(self)
         for name, cb, icon in (
-                (_('Export Selected'), exportSel, 'hg-export'),
+                (_('Export Selected...'), exportSel, 'hg-export'),
                 (_('Email Selected...'), emailSel, 'mail-forward'),
                 ):
             a = QAction(name, self)
@@ -1156,7 +1156,12 @@ class RepoWidget(QWidget):
     def exportRevisions(self, revisions):
         if not revisions:
             revisions = [self.rev]
-        epath = os.path.join(self.repo.root, self.repo.shortname + '_%r.patch')
+        dir = QFileDialog.getExistingDirectory(self, _('Export patch'),
+                                               hglib.tounicode(self.repo.root))
+        if not dir:
+            return
+        epath = os.path.join(hglib.fromunicode(dir),
+                             self.repo.shortname + '_%r.patch')
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
                    '--output', epath]
         for rev in revisions:
