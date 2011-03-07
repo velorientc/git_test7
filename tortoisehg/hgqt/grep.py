@@ -528,9 +528,7 @@ class MatchTree(QTableView):
             else:
                 base = self.repo.root
             for p in paths:
-                u = QUrl()
-                u.setPath('file://' + os.path.join(base, path))
-                urls.append(u)
+                urls.append(QUrl.fromLocalFile(os.path.join(base, path)))
         if urls:
             d = QDrag(self)
             m = QMimeData()
