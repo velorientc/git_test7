@@ -5,9 +5,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from tortoisehg.util import hglib, i18n
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.hgqt import qtlib, cmdui, i18n
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -251,9 +251,8 @@ class TagDialog(QDialog):
                 ctx = self.repo[self.rev]
                 msgset = keep._('Added tag %s for changeset %s')
                 message = (english and msgset['id'] or msgset['str']) \
-                           % (tag, str(ctx))
-            if not isinstance(message, str):
-                message = hglib.fromunicode(message)
+                           % (tagu, str(ctx))
+            message = hglib.fromunicode(message)
 
         def finished():
             if exists:
@@ -302,9 +301,8 @@ class TagDialog(QDialog):
                 return
             if not message:
                 msgset = keep._('Removed tag %s')
-                message = (english and msgset['id'] or msgset['str']) % tag
-            if not isinstance(message, str):
-                message = hglib.fromunicode(message)
+                message = (english and msgset['id'] or msgset['str']) % tagu
+            message = hglib.fromunicode(message)
 
         def finished():
             self.set_status(_("Tag '%s' has been removed") % tagu, True)
