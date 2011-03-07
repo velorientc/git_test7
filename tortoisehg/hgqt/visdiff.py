@@ -288,7 +288,7 @@ def visualdiff(ui, repo, pats, opts):
 
         # If more than one file, diff on working dir copy.
         copyworkingdir = len(MAR) > 1
-        dirs, labels, fns_and_mtimes = snapshotset(repo, ctxs, sa, sb, cpy, 
+        dirs, labels, fns_and_mtimes = snapshotset(repo, ctxs, sa, sb, cpy,
                                                    copyworkingdir)
         dir1a, dir1b, dir2 = dirs
         label1a, label1b, label2 = labels
@@ -381,7 +381,7 @@ class FileSelectionDialog(QDialog):
         self.copies = cpy
         self.ui = repo.ui
 
-        layout = QVBoxLayout() 
+        layout = QVBoxLayout()
         self.setLayout(layout)
 
         lbl = QLabel(_('Temporary files are removed when this dialog'
@@ -399,7 +399,7 @@ class FileSelectionDialog(QDialog):
         self.tools = tools
 
         if len(tools) > 1:
-            hbox = QHBoxLayout() 
+            hbox = QHBoxLayout()
             combo = QComboBox()
             lbl = QLabel(_('Select Tool:'))
             lbl.setBuddy(combo)
