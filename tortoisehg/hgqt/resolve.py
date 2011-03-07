@@ -331,9 +331,7 @@ class PathsTree(QTreeView):
         urls = []
         for index in self.selectionModel().selectedRows():
             root, path = self.model().getPathForIndex(index)
-            u = QUrl()
-            u.setPath('file://' + os.path.join(root, path))
-            urls.append(u)
+            urls.append(QUrl.fromLocalFile(os.path.join(root, path)))
         if urls:
             d = QDrag(self)
             m = QMimeData()
