@@ -649,17 +649,18 @@ class SyncWidget(QWidget):
 
     def inclicked(self):
         url = self.currentUrl(True)
-        self.showMessage.emit(_('Getting incoming changesets from %s...') % url)
+        urlu = hglib.tounicode(url)
+        self.showMessage.emit(_('Getting incoming changesets from %s...') % urlu)
         if self.embedded and not url.startswith('p4://') and \
            not self.opts.get('subrepos'):
             def finished(ret, output):
                 if ret == 0 and os.path.exists(bfile):
-                    self.showMessage.emit(_('Found incoming changesets from %s') % url)
-                    self.incomingBundle.emit(bfile)
+                    self.showMessage.emit(_('Found incoming changesets from %s') % urlu)
+                    self.incomingBundle.emit(hglib.tounicode(bfile))
                 elif ret == 1:
-                    self.showMessage.emit(_('No incoming changesets from %s') % url)
+                    self.showMessage.emit(_('No incoming changesets from %s') % urlu)
                 else:
-                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (url, ret))
+                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (urlu, ret))
             bfile = url
             for badchar in (':', '*', '\\', '?', '#'):
                 bfile = bfile.replace(badchar, '')
@@ -672,22 +673,23 @@ class SyncWidget(QWidget):
         else:
             def finished(ret, output):
                 if ret == 0:
-                    self.showMessage.emit(_('Found incoming changesets from %s') % url)
+                    self.showMessage.emit(_('Found incoming changesets from %s') % urlu)
                 elif ret == 1:
-                    self.showMessage.emit(_('No incoming changesets from %s') % url)
+                    self.showMessage.emit(_('No incoming changesets from %s') % urlu)
                 else:
-                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (url, ret))
+                    self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (urlu, ret))
             self.finishfunc = finished
             cmdline = ['--repository', self.repo.root, 'incoming']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def pullclicked(self):
         url = self.currentUrl(True)
+        urlu = hglib.tounicode(url)
         def finished(ret, output):
             if ret == 0:
-                self.showMessage.emit(_('Pull from %s completed') % url)
+                self.showMessage.emit(_('Pull from %s completed') % urlu)
             else:
-                self.showMessage.emit(_('Pull from %s aborted, ret %d') % (url, ret))
+                self.showMessage.emit(_('Pull from %s aborted, ret %d') % (urlu, ret))
             # handle file conflicts during rebase
             if os.path.exists(self.repo.join('rebasestate')):
                 dlg = rebase.RebaseDialog(self.repo, self)
@@ -704,7 +706,7 @@ class SyncWidget(QWidget):
                     dlg.exec_()
                     return
         self.finishfunc = finished
-        self.showMessage.emit(_('Pulling from %s...') % url)
+        self.showMessage.emit(_('Pulling from %s...') % urlu)
         cmdline = ['--repository', self.repo.root, 'pull', '--verbose']
         uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve') \
             and 'ui.merge=internal:merge' or 'ui.merge=internal:fail'
@@ -718,18 +720,19 @@ class SyncWidget(QWidget):
 
     def outclicked(self):
         url = self.currentUrl(True)
-        self.showMessage.emit(_('Finding outgoing changesets to %s...') % url)
+        urlu = hglib.tounicode(url)
+        self.showMessage.emit(_('Finding outgoing changesets to %s...') % urlu)
         if self.embedded and not self.opts.get('subrepos'):
             def outputnodes(ret, data):
                 if ret == 0:
                     nodes = [n for n in data.splitlines() if len(n) == 40]
                     self.outgoingNodes.emit(nodes)
                     self.showMessage.emit(_('%d outgoing changesets to %s') %
-                                          (len(nodes), url))
+                                          (len(nodes), urlu))
                 elif ret == 1:
-                    self.showMessage.emit(_('No outgoing changesets to %s') % url)
+                    self.showMessage.emit(_('No outgoing changesets to %s') % urlu)
                 else:
-                    self.showMessage.emit(_('Outgoing to %s aborted, ret %d') % (url, ret))
+                    self.showMessage.emit(_('Outgoing to %s aborted, ret %d') % (urlu, ret))
             self.finishfunc = outputnodes
             cmdline = ['--repository', self.repo.root, 'outgoing', '--quiet',
                        '--template', '{node}\n']
@@ -784,20 +787,21 @@ class SyncWidget(QWidget):
 
     def pushclicked(self):
         url = self.currentUrl(True)
+        urlu = hglib.tounicode(url)
         if not hg.islocal(self.currentUrl(False)):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
-                                     % url)
+                                     % urlu)
             if not r:
-                self.showMessage.emit(_('Push to %s aborted') % url)
+                self.showMessage.emit(_('Push to %s aborted') % urlu)
                 return
 
-        self.showMessage.emit(_('Pushing to %s...') % url)
+        self.showMessage.emit(_('Pushing to %s...') % urlu)
         def finished(ret, output):
             if ret == 0:
-                self.showMessage.emit(_('Push to %s completed') % url)
+                self.showMessage.emit(_('Push to %s completed') % urlu)
             else:
-                self.showMessage.emit(_('Push to %s aborted, ret %d') % (url, ret))
+                self.showMessage.emit(_('Push to %s aborted, ret %d') % (urlu, ret))
         self.finishfunc = finished
         cmdline = ['--repository', self.repo.root, 'push']
         self.run(cmdline, ('force', 'new-branch', 'branch', 'rev'))
