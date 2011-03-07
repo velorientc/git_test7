@@ -297,9 +297,7 @@ class HgFileListView(QTableView):
             base, _ = visdiff.snapshot(ctx._repo, paths, ctx)
         urls = []
         for path in paths:
-            u = QUrl()
-            u.setPath('file://' + os.path.join(base, path))
-            urls.append(u)
+            urls.append(QUrl.fromLocalFile(os.path.join(base, path)))
         if urls:
             d = QDrag(self)
             m = QMimeData()
