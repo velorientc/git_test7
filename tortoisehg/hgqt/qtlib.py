@@ -73,7 +73,7 @@ def loadIniFile(rcpath, parent):
             except EnvironmentError:
                 pass
         else:
-            qtlib.WarningMsgBox(_('Unable to create a config file'),
+            WarningMsgBox(_('Unable to create a config file'),
                    _('Insufficient access rights.'), parent=parent)
             return None, {}
 
