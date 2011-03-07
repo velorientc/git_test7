@@ -316,6 +316,11 @@ class TagDialog(QDialog):
         self.finishfunc = finished
         self.cmd.run(cmd)
 
+    def reject(self):
+        # prevent signals from reaching deleted objects
+        self.repo.repositoryChanged.disconnect(self.refresh)
+        super(BookmarkDialog, self).reject()
+
 def run(ui, *pats, **opts):
     kargs = {}
     tag = len(pats) > 0 and pats[0] or None

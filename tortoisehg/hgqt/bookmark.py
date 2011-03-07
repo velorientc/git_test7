@@ -223,3 +223,8 @@ class BookmarkDialog(QDialog):
                    '--rename', namelocal, newnamelocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
+
+    def reject(self):
+        # prevent signals from reaching deleted objects
+        self.repo.repositoryChanged.disconnect(self.refresh)
+        super(BookmarkDialog, self).reject()
