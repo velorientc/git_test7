@@ -13,12 +13,20 @@ import stat
 import tempfile
 import re
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
 from mercurial import extensions
 
 from tortoisehg.util import hglib, paths, wconfig
 from hgext.color import _styles
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
+if PYQT_VERSION_STR.split('.') < ['4', '7'] or \
+   QT_VERSION_STR.split('.') < ['4', '6']:
+    sys.stderr.write('TortoiseHg requires Qt 4.6 and PyQt 4.7\n')
+    sys.stderr.write('You have Qt %s and PyQt %s\n' %
+                     (QT_VERSION_STR, PYQT_VERSION_STR))
+    sys.exit()
 
 tmproot = None
 def gettempdir():
