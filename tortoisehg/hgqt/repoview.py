@@ -32,11 +32,12 @@ class HgRepoView(QTableView):
     menuRequested = pyqtSignal(QPoint, object)
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, cfgname, parent=None):
         QTableView.__init__(self, parent)
         self.repo = repo
         self.current_rev = -1
         self.resized = False
+        self.cfgname = cfgname
         self.setShowGrid(False)
 
         vh = self.verticalHeader()
@@ -121,7 +122,7 @@ class HgRepoView(QTableView):
         fontm = QFontMetrics(self.font())
         widths = [-1 for _i in xrange(model.columnCount(QModelIndex()))]
 
-        key = 'repoview/column_widths/%s' % str(self.repo[0])
+        key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
         col_widths = [int(w) for w in QSettings().value(key).toStringList()]
 
         for c in range(model.columnCount(QModelIndex())):
@@ -241,15 +242,16 @@ class HgRepoView(QTableView):
         for c in range(self.model().columnCount(QModelIndex())):
             col_widths.append(self.columnWidth(c))
 
-        key = 'repoview/column_widths/%s' % str(self.repo[0])
+        key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
         s.setValue(key, col_widths)
-        s.setValue('repoview/widget_width', self.viewport().width())
+        s.setValue('%s/widget_width' % self.cfgname, self.viewport().width())
 
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
         # is re-sized according to the total widget size.
-        widget_width = QSettings().value('repoview/widget_width').toInt()[0]
-        if self.resized and widget_width:
+        key = '%s/widget_width' % self.cfgname
+        widget_width, ok = QSettings().value(key).toInt()
+        if self.resized and ok and widget_width:
             model = self.model()
             vp_width = self.viewport().width()
             total_width = stretch_col = 0

@@ -140,7 +140,7 @@ class FileLogDialog(_AbstractFileDialog):
 
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
-        self.repoview = HgRepoView(self.repo, self.splitter)
+        self.repoview = HgRepoView(self.repo, 'fileLogDialog', self.splitter)
         self.contentframe = QFrame(self.splitter)
 
         vbox = QVBoxLayout()
@@ -277,8 +277,10 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         self.horizontalLayout = QHBoxLayout()
-        self.tableView_revisions_left = HgRepoView(self.repo, self)
-        self.tableView_revisions_right = HgRepoView(self.repo, self)
+        self.tableView_revisions_left = HgRepoView(self.repo,
+                                                   'fileDiffDialogLeft', self)
+        self.tableView_revisions_right = HgRepoView(self.repo,
+                                                    'fileDiffDialogRight', self)
         self.horizontalLayout.addWidget(self.tableView_revisions_left)
         self.horizontalLayout.addWidget(self.tableView_revisions_right)
         self.frame = QFrame()

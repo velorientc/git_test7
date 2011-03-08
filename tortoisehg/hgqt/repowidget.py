@@ -123,7 +123,7 @@ class RepoWidget(QWidget):
 
         self.layout().addWidget(self.repotabs_splitter)
 
-        self.repoview = view = HgRepoView(self.repo, self)
+        self.repoview = view = HgRepoView(self.repo, 'repoWidget', self)
         view.revisionClicked.connect(self.onRevisionClicked)
         view.revisionSelected.connect(self.onRevisionSelected)
         view.revisionAltClicked.connect(self.onRevisionSelected)
