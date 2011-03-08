@@ -229,7 +229,9 @@ class FileLogDialog(_AbstractFileDialog):
         else:
             self._show_rev = rev
 
-
+    def reload(self):
+        self.repoview.saveSettings()
+        super(FileLogDialog, self).reload()
 
 class FileDiffDialog(_AbstractFileDialog):
     """
@@ -556,3 +558,8 @@ class FileDiffDialog(_AbstractFileDialog):
             bvalue = bhi
         vbar.setValue(bvalue)
         self._invbarchanged = False
+
+    def reload(self):
+        self.tableView_revisions_left.saveSettings()
+        self.tableView_revisions_right.saveSettings()
+        super(FileDiffDialog, self).reload()
