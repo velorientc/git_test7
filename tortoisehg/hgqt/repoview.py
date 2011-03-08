@@ -251,7 +251,10 @@ class HgRepoView(QTableView):
         # is re-sized according to the total widget size.
         key = '%s/widget_width' % self.cfgname
         widget_width, ok = QSettings().value(key).toInt()
-        if self.resized and ok and widget_width:
+        if not ok:
+            widget_width = 0
+            
+        if self.resized:
             model = self.model()
             vp_width = self.viewport().width()
             total_width = stretch_col = 0
