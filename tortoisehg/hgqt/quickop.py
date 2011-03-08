@@ -21,10 +21,10 @@ LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
            'revert': (_('Checkmark files to revert'), _('Revert')),
            'remove': (_('Checkmark files to remove'), _('Remove')),}
 
-ICONS = { 'add': 'add',
-           'forget': 'remove',
+ICONS = { 'add': 'fileadd',
+           'forget': 'hg-remove',
            'revert': 'hg-revert',
-           'remove': 'remove',}
+           'remove': 'hg-remove',}
 
 class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
