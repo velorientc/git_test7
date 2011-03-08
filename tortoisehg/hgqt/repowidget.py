@@ -673,6 +673,7 @@ class RepoWidget(QWidget):
 
         self.setupModels()
         self.filterbar.refresh()
+        self.repoview.saveSettings()
 
     def reloadTaskTab(self):
         tti = self.taskTabsWidget.currentIndex()
@@ -795,6 +796,7 @@ class RepoWidget(QWidget):
         self.manifestDemand.forward('saveSettings', s, 'workbench')
         self.grepDemand.forward('saveSettings', s)
         self.filterbar.saveSettings(s)
+        self.repoview.saveSettings(s)
         return True
 
     def incoming(self):
