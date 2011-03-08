@@ -32,10 +32,12 @@ class HgRepoView(QTableView):
     menuRequested = pyqtSignal(QPoint, object)
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, cfgname, parent=None):
         QTableView.__init__(self, parent)
         self.repo = repo
         self.current_rev = -1
+        self.resized = False
+        self.cfgname = cfgname
         self.setShowGrid(False)
 
         vh = self.verticalHeader()
@@ -101,35 +103,34 @@ class HgRepoView(QTableView):
                 self.setItemDelegateForColumn(c, self.standardDelegate)
 
     def resizeColumns(self, *args):
-        # resize columns the smart way: the column holding Description
-        # is resized according to the total widget size.
         if not self.model():
             return
         hh = self.horizontalHeader()
         hh.setStretchLastSection(False)
         self._resizeColumns()
         hh.setStretchLastSection(True)
+        self.resized = True
 
     def _resizeColumns(self):
         # _resizeColumns misbehaves if called with last section streched
         for c, w in enumerate(self._columnWidthHints()):
             self.setColumnWidth(c, w)
 
-    def sizeHintForColumn(self, column):
-        return self._columnWidthHints()[column]
-
     def _columnWidthHints(self):
         """Return list of recommended widths of all columns"""
         model = self.model()
-        col1_width = self.viewport().width()
         fontm = QFontMetrics(self.font())
-        tot_stretch = 0.0
         widths = [-1 for _i in xrange(model.columnCount(QModelIndex()))]
+
+        key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
+        col_widths = [int(w) for w in QSettings().value(key).toStringList()]
+
         for c in range(model.columnCount(QModelIndex())):
-            if model._columns[c] in model._stretchs:
-                tot_stretch += model._stretchs[model._columns[c]]
-                continue
-            w = model.maxWidthValueForColumn(c)
+            if c < len(col_widths) and col_widths[c] > 0:
+                w = col_widths[c]
+            else:
+                w = model.maxWidthValueForColumn(c)
+
             if isinstance(w, int):
                 widths[c] = w
             elif w is not None:
@@ -138,12 +139,7 @@ class HgRepoView(QTableView):
             else:
                 w = super(HgRepoView, self).sizeHintForColumn(c)
                 widths[c] = w
-            col1_width -= widths[c]
-        col1_width = max(col1_width, 100)
-        for c in range(model.columnCount(QModelIndex())):
-            if model._columns[c] in model._stretchs:
-                w = model._stretchs[model._columns[c]] / tot_stretch
-                widths[c] = col1_width * w
+
         return widths
 
     def revFromindex(self, index):
@@ -237,3 +233,43 @@ class HgRepoView(QTableView):
             idx = self.model().indexFromRev(rev)
             if idx is not None:
                 self.setCurrentIndex(idx)
+
+    def saveSettings(self, s = None):
+        if not s:
+            s = QSettings()
+
+        col_widths = []
+        for c in range(self.model().columnCount(QModelIndex())):
+            col_widths.append(self.columnWidth(c))
+
+        key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
+        s.setValue(key, col_widths)
+        s.setValue('%s/widget_width' % self.cfgname, self.viewport().width())
+
+    def resizeEvent(self, e):
+        # re-size columns the smart way: the column holding Description
+        # is re-sized according to the total widget size.
+        key = '%s/widget_width' % self.cfgname
+        widget_width, ok = QSettings().value(key).toInt()
+        if not ok:
+            widget_width = 0
+            
+        if self.resized:
+            model = self.model()
+            vp_width = self.viewport().width()
+            total_width = stretch_col = 0
+
+            if vp_width != widget_width:
+                for c in range(model.columnCount(QModelIndex())):
+                    if model._columns[c] in model._stretchs:
+                        #save the description column
+                        stretch_col = c
+                    else:
+                        #total the other widths
+                        total_width += self.columnWidth(c)
+
+                width = max(vp_width - total_width, 100)
+                self.setColumnWidth(stretch_col, width)
+
+        super(HgRepoView, self).resizeEvent(e)
+

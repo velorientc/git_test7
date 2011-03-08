@@ -30,8 +30,9 @@ class QDeleteDialog(QDialog):
 
         self.setLayout(QVBoxLayout())
 
-        lbl = QLabel(_('<b>Remove patches from queue?<ul><li>%s</ul></b>') %
-                     '<li>'.join(patches))
+        msg = _('Remove patches from queue?')
+        patchesu = u'<li>'.join([hglib.tounicode(p) for p in patches])
+        lbl = QLabel(u'<b>%s<ul><li>%s</ul></b>' % (msg, patchesu))
         self.layout().addWidget(lbl)
 
         self.keepchk = QCheckBox(_('Keep patch files'))

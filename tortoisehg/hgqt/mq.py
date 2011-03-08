@@ -703,8 +703,9 @@ class MQWidget(QWidget):
                 self._refreshFileListWidget()
             except Exception, e:
                 self.showMessage.emit(hglib.tounicode(str(e)))
-                import traceback
-                traceback.print_exc()
+                if 'THGDEBUG' in os.environ:
+                    import traceback
+                    traceback.print_exc()
         finally:
             self.refreshing = False
         if self.reselectFileItem:

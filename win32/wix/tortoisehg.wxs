@@ -93,7 +93,7 @@
                   Source='dist\thg.exe'
             />
             <Environment Id="Environment" Name="PATH" Part="last" System="yes"
-                         Permanent="no" Value="[INSTALLDIR]bin" Action="set"
+                         Permanent="no" Value="[INSTALLDIR]" Action="set"
             />
           </Component>
           <Component Id='WinExecutable' Guid='$(var.ComponentWinExecutableGUID)' Win64='$(var.IsX64)'>
@@ -197,6 +197,17 @@
             />
           </Component>
 
+          <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
+            <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
+                  Source='..\contrib\TortoisePlink.exe'
+            />
+          </Component>
+          <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)' Win64='$(var.IsX64)'>
+            <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
+                  Source='..\contrib\Pageant.exe'
+            />
+          </Component>
+
           <?if $(var.Platform) = "x64" ?>
             <Component Id='KDiff3EXE' Guid='$(var.KDiff3EXE.guid)' Win64='$(var.IsX64)'>
               <File Id='KDiff3EXE' Name='kdiff3.exe' KeyPath='yes'
@@ -236,29 +247,6 @@
                             Icon="hgIcon.ico" IconIndex="0" Advertise="yes"
                   />
               </File>
-            </Component>
-          </Directory>
-
-          <Directory Id='binFolder' Name='bin'>
-            <Component Id='TortoisePlinkEXE' Guid='$(var.TortoisePlinkEXE.guid)' Win64='$(var.IsX64)'>
-              <File Id='TortoisePlinkEXE' Name='TortoisePlink.exe' KeyPath='yes'
-                    Source='..\contrib\TortoisePlink.exe'
-              />
-            </Component>
-            <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)' Win64='$(var.IsX64)'>
-              <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
-                    Source='..\contrib\Pageant.exe'
-              />
-            </Component>
-            <Component Id='ThgCmd' Guid='$(var.thgcmd.guid)' Win64='$(var.IsX64)'>
-              <File Id='Thg.Cmd' Name='thg.cmd' KeyPath='yes'
-                    Source='win32\thg.cmd'
-              />
-            </Component>
-            <Component Id='HgCmd' Guid='$(var.hgcmd.guid)' Win64='$(var.IsX64)'>
-              <File Id='Hg.Cmd' Name='hg.cmd' KeyPath='yes'
-                    Source='win32\hg.cmd'
-              />
             </Component>
           </Directory>
 
@@ -385,8 +373,6 @@
         <ComponentRef Id='helpFolder' />
         <ComponentRef Id='distOutput' />
         <ComponentRef Id='imageFormats' />
-        <ComponentRef Id='ThgCmd' />
-        <ComponentRef Id='HgCmd' />
         <ComponentGroupRef Id='templatesFolder' />
         <ComponentRef Id='Icons' />
       </Feature>

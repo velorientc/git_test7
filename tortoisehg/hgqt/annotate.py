@@ -174,7 +174,10 @@ class AnnotateView(qscilib.Scintilla):
         self._rev = ctx.rev()
         self.clear()
         self.annfile = wfile
-        self.setText(hglib.tounicode(fctx.data()))
+        if util.binary(fctx.data()):
+            self.setText(_('File is binary.\n'))
+        else:
+            self.setText(hglib.tounicode(fctx.data()))
         if line:
             self.setCursorPosition(int(line) - 1, 0)
         self._updatelexer(fctx)
@@ -187,6 +190,8 @@ class AnnotateView(qscilib.Scintilla):
             return
         ctx = self.repo[self._rev]
         fctx = ctx[hglib.fromunicode(self.annfile)]
+        if util.binary(fctx.data()):
+            return
         self._thread.abort()
         self._thread.start(fctx)
 

@@ -288,7 +288,7 @@ def visualdiff(ui, repo, pats, opts):
 
         # If more than one file, diff on working dir copy.
         copyworkingdir = len(MAR) > 1
-        dirs, labels, fns_and_mtimes = snapshotset(repo, ctxs, sa, sb, cpy, 
+        dirs, labels, fns_and_mtimes = snapshotset(repo, ctxs, sa, sb, cpy,
                                                    copyworkingdir)
         dir1a, dir1b, dir2 = dirs
         label1a, label1b, label2 = labels
@@ -358,7 +358,6 @@ class FileSelectionDialog(QDialog):
     def __init__(self, repo, pats, ctx1a, sa, ctx1b, sb, ctx2, cpy):
         'Initialize the Dialog'
         QDialog.__init__(self)
-        self.curFile = None
 
         self.setWindowIcon(qtlib.geticon('visualdiff'))
 
@@ -378,10 +377,12 @@ class FileSelectionDialog(QDialog):
         self.reponame = hglib.fromunicode(repo.displayname)
 
         self.ctxs = (ctx1a, ctx1b, ctx2)
+        self.filesets = (sa, sb)
         self.copies = cpy
-        self.ui = repo.ui
+        self.repo = repo
+        self.curFile = None
 
-        layout = QVBoxLayout() 
+        layout = QVBoxLayout()
         self.setLayout(layout)
 
         lbl = QLabel(_('Temporary files are removed when this dialog'
@@ -397,9 +398,10 @@ class FileSelectionDialog(QDialog):
         preferred = besttool(repo.ui, tools)
         self.diffpath, self.diffopts, self.mergeopts = tools[preferred]
         self.tools = tools
+        self.preferred = preferred
 
         if len(tools) > 1:
-            hbox = QHBoxLayout() 
+            hbox = QHBoxLayout()
             combo = QComboBox()
             lbl = QLabel(_('Select Tool:'))
             lbl.setBuddy(combo)
@@ -411,13 +413,10 @@ class FileSelectionDialog(QDialog):
                 if name == preferred:
                     defrow = i
             combo.setCurrentIndex(defrow)
-            patterns = repo.ui.configitems('diff-patterns')
-            patterns = [(p, t) for p,t in patterns if t in tools]
 
-            callable = lambda row: self.fileSelect(row, repo, combo,
-                                                   patterns, preferred)
-            list.currentRowChanged.connect(callable)
-            combo.currentIndexChanged['QString'].connect(self.toolSelect)
+            list.currentRowChanged.connect(self.updateToolSelection)
+            combo.currentIndexChanged['QString'].connect(self.onToolSelected)
+            self.toolCombo = combo
 
         BB = QDialogButtonBox
         bb = BB()
@@ -440,11 +439,13 @@ class FileSelectionDialog(QDialog):
 
         self.updateDiffButtons(preferred)
 
-        callable = lambda: self.fillmodel(repo, sa, sb)
         QShortcut(QKeySequence('CTRL+D'), self.list, self.activateCurrent)
-        QTimer.singleShot(0, callable)
+        QTimer.singleShot(0, self.fillmodel)
 
-    def fillmodel(self, repo, sa, sb):
+    @pyqtSlot()
+    def fillmodel(self):
+        repo = self.repo
+        sa, sb = self.filesets
         self.dirs, self.revs = snapshotset(repo, self.ctxs, sa, sb, self.copies)[:2]
 
         def get_status(file, mod, add, rem):
@@ -463,26 +464,23 @@ class FileSelectionDialog(QDialog):
             self.list.addItem(row)
 
     @pyqtSlot(QString)
-    def toolSelect(self, tool):
+    def onToolSelected(self, tool):
         'user selected a tool from the tool combo'
         tool = hglib.fromunicode(tool)
         assert tool in self.tools
         self.diffpath, self.diffopts, self.mergeopts = self.tools[tool]
         self.updateDiffButtons(tool)
 
-    def updateDiffButtons(self, tool):
-        if hasattr(self, 'p1button'):
-            d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
-            d3 = self.ui.configbool('merge-tools', tool + '.dir3diff')
-            self.p1button.setEnabled(d2)
-            self.p2button.setEnabled(d2)
-            self.p3button.setEnabled(d3)
-        elif hasattr(self, 'dbutton'):
-            d2 = self.ui.configbool('merge-tools', tool + '.dirdiff')
-            self.dbutton.setEnabled(d2)
-
-    def fileSelect(self, row, repo, combo, patterns, preferred):
+    @pyqtSlot(int)
+    def updateToolSelection(self, row):
         'user selected a file, pick an appropriate tool from combo'
+        if row == -1:
+            return
+
+        repo = self.repo
+        patterns = repo.ui.configitems('diff-patterns')
+        patterns = [(p, t) for p,t in patterns if t in tools]
+
         fname = self.list.item(row).text()[2:]
         fname = hglib.fromunicode(fname)
         if self.curFile == fname:
@@ -494,10 +492,10 @@ class FileSelectionDialog(QDialog):
                 selected = tool
                 break
         else:
-            selected = preferred
+            selected = self.preferred
         for i, name in enumerate(self.tools.iterkeys()):
             if name == selected:
-                combo.setCurrentIndex(i)
+                self.toolCombo.setCurrentIndex(i)
 
     def activateCurrent(self):
         'CTRL+D has been pressed'
@@ -508,6 +506,17 @@ class FileSelectionDialog(QDialog):
     def itemActivated(self, item):
         'A QListWidgetItem has been activated'
         self.launch(item.text()[2:])
+
+    def updateDiffButtons(self, tool):
+        if hasattr(self, 'p1button'):
+            d2 = self.repo.ui.configbool('merge-tools', tool + '.dirdiff')
+            d3 = self.repo.ui.configbool('merge-tools', tool + '.dir3diff')
+            self.p1button.setEnabled(d2)
+            self.p2button.setEnabled(d2)
+            self.p3button.setEnabled(d3)
+        elif hasattr(self, 'dbutton'):
+            d2 = self.repo.ui.configbool('merge-tools', tool + '.dirdiff')
+            self.dbutton.setEnabled(d2)
 
     def launch(self, fname):
         fname = hglib.fromunicode(fname)
