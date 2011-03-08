@@ -44,6 +44,7 @@ araxis.dirdiff=True
 araxis.dir3diff=True
 
 UltraCompare.regkey=Software\Microsoft\Windows\CurrentVersion\App Paths\UC.exe
+UltraCompare.regkeyalt=Software\Wow6432Node\Microsoft\Windows\CurrentVersion\App Paths\UC.exe
 UltraCompare.args = $base $local $other -title1 base -title3 other
 UltraCompare.priority = -2
 UltraCompare.gui = True
@@ -56,6 +57,7 @@ UltraCompare.diff3args=$parent1 $child $parent2 -title1 $plabel1 -title2 $clabel
 kdiff3.priority=-3
 kdiff3.args=--auto --L1 base --L2 parent1 --L3 parent2 $base $local $other -o $output
 kdiff3.regkey=Software\KDiff3
+kdiff3.regkeyalt=Software\Wow6432Node\KDiff3
 kdiff3.regappend=\kdiff3.exe
 kdiff3.fixeol=False
 kdiff3.premerge=False
@@ -65,6 +67,7 @@ kdiff3.diff3args=--L1 '$plabel1' --L2 '$clabel' --L3 '$plabel2' $parent1 $child 
 kdiff3.dirdiff=True
 
 diffmerge.regkey=Software\SourceGear\SourceGear DiffMerge\
+diffmerge.regkeyalt=Software\Wow6432Node\SourceGear\SourceGear DiffMerge\
 diffmerge.regname=Location
 diffmerge.priority=-7
 diffmerge.args=-nosplash -merge -title1=local -title2=merged -title3=other $local $base $other -result=$output
@@ -77,6 +80,7 @@ diffmerge.dirdiff=True
 p4merge.priority=-8
 p4merge.args=$base $local $other $output
 p4merge.regkey=Software\Perforce\Environment
+p4merge.regkeyalt=Software\Wow6432Node\Perforce\Environment
 p4merge.regname=P4INSTROOT
 p4merge.regappend=\p4merge.exe
 p4merge.gui=True
@@ -87,6 +91,7 @@ p4merge.dirdiff=False
 tortoisemerge.priority=-9
 tortoisemerge.args=/base:$base /mine:$local /theirs:$other /merged:$output
 tortoisemerge.regkey=Software\TortoiseSVN
+tortoisemerge.regkeyalt=Software\Wow6432Node\TortoiseSVN
 tortoisemerge.checkchanged=True
 tortoisemerge.gui=True
 tortoisemerge.diffargs=/base:$parent /mine:$child /basename:'$plabel1' /minename:'$clabel'
@@ -95,6 +100,7 @@ tortoisemerge.diffargs=/base:$parent /mine:$child /basename:'$plabel1' /minename
 ecmerge.priority=-10
 ecmerge.args=$base $local $other --mode=merge3 --title0=base --title1=local --title2=other --to=$output
 ecmerge.regkey=Software\Elli\xc3\xa9 Computing\Merge
+ecmerge.regkeyalt=Software\Wow6432Node\Elli\xc3\xa9 Computing\Merge
 ecmerge.gui=True
 ecmerge.diffargs=$parent $child --mode=diff2 --title1='$plabel1' --title2='$clabel'
 ecmerge.diff3args=$child $parent1 $parent2 --mode=diff3 --title0='$clabel' --title1='$plabel1' --title2='$plabel2'
@@ -102,6 +108,7 @@ ecmerge.dirdiff=True
 ecmerge.dir3diff=True
 
 winmergeu.regkey=Software\Thingamahoochie\WinMerge\
+winmergeu.regkeyalt=Software\Wow6432Node\Thingamahoochie\WinMerge\
 winmergeu.regname=Executable
 winmergeu.priority=-10
 winmergeu.args=/e /x /wl /ub /dl other /dr local $other $local $output
@@ -171,6 +178,7 @@ tkdiff.dirdiff=False
 
 ; Telelogic Rhapsody DiffMerge Tool
 rhapsody_diffmerge.regkey=Software\Telelogic\Rhapsody\DiffMerge\
+rhapsody_diffmerge.regkeyalt=Software\Wow6432Node\Telelogic\Rhapsody\DiffMerge\
 rhapsody_diffmerge.regname=Install Path
 rhapsody_diffmerge.priority=-110
 rhapsody_diffmerge.args=-xmerge $other $local -base $base -out $output
