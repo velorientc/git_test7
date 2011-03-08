@@ -629,7 +629,7 @@ class FileData(object):
                 self.flabel += _(' <i>(was added, now missing)</i>')
             return
 
-        if status in ('I', '?'):
+        if status in ('I', '?', 'C'):
             try:
                 data = open(repo.wjoin(wfile), 'r').read()
                 if '\0' in data:
