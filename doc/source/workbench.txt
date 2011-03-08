@@ -293,6 +293,18 @@ buttons are prepended to the start of the filter bar:
 		mode.  This button is only visible when previewing a changeset
 		bundle.
 
+The Workbench will attempt to lookup the entered search phrase in the
+repository to see if it matches a tag, bookmark, branch name, changeset
+hash, or revision number.  If no changeset match is found, the Workbench
+checks if the search phrase has any parentheses.  If no parentheses are
+found, the Workbench assumes the search is a keyword and performs a
+:command:`keyword()` revision set search. If parentheses are found, the
+Workbench assumes the search phrase is a revision set specification and
+attempts to resolve the set.
+
+If you need to perform a keyword search that includes parentheses, use
+:command:`keyword("PHRASE(FOO)")`.
+
 Revision Graph Details
 ----------------------
 
