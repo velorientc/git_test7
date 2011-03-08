@@ -479,7 +479,7 @@ class FileSelectionDialog(QDialog):
 
         repo = self.repo
         patterns = repo.ui.configitems('diff-patterns')
-        patterns = [(p, t) for p,t in patterns if t in tools]
+        patterns = [(p, t) for p,t in patterns if t in self.tools]
 
         fname = self.list.item(row).text()[2:]
         fname = hglib.fromunicode(fname)
