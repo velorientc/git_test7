@@ -568,6 +568,8 @@ class SyncWidget(QWidget):
             cmdline = self.applyTargetOption(cmdline)
         if self.opts.get('noproxy'):
             cmdline += ['--config', 'http_proxy.host=']
+        if self.opts.get('debug'):
+            cmdline.append('--debug')
 
         cururl = self.currentUrl(False)
         if not cururl:
@@ -1340,6 +1342,7 @@ class OptionsDialog(QDialog):
             _('Allow push of a new branch (--new-branch)'))
         self.newbranchcb.setChecked(opts.get('new-branch', False))
         layout.addRow(self.newbranchcb, None)
+
         self.forcecb = QCheckBox(
             _('Force push or pull (override safety checks, --force)'))
         self.forcecb.setChecked(opts.get('force', False))
@@ -1356,6 +1359,11 @@ class OptionsDialog(QDialog):
         layout.addRow(self.noproxycb, None)
         proxy = self.repo.ui.config('http_proxy', 'host')
         self.noproxycb.setEnabled(bool(proxy))
+
+        self.debugcb = QCheckBox(
+            _('Emit debugging output (--debug)'))
+        self.debugcb.setChecked(opts.get('debug', False))
+        layout.addRow(self.debugcb, None)
 
         lbl = QLabel(_('Remote command:'))
         self.remotele = QLineEdit()
@@ -1379,6 +1387,7 @@ class OptionsDialog(QDialog):
         outopts['force'] = self.forcecb.isChecked()
         outopts['new-branch'] = self.newbranchcb.isChecked()
         outopts['noproxy'] = self.noproxycb.isChecked()
+        outopts['debug'] = self.debugcb.isChecked()
 
         self.outopts = outopts
         QDialog.accept(self)
