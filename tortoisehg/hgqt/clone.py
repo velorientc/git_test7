@@ -327,7 +327,7 @@ class CloneDialog(QDialog):
             self.src_combo.currentText(), QFileDialog.ShowDirsOnly)
         if path:
             self.src_combo.setEditText(QDir.toNativeSeparators(path))
-            self.src_combo.setFocus()
+            self.dest_combo.setFocus()
 
     def browse_dest(self):
         FD = QFileDialog
