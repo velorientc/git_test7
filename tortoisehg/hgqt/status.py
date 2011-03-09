@@ -104,10 +104,23 @@ class StatusWidget(QWidget):
         else:
             lbl = QLabel(_('Filter:'))
             hbox.addWidget(lbl)
-        pb = QPushButton(_('Status'))
-        hbox.addWidget(le)
-        hbox.addWidget(pb)
-        hbox.addWidget(tb)
+
+        st = ''
+        for s in statusTypes:
+            val = statusTypes[s]
+            if self.opts[val.name]:
+                st = st + s
+        self.statusfilter = StatusFilterButton(
+            statustext=st, types=StatusType.preferredOrder)
+
+        self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
+        self.filelistToolbar.setIconSize(QSize(16,16))
+        hbox.addWidget(self.filelistToolbar)
+        self.filelistToolbar.addWidget(le)
+        self.filelistToolbar.addSeparator()
+        self.filelistToolbar.addWidget(self.statusfilter)
+        self.filelistToolbar.addSeparator()
+        self.filelistToolbar.addWidget(self.refreshBtn)
         tv = WctxFileTree(self.repo)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
@@ -146,18 +159,14 @@ class StatusWidget(QWidget):
         tv.clicked.connect(self.onRowClicked)
         le.textEdited.connect(self.setFilter)
 
-        def statusTypeTrigger(isChecked):
-            txt = hglib.fromunicode(self.sender().text())
-            self.opts[txt[2:]] = isChecked
+        def statusTypeTrigger(status):
+            status = str(status)
+            for s in statusTypes:
+                val = statusTypes[s]
+                self.opts[val.name] = s in status
             self.refreshWctx()
-        menu = QMenu(self)
-        for stat in StatusType.preferredOrder:
-            val = statusTypes[stat]
-            a = menu.addAction('%s %s' % (stat, val.name))
-            a.setCheckable(True)
-            a.setChecked(self.opts[val.name])
-            a.triggered.connect(statusTypeTrigger)
-        pb.setMenu(menu)
+        self.statusfilter.statusChanged.connect(statusTypeTrigger)
+
         self.tv = tv
         self.le = le
 
@@ -727,6 +736,52 @@ statusTypes = {
     'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
                      'status.subrepo'),
 }
+
+
+class StatusFilterButton(QToolButton):
+    """Button with drop-down menu for status filter"""
+    statusChanged = pyqtSignal(str)
+
+    def __init__(self, statustext, types=None, parent=None, **kwargs):
+        self._TYPES = 'MARC'
+        if types is not None:
+            self._TYPES = types
+        #if 'text' not in kwargs:
+        #    kwargs['text'] = _('Status')
+        super(StatusFilterButton, self).__init__(
+            parent, popupMode=QToolButton.InstantPopup,
+            icon=qtlib.geticon('hg-status'),
+            toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
+
+        self._initactions(statustext)
+
+    def _initactions(self, text):
+        self._actions = {}
+        menu = QMenu(self)
+        for c in self._TYPES:
+            st = statusTypes[c]
+            a = menu.addAction('%s %s' % (c, st.name))
+            a.setCheckable(True)
+            a.setChecked(c in text)
+            a.toggled.connect(self._update)
+            self._actions[c] = a
+        self.setMenu(menu)
+
+    @pyqtSlot()
+    def _update(self):
+        self.statusChanged.emit(self.status())
+
+    def status(self):
+        """Return the text for status filter"""
+        return ''.join(c for c in self._TYPES
+                       if self._actions[c].isChecked())
+
+    @pyqtSlot(str)
+    def setStatus(self, text):
+        """Set the status text"""
+        assert util.all(c in self._TYPES for c in text)
+        for c in self._TYPES:
+            self._actions[c].setChecked(c in text)
 
 class StatusDialog(QDialog):
     'Standalone status browser'

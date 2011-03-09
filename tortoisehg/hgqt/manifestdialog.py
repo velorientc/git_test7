@@ -176,7 +176,8 @@ class ManifestWidget(QWidget):
         qs.setValue(prefix+'/splitter', self._splitter.saveState())
 
     def _initactions(self):
-        self._statusfilter = _StatusFilterButton(statustext='MAC')
+        self._statusfilter = status.StatusFilterButton(
+          statustext='MAC', text=_('Status'))
         self._toolbar.addWidget(self._statusfilter)
 
         self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
@@ -404,51 +405,6 @@ class ManifestWidget(QWidget):
     @pyqtSlot()
     def _emitPathChanged(self):
         self.pathChanged.emit(self.path)
-
-# TODO: share this menu with status widget?
-class _StatusFilterButton(QToolButton):
-    """Button with drop-down menu for status filter"""
-    statusChanged = pyqtSignal(str)
-
-    _TYPES = 'MARC'
-
-    def __init__(self, statustext=_TYPES, parent=None, **kwargs):
-        if 'text' not in kwargs:
-            kwargs['text'] = _('Status')
-        super(_StatusFilterButton, self).__init__(
-            parent, popupMode=QToolButton.InstantPopup,
-            icon=qtlib.geticon('hg-status'),
-            toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
-
-        self._initactions(statustext)
-
-    def _initactions(self, text):
-        self._actions = {}
-        menu = QMenu(self)
-        for c in self._TYPES:
-            st = status.statusTypes[c]
-            a = menu.addAction('%s %s' % (c, st.name))
-            a.setCheckable(True)
-            a.setChecked(c in text)
-            a.toggled.connect(self._update)
-            self._actions[c] = a
-        self.setMenu(menu)
-
-    @pyqtSlot()
-    def _update(self):
-        self.statusChanged.emit(self.status())
-
-    def status(self):
-        """Return the text for status filter"""
-        return ''.join(c for c in self._TYPES
-                       if self._actions[c].isChecked())
-
-    @pyqtSlot(str)
-    def setStatus(self, text):
-        """Set the status text"""
-        assert util.all(c in self._TYPES for c in text)
-        for c in self._TYPES:
-            self._actions[c].setChecked(c in text)
 
 class ManifestTaskWidget(ManifestWidget):
     """Manifest widget designed for task tab"""
