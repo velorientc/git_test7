@@ -797,8 +797,8 @@ table = {
         [('',  'delay', None, _('wait until the second ticks over')),
          ('n', 'notify', [], _('notify the shell for paths given')),
          ('',  'remove', None, _('remove the status cache')),
-         ('s', 'show', None, _('show the contents of the'
-                               ' status cache (no update)')),
+         ('s', 'show', None, _('show the contents of the '
+                               'status cache (no update)')),
          ('',  'all', None, _('udpate all repos in current dir')) ],
         _('hgtk thgstatus [OPTION]')),
     "^update|checkout|co": (update,

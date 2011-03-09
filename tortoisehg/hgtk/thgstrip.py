@@ -86,8 +86,8 @@ class StripDialog(gdialog.GDialog):
         self.expander.connect('notify::expanded', self.options_expanded)
 
         ### force option (fixed)
-        self.forceopt = gtk.CheckButton(_('Discard local changes, no backup'
-                                          ' (-f/--force)'))
+        self.forceopt = gtk.CheckButton(_('Discard local changes, no backup '
+                                          '(-f/--force)'))
         table.add_row(self.expander, self.forceopt)
 
         # signal handlers
@@ -109,8 +109,8 @@ class StripDialog(gdialog.GDialog):
             self.butable.add_row(None, radio, ypad=0)
             return radio
         self.buopt_all = add_type(_('Backup all (default)'))
-        self.buopt_part = add_type(_('Backup unrelated changesets'
-                                     ' (-b/--backup)'))
+        self.buopt_part = add_type(_('Backup unrelated changesets '
+                                     '(-b/--backup)'))
         self.buopt_none = add_type(_('No backup (-n/--nobackup)'))
 
         # layout group
@@ -212,8 +212,8 @@ class StripDialog(gdialog.GDialog):
         else:
             if not isclean():
                 ret = gdialog.CustomPrompt(_('Confirm Strip'),
-                              _('Detected uncommitted local changes.\nDo'
-                                ' you want to discard them and continue?'),
+                              _('Detected uncommitted local changes.\nDo '
+                                'you want to discard them and continue?'),
                               self, (_('&Yes (--force)'), _('&No')),
                               default=1, esc=1).run()
                 if ret == 0:

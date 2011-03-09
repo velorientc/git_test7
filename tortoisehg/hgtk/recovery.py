@@ -56,8 +56,8 @@ class RecoveryDialog(gtk.Window):
                 self._toolbutton(gtk.STOCK_UNDO,
                                  _('Rollback'),
                                  self._rollback_clicked,
-                                 tip=_('Rollback (undo) last transaction to'
-                                     ' repository (pull, commit, etc)')),
+                                 tip=_('Rollback (undo) last transaction to '
+                                       'repository (pull, commit, etc)')),
                 gtk.SeparatorToolItem(),
                 self._toolbutton(gtk.STOCK_CLEAR,
                                  _('Recover'),

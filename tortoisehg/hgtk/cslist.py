@@ -708,8 +708,8 @@ class ChangesetList(gtk.Frame):
         spacer.set_width_chars(24)
         sniplbl = gtk.Label()
         snipbox.pack_start(sniplbl, False, False)
-        sniplbl.set_markup('<span size="large" weight="heavy"'
-                           ' font_family="monospace">...</span>')
+        sniplbl.set_markup('<span size="large" weight="heavy" '
+                           'font_family="monospace">...</span>')
         sniplbl.set_angle(90)
         snipbox.pack_start(gtk.Label())
         self.csbox.pack_start(wrapbox, False, False, 2)

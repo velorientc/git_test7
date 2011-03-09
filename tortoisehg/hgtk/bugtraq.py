@@ -76,7 +76,10 @@ class BugTraq:
     def _get_bugtraq_object(self):
         if self.bugtr == None:
             obj = CreateObject(self.guid)
-            self.bugtr = obj.QueryInterface(IBugTraqProvider2)
+            try:
+                self.bugtr = obj.QueryInterface(IBugTraqProvider2)
+            except COMError:
+                return None
         return self.bugtr
 
     def get_commit_message(self, parameters, logmessage):
@@ -133,7 +136,7 @@ class BugTraq:
         try:
             bugtr.HasOptions()
             return True
-        except ValueError:
+        except (ValueError, AttributeError):
             return False
 
 

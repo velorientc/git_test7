@@ -317,12 +317,12 @@ class DataMineDialog(gdialog.GWindow):
         search_hbox.pack_start(search, False, False, 4)
         self.tooltips.set_tip(search, _('Start this search'))
         self.tooltips.set_tip(regexp, _('Regular expression search pattern'))
-        self.tooltips.set_tip(includes, _('Comma separated list of'
-                ' inclusion patterns.  By default, the entire repository'
-                ' is searched.'))
-        self.tooltips.set_tip(excludes, _('Comma separated list of'
-                ' exclusion patterns.  Exclusion patterns are applied'
-                ' after inclusion patterns.'))
+        self.tooltips.set_tip(includes, _('Comma separated list of '
+                'inclusion patterns.  By default, the entire repository '
+                'is searched.'))
+        self.tooltips.set_tip(excludes, _('Comma separated list of '
+                'exclusion patterns.  Exclusion patterns are applied '
+                'after inclusion patterns.'))
         vbox.pack_start(search_hbox, False, False, 4)
 
         hbox = gtk.HBox()

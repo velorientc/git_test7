@@ -235,7 +235,8 @@ class DetectRenameDialog(gtk.Window):
         unkmodel = self.unktree.get_model()
         while q.qsize():
             wfile = q.get(0)
-            unkmodel.append( [wfile, hglib.toutf(wfile)] )
+            if unkmodel is not None:
+                unkmodel.append( [wfile, hglib.toutf(wfile)] )
         return thread.isAlive()
 
     def save_settings(self):

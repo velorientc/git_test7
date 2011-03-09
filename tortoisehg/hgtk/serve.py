@@ -365,8 +365,8 @@ thg_serve_cmd =  {"^serve":
            _('name to show in web pages (default: working dir)')),
           ('', 'web-conf', '',
            _('name of the hgweb config file (serve more than one repository)')),
-          ('', 'webdir-conf', '', _('name of the webdir config file'
-                                    ' (DEPRECATED)')),
+          ('', 'webdir-conf', '', _('name of the webdir config file '
+                                    '(DEPRECATED)')),
           ('', 'pid-file', '', _('name of file to write process ID to')),
           ('', 'stdio', None, _('for remote clients')),
           ('t', 'templates', '', _('web templates to use')),

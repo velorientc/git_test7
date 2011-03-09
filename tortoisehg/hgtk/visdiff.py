@@ -367,8 +367,8 @@ class FileSelectionDialog(gtk.Dialog):
         self.copies = cpy
         self.ui = repo.ui
 
-        lbl = gtk.Label(_('Temporary files are removed when this dialog'
-            ' is closed'))
+        lbl = gtk.Label(_('Temporary files are removed when this dialog '
+                          'is closed'))
         self.vbox.pack_start(lbl, False, False, 2)
 
         scroller = gtk.ScrolledWindow()

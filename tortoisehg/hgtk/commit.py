@@ -1116,17 +1116,17 @@ class GCommit(GStatus):
 
         if sumlen and len(lines[0].rstrip()) > sumlen:
             resp = gdialog.Confirm(_('Confirm Commit'), [], self,
-                           _('The summary line length of %i is greater than'
-                             ' %i.\n\nIgnore format policy and continue'
-                             ' commit?') %
+                           _('The summary line length of %i is greater than '
+                             '%i.\n\nIgnore format policy and continue '
+                             'commit?') %
                                 (len(lines[0].rstrip()), sumlen)).run()
             if resp != gtk.RESPONSE_YES:
                 return False
         if sumlen and len(lines) > 1 and len(lines[1].strip()):
             resp = gdialog.Confirm(_('Confirm Commit'), [], self,
-                           _('The summary line is not followed by a blank'
-                             ' line.\n\nIgnore format policy and continue'
-                             ' commit?')).run()
+                           _('The summary line is not followed by a blank '
+                             'line.\n\nIgnore format policy and continue '
+                             'commit?')).run()
             if resp != gtk.RESPONSE_YES:
                 return False
         if maxlen:
@@ -1137,8 +1137,8 @@ class GCommit(GStatus):
             if errs:
                 resp = gdialog.Confirm(_('Confirm Commit'), [], self,
                                _('The following lines are over the %i-'
-                                 'character limit: %s.\n\nIgnore format'
-                                 ' policy and continue commit?') %
+                                 'character limit: %s.\n\nIgnore format '
+                                 'policy and continue commit?') %
                                     (maxlen, ', '.join(errs))).run()
                 if resp != gtk.RESPONSE_YES:
                     return False
