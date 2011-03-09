@@ -779,14 +779,19 @@ class SettingsForm(QWidget):
     def refresh(self, *args):
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
-        self.readonly = not (hasattr(self.ini, 'write') and os.access(self.fn, os.W_OK))
+        self.readonly = not (hasattr(self.ini, 'write')
+                                and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
         self.fnedit.setText(hglib.tounicode(self.fn))
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
                 extsmentioned = False
                 for row, w in enumerate(widgets):
-                    val = self.readCPath('extensions.' + w.opts['label'])
+                    key = w.opts['label']
+                    for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
+                        val = self.readCPath('extensions.' + fullkey)
+                        if val != None:
+                            break
                     if val == None:
                         curvalue = False
                     elif len(val) and val[0] == '!':
@@ -796,6 +801,10 @@ class SettingsForm(QWidget):
                         curvalue = True
                         extsmentioned = True
                     w.setValue(curvalue)
+                    if val == None:
+                        w.opts['cpath'] = 'extensions.' + key
+                    else:
+                        w.opts['cpath'] = 'extensions.' + fullkey
                 if not extsmentioned:
                     # make sure widgets are shown properly,
                     # even when no extensions mentioned in the config file
@@ -975,18 +984,18 @@ class SettingsForm(QWidget):
             if (not emitChanged) and chk.isDirty():
                 self.restartRequested.emit(_('Extensions'))
                 emitChanged = True
-            key = chk.opts['label']
+            name = chk.opts['label']
+            section, key = chk.opts['cpath'].split('.', 1)
             newvalue = chk.value()
-            if newvalue and (key in enabledexts):
+            if newvalue and (name in enabledexts):
                 continue    # unchanged
             if newvalue:
                 self.ini.set(section, key, '')
             else:
-                for cand in (key, 'hgext.%s' % key, 'hgext/%s' % key):
-                    try:
-                        del self.ini[section][cand]
-                    except KeyError:
-                        pass
+                try:
+                    del self.ini[section][key]
+                except KeyError:
+                    pass
 
     @pyqtSlot()
     def validateextensions(self):
@@ -997,17 +1006,17 @@ class SettingsForm(QWidget):
                            if chk.isChecked())
         invalidexts = hglib.validateextensions(selectedexts)
 
-        def getinival(name):
+        def getinival(cpath):
             if section not in self.ini:
                 return None
-            for cand in (name, 'hgext.%s' % name, 'hgext/%s' % name):
-                try:
-                    return self.ini[section][cand]
-                except KeyError:
-                    pass
+            sect, key = cpath.split('.', 1)
+            try:
+                return self.ini[sect][key]
+            except KeyError:
+                pass
 
-        def changable(name):
-            curval = getinival(name)
+        def changable(name, cpath):
+            curval = getinival(cpath)
             if curval not in ('', None):
                 # enabled or unspecified, official extensions only
                 return False
@@ -1023,7 +1032,7 @@ class SettingsForm(QWidget):
         allexts = hglib.allextensions()
         for chk in self.pages['extensions'][2]:
             name = chk.opts['label']
-            chk.setEnabled(changable(name))
+            chk.setEnabled(changable(name, chk.opts['cpath']))
             invalmsg = invalidexts.get(name)
             if invalmsg:
                 invalmsg = invalmsg.decode('utf-8')
