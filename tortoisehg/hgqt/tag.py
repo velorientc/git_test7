@@ -319,7 +319,7 @@ class TagDialog(QDialog):
     def reject(self):
         # prevent signals from reaching deleted objects
         self.repo.repositoryChanged.disconnect(self.refresh)
-        super(BookmarkDialog, self).reject()
+        super(TagDialog, self).reject()
 
 def run(ui, *pats, **opts):
     kargs = {}
