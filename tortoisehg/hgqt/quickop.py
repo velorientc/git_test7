@@ -88,7 +88,7 @@ class QuickOpDialog(QDialog):
         cmd.progress.connect(self.statusbar.progress)
 
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb = QDialogButtonBox(BB.Ok|BB.Close)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         bb.button(BB.Ok).setDefault(True)
