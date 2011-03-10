@@ -20,11 +20,17 @@ class BugReport(QDialog):
     def __init__(self, opts, parent=None):
         super(BugReport, self).__init__(parent)
 
-        self.text = self.gettext(opts)
-
         layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        lbl = QLabel(_('Please report this bug to our %s bug tracker %s') %
+              (u'<a href="http://bitbucket.org/tortoisehg/thg/wiki/BugReport">',
+               u'</a>'))
+        lbl.setOpenExternalLinks(True)
+        self.layout().addWidget(lbl)
 
         tb = QTextBrowser()
+        self.text = self.gettext(opts)
         tb.setHtml('<pre>' + Qt.escape(self.text) + '</pre>')
         tb.setWordWrapMode(QTextOption.NoWrap)
         layout.addWidget(tb)
@@ -35,19 +41,19 @@ class BugReport(QDialog):
         bb.accepted.connect(self.accept)
         bb.button(BB.Save).clicked.connect(self.save)
         bb.button(BB.Ok).setDefault(True)
+        bb.addButton(_('Copy'), BB.HelpRole).clicked.connect(self.copyText)
         bb.addButton(_('Quit'), BB.DestructiveRole).clicked.connect(qApp.quit)
         layout.addWidget(bb)
 
-        self.setLayout(layout)
         self.setWindowTitle(_('TortoiseHg Bug Report'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
         self.resize(650, 400)
         self._readsettings()
 
     def gettext(self, opts):
+        # TODO: make this more uniformly unicode safe
         text = '{{{\n#!python\n' # Wrap in Bitbucket wiki preformat markers
-        text += _('** Please report this bug to '
-                  'http://bitbucket.org/tortoisehg/thg/issues\n')
         text += '** Mercurial version (%s).  TortoiseHg version (%s)\n' % (
                 hglib.hgversion, version.version())
         text += '** Command: %s\n' % (hglib.tounicode(opts.get('cmd', 'N/A')))
@@ -61,6 +67,9 @@ class BugReport(QDialog):
         text += hglib.tounicode(opts.get('error', 'N/A'))
         text += '\n}}}'
         return text
+
+    def copyText(self):
+        QApplication.clipboard().setText(self.text)
 
     def getarch(self):
         text = '** Windows version: %s\n' % str(sys.getwindowsversion())
