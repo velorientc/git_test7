@@ -176,7 +176,7 @@ class patchctx(object):
             return type, rawpath.split('/', 1)[-1]
 
         files = {}
-        pf = open(self._path)
+        pf = open(self._path, 'rb')
         try:
             try:
                 # consume comments and headers
