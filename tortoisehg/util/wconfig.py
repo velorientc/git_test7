@@ -194,7 +194,7 @@ class _wconfig(object):
             fp.seek(0)
             return newini(fp)
         else:
-            fp = open(path, 'rb')
+            fp = util.posixfile(path, 'rb')
             try:
                 return newini(fp)
             finally:
