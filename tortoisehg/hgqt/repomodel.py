@@ -509,11 +509,19 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getlog(self, ctx, gnode):
         if ctx.rev() is None:
+            msg = None
             if self.unicodestar:
                 # The Unicode symbol is a black star:
-                return u'\u2605 ' + _('Working Directory') + u' \u2605'
+                msg = u'\u2605 ' + _('Working Directory') + u' \u2605'
             else:
-                return '*** ' + _('Working Directory') + ' ***'
+                msg = '*** ' + _('Working Directory') + ' ***'
+
+            for pctx in ctx.parents():
+                if pctx.node() not in self.repo._branchheads:
+                    text = _('Not a head revision!')
+                    msg += " " + qtlib.markup(text, fg='red', weight='bold')
+
+            return msg
 
         msg = ctx.longsummary()
 
