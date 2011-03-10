@@ -199,7 +199,7 @@ class ChunksWidget(QWidget):
                 return
             repo.thgbackup(path)
             if revertall:
-                commands.revert(repo.ui, repo, path)
+                commands.revert(repo.ui, repo, path, no_backup=True)
             else:
                 wlock = repo.wlock()
                 try:
@@ -309,7 +309,7 @@ class ChunksWidget(QWidget):
         else:
             repo.thgbackup(repo.wjoin(wfile))
             wasadded = wfile in repo[None].added()
-            commands.revert(repo.ui, repo, repo.wjoin(wfile))
+            commands.revert(repo.ui, repo, repo.wjoin(wfile), no_backup=True)
             if wasadded:
                 os.unlink(repo.wjoin(wfile))
         self.fileModified.emit()
