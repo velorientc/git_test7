@@ -459,6 +459,7 @@ class CommitWidget(QWidget):
         self.updateRecentMessages()
 
     def addUsernameToHistory(self, user):
+        user = hglib.tounicode(user)
         if user in self.userhist:
             self.userhist.remove(user)
         self.userhist.insert(0, user)
