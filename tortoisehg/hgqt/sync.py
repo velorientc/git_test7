@@ -728,7 +728,8 @@ class SyncWidget(QWidget):
             def outputnodes(ret, data):
                 if ret == 0:
                     nodes = [n for n in data.splitlines() if len(n) == 40]
-                    self.outgoingNodes.emit(nodes)
+                    if nodes:
+                        self.outgoingNodes.emit(nodes)
                     self.showMessage.emit(_('%d outgoing changesets to %s') %
                                           (len(nodes), urlu))
                 elif ret == 1:
