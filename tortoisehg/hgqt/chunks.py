@@ -100,27 +100,32 @@ class ChunksWidget(QWidget):
                 self.refresh()
 
     def runPatcher(self, fp, wfile, updatestate):
-        class warncapt(uimod.ui):
+        ui = self.repo.ui.copy()
+        class warncapt(ui.__class__):
             def warn(self, msg, *args, **opts):
                 self.write(msg)
-        repo = self.repo
-        ui = warncapt()
-        ui.pushbuffer()
-        strip, pfiles = 1, {}
+        ui.__class__ = warncapt
+
         ok = True
+        repo = self.repo
+        ui.pushbuffer()
+        pfiles = {}
+        curdir = os.getcwd()
         try:
-            patch.internalpatch(fp, ui, strip, repo.root, files=pfiles,
-                                eolmode=None)
+            os.chdir(repo.root)
+            if patch.applydiff(ui, fp, pfiles) < 0:
+                ok = False
+                self.showMessage.emit(_('Patch failed to apply'))
         except patch.PatchError, err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
+        os.chdir(curdir)
         for line in ui.popbuffer().splitlines():
             if line.endswith(wfile + '.rej'):
                 if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
                                         hglib.tounicode(line) + u'<br><br>' +
                                         _('Edit patched file and rejects?'),
                                        parent=self):
-                    #wctxactions.edit(self, repo.ui, repo, [wfile, wfile+'.rej'])
                     from tortoisehg.hgqt import rejects
                     dlg = rejects.RejectsDialog(repo.wjoin(wfile), self)
                     if dlg.exec_() == QDialog.Accepted:
