@@ -244,7 +244,6 @@ class HgRepoView(QTableView):
 
         key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
         s.setValue(key, col_widths)
-        s.setValue('%s/widget_width' % self.cfgname, self.viewport().width())
 
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
