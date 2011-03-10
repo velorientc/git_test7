@@ -66,6 +66,7 @@ class RepoWidget(QWidget):
         self.revset = set()
         self.namedTabs = {}
         self.repolen = len(repo)
+        self.destroyed.connect(self.repo.thginvalidate)
 
         if repo.parents()[0].rev() == -1:
             self._reload_rev = 'tip'
