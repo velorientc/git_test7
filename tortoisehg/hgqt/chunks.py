@@ -8,7 +8,7 @@
 import cStringIO
 import os
 
-from mercurial import hg, util, patch, commands
+from mercurial import hg, util, patch, commands, cmdutil
 from mercurial import match as matchmod, ui as uimod
 from hgext import record
 
@@ -128,7 +128,7 @@ class ChunksWidget(QWidget):
                     break
         if updatestate and ok:
             # Apply operations specified in git diff headers
-            hglib.updatedir(repo.ui, repo, pfiles)
+            cmdutil.updatedir(repo.ui, repo, pfiles)
         return ok
 
     def editCurrentFile(self):
