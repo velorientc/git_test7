@@ -26,6 +26,14 @@ from tortoisehg.hgqt.settings import SettingsDialog
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+class ThgTabBar(QTabBar):
+    def mouseReleaseEvent(self, event):
+        
+        if event.button() == Qt.MidButton:
+            self.tabCloseRequested.emit(self.tabAt(event.pos()))
+            
+        super(QTabBar, self).mouseReleaseEvent(event)
+
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
@@ -74,6 +82,7 @@ class Workbench(QMainWindow):
         self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.repoTabsWidget = tw = QTabWidget()
+        tw.setTabBar(ThgTabBar())
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
         tw.setMovable(True)
