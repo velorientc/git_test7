@@ -249,27 +249,28 @@ class HgRepoView(QTableView):
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
         # is re-sized according to the total widget size.
-        key = '%s/widget_width' % self.cfgname
-        widget_width, ok = QSettings().value(key).toInt()
-        if not ok:
-            widget_width = 0
-            
-        if self.resized:
-            model = self.model()
-            vp_width = self.viewport().width()
-            total_width = stretch_col = 0
+        if e.oldSize().width() != e.size().width():
+            key = '%s/widget_width' % self.cfgname
+            widget_width, ok = QSettings().value(key).toInt()
+            if not ok:
+                widget_width = 0
 
-            if vp_width != widget_width:
-                for c in range(model.columnCount(QModelIndex())):
-                    if model._columns[c] in model._stretchs:
-                        #save the description column
-                        stretch_col = c
-                    else:
-                        #total the other widths
-                        total_width += self.columnWidth(c)
+            if self.resized:
+                model = self.model()
+                vp_width = self.viewport().width()
+                total_width = stretch_col = 0
 
-                width = max(vp_width - total_width, 100)
-                self.setColumnWidth(stretch_col, width)
+                if vp_width != widget_width:
+                    for c in range(model.columnCount(QModelIndex())):
+                        if model._columns[c] in model._stretchs:
+                            #save the description column
+                            stretch_col = c
+                        else:
+                            #total the other widths
+                            total_width += self.columnWidth(c)
+
+                    width = max(vp_width - total_width, 100)
+                    self.setColumnWidth(stretch_col, width)
 
         super(HgRepoView, self).resizeEvent(e)
 
