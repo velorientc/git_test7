@@ -148,7 +148,7 @@ class RevDetailsWidget(QWidget):
         self.message.setMinimumSize(QSize(0, 0))
         f = getfont('fontcomment')
         self.message.setFont(f.font())
-        f.changed.connect(lambda font: self.message.setFont(font))
+        f.changed.connect(self.forwardFont)
 
         self.fileview = HgFileView(self.repo, self.message_splitter)
         sp = SP(SP.Expanding, SP.Expanding)
@@ -168,6 +168,9 @@ class RevDetailsWidget(QWidget):
 
         self.filelist.fileRevSelected.connect(self.onFileRevSelected)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
+
+    def forwardFont(self, font):
+        self.message.setFont(font)
 
     def createActions(self):
         def fileActivated():
