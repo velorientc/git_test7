@@ -223,6 +223,7 @@ class RenameDialog(QDialog):
         return (fullsrc.upper() == fulldest.upper() and sys.platform == 'win32')
 
     def compose_command(self, src, dest):
+        'src and dest are expected to be in local encoding'
         if self.copy_chk.isChecked():
             cmdline = ['copy']
         else:
@@ -231,8 +232,8 @@ class RenameDialog(QDialog):
         cmdline.append('-v')
         if self.isCaseFoldingOnWin():
             cmdline.append('-A')
-        cmdline.append(hglib.fromunicode(src))
-        cmdline.append(hglib.fromunicode(dest))
+        cmdline.append(src)
+        cmdline.append(dest)
         vcmdline = ' '.join(['hg'] + cmdline)
         return (cmdline, vcmdline)
 
