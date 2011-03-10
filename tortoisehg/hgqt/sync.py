@@ -258,6 +258,7 @@ class SyncWidget(QWidget):
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
         else:
+            self.setUrl('')
             self.curalias = None
 
     def refreshStatusTips(self):
