@@ -448,6 +448,7 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.currentIndex()
         if widget.closeRepoWidget():
             self.repoTabsWidget.removeTab(index)
+            widget.deleteLater()
             self.updateMenu()
 
     def repoTabCloseRequested(self, index):
@@ -455,6 +456,7 @@ class Workbench(QMainWindow):
         w = tw.widget(index)
         if w and w.closeRepoWidget():
             tw.removeTab(index)
+            w.deleteLater()
             self.updateMenu()
 
     def repoTabChanged(self, index=0):
