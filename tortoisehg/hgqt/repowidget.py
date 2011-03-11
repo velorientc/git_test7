@@ -158,23 +158,23 @@ class RepoWidget(QWidget):
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
-        self.commitDemand = w = DemandWidget(self.createCommitWidget)
+        self.commitDemand = w = DemandWidget('createCommitWidget', self)
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
-        self.syncDemand = w = DemandWidget(self.createSyncWidget)
+        self.syncDemand = w = DemandWidget('createSyncWidget', self)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
-        self.manifestDemand = w = DemandWidget(self.createManifestWidget)
+        self.manifestDemand = w = DemandWidget('createManifestWidget', self)
         self.manifestTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-annotate'), '')
         tt.setTabToolTip(idx, _('Manifest'))
 
-        self.grepDemand = w = DemandWidget(self.createGrepWidget)
+        self.grepDemand = w = DemandWidget('createGrepWidget', self)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
 
-        self.mqDemand = w = DemandWidget(self.createMQWidget)
+        self.mqDemand = w = DemandWidget('createMQWidget', self)
         if 'mq' in self.repo.extensions():
             self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
@@ -182,7 +182,7 @@ class RepoWidget(QWidget):
         else:
             self.mqTabIndex = -1
 
-        self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
+        self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
         if 'pbranch' in self.repo.extensions():
             self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
             tt.setTabToolTip(idx, _("Patch Branch"))
