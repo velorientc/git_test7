@@ -178,11 +178,31 @@ class RejectsDialog(QDialog):
         self.rejectbrowser.saveSettings(s, 'rejects/rejbrowse')
 
     def accept(self):
-        f = QFile(self.path)
-        f.open(QIODevice.WriteOnly)
-        self.editor.write(f)
-        self.saveSettings()
-        super(RejectsDialog, self).accept()
+        # If the editor has been modified, we implicitly accept the changes
+        acceptresolution = self.editor.isModified()
+        if not acceptresolution:
+            action = QMessageBox.warning(self,
+                _("Warning"),
+                _("You have marked all rejected patch chunks as resolved yet you " \
+                "have not modified the file on the edit panel.\n\n" \
+                "This probably means that no code from any of the rejected patch " \
+                "chunks made it into the file.\n\n"\
+                "Are you sure that you want to leave the file as is and " \
+                "consider all the rejected patch chunks as resolved?\n\n" \
+                "Doing so may delete them from a shelve, for example, which " \
+                "would mean that you would lose them forever!\n\n"
+                "Click Yes to accept the file as is or No to continue resolving " \
+                "the rejected patch chunks."),
+                QMessageBox.Yes, QMessageBox.No)
+            if action == QMessageBox.Yes:
+                acceptresolution = True
+
+        if acceptresolution:
+            f = QFile(self.path)
+            f.open(QIODevice.WriteOnly)
+            self.editor.write(f)
+            self.saveSettings()
+            super(RejectsDialog, self).accept()
 
     def reject(self):
         self.saveSettings()
