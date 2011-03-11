@@ -8,7 +8,7 @@
 import os
 import re
 
-from mercurial import ui, hg, error, commands, match, util
+from mercurial import ui, hg, error, commands, match, util, subrepo
 
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui
 from tortoisehg.util import paths, hglib, thread2
@@ -322,18 +322,22 @@ class SearchWidget(QWidget):
         pass
 
     def searchfinished(self):
-        count = self.tv.model().rowCount(None)
-        if not count:
-            self.showMessage.emit(_('No matches found'))
-        else:
-            self.showMessage.emit(_('%d matches found') % count)
-            for col in xrange(COL_TEXT):
-                self.tv.resizeColumnToContents(col)
-            self.tv.setSortingEnabled(True)
         self.cancelbutton.setEnabled(False)
         self.searchbutton.setEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
+        count = self.tv.model().rowCount(None)
+        if count:
+            for col in xrange(COL_TEXT):
+                self.tv.resizeColumnToContents(col)
+            self.tv.setSortingEnabled(True)
+        if self.thread.completed == False:
+            # do not overwrite error message on failure
+            pass
+        elif count:
+            self.showMessage.emit(_('%d matches found') % count)
+        else:
+            self.showMessage.emit(_('No matches found'))
 
 class DataWrapper(object):
     def __init__(self, data):
@@ -353,6 +357,7 @@ class HistorySearchThread(QThread):
         self.inc = inc
         self.exc = exc
         self.follow = follow
+        self.completed = False
 
     def cancel(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
@@ -405,6 +410,7 @@ class HistorySearchThread(QThread):
             self.showMessage.emit(_('Interrupted'))
         self.progress.emit(*cmdui.stopProgress(_('Searching')))
         os.chdir(cwd)
+        self.completed = True
 
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
@@ -421,48 +427,64 @@ class CtxSearchThread(QThread):
         self.exc = exc
         self.once = once
         self.canceled = False
+        self.completed = False
 
     def cancel(self):
         self.canceled = True
 
     def run(self):
-        hu = htmlui.htmlui()
-        rev = self.ctx.rev()
-        # generate match function relative to repo root
-        matchfn = match.match(self.repo.root, '', [], self.inc, self.exc)
         def badfn(f, msg):
             e = hglib.tounicode("%s: %s" % (matchfn.rel(f), msg))
             self.showMessage.emit(e)
-        matchfn.bad = badfn
+        self.hu = htmlui.htmlui()
+        try:
+            # generate match function relative to repo root
+            matchfn = match.match(self.repo.root, '', [], self.inc, self.exc)
+            matchfn.bad = badfn
+            self.searchRepo(self.ctx, '', matchfn)
+            self.completed = True
+        except Exception, e:
+            self.showMessage.emit(hglib.tounicode(str(e)))
 
+    def searchRepo(self, ctx, prefix, matchfn):
         topic = _('Searching')
         unit = _('files')
-        total = len(self.ctx.manifest())
+        total = len(ctx.manifest())
         count = 0
-        for wfile in self.ctx:                # walk manifest
+        for wfile in ctx:                # walk manifest
             if self.canceled:
                 break
             self.progress.emit(topic, count, wfile, unit, total)
             count += 1
             if not matchfn(wfile):
                 continue
-            data = self.ctx[wfile].data()     # load file data
+            data = ctx[wfile].data()     # load file data
             if util.binary(data):
                 continue
             for i, line in enumerate(data.splitlines()):
                 pos = 0
                 for m in self.regexp.finditer(line): # perform regexp
-                    hu.write(line[pos:m.start()], label='ui.status')
-                    hu.write(line[m.start():m.end()], label='grep.match')
+                    self.hu.write(line[pos:m.start()], label='ui.status')
+                    self.hu.write(line[m.start():m.end()], label='grep.match')
                     pos = m.end()
                 if pos:
-                    hu.write(line[pos:], label='ui.status')
-                    row = [wfile, i + 1, rev, None, hu.getdata()[0]]
+                    self.hu.write(line[pos:], label='ui.status')
+                    path = os.path.join(prefix, wfile)
+                    row = [path, i + 1, ctx.rev(), None, self.hu.getdata()[0]]
                     w = DataWrapper(row)
                     self.matchedRow.emit(w)
                     if self.once:
                         break
         self.progress.emit(topic, None, '', '', None)
+
+        if ctx.rev() is None:
+            for s in ctx.substate:
+                if not matchfn(s):
+                    continue
+                sub = ctx.sub(s)
+                if isinstance(sub, subrepo.hgsubrepo):
+                    newprefix = os.path.join(prefix, s)
+                    self.searchRepo(sub._repo[None], newprefix, lambda x: True)
 
 
 COL_PATH     = 0
@@ -589,10 +611,19 @@ class MatchTree(QTableView):
                 continue
             else:
                 seen.add(path)
+            if rev is None and path not in repo[None]:
+                abs = repo.wjoin(path)
+                root = paths.find_root(abs)
+                if root and abs.startswith(root):
+                    path = abs[len(root)+1:]
+                else:
+                    continue
+            else:
+                root = repo.root
             dlg = annotate.AnnotateDialog(path, rev=rev, line=line,
                                           pattern=pattern, parent=self,
                                           searchwidget=self.parent(),
-                                          root=repo.root)
+                                          root=root)
             dlg.show()
 
     def onViewChangeset(self):
