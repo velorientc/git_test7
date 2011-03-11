@@ -318,16 +318,16 @@ class Workbench(QMainWindow):
         self.menuView.addMenu(menu)
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='hg-incoming',
-                  tooltip=_('Check for incoming changes from default pull target'),
+                  tooltip=_('Check for incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Pull'), self._repofwd('pull'), icon='hg-pull',
-                  tooltip=_('Pull incoming changes from default pull target'),
+                  tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Outgoing'), self._repofwd('outgoing'), icon='hg-outgoing',
-                   tooltip=_('Detect outgoing changes to default push target'),
+                   tooltip=_('Detect outgoing changes to selected URL'),
                    enabled='repoopen', toolbar='sync')
         newaction(_('Push'), self._repofwd('push'), icon='hg-push',
-                  tooltip=_('Push outgoing changes to default push target'),
+                  tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
 
         self.updateMenu()
