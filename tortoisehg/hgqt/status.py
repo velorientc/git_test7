@@ -121,6 +121,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addWidget(self.statusfilter)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
+        self.actions = wctxactions.WctxActions(self.repo, self)
         tv = WctxFileTree(self.repo)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
@@ -209,8 +210,8 @@ class StatusWidget(QWidget):
 
     @pyqtSlot(QPoint, object)
     def onMenuRequest(self, point, selected):
-        action = wctxactions.wctxactions(self, point, self.repo, selected)
-        if action:
+        menu = self.actions.makeMenu(selected)
+        if menu.exec_(point):
             self.refreshWctx()
 
     def refreshWctx(self):
@@ -293,9 +294,11 @@ class StatusWidget(QWidget):
                     curidx = tm.index(i, 0)
         else:
             selmodel.select(curidx, flags)
-        selmodel.currentChanged.connect(self.currentChanged)
+        selmodel.currentChanged.connect(self.onCurrentChange)
+        selmodel.selectionChanged.connect(self.onSelectionChange)
         if curidx and curidx.isValid():
             selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
+        self.onSelectionChange(None, None)
 
     # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex)
@@ -334,9 +337,17 @@ class StatusWidget(QWidget):
         else:
             return []
 
+    @pyqtSlot(QItemSelection, QItemSelection)
+    def onSelectionChange(self, selected, deselected):
+        selrows = []
+        for index in self.tv.selectedRows():
+            path, status, mst, u, ext, sz = self.tv.model().getRow(index)
+            selrows.append((set(status+mst.lower()), path))
+        self.actions.updateActionSensitivity(selrows)
+
     # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex, QModelIndex)
-    def currentChanged(self, index, old):
+    def onCurrentChange(self, index, old):
         'Connected to treeview "currentChanged" signal'
         row = index.model().getRow(index)
         if row is None:
@@ -422,15 +433,7 @@ class WctxFileTree(QTreeView):
         if event.key() == 32:
             for index in self.selectedRows():
                 self.model().toggleRow(index)
-        if event.key() == Qt.Key_D and event.modifiers() == Qt.ControlModifier:
-            selfiles = []
-            for index in self.selectedRows():
-                selfiles.append(self.model().getRow(index)[COL_PATH])
-            dlg = visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
-            if dlg:
-                dlf.exec_()
-        else:
-            return super(WctxFileTree, self).keyPressEvent(event)
+        return super(WctxFileTree, self).keyPressEvent(event)
 
     def dragObject(self):
         urls = []
