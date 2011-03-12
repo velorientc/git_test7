@@ -152,11 +152,11 @@ class StatusWidget(QWidget):
         hcbox.addStretch(1)
         hcbox.addWidget(self.countlbl)
 
-        tv.menuAction.connect(self.refreshWctx)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
         tv.sortByColumn(COL_STATUS, Qt.AscendingOrder)
         tv.clicked.connect(self.onRowClicked)
+        tv.menuRequest.connect(self.onMenuRequest)
         le.textEdited.connect(self.setFilter)
 
         def statusTypeTrigger(status):
@@ -206,6 +206,12 @@ class StatusWidget(QWidget):
     def saveSettings(self, qs, prefix):
         self.fileview.saveSettings(qs, prefix+'/fileview')
         qs.setValue(prefix+'/state', self.split.saveState())
+
+    @pyqtSlot(QPoint, object)
+    def onMenuRequest(self, point, selected):
+        action = wctxactions.wctxactions(self, point, self.repo, selected)
+        if action:
+            self.refreshWctx()
 
     def refreshWctx(self):
         if self.refthread:
@@ -396,7 +402,7 @@ class StatusThread(QThread):
 
 
 class WctxFileTree(QTreeView):
-    menuAction = pyqtSignal()
+    menuRequest = pyqtSignal(QPoint, object)
 
     def __init__(self, repo, parent=None):
         QTreeView.__init__(self, parent)
@@ -458,10 +464,8 @@ class WctxFileTree(QTreeView):
         for index in self.selectedRows():
             path, status, mst, u, ext, sz = self.model().getRow(index)
             selrows.append((set(status+mst.lower()), path))
-        point = self.mapToGlobal(point)
-        action = wctxactions.wctxactions(self, point, self.repo, selrows)
-        if action:
-            self.menuAction.emit()
+        if selrows:
+            self.menuRequest.emit(self.mapToGlobal(point), selrows)
 
     def selectedRows(self):
         return self.selectionModel().selectedRows()
