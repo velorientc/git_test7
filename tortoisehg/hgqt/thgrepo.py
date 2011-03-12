@@ -239,8 +239,8 @@ def _extendrepo(repo):
             if changeid in self.thgmqunappliedpatches:
                 q = self.mq # must have mq to pass the previous if
                 return genPatchContext(self, q.join(changeid), rev=changeid)
-            elif type(changeid) is str and os.path.isabs(changeid) and \
-                    os.path.isfile(changeid):
+            elif type(changeid) is str and '\0' not in changeid and \
+                    os.path.isabs(changeid) and os.path.isfile(changeid):
                 return genPatchContext(repo, changeid)
 
             changectx = super(thgrepository, self).changectx(changeid)
