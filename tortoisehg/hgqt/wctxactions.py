@@ -171,9 +171,6 @@ class WctxActions(QObject):
             except (error.LookupError), e:
                 err = hglib.tounicode(str(e))
                 QMessageBox.critical(parent, name + _(' Aborted'), err)
-            except NotImplementedError:
-                QMessageBox.critical(parent, name + _(' not implemented'),
-                        'Please add it :)')
         finally:
             os.chdir(cwd)
         return notify
