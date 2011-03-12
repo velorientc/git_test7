@@ -422,7 +422,7 @@ class WctxFileTree(QTreeView):
                 selfiles.append(self.model().getRow(index)[COL_PATH])
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, selfiles, {})
             if dlg:
-                dlf.exec_()
+                dlg.exec_()
         else:
             return super(WctxFileTree, self).keyPressEvent(event)
 
