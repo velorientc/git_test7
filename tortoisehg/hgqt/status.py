@@ -157,6 +157,7 @@ class StatusWidget(QWidget):
         tv.setRootIsDecorated(False)
         tv.sortByColumn(COL_STATUS, Qt.AscendingOrder)
         tv.clicked.connect(self.onRowClicked)
+        tv.doubleClicked.connect(self.onRowDoubleClicked)
         tv.menuRequest.connect(self.onMenuRequest)
         le.textEdited.connect(self.setFilter)
 
@@ -306,6 +307,14 @@ class StatusWidget(QWidget):
         'tree view emitted a clicked signal, index guarunteed valid'
         if index.column() == COL_PATH:
             self.tv.model().toggleRow(index)
+
+    # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QModelIndex)
+    def onRowDoubleClicked(self, index):
+        'tree view emitted a doubleClicked signal, index guarunteed valid'
+        path, status, mst, u, ext, sz = self.tv.model().getRow(index)
+        if status in 'MAR!':
+            self.actions.allactions[0].trigger()
 
     @pyqtSlot(QString)
     def setFilter(self, match):
