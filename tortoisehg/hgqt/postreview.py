@@ -36,23 +36,32 @@ class LoadReviewDataThread(QThread):
             msg = _("Invalid Settings - Please provide your ReviewBoard username")
         else:
             rb = extensions.find("reviewboard")
+            plugin_msg = _("Invalid reviewboard plugin. Please download the " +
+                        "mercurial reviewboard plugin version 3.5 or higher " +
+                        "from the website below.\n\n" +
+                        "http://bitbucket.org/mdelagra/mercurial-reviewboard/")
             try:
-                pwd = self.dialog.password
-                #if we don't have a password send something here to skip
-                #the cli getpass in the extension. We will set the password
-                #later
-                if not pwd:
-                    pwd = "None"
+                if float(rb.__version__[:3]) < 3.5:
+                    msg = plugin_msg
+                else:
+                    pwd = self.dialog.password
+                    #if we don't have a password send something here to skip
+                    #the cli getpass in the extension. We will set the password
+                    #later
+                    if not pwd:
+                        pwd = "None"
 
-                self.reviewboard = rb.make_rbclient(self.dialog.server,
-                                                    self.dialog.user,
-                                                    pwd)
-                self.loadCombos()
+                    self.reviewboard = rb.make_rbclient(self.dialog.server,
+                                                        self.dialog.user,
+                                                        pwd)
+                    self.loadCombos()
 
             except rb.ReviewBoardError, e:
                 msg = e.msg
+            except AttributeError:
+                msg = plugin_msg
 
-        self.dialog._error_message = msg
+        self.dialog.error_message = msg
 
     def loadCombos(self):
         #Get the index of a users previously selected repo id
