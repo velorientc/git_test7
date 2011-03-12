@@ -760,6 +760,7 @@ class RepoWidget(QWidget):
         self.filterbar.loadSettings(s)
         self.repotabs_splitter.restoreState(
             s.value('repowidget/splitter-'+repoid).toByteArray())
+        QTimer.singleShot(0, lambda: self.toolbarVisibilityChanged.emit())
 
     def okToContinue(self):
         if not self.commitDemand.forward('canExit', default=True):
