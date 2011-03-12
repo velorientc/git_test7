@@ -146,7 +146,7 @@ class AboutDialog(QDialog):
                 if platform == p:
                     upgradeurl = _url.strip()
                     break
-        except (IndexError, ImportError):
+        except (IndexError, ImportError, ValueError):
             pass
         try:
             thgv = version.version()
