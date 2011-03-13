@@ -159,11 +159,14 @@ class ExceptionMsgBox(QDialog):
         if ref == '#bugreport':
             return BugReport(self._opts, self).exec_()
         if ref.startswith('#edit:'):
-            from tortoisehg.hgqt import wctxactions
-            fname, lineno = ref[6:].rsplit(':', 1)
             # A chicken-egg problem here, we need a ui to get your
             # editor in order to repair your ui config file.
-            wctxactions.edit(self, ui.ui(), None, [fname], lineno, None)
+            class FakeRepo(object):
+                def __init__(self):
+                    root = os.getcwd()
+                    ui = ui.ui()
+            fname, lineno = ref[6:].rsplit(':', 1)
+            qtlib.editfiles(FakeRepo(), [fname], lineno, parent=self)
 
 def run(ui, *pats, **opts):
     return BugReport(opts)
