@@ -315,6 +315,8 @@ class StatusWidget(QWidget):
         path, status, mst, u, ext, sz = self.tv.model().getRow(index)
         if status in 'MAR!':
             self.actions.allactions[0].trigger()
+        elif status == 'S':
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
 
     @pyqtSlot(QString)
     def setFilter(self, match):
