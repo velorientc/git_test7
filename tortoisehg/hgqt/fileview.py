@@ -27,7 +27,7 @@ from mercurial import ui as uimod, mdiff
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import annotate, qscilib, qtlib, blockmatcher, lexers
-from tortoisehg.hgqt import visdiff, wctxactions
+from tortoisehg.hgqt import visdiff
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -401,7 +401,7 @@ class HgFileView(QFrame):
         base = visdiff.snapshot(self.repo, [path], self.repo[rev])[0]
         files = [os.path.join(base, path)]
         pattern = hglib.fromunicode(self._lastSearch[0])
-        wctxactions.edit(self, self.repo.ui, self.repo, files, line, pattern)
+        qtlib.editfiles(self.repo, files, line, pattern, self)
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
