@@ -52,6 +52,8 @@ def dispatch(args):
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['values'] = e
+        opts['error'] = traceback.format_exc()
+        opts['nofork'] = True
         errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                       '<a href="#edit:%(arg1)s">edit</a> your config')
         main = QApplication(sys.argv)
@@ -59,13 +61,12 @@ def dispatch(args):
                               parent=None)
         dlg.exec_()
     except Exception, e:
-        print e
+        # generic errors before the QApplication is started
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
-        errstr = traceback.format_exc()
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = errstr
+        opts['error'] = traceback.format_exc()
         opts['nofork'] = True
         return qtrun(bugrun, u, **opts)
     except SystemExit:
