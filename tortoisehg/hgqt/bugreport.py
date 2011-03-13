@@ -132,7 +132,7 @@ class ExceptionMsgBox(QDialog):
             values = opts.get('values', [])
             msgopts = {}
             for i, val in enumerate(values):
-                msgopts['arg' + str(i)] = Qt.escape(val)
+                msgopts['arg' + str(i)] = Qt.escape(hglib.tounicode(val))
             try:
                 text = text % msgopts
             except Exception, e:
