@@ -7,7 +7,6 @@
 
 import os
 import re
-import subprocess
 
 from mercurial import util, error, merge, commands
 from tortoisehg.hgqt import qtlib, htmlui, visdiff
@@ -198,63 +197,7 @@ def vdiff(parent, ui, repo, files):
         dlg.exec_()
 
 def edit(parent, ui, repo, files, lineno=None, search=None):
-    files = [util.shellquote(util.localpath(f)) for f in files]
-    editor = ui.config('tortoisehg', 'editor')
-    assert len(files) == 1 or lineno == None
-    if editor:
-        try:
-            regexp = re.compile('\[([^\]]*)\]')
-            expanded = []
-            pos = 0
-            for m in regexp.finditer(editor):
-                expanded.append(editor[pos:m.start()-1])
-                phrase = editor[m.start()+1:m.end()-1]
-                pos=m.end()+1
-                if '$LINENUM' in phrase:
-                    if lineno is None:
-                        # throw away phrase
-                        continue
-                    phrase = phrase.replace('$LINENUM', str(lineno))
-                elif '$SEARCH' in phrase:
-                    if search is None:
-                        # throw away phrase
-                        continue
-                    phrase = phrase.replace('$SEARCH', search)
-                if '$FILE' in phrase:
-                    phrase = phrase.replace('$FILE', files[0])
-                    files = []
-                expanded.append(phrase)
-            expanded.append(editor[pos:])
-            cmdline = ' '.join(expanded + files)
-        except ValueError, e:
-            # '[' or ']' not found
-            cmdline = ' '.join([editor] + files)
-        except TypeError, e:
-            # variable expansion failed
-            cmdline = ' '.join([editor] + files)
-    else:
-        editor = os.environ.get('HGEDITOR') or ui.config('ui', 'editor') or \
-                os.environ.get('EDITOR', 'vi')
-        cmdline = ' '.join([editor] + files)
-    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-        res = QMessageBox.critical(parent,
-                    _('No visual editor configured'),
-                    _('Please configure a visual editor.'))
-        from tortoisehg.hgqt.settings import SettingsDialog
-        dlg = SettingsDialog(False, focus='tortoisehg.editor')
-        dlg.exec_()
-        return
-
-    cmdline = util.quotecommand(cmdline)
-    try:
-        subprocess.Popen(cmdline, shell=True, creationflags=visdiff.openflags,
-                        stderr=None, stdout=None, stdin=None)
-    except (OSError, EnvironmentError), e:
-        QMessageBox.warning(parent,
-                _('Editor launch failure'),
-                _('%s : %s') % (cmd, str(e)))
-    return False
-
+    qtlib.editfiles(repo, files, lineno, search, parent)
 
 def viewmissing(parent, ui, repo, files):
     base, _ = visdiff.snapshot(repo, files, repo['.'])

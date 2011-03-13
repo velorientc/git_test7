@@ -35,12 +35,6 @@ try:
 except ImportError:
     config_nofork = None
 
-try:
-    import win32con
-    openflags = win32con.CREATE_NO_WINDOW
-except ImportError:
-    openflags = 0
-
 nonrepo_commands = '''userconfig shellconfig clone debugcomplete init
 about help version thgstatus serve rejects log'''
 
@@ -87,7 +81,7 @@ def portable_fork(ui, opts):
     cmdline = subprocess.list2cmdline(args)
     os.chdir(origwdir)
     subprocess.Popen(cmdline,
-                     creationflags=openflags,
+                     creationflags=qtlib.openflags,
                      shell=True)
     sys.exit(0)
 
