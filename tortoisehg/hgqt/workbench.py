@@ -596,10 +596,6 @@ class Workbench(QMainWindow):
         for rw in self._findrepowidget(root):
             rw.goto(rev)
 
-    def reloadRepository(self, root):
-        for rw in self._findrepowidget(root):
-            rw.reload()
-
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""
         tw = self.repoTabsWidget
