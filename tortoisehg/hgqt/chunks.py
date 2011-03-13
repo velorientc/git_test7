@@ -15,7 +15,7 @@ from hgext import record
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, wctxactions
+from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers
 from tortoisehg.hgqt import filelistmodel, filelistview, fileview
 
 from PyQt4.QtCore import *
@@ -141,8 +141,8 @@ class ChunksWidget(QWidget):
         if isinstance(ctx, patchctx):
             path = ctx._path
         else:
-            path = self.repo.wjoin(self.currentFile)
-        wctxactions.edit(self, self.repo.ui, self.repo, [path])
+            path = self.currentFile
+        qtlib.editfiles(self.repo, [path], parent=self)
 
     def getSelectedFileAndChunks(self):
         chunks = self.diffbrowse.curchunks
