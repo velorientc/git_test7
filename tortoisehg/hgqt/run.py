@@ -185,7 +185,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except fancyopts.getopt.GetoptError, inst:
-        raise error.ParseError(None, inst)
+        raise error.CommandError(None, inst)
 
     if args:
         alias, args = args[0], args[1:]
@@ -209,7 +209,7 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions)
     except fancyopts.getopt.GetoptError, inst:
-        raise error.ParseError(cmd, inst)
+        raise error.CommandError(cmd, inst)
 
     # separate global options back out
     for o in globalopts:
@@ -234,19 +234,19 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except error.ParseError, inst:
-        if inst.args[0]:
-            ui.status(_("thg %s: %s\n") % (inst.args[0], inst.args[1]))
-            help_(ui, inst.args[0])
-        else:
-            ui.status(_("thg: %s\n") % inst.args[1])
-            help_(ui, 'shortlist')
     except error.AmbiguousCommand, inst:
         ui.status(_("thg: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
     except error.UnknownCommand, inst:
         ui.status(_("thg: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
+    except error.CommandError, inst:
+        if inst.args[0]:
+            ui.status(_("thg %s: %s\n") % (inst.args[0], inst.args[1]))
+            help_(ui, inst.args[0])
+        else:
+            ui.status(_("thg: %s\n") % inst.args[1])
+            help_(ui, 'shortlist')
     except error.RepoError, inst:
         ui.status(_("abort: %s!\n") % inst)
 
@@ -308,7 +308,7 @@ def _runcommand(ui, options, cmd, cmdfunc):
         try:
             return cmdfunc()
         except error.SignatureError:
-            raise error.ParseError(cmd, _("invalid arguments"))
+            raise error.CommandError(cmd, _("invalid arguments"))
 
     if options['profile']:
         format = ui.config('profiling', 'format', default='text')
