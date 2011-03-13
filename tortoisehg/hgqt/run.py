@@ -371,6 +371,7 @@ class _QtRunner(QObject):
         error.RepoLookupError: _('Try refreshing your repository.'),
         error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                             '<a href="#edit:%(arg1)s">edit</a> your config'),
+        error.Abort: _('Operation aborted:<br><br>%(arg0)s.'),
         }
 
     def __init__(self):
@@ -422,8 +423,13 @@ class _QtRunner(QObject):
         etype, evalue = self.errors[0][:2]
         if len(self.errors) == 1 and etype in self._recoverableexc:
             opts['values'] = evalue
+            errstr = self._recoverableexc[etype]
+            if etype == error.Abort and evalue.hint:
+                errstr = u''.join([errstr, u'<br><b>', _('hint:'),
+                                   u'</b> %(arg1)s'])
+                opts['values'] = [str(evalue), evalue.hint]
             dlg = ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                  self._recoverableexc[etype], opts,
+                                  errstr, opts,
                                   parent=self._mainapp.activeWindow())
         elif etype is KeyboardInterrupt:
             if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
