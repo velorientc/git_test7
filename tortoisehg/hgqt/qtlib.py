@@ -137,7 +137,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     cmdline = util.quotecommand(cmdline)
     try:
         subprocess.Popen(cmdline, shell=True, creationflags=openflags,
-                        stderr=None, stdout=None, stdin=None)
+                         stderr=None, stdout=None, stdin=None, cwd=repo.root)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
