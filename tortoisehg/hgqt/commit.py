@@ -617,11 +617,13 @@ class CommitWidget(QWidget):
         self.commitButtonEnable.emit(False)
         self.runner.run(*commandlines)
         self.stopAction.setEnabled(True)
+        self.progress.emit(*cmdui.startProgress(_('Commit'), ''))
 
     def stop(self):
         self.runner.cancel()
 
     def commandFinished(self, ret):
+        self.progress.emit(*cmdui.stopProgress(_('Commit')))
         self.stopAction.setEnabled(False)
         self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
