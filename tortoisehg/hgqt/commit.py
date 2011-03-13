@@ -218,6 +218,11 @@ class CommitWidget(QWidget):
         self.branchop = None
 
         tbar.addAction(_('Options')).triggered.connect(self.details)
+        tbar.setIconSize(QSize(16,16))
+        self.stopAction = tbar.addAction(_('Stop'))
+        self.stopAction.triggered.connect(self.stop)
+        self.stopAction.setIcon(qtlib.geticon('process-stop'))
+        self.stopAction.setEnabled(False)
 
         hbox.addStretch(1)
 
@@ -609,9 +614,16 @@ class CommitWidget(QWidget):
             commandlines.append(cmd)
 
         repo.incrementBusyCount()
+        self.commitButtonEnable.emit(False)
         self.runner.run(*commandlines)
+        self.stopAction.setEnabled(True)
+
+    def stop(self):
+        self.runner.cancel()
 
     def commandFinished(self, ret):
+        self.stopAction.setEnabled(False)
+        self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
             umsg = self.msgte.text()
