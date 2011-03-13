@@ -28,10 +28,10 @@ from PyQt4.QtGui import *
 
 class ThgTabBar(QTabBar):
     def mouseReleaseEvent(self, event):
-        
+
         if event.button() == Qt.MidButton:
             self.tabCloseRequested.emit(self.tabAt(event.pos()))
-            
+
         super(QTabBar, self).mouseReleaseEvent(event)
 
 class Workbench(QMainWindow):
@@ -569,9 +569,7 @@ class Workbench(QMainWindow):
             args = []
         dlg = CloneDialog(args, parent=self)
         dlg.finished.connect(dlg.deleteLater)
-        if dlg.exec_():
-            path = dlg.getDest()
-            self.openRepo(path)
+        dlg.clonedRepository.connect(self.showRepo)
 
     def openRepository(self):
         """ Open repo from File menu """
