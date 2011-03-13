@@ -8,7 +8,7 @@
 import os
 import sys
 
-from mercurial import extensions, ui
+from mercurial import extensions
 from tortoisehg.util import hglib, version
 from tortoisehg.hgqt.i18n import _
 
@@ -159,14 +159,19 @@ class ExceptionMsgBox(QDialog):
         if ref == '#bugreport':
             return BugReport(self._opts, self).exec_()
         if ref.startswith('#edit:'):
-            # A chicken-egg problem here, we need a ui to get your
-            # editor in order to repair your ui config file.
-            class FakeRepo(object):
-                def __init__(self):
-                    root = os.getcwd()
-                    ui = ui.ui()
             fname, lineno = ref[6:].rsplit(':', 1)
-            qtlib.editfiles(FakeRepo(), [fname], lineno, parent=self)
+            try:
+                # A chicken-egg problem here, we need a ui to get your
+                # editor in order to repair your ui config file.
+                from mercurial import ui as uimod
+                class FakeRepo(object):
+                    def __init__(self):
+                        self.root = os.getcwd()
+                        self.ui = uimod.ui()
+                fake = FakeRepo()
+                qtlib.editfiles(fake, [fname], lineno, parent=self)
+            except:
+                QDesktopServices.openUrl(QUrl.fromLocalFile(fname))
 
 def run(ui, *pats, **opts):
     return BugReport(opts)
