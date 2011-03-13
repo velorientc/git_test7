@@ -14,57 +14,103 @@ from tortoisehg.hgqt import qtlib, htmlui, visdiff
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QObject
 from PyQt4.QtGui import *
 
-def wctxactions(parent, point, repo, selrows):
-    if not selrows:
-        return
-    alltypes = set()
-    for t, path in selrows:
-        alltypes |= t
+class WctxActions(QObject):
+    'container class for working context actions'
 
-    def make(text, func, types, icon=None):
-        files = [f for t, f in selrows if t & types]
-        if not files:
-            return None
-        action = menu.addAction(text)
-        if icon:
-            action.setIcon(qtlib.getmenuicon(icon))
-        action.args = (func, parent, files, repo)
-        action.run = lambda: run(*action.args)
-        action.triggered.connect(action.run)
-        return action
+    def __init__(self, repo, parent):
+        super(WctxActions, self).__init__(parent)
 
-    if hasattr(parent, 'contextmenu'):
-        menu = parent.contextmenu
+        self.menu = QMenu(parent)
+        self.repo = repo
+        allactions = []
+
+        def make(text, func, types, icon=None, keys=None):
+            action = QAction(text, parent)
+            action._filetypes = types
+            action._runfunc = func
+            if icon:
+                action.setIcon(qtlib.getmenuicon(icon))
+            if keys:
+                action.setShortcut(QKeySequence(keys))
+            action.triggered.connect(self.runAction)
+            parent.addAction(action)
+            allactions.append(action)
+
+        make(_('&Visual Diff'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
+        make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
+        make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
+        make(_('View missing'), viewmissing, frozenset('R!'))
+        allactions.append(None)
+        make(_('&Revert'), revert, frozenset('MAR!'), 'hg-revert')
+        make(_('&Add'), add, frozenset('R'), 'fileadd')
+        allactions.append(None)
+        make(_('File History'), log, frozenset('MARC!'), 'hg-log')
+        make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
+        allactions.append(None)
+        make(_('&Forget'), forget, frozenset('MAC!'), 'filedelete')
+        make(_('&Add'), add, frozenset('I?'), 'fileadd')
+        make(_('&Detect Renames...'), guessRename, frozenset('A?!'),
+             'detect_rename')
+        make(_('&Ignore'), ignore, frozenset('?'), 'ignore')
+        make(_('Remove versioned'), remove, frozenset('C'), 'remove')
+        make(_('&Delete unversioned'), delete, frozenset('?I'), 'hg-purge')
+        allactions.append(None)
+        make(_('Mark unresolved'), unmark, frozenset('r'))
+        make(_('Mark resolved'), mark, frozenset('u'))
+        self.allactions = allactions
+
+    def updateActionSensitivity(self, selrows):
+        'Enable/Disable permanent actions based on current selection'
+        self.selrows = selrows
+        alltypes = set()
+        for types, wfile in selrows:
+            alltypes |= types
+        for action in self.allactions:
+            if action is not None:
+                action.setEnabled(bool(action._filetypes & alltypes))
+
+    def makeMenu(self, selrows):
+        self.selrows = selrows
+        repo, menu = self.repo, self.menu
+
+        alltypes = set()
+        for types, wfile in selrows:
+            alltypes |= types
+
         menu.clear()
-    else:
-        menu = QMenu(parent)
-        parent.contextmenu = menu
-    make(_('&Visual Diff'), vdiff, frozenset('MAR!'), 'visualdiff')
-    make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
-    make(_('Edit'), edit, frozenset('MACI?'), 'edit-file')
-    make(_('View missing'), viewmissing, frozenset('R!'))
-    if len(repo.parents()) > 1:
-        make(_('View other'), viewother, frozenset('MA'))
-    menu.addSeparator()
-    make(_('&Revert'), revert, frozenset('MAR!'), 'hg-revert')
-    make(_('&Add'), add, frozenset('R'), 'fileadd')
-    menu.addSeparator()
-    make(_('File History'), log, frozenset('MARC!'), 'hg-log')
-    make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
-    menu.addSeparator()
-    make(_('&Forget'), forget, frozenset('MAC!'), 'filedelete')
-    make(_('&Add'), add, frozenset('I?'), 'fileadd')
-    make(_('&Detect Renames...'), guessRename, frozenset('A?!'), 'detect_rename')
-    make(_('&Ignore'), ignore, frozenset('?'), 'ignore')
-    make(_('Remove versioned'), remove, frozenset('C'), 'remove')
-    make(_('&Delete unversioned'), delete, frozenset('?I'), 'hg-purge')
-    if len(selrows) == 1:
-        menu.addSeparator()
+        addedActions = False
+        for action in self.allactions:
+            if action is None and addedActions:
+                menu.addSeparator()
+                addedActions = False
+            elif action._filetypes & alltypes:
+                menu.addAction(action)
+                addedActions = True
+
+        def make(text, func, types, icon=None):
+            if not types & alltypes:
+                return
+            action = menu.addAction(text)
+            action._filetypes = types
+            action._runfunc = func
+            if icon:
+                action.setIcon(qtlib.getmenuicon(icon))
+            action.triggered.connect(self.runAction)
+
+        if len(repo.parents()) > 1:
+            make(_('View other'), viewother, frozenset('MA'))
+
+        if len(selrows) == 1:
+            menu.addSeparator()
+            make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
+            make(_('Rename...'), rename, frozenset('MC'), 'hg-rename')
+
+        # Add 'was renamed from' actions for unknown files
         t, path = selrows[0]
-        wctx = repo[None]
+        wctx = self.repo[None]
         if t & frozenset('?') and wctx.deleted():
             rmenu = QMenu(_('Was renamed from'))
             for d in wctx.deleted()[:15]:
@@ -73,63 +119,61 @@ def wctxactions(parent, point, repo, selrows):
                     a.triggered.connect(lambda: renamefromto(repo, deleted, path))
                 mkaction(d)
             menu.addMenu(rmenu)
-        else:
-            make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
-            make(_('Rename...'), rename, frozenset('MC'), 'hg-rename')
-    menu.addSeparator()
-    make(_('Mark unresolved'), unmark, frozenset('r'))
-    make(_('Mark resolved'), mark, frozenset('u'))
-    f = make(_('Restart Merge...'), resolve, frozenset('u'))
-    if f:
-        files = [f for t, f in selrows if 'u' in t]
-        rmenu = QMenu(_('Restart merge with'))
-        for tool in hglib.mergetools(repo.ui):
-            def mkaction(rtool):
-                a = rmenu.addAction(hglib.tounicode(rtool))
-                a.triggered.connect(lambda: resolve_with(rtool, repo, files))
-            mkaction(tool)
-        menu.addMenu(rmenu)
-    return menu.exec_(point)
 
-def run(func, parent, files, repo):
-    'run wrapper for all action methods'
-    hu = htmlui.htmlui()
-    name = func.__name__.title()
-    notify = False
-    cwd = os.getcwd()
-    try:
-        os.chdir(repo.root)
+        # Add restart merge actions for resolved files
+        if alltypes & frozenset('u'):
+            f = make(_('Restart Merge...'), resolve, frozenset('u'))
+            files = [f for t, f in selrows if 'u' in t]
+            rmenu = QMenu(_('Restart merge with'))
+            for tool in hglib.mergetools(repo.ui):
+                def mkaction(rtool):
+                    a = rmenu.addAction(hglib.tounicode(rtool))
+                    a.triggered.connect(lambda: resolve_with(rtool, repo, files))
+                mkaction(tool)
+            menu.addMenu(rmenu)
+        return menu
+
+    def runAction(self):
+        'run wrapper for all action methods'
+
+        repo, action, parent = self.repo, self.sender(), self.parent()
+        func = action._runfunc
+        files = [wfile for t, wfile in self.selrows if t & action._filetypes]
+
+        hu = htmlui.htmlui()
+        name = func.__name__.title()
+        notify = False
+        cwd = os.getcwd()
         try:
-            # All operations should quietly succeed.  Any error should
-            # result in a message box
-            notify = func(parent, hu, repo, files)
-            o, e = hu.getdata()
-            if e:
-                QMessageBox.warning(parent, name + _(' errors'), str(e))
-            elif o:
-                QMessageBox.information(parent, name + _(' output'), str(o))
-            elif notify:
-                wfiles = [repo.wjoin(x) for x in files]
-                shlib.shell_notify(wfiles)
-        except (IOError, OSError), e:
-            err = hglib.tounicode(str(e))
-            QMessageBox.critical(parent, name + _(' Aborted'), err)
-        except util.Abort, e:
-            if e.hint:
-                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                            hglib.tounicode(e.hint))
-            else:
+            os.chdir(repo.root)
+            try:
+                # All operations should quietly succeed.  Any error should
+                # result in a message box
+                notify = func(parent, hu, repo, files)
+                o, e = hu.getdata()
+                if e:
+                    QMessageBox.warning(parent, name + _(' errors'), str(e))
+                elif o:
+                    QMessageBox.information(parent, name + _(' output'), str(o))
+                elif notify:
+                    wfiles = [repo.wjoin(x) for x in files]
+                    shlib.shell_notify(wfiles)
+            except (IOError, OSError), e:
                 err = hglib.tounicode(str(e))
-            QMessageBox.critical(parent, name + _(' Aborted'), err)
-        except (error.LookupError), e:
-            err = hglib.tounicode(str(e))
-            QMessageBox.critical(parent, name + _(' Aborted'), err)
-        except NotImplementedError:
-            QMessageBox.critical(parent, name + _(' not implemented'),
-                    'Please add it :)')
-    finally:
-        os.chdir(cwd)
-    return notify
+                QMessageBox.critical(parent, name + _(' Aborted'), err)
+            except util.Abort, e:
+                if e.hint:
+                    err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                                hglib.tounicode(e.hint))
+                else:
+                    err = hglib.tounicode(str(e))
+                QMessageBox.critical(parent, name + _(' Aborted'), err)
+            except (error.LookupError), e:
+                err = hglib.tounicode(str(e))
+                QMessageBox.critical(parent, name + _(' Aborted'), err)
+        finally:
+            os.chdir(cwd)
+        return notify
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
@@ -190,12 +234,12 @@ def edit(parent, ui, repo, files, lineno=None, search=None):
             cmdline = ' '.join([editor] + files)
     else:
         editor = os.environ.get('HGEDITOR') or ui.config('ui', 'editor') or \
-                 os.environ.get('EDITOR', 'vi')
+                os.environ.get('EDITOR', 'vi')
         cmdline = ' '.join([editor] + files)
     if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
         res = QMessageBox.critical(parent,
-                       _('No visual editor configured'),
-                       _('Please configure a visual editor.'))
+                    _('No visual editor configured'),
+                    _('Please configure a visual editor.'))
         from tortoisehg.hgqt.settings import SettingsDialog
         dlg = SettingsDialog(False, focus='tortoisehg.editor')
         dlg.exec_()
@@ -204,11 +248,11 @@ def edit(parent, ui, repo, files, lineno=None, search=None):
     cmdline = util.quotecommand(cmdline)
     try:
         subprocess.Popen(cmdline, shell=True, creationflags=visdiff.openflags,
-                         stderr=None, stdout=None, stdin=None)
+                        stderr=None, stdout=None, stdin=None)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
-                 _('Editor launch failure'),
-                 _('%s : %s') % (cmd, str(e)))
+                _('Editor launch failure'),
+                _('%s : %s') % (cmd, str(e)))
     return False
 
 
@@ -239,10 +283,10 @@ def revert(parent, ui, repo, files):
         commands.revert(ui, repo, *files, **revertopts)
     else:
         res = qtlib.CustomPrompt(
-                 _('Confirm Revert'),
-                 _('Revert local file changes?'), parent,
-                 (_('&Revert with backup'), _('&Discard changes'),
-                  _('Cancel')), 2, 2, files).run()
+                _('Confirm Revert'),
+                _('Revert local file changes?'), parent,
+                (_('&Revert with backup'), _('&Discard changes'),
+                _('Cancel')), 2, 2, files).run()
         if res == 2:
             return False
         if res == 1:
