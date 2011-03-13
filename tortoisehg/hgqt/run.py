@@ -21,7 +21,7 @@ import traceback
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import mercurial.ui as _ui
+import mercurial.ui as uimod
 from mercurial import hg, util, fancyopts, cmdutil, extensions, error
 
 from tortoisehg.hgqt.i18n import agettext as _
@@ -41,25 +41,37 @@ about help version thgstatus serve rejects log'''
 def dispatch(args):
     """run the command specified in args"""
     try:
-        u = _ui.ui()
+        u = uimod.ui()
         if '--traceback' in args:
             u.setconfig('ui', 'traceback', 'on')
         if '--debugger' in args:
             pdb.set_trace()
         return _runcatch(u, args)
+    except error.ParseError, e:
+        from tortoisehg.hgqt.bugreport import ExceptionMsgBox
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['values'] = e
+        errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
+                      '<a href="#edit:%(arg1)s">edit</a> your config')
+        main = QApplication(sys.argv)
+        dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts,
+                              parent=None)
+        dlg.exec_()
+    except Exception, e:
+        print e
+        if '--debugger' in args:
+            pdb.post_mortem(sys.exc_info()[2])
+        errstr = traceback.format_exc()
+        opts = {}
+        opts['cmd'] = ' '.join(sys.argv[1:])
+        opts['error'] = errstr
+        opts['nofork'] = True
+        return qtrun(bugrun, u, **opts)
     except SystemExit:
         pass
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
-    except:
-        if '--debugger' in args:
-            pdb.post_mortem(sys.exc_info()[2])
-        error = traceback.format_exc()
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = error
-        opts['nofork'] = True
-        return qtrun(bugrun, u, **opts)
 
 origwdir = os.getcwd()
 def portable_fork(ui, opts):
