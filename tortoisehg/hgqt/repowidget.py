@@ -9,7 +9,7 @@
 import binascii
 import os
 
-from mercurial import util, revset, error
+from mercurial import util, revset, error, patch
 
 from tortoisehg.util import shlib, hglib
 
@@ -435,19 +435,36 @@ class RepoWidget(QWidget):
         self.generateMultipleSelectionMenu()
         self.generateBundleMenu()
 
+    def detectPatches(self, paths):
+        filepaths = []
+        for p in paths:
+            if not os.path.isfile(p):
+                continue
+            try:
+                pf = open(p, 'rb')
+                filename, message, user, date, branch, node, p1, p2 = \
+                        patch.extract(self.repo.ui, pf)
+                if filename:
+                    filepaths.append(p)
+                    os.unlink(filename)
+            except Exception, e:
+                pass
+        return filepaths
+
     def dragEnterEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        if util.any(os.path.isfile(p) for p in paths):
+        if self.detectPatches(paths):
             event.setDropAction(Qt.CopyAction)
             event.accept()
 
     def dropEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        filepaths = [p for p in paths if os.path.isfile(p)]
-        if filepaths:
-            self.thgimport(filepaths)
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
+        patches = self.detectPatches(paths)
+        if not patches:
+            return
+        event.setDropAction(Qt.CopyAction)
+        event.accept()
+        self.thgimport(patches)
 
     ## Begin Workbench event forwards
 

@@ -782,16 +782,32 @@ class MQWidget(QWidget):
 
     # Capture drop events, try to import into current patch queue
 
-    def dragEnterEvent(self, event):
-        event.acceptProposedAction()
+    def detectPatches(self, paths):
+        filepaths = []
+        for p in paths:
+            if not os.path.isfile(p):
+                continue
+            try:
+                pf = open(p, 'rb')
+                filename, message, user, date, branch, node, p1, p2 = \
+                        patch.extract(self.repo.ui, pf)
+                if filename:
+                    filepaths.append(p)
+                    os.unlink(filename)
+            except Exception, e:
+                pass
+        return filepaths
 
-    def dragMoveEvent(self, event):
-        event.acceptProposedAction()
+    def dragEnterEvent(self, event):
+        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
+        if self.detectPatches(paths):
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
 
     def dropEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        filepaths = [p for p in paths if os.path.isfile(p)]
-        if filepaths:
+        patches = self.detectPatches(paths)
+        if patches:
             event.setDropAction(Qt.CopyAction)
             event.accept()
         else:
@@ -799,7 +815,7 @@ class MQWidget(QWidget):
             return
         dlg = thgimport.ImportDialog(self.repo, self, mq=True)
         dlg.finished.connect(dlg.deleteLater)
-        dlg.setfilepaths(filepaths)
+        dlg.setfilepaths(patches)
         dlg.exec_()
 
     # End drop events
