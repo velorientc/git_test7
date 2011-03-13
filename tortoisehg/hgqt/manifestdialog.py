@@ -19,7 +19,7 @@ from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
-from tortoisehg.hgqt import visdiff, wctxactions, revert
+from tortoisehg.hgqt import visdiff, revert
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -229,19 +229,17 @@ class ManifestWidget(QWidget):
         if self.path is None:
             return
         if self.rev is None:
-            files = [self._repo.wjoin(self.path)]
-            wctxactions.edit(self, self._repo.ui, self._repo, files)
+            qtlib.editfiles(self._repo, [self.path], parent=self)
         else:
             base, _ = visdiff.snapshot(self._repo, [self.path],
                                        self._repo[self.rev])
             files = [os.path.join(base, self.path)]
-            wctxactions.edit(self, self._repo.ui, self._repo, files)
+            qtlib.editfiles(self._repo, files, parent=self)
 
     def editlocal(self):
         if self.path is None:
             return
-        path = self._repo.wjoin(self.path)
-        wctxactions.edit(self, self._repo.ui, self._repo, [path])
+        qtlib.editfiles(self._repo, [self.path], parent=self)
 
     def revertfile(self):
         if self.path is None:
@@ -395,7 +393,7 @@ def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
     pattern = hglib.fromunicode(pattern)
     base = visdiff.snapshot(repo, [path], repo[rev])[0]
     files = [os.path.join(base, path)]
-    wctxactions.edit(parent, repo.ui, repo, files, line, pattern)
+    qtlib.editfiles(repo, files, line, pattern, parent=self)
 
 
 def run(ui, *pats, **opts):
