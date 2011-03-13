@@ -385,7 +385,7 @@ class Workbench(QMainWindow):
         for u in d.urls():
             root = self.find_root(u)
             if root:
-                self.openRepo(root)
+                self.showRepo(root)
                 accept = True
         if accept:
             event.setDropAction(Qt.LinkAction)
