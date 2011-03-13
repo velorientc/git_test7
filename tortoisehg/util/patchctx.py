@@ -35,7 +35,6 @@ class patchctx(object):
         self._status = [[], [], []]
         self._fileorder = []
         self._user = ''
-        self._date = ''
         self._desc = ''
         self._branch = ''
         self._node = node.nullid
@@ -53,6 +52,7 @@ class patchctx(object):
             hash.update(str(self._mtime))
             self._identity = hash.digest()
         except EnvironmentError:
+            self._date = util.makedate()
             return
 
         try:
