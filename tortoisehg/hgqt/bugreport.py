@@ -164,13 +164,14 @@ class ExceptionMsgBox(QDialog):
                 # A chicken-egg problem here, we need a ui to get your
                 # editor in order to repair your ui config file.
                 from mercurial import ui as uimod
+                from tortoisehg.hgqt import qtlib
                 class FakeRepo(object):
                     def __init__(self):
                         self.root = os.getcwd()
                         self.ui = uimod.ui()
                 fake = FakeRepo()
                 qtlib.editfiles(fake, [fname], lineno, parent=self)
-            except:
+            except Exception, e:
                 QDesktopServices.openUrl(QUrl.fromLocalFile(fname))
 
 def run(ui, *pats, **opts):
