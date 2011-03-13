@@ -609,9 +609,11 @@ class CommitWidget(QWidget):
             commandlines.append(cmd)
 
         repo.incrementBusyCount()
+        self.commitButtonEnable.emit(False)
         self.runner.run(*commandlines)
 
     def commandFinished(self, ret):
+        self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
             umsg = self.msgte.text()
