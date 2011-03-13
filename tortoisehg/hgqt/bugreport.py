@@ -147,6 +147,7 @@ class ExceptionMsgBox(QDialog):
         self._textlabel = QLabel(text, wordWrap=True,
                                  textInteractionFlags=labelflags)
         self._textlabel.linkActivated.connect(self._openlink)
+        self._textlabel.setWordWrap(False)
         self.layout().addWidget(self._textlabel)
 
         bb = QDialogButtonBox(QDialogButtonBox.Close, centerButtons=True)
