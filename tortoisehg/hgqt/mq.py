@@ -82,41 +82,41 @@ class MQWidget(QWidget):
         qtbarhbox.setSpacing(5)
         layout.addLayout(qtbarhbox, 0)
         qtbarhbox.setContentsMargins(0, 0, 0, 0)
-        self.qpushAllBtn = a = QAction(
+        self.qpushAllAct = a = QAction(
             geticon('hg-qpush-all'), _('Push all'), self)
         a.setToolTip(_('Apply all patches'))
-        self.qpushBtn = a = QAction(
+        self.qpushAct = a = QAction(
             geticon('hg-qpush'), _('Push'), self)
         a.setToolTip(_('Apply one patch'))
-        self.setGuardsBtn = a = QAction(
+        self.setGuardsAct = a = QAction(
             geticon('hg-qguard'), _('Guards'), self)
         a.setToolTip(_('Configure guards for selected patch'))
-        self.qpushMoveBtn = a = QAction(
+        self.qpushMoveAct = a = QAction(
             geticon('hg-qreorder'), _('Push selected'), self)
         a.setToolTip(_('Apply selected patch next (change queue order)'))
-        self.qdeleteBtn = a = QAction(
+        self.qdeleteAct = a = QAction(
             geticon('hg-qdelete'), _('Delete'), self)
         a.setToolTip(_('Delete selected patches'))
-        self.qpopBtn = a = QAction(
+        self.qpopAct = a = QAction(
             geticon('hg-qpop'), _('Pop'), self)
         a.setToolTip(_('Unapply one patch'))
-        self.qpopAllBtn = a = QAction(
+        self.qpopAllAct = a = QAction(
             geticon('hg-qpop-all'), _('Pop all'), self)
         a.setToolTip(_('Unapply all patches'))
         tbar = QToolBar(_('Patch Queue Actions Toolbar'))
         tbar.setIconSize(QSize(18, 18))
         qtbarhbox.addWidget(tbar)
-        tbar.addAction(self.qpushBtn)
-        tbar.addAction(self.qpushAllBtn)
+        tbar.addAction(self.qpushAct)
+        tbar.addAction(self.qpushAllAct)
         tbar.addSeparator()
-        tbar.addAction(self.qpopBtn)
-        tbar.addAction(self.qpopAllBtn)
+        tbar.addAction(self.qpopAct)
+        tbar.addAction(self.qpopAllAct)
         tbar.addSeparator()
-        tbar.addAction(self.qpushMoveBtn)
+        tbar.addAction(self.qpushMoveAct)
         tbar.addSeparator()
-        tbar.addAction(self.qdeleteBtn)
+        tbar.addAction(self.qdeleteAct)
         tbar.addSeparator()
-        tbar.addAction(self.setGuardsBtn)
+        tbar.addAction(self.setGuardsAct)
 
         self.queueListWidget = QListWidget(self)
         layout.addWidget(self.queueListWidget, 1)
@@ -189,13 +189,13 @@ class MQWidget(QWidget):
         self.queueListWidget.currentRowChanged.connect(self.onPatchSelected)
         self.queueListWidget.itemActivated.connect(self.onGotoPatch)
         self.queueListWidget.itemChanged.connect(self.onRenamePatch)
-        self.qpushAllBtn.triggered.connect(self.onPushAll)
-        self.qpushBtn.triggered.connect(self.onPush)
-        self.qpushMoveBtn.triggered.connect(self.onPushMove)
-        self.qpopAllBtn.triggered.connect(self.onPopAll)
-        self.qpopBtn.triggered.connect(self.onPop)
-        self.setGuardsBtn.triggered.connect(self.onGuardConfigure)
-        self.qdeleteBtn.triggered.connect(self.onDelete)
+        self.qpushAllAct.triggered.connect(self.onPushAll)
+        self.qpushAct.triggered.connect(self.onPush)
+        self.qpushMoveAct.triggered.connect(self.onPushMove)
+        self.qpopAllAct.triggered.connect(self.onPopAll)
+        self.qpopAct.triggered.connect(self.onPop)
+        self.setGuardsAct.triggered.connect(self.onGuardConfigure)
+        self.qdeleteAct.triggered.connect(self.onDelete)
         self.newCheckBox.toggled.connect(self.onNewModeToggled)
         self.qnewOrRefreshBtn.clicked.connect(self.onQNewOrQRefresh)
 
@@ -434,13 +434,13 @@ class MQWidget(QWidget):
         if row >= 0:
             patch = self.queueListWidget.item(row)._thgpatch
             applied = set([p.name for p in self.repo.mq.applied])
-            self.qdeleteBtn.setEnabled(patch not in applied)
-            self.qpushMoveBtn.setEnabled(patch not in applied)
-            self.setGuardsBtn.setEnabled(True)
+            self.qdeleteAct.setEnabled(patch not in applied)
+            self.qpushMoveAct.setEnabled(patch not in applied)
+            self.setGuardsAct.setEnabled(True)
         else:
-            self.qdeleteBtn.setEnabled(False)
-            self.qpushMoveBtn.setEnabled(False)
-            self.setGuardsBtn.setEnabled(False)
+            self.qdeleteAct.setEnabled(False)
+            self.qpushMoveAct.setEnabled(False)
+            self.setGuardsAct.setEnabled(False)
 
     @pyqtSlot(int)
     def onFileSelected(self, row):
@@ -641,13 +641,13 @@ class MQWidget(QWidget):
         else:
             self.revisionOrCommitBtn.setText(_('Create MQ repo'))
 
-        self.qpushAllBtn.setEnabled(bool(repo.thgmqunappliedpatches))
-        self.qpushBtn.setEnabled(bool(repo.thgmqunappliedpatches))
-        self.qpushMoveBtn.setEnabled(False)
-        self.qdeleteBtn.setEnabled(False)
-        self.setGuardsBtn.setEnabled(False)
-        self.qpopBtn.setEnabled(bool(applied))
-        self.qpopAllBtn.setEnabled(bool(applied))
+        self.qpushAllAct.setEnabled(bool(repo.thgmqunappliedpatches))
+        self.qpushAct.setEnabled(bool(repo.thgmqunappliedpatches))
+        self.qpushMoveAct.setEnabled(False)
+        self.qdeleteAct.setEnabled(False)
+        self.setGuardsAct.setEnabled(False)
+        self.qpopAct.setEnabled(bool(applied))
+        self.qpopAllAct.setEnabled(bool(applied))
 
         pctx = repo.changectx('.')
         newmode = self.newCheckBox.isChecked()
