@@ -632,7 +632,6 @@ class MatchTree(QTableView):
             return
 
     def onViewFile(self):
-        from tortoisehg.hgqt import wctxactions
         repo, ui, pattern = self.repo, self.repo.ui, self.pattern
         seen = set()
         for rev, path, line in self.selectedRows:
@@ -642,12 +641,11 @@ class MatchTree(QTableView):
             else:
                 seen.add(path)
             if rev is None:
-                files = [repo.wjoin(path)]
-                wctxactions.edit(self, ui, repo, files, line, pattern)
+                qtlib.editfiles(repo, [path], line, pattern, self)
             else:
                 base, _ = visdiff.snapshot(repo, [path], repo[rev])
                 files = [os.path.join(base, path)]
-                wctxactions.edit(self, ui, repo, files, line, pattern)
+                qtlib.editfiles(repo, files, line, pattern, self)
 
     def onVisualDiff(self):
         rows = self.selectedRows[:]
