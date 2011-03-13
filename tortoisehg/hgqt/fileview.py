@@ -260,6 +260,10 @@ class HgFileView(QFrame):
         if rev != self._p_rev:
             self.displayFile(rev=rev)
 
+    def showLine(self, line):
+        if line < self.sci.lines():
+            self.sci.setCursorPosition(line, 0)
+
     @pyqtSlot()
     def clearDisplay(self):
         self._filename = None
