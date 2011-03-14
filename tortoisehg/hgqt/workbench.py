@@ -348,7 +348,14 @@ class Workbench(QMainWindow):
             repopath = hglib.fromunicode(repopath)
         self._openRepo(path=repopath, reuse=reuse)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(QString)
+    def openLinkedRepo(self, path):
+        self.showRepo(path)
+        rw = self.repoTabsWidget.currentWidget()
+        if rw:
+            rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
+
+    @pyqtSlot(QString)
     def showRepo(self, path):
         """Activate the repo tab or open it if not available [unicode]"""
         for i in xrange(self.repoTabsWidget.count()):
@@ -483,7 +490,7 @@ class Workbench(QMainWindow):
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
         rw.revisionSelected.connect(self.updateHistoryActions)
-        rw.repoLinkClicked.connect(self.showRepo)
+        rw.repoLinkClicked.connect(self.openLinkedRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
 
