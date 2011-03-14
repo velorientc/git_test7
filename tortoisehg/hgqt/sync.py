@@ -759,14 +759,14 @@ class SyncWidget(QWidget):
                         changelist = hashes.pop(0)
                         clnum = int(changelist)
                         if len(hashes)>1 and len(hashes[0])==1:
-                           state = hashes.pop(0)
-                           if state == 's':
-                               changelist = _('%s (submitted)') % changelist
-                           elif state == 'p':
-                               changelist = _('%s (pending)') % changelist
-                           else:
-                               raise ValueError
-                        pending[changelist] = hashes
+                            state = hashes.pop(0)
+                            if state == 's':
+                                changelist = _('%s (submitted)') % changelist
+                            elif state == 'p':
+                                changelist = _('%s (pending)') % changelist
+                            else:
+                                raise ValueError
+                            pending[changelist] = hashes
                     except (ValueError, IndexError):
                         text = _('Unable to parse p4pending output')
                 if pending:
