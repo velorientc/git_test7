@@ -226,8 +226,7 @@ class SearchWidget(QWidget):
     def stopClicked(self):
         if self.thread and self.thread.isRunning():
             self.thread.cancel()
-            if self.thread.wait( 2000 ):
-                self.thread = None
+            self.thread.wait(2000)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -458,7 +457,12 @@ class CtxSearchThread(QThread):
             count += 1
             if not matchfn(wfile):
                 continue
-            data = ctx[wfile].data()     # load file data
+            try:
+                data = ctx[wfile].data()     # load file data
+            except EnvironmentError:
+                self.showMessage.emit(_('Skipping %s, unable to read') % 
+                                      hglib.tounicode(wfile))
+                continue
             if util.binary(data):
                 continue
             for i, line in enumerate(data.splitlines()):

@@ -16,6 +16,9 @@ struct MenuDescription
 
 typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
 
+typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
+
+
 class CShellExtCMenu: public IContextMenu3, IShellExtInit
 {
 
@@ -23,16 +26,18 @@ protected:
     ULONG m_cRef;
     std::vector<std::string> myFiles;
     std::string myFolder;
+    MenuDescriptionMap myDescMap;
+    MenuIdCmdMap myMenuIdMap;
 
     virtual void RunDialog(const std::string&);
-    virtual MenuDescriptionMap& GetMenuDescriptionMap();
 
     void TweakMenuForVista(HMENU menu);
     void PrintDebugHeader(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj);
-    void InitMenuMaps(MenuDescription *menuDescs, std::size_t sz);
+    void InitMenuMaps(const MenuDescription *menuDescs, std::size_t sz);
     void InsertMenuItemByName(
 	    HMENU hMenu, const std::string& name, UINT indexMenu,
 	    UINT idCmd, UINT idCmdFirst, const std::wstring& prefix);
+    void AddMenuList(UINT idCmd, const std::string& name);
 
 public:
     explicit CShellExtCMenu(const char dummy);

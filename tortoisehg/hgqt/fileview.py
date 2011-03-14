@@ -626,6 +626,9 @@ class FileData(object):
                 olddata = ctx.p1()[wfile].data()
                 if '\0' in olddata:
                     self.error = 'binary file'
+                elif len(olddata) > ctx._repo.maxdiff:
+                    p = _('File or diffs not displayed: ')
+                    self.error = p + _('File is larger than the specified max size.\n')
                 else:
                     self.contents = hglib.tounicode(olddata)
                 self.flabel += _(' <i>(was deleted)</i>')
