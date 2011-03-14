@@ -209,7 +209,7 @@ class ChunksWidget(QWidget):
                 wlock = repo.wlock()
                 try:
                     repo.wopener(self.currentFile, 'wb').write(
-                        self.diffbrowse.origcontents)
+                        hglib.fromunicode(self.diffbrowse.origcontents))
                     fp = cStringIO.StringIO()
                     chunks[0].write(fp)
                     for c in kchunks:
