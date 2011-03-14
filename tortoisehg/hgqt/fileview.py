@@ -621,16 +621,20 @@ class FileData(object):
 
         # TODO: elif check if a subdirectory (for manifest tool)
 
+        mde = _('File or diffs not displayed: ') + \
+              _('File is larger than the specified max size.\n')
+
         if status in ('R', '!'):
             if wfile in ctx.p1():
-                olddata = ctx.p1()[wfile].data()
-                if '\0' in olddata:
-                    self.error = 'binary file'
-                elif len(olddata) > ctx._repo.maxdiff:
-                    p = _('File or diffs not displayed: ')
-                    self.error = p + _('File is larger than the specified max size.\n')
+                fctx = ctx.p1()[wfile]
+                if fctx._filelog.rawsize(fctx.filerev()) > ctx._repo.maxdiff:
+                    self.error = mde
                 else:
-                    self.contents = hglib.tounicode(olddata)
+                    olddata = fctx.data()
+                    if '\0' in olddata:
+                        self.error = 'binary file'
+                    else:
+                        self.contents = hglib.tounicode(olddata)
                 self.flabel += _(' <i>(was deleted)</i>')
             else:
                 self.flabel += _(' <i>(was added, now missing)</i>')
@@ -638,11 +642,14 @@ class FileData(object):
 
         if status in ('I', '?', 'C'):
             try:
-                data = open(repo.wjoin(wfile), 'r').read()
-                if '\0' in data:
-                    self.error = 'binary file'
+                if os.path.getsize(repo.wjoin(wfile)) > ctx._repo.maxdiff:
+                    self.error = mde
                 else:
-                    self.contents = hglib.tounicode(data)
+                    data = open(repo.wjoin(wfile), 'r').read()
+                    if '\0' in data:
+                        self.error = 'binary file'
+                    else:
+                        self.contents = hglib.tounicode(data)
                 if status in ('I', '?'):
                     self.flabel += _(' <i>(is unversioned)</i>')
             except EnvironmentError, e:
