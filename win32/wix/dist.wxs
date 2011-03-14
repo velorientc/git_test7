@@ -60,7 +60,6 @@
         <File Name="unicodedata.pyd" />
         <File Name="win32api.pyd" />
         <File Name="win32com.shell.shell.pyd" />
-        <File Name="win32console.pyd" />
         <File Name="win32_crypto.pyd" />
         <File Name="win32cred.pyd" />
         <File Name="win32event.pyd" />
