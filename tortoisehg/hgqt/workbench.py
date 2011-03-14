@@ -238,11 +238,11 @@ class Workbench(QMainWindow):
         # NOTE: Sequence must match that in repowidget.py
         addtaskview('hg-log', _("Revision &Details"))
         addtaskview('hg-commit', _('&Commit'))
+        self.actionSelectTaskMQ = \
+                addtaskview('thg-mq', _('Patch &Queue'), 'mq')
         addtaskview('thg-sync', _('S&ynchronize'))
         addtaskview('hg-annotate', _('&Manifest'))
         addtaskview('hg-grep', _('&Search'))
-        self.actionSelectTaskMQ = \
-                addtaskview('thg-mq', _('Patch &Queue'), 'mq')
         self.actionSelectTaskPbranch = \
                 addtaskview('branch', _('&Patch Branch'), 'pbranch')
         newseparator(menu='view')

@@ -162,6 +162,14 @@ class RepoWidget(QWidget):
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
+        self.mqDemand = w = DemandWidget(self.createMQWidget)
+        if 'mq' in self.repo.extensions():
+            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
+            tt.setTabToolTip(idx, _("Patch Queue"))
+            self.namedTabs['mq'] = idx
+        else:
+            self.mqTabIndex = -1
+
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
@@ -173,14 +181,6 @@ class RepoWidget(QWidget):
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
-
-        self.mqDemand = w = DemandWidget(self.createMQWidget)
-        if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
-            tt.setTabToolTip(idx, _("Patch Queue"))
-            self.namedTabs['mq'] = idx
-        else:
-            self.mqTabIndex = -1
 
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
         if 'pbranch' in self.repo.extensions():
