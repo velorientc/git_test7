@@ -26,7 +26,7 @@ protected:
     ULONG m_cRef;
     std::vector<std::string> myFiles;
     std::string myFolder;
-    MenuDescriptionMap CMenuMenuDescMap;
+    MenuDescriptionMap myDescMap;
     MenuIdCmdMap MenuIdMap;
 
     virtual void RunDialog(const std::string&);
