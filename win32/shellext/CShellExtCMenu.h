@@ -33,7 +33,7 @@ protected:
 
     void TweakMenuForVista(HMENU menu);
     void PrintDebugHeader(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj);
-    void InitMenuMaps(MenuDescription *menuDescs, std::size_t sz);
+    void InitMenuMaps(const MenuDescription *menuDescs, std::size_t sz);
     void InsertMenuItemByName(
 	    HMENU hMenu, const std::string& name, UINT indexMenu,
 	    UINT idCmd, UINT idCmdFirst, const std::wstring& prefix);

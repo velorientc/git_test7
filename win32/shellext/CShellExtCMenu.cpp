@@ -164,7 +164,7 @@ void GetCMenuTranslation(
         RegCloseKey(hkey);
 }
 
-void CShellExtCMenu::InitMenuMaps(MenuDescription *menuDescs, std::size_t sz)
+void CShellExtCMenu::InitMenuMaps(const MenuDescription *menuDescs, std::size_t sz)
 {
     if (myDescMap.empty())
     {
