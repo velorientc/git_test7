@@ -125,7 +125,7 @@ static const char* const NoRepoMenu =
 void CShellExtCMenu::AddMenuList(UINT idCmd, const std::string& name)
 {
     TDEBUG_TRACE("AddMenuList: idCmd = " << idCmd << " name = " << name);
-    MenuIdMap[idCmd] = myDescMap[name];
+    myMenuIdMap[idCmd] = myDescMap[name];
 }
 
 
@@ -192,7 +192,7 @@ void CShellExtCMenu::InitMenuMaps(MenuDescription *menuDescs, std::size_t sz)
         
     }
 
-    MenuIdMap.clear();
+    myMenuIdMap.clear();
 }
 
 
@@ -569,8 +569,8 @@ CShellExtCMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     {
         UINT idCmd = LOWORD(lpcmi->lpVerb);
         TDEBUG_TRACE("CShellExtCMenu::InvokeCommand: idCmd = " << idCmd);
-        MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
-        if (iter != MenuIdMap.end())
+        MenuIdCmdMap::iterator iter = myMenuIdMap.find(idCmd);
+        if (iter != myMenuIdMap.end())
         {
             RunDialog(iter->second.name);
             hr = S_OK;
@@ -622,8 +622,8 @@ CShellExtCMenu::GetCommandString(
         << ", cchMax = " << cchMax
     );
 
-    MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
-    if (iter == MenuIdMap.end())
+    MenuIdCmdMap::iterator iter = myMenuIdMap.find(static_cast<UINT>(idCmd));
+    if (iter == myMenuIdMap.end())
     {
         TDEBUG_TRACE("***** CShellExtCMenu::GetCommandString: idCmd not found");
     }

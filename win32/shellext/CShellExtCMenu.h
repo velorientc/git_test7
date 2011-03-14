@@ -27,7 +27,7 @@ protected:
     std::vector<std::string> myFiles;
     std::string myFolder;
     MenuDescriptionMap myDescMap;
-    MenuIdCmdMap MenuIdMap;
+    MenuIdCmdMap myMenuIdMap;
 
     virtual void RunDialog(const std::string&);
 
