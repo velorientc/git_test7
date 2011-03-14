@@ -348,7 +348,8 @@ class StatusWidget(QWidget):
         else:
             return []
 
-    @pyqtSlot(QItemSelection, QItemSelection)
+    # Disabled decorator because of bug in older PyQt releases
+    #@pyqtSlot(QItemSelection, QItemSelection)
     def onSelectionChange(self, selected, deselected):
         selrows = []
         for index in self.tv.selectedRows():
