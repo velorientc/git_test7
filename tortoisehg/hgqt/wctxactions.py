@@ -105,9 +105,11 @@ def run(func, parent, files, repo):
             notify = func(parent, hu, repo, files)
             o, e = hu.getdata()
             if e:
-                QMessageBox.warning(parent, name + _(' errors'), str(e))
+                QMessageBox.warning(parent, name + _(' errors'),
+                                    hglib.tounicode(str(e)))
             elif o:
-                QMessageBox.information(parent, name + _(' output'), str(o))
+                QMessageBox.information(parent, name + _(' output'),
+                                        hglib.tounicode(str(o)))
             elif notify:
                 wfiles = [repo.wjoin(x) for x in files]
                 shlib.shell_notify(wfiles)
