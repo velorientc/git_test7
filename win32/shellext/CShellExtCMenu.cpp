@@ -17,7 +17,7 @@
 // According to http://msdn.microsoft.com/en-us/library/bb776094%28VS.85%29.aspx
 // the help texts for the commands should be reasonably short (under 40 characters)
 
-static MenuDescription CMenuMenuDescList[] =
+static const MenuDescription CMenuMenuDescList[] =
 {
     {"commit",      L"Commit...",
                     L"Commit changes in repository",
@@ -122,15 +122,10 @@ static const char* const NoRepoMenu =
 ;
 
 
-typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
-
-static MenuDescriptionMap CMenuMenuDescMap;
-static MenuIdCmdMap MenuIdMap;
-
-void AddMenuList(UINT idCmd, const std::string& name, MenuDescriptionMap& menuDescMap)
+void CShellExtCMenu::AddMenuList(UINT idCmd, const std::string& name)
 {
     TDEBUG_TRACE("AddMenuList: idCmd = " << idCmd << " name = " << name);
-    MenuIdMap[idCmd] = menuDescMap[name];
+    myMenuIdMap[idCmd] = myDescMap[name];
 }
 
 
@@ -169,15 +164,9 @@ void GetCMenuTranslation(
         RegCloseKey(hkey);
 }
 
-MenuDescriptionMap& CShellExtCMenu::GetMenuDescriptionMap()
+void CShellExtCMenu::InitMenuMaps(const MenuDescription *menuDescs, std::size_t sz)
 {
-    return CMenuMenuDescMap;
-}
-
-void CShellExtCMenu::InitMenuMaps(MenuDescription *menuDescs, std::size_t sz)
-{
-    MenuDescriptionMap& menuDescMap = GetMenuDescriptionMap();
-    if (menuDescMap.empty())
+    if (myDescMap.empty())
     {
         std::string lang;
         GetRegistryConfig("CMenuLang", lang);
@@ -198,12 +187,12 @@ void CShellExtCMenu::InitMenuMaps(MenuDescription *menuDescs, std::size_t sz)
             if (!lang.empty())
                 GetCMenuTranslation(lang, md.name, md.menuText, md.helpText);
 
-            menuDescMap[md.name] = md;
+            myDescMap[md.name] = md;
         }
         
     }
 
-    MenuIdMap.clear();
+    myMenuIdMap.clear();
 }
 
 
@@ -309,11 +298,8 @@ void CShellExtCMenu::InsertMenuItemByName(
     HMENU hMenu, const std::string& name, UINT indexMenu,
     UINT idCmd, UINT idCmdFirst, const std::wstring& prefix)
 {
-
-    MenuDescriptionMap& menuDescMap = GetMenuDescriptionMap();
-
-    MenuDescriptionMap::iterator iter = menuDescMap.find(name);
-    if (iter == menuDescMap.end())
+    MenuDescriptionMap::iterator iter = myDescMap.find(name);
+    if (iter == myDescMap.end())
     {
         TDEBUG_TRACE("***** InsertMenuItemByName: can't find menu info for " << name);
         return;
@@ -321,7 +307,7 @@ void CShellExtCMenu::InsertMenuItemByName(
 
 
     MenuDescription md = iter->second;
-    AddMenuList(idCmd - idCmdFirst, name, menuDescMap);
+    AddMenuList(idCmd - idCmdFirst, name);
     InsertMenuItemWithIcon1(
         hMenu, indexMenu, idCmd, prefix + md.menuText, md.iconName);
 }
@@ -583,8 +569,8 @@ CShellExtCMenu::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     {
         UINT idCmd = LOWORD(lpcmi->lpVerb);
         TDEBUG_TRACE("CShellExtCMenu::InvokeCommand: idCmd = " << idCmd);
-        MenuIdCmdMap::iterator iter = MenuIdMap.find(idCmd);
-        if (iter != MenuIdMap.end())
+        MenuIdCmdMap::iterator iter = myMenuIdMap.find(idCmd);
+        if (iter != myMenuIdMap.end())
         {
             RunDialog(iter->second.name);
             hr = S_OK;
@@ -636,8 +622,8 @@ CShellExtCMenu::GetCommandString(
         << ", cchMax = " << cchMax
     );
 
-    MenuIdCmdMap::iterator iter = MenuIdMap.find(static_cast<UINT>(idCmd));
-    if (iter == MenuIdMap.end())
+    MenuIdCmdMap::iterator iter = myMenuIdMap.find(static_cast<UINT>(idCmd));
+    if (iter == myMenuIdMap.end())
     {
         TDEBUG_TRACE("***** CShellExtCMenu::GetCommandString: idCmd not found");
     }
