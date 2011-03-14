@@ -457,7 +457,12 @@ class CtxSearchThread(QThread):
             count += 1
             if not matchfn(wfile):
                 continue
-            data = ctx[wfile].data()     # load file data
+            try:
+                data = ctx[wfile].data()     # load file data
+            except EnvironmentError:
+                self.showMessage.emit(_('Skipping %s, unable to read') % 
+                                      hglib.tounicode(wfile))
+                continue
             if util.binary(data):
                 continue
             for i, line in enumerate(data.splitlines()):
