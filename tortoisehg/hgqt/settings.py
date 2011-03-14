@@ -41,8 +41,7 @@ class SettingsCombo(QComboBox):
             settings = opts['settings']
             slist = settings.value('settings/'+opts['cpath']).toStringList()
             self.previous = [s for s in slist if s]
-        self.setFixedWidth(ENTRY_WIDTH)
-
+        self.setMinimumWidth(ENTRY_WIDTH)
     def resetList(self):
         self.clear()
         ucur = hglib.tounicode(self.curvalue)
@@ -109,10 +108,8 @@ class PasswordEntry(QLineEdit):
         self.opts = opts
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
-        self.setFixedWidth(ENTRY_WIDTH)
-
+        self.setMinimumWidth(ENTRY_WIDTH)
     ## common APIs for all edit widgets
-
     def setValue(self, curvalue):
         self.curvalue = curvalue
         if curvalue:
@@ -136,8 +133,7 @@ class FontEntry(QPushButton):
         cpath = self.opts['cpath']
         assert cpath.startswith('tortoisehg.')
         self.fname = cpath[11:]
-        self.setFixedWidth(ENTRY_WIDTH)
-
+        self.setMinimumWidth(ENTRY_WIDTH)
     def on_clicked(self, checked):
         def newFont(font):
             self.setText(font.toString())
