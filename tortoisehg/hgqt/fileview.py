@@ -636,6 +636,7 @@ class FileData(object):
                     self.error = 'binary file'
                 else:
                     self.contents = hglib.tounicode(data)
+                if status in ('I', '?'):
                     self.flabel += _(' <i>(is unversioned)</i>')
             except EnvironmentError, e:
                 self.error = hglib.tounicode(str(e))
