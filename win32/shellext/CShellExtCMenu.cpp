@@ -122,11 +122,10 @@ static const char* const NoRepoMenu =
 ;
 
 
-void CShellExtCMenu::AddMenuList(
-    UINT idCmd, const std::string& name, MenuDescriptionMap& menuDescMap)
+void CShellExtCMenu::AddMenuList(UINT idCmd, const std::string& name)
 {
     TDEBUG_TRACE("AddMenuList: idCmd = " << idCmd << " name = " << name);
-    MenuIdMap[idCmd] = menuDescMap[name];
+    MenuIdMap[idCmd] = CMenuMenuDescMap[name];
 }
 
 
@@ -308,7 +307,7 @@ void CShellExtCMenu::InsertMenuItemByName(
 
 
     MenuDescription md = iter->second;
-    AddMenuList(idCmd - idCmdFirst, name, CMenuMenuDescMap);
+    AddMenuList(idCmd - idCmdFirst, name);
     InsertMenuItemWithIcon1(
         hMenu, indexMenu, idCmd, prefix + md.menuText, md.iconName);
 }

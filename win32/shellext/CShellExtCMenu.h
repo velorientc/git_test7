@@ -37,8 +37,7 @@ protected:
     void InsertMenuItemByName(
 	    HMENU hMenu, const std::string& name, UINT indexMenu,
 	    UINT idCmd, UINT idCmdFirst, const std::wstring& prefix);
-    void AddMenuList(UINT idCmd, const std::string& name,
-      MenuDescriptionMap& menuDescMap);
+    void AddMenuList(UINT idCmd, const std::string& name);
 
 public:
     explicit CShellExtCMenu(const char dummy);
