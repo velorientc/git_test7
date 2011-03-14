@@ -127,7 +127,8 @@ typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
 static MenuDescriptionMap CMenuMenuDescMap;
 static MenuIdCmdMap MenuIdMap;
 
-void AddMenuList(UINT idCmd, const std::string& name, MenuDescriptionMap& menuDescMap)
+void CShellExtCMenu::AddMenuList(
+    UINT idCmd, const std::string& name, MenuDescriptionMap& menuDescMap)
 {
     TDEBUG_TRACE("AddMenuList: idCmd = " << idCmd << " name = " << name);
     MenuIdMap[idCmd] = menuDescMap[name];
