@@ -27,7 +27,7 @@ from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
-from tortoisehg.hgqt.manifestdialog import ManifestTaskWidget
+from tortoisehg.hgqt.manifestdialog import ManifestWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.pbranch import PatchBranchWidget
@@ -162,6 +162,14 @@ class RepoWidget(QWidget):
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
+        self.mqDemand = w = DemandWidget(self.createMQWidget)
+        if 'mq' in self.repo.extensions():
+            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
+            tt.setTabToolTip(idx, _("Patch Queue"))
+            self.namedTabs['mq'] = idx
+        else:
+            self.mqTabIndex = -1
+
         self.syncDemand = w = DemandWidget(self.createSyncWidget)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
@@ -173,14 +181,6 @@ class RepoWidget(QWidget):
         self.grepDemand = w = DemandWidget(self.createGrepWidget)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
-
-        self.mqDemand = w = DemandWidget(self.createMQWidget)
-        if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
-            tt.setTabToolTip(idx, _("Patch Queue"))
-            self.namedTabs['mq'] = idx
-        else:
-            self.mqTabIndex = -1
 
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
         if 'pbranch' in self.repo.extensions():
@@ -261,10 +261,10 @@ class RepoWidget(QWidget):
             rev = None
         else:
             rev = self.rev
-        w = ManifestTaskWidget(self.repo, rev, self)
+        w = ManifestWidget(self.repo, rev, self)
         w.loadSettings(QSettings(), 'workbench')
         w.revChanged.connect(self.repoview.goto)
-        w.revisionHint.connect(self.showMessage)
+        w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
         return w
 
