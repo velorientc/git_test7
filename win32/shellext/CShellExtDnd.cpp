@@ -7,7 +7,7 @@
 // According to http://msdn.microsoft.com/en-us/library/bb776094%28VS.85%29.aspx
 // the help texts for the commands should be reasonably short (under 40 characters)
 
-static MenuDescription CDndMenuDescList[] =
+static const MenuDescription CDndMenuDescList[] =
 {
     {"drag_move",   L"Hg Move versioned item(s) here",
                     L"", "hg.ico", 0},
