@@ -175,7 +175,7 @@ class HgFileListView(QTableView):
             return
         model = self.model()
         repo = model.repo
-        qtlib.editfiles(repo, [path], parent=self)
+        qtlib.editfiles(repo, [filename], parent=self)
 
     def revertfile(self):
         filename = self.currentFile()
