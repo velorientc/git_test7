@@ -10,7 +10,6 @@ class CShellExtDnd: public CShellExtCMenu
 
 protected:
     virtual void RunDialog(const std::string&);
-    virtual MenuDescriptionMap& GetMenuDescriptionMap();
 
 public:
     explicit CShellExtDnd(const char dummy);

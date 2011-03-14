@@ -122,11 +122,6 @@ static const char* const NoRepoMenu =
 ;
 
 
-typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
-
-static MenuDescriptionMap CMenuMenuDescMap;
-static MenuIdCmdMap MenuIdMap;
-
 void CShellExtCMenu::AddMenuList(
     UINT idCmd, const std::string& name, MenuDescriptionMap& menuDescMap)
 {

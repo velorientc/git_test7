@@ -16,6 +16,9 @@ struct MenuDescription
 
 typedef std::map<std::string, MenuDescription> MenuDescriptionMap;
 
+typedef std::map<UINT, MenuDescription> MenuIdCmdMap;
+
+
 class CShellExtCMenu: public IContextMenu3, IShellExtInit
 {
 
@@ -23,6 +26,8 @@ protected:
     ULONG m_cRef;
     std::vector<std::string> myFiles;
     std::string myFolder;
+    MenuDescriptionMap CMenuMenuDescMap;
+    MenuIdCmdMap MenuIdMap;
 
     virtual void RunDialog(const std::string&);
     virtual MenuDescriptionMap& GetMenuDescriptionMap();

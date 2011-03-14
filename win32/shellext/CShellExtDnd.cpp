@@ -24,12 +24,6 @@ static const char* const DropMenu =
     "drag_move drag_copy"
 ;
 
-static MenuDescriptionMap CDndMenuDescMap;
-
-MenuDescriptionMap& CShellExtDnd::GetMenuDescriptionMap()
-{
-    return CDndMenuDescMap;
-}
 
 #define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
