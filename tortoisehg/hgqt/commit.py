@@ -628,6 +628,7 @@ class CommitWidget(QWidget):
         self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
+            self.branchop = None
             umsg = self.msgte.text()
             if umsg:
                 self.addMessageToHistory(umsg)
