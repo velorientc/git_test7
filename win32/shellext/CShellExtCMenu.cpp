@@ -165,15 +165,9 @@ void GetCMenuTranslation(
         RegCloseKey(hkey);
 }
 
-MenuDescriptionMap& CShellExtCMenu::GetMenuDescriptionMap()
-{
-    return CMenuMenuDescMap;
-}
-
 void CShellExtCMenu::InitMenuMaps(MenuDescription *menuDescs, std::size_t sz)
 {
-    MenuDescriptionMap& menuDescMap = GetMenuDescriptionMap();
-    if (menuDescMap.empty())
+    if (CMenuMenuDescMap.empty())
     {
         std::string lang;
         GetRegistryConfig("CMenuLang", lang);
@@ -194,7 +188,7 @@ void CShellExtCMenu::InitMenuMaps(MenuDescription *menuDescs, std::size_t sz)
             if (!lang.empty())
                 GetCMenuTranslation(lang, md.name, md.menuText, md.helpText);
 
-            menuDescMap[md.name] = md;
+            CMenuMenuDescMap[md.name] = md;
         }
         
     }
@@ -305,11 +299,8 @@ void CShellExtCMenu::InsertMenuItemByName(
     HMENU hMenu, const std::string& name, UINT indexMenu,
     UINT idCmd, UINT idCmdFirst, const std::wstring& prefix)
 {
-
-    MenuDescriptionMap& menuDescMap = GetMenuDescriptionMap();
-
-    MenuDescriptionMap::iterator iter = menuDescMap.find(name);
-    if (iter == menuDescMap.end())
+    MenuDescriptionMap::iterator iter = CMenuMenuDescMap.find(name);
+    if (iter == CMenuMenuDescMap.end())
     {
         TDEBUG_TRACE("***** InsertMenuItemByName: can't find menu info for " << name);
         return;
@@ -317,7 +308,7 @@ void CShellExtCMenu::InsertMenuItemByName(
 
 
     MenuDescription md = iter->second;
-    AddMenuList(idCmd - idCmdFirst, name, menuDescMap);
+    AddMenuList(idCmd - idCmdFirst, name, CMenuMenuDescMap);
     InsertMenuItemWithIcon1(
         hMenu, indexMenu, idCmd, prefix + md.menuText, md.iconName);
 }

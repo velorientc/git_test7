@@ -30,7 +30,6 @@ protected:
     MenuIdCmdMap MenuIdMap;
 
     virtual void RunDialog(const std::string&);
-    virtual MenuDescriptionMap& GetMenuDescriptionMap();
 
     void TweakMenuForVista(HMENU menu);
     void PrintDebugHeader(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj);
