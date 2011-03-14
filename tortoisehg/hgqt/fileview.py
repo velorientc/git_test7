@@ -638,11 +638,14 @@ class FileData(object):
 
         if status in ('I', '?', 'C'):
             try:
-                data = open(repo.wjoin(wfile), 'r').read()
-                if '\0' in data:
-                    self.error = 'binary file'
+                if os.path.getsize(repo.wjoin(wfile)) > ctx._repo.maxdiff:
+                    self.error = mde
                 else:
-                    self.contents = hglib.tounicode(data)
+                    data = open(repo.wjoin(wfile), 'r').read()
+                    if '\0' in data:
+                        self.error = 'binary file'
+                    else:
+                        self.contents = hglib.tounicode(data)
                 if status in ('I', '?'):
                     self.flabel += _(' <i>(is unversioned)</i>')
             except EnvironmentError, e:
