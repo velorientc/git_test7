@@ -17,7 +17,7 @@
 // According to http://msdn.microsoft.com/en-us/library/bb776094%28VS.85%29.aspx
 // the help texts for the commands should be reasonably short (under 40 characters)
 
-static MenuDescription CMenuMenuDescList[] =
+static const MenuDescription CMenuMenuDescList[] =
 {
     {"commit",      L"Commit...",
                     L"Commit changes in repository",
