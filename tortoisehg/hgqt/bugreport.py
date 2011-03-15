@@ -95,7 +95,7 @@ class BugReport(QDialog):
                         os.path.join(os.getcwd(), 'bugreport.txt'),
                         _('Text files (*.txt)'))
             if fname:
-                open(fname, 'wb').write(self.text)
+                open(fname, 'wb').write(hglib.fromunicode(self.text))
         except (EnvironmentError), e:
             QMessageBox.critical(self, _('Error writing file'), str(e))
 
