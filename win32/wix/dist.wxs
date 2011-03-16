@@ -54,6 +54,7 @@
         <?if $(var.Platform) = "x86" ?>
           <File Name="intl3_svn.dll" />
           <File Name="libdb44.dll" />
+          <File Name="libsasl.dll" />
         <?endif?>
         <File Name="select.pyd" />
         <File Name="sip.pyd" />
