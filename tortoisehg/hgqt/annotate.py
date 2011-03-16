@@ -171,19 +171,24 @@ class AnnotateView(qscilib.Scintilla):
             qtlib.ErrorMsgBox(_('Unable to annotate'),
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
             return
-        self._rev = ctx.rev()
-        self.clear()
-        self.annfile = wfile
-        if util.binary(fctx.data()):
-            self.setText(_('File is binary.\n'))
+
+        if fctx._filelog.rawsize(fctx.filerev()) > ctx._repo.maxdiff:
+            self.setText(_('File or diffs not displayed: ') + \
+                    _('File is larger than the specified max size.\n'))
         else:
-            self.setText(hglib.tounicode(fctx.data()))
-        if line:
-            self.setCursorPosition(int(line) - 1, 0)
-        self._updatelexer(fctx)
-        self._updatemarginwidth()
-        self.sourceChanged.emit(wfile, self._rev)
-        self._updateannotation()
+            self._rev = ctx.rev()
+            self.clear()
+            self.annfile = wfile
+            if util.binary(fctx.data()):
+                self.setText(_('File is binary.\n'))
+            else:
+                self.setText(hglib.tounicode(fctx.data()))
+            if line:
+                self.setCursorPosition(int(line) - 1, 0)
+            self._updatelexer(fctx)
+            self._updatemarginwidth()
+            self.sourceChanged.emit(wfile, self._rev)
+            self._updateannotation()
 
     def _updateannotation(self):
         if not self.isAnnotationEnabled() or not self.annfile:
