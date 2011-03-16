@@ -18,9 +18,8 @@ import os
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, visdiff, revert
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
-from tortoisehg.hgqt import visdiff, wctxactions, revert
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -164,12 +163,11 @@ class HgFileListView(QTableView):
         repo = model.repo
         rev = model._ctx.rev()
         if rev is None:
-            files = [repo.wjoin(filename)]
-            wctxactions.edit(self, repo.ui, repo, files)
+            qtlib.editfiles(repo, [filename], parent=self)
         else:
             base, _ = visdiff.snapshot(repo, [filename], repo[rev])
             files = [os.path.join(base, filename)]
-            wctxactions.edit(self, repo.ui, repo, files)
+            qtlib.editfiles(repo, files, parent=self)
 
     def editlocal(self):
         filename = self.currentFile()
@@ -177,8 +175,7 @@ class HgFileListView(QTableView):
             return
         model = self.model()
         repo = model.repo
-        path = repo.wjoin(filename)
-        wctxactions.edit(self, repo.ui, repo, [path])
+        qtlib.editfiles(repo, [filename], parent=self)
 
     def revertfile(self):
         filename = self.currentFile()

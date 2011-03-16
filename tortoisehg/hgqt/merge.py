@@ -569,7 +569,7 @@ class CommitPage(BasePage):
         box.addWidget(self.reslabel)
 
         # csinfo
-        def label_func(widget, item):
+        def label_func(widget, item, ctx):
             if item == 'rev':
                 return _('Revision:')
             elif item == 'parents':
