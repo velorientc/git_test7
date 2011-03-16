@@ -78,7 +78,7 @@ class ManifestDialog(QMainWindow):
 
     def setSearchPattern(self, text):
         """Set search pattern [unicode]"""
-        self._fileview.searchbar.setPattern(text)
+        self._manifest_widget._fileview.searchbar.setPattern(text)
 
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
