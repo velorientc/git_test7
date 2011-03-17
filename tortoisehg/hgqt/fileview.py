@@ -405,7 +405,7 @@ class HgFileView(QFrame):
     @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
     def sourceChanged(self, path, rev, line=None):
-        if rev != self._ctx.rev():
+        if rev != self._ctx.rev() and type(rev) is int:
             self.revisionSelected.emit(rev)
 
     @pyqtSlot(unicode, object, int)
