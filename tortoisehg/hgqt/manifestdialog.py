@@ -331,6 +331,7 @@ class ManifestWidget(QWidget):
         """Return current revision"""
         return self._rev
 
+    @pyqtSlot(int)
     @pyqtSlot(object)
     def setRev(self, rev):
         """Change revision to show"""
