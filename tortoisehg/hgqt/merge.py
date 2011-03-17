@@ -274,7 +274,7 @@ class MergePage(BasePage):
         wdbox.addWidget(wd_detail)
         wdbox.addSpacing(4)
 
-        wd_merged = QLabel(_('The workding directory is already <b>merged</b>. '
+        wd_merged = QLabel(_('The working directory is already <b>merged</b>. '
                              '<a href="skip"><b>Continue</b></a> or '
                              '<a href="discard"><b>discard</b></a> existing '
                              'merge.'))
