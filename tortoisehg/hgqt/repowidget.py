@@ -1010,6 +1010,9 @@ class RepoWidget(QWidget):
         entry(menu, 'reviewboard', fixed, _('Post to Review Board...'), 'reviewboard',
               self.sendToReviewBoard)
 
+        entry(menu, 'rupdate', fixed, _('Remote Update...'), 'hg-update',
+              self.rupdate)
+
         self.singlecmenu = menu
         self.singlecmenuitems = items
 
@@ -1250,6 +1253,10 @@ class RepoWidget(QWidget):
 
     def sendToReviewBoard(self):
         run.postreview(self.repo.ui, rev=self.repoview.selectedRevisions(),
+          repo=self.repo)
+
+    def rupdate(self):
+        run.rupdate(self.repo.ui, rev=self.rev,
           repo=self.repo)
 
     def emailRevision(self):

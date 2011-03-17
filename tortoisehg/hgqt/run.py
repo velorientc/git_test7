@@ -565,6 +565,11 @@ def postreview(ui, *pats, **opts):
     from tortoisehg.hgqt.postreview import run
     return qtrun(run, ui, *pats, **opts)
 
+def rupdate(ui, *pats, **opts):
+    """update a remote repository"""
+    from tortoisehg.hgqt.rupdate import run
+    return qtrun(run, ui, *pats, **opts)
+
 def merge(ui, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt.merge import run
