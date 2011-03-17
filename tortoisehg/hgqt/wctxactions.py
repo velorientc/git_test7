@@ -82,9 +82,10 @@ class WctxActions(QObject):
         menu.clear()
         addedActions = False
         for action in self.allactions:
-            if action is None and addedActions:
-                menu.addSeparator()
-                addedActions = False
+            if action is None:
+                if addedActions:
+                    menu.addSeparator()
+                    addedActions = False
             elif action._filetypes & alltypes:
                 menu.addAction(action)
                 addedActions = True
