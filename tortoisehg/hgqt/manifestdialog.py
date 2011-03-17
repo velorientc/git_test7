@@ -25,7 +25,6 @@ from tortoisehg.hgqt.manifestmodel import ManifestModel
 
 # TODO
 # Communicate status (MARC) from model to HgFileView
-# Allow manifest mode in HgFileView even when no diffs are available
 
 class ManifestDialog(QMainWindow):
     """
@@ -346,21 +345,20 @@ class ManifestWidget(QWidget):
     @pyqtSlot(unicode, object, int)
     def setSource(self, path, rev, line=None):
         """Change path and revision to show at once"""
-        revchanged = self._rev != rev
-        if revchanged:
+        if self._rev != rev:
             self._rev = rev
             self._setupmodel()
-        self.setPath(path)
-        ctx = self._repo[rev]
-        if self.path in ctx:
-            self._fileview.setContext(ctx)
-            self._fileview.displayFile(path, rev)
-            if line:
-                self._fileview.showLine(int(line) - 1)
-        else:
-            self._fileview.clearDisplay()
-        if revchanged:
             self.revChanged.emit(rev)
+        elif path != self.path:
+            self.setPath(path)
+            ctx = self._repo[rev]
+            if self.path in ctx:
+                self._fileview.setContext(ctx)
+                self._fileview.displayFile(path)
+                if line:
+                    self._fileview.showLine(int(line) - 1)
+            else:
+                self._fileview.clearDisplay()
 
     @property
     def path(self):
@@ -375,7 +373,7 @@ class ManifestWidget(QWidget):
     @pyqtSlot()
     def _updatecontent(self):
         self._fileview.setContext(self._repo[self._rev])
-        self._fileview.displayFile(self.path, self._rev, 'C') # TODO
+        self._fileview.displayFile(self.path) # TODO, report status
 
     @pyqtSlot()
     def _emitPathChanged(self):
