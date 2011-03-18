@@ -36,10 +36,10 @@ class LoadReviewDataThread(QThread):
             msg = _("Invalid Settings - Please provide your ReviewBoard username")
         else:
             rb = extensions.find("reviewboard")
-            plugin_msg = _("Invalid reviewboard plugin. Please download the " +
-                        "mercurial reviewboard plugin version 3.5 or higher " +
-                        "from the website below.\n\n" +
-                        "http://bitbucket.org/mdelagra/mercurial-reviewboard/")
+            plugin_msg = _("Invalid reviewboard plugin. Please download the "
+                        "mercurial reviewboard plugin version 3.5 or higher "
+                        "from the website below.\n\n %s") %
+                        u'http://bitbucket.org/mdelagra/mercurial-reviewboard/'
             try:
                 if float(rb.__version__[:3]) < 3.5:
                     msg = plugin_msg
