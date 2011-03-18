@@ -331,6 +331,8 @@ class HgFileView(QFrame):
             self.sci.setMarginWidth(1, 0)
             lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
+            if lexer is None:
+                self.setFont(qtlib.getfont('fontlog').font())
             # trim first three lines, for example:
             # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
             # --- a/tortoisehg/hgqt/thgrepo.py
@@ -348,6 +350,8 @@ class HgFileView(QFrame):
         else:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
+            if lexer is None:
+                self.setFont(qtlib.getfont('fontlog').font())
             self.sci.setText(fd.contents)
             self.sci._updatemarginwidth()
 
