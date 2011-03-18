@@ -242,6 +242,8 @@ class AnnotateView(qscilib.Scintilla):
         """Update the lexer according to the given file"""
         lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()), self)
         self.setLexer(lex)
+        if lex is None:
+            self.setFont(qtlib.getfont('fontlog').font())
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
