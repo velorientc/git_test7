@@ -290,8 +290,8 @@ def runcommand(ui, args):
         ui.quiet = True
 
     if cmd not in nonrepo_commands.split() and not path:
-        error.RepoError(_("There is no Mercurial repository here"
-                          " (.hg not found)"))
+        raise error.RepoError(_("There is no Mercurial repository here"
+                                " (.hg not found)"))
 
     cmdoptions['mainapp'] = True
     d = lambda: util.checksignature(func)(ui, *args, **cmdoptions)
