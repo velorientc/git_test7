@@ -23,9 +23,6 @@ from tortoisehg.hgqt import visdiff, revert
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
-# TODO
-# Communicate status (MARC) from model to HgFileView
-
 class ManifestDialog(QMainWindow):
     """
     Qt4 dialog to display all files of a repo at a given revision
@@ -366,6 +363,11 @@ class ManifestWidget(QWidget):
         """Return currently selected path"""
         return self._treemodel.filePath(self._treeview.currentIndex())
 
+    @property
+    def status(self):
+        """Return currently selected path"""
+        return self._treemodel.fileStatus(self._treeview.currentIndex())
+
     @pyqtSlot(unicode)
     def setPath(self, path):
         """Change path to show"""
@@ -374,7 +376,7 @@ class ManifestWidget(QWidget):
     @pyqtSlot()
     def _updatecontent(self):
         self._fileview.setContext(self._repo[self._rev])
-        self._fileview.displayFile(self.path) # TODO, report status
+        self._fileview.displayFile(self.path, status=self.status)
 
     @pyqtSlot()
     def _emitPathChanged(self):
