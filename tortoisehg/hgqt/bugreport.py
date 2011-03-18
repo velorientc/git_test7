@@ -23,9 +23,9 @@ class BugReport(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        lbl = QLabel(_('Please report this bug to our %s bug tracker %s') %
-              (u'<a href="http://bitbucket.org/tortoisehg/thg/wiki/BugReport">',
-               u'</a>'))
+        lbl = QLabel(_('Please report this bug to our '
+            '<a href="%s">bug tracker</a>') %
+            u'http://bitbucket.org/tortoisehg/thg/wiki/BugReport')
         lbl.setOpenExternalLinks(True)
         self.layout().addWidget(lbl)
 
