@@ -19,7 +19,7 @@ from hgext import mq as mqmod
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
-from tortoisehg.hgqt import qqueue, fileview
+from tortoisehg.hgqt import qqueue, fileview, thgimport
 
 # TODO
 # keep original file name in file list item
