@@ -172,7 +172,18 @@ class AnnotateView(qscilib.Scintilla):
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
             return
 
-        if fctx._filelog.rawsize(fctx.filerev()) > ctx._repo.maxdiff:
+        try:
+            if rev is None:
+                size = fctx.size()
+            else:
+                size = fctx._filelog.rawsize(fctx.filerev())
+        except (EnvironmentError, error.LookupError), e:
+            self.setText(_('File or diffs not displayed: ') + \
+                    hglib.tounicode(str(e)))
+            self.error = p + hglib.tounicode(str(e))
+            return
+
+        if size > ctx._repo.maxdiff:
             self.setText(_('File or diffs not displayed: ') + \
                     _('File is larger than the specified max size.\n'))
         else:
