@@ -143,6 +143,7 @@ class RebaseDialog(QDialog):
         self.th.start()
 
     def rebase(self):
+        self.rebasebtn.setEnabled(False)
         self.cancelbtn.setShown(False)
         self.keepchk.setEnabled(False)
         self.detachchk.setEnabled(False)
@@ -174,6 +175,7 @@ class RebaseDialog(QDialog):
         self.repo.decrementBusyCount()
         if self.checkResolve() is False:
             self.showMessage.emit(_('Rebase is complete'))
+            self.rebasebtn.setEnabled(True)
             self.rebasebtn.setText(_('Close'))
             self.rebasebtn.clicked.disconnect(self.rebase)
             self.rebasebtn.clicked.connect(self.accept)
