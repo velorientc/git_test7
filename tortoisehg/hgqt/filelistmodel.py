@@ -81,16 +81,6 @@ class HgFileListModel(QAbstractTableModel):
         row = index.row()
         return self._files[row]['path']
 
-    def revFromIndex(self, index):
-        'return revision for index. index is guarunteed to be valid'
-        if len(self._ctx.parents()) < 2:
-            return None
-        row = index.row()
-        if self._fulllist and self._files[row]['parent'] == 1:
-            return self._ctx.p2().rev()
-        else:
-            return self._ctx.p1().rev()
-
     def dataFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self._ctx:
             return None

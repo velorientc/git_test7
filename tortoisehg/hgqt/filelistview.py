@@ -29,7 +29,7 @@ class HgFileListView(QTableView):
     A QTableView for displaying a HgFileListModel
     """
 
-    fileRevSelected = pyqtSignal(object, object, object)
+    fileSelected = pyqtSignal(QString, QString)
     clearDisplay = pyqtSignal()
     contextmenu = None
 
@@ -53,7 +53,7 @@ class HgFileListView(QTableView):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
         model.contextChanged.connect(self.contextChanged)
-        self.selectionModel().currentRowChanged.connect(self.fileSelected)
+        self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
@@ -78,25 +78,24 @@ class HgFileListView(QTableView):
         index = self.currentIndex()
         count = len(self.model())
         if index.row() == -1:
-            # index is changing, fileSelected() called for us
+            # index is changing, onRowChange() called for us
             self.selectRow(0)
         elif index.row() >= count:
             if count:
-                # index is changing, fileSelected() called for us
+                # index is changing, onRowChange() called for us
                 self.selectRow(count-1)
             else:
                 self.clearDisplay.emit()
         else:
             # redisplay previous row
-            self.fileSelected()
+            self.onRowChange(index)
 
-    def fileSelected(self, index=None, *args):
+    def onRowChange(self, index, *args):
         if index is None:
             index = self.currentIndex()
         data = self.model().dataFromIndex(index)
         if data:
-            fromRev = self.model().revFromIndex(index)
-            self.fileRevSelected.emit(data['path'], fromRev, data['status'])
+            self.fileSelected.emit(data['path'], data['status'])
         else:
             self.clearDisplay.emit()
 
@@ -104,8 +103,10 @@ class HgFileListView(QTableView):
         'Select given file, if found, else the first file'
         index = self.model().indexFromFile(filename)
         if index:
-            self.setCurrentIndex(index)
-            self.fileSelected(index)
+            if index != self.currentIndex():
+                self.setCurrentIndex(index)
+            else:
+                self.onRowChange(index)
         elif self.model().count():
             self.selectRow(0)
 

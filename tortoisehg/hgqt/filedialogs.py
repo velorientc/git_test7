@@ -216,7 +216,7 @@ class FileLogDialog(_AbstractFileDialog):
         pos = self.textView.verticalScrollBar().value()
         ctx = self.filerevmodel.repo.changectx(rev)
         self.textView.setContext(ctx)
-        self.textView.displayFile(self.filerevmodel.graph.filename(rev))
+        self.textView.displayFile(self.filerevmodel.graph.filename(rev), None)
         self.textView.verticalScrollBar().setValue(pos)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)

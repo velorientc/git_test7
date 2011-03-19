@@ -166,7 +166,7 @@ class RevDetailsWidget(QWidget):
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
-        self.filelist.fileRevSelected.connect(self.onFileRevSelected)
+        self.filelist.fileSelected.connect(self.fileview.displayFile)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def forwardFont(self, font):
@@ -210,10 +210,6 @@ class RevDetailsWidget(QWidget):
     def setupModels(self):
         self.create_models()
         self.filelist.setModel(self.filelistmodel)
-
-    @pyqtSlot(object, object, object)
-    def onFileRevSelected(self, file, rev, status):
-        self.fileview.displayFile(file, rev, status)
 
     def onRevisionSelected(self, rev):
         'called by repowidget when repoview changes revisions'

@@ -352,7 +352,7 @@ class ManifestWidget(QWidget):
             ctx = self._repo[rev]
             if self.path in ctx:
                 self._fileview.setContext(ctx)
-                self._fileview.displayFile(path)
+                self._fileview.displayFile(path, self.status)
                 if line:
                     self._fileview.showLine(int(line) - 1)
             else:
@@ -376,7 +376,7 @@ class ManifestWidget(QWidget):
     @pyqtSlot()
     def _updatecontent(self):
         self._fileview.setContext(self._repo[self._rev])
-        self._fileview.displayFile(self.path, status=self.status)
+        self._fileview.displayFile(self.path, self.status)
 
     @pyqtSlot()
     def _emitPathChanged(self):

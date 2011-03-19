@@ -371,7 +371,7 @@ class StatusWidget(QWidget):
         path, status, mst, upath, ext, sz = row
         wfile = util.pconvert(path)
         self.fileview.setContext(self.repo[None])
-        self.fileview.displayFile(wfile, status=status)
+        self.fileview.displayFile(wfile, status)
 
 
 class StatusThread(QThread):

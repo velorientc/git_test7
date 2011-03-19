@@ -231,7 +231,7 @@ class HgFileView(QFrame):
             self.actionPrevDiff.setEnabled(False)
             self.blk.setVisible(mode == FileMode)
             self.sci.setAnnotationEnabled(mode == AnnMode)
-            self.displayFile()
+            self.displayFile(self._filename, self._status)
 
     def restrictModes(self, candiff, canfile, canann):
         'Disable modes based on content constraints'
@@ -287,21 +287,17 @@ class HgFileView(QFrame):
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
 
-    def displayFile(self, filename=None, rev=None, status=None):
-        if filename is None:
-            filename, status = self._filename, self._status
-        else:
-            self._filename, self._status = filename, status
+    def displayFile(self, filename, status):
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
+            status = hglib.fromunicode(status)
+        self._filename, self._status = filename, status
 
         self.clearMarkup()
         if filename is None:
             self.restrictModes(False, False, False)
             return
 
-        if rev is not None:
-            self._p_rev = rev
         if self._p_rev is not None:
             ctx2 = self.repo[self._p_rev]
         else:
