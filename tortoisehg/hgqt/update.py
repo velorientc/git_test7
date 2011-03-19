@@ -196,7 +196,12 @@ class UpdateDialog(QDialog):
             def isclean():
                 '''whether WD is changed'''
                 wc = self.repo[None]
-                return not (wc.modified() or wc.added() or wc.removed())
+                if wc.modified() or wc.added() or wc.removed():
+                    return False
+                for s in wc.substate:
+                    if wc.sub(s).dirty():
+                        return False
+                return True
             def ismergedchange():
                 '''whether the local changes are merged (have 2 parents)'''
                 wc = self.repo[None]
