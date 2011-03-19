@@ -360,7 +360,7 @@ class GLog(gdialog.GWindow):
         if self.repo.ui.configbool('tortoisehg', 'disable-syncbar'):
             sync_bar_item = []
         else:
-            sync_bar_item = [dict(text=_('Sync Bar'), ascheck=True, 
+            sync_bar_item = [dict(text=_('Sync Bar'), ascheck=True,
                     func=self.toggle_show_syncbar, check=self.show_syncbar)]
 
         # MQ extension menu
@@ -523,7 +523,7 @@ class GLog(gdialog.GWindow):
         active = button.get_active()
         if self.compactgraph != active:
             self.compactgraph = active
-            self.reload_log()         
+            self.reload_log()
 
     def toggle_showoutput(self, button):
         active = button.get_active()
@@ -1139,7 +1139,7 @@ class GLog(gdialog.GWindow):
         self.origtip = min(len(self.repo), self.origtip)
         if not self.bfile:
             self.npreviews = 0
-        
+
         opts['branch-view'] = self.compactgraph
         opts['outgoing'] = self.outgoing
         opts['orig-tip'] = self.origtip
@@ -1169,7 +1169,7 @@ class GLog(gdialog.GWindow):
         if self.no_merges:
             graphcol = False
 
-        filterprefix = _('Filter') 
+        filterprefix = _('Filter')
         filtertext = filterprefix + ': '
         if self.filter == 'branch':
             branch = opts.get('branch', None)
@@ -1328,7 +1328,7 @@ class GLog(gdialog.GWindow):
         return menu
 
     def export_context_menu(self):
-        m = gtklib.MenuBuilder() 
+        m = gtklib.MenuBuilder()
         m.append(_('_Export Patch...'), self.export_patch, 'menupatch.ico')
         m.append(_('E_mail Patch...'), self.email_patch, gtk.STOCK_GOTO_LAST)
         m.append(_('_Bundle rev:tip...'), self.bundle_rev_to_tip,
@@ -1337,7 +1337,7 @@ class GLog(gdialog.GWindow):
         return m.build()
 
     def tags_context_menu(self):
-        m = gtklib.MenuBuilder() 
+        m = gtklib.MenuBuilder()
         m.append(_('Add/Remove _Tag...'), self.add_tag)
         if 'bookmarks' in self.exs:
             m.append(_('Add/Move/Remove B_ookmark...'), self.add_bookmark)
@@ -1349,7 +1349,7 @@ class GLog(gdialog.GWindow):
         return m.build()
 
     def mq_context_menu(self):
-        m = gtklib.MenuBuilder() 
+        m = gtklib.MenuBuilder()
         mqimport = m.append(_('Import Revision to MQ'), self.qimport_rev,
                             'menuimport.ico')
         mstrip = m.append(_('Strip Revision...'), self.strip_rev,
@@ -1374,7 +1374,7 @@ class GLog(gdialog.GWindow):
         return m.build()
 
     def bisect_context_menu(self):
-        m = gtklib.MenuBuilder() 
+        m = gtklib.MenuBuilder()
         m.append(_('Reset'), self.bisect_reset, gtk.STOCK_CLEAR)
         m.append(_('Mark as Good'), self.bisect_good, gtk.STOCK_YES)
         m.append(_('Mark as Bad'), self.bisect_bad, gtk.STOCK_NO)
@@ -1408,7 +1408,7 @@ class GLog(gdialog.GWindow):
         m.append_sep()
         mmerge = m.append(_('_Merge with...'), self.domerge, 'menumerge.ico')
         m.append_sep()
-        
+
         # disable/enable menus as required
         parents = self.repo.parents()
         if len(parents) > 1:
@@ -1428,7 +1428,7 @@ class GLog(gdialog.GWindow):
         if 'rebase' in self.exs:
             m.append(_('Rebase on top of selected'), self.rebase_selected,
                      gtk.STOCK_CUT)
-        
+
         # need MQ extension for qimport command
         if 'mq' in self.exs:
             m.append(_('Import from here to selected to MQ'),
@@ -1632,7 +1632,7 @@ class GLog(gdialog.GWindow):
 
         # filter bar
         self.filterbar = FilterBar(self.tooltips,
-                                   self.filter_mode, 
+                                   self.filter_mode,
                                    hglib.getlivebranch(self.repo),
                                    self.repo)
         filterbar = self.filterbar
@@ -1891,7 +1891,7 @@ class GLog(gdialog.GWindow):
 
         self.toolbar.insert(reject, 0)
         self.toolbar.insert(apply, 0)
-        
+
         self.cmd_set_sensitive('accept', True)
         self.cmd_set_sensitive('reject', True)
 
@@ -2010,7 +2010,7 @@ class GLog(gdialog.GWindow):
         else:
             cmd += ['--quiet', '--template', '{node}\n']
             cmd += self.get_proxy_args()
-            cmd += [hglib.validate_synch_path(path, self.repo)] 
+            cmd += [hglib.validate_synch_path(path, self.repo)]
 
         def callback(return_code, buffer, *args):
             if return_code == 0:
@@ -2451,7 +2451,7 @@ class GLog(gdialog.GWindow):
                              'command has completed'), self).run()
 
     def rebase_selected(self, menuitem):
-        """Rebase revision on top of selection (1st on top of 2nd).""" 
+        """Rebase revision on top of selection (1st on top of 2nd)."""
         revs = self.revrange
         res = gdialog.Confirm(_('Confirm Rebase Revision'), [], self,
             _('Rebase revision %d on top of %d?') % (revs[0], revs[1])).run()
@@ -2491,7 +2491,7 @@ class GLog(gdialog.GWindow):
 
     def add_tag(self, menuitem):
         # save tag info for detecting new tags added
-        bmarks = hglib.get_repo_bookmarks(self.repo) 
+        bmarks = self.repo._bookmarks.keys()
         oldtags = self.repo.tagslist()
         oldlen = len(self.repo)
         rev = str(self.currevid)
@@ -2509,15 +2509,14 @@ class GLog(gdialog.GWindow):
         # save bookmark info for detecting new bookmarks added
         # since we can now move bookmarks, need to store
         # the associated changesets as well
-        oldbookmarks = hglib.get_repo_bookmarks(self.repo, values=True)
+        oldbookmarks = self.repo._bookmarks
         oldlen = len(self.repo)
         rev = str(self.currevid)
         bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
             self.refresh_on_marker_change(oldlen, oldbookmarks,
-                                          hglib.get_repo_bookmarks(self.repo,
-                                                                   values=True))
+                                          self.repo._bookmarks)
 
         dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_ADDREMOVE,
                                          bmark, rev)
@@ -2526,35 +2525,31 @@ class GLog(gdialog.GWindow):
 
     def rename_bookmark(self, menuitem):
         # save bookmark info for detecting bookmarks renamed
-        oldbookmarks = hglib.get_repo_bookmarks(self.repo) 
+        oldbookmarks = self.repo._bookmarks
         oldlen = len(self.repo)
         rev = str(self.currevid)
         bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
             self.refresh_on_marker_change(oldlen, oldbookmarks,
-                                          hglib.get_repo_bookmarks(self.repo))
+                                          self.repo._bookmarks)
 
         dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_RENAME,
                                          bmark, rev)
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
-        
+
     def current_bookmark(self, menuitem):
-        # save current bookmark info for detecting current bookmark changed
-        bookmarks = extensions.find('bookmarks')
-        # Note that the dialog shouldn't change the repo len, or # of bookmarks,
-        # etc, but check in case they've been modified by something else...
-        oldbookmarks = hglib.get_repo_bookmarks(self.repo)
         oldlen = len(self.repo)
-        oldcurrent = hglib.get_repo_bookmarkcurrent(self.repo)
+        oldbookmarks = self.repo._bookmarks
+        oldcurrent = self.repo._bookmarkcurrent
         rev = str(self.currevid)
         bmark = self.get_rev_tag(rev, include=oldbookmarks)
 
         def refresh(*args):
             self.refresh_on_current_marker_change(oldlen, oldbookmarks, oldcurrent,
-                                                  hglib.get_repo_bookmarks(self.repo),
-                                                  hglib.get_repo_bookmarkcurrent(self.repo))
+                                                  self.repo._bookmarks,
+                                                  self.repo._bookmarkcurrent)
 
         dialog = bookmark.BookmarkDialog(self.repo, bookmark.TYPE_CURRENT,
                                          bmark, rev)
@@ -2640,7 +2635,7 @@ class GLog(gdialog.GWindow):
                          '(creating new heads if needed)?') % original_path
                 buttontext = _('Forced &Push')
                 confirm_push = True
-            
+
             if confirm_push:
                 dlg = gdialog.CustomPrompt(title, text,
                     None, (buttontext, _('&Cancel')), default=1, esc=1)
@@ -2649,7 +2644,7 @@ class GLog(gdialog.GWindow):
                 else:
                     return remote_path
             else:
-                return remote_path    
+                return remote_path
 
     def push_branch(self, menuitem):
         self.push_to(menuitem, branch=self.repo[self.currevid].branch())
@@ -2658,7 +2653,7 @@ class GLog(gdialog.GWindow):
         remote_path = self.validate_path()
         if not remote_path:
             return
-        
+
         node = self.repo[self.currevid].node()
         rev = str(self.currevid)
         if branch:
