@@ -44,9 +44,11 @@ class ArchiveDialog(QDialog):
         self.rev_combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.files_in_rev_chk = QCheckBox(
                 _('Only files modified/created in this revision'))
+        self.subrepos_chk = QCheckBox(_('Recurse into subrepositories'))
         self.grid.addWidget(self.rev_lbl, 0, 0)
         self.grid.addWidget(self.rev_combo, 0, 1)
         self.grid.addWidget(self.files_in_rev_chk, 1, 1)
+        self.grid.addWidget(self.subrepos_chk, 2, 1)
 
         # selecting a destination
         self.dest_lbl = QLabel(_('Destination path:'))
@@ -55,9 +57,9 @@ class ArchiveDialog(QDialog):
         self.dest_edit.setMinimumWidth(300)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
-        self.grid.addWidget(self.dest_lbl, 2, 0)
-        self.grid.addWidget(self.dest_edit, 2, 1)
-        self.grid.addWidget(self.dest_btn, 2, 2)
+        self.grid.addWidget(self.dest_lbl, 3, 0)
+        self.grid.addWidget(self.dest_edit, 3, 1)
+        self.grid.addWidget(self.dest_btn, 3, 2)
 
         # archive type selection
         self.types_lbl = QLabel(_('Archive types:'))
@@ -70,13 +72,13 @@ class ArchiveDialog(QDialog):
         self.tgzradio = radio(_('Tar archive compressed using gzip'))
         self.uzipradio = radio(_('Uncompressed zip archive'))
         self.zipradio = radio(_('Zip archive compressed using deflate'))
-        self.grid.addWidget(self.types_lbl, 3, 0)
-        self.grid.addWidget(self.filesradio, 3, 1)
-        self.grid.addWidget(self.tarradio, 4, 1)
-        self.grid.addWidget(self.tbz2radio, 5, 1)
-        self.grid.addWidget(self.tgzradio, 6, 1)
-        self.grid.addWidget(self.uzipradio, 7, 1)
-        self.grid.addWidget(self.zipradio, 8, 1)
+        self.grid.addWidget(self.types_lbl, 4, 0)
+        self.grid.addWidget(self.filesradio, 4, 1)
+        self.grid.addWidget(self.tarradio, 5, 1)
+        self.grid.addWidget(self.tbz2radio, 6, 1)
+        self.grid.addWidget(self.tgzradio, 7, 1)
+        self.grid.addWidget(self.uzipradio, 8, 1)
+        self.grid.addWidget(self.zipradio, 9, 1)
 
         # some extras
         self.hgcmd_lbl = QLabel(_('Hg command:'))
@@ -84,9 +86,9 @@ class ArchiveDialog(QDialog):
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)
         self.keep_open_chk = QCheckBox(_('Always show output'))
-        self.grid.addWidget(self.hgcmd_lbl, 9, 0)
-        self.grid.addWidget(self.hgcmd_txt, 9, 1)
-        self.grid.addWidget(self.keep_open_chk, 10, 1)
+        self.grid.addWidget(self.hgcmd_lbl, 10, 0)
+        self.grid.addWidget(self.hgcmd_txt, 10, 1)
+        self.grid.addWidget(self.keep_open_chk, 11, 1)
 
         # command widget
         self.cmd = cmdui.Widget(True, True, self)
@@ -127,6 +129,7 @@ class ArchiveDialog(QDialog):
                      self.rev_combo_changed)
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
+        self.subrepos_chk.toggled.connect(self.onSubreposToggled)
         self.filesradio.toggled.connect(self.update_path)
         self.tarradio.toggled.connect(self.update_path)
         self.tbz2radio.toggled.connect(self.update_path)
@@ -156,6 +159,7 @@ class ArchiveDialog(QDialog):
             if self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly)) == -1:
                 self.rev_combo.insertItems(0, [text])
         self.rev_combo.setCurrentIndex(0)
+        self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.dest_edit.setText(self.repo.root)
         self.filesradio.setChecked(True)
         self.update_path()
@@ -170,6 +174,7 @@ class ArchiveDialog(QDialog):
         self._readsettings()
 
     def rev_combo_changed(self, index):
+        self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.update_path()
 
     def dest_edited(self):
@@ -199,6 +204,24 @@ class ArchiveDialog(QDialog):
         if response:
             self.dest_edit.setText(response)
             self.update_path()
+
+    def onSubreposToggled(self):
+        path = hglib.fromunicode(self.dest_edit.text())
+        type = self.get_selected_archive_type()['type']
+        self.compose_command(path, type)
+
+    def get_subrepos_present(self):
+        rev = self.get_selected_rev()
+        ctx = self.repo[rev]
+        return '.hgsubstate' in ctx.files() or '.hgsubstate' in ctx.manifest()
+
+    def get_selected_rev(self):
+        rev = self.rev_combo.currentText()
+        if rev == WD_PARENT:
+            rev = '.'
+        else:
+            rev = hglib.fromunicode(rev)
+        return rev
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
@@ -266,13 +289,11 @@ class ArchiveDialog(QDialog):
 
     def compose_command(self, dest, type):
         cmdline = ['archive', '--repository', self.repo.root]
-        rev = self.rev_combo.currentText()
-        if rev == WD_PARENT:
-            rev = '.'
-        else:
-            rev = hglib.fromunicode(rev)
+        rev = self.get_selected_rev()
         cmdline.append('-r')
         cmdline.append(rev)
+        if self.subrepos_chk.isChecked():
+            cmdline.append('-S')
         cmdline.append('-t')
         cmdline.append(type)
         if self.files_in_rev_chk.isChecked():
