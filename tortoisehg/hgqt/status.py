@@ -307,10 +307,14 @@ class StatusWidget(QWidget):
         self.countlbl.setText(text)
 
     def checkAll(self):
-        self.tv.model().checkAll(True)
+        model = self.tv.model()
+        if model:
+            model.checkAll(True)
 
     def checkNone(self):
-        self.tv.model().checkAll(False)
+        model = self.tv.model()
+        if model:
+            model.checkAll(False)
 
     def getChecked(self, types=None):
         model = self.tv.model()
