@@ -249,25 +249,14 @@ def getfontconfig(_ui=None):
 
 def invalidaterepo(repo):
     repo.dirstate.invalidate()
+    for attr in ('_bookmarks', '_bookmarkcurrent'):
+        if attr in repo.__dict__:
+            delattr(repo, attr)
     if isinstance(repo, bundlerepo.bundlerepository):
         # Work around a bug in hg-1.3.  repo.invalidate() breaks
         # overlay bundlerepos
         return
     repo.invalidate()
-    # way _bookmarks / _bookmarkcurrent cached changed
-    # from 1.4 to 1.5...
-    for cachedAttr in ('_bookmarks', '_bookmarkcurrent'):
-        # Check if it's a property or normal value...
-        if is_descriptor(repo, cachedAttr):
-            # The very act of calling hasattr would
-            # re-cache the property, so just assume it's
-            # already cached, and catch the error if it wasn't.
-            try:
-                delattr(repo, cachedAttr)
-            except AttributeError:
-                pass
-        elif hasattr(repo, cachedAttr):
-            setattr(repo, cachedAttr, None)
     if 'mq' in repo.__dict__: #do not create if it does not exist
         repo.mq.invalidate()
 
@@ -562,59 +551,6 @@ def validate_synch_path(path, repo):
         elif path == url.hidepassword(path_aux):
             return_path = path_aux
     return return_path
-
-def get_repo_bookmarks(repo, values=False):
-    """
-    Will return the bookmarks for the given repo if the
-    bookmarks extension is loaded.
-
-    By default, returns a list of bookmark names; if
-    values is True, returns a dict mapping names to
-    nodes.
-
-    If the extension is not loaded, returns an empty
-    list/dict.
-    """
-    try:
-        bookmarks = extensions.find('bookmarks')
-    except KeyError:
-        return values and {} or []
-    if bookmarks:
-        # Bookmarks changed from 1.4 to 1.5...
-        if hasattr(bookmarks, 'parse'):
-            marks = bookmarks.parse(repo)
-        elif hasattr(repo, '_bookmarks'):
-            marks = repo._bookmarks
-        else:
-            marks = {}
-    else:
-        marks = {}
-
-    if values:
-        return marks
-    else:
-        return marks.keys()
-
-def get_repo_bookmarkcurrent(repo):
-    """
-    Will return the current bookmark for the given repo
-    if the bookmarks extension is loaded, and the
-    track.current option is on.
-
-    If the extension is not loaded, or track.current
-    is not set, returns None
-    """
-    try:
-        bookmarks = extensions.find('bookmarks')
-    except KeyError:
-        return None
-    if bookmarks and repo.ui.configbool('bookmarks', 'track.current'):
-        # Bookmarks changed from 1.4 to 1.5...
-        if hasattr(bookmarks, 'current'):
-            return bookmarks.current(repo)
-        elif hasattr(repo, '_bookmarkcurrent'):
-            return repo._bookmarkcurrent
-    return None
 
 def is_rev_current(repo, rev):
     '''

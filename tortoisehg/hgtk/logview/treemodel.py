@@ -55,11 +55,13 @@ class TreeModel(gtk.GenericTreeModel):
         self.graphdata = graphdata
         self.revisions, self.parents = {}, {}
         self.wcparents, self.tagrevs, self.branchtags = [], [], {}
+        self.bookmarkrevs = []
         self.refresh()
 
     def refresh(self):
         repo = self.repo
         oldtags, oldparents = self.tagrevs, self.wcparents
+        oldbookmarks = self.bookmarkrevs
         try:
             oldbranches = [repo[n].rev() for n in self.branchtags.values()]
         except error.RepoLookupError:
@@ -71,16 +73,17 @@ class TreeModel(gtk.GenericTreeModel):
         self.set_author_color()
         self.hidetags = hglib.gethidetags(repo.ui)
 
-        self.curbookmark = hglib.get_repo_bookmarkcurrent(repo)
         try:
             self.wcparents = [x.rev() for x in repo.parents()]
             self.tagrevs = [repo[r].rev() for t, r in repo.tagslist()]
             self.branchtags = repo.branchtags()
+            self.curbookmark = repo._bookmarkcurrent
+            self.bookmarkrevs = [repo[n].rev() for n in repo._bookmarks.values()]
         except util.Abort:
             pass
         brevs = [repo[n].rev() for n in self.branchtags.values()]
-        allrevs = set(oldtags + oldparents + oldbranches +
-                      brevs + self.wcparents + self.tagrevs)
+        allrevs = set(oldtags + oldparents + oldbranches + oldbookmarks +
+                      brevs + self.wcparents + self.tagrevs + self.bookmarkrevs)
         for rev in allrevs:
             if rev in self.revisions:
                 del self.revisions[rev]
@@ -219,19 +222,24 @@ class TreeModel(gtk.GenericTreeModel):
             escape = gtklib.markup_escape_text
             summary = escape(hglib.toutf(summary))
 
-            node = ctx.node()
-            tags = self.repo.nodetags(node)
             tstr = ''
-            for tag in tags:
+            for tag in ctx.tags():
                 if tag not in self.hidetags:
-                    bg = gtklib.PYELLOW
-                    if tag == self.curbookmark:
-                        bg = gtklib.PORANGE
-                    elif tag in self.mqpatches:
+                    if tag in self.mqpatches:
                         bg = gtklib.PBLUE
+                    else:
+                        bg = gtklib.PYELLOW
                     style = {'color': gtklib.BLACK, 'background': bg}
                     tstr += gtklib.markup(' %s ' % tag, **style) + ' '
+            for mark in ctx.bookmarks():
+                if mark == self.curbookmark:
+                    bg = gtklib.PORANGE
+                else:
+                    bg = gtklib.PLIME
+                style = {'color': gtklib.BLACK, 'background': bg}
+                tstr += gtklib.markup(' %s ' % mark, **style) + ' '
 
+            node = ctx.node()
             branch = ctx.branch()
             bstr = ''
             status = 0
