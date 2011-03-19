@@ -51,7 +51,7 @@ class BookmarkDialog(gtk.Dialog):
         elif type == TYPE_RENAME:
             self.add_button(_('Rename'), RESPONSE_RENAME)
         elif type == TYPE_CURRENT:
-            self.add_button(_('Set Current'), RESPONSE_CURRENT)            
+            self.add_button(_('Set Current'), RESPONSE_CURRENT)
         else:
             raise _('unexpected type: %s') % type
         self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
@@ -85,15 +85,15 @@ class BookmarkDialog(gtk.Dialog):
                 self._name_input = entry
                 label = _('New Name:')
             table.add_row(label, entry, padding=False)
-            
+
         # Option to make new bookmark the active one
         trackcurrent = self.repo.ui.configbool('bookmarks', 'track.current')
         if type == TYPE_ADDREMOVE and trackcurrent:
             check = gtk.CheckButton(_('Make new/moved bookmark current'))
             self.opt_newcurrent = check
             check.set_sensitive(hglib.is_rev_current(self.repo, rev))
-            table.add_row(None, check)        
- 
+            table.add_row(None, check)
+
         # signal handlers
         self.connect('response', self.dialog_response)
         self._bookmark_input.connect('activate', self.entry_activated, type)
@@ -102,10 +102,10 @@ class BookmarkDialog(gtk.Dialog):
         if type == TYPE_ADDREMOVE:
             self._bookmark_input.connect('changed', self.bookmark_changed)
             if trackcurrent:
-                self._rev_input.connect('changed', self.rev_changed)                
+                self._rev_input.connect('changed', self.rev_changed)
 
         # prepare to show
-        self.load_settings()        
+        self.load_settings()
         if type == TYPE_ADDREMOVE:
             self.set_add_move_button_sensitivity()
         self._refresh(clear=False)
@@ -120,7 +120,7 @@ class BookmarkDialog(gtk.Dialog):
         self._bookmarkslist.clear()
 
         # add bookmarks to drop-down list
-        bookmarks = hglib.get_repo_bookmarks(self.repo) 
+        bookmarks = hglib.get_repo_bookmarks(self.repo)
         bookmarks.sort()
         for bookmarkname in bookmarks:
             if bookmarkname != 'tip':
@@ -196,7 +196,7 @@ class BookmarkDialog(gtk.Dialog):
         else:
             self._button_add.set_sensitive(True)
             self._button_move.set_sensitive(False)
-            
+
 
     def _do_add_bookmark(self):
         # gather input data
@@ -358,7 +358,7 @@ class BookmarkDialog(gtk.Dialog):
                            rev=revision,
                            mark=name,
                            force=True)
-        
+
     def _remove_hg_bookmark(self, name):
         if not name in hglib.get_repo_bookmarks(self.repo):
             raise util.Abort(_("Bookmark '%s' does not exist") % name)
@@ -376,8 +376,8 @@ class BookmarkDialog(gtk.Dialog):
                            repo=self.repo,
                            mark=new_name,
                            rename=name)
-        
+
     def _current_hg_bookmark(self, name):
         if name not in hglib.get_repo_bookmarks(self.repo):
             raise util.Abort(_('No bookmark named "%s" exists') % name)
-        bookmarks.setcurrent(self.repo, name)      
+        bookmarks.setcurrent(self.repo, name)
