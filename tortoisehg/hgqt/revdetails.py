@@ -186,7 +186,6 @@ class RevDetailsWidget(QWidget):
         a.triggered.connect(lambda: self.updateToRevision.emit(self._last_rev))
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addAction(self.filelist.actionShowAllMerge)
-        self.filelistToolbar.addAction(self.filelist.actionSecondParent)
 
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)

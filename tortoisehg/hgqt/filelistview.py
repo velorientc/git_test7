@@ -57,8 +57,6 @@ class HgFileListView(QTableView):
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
-        self.actionSecondParent.setChecked(False)
-        self.actionSecondParent.toggled.connect(model.toggleSecondParent)
         if model._ctx is not None:
             self.contextChanged(model._ctx)
 
@@ -69,12 +67,7 @@ class HgFileListView(QTableView):
             self._actions[act].setEnabled(real)
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
-        if len(ctx.parents()) == 2:
-            self.actionShowAllMerge.setEnabled(True)
-            self.actionSecondParent.setEnabled(True)
-        else:
-            self.actionShowAllMerge.setEnabled(False)
-            self.actionSecondParent.setEnabled(False)
+        self.actionShowAllMerge.setEnabled(len(ctx.parents()) == 2)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -93,7 +86,6 @@ class HgFileListView(QTableView):
                 self.selectRow(count-1)
             else:
                 self.clearDisplay.emit()
-                self.actionSecondParent.setEnabled(False)
         else:
             # redisplay previous row
             self.fileSelected()
@@ -105,10 +97,8 @@ class HgFileListView(QTableView):
         if data:
             fromRev = self.model().revFromIndex(index)
             self.fileRevSelected.emit(data['path'], fromRev, data['status'])
-            self.actionSecondParent.setEnabled(data['wasmerged'])
         else:
             self.clearDisplay.emit()
-            self.actionSecondParent.setEnabled(False)
 
     def selectFile(self, filename):
         'Select given file, if found, else the first file'
@@ -213,12 +203,6 @@ class HgFileListView(QTableView):
             _('Toggle display of all files and the direction they were merged'))
         self.actionShowAllMerge.setCheckable(True)
         self.actionShowAllMerge.setChecked(False)
-        self.actionSecondParent = QAction(_('Other'), self)
-        self.actionSecondParent.setToolTip(
-            _('Toggle display of diffs to second (other) parent'))
-        self.actionSecondParent.setCheckable(True)
-        self.actionSecondParent.setChecked(False)
-        self.actionSecondParent.setEnabled(False)
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
