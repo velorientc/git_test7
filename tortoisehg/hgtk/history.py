@@ -1339,13 +1339,8 @@ class GLog(gdialog.GWindow):
     def tags_context_menu(self):
         m = gtklib.MenuBuilder()
         m.append(_('Add/Remove _Tag...'), self.add_tag)
-        if 'bookmarks' in self.exs:
-            m.append(_('Add/Move/Remove B_ookmark...'), self.add_bookmark)
-            m.append(_('Rename Bookmark...'), self.rename_bookmark,
-                     gtk.STOCK_EDIT)
-            if self.repo.ui.configbool('bookmarks', 'track.current'):
-                m.append(_('Set Current Bookmark...'), self.current_bookmark,
-                         gtk.STOCK_YES)
+        m.append(_('Add/Move/Remove B_ookmark...'), self.add_bookmark)
+        m.append(_('Rename Bookmark...'), self.rename_bookmark, gtk.STOCK_EDIT)
         return m.build()
 
     def mq_context_menu(self):
