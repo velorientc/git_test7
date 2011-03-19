@@ -28,6 +28,7 @@ class RebaseDialog(QDialog):
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.repo = repo
         self.opts = opts
+        self.aborted = False
 
         box = QVBoxLayout()
         box.setSpacing(8)
@@ -169,12 +170,16 @@ class RebaseDialog(QDialog):
     def abort(self):
         cmdline = ['rebase', '--repository', self.repo.root, '--abort']
         self.repo.incrementBusyCount()
+        self.aborted = True
         self.cmd.run(cmdline)
 
     def commandFinished(self, ret):
         self.repo.decrementBusyCount()
         if self.checkResolve() is False:
-            self.showMessage.emit(_('Rebase is complete'))
+            msg = _('Rebase is complete')
+            if self.aborted:
+                msg = _('Rebase aborted')
+            self.showMessage.emit(msg)
             self.rebasebtn.setEnabled(True)
             self.rebasebtn.setText(_('Close'))
             self.rebasebtn.clicked.disconnect(self.rebase)
