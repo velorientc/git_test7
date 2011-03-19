@@ -121,25 +121,6 @@ class ArchiveDialog(QDialog):
         self.hbox.addWidget(self.cancel_btn)
         self.vbox.addLayout(self.hbox)
 
-        # connecting slots
-        self.dest_edit.textEdited.connect(self.dest_edited)
-        self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'),
-                     self.rev_combo_changed)
-        self.connect(self.rev_combo, SIGNAL('editTextChanged(QString)'),
-                     self.rev_combo_changed)
-        self.dest_btn.clicked.connect(self.browse_clicked)
-        self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
-        self.subrepos_chk.toggled.connect(self.onSubreposToggled)
-        self.filesradio.toggled.connect(self.update_path)
-        self.tarradio.toggled.connect(self.update_path)
-        self.tbz2radio.toggled.connect(self.update_path)
-        self.tgzradio.toggled.connect(self.update_path)
-        self.uzipradio.toggled.connect(self.update_path)
-        self.zipradio.toggled.connect(self.update_path)
-        self.arch_btn.clicked.connect(self.archive)
-        self.detail_btn.clicked.connect(self.detail_clicked)
-        self.close_btn.clicked.connect(self.close)
-
         # set default values
         self.ui = ui
         self.repo = repo
@@ -163,6 +144,25 @@ class ArchiveDialog(QDialog):
         self.dest_edit.setText(self.repo.root)
         self.filesradio.setChecked(True)
         self.update_path()
+
+        # connecting slots
+        self.dest_edit.textEdited.connect(self.dest_edited)
+        self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'),
+                     self.rev_combo_changed)
+        self.connect(self.rev_combo, SIGNAL('editTextChanged(QString)'),
+                     self.rev_combo_changed)
+        self.dest_btn.clicked.connect(self.browse_clicked)
+        self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
+        self.subrepos_chk.toggled.connect(self.onSubreposToggled)
+        self.filesradio.toggled.connect(self.update_path)
+        self.tarradio.toggled.connect(self.update_path)
+        self.tbz2radio.toggled.connect(self.update_path)
+        self.tgzradio.toggled.connect(self.update_path)
+        self.uzipradio.toggled.connect(self.update_path)
+        self.zipradio.toggled.connect(self.update_path)
+        self.arch_btn.clicked.connect(self.archive)
+        self.detail_btn.clicked.connect(self.detail_clicked)
+        self.close_btn.clicked.connect(self.close)
 
         # dialog setting
         self.setWindowTitle(_('Archive - %s') % self.repo.displayname)
