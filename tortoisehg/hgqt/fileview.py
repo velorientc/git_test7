@@ -139,6 +139,7 @@ class HgFileView(QFrame):
         self._filename = None
         self._status = None
         self._mode = None
+        self._parent = 0
         self._lostMode = None
         self._lastSearch = u'', False
 
@@ -153,8 +154,7 @@ class HgFileView(QFrame):
         self.actionFileMode.setCheckable(True)
         self.actionFileMode._mode = FileMode
         self.actionAnnMode = QAction(qtlib.geticon('view-annotate'),
-                                     _('View change in context, annotate with '
-                                       'revision number'),
+                                     _('annotate with revision numbers'),
                                      self)
         self.actionAnnMode.setCheckable(True)
         self.actionAnnMode._mode = AnnMode
@@ -176,6 +176,20 @@ class HgFileView(QFrame):
         self.actionPrevDiff.triggered.connect(self.prevDiff)
         self.setMode(self.actionDiffMode)
 
+        self.actionFirstParent = QAction('1', self)
+        self.actionFirstParent.setCheckable(True)
+        self.actionFirstParent.setChecked(True)
+        self.actionFirstParent.setShortcut('CTRL+1')
+        self.actionFirstParent.setToolTip(_('Show changes from first parent'))
+        self.actionSecondParent = QAction('2', self)
+        self.actionSecondParent.setCheckable(True)
+        self.actionSecondParent.setShortcut('CTRL+2')
+        self.actionSecondParent.setToolTip(_('Show changes from second parent'))
+        self.parentToggleGroup = QActionGroup(self)
+        self.parentToggleGroup.addAction(self.actionFirstParent)
+        self.parentToggleGroup.addAction(self.actionSecondParent)
+        self.parentToggleGroup.triggered.connect(self.setParent)
+
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
@@ -187,6 +201,9 @@ class HgFileView(QFrame):
         self.actionShelf.triggered.connect(self.launchShelve)
 
         tb = self.diffToolbar
+        tb.addAction(self.actionFirstParent)
+        tb.addAction(self.actionSecondParent)
+        tb.addSeparator()
         tb.addAction(self.actionDiffMode)
         tb.addAction(self.actionFileMode)
         tb.addAction(self.actionAnnMode)
@@ -233,6 +250,16 @@ class HgFileView(QFrame):
             self.sci.setAnnotationEnabled(mode == AnnMode)
             self.displayFile(self._filename, self._status)
 
+    @pyqtSlot(QAction)
+    def setParent(self, action):
+        if action.text() == '1':
+            parent = 0
+        else:
+            parent = 1
+        if self._parent != parent:
+            self._parent = parent
+            self.displayFile(self._filename, self._status)
+
     def restrictModes(self, candiff, canfile, canann):
         'Disable modes based on content constraints'
         self.actionDiffMode.setEnabled(candiff)
@@ -263,10 +290,13 @@ class HgFileView(QFrame):
 
     def setContext(self, ctx):
         self._ctx = ctx
-        self._p_rev = None
         self.sci.setTabWidth(ctx._repo.tabwidth)
         self.actionAnnMode.setVisible(ctx.rev() != None)
         self.actionShelf.setVisible(ctx.rev() == None)
+        self.actionFirstParent.setVisible(len(ctx.parents()) == 2)
+        self.actionSecondParent.setVisible(len(ctx.parents()) == 2)
+        self.actionFirstParent.setEnabled(len(ctx.parents()) == 2)
+        self.actionSecondParent.setEnabled(len(ctx.parents()) == 2)
 
     def showLine(self, line):
         if line < self.sci.lines():
@@ -298,11 +328,10 @@ class HgFileView(QFrame):
             self.restrictModes(False, False, False)
             return
 
-        if self._p_rev is not None:
-            ctx2 = self.repo[self._p_rev]
+        if self._parent == 0 or len(self._ctx.parents()) == 1:
+            ctx2 = self._ctx.p1()
         else:
-            ctx2 = None
-
+            ctx2 = self._ctx.p2()
         fd = FileData(self._ctx, ctx2, filename, status)
 
         if fd.elabel:
