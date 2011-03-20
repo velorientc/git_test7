@@ -7,7 +7,6 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 from mercurial import hg, error
-from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -16,8 +15,6 @@ from tortoisehg.hgqt import qscilib, thgrepo
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-keep = i18n.keepgettext()
 
 SUMMARY_PAGE = 0
 MERGE_PAGE   = 1
@@ -504,7 +501,7 @@ class CommitPage(BasePage):
     def currentPage(self):
         # TODO: add other branch name, when appropriate
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
-        msgset = keep._('Merge ')
+        msgset = i18n.keepgettext()._('Merge ')
         self.msgEntry.setText(engmsg and msgset['id'] or msgset['str'])
         self.msgEntry.moveCursorToEnd()
 
