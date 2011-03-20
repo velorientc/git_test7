@@ -383,8 +383,11 @@ class PostReviewDialog(QDialog):
     @pyqtSlot()
     def onSettingsButtonClicked(self):
         from tortoisehg.hgqt import settings
-
-        settings.SettingsDialog(parent=self, focus='reviewboard.server').exec_()
+        if settings.SettingsDialog(parent=self, focus='reviewboard.server').exec_():
+            # not use repo.configChanged because it can clobber user input
+            # accidentally.
+            self.repo.invalidateui()  # force reloading config immediately
+            self.readSettings()
 
 def run(ui, *pats, **opts):
     revs = opts.get('rev') or None
