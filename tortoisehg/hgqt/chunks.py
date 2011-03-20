@@ -71,7 +71,7 @@ class ChunksWidget(QWidget):
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.diffbrowse.chunksSelected.connect(self.chunksSelected)
 
-        self.filelist.fileRevSelected.connect(self.displayFile)
+        self.filelist.fileSelected.connect(self.displayFile)
         self.filelist.clearDisplay.connect(self.diffbrowse.clearDisplay)
 
         self.splitter.setStretchFactor(0, 0)
@@ -338,8 +338,11 @@ class ChunksWidget(QWidget):
             header =  record.parsepatch(buf)[0]
             return [header] + header.hunks
 
-    @pyqtSlot(object, object, object)
-    def displayFile(self, file, rev, status):
+    @pyqtSlot(QString, QString)
+    def displayFile(self, file, status):
+        if isinstance(file, (unicode, QString)):
+            file = hglib.fromunicode(file)
+            status = hglib.fromunicode(status)
         if file:
             self.currentFile = file
             path = self.repo.wjoin(file)
