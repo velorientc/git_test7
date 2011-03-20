@@ -31,7 +31,7 @@ class MergeDialog(QWizard):
 
         self.setWindowTitle(_('Merge - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-merge'))
-        self.setOption(QWizard.HelpButtonOnRight, False)
+        self.setOption(QWizard.NoBackButtonOnStartPage, True)
         self.setOption(QWizard.IndependentPages, True)
 
         # set pages
