@@ -16,11 +16,6 @@ from tortoisehg.hgqt import qscilib, thgrepo
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-SUMMARY_PAGE = 0
-MERGE_PAGE   = 1
-COMMIT_PAGE  = 2
-RESULT_PAGE  = 3
-
 MARGINS = (8, 0, 0, 0)
 
 class MergeDialog(QWizard):
@@ -40,10 +35,10 @@ class MergeDialog(QWizard):
         self.setOption(QWizard.IndependentPages, True)
 
         # set pages
-        self.setPage(SUMMARY_PAGE, SummaryPage(repo, self))
-        self.setPage(MERGE_PAGE, MergePage(repo, self))
-        self.setPage(COMMIT_PAGE, CommitPage(repo, self))
-        self.setPage(RESULT_PAGE, ResultPage(repo, self))
+        self.addPage(SummaryPage(repo, self))
+        self.addPage(MergePage(repo, self))
+        self.addPage(CommitPage(repo, self))
+        self.addPage(ResultPage(repo, self))
         self.currentIdChanged.connect(self.pageChanged)
 
         repo.repositoryChanged.connect(self.repositoryChanged)
