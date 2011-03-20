@@ -348,6 +348,7 @@ class MergePage(BasePage):
 
         self.reslabel = QLabel()
         self.reslabel.linkActivated.connect(self.onLinkActivated)
+        self.reslabel.setWordWrap(True)
         self.layout().addWidget(self.reslabel)
 
     def currentPage(self):
@@ -542,6 +543,7 @@ class CommitPage(BasePage):
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
         self.completeChanged.emit()
+
 
 class ResultPage(BasePage):
     # TODO: Add a checkbox on this page to make it optional
