@@ -19,7 +19,7 @@ from hgext import mq as mqmod
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
-from tortoisehg.hgqt import qqueue, fileview, thgimport
+from tortoisehg.hgqt import qqueue, qreorder, fileview, thgimport
 from tortoisehg.hgqt.qtlib import geticon
 
 # TODO
@@ -91,9 +91,9 @@ class MQWidget(QWidget):
         self.setGuardsAct = a = QAction(
             geticon('hg-qguard'), _('Guards'), self)
         a.setToolTip(_('Configure guards for selected patch'))
-        self.qpushMoveAct = a = QAction(
-            geticon('hg-qreorder'), _('Push selected'), self)
-        a.setToolTip(_('Apply selected patch next (change queue order)'))
+        self.qreorderAct = a = QAction(
+            geticon('hg-qreorder'), _('Reorder patches'), self)
+        a.setToolTip(_('Reorder patches'))
         self.qdeleteAct = a = QAction(
             geticon('hg-qdelete'), _('Delete'), self)
         a.setToolTip(_('Delete selected patches'))
@@ -112,7 +112,7 @@ class MQWidget(QWidget):
         tbar.addAction(self.qpopAct)
         tbar.addAction(self.qpopAllAct)
         tbar.addSeparator()
-        tbar.addAction(self.qpushMoveAct)
+        tbar.addAction(self.qreorderAct)
         tbar.addSeparator()
         tbar.addAction(self.qdeleteAct)
         tbar.addSeparator()
@@ -191,7 +191,7 @@ class MQWidget(QWidget):
         self.queueListWidget.itemChanged.connect(self.onRenamePatch)
         self.qpushAllAct.triggered.connect(self.onPushAll)
         self.qpushAct.triggered.connect(self.onPush)
-        self.qpushMoveAct.triggered.connect(self.onPushMove)
+        self.qreorderAct.triggered.connect(self.onQreorder)
         self.qpopAllAct.triggered.connect(self.onPopAll)
         self.qpopAct.triggered.connect(self.onPop)
         self.setGuardsAct.triggered.connect(self.onGuardConfigure)
@@ -349,6 +349,26 @@ class MQWidget(QWidget):
         self.finishfunc = self.checkForRejects
         self.cmd.run(cmdline)
 
+    def onQreorder(self):
+        if self.cmd.running():
+            return
+        def checkGuardsOrComments():
+            cont = True
+            for p in self.repo.mq.full_series:
+                if '#' in p:
+                    cont = QuestionMsgBox('Confirm qreorder',
+                            _('<p>ATTENTION!<br>'
+                              'Guard or comment found.<br>'
+                              'Reordering patches will destroy them.<br>'
+                              '<br>Continue?</p>'), parent=self,
+                              defaultbutton=QMessageBox.No)
+                    break
+            return cont
+        if checkGuardsOrComments():
+            dlg = qreorder.QReorderDialog(self.repo, self)
+            dlg.finished.connect(dlg.deleteLater)
+            dlg.exec_()
+
     @pyqtSlot()
     def onGuardConfigure(self):
         item = self.queueListWidget.currentItem()
@@ -435,11 +455,9 @@ class MQWidget(QWidget):
             patch = self.queueListWidget.item(row)._thgpatch
             applied = set([p.name for p in self.repo.mq.applied])
             self.qdeleteAct.setEnabled(patch not in applied)
-            self.qpushMoveAct.setEnabled(patch not in applied)
             self.setGuardsAct.setEnabled(True)
         else:
             self.qdeleteAct.setEnabled(False)
-            self.qpushMoveAct.setEnabled(False)
             self.setGuardsAct.setEnabled(False)
 
     @pyqtSlot(int)
@@ -639,7 +657,6 @@ class MQWidget(QWidget):
 
         self.qpushAllAct.setEnabled(bool(repo.thgmqunappliedpatches))
         self.qpushAct.setEnabled(bool(repo.thgmqunappliedpatches))
-        self.qpushMoveAct.setEnabled(False)
         self.qdeleteAct.setEnabled(False)
         self.setGuardsAct.setEnabled(False)
         self.qpopAct.setEnabled(bool(applied))
