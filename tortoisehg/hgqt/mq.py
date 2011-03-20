@@ -449,11 +449,7 @@ class MQWidget(QWidget):
         text = hglib.fromunicode(self.fileListWidget.item(row).text())
         status = text[0]
         filename = text[2:]
-        if self.newCheckBox.isChecked():
-            rev = self.repo['.'].rev()
-        else:
-            rev = self.repo['qtip'].p1().rev()
-        self.fileview.displayFile(filename, rev, status)
+        self.fileview.displayFile(filename, status)
 
     @pyqtSlot(int)
     def onMessageSelected(self, row):
