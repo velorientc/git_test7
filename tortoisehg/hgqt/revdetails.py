@@ -166,7 +166,7 @@ class RevDetailsWidget(QWidget):
 
         revisiondetails_layout.addWidget(self.filelist_splitter)
 
-        self.filelist.fileRevSelected.connect(self.onFileRevSelected)
+        self.filelist.fileSelected.connect(self.fileview.displayFile)
         self.filelist.clearDisplay.connect(self.fileview.clearDisplay)
 
     def forwardFont(self, font):
@@ -186,7 +186,6 @@ class RevDetailsWidget(QWidget):
         a.triggered.connect(lambda: self.updateToRevision.emit(self._last_rev))
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addAction(self.filelist.actionShowAllMerge)
-        self.filelistToolbar.addAction(self.filelist.actionSecondParent)
 
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
@@ -211,10 +210,6 @@ class RevDetailsWidget(QWidget):
     def setupModels(self):
         self.create_models()
         self.filelist.setModel(self.filelistmodel)
-
-    @pyqtSlot(object, object, object)
-    def onFileRevSelected(self, file, rev, status):
-        self.fileview.displayFile(file, rev, status)
 
     def onRevisionSelected(self, rev):
         'called by repowidget when repoview changes revisions'
