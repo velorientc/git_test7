@@ -32,6 +32,7 @@ class MergeDialog(QWizard):
         self.setWindowTitle(_('Merge - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-merge'))
         self.setOption(QWizard.NoBackButtonOnStartPage, True)
+        self.setOption(QWizard.NoBackButtonOnLastPage, True)
         self.setOption(QWizard.IndependentPages, True)
 
         # set pages
@@ -551,9 +552,14 @@ class ResultPage(BasePage):
         self.setLayout(QVBoxLayout())
         merge_sep = qtlib.LabeledSeparator(_('Merge changeset'))
         self.layout().addWidget(merge_sep)
-        merge_info = csinfo.create(self.repo, 'tip', withupdate=True)
-        self.layout().addWidget(merge_info)
+        mergeCsInfo = csinfo.create(self.repo, 'tip', withupdate=True)
+        self.layout().addWidget(mergeCsInfo)
+        self.mergeCsInfo = mergeCsInfo
         self.layout().addStretch(1)
+
+    def currentPage(self):
+        self.mergeCsInfo.update(self.repo['tip'])
+        self.setOption(QWizard.NoCancelButton, True)
 
 
 class CheckThread(QThread):
