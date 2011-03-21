@@ -193,6 +193,7 @@ class BackoutDialog(QDialog):
         self.closeBtn.setHidden(True)
         self.cancelBtn.setShown(True)
         self.detailBtn.setShown(True)
+        self.backoutBtn.setEnabled(False)
 
     def command_canceling(self):
         self.cancelBtn.setDisabled(True)
@@ -210,6 +211,7 @@ class BackoutDialog(QDialog):
         elif self.cmdline[0] == 'backout':
             self.didbackout = True
             self.msgTextEdit.setEnabled(True)
+            self.backoutBtn.setEnabled(True)
             self.backoutBtn.setText(_('Commit'))
             self.backoutBtn.clicked.disconnect(self.backout)
             self.backoutBtn.clicked.connect(self.commit)
