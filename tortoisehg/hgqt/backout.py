@@ -25,7 +25,6 @@ class BackoutDialog(QDialog):
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
         self.setWindowIcon(qtlib.geticon('hg-revert'))
         self.repo = repo
-        self.didbackout = False
 
         # main layout box
         box = QVBoxLayout()
@@ -193,6 +192,7 @@ class BackoutDialog(QDialog):
         self.closeBtn.setHidden(True)
         self.cancelBtn.setShown(True)
         self.detailBtn.setShown(True)
+        self.backoutBtn.setEnabled(False)
 
     def command_canceling(self):
         self.cancelBtn.setDisabled(True)
@@ -200,22 +200,32 @@ class BackoutDialog(QDialog):
     def command_finished(self, ret):
         self.repo.decrementBusyCount()
         self.cancelBtn.setHidden(True)
+
+        # If the action wasn't successful, display the output and we're done
         if ret not in (0, 1):
             self.detailBtn.setChecked(True)
             self.closeBtn.setShown(True)
             self.closeBtn.setAutoDefault(True)
             self.closeBtn.setFocus()
-        elif self.backoutParent:
-            self.accept()
-        elif self.cmdline[0] == 'backout':
-            self.didbackout = True
-            self.msgTextEdit.setEnabled(True)
-            self.backoutBtn.setText(_('Commit'))
-            self.backoutBtn.clicked.disconnect(self.backout)
-            self.backoutBtn.clicked.connect(self.commit)
-            self.checkResolve()
-        elif not self.cmd.outputShown():
-            self.accept()
+        else:
+            finished = True
+            #If we backed out our parent, there is no second commit step
+            if self.cmdline[0] == 'backout' and not self.backoutParent:
+                 finished = False
+                 self.msgTextEdit.setEnabled(True)
+                 self.backoutBtn.setEnabled(True)
+                 self.backoutBtn.setText(_('Commit'))
+                 self.backoutBtn.clicked.disconnect(self.backout)
+                 self.backoutBtn.clicked.connect(self.commit)
+                 self.checkResolve()
+
+            if finished:           
+                if not self.cmd.outputShown():
+                    self.accept()
+                else:
+                    self.closeBtn.clicked.disconnect(self.reject)
+                    self.closeBtn.clicked.connect(self.accept)
+                    self.closeBtn.setHidden(False)
 
     def checkResolve(self):
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
