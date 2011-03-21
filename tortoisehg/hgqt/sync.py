@@ -857,7 +857,7 @@ class SyncWidget(QWidget):
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
 
 
@@ -956,7 +956,7 @@ class PostPullDialog(QDialog):
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
         super(PostPullDialog, self).accept()
 
@@ -1033,7 +1033,7 @@ class SaveDialog(QDialog):
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
         super(SaveDialog, self).accept()
 
@@ -1213,7 +1213,7 @@ are expanded in the filename.'''))
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
         super(SecureDialog, self).accept()
 
