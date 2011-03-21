@@ -341,13 +341,21 @@ class SyncWidget(QWidget):
         self.postpullbutton.setText(name)
 
         # Refresh related paths
-        known = set(self.paths.values())
-        known.add(self.repo.root)
+        known = set()
+        known.add(os.path.abspath(self.repo.root).lower())
+        for path in self.paths.values():
+            if hg.islocal(path):
+                known.add(os.path.abspath(hg.localpath(path)).lower())
+            else:
+                known.add(path)
         related = {}
         for root, shortname in thgrepo.relatedRepositories(self.repo[0].node()):
-            if root not in known:
+            if root == self.repo.root:
+                continue
+            abs = os.path.abspath(root).lower()
+            if abs not in known:
                 related[root] = shortname
-                known.add(root)
+                known.add(abs)
             if root in thgrepo._repocache:
                 # repositories already opened keep their ui instances in sync
                 repo = thgrepo._repocache[root]
@@ -358,9 +366,13 @@ class SyncWidget(QWidget):
                 tempui.readconfig(os.path.join(root, '.hg', 'hgrc'))
                 ui = tempui
             for alias, path in ui.configitems('paths'):
-                if path not in known:
+                if hg.islocal(path):
+                    abs = os.path.abspath(hg.localpath(path)).lower()
+                else:
+                    abs = path
+                if abs not in known:
                     related[path] = alias
-                    known.add(path)
+                    known.add(abs)
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
