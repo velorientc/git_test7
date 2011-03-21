@@ -169,9 +169,8 @@ class StripDialog(QDialog):
     def preview(self):
         if self.updatecslist():
             striprevs = self.cslist.curitems
-            cstext = qtlib.markup(_("%s changesets") % len(striprevs),
-                                  weight='bold')
-            self.status.setText(_("%s will be stripped") % cstext)
+            cstext = _("<b>%d changesets</b> will be stripped") % len(striprevs)
+            self.status.setText(cstext)
             self.strip_btn.setEnabled(True)
         else:
             self.cslist.clear()
