@@ -215,7 +215,6 @@ class RepoTreeView(QTreeView):
 class RepoRegistryView(QDockWidget):
 
     openRepoSignal = pyqtSignal(QString, bool)
-    visibilityChanged = pyqtSignal(bool)
 
     def __init__(self, workbench):
         QDockWidget.__init__(self, workbench)
@@ -266,9 +265,3 @@ class RepoRegistryView(QDockWidget):
 
     def close(self):
         self.tmodel.write(settingsfilename())
-
-    def showEvent(self, event):
-        self.visibilityChanged.emit(True)
-
-    def hideEvent(self, event):
-        self.visibilityChanged.emit(False)
