@@ -495,6 +495,9 @@ class CommitPage(BasePage):
         actionEnter.triggered.connect(tryperform)
         self.addAction(actionEnter)
 
+    def refresh(self):
+        pass
+
     def currentPage(self):
         # TODO: add other branch name, when appropriate
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
@@ -559,7 +562,7 @@ class ResultPage(BasePage):
 
     def currentPage(self):
         self.mergeCsInfo.update(self.repo['tip'])
-        self.setOption(QWizard.NoCancelButton, True)
+        self.wizard().setOption(QWizard.NoCancelButton, True)
 
 
 class CheckThread(QThread):
