@@ -10,10 +10,11 @@ import sys
 import atexit
 import shutil
 import stat
+import subprocess
 import tempfile
 import re
 
-from mercurial import extensions
+from mercurial import extensions, util
 
 from tortoisehg.util import hglib, paths, wconfig
 from hgext.color import _styles
@@ -27,6 +28,12 @@ if PYQT_VERSION_STR.split('.') < ['4', '7'] or \
     sys.stderr.write('You have Qt %s and PyQt %s\n' %
                      (QT_VERSION_STR, PYQT_VERSION_STR))
     sys.exit()
+
+try:
+    import win32con
+    openflags = win32con.CREATE_NO_WINDOW
+except ImportError:
+    openflags = 0
 
 tmproot = None
 def gettempdir():
@@ -78,6 +85,64 @@ def loadIniFile(rcpath, parent):
             return None, {}
 
     return fn, wconfig.readfile(fn)
+
+def editfiles(repo, files, lineno=None, search=None, parent=None):
+    files = [util.shellquote(util.localpath(f)) for f in files]
+    editor = repo.ui.config('tortoisehg', 'editor')
+    assert len(files) == 1 or lineno == None
+    if editor:
+        try:
+            regexp = re.compile('\[([^\]]*)\]')
+            expanded = []
+            pos = 0
+            for m in regexp.finditer(editor):
+                expanded.append(editor[pos:m.start()-1])
+                phrase = editor[m.start()+1:m.end()-1]
+                pos=m.end()+1
+                if '$LINENUM' in phrase:
+                    if lineno is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$LINENUM', str(lineno))
+                elif '$SEARCH' in phrase:
+                    if search is None:
+                        # throw away phrase
+                        continue
+                    phrase = phrase.replace('$SEARCH', search)
+                if '$FILE' in phrase:
+                    phrase = phrase.replace('$FILE', files[0])
+                    files = []
+                expanded.append(phrase)
+            expanded.append(editor[pos:])
+            cmdline = ' '.join(expanded + files)
+        except ValueError, e:
+            # '[' or ']' not found
+            cmdline = ' '.join([editor] + files)
+        except TypeError, e:
+            # variable expansion failed
+            cmdline = ' '.join([editor] + files)
+    else:
+        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
+                 or os.environ.get('EDITOR', 'vi')
+        cmdline = ' '.join([editor] + files)
+    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+        res = QMessageBox.critical(parent,
+                    _('No visual editor configured'),
+                    _('Please configure a visual editor.'))
+        from tortoisehg.hgqt.settings import SettingsDialog
+        dlg = SettingsDialog(False, focus='tortoisehg.editor')
+        dlg.exec_()
+        return
+
+    cmdline = util.quotecommand(cmdline)
+    try:
+        subprocess.Popen(cmdline, shell=True, creationflags=openflags,
+                         stderr=None, stdout=None, stdin=None, cwd=repo.root)
+    except (OSError, EnvironmentError), e:
+        QMessageBox.warning(parent,
+                _('Editor launch failure'),
+                _('%s : %s') % (cmd, str(e)))
+    return False
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
