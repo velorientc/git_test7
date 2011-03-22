@@ -302,9 +302,6 @@ INFO = (
         _('The maximum size file (in KB) that TortoiseHg will '
           'show changes for in the changelog, status, and commit windows. '
           'A value of zero implies no limit.  Default: 1024 (1MB)')),
-    _fi(_('Capture stderr'), 'tortoisehg.stderrcapt', genBoolCombo,
-        _('Redirect stderr to a buffer which is parsed at the end of '
-          'the process for runtime errors. Default: True')),
     _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolCombo,
         _('When running from the command line, fork a background '
           'process to run graphical dialogs.  Default: True')),

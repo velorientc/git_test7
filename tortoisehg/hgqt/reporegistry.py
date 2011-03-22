@@ -182,11 +182,7 @@ class RepoTreeView(QTreeView):
             return
         root = self.selitem.internalPointer().rootpath()
         d = CloneDialog(args=[root, root + '-clone'], parent=self)
-        def cmdfinished(res):
-            if res == 0:
-                dest = d.getDest()
-                self.workbench.openRepo(dest)
-        d.cmdfinished.connect(cmdfinished)
+        d.clonedRepository.connect(self.workbench.showRepo)
         d.show()
 
     def explore(self):
