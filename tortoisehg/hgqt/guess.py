@@ -209,9 +209,10 @@ class DetectRenameDialog(QDialog):
         for index in self.matchtv.selectionModel().selectedRows():
             src, dest, percent = self.matchtv.model().getRow(index)
             if dest in remdests:
+                udest = hglib.tounicode(dest)
                 QMessageBox.warning(self, _('Multiple sources chosen'),
                     _('You have multiple renames selected for '
-                      'destination file:\n%s. Aborting!') % dest)
+                      'destination file:\n%s. Aborting!') % udest)
                 return
             remdests[dest] = src
         for dest, src in remdests.iteritems():
@@ -233,7 +234,8 @@ class DetectRenameDialog(QDialog):
         date = hglib.displaytime(ctx.date())
         difftext = mdiff.unidiff(rr, date, aa, date, src, dest, None)
         if not difftext:
-            t = _('%s and %s have identical contents\n\n') % (src, dest)
+            t = _('%s and %s have identical contents\n\n') % \
+                    (hglib.tounicode(src), hglib.tounicode(dest))
             hu.write(t, label='ui.error')
         else:
             for t, l in patch.difflabel(difftext.splitlines, True):
