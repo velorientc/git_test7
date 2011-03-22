@@ -157,13 +157,14 @@ class HgignoreDialog(QDialog):
             filters.append(dirname)
             dirname = os.path.dirname(dirname)
         for f in filters:
-            action = self.contextmenu.addAction(_('Ignore ') + hglib.tounicode(f))
-            action.args = (f,False)
-            action.run = lambda: self.insertFilter(*action.args)
-            action.triggered.connect(action.run)
+            a = self.contextmenu.addAction(_('Ignore ') + hglib.tounicode(f))
+            a._pattern = f
+            a.triggered.connect(self.insertFilter)
         self.contextmenu.exec_(point)
 
-    def insertFilter(self, pat, isregexp):
+    def insertFilter(self, pat=False, isregexp=False):
+        if pat is False:
+            pat = self.sender()._pattern
         h = isregexp and 'syntax: regexp' or 'syntax: glob'
         if h in self.ignorelines:
             l = self.ignorelines.index(h)
