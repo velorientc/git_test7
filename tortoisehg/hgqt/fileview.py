@@ -502,7 +502,10 @@ class FileData(object):
         self.diff = None
         self.flabel = u''
         self.elabel = u''
-        self.readStatus(ctx, ctx2, wfile, status)
+        try:
+            self.readStatus(ctx, ctx2, wfile, status)
+        except (EnvironmentError, error.LookupError), e:
+            self.error = hglib.tounicode(str(e))
 
     def checkMaxDiff(self, ctx, wfile):
         p = _('File or diffs not displayed: ')
@@ -641,19 +644,16 @@ class FileData(object):
             return
 
         if status in ('I', '?', 'C'):
-            try:
-                if os.path.getsize(repo.wjoin(wfile)) > ctx._repo.maxdiff:
-                    self.error = mde
+            if os.path.getsize(repo.wjoin(wfile)) > ctx._repo.maxdiff:
+                self.error = mde
+            else:
+                data = open(repo.wjoin(wfile), 'r').read()
+                if '\0' in data:
+                    self.error = 'binary file'
                 else:
-                    data = open(repo.wjoin(wfile), 'r').read()
-                    if '\0' in data:
-                        self.error = 'binary file'
-                    else:
-                        self.contents = hglib.tounicode(data)
-                if status in ('I', '?'):
-                    self.flabel += _(' <i>(is unversioned)</i>')
-            except EnvironmentError, e:
-                self.error = hglib.tounicode(str(e))
+                    self.contents = hglib.tounicode(data)
+            if status in ('I', '?'):
+                self.flabel += _(' <i>(is unversioned)</i>')
             return
 
         if status in ('M', 'A'):
