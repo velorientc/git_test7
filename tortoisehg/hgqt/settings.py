@@ -624,8 +624,9 @@ class SettingsDialog(QDialog):
         except error.RepoError:
             repo = None
             if configrepo:
+                uroot = hglib.tounicode(root)
                 qtlib.ErrorMsgBox(_('No repository found'),
-                                  _('no repo at ') + root, parent=self)
+                                  _('no repo at ') + uroot, parent=self)
 
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
