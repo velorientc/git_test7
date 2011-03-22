@@ -175,6 +175,7 @@ class RepoTreeView(QTreeView):
         row = s.row()
         parent = s.parent()
         m.removeRows(row, 1, parent)
+        self.selectionChanged(None, None)
 
     def cloneRepo(self):
         if not self.selitem:
