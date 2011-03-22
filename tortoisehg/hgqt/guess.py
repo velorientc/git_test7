@@ -34,8 +34,7 @@ class DetectRenameDialog(QDialog):
 
         self.setWindowTitle(_('Detect Copies/Renames in %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('detect_rename'))
-        f = self.windowFlags()
-        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(Qt.Window)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(*(2,)*4)
