@@ -436,20 +436,28 @@ class SyncWidget(QWidget):
         self.refreshStatusTips()
 
     def dragEnterEvent(self, event):
-        event.acceptProposedAction()
+        data = event.mimeData()
+        if data.hasUrls() or data.hasText():
+            event.setDropAction(Qt.CopyAction)
+            event.acceptProposedAction()
 
     def dragMoveEvent(self, event):
-        event.acceptProposedAction()
+        data = event.mimeData()
+        if data.hasUrls() or data.hasText():
+            event.setDropAction(Qt.CopyAction)
+            event.acceptProposedAction()
 
     def dropEvent(self, event):
         data = event.mimeData()
         if data.hasUrls():
             url = data.urls()[0]
             self.setUrl(hglib.fromunicode(url.toString()))
+            event.setDropAction(Qt.CopyAction)
             event.accept()
         elif data.hasText():
             text = data.text()
             self.setUrl(hglib.fromunicode(text))
+            event.setDropAction(Qt.CopyAction)
             event.accept()
 
     def canExit(self):
