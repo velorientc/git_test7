@@ -178,6 +178,8 @@ class RepoTreeModel(QAbstractItemModel):
         d = str(data.data(repoRegMimeType))
         itemread = readXml(d, extractXmlElementName, self)
         group = parent.internalPointer()
+        if group is None:
+            return False
         if row < 0:
             row = 0
         self.beginInsertRows(parent, row, row)
