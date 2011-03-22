@@ -95,7 +95,7 @@ class HgFileListView(QTableView):
             index = self.currentIndex()
         data = self.model().dataFromIndex(index)
         if data:
-            self.fileSelected.emit(data['path'], data['status'])
+            self.fileSelected.emit(hglib.tounicode(data['path']), data['status'])
         else:
             self.clearDisplay.emit()
 
