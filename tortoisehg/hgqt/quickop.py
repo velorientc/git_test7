@@ -30,8 +30,7 @@ class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
     def __init__(self, repo, command, pats, parent):
         QDialog.__init__(self, parent)
-        self.setWindowFlags(self.windowFlags() &
-                            ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(Qt.Window)
         self.pats = pats
         self.repo = repo
         os.chdir(repo.root)
