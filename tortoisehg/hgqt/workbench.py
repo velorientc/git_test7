@@ -589,8 +589,9 @@ class Workbench(QMainWindow):
                 repo = thgrepo.repository(path=path)
                 self.addRepoTab(repo)
             except RepoError:
+                upath = hglib.tounicode(path)
                 qtlib.WarningMsgBox(_('Failed to open repository'),
-                        _('%s is not a valid repository') % path)
+                        _('%s is not a valid repository') % upath)
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):
