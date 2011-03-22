@@ -117,9 +117,9 @@ class QFoldDialog(QDialog):
         self.summ.setText(hglib.tounicode(txt))
 
     def composeMsg(self, patches):
-        return '\n* * *\n'.join(
-              [self.repo.changectx('qtip').description()]
-              + [self.repo.changectx(p).description() for p in patches])
+        return u'\n* * *\n'.join(
+              [hglib.tounicode(self.repo.changectx(p).description())
+               for p in ['qtip'] + patches])
 
     def getMessage(self):
         text = self.msgte.text()
