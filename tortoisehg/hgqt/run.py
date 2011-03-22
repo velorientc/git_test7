@@ -372,6 +372,7 @@ class _QtRunner(QObject):
         error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                             '<a href="#edit:%(arg1)s">edit</a> your config'),
         error.Abort: _('Operation aborted:<br><br>%(arg0)s.'),
+        error.LockUnavailable: _('Repository is locked'),
         }
 
     def __init__(self):
