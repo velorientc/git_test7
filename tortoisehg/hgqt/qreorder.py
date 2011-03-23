@@ -57,7 +57,7 @@ class QReorderDialog(QDialog):
                 self.setCurrentRow(0)
             def contextMenuEvent(self, event):
                 self.menuRequested.emit(event.globalPos(),
-                    hglib.fromunicode(self.item(self.currentRow()).text()))
+                    self.item(self.currentRow()).patchname)
             def focusInEvent(self, e):
                 i = self.item(self.currentRow())
                 if i:
