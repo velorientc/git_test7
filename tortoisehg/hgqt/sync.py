@@ -714,11 +714,12 @@ class SyncWidget(QWidget):
             else:
                 self.showMessage.emit(_('Pull from %s aborted, ret %d') % (urlu, ret))
             # handle file conflicts during rebase
-            if os.path.exists(self.repo.join('rebasestate')):
-                dlg = rebase.RebaseDialog(self.repo, self)
-                dlg.finished.connect(dlg.deleteLater)
-                dlg.exec_()
-                return
+            if self.opts.get('rebase'):
+                if os.path.exists(self.repo.join('rebasestate')):
+                    dlg = rebase.RebaseDialog(self.repo, self)
+                    dlg.finished.connect(dlg.deleteLater)
+                    dlg.exec_()
+                    return
             # handle file conflicts during update
             for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
                 if status == 'u':
