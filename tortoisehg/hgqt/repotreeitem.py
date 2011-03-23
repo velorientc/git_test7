@@ -7,7 +7,7 @@
 
 import sys, os
 
-from mercurial import node
+from mercurial import node, error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -209,11 +209,15 @@ class RepoItem(RepoTreeItem):
         workbench.showRepo(hglib.tounicode(self._root))
 
     def startSettings(self, parent):
-        dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
-                             root=self._root)
-        self.ensureRepoLoaded()
-        dlg.exec_()
-        dlg.deleteLater()
+        try:
+            dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
+                                 root=self._root)
+            self.ensureRepoLoaded()
+            dlg.exec_()
+        except error.RepoError:
+            pass
+        finally:
+            dlg.deleteLater()
 
     def ensureRepoLoaded(self):
         """load repo object if necessary
