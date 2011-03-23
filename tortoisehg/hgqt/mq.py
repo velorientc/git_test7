@@ -464,7 +464,7 @@ class MQWidget(QWidget):
             return
         text = hglib.fromunicode(self.fileListWidget.item(row).text())
         if self.newCheckBox.isChecked():
-            self.fileview.setContext(self.repo[None], self.repo['.'])
+            self.fileview.setContext(self.repo[None])
         else:
             self.fileview.setContext(self.repo[None], self.repo['qtip'].p1())
         status = text[0]
