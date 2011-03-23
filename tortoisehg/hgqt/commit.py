@@ -424,7 +424,7 @@ class CommitWidget(QWidget):
         self.msgte.loadSettings(s, lpref+'msgte')
         self.stwidget.loadSettings(s, lpref+'status')
         self.msghistory = list(s.value(gpref+'history-'+repoid).toStringList())
-        self.msghistory = [m for m in self.msghistory if m]
+        self.msghistory = [unicode(m) for m in self.msghistory if m]
         self.updateRecentMessages()
         self.userhist = s.value(gpref+'userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
@@ -457,6 +457,7 @@ class CommitWidget(QWidget):
             pass
 
     def addMessageToHistory(self, umsg):
+        umsg = unicode(umsg)
         if umsg in self.msghistory:
             self.msghistory.remove(umsg)
         self.msghistory.insert(0, umsg)
