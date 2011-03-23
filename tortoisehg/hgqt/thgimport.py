@@ -146,6 +146,7 @@ class ImportDialog(QDialog):
     def checkStatus(self):
         def activated():
             dlg = commit.CommitDialog([], dict(root=self.repo.root), self)
+            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             self.checkStatus()
         self.repo.dirstate.invalidate()
