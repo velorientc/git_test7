@@ -27,13 +27,17 @@ from mercurial import ui as uimod, mdiff
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import annotate, qscilib, qtlib, blockmatcher, lexers
-from tortoisehg.hgqt import visdiff, wctxactions
+from tortoisehg.hgqt import visdiff
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import Qsci
 
 qsci = Qsci.QsciScintilla
+
+DiffMode = 1
+FileMode = 2
+AnnMode = 3
 
 class HgFileView(QFrame):
     """file diff and content viewer"""
@@ -135,6 +139,7 @@ class HgFileView(QFrame):
         self._filename = None
         self._status = None
         self._mode = None
+        self._parent = 0
         self._lostMode = None
         self._lastSearch = u'', False
 
@@ -142,15 +147,17 @@ class HgFileView(QFrame):
                                       _('View change as unified diff output'),
                                       self)
         self.actionDiffMode.setCheckable(True)
+        self.actionDiffMode._mode = DiffMode
         self.actionFileMode = QAction(qtlib.geticon('view-file'),
                                       _('View change in context of file'),
                                       self)
         self.actionFileMode.setCheckable(True)
+        self.actionFileMode._mode = FileMode
         self.actionAnnMode = QAction(qtlib.geticon('view-annotate'),
-                                     _('View change in context, annotate with '
-                                       'revision number'),
+                                     _('annotate with revision numbers'),
                                      self)
         self.actionAnnMode.setCheckable(True)
+        self.actionAnnMode._mode = AnnMode
 
         self.modeToggleGroup = QActionGroup(self)
         self.modeToggleGroup.addAction(self.actionDiffMode)
@@ -167,8 +174,21 @@ class HgFileView(QFrame):
                                       'Previous diff (alt+up)', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
+        self.setMode(self.actionDiffMode)
 
-        self.forceMode('diff')
+        self.actionFirstParent = QAction('1', self)
+        self.actionFirstParent.setCheckable(True)
+        self.actionFirstParent.setChecked(True)
+        self.actionFirstParent.setShortcut('CTRL+1')
+        self.actionFirstParent.setToolTip(_('Show changes from first parent'))
+        self.actionSecondParent = QAction('2', self)
+        self.actionSecondParent.setCheckable(True)
+        self.actionSecondParent.setShortcut('CTRL+2')
+        self.actionSecondParent.setToolTip(_('Show changes from second parent'))
+        self.parentToggleGroup = QActionGroup(self)
+        self.parentToggleGroup.addAction(self.actionFirstParent)
+        self.parentToggleGroup.addAction(self.actionSecondParent)
+        self.parentToggleGroup.triggered.connect(self.setParent)
 
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
@@ -181,6 +201,9 @@ class HgFileView(QFrame):
         self.actionShelf.triggered.connect(self.launchShelve)
 
         tb = self.diffToolbar
+        tb.addAction(self.actionFirstParent)
+        tb.addAction(self.actionSecondParent)
+        tb.addSeparator()
         tb.addAction(self.actionDiffMode)
         tb.addAction(self.actionFileMode)
         tb.addAction(self.actionAnnMode)
@@ -218,52 +241,73 @@ class HgFileView(QFrame):
     @pyqtSlot(QAction)
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
-
-        mode = {self.actionDiffMode.text():'diff',
-                self.actionFileMode.text():'file',
-                self.actionAnnMode.text() :'ann'}[action.text()]
-        self.actionNextDiff.setEnabled(mode == 'file')
-        self.actionPrevDiff.setEnabled(False)
-        self.blk.setVisible(mode == 'file')
-        self.sci.setAnnotationEnabled(mode == 'ann')
+        mode = action._mode
         if mode != self._mode:
             self._mode = mode
-            if not self._lostMode:
-                self.displayFile()
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
+            self.blk.setVisible(mode == FileMode)
+            self.sci.setAnnotationEnabled(mode == AnnMode)
+            self.displayFile(self._filename, self._status)
 
-    def forceMode(self, mode):
-        'Force into file or diff mode, based on content constaints'
-        assert mode in ('diff', 'file')
+    @pyqtSlot(QAction)
+    def setParent(self, action):
+        if action.text() == '1':
+            parent = 0
+        else:
+            parent = 1
+        if self._parent != parent:
+            self._parent = parent
+            self.displayFile(self._filename, self._status)
+
+    def restrictModes(self, candiff, canfile, canann):
+        'Disable modes based on content constraints'
+        self.actionDiffMode.setEnabled(candiff)
+        self.actionFileMode.setEnabled(canfile)
+        self.actionAnnMode.setEnabled(canann)
+
+        # Switch mode if necessary
+        mode = self._mode
+        if not candiff and mode == DiffMode and canfile:
+            mode = FileMode
+        if not canfile and mode != DiffMode:
+            mode = DiffMode
         if self._lostMode is None:
             self._lostMode = self._mode
-        self._mode = mode
-        if mode == 'diff':
-            self.actionDiffMode.setChecked(True)
-        else:
-            self.actionFileMode.setChecked(True)
-        self.actionDiffMode.setEnabled(False)
-        self.actionFileMode.setEnabled(False)
-        self.actionAnnMode.setEnabled(False)
-        self.actionNextDiff.setEnabled(False)
-        self.actionPrevDiff.setEnabled(False)
-        self.blk.setVisible(mode == 'file')
-        self.sci.setAnnotationEnabled(False)
+        if self._mode != mode:
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
+            self.blk.setVisible(mode == FileMode)
+            self.sci.setAnnotationEnabled(mode == AnnMode)
+            self._mode = mode
 
-    def setContext(self, ctx):
+        if self._mode == DiffMode:
+            self.actionDiffMode.setChecked(True)
+        elif self._mode == FileMode:
+            self.actionFileMode.setChecked(True)
+        else:
+            self.actionAnnMode.setChecked(True)
+
+    def setContext(self, ctx, ctx2=None):
         self._ctx = ctx
-        self._p_rev = None
+        self._ctx2 = ctx2
         self.sci.setTabWidth(ctx._repo.tabwidth)
         self.actionAnnMode.setVisible(ctx.rev() != None)
         self.actionShelf.setVisible(ctx.rev() == None)
+        self.actionFirstParent.setVisible(len(ctx.parents()) == 2)
+        self.actionSecondParent.setVisible(len(ctx.parents()) == 2)
+        self.actionFirstParent.setEnabled(len(ctx.parents()) == 2)
+        self.actionSecondParent.setEnabled(len(ctx.parents()) == 2)
 
-    def displayDiff(self, rev):
-        if rev != self._p_rev:
-            self.displayFile(rev=rev)
+    def showLine(self, line):
+        if line < self.sci.lines():
+            self.sci.setCursorPosition(line, 0)
 
     @pyqtSlot()
     def clearDisplay(self):
         self._filename = None
-        self.forceMode('diff')
+        self.restrictModes(False, False, False)
+        self.sci.setMarginWidth(1, 0)
         self.clearMarkup()
 
     def clearMarkup(self):
@@ -274,26 +318,23 @@ class HgFileView(QFrame):
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
 
-    def displayFile(self, filename=None, rev=None, status=None):
-        if filename is None:
-            filename, status = self._filename, self._status
-        else:
-            self._filename, self._status = filename, status
+    def displayFile(self, filename, status):
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
-        if rev is not None:
-            self._p_rev = rev
+            status = hglib.fromunicode(status)
+        self._filename, self._status = filename, status
 
         self.clearMarkup()
         if filename is None:
-            self.forceMode('file')
+            self.restrictModes(False, False, False)
             return
 
-        if self._p_rev is not None:
-            ctx2 = self.repo[self._p_rev]
+        if self._ctx2:
+            ctx2 = self._ctx2
+        elif self._parent == 0 or len(self._ctx.parents()) == 1:
+            ctx2 = self._ctx.p1()
         else:
-            ctx2 = None
-
+            ctx2 = self._ctx.p2()
         fd = FileData(self._ctx, ctx2, filename, status)
 
         if fd.elabel:
@@ -305,29 +346,32 @@ class HgFileView(QFrame):
 
         if not fd.isValid():
             self.sci.setText(fd.error)
-            self.forceMode('file')
+            self.restrictModes(False, False, False)
             return
 
-        if fd.diff and not fd.contents:
-            self.forceMode('diff')
-        elif fd.contents and not fd.diff:
-            self.forceMode('file')
-        elif not fd.contents and not fd.diff:
-            self.forceMode('file')
+        candiff = bool(fd.diff)
+        canfile = bool(fd.contents)
+        canann = canfile and type(self._ctx.rev()) is int
+
+        if not candiff or not canfile:
+            self.restrictModes(candiff, canfile, canann)
         else:
             self.actionDiffMode.setEnabled(True)
             self.actionFileMode.setEnabled(True)
             self.actionAnnMode.setEnabled(True)
             if self._lostMode:
-                if self._lostMode == 'diff':
+                self._mode = self._lostMode
+                if self._lostMode == DiffMode:
                     self.actionDiffMode.trigger()
-                elif self._lostMode == 'file':
+                elif self._lostMode == FileMode:
                     self.actionFileMode.trigger()
-                elif self._lostMode == 'ann':
+                elif self._lostMode == AnnMode:
                     self.actionAnnMode.trigger()
                 self._lostMode = None
+                self.blk.setVisible(self._mode == FileMode)
+                self.sci.setAnnotationEnabled(self._mode == AnnMode)
 
-        if self._mode == 'diff':
+        if self._mode == DiffMode:
             self.sci.setMarginWidth(1, 0)
             lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
@@ -337,15 +381,16 @@ class HgFileView(QFrame):
             # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
             # --- a/tortoisehg/hgqt/thgrepo.py
             # +++ b/tortoisehg/hgqt/thgrepo.py
-            out = fd.diff.split('\n', 3)
-            if len(out) == 4:
-                self.sci.setText(hglib.tounicode(out[3]))
-            else:
-                # there was an error or rename without diffs
-                self.sci.setText(hglib.tounicode(fd.diff))
+            if fd.diff:
+                out = fd.diff.split('\n', 3)
+                if len(out) == 4:
+                    self.sci.setText(hglib.tounicode(out[3]))
+                else:
+                    # there was an error or rename without diffs
+                    self.sci.setText(hglib.tounicode(fd.diff))
         elif fd.contents is None:
             return
-        elif self._mode == 'ann':
+        elif self._mode == AnnMode:
             self.sci.setSource(filename, self._ctx.rev())
         else:
             lexer = lexers.get_lexer(filename, fd.contents, self)
@@ -359,7 +404,7 @@ class HgFileView(QFrame):
         uf = hglib.tounicode(self._filename)
         self.fileDisplayed.emit(uf, fd.contents or QString())
 
-        if self._mode == 'file' and fd.contents and fd.olddata:
+        if self._mode == FileMode and fd.contents and fd.olddata:
             # Update blk margin
             if self.timer.isActive():
                 self.timer.stop()
@@ -392,7 +437,8 @@ class HgFileView(QFrame):
     @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
     def sourceChanged(self, path, rev, line=None):
-        self.revisionSelected.emit(rev)
+        if rev != self._ctx.rev() and type(rev) is int:
+            self.revisionSelected.emit(rev)
 
     @pyqtSlot(unicode, object, int)
     def editSelected(self, path, rev, line):
@@ -401,7 +447,7 @@ class HgFileView(QFrame):
         base = visdiff.snapshot(self.repo, [path], self.repo[rev])[0]
         files = [os.path.join(base, path)]
         pattern = hglib.fromunicode(self._lastSearch[0])
-        wctxactions.edit(self, self.repo.ui, self.repo, files, line, pattern)
+        qtlib.editfiles(self.repo, files, line, pattern, self)
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
@@ -457,7 +503,7 @@ class HgFileView(QFrame):
         self.blk.setUpdatesEnabled(True)
 
     def nextDiff(self):
-        if self._mode == 'diff' or not self._diffs:
+        if self._mode == DiffMode or not self._diffs:
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
             return
@@ -474,7 +520,7 @@ class HgFileView(QFrame):
         self.actionPrevDiff.setEnabled(True)
 
     def prevDiff(self):
-        if self._mode == 'diff' or not self._diffs:
+        if self._mode == DiffMode or not self._diffs:
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
             return
@@ -547,6 +593,8 @@ class FileData(object):
                 return 'A'
             if wfile in removed:
                 return 'R'
+            if wfile in ctx:
+                return 'C'
             return None
 
         repo = ctx._repo
