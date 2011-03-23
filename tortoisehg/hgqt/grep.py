@@ -66,9 +66,11 @@ class SearchWidget(QWidget):
         history = QRadioButton(_('All History'))
         singlematch = QCheckBox(_('Report only the first match per file'))
         follow = QCheckBox(_('Follow copies and renames'))
+        recurse = QCheckBox(_('Recurse into subrepos'))
         revle = QLineEdit()
         grid = QGridLayout()
         grid.addWidget(working, 0, 0)
+        grid.addWidget(recurse, 0, 1)
         grid.addWidget(history, 1, 0)
         grid.addWidget(revision, 2, 0)
         grid.addWidget(revle, 2, 1)
@@ -110,6 +112,20 @@ class SearchWidget(QWidget):
         excle.returnPressed.connect(self.searchActivated)
         incle.returnPressed.connect(self.searchActivated)
         bt.clicked.connect(self.searchActivated)
+
+        def updateRecurse(checked):
+            try:
+                wctx = repo[None]
+                if '.hgsubstate' in wctx:
+                    recurse.setEnabled(checked)
+                else:
+                    recurse.setEnabled(False)
+                    recurse.setChecked(False)
+            except Exception:
+                recurse.setEnabled(False)
+                recurse.setChecked(False)
+        working.toggled.connect(updateRecurse)
+        recurse.setChecked(True)
         working.setChecked(True)
 
         def updatefollow():
@@ -134,7 +150,7 @@ class SearchWidget(QWidget):
         le.returnPressed.connect(self.searchActivated)
 
         self.repo = repo
-        self.tv, self.regexple, self.chk = tv, le, chk
+        self.tv, self.regexple, self.chk, self.recurse = tv, le, chk, recurse
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
         self.singlematch, self.follow, self.eframe = singlematch, follow, frame
@@ -285,7 +301,8 @@ class SearchWidget(QWidget):
             self.tv.setColumnHidden(COL_USER, True)
             ctx = self.repo[None]
             self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc,
-                                          once=self.singlematch.isChecked())
+                                          self.singlematch.isChecked(),
+                                          self.recurse.isChecked())
         elif self.ctxradio.isChecked():
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
@@ -296,7 +313,8 @@ class SearchWidget(QWidget):
                 self.showMessage.emit(msg)
                 return
             self.thread = CtxSearchThread(self.repo, regexp, ctx, inc, exc,
-                                          once=self.singlematch.isChecked())
+                                          self.singlematch.isChecked(),
+                                          False)
         else:
             assert self.aradio.isChecked()
             self.tv.setColumnHidden(COL_REVISION, False)
@@ -417,7 +435,7 @@ class CtxSearchThread(QThread):
     showMessage = pyqtSignal(unicode)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, repo, regexp, ctx, inc, exc, once):
+    def __init__(self, repo, regexp, ctx, inc, exc, once, recurse):
         super(CtxSearchThread, self).__init__()
         self.repo = hg.repository(repo.ui, repo.root)
         self.regexp = regexp
@@ -425,6 +443,7 @@ class CtxSearchThread(QThread):
         self.inc = inc
         self.exc = exc
         self.once = once
+        self.recurse = recurse
         self.canceled = False
         self.completed = False
 
@@ -481,7 +500,7 @@ class CtxSearchThread(QThread):
                         break
         self.progress.emit(topic, None, '', '', None)
 
-        if ctx.rev() is None:
+        if ctx.rev() is None and self.recurse:
             for s in ctx.substate:
                 if not matchfn(s):
                     continue
