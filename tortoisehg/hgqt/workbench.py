@@ -570,6 +570,7 @@ class Workbench(QMainWindow):
         dlg = CloneDialog(args, parent=self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.clonedRepository.connect(self.showRepo)
+        dlg.exec_()
 
     def openRepository(self):
         """ Open repo from File menu """
