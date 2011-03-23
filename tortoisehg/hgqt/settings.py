@@ -13,6 +13,8 @@ from tortoisehg.util import hglib, settings, paths, wconfig, i18n
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo
 
+from tortoisehg.hgtk import bugtraq
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -198,6 +200,66 @@ class SettingsCheckBox(QCheckBox):
         return self.value() != self.curvalue
 
 
+class BugTraqConfigureEntry(QPushButton):
+    def __init__(self, parent=None, **opts):
+        QPushButton.__init__(self, parent, toolTip=opts['tooltip'])
+
+        self.opts = opts
+        self.curvalue = None
+        self.options = None
+
+        self.tracker = None
+        self.master = None
+        self.setText(opts['label'])
+        self.clicked.connect(self.on_clicked)
+
+    def on_clicked(self, checked):
+        parameters = self.options
+        self.options = self.tracker.show_options_dialog(parameters)
+
+    def master_updated(self):
+        self.setEnabled(False)
+        if self.master == None:
+            return
+        if self.master.value() == None:
+            return
+        if len(self.master.value()) == 0:
+            return
+        
+        try:
+            setting = self.master.value().split(' ', 1)
+            trackerid = setting[0]
+            name = setting[1]
+            self.tracker = bugtraq.BugTraq(trackerid)
+        except:
+            # failed to load bugtraq module or parse the setting:
+            # swallow the error and leave the widget disabled
+            return
+
+        try:
+            self.setEnabled(self.tracker.has_options())
+        except Exception, e:
+            qtlib.ErrorMsgBox(_('Issue Tracker'),
+                              _('Failed to load issue tracker: \'%s\': %s. '
+                                % (name, e)),
+                              parent=self)
+    
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        if self.master == None:
+            self.master = self.opts['master']
+            self.master.currentIndexChanged.connect(self.master_updated)
+        self.master_updated()
+        self.curvalue = curvalue
+        self.options = curvalue
+
+    def value(self):
+        return self.options
+
+    def isDirty(self):
+        return self.value() != self.curvalue
+
+
 def genEditCombo(opts, defaults=[]):
     opts['canedit'] = True
     opts['defaults'] = defaults
@@ -234,6 +296,22 @@ def genDeferredCombo(opts, func):
 def genFontEdit(opts):
     return FontEntry(**opts)
 
+def genBugTraqEdit(opts):
+    return BugTraqConfigureEntry(**opts)
+
+def findIssueTrackerPlugins():
+    plugins = bugtraq.get_issue_plugins_with_names()
+    names = [("%s %s" % (key[0], key[1])) for key in plugins]
+    return names
+
+def issuePluginVisible():
+    try:
+        # quick test to see if we're able to load the bugtraq module
+        test = bugtraq.BugTraq('')
+        return True
+    except:
+        return False
+
 def findDiffTools():
     return hglib.difftools(ui.ui())
 
@@ -247,16 +325,26 @@ def genCheckBox(opts):
 class _fi(object):
     """Information of each field"""
     __slots__ = ('label', 'cpath', 'values', 'tooltip',
-                 'restartneeded', 'globalonly')
+                 'restartneeded', 'globalonly',
+                 'master', 'visible')
 
     def __init__(self, label, cpath, values, tooltip,
-                 restartneeded=False, globalonly=False):
+                 restartneeded=False, globalonly=False,
+                 master=None, visible=None):
         self.label = label
         self.cpath = cpath
         self.values = values
         self.tooltip = tooltip
         self.restartneeded = restartneeded
         self.globalonly = globalonly
+        self.master = master
+        self.visible = visible
+
+    def isVisible(self):
+        if self.visible == None:
+            return True
+        else:
+            return self.visible()
 
 INFO = (
 ({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
@@ -551,6 +639,13 @@ INFO = (
           'while {1} refers to the first group and so on. If no {n} tokens'
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
+    _fi(_('Issue Tracker Plugin'), 'tortoisehg.issue.bugtraqplugin',
+        (genDeferredCombo, findIssueTrackerPlugins),
+        _('Configures a COM IBugTraqProvider or IBugTrackProvider2 issue '
+          'tracking plugin.'), visible=issuePluginVisible),
+    _fi(_('Configure Issue Tracker'), 'tortoisehg.issue.bugtraqparameters', genBugTraqEdit,
+        _('Configure the selected COM Bug Tracker plugin.'),
+        master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
     )),
 
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
@@ -849,7 +944,7 @@ class SettingsForm(QWidget):
 
         for e in info:
             opts = {'label': e.label, 'cpath': e.cpath, 'tooltip': e.tooltip,
-                    'settings':self.settings}
+                    'master': e.master, 'settings':self.settings}
             if isinstance(e.values, tuple):
                 func = e.values[0]
                 w = func(opts, e.values[1])
@@ -862,8 +957,16 @@ class SettingsForm(QWidget):
             lbl = QLabel(e.label)
             lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)
-            form.addRow(lbl, w)
             widgets.append(w)
+            if e.isVisible():
+                form.addRow(lbl, w)
+
+        # assign the master to widgets that have a master
+        for w in widgets:
+            if w.opts['master'] != None:
+                for dep in widgets:
+                    if dep.opts['cpath'] == w.opts['master']:
+                        w.opts['master'] = dep
         return widgets
 
     def fillExtensionsFrame(self):
