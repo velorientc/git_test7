@@ -8,10 +8,10 @@
 import sys, os, httplib, socket, tempfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import extensions, hgweb, util
+from mercurial import extensions, hgweb, util, error, subrepo
 from mercurial.hgweb import server  # workaround for demandimport
-from tortoisehg.util import paths, wconfig
-from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.util import paths, wconfig, hglib
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.serve_ui import Ui_ServeDialog
 from tortoisehg.hgqt.webconf import WebconfForm
@@ -249,6 +249,18 @@ def run(ui, *pats, **opts):
         dlg.start()
     return dlg
 
+def recursiveRepoSearch(repo):
+    yield repo.root
+    try:
+        wctx = repo[None]
+        for s in wctx.substate:
+            sub = wctx.sub(s)
+            if isinstance(sub, subrepo.hgsubrepo):
+                for root in recursiveRepoSearch(sub._repo):
+                    yield root
+    except (EnvironmentError, error.Abort, error.RepoError):
+        pass
+
 def _newwebconf(repopath, webconfpath):
     """create config obj for hgweb"""
     if webconfpath:
@@ -258,5 +270,16 @@ def _newwebconf(repopath, webconfpath):
         return c
     elif repopath:  # imitate webconf for single repo
         c = wconfig.config()
-        c.set('paths', '/', repopath)
+        try:
+            repo = thgrepo.repository(None, repopath)
+            roots = [root for root in recursiveRepoSearch(repo)]
+            if len(roots) == 1:
+                c.set('paths', '/', repopath)
+            else:
+                base = hglib.fromunicode(repo.shortname)
+                c.set('paths', base, repopath)
+                for root in roots[1:]:
+                    c.set('paths', base + root[len(repopath):], root)
+        except (EnvironmentError, error.Abort, error.RepoError):
+            c.set('paths', '/', repopath)
         return c
