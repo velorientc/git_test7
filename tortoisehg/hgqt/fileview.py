@@ -288,8 +288,9 @@ class HgFileView(QFrame):
         else:
             self.actionAnnMode.setChecked(True)
 
-    def setContext(self, ctx):
+    def setContext(self, ctx, ctx2=None):
         self._ctx = ctx
+        self._ctx2 = ctx2
         self.sci.setTabWidth(ctx._repo.tabwidth)
         self.actionAnnMode.setVisible(ctx.rev() != None)
         self.actionShelf.setVisible(ctx.rev() == None)
@@ -328,7 +329,9 @@ class HgFileView(QFrame):
             self.restrictModes(False, False, False)
             return
 
-        if self._parent == 0 or len(self._ctx.parents()) == 1:
+        if self._ctx2:
+            ctx2 = self._ctx2
+        elif self._parent == 0 or len(self._ctx.parents()) == 1:
             ctx2 = self._ctx.p1()
         else:
             ctx2 = self._ctx.p2()

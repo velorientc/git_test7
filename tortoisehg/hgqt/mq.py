@@ -240,12 +240,10 @@ class MQWidget(QWidget):
     def onConfigChanged(self):
         'Repository is reporting its config files have changed'
         self.messageEditor.refresh(self.repo)
-        self.fileview.setContext(self.repo[None])
 
     @pyqtSlot()
     def onRepositoryChanged(self):
         'Repository is reporting its changelog has changed'
-        self.fileview.setContext(self.repo[None])
         self.reload()
 
     @pyqtSlot(int)
@@ -465,6 +463,10 @@ class MQWidget(QWidget):
         if self.refreshing or row == -1:
             return
         text = hglib.fromunicode(self.fileListWidget.item(row).text())
+        if self.newCheckBox.isChecked():
+            self.fileview.setContext(self.repo[None], self.repo['.'])
+        else:
+            self.fileview.setContext(self.repo[None], self.repo['qtip'].p1())
         status = text[0]
         filename = text[2:]
         self.fileview.displayFile(filename, status)
