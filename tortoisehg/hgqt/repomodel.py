@@ -530,7 +530,7 @@ class HgRepoListModel(QAbstractTableModel):
             text = qtlib.applyeffects(' %s ' % ctx._patchname, effects)
             # qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)
             msg = qtlib.markup(msg)
-            return hglib.tounicode(text + ' ' + msg)
+            return hglib.tounicode(text + ' ') + msg
 
         parts = []
         if ctx.thgbranchhead():
