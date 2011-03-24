@@ -18,9 +18,8 @@ import os
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import qtlib, visdiff, revert
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
-from tortoisehg.hgqt import visdiff, wctxactions, revert
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -30,7 +29,7 @@ class HgFileListView(QTableView):
     A QTableView for displaying a HgFileListModel
     """
 
-    fileRevSelected = pyqtSignal(object, object, object)
+    fileSelected = pyqtSignal(QString, QString)
     clearDisplay = pyqtSignal()
     contextmenu = None
 
@@ -54,12 +53,10 @@ class HgFileListView(QTableView):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
         model.contextChanged.connect(self.contextChanged)
-        self.selectionModel().currentRowChanged.connect(self.fileSelected)
+        self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
-        self.actionSecondParent.setChecked(False)
-        self.actionSecondParent.toggled.connect(model.toggleSecondParent)
         if model._ctx is not None:
             self.contextChanged(model._ctx)
 
@@ -70,12 +67,7 @@ class HgFileListView(QTableView):
             self._actions[act].setEnabled(real)
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
-        if len(ctx.parents()) == 2:
-            self.actionShowAllMerge.setEnabled(True)
-            self.actionSecondParent.setEnabled(True)
-        else:
-            self.actionShowAllMerge.setEnabled(False)
-            self.actionSecondParent.setEnabled(False)
+        self.actionShowAllMerge.setEnabled(len(ctx.parents()) == 2)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -86,37 +78,35 @@ class HgFileListView(QTableView):
         index = self.currentIndex()
         count = len(self.model())
         if index.row() == -1:
-            # index is changing, fileSelected() called for us
+            # index is changing, onRowChange() called for us
             self.selectRow(0)
         elif index.row() >= count:
             if count:
-                # index is changing, fileSelected() called for us
+                # index is changing, onRowChange() called for us
                 self.selectRow(count-1)
             else:
                 self.clearDisplay.emit()
-                self.actionSecondParent.setEnabled(False)
         else:
             # redisplay previous row
-            self.fileSelected()
+            self.onRowChange(index)
 
-    def fileSelected(self, index=None, *args):
+    def onRowChange(self, index, *args):
         if index is None:
             index = self.currentIndex()
         data = self.model().dataFromIndex(index)
         if data:
-            fromRev = self.model().revFromIndex(index)
-            self.fileRevSelected.emit(data['path'], fromRev, data['status'])
-            self.actionSecondParent.setEnabled(data['wasmerged'])
+            self.fileSelected.emit(hglib.tounicode(data['path']), data['status'])
         else:
             self.clearDisplay.emit()
-            self.actionSecondParent.setEnabled(False)
 
     def selectFile(self, filename):
         'Select given file, if found, else the first file'
         index = self.model().indexFromFile(filename)
         if index:
-            self.setCurrentIndex(index)
-            self.fileSelected(index)
+            if index != self.currentIndex():
+                self.setCurrentIndex(index)
+            else:
+                self.onRowChange(index)
         elif self.model().count():
             self.selectRow(0)
 
@@ -164,12 +154,11 @@ class HgFileListView(QTableView):
         repo = model.repo
         rev = model._ctx.rev()
         if rev is None:
-            files = [repo.wjoin(filename)]
-            wctxactions.edit(self, repo.ui, repo, files)
+            qtlib.editfiles(repo, [filename], parent=self)
         else:
             base, _ = visdiff.snapshot(repo, [filename], repo[rev])
             files = [os.path.join(base, filename)]
-            wctxactions.edit(self, repo.ui, repo, files)
+            qtlib.editfiles(repo, files, parent=self)
 
     def editlocal(self):
         filename = self.currentFile()
@@ -177,8 +166,7 @@ class HgFileListView(QTableView):
             return
         model = self.model()
         repo = model.repo
-        path = repo.wjoin(filename)
-        wctxactions.edit(self, repo.ui, repo, [path])
+        qtlib.editfiles(repo, [filename], parent=self)
 
     def revertfile(self):
         filename = self.currentFile()
@@ -216,12 +204,6 @@ class HgFileListView(QTableView):
             _('Toggle display of all files and the direction they were merged'))
         self.actionShowAllMerge.setCheckable(True)
         self.actionShowAllMerge.setChecked(False)
-        self.actionSecondParent = QAction(_('Other'), self)
-        self.actionSecondParent.setToolTip(
-            _('Toggle display of diffs to second (other) parent'))
-        self.actionSecondParent.setCheckable(True)
-        self.actionSecondParent.setChecked(False)
-        self.actionSecondParent.setEnabled(False)
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
