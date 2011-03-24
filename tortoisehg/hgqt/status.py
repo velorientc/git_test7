@@ -484,7 +484,7 @@ class WctxFileTree(QTreeView):
             path, status, mst, u, ext, sz = self.model().getRow(index)
             selrows.append((set(status+mst.lower()), path))
         if selrows:
-            self.menuRequest.emit(self.mapToGlobal(point), selrows)
+            self.menuRequest.emit(self.viewport().mapToGlobal(point), selrows)
 
     def selectedRows(self):
         return self.selectionModel().selectedRows()
