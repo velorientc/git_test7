@@ -35,8 +35,23 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
-ALLCOLUMNS = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Tags', 'Node',
-              'Age', 'LocalTime', 'UTCTime', 'Changes')
+COLUMNHEADERS = (
+    ('Graph', _('Graph', 'column header')),
+    ('Rev', _('Rev', 'column header')),
+    ('Branch', _('Branch', 'column header')),
+    ('Description', _('Description', 'column header')),
+    ('Author', _('Author', 'column header')),
+    ('Tags', _('Tags', 'column header')),
+    ('Node', _('Node', 'column header')),
+    ('Age', _('Age', 'column header')),
+    ('LocalTime', _('Local Time', 'column header')),
+    ('UTCTime', _('UTC Time', 'column header')),
+    ('Changes', _('Changes', 'column header')),
+    )
+
+COLUMNNAMES = dict(COLUMNHEADERS)
+
+ALLCOLUMNS = [h[0] for h in COLUMNHEADERS]
 
 UNAPPLIED_PATCH_COLOR = '#999999'
 
@@ -459,7 +474,7 @@ class HgRepoListModel(QAbstractTableModel):
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
-                return QVariant(self._columns[section])
+                return QVariant(COLUMNNAMES[self._columns[section]])
             if role == Qt.TextAlignmentRole:
                 return QVariant(Qt.AlignLeft)
         return nullvariant

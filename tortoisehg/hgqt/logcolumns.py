@@ -41,7 +41,8 @@ class ColumnSelectDialog(QDialog):
         list = QListWidget()
         # enabled cols are listed in sorted order
         for c in self.curcolumns:
-            item = QListWidgetItem(c)
+            item = QListWidgetItem(repomodel.COLUMNNAMES[c])
+            item.columnid = c
             item.setFlags(Qt.ItemIsSelectable |
                           Qt.ItemIsEnabled |
                           Qt.ItemIsDragEnabled |
@@ -50,7 +51,8 @@ class ColumnSelectDialog(QDialog):
             list.addItem(item)
         # disabled cols are listed last
         for c in self.disabled:
-            item = QListWidgetItem(c)
+            item = QListWidgetItem(repomodel.COLUMNNAMES[c])
+            item.columnid = c
             item.setFlags(Qt.ItemIsSelectable |
                           Qt.ItemIsEnabled |
                           Qt.ItemIsDragEnabled |
@@ -78,7 +80,7 @@ class ColumnSelectDialog(QDialog):
         for i in xrange(self.list.count()):
             item = self.list.item(i)
             if item.checkState() == Qt.Checked:
-                cols.append(str(item.text()))
+                cols.append(item.columnid)
         s.setValue('workbench/columns', cols)
         QDialog.accept(self)
 
