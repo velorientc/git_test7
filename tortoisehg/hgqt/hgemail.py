@@ -357,7 +357,7 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
     _COLUMNS = [('rev', lambda ctx: '%d:%s' % (ctx.rev(), ctx)),
                 ('author', lambda ctx: hglib.username(ctx.user())),
                 ('date', lambda ctx: util.shortdate(ctx.date())),
-                ('description', lambda ctx: ctx.description().splitlines()[0])]
+                ('description', lambda ctx: ctx.longsummary())]
 
     def __init__(self, repo, revs, selectedrevs, parent=None):
         super(_ChangesetsModel, self).__init__(parent)
@@ -387,7 +387,7 @@ class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewe
             return rev in self._selectedrevs and Qt.Checked or Qt.Unchecked
         if role == Qt.DisplayRole:
             coldata = self._COLUMNS[index.column()][1]
-            return QVariant(hglib.tounicode(coldata(self._repo[rev])))
+            return QVariant(hglib.tounicode(coldata(self._repo.changectx(rev))))
 
         return QVariant()
 
