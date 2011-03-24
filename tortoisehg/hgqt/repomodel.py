@@ -379,10 +379,17 @@ class HgRepoListModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return nullvariant
-        if role in self._roleoffsets:
-            offset = self._roleoffsets[role]
-        else:
+        if role not in self._roleoffsets:
             return nullvariant
+        try:
+            return self.safedata(index, role)
+        except Exception, e:
+            if role == Qt.DisplayRole:
+                return QVariant(hglib.tounicode(str(e)))
+            else:
+                return nullvariant
+
+    def safedata(self, index, role):
         row = index.row()
         self.ensureBuilt(row=row)
         graphlen = len(self.graph)
@@ -393,6 +400,7 @@ class HgRepoListModel(QAbstractTableModel):
         if data is None:
             data = [None,] * (self._roleoffsets[Qt.DecorationRole]+1)
         column = self._columns[index.column()]
+        offset = self._roleoffsets[role]
         if role == Qt.DecorationRole:
             if column != 'Graph':
                 return nullvariant
