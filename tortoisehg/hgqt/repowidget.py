@@ -347,6 +347,8 @@ class RepoWidget(QWidget):
 
     def clearRevisionSet(self):
         if not self.revset:
+            self.filterbar.hide()
+            self.toolbarVisibilityChanged.emit()
             return
         self.revset = []
         if self.revsetfilter:
