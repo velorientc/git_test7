@@ -1088,7 +1088,7 @@ class RepoWidget(QWidget):
             a.triggered.connect(cb)
             menu.addAction(a)
         if 'reviewboard' in self.repo.extensions():
-            a = QAction(_('Post Pair to Review Board...'), self)
+            a = QAction(_('Post Selected to Review Board...'), self)
             a.triggered.connect(self.sendToReviewBoard)
             menu.addAction(a)
         self.paircmenu = menu
