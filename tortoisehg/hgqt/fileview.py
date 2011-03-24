@@ -214,6 +214,7 @@ class HgFileView(QFrame):
 
     def setRepo(self, repo):
         self.repo = repo
+        self.sci.repo = repo
 
     @pyqtSlot(QAction)
     def setMode(self, action):
