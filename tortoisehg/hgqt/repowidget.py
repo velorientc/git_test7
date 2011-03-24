@@ -1087,6 +1087,13 @@ class RepoWidget(QWidget):
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
+            
+        if 'transplant' in self.repo.extensions():
+            a = QAction(_('Transplant Selected to local'), self)
+            a.setIcon(qtlib.getmenuicon('hg-transplant'))
+            a.triggered.connect(self.transplantRevisions)
+            menu.addAction(a)
+
         if 'reviewboard' in self.repo.extensions():
             a = QAction(_('Post Selected to Review Board...'), self)
             a.triggered.connect(self.sendToReviewBoard)
@@ -1157,6 +1164,13 @@ class RepoWidget(QWidget):
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
+
+        if 'transplant' in self.repo.extensions():
+            a = QAction(_('Transplant Selected to local'), self)
+            a.setIcon(qtlib.getmenuicon('hg-transplant'))
+            a.triggered.connect(self.transplantRevisions)
+            menu.addAction(a)
+
         if 'reviewboard' in self.repo.extensions():
             a = QAction(_('Post Selected to Review Board...'), self)
             a.triggered.connect(self.sendToReviewBoard)
@@ -1237,6 +1251,12 @@ class RepoWidget(QWidget):
 
     def transplantRevision(self):
         cmdline = ['transplant', '--repository', self.repo.root, str(self.rev)]
+        self.runCommand(cmdline)
+
+    def transplantRevisions(self):
+        cmdline = ['transplant', '--repository', self.repo.root]
+        for rev in self.repoview.selectedRevisions():
+            cmdline.append(str(rev))
         self.runCommand(cmdline)
 
     def backoutToRevision(self):
