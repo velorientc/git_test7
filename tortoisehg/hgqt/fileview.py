@@ -7,6 +7,7 @@
 
 import os
 import difflib
+import re
 
 from mercurial import error, util
 
@@ -28,6 +29,8 @@ AnnMode = 3
 class HgFileView(QFrame):
     "file diff, content, and annotation viewer"
 
+    diffHeaderRegExp = re.compile("^@@ -[0-9]+,[0-9]+ \+[0-9]+,[0-9]+ @@$")
+
     linkActivated = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(QString, QString)
     showMessage = pyqtSignal(QString)
@@ -48,6 +51,8 @@ class HgFileView(QFrame):
         l.setSpacing(0)
 
         self.repo = repo
+        self._diffs = []
+
         self.topLayout = QVBoxLayout()
 
         self.labelhbox = hbox = QHBoxLayout()
@@ -290,6 +295,7 @@ class HgFileView(QFrame):
     @pyqtSlot()
     def clearDisplay(self):
         self._filename = None
+        self._diffs = []
         self.restrictModes(False, False, False)
         self.sci.setMarginWidth(1, 0)
         self.clearMarkup()
@@ -317,6 +323,7 @@ class HgFileView(QFrame):
         self._filename, self._status = filename, status
 
         self.clearMarkup()
+        self._diffs = []
         if filename is None:
             self.restrictModes(False, False, False)
             return
@@ -420,11 +427,13 @@ class HgFileView(QFrame):
             self.blk.setVisible(True)
             self.blk.syncPageStep()
 
-        if self._mode != DiffMode and fd.contents and fd.olddata:
+        if fd.contents and fd.olddata:
             if self.timer.isActive():
                 self.timer.stop()
             self._fd = fd
             self.timer.start()
+        self.actionNextDiff.setEnabled(bool(self._diffs))
+        self.actionPrevDiff.setEnabled(bool(self._diffs))
 
     #
     # These four functions are used by Shift+Cursor actions in revdetails
@@ -462,34 +471,69 @@ class HgFileView(QFrame):
     #
     def timerBuildDiffMarkers(self):
         'show modified and added lines in the self.blk margin'
+        # The way the diff markers are generated differs between the DiffMode
+        # and the other modes
+        # In the DiffMode case, the marker positions are found by looking for
+        # lines matching a regular expression representing a diff header, while
+        # in all other cases we use the difflib.SequenceMatcher, which returns
+        # a set of opcodes that must be parsed
+        # In any case, the markers are generated incrementally. This function is
+        # run by a timer, which each time that is called processes a bunch of
+        # lines (when in DiffMode) or of opcodes (in all other modes).
+        # When there are no more lines or opcodes to consume the timer is
+        # stopped.
+
         self.sci.setUpdatesEnabled(False)
         self.blk.setUpdatesEnabled(False)
 
-        if self._fd:
-            olddata = self._fd.olddata.splitlines()
-            newdata = self._fd.contents.splitlines()
-            diff = difflib.SequenceMatcher(None, olddata, newdata)
-            self._opcodes = diff.get_opcodes()
-            self._fd = None
-            self._diffs = []
+        if self._mode == DiffMode:
+            if self._fd:
+                self._fd = None
+                self._diffs = []
+                self._linestoprocess = \
+                    hglib.fromunicode(self.sci.text()).splitlines()
+                self._firstlinetoprocess = 0
+                self._opcodes = True
+            # Process linesPerBlock lines at a time
+            linesPerBlock = 100
+            # Look for lines matching the "diff header"
+            for n, line in enumerate(self._linestoprocess[:linesPerBlock]):
+                if self.diffHeaderRegExp.match(line):
+                    diffLine = self._firstlinetoprocess + n
+                    self._diffs.append([diffLine, diffLine])
+                    self.sci.markerAdd(diffLine, self.markerplus)
+            self._linestoprocess = self._linestoprocess[linesPerBlock:]
+            self._firstlinetoprocess += linesPerBlock
+            if not self._linestoprocess:
+                self._opcodes = False
+                self._firstlinetoprocess = 0
+        else:
+            if self._fd:
+                olddata = self._fd.olddata.splitlines()
+                newdata = self._fd.contents.splitlines()
+                diff = difflib.SequenceMatcher(None, olddata, newdata)
+                self._opcodes = diff.get_opcodes()
+                self._fd = None
+                self._diffs = []
 
-        for tag, alo, ahi, blo, bhi in self._opcodes[:30]:
-            if tag == 'replace':
-                self._diffs.append([blo, bhi])
-                self.blk.addBlock('x', blo, bhi)
-                for i in range(blo, bhi):
-                    self.sci.markerAdd(i, self.markertriangle)
-            elif tag == 'insert':
-                self._diffs.append([blo, bhi])
-                self.blk.addBlock('+', blo, bhi)
-                for i in range(blo, bhi):
-                    self.sci.markerAdd(i, self.markerplus)
-            elif tag in ('equal', 'delete'):
-                pass
-            else:
-                raise ValueError, 'unknown tag %r' % (tag,)
+            for tag, alo, ahi, blo, bhi in self._opcodes[:30]:
+                if tag == 'replace':
+                    self._diffs.append([blo, bhi])
+                    self.blk.addBlock('x', blo, bhi)
+                    for i in range(blo, bhi):
+                        self.sci.markerAdd(i, self.markertriangle)
+                elif tag == 'insert':
+                    self._diffs.append([blo, bhi])
+                    self.blk.addBlock('+', blo, bhi)
+                    for i in range(blo, bhi):
+                        self.sci.markerAdd(i, self.markerplus)
+                elif tag in ('equal', 'delete'):
+                    pass
+                else:
+                    raise ValueError, 'unknown tag %r' % (tag,)
 
-        self._opcodes = self._opcodes[30:]
+            self._opcodes = self._opcodes[30:]
+
         if not self._opcodes:
             self.actionNextDiff.setEnabled(bool(self._diffs))
             self.actionPrevDiff.setEnabled(False)
@@ -499,36 +543,38 @@ class HgFileView(QFrame):
         self.blk.setUpdatesEnabled(True)
 
     def nextDiff(self):
-        if self._mode == DiffMode or not self._diffs:
+        if not self._diffs:
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
             return
-        row, column = self.sci.getCursorPosition()
-        for i, (lo, hi) in enumerate(self._diffs):
-            if lo > row:
-                last = (i == (len(self._diffs)-1))
-                self.sci.setCursorPosition(lo, 0)
-                self.sci.verticalScrollBar().setValue(lo)
-                break
         else:
-            last = True
+            row, column = self.sci.getCursorPosition()
+            for i, (lo, hi) in enumerate(self._diffs):
+                if lo > row:
+                    last = (i == (len(self._diffs)-1))
+                    self.sci.setCursorPosition(lo, 0)
+                    self.sci.verticalScrollBar().setValue(lo)
+                    break
+            else:
+                last = True
         self.actionNextDiff.setEnabled(not last)
         self.actionPrevDiff.setEnabled(True)
 
     def prevDiff(self):
-        if self._mode == DiffMode or not self._diffs:
+        if not self._diffs:
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
             return
-        row, column = self.sci.getCursorPosition()
-        for i, (lo, hi) in enumerate(reversed(self._diffs)):
-            if hi < row:
-                first = (i == (len(self._diffs)-1))
-                self.sci.setCursorPosition(lo, 0)
-                self.sci.verticalScrollBar().setValue(lo)
-                break
         else:
-            first = True
+            row, column = self.sci.getCursorPosition()
+            for i, (lo, hi) in enumerate(reversed(self._diffs)):
+                if hi < row:
+                    first = (i == (len(self._diffs)-1))
+                    self.sci.setCursorPosition(lo, 0)
+                    self.sci.verticalScrollBar().setValue(lo)
+                    break
+            else:
+                first = True
         self.actionNextDiff.setEnabled(True)
         self.actionPrevDiff.setEnabled(not first)
 
