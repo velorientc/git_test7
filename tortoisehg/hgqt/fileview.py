@@ -137,6 +137,7 @@ class HgFileView(QFrame):
         self._mode = None
         self._lostMode = None
         self._lastSearch = u'', False
+        self._lastScrollPosition = 0
 
         self.actionDiffMode = QAction(qtlib.geticon('view-diff'),
                                       _('View change as unified diff output'),
@@ -264,6 +265,7 @@ class HgFileView(QFrame):
     @pyqtSlot()
     def clearDisplay(self):
         self._filename = None
+        self._lastScrollPosition = 0
         self.forceMode('diff')
         self.clearMarkup()
 
@@ -276,9 +278,15 @@ class HgFileView(QFrame):
         self.extralabel.hide()
 
     def displayFile(self, filename=None, rev=None, status=None):
+        # Get the last visible line to restore it after reloading the editor
+        self._lastScrollPosition = self.sci.firstVisibleLine()
+
         if filename is None:
             filename, status = self._filename, self._status
         else:
+            if self._filename != filename:
+                # Reset the scroll positions when the file is changed
+                self._lastScrollPosition = 0
             self._filename, self._status = filename, status
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
@@ -348,6 +356,13 @@ class HgFileView(QFrame):
             return
         elif self._mode == 'ann':
             self.sci.setSource(filename, self._ctx.rev())
+
+            # Recover the last scroll position
+            # Make sure that _lastScrollPosition never exceeds the amount of
+            # lines on the editor
+            self._lastScrollPosition = min(self._lastScrollPosition, \
+                self.sci.lines() - 1)
+            self.sci.verticalScrollBar().setValue(self._lastScrollPosition)
         else:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
@@ -355,6 +370,13 @@ class HgFileView(QFrame):
                 self.setFont(qtlib.getfont('fontlog').font())
             self.sci.setText(fd.contents)
             self.sci._updatemarginwidth()
+
+            # Recover the last scroll position
+            # Make sure that _lastScrollPosition never exceeds the amount of
+            # lines on the editor
+            self._lastScrollPosition = min(self._lastScrollPosition, \
+                self.sci.lines() - 1)
+            self.sci.verticalScrollBar().setValue(self._lastScrollPosition)
 
         self.highlightText(*self._lastSearch)
         uf = hglib.tounicode(self._filename)
