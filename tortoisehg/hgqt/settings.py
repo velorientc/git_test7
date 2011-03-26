@@ -9,11 +9,9 @@ import os
 
 from mercurial import ui, util, error
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n
+from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo
-
-from tortoisehg.hgtk import bugtraq
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

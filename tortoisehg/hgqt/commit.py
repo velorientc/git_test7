@@ -14,10 +14,8 @@ from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerMakefile
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, shlib, wconfig
+from tortoisehg.util import hglib, shlib, wconfig, bugtraq
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
-
-from tortoisehg.hgtk import bugtraq
 
 # Technical Debt for CommitWidget
 #  disable commit button while no message is entered or no files are selected
