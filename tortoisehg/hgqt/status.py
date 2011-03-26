@@ -409,6 +409,7 @@ class WctxFileTree(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
         self.setTextElideMode(Qt.ElideLeft)
+        self.setItemDelegate(WctxItemDelegate())
 
     def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
         # don't update horizontal position by selection change
@@ -702,6 +703,18 @@ class WctxModel(QAbstractTableModel):
 
     def getChecked(self):
         return self.checked.copy()
+
+class WctxItemDelegate(QItemDelegate):
+    '''Draw treeview checkboxes like standard QCheckBoxes'''
+    def drawCheck(self, painter, option, rect, state):
+        option.rect = rect
+        if state == Qt.Unchecked:
+            option.state |= QStyle.State_Off
+        elif state == Qt.Checked:
+            option.state |= QStyle.State_On
+        style = QApplication.style()
+        primitive = QStyle.PE_IndicatorCheckBox
+        return style.drawPrimitive(primitive, option, painter, None)
 
 def statusMessage(status, mst, upath):
     tip = ''
