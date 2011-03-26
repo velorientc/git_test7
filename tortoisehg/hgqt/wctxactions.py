@@ -248,10 +248,10 @@ def log(parent, ui, repo, files):
     return False
 
 def annotate(parent, ui, repo, files):
-    from tortoisehg.hgqt.annotate import run
+    from tortoisehg.hgqt.manifestdialog import run
     from tortoisehg.hgqt.run import qtrun
-    opts = {'root': repo.root}
-    qtrun(run, repo.ui, *files, **opts)
+    opts = {'repo': repo, 'canonpath' : files[0], 'rev' : repo['.'].rev()}
+    qtrun(run, repo.ui, **opts)
     return False
 
 def forget(parent, ui, repo, files):

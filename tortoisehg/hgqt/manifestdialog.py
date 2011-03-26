@@ -404,9 +404,18 @@ def run(ui, *pats, **opts):
     # set initial state after dialog visible
     def init():
         try:
-            path = hglib.canonpaths(pats)[0]
+            if pats:
+                path = hglib.canonpaths(pats)[0]
+            elif 'canonpath' in opts:
+                path = opts['canonpath']
+            else:
+                return
             line = opts.get('line') and int(opts['line']) or None
             dlg.setSource(path, opts.get('rev'), line)
+            if opts.get('pattern'):
+                dlg.setSearchPattern(opts['pattern'])
+            if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
+                dlg._manifest_widget._fileview.actionAnnMode.trigger()
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')

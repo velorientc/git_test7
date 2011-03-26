@@ -703,7 +703,7 @@ def bisect(ui, *pats, **opts):
 
 def annotate(ui, *pats, **opts):
     """annotate dialog"""
-    from tortoisehg.hgqt.annotate import run
+    from tortoisehg.hgqt.manifestdialog import run
     if len(pats) != 1:
         ui.warn(_('annotate requires a single filename\n'))
         return
