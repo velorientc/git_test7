@@ -14,8 +14,9 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from tortoisehg.hgqt.repomodel import HgRepoListModel
+from tortoisehg.hgqt.repomodel import HgRepoListModel, COLUMNNAMES
 from tortoisehg.hgqt.graph import Graph, filelog_grapher
+from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
 
@@ -37,6 +38,7 @@ class FileRevModel(HgRepoListModel):
         data is a HgHLRepo instance
         """
         HgRepoListModel.__init__(self, repo, '', [], False, parent)
+        COLUMNNAMES['Filename'] = _('Filename', 'column header')
         self.setFilename(filename)
 
     def setRepo(self, repo, branch='', fromhead=None, follow=False):
