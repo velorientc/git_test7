@@ -16,7 +16,7 @@ from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers
-from tortoisehg.hgqt import filelistmodel, filelistview, fileview
+from tortoisehg.hgqt import filelistmodel, filelistview, filedata
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -572,7 +572,7 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = fileview.FileData(self._ctx, None, filename, status)
+        fd = filedata.FileData(self._ctx, None, filename, status)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
