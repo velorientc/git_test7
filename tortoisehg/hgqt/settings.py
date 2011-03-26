@@ -824,7 +824,7 @@ class SettingsForm(QWidget):
         stack = QStackedWidget()
         bothbox.addWidget(pageList, 0)
         bothbox.addWidget(stack, 1)
-        pageList.currentRowChanged.connect(stack.setCurrentIndex)
+        pageList.currentRowChanged.connect(self.activatePage)
 
         self.pages = {}
         self.stack = stack
@@ -847,10 +847,25 @@ class SettingsForm(QWidget):
                 icon.addPixmap(style.standardPixmap(meta['icon']))
             item = QListWidgetItem(icon, meta['label'])
             pageList.addItem(item)
-            self.addPage(meta['name'])
 
         self.refresh()
         self.focusField(focus or 'ui.merge')
+
+    def activatePage(self, index):
+        item = self.pageList.currentItem()
+        for data in INFO:
+            if item.text() == data[0]['label']:
+                meta, info = data
+                break
+
+        pagename = meta['name']
+        if self.pages.has_key(pagename):
+            page = self.pages[pagename]
+        else:
+            page = self.createPage(pagename, info)
+            self.refreshPage(page)
+        frame = page[2][0].parentWidget()
+        self.stack.setCurrentWidget(frame)
 
     def editClicked(self):
         'Open internal editor in stacked widget'
@@ -873,36 +888,40 @@ class SettingsForm(QWidget):
                                 and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
         self.fnedit.setText(hglib.tounicode(self.fn))
-        for name, info, widgets in self.pages.values():
-            if name == 'extensions':
-                extsmentioned = False
-                for row, w in enumerate(widgets):
-                    key = w.opts['label']
-                    for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
-                        val = self.readCPath('extensions.' + fullkey)
-                        if val != None:
-                            break
-                    if val == None:
-                        curvalue = False
-                    elif len(val) and val[0] == '!':
-                        curvalue = False
-                        extsmentioned = True
-                    else:
-                        curvalue = True
-                        extsmentioned = True
-                    w.setValue(curvalue)
-                    if val == None:
-                        w.opts['cpath'] = 'extensions.' + key
-                    else:
-                        w.opts['cpath'] = 'extensions.' + fullkey
-                if not extsmentioned:
-                    # make sure widgets are shown properly,
-                    # even when no extensions mentioned in the config file
-                    self.validateextensions()
-            else:
-                for row, e in enumerate(info):
-                    curvalue = self.readCPath(e.cpath)
-                    widgets[row].setValue(curvalue)
+        for page in self.pages.values():
+            self.refreshPage(page)
+
+    def refreshPage(self, page):
+        name, info, widgets = page
+        if name == 'extensions':
+            extsmentioned = False
+            for row, w in enumerate(widgets):
+                key = w.opts['label']
+                for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
+                    val = self.readCPath('extensions.' + fullkey)
+                    if val != None:
+                        break
+                if val == None:
+                    curvalue = False
+                elif len(val) and val[0] == '!':
+                    curvalue = False
+                    extsmentioned = True
+                else:
+                    curvalue = True
+                    extsmentioned = True
+                w.setValue(curvalue)
+                if val == None:
+                    w.opts['cpath'] = 'extensions.' + key
+                else:
+                    w.opts['cpath'] = 'extensions.' + fullkey
+            if not extsmentioned:
+                # make sure widgets are shown properly,
+                # even when no extensions mentioned in the config file
+                self.validateextensions()
+        else:
+            for row, e in enumerate(info):
+                curvalue = self.readCPath(e.cpath)
+                widgets[row].setValue(curvalue)
 
     def isDirty(self):
         if self.readonly:
@@ -997,17 +1016,14 @@ class SettingsForm(QWidget):
             return True  # tooltip is shown in self.desctext
         return False
 
-    def addPage(self, name):
-        for data in INFO:
-            if name == data[0]['name']:
-                meta, info = data
-                break
+    def createPage(self, name, info):
         if name == 'extensions':
             extsinfo, widgets = self.fillExtensionsFrame()
             self.pages[name] = name, extsinfo, widgets
         else:
             widgets = self.fillFrame(info)
             self.pages[name] = name, info, widgets
+        return self.pages[name]
 
     def readCPath(self, cpath):
         'Retrieve a value from the parsed config file'
