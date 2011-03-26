@@ -9,7 +9,7 @@ import os
 
 from mercurial import ui, error, util
 
-from tortoisehg.hgqt import visdiff, qtlib, qscilib, wctxactions, thgrepo, lexers
+from tortoisehg.hgqt import visdiff, qtlib, qscilib, thgrepo, lexers
 from tortoisehg.util import paths, hglib, colormap, thread2
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.grep import SearchWidget
@@ -44,7 +44,6 @@ class AnnotateView(qscilib.Scintilla):
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, QsciScintilla.TextMarginRightJustified)
         self.setMouseTracking(True)
-        self.setFont(qtlib.getfont('fontdiff').font())
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequest)
 
@@ -416,7 +415,7 @@ class AnnotateDialog(QMainWindow):
 
         base, _ = visdiff.snapshot(repo, [wfile], repo[rev])
         files = [os.path.join(base, wfile)]
-        wctxactions.edit(self, repo.ui, repo, files, line, pattern)
+        qtlib.editfiles(repo, files, line, pattern, self)
 
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):

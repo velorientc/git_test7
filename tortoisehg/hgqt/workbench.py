@@ -28,10 +28,10 @@ from PyQt4.QtGui import *
 
 class ThgTabBar(QTabBar):
     def mouseReleaseEvent(self, event):
-        
+
         if event.button() == Qt.MidButton:
             self.tabCloseRequested.emit(self.tabAt(event.pos()))
-            
+
         super(QTabBar, self).mouseReleaseEvent(event)
 
 class Workbench(QMainWindow):
@@ -238,11 +238,11 @@ class Workbench(QMainWindow):
         # NOTE: Sequence must match that in repowidget.py
         addtaskview('hg-log', _("Revision &Details"))
         addtaskview('hg-commit', _('&Commit'))
+        self.actionSelectTaskMQ = \
+                addtaskview('thg-mq', _('Patch &Queue'), 'mq')
         addtaskview('thg-sync', _('S&ynchronize'))
         addtaskview('hg-annotate', _('&Manifest'))
         addtaskview('hg-grep', _('&Search'))
-        self.actionSelectTaskMQ = \
-                addtaskview('thg-mq', _('Patch &Queue'), 'mq')
         self.actionSelectTaskPbranch = \
                 addtaskview('branch', _('&Patch Branch'), 'pbranch')
         newseparator(menu='view')
@@ -348,7 +348,14 @@ class Workbench(QMainWindow):
             repopath = hglib.fromunicode(repopath)
         self._openRepo(path=repopath, reuse=reuse)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(QString)
+    def openLinkedRepo(self, path):
+        self.showRepo(path)
+        rw = self.repoTabsWidget.currentWidget()
+        if rw:
+            rw.taskTabsWidget.setCurrentIndex(rw.commitTabIndex)
+
+    @pyqtSlot(QString)
     def showRepo(self, path):
         """Activate the repo tab or open it if not available [unicode]"""
         for i in xrange(self.repoTabsWidget.count()):
@@ -483,7 +490,7 @@ class Workbench(QMainWindow):
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
         rw.revisionSelected.connect(self.updateHistoryActions)
-        rw.repoLinkClicked.connect(self.showRepo)
+        rw.repoLinkClicked.connect(self.openLinkedRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
 
@@ -562,9 +569,8 @@ class Workbench(QMainWindow):
             args = []
         dlg = CloneDialog(args, parent=self)
         dlg.finished.connect(dlg.deleteLater)
-        if dlg.exec_():
-            path = dlg.getDest()
-            self.openRepo(path)
+        dlg.clonedRepository.connect(self.showRepo)
+        dlg.exec_()
 
     def openRepository(self):
         """ Open repo from File menu """
