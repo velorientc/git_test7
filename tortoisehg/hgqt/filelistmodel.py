@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, patchctx
 
 from tortoisehg.hgqt.qtlib import geticon
 
@@ -116,6 +116,21 @@ class HgFileListModel(QAbstractTableModel):
         ctxfiles = self._ctx.files()
         modified, added, removed = self._ctx.changesToParent(parent)
         ismerge = bool(self._ctx.p2())
+
+        # Add the list of modified subrepos to the top of the list
+        if not isinstance(self._ctx, patchctx.patchctx):
+            from mercurial import subrepo
+            for s, sd in self._ctx.substate.items():
+                srev = self._ctx.substate.get(s, subrepo.nullstate)[1]
+                sp1rev = self._ctx.p1().substate.get(s, subrepo.nullstate)[1]
+                sp2rev = ''
+                if ismerge:
+                    sp2rev = self._ctx.p2().substate.get(s, subrepo.nullstate)[1]
+                if srev != sp1rev or (sp2rev != '' and srev != sp2rev):
+                    wasmerged = ismerge and s in ctxfiles
+                    files.append({'path': s, 'status': 'S', 'parent': parent,
+                      'wasmerged': wasmerged})        
+
         if self._fulllist and ismerge:
             func = lambda x: True
         else:
@@ -163,6 +178,8 @@ class HgFileListModel(QAbstractTableModel):
                 return QVariant(geticon('fileadd'))
             elif current_file_desc['status'] == 'R':
                 return QVariant(geticon('filedelete'))
+            elif current_file_desc['status'] == 'S':
+                return QVariant(geticon('hg'))
             #else:
             #    return QVariant(geticon('filemodify'))
         elif role == Qt.FontRole:

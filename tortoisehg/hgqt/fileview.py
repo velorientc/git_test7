@@ -605,7 +605,25 @@ class FileData(object):
         if status == 'S':
             try:
                 from mercurial import subrepo, commands
-                assert(ctx.rev() is None)
+                
+                def genSubrepoRevChangedDescription(sfrom, sto):
+                    """Generate a subrepository revision change description"""
+                    out = []
+                    opts = {'date':None, 'user':None, 'rev':[sfrom]}
+                    if not sfrom:
+                        out.append(_('Subrepo initialized to revision:') + u'\n\n')
+                    else:
+                        out.append(_('Revision has changed from:') + u'\n\n')
+                        _ui.pushbuffer()
+                        commands.log(_ui, srepo, **opts)
+                        out.append(hglib.tounicode(_ui.popbuffer()))
+                        out.append(_('To:') + u'\n')
+                    opts['rev'] = [sto]
+                    _ui.pushbuffer()
+                    commands.log(_ui, srepo, **opts)
+                    out.append(hglib.tounicode(_ui.popbuffer()))
+                    return out
+                
                 srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
                 sub = ctx.sub(wfile)
                 if isinstance(sub, subrepo.hgsubrepo):
@@ -623,21 +641,29 @@ class FileData(object):
                     out.append(_('File Status:') + u'\n')
                     out.append(hglib.tounicode(data))
                     out.append(u'\n')
-                if srev == '':
-                    out.append(_('New subrepository') + u'\n\n')
-                elif srev != sactual:
-                    out.append(_('Revision has changed from:') + u'\n\n')
-                    opts = {'date':None, 'user':None, 'rev':[srev]}
-                    _ui.pushbuffer()
-                    commands.log(_ui, srepo, **opts)
-                    out.append(hglib.tounicode(_ui.popbuffer()))
-                    out.append(_('To:') + u'\n')
-                    opts['rev'] = [sactual]
-                    _ui.pushbuffer()
-                    commands.log(_ui, srepo, **opts)
-                    out.append(hglib.tounicode(_ui.popbuffer()))
+                sstatedesc = 'changed'
+                if ctx.rev() is not None:
+                    sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
+                    out += genSubrepoRevChangedDescription(sparent, srev)
+                else:
+                    sstatedesc = 'dirty'
+                    if srev == '':
+                        sstatedesc = 'new'
+                        out.append(_('New subrepository') + u'\n\n')
+                    elif srev != sactual:
+                        sstatedesc = 'changed'
+                        out.append(_('Revision has changed from:') + u'\n\n')
+                        opts = {'date':None, 'user':None, 'rev':[srev]}
+                        _ui.pushbuffer()
+                        commands.log(_ui, srepo, **opts)
+                        out.append(hglib.tounicode(_ui.popbuffer()))
+                        out.append(_('To:') + u'\n')
+                        opts['rev'] = [sactual]
+                        _ui.pushbuffer()
+                        commands.log(_ui, srepo, **opts)
+                        out.append(hglib.tounicode(_ui.popbuffer()))
                 self.contents = u''.join(out)
-                self.flabel += _(' <i>(is a dirty sub-repository)</i>')
+                self.flabel += _(' <i>(is a %s sub-repository)</i>' % sstatedesc)
                 lbl = u' <a href="subrepo:%s">%s...</a>'
                 self.flabel += lbl % (hglib.tounicode(srepo.root), _('open'))
             except (EnvironmentError, error.RepoError, util.Abort), e:
