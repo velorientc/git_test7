@@ -163,8 +163,9 @@ class RepoWidget(QWidget):
         tt.setTabToolTip(idx, _("Commit"))
 
         self.mqDemand = w = DemandWidget(self.createMQWidget)
+        idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
         if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
+            self.mqTabIndex = idx
             tt.setTabToolTip(idx, _("Patch Queue"))
             self.namedTabs['mq'] = idx
         else:
@@ -183,8 +184,9 @@ class RepoWidget(QWidget):
         tt.setTabToolTip(idx, _("Search"))
 
         self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
+        idx = tt.addTab(w, qtlib.geticon('branch'), '')
         if 'pbranch' in self.repo.extensions():
-            self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
+            self.pbranchTabIndex = idx
             tt.setTabToolTip(idx, _("Patch Branch"))
             self.namedTabs['pbranch'] = idx
         else:
