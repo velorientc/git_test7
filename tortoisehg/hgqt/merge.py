@@ -25,11 +25,10 @@ class MergeDialog(QWizard):
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 
-        self.repo = repo
         self.otherrev = str(otherrev)
-        self.localrev = str(self.repo['.'].rev())
+        self.localrev = str(repo['.'].rev())
 
-        self.setWindowTitle(_('Merge - %s') % self.repo.displayname)
+        self.setWindowTitle(_('Merge - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-merge'))
         self.setOption(QWizard.NoBackButtonOnStartPage, True)
         self.setOption(QWizard.NoBackButtonOnLastPage, True)
@@ -41,6 +40,8 @@ class MergeDialog(QWizard):
         self.addPage(CommitPage(repo, self))
         self.addPage(ResultPage(repo, self))
         self.currentIdChanged.connect(self.pageChanged)
+
+        self.resize(QSize(700, 489).expandedTo(self.minimumSizeHint()))
 
         repo.repositoryChanged.connect(self.repositoryChanged)
         repo.configChanged.connect(self.configChanged)
@@ -593,5 +594,10 @@ def run(ui, *pats, **opts):
     rev = opts.get('rev') or None
     if not rev and len(pats):
         rev = pats[0]
+    if not rev:
+        import sys
+        qtlib.InfoMsgBox(_('Unable to merge'),
+                         _('Merge revision not specified or not found'))
+        sys.exit()
     repo = thgrepo.repository(ui, path=paths.find_root())
     return MergeDialog(rev, repo, None)
