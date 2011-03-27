@@ -328,8 +328,6 @@ class SummaryPage(BasePage):
 
 
 class MergePage(BasePage):
-    # TODO: add a checkbox on this page to automatically continue
-
     def __init__(self, repo, parent):
         super(MergePage, self).__init__(repo, parent)
         self.mergecomplete = False
@@ -347,6 +345,13 @@ class MergePage(BasePage):
         self.reslabel.linkActivated.connect(self.onLinkActivated)
         self.reslabel.setWordWrap(True)
         self.layout().addWidget(self.reslabel)
+
+        self.autonext = QCheckBox(_('Automatically advance to next page '
+                                    'when merge is complete.'))
+        checked = QSettings().value('merge/autoadvance', False).toBool()
+        self.autonext.setChecked(checked)
+        self.autonext.toggled.connect(self.tryAutoAdvance)
+        self.layout().addWidget(self.autonext)
 
     def currentPage(self):
         if self.field('discard').toBool():
@@ -394,11 +399,20 @@ class MergePage(BasePage):
             self.reslabel.setText(_('No merge conflicts, ready to commit'))
         return True
 
+    def tryAutoAdvance(self, checked):
+        if checked and self.isComplete():
+            self.wizard().next()
+
+    def cleanupPage(self):
+        QSettings().setValue('merge/autoadvance', self.autonext.isChecked())
+
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
         if ret in (0, 1):
             self.mergecomplete = True
-        self.completeChanged.emit()
+            if self.autonext.isChecked():
+                self.tryAutoAdvance(True)
+            self.completeChanged.emit()
 
     @pyqtSlot(QString)
     def onLinkActivated(self, cmd):
@@ -406,6 +420,8 @@ class MergePage(BasePage):
             dlg = resolve.ResolveDialog(self.repo, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
+            if self.autonext.isChecked():
+                self.tryAutoAdvance(True)
             self.completeChanged.emit()
 
 
