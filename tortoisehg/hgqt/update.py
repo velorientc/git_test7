@@ -144,7 +144,6 @@ class UpdateDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('hg-update'))
 
         # prepare to show
-        self.rev_combo.lineEdit().selectAll()
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
@@ -152,6 +151,8 @@ class UpdateDialog(QDialog):
         self.autoresolve_chk.setHidden(True)
         self.showlog_chk.setHidden(True)
         self.update_info()
+        if not self.update_btn.isEnabled():
+            self.rev_combo.lineEdit().selectAll()  # need to change rev
 
     ### Private Methods ###
 
