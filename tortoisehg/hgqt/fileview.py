@@ -605,7 +605,7 @@ class FileData(object):
         if status == 'S':
             try:
                 from mercurial import subrepo, commands
-                
+
                 def genSubrepoRevChangedDescription(sfrom, sto):
                     """Generate a subrepository revision change description"""
                     out = []
@@ -632,7 +632,7 @@ class FileData(object):
                         stolog = _('Initial revision')
                     out.append(hglib.tounicode(stolog))
                     return out, sstatedesc
-                
+
                 srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
                 try:
                     sub = ctx.sub(wfile)
