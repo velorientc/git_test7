@@ -32,9 +32,10 @@ tmproot = None
 def gettempdir():
     global tmproot
     def cleanup():
-        def writeable(arg, dirname, fnames):
-            for fname in fnames:
-                os.chmod(os.path.join(dirname, fname), stat.S_IWUSR)
+        def writeable(arg, dirname, names):
+            for name in names:
+                fullname = os.path.join(dirname, name)
+                os.chmod(fullname, os.stat(fullname).st_mode | stat.S_IWUSR)
         try:
             os.path.walk(tmproot, writeable, None)
             shutil.rmtree(tmproot)
