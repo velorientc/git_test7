@@ -463,9 +463,9 @@ def fix_application_font():
     except ImportError:
         return
 
-    # On Windows, the font for main window seems to be determined by "icon"
-    # font, but Qt chooses uncustomizable system font.
-    lf = win32gui.SystemParametersInfo(win32con.SPI_GETICONTITLELOGFONT)
+    # use configurable font like GTK, Mozilla XUL or Eclipse SWT
+    ncm = win32gui.SystemParametersInfo(win32con.SPI_GETNONCLIENTMETRICS)
+    lf = ncm['lfMessageFont']
     f = QFont(hglib.tounicode(lf.lfFaceName))
     f.setItalic(lf.lfItalic)
     if lf.lfWeight != win32con.FW_DONTCARE:
@@ -474,7 +474,7 @@ def fix_application_font():
         n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
         f.setWeight(w)
     f.setPixelSize(abs(lf.lfHeight))
-    QApplication.setFont(f, 'QMainWindow')
+    QApplication.setFont(f, 'QWidget')
 
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
