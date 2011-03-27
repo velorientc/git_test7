@@ -109,8 +109,14 @@ class FileData(object):
                     out = []
                     opts = {'date':None, 'user':None, 'rev':[sfrom]}
                     if not sfrom:
+                        sstatedesc = 'new'
                         out.append(_('Subrepo initialized to revision:') + u'\n\n')
+                    elif not sto:
+                        sstatedesc = 'removed'
+                        out.append(_('Subrepo removed from repository.') + u'\n\n')
+                        return out, sstatedesc
                     else:
+                        sstatedesc = 'changed'
                         out.append(_('Revision has changed from:') + u'\n\n')
                         _ui.pushbuffer()
                         commands.log(_ui, srepo, **opts)
@@ -119,17 +125,25 @@ class FileData(object):
                     opts['rev'] = [sto]
                     _ui.pushbuffer()
                     commands.log(_ui, srepo, **opts)
-                    out.append(hglib.tounicode(_ui.popbuffer()))
-                    return out
+                    stolog = _ui.popbuffer()
+                    if not stolog:
+                        stolog = _('Initial revision')
+                    out.append(hglib.tounicode(stolog))
+                    return out, sstatedesc
 
                 srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
-                sub = ctx.sub(wfile)
-                if isinstance(sub, subrepo.hgsubrepo):
+                try:
+                    sub = ctx.sub(wfile)
+                    if isinstance(sub, subrepo.hgsubrepo):
+                        srepo = sub._repo
+                        sactual = srepo['.'].hex()
+                    else:
+                        self.error = _('Not a Mercurial subrepo, not previewable')
+                        return
+                except (util.Abort), e:
+                    sub = ctx.p1().sub(wfile)
                     srepo = sub._repo
-                    sactual = srepo['.'].hex()
-                else:
-                    self.error = _('Not a Mercurial subrepo, not previewable')
-                    return
+                    sactual = ''
                 out = []
                 _ui = uimod.ui()
                 _ui.pushbuffer()
@@ -142,19 +156,22 @@ class FileData(object):
                 sstatedesc = 'changed'
                 if ctx.rev() is not None:
                     sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
-                    out += genSubrepoRevChangedDescription(sparent, srev)
+                    subrepochange, sstatedesc = genSubrepoRevChangedDescription(sparent, srev)
+                    out += subrepochange
                 else:
-                    sstatedesc = 'dirty'
-                    if srev == '':
-                        sstatedesc = 'new'
-                        out.append(_('New subrepository') + u'\n\n')
-                    elif srev != sactual:
-                        sstatedesc = 'changed'
-                        out += genSubrepoRevChangedDescription(srev, sactual)
+                    if srev != sactual:
+                        subrepochange, sstatedesc = \
+                            genSubrepoRevChangedDescription(srev, sactual)
+                        out += subrepochange
+                    if data:
+                        sstatedesc += ' and dirty'
                 self.contents = u''.join(out)
+                if not sactual:
+                    sstatedesc = 'removed'
                 self.flabel += _(' <i>(is a %s sub-repository)</i>' % sstatedesc)
-                lbl = u' <a href="subrepo:%s">%s...</a>'
-                self.flabel += lbl % (hglib.tounicode(srepo.root), _('open'))
+                if sactual:
+                    lbl = u' <a href="subrepo:%s">%s...</a>'
+                    self.flabel += lbl % (hglib.tounicode(srepo.root), _('open'))
             except (EnvironmentError, error.RepoError, util.Abort), e:
                 self.error = _('Error previewing subrepo: %s') % \
                         hglib.tounicode(str(e))
