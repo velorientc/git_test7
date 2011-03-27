@@ -7,14 +7,14 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
-from mercurial import error, merge as mergemod
+from mercurial import error
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, resolve
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 class UpdateDialog(QDialog):
 
@@ -319,7 +319,6 @@ class UpdateDialog(QDialog):
         self.cancel_btn.setDisabled(True)
 
 def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
     repo = thgrepo.repository(ui, path=paths.find_root())
     rev = None
     if opts.get('rev'):
