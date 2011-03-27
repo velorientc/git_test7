@@ -512,8 +512,17 @@ class CommitPage(BasePage):
         actionEnter.triggered.connect(tryperform)
         self.addAction(actionEnter)
 
+        self.skiplast = QCheckBox(_('Skip final confirmation page, '
+                                    'close after commit.'))
+        checked = QSettings().value('merge/skiplast', False).toBool()
+        self.skiplast.setChecked(checked)
+        self.layout().addWidget(self.skiplast)
+
     def refresh(self):
         pass
+
+    def cleanupPage(self):
+        QSettings().setValue('merge/skiplast', self.skiplast.isChecked())
 
     def currentPage(self):
         # TODO: add other branch name, when appropriate
@@ -535,6 +544,9 @@ class CommitPage(BasePage):
     def validatePage(self):
         if len(self.repo.parents()) == 1:
             # commit succeeded, repositoryChanged() called wizard().next()
+            QSettings().setValue('merge/skiplast', self.skiplast.isChecked())
+            if self.skiplast.isChecked():
+                self.wizard().close()
             return True
         if self.cmd.core.running():
             return False
@@ -562,8 +574,6 @@ class CommitPage(BasePage):
 
 
 class ResultPage(BasePage):
-    # TODO: Add a checkbox on this page to make it optional
-
     def __init__(self, repo, parent):
         super(ResultPage, self).__init__(repo, parent)
         self.setTitle(_('Finished'))
