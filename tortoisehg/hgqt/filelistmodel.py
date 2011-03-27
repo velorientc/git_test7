@@ -42,17 +42,11 @@ class HgFileListModel(QAbstractTableModel):
         self._files = []
         self._filesdict = {}
         self._fulllist = False
-        self._secondParent = False
 
     @pyqtSlot(bool)
     def toggleFullFileList(self, value):
         self._fulllist = value
         self.loadFiles()
-        self.layoutChanged.emit()
-
-    @pyqtSlot(bool)
-    def toggleSecondParent(self, value):
-        self._secondParent = value
         self.layoutChanged.emit()
 
     def __len__(self):
@@ -86,18 +80,6 @@ class HgFileListModel(QAbstractTableModel):
             return None
         row = index.row()
         return self._files[row]['path']
-
-    def revFromIndex(self, index):
-        'return revision for index. index is guarunteed to be valid'
-        if len(self._ctx.parents()) < 2:
-            return None
-        row = index.row()
-        data = self._files[row]
-        if (data['wasmerged'] and self._secondParent) or \
-           (data['parent'] == 1 and self._fulllist):
-            return self._ctx.p2().rev()
-        else:
-            return self._ctx.p1().rev()
 
     def dataFromIndex(self, index):
         if not index.isValid() or index.row()>=len(self) or not self._ctx:
