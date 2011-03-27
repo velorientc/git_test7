@@ -89,8 +89,9 @@ def snapshotset(repo, ctxs, sa, sb, copies, copyworkingdir = False):
 def snapshot(repo, files, ctx):
     '''snapshot files as of some revision'''
     dirname = os.path.basename(repo.root) or 'root'
+    dirname += '.%d' % _diffCount
     if ctx.rev() is not None:
-        dirname = '%s.%d.%d' % (dirname, _diffCount, ctx.rev())
+        dirname += '.%d' % ctx.rev()
     base = os.path.join(qtlib.gettempdir(), dirname)
     fns_and_mtime = []
     if not os.path.exists(base):
