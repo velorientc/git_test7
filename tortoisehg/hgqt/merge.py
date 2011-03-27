@@ -360,7 +360,7 @@ class MergePage(BasePage):
             cmdline = ['--repository', self.repo.root, 'debugsetparents',
                        '.', self.wizard().otherrev]
         else:
-            cmdline = ['--repository', self.repo.root, 'merge']
+            cmdline = ['--repository', self.repo.root, 'merge', '--verbose']
             if self.field('force').toBool():
                 cmdline.append('--force')
             tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
