@@ -109,7 +109,7 @@ class SummaryPage(BasePage):
     def initializePage(self):
         if self.layout():
             return
-        self.setTitle(_('Preparation'))
+        self.setTitle(_('Prepare to merge'))
         self.setSubTitle(_('Verify merge targets and ensure your working '
                            'directory is clean.'))
         self.setLayout(QVBoxLayout())
@@ -214,7 +214,6 @@ class SummaryPage(BasePage):
         self.layout().addWidget(autoresolve_chk)
         self.autoresolve_chk = autoresolve_chk
 
-        self.setTitle(_('Merge another revision to the working directory'))
         self.groups.set_visible(False, 'dirty')
         self.groups.set_visible(False, 'merged')
         self.toggleShowOptions(self.expander.is_expanded())
