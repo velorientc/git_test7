@@ -543,7 +543,9 @@ class CommitPage(BasePage):
     def validatePage(self):
         if len(self.repo.parents()) == 1:
             # commit succeeded, repositoryChanged() called wizard().next()
-            QSettings().setValue('merge/skiplast', self.skiplast.isChecked())
+            s = QSettings()
+            s.setValue('merge/skiplast', self.skiplast.isChecked())
+            self.msgEntry.saveSettings(s, 'merge/message')
             if self.skiplast.isChecked():
                 self.wizard().close()
             return True
@@ -559,7 +561,6 @@ class CommitPage(BasePage):
         self.repo.incrementBusyCount()
         self.cmd.setShowOutput(True)
         self.cmd.run(cmdline)
-        self.msgEntry.saveSettings(QSettings(), 'merge/message')
         return False
 
     def repositoryChanged(self):
