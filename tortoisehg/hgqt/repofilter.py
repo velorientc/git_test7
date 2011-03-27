@@ -12,7 +12,7 @@ from PyQt4.QtGui import *
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import revset, qtlib
 
-_permanent_queries = ('head()', 'merge()', 'tagged()', 'file(".hgsubstate")')
+_permanent_queries = ('head()', 'merge()', 'tagged()', 'file(".hgsubstate") or file(".hgsub")')
 
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
