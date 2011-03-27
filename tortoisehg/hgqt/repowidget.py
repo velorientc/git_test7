@@ -16,7 +16,7 @@ from tortoisehg.util import shlib, hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox
-from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
+from tortoisehg.hgqt.qtlib import CustomPrompt, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
@@ -228,34 +228,26 @@ class RepoWidget(QWidget):
 
         QDesktopServices.openUrl(QUrl(link))
 
-    def getCommitWidget(self):
-        return getattr(self.repo, '_commitwidget', None)  # TODO: ugly
-
     def createCommitWidget(self):
-        cw = self.getCommitWidget()
-        if not cw:
-            pats = {}
-            opts = {}
-            b = QPushButton(_('Commit'))
-            b.setAutoDefault(True)
-            f = b.font()
-            f.setWeight(QFont.Bold)
-            b.setFont(f)
-            cw = CommitWidget(pats, opts, self.repo.root, True, self)
-            cw.buttonHBox.addWidget(b)
-            cw.commitButtonEnable.connect(b.setEnabled)
-            b.clicked.connect(cw.commit)
-            cw.loadSettings(QSettings(), 'workbench')
-            QTimer.singleShot(0, cw.reload)
-            self.repo._commitwidget = cw
+        pats, opts = {}, {}
+        cw = CommitWidget(pats, opts, self.repo.root, True, self)
 
-        cw = SharedWidget(cw)
+        b = QPushButton(_('Commit'))
+        b.setAutoDefault(True)
+        f = b.font()
+        f.setWeight(QFont.Bold)
+        b.setFont(f)
+        cw.buttonHBox.addWidget(b)
+        cw.commitButtonEnable.connect(b.setEnabled)
+        b.clicked.connect(cw.commit)
+        cw.loadSettings(QSettings(), 'workbench')
+
         cw.output.connect(self.output)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
         cw.linkActivated.connect(self._openLink)
-
         cw.showMessage.connect(self.showMessage)
+        QTimer.singleShot(0, cw.reload)
         return cw
 
     def createManifestWidget(self):
@@ -271,11 +263,7 @@ class RepoWidget(QWidget):
         return w
 
     def createSyncWidget(self):
-        sw = getattr(self.repo, '_syncwidget', None)  # TODO: ugly
-        if not sw:
-            sw = SyncWidget(self.repo, self)
-            self.repo._syncwidget = sw
-        sw = SharedWidget(sw)
+        sw = SyncWidget(self.repo, self)
         sw.output.connect(self.output)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
