@@ -150,16 +150,7 @@ class FileData(object):
                         out.append(_('New subrepository') + u'\n\n')
                     elif srev != sactual:
                         sstatedesc = 'changed'
-                        out.append(_('Revision has changed from:') + u'\n\n')
-                        opts = {'date':None, 'user':None, 'rev':[srev]}
-                        _ui.pushbuffer()
-                        commands.log(_ui, srepo, **opts)
-                        out.append(hglib.tounicode(_ui.popbuffer()))
-                        out.append(_('To:') + u'\n')
-                        opts['rev'] = [sactual]
-                        _ui.pushbuffer()
-                        commands.log(_ui, srepo, **opts)
-                        out.append(hglib.tounicode(_ui.popbuffer()))
+                        out += genSubrepoRevChangedDescription(srev, sactual)
                 self.contents = u''.join(out)
                 self.flabel += _(' <i>(is a %s sub-repository)</i>' % sstatedesc)
                 lbl = u' <a href="subrepo:%s">%s...</a>'

@@ -101,17 +101,18 @@ class HgFileListModel(QAbstractTableModel):
 
         # Add the list of modified subrepos to the top of the list
         if not isinstance(self._ctx, patchctx.patchctx):
-            from mercurial import subrepo
-            for s, sd in self._ctx.substate.items():
-                srev = self._ctx.substate.get(s, subrepo.nullstate)[1]
-                sp1rev = self._ctx.p1().substate.get(s, subrepo.nullstate)[1]
-                sp2rev = ''
-                if ismerge:
-                    sp2rev = self._ctx.p2().substate.get(s, subrepo.nullstate)[1]
-                if srev != sp1rev or (sp2rev != '' and srev != sp2rev):
-                    wasmerged = ismerge and s in ctxfiles
-                    files.append({'path': s, 'status': 'S', 'parent': parent,
-                      'wasmerged': wasmerged})        
+            if ".hgsubstate" in ctxfiles or ".hgsub" in ctxfiles:
+                from mercurial import subrepo
+                for s, sd in self._ctx.substate.items():
+                    srev = self._ctx.substate.get(s, subrepo.nullstate)[1]
+                    sp1rev = self._ctx.p1().substate.get(s, subrepo.nullstate)[1]
+                    sp2rev = ''
+                    if ismerge:
+                        sp2rev = self._ctx.p2().substate.get(s, subrepo.nullstate)[1]
+                    if srev != sp1rev or (sp2rev != '' and srev != sp2rev):
+                        wasmerged = ismerge and s in ctxfiles
+                        files.append({'path': s, 'status': 'S', 'parent': parent,
+                          'wasmerged': wasmerged})        
 
         if self._fulllist and ismerge:
             func = lambda x: True
