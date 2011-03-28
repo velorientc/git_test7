@@ -19,7 +19,7 @@ import os
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
+from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt import visdiff, wctxactions, revert
 
 from PyQt4.QtCore import *
@@ -32,7 +32,8 @@ class HgFileListView(QTableView):
 
     fileRevSelected = pyqtSignal(object, object, object)
     clearDisplay = pyqtSignal()
-    contextmenu = None
+    filecontextmenu = None
+    subrepocontextmenu = None
 
     def __init__(self, parent=None):
         QTableView.__init__(self, parent)
@@ -255,15 +256,23 @@ class HgFileListView(QTableView):
             self.addAction(act)
 
     def contextMenuEvent(self, event):
-        if not self.contextmenu:
-            self.contextmenu = QMenu(self)
-            for act in ['diff', 'ldiff', 'edit', 'ledit', 'revert',
-                        'navigate', 'diffnavigate']:
+        itemissubrepo = self.currentFile() in self.model()._ctx.substate.keys()
+        # Subrepos and regular items have different context menus
+        if itemissubrepo:
+            contextmenu = self.subrepocontextmenu
+            actionlist = []
+        else:
+            contextmenu = self.filecontextmenu
+            actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
+                        'navigate', 'diffnavigate']
+        if not contextmenu:
+            contextmenu = QMenu(self)
+            for act in actionlist:
                 if act:
-                    self.contextmenu.addAction(self._actions[act])
+                    contextmenu.addAction(self._actions[act])
                 else:
-                    self.contextmenu.addSeparator()
-        self.contextmenu.exec_(event.globalPos())
+                    contextmenu.addSeparator()
+        contextmenu.exec_(event.globalPos())
 
     def resizeEvent(self, event):
         if self.model() is not None:
