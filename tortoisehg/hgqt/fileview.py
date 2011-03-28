@@ -671,10 +671,18 @@ class FileData(object):
                 self.contents = u''.join(out)
                 if not sactual:
                     sstatedesc = 'removed'
-                self.flabel += _(' <i>(is a %s sub-repository)</i>' % sstatedesc)
+                lbl = {
+                    'changed':   _('(is a changed sub-repository)'),
+                    'dirty':   _('(is a dirty sub-repository)'),
+                    'new':   _('(is a new sub-repository)'),
+                    'removed':   _('(is a removed sub-repository)'),
+                    'changed and dirty':   _('(is a changed and dirty sub-repository)'),
+                    'new and dirty':   _('(is a new and dirty sub-repository)')
+                }[sstatedesc]
+                self.flabel += ' <i>' + lbl + '</i>'
                 if sactual:
-                    lbl = u' <a href="subrepo:%s">%s...</a>'
-                    self.flabel += lbl % (hglib.tounicode(srepo.root), _('open'))
+                    lbl = _(' <a href="subrepo:%s">open...</a>')
+                    self.flabel += lbl % hglib.tounicode(srepo.root)
             except (EnvironmentError, error.RepoError, util.Abort), e:
                 self.error = _('Error previewing subrepo: %s') % \
                         hglib.tounicode(str(e))
