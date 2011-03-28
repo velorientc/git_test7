@@ -47,7 +47,7 @@ class HgFileListView(QTableView):
 
         self.createActions()
 
-        self.doubleClicked.connect(self.fileActivated)
+        self.doubleClicked.connect(self.vdiff)
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
