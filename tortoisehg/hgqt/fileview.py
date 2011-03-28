@@ -661,12 +661,13 @@ class FileData(object):
                     subrepochange, sstatedesc = genSubrepoRevChangedDescription(sparent, srev)
                     out += subrepochange
                 else:
+                    sstatedesc = 'dirty'
                     if srev != sactual:
                         subrepochange, sstatedesc = \
                             genSubrepoRevChangedDescription(srev, sactual)
                         out += subrepochange
-                    if data:
-                        sstatedesc += ' and dirty'
+                        if data:
+                            sstatedesc += ' and dirty'
                 self.contents = u''.join(out)
                 if not sactual:
                     sstatedesc = 'removed'
