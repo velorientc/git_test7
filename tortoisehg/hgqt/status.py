@@ -417,7 +417,7 @@ class StatusThread(QThread):
                     wctx.dirtySubrepos.append(s)
         except EnvironmentError, e:
             self.showMessage.emit(hglib.tounicode(str(e)))
-        except (error.RepoLookupError, error.ConfigError), e:
+        except (error.LookupError, error.RepoError, error.ConfigError), e:
             self.showMessage.emit(hglib.tounicode(str(e)))
         except util.Abort, e:
             if e.hint:
