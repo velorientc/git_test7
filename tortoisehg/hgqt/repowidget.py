@@ -1075,7 +1075,7 @@ class RepoWidget(QWidget):
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
-            
+
         if 'transplant' in self.repo.extensions():
             a = QAction(_('Transplant Selected to local'), self)
             a.setIcon(qtlib.getmenuicon('hg-transplant'))
