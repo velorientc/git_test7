@@ -74,6 +74,10 @@ class patchctx(object):
         # ensure the patch contents are re-read
         self._mtime = 0
 
+    @property
+    def substate(self):
+        return {}  # unapplied patch won't include .hgsubstate
+
     def __contains__(self, key):
         return key in self._files
 
