@@ -14,7 +14,7 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, visdiff, thgrepo
+from tortoisehg.hgqt import qtlib, cmdui, csinfo, visdiff, thgrepo
 
 MARGINS = (8, 0, 0, 0)
 
@@ -39,6 +39,40 @@ class ResolveDialog(QDialog):
         self.stlabel = QLabel()
         hbox.addWidget(tb)
         hbox.addWidget(self.stlabel)
+
+        def revisionInfoLayout(repo):
+            """
+            Return a layout containg the revision information (local and other)
+            """
+            hbox = QHBoxLayout()
+            hbox.setSpacing(0)
+            hbox.setContentsMargins(*MARGINS)
+
+            vbox = QVBoxLayout()
+            vbox.setContentsMargins(*MARGINS)
+            hbox.addLayout(vbox)
+            localrevtitle = qtlib.LabeledSeparator(_('Local revision information'))
+            localrevinfo = csinfo.create(repo)
+            localrevinfo.update(repo[None].p1())
+            vbox.addWidget(localrevtitle)
+            vbox.addWidget(localrevinfo)
+            vbox.addStretch()
+
+            vbox = QVBoxLayout()
+            vbox.setContentsMargins(*MARGINS)
+            hbox.addLayout(vbox)
+            otherrevtitle = qtlib.LabeledSeparator(_('Other revision information'))
+            otherrevinfo = csinfo.create(repo)
+            otherrevinfo.update(repo[None].p2())
+
+            vbox.addWidget(otherrevtitle)
+            vbox.addWidget(otherrevinfo)
+            vbox.addStretch()
+
+            return hbox
+
+        if len(self.repo[None].parents()) > 1:
+            self.layout().addLayout(revisionInfoLayout(self.repo))
 
         unres = qtlib.LabeledSeparator(_('Unresolved conflicts'))
         self.layout().addWidget(unres)
