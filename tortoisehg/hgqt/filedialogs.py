@@ -399,6 +399,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self.goto(rev)
 
     def revisionSelected(self, rev):
+        if rev is None or rev not in self.filerevmodel.graph.nodesdict:
+            return
         if self.sender() is self.tableView_revisions_right:
             side = 'right'
         else:
