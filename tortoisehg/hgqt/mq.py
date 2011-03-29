@@ -153,11 +153,17 @@ class MQWidget(QWidget):
         self.messageEditor = commit.MessageEntry(self)
         self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.messageEditor.refresh(repo)
-        layout.addWidget(self.messageEditor, 1)
 
         self.fileListWidget = QListWidget(self)
         self.fileListWidget.currentRowChanged.connect(self.onFileSelected)
-        layout.addWidget(self.fileListWidget, 2)
+
+        # The message editor and the file list are separated by
+        # a vertical splitter
+        vsplitter = QSplitter()
+        vsplitter.setOrientation(Qt.Vertical)
+        layout.addWidget(vsplitter)
+        vsplitter.addWidget(self.messageEditor)
+        vsplitter.addWidget(self.fileListWidget)
 
         qrefhbox = QHBoxLayout()
         layout.addLayout(qrefhbox, 0)
