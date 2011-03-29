@@ -240,7 +240,8 @@ class HgFileListView(QTableView):
             self.addAction(act)
 
     def contextMenuEvent(self, event):
-        itemissubrepo = self.currentFile() in self.model()._ctx.substate.keys()
+        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+
         # Subrepos and regular items have different context menus
         if itemissubrepo:
             contextmenu = self.subrepocontextmenu

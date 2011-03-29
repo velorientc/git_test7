@@ -112,11 +112,16 @@ class ChunksWidget(QWidget):
         pfiles = {}
         curdir = os.getcwd()
         try:
+            eolmode = ui.config('patch', 'eol', 'strict')
+            if eolmode.lower() not in patch.eolmodes:
+                eolmode = 'strict'
+            else:
+                eolmode = eolmode.lower()
             os.chdir(repo.root)
-            if patch.applydiff(ui, fp, pfiles) < 0:
+            if patch.applydiff(ui, fp, pfiles, eolmode=eolmode) < 0:
                 ok = False
                 self.showMessage.emit(_('Patch failed to apply'))
-        except patch.PatchError, err:
+        except (patch.PatchError, EnvironmentError), err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
         os.chdir(curdir)
