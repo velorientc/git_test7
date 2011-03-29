@@ -21,7 +21,6 @@ class htmlui(ui.ui):
         self.setconfig('ui', 'interactive', 'off')
         self.setconfig('progress', 'disable', 'True')
         self.output, self.error = [], []
-        os.environ['TERM'] = 'dumb'
 
     def write(self, *args, **opts):
         label = opts.get('label', '')

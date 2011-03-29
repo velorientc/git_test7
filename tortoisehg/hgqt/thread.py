@@ -101,7 +101,6 @@ class QtUi(uimod.ui):
 
         self.setconfig('ui', 'interactive', 'on')
         self.setconfig('progress', 'disable', 'True')
-        os.environ['TERM'] = 'dumb'
 
     def write(self, *args, **opts):
         if self._buffers:
