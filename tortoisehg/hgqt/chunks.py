@@ -121,7 +121,7 @@ class ChunksWidget(QWidget):
             if patch.applydiff(ui, fp, pfiles, eolmode=eolmode) < 0:
                 ok = False
                 self.showMessage.emit(_('Patch failed to apply'))
-        except patch.PatchError, err:
+        except (patch.PatchError, EnvironmentError), err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
         os.chdir(curdir)
