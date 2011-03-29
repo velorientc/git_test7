@@ -124,8 +124,9 @@ class QReorderDialog(QDialog):
         patchname = self.menuselection
         dlg = qrename.QRenameDialog(self.repo, patchname, self)
         dlg.finished.connect(dlg.deleteLater)
-        dlg.output.connect(self.parent().output)
-        dlg.makeLogVisible.connect(self.parent().makeLogVisible)
+        if self.parent():
+            dlg.output.connect(self.parent().output)
+            dlg.makeLogVisible.connect(self.parent().makeLogVisible)
         dlg.exec_()
 
     def refresh(self):
