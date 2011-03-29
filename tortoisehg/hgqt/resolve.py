@@ -14,7 +14,7 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, wctxactions, visdiff, thgrepo
+from tortoisehg.hgqt import qtlib, cmdui, visdiff, thgrepo
 
 MARGINS = (8, 0, 0, 0)
 
@@ -192,7 +192,7 @@ class ResolveDialog(QDialog):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
             abspaths = [os.path.join(r,w) for r,w in paths]
-            wctxactions.edit(self, self.repo.ui, self.repo, abspaths)
+            qtlib.editfiles(self.repo, abspaths, parent=self)
 
     def getVdiffFiles(self, tree):
         paths = self.getSelectedPaths(self.rtree)

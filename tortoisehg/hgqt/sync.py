@@ -163,46 +163,51 @@ class SyncWidget(QWidget):
         hbox.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(hbox)
 
+        self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
+        tbar.setIconSize(QSize(16, 16))
+        hbox.addWidget(tbar)
         self.schemecombo = QComboBox()
         for s in _schemes:
             self.schemecombo.addItem(s)
         self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.schemecombo)
+        tbar.addWidget(self.schemecombo)
 
-        self.securebutton = QPushButton(qtlib.geticon('thg-password'), '')
-        self.securebutton.setToolTip(
-            _('Manage HTTPS connection security and user authentication'))
-        hbox.addWidget(self.securebutton)
+        a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
+        a.setToolTip(_('Manage HTTPS connection security and user authentication'))
+        self.securebutton = a
 
+        fontm = QFontMetrics(self.font())
         self.hostentry = QLineEdit()
         self.hostentry.setToolTip(_('Hostname'))
         self.hostentry.setAcceptDrops(False)
+        self.hostentry.setFixedWidth(30 * fontm.width('9'))
         self.hostentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.hostentry, 1)
+        tbar.addWidget(self.hostentry)
+        
         self.HostAndPortWidgets = [self.hostentry]
         w = QLabel(':')
-        hbox.addWidget(w)
+        tbar.addWidget(w)
         self.HostAndPortWidgets.append(w)
         self.portentry = QLineEdit()
         self.portentry.setAcceptDrops(False)
         self.portentry.setToolTip(_('Port'))
-        fontm = QFontMetrics(self.font())
         self.portentry.setFixedWidth(8 * fontm.width('9'))
         self.portentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.portentry)
+        tbar.addWidget(self.portentry)
         self.HostAndPortWidgets.append(self.portentry)
         w = QLabel('/')
-        hbox.addWidget(w)
+        tbar.addWidget(w)
         self.HostAndPortWidgets.append(w)
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
         self.pathentry.setToolTip(_('Path'))
         self.pathentry.textChanged.connect(self.refreshUrl)
-        hbox.addWidget(self.pathentry, 4)
+        tbar.addWidget(self.pathentry)
 
-        self.savebutton = QPushButton(style.standardIcon(QStyle.SP_DialogSaveButton), '')
-        self.savebutton.setToolTip(_('Save current URL under an alias'))
-        hbox.addWidget(self.savebutton)
+        a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
+                          _('Save'))
+        a.setToolTip(_('Save current URL under an alias'))
+        self.savebutton = a
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -237,8 +242,8 @@ class SyncWidget(QWidget):
 
         self.layout().addLayout(hbox, 1)
 
-        self.savebutton.clicked.connect(self.saveclicked)
-        self.securebutton.clicked.connect(self.secureclicked)
+        self.savebutton.triggered.connect(self.saveclicked)
+        self.securebutton.triggered.connect(self.secureclicked)
         self.postpullbutton.clicked.connect(self.postpullclicked)
         self.optionsbutton.pressed.connect(self.editOptions)
 
@@ -385,7 +390,7 @@ class SyncWidget(QWidget):
         schemeIndex = self.schemecombo.currentIndex()
         for w in self.HostAndPortWidgets:
             w.setHidden(schemeIndex == 0)
-        self.securebutton.setHidden(schemeIndex != 3)
+        self.securebutton.setVisible(schemeIndex == 3)
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]

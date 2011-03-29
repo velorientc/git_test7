@@ -27,7 +27,7 @@ from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
-from tortoisehg.hgqt.manifestdialog import ManifestTaskWidget
+from tortoisehg.hgqt.manifestdialog import ManifestWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.pbranch import PatchBranchWidget
@@ -162,6 +162,15 @@ class RepoWidget(QWidget):
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
+        self.mqDemand = w = DemandWidget('createMQWidget', self)
+        idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
+        if 'mq' in self.repo.extensions():
+            self.mqTabIndex = idx
+            tt.setTabToolTip(idx, _("Patch Queue"))
+            self.namedTabs['mq'] = idx
+        else:
+            self.mqTabIndex = -1
+
         self.syncDemand = w = DemandWidget('createSyncWidget', self)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
@@ -174,17 +183,10 @@ class RepoWidget(QWidget):
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
 
-        self.mqDemand = w = DemandWidget('createMQWidget', self)
-        if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
-            tt.setTabToolTip(idx, _("Patch Queue"))
-            self.namedTabs['mq'] = idx
-        else:
-            self.mqTabIndex = -1
-
         self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
+        idx = tt.addTab(w, qtlib.geticon('branch'), '')
         if 'pbranch' in self.repo.extensions():
-            self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
+            self.pbranchTabIndex = idx
             tt.setTabToolTip(idx, _("Patch Branch"))
             self.namedTabs['pbranch'] = idx
         else:
@@ -253,10 +255,10 @@ class RepoWidget(QWidget):
             rev = None
         else:
             rev = self.rev
-        w = ManifestTaskWidget(self.repo, rev, self)
+        w = ManifestWidget(self.repo, rev, self)
         w.loadSettings(QSettings(), 'workbench')
         w.revChanged.connect(self.repoview.goto)
-        w.revisionHint.connect(self.showMessage)
+        w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
         return w
 
@@ -1000,6 +1002,9 @@ class RepoWidget(QWidget):
         entry(menu, 'reviewboard', fixed, _('Post to Review Board...'), 'reviewboard',
               self.sendToReviewBoard)
 
+        entry(menu, 'rupdate', fixed, _('Remote Update...'), 'hg-update',
+              self.rupdate)
+
         self.singlecmenu = menu
         self.singlecmenuitems = items
 
@@ -1248,7 +1253,7 @@ class RepoWidget(QWidget):
         self.runCommand(cmdline)
 
     def backoutToRevision(self):
-        dlg = backout.BackoutDialog(self.repo, str(self.rev), self)
+        dlg = backout.BackoutDialog(self.rev, self.repo, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
@@ -1260,6 +1265,10 @@ class RepoWidget(QWidget):
 
     def sendToReviewBoard(self):
         run.postreview(self.repo.ui, rev=self.repoview.selectedRevisions(),
+          repo=self.repo)
+
+    def rupdate(self):
+        run.rupdate(self.repo.ui, rev=self.rev,
           repo=self.repo)
 
     def emailRevision(self):
