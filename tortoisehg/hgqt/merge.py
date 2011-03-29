@@ -631,8 +631,18 @@ class CommitPage(BasePage):
         msg_text.refresh(repo)
         msg_text.loadSettings(QSettings(), 'merge/message')
         engmsg = repo.ui.configbool('tortoisehg', 'engmsg', False)
-        msgset = keep._('Merge ')
-        msg_text.setText(engmsg and msgset['id'] or msgset['str'])
+        p1branch = repo[None].p1().branch()
+        p2branch = repo[None].p2().branch()
+        if p1branch == p2branch:
+            msgset = keep._('Merge ')
+        else:
+            # Show a default 'Merge with OTHER_BRANCH' message when merging
+            # changesets from different branches
+            msgset = keep._('Merge with %s')
+        msg = engmsg and msgset['id'] or msgset['str']
+        if p1branch != p2branch:
+            msg = unicode(msg) % hglib.tounicode(p2branch)
+        msg_text.setText(msg)
         msg_text.textChanged.connect(self.completeChanged)
         self.msg_text = msg_text
         box.addWidget(msg_text)
