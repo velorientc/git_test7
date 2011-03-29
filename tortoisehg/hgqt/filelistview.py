@@ -123,6 +123,8 @@ class HgFileListView(QTableView):
 
     def fileActivated(self, index, alternate=False):
         selFile = self.model().fileFromIndex(index)
+        if not self._actions['navigate'].isEnabled():
+            return
         if alternate:
             self.navigate(selFile)
         else:
