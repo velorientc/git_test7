@@ -56,8 +56,9 @@ class QReorderDialog(QDialog):
                 QListWidget.__init__(self, parent)
                 self.setCurrentRow(0)
             def contextMenuEvent(self, event):
-                self.menuRequested.emit(event.globalPos(),
-                    self.item(self.currentRow()).patchname)
+                i = self.item(self.currentRow())
+                if i:
+                    self.menuRequested.emit(event.globalPos(), i.patchname)
             def focusInEvent(self, e):
                 i = self.item(self.currentRow())
                 if i:
