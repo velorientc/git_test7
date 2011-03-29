@@ -335,8 +335,12 @@ class ChunksWidget(QWidget):
                                 opts=diffopts):
                 buf.write(p)
             buf.seek(0)
-            header =  record.parsepatch(buf)[0]
-            return [header] + header.hunks
+            chunks = record.parsepatch(buf)
+            if chunks:
+                header = chunks[0]
+                return [header] + header.hunks
+            else:
+                return []
 
     @pyqtSlot(object, object, object)
     def displayFile(self, file, rev, status):
