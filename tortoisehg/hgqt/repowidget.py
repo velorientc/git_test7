@@ -321,8 +321,8 @@ class RepoWidget(QWidget):
         removed = [self.repo[self.rev]]
         while removed:
             ctx = removed.pop()
-            if ctx.node() in self.revset:
-                self.revset.remove(ctx.node())
+            if ctx.rev() in self.revset:
+                self.revset.remove(ctx.rev())
                 removed.extend(ctx.parents())
         self.repomodel.revset = self.revset
         if not self.revset:
