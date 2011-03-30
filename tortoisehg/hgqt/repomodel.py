@@ -123,7 +123,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.filterbranch = branch
         self.invalidateCache()
         if self.revset and self.filterbyrevset:
-            grapher = revision_grapher(self.repo, revset=self.revset)
+            grapher = revision_grapher(self.repo, branch=branch, revset=self.revset)
             self.graph = Graph(self.repo, grapher, include_mq=False)
         else:
             grapher = revision_grapher(self.repo, branch=branch,

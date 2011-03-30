@@ -52,16 +52,15 @@ def revision_grapher(repo, **opts):
     """
 
     revset = opts.get('revset', None)
+    branch = opts.get('branch', None)
     if revset:
         start_rev = max(revset)
         stop_rev = min(revset)
-        branch = None
         follow = False
         hidden = lambda rev: rev not in revset
     else:
         start_rev = opts.get('start_rev', None)
         stop_rev = opts.get('stop_rev', 0)
-        branch = opts.get('branch', None)
         follow = opts.get('follow', False)
         hidden = lambda rev: False
 
