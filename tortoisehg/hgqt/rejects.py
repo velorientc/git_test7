@@ -93,10 +93,18 @@ class RejectsDialog(QDialog):
 
         f = QFile(path)
         f.open(QIODevice.ReadOnly)
+        earlybytes = f.readData(4096)
+        if '\0' in earlybytes:
+            qtlib.ErrorMsgBox(_('Unable to merge rejects'),
+                              _('This appears to be a binary file'))
+            self.hide()
+            QTimer.singleShot(0, self.reject)
+            return
+
+        f.seek(0)
         editor.read(f)
         editor.setModified(False)
-        f.seek(0)
-        lexer = lexers.get_lexer(path, f.readData(1024), self)
+        lexer = lexers.get_lexer(path, earlybytes, self)
         editor.setLexer(lexer)
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
