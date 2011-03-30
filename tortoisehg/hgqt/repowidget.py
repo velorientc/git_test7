@@ -63,7 +63,7 @@ class RepoWidget(QWidget):
         self.revsetfilter = False
         self.branch = ''
         self.bundle = None
-        self.revset = set()
+        self.revset = []
         self.namedTabs = {}
         self.repolen = len(repo)
         self.destroyed.connect(self.repo.thginvalidate)
