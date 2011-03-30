@@ -89,6 +89,7 @@ class RevDetailsWidget(QWidget):
         self.filelistToolbar = QToolBar(_('File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
         self.filelist = HgFileListView()
+        self.filelist.linkActivated.connect(self.linkActivated)
 
         self.tbarFileListFrame = QFrame(self.filelist_splitter)
         sp = SP(SP.Preferred, SP.Preferred)

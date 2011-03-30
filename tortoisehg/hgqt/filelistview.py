@@ -32,6 +32,7 @@ class HgFileListView(QTableView):
 
     fileRevSelected = pyqtSignal(object, object, object)
     clearDisplay = pyqtSignal()
+    linkActivated = pyqtSignal(QString)
     filecontextmenu = None
     subrepocontextmenu = None
 
@@ -244,6 +245,9 @@ class HgFileListView(QTableView):
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
+            ('opensubrepo', _('Open subrepository'), 'thg-repository-open', 
+              'Alt+Ctrl+O', _('Open the selected subrepository'),
+              self.opensubrepo),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -256,14 +260,23 @@ class HgFileListView(QTableView):
                 act.triggered.connect(cb)
             self._actions[name] = act
             self.addAction(act)
-
+    
+    def opensubrepo(self):
+        path = os.path.join(self.model().repo.root, self.currentFile())
+        if os.path.isdir(path):
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+        else:
+            QMessageBox.warning(self,
+                _("Cannot open subrepository"),
+                _("The selected subrepository does not exist on the working directory"))
+        
     def contextMenuEvent(self, event):
         itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
 
         # Subrepos and regular items have different context menus
         if itemissubrepo:
             contextmenu = self.subrepocontextmenu
-            actionlist = []
+            actionlist = ['opensubrepo']
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
