@@ -48,7 +48,7 @@ class HgFileListView(QTableView):
 
         self.createActions()
 
-        self.doubleClicked.connect(self.vdiff)
+        self.doubleClicked.connect(self.doubleClickHandler)
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
@@ -214,6 +214,22 @@ class HgFileListView(QTableView):
             dlg.raise_()
             dlg.activateWindow()
 
+    def opensubrepo(self):
+        path = os.path.join(self.model().repo.root, self.currentFile())
+        if os.path.isdir(path):
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+        else:
+            QMessageBox.warning(self,
+                _("Cannot open subrepository"),
+                _("The selected subrepository does not exist on the working directory"))
+    
+    def doubleClickHandler(self):
+        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+        if itemissubrepo:
+            self.opensubrepo()
+        else:
+            self.vdiff()
+        
     def createActions(self):
         self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setToolTip(
@@ -261,15 +277,6 @@ class HgFileListView(QTableView):
             self._actions[name] = act
             self.addAction(act)
     
-    def opensubrepo(self):
-        path = os.path.join(self.model().repo.root, self.currentFile())
-        if os.path.isdir(path):
-            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
-        else:
-            QMessageBox.warning(self,
-                _("Cannot open subrepository"),
-                _("The selected subrepository does not exist on the working directory"))
-        
     def contextMenuEvent(self, event):
         itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
 
