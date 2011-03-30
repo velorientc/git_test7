@@ -210,17 +210,29 @@ class Scintilla(QsciScintilla):
                 a.setChecked(self.whitespaceVisibility() == m)
                 a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
             mkaction(name, mode)
+        vsmenu = QMenu(_('EolnVisibility'), self)
+        for name, mode in ((_('Visible'), True),
+                           (_('Invisible'), False)):
+            def mkaction(n, m):
+                a = vsmenu.addAction(n)
+                a.setCheckable(True)
+                a.setChecked(self.eolVisibility() == m)
+                a.triggered.connect(lambda: self.setEolVisibility(m))
+            mkaction(name, mode)
         self._stdMenu.addMenu(wrapmenu)
         self._stdMenu.addMenu(wsmenu)
+        self._stdMenu.addMenu(vsmenu)
         return self._stdMenu
 
     def saveSettings(self, qs, prefix):
         qs.setValue(prefix+'/wrap', self.wrapMode())
         qs.setValue(prefix+'/whitespace', self.whitespaceVisibility())
+        qs.setValue(prefix+'/eol', self.eolVisibility())
 
     def loadSettings(self, qs, prefix):
         self.setWrapMode(qs.value(prefix+'/wrap').toInt()[0])
         self.setWhitespaceVisibility(qs.value(prefix+'/whitespace').toInt()[0])
+        self.setEolVisibility(qs.value(prefix+'/eol').toBool())
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
