@@ -23,4 +23,4 @@ Steps for making a release:
 Post Major Release:
 * Increment minimum Mercurial version in tortoisehg/util/hgversion.py
 * Sweep through code and remove hacks for older Mercurial releases
-* Update http://bitbucket.org/tortoisehg/stable/wiki/ReleaseNotes#matching-versions
+* Update http://bitbucket.org/tortoisehg/thg/wiki/ReleaseNotes#matching-versions
