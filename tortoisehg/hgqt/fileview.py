@@ -1,33 +1,19 @@
-# Copyright (c) 2009-2010 LOGILAB S.A. (Paris, FRANCE).
-# http://www.logilab.fr/ -- mailto:contact@logilab.fr
+# fileview.py - File diff, content, and annotation display widget
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Copyright 2010 Steve Borho <steve@borho.org>
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-"""
-Qt4 high level widgets for hg repo changelogs and filelogs
-"""
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import os
 import difflib
-import re
 
-from mercurial import hg, error, match, patch, util
-from mercurial import ui as uimod, mdiff
+from mercurial import error, util
 
-from tortoisehg.util import hglib, patchctx
+from tortoisehg.util import hglib, patchctx, colormap, thread2
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import annotate, qscilib, qtlib, blockmatcher, lexers
-from tortoisehg.hgqt import visdiff, wctxactions
+from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, lexers
+from tortoisehg.hgqt import visdiff, filedata
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -35,8 +21,12 @@ from PyQt4 import Qsci
 
 qsci = Qsci.QsciScintilla
 
+DiffMode = 1
+FileMode = 2
+AnnMode = 3
+
 class HgFileView(QFrame):
-    """file diff and content viewer"""
+    "file diff, content, and annotation viewer"
 
     linkActivated = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(QString, QString)
@@ -94,7 +84,7 @@ class HgFileView(QFrame):
         l.addLayout(hbox)
 
         self.blk = blockmatcher.BlockList(self)
-        self.sci = annotate.AnnotateView(repo, self)
+        self.sci = AnnotateView(repo, self)
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
 
@@ -135,23 +125,25 @@ class HgFileView(QFrame):
         self._filename = None
         self._status = None
         self._mode = None
+        self._parent = 0
         self._lostMode = None
         self._lastSearch = u'', False
-        self._lastScrollPosition = 0
 
         self.actionDiffMode = QAction(qtlib.geticon('view-diff'),
                                       _('View change as unified diff output'),
                                       self)
         self.actionDiffMode.setCheckable(True)
+        self.actionDiffMode._mode = DiffMode
         self.actionFileMode = QAction(qtlib.geticon('view-file'),
                                       _('View change in context of file'),
                                       self)
         self.actionFileMode.setCheckable(True)
+        self.actionFileMode._mode = FileMode
         self.actionAnnMode = QAction(qtlib.geticon('view-annotate'),
-                                     _('View change in context, annotate with '
-                                       'revision number'),
+                                     _('annotate with revision numbers'),
                                      self)
         self.actionAnnMode.setCheckable(True)
+        self.actionAnnMode._mode = AnnMode
 
         self.modeToggleGroup = QActionGroup(self)
         self.modeToggleGroup.addAction(self.actionDiffMode)
@@ -168,8 +160,21 @@ class HgFileView(QFrame):
                                       'Previous diff (alt+up)', self)
         self.actionPrevDiff.setShortcut('Alt+Up')
         self.actionPrevDiff.triggered.connect(self.prevDiff)
+        self.setMode(self.actionDiffMode)
 
-        self.forceMode('diff')
+        self.actionFirstParent = QAction('1', self)
+        self.actionFirstParent.setCheckable(True)
+        self.actionFirstParent.setChecked(True)
+        self.actionFirstParent.setShortcut('CTRL+1')
+        self.actionFirstParent.setToolTip(_('Show changes from first parent'))
+        self.actionSecondParent = QAction('2', self)
+        self.actionSecondParent.setCheckable(True)
+        self.actionSecondParent.setShortcut('CTRL+2')
+        self.actionSecondParent.setToolTip(_('Show changes from second parent'))
+        self.parentToggleGroup = QActionGroup(self)
+        self.parentToggleGroup.addAction(self.actionFirstParent)
+        self.parentToggleGroup.addAction(self.actionSecondParent)
+        self.parentToggleGroup.triggered.connect(self.setParent)
 
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
@@ -182,6 +187,9 @@ class HgFileView(QFrame):
         self.actionShelf.triggered.connect(self.launchShelve)
 
         tb = self.diffToolbar
+        tb.addAction(self.actionFirstParent)
+        tb.addAction(self.actionSecondParent)
+        tb.addSeparator()
         tb.addAction(self.actionDiffMode)
         tb.addAction(self.actionFileMode)
         tb.addAction(self.actionAnnMode)
@@ -220,53 +228,73 @@ class HgFileView(QFrame):
     @pyqtSlot(QAction)
     def setMode(self, action):
         'One of the mode toolbar buttons has been toggled'
-
-        mode = {self.actionDiffMode.text():'diff',
-                self.actionFileMode.text():'file',
-                self.actionAnnMode.text() :'ann'}[action.text()]
-        self.actionNextDiff.setEnabled(mode == 'file')
-        self.actionPrevDiff.setEnabled(False)
-        self.blk.setVisible(mode == 'file')
-        self.sci.setAnnotationEnabled(mode == 'ann')
+        mode = action._mode
         if mode != self._mode:
             self._mode = mode
-            if not self._lostMode:
-                self.displayFile()
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
+            self.blk.setVisible(mode == FileMode)
+            self.sci.setAnnotationEnabled(mode == AnnMode)
+            self.displayFile(self._filename, self._status)
 
-    def forceMode(self, mode):
-        'Force into file or diff mode, based on content constaints'
-        assert mode in ('diff', 'file')
+    @pyqtSlot(QAction)
+    def setParent(self, action):
+        if action.text() == '1':
+            parent = 0
+        else:
+            parent = 1
+        if self._parent != parent:
+            self._parent = parent
+            self.displayFile(self._filename, self._status)
+
+    def restrictModes(self, candiff, canfile, canann):
+        'Disable modes based on content constraints'
+        self.actionDiffMode.setEnabled(candiff)
+        self.actionFileMode.setEnabled(canfile)
+        self.actionAnnMode.setEnabled(canann)
+
+        # Switch mode if necessary
+        mode = self._mode
+        if not candiff and mode == DiffMode and canfile:
+            mode = FileMode
+        if not canfile and mode != DiffMode:
+            mode = DiffMode
         if self._lostMode is None:
             self._lostMode = self._mode
-        self._mode = mode
-        if mode == 'diff':
-            self.actionDiffMode.setChecked(True)
-        else:
-            self.actionFileMode.setChecked(True)
-        self.actionDiffMode.setEnabled(False)
-        self.actionFileMode.setEnabled(False)
-        self.actionAnnMode.setEnabled(False)
-        self.actionNextDiff.setEnabled(False)
-        self.actionPrevDiff.setEnabled(False)
-        self.blk.setVisible(mode == 'file')
-        self.sci.setAnnotationEnabled(False)
+        if self._mode != mode:
+            self.actionNextDiff.setEnabled(False)
+            self.actionPrevDiff.setEnabled(False)
+            self.blk.setVisible(mode == FileMode)
+            self.sci.setAnnotationEnabled(mode == AnnMode)
+            self._mode = mode
 
-    def setContext(self, ctx):
+        if self._mode == DiffMode:
+            self.actionDiffMode.setChecked(True)
+        elif self._mode == FileMode:
+            self.actionFileMode.setChecked(True)
+        else:
+            self.actionAnnMode.setChecked(True)
+
+    def setContext(self, ctx, ctx2=None):
         self._ctx = ctx
-        self._p_rev = None
+        self._ctx2 = ctx2
         self.sci.setTabWidth(ctx._repo.tabwidth)
         self.actionAnnMode.setVisible(ctx.rev() != None)
         self.actionShelf.setVisible(ctx.rev() == None)
+        self.actionFirstParent.setVisible(len(ctx.parents()) == 2)
+        self.actionSecondParent.setVisible(len(ctx.parents()) == 2)
+        self.actionFirstParent.setEnabled(len(ctx.parents()) == 2)
+        self.actionSecondParent.setEnabled(len(ctx.parents()) == 2)
 
-    def displayDiff(self, rev):
-        if rev != self._p_rev:
-            self.displayFile(rev=rev)
+    def showLine(self, line):
+        if line < self.sci.lines():
+            self.sci.setCursorPosition(line, 0)
 
     @pyqtSlot()
     def clearDisplay(self):
         self._filename = None
-        self._lastScrollPosition = 0
-        self.forceMode('diff')
+        self.restrictModes(False, False, False)
+        self.sci.setMarginWidth(1, 0)
         self.clearMarkup()
 
     def clearMarkup(self):
@@ -277,33 +305,30 @@ class HgFileView(QFrame):
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
 
-    def displayFile(self, filename=None, rev=None, status=None):
-        # Get the last visible line to restore it after reloading the editor
-        self._lastScrollPosition = self.sci.firstVisibleLine()
-
-        if filename is None:
-            filename, status = self._filename, self._status
-        else:
-            if self._filename != filename:
-                # Reset the scroll positions when the file is changed
-                self._lastScrollPosition = 0
-            self._filename, self._status = filename, status
+    def displayFile(self, filename=None, status=None):
         if isinstance(filename, (unicode, QString)):
             filename = hglib.fromunicode(filename)
-        if rev is not None:
-            self._p_rev = rev
+            status = hglib.fromunicode(status)
+        if self._filename == filename:
+            # Get the last visible line to restore it after reloading the editor
+            lastScrollPosition = self.sci.firstVisibleLine()
+        else:
+            # Reset the scroll positions when the file is changed
+            lastScrollPosition = 0
+        self._filename, self._status = filename, status
 
         self.clearMarkup()
         if filename is None:
-            self.forceMode('file')
+            self.restrictModes(False, False, False)
             return
 
-        if self._p_rev is not None:
-            ctx2 = self.repo[self._p_rev]
+        if self._ctx2:
+            ctx2 = self._ctx2
+        elif self._parent == 0 or len(self._ctx.parents()) == 1:
+            ctx2 = self._ctx.p1()
         else:
-            ctx2 = None
-
-        fd = FileData(self._ctx, ctx2, filename, status)
+            ctx2 = self._ctx.p2()
+        fd = filedata.FileData(self._ctx, ctx2, filename, status)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -314,29 +339,32 @@ class HgFileView(QFrame):
 
         if not fd.isValid():
             self.sci.setText(fd.error)
-            self.forceMode('file')
+            self.restrictModes(False, False, False)
             return
 
-        if fd.diff and not fd.contents:
-            self.forceMode('diff')
-        elif fd.contents and not fd.diff:
-            self.forceMode('file')
-        elif not fd.contents and not fd.diff:
-            self.forceMode('file')
+        candiff = bool(fd.diff)
+        canfile = bool(fd.contents)
+        canann = canfile and type(self._ctx.rev()) is int
+
+        if not candiff or not canfile:
+            self.restrictModes(candiff, canfile, canann)
         else:
             self.actionDiffMode.setEnabled(True)
             self.actionFileMode.setEnabled(True)
             self.actionAnnMode.setEnabled(True)
             if self._lostMode:
-                if self._lostMode == 'diff':
+                self._mode = self._lostMode
+                if self._lostMode == DiffMode:
                     self.actionDiffMode.trigger()
-                elif self._lostMode == 'file':
+                elif self._lostMode == FileMode:
                     self.actionFileMode.trigger()
-                elif self._lostMode == 'ann':
+                elif self._lostMode == AnnMode:
                     self.actionAnnMode.trigger()
                 self._lostMode = None
+                self.blk.setVisible(self._mode == FileMode)
+                self.sci.setAnnotationEnabled(self._mode == AnnMode)
 
-        if self._mode == 'diff':
+        if self._mode == DiffMode:
             self.sci.setMarginWidth(1, 0)
             lexer = lexers.get_diff_lexer(self)
             self.sci.setLexer(lexer)
@@ -346,23 +374,17 @@ class HgFileView(QFrame):
             # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/thgrepo.py
             # --- a/tortoisehg/hgqt/thgrepo.py
             # +++ b/tortoisehg/hgqt/thgrepo.py
-            out = fd.diff.split('\n', 3)
-            if len(out) == 4:
-                self.sci.setText(hglib.tounicode(out[3]))
-            else:
-                # there was an error or rename without diffs
-                self.sci.setText(hglib.tounicode(fd.diff))
+            if fd.diff:
+                out = fd.diff.split('\n', 3)
+                if len(out) == 4:
+                    self.sci.setText(hglib.tounicode(out[3]))
+                else:
+                    # there was an error or rename without diffs
+                    self.sci.setText(hglib.tounicode(fd.diff))
         elif fd.contents is None:
             return
-        elif self._mode == 'ann':
+        elif self._mode == AnnMode:
             self.sci.setSource(filename, self._ctx.rev())
-
-            # Recover the last scroll position
-            # Make sure that _lastScrollPosition never exceeds the amount of
-            # lines on the editor
-            self._lastScrollPosition = min(self._lastScrollPosition, \
-                self.sci.lines() - 1)
-            self.sci.verticalScrollBar().setValue(self._lastScrollPosition)
         else:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
@@ -371,18 +393,17 @@ class HgFileView(QFrame):
             self.sci.setText(fd.contents)
             self.sci._updatemarginwidth()
 
-            # Recover the last scroll position
-            # Make sure that _lastScrollPosition never exceeds the amount of
-            # lines on the editor
-            self._lastScrollPosition = min(self._lastScrollPosition, \
-                self.sci.lines() - 1)
-            self.sci.verticalScrollBar().setValue(self._lastScrollPosition)
+        # Recover the last scroll position
+        # Make sure that lastScrollPosition never exceeds the amount of
+        # lines on the editor
+        lastScrollPosition = min(lastScrollPosition,  self.sci.lines() - 1)
+        self.sci.verticalScrollBar().setValue(lastScrollPosition)
 
         self.highlightText(*self._lastSearch)
         uf = hglib.tounicode(self._filename)
         self.fileDisplayed.emit(uf, fd.contents or QString())
 
-        if self._mode == 'file' and fd.contents and fd.olddata:
+        if self._mode == FileMode and fd.contents and fd.olddata:
             # Update blk margin
             if self.timer.isActive():
                 self.timer.stop()
@@ -415,7 +436,8 @@ class HgFileView(QFrame):
     @pyqtSlot(unicode, object)
     @pyqtSlot(unicode, object, int)
     def sourceChanged(self, path, rev, line=None):
-        self.revisionSelected.emit(rev)
+        if rev != self._ctx.rev() and type(rev) is int:
+            self.revisionSelected.emit(rev)
 
     @pyqtSlot(unicode, object, int)
     def editSelected(self, path, rev, line):
@@ -424,7 +446,7 @@ class HgFileView(QFrame):
         base = visdiff.snapshot(self.repo, [path], self.repo[rev])[0]
         files = [os.path.join(base, path)]
         pattern = hglib.fromunicode(self._lastSearch[0])
-        wctxactions.edit(self, self.repo.ui, self.repo, files, line, pattern)
+        qtlib.editfiles(self.repo, files, line, pattern, self)
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
@@ -480,7 +502,7 @@ class HgFileView(QFrame):
         self.blk.setUpdatesEnabled(True)
 
     def nextDiff(self):
-        if self._mode == 'diff' or not self._diffs:
+        if self._mode == DiffMode or not self._diffs:
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
             return
@@ -497,7 +519,7 @@ class HgFileView(QFrame):
         self.actionPrevDiff.setEnabled(True)
 
     def prevDiff(self):
-        if self._mode == 'diff' or not self._diffs:
+        if self._mode == DiffMode or not self._diffs:
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
             return
@@ -517,252 +539,334 @@ class HgFileView(QFrame):
         return len(self._diffs)
 
 
-class FileData(object):
-    def __init__(self, ctx, ctx2, wfile, status=None):
-        self.contents = None
-        self.error = None
-        self.olddata = None
-        self.diff = None
-        self.flabel = u''
-        self.elabel = u''
-        try:
-            self.readStatus(ctx, ctx2, wfile, status)
-        except (EnvironmentError, error.LookupError), e:
-            self.error = hglib.tounicode(str(e))
+class AnnotateView(qscilib.Scintilla):
+    'QScintilla widget capable of displaying annotations'
 
-    def checkMaxDiff(self, ctx, wfile):
-        p = _('File or diffs not displayed: ')
+    revisionHint = pyqtSignal(QString)
+
+    searchRequested = pyqtSignal(QString)
+    """Emitted (pattern) when user request to search content"""
+
+    editSelected = pyqtSignal(unicode, object, int)
+    """Emitted (path, rev, line) when user requests to open editor"""
+
+    grepRequested = pyqtSignal(QString, dict)
+    """Emitted (pattern, **opts) when user request to search changelog"""
+
+    sourceChanged = pyqtSignal(unicode, object)
+    """Emitted (path, rev) when the content source changed"""
+
+    def __init__(self, repo, parent=None, **opts):
+        super(AnnotateView, self).__init__(parent)
+        self.setReadOnly(True)
+        self.setMarginLineNumbers(1, True)
+        self.setMarginType(2, qsci.TextMarginRightJustified)
+        self.setMouseTracking(True)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menuRequest)
+
+        self.repo = repo
+        self.repo.configChanged.connect(self.configChanged)
+        self.configChanged()
+        self._rev = None
+        self.annfile = None
+        self._annotation_enabled = bool(opts.get('annotationEnabled', False))
+
+        self._links = []  # by line
+        self._revmarkers = {}  # by rev
+        self._lastrev = None
+
+        self._thread = AnnotateThread(self)
+        self._thread.finished.connect(self.fillModel)
+
+    def configChanged(self):
+        self.setIndentationWidth(self.repo.tabwidth)
+        self.setTabWidth(self.repo.tabwidth)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self._thread.abort()
+            return
+        return super(AnnotateView, self).keyPressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        self._emitRevisionHintAtLine(self.lineAt(event.pos()))
+        super(AnnotateView, self).mouseMoveEvent(event)
+
+    def _emitRevisionHintAtLine(self, line):
+        if line < 0:
+            return
         try:
-            fctx = ctx.filectx(wfile)
-            if ctx.rev() is None:
+            fctx = self._links[line][0]
+            if fctx.rev() != self._lastrev:
+                s = hglib.get_revision_desc(fctx,
+                                            hglib.fromunicode(self.annfile))
+                self.revisionHint.emit(s)
+                self._lastrev = fctx.rev()
+        except IndexError:
+            pass
+
+    @pyqtSlot(QPoint)
+    def menuRequest(self, point):
+        menu = self.createStandardContextMenu()
+        line = self.lineAt(point)
+        point = self.mapToGlobal(point)
+        if line < 0 or not self.isAnnotationEnabled():
+            return menu.exec_(point)
+
+        fctx, line = self._links[line]
+        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
+
+        if self.hasSelectedText():
+            selection = self.selectedText()
+            def sreq(**opts):
+                return lambda: self.grepRequested.emit(selection, opts)
+            def sann():
+                self.searchRequested.emit(selection)
+            menu.addSeparator()
+            for name, func in [(_('Search in original revision'),
+                                sreq(rev=fctx.rev())),
+                               (_('Search in working revision'),
+                                sreq(rev='.')),
+                               (_('Search in current annotation'), sann),
+                               (_('Search in history'), sreq(all=True))]:
+                def add(name, func):
+                    action = menu.addAction(name)
+                    action.triggered.connect(func)
+                add(name, func)
+
+        def annorig():
+            self.setSource(*data)
+        def editorig():
+            self.editSelected.emit(*data)
+        menu.addSeparator()
+        for name, func in [(_('Annotate originating revision'), annorig),
+                           (_('View originating revision'), editorig)]:
+            def add(name, func):
+                action = menu.addAction(name)
+                action.triggered.connect(func)
+            add(name, func)
+        for pfctx in fctx.parents():
+            pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
+                     line]
+            def annparent(data):
+                self.setSource(*data)
+            def editparent(data):
+                self.editSelected.emit(*data)
+            for name, func in [(_('Annotate parent revision %d') % pdata[1],
+                                  annparent),
+                               (_('View parent revision %d') % pdata[1],
+                                  editparent)]:
+                def add(name, func):
+                    action = menu.addAction(name)
+                    action.data = pdata
+                    action.run = lambda: func(action.data)
+                    action.triggered.connect(action.run)
+                add(name, func)
+        menu.exec_(point)
+
+    @property
+    def rev(self):
+        """Returns the current revision number"""
+        return self._rev
+
+    @pyqtSlot(unicode, object, int)
+    def setSource(self, wfile, rev, line=None):
+        """Change the content to the specified file at rev [unicode]
+
+        line is counted from 1.
+        """
+        if self.annfile == wfile and self.rev == rev:
+            if line:
+                self.setCursorPosition(int(line) - 1, 0)
+            return
+
+        try:
+            ctx = self.repo[rev]
+            fctx = ctx[hglib.fromunicode(wfile)]
+        except error.LookupError:
+            qtlib.ErrorMsgBox(_('Unable to annotate'),
+                    _('%s is not found in revision %d') % (wfile, ctx.rev()))
+            return
+
+        try:
+            if rev is None:
                 size = fctx.size()
             else:
-                # fctx.size() can read all data into memory in rename cases so
-                # we read the size directly from the filelog, this is deeper
-                # under the API than I prefer to go, but seems necessary
                 size = fctx._filelog.rawsize(fctx.filerev())
         except (EnvironmentError, error.LookupError), e:
+            self.setText(_('File or diffs not displayed: ') + \
+                    hglib.tounicode(str(e)))
             self.error = p + hglib.tounicode(str(e))
-            return None
+            return
+
         if size > ctx._repo.maxdiff:
-            self.error = p + _('File is larger than the specified max size.\n')
-            return None
-        try:
-            data = fctx.data()
-            if '\0' in data:
-                self.error = p + _('File is binary.\n')
-                return None
-        except EnvironmentError, e:
-            self.error = p + hglib.tounicode(str(e))
-            return None
-        return fctx, data
-
-    def isValid(self):
-        return self.error is None
-
-    def readStatus(self, ctx, ctx2, wfile, status):
-        def getstatus(repo, n1, n2, wfile):
-            m = match.exact(repo.root, repo.getcwd(), [wfile])
-            modified, added, removed = repo.status(n1, n2, match=m)[:3]
-            if wfile in modified:
-                return 'M'
-            if wfile in added:
-                return 'A'
-            if wfile in removed:
-                return 'R'
-            return None
-
-        repo = ctx._repo
-        self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
-
-        if isinstance(ctx, patchctx.patchctx):
-            self.diff = ctx.thgmqpatchdata(wfile)
-            flags = ctx.flags(wfile)
-            if flags in ('x', '-'):
-                lbl = _("exec mode has been <font color='red'>%s</font>")
-                change = (flags == 'x') and _('set') or _('unset')
-                self.elabel = lbl % change
-            elif flags == 'l':
-                self.flabel += _(' <i>(is a symlink)</i>')
-            return
-
-        absfile = repo.wjoin(wfile)
-        if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
-           os.path.islink(absfile):
-            if wfile in ctx:
-                data = ctx[wfile].data()
-            else:
-                data = os.readlink(absfile)
-            self.contents = hglib.tounicode(data)
-            self.flabel += _(' <i>(is a symlink)</i>')
-            return
-
-        if status is None:
-            status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)
-        if ctx2 is None:
-            ctx2 = ctx.p1()
-
-        if status == 'S':
-            try:
-                from mercurial import subrepo, commands
-
-                def genSubrepoRevChangedDescription(sfrom, sto):
-                    """Generate a subrepository revision change description"""
-                    out = []
-                    opts = {'date':None, 'user':None, 'rev':[sfrom]}
-                    if not sfrom:
-                        sstatedesc = 'new'
-                        out.append(_('Subrepo initialized to revision:') + u'\n\n')
-                    elif not sto:
-                        sstatedesc = 'removed'
-                        out.append(_('Subrepo removed from repository.') + u'\n\n')
-                        return out, sstatedesc
-                    else:
-                        sstatedesc = 'changed'
-                        out.append(_('Revision has changed from:') + u'\n\n')
-                        _ui.pushbuffer()
-                        commands.log(_ui, srepo, **opts)
-                        out.append(hglib.tounicode(_ui.popbuffer()))
-                        out.append(_('To:') + u'\n')
-                    opts['rev'] = [sto]
-                    _ui.pushbuffer()
-                    commands.log(_ui, srepo, **opts)
-                    stolog = _ui.popbuffer()
-                    if not stolog:
-                        stolog = _('Initial revision')
-                    out.append(hglib.tounicode(stolog))
-                    return out, sstatedesc
-
-                srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
-                try:
-                    sub = ctx.sub(wfile)
-                    if isinstance(sub, subrepo.hgsubrepo):
-                        srepo = sub._repo
-                        sactual = srepo['.'].hex()
-                    else:
-                        self.error = _('Not a Mercurial subrepo, not previewable')
-                        return
-                except (util.Abort), e:
-                    sub = ctx.p1().sub(wfile)
-                    srepo = sub._repo
-                    sactual = ''
-                out = []
-                _ui = uimod.ui()
-                _ui.pushbuffer()
-                commands.status(_ui, srepo)
-                data = _ui.popbuffer()
-                if data:
-                    out.append(_('File Status:') + u'\n')
-                    out.append(hglib.tounicode(data))
-                    out.append(u'\n')
-                sstatedesc = 'changed'
-                if ctx.rev() is not None:
-                    sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
-                    subrepochange, sstatedesc = genSubrepoRevChangedDescription(sparent, srev)
-                    out += subrepochange
-                else:
-                    sstatedesc = 'dirty'
-                    if srev != sactual:
-                        subrepochange, sstatedesc = \
-                            genSubrepoRevChangedDescription(srev, sactual)
-                        out += subrepochange
-                        if data:
-                            sstatedesc += ' and dirty'
-                self.contents = u''.join(out)
-                if not sactual:
-                    sstatedesc = 'removed'
-                lbl = {
-                    'changed':   _('(is a changed sub-repository)'),
-                    'dirty':   _('(is a dirty sub-repository)'),
-                    'new':   _('(is a new sub-repository)'),
-                    'removed':   _('(is a removed sub-repository)'),
-                    'changed and dirty':   _('(is a changed and dirty sub-repository)'),
-                    'new and dirty':   _('(is a new and dirty sub-repository)')
-                }[sstatedesc]
-                self.flabel += ' <i>' + lbl + '</i>'
-                if sactual:
-                    lbl = _(' <a href="subrepo:%s">open...</a>')
-                    self.flabel += lbl % hglib.tounicode(srepo.root)
-            except (EnvironmentError, error.RepoError, util.Abort), e:
-                self.error = _('Error previewing subrepo: %s') % \
-                        hglib.tounicode(str(e))
-            return
-
-        # TODO: elif check if a subdirectory (for manifest tool)
-
-        mde = _('File or diffs not displayed: ') + \
-              _('File is larger than the specified max size.\n')
-
-        if status in ('R', '!'):
-            if wfile in ctx.p1():
-                fctx = ctx.p1()[wfile]
-                if fctx._filelog.rawsize(fctx.filerev()) > ctx._repo.maxdiff:
-                    self.error = mde
-                else:
-                    olddata = fctx.data()
-                    if '\0' in olddata:
-                        self.error = 'binary file'
-                    else:
-                        self.contents = hglib.tounicode(olddata)
-                self.flabel += _(' <i>(was deleted)</i>')
-            else:
-                self.flabel += _(' <i>(was added, now missing)</i>')
-            return
-
-        if status in ('I', '?', 'C'):
-            if os.path.getsize(repo.wjoin(wfile)) > ctx._repo.maxdiff:
-                self.error = mde
-            else:
-                data = open(repo.wjoin(wfile), 'r').read()
-                if '\0' in data:
-                    self.error = 'binary file'
-                else:
-                    self.contents = hglib.tounicode(data)
-            if status in ('I', '?'):
-                self.flabel += _(' <i>(is unversioned)</i>')
-            return
-
-        if status in ('M', 'A'):
-            res = self.checkMaxDiff(ctx, wfile)
-            if res is None:
-                return
-            fctx, newdata = res
-            self.contents = hglib.tounicode(newdata)
-            change = None
-            for pfctx in fctx.parents():
-                if 'x' in fctx.flags() and 'x' not in pfctx.flags():
-                    change = _('set')
-                elif 'x' not in fctx.flags() and 'x' in pfctx.flags():
-                    change = _('unset')
-            if change:
-                lbl = _("exec mode has been <font color='red'>%s</font>")
-                self.elabel = lbl % change
-
-        if status == 'A':
-            renamed = fctx.renamed()
-            if not renamed:
-                self.flabel += _(' <i>(was added)</i>')
-                return
-
-            oldname, node = renamed
-            fr = hglib.tounicode(oldname)
-            self.flabel += _(' <i>(renamed from %s)</i>') % fr
-            olddata = repo.filectx(oldname, fileid=node).data()
-        elif status == 'M':
-            if wfile not in ctx2:
-                # merge situation where file was added in other branch
-                self.flabel += _(' <i>(was added)</i>')
-                return
-            oldname = wfile
-            olddata = ctx2[wfile].data()
+            self.setText(_('File or diffs not displayed: ') + \
+                    _('File is larger than the specified max size.\n'))
         else:
+            self._rev = ctx.rev()
+            self.clear()
+            self.annfile = wfile
+            if util.binary(fctx.data()):
+                self.setText(_('File is binary.\n'))
+            else:
+                self.setText(hglib.tounicode(fctx.data()))
+            if line:
+                self.setCursorPosition(int(line) - 1, 0)
+            self._updatelexer(fctx)
+            self._updatemarginwidth()
+            self.sourceChanged.emit(wfile, self._rev)
+            self._updateannotation()
+
+    def _updateannotation(self):
+        if not self.isAnnotationEnabled() or not self.annfile:
+            return
+        ctx = self.repo[self._rev]
+        fctx = ctx[hglib.fromunicode(self.annfile)]
+        if util.binary(fctx.data()):
+            return
+        self._thread.abort()
+        self._thread.start(fctx)
+
+    @pyqtSlot()
+    def fillModel(self):
+        self._thread.wait()
+        if self._thread.data is None:
             return
 
-        self.olddata = hglib.tounicode(olddata)
-        newdate = util.datestr(ctx.date())
-        olddate = util.datestr(ctx2.date())
-        revs = [str(ctx), str(ctx2)]
-        diffopts = patch.diffopts(repo.ui, {})
-        diffopts.git = False
-        self.diff = mdiff.unidiff(olddata, olddate, newdata, newdate,
-                                  oldname, wfile, revs, diffopts)
+        self._links = list(self._thread.data)
+
+        self._updaterevmargin()
+        self._updatemarkers()
+        self._updatemarginwidth()
+
+    def clear(self):
+        super(AnnotateView, self).clear()
+        self.clearMarginText()
+        self.markerDeleteAll()
+        self.annfile = None
+
+    @pyqtSlot(bool)
+    def setAnnotationEnabled(self, enabled):
+        """Enable / disable annotation"""
+        enabled = bool(enabled)
+        if enabled == self.isAnnotationEnabled():
+            return
+        self._annotation_enabled = enabled
+        self._updateannotation()
+        self._updatemarginwidth()
+        self.setMouseTracking(enabled)
+        if not self.isAnnotationEnabled():
+            self.annfile = None
+            self.markerDeleteAll()
+
+    def isAnnotationEnabled(self):
+        """True if annotation enabled and available"""
+        if self.rev is None:
+            return False  # annotate working copy is not supported
+        return self._annotation_enabled
+
+    def _updatelexer(self, fctx):
+        """Update the lexer according to the given file"""
+        lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()), self)
+        self.setLexer(lex)
+        if lex is None:
+            self.setFont(qtlib.getfont('fontlog').font())
+
+    def _updaterevmargin(self):
+        """Update the content of margin area showing revisions"""
+        s = self._margin_style
+        # Workaround to set style of the current sci widget.
+        # QsciStyle sends style data only to the first sci widget.
+        # See qscintilla2/Qt4/qscistyle.cpp
+        self.SendScintilla(qsci.SCI_STYLESETBACK,
+                           s.style(), s.paper())
+        self.SendScintilla(qsci.SCI_STYLESETFONT,
+                           s.style(), s.font().family().toAscii().data())
+        self.SendScintilla(qsci.SCI_STYLESETSIZE,
+                           s.style(), s.font().pointSize())
+        for i, (fctx, _origline) in enumerate(self._links):
+            self.setMarginText(i, str(fctx.rev()), s)
+
+    def _updatemarkers(self):
+        """Update markers which colorizes each line"""
+        self._redefinemarkers()
+        for i, (fctx, _origline) in enumerate(self._links):
+            m = self._revmarkers.get(fctx.rev())
+            if m is not None:
+                self.markerAdd(i, m)
+
+    def _redefinemarkers(self):
+        """Redefine line markers according to the current revs"""
+        curdate = self.repo[self._rev].date()[0]
+
+        # make sure to colorize at least 1 year
+        mindate = curdate - 365 * 24 * 60 * 60
+
+        self._revmarkers.clear()
+        filectxs = iter(fctx for fctx, _origline in self._links)
+        palette = colormap.makeannotatepalette(filectxs, curdate,
+                                               maxcolors=32, maxhues=8,
+                                               maxsaturations=16,
+                                               mindate=mindate)
+        for i, (color, fctxs) in enumerate(palette.iteritems()):
+            self.markerDefine(qsci.Background, i)
+            self.setMarkerBackgroundColor(QColor(color), i)
+            for fctx in fctxs:
+                self._revmarkers[fctx.rev()] = i
+
+    @util.propertycache
+    def _margin_style(self):
+        """Style for margin area"""
+        s = Qsci.QsciStyle()
+        s.setPaper(QApplication.palette().color(QPalette.Window))
+        s.setFont(self.font())
+        return s
+
+    @pyqtSlot()
+    def _updatemarginwidth(self):
+        self.setMarginsFont(self.font())
+        def lentext(s):
+            return 'M' * (len(str(s)) + 2)  # 2 for margin
+        self.setMarginWidth(1, lentext(self.lines()))
+        if self.isAnnotationEnabled() and self._links:
+            maxrev = max(fctx.rev() for fctx, _origline in self._links)
+            self.setMarginWidth(2, lentext(maxrev))
+        else:
+            self.setMarginWidth(2, 0)
+
+class AnnotateThread(QThread):
+    'Background thread for annotating a file at a revision'
+    def __init__(self, parent=None):
+        super(AnnotateThread, self).__init__(parent)
+        self._threadid = None
+
+    @pyqtSlot(object)
+    def start(self, fctx):
+        self._fctx = fctx
+        super(AnnotateThread, self).start()
+        self.data = None
+
+    @pyqtSlot()
+    def abort(self):
+        if self._threadid is None:
+            return
+        try:
+            thread2._async_raise(self._threadid, KeyboardInterrupt)
+            self.wait()
+        except ValueError:
+            pass
+
+    def run(self):
+        assert self.currentThread() != qApp.thread()
+        self._threadid = self.currentThreadId()
+        try:
+            data = []
+            for (fctx, line), _text in self._fctx.annotate(True, True):
+                data.append((fctx, line))
+            self.data = data
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self._threadid = None
+            del self._fctx
