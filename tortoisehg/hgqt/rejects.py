@@ -95,6 +95,7 @@ class RejectsDialog(QDialog):
         f.open(QIODevice.ReadOnly)
         editor.read(f)
         editor.setModified(False)
+        f.seek(0)
         lexer = lexers.get_lexer(path, f.readData(1024), self)
         editor.setLexer(lexer)
         editor.setMarginLineNumbers(1, True)
@@ -103,7 +104,7 @@ class RejectsDialog(QDialog):
         buf = cStringIO.StringIO()
         try:
             buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % path)
-            buf.write(open(path + '.rej', 'r').read())
+            buf.write(open(path + '.rej', 'rb').read())
             buf.seek(0)
         except IOError, e:
             pass
@@ -163,7 +164,7 @@ class RejectsDialog(QDialog):
         buf = cStringIO.StringIO()
         chunk = self.chunks[row]
         chunk.write(buf)
-        self.rejectbrowser.showChunk(buf.getvalue().splitlines()[1:])
+        self.rejectbrowser.showChunk(buf.getvalue().splitlines(True)[1:])
         self.editor.setCursorPosition(chunk.fromline-1, 0)
         self.editor.ensureLineVisible(chunk.fromline-1)
         self.editor.markerDeleteAll(-1)
@@ -253,7 +254,7 @@ class RejectBrowser(qscilib.Scintilla):
             elif line[0] == '-':
                 removed.append(i)
         self.markerDeleteAll(-1)
-        self.setText(u'\n'.join(utext))
+        self.setText(u''.join(utext))
         for i in added:
             self.markerAdd(i, self.addedMark)
             self.markerAdd(i, self.addedColor)
