@@ -9,7 +9,7 @@ import os
 import stat
 import shutil
 
-from mercurial import cmdutil
+from mercurial import cmdutil, hg, ui
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -137,10 +137,10 @@ class PurgeDialog(QDialog):
         unknown = self.ucb.isChecked()
         ignored = self.icb.isChecked()
         trash = self.tcb.isChecked()
-        delf = self.foldercb.isChecked()
-        keep = self.hgfilecb.isChecked()
+        delfolders = self.foldercb.isChecked()
+        keephg = self.hgfilecb.isChecked()
 
-        if not (unknown or ignored or trash or delf):
+        if not (unknown or ignored or trash or delfolders):
             QDialog.accept(self)
             return
         if not qtlib.QuestionMsgBox(_('Confirm file deletions'),
@@ -153,9 +153,13 @@ class PurgeDialog(QDialog):
                 qtlib.InfoMsgBox(_('Deletion failures'),
                     _('Unable to delete %d files or folders') %
                                  len(self.th.failures), parent=self)
-            self.reject()
+            if self.th.failures is not None:
+                self.reject()
 
-        self.th = PurgeThread(self.repo, ignored, unknown, trash, delf, keep, self)
+        opts = dict(unknown=unknown, ignored=ignored, trash=trash,
+                    delfolders=delfolders, keephg=keephg)
+
+        self.th = PurgeThread(self.repo, opts, self)
         self.th.progress.connect(self.progress)
         self.th.showMessage.connect(self.showMessage)
         self.th.finished.connect(completed)
@@ -165,27 +169,28 @@ class PurgeThread(QThread):
     progress = pyqtSignal(QString, object, QString, QString, object)
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, ignored, unknown, trash, delf, keephg, parent):
+    def __init__(self, repo, opts, parent):
         super(PurgeThread, self).__init__(parent)
         self.failures = 0
-        self.repo = repo
-        self.ignored = ignored
-        self.unknown = unknown
-        self.trash = trash
-        self.delfolders = delf
-        self.keephg = keephg
+        self.root = repo.root
+        self.opts = opts
 
     def run(self):
-        self.failures = self.purge(self.repo, self.ignored, self.unknown,
-                                   self.trash, self.delfolders, self.keephg)
+        try:
+            self.failures = self.purge(self.root, self.opts)
+        except Exception, e:
+            self.failures = None
+            self.showMessage.emit(hglib.tounicode(str(e)))
 
-    def purge(self, repo, ignored, unknown, trash, delfolders, keephg):
+    def purge(self, root, opts):
+        repo = hg.repository(ui.ui(), self.root)
+        keephg = opts['keephg']
         directories = []
         failures = []
 
-        if trash:
+        if opts['trash']:
             self.showMessage.emit(_('Deleting trash folder...'))
-            trashcan = self.repo.join('Trashcan')
+            trashcan = repo.join('Trashcan')
             try:
                 shutil.rmtree(trashcan)
             except EnvironmentError:
@@ -194,7 +199,8 @@ class PurgeThread(QThread):
         self.showMessage.emit('')
         match = cmdutil.match(repo, [], {})
         match.dir = directories.append
-        status = repo.status(match=match, ignored=ignored, unknown=unknown)
+        status = repo.status(match=match, ignored=opts['ignored'],
+                             unknown=opts['unknown'], clean=False)
         files = status[4] + status[5]
 
         def remove(remove_func, name):
@@ -224,7 +230,7 @@ class PurgeThread(QThread):
         self.progress.emit(*data)
         self.showMessage.emit(_('Deleted %d files') % len(files))
 
-        if delfolders:
+        if opts['delfolders']:
             for i, f in enumerate(sorted(directories, reverse=True)):
                 if not os.listdir(repo.wjoin(f)):
                     data = ('rmdir', i, f, '', len(directories))
