@@ -84,9 +84,13 @@ class HgRepoView(QTableView):
         self._in_history = False
         model.layoutChanged.connect(self.resetDelegate)
 
-    def resetBrowseHistory(self, revs, rev_pos=0):
-        self._rev_history = revs[:]
-        self._rev_pos = rev_pos-1
+    def resetBrowseHistory(self, revs, reselrev=None):
+        graph = self.model().graph
+        self._rev_history = [r for r in revs if r in graph.nodesdict]
+        if reselrev is not None and reselrev in self._rev_history:
+            self._rev_pos = self._rev_history.index(reselrev)
+        else:
+            self._rev_pos = -1
         self.forward()
 
     def resetDelegate(self):

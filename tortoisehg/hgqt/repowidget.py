@@ -363,11 +363,7 @@ class RepoWidget(QWidget):
         if self.revset:
             self.repomodel.filterbyrevset = checked
             self.reload()
-            if self.rev in self.revset:
-                pos = self.revset.index(self.rev)
-            else:
-                pos = 0
-            self.repoview.resetBrowseHistory(self.revset, pos)
+            self.repoview.resetBrowseHistory(self.revset, self.rev)
 
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
@@ -752,6 +748,8 @@ class RepoWidget(QWidget):
         self.branch = branch
         self.repomodel.setBranch(branch=branch, allparents=allparents)
         self.titleChanged.emit(self.title())
+        if self.revset:
+            self.repoview.resetBrowseHistory(self.revset, self.rev)
 
     ##
     ## Workbench methods
