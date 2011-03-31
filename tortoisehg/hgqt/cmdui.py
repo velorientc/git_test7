@@ -473,8 +473,8 @@ class ConsoleWidget(QWidget):
     """Console to run hg/thg command and show output"""
     closeRequested = pyqtSignal()
 
-    progressReceived = pyqtSignal(unicode, object, unicode, unicode,
-                                  object, unicode)
+    progressReceived = pyqtSignal(QString, object, QString, QString,
+                                  object, object)
     """Emitted when progress received
 
     Args: topic, pos, item, unit, total, reporoot
