@@ -15,8 +15,8 @@ from hgext import record
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, wctxactions
-from tortoisehg.hgqt import filelistmodel, filelistview, fileview
+from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers
+from tortoisehg.hgqt import filelistmodel, filelistview, filedata
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -71,7 +71,7 @@ class ChunksWidget(QWidget):
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.diffbrowse.chunksSelected.connect(self.chunksSelected)
 
-        self.filelist.fileRevSelected.connect(self.displayFile)
+        self.filelist.fileSelected.connect(self.displayFile)
         self.filelist.clearDisplay.connect(self.diffbrowse.clearDisplay)
 
         self.splitter.setStretchFactor(0, 0)
@@ -146,8 +146,8 @@ class ChunksWidget(QWidget):
         if isinstance(ctx, patchctx):
             path = ctx._path
         else:
-            path = self.repo.wjoin(self.currentFile)
-        wctxactions.edit(self, self.repo.ui, self.repo, [path])
+            path = self.currentFile
+        qtlib.editfiles(self.repo, [path], parent=self)
 
     def getSelectedFileAndChunks(self):
         chunks = self.diffbrowse.curchunks
@@ -347,8 +347,11 @@ class ChunksWidget(QWidget):
             else:
                 return []
 
-    @pyqtSlot(object, object, object)
-    def displayFile(self, file, rev, status):
+    @pyqtSlot(QString, QString)
+    def displayFile(self, file, status):
+        if isinstance(file, (unicode, QString)):
+            file = hglib.fromunicode(file)
+            status = hglib.fromunicode(status)
         if file:
             self.currentFile = file
             path = self.repo.wjoin(file)
@@ -578,7 +581,7 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = fileview.FileData(self._ctx, None, filename, status)
+        fd = filedata.FileData(self._ctx, None, filename, status)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
