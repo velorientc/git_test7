@@ -13,7 +13,7 @@ from PyQt4.QtGui import *
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, qtlib
 
 class QRenameDialog(QDialog):
 
@@ -56,9 +56,113 @@ class QRenameDialog(QDialog):
     def accept(self):
         self.newpatchname = hglib.fromunicode(self.le.text())
         if self.newpatchname != self.oldpatchname:
+            res = checkPatchname(self.repo.root, self.repo.thgactivemqname,
+                                    self.newpatchname, self)
+            if not res:
+                return
             cmdline = ['qrename', '--repository', self.repo.root, '--',
                        self.oldpatchname, self.newpatchname]
             self.cmd.run(cmdline)
         else:
             self.close()
 
+def checkPatchname(reporoot, activequeue, newpatchname, parent):
+    if activequeue == 'patches':
+        pn = 'patches'
+    else:
+        pn = 'patches-%s' % activequeue
+    patchfile = os.sep.join([reporoot, ".hg", pn, newpatchname])
+    if os.path.exists(patchfile):
+        dlg = CheckPatchnameDialog(newpatchname, parent)
+        choice = dlg.exec_()
+        if choice == 1:
+            # add .OLD to existing patchfile
+            try:
+                os.rename(patchfile, patchfile + '.OLD')
+            except (OSError, IOError), inst:
+                qtlib.ErrorMsgBox(self.errTitle,
+                        _('Could not rename existing patchfile'),
+                        hglib.tounicode(str(inst)))
+                return False
+            return True
+        elif choice == 2:
+            # overwite existing patchfile
+            try:
+                os.remove(patchfile)
+            except (OSError, IOError), inst:
+                qtlib.ErrorMsgBox(self.errTitle,
+                        _('Could not delete existing patchfile'),
+                        hglib.tounicode(str(inst)))
+                return False
+            return True
+        elif choice == 3:
+            # go back and change the new name
+            return False
+        else:
+            return False
+    else:
+        return True
+
+class CheckPatchnameDialog(QDialog):
+
+    def __init__(self, patchname, parent):
+        super(CheckPatchnameDialog, self).__init__(parent)
+        self.setWindowTitle(_('QRename - Check patchname'))
+
+        f = self.windowFlags()
+        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.patchname = patchname
+
+        self.vbox = QVBoxLayout()
+        self.vbox.setSpacing(4)
+
+        lbl = QLabel(_('Patch name <b>%s</b> already exists:')
+                        % (self.patchname))
+        self.vbox.addWidget(lbl)
+
+        self.extensionradio = \
+                QRadioButton(_('Add .OLD extension to existing patchfile'))
+        self.vbox.addWidget(self.extensionradio)
+        self.overwriteradio = QRadioButton(_('Overwrite existing patchfile'))
+        self.vbox.addWidget(self.overwriteradio)
+        self.backradio = QRadioButton(_('Go back and change new patchname'))
+        self.vbox.addWidget(self.backradio)
+
+        self.extensionradio.toggled.connect(self.onExtensionRadioChecked)
+        self.overwriteradio.toggled.connect(self.onOverwriteRadioChecked)
+        self.backradio.toggled.connect(self.onBackRadioChecked)
+
+        self.choice = 0
+        self.extensionradio.setChecked(True)
+        self.extensionradio.setFocus()
+
+        self.setLayout(self.vbox)
+
+        BB = QDialogButtonBox
+        bbox = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bbox.accepted.connect(self.accept)
+        bbox.rejected.connect(self.reject)
+        self.layout().addWidget(bbox)
+        self.bbox = bbox
+
+    @pyqtSlot()
+    def onExtensionRadioChecked(self):
+        if self.extensionradio.isChecked():
+            self.choice = 1
+
+    @pyqtSlot()
+    def onOverwriteRadioChecked(self):
+        if self.overwriteradio.isChecked():
+            self.choice = 2
+
+    @pyqtSlot()
+    def onBackRadioChecked(self):
+        if self.backradio.isChecked():
+            self.choice = 3
+
+    def accept(self):
+        self.done(self.choice)
+        self.close()
+
+    def reject(self):
+        self.done(0)

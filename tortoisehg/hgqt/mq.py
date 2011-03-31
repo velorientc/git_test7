@@ -415,10 +415,20 @@ class MQWidget(QWidget):
         'Patch has been renamed, issue qrename'
         if self.cmd.running():
             return
+        from tortoisehg.hgqt import qrename
+        newpatchname = hglib.fromunicode(item.text())
+        if newpatchname == item._thgpatch:
+            return
+        else:
+            res = qrename.checkPatchname(self.repo.root,
+                        self.repo.thgactivemqname, newpatchname, self)
+            if not res:
+                item.setText(item._thgpatch)
+                return
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
         self.cmd.run(['qrename', '-R', self.repo.root, '--',
-                      item._thgpatch, hglib.fromunicode(item.text())])
+                      item._thgpatch, newpatchname])
 
     @pyqtSlot(int)
     def onPatchSelected(self, row):
