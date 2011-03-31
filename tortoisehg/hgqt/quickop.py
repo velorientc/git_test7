@@ -8,13 +8,14 @@
 import os
 import sys
 
+from mercurial import util
+
+from tortoisehg.util import hglib, shlib
+from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib, status, cmdui
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, shlib
-
-from tortoisehg.hgqt import qtlib, status, cmdui
 
 LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
            'forget': (_('Checkmark files to forget'), _('Forget')),
@@ -128,15 +129,26 @@ class QuickOpDialog(QDialog):
         if hasattr(self, 'chk') and self.chk.isChecked():
             cmdline.append('--no-backup')
         files = self.stwidget.getChecked()
-        if files:
-            cmdline.extend(files)
-        else:
+        if not files:
             qtlib.WarningMsgBox(_('No files selected'),
                                 _('No operation to perform'),
                                 parent=self)
             return
-        self.files = files
-        self.cmd.run(cmdline)
+        if self.command == 'remove':
+            wctx = self.repo[None]
+            for wfile in files:
+                if wfile not in wctx:
+                    try:
+                        util.unlink(wfile)
+                    except EnvironmentError:
+                        pass
+                    files.remove(wfile)
+        if files:
+            cmdline.extend(files)
+            self.files = files
+            self.cmd.run(cmdline)
+        else:
+            self.reject()
 
     def reject(self):
         if self.cmd.core.running():
