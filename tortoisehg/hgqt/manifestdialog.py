@@ -18,8 +18,8 @@ from PyQt4.QtGui import *
 from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, annotate, status, thgrepo
-from tortoisehg.hgqt import visdiff, wctxactions, revert
+from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
+from tortoisehg.hgqt import visdiff, revert
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -39,19 +39,12 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget = ManifestWidget(repo, rev)
         self._manifest_widget.revChanged.connect(self._updatewindowtitle)
         self._manifest_widget.pathChanged.connect(self._updatewindowtitle)
-        self._manifest_widget.editSelected.connect(self._openInEditor)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
 
-        self._searchbar = qscilib.SearchToolBar()
-        connectsearchbar(self._manifest_widget, self._searchbar)
-        self.addToolBar(self._searchbar)
-        QShortcut(QKeySequence.Find, self,
-            lambda: self._searchbar.setFocus(Qt.OtherFocusReason))
-
         self.setStatusBar(QStatusBar())
-        self._manifest_widget.revisionHint.connect(self.statusBar().showMessage)
+        self._manifest_widget.showMessage.connect(self.statusBar().showMessage)
 
         self._readsettings()
         self._updatewindowtitle()
@@ -81,7 +74,7 @@ class ManifestDialog(QMainWindow):
 
     def setSearchPattern(self, text):
         """Set search pattern [unicode]"""
-        self._searchbar.setPattern(text)
+        self._manifest_widget._fileview.searchbar.setPattern(text)
 
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
@@ -93,7 +86,7 @@ class ManifestDialog(QMainWindow):
     def _openInEditor(self, path, rev, line):
         """Open editor to show the specified file"""
         _openineditor(self._repo, path, rev, line,
-                      pattern=self._searchbar.pattern(), parent=self)
+                      pattern=self._fileview.searchbar.pattern(), parent=self)
 
 class ManifestWidget(QWidget):
     """Display file tree and contents at the specified revision"""
@@ -104,14 +97,11 @@ class ManifestWidget(QWidget):
     pathChanged = pyqtSignal(unicode)
     """Emitted (path) when the current file path changed"""
 
-    revisionHint = pyqtSignal(unicode)
+    showMessage = pyqtSignal(unicode)
     """Emitted when to show revision summary as a hint"""
 
     searchRequested = pyqtSignal(unicode)
     """Emitted (pattern) when user request to search content"""
-
-    editSelected = pyqtSignal(unicode, object, int)
-    """Emitted (path, rev, line) when user requests to open editor"""
 
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
@@ -150,19 +140,14 @@ class ManifestWidget(QWidget):
         navlayoutw = QWidget()
         navlayoutw.setLayout(navlayout)
 
-        self._contentview = QStackedWidget()
         self._splitter.addWidget(navlayoutw)
-        self._splitter.addWidget(self._contentview)
         self._splitter.setStretchFactor(0, 1)
-        self._splitter.setStretchFactor(1, 3)
 
-        self._nullcontent = QWidget()
-        self._contentview.addWidget(self._nullcontent)
-        self._fileview = annotate.AnnotateView(self._repo)
-        self._fileview.sourceChanged.connect(self.setSource)
-        self._contentview.addWidget(self._fileview)
-        for name in ('revisionHint', 'searchRequested', 'editSelected',
-                     'grepRequested'):
+        self._fileview = fileview.HgFileView(self._repo, self)
+        self._splitter.addWidget(self._fileview)
+        self._splitter.setStretchFactor(1, 3)
+        self._fileview.revisionSelected.connect(self.setRev)
+        for name in ('showMessage', 'searchRequested', 'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
 
     def loadSettings(self, qs, prefix):
@@ -179,18 +164,6 @@ class ManifestWidget(QWidget):
         self._statusfilter = status.StatusFilterButton(
           statustext='MAC', text=_('Status'))
         self._toolbar.addWidget(self._statusfilter)
-
-        self._action_annotate_mode = QAction(_('Annotate'), self, checkable=True)
-        self._action_annotate_mode.toggled.connect(
-            self._fileview.setAnnotationEnabled)
-        self._action_annotate_mode.setEnabled(self.rev is not None)
-        self._toolbar.addAction(self._action_annotate_mode)
-
-        if hasattr(self, '_searchbar'):
-            self._action_find = self._searchbar.toggleViewAction()
-            self._action_find.setIcon(qtlib.geticon('edit-find'))
-            self._action_find.setShortcut(QKeySequence.Find)
-            self._toolbar.addAction(self._action_find)
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
@@ -252,19 +225,17 @@ class ManifestWidget(QWidget):
         if self.path is None:
             return
         if self.rev is None:
-            files = [self._repo.wjoin(self.path)]
-            wctxactions.edit(self, self._repo.ui, self._repo, files)
+            qtlib.editfiles(self._repo, [self.path], parent=self)
         else:
             base, _ = visdiff.snapshot(self._repo, [self.path],
                                        self._repo[self.rev])
             files = [os.path.join(base, self.path)]
-            wctxactions.edit(self, self._repo.ui, self._repo, files)
+            qtlib.editfiles(self._repo, files, parent=self)
 
     def editlocal(self):
         if self.path is None:
             return
-        path = self._repo.wjoin(self.path)
-        wctxactions.edit(self, self._repo.ui, self._repo, [path])
+        qtlib.editfiles(self._repo, [self.path], parent=self)
 
     def revertfile(self):
         if self.path is None:
@@ -357,6 +328,7 @@ class ManifestWidget(QWidget):
         """Return current revision"""
         return self._rev
 
+    @pyqtSlot(int)
     @pyqtSlot(object)
     def setRev(self, rev):
         """Change revision to show"""
@@ -371,22 +343,30 @@ class ManifestWidget(QWidget):
     @pyqtSlot(unicode, object, int)
     def setSource(self, path, rev, line=None):
         """Change path and revision to show at once"""
-        revchanged = self._rev != rev
-        if revchanged:
+        if self._rev != rev:
             self._rev = rev
             self._setupmodel()
-        self.setPath(path)
-        if self.path in self._repo[rev]:
-            self._fileview.setSource(path, rev, line)
-        if revchanged:
-            # annotate working copy is not supported
-            self._action_annotate_mode.setEnabled(rev is not None)
             self.revChanged.emit(rev)
+        elif path != self.path:
+            self.setPath(path)
+            ctx = self._repo[rev]
+            if self.path in ctx:
+                self._fileview.setContext(ctx)
+                self._fileview.displayFile(path, self.status)
+                if line:
+                    self._fileview.showLine(int(line) - 1)
+            else:
+                self._fileview.clearDisplay()
 
     @property
     def path(self):
         """Return currently selected path"""
         return self._treemodel.filePath(self._treeview.currentIndex())
+
+    @property
+    def status(self):
+        """Return currently selected path"""
+        return self._treemodel.fileStatus(self._treeview.currentIndex())
 
     @pyqtSlot(unicode)
     def setPath(self, path):
@@ -395,37 +375,12 @@ class ManifestWidget(QWidget):
 
     @pyqtSlot()
     def _updatecontent(self):
-        if hglib.fromunicode(self.path) not in self._repo[self._rev]:
-            self._contentview.setCurrentWidget(self._nullcontent)
-            return
-
-        self._contentview.setCurrentWidget(self._fileview)
-        self._fileview.setSource(self.path, self._rev)
+        self._fileview.setContext(self._repo[self._rev])
+        self._fileview.displayFile(self.path, self.status)
 
     @pyqtSlot()
     def _emitPathChanged(self):
         self.pathChanged.emit(self.path)
-
-class ManifestTaskWidget(ManifestWidget):
-    """Manifest widget designed for task tab"""
-
-    def __init__(self, repo, rev, parent):
-        super(ManifestTaskWidget, self).__init__(repo, rev, parent)
-        self.editSelected.connect(self._openInEditor)
-
-    @util.propertycache
-    def _searchbar(self):
-        searchbar = qscilib.SearchToolBar(hidable=True)
-        searchbar.hide()
-        self.layout().addWidget(searchbar)
-        connectsearchbar(self, searchbar)
-        return searchbar
-
-    @pyqtSlot(unicode, object, int)
-    def _openInEditor(self, path, rev, line):
-        """Open editor to show the specified file"""
-        _openineditor(self._repo, path, rev, line,
-                      pattern=self._searchbar.pattern(), parent=self)
 
 def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
@@ -439,7 +394,7 @@ def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
     pattern = hglib.fromunicode(pattern)
     base = visdiff.snapshot(repo, [path], repo[rev])[0]
     files = [os.path.join(base, path)]
-    wctxactions.edit(parent, repo.ui, repo, files, line, pattern)
+    qtlib.editfiles(repo, files, line, pattern, parent=self)
 
 
 def run(ui, *pats, **opts):
@@ -449,9 +404,18 @@ def run(ui, *pats, **opts):
     # set initial state after dialog visible
     def init():
         try:
-            path = hglib.canonpaths(pats)[0]
+            if pats:
+                path = hglib.canonpaths(pats)[0]
+            elif 'canonpath' in opts:
+                path = opts['canonpath']
+            else:
+                return
             line = opts.get('line') and int(opts['line']) or None
             dlg.setSource(path, opts.get('rev'), line)
+            if opts.get('pattern'):
+                dlg.setSearchPattern(opts['pattern'])
+            if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
+                dlg._manifest_widget._fileview.actionAnnMode.trigger()
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
