@@ -365,6 +365,12 @@ class StatusThread(QThread):
         patchecked = {}
         try:
             if self.pats:
+                if self.opts.get('checkall'):
+                    # quickop sets this flag to pre-check even !?IC files
+                    precheckfn = lambda x: True
+                else:
+                    # status and commit only pre-check MAR files
+                    precheckfn = lambda x: x < 4
                 m = cmdutil.match(self.repo, self.pats)
                 status = self.repo.status(match=m, **stopts)
                 # Record all matched files as initially checked
@@ -373,7 +379,7 @@ class StatusThread(QThread):
                         continue
                     val = statusTypes[stat]
                     if self.opts[val.name]:
-                        d = dict([(fn, True) for fn in status[i]])
+                        d = dict([(fn, precheckfn(i)) for fn in status[i]])
                         patchecked.update(d)
                 wctx = context.workingctx(self.repo, changes=status)
                 self.patchecked = patchecked

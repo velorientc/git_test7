@@ -68,6 +68,7 @@ class QuickOpDialog(QDialog):
         for s, val in status.statusTypes.iteritems():
             opts[val.name] = s in filetypes
 
+        opts['checkall'] = True # pre-check all matching files
         stwidget = status.StatusWidget(pats, opts, repo.root, self)
         layout.addWidget(stwidget, 1)
 
