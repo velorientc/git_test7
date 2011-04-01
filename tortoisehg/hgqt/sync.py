@@ -23,6 +23,13 @@ from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
 
 _schemes = ['local', 'ssh', 'http', 'https']
 
+try:
+    # hg <= 1.8
+    from mercurial.hg import localpath
+except AttributeError:
+    # hg >= 1.9
+    from mercurial.url import localpath
+
 def parseurl(path):
     if path.startswith('ssh://'):
         scheme = 'ssh'
@@ -351,7 +358,7 @@ class SyncWidget(QWidget):
         known.add(os.path.abspath(self.repo.root).lower())
         for path in self.paths.values():
             if hg.islocal(path):
-                known.add(os.path.abspath(hg.localpath(path)).lower())
+                known.add(os.path.abspath(localpath(path)).lower())
             else:
                 known.add(path)
         related = {}
@@ -373,7 +380,7 @@ class SyncWidget(QWidget):
                 ui = tempui
             for alias, path in ui.configitems('paths'):
                 if hg.islocal(path):
-                    abs = os.path.abspath(hg.localpath(path)).lower()
+                    abs = os.path.abspath(localpath(path)).lower()
                 else:
                     abs = path
                 if abs not in known:
