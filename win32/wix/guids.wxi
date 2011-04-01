@@ -43,7 +43,7 @@
   <?define Icons.guid = {34369923-9610-461C-9FB3-26CA3A139836} ?>
 
   <!-- thg-i18n.wxs -->
-  <?define thgI18nFolder.guid = {55DC742A-1E22-4A6C-B090-FD1E91AB8646} ?>
+  <?define thgI18nFolder.guid = {BC570E20-FB79-49B8-AFEF-B4BB867EE60F} ?>
 
   <!-- tortoisehg.wxs -->
   <?define ProductUpgradeCode = {838657CF-C9EC-452D-800D-0E70FC021D0A} ?>
