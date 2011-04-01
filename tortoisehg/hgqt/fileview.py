@@ -606,11 +606,23 @@ class FileData(object):
             try:
                 from mercurial import subrepo, commands
 
-                def genSubrepoRevChangedDescription(sfrom, sto):
+                def genSubrepoRevChangedDescription(subrelpath, sfrom, sto):
                     """Generate a subrepository revision change description"""
                     out = []
                     opts = {'date':None, 'user':None, 'rev':[sfrom]}
-                    if not sfrom:
+                    subabspath = os.path.join(repo.root, subrelpath)
+                    missingsub = not os.path.isdir(subabspath)
+                    def isinitialrevision(rev):
+                        return all([el == '0' for el in rev])
+                    if isinitialrevision(sfrom):
+                        sfrom = ''
+                    if isinitialrevision(sto):
+                        sto = ''
+                    if not sfrom and not sto:
+                        sstatedesc = 'new'
+                        out.append(_('Subrepo created and set to initial revision.') + u'\n\n')
+                        return out, sstatedesc
+                    elif not sfrom:
                         sstatedesc = 'new'
                         out.append(_('Subrepo initialized to revision:') + u'\n\n')
                     elif not sto:
@@ -619,52 +631,73 @@ class FileData(object):
                         return out, sstatedesc
                     else:
                         sstatedesc = 'changed'
+
                         out.append(_('Revision has changed from:') + u'\n\n')
+                        if missingsub:
+                            out.append(hglib.tounicode(_('changeset: %s') % sfrom + '\n'))
+                        else:
+                            _ui.pushbuffer()
+                            commands.log(_ui, srepo, **opts)
+                            out.append(hglib.tounicode(_ui.popbuffer()))
+
+                        out.append(_('To:') + u'\n')
+                    if missingsub:
+                        stolog = _('changeset: %s') % sto + '\n\n'
+                        stolog += _('Subrepository not found in working directory.') + '\n'
+                        stolog += _('Further subrepository revision information cannot be retrieved.') + '\n'
+                    else:
+                        opts['rev'] = [sto]
                         _ui.pushbuffer()
                         commands.log(_ui, srepo, **opts)
-                        out.append(hglib.tounicode(_ui.popbuffer()))
-                        out.append(_('To:') + u'\n')
-                    opts['rev'] = [sto]
-                    _ui.pushbuffer()
-                    commands.log(_ui, srepo, **opts)
-                    stolog = _ui.popbuffer()
+                        stolog = _ui.popbuffer()
+
                     if not stolog:
                         stolog = _('Initial revision')
                     out.append(hglib.tounicode(stolog))
+
                     return out, sstatedesc
 
                 srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
+                srepo = None
                 try:
-                    sub = ctx.sub(wfile)
-                    if isinstance(sub, subrepo.hgsubrepo):
-                        srepo = sub._repo
-                        sactual = srepo['.'].hex()
+                    subabspath = os.path.join(repo.root, wfile)
+                    if not os.path.isdir(subabspath):
+                        sactual = ''
                     else:
-                        self.error = _('Not a Mercurial subrepo, not previewable')
-                        return
+                        sub = ctx.sub(wfile)
+                        if isinstance(sub, subrepo.hgsubrepo):
+                            srepo = sub._repo
+                            sactual = srepo['.'].hex()
+                        else:
+                            self.error = _('Not a Mercurial subrepo, not previewable')
+                            return
                 except (util.Abort), e:
-                    sub = ctx.p1().sub(wfile)
-                    srepo = sub._repo
                     sactual = ''
+
                 out = []
                 _ui = uimod.ui()
-                _ui.pushbuffer()
-                commands.status(_ui, srepo)
-                data = _ui.popbuffer()
-                if data:
-                    out.append(_('File Status:') + u'\n')
-                    out.append(hglib.tounicode(data))
-                    out.append(u'\n')
+
+                if srepo is None or ctx.rev() is not None:
+                    data = []
+                else:
+                    _ui.pushbuffer()
+                    commands.status(_ui, srepo)
+                    data = _ui.popbuffer()
+                    if data:
+                        out.append(_('File Status:') + u'\n')
+                        out.append(hglib.tounicode(data))
+                        out.append(u'\n')
+
                 sstatedesc = 'changed'
                 if ctx.rev() is not None:
                     sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
-                    subrepochange, sstatedesc = genSubrepoRevChangedDescription(sparent, srev)
+                    subrepochange, sstatedesc = genSubrepoRevChangedDescription(wfile, sparent, srev)
                     out += subrepochange
                 else:
                     sstatedesc = 'dirty'
                     if srev != sactual:
                         subrepochange, sstatedesc = \
-                            genSubrepoRevChangedDescription(srev, sactual)
+                            genSubrepoRevChangedDescription(wfile, srev, sactual)
                         out += subrepochange
                         if data:
                             sstatedesc += ' and dirty'
