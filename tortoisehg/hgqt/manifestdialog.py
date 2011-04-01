@@ -346,12 +346,12 @@ class ManifestWidget(QWidget):
         if self._rev != rev:
             self._rev = rev
             self._setupmodel()
+            self._fileview.setContext(self._repo[rev])
             self.revChanged.emit(rev)
         elif path != self.path:
             self.setPath(path)
             ctx = self._repo[rev]
             if self.path in ctx:
-                self._fileview.setContext(ctx)
                 self._fileview.displayFile(path, self.status)
                 if line:
                     self._fileview.showLine(int(line) - 1)
