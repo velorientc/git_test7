@@ -56,6 +56,7 @@ class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
     incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
+    pullCompleted = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -716,6 +717,7 @@ class SyncWidget(QWidget):
                 self.showMessage.emit(_('Pull from %s completed') % urlu)
             else:
                 self.showMessage.emit(_('Pull from %s aborted, ret %d') % (urlu, ret))
+            self.pullCompleted.emit()
             # handle file conflicts during rebase
             if self.opts.get('rebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
