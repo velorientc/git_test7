@@ -332,7 +332,18 @@ class ManifestWidget(QWidget):
     @pyqtSlot(object)
     def setRev(self, rev):
         """Change revision to show"""
-        self.setSource(self.path, rev)
+        if rev == self._rev:
+            return
+        self._rev = rev
+        path = self.path
+        self._setupmodel()
+        ctx = self._repo[rev]
+        if path and path in ctx:
+            # recover file selection after reloading the model
+            self.setPath(path)
+            self._fileview.setContext(ctx)
+            self._fileview.displayFile(self.path, self.status)
+        # update sensitivity of actions
         real = type(rev) is int
         self._actions['ldiff'].setEnabled(real)
         for act in ['diff', 'edit']:
@@ -346,9 +357,8 @@ class ManifestWidget(QWidget):
         if self._rev != rev:
             self._rev = rev
             self._setupmodel()
-            self._fileview.setContext(self._repo[rev])
             self.revChanged.emit(rev)
-        elif path != self.path:
+        if path != self.path:
             self.setPath(path)
             ctx = self._repo[rev]
             if self.path in ctx:
