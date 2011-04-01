@@ -18,7 +18,7 @@
   <?define helpFolder.guid = {4B71277D-72E9-48F2-8A06-C706E9C3B4C0} ?>
   
   <!-- i18n.wxs -->
-  <?define i18nFolder.guid = {F88D7B07-D61C-4EE8-9BE0-B8CB6E8A52DB} ?>
+  <?define i18nFolder.guid = {5191051C-742F-470E-AD76-D83C2F1EDE4E} ?>
 
   <!-- templates.wxs -->
   <?define templates.root.guid = {6A82D0BF-6878-42F3-92FD-AB39F7A97EEF} ?>
