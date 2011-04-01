@@ -14,7 +14,7 @@ import urlparse
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error
+from mercurial import hg, ui, url, util, error, demandimport
 from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib, wconfig
@@ -23,12 +23,14 @@ from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve
 
 _schemes = ['local', 'ssh', 'http', 'https']
 
+demandimport.disable()
 try:
     # hg <= 1.8
     from mercurial.hg import localpath
-except AttributeError:
+except ImportError:
     # hg >= 1.9
     from mercurial.url import localpath
+demandimport.enable()
 
 def parseurl(path):
     if path.startswith('ssh://'):
