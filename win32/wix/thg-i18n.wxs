@@ -5,7 +5,7 @@
   <?include defines.wxi ?>
 
   <?define thg_po_langs =
-    ca;cs;da;de;en_AU;en_GB;es;et;fa;fr;he;hr;hu;it;ja;ko;nb;nl;nn;oc;pl;pt;pt_BR;ru;sr;sv;tr;uk;zh_CN;zh_TW
+    cs;da;de;en_AU;en_GB;es;et;fa;fr;he;hr;hu;it;ja;ko;nb;nl;nn;oc;pl;pt;pt_BR;ru;sr;sv;tr;uk;zh_CN;zh_TW
   ?>
   <!-- lang 'ca' is used for key path -->
 
