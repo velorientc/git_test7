@@ -56,6 +56,7 @@ class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
     incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
+    pullCompleted = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -721,6 +722,7 @@ class SyncWidget(QWidget):
                 self.showMessage.emit(_('Pull from %s completed') % urlu)
             else:
                 self.showMessage.emit(_('Pull from %s aborted, ret %d') % (urlu, ret))
+            self.pullCompleted.emit()
             # handle file conflicts during rebase
             if self.opts.get('rebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
@@ -755,9 +757,14 @@ class SyncWidget(QWidget):
         urlu = hglib.tounicode(url)
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % urlu)
         if self.embedded and not self.opts.get('subrepos'):
+            def verifyhash(hash):
+                if len(hash) != 40:
+                    return False
+                bad = [c for c in hash if c not in '0123456789abcdef']
+                return not bad
             def outputnodes(ret, data):
                 if ret == 0:
-                    nodes = [n for n in data.splitlines() if len(n) == 40]
+                    nodes = [n for n in data.splitlines() if verifyhash(n)]
                     if nodes:
                         self.outgoingNodes.emit(nodes)
                     self.showMessage.emit(_('%d outgoing changesets to %s') %

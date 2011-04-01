@@ -18,7 +18,7 @@
   <?define helpFolder.guid = {4B71277D-72E9-48F2-8A06-C706E9C3B4C0} ?>
   
   <!-- i18n.wxs -->
-  <?define i18nFolder.guid = {F88D7B07-D61C-4EE8-9BE0-B8CB6E8A52DB} ?>
+  <?define i18nFolder.guid = {5191051C-742F-470E-AD76-D83C2F1EDE4E} ?>
 
   <!-- templates.wxs -->
   <?define templates.root.guid = {6A82D0BF-6878-42F3-92FD-AB39F7A97EEF} ?>
@@ -43,7 +43,7 @@
   <?define Icons.guid = {34369923-9610-461C-9FB3-26CA3A139836} ?>
 
   <!-- thg-i18n.wxs -->
-  <?define thgI18nFolder.guid = {55DC742A-1E22-4A6C-B090-FD1E91AB8646} ?>
+  <?define thgI18nFolder.guid = {BC570E20-FB79-49B8-AFEF-B4BB867EE60F} ?>
 
   <!-- tortoisehg.wxs -->
   <?define ProductUpgradeCode = {838657CF-C9EC-452D-800D-0E70FC021D0A} ?>

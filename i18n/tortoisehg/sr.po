@@ -1,16 +1,16 @@
-# Polish translation for tortoisehg
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Serbian translation for tortoisehg
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the tortoisehg package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-31 11:23-0300\n"
-"PO-Revision-Date: 2010-04-05 12:11+0000\n"
-"Last-Translator: Yuki Kodama <Unknown>\n"
-"Language-Team: Polish <pl@li.org>\n"
+"PO-Revision-Date: 2011-03-26 19:44+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Serbian <sr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,11 +19,11 @@ msgstr ""
 
 #: TortoiseHgOverlayServer.py:50
 msgid "TortoiseHg Overlay Icon Server"
-msgstr "Serwer nakładek na ikony TortoiseHg"
+msgstr ""
 
 #: TortoiseHgOverlayServer.py:161
 msgid "Exit"
-msgstr "Zakończ"
+msgstr ""
 
 #: tortoisehg/hgqt/about.py:34 tortoisehg/hgqt/workbench.py:296
 #: tortoisehg/hgtk/gdialog.py:505
@@ -36,7 +36,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/about.py:64 tortoisehg/hgtk/about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr "Niektóre ikony zostały pobrane z projektu TortoiseSVN"
+msgstr ""
 
 #: tortoisehg/hgqt/about.py:74
 msgid "You can visit our site here"
@@ -65,7 +65,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/about.py:159 tortoisehg/hgtk/about.py:70
 msgid "A new version of TortoiseHg is ready for download!"
-msgstr "Nowa wersja TortoiseHG jest dostępna do pobrania!"
+msgstr ""
 
 #: tortoisehg/hgqt/annotate.py:110
 msgid "Search in original revision"
@@ -132,7 +132,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/archive.py:20 tortoisehg/hgtk/archive.py:18
 msgid "= Working Directory Parent ="
-msgstr "= Nadzędna ścieżka pracy ="
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:40 tortoisehg/hgqt/bookmark.py:50
 #: tortoisehg/hgqt/csinfo.py:105 tortoisehg/hgqt/csinfo.py:106
@@ -141,7 +141,7 @@ msgstr "= Nadzędna ścieżka pracy ="
 #: tortoisehg/hgtk/csinfo.py:211 tortoisehg/hgtk/csinfo.py:212
 #: tortoisehg/hgtk/cslist.py:142 tortoisehg/hgtk/tagadd.py:66
 msgid "Revision:"
-msgstr "Rewizja:"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:46 tortoisehg/hgtk/archive.py:62
 msgid "Only files modified/created in this revision"
@@ -154,7 +154,7 @@ msgstr ""
 #: tortoisehg/hgqt/archive.py:54 tortoisehg/hgqt/hginit.py:34
 #: tortoisehg/hgtk/archive.py:72 tortoisehg/hgtk/clone.py:106
 msgid "Destination path:"
-msgstr "Ścieżka docelowa"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:58 tortoisehg/hgqt/clone.py:56
 #: tortoisehg/hgqt/clone.py:68 tortoisehg/hgqt/hginit.py:37
@@ -162,36 +162,36 @@ msgstr "Ścieżka docelowa"
 #: tortoisehg/hgtk/clone.py:70 tortoisehg/hgtk/hginit.py:55
 #: tortoisehg/hgtk/thgconfig.py:394 tortoisehg/hgtk/thgimport.py:63
 msgid "Browse..."
-msgstr "Przeglądaj..."
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:65 tortoisehg/hgtk/archive.py:77
 msgid "Archive types:"
-msgstr "Typy archiwów:"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:69 tortoisehg/hgqt/archive.py:242
 #: tortoisehg/hgtk/archive.py:75
 msgid "Directory of files"
-msgstr "Folder plików"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:70 tortoisehg/hgtk/archive.py:83
 msgid "Uncompressed tar archive"
-msgstr "Nieskompresowane archiwum tar"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:71 tortoisehg/hgtk/archive.py:84
 msgid "Tar archive compressed using bzip2"
-msgstr "Archiwum tar skompresowane za pomocą bzip2"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:72 tortoisehg/hgtk/archive.py:85
 msgid "Tar archive compressed using gzip"
-msgstr "Archiwum tar skompresowane za pomocą gzip"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:73 tortoisehg/hgtk/archive.py:86
 msgid "Uncompressed zip archive"
-msgstr "Rozpakuj archiwum zip"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:74 tortoisehg/hgtk/archive.py:87
 msgid "Zip archive compressed using deflate"
-msgstr "Archiwum zip skompresowane za pomocą deflate"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:84 tortoisehg/hgqt/hginit.py:67
 #: tortoisehg/hgqt/rename.py:78
@@ -228,13 +228,13 @@ msgstr ""
 #: tortoisehg/hgqt/archive.py:168 tortoisehg/hgtk/archive.py:29
 #, python-format
 msgid "Archive - %s"
-msgstr "Archiwum - %s"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:193 tortoisehg/hgqt/hginit.py:106
 #: tortoisehg/hgqt/rename.py:197 tortoisehg/hgtk/archive.py:195
 #: tortoisehg/hgtk/clone.py:107 tortoisehg/hgtk/hginit.py:95
 msgid "Select Destination Folder"
-msgstr "Wybierz katalog docelowy"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:198
 msgid "Open File"
@@ -242,19 +242,19 @@ msgstr ""
 
 #: tortoisehg/hgqt/archive.py:229 tortoisehg/hgtk/archive.py:171
 msgid "Tar archives"
-msgstr "Archiwa tar"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:232 tortoisehg/hgtk/archive.py:174
 msgid "Bzip2 tar archives"
-msgstr "Archiwa tar bzip2"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:235 tortoisehg/hgtk/archive.py:177
 msgid "Gzip tar archives"
-msgstr "Archiwa tar gzip"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:241 tortoisehg/hgtk/archive.py:183
 msgid "Compressed zip archives"
-msgstr "Skompresowane archiwa zip"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:316 tortoisehg/hgqt/archive.py:334
 msgid "Duplicate Name"
@@ -270,7 +270,7 @@ msgstr ""
 #: tortoisehg/hgtk/gtklib.py:594 tortoisehg/hgtk/thgconfig.py:574
 #: tortoisehg/hgtk/thgconfig.py:1077
 msgid "Confirm Overwrite"
-msgstr "Potwierdź nadpisanie"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:322
 #, python-format
@@ -299,11 +299,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:43 tortoisehg/hgtk/backout.py:52
 msgid "Backout commit message"
-msgstr "Wiadomość dotycząca wycofania"
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:47 tortoisehg/hgtk/backout.py:41
 msgid "Backed out changeset: "
-msgstr "Wycofano pakiet zmian: "
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:59 tortoisehg/hgqt/clone.py:94
 #: tortoisehg/hgqt/commit.py:220 tortoisehg/hgqt/merge.py:313
@@ -315,7 +315,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:66 tortoisehg/hgtk/backout.py:82
 msgid "Use English backout message"
-msgstr "Użyj angielskiej wiadomości dotyczącej wycofania"
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:72 tortoisehg/hgtk/backout.py:90
 msgid "Commit backout before merging with current working parent"
@@ -346,11 +346,11 @@ msgstr ""
 #: tortoisehg/hgqt/mq.py:455 tortoisehg/hgtk/backout.py:139
 #: tortoisehg/hgtk/commit.py:581
 msgid "Confirm Discard Message"
-msgstr "Wiadomość potwierdzenia usunięcia"
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:146 tortoisehg/hgtk/backout.py:140
 msgid "Discard current backout message?"
-msgstr "Usunąć obecną wiadomość wycofania?"
+msgstr ""
 
 #: tortoisehg/hgqt/backout.py:217 tortoisehg/hgqt/commit.py:179
 #: tortoisehg/hgqt/commit.py:621 tortoisehg/hgqt/commit.py:627
@@ -410,7 +410,7 @@ msgstr ""
 #: tortoisehg/hgqt/rebase.py:184 tortoisehg/hgtk/bugreport.py:48
 #: tortoisehg/hgtk/hgcmd.py:50 tortoisehg/hgtk/thgmq.py:142
 msgid "Close"
-msgstr "Zamknij"
+msgstr ""
 
 #: tortoisehg/hgqt/bisect.py:83
 msgid "Error encountered."
@@ -439,11 +439,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/bookmark.py:57 tortoisehg/hgtk/bookmark.py:66
 msgid "Bookmark:"
-msgstr "Zakładka:"
+msgstr ""
 
 #: tortoisehg/hgqt/bookmark.py:62 tortoisehg/hgtk/bookmark.py:78
 msgid "New Name:"
-msgstr "Nowa nazwa:"
+msgstr ""
 
 #: tortoisehg/hgqt/bookmark.py:67 tortoisehg/hgqt/commit.py:567
 #: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:53
@@ -467,7 +467,7 @@ msgstr ""
 #: tortoisehg/hgqt/bookmark.py:92 tortoisehg/hgtk/bookmark.py:34
 #, python-format
 msgid "Bookmark - %s"
-msgstr "Zakładka - %s"
+msgstr ""
 
 #: tortoisehg/hgqt/bookmark.py:160 tortoisehg/hgqt/bookmark.py:214
 #, python-format
@@ -493,7 +493,7 @@ msgstr ""
 #: tortoisehg/hgtk/bookmark.py:287
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr "Zakładka '%s' nie istnieje"
+msgstr ""
 
 #: tortoisehg/hgqt/bookmark.py:196
 #, python-format
@@ -515,11 +515,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/branchop.py:46 tortoisehg/hgtk/commit.py:60
 msgid "No branch changes"
-msgstr "Brak zmian w gałęzi"
+msgstr ""
 
 #: tortoisehg/hgqt/branchop.py:47 tortoisehg/hgtk/commit.py:62
 msgid "Open a new named branch"
-msgstr "Otwórz nową nazwaną gałąź"
+msgstr ""
 
 #: tortoisehg/hgqt/branchop.py:48
 msgid "Close current branch"
@@ -541,11 +541,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/bugreport.py:48 tortoisehg/hgtk/bugreport.py:25
 msgid "TortoiseHg Bug Report"
-msgstr "Raport błędu TortoiseHg"
+msgstr ""
 
 #: tortoisehg/hgqt/bugreport.py:94 tortoisehg/hgtk/bugreport.py:87
 msgid "Save error report to"
-msgstr "Zapisz raport błędu do"
+msgstr ""
 
 #: tortoisehg/hgqt/bugreport.py:96
 msgid "Text files (*.txt)"
@@ -633,19 +633,19 @@ msgstr ""
 
 #: tortoisehg/hgqt/clone.py:116 tortoisehg/hgtk/clone.py:127
 msgid "Clone to revision:"
-msgstr "Klonuj do rewizji:"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:119 tortoisehg/hgtk/clone.py:141
 msgid "Do not update the new working directory"
-msgstr "Nie aktualizuj nowego katalogu roboczego"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:120 tortoisehg/hgtk/clone.py:142
 msgid "Use pull protocol to copy metadata"
-msgstr "Użyj protokołu ściągnij do skopiowania danych meta"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:121 tortoisehg/hgtk/clone.py:143
 msgid "Use uncompressed transfer"
-msgstr "Użyj transferu nieskompresowanego"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:122
 msgid "Include patch queue"
@@ -654,7 +654,7 @@ msgstr ""
 #: tortoisehg/hgqt/clone.py:128 tortoisehg/hgtk/clone.py:149
 #: tortoisehg/hgtk/history.py:467 tortoisehg/hgtk/synch.py:179
 msgid "Use proxy server"
-msgstr "Użyj serwera proxy"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:134 tortoisehg/hgqt/sync.py:1398
 #: tortoisehg/hgtk/clone.py:159 tortoisehg/hgtk/synch.py:202
@@ -677,7 +677,7 @@ msgstr ""
 #: tortoisehg/hgqt/clone.py:228 tortoisehg/hgqt/clone.py:255
 #: tortoisehg/hgqt/clone.py:262 tortoisehg/hgtk/clone.py:37
 msgid "TortoiseHg Clone"
-msgstr "Klon TortoiseHg"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:229
 msgid "Error creating destination folder"
@@ -689,7 +689,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/clone.py:256 tortoisehg/hgtk/clone.py:288
 msgid "Source path is empty"
-msgstr "Ścieżka źródłowa jest pusta"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:257
 msgid "Please enter a valid source path."
@@ -697,7 +697,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/clone.py:263 tortoisehg/hgtk/clone.py:294
 msgid "Source and destination are the same"
-msgstr "Źródło i miejsce docelowe są identyczne"
+msgstr ""
 
 #: tortoisehg/hgqt/clone.py:264
 msgid "Please specify different paths."
@@ -1104,7 +1104,7 @@ msgstr ""
 #: tortoisehg/hgqt/cslist.py:88 tortoisehg/hgqt/revpanel.py:26
 #: tortoisehg/hgtk/changeset.py:585 tortoisehg/hgtk/cslist.py:143
 msgid "Patch:"
-msgstr "Ścieżka"
+msgstr ""
 
 #: tortoisehg/hgqt/cslist.py:134 tortoisehg/hgtk/cslist.py:409
 #, python-format
@@ -1750,7 +1750,7 @@ msgstr ""
 #: tortoisehg/hgtk/hgignore.py:58 tortoisehg/hgtk/quickop.py:19
 #: tortoisehg/hgtk/tagadd.py:39
 msgid "Add"
-msgstr "Dodaj"
+msgstr ""
 
 #: tortoisehg/hgqt/hgignore.py:72 tortoisehg/hgqt/resolve.py:128
 #: tortoisehg/hgqt/settings.py:719 tortoisehg/hgtk/hgignore.py:77
@@ -2546,7 +2546,7 @@ msgstr ""
 #: tortoisehg/hgqt/qqueue.py:94 tortoisehg/hgqt/rename.py:163
 #: tortoisehg/hgqt/reporegistry.py:101 tortoisehg/hgtk/bookmark.py:49
 msgid "Rename"
-msgstr "Zmień nazwę"
+msgstr ""
 
 #: tortoisehg/hgqt/qqueue.py:97 tortoisehg/hgqt/qscilib.py:185
 #: tortoisehg/hgqt/shelve.py:68 tortoisehg/hgqt/shelve.py:97
@@ -2747,7 +2747,7 @@ msgstr ""
 #: tortoisehg/hgqt/webconf_ui.py:80 tortoisehg/hgtk/bookmark.py:47
 #: tortoisehg/hgtk/quickop.py:22 tortoisehg/hgtk/tagadd.py:40
 msgid "Remove"
-msgstr "Usuń"
+msgstr ""
 
 #: tortoisehg/hgqt/quickop.py:78 tortoisehg/hgtk/quickop.py:133
 msgid "Do not save backup files (*.orig)"
@@ -2790,7 +2790,7 @@ msgstr ""
 #: tortoisehg/hgqt/rebase.py:94 tortoisehg/hgqt/rebase.py:255
 #: tortoisehg/hgtk/gdialog.py:863
 msgid "Abort"
-msgstr "Przerwij"
+msgstr ""
 
 #: tortoisehg/hgqt/rebase.py:111
 #, python-format
@@ -2931,11 +2931,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/rename.py:191 tortoisehg/hgtk/clone.py:91
 msgid "Select Source Folder"
-msgstr "Wybierz folder źródłowy"
+msgstr ""
 
 #: tortoisehg/hgqt/rename.py:195 tortoisehg/hgtk/archive.py:201
 msgid "Select Destination File"
-msgstr "Wybierz plik docelowy"
+msgstr ""
 
 #: tortoisehg/hgqt/rename.py:255
 msgid "Source does not exists."
@@ -3708,16 +3708,16 @@ msgstr ""
 
 #: tortoisehg/hgqt/revpanel.py:20 tortoisehg/hgtk/changeset.py:579
 msgid "Changeset:"
-msgstr "Pakiet zmian:"
+msgstr ""
 
 #: tortoisehg/hgqt/revpanel.py:22 tortoisehg/hgqt/update.py:82
 #: tortoisehg/hgtk/changeset.py:581 tortoisehg/hgtk/update.py:90
 msgid "Parent:"
-msgstr "Nadrzędna:"
+msgstr ""
 
 #: tortoisehg/hgqt/revpanel.py:24 tortoisehg/hgtk/changeset.py:583
 msgid "Child:"
-msgstr "Podrzędna:"
+msgstr ""
 
 #: tortoisehg/hgqt/revpanel.py:161
 msgid "Head is closed!"
@@ -5609,7 +5609,7 @@ msgstr ""
 #: tortoisehg/hgqt/status.py:232 tortoisehg/hgtk/browse.py:112
 #: tortoisehg/hgtk/quickop.py:106 tortoisehg/hgtk/status.py:95
 msgid "status"
-msgstr "status"
+msgstr ""
 
 #: tortoisehg/hgqt/status.py:258 tortoisehg/hgtk/quickop.py:186
 msgid "No appropriate files"
@@ -6215,7 +6215,7 @@ msgstr ""
 #: tortoisehg/hgqt/tag.py:184 tortoisehg/hgtk/bookmark.py:46
 #: tortoisehg/hgtk/commit.py:262 tortoisehg/hgtk/status.py:124
 msgid "Move"
-msgstr "Przenieś"
+msgstr ""
 
 #: tortoisehg/hgqt/tag.py:239
 #, python-format
@@ -6398,7 +6398,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/thread.py:128 tortoisehg/hgtk/hgthread.py:94
 msgid "password: "
-msgstr "hasło: "
+msgstr ""
 
 #: tortoisehg/hgqt/thread.py:276 tortoisehg/hgtk/hgthread.py:187
 msgid "abort: "
@@ -7113,40 +7113,40 @@ msgstr ""
 #: tortoisehg/hgtk/about.py:76
 #, python-format
 msgid "(version %s)"
-msgstr "(wersja %s)"
+msgstr ""
 
 #: tortoisehg/hgtk/about.py:79
 msgid "Copyright 2008-2010 Steve Borho and others"
-msgstr "Prawa autorskie 2008-2010 Steve Borho i inni"
+msgstr ""
 
 #: tortoisehg/hgtk/about.py:95
 #, python-format
 msgid "with %s"
-msgstr "z %s"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:59
 msgid "Archive revision:"
-msgstr "Wersje archiwalne:"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:96
 msgid "Archive"
-msgstr "Archiwum"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:111
 msgid "Archived successfully"
-msgstr "Pomyślnie zarchiwizowano"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:113
 msgid "Canceled archiving"
-msgstr "Archiwizacja anulowana"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:115
 msgid "Failed to archive"
-msgstr "Nie udało się zarchiwizować"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:203
 msgid "All Files (*.*)"
-msgstr "Wszystkie pliki (*.*)"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:214
 #, python-format
@@ -7155,8 +7155,6 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"Ścieżka docelowa \"%s\" już istnieje!\n"
-"Czy chcesz ją zastąpić?"
 
 #: tortoisehg/hgtk/archive.py:220
 #, python-format
@@ -7165,17 +7163,15 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"Katalog \"%s\" nie jest pusty!\n"
-"Czy chcesz go zastąpić?"
 
 #: tortoisehg/hgtk/backout.py:28
 #, python-format
 msgid "Backout changeset - %s"
-msgstr "Wycofaj pakiet zmian - %s"
+msgstr ""
 
 #: tortoisehg/hgtk/backout.py:46
 msgid "Changeset Description"
-msgstr "Opis pakietu zmian"
+msgstr ""
 
 #: tortoisehg/hgtk/backout.py:78
 msgid ""
@@ -7185,7 +7181,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/backout.py:95
 msgid "Backout"
-msgstr "Wycofanie"
+msgstr ""
 
 #: tortoisehg/hgtk/backout.py:114
 msgid "Backed out successfully, you must now commit the results"
@@ -7193,112 +7189,112 @@ msgstr ""
 
 #: tortoisehg/hgtk/backout.py:118
 msgid "Canceled backout"
-msgstr "Anulowano wycofanie"
+msgstr ""
 
 #: tortoisehg/hgtk/backout.py:120
 msgid "Failed to backout"
-msgstr "Nie udało się wycofać"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:51 tortoisehg/hgtk/bookmark.py:144
 #: tortoisehg/hgtk/merge.py:184
 #, python-format
 msgid "unexpected type: %s"
-msgstr "niespodziewany typ: %s"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:64
 msgid "Old name:"
-msgstr "Stara nazwa"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:131 tortoisehg/hgtk/gdialog.py:918
 #: tortoisehg/hgtk/hginit.py:87 tortoisehg/hgtk/tagadd.py:203
 #, python-format
 msgid "unexpected response id: %s"
-msgstr "niespodziewany identyfikator odpowiedzi: %s"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:170 tortoisehg/hgtk/bookmark.py:196
 #: tortoisehg/hgtk/bookmark.py:246
 msgid "Bookmark input is empty"
-msgstr "Wpis zakładki jest pusty"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:171 tortoisehg/hgtk/bookmark.py:197
 #: tortoisehg/hgtk/bookmark.py:247
 msgid "Please enter bookmark name"
-msgstr "Wprowadź nazwę zakładki"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:178 tortoisehg/hgtk/bookmark.py:204
 #: tortoisehg/hgtk/bookmark.py:228 tortoisehg/hgtk/bookmark.py:260
 msgid "Bookmarking completed"
-msgstr "Tworzenie zakładki zakończone pomyślnie"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:179
 #, python-format
 msgid "Bookmark \"%s\" has been added"
-msgstr "Zakładka \"%s\" została dodana"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:182 tortoisehg/hgtk/bookmark.py:185
 #: tortoisehg/hgtk/bookmark.py:208 tortoisehg/hgtk/bookmark.py:211
 #: tortoisehg/hgtk/bookmark.py:232 tortoisehg/hgtk/bookmark.py:235
 #: tortoisehg/hgtk/bookmark.py:265 tortoisehg/hgtk/bookmark.py:268
 msgid "Error in bookmarking"
-msgstr "Błąd podczas tworzenia zakładki"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:205
 #, python-format
 msgid "Bookmark \"%s\" has been moved"
-msgstr "Zakładka \"%s\" została przesunięta"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:221
 msgid "Bookmark name is empty"
-msgstr "Nazwa zakładki jest pusta"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:222
 msgid "Please select bookmark name to remove"
-msgstr "Wybierz nazwę zakładki, którą chcesz usunąć"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:229
 #, python-format
 msgid "Bookmark \"%s\" has been removed"
-msgstr "Zakładka \"%s\" została usunięta"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:252
 msgid "Bookmark new name input is empty"
-msgstr "Pole nowej nazwy zakładki jest puste"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:253
 msgid "Please enter new bookmark name"
-msgstr "Wprowadź nową nazwę zakładki"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:261
 #, python-format
 msgid "Bookmark \"%s\" has been renamed to \"%s\""
-msgstr "Nazwa zakładki \"%s\" została zmieniona na \"%s\""
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:275 tortoisehg/hgtk/bookmark.py:293
 #, python-format
 msgid "a bookmark named \"%s\" already exists"
-msgstr "zakładka o nazwie \"%s\" już istnieje"
+msgstr ""
 
 #: tortoisehg/hgtk/bookmark.py:281
 #, python-format
 msgid "No bookmark named \"%s\" exists"
-msgstr "Nie istnieje zakładka o nazwie \"%s\""
+msgstr ""
 
 #: tortoisehg/hgtk/browse.py:136
 msgid "type"
-msgstr "typ"
+msgstr ""
 
 #: tortoisehg/hgtk/browse.py:142 tortoisehg/hgtk/quickop.py:109
 #: tortoisehg/hgtk/status.py:293
 msgid "path"
-msgstr "ścieżka"
+msgstr ""
 
 #: tortoisehg/hgtk/browse.py:344 tortoisehg/hgtk/browse.py:346
 msgid "browser"
-msgstr "przeglądarka"
+msgstr ""
 
 #: tortoisehg/hgtk/bugreport.py:45
 msgid "Save as.."
-msgstr "Zapisz jako..."
+msgstr ""
 
 #: tortoisehg/hgtk/bugreport.py:57
 msgid ""
@@ -7308,11 +7304,11 @@ msgstr ""
 #: tortoisehg/hgtk/changeset.py:46
 #, python-format
 msgid "%s changeset "
-msgstr "Pakiet zmian %s "
+msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:171 tortoisehg/hgtk/changeset.py:215
 msgid "[All Files]"
-msgstr "[Wszystkie pliki]"
+msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:254
 #, python-format
@@ -7322,12 +7318,12 @@ msgstr ""
 #: tortoisehg/hgtk/changeset.py:362
 #, python-format
 msgid " %s is larger than the specified max diff size"
-msgstr " %s jest większe niż ustalony maksymalny rozmiar różnicy"
+msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:377
 #, python-format
 msgid "Repository Error:  %s, refresh suggested"
-msgstr "Błąd repozytorium: %s, sugeruje się odświeżenie"
+msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:423
 msgid "[no hunks to display]"
@@ -7352,7 +7348,7 @@ msgstr ""
 #: tortoisehg/hgtk/changeset.py:486 tortoisehg/hgtk/datamine.py:153
 #: tortoisehg/hgtk/datamine.py:181
 msgid "_File History"
-msgstr "Hi_storia plików"
+msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:487 tortoisehg/hgtk/datamine.py:152
 msgid "_Annotate File"
@@ -7368,7 +7364,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:958
 msgid "Save file to"
-msgstr "Zapisz plik do"
+msgstr ""
 
 #: tortoisehg/hgtk/changeset.py:969
 msgid "Unable to save file"
@@ -7401,12 +7397,12 @@ msgstr ""
 
 #: tortoisehg/hgtk/clone.py:90
 msgid "Source path:"
-msgstr "Ścieżka źródłowa:"
+msgstr ""
 
 #: tortoisehg/hgtk/clone.py:117 tortoisehg/hgtk/merge.py:90
 #: tortoisehg/hgtk/tagadd.py:69
 msgid "Advanced options"
-msgstr "Opcje zaawansowane"
+msgstr ""
 
 #: tortoisehg/hgtk/clone.py:135
 msgid "Starting Revision:"
@@ -7414,19 +7410,19 @@ msgstr ""
 
 #: tortoisehg/hgtk/clone.py:165
 msgid "Clone"
-msgstr "Klonuj"
+msgstr ""
 
 #: tortoisehg/hgtk/clone.py:191
 msgid "Cloned successfully"
-msgstr "Klonowanie zakończone pomyślnie"
+msgstr ""
 
 #: tortoisehg/hgtk/clone.py:193 tortoisehg/hgtk/update.py:154
 msgid "Canceled updating"
-msgstr "Anulowano aktualizację"
+msgstr ""
 
 #: tortoisehg/hgtk/clone.py:195
 msgid "Failed to clone"
-msgstr "Nie udało się sklonować"
+msgstr ""
 
 #: tortoisehg/hgtk/clone.py:226
 msgid "Mercurial bundles"
@@ -7434,15 +7430,15 @@ msgstr ""
 
 #: tortoisehg/hgtk/clone.py:289
 msgid "Please enter a valid source path"
-msgstr "Wprowadź poprawną ścieżkę źródłową"
+msgstr ""
 
 #: tortoisehg/hgtk/clone.py:295
 msgid "Please specify different paths"
-msgstr "Wybierz różne ścieżki"
+msgstr ""
 
 #: tortoisehg/hgtk/commit.py:38
 msgid "Branch Operations"
-msgstr "Operacje na gałęziach"
+msgstr ""
 
 #: tortoisehg/hgtk/commit.py:70
 msgid "Close current named branch"
@@ -7993,11 +7989,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/gdialog.py:904
 msgid "Confirm Abort"
-msgstr "Potwierdź przerwanie"
+msgstr ""
 
 #: tortoisehg/hgtk/gdialog.py:905
 msgid "Do you want to abort?"
-msgstr "Czy chcesz przewać?"
+msgstr ""
 
 #: tortoisehg/hgtk/gorev.py:27
 msgid "Select"
@@ -11398,7 +11394,7 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:73
 msgid "About TortoiseHg"
-msgstr "O TortoiseHG"
+msgstr ""
 
 #: tortoisehg/util/menuthg.py:74
 msgid "Show About Dialog"
@@ -11523,32 +11519,3 @@ msgstr ""
 #, python-format
 msgid "repository %s not found"
 msgstr ""
-
-#~ msgid "Options..."
-#~ msgstr "Opcje..."
-
-#~ msgid "Backed out successfully"
-#~ msgstr "Wycofano zmiany"
-
-#~ msgid "Set Current"
-#~ msgstr "Ustaw obecny"
-
-#~ msgid "Make new/moved bookmark current"
-#~ msgstr "Ustaw nową/przesuniętą zakładkę jako obecną"
-
-#, python-format
-#~ msgid "Bookmark \"%s\" has been made current"
-#~ msgstr "Zakładka \"%s\" została ustawiona jako obecna"
-
-#~ msgid ""
-#~ "Commit message text for new changeset that reverses the  effect of the "
-#~ "change being backed out."
-#~ msgstr ""
-#~ "Wysłano wiadomość dla nowego pakietu zmian, która przywraca wycofane zmiany."
-
-#~ msgid ""
-#~ "** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues "
-#~ "or tortoisehg-discuss@lists.sourceforge.net\n"
-#~ msgstr ""
-#~ "** Proszę, zgłoś ten błąd na http://bitbucket.org/tortoisehg/stable/issues "
-#~ "lub tortoisehg-discuss@lists.sourceforge.net\n"

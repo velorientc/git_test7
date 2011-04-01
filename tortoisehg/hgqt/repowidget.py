@@ -270,6 +270,7 @@ class RepoWidget(QWidget):
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.incomingBundle.connect(self.setBundle)
+        sw.pullCompleted.connect(self.onPullCompleted)
         sw.refreshTargets(self.rev)
         return sw
 
@@ -312,24 +313,35 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.setRepo(self.repo)
         self.manifestDemand.forward('setRepo', self.repo)
 
+    def onPullCompleted(self):
+        if self.bundle:
+            # create a new bundlerepo instance; revision numbers may change
+            brepo = thgrepo.repository(self.repo.ui, self.repo.root,
+                                       bundle=self.bundle)
+            repo = thgrepo.repository(self.repo.ui, self.repo.root)
+            if len(repo) == len(brepo):
+                # all bundle revisions pulled
+                self.clearBundle()
+                self.reload()
+            else:
+                # refresh revset with remaining revisions
+                self.revset = range(len(repo), len(brepo))
+                self.repo = brepo
+                self.repoview.setRepo(brepo)
+                self.revDetailsWidget.setRepo(brepo)
+                self.manifestDemand.forward('setRepo', brepo)
+                self.reload()
+                self.repomodel.revset = self.revset
+                self.repoview.resetBrowseHistory(self.revset)
+                self._reload_rev = self.revset[0]
+
     def acceptBundle(self):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.pullBundle(self.bundle, None)
-        self.clearBundle()
 
     def pullBundleToRev(self):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.pullBundle(self.bundle, self.rev)
-        removed = [self.repo[self.rev]]
-        while removed:
-            ctx = removed.pop()
-            if ctx.rev() in self.revset:
-                self.revset.remove(ctx.rev())
-                removed.extend(ctx.parents())
-        self.repomodel.revset = self.revset
-        if not self.revset:
-            self.clearBundle()
-        self.refresh()
 
     def rejectBundle(self):
         self.clearBundle()
