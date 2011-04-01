@@ -144,7 +144,8 @@ class PurgeDialog(QDialog):
             QDialog.accept(self)
             return
         if not qtlib.QuestionMsgBox(_('Confirm file deletions'),
-            _('Are you sure you want to delete these files and/or folders?')):
+            _('Are you sure you want to delete these files and/or folders?'),
+            parent=self):
             return
 
         def completed():
