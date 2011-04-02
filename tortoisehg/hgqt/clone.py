@@ -133,6 +133,10 @@ class CloneDialog(QDialog):
         self.proxy_chk.setEnabled(useproxy)
         self.proxy_chk.setChecked(useproxy)
 
+        self.insecure_chk = QCheckBox(_('Do not check certificates'))
+        optbox.addWidget(self.insecure_chk)
+        self.insecure_chk.setEnabled(False)
+
         self.remote_chk, self.remote_text = chktext(_('Remote command:'))
 
         # allow to specify start revision for p4 & svn repos.
@@ -179,7 +183,9 @@ class CloneDialog(QDialog):
 
         # connect extra signals
         self.src_combo.editTextChanged.connect(self.composeCommand)
+        self.src_combo.editTextChanged.connect(self.onUrlHttps)
         self.dest_combo.editTextChanged.connect(self.composeCommand)
+        self.dest_combo.editTextChanged.connect(self.onUrlHttps)
         self.rev_chk.toggled.connect(self.composeCommand)
         self.rev_text.textChanged.connect(self.composeCommand)
         self.noupdate_chk.toggled.connect(self.composeCommand)
@@ -187,6 +193,7 @@ class CloneDialog(QDialog):
         self.uncomp_chk.toggled.connect(self.composeCommand)
         self.qclone_chk.toggled.connect(self.composeCommand)
         self.proxy_chk.toggled.connect(self.composeCommand)
+        self.insecure_chk.toggled.connect(self.composeCommand)
         self.remote_chk.toggled.connect(self.composeCommand)
         self.remote_text.textChanged.connect(self.composeCommand)
         self.startrev_chk.toggled.connect(self.composeCommand)
@@ -225,6 +232,7 @@ class CloneDialog(QDialog):
         self.pproto_chk.setVisible(visible)
         self.uncomp_chk.setVisible(visible)
         self.proxy_chk.setVisible(visible)
+        self.insecure_chk.setVisible(visible)
         self.qclone_chk.setVisible(visible)
         self.remote_chk.setVisible(visible)
         self.remote_text.setVisible(visible)
@@ -259,8 +267,11 @@ class CloneDialog(QDialog):
             cmdline.append(startrev)
         cmdline.append('--verbose')
         src = self.getSrc()
-        cmdline.append(src)
         dest = self.getDest()
+        if (self.insecure_chk.isChecked()
+              and (src.startswith('https://') or dest.startswith('https://'))):
+            cmdline.append('--insecure')
+        cmdline.append(src)
         if dest:
             cmdline.append('--')
             cmdline.append(dest)
@@ -413,6 +424,11 @@ class CloneDialog(QDialog):
             self.accept()
         else:
             self.reject()
+
+    def onUrlHttps(self):
+        self.insecure_chk.setEnabled(self.getSrc().startswith('https://')
+                or self.getDest().startswith('https://'))
+        self.composeCommand()
 
     def command_canceling(self):
         self.cancel_btn.setDisabled(True)
