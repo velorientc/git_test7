@@ -559,7 +559,7 @@ class Workbench(QMainWindow):
         repoWidget = self.repoTabsWidget.currentWidget()
         if repoWidget:
             root = repoWidget.repo.root
-            args = [root, os.path.dirname(root)]
+            args = [root, root + '-clone']
         else:
             args = []
         dlg = CloneDialog(args, parent=self)
