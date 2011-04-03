@@ -521,7 +521,9 @@ class CommitPage(BasePage):
         pass
 
     def cleanupPage(self):
-        QSettings().setValue('merge/skiplast', self.skiplast.isChecked())
+        s = QSettings()
+        s.setValue('merge/skiplast', self.skiplast.isChecked())
+        self.msgEntry.saveSettings(s, 'merge/message')
 
     def currentPage(self):
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
@@ -550,9 +552,6 @@ class CommitPage(BasePage):
     def validatePage(self):
         if len(self.repo.parents()) == 1:
             # commit succeeded, repositoryChanged() called wizard().next()
-            s = QSettings()
-            s.setValue('merge/skiplast', self.skiplast.isChecked())
-            self.msgEntry.saveSettings(s, 'merge/message')
             if self.skiplast.isChecked():
                 self.wizard().close()
             return True
@@ -565,9 +564,14 @@ class CommitPage(BasePage):
         message = hglib.fromunicode(self.msgEntry.text())
         cmdline = ['commit', '--verbose', '--message', message,
                    '--repository', self.repo.root]
+        commandlines = [cmdline]
+        pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
+        if pushafter:
+            cmd = ['push', '--repository', self.repo.root, pushafter]
+            commandlines.append(cmd)
         self.repo.incrementBusyCount()
         self.cmd.setShowOutput(True)
-        self.cmd.run(cmdline)
+        self.cmd.run(*commandlines)
         return False
 
     def repositoryChanged(self):
