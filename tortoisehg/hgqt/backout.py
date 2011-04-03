@@ -159,24 +159,35 @@ class BackoutDialog(QDialog):
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         if self.backoutParent:
             msg = self.msgTextEdit.text()
-            cmdline += ['--message', hglib.fromunicode(msg)]
+            cmdline += ['--message='+hglib.fromunicode(msg)]
+            commandlines = [cmdline]
+            pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
+            if pushafter:
+                cmd = ['push', '--repository', self.repo.root, pushafter]
+                commandlines.append(cmd)
         elif self.mergeChk.isChecked():
             cmdline += ['--merge']
             msg = self.msgTextEdit.text()
             cmdline += ['--message', hglib.fromunicode(msg)]
+            commandlines = [cmdline]
 
         # start backing out
         self.cmdline = cmdline
         self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
+        self.cmd.run(*commandlines)
 
     def commit(self):
         cmdline = ['commit', '--repository', self.repo.root]
         msg = self.msgTextEdit.text()
-        cmdline += ['--message', hglib.fromunicode(msg)]
+        cmdline += ['--message='+hglib.fromunicode(msg)]
         self.cmdline = cmdline
+        commandlines = [cmdline]
+        pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
+        if pushafter:
+            cmd = ['push', '--repository', self.repo.root, pushafter]
+            commandlines.append(cmd)
         self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
+        self.cmd.run(*commandlines)
 
     ### Signal Handlers ###
 
@@ -219,7 +230,7 @@ class BackoutDialog(QDialog):
                  self.backoutBtn.clicked.connect(self.commit)
                  self.checkResolve()
 
-            if finished:           
+            if finished:
                 if not self.cmd.outputShown():
                     self.accept()
                 else:
