@@ -189,7 +189,7 @@ class RepoWidget(QWidget):
 
         if 'pbranch' in self.repo.extensions():
             self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
-            self.pbranchTabIndex = tt.addTab(w, qtlib.geticon('branch'), '')
+            self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
             tt.setTabToolTip(idx, _("Patch Branch"))
             self.namedTabs['pbranch'] = idx
         else:
