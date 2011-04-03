@@ -280,7 +280,7 @@ class ArchiveDialog(QDialog):
         path = hglib.fromunicode(self.dest_edit.text())
         path = remove_ext(path)
         path = remove_rev(path)
-        path = add_rev(path, text)
+        path = add_rev(path, hglib.fromunicode(text))
         path = add_ext(path)
         self.dest_edit.setText(path)
         self.prevtarget = text
