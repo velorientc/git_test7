@@ -688,11 +688,17 @@ class CommitPage(BasePage):
         self.setSubTitle(_('Please wait while committing merged files.'))
 
         # merges must be committed without specifying file list
+        repo = self.wizard().repo
         message = hglib.fromunicode(self.msg_text.text())
         cmdline = ['commit', '--verbose', '--message', message,
-                   '--repository', self.wizard().repo.root]
+                   '--repository', repo.root]
+        commandlines = [cmdline]
+        pushafter = repo.ui.config('tortoisehg', 'cipushafter')
+        if pushafter:
+            cmd = ['push', '--repository', repo.root, pushafter]
+            commandlines.append(cmd)
         self.wizard().repo.incrementBusyCount()
-        self.cmd.run(cmdline)
+        self.cmd.run(*commandlines)
 
     def isComplete(self):
         if not self.nextEnabled:
