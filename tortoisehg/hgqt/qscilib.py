@@ -83,7 +83,7 @@ class _SciImSupport(object):
 
     def movepreeditcursor(self, pos):
         """Move the cursor to the relative pos inside preedit text"""
-        self._preeditcursorpos = pos
+        self._preeditcursorpos = min(pos, self._preeditlen)
         l, i = self._preeditpos
         self._sci.setCursorPosition(l, i + self._preeditcursorpos)
 
