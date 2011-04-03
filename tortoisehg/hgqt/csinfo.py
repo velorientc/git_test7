@@ -223,7 +223,7 @@ class SummaryInfo(object):
                 raise UnknownItem(item)
         if 'label' in custom and not kargs.get('usepreset', False):
             try:
-                return custom['label'](widget, item)
+                return custom['label'](widget, item, ctx)
             except UnknownItem:
                 pass
         try:
