@@ -200,7 +200,8 @@ class RepoWidget(QWidget):
         if self.bundle:
             return _('%s <incoming>') % self.repo.shortname
         elif self.branch:
-            return '%s [%s]' % (self.repo.shortname, self.branch)
+            return u'%s [%s]' % (self.repo.shortname,
+                                 hglib.tounicode(self.branch))
         else:
             return self.repo.shortname
 
@@ -1199,7 +1200,7 @@ class RepoWidget(QWidget):
         if not dir:
             return
         epath = os.path.join(hglib.fromunicode(dir),
-                             self.repo.shortname + '_%r.patch')
+                             hglib.fromunicode(self.repo.shortname)+'_%r.patch')
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
                    '--output', epath]
         for rev in revisions:
