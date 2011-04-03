@@ -156,16 +156,17 @@ class RepoWidget(QWidget):
         w.showMessage.connect(self.showMessage)
         w.updateToRevision.connect(lambda rev: self.updateToRevision())
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
+        self.namedTabs['log'] = idx
         tt.setTabToolTip(idx, _("Revision details"))
 
         self.commitDemand = w = DemandWidget('createCommitWidget', self)
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
+        self.namedTabs['commit'] = idx
         tt.setTabToolTip(idx, _("Commit"))
 
-        self.mqDemand = w = DemandWidget('createMQWidget', self)
-        idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
         if 'mq' in self.repo.extensions():
-            self.mqTabIndex = idx
+            self.mqDemand = w = DemandWidget('createMQWidget', self)
+            self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
             self.namedTabs['mq'] = idx
         else:
@@ -173,20 +174,22 @@ class RepoWidget(QWidget):
 
         self.syncDemand = w = DemandWidget('createSyncWidget', self)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
+        self.namedTabs['sync'] = idx
         tt.setTabToolTip(idx, _("Synchronize"))
 
         self.manifestDemand = w = DemandWidget('createManifestWidget', self)
         self.manifestTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-annotate'), '')
+        self.namedTabs['manifest'] = idx
         tt.setTabToolTip(idx, _('Manifest'))
 
         self.grepDemand = w = DemandWidget('createGrepWidget', self)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
+        self.namedTabs['grep'] = idx
         tt.setTabToolTip(idx, _("Search"))
 
-        self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
-        idx = tt.addTab(w, qtlib.geticon('branch'), '')
         if 'pbranch' in self.repo.extensions():
-            self.pbranchTabIndex = idx
+            self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
+            self.pbranchTabIndex = tt.addTab(w, qtlib.geticon('branch'), '')
             tt.setTabToolTip(idx, _("Patch Branch"))
             self.namedTabs['pbranch'] = idx
         else:

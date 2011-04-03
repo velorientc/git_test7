@@ -226,23 +226,20 @@ class Workbench(QMainWindow):
 
         self.actionGroupTaskView = QActionGroup(self)
         self.actionGroupTaskView.triggered.connect(self.onSwitchRepoTaskTab)
-        def addtaskview(icon, label, data=None):
-            if data is None:
-                data = len(self.actionGroupTaskView.actions())
-            a = newaction(label, icon=None, checkable=True, data=data,
+        def addtaskview(icon, label, name):
+            a = newaction(label, icon=None, checkable=True, data=name,
                           enabled='repoopen', menu='view')
             a.setIcon(qtlib.geticon(icon))
             self.actionGroupTaskView.addAction(a)
             self.tasktbar.addAction(a)
             return a
-        # NOTE: Sequence must match that in repowidget.py
-        addtaskview('hg-log', _("Revision &Details"))
-        addtaskview('hg-commit', _('&Commit'))
+        addtaskview('hg-log', _("Revision &Details"), 'log')
+        addtaskview('hg-commit', _('&Commit'), 'commit')
         self.actionSelectTaskMQ = \
                 addtaskview('thg-mq', _('Patch &Queue'), 'mq')
-        addtaskview('thg-sync', _('S&ynchronize'))
-        addtaskview('hg-annotate', _('&Manifest'))
-        addtaskview('hg-grep', _('&Search'))
+        addtaskview('thg-sync', _('S&ynchronize'), 'sync')
+        addtaskview('hg-annotate', _('&Manifest'), 'manifest')
+        addtaskview('hg-grep', _('&Search'), 'grep')
         self.actionSelectTaskPbranch = \
                 addtaskview('branch', _('&Patch Branch'), 'pbranch')
         newseparator(menu='view')
@@ -335,11 +332,7 @@ class Workbench(QMainWindow):
     @pyqtSlot(QAction)
     def onSwitchRepoTaskTab(self, action):
         rw = self.repoTabsWidget.currentWidget()
-        if not rw: return
-        index, wasint = action.data().toInt()
-        if wasint:
-            rw.taskTabsWidget.setCurrentIndex(index)
-        else:
+        if rw:
             rw.switchToNamedTaskTab(str(action.data().toString()))
 
     def openRepo(self, repopath, reuse=False):
@@ -430,7 +423,7 @@ class Workbench(QMainWindow):
         if w:
             self.filtertbaction.setChecked(w.filterBarVisible())
 
-    def updateTaskViewMenu(self, taskIndex=0):
+    def updateTaskViewMenu(self):
         'Update task tab menu for current repository'
         if self.repoTabsWidget.count() == 0:
             for a in self.actionGroupTaskView.actions():
@@ -443,12 +436,12 @@ class Workbench(QMainWindow):
             self.actionSelectTaskMQ.setVisible('mq' in exts)
             self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
             taskIndex = repoWidget.taskTabsWidget.currentIndex()
-            if taskIndex <= 4: # count of standard task tabs
-                self.actionGroupTaskView.actions()[taskIndex].setChecked(True)
-            elif taskIndex == repoWidget.namedTabs.get('mq', None):
-                self.actionSelectTaskMQ.setChecked(True)
-            elif taskIndex == repoWidget.namedTabs.get('pbranch', None):
-                self.actionSelectTaskPbranch.setChecked(True)
+            for name, idx in repoWidget.namedTabs.iteritems():
+                if idx == taskIndex:
+                    break
+            for action in self.actionGroupTaskView.actions():
+                if str(action.data().toString()) == name:
+                    action.setChecked(True)
 
     @pyqtSlot()
     def updateHistoryActions(self):
