@@ -34,9 +34,6 @@ class HgFileView(QFrame):
     revisionSelected = pyqtSignal(int)
     shelveToolExited = pyqtSignal()
 
-    searchRequested = pyqtSignal(unicode)
-    """Emitted (pattern) when user request to search content"""
-
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
@@ -432,15 +429,6 @@ class HgFileView(QFrame):
         x, y = self.sci.getCursorPosition()
         self.sci.setCursorPosition(x, y-1)
 
-    @pyqtSlot(unicode, object, int)
-    def editSelected(self, path, rev, line):
-        """Open editor to show the specified file"""
-        path = hglib.fromunicode(path)
-        base = visdiff.snapshot(self.repo, [path], self.repo[rev])[0]
-        files = [os.path.join(base, path)]
-        pattern = hglib.fromunicode(self._lastSearch[0])
-        qtlib.editfiles(self.repo, files, line, pattern, self)
-
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
         self.sci.find(exp, icase, wrap, forward)
@@ -531,29 +519,48 @@ class HgFileView(QFrame):
     def nDiffs(self):
         return len(self._diffs)
 
+    def editSelected(self, path, rev, line):
+        """Open editor to show the specified file"""
+        path = hglib.fromunicode(path)
+        base = visdiff.snapshot(self.repo, [path], self.repo[rev])[0]
+        files = [os.path.join(base, path)]
+        pattern = hglib.fromunicode(self._lastSearch[0])
+        qtlib.editfiles(self.repo, files, line, pattern, self)
+
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
         menu = self.sci.createStandardContextMenu()
         line = self.sci.lineAt(point)
         point = self.sci.mapToGlobal(point)
-        if line < 0 or self._mode != AnnMode:
+
+        selection = self.sci.selectedText()
+        def sreq(**opts):
+            return lambda: self.grepRequested.emit(selection, opts)
+        def sann():
+            self.searchbar.search(selection)
+            self.searchbar.show()
+
+        if self._mode != AnnMode:
+            if selection:
+                menu.addSeparator()
+                for name, func in [(_('Search in current file'), sann),
+                        (_('Search in history'), sreq(all=True))]:
+                    def add(name, func):
+                        action = menu.addAction(name)
+                        action.triggered.connect(func)
+                    add(name, func)
             return menu.exec_(point)
 
-        def setSource(path, rev, line):
-            self.revisionSelected.emit(rev)
-            self.setContext(self.repo[rev])
-            self.displayFile(path, None)
-            self.showLine(line)
+        if line < 0:
+            return menu.exec_(point)
 
         fctx, line = self.sci._links[line]
-        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
-
-        if self.sci.hasSelectedText():
-            selection = self.sci.selectedText()
+        if selection:
             def sreq(**opts):
                 return lambda: self.grepRequested.emit(selection, opts)
             def sann():
-                self.searchRequested.emit(selection)
+                self.searchbar.search(selection)
+                self.searchbar.show()
             menu.addSeparator()
             for name, func in [(_('Search in original revision'),
                                 sreq(rev=fctx.rev())),
@@ -565,6 +572,14 @@ class HgFileView(QFrame):
                     action = menu.addAction(name)
                     action.triggered.connect(func)
                 add(name, func)
+
+        def setSource(path, rev, line):
+            self.revisionSelected.emit(rev)
+            self.setContext(self.repo[rev])
+            self.displayFile(path, None)
+            self.showLine(line)
+
+        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
 
         def annorig():
             setSource(*data)
