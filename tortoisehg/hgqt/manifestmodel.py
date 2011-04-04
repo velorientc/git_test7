@@ -26,13 +26,13 @@ class ManifestModel(QAbstractItemModel):
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
-    def __init__(self, repo, rev, statusfilter='MAC', parent=None):
+    def __init__(self, repo, rev, statusfilter='MASC', parent=None):
         QAbstractItemModel.__init__(self, parent)
 
         self._repo = repo
         self._rev = rev
 
-        assert util.all(c in 'MARC' for c in statusfilter)
+        assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
 
     def data(self, index, role=Qt.DisplayRole):
@@ -79,7 +79,11 @@ class ManifestModel(QAbstractItemModel):
         if not index.isValid():
             return True  # root entry must be a directory
         e = index.internalPointer()
-        return len(e) != 0
+        if e.status == 'S':
+            # Consider subrepos as dirs as well
+            return True
+        else:
+            return len(e) != 0
 
     def mimeData(self, indexes):
         def preparefiles():
@@ -155,9 +159,9 @@ class ManifestModel(QAbstractItemModel):
 
     @pyqtSlot(str)
     def setStatusFilter(self, status):
-        """Filter file tree by change status 'MARC'"""
+        """Filter file tree by change status 'MARSC'"""
         status = str(status)
-        assert util.all(c in 'MARC' for c in status)
+        assert util.all(c in 'MARSC' for c in status)
         if self._statusfilter == status:
             return  # for performance reason
         self._statusfilter = status
@@ -181,6 +185,25 @@ class ManifestModel(QAbstractItemModel):
         roote = _Entry()
         ctx = self._repo[self._rev]
 
+        # Add subrepos to the tree
+        subpaths = ctx.substate.keys()
+        for path in subpaths:
+            if not 'S' in self._statusfilter:
+                break
+            e = roote
+            pathelements = hglib.tounicode(path).split('/')
+            for p in pathelements[:-1]:
+                if not p in e:
+                    e.addchild(p)
+                e = e[p]
+
+            p = pathelements[-1]
+            if not p in e:
+                e.addchild(p)
+            e = e[p]
+            e.setstatus('S')
+
+        # Add regular files to the tree
         status = dict(zip(('M', 'A', 'R'),
                           (set(a) for a in self._repo.status(ctx.parents()[0],
                                                              ctx)[:3])))
@@ -258,7 +281,7 @@ class _Entry(object):
         return self._status
 
     def setstatus(self, status):
-        assert status in 'MARC'
+        assert status in 'MARSC'
         self._status = status
 
     def __len__(self):

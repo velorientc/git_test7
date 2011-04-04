@@ -159,7 +159,7 @@ class ManifestWidget(QWidget):
 
     def _initactions(self):
         self._statusfilter = status.StatusFilterButton(
-          statustext='MAC', text=_('Status'))
+          statustext='MASC', text=_('Status'))
         self._toolbar.addWidget(self._statusfilter)
 
         self._actions = {}

@@ -782,7 +782,7 @@ class StatusFilterButton(QToolButton):
     statusChanged = pyqtSignal(str)
 
     def __init__(self, statustext, types=None, parent=None, **kwargs):
-        self._TYPES = 'MARC'
+        self._TYPES = 'MARSC'
         if types is not None:
             self._TYPES = types
         #if 'text' not in kwargs:
