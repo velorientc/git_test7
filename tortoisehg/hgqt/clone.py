@@ -39,6 +39,8 @@ class CloneDialog(QDialog):
         usrc = hglib.tounicode(src)
         ucwd = hglib.tounicode(cwd)
 
+        self.prev_dest = None
+
         # base layout box
         box = QVBoxLayout()
         box.setSpacing(6)
@@ -64,7 +66,6 @@ class CloneDialog(QDialog):
         self.dest_combo = QComboBox()
         self.dest_combo.setEditable(True)
         self.dest_combo.setMinimumWidth(310)
-        self.dest_combo.lineEdit().returnPressed.connect(self.clone)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
         self.dest_btn.clicked.connect(self.browse_dest)
@@ -306,6 +307,14 @@ class CloneDialog(QDialog):
         if dest:
             cmdline.append('--')
             cmdline.append(dest)
+
+        # do not make the same clone twice (see #514)
+        if dest == self.prev_dest:
+            qtlib.ErrorMsgBox(_('TortoiseHg Clone'),
+                  _('Please enter a new destination path.'))
+            self.dest_combo.setFocus()
+            return
+        self.prev_dest = dest
 
         # start cloning
         self.cmd.run(cmdline)
