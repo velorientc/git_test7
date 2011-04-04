@@ -100,9 +100,6 @@ class ManifestWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     """Emitted when to show revision summary as a hint"""
 
-    searchRequested = pyqtSignal(unicode)
-    """Emitted (pattern) when user request to search content"""
-
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
@@ -147,7 +144,7 @@ class ManifestWidget(QWidget):
         self._splitter.addWidget(self._fileview)
         self._splitter.setStretchFactor(1, 3)
         self._fileview.revisionSelected.connect(self.setRev)
-        for name in ('showMessage', 'searchRequested', 'grepRequested'):
+        for name in ('showMessage', 'grepRequested'):
             getattr(self._fileview, name).connect(getattr(self, name))
 
     def loadSettings(self, qs, prefix):
@@ -396,7 +393,6 @@ def connectsearchbar(manifestwidget, searchbar):
     """Connect searchbar to manifest widget"""
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
     searchbar.searchRequested.connect(manifestwidget.find)
-    manifestwidget.searchRequested.connect(searchbar.search)
 
 def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
     """Open editor to show the specified file [unicode]"""
