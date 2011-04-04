@@ -797,10 +797,11 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.showMessage(_('Sync tab cannot exit'))
             return False
-        if not self.mqDemand.forward('canExit', default=True):
-            self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
-            self.showMessage(_('MQ tab cannot exit'))
-            return False
+        if 'mq' in self.repo.extensions():
+            if not self.mqDemand.forward('canExit', default=True):
+                self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
+                self.showMessage(_('MQ tab cannot exit'))
+                return False
         if not self.grepDemand.forward('canExit', default=True):
             self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
             self.showMessage(_('Search tab cannot exit'))
