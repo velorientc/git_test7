@@ -370,6 +370,10 @@ class ChunksWidget(QWidget):
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
+        if empty:
+            self.currentFile = None
+            self.diffbrowse.clearDisplay()
+            self.diffbrowse.clearChunks()
         self.diffbrowse.updateSummary()
 
     def refresh(self):
