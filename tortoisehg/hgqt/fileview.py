@@ -233,7 +233,7 @@ class HgFileView(QFrame):
             self._mode = mode
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
-            self.blk.setVisible(mode == FileMode)
+            self.blk.setVisible(mode != DiffMode)
             self.sci.setAnnotationEnabled(mode == AnnMode)
             self.displayFile(self._filename, self._status)
 
@@ -264,7 +264,7 @@ class HgFileView(QFrame):
         if self._mode != mode:
             self.actionNextDiff.setEnabled(False)
             self.actionPrevDiff.setEnabled(False)
-            self.blk.setVisible(mode == FileMode)
+            self.blk.setVisible(mode != DiffMode)
             self.sci.setAnnotationEnabled(mode == AnnMode)
             self._mode = mode
 
@@ -361,7 +361,7 @@ class HgFileView(QFrame):
                 elif self._lostMode == AnnMode:
                     self.actionAnnMode.trigger()
                 self._lostMode = None
-                self.blk.setVisible(self._mode == FileMode)
+                self.blk.setVisible(self._mode != DiffMode)
                 self.sci.setAnnotationEnabled(self._mode == AnnMode)
 
         if self._mode == DiffMode:
@@ -383,8 +383,6 @@ class HgFileView(QFrame):
                     self.sci.setText(hglib.tounicode(fd.diff))
         elif fd.contents is None:
             return
-        elif self._mode == AnnMode:
-            self.sci.setSource(filename, self._ctx.rev())
         else:
             lexer = lexers.get_lexer(filename, fd.contents, self)
             self.sci.setLexer(lexer)
@@ -392,6 +390,10 @@ class HgFileView(QFrame):
                 self.setFont(qtlib.getfont('fontlog').font())
             self.sci.setText(fd.contents)
             self.sci._updatemarginwidth()
+            if self._mode == AnnMode:
+                self.sci.annfile = filename
+                self.sci._rev = self._ctx.rev()
+                self.sci._updateannotation()
 
         # Recover the last scroll position
         # Make sure that lastScrollPosition never exceeds the amount of
@@ -400,10 +402,10 @@ class HgFileView(QFrame):
         self.sci.verticalScrollBar().setValue(lastScrollPosition)
 
         self.highlightText(*self._lastSearch)
-        uf = hglib.tounicode(self._filename)
+        uf = hglib.tounicode(filename)
         self.fileDisplayed.emit(uf, fd.contents or QString())
 
-        if self._mode == FileMode and fd.contents and fd.olddata:
+        if self._mode != DiffMode and fd.contents and fd.olddata:
             # Update blk margin
             if self.timer.isActive():
                 self.timer.stop()
