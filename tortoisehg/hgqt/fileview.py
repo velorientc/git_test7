@@ -88,11 +88,10 @@ class HgFileView(QFrame):
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
 
-        for name in ('searchRequested', 'editSelected', 'grepRequested'):
-            getattr(self.sci, name).connect(getattr(self, name))
-        self.sci.revisionHint.connect(self.showMessage)
-        self.sci.sourceChanged.connect(self.sourceChanged)
+        self.sci.showMessage.connect(self.showMessage)
         self.sci.setAnnotationEnabled(False)
+        self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.sci.customContextMenuRequested.connect(self.menuRequest)
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
@@ -391,9 +390,7 @@ class HgFileView(QFrame):
             self.sci.setText(fd.contents)
             self.sci._updatemarginwidth()
             if self._mode == AnnMode:
-                self.sci.annfile = filename
-                self.sci._rev = self._ctx.rev()
-                self.sci._updateannotation()
+                self.sci._updateannotation(self._ctx, filename)
 
         # Recover the last scroll position
         # Make sure that lastScrollPosition never exceeds the amount of
@@ -434,12 +431,6 @@ class HgFileView(QFrame):
     def prevCol(self):
         x, y = self.sci.getCursorPosition()
         self.sci.setCursorPosition(x, y-1)
-
-    @pyqtSlot(unicode, object)
-    @pyqtSlot(unicode, object, int)
-    def sourceChanged(self, path, rev, line=None):
-        if rev != self._ctx.rev() and type(rev) is int:
-            self.revisionSelected.emit(rev)
 
     @pyqtSlot(unicode, object, int)
     def editSelected(self, path, rev, line):
@@ -540,46 +531,95 @@ class HgFileView(QFrame):
     def nDiffs(self):
         return len(self._diffs)
 
+    @pyqtSlot(QPoint)
+    def menuRequest(self, point):
+        menu = self.sci.createStandardContextMenu()
+        line = self.sci.lineAt(point)
+        point = self.sci.mapToGlobal(point)
+        if line < 0 or self._mode != AnnMode:
+            return menu.exec_(point)
+
+        def setSource(path, rev, line):
+            self.revisionSelected.emit(rev)
+            self.setContext(self.repo[rev])
+            self.displayFile(path, None)
+            self.showLine(line)
+
+        fctx, line = self.sci._links[line]
+        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
+
+        if self.sci.hasSelectedText():
+            selection = self.sci.selectedText()
+            def sreq(**opts):
+                return lambda: self.grepRequested.emit(selection, opts)
+            def sann():
+                self.searchRequested.emit(selection)
+            menu.addSeparator()
+            for name, func in [(_('Search in original revision'),
+                                sreq(rev=fctx.rev())),
+                               (_('Search in working revision'),
+                                sreq(rev='.')),
+                               (_('Search in current annotation'), sann),
+                               (_('Search in history'), sreq(all=True))]:
+                def add(name, func):
+                    action = menu.addAction(name)
+                    action.triggered.connect(func)
+                add(name, func)
+
+        def annorig():
+            setSource(*data)
+        def editorig():
+            self.editSelected(*data)
+        menu.addSeparator()
+        for name, func in [(_('Annotate originating revision'), annorig),
+                           (_('View originating revision'), editorig)]:
+            def add(name, func):
+                action = menu.addAction(name)
+                action.triggered.connect(func)
+            add(name, func)
+        for pfctx in fctx.parents():
+            pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
+                     line]
+            def annparent(data):
+                setSource(*data)
+            def editparent(data):
+                self.editSelected(*data)
+            for name, func in [(_('Annotate parent revision %d') % pdata[1],
+                                  annparent),
+                               (_('View parent revision %d') % pdata[1],
+                                  editparent)]:
+                def add(name, func):
+                    action = menu.addAction(name)
+                    action.data = pdata
+                    action.run = lambda: func(action.data)
+                    action.triggered.connect(action.run)
+                add(name, func)
+        menu.exec_(point)
+
 
 class AnnotateView(qscilib.Scintilla):
     'QScintilla widget capable of displaying annotations'
 
-    revisionHint = pyqtSignal(QString)
+    showMessage = pyqtSignal(QString)
 
-    searchRequested = pyqtSignal(QString)
-    """Emitted (pattern) when user request to search content"""
-
-    editSelected = pyqtSignal(unicode, object, int)
-    """Emitted (path, rev, line) when user requests to open editor"""
-
-    grepRequested = pyqtSignal(QString, dict)
-    """Emitted (pattern, **opts) when user request to search changelog"""
-
-    sourceChanged = pyqtSignal(unicode, object)
-    """Emitted (path, rev) when the content source changed"""
-
-    def __init__(self, repo, parent=None, **opts):
+    def __init__(self, repo, parent=None):
         super(AnnotateView, self).__init__(parent)
         self.setReadOnly(True)
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, qsci.TextMarginRightJustified)
-        self.setMouseTracking(True)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.menuRequest)
+        self.setMouseTracking(False)
 
-        self.repo = repo
-        self.repo.configChanged.connect(self.configChanged)
-        self.configChanged()
-        self._rev = None
-        self.annfile = None
-        self._annotation_enabled = bool(opts.get('annotationEnabled', False))
-
+        self._annotation_enabled = False
         self._links = []  # by line
         self._revmarkers = {}  # by rev
         self._lastrev = None
 
         self._thread = AnnotateThread(self)
         self._thread.finished.connect(self.fillModel)
+
+        self.repo = repo
+        self.repo.configChanged.connect(self.configChanged)
+        self.configChanged()
 
     def configChanged(self):
         self.setIndentationWidth(self.repo.tabwidth)
@@ -603,132 +643,18 @@ class AnnotateView(qscilib.Scintilla):
             if fctx.rev() != self._lastrev:
                 s = hglib.get_revision_desc(fctx,
                                             hglib.fromunicode(self.annfile))
-                self.revisionHint.emit(s)
+                self.showMessage.emit(s)
                 self._lastrev = fctx.rev()
         except IndexError:
             pass
 
-    @pyqtSlot(QPoint)
-    def menuRequest(self, point):
-        menu = self.createStandardContextMenu()
-        line = self.lineAt(point)
-        point = self.mapToGlobal(point)
-        if line < 0 or not self.isAnnotationEnabled():
-            return menu.exec_(point)
-
-        fctx, line = self._links[line]
-        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
-
-        if self.hasSelectedText():
-            selection = self.selectedText()
-            def sreq(**opts):
-                return lambda: self.grepRequested.emit(selection, opts)
-            def sann():
-                self.searchRequested.emit(selection)
-            menu.addSeparator()
-            for name, func in [(_('Search in original revision'),
-                                sreq(rev=fctx.rev())),
-                               (_('Search in working revision'),
-                                sreq(rev='.')),
-                               (_('Search in current annotation'), sann),
-                               (_('Search in history'), sreq(all=True))]:
-                def add(name, func):
-                    action = menu.addAction(name)
-                    action.triggered.connect(func)
-                add(name, func)
-
-        def annorig():
-            self.setSource(*data)
-        def editorig():
-            self.editSelected.emit(*data)
-        menu.addSeparator()
-        for name, func in [(_('Annotate originating revision'), annorig),
-                           (_('View originating revision'), editorig)]:
-            def add(name, func):
-                action = menu.addAction(name)
-                action.triggered.connect(func)
-            add(name, func)
-        for pfctx in fctx.parents():
-            pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
-                     line]
-            def annparent(data):
-                self.setSource(*data)
-            def editparent(data):
-                self.editSelected.emit(*data)
-            for name, func in [(_('Annotate parent revision %d') % pdata[1],
-                                  annparent),
-                               (_('View parent revision %d') % pdata[1],
-                                  editparent)]:
-                def add(name, func):
-                    action = menu.addAction(name)
-                    action.data = pdata
-                    action.run = lambda: func(action.data)
-                    action.triggered.connect(action.run)
-                add(name, func)
-        menu.exec_(point)
-
-    @property
-    def rev(self):
-        """Returns the current revision number"""
-        return self._rev
-
-    @pyqtSlot(unicode, object, int)
-    def setSource(self, wfile, rev, line=None):
-        """Change the content to the specified file at rev [unicode]
-
-        line is counted from 1.
-        """
-        if self.annfile == wfile and self.rev == rev:
-            if line:
-                self.setCursorPosition(int(line) - 1, 0)
-            return
-
-        try:
-            ctx = self.repo[rev]
-            fctx = ctx[hglib.fromunicode(wfile)]
-        except error.LookupError:
-            qtlib.ErrorMsgBox(_('Unable to annotate'),
-                    _('%s is not found in revision %d') % (wfile, ctx.rev()))
-            return
-
-        try:
-            if rev is None:
-                size = fctx.size()
-            else:
-                size = fctx._filelog.rawsize(fctx.filerev())
-        except (EnvironmentError, error.LookupError), e:
-            self.setText(_('File or diffs not displayed: ') + \
-                    hglib.tounicode(str(e)))
-            self.error = p + hglib.tounicode(str(e))
-            return
-
-        if size > ctx._repo.maxdiff:
-            self.setText(_('File or diffs not displayed: ') + \
-                    _('File is larger than the specified max size.\n'))
-        else:
-            self._rev = ctx.rev()
-            self.clear()
-            self.annfile = wfile
-            if util.binary(fctx.data()):
-                self.setText(_('File is binary.\n'))
-            else:
-                self.setText(hglib.tounicode(fctx.data()))
-            if line:
-                self.setCursorPosition(int(line) - 1, 0)
-            self._updatelexer(fctx)
-            self._updatemarginwidth()
-            self.sourceChanged.emit(wfile, self._rev)
-            self._updateannotation()
-
-    def _updateannotation(self):
-        if not self.isAnnotationEnabled() or not self.annfile:
-            return
-        ctx = self.repo[self._rev]
-        fctx = ctx[hglib.fromunicode(self.annfile)]
-        if util.binary(fctx.data()):
-            return
+    def _updateannotation(self, ctx, filename):
+        assert ctx.rev() is not None
+        assert filename in ctx
+        self.ctx = ctx
+        self.annfile = filename
         self._thread.abort()
-        self._thread.start(fctx)
+        self._thread.start(ctx[filename])
 
     @pyqtSlot()
     def fillModel(self):
@@ -746,34 +672,18 @@ class AnnotateView(qscilib.Scintilla):
         super(AnnotateView, self).clear()
         self.clearMarginText()
         self.markerDeleteAll()
-        self.annfile = None
 
-    @pyqtSlot(bool)
     def setAnnotationEnabled(self, enabled):
         """Enable / disable annotation"""
-        enabled = bool(enabled)
-        if enabled == self.isAnnotationEnabled():
-            return
         self._annotation_enabled = enabled
-        self._updateannotation()
         self._updatemarginwidth()
         self.setMouseTracking(enabled)
-        if not self.isAnnotationEnabled():
-            self.annfile = None
+        if not enabled:
             self.markerDeleteAll()
 
     def isAnnotationEnabled(self):
         """True if annotation enabled and available"""
-        if self.rev is None:
-            return False  # annotate working copy is not supported
         return self._annotation_enabled
-
-    def _updatelexer(self, fctx):
-        """Update the lexer according to the given file"""
-        lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()), self)
-        self.setLexer(lex)
-        if lex is None:
-            self.setFont(qtlib.getfont('fontlog').font())
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""
@@ -800,7 +710,7 @@ class AnnotateView(qscilib.Scintilla):
 
     def _redefinemarkers(self):
         """Redefine line markers according to the current revs"""
-        curdate = self.repo[self._rev].date()[0]
+        curdate = self.ctx.date()[0]
 
         # make sure to colorize at least 1 year
         mindate = curdate - 365 * 24 * 60 * 60
