@@ -415,12 +415,21 @@ class WctxFileTree(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
         self.setTextElideMode(Qt.ElideLeft)
+        self.doubleClicked.connect(self.onDoubleClick)
 
     def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
         # don't update horizontal position by selection change
         orighoriz = self.horizontalScrollBar().value()
         super(WctxFileTree, self).scrollTo(index, hint)
         self.horizontalScrollBar().setValue(orighoriz)
+
+    def onDoubleClick(self, index):
+        if not index.isValid():
+            return
+        path = self.model().getRow(index)[COL_PATH]
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [path], {})
+        if dlg:
+            dlg.exec_()
 
     def keyPressEvent(self, event):
         if event.key() == 32:
