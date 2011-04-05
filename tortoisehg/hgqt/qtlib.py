@@ -138,8 +138,12 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
 
     cmdline = util.quotecommand(cmdline)
     try:
+        try:
+            cwd = os.path.dirname(files[0])
+        except:
+            cwd = repo.root
         subprocess.Popen(cmdline, shell=True, creationflags=openflags,
-                         stderr=None, stdout=None, stdin=None, cwd=repo.root)
+                         stderr=None, stdout=None, stdin=None, cwd=cwd)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
