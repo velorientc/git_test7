@@ -360,7 +360,7 @@ class RevDetailsWidget(QWidget):
                 _("Cannot open subrepository"),
                 _("The selected subrepository does not exist on the working directory"))
 
-    @pyqtSlot(QModelIndex)
+    #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         model = self.filelist.model()
         itemissubrepo = (model.dataFromIndex(index)['status'] == 'S')
