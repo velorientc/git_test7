@@ -250,7 +250,6 @@ class RevDetailsWidget(QWidget):
             self._actions[name] = act
             self.addAction(act)
 
-
     def onRevisionSelected(self, rev):
         'called by repowidget when repoview changes revisions'
         self.ctx = ctx = self.repo.changectx(rev)
