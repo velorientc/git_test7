@@ -65,6 +65,9 @@ class HgFileListView(QTableView):
         if model._ctx is not None:
             self.contextChanged(model._ctx)
 
+    def setRepo(self, repo):
+        self.model().repo = repo
+
     def contextChanged(self, ctx):
         real = type(ctx.rev()) is int
         wd = ctx.rev() is None
