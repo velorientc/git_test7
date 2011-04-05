@@ -138,6 +138,7 @@ class ManifestWidget(QWidget):
         self._treeview = QTreeView(self, headerHidden=True, dragEnabled=True)
         self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
         self._treeview.customContextMenuRequested.connect(self.menuRequest)
+        self._treeview.doubleClicked.connect(self.onDoubleClick)
         navlayout.addWidget(self._toolbar)
         navlayout.addWidget(self._treeview)
         navlayoutw = QWidget()
@@ -263,6 +264,23 @@ class ManifestWidget(QWidget):
         dlg.show()
         dlg.raise_()
         dlg.activateWindow()
+
+    def opensubrepo(self):
+        path = os.path.join(self._repo.root, self.path)
+        if os.path.isdir(path):
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+        else:
+            QMessageBox.warning(self,
+                _("Cannot open subrepository"),
+                _("The selected subrepository does not exist on the working directory"))
+
+    #@pyqtSlot(QModelIndex)
+    def onDoubleClick(self, index):
+        itemissubrepo = self.path in self._repo[self._rev].substate.keys()
+        if itemissubrepo:
+            self.opensubrepo()
+        else:
+            self.vdiff()
 
     def menuRequest(self, point):
         point = self.mapToGlobal(point)
