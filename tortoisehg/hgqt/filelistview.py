@@ -18,8 +18,7 @@ import os
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, visdiff, revert
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
+from tortoisehg.hgqt import qtlib, visdiff
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -30,10 +29,8 @@ class HgFileListView(QTableView):
     """
 
     fileSelected = pyqtSignal(QString, QString)
-    clearDisplay = pyqtSignal()
     linkActivated = pyqtSignal(QString)
-    filecontextmenu = None
-    subrepocontextmenu = None
+    clearDisplay = pyqtSignal()
 
     def __init__(self, repo, parent):
         QTableView.__init__(self, parent)
@@ -46,32 +43,17 @@ class HgFileListView(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setTextElideMode(Qt.ElideLeft)
 
-        self.createActions()
-
-        self.doubleClicked.connect(self.doubleClickHandler)
-        self._diff_dialogs = {}
-        self._nav_dialogs = {}
-
     def setModel(self, model):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
-        self.actionShowAllMerge.setChecked(False)
-        self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
 
     def setRepo(self, repo):
         self.repo = repo
 
     def setContext(self, ctx):
         self.ctx = ctx
-        real = type(ctx.rev()) is int
-        wd = ctx.rev() is None
-        for act in ['navigate', 'diffnavigate', 'ldiff', 'edit']:
-            self._actions[act].setEnabled(real)
-        for act in ['diff', 'revert']:
-            self._actions[act].setEnabled(real or wd)
-        self.actionShowAllMerge.setEnabled(len(ctx.parents()) == 2)
         self.model().setContext(ctx)
 
     def currentFile(self):
@@ -115,164 +97,6 @@ class HgFileListView(QTableView):
         elif self.model().count():
             self.selectRow(0)
 
-    def fileActivated(self, index, alternate=False):
-        selFile = self.model().fileFromIndex(index)
-        if not self._actions['navigate'].isEnabled():
-            return
-        if alternate:
-            self.navigate(selFile)
-        else:
-            self.diffNavigate(selFile)
-
-    def navigate(self, filename=None):
-        self._navigate(filename, FileLogDialog, self._nav_dialogs)
-
-    def diffNavigate(self, filename=None):
-        self._navigate(filename, FileDiffDialog, self._diff_dialogs)
-
-    def vdiff(self):
-        filename = self.currentFile()
-        if filename is None:
-            return
-        pats = [filename]
-        opts = {'change':self.ctx.rev()}
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
-        if dlg:
-            dlg.exec_()
-
-    def vdifflocal(self):
-        filename = self.currentFile()
-        if filename is None:
-            return
-        pats = [filename]
-        assert type(self.ctx.rev()) is int
-        opts = {'rev':['rev(%d)' % (self.ctx.rev())]}
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
-        if dlg:
-            dlg.exec_()
-
-    def editfile(self):
-        filename = self.currentFile()
-        if filename is None:
-            return
-        rev = self.ctx.rev()
-        if rev is None:
-            qtlib.editfiles(self.repo, [filename], parent=self)
-        else:
-            base, _ = visdiff.snapshot(self.repo, [filename], self.ctx)
-            files = [os.path.join(base, filename)]
-            qtlib.editfiles(self.repo, files, parent=self)
-
-    def editlocal(self):
-        filename = self.currentFile()
-        if filename is None:
-            return
-        qtlib.editfiles(self.repo, [filename], parent=self)
-
-    def revertfile(self):
-        filename = self.currentFile()
-        if filename is None:
-            return
-        rev = self.ctx.rev()
-        if rev is None:
-            rev = self.ctx.p1().rev()
-        dlg = revert.RevertDialog(self.repo, filename, rev, self)
-        dlg.exec_()
-
-    def _navigate(self, filename, dlgclass, dlgdict):
-        if not filename:
-            filename = self.currentFile()
-        if filename is not None and len(self.repo.file(filename))>0:
-            if filename not in dlgdict:
-                dlg = dlgclass(self.repo, filename,
-                               repoviewer=self.window())
-                dlgdict[filename] = dlg
-                ufname = hglib.tounicode(filename)
-                dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
-                dlg.setWindowIcon(qtlib.geticon('hg-log'))
-            dlg = dlgdict[filename]
-            dlg.goto(model._ctx.rev())
-            dlg.show()
-            dlg.raise_()
-            dlg.activateWindow()
-
-    def opensubrepo(self):
-        path = os.path.join(self.repo.root, self.currentFile())
-        if os.path.isdir(path):
-            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
-        else:
-            QMessageBox.warning(self,
-                _("Cannot open subrepository"),
-                _("The selected subrepository does not exist on the working directory"))
-
-    def doubleClickHandler(self):
-        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
-        if itemissubrepo:
-            self.opensubrepo()
-        else:
-            self.vdiff()
-
-    def createActions(self):
-        self.actionShowAllMerge = QAction(_('Show All'), self)
-        self.actionShowAllMerge.setToolTip(
-            _('Toggle display of all files and the direction they were merged'))
-        self.actionShowAllMerge.setCheckable(True)
-        self.actionShowAllMerge.setChecked(False)
-
-        self._actions = {}
-        for name, desc, icon, key, tip, cb in [
-            ('navigate', _('File history'), 'hg-log', 'Shift+Return',
-              _('Show the history of the selected file'), self.navigate),
-            ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
-              _('Compare revisions of the selected file'), self.diffNavigate),
-            ('diff', _('Visual Diff'), 'visualdiff', 'Ctrl+D',
-              _('View file changes in external diff tool'), self.vdiff),
-            ('ldiff', _('Visual Diff to Local'), 'ldiff', 'Shift+Ctrl+D',
-              _('View changes to current in external diff tool'),
-              self.vdifflocal),
-            ('edit', _('View at Revision'), 'view-at-revision', 'Alt+Ctrl+E',
-              _('View file as it appeared at this revision'), self.editfile),
-            ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
-              _('Edit current file in working copy'), self.editlocal),
-            ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
-              _('Revert file(s) to contents at this revision'),
-              self.revertfile),
-            ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
-              'Alt+Ctrl+O', _('Open the selected subrepository'),
-              self.opensubrepo),
-            ]:
-            act = QAction(desc, self)
-            if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
-            if key:
-                act.setShortcut(key)
-            if tip:
-                act.setStatusTip(tip)
-            if cb:
-                act.triggered.connect(cb)
-            self._actions[name] = act
-            self.addAction(act)
-
-    def contextMenuEvent(self, event):
-        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
-
-        # Subrepos and regular items have different context menus
-        if itemissubrepo:
-            contextmenu = self.subrepocontextmenu
-            actionlist = ['opensubrepo']
-        else:
-            contextmenu = self.filecontextmenu
-            actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
-                        'navigate', 'diffnavigate']
-        if not contextmenu:
-            contextmenu = QMenu(self)
-            for act in actionlist:
-                if act:
-                    contextmenu.addAction(self._actions[act])
-                else:
-                    contextmenu.addSeparator()
-        contextmenu.exec_(event.globalPos())
-
     def resizeEvent(self, event):
         if self.model() is not None:
             vp_width = self.viewport().width()
@@ -291,18 +115,17 @@ class HgFileListView(QTableView):
         return self.selectionModel().selectedRows()
 
     def dragObject(self):
-        ctx = self.ctx
-        if type(ctx.rev()) == str:
+        if type(self.ctx.rev()) == str:
             return
         paths = []
         for index in self.selectedRows():
             paths.append(self.model().fileFromIndex(index))
         if not paths:
             return
-        if ctx.rev() is None:
+        if self.ctx.rev() is None:
             base = self.repo.root
         else:
-            base, _ = visdiff.snapshot(self.repo, paths, ctx)
+            base, _ = visdiff.snapshot(self.repo, paths, self.ctx)
         urls = []
         for path in paths:
             urls.append(QUrl.fromLocalFile(os.path.join(base, path)))
