@@ -149,7 +149,7 @@ class RepoWidget(QWidget):
         tt.setDocumentMode(True)
         self.updateTaskTabs()
 
-        self.revDetailsWidget = w = RevDetailsWidget(self.repo)
+        self.revDetailsWidget = w = RevDetailsWidget(self.repo, self)
         w.linkActivated.connect(self._openLink)
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)

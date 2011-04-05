@@ -25,8 +25,8 @@ class RevDetailsWidget(QWidget):
     revisionSelected = pyqtSignal(int)
     updateToRevision = pyqtSignal(int)
 
-    def __init__(self, repo):
-        QWidget.__init__(self)
+    def __init__(self, repo, parent):
+        QWidget.__init__(self, parent)
 
         self.repo = repo
         self.splitternames = []
