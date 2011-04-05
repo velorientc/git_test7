@@ -383,6 +383,7 @@ class RevDetailsWidget(QWidget):
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
                         'navigate', 'diffnavigate']
+
         if not contextmenu:
             contextmenu = QMenu(self)
             for act in actionlist:
@@ -390,7 +391,14 @@ class RevDetailsWidget(QWidget):
                     contextmenu.addAction(self._actions[act])
                 else:
                     contextmenu.addSeparator()
-        contextmenu.exec_(self.filelist.mapToGlobal(point))
+
+            if itemissubrepo:
+                self.subrepocontextmenu = contextmenu
+            else:
+                self.filecontextmenu = contextmenu
+
+        if actionlist:
+            contextmenu.exec_(self.filelist.mapToGlobal(point))
 
     def saveSettings(self, s):
         wb = "RevDetailsWidget/"
