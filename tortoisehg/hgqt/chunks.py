@@ -450,8 +450,6 @@ class ChunksWidget(QWidget):
             self.repo.thginvalidate()
             ctx = self.repo.changectx(ctx.node())
         self.setContext(ctx)
-        if self.currentFile:
-            self.filelist.selectFile(self.currentFile)
 
     def loadSettings(self, qs, prefix):
         self.diffbrowse.loadSettings(qs, prefix)

@@ -86,17 +86,6 @@ class HgFileListView(QTableView):
         else:
             self.clearDisplay.emit()
 
-    def selectFile(self, filename):
-        'Select given file, if found, else the first file'
-        index = self.model().indexFromFile(filename)
-        if index:
-            if index != self.currentIndex():
-                self.setCurrentIndex(index)
-            else:
-                self.onRowChange(index)
-        elif self.model().count():
-            self.selectRow(0)
-
     def resizeEvent(self, event):
         if self.model() is not None:
             vp_width = self.viewport().width()

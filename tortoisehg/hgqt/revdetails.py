@@ -277,9 +277,7 @@ class RevDetailsWidget(QWidget):
         rev = self.ctx.rev()
         if type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev():
             rev = 'tip'
-        f = self.filelist.currentFile()
         self.onRevisionSelected(rev)
-        self.filelist.selectFile(f)
 
     def navigate(self, filename=None):
         self._navigate(filename, FileLogDialog, self._nav_dialogs)
