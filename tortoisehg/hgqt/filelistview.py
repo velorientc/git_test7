@@ -35,8 +35,9 @@ class HgFileListView(QTableView):
     filecontextmenu = None
     subrepocontextmenu = None
 
-    def __init__(self, parent=None):
+    def __init__(self, repo, parent):
         QTableView.__init__(self, parent)
+        self.repo = repo
         self.setShowGrid(False)
         self.horizontalHeader().hide()
         self.verticalHeader().hide()
@@ -54,18 +55,16 @@ class HgFileListView(QTableView):
     def setModel(self, model):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
-        model.contextChanged.connect(self.contextChanged)
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
         self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.toggled.connect(model.toggleFullFileList)
-        if model._ctx is not None:
-            self.contextChanged(model._ctx)
 
     def setRepo(self, repo):
-        self.model().repo = repo
+        self.repo = repo
 
-    def contextChanged(self, ctx):
+    def setContext(self, ctx):
+        self.ctx = ctx
         real = type(ctx.rev()) is int
         wd = ctx.rev() is None
         for act in ['navigate', 'diffnavigate', 'ldiff', 'edit']:
@@ -73,6 +72,7 @@ class HgFileListView(QTableView):
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
         self.actionShowAllMerge.setEnabled(len(ctx.parents()) == 2)
+        self.model().setContext(ctx)
 
     def currentFile(self):
         index = self.currentIndex()
@@ -134,10 +134,9 @@ class HgFileListView(QTableView):
         filename = self.currentFile()
         if filename is None:
             return
-        model = self.model()
         pats = [filename]
-        opts = {'change':model._ctx.rev()}
-        dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
+        opts = {'change':self.ctx.rev()}
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
         if dlg:
             dlg.exec_()
 
@@ -145,11 +144,10 @@ class HgFileListView(QTableView):
         filename = self.currentFile()
         if filename is None:
             return
-        model = self.model()
         pats = [filename]
-        assert type(model._ctx.rev()) is int
-        opts = {'rev':['rev(%d)' % (model._ctx.rev())]}
-        dlg = visdiff.visualdiff(model.repo.ui, model.repo, pats, opts)
+        assert type(self.ctx.rev()) is int
+        opts = {'rev':['rev(%d)' % (self.ctx.rev())]}
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, pats, opts)
         if dlg:
             dlg.exec_()
 
@@ -157,43 +155,36 @@ class HgFileListView(QTableView):
         filename = self.currentFile()
         if filename is None:
             return
-        model = self.model()
-        repo = model.repo
-        rev = model._ctx.rev()
+        rev = self.ctx.rev()
         if rev is None:
-            qtlib.editfiles(repo, [filename], parent=self)
+            qtlib.editfiles(self.repo, [filename], parent=self)
         else:
-            base, _ = visdiff.snapshot(repo, [filename], repo[rev])
+            base, _ = visdiff.snapshot(self.repo, [filename], self.ctx)
             files = [os.path.join(base, filename)]
-            qtlib.editfiles(repo, files, parent=self)
+            qtlib.editfiles(self.repo, files, parent=self)
 
     def editlocal(self):
         filename = self.currentFile()
         if filename is None:
             return
-        model = self.model()
-        repo = model.repo
-        qtlib.editfiles(repo, [filename], parent=self)
+        qtlib.editfiles(self.repo, [filename], parent=self)
 
     def revertfile(self):
         filename = self.currentFile()
         if filename is None:
             return
-        model = self.model()
-        repo = model.repo
-        rev = model._ctx.rev()
+        rev = self.ctx.rev()
         if rev is None:
-            rev = model._ctx.p1().rev()
-        dlg = revert.RevertDialog(repo, filename, rev, self)
+            rev = self.ctx.p1().rev()
+        dlg = revert.RevertDialog(self.repo, filename, rev, self)
         dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
             filename = self.currentFile()
-        model = self.model()
-        if filename is not None and len(model.repo.file(filename))>0:
+        if filename is not None and len(self.repo.file(filename))>0:
             if filename not in dlgdict:
-                dlg = dlgclass(model.repo, filename,
+                dlg = dlgclass(self.repo, filename,
                                repoviewer=self.window())
                 dlgdict[filename] = dlg
                 ufname = hglib.tounicode(filename)
@@ -206,21 +197,21 @@ class HgFileListView(QTableView):
             dlg.activateWindow()
 
     def opensubrepo(self):
-        path = os.path.join(self.model().repo.root, self.currentFile())
+        path = os.path.join(self.repo.root, self.currentFile())
         if os.path.isdir(path):
             self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
         else:
             QMessageBox.warning(self,
                 _("Cannot open subrepository"),
                 _("The selected subrepository does not exist on the working directory"))
-    
+
     def doubleClickHandler(self):
         itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
         if itemissubrepo:
             self.opensubrepo()
         else:
             self.vdiff()
-        
+
     def createActions(self):
         self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setToolTip(
@@ -246,7 +237,7 @@ class HgFileListView(QTableView):
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
-            ('opensubrepo', _('Open subrepository'), 'thg-repository-open', 
+            ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
               'Alt+Ctrl+O', _('Open the selected subrepository'),
               self.opensubrepo),
             ]:
@@ -261,7 +252,7 @@ class HgFileListView(QTableView):
                 act.triggered.connect(cb)
             self._actions[name] = act
             self.addAction(act)
-    
+
     def contextMenuEvent(self, event):
         itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
 
@@ -300,7 +291,7 @@ class HgFileListView(QTableView):
         return self.selectionModel().selectedRows()
 
     def dragObject(self):
-        ctx = self.model()._ctx
+        ctx = self.ctx
         if type(ctx.rev()) == str:
             return
         paths = []
@@ -309,9 +300,9 @@ class HgFileListView(QTableView):
         if not paths:
             return
         if ctx.rev() is None:
-            base = ctx._repo.root
+            base = self.repo.root
         else:
-            base, _ = visdiff.snapshot(ctx._repo, paths, ctx)
+            base, _ = visdiff.snapshot(self.repo, paths, ctx)
         urls = []
         for path in paths:
             urls.append(QUrl.fromLocalFile(os.path.join(base, path)))

@@ -53,8 +53,8 @@ class ChunksWidget(QWidget):
         self.splitter.setChildrenCollapsible(False)
         self.layout().addWidget(self.splitter)
 
-        self.filelist = filelistview.HgFileListView(self)
-        self.filelistmodel = filelistmodel.HgFileListModel(self.repo, self)
+        self.filelist = filelistview.HgFileListView(repo, self)
+        self.filelistmodel = filelistmodel.HgFileListModel(self)
         self.filelist.setModel(self.filelistmodel)
 
         self.fileListFrame = QFrame(self.splitter)
@@ -80,9 +80,9 @@ class ChunksWidget(QWidget):
 
     def timerEvent(self, event):
         'Periodic poll of currently displayed patch or working file'
-        if not hasattr(self, 'filelistmodel'):
+        if not hasattr(self, 'filelist'):
             return
-        ctx = self.filelistmodel._ctx
+        ctx = self.filelist.ctx
         if ctx is None:
             return
         if isinstance(ctx, patchctx):
@@ -142,7 +142,7 @@ class ChunksWidget(QWidget):
         return ok
 
     def editCurrentFile(self):
-        ctx = self.filelistmodel._ctx
+        ctx = self.filelist.ctx
         if isinstance(ctx, patchctx):
             path = ctx._path
         else:
@@ -170,7 +170,7 @@ class ChunksWidget(QWidget):
         if not kchunks and qtlib.QuestionMsgBox(_('No chunks remain'),
                                                 _('Remove all file changes?')):
             revertall = True
-        ctx = self.filelistmodel._ctx
+        ctx = self.filelist.ctx
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
@@ -234,7 +234,7 @@ class ChunksWidget(QWidget):
                     return True
             return False
         repo = self.repo
-        ctx = self.filelistmodel._ctx
+        ctx = self.filelist.ctx
         if isinstance(ctx, patchctx):
             if wfile in ctx._files:
                 patchchunks = ctx._files[wfile]
@@ -295,11 +295,11 @@ class ChunksWidget(QWidget):
             return False
 
     def getFileList(self):
-        return self.filelistmodel._ctx.files()
+        return self.filelist.ctx.files()
 
     def removeFile(self, wfile):
         repo = self.repo
-        ctx = self.filelistmodel._ctx
+        ctx = self.filelist.ctx
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
@@ -326,7 +326,7 @@ class ChunksWidget(QWidget):
 
     def getChunksForFile(self, wfile):
         repo = self.repo
-        ctx = self.filelistmodel._ctx
+        ctx = self.filelist.ctx
         if isinstance(ctx, patchctx):
             if wfile in ctx._files:
                 return ctx._files[wfile]
@@ -369,7 +369,7 @@ class ChunksWidget(QWidget):
 
     def setContext(self, ctx):
         self.diffbrowse.setContext(ctx)
-        self.filelistmodel.setContext(ctx)
+        self.filelist.setContext(ctx)
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
@@ -380,7 +380,7 @@ class ChunksWidget(QWidget):
         self.diffbrowse.updateSummary()
 
     def refresh(self):
-        ctx = self.filelistmodel._ctx
+        ctx = self.filelist.ctx
         if isinstance(ctx, patchctx):
             # if patch mtime has not changed, it could return the same ctx
             ctx = self.repo.changectx(ctx._path)

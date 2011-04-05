@@ -27,15 +27,8 @@ class HgFileListModel(QAbstractTableModel):
     """
     Model used for listing (modified) files of a given Hg revision
     """
-
-    contextChanged = pyqtSignal(object)
-
-    def __init__(self, repo, parent):
-        """
-        data is a HgHLRepo instance
-        """
+    def __init__(self, parent):
         QAbstractTableModel.__init__(self, parent)
-        self.repo = repo
         self._boldfont = parent.font()
         self._boldfont.setBold(True)
         self._ctx = None
@@ -62,7 +55,6 @@ class HgFileListModel(QAbstractTableModel):
         return self._files[row]['path']
 
     def setContext(self, ctx):
-        self.contextChanged.emit(ctx)
         reload = False
         if not self._ctx:
             reload = True

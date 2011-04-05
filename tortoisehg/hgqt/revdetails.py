@@ -89,7 +89,7 @@ class RevDetailsWidget(QWidget):
 
         self.filelistToolbar = QToolBar(_('File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
-        self.filelist = HgFileListView()
+        self.filelist = HgFileListView(self.repo, self)
         self.filelist.linkActivated.connect(self.linkActivated)
 
         self.tbarFileListFrame = QFrame(self.filelist_splitter)
@@ -175,6 +175,10 @@ class RevDetailsWidget(QWidget):
     def forwardFont(self, font):
         self.message.setFont(font)
 
+    def setupModels(self):
+        self.filelistmodel = HgFileListModel(self)
+        self.filelist.setModel(self.filelistmodel)
+
     def createActions(self):
         def fileActivated():
             idx = self.filelist.currentIndex()
@@ -207,13 +211,6 @@ class RevDetailsWidget(QWidget):
         self.actionPrevCol.triggered.connect(self.fileview.prevCol)
         self.addAction(self.actionPrevCol)
 
-    def create_models(self):
-        self.filelistmodel = HgFileListModel(self.repo, self)
-
-    def setupModels(self):
-        self.create_models()
-        self.filelist.setModel(self.filelistmodel)
-
     def onRevisionSelected(self, rev):
         'called by repowidget when repoview changes revisions'
         self._last_rev = rev
@@ -223,7 +220,7 @@ class RevDetailsWidget(QWidget):
         self.message.setHtml('<pre>%s</pre>'
                              % self._deschtmlize(ctx.description()))
         self.fileview.setContext(ctx)
-        self.filelistmodel.setContext(ctx)
+        self.filelist.setContext(ctx)
 
     @pyqtSlot()
     def _updatedeschtmlizer(self):
